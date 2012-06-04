@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAK3//2qU\u003d",
+        "filename": "common/build.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000187
+      },
+      "writtenOn": "2012-06-04T22:38:08Z",
+      "side": 1,
+      "message": "common-$(CONFIG_TASK_WATCHDOG)",
+      "revId": "8b35589ef25883c454b364dd5b5ac58343879993",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    }
+  ]
+}
