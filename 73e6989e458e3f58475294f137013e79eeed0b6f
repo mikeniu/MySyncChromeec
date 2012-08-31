@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAPn//25s\u003d",
+        "filename": "board/snow/board.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2012-08-31T19:28:50Z",
+      "side": 1,
+      "message": "your loop code is equivalent to do :\nudelay(HARD_RESET_TIMEOUT_MS * 1000) \nisn\u0027t it ?\n\neither you want to usleep here (but you don\u0027t want) or remove the loop",
+      "revId": "73e6989e458e3f58475294f137013e79eeed0b6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    }
+  ]
+}
