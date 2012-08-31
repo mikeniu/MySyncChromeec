@@ -16,6 +16,24 @@
       "revId": "73e6989e458e3f58475294f137013e79eeed0b6f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAPn//25k\u003d",
+        "filename": "board/snow/board.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1001923
+      },
+      "writtenOn": "2012-08-31T19:38:58Z",
+      "side": 1,
+      "message": "oh darn, you\u0027re absolutely right.  I was in this silly mindset from something I was doing shortly ago where I was polling in between.  Fixed",
+      "parentUuid": "AAAAPn//25s\u003d",
+      "revId": "73e6989e458e3f58475294f137013e79eeed0b6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
