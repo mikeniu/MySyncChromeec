@@ -16,6 +16,24 @@
       "revId": "3400e5df201ddf1d69acb86075fe334c26579a2b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAPn//21s\u003d",
+        "filename": "board/snow/board.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1001923
+      },
+      "writtenOn": "2012-08-31T20:32:54Z",
+      "side": 1,
+      "message": "Yep, this only gets called in a couple places, and if it returns it will just try and boot like normal.  Obviously, this will likely fail if we\u0027re trying to reset the pmic, but it seems better to not just hang and hit the watchdog.  This way at least there is some more debugging information.",
+      "parentUuid": "AAAAPn//22U\u003d",
+      "revId": "3400e5df201ddf1d69acb86075fe334c26579a2b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
