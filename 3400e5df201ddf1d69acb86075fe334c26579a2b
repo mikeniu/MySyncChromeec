@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAPn//22U\u003d",
+        "filename": "board/snow/board.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1000294
+      },
+      "writtenOn": "2012-08-31T20:16:34Z",
+      "side": 1,
+      "message": "Is it ok to continue execution here? Do all callers cope with it?",
+      "revId": "3400e5df201ddf1d69acb86075fe334c26579a2b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    }
+  ]
+}
