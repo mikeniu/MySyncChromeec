@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 The Chromium OS Authors. All rights reserved.
+/* Copyright (c) 2013 The Chromium OS Authors. All rights reserved.
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
@@ -34,6 +34,25 @@
  */
 #define RTC_FREQ 40000 /* Hz */
 #define US_PER_RTC_TICK (1000000 / RTC_FREQ)
+
+#if (CPU_CLOCK == 16000000)
+/*
+ * Stay on HSI (8MHz), no prescaler, PLLSRC = HSI/2, PLLMUL = x4
+ * no MCO                      => PLLCLK = 16 Mhz
+ */
+#define RCC_CFGR 0x00080000
+
+#elif (CPU_CLOCK == 48000000)
+/*
+ * HSI = 8MHz, no prescaler, no MCO
+ * PLLSRC = HSI/2, PLLMUL = x12 => PLLCLK = 48MHz
+ * USB clock = PLLCLK
+ */
+#define RCC_CFGR 0x00680000
+
+#else
+#error "Unsupported CPU_CLOCK."
+#endif
 
 /* On-going actions preventing to go into deep-sleep mode */
 static uint32_t sleep_mask;
@@ -123,25 +142,6 @@ static void __rtc_alarm_irq(void)
 }
 DECLARE_IRQ(STM32_IRQ_RTC_ALARM, __rtc_alarm_irq, 1);
 
-#if defined(BOARD_daisy) || defined(BOARD_snow) || defined(BOARD_spring)
-/*
- * stays on HSI (8MHz), no prescaler, PLLSRC = HSI/2, PLLMUL = x4
- * no MCO                      => PLLCLK = 16 Mhz
- */
-#define DESIRED_CPU_CLOCK 16000000
-#define RCC_CFGR 0x00080000
-#elif defined(BOARD_mccroskey)
-/*
- * HSI = 8MHz, no prescaler, no MCO
- * PLLSRC = HSI/2, PLLMUL = x12 => PLLCLK = 48MHz
- * USB clock = PLLCLK
- */
-#define DESIRED_CPU_CLOCK 48000000
-#define RCC_CFGR 0x00680000
-#else
-#error "Need board-specific clock settings"
-#endif
-
 static void config_hispeed_clock(void)
 {
 	/* Ensure that HSI is ON */
@@ -153,7 +153,6 @@ static void config_hispeed_clock(void)
 			;
 	}
 
-	BUILD_ASSERT(CPU_CLOCK == DESIRED_CPU_CLOCK);
 	STM32_RCC_CFGR = RCC_CFGR;
 	/* Enable the PLL */
 	STM32_RCC_CR |= 1 << 24;
