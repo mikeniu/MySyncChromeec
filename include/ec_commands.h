@@ -1140,7 +1140,7 @@ struct ec_response_gpio_get {
 #define EC_CMD_I2C_READ 0x94
 
 struct ec_params_i2c_read {
-	uint16_t addr;
+	uint16_t addr; /* 8-bit address (7-bit shifted << 1) */
 	uint8_t read_size; /* Either 8 or 16. */
 	uint8_t port;
 	uint8_t offset;
@@ -1154,7 +1154,7 @@ struct ec_response_i2c_read {
 
 struct ec_params_i2c_write {
 	uint16_t data;
-	uint16_t addr;
+	uint16_t addr; /* 8-bit address (7-bit shifted << 1) */
 	uint8_t write_size; /* Either 8 or 16. */
 	uint8_t port;
 	uint8_t offset;
@@ -1252,6 +1252,33 @@ struct ec_response_power_info {
 	uint16_t current_system;
 	uint16_t usb_current_limit;
 } __packed;
+
+/*****************************************************************************/
+/* I2C passthru command */
+
+#define EC_CMD_I2C_PASSTHRU 0x9e
+
+#define EC_I2C_FLAG_10BIT (1 << 10)	/* Slave address is 10 (not 7) bit */
+
+#define EC_I2C_STATUS_ERROR     (1 << 0) /* Error (present for all errors) */
+#define EC_I2C_STATUS_TIMEOUT   (1 << 1) /* Timeout during transfer */
+#define EC_I2C_STATUS_NAK_ADDR  (1 << 2) /* Address didn't get ACK'd */
+#define EC_I2C_STATUS_NAK_WRITE (1 << 3) /* Data write failed */
+#define EC_I2C_STATUS_NAK_READ  (1 << 4) /* Data read failed */
+
+struct ec_params_i2c_passthru {
+	uint8_t port;		/* Port number */
+	uint16_t addr_flags;	/* Slave address and flags (EC_I2C_FLAG_*) */
+	uint8_t write_len;	/* Number of bytes to write */
+	uint8_t read_len;	/* Number of bytes to read */
+} __packed;
+/* Followed by write_len bytes of data */
+
+struct ec_response_i2c_passthru {
+	uint8_t status;		/* Status flags (EC_I2C_STATUS_*) */
+	uint8_t read_len;	/* Number of bytes actually read */
+} __packed;
+/* Followed by read_len bytes of data */
 
 /*****************************************************************************/
 /* Temporary debug commands. TODO: remove this crosbug.com/p/13849 */

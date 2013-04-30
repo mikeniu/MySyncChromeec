@@ -123,8 +123,10 @@ static int i2c_command_read(struct host_cmd_handler_args *args)
 	struct ec_response_i2c_read *r = args->response;
 	int data, rv = -1;
 
+#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED
 	if (system_is_locked())
 		return EC_RES_ACCESS_DENIED;
+#endif
 
 	if  (p->read_size == 16)
 		rv = i2c_read16(p->port, p->addr, p->offset, &data);
@@ -145,8 +147,10 @@ static int i2c_command_write(struct host_cmd_handler_args *args)
 	const struct ec_params_i2c_write *p = args->params;
 	int rv = -1;
 
+#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED
 	if (system_is_locked())
 		return EC_RES_ACCESS_DENIED;
+#endif
 
 	if (p->write_size == 16)
 		rv = i2c_write16(p->port, p->addr, p->offset, p->data);
@@ -159,6 +163,56 @@ static int i2c_command_write(struct host_cmd_handler_args *args)
 	return EC_RES_SUCCESS;
 }
 DECLARE_HOST_COMMAND(EC_CMD_I2C_WRITE, i2c_command_write, EC_VER_MASK(0));
+
+static int i2c_command_passthru(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_i2c_passthru *p = args->params;
+	struct ec_response_i2c_passthru *r = args->response;
+	int rv;
+
+#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED
+	if (system_is_locked())
+		return EC_RES_ACCESS_DENIED;
+#endif
+
+	/* Check input parameters */
+	if (p->port >= I2C_PORT_COUNT ||
+	    sizeof(*p) + p->write_len > args->params_size ||
+	    sizeof(*r) + p->read_len > args->response_max)
+		return EC_RES_INVALID_PARAM;
+
+	/* 10-bit addressing not supported yet */
+	if (p->addr_flags & EC_I2C_FLAG_10BIT)
+		return EC_RES_INVALID_PARAM;
+
+	/* Clear response */
+	memset(r, 0, sizeof(*r));
+
+	/* Do transfer, converting address from 7-bit to 8-bit */
+	rv = i2c_xfer(p->port, (p->addr_flags & 0x7f) << 1,
+		      (const uint8_t *)(p + 1), p->write_len,
+		      (uint8_t *)(r + 1), p->read_len, I2C_XFER_SINGLE);
+
+	if (rv) {
+		r->status |= EC_I2C_STATUS_ERROR;
+		args->response_size = sizeof(*r);
+	} else {
+		r->read_len = p->read_len;
+		args->response_size = sizeof(*r) + r->read_len;
+	}
+
+	/* Add flags for specific errors */
+	/* TODO: support NAK flags */
+	if (rv == EC_ERROR_TIMEOUT)
+		r->status |= EC_I2C_STATUS_TIMEOUT;
+
+	/*
+	 * Return success even if transfer failed so response is sent.  Host
+	 * will check r->status to determine the transfer result.
+	 */
+	return EC_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_I2C_PASSTHRU, i2c_command_passthru, EC_VER_MASK(0));
 
 /*****************************************************************************/
 /* Console commands */
