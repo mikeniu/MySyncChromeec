@@ -36,6 +36,8 @@
 /* External Charger maximum current. */
 #define   CONFIG_CHARGER_INPUT_CURRENT 5000
 #define CONFIG_PWM_FAN
+#define CONFIG_PWM_FAN_RPM_MIN 1000
+#define CONFIG_PWM_FAN_RPM_MAX 5050
 #define CONFIG_PWM_KBLIGHT
 #define CONFIG_TEMP_SENSOR
 #define CONFIG_UART_HOST 2
@@ -160,6 +162,9 @@ enum gpio_signal {
 	/* Number of GPIOs; not an actual GPIO */
 	GPIO_COUNT
 };
+
+/* Which of those GPIOs is used for the fan power rail? */
+#define CONFIG_PWM_FAN_POWER_GPIO   GPIO_PP5000_PGOOD
 
 /* x86 signal definitions */
 enum x86_signal {

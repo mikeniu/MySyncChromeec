@@ -16,7 +16,6 @@
 #include "peci.h"
 #include "task.h"
 #include "temp_sensor.h"
-#include "thermal.h"
 #include "timer.h"
 #include "tmp006.h"
 #include "util.h"

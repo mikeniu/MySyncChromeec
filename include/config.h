@@ -456,9 +456,25 @@
  */
 #undef CONFIG_PSTORE
 
+/*****************************************************************************/
 /* Compile support for PWM control of cooling fans */
 #undef CONFIG_PWM_FAN
 
+/* Fan speeds corresponding to 1% and 100% cooling (0% == off). */
+#undef CONFIG_PWM_FAN_RPM_MIN
+#undef CONFIG_PWM_FAN_RPM_MAX
+
+/* Alternately, define this to implement a board-specific mapping of
+ * cooling percentage to fan RPM.
+ */
+#undef CONFIG_PWM_FAN_RPM_CUSTOM
+
+/* If you define this, the "faninfo" console command will read the GPIO to
+ * display the state of the fan's power rail.
+ */
+#undef CONFIG_PWM_FAN_POWER_GPIO
+
+/*****************************************************************************/
 /* Compile support for PWM output to keyboard backlight */
 #undef CONFIG_PWM_KBLIGHT
 

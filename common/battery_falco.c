@@ -36,8 +36,8 @@ const struct battery_info *battery_get_info(void)
 	return &info;
 }
 
-/* FIXME: The smart battery should do the right thing - that's why it's
- * called "smart". Do we really want to second-guess it? For now, let's not. */
+/* The smart battery should do the right thing - that's why it's called
+ * "smart". Do we really want to second-guess it? For now, let's not. */
 void battery_vendor_params(struct batt_params *batt)
 {
 }
