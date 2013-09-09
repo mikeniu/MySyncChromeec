@@ -39,6 +39,7 @@ common-$(CONFIG_PMU_TPS65090)+=pmu_tps65090.o
 common-$(CONFIG_EOPTION)+=eoption.o
 common-$(CONFIG_EXTPOWER_FALCO)+=extpower_falco.o
 common-$(CONFIG_EXTPOWER_GPIO)+=extpower_gpio.o
+common-$(CONFIG_EXTPOWER_LEON)+=extpower_leon.o
 common-$(CONFIG_EXTPOWER_USB)+=extpower_usb.o
 common-$(CONFIG_FLASH)+=flash_common.o
 common-$(CONFIG_FMAP)+=fmap.o
