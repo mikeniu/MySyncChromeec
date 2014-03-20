@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9c21e133_c865f729",
+        "filename": "include/charge_state.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000187
+      },
+      "writtenOn": "2014-03-20T17:15:42Z",
+      "side": 1,
+      "message": "Do we need to worry about the case where neither V1 nor V2 are defined?",
+      "revId": "72a0841a090f93b9e9cc183a15b1a91e68546b4a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    }
+  ]
+}
