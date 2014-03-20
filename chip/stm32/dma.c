@@ -241,7 +241,7 @@ void dma_clear_isr(enum dma_channel channel)
 	dma->ifcr |= STM32_DMA_ISR_ALL(channel);
 }
 
-#ifndef CHIP_FAMILY_STM32F0
+#if !defined(CHIP_FAMILY_STM32F0) && !defined(CHIP_FAMILY_STM32L0)
 void dma_event_interrupt_channel_4(void)
 {
 	dma_clear_isr(STM32_DMAC_CH4);

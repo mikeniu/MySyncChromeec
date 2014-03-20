@@ -48,7 +48,22 @@
 #define STM32_TIM_TS_SLAVE_15_MASTER_3  1
 #define STM32_TIM_TS_SLAVE_15_MASTER_16 2
 #define STM32_TIM_TS_SLAVE_15_MASTER_17 3
-#else /* !CHIP_FAMILY_STM32F0 */
+#elif defined(CHIP_FAMILY_STM32L0)
+/*
+ * Slave      Master
+ *     2    21    22
+ *    21     2    22
+ *    22    21     2
+ *    --------------------
+ *    ts =  0     1
+ */
+#define STM32_TIM_TS_SLAVE_2_MASTER_21  0
+#define STM32_TIM_TS_SLAVE_2_MASTER_22  1
+#define STM32_TIM_TS_SLAVE_21_MASTER_2  0
+#define STM32_TIM_TS_SLAVE_21_MASTER_22 1
+#define STM32_TIM_TS_SLAVE_22_MASTER_21 0
+#define STM32_TIM_TS_SLAVE_22_MASTER_2  1
+#elif defined(CHIP_FAMILY_STM32F) || defined(CHIP_FAMILY_STM32L)
 /*
  * Slave        Master
  *     1    15  2  3  4  (STM32F100 only)

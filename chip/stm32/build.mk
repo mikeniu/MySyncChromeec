@@ -6,8 +6,8 @@
 # STM32 chip specific files build
 #
 
-ifeq ($(CHIP_FAMILY),stm32f0)
-# STM32F0xx sub-family has a Cortex-M0 ARM core
+ifneq (,$(filter $(CHIP_FAMILY),stm32f0 stm32l0))
+# STM32F0xx and STM32L0xx sub-family has a Cortex-M0 ARM core
 CORE:=cortex-m0
 # Force ARMv6-M ISA used by the Cortex-M0
 CFLAGS_CPU+=-march=armv6-m -mcpu=cortex-m0
@@ -18,8 +18,9 @@ CORE:=cortex-m
 CFLAGS_CPU+=-march=armv7-m -mcpu=cortex-m3
 endif
 
-# STM32F0xx and STM32F1xx are using the same flash controller
-FLASH_FAMILY=$(subst stm32f0,stm32f,$(CHIP_FAMILY))
+# STM32F0xx and STM32F1xx are using the same flash controller.
+# So are STM32L0xx and STM32L1xx.
+FLASH_FAMILY=$(patsubst stm32%0,stm32%,$(CHIP_FAMILY))
 # STM32F0xx chips will re-use STM32L I2C code
 I2C_FAMILY=$(subst stm32f0,stm32l,$(CHIP_FAMILY))
 # Select between 16-bit and 32-bit timer for clock source
