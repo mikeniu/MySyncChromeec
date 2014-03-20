@@ -16,6 +16,24 @@
       "revId": "72a0841a090f93b9e9cc183a15b1a91e68546b4a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc29fd1f_f40c589d",
+        "filename": "include/charge_state.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2014-03-20T17:17:05Z",
+      "side": 1,
+      "message": "Nope. In fact, there are some tests where that\u0027s required - just the headers without any implementation.",
+      "parentUuid": "9c21e133_c865f729",
+      "revId": "72a0841a090f93b9e9cc183a15b1a91e68546b4a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
