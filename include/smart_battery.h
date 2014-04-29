@@ -238,5 +238,8 @@ int battery_time_at_rate(int rate, int *minutes);
 /* Read manufacturer date */
 int battery_manufacturer_date(int *year, int *month, int *day);
 
+/* Wait for battery stable when first boot-up */
+int battery_wait_for_stable(void);
+
 #endif /* __CROS_EC_SMART_BATTERY_H */
 
