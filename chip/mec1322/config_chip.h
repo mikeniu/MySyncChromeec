@@ -91,7 +91,6 @@
 #define CONFIG_FPU
 #define CONFIG_SPI
 #define CONFIG_DMA
-
 #undef CONFIG_FLASH
 
 #endif  /* __CROS_EC_CONFIG_CHIP_H */
