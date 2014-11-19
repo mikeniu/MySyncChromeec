@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-#include "charge_state.h"
+#include "charge_manager.h"
 #include "common.h"
 #include "console.h"
 #include "gpio.h"
@@ -40,8 +40,9 @@ const int pd_snk_pdo_cnt = ARRAY_SIZE(pd_snk_pdo);
 /* Cap on the max voltage requested as a sink (in millivolts) */
 static unsigned max_mv = -1; /* no cap */
 
-int pd_choose_voltage(int cnt, uint32_t *src_caps, uint32_t *rdo,
-		      uint32_t *curr_limit, uint32_t *supply_voltage)
+int pd_choose_voltage_common(int cnt, uint32_t *src_caps, uint32_t *rdo,
+			     uint32_t *curr_limit, uint32_t *supply_voltage,
+			     int choose_min)
 {
 	int i;
 	int sel_mv;
@@ -66,6 +67,12 @@ int pd_choose_voltage(int cnt, uint32_t *src_caps, uint32_t *rdo,
 			max_uw = uw;
 			sel_mv = mv;
 		}
+		/*
+		 * Choose the first entry if seaching for minimum, which will
+		 * always be vSafe5V.
+		 */
+		if (choose_min)
+			break;
 	}
 	if (max_i < 0)
 		return -EC_ERROR_UNKNOWN;
@@ -81,7 +88,12 @@ int pd_choose_voltage(int cnt, uint32_t *src_caps, uint32_t *rdo,
 			max_i, sel_mv/1000, max);
 	} else {
 		int ma = 10 * (src_caps[max_i] & 0x3FF);
-		max = MIN(ma, MAX_CURRENT_MA);
+		/*
+		 * If we're choosing the minimum charge mode, limit our current
+		 * to what we can set with ilim PWM (500mA)
+		 */
+		max = MIN(ma, choose_min ? CONFIG_CHARGER_INPUT_CURRENT :
+					   MAX_CURRENT_MA);
 		flags = (max * sel_mv) < (1000 * OPERATING_POWER_MW) ?
 				RDO_CAP_MISMATCH : 0;
 		max_ma = max;
@@ -99,13 +111,36 @@ int pd_choose_voltage(int cnt, uint32_t *src_caps, uint32_t *rdo,
 	return EC_SUCCESS;
 }
 
+int pd_choose_voltage_min(int cnt, uint32_t *src_caps, uint32_t *rdo,
+			  uint32_t *curr_limit, uint32_t *supply_voltage)
+{
+	return pd_choose_voltage_common(cnt, src_caps, rdo, curr_limit,
+					supply_voltage, 1);
+}
+
+int pd_choose_voltage(int cnt, uint32_t *src_caps, uint32_t *rdo,
+		      uint32_t *curr_limit, uint32_t *supply_voltage)
+{
+	return pd_choose_voltage_common(cnt, src_caps, rdo, curr_limit,
+					supply_voltage, 0);
+}
+
 void pd_set_input_current_limit(int port, uint32_t max_ma,
 				uint32_t supply_voltage)
 {
-	int rv = charge_set_input_current_limit(MAX(max_ma,
-					CONFIG_CHARGER_INPUT_CURRENT));
-	if (rv < 0)
-		CPRINTS("Failed to set input current limit for PD");
+	struct charge_port_info charge;
+	charge.current = max_ma;
+	charge.voltage = supply_voltage;
+	charge_manager_update(CHARGE_SUPPLIER_PD, port, &charge);
+}
+
+void typec_set_input_current_limit(int port, uint32_t max_ma,
+				   uint32_t supply_voltage)
+{
+	struct charge_port_info charge;
+	charge.current = max_ma;
+	charge.voltage = supply_voltage;
+	charge_manager_update(CHARGE_SUPPLIER_TYPEC, port, &charge);
 }
 
 void pd_set_max_voltage(unsigned mv)

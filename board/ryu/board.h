@@ -19,6 +19,7 @@
 #define CC_DEFAULT     (CC_ALL & ~CC_MASK(CC_USBPD))
 
 /* Optional features */
+#define CONFIG_CHARGE_MANAGER
 #define CONFIG_FORCE_CONSOLE_RESUME
 #define CONFIG_STM_HWTIMER32
 #define CONFIG_USB_POWER_DELIVERY
@@ -132,6 +133,21 @@ enum adc_channel {
 	ADC_CH_COUNT
 };
 
+/* Charge suppliers */
+enum charge_supplier {
+	CHARGE_SUPPLIER_PD,
+	CHARGE_SUPPLIER_TYPEC,
+	CHARGE_SUPPLIER_BC12_DCP,
+	CHARGE_SUPPLIER_BC12_CDP,
+	CHARGE_SUPPLIER_BC12_SDP,
+	CHARGE_SUPPLIER_PROPRIETARY,
+	CHARGE_SUPPLIER_OTHER,
+	CHARGE_SUPPLIER_COUNT
+};
+
+/* supplier_priority table defined in board.c */
+extern const int supplier_priority[];
+
 /* USB string indexes */
 enum usb_strings {
 	USB_STR_DESC = 0,
@@ -145,6 +161,12 @@ enum usb_strings {
 
 /* Discharge battery when on AC power for factory test. */
 int board_discharge_on_ac(int enable);
+
+/* Set the active charge port. */
+void board_set_active_charge_port(int charge_port);
+
+/* Set the charge current limit. */
+void board_set_charge_limit(int charge_ma);
 
 #endif /* !__ASSEMBLER__ */
 
