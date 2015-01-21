@@ -412,6 +412,8 @@ DECLARE_CONSOLE_COMMAND(pe, command_pe,
 
 int pd_svdm(int port, int cnt, uint32_t *payload, uint32_t **rpayload)
 {
+	static int busy_cnt;
+
 	int cmd = PD_VDO_CMD(payload[0]);
 	int cmd_type = PD_VDO_CMDT(payload[0]);
 	int (*func)(int port, uint32_t *payload) = NULL;
@@ -457,10 +459,18 @@ int pd_svdm(int port, int cnt, uint32_t *payload, uint32_t **rpayload)
 			CPRINTF("ERR:CMD:%d\n", cmd);
 			rsize = 0;
 		}
-		if (func)
-			rsize = func(port, payload);
-		else /* not supported : NACK it */
-			rsize = 0;
+
+		busy_cnt++;
+		if (busy_cnt < 20) {
+			rsize = -1;
+		} else {
+
+			if (func)
+				rsize = func(port, payload);
+			else /* not supported : NACK it */
+				rsize = 0;
+		}
+
 		if (rsize >= 1)
 			payload[0] |= VDO_CMDT(CMDT_RSP_ACK);
 		else if (!rsize) {
