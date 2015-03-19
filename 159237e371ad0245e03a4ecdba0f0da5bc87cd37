@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2620002d_19282b7c",
+        "filename": "include/common.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1000187
+      },
+      "writtenOn": "2015-03-19T19:52:58Z",
+      "side": 1,
+      "message": "Just make EC_ERROR_NOT_PRESENT code 22.\n\nThese have explicit values to hint that they shouldn\u0027t be changed, because they can cross boundaries between an immediate runtime and other processors or bug reports.",
+      "range": {
+        "startLine": 93,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 27
+      },
+      "revId": "159237e371ad0245e03a4ecdba0f0da5bc87cd37",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    }
+  ]
+}
