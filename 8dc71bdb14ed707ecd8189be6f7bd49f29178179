@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "83a19e60_85cf682d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1001696
+      },
+      "writtenOn": "2015-03-26T18:56:16Z",
+      "side": 1,
+      "message": "Left align here.",
+      "revId": "8dc71bdb14ed707ecd8189be6f7bd49f29178179",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "83a19e60_45d960f7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1001696
+      },
+      "writtenOn": "2015-03-26T18:56:16Z",
+      "side": 1,
+      "message": "Need BRANCH tag I think? Did you skip the presubmit check?",
+      "revId": "8dc71bdb14ed707ecd8189be6f7bd49f29178179",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    }
+  ]
+}
