@@ -16,6 +16,24 @@
       "revId": "8d6dec76911e1e464ca8af26495e2525de195e48",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f090620b_bc371811",
+        "filename": "board/sumo/board.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1126244
+      },
+      "writtenOn": "2015-04-16T11:21:42Z",
+      "side": 1,
+      "message": "As we referred to Rambi design, the design didn\u0027t support the function. The GPIO pins are not used in Rambi design.\nThe HW changes have been verified by Max Chang.",
+      "parentUuid": "108ed6ef_55e906ac",
+      "revId": "8d6dec76911e1e464ca8af26495e2525de195e48",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
