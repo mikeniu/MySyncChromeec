@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "108ed6ef_55e906ac",
+        "filename": "board/sumo/board.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1002584
+      },
+      "writtenOn": "2015-04-16T08:16:26Z",
+      "side": 1,
+      "message": "how/why did you choose these gpios? have these hardware changes been verified by anyone at Google?",
+      "revId": "8d6dec76911e1e464ca8af26495e2525de195e48",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    }
+  ]
+}
