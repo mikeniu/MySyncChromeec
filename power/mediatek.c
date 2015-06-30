@@ -649,7 +649,8 @@ enum power_state power_handle_state(enum power_state state)
 			CPRINTS("power off %d", value);
 			power_off();
 			return POWER_S0S3;
-		} else if (power_get_signals() & IN_SUSPEND) {
+		} else if (power_get_signals() & IN_SUSPEND ||
+			   !(power_get_signals() & IN_POWER_GOOD)) {
 			return POWER_S0S3;
 		}
 		return state;
