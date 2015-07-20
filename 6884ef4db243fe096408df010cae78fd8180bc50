@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0d0ec228_d7c3fc7b",
+        "filename": "include/config.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 837,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2015-07-20T21:56:05Z",
+      "side": 1,
+      "message": "CONFIG_HOSTCMD_SPI_SLAVE ?",
+      "range": {
+        "startLine": 837,
+        "startChar": 7,
+        "endLine": 837,
+        "endChar": 25
+      },
+      "revId": "6884ef4db243fe096408df010cae78fd8180bc50",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f8568eec_92051a4f",
+        "filename": "include/config.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1326,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2015-07-20T21:56:05Z",
+      "side": 1,
+      "message": "Can we change these to CONFIG_SPI_MASTER and CONFIG_SPI_SLAVE, for readability? It\u0027s not obvious what SPS is, unless you\u0027re familiar with chip/g",
+      "range": {
+        "startLine": 1322,
+        "startChar": 1,
+        "endLine": 1326,
+        "endChar": 17
+      },
+      "revId": "6884ef4db243fe096408df010cae78fd8180bc50",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "383666c8_ec5123dd",
+        "filename": "include/console.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2015-07-20T21:56:05Z",
+      "side": 1,
+      "message": "CC_SPI_MASTER and CC_SPI_SLAVE ?",
+      "range": {
+        "startLine": 51,
+        "startChar": 1,
+        "endLine": 52,
+        "endChar": 8
+      },
+      "revId": "6884ef4db243fe096408df010cae78fd8180bc50",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    }
+  ]
+}
