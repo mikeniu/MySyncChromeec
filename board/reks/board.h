@@ -74,6 +74,9 @@
 /* Number of buttons */
 #define CONFIG_BUTTON_COUNT		2
 
+#undef DEFERRABLE_MAX_COUNT
+#define DEFERRABLE_MAX_COUNT	9
+
 /* Modules we want to exclude */
 #undef CONFIG_EEPROM
 #undef CONFIG_EOPTION
