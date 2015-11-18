@@ -458,6 +458,21 @@ static void siglog_add(enum gpio_signal signal)
 
 void power_signal_interrupt(enum gpio_signal signal)
 {
+#ifdef CONFIG_POWER_SIGNAL_INTERRUPT_STORM_DETECT
+	static int interrupt_count[POWER_SIGNAL_COUNT];
+	int i;
+
+	/* Tally our interrupts and print a warning once we hit 300. */
+	for (i = 0; i < POWER_SIGNAL_COUNT; ++i) {
+		if (power_signal_list[i].gpio == signal) {
+			interrupt_count[i]++;
+			if (interrupt_count[i] % 300 == 0)
+				CPRINTS("Interrupt storm? Signal %d\n", i);
+			break;
+		}
+	}
+#endif
+
 	SIGLOG(signal);
 
 	/* Shadow signals and compare with our desired signal state. */
