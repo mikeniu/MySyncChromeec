@@ -148,7 +148,9 @@ static void thermal_control(void)
 	int fmax;
 	int dptf_tripped;
 	int temp_fan_configured;
-
+#ifdef CONFIG_DPTF_FAIL_SAFE
+	int exceed_fan_temp_max;
+#endif
 	/* Get ready to count things */
 	memset(count_over, 0, sizeof(count_over));
 	memset(count_under, 0, sizeof(count_under));
@@ -157,7 +159,9 @@ static void thermal_control(void)
 	fmax = 0;
 	dptf_tripped = 0;
 	temp_fan_configured = 0;
-
+#ifdef CONFIG_DPTF_FAIL_SAFE
+	exceed_fan_temp_max = 0;
+#endif
 	/* go through all the sensors */
 	for (i = 0; i < TEMP_SENSOR_COUNT; ++i) {
 
@@ -180,6 +184,10 @@ static void thermal_control(void)
 			}
 		}
 
+ 	/*
+	 * this code should be removed when DPTF is used and FAN Max/Off are
+	 * non zero
+	*/
 		/* figure out the max fan needed, too */
 		if (thermal_params[i].temp_fan_off &&
 		    thermal_params[i].temp_fan_max) {
@@ -190,8 +198,30 @@ static void thermal_control(void)
 				fmax = f;
 
 			temp_fan_configured = 1;
-		}
 
+#ifdef CONFIG_DPTF_FAIL_SAFE
+			if (t > thermal_params[i].temp_fan_max) {
+				exceed_fan_temp_max++;
+#if 0
+			ccprintf("### actual RPM = %d, duty = %d, mode = %d, stalled =%d\n",
+						fan_get_rpm_actual(0),
+						fan_get_duty(0),
+						fan_get_rpm_mode(0),
+						fan_is_stalled(0));
+
+			/* if currently FAN is not driving by EC (0 duty or 0 RPM),
+			 * TACH reading is not correct(shows previous value).
+			 */
+
+			j = fan_get_rpm_mode(0)
+				? fan_get_rpm_actual(0) /*RPM mode*/
+			       	: fan_get_duty(0);   /* duty mode */
+			ccprintf("### fan status = %d, fan_get_enabled = %d\n",
+					j, fan_get_enabled(0));
+#endif
+			}
+#endif
+		}
 		/* and check the dptf thresholds */
 		dptf_tripped |= dpft_check_temp_threshold(i, t);
 	}
@@ -262,8 +292,20 @@ static void thermal_control(void)
 	 * profiles to each fan - in case one fan cools the CPU while another
 	 * cools the radios or battery.
 	 */
-		for (i = 0; i < CONFIG_FANS; i++)
-			fan_set_percent_needed(i, fmax);
+#ifdef CONFIG_DPTF_FAIL_SAFE
+		j = 0;
+		if (exceed_fan_temp_max == 0) {
+#endif
+			for (i = 0; i < CONFIG_FANS; i++)
+				fan_set_percent_needed(i, fmax);
+#ifdef CONFIG_DPTF_FAIL_SAFE
+		} else {
+			for (i = 0; i < CONFIG_FANS; i++)
+				j += (fan_get_duty(i)<100) ? 1 : 0;
+			if (j != 0)
+				dptf_set_fan_duty_target(100);
+		}
+#endif
 #endif
 	}
 
