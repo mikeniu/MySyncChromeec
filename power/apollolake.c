@@ -254,8 +254,13 @@ static enum power_state _power_handle_state(enum power_state state)
 			return POWER_G3;
 		}
 
+		/* FIXME(dhendrix): Migrate these into board-specific hooks
+		 * (perhaps CHIPSET_PRE_INIT)? */
 		/* Enable V5A */
 		gpio_set_level(GPIO_V5A_EN, 1);
+		/* FIXME(dhendrix): Enable PP3300 and PMIC_A_RAILS_EN at the
+		 * same time (chrome-os-partner:51323). */
+		gpio_get_level(GPIO_PP3300_PG);
 
 		if (power_wait_signals(IN_PGOOD_ALL_CORE)) {
 			chipset_force_shutdown();
@@ -283,6 +288,8 @@ static enum power_state _power_handle_state(enum power_state state)
 			return POWER_S3S5;
 		}
 
+		/* FIXME(dhendrix): Backlight enable should probably go in
+		   board-specific code */
 		gpio_set_level(GPIO_ENABLE_BACKLIGHT, 1);
 
 		/* Enable wireless */
@@ -309,6 +316,8 @@ static enum power_state _power_handle_state(enum power_state state)
 		/* Call hooks before we remove power rails */
 		hook_notify(HOOK_CHIPSET_SUSPEND);
 
+		/* FIXME(dhendrix): Backlight enable should probably go in
+		   board-specific code */
 		gpio_set_level(GPIO_ENABLE_BACKLIGHT, 0);
 
 		/* Suspend wireless */

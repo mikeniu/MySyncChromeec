@@ -94,6 +94,7 @@ void usb_charger_vbus_change(int port, int vbus_level)
 #endif
 }
 
+#ifdef CONFIG_USB_SWITCH_PI3USB9281
 static void usb_charger_bc12_detect(int port)
 {
 	int device_type, charger_status;
@@ -279,3 +280,9 @@ static void usb_charger_init(void)
 	}
 }
 DECLARE_HOOK(HOOK_INIT, usb_charger_init, HOOK_PRIO_DEFAULT);
+#else
+void usb_charger_task(void)
+{
+	/* FIXME(dhendrix): Do something for BD99956? */
+}
+#endif /* CONFIG_USB_SWITCH_PI3USB9281 */
