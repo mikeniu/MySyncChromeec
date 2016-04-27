@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "c8483da3_50185a74",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1138199
+      },
+      "writtenOn": "2016-04-27T18:46:44Z",
+      "side": 1,
+      "message": "\u003e TEST\u003dTCG test CPCTPM_TC2_2_20_03_02 reliably passes\n\nTry running CPCTPM_TC2_2_20_03_02.  It\u0027s a flaky test.",
+      "parentUuid": "c8483da3_d5245cb8",
+      "revId": "fbe53ace477992e1e7243592d4f041f0903ff561",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c8483da3_95f3f419",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
@@ -30,6 +48,30 @@
       "writtenOn": "2016-04-27T16:57:10Z",
       "side": 1,
       "message": "Sounds iffy to me. Is there any way at all that the buffer or size can be derived from user input?",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 9
+      },
+      "revId": "fbe53ace477992e1e7243592d4f041f0903ff561",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8483da3_101d3257",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1138199
+      },
+      "writtenOn": "2016-04-27T18:46:44Z",
+      "side": 1,
+      "message": "The reference implementation does not check the sizes of input buffers.  That was the inspiration for this change  (see _cpri__GenerateKeyRSA() in third_party/tpm2/CpriRSA.c where p-\u003esize and N-\u003esize are written but never read).",
+      "parentUuid": "c8483da3_95f3f419",
       "range": {
         "startLine": 13,
         "startChar": 0,
