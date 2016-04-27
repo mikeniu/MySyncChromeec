@@ -16,6 +16,29 @@
       "revId": "fbe53ace477992e1e7243592d4f041f0903ff561",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8483da3_95f3f419",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2016-04-27T16:57:10Z",
+      "side": 1,
+      "message": "Sounds iffy to me. Is there any way at all that the buffer or size can be derived from user input?",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 9
+      },
+      "revId": "fbe53ace477992e1e7243592d4f041f0903ff561",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
