@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c8483da3_d5245cb8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000039
+      },
+      "writtenOn": "2016-04-27T16:29:51Z",
+      "side": 1,
+      "message": "when does this happen for you? I saw this happening during marshaling when preparing reply to the master, but did not think it involved crypto code.\n\nIs there a bug in TPM2 which needs to be fixed instead?",
+      "revId": "fbe53ace477992e1e7243592d4f041f0903ff561",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    }
+  ]
+}
