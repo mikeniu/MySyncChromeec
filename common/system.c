@@ -789,6 +789,12 @@ static int handle_pending_reboot(enum ec_reboot_cmd cmd)
 		/* That shouldn't return... */
 		return EC_ERROR_UNKNOWN;
 #endif
+#ifdef HAS_TASK_PDCMD
+	case EC_REBOOT_PD:
+		/* Reboot the PD chip */
+		board_reset_pd_mcu();
+		return EC_SUCCESS;
+#endif
 	default:
 		return EC_ERROR_INVAL;
 	}

@@ -651,6 +651,8 @@ int cmd_reboot_ec(int argc, char *argv[])
 		p.cmd = EC_REBOOT_DISABLE_JUMP;
 	else if (!strcmp(argv[1], "hibernate"))
 		p.cmd = EC_REBOOT_HIBERNATE;
+	else if (!strcmp(argv[1], "pd"))
+		p.cmd = EC_REBOOT_PD;
 	else {
 		fprintf(stderr, "Unknown command: %s\n", argv[1]);
 		return -1;
