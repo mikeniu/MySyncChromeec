@@ -22,6 +22,30 @@
       "revId": "96be4fd8ff92373df183505e74062fd9432a14ca",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bb944b51_a0bb22b3",
+        "filename": "include/gesture.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1104704
+      },
+      "writtenOn": "2016-08-17T19:04:20Z",
+      "side": 0,
+      "message": "sensors ODR was set at 200Hz, EC polling rate at 100Hz: the idea is to avoid EC reading stale data, but 100Hz is the actual data rate.\nIn the new code, EC polling is tweaked to avoid stale data, so we can set the sensors ODR at 100Hz.\nIf we leave the code as is, the EC will poll at 200Hz, that may affect the double tap detection behavior.",
+      "parentUuid": "7bd3b3eb_b56baaae",
+      "range": {
+        "startLine": 21,
+        "startChar": 9,
+        "endLine": 22,
+        "endChar": 48
+      },
+      "revId": "96be4fd8ff92373df183505e74062fd9432a14ca",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
