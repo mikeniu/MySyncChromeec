@@ -130,6 +130,13 @@ static void wr_complete_handler(void *i2cs_data, size_t i2cs_data_size)
 		if (reg_size == 1 || reg_size == 4) {
 			/* Always read regsize number of bytes */
 			tpm_register_get(tpm_reg, reg_value, reg_size);
+			/*
+			 * The host wants to read a TPM register. There should
+			 * be no bytes currently buffered in the HW read
+			 * fifo. If there are bytes buffered, throw them away by
+			 * adjusting the fw read pointer.
+			 */
+			i2cs_get_read_fifo_buffer_depth(1);
 			for (i = 0; i < reg_size; i++)
 				i2cs_post_read_data(reg_value[i]);
 			return;
@@ -155,7 +162,7 @@ static void wr_complete_handler(void *i2cs_data, size_t i2cs_data_size)
 		 * response has been fully read.
 		 *
 		 */
-		if (i2cs_get_read_fifo_buffer_depth())
+		if (i2cs_get_read_fifo_buffer_depth(0))
 			/* Data is already in the queue, just return */
 			return;
 

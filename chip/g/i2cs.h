@@ -34,8 +34,11 @@ void i2cs_set_pinmux(void);
  * Determine the number of bytes currently buffered in the I2CS READ fifo. This
  * value is calculated by finding the difference between read pointer that's
  * used by FW to add bytes to the HW fifo and the HW's read pointer.
+ *
+ * @param adjust: if set, then force buffer depth to be zero
+ * @returns: the number of bytes buffered when the function is called
  */
-size_t i2cs_get_read_fifo_buffer_depth(void);
+size_t i2cs_get_read_fifo_buffer_depth(int adjust);
 
 /*
  * Write buffer of data into the I2CS HW read fifo. The function will operate a
