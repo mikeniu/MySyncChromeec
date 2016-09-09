@@ -264,7 +264,7 @@ int i2cs_register_write_complete_handler(wr_complete_handler_f wc_handler)
 	return 0;
 }
 
-size_t i2cs_get_read_fifo_buffer_depth(void)
+size_t i2cs_zero_read_fifo_buffer_depth(void)
 {
 	uint32_t hw_read_pointer;
 	size_t depth;
@@ -277,6 +277,13 @@ size_t i2cs_get_read_fifo_buffer_depth(void)
 	hw_read_pointer = GREAD(I2CS, READ_PTR) >> 3;
 	/* Determine the number of bytes buffered in the HW fifo */
 	depth = (last_read_pointer - hw_read_pointer) & REGISTER_FILE_MASK;
+	/*
+	 * If adjust parameter is set and the queue depth is not zero, force the
+	 * queue depth to 0 by adjusting last_read_pointer to where the hw read
+	 * pointer is.
+	 */
+	if (depth)
+		last_read_pointer = (uint16_t)hw_read_pointer;
 
 	return depth;
 }
