@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "25d67f37_7083903e",
+        "filename": "driver/charger/bd9995x.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 639,
+      "author": {
+        "id": 1001696
+      },
+      "writtenOn": "2016-09-27T16:55:44Z",
+      "side": 1,
+      "message": "This line needs to be behind CONFIG_BATTERY_REVIVE_DISCONNECT.",
+      "range": {
+        "startLine": 639,
+        "startChar": 4,
+        "endLine": 639,
+        "endChar": 62
+      },
+      "revId": "b4b7c5ef66d34a00d173d0616731dfe7e5bb708e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "25d67f37_d06b847c",
+        "filename": "driver/charger/bd9995x.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 642,
+      "author": {
+        "id": 1001696
+      },
+      "writtenOn": "2016-09-27T16:55:44Z",
+      "side": 1,
+      "message": "This section should be behind CONFIG_CHARGER_MIN_BAT_PCT_FOR_POWER_ON.",
+      "range": {
+        "startLine": 640,
+        "startChar": 1,
+        "endLine": 642,
+        "endChar": 10
+      },
+      "revId": "b4b7c5ef66d34a00d173d0616731dfe7e5bb708e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    }
+  ]
+}
