@@ -55,11 +55,18 @@
  * two internal GPIOs to the same pad if sys_rst_l is also being used to detect
  * system resets.
  */
-GPIO_INT(TPM_RST_L,       PIN(1, 0),  GPIO_INT_FALLING, tpm_rst_asserted)
+GPIO_INT(SYS_RST_L,       PIN(1, 0),  GPIO_INT_FALLING, sys_rst_asserted)
 GPIO_INT(DETECT_AP,       PIN(1, 1),  GPIO_INT_HIGH, device_state_on)
 GPIO_INT(DETECT_EC,       PIN(1, 2),  GPIO_INT_HIGH, device_state_on)
 GPIO_INT(DETECT_SERVO,    PIN(1, 3),  GPIO_INT_HIGH | GPIO_PULL_DOWN,
 	 device_state_on)
+/*
+ * We can't detect both edges with the same interrupt gpio, so we have to
+ * create two gpios attached to plt_rst_l. One will detect the rising edge and
+ * one will detect the falling edge.
+ */
+GPIO_INT(PLT_RST_L_RED,     PIN(1, 4),  GPIO_INT_RISING,  plt_rst_changed)
+GPIO_INT(PLT_RST_L_FED,     PIN(1, 5),  GPIO_INT_FALLING, plt_rst_changed)
 
 /* Pull this low to interrupt the AP */
 GPIO(INT_AP_L,        PIN(0, 0), GPIO_OUT_HIGH)
@@ -114,6 +121,16 @@ PINMUX(GPIO(INT_AP_L),        A5, DIO_INPUT)	/* DIOB7 is p_digitial_od */
 PINMUX(GPIO(EC_FLASH_SELECT), B2, DIO_INPUT)
 PINMUX(GPIO(AP_FLASH_SELECT), B3, DIO_INPUT)
 PINMUX(GPIO(EN_PP3300_INA_L), B7, DIO_INPUT)
+/* Configured as a wake pin in board.c if we detect we are on ARM */
+PINMUX(GPIO(SYS_RST_L),       M0, DIO_INPUT)
+/*
+ * We want to make sure to wake up on every plt_rst_l edge. We can only
+ * configure the pin to trigger a wake up on one type of edge. board.c set the
+ * polarity and enable the wake pin based on plt_rst_l state and it will flip
+ * the polarity when the state changes.
+ */
+PINMUX(GPIO(PLT_RST_L_RED),   M3, DIO_INPUT)
+PINMUX(GPIO(PLT_RST_L_FED),   M3, DIO_INPUT)
 /*
  * To allow the EC to drive the signal we set sys_rst_l_out as an input here and
  * only change it to an output when we want to assert the signal.

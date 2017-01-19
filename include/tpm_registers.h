@@ -46,6 +46,9 @@ void tpm_register_interface(interface_restart_func interface_restart);
 int tpm_reset_request(int wait_until_done, int wipe_nvmem_first,
 	int post_reboot);
 
+/* Returns true if the TPM should reset automatically during init. */
+int tpm_reset_on_init(void);
+
 /*
  * This structure describes the header of all commands and responses sent and
  * received over TPM FIFO.

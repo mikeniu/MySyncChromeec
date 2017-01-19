@@ -309,7 +309,6 @@ static void init_pmu(void)
 void pmu_wakeup_interrupt(void)
 {
 	int exiten, wakeup_src;
-	int wake_on_low;
 
 	delay_sleep_by(1 * MSEC);
 
@@ -335,17 +334,6 @@ void pmu_wakeup_interrupt(void)
 		 * or for the system to be reset.
 		 */
 		delay_sleep_by(20 * SECOND);
-
-		/*
-		 * If sys_rst_l or plt_rst_l (if signal is present) is
-		 * configured to wake on low and the signal is low, then call
-		 * tpm_rst_asserted
-		 */
-		wake_on_low = board_use_plt_rst() ?
-			GREAD_FIELD(PINMUX, EXITINV0, DIOM3) :
-			GREAD_FIELD(PINMUX, EXITINV0, DIOM0);
-		if (!gpio_get_level(GPIO_TPM_RST_L) && wake_on_low)
-			tpm_rst_asserted(GPIO_TPM_RST_L);
 	}
 
 	/* Trigger timer0 interrupt */
@@ -381,24 +369,12 @@ void board_configure_deep_sleep_wakepins(void)
 	GWRITE_FIELD(PINMUX, EXITEN0, DIOA3, 1);   /* GPIO_DETECT_AP */
 
 	/*
-	 * Whether it is a short pulse or long one waking on the rising edge is
-	 * fine because the goal of the system reset signal is to reset the TPM
+	 * On boards that use SYS_RST_L reconfigure the pin to wake on the
+	 * rising edge. The goal of the system reset signal is to reset the TPM
 	 * and after resuming from deep sleep the TPM will be reset. Cr50
 	 * doesn't need to read the low value and then reset.
 	 */
-	if (board_use_plt_rst()) {
-		/*
-		 * If the board includes plt_rst_l, configure Cr50 to resume on
-		 * the rising edge of this signal.
-		 */
-		/* Disable plt_rst_l as a wake pin */
-		GWRITE_FIELD(PINMUX, EXITEN0, DIOM3, 0);
-		/* Reconfigure and reenable it. */
-		GWRITE_FIELD(PINMUX, EXITEDGE0, DIOM3, 1); /* edge sensitive */
-		GWRITE_FIELD(PINMUX, EXITINV0, DIOM3, 0);  /* wake on high */
-		/* enable powerdown exit */
-		GWRITE_FIELD(PINMUX, EXITEN0, DIOM3, 1);
-	} else {
+	if (!board_use_plt_rst()) {
 		 /* Configure cr50 to resume on the rising edge of sys_rst_l */
 		/* Disable sys_rst_l as a wake pin */
 		GWRITE_FIELD(PINMUX, EXITEN0, DIOM0, 0);
@@ -431,32 +407,10 @@ static void configure_board_specific_gpios(void)
 	if (board_rst_pullup_needed())
 		GWRITE_FIELD(PINMUX, DIOM0_CTL, PU, 1);
 
-	/*
-	 * Connect either plt_rst_l or sys_rst_l to GPIO_TPM_RST_L based on the
-	 * board type. This signal is used to monitor AP resets and reset the
-	 * TPM.
-	 *
-	 * plt_rst_l is on diom3, and sys_rst_l is on diom0.
-	 */
-	if (board_use_plt_rst()) {
-		/* Use plt_rst_l as the tpm reset signal. */
-		GWRITE(PINMUX, GPIO1_GPIO0_SEL, GC_PINMUX_DIOM3_SEL);
-		/* Enbale the input */
-		GWRITE_FIELD(PINMUX, DIOM3_CTL, IE, 1);
-
-		/* Set power down for the equivalent of DIO_WAKE_FALLING */
-		/* Set to be edge sensitive */
-		GWRITE_FIELD(PINMUX, EXITEDGE0, DIOM3, 1);
-		/* Select failling edge polarity */
-		GWRITE_FIELD(PINMUX, EXITINV0, DIOM3, 1);
-		/* Enable powerdown exit on DIOM3 */
-		GWRITE_FIELD(PINMUX, EXITEN0, DIOM3, 1);
-	} else {
-		/* Use sys_rst_l as the tpm reset signal. */
-		GWRITE(PINMUX, GPIO1_GPIO0_SEL, GC_PINMUX_DIOM0_SEL);
-		/* Enbale the input */
-		GWRITE_FIELD(PINMUX, DIOM0_CTL, IE, 1);
-
+	/* If we are using sys_rst_l as the tpm reset add it as a wake pin. */
+	if (!board_use_plt_rst()) {
+		/* Disable the sys_rst_l wake pin */
+		GWRITE_FIELD(PINMUX, EXITEN0, DIOM0, 0);
 		/* Set power down for the equivalent of DIO_WAKE_FALLING */
 		/* Set to be edge sensitive */
 		GWRITE_FIELD(PINMUX, EXITEDGE0, DIOM0, 1);
@@ -573,9 +527,18 @@ int flash_regions_to_enable(struct g_flash_region *regions,
 	return 3;
 }
 
-/* This is the interrupt handler to react to TPM_RST_L */
-void tpm_rst_asserted(enum gpio_signal signal)
+/* This is the interrupt handler to react to SYS_RST_L */
+void sys_rst_asserted(enum gpio_signal signal)
 {
+	/*
+	 * TODO(crosbug.com/p/62380): Remove the interrupt disable once we can
+	 * control what interrupts we enable on each board.
+	 */
+	if (board_use_plt_rst()) {
+		gpio_disable_interrupt(signal);
+		return;
+	}
+
 	/*
 	 * Cr50 drives SYS_RST_L in certain scenarios, in those cases
 	 * this signal's assertion should be ignored here.
@@ -591,6 +554,113 @@ void tpm_rst_asserted(enum gpio_signal signal)
 	 * reboot the system after the reset.
 	 */
 	tpm_reset_request(0, 0, reboot_request_posted);
+}
+
+static void process_requested_reboot(void)
+{
+	/*
+	 * If a reboot request is posted, then reboot cr50 on CHIPSET_SHUTDOWN.
+	 */
+	if (board_use_plt_rst() && reboot_request_posted)
+		system_reset(SYSTEM_RESET_HARD);
+}
+DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, process_requested_reboot, HOOK_PRIO_FIRST);
+
+static void reset_tpm_on_resume(void)
+{
+	/*
+	 * Boards without PLT_RST_L still only reset the TPM when SYS_RST_L is
+	 * asserted. Don't reset the TPM on HOOK_CHIPSET_RESUME.
+	 */
+	if (board_use_plt_rst())
+		tpm_reset_request(0, 0, reboot_request_posted);
+}
+DECLARE_HOOK(HOOK_CHIPSET_RESUME, reset_tpm_on_resume, HOOK_PRIO_FIRST);
+
+static void configure_plt_rst_wake(int wake_on_falling_edge)
+{
+	/* Disable plt_rst_l as a wake pin */
+	GWRITE_FIELD(PINMUX, EXITEN0, DIOM3, 0);
+	/* Reconfigure and reenable it. */
+	GWRITE_FIELD(PINMUX, EXITEDGE0, DIOM3, 1); /* edge sensitive */
+	GWRITE_FIELD(PINMUX, EXITINV0, DIOM3, wake_on_falling_edge);
+	/* enable powerdown exit */
+	GWRITE_FIELD(PINMUX, EXITEN0, DIOM3, 1);
+}
+
+/* This is the interrupt handler to react to PLT_RST_L */
+void plt_rst_changed(enum gpio_signal signal)
+{
+	int rst_asserted = !gpio_get_level(signal);
+	int is_fed = signal == GPIO_PLT_RST_L_FED;
+	int missed_transition;
+	/*
+	 * TODO(crosbug.com/p/62380): Remove the interrupt disable once we can
+	 * control what interrupts we enable on each board.
+	 */
+	if (!board_use_plt_rst()) {
+		gpio_disable_interrupt(signal);
+		return;
+	}
+
+
+	/*
+	 * If the level of plt_rst_l does not match the polarity we were trying
+	 * to detect, we know that we missed a short pulse or are racing with a
+	 * changing signal. If we missed a transition, notify the chipset hook
+	 * even if the device state doesn't change.
+	 */
+	missed_transition = is_fed != rst_asserted;
+
+	CPRINTS("%splt_rst is %s", missed_transition ? "saw short pulse " :
+		"", rst_asserted ? "asserted" : "deasserted");
+
+	/*
+	 * Use the gpio level not the interrupt signal to figure out whether the
+	 * signal is asserted.
+	 */
+	if (rst_asserted) {
+		if (device_set_state(DEVICE_AP, DEVICE_STATE_OFF) ||
+		    missed_transition) {
+			/*
+			 * plt_rst_l changed to low. Configure pin to wake on
+			 * high.
+			 */
+			configure_plt_rst_wake(0);
+
+			CPRINTS("chipset shutdown");
+			hook_notify(HOOK_CHIPSET_SHUTDOWN);
+		}
+	} else {
+		if (device_set_state(DEVICE_AP, DEVICE_STATE_ON) ||
+		    missed_transition) {
+			/*
+			 * plt_rst_l changed to high. Configure pin to wake on
+			 * low.
+			 */
+			configure_plt_rst_wake(1);
+
+			CPRINTS("chipset resume");
+			hook_notify(HOOK_CHIPSET_RESUME);
+		}
+	}
+}
+
+int tpm_reset_on_init(void)
+{
+	/*
+	 * If the board uses plt_rst_l, then don't automatically reset the TPM
+	 * on init. Reset it only when the AP resumes.
+	 */
+	if (board_use_plt_rst()) {
+		/*
+		 * plt_rst_l interrupts are edge triggered so call
+		 * plt_rst_changed to update the initial state.
+		 */
+		plt_rst_changed(GPIO_PLT_RST_L_FED);
+		return 0;
+	}
+	return 1;
 }
 
 void assert_sys_rst(void)
@@ -769,12 +839,26 @@ static void servo_attached(void)
 	usb_i2c_board_disable(0);
 }
 
+/*
+ * Boards with plt_rst_l can use it to directly detect the AP state. It is
+ * asserted in s3, s5, and g3. There is no other data sent on that signal so
+ * we can use interrupts to directly detect the state. We don't need any of the
+ * logic to debounce the signal.
+ */
+static inline int use_uart_to_detect_ap(void)
+{
+	return !board_use_plt_rst();
+}
+
 void device_state_on(enum gpio_signal signal)
 {
 	gpio_disable_interrupt(signal);
 
 	switch (signal) {
 	case GPIO_DETECT_AP:
+		if (!use_uart_to_detect_ap())
+			return;
+
 		if (device_state_changed(DEVICE_AP, DEVICE_STATE_ON))
 			hook_notify(HOOK_CHIPSET_RESUME);
 		break;
@@ -793,6 +877,10 @@ void device_state_on(enum gpio_signal signal)
 
 void board_update_device_state(enum device_type device)
 {
+
+	if (device == DEVICE_AP && !use_uart_to_detect_ap())
+		return;
+
 	if (device == DEVICE_SERVO && servo_state_unknown())
 		return;
 
