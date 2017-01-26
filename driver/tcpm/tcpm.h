@@ -162,6 +162,13 @@ static inline int tcpc_i2c_write(const int port, const int addr,
 }
 #endif
 
+static inline int tcpc_get_chip_info(int port, struct pd_chip_info *info)
+{
+	if (tcpc_config[port].drv->get_chip_info)
+		return tcpc_config[port].drv->get_chip_info(port, info);
+	return -1;
+}
+
 #else
 
 /**

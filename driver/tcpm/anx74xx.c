@@ -9,6 +9,7 @@
 
 #include "anx74xx.h"
 #include "task.h"
+#include "tcpci.h"
 #include "tcpm.h"
 #include "timer.h"
 #include "usb_charge.h"
@@ -909,6 +910,7 @@ const struct tcpm_drv anx74xx_tcpm_drv = {
 #ifdef CONFIG_USB_PD_DISCHARGE_TCPC
 	.tcpc_discharge_vbus	= &anx74xx_tcpc_discharge_vbus,
 #endif
+	.get_chip_info		= &tcpci_get_chip_info,
 };
 
 #ifdef CONFIG_CMD_I2C_STRESS_TEST_TCPC

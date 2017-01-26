@@ -54,6 +54,13 @@ enum tcpc_transmit_complete {
 	TCPC_TX_COMPLETE_FAILED =    2,
 };
 
+struct pd_chip_info {
+	uint16_t vendor_id;
+	uint16_t product_id;
+	uint16_t device_id;
+	uint16_t fw_version;
+};
+
 struct tcpm_drv {
 	/**
 	 * Initialize TCPM driver and wait for TCPC readiness.
@@ -195,6 +202,16 @@ struct tcpm_drv {
 	 */
 	int (*drp_toggle)(int port);
 #endif
+
+	/**
+	 * Get firmware version.
+	 *
+	 * @param port Type-C port number
+	 * @param info Pointer to PD chip info
+	 *
+	 * @return EC_SUCCESS or error
+	 */
+	int (*get_chip_info)(int port, struct pd_chip_info *info);
 };
 
 enum tcpc_alert_polarity {

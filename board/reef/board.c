@@ -305,16 +305,13 @@ void board_reset_pd_mcu(void)
 #ifdef CONFIG_USB_PD_TCPC_FW_VERSION
 void board_print_tcpc_fw_version(int port)
 {
-	int rv;
-	int version;
+	struct pd_chip_info info;
+	int error;
 
-	if (port)
-		rv = ps8751_tcpc_get_fw_version(port, &version);
-	else
-		rv = anx74xx_tcpc_get_fw_version(port, &version);
-
-	if (!rv)
-		CPRINTS("TCPC p%d FW VER: 0x%x", port, version);
+	error = tcpc_get_chip_info(port, &info);
+	CPRINTS("TCPC p%d VID:0x%x PID:0x%x DID:0x%x FWV:0x%x (err=%d)",
+		port, info.vendor_id, info.product_id, info.device_id,
+		info.fw_version, error);
 }
 #endif
 
