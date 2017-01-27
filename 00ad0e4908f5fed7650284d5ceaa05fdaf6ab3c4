@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5849341e_3d24f45f",
+        "filename": "board/caroline/led.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1001696
+      },
+      "writtenOn": "2017-01-27T21:59:46Z",
+      "side": 1,
+      "message": "This will actually fall into PWR_STATE_ERROR below (flash red / green). I\u0027m not sure if we should change it -- let\u0027s discuss on crbug.",
+      "range": {
+        "startLine": 82,
+        "startChar": 6,
+        "endLine": 82,
+        "endChar": 36
+      },
+      "revId": "00ad0e4908f5fed7650284d5ceaa05fdaf6ab3c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    }
+  ]
+}
