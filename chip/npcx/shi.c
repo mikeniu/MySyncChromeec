@@ -376,9 +376,24 @@ static int shi_is_cs_glitch(void)
 	 * If input buffer pointer is no changed after timeout, it will
 	 * return true
 	 */
-	while (shi_params.pre_ibufstat == shi_read_buf_pointer())
-		if (timestamp_expired(deadline, NULL))
+	while (shi_params.pre_ibufstat == shi_read_buf_pointer()) {
+		if (timestamp_expired(deadline, NULL)) {
+			/*
+			 * No Rx data appeared for the timeout period, but
+			 * maybe our entire header was already received. Check
+			 * byte count and VERSION byte, and if it's a
+			 * possibility, then speculate that this is not in fact
+			 * a glitch.
+			 */
+			if (shi_params.pre_ibufstat >=
+			    sizeof(struct ec_host_request) &&
+			    *shi_params.rx_buf == EC_HOST_REQUEST_VERSION)
+				return 0;
+
 			return 1;
+		}
+	}
+
 	/* valid package */
 	return 0;
 }
