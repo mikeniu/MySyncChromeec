@@ -13,6 +13,7 @@
 #include "gpio.h"
 #include "hooks.h"
 #include "host_command.h"
+#include "power_button.h"
 #include "power.h"
 #include "system.h"
 #include "task.h"
@@ -33,6 +34,8 @@
 
 /* Timeout for dropping back from S5 to G3 */
 #define S5_INACTIVITY_TIMEOUT (10 * SECOND)
+
+#define SIGNAL_ASSERTION_TIMEOUT (10 * SECOND)
 
 static const char * const state_names[] = {
 	"G3",
@@ -726,6 +729,15 @@ DECLARE_CONSOLE_COMMAND(pause_in_s5, command_pause_in_s5,
 #endif /* CONFIG_POWER_SHUTDOWN_PAUSE_IN_S5 */
 
 #ifdef CONFIG_POWER_TRACK_HOST_SLEEP_STATE
+void slp_s0_signal_check_deferred(void)
+{
+	if (chipset_in_state(CHIPSET_STATE_ON)) {
+
+		CPRINTS("SLP_S0 failed to assert. Force PBTN wake up.");
+		power_button_pch_pulse();
+	}
+}
+DECLARE_DEFERRED(slp_s0_signal_check_deferred);
 /* Track last reported sleep event */
 static enum host_sleep_event host_sleep_state;
 
@@ -734,6 +746,19 @@ static int host_command_host_sleep_event(struct host_cmd_handler_args *args)
 	const struct ec_params_host_sleep_event *p = args->params;
 
 	host_sleep_state = p->sleep_event;
+
+#ifdef CONFIG_POWER_S0IX
+	if (p->sleep_event == HOST_SLEEP_EVENT_S0IX_SUSPEND) {
+		CPRINTS("S0ix sus evt");
+		CPRINTS("Initiating signal detect with timeout %d",
+					SIGNAL_ASSERTION_TIMEOUT);
+		hook_call_deferred(&slp_s0_signal_check_deferred_data,
+					SIGNAL_ASSERTION_TIMEOUT);
+	} else if (p->sleep_event == HOST_SLEEP_EVENT_S0IX_RESUME) {
+		CPRINTS("S0ix res evt");
+		hook_call_deferred(&slp_s0_signal_check_deferred_data, -1);
+	}
+#endif /* CONFIG_POWER_S0IX */
 
 	return EC_RES_SUCCESS;
 }
