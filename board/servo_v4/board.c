@@ -304,8 +304,6 @@ static void init_ioexpander(void)
 /* Define voltage thresholds for SBU USB detection */
 #define GND_MAX_MV	350
 #define USB_HIGH_MV	1500
-/* Tracks current state of ccd */
-static int ccd_mode;
 
 static void ccd_measure_sbu(void);
 DECLARE_DEFERRED(ccd_measure_sbu);
@@ -325,7 +323,6 @@ static void ccd_measure_sbu(void)
 		write_ioexpander(0, 2, 1);
 		msleep(10);
 		gpio_set_level(GPIO_SBU_MUX_EN, 1);
-		ccd_mode = CCD_MODE_ENABLED;
 		CPRINTS("CCD: connected flip");
 	} else if ((sbu2 > USB_HIGH_MV) &&
 		   (sbu1 < GND_MAX_MV)) {
@@ -333,7 +330,6 @@ static void ccd_measure_sbu(void)
 		write_ioexpander(0, 2, 0);
 		msleep(10);
 		gpio_set_level(GPIO_SBU_MUX_EN, 1);
-		ccd_mode = CCD_MODE_ENABLED;
 		CPRINTS("CCD: connected noflip");
 	} else {
 		/* Measure again after 100 msec */
@@ -352,10 +348,12 @@ void ccd_set_mode(enum ccd_mode new_mode)
 
 		/* Disable ccd_measure_sbu deferred call always */
 		hook_call_deferred(&ccd_measure_sbu_data, -1);
-		/* Turn off CCD */
-		gpio_set_level(GPIO_SBU_MUX_EN, 0);
-		CPRINTS("CCD: disconnect");
-		ccd_mode = CCD_MODE_DISABLED;
+		/*
+		 * The DUT port has detected a detach event. Don't want to
+		 * disconnect the SBU mux here so that the H1 USB console can
+		 * remain connected.
+		 */
+		CPRINTS("CCD: TypeC detach, no change to SBU mux");
 	}
 }
 
