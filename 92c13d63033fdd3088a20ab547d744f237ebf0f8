@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b9b751d0_74612f67",
+        "filename": "board/kevin/board.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2017-05-11T17:50:29Z",
+      "side": 1,
+      "message": "Aren\u0027t there a whole lot more events? What about the ones in the wakeup mask at L228?",
+      "range": {
+        "startLine": 239,
+        "startChar": 0,
+        "endLine": 240,
+        "endChar": 25
+      },
+      "revId": "92c13d63033fdd3088a20ab547d744f237ebf0f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e8622d40_d7be033d",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2017-05-11T17:50:29Z",
+      "side": 1,
+      "message": "Maybe it would be better to have this at the start of the function and just return.",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 6
+      },
+      "revId": "92c13d63033fdd3088a20ab547d744f237ebf0f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b842a5a2_241a1110",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2017-05-11T17:50:29Z",
+      "side": 1,
+      "message": "I think we\u0027d still be setting the event here which could be queried by a host command.",
+      "revId": "92c13d63033fdd3088a20ab547d744f237ebf0f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
