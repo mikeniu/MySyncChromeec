@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1ca6b2d8_dab64f28",
+        "filename": "board/kevin/board.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-05-11T18:41:43Z",
+      "side": 1,
+      "message": "That was my concern as well, I don\u0027t feel extremely confident about this change.  If I grep the kernel for EC_HOST_EVENT_, I only see it in a couple of places, each one using croc_ec_get_host_event() to retrieve the event.  In each case, they only act on the event if it matches one of the items I have enabled below.  Unless there is another interface to get to host_events (which is my concern), it does appear that\u0027s it.\n\nAs for the wake mask, those events should still wake the kernel, but if the kernel is already awake, will not interrupt the kernel to say the status changed.  The change in status is still recorded inside host_events variable, we just don\u0027t interrupt kernel to say \"come check host events, we have a change you care about\".\n\nI believe the kernel doesn\u0027t care about EC_HOST_EVENT_LID_OPEN other than it wants the device (kernel / AP) to wake up in the event the user opens the lid, but aside from that, the kernel doesn\u0027t do anything about the lid having been open aside from the wakeup itself.\n\nThe EC_HOST_EVENT_RTC is part of kevin\u0027s \"report this\" list, so that\u0027s covered.  Not sure about EC_HOST_EVENT_POWER_BUTTON.  Do you know happens in kernel space on a power button press?  I don\u0027t see either kernel specifically look for EC_HOST_EVENT_POWER_BUTTON (does that come up through a keymap?)",
+      "parentUuid": "b9b751d0_74612f67",
+      "range": {
+        "startLine": 239,
+        "startChar": 0,
+        "endLine": 240,
+        "endChar": 25
+      },
+      "revId": "92c13d63033fdd3088a20ab547d744f237ebf0f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e8622d40_d7be033d",
         "filename": "common/host_event_commands.c",
         "patchSetId": 2
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "548d9182_355b121e",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-05-11T18:41:43Z",
+      "side": 1,
+      "message": "I think we still want to record that the event occurred, we just don\u0027t want to interrupt the kernel with that fact (but if someone wants to proactively get host_events, that information will still be available).",
+      "parentUuid": "e8622d40_d7be033d",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 6
+      },
+      "revId": "92c13d63033fdd3088a20ab547d744f237ebf0f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "b842a5a2_241a1110",
         "filename": "common/host_event_commands.c",
         "patchSetId": 2
@@ -59,6 +107,24 @@
       "writtenOn": "2017-05-11T17:50:29Z",
       "side": 1,
       "message": "I think we\u0027d still be setting the event here which could be queried by a host command.",
+      "revId": "92c13d63033fdd3088a20ab547d744f237ebf0f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ee89d7c6_987fed1e",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-05-11T18:41:43Z",
+      "side": 1,
+      "message": "Agreed, that was the intention, I think we want that.  Please see my response to your previous comment above this one.",
+      "parentUuid": "b842a5a2_241a1110",
       "revId": "92c13d63033fdd3088a20ab547d744f237ebf0f8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
