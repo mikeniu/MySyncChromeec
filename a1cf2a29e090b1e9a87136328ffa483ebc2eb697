@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a71150c9_8c1b81d6",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-05-12T22:31:51Z",
+      "side": 1,
+      "message": "Is this an existing bug? Is there a reason we run through the rest of this routine if nothing really changed state?  I realize caller expects memory to be mapped upon return, but if that\u0027s the only reason the rest of this call is executed if nothing changed state, should we just map memory and return here in the case where no events actually changed state?",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 2
+      },
+      "revId": "a1cf2a29e090b1e9a87136328ffa483ebc2eb697",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
