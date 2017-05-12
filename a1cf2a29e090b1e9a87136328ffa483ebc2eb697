@@ -22,6 +22,29 @@
       "revId": "a1cf2a29e090b1e9a87136328ffa483ebc2eb697",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8e0474f4_bd7ef00f",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-05-12T22:38:51Z",
+      "side": 1,
+      "message": "Same question/comment as above comment.  Do we need or want to interrupt kernel if the event didn\u0027t actually change state?  I\u0027d fix it in a separate change if we decide we don\u0027t need to interrupt kernel if none of the event states actually changed.",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 86,
+        "endChar": 2
+      },
+      "revId": "a1cf2a29e090b1e9a87136328ffa483ebc2eb697",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
