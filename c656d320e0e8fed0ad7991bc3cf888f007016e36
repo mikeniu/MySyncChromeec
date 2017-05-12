@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6f0ee294_d0d1cae7",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-05-12T22:00:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "29024d68_d8f45006",
+      "revId": "c656d320e0e8fed0ad7991bc3cf888f007016e36",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7bbaf7d2_cd0b8d5c",
         "filename": "common/host_event_commands.c",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2017-05-12T21:18:20Z",
       "side": 1,
       "message": "I prefer positive logic.",
+      "revId": "c656d320e0e8fed0ad7991bc3cf888f007016e36",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2a5760d_1e34e996",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-05-12T22:00:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7bbaf7d2_cd0b8d5c",
       "revId": "c656d320e0e8fed0ad7991bc3cf888f007016e36",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "2a3d19c1_ddf617a8",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-05-12T22:00:52Z",
+      "side": 1,
+      "message": "I thought it would save cycles avoiding mapping host_get_memmap since kernel won\u0027t be interrupted to be told to come get a value (and expect the memory to be mapped), but didn\u0027t realize it was expected side-effect of calling host_set_events() and host_clear_events() that the memory be mapped upon return.  I\u0027ll return after mapping memory but before pulling interrupt line.",
+      "parentUuid": "ad67c621_bedf03f2",
+      "revId": "c656d320e0e8fed0ad7991bc3cf888f007016e36",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8db3c69d_e9b063bd",
         "filename": "common/host_event_commands.c",
         "patchSetId": 4
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "04f6bacd_852eb231",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-05-12T22:00:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8db3c69d_e9b063bd",
+      "revId": "c656d320e0e8fed0ad7991bc3cf888f007016e36",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f916fe7f_a3159f36",
         "filename": "common/host_event_commands.c",
         "patchSetId": 4
@@ -81,6 +153,24 @@
       "writtenOn": "2017-05-12T21:18:20Z",
       "side": 1,
       "message": "There is a problem: host_clear_events is called from ..query_host_event_state(), but the AP would not query the host event state if the event is not sent, so the mask will not be reset.\nI think you should not set the mask at all in host_set_event when masked.",
+      "revId": "c656d320e0e8fed0ad7991bc3cf888f007016e36",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b38f7401_a00ac8f8",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-05-12T22:00:52Z",
+      "side": 1,
+      "message": "It would get cleared the next time the AP queried the host event, but I\u0027m ok not setting the bit in the first place in host_set_event().",
+      "parentUuid": "f916fe7f_a3159f36",
       "revId": "c656d320e0e8fed0ad7991bc3cf888f007016e36",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": false
