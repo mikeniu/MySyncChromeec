@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3ab8939d_2c5ae7a9",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2017-05-15T19:29:38Z",
+      "side": 1,
+      "message": "Again, my question is, if the host doesn\u0027t care about the event, why not return from this function immediately?",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 6
+      },
+      "revId": "a1cf2a29e090b1e9a87136328ffa483ebc2eb697",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "a71150c9_8c1b81d6",
         "filename": "common/host_event_commands.c",
         "patchSetId": 9
@@ -13,6 +36,30 @@
       "writtenOn": "2017-05-12T22:31:51Z",
       "side": 1,
       "message": "Is this an existing bug? Is there a reason we run through the rest of this routine if nothing really changed state?  I realize caller expects memory to be mapped upon return, but if that\u0027s the only reason the rest of this call is executed if nothing changed state, should we just map memory and return here in the case where no events actually changed state?",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 2
+      },
+      "revId": "a1cf2a29e090b1e9a87136328ffa483ebc2eb697",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cd123008_36a75366",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2017-05-15T19:29:38Z",
+      "side": 1,
+      "message": "rspangler@ might know, but my guess is that we might want to try reposting an interrupt. Looking briefly at the LPC implementation, it looks like we could make a SCI pulse for every event (even if one\u0027s already pending...)\n\nSure, for MKBP where we\u0027re notifying with a single GPIO, setting a GPIO high that\u0027s already high doesn\u0027t do much.",
+      "parentUuid": "a71150c9_8c1b81d6",
       "range": {
         "startLine": 54,
         "startChar": 0,
