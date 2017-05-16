@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "c484b748_fc774ac3",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2017-05-16T21:56:33Z",
+      "side": 1,
+      "message": "Is writing to the memory mapped region necessary? Shouldn\u0027t it already be set to \"events\"?",
+      "parentUuid": "672db817_a5d9a6ff",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 6
+      },
+      "revId": "a1cf2a29e090b1e9a87136328ffa483ebc2eb697",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "a71150c9_8c1b81d6",
         "filename": "common/host_event_commands.c",
         "patchSetId": 9
@@ -108,6 +132,30 @@
       "side": 1,
       "message": "When referring to \"no events actually changed state\", I was not referring to the state of the interrupt line itself.  What I mean is that if someone calls host_set_events() to set LID_CLOSED \u003d 1, and LID_CLOSED is already set to 1, the current code is still going to interrupt the kernel even though nothing has changed.  The kernel will call back into EC and get the host_events, but none of those bits in host_events will have theoretically changed since the last it called down to the EC.  Adding printk logs to the kernel, I see a lot of messages where registered handlers in the notifier chain interested in host_event changed events print that they received callback but have no events to act on.",
       "parentUuid": "cd123008_36a75366",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 2
+      },
+      "revId": "a1cf2a29e090b1e9a87136328ffa483ebc2eb697",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d05e55a3_58729489",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2017-05-16T21:56:33Z",
+      "side": 1,
+      "message": "That\u0027s what I meant as well by \"mak[ing] a SCI pulse for every event (even if one\u0027s already pending...)\". ie: lid closed, event posted, but not consumed/cleared, lid closed again, event posted again (still pending, but pulse made again).\n\nI\u0027m not sure why the behaviour is that way, and I\u0027m also not sure if it\u0027s intentional.",
+      "parentUuid": "803a5a0f_9aded803",
       "range": {
         "startLine": 54,
         "startChar": 0,
