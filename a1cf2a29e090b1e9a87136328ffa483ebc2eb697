@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "672db817_a5d9a6ff",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-05-16T01:33:46Z",
+      "side": 1,
+      "message": "Done. Current version of this change returns without actually setting the event.",
+      "parentUuid": "3ab8939d_2c5ae7a9",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 6
+      },
+      "revId": "a1cf2a29e090b1e9a87136328ffa483ebc2eb697",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "a71150c9_8c1b81d6",
         "filename": "common/host_event_commands.c",
         "patchSetId": 9
@@ -60,6 +84,30 @@
       "side": 1,
       "message": "rspangler@ might know, but my guess is that we might want to try reposting an interrupt. Looking briefly at the LPC implementation, it looks like we could make a SCI pulse for every event (even if one\u0027s already pending...)\n\nSure, for MKBP where we\u0027re notifying with a single GPIO, setting a GPIO high that\u0027s already high doesn\u0027t do much.",
       "parentUuid": "a71150c9_8c1b81d6",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 2
+      },
+      "revId": "a1cf2a29e090b1e9a87136328ffa483ebc2eb697",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "803a5a0f_9aded803",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-05-16T01:33:46Z",
+      "side": 1,
+      "message": "When referring to \"no events actually changed state\", I was not referring to the state of the interrupt line itself.  What I mean is that if someone calls host_set_events() to set LID_CLOSED \u003d 1, and LID_CLOSED is already set to 1, the current code is still going to interrupt the kernel even though nothing has changed.  The kernel will call back into EC and get the host_events, but none of those bits in host_events will have theoretically changed since the last it called down to the EC.  Adding printk logs to the kernel, I see a lot of messages where registered handlers in the notifier chain interested in host_event changed events print that they received callback but have no events to act on.",
+      "parentUuid": "cd123008_36a75366",
       "range": {
         "startLine": 54,
         "startChar": 0,
