@@ -16,6 +16,24 @@
       "revId": "f2832fbb5be4d178f591fbed4ca90977e2e8ea44",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4f5c1bb7_506ef7f9",
+        "filename": "board/reef/board.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1186994
+      },
+      "writtenOn": "2017-05-16T12:24:51Z",
+      "side": 1,
+      "message": "Yes, BC12 interrupt will wake PD0 task.\ntest with reverting CL, ANX interrupt is in HOOK(Deferr) task.",
+      "parentUuid": "b637eb3e_b8e0286f",
+      "revId": "f2832fbb5be4d178f591fbed4ca90977e2e8ea44",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
