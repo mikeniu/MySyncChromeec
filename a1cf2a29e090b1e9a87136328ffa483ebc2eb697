@@ -73,6 +73,30 @@
     },
     {
       "key": {
+        "uuid": "1d38aaed_2dc5d3a3",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-05-17T16:10:01Z",
+      "side": 1,
+      "message": "I was told that it\u0027s an \"expectation\" of callers that the memory be mapped upon return from the call, so I added the memory mapping prior to returning.\n\nIt probably should have a #ifndef CONFIG_LPC around it, but thinking is that CONFIG_LPC products wouldn\u0027t enable CONFIG_HOST_EVENT_REPORT_MASK.  If you think there might be some reason LPC products would, I can add the #ifndef around the memmap call.",
+      "parentUuid": "c484b748_fc774ac3",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 6
+      },
+      "revId": "a1cf2a29e090b1e9a87136328ffa483ebc2eb697",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "a71150c9_8c1b81d6",
         "filename": "common/host_event_commands.c",
         "patchSetId": 9
