@@ -97,6 +97,30 @@
     },
     {
       "key": {
+        "uuid": "91abcd6f_654d3bcb",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-05-17T16:12:39Z",
+      "side": 1,
+      "message": "I shouldn\u0027t have quoted \"expectation\".  The actual comment was made on patch set 5 : \"there is a strong assumption in the code that host_get_memmap(EC_MEMMAP_HOST_EVENTS) \u003d\u003d events\n\nSee in host_get_next_event(): events is put in the out location, so AP will get it.\"",
+      "parentUuid": "1d38aaed_2dc5d3a3",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 6
+      },
+      "revId": "a1cf2a29e090b1e9a87136328ffa483ebc2eb697",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "a71150c9_8c1b81d6",
         "filename": "common/host_event_commands.c",
         "patchSetId": 9
