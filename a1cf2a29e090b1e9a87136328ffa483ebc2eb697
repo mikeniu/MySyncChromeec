@@ -121,6 +121,30 @@
     },
     {
       "key": {
+        "uuid": "6377de62_74f73dd0",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2017-05-17T16:42:52Z",
+      "side": 1,
+      "message": "Yes, but if we haven\u0027t modified \u0027events\u0027, I think that value in the memory mapped location would still be correct.",
+      "parentUuid": "91abcd6f_654d3bcb",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 6
+      },
+      "revId": "a1cf2a29e090b1e9a87136328ffa483ebc2eb697",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "a71150c9_8c1b81d6",
         "filename": "common/host_event_commands.c",
         "patchSetId": 9
