@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8e7b42e6_4a900b5c",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2017-05-20T01:03:13Z",
+      "side": 1,
+      "message": "What do you think about the following?\n\n    \nvoid host_set_events(uint32_mask)\n{\n#ifdef CONFIG_HOST_EVENT_REPORT_MASK\n    mask \u0026\u003d CONFIG_HOST_EVENT_REPORT_MASK;\n#endif /* defined(CONFIG_HOST_EVENT_REPORT_MASK) */\n\n    /* Only set an event if something\u0027s about to change */\n    if ((events \u0026 mask) !\u003d mask || (events_copy_b \u0026 mask) !\u003d mask)\n        CPRINTS(\"event set 0x%08x\", mask);\n    else\n        return;\n\n---8\u003c---\n\nMy reasoning is that if the host truly doesn\u0027t care about the event, then immediately drop it on the floor. Otherwise, proceed as normal and set the event if needed. Similarly for the clear events path.",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 2
+      },
+      "revId": "15bc5419a3a2da51e6098e1928252b4276462b30",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
