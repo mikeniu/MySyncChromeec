@@ -16,6 +16,24 @@
       "revId": "0e3769b663db3d5f2b770727841fd482f5100a81",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4612ca8e_67204814",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1121210
+      },
+      "writtenOn": "2017-05-20T00:37:05Z",
+      "side": 1,
+      "message": "Indeed. The issue is platform regardless.",
+      "parentUuid": "d86fe7c3_24406676",
+      "revId": "0e3769b663db3d5f2b770727841fd482f5100a81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
