@@ -46,6 +46,30 @@
       "revId": "15bc5419a3a2da51e6098e1928252b4276462b30",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2b786e4d_c3c8135b",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2017-05-20T03:00:04Z",
+      "side": 1,
+      "message": "I believe the intention is that the value should be \u00271\u0027s for events that a board\u0027s host cares about. See the child CL for an example. https://chromium-review.googlesource.com/c/503536/",
+      "parentUuid": "d31c9b53_adc9e4cd",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 2
+      },
+      "revId": "15bc5419a3a2da51e6098e1928252b4276462b30",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
