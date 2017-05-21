@@ -70,6 +70,30 @@
       "revId": "15bc5419a3a2da51e6098e1928252b4276462b30",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "791aae80_7c142d08",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1003000
+      },
+      "writtenOn": "2017-05-21T04:57:54Z",
+      "side": 1,
+      "message": "Aah I see.. Then yeah, your comment above makes sense. If mask is 0 after ANDing it with REPORT_MASK, then no action should be taken.\n\nAnother thing that can be done is have the REPORT_MASK set to all fs by default and allow boards that want to change that, to undefine and define the way they want. You can then avoid the #ifdef here i.e.\n\nvoid host_set_events(uint32_t mask)\n{\n    mask \u0026\u003d CONFIG_HOST_EVENT_REPORT_MASK;\n\n    if (....\n\n }",
+      "parentUuid": "2b786e4d_c3c8135b",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 2
+      },
+      "revId": "15bc5419a3a2da51e6098e1928252b4276462b30",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
