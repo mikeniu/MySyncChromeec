@@ -94,6 +94,30 @@
       "revId": "15bc5419a3a2da51e6098e1928252b4276462b30",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c3280b67_b2fbc4e6",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-05-22T22:21:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "791aae80_7c142d08",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 2
+      },
+      "revId": "15bc5419a3a2da51e6098e1928252b4276462b30",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
