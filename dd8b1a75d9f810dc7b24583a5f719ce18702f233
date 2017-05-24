@@ -22,6 +22,30 @@
       "revId": "dd8b1a75d9f810dc7b24583a5f719ce18702f233",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8c3b6238_db1505d6",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-05-24T22:07:46Z",
+      "side": 1,
+      "message": "I added the mem mapping based on a review comment (see review comment #5 on https://chromium-review.googlesource.com/c/502078/ ) :\n\n\"there is a strong assumption in the code that host_get_memmap(EC_MEMMAP_HOST_EVENTS) \u003d\u003d events\nSee in host_get_next_event(): events is put in the out location, so AP will get it.\"",
+      "parentUuid": "918d8207_e25a74ec",
+      "range": {
+        "startLine": 51,
+        "startChar": 2,
+        "endLine": 53,
+        "endChar": 11
+      },
+      "revId": "dd8b1a75d9f810dc7b24583a5f719ce18702f233",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
