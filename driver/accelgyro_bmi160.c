@@ -692,6 +692,9 @@ int manage_activity(const struct motion_sensor_t *s,
 	case MOTIONSENSE_ACTIVITY_SIG_MOTION: {
 		int tmp;
 		ret = raw_read8(s->port, s->addr, BMI160_INT_EN_0, &tmp);
+if (s->location == MOTIONSENSE_LOC_LID)
+	CPRINTS("lid sensor, SIGMO read INT_EN_0 = 0x%x", tmp);
+
 		if (ret)
 			return ret;
 		if (enable) {
@@ -715,6 +718,8 @@ int manage_activity(const struct motion_sensor_t *s,
 				 BMI160_INT_ANYMO_Y_EN |
 				 BMI160_INT_ANYMO_Z_EN);
 		}
+		if (s->location == MOTIONSENSE_LOC_LID)
+			CPRINTS("lid sensor, SIGMO config INT_EN_0 = 0x%x", tmp);
 		ret = raw_write8(s->port, s->addr, BMI160_INT_EN_0, tmp);
 		if (ret)
 			ret = EC_RES_UNAVAILABLE;
@@ -728,10 +733,14 @@ int manage_activity(const struct motion_sensor_t *s,
 		ret = raw_read8(s->port, s->addr, BMI160_INT_EN_0, &tmp);
 		if (ret)
 			return ret;
+if (s->location == MOTIONSENSE_LOC_LID)
+	CPRINTS("lid sensor, BATTERY_TAP read INT_EN_0 = 0x%x", tmp);
 		if (enable)
 			tmp |= BMI160_INT_D_TAP_EN;
 		else
 			tmp &= ~BMI160_INT_D_TAP_EN;
+if (s->location == MOTIONSENSE_LOC_LID)
+	CPRINTS("lid sensor, BATTERY_TAP setting INT_EN_0 = 0x%x", tmp);
 		ret = raw_write8(s->port, s->addr, BMI160_INT_EN_0, tmp);
 		if (ret)
 			ret = EC_RES_UNAVAILABLE;
@@ -782,6 +791,9 @@ void bmi160_interrupt(enum gpio_signal signal)
 static int config_interrupt(const struct motion_sensor_t *s)
 {
 	int ret, tmp;
+#ifdef CONFIG_ORIENTATION_SENSOR
+	int lid_sensor = 0;
+#endif
 
 	if (s->type != MOTIONSENSE_TYPE_ACCEL)
 		return EC_SUCCESS;
@@ -796,15 +808,33 @@ static int config_interrupt(const struct motion_sensor_t *s)
 	ret = raw_write8(s->port, s->addr, BMI160_INT_TAP_1,
 		BMI160_TAP_TH(s, CONFIG_GESTURE_TAP_THRES_MG));
 #endif
+#ifdef CONFIG_ORIENTATION_SENSOR
+	/* only use orientation sensor on the lid sensor */
+	if (s->location == MOTIONSENSE_LOC_LID) {
+lid_sensor = 1;
+	        CPRINTS("lid sensor, prog orient0=0x%x, orient_1=0x%x",
+				BMI160_INT_ORIENT_0_INIT_VAL,
+				BMI160_INT_ORIENT_1_INIT_VAL);
+		ret = raw_write8(s->port, s->addr, BMI160_INT_ORIENT_0,
+			BMI160_INT_ORIENT_0_INIT_VAL);
+		ret = raw_write8(s->port, s->addr, BMI160_INT_ORIENT_1,
+			BMI160_INT_ORIENT_1_INIT_VAL);
+	}
+#endif
+
 	/*
 	 * configure int2 as an external input.
 	 * Set a 5ms latch to be sure the EC can read the interrupt register
 	 * properly, even when it is running more slowly.
 	 */
+	if (lid_sensor) CPRINTS("lid sensor, INT_LATCH = 0x%x (5 ms latch)",
+				(BMI160_INT1_INPUT_EN | BMI160_LATCH_5MS));
 	ret = raw_write8(s->port, s->addr, BMI160_INT_LATCH,
 		BMI160_INT2_INPUT_EN | BMI160_LATCH_5MS);
 
 	/* configure int1 as an interupt */
+	 if (lid_sensor) CPRINTS("lid sensor, config int1 INT_OUT_CTRL = 0x%x",
+				(BMI160_INT_CTRL(1, OUTPUT_EN)));
 	ret = raw_write8(s->port, s->addr, BMI160_INT_OUT_CTRL,
 		BMI160_INT_CTRL(1, OUTPUT_EN));
 
@@ -816,17 +846,41 @@ static int config_interrupt(const struct motion_sensor_t *s)
 #ifdef CONFIG_GESTURE_SENSOR_BATTERY_TAP
 	tmp |= BMI160_INT_D_TAP;
 #endif
+#ifdef CONFIG_ORIENTATION_SENSOR
+	/* enable orientation interrupt for lid sensor only */
+	if (s->location == MOTIONSENSE_LOC_LID) {
+	        CPRINTS("lid sensor, enable orient interrupt (tmp=0x%x, INT_ORIENT_EN=0x%x)", tmp, BMI160_INT_ORIENT_EN);
+		tmp |= BMI160_INT_ORIENT_EN;
+	}
+#endif
+	if (lid_sensor) CPRINTS("lid sensor, config BMI160_INT_MAP_0 = 0x%x", tmp);
 	ret = raw_write8(s->port, s->addr, BMI160_INT_MAP_REG(1), tmp);
+#ifdef CONFIG_ORIENTATION_SENSOR
+	/* enable INT1 for activity */
+	if (s->location == MOTIONSENSE_LOC_LID) {
+		CPRINTS("lid sensor, config BMI160_INT_EN_0 = 0x%x", tmp);
+		ret = raw_write8(s->port, s->addr, BMI160_INT_EN_0, tmp);
+	}
+#endif
 
 #ifdef CONFIG_ACCEL_FIFO
 	/* map fifo water mark to int 1 */
+	if (lid_sensor) CPRINTS("lid sensor, config INT_FIFO_MAP = 0x%x",
+			(BMI160_INT_MAP(1, FWM) |
+			BMI160_INT_MAP(1, FFULL)));
 	ret = raw_write8(s->port, s->addr, BMI160_INT_FIFO_MAP,
 			BMI160_INT_MAP(1, FWM) |
 			BMI160_INT_MAP(1, FFULL));
 
 	/* configure fifo watermark at 50% */
+	if (lid_sensor) CPRINTS("lid sensor, config FIFO_CONFIG_0 = 0x%x",
+			512 / sizeof(uint32_t));
 	ret = raw_write8(s->port, s->addr, BMI160_FIFO_CONFIG_0,
 			512 / sizeof(uint32_t));
+	if (lid_sensor) CPRINTS("lid sensor, config FIFO_CONFIG_1 = 0x%x",
+			(BMI160_FIFO_TAG_INT1_EN |
+			BMI160_FIFO_TAG_INT2_EN |
+			BMI160_FIFO_HEADER_EN));
 	ret = raw_write8(s->port, s->addr, BMI160_FIFO_CONFIG_1,
 			BMI160_FIFO_TAG_INT1_EN |
 			BMI160_FIFO_TAG_INT2_EN |
@@ -835,8 +889,10 @@ static int config_interrupt(const struct motion_sensor_t *s)
 	/* Set fifo*/
 	ret = raw_read8(s->port, s->addr, BMI160_INT_EN_1, &tmp);
 	tmp |= BMI160_INT_FWM_EN | BMI160_INT_FFUL_EN;
+	if (lid_sensor) CPRINTS("lid sensor, config INT_EN_1 = 0x%x", tmp);
 	ret = raw_write8(s->port, s->addr, BMI160_INT_EN_1, tmp);
 #endif
+
 	mutex_unlock(s->mutex);
 	return ret;
 }
@@ -848,6 +904,35 @@ static int config_interrupt(const struct motion_sensor_t *s)
  * For now, we just print out. We should set a bitmask motion sense code will
  * act upon.
  */
+static int orientation_remap(int orientation)
+{
+	int new_orientation = orientation;
+#ifdef ORIENTATION_REMAP_X_Y_AXES
+	switch (orientation) {
+	case CONFIG_ORIENT_PORTRAIT_EVENT:
+		CPRINTS("PORTRAIT -> LANDSCAPE");
+		new_orientation = CONFIG_ORIENT_LANDSCAPE_EVENT;
+		break;
+	case CONFIG_ORIENT_INVERT_PORTRAIT_EVENT:
+		CPRINTS("INVERT_PORTRAIT -> INVERT_LANDSCAPE");
+		new_orientation = CONFIG_ORIENT_INVERT_LANDSCAPE_EVENT;
+		break;
+	case CONFIG_ORIENT_LANDSCAPE_EVENT:
+		CPRINTS("LANDSCAPE -> PORTRAIT");
+		new_orientation = CONFIG_ORIENT_PORTRAIT_EVENT;
+		break;
+	case CONFIG_ORIENT_INVERT_LANDSCAPE_EVENT:
+		CPRINTS("INVERT_LANDSCAPE -> INVERT_PORTRAIT");
+		new_orientation = CONFIG_ORIENT_INVERT_PORTRAIT_EVENT;
+		break;
+	default:
+		break;
+	}
+#endif
+	return new_orientation;
+}
+
+
 static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 {
 	int interrupt;
@@ -865,6 +950,41 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 #ifdef CONFIG_GESTURE_SIGMO
 	if (interrupt & BMI160_SIGMOT_INT)
 		*event |= CONFIG_GESTURE_SIGMO_EVENT;
+#endif
+#ifdef CONFIG_ORIENTATION_SENSOR
+	if (interrupt & BMI160_ORIENT_INT) {
+		switch(interrupt & BMI160_ORIENT_XY_MASK_32) {
+		// Must check orientation of sensor mount and translate
+		case BMI160_ORIENT_PORTRAIT_32:
+			*event |= orientation_remap(CONFIG_ORIENT_PORTRAIT_EVENT);
+			CPRINTS("Saw CONFIG_ORIENT_PORTRAIT_EVENT (int=0x%x, event=0x%x)",
+					interrupt, interrupt & BMI160_ORIENT_XY_MASK_32);
+			break;
+		case BMI160_ORIENT_PORTRAIT_INVERT_32:
+			*event |= orientation_remap(CONFIG_ORIENT_INVERT_PORTRAIT_EVENT);
+			CPRINTS("Saw CONFIG_ORIENT_INVERT_PORTRAIT_EVENT (int=0x%x, event=0x%x)",
+					interrupt, interrupt & BMI160_ORIENT_XY_MASK_32);
+			break;
+		case BMI160_ORIENT_LANDSCAPE_32:
+			*event |= orientation_remap(CONFIG_ORIENT_LANDSCAPE_EVENT);
+			CPRINTS("Saw CONFIG_ORIENT_LANDSCAPE_EVENT (int=0x%x, event=0x%x)",
+					interrupt, interrupt & BMI160_ORIENT_XY_MASK_32);
+			break;
+		case BMI160_ORIENT_LANDSCAPE_INVERT_32:
+			*event |= orientation_remap(CONFIG_ORIENT_INVERT_LANDSCAPE_EVENT);
+			CPRINTS("Saw CONFIG_ORIENT_INVERT_LANDSCAPE_EVENT (int=0x%x, event=0x%x)",
+					interrupt, interrupt & BMI160_ORIENT_XY_MASK_32);
+			break;
+		default:
+			CPRINTS("unknown accel int 0x%x", interrupt & BMI160_ORIENT_XY_MASK_32);
+			break;
+		}
+	} else {
+		if (s->location == MOTIONSENSE_LOC_LID) {
+			raw_read32(s->port, s->addr, BMI160_INT_STATUS_3, &interrupt);
+			CPRINTS("Orient VAL: 0x%x", (orientation_event(interrupt) >> 4));
+		}
+	}
 #endif
 	/*
 	 * No need to read the FIFO here, motion sense task is

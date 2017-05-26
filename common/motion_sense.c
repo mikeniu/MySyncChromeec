@@ -724,6 +724,47 @@ void motion_sense_task(void)
 			}
 		}
 
+#ifdef CONFIG_ORIENTATION_SENSOR
+		if (orientation_event(event)) {
+			struct ec_response_motion_sensor_data vector = {
+				.flags = 0,
+				.activity = MOTIONSENSE_ACTIVITY_ORIENTATION,
+				.sensor_num = MOTION_SENSE_ACTIVITY_SENSOR_ID
+			};
+			int send_event = 1;
+
+			switch(orientation_event(event)) {
+			case CONFIG_ORIENT_PORTRAIT_EVENT:
+				CPRINTS("sending orientation event MOTIONSENSE_ORIENTATION_PORTRAIT (event=0x%x", orientation_event(event));
+				vector.state = MOTIONSENSE_ORIENTATION_PORTRAIT;
+				break;
+			case CONFIG_ORIENT_INVERT_PORTRAIT_EVENT:
+				CPRINTS("sending orientation event MOTIONSENSE_ORIENTATION_UPSIDE_DOWN_PORTRAIT");
+				vector.state = MOTIONSENSE_ORIENTATION_UPSIDE_DOWN_PORTRAIT;
+				break;
+			case CONFIG_ORIENT_LANDSCAPE_EVENT:
+				CPRINTS("sending orientation event MOTIONSENSE_ORIENTATION_LANDSCAPE");
+				vector.state = MOTIONSENSE_ORIENTATION_LANDSCAPE;
+				break;
+			case CONFIG_ORIENT_INVERT_LANDSCAPE_EVENT:
+				CPRINTS("sending orientation event MOTIONSENSE_ORIENTATION_UPSIDE_DOWN_LANDSCAPE");
+				vector.state = MOTIONSENSE_ORIENTATION_UPSIDE_DOWN_LANDSCAPE;
+				break;
+			default:
+				/* more than one event set ? */
+				CPRINTS("error: unknown orientation event 0x%x", orientation_event(event));
+				send_event = 0;
+				break;
+			}
+
+			/* Send events to the FIFO */
+			if (send_event) {
+				motion_sense_fifo_add_unit(&vector, NULL, 0);
+				CPRINTS("orientation change 0x%x", orientation_event(event));
+			}
+		}
+#endif
+
 #ifdef CONFIG_GESTURE_DETECTION
 #ifdef CONFIG_GESTURE_SW_DETECTION
 		/* Run gesture recognition engine */
