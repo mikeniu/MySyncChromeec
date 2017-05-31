@@ -46,6 +46,30 @@
       "revId": "dd8b1a75d9f810dc7b24583a5f719ce18702f233",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0f9b097e_240dc27a",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2017-05-31T01:10:23Z",
+      "side": 1,
+      "message": "I still don\u0027t think that this is needed. In patchset #5, the code was written such that events were being set, but the memmap wasn\u0027t being updated. \n\nIn this case, no new event is being set, so no need to set the memmap because nothing has changed. The events and memmap already agree.",
+      "parentUuid": "8c3b6238_db1505d6",
+      "range": {
+        "startLine": 51,
+        "startChar": 2,
+        "endLine": 53,
+        "endChar": 11
+      },
+      "revId": "dd8b1a75d9f810dc7b24583a5f719ce18702f233",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
