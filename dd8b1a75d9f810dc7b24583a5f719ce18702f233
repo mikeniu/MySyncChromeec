@@ -70,6 +70,30 @@
       "revId": "dd8b1a75d9f810dc7b24583a5f719ce18702f233",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "69158986_1437032b",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-06-06T23:06:37Z",
+      "side": 1,
+      "message": "I was initially thinking that the space would be mapped when it originally changed and thus didn\u0027t need to be remapped if it didn\u0027t change.  But I was concerned about the potential initial corner case where nothing has changed yet but the memory hasn\u0027t been mapped for the first time yet.  Unless there\u0027s a reason that could never happen, I could add a \"first_time\" variable to make sure to map the memory if the routine gets called but no events have changed and the event variable has never been mapped to handle that particular case if you agree it\u0027s a possible issue.  More likely, I\u0027d just issue the initial map call during init process and avoid checking a first_time flag every time if that makes sense once I examine the code with that in mind.",
+      "parentUuid": "0f9b097e_240dc27a",
+      "range": {
+        "startLine": 51,
+        "startChar": 2,
+        "endLine": 53,
+        "endChar": 11
+      },
+      "revId": "dd8b1a75d9f810dc7b24583a5f719ce18702f233",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
