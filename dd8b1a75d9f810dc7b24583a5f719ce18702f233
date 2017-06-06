@@ -94,6 +94,30 @@
       "revId": "dd8b1a75d9f810dc7b24583a5f719ce18702f233",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "af0d76dc_26466772",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2017-06-06T23:26:42Z",
+      "side": 1,
+      "message": "I don\u0027t think we have to worry about that because the memory mapped location and the events copies are in the .bss section. Therefore, once the EC boots, they\u0027re both cleared. Any event of interest that then occurs will set the event and in the memory mapped location as well.\n\nI\u0027m not sure I see a case where the events have changed but we haven\u0027t set it in the memory mapped location as well since they both happen from this function.",
+      "parentUuid": "69158986_1437032b",
+      "range": {
+        "startLine": 51,
+        "startChar": 2,
+        "endLine": 53,
+        "endChar": 11
+      },
+      "revId": "dd8b1a75d9f810dc7b24583a5f719ce18702f233",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
