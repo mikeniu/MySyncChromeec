@@ -142,6 +142,30 @@
       "revId": "dd8b1a75d9f810dc7b24583a5f719ce18702f233",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b1a947f9_ca8edee9",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-06-07T02:03:47Z",
+      "side": 1,
+      "message": "I meant I\u0027ll make the change to not map the \"memory space\", not \"code\".\n\nDone.",
+      "parentUuid": "c631cca8_605a2cc5",
+      "range": {
+        "startLine": 51,
+        "startChar": 2,
+        "endLine": 53,
+        "endChar": 11
+      },
+      "revId": "dd8b1a75d9f810dc7b24583a5f719ce18702f233",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
