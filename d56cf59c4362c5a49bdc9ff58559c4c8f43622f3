@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fccfa1b_6b50c7fe",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2017-06-08T21:19:25Z",
+      "side": 1,
+      "message": "don\u0027t need to add this blank line.",
+      "revId": "d56cf59c4362c5a49bdc9ff58559c4c8f43622f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9403ca7a_87b325f5",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2017-06-08T21:19:25Z",
+      "side": 1,
+      "message": "looks like you might have some trailing whitespace.",
+      "revId": "d56cf59c4362c5a49bdc9ff58559c4c8f43622f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
