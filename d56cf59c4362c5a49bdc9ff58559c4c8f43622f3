@@ -69,6 +69,24 @@
       "revId": "d56cf59c4362c5a49bdc9ff58559c4c8f43622f3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a37a11b_2f4cd763",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1186109
+      },
+      "writtenOn": "2017-06-09T20:19:08Z",
+      "side": 1,
+      "message": "Running into a weird problem here.  Source shows I removed whitespace, \"git commit -a --amend\" added it, but checkin hook still thinks it has a trailing white space, as does gerrit.  Editing the file again shows there\u0027s no white space.  Will continue to dig to try to figure this weird problem out.",
+      "parentUuid": "7e987f63_2a44c87f",
+      "revId": "d56cf59c4362c5a49bdc9ff58559c4c8f43622f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
