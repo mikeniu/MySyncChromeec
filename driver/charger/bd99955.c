@@ -642,10 +642,6 @@ int charger_set_current(int current)
 	/* Charge current step 64 mA */
 	current &= ~0x3F;
 
-	if (current < BD99955_NO_BATTERY_CHARGE_I_MIN &&
-	    (battery_is_present() != BP_YES || battery_is_cut_off()))
-		current = BD99955_NO_BATTERY_CHARGE_I_MIN;
-
 	/*
 	 * Disable charger before setting charge current to 0 or when
 	 * discharging on AC.
