@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6e37e517_96917502",
+        "filename": "common/rwsig.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-07-07T14:56:46Z",
+      "side": 1,
+      "message": "You\u0027re changing the default return value here...\n\nIf the first if block fails, you\u0027ll end up returning true...",
+      "revId": "4d424f137e99d456ec4a23c856158a9bcf682e30",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "29042af0_3d03b519",
+        "filename": "include/config.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 1967,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-07-07T14:56:46Z",
+      "side": 1,
+      "message": "rwsig vs usbpd1 is also the name that is used by futility, so I\u0027m not sure why you want to change this.",
+      "revId": "4d424f137e99d456ec4a23c856158a9bcf682e30",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
