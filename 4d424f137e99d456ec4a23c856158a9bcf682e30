@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "658f0464_ea90794a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-07-07T15:11:21Z",
+      "side": 1,
+      "message": "Please also test on hammer, you should easily be able to get a board in MTV (but I\u0027m also happy to help you with that if needed).",
+      "revId": "4d424f137e99d456ec4a23c856158a9bcf682e30",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6e37e517_96917502",
         "filename": "common/rwsig.c",
         "patchSetId": 4
