@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2885970c_275ac770",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000187
+      },
+      "writtenOn": "2017-07-11T15:40:06Z",
+      "side": 1,
+      "message": "please do \u0027git commit --amend -s\u0027 to add signed-off-by.",
+      "revId": "9adeeacbf7754285e516ff202ebc7c6d4e9b0f61",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    }
+  ]
+}
