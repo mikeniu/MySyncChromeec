@@ -11,6 +11,7 @@
 #include "hooks.h"
 #include "nvmem.h"
 #include "nvmem_vars.h"
+#include "physical_presence.h"
 #include "registers.h"
 #include "scratch_reg1.h"
 #include "system.h"
@@ -356,6 +357,7 @@ static timestamp_t unlock_deadline;
 
 /* Are we expecting power button pokes? */
 static int unlock_in_progress;
+static int physical_presence_in_progress;
 
 /* This is invoked only when the unlock sequence has ended */
 static void unlock_sequence_is_over(void)
@@ -397,7 +399,10 @@ static void power_button_poked(void)
 
 static void power_button_handler(void)
 {
-	if (unlock_in_progress)
+	CPRINTS("power button pressed");
+	if (physical_presence_in_progress)
+		physical_detect_press();
+	else if (unlock_in_progress)
 		power_button_poked();
 #ifdef CONFIG_U2F
 	else
@@ -436,6 +441,18 @@ static void power_button_init(void)
 	task_enable_irq(GC_IRQNUM_RBOX0_INTR_PWRB_IN_FED_INT);
 }
 DECLARE_HOOK(HOOK_INIT, power_button_init, HOOK_PRIO_DEFAULT);
+
+void board_physical_presence_enable(int enable)
+{
+	/* Stay awake while we're doing this, just in case. */
+	if (enable)
+		disable_sleep(SLEEP_MASK_FORCE_NO_DSLEEP);
+	else
+		enable_sleep(SLEEP_MASK_FORCE_NO_DSLEEP);
+
+	physical_presence_in_progress = enable;
+}
+
 
 /****************************************************************************/
 /* TPM vendor-specific commands */

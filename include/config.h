@@ -1817,6 +1817,9 @@
  */
 #undef CONFIG_PECI_TJMAX
 
+/* Support physical presence detect via the power button */
+#undef CONFIG_PHYSICAL_PRESENCE
+
 /*****************************************************************************/
 /* PMU config */
 

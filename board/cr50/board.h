@@ -102,6 +102,7 @@
 
 /* Enable Case Closed Debugging */
 #define CONFIG_CASE_CLOSED_DEBUG
+#define CONFIG_PHYSICAL_PRESENCE
 
 #define CONFIG_USB_PID 0x5014
 #define CONFIG_USB_SELF_POWERED
