@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7badd415_504c5d77",
+        "filename": "common/rwsig.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-07-13T02:34:29Z",
+      "side": 1,
+      "message": "No this is still wrong, if the first goto out is taken, you\u0027ll end up returning true.",
+      "revId": "1109c5c648659ee071f77cec355455cdcf66e053",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
