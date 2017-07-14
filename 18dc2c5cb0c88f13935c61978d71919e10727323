@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "910856c1_d4024f48",
+        "filename": "common/rwsig.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-07-14T11:01:02Z",
+      "side": 1,
+      "message": "Can we use some EC_* code instead? (EC_ERROR_UNKNOWN is fine, which, well, is \u003d\u003d 1 ,-))",
+      "range": {
+        "startLine": 79,
+        "startChar": 11,
+        "endLine": 79,
+        "endChar": 12
+      },
+      "revId": "18dc2c5cb0c88f13935c61978d71919e10727323",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "49bf3bcf_c15768eb",
+        "filename": "common/rwsig.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-07-14T11:01:02Z",
+      "side": 1,
+      "message": "I guess this can be err \u003d ret",
+      "revId": "18dc2c5cb0c88f13935c61978d71919e10727323",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
