@@ -6262,8 +6262,10 @@ int cmd_ec_hash(int argc, char *argv[])
 			fprintf(stderr, "Bad nonce integer.\n");
 			return -1;
 		}
+		memset(p.nonce_data, 0, sizeof(p.nonce_data));
 		memcpy(p.nonce_data, &nonce, sizeof(nonce));
-		p.nonce_size = sizeof(nonce);
+		// p.nonce_size = sizeof(nonce);
+		p.nonce_size = 64;
 	} else
 		p.nonce_size = 0;
 
