@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "494b5b26_50438609",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2017-08-16T18:34:16Z",
+      "side": 1,
+      "message": "a file from core/cortex-m0 built with an x86 toolchain is not a great idea, we should fix it for real.\nCan you post the build command-line for this case (make buildall V\u003d1) ?",
+      "range": {
+        "startLine": 9,
+        "startChar": 28,
+        "endLine": 11,
+        "endChar": 10
+      },
+      "revId": "a2583baabb69e42f383bba35c06925091143e211",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
