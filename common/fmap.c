@@ -206,16 +206,5 @@ const struct _ec_fmap {
 			.area_flags = FMAP_AREA_STATIC,
 		},
 #endif
-#ifdef CONFIG_RWSIG_TYPE_RWSIG
-		{
-			 /* RW image signature */
-			.area_name = "SIG_RW",
-			.area_offset = CONFIG_EC_PROTECTED_STORAGE_OFF -
-				FMAP_REGION_START + CONFIG_RW_SIG_ADDR -
-				CONFIG_PROGRAM_MEMORY_BASE,
-			.area_size = CONFIG_RW_SIG_SIZE,
-			.area_flags = FMAP_AREA_STATIC | FMAP_AREA_RO,
-		},
-#endif
 	}
 };

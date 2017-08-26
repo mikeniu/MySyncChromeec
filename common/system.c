@@ -381,12 +381,19 @@ test_mockable int system_unsafe_to_overwrite(uint32_t offset, uint32_t size)
 	case SYSTEM_IMAGE_RW:
 		r_offset = CONFIG_EC_WRITABLE_STORAGE_OFF +
 			   CONFIG_RW_STORAGE_OFF;
-		r_size = CONFIG_RW_SIZE;
+		r_size = CONFIG_RW_SIZE - CONFIG_RW_SIG_SIZE;
 #ifdef CONFIG_RWSIG
 		/* Allow RW sig to be overwritten */
 		r_size -= CONFIG_RW_SIG_SIZE;
 #endif
 		break;
+#ifdef CONFIG_VBOOT_EFS
+	case SYSTEM_IMAGE_RW_B:
+		r_offset = CONFIG_EC_WRITABLE_STORAGE_OFF +
+				CONFIG_RW_B_STORAGE_OFF;
+		r_size = CONFIG_RW_SIZE - CONFIG_RW_SIG_SIZE;
+		break;
+#endif
 	default:
 		return 0;
 	}
@@ -497,6 +504,11 @@ static void jump_to_image(uintptr_t init_addr)
 	resetvec();
 }
 
+int system_is_rw_image(enum system_image_copy_t copy)
+{
+	return copy == SYSTEM_IMAGE_RW || copy == SYSTEM_IMAGE_RW_B;
+}
+
 int system_run_image_copy(enum system_image_copy_t copy)
 {
 	uintptr_t base;
@@ -515,7 +527,7 @@ int system_run_image_copy(enum system_image_copy_t copy)
 			return EC_ERROR_ACCESS_DENIED;
 
 		/* Target image must be RW image */
-		if (copy != SYSTEM_IMAGE_RW)
+		if (!system_is_rw_image(copy))
 			return EC_ERROR_ACCESS_DENIED;
 
 		/* Jumping must still be enabled */
@@ -588,9 +600,20 @@ static const struct image_data *system_get_image_data(
 	 * Read the version information from the proper location
 	 * on storage.
 	 */
-	addr += (copy == SYSTEM_IMAGE_RW) ?
-		CONFIG_EC_WRITABLE_STORAGE_OFF + CONFIG_RW_STORAGE_OFF :
-		CONFIG_EC_PROTECTED_STORAGE_OFF + CONFIG_RO_STORAGE_OFF;
+	switch (copy) {
+	case SYSTEM_IMAGE_RW:
+		addr += CONFIG_EC_WRITABLE_STORAGE_OFF + CONFIG_RW_STORAGE_OFF;
+		break;
+#ifdef CONFIG_VBOOT_EFS
+	case SYSTEM_IMAGE_RW_B:
+		addr += CONFIG_EC_WRITABLE_STORAGE_OFF +
+				CONFIG_RW_B_STORAGE_OFF;
+		break;
+#endif
+	default:
+		addr += CONFIG_EC_PROTECTED_STORAGE_OFF + CONFIG_RO_STORAGE_OFF;
+		break;
+	}
 
 #ifdef CONFIG_MAPPED_STORAGE
 	addr += CONFIG_MAPPED_STORAGE_BASE;
@@ -632,8 +655,11 @@ int32_t system_get_rollback_version(enum system_image_copy_t copy)
 int system_get_image_used(enum system_image_copy_t copy)
 {
 	const struct image_data *data = system_get_image_data(copy);
-
-	return data ? MAX((int)data->size, 0) : 0;
+	int size = data ? MAX((int)data->size, 0) : 0;
+	if (copy == SYSTEM_IMAGE_RO)
+		return size;
+	else
+		return CONFIG_RW_SIG_SIZE + size;
 }
 
 int system_get_board_version(void)

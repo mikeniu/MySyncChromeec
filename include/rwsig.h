@@ -96,7 +96,6 @@ void rwsig_jump_now(void);
 #endif
 #endif /* CONFIG_RO_PUBKEY_ADDR */
 
-#ifndef CONFIG_RW_SIG_SIZE
 #ifdef CONFIG_RWSIG_TYPE_RWSIG
 /*
  * rwsig type: futility expects signature to be 1024 bytes from the end of
@@ -106,21 +105,19 @@ void rwsig_jump_now(void);
 #else
 #define CONFIG_RW_SIG_SIZE RSANUMBYTES
 #endif
-#endif /* ! CONFIG_RW_SIG_SIZE */
-/* The signature resides at the end of each RW copy */
-#define RW_SIG_OFFSET		(CONFIG_RW_SIZE - CONFIG_RW_SIG_SIZE)
-#define RW_A_ADDR		(CONFIG_PROGRAM_MEMORY_BASE +		\
-				 CONFIG_EC_WRITABLE_STORAGE_OFF +	\
-				 CONFIG_RW_STORAGE_OFF)
+
+/* By default, signatures are placed at the start of each slot */
+#ifndef CONFIG_RW_SIGN_STORAGE_OFF
+#define CONFIG_RW_SIGN_STORAGE_OFF	0
+#endif
+#ifndef CONFIG_RW_B_SIGN_STORAGE_OFF
+#define CONFIG_RW_B_SIGN_STORAGE_OFF	(CONFIG_RW_SIGN_STORAGE_OFF + \
+					 CONFIG_RW_SIZE)
+#endif
+#define EC_WRITABLE_ADDR	(CONFIG_PROGRAM_MEMORY_BASE +	\
+				 CONFIG_EC_WRITABLE_STORAGE_OFF)
 /* Assume the layout is same as RW_A and it sits right after RW_A */
-#define RW_B_ADDR		(CONFIG_PROGRAM_MEMORY_BASE + \
-				 CONFIG_EC_WRITABLE_STORAGE_OFF + \
-				 CONFIG_RW_B_STORAGE_OFF)
-#ifndef CONFIG_RW_SIG_ADDR
-#define CONFIG_RW_SIG_ADDR	(RW_A_ADDR + RW_SIG_OFFSET)
-#endif
-#ifndef CONFIG_RW_B_SIG_ADDR
-#define CONFIG_RW_B_SIG_ADDR	(RW_B_ADDR + RW_SIG_OFFSET)
-#endif
+#define CONFIG_RW_SIG_ADDR    (EC_WRITABLE_ADDR + CONFIG_RW_SIGN_STORAGE_OFF)
+#define CONFIG_RW_B_SIG_ADDR  (EC_WRITABLE_ADDR + CONFIG_RW_B_SIGN_STORAGE_OFF)
 
 #endif /* __CROS_EC_RWSIG_H */

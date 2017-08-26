@@ -1220,9 +1220,16 @@
 /* This is the offset of the second RW section into the flash. */
 #undef CONFIG_RW_B_MEM_OFF
 
-/* Offset relative to CONFIG_EC_WRITABLE_STORAGE_OFF */
+/* Offset of the start of RW_A/B code
+ * relative to CONFIG_EC_WRITABLE_STORAGE_OFF. */
 #undef CONFIG_RW_STORAGE_OFF
+#undef CONFIG_RW_B_STORAGE_OFF
 #undef CONFIG_RW_SIZE
+
+/* Offset of the start of RW_A/B signature
+ * relative to CONFIG_EC_WRITABLE_STORAGE_OFF. */
+#undef CONFIG_RW_SIGN_STORAGE_OFF
+#undef CONFIG_RW_B_SIGN_STORAGE_OFF
 
 /*
  * NPCX-specific bootheader geometry.

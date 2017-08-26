@@ -76,11 +76,11 @@ static int verify_slot(int slot)
 	if (slot == VBOOT_EC_SLOT_A) {
 		data = (const uint8_t *)(CONFIG_MAPPED_STORAGE_BASE +
 				CONFIG_EC_WRITABLE_STORAGE_OFF +
-				CONFIG_RW_A_STORAGE_OFF);
+				CONFIG_RW_STORAGE_OFF);
 		vb21_sig = (const struct vb21_signature *)(
 				CONFIG_MAPPED_STORAGE_BASE +
 				CONFIG_EC_WRITABLE_STORAGE_OFF +
-				CONFIG_RW_A_SIGN_STORAGE_OFF);
+				CONFIG_RW_SIGN_STORAGE_OFF);
 	} else {
 		data = (const uint8_t *)(CONFIG_MAPPED_STORAGE_BASE +
 				CONFIG_EC_WRITABLE_STORAGE_OFF +

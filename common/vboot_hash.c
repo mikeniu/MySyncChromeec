@@ -10,6 +10,7 @@
 #include "flash.h"
 #include "hooks.h"
 #include "host_command.h"
+#include "rwsig.h"
 #include "sha256.h"
 #include "shared_mem.h"
 #include "system.h"

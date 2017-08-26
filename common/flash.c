@@ -12,6 +12,7 @@
 #include "hooks.h"
 #include "host_command.h"
 #include "otp.h"
+#include "rwsig.h"
 #include "shared_mem.h"
 #include "system.h"
 #include "util.h"
