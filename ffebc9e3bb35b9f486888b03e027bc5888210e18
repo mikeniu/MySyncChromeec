@@ -16,6 +16,24 @@
       "revId": "ffebc9e3bb35b9f486888b03e027bc5888210e18",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5b3ee09c_d059703b",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1121210
+      },
+      "writtenOn": "2017-09-11T03:42:56Z",
+      "side": 1,
+      "message": "It\u0027s better to reply here. (Forget my previous comment :))\n\nI think the key is this patch should forbid the uart task to put the character in UTBUF. It\u0027s dangerous to switch the UART interface to the new pad if the transaction is ongoing. clock_disable_peripheral() will stop the clock of UART and any register operation is useless.",
+      "parentUuid": "623a06d2_d155c25c",
+      "revId": "ffebc9e3bb35b9f486888b03e027bc5888210e18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
