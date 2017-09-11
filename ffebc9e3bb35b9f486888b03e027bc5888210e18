@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "623a06d2_d155c25c",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-09-11T02:10:49Z",
+      "side": 1,
+      "message": "ML: Would be good to understand what is going on here. Without disabling the peripheral, I sometimes see the UART controller getting stuck in a state where it is not able to receive any data anymore (TX still works fine).\n\n(some more details in the bug)",
+      "revId": "ffebc9e3bb35b9f486888b03e027bc5888210e18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
