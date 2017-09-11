@@ -34,6 +34,24 @@
       "revId": "ffebc9e3bb35b9f486888b03e027bc5888210e18",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7f3463ac_32ad5f69",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1121210
+      },
+      "writtenOn": "2017-09-11T10:17:51Z",
+      "side": 1,
+      "message": "I also have the concern about rx transaction. If ec was already receiving a rx transaction and ec switched the UART pads to the others at the same time, the internal state machine of UART might still wait for incoming clocks. (I need to discuss with the designers to confirm that.)",
+      "parentUuid": "5b3ee09c_d059703b",
+      "revId": "ffebc9e3bb35b9f486888b03e027bc5888210e18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
