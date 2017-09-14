@@ -52,6 +52,24 @@
       "revId": "ffebc9e3bb35b9f486888b03e027bc5888210e18",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "29bfecf8_91161f9d",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-09-14T06:09:35Z",
+      "side": 1,
+      "message": "Updated to set UICTRL to 0x00, make sure RX FIFO is cleared, then reset UICTRL after pad switching.\n\nI could not reproduce the RX locking issue after ~1h, so maybe this is better? I need to do more extensive testing.",
+      "parentUuid": "7f3463ac_32ad5f69",
+      "revId": "ffebc9e3bb35b9f486888b03e027bc5888210e18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
