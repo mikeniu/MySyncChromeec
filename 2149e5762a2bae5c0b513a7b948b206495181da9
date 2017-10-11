@@ -22,6 +22,30 @@
       "revId": "2149e5762a2bae5c0b513a7b948b206495181da9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f9d04253_b32a677c",
+        "filename": "driver/bc12/bq24392.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2017-10-11T22:51:49Z",
+      "side": 1,
+      "message": "According to Willis and Rachel, it should be fine to turn this on anytime.\n\nWhat\u0027s the race you\u0027re worried about?",
+      "parentUuid": "176d4bbc_4c5fa327",
+      "range": {
+        "startLine": 137,
+        "startChar": 3,
+        "endLine": 143,
+        "endChar": 38
+      },
+      "revId": "2149e5762a2bae5c0b513a7b948b206495181da9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
