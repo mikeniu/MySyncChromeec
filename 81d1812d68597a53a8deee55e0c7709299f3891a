@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a1b9063b_a3a9fd44",
+        "filename": "board/poppy/gpio.inc",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1001696
+      },
+      "writtenOn": "2017-10-11T23:20:07Z",
+      "side": 1,
+      "message": "If this pin isn\u0027t getting dropped, there probably needs to be a pull-down (or pull-up for later versions) on the board. May want to add a TODO for now.",
+      "range": {
+        "startLine": 117,
+        "startChar": 22,
+        "endLine": 117,
+        "endChar": 59
+      },
+      "revId": "81d1812d68597a53a8deee55e0c7709299f3891a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    }
+  ]
+}
