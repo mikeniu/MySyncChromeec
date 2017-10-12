@@ -46,6 +46,30 @@
       "revId": "2149e5762a2bae5c0b513a7b948b206495181da9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8c60cb7e_f4f7b80d",
+        "filename": "driver/bc12/bq24392.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1001696
+      },
+      "writtenOn": "2017-10-12T04:14:49Z",
+      "side": 1,
+      "message": "The chipset task sets this GPIO low in POWER_S3S5, so there is no guarantee it will be high throughout detect_or_power_down_ic(). And, I don\u0027t think CHIPSET_STATE_ANY_OFF includes POWER_S3S5, so it may be possible in theory (probably not in practice) for GPIO_EN_PP5000 to be incorrectly left on, going to S5 / G3.\n\nMaybe we should add some chipset-level code to synchronize this, basically allow either of two tasks to request this GPIO be turned on, and turn it off only when both tasks don\u0027t set the request.",
+      "parentUuid": "f9d04253_b32a677c",
+      "range": {
+        "startLine": 137,
+        "startChar": 3,
+        "endLine": 143,
+        "endChar": 38
+      },
+      "revId": "2149e5762a2bae5c0b513a7b948b206495181da9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
