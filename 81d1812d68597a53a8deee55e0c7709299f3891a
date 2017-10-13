@@ -22,6 +22,30 @@
       "revId": "81d1812d68597a53a8deee55e0c7709299f3891a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9bcaeadd_27e2ebc5",
+        "filename": "board/poppy/gpio.inc",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1127214
+      },
+      "writtenOn": "2017-10-13T19:22:55Z",
+      "side": 1,
+      "message": "Remove GPIO_PULL_UP and added comments for TODO in PTV.",
+      "parentUuid": "a1b9063b_a3a9fd44",
+      "range": {
+        "startLine": 117,
+        "startChar": 22,
+        "endLine": 117,
+        "endChar": 59
+      },
+      "revId": "81d1812d68597a53a8deee55e0c7709299f3891a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
