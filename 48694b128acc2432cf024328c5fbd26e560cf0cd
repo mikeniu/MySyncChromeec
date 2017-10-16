@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "175420b6_fa2d2d97",
+        "filename": "board/poppy/gpio.inc",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-16T00:45:36Z",
+      "side": 1,
+      "message": "You can set the pull-up as default, gpio_get_ternary will do the right thing.",
+      "revId": "48694b128acc2432cf024328c5fbd26e560cf0cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
