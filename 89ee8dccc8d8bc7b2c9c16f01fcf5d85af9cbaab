@@ -82,6 +82,24 @@
     },
     {
       "key": {
+        "uuid": "d43f8f88_47fff5a2",
+        "filename": "board/poppy/gpio.inc",
+        "patchSetId": 4
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1127214
+      },
+      "writtenOn": "2017-10-17T19:49:00Z",
+      "side": 1,
+      "message": "From Soraka measurement, it lowers S0ix power by 3.5+mW on EVT2.(b:64503543).\nDo you think it should be treated as TODO list ?",
+      "parentUuid": "624aa2d3_a37d119d",
+      "revId": "89ee8dccc8d8bc7b2c9c16f01fcf5d85af9cbaab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "74a82e00_2d6e28e2",
         "filename": "board/poppy/gpio.inc",
         "patchSetId": 4
