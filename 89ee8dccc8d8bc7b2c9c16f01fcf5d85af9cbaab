@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fb9538e6_372bd8bf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-17T03:43:26Z",
+      "side": 1,
+      "message": "poppy",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 6
+      },
+      "revId": "89ee8dccc8d8bc7b2c9c16f01fcf5d85af9cbaab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "110d6099_6d517fef",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-17T03:43:26Z",
+      "side": 1,
+      "message": "none",
+      "range": {
+        "startLine": 12,
+        "startChar": 7,
+        "endLine": 12,
+        "endChar": 13
+      },
+      "revId": "89ee8dccc8d8bc7b2c9c16f01fcf5d85af9cbaab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "23927c5f_17e83aea",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-17T03:43:26Z",
+      "side": 1,
+      "message": "lower by how much?",
+      "revId": "89ee8dccc8d8bc7b2c9c16f01fcf5d85af9cbaab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "624aa2d3_a37d119d",
+        "filename": "board/poppy/gpio.inc",
+        "patchSetId": 4
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-17T03:43:26Z",
+      "side": 1,
+      "message": "Not used since rev4.\n\nAlso, remember that this is shared between poppy/lux and soraka, so I\u0027m not sure if this statement is true.\n\nAnd we don\u0027t want to deprecate older Lux (rev2) just yet, can you please check if this change is necessary?",
+      "revId": "89ee8dccc8d8bc7b2c9c16f01fcf5d85af9cbaab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "74a82e00_2d6e28e2",
+        "filename": "board/poppy/gpio.inc",
+        "patchSetId": 4
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-17T03:43:26Z",
+      "side": 1,
+      "message": "I don\u0027t feel this TODO is very necessary. Please also get into the habit of not mentioning build phases in public CLs (i.e. replace EVT2 by rev4, DVT by rev5).",
+      "revId": "89ee8dccc8d8bc7b2c9c16f01fcf5d85af9cbaab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
