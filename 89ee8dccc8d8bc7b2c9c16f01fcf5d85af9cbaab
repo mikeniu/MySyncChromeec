@@ -114,6 +114,24 @@
       "revId": "89ee8dccc8d8bc7b2c9c16f01fcf5d85af9cbaab",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "72910f67_f061e348",
+        "filename": "board/poppy/gpio.inc",
+        "patchSetId": 4
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-18T00:37:58Z",
+      "side": 1,
+      "message": "Sorry, I think I missed the important point here.\n\nWhat you should probably do is set LED_YELLOW_C0_OLD as GPIO_INPUT | GPIO_PULL_UP, and, in init code, change the flags to make it an output if rev\u003c\u003d4. That way we\u0027ll get the best power consumption on rev5 and forward.",
+      "parentUuid": "74a82e00_2d6e28e2",
+      "revId": "89ee8dccc8d8bc7b2c9c16f01fcf5d85af9cbaab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
