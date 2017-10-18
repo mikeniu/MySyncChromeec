@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a482c8e0_43641935",
+        "filename": "board/poppy/gpio.inc",
+        "patchSetId": 5
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-18T00:33:26Z",
+      "side": 1,
+      "message": "See b:65104436, can you see if a PULL_DOWN would also work?",
+      "revId": "1e1742854fe3bba1ad372dc07dcdaec2023b23df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "12a21c19_5fa4020a",
+        "filename": "board/poppy/gpio.inc",
+        "patchSetId": 5
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-18T00:33:26Z",
+      "side": 1,
+      "message": "I\u0027m a bit concerned that this may break LTE SKUs (on Lux), especially PP3300_DX_LTE.",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 56
+      },
+      "revId": "1e1742854fe3bba1ad372dc07dcdaec2023b23df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
