@@ -81,6 +81,30 @@
       "revId": "1e1742854fe3bba1ad372dc07dcdaec2023b23df",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "713fbbd6_f23ed05f",
+        "filename": "board/poppy/gpio.inc",
+        "patchSetId": 5
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-18T23:51:10Z",
+      "side": 1,
+      "message": "Lux may have it as an option.\n\nMaybe do it as a conditional: #ifdef BOARD_SORAKA set them all as input+pull-up, and leave the current settings in the #else branch. Feel free to add a TODO.",
+      "parentUuid": "4bc4de84_11fbd3b0",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 56
+      },
+      "revId": "1e1742854fe3bba1ad372dc07dcdaec2023b23df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
