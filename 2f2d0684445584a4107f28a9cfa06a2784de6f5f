@@ -1,0 +1,257 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "41490b86_fb393027",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2017-10-18T11:57:41Z",
+      "side": 1,
+      "message": "I\u0027m not 100% convinced that having a volatile pointer here is anyhow useful.",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 39
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8bb2b76a_e716d38b",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2017-10-18T11:57:41Z",
+      "side": 1,
+      "message": "nit: writing \u0027#endif /* CONFIG_UART_PAD_SWITCH */\u0027 is saving me efforts ...",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 6
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4bb77d6a_6968baaa",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2017-10-18T11:57:41Z",
+      "side": 1,
+      "message": "isn\u0027t this just \" SET_BIT(NPCX_WKEDG(1, 6), 4);\" ?\nas you are using CLEAR_BIT below\n\nby the way it might be time to define proper constants in registers.h\nfor the possible GPIOs config depending on NCPX_UART_MODULE2 rather this ugly stuff all over the place in the UART code",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 36
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6ae8ee59_7107fe56",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2017-10-18T11:57:41Z",
+      "side": 1,
+      "message": "ditto when you have nested #ifdef",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 6
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ad00d6a3_1d18fe32",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2017-10-18T11:57:41Z",
+      "side": 1,
+      "message": "you have a global variable pad and a parameter pad ?\nbadness might happen ?",
+      "range": {
+        "startLine": 70,
+        "startChar": 20,
+        "endLine": 72,
+        "endChar": 29
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6e1fa507_d313e7ef",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2017-10-18T11:57:41Z",
+      "side": 1,
+      "message": "while the NPCX_WKEDG dance was the original code, can you clarify to me what this is supposed to do ? why this correct ?\n\nThere are several questionable details in the original ...",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 37
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8a1341cb_60264780",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2017-10-18T11:57:41Z",
+      "side": 1,
+      "message": "is this better than just defining the \u0027pad\u0027 variable above as \n#ifdef CONFIG_UART_PAD_SWITCH\nstatic volatile enum uart_pad pad;\n#else\nstatic const enum uart_pad pad \u003d UART_DEFAULT_PAD;\n#endif",
+      "range": {
+        "startLine": 91,
+        "startChar": 0,
+        "endLine": 98,
+        "endChar": 1
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "772b6507_56a6abea",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2017-10-18T11:57:41Z",
+      "side": 1,
+      "message": "this UART has no FIFO no DMA in 2017 ? \u003csigh\u003e\nseems one day we should write in the EC HW requirements, we want \u0027modern\u0027 hardware not some silicon from the 80s.",
+      "range": {
+        "startLine": 224,
+        "startChar": 0,
+        "endLine": 227,
+        "endChar": 7
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d688316e_94f64e71",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2017-10-18T11:57:41Z",
+      "side": 1,
+      "message": "is this better than a simple :\nif ((start - last_default_pad_rx_time) \u003c block_alt_timeout_us)\nwhere you keep only your low 32-bit / _hw_clock_source_read() in last_default_pad_rx_time",
+      "range": {
+        "startLine": 287,
+        "startChar": 0,
+        "endLine": 289,
+        "endChar": 24
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "208a4293_e47b7966",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2017-10-18T11:57:41Z",
+      "side": 1,
+      "message": "if the goal of this (rather than having directly \n} while ((__hw_clock_source_read() - start) \u003c timeout_us);\nis to do a last loop before timeout ? maybe you should comment it",
+      "range": {
+        "startLine": 316,
+        "startChar": 0,
+        "endLine": 319,
+        "endChar": 30
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9737e49f_b0e5f4df",
+        "filename": "core/cortex-m/panic.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2017-10-18T11:57:41Z",
+      "side": 1,
+      "message": "actually getting a secondary panic / watchdog in panic context is an order of magnitude more difficult to debug than a regular panic.\nso I\u0027m extremely reluctant doing the kind of loop you have in uart_tx_flush() in panic context (ie it might or might not terminate for plenty of reasons when everything is already broken).\nIMO it\u0027s safer/easier to use to spew a bit of junk than doing complex/unbounded processes on the UART",
+      "range": {
+        "startLine": 338,
+        "startChar": 0,
+        "endLine": 341,
+        "endChar": 6
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
