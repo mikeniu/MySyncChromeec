@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "637978f9_aef1b79a",
+        "filename": "board/poppy/board.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 698,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-19T00:39:07Z",
+      "side": 1,
+      "message": "Set ununsed GPIO_LED_YELLOW_C0[_OLD] as input for better S0ix/S3 power",
+      "range": {
+        "startLine": 698,
+        "startChar": 11,
+        "endLine": 698,
+        "endChar": 28
+      },
+      "revId": "b82f23242255ca4004449912ec6f674f59e22d38",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eb91c3b0_0cef7aea",
+        "filename": "board/poppy/board.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 699,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-19T00:39:07Z",
+      "side": 1,
+      "message": "Drop the comment, not needed.",
+      "range": {
+        "startLine": 699,
+        "startChar": 38,
+        "endLine": 699,
+        "endChar": 57
+      },
+      "revId": "b82f23242255ca4004449912ec6f674f59e22d38",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
