@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "48d9c6b4_b73ff664",
+        "filename": "board/poppy/board.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 714,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-19T23:21:15Z",
+      "side": 1,
+      "message": "*/",
+      "range": {
+        "startLine": 714,
+        "startChar": 2,
+        "endLine": 714,
+        "endChar": 6
+      },
+      "revId": "101380eec9c86393e4665a301145cf15d88e8b74",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8c76188f_c61e0132",
+        "filename": "board/poppy/gpio.inc",
+        "patchSetId": 8
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-19T23:21:15Z",
+      "side": 1,
+      "message": "Set ununsed pins as input + PU to save power in S0ix/S3.",
+      "revId": "101380eec9c86393e4665a301145cf15d88e8b74",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ed46de26_0ac004cf",
+        "filename": "board/poppy/gpio.inc",
+        "patchSetId": 8
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-19T23:21:15Z",
+      "side": 1,
+      "message": "Drop this comment, not needed.",
+      "revId": "101380eec9c86393e4665a301145cf15d88e8b74",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
