@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "89b2b0ea_8b67bedc",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-20T06:47:02Z",
+      "side": 1,
+      "message": "\"configure the new pad\"",
+      "range": {
+        "startLine": 74,
+        "startChar": 43,
+        "endLine": 74,
+        "endChar": 67
+      },
+      "revId": "7df7265b8e76027b26d6204ee3826276ec2a3784",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}

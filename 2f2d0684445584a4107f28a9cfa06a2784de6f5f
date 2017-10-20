@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "7b4f41c4_4d3ebc11",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-20T06:47:02Z",
+      "side": 1,
+      "message": "Right, I think only _pos needs to be volatile.",
+      "parentUuid": "41490b86_fb393027",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 39
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8bb2b76a_e716d38b",
         "filename": "chip/npcx/uart.c",
         "patchSetId": 7
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "576a64bc_5047baed",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-20T06:47:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8bb2b76a_e716d38b",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 6
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4bb77d6a_6968baaa",
         "filename": "chip/npcx/uart.c",
         "patchSetId": 7
@@ -59,6 +107,30 @@
       "writtenOn": "2017-10-18T11:57:41Z",
       "side": 1,
       "message": "isn\u0027t this just \" SET_BIT(NPCX_WKEDG(1, 6), 4);\" ?\nas you are using CLEAR_BIT below\n\nby the way it might be time to define proper constants in registers.h\nfor the possible GPIOs config depending on NCPX_UART_MODULE2 rather this ugly stuff all over the place in the UART code",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 36
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eb64f9a6_cb2d14f5",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-20T06:47:02Z",
+      "side": 1,
+      "message": "I tried to do this cleanup in a follow-up CL:730029.",
+      "parentUuid": "4bb77d6a_6968baaa",
       "range": {
         "startLine": 55,
         "startChar": 0,
@@ -94,6 +166,30 @@
     },
     {
       "key": {
+        "uuid": "33085b0a_ac31bdc3",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-20T06:47:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6ae8ee59_7107fe56",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 6
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ad00d6a3_1d18fe32",
         "filename": "chip/npcx/uart.c",
         "patchSetId": 7
@@ -105,6 +201,30 @@
       "writtenOn": "2017-10-18T11:57:41Z",
       "side": 1,
       "message": "you have a global variable pad and a parameter pad ?\nbadness might happen ?",
+      "range": {
+        "startLine": 70,
+        "startChar": 20,
+        "endLine": 72,
+        "endChar": 29
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eae01cf4_db82ef0f",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-20T06:47:02Z",
+      "side": 1,
+      "message": "Right, we can just use the global variable here.",
+      "parentUuid": "ad00d6a3_1d18fe32",
       "range": {
         "startLine": 70,
         "startChar": 20,
@@ -140,6 +260,30 @@
     },
     {
       "key": {
+        "uuid": "e4157320_879b03a3",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-20T06:47:02Z",
+      "side": 1,
+      "message": "The only thing CL:284036 says is \"uart.c/clock.c/register.h: Fixed bug which cannot enter deep-idle when gpio is any-edge trigger mode.\", so it makes some kind of sense to set it here, and clear it in npcx_uart2gpio (called from clock_uart2gpio in chip/npcx/clock.c).\n\nHowever, I should probably not set it when switching to alternate pad, as that bit will be set all the time and prevent deep sleep. \u003d\u003e fixed.",
+      "parentUuid": "6e1fa507_d313e7ef",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 37
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8a1341cb_60264780",
         "filename": "chip/npcx/uart.c",
         "patchSetId": 7
@@ -160,6 +304,30 @@
       "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d09ecf54_fb06600c",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-20T06:47:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a1341cb_60264780",
+      "range": {
+        "startLine": 91,
+        "startChar": 0,
+        "endLine": 98,
+        "endChar": 1
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     },
     {
       "key": {
@@ -186,6 +354,30 @@
     },
     {
       "key": {
+        "uuid": "bc2019d4_7754b44d",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-20T06:47:02Z",
+      "side": 1,
+      "message": "Ack ,-(",
+      "parentUuid": "772b6507_56a6abea",
+      "range": {
+        "startLine": 224,
+        "startChar": 0,
+        "endLine": 227,
+        "endChar": 7
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d688316e_94f64e71",
         "filename": "chip/npcx/uart.c",
         "patchSetId": 7
@@ -197,6 +389,30 @@
       "writtenOn": "2017-10-18T11:57:41Z",
       "side": 1,
       "message": "is this better than a simple :\nif ((start - last_default_pad_rx_time) \u003c block_alt_timeout_us)\nwhere you keep only your low 32-bit / _hw_clock_source_read() in last_default_pad_rx_time",
+      "range": {
+        "startLine": 287,
+        "startChar": 0,
+        "endLine": 289,
+        "endChar": 24
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3fba2952_d815dafd",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-20T06:47:02Z",
+      "side": 1,
+      "message": "Well, _hw_clock_source_read wraps around every 4294 seconds, so we\u0027d lose a few transactions every hour (even if nothing is ever transmitted as last_default_pad_rx_time is set to 0 by default).\n\nget_time() wraps around every 500\u0027000 years ,-)",
+      "parentUuid": "d688316e_94f64e71",
       "range": {
         "startLine": 287,
         "startChar": 0,
@@ -232,6 +448,30 @@
     },
     {
       "key": {
+        "uuid": "4212abd4_369b6452",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-20T06:47:02Z",
+      "side": 1,
+      "message": "Right, that\u0027s the goal, but it\u0027s a bit overkill as transactions will require 100us at least, so I can just put the sleep at the beginning of the loop.",
+      "parentUuid": "208a4293_e47b7966",
+      "range": {
+        "startLine": 316,
+        "startChar": 0,
+        "endLine": 319,
+        "endChar": 30
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9737e49f_b0e5f4df",
         "filename": "core/cortex-m/panic.c",
         "patchSetId": 7
@@ -252,6 +492,30 @@
       "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c5fcc6fb_0e49a90e",
+        "filename": "core/cortex-m/panic.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-20T06:47:02Z",
+      "side": 1,
+      "message": "Done, added a parameter to uart_set_pad to forcibly switch the pad for this use case. I\u0027m still adding a udelay(200) to make sure the receiving end is able to re-sync with the beginning of the panic message.",
+      "parentUuid": "9737e49f_b0e5f4df",
+      "range": {
+        "startLine": 338,
+        "startChar": 0,
+        "endLine": 341,
+        "endChar": 6
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
