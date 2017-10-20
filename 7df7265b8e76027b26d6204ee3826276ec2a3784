@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "c770d2aa_ef36ed2a",
+        "filename": "chip/npcx/registers.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 1850,
+      "author": {
+        "id": 1000187
+      },
+      "writtenOn": "2017-10-20T15:52:35Z",
+      "side": 1,
+      "message": "registers.h should just be constants and macros.\n\nThese should be in gpio_chip.h.",
+      "range": {
+        "startLine": 1849,
+        "startChar": 0,
+        "endLine": 1850,
+        "endChar": 26
+      },
+      "revId": "7df7265b8e76027b26d6204ee3826276ec2a3784",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "89b2b0ea_8b67bedc",
         "filename": "chip/npcx/uart.c",
         "patchSetId": 8
@@ -22,6 +45,121 @@
       "revId": "7df7265b8e76027b26d6204ee3826276ec2a3784",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9c67eb26_97601f43",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1000187
+      },
+      "writtenOn": "2017-10-20T15:52:35Z",
+      "side": 1,
+      "message": "XOR seems strange here.",
+      "range": {
+        "startLine": 80,
+        "startChar": 23,
+        "endLine": 80,
+        "endChar": 24
+      },
+      "revId": "7df7265b8e76027b26d6204ee3826276ec2a3784",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a34bdada_585bd952",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1000187
+      },
+      "writtenOn": "2017-10-20T15:52:35Z",
+      "side": 1,
+      "message": "Seems like\n\nuint8_t rx_fifo_not_empty \u003d NPCX_UICTRL \u0026 0x02;\n\nwould be cleaner, since the same bit is returned in line 185.",
+      "range": {
+        "startLine": 169,
+        "startChar": 1,
+        "endLine": 170,
+        "endChar": 19
+      },
+      "revId": "7df7265b8e76027b26d6204ee3826276ec2a3784",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "088a8378_4cf882a5",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1000187
+      },
+      "writtenOn": "2017-10-20T15:52:35Z",
+      "side": 1,
+      "message": "Seems like this should be a separate function with no params, since it will always switch back to the EC pad, and it shares no code with the panic\u003d0 path.\n\nuart_set_pad_panic();",
+      "range": {
+        "startLine": 245,
+        "startChar": 0,
+        "endLine": 259,
+        "endChar": 2
+      },
+      "revId": "7df7265b8e76027b26d6204ee3826276ec2a3784",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c2ee688a_ecc8a1c5",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1000187
+      },
+      "writtenOn": "2017-10-20T15:52:35Z",
+      "side": 1,
+      "message": "Word is corrupted. ;)",
+      "range": {
+        "startLine": 278,
+        "startChar": 8,
+        "endLine": 278,
+        "endChar": 9
+      },
+      "revId": "7df7265b8e76027b26d6204ee3826276ec2a3784",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0bbc09ec_cf707054",
+        "filename": "include/uart.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1000187
+      },
+      "writtenOn": "2017-10-20T15:52:35Z",
+      "side": 1,
+      "message": "?",
+      "range": {
+        "startLine": 269,
+        "startChar": 3,
+        "endLine": 269,
+        "endChar": 20
+      },
+      "revId": "7df7265b8e76027b26d6204ee3826276ec2a3784",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }

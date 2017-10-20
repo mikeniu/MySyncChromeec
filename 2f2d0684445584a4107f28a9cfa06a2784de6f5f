@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "88715041_30413451",
+        "filename": "chip/npcx/registers.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 1850,
+      "author": {
+        "id": 1000187
+      },
+      "writtenOn": "2017-10-20T15:52:35Z",
+      "side": 1,
+      "message": "This file should *just* be register definitions and macros.\n\nMore complex function definitions belong elsewhere.  For example, gpio_chip.h.\n\nFunction declarations should have header comments describing usage.  For example, what is pad?  Shouldn\u0027t have to look at the implementation to figure that out.",
+      "range": {
+        "startLine": 1849,
+        "startChar": 0,
+        "endLine": 1850,
+        "endChar": 29
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "41490b86_fb393027",
         "filename": "chip/npcx/uart.c",
         "patchSetId": 7
@@ -331,6 +354,29 @@
     },
     {
       "key": {
+        "uuid": "5c8bc783_cacbc692",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1000187
+      },
+      "writtenOn": "2017-10-20T15:52:35Z",
+      "side": 1,
+      "message": "Should be a #defined constant in registers.h",
+      "range": {
+        "startLine": 169,
+        "startChar": 12,
+        "endLine": 169,
+        "endChar": 16
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772b6507_56a6abea",
         "filename": "chip/npcx/uart.c",
         "patchSetId": 7
@@ -375,6 +421,30 @@
       "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "12be9f00_436474a4",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1000187
+      },
+      "writtenOn": "2017-10-20T15:52:35Z",
+      "side": 1,
+      "message": "It\u0027s in the wishlist in go/ec-qual-process, and coming in next silicon.",
+      "parentUuid": "772b6507_56a6abea",
+      "range": {
+        "startLine": 224,
+        "startChar": 0,
+        "endLine": 227,
+        "endChar": 7
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     },
     {
       "key": {
@@ -512,6 +582,75 @@
         "startChar": 0,
         "endLine": 341,
         "endChar": 6
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "960ca3ef_fd97f15e",
+        "filename": "include/uart.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1000187
+      },
+      "writtenOn": "2017-10-20T15:52:35Z",
+      "side": 1,
+      "message": "In which case, what happens?",
+      "range": {
+        "startLine": 266,
+        "startChar": 21,
+        "endLine": 267,
+        "endChar": 31
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b90bca61_523b90ba",
+        "filename": "include/uart.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1000187
+      },
+      "writtenOn": "2017-10-20T15:52:35Z",
+      "side": 1,
+      "message": "@return?",
+      "range": {
+        "startLine": 274,
+        "startChar": 0,
+        "endLine": 274,
+        "endChar": 3
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4ef60b16_4069ecd6",
+        "filename": "include/uart.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 1000187
+      },
+      "writtenOn": "2017-10-20T15:52:35Z",
+      "side": 1,
+      "message": "transaction?\n\nwrite_read?",
+      "range": {
+        "startLine": 275,
+        "startChar": 17,
+        "endLine": 275,
+        "endChar": 27
       },
       "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
