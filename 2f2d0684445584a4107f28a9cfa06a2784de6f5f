@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "8d85443f_8ea856b8",
+        "filename": "chip/npcx/registers.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 1850,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-23T03:23:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "88715041_30413451",
+      "range": {
+        "startLine": 1849,
+        "startChar": 0,
+        "endLine": 1850,
+        "endChar": 29
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "41490b86_fb393027",
         "filename": "chip/npcx/uart.c",
         "patchSetId": 7
@@ -377,6 +401,30 @@
     },
     {
       "key": {
+        "uuid": "9105598b_c5a8ec44",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-23T03:23:37Z",
+      "side": 1,
+      "message": "This is not new code... Looks like using IS_BIT_SET macros would be the right thing to do.",
+      "parentUuid": "5c8bc783_cacbc692",
+      "range": {
+        "startLine": 169,
+        "startChar": 12,
+        "endLine": 169,
+        "endChar": 16
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772b6507_56a6abea",
         "filename": "chip/npcx/uart.c",
         "patchSetId": 7
@@ -612,6 +660,30 @@
     },
     {
       "key": {
+        "uuid": "427f5b1b_866541a4",
+        "filename": "include/uart.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-23T03:23:37Z",
+      "side": 1,
+      "message": "Done in the @return description below.",
+      "parentUuid": "960ca3ef_fd97f15e",
+      "range": {
+        "startLine": 266,
+        "startChar": 21,
+        "endLine": 267,
+        "endChar": 31
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b90bca61_523b90ba",
         "filename": "include/uart.h",
         "patchSetId": 7
@@ -635,6 +707,30 @@
     },
     {
       "key": {
+        "uuid": "21278a82_6309d7a4",
+        "filename": "include/uart.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-23T03:23:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b90bca61_523b90ba",
+      "range": {
+        "startLine": 274,
+        "startChar": 0,
+        "endLine": 274,
+        "endChar": 3
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4ef60b16_4069ecd6",
         "filename": "include/uart.h",
         "patchSetId": 7
@@ -646,6 +742,30 @@
       "writtenOn": "2017-10-20T15:52:35Z",
       "side": 1,
       "message": "transaction?\n\nwrite_read?",
+      "range": {
+        "startLine": 275,
+        "startChar": 17,
+        "endLine": 275,
+        "endChar": 27
+      },
+      "revId": "2f2d0684445584a4107f28a9cfa06a2784de6f5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "73d1bca8_095f5834",
+        "filename": "include/uart.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-23T03:23:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4ef60b16_4069ecd6",
       "range": {
         "startLine": 275,
         "startChar": 17,

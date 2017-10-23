@@ -16,6 +16,24 @@
       "revId": "640ce20fd55e88d735969b0e31a17dbe5e2cec94",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "df433da8_17526edf",
+        "filename": "chip/npcx/registers.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 1865,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-23T03:23:37Z",
+      "side": 0,
+      "message": "(will be handled in next CL)",
+      "parentUuid": "73ce099d_3e4a0715",
+      "revId": "640ce20fd55e88d735969b0e31a17dbe5e2cec94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
