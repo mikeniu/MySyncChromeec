@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6e701f4f_2d5a2e9f",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 1165254
+      },
+      "writtenOn": "2017-10-23T20:54:04Z",
+      "side": 1,
+      "message": "This is not relevant anymore. However, uart_reset_default_pad_panic() and uart_set_pad() would need to be modified.",
+      "range": {
+        "startLine": 387,
+        "startChar": 24,
+        "endLine": 387,
+        "endChar": 38
+      },
+      "revId": "bb293677d4be24fd8ae710ac5b0ca43f752de641",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
