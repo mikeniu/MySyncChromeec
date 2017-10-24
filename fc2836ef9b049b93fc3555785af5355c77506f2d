@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3956f663_94ce06d6",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2017-10-24T08:14:26Z",
+      "side": 1,
+      "message": "Am I missing something or for NPCX7, npcx_uart2gpio is missing (but npcx_gpio2uart is present) so we cannot really use the alt pads (then why having NPCX7 specific code in gpio2uart?)",
+      "range": {
+        "startLine": 57,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 25
+      },
+      "revId": "fc2836ef9b049b93fc3555785af5355c77506f2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
