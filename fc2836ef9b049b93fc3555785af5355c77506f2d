@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "e49bb102_edc8d37f",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-25T04:05:00Z",
+      "side": 1,
+      "message": "Added a comment in npcx_gpio2uart, let me know if you have a better idea (maybe renaming the function to npcx_uart_enable_pad or something).",
+      "parentUuid": "c3de5f27_ffce1cd9",
+      "range": {
+        "startLine": 57,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 25
+      },
+      "revId": "fc2836ef9b049b93fc3555785af5355c77506f2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "07118fe7_cceaaa2b",
         "filename": "chip/npcx/uart.c",
         "patchSetId": 12
@@ -60,6 +84,30 @@
       "writtenOn": "2017-10-24T08:21:57Z",
       "side": 1,
       "message": "Argh, these 2 lines shouldn\u0027t be there (doesn\u0027t hurt, or matter too much, as the next patch will get rid of it, but, still...)",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 38
+      },
+      "revId": "fc2836ef9b049b93fc3555785af5355c77506f2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "20e484af_f3232501",
+        "filename": "chip/npcx/uart.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2017-10-25T04:05:00Z",
+      "side": 1,
+      "message": "Dropped.",
+      "parentUuid": "07118fe7_cceaaa2b",
       "range": {
         "startLine": 84,
         "startChar": 0,
