@@ -45,6 +45,30 @@
       "revId": "168b0cacc7cd1b38eab108b3533384c45cb4bc7c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7dad184a_024a2b3a",
+        "filename": "board/bob/board.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1001696
+      },
+      "writtenOn": "2017-11-07T16:08:56Z",
+      "side": 1,
+      "message": "I opened crbug.com/782244 for it, I will fix it (or find someone else to fix it) soon. Anyway, I would suggest not backporting such changes (even if they existed right now) into this FW branch due to stability concerns. How about we change the comment to \"/* crbug.com/782244: CONFIG_MPU only supports power-of-2 region size */\" and keep the #undef?",
+      "parentUuid": "962173a2_9b681b1f",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 18
+      },
+      "revId": "168b0cacc7cd1b38eab108b3533384c45cb4bc7c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
