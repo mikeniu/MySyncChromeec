@@ -69,6 +69,30 @@
       "revId": "168b0cacc7cd1b38eab108b3533384c45cb4bc7c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "497574ec_ac534af4",
+        "filename": "board/bob/board.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2017-11-07T16:11:10Z",
+      "side": 1,
+      "message": "Fine, \nI\u0027m not proud of disabling a security feature for years by laziness, but whatever for this branch.",
+      "parentUuid": "7dad184a_024a2b3a",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 18
+      },
+      "revId": "168b0cacc7cd1b38eab108b3533384c45cb4bc7c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
