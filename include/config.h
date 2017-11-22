@@ -154,6 +154,8 @@
 #undef CONFIG_ALS_AL3010
 #undef CONFIG_ALS_ISL29035
 #undef CONFIG_ALS_OPT3001
+#undef CONFIG_ALS_BH1730
+#undef CONFIG_ALS_BH1730_CONSTANTS
 /* Define the exact model ID present on the board: SI1141 = 41, SI1142 = 42, */
 #undef CONFIG_ALS_SI114X
 /* Check if the device revision is supported */
