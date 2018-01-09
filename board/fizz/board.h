@@ -49,6 +49,13 @@
 #define CONFIG_CHIPSET_CAN_THROTTLE
 #define CONFIG_PWM
 
+/* EC host commands */
+#define CONFIG_HOSTCMD_AP_SET_SKUID
+#define CONFIG_HOSTCMD_AP_SET_SKUID_DEFAULT_ID -1
+#define SKU_KENCH	0x00
+#define SKU_TEEMO	0x01
+#define SKU_SION	0x02
+
 /* EC console commands */
 #define CONFIG_CMD_BUTTON
 

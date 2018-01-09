@@ -102,8 +102,11 @@ static enum ec_reboot_cmd reboot_at_shutdown;
 uint32_t sleep_mask;
 
 #ifdef CONFIG_HOSTCMD_AP_SET_SKUID
+#ifdef CONFIG_HOSTCMD_AP_SET_SKUID_DEFAULT_ID
+static uint32_t ap_sku_id = CONFIG_HOSTCMD_AP_SET_SKUID_DEFAULT_ID;
+#else
 static uint32_t ap_sku_id;
-
+#endif /* CONFIG_HOSTCMD_AP_SET_SKUID_DEFAULT_ID */
 uint32_t system_get_sku_id(void)
 {
 	return ap_sku_id;

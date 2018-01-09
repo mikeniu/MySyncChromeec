@@ -1583,6 +1583,9 @@
 /* Set SKU ID from AP */
 #undef CONFIG_HOSTCMD_AP_SET_SKUID
 
+/* Custom default SKU ID used by CONFIG_HOSTCMD_AP_SET_SKUID */
+#undef CONFIG_HOSTCMD_AP_SET_SKUID_DEFAULT_ID
+
 /*****************************************************************************/
 
 /* Enable debugging and profiling statistics for hook functions */
