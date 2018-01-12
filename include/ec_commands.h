@@ -4015,7 +4015,23 @@ struct __ec_align2 ec_response_pd_chip_info {
 	};
 };
 
-#endif  /* !__ACPI__ */
+/*
+ * Flags to control write behavior.
+ *
+ * NO_SYNC: Makes EC update data in RAM but skip writing to EEPROM. It's
+ *          useful when writing multiple fields in a row.
+ * INIT:    Need to be set when creating a new CBI from scratch. All fields
+ *          will be initialized to zero first.
+ */
+#define CBI_SET_NO_SYNC		(1 << 0)
+#define CBI_SET_INIT		(1 << 1)
+
+struct __ec_align1 ec_params_set_cbi {
+	uint32_t type;		/* enum cbi_data_type */
+	uint8_t flag;		/* CBI_SET_* */
+	uint32_t data;		/* For numeric value */
+	uint8_t raw[];		/* For string and raw data */
+};
 
 /*****************************************************************************/
 /* The command range 0x200-0x2FF is reserved for Rotor. */
