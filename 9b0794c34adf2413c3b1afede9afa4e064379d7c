@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ddec19de_f25a7933",
+        "filename": "power/mediatek.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 449,
+      "author": {
+        "id": 1000160
+      },
+      "writtenOn": "2018-01-22T08:21:58Z",
+      "side": 1,
+      "message": "It\u0027s wrong to call board specific function in chipset init. According to you flow, you just want to reset the sensors on init. So, if it works in power_chipset_init, it should work to call board_reset_sensors() in board.c board_init().",
+      "range": {
+        "startLine": 449,
+        "startChar": 1,
+        "endLine": 449,
+        "endChar": 20
+      },
+      "revId": "9b0794c34adf2413c3b1afede9afa4e064379d7c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
