@@ -448,6 +448,7 @@ void system_set_gpios_and_wakeup_inputs_hibernate(void)
 	NPCX_WKINEN(MIWU_TABLE_2, MIWU_GROUP_6) = 0x00;
 #endif
 
+#ifdef CONFIG_SUPPORT_HIB
 	/* Enable wake-up inputs of hibernate_wake_pins array */
 	for (i = 0; i < hibernate_wake_pins_used; i++) {
 		gpio_reset(hibernate_wake_pins[i]);
@@ -459,6 +460,7 @@ void system_set_gpios_and_wakeup_inputs_hibernate(void)
 			ccprintf("Invalid PSL setting in wake-up pin %d\n", i);
 #endif
 	}
+#endif
 }
 
 /**

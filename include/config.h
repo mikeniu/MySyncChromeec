@@ -1650,6 +1650,9 @@
 /* For ECs with multiple wakeup pins, define enabled wakeup pins */
 #undef CONFIG_HIBERNATE_WAKEUP_PINS
 
+/* Default need define wakeup pins in board.c */
+#define CONFIG_SUPPORT_HIB
+
 /*
  * Use PSL (Power Switch Logic) for hibernating. It turns off VCC power rail
  * for ultra-low power consumption and uses PSL inputs rely on VSBY power rail
