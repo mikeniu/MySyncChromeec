@@ -1843,6 +1843,16 @@ static void pd_partner_port_reset(int port)
 	uint64_t timeout;
 
 	/*
+	 * If VBUS is present and PD communications are allowed, try and issue
+	 * a soft reset since we may already have an explicit contract
+	 * in place.
+	 */
+	if (pd_is_vbus_present(port) && pd_comm_is_enabled(port)) {
+		set_state(port, PD_STATE_SOFT_RESET);
+		return;
+	}
+
+	/*
 	 * Check our battery-backed previous port state. If PD comms were
 	 * active, and we didn't just lose power, make sure we
 	 * don't boot into RO with a pre-existing power contract.
