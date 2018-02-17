@@ -1,0 +1,129 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bb86920b_af701258",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-02-17T16:44:08Z",
+      "side": 1,
+      "message": "Can you describe here, and ideally in base_detect.c, how the base detection works on meowth? I have a hard time following the code right now.",
+      "revId": "856bfb3f6843afd13c8c96f4c3a4a914c1246fa0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0a139f93_0bf6c430",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-02-17T16:44:08Z",
+      "side": 1,
+      "message": "Up to you, but IMHO this is quite a bit of code size for little added value.",
+      "revId": "856bfb3f6843afd13c8c96f4c3a4a914c1246fa0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b5e6cb75_b3fb4f9d",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-02-17T16:44:08Z",
+      "side": 1,
+      "message": "What is a \"power fault\"? This sounds like something bad (but I think it isn\u0027t ,-))",
+      "range": {
+        "startLine": 58,
+        "startChar": 22,
+        "endLine": 58,
+        "endChar": 34
+      },
+      "revId": "856bfb3f6843afd13c8c96f4c3a4a914c1246fa0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "82d65c32_108a2e22",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-02-17T16:44:08Z",
+      "side": 1,
+      "message": "Why do we still poll after this if we have an interrupt?",
+      "revId": "856bfb3f6843afd13c8c96f4c3a4a914c1246fa0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2947fcd4_9d4c831e",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-02-17T16:44:08Z",
+      "side": 1,
+      "message": "why ?",
+      "revId": "856bfb3f6843afd13c8c96f4c3a4a914c1246fa0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a36e9bc7_a7f53714",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-02-17T16:44:08Z",
+      "side": 1,
+      "message": "Not needed, just use gpioset?",
+      "revId": "856bfb3f6843afd13c8c96f4c3a4a914c1246fa0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "71c9e96a_06d79ed9",
+        "filename": "board/zoombini/board.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-02-17T16:44:08Z",
+      "side": 1,
+      "message": "Can this be defined in base_detect.c instead?",
+      "revId": "856bfb3f6843afd13c8c96f4c3a4a914c1246fa0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
