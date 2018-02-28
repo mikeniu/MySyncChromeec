@@ -12,11 +12,6 @@
  */
 void *memcpy(void *dest, const void *src, size_t len);
 
-uint32_t get_restart_count(void)
-{
-	return gp.resetCount;
-}
-
 void get_storage_seed(void *buf, size_t *len)
 {
 	*len = *len < sizeof(gp.SPSeed) ? *len : sizeof(gp.SPSeed);

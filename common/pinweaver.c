@@ -6,10 +6,12 @@
 #include <pinweaver.h>
 
 #include <common.h>
+#include <compile_time_macros.h>
 #include <console.h>
 #include <dcrypto.h>
 #include <extension.h>
 #include <hooks.h>
+#include <nvmem_vars.h>
 #include <pinweaver_tpm_imports.h>
 #include <pinweaver_types.h>
 #include <timer.h>
@@ -27,13 +29,19 @@ BUILD_ASSERT(sizeof(struct leaf_sensitive_data_t) % PW_WRAP_BLOCK_SIZE == 0);
 BUILD_ASSERT(sizeof(((struct merkle_tree_t *)0)->wrap_key) ==
 	     AES256_BLOCK_CIPHER_KEY_SIZE);
 
+/* Verify that the nvmem_vars log entries have the correct sizes. */
+BUILD_ASSERT(sizeof(struct pw_long_term_storage_t) +
+	     sizeof(struct pw_log_storage_t) <= PW_MAX_VAR_USAGE);
+
 /* Verify that the request structs will fit into the message. */
 BUILD_ASSERT(PW_MAX_MESSAGE_SIZE >=
 	     sizeof(struct pw_request_header_t) +
 	     sizeof(union {struct pw_request_insert_leaf_t insert_leaf;
 		     struct pw_request_remove_leaf_t remove_leaf;
 		     struct pw_request_try_auth_t try_auth;
-		     struct pw_request_reset_auth_t reset_auth; }) +
+		     struct pw_request_reset_auth_t reset_auth;
+		     struct pw_request_get_log_t get_log;
+		     struct pw_request_log_replay_t log_replay; }) +
 	     sizeof(struct leaf_public_data_t) +
 	     sizeof(struct leaf_sensitive_data_t) +
 	     PW_MAX_PATH_SIZE);
@@ -41,7 +49,8 @@ BUILD_ASSERT(PW_MAX_MESSAGE_SIZE >=
 #define PW_MAX_RESPONSE_SIZE (sizeof(struct pw_response_header_t) + \
 		sizeof(union {struct pw_response_insert_leaf_t insert_leaf; \
 			struct pw_response_try_auth_t try_auth; \
-			struct pw_response_reset_auth_t reset_auth; }) + \
+			struct pw_response_reset_auth_t reset_auth; \
+			struct pw_response_log_replay_t log_replay; }) + \
 		PW_LEAF_PAYLOAD_SIZE)
 /* Verify that the request structs will fit into the message. */
 BUILD_ASSERT(PW_MAX_MESSAGE_SIZE >= PW_MAX_RESPONSE_SIZE);
@@ -471,7 +480,7 @@ static int validate_request_with_wrapped_leaf(
 static void update_timestamp(struct pw_timestamp_t *ts)
 {
 	ts->timer_value = get_time().val / SECOND;
-	ts->boot_count = get_restart_count();
+	ts->boot_count = pw_restart_count;
 }
 
 /* Checks if an auth attempt can be made or not based on the delay schedule.
@@ -534,6 +543,252 @@ static int test_rate_limit(struct leaf_data_t *leaf_data,
 }
 
 /******************************************************************************/
+/* Logging implementation.
+ */
+
+/* Once the storage version is incremented, the update code needs to be written
+ * to handle differences in the structs.
+ *
+ * See the two comments "Add storage format updates here." below.
+ */
+BUILD_ASSERT(PW_STORAGE_VERSION == 0);
+
+void force_restart_count(uint32_t mock_value)
+{
+	pw_restart_count = mock_value;
+}
+
+/* Returns EC_SUCCESS if the root hash was found. Sets *index to the first index
+ * of the log entry with a matching root hash, or the index of the last valid
+ * entry.
+ */
+static int find_relevant_entry(const struct pw_log_storage_t *log,
+			       const uint8_t root[PW_HASH_SIZE], int *index)
+{
+	/* Find the relevant log entry. */
+	for (*index = 0; *index < PW_LOG_ENTRY_COUNT; ++*index) {
+		if (log->entries[*index].type.v == PW_MT_INVALID)
+			break;
+		if (memcmp(root, log->entries[*index].root, PW_HASH_SIZE) == 0)
+			return EC_SUCCESS;
+	}
+	--*index;
+	return PW_ERR_ROOT_NOT_FOUND;
+}
+
+static int load_log_data(struct pw_log_storage_t *log)
+{
+	const struct tuple *ptr;
+	const struct pw_log_storage_t *view;
+
+	ptr = getvar(PW_LOG_VAR0, sizeof(PW_LOG_VAR0) - 1);
+	if (ptr == NULL)
+		return PW_ERR_NV_EMPTY;
+
+	view = (void *)tuple_val(ptr);
+	if (ptr->val_len != sizeof(struct pw_log_storage_t))
+		return PW_ERR_NV_LENGTH_MISMATCH;
+	if (view->storage_version != PW_STORAGE_VERSION)
+		return PW_ERR_NV_VERSION_MISMATCH;
+
+	memcpy(log, view, ptr->val_len);
+	return EC_SUCCESS;
+}
+
+int store_log_data(const struct pw_log_storage_t *log)
+{
+	int ret;
+
+	ret = setvar(PW_LOG_VAR0, sizeof(PW_LOG_VAR0) - 1, (uint8_t *)log,
+		     sizeof(struct pw_log_storage_t));
+	if (ret != EC_SUCCESS)
+		return ret;
+
+	return writevars();
+}
+
+static int load_merkle_tree(struct merkle_tree_t *merkle_tree)
+{
+	int ret;
+	const struct tuple *ptr;
+
+	/* Handle the immutable data. */
+	{
+		const struct pw_long_term_storage_t *tree;
+
+		ptr = getvar(PW_TREE_VAR, sizeof(PW_TREE_VAR) - 1);
+		if (ptr == NULL)
+			return PW_ERR_NV_EMPTY;
+
+		tree = (void *)tuple_val(ptr);
+		/* Add storage format updates here. */
+		if (ptr->val_len != sizeof(*tree))
+			return PW_ERR_NV_LENGTH_MISMATCH;
+		if (tree->storage_version != PW_STORAGE_VERSION)
+			return PW_ERR_NV_VERSION_MISMATCH;
+
+		merkle_tree->bits_per_level = tree->bits_per_level;
+		merkle_tree->height = tree->height;
+		memcpy(merkle_tree->key_derivation_nonce,
+		       tree->key_derivation_nonce,
+		       sizeof(tree->key_derivation_nonce));
+		ret = derive_keys(merkle_tree);
+		if (ret != EC_SUCCESS)
+			return ret;
+	}
+
+	/* Handle the root hash. */
+	{
+		struct pw_log_storage_t *log;
+
+		ptr = getvar(PW_LOG_VAR0, sizeof(PW_LOG_VAR0) - 1);
+		if (ptr == NULL)
+			return PW_ERR_NV_EMPTY;
+
+		log = (void *)tuple_val(ptr);
+		/* Add storage format updates here. */
+		if (ptr->val_len != sizeof(struct pw_log_storage_t))
+			return PW_ERR_NV_LENGTH_MISMATCH;
+		if (log->storage_version != PW_STORAGE_VERSION)
+			return PW_ERR_NV_VERSION_MISMATCH;
+
+		memcpy(merkle_tree->root, log->entries[0].root,
+		       sizeof(merkle_tree->root));
+
+		/* This forces an NVRAM write for hard reboots for which the
+		 * timer value gets reset. The TPM restart and reset counters
+		 * were not used because they do not track the state of the
+		 * counter.
+		 *
+		 * Pinweaver uses the restart_count to know when the time since
+		 * boot can be used as the elapsed time for the delay schedule,
+		 * versus when the elapsed time starts from a timestamp.
+		 */
+		if (get_time().val < SECOND) {
+			++log->restart_count;
+			ret = setvar(PW_LOG_VAR0, sizeof(PW_LOG_VAR0) - 1,
+				     (uint8_t *)log,
+				     sizeof(struct pw_log_storage_t));
+			if (ret != EC_SUCCESS)
+				return ret;
+		}
+		pw_restart_count = log->restart_count;
+	}
+
+	return EC_SUCCESS;
+}
+
+/* This should only be called when a new tree is created. */
+int store_merkle_tree(const struct merkle_tree_t *merkle_tree)
+{
+	int ret;
+
+	/* Handle the immutable data. */
+	{
+		struct pw_long_term_storage_t data;
+
+		data.storage_version = PW_STORAGE_VERSION;
+		data.bits_per_level = merkle_tree->bits_per_level;
+		data.height = merkle_tree->height;
+		memcpy(data.key_derivation_nonce,
+		       merkle_tree->key_derivation_nonce,
+		       sizeof(data.key_derivation_nonce));
+
+		ret = setvar(PW_TREE_VAR, sizeof(PW_TREE_VAR) - 1,
+			     (uint8_t *)&data, sizeof(data));
+		if (ret != EC_SUCCESS)
+			return ret;
+	}
+
+	/* Handle the root hash. */
+	{
+		struct pw_log_storage_t log = {};
+		struct pw_get_log_entry_t *entry = log.entries;
+
+		log.storage_version = PW_STORAGE_VERSION;
+		entry->type.v = PW_RESET_TREE;
+		memcpy(entry->root, merkle_tree->root,
+		       sizeof(merkle_tree->root));
+
+		ret = store_log_data(&log);
+		if (ret == EC_SUCCESS)
+			pw_restart_count = 0;
+		return ret;
+	}
+
+}
+
+static int log_roll_for_append(struct pw_log_storage_t *log)
+{
+	int ret;
+
+	ret = load_log_data(log);
+	if (ret != EC_SUCCESS)
+		return ret;
+
+	memmove(&log->entries[1], &log->entries[0],
+		sizeof(log->entries[0]) * (PW_LOG_ENTRY_COUNT - 1));
+	memset(&log->entries[0], 0, sizeof(log->entries[0]));
+	return EC_SUCCESS;
+}
+
+int log_insert_leaf(struct label_t label, const uint8_t root[PW_HASH_SIZE],
+		    const uint8_t hmac[PW_HASH_SIZE])
+{
+	int ret;
+	struct pw_log_storage_t log;
+	struct pw_get_log_entry_t *entry = log.entries;
+
+	ret = log_roll_for_append(&log);
+	if (ret != EC_SUCCESS)
+		return ret;
+
+	entry->type.v = PW_INSERT_LEAF;
+	entry->label.v = label.v;
+	memcpy(entry->root, root, sizeof(entry->root));
+	memcpy(entry->leaf_hmac, hmac, sizeof(entry->leaf_hmac));
+
+	return store_log_data(&log);
+}
+
+int log_remove_leaf(struct label_t label, const uint8_t root[PW_HASH_SIZE])
+{
+	int ret;
+	struct pw_log_storage_t log;
+	struct pw_get_log_entry_t *entry = log.entries;
+
+	ret = log_roll_for_append(&log);
+	if (ret != EC_SUCCESS)
+		return ret;
+
+	entry->type.v = PW_REMOVE_LEAF;
+	entry->label.v = label.v;
+	memcpy(entry->root, root, sizeof(entry->root));
+
+	return store_log_data(&log);
+}
+
+int log_auth(struct label_t label, const uint8_t root[PW_HASH_SIZE], int code,
+	     struct pw_timestamp_t timestamp)
+{
+	int ret;
+	struct pw_log_storage_t log;
+	struct pw_get_log_entry_t *entry = log.entries;
+
+	ret = log_roll_for_append(&log);
+	if (ret != EC_SUCCESS)
+		return ret;
+
+	entry->type.v = PW_TRY_AUTH;
+	entry->label.v = label.v;
+	memcpy(entry->root, root, sizeof(entry->root));
+	entry->return_code = code;
+	memcpy(&entry->timestamp, &timestamp, sizeof(entry->timestamp));
+
+	return store_log_data(&log);
+}
+
+/******************************************************************************/
 /* Per-request-type handler implementations.
  */
 
@@ -557,8 +812,12 @@ static int pw_handle_reset_tree(struct merkle_tree_t *merkle_tree,
 				 &new_tree);
 
 	if (ret == EC_SUCCESS) {
-		memcpy(merkle_tree, &new_tree, sizeof(new_tree));
-		memcpy(new_root, new_tree.root, sizeof(new_tree.root));
+		ret = store_merkle_tree(&new_tree);
+		if (ret == EC_SUCCESS) {
+			memcpy(merkle_tree, &new_tree, sizeof(new_tree));
+			memcpy(new_root, new_tree.root,
+			       sizeof(new_tree.root));
+		}
 	}
 	return ret;
 }
@@ -606,6 +865,13 @@ static int pw_handle_insert_leaf(struct merkle_tree_t *merkle_tree,
 	if (ret != EC_SUCCESS)
 		return ret;
 
+	ret = log_insert_leaf(request->label, new_root,
+			      wrapped_leaf_data.hmac);
+	if (ret != EC_SUCCESS) {
+		memcpy(new_root, merkle_tree->root, sizeof(merkle_tree->root));
+		return ret;
+	}
+
 	memcpy(&response->unimported_leaf_data, &wrapped_leaf_data,
 	       sizeof(wrapped_leaf_data));
 
@@ -635,6 +901,12 @@ static int pw_handle_remove_leaf(struct merkle_tree_t *merkle_tree,
 
 	compute_root_hash(merkle_tree, request->leaf_location,
 			  request->path_hashes, empty_hash, new_root);
+
+	ret = log_remove_leaf(request->leaf_location, new_root);
+	if (ret != EC_SUCCESS) {
+		memcpy(new_root, merkle_tree->root, sizeof(merkle_tree->root));
+		return ret;
+	}
 
 	return ret;
 }
@@ -713,6 +985,17 @@ static int pw_handle_try_auth(struct merkle_tree_t *merkle_tree,
 	if (ret != EC_SUCCESS)
 		return ret;
 
+	ret = log_auth(wrapped_leaf_data.pub.label, new_root,
+		       results_table[auth_result].ret, leaf_data.pub.timestamp);
+	if (ret != EC_SUCCESS) {
+		memcpy(new_root, merkle_tree->root, sizeof(merkle_tree->root));
+		return ret;
+	}
+	/**********************************************************************/
+	/* At this point the log should be written so it should be safe for the
+	 * runtime of the code paths to diverge.
+	 */
+
 	*data_length = sizeof(*response) + PW_LEAF_PAYLOAD_SIZE;
 	memset(response, 0, *data_length);
 
@@ -766,6 +1049,13 @@ static int pw_handle_reset_auth(struct merkle_tree_t *merkle_tree,
 	if (ret != EC_SUCCESS)
 		return ret;
 
+	ret = log_auth(leaf_data.pub.label, new_root,
+		       ret, leaf_data.pub.timestamp);
+	if (ret != EC_SUCCESS) {
+		memcpy(new_root, merkle_tree->root, sizeof(merkle_tree->root));
+		return ret;
+	}
+
 	memcpy(&response->unimported_leaf_data, &wrapped_leaf_data,
 	       sizeof(wrapped_leaf_data));
 
@@ -776,6 +1066,141 @@ static int pw_handle_reset_auth(struct merkle_tree_t *merkle_tree,
 	*response_size = sizeof(*response) + PW_LEAF_PAYLOAD_SIZE;
 
 	return ret;
+}
+
+static int pw_handle_get_log(const struct merkle_tree_t *merkle_tree,
+			     const struct pw_request_get_log_t *request,
+			     uint16_t req_size,
+			     struct pw_get_log_entry_t response[],
+			     uint16_t *response_size)
+{
+	int ret;
+	int x;
+	struct pw_log_storage_t log;
+
+	if (req_size != sizeof(*request))
+		return PW_ERR_LENGTH_INVALID;
+
+	ret = validate_tree(merkle_tree);
+	if (ret != EC_SUCCESS)
+		return ret;
+
+	ret = load_log_data(&log);
+	if (ret != EC_SUCCESS)
+		return ret;
+
+	/* Find the relevant log entry. The return value isn't used because if
+	 * the entry isn't found the entire log is returned. This makes it
+	 * easier to recover when the log is too short.
+	 *
+	 * Here is an example:
+	 * 50 attempts have been made against a leaf that becomes out of sync
+	 * because of a disk flush failing. The copy of the leaf on disk is
+	 * behind by 50 and the log contains less than 50 entries. The CrOS
+	 * implementation can check the public parameters of the local copy with
+	 * the log entry to determine that leaf is out of sync. It can then send
+	 * any valid copy of that leaf with a log replay request that will only
+	 * succeed if the HMAC of the resulting leaf matches the log entry.
+	 */
+	find_relevant_entry(&log, request->root, &x);
+	/* If there are no valid entries, return. */
+	if (x < 0)
+		return EC_SUCCESS;
+
+	/* Copy the entries in reverse order. */
+	while (1) {
+		memcpy(&response[x], &log.entries[x], sizeof(log.entries[x]));
+		*response_size += sizeof(log.entries[x]);
+		if (x == 0)
+			break;
+		--x;
+	}
+
+	return EC_SUCCESS;
+}
+
+static int pw_handle_log_replay(const struct merkle_tree_t *merkle_tree,
+				const struct pw_request_log_replay_t *request,
+				uint16_t req_size,
+				struct pw_response_log_replay_t *response,
+				uint16_t *response_size)
+{
+	int ret;
+	int x;
+	struct pw_log_storage_t log;
+	struct leaf_data_t leaf_data = {};
+	struct imported_leaf_data_t imported_leaf_data;
+	struct wrapped_leaf_data_t wrapped_leaf_data;
+	uint8_t hmac[PW_HASH_SIZE];
+	uint8_t root[PW_HASH_SIZE];
+
+	if (req_size < sizeof(*request))
+		return PW_ERR_LENGTH_INVALID;
+
+	ret = validate_tree(merkle_tree);
+	if (ret != EC_SUCCESS)
+		return ret;
+
+	/* validate_request_with_wrapped_leaf() isn't used here because the
+	 * path validation is delayed to allow any valid copy of the same leaf
+	 * to be used in the replay operation as long as the result passes path
+	 * validation.
+	 */
+	ret = validate_leaf_header(&request->unimported_leaf_data.head,
+				   req_size - sizeof(*request),
+				   get_path_auxiliary_hash_count(merkle_tree));
+	if (ret != EC_SUCCESS)
+		return ret;
+
+	import_leaf(&request->unimported_leaf_data, &imported_leaf_data);
+
+	ret = load_log_data(&log);
+	if (ret != EC_SUCCESS)
+		return ret;
+
+	/* Find the relevant log entry. */
+	ret = find_relevant_entry(&log, request->log_root, &x);
+	if (ret != EC_SUCCESS)
+		return ret;
+
+	/* The other message types don't need to be handled by Cr50. */
+	if (log.entries[x].type.v != PW_TRY_AUTH)
+		return PW_ERR_TYPE_INVALID;
+
+	compute_hmac(merkle_tree, &imported_leaf_data, hmac);
+	if (safe_memcmp(hmac, request->unimported_leaf_data.hmac, sizeof(hmac)))
+		return PW_ERR_HMAC_AUTH_FAILED;
+
+	ret = decrypt_leaf_data(merkle_tree, &imported_leaf_data, &leaf_data);
+	if (ret != EC_SUCCESS)
+		return ret;
+
+	if (leaf_data.pub.label.v != log.entries[x].label.v)
+		return PW_ERR_LABEL_INVALID;
+
+	/* Update the metadata to match the log. */
+	if (log.entries[x].return_code == EC_SUCCESS)
+		leaf_data.pub.attempt_count.v = 0;
+	else
+		++leaf_data.pub.attempt_count.v;
+	memcpy(&leaf_data.pub.timestamp, &log.entries[x].timestamp,
+	       sizeof(leaf_data.pub.timestamp));
+
+	ret = handle_leaf_update(merkle_tree, &leaf_data,
+				 imported_leaf_data.hashes, &wrapped_leaf_data,
+				 root, &imported_leaf_data);
+	if (ret != EC_SUCCESS)
+		return ret;
+
+	if (memcmp(root, log.entries[x].root, PW_HASH_SIZE))
+		return PW_ERR_PATH_AUTH_FAILED;
+
+	memcpy(&response->unimported_leaf_data, &wrapped_leaf_data,
+	       sizeof(wrapped_leaf_data));
+
+	*response_size = sizeof(*response) + PW_LEAF_PAYLOAD_SIZE;
+
+	return EC_SUCCESS;
 }
 
 struct merkle_tree_t pw_merkle_tree;
@@ -824,8 +1249,6 @@ static enum vendor_cmd_rc pw_vendor_specific_command(enum vendor_cmd_cc code,
 	 */
 	pw_handle_request(&pw_merkle_tree, request, response);
 
-	/* TODO(allenwebb) store merkle_tree log update to flash here. */
-
 	*response_size = response->header.data_length +
 			 sizeof(response->header);
 
@@ -839,7 +1262,7 @@ DECLARE_VENDOR_COMMAND(VENDOR_CC_PINWEAVER,
 
 static void pinweaver_init(void)
 {
-	/* TODO(allenwebb) load merkle_tree from flash here. */
+	load_merkle_tree(&pw_merkle_tree);
 }
 DECLARE_HOOK(HOOK_INIT, pinweaver_init, HOOK_PRIO_LAST);
 
@@ -938,6 +1361,18 @@ int pw_handle_request(struct merkle_tree_t *merkle_tree,
 					   request->header.data_length,
 					   &response->data.reset_auth,
 					   &resp_length, root);
+		break;
+	case PW_GET_LOG:
+		ret = pw_handle_get_log(merkle_tree, &request->data.get_log,
+					request->header.data_length,
+					(void *)&response->data, &resp_length);
+		break;
+	case PW_LOG_REPLAY:
+		ret = pw_handle_log_replay(merkle_tree,
+					   &request->data.log_replay,
+					   request->header.data_length,
+					   &response->data.log_replay,
+					   &resp_length);
 		break;
 	default:
 		ret = PW_ERR_TYPE_INVALID;
