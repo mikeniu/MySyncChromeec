@@ -1,0 +1,277 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "afbeb9b9_e7378974",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-03-06T02:51:41Z",
+      "side": 1,
+      "message": "Not used, drop.",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ee7bf9de_1220f205",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-03-06T02:51:41Z",
+      "side": 1,
+      "message": "Please define the fault constants here, too (delays, retries)",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0591b198_30ecd329",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-03-06T02:51:41Z",
+      "side": 1,
+      "message": "Just use ADC_BASE_ATTACH/DETACH in the code directly.",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7bd9e6fd_2b9ff0f1",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-03-06T02:51:41Z",
+      "side": 1,
+      "message": "Not needed.",
+      "range": {
+        "startLine": 48,
+        "startChar": 35,
+        "endLine": 48,
+        "endChar": 51
+      },
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0586dcfe_55f6326e",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-03-06T02:51:41Z",
+      "side": 1,
+      "message": "I don\u0027t think this need to be a global variable.",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8d3f9f68_60aa2b20",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-03-06T02:51:41Z",
+      "side": 1,
+      "message": "nit: Format is usually * TODO(b/73133611): ...",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6088cfcb_6057b62d",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-03-06T02:51:41Z",
+      "side": 1,
+      "message": "break not needed. Also, you could use if/else instead, code might be more compact (please test).",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e216ea60_8ed81bdf",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-03-06T02:51:41Z",
+      "side": 1,
+      "message": "Who uses this anymore?",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0ef0c85c_dc622e6e",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-03-06T02:51:41Z",
+      "side": 1,
+      "message": "Drop this, just add the debugging code in the deferred handler.",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f30b33b6_4dd26df4",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-03-06T02:51:41Z",
+      "side": 1,
+      "message": "?",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e03dd913_2088b2f1",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-03-06T02:51:41Z",
+      "side": 1,
+      "message": "nit: Use bugs rather than usernames in TODO.",
+      "range": {
+        "startLine": 189,
+        "startChar": 10,
+        "endLine": 189,
+        "endChar": 18
+      },
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2ccebafe_e781c83d",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-03-06T02:51:41Z",
+      "side": 1,
+      "message": "Once base_power_on_attempts reaches 3, you will not ever try to power on the base again, even if there is a full connect/disconnect cycle. This seems wrong.",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bb48a153_53e603dd",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-03-06T02:51:41Z",
+      "side": 1,
+      "message": "nit: Add braces to this block (nevermind if the linter complains), or put both tests on one line.",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3a41a2b8_7b5e541f",
+        "filename": "board/zoombini/base_detect.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-03-06T02:51:41Z",
+      "side": 1,
+      "message": "I don\u0027t think this file is needed anymore.",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dfd91b9f_47c19921",
+        "filename": "board/zoombini/board.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-03-06T02:51:41Z",
+      "side": 1,
+      "message": "Might be best if the function ends in _interrupt, to make it a little clearer it\u0027s an interrupt handler.",
+      "range": {
+        "startLine": 262,
+        "startChar": 5,
+        "endLine": 262,
+        "endChar": 19
+      },
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
