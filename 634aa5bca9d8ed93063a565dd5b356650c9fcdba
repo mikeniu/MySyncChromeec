@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "18a50429_24bfaa33",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2018-03-07T00:45:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "afbeb9b9_e7378974",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ee7bf9de_1220f205",
         "filename": "board/zoombini/base_detect.c",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9a7c1f2d_7ed95cd3",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2018-03-07T00:45:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee7bf9de_1220f205",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0591b198_30ecd329",
         "filename": "board/zoombini/base_detect.c",
         "patchSetId": 2
@@ -50,6 +86,24 @@
       "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "75bd6f31_5a7b73b1",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2018-03-07T00:45:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0591b198_30ecd329",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     },
     {
       "key": {
@@ -76,6 +130,30 @@
     },
     {
       "key": {
+        "uuid": "b24da7b2_3dec246c",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2018-03-07T00:45:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7bd9e6fd_2b9ff0f1",
+      "range": {
+        "startLine": 48,
+        "startChar": 35,
+        "endLine": 48,
+        "endChar": 51
+      },
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0586dcfe_55f6326e",
         "filename": "board/zoombini/base_detect.c",
         "patchSetId": 2
@@ -90,6 +168,24 @@
       "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "677025f1_6a749f38",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2018-03-07T00:45:50Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "0586dcfe_55f6326e",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     },
     {
       "key": {
@@ -110,6 +206,24 @@
     },
     {
       "key": {
+        "uuid": "60cb097d_d4628a11",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2018-03-07T00:45:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d3f9f68_60aa2b20",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6088cfcb_6057b62d",
         "filename": "board/zoombini/base_detect.c",
         "patchSetId": 2
@@ -121,6 +235,24 @@
       "writtenOn": "2018-03-06T02:51:41Z",
       "side": 1,
       "message": "break not needed. Also, you could use if/else instead, code might be more compact (please test).",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1cd330ed_95004969",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2018-03-07T00:45:50Z",
+      "side": 1,
+      "message": "No size difference.",
+      "parentUuid": "6088cfcb_6057b62d",
       "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
@@ -144,6 +276,24 @@
     },
     {
       "key": {
+        "uuid": "1fea4ce4_98167413",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2018-03-07T00:45:50Z",
+      "side": 1,
+      "message": "Only used internal to this module. Removed.",
+      "parentUuid": "e216ea60_8ed81bdf",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0ef0c85c_dc622e6e",
         "filename": "board/zoombini/base_detect.c",
         "patchSetId": 2
@@ -161,6 +311,24 @@
     },
     {
       "key": {
+        "uuid": "c4d40784_49e32cab",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2018-03-07T00:45:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0ef0c85c_dc622e6e",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f30b33b6_4dd26df4",
         "filename": "board/zoombini/base_detect.c",
         "patchSetId": 2
@@ -175,6 +343,24 @@
       "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a079f0d9_e71c4316",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2018-03-07T00:45:50Z",
+      "side": 1,
+      "message": "Removed.",
+      "parentUuid": "f30b33b6_4dd26df4",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     },
     {
       "key": {
@@ -201,6 +387,30 @@
     },
     {
       "key": {
+        "uuid": "b0e6465d_06671d82",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2018-03-07T00:45:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e03dd913_2088b2f1",
+      "range": {
+        "startLine": 189,
+        "startChar": 10,
+        "endLine": 189,
+        "endChar": 18
+      },
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2ccebafe_e781c83d",
         "filename": "board/zoombini/base_detect.c",
         "patchSetId": 2
@@ -212,6 +422,24 @@
       "writtenOn": "2018-03-06T02:51:41Z",
       "side": 1,
       "message": "Once base_power_on_attempts reaches 3, you will not ever try to power on the base again, even if there is a full connect/disconnect cycle. This seems wrong.",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f951ecbb_fddbdb54",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2018-03-07T00:45:50Z",
+      "side": 1,
+      "message": "After 1 second of base_power_on_attempts reaching 3, it will be reset. (actually anytime there\u0027s a base power fault, the counter will be reset within 1 second of the last attempt). This seems okay to me?",
+      "parentUuid": "2ccebafe_e781c83d",
       "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
@@ -235,6 +463,24 @@
     },
     {
       "key": {
+        "uuid": "2a4ab7e2_1e78ca16",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2018-03-07T00:45:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb48a153_53e603dd",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a41a2b8_7b5e541f",
         "filename": "board/zoombini/base_detect.h",
         "patchSetId": 2
@@ -252,6 +498,24 @@
     },
     {
       "key": {
+        "uuid": "81f71606_0e9daa5b",
+        "filename": "board/zoombini/base_detect.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2018-03-07T00:45:50Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "3a41a2b8_7b5e541f",
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfd91b9f_47c19921",
         "filename": "board/zoombini/board.h",
         "patchSetId": 2
@@ -263,6 +527,30 @@
       "writtenOn": "2018-03-06T02:51:41Z",
       "side": 1,
       "message": "Might be best if the function ends in _interrupt, to make it a little clearer it\u0027s an interrupt handler.",
+      "range": {
+        "startLine": 262,
+        "startChar": 5,
+        "endLine": 262,
+        "endChar": 19
+      },
+      "revId": "634aa5bca9d8ed93063a565dd5b356650c9fcdba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d8527dcd_64393ed2",
+        "filename": "board/zoombini/board.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2018-03-07T00:45:50Z",
+      "side": 1,
+      "message": "Good idea, done.",
+      "parentUuid": "dfd91b9f_47c19921",
       "range": {
         "startLine": 262,
         "startChar": 5,
