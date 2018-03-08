@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "baa15fb8_20f4156f",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-03-08T06:25:37Z",
+      "side": 1,
+      "message": "I don\u0027t think this needs to be static, if you set a reasonable default value and set it in all path that matter.",
+      "range": {
+        "startLine": 137,
+        "startChar": 1,
+        "endLine": 137,
+        "endChar": 7
+      },
+      "revId": "df82172250838cc77a4a62712fa8d14ebf230c2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6ee7d5ec_181929de",
         "filename": "board/zoombini/base_detect.c",
         "patchSetId": 4
@@ -114,6 +137,29 @@
       "side": 1,
       "message": "If the power on attempts meets POWER_FAULT_MAX_TRIES, my intention is that the base must be disconnected and then reconnected before attempting to power on again.",
       "parentUuid": "8b147f7c_99b20bf6",
+      "revId": "df82172250838cc77a4a62712fa8d14ebf230c2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "18430f1d_8effc847",
+        "filename": "board/zoombini/gpio.inc",
+        "patchSetId": 4
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1129199
+      },
+      "writtenOn": "2018-03-08T06:25:37Z",
+      "side": 1,
+      "message": "Why both? Should it be only falling edge?",
+      "range": {
+        "startLine": 157,
+        "startChar": 37,
+        "endLine": 157,
+        "endChar": 50
+      },
       "revId": "df82172250838cc77a4a62712fa8d14ebf230c2d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
