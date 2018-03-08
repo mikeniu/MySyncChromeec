@@ -143,6 +143,24 @@
     },
     {
       "key": {
+        "uuid": "4293aa71_c1b09296",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1003000
+      },
+      "writtenOn": "2018-03-08T06:37:35Z",
+      "side": 1,
+      "message": "But wait, what about this situation:\n\n1. base_pwr_fault_interrupt --\u003e power disable, deferred call\n2. check_and_reapply_base_power_deferred --\u003e power enable, attempts \u003d 1, deferred call for clear_base_power_on_attempts_deferred\n3. base_pwr_fault_interrupt within 1 second --\u003e power disable, deferred call\n4. check_and_reapply_base_power_deferred --\u003e power enable, attempts \u003d 2, deferred call for clear_base_power_on_attempts_deferred\n5. base_pwr_fault_interrupt within 1 second --\u003e power disable, deferred call\n6. check_and_reapply_base_power_deferred --\u003e power enable, attempts \u003d 3, deferred call for clear_base_power_on_attempts_deferred\n7. base_pwr_fault_interrupt within 1 second --\u003e power disable, deferred call\n8. check_and_reapply_base_power_deferred --\u003e attempts reached. nothing to do.\n9. after 1 second, clear_base_power_on_attempts_deferred clears attempts\u003d0.\n\nNow either:\n1. Base would recover --\u003e which you mentioned that the intention is user should disconnect and reconnect the base.\n\n2. fault still triggers --\u003e this code would still enable power to base and set attempts to 1. Shouldn\u0027t you at least disable fault interrupt at step #8?",
+      "parentUuid": "65b48dfc_9bfaca20",
+      "revId": "df82172250838cc77a4a62712fa8d14ebf230c2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "18430f1d_8effc847",
         "filename": "board/zoombini/gpio.inc",
         "patchSetId": 4
