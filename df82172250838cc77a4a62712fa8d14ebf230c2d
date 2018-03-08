@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6ee7d5ec_181929de",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1003000
+      },
+      "writtenOn": "2018-03-08T01:00:17Z",
+      "side": 1,
+      "message": "Does this need to be checked? Or is the intention here to stay in debounced state until you can make a clear decision?",
+      "range": {
+        "startLine": 161,
+        "startChar": 9,
+        "endLine": 162,
+        "endChar": 28
+      },
+      "revId": "df82172250838cc77a4a62712fa8d14ebf230c2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8ebff1d5_ce7780ec",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1003000
+      },
+      "writtenOn": "2018-03-08T01:00:17Z",
+      "side": 1,
+      "message": "what happens after hitting MAX_RETRIES? Do you want to go back to DETACHED state?",
+      "revId": "df82172250838cc77a4a62712fa8d14ebf230c2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
