@@ -81,6 +81,24 @@
       "revId": "df82172250838cc77a4a62712fa8d14ebf230c2d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8b147f7c_99b20bf6",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1003000
+      },
+      "writtenOn": "2018-03-08T05:02:49Z",
+      "side": 1,
+      "message": "But then where would you apply power if the base recovers after POWER_FAULT_MAX_TRIES?",
+      "parentUuid": "ebdf5a4e_30abe2da",
+      "revId": "df82172250838cc77a4a62712fa8d14ebf230c2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
