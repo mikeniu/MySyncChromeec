@@ -99,6 +99,24 @@
       "revId": "df82172250838cc77a4a62712fa8d14ebf230c2d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "65b48dfc_9bfaca20",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2018-03-08T06:19:35Z",
+      "side": 1,
+      "message": "If the power on attempts meets POWER_FAULT_MAX_TRIES, my intention is that the base must be disconnected and then reconnected before attempting to power on again.",
+      "parentUuid": "8b147f7c_99b20bf6",
+      "revId": "df82172250838cc77a4a62712fa8d14ebf230c2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
