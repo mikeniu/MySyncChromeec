@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "95345ac6_9e05681f",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-15T22:54:19Z",
+      "side": 1,
+      "message": "+vbendeb@chromium.org The comments said NvWrites are committed after the TPM command finishes. Do I need to explicitly call commit if I want the write to happen prior to sending the response back over SPI?\n\nI need to ensure the write completes prior to CrOS getting the TPM vendor specific response message.",
+      "range": {
+        "startLine": 225,
+        "startChar": 0,
+        "endLine": 227,
+        "endChar": 33
+      },
+      "revId": "8e7bde5145c5dcd57cfb8258c8407f902c0db8bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
