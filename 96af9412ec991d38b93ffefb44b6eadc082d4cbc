@@ -1,0 +1,441 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "aed85303_b7bd5c25",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "these",
+      "range": {
+        "startLine": 18,
+        "startChar": 31,
+        "endLine": 18,
+        "endChar": 36
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c0481218_d563076b",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "Please check with Andrey and Vadim",
+      "range": {
+        "startLine": 19,
+        "startChar": 3,
+        "endLine": 19,
+        "endChar": 44
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "71d89ec3_b07fd3ec",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "This should go to the top of the file before all functions with a comment that explains semantics.",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 22
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4d5e7426_df0235ae",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "Also, does this cause a write? Or will it skip the write if the space already exists and has the correct parameters?",
+      "range": {
+        "startLine": 65,
+        "startChar": 18,
+        "endLine": 65,
+        "endChar": 31
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ad786af3_04735d81",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "Does this mean the pinweaver state shows up as nvram spaces and is accessible from userspace via TPM\u0027s NVRAM API? Is there a way to keep objects that are not exposed via the TPM layer? Andrey?",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 73
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a4168c9d_17e5a0a7",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "I guess it\u0027s more likely that we\u0027d actually handle conversion of old objects in the load path, so maybe put the assert there?",
+      "range": {
+        "startLine": 71,
+        "startChar": 22,
+        "endLine": 71,
+        "endChar": 50
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2d93f125_c2dd0a30",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "Check for errors?",
+      "range": {
+        "startLine": 113,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 30
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e1eb77ed_9a4e5f68",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "This can go before the scope block",
+      "range": {
+        "startLine": 150,
+        "startChar": 0,
+        "endLine": 157,
+        "endChar": 0
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "91b284cb_744a5019",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "Should be TPM_VS_PINWEAVER_LOG ?",
+      "range": {
+        "startLine": 204,
+        "startChar": 16,
+        "endLine": 204,
+        "endChar": 37
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eb685cd3_68c87ae5",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "This block is duplicated quite a few times - move to helper?",
+      "range": {
+        "startLine": 216,
+        "startChar": 0,
+        "endLine": 221,
+        "endChar": 35
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "22adfcd2_b3e630c2",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "TPM_VS_PINWEAVER_LOG?",
+      "range": {
+        "startLine": 225,
+        "startChar": 28,
+        "endLine": 225,
+        "endChar": 49
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "50dddec7_8316e534",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "nit: curly braces",
+      "range": {
+        "startLine": 430,
+        "startChar": 24,
+        "endLine": 430,
+        "endChar": 0
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2e6843a2_e3fd8fde",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 435,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "why?",
+      "range": {
+        "startLine": 434,
+        "startChar": 0,
+        "endLine": 435,
+        "endChar": 37
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7b203fe5_319a9fb7",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 533,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "use a better name? log_ret maybe?",
+      "range": {
+        "startLine": 533,
+        "startChar": 5,
+        "endLine": 533,
+        "endChar": 9
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b52d2e37_52fdb92b",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 691,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "it\u0027d be clearer if this loop would just count to PW_LOG_ENTRY_COUNT and the validity conditions be checked in the body. As is, I believe this may access log.entries[PW_LOG_ENTRY_COUNT], which is out of bounds.",
+      "range": {
+        "startLine": 690,
+        "startChar": 13,
+        "endLine": 691,
+        "endChar": 28
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "27df4b8b_eb5e3f45",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 740,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "break out into common helper?",
+      "range": {
+        "startLine": 729,
+        "startChar": 0,
+        "endLine": 740,
+        "endChar": 0
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "46173578_4e53035b",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 746,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "constant time comparison required here?",
+      "range": {
+        "startLine": 746,
+        "startChar": 5,
+        "endLine": 746,
+        "endChar": 16
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "33d34a2f_b70e4934",
+        "filename": "include/pinweaver_types.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "I think I\u0027d prefer a separate enum for this - saving bits in the log seems worth it.",
+      "range": {
+        "startLine": 274,
+        "startChar": 8,
+        "endLine": 274,
+        "endChar": 25
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c8b536cf_0b6595b0",
+        "filename": "include/pinweaver_types.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-03-16T14:44:46Z",
+      "side": 1,
+      "message": "I think PW_HASH_SIZE is much larger than the timestamp + return code. Thus, we\u0027re generally wasting quite a few bytes, and INSERT log entries are actually pretty rare. Thus, it probably makes sense to switch to variable-length records? a single-byte field to encode length and type should work I guess.",
+      "range": {
+        "startLine": 276,
+        "startChar": 0,
+        "endLine": 285,
+        "endChar": 3
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
