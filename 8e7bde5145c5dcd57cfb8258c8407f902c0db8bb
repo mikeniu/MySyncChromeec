@@ -22,6 +22,30 @@
       "revId": "8e7bde5145c5dcd57cfb8258c8407f902c0db8bb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7179c66a_26375537",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1000039
+      },
+      "writtenOn": "2018-03-16T15:32:44Z",
+      "side": 1,
+      "message": "yes, you do need to call commit here, commits for TPM commands happen in the TPM stack, this NV write would be never committed.\n\nThis is executed on a vendor command context, right? there is no chance another TPM command would be executed?\n\nAlso, you are aware that there is a name/value pair non volatile storage facility - why not use that, why do you need to use TPM NVMEM?",
+      "parentUuid": "95345ac6_9e05681f",
+      "range": {
+        "startLine": 225,
+        "startChar": 0,
+        "endLine": 227,
+        "endChar": 33
+      },
+      "revId": "8e7bde5145c5dcd57cfb8258c8407f902c0db8bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
