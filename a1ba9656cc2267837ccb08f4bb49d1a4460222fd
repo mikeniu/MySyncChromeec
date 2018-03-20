@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eb8649f7_38d7e3c0",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1003000
+      },
+      "writtenOn": "2018-03-20T05:24:02Z",
+      "side": 1,
+      "message": "Not for this CL, but I think we should move this to a common place so that all boards can benefit from this and also we have a standard command for this across different boards.",
+      "range": {
+        "startLine": 239,
+        "startChar": 0,
+        "endLine": 249,
+        "endChar": 38
+      },
+      "revId": "a1ba9656cc2267837ccb08f4bb49d1a4460222fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}

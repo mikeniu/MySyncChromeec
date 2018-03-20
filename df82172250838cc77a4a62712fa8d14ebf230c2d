@@ -203,6 +203,24 @@
     },
     {
       "key": {
+        "uuid": "e29a633b_cc89cfa8",
+        "filename": "board/zoombini/base_detect.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1003000
+      },
+      "writtenOn": "2018-03-20T05:24:02Z",
+      "side": 1,
+      "message": "Aah I see. Thanks for the clarification!",
+      "parentUuid": "51bfd5fd_7782f3f1",
+      "revId": "df82172250838cc77a4a62712fa8d14ebf230c2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "18430f1d_8effc847",
         "filename": "board/zoombini/gpio.inc",
         "patchSetId": 4
