@@ -70,6 +70,30 @@
       "revId": "8e7bde5145c5dcd57cfb8258c8407f902c0db8bb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "edc46629_60db4d7c",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1000039
+      },
+      "writtenOn": "2018-03-20T18:57:49Z",
+      "side": 1,
+      "message": "but the entire name/value storage space is NVMEM_CR50_SIZE in size, which happens to be 272 bytes...\n\nany chance this log can be reduced in size to fit say in 200 bytes?",
+      "parentUuid": "35054d7a_d9397182",
+      "range": {
+        "startLine": 225,
+        "startChar": 0,
+        "endLine": 227,
+        "endChar": 33
+      },
+      "revId": "8e7bde5145c5dcd57cfb8258c8407f902c0db8bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
