@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "c04f7056_81b3ef86",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-20T18:14:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aed85303_b7bd5c25",
+      "range": {
+        "startLine": 18,
+        "startChar": 31,
+        "endLine": 18,
+        "endChar": 36
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c0481218_d563076b",
         "filename": "board/cr50/pinweaver_tpm_imports.c",
         "patchSetId": 3
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "01d5ed36_037667ff",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-20T18:14:34Z",
+      "side": 1,
+      "message": "This is no longer needed because of a shift in which API I use for NVRAM.",
+      "parentUuid": "c0481218_d563076b",
+      "range": {
+        "startLine": 19,
+        "startChar": 3,
+        "endLine": 19,
+        "endChar": 44
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "71d89ec3_b07fd3ec",
         "filename": "board/cr50/pinweaver_tpm_imports.c",
         "patchSetId": 3
@@ -68,6 +116,30 @@
       "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3e101b74_ee39d9cc",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-20T18:14:34Z",
+      "side": 1,
+      "message": "The NVRAM API shift made this var no longer needed.",
+      "parentUuid": "71d89ec3_b07fd3ec",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 22
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     },
     {
       "key": {
@@ -117,6 +189,54 @@
     },
     {
       "key": {
+        "uuid": "56322757_bff6157d",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-20T18:14:34Z",
+      "side": 1,
+      "message": "The NVRAM API shift made this comment N/A",
+      "parentUuid": "4d5e7426_df0235ae",
+      "range": {
+        "startLine": 65,
+        "startChar": 18,
+        "endLine": 65,
+        "endChar": 31
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "450291f5_e7024b4b",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-20T18:14:34Z",
+      "side": 1,
+      "message": "These object would not have been visible through the TPM layer, but this should still hold after the API shift.",
+      "parentUuid": "ad786af3_04735d81",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 73
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a4168c9d_17e5a0a7",
         "filename": "board/cr50/pinweaver_tpm_imports.c",
         "patchSetId": 3
@@ -137,6 +257,30 @@
       "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "acc86796_40965d49",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-20T18:14:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a4168c9d_17e5a0a7",
+      "range": {
+        "startLine": 71,
+        "startChar": 22,
+        "endLine": 71,
+        "endChar": 50
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     },
     {
       "key": {
@@ -163,6 +307,30 @@
     },
     {
       "key": {
+        "uuid": "84d9bdf3_213e5080",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-20T18:14:34Z",
+      "side": 1,
+      "message": "The NVRAM API shift made this comment N/A",
+      "parentUuid": "2d93f125_c2dd0a30",
+      "range": {
+        "startLine": 113,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 30
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e1eb77ed_9a4e5f68",
         "filename": "board/cr50/pinweaver_tpm_imports.c",
         "patchSetId": 3
@@ -183,6 +351,30 @@
       "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a0009137_bae24d1a",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-20T18:14:34Z",
+      "side": 1,
+      "message": "The NVRAM API shift made this comment N/A",
+      "parentUuid": "e1eb77ed_9a4e5f68",
+      "range": {
+        "startLine": 150,
+        "startChar": 0,
+        "endLine": 157,
+        "endChar": 0
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     },
     {
       "key": {
@@ -209,6 +401,30 @@
     },
     {
       "key": {
+        "uuid": "58753b90_2cb0ce42",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-20T18:14:34Z",
+      "side": 1,
+      "message": "The NVRAM API shift made this comment N/A",
+      "parentUuid": "91b284cb_744a5019",
+      "range": {
+        "startLine": 204,
+        "startChar": 16,
+        "endLine": 204,
+        "endChar": 37
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "eb685cd3_68c87ae5",
         "filename": "board/cr50/pinweaver_tpm_imports.c",
         "patchSetId": 3
@@ -229,6 +445,30 @@
       "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8f7af947_451c9857",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-20T18:14:34Z",
+      "side": 1,
+      "message": "The NVRAM API shift made this comment N/A",
+      "parentUuid": "eb685cd3_68c87ae5",
+      "range": {
+        "startLine": 216,
+        "startChar": 0,
+        "endLine": 221,
+        "endChar": 35
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     },
     {
       "key": {
@@ -255,6 +495,30 @@
     },
     {
       "key": {
+        "uuid": "037717c3_584a0880",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-20T18:14:34Z",
+      "side": 1,
+      "message": "The NVRAM API shift made this comment N/A",
+      "parentUuid": "22adfcd2_b3e630c2",
+      "range": {
+        "startLine": 225,
+        "startChar": 28,
+        "endLine": 225,
+        "endChar": 49
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "50dddec7_8316e534",
         "filename": "common/pinweaver.c",
         "patchSetId": 3
@@ -275,6 +539,30 @@
       "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5a84c6b5_2623b807",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-20T18:14:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "50dddec7_8316e534",
+      "range": {
+        "startLine": 430,
+        "startChar": 24,
+        "endLine": 430,
+        "endChar": 0
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     },
     {
       "key": {
@@ -301,6 +589,30 @@
     },
     {
       "key": {
+        "uuid": "f2ae86f4_6c39a194",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 435,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-20T18:14:34Z",
+      "side": 1,
+      "message": "This didn\u0027t function the way I wanted so I created new_tree instead.",
+      "parentUuid": "2e6843a2_e3fd8fde",
+      "range": {
+        "startLine": 434,
+        "startChar": 0,
+        "endLine": 435,
+        "endChar": 37
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7b203fe5_319a9fb7",
         "filename": "common/pinweaver.c",
         "patchSetId": 3
@@ -321,6 +633,30 @@
       "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0e23c749_0c99b16c",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 533,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-20T18:14:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7b203fe5_319a9fb7",
+      "range": {
+        "startLine": 533,
+        "startChar": 5,
+        "endLine": 533,
+        "endChar": 9
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     },
     {
       "key": {
@@ -347,6 +683,30 @@
     },
     {
       "key": {
+        "uuid": "28b424f9_3d2a745f",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 691,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-20T18:14:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b52d2e37_52fdb92b",
+      "range": {
+        "startLine": 690,
+        "startChar": 13,
+        "endLine": 691,
+        "endChar": 28
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "27df4b8b_eb5e3f45",
         "filename": "common/pinweaver.c",
         "patchSetId": 3
@@ -370,6 +730,30 @@
     },
     {
       "key": {
+        "uuid": "86b6abc1_e3e3e42f",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 740,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-20T18:14:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "27df4b8b_eb5e3f45",
+      "range": {
+        "startLine": 729,
+        "startChar": 0,
+        "endLine": 740,
+        "endChar": 0
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "46173578_4e53035b",
         "filename": "common/pinweaver.c",
         "patchSetId": 3
@@ -390,6 +774,30 @@
       "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "690cd75d_fd983bd9",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 746,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-20T18:14:34Z",
+      "side": 1,
+      "message": "Yes, I do not want an attacker to be able to determine a valid HMAC for a crafted payload.",
+      "parentUuid": "46173578_4e53035b",
+      "range": {
+        "startLine": 746,
+        "startChar": 5,
+        "endLine": 746,
+        "endChar": 16
+      },
+      "revId": "96af9412ec991d38b93ffefb44b6eadc082d4cbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     },
     {
       "key": {
