@@ -94,6 +94,30 @@
       "revId": "8e7bde5145c5dcd57cfb8258c8407f902c0db8bb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e894e70_d271d458",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-03-22T03:42:33Z",
+      "side": 1,
+      "message": "+mnissler@chromium.org\n\nMattias, do you think this is an acceptable place to store the log or should I move it back to the TPM stack?\n\nOnce, I switch the log entries over the variable length that will save some space, but I don\u0027t particularly like the idea of having a variable length log because of the potential of it hiding issues that show up in the worse case when combine with other features\u0027 worse case usage.",
+      "parentUuid": "edc46629_60db4d7c",
+      "range": {
+        "startLine": 225,
+        "startChar": 0,
+        "endLine": 227,
+        "endChar": 33
+      },
+      "revId": "8e7bde5145c5dcd57cfb8258c8407f902c0db8bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
