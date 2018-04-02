@@ -118,6 +118,30 @@
       "revId": "8e7bde5145c5dcd57cfb8258c8407f902c0db8bb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "590d94f8_463f03b3",
+        "filename": "board/cr50/pinweaver_tpm_imports.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-04-02T23:56:09Z",
+      "side": 1,
+      "message": "We reduced the log size to 2 entries and now both of our key, value pairs should be 200 bytes plus the overhead or less. (I added a BUILD_ASSERT to check this).",
+      "parentUuid": "6e894e70_d271d458",
+      "range": {
+        "startLine": 225,
+        "startChar": 0,
+        "endLine": 227,
+        "endChar": 33
+      },
+      "revId": "8e7bde5145c5dcd57cfb8258c8407f902c0db8bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
