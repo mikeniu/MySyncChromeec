@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "710c5748_fda5c125",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 543,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-04-03T19:40:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce28a8ba_13174d93",
+      "range": {
+        "startLine": 543,
+        "startChar": 11,
+        "endLine": 543,
+        "endChar": 26
+      },
+      "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e8193fc0_b1757c50",
         "filename": "common/pinweaver.c",
         "patchSetId": 11
@@ -45,6 +69,30 @@
       "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "12a72a4f_9034af9a",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-04-03T19:40:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8193fc0_b1757c50",
+      "range": {
+        "startLine": 561,
+        "startChar": 0,
+        "endLine": 561,
+        "endChar": 2
+      },
+      "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     },
     {
       "key": {
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "50a0fbb3_1e9458f7",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 664,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-04-03T19:40:51Z",
+      "side": 1,
+      "message": "Those counters cannot be used because they increment at times that the timer doesn\u0027t get reset. We need a way of tracking exactly when the timer is reset. The TPM counters don\u0027t give us this property so we are forced to use another counter. I have added a comment to explain.",
+      "parentUuid": "819db36d_b7739bdd",
+      "range": {
+        "startLine": 656,
+        "startChar": 0,
+        "endLine": 664,
+        "endChar": 40
+      },
+      "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c0c4682b_f1a67ae3",
         "filename": "common/pinweaver.c",
         "patchSetId": 11
@@ -91,6 +163,30 @@
       "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1c474d6f_3a9051e7",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-04-03T19:40:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c0c4682b_f1a67ae3",
+      "range": {
+        "startLine": 710,
+        "startChar": 11,
+        "endLine": 710,
+        "endChar": 19
+      },
+      "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     },
     {
       "key": {
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "d1ed8afa_511e7c72",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 979,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-04-03T19:40:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f76a789d_2b48b3d8",
+      "range": {
+        "startLine": 979,
+        "startChar": 37,
+        "endLine": 979,
+        "endChar": 50
+      },
+      "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "994d88a4_1fed3dba",
         "filename": "common/pinweaver.c",
         "patchSetId": 11
@@ -131,6 +251,24 @@
       "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "be9d66b6_c3197dee",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 1083,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-04-03T19:40:51Z",
+      "side": 1,
+      "message": "I added a comment for why the return value isn\u0027t checked.",
+      "parentUuid": "994d88a4_1fed3dba",
+      "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     },
     {
       "key": {
@@ -157,6 +295,30 @@
     },
     {
       "key": {
+        "uuid": "13244dc6_5643ef86",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 1122,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-04-03T19:40:51Z",
+      "side": 1,
+      "message": "No, I have added a comment for why.",
+      "parentUuid": "7fb1f699_c68c77b0",
+      "range": {
+        "startLine": 1122,
+        "startChar": 7,
+        "endLine": 1122,
+        "endChar": 27
+      },
+      "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b32543f5_a8c9486c",
         "filename": "common/pinweaver.c",
         "patchSetId": 11
@@ -177,6 +339,30 @@
       "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e930c710_64f2a27c",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 1162,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-04-03T19:40:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b32543f5_a8c9486c",
+      "range": {
+        "startLine": 1159,
+        "startChar": 0,
+        "endLine": 1162,
+        "endChar": 40
+      },
+      "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
