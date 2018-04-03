@@ -1,0 +1,182 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ce28a8ba_13174d93",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 543,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-04-03T14:21:11Z",
+      "side": 1,
+      "message": "nit: implementation",
+      "range": {
+        "startLine": 543,
+        "startChar": 11,
+        "endLine": 543,
+        "endChar": 26
+      },
+      "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e8193fc0_b1757c50",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-04-03T14:21:11Z",
+      "side": 1,
+      "message": "nit: delete useless blank line",
+      "range": {
+        "startLine": 561,
+        "startChar": 0,
+        "endLine": 561,
+        "endChar": 2
+      },
+      "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "819db36d_b7739bdd",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 664,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-04-03T14:21:11Z",
+      "side": 1,
+      "message": "Does this force another NVRAM write on each startup? If so, might it be better to rely on the restart counter maintained by the TPM implementation?",
+      "range": {
+        "startLine": 656,
+        "startChar": 0,
+        "endLine": 664,
+        "endChar": 40
+      },
+      "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c0c4682b_f1a67ae3",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-04-03T14:21:11Z",
+      "side": 1,
+      "message": "nit: Could use a better name - perhaps \"log_roll_for_append\" or somesuch?",
+      "range": {
+        "startLine": 710,
+        "startChar": 11,
+        "endLine": 710,
+        "endChar": 19
+      },
+      "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f76a789d_2b48b3d8",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 979,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-04-03T14:21:11Z",
+      "side": 1,
+      "message": "nit: stale",
+      "range": {
+        "startLine": 979,
+        "startChar": 37,
+        "endLine": 979,
+        "endChar": 50
+      },
+      "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "994d88a4_1fed3dba",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 1083,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-04-03T14:21:11Z",
+      "side": 1,
+      "message": "Better check the return value of this?",
+      "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7fb1f699_c68c77b0",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 1122,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-04-03T14:21:11Z",
+      "side": 1,
+      "message": "Can\u0027t we use validate_request_with_wrapped_leaf here for simplicity?",
+      "range": {
+        "startLine": 1122,
+        "startChar": 7,
+        "endLine": 1122,
+        "endChar": 27
+      },
+      "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b32543f5_a8c9486c",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 1162,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-04-03T14:21:11Z",
+      "side": 1,
+      "message": "might just memcpy these?",
+      "range": {
+        "startLine": 1159,
+        "startChar": 0,
+        "endLine": 1162,
+        "endChar": 40
+      },
+      "revId": "c06da935f7c8336c1ecfe93bb1832e602fe32cd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
