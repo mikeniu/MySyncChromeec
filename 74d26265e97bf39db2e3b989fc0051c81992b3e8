@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9b704419_7317d7c9",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 656,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-04-04T10:30:13Z",
+      "side": 1,
+      "message": "OK, thanks for adding this comment. I defer to Vadim to make a call on whether this is the best we can do or whether he has an idea for something that we could reuse to avoid the NVRAM write on startup.",
+      "range": {
+        "startLine": 647,
+        "startChar": 0,
+        "endLine": 656,
+        "endChar": 5
+      },
+      "revId": "74d26265e97bf39db2e3b989fc0051c81992b3e8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "26cf49a2_3507e8cf",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 1087,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-04-04T10:30:13Z",
+      "side": 1,
+      "message": "How would one know which leaf to remove?",
+      "range": {
+        "startLine": 1085,
+        "startChar": 60,
+        "endLine": 1087,
+        "endChar": 14
+      },
+      "revId": "74d26265e97bf39db2e3b989fc0051c81992b3e8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "de08b571_0bc3f0f2",
+        "filename": "include/pinweaver.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-04-04T10:30:13Z",
+      "side": 1,
+      "message": "until what?",
+      "range": {
+        "startLine": 120,
+        "startChar": 72,
+        "endLine": 120,
+        "endChar": 77
+      },
+      "revId": "74d26265e97bf39db2e3b989fc0051c81992b3e8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2518e347_cc32f656",
+        "filename": "include/pinweaver_types.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-04-04T10:30:13Z",
+      "side": 1,
+      "message": "Not sure what you mean - this is a request message, so what does \"success\" refer to?",
+      "range": {
+        "startLine": 258,
+        "startChar": 0,
+        "endLine": 258,
+        "endChar": 42
+      },
+      "revId": "74d26265e97bf39db2e3b989fc0051c81992b3e8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f4b2f07e_aec953eb",
+        "filename": "include/pinweaver_types.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-04-04T10:30:13Z",
+      "side": 1,
+      "message": "An array?",
+      "range": {
+        "startLine": 321,
+        "startChar": 5,
+        "endLine": 321,
+        "endChar": 7
+      },
+      "revId": "74d26265e97bf39db2e3b989fc0051c81992b3e8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
