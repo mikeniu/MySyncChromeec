@@ -22,6 +22,30 @@
       "revId": "be6ff508db83c67e9d289b7a3644e9d0aeb46a5e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3d4b86db_c1bde7b5",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 489,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-04-24T18:20:11Z",
+      "side": 1,
+      "message": "Check \"timerinfo\" on the Cr50 UART console after a reset and let me know if it is close to 0 seconds. If not, the timer wasn\u0027t reset so the boot count doesn\u0027t get incremented.",
+      "parentUuid": "67f0b139_66df1986",
+      "range": {
+        "startLine": 488,
+        "startChar": 0,
+        "endLine": 489,
+        "endChar": 0
+      },
+      "revId": "be6ff508db83c67e9d289b7a3644e9d0aeb46a5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
