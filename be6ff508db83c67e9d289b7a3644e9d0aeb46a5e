@@ -46,6 +46,30 @@
       "revId": "be6ff508db83c67e9d289b7a3644e9d0aeb46a5e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ef1faadb_40454685",
+        "filename": "common/pinweaver.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 489,
+      "author": {
+        "id": 1135824
+      },
+      "writtenOn": "2018-04-25T13:55:03Z",
+      "side": 1,
+      "message": "I have checked that and it does reset to 0.\n\nBtw. I\u0027m not sure whether you have made code changes to fix this (our chat conversation yesterday seemed to suggest so) - I\u0027ve retested PS#26 and still see pinweaver credentials no longer working after reboot hard via UART.",
+      "parentUuid": "3d4b86db_c1bde7b5",
+      "range": {
+        "startLine": 488,
+        "startChar": 0,
+        "endLine": 489,
+        "endChar": 0
+      },
+      "revId": "be6ff508db83c67e9d289b7a3644e9d0aeb46a5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
