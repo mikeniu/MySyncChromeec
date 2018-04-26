@@ -22,6 +22,30 @@
       "revId": "e3d5bfab85dffd0e12ac76f702f0da3a8881a2fd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "642df77e_54871428",
+        "filename": "board/host/dcrypto.h",
+        "patchSetId": 31
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1160200
+      },
+      "writtenOn": "2018-04-26T21:39:46Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "af55f677_3083572e",
+      "range": {
+        "startLine": 7,
+        "startChar": 14,
+        "endLine": 9,
+        "endChar": 11
+      },
+      "revId": "e3d5bfab85dffd0e12ac76f702f0da3a8881a2fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
