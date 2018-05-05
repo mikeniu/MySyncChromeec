@@ -274,12 +274,25 @@ static void charge_manager_fill_power_info(int port,
 
 	if (sup == CHARGE_SUPPLIER_NONE ||
 	    r->role == USB_PD_PORT_POWER_SOURCE) {
-		r->type = USB_CHG_TYPE_NONE;
-		r->meas.voltage_max = 0;
-		r->meas.voltage_now = r->role == USB_PD_PORT_POWER_SOURCE ? 5000
-									  : 0;
-		r->meas.current_max = charge_manager_get_source_current(port);
-		r->max_power = 0;
+		if (is_pd_port(port)) {
+			r->type = USB_CHG_TYPE_NONE;
+			r->meas.voltage_max = 0;
+			r->meas.voltage_now =
+				r->role == USB_PD_PORT_POWER_SOURCE ? 5000 : 0;
+			r->meas.current_max =
+				charge_manager_get_source_current(port);
+			r->max_power = 0;
+		} else {
+#if CONFIG_DEDICATED_CHARGE_PORT_COUNT > 0
+			r->type = USB_CHG_TYPE_DEDICATED;
+#else
+			r->type = USB_CHG_TYPE_NONE;
+#endif
+			r->meas.voltage_max = 0;
+			r->meas.voltage_now = 0;
+			r->meas.current_max = 0;
+			r->max_power = 0;
+		}
 	} else {
 #if defined(HAS_TASK_CHG_RAMP) || defined(CONFIG_CHARGE_RAMP_HW)
 		/* Read ramped current if active charging port */
