@@ -135,6 +135,23 @@ void chipset_do_shutdown(void)
 		;
 }
 
+/* Call from S3->S0 transition */
+static void board_kblight_init(void)
+{
+	gpio_set_level(GPIO_KB_BL_PWR_EN, 1);
+}
+DECLARE_HOOK(HOOK_CHIPSET_RESUME, board_kblight_init, HOOK_PRIO_DEFAULT);
+
+/* Call from S0->(S0ix|S3) transition */
+static void board_kblight_stop(void)
+{
+	gpio_set_level(GPIO_KB_BL_PWR_EN, 0);
+}
+DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, board_kblight_stop, HOOK_PRIO_DEFAULT);
+
+/******************************************************************************/
+/* Charger functions */
+
 int board_set_active_charge_port(int port)
 {
 	int is_valid_port = (port >= 0 &&

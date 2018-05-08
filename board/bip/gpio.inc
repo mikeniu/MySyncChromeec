@@ -91,6 +91,9 @@ GPIO(USB_C0_BC12_VBUS_ON,   PIN(J, 4), GPIO_OUT_LOW)	/* C0 BC1.2 Power */
 GPIO(USB_C1_BC12_VBUS_ON,   PIN(J, 5), GPIO_OUT_LOW)	/* C1 BC1.2 Power */
 GPIO(USB_C1_PD_RST_ODL,  PIN(L, 7), GPIO_ODR_HIGH)	/* C1 PD Reset */
 
+/* Not implemented in hardware yet */
+UNIMPLEMENTED(KB_BL_PWR_EN)
+
 /* Alternate functions GPIO definitions */
 /* Cr50 requires no pull-ups on UART pins. */
 ALTERNATE(PIN_MASK(B, 0x03), 0, MODULE_UART, 0)		/* UART from EC to Servo */
