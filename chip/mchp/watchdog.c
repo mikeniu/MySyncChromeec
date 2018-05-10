@@ -19,7 +19,8 @@ void watchdog_reload(void)
 	/* Reload the auxiliary timer */
 	MCHP_TMR16_CTL(0) &= ~(1 << 5);
 	MCHP_TMR16_CNT(0) = CONFIG_AUX_TIMER_PERIOD_MS;
-#ifndef CONFIG_CHIPSET_DEBUG
+#if defined(CONFIG_CHIPSET_DEBUG) && defined(CONFIG_CHIPSET_DEBUG_NO_WDTRST)
+#else
 	MCHP_TMR16_CTL(0) |= 1 << 5;
 #endif
 #endif
@@ -58,7 +59,8 @@ int watchdog_init(void)
 
 	MCHP_TMR16_CTL(0) = val;
 
-#ifndef CONFIG_CHIPSET_DEBUG
+#if defined(CONFIG_CHIPSET_DEBUG) && defined(CONFIG_CHIPSET_DEBUG_NO_WDTRST)
+#else
 	/* Enable interrupt from auxiliary timer */
 	MCHP_TMR16_IEN(0) |= 1;
 	task_enable_irq(MCHP_IRQ_TIMER16_0);
