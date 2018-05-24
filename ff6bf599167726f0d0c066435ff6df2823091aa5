@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "c7234ed4_925bba11",
+        "filename": "baseboard/grunt/baseboard.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2018-05-24T15:53:53Z",
+      "side": 1,
+      "message": "Sorry, I thought https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/1068030/1 submitted already. It is in the CQ",
+      "parentUuid": "a3649d48_1247fd8e",
+      "range": {
+        "startLine": 117,
+        "startChar": 0,
+        "endLine": 117,
+        "endChar": 5
+      },
+      "revId": "ff6bf599167726f0d0c066435ff6df2823091aa5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "a1a481d9_bb450396",
         "filename": "baseboard/grunt/baseboard.c",
         "patchSetId": 1
