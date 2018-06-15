@@ -526,11 +526,13 @@ enum fan_status fan_get_status(int ch)
  */
 int fan_is_stalled(int ch)
 {
+	/* Target is non-zero but observed rpm is zero */
+	if (fan_get_rpm_target(ch) > 0 && fan_get_rpm_actual(ch) == 0)
+		return 1;
 	/* if fan is enabled but we didn't detect any tacho */
 	if (fan_get_enabled(ch) && fan_status[ch].cur_state == TACHO_UNDERFLOW)
 		return 1;
-	else
-		return 0;
+	return 0;
 }
 
 /**
