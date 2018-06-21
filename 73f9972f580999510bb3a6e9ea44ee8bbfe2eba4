@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e171dd13_ab5cc21f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2018-06-21T06:51:57Z",
+      "side": 1,
+      "message": "the whole wording here is very confusing and makes it sound magic.\n\u0027the OS\u0027 means what you put in powerd settings ?\n\nI don\u0027t think it\u0027s supposed to jump either...",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 57
+      },
+      "revId": "73f9972f580999510bb3a6e9ea44ee8bbfe2eba4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
