@@ -88,6 +88,8 @@ static uint8_t __bss_slow prev_state[KEYBOARD_COLS];
 static uint8_t __bss_slow debouncing[KEYBOARD_COLS];
 /* Keys simulated-pressed */
 static uint8_t __bss_slow simulated_key[KEYBOARD_COLS];
+/* Matrix of boot keys */
+static uint8_t __bss_slow boot_key_state[KEYBOARD_COLS];
 
 /* Times of last scans */
 static uint32_t __bss_slow scan_time[SCAN_TIME_COUNT];
@@ -642,6 +644,8 @@ void keyboard_scan_init(void)
 	read_matrix(debounced_state);
 	memcpy(prev_state, debounced_state, sizeof(prev_state));
 
+	memcpy(boot_key_state, debounced_state, sizeof(boot_key_state));
+
 #ifdef CONFIG_KEYBOARD_BOOT_KEYS
 	/* Check for keys held down at boot */
 	boot_key_value = check_boot_key(debounced_state);
@@ -890,3 +894,16 @@ DECLARE_CONSOLE_COMMAND(kbpress, command_keyboard_press,
 			"[col row [0 | 1]]",
 			"Simulate keypress");
 #endif
+
+static int keyboard_matrix_at_boot(struct host_cmd_handler_args *args)
+{
+	CPRINTS("keyboard_matrix_at_boot\n");
+	args->response_size = 0;
+
+	memcpy(args->response, boot_key_state, KEYBOARD_COLS);
+	args->response_size = KEYBOARD_COLS;
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_KEYBOARD_MATRIX_AT_BOOT,
+		     keyboard_matrix_at_boot,
+		     EC_VER_MASK(0));
