@@ -11,7 +11,12 @@
  */
 
 /* Interrupts */
-GPIO_INT(SPI1_NSS,          PIN(A, 15), GPIO_INT_BOTH,
+
+/*
+ * HACK: SPI1 NSS is actually on A15, but x15 is already used for eMMC
+ * command.
+ */
+GPIO_INT(SPI1_NSS,          PIN(A, 14), GPIO_INT_BOTH,
          spi_event)
 GPIO_INT(USB_C0_PD_INT_ODL, PIN(B, 1), GPIO_INT_FALLING | GPIO_PULL_UP,
          tcpc_alert_event)
@@ -38,7 +43,7 @@ GPIO_INT(SYNC_INT,          PIN(A, 5),  GPIO_INT_RISING | GPIO_PULL_DOWN,
 GPIO_INT(CHARGER_INT_ODL,   PIN(C, 13), GPIO_INPUT | GPIO_PULL_UP,
          rt946x_interrupt)
 #ifdef SECTION_IS_RO
-GPIO_INT(EMMC_CMD,          PIN(A, 14), GPIO_INT_FALLING,
+GPIO_INT(EMMC_CMD,          PIN(B, 15), GPIO_INT_FALLING,
          emmc_cmd_interrupt)
 #endif
 
