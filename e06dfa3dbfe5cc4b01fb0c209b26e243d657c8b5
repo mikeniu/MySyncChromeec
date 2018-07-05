@@ -22,6 +22,30 @@
       "revId": "e06dfa3dbfe5cc4b01fb0c209b26e243d657c8b5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "91b54ba9_56b8e267",
+        "filename": "board/nami/led.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1256311
+      },
+      "writtenOn": "2018-07-05T14:33:53Z",
+      "side": 1,
+      "message": "\u003e From my observed, the OS show battery is full when battery capacity \u003e\u003d 94%.\n\u003e If battery_full_soc kept 97, the gap is too big between full charged LED and OS status.\n\nAfter I read the commnet #20 in issue:80270446, I understand why this define is 97. Please ignore above my comment.",
+      "parentUuid": "cc045069_9ac4ee79",
+      "range": {
+        "startLine": 184,
+        "startChar": 17,
+        "endLine": 184,
+        "endChar": 34
+      },
+      "revId": "e06dfa3dbfe5cc4b01fb0c209b26e243d657c8b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
