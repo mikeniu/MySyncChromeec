@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "55c6f3cc_d72d34cd",
+        "filename": "board/meep/board.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1115020
+      },
+      "writtenOn": "2018-07-26T22:17:53Z",
+      "side": 1,
+      "message": "Unfortunately that won\u0027t be listed in the schematic or the layout; we\u0027ll have to get that information from the BOM. This is fine for now, just a reminder that it should get checked at some point.",
+      "parentUuid": "7baa5b20_89d79fa2",
+      "revId": "e810c16cfd8684e9e806b53723bb30ceb23bf6ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8e9f225c_d05f9b9b",
         "filename": "board/meep/board.c",
         "patchSetId": 1
@@ -83,6 +101,24 @@
       "side": 1,
       "message": "These are used to distinguish the two different charging levels.  Right now, phaser has different LED behavior for 0-5% vs 5-95% charged.  The rest of the platforms aren\u0027t really using them yet, though I\u0027m guessing other OEMs may want them as well since it looks like coral had multiple charging levels too",
       "parentUuid": "ba7270c8_7ea9e522",
+      "revId": "e810c16cfd8684e9e806b53723bb30ceb23bf6ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "190c1301_cba962b8",
+        "filename": "board/meep/led.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1115020
+      },
+      "writtenOn": "2018-07-26T22:17:53Z",
+      "side": 1,
+      "message": "I\u0027m just confused since I don\u0027t see this used anywhere. Let me know if I\u0027m being dense, but it seems like these should just get omitted until they\u0027re actually used.",
+      "parentUuid": "2c1723fb_f3cee2eb",
       "revId": "e810c16cfd8684e9e806b53723bb30ceb23bf6ef",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
