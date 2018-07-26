@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "96a3696b_abb8b9c4",
+        "filename": "board/meep/board.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1115020
+      },
+      "writtenOn": "2018-07-26T21:07:19Z",
+      "side": 1,
+      "message": "We should confirm that the part used has a 4050 B-coefficient, but this is ok for now.",
+      "revId": "e810c16cfd8684e9e806b53723bb30ceb23bf6ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8e9f225c_d05f9b9b",
+        "filename": "board/meep/board.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1115020
+      },
+      "writtenOn": "2018-07-26T21:07:19Z",
+      "side": 1,
+      "message": "probably don\u0027t need a newline before i here.",
+      "revId": "e810c16cfd8684e9e806b53723bb30ceb23bf6ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ba7270c8_7ea9e522",
+        "filename": "board/meep/led.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1115020
+      },
+      "writtenOn": "2018-07-26T21:07:19Z",
+      "side": 1,
+      "message": "What are these led_charge_lvl constants used for?",
+      "revId": "e810c16cfd8684e9e806b53723bb30ceb23bf6ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cb7b6cfe_3f608c65",
+        "filename": "board/meep/usb_pd_policy.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1115020
+      },
+      "writtenOn": "2018-07-26T21:07:19Z",
+      "side": 1,
+      "message": "I don\u0027t think we need to keep these TODOs around, but Jett can chime in with what he wants.\nI\u0027m not sure why we\u0027re even adding it if we don\u0027t need it.",
+      "revId": "e810c16cfd8684e9e806b53723bb30ceb23bf6ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
