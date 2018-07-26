@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7baa5b20_89d79fa2",
+        "filename": "board/meep/board.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1287197
+      },
+      "writtenOn": "2018-07-26T22:07:59Z",
+      "side": 1,
+      "message": "I\u0027ll check the schematic tomorrow to confirm what this sensor is",
+      "parentUuid": "96a3696b_abb8b9c4",
+      "revId": "e810c16cfd8684e9e806b53723bb30ceb23bf6ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8e9f225c_d05f9b9b",
         "filename": "board/meep/board.c",
         "patchSetId": 1
@@ -47,6 +65,24 @@
       "writtenOn": "2018-07-26T21:07:19Z",
       "side": 1,
       "message": "What are these led_charge_lvl constants used for?",
+      "revId": "e810c16cfd8684e9e806b53723bb30ceb23bf6ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2c1723fb_f3cee2eb",
+        "filename": "board/meep/led.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1287197
+      },
+      "writtenOn": "2018-07-26T22:07:59Z",
+      "side": 1,
+      "message": "These are used to distinguish the two different charging levels.  Right now, phaser has different LED behavior for 0-5% vs 5-95% charged.  The rest of the platforms aren\u0027t really using them yet, though I\u0027m guessing other OEMs may want them as well since it looks like coral had multiple charging levels too",
+      "parentUuid": "ba7270c8_7ea9e522",
       "revId": "e810c16cfd8684e9e806b53723bb30ceb23bf6ef",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
