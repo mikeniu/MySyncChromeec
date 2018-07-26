@@ -133,6 +133,7 @@ BOARDS_NPCX_INT_SPI=(
 	atlas
 	fleex
 	grunt
+	meep
 	meowth
 	nocturne
 	phaser
