@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "b096061c_bf5e79e1",
+        "filename": "board/meep/board.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1287197
+      },
+      "writtenOn": "2018-07-27T14:11:57Z",
+      "side": 1,
+      "message": "I\u0027ll add a note then",
+      "parentUuid": "55c6f3cc_d72d34cd",
+      "revId": "e810c16cfd8684e9e806b53723bb30ceb23bf6ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8e9f225c_d05f9b9b",
         "filename": "board/meep/board.c",
         "patchSetId": 1
@@ -119,6 +137,24 @@
       "side": 1,
       "message": "I\u0027m just confused since I don\u0027t see this used anywhere. Let me know if I\u0027m being dense, but it seems like these should just get omitted until they\u0027re actually used.",
       "parentUuid": "2c1723fb_f3cee2eb",
+      "revId": "e810c16cfd8684e9e806b53723bb30ceb23bf6ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f96621a8_b31a6d22",
+        "filename": "board/meep/led.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1287197
+      },
+      "writtenOn": "2018-07-27T14:11:57Z",
+      "side": 1,
+      "message": "This would have been merged pretty recently into the baseboard led_states.c file.  I picked it up in my tree when I ran a repo sync yesterday",
+      "parentUuid": "190c1301_cba962b8",
       "revId": "e810c16cfd8684e9e806b53723bb30ceb23bf6ef",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
