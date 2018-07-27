@@ -46,6 +46,9 @@ GPIO(EC_INT_L,              PIN(A, 2), GPIO_ODR_HIGH)  /* Interrupt line between
 GPIO(POWER_GOOD,            PIN(5, 4), GPIO_INPUT)     /* SRC_PP1800_S4A from PMIC */
 GPIO(AP_SUSPEND_L,          PIN(5, 7), GPIO_INPUT)     /* Suspend signal from AP */
 GPIO(PROCHOT_L,             PIN(3, 4), GPIO_INPUT)
+GPIO(AP_EC_SPI_MISO,        PIN(4, 6), GPIO_INPUT | GPIO_PULL_DOWN)
+GPIO(AP_EC_SPI_MOSI,        PIN(4, 7), GPIO_INPUT | GPIO_PULL_DOWN)
+GPIO(AP_EC_SPI_CLK,         PIN(5, 5), GPIO_INPUT | GPIO_PULL_DOWN)
 
 /* Power enables */
 GPIO(SWITCHCAP_ON_L,        PIN(D, 5), GPIO_OUT_LOW)   /* Enable switch cap. XXX: It's active-high */
