@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3d927d24_60c74c55",
+        "filename": "util/iteflash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1287197
+      },
+      "writtenOn": "2018-08-23T17:07:07Z",
+      "side": 1,
+      "message": "Is this the right name for the flag?  Looking at the ITE datasheet I have, it looks like VFSPIPG is bit 5 and bit 6 is part of the VCC Detector Option field",
+      "range": {
+        "startLine": 68,
+        "startChar": 8,
+        "endLine": 68,
+        "endChar": 20
+      },
+      "revId": "08b7c9a8af2456be91b31f00d2d454a9acfd373b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
