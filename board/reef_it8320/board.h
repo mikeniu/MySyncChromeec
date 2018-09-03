@@ -17,6 +17,8 @@
 #define CONFIG_HOSTCMD_DEBUG_MODE HCDEBUG_OFF
 
 /* EC console commands  */
+#define CONFIG_CMD_ACCELS
+#define CONFIG_CMD_ACCEL_INFO
 #define CONFIG_CMD_BATT_MFG_ACCESS
 #define CONFIG_CMD_CHARGER_ADC_AMON_BMON
 #define CONFIG_CHARGER_SENSE_RESISTOR		10
@@ -28,6 +30,11 @@
 #define BD9995X_PSYS_GAIN_SELECT \
 		BD9995X_CMD_PMON_IOUT_CTRL_SET_PMON_GAIN_SET_02UAW
 
+#define CONFIG_CMD_I2C_STRESS_TEST
+#define CONFIG_CMD_I2C_STRESS_TEST_ACCEL
+#define CONFIG_CMD_I2C_STRESS_TEST_ALS
+#define CONFIG_CMD_I2C_STRESS_TEST_BATTERY
+#define CONFIG_CMD_I2C_STRESS_TEST_CHARGER
 /* Battery */
 #define CONFIG_BATTERY_DEVICE_CHEMISTRY  "LION"
 #define CONFIG_BATTERY_CUT_OFF
@@ -101,15 +108,17 @@
 #define CONFIG_EXTPOWER_GPIO
 #undef  CONFIG_EXTPOWER_DEBOUNCE_MS
 #define CONFIG_EXTPOWER_DEBOUNCE_MS 1000
+#define CONFIG_FPU
 #define CONFIG_I2C
 #define CONFIG_I2C_MASTER
 #define CONFIG_KEYBOARD_BOARD_CONFIG
 #define CONFIG_KEYBOARD_PROTOCOL_8042
 #define CONFIG_KEYBOARD_COL2_INVERTED
+#define CONFIG_KEYBOARD_PWRBTN_ASSERTS_KSI2
 #define CONFIG_LED_COMMON
 #define CONFIG_LID_SWITCH
 #define CONFIG_LOW_POWER_IDLE
-#define CONFIG_LTO
+#undef CONFIG_LTO
 #define CONFIG_POWER_SIGNAL_INTERRUPT_STORM_DETECT_THRESHOLD 30
 #define CONFIG_TABLET_MODE
 #define CONFIG_TEMP_SENSOR
@@ -131,16 +140,52 @@
 #define CONFIG_PWR_STATE_DISCHARGE_FULL
 
 /*
+ * During shutdown sequence TPS65094x PMIC turns off the sensor rails
+ * asynchronously to the EC. If we access the sensors when the sensor power
+ * rails are off we get I2C errors. To avoid this issue, defer switching
+ * the sensors rate if in S3. By the time deferred function is serviced if
+ * the chipset is in S5 we can back out from switching the sensor rate.
+ *
+ * Time taken by V1P8U rail to go down from S3 is 30ms to 60ms hence defer
+ * the sensor switching after 60ms.
+ */
+#undef CONFIG_MOTION_SENSE_SUSPEND_DELAY_US
+#define CONFIG_MOTION_SENSE_SUSPEND_DELAY_US (MSEC * 60)
+
+/*
  * Enable 1 slot of secure temporary storage to support
  * suspend/resume with read/write memory training.
  */
 #define CONFIG_VSTORE
 #define CONFIG_VSTORE_SLOT_COUNT 1
 
+/* Sensors */
+#define CONFIG_MKBP_EVENT
+#define CONFIG_MKBP_USE_HOST_EVENT
+#define CONFIG_ACCELGYRO_BMI160
+#define CONFIG_ACCEL_INTERRUPTS
+#define CONFIG_ACCELGYRO_BMI160_INT_EVENT TASK_EVENT_CUSTOM(4)
+#define CONFIG_MAG_BMI160_BMM150
+#define BMI160_SEC_ADDR BMM150_ADDR0	/* 8-bit address */
+#define CONFIG_MAG_CALIBRATE
+#define CONFIG_ACCEL_KX022
+#define CONFIG_ALS_OPT3001
+#define CONFIG_LID_ANGLE
+#define CONFIG_LID_ANGLE_UPDATE
+#define CONFIG_LID_ANGLE_SENSOR_BASE BASE_ACCEL
+#define CONFIG_LID_ANGLE_SENSOR_LID LID_ACCEL
+
+/* FIFO size is in power of 2. */
+#define CONFIG_ACCEL_FIFO 1024
+
+/* Depends on how fast the AP boots and typical ODRs */
+#define CONFIG_ACCEL_FIFO_THRES (CONFIG_ACCEL_FIFO / 3)
+
 #undef CONFIG_UART_TX_BUF_SIZE
 #define CONFIG_UART_TX_BUF_SIZE 4096
 #undef CONFIG_UART_RX_BUF_SIZE
 #define CONFIG_UART_RX_BUF_SIZE 512
+
 
 #ifndef __ASSEMBLER__
 
@@ -148,6 +193,11 @@
 #include "registers.h"
 
 /* I2C ports */
+#define I2C_PORT_GYRO			IT83XX_I2C_CH_A
+/* Accelerometer and Gyroscope are the same device. */
+#define I2C_PORT_ACCEL			I2C_PORT_GYRO
+#define I2C_PORT_ALS			IT83XX_I2C_CH_B
+#define I2C_PORT_LID_ACCEL		IT83XX_I2C_CH_B
 #define I2C_PORT_USB_MUX		IT83XX_I2C_CH_C
 #define I2C_PORT_BATTERY		IT83XX_I2C_CH_E
 #define I2C_PORT_CHARGER		IT83XX_I2C_CH_E
@@ -182,6 +232,28 @@ enum temp_sensor_id {
 	TEMP_SENSOR_AMBIENT,
 	TEMP_SENSOR_CHARGER,
 	TEMP_SENSOR_COUNT
+};
+
+/*
+ * For backward compatibility, to report ALS via ACPI,
+ * Define the number of ALS sensors: motion_sensor copy the data to the ALS
+ * memmap region.
+ */
+#define CONFIG_ALS
+#define ALS_COUNT 1
+
+/*
+ * Motion sensors:
+ * When reading through IO memory is set up for sensors (LPC is used),
+ * the first 2 entries must be accelerometers, then gyroscope.
+ * For BMI160, accel, gyro and compass sensors must be next to each other.
+ */
+enum sensor_id {
+	LID_ACCEL = 0,
+	BASE_ACCEL,
+	BASE_GYRO,
+	BASE_MAG,
+	LID_ALS,
 };
 
 enum reef_it8320_board_version {
@@ -220,6 +292,9 @@ void board_reset_pd_mcu(void);
 int board_get_version(void);
 /* Turn on/off vconn power switch. */
 void board_pd_vconn_ctrl(int port, int cc_pin, int enabled);
+
+/* Sensors without hardware FIFO are in forced mode */
+#define CONFIG_ACCEL_FORCE_MODE_MASK ((1 << LID_ACCEL) | (1 << LID_ALS))
 
 #endif /* !__ASSEMBLER__ */
 

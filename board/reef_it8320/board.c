@@ -14,6 +14,10 @@
 #include "charger.h"
 #include "chipset.h"
 #include "console.h"
+#include "driver/als_opt3001.h"
+#include "driver/accel_kionix.h"
+#include "driver/accel_kx022.h"
+#include "driver/accelgyro_bmi160.h"
 #include "driver/charger/bd9995x.h"
 #include "driver/tcpm/it83xx_pd.h"
 #include "driver/tcpm/tcpm.h"
@@ -86,12 +90,53 @@ const struct adc_t adc_channels[] = {
 BUILD_ASSERT(ARRAY_SIZE(adc_channels) == ADC_CH_COUNT);
 
 const struct i2c_port_t i2c_ports[]  = {
+	{"accelgyro", IT83XX_I2C_CH_A, 400,
+		 GPIO_EC_I2C_A_SCL, GPIO_EC_I2C_A_SDA},
+	{"sensors",   IT83XX_I2C_CH_B, 400,
+		GPIO_EC_I2C_B_SCL, GPIO_EC_I2C_B_SDA},
 	{"mux",       IT83XX_I2C_CH_C, 400,
 		GPIO_EC_I2C_C_SCL, GPIO_EC_I2C_C_SDA},
 	{"batt",      IT83XX_I2C_CH_E, 100,
 		GPIO_EC_I2C_E_SCL, GPIO_EC_I2C_E_SDA},
 };
 const unsigned int i2c_ports_used = ARRAY_SIZE(i2c_ports);
+
+#ifdef CONFIG_CMD_I2C_STRESS_TEST
+struct i2c_stress_test i2c_stress_tests[] = {
+#ifdef CONFIG_CMD_I2C_STRESS_TEST_ACCEL
+	{
+		.port = I2C_PORT_GYRO,
+		.addr = BMI160_ADDR0,
+		.i2c_test = &bmi160_i2c_stress_test_dev,
+	},
+#endif
+#ifdef CONFIG_CMD_I2C_STRESS_TEST_ACCEL
+	{
+		.port = I2C_PORT_LID_ACCEL,
+		.addr = KX022_ADDR1,
+		.i2c_test = &kionix_i2c_stress_test_dev,
+	},
+#endif
+#ifdef CONFIG_CMD_I2C_STRESS_TEST_ALS
+	{
+		.port = I2C_PORT_ALS,
+		.addr = OPT3001_I2C_ADDR1,
+		.i2c_test = &opt3001_i2c_stress_test_dev,
+	},
+#endif
+#ifdef CONFIG_CMD_I2C_STRESS_TEST_BATTERY
+	{
+		.i2c_test = &battery_i2c_stress_test_dev,
+	},
+#endif
+#ifdef CONFIG_CMD_I2C_STRESS_TEST_CHARGER
+	{
+		.i2c_test = &bd9995x_i2c_stress_test_dev,
+	},
+#endif
+};
+const int i2c_test_dev_used = ARRAY_SIZE(i2c_stress_tests);
+#endif /* CONFIG_CMD_I2C_STRESS_TEST */
 
 const struct tcpc_config_t tcpc_config[CONFIG_USB_PD_PORT_COUNT] = {
 	{-1, -1, &it83xx_tcpm_drv, 0},
@@ -256,6 +301,9 @@ static void board_init(void)
 	/* Enable charger interrupts */
 	gpio_enable_interrupt(GPIO_CHARGER_INT_L);
 
+	/* Enable Gyro interrupts */
+	gpio_enable_interrupt(GPIO_BASE_SIXAXIS_INT_L);
+
 	/*
 	* Initialize HPD to low; after sysjump SOC needs to see
 	* HPD pulse to enable video path
@@ -350,6 +398,19 @@ int board_is_vbus_too_low(int port, enum chg_ramp_vbus_state ramp_state)
 	return charger_get_vbus_voltage(port) < BD9995X_BC12_MIN_VOLTAGE;
 }
 
+/* Enable or disable input devices, based on chipset state and tablet mode */
+#ifndef TEST_BUILD
+void lid_angle_peripheral_enable(int enable)
+{
+	/* If the lid is in 360 position, ignore the lid angle,
+	 * which might be faulty. Disable keyboard and touchpad.
+	 */
+	if (tablet_get_mode() || chipset_in_state(CHIPSET_STATE_ANY_OFF))
+		enable = 0;
+	keyboard_scan_enable(enable, KB_SCAN_DISABLE_LID_ANGLE);
+}
+#endif
+
 /* Called on AP S5 -> S3 transition */
 static void board_chipset_startup(void)
 {
@@ -435,6 +496,158 @@ void board_hibernate_late(void)
 	for (i = 0; i < ARRAY_SIZE(hibernate_pins); ++i)
 		gpio_set_flags(hibernate_pins[i][0], hibernate_pins[i][1]);
 }
+
+/* Motion sensors */
+/* Mutexes */
+static struct mutex g_lid_mutex;
+static struct mutex g_base_mutex;
+
+/* Matrix to rotate accelrator into standard reference frame */
+const matrix_3x3_t base_standard_ref = {
+	{ 0, FLOAT_TO_FP(-1), 0},
+	{ FLOAT_TO_FP(1), 0,  0},
+	{ 0, 0,  FLOAT_TO_FP(1)}
+};
+
+const matrix_3x3_t mag_standard_ref = {
+	{ FLOAT_TO_FP(-1), 0, 0},
+	{ 0,  FLOAT_TO_FP(1), 0},
+	{ 0, 0, FLOAT_TO_FP(-1)}
+};
+
+const matrix_3x3_t lid_standard_ref = {
+	{ FLOAT_TO_FP(1), 0,  0},
+	{ 0, FLOAT_TO_FP(-1), 0},
+	{ 0, 0,  FLOAT_TO_FP(-1)}
+};
+
+/* sensor private data */
+static struct kionix_accel_data g_kx022_data;
+static struct bmi160_drv_data_t g_bmi160_data;
+static struct opt3001_drv_data_t g_opt3001_data = {
+	.scale = 1,
+	.uscale = 0,
+	.offset = 0,
+};
+
+/* FIXME(dhendrix): Copied from Amenia, probably need to tweak for Reef */
+struct motion_sensor_t motion_sensors[] = {
+	[LID_ACCEL] = {
+	 .name = "Lid Accel",
+	 .active_mask = SENSOR_ACTIVE_S0_S3,
+	 .chip = MOTIONSENSE_CHIP_KX022,
+	 .type = MOTIONSENSE_TYPE_ACCEL,
+	 .location = MOTIONSENSE_LOC_LID,
+	 .drv = &kionix_accel_drv,
+	 .mutex = &g_lid_mutex,
+	 .drv_data = &g_kx022_data,
+	 .port = I2C_PORT_LID_ACCEL,
+	 .addr = KX022_ADDR1,
+	 .rot_standard_ref = &lid_standard_ref, /* Identity matrix. */
+	 .default_range = 2, /* g, enough for laptop. */
+	 .min_frequency = KX022_ACCEL_MIN_FREQ,
+	 .max_frequency = KX022_ACCEL_MAX_FREQ,
+	 .config = {
+		/* EC use accel for angle detection */
+		[SENSOR_CONFIG_EC_S0] = {
+			.odr = 10000 | ROUND_UP_FLAG,
+		},
+		 /* Sensor on for lid angle detection */
+		[SENSOR_CONFIG_EC_S3] = {
+			.odr = 10000 | ROUND_UP_FLAG,
+		},
+	 },
+	},
+
+	[BASE_ACCEL] = {
+	 .name = "Base Accel",
+	 .active_mask = SENSOR_ACTIVE_S0_S3,
+	 .chip = MOTIONSENSE_CHIP_BMI160,
+	 .type = MOTIONSENSE_TYPE_ACCEL,
+	 .location = MOTIONSENSE_LOC_BASE,
+	 .drv = &bmi160_drv,
+	 .mutex = &g_base_mutex,
+	 .drv_data = &g_bmi160_data,
+	 .port = I2C_PORT_GYRO,
+	 .addr = BMI160_ADDR0,
+	 .rot_standard_ref = &base_standard_ref,
+	 .default_range = 2,  /* g, enough for laptop. */
+	 .min_frequency = BMI160_ACCEL_MIN_FREQ,
+	 .max_frequency = BMI160_ACCEL_MAX_FREQ,
+	 .config = {
+		 /* EC use accel for angle detection */
+		 [SENSOR_CONFIG_EC_S0] = {
+			.odr = 10000 | ROUND_UP_FLAG,
+			.ec_rate = 100 * MSEC,
+		 },
+		 /* Sensor on for lid angle detection */
+		 [SENSOR_CONFIG_EC_S3] = {
+			.odr = 10000 | ROUND_UP_FLAG,
+			.ec_rate = 100 * MSEC,
+		 },
+	 },
+	},
+
+	[BASE_GYRO] = {
+	 .name = "Base Gyro",
+	 .active_mask = SENSOR_ACTIVE_S0,
+	 .chip = MOTIONSENSE_CHIP_BMI160,
+	 .type = MOTIONSENSE_TYPE_GYRO,
+	 .location = MOTIONSENSE_LOC_BASE,
+	 .drv = &bmi160_drv,
+	 .mutex = &g_base_mutex,
+	 .drv_data = &g_bmi160_data,
+	 .port = I2C_PORT_GYRO,
+	 .addr = BMI160_ADDR0,
+	 .default_range = 1000, /* dps */
+	 .rot_standard_ref = &base_standard_ref,
+	 .min_frequency = BMI160_GYRO_MIN_FREQ,
+	 .max_frequency = BMI160_GYRO_MAX_FREQ,
+	},
+	[BASE_MAG] = {
+	 .name = "Base Mag",
+	 .active_mask = SENSOR_ACTIVE_S0,
+	 .chip = MOTIONSENSE_CHIP_BMI160,
+	 .type = MOTIONSENSE_TYPE_MAG,
+	 .location = MOTIONSENSE_LOC_BASE,
+	 .drv = &bmi160_drv,
+	 .mutex = &g_base_mutex,
+	 .drv_data = &g_bmi160_data,
+	 .port = I2C_PORT_GYRO,
+	 .addr = BMI160_ADDR0,
+	 .default_range = 1 << 11, /* 16LSB / uT, fixed */
+	 .rot_standard_ref = &mag_standard_ref,
+	 .min_frequency = BMM150_MAG_MIN_FREQ,
+	 .max_frequency = BMM150_MAG_MAX_FREQ(SPECIAL),
+	},
+	[LID_ALS] = {
+	 .name = "Light",
+	 .active_mask = SENSOR_ACTIVE_S0_S3,
+	 .chip = MOTIONSENSE_CHIP_OPT3001,
+	 .type = MOTIONSENSE_TYPE_LIGHT,
+	 .location = MOTIONSENSE_LOC_LID,
+	 .drv = &opt3001_drv,
+	 .drv_data = &g_opt3001_data,
+	 .port = I2C_PORT_ALS,
+	 .addr = OPT3001_I2C_ADDR1,
+	 .rot_standard_ref = NULL,
+	 .default_range = 0x10000, /* scale = 1; uscale = 0 */
+	 .min_frequency = OPT3001_LIGHT_MIN_FREQ,
+	 .max_frequency = OPT3001_LIGHT_MAX_FREQ,
+	 .config = {
+		[SENSOR_CONFIG_EC_S0] = {
+			.odr = 1000,
+		},
+	 },
+	},
+};
+const unsigned int motion_sensor_count = ARRAY_SIZE(motion_sensors);
+
+/* ALS instances when LPC mapping is needed. Each entry directs to a sensor. */
+const struct motion_sensor_t *motion_als_sensors[] = {
+	&motion_sensors[LID_ALS],
+};
+BUILD_ASSERT(ARRAY_SIZE(motion_als_sensors) == ALS_COUNT);
 
 void board_hibernate(void)
 {

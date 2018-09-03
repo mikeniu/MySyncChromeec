@@ -491,6 +491,9 @@ cleanup() {
 		dut_control ftdii2c_cmd:open
 		dut_control ftdii2c_cmd:setclock
 
+		dut-control fw_wp_en:off
+		dut-control fw_wp_vref:off
+
 		# Reset the dut mux if it exists
 		if $(servo_has_dut_i2c_mux); then
 			# Ensure servo i2c mux is on so we can talk to dut
@@ -995,6 +998,10 @@ function flash_it83xx() {
 	if $(servo_has_dut_i2c_mux); then
 		dut_control dut_i2c_mux:ec_prog
 	fi
+
+	info "Write protect disabled."
+	dut-control fw_wp_vref:pp3300
+	dut-control fw_wp_en:on
 
 	# Ensure that the AP is off while we are flashing the EC
 	servo_ec_hard_reset
