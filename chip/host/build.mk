@@ -13,6 +13,10 @@ chip-y=system.o gpio.o uart.o persistence.o flash.o lpc.o reboot.o i2c.o \
 chip-$(HAS_TASK_KEYSCAN)+=keyboard_raw.o
 chip-$(CONFIG_USB_POWER_DELIVERY)+=usb_pd_phy.o
 
+ifeq ($(HAS_TASK_TPM),y)
+CFLAGS += -I$(realpath ../../third_party/tpm2)
+endif
+
 ifeq ($(CONFIG_DCRYPTO),y)
 CPPFLAGS += -I$(abspath ./chip/g)
 dirs-y += chip/g/dcrypto

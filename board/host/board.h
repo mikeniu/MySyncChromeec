@@ -73,4 +73,57 @@ extern const int supplier_priority[];
 #define PD_MIN_CURRENT_MA     500
 #define PD_MIN_POWER_MW       7500
 
+#ifdef HAS_TASK_TPM
+
+/**
+ * Set up a deferred call to update CCD state.
+ *
+ * This will enable/disable UARTs, SPI, I2C, etc. as needed.
+ */
+void ccd_update_state(void);
+
+int board_use_plt_rst(void);
+int board_rst_pullup_needed(void);
+int board_tpm_uses_i2c(void);
+int board_tpm_uses_spi(void);
+int board_id_is_mismatched(void);
+/* Allow for deep sleep to be enabled on AP shutdown */
+int board_deep_sleep_allowed(void);
+
+void power_button_record(void);
+
+/**
+ * Enable/disable power button release interrupt.
+ *
+ * @param enable	Enable (!=0) or disable (==0)
+ */
+void power_button_release_enable_interrupt(int enable);
+
+/* Functions needed by CCD config */
+int board_battery_is_present(void);
+int board_fwmp_allows_unlock(void);
+int board_vboot_dev_mode_enabled(void);
+void board_reboot_ap(void);
+int board_wipe_tpm(void);
+int board_is_first_factory_boot(void);
+
+int usb_i2c_board_enable(void);
+void usb_i2c_board_disable(void);
+
+void print_ap_state(void);
+void print_ap_uart_state(void);
+void print_ec_state(void);
+void print_servo_state(void);
+
+int ap_is_on(void);
+int ap_uart_is_on(void);
+int ec_is_on(void);
+int ec_is_rx_allowed(void);
+int servo_is_connected(void);
+
+void set_ap_on(void);
+
+int chip_factory_mode(void);
+#endif
+
 #endif /* __CROS_EC_BOARD_H */

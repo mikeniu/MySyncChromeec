@@ -93,7 +93,7 @@ CONSOLE_CHANNEL(CC_DPTF,         "dptf")
 CONSOLE_CHANNEL(CC_ALS,		 "als")
 #endif
 CONSOLE_CHANNEL(CC_THERMAL,      "thermal")
-#ifdef CHIP_G
+#ifdef HAS_TASK_TPM
 CONSOLE_CHANNEL(CC_TPM,          "tpm")
 #endif
 CONSOLE_CHANNEL(CC_USB,          "usb")

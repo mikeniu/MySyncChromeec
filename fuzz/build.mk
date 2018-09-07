@@ -20,7 +20,7 @@ fuzz-test-list-host = cr50_fuzz host_command_fuzz
 # Does your object file need to link against cstdlib?
 #   Yes -> use <obj_name>-rw
 # Otherwise use <obj_name>-y
-cr50_fuzz-rw = cr50_fuzz.o pinweaver_model.o mem_hash_tree.o
+cr50_fuzz-rw = cr50_fuzz.o pinweaver_model.o mem_hash_tree.o tpm_task.o
 host_command_fuzz-y = host_command_fuzz.o
 
 $(out)/RW/fuzz/cr50_fuzz.o: $(out)/gen/fuzz/cr50_fuzz.pb.h

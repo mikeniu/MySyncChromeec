@@ -12,6 +12,10 @@
 /* Disable hibernate: We never want to exit while fuzzing. */
 #undef CONFIG_HIBERNATE
 
+#ifdef HAS_TASK_TPM
+#define CONFIG_TPM_LOGGING
+#endif
+
 #ifdef TEST_CR50_FUZZ
 #define CONFIG_DCRYPTO
 #define CONFIG_PINWEAVER
