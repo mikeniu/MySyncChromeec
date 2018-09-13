@@ -686,6 +686,33 @@
  */
 #undef CONFIG_CHARGER_INPUT_CURRENT
 
+/* Define to use Power Delivery State Machine Framework */
+#undef CONFIG_USB_TYPEC_PD_STATE_MACHINES
+
+/*
+ * This is the maximum number of levels in the hierarchical
+ * state machine framework. Set to 1 for a flat state machine.
+ */
+#define CONFIG_SM_NESTING_NUM 3
+
+/*
+ * Define to enable Type-C State Machine. Must be enabled
+ * with CONFIG_USB_TYPEC_PD_STATE_MACHINES
+ */
+#undef CONFIG_USB_TYPEC
+
+/*
+ * Define to enable Protocol Layer State Machine. Must be enabled
+ * with CONFIG_USB_TYPEC_PD_STATE_MACHINES and CONFIG_USB_TYPEC
+ */
+#undef CONFIG_USB_PRL_SM
+
+/*
+ * Define to enable Policy Engine State Machine. Must be enabled
+ * with CONFIG_USB_TYPEC_PD_STATE_MACHINES and CONFIG_USB_TYPEC
+ */
+#undef CONFIG_USB_PE_SM
+
 /*
  * Board specific maximum input current limit, in mA.
  */
@@ -3241,6 +3268,12 @@
 
 /* Use DAC as reference for comparator at 850mV. */
 #undef CONFIG_PD_USE_DAC_AS_REF
+
+/* Type-C VCONN Powered Device */
+#undef CONFIG_USB_TYPEC_VPD
+
+/* Type-C Charge Through VCONN Powered Device */
+#undef CONFIG_USB_TYPEC_VPD_CT
 
 /* USB Product ID. */
 #undef CONFIG_USB_PID

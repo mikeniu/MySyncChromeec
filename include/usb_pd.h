@@ -48,6 +48,7 @@ enum pd_rx_errors {
  */
 #define PD_EVENT_DEVICE_ACCESSED    (1<<7)
 #define PD_EVENT_POWER_STATE_CHANGE (1<<8) /* Chipset power state changed */
+#define PD_EVENT_SM                 (1<<9) /* PD State machine event */
 
 /* --- PD data message helpers --- */
 #define PDO_MAX_OBJECTS   7
@@ -172,6 +173,10 @@ enum pd_rx_errors {
 #define PD_T_TRY_SRC          (125*MSEC) /* Max time for Try.SRC state */
 #define PD_T_TRY_WAIT         (600*MSEC) /* Max time for TryWait.SNK state */
 #define PD_T_SINK_REQUEST     (100*MSEC) /* Wait 100ms before next request */
+#define PD_T_PD_DEBOUNCE      (15*MSEC)  /* between 10ms and 20ms */
+#define PD_T_CHUNK_SENDER_RESPONSE (25*MSEC) /* 25ms */
+#define PD_T_CHUNK_SENDER_REQUEST  (25*MSEC) /* 25ms */
+#define PD_T_SWAP_SOURCE_START     (25*MSEC) /* Min of 20ms */
 
 /* number of edges and time window to detect CC line is not idle */
 #define PD_RX_TRANSITION_COUNT  3
@@ -186,6 +191,11 @@ enum pd_rx_errors {
 #define PD_T_VDM_RCVR_RSP      (15*MSEC) /* max of 15ms */
 #define PD_T_VDM_SNDR_RSP      (30*MSEC) /* max of 30ms */
 #define PD_T_VDM_WAIT_MODE_E  (100*MSEC) /* enter/exit the same max */
+
+/* CTVPD Timers ( USB Type-C ECN Table 4-27 ) */
+#define PD_T_VPDDETACH        (20*MSEC) /* max of 20*MSEC */
+#define PD_T_VPDCTDD           (5*MSEC) /* max of 5ms */
+#define PD_T_VPDDISABLE       (25*MSEC) /* min of 25ms */
 
 /* function table for entered mode */
 struct amode_fx {
@@ -382,6 +392,7 @@ struct pd_policy {
 #define IDH_PTYPE_PCABLE 3
 #define IDH_PTYPE_ACABLE 4
 #define IDH_PTYPE_AMA    5
+#define IDH_PTYPE_VPD    6
 
 #define VDO_IDH(usbh, usbd, ptype, is_modal, vid)		\
 	((usbh) << 31 | (usbd) << 30 | ((ptype) & 0x7) << 27	\
@@ -480,6 +491,34 @@ struct pd_policy {
 #define AMA_USBSS_U31_GEN1 1
 #define AMA_USBSS_U31_GEN2 2
 #define AMA_USBSS_BBONLY   3
+
+/*
+ * VPD VDO
+ * ---------
+ *  <31:28> :: HW version
+ *  <27:24> :: FW version
+ *  <23:21> :: VDO version
+ *  <20:17> :: SBZ
+ *  <16:15> :: Maximum VBUS Voltage
+ *  <14:13> :: SBZ
+ *  <12:7>  :: VBUS Impedance
+ *  <6:1>   :: Ground Impedance
+ *  <0>     :: Charge Through Support
+ */
+#define VDO_VPD(hw, fw, vbus, vbusz, gndz, cts)  \
+	(((hw) & 0xf) << 28 | ((fw) & 0xf) << 24 \
+	 | ((vbus) & 0x3) << 15                  \
+	 | ((vbusz) & 0x3f) << 7                 \
+	 | ((gndz) & 0x3f) << 1 | (cts))
+
+#define VPD_MAX_VBUS_20V       0
+#define VPD_MAX_VBUS_30V       1
+#define VPD_MAX_VBUS_40V       2
+#define VPD_MAX_VBUS_50V       3
+#define VPD_VBUS_IMP(mo)       ((mo) >> 1)
+#define VPD_GND_IMP(mo)        (mo)
+#define VPD_CTS_SUPPORTED      1
+#define VPD_CTS_NOT_SUPPORTED  0
 
 /*
  * SVDM Discover SVIDs request -> response
@@ -883,6 +922,7 @@ enum pd_data_msg_type {
 /* Power role */
 #define PD_ROLE_SINK   0
 #define PD_ROLE_SOURCE 1
+#define PD_ROLE_VPD    1
 /* Data role */
 #define PD_ROLE_UFP          0
 #define PD_ROLE_DFP          1
@@ -932,7 +972,11 @@ enum pd_data_msg_type {
 /* Used for processing pd header */
 #define PD_HEADER_EXT(header)   (((header) >> 15) & 1)
 #define PD_HEADER_CNT(header)   (((header) >> 12) & 7)
+#ifdef CONFIG_USB_TYPEC_PD_STATE_MACHINES
+#define PD_HEADER_TYPE(header)  ((header) & 0x1F)
+#else
 #define PD_HEADER_TYPE(header)  ((header) & 0xF)
+#endif
 #define PD_HEADER_ID(header)    (((header) >> 9) & 7)
 #define PD_HEADER_REV(header)   (((header) >> 6) & 3)
 #define PD_HEADER_DROLE(header) (((header) >> 5) & 1)
@@ -942,6 +986,9 @@ enum pd_data_msg_type {
 #define PD_EXT_HEADER_CHUNK_NUM(header) (((header) >> 11) & 0xf)
 #define PD_EXT_HEADER_REQ_CHUNK(header) (((header) >> 10) & 1)
 #define PD_EXT_HEADER_DATA_SIZE(header) ((header) & 0x1ff)
+
+/* Used to get extended header from the first 32-bit word of the message */
+#define GET_EXT_HEADER(msg) (msg & 0xffff)
 
 /* K-codes for special symbols */
 #define PD_SYNC1 0x18
