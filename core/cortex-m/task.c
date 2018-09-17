@@ -136,10 +136,24 @@ static const struct {
 
 /* Contexts for all tasks */
 static task_ tasks[TASK_ID_COUNT];
+
+/* Reset constants and state for all tasks */
+#define TASK_RESET_ENABLED	0x80000000
+#define TASK_RESET_LOCK		0x40000000
+#define TASK_WAITERS_MASK	~(TASK_RESET_ENABLED | TASK_RESET_LOCK)
+
+#define ENABLE_RESET(n) \
+	[TASK_ID_##n] = TASK_RESET_ENABLED,
+static uint32_t task_reset_state[TASK_ID_COUNT] = {
+#ifdef CONFIG_TASK_RESET_LIST
+	CONFIG_TASK_RESET_LIST
+#endif
+};
+#undef ENABLE_RESET
+
 /* Sanity checks about static task invariants */
 BUILD_ASSERT(TASK_ID_COUNT <= sizeof(unsigned) * 8);
 BUILD_ASSERT(TASK_ID_COUNT < (1 << (sizeof(task_id_t) * 8)));
-
 
 /* Stacks for all tasks */
 #define TASK(n, r, d, s)  + s
@@ -486,6 +500,205 @@ void task_trigger_irq(int irq)
 	CPU_NVIC_SWTRIG = irq;
 }
 
+static uint32_t init_task_context(task_id_t id);
+
+/*
+ * Re-initializes a task stack to it's initial state, and marks it ready.
+ * The task reset lock must be held prior to calling this function.
+ */
+static void do_task_reset(task_id_t id)
+{
+	interrupt_disable();
+	init_task_context(id);
+	tasks_ready |= 1 << id;
+	/* TODO: Clear all pending events? */
+	interrupt_enable();
+}
+
+/* We can't pass a parameter to a deferred call. Use this instead. */
+static uint32_t deferred_reset_task_ids;
+
+/* Tasks may call this function if they want to reset themselves. */
+static void deferred_task_reset(void)
+{
+	/*
+	 * TODO: Check if deferred_reset_taks_ids should be volatile.
+	 *
+	 * Relevant notes:
+	 *
+	 * Any tasks that update deferred_reset_task_ids will ensure
+	 * that this function runs again after their update completes.
+	 *
+	 * Check the compiler is smart enough to realise the atomic_clear()
+	 * is affecting the value.
+	 */
+	while (deferred_reset_task_ids) {
+		task_id_t reset_id = __fls(deferred_reset_task_ids);
+
+		atomic_clear(&deferred_reset_task_ids, 1 << reset_id);
+		do_task_reset(reset_id);
+	}
+}
+DECLARE_DEFERRED(deferred_task_reset);
+
+void task_enable_resets(void)
+{
+	task_id_t id = task_get_current();
+	uint32_t *state = &task_reset_state[id];
+
+	/*
+	 * A correctly written resettable task will only call this function
+	 * if resets are currently disabled; this implies that this task
+	 * holds the reset lock.
+	 *
+	 * Attempt to release the lock. If we cannot, it means there are tasks
+	 * waiting for a reset.
+	 */
+	if (!atomic_cond_clear(state,
+			       /* if the lock is held, with no waiters */
+			       TASK_RESET_ENABLED | TASK_RESET_LOCK,
+			       /* release it */
+			       TASK_RESET_LOCK,
+			       /* else (there are waiters), do nothing */
+			       0)) {
+		/* People are waiting for us to reset; schedule a reset. */
+		atomic_or(&deferred_reset_task_ids, 1 << id);
+		/*
+		 * This will always trigger a deferred call after our new ID was
+		 * written. If the hook call is currently executing, it will run
+		 * again.
+		 */
+		hook_call_deferred(&deferred_task_reset_data, 0);
+		/* Sleep forever, we will be reset. */
+		while (1)
+			sleep(-1);
+	}
+}
+
+void task_disable_resets(void)
+{
+	task_id_t id = task_get_current();
+	uint32_t *state = &task_reset_state[id];
+
+	/*
+	 * A correctly written resettable task will only call this function
+	 * if resets are currently enabled; this implies that this task does
+	 * not hold the reset lock.
+	 *
+	 * Try and acquire the lock. If we can't have it, we are about to be
+	 * reset by another task. Sleep forever.
+	 */
+	if (!atomic_cond_or(state, TASK_RESET_ENABLED, TASK_RESET_LOCK, 0))
+		while (1)
+			sleep(-1);
+}
+
+int task_reset_cleanup(void)
+{
+	task_id_t id = task_get_current();
+	uint32_t *state = &task_reset_state[id];
+
+	/*
+	 * If the task has never started before, state will be
+	 * TASK_RESET_ENABLED.
+	 *
+	 * If the task was reset, the TASK_RESET_LOCK bit will be set, and
+	 * there may additionally be bits representing tasks we must notify
+	 * that we have reset.
+	 */
+
+	/*
+	 * Only this task can unset the lock bit so we can read this safely,
+	 * even though other tasks may be modifying the state to add themselves
+	 * as waiters.
+	 */
+	int cleanup_req = *state & TASK_RESET_LOCK;
+
+	/*
+	 * Attempt to release the lock. We can only do this when there are no
+	 * tasks waiting to be notified that we have been reset, so we loop
+	 * until no tasks are waiting.
+	 *
+	 * Other tasks may still be trying to reset us at this point; if they
+	 * do, they will add themselves to the list of tasks we must notify. We
+	 * will simply notify them (multiple times if necessary) until we are
+	 * free to unlock.
+	 */
+	while (cleanup_req &&
+	       !atomic_cond_clear(state,
+				  /* if the lock is held, with no waiters */
+				  TASK_RESET_ENABLED | TASK_RESET_LOCK,
+				  /* release it */
+				  TASK_RESET_LOCK,
+				  /* else (there are waiters); do nothing */
+				  0)) {
+		/* Find the first waiter to notify. */
+		task_id_t notify_id = __fls(*state & TASK_WAITERS_MASK);
+		/*
+		 * Remove the task from waiters first, so that when it wakes
+		 * after being notified, it is in a consistent state (it should
+		 * waiting to be notified and running).
+		 * After being notified, the task may try to reset us again; if
+		 * it does, it will just add itself back to the list of tasks to
+		 * notify, and we will notify it again.
+		 */
+		atomic_clear(state, 1 << notify_id);
+		/*
+		 * Skip any invalid ids set by tasks that requested a
+		 * non-blocking reset.
+		 */
+		if (notify_id < TASK_ID_COUNT)
+			task_set_event(notify_id, TASK_EVENT_RESET_DONE, 0);
+	}
+
+	return cleanup_req;
+}
+
+int task_reset(task_id_t id, int wait)
+{
+	task_id_t current = task_get_current();
+	uint32_t *state = &task_reset_state[id];
+	uint32_t waiter_id;
+
+	if (id == current)
+		return EC_ERROR_INVAL;
+
+	/*
+	 * A state of 0 represents a task that does not support resets. This
+	 * value is only set at compile time, and will never be modified.
+	 */
+	if (!(*state))
+		return EC_ERROR_INVAL;
+
+	/*
+	 * If we are not blocking for reset, we use an invalid task id to notify
+	 * the task that _someone_ wanted it to reset, but didn't want to be
+	 * notified when the reset is complete.
+	 */
+	waiter_id = 1 << (wait ? current : TASK_ID_COUNT);
+
+	/*
+	 * Try and take the lock. If we can't have it, just notify the task we
+	 * tried; it will reset itself when it next tries to release the lock.
+	 */
+	if (atomic_cond_or(state,
+			   TASK_RESET_ENABLED,  /* if lock is available */
+			   TASK_RESET_LOCK,     /* take it */
+			   waiter_id)) {        /* else, notify someone tried */
+		/* We got the lock, do the reset immediately. */
+		do_task_reset(id);
+	} else if (wait) {
+		/*
+		 * We couldn't get the lock, and have been asked to block for
+		 * reset. We have asked the task to reset itself; it will notify
+		 * us when it has.
+		 */
+		task_wait_event_mask(TASK_EVENT_RESET_DONE, -1);
+	}
+
+	return EC_SUCCESS;
+}
+
 /*
  * Initialize IRQs in the NVIC and set their priorities as defined by the
  * DECLARE_IRQ statements.
@@ -652,6 +865,33 @@ DECLARE_CONSOLE_COMMAND(taskready, command_task_ready,
 			"Print/set ready tasks");
 #endif
 
+static uint32_t init_task_context(task_id_t id)
+{
+	uint32_t *sp;
+	/* Stack size in words */
+	uint32_t ssize = tasks_init[id].stack_size / 4;
+
+	/*
+	 * Update stack used by first frame: 8 words for the normal
+	 * stack, plus 8 for R4-R11. Even if using FPU, the first frame
+	 * does not store FP regs.
+	 */
+	sp = tasks[id].stack + ssize - 16;
+	tasks[id].sp = (uint32_t)sp;
+
+	/* Initial context on stack (see __switchto()) */
+	sp[8] = tasks_init[id].r0;          /* r0 */
+	sp[13] = (uint32_t)task_exit_trap;  /* lr */
+	sp[14] = tasks_init[id].pc;         /* pc */
+	sp[15] = 0x01000000;                /* psr */
+
+	/* Fill unused stack; also used to detect stack overflow. */
+	for (sp = tasks[id].stack; sp < (uint32_t *)tasks[id].sp; sp++)
+		*sp = STACK_UNUSED_VALUE;
+
+	return ssize;
+}
+
 void task_pre_init(void)
 {
 	uint32_t *stack_next = (uint32_t *)task_stacks;
@@ -659,31 +899,8 @@ void task_pre_init(void)
 
 	/* Fill the task memory with initial values */
 	for (i = 0; i < TASK_ID_COUNT; i++) {
-		uint32_t *sp;
-		/* Stack size in words */
-		uint32_t ssize = tasks_init[i].stack_size / 4;
-
 		tasks[i].stack = stack_next;
-
-		/*
-		 * Update stack used by first frame: 8 words for the normal
-		 * stack, plus 8 for R4-R11. Even if using FPU, the first frame
-		 * does not store FP regs.
-		 */
-		sp = stack_next + ssize - 16;
-		tasks[i].sp = (uint32_t)sp;
-
-		/* Initial context on stack (see __switchto()) */
-		sp[8] = tasks_init[i].r0;           /* r0 */
-		sp[13] = (uint32_t)task_exit_trap;  /* lr */
-		sp[14] = tasks_init[i].pc;          /* pc */
-		sp[15] = 0x01000000;                /* psr */
-
-		/* Fill unused stack; also used to detect stack overflow. */
-		for (sp = stack_next; sp < (uint32_t *)tasks[i].sp; sp++)
-			*sp = STACK_UNUSED_VALUE;
-
-		stack_next += ssize;
+		stack_next += init_task_context(i);
 	}
 
 	/*
@@ -721,3 +938,21 @@ int task_start(void)
 
 	return __task_start(&need_resched_or_profiling);
 }
+
+#ifdef CONFIG_CMD_TASK_RESET
+static int command_task_reset(int argc, char **argv)
+{
+	task_id_t id;
+
+	if (argc == 2) {
+		id = strtoi(argv[1], NULL, 10);
+		ccprintf("Resetting task %d\n", id);
+		return task_reset(id, 1);
+	}
+
+	return EC_ERROR_PARAM_COUNT;
+}
+DECLARE_CONSOLE_COMMAND(taskreset, command_task_reset,
+			"[task_id]",
+			"Reset a task");
+#endif  /* CONFIG_CMD_TASK_RESET */

@@ -20,3 +20,9 @@
 	TASK_ALWAYS(HOOKS, hook_task, NULL, CONFIG_STACK_SIZE) \
 	TASK_NOTEST(TPM, tpm_task, NULL, 8192) \
 	TASK_ALWAYS(CONSOLE, console_task, NULL, CONFIG_STACK_SIZE)
+
+/**
+ * List of tasks that support reset.
+ */
+#define CONFIG_TASK_RESET_LIST \
+	ENABLE_RESET(TPM)

@@ -82,8 +82,6 @@
 #define GOOGLE_DID 0x0028
 #define CR50_RID	0  /* No revision ID yet */
 
-static __preserved uint8_t reset_in_progress;
-
 /* Tpm state machine states. */
 enum tpm_states {
 	tpm_state_idle,
@@ -410,9 +408,6 @@ void tpm_register_put(uint32_t regaddr, const uint8_t *data, uint32_t data_size)
 {
 	uint32_t i;
 
-	if (reset_in_progress)
-		return;
-
 	CPRINTF("%s(0x%03x, %d,", __func__, regaddr, data_size);
 	for (i = 0; i < data_size && i < 4; i++)
 		CPRINTF(" %02x", data[i]);
@@ -672,7 +667,6 @@ static void call_extension_command(struct tpm_cmd_header *tpmh,
  * Events used on the TPM task context. Make sure there is no collision with
  * event(s) defined in chip/g/dcrypto/dcrypto_runtime.c
  */
-#define TPM_EVENT_RESET TASK_EVENT_CUSTOM(1 << 1)
 #define TPM_EVENT_COMMIT TASK_EVENT_CUSTOM(1 << 2)
 #define TPM_EVENT_ALT_EXTENSION TASK_EVENT_CUSTOM(1 << 3)
 
@@ -737,9 +731,6 @@ void tpm_alt_extension(struct tpm_cmd_header *command, size_t buffer_size)
 	mutex_unlock(&alt_if.if_mutex);
 }
 
-/* Calling task (singular) to notify when the TPM reset has completed */
-static __initialized task_id_t waiting_for_reset = TASK_ID_INVALID;
-
 /* Return value from blocking tpm_reset_request() call */
 static __preserved int wipe_result;
 
@@ -750,53 +741,17 @@ static int wipe_requested;
 
 int tpm_reset_request(int wait_until_done, int wipe_nvmem_first)
 {
-	uint32_t evt;
-
 	cprints(CC_TASK, "%s(%d, %d)", __func__,
 		wait_until_done, wipe_nvmem_first);
-
-	if (reset_in_progress) {
-		cprints(CC_TASK, "%s: already scheduled", __func__);
-		return EC_ERROR_BUSY;
-	}
 
 	/* Record input parameters as two bits in the data field. */
 	tpm_log_event(TPM_EVENT_INIT,
 		      (!!wait_until_done << 1) | !!wipe_nvmem_first);
 
-	reset_in_progress = 1;
-	wipe_result = EC_SUCCESS;
-
 	/* We can't change our minds about wiping. */
 	wipe_requested |= wipe_nvmem_first;
 
-	if (wait_until_done)
-		/*
-		 * Completion could take a while, if other things have
-		 * higher priority.
-		 */
-		waiting_for_reset = task_get_current();
-
-	/* Ask the TPM task to reset itself */
-	task_set_event(TASK_ID_TPM, TPM_EVENT_RESET, 0);
-
-	if (!wait_until_done)
-		return EC_SUCCESS;
-
-	if (in_interrupt_context() ||
-	    task_get_current() == TASK_ID_TPM) {
-		waiting_for_reset = TASK_ID_INVALID;
-		return EC_ERROR_BUSY;	    /* Can't sleep. Clown'll eat me. */
-	}
-
-	evt = task_wait_event_mask(TPM_EVENT_RESET, 5 * SECOND);
-
-	/* We were notified of completion */
-	if (evt & TPM_EVENT_RESET)
-		return wipe_result;
-
-	/* Timeout is bad */
-	return EC_ERROR_TIMEOUT;
+	return task_reset(TASK_ID_TPM, wait_until_done);
 }
 
 /*
@@ -863,12 +818,6 @@ static void tpm_reset_now(int wipe_first)
 	/* Re-initialize our registers */
 	tpm_init();
 
-	if (waiting_for_reset != TASK_ID_INVALID) {
-		/* Wake the waiting task, if any */
-		task_set_event(waiting_for_reset, TPM_EVENT_RESET, 0);
-		waiting_for_reset = TASK_ID_INVALID;
-	}
-
 	cprints(CC_TASK, "%s: done", __func__);
 
 	/*
@@ -876,8 +825,6 @@ static void tpm_reset_now(int wipe_first)
 	 * do not stay disabled for more than 3 seconds.
 	 */
 	hook_call_deferred(&reinstate_nvmem_commits_data, 3 * SECOND);
-
-	reset_in_progress = 0;
 
 	/*
 	 * In chip factory mode SPI idle byte sent on MISO is used for
@@ -904,6 +851,23 @@ void tpm_task(void)
 {
 	uint32_t evt = 0;
 
+	/*
+	 *
+	 * TODO / TODO / TODO / TODO
+	 *
+	 * The changes below (and throughout this file) have not been thoroughly
+	 * tested, but hopefully illustrate the most basic case of how the reset
+	 * framework can be used.
+	 *
+	 * These changes need careful thought and review before submitting.
+	 */
+
+	if (task_reset_cleanup()) {
+		tpm_reset_now(wipe_requested);
+		/* Other cleanup goes here. */
+	}
+	task_disable_resets();
+
 	if (!chip_factory_mode()) {
 		/*
 		 * Just in case there is a resume from deep sleep where AP is
@@ -914,27 +878,22 @@ void tpm_task(void)
 		while (!ap_is_on()) {
 			/*
 			 * The only events we should expect at this point
-			 * would be the reset request or a command routed
-			 * through TPM task context to make use of the large
-			 * stack.
+			 * would be a command routed through TPM task context
+			 * to make use of the large stack. Enable resets
+			 * while we're waiting.
 			 */
+			task_enable_resets();
 			evt = task_wait_event(-1);
-			if (evt & (TPM_EVENT_RESET | TPM_EVENT_ALT_EXTENSION)) {
-				/*
-				 * No need to remember the reset request: tpm
-				 * reset will happen as soon as we break out
-				 * from this while loop,
-				 */
-				evt &= TPM_EVENT_ALT_EXTENSION;
+			task_disable_resets();
+
+			if (evt & TPM_EVENT_ALT_EXTENSION)
 				break;
-			}
 
 			cprints(CC_TASK, "%s:%d unexpected event %x",
 				__func__, __LINE__, evt);
 		}
 	}
 
-	tpm_reset_now(0);
 	while (1) {
 		uint8_t *response;
 		unsigned response_size;
@@ -944,28 +903,11 @@ void tpm_task(void)
 		uint8_t alt_if_command;
 
 		/* Process unprocessed events or wait for the next event */
-		if (!evt)
+		if (!evt) {
+			/* Enable resets while we wait. */
+			task_enable_resets();
 			evt = task_wait_event(-1);
-
-		if (evt & TPM_EVENT_RESET) {
-			tpm_reset_now(wipe_requested);
-			if (evt & TPM_EVENT_ALT_EXTENSION) {
-				/*
-				 * Need to tell the waiting task that
-				 * processing was interrupted.
-				 */
-				alt_if.process_result = ALT_PROCESS_INTERRUPTED;
-			}
-			/*
-			 * There is no point in looking at other events in
-			 * this situation: the nvram will be committed by TPM
-			 * reset; other tpm commands would be ignored.
-			 *
-			 * Let's just continue. This could change if there are
-			 * other events added to the set.
-			 */
-			evt = 0;
-			continue;
+			task_disable_resets();
 		}
 
 		if (evt & TPM_EVENT_COMMIT) {
