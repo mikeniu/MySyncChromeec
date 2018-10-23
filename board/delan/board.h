@@ -52,7 +52,9 @@ enum pwm_channel {
 };
 
 enum battery_type {
-	BATTERY_PANASONIC,
+	BATTERY_BYD,
+	BATTERY_LGC,
+	BATTERY_SIMPLO,
 	BATTERY_TYPE_COUNT,
 };
 
