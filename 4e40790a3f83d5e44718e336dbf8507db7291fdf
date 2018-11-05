@@ -45,6 +45,29 @@
       "revId": "4e40790a3f83d5e44718e336dbf8507db7291fdf",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "aa1ffd76_582d39ca",
+        "filename": "board/cr50/scratch_reg1.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000039
+      },
+      "writtenOn": "2018-11-05T21:50:43Z",
+      "side": 1,
+      "message": "the name should not include board name, this could become necessary for another board in no time. Should be something like EC_CUSTOM_OPTIONS or maybe a better description of what the options are.",
+      "range": {
+        "startLine": 61,
+        "startChar": 7,
+        "endLine": 61,
+        "endChar": 34
+      },
+      "revId": "4e40790a3f83d5e44718e336dbf8507db7291fdf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
