@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "70ec6da5_db31d025",
+        "filename": "board/cr50/scratch_reg1.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1136059
+      },
+      "writtenOn": "2018-11-05T23:09:20Z",
+      "side": 1,
+      "message": "This needs to be 16. The next one should be 17",
+      "range": {
+        "startLine": 60,
+        "startChar": 43,
+        "endLine": 60,
+        "endChar": 45
+      },
+      "revId": "6bc77d0630d150cb88450126f29a65a8c0ea7c55",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
