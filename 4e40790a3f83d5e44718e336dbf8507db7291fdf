@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0fe053b0_bd441ddf",
+        "filename": "board/cr50/board.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2018-11-05T21:41:51Z",
+      "side": 1,
+      "message": "I like the addition of .field_name \u003d \n\nCan you place them on separate lines to make it just a little easier to read? (It\u0027s subjective, so if you push back that is okay too).",
+      "range": {
+        "startLine": 227,
+        "startChar": 3,
+        "endLine": 227,
+        "endChar": 21
+      },
+      "revId": "4e40790a3f83d5e44718e336dbf8507db7291fdf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1503d7af_fd694502",
+        "filename": "board/cr50/scratch_reg1.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2018-11-05T21:41:51Z",
+      "side": 1,
+      "message": "nit: I would keep the vertical alignment of values)",
+      "range": {
+        "startLine": 61,
+        "startChar": 35,
+        "endLine": 61,
+        "endChar": 37
+      },
+      "revId": "4e40790a3f83d5e44718e336dbf8507db7291fdf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
