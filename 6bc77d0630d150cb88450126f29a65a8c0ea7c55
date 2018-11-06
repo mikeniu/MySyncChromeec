@@ -22,6 +22,30 @@
       "revId": "6bc77d0630d150cb88450126f29a65a8c0ea7c55",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5043afc6_18d0666e",
+        "filename": "board/cr50/scratch_reg1.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2018-11-06T18:34:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70ec6da5_db31d025",
+      "range": {
+        "startLine": 60,
+        "startChar": 43,
+        "endLine": 60,
+        "endChar": 45
+      },
+      "revId": "6bc77d0630d150cb88450126f29a65a8c0ea7c55",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
