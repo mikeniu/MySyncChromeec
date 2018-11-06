@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "10f10131_07286f6a",
+        "filename": "board/cr50/scratch_reg1.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2018-11-06T18:37:57Z",
+      "side": 1,
+      "message": "factory",
+      "range": {
+        "startLine": 66,
+        "startChar": 11,
+        "endLine": 66,
+        "endChar": 17
+      },
+      "revId": "bd93fab6bfe34a2ae79402b999baa2d3285a0ddd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0ea9c050_96f28b36",
+        "filename": "board/cr50/scratch_reg1.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2018-11-06T18:37:57Z",
+      "side": 1,
+      "message": "maybe we could call this\nBOARD_CLOSED_SOURCE_SET since they are really all a derivative of that fact, right?",
+      "range": {
+        "startLine": 70,
+        "startChar": 21,
+        "endLine": 70,
+        "endChar": 33
+      },
+      "revId": "bd93fab6bfe34a2ae79402b999baa2d3285a0ddd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
