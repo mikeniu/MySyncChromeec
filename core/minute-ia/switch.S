@@ -25,6 +25,9 @@
 __task_start:
 	movl current_task, %eax
 	movl (%eax), %esp
+#ifdef CONFIG_FPU
+	frstor 20(%eax)
+#endif
 	popa
 	iret
 .endfunc
