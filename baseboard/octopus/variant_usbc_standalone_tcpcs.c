@@ -11,6 +11,7 @@
 #include "driver/ppc/nx20p348x.h"
 #include "driver/tcpm/anx7447.h"
 #include "driver/tcpm/ps8xxx.h"
+#include "driver/tcpm/nct38xx.h"
 #include "driver/tcpm/tcpci.h"
 #include "driver/tcpm/tcpm.h"
 #include "gpio.h"
@@ -44,8 +45,8 @@ const struct tcpc_config_t tcpc_config[CONFIG_USB_PD_PORT_COUNT] = {
 	},
 	[USB_PD_PORT_TCPC_1] = {
 		.i2c_host_port = I2C_PORT_TCPC1,
-		.i2c_slave_addr = PS8751_I2C_ADDR1,
-		.drv = &ps8xxx_tcpm_drv,
+		.i2c_slave_addr = NCT38xx_I2C_ADDR1_1,
+		.drv = &nct38xx_tcpm_drv,
 		.pol = TCPC_ALERT_ACTIVE_LOW,
 	},
 };
@@ -64,6 +65,10 @@ struct usb_mux usb_muxes[CONFIG_USB_PD_PORT_COUNT] = {
 #endif
 	},
 	[USB_PD_PORT_TCPC_1] = {
+		/* Use PS8751 as mux only */
+		.port_addr = MUX_PORT_AND_ADDR(
+			I2C_PORT_TCPC1, PS8751_I2C_ADDR1),
+		.flags = USB_MUX_FLAG_NOT_TCPC,
 		.driver = &tcpci_tcpm_usb_mux_driver,
 		.hpd_update = &ps8xxx_tcpc_update_hpd_status,
 	}

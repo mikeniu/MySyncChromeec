@@ -22,7 +22,7 @@ GPIO_INT(AC_PRESENT,	 PIN(0, 0), GPIO_INT_BOTH |
 
 /* USB-C interrupts */
 GPIO_INT(USB_C0_MUX_INT_ODL, PIN(6, 1), GPIO_INT_FALLING, tcpc_alert_event)
-GPIO_INT(USB_C1_MUX_INT_ODL, PIN(F, 5), GPIO_INT_FALLING, tcpc_alert_event)
+GPIO_INT(USB_C1_MUX_INT_ODL, PIN(D, 7), GPIO_INT_FALLING, tcpc_alert_event)
 GPIO_INT(USB_PD_C0_INT_ODL,  PIN(E, 0), GPIO_INT_FALLING, ppc_interrupt)
 GPIO_INT(USB_PD_C1_INT_ODL,  PIN(F, 1), GPIO_INT_FALLING, ppc_interrupt)
 
@@ -140,7 +140,11 @@ GPIO(USB2_OTG_ID,	 PIN(8, 3), GPIO_ODR_LOW)	/* OTG ID */
 /* LED */
 GPIO(BAT_LED_ORANGE_L,	 PIN(C, 3), GPIO_OUT_HIGH)	/* LED_1_L */
 GPIO(BAT_LED_BLUE_L,	 PIN(C, 4), GPIO_OUT_HIGH)	/* LED_2_L */
+
+/* GPIOD7 is used to connet to the alert pin of NCT3807 */
+#if 0
 GPIO(LED_3_L,		 PIN(D, 7), GPIO_OUT_HIGH)
+#endif
 
 /* Keyboard Backlight */
 GPIO(KB_BL_PWR_EN,	 PIN(6, 2), GPIO_OUT_LOW)
