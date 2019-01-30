@@ -186,3 +186,8 @@ static int command_perftest(int argc, char **argv)
 DECLARE_SAFE_CONSOLE_COMMAND(perftest, command_perftest,
 			     NULL,
 			     "Do I-cache performance test");
+
+int command_my_dram_test(int argc, char **argv);
+DECLARE_SAFE_CONSOLE_COMMAND(dramtest, command_my_dram_test,
+			     NULL,
+			     "DRAM placing test");
