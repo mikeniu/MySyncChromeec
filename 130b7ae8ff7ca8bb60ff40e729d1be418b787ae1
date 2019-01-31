@@ -16,6 +16,24 @@
       "revId": "130b7ae8ff7ca8bb60ff40e729d1be418b787ae1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "be7d7c28_94af5167",
+        "filename": "board/cr50/board.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1136059
+      },
+      "writtenOn": "2019-01-31T17:13:04Z",
+      "side": 1,
+      "message": "Yeah.",
+      "parentUuid": "75f61311_431b9174",
+      "revId": "130b7ae8ff7ca8bb60ff40e729d1be418b787ae1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
