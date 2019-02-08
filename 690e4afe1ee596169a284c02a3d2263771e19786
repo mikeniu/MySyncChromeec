@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "714acd61_4444c84c",
+        "filename": "chip/ish/host_command_heci.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1002053
+      },
+      "writtenOn": "2019-02-08T01:05:18Z",
+      "side": 1,
+      "message": "why do we need this extra structure esp. when command is always CROS_EC_CMD_HOST2ISH?\n\nOnce we register, HECI knows which protocol is used thanks to msg-\u003ehdr.fw_addr.",
+      "revId": "690e4afe1ee596169a284c02a3d2263771e19786",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4d00e02b_09c03de3",
+        "filename": "chip/ish/host_command_heci.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1002053
+      },
+      "writtenOn": "2019-02-08T01:05:18Z",
+      "side": 1,
+      "message": "It needs to be populated, kernel check the response from the EC is smaller than max_response_packet_size - check ec_dev-\u003emax_response.\n\nEC share the buffer for request and response.",
+      "revId": "690e4afe1ee596169a284c02a3d2263771e19786",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
