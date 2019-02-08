@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9e3dfbf6_15e37a20",
+        "filename": "chip/ish/host_command_heci.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2019-02-08T20:39:40Z",
+      "side": 1,
+      "message": "Thanks for point that out. I added the proper use to line 85",
+      "parentUuid": "5d37f15b_49d37d47",
+      "range": {
+        "startLine": 25,
+        "startChar": 8,
+        "endLine": 25,
+        "endChar": 20
+      },
+      "revId": "e1cc72c2434a98d80b79d20b1b01a8601bd1b3b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "22cad360_1256bd6b",
         "filename": "chip/ish/host_command_heci.c",
         "patchSetId": 2
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "44a5acdb_e55a19dd",
+        "filename": "chip/ish/host_command_heci.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2019-02-08T20:39:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22cad360_1256bd6b",
+      "range": {
+        "startLine": 54,
+        "startChar": 14,
+        "endLine": 54,
+        "endChar": 16
+      },
+      "revId": "e1cc72c2434a98d80b79d20b1b01a8601bd1b3b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6a6010e8_28055f8c",
         "filename": "chip/ish/host_command_heci.c",
         "patchSetId": 2
@@ -68,6 +116,30 @@
       "revId": "e1cc72c2434a98d80b79d20b1b01a8601bd1b3b5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "35d3482b_49f958cb",
+        "filename": "chip/ish/host_command_heci.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2019-02-08T20:39:40Z",
+      "side": 1,
+      "message": "Add comment. I based it off of other max sizes. I did reduce it to 256 as I don\u0027t think we will need more than that.",
+      "parentUuid": "6a6010e8_28055f8c",
+      "range": {
+        "startLine": 115,
+        "startChar": 39,
+        "endLine": 115,
+        "endChar": 42
+      },
+      "revId": "e1cc72c2434a98d80b79d20b1b01a8601bd1b3b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
