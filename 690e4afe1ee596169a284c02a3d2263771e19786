@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "32b972da_4e38168c",
+        "filename": "chip/ish/host_command_heci.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1146375
+      },
+      "writtenOn": "2019-02-08T09:10:15Z",
+      "side": 1,
+      "message": "Idea was to be consistent with the other heci client implementations, and allow for bidirectional messaging and report status/error. You are right, currently there is only 1 command for host2ish and we are not returning error status at that layer from FW. \n\nWould it still make sense to still keep the command/status to allow for future extensions? ish2host events / mkbp ?",
+      "parentUuid": "714acd61_4444c84c",
+      "revId": "690e4afe1ee596169a284c02a3d2263771e19786",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4d00e02b_09c03de3",
         "filename": "chip/ish/host_command_heci.c",
         "patchSetId": 1
