@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5d37f15b_49d37d47",
+        "filename": "chip/ish/host_command_heci.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1311094
+      },
+      "writtenOn": "2019-02-08T18:16:28Z",
+      "side": 1,
+      "message": "This is never used",
+      "range": {
+        "startLine": 25,
+        "startChar": 8,
+        "endLine": 25,
+        "endChar": 20
+      },
+      "revId": "e1cc72c2434a98d80b79d20b1b01a8601bd1b3b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "22cad360_1256bd6b",
+        "filename": "chip/ish/host_command_heci.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1311094
+      },
+      "writtenOn": "2019-02-08T18:16:28Z",
+      "side": 1,
+      "message": "th",
+      "range": {
+        "startLine": 54,
+        "startChar": 14,
+        "endLine": 54,
+        "endChar": 16
+      },
+      "revId": "e1cc72c2434a98d80b79d20b1b01a8601bd1b3b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6a6010e8_28055f8c",
+        "filename": "chip/ish/host_command_heci.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1311094
+      },
+      "writtenOn": "2019-02-08T18:16:28Z",
+      "side": 1,
+      "message": "This still seems pretty big, but I have no idea what the requirements are. Maybe edit the comment to briefly explain how you made this estimate?",
+      "range": {
+        "startLine": 115,
+        "startChar": 39,
+        "endLine": 115,
+        "endChar": 42
+      },
+      "revId": "e1cc72c2434a98d80b79d20b1b01a8601bd1b3b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
