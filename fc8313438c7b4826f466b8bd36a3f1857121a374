@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "26068cee_feebf536",
+        "filename": "driver/accelgyro_lsm6dsm.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1287197
+      },
+      "writtenOn": "2019-02-13T23:10:29Z",
+      "side": 1,
+      "message": "I think you might have an issue with your \"D\" key today :)",
+      "range": {
+        "startLine": 71,
+        "startChar": 21,
+        "endLine": 71,
+        "endChar": 22
+      },
+      "revId": "fc8313438c7b4826f466b8bd36a3f1857121a374",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
