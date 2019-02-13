@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "df2eb220_4f832b81",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2019-02-13T23:47:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35910719_0ef51c7f",
+      "range": {
+        "startLine": 9,
+        "startChar": 38,
+        "endLine": 9,
+        "endChar": 57
+      },
+      "revId": "d8c767f8859fd5c430ca9d2a1332ea208b5693ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b35a2ba6_b4cc37c8",
         "filename": "chip/ish/host_command_heci.c",
         "patchSetId": 3
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "4f6921d9_bd5f9f95",
+        "filename": "chip/ish/host_command_heci.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2019-02-13T23:47:10Z",
+      "side": 1,
+      "message": "I agree that we should send an error back.\n\nAs I was adding that code. I really started to look at this ISHTP layer, and I don\u0027t think that it gives us that much (especially for host commands).\n\nI ended up removing the cros_ec_ishtp_msg_hdr layer (and command interface) and we can plan on making a new HECI client with a different guid that and publish information from ISH to AP.\n\nRemoving the layer made the code simpler and there are less error conditions :)",
+      "parentUuid": "b35a2ba6_b4cc37c8",
+      "range": {
+        "startLine": 85,
+        "startChar": 6,
+        "endLine": 85,
+        "endChar": 65
+      },
+      "revId": "d8c767f8859fd5c430ca9d2a1332ea208b5693ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f397301_884617fa",
         "filename": "chip/ish/host_command_heci.c",
         "patchSetId": 3
@@ -68,6 +116,30 @@
       "revId": "d8c767f8859fd5c430ca9d2a1332ea208b5693ab",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bd6941e2_3d8791ab",
+        "filename": "chip/ish/host_command_heci.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2019-02-13T23:47:10Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "5f397301_884617fa",
+      "range": {
+        "startLine": 90,
+        "startChar": 5,
+        "endLine": 90,
+        "endChar": 50
+      },
+      "revId": "d8c767f8859fd5c430ca9d2a1332ea208b5693ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
