@@ -120,6 +120,30 @@
     },
     {
       "key": {
+        "uuid": "4a41627f_382d85fc",
+        "filename": "chip/ish/host_command_heci.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1146375
+      },
+      "writtenOn": "2019-02-14T03:27:08Z",
+      "side": 1,
+      "message": "Oh I missed that you already uploaded the patch set 4. I\u0027ll update the kernel driver by EOD",
+      "parentUuid": "511a4905_fcb60d3f",
+      "range": {
+        "startLine": 85,
+        "startChar": 6,
+        "endLine": 85,
+        "endChar": 65
+      },
+      "revId": "d8c767f8859fd5c430ca9d2a1332ea208b5693ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f397301_884617fa",
         "filename": "chip/ish/host_command_heci.c",
         "patchSetId": 3
