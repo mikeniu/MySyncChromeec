@@ -160,9 +160,6 @@ static void scp_enable_clock(void)
 	SCP_CPU_VREQ = 0x10001;
 	SCP_SECURE_CTRL &= ~ENABLE_SPM_MASK_VREQ;
 
-	/* DDREN auto mode */
-	SCP_SYS_CTRL |= AUTO_DDREN;
-
 	/* Set settle time */
 	SCP_CLK_SYS_VAL = 1;  /* System clock */
 	SCP_CLK_HIGH_VAL = 1; /* ULPOSC */
@@ -281,4 +278,22 @@ int system_is_reboot_warm(void)
 int system_get_bbram(enum system_bbram_idx idx, uint8_t *value)
 {
 	return EC_ERROR_INVAL;
+}
+
+// from dvfs_disable_DRAM_resource
+void disable_dram(void)
+{
+	// from disable_AP_resource
+	SCP_AP_RESOURCE &= ~0x1;
+	/* We have DDREN_AUTO, so no need to disable manually */
+
+	/* disable MPU */
+	SCP_SLP_PROTECT_CFG = SCP_SLP_PROTECT_CFG |
+		(P_CACHE_SLP_PROT_EN | D_CACHE_SLP_PROT_EN);
+
+	// from disable_infra
+	SCP_BUS_RESOURCE &= ~0x1;
+
+	// from turn_off_clk_sys_from_isr
+	SCP_CLK_EN &= ~EN_CLK_SYS;
 }
