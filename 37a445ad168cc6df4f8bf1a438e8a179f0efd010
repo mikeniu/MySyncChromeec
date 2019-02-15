@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a9c1b733_5342d987",
+        "filename": "chip/ish/host_command_heci.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1287197
+      },
+      "writtenOn": "2019-02-15T21:56:09Z",
+      "side": 1,
+      "message": "Is this a value which needs to be #define\u0027d somewhere?",
+      "range": {
+        "startLine": 74,
+        "startChar": 1,
+        "endLine": 74,
+        "endChar": 33
+      },
+      "revId": "37a445ad168cc6df4f8bf1a438e8a179f0efd010",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "25e1263d_5444eb58",
+        "filename": "chip/ish/host_command_heci.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1287197
+      },
+      "writtenOn": "2019-02-15T21:56:09Z",
+      "side": 1,
+      "message": "Doesn\u0027t match protocol_versions in the info command?",
+      "range": {
+        "startLine": 106,
+        "startChar": 1,
+        "endLine": 106,
+        "endChar": 19
+      },
+      "revId": "37a445ad168cc6df4f8bf1a438e8a179f0efd010",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
