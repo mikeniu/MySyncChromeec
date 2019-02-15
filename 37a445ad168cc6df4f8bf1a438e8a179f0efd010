@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "2e2deb6b_b7ccec36",
+        "filename": "chip/ish/host_command_heci.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2019-02-15T22:30:28Z",
+      "side": 1,
+      "message": "Probably...\n\nI left this since it is this way every other place in the EC code base. I can change them all in a followup CL, thoughts?\n\n\nsee $git grep \u0027\\-\u003eprotocol_versions\\ \u003d\u0027",
+      "parentUuid": "a9c1b733_5342d987",
+      "range": {
+        "startLine": 74,
+        "startChar": 1,
+        "endLine": 74,
+        "endChar": 33
+      },
+      "revId": "37a445ad168cc6df4f8bf1a438e8a179f0efd010",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "25e1263d_5444eb58",
         "filename": "chip/ish/host_command_heci.c",
         "patchSetId": 5
@@ -36,6 +60,30 @@
       "writtenOn": "2019-02-15T21:56:09Z",
       "side": 1,
       "message": "Doesn\u0027t match protocol_versions in the info command?",
+      "range": {
+        "startLine": 106,
+        "startChar": 1,
+        "endLine": 106,
+        "endChar": 19
+      },
+      "revId": "37a445ad168cc6df4f8bf1a438e8a179f0efd010",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "81fdc89f_ed2bff58",
+        "filename": "chip/ish/host_command_heci.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2019-02-15T22:30:28Z",
+      "side": 1,
+      "message": "That is the heci protocol version instead of the cros_ec protocol version. So many layers! More comments needed?",
+      "parentUuid": "25e1263d_5444eb58",
       "range": {
         "startLine": 106,
         "startChar": 1,
