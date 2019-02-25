@@ -3569,6 +3569,10 @@
 /* Enable TCPC to enter low power mode */
 #undef CONFIG_USB_PD_TCPC_LOW_POWER
 
+/*
+ * TODO (b/129118686): USB PD 3.0: Enable Vconn source communication
+ * with cable plug.
+ */
 /* Enable the encoding of msg SOP* in bits 31-28 of 32-bit msg header type */
 #undef CONFIG_USB_PD_DECODE_SOP
 

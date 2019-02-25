@@ -816,6 +816,12 @@ enum pd_states {
 #define PD_FLAGS_LPM_ENGAGED       BIT(18)/* Tracks HW LPM state */
 #define PD_FLAGS_LPM_TRANSITION    BIT(19)/* Tracks HW LPM transition */
 #endif
+
+#ifdef CONFIG_USB_PD_DECODE_SOP
+/* Enable communication with the cable plug */
+#define PD_FLAGS_CHECK_CABLE_ENABLE BIT (20)
+#endif
+
 /* Flags to clear on a disconnect */
 #define PD_FLAGS_RESET_ON_DISCONNECT_MASK (PD_FLAGS_PARTNER_DR_POWER | \
 					   PD_FLAGS_PARTNER_DR_DATA | \
