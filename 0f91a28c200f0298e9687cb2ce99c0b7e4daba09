@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "811aef27_9cf9a14f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2019-02-28T18:42:14Z",
+      "side": 1,
+      "message": "I think this command is needed for running FAFT. (firmware_ECSharedMem)",
+      "revId": "0f91a28c200f0298e9687cb2ce99c0b7e4daba09",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
