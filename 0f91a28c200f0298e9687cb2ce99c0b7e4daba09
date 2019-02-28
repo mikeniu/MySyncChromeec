@@ -16,6 +16,29 @@
       "revId": "0f91a28c200f0298e9687cb2ce99c0b7e4daba09",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b9412933_4f6092a6",
+        "filename": "board/flapjack/board.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1165609
+      },
+      "writtenOn": "2019-02-28T19:32:23Z",
+      "side": 1,
+      "message": "this has come in handy before to debug low power for the EC and make sure that the EC is asleep when we think it should be asleep. Is there an alternative route to get that debug information if we remove it?",
+      "range": {
+        "startLine": 174,
+        "startChar": 7,
+        "endLine": 174,
+        "endChar": 28
+      },
+      "revId": "0f91a28c200f0298e9687cb2ce99c0b7e4daba09",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
