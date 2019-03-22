@@ -43,6 +43,8 @@ GPIO_INT(HALL_INT_L,        PIN(C, 5),  GPIO_INT_FALLING,
          hall_interrupt)
 GPIO_INT(GAUGE_INT_ODL,     PIN(C, 9),  GPIO_INT_FALLING | GPIO_PULL_UP,
          gauge_interrupt)
+GPIO_INT(POGO_VBUS_PRESENT, PIN(A, 14), GPIO_INT_BOTH,
+         pogo_vbus_present)
 
 /* Interrupts not implemented yet */
 /* TODO(b:122993147): It's also an analog input. */
@@ -73,7 +75,6 @@ GPIO(EC_SKU_ID,            PIN(B, 0),  GPIO_ANALOG)
 GPIO(WP_L,                 PIN(C, 8),  GPIO_INPUT) /* EC_FLASH_WP_ODL */
 GPIO(BOOT0,                PIN(F, 11), GPIO_INPUT)
 GPIO(CCD_MODE_ODL,         PIN(A, 1),  GPIO_INPUT)
-GPIO(POGO_VBUS_PRESENT,    PIN(A, 14), GPIO_INPUT)
 
 /* Other output pins */
 GPIO(ENTERING_RW,          PIN(C, 6),  GPIO_ODR_HIGH) /* EC_ENTERING_RW_ODL */

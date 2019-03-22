@@ -61,6 +61,8 @@ int board_vbus_source_enabled(int port)
 
 int pd_set_power_supply_ready(int port)
 {
+	if (port != CHARGE_PORT_USB_C)
+		return EC_ERROR_INVAL;
 
 	pd_set_vbus_discharge(port, 0);
 	/* Provide VBUS */
@@ -68,7 +70,6 @@ int pd_set_power_supply_ready(int port)
 	charger_enable_otg_power(1);
 
 	if (board_get_version() >= 2) {
-		/* TODO(b:123268580): Implement POGO discharge logic. */
 		gpio_set_level(GPIO_EN_USBC_CHARGE_L, 1);
 		gpio_set_level(GPIO_EN_PP5000_USBC, 1);
 	}
@@ -83,6 +84,9 @@ void pd_power_supply_reset(int port)
 {
 	int prev_en;
 
+	if (port != CHARGE_PORT_USB_C)
+		return;
+
 	prev_en = vbus_en;
 	/* Disable VBUS */
 	vbus_en = 0;
@@ -92,15 +96,7 @@ void pd_power_supply_reset(int port)
 		pd_set_vbus_discharge(port, 1);
 
 	if (board_get_version() >= 2) {
-		/*
-		 * TODO(b:123268580): Implement POGO discharge logic.
-		 *
-		 * Turn off source path and POGO path before asserting
-		 * EN_USB_CHARGE_L.
-		 */
 		gpio_set_level(GPIO_EN_PP5000_USBC, 0);
-		gpio_set_level(GPIO_EN_POGO_CHARGE_L, 1);
-		gpio_set_level(GPIO_EN_USBC_CHARGE_L, 0);
 	}
 
 	/* notify host of power info change */
