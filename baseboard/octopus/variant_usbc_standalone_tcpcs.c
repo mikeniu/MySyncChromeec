@@ -42,12 +42,6 @@ const struct tcpc_config_t tcpc_config[CONFIG_USB_PD_PORT_COUNT] = {
 		.pol = TCPC_ALERT_ACTIVE_LOW,
 #endif
 	},
-	[USB_PD_PORT_TCPC_1] = {
-		.i2c_host_port = I2C_PORT_TCPC1,
-		.i2c_slave_addr = PS8751_I2C_ADDR1,
-		.drv = &ps8xxx_tcpm_drv,
-		.pol = TCPC_ALERT_ACTIVE_LOW,
-	},
 };
 
 /******************************************************************************/
@@ -73,10 +67,6 @@ struct usb_mux usb_muxes[CONFIG_USB_PD_PORT_COUNT] = {
 		.hpd_update = &anx7447_tcpc_update_hpd_status,
 #endif
 	},
-	[USB_PD_PORT_TCPC_1] = {
-		.driver = &tcpci_tcpm_usb_mux_driver,
-		.hpd_update = &ps8xxx_tcpc_update_hpd_status,
-	}
 };
 
 /******************************************************************************/
@@ -84,11 +74,6 @@ struct usb_mux usb_muxes[CONFIG_USB_PD_PORT_COUNT] = {
 struct ppc_config_t ppc_chips[CONFIG_USB_PD_PORT_COUNT] = {
 	[USB_PD_PORT_TCPC_0] = {
 		.i2c_port = I2C_PORT_TCPC0,
-		.i2c_addr = NX20P3483_ADDR2,
-		.drv = &nx20p348x_drv,
-	},
-	[USB_PD_PORT_TCPC_1] = {
-		.i2c_port = I2C_PORT_TCPC1,
 		.i2c_addr = NX20P3483_ADDR2,
 		.drv = &nx20p348x_drv,
 	},
@@ -106,9 +91,6 @@ void tcpc_alert_event(enum gpio_signal signal)
 	case GPIO_USB_C0_MUX_INT_ODL:
 		port = 0;
 		break;
-	case GPIO_USB_C1_MUX_INT_ODL:
-		port = 1;
-		break;
 	default:
 		return;
 	}
@@ -120,11 +102,9 @@ void variant_tcpc_init(void)
 {
 	/* Enable PPC interrupts. */
 	gpio_enable_interrupt(GPIO_USB_PD_C0_INT_ODL);
-	gpio_enable_interrupt(GPIO_USB_PD_C1_INT_ODL);
 
 	/* Enable TCPC interrupts. */
 	gpio_enable_interrupt(GPIO_USB_C0_MUX_INT_ODL);
-	gpio_enable_interrupt(GPIO_USB_C1_MUX_INT_ODL);
 }
 /* Called after the baseboard_tcpc_init (via +3) */
 DECLARE_HOOK(HOOK_INIT, variant_tcpc_init, HOOK_PRIO_INIT_I2C + 3);
@@ -141,11 +121,6 @@ uint16_t tcpc_get_alert_status(void)
 		    !gpio_get_level(GPIO_USB_C0_PD_RST))
 #endif
 			status |= PD_STATUS_TCPC_ALERT_0;
-	}
-
-	if (!gpio_get_level(GPIO_USB_C1_MUX_INT_ODL)) {
-		if (gpio_get_level(GPIO_USB_C1_PD_RST_ODL))
-			status |= PD_STATUS_TCPC_ALERT_1;
 	}
 
 	return status;
@@ -192,19 +167,4 @@ void board_reset_pd_mcu(void)
 		msleep(ANX74XX_RESET_FINISH_MS);
 	}
 #endif
-	/*
-	 * C1: Assert reset to TCPC1 (PS8751) for required delay (1ms) only if
-	 * we have a battery, otherwise we may brown out the system.
-	 */
-	if (battery_is_present() == BP_YES) {
-		/*
-		 * TODO(crbug:846412): After refactor, ensure that battery has
-		 * enough charge to last the reboot as well
-		 */
-		gpio_set_level(GPIO_USB_C1_PD_RST_ODL, 0);
-		msleep(PS8XXX_RESET_DELAY_MS);
-		gpio_set_level(GPIO_USB_C1_PD_RST_ODL, 1);
-	} else {
-		CPRINTS("Skipping C1 TCPC reset because no battery");
-	}
 }
