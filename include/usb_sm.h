@@ -8,15 +8,26 @@
 #ifndef __CROS_EC_USB_SM_H
 #define __CROS_EC_USB_SM_H
 
-#define DECLARE_SM_FUNC_(prefix, name, exit) \
-				DECLARE_SM_FUNC_##exit(prefix, name)
-#define DECLARE_SM_FUNC_WITH_EXIT(prefix, name)   static unsigned int \
+#define DECLARE_SM_FUNC_(prefix, name, run, exit) \
+			DECLARE_SM_FUNC_##run(prefix, name); \
+			DECLARE_SM_FUNC_##exit(prefix, name)
+
+#define DECLARE_SM_FUNC_WITH_RUN(prefix, name)    static int \
+				prefix##_##name##_run(int port)
+
+#define DECLARE_SM_FUNC_WITH_EXIT(prefix, name)   static int \
 				prefix##_##name##_exit(int port)
+
+#define DECLARE_SM_FUNC_NOOP_RUN(prefix, name)
 #define DECLARE_SM_FUNC_NOOP_EXIT(prefix, name)
 
-#define DECLARE_SM_SIG_(prefix, name, exit)  DECLARE_SM_##exit(prefix, name)
+#define DECLARE_SM_SIG_RUN(prefix, name, run)  DECLARE_SM_##run(prefix, name)
+#define DECLARE_SM_WITH_RUN(prefix, name)   prefix##_##name##_run
+#define DECLARE_SM_NOOP_RUN(prefix, name)   do_nothing_func
+
+#define DECLARE_SM_SIG_EXIT(prefix, name, exit)  DECLARE_SM_##exit(prefix, name)
 #define DECLARE_SM_WITH_EXIT(prefix, name)   prefix##_##name##_exit
-#define DECLARE_SM_NOOP_EXIT(prefix, name)  do_nothing_exit
+#define DECLARE_SM_NOOP_EXIT(prefix, name)  do_nothing_func
 
 
 /*
@@ -24,12 +35,14 @@
  *
  * @param prefix - prefix of state function name
  * @param name   - name of state
+ * @param run    - if WITH_RUN, generates a run state function name
+ *                 if NOOP_RUN, generates a do_nothing_run function name
  * @param exit   - if WITH_EXIT, generates an exit state function name
- *                 if NOOP_EXIT, generates do_nothing_exit function name
+ *                 if NOOP_EXIT, generates do_nothing_func function name
  *
  * EXAMPLE:
  *
- * DECLARE_STATE(tc, test, WITH_EXIT); generates the following:
+ * DECLARE_STATE(tc, test, WITH_RUN, WITH_EXIT); generates the following:
  *
  * static unsigned int tc_test(int port, enum signal sig);
  * static unsigned int tc_test_entry(int port);
@@ -41,26 +54,24 @@
  *	tc_test_exit,
  *	get_super_state };
  *
- * DECLARE_STATE(tc, test, NOOP_EXIT); generates the following:
+ * DECLARE_STATE(tc, test, NOOP_RUN, NOOP_EXIT); generates the following:
  *
  * static unsigned int tc_test(int port, enum signal sig);
  * static unsigned int tc_test_entry(int port);
- * static unsigned int tc_test_run(int port);
  * static const state_sig tc_test_sig[] = {
  *      tc_test_entry,
- *      tc_test_run,
- *      do_nothing_exit,
+ *      do_nothing_func,
+ *      do_nothing_func,
  *      get_super_state };
  */
-#define DECLARE_STATE(prefix, name, exit) \
-static unsigned int prefix##_##name(int port, enum signal sig); \
-static unsigned int prefix##_##name##_entry(int port); \
-static unsigned int prefix##_##name##_run(int port); \
-DECLARE_SM_FUNC_(prefix, name, exit); \
+#define DECLARE_STATE(prefix, name, run, exit) \
+static int prefix##_##name(int port, enum signal sig); \
+static int prefix##_##name##_entry(int port); \
+DECLARE_SM_FUNC_(prefix, name, run, exit); \
 static const state_sig prefix##_##name##_sig[] = { \
 prefix##_##name##_entry, \
-prefix##_##name##_run, \
-DECLARE_SM_SIG_(prefix, name, exit), \
+DECLARE_SM_SIG_RUN(prefix, name, run), \
+DECLARE_SM_SIG_EXIT(prefix, name, exit), \
 get_super_state \
 }
 
@@ -84,8 +95,8 @@ enum signal {
 	SUPER_SIG,
 };
 
-typedef unsigned int (*state_sig)(int port);
-typedef unsigned int (*sm_state)(int port, enum signal sig);
+typedef int (*state_sig)(int port);
+typedef int (*sm_state)(int port, enum signal sig);
 
 struct sm_obj {
 	sm_state task_state;
@@ -112,21 +123,22 @@ void init_state(int port, struct sm_obj *obj, sm_state target);
 int set_state(int port, struct sm_obj *obj, sm_state target);
 
 /**
- * Executes a state machine
+ * Runs a state machine
  *
  * @param port USB-C port number
  * @param obj  State machine object
  * @param sig  State machine signal
  */
-void exe_state(int port, struct sm_obj *obj, enum signal sig);
+void run_state_machine(int port, struct sm_obj *obj, enum signal sig);
 
 /**
- * Substitute this function for states that do not implement an exit state.
+ * Substitute this function for states that do not implement a
+ * run or exit state.
  *
  * @param port USB-C port number
  * @return 0
  */
-unsigned int do_nothing_exit(int port);
+int do_nothing_func(int port);
 
 /**
  * Called by the state machine framework to execute a states super state.
@@ -134,6 +146,6 @@ unsigned int do_nothing_exit(int port);
  * @param port USB-C port number
  * @return RUN_SUPER
  */
-unsigned int get_super_state(int port);
+int get_super_state(int port);
 
 #endif /* __CROS_EC_USB_SM_H */

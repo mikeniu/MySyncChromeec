@@ -152,7 +152,7 @@ int set_state(int port, struct sm_obj *obj, sm_state target)
 	return 0;
 }
 
-void exe_state(int port, struct sm_obj *obj, enum signal sig)
+void run_state_machine(int port, struct sm_obj *obj, enum signal sig)
 {
 #if (CONFIG_SM_NESTING_NUM > 0)
 	sm_state state = obj->task_state;
@@ -165,12 +165,12 @@ void exe_state(int port, struct sm_obj *obj, enum signal sig)
 #endif
 }
 
-unsigned int do_nothing_exit(int port)
+int do_nothing_func(int port)
 {
 	return 0;
 }
 
-unsigned int get_super_state(int port)
+int get_super_state(int port)
 {
 	return RUN_SUPER;
 }

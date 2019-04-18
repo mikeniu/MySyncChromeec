@@ -26,10 +26,6 @@
 /* Type-C Layer Flags */
 #define TC_FLAGS_VCONN_ON           (1 << 0)
 
-#undef PD_DEFAULT_STATE
-/* Port default state at startup */
-#define PD_DEFAULT_STATE(port) tc_unattached_snk
-
 #define SUPPORT_TIMER_RESET_INIT     0
 #define SUPPORT_TIMER_RESET_REQUEST  1
 #define SUPPORT_TIMER_RESET_COMPLETE 2
@@ -41,47 +37,51 @@
 struct type_c tc[CONFIG_USB_PD_PORT_COUNT];
 
 /* Type-C states */
-DECLARE_STATE(tc, disabled, WITH_EXIT);
-DECLARE_STATE(tc, error_recovery, NOOP_EXIT);
-DECLARE_STATE(tc, unattached_snk, NOOP_EXIT);
-DECLARE_STATE(tc, attach_wait_snk, NOOP_EXIT);
-DECLARE_STATE(tc, attached_snk, WITH_EXIT);
-DECLARE_STATE(tc, try_snk, NOOP_EXIT);
-DECLARE_STATE(tc, unattached_src, NOOP_EXIT);
-DECLARE_STATE(tc, attach_wait_src, NOOP_EXIT);
-DECLARE_STATE(tc, try_wait_src, NOOP_EXIT);
-DECLARE_STATE(tc, attached_src, NOOP_EXIT);
-DECLARE_STATE(tc, ct_try_snk, WITH_EXIT);
-DECLARE_STATE(tc, ct_attach_wait_unsupported, WITH_EXIT);
-DECLARE_STATE(tc, ct_attached_unsupported, WITH_EXIT);
-DECLARE_STATE(tc, ct_unattached_unsupported, WITH_EXIT);
-DECLARE_STATE(tc, ct_unattached_vpd, WITH_EXIT);
-DECLARE_STATE(tc, ct_disabled_vpd, NOOP_EXIT);
-DECLARE_STATE(tc, ct_attached_vpd, NOOP_EXIT);
-DECLARE_STATE(tc, ct_attach_wait_vpd, WITH_EXIT);
+DECLARE_STATE(tc, disabled, WITH_RUN, WITH_EXIT);
+DECLARE_STATE(tc, error_recovery, WITH_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, unattached_snk, WITH_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, attach_wait_snk, WITH_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, attached_snk, WITH_RUN, WITH_EXIT);
+DECLARE_STATE(tc, try_snk, WITH_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, unattached_src, WITH_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, attach_wait_src, WITH_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, try_wait_src, WITH_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, attached_src, WITH_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, ct_try_snk, WITH_RUN, WITH_EXIT);
+DECLARE_STATE(tc, ct_attach_wait_unsupported, WITH_RUN, WITH_EXIT);
+DECLARE_STATE(tc, ct_attached_unsupported, WITH_RUN, WITH_EXIT);
+DECLARE_STATE(tc, ct_unattached_unsupported, WITH_RUN, WITH_EXIT);
+DECLARE_STATE(tc, ct_unattached_vpd, WITH_RUN, WITH_EXIT);
+DECLARE_STATE(tc, ct_disabled_vpd, WITH_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, ct_attached_vpd, WITH_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, ct_attach_wait_vpd, WITH_RUN, WITH_EXIT);
 
 /* Super States */
-DECLARE_STATE(tc, host_rard_ct_rd, NOOP_EXIT);
-DECLARE_STATE(tc, host_open_ct_open, NOOP_EXIT);
-DECLARE_STATE(tc, vbus_cc_iso, NOOP_EXIT);
-DECLARE_STATE(tc, host_rp3_ct_rd, NOOP_EXIT);
-DECLARE_STATE(tc, host_rp3_ct_rpu, NOOP_EXIT);
-DECLARE_STATE(tc, host_rpu_ct_rd, NOOP_EXIT);
+DECLARE_STATE(tc, host_rard_ct_rd, NOOP_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, host_open_ct_open, NOOP_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, vbus_cc_iso, NOOP_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, host_rp3_ct_rd, NOOP_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, host_rp3_ct_rpu, NOOP_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, host_rpu_ct_rd, NOOP_RUN, NOOP_EXIT);
 
 void tc_reset_support_timer(int port)
 {
 	tc[port].support_timer_reset |= SUPPORT_TIMER_RESET_REQUEST;
 }
 
-void tc_state_init(int port)
+void tc_state_init(int port, enum typec_state_id start_state)
 {
 	int res = 0;
 	sm_state this_state;
 
 	res = tc_restart_tcpc(port);
+	if (res)
+		this_state = tc_disabled;
+	else
+		this_state = (start_state == UNATTACHED_SRC) ?
+				tc_unattached_src : tc_unattached_snk;
 
 	CPRINTS("TCPC p%d init %s", port, res ? "failed" : "ready");
-	this_state = res ? tc_disabled : PD_DEFAULT_STATE(port);
 
 	init_state(port, TC_OBJ(port), this_state);
 
@@ -108,7 +108,7 @@ void tc_event_check(int port, int evt)
  *   Remove the terminations from Host
  *   Remove the terminations from Charge-Through
  */
-static unsigned int tc_disabled(int port, enum signal sig)
+static int tc_disabled(int port, enum signal sig)
 {
 	int ret = 0;
 
@@ -116,20 +116,20 @@ static unsigned int tc_disabled(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_open_ct_open);
 }
 
-static unsigned int tc_disabled_entry(int port)
+static int tc_disabled_entry(int port)
 {
 	tc[port].state_id = DISABLED;
 	CPRINTS("C%d: %s", port, tc_state_names[tc[port].state_id]);
 	return 0;
 }
 
-static unsigned int tc_disabled_run(int port)
+static int tc_disabled_run(int port)
 {
 	task_wait_event(-1);
 	return RUN_SUPER;
 }
 
-static unsigned int tc_disabled_exit(int port)
+static int tc_disabled_exit(int port)
 {
 #ifndef CONFIG_USB_PD_TCPC
 	if (tc_restart_tcpc(port) != 0) {
@@ -152,7 +152,7 @@ static unsigned int tc_disabled_exit(int port)
  *   Remove the terminations from Host
  *   Remove the terminations from Charge-Through
  */
-static unsigned int tc_error_recovery(int port, enum signal sig)
+static int tc_error_recovery(int port, enum signal sig)
 {
 	int ret = 0;
 
@@ -160,7 +160,7 @@ static unsigned int tc_error_recovery(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_open_ct_open);
 }
 
-static unsigned int tc_error_recovery_entry(int port)
+static int tc_error_recovery_entry(int port)
 {
 	tc[port].state_id = ERROR_RECOVERY;
 	CPRINTS("C%d: %s", port, tc_state_names[tc[port].state_id]);
@@ -169,7 +169,7 @@ static unsigned int tc_error_recovery_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_error_recovery_run(int port)
+static int tc_error_recovery_run(int port)
 {
 	if (get_time().val > tc[port].cc_debounce) {
 		set_state(port, TC_OBJ(port), tc_unattached_snk);
@@ -188,7 +188,7 @@ static unsigned int tc_error_recovery_run(int port)
  *   Place Ra on VCONN and Rd on Host CC
  *   Place Rd on Charge-Through CCs
  */
-static unsigned int tc_unattached_snk(int port, enum signal sig)
+static int tc_unattached_snk(int port, enum signal sig)
 {
 	int ret = 0;
 
@@ -196,7 +196,7 @@ static unsigned int tc_unattached_snk(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_rard_ct_rd);
 }
 
-static unsigned int tc_unattached_snk_entry(int port)
+static int tc_unattached_snk_entry(int port)
 {
 	tc[port].state_id = UNATTACHED_SNK;
 	if (tc[port].obj.last_state != tc_unattached_src)
@@ -208,7 +208,7 @@ static unsigned int tc_unattached_snk_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_unattached_snk_run(int port)
+static int tc_unattached_snk_run(int port)
 {
 	int host_cc;
 	int new_cc_state;
@@ -275,7 +275,7 @@ static unsigned int tc_unattached_snk_run(int port)
  *   Place Ra on VCONN and Rd on Host CC
  *   Place Rd on Charge-Through CCs
  */
-static unsigned int tc_attach_wait_snk(int port, enum signal sig)
+static int tc_attach_wait_snk(int port, enum signal sig)
 {
 	int ret;
 
@@ -283,7 +283,7 @@ static unsigned int tc_attach_wait_snk(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_rard_ct_rd);
 }
 
-static unsigned int tc_attach_wait_snk_entry(int port)
+static int tc_attach_wait_snk_entry(int port)
 {
 	tc[port].state_id = ATTACH_WAIT_SNK;
 	CPRINTS("C%d: %s", port, tc_state_names[tc[port].state_id]);
@@ -292,7 +292,7 @@ static unsigned int tc_attach_wait_snk_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_attach_wait_snk_run(int port)
+static int tc_attach_wait_snk_run(int port)
 {
 	int host_new_cc_state;
 	int host_cc;
@@ -342,7 +342,7 @@ static unsigned int tc_attach_wait_snk_run(int port)
 /**
  * Attached.SNK
  */
-static unsigned int tc_attached_snk(int port, enum signal sig)
+static int tc_attached_snk(int port, enum signal sig)
 {
 	int ret;
 
@@ -350,7 +350,7 @@ static unsigned int tc_attached_snk(int port, enum signal sig)
 	return SUPER(ret, sig, 0);
 }
 
-static unsigned int tc_attached_snk_entry(int port)
+static int tc_attached_snk_entry(int port)
 {
 	tc[port].state_id = ATTACHED_SNK;
 	CPRINTS("C%d: %s", port, tc_state_names[tc[port].state_id]);
@@ -379,7 +379,7 @@ static unsigned int tc_attached_snk_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_attached_snk_run(int port)
+static int tc_attached_snk_run(int port)
 {
 	int host_new_cc_state;
 	int host_cc;
@@ -452,7 +452,7 @@ static unsigned int tc_attached_snk_run(int port)
 	return 0;
 }
 
-static unsigned int tc_attached_snk_exit(int port)
+static int tc_attached_snk_exit(int port)
 {
 	/* Reset timeout value to 10ms */
 	tc_set_timeout(port, 10*MSEC);
@@ -465,7 +465,7 @@ static unsigned int tc_attached_snk_exit(int port)
 /**
  * Super State HOST_RA_CT_RD
  */
-static unsigned int tc_host_rard_ct_rd(int port, enum signal sig)
+static int tc_host_rard_ct_rd(int port, enum signal sig)
 {
 	int ret;
 
@@ -473,7 +473,7 @@ static unsigned int tc_host_rard_ct_rd(int port, enum signal sig)
 	return SUPER(ret, sig, tc_vbus_cc_iso);
 }
 
-static unsigned int tc_host_rard_ct_rd_entry(int port)
+static int tc_host_rard_ct_rd_entry(int port)
 {
 	/* Place Ra on VCONN and Rd on Host CC */
 	vpd_host_set_pull(TYPEC_CC_RA_RD, 0);
@@ -484,15 +484,10 @@ static unsigned int tc_host_rard_ct_rd_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_host_rard_ct_rd_run(int port)
-{
-	return RUN_SUPER;
-}
-
 /**
  * Super State HOST_OPEN_CT_OPEN
  */
-static unsigned int tc_host_open_ct_open(int port, enum signal sig)
+static int tc_host_open_ct_open(int port, enum signal sig)
 {
 	int ret;
 
@@ -500,7 +495,7 @@ static unsigned int tc_host_open_ct_open(int port, enum signal sig)
 	return SUPER(ret, sig, tc_vbus_cc_iso);
 }
 
-static unsigned int tc_host_open_ct_open_entry(int port)
+static int tc_host_open_ct_open_entry(int port)
 {
 	/* Remove the terminations from Host */
 	vpd_host_set_pull(TYPEC_CC_OPEN, 0);
@@ -511,15 +506,10 @@ static unsigned int tc_host_open_ct_open_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_host_open_ct_open_run(int port)
-{
-	return RUN_SUPER;
-}
-
 /**
  * Super State VBUS_CC_ISO
  */
-static unsigned int tc_vbus_cc_iso(int port, enum signal sig)
+static int tc_vbus_cc_iso(int port, enum signal sig)
 {
 	int ret;
 
@@ -527,7 +517,7 @@ static unsigned int tc_vbus_cc_iso(int port, enum signal sig)
 	return SUPER(ret, sig, 0);
 }
 
-static unsigned int tc_vbus_cc_iso_entry(int port)
+static int tc_vbus_cc_iso_entry(int port)
 {
 	/* Isolate the Host-side port from the Charge-Through port */
 	vpd_vbus_pass_en(0);
@@ -541,11 +531,6 @@ static unsigned int tc_vbus_cc_iso_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_vbus_cc_iso_run(int port)
-{
-	return 0;
-}
-
 /**
  * Unattached.SRC
  *
@@ -555,7 +540,7 @@ static unsigned int tc_vbus_cc_iso_run(int port)
  *   Place RpUSB on Host CC
  *   Place Rd on Charge-Through CCs
  */
-static unsigned int tc_unattached_src(int port, enum signal sig)
+static int tc_unattached_src(int port, enum signal sig)
 {
 	int ret;
 
@@ -563,7 +548,7 @@ static unsigned int tc_unattached_src(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_rpu_ct_rd);
 }
 
-static unsigned int tc_unattached_src_entry(int port)
+static int tc_unattached_src_entry(int port)
 {
 	tc[port].state_id = UNATTACHED_SRC;
 	if (tc[port].obj.last_state != tc_unattached_snk)
@@ -583,7 +568,7 @@ static unsigned int tc_unattached_src_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_unattached_src_run(int port)
+static int tc_unattached_src_run(int port)
 {
 	int host_cc;
 
@@ -622,7 +607,7 @@ static unsigned int tc_unattached_src_run(int port)
  *   Place RpUSB on Host CC
  *   Place Rd on Charge-Through CCs
  */
-static unsigned int tc_attach_wait_src(int port, enum signal sig)
+static int tc_attach_wait_src(int port, enum signal sig)
 {
 	int ret;
 
@@ -630,7 +615,7 @@ static unsigned int tc_attach_wait_src(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_rpu_ct_rd);
 }
 
-static unsigned int tc_attach_wait_src_entry(int port)
+static int tc_attach_wait_src_entry(int port)
 {
 	tc[port].state_id = ATTACH_WAIT_SRC;
 	CPRINTS("C%d: %s", port, tc_state_names[tc[port].state_id]);
@@ -640,7 +625,7 @@ static unsigned int tc_attach_wait_src_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_attach_wait_src_run(int port)
+static int tc_attach_wait_src_run(int port)
 {
 	int host_new_cc_state;
 	int host_cc;
@@ -694,7 +679,7 @@ static unsigned int tc_attach_wait_src_run(int port)
 /**
  * Attached.SRC
  */
-static unsigned int tc_attached_src(int port, enum signal sig)
+static int tc_attached_src(int port, enum signal sig)
 {
 	int ret;
 
@@ -702,7 +687,7 @@ static unsigned int tc_attached_src(int port, enum signal sig)
 	return SUPER(ret, sig, 0);
 }
 
-static unsigned int tc_attached_src_entry(int port)
+static int tc_attached_src_entry(int port)
 {
 	tc[port].state_id = ATTACHED_SRC;
 	CPRINTS("C%d: %s", port, tc_state_names[tc[port].state_id]);
@@ -724,7 +709,7 @@ static unsigned int tc_attached_src_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_attached_src_run(int port)
+static int tc_attached_src_run(int port)
 {
 	int host_cc;
 
@@ -747,7 +732,7 @@ static unsigned int tc_attached_src_run(int port)
 /**
  * Super State HOST_RPU_CT_RD
  */
-static unsigned int tc_host_rpu_ct_rd(int port, enum signal sig)
+static int tc_host_rpu_ct_rd(int port, enum signal sig)
 {
 	int ret;
 
@@ -755,7 +740,7 @@ static unsigned int tc_host_rpu_ct_rd(int port, enum signal sig)
 	return SUPER(ret, sig, tc_vbus_cc_iso);
 }
 
-static unsigned int tc_host_rpu_ct_rd_entry(int port)
+static int tc_host_rpu_ct_rd_entry(int port)
 {
 	/* Place RpUSB on Host CC */
 	vpd_host_set_pull(TYPEC_CC_RP, TYPEC_RP_USB);
@@ -764,11 +749,6 @@ static unsigned int tc_host_rpu_ct_rd_entry(int port)
 	vpd_ct_set_pull(TYPEC_CC_RD, 0);
 
 	return 0;
-}
-
-static unsigned int tc_host_rpu_ct_rd_run(int port)
-{
-	return RUN_SUPER;
 }
 
 /**
@@ -780,7 +760,7 @@ static unsigned int tc_host_rpu_ct_rd_run(int port)
  *   Place Ra on VCONN and Rd on Host CC
  *   Place Rd on Charge-Through CCs
  */
-static unsigned int tc_try_snk(int port, enum signal sig)
+static int tc_try_snk(int port, enum signal sig)
 {
 	int ret;
 
@@ -788,7 +768,7 @@ static unsigned int tc_try_snk(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_rard_ct_rd);
 }
 
-static unsigned int tc_try_snk_entry(int port)
+static int tc_try_snk_entry(int port)
 {
 	tc[port].state_id = TRY_SNK;
 	CPRINTS("C%d: %s", port, tc_state_names[tc[port].state_id]);
@@ -810,7 +790,7 @@ static unsigned int tc_try_snk_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_try_snk_run(int port)
+static int tc_try_snk_run(int port)
 {
 	int host_new_cc_state;
 	int host_cc;
@@ -869,7 +849,7 @@ static unsigned int tc_try_snk_run(int port)
  *   Place RpUSB on Host CC
  *   Place Rd on Charge-Through CCs
  */
-static unsigned int tc_try_wait_src(int port, enum signal sig)
+static int tc_try_wait_src(int port, enum signal sig)
 {
 	int ret;
 
@@ -877,7 +857,7 @@ static unsigned int tc_try_wait_src(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_rpu_ct_rd);
 }
 
-static unsigned int tc_try_wait_src_entry(int port)
+static int tc_try_wait_src_entry(int port)
 {
 	tc[port].state_id = TRY_WAIT_SRC;
 	CPRINTS("C%d: %s", port, tc_state_names[tc[port].state_id]);
@@ -888,7 +868,7 @@ static unsigned int tc_try_wait_src_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_try_wait_src_run(int port)
+static int tc_try_wait_src_run(int port)
 {
 	int host_new_cc_state;
 	int host_cc;
@@ -948,7 +928,7 @@ static unsigned int tc_try_wait_src_run(int port)
  *   Connect Charge-Through Rd
  *   Get power from VCONN
  */
-static unsigned int tc_ct_try_snk(int port, enum signal sig)
+static int tc_ct_try_snk(int port, enum signal sig)
 {
 	int ret;
 
@@ -956,7 +936,7 @@ static unsigned int tc_ct_try_snk(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_rp3_ct_rd);
 }
 
-static unsigned int tc_ct_try_snk_entry(int port)
+static int tc_ct_try_snk_entry(int port)
 {
 	tc[port].state_id = CTTRY_SNK;
 	CPRINTS("C%d: %s", port, tc_state_names[tc[port].state_id]);
@@ -971,7 +951,7 @@ static unsigned int tc_ct_try_snk_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_ct_try_snk_run(int port)
+static int tc_ct_try_snk_run(int port)
 {
 	int new_cc_state;
 	int cc1;
@@ -1041,7 +1021,7 @@ static unsigned int tc_ct_try_snk_run(int port)
 	return RUN_SUPER;
 }
 
-static unsigned int tc_ct_try_snk_exit(int port)
+static int tc_ct_try_snk_exit(int port)
 {
 	/* Disable PD */
 	tc[port].pd_enable = 0;
@@ -1059,7 +1039,7 @@ static unsigned int tc_ct_try_snk_exit(int port)
  *    Place RPUSB on Charge-Through CC
  *    Get power from VCONN
  */
-static unsigned int tc_ct_attach_wait_unsupported(int port, enum signal sig)
+static int tc_ct_attach_wait_unsupported(int port, enum signal sig)
 {
 	int ret;
 
@@ -1067,7 +1047,7 @@ static unsigned int tc_ct_attach_wait_unsupported(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_rp3_ct_rpu);
 }
 
-static unsigned int tc_ct_attach_wait_unsupported_entry(int port)
+static int tc_ct_attach_wait_unsupported_entry(int port)
 {
 	tc[port].state_id = CTATTACH_WAIT_UNSUPPORTED;
 	CPRINTS("C%d: %s", port, tc_state_names[tc[port].state_id]);
@@ -1081,7 +1061,7 @@ static unsigned int tc_ct_attach_wait_unsupported_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_ct_attach_wait_unsupported_run(int port)
+static int tc_ct_attach_wait_unsupported_run(int port)
 {
 	int new_cc_state;
 	int cc1;
@@ -1135,7 +1115,7 @@ static unsigned int tc_ct_attach_wait_unsupported_run(int port)
 	return 0;
 }
 
-static unsigned int tc_ct_attach_wait_unsupported_exit(int port)
+static int tc_ct_attach_wait_unsupported_exit(int port)
 {
 	/* Disable PD */
 	tc[port].pd_enable = 0;
@@ -1153,7 +1133,7 @@ static unsigned int tc_ct_attach_wait_unsupported_exit(int port)
  *    Place RPUSB on Charge-Through CC
  *    Get power from VCONN
  */
-static unsigned int tc_ct_attached_unsupported(int port, enum signal sig)
+static int tc_ct_attached_unsupported(int port, enum signal sig)
 {
 	int ret;
 
@@ -1161,7 +1141,7 @@ static unsigned int tc_ct_attached_unsupported(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_rp3_ct_rpu);
 }
 
-static unsigned int tc_ct_attached_unsupported_entry(int port)
+static int tc_ct_attached_unsupported_entry(int port)
 {
 	tc[port].state_id = CTATTACHED_UNSUPPORTED;
 	CPRINTS("C%d: %s", port, tc_state_names[tc[port].state_id]);
@@ -1172,7 +1152,7 @@ static unsigned int tc_ct_attached_unsupported_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_ct_attached_unsupported_run(int port)
+static int tc_ct_attached_unsupported_run(int port)
 {
 	int cc1;
 	int cc2;
@@ -1201,7 +1181,7 @@ static unsigned int tc_ct_attached_unsupported_run(int port)
 	return RUN_SUPER;
 }
 
-static unsigned int tc_ct_attached_unsupported_exit(int port)
+static int tc_ct_attached_unsupported_exit(int port)
 {
 	vpd_present_billboard(BB_NONE);
 
@@ -1218,7 +1198,7 @@ static unsigned int tc_ct_attached_unsupported_exit(int port)
  *    Place RPUSB on Charge-Through CC
  *    Get power from VCONN
  */
-static unsigned int tc_ct_unattached_unsupported(int port, enum signal sig)
+static int tc_ct_unattached_unsupported(int port, enum signal sig)
 {
 	int ret;
 
@@ -1226,7 +1206,7 @@ static unsigned int tc_ct_unattached_unsupported(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_rp3_ct_rpu);
 }
 
-static unsigned int tc_ct_unattached_unsupported_entry(int port)
+static int tc_ct_unattached_unsupported_entry(int port)
 {
 	tc[port].state_id = CTUNATTACHED_UNSUPPORTED;
 	if (tc[port].obj.last_state != tc_ct_unattached_vpd)
@@ -1241,7 +1221,7 @@ static unsigned int tc_ct_unattached_unsupported_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_ct_unattached_unsupported_run(int port)
+static int tc_ct_unattached_unsupported_run(int port)
 {
 	int cc1;
 	int cc2;
@@ -1283,7 +1263,7 @@ static unsigned int tc_ct_unattached_unsupported_run(int port)
 	return RUN_SUPER;
 }
 
-static unsigned int tc_ct_unattached_unsupported_exit(int port)
+static int tc_ct_unattached_unsupported_exit(int port)
 {
 	/* Disable PD */
 	tc[port].pd_enable = 0;
@@ -1301,7 +1281,7 @@ static unsigned int tc_ct_unattached_unsupported_exit(int port)
  *    Connect Charge-Through Rd
  *    Get power from VCONN
  */
-static unsigned int tc_ct_unattached_vpd(int port, enum signal sig)
+static int tc_ct_unattached_vpd(int port, enum signal sig)
 {
 	int ret;
 
@@ -1309,7 +1289,7 @@ static unsigned int tc_ct_unattached_vpd(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_rp3_ct_rd);
 }
 
-static unsigned int tc_ct_unattached_vpd_entry(int port)
+static int tc_ct_unattached_vpd_entry(int port)
 {
 	tc[port].state_id = CTUNATTACHED_VPD;
 	if (tc[port].obj.last_state != tc_ct_unattached_unsupported)
@@ -1324,7 +1304,7 @@ static unsigned int tc_ct_unattached_vpd_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_ct_unattached_vpd_run(int port)
+static int tc_ct_unattached_vpd_run(int port)
 {
 	int new_cc_state;
 	int cc1;
@@ -1387,7 +1367,7 @@ static unsigned int tc_ct_unattached_vpd_run(int port)
 	return RUN_SUPER;
 }
 
-static unsigned int tc_ct_unattached_vpd_exit(int port)
+static int tc_ct_unattached_vpd_exit(int port)
 {
 	/* Disable PD */
 	tc[port].pd_enable = 0;
@@ -1404,7 +1384,7 @@ static unsigned int tc_ct_unattached_vpd_exit(int port)
  *   Remove the terminations from Host
  *   Remove the terminations from Charge-Through
  */
-static unsigned int tc_ct_disabled_vpd(int port, enum signal sig)
+static int tc_ct_disabled_vpd(int port, enum signal sig)
 {
 	int ret;
 
@@ -1412,7 +1392,7 @@ static unsigned int tc_ct_disabled_vpd(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_open_ct_open);
 }
 
-static unsigned int tc_ct_disabled_vpd_entry(int port)
+static int tc_ct_disabled_vpd_entry(int port)
 {
 	tc[port].state_id = CTDISABLED_VPD;
 	CPRINTS("C%d: %s", port, tc_state_names[tc[port].state_id]);
@@ -1425,7 +1405,7 @@ static unsigned int tc_ct_disabled_vpd_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_ct_disabled_vpd_run(int port)
+static int tc_ct_disabled_vpd_run(int port)
 {
 	/*
 	 * A Charge-Through VCONN-Powered USB Device shall transition
@@ -1440,7 +1420,7 @@ static unsigned int tc_ct_disabled_vpd_run(int port)
 /**
  * CTAttached.VPD
  */
-static unsigned int tc_ct_attached_vpd(int port, enum signal sig)
+static int tc_ct_attached_vpd(int port, enum signal sig)
 {
 	int ret;
 
@@ -1448,7 +1428,7 @@ static unsigned int tc_ct_attached_vpd(int port, enum signal sig)
 	return SUPER(ret, sig, 0);
 }
 
-static unsigned int tc_ct_attached_vpd_entry(int port)
+static int tc_ct_attached_vpd_entry(int port)
 {
 	int cc1;
 	int cc2;
@@ -1501,7 +1481,7 @@ static unsigned int tc_ct_attached_vpd_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_ct_attached_vpd_run(int port)
+static int tc_ct_attached_vpd_run(int port)
 {
 	int new_cc_state;
 	int cc1;
@@ -1554,7 +1534,7 @@ static unsigned int tc_ct_attached_vpd_run(int port)
  *    Connect Charge-Through Rd
  *    Get power from VCONN
  */
-static unsigned int tc_ct_attach_wait_vpd(int port, enum signal sig)
+static int tc_ct_attach_wait_vpd(int port, enum signal sig)
 {
 	int ret;
 
@@ -1562,7 +1542,7 @@ static unsigned int tc_ct_attach_wait_vpd(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_rp3_ct_rd);
 }
 
-static unsigned int tc_ct_attach_wait_vpd_entry(int port)
+static int tc_ct_attach_wait_vpd_entry(int port)
 {
 	tc[port].state_id = CTATTACH_WAIT_VPD;
 	CPRINTS("C%d: %s", port, tc_state_names[tc[port].state_id]);
@@ -1578,7 +1558,7 @@ static unsigned int tc_ct_attach_wait_vpd_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_ct_attach_wait_vpd_run(int port)
+static int tc_ct_attach_wait_vpd_run(int port)
 {
 	int new_cc_state;
 	int cc1;
@@ -1645,7 +1625,7 @@ static unsigned int tc_ct_attach_wait_vpd_run(int port)
 	return RUN_SUPER;
 }
 
-static unsigned int tc_ct_attach_wait_vpd_exit(int port)
+static int tc_ct_attach_wait_vpd_exit(int port)
 {
 	/* Disable PD */
 	tc[port].pd_enable = 0;
@@ -1659,7 +1639,7 @@ static unsigned int tc_ct_attach_wait_vpd_exit(int port)
 /**
  * Super State HOST_RP3_CT_RD
  */
-static unsigned int tc_host_rp3_ct_rd(int port, enum signal sig)
+static int tc_host_rp3_ct_rd(int port, enum signal sig)
 {
 	int ret;
 
@@ -1668,7 +1648,7 @@ static unsigned int tc_host_rp3_ct_rd(int port, enum signal sig)
 	return SUPER(ret, sig, tc_vbus_cc_iso);
 }
 
-static unsigned int tc_host_rp3_ct_rd_entry(int port)
+static int tc_host_rp3_ct_rd_entry(int port)
 {
 	/* Place RP3A0 on Host CC */
 	vpd_host_set_pull(TYPEC_CC_RP, TYPEC_RP_3A0);
@@ -1691,15 +1671,10 @@ static unsigned int tc_host_rp3_ct_rd_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_host_rp3_ct_rd_run(int port)
-{
-	return 0;
-}
-
 /**
  * Super State HOST_RP3_CT_RPU
  */
-static unsigned int tc_host_rp3_ct_rpu(int port, enum signal sig)
+static int tc_host_rp3_ct_rpu(int port, enum signal sig)
 {
 	int ret;
 
@@ -1707,7 +1682,7 @@ static unsigned int tc_host_rp3_ct_rpu(int port, enum signal sig)
 	return SUPER(ret, sig, tc_vbus_cc_iso);
 }
 
-static unsigned int tc_host_rp3_ct_rpu_entry(int port)
+static int tc_host_rp3_ct_rpu_entry(int port)
 {
 	/* Place RP3A0 on Host CC */
 	vpd_host_set_pull(TYPEC_CC_RP, TYPEC_RP_3A0);
@@ -1727,10 +1702,5 @@ static unsigned int tc_host_rp3_ct_rpu_entry(int port)
 	/* Get power from VCONN */
 	vpd_vconn_pwr_sel_odl(PWR_VCONN);
 
-	return 0;
-}
-
-static unsigned int tc_host_rp3_ct_rpu_run(int port)
-{
 	return 0;
 }

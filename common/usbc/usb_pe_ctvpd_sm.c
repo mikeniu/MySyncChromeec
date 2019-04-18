@@ -44,7 +44,7 @@ static struct policy_engine {
 } pe[CONFIG_USB_PD_PORT_COUNT];
 
 /* Policy Engine states */
-DECLARE_STATE(pe, request, NOOP_EXIT);
+DECLARE_STATE(pe, request, WITH_RUN, NOOP_EXIT);
 
 void pe_init(int port)
 {
@@ -52,7 +52,7 @@ void pe_init(int port)
 	init_state(port, PE_OBJ(port), pe_request);
 }
 
-void policy_engine(int port, int evt, int en)
+void usbc_policy_engine(int port, int evt, int en)
 {
 	switch (local_state) {
 	case PE_INIT:
@@ -65,7 +65,7 @@ void policy_engine(int port, int evt, int en)
 			break;
 		}
 
-		exe_state(port, PE_OBJ(port), RUN_SIG);
+		run_state_machine(port, PE_OBJ(port), RUN_SIG);
 		break;
 	case PE_PAUSED:
 		if (en)
@@ -105,7 +105,7 @@ void pe_message_sent(int port)
 	/* Do nothing */
 }
 
-static unsigned int pe_request(int port, enum signal sig)
+static int pe_request(int port, enum signal sig)
 {
 	int ret;
 
@@ -113,12 +113,12 @@ static unsigned int pe_request(int port, enum signal sig)
 	return SUPER(ret, sig, 0);
 }
 
-static unsigned int pe_request_entry(int port)
+static int pe_request_entry(int port)
 {
 	return 0;
 }
 
-static unsigned int pe_request_run(int port)
+static int pe_request_run(int port)
 {
 	uint32_t *payload = (uint32_t *)emsg[port].buf;
 	uint32_t header = emsg[port].header;

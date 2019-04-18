@@ -26,10 +26,6 @@
 /* Type-C Layer Flags */
 #define TC_FLAGS_VCONN_ON           BIT(0)
 
-#undef PD_DEFAULT_STATE
-/* Port default state at startup */
-#define PD_DEFAULT_STATE(port) tc_unattached_snk
-
 /**
  * This is the Type-C Port object that contains information needed to
  * implement a VCONN Powered Device.
@@ -37,17 +33,17 @@
 struct type_c tc[CONFIG_USB_PD_PORT_COUNT];
 
 /* Type-C states */
-DECLARE_STATE(tc, disabled, WITH_EXIT);
-DECLARE_STATE(tc, unattached_snk, NOOP_EXIT);
-DECLARE_STATE(tc, attach_wait_snk, NOOP_EXIT);
-DECLARE_STATE(tc, attached_snk, WITH_EXIT);
+DECLARE_STATE(tc, disabled, WITH_RUN, WITH_EXIT);
+DECLARE_STATE(tc, unattached_snk, WITH_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, attach_wait_snk, WITH_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, attached_snk, WITH_RUN, WITH_EXIT);
 
 /* Super States */
-DECLARE_STATE(tc, host_rard, NOOP_EXIT);
-DECLARE_STATE(tc, host_open, NOOP_EXIT);
-DECLARE_STATE(tc, vbus_cc_iso, NOOP_EXIT);
+DECLARE_STATE(tc, host_rard, NOOP_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, host_open, NOOP_RUN, NOOP_EXIT);
+DECLARE_STATE(tc, vbus_cc_iso, NOOP_RUN, NOOP_EXIT);
 
-void tc_state_init(int port)
+void tc_state_init(int port, enum typec_state_id start_state)
 {
 	int res = 0;
 	sm_state this_state;
@@ -55,7 +51,7 @@ void tc_state_init(int port)
 	res = tc_restart_tcpc(port);
 
 	CPRINTS("TCPC p%d init %s", port, res ? "failed" : "ready");
-	this_state = res ? tc_disabled : PD_DEFAULT_STATE(port);
+	this_state = res ? tc_disabled : tc_unattached_snk;
 
 	/* Disable TCPC RX until connection is established */
 	tcpm_set_rx_enable(port, 0);
@@ -82,7 +78,7 @@ void tc_event_check(int port, int evt)
  *   Enable mcu communication
  *   Remove the terminations from Host CC
  */
-static unsigned int tc_disabled(int port, enum signal sig)
+static int tc_disabled(int port, enum signal sig)
 {
 	int ret = 0;
 
@@ -90,7 +86,7 @@ static unsigned int tc_disabled(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_open);
 }
 
-static unsigned int tc_disabled_entry(int port)
+static int tc_disabled_entry(int port)
 {
 	tc[port].state_id = DISABLED;
 	CPRINTS("C%d: %s", port, tc_state_names[tc[port].state_id]);
@@ -98,14 +94,14 @@ static unsigned int tc_disabled_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_disabled_run(int port)
+static int tc_disabled_run(int port)
 {
 	task_wait_event(-1);
 
 	return RUN_SUPER;
 }
 
-static unsigned int tc_disabled_exit(int port)
+static int tc_disabled_exit(int port)
 {
 #ifndef CONFIG_USB_PD_TCPC
 	if (tc_restart_tcpc(port) != 0) {
@@ -126,7 +122,7 @@ static unsigned int tc_disabled_exit(int port)
  *   Enable mcu communication
  *   Place Ra on VCONN and Rd on Host CC
  */
-static unsigned int tc_unattached_snk(int port, enum signal sig)
+static int tc_unattached_snk(int port, enum signal sig)
 {
 	int ret;
 
@@ -134,7 +130,7 @@ static unsigned int tc_unattached_snk(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_rard);
 }
 
-static unsigned int tc_unattached_snk_entry(int port)
+static int tc_unattached_snk_entry(int port)
 {
 	tc[port].state_id = UNATTACHED_SNK;
 	CPRINTS("C%d: %s", port, tc_state_names[tc[port].state_id]);
@@ -142,7 +138,7 @@ static unsigned int tc_unattached_snk_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_unattached_snk_run(int port)
+static int tc_unattached_snk_run(int port)
 {
 	int host_cc;
 
@@ -169,7 +165,7 @@ static unsigned int tc_unattached_snk_run(int port)
  *   Enable mcu communication
  *   Place Ra on VCONN and Rd on Host CC
  */
-static unsigned int tc_attach_wait_snk(int port, enum signal sig)
+static int tc_attach_wait_snk(int port, enum signal sig)
 {
 	int ret = 0;
 
@@ -177,7 +173,7 @@ static unsigned int tc_attach_wait_snk(int port, enum signal sig)
 	return SUPER(ret, sig, tc_host_rard);
 }
 
-static unsigned int tc_attach_wait_snk_entry(int port)
+static int tc_attach_wait_snk_entry(int port)
 {
 	tc[port].state_id = ATTACH_WAIT_SNK;
 	CPRINTS("C%d: %s", port, tc_state_names[tc[port].state_id]);
@@ -186,7 +182,7 @@ static unsigned int tc_attach_wait_snk_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_attach_wait_snk_run(int port)
+static int tc_attach_wait_snk_run(int port)
 {
 	int host_new_cc_state;
 	int host_cc;
@@ -237,7 +233,7 @@ static unsigned int tc_attach_wait_snk_run(int port)
 /**
  * Attached.SNK
  */
-static unsigned int tc_attached_snk(int port, enum signal sig)
+static int tc_attached_snk(int port, enum signal sig)
 {
 	int ret;
 
@@ -245,7 +241,7 @@ static unsigned int tc_attached_snk(int port, enum signal sig)
 	return SUPER(ret, sig, 0);
 }
 
-static unsigned int tc_attached_snk_entry(int port)
+static int tc_attached_snk_entry(int port)
 {
 	tc[port].state_id = ATTACHED_SNK;
 	CPRINTS("C%d: %s", port, tc_state_names[tc[port].state_id]);
@@ -257,7 +253,7 @@ static unsigned int tc_attached_snk_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_attached_snk_run(int port)
+static int tc_attached_snk_run(int port)
 {
 	/* Has host vbus and vconn been removed */
 	if (!vpd_is_host_vbus_present() && !vpd_is_vconn_present()) {
@@ -276,7 +272,7 @@ static unsigned int tc_attached_snk_run(int port)
 	return 0;
 }
 
-static unsigned int tc_attached_snk_exit(int port)
+static int tc_attached_snk_exit(int port)
 {
 	/* Disable PD */
 	tc[port].pd_enable = 0;
@@ -288,7 +284,7 @@ static unsigned int tc_attached_snk_exit(int port)
 /**
  * Super State HOST_RARD
  */
-static unsigned int tc_host_rard(int port, enum signal sig)
+static int tc_host_rard(int port, enum signal sig)
 {
 	int ret;
 
@@ -296,7 +292,7 @@ static unsigned int tc_host_rard(int port, enum signal sig)
 	return SUPER(ret, sig, tc_vbus_cc_iso);
 }
 
-static unsigned int tc_host_rard_entry(int port)
+static int tc_host_rard_entry(int port)
 {
 	/* Place Ra on VCONN and Rd on Host CC */
 	vpd_host_set_pull(TYPEC_CC_RA_RD, 0);
@@ -304,15 +300,10 @@ static unsigned int tc_host_rard_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_host_rard_run(int port)
-{
-	return RUN_SUPER;
-}
-
 /**
  * Super State HOST_OPEN
  */
-static unsigned int tc_host_open(int port, enum signal sig)
+static int tc_host_open(int port, enum signal sig)
 {
 	int ret;
 
@@ -320,7 +311,7 @@ static unsigned int tc_host_open(int port, enum signal sig)
 	return SUPER(ret, sig, tc_vbus_cc_iso);
 }
 
-static unsigned int tc_host_open_entry(int port)
+static int tc_host_open_entry(int port)
 {
 	/* Remove the terminations from Host CC */
 	vpd_host_set_pull(TYPEC_CC_OPEN, 0);
@@ -328,15 +319,10 @@ static unsigned int tc_host_open_entry(int port)
 	return 0;
 }
 
-static unsigned int tc_host_open_run(int port)
-{
-	return RUN_SUPER;
-}
-
 /**
  * Super State VBUS_CC_ISO
  */
-static unsigned int tc_vbus_cc_iso(int port, enum signal sig)
+static int tc_vbus_cc_iso(int port, enum signal sig)
 {
 	int ret;
 
@@ -344,15 +330,10 @@ static unsigned int tc_vbus_cc_iso(int port, enum signal sig)
 	return SUPER(ret, sig, 0);
 }
 
-static unsigned int tc_vbus_cc_iso_entry(int port)
+static int tc_vbus_cc_iso_entry(int port)
 {
 	/* Enable mcu communication and cc */
 	vpd_mcu_cc_en(1);
 
-	return 0;
-}
-
-static unsigned int tc_vbus_cc_iso_run(int port)
-{
 	return 0;
 }

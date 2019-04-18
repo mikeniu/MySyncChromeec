@@ -124,82 +124,31 @@ struct sm_ {
 } sm[1];
 
 #if defined(TEST_USB_SM_FRAMEWORK_H3)
-static unsigned int sm_test_super_A1(int port, enum signal sig);
-static unsigned int sm_test_super_A1_entry(int port);
-static unsigned int sm_test_super_A1_run(int port);
-static unsigned int sm_test_super_A1_exit(int port);
-
-static unsigned int sm_test_super_B1(int port, enum signal sig);
-static unsigned int sm_test_super_B1_entry(int port);
-static unsigned int sm_test_super_B1_run(int port);
-static unsigned int sm_test_super_B1_exit(int port);
+DECLARE_STATE(sm, test_super_A1, WITH_RUN, WITH_EXIT);
+DECLARE_STATE(sm, test_super_B1, WITH_RUN, WITH_EXIT);
 #endif
 
 #if defined(TEST_USB_SM_FRAMEWORK_H3) || defined(TEST_USB_SM_FRAMEWORK_H2)
-static unsigned int sm_test_super_A2(int port, enum signal sig);
-static unsigned int sm_test_super_A2_entry(int port);
-static unsigned int sm_test_super_A2_run(int port);
-static unsigned int sm_test_super_A2_exit(int port);
-
-static unsigned int sm_test_super_B2(int port, enum signal sig);
-static unsigned int sm_test_super_B2_entry(int port);
-static unsigned int sm_test_super_B2_run(int port);
-static unsigned int sm_test_super_B2_exit(int port);
+DECLARE_STATE(sm, test_super_A2, WITH_RUN, WITH_EXIT);
+DECLARE_STATE(sm, test_super_B2, WITH_RUN, WITH_EXIT);
 #endif
 
 #if defined(TEST_USB_SM_FRAMEWORK_H3) || defined(TEST_USB_SM_FRAMEWORK_H2) || \
 	defined(TEST_USB_SM_FRAMEWORK_H1)
-static unsigned int sm_test_super_A3(int port, enum signal sig);
-static unsigned int sm_test_super_A3_entry(int port);
-static unsigned int sm_test_super_A3_run(int port);
-static unsigned int sm_test_super_A3_exit(int port);
-
-static unsigned int sm_test_super_B3(int port, enum signal sig);
-static unsigned int sm_test_super_B3_entry(int port);
-static unsigned int sm_test_super_B3_run(int port);
-static unsigned int sm_test_super_B3_exit(int port);
+DECLARE_STATE(sm, test_super_A3, WITH_RUN, WITH_EXIT);
+DECLARE_STATE(sm, test_super_B3, WITH_RUN, WITH_EXIT);
 #endif
 
-static unsigned int sm_test_A4(int port, enum signal sig);
-static unsigned int sm_test_A4_entry(int port);
-static unsigned int sm_test_A4_run(int port);
-static unsigned int sm_test_A4_exit(int port);
+DECLARE_STATE(sm, test_A4, WITH_RUN, WITH_EXIT);
+DECLARE_STATE(sm, test_A5, WITH_RUN, WITH_EXIT);
+DECLARE_STATE(sm, test_A6, WITH_RUN, WITH_EXIT);
+DECLARE_STATE(sm, test_A7, WITH_RUN, WITH_EXIT);
 
-static unsigned int sm_test_A5(int port, enum signal sig);
-static unsigned int sm_test_A5_entry(int port);
-static unsigned int sm_test_A5_run(int port);
-static unsigned int sm_test_A5_exit(int port);
-
-static unsigned int sm_test_A6(int port, enum signal sig);
-static unsigned int sm_test_A6_entry(int port);
-static unsigned int sm_test_A6_run(int port);
-static unsigned int sm_test_A6_exit(int port);
-
-static unsigned int sm_test_A7(int port, enum signal sig);
-static unsigned int sm_test_A7_entry(int port);
-static unsigned int sm_test_A7_run(int port);
-static unsigned int sm_test_A7_exit(int port);
-
-static unsigned int sm_test_B4(int port, enum signal sig);
-static unsigned int sm_test_B4_entry(int port);
-static unsigned int sm_test_B4_run(int port);
-static unsigned int sm_test_B4_exit(int port);
-
-static unsigned int sm_test_B5(int port, enum signal sig);
-static unsigned int sm_test_B5_entry(int port);
-static unsigned int sm_test_B5_run(int port);
-static unsigned int sm_test_B5_exit(int port);
-
-static unsigned int sm_test_B6(int port, enum signal sig);
-static unsigned int sm_test_B6_entry(int port);
-static unsigned int sm_test_B6_run(int port);
-static unsigned int sm_test_B6_exit(int port);
-
-static unsigned int sm_test_C(int port, enum signal sig);
-static unsigned int sm_test_C_entry(int port);
-static unsigned int sm_test_C_run(int port);
-static unsigned int sm_test_C_exit(int port);
-
+DECLARE_STATE(sm, test_B4, WITH_RUN, WITH_EXIT);
+DECLARE_STATE(sm, test_B5, WITH_RUN, WITH_EXIT);
+DECLARE_STATE(sm, test_B6, WITH_RUN, WITH_EXIT);
+DECLARE_STATE(sm, test_C, WITH_RUN, WITH_EXIT);
+#if 0
 #if defined(TEST_USB_SM_FRAMEWORK_H3)
 static const state_sig sm_test_super_A1_sig[] = {
 	sm_test_super_A1_entry,
@@ -304,6 +253,7 @@ static const state_sig sm_test_C_sig[] = {
 	sm_test_C_exit,
 	get_super_state
 };
+#endif
 
 static void clear_seq(int port)
 {
@@ -316,7 +266,7 @@ static void clear_seq(int port)
 }
 
 #if defined(TEST_USB_SM_FRAMEWORK_H3)
-static unsigned int sm_test_super_A1(int port, enum signal sig)
+static int sm_test_super_A1(int port, enum signal sig)
 {
 	int ret;
 
@@ -324,25 +274,25 @@ static unsigned int sm_test_super_A1(int port, enum signal sig)
 	return SUPER(ret, sig, 0);
 }
 
-static unsigned int sm_test_super_A1_entry(int port)
+static int sm_test_super_A1_entry(int port)
 {
 	sm[port].seq[sm[port].idx++] = ENTER_A1;
 	return 0;
 }
 
-static unsigned int sm_test_super_A1_run(int port)
+static int sm_test_super_A1_run(int port)
 {
 	sm[port].seq[sm[port].idx++] = RUN_A1;
 	return 0;
 }
 
-static unsigned int sm_test_super_A1_exit(int port)
+static int sm_test_super_A1_exit(int port)
 {
 	sm[port].seq[sm[port].idx++] = EXIT_A1;
 	return 0;
 }
 
-static unsigned int sm_test_super_B1(int port, enum signal sig)
+static int sm_test_super_B1(int port, enum signal sig)
 {
 	int ret;
 
@@ -350,19 +300,19 @@ static unsigned int sm_test_super_B1(int port, enum signal sig)
 	return SUPER(ret, sig, 0);
 }
 
-static unsigned int sm_test_super_B1_entry(int port)
+static int sm_test_super_B1_entry(int port)
 {
 	sm[port].seq[sm[port].idx++] = ENTER_B1;
 	return 0;
 }
 
-static unsigned int sm_test_super_B1_run(int port)
+static int sm_test_super_B1_run(int port)
 {
 	sm[port].seq[sm[port].idx++] = RUN_B1;
 	return 0;
 }
 
-static unsigned int sm_test_super_B1_exit(int port)
+static int sm_test_super_B1_exit(int port)
 {
 	sm[port].seq[sm[port].idx++] = EXIT_B1;
 	return 0;
@@ -370,7 +320,7 @@ static unsigned int sm_test_super_B1_exit(int port)
 #endif
 
 #if defined(TEST_USB_SM_FRAMEWORK_H3) || defined(TEST_USB_SM_FRAMEWORK_H2)
-static unsigned int sm_test_super_A2(int port, enum signal sig)
+static int sm_test_super_A2(int port, enum signal sig)
 {
 	int ret;
 
@@ -382,25 +332,25 @@ static unsigned int sm_test_super_A2(int port, enum signal sig)
 #endif
 }
 
-static unsigned int sm_test_super_A2_entry(int port)
+static int sm_test_super_A2_entry(int port)
 {
 	sm[port].seq[sm[port].idx++] = ENTER_A2;
 	return 0;
 }
 
-static unsigned int sm_test_super_A2_run(int port)
+static int sm_test_super_A2_run(int port)
 {
 	sm[port].seq[sm[port].idx++] = RUN_A2;
 	return RUN_SUPER;
 }
 
-static unsigned int sm_test_super_A2_exit(int port)
+static int sm_test_super_A2_exit(int port)
 {
 	sm[port].seq[sm[port].idx++] = EXIT_A2;
 	return 0;
 }
 
-static unsigned int sm_test_super_B2(int port, enum signal sig)
+static int sm_test_super_B2(int port, enum signal sig)
 {
 	int ret;
 
@@ -412,19 +362,19 @@ static unsigned int sm_test_super_B2(int port, enum signal sig)
 #endif
 }
 
-static unsigned int sm_test_super_B2_entry(int port)
+static int sm_test_super_B2_entry(int port)
 {
 	sm[port].seq[sm[port].idx++] = ENTER_B2;
 	return 0;
 }
 
-static unsigned int sm_test_super_B2_run(int port)
+static int sm_test_super_B2_run(int port)
 {
 	sm[port].seq[sm[port].idx++] = RUN_B2;
 	return RUN_SUPER;
 }
 
-static unsigned int sm_test_super_B2_exit(int port)
+static int sm_test_super_B2_exit(int port)
 {
 	sm[port].seq[sm[port].idx++] = EXIT_B2;
 	return 0;
@@ -433,7 +383,7 @@ static unsigned int sm_test_super_B2_exit(int port)
 
 #if defined(TEST_USB_SM_FRAMEWORK_H3) || defined(TEST_USB_SM_FRAMEWORK_H2) || \
 		defined(TEST_USB_SM_FRAMEWORK_H1)
-static unsigned int sm_test_super_A3(int port, enum signal sig)
+static int sm_test_super_A3(int port, enum signal sig)
 {
 	int ret;
 
@@ -445,13 +395,13 @@ static unsigned int sm_test_super_A3(int port, enum signal sig)
 #endif
 }
 
-static unsigned int sm_test_super_A3_entry(int port)
+static int sm_test_super_A3_entry(int port)
 {
 	sm[port].seq[sm[port].idx++] = ENTER_A3;
 	return 0;
 }
 
-static unsigned int sm_test_super_A3_run(int port)
+static int sm_test_super_A3_run(int port)
 {
 	sm[port].seq[sm[port].idx++] = RUN_A3;
 #if defined(TEST_USB_SM_FRAMEWORK_H3) || defined(TEST_USB_SM_FRAMEWORK_H2)
@@ -461,13 +411,13 @@ static unsigned int sm_test_super_A3_run(int port)
 #endif
 }
 
-static unsigned int sm_test_super_A3_exit(int port)
+static int sm_test_super_A3_exit(int port)
 {
 	sm[port].seq[sm[port].idx++] = EXIT_A3;
 	return 0;
 }
 
-static unsigned int sm_test_super_B3(int port, enum signal sig)
+static int sm_test_super_B3(int port, enum signal sig)
 {
 	int ret;
 
@@ -479,13 +429,13 @@ static unsigned int sm_test_super_B3(int port, enum signal sig)
 #endif
 }
 
-static unsigned int sm_test_super_B3_entry(int port)
+static int sm_test_super_B3_entry(int port)
 {
 	sm[port].seq[sm[port].idx++] = ENTER_B3;
 	return 0;
 }
 
-static unsigned int sm_test_super_B3_run(int port)
+static int sm_test_super_B3_run(int port)
 {
 	sm[port].seq[sm[port].idx++] = RUN_B3;
 #if defined(TEST_USB_SM_FRAMEWORK_H3) || defined(TEST_USB_SM_FRAMEWORK_H2)
@@ -495,7 +445,7 @@ static unsigned int sm_test_super_B3_run(int port)
 #endif
 }
 
-static unsigned int sm_test_super_B3_exit(int port)
+static int sm_test_super_B3_exit(int port)
 {
 	sm[port].seq[sm[port].idx++] = EXIT_B3;
 	return 0;
@@ -503,7 +453,7 @@ static unsigned int sm_test_super_B3_exit(int port)
 #endif
 
 
-static unsigned int sm_test_A4(int port, enum signal sig)
+static int sm_test_A4(int port, enum signal sig)
 {
 	int ret;
 
@@ -516,14 +466,14 @@ static unsigned int sm_test_A4(int port, enum signal sig)
 #endif
 }
 
-static unsigned int sm_test_A4_entry(int port)
+static int sm_test_A4_entry(int port)
 {
 	sm[port].sv_tmp = 0;
 	sm[port].seq[sm[port].idx++] = ENTER_A4;
 	return 0;
 }
 
-static unsigned int sm_test_A4_run(int port)
+static int sm_test_A4_run(int port)
 {
 	if (sm[port].sv_tmp == 0) {
 		sm[port].sv_tmp = 1;
@@ -536,13 +486,13 @@ static unsigned int sm_test_A4_run(int port)
 	return RUN_SUPER;
 }
 
-static unsigned int sm_test_A4_exit(int port)
+static int sm_test_A4_exit(int port)
 {
 	sm[port].seq[sm[port].idx++] = EXIT_A4;
 	return 0;
 }
 
-static unsigned int sm_test_A5(int port, enum signal sig)
+static int sm_test_A5(int port, enum signal sig)
 {
 	int ret;
 
@@ -555,14 +505,14 @@ static unsigned int sm_test_A5(int port, enum signal sig)
 #endif
 }
 
-static unsigned int sm_test_A5_entry(int port)
+static int sm_test_A5_entry(int port)
 {
 	sm[port].sv_tmp = 0;
 	sm[port].seq[sm[port].idx++] = ENTER_A5;
 	return 0;
 }
 
-static unsigned int sm_test_A5_run(int port)
+static int sm_test_A5_run(int port)
 {
 	if (sm[port].sv_tmp == 0) {
 		sm[port].sv_tmp = 1;
@@ -575,13 +525,13 @@ static unsigned int sm_test_A5_run(int port)
 	return RUN_SUPER;
 }
 
-static unsigned int sm_test_A5_exit(int port)
+static int sm_test_A5_exit(int port)
 {
 	sm[port].seq[sm[port].idx++] = EXIT_A5;
 	return 0;
 }
 
-static unsigned int sm_test_A6(int port, enum signal sig)
+static int sm_test_A6(int port, enum signal sig)
 {
 	int ret;
 
@@ -593,14 +543,14 @@ static unsigned int sm_test_A6(int port, enum signal sig)
 #endif
 }
 
-static unsigned int sm_test_A6_entry(int port)
+static int sm_test_A6_entry(int port)
 {
 	sm[port].sv_tmp = 0;
 	sm[port].seq[sm[port].idx++] = ENTER_A6;
 	return 0;
 }
 
-static unsigned int sm_test_A6_run(int port)
+static int sm_test_A6_run(int port)
 {
 	if (sm[port].sv_tmp == 0) {
 		sm[port].sv_tmp = 1;
@@ -613,13 +563,13 @@ static unsigned int sm_test_A6_run(int port)
 	return RUN_SUPER;
 }
 
-static unsigned int sm_test_A6_exit(int port)
+static int sm_test_A6_exit(int port)
 {
 	sm[port].seq[sm[port].idx++] = EXIT_A6;
 	return 0;
 }
 
-static unsigned int sm_test_A7(int port, enum signal sig)
+static int sm_test_A7(int port, enum signal sig)
 {
 	int ret;
 
@@ -631,14 +581,14 @@ static unsigned int sm_test_A7(int port, enum signal sig)
 #endif
 }
 
-static unsigned int sm_test_A7_entry(int port)
+static int sm_test_A7_entry(int port)
 {
 	sm[port].sv_tmp = 0;
 	sm[port].seq[sm[port].idx++] = ENTER_A7;
 	return 0;
 }
 
-static unsigned int sm_test_A7_run(int port)
+static int sm_test_A7_run(int port)
 {
 	if (sm[port].sv_tmp == 0) {
 		sm[port].sv_tmp = 1;
@@ -651,13 +601,13 @@ static unsigned int sm_test_A7_run(int port)
 	return RUN_SUPER;
 }
 
-static unsigned int sm_test_A7_exit(int port)
+static int sm_test_A7_exit(int port)
 {
 	sm[port].seq[sm[port].idx++] = EXIT_A7;
 	return 0;
 }
 
-static unsigned int sm_test_B4(int port, enum signal sig)
+static int sm_test_B4(int port, enum signal sig)
 {
 	int ret;
 
@@ -670,14 +620,14 @@ static unsigned int sm_test_B4(int port, enum signal sig)
 #endif
 }
 
-static unsigned int sm_test_B4_entry(int port)
+static int sm_test_B4_entry(int port)
 {
 	sm[port].sv_tmp = 0;
 	sm[port].seq[sm[port].idx++] = ENTER_B4;
 	return 0;
 }
 
-static unsigned int sm_test_B4_run(int port)
+static int sm_test_B4_run(int port)
 {
 	if (sm[port].sv_tmp == 0) {
 		sm[port].seq[sm[port].idx++] = RUN_B4;
@@ -690,13 +640,13 @@ static unsigned int sm_test_B4_run(int port)
 	return RUN_SUPER;
 }
 
-static unsigned int sm_test_B4_exit(int port)
+static int sm_test_B4_exit(int port)
 {
 	sm[port].seq[sm[port].idx++] = EXIT_B4;
 	return 0;
 }
 
-static unsigned int sm_test_B5(int port, enum signal sig)
+static int sm_test_B5(int port, enum signal sig)
 {
 	int ret;
 
@@ -708,14 +658,14 @@ static unsigned int sm_test_B5(int port, enum signal sig)
 #endif
 }
 
-static unsigned int sm_test_B5_entry(int port)
+static int sm_test_B5_entry(int port)
 {
 	sm[port].sv_tmp = 0;
 	sm[port].seq[sm[port].idx++] = ENTER_B5;
 	return 0;
 }
 
-static unsigned int sm_test_B5_run(int port)
+static int sm_test_B5_run(int port)
 {
 	if (sm[port].sv_tmp == 0) {
 		sm[port].sv_tmp = 1;
@@ -728,13 +678,13 @@ static unsigned int sm_test_B5_run(int port)
 	return RUN_SUPER;
 }
 
-static unsigned int sm_test_B5_exit(int port)
+static int sm_test_B5_exit(int port)
 {
 	sm[port].seq[sm[port].idx++] = EXIT_B5;
 	return 0;
 }
 
-static unsigned int sm_test_B6(int port, enum signal sig)
+static int sm_test_B6(int port, enum signal sig)
 {
 	int ret;
 
@@ -746,14 +696,14 @@ static unsigned int sm_test_B6(int port, enum signal sig)
 #endif
 }
 
-static unsigned int sm_test_B6_entry(int port)
+static int sm_test_B6_entry(int port)
 {
 	sm[port].sv_tmp = 0;
 	sm[port].seq[sm[port].idx++] = ENTER_B6;
 	return 0;
 }
 
-static unsigned int sm_test_B6_run(int port)
+static int sm_test_B6_run(int port)
 {
 	if (sm[port].sv_tmp == 0) {
 		sm[port].sv_tmp = 1;
@@ -766,13 +716,13 @@ static unsigned int sm_test_B6_run(int port)
 	return RUN_SUPER;
 }
 
-static unsigned int sm_test_B6_exit(int port)
+static int sm_test_B6_exit(int port)
 {
 	sm[port].seq[sm[port].idx++] = EXIT_B6;
 	return 0;
 }
 
-static unsigned int sm_test_C(int port, enum signal sig)
+static int sm_test_C(int port, enum signal sig)
 {
 	int ret;
 
@@ -780,14 +730,14 @@ static unsigned int sm_test_C(int port, enum signal sig)
 	return SUPER(ret, sig, 0);
 }
 
-static unsigned int sm_test_C_entry(int port)
+static int sm_test_C_entry(int port)
 {
 	sm[port].sv_tmp = 0;
 	sm[port].seq[sm[port].idx++] = ENTER_C;
 	return 0;
 }
 
-static unsigned int sm_test_C_run(int port)
+static int sm_test_C_run(int port)
 {
 	if (sm[port].sv_tmp == 0) {
 		sm[port].seq[sm[port].idx++] = RUN_C;
@@ -799,7 +749,7 @@ static unsigned int sm_test_C_run(int port)
 	return 0;
 }
 
-static unsigned int sm_test_C_exit(int port)
+static int sm_test_C_exit(int port)
 {
 	sm[port].seq[sm[port].idx++] = EXIT_C;
 	return 0;
@@ -1190,7 +1140,7 @@ int test_task(void *u)
 		/* wait for next event/packet or timeout expiration */
 		task_wait_event(-1);
 		/* run state machine */
-		exe_state(port, TSM_OBJ(port), RUN_SIG);
+		run_state_machine(port, TSM_OBJ(port), RUN_SIG);
 	}
 
 	return EC_SUCCESS;

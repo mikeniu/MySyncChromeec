@@ -99,6 +99,24 @@ int tc_get_data_role(int port);
 int tc_get_power_role(int port);
 
 /**
+ * Set the power role
+ *
+ * @param port USB-C port number
+ * @param role power role
+ */
+void tc_set_power_role(int port, int role);
+
+/**
+ * Sets the USB Mux depending on current data role
+ *   Mux is connected except when:
+ *     1) PD is disconnected
+ *     2) Current data role is UFP and we only support DFP
+ *
+ *  @param port USB-C port number
+ */
+void set_usb_mux_with_current_data_role(int port);
+
+/**
  * Set loop timeout value
  *
  * @param port USB-C port number
@@ -136,8 +154,12 @@ void set_polarity(int port, int polarity);
  * TypeC state machine
  *
  * @param port USB-C port number
+ * @param sm_state initial state of the state machine. Must be
+ *			UNATTACHED_SNK or UNATTACHED_SRC, any other
+ *			state id value will be interpreted as
+ *			UNATTACHED_SNK.
  */
-void tc_state_init(int port);
+void tc_state_init(int port, enum typec_state_id start_state);
 
 /**
  * Called by the state machine framework to handle events
