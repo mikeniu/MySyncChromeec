@@ -19,6 +19,31 @@
 /* Panic data goes at the end of RAM. */
 static struct panic_data * const pdata_ptr = PANIC_DATA_PTR;
 
+/* Common SW Panic reasons strings */
+#ifdef CONFIG_SOFTWARE_PANIC
+const char * const panic_sw_reasons[] = {
+	"PANIC_SW_DIV_ZERO",
+	"PANIC_SW_STACK_OVERFLOW",
+	"PANIC_SW_PD_CRASH",
+	"PANIC_SW_ASSERT",
+	"PANIC_SW_WATCHDOG",
+	"PANIC_SW_RNG",
+	"PANIC_SW_PMIC_FAULT",
+};
+#endif
+
+/**
+ * Check an interrupt vector as being a valid software panic
+ * @param vec		Vector
+ * @return 1 if not a valid software panic vactor, otherwise 0.
+ */
+int panic_sw_vector_is_valid(uint32_t vec)
+{
+	return (IS_ENABLED(CONFIG_SOFTWARE_PANIC) &&
+		vec >= PANIC_SW_BASE &&
+		(vec - PANIC_SW_BASE) < ARRAY_SIZE(panic_sw_reasons));
+}
+
 /**
  * Add a character directly to the UART buffer.
  *

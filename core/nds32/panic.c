@@ -78,18 +78,6 @@ static const char * const itype_exc_type[16] = {
 #endif /* CONFIG_DEBUG_EXCEPTIONS */
 
 #ifdef CONFIG_SOFTWARE_PANIC
-/* Software panic reasons */
-static const char * const panic_sw_reasons[8] = {
-	"PANIC_SW_DIV_ZERO",
-	"PANIC_SW_STACK_OVERFLOW",
-	"PANIC_SW_PD_CRASH",
-	"PANIC_SW_ASSERT",
-	"PANIC_SW_WATCHDOG",
-	NULL,
-	NULL,
-	NULL,
-};
-
 void software_panic(uint32_t reason, uint32_t info)
 {
 	asm volatile ("mov55  $r6, %0" : : "r"(reason));
