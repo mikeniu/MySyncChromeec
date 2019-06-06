@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4e3db607_7dfc5794",
+        "filename": "board/cr50/ec_state.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1000039
+      },
+      "writtenOn": "2019-06-06T16:26:28Z",
+      "side": 1,
+      "message": "Isn\u0027t ccd_update_sate() missing here (and in the original code)?",
+      "range": {
+        "startLine": 70,
+        "startChar": 0,
+        "endLine": 70,
+        "endChar": 2
+      },
+      "revId": "7eebe62e809d6e79cc57efcabbff96fdbf7a22e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "040f9e77_53252171",
+        "filename": "board/cr50/ec_state.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1000039
+      },
+      "writtenOn": "2019-06-06T16:26:28Z",
+      "side": 1,
+      "message": "I am curious, does this ever get printed? What is \u0027state\u0027 in that case?",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 18
+      },
+      "revId": "7eebe62e809d6e79cc57efcabbff96fdbf7a22e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
