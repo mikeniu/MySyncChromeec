@@ -117,6 +117,30 @@
       "revId": "7eebe62e809d6e79cc57efcabbff96fdbf7a22e1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "98b1749f_7eea8fb3",
+        "filename": "board/cr50/ec_state.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1283719
+      },
+      "writtenOn": "2019-06-06T17:16:36Z",
+      "side": 1,
+      "message": "At this point, EC state is \u0027DEVICE_STATE_INIT_RX_ONLY\u0027.\n\nIf I do \u0027ecrst on\u0027, wait for 3 seconds, then I see\n\"\u003e [\u003ctimestamp\u003e EC off]\"\n\n, then I do \u0027ecrst off\u0027, then I see\n\"\u003e [\u003ctimestamp\u003e EC on]\"",
+      "parentUuid": "b9faa9c8_83857a64",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 18
+      },
+      "revId": "7eebe62e809d6e79cc57efcabbff96fdbf7a22e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
