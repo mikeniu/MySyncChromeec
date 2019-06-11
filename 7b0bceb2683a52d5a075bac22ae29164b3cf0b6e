@@ -46,6 +46,30 @@
       "revId": "7b0bceb2683a52d5a075bac22ae29164b3cf0b6e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1dd405c1_a495e250",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2019-06-11T23:36:31Z",
+      "side": 1,
+      "message": "Yes, I checked the gitiles link. I will update the commit message with that info. Seems OK to me.",
+      "parentUuid": "2634abba_619339e2",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 21
+      },
+      "revId": "7b0bceb2683a52d5a075bac22ae29164b3cf0b6e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
