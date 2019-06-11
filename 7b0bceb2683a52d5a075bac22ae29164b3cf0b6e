@@ -22,6 +22,30 @@
       "revId": "7b0bceb2683a52d5a075bac22ae29164b3cf0b6e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2634abba_619339e2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1106949
+      },
+      "writtenOn": "2019-06-11T23:31:33Z",
+      "side": 1,
+      "message": "https://chromium.googlesource.com/chromiumos/platform/ec/+/refs/changes/97/1653597/1/README.md",
+      "parentUuid": "f4695e55_a0c29860",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 21
+      },
+      "revId": "7b0bceb2683a52d5a075bac22ae29164b3cf0b6e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
