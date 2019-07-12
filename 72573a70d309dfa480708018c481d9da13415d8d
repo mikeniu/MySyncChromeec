@@ -16,6 +16,24 @@
       "revId": "72573a70d309dfa480708018c481d9da13415d8d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7556774c_9fd9c900",
+        "filename": "board/meep/board.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1287197
+      },
+      "writtenOn": "2019-07-12T18:45:05Z",
+      "side": 1,
+      "message": "It is the DS3TR-C, which is generally more similar to the DSM than the DS3 if I remember correctly (ex. shares WHO_AM_I with DSM CL 1470894 and CL 1446533)",
+      "parentUuid": "1b1059d5_a3797e45",
+      "revId": "72573a70d309dfa480708018c481d9da13415d8d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
