@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1b1059d5_a3797e45",
+        "filename": "board/meep/board.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1104704
+      },
+      "writtenOn": "2019-07-12T18:26:36Z",
+      "side": 1,
+      "message": "Looking at yorp proto2 schematics: https://drive.google.com/corp/drive/u/0/folders/14KJ_5NqJcrgYr_k3Gz71iylDT2nx85O9\nShouldn\u0027t it be DS3 instead of DSM?",
+      "revId": "72573a70d309dfa480708018c481d9da13415d8d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
