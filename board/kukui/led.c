@@ -43,6 +43,8 @@ static void kukui_led_set_battery(void)
 	case PWR_STATE_CHARGE:
 		/* Always indicate when charging, even in suspend. */
 		br[EC_LED_COLOR_BLUE] = 1;
+		br[EC_LED_COLOR_GREEN] = 1;
+		br[EC_LED_COLOR_RED] = 1;
 		break;
 	case PWR_STATE_DISCHARGE:
 		if (charge_get_percent() <= 10)
@@ -52,7 +54,9 @@ static void kukui_led_set_battery(void)
 		br[EC_LED_COLOR_RED] = 1;
 		break;
 	case PWR_STATE_CHARGE_NEAR_FULL:
+		br[EC_LED_COLOR_BLUE] = 1;
 		br[EC_LED_COLOR_GREEN] = 1;
+		br[EC_LED_COLOR_RED] = 1;
 		break;
 	default:
 		/* Other states don't alter LED behavior */
