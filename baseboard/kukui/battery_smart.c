@@ -13,6 +13,35 @@
 
 static enum battery_present batt_pres_prev = BP_NOT_SURE;
 
+/* Shutdown mode parameter to write to manufacturer access register */
+#define SB_SHIP_MODE_REG	SB_MANUFACTURER_ACCESS
+#define SB_SHUTDOWN_DATA	0x0010
+
+static const struct battery_info info = {
+	.voltage_max		= 4400 * 3,
+	.voltage_normal		= 3860 * 3,
+	.voltage_min		= 3000 * 3,
+	.precharge_current	= 256,
+	.start_charging_min_c	= 0,
+	.start_charging_max_c	= 45,
+	.charging_min_c		= 0,
+	.charging_max_c		= 60,
+	.discharging_min_c	= -20,
+	.discharging_max_c	= 60,
+};
+
+const struct battery_info *battery_get_info(void)
+{
+	return &info;
+}
+
+enum battery_disconnect_state battery_get_disconnect_state(void)
+{
+	if (battery_is_present() == BP_YES)
+		return BATTERY_NOT_DISCONNECTED;
+	return BATTERY_DISCONNECTED;
+}
+
 enum battery_present battery_hw_present(void)
 {
 	return gpio_get_level(GPIO_EC_BATT_PRES_ODL) ? BP_NO : BP_YES;
@@ -68,3 +97,17 @@ enum battery_present battery_is_present(void)
 	batt_pres_prev = battery_check_present_status();
 	return batt_pres_prev;
 }
+
+int board_cut_off_battery(void)
+{
+	int rv;
+
+	/* Ship mode command must be sent twice to take effect */
+	rv = sb_write(SB_SHIP_MODE_REG, SB_SHUTDOWN_DATA);
+
+	if (rv != EC_SUCCESS)
+		return rv;
+
+	return sb_write(SB_SHIP_MODE_REG, SB_SHUTDOWN_DATA);
+}
+
