@@ -16,6 +16,8 @@
 #error "fpsensor requires AES, AES_GCM and ROLLBACK_SECRET_SIZE"
 #endif
 
+#define MAX_INFO_SIZE 128
+
 static int get_ikm(uint8_t *ikm)
 {
 	int ret;
@@ -79,6 +81,49 @@ static int hkdf_expand_one_step(uint8_t *out_key, size_t out_key_size,
 	memcpy(out_key, key_buf, out_key_size);
 	memset(key_buf, 0, sizeof(key_buf));
 
+	return EC_SUCCESS;
+}
+
+int hkdf_expand(uint8_t *out_key, size_t out_key_size, const uint8_t *prk,
+		size_t prk_size, const uint8_t *info, size_t info_size)
+{
+	uint8_t count = 1;
+	const uint8_t *T = out_key;
+	size_t T_len = 0;
+	uint8_t T_buffer[SHA256_DIGEST_SIZE] = { 0 };
+	const uint32_t num_blocks = (out_key_size / SHA256_DIGEST_SIZE) +
+		(out_key_size % SHA256_DIGEST_SIZE ? 1 : 0);
+	uint8_t info_buffer[SHA256_DIGEST_SIZE + MAX_INFO_SIZE + 1];
+
+	if (out_key == NULL || out_key_size == 0)
+		return EC_ERROR_INVAL;
+	if (prk == NULL)
+		return EC_ERROR_INVAL;
+	if (info == NULL && info_size > 0)
+		return EC_ERROR_INVAL;
+	if (info_size > MAX_INFO_SIZE)
+		return EC_ERROR_INVAL;
+	if (num_blocks > 255)
+		return EC_ERROR_INVAL;
+
+	while (out_key_size > 0) {
+		const size_t block_size = out_key_size < SHA256_DIGEST_SIZE ?
+			out_key_size : SHA256_DIGEST_SIZE;
+
+		memset(info_buffer, 0, sizeof(info_buffer));
+		memcpy(info_buffer, T, T_len);
+		memcpy(info_buffer + T_len, info, info_size);
+		info_buffer[T_len + info_size] = count;
+		hmac_SHA256(T_buffer, prk, prk_size, info_buffer,
+			    T_len + info_size + 1);
+		memcpy(out_key, T_buffer, block_size);
+
+		T += T_len;
+		T_len = SHA256_DIGEST_SIZE;
+		count++;
+		out_key += block_size;
+		out_key_size -= block_size;
+	}
 	return EC_SUCCESS;
 }
 
