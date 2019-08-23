@@ -500,10 +500,17 @@ static int fp_command_stats(struct host_cmd_handler_args *args)
 }
 DECLARE_HOST_COMMAND(EC_CMD_FP_STATS, fp_command_stats, EC_VER_MASK(0));
 
+static bool template_needs_new_validation_value(
+	struct ec_fp_template_encryption_metadata *enc_info)
+{
+	return enc_info->struct_version == 3
+		&& FP_TEMPLATE_FORMAT_VERSION == 4;
+}
+
 static int validate_template_format(
 	struct ec_fp_template_encryption_metadata *enc_info)
 {
-	if (enc_info->struct_version == 3 && FP_TEMPLATE_FORMAT_VERSION == 4)
+	if (template_needs_new_validation_value(enc_info))
 		/* The host requested migration to v4. */
 		return EC_RES_SUCCESS;
 
@@ -539,6 +546,9 @@ static int fp_command_template(struct host_cmd_handler_args *args)
 	memcpy(&fp_enc_buffer[offset], params->data, size);
 
 	if (xfer_complete) {
+		uint8_t *positive_match_salt;
+		size_t bytes_to_decrypt;
+
 		/*
 		 * The complete encrypted template has been received, start
 		 * decryption.
@@ -560,9 +570,16 @@ static int fp_command_template(struct host_cmd_handler_args *args)
 			return EC_RES_UNAVAILABLE;
 		}
 
+		if (enc_info->struct_version <= 3) {
+			bytes_to_decrypt = sizeof(fp_template[0]);
+		} else {
+			bytes_to_decrypt = sizeof(fp_template[0]) +
+					   sizeof(fp_positive_match_salt[0]);
+		}
+
 		ret = aes_gcm_decrypt(key, SBP_ENC_KEY_LEN, fp_enc_blob_buffer,
 				      fp_enc_buffer + sizeof(*enc_info),
-				      sizeof(fp_enc_blob_buffer),
+				      bytes_to_decrypt,
 				      enc_info->nonce, FP_CONTEXT_NONCE_BYTES,
 				      enc_info->tag, FP_CONTEXT_TAG_BYTES);
 		always_memset(key, 0, sizeof(key));
@@ -576,9 +593,25 @@ static int fp_command_template(struct host_cmd_handler_args *args)
 		memcpy(fp_template[idx], fp_enc_blob_buffer,
 		       sizeof(fp_template[0]));
 		/* Positive match salt is after the template. */
-		memcpy(fp_positive_match_salt[idx],
-		       fp_enc_blob_buffer + sizeof(fp_template[0]),
-		       sizeof(fp_positive_match_salt[0]));
+		positive_match_salt =
+			fp_enc_blob_buffer + sizeof(fp_template[0]);
+		if (template_needs_new_validation_value(enc_info)) {
+			init_trng();
+			rand_bytes(fp_positive_match_salt[idx],
+				   FP_POSITIVE_MATCH_SALT_BYTES);
+			exit_trng();
+		} else {
+			if (bytes_are_trivial(
+				positive_match_salt,
+				sizeof(fp_positive_match_salt[0]))) {
+				CPRINTS("fgr%d: Trivial positive match salt "
+					"after decryption.", idx);
+				return EC_RES_INVALID_PARAM;
+			}
+			memcpy(fp_positive_match_salt[idx],
+			       positive_match_salt,
+			       sizeof(fp_positive_match_salt[0]));
+		}
 	}
 
 	return EC_RES_SUCCESS;
