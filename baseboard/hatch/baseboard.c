@@ -77,6 +77,7 @@ const struct i2c_port_t i2c_ports[] = {
 #ifdef BOARD_AKEMI
 	{"thermal", I2C_PORT_THERMAL, 400, GPIO_I2C4_SCL, GPIO_I2C4_SDA},
 #endif
+	{"thermal", I2C_PORT_THERMAL, 400, GPIO_I2C4_SCL, GPIO_I2C4_SDA},
 	{"power",   I2C_PORT_POWER,   100, GPIO_I2C5_SCL, GPIO_I2C5_SDA},
 	{"eeprom",  I2C_PORT_EEPROM,  100, GPIO_I2C7_SCL, GPIO_I2C7_SDA},
 };
