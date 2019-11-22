@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "16e1b230_3451031e",
+        "filename": "driver/usb_mux/usb_mux.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2019-11-22T23:10:55Z",
+      "side": 1,
+      "message": "Would you be opposed to a single format string and ccprintf call? I don\u0027t think we lock the console when we print, but that might slightly increase the odds of outputting an uninterrupted string.",
+      "range": {
+        "startLine": 239,
+        "startChar": 2,
+        "endLine": 247,
+        "endChar": 17
+      },
+      "revId": "7fc316a3d99a057c9e0dd5a8925aaf0964801b2b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
