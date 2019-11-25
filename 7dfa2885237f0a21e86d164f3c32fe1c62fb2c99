@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "025209df_468774a6",
+        "filename": "driver/usb_mux/usb_mux.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1296157
+      },
+      "writtenOn": "2019-11-25T22:39:48Z",
+      "side": 1,
+      "message": "Hi Jett, do you mean only for this bit?\nwe would need !! otherwise we will be printing value of maco when true",
+      "parentUuid": "69c6673a_9e4c0000",
+      "range": {
+        "startLine": 241,
+        "startChar": 3,
+        "endLine": 241,
+        "endChar": 41
+      },
+      "revId": "7dfa2885237f0a21e86d164f3c32fe1c62fb2c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "293f6f58_4bc81179",
         "filename": "include/usb_mux.h",
         "patchSetId": 3
