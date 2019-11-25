@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9263c0c5_82b5f501",
+        "filename": "driver/usb_mux/usb_mux.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2019-11-25T22:25:12Z",
+      "side": 1,
+      "message": "you can reduce the scope of this variable and decalare it on line 238 (as a const even)",
+      "range": {
+        "startLine": 222,
+        "startChar": 1,
+        "endLine": 222,
+        "endChar": 22
+      },
+      "revId": "7dfa2885237f0a21e86d164f3c32fe1c62fb2c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "69c6673a_9e4c0000",
+        "filename": "driver/usb_mux/usb_mux.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2019-11-25T22:25:12Z",
+      "side": 1,
+      "message": "since we are just treating this as a bool, we don\u0027t need to wrap these in !!()\n\nYou can drop all of the !!() in this print",
+      "range": {
+        "startLine": 241,
+        "startChar": 3,
+        "endLine": 241,
+        "endChar": 41
+      },
+      "revId": "7dfa2885237f0a21e86d164f3c32fe1c62fb2c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "293f6f58_4bc81179",
+        "filename": "include/usb_mux.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2019-11-25T22:25:12Z",
+      "side": 1,
+      "message": "update return description please",
+      "range": {
+        "startLine": 264,
+        "startChar": 5,
+        "endLine": 264,
+        "endChar": 70
+      },
+      "revId": "7dfa2885237f0a21e86d164f3c32fe1c62fb2c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a7a4b10f_58d6e4fe",
+        "filename": "include/usb_mux.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2019-11-25T22:25:12Z",
+      "side": 1,
+      "message": "let\u0027s update this to mux_state_t",
+      "range": {
+        "startLine": 266,
+        "startChar": 0,
+        "endLine": 266,
+        "endChar": 3
+      },
+      "revId": "7dfa2885237f0a21e86d164f3c32fe1c62fb2c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
