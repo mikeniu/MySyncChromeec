@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "c2a5db92_4ed4def2",
+        "filename": "driver/usb_mux/usb_mux.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1296157
+      },
+      "writtenOn": "2019-11-25T22:56:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9263c0c5_82b5f501",
+      "range": {
+        "startLine": 222,
+        "startChar": 1,
+        "endLine": 222,
+        "endChar": 22
+      },
+      "revId": "7dfa2885237f0a21e86d164f3c32fe1c62fb2c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "69c6673a_9e4c0000",
         "filename": "driver/usb_mux/usb_mux.c",
         "patchSetId": 3
@@ -95,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "bfcbc572_397ac177",
+        "filename": "include/usb_mux.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1296157
+      },
+      "writtenOn": "2019-11-25T22:56:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "293f6f58_4bc81179",
+      "range": {
+        "startLine": 264,
+        "startChar": 5,
+        "endLine": 264,
+        "endChar": 70
+      },
+      "revId": "7dfa2885237f0a21e86d164f3c32fe1c62fb2c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a7a4b10f_58d6e4fe",
         "filename": "include/usb_mux.h",
         "patchSetId": 3
@@ -115,6 +163,30 @@
       "revId": "7dfa2885237f0a21e86d164f3c32fe1c62fb2c99",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c4d32c0d_6ae45eeb",
+        "filename": "include/usb_mux.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1296157
+      },
+      "writtenOn": "2019-11-25T22:56:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a7a4b10f_58d6e4fe",
+      "range": {
+        "startLine": 266,
+        "startChar": 0,
+        "endLine": 266,
+        "endChar": 3
+      },
+      "revId": "7dfa2885237f0a21e86d164f3c32fe1c62fb2c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
