@@ -96,6 +96,30 @@
     },
     {
       "key": {
+        "uuid": "c3808af1_67633f66",
+        "filename": "driver/usb_mux/usb_mux.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2019-11-26T17:12:51Z",
+      "side": 1,
+      "message": "Good point :) This is correct how it is.\n\nMust have reviewed too much code yesterday. I was thinking that we were taking in a boolean instead of a int for some reason.",
+      "parentUuid": "025209df_468774a6",
+      "range": {
+        "startLine": 241,
+        "startChar": 3,
+        "endLine": 241,
+        "endChar": 41
+      },
+      "revId": "7dfa2885237f0a21e86d164f3c32fe1c62fb2c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "293f6f58_4bc81179",
         "filename": "include/usb_mux.h",
         "patchSetId": 3
