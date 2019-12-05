@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4578c22a_0f1c86a1",
+        "filename": "board/jacuzzi/ec.tasklist",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1113904
+      },
+      "writtenOn": "2019-12-05T00:27:10Z",
+      "side": 1,
+      "message": "Why?",
+      "range": {
+        "startLine": 17,
+        "startChar": 42,
+        "endLine": 17,
+        "endChar": 63
+      },
+      "revId": "ff1013a2e638c6c3d367be533bb179c7b385909e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
