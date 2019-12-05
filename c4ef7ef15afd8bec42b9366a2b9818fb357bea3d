@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d80ba5f1_a62fbaa2",
+        "filename": "Makefile.rules",
+        "patchSetId": 2
+      },
+      "lineNbr": 701,
+      "author": {
+        "id": 1106949
+      },
+      "writtenOn": "2019-12-05T23:30:33Z",
+      "side": 1,
+      "message": "Is this too ambitious? Can you think of something else? How about \u0027openocd\u0027?",
+      "range": {
+        "startLine": 701,
+        "startChar": 10,
+        "endLine": 701,
+        "endChar": 15
+      },
+      "revId": "c4ef7ef15afd8bec42b9366a2b9818fb357bea3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
