@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f728f236_8f95bdad",
+        "filename": "Makefile.rules",
+        "patchSetId": 3
+      },
+      "lineNbr": 701,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2019-12-06T18:01:10Z",
+      "side": 1,
+      "message": "can you call out that this attached to an existing image (instead of loading it) -- referring to your latest comment.",
+      "range": {
+        "startLine": 701,
+        "startChar": 33,
+        "endLine": 701,
+        "endChar": 61
+      },
+      "revId": "1f64155cd28155e405921d4f0967af9bb43d8d82",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
