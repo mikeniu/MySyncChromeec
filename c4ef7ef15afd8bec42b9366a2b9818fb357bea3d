@@ -22,6 +22,30 @@
       "revId": "c4ef7ef15afd8bec42b9366a2b9818fb357bea3d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2e062d91_c445bf2c",
+        "filename": "Makefile.rules",
+        "patchSetId": 2
+      },
+      "lineNbr": 701,
+      "author": {
+        "id": 1334530
+      },
+      "writtenOn": "2019-12-06T00:51:18Z",
+      "side": 1,
+      "message": "Hmm. Well, it is consistent with `flash` and it makes life slightly easier.\n\nI guess the questions is \"How else would you specifically `debug` in an open source project?\". Print statements are great (I\u0027m more of a `console` command kind of person), but debug implies single-step debugging.\n\nThe only thing that I thought would receive push-back on ... is the idea that debug doesn\u0027t automatically flash, halt, and then connect debugger.\nSince that is the normal flow for the embedded IDEs I have used (CodeComposer Studio, Eclipse w/embedded, ...)\nYou normally need to go out of your way to attach without loading the program.",
+      "parentUuid": "d80ba5f1_a62fbaa2",
+      "range": {
+        "startLine": 701,
+        "startChar": 10,
+        "endLine": 701,
+        "endChar": 15
+      },
+      "revId": "c4ef7ef15afd8bec42b9366a2b9818fb357bea3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
