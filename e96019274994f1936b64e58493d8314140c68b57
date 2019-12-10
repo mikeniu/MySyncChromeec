@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "82e5589f_7793059a",
+        "filename": "board/jacuzzi/board.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1113904
+      },
+      "writtenOn": "2019-12-10T20:59:08Z",
+      "side": 1,
+      "message": "hmm, this might have been a rebase error",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 26
+      },
+      "revId": "e96019274994f1936b64e58493d8314140c68b57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fd5f9e58_fb744e6b",
+        "filename": "board/jacuzzi/board.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1113904
+      },
+      "writtenOn": "2019-12-10T20:59:08Z",
+      "side": 1,
+      "message": "Consider increasing this with the appropriate ifdef checks. It\u0027s pretty important for the keyboard to be able to go faster.",
+      "range": {
+        "startLine": 73,
+        "startChar": 14,
+        "endLine": 73,
+        "endChar": 17
+      },
+      "revId": "e96019274994f1936b64e58493d8314140c68b57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5ba5c4d3_0833ef10",
+        "filename": "board/jacuzzi/board.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1113904
+      },
+      "writtenOn": "2019-12-10T20:59:08Z",
+      "side": 1,
+      "message": "Can\u0027t this just be done using BOARD_ ifdefs?\n\nIf BOARD_JACUZZI then board_get_version() always returns 0\nIf BOARD_JUNIPER then board_get_version() always returns 1 or more\n\nThen you can just get rid of this whole function, probably even the one above. and just ifdef them directly in the h file at compile time (you won\u0027t even need the runtime i2c speed setting cl then)\n\nAm I wrong here?",
+      "range": {
+        "startLine": 327,
+        "startChar": 0,
+        "endLine": 327,
+        "endChar": 41
+      },
+      "revId": "e96019274994f1936b64e58493d8314140c68b57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f0e86a88_b1b4d45a",
+        "filename": "board/jacuzzi/ec.tasklist",
+        "patchSetId": 7
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1113904
+      },
+      "writtenOn": "2019-12-10T20:59:08Z",
+      "side": 1,
+      "message": "Is this related to the CL? If so can you add a comment in the commit message why.",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 66
+      },
+      "revId": "e96019274994f1936b64e58493d8314140c68b57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6549516e_7de9595e",
+        "filename": "board/kodama/board.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1113904
+      },
+      "writtenOn": "2019-12-10T20:59:08Z",
+      "side": 1,
+      "message": "Are the i2c slaves on the first board ok with the higher speed?",
+      "range": {
+        "startLine": 66,
+        "startChar": 14,
+        "endLine": 66,
+        "endChar": 17
+      },
+      "revId": "e96019274994f1936b64e58493d8314140c68b57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "73c845bc_fd885101",
+        "filename": "board/kodama/ec.tasklist",
+        "patchSetId": 7
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1113904
+      },
+      "writtenOn": "2019-12-10T20:59:08Z",
+      "side": 1,
+      "message": "Is this related?",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 61
+      },
+      "revId": "e96019274994f1936b64e58493d8314140c68b57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
