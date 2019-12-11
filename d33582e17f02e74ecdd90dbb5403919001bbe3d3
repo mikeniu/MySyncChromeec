@@ -16,6 +16,24 @@
       "revId": "d33582e17f02e74ecdd90dbb5403919001bbe3d3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "25333c3e_ad90839c",
+        "filename": "board/kodama/gpio.inc",
+        "patchSetId": 7
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2019-12-11T09:25:41Z",
+      "side": 0,
+      "message": "Comment removed by: Anthony Polito",
+      "parentUuid": "137711c8_22a491d4",
+      "revId": "d33582e17f02e74ecdd90dbb5403919001bbe3d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
