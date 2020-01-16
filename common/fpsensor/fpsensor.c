@@ -53,6 +53,8 @@ static uint32_t overall_time_us;
 static timestamp_t overall_t0;
 static uint8_t timestamps_invalid;
 
+#define HAVE_FP_PRIVATE_DRIVER
+
 BUILD_ASSERT(sizeof(struct ec_fp_template_encryption_metadata) % 4 == 0);
 
 /* Interrupt line from the fingerprint sensor */

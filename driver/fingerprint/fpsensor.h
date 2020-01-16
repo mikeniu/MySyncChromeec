@@ -11,10 +11,10 @@
 #include "fpc/fpc_sensor.h"
 #else
 /* These values are used by the host (emulator) tests. */
-#define FP_SENSOR_IMAGE_SIZE 0
-#define FP_SENSOR_RES_X 0
-#define FP_SENSOR_RES_Y 0
-#define FP_ALGORITHM_TEMPLATE_SIZE 0
+#define FP_SENSOR_IMAGE_SIZE (56*56)
+#define FP_SENSOR_RES_X 56
+#define FP_SENSOR_RES_Y 56
+#define FP_ALGORITHM_TEMPLATE_SIZE 40960
 #define FP_MAX_FINGER_COUNT 5
 #endif
 
