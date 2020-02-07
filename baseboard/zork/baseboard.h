@@ -119,7 +119,10 @@
 #define CONFIG_USB_SM_FRAMEWORK
 #define CONFIG_USB_TYPEC_SM
 #define CONFIG_USB_TYPEC_DRP_ACC_TRYSRC
+#if 0
+ /* TODO(b/146393213): Enable Fast Role Swap */
 #define CONFIG_USB_TYPEC_PD_FAST_ROLE_SWAP
+#endif
 #endif
 
 #define CONFIG_CMD_PD_CONTROL
