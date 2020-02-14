@@ -138,6 +138,8 @@
 #if 0
 #define CONFIG_USB_PD_TCPMV2
 #define CONFIG_USB_DRP_ACC_TRYSRC
+#define CONFIG_USB_TYPEC_PD_FAST_ROLE_SWAP
+#define CONFIG_USB_TYPEC_PD_FAST_ROLE_SWAP_PPC
 #else
 /*
  * PD 3.0 is always enabled by the TCPMv2 stack, so it's only explicitly
