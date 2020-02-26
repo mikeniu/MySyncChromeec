@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "835239f5_09da024f",
+        "filename": "baseboard/zork/baseboard.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1346479
+      },
+      "writtenOn": "2020-02-26T14:28:30Z",
+      "side": 1,
+      "message": "IS_ENABLED?",
+      "revId": "6b9bec306dc8eea9199376444518b3bb92f6d5eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}

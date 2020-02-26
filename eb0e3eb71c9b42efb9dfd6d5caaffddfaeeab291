@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "980eb84a_890f9c1b",
+        "filename": "board/dalboz/board.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1346479
+      },
+      "writtenOn": "2020-02-26T14:28:30Z",
+      "side": 0,
+      "message": "GPIOs?",
+      "range": {
+        "startLine": 153,
+        "startChar": 1,
+        "endLine": 157,
+        "endChar": 3
+      },
+      "revId": "eb0e3eb71c9b42efb9dfd6d5caaffddfaeeab291",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a3551b81_cf71249f",
+        "filename": "board/dalboz/board.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1346479
+      },
+      "writtenOn": "2020-02-26T14:28:30Z",
+      "side": 0,
+      "message": "GPIOs?",
+      "range": {
+        "startLine": 162,
+        "startChar": 0,
+        "endLine": 169,
+        "endChar": 55
+      },
+      "revId": "eb0e3eb71c9b42efb9dfd6d5caaffddfaeeab291",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4857dcfa_7c125669",
+        "filename": "board/dalboz/board.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1346479
+      },
+      "writtenOn": "2020-02-26T14:28:30Z",
+      "side": 0,
+      "message": "is this in the right CL?  Does not look like it has anything to do with adjusting GPIOs",
+      "range": {
+        "startLine": 74,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 12
+      },
+      "revId": "eb0e3eb71c9b42efb9dfd6d5caaffddfaeeab291",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
