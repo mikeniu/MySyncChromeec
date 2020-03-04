@@ -160,7 +160,7 @@ SCRIPT_ROOT="${CROS_WORKON_SRCROOT}/src/scripts"
 TMPD="$(mktemp -d /tmp/${ME}.XXXXX)"
 trap "/bin/rm -rf ${TMPD}" SIGINT SIGTERM EXIT
 
-EC_ROOT="${CROS_WORKON_SRCROOT}/src/platform/ec"
+EC_ROOT="$(readlink -f "$(dirname $0)/../..")"
 RESULT_FILE="${TMPD}/release.bin"
 dest_dir=
 IMAGE_SIZE='524288'
