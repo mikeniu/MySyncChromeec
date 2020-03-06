@@ -139,12 +139,6 @@ cmd_emmc_bootblock = $(out)/util/gen_emmc_transfer_data \
 cmd_ipi_table = $(out)/util/gen_ipi_table $@
 cmd_cp_script = cp "$<" "$@" && chmod +x "$@"
 
-cmd_libcryptoc_make = $(MAKE) --no-print-directory -C $(CRYPTOCLIB) \
-	obj=$(realpath $(out))/cryptoc \
-	SUPPORT_UNALIGNED=1 \
-	CONFIG_UPTO_SHA512=$(CONFIG_UPTO_SHA512)
-cmd_libcryptoc = $(cmd_libcryptoc_make) -q || $(cmd_libcryptoc_make)
-
 # commands for RSA signature: rwsig does not need to sign the whole image
 # (it signs the RW part separately). usbpd1 type needs to sign the final image.
 ifeq ($(CONFIG_RWSIG_TYPE_RWSIG),)
@@ -850,6 +844,9 @@ build_cros_ec_commands: build/kernel/include/linux/mfd/cros_ec_commands.h
 
 build/kernel/include/linux/mfd/cros_ec_commands.h: include/ec_commands.h
 	util/make_linux_ec_commands_h.sh $< $@
+
+# Pull in special rules/targets for third_party software
+-include third_party/rules.mk
 
 .SECONDARY:
 
