@@ -1887,19 +1887,11 @@ static void tc_attached_snk_entry(const int port)
 static void tc_attached_snk_run(const int port)
 {
 #ifdef CONFIG_USB_PE_SM
-	/*
-	 * On device power ON, when charging from a Dock that has DP, enter any
-	 * alt modes by briefly transitioning the Unattached.SNK state. This has
-	 * no impact when charging from a regular charger.
-	 *
-	 * TODO(b/149662829): Implement a better solution for re-entering
-	 * alt modes after a reboot.
-	 */
+	/* On device power ON, enter any available alt modes after a reboot. */
 	if (TC_CHK_FLAG(port, TC_FLAGS_POWER_STATE_CHANGE) &&
 				chipset_in_state(CHIPSET_STATE_ON)) {
 		TC_CLR_FLAG(port, TC_FLAGS_POWER_STATE_CHANGE);
-		set_state_tc(port, TC_UNATTACHED_SNK);
-		return;
+		pe_dpm_request(port, DPM_REQUEST_PORT_DISCOVERY);
 	}
 
 	/*

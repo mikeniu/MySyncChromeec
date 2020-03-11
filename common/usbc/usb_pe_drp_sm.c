@@ -889,6 +889,20 @@ static bool common_src_snk_dpm_requests(int port)
 					DPM_REQUEST_SOFT_RESET_SEND);
 		set_state_pe(port, PE_SEND_SOFT_RESET);
 		return true;
+	} else if (PE_CHK_DPM_REQUEST(port,
+					DPM_REQUEST_PORT_DISCOVERY)) {
+		PE_CLR_DPM_REQUEST(port,
+					DPM_REQUEST_PORT_DISCOVERY);
+		PE_CLR_FLAG(port, PE_FLAGS_DISCOVER_PORT_IDENTITY_DONE);
+		/*
+		 * Clear counters and reset timer to trigger a
+		 * port discovery.
+		 */
+		pe[port].dr_swap_attempt_counter = 0;
+		pe[port].discover_port_identity_counter = 0;
+		pe[port].discover_port_identity_timer = get_time().val +
+						PD_T_PORT_DISCOVERY_DELAY;
+		return true;
 	}
 
 	return false;
