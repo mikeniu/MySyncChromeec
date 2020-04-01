@@ -11,14 +11,14 @@
 #include "usb_mux.h"
 #include "util.h"
 
-static inline int ps874x_read(const struct usb_mux *me,
+int ps874x_read(const struct usb_mux *me,
 			      uint8_t reg, int *val)
 {
 	return i2c_read8(me->i2c_port, me->i2c_addr_flags,
 			 reg, val);
 }
 
-static inline int ps874x_write(const struct usb_mux *me,
+int ps874x_write(const struct usb_mux *me,
 			       uint8_t reg, uint8_t val)
 {
 	return i2c_write8(me->i2c_port, me->i2c_addr_flags,
@@ -84,7 +84,12 @@ static int ps874x_init(const struct usb_mux *me)
 /* Writes control register to set switch mode */
 static int ps874x_set_mux(const struct usb_mux *me, mux_state_t mux_state)
 {
-	uint8_t reg = 0;
+	int reg;
+	int res;
+
+	res = ps874x_read(me, PS874X_REG_MODE, &reg);
+	if (res)
+		return res;
 
 	if (mux_state & USB_PD_MUX_USB_ENABLED)
 		reg |= PS874X_MODE_USB_ENABLED;

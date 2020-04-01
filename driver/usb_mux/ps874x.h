@@ -111,5 +111,9 @@
 #endif
 
 int ps874x_tune_usb_eq(int i2c_addr, uint8_t tx, uint8_t rx);
+int ps874x_write(const struct usb_mux *me,
+			       uint8_t reg, uint8_t val);
+int ps874x_read(const struct usb_mux *me,
+			      uint8_t reg, int *val);
 
 #endif /* __CROS_EC_PS874X_H */

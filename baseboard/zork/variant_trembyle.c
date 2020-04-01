@@ -12,6 +12,7 @@
 #include "driver/retimer/tusb544.h"
 #include "driver/tcpm/nct38xx.h"
 #include "driver/usb_mux/amd_fp5.h"
+#include "driver/usb_mux/ps874x.h"
 #include "fan.h"
 #include "fan_chip.h"
 #include "gpio.h"
@@ -272,6 +273,69 @@ static int board_ps8818_mux_set(const struct usb_mux *me,
 	return rv;
 }
 
+/*
+ * TUSB544 set mux board tuning.
+ * Adds in board specific gain and DP lane count configuration
+ */
+static int board_tusb544_mux_set(const struct usb_mux *me,
+				mux_state_t mux_state)
+{
+	int rv = EC_SUCCESS;
+
+	/* USB specific config */
+	if (mux_state & USB_PD_MUX_USB_ENABLED) {
+		/* Boost the USB gain if needed*/
+	}
+
+	/* DP specific config */
+	if (mux_state & USB_PD_MUX_DP_ENABLED) {
+		/* Boost the DP gain if needed*/
+
+		/* Enable IN_HPD on the DB */
+		ioex_set_level(IOEX_USB_C1_HPD_IN_DB, 1);
+	} else {
+		/* Disable IN_HPD on the DB */
+		ioex_set_level(IOEX_USB_C1_HPD_IN_DB, 0);
+	}
+
+	return rv;
+}
+
+/*
+ * PS8743 set mux board tuning.
+ * Adds in board specific gain and DP lane count configuration
+ */
+static int board_ps8743_mux_set(const struct usb_mux *me,
+				mux_state_t mux_state)
+{
+	int rv = EC_SUCCESS;
+	int reg = 0;
+
+	rv = ps874x_read(me, PS874X_REG_MODE, &reg);
+	if (rv)
+		return rv;
+
+	/* USB specific config */
+	if (mux_state & USB_PD_MUX_USB_ENABLED) {
+		/* Boost the USB gain if needed*/
+		reg |= PS874X_MODE_FLIP_PIN_ENABLED;
+	}
+
+	/* DP specific config */
+	if (mux_state & USB_PD_MUX_DP_ENABLED) {
+		/* Boost the DP gain if needed*/
+		reg |= PS874X_MODE_CE_DP_ENABLED;
+
+		/* Enable IN_HPD on the DB */
+		ioex_set_level(IOEX_USB_C1_HPD_IN_DB, 1);
+	} else {
+		/* Disable IN_HPD on the DB */
+		ioex_set_level(IOEX_USB_C1_HPD_IN_DB, 0);
+	}
+
+	return ps874x_write(me, PS874X_REG_MODE, reg);
+}
+
 const struct pi3dpx1207_usb_control pi3dpx1207_controls[] = {
 	[USBC_PORT_C0] = {
 #ifdef VARIANT_ZORK_TREMBYLE
@@ -310,12 +374,14 @@ const struct usb_mux usbc1_tusb544 = {
 	.i2c_port = I2C_PORT_TCPC1,
 	.i2c_addr_flags = TUSB544_I2C_ADDR_FLAGS0,
 	.driver = &tusb544_drv,
+	.board_set = &board_tusb544_mux_set,
 };
 const struct usb_mux usbc1_ps8743 = {
 	.usb_port = USBC_PORT_C1,
 	.i2c_port = I2C_PORT_TCPC1,
 	.i2c_addr_flags = PS8743_I2C_ADDR_FLAGS,
 	.driver = &ps874x_usb_mux_driver,
+	.board_set = &board_ps8743_mux_set,
 };
 struct usb_mux usbc1_amd_fp5_usb_mux = {
 	.usb_port = USBC_PORT_C1,
