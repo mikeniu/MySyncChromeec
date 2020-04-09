@@ -156,7 +156,6 @@
 
 /* 2 I2C master ports, connect to battery, charger, pd and USB switches */
 #define I2C_PORT_MASTER  0
-#define I2C_PORT_ACCEL   0
 #define I2C_PORT_BATTERY 0
 #define I2C_PORT_CHARGER 0
 #define I2C_PORT_PERICOM 0

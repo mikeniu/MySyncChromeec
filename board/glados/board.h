@@ -16,6 +16,7 @@
 
 /* Optional features */
 #define CONFIG_ACCELGYRO_BMI160
+#define CONFIG_BMI_I2C
 #define CONFIG_ACCEL_KX022
 #define CONFIG_ADC
 #define CONFIG_ALS_OPT3001

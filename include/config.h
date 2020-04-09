@@ -173,6 +173,12 @@
 /* Support the orientation gesture */
 #undef CONFIG_GESTURE_ORIENTATION
 
+/* When set, it indicates the BMI driver uses I2C for read/write */
+#undef CONFIG_BMI_I2C
+
+/* When set, it indicates the BMI driver uses SPI for read/write */
+#undef CONFIG_BMI_SPI
+
 /*
  * Use the old standard reference frame for accelerometers. The old
  * reference frame is:
@@ -5125,6 +5131,12 @@
 /*
  * Sanity checks to make sure some of the configs above make sense.
  */
+
+#if (defined(CONFIG_ACCELGYRO_BMI160) || defined(CONFIG_ACCELGYRO_BMI260)) && \
+	!(defined(CONFIG_BMI_I2C) || defined(CONFIG_BMI_SPI))
+#error "Either CONFIG_BMI_I2C or CONFIG_BMI_SPI should be set if" \
+	"CONFIG_ACCELGYRO_BMI160 or CONFIG_ACCELGYRO_BMI260 is set"
+#endif
 
 #if (CONFIG_AUX_TIMER_PERIOD_MS) < ((HOOK_TICK_INTERVAL_MS) * 2)
 #error "CONFIG_AUX_TIMER_PERIOD_MS must be at least 2x HOOK_TICK_INTERVAL_MS"

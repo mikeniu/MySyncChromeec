@@ -140,7 +140,7 @@ int bmi_get_engineering_val(const int reg_val,
 	return pairs[i].val;
 }
 
-#ifdef CONFIG_SPI_ACCEL_PORT
+#ifdef CONFIG_BMI_SPI
 int bmi_spi_raw_read(const int addr, const uint8_t reg,
 		     uint8_t *data, const int len)
 {
@@ -158,21 +158,17 @@ int bmi_read8(const int port, const uint16_t i2c_spi_addr_flags,
 {
 	int rv = -EC_ERROR_PARAM1;
 
-	if (SLAVE_IS_SPI(i2c_spi_addr_flags)) {
-#ifdef CONFIG_SPI_ACCEL_PORT
-		uint8_t val;
+#ifdef CONFIG_BMI_SPI
+	uint8_t val;
 
-		rv = bmi_spi_raw_read(SLAVE_GET_SPI_ADDR(i2c_spi_addr_flags),
-				  reg, &val, 1);
-		if (rv == EC_SUCCESS)
-			*data_ptr = val;
+	rv = bmi_spi_raw_read(SLAVE_GET_SPI_ADDR(i2c_spi_addr_flags),
+			  reg, &val, 1);
+	if (rv == EC_SUCCESS)
+		*data_ptr = val;
+#else
+	rv = i2c_read8(port, i2c_spi_addr_flags,
+		       reg, data_ptr);
 #endif
-	} else {
-#ifdef I2C_PORT_ACCEL
-		rv = i2c_read8(port, i2c_spi_addr_flags,
-			       reg, data_ptr);
-#endif
-	}
 	return rv;
 }
 
@@ -184,20 +180,16 @@ int bmi_write8(const int port, const uint16_t i2c_spi_addr_flags,
 {
 	int rv = -EC_ERROR_PARAM1;
 
-	if (SLAVE_IS_SPI(i2c_spi_addr_flags)) {
-#ifdef CONFIG_SPI_ACCEL_PORT
-		uint8_t cmd[2] = { reg, data };
+#ifdef CONFIG_BMI_SPI
+	uint8_t cmd[2] = { reg, data };
 
-		rv = spi_transaction(
-			&spi_devices[SLAVE_GET_SPI_ADDR(i2c_spi_addr_flags)],
-			cmd, 2, NULL, 0);
+	rv = spi_transaction(
+		&spi_devices[SLAVE_GET_SPI_ADDR(i2c_spi_addr_flags)],
+		cmd, 2, NULL, 0);
+#else
+	rv = i2c_write8(port, i2c_spi_addr_flags,
+			reg, data);
 #endif
-	} else {
-#ifdef I2C_PORT_ACCEL
-		rv = i2c_write8(port, i2c_spi_addr_flags,
-				reg, data);
-#endif
-	}
 	/*
 	 * From Bosch:  BMI needs a delay of 450us after each write if it
 	 * is in suspend mode, otherwise the operation may be ignored by
@@ -216,17 +208,13 @@ int bmi_read16(const int port, const uint16_t i2c_spi_addr_flags,
 {
 	int rv = -EC_ERROR_PARAM1;
 
-	if (SLAVE_IS_SPI(i2c_spi_addr_flags)) {
-#ifdef CONFIG_SPI_ACCEL_PORT
-		rv = bmi_spi_raw_read(SLAVE_GET_SPI_ADDR(i2c_spi_addr_flags),
-				      reg, (uint8_t *)data_ptr, 2);
+#ifdef CONFIG_BMI_SPI
+	rv = bmi_spi_raw_read(SLAVE_GET_SPI_ADDR(i2c_spi_addr_flags),
+			      reg, (uint8_t *)data_ptr, 2);
+#else
+	rv = i2c_read16(port, i2c_spi_addr_flags,
+			reg, data_ptr);
 #endif
-	} else {
-#ifdef I2C_PORT_ACCEL
-		rv = i2c_read16(port, i2c_spi_addr_flags,
-				reg, data_ptr);
-#endif
-	}
 	return rv;
 }
 
@@ -238,16 +226,12 @@ int bmi_write16(const int port, const uint16_t i2c_spi_addr_flags,
 {
 	int rv = -EC_ERROR_PARAM1;
 
-	if (SLAVE_IS_SPI(i2c_spi_addr_flags)) {
-#ifdef CONFIG_SPI_ACCEL_PORT
-		CPRINTS("%s() spi part is not implemented", __func__);
+#ifdef CONFIG_BMI_SPI
+	CPRINTS("%s() spi part is not implemented", __func__);
+#else
+	rv = i2c_write16(port, i2c_spi_addr_flags,
+			 reg, data);
 #endif
-	} else {
-#ifdef I2C_PORT_ACCEL
-		rv = i2c_write16(port, i2c_spi_addr_flags,
-				 reg, data);
-#endif
-	}
 	/*
 	 * From Bosch:  BMI needs a delay of 450us after each write if it
 	 * is in suspend mode, otherwise the operation may be ignored by
@@ -266,17 +250,13 @@ int bmi_read32(const int port, const uint16_t i2c_spi_addr_flags,
 {
 	int rv = -EC_ERROR_PARAM1;
 
-	if (SLAVE_IS_SPI(i2c_spi_addr_flags)) {
-#ifdef CONFIG_SPI_ACCEL_PORT
-		rv = bmi_spi_raw_read(SLAVE_GET_SPI_ADDR(i2c_spi_addr_flags),
-				  reg, (uint8_t *)data_ptr, 4);
+#ifdef CONFIG_BMI_SPI
+	rv = bmi_spi_raw_read(SLAVE_GET_SPI_ADDR(i2c_spi_addr_flags),
+			  reg, (uint8_t *)data_ptr, 4);
+#else
+	rv = i2c_read32(port, i2c_spi_addr_flags,
+			reg, data_ptr);
 #endif
-	} else {
-#ifdef I2C_PORT_ACCEL
-		rv = i2c_read32(port, i2c_spi_addr_flags,
-				reg, data_ptr);
-#endif
-	}
 	return rv;
 }
 
@@ -288,17 +268,13 @@ int bmi_read_n(const int port, const uint16_t i2c_spi_addr_flags,
 {
 	int rv = -EC_ERROR_PARAM1;
 
-	if (SLAVE_IS_SPI(i2c_spi_addr_flags)) {
-#ifdef CONFIG_SPI_ACCEL_PORT
-		rv = bmi_spi_raw_read(SLAVE_GET_SPI_ADDR(i2c_spi_addr_flags),
-				  reg, data_ptr, len);
+#ifdef CONFIG_BMI_SPI
+	rv = bmi_spi_raw_read(SLAVE_GET_SPI_ADDR(i2c_spi_addr_flags),
+			  reg, data_ptr, len);
+#else
+	rv = i2c_read_block(port, i2c_spi_addr_flags,
+			    reg, data_ptr, len);
 #endif
-	} else {
-#ifdef I2C_PORT_ACCEL
-		rv = i2c_read_block(port, i2c_spi_addr_flags,
-				    reg, data_ptr, len);
-#endif
-	}
 	return rv;
 }
 
@@ -310,16 +286,12 @@ int bmi_write_n(const int port, const uint16_t i2c_spi_addr_flags,
 {
 	int rv = -EC_ERROR_PARAM1;
 
-	if (SLAVE_IS_SPI(i2c_spi_addr_flags)) {
-#ifdef CONFIG_SPI_ACCEL_PORT
-		CPRINTS("%s() spi part is not implemented", __func__);
+#ifdef CONFIG_BMI_SPI
+	CPRINTS("%s() spi part is not implemented", __func__);
+#else
+	rv = i2c_write_block(port, i2c_spi_addr_flags,
+			     reg, data_ptr, len);
 #endif
-	} else {
-#ifdef I2C_PORT_ACCEL
-		rv = i2c_write_block(port, i2c_spi_addr_flags,
-				     reg, data_ptr, len);
-#endif
-	}
 	/*
 	 * From Bosch:  BMI needs a delay of 450us after each write if it
 	 * is in suspend mode, otherwise the operation may be ignored by
