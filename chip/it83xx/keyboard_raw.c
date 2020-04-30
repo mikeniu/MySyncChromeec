@@ -10,11 +10,15 @@
 #include "task.h"
 #include "irq_chip.h"
 
+#define KSOH_PIN_MASK (((1 << (KEYBOARD_COLS_MAX - 8)) - 1) & 0xff)
+
 /*
  * Initialize the raw keyboard interface.
  */
 void keyboard_raw_init(void)
 {
+	uint32_t int_mask;
+
 	/* Ensure top-level interrupt is disabled */
 	keyboard_raw_enable_interrupt(0);
 
@@ -37,8 +41,17 @@ void keyboard_raw_init(void)
 	IT83XX_KBS_KSOL = 0x00;
 #endif
 
-	/* KSO[15:8] pins low. */
-	IT83XX_KBS_KSOH1 = 0x00;
+	if (IS_ENABLED(CONFIG_KSI_KSO_AS_GPIO)) {
+		int_mask = get_int_mask();
+		/* critical section with interrupts off */
+		interrupt_disable();
+		/* KSO[COLS_MAX:8] pins low. */
+		IT83XX_KBS_KSOH1 &= ~KSOH_PIN_MASK;
+		/* restore interrupts */
+		set_int_mask(int_mask);
+	} else
+		/* KSO[15:8] pins low. */
+		IT83XX_KBS_KSOH1 = 0x00;
 
 	/* KSI[0-7] falling-edge triggered is selected */
 	IT83XX_WUC_WUEMR3 = 0xFF;
@@ -68,6 +81,7 @@ void keyboard_raw_task_start(void)
 test_mockable void keyboard_raw_drive_column(int col)
 {
 	int mask;
+	uint32_t int_mask;
 
 	/* Tri-state all outputs */
 	if (col == KEYBOARD_COLUMN_NONE)
@@ -84,7 +98,23 @@ test_mockable void keyboard_raw_drive_column(int col)
 	mask ^= BIT(2);
 #endif
 	IT83XX_KBS_KSOL = mask & 0xff;
-	IT83XX_KBS_KSOH1 = (mask >> 8) & 0xff;
+
+	if (IS_ENABLED(CONFIG_KSI_KSO_AS_GPIO)) {
+		int_mask = get_int_mask();
+		/* critical section with interrupts off */
+		interrupt_disable();
+		/*
+		 * Because IT83XX_KBS_KSOH1 register is shared by keyboard scan
+		 * out and GPIO output mode, so we don't drive all KSOH pins
+		 * here (this depends on how many keyboard matrix output pin
+		 * we are using).
+		 */
+		IT83XX_KBS_KSOH1 = (IT83XX_KBS_KSOH1 & ~KSOH_PIN_MASK) |
+			((mask >> 8) & KSOH_PIN_MASK);
+		/* restore interrupts */
+		set_int_mask(int_mask);
+	} else
+		IT83XX_KBS_KSOH1 = (mask >> 8) & 0xff;
 }
 
 /*

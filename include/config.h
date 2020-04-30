@@ -2473,6 +2473,12 @@
 #undef CONFIG_KEYBOARD_KEYPAD
 
 /*
+ * For the case that GPIO pins are not enough, we can use KSI/KSO pins as GPIO
+ * mode.
+ */
+#undef CONFIG_KSI_KSO_AS_GPIO
+
+/*
  * Enable the 8042 AUX port. This is typically used for PS/2 mouse devices.
  * You will need to implement send_aux_data_to_device and lpc_aux_put_char.
  */
