@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "217f6729_45dc073b",
+        "filename": "driver/tcpm/tcpci.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1346479
+      },
+      "writtenOn": "2020-05-18T21:17:55Z",
+      "side": 1,
+      "message": "I believe the optimizer would remove if no one is using them, but will revert all #ifdef clean up and will just add the one change to set the cached value ahead of the \"if (enable)\"",
+      "parentUuid": "35e2858e_375451fa",
+      "revId": "cdab22a3f884ddb75cdbf73892a86cb272c23c09",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "41afe3f7_40cdee36",
         "filename": "driver/tcpm/tcpci.c",
         "patchSetId": 2
@@ -85,6 +103,30 @@
       "revId": "cdab22a3f884ddb75cdbf73892a86cb272c23c09",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c7dbc582_b8e3342d",
+        "filename": "driver/tcpm/tcpci.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 626,
+      "author": {
+        "id": 1346479
+      },
+      "writtenOn": "2020-05-18T21:17:55Z",
+      "side": 1,
+      "message": "I think this would change the meaning of the code.  detect_sop_en is 0 if we are disabling.  If we are enabling then !vconn_en[port] or !IS_ENABLED will set detect_sop_en to SOP_HRST mask, otherwise it is set to SOP_SOPP_SOPPP_HRST mask.\n\nRemoving the #ifdef clean up and just adding the one change that is needed.",
+      "parentUuid": "fd1efb71_80fdb873",
+      "range": {
+        "startLine": 625,
+        "startChar": 0,
+        "endLine": 626,
+        "endChar": 20
+      },
+      "revId": "cdab22a3f884ddb75cdbf73892a86cb272c23c09",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
