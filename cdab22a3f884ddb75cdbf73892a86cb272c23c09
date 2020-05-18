@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "35e2858e_375451fa",
+        "filename": "driver/tcpm/tcpci.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1287197
+      },
+      "writtenOn": "2020-05-18T20:16:07Z",
+      "side": 1,
+      "message": "I could go either way on whether we only define these when decoding SOP\u0027.  I\u0027m not a fan of ifdef\u0027s generally, but it sounds like we\u0027re trying to free up all the code space we can for older boards moving to TCPMv2",
+      "revId": "cdab22a3f884ddb75cdbf73892a86cb272c23c09",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "41afe3f7_40cdee36",
         "filename": "driver/tcpm/tcpci.c",
         "patchSetId": 2
@@ -45,6 +62,29 @@
       "revId": "cdab22a3f884ddb75cdbf73892a86cb272c23c09",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fd1efb71_80fdb873",
+        "filename": "driver/tcpm/tcpci.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 626,
+      "author": {
+        "id": 1287197
+      },
+      "writtenOn": "2020-05-18T20:16:07Z",
+      "side": 1,
+      "message": "Might be less awkward to fold this \"if (enable)\" into the above IS_ENABLED?",
+      "range": {
+        "startLine": 625,
+        "startChar": 0,
+        "endLine": 626,
+        "endChar": 20
+      },
+      "revId": "cdab22a3f884ddb75cdbf73892a86cb272c23c09",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
