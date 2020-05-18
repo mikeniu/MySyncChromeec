@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "41afe3f7_40cdee36",
+        "filename": "driver/tcpm/tcpci.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 582,
+      "author": {
+        "id": 1346479
+      },
+      "writtenOn": "2020-05-18T19:13:13Z",
+      "side": 1,
+      "message": "this is the same, without the #ifdef.  Since I was changing the code that was very similar below I changed this one to follow IS_ENABLED as well.",
+      "range": {
+        "startLine": 570,
+        "startChar": 0,
+        "endLine": 582,
+        "endChar": 2
+      },
+      "revId": "cdab22a3f884ddb75cdbf73892a86cb272c23c09",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9dad6876_0841a218",
+        "filename": "driver/tcpm/tcpci.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 618,
+      "author": {
+        "id": 1346479
+      },
+      "writtenOn": "2020-05-18T19:13:13Z",
+      "side": 1,
+      "message": "This is the actual fix. The cached version has to be saved on disable as well as enable.",
+      "range": {
+        "startLine": 616,
+        "startChar": 0,
+        "endLine": 618,
+        "endChar": 23
+      },
+      "revId": "cdab22a3f884ddb75cdbf73892a86cb272c23c09",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    }
+  ]
+}
