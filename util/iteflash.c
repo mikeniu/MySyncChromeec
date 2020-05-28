@@ -688,6 +688,27 @@ static int dbgr_reset(struct common_hnd *chnd, unsigned char val)
 	return 0;
 }
 
+/* DBGR reset GPIO module to default */
+static int dbgr_reset_gpio(struct common_hnd *chnd)
+{
+#if 0
+	int ret = 0;
+
+	printf("Reset GPIO to default...\n");
+	if (chnd->dbgr_addr_3bytes)
+		ret |= i2c_write_byte(chnd, 0x80, 0xf0);
+
+	ret |= i2c_write_byte(chnd, 0x2f, 0x20);
+	ret |= i2c_write_byte(chnd, 0x2e, 0x07);
+	ret |= i2c_write_byte(chnd, 0x30, BIT(1));
+
+	if (ret < 0)
+		fprintf(stderr, "DBGR RESET GPIO FAILED\n");
+#endif
+	return 0;
+}
+
+
 /* disable watchdog */
 static int dbgr_disable_watchdog(struct common_hnd *chnd)
 {
@@ -2231,6 +2252,24 @@ static void register_sigaction(void)
 	sigaction(SIGQUIT, &sigact, NULL);
 }
 
+/* Disable DBGR mode through I2C. */
+static int exit_dbgr_mode(struct common_hnd *chnd)
+{
+	int ret = 0;
+
+	printf("Exit DBGR mode...\n");
+	if (chnd->dbgr_addr_3bytes)
+		ret |= i2c_write_byte(chnd, 0x80, 0xf0);
+	ret |= i2c_write_byte(chnd, 0x2f, 0x1c);
+	ret |= i2c_write_byte(chnd, 0x2e, 0x08);
+	ret |= i2c_write_byte(chnd, 0x30, BIT(4));
+
+	if (ret < 0)
+		fprintf(stderr, "EXIT DBGR MODE FAILED\n");
+
+	return 0;
+}
+
 int main(int argc, char **argv)
 {
 	int ret = 1, other_ret;
@@ -2292,6 +2331,17 @@ int main(int argc, char **argv)
 	if (ret)
 		goto return_after_init;
 
+	/*
+	 * This reset will shutdown system since GPIOs go back to default state.
+	 *
+	 * NOTE:
+	 * Most GPIOs are input mode by default, but a few pins are output mode.
+	 * (eg: GPG0 and GPG1)
+	 * Default mode of GPIOs are listed at "Def Mode" field of Table 7-10 in
+	 * EC's datasheet.
+	 */
+	dbgr_reset_gpio(&chnd);
+
 	if (chnd.conf.input_filename) {
 		ret = read_flash(&chnd);
 		if (ret)
@@ -2322,8 +2372,15 @@ int main(int argc, char **argv)
 			command_erase2(&chnd, chnd.flash_size, 0, 0);
 		else
 			command_erase(&chnd, chnd.flash_size, 0);
-		/* Call DBGR Rest to clear the EC lock status after erasing */
-		dbgr_reset(&chnd, RSTS_VCCDO_PW_ON|RSTS_HGRST|RSTS_GRST);
+		/*
+		 * Call DBGR Rest to clear the EC lock status after erasing
+		 * This reset prevents watchdog will reboot the system
+		 * during flashing. We don't need the reset if watchdog has
+		 * already been disabled.
+		 */
+		if (!(chnd.conf.disable_watchdog))
+			dbgr_reset(&chnd,
+				RSTS_VCCDO_PW_ON|RSTS_HGRST|RSTS_GRST);
 	}
 
 	if (chnd.conf.output_filename) {
@@ -2355,8 +2412,12 @@ int main(int argc, char **argv)
 	ret = 0;
 
  return_after_init:
-	/* Enable EC Host Global Reset to reset EC resource and EC domain. */
-	dbgr_reset(&chnd, RSTS_VCCDO_PW_ON|RSTS_HGRST|RSTS_GRST);
+	/*
+	 * Exit DBGR mode.
+	 * This ensures EC won't hold clock and data pins of I2C even we don't
+	 * assert a global reset via DBGR. Servo board will reset EC later.
+	 */
+	exit_dbgr_mode(&chnd);
 
 	if (chnd.conf.i2c_mux) {
 		printf("configuring I2C MUX to none.\n");
