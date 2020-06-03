@@ -62,8 +62,8 @@ void dp_reset_next_command(int port)
 
 int dp_setup_next_vdm(int port, int vdo_count, uint32_t *vdm)
 {
-	const struct svdm_amode_data *modep =
-				pd_get_amode_data(port, USB_SID_DISPLAYPORT);
+	const struct svdm_amode_data *modep = pd_get_amode_data(port,
+			TCPC_TX_SOP, USB_SID_DISPLAYPORT);
 	int vdo_count_ret;
 
 	if (vdo_count < VDO_MAX_SIZE)
@@ -72,7 +72,8 @@ int dp_setup_next_vdm(int port, int vdo_count, uint32_t *vdm)
 	switch (next_vdm_cmd[port]) {
 	case CMD_ENTER_MODE:
 		/* Enter the first supported mode for DisplayPort. */
-		vdm[0] = pd_dfp_enter_mode(port, USB_SID_DISPLAYPORT, 0);
+		vdm[0] = pd_dfp_enter_mode(port, TCPC_TX_SOP,
+				USB_SID_DISPLAYPORT, 0);
 		if (vdm[0] == 0)
 			return -1;
 		/* CMDT_INIT is 0, so this is a no-op */

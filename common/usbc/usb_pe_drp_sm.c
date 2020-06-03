@@ -1011,13 +1011,14 @@ void pd_send_vdm(int port, uint32_t vid, int cmd, const uint32_t *data,
 void pe_exit_dp_mode(int port)
 {
 	if (IS_ENABLED(CONFIG_USB_PD_ALT_MODE_DFP)) {
-		int opos = pd_alt_mode(port, USB_SID_DISPLAYPORT);
+		int opos = pd_alt_mode(port, TCPC_TX_SOP, USB_SID_DISPLAYPORT);
 
 		if (opos <= 0)
 			return;
 
 		CPRINTS("C%d Exiting DP mode", port);
-		if (!pd_dfp_exit_mode(port, USB_SID_DISPLAYPORT, opos))
+		if (!pd_dfp_exit_mode(port, TCPC_TX_SOP, USB_SID_DISPLAYPORT,
+					opos))
 			return;
 
 		pd_send_vdm(port, USB_SID_DISPLAYPORT,
@@ -1347,13 +1348,13 @@ static bool pe_attempt_port_discovery(int port)
 }
 #endif
 
-bool pd_setup_vdm_request(int port, uint32_t *vdm, uint32_t vdo_cnt)
+bool pd_setup_vdm_request(int port, enum tcpm_transmit_type tx_type,
+		uint32_t *vdm, uint32_t vdo_cnt)
 {
 	if (vdo_cnt < VDO_HDR_SIZE || vdo_cnt > VDO_MAX_SIZE)
 		return false;
 
-	/* TODO(b/155890173): Support cable plug */
-	pe[port].partner_type = PORT;
+	pe[port].tx_type = tx_type;
 	memcpy(pe[port].vdm_data, vdm, vdo_cnt * sizeof(*vdm));
 	pe[port].vdm_cnt = vdo_cnt;
 
@@ -4130,7 +4131,7 @@ static void pe_do_port_discovery_run(int port)
 #ifdef CONFIG_USB_PD_ALT_MODE_DFP
 	uint32_t *payload = (uint32_t *)rx_emsg[port].buf;
 	struct svdm_amode_data *modep =
-				pd_get_amode_data(port, PD_VDO_VID(payload[0]));
+		pd_get_amode_data(port, TCPC_TX_SOP, PD_VDO_VID(payload[0]));
 	int ret = 0;
 
 	if (!PE_CHK_FLAG(port,
@@ -4152,7 +4153,8 @@ static void pe_do_port_discovery_run(int port)
 			break;
 		case CMD_DISCOVER_MODES:
 			pe[port].vdm_cmd = CMD_ENTER_MODE;
-			pe[port].vdm_data[0] = pd_dfp_enter_mode(port, 0, 0);
+			pe[port].vdm_data[0] =
+				pd_dfp_enter_mode(port, TCPC_TX_SOP, 0, 0);
 			if (pe[port].vdm_data[0])
 				ret = 1;
 			break;
@@ -4821,8 +4823,7 @@ static void pe_vdm_request_entry(int port)
 		tx_emsg[port].len = pe[port].vdm_cnt * 4;
 	}
 
-	/* TODO(b/155890173): Support cable plug */
-	prl_send_data_msg(port, TCPC_TX_SOP, PD_DATA_VENDOR_DEF);
+	prl_send_data_msg(port, pe[port].tx_type, PD_DATA_VENDOR_DEF);
 
 	pe[port].vdm_response_timer = TIMER_DISABLED;
 }
@@ -4857,9 +4858,8 @@ static void pe_vdm_request_run(int port)
 		cnt = PD_HEADER_CNT(rx_emsg[port].header);
 		ext = PD_HEADER_EXT(rx_emsg[port].header);
 
-		if ((sop == TCPC_TX_SOP || sop == TCPC_TX_SOP_PRIME) &&
-				type == PD_DATA_VENDOR_DEF && cnt > 0 &&
-				ext == 0) {
+		if (sop == pe[port].tx_type && type == PD_DATA_VENDOR_DEF &&
+				cnt > 0 && ext == 0) {
 			if (PD_VDO_CMDT(payload[0]) == CMDT_RSP_ACK) {
 				set_state_pe(port, PE_VDM_ACKED);
 				return;
@@ -4873,9 +4873,9 @@ static void pe_vdm_request_run(int port)
 						PE_FLAGS_VDM_REQUEST_BUSY);
 			}
 		} else {
-			if ((sop == TCPC_TX_SOP || sop == TCPC_TX_SOP_PRIME) &&
-				type == PD_CTRL_NOT_SUPPORTED && cnt == 0 &&
-				ext == 0) {
+			if (sop == pe[port].tx_type &&
+					type == PD_CTRL_NOT_SUPPORTED &&
+					cnt == 0 && ext == 0) {
 				/* Do not continue port discovery */
 				PE_SET_FLAG(port,
 					PE_FLAGS_DISCOVER_PORT_IDENTITY_DONE);
@@ -4913,7 +4913,8 @@ static void pe_vdm_request_run(int port)
 		PE_SET_FLAG(port, PE_FLAGS_VDM_REQUEST_BUSY);
 	} else if (get_time().val > pe[port].vdm_response_timer) {
 		CPRINTF("C%d: VDM %s Response Timeout\n", port,
-				pe[port].partner_type ? "Cable" : "Port");
+				pe[port].tx_type == TCPC_TX_SOP
+				? "Port" : "Cable");
 
 		PE_SET_FLAG(port, PE_FLAGS_VDM_REQUEST_NAKED);
 	}
@@ -4927,6 +4928,9 @@ static void pe_vdm_request_run(int port)
 
 static void pe_vdm_request_exit(int port)
 {
+	/* Invalidate TX type so that it must be set before next call */
+	pe[port].tx_type = TCPC_TX_INVALID;
+
 	PE_CLR_FLAG(port, PE_FLAGS_INTERRUPTIBLE_AMS);
 }
 
@@ -4935,80 +4939,57 @@ static void pe_vdm_request_exit(int port)
  */
 static void pe_vdm_acked_entry(int port)
 {
-	uint32_t *payload;
-	uint8_t vdo_cmd;
 	int sop;
+	uint32_t *payload;
+	uint16_t svid;
+	uint8_t vdo_cmd;
+	struct svdm_amode_data *modep;
 
 	print_current_state(port);
 
 	/* Get the message */
-	payload = (uint32_t *)rx_emsg[port].buf;
-	vdo_cmd = PD_VDO_CMD(payload[0]);
 	sop = PD_HEADER_GET_SOP(rx_emsg[port].header);
+	payload = (uint32_t *)rx_emsg[port].buf;
+	svid = PD_VDO_VID(payload[0]);
+	vdo_cmd = PD_VDO_CMD(payload[0]);
 
-	/* TODO(b/155890173): Support cable plug */
-	if (sop == TCPC_TX_SOP) {
-		/*
-		 * Handle Message From Port Partner
-		 */
 
+	modep = pd_get_amode_data(port, sop, svid);
+
+	switch (vdo_cmd) {
 #ifdef CONFIG_USB_PD_ALT_MODE_DFP
-		int cnt = PD_HEADER_CNT(rx_emsg[port].header);
-		struct svdm_amode_data *modep;
-		const uint16_t svid = PD_VDO_VID(payload[0]);
-
-		modep = pd_get_amode_data(port, svid);
-#endif
-
-		switch (vdo_cmd) {
-#ifdef CONFIG_USB_PD_ALT_MODE_DFP
-		case CMD_DISCOVER_IDENT:
-			dfp_consume_identity(port, cnt, payload);
-#ifdef CONFIG_CHARGE_MANAGER
-			if (pd_charge_from_device(pd_get_identity_vid(port),
-						pd_get_identity_pid(port))) {
-				charge_manager_update_dualrole(port,
-								CAP_DEDICATED);
-			}
-#endif
-			break;
-		case CMD_DISCOVER_SVID:
-			dfp_consume_svids(port, TCPC_TX_SOP, cnt, payload);
-			break;
-		case CMD_DISCOVER_MODES:
-			dfp_consume_modes(port, TCPC_TX_SOP, cnt, payload);
-			break;
-		case CMD_ENTER_MODE:
-			if (svid == USB_SID_DISPLAYPORT)
-				dp_vdm_cmd_acked(port, vdo_cmd);
-			break;
-		case CMD_DP_STATUS:
-			if (svid == USB_SID_DISPLAYPORT)
-				dp_vdm_cmd_acked(port, vdo_cmd);
+	case CMD_ENTER_MODE:
+		if (sop == TCPC_TX_SOP && svid == USB_SID_DISPLAYPORT)
+			dp_vdm_cmd_acked(port, vdo_cmd);
+		break;
+	case CMD_DP_STATUS:
+		if (sop == TCPC_TX_SOP && svid == USB_SID_DISPLAYPORT) {
+			dp_vdm_cmd_acked(port, vdo_cmd);
 			/*
 			 * DP status response & UFP's DP attention have same
 			 * payload
 			 */
 			dfp_consume_attention(port, payload);
-			break;
-		case CMD_DP_CONFIG:
-			if (svid == USB_SID_DISPLAYPORT)
-				dp_vdm_cmd_acked(port, vdo_cmd);
+		}
+		break;
+	case CMD_DP_CONFIG:
+		if (sop == TCPC_TX_SOP && svid == USB_SID_DISPLAYPORT) {
+			dp_vdm_cmd_acked(port, vdo_cmd);
 			if (modep && modep->opos && modep->fx->post_config)
 				modep->fx->post_config(port);
 			PE_SET_FLAG(port, PE_FLAGS_DISCOVER_PORT_IDENTITY_DONE);
 			dpm_set_mode_entry_done(port);
-			break;
-		case CMD_EXIT_MODE:
-			/* Do nothing */
-			break;
-#endif
-		case CMD_ATTENTION:
-			/* Do nothing */
-			break;
-		default:
-			CPRINTF("ERR:CMD:%d\n", vdo_cmd);
 		}
+		break;
+	case CMD_EXIT_MODE:
+		/* Do nothing */
+		break;
+#endif
+	case CMD_ATTENTION:
+		/* Do nothing */
+		break;
+	default:
+		CPRINTF("ERR:CMD:%d\n", vdo_cmd);
 	}
 
 	if (pe[port].power_role == PD_ROLE_SOURCE) {

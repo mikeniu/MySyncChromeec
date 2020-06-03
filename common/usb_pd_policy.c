@@ -748,7 +748,8 @@ int pd_svdm(int port, int cnt, uint32_t *payload, uint32_t **rpayload,
 #ifdef CONFIG_USB_PD_ALT_MODE_DFP
 		struct svdm_amode_data *modep;
 
-		modep = pd_get_amode_data(port, PD_VDO_VID(payload[0]));
+		modep = pd_get_amode_data(port, TCPC_TX_SOP,
+				PD_VDO_VID(payload[0]));
 #endif
 		switch (cmd) {
 #ifdef CONFIG_USB_PD_ALT_MODE_DFP
@@ -863,7 +864,8 @@ int pd_svdm(int port, int cnt, uint32_t *payload, uint32_t **rpayload,
 				 * SVID.
 				 */
 				disable_tbt_compat_mode(port);
-				payload[0] = pd_dfp_enter_mode(port, 0, 0);
+				payload[0] = pd_dfp_enter_mode(port,
+						TCPC_TX_SOP, 0, 0);
 				if (payload[0])
 					rsize = 1;
 			}
@@ -881,7 +883,8 @@ int pd_svdm(int port, int cnt, uint32_t *payload, uint32_t **rpayload,
 				rsize = 0;
 			} else {
 				if (!modep->opos)
-					pd_dfp_enter_mode(port, 0, 0);
+					pd_dfp_enter_mode(port, TCPC_TX_SOP, 0,
+							0);
 
 				if (modep->opos) {
 					rsize = modep->fx->status(port,
