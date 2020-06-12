@@ -10,6 +10,7 @@
 #include "common.h"
 #include "console.h"
 #include "ec_commands.h"
+#include "extpower.h"
 #include "gpio.h"
 #include "hooks.h"
 #include "lid_switch.h"
@@ -359,6 +360,20 @@ enum power_state power_handle_state(enum power_state state)
 				total_sleep_ms += 10;
 				return POWER_G3S5;
 			}
+		}
+#endif
+
+#ifdef BOARD_KAKADU
+	/* Due to kakadu using dump battery, system will power on when plug in battery.
+	In b:156455781, we tried to use a gpio pin to check if DMIC is installed or not.
+	When first boot up, check PA5.
+	H: cutoff battery immediately (No DMIC attached)
+	L: normal boot up (DMIC attached)
+	*/
+		if (boot_from_cutoff &&
+			gpio_get_level(GPIO_BATT_CUTOFF_INDICATOR) &&
+			!extpower_is_present()) {
+			board_cut_off_battery();
 		}
 #endif
 
