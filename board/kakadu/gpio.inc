@@ -57,6 +57,7 @@ GPIO(PMIC_WATCHDOG_L,      PIN(C, 3),  GPIO_OUT_LOW)
 GPIO(PMIC_EN_ODL,          PIN(C, 10), GPIO_ODR_HIGH)
 GPIO(PMIC_FORCE_RESET_ODL, PIN(A, 2),  GPIO_ODR_HIGH)
 GPIO(MT6370_RST_L,         PIN(F, 0),  GPIO_OUT_LOW)
+GPIO(BATT_CUTOFF_INDICATOR, PIN(A, 5), GPIO_OUT_HIGH)
 
 /*
  * I2C pins should be configured as inputs until I2C module is
