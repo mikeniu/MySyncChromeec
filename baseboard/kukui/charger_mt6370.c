@@ -16,8 +16,8 @@
 #include "usb_pd.h"
 #include "util.h"
 
-#define BAT_LEVEL_PD_LIMIT 85
-#define SYSTEM_PLT_MW 3500
+#define BAT_LEVEL_PD_LIMIT 95
+#define SYSTEM_PLT_MW 10000
 /*
  * b/143318064: Prefer a voltage above 5V to force it picks a voltage
  * above 5V at first. If PREFER_MV is 5V, when desired power is around
@@ -212,11 +212,17 @@ static void battery_desired_curr_dynamic(struct charge_state_data *curr)
 		goto update_charge;
 
 	delta_current = prev_stable_current - stable_current;
+	CPRINTS("[SC] prev_stable_current=%d, stable_current=%d", prev_stable_current, stable_current);
+	CPRINTS("[SC] RSOC=%d", curr->batt.state_of_charge);
+	CPRINTS("[SC] supply_voltage=%d", supply_voltage);
+	CPRINTS("[SC] prev_supply_voltage=%d", prev_supply_voltage);
+	CPRINTS("[SC] delta_current=%d", delta_current);
 	if (curr->batt.state_of_charge >= pd_pref_config.cv &&
 	    supply_voltage == DEFAULT_PREFER_MV &&
 	    prev_supply_voltage > supply_voltage &&
 	    delta_current > STABLE_CURRENT_DELTA) {
 		/* Raise perfer voltage above 5000mV */
+		CPRINTS("[SC] Raise perfer voltage above 5000mV");
 		pd_pref_config.mv = PREVENT_CURRENT_DROP_MV;
 		/*
 		 * Delay stable current evaluation for 5 mins if we see a
@@ -226,7 +232,7 @@ static void battery_desired_curr_dynamic(struct charge_state_data *curr)
 		 */
 		charge_reset_stable_current_us(5 * MINUTE);
 		/* Rewrite the stable current to re-evalute desired watt */
-		charge_set_stable_current(prev_stable_current);
+		//charge_set_stable_current(prev_stable_current);
 
 		/*
 		 * do not alter current by thermal if we just raising PD
@@ -234,6 +240,7 @@ static void battery_desired_curr_dynamic(struct charge_state_data *curr)
 		 */
 		thermal_wait_until.val = get_time().val + (10 * SECOND);
 	} else {
+		CPRINTS("[SC] Not Raise perfer voltage above 5000mV");
 		pd_pref_config.mv = DEFAULT_PREFER_MV;
 		/*
 		 * If the power supply is plugged while battery full,

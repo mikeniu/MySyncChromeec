@@ -153,7 +153,7 @@ int pd_find_pdo_index(uint32_t src_cap_cnt, const uint32_t * const src_caps,
 
 	if (IS_ENABLED(CONFIG_USB_PD_PREFER_MV))
 		desired_uw = charge_get_plt_plus_bat_desired_mw() * 1000;
-
+	CPRINTS("[SC] desired_uw=%d", desired_uw);
 	/* max voltage is always limited by this boards max request */
 	max_mv = MIN(max_mv, PD_MAX_VOLTAGE_MV);
 
@@ -243,6 +243,7 @@ int pd_find_pdo_index(uint32_t src_cap_cnt, const uint32_t * const src_caps,
 			ret = i;
 			cur_uw = uw;
 			cur_mv = mv;
+			CPRINTS("[%d] cur_uw=%d, cur_mv=%d", ret, cur_uw, cur_mv);
 		}
 	}
 

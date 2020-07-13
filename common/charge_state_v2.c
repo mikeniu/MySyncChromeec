@@ -1715,7 +1715,11 @@ void charger_task(void *u)
 		/* battery current stable now, saves the current. */
 		if (IS_ENABLED(CONFIG_USB_PD_PREFER_MV) &&
 		    get_time().val > stable_ts.val && curr.batt.current >= 0)
-			stable_current = curr.batt.current;
+			{
+				stable_current = curr.batt.current;
+				CPRINTS("[SC] origin stable_current=%d", stable_current);
+			}
+			
 
 		/*
 		 * Now decide what we want to do about it. We'll normally just
@@ -2052,10 +2056,17 @@ wait_for_it:
 			if (!is_pd_supply)
 				desired_mw = bat_spec_desired_mw;
 			else if (curr.batt.state_of_charge < pd_pref_config.cv)
+			{
 				desired_mw = bat_spec_desired_mw;
+				CPRINTS("[SC] desired_mw00000=%d", desired_mw);
+			}
 			else if (stable_current != CHARGE_CURRENT_UNINITIALIZED)
+			{
 				desired_mw = curr.batt.voltage *
 					     stable_current / 1000;
+				CPRINTS("[SC] desired_mw11111=%d", desired_mw);
+			}
+				
 
 			/* if the plt_and_desired_mw changes, re-evaluate PDO */
 			if (is_pd_supply &&
