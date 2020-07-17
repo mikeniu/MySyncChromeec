@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "82521554_e5ff7e7d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1345639
+      },
+      "writtenOn": "2020-07-17T01:39:34Z",
+      "side": 1,
+      "message": "This is a proof of concept of how version 2 key handles will work with authorization secret. It uses a dumb encryption algorithm to show the concept. Migration from v1 (not authorization secret) to v2 is possible based on this.",
+      "revId": "4e31a97d5fbeb5fd62af4bb9468a776607150ce3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    }
+  ]
+}
