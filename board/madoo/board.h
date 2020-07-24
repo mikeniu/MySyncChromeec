@@ -151,5 +151,7 @@ enum battery_type {
 
 int board_is_sourcing_vbus(int port);
 
+#define SKU_ID_MASK_UK2		BIT(18)
+
 #endif /* !__ASSEMBLER__ */
 #endif /* __CROS_EC_BOARD_H */
