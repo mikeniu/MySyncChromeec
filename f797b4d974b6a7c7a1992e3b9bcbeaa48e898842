@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3c95bce5_371a15bc",
+        "filename": "board/morphius/board.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 1212794
+      },
+      "writtenOn": "2020-07-31T18:56:38Z",
+      "side": 1,
+      "message": "Is thermal_params still used?\nDoes it need to be set correctly to match the TEMP_SENSOR_* changes?",
+      "revId": "f797b4d974b6a7c7a1992e3b9bcbeaa48e898842",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
