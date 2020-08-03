@@ -16,6 +16,24 @@
       "revId": "f797b4d974b6a7c7a1992e3b9bcbeaa48e898842",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "beb90221_3f719720",
+        "filename": "board/morphius/board.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 1294793
+      },
+      "writtenOn": "2020-08-03T05:40:43Z",
+      "side": 1,
+      "message": "Hi Edward\nI remove TEMP_SENSOR_SOC which not use on morphius, TEMP_SENSOR_CHARGER currently not use for thermal setting.",
+      "parentUuid": "3c95bce5_371a15bc",
+      "revId": "f797b4d974b6a7c7a1992e3b9bcbeaa48e898842",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
     }
   ]
 }
