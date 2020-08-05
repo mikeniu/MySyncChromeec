@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0445c38b_850a3e7c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2020-08-05T22:51:17Z",
+      "side": 1,
+      "message": "Thanks for adding tests!",
+      "revId": "92a70f88592c1ba077da37e4a9f23ef54e005ccb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e8f45ff0_0cdcf55a",
+        "filename": "test/cbi.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2020-08-05T22:51:17Z",
+      "side": 1,
+      "message": "this looks like a separate test case, can you break it out into another named test_ function please (e.g. test_get_set_uint32(void) )",
+      "range": {
+        "startLine": 48,
+        "startChar": 2,
+        "endLine": 62,
+        "endChar": 24
+      },
+      "revId": "92a70f88592c1ba077da37e4a9f23ef54e005ccb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4379211e_ec3b3dad",
+        "filename": "test/cbi.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1259838
+      },
+      "writtenOn": "2020-08-05T22:51:17Z",
+      "side": 1,
+      "message": "Same with these tests as well, please break them out in to separate functions.\n\nThen you can put the reset_cbi in the before_test(void) function/hook so you don\u0027t have to call it yourself every time.",
+      "revId": "92a70f88592c1ba077da37e4a9f23ef54e005ccb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
