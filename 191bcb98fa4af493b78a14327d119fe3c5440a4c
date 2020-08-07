@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2d1feb58_ef443469",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1106949
+      },
+      "writtenOn": "2020-08-07T18:15:46Z",
+      "side": 1,
+      "message": "Thank you for reviewing. I fixed one line. Carrying over +2.",
+      "revId": "191bcb98fa4af493b78a14327d119fe3c5440a4c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
+    }
+  ]
+}
