@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ee387cfb_07502297",
+        "filename": "util/compare_build.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2020-08-17T21:23:46Z",
+      "side": 1,
+      "message": "this tests for a file, which is not the\nbest precondition for mkdir.",
+      "range": {
+        "startLine": 103,
+        "startChar": 10,
+        "endLine": 103,
+        "endChar": 12
+      },
+      "revId": "39802961a0b64f9bff284182cdc30b12e31cf317",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "56106d7b_2d230669",
+        "filename": "util/compare_build.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2020-08-17T21:23:46Z",
+      "side": 1,
+      "message": "this is either fast and doesn\u0027t need to by async or\nit\u0027s really slow and and will be painful on\na low-core machine.\n\nalso, do you want to check for success?\n\ni think iterating over the boards and dumping the vars\nis better done in the the makefile similar\nto how the buildall rule is implemented. it should be\nmore robust and will handle \u0027-j\u0027 better.\n\ni\u0027m not sure that you need TMP_DIR. it should be OK\nto leave the artifacts in build/$BOARD/...\nthen just process build/*/make-build-vars or something.",
+      "range": {
+        "startLine": 112,
+        "startChar": 49,
+        "endLine": 112,
+        "endChar": 50
+      },
+      "revId": "39802961a0b64f9bff284182cdc30b12e31cf317",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
