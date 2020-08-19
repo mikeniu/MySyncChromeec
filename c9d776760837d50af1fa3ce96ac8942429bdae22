@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "25f378c1_f874892c",
+        "filename": "core/riscv-rv32i/build.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1296031
+      },
+      "writtenOn": "2020-08-19T16:27:05Z",
+      "side": 1,
+      "message": "typo: opton -\u003e option",
+      "revId": "c9d776760837d50af1fa3ce96ac8942429bdae22",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    }
+  ]
+}
