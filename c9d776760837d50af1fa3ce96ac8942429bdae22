@@ -16,6 +16,24 @@
       "revId": "c9d776760837d50af1fa3ce96ac8942429bdae22",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "24eb9e5b_d68fb2c5",
+        "filename": "core/riscv-rv32i/build.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1153134
+      },
+      "writtenOn": "2020-08-20T03:14:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "25f378c1_f874892c",
+      "revId": "c9d776760837d50af1fa3ce96ac8942429bdae22",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": false
     }
   ]
 }
