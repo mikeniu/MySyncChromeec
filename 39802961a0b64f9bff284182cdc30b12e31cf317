@@ -95,6 +95,30 @@
     },
     {
       "key": {
+        "uuid": "accfe777_8b74c165",
+        "filename": "util/compare_build.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1334530
+      },
+      "writtenOn": "2020-08-27T19:24:36Z",
+      "side": 1,
+      "message": "Here is where I had problems with this:\n\nhttps://github.com/coreboot/chrome-ec/blob/master/util/ide-config.sh#L446",
+      "parentUuid": "054abbe1_d1dbaed7",
+      "range": {
+        "startLine": 112,
+        "startChar": 49,
+        "endLine": 112,
+        "endChar": 50
+      },
+      "revId": "39802961a0b64f9bff284182cdc30b12e31cf317",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "cf072523_fca721cd",
         "filename": "util/compare_build.sh",
         "patchSetId": 2
