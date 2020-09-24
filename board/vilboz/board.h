@@ -24,6 +24,12 @@
 /* Power  LEDs */
 #define CONFIG_LED_POWER_LED
 
+/*
+ * EC will boot AP to depthcharge if: (AC >= 45W)
+ */
+#undef CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON
+#define CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON 45000
+
 /* Motion sensing drivers */
 #define CONFIG_ACCELGYRO_LSM6DSM
 #define CONFIG_ACCEL_LSM6DSM_INT_EVENT \
