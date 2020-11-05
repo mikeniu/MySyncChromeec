@@ -46,7 +46,9 @@ static void board_power_sequence(void)
 const struct i2c_port_t i2c_ports[] = {
 	{"i2c1",  I2C_PORT_I2C1,  400, GPIO_EC_I2C1_SCL, GPIO_EC_I2C1_SDA},
 #ifndef QUICHE_BOARD_P1
+#ifndef GINGERBREAD_BOARD_P1
 	{"i2c2",  I2C_PORT_I2C2,  400, GPIO_EC_I2C2_SCL, GPIO_EC_I2C2_SDA},
+#endif
 #endif
 	{"i2c3",  I2C_PORT_I2C3,  400, GPIO_EC_I2C3_SCL, GPIO_EC_I2C3_SDA},
 };
