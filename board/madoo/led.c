@@ -5,6 +5,8 @@
  * Power and battery LED control for madoo
  */
 
+#include "driver/tcpm/raa489000.h"
+#include "driver/tcpm/tcpci.h"
 #include "ec_commands.h"
 #include "gpio.h"
 #include "led_common.h"
@@ -59,18 +61,41 @@ void led_set_color_power(enum ec_led_colors color)
 		gpio_set_level(GPIO_PWR_LED_WHITE_L, LED_OFF_LVL);
 }
 
+/* Check charging via which port. PRIMARY: TRUE; SECONDARY: FALSE */
+int check_charging_port(int port)
+{
+	int regval;
+
+	tcpc_read(port, TCPC_REG_POWER_STATUS, &regval);
+	return !!(regval & TCPC_REG_POWER_STATUS_SINKING_VBUS);
+}
+
 void led_set_color_battery(enum ec_led_colors color)
 {
 	switch (color) {
 	case EC_LED_COLOR_WHITE:
-		gpio_set_level(GPIO_BAT_LED_WHITE_L, LED_ON_LVL);
-		gpio_set_level(GPIO_BAT_LED_AMBER_L, LED_OFF_LVL);
+		/* Primary and secondary port are control by different GPIO */
+		if (check_charging_port(CHARGER_PRIMARY)) {
+			gpio_set_level(GPIO_EC_CHG_LED_R_W, LED_ON_LVL);
+			gpio_set_level(GPIO_EC_CHG_LED_R_Y, LED_OFF_LVL);
+		} else {
+			gpio_set_level(GPIO_BAT_LED_WHITE_L, LED_ON_LVL);
+			gpio_set_level(GPIO_BAT_LED_AMBER_L, LED_OFF_LVL);
+		}
 		break;
 	case EC_LED_COLOR_AMBER:
-		gpio_set_level(GPIO_BAT_LED_WHITE_L, LED_OFF_LVL);
-		gpio_set_level(GPIO_BAT_LED_AMBER_L, LED_ON_LVL);
+		/* Primary and secondary port are control by different GPIO */
+		if (check_charging_port(CHARGER_PRIMARY)) {
+			gpio_set_level(GPIO_EC_CHG_LED_R_W, LED_OFF_LVL);
+			gpio_set_level(GPIO_EC_CHG_LED_R_Y, LED_ON_LVL);
+		} else {
+			gpio_set_level(GPIO_BAT_LED_WHITE_L, LED_OFF_LVL);
+			gpio_set_level(GPIO_BAT_LED_AMBER_L, LED_ON_LVL);
+		}
 		break;
 	default: /* LED_OFF and other unsupported colors */
+		gpio_set_level(GPIO_EC_CHG_LED_R_W, LED_OFF_LVL);
+		gpio_set_level(GPIO_EC_CHG_LED_R_Y, LED_OFF_LVL);
 		gpio_set_level(GPIO_BAT_LED_WHITE_L, LED_OFF_LVL);
 		gpio_set_level(GPIO_BAT_LED_AMBER_L, LED_OFF_LVL);
 		break;
