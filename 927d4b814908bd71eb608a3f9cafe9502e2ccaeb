@@ -16,6 +16,24 @@
       "message": "nit: this one is good to keep at the board level once the project starts heading out to RO lock, but it\u0027s fine here for now",
       "revId": "927d4b814908bd71eb608a3f9cafe9502e2ccaeb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98b339f3_3f2c6a59",
+        "filename": "baseboard/guybrush/baseboard.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2020-12-10T00:06:55Z",
+      "side": 1,
+      "message": "ack, we\u0027ll move it when we get close to RO.",
+      "parentUuid": "fc025225_e9a1e632",
+      "revId": "927d4b814908bd71eb608a3f9cafe9502e2ccaeb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
