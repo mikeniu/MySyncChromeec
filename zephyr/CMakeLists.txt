@@ -49,6 +49,8 @@ zephyr_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY_FUEL_GAUGE
                                                 "${PLATFORM_EC}/common/battery_fuel_gauge.c")
 zephyr_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY_SMART
                                                 "${PLATFORM_EC}/driver/battery/smart.c")
+zephyr_sources_ifdef(CONFIG_PLATFORM_EC_BC12_DETECT_PI3USB9201
+                                                "${PLATFORM_EC}/driver/bc12/pi3usb9201.c")
 zephyr_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_ISL9241
                                                 "${PLATFORM_EC}/driver/charger/isl9241.c")
 zephyr_sources_ifdef(CONFIG_PLATFORM_EC_CHARGE_MANAGER
@@ -84,6 +86,9 @@ zephyr_sources_ifdef(CONFIG_PLATFORM_EC_POWERSEQ_INTEL
                                                 "${PLATFORM_EC}/common/power_button_x86.c"
                                                 "${PLATFORM_EC}/power/intel_x86.c")
 zephyr_sources_ifdef(CONFIG_PLATFORM_EC_TIMER   "${PLATFORM_EC}/common/timer.c")
+
+zephyr_sources_ifdef(CONFIG_PLATFORM_EC_USB_CHARGER
+                                                "${PLATFORM_EC}/common/usb_charger.c")
 
 zephyr_sources_ifdef(CONFIG_PLATFORM_EC_USB_POWER_DELIVERY
                                                 "${PLATFORM_EC}/common/usb_common.c"
