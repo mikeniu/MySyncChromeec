@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f9eeec0_4ab269c0",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1165921
+      },
+      "writtenOn": "2020-12-30T18:12:17Z",
+      "side": 1,
+      "message": "OK let\u0027s go with second format:\n\n                               Zephyr Kernel Configuration\n    Select the keyboard protocol to use (i8042)  ---\u003e\n[*] A mechanism for passing KSO2 to H1 which inverts the signal\n[*] Console command: i8042",
+      "parentUuid": "68149274_9b7f0936",
+      "range": {
+        "startLine": 199,
+        "startChar": 7,
+        "endLine": 199,
+        "endChar": 19
+      },
+      "revId": "db983e45a7d4b1a9f38b4856797167db68a64fd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "574a7c84_75a0c6cd",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2aa840f3_67feca6d",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1165921
+      },
+      "writtenOn": "2020-12-30T18:12:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "574a7c84_75a0c6cd",
+      "range": {
+        "startLine": 202,
+        "startChar": 3,
+        "endLine": 202,
+        "endChar": 34
+      },
+      "revId": "db983e45a7d4b1a9f38b4856797167db68a64fd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e9b3481f_36c6b398",
@@ -60,6 +108,30 @@
       "writtenOn": "2020-12-30T17:22:32Z",
       "side": 1,
       "message": "Update to whichever convention you pick.",
+      "range": {
+        "startLine": 279,
+        "startChar": 0,
+        "endLine": 279,
+        "endChar": 34
+      },
+      "revId": "db983e45a7d4b1a9f38b4856797167db68a64fd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d5d880f_76dcd0ab",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1165921
+      },
+      "writtenOn": "2020-12-30T18:12:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9b3481f_36c6b398",
       "range": {
         "startLine": 279,
         "startChar": 0,
