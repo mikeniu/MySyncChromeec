@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68149274_9b7f0936",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2020-12-30T17:22:32Z",
+      "side": 1,
+      "message": "Would should to pick a convention for console commands.\n    \u0027\u003ccommand\u003e\u0027 console command\n\nor\n    Console command: \u003ccommand\u003e\n\nI think I prefer the 2nd format, but haven\u0027t tested what this looks like under menuconfig or guiconfig.\n\nWe can follow the same convention for host commands that can be turned on/off.",
+      "range": {
+        "startLine": 199,
+        "startChar": 7,
+        "endLine": 199,
+        "endChar": 19
+      },
+      "revId": "db983e45a7d4b1a9f38b4856797167db68a64fd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "574a7c84_75a0c6cd",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2020-12-30T17:22:32Z",
+      "side": 1,
+      "message": "\"This command prints the state of the i8042 keyboard protocol and\"",
+      "range": {
+        "startLine": 202,
+        "startChar": 3,
+        "endLine": 202,
+        "endChar": 34
+      },
+      "revId": "db983e45a7d4b1a9f38b4856797167db68a64fd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9b3481f_36c6b398",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2020-12-30T17:22:32Z",
+      "side": 1,
+      "message": "Update to whichever convention you pick.",
+      "range": {
+        "startLine": 279,
+        "startChar": 0,
+        "endLine": 279,
+        "endChar": 34
+      },
+      "revId": "db983e45a7d4b1a9f38b4856797167db68a64fd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
