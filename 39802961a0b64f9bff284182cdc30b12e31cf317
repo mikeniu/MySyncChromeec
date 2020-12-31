@@ -1,6 +1,24 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "760bf4e4_4fddf47f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2020-12-31T02:04:29Z",
+      "side": 1,
+      "message": "hmmm - this resurfaced due to the branch rename 😊",
+      "revId": "39802961a0b64f9bff284182cdc30b12e31cf317",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
       "key": {
         "uuid": "cbdde350_1239a7aa",
         "filename": "util/compare_build.sh",
@@ -20,10 +38,33 @@
         "endChar": 23
       },
       "revId": "39802961a0b64f9bff284182cdc30b12e31cf317",
-      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
-      "unresolved": true
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b44c4ce_a7a554b0",
+        "filename": "util/compare_build.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2020-12-31T02:04:29Z",
+      "side": 1,
+      "message": "technically, you\u0027d also want a \"local key\" declaration\nin this function, et. al.",
+      "range": {
+        "startLine": 68,
+        "startChar": 6,
+        "endLine": 68,
+        "endChar": 9
+      },
+      "revId": "39802961a0b64f9bff284182cdc30b12e31cf317",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
       "key": {
         "uuid": "ee387cfb_07502297",
         "filename": "util/compare_build.sh",
@@ -43,10 +84,10 @@
         "endChar": 12
       },
       "revId": "39802961a0b64f9bff284182cdc30b12e31cf317",
-      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
-      "unresolved": true
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "56106d7b_2d230669",
         "filename": "util/compare_build.sh",
@@ -66,10 +107,10 @@
         "endChar": 50
       },
       "revId": "39802961a0b64f9bff284182cdc30b12e31cf317",
-      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
-      "unresolved": true
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "054abbe1_d1dbaed7",
         "filename": "util/compare_build.sh",
@@ -90,10 +131,10 @@
         "endChar": 50
       },
       "revId": "39802961a0b64f9bff284182cdc30b12e31cf317",
-      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
-      "unresolved": true
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "accfe777_8b74c165",
         "filename": "util/compare_build.sh",
@@ -114,10 +155,10 @@
         "endChar": 50
       },
       "revId": "39802961a0b64f9bff284182cdc30b12e31cf317",
-      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
-      "unresolved": true
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "cf072523_fca721cd",
         "filename": "util/compare_build.sh",
@@ -137,8 +178,7 @@
         "endChar": 7
       },
       "revId": "39802961a0b64f9bff284182cdc30b12e31cf317",
-      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba",
-      "unresolved": true
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
