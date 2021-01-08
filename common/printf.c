@@ -461,6 +461,12 @@ int vfnprintf(int (*addchar)(void *context, int c), void *context,
 	return EC_SUCCESS;
 }
 
+/*
+ * These symbols are already defined by the Zephyr OS kernel, and we
+ * don't want to use the EC implementation.
+ */
+#ifndef CONFIG_ZEPHYR
+
 /* Context for snprintf() */
 struct snprintf_context {
 	char *str;
@@ -516,3 +522,5 @@ int vsnprintf(char *str, int size, const char *format, va_list args)
 
 	return (rv == EC_SUCCESS) ? (ctx.str - str) : -rv;
 }
+
+#endif /* !CONFIG_ZEPHYR */
