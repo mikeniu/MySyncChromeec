@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89e0dd42_42b77e39",
+        "filename": "board/jacuzzi/board.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 514,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2021-01-12T07:45:59Z",
+      "side": 1,
+      "message": "Does this work in RO? I thought sensor is not powered on in RO\u0027s HOOK_INIT.\nMaybe need to add a DECLARE_HOOK(HOOK_RESUME, ...) so that we can probe the sensor when entering S3.\n\nAnd please make sure this happens before motionsense task reads the motion_sensors array, the priority has to be higher than MOTION_SENSE_HOOK_PRIO)",
+      "revId": "bb760a668b233506b5ceb50cf6bff6be5e20680b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
