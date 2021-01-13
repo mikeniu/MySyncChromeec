@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dab4e010_d3b5f391",
+        "filename": "board/jacuzzi/board.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 517,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2021-01-13T07:17:18Z",
+      "side": 1,
+      "message": "HOOK_PRIO_DEFAULT - 1, this have to be faster than motionsense task.",
+      "range": {
+        "startLine": 517,
+        "startChar": 51,
+        "endLine": 517,
+        "endChar": 68
+      },
+      "revId": "055c7052a9a925066f3acd10f1464f6ffdc386ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
