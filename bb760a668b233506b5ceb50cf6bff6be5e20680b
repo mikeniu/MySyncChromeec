@@ -52,6 +52,24 @@
       "parentUuid": "86bead24_3d7109c8",
       "revId": "bb760a668b233506b5ceb50cf6bff6be5e20680b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5daa2a00_5f964e68",
+        "filename": "board/jacuzzi/board.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 514,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2021-01-13T04:36:36Z",
+      "side": 1,
+      "message": "There is a rare case only happens when development:\nIf ec sync is disabled, and someone calls manual sysjump in S5/G3, the sensor won\u0027t response during RW HOOK_INIT because it\u0027s not powered yet.\nSo you have to probe the sensor again in CHIPSET_STARTUP.",
+      "parentUuid": "4def10eb_32a6093a",
+      "revId": "bb760a668b233506b5ceb50cf6bff6be5e20680b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
