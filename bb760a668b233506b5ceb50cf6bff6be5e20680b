@@ -34,6 +34,24 @@
       "parentUuid": "89e0dd42_42b77e39",
       "revId": "bb760a668b233506b5ceb50cf6bff6be5e20680b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4def10eb_32a6093a",
+        "filename": "board/jacuzzi/board.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 514,
+      "author": {
+        "id": 1215230
+      },
+      "writtenOn": "2021-01-13T01:01:04Z",
+      "side": 1,
+      "message": "sysjump should trigger HOOK_INIT, do we need to do it again in HOOK_CHIPSET_STARTUP?\nOr you want to do the init in RO when system startup?",
+      "parentUuid": "86bead24_3d7109c8",
+      "revId": "bb760a668b233506b5ceb50cf6bff6be5e20680b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
