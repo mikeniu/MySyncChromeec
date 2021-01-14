@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a744b04_c346338b",
+        "filename": "board/jacuzzi/board.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 517,
+      "author": {
+        "id": 1215230
+      },
+      "writtenOn": "2021-01-14T03:28:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f18b4010_fb1d82fd",
+      "range": {
+        "startLine": 517,
+        "startChar": 51,
+        "endLine": 517,
+        "endChar": 68
+      },
+      "revId": "1933b1336bca5cb9d0f50f055f527a79d2929456",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4b91d218_c9dc234a",
@@ -37,6 +61,30 @@
       "writtenOn": "2021-01-13T09:13:20Z",
       "side": 1,
       "message": "spaces around operator",
+      "range": {
+        "startLine": 519,
+        "startChar": 20,
+        "endLine": 519,
+        "endChar": 21
+      },
+      "revId": "1933b1336bca5cb9d0f50f055f527a79d2929456",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8aa8d1a_4904f845",
+        "filename": "board/jacuzzi/board.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 519,
+      "author": {
+        "id": 1215230
+      },
+      "writtenOn": "2021-01-14T03:28:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4b91d218_c9dc234a",
       "range": {
         "startLine": 519,
         "startChar": 20,
