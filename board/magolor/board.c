@@ -7,6 +7,7 @@
 
 #include "adc_chip.h"
 #include "button.h"
+#include "cbi_fw_config.h"
 #include "cbi_ssfc.h"
 #include "charge_manager.h"
 #include "charge_state_v2.h"
@@ -589,6 +590,15 @@ void board_init(void)
 
 	/* Enable gpio interrupt for base accelgyro sensor */
 	gpio_enable_interrupt(GPIO_BASE_SIXAXIS_INT_L);
+	if (get_cbi_fw_config_tablet_mode())
+		/* Enable gpio interrupt for base accelgyro sensor */
+		gpio_enable_interrupt(GPIO_BASE_SIXAXIS_INT_L);
+	else {
+		gmr_tablet_switch_disable();
+		/* Base accel is not stuffed, don't allow line to float */
+		gpio_set_flags(GPIO_BASE_SIXAXIS_INT_L,
+		GPIO_INPUT | GPIO_PULL_DOWN);
+	}
 
 	/* Turn on 5V if the system is on, otherwise turn it off. */
 	on = chipset_in_state(CHIPSET_STATE_ON | CHIPSET_STATE_ANY_SUSPEND |
