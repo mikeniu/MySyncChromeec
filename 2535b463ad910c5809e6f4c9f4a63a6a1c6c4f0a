@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fb06d2f_88e44362",
+        "filename": "zephyr/Kconfig.battery",
+        "patchSetId": 4
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2021-01-26T18:42:52Z",
+      "side": 1,
+      "message": "Sorry, I forgot to save a comment on the previous patchset.\n\nLet\u0027s try to specify the console command name and host command that is enabled with this option.  My suggested text:\n\n\"Enables support for disconnecting the battery using the \"cutoff\" console command and the EC_CMD_BATTERY_CUT_OFF host command.\"",
+      "range": {
+        "startLine": 130,
+        "startChar": 3,
+        "endLine": 130,
+        "endChar": 63
+      },
+      "revId": "2535b463ad910c5809e6f4c9f4a63a6a1c6c4f0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
