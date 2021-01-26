@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f6d8808_e63bc4b9",
+        "filename": "zephyr/Kconfig.battery",
+        "patchSetId": 3
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1411064
+      },
+      "writtenOn": "2021-01-26T17:58:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "93f5682e_bb694d0a",
+      "range": {
+        "startLine": 137,
+        "startChar": 0,
+        "endLine": 141,
+        "endChar": 11
+      },
+      "revId": "d01bf405b8f372b1e70077c62b88fc2a7a23c250",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b02d131c_16d2a038",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "552fabbb_486550a3",
+        "filename": "zephyr/Kconfig.battery",
+        "patchSetId": 3
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1411064
+      },
+      "writtenOn": "2021-01-26T17:58:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b02d131c_16d2a038",
+      "range": {
+        "startLine": 146,
+        "startChar": 0,
+        "endLine": 149,
+        "endChar": 30
+      },
+      "revId": "d01bf405b8f372b1e70077c62b88fc2a7a23c250",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ea4718e_d800c542",
@@ -60,6 +108,30 @@
       "writtenOn": "2021-01-26T16:28:05Z",
       "side": 1,
       "message": "Move this into a separate change list.",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 0
+      },
+      "revId": "d01bf405b8f372b1e70077c62b88fc2a7a23c250",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d4caa3a_d5d09f1c",
+        "filename": "zephyr/projects/volteer/prj.conf",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1411064
+      },
+      "writtenOn": "2021-01-26T17:58:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8ea4718e_d800c542",
       "range": {
         "startLine": 28,
         "startChar": 0,
