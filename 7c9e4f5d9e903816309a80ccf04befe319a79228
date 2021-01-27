@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9cd771bf_c1c78c80",
+        "filename": "zephyr/Kconfig.battery",
+        "patchSetId": 6
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1165921
+      },
+      "writtenOn": "2021-01-27T19:02:24Z",
+      "side": 1,
+      "message": "board-specific",
+      "range": {
+        "startLine": 132,
+        "startChar": 24,
+        "endLine": 132,
+        "endChar": 26
+      },
+      "revId": "7c9e4f5d9e903816309a80ccf04befe319a79228",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3f08d33_aac0fd33",
+        "filename": "zephyr/Kconfig.battery",
+        "patchSetId": 6
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1165921
+      },
+      "writtenOn": "2021-01-27T19:02:24Z",
+      "side": 1,
+      "message": "-",
+      "range": {
+        "startLine": 138,
+        "startChar": 47,
+        "endLine": 138,
+        "endChar": 48
+      },
+      "revId": "7c9e4f5d9e903816309a80ccf04befe319a79228",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98e79dad_b7e97c9f",
+        "filename": "zephyr/Kconfig.battery",
+        "patchSetId": 6
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1165921
+      },
+      "writtenOn": "2021-01-27T19:02:24Z",
+      "side": 1,
+      "message": "-",
+      "range": {
+        "startLine": 140,
+        "startChar": 34,
+        "endLine": 140,
+        "endChar": 35
+      },
+      "revId": "7c9e4f5d9e903816309a80ccf04befe319a79228",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
