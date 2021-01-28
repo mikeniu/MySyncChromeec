@@ -35,12 +35,13 @@
 #endif
 #endif
 
-/* Wait time for vconn power switch to turn off. */
-#ifdef PD_VCONN_SWAP_DELAY
-#define PD_IT83XX_VCONN_TURN_OFF_DELAY_US PD_VCONN_SWAP_DELAY
-#else
-#define PD_IT83XX_VCONN_TURN_OFF_DELAY_US 500
-#endif
+/*
+ * tVconnOff (max 35ms): defined in Type-C spec, if we're supplying Vconn,
+ * then shall cease to supply it within tVconnOff of exiting Attached.SRC/SNK.
+ * NOTE: In USB-PD spec, there are another two tVconnSrcOff (max 25ms) and
+ *       tVconnSrcOn (max 50ms) for turning Vconn on/off during Vconn swap.
+ */
+#define PD_IT83XX_VCONN_TURN_OFF_DELAY_US 35000 /* max 35ms */
 
 int rx_en[IT83XX_USBPD_PHY_PORT_COUNT];
 STATIC_IF(CONFIG_USB_PD_DECODE_SOP)
