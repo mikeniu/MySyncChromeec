@@ -25,6 +25,12 @@
 #include "vboot.h"
 #include "vboot_hash.h"
 
+#ifdef CONFIG_ZEPHYR
+#include <device.h>
+#include <drivers/uart.h>
+#include <shell/shell_uart.h>
+#endif
+
 #define CPRINTS(format, args...) cprints(CC_VBOOT,"VB " format, ## args)
 #define CPRINTF(format, args...) cprintf(CC_VBOOT,"VB " format, ## args)
 
@@ -60,8 +66,13 @@ static void enable_packet_mode(bool enable)
 
 static enum cr50_comm_err send_to_cr50(const uint8_t *data, size_t size)
 {
+#ifdef CONFIG_ZEPHYR
+	const struct device *uart_dev =
+		device_get_binding(CONFIG_UART_CONSOLE_ON_DEV_NAME);
+#endif
 	timestamp_t until;
 	int i, timeout = 0;
+	uint32_t lock_key;
 	struct cr50_comm_response res = {};
 
 	/* This will wake up (if it's sleeping) and interrupt Cr50. */
@@ -69,6 +80,15 @@ static enum cr50_comm_err send_to_cr50(const uint8_t *data, size_t size)
 
 	uart_flush_output();
 	uart_clear_input();
+
+#ifdef CONFIG_ZEPHYR
+	/* Disable interrupts for the uart. */
+	uart_irq_rx_disable(uart_dev);
+	uart_irq_tx_disable(uart_dev);
+	/* Stop the shell and process all pending operations. */
+	shell_stop(shell_backend_uart_get_ptr());
+	shell_process(shell_backend_uart_get_ptr());
+#endif
 
 	/*
 	 * Send packet. No traffic control, assuming Cr50 consumes stream much
@@ -78,9 +98,17 @@ static enum cr50_comm_err send_to_cr50(const uint8_t *data, size_t size)
 	 * Disable interrupts so that the data frame will be stored in the Tx
 	 * buffer in one piece.
 	 */
-	interrupt_disable();
+	lock_key = irq_lock();
+#ifdef CONFIG_ZEPHYR
+	for (i = 0; i < size; ++i) {
+		uart_poll_out(uart_dev, data[i]);
+		msleep(1);
+	}
+	shell_process(shell_backend_uart_get_ptr());
+#else
 	uart_put_raw(data, size);
-	interrupt_enable();
+#endif
+	irq_unlock(lock_key);
 
 	uart_flush_output();
 
@@ -90,8 +118,10 @@ static enum cr50_comm_err send_to_cr50(const uint8_t *data, size_t size)
 	 * Make sure console task won't steal the response in case we exchange
 	 * packets after tasks start.
 	 */
+#ifndef CONFIG_ZEPHYR
 	if (task_start_called())
 		task_disable_task(TASK_ID_CONSOLE);
+#endif /* !CONFIG_ZEPHYR */
 
 	/* Wait for response from Cr50 */
 	for (i = 0; i < sizeof(res); i++) {
@@ -106,18 +136,26 @@ static enum cr50_comm_err send_to_cr50(const uint8_t *data, size_t size)
 		}
 	}
 
+#ifdef CONFIG_ZEPHYR
+	/* Restart the shell. */
+	shell_start(shell_backend_uart_get_ptr());
+	/* Reenable interrupts for the uart. */
+	uart_irq_rx_enable(uart_dev);
+	uart_irq_tx_enable(uart_dev);
+#else
 	if (task_start_called())
 		task_enable_task(TASK_ID_CONSOLE);
+#endif /* CONFIG_ZEPHYR */
 
 	/* Exit packet mode */
 	enable_packet_mode(false);
+
+	CPRINTS("Received 0x%04x", res.error);
 
 	if (timeout) {
 		CPRINTS("Timeout");
 		return CR50_COMM_ERR_TIMEOUT;
 	}
-
-	CPRINTS("Received 0x%04x", res.error);
 
 	return res.error;
 }

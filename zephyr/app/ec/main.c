@@ -45,6 +45,16 @@ void main(void)
 		}
 	}
 
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_VBOOT)) {
+		/*
+		 * For RO, it behaves as follows:
+		 *   In recovery, it enables PD communication and returns.
+		 *   In normal boot, it verifies and jumps to RW.
+		 * For RW, it returns immediately.
+		 */
+		vboot_main();
+	}
+
 	/* Call init hooks before main tasks start */
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_HOOKS)) {
 		hook_notify(HOOK_INIT);

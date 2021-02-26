@@ -118,6 +118,12 @@ config PLATFORM_EC_BRINGUP
 	  - And more!  You can search the codebase for CONFIG_BRINGUP
             to see all of the features this flag will toggle.
 
+config PLATFORM_EC_VBOOT
+	bool "Enable verified boot"
+	default y if !SOC_POSIX
+	help
+	  Enables EFS2 verified boot.
+
 config PLATFORM_EC_BOARD_VERSION
 	bool "Support the notion of board version"
 	default y
