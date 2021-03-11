@@ -4,7 +4,7 @@
  */
 
 /*
- * STM32F412 + FPC 1025 Fingerprint MCU configuration
+ * STM32F412 + FPC 1025 or ELAN 515  Fingerprint MCU configuration
  *
  * Alternate names that share this same board file:
  *   hatch_fp
@@ -193,6 +193,7 @@
 #define CONFIG_FINGERPRINT_MCU
 #ifdef SECTION_IS_RW
 #define CONFIG_FP_SENSOR_FPC1025
+#define CONFIG_FP_SENSOR_ELAN515
 /*
  * Use the malloc code only in the RW section (for the private library),
  * we cannot enable it in RO since it is not compatible with the RW verification
