@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a139d2b7_d3d3bd57",
+        "filename": "common/peripheral_charger.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1106949
+      },
+      "writtenOn": "2021-03-18T23:04:25Z",
+      "side": 1,
+      "message": "Other option is to keep it until the next reset so that error flags can be retrieved by EC_CMD_PCHG.",
+      "range": {
+        "startLine": 305,
+        "startChar": 2,
+        "endLine": 305,
+        "endChar": 40
+      },
+      "revId": "d7d684ce40071a21fb9dd31beb23a2cd33e50541",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
