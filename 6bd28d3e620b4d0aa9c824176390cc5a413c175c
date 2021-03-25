@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d03db8ca_aef3b8e0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2021-03-25T20:20:07Z",
+      "side": 1,
+      "message": "Adding the same reviewers as https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/2765150 had",
+      "revId": "6bd28d3e620b4d0aa9c824176390cc5a413c175c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
