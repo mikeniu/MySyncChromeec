@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "712a5e83_a0e97303",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1330845
+      },
+      "writtenOn": "2021-03-29T23:00:26Z",
+      "side": 1,
+      "message": "typo?",
+      "range": {
+        "startLine": 10,
+        "startChar": 39,
+        "endLine": 10,
+        "endChar": 46
+      },
+      "revId": "4db1cc3efacd05c912b4c36fac8c905827fe8af3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9aa5a9c8_b698b776",
+        "filename": "zephyr/Kconfig.keyboard",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1330845
+      },
+      "writtenOn": "2021-03-29T23:00:26Z",
+      "side": 1,
+      "message": "volume",
+      "range": {
+        "startLine": 133,
+        "startChar": 3,
+        "endLine": 133,
+        "endChar": 10
+      },
+      "revId": "4db1cc3efacd05c912b4c36fac8c905827fe8af3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
