@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e719ae1_0c8984a8",
+        "filename": "common/peripheral_charger.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1296031
+      },
+      "writtenOn": "2021-03-30T17:06:17Z",
+      "side": 1,
+      "message": "why not a single atomic or ?\natomic_or(\u0026pchg_host_events, event | (port \u003c\u003c EC_MKBP_PCHG_PORT_SHIFT));",
+      "range": {
+        "startLine": 41,
+        "startChar": 1,
+        "endLine": 42,
+        "endChar": 63
+      },
+      "revId": "e14aa2cbdffe4cf752532d6547bf63811fb8b6b0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d01222d8_a6a9f7fd",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 6828,
+      "author": {
+        "id": 1296031
+      },
+      "writtenOn": "2021-03-30T17:06:17Z",
+      "side": 1,
+      "message": "to be honest, it\u0027s not exactly crystal clear.",
+      "range": {
+        "startLine": 6825,
+        "startChar": 0,
+        "endLine": 6828,
+        "endChar": 24
+      },
+      "revId": "e14aa2cbdffe4cf752532d6547bf63811fb8b6b0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53d68a9e_7f2a0ac8",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 6889,
+      "author": {
+        "id": 1296031
+      },
+      "writtenOn": "2021-03-30T17:06:17Z",
+      "side": 1,
+      "message": "this struct is an alignment disaster, please fix it.",
+      "range": {
+        "startLine": 6889,
+        "startChar": 1,
+        "endLine": 6889,
+        "endChar": 6
+      },
+      "revId": "e14aa2cbdffe4cf752532d6547bf63811fb8b6b0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abb5ee95_379c48d1",
+        "filename": "include/peripheral_charger.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1296031
+      },
+      "writtenOn": "2021-03-30T17:06:17Z",
+      "side": 1,
+      "message": "is CRC30 a typo ?",
+      "revId": "e14aa2cbdffe4cf752532d6547bf63811fb8b6b0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
