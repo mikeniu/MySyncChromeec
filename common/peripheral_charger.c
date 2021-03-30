@@ -450,6 +450,50 @@ void pchg_irq(enum gpio_signal signal)
 	}
 }
 
+static void _reset_to_normal(struct pchg *ctx)
+{
+	_clear_port(ctx);
+	ctx->mode = PCHG_MODE_NORMAL;
+	ctx->cfg->drv->reset(ctx);
+}
+
+static void pchg_suspend(void)
+{
+	struct pchg *ctx;
+	int p;
+
+	CPRINTS("%s", __func__);
+
+	for (p = 0; p < pchg_count; p++) {
+		/*
+		 * Reset port so that chips can enable slower device detection.
+		 * If a device is already detected, system will wake up when a
+		 * device is detached. So, we don't need to take any action.
+		 */
+		ctx = &pchgs[0];
+		if (ctx->state == PCHG_STATE_ENABLED)
+			_reset_to_normal(ctx);
+	}
+}
+DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, pchg_suspend, HOOK_PRIO_DEFAULT);
+
+static void pchg_resume(void)
+{
+	struct pchg *ctx;
+	int p;
+
+	CPRINTS("%s", __func__);
+
+	for (p = 0; p < pchg_count; p++) {
+		/*
+		 * Reset port so that chips can enable faster device detection.
+		 */
+		ctx = &pchgs[0];
+		_reset_to_normal(ctx);
+	}
+}
+DECLARE_HOOK(HOOK_CHIPSET_RESUME, pchg_resume, HOOK_PRIO_DEFAULT);
+
 static void pchg_startup(void)
 {
 	struct pchg *ctx;
@@ -459,9 +503,7 @@ static void pchg_startup(void)
 
 	for (p = 0; p < pchg_count; p++) {
 		ctx = &pchgs[p];
-		_clear_port(ctx);
-		ctx->mode = PCHG_MODE_NORMAL;
-		ctx->cfg->drv->reset(ctx);
+		_reset_to_normal(ctx);
 		gpio_enable_interrupt(ctx->cfg->irq_pin);
 	}
 
@@ -582,9 +624,7 @@ static enum ec_status hc_pchg_update(struct host_cmd_handler_args *args)
 		HCPRINTS("Resetting to normal mode");
 
 		gpio_disable_interrupt(ctx->cfg->irq_pin);
-		_clear_port(ctx);
-		ctx->mode = PCHG_MODE_NORMAL;
-		ctx->cfg->drv->reset(ctx);
+		_reset_to_normal(ctx);
 		gpio_enable_interrupt(ctx->cfg->irq_pin);
 		break;
 

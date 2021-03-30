@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "chipset.h"
 #include "common.h"
 #include "console.h"
 #include "gpio.h"
@@ -27,6 +28,7 @@ static const int _wake_up_delay_ms = 10;
 
 /* Device detection interval */
 static const int _detection_interval_ms = 500;
+static const int _detection_interval_ms_in_suspend = 500;
 
 /* Buffer size for i2c read & write */
 #define CTN730_MESSAGE_BUFFER_SIZE	0x20
@@ -337,7 +339,10 @@ static int ctn730_enable(struct pchg *ctx, bool enable)
 		cmd->instruction = WLC_CHG_CTRL_ENABLE;
 		cmd->length = WLC_CHG_CTRL_ENABLE_CMD_SIZE;
 		/* Assume core is little endian. Use htole16 for portability. */
-		*interval = _detection_interval_ms;
+		*interval = chipset_in_or_transitioning_to_state(
+				CHIPSET_STATE_ANY_SUSPEND)
+				? _detection_interval_ms_in_suspend
+				: _detection_interval_ms;
 	} else {
 		cmd->instruction = WLC_CHG_CTRL_DISABLE;
 		cmd->length = WLC_CHG_CTRL_DISABLE_CMD_SIZE;
