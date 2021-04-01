@@ -16,6 +16,24 @@
       "message": "Deprecating -rev \u003c2? probably for the best.",
       "revId": "730318e36495a61a649a3715c7e2f96f572fe588",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb8de968_f794b7da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2021-04-01T17:25:25Z",
+      "side": 1,
+      "message": "Right. The CL:2738527 made (BOARD_REV \u003c TROGDOR_REV2) not buildable.",
+      "parentUuid": "f008e8f2_9f360e21",
+      "revId": "730318e36495a61a649a3715c7e2f96f572fe588",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
