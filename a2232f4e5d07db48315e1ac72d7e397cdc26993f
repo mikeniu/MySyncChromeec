@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "faefc1c3_ea30f07c",
+        "filename": "driver/nfc/ctn730.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 590,
+      "author": {
+        "id": 1106949
+      },
+      "writtenOn": "2021-04-01T17:12:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7306791_77fdfe1c",
+      "revId": "a2232f4e5d07db48315e1ac72d7e397cdc26993f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "982551c6_5487316d",
@@ -31,6 +49,24 @@
       "writtenOn": "2021-04-01T12:35:54Z",
       "side": 1,
       "message": "padding ?",
+      "revId": "a2232f4e5d07db48315e1ac72d7e397cdc26993f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9cd811e_daa5783c",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 6880,
+      "author": {
+        "id": 1106949
+      },
+      "writtenOn": "2021-04-01T17:12:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "982551c6_5487316d",
       "revId": "a2232f4e5d07db48315e1ac72d7e397cdc26993f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
