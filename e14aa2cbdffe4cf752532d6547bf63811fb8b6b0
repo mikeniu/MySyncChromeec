@@ -95,6 +95,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "19ada62a_48962156",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 6828,
+      "author": {
+        "id": 1296031
+      },
+      "writtenOn": "2021-04-01T12:35:54Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "4cdb7cea_1a8e9a4a",
+      "range": {
+        "startLine": 6825,
+        "startChar": 0,
+        "endLine": 6828,
+        "endChar": 24
+      },
+      "revId": "e14aa2cbdffe4cf752532d6547bf63811fb8b6b0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "53d68a9e_7f2a0ac8",

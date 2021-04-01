@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7306791_77fdfe1c",
+        "filename": "driver/nfc/ctn730.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 590,
+      "author": {
+        "id": 1296031
+      },
+      "writtenOn": "2021-04-01T12:35:54Z",
+      "side": 1,
+      "message": "why are we allocating 32 bytes on the stack for the small message below ?",
+      "revId": "a2232f4e5d07db48315e1ac72d7e397cdc26993f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "982551c6_5487316d",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 6880,
+      "author": {
+        "id": 1296031
+      },
+      "writtenOn": "2021-04-01T12:35:54Z",
+      "side": 1,
+      "message": "padding ?",
+      "revId": "a2232f4e5d07db48315e1ac72d7e397cdc26993f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
