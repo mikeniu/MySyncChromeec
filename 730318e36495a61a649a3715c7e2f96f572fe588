@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f008e8f2_9f360e21",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1113904
+      },
+      "writtenOn": "2021-04-01T04:44:58Z",
+      "side": 1,
+      "message": "Deprecating -rev \u003c2? probably for the best.",
+      "revId": "730318e36495a61a649a3715c7e2f96f572fe588",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
