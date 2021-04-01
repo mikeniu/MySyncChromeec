@@ -57,6 +57,30 @@
       },
       "revId": "730318e36495a61a649a3715c7e2f96f572fe588",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b01d523_79a35b9b",
+        "filename": "board/trogdor/board.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2021-04-01T18:25:14Z",
+      "side": 1,
+      "message": "The rev-2 EC SKU is not compatible with the old rev\u0027s. It has different RAM layout. So we stop AU\u0027ing the old rev.",
+      "parentUuid": "b531c64a_5e55b71b",
+      "range": {
+        "startLine": 25,
+        "startChar": 33,
+        "endLine": 25,
+        "endChar": 36
+      },
+      "revId": "730318e36495a61a649a3715c7e2f96f572fe588",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
