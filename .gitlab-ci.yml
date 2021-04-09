@@ -48,7 +48,7 @@ before_script:
   stage: build
   script:
     - zmake --zephyr-base "${ZEPHYR_BASE}" --modules-dir "${MODULES_DIR}"
-      -l DEBUG configure -b -B "${BUILD_DIR}/${PROJECT}" -t zephyr
+      -l DEBUG configure -b -B "${BUILD_DIR}/${PROJECT}" -t ${TOOLCHAIN:-zephyr}
       zephyr/projects/${PROJECT_SUBDIR}${PROJECT}
     - ls "${BUILD_DIR}/${PROJECT}" "${BUILD_DIR}/${PROJECT}/output"
   artifacts:
@@ -71,6 +71,12 @@ lazor:
   variables:
     PROJECT: "lazor"
     PROJECT_SUBDIR: "trogdor/"
+  <<: *build_template
+
+native_posix:
+  variables:
+    PROJECT: "posix-ec"
+    TOOLCHAIN: "host"
   <<: *build_template
 
 volteer:
