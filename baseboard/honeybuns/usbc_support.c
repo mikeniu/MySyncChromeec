@@ -322,6 +322,8 @@ DECLARE_CONSOLE_COMMAND(usbc, command_usbc,
 
 
 #if defined(GPIO_USBC_UF_ATTACHED_SRC) && defined(SECTION_IS_RW)
+static int ppc_ocp_count;
+
 static void baseboard_usb3_manage_vbus(void)
 {
 	int level = gpio_get_level(GPIO_USBC_UF_ATTACHED_SRC);
@@ -333,6 +335,10 @@ static void baseboard_usb3_manage_vbus(void)
 	 */
 	ppc_vbus_source_enable(USB_PD_PORT_USB3, level);
 	CPRINTS("C2: State = %s", level ? "Attached.SRC " : "Unattached.SRC");
+
+	/* Reset OCP event counter for on detach */
+	if (!level)
+		ppc_ocp_count = 0;
 }
 DECLARE_DEFERRED(baseboard_usb3_manage_vbus);
 
@@ -354,7 +360,9 @@ int baseboard_config_usbc_usb3_ppc(void)
 		return rv;
 
 	/* Need to set current limit to 3A to match advertised value */
-	ppc_set_vbus_source_current_limit(USB_PD_PORT_USB3, TYPEC_RP_3A0);
+	//ppc_set_vbus_source_current_limit(USB_PD_PORT_USB3, TYPEC_RP_3A0);
+	/* Reset OCP event counter */
+	ppc_ocp_count = 0;
 
 	/* Check state at init time */
 	baseboard_usb3_manage_vbus();
@@ -362,7 +370,68 @@ int baseboard_config_usbc_usb3_ppc(void)
 	/* Enable VBUS control interrupt for C2 */
 	gpio_enable_interrupt(GPIO_USBC_UF_ATTACHED_SRC);
 
+	/* Enable PPC interrupt */
+	gpio_enable_interrupt(GPIO_USBC_UF_PPC_INT_ODL);
+
 	return EC_SUCCESS;
+}
+
+static void baseboard_usbc_usb3_handle_interrupt(void)
+{
+	int port = USB_PD_PORT_USB3;
+
+	/*
+	 * SN5S330's /INT pin is level, so process interrupts until it
+	 * deasserts if the chip has a dedicated interrupt pin.
+	 */
+	while (gpio_get_level(GPIO_USBC_UF_PPC_INT_ODL) == 0)
+	{
+		int rise = 0;
+		int fall = 0;
+
+		read_reg(port, SN5S330_INT_TRIP_RISE_REG1, &rise);
+		read_reg(port, SN5S330_INT_TRIP_FALL_REG1, &fall);
+
+		/* Notify the system about the overcurrent event. */
+		if (rise & SN5S330_ILIM_PP1_MASK) {
+			CPRINTS("usb3_ppc: VBUS OC!");
+			if (++ppc_ocp_count < 5)
+				hook_call_deferred(&baseboard_usb3_manage_vbus_data,
+						   10 * MSEC);
+			else
+				CPRINTS("usb3_ppc: VBUS OC limit reached!");
+		}
+
+		/* Clear the interrupt sources. */
+		write_reg(port, SN5S330_INT_TRIP_RISE_REG1, rise);
+		write_reg(port, SN5S330_INT_TRIP_FALL_REG1, fall);
+
+		read_reg(port, SN5S330_INT_TRIP_RISE_REG2, &rise);
+		read_reg(port, SN5S330_INT_TRIP_FALL_REG2, &fall);
+
+		/*
+		 * VCONN may be latched off due to an overcurrent.  Indicate
+		 * when the VCONN overcurrent happens.
+		 */
+		if (rise & SN5S330_VCONN_ILIM)
+			CPRINTS("usb3_ppc: VCONN OC!");
+
+		/* Notify the system about the CC overvoltage event. */
+		if (rise & SN5S330_CC1_CON || rise & SN5S330_CC2_CON) {
+			CPRINTS("usb3_ppc: CC OV!");
+		}
+
+		/* Clear the interrupt sources. */
+		write_reg(port, SN5S330_INT_TRIP_RISE_REG2, rise);
+		write_reg(port, SN5S330_INT_TRIP_FALL_REG2, fall);
+
+	}
+}
+DECLARE_DEFERRED(baseboard_usbc_usb3_handle_interrupt);
+
+void baseboard_usbc_usb3_irq(void)
+{
+	hook_call_deferred(&baseboard_usbc_usb3_handle_interrupt_data, 0);
 }
 #endif
 

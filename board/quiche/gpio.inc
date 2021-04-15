@@ -15,6 +15,7 @@ GPIO_INT(USBC_DP_PPC_INT_ODL,    PIN(E,  7),      GPIO_INT_FALLING | GPIO_PULL_U
 GPIO_INT(DDI_MST_IN_HPD,         PIN(C,  14),     GPIO_INT_BOTH, hpd_interrupt)
 GPIO_INT(USBC_UF_MUX_VBUS_EN,    PIN(C,  12),     GPIO_INT_BOTH, board_uf_manage_vbus_interrupt)
 GPIO_INT(PWR_BTN,                PIN(A,  0),      GPIO_INT_BOTH, board_pwr_btn_interrupt)
+GPIO_INT(USBC_UF_PPC_INT_ODL,    PIN(B,  5),      GPIO_INT_FALLING | GPIO_PULL_UP, board_usbc_usb3_interrupt)
 #endif
 
 /* Power sequencing signals */

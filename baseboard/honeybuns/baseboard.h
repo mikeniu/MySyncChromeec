@@ -277,6 +277,8 @@ void baseboard_usb3_check_state(void);
  */
 void baseboard_set_mst_lane_control(int dock_mf);
 
+void baseboard_usbc_usb3_irq(void);
+
 #endif /* !__ASSEMBLER__ */
 
 #endif /* __CROS_EC_BASEBOARD_H */

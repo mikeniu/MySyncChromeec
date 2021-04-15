@@ -89,6 +89,11 @@ static void board_pwr_btn_interrupt(enum gpio_signal signal)
 {
 	baseboard_power_button_evt(gpio_get_level(signal));
 }
+
+static void board_usbc_usb3_interrupt(enum gpio_signal signal)
+{
+	baseboard_usbc_usb3_irq();
+}
 #endif /* SECTION_IS_RW */
 
 #include "gpio_list.h" /* Must come after other header files. */
