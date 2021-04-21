@@ -101,7 +101,11 @@ void ppc_interrupt(enum gpio_signal signal)
 
 void board_charging_enable(int port, int enable)
 {
+#ifdef CONFIG_USB_PD_PPC
+	if (tcpc_config[port].drv->set_snk_ctrl(port, enable))
+#elif defined(CONFIG_USBC_PPC)
 	if (ppc_vbus_sink_enable(port, enable))
+#endif
 		CPRINTS("C%d: sink path %s failed",
 				port, enable ? "en" : "dis");
 }

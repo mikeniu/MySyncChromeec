@@ -11,7 +11,7 @@
 #define __CROS_EC_DRIVER_TCPM_CCGXXF_H
 
 #define CCGXXF_I2C_ADDR1_FLAGS	0x0B
-#define CCGXXF_I2C_ADDR2_FLAGS	0x40
+#define CCGXXF_I2C_ADDR2_FLAGS	0x1B
 #define CCGXXF_I2C_ADDR3_FLAGS	0x42
 
 /* CCGXXF built in I/O expander definitions */

@@ -10,6 +10,7 @@
 #include "usb_mux.h"
 #include "usb_pd.h"
 #include "usbc_ppc.h"
+#include "usb_pd_tcpm.h"
 
 #define CPRINTF(format, args...) cprintf(CC_USBPD, format, ## args)
 #define CPRINTS(format, args...) cprints(CC_USBPD, format, ## args)
@@ -19,14 +20,24 @@ int pd_set_power_supply_ready(int port)
 	int rv;
 
 	/* Disable charging. */
+#ifdef CONFIG_USB_PD_PPC
+	rv = tcpc_config[port].drv->set_snk_ctrl(port, 0);
+#elif defined(CONFIG_USBC_PPC)
 	rv = ppc_vbus_sink_enable(port, 0);
+#endif
+
 	if (rv)
 		return rv;
 
 	pd_set_vbus_discharge(port, 0);
 
 	/* Provide Vbus. */
+#ifdef CONFIG_USB_PD_PPC
+	rv = tcpc_config[port].drv->set_src_ctrl(port, 1);
+#elif defined(CONFIG_USBC_PPC)
 	rv = ppc_vbus_source_enable(port, 1);
+#endif
+
 	if (rv)
 		return rv;
 
@@ -43,7 +54,11 @@ void pd_power_supply_reset(int port)
 	prev_en = board_vbus_source_enabled(port);
 
 	/* Disable VBUS. */
+#ifdef CONFIG_USB_PD_PPC
+	tcpc_config[port].drv->set_src_ctrl(port, 0);
+#elif defined(CONFIG_USBC_PPC)
 	ppc_vbus_source_enable(port, 0);
+#endif
 
 	/* Enable discharge if we were previously sourcing 5V */
 	if (prev_en)
@@ -61,12 +76,21 @@ int pd_check_vconn_swap(int port)
 
 int pd_snk_is_vbus_provided(int port)
 {
+#ifdef CONFIG_USB_PD_PPC
+	return tcpc_config[port].drv->check_vbus_level(port, VBUS_PRESENT);
+#elif defined(CONFIG_USBC_PPC)
 	return ppc_is_vbus_present(port);
+#endif
 }
 
 int board_vbus_source_enabled(int port)
 {
-	if (is_typec_port(port))
+	if (is_typec_port(port)) {
+#ifdef CONFIG_USB_PD_PPC
+		return tcpc_config[port].drv->get_src_ctrl(port);
+#elif defined(CONFIG_USBC_PPC)
 		return ppc_is_sourcing_vbus(port);
+#endif
+	}
 	return 0;
 }
