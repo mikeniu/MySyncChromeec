@@ -2402,6 +2402,10 @@ static void tc_attached_snk_entry(const int port)
 		tcpm_set_msg_header(port, tc[port].power_role,
 							tc[port].data_role);
 
+		/* Initialize type-C supplier to seed the charge manger */
+		if (IS_ENABLED(CONFIG_CHARGE_MANAGER))
+			typec_set_input_current_limit(port, 0, 0);
+
 		/*
 		 * Maintain VCONN supply state, whether ON or OFF, and its
 		 * data role / usb mux connections. Do not re-enable
