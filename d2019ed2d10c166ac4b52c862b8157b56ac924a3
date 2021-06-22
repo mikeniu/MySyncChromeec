@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e75dfd81_47cc334a",
+        "filename": "driver/tcpm/nct38xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1346479
+      },
+      "writtenOn": "2021-06-22T15:21:01Z",
+      "side": 1,
+      "message": "I would rather stay consistent with all of the other i2c calls and go through a tcpc_ interface. Maybe tcpc_addr_read16_no_lpm_exit. You could then change tcpc_addr_read16 to do the pd_wait_exit_low_power call, call tcpc_addr_read16_no_lpm_exit and then on return could call pd_device_accessed. This adds a single call and gives both functions.",
+      "range": {
+        "startLine": 247,
+        "startChar": 6,
+        "endLine": 247,
+        "endChar": 16
+      },
+      "revId": "d2019ed2d10c166ac4b52c862b8157b56ac924a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de990814_4f46e453",
+        "filename": "driver/tcpm/nct38xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1346479
+      },
+      "writtenOn": "2021-06-22T15:21:01Z",
+      "side": 1,
+      "message": "Can you add a define in tcpci.h for TCPC_REG_ALERT_NONE and use that instead of a magic number?",
+      "range": {
+        "startLine": 250,
+        "startChar": 34,
+        "endLine": 250,
+        "endChar": 40
+      },
+      "revId": "d2019ed2d10c166ac4b52c862b8157b56ac924a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
