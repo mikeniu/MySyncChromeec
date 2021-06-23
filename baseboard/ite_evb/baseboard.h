@@ -10,6 +10,7 @@
 
 /* Optional features */
 #define CONFIG_BATTERY_SMART
+#undef CONFIG_BATTERY_EXPORT_DISPLAY_SOC
 #define CONFIG_BOARD_VERSION_GPIO
 #define CONFIG_FANS 1
 #define CONFIG_I2C
