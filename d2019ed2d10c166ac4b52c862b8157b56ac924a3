@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fd79a70_189f48b9",
+        "filename": "driver/tcpm/nct38xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2021-06-24T21:10:27Z",
+      "side": 1,
+      "message": "i\u0027m checking with nuvoton about whether both ports exit idle\nwhen only one is alerting. i suspect they operate independently\non the 3808.\n\ni\u0027m not sure it matters - i\u0027m adding code to put the \"inactive\"\nport back to sleep since reading the alert register would have\nwoken it up, even if the port didn\u0027t exit idle because its\nsibling woke up.\n\ngood catch, though - i missed the case of putting the \"inactive\"\nport back to sleep after checking its alert register.",
+      "parentUuid": "68b173c5_56861ff0",
+      "revId": "d2019ed2d10c166ac4b52c862b8157b56ac924a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e75dfd81_47cc334a",
@@ -41,6 +59,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "24f7fa8e_7a8fc387",
+        "filename": "driver/tcpm/nct38xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2021-06-24T21:10:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e75dfd81_47cc334a",
+      "range": {
+        "startLine": 247,
+        "startChar": 6,
+        "endLine": 247,
+        "endChar": 16
+      },
+      "revId": "d2019ed2d10c166ac4b52c862b8157b56ac924a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de990814_4f46e453",
@@ -54,6 +96,30 @@
       "writtenOn": "2021-06-22T15:21:01Z",
       "side": 1,
       "message": "Can you add a define in tcpci.h for TCPC_REG_ALERT_NONE and use that instead of a magic number?",
+      "range": {
+        "startLine": 250,
+        "startChar": 34,
+        "endLine": 250,
+        "endChar": 40
+      },
+      "revId": "d2019ed2d10c166ac4b52c862b8157b56ac924a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6cc84944_80f0c180",
+        "filename": "driver/tcpm/nct38xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2021-06-24T21:10:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de990814_4f46e453",
       "range": {
         "startLine": 250,
         "startChar": 34,
