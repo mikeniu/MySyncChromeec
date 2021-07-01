@@ -55,6 +55,7 @@ board-${CONFIG_USB_SPI} += usb_spi.o
 board-${CONFIG_USB_I2C} += usb_i2c.o
 board-y += recovery_button.o
 
+ifeq ($(CONFIG_DCRYPTO_BOARD),y)
 board-$(CONFIG_DCRYPTO_BOARD)+= dcrypto/aes.o
 board-$(CONFIG_DCRYPTO_BOARD)+= dcrypto/app_cipher.o
 board-$(CONFIG_DCRYPTO_BOARD)+= dcrypto/app_key.o
@@ -82,7 +83,22 @@ board-$(CONFIG_DCRYPTO_BOARD)+= dcrypto/sha512.o
 endif
 endif
 board-$(CONFIG_DCRYPTO_BOARD)+= dcrypto/x509.o
-board-$(CONFIG_DCRYPTO_BOARD)+= dcrypto/trng.o
+# TODO(mruthven): add all files included in the fips boundary
+FIPS_OBJS=dcrypto/trng.o
+
+
+RW_BDIR=$(out)/RW/$(BDIR)
+FIPS_NAME = fipsmodule
+FIPS_OBJ=dcrypto/$(FIPS_NAME).o
+
+FIPS_OBJS_RW=$(patsubst %.o, $(RW_BDIR)/%.o, $(FIPS_OBJS))
+
+$(RW_BDIR)/$(FIPS_OBJ): $(FIPS_OBJS_RW)
+	@echo "  LD      $(notdir $@)"
+	$(Q)$(CC) -nostdlib --static -Wl,--relocatable -Wl,-Map=$@.map -o $@ $^
+
+board-y+= $(FIPS_OBJ)
+endif
 
 board-y += tpm2/NVMem.o
 board-y += tpm2/aes.o
