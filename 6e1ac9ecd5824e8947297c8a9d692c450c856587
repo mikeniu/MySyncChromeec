@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4df1d664_2f89fb07",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1407950
+      },
+      "writtenOn": "2021-07-08T22:38:27Z",
+      "side": 1,
+      "message": "\u003e The gpio_pre_init sequence in RW incorrectly ignores setting the init value (from gpio_rw.inc) for FP_RST_ODL because it assumes that the boot is \"warm\"\n\nI don\u0027t agree with that. Sysjump to RW is actually warm boot. Most of the boards in EC have one gpio.inc for RO and RW parts. I don\u0027t know why FPMCU is different, but if we did an exception from having one gpio.inc, and it turned out to be problematic, it should be fixed in our FPMCU board code really. So I\u0027m starting to think that drivers and FP task is not the best place to fix this problem.",
+      "parentUuid": "a0ab39f1_a429fd0b",
+      "revId": "6e1ac9ecd5824e8947297c8a9d692c450c856587",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "85a7280f_c65771bc",
         "filename": "driver/fingerprint/fpc/bep/fpc_private.c",
         "patchSetId": 1
@@ -31,6 +49,30 @@
       "writtenOn": "2021-07-08T21:33:30Z",
       "side": 1,
       "message": "This is good for now, but we really should fix this reset and warm reset gpio behavior.",
+      "range": {
+        "startLine": 178,
+        "startChar": 1,
+        "endLine": 178,
+        "endChar": 36
+      },
+      "revId": "6e1ac9ecd5824e8947297c8a9d692c450c856587",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d9fc2e3_7387c4f0",
+        "filename": "driver/fingerprint/fpc/bep/fpc_private.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1407950
+      },
+      "writtenOn": "2021-07-08T22:38:27Z",
+      "side": 1,
+      "message": "I don\u0027t see warm reset gpio behavior as incorrect. To be honest having separate gpio.inc for RO and RW is unsound for me. So, if we should fix this somewhere else I would just enable sensor in board_init_rw() for dartmonkey and bloonchipper and leave drivers and FP task untouched. What do you think about this approach?",
+      "parentUuid": "85a7280f_c65771bc",
       "range": {
         "startLine": 178,
         "startChar": 1,
