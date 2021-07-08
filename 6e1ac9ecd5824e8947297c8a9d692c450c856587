@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0ab39f1_a429fd0b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1334530
+      },
+      "writtenOn": "2021-07-08T21:33:30Z",
+      "side": 1,
+      "message": "Can you put a bit more detail as to why FP_RST_ODL is 0, instead of  the state defined in the gpio_rw.inc?\n\nMaybe something like:\n\nAfter EC reboot, FP_RST_ODL is set to 0, so the FP sensor is held in reset. This is because the gpio is only defined in RW. The gpio_pre_init sequence in RW incorrectly ignores setting the init value (from gpio_rw.inc) for FP_RST_ODL because it assumes that the boot is \"warm\", meaning that RO already set the output value.\n\nSee https://github.com/coreboot/chrome-ec/blob/c903c31711f3b2f4370a599b251a61586b3c066e/chip/stm32/gpio.c#L53-L58 .",
+      "revId": "6e1ac9ecd5824e8947297c8a9d692c450c856587",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85a7280f_c65771bc",
+        "filename": "driver/fingerprint/fpc/bep/fpc_private.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1334530
+      },
+      "writtenOn": "2021-07-08T21:33:30Z",
+      "side": 1,
+      "message": "This is good for now, but we really should fix this reset and warm reset gpio behavior.",
+      "range": {
+        "startLine": 178,
+        "startChar": 1,
+        "endLine": 178,
+        "endChar": 36
+      },
+      "revId": "6e1ac9ecd5824e8947297c8a9d692c450c856587",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
