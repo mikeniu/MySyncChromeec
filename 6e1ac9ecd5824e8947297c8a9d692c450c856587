@@ -81,6 +81,30 @@
       },
       "revId": "6e1ac9ecd5824e8947297c8a9d692c450c856587",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2ab42ce_58a9d637",
+        "filename": "driver/fingerprint/fpc/bep/fpc_private.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1407950
+      },
+      "writtenOn": "2021-07-09T14:53:44Z",
+      "side": 1,
+      "message": "I implemented GPIO reset in board_init_rw(), but setting DIVIDER_HIGHSIDE needs to stay in driver, that\u0027s why I need changes in fp_sensor_init(). Craig, let me know what do you think about it.",
+      "parentUuid": "9d9fc2e3_7387c4f0",
+      "range": {
+        "startLine": 178,
+        "startChar": 1,
+        "endLine": 178,
+        "endChar": 36
+      },
+      "revId": "6e1ac9ecd5824e8947297c8a9d692c450c856587",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
