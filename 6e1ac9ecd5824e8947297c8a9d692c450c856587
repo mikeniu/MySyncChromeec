@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a552ac2_10fa5519",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1334530
+      },
+      "writtenOn": "2021-07-15T00:48:08Z",
+      "side": 1,
+      "message": "I see what you are saying. Maybe we should chat offline about what we expect in a warm reset scenario and why we keep FP stuff in RW.\n\nFor now, this implementation is fine.",
+      "parentUuid": "4df1d664_2f89fb07",
+      "revId": "6e1ac9ecd5824e8947297c8a9d692c450c856587",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "85a7280f_c65771bc",
@@ -97,6 +115,30 @@
       "side": 1,
       "message": "I implemented GPIO reset in board_init_rw(), but setting DIVIDER_HIGHSIDE needs to stay in driver, that\u0027s why I need changes in fp_sensor_init(). Craig, let me know what do you think about it.",
       "parentUuid": "9d9fc2e3_7387c4f0",
+      "range": {
+        "startLine": 178,
+        "startChar": 1,
+        "endLine": 178,
+        "endChar": 36
+      },
+      "revId": "6e1ac9ecd5824e8947297c8a9d692c450c856587",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f07af198_f20cd60a",
+        "filename": "driver/fingerprint/fpc/bep/fpc_private.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1334530
+      },
+      "writtenOn": "2021-07-15T00:48:08Z",
+      "side": 1,
+      "message": "This seems fine. We can chat offline about what we expect from a warm reset.",
+      "parentUuid": "f2ab42ce_58a9d637",
       "range": {
         "startLine": 178,
         "startChar": 1,
