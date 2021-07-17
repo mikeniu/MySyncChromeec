@@ -177,8 +177,20 @@ static void ps8815_reset(void)
 
 void board_reset_pd_mcu(void)
 {
+	/* Port0 */
+	gpio_set_level(GPIO_USB_C0_TCPC_RST_ODL, 0);
+	/*
+	 * delay for power-on to reset-off and min. assertion time
+	 */
+	msleep(20);
+	gpio_set_level(GPIO_USB_C0_TCPC_RST_ODL, 1);
+
+	/* Port1 */
 	ps8815_reset();
 	usb_mux_hpd_update(USBC_PORT_C1, 0, 0);
+
+	/* wait for chips to come up */
+	msleep(50);
 }
 
 static void board_tcpc_init(void)
