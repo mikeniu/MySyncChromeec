@@ -32,7 +32,7 @@ static int get_battery_type(void)
 	/* Get the manufacturer name. If can't read then just exit */
 	if (battery_manufacturer_name(manuf_name, sizeof(manuf_name)))
 		return battery_type;
-
+	CPRINTS("print manuf_name=%s", manuf_name);
 	/*
 	 * Compare the manufacturer name read from the fuel gauge to the
 	 * manufacturer names defined in the board_battery_info table. If
