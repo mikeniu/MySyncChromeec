@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d04cdad_accb50d2",
+        "filename": "core/nds32/atomic.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2021-07-28T10:00:09Z",
+      "side": 1,
+      "message": "Fixed a bug here, please review again\n\nThis CL passed presubmit hook now.",
+      "range": {
+        "startLine": 18,
+        "startChar": 14,
+        "endLine": 18,
+        "endChar": 18
+      },
+      "revId": "f17bd34d3f668a1a8dab10e23b4bbebe091edad5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
