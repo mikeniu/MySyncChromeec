@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "553930df_cedbcd69",
+        "filename": "board/collis/board.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2021-08-02T22:28:58Z",
+      "side": 1,
+      "message": "The BB retimer is also not used on Collis.  Delete these lines and also add:\n\n#undef CONFIG_USBC_RETIMER_INTEL_BB\n#undef CONFIG_USBC_RETIMER_INTEL_BB_RUNTIME_CONFIG\n\nIn collis/board.c, you can remove all references to the bb_retimer.",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 84,
+        "endChar": 0
+      },
+      "revId": "29a09adf42b48ca273232aa8c0377da1bf873870",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
