@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96edd806_fbadf507",
+        "filename": "baseboard/dedede/baseboard.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 1106949
+      },
+      "writtenOn": "2021-08-04T18:08:30Z",
+      "side": 1,
+      "message": "This rule seems applicable to all boards. Can we apply this to all boards?",
+      "range": {
+        "startLine": 294,
+        "startChar": 0,
+        "endLine": 295,
+        "endChar": 37
+      },
+      "revId": "4162f1844b2d4d1413736732eddb875b8bc5055b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
