@@ -46,6 +46,30 @@
       },
       "revId": "4162f1844b2d4d1413736732eddb875b8bc5055b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41573498_b5846676",
+        "filename": "baseboard/dedede/baseboard.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 1125984
+      },
+      "writtenOn": "2021-08-05T06:46:31Z",
+      "side": 1,
+      "message": "This makes me think that your new implementation is not truly ACOK. Because ACOK will never be asserted when sourcing, which I assume is the case now?\n\nIn other words, if CHG DET is simply indicating VBUS presence, that\u0027s not the same thing as ACOK. VBUS presence just indicates that VBUS is at the connector. ACOK means that there\u0027s voltage at the switching node that the charger could boost if needed/desired.\n\nIf it\u0027s not just VBUS presence, then this check should be hidden inside sm5803_is_acok.",
+      "parentUuid": "69761479_bf34df37",
+      "range": {
+        "startLine": 294,
+        "startChar": 0,
+        "endLine": 295,
+        "endChar": 37
+      },
+      "revId": "4162f1844b2d4d1413736732eddb875b8bc5055b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
