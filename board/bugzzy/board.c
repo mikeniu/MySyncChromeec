@@ -731,6 +731,15 @@ static void panel_power_change_deferred(void)
 	if (signal == 0 && board_id >= 3)
 		return;
 
+	if (board_id >= 3) {
+		i2c_write8(I2C_PORT_LCD, I2C_ADDR_ISL98607_FLAGS,
+				ISL98607_REG_VBST_OUT, ISL98607_VBST_OUT_5P65);
+		i2c_write8(I2C_PORT_LCD, I2C_ADDR_ISL98607_FLAGS,
+				ISL98607_REG_VN_OUT, ISL98607_VN_OUT_5P5);
+		i2c_write8(I2C_PORT_LCD, I2C_ADDR_ISL98607_FLAGS,
+				ISL98607_REG_VP_OUT, ISL98607_VP_OUT_5P5);
+	}
+
 	gpio_set_level(GPIO_EN_LCD_ENP, signal);
 	msleep(1);
 	gpio_set_level(GPIO_EN_LCD_ENN, signal);
