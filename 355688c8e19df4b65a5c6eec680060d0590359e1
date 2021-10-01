@@ -16,6 +16,24 @@
       "message": "Thanks, this looks good.  This will convert over to devicetree under Zephyr much easier.",
       "revId": "355688c8e19df4b65a5c6eec680060d0590359e1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e422c432_b1232e46",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1296157
+      },
+      "writtenOn": "2021-10-01T22:57:58Z",
+      "side": 1,
+      "message": "ACK, I will test it once on Brya and publish it Monday",
+      "parentUuid": "3020c255_13b05b78",
+      "revId": "355688c8e19df4b65a5c6eec680060d0590359e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
