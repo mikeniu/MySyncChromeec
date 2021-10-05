@@ -548,6 +548,17 @@
 		reg = <0x9>;
 		label = "ISL923X_EMUL";
 	};
+
+	tcpc_emul: tcpc_emul@82 {
+		compatible = "cros,tcpc-emul";
+		status = "okay";
+		reg = <0x82>;
+		label = "TCPC_EMUL";
+		error-on-ro-write;
+		error-on-reserved-bit-write;
+		error-on-sequential-read;
+		error-on-sequential-write;
+	};
 };
 
 /* Enable all thermistors for testing */
