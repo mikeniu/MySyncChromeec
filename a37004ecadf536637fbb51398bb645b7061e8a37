@@ -16,6 +16,29 @@
       "message": "Adding Caveh also as we are touching Brya variants ",
       "revId": "a37004ecadf536637fbb51398bb645b7061e8a37",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8dc2f70_c04c62e1",
+        "filename": "board/brya/usbc_config.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2021-10-12T21:23:48Z",
+      "side": 1,
+      "message": "might as well remove this function and call ioex_init\ndirectly from board_tcpc_init.",
+      "range": {
+        "startLine": 311,
+        "startChar": 1,
+        "endLine": 311,
+        "endChar": 10
+      },
+      "revId": "a37004ecadf536637fbb51398bb645b7061e8a37",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
