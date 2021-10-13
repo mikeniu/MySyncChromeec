@@ -69,10 +69,10 @@ BUILD_ASSERT(ARRAY_SIZE(adc_channels) == ADC_CH_COUNT);
  */
 const struct fan_tach_t fan_tach[] = {
 	[PWM_HW_CH_DCR0] = {
-		.ch_tach = TACH_CH_NULL,
-		.fan_p = -1,
-		.rpm_re = -1,
-		.s_duty = -1,
+		.ch_tach = TACH_CH_TACH1A,
+		.fan_p = 2,
+		.rpm_re = 1,
+		.s_duty = 1,
 	},
 	[PWM_HW_CH_DCR1] = {
 		.ch_tach = TACH_CH_NULL,
@@ -81,10 +81,10 @@ const struct fan_tach_t fan_tach[] = {
 		.s_duty = -1,
 	},
 	[PWM_HW_CH_DCR2] = {
-		.ch_tach = TACH_CH_TACH1A,
-		.fan_p = 2,
-		.rpm_re = 1,
-		.s_duty = 1,
+		.ch_tach = TACH_CH_NULL,
+		.fan_p = -1,
+		.rpm_re = -1,
+		.s_duty = -1,
 	},
 	[PWM_HW_CH_DCR3] = {
 		.ch_tach = TACH_CH_NULL,
@@ -122,7 +122,7 @@ BUILD_ASSERT(ARRAY_SIZE(fan_tach) == PWM_HW_CH_TOTAL);
 /* PWM channels */
 const struct pwm_t pwm_channels[] = {
 	[PWM_CH_FAN] = {
-		.channel = PWM_HW_CH_DCR2,
+		.channel = PWM_HW_CH_DCR0,
 		.flags = PWM_CONFIG_HAS_RPM_MODE,
 		.freq_hz = 30000,
 		.pcfsr_sel = PWM_PRESCALER_C7,
