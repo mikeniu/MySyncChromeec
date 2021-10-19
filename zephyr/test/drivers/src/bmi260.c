@@ -1915,6 +1915,85 @@ void test_interrupt_handler(void)
 		     "Event flag is not set after firing interrupt");
 }
 
+void test_bmi_init_chip_id(void)
+{
+	struct motion_sensor_t *ms_acc, ms_fake;
+	struct i2c_emul *emul;
+	int ret;
+
+	emul = bmi_emul_get(BMI_ORD);
+	ms_acc = &motion_sensors[BMI_ACC_SENSOR_ID];
+
+	/* Part 1:
+	 * Error occurs while reading the chip ID
+	 */
+	i2c_common_emul_set_read_fail_reg(emul, BMI260_CHIP_ID);
+	ret = ms_acc->drv->init(ms_acc);
+	zassert_equal(ret, EC_ERROR_UNKNOWN,
+		      "Expected %d (EC_ERROR_UNKNOWN) but got %d",
+		      EC_ERROR_UNKNOWN, ret);
+	i2c_common_emul_set_read_fail_reg(emul, I2C_COMMON_EMUL_NO_FAIL_REG);
+
+	/* Part 2:
+	 * Test cases where the returned chip ID does not match what is
+	 * expected. This involves overriding values in the motion_sensor
+	 * struct, so make a copy first.
+	 */
+	memcpy(&ms_fake, ms_acc, sizeof(ms_fake));
+
+	/* Part 2a: expecting MOTIONSENSE_CHIP_BMI220 but get BMI260's chip ID!
+	 */
+	bmi_emul_set_reg(emul, BMI260_CHIP_ID, BMI260_CHIP_ID_MAJOR);
+	ms_fake.chip = MOTIONSENSE_CHIP_BMI220;
+
+	ret = ms_fake.drv->init(&ms_fake);
+	zassert_equal(ret, EC_ERROR_ACCESS_DENIED,
+		      "Expected %d (EC_ERROR_ACCESS_DENIED) but got %d",
+		      EC_ERROR_ACCESS_DENIED, ret);
+
+	/* Part 2b: expecting MOTIONSENSE_CHIP_BMI260 but get BMI220's chip ID!
+	 */
+	bmi_emul_set_reg(emul, BMI260_CHIP_ID, BMI220_CHIP_ID_MAJOR);
+	ms_fake.chip = MOTIONSENSE_CHIP_BMI260;
+
+	ret = ms_fake.drv->init(&ms_fake);
+	zassert_equal(ret, EC_ERROR_ACCESS_DENIED,
+		      "Expected %d (EC_ERROR_ACCESS_DENIED) but got %d",
+		      EC_ERROR_ACCESS_DENIED, ret);
+
+	/* Part 2c: use an invalid expected chip */
+	ms_fake.chip = MOTIONSENSE_CHIP_MAX;
+
+	ret = ms_fake.drv->init(&ms_fake);
+	zassert_equal(ret, EC_ERROR_ACCESS_DENIED,
+		      "Expected %d (EC_ERROR_ACCESS_DENIED) but got %d",
+		      EC_ERROR_ACCESS_DENIED, ret);
+}
+
+void test_bmi_init_config_error(void)
+{
+	/* Test the situation where `init_config`, through its helper
+	 * `bmi_config_load`, doesn't know how to handle a particular
+	 * chip type. The BMI220 is an example of such a chip (turned
+	 * off by our config flags)
+	 */
+	struct motion_sensor_t ms_fake;
+	struct i2c_emul *emul;
+	int ret;
+
+	emul = bmi_emul_get(BMI_ORD);
+	memcpy(&ms_fake, &motion_sensors[BMI_ACC_SENSOR_ID], sizeof(ms_fake));
+
+	/* Set chip type in motion sensor struct and in chip ID register */
+	bmi_emul_set_reg(emul, BMI260_CHIP_ID, BMI220_CHIP_ID_MAJOR);
+	ms_fake.chip = MOTIONSENSE_CHIP_BMI220;
+
+	ret = ms_fake.drv->init(&ms_fake);
+	zassert_equal(ret, EC_ERROR_INVALID_CONFIG,
+		      "Expected %d (EC_ERROR_INVALID_CONFIG) but got %d",
+		      EC_ERROR_INVALID_CONFIG, ret);
+}
+
 void test_suite_bmi260(void)
 {
 	ztest_test_suite(bmi260,
@@ -1937,6 +2016,8 @@ void test_suite_bmi260(void)
 			 ztest_user_unit_test(test_bmi_acc_fifo),
 			 ztest_user_unit_test(test_bmi_gyr_fifo),
 			 ztest_user_unit_test(test_unsupported_configs),
-			 ztest_user_unit_test(test_interrupt_handler));
+			 ztest_user_unit_test(test_interrupt_handler),
+			 ztest_user_unit_test(test_bmi_init_chip_id),
+			 ztest_user_unit_test(test_bmi_init_config_error));
 	ztest_run_test_suite(bmi260);
 }
