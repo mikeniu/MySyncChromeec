@@ -808,7 +808,7 @@ void chipset_reset(enum chipset_reset_reason reason)
 	int rv;
 
 	CPRINTS("%s(%d)", __func__, reason);
-	report_ap_reset(reason);
+	report_ap_reset((enum chipset_shutdown_reason)reason);
 
 	/*
 	 * Warm reset sequence:

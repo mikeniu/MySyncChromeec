@@ -629,7 +629,7 @@ void chipset_reset(enum chipset_reset_reason reason)
 		return;
 	}
 
-	report_ap_reset(reason);
+	report_ap_reset((enum chipset_shutdown_reason)reason);
 
 	gpio_set_level(GPIO_SYS_RESET_L, 0);
 	intel_x86_sys_reset_delay();

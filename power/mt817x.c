@@ -647,7 +647,7 @@ static void power_on(void)
 void chipset_reset(enum chipset_reset_reason reason)
 {
 	CPRINTS("%s: %d", __func__, reason);
-	report_ap_reset(reason);
+	report_ap_reset((enum chipset_shutdown_reason)reason);
 
 	set_warm_reset(1);
 	usleep(PMIC_WARM_RESET_H_HOLD_TIME);

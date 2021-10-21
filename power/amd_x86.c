@@ -56,7 +56,7 @@ void chipset_reset(enum chipset_reset_reason reason)
 		return;
 	}
 
-	report_ap_reset(reason);
+	report_ap_reset((enum chipset_shutdown_reason)reason);
 	/*
 	 * Send a pulse to SYS_RST to trigger a warm reset.
 	 */

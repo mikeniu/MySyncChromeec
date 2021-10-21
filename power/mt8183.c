@@ -191,7 +191,7 @@ void chipset_reset(enum chipset_reset_reason reason)
 	int flags = SYSTEM_RESET_HARD;
 
 	CPRINTS("%s: %d", __func__, reason);
-	report_ap_reset(reason);
+	report_ap_reset((enum chipset_shutdown_reason)reason);
 
 	cflush();
 	if (reason == CHIPSET_RESET_AP_WATCHDOG)

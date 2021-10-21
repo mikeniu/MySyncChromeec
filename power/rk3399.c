@@ -222,7 +222,7 @@ void chipset_reset(enum chipset_reset_reason reason)
 	print_system_rtc(CC_CHIPSET);
 #endif
 	CPRINTS("%s(%d)", __func__, reason);
-	report_ap_reset(reason);
+	report_ap_reset((enum chipset_shutdown_reason)reason);
 
 	/* Pulse SYS_RST */
 	gpio_set_level(GPIO_SYS_RST_L, 0);
