@@ -100,17 +100,18 @@ static void pd_task_init(int port)
 
 static int pd_task_timeout(int port)
 {
-	int timeout;
+	int timeout = USBC_EVENT_TIMEOUT;
 
-	if (paused[port])
+	if (paused[port]) {
 		timeout = -1;
-	else {
+	} else if (!IS_ENABLED(CONFIG_USB_SERVO)) {
 		timeout = pd_timer_next_expiration(port);
 		if (timeout < 0 || timeout > USBC_EVENT_TIMEOUT)
 			timeout = USBC_EVENT_TIMEOUT;
 		else if (timeout < USBC_MIN_EVENT_TIMEOUT)
 			timeout = USBC_MIN_EVENT_TIMEOUT;
 	}
+
 	return timeout;
 }
 
@@ -119,9 +120,11 @@ static bool pd_task_loop(int port)
 	/* wait for next event/packet or timeout expiration */
 	const uint32_t evt = task_wait_event(pd_task_timeout(port));
 
-	/* Manage expired PD Timers on timeouts */
-	if (evt & TASK_EVENT_TIMER)
-		pd_timer_manage_expired(port);
+	if (!IS_ENABLED(CONFIG_USB_SERVO)) {
+		/* Manage expired PD Timers on timeouts */
+		if (evt & TASK_EVENT_TIMER)
+			pd_timer_manage_expired(port);
+	}
 
 	/*
 	 * Re-use TASK_EVENT_RESET_DONE in tests to restart the USB task
@@ -167,7 +170,9 @@ void pd_task(void *u)
 		return;
 
 	while (1) {
-		pd_timer_init(port);
+		if (!IS_ENABLED(CONFIG_USB_SERVO))
+			pd_timer_init(port);
+
 		pd_task_init(port);
 
 		/* As long as pd_task_loop returns true, keep running the loop.

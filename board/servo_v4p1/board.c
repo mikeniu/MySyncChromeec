@@ -38,6 +38,8 @@
 #include "usb_pd.h"
 #include "usb_spi.h"
 #include "usb-stream.h"
+#include "usb_tc_snk_sm.h"
+#include "usb_tc_sm.h"
 #include "util.h"
 
 #ifdef SECTION_IS_RO
@@ -46,10 +48,19 @@
 #define CROS_EC_SECTION "RW"
 #endif
 
+/* Servo Alternate Power Plug Event */
+#define SERVO_EVT_TCPC       BIT(0)
+
+#define SET_EVENT(evt) atomic_or(&evt_flags, (evt))
+#define CLR_EVENT(evt) atomic_clear_bits(&evt_flags, (evt))
+#define CHK_EVENT(evt) (evt_flags & (evt))
+
+#ifdef SECTION_IS_RO
+static atomic_t evt_flags;
+
 /******************************************************************************
  * GPIO interrupt handlers.
  */
-#ifdef SECTION_IS_RO
 static void vbus0_evt(enum gpio_signal signal)
 {
 	task_wake(TASK_ID_PD_C0);
@@ -179,7 +190,7 @@ static void dp_evt(enum gpio_signal signal)
 
 static void tcpc_evt(enum gpio_signal signal)
 {
-	update_status_fusb302b();
+	SET_EVENT(SERVO_EVT_TCPC);
 }
 
 #define HOST_HUB		0
@@ -227,6 +238,7 @@ void ext_hpd_detection_enable(int enable)
 		gpio_disable_interrupt(GPIO_DP_HPD);
 	}
 }
+
 #endif /* SECTION_IS_RO */
 
 #include "gpio_list.h"
@@ -413,7 +425,6 @@ const unsigned int i2c_ports_used = ARRAY_SIZE(i2c_ports);
 
 int usb_i2c_board_is_enabled(void) { return 1; }
 
-
 /******************************************************************************
  * Initialize board.
  */
@@ -424,6 +435,9 @@ int board_get_version(void)
 }
 
 #ifdef SECTION_IS_RO
+/* Signals when to initialize and start PD */
+static bool board_init_done;
+
 /* Forward declaration */
 static void evaluate_input_power_def(void);
 DECLARE_DEFERRED(evaluate_input_power_def);
@@ -482,8 +496,9 @@ static void board_init(void)
 	init_uservo_port();
 	init_pathsel();
 	init_ina231s();
-	init_fusb302b(1);
-	vbus_dischrg_en(0);
+
+	/* Disable power to DUT by default */
+	chg_power_select(CHG_POWER_OFF);
 
 	/* Bring atmel part out of reset */
 	atmel_reset_l(1);
@@ -515,9 +530,12 @@ static void board_init(void)
 	 * DUT ports, so initially limit voltage to 5V.
 	 */
 	pd_set_max_voltage(PD_MIN_MV);
-
 	/* Start SuzyQ detection */
 	start_ccd_meas_sbu_cycle();
+
+	/* Init done. */
+	board_init_done = true;
+
 #else /* SECTION_IS_RO */
 	CPRINTS("Board ID is %d", board_id_det());
 #endif /* SECTION_IS_RO */
@@ -525,6 +543,48 @@ static void board_init(void)
 DECLARE_HOOK(HOOK_INIT, board_init, HOOK_PRIO_DEFAULT);
 
 #ifdef SECTION_IS_RO
+void handle_events(void)
+{
+	if (CHK_EVENT(SERVO_EVT_TCPC)) {
+		CLR_EVENT(SERVO_EVT_TCPC);
+		fusb302b_evt();
+	}
+}
+
+enum board_state_t {
+	BOARD_INIT,
+	BOARD_PD_INIT,
+	BOARD_RUN
+};
+
+/* Board init state */
+static enum board_state_t board_state = BOARD_INIT;
+
+void servo_task(void *u)
+{
+	while (1) {
+		task_wait_event(5*MSEC);
+
+		switch (board_state) {
+		case BOARD_INIT:
+			if (board_init_done)
+				board_state = BOARD_PD_INIT;
+			break;
+		case BOARD_PD_INIT:
+			init_fusb302b(1);
+			if (usb_tc_snk_sm_init())
+				ccprintf(
+				"FAULT: Servo Alt. Power not functioning\n");
+			board_state = BOARD_RUN;
+			/* fall through */
+		case BOARD_RUN:
+			handle_events();
+			usb_tc_snk_sm_run();
+			break;
+		}
+	}
+}
+
 void tick_event(void)
 {
 	static int i = 0;

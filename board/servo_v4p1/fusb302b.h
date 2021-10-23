@@ -219,7 +219,7 @@ int init_fusb302b(int port);
  * by the FUSB302. This function reads status
  * and interrupt registers in the FUSB302.
  */
-int update_status_fusb302b(void);
+void fusb302b_evt(void);
 
 /**
  * Returns true if VBUS is present, else false

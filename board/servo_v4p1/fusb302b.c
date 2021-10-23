@@ -82,7 +82,7 @@ int init_fusb302b(int p)
 		return ret;
 
 	/* Call this, will detect a charger that's already plugged in */
-	update_status_fusb302b();
+	fusb302b_evt();
 
 	/* Enable interrupt */
 	gpio_enable_interrupt(GPIO_CHGSRV_TCPC_INT_ODL);
@@ -90,20 +90,11 @@ int init_fusb302b(int p)
 	return EC_SUCCESS;
 }
 
-void fusb302b_irq(void)
+void fusb302b_evt(void)
 {
 	tcpc_read(TCPC_REG_INTERRUPT, &interrupt);
 	tcpc_read(TCPC_REG_STATUS0, &status0);
 	tcpc_read(TCPC_REG_STATUS1, &status1);
-
-	task_wake(TASK_ID_PD_C2);
-}
-DECLARE_DEFERRED(fusb302b_irq);
-
-int update_status_fusb302b(void)
-{
-	hook_call_deferred(&fusb302b_irq_data, 0);
-	return EC_SUCCESS;
 }
 
 int is_vbus_present(void)

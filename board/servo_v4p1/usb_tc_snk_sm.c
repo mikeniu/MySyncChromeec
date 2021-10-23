@@ -14,9 +14,6 @@
 #include "usb_sm.h"
 #include "usb_tc_sm.h"
 
-#define EVT_TIMEOUT_NEVER  (-1)
-#define EVT_TIMEOUT_5MS    (5 * MSEC)
-
 /*
  * USB Type-C Sink
  *   See Figure 4-13 in Release 1.4 of USB Type-C Spec.
@@ -40,25 +37,33 @@ static const char * const pwr2_5_str = "5V/0.5A";
 static const char * const pwr7_5_str = "5V/1.5A";
 static const char * const pwr15_str  = "5V/3A";
 
+
+#define ENABLE_TIMER         0x80
+#define T_LOOP_5MS           (5 * MSEC)
+
+#define TC_T_CC_DEBOUNCE     (PD_T_CC_DEBOUNCE / T_LOOP_5MS)
+#define TC_T_PD_DEBOUNCE     (PD_T_PD_DEBOUNCE / T_LOOP_5MS)
+
+enum timer_t {
+	TC_CC_DEBOUNCE = 0,
+	TC_PD_DEBOUNCE
+};
+
 static struct type_c {
 	/* state machine context */
 	struct sm_ctx ctx;
 	/* Port polarity */
 	enum tcpc_cc_polarity polarity;
-	/* event timeout */
-	uint64_t evt_timeout;
 	/* Time a port shall wait before it can determine it is attached */
-	uint64_t cc_debounce;
+	uint8_t cc_debounce_timer;
 	/*
 	 * Time a Sink port shall wait before it can determine it is detached
 	 * due to the potential for USB PD signaling on CC as described in
 	 * the state definitions.
 	 */
-	uint64_t pd_debounce;
+	uint8_t pd_debounce_timer;
 	/* The cc state */
 	enum pd_cc_states cc_state;
-	/* Generic timer */
-	uint64_t timeout;
 	/* Voltage on CC pin */
 	enum tcpc_cc_voltage_status cc_voltage;
 	/* Current CC1 value */
@@ -70,19 +75,71 @@ static struct type_c {
 /* Forward declare common, private functions */
 static void set_state_tc(const enum usb_tc_state new_state);
 
-static void restart_tc_sm(enum usb_tc_state start_state)
+static void init_timers(void)
+{
+	tc.cc_debounce_timer = 0;
+	tc.pd_debounce_timer = 0;
+}
+
+static void stop_timer(enum timer_t timer)
+{
+	switch (timer) {
+	case TC_CC_DEBOUNCE:
+		tc.cc_debounce_timer = 0;
+		break;
+	case TC_PD_DEBOUNCE:
+		tc.cc_debounce_timer = 0;
+		break;
+	}
+}
+
+static void start_timer(enum timer_t timer)
+{
+	switch (timer) {
+	case TC_CC_DEBOUNCE:
+		tc.cc_debounce_timer = ENABLE_TIMER | TC_T_CC_DEBOUNCE;
+		break;
+	case TC_PD_DEBOUNCE:
+		tc.pd_debounce_timer = ENABLE_TIMER | TC_T_PD_DEBOUNCE;
+		break;
+	}
+}
+
+static void update_timers(void)
+{
+	if (tc.cc_debounce_timer > ENABLE_TIMER)
+		tc.cc_debounce_timer--;
+
+	if (tc.pd_debounce_timer > ENABLE_TIMER)
+		tc.pd_debounce_timer--;
+}
+
+static bool is_expired_timer(enum timer_t timer)
+{
+	switch (timer) {
+	case TC_CC_DEBOUNCE:
+		return (tc.cc_debounce_timer == ENABLE_TIMER);
+	case TC_PD_DEBOUNCE:
+		return (tc.pd_debounce_timer == ENABLE_TIMER);
+	}
+
+	return true;
+}
+
+int usb_tc_snk_sm_init(void)
 {
 	int res;
+
+	init_timers();
 
 	res = init_fusb302b(1);
 	CPRINTS("FUSB302b init %s", res ? "failed" : "ready");
 
 	/* State machine is disabled if init_fusb302b fails */
 	if (!res)
-		set_state_tc(start_state);
+		set_state_tc(TC_UNATTACHED_SNK);
 
-	/* Disable timeout. Task will wake on interrupt */
-	tc.evt_timeout = EVT_TIMEOUT_NEVER;
+	return res;
 }
 
 /*
@@ -136,28 +193,20 @@ static void sink_power_sub_states(void)
 	/* Debounce the cc state */
 	if (new_cc_voltage != tc.cc_voltage) {
 		tc.cc_voltage = new_cc_voltage;
-		tc.cc_debounce = get_time().val + PD_T_RP_VALUE_CHANGE;
+		start_timer(TC_CC_DEBOUNCE);
 		return;
 	}
 
-	if (tc.cc_debounce == 0 || get_time().val < tc.cc_debounce)
+	if (!is_expired_timer(TC_CC_DEBOUNCE))
 		return;
 
-	tc.cc_debounce = 0;
+	stop_timer(TC_CC_DEBOUNCE);
 	print_alt_power();
 }
 
 /*
  * TYPE-C State Implementations
  */
-
-/**
- * Unattached.SNK
- */
-static void tc_unattached_snk_entry(int port)
-{
-	tc.evt_timeout = EVT_TIMEOUT_NEVER;
-}
 
 static void tc_unattached_snk_run(int port)
 {
@@ -175,7 +224,6 @@ static void tc_unattached_snk_run(int port)
  */
 static void tc_attach_wait_snk_entry(int port)
 {
-	tc.evt_timeout = EVT_TIMEOUT_5MS;
 	tc.cc_state = PD_CC_UNSET;
 }
 
@@ -192,14 +240,14 @@ static void tc_attach_wait_snk_run(int port)
 
 	/* Debounce the cc state */
 	if (new_cc_state != tc.cc_state) {
-		tc.cc_debounce = get_time().val + PD_T_CC_DEBOUNCE;
-		tc.pd_debounce = get_time().val + PD_T_PD_DEBOUNCE;
+		start_timer(TC_CC_DEBOUNCE);
+
 		tc.cc_state = new_cc_state;
 		return;
 	}
 
 	/* Wait for CC debounce */
-	if (get_time().val < tc.cc_debounce)
+	if (!is_expired_timer(TC_CC_DEBOUNCE))
 		return;
 
 	/*
@@ -220,8 +268,7 @@ static void tc_attached_snk_entry(int port)
 {
 	print_alt_power();
 
-	tc.evt_timeout = EVT_TIMEOUT_NEVER;
-	tc.cc_debounce = 0;
+	stop_timer(TC_CC_DEBOUNCE);
 
 	/* Switch over to alternate supply */
 	en_pp5000_alt_3p3(1);
@@ -255,7 +302,6 @@ static void tc_attached_snk_exit(int port)
  */
 static const struct usb_state tc_states[] = {
 	[TC_UNATTACHED_SNK] = {
-		.entry	= tc_unattached_snk_entry,
 		.run	= tc_unattached_snk_run,
 	},
 	[TC_ATTACH_WAIT_SNK] = {
@@ -269,22 +315,17 @@ static const struct usb_state tc_states[] = {
 	},
 };
 
-void snk_task(void *u)
+void usb_tc_snk_sm_run(void)
 {
-	/* Unattached.SNK is the default starting state. */
-	restart_tc_sm(TC_UNATTACHED_SNK);
+	/* Sample CC lines */
+	get_cc(&tc.cc1, &tc.cc2);
 
-	while (1) {
-		/* wait for next event or timeout expiration */
-		task_wait_event(tc.evt_timeout);
+	/* Detect polarity */
+	tc.polarity = (tc.cc1 > tc.cc2) ? POLARITY_CC1 : POLARITY_CC2;
 
-		/* Sample CC lines */
-		get_cc(&tc.cc1, &tc.cc2);
+	/* update timers */
+	update_timers();
 
-		/* Detect polarity */
-		tc.polarity = (tc.cc1 > tc.cc2) ? POLARITY_CC1 : POLARITY_CC2;
-
-		/* Run TypeC state machine */
-		run_state(0, &tc.ctx);
-	}
+	/* Run TypeC state machine */
+	run_state(0, &tc.ctx);
 }
