@@ -16,6 +16,29 @@
       "message": "oops, i had a draft comment that i meant to post.",
       "revId": "af15326d86c6060aa5aaabb6d6a4ec3ae9e259bb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1930d2fa_bacb3d29",
+        "filename": "common/ioexpander.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1477788
+      },
+      "writtenOn": "2021-10-29T16:34:17Z",
+      "side": 1,
+      "message": "If the disabled flag was changed to DEFAULT_INIT_DISABLED, then it should be removed here, since now it doesn\u0027t mean that ioex is disabled at the moment.\nAlso, assigning the initialized flag to flags variable removes any other flag (that may exist in the future), especially the custom flags like the one used in tca64xxa driver",
+      "range": {
+        "startLine": 194,
+        "startChar": 0,
+        "endLine": 195,
+        "endChar": 50
+      },
+      "revId": "af15326d86c6060aa5aaabb6d6a4ec3ae9e259bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
