@@ -39,6 +39,30 @@
       },
       "revId": "af15326d86c6060aa5aaabb6d6a4ec3ae9e259bb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ded24bad_627e2803",
+        "filename": "common/ioexpander.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2021-11-01T15:49:51Z",
+      "side": 1,
+      "message": "This was fixed by https://crrev.com/c/3239014",
+      "parentUuid": "1930d2fa_bacb3d29",
+      "range": {
+        "startLine": 194,
+        "startChar": 0,
+        "endLine": 195,
+        "endChar": 50
+      },
+      "revId": "af15326d86c6060aa5aaabb6d6a4ec3ae9e259bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
