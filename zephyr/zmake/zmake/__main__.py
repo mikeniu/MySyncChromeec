@@ -136,7 +136,7 @@ def main(argv=None):
         "--log-level",
         choices=list(log_level_map.keys()),
         dest="log_level",
-        help="Set the logging level (default=INFO)",
+        help="Set the logging level (default=WARNING)",
     )
     parser.add_argument(
         "-L",
@@ -276,7 +276,7 @@ def main(argv=None):
     opts = parser.parse_args(argv)
 
     # Default logging
-    log_level = logging.INFO
+    log_level = logging.WARNING
     log_label = False
 
     if opts.log_level:
