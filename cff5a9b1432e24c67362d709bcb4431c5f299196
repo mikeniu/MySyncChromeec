@@ -52,6 +52,24 @@
       "parentUuid": "2de46dde_0f0fd09e",
       "revId": "cff5a9b1432e24c67362d709bcb4431c5f299196",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b49513b8_e2c36197",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2022-01-06T10:59:06Z",
+      "side": 1,
+      "message": "I check the datasheet of bmi320, its chip id is 0x41(in the page 50 of https://drive.google.com/file/d/1Hph3IFGt4xUR6iuU9aLQ8dIXe3ryTnVG/view?usp\u003dsharing),\nso I guess the Kingler proto0 used the bmi320, I will double-check with EE.",
+      "parentUuid": "fe3f7b92_04109439",
+      "revId": "cff5a9b1432e24c67362d709bcb4431c5f299196",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
