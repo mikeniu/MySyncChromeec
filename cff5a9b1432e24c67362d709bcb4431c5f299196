@@ -16,6 +16,24 @@
       "message": "cc Guybrush owner.\n\nI don\u0027t have a real device to check, but a random datasheet in google drive says it\u0027s 0x43...?",
       "revId": "cff5a9b1432e24c67362d709bcb4431c5f299196",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2de46dde_0f0fd09e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1182824
+      },
+      "writtenOn": "2022-01-06T08:28:15Z",
+      "side": 1,
+      "message": "I checked the datasheet: go/bmi323-ds",
+      "parentUuid": "7d6307ef_d31ff341",
+      "revId": "cff5a9b1432e24c67362d709bcb4431c5f299196",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
