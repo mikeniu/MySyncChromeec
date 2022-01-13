@@ -317,7 +317,6 @@ static int anx7447_init(int port)
 		return EC_ERROR_UNKNOWN;
 	}
 
-
 	rv = tcpci_tcpm_init(port);
 	if (rv)
 		return rv;
@@ -509,6 +508,9 @@ static int anx7447_mux_init(const struct usb_mux *me)
 {
 	int port = me->usb_port;
 	bool unused;
+
+	/* SPI0_I2C for MUX only */
+	anx[port].i2c_addr_flags = AN7447_SPI0_I2C_ADDR_FLAGS;
 
 	ASSERT(port < CONFIG_USB_PD_PORT_MAX_COUNT);
 
