@@ -46,6 +46,12 @@ config X86_NON_DSW_PWRSEQ_STACK_SIZE
 	  This option specifies the size of the stack used by the
 	  AP power sequencing state machine thread handler.
 
+config X86_NON_DSX_ADL_NO_EXT_PS_CHIP
+	bool "ADL Non Deep Sx with no external power sequencer chip"
+	default n
+	help
+	  This option indicates that there is no external power sequencer
+	  chip present.
 endif
 
 module = AP_PWRSEQ

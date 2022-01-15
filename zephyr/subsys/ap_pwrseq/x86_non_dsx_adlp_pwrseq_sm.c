@@ -114,18 +114,18 @@ static int wait_for_vrrdy(void)
 
 /* PCH_PWROK to PCH from EC */
 __attribute__((weak)) int generate_pch_pwrok_handler(
-				const struct common_pwrseq_config *com_cfg)
+				const struct chipset_pwrseq_config *chip_cfg)
 {
 	/* Enable PCH_PWROK, gated by VRRDY. */
-	if (gpio_pin_get_dt(&com_cfg->pch_pwrok) == 0) {
+	if (gpio_pin_get_dt(&chip_cfg->pch_pwrok) == 0) {
 		if (wait_for_vrrdy() == 0) {
 			LOG_DBG("Timed out waiting for VRRDY, "
 				"shutting AP off!");
 			ap_off();
 			return -1;
 		}
-		k_msleep(com_cfg->pch_pwrok_delay_ms);
-		gpio_pin_set_dt(&com_cfg->pch_pwrok, 1);
+		k_msleep(chip_cfg->pch_pwrok_delay_ms);
+		gpio_pin_set_dt(&chip_cfg->pch_pwrok, 1);
 		LOG_DBG("Set PCH_PWROK\n");
 	}
 
@@ -172,7 +172,7 @@ void s0_action_handler(const struct common_pwrseq_config *com_cfg)
 	/* TODO: There is possibility of EC not needing to generate
 	 * this as power sequencer may do it
 	 */
-	ret = generate_pch_pwrok_handler(com_cfg);
+	ret = generate_pch_pwrok_handler(&chip_cfg);
 	if (ret) {
 		LOG_DBG("PCH_PWROK handling failed err=%d\n", ret);
 		return;
