@@ -16,6 +16,29 @@
       "message": "Vadim, can you take a look at this?",
       "revId": "14d58d0bdca40f8c199b7ebf333cd5e09da70b81",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f843d201_d30dc96d",
+        "filename": "board/cr50/board.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 1602,
+      "author": {
+        "id": 1000039
+      },
+      "writtenOn": "2022-01-15T00:29:49Z",
+      "side": 1,
+      "message": "I don\u0027t think adding __func__ here is paritcularly useful, and the message in line 1574 still does not have it. I would suggest not to add it anywhere.",
+      "range": {
+        "startLine": 1602,
+        "startChar": 11,
+        "endLine": 1602,
+        "endChar": 14
+      },
+      "revId": "14d58d0bdca40f8c199b7ebf333cd5e09da70b81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
