@@ -24,6 +24,7 @@
 #include "power_button.h"
 #include "power.h"
 #include "registers.h"
+#include "rgb_keyboard.h"
 #include "switch.h"
 #include "tablet_mode.h"
 #include "throttle_ap.h"
