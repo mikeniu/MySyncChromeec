@@ -265,6 +265,9 @@ enum device_state {
 	/* The state is being ignored. */
 	DEVICE_STATE_IGNORED,
 
+	/* The state is blocked. */
+	DEVICE_STATE_BLOCKING,
+
 	/* Number of device states */
 	DEVICE_STATE_COUNT
 };

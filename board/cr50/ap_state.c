@@ -15,9 +15,11 @@
 #define CPRINTS(format, args...) cprints(CC_SYSTEM, format, ## args)
 
 static enum device_state state = DEVICE_STATE_INIT;
+static enum device_state disable_ds_temp = DEVICE_STATE_OFF;
 
 void print_ap_state(void)
 {
+	ccprintf("DS Dis:  %s\n", device_state_name(disable_ds_temp));
 	ccprintf("AP:      %s\n", device_state_name(state));
 }
 
@@ -25,6 +27,31 @@ int ap_is_on(void)
 {
 	return state == DEVICE_STATE_ON;
 }
+
+/*
+ * Console command is for testing only. This will be replaced with
+ * a VENDOR_CC_DS_DIS_TEMP(59) vendor command.
+ */
+static int command_dsvc(int argc, char **argv)
+{
+	int val;
+
+	if (argc > 1 && parse_bool(argv[1], &val)) {
+		if (val)
+			disable_ds_temp = DEVICE_STATE_ON;
+		else
+			ccprintf("Only enable is supported");
+	}
+	if (disable_ds_temp == DEVICE_STATE_ON)
+		ccprintf("Disabled deep sleep for next shutdown\n");
+	else if (disable_ds_temp == DEVICE_STATE_BLOCKING)
+		ccprintf("Blocking deep sleep\n");
+	else
+		ccprintf("deep sleep is enabled\n");
+	return EC_SUCCESS;
+}
+DECLARE_SAFE_CONSOLE_COMMAND(dsvc, command_dsvc,
+	"[enable]", "Force rollback to escape DEV image.");
 
 /**
  * Set the AP state.
@@ -75,8 +102,18 @@ static void deferred_set_ap_off(void)
 	 * Note: Presence of platform reset is a poor indicator of deep sleep
 	 * support.  It happens to be correlated with ARM vs x86 at present.
 	 */
-	if (board_deep_sleep_allowed())
+	if (disable_ds_temp != DEVICE_STATE_OFF) {
+		disable_ds_temp = DEVICE_STATE_BLOCKING;
+		CPRINTS("Block DS");
+		disable_deep_sleep();
+		/*
+		 * TPM_RST_L will stay asserted until the system resumes.
+		 * Wake from sleep when it goes high.
+		 */
+		gpio_set_wakepin(GPIO_TPM_RST_L, GPIO_HIB_WAKE_HIGH);
+	} else if (board_deep_sleep_allowed()) {
 		enable_deep_sleep();
+	}
 }
 DECLARE_DEFERRED(deferred_set_ap_off);
 
@@ -100,6 +137,24 @@ void set_ap_on(void)
 
 	if (board_deep_sleep_allowed())
 		disable_deep_sleep();
+
+	/*
+	 * set_ap_on is called often. Only reset the TPM_RST_L configuration if
+	 * it blocked deep sleep.
+	 */
+	if (disable_ds_temp == DEVICE_STATE_BLOCKING) {
+		CPRINTS("Clear DS Block");
+		/*
+		 * Restore TPM_RST_L wake low now that TPM_RST_L has been
+		 * deasserted.
+		 */
+		gpio_set_wakepin(GPIO_TPM_RST_L, GPIO_HIB_WAKE_LOW);
+	}
+	/*
+	 * disable_ds_temp only survives one TPM_RST_L pulse. Clear it when
+	 * the AP turns back on.
+	 */
+	disable_ds_temp = DEVICE_STATE_OFF;
 }
 
 static uint8_t waiting_for_ap_reset;
