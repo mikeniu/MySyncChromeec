@@ -16,12 +16,13 @@ menuconfig CROS_KB_RAW_NPCX
 
 if CROS_KB_RAW_NPCX
 
-config CROS_KB_RAW_NPCX_KSO_HIGH_DRIVE
-	bool "Enable quasi-bidirectional buffers for KSO pins"
+config CROS_KB_RAW_NPCX_INIT_PRIORITY
+	int "npcx cros_kb_raw initialization priority"
+	default 95
 	help
-	  This option enables quasi-bidirectional buffers for KSO pins. The
-	  low-impedance high drive is active when ec changes the output data
-	  buffers from 0 to 1, thereby reducing the low-to-high transition time.
+	  This option sets the npcx cros_kb_raw initialization priority.
+	  This driver depends on native zephyr kscan_npcx driver. Its priority
+	  must be lower than CONFIG_KSCAN_INIT_PRIORIT.
 
 endif # CROS_KB_RAW_NPCX
 

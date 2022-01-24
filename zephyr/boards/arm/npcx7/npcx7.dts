@@ -53,7 +53,7 @@
 	pinctrl-0 = <&altc_uart1_sl2>; /* Use UART1_SL2 ie. PIN64.65 */
 };
 
-&cros_kb_raw {
+&kscan0 {
 	status = "okay";
 	/* No KSO2 (it's inverted and implemented by GPIO) */
 	pinctrl-0 = <&alt7_no_ksi0_sl
