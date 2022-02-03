@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae47fbde_bf51fd2e",
+        "filename": "zephyr/subsys/ap_pwrseq/CMakeLists.txt",
+        "patchSetId": 14
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1281040
+      },
+      "writtenOn": "2022-02-03T01:51:04Z",
+      "side": 1,
+      "message": "Please separate the Brya specific config from the main driver/subsys code\nit may be better to move all the Brya specific config to a separate CL\nthat is last in the relation chain so that the entire config can be seen.",
+      "revId": "116a00d251bf6dba99bc1bd3b01ad94e884a65c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b70dcad3_432c7d72",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_espi.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1281040
+      },
+      "writtenOn": "2022-02-03T01:51:04Z",
+      "side": 1,
+      "message": "These should go into the pwr seq config structure.",
+      "revId": "116a00d251bf6dba99bc1bd3b01ad94e884a65c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25a15294_79fadbcd",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_espi.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1281040
+      },
+      "writtenOn": "2022-02-03T01:51:04Z",
+      "side": 1,
+      "message": "I am not sure how fixed some of these config items are.\nIf they are at all configurable, they should have a DTS\nconfig and bindings.",
+      "revId": "116a00d251bf6dba99bc1bd3b01ad94e884a65c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8d241a3_424f09ea",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_espi.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1281040
+      },
+      "writtenOn": "2022-02-03T01:51:04Z",
+      "side": 1,
+      "message": "This should be a configurable string, maybe obtained from a phandle\nreference to the espi node.",
+      "revId": "116a00d251bf6dba99bc1bd3b01ad94e884a65c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
