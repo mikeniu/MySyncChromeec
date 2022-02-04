@@ -37,6 +37,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "35f9f94b_a90fd8cb",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_espi.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2022-02-04T16:35:32Z",
+      "side": 1,
+      "message": "I suggest creating separate handlers for each event type. The eSPI driver has already verified the event type, so the switch statement below just is duplicated code.",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 54
+      },
+      "revId": "116a00d251bf6dba99bc1bd3b01ad94e884a65c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "25a15294_79fadbcd",
         "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_espi.c",
         "patchSetId": 14
