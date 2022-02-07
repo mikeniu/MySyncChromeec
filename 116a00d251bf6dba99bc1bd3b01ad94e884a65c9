@@ -58,6 +58,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90122d35_334f75ed",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_espi.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1129265
+      },
+      "writtenOn": "2022-02-07T23:13:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35f9f94b_a90fd8cb",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 54
+      },
+      "revId": "116a00d251bf6dba99bc1bd3b01ad94e884a65c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "25a15294_79fadbcd",
