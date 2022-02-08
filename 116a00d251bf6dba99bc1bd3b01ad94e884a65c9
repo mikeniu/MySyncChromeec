@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7eabd2a_b7558e06",
+        "filename": "zephyr/subsys/ap_pwrseq/CMakeLists.txt",
+        "patchSetId": 14
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1129265
+      },
+      "writtenOn": "2022-02-08T22:47:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a93e3b0e_d66907a8",
+      "revId": "116a00d251bf6dba99bc1bd3b01ad94e884a65c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b70dcad3_432c7d72",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Currently these are not being used. Tending to keep it local to this file for readability.",
       "parentUuid": "b70dcad3_432c7d72",
+      "revId": "116a00d251bf6dba99bc1bd3b01ad94e884a65c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d71747fe_7c576a30",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_espi.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1129265
+      },
+      "writtenOn": "2022-02-08T22:47:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f8726b04_f8a042ef",
       "revId": "116a00d251bf6dba99bc1bd3b01ad94e884a65c9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },

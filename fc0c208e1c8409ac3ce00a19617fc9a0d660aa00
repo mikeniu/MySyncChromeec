@@ -16,6 +16,24 @@
       "message": "Make the include guard the same name as the filename.",
       "revId": "fc0c208e1c8409ac3ce00a19617fc9a0d660aa00",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c15a43d8_f14af403",
+        "filename": "zephyr/subsys/ap_pwrseq/include/x86_non_dsx_espi.h",
+        "patchSetId": 17
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1129265
+      },
+      "writtenOn": "2022-02-08T22:47:33Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "590ff564_2fc42237",
+      "revId": "fc0c208e1c8409ac3ce00a19617fc9a0d660aa00",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
