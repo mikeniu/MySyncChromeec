@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a93e3b0e_d66907a8",
+        "filename": "zephyr/subsys/ap_pwrseq/CMakeLists.txt",
+        "patchSetId": 14
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1129265
+      },
+      "writtenOn": "2022-02-08T06:45:07Z",
+      "side": 1,
+      "message": "Could you please clarify this? Brya specific changes are moved to CL: 3377811, will be pushed up the relation chain.",
+      "parentUuid": "ae47fbde_bf51fd2e",
+      "revId": "116a00d251bf6dba99bc1bd3b01ad94e884a65c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b70dcad3_432c7d72",
         "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_espi.c",
         "patchSetId": 14
@@ -31,6 +49,24 @@
       "writtenOn": "2022-02-03T01:51:04Z",
       "side": 1,
       "message": "These should go into the pwr seq config structure.",
+      "revId": "116a00d251bf6dba99bc1bd3b01ad94e884a65c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8726b04_f8a042ef",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_espi.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1129265
+      },
+      "writtenOn": "2022-02-08T06:45:07Z",
+      "side": 1,
+      "message": "Currently these are not being used. Tending to keep it local to this file for readability.",
+      "parentUuid": "b70dcad3_432c7d72",
       "revId": "116a00d251bf6dba99bc1bd3b01ad94e884a65c9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -99,6 +135,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3784e4c6_f258091f",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_espi.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1129265
+      },
+      "writtenOn": "2022-02-08T06:45:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "25a15294_79fadbcd",
+      "revId": "116a00d251bf6dba99bc1bd3b01ad94e884a65c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c8d241a3_424f09ea",
@@ -112,6 +166,24 @@
       "writtenOn": "2022-02-03T01:51:04Z",
       "side": 1,
       "message": "This should be a configurable string, maybe obtained from a phandle\nreference to the espi node.",
+      "revId": "116a00d251bf6dba99bc1bd3b01ad94e884a65c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92f7f971_2540beaa",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_espi.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1129265
+      },
+      "writtenOn": "2022-02-08T06:45:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c8d241a3_424f09ea",
       "revId": "116a00d251bf6dba99bc1bd3b01ad94e884a65c9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
