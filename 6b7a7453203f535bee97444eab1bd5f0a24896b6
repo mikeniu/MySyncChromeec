@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0392f9b_2b08e480",
+        "filename": "driver/led/aw20198.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2022-02-10T12:24:23Z",
+      "side": 1,
+      "message": "Can you prefix the function names with the driver name? Not sure if it\u0027s an explicit guideline but it\u0027s useful to identify the specific function in the compiled image symbol table (imagine seeing _get_config versus aw20198_get_config).\n\nThis and the the set ones also feels over descriptive to me, if there\u0027s only 8 bit register access I\u0027d just call them aw20198_read and aw20198_write: makes it clear that there\u0027s only one way of accessing the registers and is inline with few other drivers here.",
+      "range": {
+        "startLine": 40,
+        "startChar": 11,
+        "endLine": 40,
+        "endChar": 20
+      },
+      "revId": "6b7a7453203f535bee97444eab1bd5f0a24896b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0eb3c99d_bf08e17b",
+        "filename": "driver/led/aw20198.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2022-02-10T12:24:23Z",
+      "side": 1,
+      "message": "nit: this syntax looks odd to me, I would rather use:\n\n`uint8_t buf[2] \u003d {addr, value};`\n\nor\n\n```\nuint8_t buf[2];\n\nbuf[0] \u003d addr;\nbuf[1] \u003d value;\n```\n\nMatter of taste of course, up to you.",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 0
+      },
+      "revId": "6b7a7453203f535bee97444eab1bd5f0a24896b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1dbe509d_4ec6aa46",
+        "filename": "driver/led/aw20198.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2022-02-10T12:24:23Z",
+      "side": 1,
+      "message": "Think this should be ADDR_FLAGS, that\u0027s what the API takes:\n\n```\nint chip_i2c_xfer(const int port, const uint16_t addr_flags,\n                  const uint8_t *out, int out_size,\n                  uint8_t *in, int in_size, int flags)\n```\n\n...or you could use `i2c_write8(..., addr, value)` (and read8 above)?",
+      "range": {
+        "startLine": 53,
+        "startChar": 32,
+        "endLine": 53,
+        "endChar": 48
+      },
+      "revId": "6b7a7453203f535bee97444eab1bd5f0a24896b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1851cad7_ffd6b764",
+        "filename": "driver/led/aw20198.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2022-02-10T12:24:23Z",
+      "side": 1,
+      "message": "I see this is used quite a bit, how would you feel about having an explicit `aw20198_set_page()` function? First I think it would make the code flow a bit better, but also you could use it to remember what page has been set last, and skip the register write if we are accessing the same page again.",
+      "range": {
+        "startLine": 68,
+        "startChar": 25,
+        "endLine": 68,
+        "endChar": 41
+      },
+      "revId": "6b7a7453203f535bee97444eab1bd5f0a24896b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c1bbedc_406bfaa0",
+        "filename": "driver/led/aw20198.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2022-02-10T12:24:23Z",
+      "side": 1,
+      "message": "I would use defines for the various magic numbers in the file. I see few magics around these drivers so maybe it\u0027s not super common practice? Up to you I guess...",
+      "range": {
+        "startLine": 77,
+        "startChar": 43,
+        "endLine": 77,
+        "endChar": 47
+      },
+      "revId": "6b7a7453203f535bee97444eab1bd5f0a24896b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "188e4ad5_aec15ddd",
+        "filename": "driver/led/aw20198.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2022-02-10T12:24:23Z",
+      "side": 1,
+      "message": "use the a name that describe the meaning of the variable rather than the type? `uint8_t cfg` could be a good one.",
+      "range": {
+        "startLine": 82,
+        "startChar": 9,
+        "endLine": 82,
+        "endChar": 11
+      },
+      "revId": "6b7a7453203f535bee97444eab1bd5f0a24896b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4828d9ac_c2c86cf5",
+        "filename": "driver/led/aw20198.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2022-02-10T12:24:23Z",
+      "side": 1,
+      "message": "nit: space before \u0027+\u0027? (`buf[i * RGB + 1]`)",
+      "range": {
+        "startLine": 109,
+        "startChar": 15,
+        "endLine": 109,
+        "endChar": 16
+      },
+      "revId": "6b7a7453203f535bee97444eab1bd5f0a24896b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
