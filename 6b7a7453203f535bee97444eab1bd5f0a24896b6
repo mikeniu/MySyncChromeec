@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "cb161694_966d5457",
+        "filename": "driver/led/aw20198.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1106949
+      },
+      "writtenOn": "2022-02-11T19:37:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0392f9b_2b08e480",
+      "range": {
+        "startLine": 40,
+        "startChar": 11,
+        "endLine": 40,
+        "endChar": 20
+      },
+      "revId": "6b7a7453203f535bee97444eab1bd5f0a24896b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "0eb3c99d_bf08e17b",
         "filename": "driver/led/aw20198.c",
         "patchSetId": 10
@@ -70,6 +94,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7b71045_1b94d852",
+        "filename": "driver/led/aw20198.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1106949
+      },
+      "writtenOn": "2022-02-11T19:37:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1dbe509d_4ec6aa46",
+      "range": {
+        "startLine": 53,
+        "startChar": 32,
+        "endLine": 53,
+        "endChar": 48
+      },
+      "revId": "6b7a7453203f535bee97444eab1bd5f0a24896b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1851cad7_ffd6b764",
@@ -83,6 +131,30 @@
       "writtenOn": "2022-02-10T12:24:23Z",
       "side": 1,
       "message": "I see this is used quite a bit, how would you feel about having an explicit `aw20198_set_page()` function? First I think it would make the code flow a bit better, but also you could use it to remember what page has been set last, and skip the register write if we are accessing the same page again.",
+      "range": {
+        "startLine": 68,
+        "startChar": 25,
+        "endLine": 68,
+        "endChar": 41
+      },
+      "revId": "6b7a7453203f535bee97444eab1bd5f0a24896b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bb7f70b_a880e58b",
+        "filename": "driver/led/aw20198.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1106949
+      },
+      "writtenOn": "2022-02-11T19:37:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1851cad7_ffd6b764",
       "range": {
         "startLine": 68,
         "startChar": 25,
@@ -116,6 +188,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "58d6a9b2_acebc65b",
+        "filename": "driver/led/aw20198.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1106949
+      },
+      "writtenOn": "2022-02-11T19:37:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c1bbedc_406bfaa0",
+      "range": {
+        "startLine": 77,
+        "startChar": 43,
+        "endLine": 77,
+        "endChar": 47
+      },
+      "revId": "6b7a7453203f535bee97444eab1bd5f0a24896b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "188e4ad5_aec15ddd",
@@ -139,6 +235,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "79f04380_d82d899c",
+        "filename": "driver/led/aw20198.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1106949
+      },
+      "writtenOn": "2022-02-11T19:37:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "188e4ad5_aec15ddd",
+      "range": {
+        "startLine": 82,
+        "startChar": 9,
+        "endLine": 82,
+        "endChar": 11
+      },
+      "revId": "6b7a7453203f535bee97444eab1bd5f0a24896b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4828d9ac_c2c86cf5",
@@ -152,6 +272,30 @@
       "writtenOn": "2022-02-10T12:24:23Z",
       "side": 1,
       "message": "nit: space before \u0027+\u0027? (`buf[i * RGB + 1]`)",
+      "range": {
+        "startLine": 109,
+        "startChar": 15,
+        "endLine": 109,
+        "endChar": 16
+      },
+      "revId": "6b7a7453203f535bee97444eab1bd5f0a24896b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46f79c47_4cc4b0e6",
+        "filename": "driver/led/aw20198.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1106949
+      },
+      "writtenOn": "2022-02-11T19:37:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4828d9ac_c2c86cf5",
       "range": {
         "startLine": 109,
         "startChar": 15,
