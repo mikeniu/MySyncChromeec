@@ -35,7 +35,6 @@ properties:
       - GPIO_DP_MUX_OE_L
       - GPIO_DP_MUX_SEL
       - GPIO_EC_BL_EN_OD
-      - GPIO_EC_CBI_WP
       - GPIO_EC_CHG_LED_W_C0
       - GPIO_EC_CHG_LED_W_C1
       - GPIO_EC_CHG_LED_Y_C0
