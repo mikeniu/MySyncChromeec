@@ -16,6 +16,29 @@
       "message": "ping.",
       "revId": "ef40701f958a397a4410aa5b8bb13034ae13ec82",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e4dbdf6_84f962c1",
+        "filename": "driver/led/aw20198.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2022-02-15T18:33:45Z",
+      "side": 1,
+      "message": "Drop the initial underscore, that\u0027s reserved compiler and stdlib stuff.",
+      "range": {
+        "startLine": 41,
+        "startChar": 11,
+        "endLine": 41,
+        "endChar": 12
+      },
+      "revId": "ef40701f958a397a4410aa5b8bb13034ae13ec82",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
