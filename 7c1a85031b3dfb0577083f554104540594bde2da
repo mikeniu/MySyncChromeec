@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1aeaedf9_b47f0ed3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1191034
+      },
+      "writtenOn": "2022-02-15T17:40:52Z",
+      "side": 1,
+      "message": "Reviewed the diff change is as expected in the header file, following the review comments.\n\n",
+      "revId": "7c1a85031b3dfb0577083f554104540594bde2da",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
