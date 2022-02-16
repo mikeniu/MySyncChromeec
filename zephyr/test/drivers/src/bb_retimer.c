@@ -523,4 +523,15 @@ ZTEST_USER(bb_retimer, test_bb_init)
 		      NULL);
 }
 
+/** Test BB retimer console command */
+ZTEST_USER(bb_retimer, test_bb_console_cmd)
+{
+	int rv;
+
+	rv = shell_execute_cmd(get_ec_shell(), "bb 1 r 2");
+	zassert_ok(rv, "rv=%d", rv);
+	rv = shell_execute_cmd(get_ec_shell(), "bb 1 w 2 0");
+	zassert_ok(rv, "rv=%d", rv);
+}
+
 ZTEST_SUITE(bb_retimer, drivers_predicate_post_main, NULL, NULL, NULL, NULL);
