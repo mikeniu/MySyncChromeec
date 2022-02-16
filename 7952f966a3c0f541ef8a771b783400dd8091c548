@@ -16,6 +16,23 @@
       "message": "get value dd from evtest",
       "revId": "7952f966a3c0f541ef8a771b783400dd8091c548",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4054269a_f4863102",
+        "filename": "board/nipperkin/board.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2022-02-16T13:48:12Z",
+      "side": 1,
+      "message": "Will this cause the keyboard on existing boards to malfunction? i.e. should we be checking board version before applying this?",
+      "revId": "7952f966a3c0f541ef8a771b783400dd8091c548",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
