@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75390539_cb3db837",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1361259
+      },
+      "writtenOn": "2022-02-25T00:25:44Z",
+      "side": 1,
+      "message": "This seems like something we\u0027ll want for every variant, so can we turn it on in prj.conf instead of the Nereid-specific file?",
+      "revId": "f146b25fe411ec1391e7e63e3ec3c26dbd15d52a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
