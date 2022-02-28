@@ -39,9 +39,10 @@ static void hostcmd_respond(struct host_packet *pkt)
 
 static char calculate_checksum(const char *buf, int size)
 {
-	int c = 0;
+	int c;
 	int i;
 
+	c = 0;
 	for (i = 0; i < size; ++i)
 		c += buf[i];
 
@@ -75,14 +76,16 @@ static int hostcmd_fill(const uint8_t *data, size_t size)
 	struct chunk chunks[1] = { {0, sizeof(req_buf)} };
 #endif
 
-	int ipos = 0;
+	int ipos;
 	int i;
-	int req_size = 0;
+	int req_size;
 
 	/*
 	 * TODO(chromium:854975): We should probably malloc req_buf with the
 	 * correct size, to make we do not read uninitialized req_buf data.
 	 */
+	ipos = 0;
+	req_size = 0;
 	memset(req_buf, 0, sizeof(req_buf));
 
 	/*
