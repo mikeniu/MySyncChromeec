@@ -33,14 +33,14 @@
 		compatible = "intel,ap-pwrseq-gpio";
 		dbg-label = "pwr-pg-ec-rsmrst-odl";
 		enum-name = "PWR_RSMRST";
-		gpios = <&gpio9 4 (GPIO_ACTIVE_LOW|GPIO_PULL_UP)>;
+		gpios = <&gpio9 4 (GPIO_ACTIVE_HIGH|GPIO_PULL_UP)>;
 		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
 	};
 	pwr-ec-pch-rsmrst-odl {
 		compatible = "intel,ap-pwrseq-gpio";
 		dbg-label = "pwr-ec-pch-rsmrst-odl";
 		enum-name = "PWR_EC_PCH_RSMRST";
-		gpios = <&gpioa 6 (GPIO_ACTIVE_LOW)>;
+		gpios = <&gpioa 6 (GPIO_ACTIVE_HIGH)>;
 		output;
 	};
 	pwr-slp-s0-l {
