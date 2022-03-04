@@ -120,6 +120,17 @@ void lid_interrupt(enum gpio_signal signal)
 	hook_call_deferred(&lid_change_deferred_data, LID_DEBOUNCE_US);
 }
 
+void base_enable_lid_detect(int enable)
+{
+	CPRINTS("lid detect %sabled", enable ? "en" : "dis");
+	if (enable) {
+		gpio_enable_interrupt(GPIO_LID_OPEN);
+	} else {
+		gpio_disable_interrupt(GPIO_LID_OPEN);
+		lid_switch_open();
+	}
+}
+
 static int command_lidopen(int argc, char **argv)
 {
 	lid_switch_open();

@@ -14,6 +14,7 @@
 #include "gpio.h"
 #include "hooks.h"
 #include "host_command.h"
+#include "lid_switch.h"
 #include "system.h"
 #include "tablet_mode.h"
 #include "timer.h"
@@ -67,27 +68,40 @@ enum base_status {
 };
 
 static enum base_status current_base_status;
+static int base_enable_allow;
+static int current_base_enable_allow;
 
 /*
  * This function is called whenever there is a change in the base detect
  * status. Actions taken include:
- * 1. Change in power to base
+ * 1. Change in power to base after chipset startup, and disable the base
+ * power after chipset shutdown.
  * 2. Indicate mode change to host.
  * 3. Indicate tablet mode to host. Current assumption is that if base is
  * disconnected then the system is in tablet mode, else if the base is
  * connected, then the system is not in tablet mode.
+ * 4. Change lid dectect according to base status.
  */
 static void base_detect_change(enum base_status status)
 {
 	int connected = (status == BASE_CONNECTED);
 
-	if (current_base_status == status)
+	if ((current_base_status == status) &&
+			(current_base_enable_allow == base_enable_allow))
 		return;
 
-	gpio_set_level(GPIO_EN_BASE, connected);
+	if (base_enable_allow) {
+		gpio_set_level(GPIO_EN_BASE, connected);
+	} else {
+		gpio_set_level(GPIO_EN_BASE, 0);
+	}
+
 	tablet_set_mode(!connected, TABLET_TRIGGER_BASE);
 	base_set_state(connected);
 	current_base_status = status;
+	current_base_enable_allow = base_enable_allow;
+	connected ? base_enable_lid_detect(1) :
+			base_enable_lid_detect(0);
 }
 
 /* Measure detection pin pulse duration (used to wake AP from deep S3). */
@@ -119,7 +133,8 @@ static void base_detect_deferred(void)
 	print_base_detect_value(v, tmp_pulse_width);
 
 	if (v >= BASE_DETECT_MIN_MV && v <= BASE_DETECT_MAX_MV) {
-		if (current_base_status != BASE_CONNECTED) {
+		if ((current_base_status != BASE_CONNECTED) ||
+			(current_base_enable_allow != base_enable_allow)) {
 			base_detect_change(BASE_CONNECTED);
 		} else if (tmp_pulse_width >= BASE_DETECT_PULSE_MIN_US &&
 			   tmp_pulse_width <= BASE_DETECT_PULSE_MAX_US) {
@@ -191,18 +206,19 @@ static void base_enable(void)
 	hook_call_deferred(&base_detect_deferred_data,
 			BASE_DETECT_EN_LATER_US);
 	gpio_enable_interrupt(GPIO_BASE_DET_L);
+	base_enable_allow = 1;
 }
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, base_enable, HOOK_PRIO_DEFAULT);
 
 static void base_disable(void)
 {
 	/*
-	 * Disable base detection interrupt and disable power to base.
-	 * Set the state UNKNOWN so the next startup will initialize a
-	 * correct state and notify AP.
+	 * Disable power to base and reset the base_enable_allow,
+	 * so the next startup will initialize a correct state
+	 * and notify AP.
 	 */
-	gpio_disable_interrupt(GPIO_BASE_DET_L);
-	base_detect_change(BASE_UNKNOWN);
+	base_enable_allow = 0;
+	base_detect_change(current_base_status);
 }
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, base_disable, HOOK_PRIO_DEFAULT);
 

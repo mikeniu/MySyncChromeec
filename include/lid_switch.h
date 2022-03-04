@@ -24,4 +24,11 @@ int lid_is_open(void);
  */
 void lid_interrupt(enum gpio_signal signal);
 
+/**
+ * Disable lid interrupt and set the lid open, when base is disconnected.
+ *
+ * @param enable    Flag that enables or disables lid interrupt.
+ */
+void base_enable_lid_detect(int enable);
+
 #endif  /* __CROS_EC_LID_SWITCH_H */
