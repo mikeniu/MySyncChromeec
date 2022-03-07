@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "359003dd_3cee0df6",
+        "filename": "driver/retimer/ps8811.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2022-03-07T05:14:26Z",
+      "side": 1,
+      "message": "(7, 4)",
+      "range": {
+        "startLine": 47,
+        "startChar": 44,
+        "endLine": 47,
+        "endChar": 57
+      },
+      "revId": "8670e6f1339ec763d92b52cf77cf65396817bedf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
