@@ -24,6 +24,7 @@ GPIO_INT(USB_C0_TCPC_INT_ODL,            PIN(E, 0), GPIO_INT_FALLING, tcpc_alert
 GPIO_INT(USB_C0_PPC_INT_ODL,             PIN(6, 2), GPIO_INT_FALLING, ppc_interrupt)
 GPIO_INT(USB_C1_BC12_INT_ODL,            PIN(8, 3), GPIO_INT_FALLING, bc12_interrupt)
 GPIO_INT(USB_C1_TCPC_INT_ODL,            PIN(7, 0), GPIO_INT_FALLING, tcpc_alert_event)
+GPIO_INT(BJ_ADP_PRESENT_ODL,             PIN(5, 6), GPIO_INT_BOTH | GPIO_PULL_UP, bj_present_interrupt)
 
 /* USED GPIOs: */
 GPIO(CCD_MODE_ODL,                   PIN(E, 5), GPIO_INPUT)
@@ -68,7 +69,6 @@ GPIO(EN_USB_A_LOW_POWER,             PIN(9, 3), GPIO_OUT_LOW)
 
 /* Barreljack */
 GPIO(EN_PPVAR_BJ_ADP,                PIN(A, 2), GPIO_OUT_LOW)
-GPIO(BJ_ADP_PRESENT_L,               PIN(5, 6), GPIO_INPUT)
 
 /*
  * The NPCX keyboard driver does not use named GPIOs to access
