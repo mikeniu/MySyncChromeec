@@ -73,6 +73,7 @@
 #define TCPC_REG_CONFIG_STD_OUTPUT_CONNECTOR_FLIPPED BIT(0)
 
 #define TCPC_REG_TCPC_CTRL         0x19
+#define TCPC_REG_TCPC_CTRL_BIST_TEST_MODE BIT(1)
 #define TCPC_REG_TCPC_CTRL_SET(polarity) (polarity)
 #define TCPC_REG_TCPC_CTRL_POLARITY(reg) ((reg) & 0x1)
 /*

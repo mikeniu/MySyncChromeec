@@ -11,6 +11,7 @@
 #include "common.h"
 #include "console.h"
 #include "dps.h"
+#include "tcpm/tcpci.h"
 #include "driver/tcpm/tcpm.h"
 #include "ec_commands.h"
 #include "hooks.h"
@@ -5124,6 +5125,10 @@ static void pe_bist_tx_entry(int port)
 
 static void pe_bist_tx_run(int port)
 {
+	int regval;
+	int cc1;
+	int cc2;
+
 	if (pd_timer_is_expired(port, PE_TIMER_BIST_CONT_MODE)) {
 		/*
 		 * Entry point to disable BIST in TCPC if that's not already
@@ -5144,6 +5149,17 @@ static void pe_bist_tx_run(int port)
 		 */
 		if (PE_CHK_FLAG(port, PE_FLAGS_MSG_RECEIVED))
 			PE_CLR_FLAG(port, PE_FLAGS_MSG_RECEIVED);
+
+		tcpc_read(port, TCPC_REG_CC_STATUS, &regval);
+
+		/* Get the current CC values from the CC STATUS */
+		cc1 = TCPC_REG_CC_STATUS_CC1(regval);
+		cc2 = TCPC_REG_CC_STATUS_CC2(regval);
+		if ((cc1 == TYPEC_CC_VOLT_OPEN) && (cc2 == TYPEC_CC_VOLT_OPEN)) {
+			tcpc_read(port, TCPC_REG_TCPC_CTRL, &regval);
+			regval &= ~TCPC_REG_TCPC_CTRL_BIST_TEST_MODE;
+			tcpc_write(port, TCPC_REG_TCPC_CTRL, regval);
+		}
 	}
 }
 
