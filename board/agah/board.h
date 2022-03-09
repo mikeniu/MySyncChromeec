@@ -143,6 +143,10 @@
 #define CONFIG_CHARGER_SENSE_RESISTOR		10
 #define CONFIG_CHARGER_SENSE_RESISTOR_AC	10
 
+/* Barrel jack adapter settings */
+#define CONFIG_DEDICATED_CHARGE_PORT_COUNT	1
+#define DEDICATED_CHARGE_PORT			3
+
 /*
  * Older boards have a different ADC assignment.
  */

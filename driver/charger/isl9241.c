@@ -369,6 +369,68 @@ int isl9241_set_dc_prochot(int chgnum, int ma)
 	return rv;
 }
 
+enum charge_mode {
+	CHARGE_MODE_NVDC = 0,
+	CHARGE_MODE_NVDC_CHG = 1,
+	CHARGE_MODE_BYPASS = 2,
+	CHARGE_MODE_BYPASS_CHG = 3,
+	CHARGE_MODE_RTB = 4,
+};
+
+static enum charge_mode isl9241_charge_mode;
+
+enum ec_error_list isl9241_set_charge_mode(int chgnum, enum charge_mode mode,
+					   int input_current,
+					   int battery_full_voltage_mv)
+{
+	enum ec_error_list rv = EC_ERROR_UNKNOWN;
+
+	switch (isl9241_charge_mode) {
+	case CHARGE_MODE_NVDC:
+		/* To BYPASS (A) */
+		if (mode == CHARGE_MODE_BYPASS) {
+			/* Step A1 through 16 of table 1 in Application notes */
+			rv = isl9241_set_input_current_limit(chgnum,
+							     input_current);
+			rv |= isl9241_update(chgnum, ISL9241_REG_CONTROL0,
+					     ISL9241_CONTROL0_EN_CHARGE_PUMPS,
+					     MASK_SET);
+			rv |= isl9241_update(chgnum, ISL9241_REG_CONTROL3,
+					     ISL9241_CONTROL3_ENABLE_ADC,
+					     MASK_SET);
+			rv |= isl9241_update(chgnum, ISL9241_REG_CONTROL0,
+					     ISL9241_CONTROL0_EN_VIN_VOUT_COMP,
+					     MASK_SET);
+			rv |= isl9241_write(chgnum, ISL9241_REG_ACOK_REFERENCE,
+					    ISL9241_MV_TO_ACOK_REFERENCE(
+						battery_full_voltage_mv + 800));
+		}
+		/* To NVDC_CHG (K) */
+		break;
+	case CHARGE_MODE_NVDC_CHG:
+		/* To NVDC (L) */
+		if (mode == CHARGE_MODE_NVDC) {
+			rv = isl9241_set_current(chgnum, 0);
+			rv |= isl9241_write(chgnum,
+					    ISL9241_REG_MIN_SYSTEM_VOLTAGE, 0);
+		} else {
+			return EC_ERROR_INVAL;
+		}
+		break;
+	case CHARGE_MODE_BYPASS:
+		break;
+	case CHARGE_MODE_BYPASS_CHG:
+		break;
+	case CHARGE_MODE_RTB:
+	default:
+	}
+
+	if (rv == EC_SUCCESS)
+		isl9241_charge_mode = mode;
+
+	return rv;
+}
+
 /*****************************************************************************/
 /* ISL-9241 initialization */
 static void isl9241_init(int chgnum)

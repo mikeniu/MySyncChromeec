@@ -897,6 +897,10 @@ static void charge_manager_refresh(void)
 	charge_supplier = new_supplier;
 	charge_port = new_port;
 
+	/* Enable/disable bypass mode */
+	charger_enable_bypass_mode(
+			charge_supplier == CHARGE_SUPPLIER_DEDICATED);
+
 #ifdef CONFIG_USB_PD_LOGGING
 	/*
 	 * Write a log under the following conditions:

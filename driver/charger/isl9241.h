@@ -43,6 +43,8 @@
 #define ISL9241_REG_CONTROL0		0x39
 /* 2: Input Voltage Regulation (0 = Enable (default), 1 = Disable) */
 #define ISL9241_CONTROL0_INPUT_VTG_REGULATION	BIT(2)
+#define ISL9241_CONTROL0_EN_VIN_VOUT_COMP	BIT(5)
+#define ISL9241_CONTROL0_EN_CHARGE_PUMPS	BIT(6)
 
 
 #define ISL9241_REG_INFORMATION1	0x3A
@@ -96,6 +98,8 @@
 #define ISL9241_REG_DC_PROCHOT		0x48
 #define ISL9241_REG_OTG_VOLTAGE		0x49
 #define ISL9241_REG_OTG_CURRENT		0x4A
+
+#define ISL9241_MV_TO_ACOK_REFERENCE(mv)	(((mv) / 96) << 6)
 
 /* VIN Voltage (ADP Min Voltage) (default 4.096V) */
 #define ISL9241_REG_VIN_VOLTAGE		0x4B
