@@ -22,6 +22,30 @@
       },
       "revId": "d380fe34ccce733a107969d0b30a731847fc9a7d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16439e9c_4dca4ee0",
+        "filename": "zephyr/test/drivers/src/i2c_passthru.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2022-03-10T20:17:17Z",
+      "side": 1,
+      "message": "Because struct ec_response_i2c_passthru has a variable sized array as its last member.",
+      "parentUuid": "bd2d15a5_a93fee5d",
+      "range": {
+        "startLine": 17,
+        "startChar": 61,
+        "endLine": 17,
+        "endChar": 65
+      },
+      "revId": "d380fe34ccce733a107969d0b30a731847fc9a7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
