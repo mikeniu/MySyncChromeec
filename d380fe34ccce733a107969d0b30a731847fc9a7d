@@ -94,6 +94,30 @@
       },
       "revId": "d380fe34ccce733a107969d0b30a731847fc9a7d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce17765b_c93afa46",
+        "filename": "zephyr/test/drivers/src/i2c_passthru.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2022-03-10T23:43:39Z",
+      "side": 1,
+      "message": "Got it.",
+      "parentUuid": "0c7242cc_d0e3c9aa",
+      "range": {
+        "startLine": 17,
+        "startChar": 61,
+        "endLine": 17,
+        "endChar": 65
+      },
+      "revId": "d380fe34ccce733a107969d0b30a731847fc9a7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
