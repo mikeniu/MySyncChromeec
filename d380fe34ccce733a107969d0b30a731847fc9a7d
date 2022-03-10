@@ -46,6 +46,30 @@
       },
       "revId": "d380fe34ccce733a107969d0b30a731847fc9a7d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "240356bd_5b189e09",
+        "filename": "zephyr/test/drivers/src/i2c_passthru.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2022-03-10T23:16:08Z",
+      "side": 1,
+      "message": "I see. As most the battery params are 2 bytes, the virtual battery code limits to read 2 bytes max. The first byte is stored in the last member of ec_response_i2c_passthru, so 1 extra byte is enough, right?",
+      "parentUuid": "16439e9c_4dca4ee0",
+      "range": {
+        "startLine": 17,
+        "startChar": 61,
+        "endLine": 17,
+        "endChar": 65
+      },
+      "revId": "d380fe34ccce733a107969d0b30a731847fc9a7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
