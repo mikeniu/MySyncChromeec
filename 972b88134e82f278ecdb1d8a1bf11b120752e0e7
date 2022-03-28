@@ -1,0 +1,159 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a2f32d5_c9e95a1f",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1534724
+      },
+      "writtenOn": "2022-03-28T19:33:50Z",
+      "side": 1,
+      "message": "Out of curiosity, is this always guaranteed to be a `rw` area, regardless of the `section` specified as input to the function?",
+      "range": {
+        "startLine": 256,
+        "startChar": 4,
+        "endLine": 256,
+        "endChar": 11
+      },
+      "revId": "972b88134e82f278ecdb1d8a1bf11b120752e0e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d52d8bca_435ba366",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1534724
+      },
+      "writtenOn": "2022-03-28T19:33:50Z",
+      "side": 1,
+      "message": "Minor: maybe this could be called `read_section` instead? The word `backup` makes me think we are saving the content to a file.",
+      "range": {
+        "startLine": 259,
+        "startChar": 4,
+        "endLine": 259,
+        "endChar": 18
+      },
+      "revId": "972b88134e82f278ecdb1d8a1bf11b120752e0e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "165e55e2_9dd1608b",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1534724
+      },
+      "writtenOn": "2022-03-28T19:33:50Z",
+      "side": 1,
+      "message": "See suggestion below about replacing `bool` return values with exceptions.\n\nSame applies to `copy_section` and `replace_ro`.",
+      "range": {
+        "startLine": 265,
+        "startChar": 65,
+        "endLine": 265,
+        "endChar": 69
+      },
+      "revId": "972b88134e82f278ecdb1d8a1bf11b120752e0e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81d2417f_c4b732d1",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1534724
+      },
+      "writtenOn": "2022-03-28T19:33:50Z",
+      "side": 1,
+      "message": "Should the types be swapped? Also, maybe we can use more descriptive names.  For examople:\n\n```\nsrc_bytes: bytearray, dst_image: bytes,\n```",
+      "range": {
+        "startLine": 265,
+        "startChar": 20,
+        "endLine": 265,
+        "endChar": 47
+      },
+      "revId": "972b88134e82f278ecdb1d8a1bf11b120752e0e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb559fd0_68b55c47",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 1534724
+      },
+      "writtenOn": "2022-03-28T19:33:50Z",
+      "side": 1,
+      "message": "Should this be `bytes`?",
+      "range": {
+        "startLine": 276,
+        "startChar": 34,
+        "endLine": 276,
+        "endChar": 43
+      },
+      "revId": "972b88134e82f278ecdb1d8a1bf11b120752e0e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "774ae6cd_d9e343b5",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 1534724
+      },
+      "writtenOn": "2022-03-28T19:33:50Z",
+      "side": 1,
+      "message": "This makes sense. Also, in the case where `dst_size` \u003e `src_size` should we explicitly clear the remaining extra bytes that won\u0027t be overwritten at line 287?\n\nI am not sure how the image is organized, so maybe that\u0027s not necessary.\n\nSame for the check at line 269.",
+      "range": {
+        "startLine": 281,
+        "startChar": 0,
+        "endLine": 282,
+        "endChar": 20
+      },
+      "revId": "972b88134e82f278ecdb1d8a1bf11b120752e0e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00692a83_3b242398",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 1534724
+      },
+      "writtenOn": "2022-03-28T19:33:50Z",
+      "side": 1,
+      "message": "I think the function is missing the return value if this is `False`.\n\nOn the other hand, would it be safer to remove the `bool` return value entirely and use [Python exceptions](https://docs.python.org/3/tutorial/errors.html) instead?\n\nThere are a lot of operations that can fail in the functions defined above (e.g. a URL is incorrect and the file can\u0027t be downloaded).\n\nIf `patch_image` is usually expected to succeed, then we can have a single `try...except` block where it\u0027s invoked at line 577.",
+      "revId": "972b88134e82f278ecdb1d8a1bf11b120752e0e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
