@@ -83,6 +83,8 @@
 #define CONFIG_USBC_PPC_SYV682X
 #define CONFIG_USBC_PPC_NX20P3483
 
+#define CONFIG_DISABLE_VPRO_SUPPORT
+
 /* TODO: b/193452481 - measure and check these values on redrix */
 #define PD_POWER_SUPPLY_TURN_ON_DELAY	30000 /* us */
 #define PD_POWER_SUPPLY_TURN_OFF_DELAY	30000 /* us */
