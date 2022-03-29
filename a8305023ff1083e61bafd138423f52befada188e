@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4de49a02_32d426b4",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1529242
+      },
+      "writtenOn": "2022-03-29T18:28:21Z",
+      "side": 1,
+      "message": "I think it\u0027s okay but looking at `read_file` and  `read_file_gsutil` 6 months down the line, it may be confusing that one returns `bytearray` while the other returns `bytes`. It might make sense to have both return `bytes` and then construct a `bytearray` to merge them, but I\u0027m not sure.",
+      "range": {
+        "startLine": 236,
+        "startChar": 35,
+        "endLine": 236,
+        "endChar": 40
+      },
+      "revId": "a8305023ff1083e61bafd138423f52befada188e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d70b8a9_c65092d3",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1529242
+      },
+      "writtenOn": "2022-03-29T18:28:21Z",
+      "side": 1,
+      "message": "This comment is a little misleading. Maybe it would read better as `Update image by replacing the specified section with the contents of data`?",
+      "range": {
+        "startLine": 264,
+        "startChar": 7,
+        "endLine": 264,
+        "endChar": 47
+      },
+      "revId": "a8305023ff1083e61bafd138423f52befada188e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "79cb7201_1b5c7399",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1529242
+      },
+      "writtenOn": "2022-03-29T18:28:21Z",
+      "side": 1,
+      "message": "I was going to ask if we should be concerned if the sizes don\u0027t match exactly, as that could be an indication that the format is no longer compatible but after thinking about it more, I\u0027m not sure that this is the right place for that logic. \n\nAlso, it\u0027s probably not a major issue for changing keys out but it may be something we should be concerned with if this is used elsewhere.",
+      "range": {
+        "startLine": 280,
+        "startChar": 7,
+        "endLine": 280,
+        "endChar": 15
+      },
+      "revId": "a8305023ff1083e61bafd138423f52befada188e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
