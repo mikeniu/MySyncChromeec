@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "359817bf_a7b177f0",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1407950
+      },
+      "writtenOn": "2022-03-29T15:34:54Z",
+      "side": 1,
+      "message": "No. I was changing this code back and forth and didn\u0027t note that this is named `rw_area`. Changed it to `area`.",
+      "parentUuid": "7a2f32d5_c9e95a1f",
+      "range": {
+        "startLine": 256,
+        "startChar": 4,
+        "endLine": 256,
+        "endChar": 11
+      },
+      "revId": "972b88134e82f278ecdb1d8a1bf11b120752e0e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d52d8bca_435ba366",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-03-28T19:33:50Z",
       "side": 1,
       "message": "Minor: maybe this could be called `read_section` instead? The word `backup` makes me think we are saving the content to a file.",
+      "range": {
+        "startLine": 259,
+        "startChar": 4,
+        "endLine": 259,
+        "endChar": 18
+      },
+      "revId": "972b88134e82f278ecdb1d8a1bf11b120752e0e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c98ed35a_eecb02d8",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1407950
+      },
+      "writtenOn": "2022-03-29T15:34:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d52d8bca_435ba366",
       "range": {
         "startLine": 259,
         "startChar": 4,
@@ -93,6 +141,54 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c80012ed_ee60d892",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1407950
+      },
+      "writtenOn": "2022-03-29T15:34:54Z",
+      "side": 1,
+      "message": "`bytes` type is read only, `bytearray` can be modified.",
+      "parentUuid": "81d2417f_c4b732d1",
+      "range": {
+        "startLine": 265,
+        "startChar": 20,
+        "endLine": 265,
+        "endChar": 47
+      },
+      "revId": "972b88134e82f278ecdb1d8a1bf11b120752e0e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48353a56_f6e20d66",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1407950
+      },
+      "writtenOn": "2022-03-29T15:34:54Z",
+      "side": 1,
+      "message": "Yup. I replaced returning bool to raising exceptions. Actually, in this file some functions are returning bool instead of using exceptions, but I agree that using exceptions is much cleaner.",
+      "parentUuid": "165e55e2_9dd1608b",
+      "range": {
+        "startLine": 265,
+        "startChar": 65,
+        "endLine": 265,
+        "endChar": 69
+      },
+      "revId": "972b88134e82f278ecdb1d8a1bf11b120752e0e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cb559fd0_68b55c47",
@@ -106,6 +202,30 @@
       "writtenOn": "2022-03-28T19:33:50Z",
       "side": 1,
       "message": "Should this be `bytes`?",
+      "range": {
+        "startLine": 276,
+        "startChar": 34,
+        "endLine": 276,
+        "endChar": 43
+      },
+      "revId": "972b88134e82f278ecdb1d8a1bf11b120752e0e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4648c80_357fe187",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 1407950
+      },
+      "writtenOn": "2022-03-29T15:34:54Z",
+      "side": 1,
+      "message": "No. `dst` is modified, so it needs to be `bytearray`.",
+      "parentUuid": "cb559fd0_68b55c47",
       "range": {
         "startLine": 276,
         "startChar": 34,
@@ -139,6 +259,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b68aa6ba_f8d8bd03",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 1407950
+      },
+      "writtenOn": "2022-03-29T15:34:54Z",
+      "side": 1,
+      "message": "Added clearing. In most cases the same section in images have the same size, but clearing remaining bytes is okay for me.",
+      "parentUuid": "774ae6cd_d9e343b5",
+      "range": {
+        "startLine": 281,
+        "startChar": 0,
+        "endLine": 282,
+        "endChar": 20
+      },
+      "revId": "972b88134e82f278ecdb1d8a1bf11b120752e0e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "00692a83_3b242398",
@@ -152,6 +296,24 @@
       "writtenOn": "2022-03-28T19:33:50Z",
       "side": 1,
       "message": "I think the function is missing the return value if this is `False`.\n\nOn the other hand, would it be safer to remove the `bool` return value entirely and use [Python exceptions](https://docs.python.org/3/tutorial/errors.html) instead?\n\nThere are a lot of operations that can fail in the functions defined above (e.g. a URL is incorrect and the file can\u0027t be downloaded).\n\nIf `patch_image` is usually expected to succeed, then we can have a single `try...except` block where it\u0027s invoked at line 577.",
+      "revId": "972b88134e82f278ecdb1d8a1bf11b120752e0e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ebb3224_84b01543",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 1407950
+      },
+      "writtenOn": "2022-03-29T15:34:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "00692a83_3b242398",
       "revId": "972b88134e82f278ecdb1d8a1bf11b120752e0e7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
