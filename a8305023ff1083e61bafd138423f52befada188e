@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5af8eaf8_b7d88900",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2022-03-29T19:54:19Z",
+      "side": 1,
+      "message": "Can you add two blank lines between each of the functions?\n\n`PEP 8: E302 expected 2 blank lines, found 1`\n\nI\u0027m not sure why `cros lint` does not complain.",
+      "revId": "a8305023ff1083e61bafd138423f52befada188e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4de49a02_32d426b4",
         "filename": "test/run_device_tests.py",
         "patchSetId": 2
@@ -19,6 +36,52 @@
         "startChar": 35,
         "endLine": 236,
         "endChar": 40
+      },
+      "revId": "a8305023ff1083e61bafd138423f52befada188e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a61c6b21_3237c9ed",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2022-03-29T19:54:19Z",
+      "side": 1,
+      "message": "You can remove parentheses here",
+      "range": {
+        "startLine": 255,
+        "startChar": 11,
+        "endLine": 255,
+        "endChar": 41
+      },
+      "revId": "a8305023ff1083e61bafd138423f52befada188e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfb5e02a_ed4d86e6",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2022-03-29T19:54:19Z",
+      "side": 1,
+      "message": "My editor is warning:\n\n`Expected type \u0027bytearray\u0027, got \u0027Union[int, bytes]\u0027 instead`\n\nLooks like the return type should be `bytes` instead of `bytearray`.",
+      "range": {
+        "startLine": 261,
+        "startChar": 11,
+        "endLine": 261,
+        "endChar": 33
       },
       "revId": "a8305023ff1083e61bafd138423f52befada188e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -47,6 +110,29 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "df2ce22d_02094c6f",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2022-03-29T19:54:19Z",
+      "side": 1,
+      "message": "I\u0027m not sure what `src` is referring to here. I think Bobby\u0027s suggestion sounds good.",
+      "range": {
+        "startLine": 264,
+        "startChar": 34,
+        "endLine": 264,
+        "endChar": 47
+      },
+      "revId": "a8305023ff1083e61bafd138423f52befada188e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "79cb7201_1b5c7399",
@@ -65,6 +151,29 @@
         "startChar": 7,
         "endLine": 280,
         "endChar": 15
+      },
+      "revId": "a8305023ff1083e61bafd138423f52befada188e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39ca6401_db36e7f3",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2022-03-29T19:54:19Z",
+      "side": 1,
+      "message": "Can we move the `if test.ro_image is not None` check here? That makes it a little more obvious that we\u0027re only patching in some cases without having to read `patch_image`. You could add an `assert` in `patch_image` to check `test.ro_image` if you wanted.",
+      "range": {
+        "startLine": 570,
+        "startChar": 12,
+        "endLine": 570,
+        "endChar": 41
       },
       "revId": "a8305023ff1083e61bafd138423f52befada188e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
