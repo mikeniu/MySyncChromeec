@@ -189,6 +189,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7470201_6879dad4",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1534724
+      },
+      "writtenOn": "2022-03-29T15:50:49Z",
+      "side": 1,
+      "message": "Thanks for the clarification. I think I was tricked by the types in `find_section_offset_size` where the input variable `image` is hinted to be `bytes`.",
+      "parentUuid": "c80012ed_ee60d892",
+      "range": {
+        "startLine": 265,
+        "startChar": 20,
+        "endLine": 265,
+        "endChar": 47
+      },
+      "revId": "972b88134e82f278ecdb1d8a1bf11b120752e0e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cb559fd0_68b55c47",
