@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "840815c9_4e66fc83",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1407950
+      },
+      "writtenOn": "2022-03-30T18:03:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5af8eaf8_b7d88900",
+      "revId": "a8305023ff1083e61bafd138423f52befada188e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4de49a02_32d426b4",
@@ -31,6 +49,30 @@
       "writtenOn": "2022-03-29T18:28:21Z",
       "side": 1,
       "message": "I think it\u0027s okay but looking at `read_file` and  `read_file_gsutil` 6 months down the line, it may be confusing that one returns `bytearray` while the other returns `bytes`. It might make sense to have both return `bytes` and then construct a `bytearray` to merge them, but I\u0027m not sure.",
+      "range": {
+        "startLine": 236,
+        "startChar": 35,
+        "endLine": 236,
+        "endChar": 40
+      },
+      "revId": "a8305023ff1083e61bafd138423f52befada188e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5735a3f8_4865163f",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1407950
+      },
+      "writtenOn": "2022-03-30T18:03:37Z",
+      "side": 1,
+      "message": "I changed returned value to bytes, then I realized that `read_file` and `write_file` functions are used only in one place and they are so trivial, so I moved them to `patch_image`.",
+      "parentUuid": "4de49a02_32d426b4",
       "range": {
         "startLine": 236,
         "startChar": 35,
@@ -64,6 +106,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e458e76a_ce7295c6",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 1407950
+      },
+      "writtenOn": "2022-03-30T18:03:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a61c6b21_3237c9ed",
+      "range": {
+        "startLine": 255,
+        "startChar": 11,
+        "endLine": 255,
+        "endChar": 41
+      },
+      "revId": "a8305023ff1083e61bafd138423f52befada188e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cfb5e02a_ed4d86e6",
@@ -77,6 +143,30 @@
       "writtenOn": "2022-03-29T19:54:19Z",
       "side": 1,
       "message": "My editor is warning:\n\n`Expected type \u0027bytearray\u0027, got \u0027Union[int, bytes]\u0027 instead`\n\nLooks like the return type should be `bytes` instead of `bytearray`.",
+      "range": {
+        "startLine": 261,
+        "startChar": 11,
+        "endLine": 261,
+        "endChar": 33
+      },
+      "revId": "a8305023ff1083e61bafd138423f52befada188e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5368f53_03bb7fe9",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1407950
+      },
+      "writtenOn": "2022-03-30T18:03:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cfb5e02a_ed4d86e6",
       "range": {
         "startLine": 261,
         "startChar": 11,
@@ -135,6 +225,54 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "1985e6ee_6967df35",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1407950
+      },
+      "writtenOn": "2022-03-30T18:03:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df2ce22d_02094c6f",
+      "range": {
+        "startLine": 264,
+        "startChar": 34,
+        "endLine": 264,
+        "endChar": 47
+      },
+      "revId": "a8305023ff1083e61bafd138423f52befada188e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0b42878_f0d9b326",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1407950
+      },
+      "writtenOn": "2022-03-30T18:03:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d70b8a9_c65092d3",
+      "range": {
+        "startLine": 264,
+        "startChar": 7,
+        "endLine": 264,
+        "endChar": 47
+      },
+      "revId": "a8305023ff1083e61bafd138423f52befada188e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "79cb7201_1b5c7399",
         "filename": "test/run_device_tests.py",
         "patchSetId": 2
@@ -169,6 +307,30 @@
       "writtenOn": "2022-03-29T19:54:19Z",
       "side": 1,
       "message": "Can we move the `if test.ro_image is not None` check here? That makes it a little more obvious that we\u0027re only patching in some cases without having to read `patch_image`. You could add an `assert` in `patch_image` to check `test.ro_image` if you wanted.",
+      "range": {
+        "startLine": 570,
+        "startChar": 12,
+        "endLine": 570,
+        "endChar": 41
+      },
+      "revId": "a8305023ff1083e61bafd138423f52befada188e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57f2a1d0_5f741935",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 1407950
+      },
+      "writtenOn": "2022-03-30T18:03:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "39ca6401_db36e7f3",
       "range": {
         "startLine": 570,
         "startChar": 12,
