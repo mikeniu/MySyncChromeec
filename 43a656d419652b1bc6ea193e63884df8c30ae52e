@@ -16,6 +16,23 @@
       "message": "Also getting Keith to double check.",
       "revId": "43a656d419652b1bc6ea193e63884df8c30ae52e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "39cb748b_4bd28c3b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2022-04-05T22:12:46Z",
+      "side": 1,
+      "message": "You also need to update zephyr_new_board_checklist.md with a link to this doc.",
+      "revId": "43a656d419652b1bc6ea193e63884df8c30ae52e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
