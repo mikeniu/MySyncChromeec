@@ -52,6 +52,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5997edc5_7d656d2e",
+        "filename": "docs/zephyr/zephyr_charger.md",
+        "patchSetId": 14
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1425418
+      },
+      "writtenOn": "2022-04-08T17:55:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60826362_6b7fb04f",
+      "revId": "43a656d419652b1bc6ea193e63884df8c30ae52e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5a632fec_78d03057",
@@ -65,6 +83,30 @@
       "writtenOn": "2022-04-05T23:46:02Z",
       "side": 1,
       "message": "While some boards are defining chargers this way, this seems to be unused by the code.\n\nI\u0027ve opened b:228237412 to fix this.\n\nI see you opened a different bug b:226925642.  I marked yours a duplicate only because I put more context on my bug.",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 23
+      },
+      "revId": "43a656d419652b1bc6ea193e63884df8c30ae52e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d42970a8_d33f675d",
+        "filename": "docs/zephyr/zephyr_charger.md",
+        "patchSetId": 14
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1425418
+      },
+      "writtenOn": "2022-04-08T17:55:31Z",
+      "side": 1,
+      "message": "Should I go add some TODOs in the boards that make these definitions so folks aren\u0027t confused in the future?",
+      "parentUuid": "5a632fec_78d03057",
       "range": {
         "startLine": 51,
         "startChar": 0,
@@ -98,6 +140,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc57c859_a91f0657",
+        "filename": "docs/zephyr/zephyr_charger.md",
+        "patchSetId": 14
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1425418
+      },
+      "writtenOn": "2022-04-08T17:55:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee0e67eb_20c3a353",
+      "range": {
+        "startLine": 119,
+        "startChar": 12,
+        "endLine": 119,
+        "endChar": 21
+      },
+      "revId": "43a656d419652b1bc6ea193e63884df8c30ae52e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "850fa7c6_9726d29e",
@@ -111,6 +177,30 @@
       "writtenOn": "2022-04-05T23:46:02Z",
       "side": 1,
       "message": "I think you should also link to the actual charger thread:\n\nhttps://chromium.googlesource.com/chromiumos/platform/ec/+/3523f9b4/common/charge_state_v2.c#1592",
+      "range": {
+        "startLine": 124,
+        "startChar": 0,
+        "endLine": 124,
+        "endChar": 97
+      },
+      "revId": "43a656d419652b1bc6ea193e63884df8c30ae52e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3373934_7933fa08",
+        "filename": "docs/zephyr/zephyr_charger.md",
+        "patchSetId": 14
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1425418
+      },
+      "writtenOn": "2022-04-08T17:55:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "850fa7c6_9726d29e",
       "range": {
         "startLine": 124,
         "startChar": 0,
@@ -144,6 +234,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "34a5dd7b_d12cbc02",
+        "filename": "docs/zephyr/zephyr_charger.md",
+        "patchSetId": 14
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1425418
+      },
+      "writtenOn": "2022-04-08T17:55:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5084846b_eda8484f",
+      "range": {
+        "startLine": 126,
+        "startChar": 3,
+        "endLine": 126,
+        "endChar": 34
+      },
+      "revId": "43a656d419652b1bc6ea193e63884df8c30ae52e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cc38b5de_1b905228",
@@ -157,6 +271,30 @@
       "writtenOn": "2022-04-05T23:46:02Z",
       "side": 1,
       "message": "Just link directly to the file instead of linking to the PLATFORM_EC_CHARGER option.",
+      "range": {
+        "startLine": 173,
+        "startChar": 19,
+        "endLine": 173,
+        "endChar": 77
+      },
+      "revId": "43a656d419652b1bc6ea193e63884df8c30ae52e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd5805df_f17e9be7",
+        "filename": "docs/zephyr/zephyr_charger.md",
+        "patchSetId": 14
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1425418
+      },
+      "writtenOn": "2022-04-08T17:55:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cc38b5de_1b905228",
       "range": {
         "startLine": 173,
         "startChar": 19,
