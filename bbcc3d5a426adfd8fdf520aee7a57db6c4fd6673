@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4e2c87e_8198617e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1513493
+      },
+      "writtenOn": "2022-04-08T03:37:10Z",
+      "side": 1,
+      "message": "I was under the impression that first line should be upto 50 chars. But checked other commit messages, that\u0027s not the case. Fixed.",
+      "parentUuid": "5a3ec6cd_6b5f27c9",
+      "range": {
+        "startLine": 7,
+        "startChar": 6,
+        "endLine": 7,
+        "endChar": 7
+      },
+      "revId": "bbcc3d5a426adfd8fdf520aee7a57db6c4fd6673",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "64f03d4c_7c2e8230",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-04-08T01:34:19Z",
       "side": 1,
       "message": "Led",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 3
+      },
+      "revId": "bbcc3d5a426adfd8fdf520aee7a57db6c4fd6673",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "367329e8_2f6504b9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1513493
+      },
+      "writtenOn": "2022-04-08T03:37:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "64f03d4c_7c2e8230",
       "range": {
         "startLine": 9,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "893eafe8_371d261c",
+        "filename": "zephyr/shim/src/led_driver/led_gpio.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1513493
+      },
+      "writtenOn": "2022-04-08T03:37:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe5b1267_5445090e",
+      "range": {
+        "startLine": 37,
+        "startChar": 33,
+        "endLine": 37,
+        "endChar": 55
+      },
+      "revId": "bbcc3d5a426adfd8fdf520aee7a57db6c4fd6673",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4eb346f3_69a5aedf",
@@ -93,6 +165,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "61bdc8fd_d6862739",
+        "filename": "zephyr/shim/src/led_driver/led_gpio.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1513493
+      },
+      "writtenOn": "2022-04-08T03:37:10Z",
+      "side": 1,
+      "message": "This is done in calling function [here](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/common/led_common.c;l\u003d67?q\u003dled_common\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch:src%2Fplatform%2Fec%2F)",
+      "parentUuid": "4eb346f3_69a5aedf",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 1
+      },
+      "revId": "bbcc3d5a426adfd8fdf520aee7a57db6c4fd6673",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1bab456c_97789c79",
@@ -106,6 +202,30 @@
       "writtenOn": "2022-04-08T01:34:19Z",
       "side": 1,
       "message": "Same question: clear brightness_range[] to 0?",
+      "range": {
+        "startLine": 107,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 1
+      },
+      "revId": "bbcc3d5a426adfd8fdf520aee7a57db6c4fd6673",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9055c7be_1b9886b5",
+        "filename": "zephyr/shim/src/led_driver/led_pwm.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1513493
+      },
+      "writtenOn": "2022-04-08T03:37:10Z",
+      "side": 1,
+      "message": "This is done in calling function [here](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/common/led_common.c;l\u003d67?q\u003dled_common\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch:src%2Fplatform%2Fec%2F)",
+      "parentUuid": "1bab456c_97789c79",
       "range": {
         "startLine": 107,
         "startChar": 0,
