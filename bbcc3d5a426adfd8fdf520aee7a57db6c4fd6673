@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a3ec6cd_6b5f27c9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2022-04-08T01:34:19Z",
+      "side": 1,
+      "message": "Add a space after the colon, like\nzephyr: LED: Convert",
+      "range": {
+        "startLine": 7,
+        "startChar": 6,
+        "endLine": 7,
+        "endChar": 7
+      },
+      "revId": "bbcc3d5a426adfd8fdf520aee7a57db6c4fd6673",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64f03d4c_7c2e8230",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2022-04-08T01:34:19Z",
+      "side": 1,
+      "message": "Led",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 3
+      },
+      "revId": "bbcc3d5a426adfd8fdf520aee7a57db6c4fd6673",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe5b1267_5445090e",
+        "filename": "zephyr/shim/src/led_driver/led_gpio.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2022-04-08T01:34:19Z",
+      "side": 1,
+      "message": "Any better description?",
+      "range": {
+        "startLine": 37,
+        "startChar": 33,
+        "endLine": 37,
+        "endChar": 55
+      },
+      "revId": "bbcc3d5a426adfd8fdf520aee7a57db6c4fd6673",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4eb346f3_69a5aedf",
+        "filename": "zephyr/shim/src/led_driver/led_gpio.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2022-04-08T01:34:19Z",
+      "side": 1,
+      "message": "Clear all values in brightness_range[] to 0 first?",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 1
+      },
+      "revId": "bbcc3d5a426adfd8fdf520aee7a57db6c4fd6673",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1bab456c_97789c79",
+        "filename": "zephyr/shim/src/led_driver/led_pwm.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2022-04-08T01:34:19Z",
+      "side": 1,
+      "message": "Same question: clear brightness_range[] to 0?",
+      "range": {
+        "startLine": 107,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 1
+      },
+      "revId": "bbcc3d5a426adfd8fdf520aee7a57db6c4fd6673",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
