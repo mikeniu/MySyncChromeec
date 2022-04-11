@@ -117,6 +117,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14fd829e_4417e7dd",
+        "filename": "docs/zephyr/zephyr_charger.md",
+        "patchSetId": 14
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1425418
+      },
+      "writtenOn": "2022-04-11T23:52:53Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "d42970a8_d33f675d",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 23
+      },
+      "revId": "43a656d419652b1bc6ea193e63884df8c30ae52e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee0e67eb_20c3a353",
