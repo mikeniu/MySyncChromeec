@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "285a1108_d2f21f1d",
+        "filename": "docs/zephyr/zephyr_charger.md",
+        "patchSetId": 31
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1425418
+      },
+      "writtenOn": "2022-04-12T23:57:28Z",
+      "side": 1,
+      "message": "I think defining every developer command might be out of scope for this doc.\n\nIf not, I\u0027ll add here.\n\nLeaving unresolved for visibility.",
+      "range": {
+        "startLine": 234,
+        "startChar": 0,
+        "endLine": 236,
+        "endChar": 0
+      },
+      "revId": "6e25b5c2985b19da3b1e843f7c7d122f1051adbd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b7d67ae_f97b3c6f",
+        "filename": "docs/zephyr/zephyr_charger.md",
+        "patchSetId": 30
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1425418
+      },
+      "writtenOn": "2022-04-12T23:57:28Z",
+      "side": 1,
+      "message": "I cannot find a corresponding ectool command that contains the \"chgsup\" EC console command information.\n\nKeep unresolved for visibility.",
+      "range": {
+        "startLine": 234,
+        "startChar": 0,
+        "endLine": 235,
+        "endChar": 17
+      },
+      "revId": "c89a986554656300812b3e7f07bc3fa5ebdfd507",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
