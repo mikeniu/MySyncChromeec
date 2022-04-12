@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd1ab4d7_32661ee9",
+        "filename": "docs/zephyr/zephyr_charger.md",
+        "patchSetId": 26
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2022-04-12T20:25:28Z",
+      "side": 1,
+      "message": "Missing a verb 😊 \"Use the\"",
+      "range": {
+        "startLine": 161,
+        "startChar": 0,
+        "endLine": 161,
+        "endChar": 3
+      },
+      "revId": "242c3ca73e73ff74195b6bd48f6862592dba8469",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "004b0c14_7e3656e5",
+        "filename": "docs/zephyr/zephyr_charger.md",
+        "patchSetId": 26
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2022-04-12T20:25:28Z",
+      "side": 1,
+      "message": "Use the",
+      "range": {
+        "startLine": 165,
+        "startChar": 0,
+        "endLine": 165,
+        "endChar": 3
+      },
+      "revId": "242c3ca73e73ff74195b6bd48f6862592dba8469",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07dee07b_1294681c",
+        "filename": "docs/zephyr/zephyr_charger.md",
+        "patchSetId": 26
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2022-04-12T20:25:28Z",
+      "side": 1,
+      "message": "Is this the extent of the output? Should the user run \"chrgstate\" after running \"chgoverride\" to see a change?",
+      "range": {
+        "startLine": 177,
+        "startChar": 0,
+        "endLine": 177,
+        "endChar": 42
+      },
+      "revId": "242c3ca73e73ff74195b6bd48f6862592dba8469",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a3750ca_1739d53f",
+        "filename": "docs/zephyr/zephyr_charger.md",
+        "patchSetId": 26
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2022-04-12T20:25:28Z",
+      "side": 1,
+      "message": "I\u0027m not sure what you\u0027re trying to show here.  These commands should at least be wrapped in backticks.",
+      "range": {
+        "startLine": 180,
+        "startChar": 0,
+        "endLine": 182,
+        "endChar": 0
+      },
+      "revId": "242c3ca73e73ff74195b6bd48f6862592dba8469",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
