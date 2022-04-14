@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7580dfd9_37c4b431",
+        "filename": "docs/zephyr/zephyr_charger.md",
+        "patchSetId": 33
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2022-04-14T20:41:15Z",
+      "side": 1,
+      "message": "Since I asked you to note a charger chip is required, add an charger chip after this line.",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 28
+      },
+      "revId": "59708adeb129230aa325b3df30defb4bb378d3d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
