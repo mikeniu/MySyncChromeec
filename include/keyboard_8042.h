@@ -10,6 +10,7 @@
 
 #include "button.h"
 #include "common.h"
+#include "stdbool.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,6 +46,15 @@ void send_aux_data_to_host_interrupt(uint8_t data);
  * @param data	Aux data to send to device.
  */
 void send_aux_data_to_device(uint8_t data);
+
+/**
+ * Pauses or resumes the i8042 device -> host queue.
+ *
+ * We cannot send any IRQs before the eSPI virtual wire channel has been
+ * enabled. This method will allow deferring sending data to the host.
+ *
+ */
+void i8042_pause_to_host_queue(bool pause);
 
 #ifdef TEST_BUILD
 

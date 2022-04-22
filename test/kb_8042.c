@@ -1067,6 +1067,24 @@ static int test_register_scancode_set2(void)
 	return EC_SUCCESS;
 }
 
+test_static int test_8042_pause_to_host_queue(void)
+{
+	SET_SCANCODE(2);
+	ENABLE_KEYSTROKE(1);
+	WRITE_CMD_BYTE(READ_CMD_BYTE() | I8042_XLATE);
+
+	i8042_pause_to_host_queue(true);
+
+	press_key(1, 1, 1);
+	press_key(1, 1, 0);
+	VERIFY_NO_CHAR();
+
+	i8042_pause_to_host_queue(false);
+	VERIFY_LPC_CHAR("\x01\x81");
+
+	return EC_SUCCESS;
+}
+
 void run_test(int argc, const char **argv)
 {
 	test_reset();
@@ -1074,6 +1092,7 @@ void run_test(int argc, const char **argv)
 
 	if (system_get_image_copy() == EC_IMAGE_RO) {
 		RUN_TEST(test_register_scancode_set2);
+		RUN_TEST(test_8042_pause_to_host_queue);
 		RUN_TEST(test_8042_aux_loopback);
 		RUN_TEST(test_8042_aux_two_way_communication);
 		RUN_TEST(test_8042_aux_inhibit);
