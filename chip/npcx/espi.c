@@ -9,6 +9,7 @@
 #include "console.h"
 #include "espi.h"
 #include "hooks.h"
+#include "keyboard_8042.h"
 #include "lpc_chip.h"
 #include "power.h"
 #include "registers.h"
@@ -461,9 +462,14 @@ void espi_vw_evt_pltrst(void)
 		SET_BIT(NPCX_ESPICFG, NPCX_ESPICFG_PCHANEN);
 #endif
 		update_ap_boot_time(PLTRST_HIGH);
-
+		if (IS_ENABLED(HAS_TASK_KEYPROTO))
+			i8042_pause_to_host_queue(false);
 	} else {
 		/* PLTRST# asserted */
+
+		if (IS_ENABLED(HAS_TASK_KEYPROTO))
+			i8042_pause_to_host_queue(true);
+
 #ifdef CONFIG_CHIPSET_RESET_HOOK
 		hook_call_deferred(&espi_chipset_reset_data, MSEC);
 #endif
@@ -685,6 +691,9 @@ void espi_init(void)
 	/* Configure MIWU for eSPI VW */
 	for (i = 0; i < ARRAY_SIZE(espi_vw_int_list); i++)
 		espi_enable_vw_int(&espi_vw_int_list[i]);
+
+	if (IS_ENABLED(HAS_TASK_KEYPROTO))
+		i8042_pause_to_host_queue(true);
 }
 
 static int command_espi(int argc, const char **argv)
