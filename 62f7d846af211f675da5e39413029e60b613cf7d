@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63f83fca_91b619bd",
+        "filename": "zephyr/subsys/ap_pwrseq/include/x86_common_pwrseq.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1296157
+      },
+      "writtenOn": "2022-04-29T04:52:07Z",
+      "side": 1,
+      "message": "nit: add comment about this variable",
+      "revId": "62f7d846af211f675da5e39413029e60b613cf7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
