@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7261ee25_b05e2e55",
+        "filename": "zephyr/subsys/ap_pwrseq/include/x86_common_pwrseq.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2022-05-05T19:23:36Z",
+      "side": 1,
+      "message": "delay in ms. so it\u0027s clear why there is conversion from second to ms.",
+      "range": {
+        "startLine": 21,
+        "startChar": 42,
+        "endLine": 21,
+        "endChar": 47
+      },
+      "revId": "7ca057ffba561860d07c4841bda1e37c75a65e96",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "389d611f_cbc2487c",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2022-05-05T19:23:36Z",
+      "side": 1,
+      "message": "\"d_time * MSEC\", so line 165,166 can be removed.",
+      "range": {
+        "startLine": 120,
+        "startChar": 36,
+        "endLine": 120,
+        "endChar": 42
+      },
+      "revId": "7ca057ffba561860d07c4841bda1e37c75a65e96",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39cdc150_a2481ccd",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2022-05-05T19:23:36Z",
+      "side": 1,
+      "message": "Remove. It\u0027s not in TOT anymore.",
+      "revId": "7ca057ffba561860d07c4841bda1e37c75a65e96",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
