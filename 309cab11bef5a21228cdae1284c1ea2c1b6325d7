@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af0962a3_b2f11153",
+        "filename": "zephyr/subsys/ap_pwrseq/Kconfig",
+        "patchSetId": 10
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1281040
+      },
+      "writtenOn": "2022-05-06T08:58:41Z",
+      "side": 1,
+      "message": "The current command is on by default, so perhaps this should be \u0027y\u0027\nIt is gated by X86_NON_DSX_PWRSEQ anyway.",
+      "range": {
+        "startLine": 78,
+        "startChar": 1,
+        "endLine": 78,
+        "endChar": 8
+      },
+      "revId": "309cab11bef5a21228cdae1284c1ea2c1b6325d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d793d6ee_cc3b7030",
+        "filename": "zephyr/subsys/ap_pwrseq/include/x86_common_pwrseq.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1281040
+      },
+      "writtenOn": "2022-05-06T08:58:41Z",
+      "side": 1,
+      "message": "maybe make this uint32_t to save space. That still gives 49 days.\nAlso name it reboot_ap_at_g3_delay_ms to make it clear it is milliseconds.",
+      "range": {
+        "startLine": 22,
+        "startChar": 10,
+        "endLine": 22,
+        "endChar": 31
+      },
+      "revId": "309cab11bef5a21228cdae1284c1ea2c1b6325d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5dd16af8_df23b9d4",
+        "filename": "zephyr/subsys/ap_pwrseq/include/x86_non_dsx_common_pwrseq_sm_handler.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1281040
+      },
+      "writtenOn": "2022-05-06T08:58:41Z",
+      "side": 1,
+      "message": "Maybe set_reboot_ap_at_g3_delay_seconds",
+      "revId": "309cab11bef5a21228cdae1284c1ea2c1b6325d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1d4db1a_2f7816e1",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 1281040
+      },
+      "writtenOn": "2022-05-06T08:58:41Z",
+      "side": 1,
+      "message": "Not sure why there is a loop here.\nWhy not just k_msleep(pwrseq_ctx.reboot_ap_at_g3_delay);",
+      "range": {
+        "startLine": 176,
+        "startChar": 4,
+        "endLine": 176,
+        "endChar": 12
+      },
+      "revId": "309cab11bef5a21228cdae1284c1ea2c1b6325d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
