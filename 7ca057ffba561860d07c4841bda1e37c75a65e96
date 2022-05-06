@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5246d22c_94126bdb",
+        "filename": "zephyr/subsys/ap_pwrseq/include/x86_common_pwrseq.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1523269
+      },
+      "writtenOn": "2022-05-06T04:09:20Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "7261ee25_b05e2e55",
+      "range": {
+        "startLine": 21,
+        "startChar": 42,
+        "endLine": 21,
+        "endChar": 47
+      },
+      "revId": "7ca057ffba561860d07c4841bda1e37c75a65e96",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "389d611f_cbc2487c",
@@ -60,6 +84,24 @@
       "writtenOn": "2022-05-05T19:23:36Z",
       "side": 1,
       "message": "Remove. It\u0027s not in TOT anymore.",
+      "revId": "7ca057ffba561860d07c4841bda1e37c75a65e96",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ddcdbeac_835d9f3e",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1523269
+      },
+      "writtenOn": "2022-05-06T04:09:20Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "39cdc150_a2481ccd",
       "revId": "7ca057ffba561860d07c4841bda1e37c75a65e96",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
