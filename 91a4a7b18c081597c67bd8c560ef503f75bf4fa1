@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e6a4432_006605a6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523269
+      },
+      "writtenOn": "2022-05-06T12:05:27Z",
+      "side": 1,
+      "message": "@Andrew, many thanks for the review. modified accordingly. Please let me know for any changes if required. Did verify the changes without the for loop and I even see that the loop is not required as the command behaves as expected without the loop.",
+      "revId": "91a4a7b18c081597c67bd8c560ef503f75bf4fa1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
