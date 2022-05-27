@@ -140,6 +140,18 @@
 			port = <&i2c_ec_i2c_sensor>;
 			rot-standard-ref = <&base_rot_ref>;
 			drv-data = <&bmi323_data>;
+			configs {
+				compatible =
+					"cros-ec,motionsense-sensor-config";
+				ec-s0 {
+					label = "SENSOR_CONFIG_EC_S0";
+					odr = <(13000 | ROUND_UP_FLAG)>;
+				};
+				ec-s3 {
+					label = "SENSOR_CONFIG_EC_S3";
+					odr = <(13000 | ROUND_UP_FLAG)>;
+				};
+			};
 		};
 	};
 
