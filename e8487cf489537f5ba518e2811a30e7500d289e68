@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1434d78a_716c1fb8",
+        "filename": "board/mithrax/board.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2022-05-31T17:58:55Z",
+      "side": 1,
+      "message": "I guess the I2C address should be defined along those lines too",
+      "revId": "e8487cf489537f5ba518e2811a30e7500d289e68",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
