@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a87bc525_cf03b05b",
+        "filename": "board/mithrax/board.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2022-06-03T05:55:33Z",
+      "side": 1,
+      "message": "i may be missing some of the background here - why is this RW only?",
+      "range": {
+        "startLine": 188,
+        "startChar": 7,
+        "endLine": 188,
+        "endChar": 20
+      },
+      "revId": "bfa5ba348fe25de0f651b6fad3e861154e994bab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
