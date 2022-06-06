@@ -69,6 +69,30 @@
       },
       "revId": "bfa5ba348fe25de0f651b6fad3e861154e994bab",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0b7eedd_9a3e51e8",
+        "filename": "board/mithrax/keyboard.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1106949
+      },
+      "writtenOn": "2022-06-06T18:35:03Z",
+      "side": 1,
+      "message": "Without proper rgbkbd_map, RGB keyboard functionality does not work.\n\nIIUC, there are 4 zones. Under which keys is LED(0,0) placed? Under which keys is LED(1,0) placed? ....\n\nYou can run \u0027rgb 1,0 0xff\u0027 to find which keys are illuminated.",
+      "parentUuid": "f5f563df_59e4df25",
+      "range": {
+        "startLine": 67,
+        "startChar": 14,
+        "endLine": 67,
+        "endChar": 24
+      },
+      "revId": "bfa5ba348fe25de0f651b6fad3e861154e994bab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
