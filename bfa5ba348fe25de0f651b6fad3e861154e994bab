@@ -117,6 +117,30 @@
       },
       "revId": "bfa5ba348fe25de0f651b6fad3e861154e994bab",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "379e8b54_c03f23bb",
+        "filename": "board/mithrax/keyboard.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1106949
+      },
+      "writtenOn": "2022-06-07T20:55:26Z",
+      "side": 1,
+      "message": "Since RGB doesn\u0027t function without rgbkbd_map, there is little or no point of enabling it (or submitting this patch as is).\n\n\u003e t the behavior customer wants is that no matter which keys are pressed, ALL LEDs turn on at the same time. \n\nAck. The RGB behavior is defined by the OS and that\u0027s not what firmware controls or should control. The only exception is on/off/init during startup and shutdown.",
+      "parentUuid": "5888aac0_009c3eaa",
+      "range": {
+        "startLine": 67,
+        "startChar": 14,
+        "endLine": 67,
+        "endChar": 24
+      },
+      "revId": "bfa5ba348fe25de0f651b6fad3e861154e994bab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
