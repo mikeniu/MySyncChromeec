@@ -16,6 +16,11 @@
 #define CPRINTF(format, args...) cprintf(CC_USBPD, format, ## args)
 #define CPRINTS(format, args...) cprints(CC_USBPD, format, ## args)
 
+int board_vbus_source_enabled(int port)
+{
+	return charger_is_sourcing_otg_power(port);
+}
+
 int pd_check_vconn_swap(int port)
 {
 	/* Allow VCONN swaps if the AP is on */

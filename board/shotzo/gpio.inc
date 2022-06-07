@@ -38,9 +38,10 @@ GPIO_INT(LID_OPEN,		PIN(F, 3), GPIO_INT_BOTH, lid_interrupt)
 GPIO_INT(LID_360_L,		PIN(A, 7), GPIO_INT_BOTH, gmr_tablet_switch_isr)
 GPIO_INT(VOLDN_BTN_ODL,		PIN(I, 6), GPIO_INT_BOTH | GPIO_PULL_UP, button_interrupt)
 GPIO_INT(VOLUP_BTN_ODL_HDMI_HPD,	PIN(I, 7), GPIO_INT_BOTH | GPIO_PULL_UP, button_interrupt)
-GPIO_INT(BASE_SIXAXIS_INT_L,	PIN(J, 0), GPIO_INT_FALLING | GPIO_SEL_1P8V, lsm6dsm_interrupt)
 GPIO_INT(EC_WP_OD,		PIN(A, 6), GPIO_INT_BOTH, switch_interrupt)
-GPIO_INT(PEN_DET_ODL,		PIN(J, 1), GPIO_INT_BOTH | GPIO_PULL_UP, pen_detect_interrupt)
+
+/* Barrel jack adapter present interrupts */
+GPIO_INT(BJ_ADP_PRESENT_L,	PIN(J, 1), GPIO_INT_BOTH | GPIO_PULL_UP, adp_connect_interrupt)
 
 /* Power sequence GPIOs */
 GPIO(EC_AP_RTCRST,		PIN(K, 2), GPIO_OUT_LOW)
@@ -104,6 +105,9 @@ GPIO(EC_BATTERY_PRES_ODL,	PIN(I, 4), GPIO_INPUT)
 GPIO(EN_KB_BL,			PIN(J, 3), GPIO_OUT_LOW) /* Currently unused */
 GPIO(ECH1_PACKET_MODE,		PIN(H, 1), GPIO_OUT_LOW)
 GPIO(EN_PP5000_PEN,		PIN(B, 5), GPIO_OUT_LOW)
+
+/* Barreljack */
+GPIO(EN_PPVAR_BJ_ADP_L,		PIN(J, 0), GPIO_OUT_LOW)
 
 /* NC pins, enable internal pull-down to avoid floating state. */
 GPIO(GPIOC0_NC, PIN(C, 0), GPIO_INPUT | GPIO_PULL_DOWN)
