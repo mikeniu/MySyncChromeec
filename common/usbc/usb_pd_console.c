@@ -161,8 +161,8 @@ int command_pd(int argc, char **argv)
 
 	if (!strcasecmp(argv[2], "state")) {
 		cflush();
-		ccprintf("Port C%d CC%d, %s - Role: %s-%s",
-		port, pd_get_polarity(port) + 1,
+		ccprintf("Port C%d CC%d, Pol%d, %s - Role: %s-%s",
+		port, pd_get_task_cc_state(port), pd_get_polarity(port) + 1,
 		pd_comm_is_enabled(port) ? "Enable" : "Disable",
 		pd_get_power_role(port) ==
 					PD_ROLE_SOURCE ? "SRC" : "SNK",
