@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c30eee87_09f77e4c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1534724
+      },
+      "writtenOn": "2022-06-13T20:58:43Z",
+      "side": 1,
+      "message": "FYI, I have also found this article: https://community.arm.com/arm-community-blogs/b/tools-software-ides-blog/posts/compiler-flags-across-architectures-march-mtune-and-mcpu\n\nIt includes more details on these compiler flags and the key takeaway is similar to what you have already found:\n\n\u003e On Arm, if you want to optimize for both a particular architecture and microarchitecture then you use the -mcpu flag.  This is different from x86, where -mcpu is a deprecated synonym for ‑mtune. \n\nThe \"Summary\" section explains which flags are overridden by others. Feel free to include a link here if you think it would help.",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 51
+      },
+      "revId": "822fc2d277367163c43278cfe90489b6ab0ed846",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
