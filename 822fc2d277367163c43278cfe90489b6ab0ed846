@@ -22,6 +22,30 @@
       },
       "revId": "822fc2d277367163c43278cfe90489b6ab0ed846",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd8191e1_3b50ddbf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2022-06-14T18:42:47Z",
+      "side": 1,
+      "message": "Thanks, that\u0027s a nice article, so I\u0027m adding it.",
+      "parentUuid": "c30eee87_09f77e4c",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 51
+      },
+      "revId": "822fc2d277367163c43278cfe90489b6ab0ed846",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
