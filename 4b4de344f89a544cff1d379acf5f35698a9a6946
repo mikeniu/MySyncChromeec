@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fb1df33_137b7853",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1361259
+      },
+      "writtenOn": "2022-06-20T23:33:25Z",
+      "side": 1,
+      "message": "I think it makes more sense to clear the flag on any transition into G3 rather than treating S5 specially? We know any request to exit G3 is stale when we\u0027re entering G3 (because the AP was already on), so it seems simplest to clear the flag at that point.",
+      "revId": "4b4de344f89a544cff1d379acf5f35698a9a6946",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
