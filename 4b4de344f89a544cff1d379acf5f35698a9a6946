@@ -16,6 +16,24 @@
       "message": "I think it makes more sense to clear the flag on any transition into G3 rather than treating S5 specially? We know any request to exit G3 is stale when we\u0027re entering G3 (because the AP was already on), so it seems simplest to clear the flag at that point.",
       "revId": "4b4de344f89a544cff1d379acf5f35698a9a6946",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4413f806_a7d6c2ae",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1281040
+      },
+      "writtenOn": "2022-06-20T23:41:08Z",
+      "side": 1,
+      "message": "The problem is that the AP isn\u0027t entering G3, but is instead going into S5 and then the AP is started again - meanwhile the flag is set (and not cleared) and next time the AP is shutdown to G3, it starts immediately.\nAt some point we need to clear the flag, and this point seems to be the most common place where the AP is going out of some power-down state. We could possibly remove the clear in the G3 state and just have the one place, and that could be OK.",
+      "parentUuid": "9fb1df33_137b7853",
+      "revId": "4b4de344f89a544cff1d379acf5f35698a9a6946",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
