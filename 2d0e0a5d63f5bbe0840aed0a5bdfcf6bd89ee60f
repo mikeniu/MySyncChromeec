@@ -33,6 +33,24 @@
       "message": "The behavior here is pretty subtle, so can we expand on this comment? Specifically this code assumes that there\u0027s a power button pulse that goes along with this function call, so we give the AP extra time to deassert SLP_S5.",
       "revId": "2d0e0a5d63f5bbe0840aed0a5bdfcf6bd89ee60f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "152907b3_c6e26dc2",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1281040
+      },
+      "writtenOn": "2022-06-21T07:02:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "17a90067_e8c5c9ad",
+      "revId": "2d0e0a5d63f5bbe0840aed0a5bdfcf6bd89ee60f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

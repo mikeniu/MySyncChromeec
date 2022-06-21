@@ -16,6 +16,24 @@
       "message": "I still think we should clear this on S5G3 instead, since this leaves a window in S5G3 where a wakeup request could cause an immediate restart on G3 entry. We should do it as late as possible (ideally on G3 entry, but that\u0027s difficult with the way this is structured) to minimize the size of that window.\n\nThat matches the way the legacy code works; it actually blocks in G3 and clears the flag before blocking (see `power_common_state()`), illustrating the intent that this G3 exit flag is only meant to be a wakeup and not latch on until the next shutdown.",
       "revId": "422c6d43160c7b3e57761e21429a39ecf2793d9a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "676ef228_74405738",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1281040
+      },
+      "writtenOn": "2022-06-21T07:02:55Z",
+      "side": 1,
+      "message": "OK we can try that.",
+      "parentUuid": "4afb2508_8f440f7b",
+      "revId": "422c6d43160c7b3e57761e21429a39ecf2793d9a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
