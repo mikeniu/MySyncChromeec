@@ -34,6 +34,24 @@
       "parentUuid": "9fb1df33_137b7853",
       "revId": "4b4de344f89a544cff1d379acf5f35698a9a6946",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ece5ca9_5416ecf5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1361259
+      },
+      "writtenOn": "2022-06-21T00:05:04Z",
+      "side": 1,
+      "message": "Wouldn\u0027t clearing the flag on that later G3 entry be fine as well? The issue with clearing it anywhere but on G3 entry is that it can be set again while the AP is still on.\n\nThis wouldn\u0027t close the hole, it just makes it smaller whereas clearing the flag on G3 entry actually closes it.",
+      "parentUuid": "4413f806_a7d6c2ae",
+      "revId": "4b4de344f89a544cff1d379acf5f35698a9a6946",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
