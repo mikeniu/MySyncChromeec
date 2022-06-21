@@ -70,6 +70,24 @@
       "parentUuid": "1ece5ca9_5416ecf5",
       "revId": "4b4de344f89a544cff1d379acf5f35698a9a6946",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b06cf2d9_9b1a5447",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1361259
+      },
+      "writtenOn": "2022-06-21T06:48:32Z",
+      "side": 1,
+      "message": "We worked out that the key difference is in how the AP responds to power button pulses. A power button press should start the AP booting from S5, but that can take some time. While the AP is starting up the S5 inactivity timer might expire and we\u0027d shut it down again, so we assume that a wakeup signal in S5 indicates the AP should be booting up and we\u0027ll extend the inactivity timer to allow it to do so. This matches what the legacy code does.\n\nWe might want a better name for the wakeup function, but that\u0027s not terribly obvious.",
+      "parentUuid": "4ca55b66_eef54e01",
+      "revId": "4b4de344f89a544cff1d379acf5f35698a9a6946",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
