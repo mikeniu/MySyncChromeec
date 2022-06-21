@@ -52,6 +52,24 @@
       "parentUuid": "4413f806_a7d6c2ae",
       "revId": "4b4de344f89a544cff1d379acf5f35698a9a6946",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ca55b66_eef54e01",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1281040
+      },
+      "writtenOn": "2022-06-21T00:16:30Z",
+      "side": 1,
+      "message": "It\u0027s not so much clearing the flag in G3 that\u0027s the issue, it\u0027s the action to take the AP out of G3 that is the problem, since that is left over from the previous cycle (since it wasn\u0027t cleared then).\nAt that point, the AP should stay in G3.",
+      "parentUuid": "1ece5ca9_5416ecf5",
+      "revId": "4b4de344f89a544cff1d379acf5f35698a9a6946",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
