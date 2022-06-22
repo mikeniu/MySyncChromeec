@@ -69,6 +69,24 @@
       "message": "PTAL",
       "revId": "44003ee450273ae0f379e9c9ee6770ecb8c01e7d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "734a3edc_7f806fd7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1361259
+      },
+      "writtenOn": "2022-06-22T23:41:27Z",
+      "side": 1,
+      "message": "Realized that clearing the flag on S5G3 conflicts with the `REBOOT_AP_ON_G3` host command: a request to start up when the AP is in S0 must be maintained until we reach G3 again. So it seems like there\u0027s another problem with not responding to the power button in S5, but what we have here appears to do what it needs.\n\nIt seems like the `want_g3_exit` flag is a little confusingly named or underdocumented, so we can probably improve that and avoid this confusion in the future.",
+      "parentUuid": "3b036e26_761ed5a7",
+      "revId": "44003ee450273ae0f379e9c9ee6770ecb8c01e7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
