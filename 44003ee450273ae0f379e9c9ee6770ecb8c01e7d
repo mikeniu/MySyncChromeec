@@ -16,6 +16,24 @@
       "message": "So the EC log attached to the bug captures some important expectations related to these changes.\nIt does seem that when in S5, the power button can be pressed, and this is expected to restart the AP, and the way it does it is to preserve the exit-hardoff flag when it enters G3 so that the AP restarts.\nSo clearing this flag in S5G3 doesn\u0027t allow this.\nHowever at some point this flag needs clearing so that when the AP next enters G3, it doesn\u0027t inadvertantly restart.\nSo clearing it upon leaving S5 to S4 may be the best option.\nFAFT test passes now.",
       "revId": "44003ee450273ae0f379e9c9ee6770ecb8c01e7d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd4f493a_396765e1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1361259
+      },
+      "writtenOn": "2022-06-22T04:38:59Z",
+      "side": 1,
+      "message": "As discussed, the AP should repond to power button presses in S5. If it doesn\u0027t that\u0027s a separate issue; we should not require the AP to go to G3 before it can be booted.",
+      "parentUuid": "e7faa344_409d626d",
+      "revId": "44003ee450273ae0f379e9c9ee6770ecb8c01e7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
