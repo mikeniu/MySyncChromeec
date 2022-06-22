@@ -34,6 +34,41 @@
       "parentUuid": "e7faa344_409d626d",
       "revId": "44003ee450273ae0f379e9c9ee6770ecb8c01e7d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b036e26_761ed5a7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1281040
+      },
+      "writtenOn": "2022-06-22T05:35:37Z",
+      "side": 1,
+      "message": "I see what you are saying, that the AP should be responding to the button press,\nand since it isn\u0027t, the AP is ending up in G3.\nI will note ec/power/common.c:power_set_state() will clear the exit-hard-off flag, so this is what I\u0027ve tried to follow.\n\nRegardless of whether the AP drops into G3, the want-exit-hard-off should be cleared coming out of G3 or S5. If the AP started to come out of S5 because of a power button press, then at that point the flag should be cleared.\nClearing it at S5G3 breaks the expectation that if the AP does drop to G3, then it misses the request to start.\n\nWe should get some feedback from Intel about the power button signal in S5, but that does seem like a separate issue.\n\nI guess the sticking point here is that you are saying it should clear the flag in S5G3, and not in the S5 transition to S4?\nI am saying that it should clear it in the latter case, and I can see that the former case has an issue when the AP isn\u0027t responding to the pwr btn (as we observe) since it will get stuck in G3.\nIs that a fair summary?",
+      "parentUuid": "bd4f493a_396765e1",
+      "revId": "44003ee450273ae0f379e9c9ee6770ecb8c01e7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4abbb0a_671121a7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1281040
+      },
+      "writtenOn": "2022-06-22T05:35:37Z",
+      "side": 1,
+      "message": "PTAL",
+      "revId": "44003ee450273ae0f379e9c9ee6770ecb8c01e7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
