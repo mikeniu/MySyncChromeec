@@ -405,6 +405,8 @@ ZTEST(signals, test_espi_vw)
 	emul_espi_host_send_vw(espi, ESPI_VWIRE_SIGNAL_SLP_S5, 1);
 	zassert_equal(0, power_signal_get(PWR_SLP_S5),
 		"VW SLP_S5 should be 0");
+
+	// TODO verify that eSPI reset clears signals to default
 }
 
 static void *init_dev(void)

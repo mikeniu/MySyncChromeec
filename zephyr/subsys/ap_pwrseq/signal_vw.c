@@ -42,12 +42,57 @@ static atomic_t signal_data;
 /*
  * Mask of valid signals. A signal is considered valid once an
  * initial value has been received for it.
+ *
+ * Values are only invalid following an EC reset; all other reset events
+ * (including eSPI reset and PLTRST) leave virtual wires in well-defined states
+ * but the platform may be in a non-default state on EC boot.
  */
 static atomic_t signal_valid;
 
 #define espi_dev DEVICE_DT_GET(DT_CHOSEN(intel_ap_pwrseq_espi))
 
 BUILD_ASSERT(ARRAY_SIZE(vw_config) <= (sizeof(atomic_t) * 8));
+
+/**
+ * Set the physical level of a virtual wire power signal.
+ *
+ * For inverted signals, the logical value (which gets stored) will be the
+ * inverse of the provided value.
+ */
+static void vw_set_level(enum espi_vwire_signal espi_signal, bool value)
+{
+	for (int i = 0; i < ARRAY_SIZE(vw_config); i++) {
+		if (espi_signal != vw_config[i].espi_signal) {
+			continue;
+		}
+		value = vw_config[i].invert ? !value : !!value;
+
+		atomic_set_bit_to(&signal_data, i, value);
+		atomic_set_bit(&signal_valid, i);
+		power_signal_interrupt(vw_config[i].signal, value);
+		break;
+	}
+}
+
+/**
+ * Virtual wires that get cleared on eSPI reset.
+ *
+ * These are defined by section 5.2.2.2 of the eSPI 1.0 specification, providing
+ * the reset values for virtual wires that are reset by assertion of the eSPI
+ * Reset# signal (but not PLTRST#). Only VWs sent by the host are included
+ * because this module only supports receiving VW values, not setting them.
+ *
+ * The polarity of the signals varies, but the reset state of each one is low
+ * (which is asserted for the active-low signals).
+ */
+const static enum espi_vwire_signal espi_reset_signals[] = {
+	ESPI_VWIRE_SIGNAL_SLP_S3,
+	ESPI_VWIRE_SIGNAL_SLP_S4,
+	ESPI_VWIRE_SIGNAL_SLP_S5,
+	ESPI_VWIRE_SIGNAL_OOB_RST_WARN,
+	ESPI_VWIRE_SIGNAL_PLTRST,
+	ESPI_VWIRE_SIGNAL_SUS_STAT,
+};
 
 static void espi_handler(const struct device *dev,
 			 struct espi_callback *cb,
@@ -61,27 +106,22 @@ static void espi_handler(const struct device *dev,
 			 event.evt_type);
 		break;
 
-	case ESPI_BUS_EVENT_CHANNEL_READY:
-		/* Virtual wire channel is not ready, clear valid flag */
-		if (event.evt_details == ESPI_CHANNEL_VWIRE &&
-		    !event.evt_data) {
-			atomic_clear(&signal_valid);
+	case ESPI_BUS_RESET:
+		/*
+		 * Bus reset (not PLTRST): reset virtual wires to their default
+		 * states when asserted.
+		 */
+		if (event.evt_data == 0) {
+			LOG_INF("eSPI bus reset asserted");
+			for (int i = 0; i < ARRAY_SIZE(espi_reset_signals);
+			     i++) {
+				vw_set_level(espi_reset_signals[i], 0);
+			}
 		}
 		break;
 
 	case ESPI_BUS_EVENT_VWIRE_RECEIVED:
-		for (int i = 0; i < ARRAY_SIZE(vw_config); i++) {
-			if (event.evt_details == vw_config[i].espi_signal) {
-				bool value = vw_config[i].invert
-						? !event.evt_data
-						: !!event.evt_data;
-
-				atomic_set_bit_to(&signal_data, i, value);
-				atomic_set_bit(&signal_valid, i);
-				power_signal_interrupt(vw_config[i].signal,
-						       value);
-			}
-		}
+		vw_set_level(event.evt_details, event.evt_data);
 		break;
 	}
 }
