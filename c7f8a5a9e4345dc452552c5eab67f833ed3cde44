@@ -16,6 +16,23 @@
       "message": "PTAL",
       "revId": "c7f8a5a9e4345dc452552c5eab67f833ed3cde44",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a68c60dc_cadf1b51",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1361259
+      },
+      "writtenOn": "2022-06-24T01:16:42Z",
+      "side": 1,
+      "message": "Use `ATOMIC_DEFINE` here to ensure there\u0027s enough storage for all the flags.\n\n```\n    ...\n    START_FROM_G3,\n    FLAGS_MAX,\n};\n\nATOMIC_DEFINE(flags, FLAGS_MAX - 1);\n```",
+      "revId": "c7f8a5a9e4345dc452552c5eab67f833ed3cde44",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
