@@ -9,6 +9,7 @@
 #include "clock-f.h"
 #include "clock.h"
 #include "common.h"
+#include "debug.h"
 #include "hooks.h"
 #include "hwtimer.h"
 #include "panic.h"
@@ -270,7 +271,8 @@ void __keep watchdog_check(uint32_t excep_lr, uint32_t excep_sp)
 	/* clear status */
 	STM32_TIM_SR(TIM_WATCHDOG) = 0;
 
-	watchdog_trace(excep_lr, excep_sp);
+	if (!debugger_is_connected())
+		watchdog_trace(excep_lr, excep_sp);
 }
 
 void IRQ_HANDLER(IRQ_WD)(void) __attribute__((naked));
