@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3315c038_b906c4e6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2022-07-06T22:55:38Z",
+      "side": 1,
+      "message": "The builder error doesn\u0027t match up with the patch. I\u0027m guessing it was some kind of bad merge. Builds locally after rebasing.",
+      "revId": "9207f287e8461e4f0ded31370e7edd42d6df0a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
