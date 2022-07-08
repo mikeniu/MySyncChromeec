@@ -394,7 +394,7 @@ class DeviceUnderTest(Board):
         # If len(dut) is 0 then your dut doesn't use an st-link device, so we
         # don't have to worry about its serial number
         if not dut:
-            msg = "Failed to find serial for DUT.\n" "Is " + self.board + " connected?"
+            msg = "Failed to find serial for DUT.\nIs " + self.board + " connected?"
             raise RuntimeError(msg)
         if len(dut) > 1:
             msg = (

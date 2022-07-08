@@ -34,8 +34,7 @@ def parseargs():
     parser.add_argument(
         "-k",
         "--kernel",
-        help="EC kernel binary to pack, \
-                      usually ec.RW.bin or ec.RW.flat.",
+        help="EC kernel binary to pack, usually ec.RW.bin or ec.RW.flat.",
         required=True,
     )
     parser.add_argument(
@@ -44,8 +43,7 @@ def parseargs():
     parser.add_argument(
         "-a",
         "--aon",
-        help="EC aontask binary to pack, \
-                      usually ish_aontask.bin.",
+        help="EC aontask binary to pack, usually ish_aontask.bin.",
         required=False,
     )
     parser.add_argument(

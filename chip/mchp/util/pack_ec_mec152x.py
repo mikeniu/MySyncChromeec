@@ -508,9 +508,6 @@ def gen_test_ecrw(pldrw):
 
 
 def parseargs():
-    # TODO I commented this out. Why?
-    rpath = os.path.dirname(os.path.relpath(__file__))
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-i",
