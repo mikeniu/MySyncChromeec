@@ -35,6 +35,7 @@
 
 #include "common.h"
 
+#include "adc.h"
 #include "charge_manager.h"
 #include "charge_state.h"
 #include "charge_state_v2.h"
@@ -115,6 +116,7 @@ int board_set_active_charge_port(int port)
 {
 	enum charge_supplier active_supplier = charge_manager_get_supplier();
 	int active_port = charge_manager_get_active_charge_port();
+	int reg;
 
 	CPRINTS("Switching charger from P%d (supplier=%d) to P%d", active_port,
 		active_supplier, port);
@@ -124,6 +126,25 @@ int board_set_active_charge_port(int port)
 
 		board_enable_bj_port(false);
 		board_disable_other_vbus_sink(-1);
+
+		/* Switch to BMON */
+		ccprintf("Switch to BMON\n");
+
+		if (i2c_read16(I2C_PORT_CHARGER, ISL9241_ADDR_FLAGS,
+				   ISL9241_REG_CONTROL1, &reg) == EC_SUCCESS) {
+			reg |= ISL9241_CONTROL1_SELECT_BMON;
+			if (i2c_write16(I2C_PORT_CHARGER, ISL9241_ADDR_FLAGS,
+					ISL9241_REG_CONTROL1, reg))
+				CPRINTS("Failed to set isl9241");
+		}
+
+		if (i2c_read16(I2C_PORT_CHARGER, ISL9241_ADDR_FLAGS,
+				   ISL9241_REG_CONTROL3, &reg) == EC_SUCCESS) {
+			reg |= ISL9241_CONTROL3_AMON_BMON_DIRECTION;
+			if (i2c_write16(I2C_PORT_CHARGER, ISL9241_ADDR_FLAGS,
+					ISL9241_REG_CONTROL3, reg))
+				CPRINTS("Failed to set isl9241");
+		}
 
 		return EC_SUCCESS;
 	}
@@ -189,6 +210,24 @@ int board_set_active_charge_port(int port)
 		if (board_disable_other_vbus_sink(-1))
 			return EC_ERROR_UNKNOWN;
 		board_enable_bj_port(true);
+	}
+
+	/* Switch to AMON */
+	ccprintf("Switch to AMON\n");
+	if (i2c_read16(I2C_PORT_CHARGER, ISL9241_ADDR_FLAGS,
+		       ISL9241_REG_CONTROL1, &reg) == EC_SUCCESS) {
+		reg &= ~ISL9241_CONTROL1_SELECT_BMON;
+		if (i2c_write16(I2C_PORT_CHARGER, ISL9241_ADDR_FLAGS,
+				ISL9241_REG_CONTROL1, reg))
+			CPRINTS("Failed to set isl9241");
+	}
+
+	if (i2c_read16(I2C_PORT_CHARGER, ISL9241_ADDR_FLAGS,
+			   ISL9241_REG_CONTROL3, &reg) == EC_SUCCESS) {
+		reg &= ~ISL9241_CONTROL3_AMON_BMON_DIRECTION;
+		if (i2c_write16(I2C_PORT_CHARGER, ISL9241_ADDR_FLAGS,
+				ISL9241_REG_CONTROL3, reg))
+			CPRINTS("Failed to set isl9241");
 	}
 
 	CPRINTS("New charger P%d", port);
@@ -280,3 +319,15 @@ static void bj_state_init(void)
 	bj_connect();
 }
 DECLARE_HOOK(HOOK_INIT, bj_state_init, HOOK_PRIO_INIT_CHARGE_MANAGER + 1);
+
+static void print_amon_bmon(void)
+{
+	int charger_iadp, sys_i;
+
+	charger_iadp = adc_read_channel(ADC_CHARGER_IADP);
+
+	sys_i = charger_iadp*100/18;
+
+	ccprintf("IADP:%d mV, I:%d mA\n",charger_iadp, sys_i);
+}
+DECLARE_HOOK(HOOK_SECOND, print_amon_bmon, HOOK_PRIO_DEFAULT);

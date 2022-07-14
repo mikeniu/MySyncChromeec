@@ -54,6 +54,7 @@
 /* Configures various charger options */
 #define ISL9241_REG_CONTROL1 0x3C
 #define ISL9241_CONTROL1_PSYS BIT(3)
+#define ISL9241_CONTROL1_SELECT_BMON BIT(4)
 #define ISL9241_CONTROL1_BGATE_OFF BIT(6)
 #define ISL9241_CONTROL1_LEARN_MODE BIT(12)
 /*
@@ -112,6 +113,10 @@
 #define ISL9241_CONTROL3_ACLIM_RELOAD BIT(14)
 /* 5: Input Current Limit Loop (0 - Enable, 1 - Disable */
 #define ISL9241_CONTROL3_INPUT_CURRENT_LIMIT BIT(5)
+/* 3: AMON/BMON direction.
+ * 0: adapter/charging, 1:OTG/discharging
+ */
+#define ISL9241_CONTROL3_AMON_BMON_DIRECTION BIT(3)
 /* 2: Digital Reset (0 - Idle, 1 - Reset */
 #define ISL9241_CONTROL3_DIGITAL_RESET BIT(2)
 /* 0: Enable ADC (0 - Active when charging, 1 - Active always) */
