@@ -14,33 +14,30 @@
 		compatible = "named-gpios";
 
 		base_imu_int_l: base_imu_int_l {
-			gpios = <&gpio5 6 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			gpios = <&gpio5 6 GPIO_INPUT>; /* 1.8V VHIF */
 		};
 		spi_ap_clk_ec {
-			gpios = <&gpio5 5 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			gpios = <&gpio5 5 GPIO_INPUT>; /* 1.8V VHIF */
 		};
 		spi_ap_cs_ec_l {
-			gpios = <&gpio5 3 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			gpios = <&gpio5 3 GPIO_INPUT>; /* 1.8V VHIF */
 		};
 		spi_ap_do_ec_di {
-			gpios = <&gpio4 6 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			gpios = <&gpio4 6 GPIO_INPUT>; /* 1.8V VHIF */
 		};
 		spi_ap_di_ec_do {
-			gpios = <&gpio4 7 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			gpios = <&gpio4 7 GPIO_INPUT>; /* 1.8V VHIF */
 		};
 		ap_ec_warm_rst_req: ap_ec_warm_rst_req {
-			gpios = <&gpio5 1 (GPIO_INPUT | GPIO_VOLTAGE_1P8 |
-				 GPIO_ACTIVE_HIGH)>;
+			gpios = <&gpio5 1 (GPIO_INPUT | GPIO_ACTIVE_HIGH)>; /* 1.8V VHIF */
 			enum-name = "GPIO_AP_EC_WARM_RST_REQ";
 		};
 		ap_ec_wdtrst_l: ap_ec_wdtrst_l {
-			gpios = <&gpio5 2 (GPIO_INPUT | GPIO_VOLTAGE_1P8 |
-				 GPIO_ACTIVE_LOW)>;
+			gpios = <&gpio5 2 (GPIO_INPUT | GPIO_ACTIVE_LOW)>; /* 1.8V VHIF */
 			enum-name = "GPIO_AP_EC_WDTRST_L";
 		};
 		ap_in_sleep_l: ap_in_sleep_l {
-			gpios = <&gpio5 4 (GPIO_INPUT | GPIO_VOLTAGE_1P8 |
-				 GPIO_ACTIVE_LOW)>;
+			gpios = <&gpio5 4 (GPIO_INPUT | GPIO_ACTIVE_LOW)>; /* 1.8V VHIF */
 			enum-name = "GPIO_AP_IN_SLEEP_L";
 		};
 		gpio_en_ulp: en_ulp {
@@ -50,14 +47,17 @@
 			gpios = <&gpio7 6 GPIO_ODR_HIGH>;
 		};
 		sys_rst_odl {
+			/* Switch to 1.8V detection input buffer */
 			gpios = <&gpioc 5 (GPIO_ODR_LOW | GPIO_VOLTAGE_1P8)>;
 			enum-name = "GPIO_SYS_RST_ODL";
 		};
 		ec_i2c_sensor_scl {
-			gpios = <&gpiob 5 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			/* Switch to 1.8V detection input buffer */
+			gpios = <&gpiob 5 (GPIO_ODR_LOW | GPIO_VOLTAGE_1P8)>;
 		};
 		ec_i2c_sensor_sda {
-			gpios = <&gpiob 4 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			/* Switch to 1.8V detection input buffer */
+			gpios = <&gpiob 4 (GPIO_ODR_LOW | GPIO_VOLTAGE_1P8)>;
 		};
 		ec_i2c_usb_c0_scl {
 			gpios = <&gpio9 0 GPIO_INPUT>;
@@ -72,10 +72,12 @@
 			gpios = <&gpio9 1 GPIO_INPUT>;
 		};
 		ec_i2c_pwr_cbi_scl {
-			gpios = <&gpiod 1 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			/* Switch to 1.8V detection input buffer */
+			gpios = <&gpiod 1 (GPIO_ODR_LOW | GPIO_VOLTAGE_1P8)>;
 		};
 		ec_i2c_pwr_cbi_sda {
-			gpios = <&gpiod 0 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			/* Switch to 1.8V detection input buffer */
+			gpios = <&gpiod 0 (GPIO_ODR_LOW | GPIO_VOLTAGE_1P8)>;
 		};
 		ec_i2c_batt_scl {
 			gpios = <&gpio3 3 GPIO_INPUT>;
@@ -96,16 +98,20 @@
 			gpios = <&gpio8 0 GPIO_OUTPUT_LOW>;
 		};
 		gpio_ec_wp_l: ec_wp_odl {
-			gpios = <&gpioe 3 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+			/* Switch to 1.8V detection input buffer */
+			gpios = <&gpioe 3 (GPIO_INPUT | GPIO_ACTIVE_LOW |
+				 GPIO_VOLTAGE_1P8)>;
 		};
 		lid_accel_int_l {
-			gpios = <&gpiob 3 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			/* Switch to 1.8V detection input buffer */
+			gpios = <&gpiob 3 (GPIO_ODR_LOW | GPIO_VOLTAGE_1P8)>;
 		};
 		gpio_tablet_mode_l: tablet_mode_l {
 			gpios = <&gpiob 2 GPIO_INPUT>;
 			enum-name = "GPIO_TABLET_MODE_L";
 		};
 		ec_ap_int_odl {
+			/* Switch to 1.8V detection input buffer */
 			gpios = <&gpioc 1 (GPIO_ODR_HIGH | GPIO_VOLTAGE_1P8)>;
 			enum-name = "GPIO_EC_INT_L";
 		};
@@ -148,12 +154,11 @@
 			gpios = <&gpiod 4 GPIO_INPUT>;
 		};
 		ap_sysrst_odl_r: ap_sysrst_odl_r {
-			gpios = <&gpioa 1 (GPIO_INPUT | GPIO_VOLTAGE_1P8 |
-				 GPIO_ACTIVE_LOW)>;
+			gpios = <&gpioa 1 (GPIO_INPUT | GPIO_ACTIVE_LOW)>; /* 1.8V VSPI */
 			enum-name = "GPIO_AP_EC_SYSRST_ODL";
 		};
 		gpio_ap_xhci_init_done: ap_xhci_init_done {
-			gpios = <&gpioa 3 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			gpios = <&gpioa 3 GPIO_INPUT>; /* 1.8V VSPI */
 		};
 		gpio_usb_c0_ppc_int_odl: usb_c0_ppc_int_odl {
 			gpios = <&gpio6 7 GPIO_INPUT>;
@@ -201,9 +206,11 @@
 			gpios = <&gpioc 7 GPIO_INPUT>;
 		};
 		ec_ap_dp_hpd_odl: ec_ap_dp_hpd_odl {
-			gpios = <&gpio6 1 (GPIO_ODR_HIGH | GPIO_VOLTAGE_1P8)>;
+			/* GPIO61 doesn't support 1.8V detection */
+			gpios = <&gpio6 1 GPIO_ODR_HIGH>;
 		};
 		ec_pmic_en_odl {
+			/* Switch to 1.8V detection input buffer */
 			gpios = <&gpio7 4 (GPIO_ODR_HIGH | GPIO_VOLTAGE_1P8)>;
 			enum-name = "GPIO_EC_PMIC_EN_ODL";
 		};
@@ -243,14 +250,6 @@
 			&int_ac_present
 			&int_power_button
 			&int_lid_open
-		>;
-	};
-
-	def-lvol-io-list {
-		compatible = "nuvoton,npcx-lvolctrl-def";
-		lvol-io-pads = <
-			&lvol_ioe3 /*  GPIOE3 GPIO_EC_WP_L */
-			&lvol_io40 /*  GPIO40 GPIO_EC_BL_EN_OD */
 		>;
 	};
 };
