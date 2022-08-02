@@ -12,7 +12,7 @@
 
 #define CHG_CONFIG_BQ25710(id)                               \
 	{                                                    \
-		.i2c_port = I2C_PORT(DT_PHANDLE(id, port)),  \
+		.i2c_port = I2C_PORT_BY_DEV(id),             \
 		.i2c_addr_flags = BQ25710_SMBUS_ADDR1_FLAGS, \
 		.drv = &bq25710_drv,                         \
 	},
