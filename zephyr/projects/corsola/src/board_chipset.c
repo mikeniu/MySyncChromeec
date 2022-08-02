@@ -8,28 +8,24 @@
 #include <zephyr/init.h>
 #include <ap_power/ap_power.h>
 #include <zephyr/drivers/gpio.h>
+
+#include "chipset.h"
 #include "gpio.h"
+#include "hooks.h"
+#include "lid_switch.h"
+
+static void update_backlight(void)
+{
+	bool enable = lid_is_open() && chipset_in_state(CHIPSET_STATE_ON);
+
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_bl_en_od), enable);
+}
+DECLARE_HOOK(HOOK_LID_CHANGE, update_backlight, HOOK_PRIO_DEFAULT);
 
 static void board_backlight_handler(struct ap_power_ev_callback *cb,
 				    struct ap_power_ev_data data)
 {
-	int value;
-
-	switch (data.event) {
-	default:
-		return;
-
-	case AP_POWER_RESUME:
-		/* Called on AP S3 -> S0 transition */
-		value = 1;
-		break;
-
-	case AP_POWER_SUSPEND:
-		/* Called on AP S0 -> S3 transition */
-		value = 0;
-		break;
-	}
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_bl_en_od), value);
+	update_backlight();
 }
 
 static int install_backlight_handler(const struct device *unused)
