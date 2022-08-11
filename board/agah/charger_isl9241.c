@@ -119,24 +119,26 @@ int board_set_active_charge_port(int port)
 	CPRINTS("Switching charger from P%d (supplier=%d) to P%d", active_port,
 		active_supplier, port);
 
+	/* Return on invalid or no-op call. */
+	if (port < CHARGE_PORT_NONE || CHARGE_PORT_COUNT <= port) {
+		return EC_ERROR_INVAL;
+	} else if (port == active_port) {
+		return EC_SUCCESS;
+	} else if (port != CHARGE_PORT_NONE &&
+			board_vbus_source_enabled(port)) {
+		/* Don't charge from a USBC source port */
+		CPRINTS("Don't enable P%d. It's sourcing.", port);
+		return EC_ERROR_INVAL;
+	}
+
 	if (port == CHARGE_PORT_NONE) {
 		CPRINTS("Disabling all charger ports");
 
+		board_throttle_ap_gpu();
 		board_enable_bj_port(false);
 		board_disable_other_vbus_sink(-1);
 
 		return EC_SUCCESS;
-	}
-
-	/* Return on invalid or no-op call. */
-	if (port < 0 || CHARGE_PORT_COUNT <= port) {
-		return EC_ERROR_INVAL;
-	} else if (port == active_port) {
-		return EC_SUCCESS;
-	} else if (board_vbus_source_enabled(port)) {
-		/* Don't charge from a USBC source port */
-		CPRINTS("Don't enable P%d. It's sourcing.", port);
-		return EC_ERROR_INVAL;
 	}
 
 	/*
