@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87a9b870_b7a9b833",
+        "filename": "zephyr/test/drivers/common/CMakeLists.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2022-08-18T20:13:42Z",
+      "side": 1,
+      "message": "Is this actually necessary? We don\u0027t have to do this for any of the other shimmed code.",
+      "range": {
+        "startLine": 12,
+        "startChar": 3,
+        "endLine": 12,
+        "endChar": 45
+      },
+      "revId": "de487a94131f6a956240d10056bbbee80784896d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
