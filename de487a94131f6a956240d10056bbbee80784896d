@@ -22,6 +22,30 @@
       },
       "revId": "de487a94131f6a956240d10056bbbee80784896d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6250af40_b0195056",
+        "filename": "zephyr/test/drivers/common/CMakeLists.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2022-08-19T11:19:42Z",
+      "side": 1,
+      "message": "No, the list below is our include path, \nzephyr/shim/src is not included\n\n-I/home/phoenixshen/trunk/src/platform/ec/zephyr/include\n-I/mnt/host/source/src/platform/ec/zephyr/shim/include\n-I/mnt/host/source/src/platform/ec/fuzz\n-I/mnt/host/source/src/platform/ec/test\n-I/mnt/host/source/src/platform/ec\n-I/mnt/host/source/src/platform/ec/include\n-I/mnt/host/source/src/platform/ec/include/driver\n-I/mnt/host/source/src/platform/ec/third_party\n-I/home/phoenixshen/trunk/src/platform/ec/zephyr/subsys/ap_pwrseq/include\n-I/home/phoenixshen/trunk/src/platform/ec/zephyr/app/ec/include\n-I/home/phoenixshen/trunk/src/platform/ec/zephyr/emul/include\n-I/home/phoenixshen/trunk/src/platform/ec/zephyr/test/drivers/common/include \n-I/mnt/host/source/src/platform/ec/driver/ppc\n-I/home/phoenixshen/trunk/src/third_party/zephyr/main/include\n-Izephyr/include/generated\n-I/mnt/host/source/src/third_party/zephyr/main/soc/posix/inf_clock\n-I/home/phoenixshen/trunk/src/third_party/zephyr/main/boards/posix/native_posix\n-I/mnt/host/source/src/third_party/zephyr/main/subsys/testsuite/include\n-I/mnt/host/source/src/third_party/zephyr/main/subsys/testsuite/ztest/include -Imodules/ec/include",
+      "parentUuid": "87a9b870_b7a9b833",
+      "range": {
+        "startLine": 12,
+        "startChar": 3,
+        "endLine": 12,
+        "endChar": 45
+      },
+      "revId": "de487a94131f6a956240d10056bbbee80784896d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
