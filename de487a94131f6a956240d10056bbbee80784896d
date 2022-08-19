@@ -46,6 +46,30 @@
       },
       "revId": "de487a94131f6a956240d10056bbbee80784896d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "317be472_71bbd9b6",
+        "filename": "zephyr/test/drivers/common/CMakeLists.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1333748
+      },
+      "writtenOn": "2022-08-19T16:05:41Z",
+      "side": 1,
+      "message": "Yeah, this is a strange implementation of src/platform/ec/zephyr/shim/src/led_driver/CMakeLists.txt that\u0027s causing us to need this. Ideally the led_driver shim would be a library that exposes the header and we would just add to our binary, but that\u0027s not the case.",
+      "parentUuid": "6250af40_b0195056",
+      "range": {
+        "startLine": 12,
+        "startChar": 3,
+        "endLine": 12,
+        "endChar": 45
+      },
+      "revId": "de487a94131f6a956240d10056bbbee80784896d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

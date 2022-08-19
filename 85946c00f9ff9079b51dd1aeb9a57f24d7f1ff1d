@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b521de6_020a1e5c",
+        "filename": "zephyr/emul/pwm_mock.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1333748
+      },
+      "writtenOn": "2022-08-19T16:05:41Z",
+      "side": 1,
+      "message": "Why do we need to comment this out if there\u0027s no use of it? Do we have any conflicting function names here?",
+      "revId": "85946c00f9ff9079b51dd1aeb9a57f24d7f1ff1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
