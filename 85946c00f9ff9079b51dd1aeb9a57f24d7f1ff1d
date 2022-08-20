@@ -34,6 +34,24 @@
       "parentUuid": "7b521de6_020a1e5c",
       "revId": "85946c00f9ff9079b51dd1aeb9a57f24d7f1ff1d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c3547c7_71946ce3",
+        "filename": "zephyr/emul/pwm_mock.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1333748
+      },
+      "writtenOn": "2022-08-20T13:27:06Z",
+      "side": 1,
+      "message": "alternatively you could set CONFIG_PWM_MOCK\u003dn so you exclude this file at https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/emul/CMakeLists.txt;l\u003d25",
+      "parentUuid": "bd1e3ef7_2ad34dd5",
+      "revId": "85946c00f9ff9079b51dd1aeb9a57f24d7f1ff1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
