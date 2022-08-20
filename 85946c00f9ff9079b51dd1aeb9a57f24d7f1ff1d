@@ -16,6 +16,24 @@
       "message": "Why do we need to comment this out if there\u0027s no use of it? Do we have any conflicting function names here?",
       "revId": "85946c00f9ff9079b51dd1aeb9a57f24d7f1ff1d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd1e3ef7_2ad34dd5",
+        "filename": "zephyr/emul/pwm_mock.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2022-08-20T10:32:51Z",
+      "side": 1,
+      "message": "If no one uses this driver, complier warns that the functions here are defined but not used.",
+      "parentUuid": "7b521de6_020a1e5c",
+      "revId": "85946c00f9ff9079b51dd1aeb9a57f24d7f1ff1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
