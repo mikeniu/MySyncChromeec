@@ -70,6 +70,24 @@
       "parentUuid": "8c3547c7_71946ce3",
       "revId": "85946c00f9ff9079b51dd1aeb9a57f24d7f1ff1d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca792abd_54b71629",
+        "filename": "zephyr/emul/pwm_mock.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1333748
+      },
+      "writtenOn": "2022-08-22T16:34:04Z",
+      "side": 1,
+      "message": "There was a very long discussion upstream about this very topic. I actually started off very much on the same camp as you saying that it makes no sense to have both the Kconfig and the status \u003d\u003d \"okay\" gate a feature. The final conclusion in Zephyr was that it makes overlays easier. Since your common logic might be running on 2+ boards, some might have the DTS enabled while others might have the node completely missing. It\u0027s easier to control in Kconfig.\n\nThis of one board having the node, you could do `\u0026node: { status \u003d \"disabled\"; };` but this overaly would fail if another board didn\u0027t have `node` at all. Instead disabling it at the Kconfig is easier.\n\nIf you really want to guard the `.c` file from being added when not used in the DTS you can actually do that at the cmake level, but it generally gets overly complicated.\n\n```\n# Populate \u0027pwm_mock_paths\u0027 as a list of all the DTS paths with cros_pwm_mock\ndt_comp_path(pwm_mock_paths COMPATIBLE cros_pwm_mock)\nif (pwm_mock_paths AND CONFIG_PWM_MOCK)\n  # The list is not empty and the Kconfig was set\n  set(found_pwm_mock:BOOL FALSE)\n  # Check all the paths to see if any of them have status\u003d\"okay\"\n  foreach(path ${pwm_mock_paths})\n    dt_node_has_status(found_pwm_mock PATH \"${path}\")\n    if (${found_pwm_mock})\n      break()\n    endif()\n  endforeach()\n  # Add to sources if found\n  if (${found_pwm_mock})\n    zephyr_library_sources(pwm_mock.c)\n  endif()\nendif()\n```\n\nNote that if you believe that this should be more common place, you\u0027re welcome to suggest it upstream to be added to cmake/extensions.cmake via a GitHub issue at https://github.com/zephyrproject-rtos/zephyr/issues\n\nFor now, I think that removing this guard is the right approach as it follows the established pattern.",
+      "parentUuid": "1322ffbc_0abbee8f",
+      "revId": "85946c00f9ff9079b51dd1aeb9a57f24d7f1ff1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
