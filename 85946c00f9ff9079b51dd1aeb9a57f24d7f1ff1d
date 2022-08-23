@@ -88,6 +88,24 @@
       "parentUuid": "1322ffbc_0abbee8f",
       "revId": "85946c00f9ff9079b51dd1aeb9a57f24d7f1ff1d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1c6585c_6eecbe22",
+        "filename": "zephyr/emul/pwm_mock.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2022-08-23T13:09:36Z",
+      "side": 1,
+      "message": "Done. (actually I forgot to add pwm_mock.c into the last patchset... DT_HAS_COMPAT_STATUS_OKAY is removed now)\n\nIs there any pointer to the discussion?",
+      "parentUuid": "ca792abd_54b71629",
+      "revId": "85946c00f9ff9079b51dd1aeb9a57f24d7f1ff1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
