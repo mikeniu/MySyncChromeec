@@ -85,6 +85,19 @@ if (DEFINED CONFIG_RISCV)
   zephyr_cc_option(-fsanitize-undefined-trap-on-error)
 endif()
 
+if (DEFINED CONFIG_ZEPHYR_PIGWEED_MODULE)
+  get_filename_component(PW_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../third_party/pigweed" ABSOLUTE)
+  add_subdirectory(${PW_ROOT} pigweed)
+  zephyr_link_libraries_ifdef(CONFIG_PIGWEED_LOG pw_log_zephyr)
+  zephyr_link_libraries_ifdef(CONFIG_PIGWEED_ASSERT pw_assert_zephyr.assert)
+  zephyr_link_libraries_ifdef(CONFIG_PIGWEED_ASSERT pw_assert_zephyr.check)
+  zephyr_link_libraries_ifdef(CONFIG_PIGWEED_CHRONO_SYSTEM_CLOCK pw_chrono_zephyr.system_clock)
+  zephyr_link_libraries_ifdef(CONFIG_PIGWEED_INTERRUPT_CONTEXT pw_interrupt_zephyr.context)
+  zephyr_link_libraries_ifdef(CONFIG_PIGWEED_SYNC_BINARY_SEMAPHORE pw_sync_zephyr.binary_semaphore_backend)
+  zephyr_link_libraries_ifdef(CONFIG_PIGWEED_SYNC_MUTEX pw_sync_zephyr.mutex_backend)
+  zephyr_link_libraries_ifdef(CONFIG_PIGWEED_SYS_IO pw_sys_io_zephyr)
+endif()
+
 # The EC application is split into two libraries:
 #   app: contains all the legacy code
 #   ec_shim: contains all the code under platform/ec/shim

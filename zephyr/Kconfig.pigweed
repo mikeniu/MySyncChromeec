@@ -1,0 +1,46 @@
+# Copyright 2022 The Chromium OS Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+rsource "../../../third_party/pigweed/Kconfig.zephyr"
+
+config ZEPHYR_PIGWEED_MODULE
+        bool "Enable Pigweed Module"
+        default y
+
+if ZEPHYR_PIGWEED_MODULE
+
+config PIGWEED_ASSERT
+        default y
+
+config PIGWEED_LOG
+        default y
+
+# Missing <cstddef>
+config PIGWEED_CONTAINERS
+        default n
+
+config PIGWEED_CHRONO_SYSTEM_CLOCK
+        default y
+
+config PIGWEED_INTERRUPT_CONTEXT
+        default y
+
+# Missing <kernel.h>
+config PIGWEED_SYNC_BINARY_SEMAPHORE
+        default n
+
+config PIGWEED_SYNC_MUTEX
+        default y
+
+# Missing <algorithm>
+config PIGWEED_SYS_IO
+        default n
+
+# Missing <stdint.h>
+config PIGWEED_VARINT
+       default y
+
+endif # ZEPHYR_PIGWEED_MODULE
+
+
