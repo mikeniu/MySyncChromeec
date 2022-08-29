@@ -42,4 +42,41 @@
 #define FORWARD_DECLARE_ENUM(x) enum x
 #endif /* __cplusplus */
 
+#define DO_PRAGMA(x) _Pragma(#x)
+
+#define _DISABLE_COMPILER_WARNING(compiler, warning) \
+	DO_PRAGMA(compiler diagnostic push);         \
+	DO_PRAGMA(compiler diagnostic ignored warning);
+
+#define _ENABLE_COMPILER_WARNING(compiler, warning) \
+	DO_PRAGMA(compiler diagnostic pop);
+
+/**
+ * Disable the specified compiler warning.
+ */
+#define DISABLE_COMPILER_WARNING(warning) \
+	_DISABLE_COMPILER_WARNING(GCC, warning)
+
+/**
+ * Re-enable the specified compiler warning. Can only be used after a call to
+ * DISABLE_COMPILER_WARNING.
+ */
+#define ENABLE_COMPILER_WARNING(warning) _ENABLE_COMPILER_WARNING(GCC, warning)
+
+#ifdef __clang__
+#define DISABLE_CLANG_WARNING(warning) _DISABLE_COMPILER_WARNING(clang, warning)
+#define ENABLE_CLANG_WARNING(warning) _ENABLE_COMPILER_WARNING(clang, warning)
+#else
+#define DISABLE_CLANG_WARNING(warning)
+#define ENABLE_CLANG_WARNING(warning)
+#endif
+
+#ifdef __GNUC__
+#define DISABLE_GCC_WARNING(warning) _DISABLE_COMPILER_WARNING(GCC, warning)
+#define ENABLE_GCC_WARNING(warning) _ENABLE_COMPILER_WARNING(GCC, warning)
+#else
+#define DISABLE_GCC_WARNING(warning)
+#define ENABLE_GCC_WARNING(warning)
+#endif
+
 #endif /* __CROS_EC_COMPILER_H */
