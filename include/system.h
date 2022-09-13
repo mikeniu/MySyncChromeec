@@ -658,6 +658,13 @@ void disable_deep_sleep(void);
 void enable_deep_sleep(void);
 
 /**
+ * Test only function allowing override for the RTC
+ *
+ * @param seconds
+ */
+__test_only void system_set_rtc(uint32_t seconds);
+
+/**
  * Use hibernate module to set up an RTC interrupt at a given
  * time from now
  *

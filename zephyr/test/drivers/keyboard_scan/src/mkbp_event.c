@@ -12,6 +12,7 @@
 #include "console.h"
 #include "host_command.h"
 #include "mkbp_event.h"
+#include "mkbp_fifo.h"
 #include "test/drivers/test_mocks.h"
 #include "test/drivers/test_state.h"
 
@@ -47,7 +48,7 @@ ZTEST(mkbp_event, host_command_get_events__get_event)
 	/* Add the above event to the MKBP keyboard FIFO and raise the event */
 
 	ret = mkbp_fifo_add(expected_event.event_type,
-			    &expected_event.data.key_matrix);
+			    (const uint8_t*)&expected_event.data.key_matrix);
 	activate_mkbp_with_events(BIT(expected_event.event_type));
 
 	zassert_equal(EC_SUCCESS, ret, "Got %d when adding to FIFO", ret);
