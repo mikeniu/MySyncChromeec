@@ -6,6 +6,7 @@
 #include <cros/binman.dtsi>
 #include <ite/it8xxx2.dtsi>
 #include <ite/it8xxx2-pinctrl-map.dtsi>
+#include <ite/it8xxx2-pinctrl-kscan-map.dtsi>
 
 / {
 	chosen {

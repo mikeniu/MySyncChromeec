@@ -26,3 +26,28 @@
 			>;
 	};
 };
+
+&cros_kb_raw {
+	status = "okay";
+	/* No KSO2 (it's inverted and implemented by GPIO) */
+	pinctrl-kscan = <&kscan_ksi_0_kbs
+			 &kscan_ksi_1_kbs
+			 &kscan_ksi_2_kbs
+			 &kscan_ksi_3_kbs
+			 &kscan_ksi_4_kbs
+			 &kscan_ksi_5_kbs
+			 &kscan_ksi_6_kbs
+			 &kscan_ksi_7_kbs
+			 &kscan_kso_0_kbs
+			 &kscan_kso_1_kbs
+			 &kscan_kso_3_kbs
+			 &kscan_kso_4_kbs
+			 &kscan_kso_5_kbs
+			 &kscan_kso_6_kbs
+			 &kscan_kso_7_kbs
+			 &kscan_kso_8_kbs
+			 &kscan_kso_9_kbs
+			 &kscan_kso_10_kbs
+			 &kscan_kso_11_kbs
+			 &kscan_kso_12_kbs>;
+};
