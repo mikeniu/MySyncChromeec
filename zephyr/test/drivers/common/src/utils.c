@@ -612,6 +612,11 @@ void check_console_cmd(const char *cmd, const char *expected_output,
 	int rv;
 
 	shell_backend_dummy_clear_output(get_ec_shell());
+	/*
+	 * Harden against race-condition where clearing output can happen at the
+	 * same time as writing to console
+	 */
+	k_sleep(K_SECONDS(1));
 	rv = shell_execute_cmd(get_ec_shell(), cmd);
 
 	zassert_equal(expected_rv, rv,
