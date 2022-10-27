@@ -2,3 +2,7 @@ common:
   platform_allow: native_posix
 tests:
   qcom_power.default: {}
+  qcom_power.power_button_v2:
+    extra_configs:
+      - CONFIG_PLATFORM_EC_POWER_BUTTON=n
+      - CONFIG_PLATFORM_EC_POWER_BUTTON_V2=y

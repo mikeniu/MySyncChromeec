@@ -518,6 +518,14 @@ config PLATFORM_EC_PORT80
 
 	  https://en.wikipedia.org/wiki/Power-on_self-test#Progress_and_error_reporting
 
+config PLATFORM_EC_POWER_BUTTON_V2
+	bool "Power-button support v2"
+	depends on PLATFORM_EC_HOSTCMD
+	help
+	  Enable generic power button driver using Zephyr GPIO APIs
+
+	  This requires a GPIO named GPIO_POWER_BUTTON_L.
+
 config PLATFORM_EC_POWER_BUTTON
 	bool "Power-button support"
 	depends on PLATFORM_EC_HOSTCMD

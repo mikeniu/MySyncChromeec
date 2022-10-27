@@ -50,6 +50,7 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MKBP_EVENT  mkbp_event.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MOTIONSENSE
                                                             motionsense_sensors.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PANIC       panic.c)
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWER_BUTTON_V2 power_button.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PWM_HC      pwm_hc.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LED_PWM     pwm_led.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_RTC         rtc.c)

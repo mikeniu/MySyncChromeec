@@ -113,6 +113,17 @@ tests:
     tags:
       common
       mkbp
+  drivers.power_button_v2:
+    timeout: 240
+    extra_args: CONF_FILE="prj.conf;default/prj.conf"
+    extra_configs:
+      - CONFIG_LINK_TEST_SUITE_DEFAULT=y
+      - CONFIG_PLATFORM_EC_BATTERY_CUT_OFF=y
+      - CONFIG_PLATFORM_EC_CBI_EEPROM=y
+      - CONFIG_PLATFORM_EC_LID_ANGLE_UPDATE=y
+      - CONFIG_PLATFORM_EC_POWER_BUTTON=n
+      - CONFIG_PLATFORM_EC_POWER_BUTTON_V2=y
+      - CONFIG_PLATFORM_EC_USB_PD_DPS=y
   drivers.power_host_sleep:
     extra_configs:
       - CONFIG_LINK_TEST_SUITE_POWER_HOST_SLEEP=y
