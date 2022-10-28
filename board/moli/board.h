@@ -58,6 +58,19 @@
 #define PD_MAX_CURRENT_MA 5000
 #define PD_MAX_VOLTAGE_MV 20000
 
+#define USB_VID_USBC_MONITOR 0x0502
+#define CMD_DOCKING_MONITOR_ATTENTION 0x15
+#define CMD_DOCKING_MONITOR_CONFIG 0x16
+
+#define MONITOR_STATUS_MASK GENMASK(4, 3)
+#define MONITOR_STATUS_OFF_TO_ON 0x00
+#define MONITOR_STATUS_STANDBY_TO_OFF 0x01
+#define MONITOR_STATUS_ON_TO_OFF 0x02
+#define SYSTEM_STATUS_ON 0x00
+#define SYSTEM_STATUS_SUSPEND 0x02
+#define SYSTEM_STATUS_S5 0x05
+#define SYSTEM_STATUS_G3 0x06
+
 /*
  * Macros for GPIO signals used in common code that don't match the
  * schematic names. Signal names in gpio.inc match the schematic and are
