@@ -13,6 +13,7 @@ BASEBOARD:=brask
 
 board-y=
 board-y+=board.o
+board-y+=customized_vdm.o
 board-y+=fans.o
 board-y+=i2c.o
 board-y+=led.o
