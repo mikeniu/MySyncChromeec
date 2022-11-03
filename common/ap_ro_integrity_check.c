@@ -1096,22 +1096,39 @@ int ec_rst_override(void)
 
 static uint8_t do_ap_ro_check(void)
 {
-	enum ap_ro_check_result rv;
+	enum ap_ro_check_result rv = ROV_SUCCEEDED;
+	enum ap_ro_check_vc_errors v1_check;
 	struct gbb_descriptor gbbd;
 
 	apro_result = AP_RO_IN_PROGRESS;
 	apro_fail_status_cleared = 0;
-	if (ap_ro_check_unsupported(true) != ARCVE_OK ||
-	    p_chk->header.type != AP_RO_HASH_TYPE_FACTORY) {
+
+	/*
+	 * Reading the V1 data failed, flash is corrupted. Fail verification
+	 * without reading the AP RO flash.
+	 */
+	v1_check = ap_ro_check_unsupported(true);
+	switch (v1_check) {
+	case ARCVE_OK:
+		CPRINTS("%s: found v1 data", __func__);
+		break;
+	case ARCVE_NOT_PROGRAMMED:
+	case ARCVE_BOARD_ID_BLOCKED:
+		CPRINTS("%s: unsupported", __func__);
 		apro_result = AP_RO_UNSUPPORTED_TRIGGERED;
 		ap_ro_add_flash_event(APROF_CHECK_UNSUPPORTED);
 		return EC_ERROR_UNIMPLEMENTED;
+	default:
+		CPRINTS("%s: bad v1 data", __func__);
+		rv = ROV_FAILED;
+		break;
 	}
 
 	enable_ap_spi_hash_shortcut();
 
 	/* Try and load the GBB and FMAP locations from flash. */
-	rv = get_saved_gbbd(&gbbd);
+	if (rv == ROV_SUCCEEDED)
+		rv = get_saved_gbbd(&gbbd);
 	switch (rv) {
 	case ROV_SUCCEEDED:
 		/* Use the saved gbbd to verify RO */
@@ -1163,7 +1180,8 @@ static uint8_t do_ap_ro_check(void)
 		}
 		break;
 	default:
-		CPRINTS("%s: FAIL corrupted GBBD", __func__);
+		if (v1_check == ARCVE_OK)
+			CPRINTS("%s: FAIL corrupted GBBD", __func__);
 		break;
 	}
 
@@ -1332,6 +1350,7 @@ static enum vendor_cmd_rc vc_get_ap_ro_status(enum vendor_cmd_cc code,
 {
 	uint8_t rv = apro_result;
 	uint8_t *response = buf;
+	enum ap_ro_check_vc_errors v1_check;
 
 	CPRINTS("Check AP RO status");
 
@@ -1339,9 +1358,12 @@ static enum vendor_cmd_rc vc_get_ap_ro_status(enum vendor_cmd_cc code,
 	if (input_size)
 		return VENDOR_RC_BOGUS_ARGS;
 
-	if ((apro_result != AP_RO_UNSUPPORTED_TRIGGERED) &&
-	    (ap_ro_check_unsupported(false) != ARCVE_OK))
-		rv = AP_RO_UNSUPPORTED_NOT_TRIGGERED;
+	if (apro_result != AP_RO_UNSUPPORTED_TRIGGERED) {
+		v1_check = ap_ro_check_unsupported(false);
+		if (v1_check == ARCVE_NOT_PROGRAMMED ||
+		    v1_check == ARCVE_BOARD_ID_BLOCKED)
+			rv = AP_RO_UNSUPPORTED_NOT_TRIGGERED;
+	}
 
 	*response_size = 1;
 	response[0] = rv;
