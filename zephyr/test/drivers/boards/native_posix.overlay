@@ -28,6 +28,7 @@
 		tcs3400-int = &tcs3400_clear;
 		gpio-wp = &gpio_wp_l;
 		gpio-kbd-kso2 = &gpio_ec_kso_02_inv;
+		int-wp = &int_wp_l;
 	};
 
 	ec-console {
@@ -303,6 +304,11 @@
 			irq-pin = <&gpio_ec_pwr_btn_odl>;
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "power_button_interrupt";
+		};
+		int_wp_l: wp_l {
+			irq-pin = <&gpio_wp_lgit g>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "switch_interrupt";
 		};
 	};
 
