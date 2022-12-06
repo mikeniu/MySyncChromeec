@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7db9eef_cf5d7b93",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1273086
+      },
+      "writtenOn": "2022-12-06T21:10:14Z",
+      "side": 1,
+      "message": "Eason - \n\nCan you please verify that this change is appropriate to both villager and zombie?\nNeil and I took a look at the schematics (that we had) and they appear to have the same circuit (from the reference design).\n\n-Bob",
+      "revId": "7475546fc2c596a35de43b989a30368cb84d8e12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
