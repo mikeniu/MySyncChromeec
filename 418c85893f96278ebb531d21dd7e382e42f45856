@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "09e4b47a_04e87c5b",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2022-12-22T20:18:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "518db869_53e46e18",
+      "range": {
+        "startLine": 238,
+        "startChar": 10,
+        "endLine": 238,
+        "endChar": 45
+      },
+      "revId": "418c85893f96278ebb531d21dd7e382e42f45856",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fb22272a_e6931a49",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-12-22T17:46:58Z",
       "side": 1,
       "message": "Use `flash_get_page_info_*` and `flash_page_foreach()` here instead.  If these routines don\u0027t provide everything you need, you should request an upstream API change instead of poking directly into the `flash_driver_api`.",
+      "range": {
+        "startLine": 242,
+        "startChar": 6,
+        "endLine": 242,
+        "endChar": 17
+      },
+      "revId": "418c85893f96278ebb531d21dd7e382e42f45856",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "901f2309_d2f8d58a",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2022-12-22T20:18:31Z",
+      "side": 1,
+      "message": "Unfortunately `flash_get_page_info_*` and `flash_page_foreach()` are not sufficient here. I will add an appropriate function on the Zephyr side and use it here.",
+      "parentUuid": "fb22272a_e6931a49",
       "range": {
         "startLine": 242,
         "startChar": 6,
