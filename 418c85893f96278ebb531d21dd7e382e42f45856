@@ -93,6 +93,30 @@
       },
       "revId": "418c85893f96278ebb531d21dd7e382e42f45856",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f37768cb_e523a1a6",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2022-12-23T11:59:11Z",
+      "side": 1,
+      "message": "Created Zephyr PR https://github.com/zephyrproject-rtos/zephyr/pull/53324 and modified this patch accordingly.",
+      "parentUuid": "901f2309_d2f8d58a",
+      "range": {
+        "startLine": 242,
+        "startChar": 6,
+        "endLine": 242,
+        "endChar": 17
+      },
+      "revId": "418c85893f96278ebb531d21dd7e382e42f45856",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
