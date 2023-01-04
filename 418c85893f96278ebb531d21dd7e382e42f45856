@@ -117,6 +117,30 @@
       },
       "revId": "418c85893f96278ebb531d21dd7e382e42f45856",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40fcc3e7_f2c0d933",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2023-01-04T16:08:55Z",
+      "side": 1,
+      "message": "Unfortunately, the PR is not going to be merged (problem with accessing driver structure from userspace).\n\nI modified the implementation to use the existing page layout API. The implementation is difficult and inefficient, but it\u0027s hard to implement something better with existing API.",
+      "parentUuid": "f37768cb_e523a1a6",
+      "range": {
+        "startLine": 242,
+        "startChar": 6,
+        "endLine": 242,
+        "endChar": 17
+      },
+      "revId": "418c85893f96278ebb531d21dd7e382e42f45856",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
