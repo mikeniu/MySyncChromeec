@@ -22,6 +22,30 @@
       },
       "revId": "4497db8a5c51ca1655a7a619b9396c33dd8c2d29",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80893234_fa7e2202",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2023-01-05T18:02:19Z",
+      "side": 1,
+      "message": "\u003e  Can this function call crec_flash_response_fill_banks() instead and then just print out information from the struct ec_response_flash_info_2 response?\n\nThe problem with this approach is that we don\u0027t know how many banks we have. `struct ec_response_flash_info_2` doesn\u0027t allocate memory for banks. It would get complicated quickly.\n```\nstruct ec_response_flash_info_2 {\n\t/* Total flash in the EC. */\n\tuint32_t flash_size;\n\t/* Flags; see EC_FLASH_INFO_* */\n\tuint32_t flags;\n\t/* Maximum size to use to send data to write to the EC. */\n\tuint32_t write_ideal_size;\n\t/* Number of banks present in the EC. */\n\tuint16_t num_banks_total;\n\t/* Number of banks described in banks array. */\n\tuint16_t num_banks_desc;\n\tstruct ec_flash_bank banks[0];\n} __ec_align4;\n```\n\nInstead, I added `flash_get_region()` function which provides information about the region, of which the sector is a part. Function returns true if there are more regions, false otherwise.\n\nSurprisingly, it started to look easier to me 😊",
+      "parentUuid": "614a7947_0ae49e53",
+      "range": {
+        "startLine": 241,
+        "startChar": 5,
+        "endLine": 241,
+        "endChar": 33
+      },
+      "revId": "4497db8a5c51ca1655a7a619b9396c33dd8c2d29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
