@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfdb9e64_4bb52c70",
+        "filename": "zephyr/Kconfig.flash",
+        "patchSetId": 10
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1529242
+      },
+      "writtenOn": "2023-01-05T19:47:15Z",
+      "side": 1,
+      "message": "I\u0027m assuming that enabling this by default won\u0027t cause any short term issues while the rest of the code is being rolled out, right?",
+      "range": {
+        "startLine": 117,
+        "startChar": 1,
+        "endLine": 117,
+        "endChar": 30
+      },
+      "revId": "f6097095528b0e8c91ce8913fa9da4b72c540e81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad8250eb_62b3488e",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1529242
+      },
+      "writtenOn": "2023-01-05T19:47:15Z",
+      "side": 1,
+      "message": "I don\u0027t think it\u0027s a major issue, but what the implications of an error occurring in `flash_get_region`? If `flash_get_page_info_by_idx` for some reason returns an error here:\n```\n  rv \u003d flash_get_page_info_by_idx(flash_ctrl_dev, start_idx, \u0026first);\n  if (rv)\n    return false;\n```\n\nthen `region` will never be updated and will either contain undefined contents (on the first iteration, due to whatever is in the stack) or the contents of the previous iteration. That would result in potentially printing garbage data, and `sector_idx` will be incremented with garbage data. I don\u0027t think there\u0027s any major problem with this (as there are likely bigger issues if this is failing!) but it seemed worth discussing.",
+      "range": {
+        "startLine": 299,
+        "startChar": 2,
+        "endLine": 299,
+        "endChar": 6
+      },
+      "revId": "f6097095528b0e8c91ce8913fa9da4b72c540e81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bc8c5ee_38f26661",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1529242
+      },
+      "writtenOn": "2023-01-05T19:47:15Z",
+      "side": 1,
+      "message": "The implications of this one seem more severe. In the unlikely event of `flash_get_region` failing, `region` may contains garbage data, which is then copied into `r-\u003ebanks[banks_idx]` and `sector_idx` is potentially incremented to some undefined value, which may cause issues with subsequent calls to `flash_get_page_info_by_idx`.\n\nIs there any reason not to update `flash_get_region` to either return an enumeration (i.e. `MORE_STUFF`, `NO_MORE_STUFF`, `ERROR`) or make the return code an error status and get `cont` via a parameter?",
+      "range": {
+        "startLine": 321,
+        "startChar": 2,
+        "endLine": 321,
+        "endChar": 6
+      },
+      "revId": "f6097095528b0e8c91ce8913fa9da4b72c540e81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
