@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a55280f9_aab136df",
+        "filename": "zephyr/Kconfig.flash",
+        "patchSetId": 10
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2023-01-09T16:56:35Z",
+      "side": 1,
+      "message": "Yup. Enabling this by default won\u0027t break anything 😊",
+      "parentUuid": "cfdb9e64_4bb52c70",
+      "range": {
+        "startLine": 117,
+        "startChar": 1,
+        "endLine": 117,
+        "endChar": 30
+      },
+      "revId": "f6097095528b0e8c91ce8913fa9da4b72c540e81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ad8250eb_62b3488e",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "30ee7821_95088e71",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2023-01-09T16:56:35Z",
+      "side": 1,
+      "message": "I changed `flash_get_region()` to return an EC error code. To indicate that there are more regions I use `EC_RES_IN_PROGRESS`. `EC_RES_SUCCESS` is returned with the last region.\n\nNow `crec_flash_print_region_info()` and `crec_flash_response_fill_banks()` can stop if `flash_get_region()` returned error. `crec_flash_response_fill_banks()` will also propagate error, so the host command handler can return it to AP.",
+      "parentUuid": "ad8250eb_62b3488e",
+      "range": {
+        "startLine": 299,
+        "startChar": 2,
+        "endLine": 299,
+        "endChar": 6
+      },
+      "revId": "f6097095528b0e8c91ce8913fa9da4b72c540e81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5bc8c5ee_38f26661",
@@ -60,6 +108,30 @@
       "writtenOn": "2023-01-05T19:47:15Z",
       "side": 1,
       "message": "The implications of this one seem more severe. In the unlikely event of `flash_get_region` failing, `region` may contains garbage data, which is then copied into `r-\u003ebanks[banks_idx]` and `sector_idx` is potentially incremented to some undefined value, which may cause issues with subsequent calls to `flash_get_page_info_by_idx`.\n\nIs there any reason not to update `flash_get_region` to either return an enumeration (i.e. `MORE_STUFF`, `NO_MORE_STUFF`, `ERROR`) or make the return code an error status and get `cont` via a parameter?",
+      "range": {
+        "startLine": 321,
+        "startChar": 2,
+        "endLine": 321,
+        "endChar": 6
+      },
+      "revId": "f6097095528b0e8c91ce8913fa9da4b72c540e81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32506203_0cf97e3f",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2023-01-09T16:56:35Z",
+      "side": 1,
+      "message": "Please see response in comment above.",
+      "parentUuid": "5bc8c5ee_38f26661",
       "range": {
         "startLine": 321,
         "startChar": 2,
