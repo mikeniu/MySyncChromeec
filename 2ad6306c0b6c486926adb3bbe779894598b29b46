@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "639fd3d1_a74422ff",
+        "filename": "zephyr/Kconfig.flash",
+        "patchSetId": 11
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2023-01-10T18:05:43Z",
+      "side": 1,
+      "message": "Can you open a bug to track whether this option can be enabled for other SOCs?  It would be good to eventually deprecate `CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT` and always use the Zephyr API.",
+      "range": {
+        "startLine": 117,
+        "startChar": 0,
+        "endLine": 117,
+        "endChar": 30
+      },
+      "revId": "2ad6306c0b6c486926adb3bbe779894598b29b46",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15764e2f_90f17859",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2023-01-10T18:05:43Z",
+      "side": 1,
+      "message": "I want to clarify some terms:\n* Flash page: a single erase chunk.\n* Flash bank: one or more contiguous flash pages, each with the same erase size.\n\nA flash device with uniform erase sectors has multiple pages, but just one bank, correct?\n\nThis code is returning the number of pages, but the number of banks is typically less than the number of pages.",
+      "range": {
+        "startLine": 348,
+        "startChar": 0,
+        "endLine": 348,
+        "endChar": 45
+      },
+      "revId": "2ad6306c0b6c486926adb3bbe779894598b29b46",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
