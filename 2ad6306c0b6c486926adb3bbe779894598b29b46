@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "eb0fa731_615810f5",
+        "filename": "zephyr/Kconfig.flash",
+        "patchSetId": 11
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2023-01-10T18:32:28Z",
+      "side": 1,
+      "message": "Do you have a bug template? Or in which component should I create it?",
+      "parentUuid": "639fd3d1_a74422ff",
+      "range": {
+        "startLine": 117,
+        "startChar": 0,
+        "endLine": 117,
+        "endChar": 30
+      },
+      "revId": "2ad6306c0b6c486926adb3bbe779894598b29b46",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "15764e2f_90f17859",
         "filename": "zephyr/shim/src/flash.c",
         "patchSetId": 11
@@ -37,6 +61,30 @@
       "writtenOn": "2023-01-10T18:05:43Z",
       "side": 1,
       "message": "I want to clarify some terms:\n* Flash page: a single erase chunk.\n* Flash bank: one or more contiguous flash pages, each with the same erase size.\n\nA flash device with uniform erase sectors has multiple pages, but just one bank, correct?\n\nThis code is returning the number of pages, but the number of banks is typically less than the number of pages.",
+      "range": {
+        "startLine": 348,
+        "startChar": 0,
+        "endLine": 348,
+        "endChar": 45
+      },
+      "revId": "2ad6306c0b6c486926adb3bbe779894598b29b46",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "578b7c29_38d1ef99",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2023-01-10T18:32:28Z",
+      "side": 1,
+      "message": "\u003e Flash page: a single erase chunk\n\nYes\n\n\u003e Flash bank: one or more contiguous flash pages, each with the same erase size\n\nYes, it\u0027s also called `region`. Unfortunately, in EC codebase sometimes `bank` means `page` e.g. https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/common/flash.c;l\u003d167-189;drc\u003d3c5eb7bebec88813abb1a44a60230acdb05ef29e\n\n\u003e A flash device with uniform erase sectors has multiple pages, but just one bank, correct?\n\nCorrect.\n\n\u003e This code is returning the number of pages, but the number of banks is typically less than the number of pages.\n\nThat\u0027s right.",
+      "parentUuid": "15764e2f_90f17859",
       "range": {
         "startLine": 348,
         "startChar": 0,
