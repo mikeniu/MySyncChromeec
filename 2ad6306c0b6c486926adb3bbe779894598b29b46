@@ -165,6 +165,30 @@
       },
       "revId": "2ad6306c0b6c486926adb3bbe779894598b29b46",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e678b1d6_be5753c5",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2023-01-11T16:45:20Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "947b4cce_8aa53e2c",
+      "range": {
+        "startLine": 348,
+        "startChar": 0,
+        "endLine": 348,
+        "endChar": 45
+      },
+      "revId": "2ad6306c0b6c486926adb3bbe779894598b29b46",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
