@@ -141,6 +141,30 @@
       },
       "revId": "2ad6306c0b6c486926adb3bbe779894598b29b46",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "947b4cce_8aa53e2c",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2023-01-11T16:41:21Z",
+      "side": 1,
+      "message": "No. We can check implementation of these functions in common/flash.c, e.g. crec_flash_total_banks():\n\n```\nint crec_flash_total_banks(void)\n{\n\treturn PHYSICAL_BANKS;\n}\n```\n\nwhere PHYSICAL_BANKS is:\n\n```\n/* Number of physical flash banks */\n#define PHYSICAL_BANKS CONFIG_FLASH_MULTIPLE_REGION\n```\nwhen pages have different sizes\n\nor\n```\n/* Number of physical flash banks */\n#ifndef PHYSICAL_BANKS\n#define PHYSICAL_BANKS (CONFIG_FLASH_SIZE_BYTES / CONFIG_FLASH_BANK_SIZE)\n```\nwhen pages have uniform size\n\n`CONFIG_FLASH_MULTIPLE_REGION` example (STM32F4)\n```\n#define CONFIG_FLASH_REGION_TYPE_COUNT 3\n#define CONFIG_FLASH_MULTIPLE_REGION \\\n\t(5 + (CONFIG_FLASH_SIZE_BYTES - SIZE_128KB) / SIZE_128KB)\n```\n4 first pages have 16KB size (64KB total)\n5th page has 64KB size\nOther pages have 128KB size\n\nSo there are 3 regions, but at least 5 pages.",
+      "parentUuid": "62279ca5_04426012",
+      "range": {
+        "startLine": 348,
+        "startChar": 0,
+        "endLine": 348,
+        "endChar": 45
+      },
+      "revId": "2ad6306c0b6c486926adb3bbe779894598b29b46",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
