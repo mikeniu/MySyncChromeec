@@ -88,6 +88,99 @@ bool system_is_in_safe_mode(void)
 	return !!in_safe_mode;
 }
 
+/* TODO: Remove when coredumps are supported.
+ *
+ * This is a temporary workaround for getting the stack into the console
+ * buffer. When coredumps are supported this workaround can be removed.
+ */
+
+#define STACK_DUMP_SIZE_WORDS 32
+
+/*
+ * Returns non-zero if the exception frame was created on the main stack, or
+ * zero if it's on the process stack.
+ *
+ * See B1.5.8 "Exception return behavior" of ARM DDI 0403D for details.
+ */
+static int32_t is_frame_in_handler_stack(const uint32_t exc_return)
+{
+	return (exc_return & 0xf) == 1 || (exc_return & 0xf) == 9;
+}
+
+/*
+ * Returns the size of the exception frame.
+ *
+ * See B1.5.7 "Stack alignment on exception entry" of ARM DDI 0403D for details.
+ * In short, the exception frame size can be either 0x20, 0x24, 0x68, or 0x6c
+ * depending on FPU context and padding for 8-byte alignment.
+ */
+static uint32_t get_exception_frame_size(const struct panic_data *pdata)
+{
+	uint32_t frame_size = 0;
+
+	/* base exception frame */
+	frame_size += 8 * sizeof(uint32_t);
+
+	/* CPU uses xPSR[9] to indicate whether it padded the stack for
+	 * alignment or not.
+	 */
+	if (pdata->cm.frame[CORTEX_PANIC_FRAME_REGISTER_PSR] & BIT(9))
+		frame_size += sizeof(uint32_t);
+
+	if (IS_ENABLED(CONFIG_FPU)) {
+		/* CPU uses EXC_RETURN[4] to indicate whether it stored extended
+		 * frame for FPU or not.
+		 */
+		if (!(pdata->cm.regs[CORTEX_PANIC_REGISTER_LR] & BIT(4)))
+			frame_size += 18 * sizeof(uint32_t);
+	}
+
+	return frame_size;
+}
+
+/*
+ * Returns the position of the process stack before the exception frame.
+ * It computes the size of the exception frame and adds it to psp.
+ * If the exception happened in the exception context, it returns psp as is.
+ */
+static uint32_t get_process_stack_position(const struct panic_data *pdata)
+{
+	uint32_t psp = pdata->cm.regs[CORTEX_PANIC_REGISTER_PSP];
+
+	if (!is_frame_in_handler_stack(
+		    pdata->cm.regs[CORTEX_PANIC_REGISTER_LR]))
+		psp += get_exception_frame_size(pdata);
+
+	return psp;
+}
+
+/*
+ * Prints process stack contents stored above the exception frame.
+ */
+static void print_panic_task_stack(void)
+{
+	uint32_t psp;
+	const struct panic_data *pdata = panic_get_data();
+
+	if (!pdata || !(pdata->flags & PANIC_DATA_FLAG_FRAME_VALID)) {
+		ccprintf("Invalid panic data. Cannot dump stack.\n");
+		return;
+	}
+	ccprintf("=========== Process Stack Contents ===========");
+	psp = get_process_stack_position(pdata);
+	for (int i = 0; i < STACK_DUMP_SIZE_WORDS; i++) {
+		if (psp + sizeof(uint32_t) > CONFIG_RAM_BASE + CONFIG_RAM_SIZE)
+			break;
+		if (i % 4 == 0)
+			ccprintf("\n%08x:", psp);
+		ccprintf(" %08x", *(uint32_t *)psp);
+		psp += sizeof(uint32_t);
+	}
+	ccprintf("\n");
+	/* Flush so dump isn't mixed with other output */
+	cflush();
+}
+
 bool command_is_allowed_in_safe_mode(int command)
 {
 	for (int i = 0; i < ARRAY_SIZE(safe_mode_allowed_hostcmds); i++)
@@ -98,6 +191,9 @@ bool command_is_allowed_in_safe_mode(int command)
 
 static void system_safe_mode_start(void)
 {
+	ccprintf("*** Post Panic System Safe Mode ***\n");
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_SYSTEM_SAFE_MODE_PRINT_STACK))
+		print_panic_task_stack();
 	if (IS_ENABLED(CONFIG_HOSTCMD_EVENTS))
 		host_set_single_event(EC_HOST_EVENT_PANIC);
 }
