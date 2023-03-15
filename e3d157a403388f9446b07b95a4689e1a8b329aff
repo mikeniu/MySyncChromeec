@@ -22,6 +22,30 @@
       },
       "revId": "e3d157a403388f9446b07b95a4689e1a8b329aff",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "def4aab6_6665ae54",
+        "filename": "chip/stm32/spi_controller.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 1341996
+      },
+      "writtenOn": "2023-03-15T20:50:47Z",
+      "side": 0,
+      "message": "Callers can either use `spi_transaction_async()` followed by `spi_transaction_flush()`, or they can use the blocking `spi_transaction()`, which is just a wrapper around the two calls.\n\nFor write-then-read transactions, `spi_transaction_start()` does first `spi_dma_start()` to initiate the write part, then `spi_dma_wait()` before invoking `spi_dma_start()` to initiate the read part, and then returns while the DMA read is  ongoing.  Later, `spi_transaction_flush()` will invoke `spi_dma_wait()` a second time to wait for the read part to complete.  This works as intended, as the write part will typically be one a few bytes, and we have to tolerate blocking while those are transmitted.\n\nFor write-only transactions, however, before my change `spi_transaction_start()` does first `spi_dma_start()` to initiate the write part, and then `spi_dma_wait()` in line 386 waiting for the entire transaction to complete, before retuning.  Later, when `spi_transaction_flush()` is called, it will call `spi_dma_wait()` a second time, despite the dma having been confirmed finished already.  I find that counter-intuitive, and refuse to believe it to have been the intention.\n\nTo answer your question directly.  For write-only transactions we do NOT need or want to wait for the TX inside this function that initiates a transfer.",
+      "parentUuid": "ce374ae8_864dca3b",
+      "range": {
+        "startLine": 386,
+        "startChar": 6,
+        "endLine": 386,
+        "endChar": 18
+      },
+      "revId": "e3d157a403388f9446b07b95a4689e1a8b329aff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
