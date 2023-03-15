@@ -46,6 +46,30 @@
       },
       "revId": "e3d157a403388f9446b07b95a4689e1a8b329aff",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0f10718_46ac1e97",
+        "filename": "chip/stm32/spi_controller.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 1106949
+      },
+      "writtenOn": "2023-03-15T21:16:08Z",
+      "side": 0,
+      "message": "\u003e For write-only transactions, however, before my change spi_transaction_start() does first...\n\nThere is no spi_transaction_start. Do you mean spi_transaction_async?\n\nAssuming you meant spi_transaction_async, I think the spi_dma_start at line 386 is redundant for write-only transactions. Your change makes sense.\n\nPlease add comments to explain why we\u0027re skipping a wait (because it\u0027s done by spi_transaction_flush).",
+      "parentUuid": "def4aab6_6665ae54",
+      "range": {
+        "startLine": 386,
+        "startChar": 6,
+        "endLine": 386,
+        "endChar": 18
+      },
+      "revId": "e3d157a403388f9446b07b95a4689e1a8b329aff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
