@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce374ae8_864dca3b",
+        "filename": "chip/stm32/spi_controller.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 1106949
+      },
+      "writtenOn": "2023-03-15T20:33:20Z",
+      "side": 0,
+      "message": "This looks to me a wait for the tx kicked off at line 375. This isn\u0027t needed for write-only transactions?",
+      "range": {
+        "startLine": 386,
+        "startChar": 6,
+        "endLine": 386,
+        "endChar": 18
+      },
+      "revId": "e3d157a403388f9446b07b95a4689e1a8b329aff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
