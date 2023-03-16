@@ -33,6 +33,24 @@
       "message": "My current code skips spi_clear_tx_fifo(), in case of write-only transactions.  I think I now see what it is meant to guard against.  The TX DMA having finished just tells us that the DMA engine has offloaded all the data to the SPI controller, the SPI controller could still be clocking out a few bits from the final byte.  We do not want to e.g. deassert chip select before being sure that the last SPI clock pulse is over, so in order to do that, I need to call `spi_clear_tx_fifo()` from `spi_transaction_flush()` (it will not hurt that it gets called a second for write-then-read transactions).",
       "revId": "77d391fdf70241ed2f1943379f4504fe6a1a2c07",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e168e9e_553b782c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1341996
+      },
+      "writtenOn": "2023-03-16T04:13:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "33c643c1_638fb647",
+      "revId": "77d391fdf70241ed2f1943379f4504fe6a1a2c07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

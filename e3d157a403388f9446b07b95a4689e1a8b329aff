@@ -94,6 +94,30 @@
       },
       "revId": "e3d157a403388f9446b07b95a4689e1a8b329aff",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9380270e_1b6c432f",
+        "filename": "chip/stm32/spi_controller.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 1341996
+      },
+      "writtenOn": "2023-03-16T04:13:01Z",
+      "side": 0,
+      "message": "Yes, I meant `spi_transaction_async()` whenever I wrote `spi_transaction_start()`.\n\nI thought about it a little more, and came to the conclusion that the `spi_dma_wait()` at line 386 is necessary only when doing BOTH write and then read.  If doing just one of the two, then the wait in `spi_transaction_flush()` will be sufficient.  This way, there will be exactly one `spi_dma_wait()` for every `spi_dma_start()`.  I have added more comments to explain the logic.",
+      "parentUuid": "e8b88bd8_f209b130",
+      "range": {
+        "startLine": 386,
+        "startChar": 6,
+        "endLine": 386,
+        "endChar": 18
+      },
+      "revId": "e3d157a403388f9446b07b95a4689e1a8b329aff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
