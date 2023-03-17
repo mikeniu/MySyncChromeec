@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac553569_551718b4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2023-03-17T11:14:24Z",
+      "side": 1,
+      "message": "add b:274063396",
+      "revId": "2f6f994bcbb462ad779c0773340570aff4cfcd6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "7500d3b3_15faaeb4",
@@ -14,6 +31,23 @@
       "writtenOn": "2023-03-17T10:48:43Z",
       "side": 1,
       "message": "test firmware_ECPowerButton pass",
+      "revId": "2f6f994bcbb462ad779c0773340570aff4cfcd6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c1ffc48_b008f5c4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2023-03-17T11:14:24Z",
+      "side": 1,
+      "message": "This doesn\u0027t fix the case where ec reboots and stays in RO.\n\nI think the better way is to fix `power_chipset_init`, something like\n```\nif (init_state \u003d\u003d S5) {\n    init_state \u003d G3;\n    is_s5g3_passed \u003d true;\n}\n```",
       "revId": "2f6f994bcbb462ad779c0773340570aff4cfcd6f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
