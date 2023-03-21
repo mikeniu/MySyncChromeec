@@ -49,6 +49,19 @@
 		};
 
 		/* Two sectors used for rollback (128KB each) */
+		rollback0 {
+			offset = <0x20000>;
+			size = <0x20000>;
+			type = "blob";
+			filename = "../build-rw/rollback_initial_data.bin";
+		};
+
+		rollback1 {
+			offset = <0x40000>;
+			size = <0x20000>;
+			type = "blob";
+			filename = "../build-rw/rollback_initial_data.bin";
+		};
 
 		/* Remaining 5 sectors (128KB each) used for RW */
 		ec-rw {
@@ -57,4 +70,24 @@
 		};
 		pad-byte = <0xff>;
 	};
+};
+
+&flash0 {
+        partitions {
+                compatible = "fixed-partitions";
+                #address-cells = <1>;
+                #size-cells = <1>;
+
+                /* Sixth sector is used as first rollback sector. */
+                rollback0: partition@20000 {
+                        label = "rollback0";
+                        reg = <0x20000 DT_SIZE_K(128)>;
+                };
+
+                /* Seventh sector is used as second rollback sector. */
+                rollback1: partition@40000 {
+                        label = "rollback1";
+                        reg = <0x40000 DT_SIZE_K(128)>;
+                };
+        };
 };
