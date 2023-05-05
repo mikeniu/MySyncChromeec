@@ -233,6 +233,13 @@ static int command_run_test(int argc, const char **argv)
 }
 DECLARE_CONSOLE_COMMAND(runtest, command_run_test, NULL, NULL);
 
+static enum ec_status host_command_run_test(struct host_cmd_handler_args *args)
+{
+	run_test(0, NULL);
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_READ_TEST, host_command_run_test, EC_VER_MASK(0));
+
 #ifndef CONFIG_ZEPHYR
 void z_ztest_run_test_suite(const char *name, struct unit_test *suite)
 {
