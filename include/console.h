@@ -164,6 +164,10 @@ static inline bool console_channel_is_disabled(enum console_channel channel)
  */
 int cputs(enum console_channel channel, const char *outstr);
 
+#ifdef CONFIG_PIGWEED_LOG_TOKENIZED
+#define cprintf(channel, format, ...) LOG_DBG(format, ##__VA_ARGS__)
+#define cprints(channel, format, ...) LOG_DBG(format, ##__VA_ARGS__)
+#else
 /**
  * Print formatted output to the console channel.
  *
@@ -186,6 +190,7 @@ cprintf(enum console_channel channel, const char *format, ...);
  */
 __attribute__((__format__(__printf__, 2, 3))) int
 cprints(enum console_channel channel, const char *format, ...);
+#endif /* CONFIG_PIGWEED_LOG_TOKENIZED */
 
 /**
  * Flush the console output for all channels.
@@ -197,10 +202,15 @@ void cflush(void);
  * Modules may define similar macros in their .c files for their own use; it is
  * recommended those module-specific macros be named CPUTS and CPRINTF. */
 #define ccputs(outstr) cputs(CC_COMMAND, outstr)
+#ifdef CONFIG_PIGWEED_LOG_TOKENIZED
+#define ccprintf(format, ...) LOG_DBG(format, ##__VA_ARGS__)
+#define ccprints(format, ...) LOG_DBG(format, ##__VA_ARGS__)
+#else
 /* gcc allows variable arg lists in macros; see
  * http://gcc.gnu.org/onlinedocs/gcc/Variadic-Macros.html */
 #define ccprintf(format, args...) cprintf(CC_COMMAND, format, ##args)
 #define ccprints(format, args...) cprints(CC_COMMAND, format, ##args)
+#endif /* CONFIG_PIGWEED_LOG_TOKENIZED */
 
 /**
  * Called by UART when a line of input is pending.

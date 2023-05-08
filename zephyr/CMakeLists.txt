@@ -123,6 +123,12 @@ if (DEFINED CONFIG_PLATFORM_EC)
     "${PLATFORM_EC}/third_party")
 endif()
 
+if (DEFINED CONFIG_ZEPHYR_PIGWEED_MODULE)
+  get_filename_component(pw_root "${CMAKE_CURRENT_SOURCE_DIR}/../../../third_party/pigweed" ABSOLUTE)
+  set(ENV{PW_ROOT} "${pw_root}")
+  add_subdirectory(${pw_root} pigweed)
+endif()
+
 add_subdirectory("subsys")
 
 # Creates a phony target all.libraries in case you only want to build the
@@ -619,3 +625,23 @@ add_dependencies(app ec_version_header)
 
 # Include the directory containing the generated header.
 zephyr_include_directories("${CMAKE_CURRENT_BINARY_DIR}/include")
+
+if (DEFINED CONFIG_PIGWEED_LOG_TOKENIZED)
+  # include("${pw_root}/pw_tokenizer/database.cmake")
+  # pw_tokenizer_database("token_database"
+  #   DATABASE ${CMAKE_BINARY_DIR}/database.csv
+  #   TARGET ${logical_target_for_zephyr_elf}
+  # )
+
+  set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
+    COMMAND
+      ${PYTHON_EXECUTABLE}
+      $ENV{PW_ROOT}/pw_tokenizer/py/pw_tokenizer/database.py
+      create
+      --force
+      --type csv
+      -d ${CMAKE_BINARY_DIR}/database.csv
+      ${CMAKE_BINARY_DIR}/zephyr/zephyr_pre0.elf
+  )
+
+endif()

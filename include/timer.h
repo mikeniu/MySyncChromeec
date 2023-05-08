@@ -14,7 +14,7 @@
 #include <sys/types.h>
 #else
 /* Data type for POSIX style clock() implementation */
-typedef long clock_t;
+typedef long unsigned int clock_t;
 #endif
 
 #include "common.h"

@@ -31,7 +31,8 @@ int ppc_prints(const char *string, int port)
 #if defined(TEST_LEGACY_BUILD) || !defined(CONFIG_USBC_PPC_LOGGING)
 	return 0;
 #else
-	return CPRINTS("ppc p%d %s", port, string);
+	CPRINTS("ppc p%d %s", port, string);
+	return 0;
 #endif /* defined(TEST_LEGACY_BUILD) || !defined(CONFIG_USBC_PPC_LOGGING) */
 }
 
@@ -40,7 +41,8 @@ int ppc_err_prints(const char *string, int port, int error)
 #if defined(TEST_LEGACY_BUILD) || !defined(CONFIG_USBC_PPC_LOGGING)
 	return 0;
 #else
-	return CPRINTS("ppc p%d %s (%d)", port, string, error);
+	CPRINTS("ppc p%d %s (%d)", port, string, error);
+	return 0;
 #endif /* defined(TEST_LEGACY_BUILD) || !defined(CONFIG_USBC_PPC_LOGGING) */
 }
 

@@ -387,6 +387,7 @@ void uart_clear_input(void)
 #endif
 }
 
+#ifndef CONFIG_PIGWEED_LOG_TOKENIZED
 static void handle_sprintf_rv(int rv, size_t *len)
 {
 	if (rv < 0) {
@@ -396,6 +397,7 @@ static void handle_sprintf_rv(int rv, size_t *len)
 		*len += rv;
 	}
 }
+#endif
 
 static void zephyr_print(const char *buff, size_t size)
 {
@@ -439,6 +441,7 @@ int cputs(enum console_channel channel, const char *outstr)
 	return 0;
 }
 
+#ifndef CONFIG_PIGWEED_LOG_TOKENIZED
 int cprintf(enum console_channel channel, const char *format, ...)
 {
 	int rv;
@@ -495,3 +498,4 @@ int cprints(enum console_channel channel, const char *format, ...)
 
 	return rv > 0 ? EC_SUCCESS : rv;
 }
+#endif /* CONFIG_PIGWEED_LOG_TOKENIZED */

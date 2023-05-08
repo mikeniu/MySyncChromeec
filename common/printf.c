@@ -468,7 +468,7 @@ int vfnprintf(int (*addchar)(void *context, int c), void *context,
 			 * If precision is set, ensure that we do not
 			 * overrun it
 			 */
-			vlen = strnlen(vstr, precision);
+			vlen = strlen(vstr);
 		}
 
 		while (vlen < pad_width && !(flags & PF_LEFT)) {
