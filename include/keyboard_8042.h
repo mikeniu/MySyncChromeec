@@ -59,4 +59,22 @@ void send_aux_data_to_host_interrupt(uint8_t data);
  */
 void send_aux_data_to_device(uint8_t data);
 
+#ifdef TEST_BUILD
+
+/**
+ * @brief Expose function for testing to set typematic scan code
+ *
+ * @param scan_code Pointer to byte array with scan code
+ * @param len Length of scan code in number of bytes
+ */
+void set_typematic_key(const uint8_t *scan_code, int32_t len);
+
+void test_keyboard_8042_set_resend_command(uint8_t *data, int length);
+
+/**
+ * @brief Reset typematic, RAM, and scancode set for testing purposes.
+ */
+__test_only void test_keyboard_8042_reset(void);
+#endif /* TEST_BUILD */
+
 #endif /* __CROS_EC_KEYBOARD_8042_H */
