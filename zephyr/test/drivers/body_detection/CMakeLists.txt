@@ -2,4 +2,4 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-target_sources(app PRIVATE src/body_detection.c)
+target_sources(app PRIVATE src/body_detection.c src/filter.c)

@@ -16,45 +16,48 @@ if PLATFORM_EC_BODY_DETECTION
 
 config PLATFORM_EC_BODY_DETECTION_MAX_WINDOW_SIZE
 	int "Maximal sensor data rate"
-	default 250
+	default 0
 	help
 	  Sets the maximum sensor data rate, in Hz. Note that larger data rate
 	  values consume more memory and computing resource.
+	  This configuration value refers to legacy body detection algorithm
+	  and is deprecated.
 
 config PLATFORM_EC_BODY_DETECTION_VAR_THRESHOLD
 	int "The threshold of acceleration variance for confidence calculation"
-	default 550
+	default 4000
 	help
-	  The unit is (mm/s^2)^2
+	  The unit is uG
 
-	  The motion confidence is calculated if the variance is within
-	  variance_threshold +/- confidence_delta. Otherwise, if variance is
-	  too high/low, confidence will be 100%/0%
+	  The motion confidence is calculated if the variance estimator is
+	  within variance_threshold +/- confidence_delta. Otherwise, if
+	  variance estimator is too high/low, confidence will be 100%/0%
 
 config PLATFORM_EC_BODY_DETECTION_CONFIDENCE_DELTA
 	int "The delta of acceleration variance for confidence calculation"
-	default 525
+	default 3000
 	help
-	  The unit is (mm/s^2)^2
+	  The unit is uG
 
-	  The motion confidence is calculated if the variance is within
-	  variance_threshold +/- confidence_delta. Otherwise, if variance is
-	  too high/low, confidence will be 100%/0%
+	  The motion confidence is calculated if the variance estimator is
+	  within variance_threshold +/- confidence_delta. Otherwise, if
+	  variance estimator is too high/low, confidence will be 100%/0%
 
 config PLATFORM_EC_BODY_DETECTION_VAR_NOISE_FACTOR
 	int "How much noise affects the threshold of variance"
-	default 120
+	default 0
 	help
 	  The unit is percentage
-
 	  This is used for mitigate the effect of the noise from the sensor.
 	  If set to 100%, the average noise is canceled out. This is set to
 	  120% by default because the noise might get larger than average
 	  sometimes.
+	  This configuration value refers to legacy body detection algorithm
+	  and is deprecated.
 
 config PLATFORM_EC_BODY_DETECTION_ON_BODY_CON
 	int "The confidence limit of on_body"
-	default 50
+	default 90
 	help
 	  The unit is percentage
 

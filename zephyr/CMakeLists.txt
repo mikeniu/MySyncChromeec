@@ -195,7 +195,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ACCEL_FIFO
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_AMD_STB_DUMP
                                                 "${PLATFORM_EC}/driver/amd_stb.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BODY_DETECTION
-                                                "${PLATFORM_EC}/common/body_detection.c")
+                                                "${PLATFORM_EC}/common/body_detection.c"
+						"${PLATFORM_EC}/common/filter.c")
 zephyr_library_sources_ifdef(CONFIG_NAMED_ADC_CHANNELS
                                                 "${PLATFORM_EC}/common/adc.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ALS_TCS3400
