@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96bc5d9a_5ab8e96a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2023-06-23T20:16:18Z",
+      "side": 1,
+      "message": "please add b/267628657 since you\u0027re updating changes\ndone for that bug and this work is not really board\nspecific as the other two bugs listed here.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 3
+      },
+      "revId": "8e54d05616caa22e99622733baaf523b86340ebb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ad5ecfb_fd94d9ab",
+        "filename": "zephyr/shim/include/cbi_flash.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2023-06-23T20:16:18Z",
+      "side": 1,
+      "message": "would it make more sense to move these asserts to cbi_flash.c?\nyou could probably get rid of the conditional compilation that way.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 41
+      },
+      "revId": "8e54d05616caa22e99622733baaf523b86340ebb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
