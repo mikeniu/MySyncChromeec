@@ -117,6 +117,30 @@
       },
       "revId": "8e54d05616caa22e99622733baaf523b86340ebb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24dc96d5_d4e48873",
+        "filename": "zephyr/shim/include/cbi_flash.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1541242
+      },
+      "writtenOn": "2023-06-26T20:40:46Z",
+      "side": 1,
+      "message": "They are used in flash.c other than cbi_flash.c",
+      "parentUuid": "7aa8a6ba_753b5580",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 41
+      },
+      "revId": "8e54d05616caa22e99622733baaf523b86340ebb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
