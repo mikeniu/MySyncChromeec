@@ -93,6 +93,30 @@
       },
       "revId": "8e54d05616caa22e99622733baaf523b86340ebb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7aa8a6ba_753b5580",
+        "filename": "zephyr/shim/include/cbi_flash.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2023-06-26T20:01:36Z",
+      "side": 1,
+      "message": "\"multiple source files\" - are any of these related to the cbi_flash\nfunctionality? there\u0027s no need to have these asserts in unrelated\nfiles.\n\nif you\u0027re compiling this section conditionally based on\nCONFIG_PLATFORM_EC_CBI_FLASH, these checks aren\u0027t performed\nin any case. so, when the feature is enabled, it\u0027s sufficent\nto have asserts in files that are directly feature related.",
+      "parentUuid": "263b056f_f2c7fe34",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 41
+      },
+      "revId": "8e54d05616caa22e99622733baaf523b86340ebb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
