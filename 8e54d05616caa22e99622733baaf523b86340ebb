@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "93f5e479_b4d7102f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1541242
+      },
+      "writtenOn": "2023-06-26T10:07:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "96bc5d9a_5ab8e96a",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 3
+      },
+      "revId": "8e54d05616caa22e99622733baaf523b86340ebb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3ad5ecfb_fd94d9ab",
@@ -37,6 +61,30 @@
       "writtenOn": "2023-06-23T20:16:18Z",
       "side": 1,
       "message": "would it make more sense to move these asserts to cbi_flash.c?\nyou could probably get rid of the conditional compilation that way.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 41
+      },
+      "revId": "8e54d05616caa22e99622733baaf523b86340ebb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "263b056f_f2c7fe34",
+        "filename": "zephyr/shim/include/cbi_flash.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1541242
+      },
+      "writtenOn": "2023-06-26T10:07:46Z",
+      "side": 1,
+      "message": "I moved the build asserts to header file earlier because the macros CBI_FLASH_OFFSET, CBI_FLASH_SIZE are used in multiple source files and I was trying to make sure these contain valid values wherever this header is included. Given the case do you think I should keep them in cbi_flash.c",
+      "parentUuid": "3ad5ecfb_fd94d9ab",
       "range": {
         "startLine": 20,
         "startChar": 0,
