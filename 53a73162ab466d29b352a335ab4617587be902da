@@ -283,6 +283,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c86bac91_a869760f",
+        "filename": "zephyr/program/nissa/yavilla/src/led.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1444467
+      },
+      "writtenOn": "2023-07-05T07:09:47Z",
+      "side": 1,
+      "message": "Correct typo, \"duty!\u003d0\"",
+      "parentUuid": "f385cb95_86d3ff9d",
+      "range": {
+        "startLine": 136,
+        "startChar": 10,
+        "endLine": 136,
+        "endChar": 32
+      },
+      "revId": "53a73162ab466d29b352a335ab4617587be902da",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "16dff3c9_433bf11b",
