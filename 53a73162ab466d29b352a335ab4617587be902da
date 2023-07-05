@@ -142,6 +142,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "265deb16_88479e06",
+        "filename": "zephyr/program/nissa/yavilla/src/led.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2023-07-05T07:22:05Z",
+      "side": 1,
+      "message": "OK, we can keep this if use `board_led.h`",
+      "parentUuid": "7db1a8a9_edf47813",
+      "range": {
+        "startLine": 64,
+        "startChar": 1,
+        "endLine": 64,
+        "endChar": 6
+      },
+      "revId": "53a73162ab466d29b352a335ab4617587be902da",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dde57efe_53691f0b",
