@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7458444e_e34c9509",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1270601
+      },
+      "writtenOn": "2023-07-12T17:00:43Z",
+      "side": 1,
+      "message": "Can you add a unit test for this?",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 4
+      },
+      "revId": "3a0205d9611164359f2e36b2ca064f7bfa1ba46d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bd1db6f_1655b338",
+        "filename": "include/config.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 6873,
+      "author": {
+        "id": 1270601
+      },
+      "writtenOn": "2023-07-12T17:00:43Z",
+      "side": 1,
+      "message": "Is this comment still accurate?",
+      "range": {
+        "startLine": 6873,
+        "startChar": 41,
+        "endLine": 6873,
+        "endChar": 54
+      },
+      "revId": "3a0205d9611164359f2e36b2ca064f7bfa1ba46d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2c43dbf_b6703b14",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1270601
+      },
+      "writtenOn": "2023-07-12T17:00:43Z",
+      "side": 1,
+      "message": "Do you need this guard here?",
+      "range": {
+        "startLine": 267,
+        "startChar": 1,
+        "endLine": 267,
+        "endChar": 41
+      },
+      "revId": "3a0205d9611164359f2e36b2ca064f7bfa1ba46d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d0509b5_06a0049e",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1270601
+      },
+      "writtenOn": "2023-07-12T17:00:43Z",
+      "side": 1,
+      "message": "Do we need to cancel? Hasn\u0027t the timer already expired?",
+      "range": {
+        "startLine": 269,
+        "startChar": 2,
+        "endLine": 269,
+        "endChar": 20
+      },
+      "revId": "3a0205d9611164359f2e36b2ca064f7bfa1ba46d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e89dede_c7d1574d",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1270601
+      },
+      "writtenOn": "2023-07-12T17:00:43Z",
+      "side": 1,
+      "message": "This should move into the else block shouldn\u0027t it?",
+      "range": {
+        "startLine": 293,
+        "startChar": 1,
+        "endLine": 293,
+        "endChar": 58
+      },
+      "revId": "3a0205d9611164359f2e36b2ca064f7bfa1ba46d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
