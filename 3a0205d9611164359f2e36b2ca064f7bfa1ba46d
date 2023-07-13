@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d6d7363_a2ba3f4a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1297197
+      },
+      "writtenOn": "2023-07-13T15:00:07Z",
+      "side": 1,
+      "message": "I updated `amd_power` and `test_power_stb_dump_interrupt`, which goes down this path.",
+      "parentUuid": "7458444e_e34c9509",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 4
+      },
+      "revId": "3a0205d9611164359f2e36b2ca064f7bfa1ba46d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0bd1db6f_1655b338",
@@ -37,6 +61,30 @@
       "writtenOn": "2023-07-12T17:00:43Z",
       "side": 1,
       "message": "Is this comment still accurate?",
+      "range": {
+        "startLine": 6873,
+        "startChar": 41,
+        "endLine": 6873,
+        "endChar": 54
+      },
+      "revId": "3a0205d9611164359f2e36b2ca064f7bfa1ba46d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3a247e1_386fac05",
+        "filename": "include/config.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 6873,
+      "author": {
+        "id": 1297197
+      },
+      "writtenOn": "2023-07-13T15:00:07Z",
+      "side": 1,
+      "message": "Oops, bad copy/paste and got the comments swapped between this and `CONFIG_SLEEP_TIMEOUT_MS`.",
+      "parentUuid": "0bd1db6f_1655b338",
       "range": {
         "startLine": 6873,
         "startChar": 41,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "98b7e13b_c59fab4d",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1297197
+      },
+      "writtenOn": "2023-07-13T15:00:07Z",
+      "side": 1,
+      "message": "Probably not, I was just being on the safe side. Removed.",
+      "parentUuid": "c2c43dbf_b6703b14",
+      "range": {
+        "startLine": 267,
+        "startChar": 1,
+        "endLine": 267,
+        "endChar": 41
+      },
+      "revId": "3a0205d9611164359f2e36b2ca064f7bfa1ba46d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5d0509b5_06a0049e",
@@ -93,6 +165,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "07e34357_0171c06e",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1297197
+      },
+      "writtenOn": "2023-07-13T15:00:07Z",
+      "side": 1,
+      "message": "Same, I was probably being a bit too cautious. Removed.",
+      "parentUuid": "5d0509b5_06a0049e",
+      "range": {
+        "startLine": 269,
+        "startChar": 2,
+        "endLine": 269,
+        "endChar": 20
+      },
+      "revId": "3a0205d9611164359f2e36b2ca064f7bfa1ba46d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e89dede_c7d1574d",
@@ -106,6 +202,30 @@
       "writtenOn": "2023-07-12T17:00:43Z",
       "side": 1,
       "message": "This should move into the else block shouldn\u0027t it?",
+      "range": {
+        "startLine": 293,
+        "startChar": 1,
+        "endLine": 293,
+        "endChar": 58
+      },
+      "revId": "3a0205d9611164359f2e36b2ca064f7bfa1ba46d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "905dc474_e35045a6",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1297197
+      },
+      "writtenOn": "2023-07-13T15:00:07Z",
+      "side": 1,
+      "message": "I kept it here for the consistency of having \"Detected sleep hang\" logged, regardless of what the recovery action is. I think that makes life easier when debugging, since we can look/grep for the same output across all of the boards.\n\nThen, we either wake the host with a SysRq or a host event, but that occurs separately from detecting the hang in the first place.",
+      "parentUuid": "8e89dede_c7d1574d",
       "range": {
         "startLine": 293,
         "startChar": 1,
