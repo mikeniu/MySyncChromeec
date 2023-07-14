@@ -234,6 +234,30 @@
       },
       "revId": "3a0205d9611164359f2e36b2ca064f7bfa1ba46d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d7974f8_98b33224",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1270601
+      },
+      "writtenOn": "2023-07-14T17:42:12Z",
+      "side": 1,
+      "message": "Well you are already printing `CPRINTS(\"Sending SysRq to trigger AP kernel panic and reboot.\");` Maybe change that one to `Warning: Detected sleep hang! Sending SysRq to trigger AP kernel panic and reboot!`?",
+      "parentUuid": "905dc474_e35045a6",
+      "range": {
+        "startLine": 293,
+        "startChar": 1,
+        "endLine": 293,
+        "endChar": 58
+      },
+      "revId": "3a0205d9611164359f2e36b2ca064f7bfa1ba46d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

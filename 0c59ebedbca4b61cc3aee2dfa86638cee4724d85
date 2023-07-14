@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e905d9f4_f8054594",
+        "filename": "include/config.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 6874,
+      "author": {
+        "id": 1270601
+      },
+      "writtenOn": "2023-07-14T17:42:12Z",
+      "side": 1,
+      "message": "Can you document the ordering between the different states?",
+      "range": {
+        "startLine": 6873,
+        "startChar": 27,
+        "endLine": 6874,
+        "endChar": 25
+      },
+      "revId": "0c59ebedbca4b61cc3aee2dfa86638cee4724d85",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f098c0b_6382e37b",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1270601
+      },
+      "writtenOn": "2023-07-14T17:42:12Z",
+      "side": 1,
+      "message": "So on guybrush we added some robust logic to handle a hung AP: https://chromium.googlesource.com/chromiumos/platform/ec/+/refs/heads/main/baseboard/guybrush/baseboard.c#945\n\nMaybe we should port that code into here and have the SYSRQ be a part of it?",
+      "range": {
+        "startLine": 272,
+        "startChar": 16,
+        "endLine": 272,
+        "endChar": 47
+      },
+      "revId": "0c59ebedbca4b61cc3aee2dfa86638cee4724d85",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0719305_924dc0b5",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 1270601
+      },
+      "writtenOn": "2023-07-14T17:42:12Z",
+      "side": 1,
+      "message": "Does this also get called if the system powers off?",
+      "range": {
+        "startLine": 320,
+        "startChar": 12,
+        "endLine": 320,
+        "endChar": 32
+      },
+      "revId": "0c59ebedbca4b61cc3aee2dfa86638cee4724d85",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c8287ed_9fdaa36c",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 1270601
+      },
+      "writtenOn": "2023-07-14T17:42:12Z",
+      "side": 1,
+      "message": "nit: linux style guide says no {} for single line statements.",
+      "range": {
+        "startLine": 340,
+        "startChar": 39,
+        "endLine": 340,
+        "endChar": 41
+      },
+      "revId": "0c59ebedbca4b61cc3aee2dfa86638cee4724d85",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
