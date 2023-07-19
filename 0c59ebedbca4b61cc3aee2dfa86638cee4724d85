@@ -26,6 +26,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9fc27845_07fd68e4",
+        "filename": "include/config.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 6885,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2023-07-19T18:56:23Z",
+      "side": 1,
+      "message": "10 seconds seems like a long time for the user to be stuck waiting.",
+      "revId": "0c59ebedbca4b61cc3aee2dfa86638cee4724d85",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9f098c0b_6382e37b",
         "filename": "power/amd_x86.c",
         "patchSetId": 7
@@ -43,6 +60,23 @@
         "endLine": 272,
         "endChar": 47
       },
+      "revId": "0c59ebedbca4b61cc3aee2dfa86638cee4724d85",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13484590_a8e4c093",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2023-07-19T18:56:23Z",
+      "side": 1,
+      "message": "I suggest starting timer first, just in case host_send_sysrq hangs somehow.",
       "revId": "0c59ebedbca4b61cc3aee2dfa86638cee4724d85",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
