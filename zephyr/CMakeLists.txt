@@ -126,6 +126,16 @@ if (DEFINED CONFIG_PLATFORM_EC)
     "${PLATFORM_EC}/third_party")
 endif()
 
+if (ZEPHYR_PIGWEED_MODULE_DIR)
+  include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_build/pigweed.cmake")
+  if (DEFINED CONFIG_PIGWEED_LOG_TOKENIZED)
+    add_library(log_tokenized_config INTERFACE)
+    target_compile_options(log_tokenized_config INTERFACE -include
+                           ${PLATFORM_EC}/zephyr/include/pigweed/pw_zephyr_tokenized_custom_log.h)
+    pw_set_module_config(pw_log_tokenized_CONFIG log_tokenized_config)
+  endif()
+endif()
+
 add_subdirectory("subsys")
 
 # Creates a phony target all.libraries in case you only want to build the
@@ -286,7 +296,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FAN
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FLASH_CROS
                                                 "${PLATFORM_EC}/common/flash.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
-                                                "${PLATFORM_EC}/common/host_command.c")
+                                                "${PLATFORM_EC}/common/host_command.c"
+                                                "${PLATFORM_EC}/common/host_command_task.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
                                                 "${PLATFORM_EC}/common/host_event_commands.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE
@@ -313,21 +324,20 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_PCAL6408
                                                 "${PLATFORM_EC}/driver/ioexpander/pcal6408.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_TCA64XXA
                                                 "${PLATFORM_EC}/driver/ioexpander/tca64xxa.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD
+zephyr_library_sources_ifdef(CONFIG_HAS_TASK_KEYSCAN
                                                 "${PLATFORM_EC}/common/keyboard_scan.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_RGB_KEYBOARD
                                                 "${PLATFORM_EC}/common/rgb_keyboard.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_8042
                                                 "${PLATFORM_EC}/common/keyboard_8042.c"
                                                 "${PLATFORM_EC}/common/keyboard_8042_sharedlib.c")
+zephyr_library_sources_ifdef(CONFIG_MKBP_PROTOCOL
+                                                "${PLATFORM_EC}/common/mkbp_fifo.c"
+                                                "${PLATFORM_EC}/common/mkbp_info.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_MKBP
-                                                "${PLATFORM_EC}/common/keyboard_mkbp.c"
-                                                "${PLATFORM_EC}/common/mkbp_fifo.c"
-                                                "${PLATFORM_EC}/common/mkbp_info.c")
+                                                "${PLATFORM_EC}/common/keyboard_mkbp.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MKBP_INPUT_DEVICES
-                                                "${PLATFORM_EC}/common/mkbp_input_devices.c"
-                                                "${PLATFORM_EC}/common/mkbp_fifo.c"
-                                                "${PLATFORM_EC}/common/mkbp_info.c")
+                                                "${PLATFORM_EC}/common/mkbp_input_devices.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_VIVALDI
                                                 "${PLATFORM_EC}/common/keyboard_vivaldi.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PWM_KBLIGHT
@@ -468,6 +478,10 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_KB8010
                                                 "${PLATFORM_EC}/driver/retimer/kb8010.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_PS8818
                                                 "${PLATFORM_EC}/driver/retimer/ps8818.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_PS8828
+                                                "${PLATFORM_EC}/driver/retimer/ps8828.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_PS8833
+                                                "${PLATFORM_EC}/driver/retimer/ps8833.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_PS8811
                                                 "${PLATFORM_EC}/driver/retimer/ps8811.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_ANX7451
@@ -476,6 +490,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_SS_MUX
                                                 "${PLATFORM_EC}/driver/usb_mux/usb_mux.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_MUX_AMD_FP6
                                                 "${PLATFORM_EC}/driver/usb_mux/amd_fp6.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_MUX_AMD_FP8
+                                                "${PLATFORM_EC}/driver/usb_mux/amd_fp8.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_MUX_IT5205
                                                 "${PLATFORM_EC}/driver/usb_mux/it5205.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_MUX_PS8743
@@ -651,5 +667,28 @@ if (DEFINED CONFIG_CROS_EC_RW AND DEFINED CONFIG_PLATFORM_EC_RWSIG)
     COMMENT "Signing EC RW"
     DEPENDS zephyr_final key_extract
     VERBATIM
+  )
+endif()
+
+if (DEFINED CONFIG_PIGWEED_LOG_TOKENIZED)
+  set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
+    COMMAND
+      ${PYTHON_EXECUTABLE}
+      ${ZEPHYR_PIGWEED_MODULE_DIR}/pw_tokenizer/py/pw_tokenizer/database.py
+      create
+      --force
+      --type csv
+      -d ${CMAKE_BINARY_DIR}/database.bin
+      ${CMAKE_BINARY_DIR}/zephyr/zephyr_pre0.elf
+  )
+endif()
+
+if (NOT DEFINED CONFIG_BOARD_NATIVE_POSIX)
+  set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
+    COMMAND
+      ${PYTHON_EXECUTABLE}
+      ${PLATFORM_EC}/util/check_zephyr_end_of_ram.py
+      ${CMAKE_BINARY_DIR}/zephyr/zephyr.elf
+      --delete
   )
 endif()

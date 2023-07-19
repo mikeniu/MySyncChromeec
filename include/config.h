@@ -884,6 +884,9 @@
 #undef CONFIG_CEC
 #undef CONFIG_CEC_DEBUG
 
+/* CEC drivers */
+#undef CONFIG_CEC_BITBANG
+
 /*****************************************************************************/
 
 /* Compile charge manager */
@@ -1804,6 +1807,9 @@
  * Add flag GPIO_POWER_DOWN and additional API's.
  */
 #undef CONFIG_GPIO_POWER_DOWN
+
+/* Allow unaligned access */
+#undef CONFIG_ALLOW_UNALIGNED_ACCESS
 
 /*
  * Provide common runtime layer code (tasks, hooks ...)

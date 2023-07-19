@@ -73,6 +73,7 @@ if(DEFINED CONFIG_BOARD_JOXER)
 			"joxer/src/keyboard.c"
 			"joxer/src/form_factor.c"
 			"joxer/src/board.c"
+			"joxer/src/thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "joxer/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "joxer/src/charger.c")
@@ -126,11 +127,17 @@ endif()
 if(DEFINED CONFIG_BOARD_GOTHRAX)
 	project(gothrax)
 	zephyr_library_sources(
-			"src/led.c"
 			"gothrax/src/keyboard.c"
 			"gothrax/src/hdmi.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "gothrax/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "gothrax/src/charger.c")
-	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FAN "gothrax/src/fan.c")
+endif()
+if(DEFINED CONFIG_BOARD_CRAASKOV)
+	project(craaskov)
+	zephyr_library_sources(
+			"craaskov/src/keyboard.c"
+	)
+	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "craaskov/src/usbc.c")
+	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "craaskov/src/charger.c")
 endif()
