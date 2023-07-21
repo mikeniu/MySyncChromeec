@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "491de34c_aa36ceb5",
+        "filename": "include/config.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 6874,
+      "author": {
+        "id": 1297197
+      },
+      "writtenOn": "2023-07-21T18:33:37Z",
+      "side": 1,
+      "message": "Done.\n\nHopefully it has enough detail, and (more importantly) is accurate.",
+      "parentUuid": "e905d9f4_f8054594",
+      "range": {
+        "startLine": 6873,
+        "startChar": 27,
+        "endLine": 6874,
+        "endChar": 25
+      },
+      "revId": "0c59ebedbca4b61cc3aee2dfa86638cee4724d85",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9fc27845_07fd68e4",
@@ -37,6 +61,24 @@
       "writtenOn": "2023-07-19T18:56:23Z",
       "side": 1,
       "message": "10 seconds seems like a long time for the user to be stuck waiting.",
+      "revId": "0c59ebedbca4b61cc3aee2dfa86638cee4724d85",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22194c52_fef5494b",
+        "filename": "include/config.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 6885,
+      "author": {
+        "id": 1297197
+      },
+      "writtenOn": "2023-07-21T18:33:37Z",
+      "side": 1,
+      "message": "True, but we don\u0027t want it to be too short, otherwise we risk false positives. Also, this matches the guybrush value:\n\n```\n/* This timeout begins after CONFIG_SLEEP_TIMEOUT_MS */\n#define HARD_SLEEP_HANG_TIMEOUT 10000\n```\n\nI\u0027m going to keep this value for now, and we can reduce it if we find the user experience isn\u0027t good.",
+      "parentUuid": "9fc27845_07fd68e4",
       "revId": "0c59ebedbca4b61cc3aee2dfa86638cee4724d85",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -64,6 +106,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f4f2c01_c579cc81",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1297197
+      },
+      "writtenOn": "2023-07-21T18:33:37Z",
+      "side": 1,
+      "message": "Done: https://crrev.com/c/4706379",
+      "parentUuid": "9f098c0b_6382e37b",
+      "range": {
+        "startLine": 272,
+        "startChar": 16,
+        "endLine": 272,
+        "endChar": 47
+      },
+      "revId": "0c59ebedbca4b61cc3aee2dfa86638cee4724d85",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "13484590_a8e4c093",
@@ -77,6 +143,24 @@
       "writtenOn": "2023-07-19T18:56:23Z",
       "side": 1,
       "message": "I suggest starting timer first, just in case host_send_sysrq hangs somehow.",
+      "revId": "0c59ebedbca4b61cc3aee2dfa86638cee4724d85",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed894138_da0dc4bf",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1297197
+      },
+      "writtenOn": "2023-07-21T18:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "13484590_a8e4c093",
       "revId": "0c59ebedbca4b61cc3aee2dfa86638cee4724d85",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -104,6 +188,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4680712_19de7c78",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 1297197
+      },
+      "writtenOn": "2023-07-21T18:33:37Z",
+      "side": 1,
+      "message": "That case is handled more explicitly now by migrating the guybrush implementation to here: https://crrev.com/c/4706379/1",
+      "parentUuid": "d0719305_924dc0b5",
+      "range": {
+        "startLine": 320,
+        "startChar": 12,
+        "endLine": 320,
+        "endChar": 32
+      },
+      "revId": "0c59ebedbca4b61cc3aee2dfa86638cee4724d85",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4c8287ed_9fdaa36c",
@@ -117,6 +225,30 @@
       "writtenOn": "2023-07-14T17:42:12Z",
       "side": 1,
       "message": "nit: linux style guide says no {} for single line statements.",
+      "range": {
+        "startLine": 340,
+        "startChar": 39,
+        "endLine": 340,
+        "endChar": 41
+      },
+      "revId": "0c59ebedbca4b61cc3aee2dfa86638cee4724d85",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a874e386_b0e7b28e",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 1297197
+      },
+      "writtenOn": "2023-07-21T18:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4c8287ed_9fdaa36c",
       "range": {
         "startLine": 340,
         "startChar": 39,
