@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ed72e22_cb21e213",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1270601
+      },
+      "writtenOn": "2023-07-27T18:12:20Z",
+      "side": 1,
+      "message": "Is it ok to sleep in this context?",
+      "range": {
+        "startLine": 379,
+        "startChar": 2,
+        "endLine": 379,
+        "endChar": 8
+      },
+      "revId": "4b1181a4a1ec546aa4451c1b8b87c962e80deb80",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
