@@ -22,6 +22,30 @@
       },
       "revId": "4b1181a4a1ec546aa4451c1b8b87c962e80deb80",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "165095cc_a6a548c9",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1297197
+      },
+      "writtenOn": "2023-07-27T23:26:11Z",
+      "side": 1,
+      "message": "Good question, I hadn\u0027t considered that. Servicing timers in an interrupt context is certainly a possibility, though it limits what you can actually do in the timer handlers.\n\nLooking at `hook_notify()`, it seems we\u0027re safe:\n\n```\n/**\n * Call all the hook routines of a specified type.\n *\n * This function must be called from the correct type-specific context (task);\n * see enum hook_type for details.  hook_notify() should NEVER be called from\n * interrupt context unless specifically allowed for a hook type, because hook\n * routines may need to perform task-level calls like usleep() and mutex\n * operations that are not valid in interrupt context.  Instead of calling a\n * hook from interrupt context, use a deferred function.\n *\n * @param type\t\tType of hook routines to call.\n */\nvoid hook_notify(enum hook_type type);\n```\n\nBased on that, it\u0027s a notifier bug if we can\u0027t sleep, since they notified us in the wrong context.\n\nMy testing has looked good so far, both on real boards and twister unit tests.",
+      "parentUuid": "2ed72e22_cb21e213",
+      "range": {
+        "startLine": 379,
+        "startChar": 2,
+        "endLine": 379,
+        "endChar": 8
+      },
+      "revId": "4b1181a4a1ec546aa4451c1b8b87c962e80deb80",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
