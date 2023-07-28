@@ -46,6 +46,30 @@
       },
       "revId": "4b1181a4a1ec546aa4451c1b8b87c962e80deb80",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3de27c91_23060f1f",
+        "filename": "power/amd_x86.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1270601
+      },
+      "writtenOn": "2023-07-28T22:08:56Z",
+      "side": 1,
+      "message": "Thanks for checking",
+      "parentUuid": "165095cc_a6a548c9",
+      "range": {
+        "startLine": 379,
+        "startChar": 2,
+        "endLine": 379,
+        "endChar": 8
+      },
+      "revId": "4b1181a4a1ec546aa4451c1b8b87c962e80deb80",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
