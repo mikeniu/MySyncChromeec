@@ -23,34 +23,36 @@ struct watchdog_info {
 
 __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 					       int channel_id);
+__maybe_unused static void
+wdt_warning_handler_with_enable(const struct device *wdt_dev, int channel_id);
 
 const struct watchdog_info wdt_info[] = {
-	{
-		.wdt_dev = DEVICE_DT_GET(DT_CHOSEN(cros_ec_watchdog)),
-		.config = {
+        {
+                .wdt_dev = DEVICE_DT_GET(DT_CHOSEN(cros_ec_watchdog)),
+                .config = {
 #if DT_NODE_HAS_COMPAT(DT_CHOSEN(cros_ec_watchdog), st_stm32_watchdog)
-			.flags = WDT_FLAG_RESET_SOC,
-			.window.min = 0U,
-			.window.max = CONFIG_WATCHDOG_PERIOD_MS,
-			.callback = NULL,
+                        .flags = WDT_FLAG_RESET_SOC,
+                        .window.min = 0U,
+                        .window.max = CONFIG_WATCHDOG_PERIOD_MS,
+                        .callback = NULL,
 #else
-			.flags = WDT_FLAG_RESET_SOC,
-			.window.min = 0U,
-			.window.max = CONFIG_AUX_TIMER_PERIOD_MS,
-			.callback = wdt_warning_handler,
+                        .flags = WDT_FLAG_RESET_SOC,
+                        .window.min = 0U,
+                        .window.max = CONFIG_AUX_TIMER_PERIOD_MS,
+                        .callback = wdt_warning_handler,
 #endif
-		},
-	},
+                },
+        },
 #ifdef CONFIG_PLATFORM_EC_WATCHDOG_HELPER
-	{
-		.wdt_dev = DEVICE_DT_GET(DT_CHOSEN(cros_ec_watchdog_helper)),
-		.config = {
-			.flags = 0U,
-			.window.min = 0U,
-			.window.max = CONFIG_AUX_TIMER_PERIOD_MS,
-			.callback = wdt_warning_handler,
-		},
-	},
+        {
+                .wdt_dev = DEVICE_DT_GET(DT_CHOSEN(cros_ec_watchdog_helper)),
+                .config = {
+                        .flags = 0U,
+                        .window.min = 0U,
+                        .window.max = CONFIG_AUX_TIMER_PERIOD_MS,
+                        .callback = wdt_warning_handler_with_enable,
+                },
+        },
 #endif
 };
 
@@ -157,7 +159,7 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 #ifdef CONFIG_RISCV
 	exception_address = csr_read(mepc);
 	printk("WDT pre-warning MEPC:%p THREAD_NAME:%s\n",
-	       (void *)exception_address, thread_name
+               (void *)exception_address, thread_name);
 #elif CONFIG_CPU_CORTEX_M
 	struct __esf *esf;
 	/*
@@ -173,22 +175,27 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	printk("Watchdog deadline is close! THREAD_NAME:%s\n", thread_name);
 #endif
 #ifdef TEST_BUILD
-	wdt_warning_triggered = true;
+        wdt_warning_triggered = true;
 #endif
 #ifdef CONFIG_SOC_SERIES_MEC172X
-	extern void cros_chip_wdt_handler(const struct device *wdt_dev,
-					  int channel_id);
-	cros_chip_wdt_handler(wdt_dev, channel_id);
+        extern void cros_chip_wdt_handler(const struct device *wdt_dev,
+                                          int channel_id);
+        cros_chip_wdt_handler(wdt_dev, channel_id);
 #endif
 
-	/* Save the current task id in panic info.
-	 * The PANIC_SW_WATCHDOG_WARN reason will be changed to a regular
-	 * PANIC_SW_WATCHDOG in system_common_pre_init if a watchdog reset
-	 * occurs.
-	 */
-	panic_set_reason(PANIC_SW_WATCHDOG_WARN, exception_address,
-			 task_get_current());
+        /* Save the current task id in panic info.
+         * The PANIC_SW_WATCHDOG_WARN reason will be changed to a regular
+         * PANIC_SW_WATCHDOG in system_common_pre_init if a watchdog reset
+         * occurs.
+         */
+        panic_set_reason(PANIC_SW_WATCHDOG_WARN, exception_address,
+                         task_get_current());
+}
 
+__maybe_unused static void
+wdt_warning_handler_with_enable(const struct device *wdt_dev, int channel_id)
+{
+	wdt_warning_handler(wdt_dev, channel_id);
 	/* Watchdog is disabled after calling handler. Re-enable it now. */
 	watchdog_enable(wdt_dev);
 }

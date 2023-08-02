@@ -217,6 +217,11 @@ config LINK_TEST_SUITE_LED_COMMON
 	select PLATFORM_EC_LED_COMMON
 
 config LINK_TEST_SUITE_HOST_COMMAND_MEMORY_DUMP
-	bool "Link and test memory dump host commands tests"
+        bool "Link and test memory dump host commands tests"
+
+config LINK_TEST_SUITE_WATCHDOG_HELPER
+        bool "Link and run watchdog helper tests"
+        help
+          Include the test suite exercising the Watchdog Helper utility.
 
 source "Kconfig.zephyr"

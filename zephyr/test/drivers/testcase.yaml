@@ -388,3 +388,17 @@ tests:
       - CONFIG_LINK_TEST_SUITE_HOST_COMMAND_MEMORY_DUMP=y
       - CONFIG_PLATFORM_EC_HOST_COMMAND_MEMORY_DUMP=y
       - CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_8042=y
+  drivers.watchdog_helper:
+    extra_configs:
+      - CONFIG_PLATFORM_EC_WATCHDOG_HELPER=y
+      - CONFIG_LINK_TEST_SUITE_WATCHDOG_HELPER=y
+      - CONFIG_PLATFORM_EC_WATCHDOG_HELPER_PERIOD_MS=10
+    extra_args: DTC_OVERLAY_FILE="./boards/native_posix.overlay;./watchdog_helper/watchdog_helper.dts"
+  drivers.watchdog_helper:
+    extra_configs:
+      - CONFIG_PLATFORM_EC_WATCHDOG_HELPER=y
+      - CONFIG_LINK_TEST_SUITE_WATCHDOG_HELPER=y
+      - CONFIG_AUX_TIMER_PERIOD_MS=500
+    extra_dtc_overlay_files:
+      - ./boards/native_posix.overlay
+      - ./watchdog_helper/watchdog_helper.dts
