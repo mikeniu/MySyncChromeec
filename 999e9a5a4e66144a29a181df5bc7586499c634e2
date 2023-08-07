@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64fc7e46_3efe1bf2",
+        "filename": "zephyr/program/rex/CMakeLists.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1330845
+      },
+      "writtenOn": "2023-08-07T20:02:24Z",
+      "side": 1,
+      "message": "I believe you can also just leave this un-commented and everything will work OK.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 28
+      },
+      "revId": "999e9a5a4e66144a29a181df5bc7586499c634e2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
