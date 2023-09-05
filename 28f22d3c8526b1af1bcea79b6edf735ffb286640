@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "117a54d6_bcac8f42",
+        "filename": "driver/fingerprint/fpc/bep/fpc_private.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2023-09-05T22:00:44Z",
+      "side": 1,
+      "message": "is the `__overridable` attribute a C native or defined in the EC codebase? Do you have a documentation about it. I would like to understand how it will be used",
+      "range": {
+        "startLine": 221,
+        "startChar": 0,
+        "endLine": 221,
+        "endChar": 13
+      },
+      "revId": "28f22d3c8526b1af1bcea79b6edf735ffb286640",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
