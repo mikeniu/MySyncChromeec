@@ -22,6 +22,30 @@
       },
       "revId": "28f22d3c8526b1af1bcea79b6edf735ffb286640",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cfc6f84_24c54c2e",
+        "filename": "driver/fingerprint/fpc/bep/fpc_private.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1334530
+      },
+      "writtenOn": "2023-09-05T23:08:43Z",
+      "side": 1,
+      "message": "It is an [EC macros](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/include/common.h;l\u003d194;drc\u003d68cae8ba723c085fc249a1381fcb5f630fb499bb) for `__attribute__((weak))`.",
+      "parentUuid": "117a54d6_bcac8f42",
+      "range": {
+        "startLine": 221,
+        "startChar": 0,
+        "endLine": 221,
+        "endChar": 13
+      },
+      "revId": "28f22d3c8526b1af1bcea79b6edf735ffb286640",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
