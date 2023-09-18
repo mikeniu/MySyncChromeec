@@ -16,6 +16,24 @@
       "message": "Hi Keith, I\u0027m not familiar with zephyr\u0027s scheduling, can you take a look?",
       "revId": "ea73c674b8a6eb5b861659f0f8a4d9897ac5ef12",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "268d27ba_74640161",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2023-09-18T15:44:05Z",
+      "side": 1,
+      "message": "This is an appropriate use of the schedule lock.  `chargen` is only ever used during GSC testing.\n\nHowever, it\u0027s probably worth exploring if the performance on tentacruel can be tuned.  For instance, on Nissa, enabling FPU helps performance because it reduces instruction counts, making the instruction cache more efficient.\n\nhttp://issuetracker.google.com/240485526#comment4",
+      "parentUuid": "52864f6d_3c477840",
+      "revId": "ea73c674b8a6eb5b861659f0f8a4d9897ac5ef12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
