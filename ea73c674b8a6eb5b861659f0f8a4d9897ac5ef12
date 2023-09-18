@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52864f6d_3c477840",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2023-09-18T10:12:43Z",
+      "side": 1,
+      "message": "Hi Keith, I\u0027m not familiar with zephyr\u0027s scheduling, can you take a look?",
+      "revId": "ea73c674b8a6eb5b861659f0f8a4d9897ac5ef12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
