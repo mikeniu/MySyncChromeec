@@ -16,6 +16,24 @@
       "message": "still differences between ec\u0027s black and hdctools\u0027 black",
       "revId": "aabdcaf1348b8bae2ac1337bd1b8a7ba72ac3fcf",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "26704036_1de923b9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1119399
+      },
+      "writtenOn": "2023-09-20T22:34:55Z",
+      "side": 1,
+      "message": "I think it might be a version difference - possible that hdctools is using a newer version than cros_sdk  - cros format should work for ec - I will try to see what the differences are.",
+      "parentUuid": "1fcda8f6_978ac4c9",
+      "revId": "aabdcaf1348b8bae2ac1337bd1b8a7ba72ac3fcf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
