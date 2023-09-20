@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c2ce153_3c35ee3f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1118539
+      },
+      "writtenOn": "2023-09-20T16:45:24Z",
+      "side": 1,
+      "message": "taking this out of circulation because ec and hdctools seem to differ on what they consider acceptable python formatting",
+      "revId": "b78072e9a7217c8dd721b05a3ac9032e99266aea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
