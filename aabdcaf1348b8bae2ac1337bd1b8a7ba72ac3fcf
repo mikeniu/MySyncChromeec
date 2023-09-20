@@ -34,6 +34,24 @@
       "parentUuid": "1fcda8f6_978ac4c9",
       "revId": "aabdcaf1348b8bae2ac1337bd1b8a7ba72ac3fcf",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c75e6cb9_d80c2235",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1119399
+      },
+      "writtenOn": "2023-09-20T22:45:12Z",
+      "side": 1,
+      "message": "cros_sdk ( and I assume the CQ ) is using black 22.3.0 where hdctools is using the current debian package 23.1.0 \n\nthe diffs are very minor:\n```\n\u003c     def _issue_cmd_get_results(self, cmds, regex_list, timeout\u003dDEFAULT_UART_TIMEOUT):\n---\n\u003e     def _issue_cmd_get_results(\n\u003e         self, cmds, regex_list, timeout\u003dDEFAULT_UART_TIMEOUT\n\u003e     ):\n205c207,209\n\u003c                     lastindex \u003d match.lastindex if match and match.lastindex else 0\n---\n\u003e                     lastindex \u003d (\n\u003e                         match.lastindex if match and match.lastindex else 0\n\u003e                     )\n208c212,214\n\u003c                     result \u003d match.group(*range(lastindex + 1)) if match else None\n---\n\u003e                     result \u003d (\n\u003e                         match.group(*range(lastindex + 1)) if match else None\n\u003e                     )\n312d317\n\u003c \n```\n\nIt might just be that hdctools allows 88 character lines and the ec has shorter lines ?",
+      "parentUuid": "26704036_1de923b9",
+      "revId": "aabdcaf1348b8bae2ac1337bd1b8a7ba72ac3fcf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
