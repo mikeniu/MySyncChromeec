@@ -70,6 +70,24 @@
       "parentUuid": "c75e6cb9_d80c2235",
       "revId": "aabdcaf1348b8bae2ac1337bd1b8a7ba72ac3fcf",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "482d4760_acc923e8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1119399
+      },
+      "writtenOn": "2023-09-21T21:21:44Z",
+      "side": 1,
+      "message": "I think cros format is stricter so in this case if you cros format the problem files it will pass the hdctools black check.",
+      "parentUuid": "f7af5c1b_d281955c",
+      "revId": "aabdcaf1348b8bae2ac1337bd1b8a7ba72ac3fcf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
