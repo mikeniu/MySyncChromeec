@@ -52,6 +52,24 @@
       "parentUuid": "26704036_1de923b9",
       "revId": "aabdcaf1348b8bae2ac1337bd1b8a7ba72ac3fcf",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7af5c1b_d281955c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1118539
+      },
+      "writtenOn": "2023-09-21T09:45:53Z",
+      "side": 1,
+      "message": "It\u0027s probably not a whole lot. I think we can consider this particular CL more of a documentation on what is being copied over to hdctools because black should go to great lengths not to mess with code semantics.\n\nThe pylint changes that precede it are more sensitive because they _might_ (but shouldn\u0027t) change behavior.",
+      "parentUuid": "c75e6cb9_d80c2235",
+      "revId": "aabdcaf1348b8bae2ac1337bd1b8a7ba72ac3fcf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
