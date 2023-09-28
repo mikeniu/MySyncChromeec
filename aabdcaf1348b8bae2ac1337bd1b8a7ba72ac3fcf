@@ -88,6 +88,24 @@
       "parentUuid": "f7af5c1b_d281955c",
       "revId": "aabdcaf1348b8bae2ac1337bd1b8a7ba72ac3fcf",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8970260_493afbc3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1118539
+      },
+      "writtenOn": "2023-09-28T20:37:09Z",
+      "side": 1,
+      "message": "It\u0027s really only about the line length. Once a line fits into 88 characters when it was wrapped in weird ways for 80, black will reformat it. I made the copy commit with those minor automated changes and added a remark to the commit message (see CL:4879103). That\u0027s probably the best we can do here.\n\n4879103 still needs work, to work with the docker build. I have it mostly working locally but I\u0027m cleaning up some aspects right now...",
+      "parentUuid": "482d4760_acc923e8",
+      "revId": "aabdcaf1348b8bae2ac1337bd1b8a7ba72ac3fcf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
