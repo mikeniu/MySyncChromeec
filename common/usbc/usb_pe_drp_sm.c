@@ -625,6 +625,10 @@ static struct policy_engine {
 	uint32_t ado;
 	mutex_t ado_lock;
 
+	/* Retry flag for Port identity response */
+	bool retry_identity_req;
+	uint64_t port_identity_start;
+
 	/* Counters */
 
 	/*
@@ -5786,7 +5790,15 @@ static void pe_vdm_send_request_run(int port)
 
 		/* Start no response timer */
 		/* TODO(b/155890173): Support DPM-supplied timeout */
-		pd_timer_enable(port, PE_TIMER_VDM_RESPONSE, PD_T_VDM_SNDR_RSP);
+		if (!pe[port].retry_identity_req)
+			pd_timer_enable(port, PE_TIMER_VDM_RESPONSE,
+					PD_T_VDM_SNDR_RSP);
+		else
+			/* If partner failed to respond retry with longer
+			 * timeout
+			 */
+			pd_timer_enable(port, PE_TIMER_VDM_RESPONSE,
+					PD_T_VDM_SNDR_RSP * 2);
 	}
 
 	if (PE_CHK_FLAG(port, PE_FLAGS_MSG_DISCARDED)) {
@@ -5805,13 +5817,24 @@ static void pe_vdm_send_request_run(int port)
 	if (pd_timer_is_expired(port, PE_TIMER_VDM_RESPONSE)) {
 		CPRINTF("VDM %s Response Timeout\n",
 			pe[port].tx_type == TCPCI_MSG_SOP ? "Port" : "Cable");
-		/*
-		 * Flag timeout so child state can mark appropriate discovery
-		 * item as failed.
-		 */
-		PE_SET_FLAG(port, PE_FLAGS_VDM_REQUEST_TIMEOUT);
 
-		set_state_pe(port, get_last_state_pe(port));
+		if ((get_state_pe(port) == PE_INIT_PORT_VDM_IDENTITY_REQUEST ||
+		     get_state_pe(port) == PE_VDM_IDENTITY_REQUEST_CBL) &&
+		    !pe[port].retry_identity_req) {
+			CPRINTS("Retrying port vdm identity request");
+			PE_SET_FLAG(port, PE_FLAGS_TX_COMPLETE);
+			pd_timer_disable(port, PE_TIMER_VDM_RESPONSE);
+			pe[port].retry_identity_req = true;
+			pe_vdm_send_request_run(port);
+		} else {
+			/*
+			 * Flag timeout so child state can mark appropriate
+			 * discovery item as failed.
+			 */
+			PE_SET_FLAG(port, PE_FLAGS_VDM_REQUEST_TIMEOUT);
+
+			set_state_pe(port, get_last_state_pe(port));
+		}
 	}
 }
 
@@ -6041,6 +6064,9 @@ static void pe_init_port_vdm_identity_request_entry(int port)
 	 * (header, ID header, Cert Stat, Product VDO).
 	 */
 	pe[port].vdm_ack_min_data_objects = 4;
+
+	pe[port].retry_identity_req = false;
+	pe[port].port_identity_start = get_time().val;
 }
 
 static void pe_init_port_vdm_identity_request_run(int port)
@@ -6058,6 +6084,8 @@ static void pe_init_port_vdm_identity_request_run(int port)
 		break;
 	case VDM_RESULT_ACK: {
 		/* Retrieve the message information. */
+		CPRINTS("Port ACK received after %llu",
+			get_time().val - pe[port].port_identity_start);
 		uint32_t *payload = (uint32_t *)rx_emsg[port].buf;
 		int sop = PD_HEADER_GET_SOP(rx_emsg[port].header);
 		uint8_t cnt = PD_HEADER_CNT(rx_emsg[port].header);
