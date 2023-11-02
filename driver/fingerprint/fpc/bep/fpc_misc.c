@@ -19,6 +19,8 @@ __staticlib_hook void *fpc_malloc(uint32_t size)
 	char *data;
 	int rc;
 
+	CPRINTS("FPC Malloc %d", size);
+
 	rc = shared_mem_acquire(size, &data);
 
 	if (rc == EC_SUCCESS)

@@ -47,6 +47,28 @@
 #define FP_SENSOR_IMAGE_OFFSET (0)
 #endif
 
+#ifdef CONFIG_LIB_DRUID
+
+#undef noreturn
+// #include "mcu/primitives/templates.h"
+// #warning APPLYING TEMPLATE SIZE OVERRIDE
+#undef FP_ALGORITHM_TEMPLATE_SIZE
+// #define FP_ALGORITHM_TEMPLATE_SIZE sizeof(fingerprintauth::FingerTemplate)
+// inline constexpr int kNumberPolarShapeletFilters = 22;
+// #define FP_ALGORITHM_TEMPLATE_SIZE 28820
+// inline constexpr int kNumberPolarShapeletFilters = 10;
+#define FP_ALGORITHM_TEMPLATE_SIZE 14420
+// (gdb) p sizeof(fingerprintauth::FingerTemplate)
+#undef FP_MAX_FINGER_COUNT
+#define FP_MAX_FINGER_COUNT 2
+// typedef fingerprintauth::FingerTemplate fp_template_t;
+
+#else
+
+// typedef uint8_t fp_template_t[FP_ALGORITHM_TEMPLATE_SIZE];
+
+#endif /* CONFIG_LIB_DRUID */
+
 typedef uint8_t fp_template_t[FP_ALGORITHM_TEMPLATE_SIZE];
 
 #endif /* __CROS_EC_DRIVER_FINGERPRINT_FPSENSOR_MATCHER_H_ */
