@@ -1,0 +1,81 @@
+/* Copyright 2023 The ChromiumOS Authors.
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <cros/nuvoton/npcx9.dtsi>
+
+/*
+ * &iwdg {
+ *	status = "okay";
+ * };
+ *
+ * &itims {
+ *	status = "okay";
+ *	wdg_helper_counter: counter {
+ *		status = "okay";
+ *	};
+ * };
+ *
+ * &wdg_helper {
+ *	counter = <&wdg_helper_counter>;
+ *	status = "okay";
+ * };
+ */
+
+ &drbg0 {
+	status = "okay";
+	};
+
+
+/* UART1: Servo UART (console) */
+&uart1 {
+	uart1_2_sin_gp64: periph-uart1-2-sin {
+		pinmux = <&altj_cr_sin1_sl2>;
+	};
+
+	uart1_2_sout_gp65: periph-uart1-2-sout {
+		pinmux = <&altj_cr_sout1_sl2>;
+	};
+
+	/* Use UART1_SL2 ie. PIN64.65 */
+	pinctrl-0 = <&uart1_2_sin_gp64 &uart1_2_sout_gp65>;
+	pinctrl-names = "default";
+
+	current-speed = <115200>;
+	status = "okay";
+};
+
+/* UART2: AP UART (Host Commands and MKBP) */
+&uart2 {
+	uart2_sin_gp75: periph-uart2-sin {
+		pinmux = <&altj_cr_sin2_sl>;
+	};
+
+	uart2_sout_gp86: periph-uart2-sout {
+		pinmux = <&altj_cr_sout2_sl>;
+	};
+
+	pinctrl-0 = <&uart2_sin_gp75 &uart2_sout_gp86>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "okay";
+};
+
+/*
+ * SPI0: communication with the fingerprint sensor
+ */
+&spip0 {
+	pinctrl-0 = <&alt0_f_spi_cs1 &alt0_spip_sl>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+/*
+ * SHI0: communication with the AP
+ * @shi0 {
+ *	buffer-rx-size = <128>;
+ *	buffer-tx-size = <128>;
+ *	status = "enabled";
+ *};
+ */

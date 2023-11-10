@@ -42,6 +42,23 @@ bloonchipper = register_fpmcu_variant(
     ),
 )
 
+helipilot = register_fpmcu_variant(
+    project_name="helipilot",
+    zephyr_board="google_quincy",
+    # variant_modules=["hal_stm32", "cmsis"],
+    variant_dts_overlays=[
+        here / "helipilot" / "helipilot.dts",
+        here / "helipilot" / "ec_quirks.dts",
+    ],
+    variant_kconfig_files=[
+        here / "helipilot" / "prj.conf",
+        here / "helipilot" / "ec_quirks.conf",
+    ],
+    signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
+        here / "helipilot" / "dev_key.pem",
+    ),
+)
+
 # The address of RW_FWID is hardcoded in RO. You need to have REALLY
 # good reason to change it.
 assert_rw_fwid_DO_NOT_EDIT(project_name="bloonchipper", addr=0x601C8)

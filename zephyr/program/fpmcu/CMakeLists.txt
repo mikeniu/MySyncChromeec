@@ -13,3 +13,8 @@ if (DEFINED CONFIG_BOARD_BLOONCHIPPER)
 	add_subdirectory(bloonchipper)
 	project(bloonchipper)
 endif()
+
+if (DEFINED CONFIG_BOARD_HELIPILOT)
+	add_subdirectory(helipilot)
+	project(helipilot)
+endif()
