@@ -1,0 +1,106 @@
+/* Copyright 2023 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ *
+ * CAPELLA VCNL4200 light and proximity sensor driver
+ */
+
+#ifndef __CROS_EC_ALS_VCNL4200_H
+#define __CROS_EC_ALS_VCNL4200_H
+
+/* I2C interface */
+#define VCNL4200_I2C_ADDR_FLAGS 0x51
+
+/* VCNL4200 registers */
+#define VCNL4200_ALS_CONF 0x00
+#define VCNL4200_ALS_THDH 0x01
+#define VCNL4200_ALS_THDL 0x02
+#define VCNL4200_PS_CONF1 0x03
+#define VCNL4200_PS_CONF3 0x04
+#define VCNL4200_PS_CANC 0x05
+#define VCNL4200_PS_THDL 0x06
+#define VCNL4200_PS_THDH 0x07
+#define VCNL4200_PS_DATA 0x08
+#define VCNL4200_ALS_DATA 0x09
+#define VCNL4200_WHITE_DATA 0x0A
+#define VCNL4200_INT_FLAG 0x0D
+#define VCNL4200_ID 0x0E
+
+/* VCNL4200 ALS_CONF register bits */
+#define VCNL4200_ALS_SD 0x0001
+#define VCNL4200_ALS_INT_EN 0x0002
+#define VCNL4200_ALS_PERS_1 0x0000
+#define VCNL4200_ALS_PERS_2 0x0004
+#define VCNL4200_ALS_PERS_4 0x0008
+#define VCNL4200_ALS_PERS_8 0x000C
+#define VCNL4200_ALS_IT_MASK 0x00C0
+#define VCNL4200_ALS_IT_50MS 0x0000
+#define VCNL4200_ALS_IT_100MS 0x0040
+#define VCNL4200_ALS_IT_200MS 0x0080
+#define VCNL4200_ALS_IT_400MS 0x00C0
+
+/* VCNL4200 PS_CONF1 register bits */
+#define VCNL4200_PS_SD 0x0001
+#define VCNL4200_PS_IT_1T 0x0000
+#define VCNL4200_PS_IT_1_5T 0x0002
+#define VCNL4200_PS_IT_2T 0x0004
+#define VCNL4200_PS_IT_4T 0x0006
+#define VCNL4200_PS_IT_8T 0x0008
+#define VCNL4200_PS_IT_9T 0x000A
+#define VCNL4200_PS_PERS_1 0x0000
+#define VCNL4200_PS_PERS_2 0x0010
+#define VCNL4200_PS_PERS_3 0x0020
+#define VCNL4200_PS_PERS_4 0x0030
+#define VCNL4200_PS_DUTY_1_160 0x0000
+#define VCNL4200_PS_DUTY_1_320 0x0040
+#define VCNL4200_PS_DUTY_1_640 0x0080
+#define VCNL4200_PS_DUTY_1_1280 0x00C0
+#define VCNL4200_PS_INT_EN 0x0300
+#define VCNL4200_PS_CONF1_DEFAULT \
+	(VCNL4200_PS_IT_8T | VCNL4200_PS_PERS_2 | VCNL4200_PS_DUTY_1_160)
+
+/* VCNL4200 PS_CONF3 register bits */
+#define VCNL4200_PS_FOR_TRIG_ONCE 0x0004
+#define VCNL4200_PS_FOR_EN 0x0008
+#define VCNL4200_PS_SMART_PERS_EN 0x0010
+#define VCNL4200_PS_MPS_1 0x0000
+#define VCNL4200_PS_MPS_2 0x0020
+#define VCNL4200_PS_MPS_4 0x0040
+#define VCNL4200_PS_MPS_8 0x0060
+#define VCNL4200_PS_LED_I_50MA 0x0000
+#define VCNL4200_PS_LED_I_75MA 0x0100
+#define VCNL4200_PS_LED_I_100MA 0x0200
+#define VCNL4200_PS_LED_I_120MA 0x0300
+#define VCNL4200_PS_LED_I_140MA 0x0400
+#define VCNL4200_PS_LED_I_160MA 0x0500
+#define VCNL4200_PS_LED_I_180MA 0x0600
+#define VCNL4200_PS_LED_I_200MA 0x0700
+#define VCNL4200_PS_DLO_MODE_EN 0x2000
+#define VCNL4200_PS_CONF3_DEFAULT (VCNL4200_PS_MPS_8 | VCNL4200_PS_LED_I_50MA)
+
+/* VCNL4200 INT_FLAG register bits */
+#define VCNL4200_PS_IF_AWAY 0x0100
+#define VCNL4200_PS_IF_CLOSE 0x0200
+#define VCNL4200_ALS_IF_H 0x1000
+#define VCNL4200_ALS_IF_L 0x2000
+
+/* VCNL4200 device ID */
+#define VCNL4200_DEV_ID 0x58
+
+/* Min and Max sampling frequency in mHz */
+/* TODO: check real value for VCNL4200, this just for test */
+#define VCNL4200_LIGHT_MIN_FREQ 1000
+#define VCNL4200_LIGHT_MAX_FREQ 100000
+
+struct vcnl4200_drv_data {
+	int rate;
+	int last_value;
+	/* the coefficient is scale.uscale */
+	int16_t scale;
+	uint16_t uscale;
+	int16_t offset;
+};
+
+extern const struct accelgyro_drv vcnl4200_drv;
+
+#endif /* __CROS_EC_ALS_VCNL4200_H */

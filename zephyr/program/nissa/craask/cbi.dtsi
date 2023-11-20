@@ -161,6 +161,23 @@
 				value = <1>;
 			};
 		};
+
+		als-sensor {
+			enum-name = "ALS_SENSOR";
+			start = <21>;
+			size = <1>;
+
+			als-sensor-default {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "ALS_SENSOR_NONE";
+				value = <0>;
+			};
+			als-sensor-vcnl4200 {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "ALS_SENSOR_VCNL4200";
+				value = <1>;
+			};
+		};
 	};
 	/* Craask-specific ssfc fields. */
 	cbi-ssfc {

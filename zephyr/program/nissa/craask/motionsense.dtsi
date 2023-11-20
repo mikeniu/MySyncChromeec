@@ -120,6 +120,11 @@
 			compatible = "cros-ec,drvdata-bmi3xx";
 			status = "okay";
 		};
+
+		vcnl4200_data: vcnl4200-drv-data {
+			compatible = "cros-ec,drvdata-vcnl4200";
+			status = "okay";
+		};
 	};
 
 	/*
@@ -173,6 +178,29 @@
 				};
 				ec-s3 {
 					odr = <(10000 | ROUND_UP_FLAG)>;
+				};
+			};
+		};
+
+		als: als {
+			compatible = "cros-ec,vcnl4200";
+			status = "okay";
+
+			active-mask = "SENSOR_ACTIVE_S0_S3";
+			location = "MOTIONSENSE_LOC_CAMERA";
+			port = <&i2c_ec_i2c_sensor>;
+			default-range = <2>;
+			drv-data = <&vcnl4200_data>;
+			configs {
+				compatible =
+					"cros-ec,motionsense-sensor-config";
+				ec-s0 {
+					odr = <1000>;
+					ec-rate = <1000>;
+				};
+				ec-s3 {
+					odr = <1000>;
+					ec-rate = <1000>;
 				};
 			};
 		};
@@ -291,5 +319,8 @@
 		 * be enabled at initial stage
 		 */
 		sensor-irqs = <&int_imu &int_lid_accel>;
+
+		/* list of sensors in force mode */
+		accel-force-mode-sensors = <&als>;
 	};
 };

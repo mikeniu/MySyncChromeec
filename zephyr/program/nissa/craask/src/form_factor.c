@@ -120,6 +120,15 @@ test_export_static void alt_sensor_init(void)
 	if (val == CLAMSHELL)
 		return;
 
+	/* init ALS sensor */
+	ret = cros_cbi_get_fw_config(ALS_SENSOR, &val);
+	if (ret != 0) {
+		LOG_ERR("Error retrieving CBI FW_CONFIG field %d", ALS_SENSOR);
+		return;
+	}
+	if (val != ALS_SENSOR_VCNL4200)
+		motion_sensor_count--;
+
 	/* check which motion sensors are used */
 	if (cros_cbi_ssfc_check_match(
 		    CBI_SSFC_VALUE_ID(DT_NODELABEL(base_sensor_1)))) {
@@ -128,7 +137,7 @@ test_export_static void alt_sensor_init(void)
 	} else if (cros_cbi_ssfc_check_match(
 			   CBI_SSFC_VALUE_ID(DT_NODELABEL(base_sensor_2)))) {
 		use_alt_sensor = base_bma422;
-		motion_sensor_count--;
+		//motion_sensor_count--;
 		ccprints("BASE ACCEL IS BMA422");
 	} else {
 		use_alt_sensor = base_lsm6dso;

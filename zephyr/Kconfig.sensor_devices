@@ -91,6 +91,12 @@ config PLATFORM_EC_ALS_CM32183
 	  The driver supports CM32183 which provides ambient
 	  light sensing.
 
+config PLATFORM_EC_ALS_VCNL4200
+	bool "VCNL4200 Ambient Light Sensor Driver"
+	help
+	  The driver supports VCNL4200 which provides ambient light
+	  sensing and proximity sensing.
+
 config PLATFORM_EC_ALS_TCS3400_EMULATED_IRQ_EVENT
 	bool "Enable TCS3400 Ambient Light Sensor Driver Polling mode"
 	help

@@ -231,6 +231,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ALS_TCS3400
                                                 "${PLATFORM_EC}/driver/als_tcs3400.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ALS_CM32183
                                                 "${PLATFORM_EC}/driver/als_cm32183.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ALS_VCNL4200
+                                                "${PLATFORM_EC}/driver/als_vcnl4200.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ACPI
                                                 "${PLATFORM_EC}/common/acpi.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_AMD_SB_RMI

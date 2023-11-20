@@ -1,0 +1,17 @@
+# Copyright 2023 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: ambient light sensor node for vcnl4200
+
+compatible: "cros-ec,vcnl4200"
+
+include: motionsense-sensor-base.yaml
+
+properties:
+  i2c-spi-addr-flags:
+    type: string
+    description: i2c address or SPI peripheral logic GPIO
+    enum:
+      - "VCNL4200_I2C_ADDR_FLAGS"
+    default: "VCNL4200_I2C_ADDR_FLAGS"
