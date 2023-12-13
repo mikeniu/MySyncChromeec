@@ -16,6 +16,40 @@
       "message": "Might need some backgroup from CL:5016847.",
       "revId": "3ab76263b7c5f82ee41f9f866592d17e313855bb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ef03620_c987c67a",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2023-12-13T09:10:45Z",
+      "side": 1,
+      "message": "select PLATFORM_EC_BUTTON",
+      "revId": "3ab76263b7c5f82ee41f9f866592d17e313855bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff37c7c5_c030c693",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2023-12-13T09:10:45Z",
+      "side": 1,
+      "message": "`select PLATFORM_EC_BUTTON_TRIGGERED_RECOVERY` seems better.\nsame below.",
+      "revId": "3ab76263b7c5f82ee41f9f866592d17e313855bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
