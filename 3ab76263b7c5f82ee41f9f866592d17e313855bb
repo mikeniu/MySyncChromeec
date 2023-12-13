@@ -78,6 +78,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9e7d79da_207f1649",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 1182824
+      },
+      "writtenOn": "2023-12-13T21:48:00Z",
+      "side": 1,
+      "message": "It\u0027s better to drop the line, also below.",
+      "parentUuid": "b5b3ca32_325a0965",
+      "range": {
+        "startLine": 365,
+        "startChar": 1,
+        "endLine": 365,
+        "endChar": 26
+      },
+      "revId": "3ab76263b7c5f82ee41f9f866592d17e313855bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ff37c7c5_c030c693",
         "filename": "zephyr/Kconfig",
         "patchSetId": 2
