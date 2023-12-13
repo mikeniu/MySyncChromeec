@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea9a105e_18def3bb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1512562
+      },
+      "writtenOn": "2023-12-13T13:42:50Z",
+      "side": 1,
+      "message": "Ovis target builds successfully too.",
+      "revId": "3ed00ebaf667a425ea14f4f60452a80d314d9bd3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
