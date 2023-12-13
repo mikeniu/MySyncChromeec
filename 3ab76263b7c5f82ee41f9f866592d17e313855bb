@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "feb8eded_173c2114",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1436607
+      },
+      "writtenOn": "2023-12-13T11:39:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3ef03620_c987c67a",
+      "revId": "3ab76263b7c5f82ee41f9f866592d17e313855bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b5b3ca32_325a0965",
@@ -71,6 +89,24 @@
       "writtenOn": "2023-12-13T09:10:45Z",
       "side": 1,
       "message": "`select PLATFORM_EC_BUTTON_TRIGGERED_RECOVERY` seems better.\nsame below.",
+      "revId": "3ab76263b7c5f82ee41f9f866592d17e313855bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15ef0e6a_42863ad6",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1436607
+      },
+      "writtenOn": "2023-12-13T11:39:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff37c7c5_c030c693",
       "revId": "3ab76263b7c5f82ee41f9f866592d17e313855bb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
