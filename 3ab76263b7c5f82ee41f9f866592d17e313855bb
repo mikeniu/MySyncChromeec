@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c57fbbe9_7b41f8b3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1525237
+      },
+      "writtenOn": "2023-12-13T08:10:13Z",
+      "side": 1,
+      "message": "Might need some backgroup from CL:5016847.",
+      "revId": "3ab76263b7c5f82ee41f9f866592d17e313855bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
