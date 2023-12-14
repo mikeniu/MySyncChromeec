@@ -51,6 +51,24 @@
       "parentUuid": "df1f3338_9623463d",
       "revId": "58bc31e409de4cfa0f53861647b6727fd68052a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a9b9e7d_1d61e49f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1436607
+      },
+      "writtenOn": "2023-12-14T06:19:26Z",
+      "side": 1,
+      "message": "Is there anything I can do? But I don\u0027t see this failure locally.\n\nIt seems we need to add `CONFIG_PLATFORM_EC_BUTTON` in console_channel.inc?\n\n```\n#if defined(CONFIG_SWITCH) || defined(CONFIG_LID_SWITCH) || \\\n\tdefined(CONFIG_HAS_TASK_POWERBTN) || define(CONFIG_PLATFORM_EC_BUTTON)\nCONSOLE_CHANNEL(CC_SWITCH,       \"switch\")\n#endif\n```",
+      "parentUuid": "abaa1e98_82c34079",
+      "revId": "58bc31e409de4cfa0f53861647b6727fd68052a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
