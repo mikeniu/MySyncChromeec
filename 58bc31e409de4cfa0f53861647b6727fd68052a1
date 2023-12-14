@@ -33,6 +33,24 @@
       "message": "```\n/mnt/host/source/src/platform/ec/build/zephyr/minimal-npcx9/modules/ec/common/button.c: In function \u0027button_check_hw_reinit_required\u0027:\n/mnt/host/source/src/platform/ec/build/zephyr/minimal-npcx9/modules/ec/common/button.c:27:42: error: \u0027CC_SWITCH\u0027 undeclared (first use in this function)\n   27 | #define CPRINTS(format, args...) cprints(CC_SWITCH, format, ##args)\n      |                                          ^~~~~~~~~\n```",
       "revId": "58bc31e409de4cfa0f53861647b6727fd68052a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abaa1e98_82c34079",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1525237
+      },
+      "writtenOn": "2023-12-14T05:32:12Z",
+      "side": 1,
+      "message": "Seems tracking in b/316076274.",
+      "parentUuid": "df1f3338_9623463d",
+      "revId": "58bc31e409de4cfa0f53861647b6727fd68052a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
