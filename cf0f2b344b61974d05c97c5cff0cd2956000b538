@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4ced77f_30600602",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 574,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2023-12-18T20:02:52Z",
+      "side": 1,
+      "message": "Duplicate comment from line 582?",
+      "range": {
+        "startLine": 574,
+        "startChar": 1,
+        "endLine": 574,
+        "endChar": 29
+      },
+      "revId": "cf0f2b344b61974d05c97c5cff0cd2956000b538",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
