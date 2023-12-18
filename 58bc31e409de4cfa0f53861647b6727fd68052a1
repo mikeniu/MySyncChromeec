@@ -105,6 +105,24 @@
       "parentUuid": "e105d850_f8297580",
       "revId": "58bc31e409de4cfa0f53861647b6727fd68052a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "609e41a0_f86ebb65",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1525237
+      },
+      "writtenOn": "2023-12-18T03:17:29Z",
+      "side": 1,
+      "message": "Humm, there\u0027s other CLs land without problem(e.g.: crrev.com/c/4613429),\nand this is break on button which matches this CL\u0027s change.\nWe should dig into it and see what happend.\n\n```\n/mnt/host/source/src/platform/ec/build/zephyr/brox/modules/ec/common/button.c: In function \u0027button_check_hw_reinit_required\u0027:\n/mnt/host/source/src/platform/ec/build/zephyr/brox/modules/ec/common/button.c:27:42: error: \u0027CC_SWITCH\u0027 undeclared (first use in this function)\n   27 | #define CPRINTS(format, args...) cprints(CC_SWITCH, format, ##args)\n      |                                          ^~~~~~~~~\n```",
+      "parentUuid": "5fd14d3b_305ef76d",
+      "revId": "58bc31e409de4cfa0f53861647b6727fd68052a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
