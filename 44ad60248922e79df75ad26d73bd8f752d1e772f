@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8528e26d_8b7ac815",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1324172
+      },
+      "writtenOn": "2023-12-19T23:17:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c803e5d_0e50369e",
+      "revId": "44ad60248922e79df75ad26d73bd8f752d1e772f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aadb8676_20e44c05",
@@ -35,6 +53,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "37f8ed69_6ab8ebba",
+        "filename": "common/new_nvmem.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1520,
+      "author": {
+        "id": 1324172
+      },
+      "writtenOn": "2023-12-19T23:17:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aadb8676_20e44c05",
+      "revId": "44ad60248922e79df75ad26d73bd8f752d1e772f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aa21db77_9ff2cc17",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-12-19T22:53:43Z",
       "side": 1,
       "message": "one variable per line.",
+      "revId": "44ad60248922e79df75ad26d73bd8f752d1e772f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3e3eff6_d766b66b",
+        "filename": "common/new_nvmem.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 2542,
+      "author": {
+        "id": 1324172
+      },
+      "writtenOn": "2023-12-19T23:17:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa21db77_9ff2cc17",
       "revId": "44ad60248922e79df75ad26d73bd8f752d1e772f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
