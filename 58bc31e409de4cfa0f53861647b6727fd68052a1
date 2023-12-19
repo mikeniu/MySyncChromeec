@@ -195,6 +195,24 @@
       "parentUuid": "651ea025_a1a2f4bb",
       "revId": "58bc31e409de4cfa0f53861647b6727fd68052a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8c67e89_63ef9d07",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1436607
+      },
+      "writtenOn": "2023-12-19T02:29:08Z",
+      "side": 1,
+      "message": "I want to but can\u0027t.. It seems the config `PLATFORM_EC_BUTTON` enabled by default break some test",
+      "parentUuid": "fef9da81_a42f2e79",
+      "revId": "58bc31e409de4cfa0f53861647b6727fd68052a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
