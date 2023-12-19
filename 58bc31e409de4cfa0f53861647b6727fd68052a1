@@ -213,6 +213,24 @@
       "parentUuid": "fef9da81_a42f2e79",
       "revId": "58bc31e409de4cfa0f53861647b6727fd68052a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d4665d5_d260596c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1525237
+      },
+      "writtenOn": "2023-12-19T12:09:04Z",
+      "side": 1,
+      "message": "Got it, I thought infra release the permission recently : \n\n```\nFAILED: zephyr/zephyr.elf zephyr/zephyr_pre0.map zephyr/zephyr.map zephyr/zephyr.lst zephyr/zephyr.stat zephyr/zephyr.exe /mnt/host/source/src/platform/ec/twister-out-llvm/native_posix/kingler/kingler.ponyta/zephyr/zephyr_pre0.map /mnt/host/source/src/platform/ec/twister-out-llvm/native_posix/kingler/kingler.ponyta/zephyr/zephyr.map /mnt/host/source/src/platform/ec/twister-out-llvm/native_posix/kingler/kingler.ponyta/zephyr/zephyr.lst /mnt/host/source/src/platform/ec/twister-out-llvm/native_posix/kingler/kingler.ponyta/zephyr/zephyr.stat /mnt/host/source/src/platform/ec/twister-out-llvm/native_posix/kingler/kingler.ponyta/zephyr/zephyr.exe \n: \u0026\u0026 ccache /usr/bin/x86_64-pc-linux-gnu-clang --target\u003dx86_64-pc-linux-gnu   zephyr/CMakeFiles/zephyr_pre0.dir/misc/empty_file.c.obj -o zephyr/zephyr.elf  zephyr/CMakeFiles/offsets.dir/./arch/posix/core/offsets/offsets.c.obj  -Wl,-T  zephyr/linker_zephyr_pre0.cmd  -Wl,-Map\u003d/mnt/host/source/src/platform/ec/twister-out-llvm/native_posix/kingler/kingler.ponyta/zephyr/zephyr_pre0.map  -Wl,--whole-archive  app/libapp.a  zephyr/libzephyr.a  zephyr/arch/arch/posix/core/libarch__posix__core.a  zephyr/soc/soc/posix/inf_clock/libsoc__posix__inf_clock.a  zephyr/boards/posix/native_posix/libboards__posix__native_posix.a  zephyr/subsys/testsuite/ztest/libsubsys__testsuite__ztest.a  zephyr/subsys/emul/libsubsys__emul.a  zephyr/drivers/adc/libdrivers__adc.a  zephyr/drivers/console/libdrivers__console.a  zephyr/drivers/eeprom/libdrivers__eeprom.a  zephyr/drivers/gpio/libdrivers__gpio.a  zephyr/drivers/i2c/libdrivers__i2c.a  zephyr/drivers/serial/libdrivers__serial.a  zephyr/drivers/timer/libdrivers__timer.a  modules/ec/zephyr/libec_shim.a  -Wl,--no-whole-archive  zephyr/kernel/libkernel.a  -L/mnt/host/source/src/platform/ec/twister-out-llvm/native_posix/kingler/kingler.ponyta/zephyr  -Wl,--gc-sections  -Wl,--build-id\u003dnone  -Wl,--sort-section\u003dalignment  --config  /mnt/host/source/src/third_party/zephyr/main/cmake/toolchain/llvm/clang_compiler_rt.cfg  -Wl,-u,_OffsetAbsSyms  -Wl,-u,_ConfigAbsSyms  -nopie  --coverage  -m32  -ldl  -pthread  -lm \u0026\u0026 cd /mnt/host/source/src/platform/ec/twister-out-llvm/native_posix/kingler/kingler.ponyta/zephyr \u0026\u0026 /usr/bin/cmake -E true \u0026\u0026 cd /mnt/host/source/src/platform/ec/twister-out-llvm/native_posix/kingler/kingler.ponyta/zephyr \u0026\u0026 /usr/bin/cmake -E copy zephyr_pre0.map zephyr.map \u0026\u0026 /usr/bin/llvm-objdump -d -S zephyr.elf \u003e zephyr.lst \u0026\u0026 /usr/bin/llvm-readelf -e zephyr.elf \u003e zephyr.stat \u0026\u0026 /usr/bin/cmake -E copy zephyr.elf zephyr.exe\nld.lld: error: undefined symbol: mkbp_button_update\n\u003e\u003e\u003e referenced by button.c:339 (/mnt/host/source/src/platform/ec/common/button.c:339)\n\u003e\u003e\u003e               button.c.obj:(button_change_deferred) in archive app/libapp.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\nninja: build stopped: subcommand failed.\n```\n\n```\n...\n/usr/x86_64-pc-linux-gnu/binutils-bin/2.40/ld.bfd.real: app/libapp.a(button.c.obj): in function `button_change_deferred\u0027:\n/mnt/host/source/src/platform/ec/common/button.c:339: undefined reference to `mkbp_button_update\u0027\ncollect2: error: ld returned 1 exit status\nninja: build stopped: subcommand failed.\n```",
+      "parentUuid": "d8c67e89_63ef9d07",
+      "revId": "58bc31e409de4cfa0f53861647b6727fd68052a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
