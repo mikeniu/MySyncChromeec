@@ -231,6 +231,24 @@
       "parentUuid": "d8c67e89_63ef9d07",
       "revId": "58bc31e409de4cfa0f53861647b6727fd68052a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32993e88_fc785538",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1436607
+      },
+      "writtenOn": "2023-12-20T12:13:35Z",
+      "side": 1,
+      "message": "Test all kingler passed locally.",
+      "parentUuid": "8d4665d5_d260596c",
+      "revId": "58bc31e409de4cfa0f53861647b6727fd68052a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
