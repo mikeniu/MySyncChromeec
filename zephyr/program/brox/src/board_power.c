@@ -124,7 +124,29 @@ int board_power_signal_get(enum power_signal signal)
 	}
 }
 
+#ifndef CONFIG_ZTEST
 int board_power_signal_set(enum power_signal signal, int value)
 {
 	return -EINVAL;
 }
+#else
+/*
+ * The test harness needs to set these signals. The leaves the
+ * real implementation of board_power_signal_set() untested,
+ * but this does allow board_power_signal_get to get covered.
+ */
+int board_power_signal_set(enum power_signal signal, int value)
+{
+	switch (signal) {
+	default:
+		LOG_ERR("Unknown signal");
+		return -1;
+
+	case PWR_DSW_PWROK:
+		return 0;
+
+	case PWR_PG_PP1P05:
+		return 0;
+	}
+}
+#endif
