@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a21f79bd_69557ec1",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 6
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2023-12-20T04:41:58Z",
+      "side": 1,
+      "message": "Remove this line.\n\nPlease also run `zmake compare-builds -all` to make sure other boards are not affected.",
+      "revId": "5336d0b87363b8c2615b6d12dc2c846f282ecebd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
