@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "429a1c8f_88465978",
+        "filename": "include/console_channel.inc",
+        "patchSetId": 7
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2023-12-21T04:40:06Z",
+      "side": 1,
+      "message": "Sorry, one more thing.\n\nNow PLATFORM_EC_BUTTON_TRIGGERED_RECOVERY is not enabled by default, is this still needed?",
+      "range": {
+        "startLine": 93,
+        "startChar": 34,
+        "endLine": 93,
+        "endChar": 72
+      },
+      "revId": "1ed16841ff56fb1307aa75b3e9381a13acbcb309",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
