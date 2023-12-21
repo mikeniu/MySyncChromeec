@@ -22,6 +22,30 @@
       },
       "revId": "1ed16841ff56fb1307aa75b3e9381a13acbcb309",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58d5d133_8586d175",
+        "filename": "include/console_channel.inc",
+        "patchSetId": 7
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1436607
+      },
+      "writtenOn": "2023-12-21T06:59:16Z",
+      "side": 1,
+      "message": "I can build ciri and ovis passed even if I remove this. It’s probably not needed now. but it seems if enable CONFIG_PLATFORM_EC_BUTTON, then we might see CC_SWITCH undeclared in button.c, so I\u0027m not sure if CQ can pass.\n\nDo you think I can remove this and try CQ again?",
+      "parentUuid": "429a1c8f_88465978",
+      "range": {
+        "startLine": 93,
+        "startChar": 34,
+        "endLine": 93,
+        "endChar": 72
+      },
+      "revId": "1ed16841ff56fb1307aa75b3e9381a13acbcb309",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
