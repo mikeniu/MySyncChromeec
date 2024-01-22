@@ -11,13 +11,13 @@
 #include "../interrupts.dtsi"
 #include "../keyboard.dtsi"
 #include "../power_signals.dtsi"
-#include "../rex.dtsi"
 #include "../usbc.dtsi"
 
 /* Karis project DTS includes */
 #include "battery.dtsi"
 #include "cbi.dtsi"
 #include "i2c.dtsi"
+#include "karis.dtsi"
 #include "keyboard.dtsi"
 #include "led_pins.dtsi"
 #include "led_policy.dtsi"
