@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4352bcf_603546cd",
+        "filename": "zephyr/program/ovis/deku/project.conf",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2024-01-26T00:33:55Z",
+      "side": 1,
+      "message": "This config only exists if CONFIG_PLATFORM_EC_USB_PD_FRS is defined, so having CONFIG_PLATFORM_EC_USB_PD_FRS\u003dn should be sufficient.",
+      "revId": "274aceb64c8fa532fdc451af305a649455670b81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
