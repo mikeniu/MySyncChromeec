@@ -16,6 +16,24 @@
       "message": "Is this change still needed?  If so, please split out the brox board changes from the ITE driver change.",
       "revId": "209cd3548f1adcd962345d66ff722140c90f56e0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82f854e8_d34d994c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1273969
+      },
+      "writtenOn": "2024-02-15T10:07:37Z",
+      "side": 1,
+      "message": "Yes, it is still needed. Done.",
+      "parentUuid": "58259e19_0b2df630",
+      "revId": "209cd3548f1adcd962345d66ff722140c90f56e0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
