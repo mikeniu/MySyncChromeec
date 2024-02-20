@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "409359aa_6be2030f",
+        "filename": "zephyr/program/brox/gpio.dtsi",
+        "patchSetId": 9
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2024-02-20T21:24:40Z",
+      "side": 1,
+      "message": "`enum-name` property isn\u0027t needed.",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 31
+      },
+      "revId": "a643a8a79e416ee7421f584a883bfac0e3577697",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
