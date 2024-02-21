@@ -22,6 +22,30 @@
       },
       "revId": "a643a8a79e416ee7421f584a883bfac0e3577697",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "369eb489_11d044e9",
+        "filename": "zephyr/program/brox/gpio.dtsi",
+        "patchSetId": 9
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1273969
+      },
+      "writtenOn": "2024-02-21T06:36:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "409359aa_6be2030f",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 31
+      },
+      "revId": "a643a8a79e416ee7421f584a883bfac0e3577697",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
