@@ -34,6 +34,24 @@
       "parentUuid": "f4352bcf_603546cd",
       "revId": "274aceb64c8fa532fdc451af305a649455670b81",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bbe3fd6_1a5ab47c",
+        "filename": "zephyr/program/ovis/deku/project.conf",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2024-02-22T01:12:51Z",
+      "side": 1,
+      "message": "I made a similar comment on the preceding CL, but I think we should disable FRS at the Ovis platform level. We don\u0027t need this for Ovis either.",
+      "parentUuid": "a782d661_b16bf5aa",
+      "revId": "274aceb64c8fa532fdc451af305a649455670b81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
