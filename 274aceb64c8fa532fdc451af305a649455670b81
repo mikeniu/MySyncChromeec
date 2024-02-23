@@ -52,6 +52,24 @@
       "parentUuid": "a782d661_b16bf5aa",
       "revId": "274aceb64c8fa532fdc451af305a649455670b81",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fea2f88d_2b842ba4",
+        "filename": "zephyr/program/ovis/deku/project.conf",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1215230
+      },
+      "writtenOn": "2024-02-23T00:12:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3bbe3fd6_1a5ab47c",
+      "revId": "274aceb64c8fa532fdc451af305a649455670b81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
