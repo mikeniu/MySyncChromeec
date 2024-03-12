@@ -22,6 +22,30 @@
       },
       "revId": "4a95d6a897ca5d682c8a48d825a30a64dcb29fd2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53a90bd9_74a00b12",
+        "filename": "zephyr/include/usbc/pdc_power_mgmt.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2024-03-12T18:05:24Z",
+      "side": 1,
+      "message": "Yeah, maybe at this level is better to pass in just the enum and then pack that into the union type prior to calling the driver function. That fits a little better the model other functions are using. I will make this change and upload another patchset.",
+      "parentUuid": "6f358687_6329b9c3",
+      "range": {
+        "startLine": 321,
+        "startChar": 45,
+        "endLine": 321,
+        "endChar": 74
+      },
+      "revId": "4a95d6a897ca5d682c8a48d825a30a64dcb29fd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
