@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fa510700_5d3041ba",
+        "filename": "zephyr/include/usbc/pdc_power_mgmt.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2024-03-12T18:21:40Z",
+      "side": 1,
+      "message": "I changed the function prototype to take an enum connector_reset as suggested.",
+      "parentUuid": "53a90bd9_74a00b12",
+      "range": {
+        "startLine": 321,
+        "startChar": 45,
+        "endLine": 321,
+        "endChar": 74
+      },
+      "revId": "4a95d6a897ca5d682c8a48d825a30a64dcb29fd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e72502ee_2364a195",
         "filename": "zephyr/subsys/pd_controller/pdc_console.c",
         "patchSetId": 10
@@ -61,6 +85,30 @@
       "writtenOn": "2024-03-12T18:14:24Z",
       "side": 1,
       "message": "Can you print an error message showing the return value if this fails for some reason? This logging will help for TAST troubleshooting.",
+      "range": {
+        "startLine": 205,
+        "startChar": 0,
+        "endLine": 205,
+        "endChar": 52
+      },
+      "revId": "4a95d6a897ca5d682c8a48d825a30a64dcb29fd2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74d7c732_98282c31",
+        "filename": "zephyr/subsys/pd_controller/pdc_console.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2024-03-12T18:21:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e72502ee_2364a195",
       "range": {
         "startLine": 205,
         "startChar": 0,
