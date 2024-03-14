@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c793f748_e1b4b064",
+        "filename": "extra/um_ppm/platform_usermode.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1365249
+      },
+      "writtenOn": "2024-03-14T17:05:18Z",
+      "side": 1,
+      "message": "unnecessary",
+      "revId": "749989d0884108b180a38e44ace7a20d6af828c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12dde6ea_6f4133f4",
+        "filename": "extra/um_ppm/um_ppm_chardev.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1365249
+      },
+      "writtenOn": "2024-03-14T17:05:18Z",
+      "side": 1,
+      "message": "\"interrupted by this signal\"",
+      "revId": "749989d0884108b180a38e44ace7a20d6af828c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
