@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84725c95_99164794",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2024-03-19T22:35:40Z",
+      "side": 1,
+      "message": "Actually, this might not work on all boards. Need more investigation. Marking as not verified for now.",
+      "revId": "3b392a5445cf3b7ee9b1d86e37858a473d16748f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
