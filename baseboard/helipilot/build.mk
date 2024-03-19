@@ -53,6 +53,7 @@ test-list-y = \
        pingpong \
        printf \
        queue \
+       ram_lock \
        restricted_console \
        rng_benchmark \
        rollback \
