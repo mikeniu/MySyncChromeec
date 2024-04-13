@@ -152,6 +152,7 @@ const struct smbus_cmd_t SET_PDR = { 0x0E, 0x04, 0x0B };
 const struct smbus_cmd_t UCSI_GET_CONNECTOR_STATUS = { 0x0E, 0x3, 0x12 };
 const struct smbus_cmd_t UCSI_GET_ERROR_STATUS = { 0x0E, 0x03, 0x13 };
 const struct smbus_cmd_t UCSI_READ_POWER_LEVEL = { 0x0E, 0x05, 0x1E };
+const struct smbus_cmd_t UCSI_SET_CCOM = { 0x0E, 0x04, 0x08 };
 const struct smbus_cmd_t GET_IC_STATUS = { 0x3A, 0x03, 0x00 };
 const struct smbus_cmd_t SET_RETIMER_FW_UPDATE_MODE = { 0x20, 0x03, 0x00 };
 const struct smbus_cmd_t GET_CABLE_PROPERTY = { 0x0E, 0x02, 0x11 };
@@ -617,6 +618,9 @@ static int rts54_i2c_write(const struct device *dev)
 	msg.buf = data->wr_buf;
 	msg.len = data->wr_buf_len;
 	msg.flags = I2C_MSG_WRITE | I2C_MSG_STOP;
+	for (size_t i = 0; i < data->wr_buf_len; ++i) {
+		LOG_INF("RTS54 WR: %u: 0x%02x", i, data->wr_buf[i]);
+	}
 
 	return i2c_transfer_dt(&cfg->i2c, &msg, 1);
 }
@@ -1942,7 +1946,8 @@ static int rts54_set_ccom(const struct device *dev, enum ccom_t ccom,
 			  enum drp_mode_t dm)
 {
 	struct pdc_data_t *data = dev->data;
-	uint8_t byte = 0;
+	uint8_t bit39 = 0;
+	uint8_t byte40 = 0;
 
 	if (get_state(data) != ST_IDLE) {
 		return -EBUSY;
@@ -1950,36 +1955,26 @@ static int rts54_set_ccom(const struct device *dev, enum ccom_t ccom,
 
 	switch (ccom) {
 	case CCOM_RP:
-		byte = 0x02;
+		bit39 = 1;
+		byte40 = 0;
 		break;
 	case CCOM_DRP:
-		byte = 0x01;
-		switch (dm) {
-		case DRP_NORMAL:
-			/* No Try.Src or Try.Snk */
-			break;
-		case DRP_TRY_SRC:
-			byte |= (1 << 3);
-			break;
-		case DRP_TRY_SNK:
-			byte |= (2 << 3);
-			break;
-		}
+		bit39 = 0;
+		byte40 = 0x1 << 6;
 		break;
 	case CCOM_RD:
-		byte = 0;
+		bit39 = 0;
+		byte40 = 0x1 << 7;
 		break;
 	}
 
-	/* We always want Accessory Support */
-	byte |= (1 << 2);
-
 	uint8_t payload[] = {
-		SET_TPC_CSD_OPERATION_MODE.cmd,
-		SET_TPC_CSD_OPERATION_MODE.len,
-		SET_TPC_CSD_OPERATION_MODE.sub,
-		0x00,
-		byte,
+		UCSI_SET_CCOM.cmd,
+		UCSI_SET_CCOM.len,
+		UCSI_SET_CCOM.sub,
+		0x00 /* data length */,
+		bit39 /* connector number (0) + Rp bit */,
+		byte40,
 	};
 
 	return rts54_post_command(dev, CMD_SET_CCOM, payload,
