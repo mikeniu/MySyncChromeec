@@ -6,6 +6,13 @@
 /* Console output module for Chrome EC */
 
 #include "console.h"
+<<<<<<< HEAD   (3cb0f4c51a8bf64f21989a4f0bae67169d0661f2 jacuzzi: enable Try.SRC by default)
+||||||| BASE   (5b42e4670d58fc19e82da4e955ef06fbc67bfd66 tcpmv2: Don't call tcpm_debug_detach during PRS)
+#include "printf.h"
+=======
+#include "host_command.h"
+#include "printf.h"
+>>>>>>> CHANGE (655c2c33c22933d7a492282882ec3781893d3521 host_cmd: Add console_print host command)
 #include "uart.h"
 #include "usb_console.h"
 #include "util.h"
@@ -159,3 +166,23 @@ DECLARE_SAFE_CONSOLE_COMMAND(chan, command_ch,
 			     "[ save | restore | <mask> ]",
 			     "Save, restore, get or set console channel mask");
 #endif /* CONFIG_CONSOLE_CHANNEL */
+
+#ifdef CONFIG_HOSTCMD_CONSOLE_PRINT
+static enum ec_status
+host_command_console_print(struct host_cmd_handler_args *args)
+{
+	char *msg = (char *)args->params;
+
+	if (args->params_size <= 0)
+		return EC_RES_INVALID_PARAM;
+	/* Ensure message is null terminated */
+	msg[args->params_size - 1] = '\0';
+	/* No response */
+	args->response_size = 0;
+	/* Print message to console */
+	ccprints("Host: %s", msg);
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_CONSOLE_PRINT, host_command_console_print,
+		     EC_VER_MASK(0));
+#endif
