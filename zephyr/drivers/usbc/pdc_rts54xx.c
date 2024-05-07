@@ -1348,6 +1348,14 @@ static void st_read_run(void *o)
 		k_mutex_unlock(&data->mtx);
 		data->conn_status_cached = true;
 		break;
+	case CMD_GET_CAPABILITY:
+		struct ucsiv3_get_capability_data *cap =
+			(struct ucsiv3_get_capability_data *)data->user_buf;
+
+		/* Force enable GET_PD_MESSAGE support. */
+		cap->optional_features |= (1 << 8);
+		memcpy(data->user_buf, data->rd_buf + offset, len);
+		break;
 	default:
 		/* No preprocessing needed for the user data */
 		memcpy(data->user_buf, data->rd_buf + offset, len);
@@ -2491,6 +2499,9 @@ static int rts54_execute_ucsi_cmd(const struct device *dev,
 	}
 	case UCSI_CMD_GET_CONNECTOR_STATUS:
 		use_cmd = CMD_GET_CONNECTOR_STATUS;
+		break;
+	case UCSI_CMD_GET_CAPABILITY:
+		use_cmd = CMD_GET_CAPABILITY;
 		break;
 	default:
 		break;
