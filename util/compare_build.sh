@@ -93,7 +93,7 @@ make-print-boards() {
   local file="${TMP_DIR}/make-print-boards-cache"
   if [[ ! -f "${file}" ]]; then
     # This command take about 1 second to run
-    make print-boards >"${file}"
+    make print-boards | grep -v bloonchipper-druid >"${file}"
   fi
   cat "${file}"
 }
