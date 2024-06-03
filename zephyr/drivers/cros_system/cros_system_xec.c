@@ -64,6 +64,9 @@ LOG_MODULE_REGISTER(cros_system, LOG_LEVEL_ERR);
 #define STRUCT_HTMR0_REG_BASE_ADDR \
 	((struct htmr_regs *)(DT_REG_ADDR(DT_NODELABEL(hibtimer0))))
 
+#define STRUCT_VCI_REG_BASE_ADDR \
+	((struct vci_regs *)(DT_REG_ADDR(DT_NODELABEL(vci0))))
+
 /* Driver config */
 struct cros_system_xec_config {
 	/* hardware module base address */
@@ -137,6 +140,18 @@ static int cros_system_xec_get_reset_cause(const struct device *dev)
 	return data->reset;
 }
 
+/* configure VCI_OUT pin state */
+static void cros_system_xec_vci_out(bool vci_out_state)
+{
+	struct vci_regs *vci = STRUCT_VCI_REG_BASE_ADDR;
+
+	if (vci_out_state) {
+		vci->CONFIG |= MCHP_VCI_FW_CTRL_EN;
+	} else {
+		vci->CONFIG &= ~MCHP_VCI_FW_CTRL_EN;
+	}
+}
+
 /* MCHP TODO check and verify this logic for all corner cases:
  * Someone doing ARM Vector Reset insead of SYSRESETREQ or HW reset.
  * Does NRESETIN# status get set also on power on from no power state?
@@ -145,6 +160,7 @@ static int cros_system_xec_init(const struct device *dev)
 {
 	struct vbatr_regs *vbr = HAL_VBATR_INST(dev);
 	struct cros_system_xec_data *data = DRV_DATA(dev);
+	struct vci_regs *vci = STRUCT_VCI_REG_BASE_ADDR;
 	uint32_t pfsr = vbr->PFRS;
 
 	if (IS_BIT_SET(pfsr, MCHP_VBATR_PFRS_WDT_POS)) {
@@ -157,6 +173,17 @@ static int cros_system_xec_init(const struct device *dev)
 		data->reset = VCC1_RST_PIN;
 	} else {
 		data->reset = POWERUP;
+	}
+
+	/* Check if VCI mechanism is enabled */
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_HIBERNATE_VCI)) {
+		/*
+		 * As soon as FW is running, FW takes control VCI_OUT pin
+		 * and configure as high to keep VTR on
+		 */
+		cros_system_xec_vci_out(1);
+		/* VCI_OUT is controlled by FW */
+		vci->CONFIG |= MCHP_VCI_FW_EXT_SEL;
 	}
 
 	return 0;
@@ -294,10 +321,58 @@ static void system_set_htimer_alarm(uint32_t seconds, uint32_t microseconds)
 	htmr0->PRLD = hcnt;
 }
 
+/* Configure detection settings of VCI_INx pads */
+static void cros_system_xec_configure_vci_in(void)
+{
+	struct vci_regs *vci = STRUCT_VCI_REG_BASE_ADDR;
+
+	/*
+	 * TODO - to derive used VCI pins list & polarity from device tree
+	 * per board design
+	 */
+
+	/* enable VCI_IN1~2# */
+	vci->INPUT_EN |= MCHP_VCI_INPUT_EN_IN1 + MCHP_VCI_INPUT_EN_IN2;
+	/* set VCI_IN2 Active High, default is Active Low */
+	vci->POLARITY |= MCHP_VCI_POL_ACT_HI_IN2;
+}
+
+/* Arm MCHP VCI logic and drive VCI_OUT low to turn off EC VTR power rail */
+static void system_xec_hibernate_by_vci(const struct device *dev,
+					uint32_t seconds, uint32_t microseconds)
+{
+	ARG_UNUSED(dev);
+	ARG_UNUSED(seconds);
+	ARG_UNUSED(microseconds);
+
+	/* Configure detection settings of VCI_INx pads first */
+	cros_system_xec_configure_vci_in();
+
+	/*
+	 * Give the board a chance to do any late stage hibernation work.  This
+	 * is likely going to configure GPIOs for hibernation.  On some boards,
+	 * it's possible that this may not return at all.  On those boards,
+	 * power to the EC is likely being turn off entirely.
+	 */
+	if (board_hibernate_late)
+		board_hibernate_late();
+
+	/*
+	 * FW takes control VCI_OUT and drive it low
+	 * to inactive state. Then, it will turn Core Domain
+	 * power supply (VTR) off for better power consumption.
+	 */
+	cros_system_xec_vci_out(0);
+
+	/* EC suicides to turn off VTR itself */
+	while (1)
+		;
+}
+
 /* Put the EC in hibernate (lowest EC power state). */
-FUNC_NORETURN static int cros_system_xec_hibernate(const struct device *dev,
-						   uint32_t seconds,
-						   uint32_t microseconds)
+static void system_xec_hibernate_by_dsleep(const struct device *dev,
+					   uint32_t seconds,
+					   uint32_t microseconds)
 {
 	struct pcr_regs *const pcr = HAL_PCR_INST(dev);
 #ifdef CONFIG_ADC_XEC_V2
@@ -321,11 +396,6 @@ FUNC_NORETURN static int cros_system_xec_hibernate(const struct device *dev,
 #endif
 	struct ecia_regs *ecia = (struct ecia_regs *)(ECIA_BASE_ADDR);
 	int i;
-
-	/* Disable interrupt first */
-	interrupt_disable_all();
-	/* Stop the watchdog */
-	system_xec_watchdog_stop();
 
 	/* Disable all individaul block interrupt and source */
 	for (i = 0; i < MCHP_GIRQ_IDX_MAX; ++i) {
@@ -424,10 +494,32 @@ FUNC_NORETURN static int cros_system_xec_hibernate(const struct device *dev,
 	__NOP();
 
 	/* Reset EC chip */
-	cros_system_xec_soc_reset(dev);
+	pcr->SYS_RST |= MCHP_PCR_SYS_RESET_NOW;
+	/* Wait for the soc reset */
+	while (1)
+		;
+}
 
-	/* Should not reach here... */
-	/* return 0; */
+/* Put the EC in hibernate (lowest EC power state or VCI mechanism). */
+static int cros_system_xec_hibernate(const struct device *dev, uint32_t seconds,
+				     uint32_t microseconds)
+{
+	/* Disable interrupt first */
+	interrupt_disable_all();
+	/* Stop the watchdog */
+	system_xec_watchdog_stop();
+
+	/*
+	 * Enter hibernate VCI mechanism if it is enabled per board design
+	 * otherwise, enter deepest sleep mode
+	 */
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_HIBERNATE_VCI)) {
+		system_xec_hibernate_by_vci(dev, seconds, microseconds);
+	} else {
+		system_xec_hibernate_by_dsleep(dev, seconds, microseconds);
+	}
+
+	return 0;
 }
 
 static struct cros_system_xec_data cros_system_xec_dev_data;
