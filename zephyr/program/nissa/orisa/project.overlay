@@ -13,3 +13,8 @@
 #include "power_signals.dtsi"
 #include "led_pins.dtsi"
 #include "led_policy.dtsi"
+
+/* These GPIOS are initialized by the PDC driver */
+&gpio_usb_pd_int_odl {
+	no-auto-init;
+};
