@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fdf5cefb_c3514cd3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1273969
+      },
+      "writtenOn": "2024-06-27T05:43:01Z",
+      "side": 1,
+      "message": "LOW_COVERAGE_REASON added. @fabiobaltieri@google.com Could you help remove the -1 vote for code-coverage?",
+      "revId": "f9b63c3b1d4a30676a7a98574f3fc1845e9c8eb6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
