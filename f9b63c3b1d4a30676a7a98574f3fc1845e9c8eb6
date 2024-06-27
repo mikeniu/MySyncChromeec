@@ -69,6 +69,24 @@
       "message": "@fabiobaltieri@google.com Could you help me check the reason of error?",
       "revId": "f9b63c3b1d4a30676a7a98574f3fc1845e9c8eb6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1969c3e9_4c71cb9a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2024-06-27T15:41:07Z",
+      "side": 1,
+      "message": "```\n    Hook script \"util/check_line_directives.py --commit ${PRESUBMIT_COMMIT}\" failed with code 1:\n      error: Invalid #line directive (got 43 expected 44)\n      zephyr/drivers/cros_kb_raw/cros_kb_raw_ite.c:43: #line 43\n```\n\nI think it wants you to change that `#line` at the top of the file, because you added an include in the list so that should move now",
+      "parentUuid": "7bddf4c0_b8ae25e4",
+      "revId": "f9b63c3b1d4a30676a7a98574f3fc1845e9c8eb6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
