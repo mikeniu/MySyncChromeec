@@ -1,0 +1,6 @@
+board:
+  name: mediatek
+  full_name: Mediatek EC
+  vendor: google
+  socs:
+    - name: mt8196_scp
