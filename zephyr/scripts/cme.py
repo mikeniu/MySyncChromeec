@@ -375,6 +375,7 @@ def find_i2c_portmap(edtlib, edt):
         "zephyr,i2c-emul-controller",
         "intel,sedi-i2c",
         "snps,designware-i2c",
+        "mediatek,mtk-scp-i2c",
     ]
 
     # Append all I2C chip names to a list; its index is the port number.

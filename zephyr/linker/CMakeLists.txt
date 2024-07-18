@@ -27,8 +27,9 @@ zephyr_linker_sources(DATA_SECTIONS iterables-ram.ld)
 zephyr_linker_sources(SECTIONS iterables-rom.ld)
 
 if(DEFINED CONFIG_PLATFORM_EC_NOINIT_END_OF_RAM_SECTION)
-  if(DEFINED CONFIG_SOC_IT8XXX2)
-    # SOC_IT8XXX2 layout is special, snippets-sections.ld is included last.
+  if(DEFINED CONFIG_SOC_IT8XXX2 OR DEFINED CONFIG_SOC_FAMILY_MT81XX_SCP)
+    # These layouts include snippets-sections.ld after common-noinit.ld, so
+    # the SECTIONS slot is the last RAM consumer, not the NOINIT slot.
     zephyr_linker_sources(SECTIONS SORT_KEY zzz noinit-end-of-ram-section.ld)
   else()
     zephyr_linker_sources(NOINIT SORT_KEY zzz noinit-end-of-ram.ld)
