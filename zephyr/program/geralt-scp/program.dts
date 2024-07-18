@@ -1,0 +1,9 @@
+/ {
+	named-gpios {
+		compatible = "named-gpios";
+
+		entering_rw: entering_rw {
+			enum-name = "GPIO_ENTERING_RW";
+		};
+	};
+};

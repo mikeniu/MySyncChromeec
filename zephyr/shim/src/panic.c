@@ -243,7 +243,7 @@ __override void assert_post_action(const char *path, unsigned int line)
 		print_stack_trace(thread);
 	}
 
-	panic_reboot();
+	panic_printf("assert_post_action %s %u\n", path, line);
 	__ASSERT_UNREACHABLE;
 }
 #endif /* CONFIG_ASSERT_NO_FILE_INFO */
