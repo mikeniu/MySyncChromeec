@@ -83,3 +83,11 @@ def register_rtk_project(**kwargs):
     kwargs.setdefault("output_packer", zmake.output_packers.RTKBinmanPacker)
     kwargs.setdefault("modules", ["cmsis_6", "ec"])
     return register_raw_project(**kwargs)
+
+
+def register_mtkscp_project(**kwargs):
+    """Register a project that uses RawBinPacker."""
+    kwargs.setdefault("supported_toolchains", ["coreboot-sdk", "zephyr"])
+    kwargs.setdefault("output_packer", zmake.output_packers.ElfPacker)
+    kwargs.setdefault("modules", ["ec", "cmsis_6"])
+    return _register_project(**kwargs)
