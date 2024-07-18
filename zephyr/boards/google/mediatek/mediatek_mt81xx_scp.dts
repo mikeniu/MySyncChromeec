@@ -1,0 +1,13 @@
+/dts-v1/;
+#include <mediatek/mt81xx_scp.dtsi>
+/ {
+	chosen {
+		zephyr,sram = &ram0;
+		zephyr,console = &uart0;
+		zephyr,shell-uart = &uart0;
+	};
+};
+
+&uart0 {
+	status = "okay";
+};
