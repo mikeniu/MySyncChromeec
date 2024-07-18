@@ -24,6 +24,8 @@ elseif (DEFINED CONFIG_ARCH_POSIX)
     # __wrap_main() in ztest_system.c.
     zephyr_link_libraries(-Wl,--wrap=main)
   endif()
+elseif (DEFINED CONFIG_SOC_SERIES_MT81XX_SCP)
+  zephyr_library_sources(mtk_scp_system.c)
 else()
   zephyr_library_sources(system.c)
 endif()
