@@ -27,6 +27,7 @@ BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(named_i2c_ports) == 1,
 #define MICROCHIP_XEC_COMPAT microchip_xec_i2c_v2
 #define INTEL_SEDI_I2C_COMPAT intel_sedi_i2c
 #define REALTEK_PORT_COMPAT snps_designware_i2c
+#define MEDIATEK_I2C_COMPAT mediatek_mtk_scp_i2c
 #define I2C_EMUL_COMPAT zephyr_i2c_emul_controller
 #define I2C_FOREACH_PORT(fn)                                \
 	DT_FOREACH_STATUS_OKAY(NPCX_PORT_COMPAT, fn)        \
@@ -35,6 +36,7 @@ BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(named_i2c_ports) == 1,
 	DT_FOREACH_STATUS_OKAY(MICROCHIP_XEC_COMPAT, fn)    \
 	DT_FOREACH_STATUS_OKAY(INTEL_SEDI_I2C_COMPAT, fn)   \
 	DT_FOREACH_STATUS_OKAY(REALTEK_PORT_COMPAT, fn)     \
+	DT_FOREACH_STATUS_OKAY(MEDIATEK_I2C_COMPAT, fn)     \
 	DT_FOREACH_STATUS_OKAY(I2C_EMUL_COMPAT, fn)
 
 /*

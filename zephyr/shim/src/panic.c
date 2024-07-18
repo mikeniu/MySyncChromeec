@@ -315,7 +315,7 @@ __override void zassert_post_action(const char *path, unsigned int line)
 		print_stack_trace(k_current_get());
 	}
 
-	panic_reboot();
+	panic_printf("assert_post_action %s %u\n", path, line);
 
 #ifndef CONFIG_ASSERT_TEST
 	CODE_UNREACHABLE;

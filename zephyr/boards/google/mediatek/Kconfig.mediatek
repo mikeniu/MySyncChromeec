@@ -1,0 +1,6 @@
+# Copyright 2025 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config BOARD_MEDIATEK
+	select SOC_MT8196_SCP
