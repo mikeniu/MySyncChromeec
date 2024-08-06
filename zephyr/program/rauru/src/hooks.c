@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+#include "charger.h"
+#include "driver/charger/bq257x0_regs.h"
 #include "gpio.h"
 #include "gpio/gpio_int.h"
 #include "gpio_signal.h"
@@ -21,6 +23,11 @@ static void rauru_common_init(void)
 
 	/* TODO(yllin): move this to usb redriver/retimer configure place */
 	rauru_get_sb_type();
+
+	i2c_update16(chg_chips[CHARGER_SOLO].i2c_port,
+		     chg_chips[CHARGER_SOLO].i2c_addr_flags,
+		     BQ25710_REG_CHARGE_OPTION_2,
+		     1 << BQ257X0_CHARGE_OPTION_2_EN_EXTILIM_SHIFT, 0);
 }
 DECLARE_HOOK(HOOK_INIT, rauru_common_init, HOOK_PRIO_PRE_DEFAULT);
 
