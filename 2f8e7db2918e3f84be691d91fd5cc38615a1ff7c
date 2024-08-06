@@ -16,6 +16,41 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "2f8e7db2918e3f84be691d91fd5cc38615a1ff7c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c59bc5a0_7f8dd60f",
+        "filename": "zephyr/include/drivers/one_wire_uart.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1182824
+      },
+      "writtenOn": "2024-08-06T17:29:54Z",
+      "side": 1,
+      "message": "Please add a comment for this function declaration.",
+      "fixSuggestions": [
+        {
+          "fixId": "a64ef44d_eb3fe651",
+          "description": "prompt_to_edit API",
+          "replacements": [
+            {
+              "path": "zephyr/include/drivers/one_wire_uart.h",
+              "range": {
+                "startLine": 76,
+                "startChar": 0,
+                "endLine": 76,
+                "endChar": 0
+              },
+              "replacement": "/**\n * @brief Add a keyboard matrix to the one-wire UART device.\n *\n * This function adds a keyboard matrix to the one-wire UART device.\n * The keyboard matrix is used to translate the key press event to\n * a key code.\n *\n * @param dev One-Wire UART device instance.\n * @key_matrix Pointer to the keyboard matrix.\n */\n"
+            }
+          ]
+        }
+      ],
+      "revId": "2f8e7db2918e3f84be691d91fd5cc38615a1ff7c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
