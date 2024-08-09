@@ -22,6 +22,30 @@
       },
       "revId": "f2ba4f9f19932be9428d5f3801814bb2f6f10dfd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7707717_75f843a2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2024-08-09T23:53:52Z",
+      "side": 1,
+      "message": "Filed a bug: http://b/358693878",
+      "parentUuid": "81455135_5383610b",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 92,
+        "endChar": 70
+      },
+      "revId": "f2ba4f9f19932be9428d5f3801814bb2f6f10dfd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
