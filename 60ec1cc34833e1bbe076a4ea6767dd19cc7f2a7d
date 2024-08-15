@@ -16,6 +16,24 @@
       "message": "@fsammoura@google.com I lost +2 after rebasing. Can you take another look?",
       "revId": "60ec1cc34833e1bbe076a4ea6767dd19cc7f2a7d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d2cf062_4469b8f2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2024-08-15T23:25:56Z",
+      "side": 1,
+      "message": "done.",
+      "parentUuid": "63856a4d_5e775c25",
+      "revId": "60ec1cc34833e1bbe076a4ea6767dd19cc7f2a7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
