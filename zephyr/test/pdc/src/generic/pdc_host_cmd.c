@@ -44,6 +44,7 @@ const static union data_status_reg data_status = {
 	/* 0x71 0x85 0x00 0x00 0x00 */
 	.data_conn = 1, .usb2 = 1,   .usb3_2 = 1,  .usb3_2_speed = 1,
 	.dp = 1,	.dp_pin = 1, .hpd_lvl = 1,
+	.no_fw_update = true,
 };
 
 /**

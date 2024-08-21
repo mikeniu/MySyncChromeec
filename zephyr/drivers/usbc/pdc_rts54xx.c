@@ -3107,9 +3107,6 @@ static void rts54xx_thread(void *dev, void *unused1, void *unused2)
 		.bits.error = 1,                                              \
 		.bits.sink_path_status_change = 1,                            \
 		.create_thread = create_thread_##inst,                        \
-		.no_fw_update = DT_INST_PROP(inst, no_fw_update),             \
-		.ccd = DT_INST_PROP(inst, ccd),                               \
-		.callback_handler = pdc_interrupt_callback##inst,             \
 	};                                                                    \
                                                                               \
 	DEVICE_DT_INST_DEFINE(inst, pdc_init, NULL,                           \

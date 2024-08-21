@@ -1638,7 +1638,7 @@ error_recovery:
  * @param info Output param for chip info
  * @return 0 on success or an error code
  */
-static int cmd_get_ic_status_sync_internal(const struct pdc_config_t *cfg,
+static int cmd_get_ic_status_sync_internal(const struct i2c_dt_spec *i2c,
 					   struct pdc_info_t *info)
 {
 	union reg_version version;
@@ -1729,10 +1729,6 @@ static int cmd_get_ic_status_sync_internal(const struct pdc_config_t *cfg,
 	strncpy(info->driver_name, STRINGIFY(DT_DRV_COMPAT),
 		sizeof(info->driver_name));
 	info->driver_name[sizeof(info->driver_name) - 1] = '\0';
-
-	info->no_fw_update = cfg->no_fw_update;
-	info->frs_supported = cfg->frs_supported;
-	info->usb_comm_capable_as_device = false;
 
 	return 0;
 }
@@ -3426,10 +3422,6 @@ BUILD_ASSERT(
 		.bits.error = 1,                                               \
 		.bits.sink_path_status_change = 1,                             \
 		.create_thread = create_thread_##inst,                         \
-		.no_fw_update = DT_INST_PROP(inst, no_fw_update),              \
-		.ccd = DT_INST_PROP(inst, ccd),                                \
-		.frs_supported = DT_INST_PROP(inst, frs_supported),            \
-		.port_index_on_chip = DT_INST_PROP(inst, port_index_on_chip),  \
 	};                                                                     \
                                                                                \
 	BUILD_ASSERT(                                                          \
