@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf07d726_04d069f2",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1783,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2024-08-22T18:04:08Z",
+      "side": 1,
+      "message": "No, that makes sense.",
+      "parentUuid": "607e9b44_2476ca30",
+      "revId": "9dc60e09a7bde8a4731b827e722c4a4a1a47ecda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1ae3952c_5c608a1e",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "The TI driver does not support this in the `PORT_CONTROL_REGISTER` interface, although its defined within UCSI spec. The generic test expects the driver to return `-EINVAL`.  This may need to change when we support a PDC that supports this value.",
       "parentUuid": "1ae3952c_5c608a1e",
+      "revId": "9dc60e09a7bde8a4731b827e722c4a4a1a47ecda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2186b0a6_64154612",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1639,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2024-08-22T18:04:08Z",
+      "side": 1,
+      "message": "This seems fine for now.",
+      "parentUuid": "be407556_c83b8292",
       "revId": "9dc60e09a7bde8a4731b827e722c4a4a1a47ecda",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
