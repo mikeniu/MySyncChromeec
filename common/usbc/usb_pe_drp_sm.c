@@ -6805,13 +6805,12 @@ static void pe_vcs_evaluate_swap_entry(int port)
 	 *  1) The Device Policy Manager indicates that a VCONN Swap is ok.
 	 *
 	 * Transition to the PE_VCS_Reject_Swap state when:
-	 *  1)  Port is not presently the VCONN Source and
-	 *  2) The DPM indicates that a VCONN Swap is not ok or
-	 *  3) The DPM indicates that a VCONN Swap cannot be done at this time.
+	 *  1) The DPM indicates that a VCONN Swap is not ok or
+	 *  2) The DPM indicates that a VCONN Swap cannot be done at this time.
 	 */
 
-	/* DPM rejects a VCONN Swap and port is not a VCONN source*/
-	if (!tc_check_vconn_swap(port) || tc_is_vconn_src(port) < 1) {
+	/* DPM rejects a VCONN Swap */
+	if (!tc_check_vconn_swap(port)) {
 		/* NOTE: PE_VCS_Reject_Swap State embedded here */
 		send_ctrl_msg(port, TCPCI_MSG_SOP, PD_CTRL_REJECT);
 	}
