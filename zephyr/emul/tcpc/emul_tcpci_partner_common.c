@@ -519,6 +519,7 @@ static void tcpci_partner_common_reset(struct tcpci_partner_data *data)
 	data->in_soft_reset = false;
 	tcpci_partner_stop_sender_response_timer(data);
 	tcpci_partner_common_clear_ams_ctrl_msg(data);
+	memset(&data->skedb, 0, sizeof(data->skedb));
 }
 
 /**
@@ -1143,6 +1144,10 @@ tcpci_partner_common_sop_msg_handler(struct tcpci_partner_data *data,
 
 			return tcpci_partner_common_battery_capability_handler(
 				data, tx_msg);
+		case PD_EXT_SINK_CAP:
+			LOG_INF("Got PD_EXT_SINK_CAP");
+			return tcpci_partner_sink_cap_extended_handler(data,
+								       tx_msg);
 		default:
 			return TCPCI_PARTNER_COMMON_MSG_NOT_HANDLED;
 		}
