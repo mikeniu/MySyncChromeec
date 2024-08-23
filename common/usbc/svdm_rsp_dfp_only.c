@@ -14,11 +14,9 @@
 
 static int svdm_identity(int port, uint32_t *payload)
 {
-	if (pd_get_rev(port, TCPCI_MSG_SOP) < PD_REV30) {
-		/*
-		 * PD 2 requires that DFPs nack received SVDM requests when no
-		 * modes are supported. PD 3 allows a response.
-		 */
+	/* The SVID in the Discover Identity Command request Shall be set to the
+	 * PD SID */
+	if (PD_VDO_VID(payload[VDO_INDEX_HDR]) != USB_SID_PD) {
 		return 0;
 	}
 
@@ -36,11 +34,23 @@ static int svdm_identity(int port, uint32_t *payload)
 	/* Single VDO for DFP product type */
 	payload[VDO_I(PRODUCT) + 1] = VDO_DFP(VDO_DFP_HOST_CAPABILITY_USB32,
 					      USB_TYPEC_RECEPTACLE, port);
-	return VDO_I(PRODUCT) + 2;
+
+	if (pd_get_rev(port, TCPCI_MSG_SOP) < PD_REV30) {
+		return VDO_I(PRODUCT) + 1;
+	} else {
+		return VDO_I(PRODUCT) + 2;
+	}
+}
+
+/* 6.4.4.3.2 A Responder that does not support any SVIDs Shall return a NAK.*/
+static int svdm_svids(int port, uint32_t *payload)
+{
+	return 0;
 }
 
 __override const struct svdm_response svdm_rsp = {
 	.identity = svdm_identity,
+	.svids = svdm_svids,
 	/*
 	 * Discover Identity support is required for devices with more than one
 	 * DFP, but other SVDM commands are optional. We don't support operating
