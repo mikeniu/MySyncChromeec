@@ -1,0 +1,152 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e481222d_16ae2822",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 1371,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2024-09-13T18:45:34Z",
+      "side": 1,
+      "message": "Could this just be `K_SECONDS(2)`? Same question for other `WAIT_FOR` calls.",
+      "range": {
+        "startLine": 1371,
+        "startChar": 4,
+        "endLine": 1371,
+        "endChar": 20
+      },
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb6a0af5_8e763e14",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 1379,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2024-09-13T18:45:34Z",
+      "side": 1,
+      "message": "If this happens with `enable_charge \u003d\u003d false`, `pdc_power_mgmt_set_active_charge_port` needs to not enable the new charge port. If this happens with `enable_charge \u003d\u003d true`, there will be no active charge port, contrary to the caller\u0027s intent.\n\nIn either case, how should the subsystem recover to a normal state?",
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99ac41aa_340d1785",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 2040,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2024-09-13T18:45:34Z",
+      "side": 1,
+      "message": "Nit: Do we still need debug logs?",
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a39b1908_c4d7d1ae",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 2469,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2024-09-13T18:45:34Z",
+      "side": 1,
+      "message": "It looks like the effect here is to remove `SNK_TYPEC_ATTACHED_SET_SINK_PATH_ON` from flow of this state and only invoke it in response to external stimulus once we\u0027ve already reached `SNK_TYPEC_ATTACHED_RUN`. Wouldn\u0027t it be simpler to just remove this substate and directly set `sink_path_en` in the policy function? Same question for `pdc_snk_attached_run`.",
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "baf993a5_48ab9728",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 2977,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2024-09-13T18:45:34Z",
+      "side": 1,
+      "message": "This involves interaction between each power management task and the thread calling this function (charge manager task?).\n\nDoes there need to be some kind of synchronization around the task state? If not, how does this code ensure that the task state read here is always valid and current?\n\nSame question for `set_charge_port` and `sink_path_en`.",
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d6fdce7_1b7d0c8c",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 2995,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2024-09-13T18:45:34Z",
+      "side": 1,
+      "message": "Line length (make sure to run pre-upload checks).",
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30f32e77_277e4115",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 2996,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2024-09-13T18:45:34Z",
+      "side": 1,
+      "message": "In this case, should this function \"redo\" setting the existing charge port, or should it just return early and not touch anything?",
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a12eeed0_b9336330",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 3027,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2024-09-13T18:45:34Z",
+      "side": 1,
+      "message": "Nit: Each of these conditions has essentially the same loop, and `set_charge_port` gets called for every port in some way. This could all just be a single loop. `CHARGE_PORT_NONE` is -1, so all of the ports would be set to `false` without explicitly checking against it. You only really need a special case for `i \u003d\u003d charge_port` to make sure it happens after turning other ports off.\n\nIMO, that would be easier to read.",
+      "range": {
+        "startLine": 3006,
+        "startChar": 0,
+        "endLine": 3027,
+        "endChar": 3
+      },
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
