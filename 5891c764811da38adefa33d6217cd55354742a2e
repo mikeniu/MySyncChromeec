@@ -261,6 +261,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1fbae748_f2042411",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 2995,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2024-09-30T15:31:22Z",
+      "side": 1,
+      "message": "The pre-upload checks are enforced in the CQ, so if the CQ passed, it should be fine.  cros format can\u0027t fix everything, some of the problems (like long strings) it just warns about, and you have to fix them yourself. But it will also overlook some problems that it thinks are not that serious, like a long url in a comment.",
+      "parentUuid": "3082e1f3_6e499056",
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "30f32e77_277e4115",
         "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
         "patchSetId": 8
