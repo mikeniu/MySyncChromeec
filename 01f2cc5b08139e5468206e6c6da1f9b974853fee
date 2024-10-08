@@ -66,6 +66,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dd16c5f0_d267b5b9",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 3032,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2024-10-08T17:52:18Z",
+      "side": 1,
+      "message": "Nit: long line",
+      "revId": "01f2cc5b08139e5468206e6c6da1f9b974853fee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "41ff4231_5b62df34",
         "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
         "patchSetId": 12
@@ -77,6 +94,30 @@
       "writtenOn": "2024-10-08T15:56:41Z",
       "side": 1,
       "message": "Is it possible to execute this path?  Under what conditions we would we try to enable the sink path when we are not a SINK?",
+      "range": {
+        "startLine": 3029,
+        "startChar": 0,
+        "endLine": 3035,
+        "endChar": 0
+      },
+      "revId": "01f2cc5b08139e5468206e6c6da1f9b974853fee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3db7dfb_ff4db2c1",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 3035,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2024-10-08T17:52:18Z",
+      "side": 1,
+      "message": "This is the path when we try to _disable_ the sink path when we not a sink. Could this happen during a PRS? I\u0027m not sure about the timing.",
+      "parentUuid": "41ff4231_5b62df34",
       "range": {
         "startLine": 3029,
         "startChar": 0,
@@ -106,6 +147,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c67a1220_009738bd",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 3108,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2024-10-08T17:52:18Z",
+      "side": 1,
+      "message": "Nit: long line",
+      "revId": "01f2cc5b08139e5468206e6c6da1f9b974853fee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f58bdd7a_334893d6",
         "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
         "patchSetId": 12
@@ -129,6 +187,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "04f19244_d2de7d06",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 3132,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2024-10-08T17:52:18Z",
+      "side": 1,
+      "message": "Nit: long line",
+      "revId": "01f2cc5b08139e5468206e6c6da1f9b974853fee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7211fcca_26250efd",
         "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
         "patchSetId": 12
@@ -146,6 +221,23 @@
         "endLine": 3136,
         "endChar": 0
       },
+      "revId": "01f2cc5b08139e5468206e6c6da1f9b974853fee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97591c95_bd11dfdc",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 3160,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2024-10-08T17:52:18Z",
+      "side": 1,
+      "message": "Nit: labels are usually lowercase",
       "revId": "01f2cc5b08139e5468206e6c6da1f9b974853fee",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

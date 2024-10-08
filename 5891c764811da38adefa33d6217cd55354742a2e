@@ -391,6 +391,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea0532da_fa405f66",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 2995,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2024-10-08T17:52:18Z",
+      "side": 1,
+      "message": "That\u0027s a striking limitation. String-splitting in C is trivial.",
+      "parentUuid": "b385d67a_a87524a1",
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "30f32e77_277e4115",
