@@ -1,0 +1,153 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f39ddaa6_3f81d66d",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 1400,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2024-10-08T15:56:41Z",
+      "side": 1,
+      "message": "Call `queue_internal_cmd(port, CMD_PDC_SET_SINK_PATH);` directly.  The SNK_ATTACHED_SET_SINK_PATH is not needed.",
+      "revId": "01f2cc5b08139e5468206e6c6da1f9b974853fee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "827069b2_2de4b842",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 1992,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2024-10-08T15:56:41Z",
+      "side": 1,
+      "message": "The next state should be RUN or GET_SINK_PDO, based on whether FRS is enabled.  When FRS is enabled, we always want to query the partner\u0027s SINK PDOs, even if we don\u0027t charge from the port.\n\n```\n\t\tif (IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_FRS) \u0026\u0026\n\t\t    port-\u003eccaps.op_mode_drp) {\n\t\t\tport-\u003esnk_attached_local_state \u003d\n\t\t\t\tSNK_ATTACHED_GET_SINK_PDO;\n\t\t} else {\n\t\t\tport-\u003esnk_attached_local_state \u003d SNK_ATTACHED_RUN;\n\t\t}\n```",
+      "range": {
+        "startLine": 1992,
+        "startChar": 0,
+        "endLine": 1992,
+        "endChar": 52
+      },
+      "revId": "01f2cc5b08139e5468206e6c6da1f9b974853fee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c54d581_2deb204c",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 2008,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2024-10-08T15:56:41Z",
+      "side": 1,
+      "message": "This sub-state can be dropped once you put the FRS check into the GET_RDO state.\n\n`run_snk_policies()` should queue `CMD_PDC_SET_SINK_PATH` directly instead of going through a sub-state.",
+      "range": {
+        "startLine": 1995,
+        "startChar": 0,
+        "endLine": 2008,
+        "endChar": 0
+      },
+      "revId": "01f2cc5b08139e5468206e6c6da1f9b974853fee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41ff4231_5b62df34",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 3035,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2024-10-08T15:56:41Z",
+      "side": 1,
+      "message": "Is it possible to execute this path?  Under what conditions we would we try to enable the sink path when we are not a SINK?",
+      "range": {
+        "startLine": 3029,
+        "startChar": 0,
+        "endLine": 3035,
+        "endChar": 0
+      },
+      "revId": "01f2cc5b08139e5468206e6c6da1f9b974853fee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53ffddcb_1ce45068",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 3099,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2024-10-08T15:56:41Z",
+      "side": 1,
+      "message": "The charger manager isn\u0027t supposed to select a charge port until all suppliers register with the charge manager.  I need to do some digging into the charger manager and PDC init flow to check if this is the right approach.",
+      "revId": "01f2cc5b08139e5468206e6c6da1f9b974853fee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f58bdd7a_334893d6",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 3114,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2024-10-08T15:56:41Z",
+      "side": 1,
+      "message": "If we keep this code to find the initial charge port, we probably need to inform the charge manager code which port is currently charging.",
+      "range": {
+        "startLine": 3114,
+        "startChar": 0,
+        "endLine": 3114,
+        "endChar": 18
+      },
+      "revId": "01f2cc5b08139e5468206e6c6da1f9b974853fee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7211fcca_26250efd",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 3136,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2024-10-08T15:56:41Z",
+      "side": 1,
+      "message": "The charge manager is supposed to perform this check.  Adding this check here points to a potential issue with how the PDC and the charge manager initialize.",
+      "range": {
+        "startLine": 3131,
+        "startChar": 0,
+        "endLine": 3136,
+        "endChar": 0
+      },
+      "revId": "01f2cc5b08139e5468206e6c6da1f9b974853fee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
