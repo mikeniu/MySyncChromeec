@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "142efda4_d559461a",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 1371,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2024-10-08T06:47:02Z",
+      "side": 1,
+      "message": "Obsolete",
+      "parentUuid": "926a03af_582e6af5",
+      "range": {
+        "startLine": 1371,
+        "startChar": 4,
+        "endLine": 1371,
+        "endChar": 20
+      },
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fb6a0af5_8e763e14",
@@ -101,6 +125,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "50a7b0d9_d462e04b",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 1379,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2024-10-08T06:47:02Z",
+      "side": 1,
+      "message": "Added recovery mechanism in `pdc_power_mgmt_set_active_charge_port`",
+      "parentUuid": "58ecf776_05c6efdb",
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "99ac41aa_340d1785",
@@ -132,6 +174,24 @@
       "side": 1,
       "message": "Not really. Will remove it.",
       "parentUuid": "99ac41aa_340d1785",
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e0388d9_690200c7",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 2040,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2024-10-08T06:47:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1248c5ab_551a7ef1",
       "revId": "5891c764811da38adefa33d6217cd55354742a2e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -171,6 +231,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "949a9867_d91da347",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 2469,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2024-10-08T06:47:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f258b0a2_4d8f57b9",
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "baf993a5_48ab9728",
@@ -202,6 +280,24 @@
       "side": 1,
       "message": "I\u0027ll replace `WAIT_FOR` with `k_condvar_wait`.",
       "parentUuid": "baf993a5_48ab9728",
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a106292_84a2a4dc",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 2977,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2024-10-08T06:47:02Z",
+      "side": 1,
+      "message": "Use `PDC_EXIT_PDC_INIT_STATE_EVENT` event for synchronization.",
+      "parentUuid": "982bc6aa_a12bf3d5",
       "revId": "5891c764811da38adefa33d6217cd55354742a2e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -277,6 +373,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b385d67a_a87524a1",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 2995,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2024-10-08T06:47:02Z",
+      "side": 1,
+      "message": "Reduced the string length.",
+      "parentUuid": "1fbae748_f2042411",
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "30f32e77_277e4115",
@@ -308,6 +422,24 @@
       "side": 1,
       "message": "Agreed. But as I recall, without doing so doesn\u0027t enable charging. I test without setting the existing pink path and debug it.",
       "parentUuid": "30f32e77_277e4115",
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2d5f54e_d9ce370f",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 2996,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2024-10-08T06:47:02Z",
+      "side": 1,
+      "message": "When battery is not present, just return early.",
+      "parentUuid": "9ad48d8c_acc2d75d",
       "revId": "5891c764811da38adefa33d6217cd55354742a2e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -349,6 +481,30 @@
       "side": 1,
       "message": "Agreed. If the PDC firmware can handle turning off unused sink path, then calling `set_charge_port(i, false)` is unnecessary.",
       "parentUuid": "a12eeed0_b9336330",
+      "range": {
+        "startLine": 3006,
+        "startChar": 0,
+        "endLine": 3027,
+        "endChar": 3
+      },
+      "revId": "5891c764811da38adefa33d6217cd55354742a2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1efafad1_49c1ffb0",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 3027,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2024-10-08T06:47:02Z",
+      "side": 1,
+      "message": "Obsolete.",
+      "parentUuid": "1d74e81c_c9ed6bf8",
       "range": {
         "startLine": 3006,
         "startChar": 0,
