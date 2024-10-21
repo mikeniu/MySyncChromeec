@@ -1,0 +1,68 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14106213_ab291a29",
+        "filename": "driver/fingerprint/egis/platform/inc/plat_log.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2024-10-21T18:29:55Z",
+      "side": 1,
+      "message": "Can you specify `[in]`/`[out]` for all the parameters?",
+      "range": {
+        "startLine": 54,
+        "startChar": 3,
+        "endLine": 54,
+        "endChar": 15
+      },
+      "revId": "55a7a34634fd56576948c684c8bdff89f8412543",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d9b9f12_bc3f6604",
+        "filename": "driver/fingerprint/egis/platform/inc/plat_log.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2024-10-21T18:29:55Z",
+      "side": 1,
+      "message": "\"A printf-style format string for the message.\"",
+      "range": {
+        "startLine": 59,
+        "startChar": 17,
+        "endLine": 59,
+        "endChar": 65
+      },
+      "fixSuggestions": [
+        {
+          "fixId": "7c311b69_90342eaa",
+          "description": "prompt_to_edit API",
+          "replacements": [
+            {
+              "path": "driver/fingerprint/egis/platform/inc/plat_log.h",
+              "range": {
+                "startLine": 59,
+                "startChar": 0,
+                "endLine": 60,
+                "endChar": 0
+              },
+              "replacement": " * @param format A printf-style format string for the message.\n"
+            }
+          ]
+        }
+      ],
+      "revId": "55a7a34634fd56576948c684c8bdff89f8412543",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
