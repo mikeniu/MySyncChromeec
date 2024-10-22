@@ -111,13 +111,13 @@ int gpio_configure_port_pin(int port, int id, int flags)
 		dev = DEVICE_DT_GET(DT_NODELABEL(gpiom));
 		break;
 	case GPIO_KSI:
-		dev = DEVICE_DT_GET(DT_NODELABEL(gpioksi));
+		dev = DEVICE_DT_GET(DT_NODELABEL(gpion));
 		break;
 	case GPIO_KSOH:
-		dev = DEVICE_DT_GET(DT_NODELABEL(gpioksoh));
+		dev = DEVICE_DT_GET(DT_NODELABEL(gpiol));
 		break;
 	case GPIO_KSOL:
-		dev = DEVICE_DT_GET(DT_NODELABEL(gpioksol));
+		dev = DEVICE_DT_GET(DT_NODELABEL(gpiok));
 		break;
 	default:
 		printk("Error port number %d\n", port);
