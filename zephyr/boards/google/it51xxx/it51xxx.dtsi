@@ -1,0 +1,45 @@
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <cros/ite/it51xxx.dtsi>
+#include <dt-bindings/gpio_defines.h>
+#include <dt-bindings/gpio/ite-it8xxx2-gpio.h>
+#include <ite/it51xxx-pinctrl-map.dtsi>
+#include <cros/vivaldi_kbd_default.dtsi>
+
+#define GPIO_VOLTAGE_1P8 IT8XXX2_GPIO_VOLTAGE_1P8
+
+/ {
+	model = "Google IT51XXX Baseboard";
+
+	chosen {
+		zephyr,sram = &sram0;
+		zephyr,console = &uart1;
+		zephyr,shell-uart = &uart1;
+		zephyr,flash = &flash0;
+		zephyr,flash-controller = &flashctrl;
+	};
+};
+
+&uart1 {
+	status = "okay";
+	current-speed = <115200>;
+	clock-frequency = <1843200>;
+	pinctrl-0 = <&uart1_rx_gpc7_default
+		     &uart1_tx_gpe6_default>;
+	pinctrl-names = "default";
+};
+
+&ite_uart1_wrapper {
+	status = "okay";
+};
+
+&kbd {
+	actual-key-mask = <0x1c 0xff 0xff 0xff 0xff
+			   0xf5 0xff 0xa4 0xff 0xfe
+			   0x55 0xfa 0xca>;
+	poll-period-ms = <3>;
+	stable-poll-period-ms = <9>;
+};

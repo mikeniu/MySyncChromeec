@@ -57,7 +57,7 @@ class BuildInfo:
 
         # How the RAM size is indicated varies by SOC
         if self.get_symbol("CONFIG_SOC_SERIES_NPCX9") or self.get_symbol(
-            "CONFIG_SOC_SERIES_IT8XXX2"
+            "CONFIG_SOC_SERIES_IT51XXX"
         ):
             ram_base = self.get_symbol("CONFIG_SRAM_BASE_ADDRESS")
             assert (

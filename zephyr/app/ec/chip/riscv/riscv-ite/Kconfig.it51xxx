@@ -1,0 +1,35 @@
+# Copyright 2025 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+if SOC_FAMILY_ITE_EC
+
+# Code RAM base for IT51XXX
+config CROS_EC_PROGRAM_MEMORY_BASE
+	default 0
+
+# The total RAM size of IT8xxx2 is 128 KB.
+# The gap: 0x800000~0x801000
+# The first 4KB block be always reserved for ram code functions,
+# so the total available RAM size will be 120KB.
+config CROS_EC_RAM_BASE
+	default 0x00802000
+
+config CROS_EC_DATA_RAM_SIZE
+	default 0x0001e000
+
+config CROS_EC_RAM_SIZE
+	default 0x00020000
+
+# Image size is configured with binman's property.
+# (CROS_EC_RO_SIZE and CROS_EC_RW_SIZE)
+config CROS_EC_RO_MEM_OFF
+	default 0x0
+
+config CROS_EC_RW_MEM_OFF
+	default $(dt_node_int_prop_hex,/binman/ec-rw,offset)
+
+config FLASH_LOAD_OFFSET
+	default CROS_EC_RW_MEM_OFF if CROS_EC_RW
+
+endif # SOC_FAMILY_ITE_EC

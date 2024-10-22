@@ -22,6 +22,7 @@ BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(named_i2c_ports) == 1,
 #define NAMED_I2C_PORTS_NODE DT_COMPAT_GET_ANY_STATUS_OKAY(named_i2c_ports)
 
 #define NPCX_PORT_COMPAT nuvoton_npcx_i2c_port
+#define ITE_IT51XXX_PORT_COMPAT ite_it51xxx_i2c
 #define ITE_IT8XXX2_PORT_COMPAT ite_it8xxx2_i2c
 #define ITE_ENHANCE_PORT_COMPAT ite_enhance_i2c
 #define MICROCHIP_XEC_COMPAT microchip_xec_i2c_v2
@@ -30,6 +31,7 @@ BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(named_i2c_ports) == 1,
 #define I2C_EMUL_COMPAT zephyr_i2c_emul_controller
 #define I2C_FOREACH_PORT(fn)                                \
 	DT_FOREACH_STATUS_OKAY(NPCX_PORT_COMPAT, fn)        \
+	DT_FOREACH_STATUS_OKAY(ITE_IT51XXX_PORT_COMPAT, fn) \
 	DT_FOREACH_STATUS_OKAY(ITE_IT8XXX2_PORT_COMPAT, fn) \
 	DT_FOREACH_STATUS_OKAY(ITE_ENHANCE_PORT_COMPAT, fn) \
 	DT_FOREACH_STATUS_OKAY(MICROCHIP_XEC_COMPAT, fn)    \

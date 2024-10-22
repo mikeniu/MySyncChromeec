@@ -368,6 +368,7 @@ def find_i2c_portmap(edtlib, edt):
     # These compats are EC-chip-specific. List all the compats here.
     i2c_compat_list = [
         "nuvoton,npcx-i2c-port",
+        "ite,it51xxx-i2c",
         "ite,it8xxx2-i2c",
         "ite,enhance-i2c",
         "microchip,xec-i2c-v2",

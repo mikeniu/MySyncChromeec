@@ -17,7 +17,7 @@
 
 LOG_MODULE_REGISTER(shim_clock, LOG_LEVEL_ERR);
 
-#define ECPM_NODE DT_INST(0, ite_it8xxx2_ecpm)
+#define ECPM_NODE DT_INST(0, ite_it51xxx_ecpm)
 #define HAL_ECPM_REG_BASE_ADDR \
 	((struct ecpm_reg *)DT_REG_ADDR_BY_IDX(ECPM_NODE, 0))
 #define PLLFREQ_MASK 0xf
