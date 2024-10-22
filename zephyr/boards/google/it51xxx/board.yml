@@ -1,0 +1,9 @@
+board:
+  name: it51xxx
+  full_name: IT51XXX series
+  vendor: google
+  socs:
+    - name: it51526aw
+    - name: it51526bw
+      variants:
+        - name: "512"
