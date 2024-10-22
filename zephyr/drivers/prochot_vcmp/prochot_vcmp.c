@@ -12,11 +12,17 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/util.h>
 
+
+#include <zephyr/drivers/comparator.h>
+
 /* Include the right definition for the custom sensor threshold attributes, the
  * enum name happen to be the same for both it8xxx2 and npcx so we just have to
  * include the right file.
  */
 #if defined(CONFIG_VCMP_IT8XXX2)
+#include <zephyr/drivers/sensor/it8xxx2_vcmp.h>
+#elif defined(CONFIG_COMPARATOR_IT51XXX_VCMP)
+#include <zephyr/dt-bindings/comparator/it51xxx-vcmp.h>
 #include <zephyr/drivers/sensor/it8xxx2_vcmp.h>
 #elif defined(CONFIG_ADC_CMP_NPCX)
 #include <zephyr/drivers/sensor/adc_cmp_npcx.h>
@@ -50,7 +56,7 @@ static void prochot_vcmp_configure(const struct device *dev, bool state)
 	int ret;
 
 	memset(&val, 0, sizeof(val));
-
+#if 0
 	val.val1 = 0;
 	ret = sensor_attr_set(cfg->vcmp_dev, SENSOR_CHAN_VOLTAGE,
 			      SENSOR_ATTR_ALERT, &val);
@@ -58,21 +64,22 @@ static void prochot_vcmp_configure(const struct device *dev, bool state)
 		LOG_ERR("vcmp attr set failed: %d", ret);
 		return;
 	}
+#endif
 
 	if (state) {
-		val.val1 = cfg->high_level_mv * TH_HIGH_PERCENT / 100;
-		attr = (enum sensor_attribute)SENSOR_ATTR_UPPER_VOLTAGE_THRESH;
+		//val.val1 = cfg->high_level_mv * TH_HIGH_PERCENT / 100;
+		attr = (enum comparator_trigger)COMPARATOR_TRIGGER_RISING_EDGE;
 	} else {
-		val.val1 = cfg->high_level_mv * TH_LOW_PERCENT / 100;
-		attr = (enum sensor_attribute)SENSOR_ATTR_LOWER_VOLTAGE_THRESH;
+		//val.val1 = cfg->high_level_mv * TH_LOW_PERCENT / 100;
+		attr = (enum comparator_trigger)COMPARATOR_TRIGGER_FALLING_EDGE;
 	}
 
-	ret = sensor_attr_set(cfg->vcmp_dev, SENSOR_CHAN_VOLTAGE, attr, &val);
+	ret = comparator_set_trigger(cfg->vcmp_dev, attr);
 	if (ret < 0) {
 		LOG_ERR("vcmp attr set failed: %d", ret);
 		return;
 	}
-
+#if 0
 	val.val1 = 1;
 	ret = sensor_attr_set(cfg->vcmp_dev, SENSOR_CHAN_VOLTAGE,
 			      SENSOR_ATTR_ALERT, &val);
@@ -80,10 +87,10 @@ static void prochot_vcmp_configure(const struct device *dev, bool state)
 		LOG_ERR("vcmp attr set failed: %d", ret);
 		return;
 	}
+#endif
 }
 
-static void prochot_vcmp_handler(const struct device *sensor_dev,
-				 const struct sensor_trigger *trigger)
+static void prochot_vcmp_handler(const struct device *sensor_dev, void *user_data)
 {
 	const struct device *dev = DEVICE_DT_GET(DT_INST(0, DT_DRV_COMPAT));
 	struct prochot_vcmp_data *data = dev->data;
@@ -103,10 +110,10 @@ static void prochot_vcmp_handler(const struct device *sensor_dev,
 	}
 }
 
-static const struct sensor_trigger prochot_trig = {
-	.type = SENSOR_TRIG_THRESHOLD,
-	.chan = SENSOR_CHAN_VOLTAGE,
-};
+//static const struct sensor_trigger prochot_trig = {
+//	.type = SENSOR_TRIG_THRESHOLD,
+//	.chan = SENSOR_CHAN_VOLTAGE,
+//};
 
 static int prochot_vcmp_init(const struct device *dev)
 {
@@ -114,8 +121,7 @@ static int prochot_vcmp_init(const struct device *dev)
 	struct prochot_vcmp_data *data = dev->data;
 	int ret;
 
-	ret = sensor_trigger_set(cfg->vcmp_dev, &prochot_trig,
-				 prochot_vcmp_handler);
+	ret = comparator_set_trigger_callback(cfg->vcmp_dev, prochot_vcmp_handler, NULL);
 	if (ret < 0) {
 		LOG_ERR("trigger set failed: %d", ret);
 		return ret;

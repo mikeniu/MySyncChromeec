@@ -27,7 +27,7 @@ zephyr_linker_sources(DATA_SECTIONS iterables-ram.ld)
 zephyr_linker_sources(SECTIONS iterables-rom.ld)
 
 if(DEFINED CONFIG_PLATFORM_EC_NOINIT_END_OF_RAM_SECTION)
-  if(DEFINED CONFIG_SOC_IT8XXX2)
+  if(DEFINED CONFIG_SOC_IT51XXX)
     # SOC_IT8XXX2 layout is special, snippets-sections.ld is included last.
     zephyr_linker_sources(SECTIONS SORT_KEY zzz noinit-end-of-ram-section.ld)
   else()
