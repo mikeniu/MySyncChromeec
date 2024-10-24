@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "61bf75ee_17269c75",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2024-10-24T15:58:39Z",
+      "side": 1,
+      "message": "Should this CL be abandoned?  The CL stack at CL:5922648 has addressed the sink path problems.  Plus the RTK firmware now prevents both sink paths from being enabled.",
+      "revId": "01f2cc5b08139e5468206e6c6da1f9b974853fee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f39ddaa6_3f81d66d",
