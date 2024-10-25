@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "870ff9c5_1cf5c66c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2024-10-25T06:45:24Z",
+      "side": 1,
+      "message": "Wondering if we still need it if the PDC from other source behaves differently, or the multi PDC cases ?",
+      "parentUuid": "61bf75ee_17269c75",
+      "revId": "01f2cc5b08139e5468206e6c6da1f9b974853fee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f39ddaa6_3f81d66d",
