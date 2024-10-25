@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d90b0b1a_fab13a9f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2024-10-25T16:03:57Z",
+      "side": 1,
+      "message": "We will need some sort of mutex/interlock for the multi PDC case.  Any implementation of this needs to include some unit test cases to verify operation.  Generally, it will be difficult to manually catch all the corner cases with multiple sinking.",
+      "parentUuid": "870ff9c5_1cf5c66c",
+      "revId": "01f2cc5b08139e5468206e6c6da1f9b974853fee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f39ddaa6_3f81d66d",
