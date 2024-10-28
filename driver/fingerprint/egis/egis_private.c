@@ -54,7 +54,6 @@ void fp_sensor_low_power(void)
 	egis_sensor_power_down();
 }
 
-/* Reset and initialize the sensor IC */
 int fp_sensor_init(void)
 {
 	int ret = egis_sensor_init();
@@ -67,7 +66,6 @@ int fp_sensor_init(void)
 	return EC_SUCCESS;
 }
 
-/* Deinitialize the sensor IC */
 int fp_sensor_deinit(void)
 {
 	return egis_sensor_deinit();
