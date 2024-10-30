@@ -57,7 +57,14 @@
 	pinctrl-names = "default";
 	row-size = <8>;
 	col-size = <13>;
+<<<<<<< HEAD   (7594147b424508f234dfde3b1f59c7f03f81d13c host_sleep: add mutex to protect sleep_transition_timeout)
 	settle-time-us = <80>;
+||||||| BASE   (51d7244cf9e60918998663da89ff27b4699b908e keyboard_input: set ignore mask)
+	settle-time-us = <80>;
+	kso-ignore-mask = <04>;
+=======
+	kso-ignore-mask = <04>;
+>>>>>>> CHANGE (6294a99d0fbcdcd945763f1bf197858272b2a6bb keyboard_input: add a dedicated col2 settle delay)
 
 	kso-gpio {
 		compatible = "cros-ec,col-gpio";
