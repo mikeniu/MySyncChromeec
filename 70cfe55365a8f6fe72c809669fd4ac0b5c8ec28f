@@ -1,0 +1,45 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7713bc6d_3d1a3eac",
+        "filename": "driver/fingerprint/egis/platform/inc/plat_log.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2024-11-04T22:37:56Z",
+      "side": 1,
+      "message": "I *think* you can use `...` here: https://youtrack.jetbrains.com/issue/CPP-6861/Doxygen-support-of-var-args.",
+      "range": {
+        "startLine": 60,
+        "startChar": 14,
+        "endLine": 60,
+        "endChar": 25
+      },
+      "fixSuggestions": [
+        {
+          "fixId": "b625b4e0_41baef32",
+          "description": "prompt_to_edit API",
+          "replacements": [
+            {
+              "path": "driver/fingerprint/egis/platform/inc/plat_log.h",
+              "range": {
+                "startLine": 60,
+                "startChar": 0,
+                "endLine": 61,
+                "endChar": 0
+              },
+              "replacement": " * @param[in] ... Variable number of arguments to be formatted according\n"
+            }
+          ]
+        }
+      ],
+      "revId": "70cfe55365a8f6fe72c809669fd4ac0b5c8ec28f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
