@@ -38,10 +38,10 @@ static void show_val(uint32_t address, uint32_t index, enum format fmt)
 		ccprintf(" %04x", val);
 		break;
 	case FMT_BYTE:
-		if (0 == (index % 16))
-			ccprintf("\n%08X:", address + index);
+		//if (0 == (index % 16))
+			//ccprintf("\n%08X:", address + index);
 		val = *((uint8_t *)ptr + index);
-		ccprintf(" %02x", val);
+		//ccprintf(" %02x", val);
 		break;
 	case FMT_STRING:
 		if (0 == (index % 32))
@@ -61,11 +61,18 @@ static int command_mem_dump(int argc, const char **argv)
 	uint32_t address, i, num = 1;
 	char *e;
 	enum format fmt = FMT_WORD;
+	int time_delta;
+	uint64_t time_start, time_stop;
 
 #ifdef CONFIG_BOARD_FINGERPRINT
 	if (system_is_locked())
 		return EC_ERROR_ACCESS_DENIED;
 #endif /* CONFIG_BOARD_FINGERPRINT */
+
+	/* disable all interrupts */
+	interrupt_disable();
+
+	time_start = get_time().val;
 
 	if (argc > 1) {
 		if ((argv[1][0] == '.') && (strlen(argv[1]) == 2)) {
@@ -103,10 +110,16 @@ static int command_mem_dump(int argc, const char **argv)
 		 * Let other things happen, too */
 		if (!(i % 0x100)) {
 			watchdog_reload();
-			crec_usleep(10 * MSEC);
+			//crec_usleep(10 * MSEC);
 		}
 	}
-	ccprintf("\n");
+
+	time_stop = get_time().val;
+	time_delta = time_stop - time_start;
+	/* enable all interrupts */
+	interrupt_enable();
+
+	ccprintf("time_delta %d(us)\n", time_delta);
 	cflush();
 	return EC_SUCCESS;
 }
