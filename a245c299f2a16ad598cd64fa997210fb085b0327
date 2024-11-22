@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "a245c299f2a16ad598cd64fa997210fb085b0327",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca73bbc8_8c8f075d",
+        "filename": "util/flash_ec",
+        "patchSetId": 1
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2024-11-22T01:29:56Z",
+      "side": 1,
+      "message": "do you already have another path to update the servod overlay?\nwe\u0027ll want to make sure these match.\n\nsomething like\nhttps://chromium-review.googlesource.com/c/chromiumos/third_party/hdctools/+/5926412\nbut use `mchp_int_uart`.",
+      "range": {
+        "startLine": 389,
+        "startChar": 20,
+        "endLine": 389,
+        "endChar": 33
+      },
+      "revId": "a245c299f2a16ad598cd64fa997210fb085b0327",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
