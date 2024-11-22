@@ -43,6 +43,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d5260f46_2b01e22f",
+        "filename": "util/flash_ec",
+        "patchSetId": 1
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 1467080
+      },
+      "writtenOn": "2024-11-22T01:59:21Z",
+      "side": 1,
+      "message": "No I didn\u0027t. Good catch. I\u0027ll take care of that.",
+      "parentUuid": "ca73bbc8_8c8f075d",
+      "range": {
+        "startLine": 389,
+        "startChar": 20,
+        "endLine": 389,
+        "endChar": 33
+      },
+      "revId": "a245c299f2a16ad598cd64fa997210fb085b0327",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6474b73d_2febffe2",
         "filename": "util/flash_ec",
         "patchSetId": 1
@@ -54,6 +78,30 @@
       "writtenOn": "2024-11-22T01:38:24Z",
       "side": 1,
       "message": "any reason to enable the bitbang again?",
+      "range": {
+        "startLine": 1970,
+        "startChar": 0,
+        "endLine": 1974,
+        "endChar": 3
+      },
+      "revId": "a245c299f2a16ad598cd64fa997210fb085b0327",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d043c3c_a3e6d46b",
+        "filename": "util/flash_ec",
+        "patchSetId": 1
+      },
+      "lineNbr": 1974,
+      "author": {
+        "id": 1467080
+      },
+      "writtenOn": "2024-11-22T01:59:21Z",
+      "side": 1,
+      "message": "The baud rate change doesn\u0027t appear to take effect without it. It behaves as though the bitbang code only processes those parameters at startup.",
+      "parentUuid": "6474b73d_2febffe2",
       "range": {
         "startLine": 1970,
         "startChar": 0,
