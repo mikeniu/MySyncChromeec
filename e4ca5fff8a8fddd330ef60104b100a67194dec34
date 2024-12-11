@@ -40,6 +40,30 @@
       ],
       "revId": "e4ca5fff8a8fddd330ef60104b100a67194dec34",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e7e63f3_b2da5aec",
+        "filename": "zephyr/program/npcx_evb/npcx_monitor/BUILD.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2024-12-11T19:22:22Z",
+      "side": 1,
+      "message": "NVM, I tried it myself, and it is necessary.",
+      "parentUuid": "bfc2a547_4622e75c",
+      "range": {
+        "startLine": 10,
+        "startChar": 20,
+        "endLine": 10,
+        "endChar": 25
+      },
+      "revId": "e4ca5fff8a8fddd330ef60104b100a67194dec34",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
