@@ -24,6 +24,10 @@ if(DEFINED COREBOOT_SDK_ROOT_${ARCH})
   set(COREBOOT_SDK_ROOT "${COREBOOT_SDK_ROOT_${ARCH}}")
 endif()
 
+if(CONFIG_PICOLIBC AND NOT CONFIG_PICOLIBC_USE_MODULE AND DEFINED COREBOOT_SDK_ROOT_${ARCH}_c_libs)
+  set(COREBOOT_SDK_ROOT "${COREBOOT_SDK_ROOT_${ARCH}_c_libs}")
+endif()
+
 set(CC gcc)
 set(C++ g++)
 set(TOOLCHAIN_HOME "${COREBOOT_SDK_ROOT}/bin")
@@ -38,6 +42,21 @@ set(CMAKE_READELF    "${TOOLCHAIN_HOME}/${CROSS_COMPILE}readelf")
 set(CMAKE_GCOV       "${TOOLCHAIN_HOME}/${CROSS_COMPILE}gcov")
 
 if(CONFIG_PICOLIBC AND NOT CONFIG_PICOLIBC_USE_MODULE)
+
+  ##########################################################################################################
+  # TODO(b/384559486) Fix this block
+  set(CMAKE_C_FLAGS    "${CMAKE_C_FLAGS} -isystem ${COREBOOT_SDK_ROOT}/include")
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -isystem ${COREBOOT_SDK_ROOT}/include")
+  set(CMAKE_C_FLAGS    "${CMAKE_C_FLAGS} -isystem ${COREBOOT_SDK_ROOT}/include/${CROSS_COMPILE_TARGET}")
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -isystem ${COREBOOT_SDK_ROOT}/include/${CROSS_COMPILE_TARGET}")
+  set(CMAKE_C_FLAGS    "${CMAKE_C_FLAGS} -isystem ${COREBOOT_SDK_ROOT}/picolibc/include")
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -isystem ${COREBOOT_SDK_ROOT}/picolibc/include")
+
+  # Place orphaned sections and disable the warning for them
+  set(CONFIG_LINKER_ORPHAN_SECTION_WARN n)
+  set(LINKER_ORPHAN_SECTION_PLACE y)
+  ##########################################################################################################
+
   # Add picolibc
   message(INFO "Setting TOOLCHAIN_HAS_PICOLIBC to support full build.")
   set(TOOLCHAIN_HAS_PICOLIBC ON CACHE BOOL "True if toolchain supports picolibc")
