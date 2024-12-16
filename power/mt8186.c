@@ -303,8 +303,23 @@ static enum power_state power_get_signal_state(void)
 			return POWER_G3;
 		return POWER_S5;
 	}
-	if (power_get_signals() & IN_SUSPEND_ASSERTED)
-		return POWER_S3;
+	if (power_get_signals() & IN_SUSPEND_ASSERTED) {
+		/*
+		 * (b:339210285#comment77) This is a cold boot from S5/G3. We
+		 * ignore the intermediate SUSPEND state, and treat it as S0.
+		 * This is necessary because on some platforms, the signal that
+		 * controls the system's power state is managed by firmware, and
+		 * it takes some time for that firmware to fully release control
+		 * of the power-related hardware pins.  The system should only
+		 * try to enter a deeper sleep state (S3) after the main
+		 * processor (AP) has fully booted up.
+		 */
+		if (is_exiting_off) {
+			return POWER_S0;
+		} else {
+			return POWER_S3;
+		}
+	}
 	return POWER_S0;
 }
 
@@ -404,6 +419,8 @@ enum power_state power_handle_state(enum power_state state)
 		break;
 
 	case POWER_S0:
+		/* Off state exited. */
+		is_exiting_off = false;
 		if (next_state != POWER_S0)
 			return POWER_S0S3;
 		break;
@@ -426,8 +443,6 @@ enum power_state power_handle_state(enum power_state state)
 		return POWER_S5;
 
 	case POWER_S5S3:
-		/* Off state exited. */
-		is_exiting_off = false;
 		is_s5g3_passed = false;
 		is_resetting = false;
 		hook_notify(HOOK_CHIPSET_PRE_INIT);
