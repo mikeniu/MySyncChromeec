@@ -50,6 +50,30 @@
       ],
       "revId": "860248c58123d4bc42dc8f62fade2f45bdd0b9c6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5df219f_118384b9",
+        "filename": "zephyr/test/hwtest/src/exit.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2024-12-19T17:48:21Z",
+      "side": 1,
+      "message": "\u003e This test will pass with this change: https://chromium-review.googlesource.com/c/chromiumos/third_party/zephyr/+/6107742\n\n\u003e I believe though that this has to be pushed upstream\n\nNo. Somebody could rely on that behavior. Please note that `_exit()` is weak, so you can override it e.g. https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/libc/sbrk.c\n\nYou can create `exit.c` file and implement `_exit` that does what you want.",
+      "parentUuid": "48c7f7d4_9b56f039",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 49
+      },
+      "revId": "860248c58123d4bc42dc8f62fade2f45bdd0b9c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
