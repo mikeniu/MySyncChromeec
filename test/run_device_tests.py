@@ -431,7 +431,6 @@ class Renode(Platform):
 
         # Tests failures that are independent of the board.
         if test_name in [
-            "benchmark",  # TODO(b/384749490)
             "fpsensor_hw",  # TODO(b/384743080)
             "power_utilization",  # Can't measure power on Renode.
             "production_app_test",  # TODO(b/384740370)
