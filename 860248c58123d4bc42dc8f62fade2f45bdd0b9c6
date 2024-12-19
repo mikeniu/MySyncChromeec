@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48c7f7d4_9b56f039",
+        "filename": "zephyr/test/hwtest/src/exit.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2024-12-19T16:52:08Z",
+      "side": 1,
+      "message": "@tomhughes@chromium.org\n@patrykd@google.com\n@dawidn@google.com\n\nThis test will pass with this change: https://chromium-review.googlesource.com/c/chromiumos/third_party/zephyr/+/6107742\n\nI believe though that this has to be pushed upstream",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 49
+      },
+      "fixSuggestions": [
+        {
+          "fixId": "84d975b3_b5179f89",
+          "description": "prompt_to_edit API",
+          "replacements": [
+            {
+              "path": "zephyr/test/hwtest/src/exit.cc",
+              "range": {
+                "startLine": 14,
+                "startChar": 0,
+                "endLine": 15,
+                "endChar": 0
+              },
+              "replacement": "LOG_MODULE_REGISTER(exit_hw_test, LOG_LEVEL_DEBUG);\n"
+            },
+            {
+              "path": "zephyr/test/hwtest/src/exit.cc",
+              "range": {
+                "startLine": 18,
+                "startChar": 0,
+                "endLine": 19,
+                "endChar": 0
+              },
+              "replacement": "\tLOG_DEBUG(\"Calling exit\\n\");\n"
+            }
+          ]
+        }
+      ],
+      "revId": "860248c58123d4bc42dc8f62fade2f45bdd0b9c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
