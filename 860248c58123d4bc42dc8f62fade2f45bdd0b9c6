@@ -122,6 +122,30 @@
       },
       "revId": "860248c58123d4bc42dc8f62fade2f45bdd0b9c6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "057d211e_57fe4c3c",
+        "filename": "zephyr/test/hwtest/src/exit.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2024-12-19T19:16:39Z",
+      "side": 1,
+      "message": "\u003e Somebody could rely on that behavior.\n\nFiras, as I mentioned before it would be good to discuss with upstream what the motivation behind the current implementation to help us confirm that we want to do something different.\n\n\u003e The link above points to the file that implements our _sbrk() function. Just create platform/ec/libc/exit.c and put implementation there.\n\nAgree that this is the right place if we want to override it. Take a look at the [blame for `src/platform/ec/libc/sbrk.c`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/libc/sbrk.c;l\u003d1) to see the CLs involved for that.",
+      "parentUuid": "26c0cc2b_1a18f9fe",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 49
+      },
+      "revId": "860248c58123d4bc42dc8f62fade2f45bdd0b9c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
