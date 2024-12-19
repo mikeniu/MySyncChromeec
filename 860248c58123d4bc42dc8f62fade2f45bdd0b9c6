@@ -74,6 +74,30 @@
       },
       "revId": "860248c58123d4bc42dc8f62fade2f45bdd0b9c6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55c35fdd_da7e9bd4",
+        "filename": "zephyr/test/hwtest/src/exit.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2024-12-19T17:58:54Z",
+      "side": 1,
+      "message": "Hello Patryk,\nJust confirming that I understand your comment:\n\u003e\u003e No. Somebody could rely on that behavior. \n[FS] Do you mean someone can reply on this bahavior in the upstream?\n\n\u003e\u003e You can create exit.c file and implement _exit that does what you want.\n[FS] Exactly, I tried to place that function in a source file that compiles with the exit test. Specifically, I added it as an experiment in `platform/ec/common/panic_output.c` and it does override the weak function\n\nNow my question, is where in our zephyr implementation can we override the exit function? Is there a specific location that you recommend? My understanding, this is going to be contained in out implementation and is not part of the zephyr upstream",
+      "parentUuid": "e5df219f_118384b9",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 49
+      },
+      "revId": "860248c58123d4bc42dc8f62fade2f45bdd0b9c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
