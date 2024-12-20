@@ -194,6 +194,30 @@
       },
       "revId": "860248c58123d4bc42dc8f62fade2f45bdd0b9c6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71da14c1_07c68643",
+        "filename": "zephyr/test/hwtest/src/exit.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2024-12-20T00:01:55Z",
+      "side": 1,
+      "message": "\u003e This caused nothing to the zephyr build.\n\nThe Zephyr build uses CMake, not the Makefiles. Search for [`sbrk.c` in the `platform/ec/zephyr` directory](https://source.chromium.org/search?q\u003dsbrk.c\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch:src%2Fplatform%2Fec%2Fzephyr%2F\u0026start\u003d1) to see where it\u0027s being configured to be built with CMake. \n\nThere is more information on the Zephyr build system [here](https://docs.zephyrproject.org/latest/build/cmake/index.html). You\u0027ll probably want to learn more about CMake. Documention [here](https://cmake.org/cmake/help/latest/index.html) and tutorfial [here](https://cmake.org/cmake/help/latest/guide/tutorial/index.html). I also used [these docs](https://cliutils.gitlab.io/modern-cmake/README.html) several years ago and they were good for learning the basics.",
+      "parentUuid": "f9395eeb_2f517936",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 49
+      },
+      "revId": "860248c58123d4bc42dc8f62fade2f45bdd0b9c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
