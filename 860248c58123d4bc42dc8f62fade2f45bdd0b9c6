@@ -218,6 +218,30 @@
       },
       "revId": "860248c58123d4bc42dc8f62fade2f45bdd0b9c6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1175be6_cdf8b105",
+        "filename": "zephyr/test/hwtest/src/exit.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2024-12-20T00:02:42Z",
+      "side": 1,
+      "message": "I added it:\n```\nzephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SBRK\n                                                \"${PLATFORM_EC}/libc/sbrk.c\")\nzephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_EXIT\n                                                \"${PLATFORM_EC}/libc/exit.c\")\n```\n\nit is still crashing",
+      "parentUuid": "71da14c1_07c68643",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 49
+      },
+      "revId": "860248c58123d4bc42dc8f62fade2f45bdd0b9c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
