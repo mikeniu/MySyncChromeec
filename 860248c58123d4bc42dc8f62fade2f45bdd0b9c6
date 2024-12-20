@@ -386,6 +386,30 @@
       },
       "revId": "860248c58123d4bc42dc8f62fade2f45bdd0b9c6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1af17f05_cc67914e",
+        "filename": "zephyr/test/hwtest/src/exit.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2024-12-20T21:53:13Z",
+      "side": 1,
+      "message": "\u003e I believe having an exit.c file in the ec codebase that is solely used for zephyr would cause confusion.\n\nWas this comment intended for [this other thread](https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/6112740/comment/8c057b4c_29ac08b2/)?",
+      "parentUuid": "7459e6fa_b5efaf1e",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 49
+      },
+      "revId": "860248c58123d4bc42dc8f62fade2f45bdd0b9c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
