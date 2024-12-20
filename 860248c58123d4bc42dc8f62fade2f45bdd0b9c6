@@ -170,6 +170,30 @@
       },
       "revId": "860248c58123d4bc42dc8f62fade2f45bdd0b9c6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6be4bbb3_4d261c09",
+        "filename": "zephyr/test/hwtest/src/exit.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2024-12-20T00:01:43Z",
+      "side": 1,
+      "message": "\u003e This caused nothing to the zephyr build.\n\nBecause `libc/syscalls.c` is only used for EC builds. Newly created file needs to be added to `CMakeLists.txt`. Please check `libc/sbrk.c` as an example.",
+      "parentUuid": "f9395eeb_2f517936",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 49
+      },
+      "revId": "860248c58123d4bc42dc8f62fade2f45bdd0b9c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
