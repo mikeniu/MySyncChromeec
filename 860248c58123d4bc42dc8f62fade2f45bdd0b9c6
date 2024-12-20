@@ -266,6 +266,30 @@
       },
       "revId": "860248c58123d4bc42dc8f62fade2f45bdd0b9c6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a089a76d_718c687e",
+        "filename": "zephyr/test/hwtest/src/exit.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2024-12-20T00:04:36Z",
+      "side": 1,
+      "message": "This is the updated CL: https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/6112740\n\nI am trying to figure out what is still missing",
+      "parentUuid": "2c50a241_4b363a72",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 49
+      },
+      "revId": "860248c58123d4bc42dc8f62fade2f45bdd0b9c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
