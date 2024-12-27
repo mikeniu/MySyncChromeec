@@ -974,6 +974,7 @@
 #undef CONFIG_CHARGER_BQ24773
 #undef CONFIG_CHARGER_BQ25710
 #undef CONFIG_CHARGER_BQ25720
+#undef CONFIG_CHARGER_BQ25770
 #undef CONFIG_CHARGER_ISL9237
 #undef CONFIG_CHARGER_ISL9238 /* For ISL9238 A/B */
 #undef CONFIG_CHARGER_ISL9238C
@@ -1192,6 +1193,12 @@
 
 /* Value of the bq25710 input current sense resistor, in mOhms */
 #undef CONFIG_CHARGER_BQ25710_SENSE_RESISTOR_AC
+
+/* Value of the bq25770 charge sense resistor, in mOhms */
+#undef CONFIG_CHARGER_BQ25770_SENSE_RESISTOR
+
+/* Value of the bq25770 input current sense resistor, in mOhms */
+#undef CONFIG_CHARGER_BQ25770_SENSE_RESISTOR_AC
 
 /*
  * This config option is used to enable the PSYS sensing circuit on the
@@ -6700,7 +6707,7 @@
 	defined(CONFIG_CHARGER_RT9467) || defined(CONFIG_CHARGER_RT9490) ||   \
 	defined(CONFIG_CHARGER_MT6370) || defined(CONFIG_CHARGER_BQ25710) ||  \
 	defined(CONFIG_CHARGER_BQ25720) || defined(CONFIG_CHARGER_ISL9241) || \
-	defined(CONFIG_CHARGER_RAA489110)
+	defined(CONFIG_CHARGER_RAA489110) || defined(CONFIG_CHARGER_BQ25770)
 #if !defined(CONFIG_USB_PD_VBUS_MEASURE_TCPC) &&              \
 	!defined(CONFIG_USB_PD_VBUS_MEASURE_ADC_EACH_PORT) && \
 	!defined(CONFIG_USB_PD_VBUS_MEASURE_BY_BOARD)
@@ -6748,6 +6755,7 @@
 	defined(CONFIG_CHARGER_ISL9238C) || defined(CONFIG_CHARGER_ISL9241) || \
 	defined(CONFIG_CHARGER_RAA489000) || defined(CONFIG_CHARGER_SM5803) || \
 	defined(CONFIG_CHARGER_BQ25710) || defined(CONFIG_CHARGER_BQ25720) ||  \
+	defined(CONFIG_CHARGER_BQ25770) ||                                     \
 	defined(CONFIG_CHARGER_RAA489110) || defined(CONFIG_CHARGER_RT9490)
 #define CONFIG_CHARGER_NARROW_VDC
 #endif

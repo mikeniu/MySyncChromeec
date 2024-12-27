@@ -4,7 +4,8 @@
  */
 
 #include <zephyr/devicetree.h>
-#if defined(CONFIG_PLATFORM_EC_CHARGER_BQ25720) || \
+#if defined(CONFIG_PLATFORM_EC_CHARGER_BQ25770) ||     \
+	defined(CONFIG_PLATFORM_EC_CHARGER_BQ25720) || \
 	defined(CONFIG_PLATFORM_EC_CHARGER_BQ25710)
 #include "driver/charger/bq25710.h"
 
