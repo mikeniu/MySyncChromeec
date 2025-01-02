@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51fb50e8_14cc3fea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1477752
+      },
+      "writtenOn": "2025-01-02T14:39:28Z",
+      "side": 1,
+      "message": "I believe this will conflict with CL:6126149 and CL:6128742, you may want to put them in relation chain.",
+      "revId": "d40aa99fa90412ef2dff567c365c1e6855c398b1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
