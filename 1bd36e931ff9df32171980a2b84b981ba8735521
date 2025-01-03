@@ -16,6 +16,24 @@
       "message": "do we have a bug for this change?",
       "revId": "1bd36e931ff9df32171980a2b84b981ba8735521",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba35533d_c68bf1c4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 3387694
+      },
+      "writtenOn": "2025-01-03T09:18:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9861106e_f06157ee",
+      "revId": "1bd36e931ff9df32171980a2b84b981ba8735521",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
