@@ -17,136 +17,146 @@
 #define CPRINTS(format, args...) cprints(CC_SYSTEM, format, ##args)
 #define CPRINTF(format, args...) cprintf(CC_SYSTEM, format, ##args)
 
-#define CHARGING_CURRENT_MA_SAFE 5000
+enum {
+	TEMP_ZONE_0, /* not limit */
+	TEMP_ZONE_1, /* 2000mA */
+	TEMP_ZONE_2, /* 500mA */
+} temp_zone = TEMP_ZONE_0;
 
-static int thermals[6];
+#define COL_NUM 3
+#define ROW_NUM 2
+
+static int thermals[5], time[ROW_NUM][COL_NUM];
 static int thermal_cyc;
+static int current = -1;
+static int charger_temp_ave_bef, charger_temp_ave;
 
-int charger_profile_override(struct charge_state_data *curr)
+/*
+ * Except time[exceptrow][exceptcol], everything else is cleared to 0
+ * Used to record the number of times the temperature reaches a certain
+ * level three times in a row.
+ */
+static void clear_remaining_array(int arr[][COL_NUM], int row, int exceptrow,
+				  int exceptcol)
 {
-	int charger_temp, charger_temp_c, charger_temp_ave;
-	int lcd_temp, lcd_temp_c;
-	int current;
+	int i, j;
+
+	time[exceptrow][exceptcol]++;
+
+	for (i = 0; i < row; i++) {
+		if (i != exceptrow) {
+			for (j = 0; j < COL_NUM; j++) {
+				if (j != exceptcol) {
+					arr[i][j] = 0;
+				}
+			}
+		}
+	}
+}
+
+/* Called by hook task every hook second (1 sec) */
+static void average_tempature(void)
+{
+	int charger_temp, charger_temp_c;
 	int charger_temp_sum = 0;
-	enum power_state chipset_state = power_get_state();
+	static int temperature_increase;
 
 	/*
 	 * Keep track of battery temperature range:
 	 *
-	 *     ZONE_0  ZONE_1   ZONE_2  ZONE_3
-	 * --->------>-------->-------->------>--- Temperature (C)
-	 *    0      50       53       56     80
-	 *     ZONE_0  ZONE_1   ZONE_2  ZONE_3
-	 * ---<------<--------<--------<------<--- Temperature (C)
-	 *    0      45        50       54     80
+	 *     ZONE_0  ZONE_1   ZONE_2
+	 * --->------>-------->--- Temperature (C)
+	 *    0      53       65
+	 *     ZONE_0  ZONE_1   ZONE_2
+	 * ---<------<--------<--- Temperature (C)
+	 *    0      48        60
 	 */
-	enum {
-		TEMP_ZONE_0, /* not limit */
-		TEMP_ZONE_1, /* 2500mA */
-		TEMP_ZONE_2, /* 1800mA */
-		TEMP_ZONE_3, /* 1000mA */
-		TEMP_ZONE_COUNT,
-		TEMP_OUT_OF_RANGE = TEMP_ZONE_COUNT /* Not charging */
-	} temp_zone;
-
-	if (!(curr->batt.flags & BATT_FLAG_RESPONSIVE))
-		return 0;
-
-	current = curr->requested_current;
-
 	temp_sensor_read(
 		TEMP_SENSOR_ID_BY_DEV(DT_NODELABEL(charger_bc12_port1)),
 		&charger_temp);
 
-	temp_sensor_read(
-		TEMP_SENSOR_ID_BY_DEV(DT_NODELABEL(temp_sensor_1_thermistor)),
-		&lcd_temp);
-
 	charger_temp_c = K_TO_C(charger_temp);
-	lcd_temp_c = K_TO_C(lcd_temp);
 
-	if ((charger_temp_c >= 125) || (charger_temp_c <= -30))
-		return 0;
-
-	/*
-	 * thermals[5] is the average of the previous 5 calculations.
-	 * charger_temp_ave is the calculated average of the previous
-	 * 4 times plus this time.
-	 */
 	thermals[thermal_cyc] = charger_temp_c;
 	thermal_cyc = (thermal_cyc + 1) % 5;
 	for (int i = 0; i < 5; i++)
 		charger_temp_sum += thermals[i];
 
+	charger_temp_ave_bef = charger_temp_ave;
 	charger_temp_ave = (charger_temp_sum + 2.5) / 5;
-	if (chipset_state != POWER_S0) {
-		if ((curr->batt.flags & BATT_FLAG_BAD_TEMPERATURE) ||
-		    (charger_temp_ave > 79))
-			temp_zone = TEMP_OUT_OF_RANGE;
-		else
-			temp_zone = TEMP_ZONE_0;
-	} else {
-		if (lcd_temp_c >= 43) {
-			if (thermals[5] <= charger_temp_ave) {
-				if ((curr->batt.flags &
-				     BATT_FLAG_BAD_TEMPERATURE) ||
-				    (charger_temp_ave > 79))
-					temp_zone = TEMP_OUT_OF_RANGE;
-				else if (charger_temp_ave >= 56)
-					temp_zone = TEMP_ZONE_3;
-				else if (charger_temp_ave >= 53)
-					temp_zone = TEMP_ZONE_2;
-				else if (charger_temp_ave >= 50)
-					temp_zone = TEMP_ZONE_1;
-				else
-					temp_zone = TEMP_ZONE_0;
-			} else {
-				if ((curr->batt.flags &
-				     BATT_FLAG_BAD_TEMPERATURE) ||
-				    (charger_temp_ave > 79))
-					temp_zone = TEMP_OUT_OF_RANGE;
-				else if (charger_temp_ave < 45)
-					temp_zone = TEMP_ZONE_0;
-				else if (charger_temp_ave < 48)
-					temp_zone = TEMP_ZONE_1;
-				else if (charger_temp_ave < 52)
-					temp_zone = TEMP_ZONE_2;
-				else
-					temp_zone = TEMP_ZONE_3;
-			}
+
+	if ((charger_temp_ave - charger_temp_ave_bef) > 0) {
+		temperature_increase = 1;
+	} else if ((charger_temp_ave - charger_temp_ave_bef) < 0) {
+		temperature_increase = 0;
+	}
+
+	if (thermals[4]) {
+		if (temperature_increase) {
+			if (charger_temp_ave >= 65 && temp_zone <= TEMP_ZONE_2)
+				clear_remaining_array(time, ROW_NUM, 0, 2);
+			else if (charger_temp_ave >= 53 &&
+				 temp_zone <= TEMP_ZONE_1)
+				clear_remaining_array(time, ROW_NUM, 0, 1);
 		} else {
-			if ((curr->batt.flags & BATT_FLAG_BAD_TEMPERATURE) ||
-			    (charger_temp_ave > 79))
-				temp_zone = TEMP_OUT_OF_RANGE;
-			else
-				temp_zone = TEMP_ZONE_0;
+			if (charger_temp_ave < 48 && temp_zone >= TEMP_ZONE_1)
+				clear_remaining_array(time, ROW_NUM, 1, 0);
+			else if (charger_temp_ave < 60 &&
+				 temp_zone >= TEMP_ZONE_2)
+				clear_remaining_array(time, ROW_NUM, 1, 1);
 		}
 	}
-	thermals[5] = charger_temp_ave;
+
+	for (int i = 0; i < COL_NUM; i++) {
+		if (time[0][i] == 3) {
+			temp_zone = i;
+			time[0][i] = 0;
+		} else if (time[1][i] == 3) {
+			temp_zone = i;
+			time[1][i] = 0;
+		}
+	}
 
 	switch (temp_zone) {
 	case TEMP_ZONE_0:
-		current = CHARGING_CURRENT_MA_SAFE;
+		/* No current limit */
+		current = -1;
 		break;
 	case TEMP_ZONE_1:
-		current = 2500;
+		current = 2000;
 		break;
 	case TEMP_ZONE_2:
-		current = 1800;
+		current = 500;
 		break;
-	case TEMP_ZONE_3:
-		current = 1000;
-		break;
-	case TEMP_OUT_OF_RANGE:
-		/* Don't charge if outside of allowable temperature range */
-		current = 0;
+	}
+}
+DECLARE_HOOK(HOOK_SECOND, average_tempature, HOOK_PRIO_DEFAULT);
+
+int charger_profile_override(struct charge_state_data *curr)
+{
+	enum power_state chipset_state;
+	/*
+	 * Precharge must be executed when communication is failed on
+	 * dead battery.
+	 */
+	if (!(curr->batt.flags & BATT_FLAG_RESPONSIVE))
+		return 0;
+
+	/* Don't charge if outside of allowable temperature range */
+	if (current == 0) {
 		curr->batt.flags &= ~BATT_FLAG_WANT_CHARGE;
 		if (curr->state != ST_DISCHARGE)
 			curr->state = ST_IDLE;
-		break;
 	}
 
-	curr->requested_current = MIN(curr->requested_current, current);
+	/* This policy only execute in state s0*/
+	chipset_state = power_get_state();
+
+	if (chipset_state != POWER_S0)
+		return 0;
+
+	if (current >= 0)
+		curr->requested_current = MIN(curr->requested_current, current);
 
 	return 0;
 }
