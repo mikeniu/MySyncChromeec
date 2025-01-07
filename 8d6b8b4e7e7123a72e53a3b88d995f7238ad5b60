@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f811e21c_0c5784e3",
+        "filename": "zephyr/test/hwtest/Kconfig",
+        "patchSetId": 23
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2025-01-07T23:47:11Z",
+      "side": 1,
+      "message": "Is this needed or was it just copied from `sbrk`? It looks like `exit.c` is only calling Zephyr functions, so I don\u0027t think it depends on any EC functionality?",
+      "range": {
+        "startLine": 47,
+        "startChar": 12,
+        "endLine": 47,
+        "endChar": 29
+      },
+      "revId": "8d6b8b4e7e7123a72e53a3b88d995f7238ad5b60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d5778b70_10fdc435",
         "filename": "zephyr/test/hwtest/Kconfig",
         "patchSetId": 23
