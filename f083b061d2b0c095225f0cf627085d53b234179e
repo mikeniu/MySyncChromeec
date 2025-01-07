@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b34d317_27a4bf1e",
+        "filename": "zephyr/test/hwtest/CMakeLists.txt",
+        "patchSetId": 11
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-01-07T16:05:51Z",
+      "side": 1,
+      "message": "Is this a C++ test?",
+      "range": {
+        "startLine": 15,
+        "startChar": 58,
+        "endLine": 15,
+        "endChar": 60
+      },
+      "revId": "f083b061d2b0c095225f0cf627085d53b234179e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
