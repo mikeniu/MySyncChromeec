@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ed693e2_8c63c22c",
+        "filename": "zephyr/program/fpmcu/testcase.yaml",
+        "patchSetId": 23
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2025-01-07T23:45:35Z",
+      "side": 1,
+      "message": "I think we probably don\u0027t want to define this because we want this test to use the same configuration that we use when building the real Zephyr image. It looks like you have that set to to be [enabled by default if newlib is enabled](https://crrev.com/c/6112740/15/zephyr/libc/Kconfig), so it should be enabled automatically for this test. (If someone changes the default to \"n\" for `CONFIG_LIBC_EXIT`, then we want this test to fail.)",
+      "range": {
+        "startLine": 46,
+        "startChar": 4,
+        "endLine": 46,
+        "endChar": 24
+      },
+      "revId": "8d6b8b4e7e7123a72e53a3b88d995f7238ad5b60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5778b70_10fdc435",
+        "filename": "zephyr/test/hwtest/Kconfig",
+        "patchSetId": 23
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2025-01-07T23:45:35Z",
+      "side": 1,
+      "message": "verifies",
+      "range": {
+        "startLine": 49,
+        "startChar": 12,
+        "endLine": 49,
+        "endChar": 18
+      },
+      "revId": "8d6b8b4e7e7123a72e53a3b88d995f7238ad5b60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "022b2f06_af45a912",
+        "filename": "zephyr/test/hwtest/Kconfig",
+        "patchSetId": 23
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2025-01-07T23:45:35Z",
+      "side": 1,
+      "message": "the",
+      "range": {
+        "startLine": 49,
+        "startChar": 21,
+        "endLine": 49,
+        "endChar": 22
+      },
+      "revId": "8d6b8b4e7e7123a72e53a3b88d995f7238ad5b60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
