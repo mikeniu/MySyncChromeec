@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4a6c6f3_7839ed81",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-01-08T21:52:48Z",
+      "side": 1,
+      "message": "This test depends on:\n- Panic data implementation in EC\n- Calling `exit()` from test thread reboots the system.\n\n**I\u0027m not saying that this is bad** - it depends on what you expect from this test.\n\nIf you want a pure Zephyr way to determine if the system panicked expecteadly (or unexpecteadly) you can define `k_sys_fatal_error_handler()` function here, take a look at [this example](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/release-firmware/fpmcu-bloonchipper/ec/zephyr/test/fingerprint/drivers/fpc1025/src/fpc1025.c;l\u003d267-278;drc\u003de4e7fda84b119c6fc8af37c399e87fb2350e1863).",
+      "range": {
+        "startLine": 25,
+        "startChar": 12,
+        "endLine": 25,
+        "endChar": 27
+      },
+      "revId": "ee643ec59021565636d3df28e08079b3504fc333",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "920a19d9_271ae66a",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-01-08T21:52:48Z",
+      "side": 1,
+      "message": "Could you explain why panicking in `abort()` is expected?",
+      "range": {
+        "startLine": 29,
+        "startChar": 33,
+        "endLine": 29,
+        "endChar": 38
+      },
+      "revId": "ee643ec59021565636d3df28e08079b3504fc333",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
