@@ -73,7 +73,6 @@ if(DEFINED CONFIG_BOARD_PUJJO)
 			"pujjo/src/hdmi.c"
 			"pujjo/src/form_factor.c"
 	)
-	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FAN "pujjo/src/fan.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "pujjo/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "pujjo/src/charger.c")
 endif()
