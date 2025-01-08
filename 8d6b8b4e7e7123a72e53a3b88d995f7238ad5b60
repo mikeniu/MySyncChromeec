@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "859bb254_507a48e8",
+        "filename": "zephyr/program/fpmcu/testcase.yaml",
+        "patchSetId": 23
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-08T04:42:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ed693e2_8c63c22c",
+      "range": {
+        "startLine": 46,
+        "startChar": 4,
+        "endLine": 46,
+        "endChar": 24
+      },
+      "revId": "8d6b8b4e7e7123a72e53a3b88d995f7238ad5b60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f811e21c_0c5784e3",
@@ -37,6 +61,30 @@
       "writtenOn": "2025-01-07T23:47:11Z",
       "side": 1,
       "message": "Is this needed or was it just copied from `sbrk`? It looks like `exit.c` is only calling Zephyr functions, so I don\u0027t think it depends on any EC functionality?",
+      "range": {
+        "startLine": 47,
+        "startChar": 12,
+        "endLine": 47,
+        "endChar": 29
+      },
+      "revId": "8d6b8b4e7e7123a72e53a3b88d995f7238ad5b60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2789b3ce_3b633f5c",
+        "filename": "zephyr/test/hwtest/Kconfig",
+        "patchSetId": 23
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-08T04:42:10Z",
+      "side": 1,
+      "message": "Done.\nI believe this is no longer needed. Previously, I was using panic_printf",
+      "parentUuid": "f811e21c_0c5784e3",
       "range": {
         "startLine": 47,
         "startChar": 12,
@@ -83,6 +131,54 @@
       "writtenOn": "2025-01-07T23:45:35Z",
       "side": 1,
       "message": "the",
+      "range": {
+        "startLine": 49,
+        "startChar": 21,
+        "endLine": 49,
+        "endChar": 22
+      },
+      "revId": "8d6b8b4e7e7123a72e53a3b88d995f7238ad5b60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94dc9bc6_b5b3a370",
+        "filename": "zephyr/test/hwtest/Kconfig",
+        "patchSetId": 23
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-08T04:42:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5778b70_10fdc435",
+      "range": {
+        "startLine": 49,
+        "startChar": 12,
+        "endLine": 49,
+        "endChar": 18
+      },
+      "revId": "8d6b8b4e7e7123a72e53a3b88d995f7238ad5b60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3160778_b8d8ce1a",
+        "filename": "zephyr/test/hwtest/Kconfig",
+        "patchSetId": 23
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-08T04:42:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "022b2f06_af45a912",
       "range": {
         "startLine": 49,
         "startChar": 21,
