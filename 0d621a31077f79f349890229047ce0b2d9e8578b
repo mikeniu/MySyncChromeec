@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1b702b0_7971d4a5",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-01-09T11:16:26Z",
+      "side": 1,
+      "message": "I think that calling `exit()` in the test thread is not the best idea. I took a look at the [mechanics](https://github.com/zephyrproject-rtos/zephyr/blob/d78952b7ba930e20910c2b6fdac49cc8dc4f709e/subsys/testsuite/ztest/src/ztest.c#L666) of running tests and by calling `exit()`, the test will terminate with `ZTEST_RESULT_PENDING` instead of `ZTEST_RESULT_PASS` which is wrong. We get pass result only because `ret` is initialized with `TC_PASS`.\n\nI think that the test should spawn a new thread. See [test_threads_cancel_abort.c](https://github.com/zephyrproject-rtos/zephyr/blob/d9eed167d06bae286199cb61c7c9318a6f55ca0d/tests/kernel/threads/thread_apis/src/test_threads_cancel_abort.c) if you need some inspiration.",
+      "range": {
+        "startLine": 20,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 9
+      },
+      "revId": "0d621a31077f79f349890229047ce0b2d9e8578b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
