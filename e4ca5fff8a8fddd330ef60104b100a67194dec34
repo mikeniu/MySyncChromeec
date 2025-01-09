@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d481959_524f386c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1160139
+      },
+      "writtenOn": "2025-01-09T03:07:27Z",
+      "side": 1,
+      "message": "```\nFAILED: monitor_bin/npcx_monitor.elf \n: \u0026\u0026 ccache \"/home/chrome-bot/.cache/bazel/_bazel_chrome-bot/e517ea39ecb43168812d1d21bda62f96/external/_main~ec_deps~ec-coreboot-sdk-arm-eabi/bin/arm-eabi-gcc\"  -nostdlib -g -mthumb -Wl,-T,/mnt/host/source/src/platform/ec/build/zephyr/npcx_monitor/modules/ec/zephyr/shim/chip/npcx/npcx_monitor/npcx_monitor.ld -gdwarf-4 -Wl,--no-warn-rwx-segments monitor_bin/CMakeFiles/npcx_monitor.dir/npcx_monitor.c.obj -o monitor_bin/npcx_monitor.elf   \u0026\u0026 :\n/home/chrome-bot/.cache/bazel/_bazel_chrome-bot/e517ea39ecb43168812d1d21bda62f96/external/_main~ec_deps~ec-coreboot-sdk-arm-eabi/bin/../lib/gcc/arm-eabi/14.2.0/../../../../arm-eabi/bin/ld: monitor_bin/npcx_monitor.elf section `.bss.__gcov0.sspi_flash_verify\u0027 will not fit in region `CODERAM\u0027\n/home/chrome-bot/.cache/bazel/_bazel_chrome-bot/e517ea39ecb43168812d1d21bda62f96/external/_main~ec_deps~ec-coreboot-sdk-arm-eabi/bin/../lib/gcc/arm-eabi/14.2.0/../../../../arm-eabi/bin/ld: region `CODERAM\u0027 overflowed by 464 bytes\n/home/chrome-bot/.cache/bazel/_bazel_chrome-bot/e517ea39ecb43168812d1d21bda62f96/external/_main~ec_deps~ec-coreboot-sdk-arm-eabi/bin/../lib/gcc/arm-eabi/14.2.0/../../../../arm-eabi/bin/ld: monitor_bin/CMakeFiles/npcx_monitor.dir/npcx_monitor.c.obj:(.data..LPBX0+0x14): undefined reference to `__gcov_merge_add\u0027\n/home/chrome-bot/.cache/bazel/_bazel_chrome-bot/e517ea39ecb43168812d1d21bda62f96/external/_main~ec_deps~ec-coreboot-sdk-arm-eabi/bin/../lib/gcc/arm-eabi/14.2.0/../../../../arm-eabi/bin/ld: monitor_bin/CMakeFiles/npcx_monitor.dir/npcx_monitor.c.obj: in function `_sub_I_00100_0\u0027:\n/mnt/host/source/src/platform/ec/build/zephyr/npcx_monitor/modules/ec/zephyr/shim/chip/npcx/npcx_monitor/npcx_monitor.c:364:(.text._sub_I_00100_0+0x6): undefined reference to `__gcov_init\u0027\n/home/chrome-bot/.cache/bazel/_bazel_chrome-bot/e517ea39ecb43168812d1d21bda62f96/external/_main~ec_deps~ec-coreboot-sdk-arm-eabi/bin/../lib/gcc/arm-eabi/14.2.0/../../../../arm-eabi/bin/ld: monitor_bin/CMakeFiles/npcx_monitor.dir/npcx_monitor.c.obj: in function `_sub_D_00100_1\u0027:\n/mnt/host/source/src/platform/ec/build/zephyr/npcx_monitor/modules/ec/zephyr/shim/chip/npcx/npcx_monitor/npcx_monitor.c:364:(.text._sub_D_00100_1+0x4): undefined reference to `__gcov_exit\u0027\ncollect2: error: ld returned 1 exit status\n```",
+      "parentUuid": "d2cd23e4_b3ee2a90",
+      "revId": "e4ca5fff8a8fddd330ef60104b100a67194dec34",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bfc2a547_4622e75c",
