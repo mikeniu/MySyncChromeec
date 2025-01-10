@@ -70,6 +70,30 @@
       },
       "revId": "0d621a31077f79f349890229047ce0b2d9e8578b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "329542a2_e1fe900b",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-10T07:29:44Z",
+      "side": 1,
+      "message": "another question, why it does not progress to the next step `test_panic_data` when we use `k_thread_abort()` for `_exit`? My understanding is the multi-step testing will progress to the next step even if reboot was not triggered?",
+      "parentUuid": "439d07d9_cec1b87f",
+      "range": {
+        "startLine": 20,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 9
+      },
+      "revId": "0d621a31077f79f349890229047ce0b2d9e8578b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
