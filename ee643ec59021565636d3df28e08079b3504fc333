@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4b0f9e40_1954067d",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-10T06:55:55Z",
+      "side": 1,
+      "message": "is it because `k_sys_fatal_error_handler()` is designed to be invoked by the system when a fatal error occurs, rather than being called directly?",
+      "parentUuid": "5640fbad_4b3a6aac",
+      "range": {
+        "startLine": 25,
+        "startChar": 12,
+        "endLine": 25,
+        "endChar": 27
+      },
+      "revId": "ee643ec59021565636d3df28e08079b3504fc333",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "920a19d9_271ae66a",
         "filename": "zephyr/test/hwtest/src/exit.c",
         "patchSetId": 25
