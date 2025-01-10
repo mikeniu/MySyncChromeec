@@ -122,6 +122,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d1c99cb3_35d398a9",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-10T23:55:20Z",
+      "side": 1,
+      "message": "I tried to create my own `k_sys_fatal_error_handler` function implementation. However, I was getting a linker error that another version exists in `zephyr/shim/src/panic.c`. Even when I enabled `CONFIG_ZTEST_FATAL_HOOK` in the `testcase.yaml`, I was still getting the duplicate error, which is bizzare. Do you have any suggestion on how to turn of the panic.c version. Can we use the panic.c version?",
+      "parentUuid": "d4746993_26524362",
+      "range": {
+        "startLine": 25,
+        "startChar": 12,
+        "endLine": 25,
+        "endChar": 27
+      },
+      "revId": "ee643ec59021565636d3df28e08079b3504fc333",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "920a19d9_271ae66a",
         "filename": "zephyr/test/hwtest/src/exit.c",
         "patchSetId": 25
