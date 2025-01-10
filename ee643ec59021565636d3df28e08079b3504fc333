@@ -98,6 +98,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d4746993_26524362",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-10T19:17:19Z",
+      "side": 1,
+      "message": "it looks this is the path when the thread is essential:\n\n[z_impl_k_thread_abort](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyr/main/kernel/sched.c;l\u003d1347?q\u003dz_impl_k_thread_abort\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch:src%2Fthird_party%2Fzephyr%2Fmain%2F#:~:text\u003d1346-,1347,-1348) calls `z_thread_abort(thread);`\n\n[z_thread_abort](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyr/main/kernel/sched.c;l\u003d1327?q\u003dsrc%2Fthird_party%2Fzephyr%2Fmain%20z_thread_abort\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch#:~:text\u003d1326-,1327,-1328) calls `k_panic` if the thread is essential.\n\n[k_panic](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyr/main/include/zephyr/kernel.h;l\u003d6150?q\u003dsrc%2Fthird_party%2Fzephyr%2Fmain%20k_panic\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch#:~:text\u003d6149-,6150,-6151) calls `z_except_reason`\n\n[z_except_reason](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyr/main/include/zephyr/kernel.h;l\u003d6119?q\u003dthird_party%2Fzephyr%2Fmain%20z_except_reason\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch#:~:text\u003d6118-,6119,-6120) calls `z_fatal_error`\n\n[z_fatal_arror](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyr/main/kernel/fatal.c;l\u003d85?q\u003dsrc%2Fthird_party%2Fzephyr%2Fmain%20z_fatal_error\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch#:~:text\u003d84-,85,-86) calls `k_sys_fatal_error_handler`",
+      "parentUuid": "6ff616c8_a1860686",
+      "range": {
+        "startLine": 25,
+        "startChar": 12,
+        "endLine": 25,
+        "endChar": 27
+      },
+      "revId": "ee643ec59021565636d3df28e08079b3504fc333",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "920a19d9_271ae66a",
         "filename": "zephyr/test/hwtest/src/exit.c",
         "patchSetId": 25
