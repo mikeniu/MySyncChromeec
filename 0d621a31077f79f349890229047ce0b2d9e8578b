@@ -46,6 +46,30 @@
       },
       "revId": "0d621a31077f79f349890229047ce0b2d9e8578b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "439d07d9_cec1b87f",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-10T06:29:57Z",
+      "side": 1,
+      "message": "I can potentially try to define what was included in the [src/third_party/zephyr/main tests_thread_apis.h](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyr/main/tests/kernel/threads/thread_apis/src/tests_thread_apis.h?q\u003dsrc%2Fthird_party%2Fzephyr%2Fmain%20tests_thread_apis.h\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch) header. I will try it tomorrow.\n\n```\n#include \u003czephyr/kernel.h\u003e\n\n\n#define STACK_SIZE (512 + CONFIG_TEST_EXTRA_STACK_SIZE)\nK_THREAD_STACK_DECLARE(tstack, STACK_SIZE);\nsize_t tstack_size;\nstruct k_thread tdata;\n```\n\nI believe this is all what is needed to create a thread. I can also try to test an non-essential thread abort like what is done in the unit test `test_threads_cancel_abort`",
+      "parentUuid": "fe73c326_e2f33b61",
+      "range": {
+        "startLine": 20,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 9
+      },
+      "revId": "0d621a31077f79f349890229047ce0b2d9e8578b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
