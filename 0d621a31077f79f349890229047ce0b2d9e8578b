@@ -142,6 +142,30 @@
       },
       "revId": "0d621a31077f79f349890229047ce0b2d9e8578b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e92ea00_7d5c87ec",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-10T22:39:18Z",
+      "side": 1,
+      "message": "actually, no need to repeat test_exit:\n```\n/* Copyright 2025 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n\n#include \"multistep_test.h\"\n#include \"panic.h\"\n#include \"system.h\"\n\n#include \u003cstdlib.h\u003e\n\n#include \u003czephyr/kernel.h\u003e\n#include \u003czephyr/logging/log.h\u003e\n#include \u003czephyr/ztest.h\u003e\n\n\n\n#define STACK_SIZE (512 + CONFIG_TEST_EXTRA_STACK_SIZE)\nstatic struct k_thread tdata;\nstatic K_THREAD_STACK_DEFINE(tstack, STACK_SIZE);\n\nstatic ZTEST_BMEM int execute_flag;\n\nLOG_MODULE_REGISTER(exit_hw_test, LOG_LEVEL_INF);\n\nstatic void thread_call_exit(void *p1, void *p2, void *p3)\n{\n\texecute_flag \u003d 1;\n\tLOG_INF(\"Calling exit.\\n\");\n\tcflush();\n\n\texit(1);\n\t/* Should never reach this. */\n\texecute_flag \u003d 2;\n\tzassert_true(1 \u003d\u003d 0);\n}\n\nstatic void test_exit(void)\n{\n\tLOG_INF(\"I am in test_exit.\\n\");\n\tcflush();\n\texecute_flag \u003d 0;\n\tk_thread_create(\u0026tdata, tstack, STACK_SIZE, thread_call_exit, NULL,\n\t\t\tNULL, NULL, 0, K_USER, K_NO_WAIT);\n\tk_msleep(100);\n\t/**TESTPOINT: spawned thread executed but abort itself*/\n\tLOG_INF(\"I am in test_exit before assert.\\n\");\n\tcflush();\n\tzassert_true(execute_flag \u003d\u003d 1);\n\n\tLOG_INF(\"I am in test_exit before creating an essential thread.\\n\");\n\tcflush();\n\n\tk_thread_create(\u0026tdata, tstack, STACK_SIZE, thread_call_exit, NULL,\n\t\t\tNULL, NULL, 0, K_ESSENTIAL, K_NO_WAIT);\n\tk_msleep(100);\n\t/* Should never reach this. */\n\texecute_flag \u003d 2;\n\tzassert_true(1 \u003d\u003d 0);\n}\n\nstatic void test_panic_data(void)\n{\n\tLOG_INF(\"I am checking the test_panic_data.\\n\");\n\tcflush();\n\tzassert_true(execute_flag \u003d\u003d 0);\n}\n\n//static ZTEST_DMEM volatile int expected_reason \u003d -1;\n\n/*void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *pEsf)\n{\n\tprintk(\"Caught system error -- reason %d\\n\", reason);\n\n\tztest_test_pass();\n\n}*/\nstatic void (*test_steps[])(void) \u003d { test_exit, test_panic_data };\n\nMULTISTEP_TEST(exit, test_steps)\n```",
+      "parentUuid": "9d36e227_fbdb9fc1",
+      "range": {
+        "startLine": 20,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 9
+      },
+      "revId": "0d621a31077f79f349890229047ce0b2d9e8578b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
