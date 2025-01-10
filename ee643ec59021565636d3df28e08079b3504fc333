@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5640fbad_4b3a6aac",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-10T00:39:44Z",
+      "side": 1,
+      "message": "I was looking at the [k_sys_fatal_error_handler](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyr/main/include/zephyr/fatal.h;l\u003d68?q\u003dsrc%2Fthird_party%2Fzephyr%2Fmain%20k_sys_fatal_error_handler\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch#:~:text\u003d67-,68,-69). It looks to me like a function that causes the system to panic based on a reason that you give it. Is my understanding correct? \nIn the [drivers.fpc1025.fpc1025](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/fingerprint/drivers/fpc1025/src/fpc1025.c;l\u003d267?q\u003dplatform%2Fec%20%20k_sys_fatal_error_handler\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch#:~:text\u003d266-,267,-268), I do not see where this function is called. You are just overriding the weakly declared function. Can you elaborate on how this function is being called?",
+      "parentUuid": "e4a6c6f3_7839ed81",
+      "range": {
+        "startLine": 25,
+        "startChar": 12,
+        "endLine": 25,
+        "endChar": 27
+      },
+      "revId": "ee643ec59021565636d3df28e08079b3504fc333",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "920a19d9_271ae66a",
         "filename": "zephyr/test/hwtest/src/exit.c",
         "patchSetId": 25
@@ -37,6 +61,30 @@
       "writtenOn": "2025-01-08T21:52:48Z",
       "side": 1,
       "message": "Could you explain why panicking in `abort()` is expected?",
+      "range": {
+        "startLine": 29,
+        "startChar": 33,
+        "endLine": 29,
+        "endChar": 38
+      },
+      "revId": "ee643ec59021565636d3df28e08079b3504fc333",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b17370a_584b77c1",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-10T00:39:44Z",
+      "side": 1,
+      "message": "This was working fine when we used `abort` in the definition of `_exit`. Now, as I mentioned above, it does not seem that this function is being called because the system is not panicing based on the current test implementation.",
+      "parentUuid": "920a19d9_271ae66a",
       "range": {
         "startLine": 29,
         "startChar": 33,
