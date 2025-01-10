@@ -74,6 +74,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6ff616c8_a1860686",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-01-10T10:54:20Z",
+      "side": 1,
+      "message": "\u003e It looks to me like a function that causes the system to panic based on a reason that you give it. Is my understanding correct?\n\nNo. From the link you provided:\n```\n/**\n * @brief Fatal error policy handler\n *\n * This function is not invoked by application code, but is declared as a\n * weak symbol so that applications may introduce their own policy.\n *\n * The default implementation of this function halts the system\n * unconditionally. Depending on architecture support, this may be\n * a simple infinite loop, power off the hardware, or exit an emulator.\n *\n * If this function returns, then the currently executing thread will be\n * aborted.\n```\n\nThis function implements fatal error policy. By default it reboots the system, but it can be changed. In test we can use it to detect crashes.\n\nYou can use `z_except_reason()` to panic with some specific error code.\n\n\u003e Can you elaborate on how this function is being called?\n\n\u003e is it because k_sys_fatal_error_handler() is designed to be invoked by the system when a fatal error occurs, rather than being called directly?\n\nYes. Finding path from `k_thread_abort()` to `k_sys_fatal_error_handler()` was left as an exercise for interested reader 😊",
+      "parentUuid": "4b0f9e40_1954067d",
+      "range": {
+        "startLine": 25,
+        "startChar": 12,
+        "endLine": 25,
+        "endChar": 27
+      },
+      "revId": "ee643ec59021565636d3df28e08079b3504fc333",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "920a19d9_271ae66a",
         "filename": "zephyr/test/hwtest/src/exit.c",
         "patchSetId": 25

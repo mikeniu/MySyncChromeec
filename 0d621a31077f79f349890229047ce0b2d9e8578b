@@ -94,6 +94,30 @@
       },
       "revId": "0d621a31077f79f349890229047ce0b2d9e8578b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe03eec7_0697a3ad",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-01-10T10:54:20Z",
+      "side": 1,
+      "message": "\u003e I do not believe the test enters test_panic_data and we used k_thread_abort() function for _exit\n\nYes, this is true and expected.\n\n\u003e  I believe we should give the new thread a K_ESSENTIAL for priority\n\nYes. Aborting thread with K_ESSENTIAL flag set crashes the kernel. I would also add a second test for non-essential thread.\n\n\u003e However, I do not believe the include is correct.\n\nIt\u0027s [zephyr/kernel.h](https://github.com/zephyrproject-rtos/zephyr/blob/ddd795a028b1a4f9e9fa672e7791b1750f34d690/include/zephyr/kernel.h#L409)\n\n\u003e My understanding is the multi-step testing will progress to the next step even if reboot was not triggered?\n\nNo. You must reboot to go to the next step.\n\n\u003e why it does not progress to the next step\n\nThe steps are only necessary if the test reboots. If the test step returns successfully then we assume that the whole test finished successfully. Think about it like calling `ztest_test_pass()` before all test code was executed.",
+      "parentUuid": "329542a2_e1fe900b",
+      "range": {
+        "startLine": 20,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 9
+      },
+      "revId": "0d621a31077f79f349890229047ce0b2d9e8578b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
