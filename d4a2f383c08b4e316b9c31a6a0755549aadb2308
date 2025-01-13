@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "65b5c419_3ca45a85",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1132339
+      },
+      "writtenOn": "2025-01-13T10:51:53Z",
+      "side": 1,
+      "message": "I rebase the CL and make sure it can be built without errors in my local build.  \nNo idea why it encountered the error in Commit Queue.",
+      "revId": "d4a2f383c08b4e316b9c31a6a0755549aadb2308",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
