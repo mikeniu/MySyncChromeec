@@ -146,6 +146,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ae52340d_633cfcf9",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-13T16:21:10Z",
+      "side": 1,
+      "message": "If I modify the `testcase.yaml` file as below:\n```\nexit:\n    extra_configs:\n    - CONFIG_HW_TEST_EXIT\u003dy\n    - CONFIG_ZTEST_FATAL_HOOK\u003dy\n    extra_conf_files:\n    - prj_hw_tests.conf\n```\nI do not enter the `k_sys_fatal_error_handler` inside `zephyr/shim/src/panic.c`. However, it still complains that `ld.lld: error: duplicate symbol: k_sys_fatal_error_handler` if I define the function inside the `exit.c` test.",
+      "parentUuid": "d1c99cb3_35d398a9",
+      "range": {
+        "startLine": 25,
+        "startChar": 12,
+        "endLine": 25,
+        "endChar": 27
+      },
+      "revId": "ee643ec59021565636d3df28e08079b3504fc333",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "920a19d9_271ae66a",
         "filename": "zephyr/test/hwtest/src/exit.c",
         "patchSetId": 25
