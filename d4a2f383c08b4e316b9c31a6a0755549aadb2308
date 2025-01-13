@@ -34,6 +34,24 @@
       "parentUuid": "65b5c419_3ca45a85",
       "revId": "d4a2f383c08b4e316b9c31a6a0755549aadb2308",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62f08b80_59ad2fab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2025-01-13T21:11:30Z",
+      "side": 1,
+      "message": "`zmake build --coverage npcx_monitor` will reproduce the failure.  The coverage build shouldn\u0027t actually be linking the binary, so this is odd.",
+      "parentUuid": "cdf6a118_e50a5c2c",
+      "revId": "d4a2f383c08b4e316b9c31a6a0755549aadb2308",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
