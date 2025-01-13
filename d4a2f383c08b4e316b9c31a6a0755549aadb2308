@@ -70,6 +70,23 @@
       "parentUuid": "62f08b80_59ad2fab",
       "revId": "d4a2f383c08b4e316b9c31a6a0755549aadb2308",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb5c0e2d_14d6fd24",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2025-01-13T22:22:13Z",
+      "side": 1,
+      "message": "Try rebasing this cl to parent https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/6172761",
+      "revId": "d4a2f383c08b4e316b9c31a6a0755549aadb2308",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
