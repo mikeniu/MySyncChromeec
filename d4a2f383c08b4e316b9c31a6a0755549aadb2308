@@ -16,6 +16,24 @@
       "message": "I rebase the CL and make sure it can be built without errors in my local build.  \nNo idea why it encountered the error in Commit Queue.",
       "revId": "d4a2f383c08b4e316b9c31a6a0755549aadb2308",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cdf6a118_e50a5c2c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1160139
+      },
+      "writtenOn": "2025-01-13T17:44:51Z",
+      "side": 1,
+      "message": "This is the CQ failure, @Wai-hong maybe you have more insight?\n```\nFAILED: monitor_bin/npcx_monitor.elf \n: \u0026\u0026 ccache \"/home/chrome-bot/.cache/bazel/_bazel_chrome-bot/e517ea39ecb43168812d1d21bda62f96/external/_main~ec_deps~ec-coreboot-sdk-arm-eabi/bin/arm-eabi-gcc\"  -nostdlib -g -mthumb -Wl,-T,/mnt/host/source/src/platform/ec/build/zephyr/npcx_monitor/modules/ec/zephyr/shim/chip/npcx/npcx_monitor/npcx_monitor.ld -gdwarf-4 -Wl,--no-warn-rwx-segments monitor_bin/CMakeFiles/npcx_monitor.dir/npcx_monitor.c.obj -o monitor_bin/npcx_monitor.elf   \u0026\u0026 :\n/home/chrome-bot/.cache/bazel/_bazel_chrome-bot/e517ea39ecb43168812d1d21bda62f96/external/_main~ec_deps~ec-coreboot-sdk-arm-eabi/bin/../lib/gcc/arm-eabi/14.2.0/../../../../arm-eabi/bin/ld: monitor_bin/npcx_monitor.elf section `.bss.__gcov0.sspi_flash_verify\u0027 will not fit in region `CODERAM\u0027\n/home/chrome-bot/.cache/bazel/_bazel_chrome-bot/e517ea39ecb43168812d1d21bda62f96/external/_main~ec_deps~ec-coreboot-sdk-arm-eabi/bin/../lib/gcc/arm-eabi/14.2.0/../../../../arm-eabi/bin/ld: region `CODERAM\u0027 overflowed by 464 bytes\n/home/chrome-bot/.cache/bazel/_bazel_chrome-bot/e517ea39ecb43168812d1d21bda62f96/external/_main~ec_deps~ec-coreboot-sdk-arm-eabi/bin/../lib/gcc/arm-eabi/14.2.0/../../../../arm-eabi/bin/ld: monitor_bin/CMakeFiles/npcx_monitor.dir/npcx_monitor.c.obj:(.data..LPBX0+0x14): undefined reference to `__gcov_merge_add\u0027\n/home/chrome-bot/.cache/bazel/_bazel_chrome-bot/e517ea39ecb43168812d1d21bda62f96/external/_main~ec_deps~ec-coreboot-sdk-arm-eabi/bin/../lib/gcc/arm-eabi/14.2.0/../../../../arm-eabi/bin/ld: monitor_bin/CMakeFiles/npcx_monitor.dir/npcx_monitor.c.obj: in function `_sub_I_00100_0\u0027:\n```",
+      "parentUuid": "65b5c419_3ca45a85",
+      "revId": "d4a2f383c08b4e316b9c31a6a0755549aadb2308",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
