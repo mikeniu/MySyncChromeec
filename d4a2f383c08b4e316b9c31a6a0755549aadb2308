@@ -52,6 +52,24 @@
       "parentUuid": "cdf6a118_e50a5c2c",
       "revId": "d4a2f383c08b4e316b9c31a6a0755549aadb2308",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f12ae96_85ce7b1b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2025-01-13T21:23:56Z",
+      "side": 1,
+      "message": "I think that `zephyr/shim/chip/npcx/npcx_monitor/CMakeLists.txt` needs `if (NOT DEFINED CONFIG_COVERAGE)` and `endif()` around the `generate_npcx_monitor` target",
+      "parentUuid": "62f08b80_59ad2fab",
+      "revId": "d4a2f383c08b4e316b9c31a6a0755549aadb2308",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
