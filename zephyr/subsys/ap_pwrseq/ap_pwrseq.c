@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "ap_power_host_sleep.h"
 #include "ap_pwrseq_drv_sm.h"
 
 #include <zephyr/kernel.h>
@@ -191,6 +192,8 @@ static void ap_pwrseq_thread(void *arg, void *unused1, void *unused2)
 			}
 			LOG_INF("%s -> %s", ap_pwrseq_get_state_str(cur_state),
 				ap_pwrseq_get_state_str(new_state));
+
+			ap_power_set_active_wake_mask();
 
 			ap_pwrseq_send_exit_callback(dev, new_state, cur_state);
 
