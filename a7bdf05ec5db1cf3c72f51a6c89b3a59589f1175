@@ -16,6 +16,24 @@
       "message": "This is the log of the test:\n\n```\nDEBUG:Running TESTSUITE libc_exit\nDEBUG:\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\nDEBUG:START - test1_non_essential_thread\nDEBUG:[0.992000] \u003cinf\u003e libc_exit: I am in non_essential_thread.\nDEBUG:\nDEBUG:[0.998000] \u003cinf\u003e libc_exit: Calling exit.\nDEBUG:\nDEBUG:I am in ztest_set_fault_value exited with rc: 1\nDEBUG:[1.036400 MKBP not cleared within threshold, toggling.]\nDEBUG:[1.098000] \u003cinf\u003e libc_exit: I am in non_essential_thread before assert.\nDEBUG:\nDEBUG: PASS - test1_non_essential_thread in 0.113 seconds\nDEBUG:\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\nDEBUG:START - test2_essential_thread\nDEBUG:[1.118000] \u003cinf\u003e libc_exit: I am in essential_thread.\nDEBUG:\nDEBUG:[1.123000] \u003cinf\u003e libc_exit: Calling exit.\nDEBUG:\nDEBUG:I am in ztest_set_fault_value exited with rc: 1\nDEBUG:[1.131000] \u003cerr\u003e os: \u003e\u003e\u003e ZEPHYR FATAL ERROR 4: Kernel panic on CPU 0\nDEBUG:[1.137000] \u003cerr\u003e os: Current thread: 0x20002c58 (unknown)\nDEBUG:I am in ztest_error_hook.cCaught system error -- reason 4 1\nDEBUG:Fatal error expected as part of test case.\nDEBUG:Caught system error -- reason 4\nDEBUG:This is Firas.\nDEBUG:This is Firas again.\nDEBUG:I am in ztest_set_fault_value[1.160000] \u003cerr\u003e os: ***** HARD FAULT *****\nDEBUG:[1.164000] \u003cerr\u003e os:   Fault escalation (see below)\nDEBUG:[1.168000] \u003cerr\u003e os: ARCH_EXCEPT with reason 4\nDEBUG:\nDEBUG:[1.173000] \u003cerr\u003e os: \u003e\u003e\u003e ZEPHYR FATAL ERROR 4: Kernel panic on CPU 0\nDEBUG:[1.179000] \u003cerr\u003e os: Fault during interrupt handling\nDEBUG:\nDEBUG:[1.183000] \u003cerr\u003e os: Current thread: 0x20002c58 (unknown)\nDEBUG:I am in ztest_error_hook.cCaught system error -- reason 4 0\nDEBUG:Fatal error was unexpected, aborting...\nDEBUG:\nDEBUG:*** Booting Zephyr OS build 4.0.99 ***\nDEBUG:\nDEBUG:\nDEBUG:--- UART initialized after reboot ---\nDEBUG:[Image: RO, bloonchipper-0.0.0-2775962 2025-01-15 16:52:49 root@fsammoura-glaptop]\nDEBUG:[Reset cause: watchdog]\nDEBUG:[0.028100 event set 0x0000000000002000]\nDEBUG:[0.033000 hostcmd init 0x0000000000002000]\nDEBUG:[0.038200 event set 0x0000000000800000]\nDEBUG:[0.043100 Inits done]\nDEBUG:[0.046500 Verifying RW image...]\nDEBUG:[0.411800 RW verify OK]\nDEBUG:[1.033100 MKBP not cleared within threshold, toggling.]\nDEBUG:[1.415900 Jumping to image RW (0x00000010)]\nDEBUG:fpmcu:~$\nDEBUG:*** Booting Zephyr OS build 4.0.99 ***\nDEBUG:\nDEBUG:[0.007900 UART initialized after sysjump]\nDEBUG:[Image: RW, bloonchipper-0.0.0-2775962 2025-01-15 16:52:49 root@fsammoura-glaptop]\nDEBUG:[Reset cause: watchdog sysjump]\nDEBUG:[0.031700 event set 0x0000000000002000]\nDEBUG:[0.036500 hostcmd init 0x0000000000002000]\nDEBUG:[0.041700 Inits done]\nDEBUG:[0.045400 FP_SENSOR_SEL: FPC]\nDEBUG:[0.049000] \u003cerr\u003e cros_fingerprint: FPC unknown silicon 0x0000\nDEBUG:[1.036600 MKBP not cleared within threshold, toggling.]\nDEBUG:[2.042900 MKBP: The AP is failing to respond because it is sleeping or off]\nDEBUG:Test timed out\nTest \"exit\": FAILED\n```\n\nFor some reason, it does detect that the fatal error is expected and does all the proper assertions. It still seems that the test reboots again and causes it to fail. I am still investigating why the test reboots. \n\n@patrykd what are your thoughts?",
       "revId": "a7bdf05ec5db1cf3c72f51a6c89b3a59589f1175",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "353aa462_fecc670d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 29
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-16T01:15:58Z",
+      "side": 1,
+      "message": "I still believe that this has to be a multistep test. We need to combine steps 1 \u0026 2. The test has to reboot and this is how the single step fails. Do you agree?",
+      "parentUuid": "4d53dd64_2ff5d97d",
+      "revId": "a7bdf05ec5db1cf3c72f51a6c89b3a59589f1175",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
