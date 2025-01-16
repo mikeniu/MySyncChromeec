@@ -190,6 +190,30 @@
       },
       "revId": "0d621a31077f79f349890229047ce0b2d9e8578b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1b27897_9268c2c0",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-16T00:57:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1056d1f1_3639b67b",
+      "range": {
+        "startLine": 20,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 9
+      },
+      "revId": "0d621a31077f79f349890229047ce0b2d9e8578b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
