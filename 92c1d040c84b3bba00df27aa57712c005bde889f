@@ -16,6 +16,161 @@
       "message": "This is the log with the multistep version:\n```\nDEBUG:Running TESTSUITE libc_exit\nDEBUG:\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\nDEBUG:START - test1_non_essential_thread\nDEBUG: PASS - test1_non_essential_thread in 0.001 seconds\nDEBUG:\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\nDEBUG:START - test_libc_exit\nDEBUG:[1.004000] \u003cinf\u003e libc_exit: I am in non_essential_thread.\nDEBUG:\nDEBUG:[1.009000] \u003cinf\u003e libc_exit: Calling exit.\nDEBUG:\nDEBUG:I am in ztest_set_fault_value exited with rc: 1\nDEBUG:[1.036400 MKBP not cleared within threshold, toggling.]\nDEBUG:[1.109000] \u003cinf\u003e libc_exit: I am in non_essential_thread before assert.\nDEBUG:\nDEBUG:[1.116000] \u003cinf\u003e libc_exit: I am in essential_thread.\nDEBUG:\nDEBUG:[1.121000] \u003cinf\u003e libc_exit: Calling exit.\nDEBUG:\nDEBUG:I am in ztest_set_fault_value exited with rc: 1\nDEBUG:[1.129000] \u003cerr\u003e os: \u003e\u003e\u003e ZEPHYR FATAL ERROR 4: Kernel panic on CPU 0\nDEBUG:[1.135000] \u003cerr\u003e os: Current thread: 0x20002c78 (unknown)\nDEBUG:I am in ztest_error_hook.cCaught system error -- reason 4 1\nDEBUG:Fatal error expected as part of test case.\nDEBUG:Caught system error -- reason 4\nDEBUG:This is Firas.\nDEBUG:This is Firas again.\nDEBUG:I am in ztest_set_fault_value[1.158000] \u003cerr\u003e os: ***** HARD FAULT *****\nDEBUG:[1.162000] \u003cerr\u003e os:   Fault escalation (see below)\nDEBUG:[1.166000] \u003cerr\u003e os: ARCH_EXCEPT with reason 4\nDEBUG:\nDEBUG:[1.170000] \u003cerr\u003e os: \u003e\u003e\u003e ZEPHYR FATAL ERROR 4: Kernel panic on CPU 0\nDEBUG:[1.176000] \u003cerr\u003e os: Fault during interrupt handling\nDEBUG:\nDEBUG:[1.181000] \u003cerr\u003e os: Current thread: 0x20002c78 (unknown)\nDEBUG:I am in ztest_error_hook.cCaught system error -- reason 4 0\nDEBUG:Fatal error was unexpected, aborting...\nDEBUG:\nDEBUG:*** Booting Zephyr OS build 4.0.99 ***\nDEBUG:\nDEBUG:\nDEBUG:--- UART initialized after reboot ---\nDEBUG:[Image: RO, bloonchipper-0.0.0-2775962+ 2025-01-15 17:18:45 root@fsammoura-glaptop]\nDEBUG:[Reset cause: watchdog]\nDEBUG:[0.028200 event set 0x0000000000002000]\nDEBUG:[0.033000 hostcmd init 0x0000000000002000]\nDEBUG:[0.038200 event set 0x0000000000800000]\nDEBUG:[0.043200 Inits done]\nDEBUG:[0.046600 Verifying RW image...]\nDEBUG:[0.411900 RW verify OK]\nDEBUG:[1.033100 MKBP not cleared within threshold, toggling.]\nDEBUG:[1.416100 Jumping to image RW (0x00000010)]\nDEBUG:fpmcu:~$\nDEBUG:*** Booting Zephyr OS build 4.0.99 ***\nDEBUG:\nDEBUG:[0.007900 UART initialized after sysjump]\nDEBUG:[Image: RW, bloonchipper-0.0.0-2775962+ 2025-01-15 17:18:45 root@fsammoura-glaptop]\nDEBUG:[Reset cause: watchdog sysjump]\nDEBUG:[0.031800 event set 0x0000000000002000]\nDEBUG:[0.036600 hostcmd init 0x0000000000002000]\nDEBUG:[0.041800 Inits done]\nDEBUG:Running TESTSUITE libc_exit\nDEBUG:[0.045500 FP_SENSOR_SEL: FPC]\nDEBUG:[0.053000] \u003cerr\u003e cros_fingerprint: FPC unknown silicon 0x0000\nDEBUG:\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\nDEBUG:START - test1_non_essential_thread\nDEBUG: PASS - test1_non_essential_thread in 0.001 seconds\nDEBUG:\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\nDEBUG:START - test_libc_exit\nDEBUG:[0.088000] \u003cinf\u003e libc_exit: I am checking the test_panic_data.\nDEBUG:\nDEBUG: PASS - test_libc_exit in 0.008 seconds\nDEBUG:\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\nDEBUG:TESTSUITE libc_exit succeeded\nDEBUG:[b\u0027fpmcu:~$ \\x1b[9D\\x1b[J[1.036700 MKBP not cleared within threshold, toggling.]\\r\\n\u0027]\nDEBUG:Calling post-test callback\nTest \"exit\": PASSED\n```\nIt rebooted and got to the `test_panic_data`. It also check that the panic was expected, but a reboot happened",
       "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "107895ab_0f2dfc0f",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-01-16T12:08:51Z",
+      "side": 1,
+      "message": "This is also executed by non-essential thread. You can move `ztest_set_fault_valid()` before `k_thread_create()`.",
+      "range": {
+        "startLine": 30,
+        "startChar": 1,
+        "endLine": 30,
+        "endChar": 29
+      },
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c69bcf2e_f26b94fb",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-01-16T12:08:51Z",
+      "side": 1,
+      "message": "Add `ztest_test_pass()` at the end of this function. This will report that test passed.",
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9428c4ab_e6ed14ef",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-01-16T12:08:51Z",
+      "side": 1,
+      "message": "Changing `fault_valid` to `false` while we are in a fault handler is not a good idea. You can move `ztest_set_fault_valid()` before `k_thread_create()`.",
+      "range": {
+        "startLine": 46,
+        "startChar": 1,
+        "endLine": 46,
+        "endChar": 30
+      },
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "edadeefe_1f84e6c4",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-01-16T12:08:51Z",
+      "side": 1,
+      "message": "```suggestion\n\tk_tid_t tid;\n\n\t/* Testing with non-essential thread. */\n```",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 41
+      },
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8637e50e_c5c305f2",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-01-16T12:08:51Z",
+      "side": 1,
+      "message": "Don\u0027t use sleep to synchronize code, please.\n\n```suggestion\n\ttid \u003d k_thread_create(\u0026tdata, tstack, STACK_SIZE, thread_call_exit, NULL,\n\t\t\tNULL, NULL, 0, K_USER, K_NO_WAIT);\n\tk_thread_join(tid, K_FOREVER);\n```",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 61,
+        "endChar": 15
+      },
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0ec5777_20a59ef9",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-01-16T12:08:51Z",
+      "side": 1,
+      "message": "If we should never reach this, why we change this value?",
+      "range": {
+        "startLine": 76,
+        "startChar": 1,
+        "endLine": 76,
+        "endChar": 18
+      },
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa2616b5_5a8ab1b3",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-01-16T12:08:51Z",
+      "side": 1,
+      "message": "```suggestion\n\tztest_test_fail();\n```",
+      "range": {
+        "startLine": 77,
+        "startChar": 1,
+        "endLine": 77,
+        "endChar": 22
+      },
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
