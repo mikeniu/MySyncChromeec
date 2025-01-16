@@ -139,6 +139,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "13e04cc8_8b435251",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-16T21:26:50Z",
+      "side": 1,
+      "message": "There is additional stuff that are run after this:\nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyr/main/kernel/fatal.c;drc\u003d7b6235d697c37d4172757575f08eeb5dec50636e;l\u003d134\nI need to dig in what is causing the crash in the additional code.",
+      "parentUuid": "99c450b7_1f6c81fa",
+      "range": {
+        "startLine": 30,
+        "startChar": 1,
+        "endLine": 30,
+        "endChar": 29
+      },
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c69bcf2e_f26b94fb",
         "filename": "zephyr/test/hwtest/src/exit.c",
         "patchSetId": 30
