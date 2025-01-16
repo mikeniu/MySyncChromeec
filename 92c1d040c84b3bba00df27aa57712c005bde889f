@@ -163,6 +163,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3a346e4c_42e6580d",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-16T21:48:49Z",
+      "side": 1,
+      "message": "per the [comment](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyr/main/kernel/fatal.c;drc\u003d7b6235d697c37d4172757575f08eeb5dec50636e;l\u003d121), \"If the system fatal error handler returns, then kill the faulting thread; a policy decision was made not to hang the system.\"",
+      "parentUuid": "13e04cc8_8b435251",
+      "range": {
+        "startLine": 30,
+        "startChar": 1,
+        "endLine": 30,
+        "endChar": 29
+      },
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c69bcf2e_f26b94fb",
         "filename": "zephyr/test/hwtest/src/exit.c",
         "patchSetId": 30
