@@ -91,6 +91,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ea9950b6_418a70e2",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-01-16T21:00:04Z",
+      "side": 1,
+      "message": "It\u0027s hard to tell anything without seeing code. Have you called `ztest_set_fault_valid(true)` before the second `k_thread_create()`?",
+      "parentUuid": "c65b84b6_519923a1",
+      "range": {
+        "startLine": 30,
+        "startChar": 1,
+        "endLine": 30,
+        "endChar": 29
+      },
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c69bcf2e_f26b94fb",
         "filename": "zephyr/test/hwtest/src/exit.c",
         "patchSetId": 30
