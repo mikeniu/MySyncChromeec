@@ -67,6 +67,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d4b34eb2_4c76dae2",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-16T20:44:05Z",
+      "side": 1,
+      "message": "I still believe that the system panic\u0027ed and it has to reboot. Please let me know if you have other thoughts. It seems it is calling \n[hard_fault](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyr/main/arch/arm/core/cortex_m/fault.c;drc\u003d59dba8ca6be7ee0555d8c4a60ba7b845fc784066;l\u003d717)\n[z_fatal_error](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyr/main/kernel/fatal.c;drc\u003d7b6235d697c37d4172757575f08eeb5dec50636e;l\u003d85)",
+      "parentUuid": "c65b84b6_519923a1",
+      "range": {
+        "startLine": 30,
+        "startChar": 1,
+        "endLine": 30,
+        "endChar": 29
+      },
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c69bcf2e_f26b94fb",
         "filename": "zephyr/test/hwtest/src/exit.c",
         "patchSetId": 30
