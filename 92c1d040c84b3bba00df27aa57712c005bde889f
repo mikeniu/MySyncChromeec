@@ -185,6 +185,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b213de1_ef206401",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-16T22:54:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a346e4c_42e6580d",
+      "range": {
+        "startLine": 30,
+        "startChar": 1,
+        "endLine": 30,
+        "endChar": 29
+      },
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c69bcf2e_f26b94fb",
@@ -216,6 +240,24 @@
       "side": 1,
       "message": "I do not believe it is making any difference. I need to understand where the HARD FAULT is coming from.",
       "parentUuid": "c69bcf2e_f26b94fb",
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3838f06a_92492de2",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-16T22:54:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1debde7f_f63e2be1",
       "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -267,6 +309,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c51561db_9cdad714",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-16T22:54:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4390c0a_d60d1a63",
+      "range": {
+        "startLine": 46,
+        "startChar": 1,
+        "endLine": 46,
+        "endChar": 30
+      },
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "edadeefe_1f84e6c4",
@@ -290,6 +356,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "98176c65_5b2f201d",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-16T22:54:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "edadeefe_1f84e6c4",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 41
+      },
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8637e50e_c5c305f2",
@@ -303,6 +393,30 @@
       "writtenOn": "2025-01-16T12:08:51Z",
       "side": 1,
       "message": "Don\u0027t use sleep to synchronize code, please.\n\n```suggestion\n\ttid \u003d k_thread_create(\u0026tdata, tstack, STACK_SIZE, thread_call_exit, NULL,\n\t\t\tNULL, NULL, 0, K_USER, K_NO_WAIT);\n\tk_thread_join(tid, K_FOREVER);\n```",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 61,
+        "endChar": 15
+      },
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "474cfa5d_b48cf3b9",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-16T22:54:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8637e50e_c5c305f2",
       "range": {
         "startLine": 59,
         "startChar": 0,
@@ -350,6 +464,30 @@
       "side": 1,
       "message": "I will add ztest_test_fail();",
       "parentUuid": "e0ec5777_20a59ef9",
+      "range": {
+        "startLine": 76,
+        "startChar": 1,
+        "endLine": 76,
+        "endChar": 18
+      },
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "363f9e9e_7044c9c3",
+        "filename": "zephyr/test/hwtest/src/exit.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-16T22:54:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "96083f14_0422b501",
       "range": {
         "startLine": 76,
         "startChar": 1,
