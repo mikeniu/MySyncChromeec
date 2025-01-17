@@ -154,6 +154,42 @@
       "parentUuid": "5b65eb76_e246d3dc",
       "revId": "bb3782bfd801ca1cf51a03ea29deb6a5fea5f204",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "475f13b6_77252c1d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 32
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-17T18:07:57Z",
+      "side": 1,
+      "message": "I agree with this assessment. This is what the experimental results show. regarding `ztest_set_fault_valid()`.",
+      "parentUuid": "629ada90_b73476ec",
+      "revId": "bb3782bfd801ca1cf51a03ea29deb6a5fea5f204",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96217a5c_99c968e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 32
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-01-17T18:07:57Z",
+      "side": 1,
+      "message": "I believe the `HARD FAULT` might be happening here because we are stopping an essential thread while it is active. \n\nI tried different scenarios and they all terminated as expected without crash.",
+      "parentUuid": "dfc268c3_fc7d0ae5",
+      "revId": "bb3782bfd801ca1cf51a03ea29deb6a5fea5f204",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
