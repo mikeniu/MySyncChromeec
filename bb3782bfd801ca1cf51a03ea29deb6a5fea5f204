@@ -118,6 +118,42 @@
       "message": "I believe we are seeing the crash because we are trying to abort an essential thread while we are in that thread. Same thing happens when an essential thread ends",
       "revId": "bb3782bfd801ca1cf51a03ea29deb6a5fea5f204",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfc268c3_fc7d0ae5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 32
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-01-17T17:45:30Z",
+      "side": 1,
+      "message": "I suspect this is because essential thread returns from `thread_call_exit()` which means the thread is stopped, which is bad because it\u0027s essential.",
+      "parentUuid": "59a2debe_97e124c3",
+      "revId": "bb3782bfd801ca1cf51a03ea29deb6a5fea5f204",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "629ada90_b73476ec",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 32
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-01-17T17:45:30Z",
+      "side": 1,
+      "message": "\u003e if you move the ztest_set_fault_valid(true); to before the the k_thread_create:\n\nI\u0027ve double checked the behavior of `ztest_set_fault_valid()` and it caches TID of the caller and later it compares if that thread caused the crash.\n\nI know I told you to move it before `k_thread_create()` but it should be moved back before calling `exit(1)`. Please note that we only expect essential thread to crash, so don\u0027t set `ztest_set_fault_valid(true)` for non-essential thread.\n\nYou may also try to increase stack size, maybe it\u0027s too small and that causes issues.",
+      "parentUuid": "5b65eb76_e246d3dc",
+      "revId": "bb3782bfd801ca1cf51a03ea29deb6a5fea5f204",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
