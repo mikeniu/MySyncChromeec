@@ -38,6 +38,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7692a3d2_10e2ac58",
+        "filename": "zephyr/program/fpmcu/testcase.yaml",
+        "patchSetId": 30
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2025-01-17T17:26:04Z",
+      "side": 1,
+      "message": "According to the Kconfig documentation, you need to add this to the test case\n```\n    ignore_faults: true\n```",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 18
+      },
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "107895ab_0f2dfc0f",
         "filename": "zephyr/test/hwtest/src/exit.c",
         "patchSetId": 30
