@@ -184,6 +184,7 @@ static int cmd_get_cam_supported(const struct shell *sh, int argc, char **argv)
                 .command_specific = {
                         /* Convert to 1-indexed port number */
                         (port + 1) & 0x7F,
+
                 },
         };
 
@@ -258,6 +259,76 @@ static int cmd_get_current_cam(const struct shell *sh, int argc, char **argv)
 	return 0;
 }
 
+/**
+ * @brief Run the SET_NEW_CAM UCSI command
+ */
+static int cmd_set_new_cam(const struct shell *sh, int argc, char **argv)
+{
+	const struct device *dev = get_ppm_dev();
+	const struct ucsi_pd_driver *ppm_api;
+	uint8_t port;
+	int rv;
+	char *e;
+
+	if (!dev) {
+		shell_error(sh, "PPM device not ready");
+		return 1;
+	}
+
+	ppm_api = dev->api;
+
+	if (cmd_get_pd_port(sh, dev, argv[1], &port)) {
+		shell_error(sh, "Invalid port");
+		return 1;
+	}
+
+	/* Parse CAM fields */
+
+	uint8_t new_cam = strtoul(argv[2], &e, 0);
+	if (*e) {
+		shell_error(sh, "Invalid new CAM param");
+		return 1;
+	}
+
+	uint32_t am_specific = strtoul(argv[3], &e, 0);
+	if (*e) {
+		shell_error(sh, "Invalid AM-specific param");
+		return 1;
+	}
+
+	uint8_t enter;
+	if (!strncmp(argv[4], "enter", strlen("enter"))) {
+		enter = 1;
+	} else if (!strncmp(argv[4], "exit", strlen("exit"))) {
+		enter = 0;
+	} else {
+		shell_error(sh, "Invalid enter/exit action");
+		return 1;
+	}
+
+	struct ucsi_control_t set_new_cam = {
+                .command = UCSI_SET_NEW_CAM,
+                .data_length = 0,
+                .command_specific = {
+                        /* Convert to 1-indexed port number */
+                        ((port + 1) & 0x7F) | (enter << 7),
+			new_cam,
+			am_specific & 0xFF,
+			(am_specific >> 8) & 0xFF,
+			(am_specific >> 16) & 0xFF,
+			(am_specific >> 24) & 0xFF,
+                },
+        };
+
+	rv = ppm_api->execute_cmd(dev, &set_new_cam, NULL);
+	if (rv < 0) {
+		shell_error(sh, "Failed to execute UCSI command: %d", rv);
+		return 1;
+	}
+
+	return 0;
+}
+
 SHELL_STATIC_SUBCMD_SET_CREATE(
 	sub_ppm_cmds,
 	SHELL_CMD_ARG(
@@ -275,6 +346,11 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 		      "Run GET_CURRENT_CAM UCSI command.\n"
 		      "Usage: ppm get_current_cam <port>",
 		      cmd_get_current_cam, 2, 0),
+	SHELL_CMD_ARG(set_new_cam, NULL,
+		      "Run SET_NEW_CAM UCSI command.\n"
+		      "Usage: ppm set_new_cam <port> <new_cam> <am_specific> "
+		      "<enter|exit>",
+		      cmd_set_new_cam, 5, 0),
 	SHELL_SUBCMD_SET_END);
 
 SHELL_CMD_REGISTER(ppm, &sub_ppm_cmds, "PPM console commands", NULL);
