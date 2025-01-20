@@ -406,3 +406,145 @@ ZTEST(ucsi_ppm_console, test_ppm_get_current_cam__success)
 	zassert_not_null(strstr(outbuffer, "00000000: ff  "));
 	zassert_not_null(strstr(outbuffer, "No active alternate modes"));
 }
+
+ZTEST(ucsi_ppm_console, test_ppm_set_new_cam__bad_port)
+{
+	int rv;
+
+	/* Note: emulated PPM driver returns 1 active port */
+
+	rv = shell_execute_cmd(get_ec_shell(), "ppm set_new_cam");
+	zassert_equal(rv, -EINVAL, "Expected %d, but got %d", -EINVAL, rv);
+	shell_backend_dummy_clear_output(get_ec_shell());
+
+	rv = shell_execute_cmd(get_ec_shell(), "ppm set_new_cam 2 0 0 enter");
+	zassert_equal(rv, -ERANGE, "Expected %d, but got %d", -ERANGE, rv);
+	shell_backend_dummy_clear_output(get_ec_shell());
+
+	rv = shell_execute_cmd(get_ec_shell(), "ppm set_new_cam -1 0 0 enter");
+	zassert_equal(rv, -ERANGE, "Expected %d, but got %d", -ERANGE, rv);
+	shell_backend_dummy_clear_output(get_ec_shell());
+}
+
+ZTEST(ucsi_ppm_console, test_ppm_set_new_cam__bad_new_cam)
+{
+	int rv;
+
+	/* Note: emulated PPM driver returns 1 active port */
+
+	rv = shell_execute_cmd(get_ec_shell(), "ppm set_new_cam 0");
+	zassert_equal(rv, -EINVAL, "Expected %d, but got %d", -EINVAL, rv);
+	shell_backend_dummy_clear_output(get_ec_shell());
+
+	rv = shell_execute_cmd(get_ec_shell(),
+			       "ppm set_new_cam 0 blah 0 enter");
+	zassert_equal(rv, -EINVAL, "Expected %d, but got %d", -EINVAL, rv);
+	shell_backend_dummy_clear_output(get_ec_shell());
+}
+
+ZTEST(ucsi_ppm_console, test_ppm_set_new_cam__bad_am_specific)
+{
+	int rv;
+
+	/* Note: emulated PPM driver returns 1 active port */
+
+	rv = shell_execute_cmd(get_ec_shell(), "ppm set_new_cam 0 0");
+	zassert_equal(rv, -EINVAL, "Expected %d, but got %d", -EINVAL, rv);
+	shell_backend_dummy_clear_output(get_ec_shell());
+
+	rv = shell_execute_cmd(get_ec_shell(),
+			       "ppm set_new_cam 0 0 blah enter");
+	zassert_equal(rv, -EINVAL, "Expected %d, but got %d", -EINVAL, rv);
+	shell_backend_dummy_clear_output(get_ec_shell());
+}
+
+ZTEST(ucsi_ppm_console, test_ppm_set_new_cam__bad_action)
+{
+	int rv;
+
+	/* Note: emulated PPM driver returns 1 active port */
+
+	rv = shell_execute_cmd(get_ec_shell(), "ppm set_new_cam 0 0 0");
+	zassert_equal(rv, -EINVAL, "Expected %d, but got %d", -EINVAL, rv);
+	shell_backend_dummy_clear_output(get_ec_shell());
+
+	rv = shell_execute_cmd(get_ec_shell(), "ppm set_new_cam 0 0 0 blah");
+	zassert_equal(rv, -EINVAL, "Expected %d, but got %d", -EINVAL, rv);
+	shell_backend_dummy_clear_output(get_ec_shell());
+}
+
+#define SET_NEW_CAM_EXPECTED_VAL 0x55
+#define SET_NEW_CAM_EXPECTED_AM_SPECIFIC 0x12345678
+
+static uint8_t set_new_cam_expected_action = 0;
+
+/**
+ * @brief Custom fake to check a new alt mode entry or exit (UCSI_SET_NEW_CAM)
+ */
+static int execute_ucsi_set_new_cam(const struct device *dev,
+				    struct ucsi_control_t *cmd, uint8_t *out)
+{
+	zassert_equal(0, cmd->data_length, "UCSI_SET_NEW_CAM length must be 0");
+	zassert_equal(UCSI_SET_NEW_CAM, cmd->command,
+		      "Command must be UCSI_SET_NEW_CAM");
+
+	/* UCSI ports are 1-indexed */
+	zassert_equal(1, cmd->command_specific[0] & 0x7F,
+		      "Incorrect port sent");
+
+	zassert_equal(set_new_cam_expected_action,
+		      (cmd->command_specific[0] >> 7) & 0x01,
+		      "Entry/exit bit incorrect");
+
+	zassert_equal(SET_NEW_CAM_EXPECTED_VAL, cmd->command_specific[1],
+		      "Wrong new CAM");
+
+	zassert_equal(SET_NEW_CAM_EXPECTED_AM_SPECIFIC,
+		      *((uint32_t *)&cmd->command_specific[2]),
+		      "Wrong AM-specific data");
+
+	/* No response */
+	return 0;
+}
+
+ZTEST(ucsi_ppm_console, test_ppm_set_new_cam__ucsi_fail)
+{
+	int rv;
+
+	/* Report an error running the UCSI command */
+	ppm_driver_mock_execute_cmd_sync_fake.return_val = -1;
+
+	rv = shell_execute_cmd(get_ec_shell(), "ppm set_new_cam 0 0 0 enter");
+	zassert_equal(rv, 1, "Expected %d, but got %d", 1, rv);
+	shell_backend_dummy_clear_output(get_ec_shell());
+}
+
+ZTEST(ucsi_ppm_console, test_ppm_set_new_cam__success_enter)
+{
+	int rv;
+
+	set_new_cam_expected_action = 1; /* Entry */
+	ppm_driver_mock_execute_cmd_sync_fake.custom_fake =
+		execute_ucsi_set_new_cam;
+
+	rv = shell_execute_cmd(
+		get_ec_shell(),
+		"ppm set_new_cam 0 " STRINGIFY(SET_NEW_CAM_EXPECTED_VAL) " " STRINGIFY(
+			SET_NEW_CAM_EXPECTED_AM_SPECIFIC) " enter");
+	zassert_ok(rv, "Expected success (0), but got %d", rv);
+}
+
+ZTEST(ucsi_ppm_console, test_ppm_set_new_cam__success_exit)
+{
+	int rv;
+
+	set_new_cam_expected_action = 0; /* Exit */
+	ppm_driver_mock_execute_cmd_sync_fake.custom_fake =
+		execute_ucsi_set_new_cam;
+
+	rv = shell_execute_cmd(
+		get_ec_shell(),
+		"ppm set_new_cam 0 " STRINGIFY(SET_NEW_CAM_EXPECTED_VAL) " " STRINGIFY(
+			SET_NEW_CAM_EXPECTED_AM_SPECIFIC) " exit");
+	zassert_ok(rv, "Expected success (0), but got %d", rv);
+}
