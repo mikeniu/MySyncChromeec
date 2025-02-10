@@ -59,6 +59,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "63688ea2_3a9ca194",
+        "filename": "zephyr/program/fpmcu/testcase.yaml",
+        "patchSetId": 30
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-02-10T21:08:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7692a3d2_10e2ac58",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 18
+      },
+      "revId": "92c1d040c84b3bba00df27aa57712c005bde889f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "107895ab_0f2dfc0f",
