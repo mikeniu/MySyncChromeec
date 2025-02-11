@@ -318,6 +318,13 @@
 		frs_en_gpio = <&gpio_usb_c1_frs_en>;
 		irq-gpios = <&gpiok 7 GPIO_ACTIVE_LOW>;
 	};
+
+	ppc_port1_alt: rt1739@70{
+		compatible = "richtek,rt1739-ppc";
+		reg = <0x70>;
+		irq-gpios = <&gpiok 7 GPIO_ACTIVE_LOW>;
+		is-alt;
+	};
 };
 
 &i2c5 {
@@ -339,6 +346,13 @@
 		reg = <0x40>;
 		frs_en_gpio = <&gpio_usb_c0_frs_en>;
 		irq-gpios = <&gpiok 0 GPIO_ACTIVE_LOW>;
+	};
+
+	ppc_port0_alt: rt1739@70{
+		compatible = "richtek,rt1739-ppc";
+		reg = <0x70>;
+		irq-gpios = <&gpiok 0 GPIO_ACTIVE_LOW>;
+		is-alt;
 	};
 };
 

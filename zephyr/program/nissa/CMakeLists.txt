@@ -376,6 +376,7 @@ if(DEFINED CONFIG_BOARD_PUJJONIRU)
 			"pujjoniru/src/board.c"
 			"pujjoniru/src/sub_board.c"
 			"pujjoniru/src/board_touchpanel.c"
+			"pujjoniru/src/ppc.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "pujjoniru/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "pujjoniru/src/charger.c")
