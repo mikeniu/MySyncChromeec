@@ -16,6 +16,24 @@
       "message": "This CL passes with this PR:\nhttps://github.com/zephyrproject-rtos/zephyr/pull/85340/commits\n\n```\nDEBUG:fpmcu:~$ ztest run-all\nDEBUG:Running TESTSUITE libc_exit\nDEBUG:\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\nDEBUG:START - test_essential_thread\nDEBUG: exited with rc: 1\nDEBUG:[1.025000] \u003cerr\u003e os: \u003e\u003e\u003e ZEPHYR FATAL ERROR 4: Kernel panic on CPU 0\nDEBUG:[1.031000] \u003cerr\u003e os: Current thread: 0x20002c58 (unknown)\nDEBUG:Caught system error -- reason 4 1\nDEBUG:Fatal error expected as part of test case.\nDEBUG: PASS - test_essential_thread in 0.020 seconds\nDEBUG:\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\nDEBUG:START - test_non_essential_thread\nDEBUG: exited with rc: 1\nDEBUG: PASS - test_non_essential_thread in 0.002 seconds\nDEBUG:\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\nDEBUG:TESTSUITE libc_exit succeeded\nDEBUG:[b\u0027\\r\\n\u0027, b\u0027------ TESTSUITE SUMMARY START ------\\r\\n\u0027, b\u0027\\r\\n\u0027, b\u0027SUITE PASS - 100.00% [libc_exit]: pass \u003d 2, fail \u003d 0, skip \u003d 0, total \u003d 2 duration \u003d 0.022 seconds\\r\\n\u0027, b\u0027 - PASS - [libc_exit.test_essential_thread] duration \u003d 0.020 seconds\\r\\n\u0027, b\u0027 - PASS - [libc_exit.test_non_essential_thread] duration \u003d 0.002 seconds\\r\\n\u0027, b\u0027\\r\\n\u0027, b\u0027------ TESTSUITE SUMMARY END ------\\r\\n\u0027, b\u0027\\r\\n\u0027, b\u0027\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\\r\\n\u0027, b\u0027PROJECT EXECUTION SUCCESSFUL\\r\\n\u0027, b\u0027fpmcu:~$ \\x1b[9D\\x1b[J[1.109400 MKBP not cleared within threshold, toggling.]\\r\\n\u0027]\nDEBUG:Calling post-test callback\nTest \"exit\": PASSED\n\n(cr) fsammoura@fsammoura-glaptop /mnt/host/source/src/platform/ec $ \n\n```",
       "revId": "5b9e816d648b76693ce1143192f5dbda688e1005",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac18fa19_9436323f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 33
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-02-12T23:10:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "638fa60f_292a98e3",
+      "revId": "5b9e816d648b76693ce1143192f5dbda688e1005",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
