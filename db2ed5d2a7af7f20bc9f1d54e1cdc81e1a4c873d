@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "083b8be2_c37f61fd",
+        "filename": "zephyr/test/lib/src/exit.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-02-13T00:30:23Z",
+      "side": 1,
+      "message": "This is a copy paste from this file:\nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyr/main/tests/kernel/threads/thread_apis/src/tests_thread_apis.h;l\u003d1?q\u003dtests_thread_apis.h\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch",
+      "parentUuid": "b03fbd53_e05a3340",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 55
+      },
+      "revId": "db2ed5d2a7af7f20bc9f1d54e1cdc81e1a4c873d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7e25741a_7b89795f",
         "filename": "zephyr/test/lib/src/exit.c",
         "patchSetId": 34
@@ -49,6 +73,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5c1ef44f_8f6f6433",
+        "filename": "zephyr/test/lib/src/exit.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-02-13T00:30:23Z",
+      "side": 1,
+      "message": "I will defer this question to @patrykd@google.com and @dawidn@google.com",
+      "parentUuid": "7e25741a_7b89795f",
+      "range": {
+        "startLine": 44,
+        "startChar": 22,
+        "endLine": 44,
+        "endChar": 47
+      },
+      "revId": "db2ed5d2a7af7f20bc9f1d54e1cdc81e1a4c873d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "457dbd9b_605f5d44",
         "filename": "zephyr/test/lib/src/exit.c",
         "patchSetId": 34
@@ -60,6 +108,30 @@
       "writtenOn": "2025-02-13T00:06:59Z",
       "side": 1,
       "message": "I\u0027m not sure I understand this comment. Is `TESTPOINT` a magic keyword used by something or just a plain comment?",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 57
+      },
+      "revId": "db2ed5d2a7af7f20bc9f1d54e1cdc81e1a4c873d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c380172_a1e48dc3",
+        "filename": "zephyr/test/lib/src/exit.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-02-13T00:30:23Z",
+      "side": 1,
+      "message": "https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyr/main/tests/kernel/threads/thread_apis/src/test_threads_cancel_abort.c;drc\u003dc257cfe9cc4cc72a624b3eae7cfa917e8b261b0f;l\u003d49\n\nThis mean that execute_flag is now one because the thread was executed and aborted and no reboot happened.",
+      "parentUuid": "457dbd9b_605f5d44",
       "range": {
         "startLine": 54,
         "startChar": 0,
