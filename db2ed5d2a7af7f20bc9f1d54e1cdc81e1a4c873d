@@ -72,6 +72,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "042509c0_f7b04827",
+        "filename": "zephyr/test/lib/src/exit.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-02-13T20:02:26Z",
+      "side": 1,
+      "message": "if the `CONFIG_TEST_EXTRA_STACK_SIZE` is removed, you have stacking error\n\n```\nDEBUG:START - test_essential_thread\nDEBUG:[0.997000] \u003cerr\u003e os: ***** MPU FAULT *****\nDEBUG:[1.001000] \u003cerr\u003e os:   Stacking error (context area might be not valid)\nDEBUG:[1.007000] \u003cerr\u003e os:   Data Access Violation\nDEBUG:[1.011000] \u003cerr\u003e os:   MMFAR Address: 0x2001a6f4\nDEBUG:[1.016000] \u003cerr\u003e os: \u003e\u003e\u003e ZEPHYR FATAL ERROR 2: Stack overflow on CPU 0\nDEBUG:[1.022000] \u003cerr\u003e os: Current thread: 0x20002c58 (unknown)\nDEBUG:Caught system error -- reason 2 1\nDEBUG:Fatal error expected as part of test case.\nDEBUG:\nDEBUG:    Assertion failed at EC_BASE/zephyr/test/lib/src/exit.c:39: ztest_post_fatal_error_hook: reason not equal to K_ERR_KERNEL_PANIC\nDEBUG:\nDEBUG:[1.046000] \u003cerr\u003e os: ***** HARD FAULT *****\nDEBUG:[1.049000] \u003cerr\u003e os:   Fault escalation (see below)\nDEBUG:[1.054000] \u003cerr\u003e os: ARCH_EXCEPT with reason 4\nDEBUG:\nDEBUG:[1.058000] \u003cerr\u003e os: \u003e\u003e\u003e ZEPHYR FATAL ERROR 4: Kernel panic on CPU 0\nDEBUG:[1.064000] \u003cerr\u003e os: Fault during interrupt handling\nDEBUG:\nDEBUG:[1.069000] \u003cerr\u003e os: Current thread: 0x20002808 (unknown)\nDEBUG:Caught system error -- reason 4 0\nDEBUG:Fatal error was unexpected, aborting...\n```\n\nIt looks that in the Zephyr Real-Time Operating System (RTOS), `CONFIG_TEST_EXTRA_STACK_SIZE` is a configuration option primarily used within the Zephyr testing framework. Its purpose is to add extra stack space to threads created during tests.",
+      "parentUuid": "1799ed45_89238c03",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 55
+      },
+      "revId": "db2ed5d2a7af7f20bc9f1d54e1cdc81e1a4c873d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7e25741a_7b89795f",
@@ -109,6 +133,30 @@
       "side": 1,
       "message": "I will defer this question to @patrykd@google.com and @dawidn@google.com",
       "parentUuid": "7e25741a_7b89795f",
+      "range": {
+        "startLine": 44,
+        "startChar": 22,
+        "endLine": 44,
+        "endChar": 47
+      },
+      "revId": "db2ed5d2a7af7f20bc9f1d54e1cdc81e1a4c873d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e4cb9ac_e4a47fb1",
+        "filename": "zephyr/test/lib/src/exit.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-02-13T20:02:26Z",
+      "side": 1,
+      "message": "I believe that the current exit() implementation will reboot only if there is only one thread running and the watchdog reset is called. If multiple threads are running, I believe, the Zephyr OS will move to other threads. I believe in the current implementation, even if we exit an essential thread, it will go to other threads (if there exists some) without triggerring reboot. I will defer to @patrykd@google.com and @dawidn@google.com to provide more detailed answers.",
+      "parentUuid": "5c1ef44f_8f6f6433",
       "range": {
         "startLine": 44,
         "startChar": 22,
@@ -180,6 +228,30 @@
       "side": 1,
       "message": "\u003e This mean that execute_flag is now one because the thread was executed and aborted and no reboot happened.\n\nOk, then write that in the comment. 😊",
       "parentUuid": "9c380172_a1e48dc3",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 57
+      },
+      "revId": "db2ed5d2a7af7f20bc9f1d54e1cdc81e1a4c873d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0af9c068_12534a0a",
+        "filename": "zephyr/test/lib/src/exit.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-02-13T20:02:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "50593fa3_3ffe63f9",
       "range": {
         "startLine": 54,
         "startChar": 0,
