@@ -70,6 +70,30 @@
       },
       "revId": "ff0784d234fca09836851dcd918515de12f9bf6b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "479e4b11_6d096db1",
+        "filename": "test/fpsensor_debug.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-02-13T01:17:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23688765_c974df7d",
+      "range": {
+        "startLine": 95,
+        "startChar": 1,
+        "endLine": 97,
+        "endChar": 50
+      },
+      "revId": "ff0784d234fca09836851dcd918515de12f9bf6b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
