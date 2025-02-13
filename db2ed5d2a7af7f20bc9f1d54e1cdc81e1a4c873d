@@ -283,6 +283,30 @@
       },
       "revId": "db2ed5d2a7af7f20bc9f1d54e1cdc81e1a4c873d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90d9c4db_982748d4",
+        "filename": "zephyr/test/lib/src/exit.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-02-13T20:38:32Z",
+      "side": 1,
+      "message": "this is not needed here. I believe it was reminiscent from an old testing version. I removed it. As such, there is no need for setup handler.",
+      "parentUuid": "aaed5bcd_8a4524cc",
+      "range": {
+        "startLine": 60,
+        "startChar": 0,
+        "endLine": 60,
+        "endChar": 18
+      },
+      "revId": "db2ed5d2a7af7f20bc9f1d54e1cdc81e1a4c873d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
