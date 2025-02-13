@@ -46,6 +46,30 @@
       },
       "revId": "ff0784d234fca09836851dcd918515de12f9bf6b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23688765_c974df7d",
+        "filename": "test/fpsensor_debug.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2025-02-13T00:24:24Z",
+      "side": 1,
+      "message": "Ah, yeah.\n\nFor clarity and to avoid overflowing the buffer, then I would make sure that instead of `8389900`, you use the largest possible value, such as `UINT32_MAX`:\n\n\n\n```suggestion\n\tchar console_input[] \u003d \"fpupload \" UINT32_MAX \" image\";\n\tsnprintf(console_input, sizeof(console_input), \"fpupload %\" PRIu32 \" image\",\n\t\t FP_SENSOR_IMAGE_SIZE - FP_SENSOR_IMAGE_OFFSET);\n```",
+      "parentUuid": "78edf7e1_3752de51",
+      "range": {
+        "startLine": 95,
+        "startChar": 1,
+        "endLine": 97,
+        "endChar": 50
+      },
+      "revId": "ff0784d234fca09836851dcd918515de12f9bf6b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
