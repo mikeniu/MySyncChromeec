@@ -169,6 +169,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5af28d47_ce43c10d",
+        "filename": "zephyr/test/lib/src/exit.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2025-02-14T09:37:11Z",
+      "side": 1,
+      "message": "\u003e Are the threads we create for the FPMCU started as essential threads or non-essential threads?\n\nAs non-essential. The last argument of the [CROS_EC_TASK](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/include/shimmed_task_id.h;l\u003d178) macro. So it won\u0027t reboot (new version of `exit` - thread abort). The newlib Zephyr hooks just do while(1), so I guess the watchdog should reboot.",
+      "parentUuid": "0e4cb9ac_e4a47fb1",
+      "range": {
+        "startLine": 44,
+        "startChar": 22,
+        "endLine": 44,
+        "endChar": 47
+      },
+      "revId": "db2ed5d2a7af7f20bc9f1d54e1cdc81e1a4c873d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "457dbd9b_605f5d44",
         "filename": "zephyr/test/lib/src/exit.c",
         "patchSetId": 34
