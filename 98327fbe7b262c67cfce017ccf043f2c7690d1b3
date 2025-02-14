@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0471335c_075e1876",
+        "filename": "test/fpsensor_debug.cc",
+        "patchSetId": 11
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2025-02-14T23:01:35Z",
+      "side": 1,
+      "message": "I guess I would put this in `run_test` so that someone who runs the tests in RO doesn\u0027t get confused when they see this test name in the output of tests that ran. You\u0027ll have to put this whole function in `#if defined(SECTION_IS_RW)` too.\n\nOr actually, we don\u0027t even have `fupload` in RO at all, do we? In that case, let\u0027s keep this as-is and create a separate CL so that we don\u0027t run any of these tests in RO: `if (!IS_ENABLED(BOARD_HOST) \u0026\u0026 IS_ENABLED(SECTION_IS_RW)))`",
+      "range": {
+        "startLine": 100,
+        "startChar": 0,
+        "endLine": 100,
+        "endChar": 26
+      },
+      "revId": "98327fbe7b262c67cfce017ccf043f2c7690d1b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
