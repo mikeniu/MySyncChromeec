@@ -193,6 +193,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6e86acf2_02674d6e",
+        "filename": "zephyr/test/lib/src/exit.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2025-02-14T23:27:53Z",
+      "side": 1,
+      "message": "\u003e If multiple threads are running, I believe, the Zephyr OS will move to other threads.\n\n\u003e As non-essential.\n\n\u003e The newlib Zephyr hooks just do while(1), so I guess the watchdog should reboot.\n\nHmm, so I guess the question is whether it makes sense to override the `exit()` implementation at all then. In EC, the reason I made `exit()` reboot was because we knew we never wanted to call `exit()` in our code and it was an error if we did. IIRC, the upstream implementation of `exit` was just `while(1)`. I haven\u0027t looked at how the watchdog or thread scheduling is set up, but @dawidn@google.com\u0027s comment suggests that it might trigger a watchdog reboot? (Which would mean it\u0027s already doing what we want.)",
+      "parentUuid": "5af28d47_ce43c10d",
+      "range": {
+        "startLine": 44,
+        "startChar": 22,
+        "endLine": 44,
+        "endChar": 47
+      },
+      "revId": "db2ed5d2a7af7f20bc9f1d54e1cdc81e1a4c873d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "457dbd9b_605f5d44",
         "filename": "zephyr/test/lib/src/exit.c",
         "patchSetId": 34
