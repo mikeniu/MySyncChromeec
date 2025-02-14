@@ -22,6 +22,30 @@
       },
       "revId": "98327fbe7b262c67cfce017ccf043f2c7690d1b3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec0c7f93_3068b6d9",
+        "filename": "test/fpsensor_debug.cc",
+        "patchSetId": 11
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-02-14T23:36:02Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "0471335c_075e1876",
+      "range": {
+        "startLine": 100,
+        "startChar": 0,
+        "endLine": 100,
+        "endChar": 26
+      },
+      "revId": "98327fbe7b262c67cfce017ccf043f2c7690d1b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
