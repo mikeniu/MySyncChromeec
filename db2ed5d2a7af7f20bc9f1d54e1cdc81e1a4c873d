@@ -217,6 +217,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "482a68fd_cf429e4a",
+        "filename": "zephyr/test/lib/src/exit.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-02-20T16:42:55Z",
+      "side": 1,
+      "message": "\u003e I guess the question is whether it makes sense to override the exit() implementation at all then.\n\nMy opinion is that upstream implementation is wrong. `exit()` should gracefully stop the task (equivalent to returning from task\u0027s main function). It may not be super useful for static tasks, because we want them to be running all the time, but there are other use cases, e.g. stopping dynamic task.",
+      "parentUuid": "6e86acf2_02674d6e",
+      "range": {
+        "startLine": 44,
+        "startChar": 22,
+        "endLine": 44,
+        "endChar": 47
+      },
+      "revId": "db2ed5d2a7af7f20bc9f1d54e1cdc81e1a4c873d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "457dbd9b_605f5d44",
         "filename": "zephyr/test/lib/src/exit.c",
         "patchSetId": 34
