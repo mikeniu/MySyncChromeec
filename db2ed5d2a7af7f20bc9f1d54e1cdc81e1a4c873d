@@ -241,6 +241,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cceb9511_695e102f",
+        "filename": "zephyr/test/lib/src/exit.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-02-20T16:57:44Z",
+      "side": 1,
+      "message": "so you prefer the approach that we took using `k_thread_abort`?",
+      "parentUuid": "482a68fd_cf429e4a",
+      "range": {
+        "startLine": 44,
+        "startChar": 22,
+        "endLine": 44,
+        "endChar": 47
+      },
+      "revId": "db2ed5d2a7af7f20bc9f1d54e1cdc81e1a4c873d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "457dbd9b_605f5d44",
         "filename": "zephyr/test/lib/src/exit.c",
         "patchSetId": 34
