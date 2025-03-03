@@ -40,6 +40,13 @@ config BOARD_HYLIA
 	  Build Google Hylia board. Hylia has MediaTek SoC
 	  with ITE it82202-ax EC.
 
+config RAURU_BOARD_CHIPSET_CUSTOM
+	bool "Rauru Platform Board Chipset Customization"
+	help
+	  Enable rauru platform customized AP power callbacks.
+	default n
+
+
 module = RAURU
 module-str = Rauru board-specific code
 source "subsys/logging/Kconfig.template.log_config"

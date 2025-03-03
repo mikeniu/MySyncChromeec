@@ -4,3 +4,5 @@
 
 target_sources(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/dp_alt_mode.c)
 zephyr_library_sources("src/kb_backlight.c" "src/board.c" "src/fan.c" "src/thermal.c")
+zephyr_library_sources_ifdef(CONFIG_RAURU_BOARD_CHIPSET_CUSTOM
+                             "./src/backlight.c")
