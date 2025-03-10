@@ -22,6 +22,30 @@
       },
       "revId": "a2b871c521450f023674ddab49678cd9b5592110",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b086332_1cd70908",
+        "filename": "zephyr/test/lib/src/exit.c",
+        "patchSetId": 41
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-03-10T15:10:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de444aee_f1034ee9",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 19
+      },
+      "revId": "a2b871c521450f023674ddab49678cd9b5592110",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
