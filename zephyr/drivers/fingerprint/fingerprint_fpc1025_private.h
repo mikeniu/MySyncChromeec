@@ -10,6 +10,8 @@
 
 #include <stdint.h>
 
+#include <drivers/fingerprint.h>
+
 /* FPC type which keeps sensor specific information. */
 struct fpc_bep_sensor;
 
@@ -190,7 +192,8 @@ int fp_sensor_maintenance(uint8_t *image_data,
  * @return 0 on success
  * @return negative value on error
  */
-int fp_sensor_acquire_image_with_mode(uint8_t *image_data, int mode);
+int fp_sensor_acquire_image_with_mode(uint8_t *image_data,
+				      enum fingerprint_capture_type mode);
 
 /**
  * Configure finger detection.

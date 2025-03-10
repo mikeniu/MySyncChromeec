@@ -127,8 +127,9 @@ void fp_configure_detect(void)
 
 int fp_acquire_image_with_mode(uint8_t *image_data, enum fp_capture_type mode)
 {
-	return fingerprint_acquire_image(fp_sensor_dev, mode, image_data,
-					 FP_SENSOR_IMAGE_SIZE);
+	return fingerprint_acquire_image(fp_sensor_dev,
+					 (enum fingerprint_capture_type)mode,
+					 image_data, FP_SENSOR_IMAGE_SIZE);
 }
 
 enum finger_state fp_finger_status(void)
