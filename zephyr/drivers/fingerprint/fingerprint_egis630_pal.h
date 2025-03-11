@@ -13,6 +13,12 @@
 
 #include <zephyr/toolchain.h>
 
+#ifdef CONFIG_ZTEST
+#define STATIC_VAR
+#else
+#define STATIC_VAR static
+#endif
+
 typedef enum {
 	LOG_VERBOSE = 2,
 	LOG_DEBUG = 3,
