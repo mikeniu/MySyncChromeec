@@ -187,7 +187,11 @@ const struct _ec_fmap {
 			.area_offset = CONFIG_EC_WRITABLE_STORAGE_OFF -
 				       FMAP_REGION_START +
 				       CONFIG_RW_STORAGE_OFF,
+#ifdef CONFIG_FMAP_EC_RW_PADDING
+			.area_size = CONFIG_RW_SIZE + CONFIG_FMAP_EC_RW_PADDING,
+#else
 			.area_size = CONFIG_RW_SIZE,
+#endif
 			.area_flags = FMAP_AREA_STATIC | FMAP_AREA_RO,
 		},
 		{
