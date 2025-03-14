@@ -43,8 +43,8 @@ CFLAGS_CPU+=-mno-unaligned-access
 CFLAGS_CPU+=$(CFLAGS_FPU-y)
 
 ifneq ($(CONFIG_LTO),)
-CFLAGS_CPU+=-flto
-LDFLAGS_EXTRA+=-flto
+CFLAGS_CPU+=-flto -ffat-lto-objects
+LDFLAGS_EXTRA+=-flto -ffat-lto-objects
 endif
 
 core-y=cpu.o debug.o init.o vecttable.o

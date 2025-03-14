@@ -39,8 +39,8 @@ add_compile_options(-Oz)
 endif()
 
 # Enable Link Time Optimization.
-add_compile_options(-flto)
-add_link_options(-flto)
+add_compile_options(-flto -ffat-lto-objects)
+add_link_options(-flto -ffat-lto-objects)
 
 # See https://www.chromium.org/chromium-os/build/c-exception-support
 add_compile_options(-fno-exceptions)

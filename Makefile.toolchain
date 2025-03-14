@@ -214,8 +214,8 @@ ifneq ($(BOARD), host)
 CFLAGS+= --param min-pagesize=0
 endif
 endif
-ifneq ($(CROSS_COMPILE_CC_NAME),clang)
 CFLAGS+= -ffat-lto-objects
+ifneq ($(CROSS_COMPILE_CC_NAME),clang)
 CFLAGS+= -fconserve-stack
 endif
 CXXFLAGS=$(CXXFLAGS_WARN)
