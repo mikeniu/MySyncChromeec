@@ -1,0 +1,14 @@
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+&i2c_ctrl0 {
+	status = "okay";
+};
+
+&i2c6_1 {
+    status = "disabled";
+};
+/delete-node/ &i2c_ec_i2c_charger;
+
