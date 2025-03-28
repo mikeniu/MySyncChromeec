@@ -336,6 +336,7 @@ static enum ec_status tablet_mode_command(struct host_cmd_handler_args *args)
 	case TABLET_MODE_FORCE_CLAMSHELL:
 		tablet_mode = 0;
 		tablet_mode_forced = true;
+		lid_angle_peripheral_enable(1);
 		break;
 	default:
 		CPRINTS("Invalid EC_CMD_SET_TABLET_MODE parameter: %d",
