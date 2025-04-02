@@ -20,6 +20,12 @@ config BOARD_ULDRENITE
 	  Build Google Uldrenite reference board.  This board uses an Intel TWL SoC
 	  and NPCX997FB0BX EC
 
+config BOARD_PUJJOCENTO
+	bool "Google Pujjocento Board"
+	help
+	  Build Google Pujjocento reference board.  This board uses an Intel TWL SoC
+	  and NPCX997FB0BX EC
+
 module = Trulo
 module-str = Trulo board-specific code
 source "subsys/logging/Kconfig.template.log_config"

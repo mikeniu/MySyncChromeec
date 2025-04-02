@@ -84,6 +84,17 @@ register_trulo_project(
     ],
 )
 
+register_trulo_project(
+    project_name="pujjocento",
+    chip="npcx9/npcx9m7fb",
+    kconfig_files=[
+        # Common to all projects.
+        here / "program.conf",
+        # Parent project's config
+        here / "pujjocento" / "project.conf",
+    ],
+)
+
 register_ish_project(
     project_name="trulo-ish",
     zephyr_board="intel_ish_5_4_1",
@@ -105,3 +116,4 @@ assert_rw_fwid_DO_NOT_EDIT(project_name="trulo", addr=0x40144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="pujjolo", addr=0x40144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="trulo-ti", addr=0x40144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="uldrenite", addr=0x40144)
+assert_rw_fwid_DO_NOT_EDIT(project_name="pujjocento", addr=0x40144)

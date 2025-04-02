@@ -21,3 +21,8 @@ if(DEFINED CONFIG_BOARD_ULDRENITE)
 	project(uldrenite)
 	add_subdirectory(uldrenite)
 endif()
+
+if(DEFINED CONFIG_BOARD_PUJJOCENTO)
+	project(pujjocento)
+	add_subdirectory(pujjocento)
+endif()
