@@ -72,3 +72,25 @@ helipilot = register_fpmcu_variant(
 # The address of RW_FWID is hardcoded in RO. You need to have REALLY
 # good reason to change it.
 assert_rw_fwid_DO_NOT_EDIT(project_name="helipilot", addr=0x40144)
+
+gwendolin = register_fpmcu_variant(
+    project_name="gwendolin",
+    zephyr_board="google_quincy",
+    register_func=register_npcx_project,
+    variant_modules=["cmsis"],
+    variant_optional_modules=["egis"],
+    variant_dts_overlays=[
+        here / "gwendolin" / "gwendolin.dts",
+    ],
+    variant_kconfig_files=[
+        here / "gwendolin" / "prj.conf",
+        here / "gwendolin" / "ec_quirks.conf",
+    ],
+    signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
+        here / "gwendolin" / "dev_key.pem",
+    ),
+)
+
+# The address of RW_FWID is hardcoded in RO. You need to have REALLY
+# good reason to change it.
+assert_rw_fwid_DO_NOT_EDIT(project_name="gwendolin", addr=0x40144)
