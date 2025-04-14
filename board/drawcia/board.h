@@ -34,6 +34,18 @@
 	21 /* R_DS(on) 10.7mOhm + 10mOhm sns rstr \
 	    */
 
+<<<<<<< HEAD   (f021fd800ea95b87fa989580d73c8dd1cd5b3587 common/tablet_mode: Fix invalid transition when disabling ta)
+||||||| BASE   (a2c423a05866a9d53607be22b92f342e96a7e013 brox-tokenized: Enable EC console-based PDC FW updater)
+/* I2C */
+#define CONFIG_I2C_BITBANG
+#define I2C_BITBANG_PORT_COUNT 1
+
+=======
+/* I2C */
+#define CONFIG_I2C_BITBANG_CROS_EC
+#define I2C_BITBANG_PORT_COUNT 1
+
+>>>>>>> CHANGE (df292c97f3f6e975fdf243e1243a05d943696a57 config: Resolve name conflict with Zephyr)
 /* PWM */
 #define CONFIG_PWM
 

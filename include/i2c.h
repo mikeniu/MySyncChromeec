@@ -69,6 +69,18 @@
 /* This port allows changing speed at runtime */
 #define I2C_PORT_FLAG_DYNAMIC_SPEED BIT(0)
 
+<<<<<<< HEAD   (f021fd800ea95b87fa989580d73c8dd1cd5b3587 common/tablet_mode: Fix invalid transition when disabling ta)
+||||||| BASE   (a2c423a05866a9d53607be22b92f342e96a7e013 brox-tokenized: Enable EC console-based PDC FW updater)
+#ifndef CONFIG_I2C_BITBANG
+#define I2C_BITBANG_PORT_COUNT 0
+#endif
+
+=======
+#ifndef CONFIG_I2C_BITBANG_CROS_EC
+#define I2C_BITBANG_PORT_COUNT 0
+#endif
+
+>>>>>>> CHANGE (df292c97f3f6e975fdf243e1243a05d943696a57 config: Resolve name conflict with Zephyr)
 /*
  * Supported I2C CLK frequencies.
  * TODO(crbug.com/549286): Use this enum in i2c_port_t.
