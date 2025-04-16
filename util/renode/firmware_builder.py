@@ -25,8 +25,9 @@ from chromite.api.gen_sdk.chromite.api import firmware_pb2
 
 
 ZEPHYR_BOARDS = [
-    "bloonchipper",
-    "sanok",
+    # "bloonchipper",
+    # "sanok",
+    "helipilot",
 ]
 
 
