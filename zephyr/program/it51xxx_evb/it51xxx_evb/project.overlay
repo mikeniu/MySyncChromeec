@@ -1,0 +1,24 @@
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+ /* Main devictree overlay for the it515xx_evb project */
+
+#include "gpio.dtsi"
+#include "i2c.dtsi"
+#include "adc.dtsi"
+#include "interrupts.dtsi"
+
+&uart2 {
+	status = "okay";
+	current-speed = <115200>;
+	clock-frequency = <1843200>;
+	pinctrl-0 = <&uart2_rx_gph1_default
+		     &uart2_tx_gph2_default>;
+	pinctrl-names = "default";
+};
+
+&ite_uart2_wrapper {
+	status = "okay";
+};
