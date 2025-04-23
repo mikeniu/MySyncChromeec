@@ -77,6 +77,14 @@
 		};
 	};
 
+	cros_cec: cros-cec {
+		compatible = "ite,it8xxx2-cec-raw";
+		pinctrl-0 = <&cec_gpf0_default>;
+		pinctrl-1 = <&cec_gpf0_sleep>;
+		pinctrl-names = "default", "sleep";
+		status = "disabled";
+	};
+
 	/* it8xxx2 has 1MB of flash. currently, we use 768KB from flash. */
 };
 
