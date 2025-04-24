@@ -15,6 +15,7 @@ properties:
       - "atl,ap24cal"
       - "atl,cfd72"
       - "atl,gb-s20-4473a9"
+      - "atl,l25n3pg1"
       - "bms-gf,cr50"
       - "byd,byd"
       - "byd,byd-1"
