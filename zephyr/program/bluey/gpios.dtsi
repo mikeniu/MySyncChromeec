@@ -219,10 +219,30 @@
 		};
 		gpio_ap_plt_rst_n: ap_plt_rst_n {
 			gpios = <&gpioa 7 (GPIO_INPUT)>;
-			enum-name = "GPIO_AP_RST_L";
 		};
 		gpio_en_hdmi_pwr: en_hdmi_pwr {
 			gpios = <&gpiod 5 (GPIO_OUTPUT)>;
+		};
+		/* TODO: Mock entries to enable power sequencing
+		 *       This pins needs to be mapped to proper GPIO
+		*/
+		gpio_ap_suspend: ap_suspend {
+			enum-name = "GPIO_AP_SUSPEND";
+		};
+		gpio_pmic_kpd_pwr_odl: pmic_kpd_pwr_odl {
+			enum-name = "GPIO_PMIC_KPD_PWR_ODL";
+		};
+		gpio_ap_rst_l: ap_rst_l {
+			enum-name = "GPIO_AP_RST_L";
+		};
+		gpio_pmic_resin_l: pmic_resin_l {
+			enum-name = "GPIO_PMIC_RESIN_L";
+		};
+		gpio_warm_reset_l: warm_reset_l {
+			enum-name = "GPIO_WARM_RESET_L";
+		};
+		gpio_power_good: power_good {
+			enum-name = "GPIO_POWER_GOOD";
 		};
 	};
 };

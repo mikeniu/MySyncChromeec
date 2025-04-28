@@ -14,4 +14,6 @@ if(DEFINED CONFIG_BOARD_QUENBI)
 	project(quenbi)
 endif()
 
+zephyr_library_sources("src/switchcap.c")
+
 add_subdirectory(${PROJECT_NAME})
