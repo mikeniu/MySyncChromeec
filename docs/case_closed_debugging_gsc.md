@@ -495,7 +495,7 @@ or
 (ti50 console) $ ccd set AllowUnverifiedRo Always
 ```
 
-1. Check WP. Ti50 will start using `follow\_batt\_pres` atboot. WP will still
+1. Check WP. Ti50 will start using `follow_batt_pres` atboot. WP will still
    be enabled until Ti50 resets.
 ```bash
 (dut) $ gsctool -a -w
