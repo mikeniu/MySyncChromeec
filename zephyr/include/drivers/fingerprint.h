@@ -25,25 +25,35 @@
 extern "C" {
 #endif
 
+// Get the number of configurations (assuming all arrays have the same length)
+#define NUM_CAPTURE_TYPES(node_id) DT_PROP_LEN(node_id, width)
+
+#define FP_NUM_IMAGE_CAPTURE_TYPES \
+	NUM_CAPTURE_TYPES(DT_CHOSEN(cros_fp_fingerprint_sensor))
+
 /** Get fingerprint sensor width. */
-#define FINGERPRINT_SENSOR_RES_X(node_id) DT_PROP(node_id, width)
+#define FINGERPRINT_SENSOR_RES_X(node_id, idx) \
+	DT_PROP_BY_IDX(node_id, width, idx)
 
 /** Get fingerprint sensor height. */
-#define FINGERPRINT_SENSOR_RES_Y(node_id) DT_PROP(node_id, height)
+#define FINGERPRINT_SENSOR_RES_Y(node_id, idx) \
+	DT_PROP_BY_IDX(node_id, height, idx)
 
 /** Get fingerprint sensor resolution (bits per pixel). */
-#define FINGERPRINT_SENSOR_RES_BPP(node_id) DT_PROP(node_id, bits_per_pixel)
+#define FINGERPRINT_SENSOR_RES_BPP(node_id, idx) \
+	DT_PROP_BY_IDX(node_id, bits_per_pixel, idx)
+
+/** Get fingerprint sensor capture type (enum fp_capture_type). */
+#define FINGERPRINT_SENSOR_CAPTURE_TYPE(node_id, idx) \
+	DT_PROP_BY_IDX(node_id, capture_type, idx)
 
 /** Get fingerprint sensor pixel format. */
-#define FINGERPRINT_SENSOR_V4L2_PIXEL_FORMAT(node_id) \
-	DT_STRING_TOKEN(node_id, v4l2_pixel_format)
+#define FINGERPRINT_SENSOR_V4L2_PIXEL_FORMAT(node_id, idx) \
+	DT_STRING_TOKEN_BY_IDX(node_id, v4l2_pixel_format, idx)
 
 /** Get size of raw fingerprint image (in bytes). */
-#define FINGERPRINT_SENSOR_REAL_IMAGE_SIZE(node_id) \
-	((FINGERPRINT_SENSOR_RES_X(node_id) *       \
-	  FINGERPRINT_SENSOR_RES_Y(node_id) *       \
-	  FINGERPRINT_SENSOR_RES_BPP(node_id)) /    \
-	 8)
+#define FINGERPRINT_SENSOR_REAL_IMAGE_SIZE(node_id, idx) \
+	DT_PROP_BY_IDX(node_id, frame_size, idx)
 
 /** Dead pixels bitmask. */
 #define FINGERPRINT_ERROR_DEAD_PIXELS_MASK GENMASK(9, 0)
@@ -65,19 +75,26 @@ extern "C" {
 #define FINGERPRINT_ERROR_INIT_FAIL BIT(15)
 
 /** Fingerprint sensor information structure. */
-struct fingerprint_info {
+struct fingerprint_sensor_info {
 	/* Sensor identification */
 	uint32_t vendor_id;
 	uint32_t product_id;
 	uint32_t model_id;
 	uint32_t version;
+	uint16_t num_capture_types;
+	uint16_t errors;
+};
+
+struct fingerprint_image_frame_params {
 	/* Image frame characteristics */
 	uint32_t frame_size;
 	uint32_t pixel_format; /* using V4L2_PIX_FMT_ */
 	uint16_t width;
 	uint16_t height;
 	uint16_t bpp;
-	uint16_t errors;
+	/** Type of image capture from enum fp_capture_type. */
+	uint8_t fp_capture_type;
+	uint8_t reserved; /**< padding for alignment */
 };
 
 /** Fingerprint sensor operation mode. */
@@ -179,8 +196,9 @@ typedef int (*fingerprint_api_config_t)(const struct device *dev,
  * @param dev Fingerprint sensor device.
  * @param info Pointer to fingerprint_info structure where data will be stored.
  */
-typedef int (*fingerprint_api_get_info_t)(const struct device *dev,
-					  struct fingerprint_info *info);
+typedef int (*fingerprint_api_get_info_t)(
+	const struct device *dev, struct fingerprint_sensor_info *sensor_info,
+	struct fingerprint_image_frame_params *image_frame_params);
 
 /**
  * @typedef fingerprint_api_maintenance_t
@@ -323,11 +341,13 @@ static inline int z_impl_fingerprint_config(const struct device *dev,
  * @retval -ENOTSUP Not supported api function.
  * @retval other negative values indicates driver specific error.
  */
-__syscall int fingerprint_get_info(const struct device *dev,
-				   struct fingerprint_info *info);
+__syscall int fingerprint_get_info(
+	const struct device *dev, struct fingerprint_sensor_info *sensor_info,
+	struct fingerprint_image_frame_params *image_frame_params_array);
 
-static inline int z_impl_fingerprint_get_info(const struct device *dev,
-					      struct fingerprint_info *info)
+static inline int z_impl_fingerprint_get_info(
+	const struct device *dev, struct fingerprint_sensor_info *sensor_info,
+	struct fingerprint_image_frame_params *image_frame_params)
 {
 	const struct fingerprint_driver_api *api =
 		(const struct fingerprint_driver_api *)dev->api;
@@ -336,7 +356,7 @@ static inline int z_impl_fingerprint_get_info(const struct device *dev,
 		return -ENOTSUP;
 	}
 
-	return api->get_info(dev, info);
+	return api->get_info(dev, sensor_info, image_frame_params);
 }
 
 /**

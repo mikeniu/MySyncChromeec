@@ -96,29 +96,40 @@ int fp_sensor_deinit(void)
 	return 0;
 }
 
-int fp_sensor_get_info(struct ec_response_fp_info *resp)
+int fp_sensor_get_info(struct ec_response_fp_info_v2 *resp)
 {
-	struct fingerprint_info info;
+	struct fingerprint_sensor_info sensor_info;
+	struct fingerprint_image_frame_params
+		image_frame_params_array[FP_NUM_IMAGE_CAPTURE_TYPES];
 	int rc;
 
-	rc = fingerprint_get_info(fp_sensor_dev, &info);
+	rc = fingerprint_get_info(fp_sensor_dev, &sensor_info,
+				  image_frame_params_array);
 	if (rc) {
 		return rc;
 	}
 
-	resp->vendor_id = info.vendor_id;
-	resp->product_id = info.product_id;
-	resp->model_id = info.model_id;
-	resp->version = info.version;
-	resp->frame_size = info.frame_size;
-	resp->pixel_format = info.pixel_format;
-	resp->width = info.width;
-	resp->height = info.height;
-	resp->bpp = info.bpp;
-	resp->errors = info.errors;
+	resp->sensor_info.vendor_id = sensor_info.vendor_id;
+	resp->sensor_info.product_id = sensor_info.product_id;
+	resp->sensor_info.model_id = sensor_info.model_id;
+	resp->sensor_info.version = sensor_info.version;
+	resp->sensor_info.num_capture_types = sensor_info.num_capture_types;
+	resp->sensor_info.errors = sensor_info.errors;
 
-	return 0;
-}
+	for (int i = 0; i < sensor_info.num_capture_types; ++i) {
+		resp->image_frame_params[i].frame_size =
+			image_frame_params_array[i].frame_size;
+		resp->image_frame_params[i].pixel_format =
+			image_frame_params_array[i].pixel_format;
+		resp->image_frame_params[i].width =
+			image_frame_params_array[i].width;
+		resp->image_frame_params[i].height =
+			image_frame_params_array[i].height;
+		resp->image_frame_params[i].bpp =
+			image_frame_params_array[i].bpp;
+		resp->image_frame_params[i].fp_capture_type =
+			image_frame_params_array[i].fp_capture_type;
+	}
 
 /* TODO(b/398899644): implement fp_sensor_get_info_v2 in zephyr */
 int fp_sensor_get_info_v2(struct ec_response_fp_info_v2 *resp)

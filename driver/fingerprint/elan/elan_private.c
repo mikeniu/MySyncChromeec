@@ -27,21 +27,6 @@
 static uint16_t errors;
 
 /* Sensor description */
-static struct ec_response_fp_info ec_fp_sensor_info = {
-	/* Sensor identification */
-	.vendor_id = FOURCC('E', 'L', 'A', 'N'),
-	.product_id = PID,
-	.model_id = MID,
-	.version = VERSION,
-	/* Image frame characteristics */
-	.frame_size = FP_SENSOR_RES_X_ELAN * FP_SENSOR_RES_Y_ELAN * 2,
-	.pixel_format = V4L2_PIX_FMT_GREY,
-	.width = FP_SENSOR_RES_X_ELAN,
-	.height = FP_SENSOR_RES_Y_ELAN,
-	.bpp = FP_SENSOR_RES_BPP_ELAN,
-};
-
-/* Sensor description */
 static struct fp_sensor_info elan_sensor_info = {
 	/* Sensor identification */
 	.vendor_id = FOURCC('E', 'L', 'A', 'N'),
@@ -192,7 +177,7 @@ int fp_sensor_deinit(void)
 }
 
 /**
- * Fill the 'ec_response_fp_info' buffer with the sensor information
+ * Fill the 'ec_response_fp_info_v2' buffer with the sensor information
  *
  * @param[out] resp      retrieve the version, sensor and template information
  *

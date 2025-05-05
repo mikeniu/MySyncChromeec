@@ -49,7 +49,7 @@ int __unused fpc_sensor_spi_write_read(uint8_t *write, uint8_t *read,
 	 */
 	if (leave_cs_asserted &&
 	    size == FINGERPRINT_SENSOR_REAL_IMAGE_SIZE(
-			    DT_CHOSEN(cros_fp_fingerprint_sensor))) {
+			    DT_CHOSEN(cros_fp_fingerprint_sensor), 0)) {
 		LOG_WRN("FPC library asked to keep CS asserted when size of "
 			"the buffer is FP_SENSOR_REAL_IMAGE_SIZE");
 	}
