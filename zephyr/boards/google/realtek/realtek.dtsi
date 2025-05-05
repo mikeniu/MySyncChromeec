@@ -7,6 +7,7 @@
 #include <dt-bindings/gpio_defines.h>
 #include <dt-bindings/gpio/realtek-gpio.h>
 #include <realtek/ec/rts5912-pinctrl.dtsi>
+#include <cros/vivaldi_kbd_default.dtsi>
 
 / {
 	model = "Google realtek Baseboard";
