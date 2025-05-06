@@ -1,0 +1,23 @@
+# Copyright 2024 Google LLC
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+properties:
+  # TODO: http://b/323371550
+  # Revisit this property when we support PDC port groupings
+  no-fw-update:
+    type: boolean
+    description: |
+      If set, do NOT consider this node to be an independent PD chip and
+      instruct Depthcharge to NOT apply firmware updates to this device. For
+      two-port PDC devices where each port has its own DT node, one of them
+      should have this property set to avoid updating the same chip twice
+      through each port.
+  ccd:
+    type: boolean
+    description: |
+      If present, this USB-C port has hardware support for closed-case
+      debugging (CCD). Used only on boards with PDC-driven CCD. This should be
+      applied to the port serviced by the PDC driver that correlates to PORTB
+      on dual-port PDCs. On dual-port RTK PDCs, this is the lower I2C target
+      address; on TI PDCs, this is the higher I2C address.

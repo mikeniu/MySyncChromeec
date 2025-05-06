@@ -136,8 +136,8 @@ static void write_optb_wrp(uint32_t value)
  * This function lives in internal RAM, as we cannot read flash during writing.
  * You must not call other functions from this one or declare it static.
  */
-void __attribute__((section(".iram.text")))
-iram_flash_write(uint32_t *addr, uint32_t *data)
+void __attribute__((section(".iram.text"))) iram_flash_write(uint32_t *addr,
+							     uint32_t *data)
 {
 	int i;
 

@@ -104,10 +104,7 @@ DT_INST_FOREACH_PROP_ELEM(0, leds, PWM_LED_DT_INIT)
 struct pwm_led pwm_leds[] = { DT_INST_FOREACH_PROP_ELEM(0, leds,
 							PWM_LED_INIT) };
 
-#define EC_LED_COLOR_BLANK \
-	{                  \
-		0          \
-	}
+#define EC_LED_COLOR_BLANK { 0 }
 
 struct pwm_led_color_map led_color_map[EC_LED_COLOR_COUNT] = {
 	[EC_LED_COLOR_RED] =

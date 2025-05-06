@@ -10,8 +10,8 @@
 #ifndef __CROS_EC_USB_PD_TCPM_PS8XXX_H
 #define __CROS_EC_USB_PD_TCPM_PS8XXX_H
 
-#define PS8751_P3_TO_P0_FLAGS(p3_flags) ((p3_flags)-3)
-#define PS8751_P3_TO_P1_FLAGS(p3_flags) ((p3_flags)-2)
+#define PS8751_P3_TO_P0_FLAGS(p3_flags) ((p3_flags) - 3)
+#define PS8751_P3_TO_P1_FLAGS(p3_flags) ((p3_flags) - 2)
 
 #define PS8751_BIST_TIMER_FREQ 15000000
 #define PS8751_BIST_DELAY_MS 50

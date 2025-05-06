@@ -38,7 +38,7 @@ GPIO_INT(LID_360_L,		PIN(A, 7), GPIO_INT_BOTH, gmr_tablet_switch_isr)
 GPIO_INT(VOLDN_BTN_ODL,		PIN(I, 6), GPIO_INT_BOTH | GPIO_PULL_UP, button_interrupt)
 GPIO_INT(VOLUP_BTN_ODL,		PIN(I, 7), GPIO_INT_BOTH | GPIO_PULL_UP, button_interrupt)
 GPIO_INT(BASE_SIXAXIS_INT_L,	PIN(J, 0), GPIO_INT_FALLING | GPIO_SEL_1P8V, lsm6dsm_interrupt)
-GPIO_INT(EC_WP_OD,		PIN(A, 6), GPIO_INT_BOTH, switch_interrupt)
+GPIO(EC_WP_OD,			PIN(A, 6), GPIO_INPUT)
 GPIO_INT(HDMI_HPD_SUB_ODL,	PIN(E, 7), GPIO_INT_BOTH, hdmi_hpd_interrupt)
 
 /* Power sequence GPIOs */

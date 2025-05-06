@@ -46,7 +46,7 @@ struct heci_msg {
 #define TO_FW_ADDR(handle) ((uintptr_t)(handle))
 #define TO_HECI_HANDLE(fw_addr) ((heci_handle_t)(uintptr_t)(fw_addr))
 /* convert client fw address to client context index */
-#define TO_CLIENT_CTX_IDX(fw_addr) ((fw_addr)-HECI_DYN_CLIENT_ADDR_START)
+#define TO_CLIENT_CTX_IDX(fw_addr) ((fw_addr) - HECI_DYN_CLIENT_ADDR_START)
 
 /* should be less than HECI_INVALID_HANDLE - 1 */
 BUILD_ASSERT(HECI_MAX_NUM_OF_CLIENTS < 0x0FE);

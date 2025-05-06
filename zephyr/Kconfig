@@ -23,6 +23,7 @@ rsource "app/Kconfig"
 rsource "drivers/Kconfig"
 rsource "emul/Kconfig"
 rsource "fake/Kconfig"
+rsource "libc/Kconfig"
 rsource "mock/Kconfig"
 rsource "subsys/Kconfig"
 rsource "subsys/emul/Kconfig"
@@ -139,6 +140,14 @@ config PLATFORM_EC_AP_RESET_LOG
 	help
 	  Enable logging of AP reset events. This information is provided in
 	  response to the EC_CMD_GET_UPTIME_INFO host command.
+
+config PLATFORM_EC_SBRK
+	bool "Use CrosEC implementation of the sbrk function"
+	default y if NEWLIB_LIBC
+	select NEWLIB_LIBC_CUSTOM_SBRK if NEWLIB_LIBC
+	help
+	  Enable using CrosEC version of the sbrk function. The function
+	  prevents from using the end of RAM, which stores jump data.
 
 config PLATFORM_EC_BACKLIGHT_LID
 	bool "Control the display backlight based on the lid switch"
@@ -561,6 +570,12 @@ config PLATFORM_EC_LID_SWITCH
 
 	  This requires a GPIO named GPIO_LID_OPEN to be defined or aliased.
 
+config PLATFORM_EC_LID_DEBOUNCE_US
+	int "Lid switch debounce delay (microseconds)"
+	default 30000
+	help
+	  Delay between seeing a lid switch change and sampling the new state.
+
 config PLATFORM_EC_CONSOLE_CMD_MMAPINFO
 	bool "Console command: mmapinfo"
 	default y
@@ -650,6 +665,23 @@ config PLATFORM_EC_MKBP_HOST_EVENT_WAKEUP_MASK
                           HOST_EVENT_AC_CONNECTED)>;
       The host events are defined in dt-bindings/wake_mask_event_defines.h
 
+config PLATFORM_EC_NOINIT_END_OF_RAM_SECTION
+	bool "Enable noinit_end_of_ram memory section"
+	default y
+	depends on CROS_EC_RW || !CROS_EC_RO || ZTEST
+	help
+	  noinit_end_of_ram is a memory section placed at the very end
+	  of used ram, where it is least likely to overlap with RO ram.
+	  The section is useful for preserving data across reboots.
+
+config PLATFORM_EC_NOINIT_END_OF_RAM_SECTION_OFFSET
+	int "Offset noinit_end_of_ram section"
+	default 0
+	depends on PLATFORM_EC_NOINIT_END_OF_RAM_SECTION
+	help
+	   Offset noinit_end_of_ram section. Only adjust in the rare case that
+	   RO ram overlaps with RW noinit_end_of_ram section.
+
 config PLATFORM_EC_PANIC
 	bool "Panic output"
 	default y
@@ -694,11 +726,33 @@ config PLATFORM_EC_POWER_BUTTON_IGNORE_LID
 	  This option should be used when power button support is required,
 	  but there is no lid switch present.
 
+config PLATFORM_EC_POWER_BUTTON_INIT_IDLE
+	bool "Remain in S5 with AC connect following gracefule shutdown"
+	depends on PLATFORM_EC_POWER_BUTTON
+	help
+	  Set/clear AP_IDLE flag. It's set when the system gracefully shuts
+	  down and it's cleared when the system boots up. The result is the
+	  system tries to go back to the previous state upon AC plug-in. If
+	  the system uncleanly shuts down, it boots immediately. If the system
+	  shuts down gracefully, it'll stay at S5 and wait for power button
+	  press.
+
 config PLATFORM_EC_BUTTON_DEBOUNCE
 	int "button debounce in us"
 	default 30000
 	help
 	  Configure the button debounce time in us per project requirement.
+
+config PLATFORM_EC_PRESERVED_RING_BUF
+	bool "Preserved ring buffer"
+	default n
+	select PLATFORM_EC_NOINIT_END_OF_RAM_SECTION
+	help
+	  Preserved ring buffers exist in noinit memory at the end of used ram.
+	  Preserved ring buffer designed to be preserved across reboots and sysjumps,
+	  but curruption may occur for various reasons. Preserved ring buffers are
+	  designed to be low overhead and fast, especially for writes. This makes
+	  these ring buffers well suited for tracing and logging use cases.
 
 config PLATFORM_EC_PSE_LTC4291
 	bool "power sourcing equipment (PSE)  support"
@@ -1031,5 +1085,13 @@ config PLATFORM_EC_FEATURE_FINCH
 	help
 	  When this option is enabled, some of the experimental features
 	  (aka finch) will be enabled for CROS_EC.
+
+config PLATFORM_EC_SHARED_MEM_LIBC
+	bool "Use version of libc shared memory"
+	default y if NEWLIB_LIBC
+	help
+	  Use version of shared memory implementation for applications
+	  that use libc with malloc. Malloc uses the same memory as
+	  shared_mem which can cause collisions if it is not synchronized.
 
 endif # PLATFORM_EC

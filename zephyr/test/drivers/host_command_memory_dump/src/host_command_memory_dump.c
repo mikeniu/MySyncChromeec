@@ -289,6 +289,7 @@ ZTEST_USER(memory_dump, test_dump_before_registered)
 
 	rv = host_command_process(&args);
 
+	zassert_equal(args.response_size, sizeof(metadata_response));
 	zassert_equal(metadata_response.memory_dump_entry_count, 0);
 }
 
@@ -358,7 +359,7 @@ ZTEST_USER(memory_dump, test_dump_thread_stack)
 }
 
 /* Check if keyscan thread stack is included in memory dump */
-ZTEST_USER(memory_dump, test_verify_excluded_threads_not_dumped)
+ZTEST_USER(memory_dump, test_excluded_threads_not_dumped)
 {
 	struct mem_dump dump;
 	k_tid_t main_thread;

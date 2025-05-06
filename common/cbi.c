@@ -186,13 +186,15 @@ int cbi_get_board_info(enum cbi_data_tag tag, uint8_t *buf, uint8_t *size)
 {
 	const struct cbi_data *d;
 
-	if (cbi_read())
+	if (cbi_read()) {
 		return EC_ERROR_UNKNOWN;
+	}
 
 	d = cbi_find_tag(cbi, tag);
-	if (!d)
+	if (!d) {
 		/* Not found */
 		return EC_ERROR_UNKNOWN;
+	}
 	if (*size < d->size)
 		/* Insufficient buffer size */
 		return EC_ERROR_INVAL;
@@ -284,21 +286,6 @@ int cbi_get_model_id(uint32_t *id)
 	return cbi_get_board_info(CBI_TAG_MODEL_ID, (uint8_t *)id, &size);
 }
 
-test_mockable int cbi_get_fw_config(uint32_t *fw_config)
-{
-	uint8_t size = sizeof(*fw_config);
-
-	return cbi_get_board_info(CBI_TAG_FW_CONFIG, (uint8_t *)fw_config,
-				  &size);
-}
-
-test_mockable int cbi_get_ssfc(uint32_t *ssfc)
-{
-	uint8_t size = sizeof(*ssfc);
-
-	return cbi_get_board_info(CBI_TAG_SSFC, (uint8_t *)ssfc, &size);
-}
-
 int cbi_get_pcb_supplier(uint32_t *pcb_supplier)
 {
 	uint8_t size = sizeof(*pcb_supplier);
@@ -328,22 +315,6 @@ test_mockable int cbi_get_common_control(union ec_common_control *ctrl)
 	return cbi_get_board_info(CBI_TAG_COMMON_CONTROL, (uint8_t *)ctrl,
 				  &size);
 }
-
-static enum ec_status hc_cbi_get(struct host_cmd_handler_args *args)
-{
-	const struct __ec_align4 ec_params_get_cbi *p = args->params;
-	uint8_t size = MIN(args->response_max, UINT8_MAX);
-
-	if (p->flag & CBI_GET_RELOAD)
-		cbi_invalidate_cache();
-
-	if (cbi_get_board_info(p->tag, args->response, &size))
-		return EC_RES_INVALID_PARAM;
-
-	args->response_size = size;
-	return EC_RES_SUCCESS;
-}
-DECLARE_HOST_COMMAND(EC_CMD_GET_CROS_BOARD_INFO, hc_cbi_get, EC_VER_MASK(0));
 
 static enum ec_status
 common_cbi_set(const struct __ec_align4 ec_params_set_cbi *p)

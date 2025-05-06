@@ -540,26 +540,26 @@
 #define NPCX_LVOL_CTRL_5_7 NPCX_GPIO_NONE
 
 /* 6 Low-Voltage Control Groups on npcx7 */
-#define NPCX_LVOL_TABLE                                  \
-	{                                                \
-		{                                        \
-			NPCX_LVOL_CTRL_ITEMS(0),         \
-		},                                       \
-			{                                \
-				NPCX_LVOL_CTRL_ITEMS(1), \
-			},                               \
-			{                                \
-				NPCX_LVOL_CTRL_ITEMS(2), \
-			},                               \
-			{                                \
-				NPCX_LVOL_CTRL_ITEMS(3), \
-			},                               \
-			{                                \
-				NPCX_LVOL_CTRL_ITEMS(4), \
-			},                               \
-			{                                \
-				NPCX_LVOL_CTRL_ITEMS(5), \
-			},                               \
+#define NPCX_LVOL_TABLE                          \
+	{                                        \
+		{                                \
+			NPCX_LVOL_CTRL_ITEMS(0), \
+		},                               \
+		{                                \
+			NPCX_LVOL_CTRL_ITEMS(1), \
+		},                               \
+		{                                \
+			NPCX_LVOL_CTRL_ITEMS(2), \
+		},                               \
+		{                                \
+			NPCX_LVOL_CTRL_ITEMS(3), \
+		},                               \
+		{                                \
+			NPCX_LVOL_CTRL_ITEMS(4), \
+		},                               \
+		{                                \
+			NPCX_LVOL_CTRL_ITEMS(5), \
+		},                               \
 	}
 
 #endif /* __CROS_EC_GPIO_CHIP_NPCX7_H */

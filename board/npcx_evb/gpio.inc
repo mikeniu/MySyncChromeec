@@ -11,7 +11,7 @@
 /********************** Inputs with interrupt handlers  **********************/
 /* TODO: Redefine debug 2 inputs */
 GPIO_INT(RECOVERY_L,       PIN(0, 0), GPIO_PULL_UP   | GPIO_INT_BOTH, switch_interrupt)       /* Recovery signal from servo */
-GPIO_INT(WP_L,             PIN(9, 3), GPIO_PULL_UP   | GPIO_INT_BOTH, switch_interrupt)       /* Write protect input */
+GPIO(WP_L,                 PIN(9, 3), GPIO_PULL_UP   | GPIO_INPUT)                            /* Write protect input */
 
 /* For testing keyboard commands, we need the following 4 GPIOs */
 /* TODO: Redefine 4 inputs */

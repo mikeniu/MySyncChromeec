@@ -631,7 +631,7 @@ void __enter_hibernate(uint32_t seconds, uint32_t microseconds)
 	for (i = NPCX_IRQ_0; i < NPCX_IRQ_COUNT; i++)
 		task_clear_pending_irq(i);
 
-		/* Set the timer interrupt for wake up.  */
+	/* Set the timer interrupt for wake up.  */
 #ifdef NPCX_LCT_SUPPORT
 	if (seconds || microseconds) {
 		system_set_lct_alarm(seconds, microseconds);

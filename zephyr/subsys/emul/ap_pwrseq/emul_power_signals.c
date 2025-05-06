@@ -118,19 +118,15 @@ struct power_signal_emul_node {
 				     (PWR_SIG_EMUL_SRC_EXT),                  \
 				     (PWR_SIG_EMUL_SRC_ADC))))))
 
-#define EMUL_POWER_SIGNAL_GET_SIGNAL_SPEC(inst, dir_signal)                    \
-	{                                                                      \
-		COND_CODE_1(DT_NODE_HAS_COMPAT(DT_PROP(inst, dir_signal),      \
-					       intel_ap_pwrseq_gpio),          \
-			    (.gpio = GPIO_DT_SPEC_GET(                         \
-				     DT_PROP(inst, dir_signal), gpios)),       \
-			    (COND_CODE_1(DT_NODE_HAS_COMPAT(                   \
-						 DT_PROP(inst, dir_signal),    \
-						 intel_ap_pwrseq_vw),          \
-					 (.vw = VW_DT_SPEC_GET(                \
-						  DT_PROP(inst, dir_signal))), \
-					 ())))                                 \
-	}
+#define EMUL_POWER_SIGNAL_GET_SIGNAL_SPEC(inst, dir_signal)                     \
+	{ COND_CODE_1(                                                          \
+		DT_NODE_HAS_COMPAT(DT_PROP(inst, dir_signal),                   \
+				   intel_ap_pwrseq_gpio),                       \
+		(.gpio = GPIO_DT_SPEC_GET(DT_PROP(inst, dir_signal), gpios)),   \
+		(COND_CODE_1(DT_NODE_HAS_COMPAT(DT_PROP(inst, dir_signal),      \
+						intel_ap_pwrseq_vw),            \
+			     (.vw = VW_DT_SPEC_GET(DT_PROP(inst, dir_signal))), \
+			     ()))) }
 
 #ifdef CONFIG_AP_PWRSEQ_SIGNAL_DEBUG_NAMES
 #define ENUM_DBGNAME(inst, dir)         \
@@ -224,12 +220,9 @@ DT_FOREACH_STATUS_OKAY(intel_ap_pwr_test_platform,
 	EMUL_POWER_SIGNAL_TEST_PLATFORM_GET_NODES_REFS(                 \
 		DT_PHANDLE_BY_IDX(inst, prop, idx))
 
-#define EMUL_POWER_SIGNAL_TEST_PLATFORM_GET_NODES(inst)                 \
-	{                                                               \
-		DT_FOREACH_PROP_ELEM(                                   \
-			inst, nodes,                                    \
-			EMUL_POWER_SIGNAL_TEST_PLATFORM_GET_IO_SIGNALS) \
-	}
+#define EMUL_POWER_SIGNAL_TEST_PLATFORM_GET_NODES(inst) \
+	{ DT_FOREACH_PROP_ELEM(                         \
+		inst, nodes, EMUL_POWER_SIGNAL_TEST_PLATFORM_GET_IO_SIGNALS) }
 
 #define EMUL_POWER_SIGNAL_TEST_PLATFORM_DEF(inst)             \
 	const struct power_signal_emul_test_platform inst = { \

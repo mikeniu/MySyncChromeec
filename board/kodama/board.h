@@ -31,7 +31,7 @@
 
 #define CONFIG_BATTERY_HW_PRESENT_CUSTOM
 
-#define CONFIG_I2C_BITBANG
+#define CONFIG_I2C_BITBANG_CROS_EC
 #define I2C_BITBANG_PORT_COUNT 1
 #undef CONFIG_I2C_NACK_RETRY_COUNT
 #define CONFIG_I2C_NACK_RETRY_COUNT 3
@@ -69,7 +69,7 @@
 /* Define the host events which are allowed to wakeup AP in S3. */
 #define CONFIG_MKBP_INPUT_DEVICES
 
-#define PD_OPERATING_POWER_MW 15000
+#define CONFIG_USB_PD_OPERATING_POWER_MW 15000
 
 /* Free up flash in RO. */
 #ifdef SECTION_IS_RO

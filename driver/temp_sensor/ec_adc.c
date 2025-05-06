@@ -23,13 +23,13 @@ static int get_temp(int idx, int *temp_ptr)
 	if (temp_raw == ADC_READ_ERROR)
 		return EC_ERROR_UNKNOWN;
 
-		/* TODO : Need modification here if the result is not 10-bit */
+	/* TODO : Need modification here if the result is not 10-bit */
 
-		/* If there is no thermistor calculation function.
-		 *  1. Add adjusting function like thermistor_ncp15wb.c
-		 *  2. Place function here with ifdef
-		 *  3. define it on board.h
-		 */
+	/* If there is no thermistor calculation function.
+	 *  1. Add adjusting function like thermistor_ncp15wb.c
+	 *  2. Place function here with ifdef
+	 *  3. define it on board.h
+	 */
 #ifdef CONFIG_THERMISTOR_NCP15WB
 	*temp_ptr = ncp15wb_calculate_temp((uint16_t)temp_raw);
 #else

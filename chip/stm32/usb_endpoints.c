@@ -46,12 +46,12 @@ int iface_undefined(iface_arguments)
 
 #define table(type, name, x) x
 
-#define endpoint_tx(number)                                            \
-	extern void __attribute__((used, weak, alias("ep_undefined"))) \
-	ep_##number##_tx(void);
-#define endpoint_rx(number)                                            \
-	extern void __attribute__((used, weak, alias("ep_undefined"))) \
-	ep_##number##_rx(void);
+#define endpoint_tx(number)         \
+	extern void __attribute__(( \
+		used, weak, alias("ep_undefined"))) ep_##number##_tx(void);
+#define endpoint_rx(number)         \
+	extern void __attribute__(( \
+		used, weak, alias("ep_undefined"))) ep_##number##_rx(void);
 #define endpoint_evt(number)                                               \
 	extern void __attribute__((used, weak, alias("ep_evt_undefined"))) \
 	ep_##number##_evt(enum usb_ep_event evt);

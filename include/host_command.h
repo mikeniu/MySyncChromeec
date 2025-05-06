@@ -5,12 +5,6 @@
 
 /* Host command module for Chrome EC */
 
-/*
- * TODO(b/272518464): Work around coreboot GCC preprocessor bug.
- * #line marks the *next* line, so it is off by one.
- */
-#line 13
-
 #ifndef __CROS_EC_HOST_COMMAND_H
 #define __CROS_EC_HOST_COMMAND_H
 
@@ -402,7 +396,8 @@ stub_send_response_callback(struct host_cmd_handler_args *args)
 #define BUILD_HOST_COMMAND(CMD, VERSION, RESPONSE, PARAMS)          \
 	{                                                           \
 		.send_response = stub_send_response_callback,       \
-		.command = (CMD), .version = (VERSION),             \
+		.command = (CMD),                                   \
+		.version = (VERSION),                               \
 		COND_CODE_0(IS_EMPTY(PARAMS),                       \
 			    (.params = &(PARAMS),                   \
 			     .params_size = sizeof(PARAMS)),        \

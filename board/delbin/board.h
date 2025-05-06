@@ -30,6 +30,23 @@
 #undef CONFIG_UART_TX_BUF_SIZE
 #define CONFIG_UART_TX_BUF_SIZE 4096
 
+/* Panic Handling Features */
+#ifdef SECTION_IS_RW
+#define CONFIG_PRESERVED_RING_BUF
+#define CONFIG_PANIC_LOG
+#endif
+/*
+ * Panic Log and System Safe Mode both provide improved
+ * log capture after crash. Disabling safe mode and
+ * panic on watchdog warning to simplify panic handling.
+ */
+#ifdef CONFIG_SYSTEM_SAFE_MODE
+#undef CONFIG_SYSTEM_SAFE_MODE
+#endif
+#ifdef CONFIG_PANIC_ON_WATCHDOG_WARNING
+#undef CONFIG_PANIC_ON_WATCHDOG_WARNING
+#endif
+
 /* Chipset features */
 #define CONFIG_POWER_PP5000_CONTROL
 
@@ -43,6 +60,10 @@
 #define CONFIG_KEYBOARD_MULTIPLE
 
 /* Sensors */
+/* Slew rate on the PP1800_A load switch requires a delay on resume */
+#undef CONFIG_MOTION_SENSE_RESUME_DELAY_US
+#define CONFIG_MOTION_SENSE_RESUME_DELAY_US (10 * MSEC)
+
 /* BMA253 accelerometer in base */
 #define CONFIG_ACCEL_BMA255
 #define CONFIG_ACCEL_KX022
@@ -74,10 +95,10 @@
  * cables only support up to 60W, the limitation of 45W is for the delbin
  * board.
  */
-#define PD_OPERATING_POWER_MW 15000
-#define PD_MAX_POWER_MW 45000
-#define PD_MAX_CURRENT_MA 3000
-#define PD_MAX_VOLTAGE_MV 20000
+#define CONFIG_USB_PD_OPERATING_POWER_MW 15000
+#define CONFIG_USB_PD_MAX_POWER_MW 45000
+#define CONFIG_USB_PD_MAX_CURRENT_MA 3000
+#define CONFIG_USB_PD_MAX_VOLTAGE_MV 20000
 
 #undef CONFIG_USB_PD_TCPC_RUNTIME_CONFIG
 #undef CONFIG_USB_MUX_RUNTIME_CONFIG

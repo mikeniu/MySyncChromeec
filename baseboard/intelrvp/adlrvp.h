@@ -50,7 +50,7 @@
 #endif
 #define CONFIG_USB_MUX_VIRTUAL
 #define CONFIG_USB_MUX_TUSB1044
-#define PD_MAX_POWER_MW 100000
+#define CONFIG_USB_PD_MAX_POWER_MW 100000
 
 #define CONFIG_USB_PD_REQUIRE_AP_MODE_ENTRY
 
@@ -203,7 +203,7 @@ enum battery_type {
 };
 
 /* I2C access in polling mode before task is initialized */
-#define CONFIG_I2C_BITBANG
+#define CONFIG_I2C_BITBANG_CROS_EC
 
 enum adlrvp_bitbang_i2c_channel {
 	I2C_BITBANG_CHAN_BRD_ID,

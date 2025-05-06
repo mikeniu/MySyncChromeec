@@ -47,6 +47,9 @@ extern "C" {
 
 /** Dead pixels bitmask. */
 #define FINGERPRINT_ERROR_DEAD_PIXELS_MASK GENMASK(9, 0)
+/* Maximum number of dead pixels */
+#define FINGERPRINT_ERROR_DEAD_PIXELS_MAX \
+	(FINGERPRINT_ERROR_DEAD_PIXELS_MASK - 1)
 /** Number of dead pixels detected on the last maintenance. */
 #define FINGERPRINT_ERROR_DEAD_PIXELS(errors) \
 	((errors) & FINGERPRINT_ERROR_DEAD_PIXELS_MASK)
@@ -88,7 +91,7 @@ enum fingerprint_sensor_mode {
 };
 
 /**
- * Image capture mode.
+ * Image capture type.
  *
  * @note This enum must remain ordered, if you add new values you must ensure
  * that FINGERPRINT_CAPTURE_TYPE_MAX is still the last one.
@@ -100,15 +103,15 @@ enum fingerprint_capture_type {
 	 */
 	FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT = 0,
 	/** Simple raw image capture (produces width x height x bpp bits). */
-	FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE = 1,
+	FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE = 4,
 	/** Self test pattern (e.g. checkerboard). */
-	FINGERPRINT_CAPTURE_TYPE_PATTERN0 = 2,
+	FINGERPRINT_CAPTURE_TYPE_PATTERN0 = 8,
 	/** Self test pattern (e.g. inverted checkerboard). */
-	FINGERPRINT_CAPTURE_TYPE_PATTERN1 = 3,
+	FINGERPRINT_CAPTURE_TYPE_PATTERN1 = 12,
 	/** Capture for quality test with fixed contrast. */
-	FINGERPRINT_CAPTURE_TYPE_QUALITY_TEST = 4,
+	FINGERPRINT_CAPTURE_TYPE_QUALITY_TEST = 16,
 	/** Capture for pixel reset value test. */
-	FINGERPRINT_CAPTURE_TYPE_RESET_TEST = 5,
+	FINGERPRINT_CAPTURE_TYPE_RESET_TEST = 20,
 	/** End of enum. */
 	FINGERPRINT_CAPTURE_TYPE_MAX,
 };
@@ -205,13 +208,14 @@ typedef int (*fingerprint_api_set_mode_t)(const struct device *dev,
  * @brief Callback API for acquiring fingerprint image.
  *
  * @param dev Fingerprint sensor device.
- * @param mode One of the mode from fingerprint_capture_type enum.
+ * @param capture_type One of the capture types from fingerprint_capture_type
+ *                     enum.
  * @param image Pointer to buffer where image should be stored.
  * @param size Size of the buffer.
  */
-typedef int (*fingerprint_api_acquire_image_t)(const struct device *dev,
-					       int mode, uint8_t *image,
-					       size_t size);
+typedef int (*fingerprint_api_acquire_image_t)(
+	const struct device *dev, enum fingerprint_capture_type capture_type,
+	uint8_t *image, size_t size);
 
 /**
  * @typedef fingerprint_api_finger_status_t
@@ -394,7 +398,8 @@ static inline int z_impl_fingerprint_set_mode(const struct device *dev,
  *
  * @param dev Pointer to the device structure for the fingerprint sensor driver
  *	      instance.
- * @param mode One of the mode from fingerprint_capture_type enum.
+ * @param capture_type One of the capture types from fingerprint_capture_type
+ *                     enum.
  * @param image Pointer to buffer where image should be stored.
  * @param size Size of the buffer.
  *
@@ -404,12 +409,15 @@ static inline int z_impl_fingerprint_set_mode(const struct device *dev,
  * @retval -EINVAL Invalid argument was passed (e.g. size of buffer).
  * @retval other negative values indicates driver specific error.
  */
-__syscall int fingerprint_acquire_image(const struct device *dev, int mode,
-					uint8_t *image, size_t size);
+__syscall int
+fingerprint_acquire_image(const struct device *dev,
+			  enum fingerprint_capture_type capture_type,
+			  uint8_t *image, size_t size);
 
-static inline int z_impl_fingerprint_acquire_image(const struct device *dev,
-						   int mode, uint8_t *image,
-						   size_t size)
+static inline int
+z_impl_fingerprint_acquire_image(const struct device *dev,
+				 enum fingerprint_capture_type capture_type,
+				 uint8_t *image, size_t size)
 {
 	const struct fingerprint_driver_api *api =
 		(const struct fingerprint_driver_api *)dev->api;
@@ -418,7 +426,7 @@ static inline int z_impl_fingerprint_acquire_image(const struct device *dev,
 		return -ENOTSUP;
 	}
 
-	return api->acquire_image(dev, mode, image, size);
+	return api->acquire_image(dev, capture_type, image, size);
 }
 
 /**

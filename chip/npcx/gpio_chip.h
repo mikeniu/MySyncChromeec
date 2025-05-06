@@ -36,12 +36,12 @@ struct npcx_wui {
 #define ALT(port, index, _alt) \
 	{ .gpio = NPCX_GPIO(port, index), .alt = (_alt) },
 
-#define NPCX_LVOL_CTRL_ITEMS(ctrl)                                            \
-	{                                                                     \
-		NPCX_LVOL_CTRL_##ctrl##_0, NPCX_LVOL_CTRL_##ctrl##_1,         \
-			NPCX_LVOL_CTRL_##ctrl##_2, NPCX_LVOL_CTRL_##ctrl##_3, \
-			NPCX_LVOL_CTRL_##ctrl##_4, NPCX_LVOL_CTRL_##ctrl##_5, \
-			NPCX_LVOL_CTRL_##ctrl##_6, NPCX_LVOL_CTRL_##ctrl##_7, \
+#define NPCX_LVOL_CTRL_ITEMS(ctrl)                                    \
+	{                                                             \
+		NPCX_LVOL_CTRL_##ctrl##_0, NPCX_LVOL_CTRL_##ctrl##_1, \
+		NPCX_LVOL_CTRL_##ctrl##_2, NPCX_LVOL_CTRL_##ctrl##_3, \
+		NPCX_LVOL_CTRL_##ctrl##_4, NPCX_LVOL_CTRL_##ctrl##_5, \
+		NPCX_LVOL_CTRL_##ctrl##_6, NPCX_LVOL_CTRL_##ctrl##_7, \
 	}
 
 /**

@@ -16,13 +16,11 @@
 #define CPRINTS(format, args...) cprints(CC_LPC, format, ##args)
 #define CPRINTF(format, args...) cprintf(CC_LPC, format, ##args)
 
-#define HECI_CLIENT_CROS_EC_ISH_GUID                                   \
-	{                                                              \
-		0x7b7154d0, 0x56f4, 0x4bdc,                            \
-		{                                                      \
-			0xb0, 0xd8, 0x9e, 0x7c, 0xda, 0xe0, 0xd6, 0xa0 \
-		}                                                      \
-	}
+#define HECI_CLIENT_CROS_EC_ISH_GUID \
+	{ 0x7b7154d0,                \
+	  0x56f4,                    \
+	  0x4bdc,                    \
+	  { 0xb0, 0xd8, 0x9e, 0x7c, 0xda, 0xe0, 0xd6, 0xa0 } }
 
 /* Handle for all heci cros_ec interactions */
 static heci_handle_t heci_cros_ec_handle = HECI_INVALID_HANDLE;

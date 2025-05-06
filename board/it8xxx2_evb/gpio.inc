@@ -13,7 +13,7 @@ GPIO_INT(POWER_BUTTON_L, PIN(E, 4), GPIO_INT_BOTH | GPIO_PULL_UP,   power_button
 GPIO_INT(PCH_PLTRST_L,   PIN(E, 3), GPIO_INT_BOTH | GPIO_PULL_UP,   lpcrst_interrupt)
 #endif
 GPIO_INT(LID_OPEN,       PIN(E, 2), GPIO_INT_BOTH | GPIO_PULL_UP,   lid_interrupt)
-GPIO_INT(WP_L,           PIN(I, 4), GPIO_INT_BOTH | GPIO_PULL_UP,   switch_interrupt)         /* Write protect input */
+GPIO(WP_L,               PIN(I, 4), GPIO_INPUT | GPIO_PULL_UP)  /* Write protect input */
 #ifdef CONFIG_LOW_POWER_IDLE
 GPIO_INT(UART1_RX,       PIN(B, 0), GPIO_INT_FALLING | GPIO_PULL_UP, uart_deepsleep_interrupt) /* UART1 RX input */
 #endif

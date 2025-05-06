@@ -123,7 +123,7 @@ int spi_flash_set_status(int reg1, int reg2)
 	if (rv)
 		return rv;
 
-		/* Second status register not present */
+	/* Second status register not present */
 #ifndef CONFIG_SPI_FLASH_HAS_SR2
 	reg2 = -1;
 #endif

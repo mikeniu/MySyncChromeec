@@ -25,7 +25,7 @@
  * This is used to avoid 64-bit shifts which might require a new library
  * function.
  */
-#define HOST_EVENT_32BIT_MASK(x) (1UL << ((x)-1))
+#define HOST_EVENT_32BIT_MASK(x) (1UL << ((x) - 1))
 static void host_event_set_bit(host_event_t *ev, uint8_t bit)
 {
 	uint32_t *ptr = (uint32_t *)ev;

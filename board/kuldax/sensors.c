@@ -80,7 +80,7 @@ BUILD_ASSERT(ARRAY_SIZE(temp_sensors) == TEMP_SENSOR_COUNT);
 /*
  * TODO(b/238260272): add the thermal sensor setting
  */
-#define THERMAL_CPU              \
+#define THERMAL_CPU \
 	{                        \
 		.temp_host = { \
 			[EC_TEMP_THRESH_HIGH] = C_TO_K(75), \
@@ -94,7 +94,7 @@ BUILD_ASSERT(ARRAY_SIZE(temp_sensors) == TEMP_SENSOR_COUNT);
 	}
 __maybe_unused static const struct ec_thermal_config thermal_cpu = THERMAL_CPU;
 
-#define THERMAL_FAN              \
+#define THERMAL_FAN \
 	{                        \
 		.temp_host = { \
 			[EC_TEMP_THRESH_HIGH] = 0, \

@@ -5927,3 +5927,5 @@ e6074b1eedc154f3bf93fbca9675e36dca51b0bc
 1efaa0779b8ded4d8d2de1fe542b93291ea22470
 # 2022-07-12 - ec: Format all python files with black and isort
 7540e7b47b55447475bb8191fb3520dd67cf7998
+# 2025-04-30 - clang-format: Update formatting to match new clang-format version
+9c9df9c7d40daf7f77f8b4132aa959ab024b219c

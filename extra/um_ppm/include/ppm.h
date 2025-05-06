@@ -278,7 +278,7 @@ typedef int(ucsi_ppm_init_and_wait)(struct ucsi_ppm_device *device,
  * @return Pointer to UCSI shared data.
  */
 typedef struct ucsi_memory_region *(
-	ucsi_ppm_get_data_region)(struct ucsi_ppm_device *device);
+	ucsi_ppm_get_data_region)(struct ucsi_ppm_device * device);
 
 /**
  * Get the next connector status if a connector change indication is

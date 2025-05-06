@@ -463,7 +463,7 @@ void gpio_set_flags_by_mask(uint32_t port, uint32_t mask, uint32_t flags)
 	if (flags & GPIO_OUTPUT)
 		NPCX_PDIR(port) |= mask;
 
-		/* Lock GPIO output and configuration if need */
+	/* Lock GPIO output and configuration if need */
 #if NPCX_FAMILY_VERSION >= NPCX_FAMILY_NPCX7
 	if (flags & GPIO_LOCKED)
 		NPCX_PLOCK_CTL(port) |= mask;

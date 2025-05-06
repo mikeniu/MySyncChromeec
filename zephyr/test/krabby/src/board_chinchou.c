@@ -28,6 +28,15 @@ FAKE_VALUE_FUNC(int, cbi_get_ssfc, uint32_t *);
 FAKE_VALUE_FUNC(int, cros_cbi_get_fw_config, enum cbi_fw_config_field_id,
 		uint32_t *);
 
+static void reset(void)
+{
+	/* Re-initialize CBI */
+	cros_cbi_ec_init();
+
+	/* Re-initialize sensors and board config */
+	hook_notify(HOOK_INIT);
+}
+
 int mock_cros_cbi_get_fw_config_clamshell(enum cbi_fw_config_field_id field_id,
 					  uint32_t *value)
 {
@@ -35,10 +44,10 @@ int mock_cros_cbi_get_fw_config_clamshell(enum cbi_fw_config_field_id field_id,
 	return 0;
 }
 
-int mock_cros_cbi_get_fw_config_error(enum cbi_fw_config_field_id field_id,
-				      uint32_t *value)
+static void chinchou_before(void *fixture)
 {
-	return -1;
+	RESET_FAKE(cbi_get_ssfc);
+	RESET_FAKE(cros_cbi_get_fw_config);
 }
 
 static void *clamshell_setup(void)
@@ -47,7 +56,7 @@ static void *clamshell_setup(void)
 
 	cros_cbi_get_fw_config_fake.custom_fake =
 		mock_cros_cbi_get_fw_config_clamshell;
-	hook_notify(HOOK_INIT);
+	reset();
 
 	/* Check if CBI write worked. */
 	zassert_ok(cros_cbi_get_fw_config(FORM_FACTOR, &val), NULL);
@@ -56,7 +65,8 @@ static void *clamshell_setup(void)
 	return NULL;
 }
 
-ZTEST_SUITE(chinchou_clamshell, NULL, clamshell_setup, NULL, NULL, NULL);
+ZTEST_SUITE(chinchou_clamshell, NULL, clamshell_setup, chinchou_before, NULL,
+	    NULL);
 
 ZTEST(chinchou_clamshell, test_gmr_tablet_switch_disabled)
 {
@@ -105,13 +115,6 @@ ZTEST(chinchou_clamshell, test_base_imu_irq_disabled)
 		      interrupt_count);
 }
 
-ZTEST_USER(chinchou_clamshell, test_error_reading_cbi)
-{
-	cros_cbi_get_fw_config_fake.custom_fake =
-		mock_cros_cbi_get_fw_config_error;
-	hook_notify(HOOK_INIT);
-}
-
 static int interrupt_id;
 
 void bmi3xx_interrupt(enum gpio_signal signal)
@@ -143,12 +146,13 @@ static void *alt_sensor_use_setup(void)
 	cbi_get_ssfc_fake.custom_fake = cbi_get_ssfc_mock;
 	ssfc_data = SSFC_ALT_SENSORS;
 	/* Run init hooks to initialize cbi. */
-	hook_notify(HOOK_INIT);
+	reset();
 
 	return NULL;
 }
 
-ZTEST_SUITE(alt_sensor_use, NULL, alt_sensor_use_setup, NULL, NULL, NULL);
+ZTEST_SUITE(alt_sensor_use, NULL, alt_sensor_use_setup, chinchou_before, NULL,
+	    NULL);
 
 ZTEST(alt_sensor_use, test_alt_sensor_use)
 {
@@ -177,12 +181,13 @@ static void *alt_sensor_no_use_setup(void)
 	cbi_get_ssfc_fake.custom_fake = cbi_get_ssfc_mock;
 	ssfc_data = SSFC_MAIM_SENSORS;
 	/* Run init hooks to initialize cbi. */
-	hook_notify(HOOK_INIT);
+	reset();
 
 	return NULL;
 }
 
-ZTEST_SUITE(alt_sensor_no_use, NULL, alt_sensor_no_use_setup, NULL, NULL, NULL);
+ZTEST_SUITE(alt_sensor_no_use, NULL, alt_sensor_no_use_setup, chinchou_before,
+	    NULL, NULL);
 
 ZTEST(alt_sensor_no_use, test_alt_sensor_no_use)
 {

@@ -17,7 +17,6 @@ FAKE_VALUE_FUNC(int, board_set_active_charge_port, int);
 FAKE_VALUE_FUNC(int, board_vbus_source_enabled, int);
 FAKE_VOID_FUNC(button_interrupt, enum gpio_signal);
 FAKE_VOID_FUNC(xhci_interrupt, enum gpio_signal);
-FAKE_VOID_FUNC(switch_interrupt, enum gpio_signal);
 FAKE_VOID_FUNC(ppc_interrupt, enum gpio_signal);
 FAKE_VOID_FUNC(bc12_interrupt, enum gpio_signal);
 FAKE_VOID_FUNC(x_ec_interrupt, enum gpio_signal);
@@ -29,13 +28,13 @@ FAKE_VALUE_FUNC(int, ppc_vbus_sink_enable, int, int);
 FAKE_VALUE_FUNC(uint8_t, get_dp_pin_mode, int);
 FAKE_VOID_FUNC(pd_set_vbus_discharge, int, int);
 FAKE_VOID_FUNC(pd_send_host_event, int);
+FAKE_VOID_FUNC(lid_angle_peripheral_enable, int);
 
 #define FFF_FAKES_LIST(FAKE)               \
 	FAKE(board_set_active_charge_port) \
 	FAKE(board_vbus_source_enabled)    \
 	FAKE(button_interrupt)             \
 	FAKE(xhci_interrupt)               \
-	FAKE(switch_interrupt)             \
 	FAKE(ppc_interrupt)                \
 	FAKE(bc12_interrupt)               \
 	FAKE(x_ec_interrupt)               \
@@ -56,6 +55,7 @@ static void corsola_reset(void *fixture)
 
 	/* Reset fakes */
 	FFF_FAKES_LIST(RESET_FAKE);
+	RESET_FAKE(lid_angle_peripheral_enable);
 	FFF_RESET_HISTORY();
 
 	active_aux_port = -1;
@@ -77,6 +77,7 @@ ZTEST(corsola_usb_pd_policy, test_pd_power_supply_reset)
 
 	ppc_is_sourcing_vbus_fake.return_val = 1;
 	pd_power_supply_reset(port);
+	k_sleep(K_MSEC(100)); /* sleep to trigger deferred hooks */
 	zassert_equal(ppc_is_sourcing_vbus_fake.arg0_history[count], port);
 	zassert_equal(ppc_vbus_source_enable_fake.arg0_history[count], port);
 	zassert_equal(ppc_vbus_source_enable_fake.arg1_history[count], 0);
@@ -87,6 +88,7 @@ ZTEST(corsola_usb_pd_policy, test_pd_power_supply_reset)
 
 	ppc_is_sourcing_vbus_fake.return_val = 0;
 	pd_power_supply_reset(port);
+	k_sleep(K_MSEC(100)); /* sleep to trigger deferred hooks */
 	count++;
 	zassert_equal(ppc_is_sourcing_vbus_fake.arg0_history[count], port);
 	zassert_equal(ppc_vbus_source_enable_fake.arg0_history[count], port);
@@ -104,6 +106,7 @@ ZTEST(corsola_usb_pd_policy, test_pd_set_power_supply_ready_success)
 	ppc_vbus_source_enable_fake.return_val = 0;
 
 	zassert_ok(pd_set_power_supply_ready(port));
+	k_sleep(K_MSEC(100)); /* sleep to trigger deferred hooks */
 
 	zassert_equal(ppc_vbus_sink_enable_fake.arg0_history[0], port);
 	zassert_equal(ppc_vbus_sink_enable_fake.arg1_history[0], 0);

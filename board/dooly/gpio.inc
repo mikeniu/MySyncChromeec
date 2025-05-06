@@ -15,7 +15,7 @@
 GPIO_INT(CPU_C10_GATE_L,       PIN(6, 7), GPIO_INT_BOTH, c10_gate_interrupt)
 
 /* Wake Source interrupts */
-GPIO_INT(EC_WP_ODL,            PIN(A, 1), GPIO_INT_BOTH, switch_interrupt)
+GPIO(EC_WP_ODL,                PIN(A, 1), GPIO_INPUT)
 GPIO_INT(H1_EC_PWR_BTN_ODL,    PIN(0, 1), GPIO_INT_BOTH, power_button_interrupt)
 
 /* Power sequencing interrupts */

@@ -14,6 +14,8 @@
 #include "lpc.h"
 #include "system.h"
 #include "usbc/pd_task_intel_altmode.h"
+#include "usbc/pdc_power_mgmt.h"
+#include "usbc/ppm.h"
 #include "vboot.h"
 #include "watchdog.h"
 #include "zephyr_espi_shim.h"
@@ -132,6 +134,14 @@ void ec_app_main(void)
 	/* Start the EC tasks after performing all main initialization */
 	if (IS_ENABLED(CONFIG_SHIMMED_TASKS)) {
 		start_ec_tasks();
+	}
+
+	if (IS_ENABLED(CONFIG_USB_PDC_POWER_MGMT)) {
+		pdc_subsys_start();
+	}
+
+	if (IS_ENABLED(CONFIG_UCSI_PPM)) {
+		eppm_init();
 	}
 
 #ifndef CONFIG_AP_PWRSEQ_DRIVER

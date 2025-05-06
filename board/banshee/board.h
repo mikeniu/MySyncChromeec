@@ -80,6 +80,9 @@
 #define CONFIG_HOSTCMD_I2C_CONTROL
 
 #define CONFIG_USBC_PPC_SYV682X
+/* Avoid spurious OCP. */
+#undef CONFIG_SYV682X_HV_ILIM
+#define CONFIG_SYV682X_HV_ILIM SYV682X_HV_ILIM_5_50
 #define CONFIG_USB_PD_PPC
 
 #define PD_POWER_SUPPLY_TURN_ON_DELAY 30000 /* us */
@@ -89,10 +92,10 @@
 /*
  * Passive USB-C cables only support up to 60W.
  */
-#define PD_OPERATING_POWER_MW 15000
-#define PD_MAX_POWER_MW 60000
-#define PD_MAX_CURRENT_MA 3000
-#define PD_MAX_VOLTAGE_MV 20000
+#define CONFIG_USB_PD_OPERATING_POWER_MW 15000
+#define CONFIG_USB_PD_MAX_POWER_MW 60000
+#define CONFIG_USB_PD_MAX_CURRENT_MA 3000
+#define CONFIG_USB_PD_MAX_VOLTAGE_MV 20000
 
 /*
  * Macros for GPIO signals used in common code that don't match the
@@ -200,7 +203,7 @@
 #include "usbc_config.h"
 
 /* I2C access in polling mode before task is initialized */
-#define CONFIG_I2C_BITBANG
+#define CONFIG_I2C_BITBANG_CROS_EC
 
 enum banshee_bitbang_i2c_channel {
 	I2C_BITBANG_CHAN_BRD_ID,

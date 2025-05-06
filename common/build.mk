@@ -54,9 +54,9 @@ common-$(CONFIG_BLUETOOTH_LE_STACK)+=btle_hci_controller.o btle_ll.o
 common-$(CONFIG_BODY_DETECTION)+=body_detection.o
 common-$(CONFIG_CAPSENSE)+=capsense.o
 common-$(CONFIG_CEC)+=cec.o
-common-$(CONFIG_CBI_EEPROM)+=cbi.o cbi_config.o cbi_eeprom.o
+common-$(CONFIG_CBI_EEPROM)+=cbi.o cbi_common.o cbi_config.o cbi_eeprom.o
 common-$(CONFIG_USB_PD_FLAGS)+=usb_pd_flags.o
-common-$(CONFIG_CBI_GPIO)+=cbi.o cbi_config.o cbi_gpio.o
+common-$(CONFIG_CBI_GPIO)+=cbi.o cbi_common.o cbi_config.o cbi_gpio.o
 ifeq ($(HAS_MOCK_CHARGE_MANAGER),)
 common-$(CONFIG_CHARGE_MANAGER)+=charge_manager.o
 endif
@@ -109,7 +109,7 @@ common-$(CONFIG_I2C_CONTROLLER)+=i2c_controller.o
 common-$(CONFIG_I2C_CONTROLLER)+=i2c_controller_cros_ec.o
 common-$(CONFIG_I2C_CONTROLLER)+=i2c_passthru.o
 common-$(CONFIG_I2C_PERIPHERAL)+=i2c_peripheral.o
-common-$(CONFIG_I2C_BITBANG)+=i2c_bitbang.o
+common-$(CONFIG_I2C_BITBANG_CROS_EC)+=i2c_bitbang.o
 common-$(CONFIG_I2C_VIRTUAL_BATTERY)+=virtual_battery.o
 common-$(CONFIG_INDUCTIVE_CHARGING)+=inductive_charging.o
 common-$(CONFIG_KEYBOARD_PROTOCOL_8042)+=keyboard_8042.o \
@@ -118,13 +118,14 @@ common-$(CONFIG_KEYBOARD_PROTOCOL_MKBP)+=keyboard_mkbp.o mkbp_fifo.o \
 	mkbp_info.o
 common-$(CONFIG_KEYBOARD_TEST)+=keyboard_test.o
 common-$(CONFIG_KEYBOARD_VIVALDI)+=keyboard_vivaldi.o
+common-$(CONFIG_KEYBOARD_STRAUSS)+=keyboard_strauss.o
 common-$(CONFIG_MKBP_INPUT_DEVICES)+=mkbp_input_devices.o mkbp_fifo.o \
 	mkbp_info.o
 common-$(CONFIG_LED_COMMON)+=led_common.o
 common-$(CONFIG_LED_PWM)+=led_pwm.o
 common-$(CONFIG_LED_ONOFF_STATES)+=led_onoff_states.o
 common-$(CONFIG_LID_ANGLE)+=motion_lid.o math_util.o
-common-$(CONFIG_LID_ANGLE_UPDATE)+=lid_angle.o
+common-$(CONFIG_LID_ANGLE_UPDATE)+=lid_angle.o lid_angle_common.o
 common-$(CONFIG_LID_SWITCH)+=lid_switch.o
 common-$(CONFIG_HOSTCMD_X86)+=acpi.o port80.o ec_features.o
 common-$(CONFIG_MAG_CALIBRATE)+= mag_cal.o math_util.o vec3.o mat33.o mat44.o \
@@ -158,7 +159,8 @@ common-$(CONFIG_SHA256_SW)+=sha256.o
 common-$(CONFIG_SOFTWARE_CLZ)+=clz.o
 common-$(CONFIG_SOFTWARE_CTZ)+=ctz.o
 common-$(CONFIG_CMD_SPI_XFER)+=spi_commands.o
-common-$(CONFIG_SPI_FLASH)+=spi_flash.o
+common-$(CONFIG_SPI_FLASH)+=spi_flash.o spi_flash_reg.o
+common-$(CONFIG_SPI_FLASH_REGS)+=spi_flash_reg.o
 common-$(CONFIG_SPI_NOR)+=spi_nor.o
 common-$(CONFIG_SWITCH)+=switch.o
 common-$(CONFIG_SW_CRC)+=crc.o
@@ -219,6 +221,8 @@ common-$(HAS_TASK_LIGHTBAR)+=lb_common.o lightbar.o
 common-$(HAS_TASK_MOTIONSENSE)+=motion_sense.o
 common-$(CONFIG_SYSTEM_SAFE_MODE)+=system_safe_mode.o
 common-$(CONFIG_HOST_COMMAND_MEMORY_DUMP)+=host_command_memory_dump.o
+common-$(CONFIG_PRESERVED_RING_BUF)+=preserved_ring_buf.o
+common-$(CONFIG_PANIC_LOG)+=panic_log.o
 
 ifneq ($(HAVE_PRIVATE_AUDIO_CODEC_WOV_LIBS),y)
 common-$(CONFIG_AUDIO_CODEC_WOV)+=hotword_dsp_api.o
@@ -336,7 +340,6 @@ endif
 
 include $(_common_dir)fpsensor/build.mk
 include $(_common_dir)usbc/build.mk
-include $(_common_dir)spi/build.mk
 include $(_common_dir)mock/build.mk
 
 $(eval $(call vars_from_dir,common,usbc,common-usbc))

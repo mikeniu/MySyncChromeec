@@ -337,7 +337,7 @@ static int shim_ioex_manage_callback(const struct device *dev,
 	return gpio_manage_callback(&drv_data->callbacks, callback, enable);
 }
 
-static const struct gpio_driver_api api_table = {
+static DEVICE_API(gpio, api_table) = {
 	.pin_configure = shim_ioex_pin_configure,
 	.port_get_raw = shim_ioex_port_get_raw,
 	.port_set_masked_raw = shim_ioex_port_set_masked_raw,
@@ -356,21 +356,18 @@ static const struct gpio_driver_api api_table = {
 		.flags = DT_PROP(id, flags),                         \
 	},
 
-#define IOEX_INIT_DATA(idx)                                                  \
-	{                                                                    \
-		.ioex = IOEXPANDER_ID(DT_PARENT(DT_DRV_INST(idx))),          \
-		.port = DT_REG_ADDR(DT_DRV_INST(idx)),                       \
-		COND_CODE_1(                                                 \
-			DT_NODE_HAS_PROP(DT_PARENT(DT_DRV_INST(idx)),        \
-					 int_gpios),                         \
-			(.int_gpio_dev = DEVICE_DT_GET(DT_PHANDLE(           \
-				 DT_PARENT(DT_DRV_INST(idx)), int_gpios)),   \
-			 .int_gpio_pin = DT_GPIO_PIN(                        \
-				 DT_PARENT(DT_DRV_INST(idx)), int_gpios),    \
-			 .int_gpio_flags = DT_GPIO_FLAGS(                    \
-				 DT_PARENT(DT_DRV_INST(idx)), int_gpios), ), \
-			())                                                  \
-	}
+#define IOEX_INIT_DATA(idx)                                                 \
+	{ .ioex = IOEXPANDER_ID(DT_PARENT(DT_DRV_INST(idx))),               \
+	  .port = DT_REG_ADDR(DT_DRV_INST(idx)),                            \
+	  COND_CODE_1(                                                      \
+		  DT_NODE_HAS_PROP(DT_PARENT(DT_DRV_INST(idx)), int_gpios), \
+		  (.int_gpio_dev = DEVICE_DT_GET(DT_PHANDLE(                \
+			   DT_PARENT(DT_DRV_INST(idx)), int_gpios)),        \
+		   .int_gpio_pin = DT_GPIO_PIN(DT_PARENT(DT_DRV_INST(idx)), \
+					       int_gpios),                  \
+		   .int_gpio_flags = DT_GPIO_FLAGS(                         \
+			   DT_PARENT(DT_DRV_INST(idx)), int_gpios), ),      \
+		  ()) }
 
 struct ioexpander_config_t ioex_config[] = { DT_FOREACH_STATUS_OKAY(
 	DT_DRV_COMPAT_CHIP, IOEX_INIT_CONFIG_ELEM) };

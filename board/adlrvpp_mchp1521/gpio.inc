@@ -57,7 +57,7 @@ GPIO_INT(BC_ACOK_EC_IN,		PIN(0172),	GPIO_INT_BOTH,	extpower_interrupt)
 
 /* H1 */
 /* WP_L interrupt pin */
-GPIO_INT(EC_WAKE_CLK_R,		PIN(0241),	GPIO_INT_BOTH,	switch_interrupt)
+GPIO(EC_WAKE_CLK_R,		PIN(0241),	GPIO_INPUT)
 
 /* Case Closed Debug Mode */
 /* CCD_MODE_ODL pin */

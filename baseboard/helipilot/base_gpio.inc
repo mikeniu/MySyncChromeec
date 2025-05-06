@@ -6,7 +6,7 @@
 
 /* Interrupts */
 /* HOST_MCU_WP_OD in the schematic. */
-GPIO_INT(WP,                   PIN(A, 4), GPIO_INT_BOTH, switch_interrupt)
+GPIO(WP,                       PIN(A, 4), GPIO_INPUT)
 
 /* SHI CS Ready, Low Active. SPI_HOST_CS_MCU_ODL in the schematic. */
 GPIO_INT(SHI_CS_L,  PIN(5, 3), GPIO_INT_FALLING,shi_cs_event)

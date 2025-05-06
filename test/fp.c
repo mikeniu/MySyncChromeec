@@ -39,7 +39,7 @@
 	(IS_FP_EQUAL((a)[0], (b)[0], (diff)) && \
 	 IS_FP_EQUAL((a)[1], (b)[1], (diff)) && \
 	 IS_FP_EQUAL((a)[2], (b)[2], (diff)))
-#define IS_FP_EQUAL(a, b, diff) ((a) >= ((b)-diff) && (a) <= ((b) + diff))
+#define IS_FP_EQUAL(a, b, diff) ((a) >= ((b) - diff) && (a) <= ((b) + diff))
 #define IS_FLOAT_EQUAL(a, b, diff) IS_FP_EQUAL(a, b, diff)
 
 static int test_fpv3_scalar_mul(void)

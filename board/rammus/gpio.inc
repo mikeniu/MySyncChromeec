@@ -20,7 +20,7 @@ GPIO_INT(PWR_BTN_ODL,        PIN(0, 4), GPIO_INT_BOTH | GPIO_PULL_UP,     power_
 GPIO_INT(LID_OPEN,           PIN(6, 7), GPIO_INT_BOTH,                    lid_interrupt)
 GPIO_INT(VOLDN_BTN,          PIN(8, 3), GPIO_INT_BOTH,                    button_interrupt)
 GPIO_INT(VOLUP_BTN,          PIN(3, 6), GPIO_INT_BOTH,                    button_interrupt)
-GPIO_INT(WP_L,               PIN(4, 0), GPIO_INT_BOTH,                    switch_interrupt)
+GPIO(WP_L,                   PIN(4, 0), GPIO_INPUT)
 GPIO_INT(ROP_EC_ACOK,        PIN(C, 1), GPIO_INT_BOTH,                    extpower_interrupt)
 GPIO_INT(USB_C0_VBUS_DET_L,  PIN(9, 3), GPIO_INT_BOTH | GPIO_PULL_UP,     vbus0_evt)
 GPIO_INT(USB_C1_VBUS_DET_L,  PIN(9, 7), GPIO_INT_BOTH | GPIO_PULL_UP,     vbus1_evt)

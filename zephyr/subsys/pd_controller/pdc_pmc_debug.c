@@ -20,7 +20,7 @@ static int cmd_get_pd_port(const struct shell *sh, char *arg_val, uint8_t *port)
 	char *e;
 
 	*port = strtoul(arg_val, &e, 0);
-	if (*e || *port >= CONFIG_USB_PD_PORT_MAX_COUNT) {
+	if (*e || *port >= pdc_power_mgmt_get_usb_pd_port_count()) {
 		shell_error(sh, "Invalid port");
 		return -EINVAL;
 	}
@@ -64,7 +64,7 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_altmode_cmds,
 
 SHELL_CMD_REGISTER(altmode, &sub_altmode_cmds, "PD Altmode commands", NULL);
 
-#ifdef CONFIG_PLATFORM_EC_CONSOLE_CMD_TYPEC
+#ifdef CONFIG_PLATFORM_EC_CONSOLE_CMD_PDC_TYPEC
 static int command_typec(const struct shell *sh, int argc, const char **argv)
 {
 	char *e;

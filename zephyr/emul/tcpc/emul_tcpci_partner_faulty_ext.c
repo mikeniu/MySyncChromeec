@@ -118,6 +118,34 @@ tcpci_faulty_ext_handle_sop_msg(struct tcpci_partner_extension *ext,
 				return TCPCI_PARTNER_COMMON_MSG_HANDLED;
 			}
 		}
+	} else {
+		switch (PD_HEADER_TYPE(header)) {
+		case PD_CTRL_FR_SWAP:
+			if (action->action_mask &
+			    TCPCI_FAULTY_EXT_IGNORE_FR_SWAP) {
+				/* Send only GoodCRC */
+				tcpci_partner_received_msg_status(
+					common_data, TCPCI_EMUL_TX_SUCCESS);
+				tcpci_faulty_ext_reduce_action_count(data);
+				return TCPCI_PARTNER_COMMON_MSG_HANDLED;
+			} else if (action->action_mask &
+				   TCPCI_FAULTY_EXT_REJECT_FR_SWAP) {
+				tcpci_partner_send_control_msg(
+					common_data, PD_CTRL_REJECT, 0);
+				tcpci_faulty_ext_reduce_action_count(data);
+				return TCPCI_PARTNER_COMMON_MSG_HANDLED;
+			} else if (action->action_mask &
+				   TCPCI_FAULTY_EXT_ACCEPT_FR_SWAP_TIMEOUT) {
+				/* Send Accept, but wait too long to do it. The
+				 * maximum allowed value of tSenderResponse is
+				 * 33 ms, so wait 35 ms.
+				 */
+				tcpci_partner_send_control_msg(
+					common_data, PD_CTRL_ACCEPT, 35);
+				tcpci_faulty_ext_reduce_action_count(data);
+				return TCPCI_PARTNER_COMMON_MSG_HANDLED;
+			}
+		}
 	}
 
 	/*

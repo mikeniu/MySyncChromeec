@@ -69,7 +69,7 @@
 
 /* Reg value for the next higher ODR */
 #define ICM426XX_ODR_REG_UP(_reg) \
-	((_reg) == 15 ? 6 : (_reg) == 7 ? 15 : (_reg)-1)
+	((_reg) == 15 ? 6 : (_reg) == 7 ? 15 : (_reg) - 1)
 
 /*
  * Register addresses are virtual address on 16 bits.

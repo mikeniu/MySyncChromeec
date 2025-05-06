@@ -25,7 +25,9 @@
 #include <zephyr/kernel.h>
 #include <zephyr/mgmt/ec_host_cmd/simulator.h>
 #include <zephyr/shell/shell.h>
+#if defined(CONFIG_SHELL_BACKEND_DUMMY)
 #include <zephyr/shell/shell_dummy.h>
+#endif
 #include <zephyr/shell/shell_uart.h>
 #include <zephyr/ztest.h>
 
@@ -137,7 +139,7 @@ void connect_source_to_port(struct tcpci_partner_data *partner,
 	zassert_ok(tcpci_partner_connect_to_tcpci(partner, tcpci_emul));
 
 	isl923x_emul_set_adc_vbus(charger_emul,
-				  PDO_FIXED_GET_VOLT(src->pdo[pdo_index]));
+				  PDO_FIXED_VOLTAGE(src->pdo[pdo_index]));
 
 	k_sleep(K_SECONDS(10));
 }
@@ -284,8 +286,21 @@ int host_cmd_motion_sense_info(uint8_t cmd_version, uint8_t sensor_num,
 	};
 	struct host_cmd_handler_args args = BUILD_HOST_COMMAND(
 		EC_CMD_MOTION_SENSE_CMD, cmd_version, *response, params);
+	int ret = host_command_process(&args);
 
-	return host_command_process(&args);
+	if (ret == EC_RES_SUCCESS) {
+		if (cmd_version < 3) {
+			zassert_equal(args.response_size,
+				      sizeof(response->info));
+		} else if (cmd_version == 3) {
+			zassert_equal(args.response_size,
+				      sizeof(response->info_3));
+		} else if (cmd_version >= 4) {
+			zassert_equal(args.response_size,
+				      sizeof(response->info_4));
+		}
+	}
+	return ret;
 }
 
 int host_cmd_motion_sense_ec_rate(uint8_t sensor_num, int data_rate_ms,
@@ -567,7 +582,6 @@ host_cmd_get_next_event_v2(struct ec_response_get_next_event_v1 *response)
 {
 	struct host_cmd_handler_args args = BUILD_HOST_COMMAND_RESPONSE(
 		EC_CMD_GET_NEXT_EVENT, 2, *response);
-
 	return host_command_process(&args);
 }
 
@@ -770,9 +784,9 @@ static uint16_t pass_args_to_sim(struct host_cmd_handler_args *args)
 	rv = k_sem_take(&send_called, K_SECONDS(1));
 	zassert_equal(rv, 0, "Send was not called");
 
-	memcpy(args->response, (uint8_t *)tx_buf->buf + TX_HEADER_SIZE,
-	       args->response_max);
 	args->response_size = tx_buf->len - TX_HEADER_SIZE;
+	memcpy(args->response, (uint8_t *)tx_buf->buf + TX_HEADER_SIZE,
+	       args->response_size);
 	tx_header = tx_buf->buf;
 
 	return tx_header->result;
@@ -821,6 +835,7 @@ int emul_init_stub(const struct device *dev)
 #define DT_DRV_COMPAT zephyr_espi_emul_espi_host
 DT_INST_FOREACH_STATUS_OKAY(EMUL_STUB_DEVICE);
 
+#if defined(CONFIG_SHELL_BACKEND_DUMMY)
 void check_console_cmd(const char *cmd, const char *expected_output,
 		       const int expected_rv, const char *file, const int line)
 {
@@ -842,3 +857,4 @@ void check_console_cmd(const char *cmd, const char *expected_output,
 			     "Invalid console output %s", buffer);
 	}
 }
+#endif /* CONFIG_SHELL_BACKEND_DUMMY */

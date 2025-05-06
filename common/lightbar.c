@@ -1558,10 +1558,7 @@ struct lightbar_cmd_t {
 	uint32_t (*sequence)(void);
 };
 
-#define LBMSG(state)                     \
-	{                                \
-		#state, sequence_##state \
-	}
+#define LBMSG(state) { #state, sequence_##state }
 #include "lightbar_msg_list.h"
 static struct lightbar_cmd_t lightbar_cmds[] = { LIGHTBAR_MSG_LIST };
 #undef LBMSG

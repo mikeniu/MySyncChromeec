@@ -60,6 +60,7 @@ const struct tcpc_config_t tcpc_config[] = {
 		.drv = &ps8xxx_tcpm_drv,
 		.flags = TCPC_FLAGS_TCPCI_REV2_0 |
 			 TCPC_FLAGS_TCPCI_REV2_0_NO_VSAFE0V |
+			 TCPC_FLAGS_SET_VCONN_IN_SYNC |
 			 TCPC_FLAGS_CONTROL_FRS,
 	},
 };
@@ -242,11 +243,11 @@ static void board_tcpc_init(void)
 	if (!system_jumped_late())
 		board_reset_pd_mcu();
 
-		/*
-		 * These IO expander pins are implemented using the
-		 * C0 TCPC, so they must be set up after the TCPC has
-		 * been taken out of reset.
-		 */
+	/*
+	 * These IO expander pins are implemented using the
+	 * C0 TCPC, so they must be set up after the TCPC has
+	 * been taken out of reset.
+	 */
 #ifndef CONFIG_ZEPHYR
 	ioex_init(IOEX_C0_NCT38XX);
 #else

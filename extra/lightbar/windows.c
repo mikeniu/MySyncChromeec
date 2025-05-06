@@ -234,7 +234,7 @@ void lb_hc_cmd_dump(struct ec_response_lightbar *out)
 	printf("lightbar is %s\n", fake_power ? "on" : "off");
 	memset(out, fake_power, sizeof(*out));
 };
-void lb_hc_cmd_reg(const struct ec_params_lightbar *in){};
+void lb_hc_cmd_reg(const struct ec_params_lightbar *in) {};
 
 int lb_power(int enabled)
 {

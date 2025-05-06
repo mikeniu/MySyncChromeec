@@ -49,11 +49,6 @@ static void switch_update(void)
 	else
 		*memmap_switches &= ~EC_SWITCH_LID_OPEN;
 
-	if ((crec_flash_get_protect() & EC_FLASH_PROTECT_GPIO_ASSERTED) == 0)
-		*memmap_switches |= EC_SWITCH_WRITE_PROTECT_DISABLED;
-	else
-		*memmap_switches &= ~EC_SWITCH_WRITE_PROTECT_DISABLED;
-
 #ifdef CONFIG_SWITCH_DEDICATED_RECOVERY
 	if (gpio_get_level(GPIO_RECOVERY_L) == 0)
 		*memmap_switches |= EC_SWITCH_DEDICATED_RECOVERY;
@@ -83,13 +78,6 @@ static void switch_init(void)
 	/* Enable interrupts, now that we've initialized */
 	gpio_enable_interrupt(GPIO_RECOVERY_L);
 #endif
-
-	/*
-	 * TODO(crosbug.com/p/23793): It's weird that flash_common.c owns
-	 * reading the write protect signal, but we enable the interrupt for it
-	 * here.  Take ownership of WP back, or refactor it to its own module.
-	 */
-	write_protect_enable_interrupt();
 }
 DECLARE_HOOK(HOOK_INIT, switch_init, HOOK_PRIO_INIT_SWITCH);
 

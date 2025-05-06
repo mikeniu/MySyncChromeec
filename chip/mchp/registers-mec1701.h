@@ -236,7 +236,7 @@
  * Cortex-M4 bit-banding does require aliasing of the
  * DATA SRAM region.
  */
-#define MCHP_RAM_ALIAS(x) ((x) >= 0x118000 ? (x)-0x118000 + 0x20000000 : (x))
+#define MCHP_RAM_ALIAS(x) ((x) >= 0x118000 ? (x) - 0x118000 + 0x20000000 : (x))
 
 /* EC Chip Configuration */
 /* 8-bit Device ID */
@@ -545,7 +545,7 @@
 #define MCHP_INT_GIRQ_LAST 26
 #define MCHP_INT_GIRQ_NUM (26 - 8 + 1)
 /* MCHP_INT_GIRQ_FIRST <= x <= MCHP_INT_GIRQ_LAST */
-#define MCHP_INTx_BASE(x) (MCHP_INT_BASE + (((x)-8) * MCHP_INT_GIRQ_LEN))
+#define MCHP_INTx_BASE(x) (MCHP_INT_BASE + (((x) - 8) * MCHP_INT_GIRQ_LEN))
 
 /*
  * GPIO GIRQ's are not direct capable
@@ -716,7 +716,7 @@
 #define MCHP_INT24_MSVW_SRC(v, s) (1ul << ((4 * (v)) + (s)))
 
 /* GIRQ25 sources Master-to-Slave v=[7:10], Source=[0:3] */
-#define MCHP_INT25_MSVW_SRC(v, s) (1ul << ((4 * ((v)-7)) + (s)))
+#define MCHP_INT25_MSVW_SRC(v, s) (1ul << ((4 * ((v) - 7)) + (s)))
 
 /* UART Peripheral 0 <= x <= 1 */
 #define MCHP_UART_INSTANCES 2
@@ -1268,7 +1268,7 @@ enum MCHP_i2c_port {
 #define MCHP_ESPI_MSVW_GIRQ(v) (24 + ((v) > 6 ? 1 : 0))
 
 #define MCHP_ESPI_MSVW_SRC_GIRQ_BIT(v, n) \
-	(((v) > 6) ? (1ul << (((v)-7) + (n))) : (1ul << ((v) + (n))))
+	(((v) > 6) ? (1ul << (((v) - 7) + (n))) : (1ul << ((v) + (n))))
 
 /* DMA */
 #define MCHP_DMA_MAX_CHAN 14

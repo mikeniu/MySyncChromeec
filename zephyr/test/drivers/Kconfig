@@ -163,6 +163,12 @@ config LINK_TEST_SUITE_PANIC_OUTPUT
 config LINK_TEST_SUITE_PANIC_REASON
 	bool "Link and test the panic_reason tests"
 
+config LINK_TEST_SUITE_PANIC_LOG
+	bool "Link and test the panic log tests"
+
+config LINK_TEST_SUITE_PRESERVED_RING_BUF
+	bool "Link and test the preserved ring buf tests"
+
 config LINK_TEST_SUITE_POWER_HOST_SLEEP
 	bool "Link and run the power/host_sleep.c specific tests"
 
@@ -174,6 +180,12 @@ config LINK_TEST_SUITE_PS8743
 
 config LINK_TEST_SUITE_PS8XXX
 	bool "Link and test the ps8xxx tests"
+
+config LINK_TEST_SUITE_RAA489000
+	bool "Link and test the raa489000 tests"
+	help
+	  Link raa489000 test suite for the TCPM driver related function
+	  tests.
 
 config LINK_TEST_SUITE_RT1715
 	bool "Link and test the rt17115 tests"
@@ -211,6 +223,9 @@ config LINK_TEST_SUITE_RANDOM
 	bool "Link and run random (trng) tests"
 	help
 	  Include the test suite exercising RNG code in the binary.
+
+config LINK_TEST_SUITE_SHIM_ESPI
+	bool "Link and run the eSPI shim tests"
 
 config LINK_TEST_SUITE_SHIM_GPIO_ID
 	bool "Link and run the gpio tests"
@@ -317,6 +332,12 @@ config LINK_TEST_SUITE_USBC_VCONN_SWAP
 	bool "Link and test the usbc_vconn_swap tests"
 	help
 	  Include the test suite exercising VCONN Swap behaviors in the binary.
+
+config LINK_TEST_SUITE_USBC_FAKE_PDOS
+	bool "Link and test the usbc_fake_pdos tests"
+	help
+	  Include the test suite exercising non-standard PDO behaviors in the
+	  binary.
 
 config LINK_TEST_SUITE_CONSOLE
 	bool "Link and test the console tests"

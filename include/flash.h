@@ -474,7 +474,7 @@ void crec_flash_reset(void);
 #ifdef CONFIG_EXTERNAL_STORAGE
 void crec_flash_lock_mapped_storage(int lock);
 #else
-static inline void crec_flash_lock_mapped_storage(int lock){};
+static inline void crec_flash_lock_mapped_storage(int lock) {};
 #endif /* CONFIG_EXTERNAL_STORAGE */
 
 /**

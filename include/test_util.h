@@ -453,9 +453,7 @@ struct unit_test {
  * @param teardown A function to call after this test function for cleanup.
  */
 #define ztest_unit_test_setup_teardown(fn, setup, teardown) \
-	{                                                   \
-		#fn, fn, setup, teardown                    \
-	}
+	{ #fn, fn, setup, teardown }
 
 /**
  * Create a unit test for a given function name with noop setup/teardown

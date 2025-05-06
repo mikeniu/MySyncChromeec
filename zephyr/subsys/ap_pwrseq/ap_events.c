@@ -47,8 +47,7 @@ int ap_power_ev_remove_callback(struct ap_power_ev_callback *cb)
 	return ap_power_ev_manage_callback(cb, false);
 }
 
-void ap_power_ev_add_events(struct ap_power_ev_callback *cb,
-			    enum ap_power_events events)
+void ap_power_ev_add_events(struct ap_power_ev_callback *cb, uint32_t events)
 {
 	__ASSERT(cb, "Callback pointer should not be NULL");
 
@@ -59,7 +58,7 @@ void ap_power_ev_add_events(struct ap_power_ev_callback *cb,
 /*
  * Run the callback list
  */
-void ap_power_ev_send_callbacks(enum ap_power_events event)
+void ap_power_ev_send_callbacks(uint32_t event)
 {
 	struct ap_power_ev_data data;
 	struct ap_power_ev_callback *cb, *tmp;

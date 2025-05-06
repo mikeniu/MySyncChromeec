@@ -255,6 +255,14 @@ __maybe_unused static int nx20p3483_vbus_source_enable(int port, int enable)
 	if (rv)
 		return rv;
 
+	/* We want to control vbus discharge with source enable */
+	if (IS_ENABLED(CONFIG_USBC_NX20P348X_VBUS_DISCHARGE_BY_SRC_EN)) {
+		if (enable)
+			nx20p348x_discharge_vbus(port, 0);
+		else
+			nx20p348x_discharge_vbus(port, 1);
+	}
+
 	/*
 	 * Wait up to NX20P348X_SWITCH_STATUS_DEBOUNCE_MSEC for the status
 	 * to reflect the control command.
@@ -292,7 +300,27 @@ static int nx20p348x_init(int port)
 	int mask;
 	int mode;
 	int rv;
+	int device_id;
 	enum tcpc_rp_value initial_current_limit;
+
+	rv = read_reg(port, NX20P348X_DEVICE_ID_REG, &device_id);
+	if (rv)
+		return rv;
+
+	/* Verify device ID*/
+	switch (device_id) {
+	case NX20P3481_DEVICE_ID:
+		CPRINTS("ppc%d: NX20P3481", port);
+		break;
+	case NX20P3483_DEVICE_ID:
+		CPRINTS("ppc%d: NX20P3483", port);
+		break;
+	case HL5099_DEVICE_ID:
+		CPRINTS("ppc%d: HL5099", port);
+		break;
+	default:
+		CPRINTS("ppc%d: unknown", port);
+	}
 
 	/* Mask interrupts for interrupt 2 register */
 	mask = ~NX20P348X_INT2_EN_ERR;

@@ -42,7 +42,7 @@ extern void (*const ioex_irq_handlers[])(enum ioex_signal signal);
 extern const int ioex_ih_count;
 
 /* Get ioex_info structure for specified signal */
-#define IOEX_GET_INFO(signal) (ioex_list + (signal)-IOEX_SIGNAL_START)
+#define IOEX_GET_INFO(signal) (ioex_list + (signal) - IOEX_SIGNAL_START)
 
 struct ioexpander_drv {
 	/* Initialize IO expander chip/driver */

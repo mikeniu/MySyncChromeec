@@ -1,0 +1,79 @@
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+ #include <cros/cbi_flash.dtsi>
+ #include "binman.dtsi"
+
+/ {
+	aliases {
+		gpio-wp = &ec_wp_l;
+	};
+
+	named-gpios {
+		compatible = "named-gpios";
+
+		ec_wp_l: write-protect {
+			gpios = <&gpioa 0 GPIO_INPUT>;
+		};
+		/* unimplemented GPIOs */
+		entering-rw {
+			enum-name = "GPIO_ENTERING_RW";
+		};
+	};
+
+	named-i2c-ports {
+		compatible = "named-i2c-ports";
+
+		i2c_ec_i2c_charger: ec_i2c_charger {
+			i2c-port = <&i2c1>;
+			enum-names = "I2C_PORT_BATTERY";
+		};
+
+		i2c_ec_i2c_pd_prog: ec_i2c_pd_prog {
+			i2c-port = <&i2c0>;
+			enum-names = "I2C_PORT_PD";
+		};
+	};
+};
+
+&sha0 {
+	status = "okay";
+};
+
+&i2c0 {
+	status = "okay";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+	pinctrl-0 = < &i2c0_clk_gpb3_default &i2c0_data_gpb4_default >;
+	pinctrl-names = "default";
+	label = "i2c0";
+};
+&i2c1 {
+	status = "okay";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+	pinctrl-0 = < &i2c1_clk_gpc1_default &i2c1_data_gpc2_default >;
+	pinctrl-names = "default";
+	label = "i2c1";
+};
+&i2c2 {
+	status = "okay";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+	label = "i2c2";
+	pinctrl-0 = < &i2c2_clk_gpc7_default &i2c2_data_gpd0_default >;
+	pinctrl-names = "default";
+};
+&i2c3 {
+	status = "okay";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+	label = "i2c3";
+	pinctrl-0 = < &i2c3_clk_gph1_default &i2c3_data_gph2_default >;
+	pinctrl-names = "default";
+};
+&i2c4 {
+	status = "okay";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+	label = "i2c4";
+	pinctrl-0 = < &i2c4_clk_gpe0_default &i2c4_data_gpe7_default >;
+	pinctrl-names = "default";
+};

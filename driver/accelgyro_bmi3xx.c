@@ -324,6 +324,7 @@ static void bmi3_parse_fifo_data(struct motion_sensor_t *s,
  */
 static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 {
+	uint32_t interrupt_timestamp = last_interrupt_timestamp;
 	bool has_read_fifo = false;
 	uint16_t int_status[2];
 	uint16_t reg_data[2];
@@ -390,7 +391,7 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 		if (rv)
 			break;
 
-		bmi3_parse_fifo_data(s, &fifo_frame, last_interrupt_timestamp);
+		bmi3_parse_fifo_data(s, &fifo_frame, interrupt_timestamp);
 		has_read_fifo = true;
 	}
 
@@ -824,8 +825,9 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 	if (s->type == MOTIONSENSE_TYPE_ACCEL) {
 		if (rate == 0) {
 			/* FIFO stop collecting events */
-			if (IS_ENABLED(ACCELGYRO_BMI3XX_INT_ENABLE))
-				ret = enable_fifo(s, 0);
+#ifdef ACCELGYRO_BMI3XX_INT_ENABLE
+			ret = enable_fifo(s, 0);
+#endif
 
 			/*
 			 * Disable accel to set rate equal to zero.
@@ -848,8 +850,9 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 	} else if (s->type == MOTIONSENSE_TYPE_GYRO) {
 		if (rate == 0) {
 			/* FIFO stop collecting events */
-			if (IS_ENABLED(ACCELGYRO_BMI3XX_INT_ENABLE))
-				ret = enable_fifo(s, 0);
+#ifdef ACCELGYRO_BMI3XX_INT_ENABLE
+			ret = enable_fifo(s, 0);
+#endif
 
 			/*
 			 * Set gyro to suspend mode to disable gyro
@@ -886,8 +889,10 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 	 * If rate is non zero, FIFO start collecting events.
 	 * They will be discarded if AP does not want them.
 	 */
-	if (IS_ENABLED(ACCELGYRO_BMI3XX_INT_ENABLE) && (rate > 0))
+#ifdef ACCELGYRO_BMI3XX_INT_ENABLE
+	if (rate > 0)
 		ret = enable_fifo(s, 1);
+#endif
 
 	mutex_unlock(s->mutex);
 	return ret;
@@ -903,7 +908,7 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 	int ret;
 	uint8_t index, sens_size = 0;
 	uint8_t reg_data[4] = { 0 };
-	int(*sensor_range)[2];
+	int (*sensor_range)[2];
 
 	int acc_sensor_range[4][2] = {
 		{ 2, BMI3_ACC_RANGE_2G },
@@ -1065,8 +1070,9 @@ static int init(struct motion_sensor_t *s)
 		RETURN_ERROR(bmi3_write_n(s, BMI3_REG_FEATURE_ENGINE_GLOB_CTRL,
 					  reg_data, 2));
 
-		if (IS_ENABLED(ACCELGYRO_BMI3XX_INT_ENABLE))
-			RETURN_ERROR(config_interrupt(s));
+#ifdef ACCELGYRO_BMI3XX_INT_ENABLE
+		RETURN_ERROR(config_interrupt(s));
+#endif
 	}
 
 	for (i = X; i <= Z; i++)

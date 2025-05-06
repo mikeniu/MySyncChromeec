@@ -33,7 +33,7 @@ GPIO_INT(VOLUME_UP,		PIN(D, 5), GPIO_INT_BOTH | GPIO_PULL_UP, button_interrupt)
 GPIO_INT(VOL_DN_EC_R,		PIN(D, 6), GPIO_INT_BOTH | GPIO_PULL_UP, button_interrupt)
 GPIO_INT(SMC_LID,		PIN(E, 2), GPIO_INT_BOTH | GPIO_PULL_UP, lid_interrupt)
 GPIO_INT(MECH_PWR_BTN_ODL,	PIN(E, 4), GPIO_INT_BOTH, power_button_interrupt)
-GPIO_INT(EC_WP_ODL,		PIN(I, 4), GPIO_INT_BOTH, switch_interrupt)
+GPIO(EC_WP_ODL,			PIN(I, 4), GPIO_INPUT)
 
 /* DC Jack presence coming from +VADP_OUT */
 GPIO_INT(STD_ADP_PRSNT, 	PIN(J, 2), GPIO_INT_BOTH, board_dc_jack_interrupt) /* DC_JACK_PRESENT */

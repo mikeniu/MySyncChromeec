@@ -208,6 +208,17 @@ int tps_rd_active_rdo_contract(const struct i2c_dt_spec *i2c,
 			       union reg_active_rdo_contract *buf);
 
 /**
+ * @brief Read Active PDO Contract
+ *
+ * @param i2c device pointer to i2c device
+ * @param buf pointer where data is stored
+ *
+ * @return 0 on success, else -EIO
+ */
+int tps_rd_active_pdo_contract(const struct i2c_dt_spec *i2c,
+			       union reg_active_pdo_contract *buf);
+
+/**
  * @brief Read or Write Port Configuration
  *
  * @param i2c device pointer to i2c device
@@ -230,6 +241,16 @@ int tps_rw_port_configuration(const struct i2c_dt_spec *i2c,
  */
 int tps_rw_port_control(const struct i2c_dt_spec *i2c,
 			union reg_port_control *buf, int flag);
+
+/**
+ * @brief Read Boot Flags
+ *
+ * @param i2c device pointer to i2c device
+ * @param buf pointer where data is stored
+ *
+ * @return 0 on success, else -EIO
+ */
+int tps_rd_boot_flags(const struct i2c_dt_spec *i2c, union reg_boot_flags *buf);
 
 /**
  * @brief Read or Write Transmit Source Capabilities
@@ -396,6 +417,16 @@ int tps_rd_connection_manager_status(const struct i2c_dt_spec *i2c,
  */
 int tps_rd_data_status_reg(const struct i2c_dt_spec *i2c,
 			   union reg_data_status *status);
+
+/**
+ * @brief Read the status register (0x1A)
+ *
+ * @param i2c device pointer to i2c device
+ * @param status Output location for contents
+ *
+ * @return 0 on success, else -EIO
+ */
+int tps_rd_status_reg(const struct i2c_dt_spec *i2c, union reg_status *status);
 
 /**
  * @brief Perform bulk transfers to the PDC

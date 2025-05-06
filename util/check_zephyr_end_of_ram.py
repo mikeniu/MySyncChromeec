@@ -56,8 +56,8 @@ class BuildInfo:
         used_ram_end = self.get_symbol("_image_ram_end")
 
         # How the RAM size is indicated varies by SOC
-        if self.get_symbol("CONFIG_BOARD_NPCX9") or self.get_symbol(
-            "CONFIG_BOARD_IT8XXX2"
+        if self.get_symbol("CONFIG_SOC_SERIES_NPCX9") or self.get_symbol(
+            "CONFIG_SOC_SERIES_IT8XXX2"
         ):
             ram_base = self.get_symbol("CONFIG_SRAM_BASE_ADDRESS")
             assert (
@@ -95,8 +95,9 @@ def main(elf_path: Path):
     ):
         return
 
+    image_ram_end = build_info.get_symbol("_image_ram_end")
     assert (
-        build_info.get_symbol("_image_ram_end") is not None
+        image_ram_end is not None
     ), "The symbol _image_ram_end must be present in the ELF."
 
     min_preserved_ram = build_info.get_symbol(
@@ -110,6 +111,15 @@ def main(elf_path: Path):
             f"'{elf_path}'. Need at least "
             f"CONFIG_PLATFORM_EC_PRESERVED_END_OF_RAM_SIZE ({min_preserved_ram} "
             f"bytes)"
+        )
+
+    # If __noinit_end_of_ram_end is defined, verify that it matches _image_ram_end
+    # This check cannot be performed in the linker due to inconsistent linker script ordering
+    noinit_end_of_ram_end = build_info.get_symbol("__noinit_end_of_ram_end")
+    if noinit_end_of_ram_end is not None:
+        assert noinit_end_of_ram_end == image_ram_end, (
+            f"__noinit_end_of_ram_end ({noinit_end_of_ram_end}) does not match "
+            f" _image_ram_end ({image_ram_end})"
         )
 
 

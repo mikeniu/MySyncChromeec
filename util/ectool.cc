@@ -42,6 +42,7 @@
 #include <libec/fingerprint/fp_encryption_status_command.h>
 #include <libec/fingerprint/fp_frame_command.h>
 #include <libec/flash_protect_command.h>
+#include <libec/mkbp_event.h>
 #include <libec/rand_num_command.h>
 #include <libec/versions_command.h>
 #include <memory>
@@ -106,6 +107,8 @@ int ascii_mode;
 
 /* Message verbosity */
 static int verbose = 0;
+
+const command *commands_find(const char *name);
 
 /* Check SBS numerical value range */
 int is_battery_range(int val)
@@ -343,8 +346,6 @@ int cmd_hibdelay(int argc, char *argv[])
 	}
 
 	printf("Hibernation delay: %u s\n", r.hibernate_delay);
-	printf("Time G3: %u s\n", r.time_g3);
-	printf("Time left: %u s\n", r.time_remaining);
 	return 0;
 }
 
@@ -659,6 +660,7 @@ static const char *const ec_feature_names[] = {
 	[EC_FEATURE_AMD_STB_DUMP] = "AMD STB dump",
 	[EC_FEATURE_MEMORY_DUMP] = "Memory Dump",
 	[EC_FEATURE_UCSI_PPM] = "UCSI PPM",
+	[EC_FEATURE_STRAUSS] = "Strauss",
 };
 
 int cmd_inventory(int argc, char *argv[])
@@ -1905,8 +1907,9 @@ fp_download_frame(struct ec_response_fp_info *info, int index)
 	}
 	if (!frame_cmd->Run(comm_get_fd())) {
 		const char *error_str = strerror(errno);
+		std::string result_str = frame_cmd->ResultString();
 		if (frame_cmd->Result() != ec::kEcCommandUninitializedResult) {
-			error_str = frame_cmd->ResultString().c_str();
+			error_str = result_str.c_str();
 		}
 		fprintf(stderr, "Fp Frame command failed with error: %s\n",
 			error_str);
@@ -2176,16 +2179,15 @@ int cmd_fp_frame(int argc, char *argv[])
 		return 0;
 	}
 
-	/* Print 8-bpp PGM ASCII header */
-	printf("P2\n%d %d\n%d\n", r.width, r.height, (1 << r.bpp) - 1);
+	auto frame_to_pgm = ec::FpFrameCommand::FrameToPgm(
+		*fp_frame,
+		{ .bpp = r.bpp, .width = r.width, .height = r.height });
 
-	uint8_t *ptr = fp_frame->data();
-	for (int y = 0; y < r.height; y++) {
-		for (int x = 0; x < r.width; x++, ptr++)
-			printf("%d ", *ptr);
-		printf("\n");
+	if (!frame_to_pgm.has_value()) {
+		fprintf(stderr, "Error: Failed to convert frame to PGM.\n");
+		return -1;
 	}
-	printf("# END OF FILE\n");
+	fprintf(stdout, "%s", frame_to_pgm->c_str());
 	return 0;
 }
 
@@ -4928,10 +4930,7 @@ static int cmd_lightbar(int argc, char **argv)
 #define ST_PRM_SIZE(SUBCMD) \
 	(ST_CMD_SIZE + ST_FLD_SIZE(ec_params_motion_sense, SUBCMD))
 #define ST_RSP_SIZE(SUBCMD) ST_FLD_SIZE(ec_response_motion_sense, SUBCMD)
-#define ST_BOTH_SIZES(SUBCMD)                            \
-	{                                                \
-		ST_PRM_SIZE(SUBCMD), ST_RSP_SIZE(SUBCMD) \
-	}
+#define ST_BOTH_SIZES(SUBCMD) { ST_PRM_SIZE(SUBCMD), ST_RSP_SIZE(SUBCMD) }
 
 /*
  * For ectool only, assume no more than 16 sensors.  More advanced
@@ -6387,6 +6386,30 @@ static void print_pd_power_info(struct ec_response_usb_pd_power_info *r)
 	printf("\n");
 }
 
+/**
+ * @brief Helper function for getting the number of USB-PD ports in the system
+ *
+ * @param num_ports[out] Output parameter for number of ports
+ * @return 0 on success
+ * @return negative error code on failure
+ */
+static int get_num_pd_ports(int *num_ports)
+{
+	struct ec_response_usb_pd_ports r;
+	int rv;
+
+	assert(num_ports);
+
+	rv = ec_command(EC_CMD_USB_PD_PORTS, 0, NULL, 0, &r, sizeof(r));
+	if (rv < 0) {
+		return rv;
+	}
+
+	*num_ports = r.num_ports;
+
+	return 0;
+}
+
 int cmd_usb_pd_mux_info(int argc, char *argv[])
 {
 	struct ec_params_usb_pd_mux_info p;
@@ -6401,11 +6424,9 @@ int cmd_usb_pd_mux_info(int argc, char *argv[])
 		return -1;
 	}
 
-	rv = ec_command(EC_CMD_USB_PD_PORTS, 0, NULL, 0, ec_inbuf,
-			ec_max_insize);
+	rv = get_num_pd_ports(&num_ports);
 	if (rv < 0)
 		return rv;
-	num_ports = ((struct ec_response_usb_pd_ports *)ec_inbuf)->num_ports;
 
 	for (i = 0; i < num_ports; i++) {
 		p.port = i;
@@ -6452,6 +6473,149 @@ int cmd_usb_pd_mux_info(int argc, char *argv[])
 	return 0;
 }
 
+static void print_usb_pd_port_caps(int port_num,
+				   const struct ec_response_get_pd_port_caps *r)
+{
+	printf("Port %02d: ", port_num);
+
+	printf("power_role_cap=");
+	switch (r->pd_power_role_cap) {
+	case EC_PD_POWER_ROLE_SOURCE:
+		printf("source-only ");
+		break;
+	case EC_PD_POWER_ROLE_SINK:
+		printf("sink-only ");
+		break;
+	case EC_PD_POWER_ROLE_DUAL:
+		printf("dual-role ");
+		break;
+	default:
+		printf("unknown(%u) ", r->pd_power_role_cap);
+		break;
+	}
+
+	printf("try_power_role_cap=");
+	switch (r->pd_try_power_role_cap) {
+	case EC_PD_TRY_POWER_ROLE_NONE:
+		printf("none ");
+		break;
+	case EC_PD_TRY_POWER_ROLE_SINK:
+		printf("trysink ");
+		break;
+	case EC_PD_TRY_POWER_ROLE_SOURCE:
+		printf("trysrc ");
+		break;
+	default:
+		printf("unknown(%u) ", r->pd_try_power_role_cap);
+		break;
+	}
+
+	printf("data_role_cap=");
+	switch (r->pd_data_role_cap) {
+	case EC_PD_DATA_ROLE_DFP:
+		printf("dfp-only ");
+		break;
+	case EC_PD_DATA_ROLE_UFP:
+		printf("ufp-only ");
+		break;
+	case EC_PD_DATA_ROLE_DUAL:
+		printf("dual-role ");
+		break;
+	default:
+		printf("unknown(%u) ", r->pd_data_role_cap);
+		break;
+	}
+
+	printf("port_location=");
+	switch (r->pd_port_location) {
+	case EC_PD_PORT_LOCATION_UNKNOWN:
+		printf("unknown ");
+		break;
+	case EC_PD_PORT_LOCATION_LEFT:
+		printf("left ");
+		break;
+	case EC_PD_PORT_LOCATION_RIGHT:
+		printf("right ");
+		break;
+	case EC_PD_PORT_LOCATION_BACK:
+		printf("back ");
+		break;
+	case EC_PD_PORT_LOCATION_FRONT:
+		printf("front ");
+		break;
+	case EC_PD_PORT_LOCATION_LEFT_FRONT:
+		printf("left-front ");
+		break;
+	case EC_PD_PORT_LOCATION_LEFT_BACK:
+		printf("left-back ");
+		break;
+	case EC_PD_PORT_LOCATION_RIGHT_FRONT:
+		printf("right-front ");
+		break;
+	case EC_PD_PORT_LOCATION_RIGHT_BACK:
+		printf("right-back ");
+		break;
+	case EC_PD_PORT_LOCATION_BACK_LEFT:
+		printf("back-left ");
+		break;
+	case EC_PD_PORT_LOCATION_BACK_RIGHT:
+		printf("back-right ");
+		break;
+	default:
+		printf("other(%u) ", r->pd_port_location);
+		break;
+	}
+
+	printf("\n");
+}
+
+int cmd_usb_pd_port_caps(int argc, char *argv[])
+{
+	struct ec_params_get_pd_port_caps p;
+	struct ec_response_get_pd_port_caps *r =
+		(struct ec_response_get_pd_port_caps *)ec_inbuf;
+	int num_ports, rv;
+	char *e;
+
+	if (argc < 2) {
+		/* Print all ports' capabilities */
+		rv = get_num_pd_ports(&num_ports);
+		if (rv < 0)
+			return rv;
+
+		for (int i = 0; i < num_ports; i++) {
+			p.port = i;
+
+			rv = ec_command(EC_CMD_GET_PD_PORT_CAPS, 0, &p,
+					sizeof(p), ec_inbuf, ec_max_insize);
+			if (rv < 0) {
+				return rv;
+			}
+
+			print_usb_pd_port_caps(i, r);
+		}
+
+		return 0;
+	}
+
+	/* Print a specific port's capabilities */
+	p.port = strtol(argv[1], &e, 0);
+	if (e && *e) {
+		fprintf(stderr, "Bad port number\n");
+		return -1;
+	}
+
+	rv = ec_command(EC_CMD_GET_PD_PORT_CAPS, 0, &p, sizeof(p), ec_inbuf,
+			ec_max_insize);
+	if (rv < 0) {
+		return rv;
+	}
+
+	print_usb_pd_port_caps(p.port, r);
+
+	return 0;
+}
+
 int cmd_usb_pd_power(int argc, char *argv[])
 {
 	struct ec_params_usb_pd_power_info p;
@@ -6460,11 +6624,9 @@ int cmd_usb_pd_power(int argc, char *argv[])
 	int num_ports, i, rv;
 	char *e;
 
-	rv = ec_command(EC_CMD_USB_PD_PORTS, 0, NULL, 0, ec_inbuf,
-			ec_max_insize);
+	rv = get_num_pd_ports(&num_ports);
 	if (rv < 0)
 		return rv;
-	num_ports = ((struct ec_response_usb_pd_ports *)r)->num_ports;
 
 	if (argc < 2) {
 		for (i = 0; i < num_ports; i++) {
@@ -6612,6 +6774,139 @@ int cmd_keyboard_get_config(int argc, char *argv[])
 	printf("\n");
 
 	return 0;
+}
+
+int cmd_panic_log(int argc, char *argv[])
+{
+	int rv;
+	struct ec_params_panic_log_info info_params = { 0 };
+	struct ec_response_panic_log_info info_response;
+
+	if (argc != 2) {
+		goto usage;
+	}
+
+	if (!ec_cmd_version_supported(EC_CMD_PANIC_LOG_INFO, 0)) {
+		fprintf(stderr, "Panic log not supported\n");
+		return -1;
+	}
+
+	if (!strcmp(argv[1], "info")) {
+		rv = ec_command(EC_CMD_PANIC_LOG_INFO, 0, &info_params,
+				sizeof(info_params), &info_response,
+				sizeof(info_response));
+		if (rv < 0) {
+			fprintf(stderr, "Error getting panic log info\n");
+			return rv;
+		}
+		printf("Valid: %d\n", info_response.valid);
+		printf("Frozen: %d\n", info_response.frozen);
+		printf("Length: %d\n", info_response.length);
+		printf("Capacity: %d\n", info_response.capacity);
+		printf("Version: %d\n", info_response.version);
+	} else if (!strcmp(argv[1], "freeze")) {
+		info_params.freeze = 1;
+		rv = ec_command(EC_CMD_PANIC_LOG_INFO, 0, &info_params,
+				sizeof(info_params), &info_response,
+				sizeof(info_response));
+		if (rv < 0) {
+			fprintf(stderr, "Error freezing panic log\n");
+			return rv;
+		}
+		if (info_response.frozen)
+			printf("Panic log already frozen\n");
+		else
+			printf("Panic log frozen\n");
+	} else if (!strcmp(argv[1], "unfreeze")) {
+		info_params.unfreeze = 1;
+		rv = ec_command(EC_CMD_PANIC_LOG_INFO, 0, &info_params,
+				sizeof(info_params), &info_response,
+				sizeof(info_response));
+		if (rv < 0) {
+			fprintf(stderr, "Error unfreezing panic log\n");
+			return rv;
+		}
+		if (!info_response.frozen)
+			printf("Panic log already unfrozen\n");
+		else
+			printf("Panic log unfrozen\n");
+	} else if (!strcmp(argv[1], "reset")) {
+		info_params.reset = 1;
+		rv = ec_command(EC_CMD_PANIC_LOG_INFO, 0, &info_params,
+				sizeof(info_params), &info_response,
+				sizeof(info_response));
+		if (rv < 0) {
+			fprintf(stderr, "Error resetting panic log\n");
+			return rv;
+		}
+		printf("Panic log reset\n");
+	} else if (!strcmp(argv[1], "dump")) {
+		char *response = (char *)ec_inbuf;
+		int response_max;
+		struct ec_params_panic_log_read read_params;
+		struct ec_response_get_protocol_info protocol_info_response;
+
+		/* Determine the max response packet size */
+		rv = ec_command(EC_CMD_GET_PROTOCOL_INFO, 0, NULL, 0,
+				&protocol_info_response,
+				sizeof(protocol_info_response));
+		if (rv < 0) {
+			fprintf(stderr, "Error getting protocol info\n");
+			return rv;
+		}
+		response_max = protocol_info_response.max_response_packet_size;
+
+		info_params.freeze = 1;
+		rv = ec_command(EC_CMD_PANIC_LOG_INFO, 0, &info_params,
+				sizeof(info_params), &info_response,
+				sizeof(info_response));
+		if (rv < 0) {
+			fprintf(stderr, "Error getting panic log info\n");
+			return rv;
+		}
+		while (read_params.offset < info_response.length) {
+			/* Limit response size by one byte for null terminator
+			 */
+			int response_size =
+				ec_command(EC_CMD_PANIC_LOG_READ, 0,
+					   &read_params, sizeof(read_params),
+					   response, response_max - 1);
+			if (response_size < 0) {
+				fprintf(stderr, "Error reading panic log\n");
+				return rv;
+			}
+			if (response_size == 0)
+				break;
+			/* Ensure null terminated */
+			response[response_size] = '\0';
+			fputs(response, stdout);
+			read_params.offset += response_size;
+		}
+		fputs("\n", stdout);
+		/* Restore frozen state */
+		if (!info_response.frozen) {
+			info_params = { 0 };
+			info_params.unfreeze = 1;
+			rv = ec_command(EC_CMD_PANIC_LOG_INFO, 0, &info_params,
+					sizeof(info_params), &info_response,
+					sizeof(info_response));
+			if (rv < 0) {
+				fprintf(stderr,
+					"Error unfreezing panic log after dumping\n");
+				return rv;
+			}
+		}
+
+	} else {
+		goto usage;
+	}
+
+	return 0;
+
+usage:
+	fprintf(stderr, "Usage: %s [info | dump | freeze | unfreeze | reset]\n",
+		argv[0]);
+	return -1;
 }
 
 int cmd_panic_info(int argc, char *argv[])
@@ -7075,8 +7370,6 @@ int cmd_switches(int argc, char *argv[])
 	       (s & EC_SWITCH_LID_OPEN ? "OPEN" : "CLOSED"));
 	printf("Power button:       %s\n",
 	       (s & EC_SWITCH_POWER_BUTTON_PRESSED ? "DOWN" : "UP"));
-	printf("Write protect:      %sABLED\n",
-	       (s & EC_SWITCH_WRITE_PROTECT_DISABLED ? "DIS" : "EN"));
 	printf("Dedicated recovery: %sABLED\n",
 	       (s & EC_SWITCH_DEDICATED_RECOVERY ? "EN" : "DIS"));
 
@@ -7638,8 +7931,21 @@ static int cs_do_cmd(struct ec_params_charge_state *to_ec,
 }
 
 static const char *const base_params[] = {
-	"chg_voltage", "chg_current", "chg_input_current",
-	"chg_status",  "chg_option",  "limit_power",
+	"chg_voltage",
+	"chg_current",
+	"chg_input_current",
+	"chg_status",
+	"chg_option",
+	"limit_power",
+	"chg_voltage_min",
+	"chg_voltage_max",
+	"chg_voltage_step",
+	"chg_current_min",
+	"chg_current_max",
+	"chg_current_step",
+	"chg_input_current_min",
+	"chg_input_current_max",
+	"chg_input_current_step",
 };
 BUILD_ASSERT(ARRAY_SIZE(base_params) == CS_NUM_BASE_PARAMS);
 
@@ -7986,7 +8292,7 @@ static int get_battery_command_v2(uint8_t index)
 
 static int get_battery_command_v1(uint8_t index)
 {
-	struct ec_params_battery_static_info static_p {
+	struct ec_params_battery_static_info static_p{
 		.index = index,
 	};
 	struct ec_response_battery_static_info_v1 static_r;
@@ -8761,20 +9067,35 @@ static int cmd_battery_config_set(int argc, char *argv[], bool search_only)
 	/* Clear the dst to ensure it'll be null-terminated. */
 	memset(identifier, 0, sizeof(identifier));
 	sprintf(identifier, "%s,%s", manuf_name, device_name);
-	base::Value::Dict *root_dict = dict->FindDict(identifier);
-	if (root_dict == nullptr) {
-		fprintf(stderr,
-			"Config matching identifier=%s not found in %s.\n",
-			identifier, json_file);
+	base::Value::Dict *root_dict = nullptr;
+	int num_matches = 0;
+
+	for (const auto &identifier_in_json : *dict) {
+		if (!strncasecmp(identifier, identifier_in_json.first.c_str(),
+				 identifier_in_json.first.size())) {
+			root_dict = identifier_in_json.second.GetIfDict();
+			++num_matches;
+		}
+	}
+
+	if (num_matches == 0) {
+		fprintf(stderr, "No config found for '%s' in %s\n", identifier,
+			json_file);
+		free(json);
+		return -1;
+	} else if (num_matches > 1) {
+		fprintf(stderr, "Multiple (%d) configs found for '%s' in %s\n",
+			num_matches, identifier, json_file);
 		free(json);
 		return -1;
 	}
+
 	if (read_u8_from_json(root_dict, "struct_version", &struct_version))
 		return -1;
 
 	if (search_only) {
-		printf("Battery config with identifier: %s,%s is found at %s\n",
-		       manuf_name, device_name, json_file);
+		printf("Battery config with identifier: '%s' is found at %s\n",
+		       identifier, json_file);
 		return 0;
 	}
 
@@ -9609,7 +9930,8 @@ struct param_info {
 
 #define FIELD(fname, field, help_str)                                       \
 	{                                                                   \
-		.name = fname, .help = help_str,                            \
+		.name = fname,                                              \
+		.help = help_str,                                           \
 		.size = sizeof(((struct ec_mkbp_config *)NULL)->field),     \
 		.offset = __builtin_offsetof(struct ec_mkbp_config, field), \
 	}
@@ -9778,7 +10100,7 @@ static void cmd_memory_dump_usage(const char *command_name)
 {
 	fprintf(stderr,
 		"Usage: %s [<address> [<size>]]\n"
-		"  Prints the memory available for dumping in hexdump cononical format.\n"
+		"  Prints the memory available for dumping in hexdump canonical format.\n"
 		"  <address> is a 32-bit address offset. Defaults to 0x0.\n"
 		"  <size> is the number of bytes to print after <address>."
 		" Defaults to end of RAM.\n"
@@ -11080,7 +11402,7 @@ int cmd_pd_control(int argc, char *argv[])
 int cmd_pd_chip_info(int argc, char *argv[])
 {
 	struct ec_params_pd_chip_info p;
-	struct ec_response_pd_chip_info_v2 r;
+	struct ec_response_pd_chip_info_v3 r;
 	char *e;
 	int rv;
 	int cmdver;
@@ -11115,6 +11437,15 @@ int cmd_pd_chip_info(int argc, char *argv[])
 	if (rv)
 		return rv;
 
+	/* Protect against the EC supporting a higher HC version than ectool.
+	 * This should be incremented as ectool support for newer versions is
+	 * implemented (specific response struct type and decoding logic below)
+	 */
+	const int highest_supported_version = 3;
+	if (cmdver > highest_supported_version) {
+		cmdver = highest_supported_version;
+	}
+
 	rv = ec_command(EC_CMD_PD_CHIP_INFO, cmdver, &p, sizeof(p), &r,
 			sizeof(r));
 	if (rv < 0)
@@ -11147,6 +11478,12 @@ int cmd_pd_chip_info(int argc, char *argv[])
 	} else {
 		printf("fw_update_flags: UNSUPPORTED\n");
 		printf("fw_name_str: UNSUPPORTED\n");
+	}
+
+	if (cmdver >= 3) {
+		printf("driver_name: '%s'\n", r.driver_name);
+	} else {
+		printf("driver_name: UNSUPPORTED\n");
 	}
 
 	return 0;
@@ -11752,7 +12089,7 @@ int cmd_wait_event(int argc, char *argv[])
 	static const char *const host_event_text[] = HOST_EVENT_TEXT;
 
 	int rv, i;
-	struct ec_response_get_next_event_v1 buffer;
+	ec_response_get_next_event_v1 buffer = { 0 };
 	long timeout = 5000;
 	long event_type;
 	char *e;
@@ -11771,7 +12108,9 @@ int cmd_wait_event(int argc, char *argv[])
 	}
 
 	if (argc < 2) {
-		fprintf(stderr, "Usage: %s <type> [<timeout>]\n", argv[0]);
+		fprintf(stderr,
+			"Usage: %s <type> [timeout [cmd [cmd_args...]]]\n",
+			argv[0]);
 		fprintf(stderr, "\n");
 		fprintf(stderr, "type: MKBP event number or name.\n");
 		for (int i = 0; i < ARRAY_SIZE(mkbp_event_text); i++) {
@@ -11781,6 +12120,21 @@ int cmd_wait_event(int argc, char *argv[])
 				fprintf(stderr, "      %s or %d\n", name, i);
 			}
 		}
+		fprintf(stderr, "timeout: "
+				"Timeout in milliseconds (default 5000).\n");
+		fprintf(stderr,
+			"cmd: "
+			"Optional ectool command to run while waiting for events.\n");
+		fprintf(stderr, "cmd_args: "
+				"Optional arguments for the ectool command.\n");
+		fprintf(stderr, "\n");
+		fprintf(stderr,
+			"The waitevent command is designed to simply wait for an MKBP event and\n"
+			"print out the event details.\n"
+			"Optionally, you can provide another ectool command with arguments that\n"
+			"will be invoked, while waiting for this MKBP event. This has the\n"
+			"effect of running the ectool command and waiting for it's resultant\n"
+			"MKBP event.\n");
 
 		return -1;
 	}
@@ -11799,7 +12153,28 @@ int cmd_wait_event(int argc, char *argv[])
 		}
 	}
 
-	rv = wait_event(event_type, &buffer, sizeof(buffer), timeout);
+	auto events = ec::MkbpEvent(
+		comm_get_fd(), static_cast<enum ec_mkbp_event>(event_type));
+	events.Enable();
+
+	if (argc >= 4) {
+		const command *cmd = commands_find(argv[3]);
+		if (cmd == nullptr) {
+			fprintf(stderr, "Unknown command '%s'\n\n", argv[3]);
+			return -2;
+		}
+		rv = cmd->handler(argc - 3, argv + 3);
+	}
+
+	rv = events.Wait(timeout);
+	if (rv == 0) {
+		fprintf(stderr, "Timeout waiting for MKBP event\n");
+		return -ETIMEDOUT;
+	} else if (rv < 0) {
+		perror("Error polling for MKBP event\n");
+		return -EIO;
+	}
+	rv = read(comm_get_fd(), &buffer, sizeof(buffer));
 	if (rv < 0)
 		return rv;
 
@@ -12392,6 +12767,7 @@ const struct command commands[] = {
 	  "[CMDS]\n"
 	  "\tVarious motion sense control commands." },
 	{ "nextevent", cmd_next_event, "\n\tGet the next pending MKBP event." },
+	{ "paniclog", cmd_panic_log, "\n\tPrints saved panic log." },
 	{ "panicinfo", cmd_panic_info, "\n\tPrints saved panic info." },
 	{ "pause_in_s5", cmd_s5,
 	  "[on|off]\n"
@@ -12572,18 +12948,40 @@ const struct command commands[] = {
 	  "as:\n"
 	  "\t\t   Port, USB enabled, DP enabled, Polarity, HPD IRQ, "
 	  "HPD LVL." },
+	{ "usbpdportcaps", cmd_usb_pd_port_caps,
+	  "[port]\n"
+	  "\tGet port capabilities for a specified USB-C port." },
 	{ "usbpdpower", cmd_usb_pd_power,
 	  "[port]\n"
 	  "\tGet USB PD power information." },
 	{ "version", cmd_version, "\n\tPrints EC version." },
 	{ "waitevent", cmd_wait_event,
-	  "<type> [<timeout>]\n"
-	  "\tWait for the MKBP event of type and display it." },
+	  "<type> [timeout [command [command_args...]]]\n"
+	  "\tWait for the MKBP event of type and display it.\n"
+	  "\tOptionaly, run the command and wait for the mkbp event.\n"
+	  "\tRun with no arguments for more information." },
 	{ "wireless", cmd_wireless,
 	  "<flags> [<mask> [<suspend_flags> <suspend_mask>]]\n"
 	  "\tEnable/disable WLAN/Bluetooth radio." },
 	{ NULL, NULL }
 };
+
+/**
+ * Find the command entry by name.
+ *
+ * @param name The name of the command to search for.
+ * @returns The command struct entry or nullptr if not found.
+ */
+const command *commands_find(const char *name)
+{
+	const command *cmd;
+	for (cmd = commands; cmd->name; cmd++) {
+		if (!strcasecmp(name, cmd->name)) {
+			return cmd;
+		}
+	}
+	return nullptr;
+}
 
 void print_help(const char *prog, int print_cmds)
 {
@@ -12752,16 +13150,13 @@ int main(int argc, char *argv[])
 	}
 
 	/* Handle commands */
-	for (cmd = commands; cmd->name; cmd++) {
-		if (!strcasecmp(argv[optind], cmd->name)) {
-			rv = cmd->handler(argc - optind, argv + optind);
-			goto out;
-		}
+	cmd = commands_find(argv[optind]);
+	if (cmd == nullptr) {
+		fprintf(stderr, "Unknown command '%s'\n\n", argv[optind]);
+		print_help(argv[0], 0);
+		goto out;
 	}
-
-	/* If we're still here, command was unknown */
-	fprintf(stderr, "Unknown command '%s'\n\n", argv[optind]);
-	print_help(argv[0], 0);
+	rv = cmd->handler(argc - optind, argv + optind);
 
 out:
 	release_gec_lock();

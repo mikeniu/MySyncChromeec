@@ -80,7 +80,7 @@ extern "C" {
 	((type *)(((uint8_t *)pointer) - offsetof(type, member)))
 
 /* True of x is a power of two */
-#define POWER_OF_TWO(x) ((x) && !((x) & ((x)-1)))
+#define POWER_OF_TWO(x) ((x) && !((x) & ((x) - 1)))
 
 /* Macro to check if the value is in range */
 #ifndef CONFIG_ZEPHYR
@@ -92,7 +92,7 @@ extern "C" {
  * default integer division rounds down.
  */
 #ifndef DIV_ROUND_UP
-#define DIV_ROUND_UP(x, y) (((x) + ((y)-1)) / (y))
+#define DIV_ROUND_UP(x, y) (((x) + ((y) - 1)) / (y))
 #endif
 
 #ifndef DIV_ROUND_NEAREST

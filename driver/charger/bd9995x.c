@@ -510,8 +510,8 @@ static int bd9995x_enable_vbus_detect_interrupts(int chgnum, int port,
 	if (rv)
 		return rv;
 
-		/* Enable threshold interrupts if we need to control discharge
-		 */
+	/* Enable threshold interrupts if we need to control discharge
+	 */
 #ifdef CONFIG_USB_PD_DISCHARGE
 	mask_val = BD9995X_CMD_INT_VBUS_DET | BD9995X_CMD_INT_VBUS_TH;
 #else
@@ -1285,7 +1285,7 @@ static void bd9995x_set_switches(int port, enum usb_switch setting)
 	if (setting != USB_SWITCH_RESTORE)
 		usb_switch_state[port] = setting;
 
-		/* ensure we disable power saving when we are using DP/DN */
+	/* ensure we disable power saving when we are using DP/DN */
 #ifdef CONFIG_BD9995X_POWER_SAVE_MODE
 	bd9995x_set_power_save_mode(
 		(usb_switch_state[0] == USB_SWITCH_DISCONNECT &&

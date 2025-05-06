@@ -40,6 +40,12 @@ tests:
     - CONFIG_HW_TEST_EXCEPTION=y
     extra_conf_files:
     - prj_hw_tests.conf
+  exit:
+    extra_configs:
+    - CONFIG_HW_TEST_EXIT=y
+    - CONFIG_ZTEST_FATAL_HOOK=y
+    extra_conf_files:
+    - prj_hw_tests.conf
   flash_physical:
     extra_configs:
     - CONFIG_HW_TEST_FLASH_PHYSICAL=y
@@ -75,6 +81,11 @@ tests:
     extra_configs:
     - CONFIG_HW_TEST_FPSENSOR_CRYPTO=y
     - CONFIG_ZTEST_STACK_SIZE=9216
+    extra_conf_files:
+    - prj_hw_tests.conf
+  fpsensor_debug:
+    extra_configs:
+    - CONFIG_HW_TEST_FPSENSOR_DEBUG=y
     extra_conf_files:
     - prj_hw_tests.conf
   fpsensor_hw:
@@ -115,6 +126,12 @@ tests:
     - CONFIG_PLATFORM_EC_PANIC_STRIP_GPR=n
     extra_conf_files:
     - prj_hw_tests.conf
+  panic_data:
+    extra_configs:
+    - CONFIG_HW_TEST_PANIC_DATA=y
+    - CONFIG_PLATFORM_EC_DEBUG_ASSERT_REBOOTS=y
+    extra_conf_files:
+    - prj_hw_tests.conf
   printf:
     extra_configs:
     - CONFIG_HW_TEST_PRINTF=y
@@ -144,6 +161,13 @@ tests:
   rollback_entropy:
     extra_configs:
     - CONFIG_HW_TEST_ROLLBACK_ENTROPY=y
+    # Added to reduce RO flash usage
+    - CONFIG_PM=n
+    extra_conf_files:
+    - prj_hw_tests.conf
+  sbrk:
+    extra_configs:
+    - CONFIG_HW_TEST_SBRK=y
     # Added to reduce RO flash usage
     - CONFIG_PM=n
     extra_conf_files:
@@ -201,6 +225,11 @@ tests:
   utils_str:
     extra_configs:
     - CONFIG_HW_TEST_UTILS_STR=y
+    extra_conf_files:
+    - prj_hw_tests.conf
+  watchdog:
+    extra_configs:
+    - CONFIG_HW_TEST_WATCHDOG=y
     extra_conf_files:
     - prj_hw_tests.conf
   stdlib:

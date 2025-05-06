@@ -26,7 +26,7 @@ const unsigned int motion_sensor_count = ARRAY_SIZE(motion_sensors);
 /* Test utilities */
 
 /* Macro to compare two floats and check if they are equal within diff. */
-#define IS_FLOAT_EQUAL(a, b, diff) ((a) >= ((b)-diff) && (a) <= ((b) + diff))
+#define IS_FLOAT_EQUAL(a, b, diff) ((a) >= ((b) - diff) && (a) <= ((b) + diff))
 
 #define ACOS_TOLERANCE_DEG 0.5f
 #define RAD_TO_DEG (180.0f / 3.1415926f)

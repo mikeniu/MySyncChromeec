@@ -96,7 +96,7 @@ void *memcpy_to_usbram_ep0_patch(const void *src, size_t n);
 #define usb_sram_addr(x) ((x - __usb_ram_start) * sizeof(uint16_t))
 
 /* Compute value to put into rx_count */
-#define usb_ep_rx_size(x) ((x) < 64 ? (x) << 9 : 0x8000 | (((x)-32) << 5))
+#define usb_ep_rx_size(x) ((x) < 64 ? (x) << 9 : 0x8000 | (((x) - 32) << 5))
 
 /* Helpers for endpoint declaration */
 #define _EP_HANDLER2(num, suffix) CONCAT3(ep_, num, suffix)

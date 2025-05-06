@@ -665,7 +665,7 @@ enum {
 #define NPCX_DISIDL_CTL1 REG8(NPCX_PMC_BASE_ADDR + 0x005)
 #define NPCX_PWDWN_CTL_ADDR(offset)                                 \
 	(((offset) < 6) ? (NPCX_PMC_BASE_ADDR + 0x008 + (offset)) : \
-			  (NPCX_PMC_BASE_ADDR + 0x024 + (offset)-6))
+			  (NPCX_PMC_BASE_ADDR + 0x024 + (offset) - 6))
 #define NPCX_PWDWN_CTL(offset) REG8(NPCX_PWDWN_CTL_ADDR(offset))
 
 /* PMC register fields */

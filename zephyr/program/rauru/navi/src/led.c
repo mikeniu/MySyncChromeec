@@ -16,8 +16,8 @@
 #define LED_OFF_LVL 1
 #define LED_ON_LVL 0
 
-__override const int led_charge_lvl_1 = 0;
-__override const int led_charge_lvl_2 = 100;
+__override const int led_charge_lvl_1 = 5;
+__override const int led_charge_lvl_2 = 98;
 
 __override struct led_descriptor
 	led_bat_state_table[LED_NUM_STATES][LED_NUM_PHASES] = {
@@ -28,6 +28,7 @@ __override struct led_descriptor
 		[STATE_CHARGING_FULL_CHARGE] = { { EC_LED_COLOR_GREEN,
 						   LED_INDEFINITE } },
 		[STATE_DISCHARGE_S0] = { { LED_OFF, LED_INDEFINITE } },
+		[STATE_DISCHARGE_S0_BAT_LOW] = { { LED_OFF, LED_INDEFINITE } },
 		[STATE_DISCHARGE_S3] = { { LED_OFF, LED_INDEFINITE } },
 		[STATE_DISCHARGE_S5] = { { LED_OFF, LED_INDEFINITE } },
 		[STATE_BATTERY_ERROR] = { { EC_LED_COLOR_RED, 1 * LED_ONE_SEC },

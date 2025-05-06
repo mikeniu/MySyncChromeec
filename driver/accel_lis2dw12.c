@@ -14,6 +14,7 @@
 #include "hooks.h"
 #include "hwtimer.h"
 #include "math_util.h"
+#include "motion_sense.h"
 #include "motion_sense_fifo.h"
 #include "task.h"
 #include "util.h"
@@ -83,10 +84,10 @@ lis2dw12_config_interrupt(const struct motion_sensor_t *s)
  * Load data from internal sensor FIFO.
  * @s: Motion sensor pointer
  */
-static int lis2dw12_load_fifo(struct motion_sensor_t *s, int nsamples)
+static int lis2dw12_load_fifo(struct motion_sensor_t *s, int nsamples,
+			      uint32_t timestamp)
 {
 	int ret, left, length, i;
-	uint32_t interrupt_timestamp = last_interrupt_timestamp;
 	int *axis = s->raw_xyz;
 	uint8_t fifo[FIFO_READ_LEN];
 
@@ -123,8 +124,8 @@ static int lis2dw12_load_fifo(struct motion_sensor_t *s, int nsamples)
 				vect.data[Z] = axis[Z];
 				vect.flags = 0;
 				vect.sensor_num = s - motion_sensors;
-				motion_sense_fifo_stage_data(
-					&vect, s, 3, interrupt_timestamp);
+				motion_sense_fifo_stage_data(&vect, s, 3,
+							     timestamp);
 			} else {
 				motion_sense_push_raw_xyz(s);
 			}
@@ -168,11 +169,12 @@ test_mockable void lis2dw12_interrupt(enum gpio_signal signal)
  */
 static int lis2dw12_irq_handler(struct motion_sensor_t *s, uint32_t *event)
 {
+	uint32_t interrupt_timestamp = last_interrupt_timestamp;
 	bool commit_needed = false;
 	int nsamples;
 
-	if ((s->type != MOTIONSENSE_TYPE_ACCEL) ||
-	    (!(*event & CONFIG_ACCEL_LIS2DW12_INT_EVENT))) {
+	if ((!(*event & CONFIG_ACCEL_LIS2DW12_INT_EVENT)) ||
+	    motion_sensor_in_forced_mode(s)) {
 		return EC_ERROR_NOT_HANDLED;
 	}
 
@@ -192,7 +194,8 @@ static int lis2dw12_irq_handler(struct motion_sensor_t *s, uint32_t *event)
 
 		if (nsamples != 0) {
 			commit_needed = true;
-			RETURN_ERROR(lis2dw12_load_fifo(s, nsamples));
+			RETURN_ERROR(lis2dw12_load_fifo(s, nsamples,
+							interrupt_timestamp));
 		}
 	} while (nsamples != 0);
 

@@ -20,11 +20,10 @@ LOG_MODULE_REGISTER(pwm_led, LOG_LEVEL_ERR);
 BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT) == 1,
 	     "Exactly one instance of cros-ec,pwm-led-pins should be defined.");
 
-#define PWM_DATA_INIT(node_id)                                       \
-	{                                                            \
-		.pwm_spec = PWM_DT_SPEC_GET(node_id), .pulse_ns = 0, \
-		.transition = LED_TRANSITION_STEP                    \
-	}
+#define PWM_DATA_INIT(node_id)                  \
+	{ .pwm_spec = PWM_DT_SPEC_GET(node_id), \
+	  .pulse_ns = 0,                        \
+	  .transition = LED_TRANSITION_STEP }
 
 #define GEN_PIN_DATA(node_id, prop, idx)                                     \
 	struct pwm_data_t DATA_NODE(DT_PHANDLE_BY_IDX(node_id, prop, idx)) = \
@@ -53,13 +52,11 @@ DT_INST_FOREACH_CHILD_STATUS_OKAY(0, GEN_PINS_DATA)
 DT_INST_FOREACH_CHILD_STATUS_OKAY_VARGS(0, DT_FOREACH_CHILD, GEN_PINS_ARRAY)
 
 /* EC_LED_COLOR maps to LED_COLOR - 1 */
-#define SET_PIN_NODE(node_id)                                   \
-	{                                                       \
-		.led_color = GET_PROP(node_id, led_color),      \
-		.led_id = GET_PROP(DT_PARENT(node_id), led_id), \
-		.pwm_pins = PINS_ARRAY(node_id),                \
-		.pins_count = DT_PROP_LEN(node_id, led_values)  \
-	}
+#define SET_PIN_NODE(node_id)                             \
+	{ .led_color = GET_PROP(node_id, led_color),      \
+	  .led_id = GET_PROP(DT_PARENT(node_id), led_id), \
+	  .pwm_pins = PINS_ARRAY(node_id),                \
+	  .pins_count = DT_PROP_LEN(node_id, led_values) }
 
 /*
  * Initialize led_pins_node_t struct for each pin node defined

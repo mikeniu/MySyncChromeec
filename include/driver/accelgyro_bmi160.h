@@ -287,7 +287,7 @@ extern "C" {
 #define BMI160_INT_TAP_0 0x63
 #define BMI160_TAP_DUR(_s, _ms)                   \
 	((_ms) <= 250 ? MAX((_ms), 50) / 50 - 1 : \
-	 (_ms) <= 500 ? 4 + ((_ms)-250) / 125 :   \
+	 (_ms) <= 500 ? 4 + ((_ms) - 250) / 125 : \
 	 (_ms) < 700  ? 6 :                       \
 			7)
 

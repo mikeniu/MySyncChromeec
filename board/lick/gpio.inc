@@ -39,7 +39,7 @@ GPIO_INT(RSMRST_L_PGOOD, PIN(E, 2), GPIO_INT_BOTH, power_signal_interrupt)	/* PM
 GPIO_INT(ALL_SYS_PGOOD,	 PIN(F, 4), GPIO_INT_BOTH, power_signal_interrupt)	/* PMIC_EC_PWROK_OD */
 
 /* Other interrupts */
-GPIO_INT(WP_L,		 PIN(A, 1), GPIO_INT_BOTH, switch_interrupt)		/* EC_WP_ODL */
+GPIO(WP_L,		 PIN(A, 1), GPIO_INPUT)					/* EC_WP_ODL */
 GPIO_INT(TABLET_MODE_L,  PIN(8, 6), GPIO_INT_BOTH, gmr_tablet_switch_isr)
 
 GPIO_INT(BASE_SIXAXIS_INT_L,    PIN(5, 6), GPIO_INT_FALLING | GPIO_SEL_1P8V, lsm6dsm_interrupt)

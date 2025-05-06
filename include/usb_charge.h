@@ -5,12 +5,6 @@
 
 /* USB charging control module for Chrome EC */
 
-/*
- * TODO(b/272518464): Work around coreboot GCC preprocessor bug.
- * #line marks the *next* line, so it is off by one.
- */
-#line 13
-
 #ifndef __CROS_EC_USB_CHARGE_H
 #define __CROS_EC_USB_CHARGE_H
 
@@ -18,8 +12,6 @@
 #include "common.h"
 #include "ec_commands.h"
 #include "task.h"
-
-#line 23
 
 #ifdef __cplusplus
 extern "C" {
@@ -92,7 +84,7 @@ int usb_charge_set_mode(int usb_port_id, enum usb_charge_mode mode,
  */
 #ifdef HAS_TASK_USB_CHG_P0
 #define USB_CHG_PORT_TO_TASK_ID(port) (TASK_ID_USB_CHG_P0 + (port))
-#define TASK_ID_TO_USB_CHG_PORT(id) ((id)-TASK_ID_USB_CHG_P0)
+#define TASK_ID_TO_USB_CHG_PORT(id) ((id) - TASK_ID_USB_CHG_P0)
 #else
 #define USB_CHG_PORT_TO_TASK_ID(port) -1 /* stub task ID */
 #define TASK_ID_TO_USB_CHG_PORT(id) 0

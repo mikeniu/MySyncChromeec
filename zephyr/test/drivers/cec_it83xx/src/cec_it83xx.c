@@ -8,7 +8,11 @@
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
 
+#include <zephyr/fff.h>
 #include <zephyr/ztest.h>
+
+FAKE_VOID_FUNC(it8xxx2_cec_alt_func_enable, int);
+FAKE_VOID_FUNC(it8xxx2_cec_clock_enable_peripheral, int);
 
 /* From chip/it83xx/intc.h, but that file has inline assembly. */
 void cec_interrupt(void);

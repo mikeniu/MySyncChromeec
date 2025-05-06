@@ -112,10 +112,10 @@ void it8801_pwm_set_duty(enum pwm_channel ch, int percent);
 int it8801_pwm_get_duty(enum pwm_channel ch);
 
 #define IT8801_REG_PWMODDSR 0x5F
-#define IT8801_REG_PWMMCR(n) (0x60 + ((n)-1) * 8)
-#define IT8801_REG_PWMDCR(n) (0x64 + ((n)-1) * 8)
-#define IT8801_REG_PWMPRSL(n) (0x66 + ((n)-1) * 8)
-#define IT8801_REG_PWMPRSM(n) (0x67 + ((n)-1) * 8)
+#define IT8801_REG_PWMMCR(n) (0x60 + ((n) - 1) * 8)
+#define IT8801_REG_PWMDCR(n) (0x64 + ((n) - 1) * 8)
+#define IT8801_REG_PWMPRSL(n) (0x66 + ((n) - 1) * 8)
+#define IT8801_REG_PWMPRSM(n) (0x67 + ((n) - 1) * 8)
 
 #define IT8801_PWMMCR_MCR_MASK 0x3
 #define IT8801_PWMMCR_MCR_OFF 0

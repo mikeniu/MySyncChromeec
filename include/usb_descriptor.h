@@ -123,11 +123,9 @@ struct usb_platform_descriptor {
 #define USB_DT_PLATFORM_SIZE 24
 
 /* Platform Capability UUIDs */
-#define USB_PLAT_CAP_WEBUSB /*{3408b638-09a9-47a0-8bfd-a0768815b665}*/      \
-	{                                                                   \
-		0x38, 0xB6, 0x08, 0x34, 0xA9, 0x09, 0xA0, 0x47, 0x8B, 0xFD, \
-			0xA0, 0x76, 0x88, 0x15, 0xB6, 0x65                  \
-	}
+#define USB_PLAT_CAP_WEBUSB /*{3408b638-09a9-47a0-8bfd-a0768815b665}*/ \
+	{ 0x38, 0xB6, 0x08, 0x34, 0xA9, 0x09, 0xA0, 0x47,              \
+	  0x8B, 0xFD, 0xA0, 0x76, 0x88, 0x15, 0xB6, 0x65 }
 
 /* Qualifier Descriptor */
 struct usb_qualifier_descriptor {

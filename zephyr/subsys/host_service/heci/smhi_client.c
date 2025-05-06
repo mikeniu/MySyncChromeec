@@ -13,13 +13,11 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(smhi, CONFIG_SMHI_LOG_LEVEL);
 
-#define HECI_CLIENT_SMHI_GUID                                          \
-	{                                                              \
-		0xbb579a2e, 0xcc54, 0x4450,                            \
-		{                                                      \
-			0xb1, 0xd0, 0x5e, 0x75, 0x20, 0xdc, 0xad, 0x25 \
-		}                                                      \
-	}
+#define HECI_CLIENT_SMHI_GUID \
+	{ 0xbb579a2e,         \
+	  0xcc54,             \
+	  0x4450,             \
+	  { 0xb1, 0xd0, 0x5e, 0x75, 0x20, 0xdc, 0xad, 0x25 } }
 
 #define SMHI_MAX_RX_SIZE 256
 #define SMHI_STACK_SIZE 1600

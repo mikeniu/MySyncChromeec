@@ -34,7 +34,7 @@ GPIO_INT(USB_C0_CCSBU_OVP_ODL,	PIN(K, 6), GPIO_INT_FALLING | GPIO_PULL_UP, c0_cc
 
 /* Other interrupts */
 GPIO_INT(LID_OPEN,		PIN(F, 3), GPIO_INT_BOTH, lid_interrupt)
-GPIO_INT(EC_WP_OD,		PIN(A, 6), GPIO_INT_BOTH, switch_interrupt)
+GPIO(EC_WP_OD,			PIN(A, 6), GPIO_INPUT)
 
 /* Power sequence GPIOs */
 GPIO(EC_AP_RTCRST,		PIN(K, 2), GPIO_OUT_LOW)

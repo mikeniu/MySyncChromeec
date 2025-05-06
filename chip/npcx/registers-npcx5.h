@@ -99,7 +99,7 @@
 #define NPCX_CR_UART_BASE_ADDR(mdl) (0x400C4000 + ((mdl) * 0x2000L))
 #define NPCX_SMB_BASE_ADDR(mdl)                           \
 	(((mdl) < 2) ? (0x40009000 + ((mdl) * 0x2000L)) : \
-		       (0x400C0000 + (((mdl)-2) * 0x2000L)))
+		       (0x400C0000 + (((mdl) - 2) * 0x2000L)))
 
 enum {
 	NPCX_UART_PORT0 = 0, /* UART port 0 */

@@ -18,13 +18,11 @@ LOG_MODULE_REGISTER(cros_ec_heci, LOG_LEVEL_INF);
 
 #define CROS_EC_ISHTP_STACK_SIZE 1024
 
-#define HECI_CLIENT_CROS_EC_ISH_GUID                                   \
-	{                                                              \
-		0x7b7154d0, 0x56f4, 0x4bdc,                            \
-		{                                                      \
-			0xb0, 0xd8, 0x9e, 0x7c, 0xda, 0xe0, 0xd6, 0xa0 \
-		}                                                      \
-	}
+#define HECI_CLIENT_CROS_EC_ISH_GUID \
+	{ 0x7b7154d0,                \
+	  0x56f4,                    \
+	  0x4bdc,                    \
+	  { 0xb0, 0xd8, 0x9e, 0x7c, 0xda, 0xe0, 0xd6, 0xa0 } }
 
 /*
  * If we hit response buffer size issues, we can increase this. This is the

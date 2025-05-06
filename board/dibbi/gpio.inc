@@ -30,7 +30,7 @@ GPIO_INT(UART1_RX,		PIN(B, 0), GPIO_INT_BOTH, uart_deepsleep_interrupt)	/* UART_
 #endif
 
 /* Other interrupts */
-GPIO_INT(EC_WP_OD,		PIN(A, 6), GPIO_INT_BOTH, switch_interrupt)
+GPIO(EC_WP_OD,			PIN(A, 6), GPIO_INPUT)
 /* Directly connected recovery button */
 GPIO_INT(EC_RECOVERY_BTN_OD,	PIN(K, 7), GPIO_INT_BOTH, button_interrupt)
 /* Recovery button input from H1 */

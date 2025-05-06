@@ -66,7 +66,7 @@ const struct temp_sensor_t temp_sensors[] = {
 };
 BUILD_ASSERT(ARRAY_SIZE(temp_sensors) == TEMP_SENSOR_COUNT);
 
-#define THERMAL_SSD                                          \
+#define THERMAL_SSD \
 	{                                                    \
 		.temp_host = {                               \
 			[EC_TEMP_THRESH_HALT] = C_TO_K(100), \
@@ -74,7 +74,7 @@ BUILD_ASSERT(ARRAY_SIZE(temp_sensors) == TEMP_SENSOR_COUNT);
 	}
 __maybe_unused static const struct ec_thermal_config thermal_ssd = THERMAL_SSD;
 
-#define THERMAL_CPU                                          \
+#define THERMAL_CPU \
 	{                                                    \
 		.temp_host = {                               \
 			[EC_TEMP_THRESH_HALT] = C_TO_K(125), \
@@ -82,7 +82,7 @@ __maybe_unused static const struct ec_thermal_config thermal_ssd = THERMAL_SSD;
 	}
 __maybe_unused static const struct ec_thermal_config thermal_cpu = THERMAL_CPU;
 
-#define THERMAL_DIMM                                        \
+#define THERMAL_DIMM \
 	{                                                   \
 		.temp_host = {                              \
 			[EC_TEMP_THRESH_HALT] = C_TO_K(95), \

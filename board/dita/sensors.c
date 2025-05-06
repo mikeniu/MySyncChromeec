@@ -70,7 +70,7 @@ const struct temp_sensor_t temp_sensors[] = {
 BUILD_ASSERT(ARRAY_SIZE(temp_sensors) == TEMP_SENSOR_COUNT);
 
 /* add the thermal sensor setting */
-#define THERMAL_MEMORY           \
+#define THERMAL_MEMORY \
 	{                        \
 		.temp_host = { \
 			[EC_TEMP_THRESH_HIGH] = C_TO_K(80), \
@@ -86,7 +86,7 @@ BUILD_ASSERT(ARRAY_SIZE(temp_sensors) == TEMP_SENSOR_COUNT);
 __maybe_unused static const struct ec_thermal_config thermal_memory =
 	THERMAL_MEMORY;
 
-#define THERMAL_SOC              \
+#define THERMAL_SOC \
 	{                        \
 		.temp_host = { \
 			[EC_TEMP_THRESH_HIGH] = C_TO_K(80), \
@@ -101,7 +101,7 @@ __maybe_unused static const struct ec_thermal_config thermal_memory =
 	}
 __maybe_unused static const struct ec_thermal_config thermal_soc = THERMAL_SOC;
 
-#define THERMAL_AMBIENT          \
+#define THERMAL_AMBIENT \
 	{                        \
 		.temp_host = { \
 			[EC_TEMP_THRESH_HIGH] = C_TO_K(80), \

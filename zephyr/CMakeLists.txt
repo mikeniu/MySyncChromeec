@@ -5,6 +5,18 @@
 separate_arguments(EXTRA_EC_VERSION_FLAGS_LIST UNIX_COMMAND
 		   ${EXTRA_EC_VERSION_FLAGS})
 
+# One time setup: Pigweed requires this variable to be set before any include
+# calls to pw_protobuf_compiler/proto.cmake so we add it at the top level. If
+# Pigweed isn't used, this variable won't do anything
+if("${dir_pw_third_party_nanopb}" STREQUAL "")
+  set(dir_pw_third_party_nanopb "${ZEPHYR_NANOPB_MODULE_DIR}" CACHE PATH "" FORCE)
+endif()
+
+# One time setup: Zephyr does some strange handling of nanopb by linking the
+# sources directly into Zephyr instead of creating a static library which we
+# can depend on, so we need to create a fake target to keep the linker happy.
+add_library(protobuf-nanopb INTERFACE)
+
 if(DEFINED CONFIG_PLATFORM_EC AND EXISTS "${EDT_PICKLE}")
   set(ENV{PYTHONPATH} "${PLATFORM_EC}/zephyr/:${PLATFORM_EC}/zephyr/zmake")
 
@@ -32,17 +44,22 @@ if(DEFINED CONFIG_PLATFORM_EC AND EXISTS "${EDT_PICKLE}")
     message(FATAL_ERROR "led_policy.py failed with return code: ${ret}")
   endif()
 
-  message(STATUS "Generating component manifest file")
-  set(CME_SCRIPT ${PLATFORM_EC}/zephyr/scripts/cme.py)
-  set(CMD_CME ${PYTHON_EXECUTABLE} ${CME_SCRIPT}
-    --zephyr-base ${ZEPHYR_BASE}
-    --edt-pickle ${EDT_PICKLE}
-    --manifest-file "${CMAKE_BINARY_DIR}/zephyr/component_manifest.json"
-    ${EXTRA_EC_VERSION_FLAGS_LIST}
-  )
-  execute_process(COMMAND ${CMD_CME} RESULT_VARIABLE ret)
-  if(NOT "${ret}" STREQUAL "0")
-    message(FATAL_ERROR "cme.py failed with return code: ${ret}")
+  if(NOT DEFINED CONFIG_PLATFORM_EC_DETACHABLE_BASE AND
+    NOT DEFINED CONFIG_FINGERPRINT_SENSOR AND
+    DEFINED CONFIG_PLATFORM_EC_I2C)
+
+    message(STATUS "Generating component manifest file")
+    set(CME_SCRIPT ${PLATFORM_EC}/zephyr/scripts/cme.py)
+    set(CMD_CME ${PYTHON_EXECUTABLE} ${CME_SCRIPT}
+      --zephyr-base ${ZEPHYR_BASE}
+      --edt-pickle ${EDT_PICKLE}
+      --manifest-file "${CMAKE_BINARY_DIR}/zephyr/component_manifest.json"
+      ${EXTRA_EC_VERSION_FLAGS_LIST}
+    )
+    execute_process(COMMAND ${CMD_CME} RESULT_VARIABLE ret)
+    if(NOT "${ret}" STREQUAL "0")
+      message(FATAL_ERROR "cme.py failed with return code: ${ret}")
+    endif()
   endif()
 endif()
 
@@ -113,7 +130,7 @@ set(double_promotion -Wdouble-promotion)
 
 if(${double_promotion} IN_LIST warning_base_override)
   list(REMOVE_ITEM warning_base_override ${double_promotion})
-  set_compiler_property(PROPERTY warning_base ${warning_base_override})
+  check_set_compiler_property(PROPERTY warning_base ${warning_base_override})
   print(warning_base_override)
 endif()
 
@@ -170,30 +187,17 @@ if (DEFINED CONFIG_PLATFORM_EC)
 endif()
 
 if (ZEPHYR_PIGWEED_MODULE_DIR)
-  include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_build/pigweed.cmake")
   if (DEFINED CONFIG_PIGWEED_LOG_TOKENIZED_LIB)
+    zephyr_include_directories("${PLATFORM_EC}/zephyr/include/pigweed")
+    include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_build/pigweed.cmake")
     add_library(log_tokenized_config INTERFACE)
     target_compile_options(log_tokenized_config INTERFACE -include
                            ${PLATFORM_EC}/zephyr/include/pigweed/pw_zephyr_tokenized_custom_log.h)
     pw_set_module_config(pw_log_tokenized_CONFIG log_tokenized_config)
-    zephyr_include_directories("${PLATFORM_EC}/zephyr/include/pigweed")
   endif()
 endif()
 
 add_subdirectory("subsys")
-
-# Creates a phony target all.libraries in case you only want to build the
-# libraries and not the binaries. For example for creating the initial zero
-# coverage files.
-get_property(ZEPHYR_LIBS_PROPERTY GLOBAL PROPERTY ZEPHYR_LIBS)
-add_custom_target(
-  all.libraries
-  DEPENDS
-  ${ZEPHYR_LIBS_PROPERTY}
-  kernel
-  ${CMAKE_BINARY_DIR}/gcov.sh
-  )
-configure_file(gcov.tmpl.sh ${CMAKE_BINARY_DIR}/gcov.sh)
 
 # CONFIG_PLATFORM_EC files that don't relate to something below should be
 # included here, sorted by filename. This is common functionality which is
@@ -210,7 +214,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC
                                                 "${PLATFORM_EC}/common/peripheral.c"
                                                 "${PLATFORM_EC}/common/printf.c"
                                                 "${PLATFORM_EC}/common/queue.c"
-                                                "${PLATFORM_EC}/common/shared_mem.c"
                                                 "${PLATFORM_EC}/common/system.c"
                                                 "${PLATFORM_EC}/common/system_boot_time.c"
                                                 "${PLATFORM_EC}/common/uart_printf.c"
@@ -311,10 +314,11 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_SM5803
                                                 "${PLATFORM_EC}/driver/charger/sm5803.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGESPLASH
                                                 "${PLATFORM_EC}/common/chargesplash.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER
+						"${PLATFORM_EC}/common/charger.c"
+						"${PLATFORM_EC}/common/charge_state.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGE_MANAGER
-                                                "${PLATFORM_EC}/common/charger.c"
-                                                "${PLATFORM_EC}/common/charge_manager.c"
-                                                "${PLATFORM_EC}/common/charge_state.c")
+                                                "${PLATFORM_EC}/common/charge_manager.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGE_RAMP_HW
                                                 "${PLATFORM_EC}/common/charge_ramp.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGE_RAMP_SW
@@ -332,8 +336,19 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_OCPC
                                                 "${PLATFORM_EC}/common/ocpc.c")
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CBI
-                                                "${PLATFORM_EC}/common/cbi.c"
-                                                "${PLATFORM_EC}/common/cbi_config.c")
+                                                "${PLATFORM_EC}/common/cbi_common.c")
+
+# Only include cbi.c and cbi_config.c if we enable CBI and we're not a DSP client with
+# remote CBI enabled.
+if(DEFINED CONFIG_PLATFORM_EC_CBI AND
+  NOT(DEFINED CONFIG_PLATFORM_EC_DSP_REMOTE_CBI AND DEFINED CONFIG_PLATFORM_EC_DSP_CLIENT))
+  zephyr_library_sources(
+    "${PLATFORM_EC}/common/cbi.c"
+    "${PLATFORM_EC}/common/cbi_config.c"
+  )
+endif(DEFINED CONFIG_PLATFORM_EC_CBI AND
+  NOT(DEFINED CONFIG_PLATFORM_EC_DSP_REMOTE_CBI AND DEFINED CONFIG_PLATFORM_EC_DSP_CLIENT))
+
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CBI_GPIO
                                                 "${PLATFORM_EC}/common/cbi_gpio.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CEC
@@ -431,6 +446,7 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LED_ONOFF_STATES
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LID_ANGLE
                                                 "${PLATFORM_EC}/common/motion_lid.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LID_ANGLE_UPDATE
+                                                "${PLATFORM_EC}/common/lid_angle_common.c"
                                                 "${PLATFORM_EC}/common/lid_angle.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LID_SWITCH
                                                 "${PLATFORM_EC}/common/lid_switch.c")
@@ -466,6 +482,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWERSEQ_MT8186
 # Re-use mt8186.c code
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWERSEQ_MT8188
                                                 "${PLATFORM_EC}/power/mt8186.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWERSEQ_MT8196
+                                                "${PLATFORM_EC}/power/mt8186.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWERSEQ_MT8192
                                                 "${PLATFORM_EC}/power/mt8192.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWERSEQ_SC7180
@@ -477,6 +495,8 @@ if (CONFIG_PLATFORM_EC_HIBERNATE AND CONFIG_AP_PWRSEQ AND NOT DEFINED CONFIG_EMU
 endif ()
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PANIC
                                                 "${PLATFORM_EC}/common/panic_output.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PRESERVED_RING_BUF "${PLATFORM_EC}/common/preserved_ring_buf.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PANIC_LOG "${PLATFORM_EC}/common/panic_log.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PSE_LTC4291
                                                 "${PLATFORM_EC}/driver/pse_ltc4291.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_RSA
@@ -488,16 +508,26 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_RWSIG_VERIFY
                                                 "${PLATFORM_EC}/common/vboot/common.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ROLLBACK
                                                 "${PLATFORM_EC}/common/rollback.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SBRK
+                                                "${PLATFORM_EC}/libc/sbrk.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SHA256_SW
                                                 "${PLATFORM_EC}/common/sha256.c")
 if (NOT DEFINED CONFIG_PLATFORM_EC_SHA256_HW_ZEPHYR)
 	zephyr_library_sources_ifdef(CONFIG_SOC_IT8XXX2_SHA256_HW_ACCELERATE
                                                 "${PLATFORM_EC}/driver/sha256/sha256_it8xxx2.c")
 endif()
+if (CONFIG_PLATFORM_EC_SHARED_MEM_LIBC)
+  zephyr_library_sources("${PLATFORM_EC}/common/shared_mem_libc.c")
+else()
+  zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC
+                                                "${PLATFORM_EC}/common/shared_mem.c")
+endif()
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SWITCH
                                                 "${PLATFORM_EC}/common/switch.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SWITCHCAP_LN9310
                                                 "${PLATFORM_EC}/driver/ln9310.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SPI_FLASH_REGS
+                                                "${PLATFORM_EC}/common/spi_flash_reg.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_STM_MEMS_COMMON
                                                 "${PLATFORM_EC}/driver/stm_mems_common.c")
 
@@ -549,7 +579,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_POWER_DELIVERY
                                                 "${PLATFORM_EC}/common/usb_pd_flags.c")
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_CONTROLLER
-                                                "${PLATFORM_EC}/common/usbc_utils.c")
+                                                "${PLATFORM_EC}/common/usbc_utils.c"
+                                                "${PLATFORM_EC}/common/usb_common.c")
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TOUCHPAD_ELAN
                                                 "${PLATFORM_EC}/driver/touchpad_elan.c")
@@ -580,6 +611,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_PS8833
                                                 "${PLATFORM_EC}/driver/retimer/ps8833.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_PS8811
                                                 "${PLATFORM_EC}/driver/retimer/ps8811.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_ANX3443
+                                                "${PLATFORM_EC}/driver/usb_mux/anx3443.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_ANX7451
                                                 "${PLATFORM_EC}/driver/usb_mux/anx7451.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_SS_MUX
@@ -630,9 +663,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_DP_HPD_GPIO
                                                 "${PLATFORM_EC}/common/usbc/dp_hpd_gpio.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_VDM_AP_CONTROL
                                                 "${PLATFORM_EC}/common/usbc/ap_vdm_control.c")
-
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PRL_SM
-                                                "${PLATFORM_EC}/common/usbc/usb_prl_sm.c")
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_TCPM_ANX7447
                                                 "${PLATFORM_EC}/driver/tcpm/anx7447.c")
@@ -713,9 +743,26 @@ add_subdirectory("app")
 add_subdirectory("drivers")
 add_subdirectory("emul")
 add_subdirectory("fake")
+add_subdirectory("libc")
 add_subdirectory("mock")
 add_subdirectory_ifdef(CONFIG_PLATFORM_EC "shim")
 add_subdirectory_ifdef(CONFIG_HW_TEST_ON "test/hwtest")
+
+# Creates a phony target all.libraries in case you only want to build the
+# libraries and not the binaries. For example for creating the initial zero
+# coverage files.
+#
+# NOTE: This target MUST come after all subdirectories were added otherwise
+# some ZEPHYR_LIBS might be missed.
+get_property(ZEPHYR_LIBS_PROPERTY GLOBAL PROPERTY ZEPHYR_LIBS)
+add_custom_target(
+  all.libraries
+  DEPENDS
+  ${ZEPHYR_LIBS_PROPERTY}
+  kernel
+  ${CMAKE_BINARY_DIR}/gcov.sh
+  )
+configure_file(gcov.tmpl.sh ${CMAKE_BINARY_DIR}/gcov.sh)
 
 # Use external script to generate the ec_version.h header and add as
 # a dependency to the EC application library.
@@ -736,7 +783,7 @@ zephyr_include_directories("${CMAKE_CURRENT_BINARY_DIR}/include")
 if (DEFINED CONFIG_PIGWEED_LOG_TOKENIZED_LIB)
   set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
     COMMAND
-      vpython3 -vpython-spec ${PLATFORM_EC}/zephyr/pigweed-vpython3
+      /usr/bin/python3.11
       ${ZEPHYR_PIGWEED_MODULE_DIR}/pw_tokenizer/py/pw_tokenizer/database.py
       create
       --force
@@ -746,7 +793,7 @@ if (DEFINED CONFIG_PIGWEED_LOG_TOKENIZED_LIB)
   )
 endif()
 
-if (NOT DEFINED CONFIG_BOARD_NATIVE_POSIX)
+if (NOT DEFINED CONFIG_BOARD_NATIVE_POSIX AND NOT DEFINED CONFIG_BOARD_NATIVE_SIM)
   set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
     COMMAND
       ${PYTHON_EXECUTABLE}

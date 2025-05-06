@@ -34,32 +34,11 @@ LOG_MODULE_REGISTER(test_rts54xx, LOG_LEVEL_INF);
 
 #define NUM_PORTS 2
 
-static const uint32_t epr_pdos[] = {
-	PDO_AUG_EPR(5000, 20000, 140, 0), PDO_AUG_EPR(5000, 20000, 140, 0),
-	PDO_AUG_EPR(5000, 20000, 140, 0), PDO_AUG_EPR(5000, 20000, 140, 0),
-	PDO_AUG_EPR(5000, 20000, 140, 0),
-};
 static const uint32_t spr_pdos[] = {
 	PDO_AUG(1000, 5000, 3000), PDO_FIXED(5000, 3000, 0),
 	PDO_AUG(1000, 5000, 3000), PDO_FIXED(9000, 3000, 0),
 	PDO_AUG(1000, 5000, 3000), PDO_FIXED(15000, 3000, 0),
 	PDO_AUG(1000, 5000, 3000), PDO_FIXED(20000, 3000, 0),
-};
-static const uint32_t mixed_pdos_success[] = {
-	PDO_AUG_EPR(5000, 20000, 140, 0),
-	PDO_FIXED(5000, 3000, PDO_FIXED_EPR_MODE_CAPABLE),
-	PDO_AUG(1000, 5000, 3000),
-	PDO_FIXED(5000, 3000, 0),
-	PDO_FIXED(9000, 3000, 0),
-	PDO_FIXED(20000, 3000, 0),
-};
-static const uint32_t mixed_pdos_failure[] = {
-	PDO_AUG(1000, 5000, 3000),
-	PDO_FIXED(5000, 3000, 0),
-	PDO_FIXED(9000, 3000, 0),
-	PDO_FIXED(20000, 3000, 0),
-	PDO_FIXED(5000, 3000, PDO_FIXED_EPR_MODE_CAPABLE),
-	PDO_AUG_EPR(5000, 20000, 140, 0),
 };
 
 static const struct emul *emul = EMUL_DT_GET(RTS5453P_NODE);
@@ -70,6 +49,7 @@ static const struct device *dev2 = DEVICE_DT_GET(RTS5453P_NODE2);
 static void rts54xx_before_test(void *data)
 {
 	emul_pdc_reset(emul);
+	emul_pdc_reset(emul2);
 	emul_pdc_set_response_delay(emul, 0);
 	if (IS_ENABLED(CONFIG_TEST_PDC_MESSAGE_TRACING)) {
 		set_pdc_trace_msg_mocks();
@@ -81,27 +61,29 @@ static void rts54xx_before_test(void *data)
 static int emul_get_src_pdos(enum pdo_offset_t pdo_offset, uint8_t pdo_count,
 			     uint32_t *pdos)
 {
-	return emul_pdc_get_pdos(emul, SOURCE_PDO, pdo_offset, pdo_count, false,
-				 pdos);
+	return emul_pdc_get_pdos(emul, SOURCE_PDO, pdo_offset, pdo_count,
+				 LPM_PDO, pdos);
 }
 
 static int emul_get_snk_pdos(enum pdo_offset_t pdo_offset, uint8_t pdo_count,
 			     uint32_t *pdos)
 {
-	return emul_pdc_get_pdos(emul, SINK_PDO, pdo_offset, pdo_count, false,
+	return emul_pdc_get_pdos(emul, SINK_PDO, pdo_offset, pdo_count, LPM_PDO,
 				 pdos);
 }
 
 static int emul_set_src_pdos(enum pdo_offset_t pdo_offset, uint8_t pdo_count,
 			     const uint32_t *pdos)
 {
-	return emul_pdc_set_pdos(emul, SOURCE_PDO, pdo_offset, pdo_count, pdos);
+	return emul_pdc_set_pdos(emul, SOURCE_PDO, pdo_offset, pdo_count,
+				 LPM_PDO, pdos);
 }
 
 static int emul_set_snk_pdos(enum pdo_offset_t pdo_offset, uint8_t pdo_count,
 			     const uint32_t *pdos)
 {
-	return emul_pdc_set_pdos(emul, SINK_PDO, pdo_offset, pdo_count, pdos);
+	return emul_pdc_set_pdos(emul, SINK_PDO, pdo_offset, pdo_count, LPM_PDO,
+				 pdos);
 }
 
 ZTEST_SUITE(rts54xx, NULL, NULL, rts54xx_before_test, NULL, NULL);
@@ -117,7 +99,7 @@ ZTEST_USER(rts54xx, test_emul_reset)
 	zassert_equal(pdos[1], RTS5453P_FIXED2_SRC);
 
 	for (int i = 1; i < 7; i++) {
-		zassert_equal(pdos[i + 1], 0xFFFFFFFF);
+		zassert_equal(pdos[i + 1], 0);
 	}
 
 	/* Test sink PDO reset values. */
@@ -128,7 +110,7 @@ ZTEST_USER(rts54xx, test_emul_reset)
 	zassert_equal(pdos[2], RTS5453P_VAR_SNK);
 
 	for (int i = 3; i < 7; i++) {
-		zassert_equal(pdos[i + 1], 0xFFFFFFFF);
+		zassert_equal(pdos[i + 1], 0);
 	}
 }
 
@@ -137,15 +119,10 @@ ZTEST_USER(rts54xx, test_emul_pdos)
 	uint32_t pdos[PDO_OFFSET_MAX];
 
 	/* Port partner PDOs aren't currently supported. */
-	/* TODO b/317065172: Update when port partner functionality is in. */
-	zassert_not_ok(emul_pdc_get_pdos(emul, SOURCE_PDO, PDO_OFFSET_0, 1,
-					 true, pdos));
-	zassert_not_ok(
-		emul_pdc_get_pdos(emul, SINK_PDO, PDO_OFFSET_0, 1, true, pdos));
-
-	/* Test that offset zero is invalid for setting. */
-	zassert_not_ok(emul_set_src_pdos(PDO_OFFSET_0, 1, pdos));
-	zassert_not_ok(emul_set_snk_pdos(PDO_OFFSET_0, 1, pdos));
+	zassert_ok(emul_pdc_get_pdos(emul, SOURCE_PDO, PDO_OFFSET_0, 1,
+				     PARTNER_PDO, pdos));
+	zassert_ok(emul_pdc_get_pdos(emul, SINK_PDO, PDO_OFFSET_0, 1,
+				     PARTNER_PDO, pdos));
 
 	/* Test PDO overflow. */
 	zassert_not_ok(emul_set_src_pdos(PDO_OFFSET_1, 8, spr_pdos));
@@ -153,25 +130,6 @@ ZTEST_USER(rts54xx, test_emul_pdos)
 
 	zassert_not_ok(emul_get_src_pdos(PDO_OFFSET_5, 8, pdos));
 	zassert_not_ok(emul_get_snk_pdos(PDO_OFFSET_5, 8, pdos));
-
-	/* Test that only PDOs 1-4 support EPR. */
-	memset(pdos, 0, sizeof(pdos));
-	zassert_ok(emul_set_src_pdos(PDO_OFFSET_1, RTS5453P_MAX_EPR_PDO_OFFSET,
-				     epr_pdos));
-	zassert_ok(emul_get_src_pdos(PDO_OFFSET_1, RTS5453P_MAX_EPR_PDO_OFFSET,
-				     pdos));
-	zassert_ok(memcmp(pdos, epr_pdos, sizeof(uint32_t) * 4));
-	zassert_not_ok(emul_set_src_pdos(
-		PDO_OFFSET_1, RTS5453P_MAX_EPR_PDO_OFFSET + 1, epr_pdos));
-
-	memset(pdos, 0, sizeof(pdos));
-	zassert_ok(emul_set_snk_pdos(PDO_OFFSET_1, RTS5453P_MAX_EPR_PDO_OFFSET,
-				     epr_pdos));
-	zassert_ok(emul_get_snk_pdos(PDO_OFFSET_1, RTS5453P_MAX_EPR_PDO_OFFSET,
-				     pdos));
-	zassert_ok(memcmp(pdos, epr_pdos, sizeof(uint32_t) * 4));
-	zassert_not_ok(emul_set_snk_pdos(
-		PDO_OFFSET_1, RTS5453P_MAX_EPR_PDO_OFFSET + 1, epr_pdos));
 
 	/* Test that SPR PDOs can be placed in any offset. */
 	memset(pdos, 0, sizeof(pdos));
@@ -183,53 +141,46 @@ ZTEST_USER(rts54xx, test_emul_pdos)
 	zassert_ok(emul_set_snk_pdos(PDO_OFFSET_1, 7, spr_pdos));
 	zassert_ok(emul_get_snk_pdos(PDO_OFFSET_1, 7, pdos));
 	zassert_ok(memcmp(pdos, spr_pdos, sizeof(uint32_t) * 7));
-
-	/* Test mixtures of PDOS. */
-	memset(pdos, 0, sizeof(pdos));
-	zassert_ok(emul_set_src_pdos(PDO_OFFSET_1, 6, mixed_pdos_success));
-	zassert_ok(emul_get_src_pdos(PDO_OFFSET_1, 6, pdos));
-	zassert_ok(
-		memcmp(pdos, mixed_pdos_success, sizeof(mixed_pdos_success)));
-
-	memset(pdos, 0, sizeof(pdos));
-	zassert_ok(emul_set_snk_pdos(PDO_OFFSET_1, 6, mixed_pdos_success));
-	zassert_ok(emul_get_snk_pdos(PDO_OFFSET_1, 6, pdos));
-	zassert_ok(
-		memcmp(pdos, mixed_pdos_success, sizeof(mixed_pdos_success)));
-
-	zassert_not_ok(emul_set_src_pdos(PDO_OFFSET_1, 6, mixed_pdos_failure));
-	zassert_not_ok(emul_set_snk_pdos(PDO_OFFSET_1, 6, mixed_pdos_failure));
 }
 
 ZTEST_USER(rts54xx, test_pdos)
 {
 	uint32_t pdos[PDO_OFFSET_MAX];
+	int num_pdos = GET_PDOS_MAX_NUM;
 
 	memset(pdos, 0, sizeof(pdos));
-	zassert_ok(emul_set_src_pdos(PDO_OFFSET_1, 6, mixed_pdos_success));
+	zassert_ok(emul_set_src_pdos(PDO_OFFSET_1, 6, spr_pdos));
 
 	/*
 	 * This is implemented using the same underlying code as
 	 * emul_pdc_get_pdos so we only need to do a basic test.
 	 */
 	memset(pdos, 0, sizeof(pdos));
-	zassert_ok(pdc_get_pdos(dev, SOURCE_PDO, PDO_OFFSET_1, 6, false, pdos));
-	k_sleep(K_MSEC(1000));
-	zassert_ok(
-		memcmp(pdos, mixed_pdos_success, sizeof(mixed_pdos_success)));
+
+	for (int i = PDO_OFFSET_1; i <= PDO_OFFSET_6; i += num_pdos) {
+		if (i + num_pdos > PDO_OFFSET_6) {
+			num_pdos = PDO_OFFSET_6 - i + 1;
+		}
+		/* UCSI GET_PDOS supports a maximum of 4 PDOs per
+		 * request. */
+		zassert_ok(pdc_get_pdos(dev, SOURCE_PDO, i, num_pdos, LPM_PDO,
+					&pdos[i - 1]));
+		k_sleep(K_MSEC(1000));
+	}
+	zassert_ok(memcmp(pdos, spr_pdos, 6));
 }
 
-ZTEST_USER(rts54xx, test_get_bus_info)
+ZTEST_USER(rts54xx, test_get_hw_config)
 {
-	struct pdc_bus_info_t info;
+	struct pdc_hw_config_t config;
 	struct i2c_dt_spec i2c_spec = I2C_DT_SPEC_GET(RTS5453P_NODE);
 
-	zassert_not_ok(pdc_get_bus_info(dev, NULL));
+	zassert_not_ok(pdc_get_hw_config(dev, NULL));
 
-	zassert_ok(pdc_get_bus_info(dev, &info));
-	zassert_equal(info.bus_type, PDC_BUS_TYPE_I2C);
-	zassert_equal(info.i2c.bus, i2c_spec.bus);
-	zassert_equal(info.i2c.addr, i2c_spec.addr);
+	zassert_ok(pdc_get_hw_config(dev, &config));
+	zassert_equal(config.bus_type, PDC_BUS_TYPE_I2C);
+	zassert_equal(config.i2c.bus, i2c_spec.bus);
+	zassert_equal(config.i2c.addr, i2c_spec.addr);
 }
 
 static volatile struct {
@@ -262,8 +213,12 @@ ZTEST_USER(rts54xx, test_irq)
 {
 #define IRQ_TEST_TIMEOUT_MS (TEST_WAIT_FOR_INTERVAL_MS * 5)
 
-	union connector_status_t status1;
-	union connector_status_t status2;
+	/* Set connector statuses for both ports to be disconnected. This test
+	 * only cares about triggering an interrupt / callback, so don't
+	 * inadvertently trigger other actions.
+	 */
+	union connector_status_t status1 = { .connect_status = 0 };
+	union connector_status_t status2 = { .connect_status = 0 };
 	struct capability_t unused_caps;
 	struct pdc_callback ci_cb;
 
@@ -281,7 +236,7 @@ ZTEST_USER(rts54xx, test_irq)
 	emul_pdc_set_response_delay(emul, IRQ_TEST_TIMEOUT_MS);
 	zassert_ok(pdc_get_capability(dev, &unused_caps));
 
-	/* Disconnect both ports but expect that we don't see interrupts until
+	/* Trigger an interrupt but expect that we don't see interrupts until
 	 * the command is completed.
 	 */
 	zassert_ok(emul_pdc_connect_partner(emul, &status1));
@@ -303,52 +258,4 @@ ZTEST_USER(rts54xx, test_irq)
 void ucsi_cc_callback(const struct device *port, struct pdc_callback *cb,
 		      union cci_event_t cci_event)
 {
-}
-
-/* TODO(b/331801899) - Workarounds we have in place for GET_PD_MESSAGE not being
- * correctly implemented in FW. Remove this after GET_PD_MESSAGE is correctly
- * implemented.
- */
-ZTEST_USER(rts54xx, test_get_pd_message_workarounds)
-{
-#define DISCOVER_IDENTITY_RESPONSE 4
-	static struct pdc_callback cc_cb;
-	union get_pd_message_t cmd;
-	struct capability_t read_caps;
-	struct capability_t caps;
-	uint8_t response[32];
-
-	cc_cb.handler = ucsi_cc_callback;
-
-	/* Set an arbitrary capability to validate. */
-	caps.bmOptionalFeatures.cable_details = 1;
-
-	emul_pdc_set_capability(emul, &caps);
-
-	/* Normal api path doesn't insert GET_PD_MESSAGE bit into caps. */
-	zassert_ok(pdc_get_capability(dev, &read_caps));
-	k_sleep(K_MSEC(TEST_WAIT_FOR_INTERVAL_MS));
-	zassert_equal(read_caps.bmOptionalFeatures.raw_value,
-		      caps.bmOptionalFeatures.raw_value);
-
-	/* Use UCSI path to check capabilities and expect bit is set. */
-	zassert_ok(pdc_execute_ucsi_cmd(dev, UCSI_GET_CAPABILITY,
-					/*command specific=*/0, NULL,
-					(uint8_t *)&read_caps, &cc_cb));
-	k_sleep(K_MSEC(TEST_WAIT_FOR_INTERVAL_MS));
-	zassert_true(read_caps.bmOptionalFeatures.get_pd_message);
-
-	/* Anything that's not for Discover Identity will be rejected. */
-	memset(&cmd, 0, sizeof(cmd));
-	zassert_equal(pdc_execute_ucsi_cmd(dev, UCSI_GET_PD_MESSAGE,
-					   sizeof(union get_pd_message_t),
-					   (uint8_t *)&cmd, response, &cc_cb),
-		      -ENOTSUP);
-
-	/* Response type of Discover identity should queue command. */
-	cmd.response_message_type = DISCOVER_IDENTITY_RESPONSE;
-	zassert_ok(pdc_execute_ucsi_cmd(dev, UCSI_GET_PD_MESSAGE,
-					sizeof(union get_pd_message_t),
-					(uint8_t *)&cmd, response, &cc_cb));
-	k_sleep(K_MSEC(TEST_WAIT_FOR_INTERVAL_MS));
 }

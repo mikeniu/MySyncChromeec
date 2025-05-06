@@ -33,7 +33,12 @@
 #define IT83XX_CEC_CECRH REG8(IT83XX_CEC_BASE + 0x07)
 
 #ifdef CONFIG_ZEPHYR
+#include <zephyr/dt-bindings/i2c/it8xxx2-i2c.h>
 #define IT83XX_IRQ_CEC 82
+#define CGC_OFFSET_CEC ((IT8XXX2_ECPM_CGCTRL4R_OFF << 8) | 0x01)
+#ifdef CONFIG_TEST
+#define IT8XXX2_ECPM_BASE 0x00F01E00
+#endif
 #endif
 
 extern const struct cec_drv it83xx_cec_drv;

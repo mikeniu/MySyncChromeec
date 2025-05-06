@@ -52,8 +52,7 @@ GPIO_INT(ACOK_OD,            PIN(E, 5), GPIO_INT_BOTH | GPIO_HIB_WAKE_HIGH,
          extpower_interrupt) /* AC_OK / AC_PRESENT in rev1+ */
 GPIO_INT(UART1_RX,           PIN(B, 0), GPIO_INT_FALLING,
          uart_deepsleep_interrupt) /* UART_DEBUG_TX_EC_RX */
-GPIO_INT(WP,                 PIN(I, 4), GPIO_INT_BOTH | GPIO_SEL_1P8V,
-         switch_interrupt) /* EC_FLASH_WP_OD */
+GPIO(WP,                     PIN(I, 4), GPIO_INPUT | GPIO_SEL_1P8V) /* EC_FLASH_WP_OD */
 GPIO_INT(SPI0_CS,            PIN(M, 5), GPIO_INT_FALLING,
          spi_event)        /* SPI slave Chip Select -- AP_SPI_EC_CS_L */
 

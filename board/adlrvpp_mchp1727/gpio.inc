@@ -43,7 +43,7 @@ GPIO_INT(BC_ACOK,		PIN(0156), GPIO_INT_BOTH, extpower_interrupt) /* AC Present *
 GPIO_INT(SLATE_MODE_INDICATION,	PIN(0222), GPIO_INT_BOTH, gmr_tablet_switch_isr)
 
 /* Flash WP interrupt */
-GPIO_INT(EC_FLASH_WP_ODL,	PIN(014), GPIO_INT_BOTH, switch_interrupt)
+GPIO(EC_FLASH_WP_ODL,		PIN(014), GPIO_INPUT)
 
 /* Case Closed Debug Mode interrupt */
 GPIO_INT(CCD_MODE_ODL,		PIN(0175), GPIO_INT_BOTH, board_connect_c0_sbu)

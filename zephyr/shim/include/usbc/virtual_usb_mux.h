@@ -14,11 +14,11 @@ extern "C" {
 
 #define VIRTUAL_USB_MUX_COMPAT cros_ec_usbc_mux_virtual
 
-#define USB_MUX_CONFIG_VIRTUAL(mux_id)                     \
-	{                                                  \
-		USB_MUX_COMMON_FIELDS(mux_id),             \
-			.driver = &virtual_usb_mux_driver, \
-			.hpd_update = &virtual_hpd_update, \
+#define USB_MUX_CONFIG_VIRTUAL(mux_id)             \
+	{                                          \
+		USB_MUX_COMMON_FIELDS(mux_id),     \
+		.driver = &virtual_usb_mux_driver, \
+		.hpd_update = &virtual_hpd_update, \
 	}
 
 #ifdef __cplusplus

@@ -3899,7 +3899,7 @@ static void tc_cc_open_entry(const int port)
 	 * browning out, don't do it so we can meet certain compliance timing
 	 * requirements.
 	 */
-	CPRINTS("C%d: Applying CC Open!", port);
+	CPRINTS_L1("C%d: Applying CC Open!", port);
 	if (!battery_is_present())
 		cflush();
 
@@ -3971,9 +3971,6 @@ static void pd_chipset_resume(void)
 	int i;
 
 	for (i = 0; i < CONFIG_USB_PD_PORT_MAX_COUNT; i++) {
-		if (IS_ENABLED(CONFIG_USB_PE_SM))
-			pd_resume_check_pr_swap_needed(i);
-
 		pd_set_dual_role_and_event(i, pd_get_drp_state_in_s0(),
 					   PD_EVENT_UPDATE_DUAL_ROLE |
 						   PD_EVENT_POWER_STATE_CHANGE);
@@ -3982,6 +3979,10 @@ static void pd_chipset_resume(void)
 			pd_send_alert_msg(i, ADO_EXTENDED_ALERT_EVENT |
 						     ADO_POWER_STATE_CHANGE);
 		}
+
+		/* This needs to happen after dual-role state is updated. */
+		if (IS_ENABLED(CONFIG_USB_PE_SM))
+			pd_resume_check_pr_swap_needed(i);
 	}
 
 	CPRINTS("PD:S3->S0");

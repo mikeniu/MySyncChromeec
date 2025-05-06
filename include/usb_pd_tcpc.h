@@ -24,7 +24,7 @@ extern "C" {
 #ifdef TCPCI_I2C_PERIPHERAL
 /* Convert TCPC address to type-C port number */
 #define TCPC_ADDR_TO_PORT(addr) \
-	((addr)-I2C_STRIP_FLAGS(CONFIG_TCPC_I2C_BASE_ADDR_FLAGS))
+	((addr) - I2C_STRIP_FLAGS(CONFIG_TCPC_I2C_BASE_ADDR_FLAGS))
 /* Check if the i2c address belongs to TCPC */
 #define ADDR_IS_TCPC(addr) \
 	(((addr) & 0x7E) == I2C_STRIP_FLAGS(CONFIG_TCPC_I2C_BASE_ADDR_FLAGS))

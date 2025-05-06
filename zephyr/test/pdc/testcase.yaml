@@ -1,5 +1,6 @@
 common:
-  platform_allow: native_sim
+  platform_allow:
+  - native_sim
 tests:
   pdc.generic:
     timeout: 500
@@ -12,8 +13,46 @@ tests:
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
 
+  pdc.generic.runtime_config:
+    timeout: 500
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_GENERIC=y
+    - CONFIG_TEST_PDC_MESSAGE_TRACING=y
+    - CONFIG_USBC_PDC_TRACE_MSG=y
+    - CONFIG_USB_PDC_LOG_LEVEL_DBG=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+    - "./boards/pdc_deferred.overlay"
+
+  pdc.utils:
+    timeout: 500
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_UTILS=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.usb_mux:
+    timeout: 500
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_PMC_USB_MUX=y
+    - CONFIG_PDC_POWER_MGMT_USB_MUX=y
+    - CONFIG_PLATFORM_EC_USBC_SS_MUX=y
+    - CONFIG_USB_PDC_LOG_LEVEL_DBG=y
+    - CONFIG_PLATFORM_EC_USB_MUX_TASK=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.sbu_mux.no_ccd:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_SBU_MUX_NO_CCD=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+    - "./boards/no_ccd.overlay"
+
   pdc.generic.tps6699x:
-    build_only: true
     timeout: 300
     extra_configs:
     - CONFIG_TEST_SUITE_PDC_GENERIC=y
@@ -21,8 +60,23 @@ tests:
     - CONFIG_USBC_PDC_TRACE_MSG=y
     - CONFIG_USB_PDC_LOG_LEVEL_DBG=y
     - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_TODO_B_345292002=y
     extra_dtc_overlay_files:
     - "./boards/tps6699x.overlay"
+
+  pdc.generic.tps6699x.runtime_config:
+    timeout: 300
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_GENERIC=y
+    - CONFIG_TEST_PDC_MESSAGE_TRACING=y
+    - CONFIG_USBC_PDC_TRACE_MSG=y
+    - CONFIG_USB_PDC_LOG_LEVEL_DBG=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_TODO_B_345292002=y
+    - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
+    extra_dtc_overlay_files:
+    - "./boards/tps6699x.overlay"
+    - "./boards/pdc_deferred.overlay"
 
   pdc.generic.api_null_check:
     timeout: 300
@@ -36,10 +90,77 @@ tests:
     timeout: 30
     extra_configs:
     - CONFIG_TEST_SUITE_PDC_DEVICE_NOT_READY=y
-    - CONFIG_ASSERT_TEST=y
-    - CONFIG_ZTEST_FATAL_HOOK=y
     extra_dtc_overlay_files:
-    - "./boards/rts5453p_deferred.overlay"
+    - "./boards/rts5453p_not_ready.overlay"
+
+  pdc.policy:
+    timeout: 300
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_POLICY=y
+    - CONFIG_USBC_PDC_TRACE_MSG=y
+    - CONFIG_USB_PDC_LOG_LEVEL_DBG=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_PLATFORM_EC_USB_PD_FRS=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.policy.no_frs:
+    timeout: 300
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_POLICY=y
+    - CONFIG_USBC_PDC_TRACE_MSG=y
+    - CONFIG_USB_PDC_LOG_LEVEL_DBG=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_PLATFORM_EC_USB_PD_FRS=n
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.policy.only_fixed_pdos:
+    timeout: 500
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_POLICY=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_PLATFORM_EC_USB_PD_ONLY_FIXED_PDOS=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.policy.low_voltage:
+    timeout: 500
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_POLICY=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_PLATFORM_EC_USB_PD_PREFER_LOW_VOLTAGE=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.policy.high_voltage:
+    timeout: 500
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_POLICY=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_PLATFORM_EC_USB_PD_PREFER_HIGH_VOLTAGE=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.policy_clamped:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_POLICY_CLAMPED=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_PLATFORM_EC_USB_PD_MAX_VOLTAGE_MV=15000
+    - CONFIG_PLATFORM_EC_USB_PD_MAX_POWER_MW=30000
+    - CONFIG_PLATFORM_EC_USB_PD_MAX_CURRENT_MA=2000
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.policy_variable:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_POLICY_VARIABLE=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_PLATFORM_EC_USB_PD_MAX_VOLTAGE_MV=28000
+    - CONFIG_PLATFORM_EC_USB_PD_MAX_POWER_MW=65000
+    - CONFIG_PLATFORM_EC_USB_PD_MAX_CURRENT_MA=3000
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
 
   pdc.rts54xx:
     extra_configs:
@@ -48,6 +169,14 @@ tests:
     - CONFIG_USBC_PDC_TRACE_MSG=y
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
+
+  pdc.tps6699x:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_TPS6699X=y
+    - CONFIG_TEST_PDC_MESSAGE_TRACING=y
+    - CONFIG_USBC_PDC_TRACE_MSG=y
+    extra_dtc_overlay_files:
+    - "./boards/tps6699x.overlay"
 
   pdc.retimer_fw_update:
     extra_configs:
@@ -58,6 +187,16 @@ tests:
     - CONFIG_USBC_PDC_TRACE_MSG=y
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
+
+  pdc.tps6699x.retimer_fw_update:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_RETIMER_FW_UPDATE=y
+    - CONFIG_PLATFORM_EC_USBC_SS_MUX=y
+    - CONFIG_PLATFORM_EC_USBC_RETIMER_FW_UPDATE=y
+    - CONFIG_TEST_PDC_MESSAGE_TRACING=y
+    - CONFIG_USBC_PDC_TRACE_MSG=y
+    extra_dtc_overlay_files:
+    - "./boards/tps6699x.overlay"
 
   pdc.console:
     extra_configs:
@@ -72,15 +211,53 @@ tests:
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
 
-  pdc.ucsi:
+  pdc.ucsi_hostcmd:
     extra_configs:
-    - CONFIG_TEST_SUITE_PDC_UCSI=y
+    - CONFIG_TEST_SUITE_UCSI_HOSTCMD=y
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
 
   pdc.ppm:
     extra_configs:
     - CONFIG_TEST_SUITE_PPM=y
+    - CONFIG_UCSI_PPM=y
+    - CONFIG_EMUL_PPM_DRIVER=n
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.ppm.runtime_config:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PPM=y
+    - CONFIG_UCSI_PPM=y
+    - CONFIG_EMUL_PPM_DRIVER=n
+    - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+    - "./boards/pdc_deferred.overlay"
+
+  pdc.ppm_console:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PPM_CONSOLE=y
+    - CONFIG_UCSI_PPM_CONSOLE=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.ppm_driver:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PPM_DRIVER=y
+    - CONFIG_EMUL_PPM_DRIVER=n
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.ucsi:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_UCSI=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.ppm_state_machine:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PPM_STATE_MACHINE=y
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
 
@@ -91,3 +268,39 @@ tests:
     - CONFIG_USBC_PDC_TRACE_MSG_LOG_LEVEL_DBG=y
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
+
+  pdc.runtime_port_config.no_pdcs:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_RUNTIME_PORT_CONFIG=y
+    - CONFIG_TEST_PDC_RUNTIME_CONFIG_SCENARIO_NO_PDCS=y
+    - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+    - "./boards/pdc_deferred.overlay"
+
+  pdc.runtime_port_config.one_pdc:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_RUNTIME_PORT_CONFIG=y
+    - CONFIG_TEST_PDC_RUNTIME_CONFIG_SCENARIO_ONE_PDC=y
+    - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+    - "./boards/pdc_deferred.overlay"
+
+  pdc.runtime_port_config.discontiguous:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_RUNTIME_PORT_CONFIG=y
+    - CONFIG_TEST_PDC_RUNTIME_CONFIG_SCENARIO_DISCONT=y
+    - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+    - "./boards/pdc_deferred.overlay"
+
+  pdc.runtime_port_config.two_pdcs:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_RUNTIME_PORT_CONFIG=y
+    - CONFIG_TEST_PDC_RUNTIME_CONFIG_SCENARIO_TWO_PDCS=y
+    - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+    - "./boards/pdc_deferred.overlay"

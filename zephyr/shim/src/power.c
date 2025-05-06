@@ -18,12 +18,10 @@
 		 POWER_SIGNAL_ACTIVE_HIGH)
 #define GEN_POWER_SIGNAL_STRUCT_ENTRY_NAME(cid) DT_PROP(cid, power_enum_name)
 
-#define GEN_POWER_SIGNAL_STRUCT_ENTRY(cid)                         \
-	{                                                          \
-		.gpio = GEN_POWER_SIGNAL_STRUCT_ENTRY_GPIO(cid),   \
-		.flags = GEN_POWER_SIGNAL_STRUCT_ENTRY_FLAGS(cid), \
-		.name = GEN_POWER_SIGNAL_STRUCT_ENTRY_NAME(cid)    \
-	}
+#define GEN_POWER_SIGNAL_STRUCT_ENTRY(cid)                   \
+	{ .gpio = GEN_POWER_SIGNAL_STRUCT_ENTRY_GPIO(cid),   \
+	  .flags = GEN_POWER_SIGNAL_STRUCT_ENTRY_FLAGS(cid), \
+	  .name = GEN_POWER_SIGNAL_STRUCT_ENTRY_NAME(cid) }
 #define GEN_POWER_SIGNAL_STRUCT(cid) \
 	[GEN_POWER_SIGNAL_ENUM_ENTRY(cid)] = GEN_POWER_SIGNAL_STRUCT_ENTRY(cid),
 

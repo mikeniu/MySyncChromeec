@@ -21,7 +21,7 @@ GPIO_INT(TABLET_MODE_L,		PIN(3, 6), GPIO_INT_BOTH,			tablet_mode_interrupt)
 /* Volume buttons are swapped in the schematic */
 GPIO_INT(VOLUME_DOWN_L,		PIN(8, 2), GPIO_INT_BOTH | GPIO_PULL_UP,	button_interrupt)
 GPIO_INT(VOLUME_UP_L,		PIN(8, 3), GPIO_INT_BOTH | GPIO_PULL_UP,	button_interrupt)
-GPIO_INT(WP_L,			PIN(4, 0), GPIO_INT_BOTH,			switch_interrupt)
+GPIO(WP_L,			PIN(4, 0), GPIO_INPUT)
 GPIO_INT(AC_PRESENT,		PIN(C, 1), GPIO_INT_BOTH,			extpower_interrupt)
 GPIO_INT(ACCELGYRO3_INT_L,	PIN(9, 3), GPIO_INT_FALLING,			bmi160_interrupt)
 GPIO_INT(TRACKPAD_INT_L,	PIN(7, 1), GPIO_INT_FALLING,			trackpad_interrupt)

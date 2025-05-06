@@ -75,6 +75,7 @@ static void test_before(void *fixture)
 	RESET_FAKE(nissa_configure_hdmi_rails);
 	RESET_FAKE(nissa_configure_hdmi_vcc);
 	RESET_FAKE(cbi_get_board_version);
+	RESET_FAKE(cros_cbi_get_fw_config);
 
 	RESET_FAKE(raa489000_enable_asgate);
 	RESET_FAKE(raa489000_set_output_current);
@@ -159,6 +160,45 @@ ZTEST(gothrax, test_check_extpower)
 	board_check_extpower();
 	zassert_equal(extpower_handle_update_fake.call_count, 2);
 	zassert_equal(extpower_handle_update_fake.arg0_val, 0);
+}
+
+static int get_adapter_voltage_limit1(enum cbi_fw_config_field_id field,
+				      uint32_t *value)
+{
+	ARG_UNUSED(field);
+	*value = MAX15;
+	return 0;
+}
+
+static int get_adapter_voltage_limit2(enum cbi_fw_config_field_id field,
+				      uint32_t *value)
+{
+	ARG_UNUSED(field);
+	*value = MAX20;
+	return 0;
+}
+
+static int get_adapter_voltage_limit3(enum cbi_fw_config_field_id field,
+				      uint32_t *value)
+{
+	ARG_UNUSED(field);
+	ARG_UNUSED(value);
+	return -1;
+}
+
+ZTEST(gothrax, test_adapter_voltage_limit)
+{
+	cros_cbi_get_fw_config_fake.custom_fake = get_adapter_voltage_limit1;
+	hook_notify(HOOK_INIT);
+	zassert_equal(pd_get_max_voltage(), 15000);
+
+	cros_cbi_get_fw_config_fake.custom_fake = get_adapter_voltage_limit2;
+	hook_notify(HOOK_INIT);
+	zassert_equal(pd_get_max_voltage(), 20000);
+
+	cros_cbi_get_fw_config_fake.custom_fake = get_adapter_voltage_limit3;
+	hook_notify(HOOK_INIT);
+	zassert_equal(pd_get_max_voltage(), 15000);
 }
 
 ZTEST(gothrax, test_is_sourcing_vbus)

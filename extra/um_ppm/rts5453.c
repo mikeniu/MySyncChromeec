@@ -132,11 +132,10 @@ struct rts5453_command_entry {
 	size_t return_length;
 };
 
-#define CMD_ENTRY(cmd, cmd_val, ret_length)                    \
-	{                                                      \
-		.command = SC_##cmd, .command_value = cmd_val, \
-		.return_length = ret_length                    \
-	}
+#define CMD_ENTRY(cmd, cmd_val, ret_length) \
+	{ .command = SC_##cmd,              \
+	  .command_value = cmd_val,         \
+	  .return_length = ret_length }
 
 struct rts5453_command_entry commands[] = {
 	CMD_ENTRY(VENDOR_CMD, 0x1, 0),
@@ -169,9 +168,10 @@ struct rts5453_ucsi_commands {
 	uint8_t command_copy_length;
 };
 
-#define UCSI_CMD_ENTRY(cmd, length)                            \
-	{                                                      \
-		.command = cmd, .command_copy_length = length, \
+#define UCSI_CMD_ENTRY(cmd, length)            \
+	{                                      \
+		.command = cmd,                \
+		.command_copy_length = length, \
 	}
 
 struct rts5453_ucsi_commands ucsi_commands[UCSI_CMD_MAX] = {

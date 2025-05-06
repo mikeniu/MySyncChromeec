@@ -355,8 +355,8 @@ static uint8_t __attribute__((unused)) espi_msvw_srcs_get(uint8_t msvw_id)
 	return msvw;
 }
 
-static void __attribute__((unused))
-espi_msvw_srcs_set(uint8_t msvw_id, uint8_t src_bitmap)
+static void __attribute__((unused)) espi_msvw_srcs_set(uint8_t msvw_id,
+						       uint8_t src_bitmap)
 {
 	if (msvw_id < MSVW_MAX) {
 		uint32_t r = (src_bitmap & 0x08) << 21;
@@ -385,8 +385,8 @@ static uint8_t __attribute__((unused)) espi_smvw_srcs_get(uint8_t smvw_id)
 	return smvw;
 }
 
-static void __attribute__((unused))
-espi_smvw_srcs_set(uint8_t smvw_id, uint8_t src_bitmap)
+static void __attribute__((unused)) espi_smvw_srcs_set(uint8_t smvw_id,
+						       uint8_t src_bitmap)
 {
 	if (smvw_id < SMVW_MAX) {
 		uint32_t r = (src_bitmap & 0x08) << 21;

@@ -33,7 +33,7 @@ GPIO_INT(EC_PWR_BTN_ODL,	 PIN(0, 1), GPIO_INT_BOTH | GPIO_PULL_UP, power_button_
 
 /* Other interrupts */
 GPIO_INT(LID_OPEN,		 PIN(D, 2), GPIO_INT_BOTH, lid_interrupt)
-GPIO_INT(EC_WP_OD,		 PIN(A, 1), GPIO_INT_BOTH, switch_interrupt)
+GPIO(EC_WP_OD,	 		 PIN(A, 1), GPIO_INPUT)
 GPIO_INT(BASE_SIXAXIS_INT_L,	 PIN(5, 6), GPIO_INT_FALLING | GPIO_SEL_1P8V, motion_interrupt)
 GPIO_INT(LID_360_L,		 PIN(9, 5), GPIO_INT_BOTH, gmr_tablet_switch_isr)
 

@@ -399,7 +399,7 @@ ZTEST(power_host_sleep, test_set_get_host_sleep_state)
 		      HOST_SLEEP_EVENT_S0IX_RESUME);
 }
 
-ZTEST(power_host_sleep, test_verify_increment_change_state)
+ZTEST(power_host_sleep, test_increment_change_state)
 {
 	struct ec_params_s0ix_cnt params = { .flags = EC_S0IX_COUNTER_RESET };
 	struct ec_response_s0ix_cnt rsp;
@@ -408,6 +408,7 @@ ZTEST(power_host_sleep, test_verify_increment_change_state)
 
 	/* Verify that counter is set to 0 */
 	zassert_ok(host_command_process(&args), "Failed to get sleep counter");
+	zassert_equal(args.response_size, sizeof(rsp));
 	zassert_equal(rsp.s0ix_counter, 0);
 
 	/* Simulate S0ix state */
@@ -417,13 +418,16 @@ ZTEST(power_host_sleep, test_verify_increment_change_state)
 	/* Confirm counter incrementation */
 	params.flags = 0;
 	zassert_ok(host_command_process(&args), "Failed to get sleep counter");
+	zassert_equal(args.response_size, sizeof(rsp));
 	zassert_equal(rsp.s0ix_counter, 1);
 
 	/* Reset counter and re-fetch it to verify that reset works */
 	params.flags = EC_S0IX_COUNTER_RESET;
 	zassert_ok(host_command_process(&args), "Failed to get sleep counter");
+	zassert_equal(args.response_size, sizeof(rsp));
 	params.flags = 0;
 	zassert_ok(host_command_process(&args), "Failed to get sleep counter");
+	zassert_equal(args.response_size, sizeof(rsp));
 	zassert_equal(rsp.s0ix_counter, 0);
 }
 

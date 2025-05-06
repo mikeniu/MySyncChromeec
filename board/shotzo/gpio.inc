@@ -33,7 +33,7 @@ GPIO_INT(USB_C0_INT_ODL,	PIN(K, 0), GPIO_INT_FALLING | GPIO_PULL_UP, usb_c0_inte
 GPIO_INT(USB_C0_CCSBU_OVP_ODL,	PIN(K, 6), GPIO_INT_FALLING | GPIO_PULL_UP, c0_ccsbu_ovp_interrupt) /* Fault protection */
 
 /* Other interrupts */
-GPIO_INT(EC_WP_OD,		PIN(A, 6), GPIO_INT_BOTH, switch_interrupt)
+GPIO(EC_WP_OD,			PIN(A, 6), GPIO_INPUT)
 GPIO_INT(BJ_ADP_PRESENT_L,	PIN(J, 1), GPIO_INT_BOTH | GPIO_PULL_UP, adp_connect_interrupt)
 GPIO_INT(PANEL_BACKLIGHT_EN,	PIN(J, 3), GPIO_INT_RISING, oz554_interrupt)
 GPIO_INT(EC_RECOVERY_BTN_ODL,	PIN(F, 1), GPIO_INT_BOTH, button_interrupt)

@@ -791,8 +791,9 @@ test_static enum ec_error_list test_fp_command_template_encrypted(void)
 	static_assert(head_size == sizeof(head_data));
 	memcpy(head.data(), &head_data, head.size());
 
-	struct ec_fp_template_encryption_metadata enc_metadata_data {
-		.struct_version = 4, .nonce = { 1, 2, 3, 4, 5, 6, 7, 8 },
+	struct ec_fp_template_encryption_metadata enc_metadata_data{
+		.struct_version = 4,
+		.nonce = { 1, 2, 3, 4, 5, 6, 7, 8 },
 		.encryption_salt = { 2, 2, 3, 4, 5, 6, 7, 8 },
 		.tag = { 3, 2, 3, 4, 5, 6, 7, 8 },
 	};
@@ -832,9 +833,7 @@ test_static enum ec_error_list test_fp_command_template_decrypted(void)
 				       NULL, 0),
 		EC_RES_SUCCESS, "%d");
 
-	struct ec_params_fp_unlock_template unlock_params0 {
-		.fgr_num = 0
-	};
+	struct ec_params_fp_unlock_template unlock_params0{ .fgr_num = 0 };
 	TEST_EQ(test_send_host_command(EC_CMD_FP_UNLOCK_TEMPLATE, 0,
 				       &unlock_params0, sizeof(unlock_params0),
 				       NULL, 0),
@@ -874,7 +873,7 @@ test_static enum ec_error_list test_fp_command_template_decrypted(void)
 			      { template_data.data(),
 				template_data.size() + salt_data.size() });
 
-	struct ec_fp_template_encryption_metadata enc_metadata_data {
+	struct ec_fp_template_encryption_metadata enc_metadata_data{
 		.struct_version = 4
 	};
 
@@ -920,9 +919,7 @@ test_static enum ec_error_list test_fp_command_unlock_template(void)
 	TEST_ASSERT(std::holds_alternative<std::monostate>(
 		global_context.template_states[0]));
 
-	struct ec_params_fp_unlock_template unlock_params {
-		.fgr_num = 1
-	};
+	struct ec_params_fp_unlock_template unlock_params{ .fgr_num = 1 };
 	TEST_EQ(test_send_host_command(EC_CMD_FP_UNLOCK_TEMPLATE, 0,
 				       &unlock_params, sizeof(unlock_params),
 				       NULL, 0),
@@ -973,7 +970,7 @@ test_static enum ec_error_list test_fp_command_unlock_template(void)
 			      { template_data.data(),
 				template_data.size() + salt_data.size() });
 
-	struct ec_fp_template_encryption_metadata enc_metadata_data {
+	struct ec_fp_template_encryption_metadata enc_metadata_data{
 		.struct_version = 4
 	};
 
@@ -1010,9 +1007,7 @@ test_static enum ec_error_list test_fp_command_unlock_template(void)
 	global_context.fp_encryption_status &=
 		~FP_CONTEXT_TEMPLATE_UNLOCKED_SET;
 
-	struct ec_params_fp_unlock_template unlock2_params {
-		.fgr_num = 2
-	};
+	struct ec_params_fp_unlock_template unlock2_params{ .fgr_num = 2 };
 
 	TEST_EQ(test_send_host_command(EC_CMD_FP_UNLOCK_TEMPLATE, 0,
 				       &unlock2_params, sizeof(unlock2_params),
@@ -1024,7 +1019,7 @@ test_static enum ec_error_list test_fp_command_unlock_template(void)
 	TEST_EQ(get_fp_encryption_status(&status), EC_SUCCESS, "%d");
 	TEST_BITS_CLEARED((int)status, FP_CONTEXT_TEMPLATE_UNLOCKED_SET);
 
-	struct ec_params_fp_unlock_template unlock_fail_params {
+	struct ec_params_fp_unlock_template unlock_fail_params{
 		.fgr_num = 0xffff
 	};
 
@@ -1107,8 +1102,9 @@ test_fp_command_unlock_template_pre_encrypted_fail(void)
 	static_assert(head_size == sizeof(head_data));
 	memcpy(head.data(), &head_data, head.size());
 
-	struct ec_fp_template_encryption_metadata enc_metadata_data {
-		.struct_version = 4, .nonce = { 1, 2, 3, 4, 5, 6, 7, 8 },
+	struct ec_fp_template_encryption_metadata enc_metadata_data{
+		.struct_version = 4,
+		.nonce = { 1, 2, 3, 4, 5, 6, 7, 8 },
 		.encryption_salt = { 2, 2, 3, 4, 5, 6, 7, 8 },
 		.tag = { 3, 2, 3, 4, 5, 6, 7, 8 },
 	};
@@ -1139,9 +1135,7 @@ test_fp_command_unlock_template_pre_encrypted_fail(void)
 				       NULL, 0),
 		EC_RES_SUCCESS, "%d");
 
-	struct ec_params_fp_unlock_template unlock_params {
-		.fgr_num = 1
-	};
+	struct ec_params_fp_unlock_template unlock_params{ .fgr_num = 1 };
 	TEST_EQ(test_send_host_command(EC_CMD_FP_UNLOCK_TEMPLATE, 0,
 				       &unlock_params, sizeof(unlock_params),
 				       NULL, 0),
@@ -1202,7 +1196,7 @@ test_fp_command_unlock_template_pre_encrypted(void)
 			      { template_data.data(),
 				template_data.size() + salt_data.size() });
 
-	struct ec_fp_template_encryption_metadata enc_metadata_data {
+	struct ec_fp_template_encryption_metadata enc_metadata_data{
 		.struct_version = 4
 	};
 
@@ -1232,9 +1226,7 @@ test_fp_command_unlock_template_pre_encrypted(void)
 	TEST_ASSERT(std::holds_alternative<fp_encrypted_template_state>(
 		global_context.template_states[0]));
 
-	struct ec_params_fp_unlock_template unlock_params {
-		.fgr_num = 1
-	};
+	struct ec_params_fp_unlock_template unlock_params{ .fgr_num = 1 };
 
 	TEST_EQ(test_send_host_command(EC_CMD_FP_GENERATE_NONCE, 0, NULL, 0,
 				       &nonce_response, sizeof(nonce_response)),
@@ -1293,7 +1285,7 @@ test_static enum ec_error_list test_fp_command_commit_v3(void)
 	encrypt_data_in_place(1, info, global_context.user_id,
 			      global_context.tpm_seed, template_data);
 
-	struct ec_fp_template_encryption_metadata enc_metadata_data {
+	struct ec_fp_template_encryption_metadata enc_metadata_data{
 		.struct_version = 3
 	};
 
@@ -1365,7 +1357,7 @@ test_static enum ec_error_list test_fp_command_commit_trivial_salt(void)
 			      { template_data.data(),
 				template_data.size() + salt_data.size() });
 
-	struct ec_fp_template_encryption_metadata enc_metadata_data {
+	struct ec_fp_template_encryption_metadata enc_metadata_data{
 		.struct_version = 4
 	};
 
@@ -1433,7 +1425,7 @@ test_static enum ec_error_list test_fp_command_commit_without_seed(void)
 
 	struct fp_auth_command_encryption_metadata info;
 
-	struct ec_fp_template_encryption_metadata enc_metadata_data {
+	struct ec_fp_template_encryption_metadata enc_metadata_data{
 		.struct_version = 4
 	};
 
@@ -1498,7 +1490,7 @@ test_fp_command_migrate_template_to_nonce_context(void)
 			      { template_data.data(),
 				template_data.size() + salt_data.size() });
 
-	struct ec_fp_template_encryption_metadata enc_metadata_data {
+	struct ec_fp_template_encryption_metadata enc_metadata_data{
 		.struct_version = 4
 	};
 

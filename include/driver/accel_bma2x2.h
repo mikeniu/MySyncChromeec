@@ -50,9 +50,9 @@ extern "C" {
 	((_range) < 8 ? BMA2x2_RANGE_2G + ((_range) / 4) * 2 : \
 			BMA2x2_RANGE_8G + ((_range) / 16) * 4)
 
-#define BMA2x2_REG_TO_RANGE(_reg)                                \
-	((_reg) < BMA2x2_RANGE_8G ? 2 + (_reg)-BMA2x2_RANGE_2G : \
-				    8 + ((_reg)-BMA2x2_RANGE_8G) * 2)
+#define BMA2x2_REG_TO_RANGE(_reg)                                  \
+	((_reg) < BMA2x2_RANGE_8G ? 2 + (_reg) - BMA2x2_RANGE_2G : \
+				    8 + ((_reg) - BMA2x2_RANGE_8G) * 2)
 
 #define BMA2x2_BW_SELECT_ADDR 0x10
 #define BMA2x2_BW_MSK 0x1F
@@ -70,10 +70,10 @@ extern "C" {
 	((_bw) < 125000 ? BMA2x2_BW_7_81HZ + __fls(((_bw) * 10) / 78125) : \
 			  BMA2x2_BW_125HZ + __fls((_bw) / 125000))
 
-#define BMA2x2_REG_TO_BW(_reg)                               \
-	((_reg) < BMA2x2_BW_125HZ ?                          \
-		 (78125 << ((_reg)-BMA2x2_BW_7_81HZ)) / 10 : \
-		 125000 << ((_reg)-BMA2x2_BW_125HZ))
+#define BMA2x2_REG_TO_BW(_reg)                                 \
+	((_reg) < BMA2x2_BW_125HZ ?                            \
+		 (78125 << ((_reg) - BMA2x2_BW_7_81HZ)) / 10 : \
+		 125000 << ((_reg) - BMA2x2_BW_125HZ))
 
 #define BMA2x2_MODE_CTRL_ADDR 0x11
 #define BMA2x2_LOW_NOISE_CTRL_ADDR 0x12

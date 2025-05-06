@@ -302,7 +302,7 @@ enum sm5803_charger_modes {
 #define SM5803_REG_TO_VOLTAGE(r) \
 	(SM5803_VOLTAGE_SHIFT + (r) * SM5803_VOLTAGE_STEP)
 #define SM5803_VOLTAGE_TO_REG(v) \
-	(((v)-SM5803_VOLTAGE_SHIFT) / SM5803_VOLTAGE_STEP)
+	(((v) - SM5803_VOLTAGE_SHIFT) / SM5803_VOLTAGE_STEP)
 
 /*
  * Precharge Termination threshold.

@@ -100,11 +100,11 @@
 
 #define NPCX_CR_UART_BASE_ADDR(mdl) (0x400E0000 + ((mdl) * 0x2000L))
 #define NPCX_LCT_BASE_ADDR 0x400D7000
-#define NPCX_SMB_BASE_ADDR(mdl)                                \
-	(((mdl) < 2)  ? (0x40009000 + ((mdl) * 0x2000L)) :     \
-	 ((mdl) < 4)  ? (0x400C0000 + (((mdl)-2) * 0x2000L)) : \
-	 ((mdl) == 4) ? (0x40008000) :                         \
-			(0x40017000 + (((mdl)-5) * 0x1000L)))
+#define NPCX_SMB_BASE_ADDR(mdl)                                  \
+	(((mdl) < 2)  ? (0x40009000 + ((mdl) * 0x2000L)) :       \
+	 ((mdl) < 4)  ? (0x400C0000 + (((mdl) - 2) * 0x2000L)) : \
+	 ((mdl) == 4) ? (0x40008000) :                           \
+			(0x40017000 + (((mdl) - 5) * 0x1000L)))
 
 #define NPCX_HFCBCD1 REG8(NPCX_HFCG_BASE_ADDR + 0x012)
 #define NPCX_HFCBCD2 REG8(NPCX_HFCG_BASE_ADDR + 0x014)

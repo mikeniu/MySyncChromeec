@@ -196,6 +196,7 @@ ZTEST(fan_common, test_fan_hc_get_target_rpm)
 		EC_CMD_PWM_GET_FAN_TARGET_RPM, 0, r);
 
 	zassert_ok(host_command_process(&args));
+	zassert_equal(args.response_size, sizeof(r));
 	zassert_equal(r.rpm, fan_get_rpm_target(0));
 }
 
@@ -283,6 +284,28 @@ ZTEST(fan_common, test_fan_hc_set_duty_v1_bad_fan)
 	zassert_equal(host_command_process(&args), EC_RES_ERROR);
 }
 
+ZTEST(fan_common, test_fan_hc_get_duty)
+{
+	struct ec_params_pwm_get_fan_duty req = { .fan_idx = 0 };
+	struct ec_response_pwm_get_fan_duty resp;
+	struct host_cmd_handler_args args =
+		BUILD_HOST_COMMAND(EC_CMD_PWM_GET_FAN_DUTY, 0, resp, req);
+
+	zassert_ok(host_command_process(&args));
+	zassert_equal(args.response_size, sizeof(resp));
+	zassert_equal(resp.percent, fan_get_duty(0));
+}
+
+ZTEST(fan_common, test_fan_hc_get_duty_bad)
+{
+	struct ec_params_pwm_get_fan_duty req = { .fan_idx = 80 };
+	struct ec_response_pwm_get_fan_duty resp;
+	struct host_cmd_handler_args args =
+		BUILD_HOST_COMMAND(EC_CMD_PWM_GET_FAN_DUTY, 0, resp, req);
+
+	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
+}
+
 void set_thermal_control_enabled(int fan, int enable);
 
 ZTEST(fan_common, test_fan_hc_set_auto_fan_v0)
@@ -316,7 +339,84 @@ ZTEST(fan_common, test_fan_hc_set_auto_fan_v1_bad_fan)
 	struct host_cmd_handler_args args =
 		BUILD_HOST_COMMAND_PARAMS(EC_CMD_THERMAL_AUTO_FAN_CTRL, 1, p);
 
-	zassert_equal(host_command_process(&args), EC_RES_ERROR);
+	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
+}
+
+ZTEST(fan_common, test_fan_hc_set_auto_fan_v2)
+{
+	struct ec_params_auto_fan_ctrl_v2 req = {
+		.fan_idx = 0,
+		.cmd = EC_AUTO_FAN_CONTROL_CMD_SET,
+		.set_auto = true,
+	};
+	struct host_cmd_handler_args args =
+		BUILD_HOST_COMMAND_PARAMS(EC_CMD_THERMAL_AUTO_FAN_CTRL, 2, req);
+
+	set_thermal_control_enabled(0, 0);
+	zassert_ok(host_command_process(&args));
+	zassert_true(is_thermal_control_enabled(0));
+
+	req.set_auto = false;
+	zassert_ok(host_command_process(&args));
+	zassert_false(is_thermal_control_enabled(0));
+}
+
+ZTEST(fan_common, test_fan_hc_set_auto_fan_v2_bad)
+{
+	struct ec_params_auto_fan_ctrl_v2 req = {
+		.fan_idx = 80,
+		.cmd = EC_AUTO_FAN_CONTROL_CMD_SET,
+		.set_auto = true,
+	};
+	struct host_cmd_handler_args args =
+		BUILD_HOST_COMMAND_PARAMS(EC_CMD_THERMAL_AUTO_FAN_CTRL, 2, req);
+
+	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
+}
+
+ZTEST(fan_common, test_fan_hc_set_auto_fan_v2_get)
+{
+	struct ec_params_auto_fan_ctrl_v2 req = {
+		.fan_idx = 0,
+		.cmd = EC_AUTO_FAN_CONTROL_CMD_GET,
+	};
+	struct ec_response_auto_fan_control resp;
+	struct host_cmd_handler_args args =
+		BUILD_HOST_COMMAND(EC_CMD_THERMAL_AUTO_FAN_CTRL, 2, resp, req);
+
+	set_thermal_control_enabled(0, 0);
+	zassert_ok(host_command_process(&args));
+	zassert_equal(args.response_size, sizeof(resp));
+	zassert_false(resp.is_auto);
+
+	set_thermal_control_enabled(0, 1);
+	zassert_ok(host_command_process(&args));
+	zassert_equal(args.response_size, sizeof(resp));
+	zassert_true(resp.is_auto);
+}
+
+ZTEST(fan_common, test_fan_hc_set_auto_fan_v2_get_bad)
+{
+	struct ec_params_auto_fan_ctrl_v2 req = {
+		.fan_idx = 80,
+		.cmd = EC_AUTO_FAN_CONTROL_CMD_GET,
+	};
+	struct host_cmd_handler_args args =
+		BUILD_HOST_COMMAND_PARAMS(EC_CMD_THERMAL_AUTO_FAN_CTRL, 2, req);
+
+	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
+}
+
+ZTEST(fan_common, test_fan_hc_set_auto_fan_v2_bad_cmd)
+{
+	struct ec_params_auto_fan_ctrl_v2 req = {
+		.fan_idx = 0,
+		.cmd = 255,
+	};
+	struct host_cmd_handler_args args =
+		BUILD_HOST_COMMAND_PARAMS(EC_CMD_THERMAL_AUTO_FAN_CTRL, 2, req);
+
+	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
 }
 
 ZTEST(fan_common, test_memmap_not_present)

@@ -560,6 +560,11 @@
 #undef CONFIG_BATTERY_FUEL_GAUGE
 
 /*
+ * Defines retry count for reading Manuf/Device name in init_battery_type
+ */
+#define CONFIG_BATTERY_INIT_TYPE_RETRY_COUNT 0
+
+/*
  * Critical battery shutdown timeout (seconds)
  *
  * If the battery is at extremely low charge (and discharging) or extremely
@@ -1826,6 +1831,42 @@
  */
 #define CONFIG_CMD_CRASH_NESTED
 
+/**
+ * Panic log captures a copy of the console log in uninitialized
+ * preserved ram. After a panic, the panic_log is frozen until it is
+ * dumped by the OS. Preserving the log is best effort. Integrity checks
+ * ensure corruption is detected and the log is discarded. The implementation
+ * is designed to be low overhead.
+ */
+#undef CONFIG_PANIC_LOG
+/* Size of panic log in bytes. Must be a power of 2. */
+#define CONFIG_PANIC_LOG_SIZE 2048
+/**
+ * Enables panic log debug features,
+ * including the `paniclog` console command.
+ */
+#undef CONFIG_PANIC_LOG_DEBUG
+
+/*
+ * noinit_end_of_ram is a memory section placed at the very end
+ * of used ram, where it is least likely to overlap with RO ram.
+ * The section is useful for preserving data across reboots.
+ * May not be enabled in RO.
+ */
+#ifndef SECTION_IS_RO
+#define CONFIG_NOINIT_END_OF_RAM_SECTION
+#else
+#undef CONFIG_NOINIT_END_OF_RAM_SECTION
+#endif
+
+/*
+ * Offset noinit_end_of_ram section. Only adjust in the rare case that
+ * RO ram overlaps with RW noinit_end_of_ram section.
+ */
+#ifndef CONFIG_NOINIT_END_OF_RAM_SECTION_OFFSET
+#define CONFIG_NOINIT_END_OF_RAM_SECTION_OFFSET 0
+#endif
+
 /*
  * Provide the default GPIO abstraction layer.
  * You want this unless you are doing a really tiny firmware.
@@ -1967,15 +2008,6 @@
  * Board support battery-related functions in EC-EC communication.
  */
 #undef CONFIG_EC_EC_COMM_BATTERY
-
-/*
- * Enable the experimental console.
- *
- * NOTE: If you enable this experimental console, you will need to run the
- * EC-3PO interactive console in the util directory!  Otherwise, you won't be
- * able to enter any commands.
- */
-#undef CONFIG_EXPERIMENTAL_CONSOLE
 
 /* Include CRC-8 utility function */
 #undef CONFIG_CRC8
@@ -2308,9 +2340,11 @@
 #undef CONFIG_FP_SENSOR_FPC1025
 #undef CONFIG_FP_SENSOR_FPC1035
 #undef CONFIG_FP_SENSOR_FPC1145
+#undef CONFIG_FP_SENSOR_EGIS630
 #undef CONFIG_FP_SENSOR_ELAN80
 #undef CONFIG_FP_SENSOR_ELAN80SG
 #undef CONFIG_FP_SENSOR_ELAN515
+#undef CONFIG_FP_SENSOR_INT_ACTIVE_LOW
 
 /*****************************************************************************/
 
@@ -2797,9 +2831,6 @@
  */
 #undef CONFIG_HWTIMER_64BIT
 
-/* Use a hardware specific udelay(). */
-#undef CONFIG_HW_SPECIFIC_UDELAY
-
 /*****************************************************************************/
 /* I2C configuration */
 
@@ -2887,9 +2918,8 @@
  */
 #undef CONFIG_I2C_MULTI_PORT_CONTROLLER
 
-#ifndef CONFIG_ZEPHYR
 /*
- * Enable I2C bitbang driver.
+ * Enable the legacy I2C bitbang driver.
  *
  * If defined, the board must define array i2c_bitbang_ports[] and
  * i2c_bitbang_ports_count (same as i2c_ports/i2c_ports_count), but with
@@ -2897,9 +2927,10 @@
  *
  * For example:
  * {"battery", 2, 100, GPIO_I2C3_SCL, GPIO_I2C3_SDA, .drv = &bitbang_drv},
+ *
+ * This option cannot be used by Zephyr EC projects.
  */
-#undef CONFIG_I2C_BITBANG
-#endif /* CONFIG_ZEPHYR */
+#undef CONFIG_I2C_BITBANG_CROS_EC
 
 /*
  * If defined, reduce I2C traffic from update functions (i2c_update8/16
@@ -3017,6 +3048,30 @@
 #undef CONFIG_IT83XX_ENABLE_MOUSE_DEVICE
 
 /*
+ * Enable more ILM to cache chip's drivers to reduce latency in fetching
+ * instructions from internal flash.
+ */
+#undef CONFIG_IT83XX_EXTENDED_ILM
+/* IT8320 hardware timer driver runs from ILM */
+#undef CONFIG_IT83XX_EXTENDED_ILM_HWTIMER_DRIVER
+/* I2C controller runs from ILM */
+#undef CONFIG_IT83XX_EXTENDED_ILM_I2C_CONTROLLER
+/* IT8320 I2C driver runs from ILM */
+#undef CONFIG_IT83XX_EXTENDED_ILM_I2C_DRIVER
+/* IT8320 IRQ driver runs from ILM */
+#undef CONFIG_IT83XX_EXTENDED_ILM_IRQ_DRIVER
+/* IT8320 UART driver runs from ILM */
+#undef CONFIG_IT83XX_EXTENDED_ILM_UART_DRIVER
+/* USBC PD timer runs from ILM */
+#undef CONFIG_IT83XX_EXTENDED_ILM_USBC_PD_TIMER
+/* TCPCI driver runs from ILM */
+#undef CONFIG_IT83XX_EXTENDED_ILM_TCPCI_DRIVER
+/* Timer runs from ILM */
+#undef CONFIG_IT83XX_EXTENDED_ILM_TIMER
+/* RAA489000 driver runs from ILM */
+#undef CONFIG_IT83XX_EXTENDED_ILM_RAA489000_DRIVER
+
+/*
  * The IT8320 supports e-flash clock up to 48 MHz (IT8390 maximum is 32 MHz).
  * Enable it if we want better performance of fetching instruction from e-flash.
  *
@@ -3074,6 +3129,13 @@
  * with using hardware multiplication and division and nop instructions.
  */
 #undef CONFIG_IT8XXX2_MUL_WORKAROUND
+
+/*
+ * Allows pre-watchdog timer interrupt to be unmasked even when all interrupts
+ * are disabled.
+ * NOTE: this config is only relevant for non-zephyr boards with NDS32 arch
+ */
+#undef CONFIG_IT83XX_PREWDT_ALWAYS_ENABLED
 
 /*
  * Support the standard integer multiplication and division instruction
@@ -3197,7 +3259,7 @@
 #undef CONFIG_KEYBOARD_CUSTOMIZATION
 
 /*
- * Allow support multiple keyboard matrix for speical key.
+ * Allow support multiple keyboard matrix for special key.
  */
 #undef CONFIG_KEYBOARD_MULTIPLE
 
@@ -3244,6 +3306,11 @@
  * in the order the keys are pressed.
  */
 #undef CONFIG_KEYBOARD_STRICT_DEBOUNCE
+
+/*
+ * Enable Strauss keyboard.
+ */
+#undef CONFIG_KEYBOARD_STRAUSS
 
 /*
  * Enable the 8042 AUX port. This is typically used for PS/2 mouse devices.
@@ -3372,6 +3439,12 @@
  * If not defined, it is using GPIO_LID_OPEN.
  */
 #undef CONFIG_LID_SWITCH_GPIO_LIST
+
+/*
+ * Lid swtich debounce timing customize.
+ * Default is 30ms.
+ */
+#define CONFIG_LID_DEBOUNCE_US (30 * MSEC)
 
 /*
  * Support for turning the lightbar power rails on briefly when the AP is off.
@@ -4060,12 +4133,10 @@
  * half of the total flash, and take up the minimum space possible. You can
  * override those defaults with these.
  */
-#undef CONFIG_RO_PUBKEY_ADDR
-#undef CONFIG_RO_PUBKEY_READ_ADDR
+#undef CONFIG_RO_PUBKEY_OFF
 #undef CONFIG_RO_PUBKEY_SIZE
-#undef CONFIG_RW_SIG_ADDR
+#undef CONFIG_RW_SIG_OFF
 #undef CONFIG_RW_SIG_SIZE
-#undef CONFIG_RWSIG_READ_ADDR
 
 /* Size of the serial number if needed */
 #undef CONFIG_SERIALNO_LEN
@@ -4282,6 +4353,11 @@
  * as the means for determining the state of the flipped-360-degree mode.
  */
 #undef CONFIG_GMR_TABLET_MODE_CUSTOM
+
+/*
+ * GMR tablet mode sensor debounce time.
+ */
+#define CONFIG_GMR_SENSOR_DEBOUNCE_US (CONFIG_LID_DEBOUNCE_US + 10 * MSEC)
 
 /*
  * Add a virtual switch to indicate when detachable device has
@@ -4771,9 +4847,9 @@
  *
  * The default SNK PDOs are:
  * - Fixed 5V/500mA with the same PDO_FIXED_FLAGS
- * - Variable (non-battery) min 4.75V, max PD_MAX_VOLTAGE_MV, operational
- *   current 3A
- * - Battery min 4.75V, max PD_MAX_VOLTAGE_MV, operational power 15W
+ * - Variable (non-battery) min 4.75V, max CONFIG_USB_PD_MAX_VOLTAGE_MV,
+ *   operational current 3A
+ * - Battery min 4.75V, max CONFIG_USB_PD_MAX_VOLTAGE_MV, operational power 15W
  */
 #undef CONFIG_USB_PD_CUSTOM_PDO
 
@@ -4880,6 +4956,18 @@
  * enables PD Rev3.0 functionality.
  */
 #undef CONFIG_USB_PD_REV30
+
+/*
+ * If enabled, the PD selection logic will select the PDO offering the lower
+ * voltage if multiple PDOs provide the same power.
+ */
+#undef CONFIG_USB_PD_PREFER_LOW_VOLTAGE
+
+/*
+ * If enabled, the PD selection logic will select the PDO offering the higher
+ * voltage if multiple PDOs provide the same power.
+ */
+#undef CONFIG_USB_PD_PREFER_HIGH_VOLTAGE
 
 /* Defined automatically based on on maximum PD revision supported. */
 #undef CONFIG_PD_RETRY_COUNT
@@ -5358,6 +5446,14 @@
  * mask for can't trigger interrupt signal.
  */
 #undef CONFIG_USBC_NX20P348X_RCP_5VSRC_MASK_ENABLE
+
+/*
+ * NX20P348x control vbus discharge with SRC_EN
+ * in case we don't have hardware logic.
+ * When SRC_EN goes low, we want to control vbus discharge earlier.
+ * It is to speed up the speed at which vbus falls to zero.
+ */
+#undef CONFIG_USBC_NX20P348X_VBUS_DISCHARGE_BY_SRC_EN
 
 /*
  * Setting SYV682X OVP to 15v power profile application
@@ -6252,6 +6348,42 @@
 	"USB PD controller."
 #endif
 
+/* Set default USB PD power levels unless already defined by the platform. */
+/*
+ * Base configuration for PD power operating power value, which is used
+ * in PD negotiation. The final PD parameter used in negotiation is
+ * affected by CONFIG_USB_PD_MAX_POWER_MW,
+ * CONFIG_USB_PD_MAX_CURRENT_MA, and CONFIG_USB_PD_MAX_VOLTAGE_MV.
+ * Increase this value is the system requires more than 15 watts to boot
+ * without a battery.
+ */
+#ifndef CONFIG_USB_PD_OPERATING_POWER_MW
+#define CONFIG_USB_PD_OPERATING_POWER_MW 15000
+#endif
+
+/*
+ * The maximum PD negotiated current for the system.
+ */
+#ifndef CONFIG_USB_PD_MAX_CURRENT_MA
+#define CONFIG_USB_PD_MAX_CURRENT_MA 3000
+#endif
+
+/*
+ * The maximum PD negotiated voltage for the system.
+ */
+#ifndef CONFIG_USB_PD_MAX_VOLTAGE_MV
+#define CONFIG_USB_PD_MAX_VOLTAGE_MV 20000
+#endif
+
+/*
+ * The maximum PD negotiated power for the system. By default, this
+ * is derived from CONFIG_USB_PD_MAX_CURRENT_MA and CONFIG_PD_MAX_CURRENT_MV.
+ */
+#ifndef CONFIG_USB_PD_MAX_POWER_MW
+#define CONFIG_USB_PD_MAX_POWER_MW \
+	((CONFIG_USB_PD_MAX_CURRENT_MA * CONFIG_USB_PD_MAX_VOLTAGE_MV) / 1000)
+#endif
+
 /******************************************************************************/
 /*
  * Automatically define CONFIG_HOSTCMD_X86 if either child option is defined.
@@ -6340,18 +6472,6 @@
 #define CONFIG_SHAREDMEM_MINIMUM_SIZE 0
 #endif
 #endif /* !CONFIG_SHAREDMEM_MINIMUM_SIZE */
-
-/******************************************************************************/
-/*
- * Disable the built-in console history if using the experimental console.
- *
- * The experimental console keeps its own session-persistent history which
- * survives EC reboot.  It also requires CRC8 for command integrity.
- */
-#ifdef CONFIG_EXPERIMENTAL_CONSOLE
-#undef CONFIG_CONSOLE_HISTORY
-#define CONFIG_CRC8
-#endif /* defined(CONFIG_EXPERIMENTAL_CONSOLE) */
 
 /******************************************************************************/
 /*
@@ -7397,6 +7517,19 @@
 /* Default to 1024 for end of ram data (panic and jump data) */
 #ifndef CONFIG_PRESERVED_END_OF_RAM_SIZE
 #define CONFIG_PRESERVED_END_OF_RAM_SIZE 1024
+#endif
+
+/* Select CONFIG_IT83XX_EXTENDED_ILM automatically */
+#if defined(CONFIG_IT83XX_EXTENDED_ILM_HWTIMER_DRIVER) ||     \
+	defined(CONFIG_IT83XX_EXTENDED_ILM_I2C_CONTROLLER) || \
+	defined(CONFIG_IT83XX_EXTENDED_ILM_I2C_DRIVER) ||     \
+	defined(CONFIG_IT83XX_EXTENDED_ILM_IRQ_DRIVER) ||     \
+	defined(CONFIG_IT83XX_EXTENDED_ILM_UART_DRIVER) ||    \
+	defined(CONFIG_IT83XX_EXTENDED_ILM_USBC_PD_TIMER) ||  \
+	defined(CONFIG_IT83XX_EXTENDED_ILM_TCPCI_DRIVER) ||   \
+	defined(CONFIG_IT83XX_EXTENDED_ILM_TIMER) ||          \
+	defined(CONFIG_IT83XX_EXTENDED_ILM_RAA489000_DRIVER)
+#define CONFIG_IT83XX_EXTENDED_ILM
 #endif
 
 #ifdef HAVE_PRIVATE

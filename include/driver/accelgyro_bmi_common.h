@@ -32,7 +32,7 @@ extern "C" {
 
 #define BMI_REG_TO_ODR(_regval)                                        \
 	((_regval) < BMI_ODR_100HZ ? 100000 / (1 << (8 - (_regval))) : \
-				     100000 * (1 << ((_regval)-8)))
+				     100000 * (1 << ((_regval) - 8)))
 #define BMI_ODR_TO_REG(_odr)                                             \
 	((_odr) < 100000 ? (__builtin_clz(100000 / ((_odr) + 1)) - 24) : \
 			   (39 - __builtin_clz((_odr) / 100000)))

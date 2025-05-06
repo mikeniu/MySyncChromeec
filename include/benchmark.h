@@ -84,7 +84,7 @@ struct BenchmarkResult {
 template <int MAX_NUM_RESULTS = 5> class Benchmark {
     public:
 	explicit Benchmark(const BenchmarkOptions &options = BenchmarkOptions())
-		: options_(options){};
+		: options_(options) {};
 
 	/* Run benchmark of the function f().
 	 *

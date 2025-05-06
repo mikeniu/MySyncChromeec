@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "assert.h"
 #include "common.h"
 #include "console.h"
 #include "elan_sensor.h"
@@ -20,6 +21,7 @@
 #include "trng.h"
 #include "util.h"
 
+#include <errno.h>
 #include <stddef.h>
 
 static uint16_t errors;
@@ -27,7 +29,7 @@ static uint16_t errors;
 /* Sensor description */
 static struct ec_response_fp_info ec_fp_sensor_info = {
 	/* Sensor identification */
-	.vendor_id = VID,
+	.vendor_id = FOURCC('E', 'L', 'A', 'N'),
 	.product_id = PID,
 	.model_id = MID,
 	.version = VERSION,
@@ -39,6 +41,27 @@ static struct ec_response_fp_info ec_fp_sensor_info = {
 	.bpp = FP_SENSOR_RES_BPP_ELAN,
 };
 
+static enum elan_capture_type
+convert_fp_capture_type_to_elan_capture_type(enum fp_capture_type mode)
+{
+	switch (mode) {
+	case FP_CAPTURE_VENDOR_FORMAT:
+		return ELAN_CAPTURE_VENDOR_FORMAT;
+	case FP_CAPTURE_SIMPLE_IMAGE:
+		return ELAN_CAPTURE_SIMPLE_IMAGE;
+	case FP_CAPTURE_PATTERN0:
+		return ELAN_CAPTURE_PATTERN0;
+	case FP_CAPTURE_PATTERN1:
+		return ELAN_CAPTURE_PATTERN1;
+	case FP_CAPTURE_QUALITY_TEST:
+		return ELAN_CAPTURE_QUALITY_TEST;
+	case FP_CAPTURE_RESET_TEST:
+		return ELAN_CAPTURE_RESET_TEST;
+	default:
+		return ELAN_CAPTURE_TYPE_INVALID;
+	}
+}
+
 int elan_get_hwid(uint16_t *id)
 {
 	int rc;
@@ -49,7 +72,7 @@ int elan_get_hwid(uint16_t *id)
 	rc |= elan_read_register(0x04, &id_lo);
 	if (rc) {
 		CPRINTS("ELAN HW ID read failed %d", rc);
-		return FP_ERROR_SPI_COMM;
+		return EC_ERROR_HW_INTERNAL;
 	}
 	*id = (id_hi << 8) | id_lo;
 	return EC_SUCCESS;
@@ -61,14 +84,19 @@ int elan_check_hwid(void)
 	int status;
 
 	status = elan_get_hwid(&id);
+	if (status != EC_SUCCESS) {
+		assert(status == EC_ERROR_HW_INTERNAL);
+		errors |= FP_ERROR_SPI_COMM;
+	}
+
 	if (id != FP_SENSOR_HWID_ELAN) {
 		CPRINTS("ELAN unknown silicon 0x%04x", id);
-		return FP_ERROR_BAD_HWID;
+		errors |= FP_ERROR_BAD_HWID;
+		return EC_ERROR_HW_INTERNAL;
 	}
-	if (status == EC_SUCCESS)
-		CPRINTS("ELAN HWID 0x%04x", id);
 
-	return status;
+	CPRINTS("ELAN HWID 0x%04x", id);
+	return EC_SUCCESS;
 }
 
 /**
@@ -86,13 +114,18 @@ int fp_sensor_init(void)
 {
 	CPRINTF("========%s=======\n", __func__);
 
-	errors = 0;
+	errors = FP_ERROR_DEAD_PIXELS_UNKNOWN;
 	elan_execute_reset();
-	algorithm_parameter_setting();
+	elan_alg_param_setting();
 	if (IC_SELECTION == EFSA80SG)
 		elan_set_hv_chip(1);
 
-	errors |= elan_check_hwid();
+	int rc = elan_check_hwid();
+	if (rc != EC_SUCCESS) {
+		errors |= FP_ERROR_INIT_FAIL;
+		return EC_SUCCESS;
+	}
+
 	if (elan_execute_calibration() < 0)
 		errors |= FP_ERROR_INIT_FAIL;
 	if (elan_woe_mode() != 0)
@@ -115,7 +148,8 @@ int fp_sensor_deinit(void)
  *
  * @param[out] resp      retrieve the version, sensor and template information
  *
- * @return EC_SUCCESS on success otherwise error.
+ * @return EC_SUCCESS on success.
+ * @return EC_RES_ERROR on error.
  */
 int fp_sensor_get_info(struct ec_response_fp_info *resp)
 {
@@ -123,7 +157,10 @@ int fp_sensor_get_info(struct ec_response_fp_info *resp)
 
 	CPRINTF("========%s=======\n", __func__);
 	memcpy(resp, &ec_fp_sensor_info, sizeof(struct ec_response_fp_info));
-	elan_get_hwid(&id);
+
+	if (elan_get_hwid(&id)) {
+		return EC_RES_ERROR;
+	}
 
 	resp->model_id = id;
 	resp->errors = errors;
@@ -156,9 +193,13 @@ int fp_sensor_get_info(struct ec_response_fp_info *resp)
 int fp_finger_match(void *templ, uint32_t templ_count, uint8_t *image,
 		    int32_t *match_index, uint32_t *update_bitmap)
 {
+	int res;
 	CPRINTF("========%s=======\n", __func__);
-	return elan_match(templ, templ_count, image, match_index,
-			  update_bitmap);
+	res = elan_match(templ, templ_count, image, match_index, update_bitmap);
+	if (res == EC_MKBP_FP_ERR_MATCH_YES)
+		res = elan_template_update(templ, *match_index);
+
+	return res;
 }
 
 /**
@@ -245,10 +286,18 @@ void fp_configure_detect(void)
  * - FP_SENSOR_TOO_FAST on finger removed before image was captured
  * - FP_SENSOR_LOW_SENSOR_COVERAGE on sensor not fully covered by finger
  */
-int fp_acquire_image_with_mode(uint8_t *image_data, int mode)
+int fp_acquire_image(uint8_t *image_data, enum fp_capture_type capture_type)
 {
+	enum elan_capture_type rc =
+		convert_fp_capture_type_to_elan_capture_type(capture_type);
+
+	if (rc == ELAN_CAPTURE_TYPE_INVALID) {
+		CPRINTF("Unsupported capture_type %d provided", capture_type);
+		return -EINVAL;
+	}
+
 	CPRINTF("========%s=======\n", __func__);
-	return elan_sensor_acquire_image_with_mode(image_data, mode);
+	return elan_sensor_acquire_image_with_mode(image_data, rc);
 }
 
 /**
@@ -278,22 +327,4 @@ int fp_maintenance(void)
 {
 	CPRINTF("========%s=======\n", __func__);
 	return elan_fp_maintenance(&errors);
-}
-
-/**
- * Provides the init_trng function required by the elan library using the EC
- * trng API
- */
-void init_trng(void)
-{
-	trng_init();
-}
-
-/**
- * Provides the exit_trng function required by the elan library using the EC
- * trng API
- */
-void exit_trng(void)
-{
-	trng_exit();
 }

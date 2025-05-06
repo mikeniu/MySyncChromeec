@@ -32,7 +32,7 @@
 #define PWRSEQ_G3S5_UP_VALUE IN_PGOOD_ALL_CORE
 
 #else
-#warning("Input power signals state flags not defined");
+#warning ("Input power signals state flags not defined");
 #endif
 
 #endif /* __X86_POWER_SIGNALS_H__ */

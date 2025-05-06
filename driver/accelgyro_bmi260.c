@@ -341,7 +341,7 @@ static __maybe_unused int config_interrupt(const struct motion_sensor_t *s)
  * This is a "top half" interrupt handler, it just asks motion sense ask
  * to schedule the "bottom half", ->irq_handler().
  */
-void bmi260_interrupt(enum gpio_signal signal)
+test_mockable void bmi260_interrupt(enum gpio_signal signal)
 {
 	last_interrupt_timestamp = __hw_clock_source_read();
 
@@ -357,6 +357,7 @@ void bmi260_interrupt(enum gpio_signal signal)
  */
 static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 {
+	uint32_t interrupt_timestamp = last_interrupt_timestamp;
 	/* use uint16_t interrupt can cause error. */
 	uint32_t interrupt = 0;
 	int8_t has_read_fifo = 0;
@@ -387,7 +388,7 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 			break;
 
 		if (interrupt & (BMI260_FWM_INT | BMI260_FFULL_INT)) {
-			bmi_load_fifo(s, last_interrupt_timestamp);
+			bmi_load_fifo(s, interrupt_timestamp);
 			has_read_fifo = 1;
 		}
 	}

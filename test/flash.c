@@ -138,7 +138,7 @@ static int verify_erase(int offset, int size)
 		uint32_t flags;                                               \
 		TEST_ASSERT(host_command_protect(0, 0, &flags, NULL, NULL) == \
 			    EC_RES_SUCCESS);                                  \
-		TEST_ASSERT(flags &(f));                                      \
+		TEST_ASSERT(flags & (f));                                     \
 	} while (0)
 
 #define ASSERT_WP_NO_FLAGS(f)                                                 \

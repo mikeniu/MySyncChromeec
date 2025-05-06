@@ -1,0 +1,120 @@
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ *
+ */
+
+/ {
+	aliases {
+		gpio-wp = &gpio_ec_flash_wp_odl;
+	};
+
+	named-gpios {
+		entering_rw {
+			enum-name = "GPIO_ENTERING_RW";
+		};
+		en_pp4200_s5: en_pp3700_s5 {};
+		ap_ec_sysrst_odl {
+			gpios = <&gpioa 1 (GPIO_INPUT | GPIO_VOLTAGE_1P8 |
+						GPIO_ACTIVE_LOW)>;
+		};
+		ap_ec_wdtrst_l {
+			gpios = <&gpio5 2 (GPIO_INPUT | GPIO_VOLTAGE_1P8 |
+						GPIO_ACTIVE_LOW)>;
+		};
+		ap_in_sleep_l {
+			gpios = <&gpio5 4 (GPIO_INPUT | GPIO_VOLTAGE_1P8 |
+						GPIO_ACTIVE_LOW)>;
+		};
+		pmic_ec_resetb {
+			gpios = <&gpio9 5 (GPIO_INPUT | GPIO_VOLTAGE_1P8 |
+					   GPIO_ACTIVE_LOW)>;
+		};
+	};
+
+	named-i2c-ports {
+		ec_smb_batt_scl_3v3 {
+			enum-names = "I2C_PORT_BATTERY", "I2C_PORT_VIRTUAL_BATTERY";
+		};
+	};
+
+	unused-pins {
+		compatible = "unused-gpios";
+		unused-gpios =
+			<&gpio0 2 0>,
+			<&gpio3 2 0>,
+			<&gpio3 5 0>,
+			<&gpio3 7 0>,
+			<&gpio4 1 0>,
+			<&gpio5 0 0>,
+			<&gpio6 6 0>,
+			<&gpio7 5 0>,
+			<&gpio7 6 0>,
+			<&gpio8 1 0>,
+			<&gpio8 5 0>,
+			<&gpio8 6 0>,
+			<&gpio9 3 0>,
+			<&gpio9 6 0>,
+			<&gpioa 0 0>,
+			<&gpioa 2 0>,
+			<&gpioa 4 0>,
+			<&gpioa 5 0>,
+			<&gpioa 7 0>,
+			<&gpiob 0 0>,
+			<&gpioc 0 0>,
+			<&gpioc 7 0>,
+			<&gpiof 0 0>,
+			<&gpiof 2 0>,
+			<&gpiof 3 0>,
+			<&gpiof 4 0>,
+			<&gpiof 5 0>;
+	};
+};
+
+&i2c0_0 {
+	label = "I2C_SENSOR";
+	clock-frequency = <I2C_BITRATE_FAST>;
+};
+
+&i2c1_0 {
+	label = "I2C_PDC_SM";
+	clock-frequency = <I2C_BITRATE_FAST>;
+};
+
+&i2c2_0 {
+	label = "I2C_PDC_S";
+	clock-frequency = <I2C_BITRATE_FAST>;
+};
+
+&i2c3_0 {
+	label = "I2C_CHARGER";
+	clock-frequency = <I2C_BITRATE_FAST>;
+};
+
+&i2c5_0 {
+	label = "I2C_SMB_BATT";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+	/* Upstream zephyr uses an irregular name here */
+	pinctrl-0 = <&i2c5_0_sda_scl_gp33_36>;
+};
+
+&cbi_flash {
+	/*
+	 * CBI section size is 0x1000 bytes, the CBI portion lies at the end of
+	 * EC_RO section.
+	 */
+	offset = <0x3e000>;
+	size = <0x1000>;
+};
+
+&pwm0_gpc3 {
+	drive-open-drain;
+};
+
+&pwm1_gpc2 {
+	drive-open-drain;
+};
+
+&pwm2_gpc4 {
+	drive-open-drain;
+};

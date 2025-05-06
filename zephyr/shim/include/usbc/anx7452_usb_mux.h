@@ -34,12 +34,12 @@ extern "C" {
 	DT_FOREACH_STATUS_OKAY(ANX7452_USB_MUX_COMPAT, \
 			       USB_MUX_ANX7452_CONTROL_ARRAY)
 
-#define USB_MUX_CONFIG_ANX7452(mux_id)                         \
-	{                                                      \
-		USB_MUX_COMMON_FIELDS(mux_id),                 \
-			.driver = &anx7452_usb_retimer_driver, \
-			.i2c_port = I2C_PORT_BY_DEV(mux_id),   \
-			.i2c_addr_flags = DT_REG_ADDR(mux_id), \
+#define USB_MUX_CONFIG_ANX7452(mux_id)                 \
+	{                                              \
+		USB_MUX_COMMON_FIELDS(mux_id),         \
+		.driver = &anx7452_usb_retimer_driver, \
+		.i2c_port = I2C_PORT_BY_DEV(mux_id),   \
+		.i2c_addr_flags = DT_REG_ADDR(mux_id), \
 	}
 
 #ifdef __cplusplus

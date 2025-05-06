@@ -19,11 +19,11 @@ typedef struct {
 	unsigned int vector;
 } irq_desc_t;
 
-#define INTR_DESC(__irq, __vector, __trig)                                \
-	{                                                                 \
-		.irq = __irq, .trigger = __trig,                          \
-		.polarity = IOAPIC_REDTBL_INTPOL_HIGH, .vector = __vector \
-	}
+#define INTR_DESC(__irq, __vector, __trig)       \
+	{ .irq = __irq,                          \
+	  .trigger = __trig,                     \
+	  .polarity = IOAPIC_REDTBL_INTPOL_HIGH, \
+	  .vector = __vector }
 
 #define LEVEL_INTR(__irq, __vector) \
 	INTR_DESC(__irq, __vector, IOAPIC_REDTBL_TRIGGER_LEVEL)

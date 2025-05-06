@@ -28,7 +28,7 @@ GPIO_INT(ALL_SYS_PGOOD,		PIN(F, 0), GPIO_INT_BOTH, power_signal_interrupt)	/* PM
 GPIO_INT(RSMRST_L_PGOOD,	PIN(F, 1), GPIO_INT_BOTH, power_signal_interrupt)	/* PMIC_EC_RSMRST_ODL */
 GPIO_INT(PCH_SLP_S3_L,		PIN(F, 2), GPIO_INT_BOTH, power_signal_interrupt)	/* SLP_S3_L */
 GPIO_INT(PCH_SLP_S4_L,		PIN(F, 3), GPIO_INT_BOTH, power_signal_interrupt)	/* SLP_S4_L */
-GPIO_INT(WP_L,			PIN(I, 4), GPIO_INT_BOTH | GPIO_SEL_1P8V, switch_interrupt)	/* EC_WP_ODL_R */
+GPIO(WP_L,			PIN(I, 4), GPIO_INPUT | GPIO_SEL_1P8V)			/* EC_WP_ODL_R */
 
 GPIO(EN_USB_C0_3A,		PIN(A, 0), GPIO_ODR_LOW)			/* 1.5/3.0 C0 current limit selection */
 GPIO(EN_USB_C1_3A,		PIN(A, 1), GPIO_ODR_LOW)			/* 1.5/3.0 C1 current limit selection */

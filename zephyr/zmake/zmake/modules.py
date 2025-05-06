@@ -22,9 +22,18 @@ def third_party_module(name, checkout):
 
 
 known_modules = {
+    # TODO(b/384581513): boringssl is not officially recognized by Zephyr,
+    # since it doesn't have a zephyr/module.yaml. That doesn't prevent us from
+    # using it with zmake.
+    "boringssl": lambda name, checkout: (
+        checkout / "src" / "third_party" / name
+    ),
     "hal_stm32": third_party_module,
     "cmsis": third_party_module,
     "ec": lambda name, checkout: (checkout / "src" / "platform" / "ec"),
+    "egis": lambda name, checkout: (
+        checkout / "src" / "platform" / "fingerprint" / "egis"
+    ),
     "fpc": lambda name, checkout: (
         checkout / "src" / "platform" / "fingerprint" / "fpc"
     ),
@@ -32,6 +41,7 @@ known_modules = {
     "pigweed": lambda name, checkout: (checkout / "src" / "third_party" / name),
     "hal_intel_public": third_party_module,
     "picolibc": third_party_module,
+    "intel_module_private": third_party_module,
 }
 
 

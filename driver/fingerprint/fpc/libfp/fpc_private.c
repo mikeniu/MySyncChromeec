@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "assert.h"
 #include "common.h"
 #include "console.h"
 #include "fpc_bio_algorithm.h"
@@ -19,6 +20,7 @@
 #include "timer.h"
 #include "util.h"
 
+#include <errno.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -76,6 +78,27 @@ enum fpc_cmd {
 	FPC_CMD_HW_ID = 0xFC,
 };
 
+enum fpc_capture_type
+convert_fp_capture_type_to_fpc_capture_type(enum fp_capture_type mode)
+{
+	switch (mode) {
+	case FP_CAPTURE_VENDOR_FORMAT:
+		return FPC_CAPTURE_VENDOR_FORMAT;
+	case FP_CAPTURE_SIMPLE_IMAGE:
+		return FPC_CAPTURE_SIMPLE_IMAGE;
+	case FP_CAPTURE_PATTERN0:
+		return FPC_CAPTURE_PATTERN0;
+	case FP_CAPTURE_PATTERN1:
+		return FPC_CAPTURE_PATTERN1;
+	case FP_CAPTURE_QUALITY_TEST:
+		return FPC_CAPTURE_QUALITY_TEST;
+	case FP_CAPTURE_RESET_TEST:
+		return FPC_CAPTURE_RESET_TEST;
+	default:
+		return FPC_CAPTURE_TYPE_INVALID;
+	}
+}
+
 /* Maximum size of a sensor command SPI transfer */
 #define MAX_CMD_SPI_TRANSFER_SIZE 3
 
@@ -107,16 +130,12 @@ int fpc_get_hwid(uint16_t *id)
 	if (id == NULL)
 		return EC_ERROR_INVAL;
 
-	/* Clear previous occurences of relevant |errors| flags. */
-	errors &= (~FP_ERROR_SPI_COMM & ~FP_ERROR_BAD_HWID);
-
 	spi_buf[0] = FPC_CMD_HW_ID;
 	rc = spi_transaction(SPI_FP_DEVICE, spi_buf, 3, spi_buf,
 			     SPI_READBACK_ALL);
 	if (rc) {
 		CPRINTS("FPC HW ID read failed %d", rc);
-		errors |= FP_ERROR_SPI_COMM;
-		return EC_ERROR_HW_INTERNAL;
+		return FP_ERROR_SPI_COMM;
 	}
 
 	sensor_id = ((spi_buf[1] << 8) | spi_buf[2]);
@@ -130,7 +149,15 @@ int fpc_check_hwid(void)
 	uint16_t id = 0;
 	int status;
 
+	// TODO(b/361826387): Reconcile the different behavior and handling of
+	// the |errors| global state between the libfp and bep implementations.
+	/* Clear previous occurrences of relevant |errors| flags. */
+	errors &= (~FP_ERROR_SPI_COMM & ~FP_ERROR_BAD_HWID);
 	status = fpc_get_hwid(&id);
+	assert(status != EC_ERROR_INVAL);
+	if (status == FP_ERROR_SPI_COMM)
+		errors |= FP_ERROR_SPI_COMM;
+
 	if ((id >> 4) != FP_SENSOR_HWID_FPC) {
 		CPRINTS("FPC unknown silicon 0x%04x", id);
 		errors |= FP_ERROR_BAD_HWID;
@@ -281,16 +308,14 @@ int fp_sensor_deinit(void)
 
 int fp_sensor_get_info(struct ec_response_fp_info *resp)
 {
-	int rc;
+	uint16_t sensor_id;
 
 	memcpy(resp, &fpc1145_info, sizeof(*resp));
 
-	spi_buf[0] = FPC_CMD_HW_ID;
-	rc = spi_transaction(SPI_FP_DEVICE, spi_buf, 3, spi_buf,
-			     SPI_READBACK_ALL);
-	if (rc)
+	if (fpc_get_hwid(&sensor_id))
 		return EC_RES_ERROR;
-	resp->model_id = (spi_buf[1] << 8) | spi_buf[2];
+
+	resp->model_id = sensor_id;
 	resp->errors = errors;
 
 	return EC_SUCCESS;
@@ -337,14 +362,16 @@ int fp_maintenance(void)
 	return fpc_fp_maintenance(&errors);
 }
 
-int fp_acquire_image_with_mode(uint8_t *image_data, int mode)
+int fp_acquire_image(uint8_t *image_data, enum fp_capture_type capture_type)
 {
-	return fp_sensor_acquire_image_with_mode(image_data, mode);
-}
+	enum fpc_capture_type rc =
+		convert_fp_capture_type_to_fpc_capture_type(capture_type);
 
-int fp_acquire_image(uint8_t *image_data)
-{
-	return fp_sensor_acquire_image(image_data);
+	if (rc == FPC_CAPTURE_TYPE_INVALID) {
+		CPRINTS("Unsupported capture_type %d provided", capture_type);
+		return -EINVAL;
+	}
+	return fp_sensor_acquire_image_with_mode(image_data, rc);
 }
 
 enum finger_state fp_finger_status(void)

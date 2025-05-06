@@ -367,11 +367,11 @@ static void board_tcpc_init(void)
 	if (!system_jumped_late())
 		board_reset_pd_mcu();
 
-		/*
-		 * These IO expander pins are implemented using the
-		 * C0/C2 TCPC, so they must be set up after the TCPC has
-		 * been taken out of reset.
-		 */
+	/*
+	 * These IO expander pins are implemented using the
+	 * C0/C2 TCPC, so they must be set up after the TCPC has
+	 * been taken out of reset.
+	 */
 #ifndef CONFIG_ZEPHYR
 	ioex_init(IOEX_C0_NCT38XX);
 	ioex_init(IOEX_C2_NCT38XX);

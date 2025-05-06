@@ -30,12 +30,12 @@ extern "C" {
 	DT_FOREACH_STATUS_OKAY(KB8010_USB_MUX_COMPAT, \
 			       USB_MUX_KB8010_CONTROL_ARRAY)
 
-#define USB_MUX_CONFIG_KB8010(mux_id)                          \
-	{                                                      \
-		USB_MUX_COMMON_FIELDS(mux_id),                 \
-			.driver = &kb8010_usb_retimer_driver,  \
-			.i2c_port = I2C_PORT_BY_DEV(mux_id),   \
-			.i2c_addr_flags = DT_REG_ADDR(mux_id), \
+#define USB_MUX_CONFIG_KB8010(mux_id)                  \
+	{                                              \
+		USB_MUX_COMMON_FIELDS(mux_id),         \
+		.driver = &kb8010_usb_retimer_driver,  \
+		.i2c_port = I2C_PORT_BY_DEV(mux_id),   \
+		.i2c_addr_flags = DT_REG_ADDR(mux_id), \
 	}
 
 #ifdef __cplusplus

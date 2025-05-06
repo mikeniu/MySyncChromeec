@@ -26,7 +26,7 @@
 #define LP5562_REG_W_CURRENT 0x0f
 #define LP5562_REG_LED_MAP 0x70
 
-#define LP5562_REG_ENG_PROG(n) (0x10 + ((n)-1) * 0x20)
+#define LP5562_REG_ENG_PROG(n) (0x10 + ((n) - 1) * 0x20)
 
 /* Brightness range: 0x00 - 0xff */
 #define LP5562_COLOR_NONE 0x000000

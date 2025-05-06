@@ -18,7 +18,7 @@
 static bool expect_assert = false;
 
 /* Set up a fake PDC API implementation with all-NULL function pointers */
-static struct pdc_driver_api_t fake_pdc_api = { 0 };
+static DEVICE_API(pdc, fake_pdc_api);
 static const struct device fake_pdc = {
 	.api = &fake_pdc_api,
 };
@@ -52,6 +52,11 @@ void assert_post_action(const char *file, unsigned int line)
 		(test);                                   \
 		zassert_true(0, "Assert did not happen"); \
 	} while (0)
+
+ZTEST(pdc_api_null_check, test_pdc_start_thread)
+{
+	EXPECT_ASSERT(pdc_start_thread(&fake_pdc));
+}
 
 ZTEST(pdc_api_null_check, test_pdc_is_init_done)
 {
@@ -134,9 +139,9 @@ ZTEST(pdc_api_null_check, test_pdc_get_info)
 	EXPECT_ASSERT(pdc_get_info(&fake_pdc, NULL, false));
 }
 
-ZTEST(pdc_api_null_check, test_pdc_get_bus_info)
+ZTEST(pdc_api_null_check, test_pdc_get_hw_config)
 {
-	EXPECT_ASSERT(pdc_get_bus_info(&fake_pdc, NULL));
+	EXPECT_ASSERT(pdc_get_hw_config(&fake_pdc, NULL));
 }
 
 ZTEST(pdc_api_null_check, test_pdc_get_rdo)
@@ -297,11 +302,52 @@ ZTEST(pdc_api_null_check, test_pdc_get_lpm_ppm_info)
 		      -ENOSYS);
 }
 
+ZTEST(pdc_api_null_check, test_pdc_set_frs)
+{
+	int rv = pdc_set_frs(&fake_pdc, false);
+
+	zassert_equal(-ENOSYS, rv, "Got %d, expected -ENOSYS (%d)", rv,
+		      -ENOSYS);
+}
+
+ZTEST(pdc_api_null_check, test_pdc_get_attention_vdo)
+{
+	int rv = pdc_get_attention_vdo(&fake_pdc, false);
+
+	zassert_equal(-ENOSYS, rv, "Got %d, expected -ENOSYS (%d)", rv,
+		      -ENOSYS);
+}
+
+ZTEST(pdc_api_null_check, test_pdc_get_drp_mode)
+{
+	enum drp_mode_t drp_mode;
+	int rv = pdc_get_drp_mode(&fake_pdc, &drp_mode);
+
+	zassert_equal(-ENOSYS, rv, "Got %d, expected -ENOSYS (%d)", rv,
+		      -ENOSYS);
+}
+
+ZTEST(pdc_api_null_check, test_pdc_get_sbu_mux_mode)
+{
+	enum pdc_sbu_mux_mode mode;
+	int rv = pdc_get_sbu_mux_mode(&fake_pdc, &mode);
+
+	zassert_equal(-ENOSYS, rv, "Got %d, expected -ENOSYS (%d)", rv,
+		      -ENOSYS);
+}
+
+ZTEST(pdc_api_null_check, test_pdc_set_sbu_mux_mode)
+{
+	int rv = pdc_set_sbu_mux_mode(&fake_pdc, PDC_SBU_MUX_MODE_NORMAL);
+
+	zassert_equal(-ENOSYS, rv, "Got %d, expected -ENOSYS (%d)", rv,
+		      -ENOSYS);
+}
+
 ZTEST(pdc_api_null_check, test_completeness)
 {
 	/* Count the number of PDC API methods supported */
-	size_t num_api_methods =
-		sizeof(struct pdc_driver_api_t) / sizeof(void *);
+	size_t num_api_methods = sizeof(struct pdc_driver_api) / sizeof(void *);
 
 	/* Get the number of tests, not counting this one. */
 	size_t num_tests = ZTEST_TEST_COUNT - 1;
@@ -310,7 +356,7 @@ ZTEST(pdc_api_null_check, test_completeness)
 
 	zassert_equal(
 		num_api_methods, num_tests,
-		"Found %zu API methods in 'struct pdc_driver_api_t' but only "
+		"Found %zu API methods in 'struct pdc_driver_api' but only "
 		"%zu tests in 'pdc_null_api.c'. Please write a test to make "
 		"sure this API method is NULL-protected",
 		num_api_methods, num_tests);

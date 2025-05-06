@@ -12,6 +12,7 @@
 #include "nissa_sub_board.h"
 #include "system.h"
 #include "usb_mux.h"
+#include "usb_pd.h"
 #include "usbc_ppc.h"
 
 #include <zephyr/logging/log.h>
@@ -106,11 +107,11 @@ void reset_nct38xx_port(int port)
 	}
 
 	gpio_pin_set_dt(reset_gpio_l, 1);
-	crec_msleep(NCT38XX_RESET_HOLD_DELAY_MS);
+	k_msleep(NCT38XX_RESET_HOLD_DELAY_MS);
 	gpio_pin_set_dt(reset_gpio_l, 0);
 	nct38xx_reset_notify(port);
 	if (NCT3807_RESET_POST_DELAY_MS != 0) {
-		crec_msleep(NCT3807_RESET_POST_DELAY_MS);
+		k_msleep(NCT3807_RESET_POST_DELAY_MS);
 	}
 
 	/* Re-enable the IO expander pins */
@@ -166,4 +167,13 @@ void board_reset_pd_mcu(void)
 int board_vbus_source_enabled(int port)
 {
 	return ppc_is_sourcing_vbus(port);
+}
+
+int board_tcpc_post_init(int port)
+{
+	/* Alert register bits may be set during TCPM initialization.
+	 * Need to process and clear alert register after TCPM initilaztion,
+	 * otherwise the alert# pin stays low indefinitely */
+	schedule_deferred_pd_interrupt(port);
+	return EC_SUCCESS;
 }

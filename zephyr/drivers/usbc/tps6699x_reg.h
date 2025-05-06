@@ -129,22 +129,31 @@ enum px_ext_vbus_sw {
 };
 
 /**
+ * @brief Chip operating modes
+ */
+enum tps_mode {
+	/** Chip is booting */
+	REG_MODE_BOOT = 0x544f4f42,
+	/** Firmware update / both banks corrupted */
+	REG_MODE_F211 = 0x31313246,
+	/** Flash code running pre-appconfig */
+	REG_MODE_APP0 = 0x30505041,
+	/** Flash code running post-appconfig */
+	REG_MODE_APP1 = 0x31505041,
+	/** Flash code is waiting for power */
+	REG_MODE_WTPR = 0x52505457,
+};
+
+/**
  * @brief 4.1 Vendor ID Register (Offset = 0x00)
  *
  * Intel-assigned Thunderbolt Vendor ID
  */
 union reg_vendor_id {
 	struct {
-		/* TODO(b/345783692): These fields don't need to be included in
-		 * every register definition. The I2C write process can write
-		 * from 2 separate buffers.
-		 */
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t data[4];
 	} __packed;
-	uint8_t raw_value[6];
+	uint8_t raw_value[4];
 };
 
 /**
@@ -154,12 +163,9 @@ union reg_vendor_id {
  */
 union reg_device_id {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t data[4];
 	} __packed;
-	uint8_t raw_value[6];
+	uint8_t raw_value[4];
 };
 
 /**
@@ -169,12 +175,9 @@ union reg_device_id {
  */
 union reg_protocol_version {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t data[4];
 	} __packed;
-	uint8_t raw_value[6];
+	uint8_t raw_value[4];
 };
 
 /**
@@ -184,12 +187,9 @@ union reg_protocol_version {
  */
 union reg_mode {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t data[4];
 	} __packed;
-	uint8_t raw_value[6];
+	uint8_t raw_value[4];
 };
 
 /**
@@ -199,12 +199,9 @@ union reg_mode {
  */
 union reg_type {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t data[4];
 	} __packed;
-	uint8_t raw_value[6];
+	uint8_t raw_value[4];
 };
 
 /**
@@ -214,12 +211,9 @@ union reg_type {
  */
 union reg_uid {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t data[16];
 	} __packed;
-	uint8_t raw_value[18];
+	uint8_t raw_value[16];
 };
 
 /**
@@ -230,17 +224,13 @@ union reg_uid {
  */
 union reg_customer_use {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		/**
 		 * The first byte is a version code, set using the firmware
 		 * config tool.
 		 */
-		uint8_t fw_config_version;
-		uint8_t data[7];
+		uint8_t data[8];
 	} __packed;
-	uint8_t raw_value[10];
+	uint8_t raw_value[8];
 };
 
 /* Values to be written to the CMD registers, indicating the task to be started
@@ -250,72 +240,89 @@ union reg_customer_use {
  * TPS6699x TRM chapter 10, 4CC Task Detailed Descriptions.
  * TODO(b/345783692): Give unused tasks their real values.
  */
+
+/* Helper function to convert TI task names to UINT32*/
+#define TASK_TO_UINT32(a, b, c, d) \
+	((uint32_t)(a | (b << 8) | (c << 16) | (d << 24)))
+
 enum command_task {
+	/* Command complete: Not a real command. The TPS6699x clears the command
+	 * register when a command completes.
+	 */
+	COMMAND_TASK_COMPLETE = 0,
 	/* Invalid command */
-	COMMAND_TASK_NO_COMMAND = 0x444d4321,
+	COMMAND_TASK_NO_COMMAND = TASK_TO_UINT32('!', 'C', 'M', 'D'),
 	/* Cold reset request */
-	COMMAND_TASK_GAID = 0x44494147,
+	COMMAND_TASK_GAID = TASK_TO_UINT32('G', 'A', 'I', 'D'),
 	/* Simulate port disconnect */
-	COMMAND_TASK_DISC = 0x43534944,
+	COMMAND_TASK_DISC = TASK_TO_UINT32('D', 'I', 'S', 'C'),
 	/* PD PR_Swap to Sink */
-	COMMAND_TASK_SWSK = 0x6b535753,
+	COMMAND_TASK_SWSK = TASK_TO_UINT32('S', 'W', 'S', 'k'),
 	/* PD PR_Swap to Source */
-	COMMAND_TASK_SWSR = 0x72535753,
+	COMMAND_TASK_SWSR = TASK_TO_UINT32('S', 'W', 'S', 'r'),
 	/* PD DR_Swap to DFP */
-	COMMAND_TASK_SWDF,
+	COMMAND_TASK_SWDF = TASK_TO_UINT32('S', 'W', 'D', 'F'),
 	/* PD DR_Swap to UFP */
-	COMMAND_TASK_SWUF,
-	/* PD Get Sink Capabilties */
-	COMMAND_TASK_GSKC,
+	COMMAND_TASK_SWUF = TASK_TO_UINT32('S', 'W', 'U', 'F'),
+	/* PD Get Sink Capabilities */
+	COMMAND_TASK_GSKC = TASK_TO_UINT32('G', 'S', 'k', 'C'),
 	/* PD Get Source Capabilities */
-	COMMAND_TASK_GSRC,
+	COMMAND_TASK_GSRC = TASK_TO_UINT32('G', 'S', 'r', 'C'),
 	/* PD Get Port Partner Information */
-	COMMAND_TASK_GPPI,
+	COMMAND_TASK_GPPI = TASK_TO_UINT32('G', 'P', 'P', 'I'),
 	/* PD Send Source Capabilities */
-	COMMAND_TASK_SSRC,
+	COMMAND_TASK_SSRC = TASK_TO_UINT32('S', 'S', 'r', 'C'),
 	/* PD Data Reset */
-	COMMAND_TASK_DRST,
+	COMMAND_TASK_DRST = TASK_TO_UINT32('D', 'R', 'S', 'T'),
 	/* Message Buffer Read */
-	COMMAND_TASK_MBRD,
+	COMMAND_TASK_MBRD = TASK_TO_UINT32('M', 'B', 'R', 'd'),
 	/* Send Alert Message */
-	COMMAND_TASK_ALRT,
+	COMMAND_TASK_ALRT = TASK_TO_UINT32('A', 'L', 'R', 'T'),
+	/* Send EPR Mode Message */
+	COMMAND_TASK_EPRM = TASK_TO_UINT32('E', 'P', 'R', 'm'),
 	/* PD Send Enter Mode */
-	COMMAND_TASK_AMEN,
+	COMMAND_TASK_AMEN = TASK_TO_UINT32('A', 'M', 'E', 'n'),
 	/* PD Send Exit Mode */
-	COMMAND_TASK_AMEX,
+	COMMAND_TASK_AMEX = TASK_TO_UINT32('A', 'M', 'E', 'x'),
 	/* PD Start Alternate Mode Discovery */
-	COMMAND_TASK_AMDS,
+	COMMAND_TASK_AMDS = TASK_TO_UINT32('A', 'M', 'D', 's'),
 	/* Get Custom Discovered Modes */
-	COMMAND_TASK_GCDM,
+	COMMAND_TASK_GCDM = TASK_TO_UINT32('G', 'C', 'd', 'm'),
 	/* PD Send VDM */
-	COMMAND_TASK_VDMS,
+	COMMAND_TASK_VDMS = TASK_TO_UINT32('V', 'D', 'M', 's'),
 	/* System ready to enter sink power */
-	COMMAND_TASK_SRDY = 0x59445253,
+	COMMAND_TASK_SRDY = TASK_TO_UINT32('S', 'R', 'D', 'Y'),
 	/* SRDY reset */
-	COMMAND_TASK_SRYR = 0x52595253,
+	COMMAND_TASK_SRYR = TASK_TO_UINT32('S', 'R', 'Y', 'R'),
+	/* Power Register Read */
+	COMMAND_TASK_PPRD = TASK_TO_UINT32('P', 'P', 'R', 'd'),
+	/* Power Register Write */
+	COMMAND_TASK_PPWR = TASK_TO_UINT32('P', 'P', 'W', 'r'),
 	/* Firmware update tasks */
-	COMMAND_TASK_TFUS = 0x73554654,
-	COMMAND_TASK_TFUC = 0x63554654,
-	COMMAND_TASK_TFUD = 0x64554654,
-	COMMAND_TASK_TFUE = 0x65554654,
-	COMMAND_TASK_TFUI = 0x69554654,
-	COMMAND_TASK_TFUQ = 0x71554654,
+	COMMAND_TASK_TFUS = TASK_TO_UINT32('T', 'F', 'U', 's'),
+	COMMAND_TASK_TFUC = TASK_TO_UINT32('T', 'F', 'U', 'c'),
+	COMMAND_TASK_TFUD = TASK_TO_UINT32('T', 'F', 'U', 'd'),
+	COMMAND_TASK_TFUE = TASK_TO_UINT32('T', 'F', 'U', 'e'),
+	COMMAND_TASK_TFUI = TASK_TO_UINT32('T', 'F', 'U', 'i'),
+	COMMAND_TASK_TFUQ = TASK_TO_UINT32('T', 'F', 'U', 'q'),
 	/* Abort current task */
-	COMMAND_TASK_ABRT,
+	COMMAND_TASK_ABRT = TASK_TO_UINT32('A', 'B', 'R', 'T'),
 	/*Auto Negotiate Sink Update */
-	COMMAND_TASK_ANEG,
+	COMMAND_TASK_ANEG = TASK_TO_UINT32('A', 'N', 'e', 'g'),
 	/* Clear Dead Battery Flag */
-	COMMAND_TASK_DBFG,
+	COMMAND_TASK_DBFG = TASK_TO_UINT32('D', 'B', 'f', 'g'),
+	/* Override SBU Debug Mux Path */
+	COMMAND_TASK_SBUD = TASK_TO_UINT32('S', 'B', 'U', 'd'),
 	/* Error handling for I2C3m transactions */
-	COMMAND_TASK_MUXR,
+	COMMAND_TASK_MUXR = TASK_TO_UINT32('M', 'u', 'x', 'R'),
 	/* Trigger an Input GPIO Event */
-	COMMAND_TASK_TRIG,
+	COMMAND_TASK_TRIG = TASK_TO_UINT32('T', 'r', 'i', 'g'),
 	/* I2C read transaction */
-	COMMAND_TASK_I2CR,
+	COMMAND_TASK_I2CR = TASK_TO_UINT32('I', '2', 'C', 'r'),
 	/* I2C write transaction */
-	COMMAND_TASK_I2CW,
+	COMMAND_TASK_I2CW = TASK_TO_UINT32('I', '2', 'C', 'w'),
 	/* UCSI tasks */
-	COMMAND_TASK_UCSI = 0x49534355,
+	COMMAND_TASK_UCSI = TASK_TO_UINT32('U', 'C', 'S', 'I')
 };
 BUILD_ASSERT(sizeof(enum command_task) == sizeof(uint32_t));
 
@@ -328,12 +335,9 @@ BUILD_ASSERT(sizeof(enum command_task) == sizeof(uint32_t));
  */
 union reg_command {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint32_t command : 32;
 	} __packed;
-	uint8_t raw_value[6];
+	uint8_t raw_value[4];
 };
 
 /**
@@ -344,12 +348,9 @@ union reg_command {
  */
 union reg_data {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t data[64];
 	} __packed;
-	uint8_t raw_value[66];
+	uint8_t raw_value[64];
 };
 
 /**
@@ -359,9 +360,6 @@ union reg_data {
  */
 union reg_device_capabilities {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t power_role : 2;
 		uint8_t usb_pd_capability : 1;
 		uint8_t tbt_present : 1;
@@ -372,7 +370,7 @@ union reg_device_capabilities {
 		uint8_t reserved2 : 8;
 		uint8_t reserved3 : 8;
 	} __packed;
-	uint8_t raw_value[6];
+	uint8_t raw_value[4];
 };
 
 /**
@@ -382,12 +380,9 @@ union reg_device_capabilities {
  */
 union reg_version {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint32_t version : 32;
 	} __packed;
-	uint8_t raw_value[6];
+	uint8_t raw_value[4];
 };
 
 /**
@@ -413,10 +408,6 @@ union reg_version {
  */
 union reg_interrupt {
 	struct {
-		/** Used for */
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		/* Bits 0 - 7 */
 		uint8_t reserved0 : 1;
 		uint8_t pd_hardreset : 1;
@@ -428,7 +419,7 @@ union reg_interrupt {
 		uint8_t source_cap_updated : 1;
 
 		/* Bits 8 - 15 */
-		uint8_t reserved2 : 1;
+		uint8_t sink_ready : 1;
 		uint8_t overcurent : 1;
 		uint8_t attention_received : 1;
 		uint8_t vdm_received : 1;
@@ -471,7 +462,7 @@ union reg_interrupt {
 		uint8_t sink_transition_completeed : 1;
 		uint8_t plug_early_notification : 1;
 		uint8_t prochot_notification : 1;
-		uint8_t reserved10 : 1;
+		uint8_t ucsi_connector_status_change_notification : 1;
 		uint8_t unable_to_source_error : 1;
 		uint8_t reserved11 : 1;
 
@@ -520,7 +511,7 @@ union reg_interrupt {
 		uint8_t ready_for_next_data_block : 1;
 		uint8_t reserved17 : 2;
 	} __packed;
-	uint8_t raw_value[13];
+	uint8_t raw_value[11];
 };
 
 /**
@@ -530,9 +521,6 @@ union reg_interrupt {
  */
 union reg_status {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t plug_present : 1;
 		uint8_t connection_state : 3;
 		uint8_t plug_orientation : 1;
@@ -547,7 +535,7 @@ union reg_status {
 		uint8_t usb_host_present : 2;
 
 		uint8_t acting_as_legacy : 2;
-		uint8_t reserved2 : 1;
+		uint8_t sbumux_mode : 1;
 		uint8_t bist : 1;
 		uint8_t reserved4 : 2;
 		uint8_t soc_ack_timeout : 1;
@@ -556,7 +544,7 @@ union reg_status {
 		uint8_t am_status : 2;
 		uint8_t reserved6 : 6;
 	};
-	uint8_t raw_value[7];
+	uint8_t raw_value[5];
 };
 
 /**
@@ -568,9 +556,6 @@ union reg_status {
  */
 union reg_sx_config {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t s0_config_enable : 1;
 		uint8_t s0_config_address_port1 : 3;
 		uint8_t reserved0 : 4;
@@ -588,7 +573,7 @@ union reg_sx_config {
 		uint8_t reserved6 : 4;
 		uint8_t reserved7[6];
 	};
-	uint8_t raw_value[26];
+	uint8_t raw_value[24];
 };
 
 /**
@@ -600,14 +585,11 @@ union reg_sx_config {
  */
 union reg_sx_app_config {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t sleep_state : 3;
 		uint8_t reserved0 : 5;
 		uint8_t reserved1 : 8;
 	};
-	uint8_t raw_value[4];
+	uint8_t raw_value[2];
 };
 
 /**
@@ -618,9 +600,6 @@ union reg_sx_app_config {
  */
 union reg_discovered_svids {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t number_sop_svids : 4;
 		uint8_t number_sopprime_svids : 4;
 
@@ -642,7 +621,7 @@ union reg_discovered_svids {
 		uint16_t svid_sopprime_6 : 16;
 		uint16_t svid_sopprime_7 : 16;
 	} __packed;
-	uint8_t raw_value[35];
+	uint8_t raw_value[33];
 };
 
 /**
@@ -652,9 +631,6 @@ union reg_discovered_svids {
  */
 union reg_connection_manager_status {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t reserved0 : 1;
 		uint8_t usb2_host_connected : 1;
 		uint8_t usb3_host_connected : 1;
@@ -664,7 +640,7 @@ union reg_connection_manager_status {
 		uint8_t pcie_host_connected : 1;
 		uint8_t reserved1 : 1;
 	} __packed;
-	uint8_t raw_value[3];
+	uint8_t raw_value[1];
 };
 
 /**
@@ -674,9 +650,6 @@ union reg_connection_manager_status {
  */
 union reg_usb_config {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t reserved0 : 8;
 
 		uint8_t reserved1 : 5;
@@ -692,7 +665,7 @@ union reg_usb_config {
 		uint8_t usb4_drd : 1;
 		uint8_t reserved4 : 5;
 	} __packed;
-	uint8_t raw_value[6];
+	uint8_t raw_value[4];
 };
 
 /**
@@ -702,9 +675,6 @@ union reg_usb_config {
  */
 union reg_usb_status {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t eudo_sop_sent_or_received : 2;
 		uint8_t usb4_required_plug_mode : 2;
 		uint8_t usb_mode_active_on_plug : 1;
@@ -715,7 +685,7 @@ union reg_usb_status {
 		uint32_t usb4_enter_usb_rx_tx : 32;
 		uint32_t reserved2 : 32;
 	} __packed;
-	uint8_t raw_value[11];
+	uint8_t raw_value[9];
 };
 
 /**
@@ -726,9 +696,6 @@ union reg_usb_status {
  */
 union reg_connection_manager_control {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t pl4_vbus_vconn_enable : 1;
 		uint8_t usb2_host_connected : 1;
 		uint8_t usb3_host_connected : 1;
@@ -738,7 +705,7 @@ union reg_connection_manager_control {
 		uint8_t pcie_host_connected : 1;
 		uint8_t reserved : 1;
 	} __packed;
-	uint8_t raw_value[3];
+	uint8_t raw_value[1];
 };
 
 /**
@@ -748,9 +715,6 @@ union reg_connection_manager_control {
  */
 union reg_power_path_status {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint32_t pa_vconn_sw : 2;
 		uint32_t pb_vconn_sw : 2;
 		uint32_t reserved0 : 2;
@@ -769,7 +733,7 @@ union reg_power_path_status {
 		uint32_t reserved4 : 2;
 		uint32_t power_source : 2;
 	} __packed;
-	uint8_t raw_value[7];
+	uint8_t raw_value[5];
 };
 
 /**
@@ -779,9 +743,6 @@ union reg_power_path_status {
  */
 union reg_global_system_configuration {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		/* Bits 0 - 7 */
 		uint8_t pa_vconn_confg : 1;
 		uint8_t reserved0 : 1;
@@ -852,7 +813,7 @@ union reg_global_system_configuration {
 		uint8_t s4_or_s5_retimer_power_saving : 2;
 		uint8_t reserved10 : 4;
 	} __packed;
-	uint8_t raw_value[16];
+	uint8_t raw_value[14];
 };
 
 /**
@@ -862,9 +823,6 @@ union reg_global_system_configuration {
  */
 union reg_port_configuration {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t typec_state_machine : 2;
 		uint8_t crossbar_type : 1;
 		uint8_t reserved0 : 4;
@@ -913,7 +871,14 @@ union reg_port_configuration {
 		uint8_t sbu_mux_usage : 2;
 
 	} __packed;
-	uint8_t raw_value[19];
+	uint8_t raw_value[17];
+};
+
+enum port_control_typec_current_t {
+	TI_TYPEC_DEFAULT = 0,
+	TI_1_5_A = 1,
+	TI_3_0_A = 2,
+	TI_RESERVED = 3,
 };
 
 /**
@@ -923,9 +888,6 @@ union reg_port_configuration {
  */
 union reg_port_control {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		/* Bits 0 - 7 */
 		uint8_t typec_current : 2;
 		uint8_t reserved : 2;
@@ -951,7 +913,7 @@ union reg_port_control {
 		uint8_t unconstrained_power : 1;
 		uint8_t enable_current_monitor : 1;
 		uint8_t sink_control_bit : 1;
-		uint8_t fw_swap_enabled : 1;
+		uint8_t fr_swap_enabled : 1;
 		uint8_t reserved0 : 1;
 
 		/* Bits 24 - 31 */
@@ -970,7 +932,7 @@ union reg_port_control {
 		uint8_t level_shifter_direction_ctrl : 1;
 		uint8_t reserved4 : 2;
 	} __packed;
-	uint8_t raw_value[8];
+	uint8_t raw_value[6];
 };
 
 /**
@@ -980,9 +942,6 @@ union reg_port_control {
  */
 union reg_boot_flags {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t boot_state : 4;
 		uint8_t reserved0 : 4;
 		uint8_t reserved1[7];
@@ -1016,7 +975,7 @@ union reg_boot_flags {
 		uint8_t adc_in_index[2];
 		uint8_t reserved9[8];
 	};
-	uint8_t raw_value[54];
+	uint8_t raw_value[52];
 };
 
 /**
@@ -1027,12 +986,9 @@ union reg_boot_flags {
  */
 union reg_build_description {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t build_description[392];
 	};
-	uint8_t raw_value[394];
+	uint8_t raw_value[392];
 };
 
 /**
@@ -1043,12 +999,9 @@ union reg_build_description {
  */
 union reg_device_information {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t device_info[320];
 	} __packed;
-	uint8_t raw_value[322];
+	uint8_t raw_value[320];
 };
 
 /**
@@ -1059,9 +1012,6 @@ union reg_device_information {
  */
 union reg_received_source_capabilities {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t number_of_valid_pdos : 3;
 		uint8_t number_of_valid_epr_pdos : 3;
 		uint8_t last_src_cap_received_is_epr : 1;
@@ -1070,7 +1020,7 @@ union reg_received_source_capabilities {
 		uint32_t spr_source_pdo[7];
 		uint32_t epr_source_pdo[6];
 	} __packed;
-	uint8_t raw_value[55];
+	uint8_t raw_value[56];
 };
 
 /**
@@ -1081,9 +1031,6 @@ union reg_received_source_capabilities {
  */
 union reg_received_sink_capabilities {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t number_of_valid_pdos : 3;
 		uint8_t rx_sink_num_valid_epr_pdos : 3;
 		uint8_t last_snk_cap_received_is_epr : 1;
@@ -1092,7 +1039,7 @@ union reg_received_sink_capabilities {
 		uint32_t spr_sink_pdo[7];
 		uint32_t epr_sink_pdo[6];
 	} __packed;
-	uint8_t raw_value[55];
+	uint8_t raw_value[56];
 };
 
 /**
@@ -1104,9 +1051,6 @@ union reg_received_sink_capabilities {
  */
 union reg_transmit_source_capabilities {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t number_of_valid_pdos : 3;
 		uint8_t tx_source_num_valid_epr_pdos : 3;
 		uint8_t reserved0 : 2;
@@ -1139,7 +1083,7 @@ union reg_transmit_source_capabilities {
 
 		uint8_t reserved5[2];
 	} __packed;
-	uint8_t raw_value[65];
+	uint8_t raw_value[64];
 };
 
 /**
@@ -1150,9 +1094,6 @@ union reg_transmit_source_capabilities {
  */
 union reg_transmit_sink_capabilities {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t number_of_valid_pdos : 3;
 		uint8_t tx_sink_num_valid_epr_pdos : 3;
 		uint8_t reserved : 2;
@@ -1160,7 +1101,7 @@ union reg_transmit_sink_capabilities {
 		uint32_t spr_tx_sink_pdo[7];
 		uint32_t epr_tx_sink_pdo[6];
 	} __packed;
-	uint8_t raw_value[55];
+	uint8_t raw_value[56];
 };
 
 /**
@@ -1171,13 +1112,10 @@ union reg_transmit_sink_capabilities {
  */
 union reg_active_pdo_contract {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint32_t active_pdo : 32;
 		/* NOTE: The upper 7 bits should be ignored */
 		uint16_t first_pdo_control_bits;
-	} _packed;
+	} __packed;
 	uint8_t raw_value[8];
 };
 
@@ -1189,14 +1127,11 @@ union reg_active_pdo_contract {
  */
 union reg_active_rdo_contract {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint32_t rdo : 32;
 		uint32_t source_epr_mode_do : 32;
 		uint32_t sink_epr_mode_do : 32;
 	} __packed;
-	uint8_t raw_value[14];
+	uint8_t raw_value[12];
 };
 
 /**
@@ -1208,9 +1143,6 @@ union reg_active_rdo_contract {
  */
 union reg_autonegotiate_sink {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint32_t auto_neg_rdo_priority : 1;
 		uint32_t no_usb_suspend : 1;
 		uint32_t auto_compute_sink_min_power : 1;
@@ -1250,7 +1182,7 @@ union reg_autonegotiate_sink {
 		uint32_t epr_avs_output_voltage : 12;
 		uint32_t reserved7 : 11;
 	} __packed;
-	uint8_t raw_value[26];
+	uint8_t raw_value[24];
 };
 
 /**
@@ -1262,9 +1194,6 @@ union reg_autonegotiate_sink {
  */
 union reg_spm_client_control {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t spm_allocated_extra_power : 8;
 		uint8_t reserved0 : 8;
 		uint8_t spm_guaranteed_power : 8;
@@ -1273,7 +1202,7 @@ union reg_spm_client_control {
 		uint8_t spm_forced_safe_state_power : 8;
 		uint8_t reserved2 : 8;
 	} __packed;
-	uint8_t raw_value[9];
+	uint8_t raw_value[7];
 };
 
 /**
@@ -1284,16 +1213,13 @@ union reg_spm_client_control {
  */
 union reg_spm_client_status {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intren_len : 8;
-
 		uint8_t spm_total_vbus_power_used : 8;
 		uint8_t reserved0 : 8;
 		uint8_t spm_requested_total_vbus_power : 8;
 		uint8_t reserved1 : 8;
 		uint8_t spm_cap_mismatch : 8;
 	} __packed;
-	uint8_t raw_value[7];
+	uint8_t raw_value[5];
 };
 
 /**
@@ -1304,9 +1230,6 @@ union reg_spm_client_status {
  */
 union reg_pd_status {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t reserved0 : 2;
 		uint8_t cc_pullup : 2;
 		uint8_t port_type : 2;
@@ -1322,7 +1245,7 @@ union reg_pd_status {
 		uint16_t reserved3 : 1;
 	} __packed;
 
-	uint8_t raw_value[6];
+	uint8_t raw_value[4];
 };
 
 /**
@@ -1332,9 +1255,6 @@ union reg_pd_status {
  */
 union reg_pd3_status {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint16_t firmware_update_response_message_received : 1;
 		uint16_t reserved0 : 4;
 		uint16_t firmware_update_request_message_received : 1;
@@ -1365,7 +1285,7 @@ union reg_pd3_status {
 		uint16_t vendor_defined_ext_msg_dropped : 1;
 		uint16_t reserved8 : 1;
 	} __packed;
-	uint8_t raw_value[11];
+	uint8_t raw_value[10];
 };
 
 /**
@@ -1375,9 +1295,6 @@ union reg_pd3_status {
  */
 union reg_pd3_configuration {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t port_max_spec_revision : 2;
 		uint8_t plug_max_spec_revision : 2;
 		uint8_t unchunked_supported : 1;
@@ -1403,7 +1320,7 @@ union reg_pd3_configuration {
 		uint8_t override_svdm_version_2_1 : 1;
 		uint8_t reserved4 : 7;
 	} __packed;
-	uint8_t raw_value[6];
+	uint8_t raw_value[4];
 };
 
 /**
@@ -1415,9 +1332,6 @@ union reg_pd3_configuration {
  */
 union reg_tx_identity {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t number_valid_vdos : 3;
 		uint8_t reserved0 : 5;
 		uint8_t vendor_id[2];
@@ -1437,7 +1351,7 @@ union reg_tx_identity {
 		uint8_t dfp1_vdo[4];
 		uint8_t reserved3[24];
 	} __packed;
-	uint8_t raw_value[51];
+	uint8_t raw_value[49];
 };
 
 /**
@@ -1454,16 +1368,13 @@ union reg_tx_identity {
  */
 union reg_received_identity_data_object {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t number_valid_vdos : 3;
 		uint8_t reserved0 : 3;
 		uint8_t response_type : 2;
 
 		uint32_t vdo[6];
 	} __packed;
-	uint8_t raw_value[27];
+	uint8_t raw_value[28];
 };
 
 /**
@@ -1471,9 +1382,6 @@ union reg_received_identity_data_object {
  */
 union reg_data_status {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint8_t data_connection : 1;
 		uint8_t connection_orientation : 1;
 		uint8_t retimer_or_redriver : 1;
@@ -1507,7 +1415,7 @@ union reg_data_status {
 
 		uint8_t debug_alternate_mode_id : 8;
 	} __packed;
-	uint8_t raw_value[7];
+	uint8_t raw_value[5];
 };
 
 /**
@@ -1515,9 +1423,6 @@ union reg_data_status {
  */
 union reg_adc_results {
 	struct {
-		uint8_t _intern_reg : 8;
-		uint8_t _intern_len : 8;
-
 		uint16_t pa_vbus : 16;
 		uint16_t pa_cc1 : 16;
 		uint16_t pa_cc2 : 16;
@@ -1541,7 +1446,25 @@ union reg_adc_results {
 		uint16_t band_gap_temp : 16;
 		uint16_t reserved3 : 16;
 	} __packed;
-	uint8_t raw_value[64];
+	uint8_t raw_value[62];
+};
+
+/**
+ * @brief - 10.6.1 SRDY switch settings
+ */
+enum srdy_switch_select {
+	SWITCH_SELECT_PP_5V1 = 0x00,
+	SWITCH_SELECT_PP_5V2 = 0x01,
+	SWITCH_SELECT_PP_EXT1 = 0x02,
+	SWITCH_SELECT_PP_EXT2 = 0x03,
+
+	/* Automatically-selected by the PP*Config field in the
+	 * GLOBAL_SYSTEM_CONFIG register (0x27).
+	 */
+	SWITCH_SELECT_PP_GLOBAL_CFG = 0x06,
+
+	/* Automatically-selected by PD Controller policy. */
+	SWITCH_SELECT_PP_PD_POLICY = 0x07,
 };
 
 #endif /* __CROS_EC_PDC_TPS6699X_REG_H */

@@ -192,10 +192,6 @@ test_mockable __keep int main(void)
 	if (IS_ENABLED(CONFIG_EEPROM_CBI_WP) && system_is_locked())
 		cbi_latch_eeprom_wp();
 
-#ifdef CONFIG_MPU
-	mpu_post_init();
-#endif
-
 #ifdef CONFIG_HOSTCMD_X86
 	/*
 	 * Keyboard scan init/Button init can set recovery events to
@@ -212,7 +208,7 @@ test_mockable __keep int main(void)
 		 */
 		i2c_init();
 
-		if (IS_ENABLED(CONFIG_I2C_BITBANG)) {
+		if (IS_ENABLED(CONFIG_I2C_BITBANG_CROS_EC)) {
 			/*
 			 * Enable I2C raw mode for the ports which need
 			 * pre-task i2c transactions.
@@ -297,7 +293,8 @@ test_mockable __keep int main(void)
 	 * transactions as the task is about to start and the I2C can resume
 	 * to event based transactions.
 	 */
-	if (IS_ENABLED(CONFIG_I2C_BITBANG) && IS_ENABLED(CONFIG_I2C_CONTROLLER))
+	if (IS_ENABLED(CONFIG_I2C_BITBANG_CROS_EC) &&
+	    IS_ENABLED(CONFIG_I2C_CONTROLLER))
 		enable_i2c_raw_mode(false);
 
 	/*

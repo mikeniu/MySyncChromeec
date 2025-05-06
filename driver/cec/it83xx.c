@@ -14,6 +14,15 @@
 #include "registers.h"
 #include "task.h"
 #include "util.h"
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/device.h>
+#include <zephyr/irq.h>
+#ifndef CONFIG_TEST
+#include <zephyr/drivers/pinctrl.h>
+
+#include <chip_chipregs.h>
+#endif
+#endif
 
 #define CPRINTF(format, args...) cprintf(CC_CEC, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_CEC, format, ##args)
@@ -24,6 +33,43 @@
 #else
 #define DEBUG_CPRINTF(...)
 #define DEBUG_CPRINTS(...)
+#endif
+
+#ifdef CONFIG_ZEPHYR
+#define IT8XXX2_CEC_NODE DT_INST(0, ite_it8xxx2_cec_raw)
+#if DT_NODE_EXISTS(IT8XXX2_CEC_NODE)
+PINCTRL_DT_DEFINE(IT8XXX2_CEC_NODE);
+#endif
+test_mockable_static void it8xxx2_cec_alt_func_enable(int enable)
+{
+#if DT_NODE_EXISTS(IT8XXX2_CEC_NODE)
+	const struct pinctrl_dev_config *pcfg =
+		PINCTRL_DT_DEV_CONFIG_GET(IT8XXX2_CEC_NODE);
+
+	if (enable) {
+		/* Enable alternate function */
+		pinctrl_apply_state(pcfg, PINCTRL_STATE_DEFAULT);
+	} else {
+		/* Configure pin back to GPIO */
+		pinctrl_apply_state(pcfg, PINCTRL_STATE_SLEEP);
+	}
+#endif
+}
+
+test_mockable_static void it8xxx2_cec_clock_enable_peripheral(int enable)
+{
+	volatile uint8_t *reg =
+		(volatile uint8_t *)(IT8XXX2_ECPM_BASE + (CGC_OFFSET_CEC >> 8));
+	uint8_t reg_mask = CGC_OFFSET_CEC & 0xff;
+
+	if (enable) {
+		/* Enable CEC clock */
+		*reg &= ~reg_mask;
+	} else {
+		/* Disable CEC clock */
+		*reg |= reg_mask;
+	}
+}
 #endif
 
 enum cec_state {
@@ -435,6 +481,13 @@ void cec_interrupt(void)
 	task_clear_pending_irq(IT83XX_IRQ_CEC);
 }
 
+#if defined(CONFIG_ZEPHYR) && !defined(CONFIG_TEST)
+static void it83xx_cec_isr(const void *user)
+{
+	cec_interrupt();
+}
+#endif
+
 static int it83xx_cec_init(int port)
 {
 	/* Initialisation is done when CEC is enabled */
@@ -460,8 +513,6 @@ static int it83xx_cec_set_enable(int port, uint8_t enable)
 
 	if (enable) {
 #ifndef CONFIG_ZEPHYR
-		/* TODO: Implement these in zephyr */
-
 		/* Enable CEC clock */
 		clock_enable_peripheral(CGC_OFFSET_CEC, 0, 0);
 
@@ -470,6 +521,9 @@ static int it83xx_cec_set_enable(int port, uint8_t enable)
 
 		/* Enable alternate function */
 		gpio_config_module(MODULE_CEC, 1);
+#else
+		it8xxx2_cec_clock_enable_peripheral(1);
+		it8xxx2_cec_alt_func_enable(1);
 #endif
 
 		/* Set logical address to unregistered (default is 0 = TV) */
@@ -483,6 +537,9 @@ static int it83xx_cec_set_enable(int port, uint8_t enable)
 
 		/* Enable CEC interrupt */
 		task_clear_pending_irq(IT83XX_IRQ_CEC);
+#if defined(CONFIG_ZEPHYR) && !defined(CONFIG_TEST)
+		IRQ_CONNECT(IT83XX_IRQ_CEC, 0, it83xx_cec_isr, 0, 0);
+#endif
 		task_enable_irq(IT83XX_IRQ_CEC);
 
 		CPRINTS("CEC%d enabled", port);
@@ -495,14 +552,15 @@ static int it83xx_cec_set_enable(int port, uint8_t enable)
 		IT83XX_CEC_CECIE &= ~CEC_ALL_INTERRUPTS;
 
 #ifndef CONFIG_ZEPHYR
-		/* TODO: Implement these in zephyr */
-
 		/* Configure pin back to GPIO */
 		gpio_config_module(MODULE_CEC, 0);
 		IT83XX_GPIO_GRC8 &= ~BIT(5);
 
 		/* Disable CEC clock */
 		clock_disable_peripheral(CGC_OFFSET_CEC, 0, 0);
+#else
+		it8xxx2_cec_alt_func_enable(0);
+		it8xxx2_cec_clock_enable_peripheral(0);
 #endif
 
 		cec_state = CEC_STATE_DISABLED;

@@ -602,7 +602,7 @@ static void shi_handle_cs_assert(void)
 	if (state == SHI_STATE_DISABLED)
 		return;
 
-		/* SHI V2 module filters cs glitch by hardware automatically */
+	/* SHI V2 module filters cs glitch by hardware automatically */
 #ifndef NPCX_SHI_V2
 	/*
 	 * IBUFSTAT resets on the 7th clock cycle after CS assertion, which

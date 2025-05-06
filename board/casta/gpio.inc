@@ -37,7 +37,7 @@ GPIO_INT(RSMRST_L_PGOOD, PIN(E, 2), GPIO_INT_BOTH, power_signal_interrupt)	/* PM
 GPIO_INT(ALL_SYS_PGOOD,	 PIN(F, 4), GPIO_INT_BOTH, power_signal_interrupt)	/* PMIC_EC_PWROK_OD */
 
 /* Other interrupts */
-GPIO_INT(WP_L,		 PIN(A, 1), GPIO_INT_BOTH, switch_interrupt)		/* EC_WP_ODL */
+GPIO(WP_L,	 	 PIN(A, 1), GPIO_INPUT)					/* EC_WP_ODL */
 
 /* Define PCH_SLP_S0_L after all interrupts if CONFIG_POWER_S0IX not defined. */
 #ifndef CONFIG_POWER_S0IX

@@ -3,12 +3,6 @@
  * found in the LICENSE file.
  */
 
-/*
- * TODO(b/272518464): Work around coreboot GCC preprocessor bug.
- * #line marks the *next* line, so it is off by one.
- */
-#line 11
-
 #include "acpi.h"
 #include "console.h"
 #include "gpio.h"
@@ -24,6 +18,27 @@
 
 #define CPRINTS(format, args...) cprints(CC_MOTION_LID, format, ##args)
 #define CPRINTF(format, args...) cprintf(CC_MOTION_LID, format, ##args)
+
+/*
+ * Tablet mode might be controlled by a remote MCU (such as the ISH). This
+ * happens if the DSP client is active and either the remote lid switch or
+ * tablet switch configs are enabled.
+ */
+#if defined(CONFIG_PLATFORM_EC_DSP_CLIENT) && \
+	defined(CONFIG_PLATFORM_EC_DSP_REMOTE_LID_SWITCH)
+#define USE_REMOTE_GMR_LID_SWITCH
+#endif /* CONFIG_PLATFORM_EC_DSP_CLIENT && \
+	  CONFIG_PLATFORM_EC_DSP_REMOTE_LID_SWITCH */
+
+#if defined(CONFIG_PLATFORM_EC_DSP_CLIENT) && \
+	defined(CONFIG_PLATFORM_EC_DSP_REMOTE_TABLET_SWITCH)
+#define USE_REMOTE_GMR_TABLET_SWITCH
+#endif /* CONFIG_PLATFORM_EC_DSP_CLIENT && \
+	  CONFIG_PLATFORM_EC_DSP_REMOTE_TABLET_SWITCH */
+
+#if defined(CONFIG_GMR_TABLET_MODE) || defined(USE_REMOTE_GMR_TABLET_SWITCH)
+#define GMR_TABLET_MODE
+#endif
 
 /*
  * Other code modules assume that notebook mode (i.e. tablet_mode = 0) at
@@ -48,10 +63,10 @@ static bool tablet_mode_forced;
 static uint32_t tablet_mode_store;
 
 /* True if the tablet GMR sensor is reporting 360 degrees. */
-STATIC_IF(CONFIG_GMR_TABLET_MODE) bool gmr_sensor_at_360;
+STATIC_IF(GMR_TABLET_MODE) bool gmr_sensor_at_360;
 
 /* True if the lid GMR sensor is reporting 0 degrees. */
-STATIC_IF(CONFIG_GMR_TABLET_MODE) bool gmr_sensor_at_0;
+STATIC_IF(GMR_TABLET_MODE) bool gmr_sensor_at_0;
 
 /*
  * True: all calls to tablet_set_mode are ignored and tablet_mode if forced to 0
@@ -78,7 +93,13 @@ static inline void print_tablet_mode(void)
 static void notify_tablet_mode_change(void)
 {
 	print_tablet_mode();
-	hook_notify(HOOK_TABLET_MODE_CHANGE);
+	/*
+	 * Ensure the system is fully awake before calling hook_notify for
+	 * ISH-enabled sensors to prevent HECI errors and I2C errors ISH ->EC.
+	 * See b:408162696
+	 */
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_HOST_INTERFACE_HECI))
+		hook_notify(HOOK_TABLET_MODE_CHANGE);
 
 	/*
 	 * When tablet mode changes, send an event to ACPI to retrieve
@@ -86,6 +107,9 @@ static void notify_tablet_mode_change(void)
 	 */
 	if (IS_ENABLED(CONFIG_HOSTCMD_EVENTS))
 		host_set_single_event(EC_HOST_EVENT_MODE_CHANGE);
+
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_HOST_INTERFACE_HECI))
+		hook_notify(HOOK_TABLET_MODE_CHANGE);
 }
 
 void tablet_set_mode(int mode, uint32_t trigger)
@@ -195,8 +219,10 @@ static void gmr_tablet_switch_interrupt_debounce(void)
 	 * When tablet mode is only decided by the GMR sensor (or
 	 * or substitute, send the tablet_mode change request.
 	 */
-	if (!IS_ENABLED(CONFIG_LID_ANGLE))
+	if (!IS_ENABLED(CONFIG_LID_ANGLE) &&
+	    !IS_ENABLED(CONFIG_PLATFORM_EC_DSP_REMOTE_LID_ANGLE)) {
 		tablet_set_mode(gmr_sensor_at_360, TABLET_TRIGGER_LID);
+	}
 
 	/*
 	 * 1. Peripherals are disabled only when lid reaches 360 position (It's
@@ -217,14 +243,16 @@ static void gmr_tablet_switch_interrupt_debounce(void)
 	 * It would mean the user was able to transition in less than ~10ms...
 	 */
 	if (IS_ENABLED(CONFIG_LID_ANGLE)) {
-		if (gmr_sensor_at_360)
+		if (gmr_sensor_at_360) {
 			tablet_set_mode(1, TABLET_TRIGGER_LID);
-		else if (gmr_sensor_at_0)
+		} else if (gmr_sensor_at_0) {
 			tablet_set_mode(0, TABLET_TRIGGER_LID);
+		}
 	}
 
-	if (IS_ENABLED(CONFIG_LID_ANGLE_UPDATE) && gmr_sensor_at_360)
+	if (IS_ENABLED(CONFIG_LID_ANGLE_UPDATE) && gmr_sensor_at_360) {
 		lid_angle_peripheral_enable(0);
+	}
 }
 DECLARE_DEFERRED(gmr_tablet_switch_interrupt_debounce);
 
@@ -239,12 +267,11 @@ DECLARE_DEFERRED(gmr_tablet_switch_interrupt_debounce);
  * the tablet_mode to be clamshell, but |gmr_sensor_at_360| will still be true,
  * the request will be ignored.
  */
-#define GMR_SENSOR_DEBOUNCE_US (LID_DEBOUNCE_US + 10 * MSEC)
 
 void gmr_tablet_switch_isr(enum gpio_signal signal)
 {
 	hook_call_deferred(&gmr_tablet_switch_interrupt_debounce_data,
-			   GMR_SENSOR_DEBOUNCE_US);
+			   CONFIG_GMR_SENSOR_DEBOUNCE_US);
 }
 
 /*
@@ -268,7 +295,8 @@ static __maybe_unused void tablet_mode_lid_event(void)
 		gmr_sensor_at_0 = false;
 	}
 }
-#if defined(CONFIG_LID_ANGLE) && defined(CONFIG_LID_SWITCH)
+#if defined(CONFIG_LID_ANGLE) && \
+	(defined(CONFIG_LID_SWITCH) || defined(USE_REMOTE_GMR_LID_SWITCH))
 DECLARE_HOOK(HOOK_LID_CHANGE, tablet_mode_lid_event, HOOK_PRIO_DEFAULT);
 #endif
 
@@ -317,6 +345,8 @@ static enum ec_status tablet_mode_command(struct host_cmd_handler_args *args)
 	case TABLET_MODE_FORCE_CLAMSHELL:
 		tablet_mode = 0;
 		tablet_mode_forced = true;
+		if (IS_ENABLED(CONFIG_LID_ANGLE_UPDATE))
+			lid_angle_peripheral_enable(1);
 		break;
 	default:
 		CPRINTS("Invalid EC_CMD_SET_TABLET_MODE parameter: %d",
@@ -372,3 +402,22 @@ __test_only void tablet_reset(void)
 	tablet_mode_forced = false;
 	disabled = false;
 }
+
+#ifdef CONFIG_PLATFORM_EC_EXTERNAL_NOTEBOOK_MODE
+static void notify_ec_for_nb_mode_change(void)
+{
+	/*
+	 * The gpio_nb_mode pin is an output from SOC (ISH) to EC.
+	 *
+	 * In this config, ISH runs motion sense task; while EC doesn't.
+	 * When ISH motion sense task detects notebook(clamshell)/tablet mode
+	 * changes, ISH will notify EC about the change by updating this pin.
+	 *
+	 * Assert this gpio if changing to notebook(clamshell) mode;
+	 * Deassert this gpio if changing to tablet mode.
+	 */
+	gpio_pin_set_dt(GPIO_DT_FROM_ALIAS(gpio_nb_mode), !tablet_get_mode());
+}
+DECLARE_HOOK(HOOK_TABLET_MODE_CHANGE, notify_ec_for_nb_mode_change,
+	     HOOK_PRIO_DEFAULT);
+#endif

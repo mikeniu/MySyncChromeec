@@ -71,7 +71,7 @@ SECTIONS
 		 * text section to avoid gap.
 		 */
 		__flash_dma_start = .;
-		ASSERT((__flash_dma_start == 0),
+		ASSERT((__flash_dma_start & (0x1000 - 1)) == 0,
 		       "__flash_dma_start has to be 4k-byte aligned");
 #endif
 		KEEP(STRINGIFY(OUTDIR/core/CORE/init.o) (.text.vecttable))
@@ -88,8 +88,8 @@ SECTIONS
 		KEEP(*(.ram_code))
 
 		__flash_dma_size = . - __flash_dma_start;
-		ASSERT((__flash_dma_size < IT83XX_ILM_BLOCK_SIZE),
-		       "__flash_dma_size < IT83XX_ILM_BLOCK_SIZE");
+		ASSERT((__flash_dma_size <= IT83XX_ILM_BLOCK_SIZE),
+		       "__flash_dma_size <= IT83XX_ILM_BLOCK_SIZE");
 		. = ALIGN(IT83XX_ILM_BLOCK_SIZE);
 		__ilm0_ram_code = .;
 		KEEP(*(.ram_code_ilm0))
@@ -147,7 +147,7 @@ SECTIONS
 		__hooks_init_end = .;
 
 		__hooks_init_early = .;
-		KEEP(*(.rodata.HOOK_EARLY_INIT))
+		KEEP(*(.rodata.HOOK_INIT_EARLY))
 		__hooks_init_early_end = .;
 
 		__hooks_pre_freq_change = .;
@@ -373,12 +373,17 @@ SECTIONS
 		. = ALIGN(4);
 		__bss_end = .;
 
-		/*
-		 * Shared memory buffer must be at the end of preallocated RAM,
-		 * so it can expand to use all the remaining RAM.
-		 */
-		__shared_mem_buf = .;
 	} > IRAM
+
+	#include "noinit_end_of_ram.inc"
+
+	/*
+	 * Shared memory buffer must be at the end of preallocated
+	 * RAM, so it can expand to use all the remaining RAM.
+	 */
+	__shared_mem_buf = .;
+
+	/* NO RAM ALLOCATIONS MAY GO AFTER THIS! */
 
 	ASSERT((__shared_mem_buf + CONFIG_SHAREDMEM_MINIMUM_SIZE) <=
 	       (CONFIG_RAM_BASE + CONFIG_RAM_SIZE),

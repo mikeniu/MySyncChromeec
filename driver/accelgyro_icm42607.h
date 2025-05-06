@@ -60,10 +60,10 @@
 
 /* ODR in mHz from Reg value */
 #define ICM42607_REG_TO_ODR(_reg) \
-	((_reg) <= 5 ? 1600000 : (1600000 / (1 << ((_reg)-5))))
+	((_reg) <= 5 ? 1600000 : (1600000 / (1 << ((_reg) - 5))))
 
 /* Reg value for the next higher ODR */
-#define ICM42607_ODR_REG_UP(_reg) ((_reg)-1)
+#define ICM42607_ODR_REG_UP(_reg) ((_reg) - 1)
 
 /*
  * Filter bandwidth values from ODR reg
@@ -74,7 +74,7 @@
  *   <= 25Hz (11) -> 16Hz (7)
  */
 #define ICM42607_ODR_TO_FILT_BW(_odr) \
-	((_odr) <= 7 ? 1 : (_odr) <= 9 ? (_odr)-5 : (_odr) == 10 ? 6 : 7)
+	((_odr) <= 7 ? 1 : (_odr) <= 9 ? (_odr) - 5 : (_odr) == 10 ? 6 : 7)
 
 /*
  * Register addresses are virtual address on 16 bits.

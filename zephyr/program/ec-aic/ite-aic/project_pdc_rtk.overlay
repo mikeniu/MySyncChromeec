@@ -1,0 +1,20 @@
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+ &i2c2 {
+	pdc_power_p0: rts54-pdc@66 {
+		compatible = "realtek,rts54-pdc";
+		reg = <0x66>;
+		/* GPI7 = BAT_DET pin also available on header J11 pin 1 */
+		irq-gpios = <&gpioh 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+		ccd;
+	};
+	pdc_power_p1: rts54-pdc@67 {
+		compatible = "realtek,rts54-pdc";
+		reg = <0x67>;
+		irq-gpios = <&gpioh 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+		no-fw-update;
+	};
+};

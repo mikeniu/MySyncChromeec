@@ -41,6 +41,13 @@ config HW_TEST_EXCEPTION
 	bool "Exception test"
 	select ZTEST
 
+config HW_TEST_EXIT
+	bool "Exit test"
+	select ZTEST
+	help
+	  The test verifies if the exit() call works correctly and validates panic
+	  data.
+
 config HW_TEST_FLASH_PHYSICAL
 	bool "Flash physical test"
 	select ZTEST
@@ -67,6 +74,10 @@ config HW_TEST_FPSENSOR_AUTH_CRYPTO_STATELESS
 
 config HW_TEST_FPSENSOR_CRYPTO
 	bool "FP sensor crypto test"
+	select ZTEST
+
+config HW_TEST_FPSENSOR_DEBUG
+	bool "FP sensor debug test"
 	select ZTEST
 
 config HW_TEST_FPSENSOR_HW
@@ -109,6 +120,14 @@ config HW_TEST_PANIC
 	help
 	  The test verifies panic data.
 
+config HW_TEST_PANIC_DATA
+	bool "Panic data test"
+	select ZTEST
+	select ASSERT
+	select PLATFORM_EC_DEBUG_ASSERT
+	help
+	  It verifies panic data across different reboots.
+
 config HW_TEST_PRINTF
 	bool "printf test"
 	select ZTEST
@@ -149,6 +168,13 @@ config HW_TEST_ROLLBACK_ENTROPY
 	depends on PLATFORM_EC_ROLLBACK
 	help
 	  The test verifies rollback entropy functionality.
+
+config HW_TEST_SBRK
+	bool "SBRK test"
+	select ZTEST
+	depends on NEWLIB_LIBC_SUPPORTED
+	help
+	  The test verifies sbrk return values.
 
 config HW_TEST_SHA256
 	bool "SHA256 test"
@@ -222,6 +248,12 @@ config HW_TEST_UTILS_STR
 	select ZTEST
 	help
 	  The test verifies util string functions.
+
+config HW_TEST_WATCHDOG
+	bool "Watchdog test"
+	select ZTEST
+	help
+	  The test verifies that the watchdog fires on a busy loop.
 
 config MOCK_ROLLBACK
 	bool "Mock rollback for tests"

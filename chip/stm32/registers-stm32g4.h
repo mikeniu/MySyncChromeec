@@ -864,7 +864,7 @@ typedef volatile struct stm32_spi_regs stm32_spi_regs_t;
 #define STM32_SPI_CR1_CPOL BIT(1)
 #define STM32_SPI_CR1_CPHA BIT(0)
 #define STM32_SPI_CR2_FRXTH BIT(12)
-#define STM32_SPI_CR2_DATASIZE(n) (((n)-1) << 8)
+#define STM32_SPI_CR2_DATASIZE(n) (((n) - 1) << 8)
 #define STM32_SPI_CR2_TXEIE BIT(7)
 #define STM32_SPI_CR2_RXNEIE BIT(6)
 #define STM32_SPI_CR2_NSSP BIT(3)

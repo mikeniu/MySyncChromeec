@@ -34,7 +34,7 @@ GPIO_INT(H1_EC_PWR_BTN_ODL,	 PIN(0, 1), GPIO_INT_BOTH | GPIO_PULL_UP, power_butt
 
 /* Other interrupts */
 GPIO_INT(LID_OPEN,		 PIN(D, 2), GPIO_INT_BOTH, lid_interrupt)
-GPIO_INT(EC_WP_OD,		 PIN(A, 1), GPIO_INT_BOTH, switch_interrupt)
+GPIO(EC_WP_OD,	 		 PIN(A, 1), GPIO_INPUT)
 
 /* I2C Ports */
 GPIO(EC_I2C_EEPROM_SCL,			PIN(B, 3), GPIO_INPUT)

@@ -37,7 +37,7 @@ GPIO_INT(EC_VOLUP_BTN_ODL,	PIN(8, 3), GPIO_INT_BOTH | GPIO_PULL_UP, button_inter
 /* Tablet switch is active-low. L: lid is attached (360 position) H: detached */
 GPIO_INT(TABLET_MODE_L,		PIN(3, 6), GPIO_INT_BOTH, tablet_mode_interrupt)
 
-GPIO_INT(WP_L,			PIN(4, 0), GPIO_INT_BOTH | GPIO_SEL_1P8V, switch_interrupt)	/* EC_WP_ODL */
+GPIO(WP_L,			PIN(4, 0), GPIO_INPUT | GPIO_SEL_1P8V)				/* EC_WP_ODL */
 
 GPIO_INT(BASE_SIXAXIS_INT_L,	PIN(9, 3), GPIO_INT_FALLING | GPIO_SEL_1P8V,
 	 bmi160_interrupt)

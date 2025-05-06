@@ -67,10 +67,7 @@
 #define CMD_RP 0x82 /* Enables the read protection */
 #define CMD_RU 0x92 /* Disables the read protection */
 
-#define CMD_LOOKUP_ENTRY(COMMAND)       \
-	{                               \
-		CMD_##COMMAND, #COMMAND \
-	}
+#define CMD_LOOKUP_ENTRY(COMMAND) { CMD_##COMMAND, #COMMAND }
 const struct {
 	const uint8_t cmd;
 	const char *name;

@@ -3,12 +3,6 @@
  * found in the LICENSE file.
  */
 
-/*
- * TODO(b/272518464): Work around coreboot GCC preprocessor bug.
- * #line marks the *next* line, so it is off by one.
- */
-#line 11
-
 #include "acpi.h"
 #include "chipset.h"
 #include "common.h"
@@ -199,7 +193,7 @@ static void espi_vwire_handler(const struct device *dev,
 	/* If PLTRST# asserted (low) then send reset hook */
 	if (event.evt_details == ESPI_VWIRE_SIGNAL_PLTRST &&
 	    event.evt_data == 0) {
-		hook_call_deferred(&espi_chipset_reset_data, MSEC);
+		hook_call_deferred(&espi_chipset_reset_data, 1 * USEC_PER_MSEC);
 		update_ap_boot_time(PLTRST_LOW);
 	} else if (event.evt_details == ESPI_VWIRE_SIGNAL_PLTRST &&
 		   event.evt_data == 1) {
@@ -287,9 +281,9 @@ static void lpc_generate_smi(void)
 {
 	/* Enforce signal-high for long enough to debounce high */
 	espi_vw_set_wire(VW_SMI_L, 1);
-	udelay(VWIRE_PULSE_TRIGGER_TIME);
+	k_busy_wait(VWIRE_PULSE_TRIGGER_TIME);
 	espi_vw_set_wire(VW_SMI_L, 0);
-	udelay(VWIRE_PULSE_TRIGGER_TIME);
+	k_busy_wait(VWIRE_PULSE_TRIGGER_TIME);
 	espi_vw_set_wire(VW_SMI_L, 1);
 }
 
@@ -297,9 +291,9 @@ static void lpc_generate_sci(void)
 {
 	/* Enforce signal-high for long enough to debounce high */
 	espi_vw_set_wire(VW_SCI_L, 1);
-	udelay(VWIRE_PULSE_TRIGGER_TIME);
+	k_busy_wait(VWIRE_PULSE_TRIGGER_TIME);
 	espi_vw_set_wire(VW_SCI_L, 0);
-	udelay(VWIRE_PULSE_TRIGGER_TIME);
+	k_busy_wait(VWIRE_PULSE_TRIGGER_TIME);
 	espi_vw_set_wire(VW_SCI_L, 1);
 }
 
@@ -312,9 +306,9 @@ static void lpc_generate_signal(enum espi_vwire_signal signal)
 {
 	/* Enforce signal-high for long enough to debounce high */
 	espi_send_vwire(espi_dev, signal, 1);
-	udelay(VWIRE_PULSE_TRIGGER_TIME);
+	k_busy_wait(VWIRE_PULSE_TRIGGER_TIME);
 	espi_send_vwire(espi_dev, signal, 0);
-	udelay(VWIRE_PULSE_TRIGGER_TIME);
+	k_busy_wait(VWIRE_PULSE_TRIGGER_TIME);
 	espi_send_vwire(espi_dev, signal, 1);
 }
 

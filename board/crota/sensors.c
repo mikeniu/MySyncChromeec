@@ -272,7 +272,7 @@ const struct temp_sensor_t temp_sensors[] = {
 };
 BUILD_ASSERT(ARRAY_SIZE(temp_sensors) == TEMP_SENSOR_COUNT);
 
-#define THERMAL_CPU              \
+#define THERMAL_CPU \
 	{                        \
 		.temp_host = { \
 			[EC_TEMP_THRESH_HIGH] = C_TO_K(77), \
@@ -286,7 +286,7 @@ BUILD_ASSERT(ARRAY_SIZE(temp_sensors) == TEMP_SENSOR_COUNT);
 	}
 __maybe_unused static const struct ec_thermal_config thermal_cpu = THERMAL_CPU;
 
-#define THERMAL_DDR              \
+#define THERMAL_DDR \
 	{                        \
 		.temp_host = { \
 			[EC_TEMP_THRESH_HIGH] = C_TO_K(75), \
@@ -300,7 +300,7 @@ __maybe_unused static const struct ec_thermal_config thermal_cpu = THERMAL_CPU;
 	}
 __maybe_unused static const struct ec_thermal_config thermal_ddr = THERMAL_DDR;
 
-#define THERMAL_CHARGER          \
+#define THERMAL_CHARGER \
 	{                        \
 		.temp_host = { \
 			[EC_TEMP_THRESH_HIGH] = C_TO_K(86), \
@@ -315,7 +315,7 @@ __maybe_unused static const struct ec_thermal_config thermal_ddr = THERMAL_DDR;
 __maybe_unused static const struct ec_thermal_config thermal_charger =
 	THERMAL_CHARGER;
 
-#define THERMAL_AMBIENT          \
+#define THERMAL_AMBIENT \
 	{                        \
 		.temp_host = { \
 			[EC_TEMP_THRESH_HIGH] = C_TO_K(57), \

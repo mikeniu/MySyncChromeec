@@ -27,6 +27,11 @@
 		lsm6dsm-int = &base_accel;
 	};
 
+	ec-console {
+		compatible = "ec-console";
+		disabled = "events";
+	};
+
 	motionsense-sensor-info {
 		compatible = "cros-ec,motionsense-sensor-info";
 
@@ -700,6 +705,10 @@
 		mivr = <4000>;
 		thermistor = <&thermistor_rt9490>;
 	};
+};
+
+&i2c1 {
+	clock-frequency = <I2C_BITRATE_STANDARD>;
 };
 
 &i2c2 {

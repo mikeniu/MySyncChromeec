@@ -21,13 +21,11 @@
 
 #define __packed __attribute__((packed))
 
-#define HECI_CLIENT_HID_GUID                                           \
-	{                                                              \
-		0x33AECD58, 0xB679, 0x4E54,                            \
-		{                                                      \
-			0x9B, 0xD9, 0xA0, 0x4D, 0x34, 0xF0, 0xC2, 0x26 \
-		}                                                      \
-	}
+#define HECI_CLIENT_HID_GUID \
+	{ 0x33AECD58,        \
+	  0xB679,            \
+	  0x4E54,            \
+	  { 0x9B, 0xD9, 0xA0, 0x4D, 0x34, 0xF0, 0xC2, 0x26 } }
 
 #define HID_SUBSYS_MAX_HID_DEVICES 3
 

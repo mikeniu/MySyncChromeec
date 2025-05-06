@@ -6,6 +6,9 @@ set(COMPILER clang)
 set(LINKER lld)
 set(BINTOOLS llvm)
 
+# Look for toolchain binaries in /usr/bin
+set(TOOLCHAIN_HOME "/usr/bin")
+
 if("${ARCH}" STREQUAL "posix")
 set(LINKER ld)
 endif()
@@ -16,6 +19,8 @@ set(CROSS_COMPILE_TARGET_unit_testing x86_64-pc-linux-gnu)
 set(CROSS_COMPILE_TARGET_x86          x86_64-pc-linux-gnu)
 
 set(CROSS_COMPILE_TARGET          ${CROSS_COMPILE_TARGET_${ARCH}})
+
+set(toolchain_uses_newlib FALSE)
 
 if("${ARCH}" STREQUAL "arm")
   if(DEFINED CONFIG_ARMV7_M_ARMV8_M_MAINLINE)
@@ -35,7 +40,24 @@ if("${ARCH}" STREQUAL "arm")
     # Baseline implementation processor is used.
     set(CROSS_COMPILE_TARGET arm-none-eabi)
   endif()
+  set(toolchain_uses_newlib TRUE)
+elseif("${ARCH}" STREQUAL "riscv")
+  set(CROSS_COMPILE_TARGET riscv32-cros-elf)
+  set(toolchain_uses_newlib TRUE)
 endif()
+
+if(toolchain_uses_newlib)
+  # LLVM based toolchains for ARM and RISC-V use newlib as a libc.
+  # This variable is set AFTER all Kconfig files were processed, so it doesn't
+  # affect them, but it's still useful for filtering tests.
+  set(TOOLCHAIN_HAS_NEWLIB ON CACHE BOOL "True if toolchain supports newlib")
+endif()
+
+# LLVM_TOOLCHAIN_PATH is used as a base path to look for 'newlib.cfg' or
+# 'picolibc.cfg' provided by toolchain. Our compiler doesn't provide these files
+# but without this variable, CMake looks for these files starting from '/' which
+# takes long time and can lead to errors if somebody creates the file somewhere.
+set(LLVM_TOOLCHAIN_PATH "/usr/${CROSS_COMPILE_TARGET}")
 
 # CMAKE_{C, ASM, CXX}_COMPILER_TARGET is used by CMake to provide correct
 # "--target" option to Clang and by Zephyr to determine which runtime library

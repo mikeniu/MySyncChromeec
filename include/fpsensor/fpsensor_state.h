@@ -37,7 +37,7 @@
 	 sizeof(struct ec_fp_template_encryption_metadata))
 
 struct enc_buffer {
-	struct ec_fp_template_encryption_metadata metadata {};
+	struct ec_fp_template_encryption_metadata metadata{};
 	std::array<uint8_t, FP_ALGORITHM_TEMPLATE_SIZE> fp_template{};
 	std::array<uint8_t, FP_POSITIVE_MATCH_SALT_BYTES> positive_match_salt{};
 };
