@@ -120,7 +120,7 @@
       <vif:SrcPDO>
         <!--Source PDO 1-->
         <vif:Src_PDO_Supply_Type value="0">Fixed</vif:Src_PDO_Supply_Type>
-        <vif:Src_PDO_Peak_Current value="1">130% IOC</vif:Src_PDO_Peak_Current>
+        <vif:Src_PDO_Peak_Current value="0">100% IOC</vif:Src_PDO_Peak_Current>
         <vif:Src_PDO_Voltage value="100">5000 mV (Factor = 50)</vif:Src_PDO_Voltage>
         <vif:Src_PDO_Max_Current value="300">3000 mA (Factor = 10)</vif:Src_PDO_Max_Current>
         <vif:Src_PD_OCP_OC_Debounce value="0">0 msec</vif:Src_PD_OCP_OC_Debounce>
@@ -157,7 +157,7 @@
         <vif:Snk_PDO_Supply_Type value="2">Variable</vif:Snk_PDO_Supply_Type>
         <vif:Snk_PDO_Min_Voltage value="95">4750 mV (Factor = 50)</vif:Snk_PDO_Min_Voltage>
         <vif:Snk_PDO_Max_Voltage value="400">20000 mV (Factor = 50)</vif:Snk_PDO_Max_Voltage>
-        <vif:Snk_PDO_Op_Current value="325">3250 mA (Factor = 10)</vif:Snk_PDO_Op_Current>
+        <vif:Snk_PDO_Op_Current value="500">5000 mA (Factor = 10)</vif:Snk_PDO_Op_Current>
       </vif:SnkPDO>
     </vif:SnkPdoList>
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
@@ -181,7 +181,7 @@
     <vif:USB_VID_SOP value="6353">18D1</vif:USB_VID_SOP>
     <vif:PID_SOP value="20581">5065</vif:PID_SOP>
     <!--BCD value below is for production FW. The main branch uses different PDC FW.-->
-    <vif:bcdDevice_SOP value="4096">1000</vif:bcdDevice_SOP>
+    <vif:bcdDevice_SOP value="37">0025</vif:bcdDevice_SOP>
   </vif:Component>
   <vif:Component>
     <!--Component 1: Port 1-->
@@ -287,7 +287,7 @@
       <vif:SrcPDO>
         <!--Source PDO 1-->
         <vif:Src_PDO_Supply_Type value="0">Fixed</vif:Src_PDO_Supply_Type>
-        <vif:Src_PDO_Peak_Current value="1">130% IOC</vif:Src_PDO_Peak_Current>
+        <vif:Src_PDO_Peak_Current value="0">100% IOC</vif:Src_PDO_Peak_Current>
         <vif:Src_PDO_Voltage value="100">5000 mV (Factor = 50)</vif:Src_PDO_Voltage>
         <vif:Src_PDO_Max_Current value="300">3000 mA (Factor = 10)</vif:Src_PDO_Max_Current>
         <vif:Src_PD_OCP_OC_Debounce value="0">0 msec</vif:Src_PD_OCP_OC_Debounce>
@@ -324,7 +324,7 @@
         <vif:Snk_PDO_Supply_Type value="2">Variable</vif:Snk_PDO_Supply_Type>
         <vif:Snk_PDO_Min_Voltage value="95">4750 mV (Factor = 50)</vif:Snk_PDO_Min_Voltage>
         <vif:Snk_PDO_Max_Voltage value="400">20000 mV (Factor = 50)</vif:Snk_PDO_Max_Voltage>
-        <vif:Snk_PDO_Op_Current value="325">3250 mA (Factor = 10)</vif:Snk_PDO_Op_Current>
+        <vif:Snk_PDO_Op_Current value="500">5000 mA (Factor = 10)</vif:Snk_PDO_Op_Current>
       </vif:SnkPDO>
     </vif:SnkPdoList>
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
@@ -348,6 +348,6 @@
     <vif:USB_VID_SOP value="6353">18D1</vif:USB_VID_SOP>
     <vif:PID_SOP value="20581">5065</vif:PID_SOP>
     <!--BCD value below is for production FW. The main branch uses different PDC FW.-->
-    <vif:bcdDevice_SOP value="4096">1000</vif:bcdDevice_SOP>
+    <vif:bcdDevice_SOP value="37">0025</vif:bcdDevice_SOP>
   </vif:Component>
 </vif:VIF>
