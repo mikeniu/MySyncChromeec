@@ -104,6 +104,7 @@ config HW_TEST_LIBC_PRINTF
 config HW_TEST_LIBCXX
 	bool "libcxx test"
 	select ZTEST
+	select XSI_SINGLE_PROCESS
 	help
 	  The test verifies time measurement system_clock vs udelay.
 
