@@ -96,6 +96,7 @@ properties:
       - "panasonic,ap23a5l-2"
       - "powertech,batgqa05l22"
       - "sdi,4404d57"
+      - "sdi,4404d57m"
       - "smp,313-12-32-a"
       - "smp,333-17-32-a"
       - "smp,ap18c7k"

@@ -37,7 +37,7 @@ properties:
 
   # Battery info
   voltage_max:
-    default: 8700
+    default: 8600
   voltage_normal:
     default: 7700
   voltage_min:

@@ -50,7 +50,11 @@
 	};
 
 	batteries {
-		default_battery: sdi {
+		sdi_4404d57m {
+			compatible = "sdi,4404d57m", "battery-smart";
+		};
+
+		default_battery: sdi_4404d57 {
 			compatible = "sdi,4404d57", "battery-smart";
 		};
 	};
