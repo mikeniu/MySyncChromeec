@@ -62,5 +62,41 @@
 				value = <1>;
 			};
 		};
+
+		ish {
+			enum-name = "ISH";
+			start = <2>;
+			size = <1>;
+
+			ish-disabled {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "ISH_DISABLED";
+				value = <0>;
+				default;
+			};
+			ish-enabled {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "ISH_ENABLED";
+				value = <1>;
+			};
+		};
+
+		form-factor {
+			enum-name = "FORM_FACTOR";
+			start = <3>;
+			size = <1>;
+
+			form-factor-clamshell {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FORM_FACTOR_CLAMSHELL";
+				value = <0>;
+				default;
+			};
+			form-factor-convertible {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FORM_FACTOR_CONVERTIBLE";
+				value = <1>;
+			};
+		};
 	};
 };
