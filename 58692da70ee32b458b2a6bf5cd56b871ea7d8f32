@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c270a9a_1ae5216a",
+        "filename": "zephyr/program/fpmcu/Kconfig",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-05-19T18:16:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1575649f_1a147098",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 29
+      },
+      "revId": "58692da70ee32b458b2a6bf5cd56b871ea7d8f32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d39e1e39_a5f398bb",
@@ -54,6 +78,30 @@
       "writtenOn": "2025-05-19T18:06:08Z",
       "side": 1,
       "message": "And also this text, since there will be different sensors",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 22
+      },
+      "revId": "58692da70ee32b458b2a6bf5cd56b871ea7d8f32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5f9084b_21e7d389",
+        "filename": "zephyr/program/fpmcu/Kconfig",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-05-19T18:16:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d39e1e39_a5f398bb",
       "range": {
         "startLine": 51,
         "startChar": 0,
