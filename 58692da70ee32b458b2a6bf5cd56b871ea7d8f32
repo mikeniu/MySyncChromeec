@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5129eec8_1526ce8f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2025-05-19T18:06:08Z",
+      "side": 1,
+      "message": "I see this is coming from https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/6441189/comments/019ba599_0962299b.\n\nI wonder if we should have both `BOARD_HELIPILOT` and `BASEBOARD_HELIPILOT` like in EC. That might make it clearer about when we\u0027re referring to the actual board (`BOARD_HELIPILOT`) vs the inherited bits (`BASEBOARD_HELIPILOT`).",
+      "revId": "58692da70ee32b458b2a6bf5cd56b871ea7d8f32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1575649f_1a147098",
+        "filename": "zephyr/program/fpmcu/Kconfig",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2025-05-19T18:06:08Z",
+      "side": 1,
+      "message": "We should probably change this description",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 29
+      },
+      "revId": "58692da70ee32b458b2a6bf5cd56b871ea7d8f32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d39e1e39_a5f398bb",
+        "filename": "zephyr/program/fpmcu/Kconfig",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2025-05-19T18:06:08Z",
+      "side": 1,
+      "message": "And also this text, since there will be different sensors",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 22
+      },
+      "revId": "58692da70ee32b458b2a6bf5cd56b871ea7d8f32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
