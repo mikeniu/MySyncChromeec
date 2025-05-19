@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b623e71c_8949ea53",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2025-05-19T18:23:02Z",
+      "side": 1,
+      "message": "I do not believe we need `BOARD_HELIPILOT` in zephyr. The actual selective build for `helipilot` vs. `gwendolin` vs. `buccaneer` boards come from [build.py](https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/6441189/36/zephyr/program/fpmcu/BUILD.py)",
+      "parentUuid": "5129eec8_1526ce8f",
+      "revId": "58692da70ee32b458b2a6bf5cd56b871ea7d8f32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1575649f_1a147098",
