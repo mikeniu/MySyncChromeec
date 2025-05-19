@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "09dcb122_23c53c3e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-05-19T19:35:13Z",
+      "side": 1,
+      "message": "The idea is to keep everything the same for all helipilot-based boards and just change the sensor in DTS, code/data split, etc.\n\nI don\u0027t think we need additional config. We can always create one if we need it.\n\nI\u0027ll give CR+1 to this CL. If you are okay with it, please give CR+2",
+      "parentUuid": "b623e71c_8949ea53",
+      "revId": "58692da70ee32b458b2a6bf5cd56b871ea7d8f32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1575649f_1a147098",
