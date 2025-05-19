@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54e0e90c_785830ac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2025-05-19T10:08:02Z",
+      "side": 1,
+      "message": "You need to fix [printf hwtest](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/hwtest/src/printf.c;l\u003d213;drc\u003d4ba7aaaa8c6880f7b083d159680b9fe04ae525c2) also.",
+      "revId": "b6dd7ad1107004d25427f1d9614d582cb1bd8d2c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
