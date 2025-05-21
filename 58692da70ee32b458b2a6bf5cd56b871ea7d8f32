@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9424ab13_5d2d23fe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2025-05-21T20:32:24Z",
+      "side": 1,
+      "message": "\u003e  just change the sensor in DTS, code/data split, etc.\n\nI see now how we\u0027re configuring everything from the DTS files [based on the `board` we pass to `zmake`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/program/fpmcu/BUILD.py;l\u003d54-70;drc\u003dd377ac3a87b2fc0e7a9460d981f1f7b7519e37bd). This change makes sense to me now.\n\nShould we also change all the other `BOARD_` configs to be consistent (e.g., `CONFIG_BOARD_BLOONCHIPPER` -\u003e `CONFIG_BASEBOARD_BLOONCHIPPER`? I think the same logic would apply to those? (separate CL if the answer is yes)",
+      "parentUuid": "09dcb122_23c53c3e",
+      "revId": "58692da70ee32b458b2a6bf5cd56b871ea7d8f32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1575649f_1a147098",
         "filename": "zephyr/program/fpmcu/Kconfig",
         "patchSetId": 3
