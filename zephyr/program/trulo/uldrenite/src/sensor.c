@@ -52,6 +52,12 @@ static void motionsense_init(void)
 {
 	int ret;
 
+	ret = cros_cbi_get_fw_config(FORM_FACTOR, &sensor_fwconfig);
+	if (ret < 0) {
+		LOG_ERR("error retriving CBI config: %d", ret);
+		return;
+	}
+
 	if (!IS_ENABLED(CONFIG_SOC_FAMILY_INTEL_ISH)) {
 		int ish_enabled;
 		ret = cros_cbi_get_fw_config(ISH, &ish_enabled);
@@ -73,15 +79,17 @@ static void motionsense_init(void)
 			gpio_pin_configure_dt(
 				GPIO_DT_FROM_NODELABEL(gpio_acc_int_l),
 				GPIO_DISCONNECTED);
-			LOG_INF("No motionsense");
+			LOG_INF("Disable motionsense for ISH");
+
+			if (sensor_fwconfig == FORM_FACTOR_CLAMSHELL) {
+				gmr_tablet_switch_disable();
+				LOG_INF("Board is Clamshell");
+			} else if (sensor_fwconfig == FORM_FACTOR_CONVERTIBLE) {
+				LOG_INF("Board is Convertible");
+			}
+
 			return;
 		}
-	}
-
-	ret = cros_cbi_get_fw_config(FORM_FACTOR, &sensor_fwconfig);
-	if (ret < 0) {
-		LOG_ERR("error retriving CBI config: %d", ret);
-		return;
 	}
 
 	if (sensor_fwconfig == FORM_FACTOR_CLAMSHELL) {
