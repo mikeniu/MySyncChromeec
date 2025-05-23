@@ -16,16 +16,6 @@
 			chg = <&charger_bq25720>;
 			pdc = <&pdc_power_p0>;
 			policy = <&cros_policy>;
-			usb-mux-chain-0 {
-				compatible = "cros-ec,usb-mux-chain";
-				usb-muxes = <&tusb546_mux_0 &virtual_mux_0>;
-			};
-		};
-
-		port0-muxes {
-			virtual_mux_0: virtual-mux-0 {
-				compatible = "cros-ec,usbc-mux-virtual";
-			};
 		};
 
 		usbc_port1: port1@1 {
@@ -33,17 +23,8 @@
 			reg = <1>;
 			pdc = <&pdc_power_p1>;
 			policy = <&cros_policy>;
-			usb-mux-chain-1 {
-				compatible = "cros-ec,usb-mux-chain";
-				usb-muxes = <&ps8747_mux_1 &virtual_mux_1>;
-			};
 		};
 
-		port1-muxes {
-			virtual_mux_1: virtual-mux-1 {
-				compatible = "cros-ec,usbc-mux-virtual";
-			};
-		};
 		ppm-driver {
 			compatible = "ucsi-ppm";
 		};

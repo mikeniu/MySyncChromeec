@@ -6,8 +6,6 @@
 #include "chipset.h"
 #include "console.h"
 #include "timer.h"
-#include "typec_control.h"
-#include "usb_mux.h"
 #include "usb_pd.h"
 #include "usb_pd_dp_hpd_gpio.h"
 #include "usbc/pdc_power_mgmt.h"
@@ -57,10 +55,8 @@ void svdm_set_hpd_gpio(int port, int en)
 static bool is_dp_muxable(int port)
 {
 	for (int i = 0; i < board_get_usb_pd_port_count(); i++) {
-		if (i != port) {
-			if (usb_mux_get(i) & USB_PD_MUX_DP_ENABLED) {
-				return false;
-			}
+		if (i != port && svdm_get_hpd_gpio(i)) {
+			return false;
 		}
 	}
 
@@ -78,16 +74,9 @@ static void skywalker_dp_attention(int port, uint32_t vdo_dp_status)
 	}
 
 	int cur_lvl = svdm_get_hpd_gpio(port);
-	mux_state_t mux_mode = pdc_power_mgmt_get_dp_mux_mode(port);
 
 	if (lvl) {
 		set_dp_path_sel(port);
-
-		usb_mux_set(port, mux_mode, USB_SWITCH_CONNECT,
-			    polarity_rm_dts(pd_get_polarity(port)));
-	} else {
-		usb_mux_set(port, USB_PD_MUX_USB_ENABLED, USB_SWITCH_CONNECT,
-			    polarity_rm_dts(pd_get_polarity(port)));
 	}
 
 	if (chipset_in_state(CHIPSET_STATE_ANY_SUSPEND) && (irq || lvl)) {
@@ -130,13 +119,6 @@ static void skywalker_dp_attention(int port, uint32_t vdo_dp_status)
 
 	/* set the minimum time delay (2ms) for the next HPD IRQ */
 	svdm_hpd_deadline[port] = get_time().val + HPD_USTREAM_DEBOUNCE_LVL;
-
-	/*
-	 * Populate MUX state before dp path mux, so we can keep the HPD status.
-	 */
-	mux_mode = (lvl ? USB_PD_MUX_HPD_LVL : USB_PD_MUX_HPD_LVL_DEASSERTED) |
-		   (irq ? USB_PD_MUX_HPD_IRQ : USB_PD_MUX_HPD_IRQ_DEASSERTED);
-	usb_mux_hpd_update(port, mux_mode);
 
 	return;
 }
