@@ -426,7 +426,7 @@ config PLATFORM_EC_EMULATED_SYSRQ
 
 config PLATFORM_EC_EXTPOWER
 	bool "Support external power detection"
-	depends on PLATFORM_EC_HOOKS && PLATFORM_EC_HOSTCMD
+	depends on PLATFORM_EC_HOOKS
 	help
 	  Enable code for handling the detection of external power.
 	  If PLATFORM_EC_EXTPOWER_GPIO is not set, then the board
@@ -437,7 +437,7 @@ config PLATFORM_EC_EXTPOWER
 config PLATFORM_EC_EXTPOWER_GPIO
 	bool "GPIO-based external power detection"
 	select PLATFORM_EC_EXTPOWER
-	depends on PLATFORM_EC_HOOKS && PLATFORM_EC_HOSTCMD
+	depends on PLATFORM_EC_HOOKS
 	help
 	  Enable shimming the extpower_gpio module, which provides
 	  GPIO-based external power presence detection features.  The
