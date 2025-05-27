@@ -1,0 +1,49 @@
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* Trulo program common DTS includes */
+
+/* Arbitrage generates an incorrect node label when using alternate pins.
+ * Create a 2nd node label on I2C3 as a workaround.
+ * TODO: b/310227384 - I2C alternate selection not detected automatically.
+ */
+i2c3ALT: &i2c3 {
+};
+
+#include <cros/cbi_flash.dtsi>
+
+#include "../binman.dtsi"
+#include "../ite_trulo.dtsi"
+#include "fan.dtsi"
+#include "../ite_generated.dtsi"
+#include "gpio.dtsi"
+#include "i2c.dtsi"
+#include "leds_pins.dtsi"
+#include "leds_policy.dtsi"
+#include "keyboard.dtsi"
+#include "../ite_power_signals.dtsi"
+#include "pwm.dtsi"
+#include "temp_sensors.dtsi"
+#include "usb_typec.dtsi"
+
+/* Kaladin project DTS includes*/
+
+/* Kaladin overrides follow... */
+
+/{
+        batteries {
+                default_battery: dynapack_313-2d-32-a {
+                        compatible = "dynapack,313-2d-32-a", "battery-smart";
+                };
+        };
+};
+
+/* These GPIOS are initialized by the PDC driver */
+&gpio_i2c_ec_pd_init_odl {
+	no-auto-init;
+};
+&gpio_ec_pmc_pd_int_odl {
+	no-auto-init;
+};

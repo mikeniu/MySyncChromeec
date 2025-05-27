@@ -8,10 +8,13 @@
 def register_trulo_project(
     project_name,
     chip="npcx9/npcx9m3f",
+    zephyr_board=None,
     kconfig_files=None,
     **kwargs,
 ):
     """Register a variant of Trulo."""
+    if zephyr_board is None:
+        zephyr_board = chip
     if kconfig_files is None:
         kconfig_files = [
             # Common to all projects.
@@ -20,18 +23,44 @@ def register_trulo_project(
             here / project_name / "project.conf",
         ]
 
-    register_npcx_project(
-        project_name=project_name,
-        zephyr_board=chip,
-        dts_overlays=[
-            here / project_name / "project.overlay",
-        ],
-        kconfig_files=kconfig_files + [here / "dsp_comms.conf"],
-        inherited_from=["trulo"],
-        modules=["cmsis", "cmsis_6", "picolibc", "ec", "pigweed", "nanopb"],
-        **kwargs,
-    )
+    if "it8" in zephyr_board:
+        register_binman_project(
+            project_name=project_name,
+            zephyr_board=zephyr_board,
+            dts_overlays=[
+                here / project_name / "project.overlay",
+            ],
+            kconfig_files=kconfig_files + [here / "dsp_comms.conf"],
+            modules=["cmsis", "cmsis_6", "picolibc", "ec", "pigweed", "nanopb"],
+            inherited_from=["trulo"],
+            **kwargs,
+        )
+    else:
+        register_npcx_project(
+            project_name=project_name,
+            zephyr_board=zephyr_board,
+            dts_overlays=[
+                here / project_name / "project.overlay",
+            ],
+            kconfig_files=kconfig_files + [here / "dsp_comms.conf"],
+            inherited_from=["trulo"],
+            modules=["cmsis", "cmsis_6", "picolibc", "ec", "pigweed", "nanopb"],
+            **kwargs,
+        )
 
+
+register_trulo_project(
+    project_name="kaladin",
+    zephyr_board="it8xxx2/it82002aw",
+    kconfig_files=[
+        # ite's config
+        here / "ite.conf",
+        # Common to all projects.
+        here / "ite_program.conf",
+        # Parent project's config
+        here / "kaladin" / "project.conf",
+    ],
+)
 
 register_trulo_project(
     project_name="trulo",
@@ -118,6 +147,26 @@ register_ish_project(
     modules=["ec", "cmsis", "cmsis_6", "hal_intel_public", "pigweed", "nanopb"],
 )
 
+
+def register_trulo_binman_project(
+    project_name,
+    kconfig_files=None,
+):
+    """Register a variant of trulo."""
+    if kconfig_files is None:
+        kconfig_files = [
+            # Common to all projects.
+            here / "program.conf",
+            # Project-specific KConfig customization.
+            here / project_name / "project.conf",
+        ]
+    return register_trulo_project(
+        project_name=project_name,
+        zephyr_board="it8xxx2/it82002aw",
+        kconfig_files=kconfig_files,
+    )
+
+
 # Note for reviews, do not let anyone edit these assertions, the addresses
 # must not change after the first RO release.
 assert_rw_fwid_DO_NOT_EDIT(project_name="trulo", addr=0x40144)
@@ -125,3 +174,4 @@ assert_rw_fwid_DO_NOT_EDIT(project_name="pujjocento", addr=0x40144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="pujjolo", addr=0x40144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="trulo-ti", addr=0x40144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="uldrenite", addr=0x40144)
+assert_rw_fwid_DO_NOT_EDIT(project_name="kaladin", addr=0x60098)

@@ -26,6 +26,12 @@ config BOARD_ULDRENITE
 	  Build Google Uldrenite reference board.  This board uses an Intel TWL SoC
 	  and NPCX997FB0BX EC
 
+config BOARD_KALADIN
+	bool "Google kaladin Board"
+	help
+	  Build Google kaladin reference board.  This board uses an Intel TWL SoC
+	  and ITE EC
+
 module = Trulo
 module-str = Trulo board-specific code
 source "subsys/logging/Kconfig.template.log_config"
