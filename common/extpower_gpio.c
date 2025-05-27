@@ -43,15 +43,18 @@ void extpower_interrupt(enum gpio_signal signal)
 
 static void extpower_init(void)
 {
-	uint8_t *memmap_batt_flags = host_get_memmap(EC_MEMMAP_BATT_FLAG);
-
 	debounced_extpower_presence = gpio_get_level(GPIO_AC_PRESENT);
 
-	/* Initialize the memory-mapped AC_PRESENT flag */
-	if (debounced_extpower_presence)
-		*memmap_batt_flags |= EC_BATT_FLAG_AC_PRESENT;
-	else
-		*memmap_batt_flags &= ~EC_BATT_FLAG_AC_PRESENT;
+	if (IS_ENABLED(CONFIG_HAS_HOSTCMD)) {
+		uint8_t *memmap_batt_flags =
+			host_get_memmap(EC_MEMMAP_BATT_FLAG);
+
+		/* Initialize the memory-mapped AC_PRESENT flag */
+		if (debounced_extpower_presence)
+			*memmap_batt_flags |= EC_BATT_FLAG_AC_PRESENT;
+		else
+			*memmap_batt_flags &= ~EC_BATT_FLAG_AC_PRESENT;
+	}
 
 	/* Enable interrupts, now that we've initialized */
 	gpio_enable_interrupt(GPIO_AC_PRESENT);
