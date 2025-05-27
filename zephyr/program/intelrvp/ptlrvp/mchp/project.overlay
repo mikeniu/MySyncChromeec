@@ -1,0 +1,94 @@
+/* Copyright 2024 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "include/board.h"
+
+#include <cros/cbi_flash.dtsi>
+#include <cros/integrated_fwid.dtsi>
+
+#include "adc.dtsi"
+#include "fan.dtsi"
+#include "gpio.dtsi"
+#include "i2c.dts"
+#include "ioex_gpio.dtsi"
+#include "interrupts.dtsi"
+#include "vci.dtsi"
+#include "pd.dtsi"
+#include "usbc.dtsi"
+#include "power_signals.dtsi"
+#include "../battery.dtsi"
+#include "../i2c.dtsi"
+#include "../ioex.dtsi"
+//#include "keyboard.dtsi"
+#include "../temp_sensor.dts"
+#include "../led_pins.dtsi"
+#include "../led_policy.dtsi"
+
+&cbi_flash {
+	offset = <0x3F000>;
+	size = <0x1000>;
+};
+
+/ {
+	chosen {
+		cros-ec,sha = &symcr;
+	};
+	named-gpios {
+		/delete-node/  ec-jtag-tms;
+	};
+
+	tabletmode_interrupt: tabletmode-interrupt {
+		compatible = "cros,tabletmode-interrupt";
+		irq-gpios = <MCHP_GPIO_DECODE_150 GPIO_ACTIVE_LOW>;
+	};
+
+	rvp-board-id {
+		compatible = "intel,board-id";
+		board-version = <PTL_RVP_BOARD_ID>;
+		devices = <&rvp_named_gpios &pca95xx_0 &pca95xx_1 &ioex_it8801_port0
+			   &ioex_it8801_port1 &ioex_it8801_port2 &ptl_ioex_gpios &usbc2>;
+	};
+	gcs-board-id {
+		compatible = "intel,board-id";
+		board-version = <PTL_GCS_BOARD_ID>;
+		devices = <&gcs_named_gpios>;
+	};
+
+};
+
+/delete-node/ &rvp_board_id;
+
+&symcr {
+	status = "okay";
+};
+
+&rom_api {
+	status = "okay";
+};
+
+&pca95xx_1 {
+	zephyr,deferred-init;
+};
+&ioex_it8801_port0 {
+	zephyr,deferred-init;
+};
+&ioex_it8801_port1 {
+	zephyr,deferred-init;
+};
+&ioex_it8801_port2 {
+	zephyr,deferred-init;
+};
+&rvp_named_gpios {
+	zephyr,deferred-init;
+};
+&gcs_named_gpios {
+	zephyr,deferred-init;
+};
+&ptl_ioex_gpios {
+	zephyr,deferred-init;
+};
+&usbc2 {
+	zephyr,deferred-init;
+};

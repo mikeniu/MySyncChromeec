@@ -59,6 +59,14 @@ config BOARD_PTLRVP_MCHP
 	  Build Intel PTLRVP_MCHP reference board. This board is Intel PTL RVP
 	  SOC with SOC_MEC172X_NSZ.
 
+config BOARD_PTL_MCHP
+	bool "Intel PTL_MCHP board"
+	depends on SOC_MEC172X_NSZ && INTEL_BOARD_ID
+	select BOARD_PTLRVP_COMMON
+	help
+	  Build Intel PTL boards with Microchip EC. This board is Intel PTL
+	  SOC with SOC_MEC172X_NSZ.
+
 config BOARD_PTLGCS
 	bool "Intel PTLRVP_MCHP board"
 	depends on SOC_MEC172X_NSZ

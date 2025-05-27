@@ -1,0 +1,25 @@
+/* Copyright 2024 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/*
+ * Define nodelabel aliases needed for fan devicetree.
+ */
+pwm_fan: &pwm8 {};
+tach_fan: &tach0 {};
+
+#include "../fan.dtsi"
+
+/* Tachemeter for fan speed measurement */
+&tach0 {
+	status = "okay";
+	pinctrl-0 = <&tach0_gpio050>; /* TACH0 input on GPI050 */
+	pinctrl-names = "default";
+};
+
+&pwm8 {
+	status = "okay";
+	pinctrl-0 = <&pwm8_gpio035>;
+	pinctrl-names = "default";
+};

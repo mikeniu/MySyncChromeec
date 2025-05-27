@@ -3,10 +3,12 @@
  * found in the LICENSE file.
  */
 
+#include "board.h"
 #include "gpio.h"
 #include "hooks.h"
 #include "intel_rvp_board_id.h"
 #include "intelrvp.h"
+#include "include/system.h"
 
 #include <zephyr/device.h>
 #include <zephyr/logging/log.h>
@@ -17,7 +19,7 @@
 #endif
 
 LOG_MODULE_REGISTER(board_id, LOG_LEVEL_INF);
-
+#ifndef CONFIG_BOARD_VERSION_CBI
 #if DT_NODE_EXISTS(DT_NODELABEL(pca95xx_0))
 static void pca95xx_deferred_init_cb(const struct device *dev,
 				     const enum ap_pwrseq_state entry,
@@ -138,3 +140,36 @@ __override int board_get_version(void)
 
 	return ptl_board_id;
 }
+#endif /* CONFIG_BOARD_VERSION_CBI */
+
+#if CONFIG_PDC_RUNTIME_PORT_CONFIG
+int board_get_pdc_for_port(int port, const struct device **dev)
+{
+	if (dev == NULL) {
+		return -EINVAL;
+	}
+	if (system_get_board_version() != PTL_RVP_BOARD_ID &&
+	    system_get_board_version() != PTL_GCS_BOARD_ID) {
+		return -EINVAL;
+	}
+
+	*dev = NULL;
+	switch(port) {
+	case 0:
+		*dev = DEVICE_DT_GET(DT_NODELABEL(pd_pow_port0));
+		break;
+	case 1:
+		*dev = DEVICE_DT_GET(DT_NODELABEL(pd_pow_port1));
+		break;
+	case 2:
+		if (system_get_board_version() == PTL_RVP_BOARD_ID) {
+			*dev = DEVICE_DT_GET(DT_NODELABEL(pd_pow_port2));
+		}
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	return 0;
+}
+#endif /* CONFIG_PDC_RUNTIME_PORT_CONFIG */
