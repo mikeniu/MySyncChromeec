@@ -264,6 +264,13 @@ void cbi_latch_eeprom_wp(void);
  * @return EC_RES_SUCCESS on success or EC_RES_* otherwise.
  */
 int cbi_write(void);
+
+/* Clears the CBI data, but doesn't set the magic signature or the header.
+ * Use only in tests to verify the handling of a completely uninitialized CBI.
+ *
+ * @return EC_RES_SUCCESS on success or EC_RES_* otherwise.
+ */
+int cbi_clear(void);
 #endif
 
 #ifdef __cplusplus

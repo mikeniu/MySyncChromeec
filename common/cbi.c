@@ -226,6 +226,17 @@ test_mockable int cbi_set_board_info(enum cbi_data_tag tag, const uint8_t *buf,
 
 	d = cbi_find_tag(cbi, tag);
 
+#ifndef CONFIG_SYSTEM_UNLOCKED
+	/*
+	 * These fields are not allowed to be reprogrammed regardless the
+	 * hardware WP state. They're considered as a part of the hardware.
+	 */
+	if (d && (tag == CBI_TAG_BOARD_VERSION || tag == CBI_TAG_OEM_ID)) {
+		CPRINTS("Failed to write tag: %d. System locked", tag);
+		return EC_RES_ACCESS_DENIED;
+	}
+#endif
+
 	/* If we found the entry, but the size doesn't match, delete it */
 	if (d && d->size != size) {
 		cbi_remove_tag(cbi, d);
@@ -256,6 +267,17 @@ int cbi_write(void)
 	}
 
 	return cbi_config->drv->store(cbi);
+}
+
+/* Clears the CBI data, but doesn't set the magic signature or the header.
+ * Use only in tests to verify the handling of a completely uninitialized CBI.
+ */
+__test_only int cbi_clear(void)
+{
+	memset(cbi, 0, sizeof(cbi));
+	cache_status = CBI_CACHE_STATUS_SYNCED;
+
+	return cbi_write();
 }
 
 test_mockable int cbi_get_board_version(uint32_t *ver)
@@ -300,37 +322,7 @@ int cbi_get_rework_id(uint64_t *id)
 	return cbi_get_board_info(CBI_TAG_REWORK_ID, (uint8_t *)id, &size);
 }
 
-int cbi_get_factory_calibration_data(uint32_t *calibration_data)
-{
-	uint8_t size = sizeof(*calibration_data);
-
-	return cbi_get_board_info(CBI_TAG_FACTORY_CALIBRATION_DATA,
-				  (uint8_t *)calibration_data, &size);
-}
-
-test_mockable int cbi_get_common_control(union ec_common_control *ctrl)
-{
-	uint8_t size = sizeof(*ctrl);
-
-	return cbi_get_board_info(CBI_TAG_COMMON_CONTROL, (uint8_t *)ctrl,
-				  &size);
-}
-
-static enum ec_status hc_cbi_get(struct host_cmd_handler_args *args)
-{
-	const struct __ec_align4 ec_params_get_cbi *p = args->params;
-	uint8_t size = MIN(args->response_max, UINT8_MAX);
-
-	if (p->flag & CBI_GET_RELOAD)
-		cbi_invalidate_cache();
-
-	if (cbi_get_board_info(p->tag, args->response, &size))
-		return EC_RES_INVALID_PARAM;
-
-	args->response_size = size;
-	return EC_RES_SUCCESS;
-}
-DECLARE_HOST_COMMAND(EC_CMD_GET_CROS_BOARD_INFO, hc_cbi_get, EC_VER_MASK(0));
+static bool is_valid_cbi(const uint8_t *cbi);
 
 static enum ec_status
 common_cbi_set(const struct __ec_align4 ec_params_set_cbi *p)
@@ -344,18 +336,13 @@ common_cbi_set(const struct __ec_align4 ec_params_set_cbi *p)
 		return EC_RES_ACCESS_DENIED;
 	}
 
-#ifndef CONFIG_SYSTEM_UNLOCKED
-	/*
-	 * These fields are not allowed to be reprogrammed regardless the
-	 * hardware WP state. They're considered as a part of the hardware.
-	 */
-	if (p->tag == CBI_TAG_BOARD_VERSION || p->tag == CBI_TAG_OEM_ID) {
-		CPRINTS("Failed to write tag: %d. System locked", p->tag);
-		return EC_RES_ACCESS_DENIED;
-	}
-#endif
-
 	if (p->flag & CBI_SET_INIT) {
+#ifndef CONFIG_SYSTEM_UNLOCKED
+		if (is_valid_cbi(cbi)) {
+			CPRINTS("Failed to init. System locked");
+			return EC_RES_ACCESS_DENIED;
+		}
+#endif
 		memset(cbi, 0, sizeof(cbi));
 		memcpy(head->magic, cbi_magic, sizeof(cbi_magic));
 		head->total_size = sizeof(*head);

@@ -7,6 +7,7 @@
 #include "host_command.h"
 #include "test/drivers/test_mocks.h"
 #include "test/drivers/test_state.h"
+#include "test_util.h"
 
 #include <zephyr/drivers/eeprom.h>
 #include <zephyr/drivers/gpio/gpio_emul.h>
@@ -118,8 +119,7 @@ ZTEST_USER(common_cbi, test_hc_cbi_set_then_get)
 	struct actual_set_params hc_set_params = {
 		.params = {
 		.tag = CBI_TAG_SKU_ID,
-		/* Force a reload */
-		.flag = CBI_SET_INIT,
+		.flag = 0,
 		.size = ARRAY_SIZE(data),
 		},
 	};
@@ -164,8 +164,7 @@ ZTEST_USER(common_cbi, test_hc_cbi_set__bad_size)
 	struct actual_set_params hc_set_params = {
 		.params = {
 		.tag = CBI_TAG_SKU_ID,
-		/* Force a reload */
-		.flag = CBI_SET_INIT,
+		.flag = 0,
 		.size = ARRAY_SIZE(data),
 		},
 	};
@@ -187,8 +186,7 @@ ZTEST_USER(common_cbi, test_hc_cbi_set_then_get__with_too_small_response)
 	struct actual_set_params hc_set_params = {
 		.params = {
 		.tag = CBI_TAG_SKU_ID,
-		/* Force a reload */
-		.flag = CBI_SET_INIT,
+		.flag = 0,
 		.size = ARRAY_SIZE(data),
 		},
 	};
@@ -396,6 +394,204 @@ ZTEST_USER(common_cbi, test_hc_cbi_bin_write_bad_param)
 	 */
 	hc_set_params.params.offset = CBI_IMAGE_SIZE + 1;
 	zassert_equal(host_command_process(&set_args), EC_RES_INVALID_PARAM);
+}
+
+ZTEST_USER(common_cbi, test_blank_then_init)
+{
+	const uint8_t board_id = 42;
+	const uint8_t oem_id = 99;
+	const uint8_t oem_name[] = "Name";
+
+	struct actual_set_params {
+		struct ec_params_set_cbi params;
+		uint8_t actual_data[32];
+	};
+
+	struct actual_set_params hc_set_params = {
+		.params = {
+		.tag = CBI_TAG_BOARD_VERSION,
+		.flag = CBI_SET_INIT,
+		.size = sizeof(board_id),
+		},
+	};
+	struct host_cmd_handler_args set_args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_SET_CROS_BOARD_INFO, 0, hc_set_params);
+
+	/* Turn off write-protect so we can actually write */
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), NULL);
+
+	/* Write the board version. */
+	memcpy(hc_set_params.params.data, &board_id, sizeof(board_id));
+	zassert_ok(host_command_process(&set_args));
+
+	/* Write the oem id. */
+	hc_set_params.params.tag = CBI_TAG_OEM_ID;
+	hc_set_params.params.flag = 0;
+	hc_set_params.params.size = sizeof(oem_id);
+	memcpy(hc_set_params.params.data, &oem_id, sizeof(oem_id));
+	zassert_ok(host_command_process(&set_args));
+
+	/* Write oem name */
+	hc_set_params.params.tag = CBI_TAG_OEM_NAME;
+	hc_set_params.params.flag = 0;
+	hc_set_params.params.size = ARRAY_SIZE(oem_name);
+	memcpy(hc_set_params.params.data, oem_name, ARRAY_SIZE(oem_name));
+	zassert_ok(host_command_process(&set_args));
+
+	/* Now verify our writes by invoking get host commands */
+
+	struct ec_params_get_cbi hc_get_params = {
+		.flag = CBI_GET_RELOAD,
+		.tag = CBI_TAG_BOARD_VERSION,
+	};
+
+	struct test_ec_params_get_cbi_response {
+		uint8_t data[32];
+	};
+	struct test_ec_params_get_cbi_response hc_get_response;
+	struct host_cmd_handler_args get_args = BUILD_HOST_COMMAND(
+		EC_CMD_GET_CROS_BOARD_INFO, 0, hc_get_response, hc_get_params);
+
+	zassert_ok(host_command_process(&get_args));
+	zassert_equal(get_args.response_size, sizeof(board_id));
+	zassert_equal(hc_get_response.data[0], board_id);
+
+	hc_get_params.flag = 0;
+	hc_get_params.tag = CBI_TAG_OEM_ID;
+
+	zassert_ok(host_command_process(&get_args));
+	zassert_equal(get_args.response_size, sizeof(oem_id));
+	zassert_equal(hc_get_response.data[0], oem_id);
+
+	hc_get_params.flag = 0;
+	hc_get_params.tag = CBI_TAG_OEM_NAME;
+
+	zassert_ok(host_command_process(&get_args));
+	zassert_equal(get_args.response_size, ARRAY_SIZE(oem_name));
+	zassert_mem_equal(hc_get_response.data, oem_name, ARRAY_SIZE(oem_name));
+}
+
+ZTEST_USER(common_cbi, test_init_fails_when_locked)
+{
+	const uint8_t oem_name[] = "Name";
+
+	struct actual_set_params {
+		struct ec_params_set_cbi params;
+		uint8_t actual_data[32];
+	};
+
+	struct actual_set_params hc_set_params = {
+		.params = {
+		.tag = CBI_TAG_OEM_NAME,
+		.flag = CBI_SET_INIT,
+		.size = ARRAY_SIZE(oem_name),
+		},
+	};
+	struct host_cmd_handler_args set_args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_SET_CROS_BOARD_INFO, 0, hc_set_params);
+
+	/* Turn off write-protect so we can actually write */
+	gpio_wp_l_set(1);
+
+	/* Write the oem name with init. */
+	memcpy(hc_set_params.params.data, oem_name, ARRAY_SIZE(oem_name));
+#ifdef CONFIG_SYSTEM_UNLOCKED
+	zassert_ok(host_command_process(&set_args));
+
+	/* Now verify our that board id & oem id are blank, and oem name is set
+	 */
+
+	struct ec_params_get_cbi hc_get_params = {
+		.flag = CBI_GET_RELOAD,
+		.tag = CBI_TAG_BOARD_VERSION,
+	};
+
+	struct test_ec_params_get_cbi_response {
+		uint8_t data[32];
+	};
+	struct test_ec_params_get_cbi_response hc_get_response;
+	struct host_cmd_handler_args get_args = BUILD_HOST_COMMAND(
+		EC_CMD_GET_CROS_BOARD_INFO, 0, hc_get_response, hc_get_params);
+
+	zassert_not_ok(host_command_process(&get_args));
+
+	hc_get_params.flag = 0;
+	hc_get_params.tag = CBI_TAG_OEM_ID;
+
+	zassert_not_ok(host_command_process(&get_args));
+
+	hc_get_params.flag = 0;
+	hc_get_params.tag = CBI_TAG_OEM_NAME;
+
+	zassert_ok(host_command_process(&get_args));
+	zassert_equal(get_args.response_size, ARRAY_SIZE(oem_name));
+	zassert_mem_equal(hc_get_response.data, oem_name, ARRAY_SIZE(oem_name));
+#else
+	zassert_not_ok(host_command_process(&set_args));
+#endif /* CONFIG_SYSTEM_UNLOCKED */
+}
+
+ZTEST_USER(common_cbi, test_board_id_fails_when_set)
+{
+	uint8_t board_id = 42;
+
+	struct actual_set_params {
+		struct ec_params_set_cbi params;
+		uint8_t actual_data[32];
+	};
+
+	struct actual_set_params hc_set_params = {
+		.params = {
+		.tag = CBI_TAG_BOARD_VERSION,
+		.flag = CBI_SET_INIT,
+		.size = sizeof(board_id),
+		},
+	};
+	struct host_cmd_handler_args set_args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_SET_CROS_BOARD_INFO, 0, hc_set_params);
+
+	/* Turn off write-protect so we can actually write */
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), NULL);
+
+	/* Write the board version. */
+	memcpy(hc_set_params.params.data, &board_id, sizeof(board_id));
+	zassert_ok(host_command_process(&set_args));
+
+	/* Now verify our writes by invoking get host commands */
+
+	struct ec_params_get_cbi hc_get_params = {
+		.flag = CBI_GET_RELOAD,
+		.tag = CBI_TAG_BOARD_VERSION,
+	};
+
+	struct test_ec_params_get_cbi_response {
+		uint8_t data[32];
+	};
+	struct test_ec_params_get_cbi_response hc_get_response;
+	struct host_cmd_handler_args get_args = BUILD_HOST_COMMAND(
+		EC_CMD_GET_CROS_BOARD_INFO, 0, hc_get_response, hc_get_params);
+
+	zassert_ok(host_command_process(&get_args));
+	zassert_equal(get_args.response_size, sizeof(board_id));
+	zassert_equal(hc_get_response.data[0], board_id);
+
+	/* Write it again without init (should fail if locked). */
+	board_id = 43;
+	memcpy(hc_set_params.params.data, &board_id, sizeof(board_id));
+	hc_set_params.params.flag = 0;
+#ifdef CONFIG_SYSTEM_UNLOCKED
+	zassert_ok(host_command_process(&set_args));
+#else
+	zassert_not_ok(host_command_process(&set_args));
+	board_id = 42;
+#endif /* CONFIG_SYSTEM_UNLOCKED */
+
+	/* verify again */
+	zassert_ok(host_command_process(&get_args));
+	zassert_equal(get_args.response_size, sizeof(board_id));
+	zassert_equal(hc_get_response.data[0], board_id);
 }
 
 static void test_common_cbi_before_after(void *test_data)
