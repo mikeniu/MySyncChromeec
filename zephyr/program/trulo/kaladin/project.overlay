@@ -18,17 +18,10 @@
 #include "leds_pins.dtsi"
 #include "leds_policy.dtsi"
 #include "keyboard.dtsi"
+#include "battery.dtsi"
 #include "pwm.dtsi"
 #include "temp_sensors.dtsi"
 #include "usb_typec.dtsi"
 #include "usba.dtsi"
 
 /* Kaladin overrides follow... */
-
-/{
-        batteries {
-                default_battery: dynapack_313-2d-32-a {
-                        compatible = "dynapack,313-2d-32-a", "battery-smart";
-                };
-        };
-};
