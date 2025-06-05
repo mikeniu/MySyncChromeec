@@ -53,4 +53,8 @@ endif # WATCHDOG
 config CROS_EC_HOOK_TICK_INTERVAL
 	default 200000
 
+config NPCX_FLASH_ERASE_SIZE
+	hex "The NPCX flash erase size."
+	default 0x1000
+
 endif # SOC_FAMILY_NPCX
