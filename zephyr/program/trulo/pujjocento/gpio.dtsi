@@ -38,7 +38,7 @@
 			enum-name = "GPIO_AC_PRESENT";
 		};
 		gpio_ec_edp_bl_en_od: ec_edp_bl_en_od {
-			gpios = <&gpiod 3 GPIO_ODR_HIGH>;
+			gpios = <&gpiod 3 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 			enum-name = "GPIO_ENABLE_BACKLIGHT";
 		};
 		gpio_imvp91_vrrdy_r_od: imvp91_vrrdy_r_od {
@@ -93,6 +93,9 @@
 		gpio_ec_entering_rw: ec_entering_rw {
 			enum-name = "GPIO_ENTERING_RW";
 		};
+		gpio_soc_bl_en: soc_bl_en {
+			gpios = <&gpioa 2 GPIO_INPUT_PULL_UP>;
+		};
 	};
 
 	pwr-imvp9-vrrdy-od {
@@ -120,6 +123,11 @@
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "extpower_interrupt";
 		};
+		int_soc_bl_en: soc_bl_int{
+			irq-pin = <&gpio_soc_bl_en>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "soc_bl_interrupt";
+		};
 	};
 
 	unused-pins {
@@ -129,8 +137,7 @@
 			<&gpio9 5 0>,
 			<&gpio5 0 0>,
 			<&gpio5 6 0>,
-			<&gpiod 5 0>,
-			<&gpioa 2 0>;
+			<&gpiod 5 0>;
 	};
 };
 
