@@ -33,12 +33,16 @@
 		ec_wake: ec-gpio144-wake {
 			gpios = <MCHP_GPIO_DECODE_144 GPIO_INPUT>;
 		};
+
+		/*
+		NOTE: used for sensor i2c, do not define.
 		m2-ssd-ec-i2c05-data {
 			gpios = <MCHP_GPIO_DECODE_141 GPIO_INPUT>;
 		};
 		m2-ssd-ec-i2c05-clk {
 			gpios = <MCHP_GPIO_DECODE_142 GPIO_INPUT>;
 		};
+		*/
 		ec-jtag-tdi {
 			gpios = <MCHP_GPIO_DECODE_145 GPIO_INPUT>;
 		};
@@ -372,8 +376,9 @@
 		sys-pwrok-ec-r {
 			gpios = <MCHP_GPIO_DECODE_015 GPIO_INPUT>;
 		};
-		ec-slatemode-hallout-snsr-r {
+		ec_tablet_mode_l: tablet-mode-l {
 			gpios = <MCHP_GPIO_DECODE_222 GPIO_INPUT>;
+			enum-name = "GPIO_TABLET_MODE_L";
 		};
 		bat-id-r {
 			gpios = <MCHP_GPIO_DECODE_162 GPIO_INPUT>;

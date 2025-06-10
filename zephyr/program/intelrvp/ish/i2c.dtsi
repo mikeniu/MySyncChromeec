@@ -20,4 +20,9 @@
 &i2c2 {
 	status = "okay";
 	clock-frequency = <I2C_BITRATE_FAST>;
+	dsp_client: dsp-client@21 {
+		compatible = "cros,dsp-client";
+		reg = <0x21>;
+		int-gpios = <&gpio0 1 GPIO_ACTIVE_LOW>;
+	};
 };
