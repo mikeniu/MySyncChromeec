@@ -43,11 +43,6 @@
 		/delete-node/  ec-jtag-tms;
 	};
 
-	tabletmode_interrupt: tabletmode-interrupt {
-		compatible = "cros,tabletmode-interrupt";
-		irq-gpios = <MCHP_GPIO_DECODE_150 GPIO_ACTIVE_LOW>;
-	};
-
 	microchip-wp {
 		compatible ="microchip,write-protect";
 		wp-gpios = <MCHP_GPIO_DECODE_076 GPIO_ACTIVE_LOW>;

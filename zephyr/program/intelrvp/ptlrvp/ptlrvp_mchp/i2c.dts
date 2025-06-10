@@ -27,3 +27,19 @@ pd_pow_i2c: &i2c_smb_1 {
 	scl-gpios = <MCHP_GPIO_DECODE_140 GPIO_OPEN_DRAIN>;
 	sda-gpios = <MCHP_GPIO_DECODE_132 GPIO_OPEN_DRAIN>;
 };
+
+/* dsp_comm */
+&i2c_smb_2 {
+	status = "okay";
+	pinctrl-0 = <&i2c05_scl_gpio142 &i2c05_sda_gpio141>;
+	pinctrl-names = "default";
+	port-sel = <5>;
+	scl-gpios = <MCHP_GPIO_DECODE_140 GPIO_OPEN_DRAIN>;
+	sda-gpios = <MCHP_GPIO_DECODE_132 GPIO_OPEN_DRAIN>;
+
+	dsp_service: dsp-service@21 {
+		compatible = "cros,dsp-service";
+		reg = <0x21>;
+		int-gpios = <MCHP_GPIO_DECODE_150 (GPIO_ACTIVE_LOW)>;
+	};
+};

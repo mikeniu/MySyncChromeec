@@ -10,6 +10,7 @@
 def register_intelrvp_project(
     project_name,
     chip,
+    modules=None,
     extra_dts_overlays=(),
     extra_kconfig_files=(),
     inherited_from=None,
@@ -38,13 +39,18 @@ def register_intelrvp_project(
     if inherited_from is None:
         inherited_from = ["intelrvp"]
 
-    register_func(
-        project_name=project_name,
-        zephyr_board=chip,
-        dts_overlays=dts_overlays,
-        kconfig_files=kconfig_files,
-        inherited_from=inherited_from,
-    )
+    kwargs = {
+        "project_name": project_name,
+        "zephyr_board": chip,
+        "dts_overlays": dts_overlays,
+        "kconfig_files": kconfig_files,
+        "inherited_from": inherited_from,
+    }
+
+    if modules is not None:
+        kwargs["modules"] = modules
+
+    register_func(**kwargs)
 
 
 register_intelrvp_project(
@@ -184,10 +190,12 @@ register_intelrvp_project(
         here / "ptlrvp/ptlrvp_mchp/project.overlay",
     ],
     extra_kconfig_files=[
+        here / "dsp_comms.conf",
         here / "ptlrvp/ptlrvp_mchp/project.conf",
         here / "ptlrvp/pd.conf",
         here / "zephyr_ap_pwrseq.conf",
     ],
+    modules=["cmsis_6", "ec", "pigweed", "nanopb"],
     inherited_from=["fatcat"],
 )
 
@@ -212,6 +220,7 @@ register_ish_project(
         here / "ish/ptl-ish/project.overlay",
     ],
     kconfig_files=[
+        here / "dsp_comms.conf",
         here / "ish" / "prj.conf",
         here / "ish" / "motionsense.conf",
         here / ".." / ".." / "ish.conf",
