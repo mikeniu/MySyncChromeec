@@ -491,9 +491,6 @@ void int_ap_register(void (*func_enable)(void));
 void int_ap_extension_enable(void);
 void int_ap_extension_stop_pulse(void);
 
-/* Moving from legacy versions might require NVMEM transition. */
-int board_nvmem_legacy_check_needed(void);
-
 void set_ap_on(void);
 
 /*

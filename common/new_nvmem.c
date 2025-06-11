@@ -168,31 +168,6 @@
  * not processed immediately, the deletion happens after all new instances
  * have been saved in flash. See more about transaction delimiters below.
  *
- * ===== Migration from legacy storage and reclaiming flash space
- *
- * To be able to migrate existing devices from the legacy storage format the
- * initialization code checks if a full 12K flash partition is still present,
- * and if so - copies its contents into the cache and invokes the migration
- * function. The function erases the alternative partition and creates a list
- * of 5 pages available for the new format (remember, the flash footprint of
- * the new scheme is smaller, only 10K is available in each half).
- *
- * The (key, value) pairs and TPM objects are stored in the new format as
- * described, and then the legacy partition is erased and its pages are added
- * to the list of free pages. This approach would fail if the existing TPM
- * storage would exceed 10K, but this is extremely unlikely, especially since
- * the large reserved objects are stored by the new scheme in marshaled form.
- * This frees up a lot of flash space.
- *
- * Eventually it will be possible to reclaim the bottom 2K page per flash half
- * currently used by the legacy scheme, but this would be possible only after
- * migration is over. The plan is to keep a few Cr50 versions supporting the
- * migration process, and then drop the migration code and rearrange the
- * memory map and reclaim the freed pages. Chrome OS will always carry a
- * migrating capable Cr50 version along with the latest one to make sure that
- * even Chrome OS devices which had not updated their Cr50 code in a long
- * while can be migrated in two steps.
- *
  * ===== Initialization, including erased/corrupted flash
  *
  * On regular startup (no legacy partition found) the flash pages dedicated to
@@ -330,7 +305,6 @@ static uint8_t init_in_progress;
  *
  * The interfaces grabbing this mutex are
  *
- *  new_nvmem_migrate()
  *  new_nvmem_init()
  *  new_nvmem_save()
  *  getvar()
@@ -368,7 +342,6 @@ test_export_static uint16_t total_var_space;
 /* The main context used when adding objects to NVMEM. */
 test_export_static struct access_tracker controller_at;
 
-test_export_static enum ec_error_list browse_flash_contents(int print);
 static enum ec_error_list save_container(struct nn_container *nc);
 static void invalidate_nvmem_flash(void);
 
@@ -1264,31 +1237,6 @@ static bool is_empty(const void *pcr_base, size_t pcr_size)
 }
 
 /*
- * A convenience function checking if the passed in blob is not empty, and if
- * so - save the blob in the destination memory.
- *
- * Return number of bytes placed in dst or zero, if the blob was empty.
- */
-static size_t copy_pcr(const uint8_t *pcr_base, size_t pcr_size, uint8_t *dst)
-{
-	/*
-	 * We rely on the fact that all 16 PCRs of every PCR bank saved in the
-	 * NVMEM's reserved space are originally set to all zeros.
-	 *
-	 * If all 0xFF is read - this is considered an artifact of trying to
-	 * retrieve PCRs from legacy flash snapshot from the state when PCRs
-	 * were not saved in the reserved space at all, i.e. also indicates an
-	 * empty PCR.
-	 */
-	if (is_empty(pcr_base, pcr_size))
-		return 0; /* No need to save this. */
-
-	memcpy(dst, pcr_base, pcr_size);
-
-	return pcr_size;
-}
-
-/*
  * A convenience structure and array, allowing quick access to PCR banks
  * contained in the STATE_CLEAR_DATA:pcrSave field. This helps when
  * marshailing/unmarshaling PCR contents.
@@ -1309,32 +1257,6 @@ static const struct pcr_descriptor pcr_arrays[] = {
 /* Just in case we ever get to reducing the PCR set one way or another. */
 BUILD_ASSERT(ARRAY_SIZE(pcr_arrays) == 4);
 BUILD_ASSERT(NUM_OF_PCRS == 64);
-/*
- * Iterate over PCRs contained in the STATE_CLEAR_DATA structure in the NVMEM
- * cache and save nonempty ones in the flash.
- */
-static void migrate_pcr(STATE_CLEAR_DATA *scd, size_t array_index,
-			size_t pcr_index, struct nn_container *ch)
-{
-	const struct pcr_descriptor *pdsc;
-	uint8_t *p_container_body;
-	uint8_t *pcr_base;
-	uint8_t reserved_index; /* Unique ID of this PCR in reserved storage. */
-
-	p_container_body = (uint8_t *)(ch + 1);
-	pdsc = pcr_arrays + array_index;
-	pcr_base = (uint8_t *)&scd->pcrSave + pdsc->pcr_array_offset +
-		   pdsc->pcr_size * pcr_index;
-	reserved_index = NV_VIRTUAL_RESERVE_LAST +
-			 array_index * NUM_STATIC_PCR + pcr_index;
-
-	if (!copy_pcr(pcr_base, pdsc->pcr_size, p_container_body + 1))
-		return;
-
-	p_container_body[0] = reserved_index;
-	ch->size = pdsc->pcr_size + 1;
-	save_container(ch);
-}
 
 /*
  * Some NVMEM structures end up in the NVMEM cache with a wrong alignment. If
@@ -1474,121 +1396,6 @@ static uint16_t marshal_state_reset_data(STATE_RESET_DATA *srd, uint8_t *dst)
 	return dst - base;
 }
 
-/*
- * Migrate all reserved objects found in the NVMEM cache after intializing
- * from legacy NVMEM storage.
- */
-static enum ec_error_list migrate_tpm_reserved(struct nn_container *ch)
-{
-	STATE_CLEAR_DATA *scd = NULL;
-	STATE_RESET_DATA *srd;
-	size_t pcr_type_index;
-	uint8_t *p_tpm_nvmem = nvmem_cache_base(NVMEM_TPM);
-	uint8_t *p_container_body = (uint8_t *)(ch + 1);
-	uint8_t index;
-
-	ch->container_type = ch->container_type_copy = NN_OBJ_TPM_RESERVED;
-
-	for (index = 0; index < NV_VIRTUAL_RESERVE_LAST; index++) {
-		NV_RESERVED_ITEM ri;
-		int copy_needed = 1;
-
-		NvGetReserved(index, &ri);
-		p_container_body[0] = index;
-
-		switch (index) {
-		case NV_STATE_CLEAR:
-			scd = (STATE_CLEAR_DATA *)(p_tpm_nvmem + ri.offset);
-			ri.size =
-				marshal_state_clear(scd, p_container_body + 1);
-			copy_needed = 0;
-			break;
-
-		case NV_STATE_RESET:
-			srd = (STATE_RESET_DATA *)(p_tpm_nvmem + ri.offset);
-			ri.size = marshal_state_reset_data(
-				srd, p_container_body + 1);
-			copy_needed = 0;
-			break;
-		}
-
-		if (copy_needed) {
-			/*
-			 * Copy data into the stage area unless already done
-			 * by marshaling function above.
-			 */
-			memcpy(p_container_body + 1, p_tpm_nvmem + ri.offset,
-			       ri.size);
-		}
-
-		ch->size = ri.size + 1;
-		save_container(ch);
-	}
-
-	/*
-	 * Now all components but the PCRs from STATE_CLEAR_DATA have been
-	 * saved, let's deal with those PCR arrays. We want to save each PCR
-	 * in a separate container, as if all PCRs are extended, the total
-	 * combined size of the arrays would exceed flash page size. Also,
-	 * PCRs are most likely to change one or very few at a time.
-	 */
-	for (pcr_type_index = 0; pcr_type_index < ARRAY_SIZE(pcr_arrays);
-	     pcr_type_index++) {
-		size_t pcr_index;
-
-		for (pcr_index = 0; pcr_index < NUM_STATIC_PCR; pcr_index++)
-			migrate_pcr(scd, pcr_type_index, pcr_index, ch);
-	}
-
-	return EC_SUCCESS;
-}
-
-/*
- * Migrate all evictable objects found in the NVMEM cache after intializing
- * from legacy NVMEM storage.
- */
-static enum ec_error_list migrate_objects(struct nn_container *ch)
-{
-	uint32_t next_obj_base;
-	uint32_t obj_base;
-	uint32_t obj_size;
-	uint8_t *obj_addr;
-	uint8_t *const tpm_base = nvmem_cache_base(NVMEM_TPM);
-
-	ch->container_type = ch->container_type_copy = NN_OBJ_TPM_EVICTABLE;
-
-	obj_base = s_evictNvStart;
-	obj_addr = tpm_base + obj_base;
-	memcpy(&next_obj_base, obj_addr, sizeof(next_obj_base));
-
-	while (next_obj_base && (next_obj_base <= s_evictNvEnd)) {
-
-		obj_size = next_obj_base - obj_base - sizeof(obj_size);
-		memcpy(ch + 1, (uint32_t *)obj_addr + 1, obj_size);
-
-		ch->size = obj_size;
-		save_container(ch);
-
-		obj_base = next_obj_base;
-		obj_addr = tpm_base + obj_base;
-
-		memcpy(&next_obj_base, obj_addr, sizeof(next_obj_base));
-	}
-
-	return EC_SUCCESS;
-}
-
-static enum ec_error_list migrate_tpm_nvmem(struct nn_container *ch)
-{
-	/* Call this to initialize NVMEM indices. */
-	NvEarlyStageFindHandle(0);
-
-	migrate_tpm_reserved(ch);
-	migrate_objects(ch);
-
-	return EC_SUCCESS;
-}
-
 static enum ec_error_list save_var(const uint8_t *key, uint8_t key_len,
 				   const uint8_t *val, uint8_t val_len,
 				   struct max_var_container *vc)
@@ -1622,125 +1429,6 @@ static enum ec_error_list save_var(const uint8_t *key, uint8_t key_len,
 		shared_mem_release(vc);
 
 	return rv;
-}
-
-/*
- * Migrate all (key, value) pairs found in the NVMEM cache after intializing
- * from legacy NVMEM storage.
- */
-static enum ec_error_list migrate_vars(struct nn_container *ch)
-{
-	const struct tuple *var;
-
-	/*
-	 * During migration (key, value) pairs need to be manually copied from
-	 * the NVMEM cache.
-	 */
-	set_local_copy();
-	var = NULL;
-	total_var_space = 0;
-
-	while ((var = legacy_getnextvar(var)) != NULL)
-		save_var(var->data_, var->key_len, var->data_ + var->key_len,
-			 var->val_len, (struct max_var_container *)ch);
-
-	return EC_SUCCESS;
-}
-
-static int erase_partition(unsigned int act_partition, int erase_backup)
-{
-	enum ec_error_list rv;
-	size_t flash_base;
-
-	/*
-	 * This is the first time we save using the new scheme, let's prepare
-	 * the flash space. First determine which half is the backup now and
-	 * erase it.
-	 */
-	flash_base = (act_partition ^ erase_backup) ? CONFIG_FLASH_NVMEM_BASE_A
-						    : CONFIG_FLASH_NVMEM_BASE_B;
-	flash_base -= CONFIG_PROGRAM_MEMORY_BASE;
-
-	rv = flash_physical_erase(flash_base, NVMEM_PARTITION_SIZE);
-
-	if (rv != EC_SUCCESS) {
-		ccprintf("%s: flash erase failed\n", __func__);
-		return -rv;
-	}
-
-	return flash_base + CONFIG_FLASH_BANK_SIZE;
-}
-
-/*
- * This function is called once in a lifetime, when Cr50 boots up and a legacy
- * partition if found in the flash.
- */
-enum ec_error_list new_nvmem_migrate(unsigned int act_partition)
-{
-	int flash_base;
-	int i;
-	int j;
-	struct nn_container *ch;
-
-	if (!crypto_enabled())
-		return EC_ERROR_INVAL;
-
-	/*
-	 * This is the first time we save using the new scheme, let's prepare
-	 * the flash space. First determine which half is the backup now and
-	 * erase it.
-	 */
-	flash_base = erase_partition(act_partition, 1);
-	if (flash_base < 0) {
-		ccprintf("%s: backup partition erase failed\n", __func__);
-		return -flash_base;
-	}
-
-	ch = get_scratch_buffer(CONFIG_FLASH_BANK_SIZE);
-
-	lock_mutex(__LINE__);
-
-	/* Populate half of page_list with available page offsets. */
-	for (i = 0; i < ARRAY_SIZE(page_list) / 2; i++)
-		page_list[i] = flash_base / CONFIG_FLASH_BANK_SIZE + i;
-	page_count = ARRAY_SIZE(page_list);
-
-	set_first_page_header();
-
-	ch->generation = 0;
-
-	migrate_vars(ch);
-	migrate_tpm_nvmem(ch);
-
-	shared_mem_release(ch);
-
-	add_final_delimiter();
-
-	unlock_mutex(__LINE__);
-
-	if (browse_flash_contents(0) != EC_SUCCESS)
-		/* Never returns. */
-		report_no_payload_failure(NVMEMF_MIGRATION_FAILURE);
-
-	CPRINTS("Migration success, used %zd bytes of flash",
-		total_used_size());
-
-	/*
-	 * Now we can erase the active partition and add its flash to the pool.
-	 */
-	flash_base = erase_partition(act_partition, 0);
-	if (flash_base < 0)
-		/* Never returns. */
-		report_no_payload_failure(NVMEMF_LEGACY_ERASE_FAILURE);
-
-	/*
-	 * Populate the second half of the page_list with pages retrieved from
-	 * legacy partition.
-	 */
-	for (j = 0; j < ARRAY_SIZE(page_list) / 2; j++)
-		page_list[i + j] = flash_base / CONFIG_FLASH_BANK_SIZE + j;
-
-	return EC_SUCCESS;
 }
 
 /* Check if the passed in flash page is empty, if not - erase it. */
@@ -3307,22 +2995,6 @@ enum ec_error_list setvar(const uint8_t *key, uint8_t key_len,
 	return rv;
 }
 
-static void dump_contents(const struct nn_container *ch)
-{
-	const uint8_t *buf = (const void *)ch;
-	size_t i;
-	size_t total_size = sizeof(*ch) + ch->size;
-
-	for (i = 0; i < total_size; i++) {
-		if (!(i % 16)) {
-			ccprintf("\n");
-			cflush();
-		}
-		ccprintf(" %02x", buf[i]);
-	}
-	ccprintf("\n");
-}
-
 enum ec_error_list nvmem_erase_tpm_data_selective(const uint32_t *objs_to_erase)
 {
 	enum ec_error_list rv;
@@ -3397,6 +3069,24 @@ enum ec_error_list nvmem_erase_tpm_data_selective(const uint32_t *objs_to_erase)
 		rv = init_rv;
 
 	return rv;
+}
+
+#ifdef CONFIG_CMD_DUMP_NVMEM
+
+static void dump_contents(const struct nn_container *ch)
+{
+	const uint8_t *buf = (const void *)ch;
+	size_t i;
+	size_t total_size = sizeof(*ch) + ch->size;
+
+	for (i = 0; i < total_size; i++) {
+		if (!(i % 16)) {
+			ccprintf("\n");
+			cflush();
+		}
+		ccprintf(" %02x", buf[i]);
+	}
+	ccprintf("\n");
 }
 
 /*
@@ -3516,7 +3206,6 @@ test_export_static enum ec_error_list browse_flash_contents(int print)
 	return rv;
 }
 
-#ifdef CONFIG_CMD_DUMP_NVMEM
 static int command_dump_nvmem(int argc, char **argv)
 {
 	int print = 1;

@@ -1952,19 +1952,6 @@ int board_in_prod_mode(void)
 	return in_prod_mode;
 }
 
-int board_nvmem_legacy_check_needed(void)
-{
-	enum system_image_copy_t other_rw;
-	const struct SignedHeader *h;
-
-	other_rw = system_get_image_copy() == SYSTEM_IMAGE_RW ?
-		SYSTEM_IMAGE_RW_B : SYSTEM_IMAGE_RW;
-
-	h = (const struct SignedHeader *)get_program_memory_addr(other_rw);
-
-	return (h->major_ <= 2) || ((h->major_ <= 4) && (h->minor_ <= 18));
-}
-
 /*
  * TPM_BOARD_CFG write is allowed from TPM reset until TPM2_PCR_Extend command
  * is requested.

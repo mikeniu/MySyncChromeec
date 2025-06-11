@@ -90,9 +90,6 @@ enum {
 
 #define CONFIG_RNG
 
-/* Let the tests always check the other NVMEM slot. */
-static inline int board_nvmem_legacy_check_needed(void){ return 1; }
-
 /* Mock functions for EC-CR50 communication test */
 int board_has_ec_cr50_comm_support(void);
 void board_reboot_ec_deferred(int usec_delay);

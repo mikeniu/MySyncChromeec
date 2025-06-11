@@ -58,12 +58,6 @@
  * then the lock is released.
  */
 
-/* Table of start addresses for each partition */
-static const uintptr_t nvmem_base_addr[NVMEM_NUM_PARTITIONS] = {
-		CONFIG_FLASH_NVMEM_BASE_A,
-		CONFIG_FLASH_NVMEM_BASE_B
-	};
-
 /* NvMem user buffer start offset table */
 static uint32_t nvmem_user_start_offset[NVMEM_NUM_USERS];
 
@@ -94,12 +88,6 @@ static void nvmem_release_cache(void);
  * save it in the provided space. The caller is expected to provide enough
  * space to store CIPHER_SALT_SIZE bytes.
  */
-static void nvmem_compute_sha(struct nvmem_tag *tag, void *sha_buf)
-{
-	app_compute_hash(tag->padding, NVMEM_PARTITION_SIZE - NVMEM_SHA_SIZE,
-			 sha_buf, sizeof(tag->sha));
-}
-
 static enum ec_error_list nvmem_save(void)
 {
 	enum ec_error_list rv;
@@ -109,44 +97,6 @@ static enum ec_error_list nvmem_save(void)
 	nvmem_unlock_cache(rv == EC_SUCCESS);
 
 	return rv;
-}
-
-/*
- * Read from flash and verify partition.
- *
- * @param index - index of the partition to verify
- *
- * Returns EC_SUCCESS on verification success
- *         EC_ERROR_BUSY in case of malloc failure
- *         EC_ERROR_UNKNOWN on failure to decrypt of verify.
- */
-static enum ec_error_list nvmem_partition_read_verify(enum nvmem_users index)
-{
-	uint8_t sha_comp[NVMEM_SHA_SIZE];
-	struct nvmem_partition *p_part;
-	struct nvmem_partition *p_copy;
-	int ret;
-
-	p_part = (struct nvmem_partition *)nvmem_base_addr[index];
-	p_copy = (struct nvmem_partition *)nvmem_cache;
-	memcpy(p_copy, p_part, NVMEM_PARTITION_SIZE);
-
-	/* Then decrypt it. */
-	if (!app_cipher(p_copy->tag.sha, &p_copy->tag + 1,
-			&p_copy->tag + 1,
-			NVMEM_PARTITION_SIZE - sizeof(struct nvmem_tag))) {
-		CPRINTF("%s: decryption failure\n", __func__);
-		return EC_ERROR_UNKNOWN;
-	}
-
-	/*
-	 * Check if computed value matches stored value. Nonzero 'ret' value
-	 * means there was a match.
-	 */
-	nvmem_compute_sha(&p_copy->tag, sha_comp);
-	ret = !memcmp(p_copy->tag.sha, sha_comp, NVMEM_SHA_SIZE);
-
-	return ret ? EC_SUCCESS : EC_ERROR_UNKNOWN;
 }
 
 static void nvmem_lock_cache(void)
@@ -178,62 +128,6 @@ static void nvmem_release_cache(void)
 	nvmem_mutex.task = TASK_ID_COUNT;
 	/* Release mutex lock here */
 	mutex_unlock(&nvmem_mutex.mtx);
-}
-
-static int nvmem_compare_generation(void)
-{
-	struct nvmem_partition *p_part;
-	uint16_t ver0, ver1;
-	uint32_t delta;
-
-	p_part = (struct nvmem_partition *)nvmem_base_addr[0];
-	ver0 = p_part->tag.generation;
-	p_part = (struct nvmem_partition *)nvmem_base_addr[1];
-	ver1 = p_part->tag.generation;
-
-	/* Compute generation difference accounting for wrap condition */
-	delta = (ver0 - ver1 + (1<<NVMEM_GENERATION_BITS)) &
-		NVMEM_GENERATION_MASK;
-	/*
-	 * If generation number delta is positive in a circular sense then
-	 * partition 0 has the newest generation number. Otherwise, it's
-	 * partition 1.
-	 */
-	return delta < (1<<(NVMEM_GENERATION_BITS-1)) ? 0 : 1;
-}
-
-static enum ec_error_list nvmem_find_partition(void)
-{
-	int n;
-	int newest;
-
-	/* Don't know which partition to use yet */
-	nvmem_act_partition = NVMEM_NOT_INITIALIZED;
-
-	/* Find the newest partition available in flash. */
-	newest = nvmem_compare_generation();
-
-	/*
-	 * Find a partition with a valid sha, starting with the newest one.
-	 */
-	for (n = 0; n < NVMEM_NUM_PARTITIONS; n++) {
-		int check_part = (n + newest) % NVMEM_NUM_PARTITIONS;
-
-		if (nvmem_partition_read_verify(check_part) == EC_SUCCESS) {
-			nvmem_act_partition = check_part;
-			ccprintf("%s:%d found legacy partition %d\n", __func__,
-				 __LINE__, check_part);
-			return EC_SUCCESS;
-		}
-	}
-
-	/*
-	 * If active_partition is still not selected, then neither partition
-	 * is valid. Let's reinitialize the NVMEM - there is nothing else we
-	 * can do.
-	 */
-	CPRINTS("%s: No Legacy Partitions found.", __func__);
-	return EC_ERROR_INVALID_CONFIG;
 }
 
 static enum ec_error_list nvmem_generate_offset_table(void)
@@ -318,24 +212,13 @@ enum ec_error_list nvmem_init(void)
 	 */
 	commits_enabled = 1;
 
-	/*
-	 * Try discovering legacy partition(s). If even one is present, need
-	 * to migrate to the new nvmem storage scheme.
-	 */
-	if (board_nvmem_legacy_check_needed() &&
-	    (nvmem_find_partition() == EC_SUCCESS))
-		ret = new_nvmem_migrate(nvmem_act_partition);
-	else
-		ret = new_nvmem_init();
+	nvmem_error_state = new_nvmem_init();
 
-	nvmem_error_state = ret;
+	if (nvmem_error_state != EC_SUCCESS)
+		CPRINTF("%s:%d error %d!\n",
+			__func__, __LINE__, nvmem_error_state);
 
-	if (ret != EC_SUCCESS) {
-		CPRINTF("%s:%d error %d!\n", __func__, __LINE__, ret);
-		return ret;
-	}
-
-	return EC_SUCCESS;
+	return nvmem_error_state;
 }
 
 enum ec_error_list nvmem_get_error_state(void)

@@ -132,7 +132,6 @@ struct access_tracker {
  * of them acquires nvmem flash protectioin mutex before proceeding.
  */
 enum ec_error_list new_nvmem_init(void);
-enum ec_error_list new_nvmem_migrate(unsigned int nvmem_act_partition);
 enum ec_error_list new_nvmem_save(void);
 
 /*
