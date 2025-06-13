@@ -121,4 +121,9 @@ int emul_pdc_fail_next_ucsi_command(const struct emul *target,
 				    enum std_task_response with_response,
 				    uint8_t num_times);
 
+/* Set the patch loaded interrupt bit. This will cause the driver to re-init all
+ * ports.
+ */
+int emul_pdc_set_interrupt_patch_loaded(const struct emul *target);
+
 #endif /* __EMUL_TPS6699X_H_ */

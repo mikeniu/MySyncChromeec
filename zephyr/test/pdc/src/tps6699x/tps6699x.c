@@ -26,6 +26,7 @@ LOG_MODULE_REGISTER(test_tps6699x, LOG_LEVEL_DBG);
 #define TPS6699X_INIT_RETRY_MAX 3
 
 #define TPS6699X_NODE DT_NODELABEL(pdc_emul1)
+#define TPS6699X_NODE2 DT_NODELABEL(pdc_emul2)
 
 enum port_control_access {
 	ACCESS_OK,
@@ -41,6 +42,7 @@ test_mockable_static int tps_xfer_reg(const struct i2c_dt_spec *i2c,
 
 static const struct emul *emul = EMUL_DT_GET(TPS6699X_NODE);
 static const struct device *dev = DEVICE_DT_GET(TPS6699X_NODE);
+static const struct device *dev2 = DEVICE_DT_GET(TPS6699X_NODE2);
 static enum port_control_access access;
 
 static void tps6699x_before_test(void *data)
@@ -267,4 +269,42 @@ ZTEST_USER(tps6699x, test_init_state_sequence)
 
 	zassert_equal(i, num_loops, "I = %d vs num_loops = %d", i, num_loops);
 	zassert_true(pdc_is_init_done(dev));
+}
+
+/* Cover various branches of handle irq including failures. */
+ZTEST_USER(tps6699x, test_handle_irq)
+{
+	zassert_true(pdc_is_init_done(dev));
+
+	/* Set up some failures to read/write interrupt registers and make sure
+	 * that the irq handling is eventually retried.
+	 */
+	emul_pdc_fail_reg_read(emul, REG_INTERRUPT_EVENT_FOR_I2C1);
+	emul_pdc_fail_reg_write(emul, REG_INTERRUPT_CLEAR_FOR_I2C1);
+
+	zassert_ok(emul_pdc_pulse_irq(emul));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Fail all SET_NOTIFICATION attempts as part of init. One failure will
+	 * be due to attempting to read REG_VERSION. */
+	emul_pdc_fail_next_ucsi_command(emul, UCSI_SET_NOTIFICATION_ENABLE,
+					TASK_REJECTED, TPS6699X_INIT_RETRY_MAX);
+
+	emul_pdc_set_interrupt_patch_loaded(emul);
+	zassert_ok(emul_pdc_pulse_irq(emul));
+	k_sleep(K_MSEC(SLEEP_MS));
+	/* We should have reset into suspend state due to failing init. */
+	zassert_false(pdc_is_init_done(dev));
+
+	/* Recover to idle. */
+	zassert_ok(pdc_set_comms_state(dev, true));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_true(pdc_is_init_done(dev));
+
+	/* Second dev may also be in a stuck state so recover it. */
+	if (!pdc_is_init_done(dev2)) {
+		zassert_ok(pdc_set_comms_state(dev2, true));
+		k_sleep(K_MSEC(SLEEP_MS));
+		zassert_true(pdc_is_init_done(dev2));
+	}
 }

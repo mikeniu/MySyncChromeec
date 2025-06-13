@@ -69,6 +69,11 @@ LOG_MODULE_REGISTER(tps6699x, CONFIG_USBC_LOG_LEVEL);
  */
 #define PDC_TI_GAID_DELAY_MS (1600)
 
+/* Error recovery period for handling interrupts (i.e. tried to read interrupt
+ * registers but failed).
+ */
+#define PDC_HANDLE_IRQ_RETRY_DELAY (50)
+
 /** @brief The number of times to try to initialize the driver before quitting.
  */
 #define PDC_INIT_RETRY_MAX 3
@@ -183,8 +188,6 @@ enum cmd_t {
  * @brief States of the main state machine
  */
 enum state_t {
-	/** Irq State */
-	ST_IRQ,
 	/** Init State */
 	ST_INIT,
 	/** Idle State */
@@ -333,7 +336,6 @@ struct pdc_data_t {
  * @brief List of human readable state names for console debugging
  */
 static const char *const state_names[] = {
-	[ST_IRQ] = "IRQ",
 	[ST_INIT] = "INIT",
 	[ST_IDLE] = "IDLE",
 	[ST_ERROR_RECOVERY] = "ERROR RECOVERY",
@@ -392,7 +394,6 @@ static void set_state(struct pdc_data_t *data, const enum state_t next_state)
 	case ST_INIT:
 	case ST_TASK_WAIT:
 	case ST_ERROR_RECOVERY:
-	case ST_IRQ:
 	case ST_SUSPENDED:
 		k_event_post(&data->pdc_event, PDC_INTERNAL_EVENT);
 		break;
@@ -475,13 +476,6 @@ static void call_cci_event_cb(struct pdc_data_t *data)
 	}
 
 	data->cci_event.raw_value = 0;
-}
-
-static void st_irq_entry(void *o)
-{
-	struct pdc_data_t *data = (struct pdc_data_t *)o;
-
-	print_current_state(data);
 }
 
 static void tps_notify_new_power_contract(struct k_work *work)
@@ -622,9 +616,8 @@ static int pdc_exit_dead_battery(struct pdc_data_t *data)
 	return 0;
 }
 
-static enum smf_state_result st_irq_run(void *o)
+static int handle_irqs(struct pdc_data_t *data)
 {
-	struct pdc_data_t *data = (struct pdc_data_t *)o;
 	struct pdc_config_t const *cfg = data->dev->config;
 	union reg_interrupt pdc_interrupt;
 	int rv;
@@ -635,7 +628,7 @@ static enum smf_state_result st_irq_run(void *o)
 	rv = tps_rd_interrupt_event(&cfg->i2c, &pdc_interrupt);
 	if (rv) {
 		LOG_ERR("Read interrupt events failed");
-		goto error_recovery;
+		return rv;
 	}
 
 	/* All raw_value data uses byte-0 for contains the register data was
@@ -650,85 +643,74 @@ static enum smf_state_result st_irq_run(void *o)
 	}
 	LOG_DBG("\n");
 
-	if (interrupt_pending) {
-		if (pdc_interrupt.patch_loaded) {
-			/* patch_loaded is a shared interrupt bit which is not
-			 * cleared individually so set ST_INIT state to all
-			 * ports to avoid clearing it before handling irq on
-			 * other ports. */
-			set_all_ports_to_init(/*delay_ms=*/0);
-			return;
-		}
-		/* Set CCI EVENT for not supported */
-		data->cci_event.not_supported =
-			pdc_interrupt.not_supported_received;
-
-		/* Set CCI EVENT for vendor defined indicator (informs subsystem
-		 * that an interrupt occurred */
-		data->cci_event.vendor_defined_indicator = 1;
-
-		/* If a UCSI event is seen, stop using the cached connector
-		 * status change bits and re-read from PDC and set CCI_EVENT for
-		 * connector change.
-		 */
-		if (pdc_interrupt.ucsi_connector_status_change_notification) {
-			data->use_cached_conn_status_change = false;
-			data->cci_event.connector_change =
-				cfg->connector_number + 1;
-		}
-
-		if (pdc_interrupt.plug_insert_or_removal) {
-			atomic_set(&data->set_rdo_possible, 0);
-			atomic_set(&data->sink_enable_possible, 0);
-		}
-
-		if (pdc_interrupt.sink_ready) {
-			atomic_set(&data->set_rdo_possible, 1);
-			k_work_reschedule(
-				&data->new_power_contract,
-				K_MSEC(PDC_TI_NEW_POWER_CONTRACT_DELAY_MS));
-		}
-
-		if (pdc_interrupt.new_contract_as_consumer) {
-			atomic_set(&data->sink_enable_possible, 1);
-			k_work_reschedule(
-				&data->new_power_contract,
-				K_MSEC(PDC_TI_NEW_POWER_CONTRACT_DELAY_MS));
-		}
-
-		/* TODO(b/345783692): Handle other interrupt bits. */
-
-		/* Clear the pending interrupt events */
-		rv = tps_rw_interrupt_clear(&cfg->i2c, &pdc_interrupt,
-					    I2C_MSG_WRITE);
-		if (rv) {
-			LOG_ERR("Clear interrupt events failed");
-			goto error_recovery;
-		}
-
-		/* Inform the subsystem of the event */
-		call_cci_event_cb(data);
-		/*
-		 * Check if interrupt is still active from any of the ports.
-		 * It's possible that the PDC will set another bit in the
-		 * interrupt status register of any of the port between the time
-		 * when EC reads this register and clears these status bits
-		 * above. If there is still another interrupt pending, then the
-		 * interrupt line will still be active.
-		 *
-		 * TODO: refactoring the IRQ handling to be more robust when irq
-		 * is triggered and handled.
-		 */
-		tps_check_and_notify_irq();
+	if (interrupt_pending && pdc_interrupt.patch_loaded) {
+		/* patch_loaded is a shared interrupt bit which is not cleared
+		 * individually so set ST_INIT state to all ports to avoid
+		 * clearing it before handling irq on other ports. */
+		set_all_ports_to_init(/*delay_ms=*/0);
+		return 0;
 	}
 
-	/* All done, transition back to idle state */
-	set_state(data, ST_IDLE);
-	return SMF_EVENT_HANDLED;
+	if (!interrupt_pending) {
+		return 0;
+	}
 
-error_recovery:
-	set_state(data, ST_ERROR_RECOVERY);
-	return SMF_EVENT_HANDLED;
+	/* Set CCI EVENT for not supported */
+	data->cci_event.not_supported = pdc_interrupt.not_supported_received;
+
+	/* Set CCI EVENT for vendor defined indicator (informs subsystem
+	 * that an interrupt occurred */
+	data->cci_event.vendor_defined_indicator = 1;
+
+	/* If a UCSI event is seen, stop using the cached connector
+	 * status change bits and re-read from PDC and set CCI_EVENT for
+	 * connector change.
+	 */
+	if (pdc_interrupt.ucsi_connector_status_change_notification) {
+		data->use_cached_conn_status_change = false;
+		data->cci_event.connector_change = cfg->connector_number + 1;
+	}
+
+	if (pdc_interrupt.plug_insert_or_removal) {
+		atomic_set(&data->set_rdo_possible, 0);
+		atomic_set(&data->sink_enable_possible, 0);
+	}
+
+	if (pdc_interrupt.sink_ready) {
+		atomic_set(&data->set_rdo_possible, 1);
+		k_work_reschedule(&data->new_power_contract,
+				  K_MSEC(PDC_TI_NEW_POWER_CONTRACT_DELAY_MS));
+	}
+
+	if (pdc_interrupt.new_contract_as_consumer) {
+		atomic_set(&data->sink_enable_possible, 1);
+		k_work_reschedule(&data->new_power_contract,
+				  K_MSEC(PDC_TI_NEW_POWER_CONTRACT_DELAY_MS));
+	}
+
+	/* TODO(b/345783692): Handle other interrupt bits. */
+
+	/* Clear the pending interrupt events */
+	rv = tps_rw_interrupt_clear(&cfg->i2c, &pdc_interrupt, I2C_MSG_WRITE);
+	if (rv) {
+		LOG_ERR("Clear interrupt events failed");
+		return rv;
+	}
+
+	/* Inform the subsystem of the event */
+	call_cci_event_cb(data);
+
+	/*
+	 * Check if interrupt is still active from any of the ports.
+	 * It's possible that the PDC will set another bit in the
+	 * interrupt status register of any of the port between the time
+	 * when EC reads this register and clears these status bits
+	 * above. If there is still another interrupt pending, then the
+	 * interrupt line will still be active.
+	 */
+	tps_check_and_notify_irq();
+
+	return 0;
 }
 
 static void st_init_entry(void *o)
@@ -864,11 +846,6 @@ static enum smf_state_result st_idle_run(void *o)
 
 		/* Re-enter idle state. */
 		set_state(data, ST_IDLE);
-	} else if (events & PDC_IRQ_EVENT) {
-		k_event_clear(&data->pdc_event, PDC_IRQ_EVENT);
-		/* Handle interrupt */
-		set_state(data, ST_IRQ);
-		return SMF_EVENT_HANDLED;
 	} else if (events & PDC_CMD_EVENT) {
 		k_event_clear(&data->pdc_event, PDC_CMD_EVENT);
 		/* Handle command */
@@ -1052,11 +1029,6 @@ static void st_suspended_entry(void *o)
 static enum smf_state_result st_suspended_run(void *o)
 {
 	struct pdc_data_t *data = (struct pdc_data_t *)o;
-
-	if (data->events & PDC_IRQ_EVENT) {
-		LOG_INF("IRQ in suspend state");
-		k_event_clear(&data->pdc_event, PDC_IRQ_EVENT);
-	}
 
 	if (data->events & PDC_CMD_SUSPEND_REQUEST_EVENT) {
 		k_event_clear(&data->pdc_event, PDC_CMD_SUSPEND_REQUEST_EVENT);
@@ -2252,7 +2224,6 @@ error_recovery:
 
 /* Populate state table */
 static const struct smf_state states[] = {
-	[ST_IRQ] = SMF_CREATE_STATE(st_irq_entry, st_irq_run, NULL, NULL, NULL),
 	[ST_INIT] =
 		SMF_CREATE_STATE(st_init_entry, st_init_run, NULL, NULL, NULL),
 	[ST_IDLE] = SMF_CREATE_STATE(st_idle_entry, st_idle_run, st_idle_exit,
@@ -2959,6 +2930,7 @@ static void tps_check_and_notify_irq(void)
 		if (!gpio_pin_get_dt(&cfg->irq_gpios)) {
 			break;
 		}
+
 		/* Read the pending interrupt events */
 		tps_rd_interrupt_event(&cfg->i2c, &pdc_interrupt);
 
@@ -2992,6 +2964,7 @@ static void tps_thread(void *dev, void *unused1, void *unused2)
 {
 	struct pdc_data_t *data = ((const struct device *)dev)->data;
 	const struct pdc_config_t *cfg = ((const struct device *)dev)->config;
+	bool irq_pending_for_idle = false;
 
 	while (1) {
 		smf_run_state(SMF_CTX(data));
@@ -3004,6 +2977,25 @@ static void tps_thread(void *dev, void *unused1, void *unused2)
 			data->events);
 
 		k_event_clear(&data->pdc_event, PDC_INTERNAL_EVENT);
+
+		if (data->events & PDC_IRQ_EVENT) {
+			k_event_clear(&data->pdc_event, PDC_IRQ_EVENT);
+
+			if (!check_comms_suspended()) {
+				irq_pending_for_idle = true;
+			}
+		}
+
+		/* We only handle IRQs on idle. */
+		if (get_state(data) == ST_IDLE && irq_pending_for_idle) {
+			if (handle_irqs(data) < 0) {
+				k_work_reschedule(
+					&data->delayed_post,
+					K_MSEC(PDC_HANDLE_IRQ_RETRY_DELAY));
+			} else {
+				irq_pending_for_idle = false;
+			}
+		}
 	}
 }
 
