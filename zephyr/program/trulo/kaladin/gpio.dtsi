@@ -29,8 +29,6 @@
 			<&gpiog 3 0>,
 			/* EC_GPG4 */
 			<&gpiog 4 0>,
-			/* EC_GPG5 */
-			<&gpiog 5 0>,
 			/* EC_GPG7 */
 			<&gpiog 7 0>;
 		};

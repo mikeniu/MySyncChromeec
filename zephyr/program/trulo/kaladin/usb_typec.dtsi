@@ -46,8 +46,8 @@
 };
 
 &i2c2 {
-	charger: bq25710@9 {
-		compatible = "ti,bq25710";
+	charger: isl9241@9 {
+		compatible = "intersil,isl9241";
 		status = "okay";
 		reg = <0x9>;
 	};

@@ -185,18 +185,18 @@ error:
 	return rv;
 }
 
-static enum ec_error_list isl9241_get_option(int chgnum, int *option)
+static enum ec_error_list isl95522_get_option(int chgnum, int *option)
 {
 	int rv;
 	uint32_t controls;
 	int reg;
 
-	rv = isl9241_read(chgnum, ISL9241_REG_CONTROL0, &reg);
+	rv = isl9241_read(chgnum, ISL95522_REG_CONTROL1, &reg);
 	if (rv)
 		return rv;
 
 	controls = reg;
-	rv = isl9241_read(chgnum, ISL9241_REG_CONTROL1, &reg);
+	rv = isl9241_read(chgnum, ISL95522_REG_CONTROL2, &reg);
 	if (rv)
 		return rv;
 
@@ -205,15 +205,15 @@ static enum ec_error_list isl9241_get_option(int chgnum, int *option)
 	return EC_SUCCESS;
 }
 
-static enum ec_error_list isl9241_set_option(int chgnum, int option)
+static enum ec_error_list isl95522_set_option(int chgnum, int option)
 {
 	int rv;
 
-	rv = isl9241_write(chgnum, ISL9241_REG_CONTROL0, option & 0xFFFF);
+	rv = isl9241_write(chgnum, ISL95522_REG_CONTROL1, option & 0xFFFF);
 	if (rv)
 		return rv;
 
-	return isl9241_write(chgnum, ISL9241_REG_CONTROL1,
+	return isl9241_write(chgnum, ISL95522_REG_CONTROL2,
 			     (option >> 16) & 0xFFFF);
 }
 
@@ -224,13 +224,13 @@ static const struct charger_info *isl9241_get_info(int chgnum)
 
 static enum ec_error_list isl9241_bypass_mode_enabled(int chgnum, int *enabled)
 {
-	int reg, rv;
+//	int reg, rv;
 
-	rv = isl9241_read(chgnum, ISL9241_REG_CONTROL0, &reg);
-	if (rv)
-		return rv;
+//	rv = isl9241_read(chgnum, ISL9241_REG_CONTROL0, &reg);
+//	if (rv)
+//		return rv;
 
-	*enabled = !!(reg & ISL9241_CONTROL0_EN_BYPASS_GATE);
+//	*enabled = !!(reg & ISL9241_CONTROL0_EN_BYPASS_GATE);
 
 	return EC_SUCCESS;
 }
@@ -244,19 +244,19 @@ static enum ec_error_list isl9241_get_status(int chgnum, int *status)
 	*status = CHARGER_LEVEL_2;
 
 	/* Charge inhibit status */
-	rv = isl9241_read(chgnum, ISL9241_REG_MIN_SYSTEM_VOLTAGE, &reg);
+	rv = isl9241_read(chgnum, ISL95522_REG_CONTROL1, &reg);
 	if (rv)
 		return rv;
-	if (!reg)
+	if (!(reg & ISL95522_REG_CONTROL1_ENABLE_CHARGING))
 		*status |= CHARGER_CHARGE_INHIBITED;
 
 	/* Battery present & AC present status */
-	rv = isl9241_read(chgnum, ISL9241_REG_INFORMATION2, &reg);
+	rv = isl9241_read(chgnum, ISL95522_REG_INFORMATION1, &reg);
 	if (rv)
 		return rv;
-	if (!(reg & ISL9241_INFORMATION2_BATGONE_PIN))
-		*status |= CHARGER_BATTERY_PRESENT;
-	if (reg & ISL9241_INFORMATION2_ACOK_PIN)
+//	if (!(reg & ISL9241_INFORMATION2_BATGONE_PIN))
+//		*status |= CHARGER_BATTERY_PRESENT;
+	if (reg & ISL95522_REG_INFORMATION1_AC_PRESENT)
 		*status |= CHARGER_AC_PRESENT;
 
 	/* Bypass mode status */
@@ -283,22 +283,20 @@ static enum ec_error_list isl9241_set_mode(int chgnum, int mode)
 
 	/*
 	 * Charger inhibit
-	 * MinSystemVoltage 0x00h = disables all battery charging
 	 */
-	rv = isl9241_write(chgnum, ISL9241_REG_MIN_SYSTEM_VOLTAGE,
-			   mode & CHARGE_FLAG_INHIBIT_CHARGE ?
-				   0 :
-				   battery_get_info()->voltage_min);
+	rv = isl9241_update(chgnum, ISL95522_REG_CONTROL1,
+                               ISL95522_REG_CONTROL1_ENABLE_CHARGING,
+                                !(mode & CHARGE_FLAG_INHIBIT_CHARGE) ? MASK_SET : MASK_CLR);
 	if (rv)
 		return rv;
 
 	/* POR reset */
-	if (mode & CHARGE_FLAG_POR_RESET) {
-		mutex_lock(&control3_mutex_isl9241);
-		rv = isl9241_write(chgnum, ISL9241_REG_CONTROL3,
-				   ISL9241_CONTROL3_DIGITAL_RESET);
-		mutex_unlock(&control3_mutex_isl9241);
-	}
+//	if (mode & CHARGE_FLAG_POR_RESET) {
+//		mutex_lock(&control3_mutex_isl9241);
+//		rv = isl9241_write(chgnum, ISL9241_REG_CONTROL3,
+//				   ISL9241_CONTROL3_DIGITAL_RESET);
+//		mutex_unlock(&control3_mutex_isl9241);
+//	}
 
 	return rv;
 }
@@ -434,13 +432,13 @@ static enum ec_error_list isl9241_post_init(int chgnum)
 }
 
 /*
- * Writes to ISL9241_REG_CONTROL1, unsafe as it does not lock
+ * Writes to ISL95522_REG_CONTROL1, unsafe as it does not lock
  * control1_mutex_isl9241.
  */
 static enum ec_error_list isl9241_discharge_on_ac_unsafe(int chgnum, int enable)
 {
-	int rv = isl9241_update(chgnum, ISL9241_REG_CONTROL1,
-				ISL9241_CONTROL1_LEARN_MODE,
+	int rv = isl9241_update(chgnum, ISL95522_REG_CONTROL1,
+				ISL95522_REG_CONTROL1_LEARN_MODE,
 				(enable) ? MASK_SET : MASK_CLR);
 	if (!rv)
 		learn_mode = enable;
@@ -1081,9 +1079,9 @@ static enum ec_error_list isl9241_enable_bypass_mode(int chgnum, bool enable)
 /* ISL-9241 initialization */
 static void isl9241_init(int chgnum)
 {
-#ifdef CONFIG_ISL9241_SWITCHING_FREQ
+//#ifdef CONFIG_ISL9241_SWITCHING_FREQ
 	int ctl_val;
-#endif
+//#endif
 
 	const struct battery_info *bi = battery_get_info();
 
@@ -1105,47 +1103,67 @@ static void isl9241_init(int chgnum)
 		goto init_fail;
 
 	/*
-	 * Set control2 register to
-	 * [15:13]: Trickle Charging Current (battery pre-charge current)
-	 * [10:9] : Prochot# Debounce time (1000us)
+	 * Set control1 register to 0x181C, no standby mode for bring up
 	 */
-	if (isl9241_update(chgnum, ISL9241_REG_CONTROL2,
-			   (ISL9241_CONTROL2_TRICKLE_CHG_CURR(
-				    BC_CURRENT_TO_REG(bi->precharge_current)) |
-			    ISL9241_CONTROL2_PROCHOT_DEBOUNCE_1000),
-			   MASK_SET))
+//	if (isl9241_read(chgnum, ISL95522_REG_CONTROL1, &ctl_val))
+//		goto init_fail;
+
+	ctl_val = 0;
+	ctl_val &= ~ISL95522_REG_CONTROL1_STANDBY_MODE;
+	ctl_val &= ~ISL95522_REG_CONTROL1_LEARN_MODE;
+	ctl_val |= ISL95522_REG_CONTROL1_AMON;
+	ctl_val |= ISL95522_REG_CONTROL1_BMON;
+	ctl_val |= ISL95522_REG_CONTROL1_PSYS;
+	ctl_val |= ISL95522_REG_CONTROL1_WOCP;
+	ctl_val |= ISL95522_REG_CONTROL1_ENABLE_CHARGING;
+	if (isl9241_write(chgnum, ISL95522_REG_CONTROL1, ctl_val))
 		goto init_fail;
+
+	/*
+	 * Set control2 register to 0x0080
+	 */
+
+	ctl_val = 0;
+	ctl_val |= ISL95522_REG_CONTROL2_TRICKLE_CHARGE;
+	if (isl9241_write(chgnum, ISL95522_REG_CONTROL2, ctl_val))
+		goto init_fail;
+//	if (isl9241_update(chgnum, ISL9241_REG_CONTROL2,
+//			   (ISL9241_CONTROL2_TRICKLE_CHG_CURR(
+//				    BC_CURRENT_TO_REG(bi->precharge_current)) |
+//			    ISL9241_CONTROL2_PROCHOT_DEBOUNCE_1000),
+//			   MASK_SET))
+//		goto init_fail;
 
 	/*
 	 * Set control3 register to
 	 * [14]: ACLIM Reload (Do not reload)
 	 */
-	if (isl9241_update(chgnum, ISL9241_REG_CONTROL3,
-			   ISL9241_CONTROL3_ACLIM_RELOAD, MASK_SET))
-		goto init_fail;
+//	if (isl9241_update(chgnum, ISL9241_REG_CONTROL3,
+//			   ISL9241_CONTROL3_ACLIM_RELOAD, MASK_SET))
+//		goto init_fail;
 
 	/*
 	 * Set control4 register to
 	 * [13]: Slew rate control enable (sets VSYS ramp to 8mV/us)
 	 */
-	if (isl9241_update(chgnum, ISL9241_REG_CONTROL4,
-			   ISL9241_CONTROL4_SLEW_RATE_CTRL, MASK_SET))
-		goto init_fail;
+//	if (isl9241_update(chgnum, ISL9241_REG_CONTROL4,
+//			   ISL9241_CONTROL4_SLEW_RATE_CTRL, MASK_SET))
+//		goto init_fail;
 
 #ifndef CONFIG_CHARGE_RAMP_HW
-	if (isl9241_update(chgnum, ISL9241_REG_CONTROL0,
-			   ISL9241_CONTROL0_INPUT_VTG_REGULATION, MASK_SET))
-		goto init_fail;
+//	if (isl9241_update(chgnum, ISL9241_REG_CONTROL0,
+//			   ISL9241_CONTROL0_INPUT_VTG_REGULATION, MASK_SET))
+//		goto init_fail;
 #endif
 
 #ifdef CONFIG_ISL9241_SWITCHING_FREQ
-	if (isl9241_read(chgnum, ISL9241_REG_CONTROL1, &ctl_val))
-		goto init_fail;
-	ctl_val &= ~ISL9241_CONTROL1_SWITCHING_FREQ_MASK;
-	ctl_val |= ((CONFIG_ISL9241_SWITCHING_FREQ << 7) &
-		    ISL9241_CONTROL1_SWITCHING_FREQ_MASK);
-	if (isl9241_write(chgnum, ISL9241_REG_CONTROL1, ctl_val))
-		goto init_fail;
+//	if (isl9241_read(chgnum, ISL9241_REG_CONTROL1, &ctl_val))
+//		goto init_fail;
+//	ctl_val &= ~ISL9241_CONTROL1_SWITCHING_FREQ_MASK;
+//	ctl_val |= ((CONFIG_ISL9241_SWITCHING_FREQ << 7) &
+//		    ISL9241_CONTROL1_SWITCHING_FREQ_MASK);
+//	if (isl9241_write(chgnum, ISL9241_REG_CONTROL1, ctl_val))
+//		goto init_fail;
 #endif
 
 	mutex_unlock(&control3_mutex_isl9241);
@@ -1255,11 +1273,8 @@ static void dump_reg_range(int chgnum, int low, int high)
 static void command_isl9241_dump(int chgnum)
 {
 	dump_reg_range(chgnum, 0x14, 0x15);
-	dump_reg_range(chgnum, 0x38, 0x40);
-	dump_reg_range(chgnum, 0x43, 0x43);
-	dump_reg_range(chgnum, 0x47, 0x4F);
-	dump_reg_range(chgnum, 0x80, 0x87);
-	dump_reg_range(chgnum, 0x90, 0x91);
+	dump_reg_range(chgnum, 0x37, 0x40);
+	dump_reg_range(chgnum, 0x45, 0x48);
 	dump_reg_range(chgnum, 0xFE, 0xFF);
 }
 #endif /* CONFIG_CMD_CHARGER_DUMP */
@@ -1275,15 +1290,15 @@ const struct charger_drv isl9241_drv = {
 	.get_voltage = &isl9241_get_voltage,
 	.set_voltage = &isl9241_set_voltage,
 	.discharge_on_ac = &isl9241_discharge_on_ac,
-	.get_vbus_voltage = &isl9241_get_vbus_voltage,
-	.get_vsys_voltage = &isl9241_get_vsys_voltage,
+	.get_vbus_voltage = &isl9241_get_vbus_voltage, //
+	.get_vsys_voltage = &isl9241_get_vsys_voltage, //
 	.set_input_current_limit = &isl9241_set_input_current_limit,
 	.get_input_current_limit = &isl9241_get_input_current_limit,
 	.manufacturer_id = &isl9241_manufacturer_id,
 	.device_id = &isl9241_device_id,
 	.set_frequency = &isl9241_set_frequency,
-	.get_option = &isl9241_get_option,
-	.set_option = &isl9241_set_option,
+	.get_option = &isl95522_get_option,
+	.set_option = &isl95522_set_option,
 #ifdef CONFIG_CHARGE_RAMP_HW
 	.set_hw_ramp = &isl9241_set_hw_ramp,
 	.ramp_is_stable = &isl9241_ramp_is_stable,

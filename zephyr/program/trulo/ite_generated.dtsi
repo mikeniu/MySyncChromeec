@@ -66,7 +66,7 @@
 			gpios = <&gpioa 5 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW)>;
 		};
 		gpio_ec_prochot_odl: ec_prochot_odl {
-			gpios = <&gpioi 0 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
+			gpios = <&gpioc 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 		};
 		gpio_ec_soc_dsw_pwrok: ec_soc_dsw_pwrok {
 			gpios = <&gpioj 4 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
@@ -168,7 +168,7 @@
 			gpios = <&gpioh 5 GPIO_OUTPUT>;
 		};
 		gpio_ec_batt_pres_odl: ec_batt_pres_odl {
-			gpios = <&gpioc 7 GPIO_INPUT>;
+			gpios = <&gpiog 5 GPIO_INPUT>;
 			enum-name = "GPIO_BATT_PRES_ODL";
 		};
 		gpio_bat_disconnect_ec_odl: bat_disconnect_ec_odl {

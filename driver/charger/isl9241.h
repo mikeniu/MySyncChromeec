@@ -10,7 +10,7 @@
 
 #include "driver/charger/isl9241_public.h"
 
-#define CHARGER_NAME "ISL9241"
+#define CHARGER_NAME "ISL95522"
 #define CHARGE_V_MAX 18304
 #define CHARGE_V_MIN 64
 #define CHARGE_V_STEP 8
@@ -29,18 +29,18 @@
 /* Registers */
 
 /*
- * ChargeCurrentLimit [12:2] 11-bit (0x0000h = disables fast charging,
+ * ChargeCurrentLimit [12:5] 8-bit (0x0000h = disables fast charging,
  * trickle charging is allowed)
  */
 #define ISL9241_REG_CHG_CURRENT_LIMIT 0x14
 
-/* MaxSystemVoltage [14:3] 12-bit, (0x0000h = disables switching) */
+/* MaxSystemVoltage [14:4] 11-bit, (0x0000h = disables switching) */
 #define ISL9241_REG_MAX_SYSTEM_VOLTAGE 0x15
 
 #define ISL9241_REG_CONTROL7 0x38
 
 /* Configures various charger options */
-#define ISL9241_REG_CONTROL0 0x39
+//#define ISL9241_REG_CONTROL0 0x39
 /* 2: Input Voltage Regulation (0 = Enable (default), 1 = Disable) */
 #define ISL9241_CONTROL0_INPUT_VTG_REGULATION BIT(2)
 #define ISL9241_CONTROL0_EN_VIN_VOUT_COMP BIT(5)
@@ -95,7 +95,24 @@
 #define ISL9241_CONTROL2_PROCHOT_DEBOUNCE_500 (2 << 9)
 #define ISL9241_CONTROL2_PROCHOT_DEBOUNCE_1000 (3 << 9)
 
-/* MinSystemVoltage [13:6] 8-bit (0x0000h = disables all battery charging) */
+#define ISL95522_REG_CONTROL1 0x3D
+#define ISL95522_REG_CONTROL1_STANDBY_MODE BIT(0)
+#define ISL95522_REG_CONTROL1_LEARN_MODE BIT(1)
+#define ISL95522_REG_CONTROL1_AMON BIT(2)
+#define ISL95522_REG_CONTROL1_BMON BIT(3)
+#define ISL95522_REG_CONTROL1_PSYS BIT(4)
+#define ISL95522_REG_CONTROL1_WOCP BIT(11)
+#define ISL95522_REG_CONTROL1_ENABLE_CHARGING BIT(12)
+
+#define ISL95522_REG_CONTROL2 0x3C
+#define ISL95522_REG_CONTROL2_TRICKLE_CHARGE BIT(7)
+
+#define ISL95522_REG_INFORMATION1 0x46
+#define ISL95522_REG_INFORMATION1_AC_PRESENT BIT(0)
+
+#define ISL95522_REG_INFORMATION2 0x45
+
+/* MinSystemVoltage [13:8] 6-bit (0x0000h = disables all battery charging) */
 #define ISL9241_REG_MIN_SYSTEM_VOLTAGE 0x3E
 
 #define ISL9241_REG_ADAPTER_CUR_LIMIT1 0x3F
