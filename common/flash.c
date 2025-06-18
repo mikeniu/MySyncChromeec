@@ -766,7 +766,7 @@ static void protect_cbi_overlapped_section(int offset, int size, char *data)
 
 test_mockable int crec_flash_unprotected_read(int offset, int size, char *data)
 {
-#ifdef CONFIG_MAPPED_STORAGE
+#if 0
 	const char *src;
 
 	if (crec_flash_dataptr(offset, size, 1, &src) < 0)

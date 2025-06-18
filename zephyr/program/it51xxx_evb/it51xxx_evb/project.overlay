@@ -22,3 +22,29 @@
 &ite_uart2_wrapper {
 	status = "okay";
 };
+
+&flash0 {
+	status = "disabled";
+};
+&manual_flash_1k {
+	status = "okay";
+
+	flash_m1k0: flash_m1k0@0 {
+		compatible = "soc-nv-flash";
+		reg = <0 DT_SIZE_M(1)>;
+		erase-block-size = <4096>;
+		write-block-size = <1>;
+	};
+
+	m1k-sel-access-flash = "external-fspi-cs1";
+
+
+	pinctrl-0 = <&fspi_fsce1_gpg6_default
+		     &fspi_fdio2_gph5_default
+		     &fspi_fdio3_gph6_default
+		     &fspi_fsck_gpg7_default
+		     &fspi_fsce_gpg3_default
+		     &fspi_fmosi_gpg4_default
+		     &fspi_fmiso_gpg5_default>;
+	pinctrl-names = "default";
+};

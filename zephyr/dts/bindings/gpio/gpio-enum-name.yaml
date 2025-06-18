@@ -144,6 +144,7 @@ properties:
       - GPIO_WARM_RESET_L
       - GPIO_WLC_NRST_CONN
       - GPIO_WPC_IRQ
+      - GPIO_TEST_M1K
       - IOEX_USB_A1_RETIMER_EN
       - IOEX_USB_C0_BB_RETIMER_LS_EN
       - IOEX_USB_C0_BB_RETIMER_RST

@@ -21,6 +21,12 @@
 			gpios = <&gpioe 2 GPIO_INPUT_PULL_UP>;
 			enum-name = "GPIO_LID_OPEN";
 		};
+
+		test_m1k: test_m1k {
+			gpios = <&gpiob 0 GPIO_INPUT_PULL_UP>;
+			enum-name = "GPIO_TEST_M1K";
+		};
+
 		gpio_wp: wp_l {
 			gpios = <&gpioi 4 (GPIO_INPUT_PULL_UP |
 					   GPIO_ACTIVE_LOW)>;
@@ -48,7 +54,8 @@
 	hibernate-wake-pins {
 		compatible = "cros-ec,hibernate-wake-pins";
 		wakeup-irqs = <&int_power_button
-			       &int_lid_open>;
+			       &int_lid_open
+			       &int_test_m1k>;
 	};
 
 	unused-pins {
@@ -73,7 +80,7 @@
 			<&gpioa 7 GPIO_INPUT_PULL_DOWN>,
 
 			/* gpiob0 */
-			<&gpiob 0 GPIO_INPUT_PULL_DOWN>,
+
 			/* gpiob1 */
 			<&gpiob 1 GPIO_INPUT_PULL_DOWN>,
 			/* gpiob2 */
@@ -110,7 +117,7 @@
 			<&gpiod 7 GPIO_INPUT_PULL_DOWN>,
 
 			/* gpioe1 */
-			<&gpioe 1 GPIO_INPUT_PULL_DOWN>,
+			<&gpioe 1 GPIO_INPUT>,
 			/* gpioe4 */
 			<&gpioe 4 GPIO_INPUT_PULL_DOWN>,
 			/* gpioe5 */
@@ -130,9 +137,8 @@
 			/* gpiog1 */
 			<&gpiog 1 GPIO_INPUT_PULL_DOWN>,
 			/* gpiog2 */
-			<&gpiog 2 GPIO_INPUT_PULL_DOWN>,
-			/* gpiog6 */
-			<&gpiog 6 GPIO_INPUT_PULL_DOWN>,
+			<&gpiog 2 GPIO_INPUT_PULL_UP>,
+
 
 			/* gpioh0 */
 			<&gpioh 0 GPIO_INPUT_PULL_DOWN>,
@@ -141,10 +147,7 @@
 			<&gpioh 3 GPIO_INPUT_PULL_DOWN>,
 			/* gpioh4 */
 			<&gpioh 4 GPIO_INPUT_PULL_DOWN>,
-			/* gpioh5 */
-			<&gpioh 5 GPIO_INPUT_PULL_DOWN>,
-			/* gpioh6 */
-			<&gpioh 6 GPIO_INPUT_PULL_DOWN>,
+
 			/* gpioh7 */
 			<&gpioh 7 GPIO_INPUT_PULL_DOWN>,
 

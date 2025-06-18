@@ -280,6 +280,7 @@ static int cros_flash_it8xxx2_write(const struct device *dev, int offset,
 		return -EACCES;
 	}
 
+	printk("[cros]write: flash_controller=%p\n",flash_controller);
 	/*
 	 * If AP sends write flash command continuously, EC might not have
 	 * chance to go back to hook task to touch watchdog. Reload watchdog
@@ -296,6 +297,8 @@ static int cros_flash_it8xxx2_erase(const struct device *dev, int offset,
 {
 	struct cros_flash_it8xxx2_data *const data = DRV_DATA(dev);
 	int ret = 0;
+
+	printk("[cros]erase: flash_controller=%p\n",flash_controller);
 
 	if (data->all_protected) {
 		return -EACCES;

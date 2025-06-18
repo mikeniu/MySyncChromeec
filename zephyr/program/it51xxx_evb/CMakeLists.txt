@@ -11,5 +11,5 @@ project(it51xxx_evb)
 zephyr_include_directories(include)
 
 zephyr_library_sources("src/hooks.c")
-zephyr_library_sources("src/i2c_test.c")
-zephyr_library_sources("src/i2c_ite_target_cb.c")
+#zephyr_library_sources("src/i2c_test.c")
+#zephyr_library_sources("src/i2c_ite_target_cb.c")
