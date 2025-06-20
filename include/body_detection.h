@@ -40,6 +40,8 @@ int body_detect_get_enable(void);
 void body_detect_set_spoof(int enable);
 bool body_detect_get_spoof(void);
 
+void body_detect_set_update_rate(int odr);
+
 #ifdef __cplusplus
 }
 #endif

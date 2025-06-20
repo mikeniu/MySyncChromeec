@@ -1684,6 +1684,7 @@ tests:
     - ec_host_cmd.conf
   drivers.body_detection:
     extra_configs:
+    - CONFIG_FPU=y
     - CONFIG_LINK_TEST_SUITE_BODY_DETECTION=y
     - CONFIG_PLATFORM_EC_BODY_DETECTION=y
     - CONFIG_PLATFORM_EC_BODY_DETECTION_ALWAYS_ENABLE_IN_S0=y
@@ -1691,6 +1692,7 @@ tests:
     - CONFIG_PLATFORM_EC_GESTURE_HOST_DETECTION=y
   drivers.body_detection.ec_host_cmd:
     extra_configs:
+    - CONFIG_FPU=y
     - CONFIG_LINK_TEST_SUITE_BODY_DETECTION=y
     - CONFIG_PLATFORM_EC_BODY_DETECTION=y
     - CONFIG_PLATFORM_EC_BODY_DETECTION_ALWAYS_ENABLE_IN_S0=y

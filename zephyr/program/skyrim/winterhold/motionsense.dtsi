@@ -76,8 +76,8 @@
 				compatible = "cros-ec,motionsense-bodydetect";
 				status = "okay";
 				var_noise_factor = <150>;
-				var_threshold = <3000>;
-				confidence_delta = <2900>;
+				var_threshold = <1000>;
+				confidence_delta = <900>;
 			};
 			configs {
 				compatible =

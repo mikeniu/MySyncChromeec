@@ -4,6 +4,7 @@
 
 menuconfig PLATFORM_EC_BODY_DETECTION
 	bool "Sensor body detection"
+	depends on FPU
 	help
 	  Enable the body detection function.
 
@@ -23,23 +24,25 @@ config PLATFORM_EC_BODY_DETECTION_MAX_WINDOW_SIZE
 
 config PLATFORM_EC_BODY_DETECTION_VAR_THRESHOLD
 	int "The threshold of acceleration variance for confidence calculation"
-	default 550
+	default 4000
 	help
-	  The unit is (mm/s^2)^2
+	  The unit is uG
 
-	  The motion confidence is calculated if the variance is within
-	  variance_threshold +/- confidence_delta. Otherwise, if variance is
-	  too high/low, confidence will be 100%/0%
+	  The motion confidence is calculated if the variance estimator is
+	  within variance_threshold +/- confidence_delta. Otherwise, if
+	  variance estimator is too high/low, confidence will be 100%/0%
 
 config PLATFORM_EC_BODY_DETECTION_CONFIDENCE_DELTA
 	int "The delta of acceleration variance for confidence calculation"
-	default 525
+	default 3000
 	help
-	  The unit is (mm/s^2)^2
+	  The unit is uG
 
-	  The motion confidence is calculated if the variance is within
-	  variance_threshold +/- confidence_delta. Otherwise, if variance is
-	  too high/low, confidence will be 100%/0%
+	  The value of hysteresis applied to threshold-based detection.
+	  Once the variance estimator exceeded variance_threshold +
+	  confidence_delta and on-body state was activated it needs to
+	  fall below variance_threshold - confidence_delta to return to
+	  off-body state.
 
 config PLATFORM_EC_BODY_DETECTION_VAR_NOISE_FACTOR
 	int "How much noise affects the threshold of variance"
@@ -54,7 +57,7 @@ config PLATFORM_EC_BODY_DETECTION_VAR_NOISE_FACTOR
 
 config PLATFORM_EC_BODY_DETECTION_ON_BODY_CON
 	int "The confidence limit of on_body"
-	default 50
+	default 90
 	help
 	  The unit is percentage
 
