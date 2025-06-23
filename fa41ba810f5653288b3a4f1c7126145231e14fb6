@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dbb13463_be7e74cf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1525237
+      },
+      "writtenOn": "2025-06-23T01:30:47Z",
+      "side": 1,
+      "message": "If it\u0027s a WA for specific module (e.g. GMT G2176) :\n\n1) Please also mentioned the module you\u0027ve WA for.\n2) List clear steps how you test the OCP and recovery.\n3) Has anyone reach to the module vendor for this issue ? What\u0027s the reason cause OCP ?",
+      "revId": "fa41ba810f5653288b3a4f1c7126145231e14fb6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
