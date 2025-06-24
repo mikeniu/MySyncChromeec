@@ -30,6 +30,7 @@ import hkdf_test
 import rsa_test
 import subcmd
 import tpm
+import sb
 import trng_test
 import upgrade_test
 import u2f_test
@@ -183,7 +184,7 @@ def check_for_run(requested_test):
 def usage():
     """Print usage information"""
     print('Syntax: tpmtest.py [-d] | [-t source [-o file] [-s bits] ]| -h | '
-          '                           -T test_name ]\n'
+          '                           -T test_name | -p | -b ]\n'
           '     -d - prints additional debug information during tests\n'
           '     -t source - only dump raw output from TRNG. source values:\n'
           '        0 - raw TRNG'
@@ -194,19 +195,21 @@ def usage():
           '     -e path for the lab expected results file\n'
           '     -f run FIPS_CMD test\n'
           '     -p run TPM2 test\n'
+          '     -b run Strongbox test\n'
           '     -T test to run\n'
           '     -h - this help\n')
 
 def main():
     """Run TPM tests"""
     try:
-        opts, _ = getopt.getopt(sys.argv[1:], 'dpft:T:hs:o:r:e:l:', 'help')
+        opts, _ = getopt.getopt(sys.argv[1:], 'dpfbt:T:hs:o:r:e:l:', 'help')
     except getopt.GetoptError as err:
         print(str(err))
         usage()
         sys.exit(2)
     debug_needed = False
     tpmtest_only = False
+    sbtest_only = False
     fipstest_only = False
     trng_only = False
     trng_output = '/tmp/trng_output'
@@ -222,6 +225,8 @@ def main():
             debug_needed = True
         elif option == '-p':
             tpmtest_only = True
+        elif option == '-b':
+            sbtest_only = True
         elif option == '-f':
             fipstest_only = True
         elif option == '-t':
@@ -249,6 +254,9 @@ def main():
             sys.exit(0)
         if fipstest_only:
             fipscmd.fips_cmd_test(tpm_object)
+            sys.exit(0)
+        if sbtest_only:
+            sb.sb_test(tpm_object)
             sys.exit(0)
         if trng_only:
             trng_test.trng_test(tpm_object, trng_output,

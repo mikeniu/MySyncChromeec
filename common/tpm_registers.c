@@ -666,13 +666,12 @@ size_t tpm_get_burst_size(void)
 #ifdef CONFIG_EXTENSION_COMMAND
 
 /* Recognize both original extension and new vendor-specific command codes */
-#define IS_CUSTOM_CODE(code)					\
-	((code == CONFIG_EXTENSION_COMMAND) ||			\
-	 (code == TPM_CC_VENDOR_BIT_MASK))
+#define IS_CUSTOM_CODE(code) \
+	((code == CONFIG_EXTENSION_COMMAND) || (code & TPM_CC_VENDOR_BIT_MASK))
 
 static void call_extension_command(struct tpm_cmd_header *tpmh,
 				   size_t *total_size,
-				   uint32_t flags)
+				   uint32_t flags, uint32_t le_command_code)
 {
 	size_t command_size = be32toh(tpmh->size);
 	uint32_t rc;
@@ -692,12 +691,17 @@ static void call_extension_command(struct tpm_cmd_header *tpmh,
 			.out_size = *total_size - sizeof(struct tpm_cmd_header),
 			.flags = flags
 		};
-
-		if (tpmh->command_code ==
-		    (TPM_CC_VENDOR_STRONGBOX | TPM_CC_VENDOR_BIT_MASK)) {
-			rc = extension_route_strongbox_command(&p);
-		} else {
+		rc = VENDOR_RC_NO_SUCH_SUBCOMMAND;
+		switch (le_command_code) {
+		case CONFIG_EXTENSION_COMMAND:
+		case TPM_CC_VENDOR_CR50:
 			rc = extension_route_command(&p);
+			break;
+		case TPM_CC_VENDOR_STRONGBOX:
+			rc = extension_route_strongbox_command(&p);
+			break;
+		default:
+			break;
 		}
 
 		/* Add the header size back. */
@@ -1090,9 +1094,10 @@ void tpm_task(void *u)
 #ifdef CONFIG_EXTENSION_COMMAND
 		if (is_custom_command) {
 			response_size = buffer_size;
-			call_extension_command(tpmh, &response_size,
-					       alt_if_command ?
-					       VENDOR_CMD_FROM_ALT_IF : 0);
+			call_extension_command(
+				tpmh, &response_size,
+				alt_if_command ? VENDOR_CMD_FROM_ALT_IF : 0,
+				command_code);
 		} else
 #endif
 		{
