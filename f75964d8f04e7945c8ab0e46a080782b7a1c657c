@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed15b428_f927bb6b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1558277
+      },
+      "writtenOn": "2025-06-25T06:48:48Z",
+      "side": 1,
+      "message": "Hi all.\n\nWA has been removed, just enable and disable the backlight normally.\n\nThanks~",
+      "revId": "f75964d8f04e7945c8ab0e46a080782b7a1c657c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
