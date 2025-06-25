@@ -70,6 +70,24 @@
       "parentUuid": "ec4b98c4_30cb549e",
       "revId": "fa41ba810f5653288b3a4f1c7126145231e14fb6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9cc1bd60_dd917d19",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1525237
+      },
+      "writtenOn": "2025-06-25T07:17:37Z",
+      "side": 1,
+      "message": "Got it, you\u0027ve remove the WA, then I\u0027m good with current CL.",
+      "parentUuid": "f07da9f5_d082f628",
+      "revId": "fa41ba810f5653288b3a4f1c7126145231e14fb6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
