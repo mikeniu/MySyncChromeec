@@ -4,4 +4,5 @@
 
 zephyr_library_sources("src/board.c")
 zephyr_library_sources("src/board_power.c")
+zephyr_library_sources("src/charger.c")
 zephyr_library_sources("src/hibernate.c")
