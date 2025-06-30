@@ -335,6 +335,40 @@ int raa489000_debug_detach(int port)
 	return rv;
 }
 
+int raa489000_debug_prs_snk(int port)
+{
+	int rv;
+
+	/* b/422547736 Workaround Step 3: Set TYPE_C_STATUS_2(C4h) = 0x29 (POTENTIAL_SNK) */
+	rv = tcpc_write16(port, RAA489000_TYPEC_STATUS2, 0x29);
+	if (rv) {
+		CPRINTS("c(%d): Failed to write 0x29 to 0xc4 reg", port);
+		return rv;
+	}
+
+	/* b/422547736 Workaround Step 4: Set TYPE_C_STATUS_2(C4h) = 0x2b (DebugAcc.SNK) */
+	rv = tcpc_write16(port, RAA489000_TYPEC_STATUS2, 0x2b);
+	if (rv) {
+		CPRINTS("c(%d): Failed to write 0x2b to 0xc4 reg", port);
+		return rv;
+	}
+
+	/* b/422547736 Workaround Step 5: Set ROLE_CONTROL = 0x0A (dsp=0, Rd/Rd) */
+	rv = tcpc_write(port, TCPC_REG_ROLE_CTRL, 0x0a);
+	if (rv) {
+		CPRINTS("c(%d): Failed to write to role control reg", port);
+		return rv;
+	}
+
+	return EC_SUCCESS;
+}
+
+int raa489000_debug_prs_exit(int port)
+{
+	return tcpc_write16(port, RAA489000_TYPEC_STATUS2, 0);
+}
+
+
 /* RAA489000 is a TCPCI compatible port controller */
 const struct tcpm_drv raa489000_tcpm_drv = {
 	.init = &raa489000_init,
