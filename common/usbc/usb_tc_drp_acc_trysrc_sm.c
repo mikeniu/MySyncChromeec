@@ -1983,6 +1983,11 @@ int tc_is_vconn_src(int port)
 		return 0;
 }
 
+int tc_is_debug_acc_connected(int port)
+{
+	return TC_CHK_FLAG(port, TC_FLAGS_TS_DTS_PARTNER);
+}
+
 static __maybe_unused int reset_device_and_notify(int port)
 {
 	int rv;
@@ -2773,6 +2778,8 @@ static void tc_attached_snk_run(const int port)
 #endif /* CONFIG_USB_PE_SM */
 }
 
+int raa489000_debug_prs(int port);
+
 static void tc_attached_snk_exit(const int port)
 {
 	if (!TC_CHK_FLAG(port, TC_FLAGS_REQUEST_PR_SWAP)) {
@@ -3051,6 +3058,11 @@ static void tc_attached_src_entry(const int port)
 			 * Discharge Disconnect in tc_pr_swap_complete. That's
 			 * too late for a sink-to-source PRS. */
 			tcpm_enable_auto_discharge_disconnect(port, 1);
+
+			if (TC_CHK_FLAG(port, TC_FLAGS_TS_DTS_PARTNER)) {
+				CPRINTS("C%d: Apply PRS workaround", port);
+				raa489000_debug_prs(port);
+			}
 
 			/*
 			 * Maintain VCONN supply state, whether ON or OFF, and

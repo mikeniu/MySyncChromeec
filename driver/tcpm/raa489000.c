@@ -335,6 +335,43 @@ int raa489000_debug_detach(int port)
 	return rv;
 }
 
+int raa48900_set_vbus_sink_disconnect_threshold(int port, int val)
+{
+	int rv;
+
+	rv = tcpc_write16(port, RAA489000_VBUS_SINK_DISCONNECT_THRESHOLD, val);
+	if (rv)
+		CPRINTS("c(%d): Failed to write to SET_VBUS_SINK_DISCONNECT_THRESHOLD",
+			port);
+
+	return rv;
+}
+
+int raa489000_debug_prs(int port)
+{
+	int rv;
+
+	rv = tcpc_write16(port, 0xc4, 0xb1);
+	if (rv) {
+		CPRINTS("c(%d): Failed to write 0xb1 to 0xc4 reg", port);
+		return rv;
+	}
+
+	rv = tcpc_write16(port, 0xc4, 0xb3);
+	if (rv) {
+		CPRINTS("c(%d): Failed to write 0xb3 to 0xc4 reg", port);
+		return rv;
+	}
+
+	rv = tcpc_write(port, TCPC_REG_ROLE_CTRL, 0x45);
+	if (rv) {
+		CPRINTS("c(%d): Failed to write to role control reg", port);
+		return rv;
+	}
+
+	return EC_SUCCESS;
+}
+
 /* RAA489000 is a TCPCI compatible port controller */
 const struct tcpm_drv raa489000_tcpm_drv = {
 	.init = &raa489000_init,

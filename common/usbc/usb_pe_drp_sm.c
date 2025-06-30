@@ -5413,12 +5413,23 @@ static void pe_prs_snk_src_evaluate_swap_entry(int port)
 	}
 }
 
+extern int raa48900_set_vbus_sink_disconnect_threshold(int port, int val);
+
 static void pe_prs_snk_src_evaluate_swap_run(int port)
 {
 	if (PE_CHK_FLAG(port, PE_FLAGS_TX_COMPLETE)) {
 		PE_CLR_FLAG(port, PE_FLAGS_TX_COMPLETE);
 		if (PE_CHK_FLAG(port, PE_FLAGS_ACCEPT)) {
 			PE_CLR_FLAG(port, PE_FLAGS_ACCEPT);
+
+			if (tc_is_debug_acc_connected(port)) {
+				CPRINTS("C%d: Apply test code for Dbg Acc in %s",
+					port, __func__);
+				raa48900_set_vbus_sink_disconnect_threshold(
+					port, 0);
+				tcpm_enable_auto_discharge_disconnect(port,
+								      false);
+			}
 
 			/*
 			 * Clear any pending DPM power role swap request so we
@@ -5586,6 +5597,12 @@ static void pe_prs_snk_src_source_on_run(int port)
 
 		/* Run swap source timer on entry to pe_src_startup */
 		PE_SET_FLAG(port, PE_FLAGS_PR_SWAP_COMPLETE);
+		if (tc_is_debug_acc_connected(port)) {
+			CPRINTS("C%d: Apply test code for Dbg Acc in %s", port,
+				__func__);
+			raa48900_set_vbus_sink_disconnect_threshold(port, 0x72);
+			tcpm_enable_auto_discharge_disconnect(port, true);
+		}
 		set_state_pe(port, PE_SRC_STARTUP);
 	}
 }

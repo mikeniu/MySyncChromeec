@@ -234,6 +234,8 @@ int tc_check_vconn_swap(int port);
  */
 int tc_is_vconn_src(int port);
 
+int tc_is_debug_acc_connected(int port);
+
 /**
  * Instructs the Attached.SRC or Attached.SNK to start sourcing VCONN.
  * This function is called from the Policy Engine and only has effect
