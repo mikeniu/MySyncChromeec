@@ -2826,6 +2826,8 @@ static void tc_attached_snk_run(const int port)
 #endif /* CONFIG_USB_PE_SM */
 }
 
+int raa489000_debug_prs(int port);
+
 static void tc_attached_snk_exit(const int port)
 {
 	if (!TC_CHK_FLAG(port, TC_FLAGS_REQUEST_PR_SWAP)) {
@@ -2853,6 +2855,12 @@ static void tc_attached_snk_exit(const int port)
 	if (TC_CHK_FLAG(port, TC_FLAGS_TS_DTS_PARTNER) &&
 	    !TC_CHK_FLAG(port, TC_FLAGS_REQUEST_PR_SWAP)) {
 		tcpm_debug_detach(port);
+	}
+
+	if (TC_CHK_FLAG(port, TC_FLAGS_TS_DTS_PARTNER) &&
+	    TC_CHK_FLAG(port, TC_FLAGS_REQUEST_PR_SWAP)) {
+		CPRINTS("C%d: Apply PRS workaround", port);
+		raa489000_debug_prs(port);
 	}
 
 	/* Clear flags after checking Vconn status */
