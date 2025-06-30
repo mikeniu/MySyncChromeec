@@ -5211,7 +5211,10 @@ static void pe_prs_src_snk_transition_to_off_run(int port)
 
 	if (!PE_CHK_FLAG(port, PE_FLAGS_SRC_SNK_SETTLE)) {
 		PE_SET_FLAG(port, PE_FLAGS_SRC_SNK_SETTLE);
-		/* Tell TypeC to power off the source */
+		/*
+		 * b/422547736 Workaround Step 2:
+		 * Set Vbus Off
+		 */
 		tc_src_power_off(port);
 
 		pd_timer_enable(port, PE_TIMER_PS_SOURCE,
@@ -5271,8 +5274,9 @@ static void pe_prs_src_snk_wait_source_on_run(int port)
 	}
 
 	/*
-	 * Transition to PE_SNK_Startup when:
-	 *   1) A PS_RDY Message is received.
+	 * b/422547736 Workaround Step 6:
+	 * Wait to receive PS_RDY which is sent by partner.
+	 * Transition to PE_SNK_Startup when a PS_RDY Message is received.
 	 */
 	if (!pd_timer_is_disabled(port, PE_TIMER_PS_SOURCE) &&
 	    PE_CHK_FLAG(port, PE_FLAGS_MSG_RECEIVED)) {

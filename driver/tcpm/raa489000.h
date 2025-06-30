@@ -22,6 +22,7 @@
 #define RAA489000_VBUS_CURRENT_TARGET 0x92
 #define RAA489000_VBUS_OCP_UV_THRESHOLD 0x94
 #define RAA489000_TYPEC_SETTING1 0xC0
+#define RAA489000_TYPEC_STATUS2 0xC4
 #define RAA489000_PD_PHYSICAL_SETTING1 0xE0
 #define RAA489000_PD_PHYSICAL_PARAMETER1 0xE8
 
@@ -85,6 +86,22 @@
  * @return	Zero if the current limit set was successful, non-zero otherwise
  */
 int raa489000_set_output_current(int port, enum tcpc_rp_value rp);
+
+/**
+ * Apply workaround for Debug Accessory PR swap to Sink.
+ *
+ * @param port USB-C port number
+ * @return EC_SUCCESS or error
+ */
+int raa489000_debug_prs_snk(int port);
+
+/**
+ * Exit Debug Accessory PRS workaround (clear overrides).
+ *
+ * @param port USB-C port number
+ * @return EC_SUCCESS or error
+ */
+int raa489000_debug_prs_exit(int port);
 
 extern const struct tcpm_drv raa489000_tcpm_drv;
 

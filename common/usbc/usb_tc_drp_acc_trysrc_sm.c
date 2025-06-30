@@ -2531,6 +2531,9 @@ static void tc_attach_wait_snk_exit(const int port)
 	pd_timer_disable(port, TC_TIMER_PD_DEBOUNCE);
 }
 
+int raa489000_debug_prs_snk(int port);
+int raa489000_debug_prs_exit(int port);
+
 /**
  * Attached.SNK, shared with Debug Accessory.SNK
  */
@@ -2555,11 +2558,24 @@ static void tc_attached_snk_entry(const int port)
 
 	if (IS_ENABLED(CONFIG_USB_PE_SM) &&
 	    TC_CHK_FLAG(port, TC_FLAGS_PR_SWAP_IN_PROGRESS)) {
-		/* Flipping power role - Disable AutoDischargeDisconnect */
+		/*
+		 * b/422547736 Workaround Step 1:
+		 * Set POWER_CONTROL.AutoDischargeDisconnect = 0
+		 */
 		tcpm_enable_auto_discharge_disconnect(port, 0);
 
 		/* Apply Rd */
 		typec_update_cc(port);
+
+		if (TC_CHK_FLAG(port, TC_FLAGS_TS_DTS_PARTNER)) {
+			/*
+			 * b/422547736 Workaround Steps 3, 4, 5:
+			 * Set TYPE_C_STATUS_2(C4h) = 0x29 (POTENTIAL_SNK)
+			 * Set TYPE_C_STATUS_2(C4h) = 0x2b (DebugAcc.SNK)
+			 * Set ROLE_CONTROL = 0x0A (dsp=0, Rd/Rd)
+			 */
+			raa489000_debug_prs_snk(port);
+		}
 
 		/* Change role to sink */
 		tc_set_power_role(port, PD_ROLE_SINK);
@@ -2720,10 +2736,9 @@ static void tc_attached_snk_run(const int port)
 		pd_timer_disable(port, TC_TIMER_VBUS_DEBOUNCE);
 
 		/*
-		 * AutoDischargeDisconnect was turned off when we
-		 * hit Safe0V on SRC->SNK PR-Swap. We now are done
-		 * with the swap and should have Vbus, so re-enable
-		 * AutoDischargeDisconnect.
+		 * b/422547736 Workaround Step 7 & 8:
+		 * Wait POWER_STATUS.VBUS_Present = 1 (checked via !VBUS_REMOVED)
+		 * and set POWER_CONTROL.AutoDischargeDisconnect = 1.
 		 */
 		if (!pd_check_vbus_level(port, VBUS_REMOVED))
 			tcpm_enable_auto_discharge_disconnect(port, 1);
@@ -2836,10 +2851,11 @@ static void tc_attached_snk_run(const int port)
 	sink_power_sub_states(port);
 #endif /* CONFIG_USB_PE_SM */
 }
-
 static void tc_attached_snk_exit(const int port)
 {
 	if (!TC_CHK_FLAG(port, TC_FLAGS_REQUEST_PR_SWAP)) {
+		if (TC_CHK_FLAG(port, TC_FLAGS_TS_DTS_PARTNER))
+			raa489000_debug_prs_exit(port);
 		/*
 		 * If supplying VCONN, the port shall cease to supply
 		 * it within tVCONNOFF of exiting Attached.SNK if not
