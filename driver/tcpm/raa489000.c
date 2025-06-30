@@ -24,6 +24,7 @@
 #define CPRINTS(format, args...) cprints(CC_USBPD, format, ##args)
 
 static int dev_id[CONFIG_USB_PD_PORT_MAX_COUNT] = { -1 };
+static void raa489000_unlatch_status(int port);
 
 #ifdef CONFIG_USB_PD_TCPC_LOW_POWER
 static int raa489000_enter_low_power_mode(int port)
@@ -157,10 +158,17 @@ int raa489000_init(int port)
 			CPRINTS("C%d: failed to set TCPC power control", port);
 	}
 
+	/* Clear any stale manual state machine override and reset role control to Rd */
+	tcpc_write16(port, RAA489000_TYPEC_STATUS2, 0);
+	tcpc_write(port, TCPC_REG_ROLE_CTRL, 0x0a);
+
 	/* Note: registers may not be ready until TCPCI init succeeds */
 	rv = tcpci_tcpm_init(port);
 	if (rv)
 		return rv;
+
+	/* Unlatch status registers and print diagnostic logs */
+	raa489000_unlatch_status(port);
 
 	/*
 	 * Set some vendor defined registers to enable the CC comparators and
@@ -331,6 +339,144 @@ int raa489000_debug_detach(int port)
 	rv = tcpci_tcpm_set_cc(port, TYPEC_CC_OPEN);
 
 	tcpci_tcpc_enable_auto_discharge_disconnect(port, 0);
+
+	return rv;
+}
+
+int raa48900_set_vbus_sink_disconnect_threshold(int port, int val)
+{
+	int rv;
+
+	rv = tcpc_write16(port, RAA489000_VBUS_SINK_DISCONNECT_THRESHOLD, val);
+	if (rv)
+		CPRINTS("c(%d): Failed to write to SET_VBUS_SINK_DISCONNECT_THRESHOLD",
+			port);
+
+	return rv;
+}
+
+int raa48900_get_vbus_sink_disconnect_threshold(int port, int *val)
+{
+	return tcpc_read16(port, RAA489000_VBUS_SINK_DISCONNECT_THRESHOLD, val);
+}
+
+int raa489000_debug_prs(int port)
+{
+	int rv;
+
+	rv = tcpc_write16(port, RAA489000_TYPEC_STATUS2, 0xb1);
+	if (rv) {
+		CPRINTS("c(%d): Failed to write 0xb1 to 0xc4 reg", port);
+		return rv;
+	}
+
+	rv = tcpc_write16(port, RAA489000_TYPEC_STATUS2, 0xb3);
+	if (rv) {
+		CPRINTS("c(%d): Failed to write 0xb3 to 0xc4 reg", port);
+		return rv;
+	}
+
+	rv = tcpc_write(port, TCPC_REG_ROLE_CTRL, 0x45);
+	if (rv) {
+		CPRINTS("c(%d): Failed to write to role control reg", port);
+		return rv;
+	}
+
+	return EC_SUCCESS;
+}
+
+int raa489000_debug_prs_snk(int port)
+{
+	int rv;
+
+	rv = tcpc_write16(port, RAA489000_TYPEC_STATUS2, 0x29);
+	if (rv) {
+		CPRINTS("c(%d): Failed to write 0x29 to 0xc4 reg", port);
+		return rv;
+	}
+
+	rv = tcpc_write16(port, RAA489000_TYPEC_STATUS2, 0x2b);
+	if (rv) {
+		CPRINTS("c(%d): Failed to write 0x2b to 0xc4 reg", port);
+		return rv;
+	}
+
+	rv = tcpc_write(port, TCPC_REG_ROLE_CTRL, 0x0a);
+	if (rv) {
+		CPRINTS("c(%d): Failed to write to role control reg", port);
+		return rv;
+	}
+
+	return EC_SUCCESS;
+}
+
+static void raa489000_unlatch_status(int port)
+{
+	int alert = 0, pwr = 0, cc = 0, fault = 0, role = 0, c4 = 0, vbus = 0;
+	int dummy = 0;
+
+	/* Read full register set (same as tcpci_dump) to unlatch hardware state */
+	tcpc_read16(port, TCPC_REG_ALERT, &alert);
+	tcpc_read16(port, TCPC_REG_ALERT_MASK, &dummy);
+	tcpc_read(port, TCPC_REG_POWER_STATUS_MASK, &dummy);
+	tcpc_read(port, TCPC_REG_FAULT_STATUS_MASK, &dummy);
+	tcpc_read(port, TCPC_REG_CONFIG_STD_OUTPUT, &dummy);
+	tcpc_read(port, TCPC_REG_TCPC_CTRL, &dummy);
+	tcpc_read(port, TCPC_REG_ROLE_CTRL, &role);
+	tcpc_read(port, TCPC_REG_POWER_CTRL, &dummy);
+	tcpc_read(port, TCPC_REG_CC_STATUS, &cc);
+	tcpc_read(port, TCPC_REG_POWER_STATUS, &pwr);
+	tcpc_read(port, TCPC_REG_FAULT_STATUS, &fault);
+	tcpc_read16(port, TCPC_REG_VBUS_VOLTAGE, &vbus);
+	tcpc_read16(port, RAA489000_TCPC_SETTING1, &dummy);
+	tcpc_read16(port, RAA489000_TYPEC_SETTING1, &dummy);
+	tcpc_read16(port, RAA489000_TYPEC_STATUS2, &c4);
+	tcpc_read16(port, RAA489000_PD_PHYSICAL_SETTING1, &dummy);
+
+	/* Trigger VBUS detect command */
+	tcpc_write(port, TCPC_REG_COMMAND, TCPC_REG_COMMAND_ENABLE_VBUS_DETECT);
+	tcpc_read16(port, TCPC_REG_VBUS_VOLTAGE, &vbus);
+	tcpc_read(port, TCPC_REG_CC_STATUS, &cc);
+	tcpc_read(port, TCPC_REG_POWER_STATUS, &pwr);
+
+	/* Clear alert & fault registers */
+	if (alert)
+		tcpc_write16(port, TCPC_REG_ALERT, alert);
+	if (fault)
+		tcpc_write(port, TCPC_REG_FAULT_STATUS, fault);
+}
+
+int raa489000_debug_prs_exit(int port)
+{
+	int rv;
+	int reg;
+
+	/* 1. Clear the custom state override */
+	rv = tcpc_write16(port, RAA489000_TYPEC_STATUS2, 0);
+
+	/*
+	 * 2. Restore vendor-specific power control (Register 0x80).
+	 * This is critical to clear the "Initialization Status" bit in
+	 * POWER_STATUS. Without this, the EC thinks the chip is dead.
+	 */
+	if (!tcpc_read16(port, RAA489000_TCPC_SETTING1, &reg)) {
+		reg |= RAA489000_TCPC_PWR_CNTRL;
+		tcpc_write16(port, RAA489000_TCPC_SETTING1, reg);
+	}
+
+	/*
+	 * 3. Restore PD Physical Settings (Register 0xE0).
+	 * Ensure receiver and squelch are back on.
+	 */
+	if (!tcpc_read16(port, RAA489000_PD_PHYSICAL_SETTING1, &reg)) {
+		reg |= RAA489000_PD_PHY_SETTING1_RECEIVER_EN |
+		       RAA489000_PD_PHY_SETTING1_SQUELCH_EN |
+		       RAA489000_PD_PHY_SETTING1_TX_LDO11_EN;
+		tcpc_write16(port, RAA489000_PD_PHYSICAL_SETTING1, reg);
+	}
+
+	/* 4. Perform full unlatch & log register state */
+	raa489000_unlatch_status(port);
 
 	return rv;
 }

@@ -137,13 +137,21 @@ void print_flag(int port, int set_or_clear, int flag);
 	TC_CLR_FLAG(port, ~(TC_FLAGS_LPM_ENGAGED | TC_FLAGS_REQUEST_SUSPEND | \
 			    TC_FLAGS_SUSPENDED))
 
+#if defined(CONFIG_USB_PD_TCPM_ANX7447)
 /*
- * 10 ms is enough time for any TCPC transaction to complete
- *
- * This value must be below ~39.7 ms to put ANX7447 into LPM due to bug in
- * silicon (see b/77544959 and b/149761477 for more details).
+ * 10 ms is enough time for ANX7447 to complete.
+ * Must be below ~39.7 ms to put ANX7447 into LPM due to bug in silicon
+ * (see b/77544959 and b/149761477 for more details).
  */
 #define PD_LPM_DEBOUNCE_US (10 * MSEC)
+#else
+/*
+ * Non-ANX7447 TCPCs (e.g. RAA489000) require >50 ms of active CC sampling
+ * in DRP mode to debounce Debug Accessory (DTS) CC voltages before
+ * entering low power mode.
+ */
+#define PD_LPM_DEBOUNCE_US (500 * MSEC)
+#endif
 
 /*
  * This delay is not part of the USB Type-C specification or the USB port
@@ -2012,6 +2020,11 @@ int tc_is_vconn_src(int port)
 		return 0;
 }
 
+int tc_is_debug_acc_connected(int port)
+{
+	return TC_CHK_FLAG(port, TC_FLAGS_TS_DTS_PARTNER);
+}
+
 static __maybe_unused int reset_device_and_notify(int port)
 {
 	int rv;
@@ -2531,6 +2544,16 @@ static void tc_attach_wait_snk_exit(const int port)
 	pd_timer_disable(port, TC_TIMER_PD_DEBOUNCE);
 }
 
+int raa489000_debug_prs(int port);
+int raa489000_debug_prs_snk(int port);
+int raa489000_debug_prs_exit(int port);
+int raa48900_set_vbus_sink_disconnect_threshold(int port, int val);
+int raa48900_get_vbus_sink_disconnect_threshold(int port, int *val);
+
+static int original_threshold[CONFIG_USB_PD_PORT_MAX_COUNT] = {
+	[0 ... CONFIG_USB_PD_PORT_MAX_COUNT - 1] = 0x72
+};
+
 /**
  * Attached.SNK, shared with Debug Accessory.SNK
  */
@@ -2560,6 +2583,14 @@ static void tc_attached_snk_entry(const int port)
 
 		/* Apply Rd */
 		typec_update_cc(port);
+
+		if (TC_CHK_FLAG(port, TC_FLAGS_TS_DTS_PARTNER)) {
+			CPRINTS("C%d: Apply SRC to SNK PRS workaround", port);
+			raa48900_get_vbus_sink_disconnect_threshold(
+				port, &original_threshold[port]);
+			raa48900_set_vbus_sink_disconnect_threshold(port, 0);
+			raa489000_debug_prs_snk(port);
+		}
 
 		/* Change role to sink */
 		tc_set_power_role(port, PD_ROLE_SINK);
@@ -2715,6 +2746,14 @@ static void tc_attached_snk_run(const int port)
 	 */
 	if (TC_CHK_FLAG(port, TC_FLAGS_PR_SWAP_IN_PROGRESS) &&
 	    pd_timer_is_expired(port, TC_TIMER_VBUS_DEBOUNCE)) {
+		if (TC_CHK_FLAG(port, TC_FLAGS_TS_DTS_PARTNER) &&
+		    !pd_check_vbus_level(port, VBUS_PRESENT)) {
+			/* VBUS not yet present, wait longer */
+			pd_timer_enable(port, TC_TIMER_VBUS_DEBOUNCE,
+					PD_T_DEBOUNCE);
+			return;
+		}
+
 		/* PR Swap is no longer in progress */
 		TC_CLR_FLAG(port, TC_FLAGS_PR_SWAP_IN_PROGRESS);
 		pd_timer_disable(port, TC_TIMER_VBUS_DEBOUNCE);
@@ -2725,8 +2764,14 @@ static void tc_attached_snk_run(const int port)
 		 * with the swap and should have Vbus, so re-enable
 		 * AutoDischargeDisconnect.
 		 */
-		if (!pd_check_vbus_level(port, VBUS_REMOVED))
+		if (!pd_check_vbus_level(port, VBUS_REMOVED)) {
+			if (TC_CHK_FLAG(port, TC_FLAGS_TS_DTS_PARTNER)) {
+				raa48900_set_vbus_sink_disconnect_threshold(
+					port, original_threshold[port]);
+			}
+
 			tcpm_enable_auto_discharge_disconnect(port, 1);
+		}
 	}
 
 	/*
@@ -2836,10 +2881,19 @@ static void tc_attached_snk_run(const int port)
 	sink_power_sub_states(port);
 #endif /* CONFIG_USB_PE_SM */
 }
-
 static void tc_attached_snk_exit(const int port)
 {
 	if (!TC_CHK_FLAG(port, TC_FLAGS_REQUEST_PR_SWAP)) {
+		if (TC_CHK_FLAG(port, TC_FLAGS_TS_DTS_PARTNER)) {
+			/*
+			 * Workaround cleanup: ensure custom registers and
+			 * thresholds are restored if we disconnect during
+			 * a swap or if the workaround was active.
+			 */
+			raa489000_debug_prs_exit(port);
+			raa48900_set_vbus_sink_disconnect_threshold(
+				port, original_threshold[port]);
+		}
 		/*
 		 * If supplying VCONN, the port shall cease to supply
 		 * it within tVCONNOFF of exiting Attached.SNK if not
@@ -3158,6 +3212,11 @@ static void tc_attached_src_entry(const int port)
 			 * Discharge Disconnect in tc_pr_swap_complete. That's
 			 * too late for a sink-to-source PRS. */
 			tcpm_enable_auto_discharge_disconnect(port, 1);
+
+			if (TC_CHK_FLAG(port, TC_FLAGS_TS_DTS_PARTNER)) {
+				CPRINTS("C%d: Apply PRS workaround", port);
+				raa489000_debug_prs(port);
+			}
 
 			/*
 			 * Maintain VCONN supply state, whether ON or OFF, and
@@ -3501,8 +3560,10 @@ static void tc_attached_src_exit(const int port)
 		    !TC_CHK_FLAG(port, TC_FLAGS_CTVPD_DETECTED))
 			set_vconn(port, 0);
 
-		if (TC_CHK_FLAG(port, TC_FLAGS_TS_DTS_PARTNER))
+		if (TC_CHK_FLAG(port, TC_FLAGS_TS_DTS_PARTNER)) {
+			raa489000_debug_prs_exit(port);
 			tcpm_debug_detach(port);
+		}
 	}
 
 	/* Clear CTVPD detected after checking for Vconn */

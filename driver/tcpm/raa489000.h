@@ -17,11 +17,13 @@
 #define RAA489000_TCPC3_I2C_FLAGS 0x25
 
 /* Vendor registers */
+#define RAA489000_VBUS_SINK_DISCONNECT_THRESHOLD 0x72
 #define RAA489000_TCPC_SETTING1 0x80
 #define RAA489000_VBUS_VOLTAGE_TARGET 0x90
 #define RAA489000_VBUS_CURRENT_TARGET 0x92
 #define RAA489000_VBUS_OCP_UV_THRESHOLD 0x94
 #define RAA489000_TYPEC_SETTING1 0xC0
+#define RAA489000_TYPEC_STATUS2 0xC4
 #define RAA489000_PD_PHYSICAL_SETTING1 0xE0
 #define RAA489000_PD_PHYSICAL_PARAMETER1 0xE8
 
@@ -85,6 +87,48 @@
  * @return	Zero if the current limit set was successful, non-zero otherwise
  */
 int raa489000_set_output_current(int port, enum tcpc_rp_value rp);
+
+/**
+ * Set Vbus Sink Disconnect Threshold.
+ *
+ * @param port USB-C port number
+ * @param val threshold value
+ * @return EC_SUCCESS or error
+ */
+int raa48900_set_vbus_sink_disconnect_threshold(int port, int val);
+
+/**
+ * Get Vbus Sink Disconnect Threshold.
+ *
+ * @param port USB-C port number
+ * @param val pointer to threshold value
+ * @return EC_SUCCESS or error
+ */
+int raa48900_get_vbus_sink_disconnect_threshold(int port, int *val);
+
+/**
+ * Apply workaround for Debug Accessory PR swap to Source.
+ *
+ * @param port USB-C port number
+ * @return EC_SUCCESS or error
+ */
+int raa489000_debug_prs(int port);
+
+/**
+ * Apply workaround for Debug Accessory PR swap to Sink.
+ *
+ * @param port USB-C port number
+ * @return EC_SUCCESS or error
+ */
+int raa489000_debug_prs_snk(int port);
+
+/**
+ * Exit Debug Accessory PRS workaround (clear overrides).
+ *
+ * @param port USB-C port number
+ * @return EC_SUCCESS or error
+ */
+int raa489000_debug_prs_exit(int port);
 
 extern const struct tcpm_drv raa489000_tcpm_drv;
 
