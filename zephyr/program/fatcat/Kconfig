@@ -22,6 +22,12 @@ config BOARD_FRANCKA
 	  Build Google Francka board. Francka has Intel PTL SoC
 	  with NPCX993FA0BX EC.
 
+config BOARD_FRTK
+	bool "Google frtk"
+	help
+	  Build Google Frtk board. Frtk has Intel PTL SoC
+	  with RTS5915 EC.
+
 config BOARD_FELINO
 	bool "Google felino"
 	help

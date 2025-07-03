@@ -81,7 +81,7 @@ struct cbi_data *cbi_find_tag(const void *buf, enum cbi_data_tag tag)
 #define CPRINTF(format, args...) cprintf(CC_SYSTEM, "CBI " format, ##args)
 
 static int cache_status = CBI_CACHE_STATUS_INVALID;
-static uint8_t cbi[CBI_IMAGE_SIZE];
+static uint8_t cbi[CBI_IMAGE_SIZE] __attribute__((aligned(32)));
 static struct cbi_header *const head = (struct cbi_header *)cbi;
 
 int cbi_create(void)

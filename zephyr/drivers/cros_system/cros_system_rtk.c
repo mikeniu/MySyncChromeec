@@ -241,9 +241,15 @@ static int cros_system_rtk_hibernate(const struct device *dev, uint32_t seconds,
 	 * it's possible that this may not return at all.  On those boards,
 	 * power to the EC is likely being turn off entirely.
 	 */
-	if (board_hibernate_late)
-		board_hibernate_late();
+	// if (board_hibernate_late)
+	//	board_hibernate_late();
 
+#ifdef CONFIG_POWEROFF
+	LOG_ERR("GO?");
+	sys_poweroff();
+#endif
+
+	LOG_ERR("Should not see me!!!");
 	return 0;
 }
 

@@ -30,6 +30,20 @@ if(DEFINED CONFIG_BOARD_FRANCKA)
 	)
 endif()
 
+if(DEFINED CONFIG_BOARD_FRTK)
+	project(frtk)
+	add_subdirectory(frtk)
+	zephyr_include_directories("frtk/include")
+	zephyr_library_sources(
+			"frtk/src/touch_panel.c"
+			"frtk/src/board_power.c"
+			"frtk/src/alt_charger.c"
+	)
+	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_CUSTOMIZATION
+	"frtk/src/keyboard_customization.c"
+	)
+endif()
+
 if(DEFINED CONFIG_BOARD_FELINO)
 	if(DEFINED CONFIG_BOARD_FELINO4ES)
 		project(felino4es)
