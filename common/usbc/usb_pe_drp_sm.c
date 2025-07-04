@@ -814,6 +814,20 @@ static void pe_init(int port)
 		set_state_pe(port, PE_SNK_STARTUP);
 }
 
+#ifdef CONFIG_ZEPHYR
+static int init_pe_drp_sm_mutexes(void)
+{
+	int port;
+
+	for (port = 0; port < CONFIG_USB_PD_PORT_MAX_COUNT; port++) {
+		k_mutex_init(&pe[port].ado_lock);
+	}
+
+	return 0;
+}
+SYS_INIT(init_pe_drp_sm_mutexes, POST_KERNEL, 50);
+#endif /* CONFIG_ZEPHYR */
+
 int pe_is_running(int port)
 {
 	return local_state[port] == SM_RUN;
