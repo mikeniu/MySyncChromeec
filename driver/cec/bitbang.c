@@ -23,6 +23,9 @@
 #define DEBUG_CPRINTS(...)
 #endif
 
+static uint8_t index = 0;
+static uint8_t cec_states_transition[128] = {0};
+
 /*
  * Free time timing (us). Our free-time is calculated from the end of
  * the last bit (not from the start). We compensate by having one
@@ -232,6 +235,8 @@ static void enter_state(int port, enum cec_state new_state)
 	enum cec_cap_edge cap_edge = CEC_CAP_EDGE_NONE;
 	uint8_t addr;
 
+	cec_states_transition[index++] = new_state + 100;
+
 	port_data->state = new_state;
 	switch (new_state) {
 	case CEC_STATE_DISABLED:
@@ -252,6 +257,10 @@ static void enter_state(int port, enum cec_state new_state)
 			gpio = 1;
 			cap_edge = CEC_CAP_EDGE_FALLING;
 			timeout = 0;
+
+			for (uint8_t i = 0; i < index; i++) {
+				printk("cec_states_transition[%hhu]: %hhu\n", i, cec_states_transition[i]);
+			}
 		}
 		break;
 	case CEC_STATE_INITIATOR_FREE_TIME:
@@ -451,6 +460,8 @@ void cec_event_timeout(int port)
 {
 	struct cec_port_data *port_data = &cec_port_data[port];
 
+	cec_states_transition[index++] = port_data->state + 200;
+
 	switch (port_data->state) {
 	case CEC_STATE_DISABLED:
 	case CEC_STATE_IDLE:
@@ -568,6 +579,8 @@ void cec_event_cap(int port)
 	struct cec_port_data *port_data = &cec_port_data[port];
 	int t;
 	int data;
+
+	cec_states_transition[index++] = port_data->state;
 
 	switch (port_data->state) {
 	case CEC_STATE_IDLE:
