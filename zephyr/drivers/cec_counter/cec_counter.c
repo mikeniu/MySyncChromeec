@@ -172,10 +172,10 @@ void cros_cec_bitbang_debounce_disable(int port)
 void cros_cec_bitbang_trigger_send(int port)
 {
 	unsigned int key;
+	key = irq_lock();
 	/* Elevate to interrupt context */
 	transfer_initiated = true;
 
-	key = irq_lock();
 	cec_ext_timer_interrupt(port);
 	irq_unlock(key);
 }

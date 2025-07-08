@@ -49,7 +49,6 @@
 			       <&gpiod 7 0>,
 			       <&gpioe 6 0>,
 			       <&gpioh 2 0>,
-			       <&gpioh 4 0>,
 			       <&gpioh 6 0>,
 			       <&gpioi 6 0>,
 			       <&gpioj 1 0>,

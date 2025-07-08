@@ -208,6 +208,9 @@
 		gpio_ack_ppvar_bj_adp_odl: ack_ppvar_bj_adp_odl {
 			gpios = <&gpioa 0 GPIO_INPUT>;
 		};
+		gpio_cec1_int_en: cec1_int_en {
+			gpios = <&gpioh 4 GPIO_OUTPUT>;
+		};
 		/* unimplemented GPIOs */
 		gpio_hdmi2_cec_pull_up: hdmi2_cec_pull_up {
 		};
