@@ -1,0 +1,98 @@
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	fans {
+		compatible = "cros-ec,fans";
+		fan_0 {
+			pwms = <&pwm6 PWM_CHANNEL_6
+				PWM_KHZ(25)
+				PWM_POLARITY_NORMAL>;
+			tach = <&tach0>;
+			rpm-min = <2300>;
+			rpm-start = <2300>;
+			rpm-max = <4500>;
+			rpm-deviation = <1>;
+		};
+	};
+
+	fan_steps: fan-steps {
+		compatible = "cros-ec,fan-steps";
+		level_0 {
+			temp-on = <43 43 0 0>;
+			temp-off = <99 99 0 0>;
+			rpm-target = <0>;
+		};
+		level_1 {
+			temp-on = <46 46 0 0>;
+			temp-off = <40 40 0 0>;
+			rpm-target = <2300>;
+		};
+		level_2 {
+			temp-on = <49 49 0 0>;
+			temp-off = <43 43 0 0>;
+			rpm-target = <2500>;
+		};
+		level_3 {
+			temp-on = <52 52 0 0>;
+			temp-off = <46 46 0 0>;
+			rpm-target = <2700>;
+		};
+		level_4 {
+			temp-on = <55 55 0 0>;
+			temp-off = <49 49 0 0>;
+			rpm-target = <2900>;
+		};
+		level_5 {
+			temp-on = <58 58 0 0>;
+			temp-off = <52 52 0 0>;
+			rpm-target = <3100>;
+		};
+		level_6 {
+			temp-on = <61 61 0 0>;
+			temp-off = <55 55 0 0>;
+			rpm-target = <3300>;
+		};
+		level_7 {
+			temp-on = <64 64 0 0>;
+			temp-off = <58 58 0 0>;
+			rpm-target = <3500>;
+		};
+		level_8 {
+			temp-on = <67 67 0 0>;
+			temp-off = <61 61 0 0>;
+			rpm-target = <3700>;
+		};
+		level_9 {
+			temp-on = <70 70 0 0>;
+			temp-off = <64 64 0 0>;
+			rpm-target = <3900>;
+		};
+		level_10 {
+			temp-on = <73 73 0 0>;
+			temp-off = <67 67 0 0>;
+			rpm-target = <4100>;
+		};
+		level_11 {
+			temp-on = <76 76 0 0>;
+			temp-off = <70 70 0 0>;
+			rpm-target = <4300>;
+		};
+		level_12 {
+			temp-on = <100 100 0 0>;
+			temp-off = <73 73 0 0>;
+			rpm-target = <4500>;
+		};
+	};
+};
+
+/* fan tachometer sensor */
+&tach0 {
+	status = "okay";
+	channel = <IT8XXX2_TACH_CHANNEL_A>;
+	pulses-per-round = <2>;
+	pinctrl-0 = <&tach0a_gpd6_default>;
+	pinctrl-names = "default";
+};

@@ -17,7 +17,7 @@ i2c3ALT: &i2c3 {
 #include "../binman.dtsi"
 #include "../brox.dtsi"
 #include "cbi.dtsi"
-#include "../fan.dtsi"
+#include "fan.dtsi"
 #include "gpio.dtsi"
 #include "../i2c.dtsi"
 #include "../interrupts.dtsi"
@@ -26,7 +26,7 @@ i2c3ALT: &i2c3 {
 #include "../power_signals.dtsi"
 #include "../power_signals_gpios.dtsi"
 #include "../pwm.dtsi"
-#include "../temp_sensors.dtsi"
+#include "temp_sensors.dtsi"
 #include "../usb_typec.dtsi"
 #include "../usba.dtsi"
 
