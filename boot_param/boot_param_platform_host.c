@@ -76,6 +76,55 @@ bool __platform_hkdf_sha256(
 	return (res > 0);
 }
 
+/* Perform HKDF-SHA512(ikm, salt, info) */
+bool __platform_hkdf_sha512(
+	/* [IN] input key material */
+	const struct slice_ref_s ikm,
+	/* [IN] salt */
+	const struct slice_ref_s salt,
+	/* [IN] info */
+	const struct slice_ref_s info,
+	/* [IN/OUT] .size sets length for hkdf,
+	 * .data is where the digest will be placed
+	 */
+	const struct slice_mut_s result
+)
+{
+	EVP_KDF *kdf;
+	EVP_KDF_CTX *kctx;
+	OSSL_PARAM params[5], *p = params;
+	int res;
+
+	kdf = EVP_KDF_fetch(NULL, "HKDF", NULL);
+	if (kdf == NULL) {
+		print_openssl_error(__func__, "Can't find HKDF");
+		return false;
+	}
+	kctx = EVP_KDF_CTX_new(kdf);
+	EVP_KDF_free(kdf);
+	if (kctx == NULL) {
+		print_openssl_error(__func__, "Can't create HKDF context");
+		return false;
+	}
+
+	*p++ = OSSL_PARAM_construct_utf8_string(OSSL_KDF_PARAM_DIGEST,
+						SN_sha512, strlen(SN_sha512));
+	*p++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_KEY,
+						 (void *)ikm.data, ikm.size);
+	*p++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_INFO,
+						 (void *)info.data, info.size);
+	*p++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_SALT,
+						 (void *)salt.data, salt.size);
+	*p = OSSL_PARAM_construct_end();
+
+	res = EVP_KDF_derive(kctx, result.data, result.size, params);
+	if (res <= 0)
+		print_openssl_error(__func__, "Can't perform HKDF");
+
+	EVP_KDF_CTX_free(kctx);
+	return (res > 0);
+}
+
 /* Calculate SH256 for the provided buffer */
 bool __platform_sha256(
 	/* [IN] data to hash */
@@ -175,6 +224,31 @@ bool __platform_get_gsc_boot_param(
 
 /* Generate ECDSA P-256 key using HMAC-DRBG initialized by the seed */
 bool __platform_ecdsa_p256_keygen_hmac_drbg(
+	/* [IN] key seed */
+	const uint8_t seed[DIGEST_BYTES],
+	/* [OUT] ECDSA key handle */
+	const void **key
+)
+{
+	/* NOTE: for testing we don't do the actual KDF based on HMAC_DRBG.
+	 * We could use EVP_KDF-HMAC-DRBG or EVP_RAND-HMAC-DRBG, but there's
+	 * no easy way to generate EC key from a seed we'd get from DRBG.
+	 * Instead, we just generate a random EC key ignoring the seed.
+	 */
+	*key = EVP_EC_gen("P-256");
+
+	if (*key == NULL) {
+		print_openssl_error(__func__, "Can't generate EC");
+		return false;
+	}
+	return true;
+}
+
+/* Generate ECDSA P-256 key using HMAC-SHA512-DRBG used by open-dice.
+ * This HKDF is used for CDI key/ID generation to ensure that
+ * GSC and pvmfw independently calculate the same values.
+ */
+bool __platform_ecdsa_p256_keygen_hmac_sha512_opendice_drbg(
 	/* [IN] key seed */
 	const uint8_t seed[DIGEST_BYTES],
 	/* [OUT] ECDSA key handle */

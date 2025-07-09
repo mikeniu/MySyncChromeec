@@ -410,6 +410,8 @@ struct ti50_stats {
 	(1 << METRICSV_ALLOW_UNVERIFIED_RO_SHIFT)
 #define METRICSV_IS_PROD_SHIFT 6
 #define METRICSV_IS_PROD_MASK (1 << METRICSV_IS_PROD_SHIFT)
+#define METRICSV_RDD_IS_DETECTED_SHIFT 7
+#define METRICSV_RDD_IS_DETECTED_MASK (1 << METRICSV_RDD_IS_DETECTED_SHIFT)
 
 /* End Ti50 Specific Structs */
 /*****************************************************************************/

@@ -567,6 +567,21 @@ TPM_RC ParseResponse_StartAuthSession(
   return TPM_RC_SUCCESS;
 }
 
+TPM_RC SerializeCommand_FlushContext(
+    const TPMI_DH_OBJECT& activate_handle,
+    std::string& serialized_command,
+    std::unique_ptr<AuthorizationDelegate>& authorization_delegate) {
+  return Tpm::SerializeCommand_FlushContext(
+      activate_handle, &serialized_command, authorization_delegate.get());
+}
+
+TPM_RC ParseResponse_FlushContext(
+    const std::string& response,
+    std::unique_ptr<AuthorizationDelegate>& authorization_delegate) {
+  return Tpm::ParseResponse_FlushContext(
+      response, authorization_delegate.get());
+}
+
 std::unique_ptr<std::string> NameFromHandle(const TPM_HANDLE& handle) {
   std::string name;
   Serialize_TPM_HANDLE(handle, &name);

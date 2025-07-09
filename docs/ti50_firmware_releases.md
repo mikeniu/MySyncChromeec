@@ -6,42 +6,43 @@ This document captures major feature differences between Ti50 firmware releases
 
 # ChromeOS Release
 
-ChromeOS Version    | PrePVT version | Prod Version
-------------------- | -------------- | ------------
-[ToT][ToT ebuild]   | 0.24.172       | 0.23.160
-[M137][137 release] | 0.24.172       | 0.23.160
-[M136][136 release] | 0.24.160       | 0.23.160
-[M135][135 release] | 0.24.160       | 0.23.140
-[M134][134 release] | 0.24.140       | 0.23.140
-[M133][133 release] | 0.24.140       | 0.23.122
-[M132][132 release] | 0.24.132       | 0.23.122
-[M131][131 release] | 0.24.121       | 0.23.112
-[M130][130 release] | 0.24.112       | 0.23.112
-[M129][129 release] | 0.24.112       | 0.23.112
-[M128][128 release] | 0.24.101       | 0.23.101
-[M127][127 release] | 0.24.101       | 0.23.101
-[M126][126 release] | 0.24.90        | 0.23.90
-[M125][125 release] | 0.24.81        | 0.23.81
-[M124][124 release] | 0.24.71        | 0.23.71
-[M123][123 release] | 0.24.71        | 0.23.71
-[M122][122 release] | 0.24.71        | 0.23.71
-[M121][121 release] | 0.24.62        | 0.23.62
-[M120][120 release] | 0.24.60        | 0.23.60
-[M119][119 release] | 0.24.51        | 0.23.51
-[M118][118 release] | 0.24.30        | 0.23.30
-[M117][117 release] | 0.24.30        | 0.23.30
-[M116][116 release] | 0.24.30        | 0.23.30
-[M115][115 release] | 0.24.30        | 0.23.30
-[M114][114 release] | 0.24.30        | 0.23.30
-[M113][113 release] | 0.24.13        | 0.23.14
-[M112][112 release] | 0.24.13        | 0.23.3
-[M111][111 release] | 0.24.3         | 0.23.3
-[M110][110 release] | 0.24.3         | 0.23.3
-[M109][109 release] | 0.24.3         | 0.23.3
-[M108][108 release] | 0.24.1         | 0.23.1
-[M107][107 release] | 0.22.6         | 0.21.0
-[M106][106 release] | 0.22.2         | 0.21.0
-[M105][105 release] | 0.22.1         | 0.21.0
+ChromeOS Version    | DT PrePVT version | DT Prod Version | NT PrePVT version | NT Prod Version
+------------------- | ----------------- | --------------- | ----------------- | ---------------
+[ToT][ToT ebuild]   | 0.24.180          | 0.23.180        | 0.33.190          | 0.33.190
+[M138][138 release] | 0.24.172          | 0.23.160        | 0.33.190          | 0.33.190
+[M137][137 release] | 0.24.172          | 0.23.160        | 0.36.170          | 0.36.170
+[M136][136 release] | 0.24.160          | 0.23.160        | 0.36.7            | 0.36.7
+[M135][135 release] | 0.24.160          | 0.23.140        | 0.36.7            | 0.36.7
+[M134][134 release] | 0.24.140          | 0.23.140        | 0.36.4            | 0.36.4
+[M133][133 release] | 0.24.140          | 0.23.122        | 0.36.4            | 0.36.4
+[M132][132 release] | 0.24.132          | 0.23.122        | 0.36.3            | 0.36.3
+[M131][131 release] | 0.24.121          | 0.23.112        | 0.36.3            | 0.36.3
+[M130][130 release] | 0.24.112          | 0.23.112        |                   |
+[M129][129 release] | 0.24.112          | 0.23.112        |                   |
+[M128][128 release] | 0.24.101          | 0.23.101        |                   |
+[M127][127 release] | 0.24.101          | 0.23.101        |                   |
+[M126][126 release] | 0.24.90           | 0.23.90         |                   |
+[M125][125 release] | 0.24.81           | 0.23.81         |                   |
+[M124][124 release] | 0.24.71           | 0.23.71         |                   |
+[M123][123 release] | 0.24.71           | 0.23.71         |                   |
+[M122][122 release] | 0.24.71           | 0.23.71         |                   |
+[M121][121 release] | 0.24.62           | 0.23.62         |                   |
+[M120][120 release] | 0.24.60           | 0.23.60         |                   |
+[M119][119 release] | 0.24.51           | 0.23.51         |                   |
+[M118][118 release] | 0.24.30           | 0.23.30         |                   |
+[M117][117 release] | 0.24.30           | 0.23.30         |                   |
+[M116][116 release] | 0.24.30           | 0.23.30         |                   |
+[M115][115 release] | 0.24.30           | 0.23.30         |                   |
+[M114][114 release] | 0.24.30           | 0.23.30         |                   |
+[M113][113 release] | 0.24.13           | 0.23.14         |                   |
+[M112][112 release] | 0.24.13           | 0.23.3          |                   |
+[M111][111 release] | 0.24.3            | 0.23.3          |                   |
+[M110][110 release] | 0.24.3            | 0.23.3          |                   |
+[M109][109 release] | 0.24.3            | 0.23.3          |                   |
+[M108][108 release] | 0.24.1            | 0.23.1          |                   |
+[M107][107 release] | 0.22.6            | 0.21.0          |                   |
+[M106][106 release] | 0.22.2            | 0.21.0          |                   |
+[M105][105 release] | 0.22.1            | 0.21.0          |                   |
 
 # Ti50 Features
 
@@ -66,6 +67,8 @@ Reporting external WP assertion fix  | 0.24.131      | 0.23.140         | M133/M
 Build uses Bazel artifacts           | 0.24.140      | 0.23.140         | M133/M134
 Support for NonInverted KSO          | 0.24.140      | 0.23.140         | M133/M134
 Boot param support                   | 0.24.160      | 0.23.160         | M135/M136
+Add `spi_drive` GSC command          | 0.24.180      | 0.23.180         | M139
+Run APRV after WP events             | 0.24.172      | 0.23.180         | M138/M139
 
 # RO revisions
 
@@ -953,8 +956,7 @@ Artifacts:
     [b/286213031](https://b.corp.google.com/issues/286213031)
 *   Add TMPV monotonic counter
     [b/376271752](https://b.corp.google.com/issues/376271752)
-*   Add DICE support
-    [b/365780607](https://b.corp.google.com/issues/365780607)
+*   Add DICE support [b/365780607](https://b.corp.google.com/issues/365780607)
 
 ```
 Build:   ti50_common_mp-15980.B:v0.0.328-7c83fd38
@@ -964,6 +966,77 @@ Build:   ti50_common_mp-15980.B:v0.0.328-7c83fd38
          chrome-bot@chromeos-ci-firmware-us-central1-b-x32-0-440b 2025-02-19 16:31:35
 ```
 
+### 0.23.180 Released on 2025-06-18 in M139
+
+Release
+[CL](https://chromium-review.googlesource.com/c/chromiumos/overlays/chromiumos-overlay/+/6655152)
+
+Builder
+[firmware-ti50-mp-15980.B-branch/74](https://ci.chromium.org/ui/p/chromeos/builders/firmware/firmware-ti50-mp-15980.B-branch/74/overview)
+
+Artifacts:
+[15980.70.0](https://pantheon.corp.google.com/storage/browser/chromeos-releases/firmware-ti50-mp-15980.B-branch-firmware/R129-15980.70.0/)
+
+**Features**
+
+*   GSC perform AP RO verification again after select write protection events
+    [b/254309086](https://b.corp.google.com/issues/327197686)
+*   Add `spi_drive` command to adjust SPI strength when in initial factory mode
+    [b/395751233](https://b.corp.google.com/issues/395751233)
+
+**Bug Fixes**
+
+*   Fix EFS2 logic to succeed on first attempt
+    [b/327197686](https://b.corp.google.com/issues/327197686)
+*   Update RSU behavior
+    [b/409307940](https://b.corp.google.com/issues/409307940)
+*   Do not re-read straps upon deep sleep resume
+    [b/401254091](https://b.corp.google.com/issues/401254091)
+*   Fix `ccdstate` capitalization of `CCD Ports Blocked`
+    [b/408488622](https://b.corp.google.com/issues/408488622)
+
+```
+Build:   0.23.180/ti50_common_mp-15980.B:v0.0.506-b6cc639a
+         libtock-rs:v0.0.925-1213708
+         tock:v0.0.9685-1f9552cfa
+         ms-tpm-20-ref:v0.0.329-aba1bbb
+         chrome-bot@chromeos-firmware-mpa-us-east1-d-x32-1-66e2 2025-05-29 06:59:22
+```
+
+### 0.x3.190
+
+#### 0.33.190 Released on 2025-06-20 in M139 (cherry-picked to M138)
+
+Release
+[CL](https://chromium-review.googlesource.com/c/chromiumos/overlays/chromiumos-overlay/+/6663579)
+
+Builder
+[firmware-ti50-mp-15980.B-branch/78](https://ci.chromium.org/ui/p/chromeos/builders/firmware/firmware-ti50-mp-15980.B-branch/78/overview)
+
+Artifacts:
+[15980.74.0](https://pantheon.corp.google.com/storage/browser/chromeos-releases/firmware-ti50-mp-15980.B-branch-firmware/R129-15980.74.0/)
+
+**NT Specific Bug Fixes**
+
+*   NT goes into deep sleep with AC Present
+    [b/421946421](https://b.corp.google.com/issues/421946421)
+    [b/423499633](https://b.corp.google.com/issues/423499633)
+*   Prevent dropped USB console forwarding packets
+    [b/420721666](https://b.corp.google.com/issues/420721666)
+*   Ensure all CCD endpoint reset after host initialed reset
+    [b/414825286](https://b.corp.google.com/issues/414825286)
+*   Fix `gpioset EN_I2C_DBG_PWR_L` to toggle correct GPIO
+    [b/419186818](https://b.corp.google.com/issues/419186818)
+
+```
+Build:   0.33.190/ti50_common_mp-15980.B:v0.0.535-c900b8e5
+         libtock-rs:v0.0.925-1213708
+         tock:v0.0.9685-1f9552cfa
+         ms-tpm-20-ref:v0.0.329-aba1bbb
+         chrome-bot@chromeos-firmware-mpa-us-east1-d-x32-1-s2pw 2025-06-20 10:24:48
+```
+
+#### 0.23.190 Unreleased
 
 ## PrePVT images
 
@@ -2115,8 +2188,7 @@ Artifacts:
     [b/286213031](https://b.corp.google.com/issues/286213031)
 *   Add TMPV monotonic counter
     [b/376271752](https://b.corp.google.com/issues/376271752)
-*   Add DICE support
-    [b/365780607](https://b.corp.google.com/issues/365780607)
+*   Add DICE support [b/365780607](https://b.corp.google.com/issues/365780607)
 
 ```
 Build:   ti50_common_prepvt-15974.B:v0.0.331-0cceb66e
@@ -2136,7 +2208,6 @@ Builder
 
 Artifacts:
 [15974.66.0](https://pantheon.corp.google.com/storage/browser/chromeos-releases/firmware/firmware-ti50-prepvt-15974.B-branch/R129-15974.66.0-1-8717571719869204161/)
-
 
 **Bug Fixes**
 
@@ -2168,7 +2239,6 @@ Builder
 Artifacts:
 [15974.69.0](https://pantheon.corp.google.com/storage/browser/chromeos-releases/firmware/firmware-ti50-prepvt-15974.B-branch/R129-15974.69.0-1-8716681550241124529/)
 
-
 **Features**
 
 *   GSC perform AP RO verification again after select write protection events
@@ -2180,6 +2250,30 @@ Build:   0.24.172/ti50_common_prepvt-15974.B:v0.0.454-48da114b
          tock:v0.0.9685-7d2295b47
          ms-tpm-20-ref:v0.0.328-4524d01
          chrome-bot@chromeos-firmware-mpa-us-central1-c-x32-0-6y79 2025-04-24 12:05:41
+```
+
+### 0.24.180 Released on 2025-06-02 in M139
+
+Release
+[CL](https://chromium-review.googlesource.com/c/chromiumos/overlays/chromiumos-overlay/+/6613122)
+
+Builder
+[firmware-ti50-prepvt-15974.B-branch/78](https://ci.chromium.org/ui/p/chromeos/builders/firmware/firmware-ti50-prepvt-15974.B-branch/78/overview)
+
+Artifacts:
+[15974.77.0](https://pantheon.corp.google.com/storage/browser/chromeos-releases/firmware-ti50-prepvt-15974.B-branch-firmware/R129-15974.77.0/)
+
+**Features**
+
+*   Add `spi_drive` command to adjust SPI strength when in initial factory mode
+    [b/395751233](https://b.corp.google.com/issues/395751233)
+
+```
+Build:   0.24.180/ti50_common_prepvt-15974.B:v0.0.513-a5fd7035
+         libtock-rs:v0.0.925-1213708
+         tock:v0.0.9685-7d2295b47
+         ms-tpm-20-ref:v0.0.330-15f70dc
+         chrome-bot@chromeos-firmware-mpa-us-east1-d-x32-1-obdd 2025-05-28 13:28:41
 ```
 
 <!-- Links -->
@@ -2217,4 +2311,5 @@ Build:   0.24.172/ti50_common_prepvt-15974.B:v0.0.454-48da114b
 [135 release]: https://chromium.googlesource.com/chromiumos/overlays/chromiumos-overlay/+/refs/heads/release-R135-16209.B/chromeos-base/chromeos-ti50/chromeos-ti50-0.0.1.ebuild
 [136 release]: https://chromium.googlesource.com/chromiumos/overlays/chromiumos-overlay/+/refs/heads/release-R136-16238.B/chromeos-base/chromeos-ti50/chromeos-ti50-0.0.1.ebuild
 [137 release]: https://chromium.googlesource.com/chromiumos/overlays/chromiumos-overlay/+/refs/heads/release-R137-16267.B/chromeos-base/chromeos-ti50/chromeos-ti50-0.0.1.ebuild
+[138 release]: https://chromium.googlesource.com/chromiumos/overlays/chromiumos-overlay/+/refs/heads/release-R138-16295.B/chromeos-base/chromeos-ti50/chromeos-ti50-0.0.1.ebuild
 [ToT ebuild]: https://chromium.googlesource.com/chromiumos/overlays/chromiumos-overlay/+/refs/heads/main/chromeos-base/chromeos-ti50/chromeos-ti50-0.0.1.ebuild

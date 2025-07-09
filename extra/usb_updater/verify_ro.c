@@ -4,8 +4,10 @@
  * found in the LICENSE file.
  */
 
+#include <endian.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +15,7 @@
 #include "config.h"
 #include "desc_parser.h"
 #include "gsctool.h"
+#include "misc_util.h"
 #include "tpm_vendor_cmds.h"
 #include "verify_ro.h"
 
@@ -298,6 +301,7 @@ int verify_ro(struct transfer_descriptor *td, const char *desc_file_name,
 	char rlz_code[sizeof(bid.type) + 1];
 	int section_count = 0;
 	int rv = 0;
+	uint32_t rlz_be;
 
 	/*
 	 * Find out what Board ID is the device we are talking to. This
@@ -312,10 +316,12 @@ int verify_ro(struct transfer_descriptor *td, const char *desc_file_name,
 	}
 
 	/*
-	 * Convert bid from int to asciiz so that it could be used for
+	 * Convert bid from uint32_t to ascii. Note the ASCII form should be big
+	 * endian byte string, e.g. 0x41424344 is "ABCD". RLZ string is used for
 	 * strcmp() on the descriptor file section headers.
 	 */
-	memcpy(rlz_code, &bid.type, sizeof(rlz_code) - 1);
+	rlz_be = htobe32(bid.type);
+	memcpy(rlz_code, &rlz_be, MIN(sizeof(rlz_be), sizeof(rlz_code)));
 	rlz_code[sizeof(rlz_code) - 1] = '\0';
 
 	while (!parser_find_board(desc_file_name, rlz_code)) {

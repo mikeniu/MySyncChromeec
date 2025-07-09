@@ -523,10 +523,10 @@ static inline bool fill_cdi_cert_signature(
 					  sig_bstr64->value);
 }
 
-/* Generates key from UDS or CDI_Attest value.
+/* Generates UDS key from UDS value.
  */
-static bool generate_key(
-	/* [IN] CDI_attest or UDS */
+static bool generate_uds_key(
+	/* [IN] UDS */
 	const uint8_t input[DIGEST_BYTES],
 	/* [OUT] key handle */
 	const void **key
@@ -545,9 +545,32 @@ static bool generate_key(
 	return __platform_ecdsa_p256_keygen_hmac_drbg(drbg_seed, key);
 }
 
-/* Generates {UDS, CDI}_ID from {UDS, CDI} public key.
+/* Generates CDI key from CDI_Attest value.
  */
-static bool generate_id_from_pub_key(
+static bool generate_cdi_key(
+	/* [IN] CDI_attest */
+	const uint8_t input[DIGEST_BYTES],
+	/* [OUT] key handle */
+	const void **key
+)
+{
+	uint8_t drbg_seed[DIGEST_BYTES];
+	const struct slice_ref_s input_slice = digest_as_slice(input);
+	const struct slice_mut_s drbg_seed_slice =
+		digest_as_slice_mut(drbg_seed);
+
+	if (!__platform_hkdf_sha512(input_slice, kAsymSaltSlice,
+				    kKeyPairLabel, drbg_seed_slice)) {
+		__platform_log_str("ASYM_KDF failed");
+		return false;
+	}
+	return __platform_ecdsa_p256_keygen_hmac_sha512_opendice_drbg(
+		drbg_seed, key);
+}
+
+/* Generates UDS_ID from UDS public key.
+ */
+static bool generate_uds_id_from_pub_key(
 	/* [IN] public key */
 	const struct ecdsa_public_s *pub_key,
 	/* [OUT] generated id */
@@ -563,6 +586,30 @@ static bool generate_id_from_pub_key(
 
 	return __platform_hkdf_sha256(pub_key_slice, kIdSaltSlice, kIdLabel,
 				      dice_id_slice);
+}
+
+/* Generates CDI_ID from CDI public key.
+ */
+static bool generate_cdi_id_from_pub_key(
+	/* [IN] public key */
+	const struct ecdsa_public_s *pub_key,
+	/* [OUT] generated id */
+	uint8_t dice_id[DICE_ID_BYTES]
+)
+{
+	const struct slice_ref_s pub_key_slice = {
+		sizeof(struct ecdsa_public_s), (const uint8_t *)pub_key
+	};
+	const struct slice_mut_s dice_id_slice = {
+		DICE_ID_BYTES, (uint8_t *)dice_id
+	};
+
+	if (!__platform_hkdf_sha512(pub_key_slice, kIdSaltSlice, kIdLabel,
+				    dice_id_slice)) {
+		return false;
+	}
+	dice_id[0] &= ~0x80;
+	return true;
 }
 
 /* Returns hexdump character for the half-byte.
@@ -638,7 +685,7 @@ static inline bool fill_cdi_details_with_key(
 		return false;
 	}
 	fill_cose_pubkey(&cdi_pub_key, &cwt_claims->subject_pk.data);
-	if (!generate_id_from_pub_key(&cdi_pub_key, cdi_id)) {
+	if (!generate_cdi_id_from_pub_key(&cdi_pub_key, cdi_id)) {
 		__platform_log_str("Failed to generate CDI_ID");
 		return false;
 	}
@@ -670,7 +717,7 @@ static inline bool fill_cdi_details(
 		__platform_log_str("Failed to calc CDI_seal");
 		return false;
 	}
-	if (!generate_key(hdr->cdi_attest.value, &cdi_key)) {
+	if (!generate_cdi_key(hdr->cdi_attest.value, &cdi_key)) {
 		__platform_log_str("Failed to generate CDI key");
 		return false;
 	}
@@ -701,7 +748,7 @@ static inline bool fill_uds_details_with_key(
 		__platform_log_str("Failed to get UDS pubkey");
 		return false;
 	}
-	if (!generate_id_from_pub_key(&uds_pub_key, uds_id)) {
+	if (!generate_uds_id_from_pub_key(&uds_pub_key, uds_id)) {
 		__platform_log_str("Failed to generate UDS_ID");
 		return false;
 	}
@@ -734,7 +781,7 @@ static inline bool fill_uds_details(
 	const void *uds_key;
 	bool result;
 
-	if (!generate_key(ctx->cfg.uds, &uds_key)) {
+	if (!generate_uds_key(ctx->cfg.uds, &uds_key)) {
 		__platform_log_str("Failed to generate UDS key");
 		return false;
 	}

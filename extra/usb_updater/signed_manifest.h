@@ -9,6 +9,13 @@
 #include "compile_time_macros.h"
 #include "stdint.h"
 
+/* Describes where the extension specific data is located within the image */
+struct Extension {
+	uint32_t id;
+	/* Offset from the start of image header where extension data is */
+	uint32_t offset;
+};
+
 /*
  * This is the signed manifest header for Opentitan images. See also
  * third_party/lowriscv/opentitan/sw/device/silicon_creator/lib/manifest.h
@@ -37,7 +44,7 @@ struct SignedManifest {
 	uint32_t code_start;
 	uint32_t code_end;
 	uint32_t entry_point;
-	uint32_t extensions[30];
+	struct Extension extensions[15];
 };
 
 BUILD_ASSERT(sizeof(struct SignedManifest) == 1024);

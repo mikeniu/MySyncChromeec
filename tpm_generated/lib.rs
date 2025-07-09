@@ -290,6 +290,19 @@ pub mod trunks {
             authorization_delegate: Pin<&mut UniquePtr<AuthorizationDelegate>>,
         ) -> u32;
 
+        /// See Tpm::SerializeCommand_FlushContext for docs.
+        fn SerializeCommand_FlushContext(
+            handle: &u32,
+            serialized_command: Pin<&mut CxxString>,
+            authorization_delegate: Pin<&mut UniquePtr<AuthorizationDelegate>>,
+        ) -> u32;
+
+        /// See Tpm::ParseResponse_FlushContext for docs.
+        fn ParseResponse_FlushContext(
+            response: &CxxString,
+            authorization_delegate: Pin<&mut UniquePtr<AuthorizationDelegate>>,
+        ) -> u32;
+
         /// Returns a serialized representation of the unmodified handle. This
         /// is useful for predefined handle values, like TPM_RH_OWNER. For
         /// details on what types of handles use this name formula see Table 3

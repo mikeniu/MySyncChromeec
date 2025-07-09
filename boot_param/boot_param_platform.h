@@ -27,6 +27,20 @@ bool __platform_hkdf_sha256(
 	const struct slice_mut_s result
 );
 
+/* Perform HKDF-SHA512(ikm, salt, info) */
+bool __platform_hkdf_sha512(
+	/* [IN] input key material */
+	const struct slice_ref_s ikm,
+	/* [IN] salt */
+	const struct slice_ref_s salt,
+	/* [IN] info */
+	const struct slice_ref_s info,
+	/* [IN/OUT] .size sets length for hkdf,
+	 * .data is where the digest will be placed
+	 */
+	const struct slice_mut_s result
+);
+
 /* Calculate SH256 for the provided buffer */
 bool __platform_sha256(
 	/* [IN] data to hash */
@@ -53,6 +67,17 @@ bool __platform_get_gsc_boot_param(
 
 /* Generate ECDSA P-256 key using HMAC-DRBG initialized by the seed */
 bool __platform_ecdsa_p256_keygen_hmac_drbg(
+	/* [IN] key seed */
+	const uint8_t seed[DIGEST_BYTES],
+	/* [OUT] ECDSA key handle */
+	const void **key
+);
+
+/* Generate ECDSA P-256 key using HMAC-SHA512-DRBG used by open-dice.
+ * This HKDF is used for CDI key/ID generation to ensure that
+ * GSC and pvmfw independently calculate the same values.
+ */
+bool __platform_ecdsa_p256_keygen_hmac_sha512_opendice_drbg(
 	/* [IN] key seed */
 	const uint8_t seed[DIGEST_BYTES],
 	/* [OUT] ECDSA key handle */

@@ -81,7 +81,7 @@ update_manifest() {
   echo "RW: ${rw_ver}"
   sed "s/epoch\": [0-9]*/epoch\": ${epoch}/" "${manifest}" -i
   sed "s/major\": [0-9]*/major\": ${major}/" "${manifest}" -i
-  sed "s/minor\": [0-9]*/minor\": ${minor}/" "${manifest}" -i
+  sed -E "s/minor\": (TOKEN_MINOR|[0-9]*)/minor\": ${minor}/" "${manifest}" -i
 }
 
 # Re-sign a single RW section.
@@ -197,7 +197,7 @@ main () {
              gsc_dir="${SCRIPT_DIR}/../../cr50"
 	     key_name="cr50-hsm-backed-node-locked-key"
              rw_key="${gsc_dir}/util/signer/${key_name}.pem.pub"
-             manifest="${gsc_dir}/util/signer/ec_RW-manifest-dev.json"
+             manifest="${gsc_dir}/util/signer/ec_RW-manifest-TOT.json"
              xml="${gsc_dir}/util/signer/fuses.xml"
              codesigner_params+=(
                --b
