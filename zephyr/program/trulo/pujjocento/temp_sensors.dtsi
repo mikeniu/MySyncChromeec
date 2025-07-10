@@ -12,9 +12,9 @@
 
 		fan_0 {
 			pwms = <&pwm5 5 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
-			rpm-min = <3000>;
-			rpm-start = <3000>;
-			rpm-max = <6000>;
+			rpm-min = <2500>;
+			rpm-start = <2500>;
+			rpm-max = <6800>;
 			tach = <&tach1>;
 			rpm-deviation = <1>;
 		};
