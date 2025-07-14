@@ -9241,7 +9241,7 @@ static void cmd_cbi_help(char *cmd)
 		"      9: REWORK_ID\n"
 		"      10: FACTORY_CALIBRATION_DATA\n"
 		"      11: COMMON_CONTROL\n"
-		"      12: BATTERY_CONFIG (hex)\n"
+		"      [12:27]: BATTERY_CONFIG_[0:15] (hex)\n"
 		"      28: PROVISION_MATRIX_VERSION\n"
 		"    <size> is the size of the data in byte. It should be zero for\n"
 		"      string types.\n"
