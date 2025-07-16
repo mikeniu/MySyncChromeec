@@ -1,0 +1,28 @@
+# Copyright 2026 Google LLC
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: ITE PDC it52xx
+
+compatible: "ite,it52xx-pdc"
+
+include: ["i2c-device.yaml", "pdc-device.yaml"]
+
+properties:
+  irq-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      Interrupt line from the PD for power path (zephyr standard GPIO format)
+  port-index-on-chip:
+    type: int
+    enum:
+      - 1
+      - 2
+    required: true
+    description: |
+      Common code according physical port number on board to set the connector
+      number, but PDC chip doesn't know which port of itself on board.
+      So the index is used as connector number in UCSI 4CC tasks.
+      For single-port PDCs, the index must be 1. For dual-port PDCs, one
+      of the index should be 1 and the other should be 2.
