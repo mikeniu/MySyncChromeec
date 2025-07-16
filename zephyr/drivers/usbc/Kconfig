@@ -16,6 +16,28 @@ config USBC_INTEL_ALTMODE
 	  chip and EC for configuring the USB-C alternate mode muxes inside
 	  Intel AP.
 
+config USBC_PDC_IT52XX
+        bool "ITE IT52XX Power Deleivery Controller driver"
+        default y if DT_HAS_ITE_IT52XX_PDC_ENABLED
+        select SMF
+        select SMF_ANCESTOR_SUPPORT
+        help
+          This option enables the ITE IT52XX Power Delivery Controller.
+
+config USBC_PDC_IT52XX_STACK_SIZE
+        int "USB-C ITE IT52XX PDC thread stack size"
+        default 1024
+	depends on USBC_PDC_IT52XX
+        help
+          Stack size of thread created for each instance.
+
+config USBC_PDC_IT52XX_THREAD_PRIORITY
+        int "USB-C ITE IT52XX PDC thread priority"
+        default 0
+	depends on USBC_PDC_IT52XX
+        help
+          Set thread priority of the USB-C PDC
+
 config USBC_PDC_TPS6699X
 	bool "TI TPS6699X Power Deleivery Controller driver"
 	default y if DT_HAS_TI_TPS6699_PDC_ENABLED
@@ -79,7 +101,7 @@ config USBC_PDC_RTS54XX_CONSOLE_FW_UPDATER
 	  over the EC console with help from a script (extra/pdc/pdc_fwup.py)
 	  running on the host.
 
-config USBC_PDC_TRACE_MSG
+config USBC_PDC_TRACE_MSG         # only realtek enable this config
 	bool "USB-C PDC message tracing"
 	depends on USBC_PDC_RTS54XX
 	help
