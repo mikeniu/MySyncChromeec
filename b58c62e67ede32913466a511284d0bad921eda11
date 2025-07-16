@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aceda0e7_4d2ff45c",
+        "filename": "zephyr/program/brox/caboc/project.conf",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2025-07-16T20:28:08Z",
+      "side": 1,
+      "message": "Modify this setting in program/brox/Kconfig\n```\n# Caboc provides a GPIO for battery presence.  All other boards\n# read the fuel gauge over I2C to check battery presence.\nchoice PLATFORM_EC_BATTERY_PRESENT_MODE\n\tdefault PLATFORM_EC_BATTERY_PRESENT_GPIO if BOARD_CABOC\n\tdefault PLATFORM_EC_BATTERY_PRESENT_NONE\nendchoice\n```",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 0
+      },
+      "revId": "b58c62e67ede32913466a511284d0bad921eda11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
