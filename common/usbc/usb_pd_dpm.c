@@ -1148,25 +1148,39 @@ union sido dpm_get_source_info_msg(int port)
 	const uint32_t *pdos; /* LCOV_EXCL_LINE: b/375430524 */
 	int pdo_count = dpm_get_source_pdo(&pdos, port);
 
-	source_info.port_type = (CONFIG_USB_PD_3A_PORTS > 0) ?
+	source_info.sido1.port_type = (CONFIG_USB_PD_3A_PORTS > 0) ?
 					PD_SOURCE_PORT_CAPABILITY_MANAGED :
 					PD_SOURCE_PORT_CAPABILITY_GUARANTEED;
 
-	source_info.reserved = 0;
+	source_info.sido2.port_type = (CONFIG_USB_PD_3A_PORTS > 0) ?
+					PD_SOURCE_PORT_CAPABILITY_MANAGED :
+					PD_SOURCE_PORT_CAPABILITY_GUARANTEED;
+
+	source_info.sido1.reserved = 0;
+	source_info.sido2.reserved = 0;
+
+	/* dps port = 0 */
+	source_info.sido2.dps_port = 0;
 
 	/* Max PDP: 5V * 3A = 15W; floor(5V * 1.5A = 7W */
-	source_info.port_maximum_pdp = (CONFIG_USB_PD_3A_PORTS > 0) ? 15 : 7;
+	source_info.sido1.port_maximum_pdp = (CONFIG_USB_PD_3A_PORTS > 0) ? 15 : 7;
+
+	/* Max PDP: 5V * 3A = 15W; 5V * 1.5A = 7.5W */
+	source_info.sido2.port_maximum_pdp = (CONFIG_USB_PD_3A_PORTS > 0) ? 30 : 15;
+
+	/* Guaranteed PDP should be 7.5W */
+	source_info.sido2.port_guaranteed_pdp = 15;
 
 	/* Reported PDP: voltage * current offered in Source Caps. */
 	if (pdo_count <= 0) {
 		/* This should never happen, but 0 is the most plausible
 		 * default.
 		 */
-		source_info.port_reported_pdp = 0;
+		source_info.sido1.port_reported_pdp = 0;
 	} else {
 		uint32_t highest_pdo = pdos[pdo_count - 1];
 
-		source_info.port_reported_pdp = PDO_FIXED_VOLTAGE(highest_pdo) *
+		source_info.sido1.port_reported_pdp = PDO_FIXED_VOLTAGE(highest_pdo) *
 						PDO_FIXED_CURRENT(highest_pdo) /
 						1000000;
 	}
@@ -1179,9 +1193,9 @@ union sido dpm_get_source_info_msg(int port)
 	 */
 	if (max_current_claimed & BIT(port) ||
 	    count_port_bits(max_current_claimed) < CONFIG_USB_PD_3A_PORTS) {
-		source_info.port_present_pdp = source_info.port_maximum_pdp;
+		source_info.sido1.port_present_pdp = source_info.sido1.port_maximum_pdp;
 	} else {
-		source_info.port_present_pdp = source_info.port_reported_pdp;
+		source_info.sido1.port_present_pdp = source_info.sido1.port_reported_pdp;
 	}
 
 	return source_info;
