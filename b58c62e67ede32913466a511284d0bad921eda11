@@ -22,6 +22,30 @@
       },
       "revId": "b58c62e67ede32913466a511284d0bad921eda11",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52e4b9b9_2c022dd0",
+        "filename": "zephyr/program/brox/caboc/project.conf",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1444467
+      },
+      "writtenOn": "2025-07-17T02:38:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aceda0e7_4d2ff45c",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 0
+      },
+      "revId": "b58c62e67ede32913466a511284d0bad921eda11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
