@@ -3135,6 +3135,7 @@ static int tps_execute_ucsi_cmd(const struct device *dev, uint8_t ucsi_command,
 	struct pdc_config_t const *cfg = dev->config;
 	union reg_data cmd_data;
 	enum cmd_t cmd = CMD_RAW_UCSI;
+	int port_index_on_chip_byte_index;
 
 	memset(cmd_data.data, 0, sizeof(cmd_data.data));
 	/* Byte 0: UCSI Command Code */

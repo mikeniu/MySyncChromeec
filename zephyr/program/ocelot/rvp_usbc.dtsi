@@ -47,12 +47,14 @@
 	pdc_ti_c0: rts54-pdc@20 {
 		compatible = "ti,tps6699-pdc";
 		reg = <0x20>;
+		port-index-on-chip = <0x1>;
 		ccd;
 		zephyr,deferred-init;
 	};
 	pdc_ti_c1: rts54-pdc@24 {
 		compatible = "ti,tps6699-pdc";
 		reg = <0x24>;
+		port-index-on-chip = <0x2>;
 		zephyr,deferred-init;
 	};
 };
