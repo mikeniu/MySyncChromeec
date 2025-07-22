@@ -3130,19 +3130,6 @@ static int tps_execute_ucsi_cmd(const struct device *dev, uint8_t ucsi_command,
 	struct pdc_config_t const *cfg = dev->config;
 	union reg_data cmd_data;
 	enum cmd_t cmd = CMD_RAW_UCSI;
-	int port_index_on_chip_byte_index;
-
-	/* The OS will send SET_UOR to request a data role swap. Sending SET_UOR
-	 * to the PDC will not clear the "initiate swap to DFP" bit, causing the
-	 * data role swap to immediately reverse. Intercept SET_UOR here and
-	 * call tps_set_uor() to issue a data role swap based on CMD_SET_DRS.
-	 */
-	if (ucsi_command == UCSI_SET_UOR) {
-		union uor_t uor;
-
-		memcpy(&uor, command_specific, sizeof(union uor_t));
-		return tps_set_uor(dev, uor);
-	}
 
 	memset(cmd_data.data, 0, sizeof(cmd_data.data));
 	/* Byte 0: UCSI Command Code */
@@ -3422,6 +3409,8 @@ BUILD_ASSERT(
 		.bits.error = 1,                                               \
 		.bits.sink_path_status_change = 1,                             \
 		.create_thread = create_thread_##inst,                         \
+		.no_fw_update = DT_INST_PROP(inst, no_fw_update),              \
+		.ccd = DT_INST_PROP(inst, ccd),                                \
 	};                                                                     \
                                                                                \
 	BUILD_ASSERT(                                                          \
