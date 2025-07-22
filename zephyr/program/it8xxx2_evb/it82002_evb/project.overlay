@@ -14,21 +14,64 @@
 		ec_wp_l: write-protect {
 			gpios = <&gpioa 0 GPIO_INPUT>;
 		};
+		gpio_ec_i2c_pdc0_sm_int_odl: ec_i2c_pdc0_sm_int_odl {
+			gpios = <&gpioa 6 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
 		/* unimplemented GPIOs */
 		entering-rw {
 			enum-name = "GPIO_ENTERING_RW";
 		};
 	};
 
+        /*
+	gpio-interrupts {
+		compatible = "cros-ec,gpio-interrupts";
+
+		int_gpio_ec_i2c_pdc0_sm_int_odl: gpio_ec_i2c_pdc0_sm_int_odl {
+		         irq-pin = <&gpio_ec_i2c_pdc0_sm_int_odl>;
+		         flags = <GPIO_INT_EDGE_FALLING>;
+		         handler = "pdc_interrupt_callback";
+		};
+	};
+	*/
+
 	named-i2c-ports {
 		compatible = "named-i2c-ports";
 
+                /*
 		smbus1 {
 			i2c-port = <&i2c1>;
 			enum-names = "I2C_1";
 		};
+		*/
+		i2c_ec_i2c_pdc_sm_scl_3v3: ec_i2c_pdc_sm_scl_3v3 {
+			i2c-port = <&i2c1>;
+			enum-names = "I2C_PORT_PDC_SM";
+		};
 	};
 
+	usbc {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		cros_policy: usbc-policy {
+			compatible = "usbc-port-policy";
+			unattached_rp_value = "TC_CURRENT_1_5A";
+			unattached_cc_mode = "CCOM_RD";
+			unattached_try = "DRP_TRY_SRC";
+		};
+
+		usbc_port0: port0@0 {
+			compatible = "named-usbc-port";
+			reg = <0>;
+			/* chg = <&charger_bq25720>;  it82002_evb doesn't have charger => try empty charger functions */
+			pdc = <&pdc_power_p0>;
+			policy = <&cros_policy>;
+		};
+
+		ppm-driver {
+			compatible = "ucsi-ppm";
+		};
+	};
 };
 
 &i2c1 {
@@ -39,12 +82,10 @@
 	pinctrl-names = "default";
 	label = "I2C_1";
 
-	rts545x@67 {
-		compatible = "realtek,rts545x";
-		reg = <0x67>;
-	};
-	rts545x@68 {
-		compatible = "realtek,rts545x";
-		reg = <0x68>;
+	pdc_power_p0: it52xx-pdc@26 {
+		compatible = "ite,it52xx-pdc";
+		reg = < 0x26 >; /* i2c: 7b'0x40, TCPC: 7b'0x26 */
+		irq-gpios = < &gpioa 6 GPIO_ACTIVE_LOW>;
+		/* ccd; */
 	};
 };
