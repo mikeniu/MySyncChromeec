@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8df75230_9ed8e9e8",
+        "filename": "zephyr/program/fpmcu/testcase.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2025-07-24T21:47:25Z",
+      "side": 1,
+      "message": "We don\u0027t need this now either, right?\n\nBut I think we need https://crrev.com/c/6729502 before this CL to remove it.",
+      "range": {
+        "startLine": 126,
+        "startChar": 4,
+        "endLine": 126,
+        "endChar": 18
+      },
+      "revId": "75c40f9f0a5d0c151df7e90086d05eb310652d8c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
