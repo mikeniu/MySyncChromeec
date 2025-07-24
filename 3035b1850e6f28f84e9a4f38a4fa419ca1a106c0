@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e76bd27e_65726b5c",
+        "filename": "zephyr/program/fpmcu/testcase.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2025-07-24T21:42:28Z",
+      "side": 1,
+      "message": "Nope. Done",
+      "parentUuid": "93c76444_cf099056",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 128,
+        "endChar": 17
+      },
+      "revId": "3035b1850e6f28f84e9a4f38a4fa419ca1a106c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "df21bbad_3da6d201",
@@ -37,6 +61,30 @@
       "writtenOn": "2025-07-17T22:42:33Z",
       "side": 1,
       "message": "Let\u0027s add this to the [`migrated_files.sh`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/util/migrated_files.sh;l\u003d12-14;drc\u003d801380cb4f2bf12b13181b7d3d9930f74c7e524f) script.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 25
+      },
+      "revId": "3035b1850e6f28f84e9a4f38a4fa419ca1a106c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0e4812d_a148af67",
+        "filename": "zephyr/test/hwtest/src/otp_key.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2025-07-24T21:42:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df21bbad_3da6d201",
       "range": {
         "startLine": 1,
         "startChar": 0,
