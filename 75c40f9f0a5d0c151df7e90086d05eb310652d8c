@@ -22,6 +22,30 @@
       },
       "revId": "75c40f9f0a5d0c151df7e90086d05eb310652d8c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "864344f3_ac47de64",
+        "filename": "zephyr/program/fpmcu/testcase.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2025-07-24T22:42:13Z",
+      "side": 1,
+      "message": "Done. Right, we can remove this. And no, we don\u0027t have a dependency on the other CL. The CONFIG_MPU was overwritten anyway and verification passes with just this CL and its predecessor in the chain",
+      "parentUuid": "8df75230_9ed8e9e8",
+      "range": {
+        "startLine": 126,
+        "startChar": 4,
+        "endLine": 126,
+        "endChar": 18
+      },
+      "revId": "75c40f9f0a5d0c151df7e90086d05eb310652d8c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
