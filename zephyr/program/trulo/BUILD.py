@@ -163,6 +163,23 @@ register_ish_project(
 )
 
 register_ish_project(
+    project_name="uldrenite-ish-chre",
+    zephyr_board="intel_ish_5_4_1",
+    dts_overlays=[
+        here / "uldrenite-ish" / "project.overlay",
+    ],
+    kconfig_files=[
+        here / "uldrenite-ish" / "project.conf",
+        # Uncomment the following line for UART support
+        # here / "trulo-ish" / "debug.conf",
+        here / "dsp_comms.conf",
+        here / "chre.conf",
+    ],
+    inherited_from=["nissa"],
+    skip_build_all=True,
+)
+
+register_ish_project(
     project_name="pujjolo-ish",
     zephyr_board="intel_ish_5_4_1",
     dts_overlays=[

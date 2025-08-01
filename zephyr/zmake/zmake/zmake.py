@@ -593,6 +593,8 @@ class Zmake:
                     )
                 if "pigweed" in module_paths:
                     default_cmake_defs["PW_ROOT"] = str(module_paths["pigweed"])
+                if "chre" in module_paths:
+                    default_cmake_defs["CHRE_ROOT"] = str(module_paths["chre"])
                 if "nanopb" in module_paths:
                     default_cmake_defs["NANOPB_DIR"] = str(
                         module_paths["nanopb"]

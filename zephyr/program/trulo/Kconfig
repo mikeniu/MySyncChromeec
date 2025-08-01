@@ -32,6 +32,14 @@ config BOARD_KALADIN
 	  Build Google Kaladin reference board.  This board uses an Intel TWL
 	  SoC and IT82002VG-1M/BW EC
 
+config TRULO_CHRE_EXPERIMENT
+	bool "Use CHRE libraries as an experiment"
+	depends on PIGWEED_CHRONO_SYSTEM_TIMER
+	depends on PIGWEED_SYNC_THREAD_NOTIFICATION
+	depends on PIGWEED_SYNC_TIMED_THREAD_NOTIFICATION
+	help
+	  Build a normal target but link the chre library for testing.
+
 module = Trulo
 module-str = Trulo board-specific code
 source "subsys/logging/Kconfig.template.log_config"

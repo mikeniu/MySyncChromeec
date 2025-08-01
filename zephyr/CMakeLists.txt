@@ -12,6 +12,8 @@ if("${dir_pw_third_party_nanopb}" STREQUAL "")
   set(dir_pw_third_party_nanopb "${ZEPHYR_NANOPB_MODULE_DIR}" CACHE PATH "" FORCE)
 endif()
 
+message("ZEPHYR_CHRE_MODULE_DIR=${ZEPHYR_CHRE_MODULE_DIR}")
+
 # One time setup: Zephyr does some strange handling of nanopb by linking the
 # sources directly into Zephyr instead of creating a static library which we
 # can depend on, so we need to create a fake target to keep the linker happy.
