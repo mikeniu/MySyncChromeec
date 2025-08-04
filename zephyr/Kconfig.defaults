@@ -53,4 +53,10 @@ config OUTPUT_DISASSEMBLY
 config SHELL_BACKEND_SERIAL_INIT_PRIORITY
 	default 51
 
+config LTO
+	default y if !X86 && !SOC_POSIX
+
+config ISR_TABLES_LOCAL_DECLARATION
+	default y
+
 orsource "Kconfig.defaults-$(ARCH)"

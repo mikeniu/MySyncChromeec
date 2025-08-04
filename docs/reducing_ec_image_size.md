@@ -398,11 +398,6 @@ For zephyr-ec builds, LTO is enabled by default and is controlled with Kconfig.
 CONFIG_LTO=y
 ```
 
-Note that for zephyr-ec builds, LTO is only turned on for the source files found
-under `platform/ec`. The upstream Zephyr code does not currently support LTO due
-to some auto-generated code that breaks the assumptions made by the linker. This
-[Github issue][4] tracks the effort to support LTO in the Zephyr kernel.
-
 ### CONFIG_CHIP_INIT_ROM_REGION
 
 The config option `CONFIG_CHIP_INIT_ROM_REGION` creates a new linker section to
@@ -461,6 +456,5 @@ enable this option, you may also need to change firmware testing configuration
 [1]:./zephyr/zephyr_build.md#Working-outside-the-chroot
 [2]:https://github.com/zephyrproject-rtos/zephyr/blob/main/subsys/shell/Kconfig
 [3]:https://docs.zephyrproject.org/latest/guides/optimizations/tools.html
-[4]:https://github.com/zephyrproject-rtos/zephyr/issues/2112
 [5]:https://chromium.googlesource.com/chromiumos/platform/tast-tests/+/main/src/go.chromium.org/tast-tests/cros/remote/bundles/cros/firmware/ec_usb_ports.go
 [6]:https://chromium.googlesource.com/chromiumos/platform/fw-testing-configs/+/e2e9547e/volteer.json#26

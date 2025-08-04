@@ -74,21 +74,6 @@ if(DEFINED CONFIG_PLATFORM_EC)
   zephyr_compile_definitions("CONFIG_ZEPHYR")
 
   include(fpu.cmake)
-
-  # When LTO is enabled, enable only for the "app" library, which compiles
-  # and links all Chromium OS sources.
-  # TODO: Enable LTO for all sources when Zephyr supports it.
-  # See https://github.com/zephyrproject-rtos/zephyr/issues/2112
-  if (DEFINED CONFIG_PLATFORM_EC_LTO)
-    # The Zephyr toolchain generates linker errors if both CONFIG_LTO and
-    # CONFIG_FPU are used. See b/184302085.
-    if(("${ZEPHYR_TOOLCHAIN_VARIANT}" STREQUAL "zephyr") AND
-     (DEFINED CONFIG_FPU))
-      message(STATUS "Zephyr toolchain and CONFIG_FPU detected: disabling LTO")
-    else()
-      set_property(TARGET app PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
-    endif()
-  endif()
 endif()
 
 # Set extra compiler flags.
