@@ -134,9 +134,6 @@ ZTEST_USER(usb_common, test_pd_check_requested_voltage)
 	/* So is operating current too high. (This RDO doesn't make sense.) */
 	rdo = RDO_FIXED(1, 1800, 1500, 0);
 	zassert_equal(pd_check_requested_voltage(rdo, 0), EC_ERROR_INVAL);
-	/* So is maximum current too high. */
-	rdo = RDO_FIXED(1, 1000, 1800, 0);
-	zassert_equal(pd_check_requested_voltage(rdo, 0), EC_ERROR_INVAL);
 }
 
 ZTEST_USER(usb_common, test_board_is_usb_pd_port_present)

@@ -209,9 +209,6 @@ int pd_check_requested_voltage(uint32_t rdo, const int port)
 	if (op_ma > pdo_ma)
 		return EC_ERROR_INVAL; /* too much op current */
 
-	if (max_ma > pdo_ma && !(rdo & RDO_CAP_MISMATCH))
-		return EC_ERROR_INVAL; /* too much max current */
-
 	if (IS_ENABLED(CONFIG_USB_PD_TCPMV2) && rdo & RDO_CAP_MISMATCH)
 		pd_dpm_request(port, DPM_REQUEST_GET_SNK_CAPS);
 
