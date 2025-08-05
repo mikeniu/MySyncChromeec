@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa8c43d2_caebc182",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2025-08-05T22:11:18Z",
+      "side": 1,
+      "message": "The previous CQ errors appear to be related to the prerequisite CL not having been merged fully, re-trying",
+      "revId": "aaaf0a050704ab44fbda8fc6c31fba86211da59b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
