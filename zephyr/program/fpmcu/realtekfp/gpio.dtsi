@@ -1,0 +1,37 @@
+/* Copyright 2026 The ChromiumOS Authors.
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <dt-bindings/gpio_defines.h>
+
+/ {
+	aliases {
+		gpio-wp = &ec_wp_l;
+	};
+
+	/*
+	 * These gpios are just added to avoid build errors, they need to be
+	 * modified according to the specific board in the future
+	 */
+	named-gpios {
+		compatible = "named-gpios";
+
+		ec_wp_l: write-protect {
+			gpios = <&gpio 20 GPIO_INPUT>;
+		};
+
+		entering-rw {
+			enum-name = "GPIO_ENTERING_RW";
+		};
+	};
+};
+
+&pinctrl {
+	uart1_default: uart1_default {
+		group0 {
+			pinmux = <P_SSI_M_MISO_F_UART1_RX>,
+				 <P_SSI_M_MOSI_F_UART1_TX>;
+		};
+	};
+};
