@@ -23,6 +23,13 @@ if (DEFINED CONFIG_BOARD_BLOONCHIPPER)
 	project(bloonchipper)
 endif()
 
+if (DEFINED CONFIG_BOARD_REALTEKFP)
+	# Expected rollback version is 0 on realtekfp.
+	set(EXPECTED_ROLLBACK_VERSION 0)
+	add_subdirectory(realtekfp)
+	project(realtekfp)
+endif()
+
 if (DEFINED CONFIG_BASEBOARD_HELIPILOT)
 	# Expected rollback version is 0 on helipilot.
 	set(EXPECTED_ROLLBACK_VERSION 0)

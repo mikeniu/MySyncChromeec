@@ -112,4 +112,25 @@ config CROS_SYSTEM_INIT_PRIORITY
 	  The cros_system driver provides access to the chip reset cause and
 	  must be initialized before the SYSTEM_PRE initialization.
 
+config CROS_SYSTEM_REALTEKFP
+	bool "REALTEK RTS5817 cros system driver"
+	depends on SOC_RTS5817
+	default y
+	help
+	  This option enables the cros system driver for the realtek rts5817
+	  soc.
+
+if CROS_SYSTEM_REALTEKFP
+
+config CROS_SYSTEM_REALTEKFP_INIT_PRIORITY
+	int "cros_system realtek initialization priority"
+	default 10
+	help
+	  This sets the realtek cros_system driver initialization priority.
+	  The cros_system driver provides access to the realtek reset cause
+	  and must be higher priority than
+	  CONFIG_PLATFORM_EC_SYSTEM_PRE_INIT_PRIORITY.
+
+endif # CROS_SYSTEM_REALTEKFP
+
 endif # PLATFORM_EC
