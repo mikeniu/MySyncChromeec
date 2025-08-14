@@ -782,6 +782,29 @@ static int test_unknown_dualrole_capability(void)
 	return EC_SUCCESS;
 }
 
+static int test_invalidate_suppliers_port(void)
+{
+	struct charge_port_info charge;
+
+	/* Initialize table to no charge. */
+	initialize_charge_table(0, 5000, 1000);
+	TEST_ASSERT(active_charge_port == CHARGE_PORT_NONE);
+
+	/* Set a charge on P0. */
+	charge.current = 500;
+	charge.voltage = 5000;
+	charge_manager_update_charge(CHARGE_SUPPLIER_TEST2, 0, &charge);
+	wait_for_charge_manager_refresh();
+	TEST_ASSERT(active_charge_port == 0);
+	TEST_ASSERT(active_charge_limit == 500);
+
+	charge_manager_invalidate_suppliers(active_charge_port);
+	wait_for_charge_manager_refresh();
+	TEST_ASSERT(active_charge_port == CHARGE_PORT_NONE);
+
+	return EC_SUCCESS;
+}
+
 void run_test(int argc, const char **argv)
 {
 	test_reset();
@@ -795,6 +818,7 @@ void run_test(int argc, const char **argv)
 	RUN_TEST(test_dual_role);
 	RUN_TEST(test_rejected_port);
 	RUN_TEST(test_unknown_dualrole_capability);
+	RUN_TEST(test_invalidate_suppliers_port);
 
 	/* Some handlers are still running after the test ends. */
 	crec_sleep(2);
