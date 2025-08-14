@@ -1186,6 +1186,15 @@ static void charge_manager_make_change(enum charge_manager_change_type change,
 		hook_call_deferred(&charge_manager_refresh_data, 0);
 }
 
+void charge_manager_invalidate_suppliers(int port)
+{
+	int i;
+
+	for (i = 0; i < CHARGE_SUPPLIER_COUNT; ++i) {
+		charge_manager_update_charge(i, port, NULL);
+	}
+}
+
 void pd_set_input_current_limit(int port, uint32_t max_ma,
 				uint32_t supply_voltage)
 {

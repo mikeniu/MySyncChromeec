@@ -112,6 +112,17 @@ struct charge_port_info {
 void charge_manager_update_charge(int supplier, int port,
 				  const struct charge_port_info *charge);
 
+/**
+ * @brief Invalidate suppliers for given port
+ *	This sets the voltage and current all the suppliers for given port to
+ *	zero. This is generally used before calling
+ *	pd_set_input_current_limit API to zero out all suppliers, as a PD port
+ *	shouldn't have other suppliers.
+ *
+ * @param port		Charge port to update.
+ */
+void charge_manager_invalidate_suppliers(int port);
+
 /* Partner port dualrole capabilities */
 enum dualrole_capabilities {
 	CAP_UNKNOWN,
