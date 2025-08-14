@@ -14,3 +14,4 @@ zephyr_library_sources_ifdef(CONFIG_CROS_FLASH_EM32F967 cros_flash_em32f967.c)
 zephyr_library_sources_ifdef(CONFIG_CROS_FLASH_ANDES_XIP
 	                                                cros_flash_andestech_xip.c)
 zephyr_library_sources_ifdef(CONFIG_CROS_FLASH_FOCALTECH cros_flash_ft.c)
+zephyr_library_sources_ifdef(CONFIG_CROS_FLASH_RTKFP cros_flash_rtkfp.c)
