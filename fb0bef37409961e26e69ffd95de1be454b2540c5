@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "04c7b2e8_e7bca3b3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2025-08-18T21:59:40Z",
+      "side": 1,
+      "message": "IIUC, the issue you shared is specific to nct38xx. Nissa uses RAA489000. I haven\u0027t seen any reports of this issue occurring on Nissa.\n\nOn nissa, the root cause of the interrupt storm is the TCPC_REG_POWER_CTRL_VOLT_ALARM_DIS register getting cleared on the TCPC the resulting alarm never clearing. This change ignores this specific alarm since it isn\u0027t part of the alert mask.",
+      "parentUuid": "8cf7895f_5e6e481a",
+      "revId": "fb0bef37409961e26e69ffd95de1be454b2540c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e427a71b_1bf14eca",
@@ -31,6 +49,30 @@
       "writtenOn": "2025-08-18T19:23:55Z",
       "side": 1,
       "message": "other boards in this family have comments about shared interrupts.\nit makes sense to poll for the actual interrupt source in that case.\ndoes C1 on joxer share this interrupt as well?",
+      "range": {
+        "startLine": 165,
+        "startChar": 44,
+        "endLine": 165,
+        "endChar": 54
+      },
+      "revId": "fb0bef37409961e26e69ffd95de1be454b2540c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8371ae4a_49928653",
+        "filename": "zephyr/program/nissa/joxer/src/usbc.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2025-08-18T21:59:40Z",
+      "side": 1,
+      "message": "Yes, the IRQ for C1 is shared between TCPC and charger on joxer.",
+      "parentUuid": "e427a71b_1bf14eca",
       "range": {
         "startLine": 165,
         "startChar": 44,
