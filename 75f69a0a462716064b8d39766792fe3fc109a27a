@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "803ef8d4_3deb358d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2025-08-18T22:48:48Z",
+      "side": 1,
+      "message": "It looks like this function was and is substantially the same across nissa variants except for the number of ports. Would it be possible to move this function to the `nissa` base directory and just have one implementation and one test?",
+      "revId": "75f69a0a462716064b8d39766792fe3fc109a27a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
