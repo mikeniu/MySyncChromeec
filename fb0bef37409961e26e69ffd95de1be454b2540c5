@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cf7895f_5e6e481a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2025-08-18T19:23:55Z",
+      "side": 1,
+      "message": "i wanted to ask about one thing. maybe this is not an issue because\nit doesn\u0027t look like we share interrupts among TCPCs here:\n\nwe had issues on brya where servicing a TCPC interrupt shared by 2 TCPCs\nwould wake up the non-alerting TCPC i.e. generate an alert/interrupt\ndue to the wake-up.\nthis was often a self-sustaining interrupt storm.\n\nhttps://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/2700314\nhttps://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/2977473\n\nis that an issue here as well?",
+      "revId": "fb0bef37409961e26e69ffd95de1be454b2540c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e427a71b_1bf14eca",
+        "filename": "zephyr/program/nissa/joxer/src/usbc.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2025-08-18T19:23:55Z",
+      "side": 1,
+      "message": "other boards in this family have comments about shared interrupts.\nit makes sense to poll for the actual interrupt source in that case.\ndoes C1 on joxer share this interrupt as well?",
+      "range": {
+        "startLine": 165,
+        "startChar": 44,
+        "endLine": 165,
+        "endChar": 54
+      },
+      "revId": "fb0bef37409961e26e69ffd95de1be454b2540c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
