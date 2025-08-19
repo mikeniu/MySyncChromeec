@@ -953,6 +953,7 @@ uint32_t crec_flash_get_protect(void)
 	flags |= flash_read_pstate();
 #endif
 
+	cprints(CC_EVENTS, "crec_flash_get_protect CP 0");
 	/* Scan flash protection */
 	for (i = 0; i < crec_flash_total_banks(); i++) {
 		int is_ro = (i >= WP_BANK_OFFSET &&
@@ -983,6 +984,7 @@ uint32_t crec_flash_get_protect(void)
 		}
 	}
 
+	cprints(CC_EVENTS, "crec_flash_get_protect CP 1 - banks %d", i);
 	if ((flags & all_flags) == all_flags)
 		flags |= EC_FLASH_PROTECT_ALL_NOW;
 
@@ -1002,8 +1004,11 @@ uint32_t crec_flash_get_protect(void)
 	flags &= ~EC_FLASH_PROTECT_RW_NOW;
 #endif
 
+	cprints(CC_EVENTS, "crec_flash_get_protect CP 2");
+	uint32_t ret = flags | crec_flash_physical_get_protect_flags();
 	/* Add in flags from physical layer */
-	return flags | crec_flash_physical_get_protect_flags();
+	cprints(CC_EVENTS, "crec_flash_get_protect CP 3");
+	return ret;
 }
 
 /*
@@ -1028,6 +1033,7 @@ int crec_flash_set_protect(uint32_t mask, uint32_t flags)
 		 EC_FLASH_PROTECT_ALL_AT_BOOT);
 	int new_flags_at_boot = old_flags_at_boot;
 
+	cprints(CC_EVENTS, "+++Protect CP 0.1");
 	/* Sanitize input flags */
 	flags = flags & mask;
 
@@ -1093,6 +1099,7 @@ int crec_flash_set_protect(uint32_t mask, uint32_t flags)
 	}
 #endif
 
+	cprints(CC_EVENTS, "+++Protect CP 0.2");
 	/* 1.f - Commit *_AT_BOOT "clears" (and RO "set" 1.b). */
 	if (new_flags_at_boot != old_flags_at_boot) {
 		rv = crec_flash_protect_at_boot(new_flags_at_boot);
@@ -1100,6 +1107,7 @@ int crec_flash_set_protect(uint32_t mask, uint32_t flags)
 			retval = rv;
 		old_flags_at_boot = new_flags_at_boot;
 	}
+	cprints(CC_EVENTS, "+++Protect CP 0.3");
 
 	/* 2 - Return if RO_AT_BOOT and HW-WP are not asserted.
 	 *
@@ -1110,6 +1118,7 @@ int crec_flash_set_protect(uint32_t mask, uint32_t flags)
 	    (EC_FLASH_PROTECT_GPIO_ASSERTED | EC_FLASH_PROTECT_RO_AT_BOOT))
 		return retval;
 
+	cprints(CC_EVENTS, "+++Protect CP 0.4");
 	/*
 	 * 3.a - Set ALL_AT_BOOT.
 	 *
@@ -1135,6 +1144,7 @@ int crec_flash_set_protect(uint32_t mask, uint32_t flags)
 			retval = rv;
 	}
 
+	cprints(CC_EVENTS, "+++Protect CP 0.5");
 	/* 4 - Commit RO_NOW. */
 	if (flags & EC_FLASH_PROTECT_RO_NOW) {
 		rv = crec_flash_physical_protect_now(false);
@@ -1150,6 +1160,7 @@ int crec_flash_set_protect(uint32_t mask, uint32_t flags)
 			cbi_latch_eeprom_wp();
 	}
 
+	cprints(CC_EVENTS, "+++Protect CP 0.6");
 	/* 5 - Commit ALL_NOW. */
 	if (flags & EC_FLASH_PROTECT_ALL_NOW) {
 		rv = crec_flash_physical_protect_now(true);
@@ -1157,6 +1168,7 @@ int crec_flash_set_protect(uint32_t mask, uint32_t flags)
 			retval = rv;
 	}
 
+	cprints(CC_EVENTS, "+++Protect CP 0.7");
 	return retval;
 }
 
@@ -1785,7 +1797,7 @@ static enum ec_status flash_command_protect(struct host_cmd_handler_args *args)
 
 	const struct ec_params_flash_protect *p = args->params;
 	struct ec_response_flash_protect *r = args->response;
-
+	cprints(CC_EVENTS, "+++Protect CP 0");
 	/*
 	 * Handle requesting new flags.  Note that we ignore the return code
 	 * from flash_set_protect(), since errors will be visible to the caller
@@ -1795,6 +1807,7 @@ static enum ec_status flash_command_protect(struct host_cmd_handler_args *args)
 	if (p->mask)
 		crec_flash_set_protect(p->mask, p->flags);
 
+	cprints(CC_EVENTS, "+++Protect CP 1");
 	/*
 	 * Retrieve the current flags.  The caller can use this to determine
 	 * which of the requested flags could be set.  This is cleaner than
@@ -1803,6 +1816,7 @@ static enum ec_status flash_command_protect(struct host_cmd_handler_args *args)
 	 */
 	r->flags = crec_flash_get_protect();
 
+	cprints(CC_EVENTS, "+++Protect CP 2");
 	/* Indicate which flags are valid on this platform */
 	r->valid_flags = EC_FLASH_PROTECT_GPIO_ASSERTED |
 			 EC_FLASH_PROTECT_ERROR_STUCK |
@@ -1813,6 +1827,7 @@ static enum ec_status flash_command_protect(struct host_cmd_handler_args *args)
 
 	args->response_size = sizeof(*r);
 
+	cprints(CC_EVENTS, "+++Protect CP 3");
 	return EC_RES_SUCCESS;
 }
 
