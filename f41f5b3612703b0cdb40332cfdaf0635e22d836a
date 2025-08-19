@@ -16,6 +16,24 @@
       "message": "Nit:\n1. This might be a little more obvious if it was `is_battery_connected`, and the check below was `!is_battery_connected()`.\n2. Would it make sense for this to be implemented in the battery component and be something like `battery_is_connected`?",
       "revId": "f41f5b3612703b0cdb40332cfdaf0635e22d836a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e72381f5_69ee5871",
+        "filename": "common/charge_manager.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 753,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2025-08-19T17:48:44Z",
+      "side": 1,
+      "message": "I agree with everything you\u0027re suggesting here, but I didn\u0027t want to change the logic too much here to introduce any bugs.  Ideally the check should look like \n```\n(is_present() !\u003d BP_YES) || (is_present() \u003d\u003d BP_YES \u0026\u0026 is_cutoff() !\u003d BATTERY_CUTOFF_STATE_NORMAL)\n```\nAnd I can make this as a followup change.",
+      "parentUuid": "fa871940_dd2cf15e",
+      "revId": "f41f5b3612703b0cdb40332cfdaf0635e22d836a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
