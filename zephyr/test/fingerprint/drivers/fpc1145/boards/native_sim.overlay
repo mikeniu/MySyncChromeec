@@ -15,6 +15,15 @@
 		reg = <0>;
 		spi-max-frequency = <4000000>;
 
+		width = <56 56 56 56 56 56>;
+		height = <192 192 192 192 192 192>;
+		bits-per-pixel = <8 8 8 8 8 8>;
+		frame-size = <10752 10752 10752 10752 10752 10752>;
+		capture-type = <0 4 8 12 16 20>;
+		v4l2-pixel-format = "V4L2_PIX_FMT_GREY", "V4L2_PIX_FMT_GREY",\
+							"V4L2_PIX_FMT_GREY", "V4L2_PIX_FMT_GREY", \
+							"V4L2_PIX_FMT_GREY", "V4L2_PIX_FMT_GREY";
+
 		width = <56>;
 		height = <192>;
 		bits-per-pixel = <8>;

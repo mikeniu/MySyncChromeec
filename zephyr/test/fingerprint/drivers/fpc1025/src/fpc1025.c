@@ -63,30 +63,38 @@ ZTEST_F(fpc1025, test_deinit_success)
 
 ZTEST_F(fpc1025, test_get_info)
 {
-	struct fingerprint_info info;
+	struct fingerprint_sensor_info sensor_info;
+	struct fingerprint_image_frame_params
+		image_frame_params_array[NUM_IMAGE_CAPTURE_TYPES];
 
 	/* We need to initialize driver first to initialize 'error' field */
 	zassert_ok(fingerprint_init(fixture->dev));
-	zassert_ok(fingerprint_get_info(fixture->dev, &info));
+	zassert_ok(fingerprint_get_info(fixture->dev, &sensor_info,
+					image_frame_params_array));
 
-	zassert_equal(info.vendor_id, FOURCC('F', 'P', 'C', ' '));
-	zassert_equal(info.product_id, 9);
+	zassert_equal(sensor_info.vendor_id, FOURCC('F', 'P', 'C', ' '));
+	zassert_equal(sensor_info.product_id, 9);
 	/*
 	 * Last 4 bits of hardware id is a year of sensor production,
 	 * could differ between sensors.
 	 */
-	zassert_equal(info.model_id >> 4, 0x021);
-	zassert_equal(info.version, 1);
-	zassert_equal(info.frame_size, CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE);
-	zassert_equal(info.pixel_format, FINGERPRINT_SENSOR_V4L2_PIXEL_FORMAT(
-						 DT_NODELABEL(fpc1025)));
-	zassert_equal(info.width,
-		      FINGERPRINT_SENSOR_RES_X(DT_NODELABEL(fpc1025)));
-	zassert_equal(info.height,
-		      FINGERPRINT_SENSOR_RES_Y(DT_NODELABEL(fpc1025)));
-	zassert_equal(info.bpp,
-		      FINGERPRINT_SENSOR_RES_BPP(DT_NODELABEL(fpc1025)));
-	zassert_equal(info.errors, FINGERPRINT_ERROR_DEAD_PIXELS_UNKNOWN);
+	zassert_equal(sensor_info.model_id >> 4, 0x021);
+	zassert_equal(sensor_info.version, 1);
+	zassert_equal(sensor_info.errors,
+		      FINGERPRINT_ERROR_DEAD_PIXELS_UNKNOWN);
+
+	uint8_t capture_types[] = { 0, 4, 8, 12, 16, 20 };
+
+	for (int i = 0; i < NUM_IMAGE_CAPTURE_TYPES; ++i) {
+		zassert_equal(image_frame_params_array[i].frame_size, 25600);
+		zassert_equal(image_frame_params_array[i].pixel_format,
+			      V4L2_PIX_FMT_GREY);
+		zassert_equal(image_frame_params_array[i].width, 160);
+		zassert_equal(image_frame_params_array[i].height, 160);
+		zassert_equal(image_frame_params_array[i].bpp, 8);
+		zassert_equal(image_frame_params_array[i].fp_capture_type,
+			      capture_types[i]);
+	}
 }
 
 ZTEST_F(fpc1025, test_enter_low_power_mode)
