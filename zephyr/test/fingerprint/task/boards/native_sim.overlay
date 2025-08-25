@@ -39,10 +39,12 @@
 
 	fpsensor_sim: fpsensor-sim {
 		compatible = "cros-ec,fingerprint-sensor-sim";
-		width = <160>;
-		height = <160>;
-		bits-per-pixel = <8>;
-		v4l2-pixel-format = "V4L2_PIX_FMT_GREY";
+		width = <160 80>;
+		height = <160 80>;
+		bits-per-pixel = <8 16>;
+		frame-size = <25600 12800>;
+		capture-type = <4 8>;
+		v4l2-pixel-format = "V4L2_PIX_FMT_GREY", "V4L2_PIX_FMT_GREY";
 	};
 };
 

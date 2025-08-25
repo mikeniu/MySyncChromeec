@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "command_helper.h"
 #include "mock_fingerprint_algorithm.h"
 
 #include <zephyr/device.h>
@@ -11,6 +12,8 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/fff.h>
+#include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
 #include <zephyr/ztest.h>
 #include <zephyr/ztest_assert.h>
 
@@ -23,6 +26,8 @@
 #include <host_command.h>
 #include <rollback.h>
 
+LOG_MODULE_REGISTER(fp_sensor_match, LOG_LEVEL_INF);
+
 DEFINE_FFF_GLOBALS;
 
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
@@ -34,6 +39,12 @@ FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 static uint8_t image_buffer[IMAGE_SIZE];
 
 static const uint8_t fake_rollback_entropy[] = "some_rollback_entropy";
+
+static size_t fp_sensor_get_info_v2_size =
+	sizeof(struct ec_response_fp_info_v2) +
+	sizeof(struct fp_image_frame_params) * NUM_IMAGE_CAPTURE_TYPES;
+static ec_response_fp_info_v2 *info = static_cast<ec_response_fp_info_v2 *>(
+	k_malloc(fp_sensor_get_info_v2_size));
 
 /* The fake TPM seed is "very_secret_32_bytes_of_tpm_seed" */
 #define FAKE_TPM_SEED                                                       \
@@ -486,7 +497,6 @@ ZTEST_USER(fpsensor_match, test_match_success_template_updated_dirty_template)
 	};
 	struct ec_response_fp_mode response;
 	struct fingerprint_sensor_state state;
-	struct ec_response_fp_info info;
 
 	/* Load example template. */
 	zassert_ok(ec_cmd_fp_template(
@@ -521,8 +531,8 @@ ZTEST_USER(fpsensor_match, test_match_success_template_updated_dirty_template)
 	zassert_equal(mock_alg_match_fake.call_count, 1);
 
 	/* Confirm that dirty templates bitmap is correct. */
-	zassert_ok(ec_cmd_fp_info(NULL, &info));
-	zassert_equal(info.template_dirty, 0x1);
+	zassert_ok(fpinfo_cmd_helper(info));
+	zassert_equal(info->template_info.template_dirty, 0x1);
 }
 
 ZTEST_USER(fpsensor_match,
@@ -533,7 +543,6 @@ ZTEST_USER(fpsensor_match,
 	};
 	struct ec_response_fp_mode response;
 	struct fingerprint_sensor_state state;
-	struct ec_response_fp_info info;
 
 	/* Load example template. */
 	zassert_ok(ec_cmd_fp_template(
@@ -568,8 +577,8 @@ ZTEST_USER(fpsensor_match,
 	zassert_equal(mock_alg_match_fake.call_count, 1);
 
 	/* Confirm that dirty templates bitmap is correct. */
-	zassert_ok(ec_cmd_fp_info(NULL, &info));
-	zassert_equal(info.template_dirty, 0x0);
+	zassert_ok(fpinfo_cmd_helper(info));
+	zassert_equal(info->template_info.template_dirty, 0x0);
 }
 
 ZTEST_USER(fpsensor_match, test_match_success_no_template_update_dirty_template)
@@ -579,7 +588,6 @@ ZTEST_USER(fpsensor_match, test_match_success_no_template_update_dirty_template)
 	};
 	struct ec_response_fp_mode response;
 	struct fingerprint_sensor_state state;
-	struct ec_response_fp_info info;
 
 	/* Load example template. */
 	zassert_ok(ec_cmd_fp_template(
@@ -614,8 +622,8 @@ ZTEST_USER(fpsensor_match, test_match_success_no_template_update_dirty_template)
 	zassert_equal(mock_alg_match_fake.call_count, 1);
 
 	/* Confirm that dirty templates bitmap is correct. */
-	zassert_ok(ec_cmd_fp_info(NULL, &info));
-	zassert_equal(info.template_dirty, 0x0);
+	zassert_ok(fpinfo_cmd_helper(info));
+	zassert_equal(info->template_info.template_dirty, 0x0);
 }
 
 ZTEST_USER(fpsensor_match,
@@ -999,6 +1007,7 @@ static void fpsensor_before(void *f)
 
 	/* Clear MKBP events from previous tests. */
 	fp_get_next_event((uint8_t *)&fp_events);
+	memset(info, 0, fp_sensor_get_info_v2_size);
 }
 
 ZTEST_SUITE(fpsensor_match, NULL, fpsensor_setup, fpsensor_before, NULL, NULL);
