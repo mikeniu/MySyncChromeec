@@ -3551,24 +3551,76 @@ static void pe_snk_select_capability_entry(int port)
 	tc_pd_connection(port, 1);
 }
 
-static void pe_snk_apply_psnkstdby(int port)
+/* Select the current limit appropriate to the transition under way and apply it
+ * via charge manager. This is a no-op if charge-manager is disabled. This
+ * function presently only applies to transitions triggered by a Request-Accept
+ * message sequence.
+ */
+static void pe_snk_apply_transition_current(int port)
 {
-	uint32_t mv = pd_get_requested_voltage(port);
-	uint32_t high;
+	uint32_t request_mv = pd_get_requested_voltage(port);
+	uint32_t high_mv = 0;
+	int current_limit = 0;
 
-	/*
-	 * Apply 2.5W ceiling during transition. We need choose the larger of
-	 * the current input voltage and the new PDO voltage because during a
-	 * transition, both voltages can be applied to the device. If the
-	 * current source isn't PD, we don't need to care about drawing more
-	 * than pSnkStdby. Thus, it's not considered (in the else clause).
+	if (!IS_ENABLED(CONFIG_CHARGE_MANAGER))
+		return;
+
+	/* There are several possible transition scenarios with varying
+	 * current/power limits. The time requirements on the transitions vary,
+	 * but in each case, the TCPM attempts to transition as quickly as
+	 * possible following the Accept/GoodCRC. In cases involving iSnkStdby,
+	 * the TCPM will subsequently transition to the new contracted current
+	 * after the PS_RDY.
+	 * 1. Transition from the initial Type-C supplier to the first explicit
+	 *    contract, where the voltage is not 5V: The Sink must transition to
+	 *    iSnkStdby = 500mA within tSnkStdby = 15ms, but see note below.
+	 * 2. Transition between PDOs where the new PDO offers >0A and the
+	 *    voltage is changing: Same as above.
+	 * 3. Transition from Type-C current or a PDO to a PDO where the voltage
+	 *    is not changing: The Sink does not need to transition until after
+	 *    receiving the PS_RDY from the Source, but the Sink must comply
+	 *    with required transient load behavior. See ss 7.2.6 Transient Load
+	 *    Behavior and also note below.
+	 * 4. Transitions involving types of PDOs not supported by TCPMv2: Not
+	 *    treated here.
+	 *
+	 * Note: PD r3.2 v1.1 requires a Sink to draw <=iSnkStdby while voltage
+	 * is increasing. PD r2.0 v1.3 is more strict and requires the Sink to
+	 * draw less than pSnkStdby = 2.5W (= iSnkStdby x 5V) while voltage is
+	 * increasing OR decreasing. Rather than attempt to differentiate
+	 * behavior between PD 2.0 and PD 3.0, this code always follows the
+	 * stricter PD 2.0 rules. See PD r2.0 v1.3 ss 7.2.3 Sink Standby.
+	 *
+	 * To avoid bugs caused by slow transitions in the case where voltage
+	 * does not change, apply pSnkStdby to all PD-to-PD transitions.
 	 */
-	if (charge_manager_get_supplier() == CHARGE_SUPPLIER_PD)
-		high = MAX(charge_manager_get_charger_voltage(), mv);
-	else
-		high = mv;
-	charge_manager_force_ceil(
-		port, high > 0 ? PD_SNK_STDBY_MW * 1000 / high : PD_MIN_MA);
+
+	/* For purposes of calculating input current to adhere to pSnkStdby,
+	 * this code chooses the higher of the present input voltage and the new
+	 * input voltage, because both voltages may appear during the
+	 * transition.
+	 */
+	high_mv = MAX(charge_manager_get_charger_voltage(), request_mv);
+
+	if (high_mv == 0) {
+		/* Transition to 0V should not be possible. Limit to iSnkStdby
+		 * out of caution.
+		 */
+		current_limit = PD_MIN_MA;
+	} else if (charge_manager_get_supplier() == CHARGE_SUPPLIER_PD) {
+		/* PD-to-PD transition: Apply pSnkStdby. */
+		/* TODO: Consider whether to limit this to voltage transitions.
+		 */
+		current_limit = PD_SNK_STDBY_MW * 1000 / high_mv;
+	} else {
+		/* Type-C-to-PD transition: Apply iSnkstdby. */
+		/* TODO: The previous code claimed that this transition did not
+		 * require iSnkStdby. Citation needed.
+		 */
+		current_limit = PD_MIN_MA;
+	}
+
+	charge_manager_force_ceil(port, current_limit);
 }
 
 static void pe_snk_select_capability_run(int port)
@@ -3632,14 +3684,8 @@ static void pe_snk_select_capability_run(int port)
 			 * Accept Message Received
 			 */
 			if (type == PD_CTRL_ACCEPT) {
-				/* explicit contract is now in place */
-				pe_set_explicit_contract(port);
-
-				if (IS_ENABLED(CONFIG_CHARGE_MANAGER))
-					pe_snk_apply_psnkstdby(port);
-
+				pe_snk_apply_transition_current(port);
 				set_state_pe(port, PE_SNK_TRANSITION_SINK);
-
 				return;
 			}
 			/*
