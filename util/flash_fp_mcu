@@ -1199,6 +1199,14 @@ config_brox() {
       # FP_PWR_EN is on GPP_D2 = 160 + 2 = 162
       readonly GPIO_PWREN=162
       ;;
+    (caboc)
+      # FPMCU RST_ODL is on GPP_D9 = 160 + 9 = 169
+      readonly GPIO_NRST=169
+      # FPMCU BOOT0 is on GPP_D8 = 160 + 8 = 168
+      readonly GPIO_BOOT0=168
+      # FP_PWR_EN is on GPP_D11 = 160 + 11 = 171
+      readonly GPIO_PWREN=171
+      ;;
     *)
       echo "FPMCU not supported on model ${model}"
       return "${EXIT_PRECONDITION}"
