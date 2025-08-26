@@ -3582,6 +3582,7 @@ static void pe_snk_select_capability_entry(int port)
 static void pe_snk_apply_transition_current(int port)
 {
 	uint32_t request_mv = pd_get_requested_voltage(port);
+	uint32_t request_ma = pd_get_requested_current(port);
 	uint32_t high_mv = 0;
 	int current_limit = 0;
 
@@ -3594,17 +3595,20 @@ static void pe_snk_apply_transition_current(int port)
 	 * possible following the Accept/GoodCRC. In cases involving iSnkStdby,
 	 * the TCPM will subsequently transition to the new contracted current
 	 * after the PS_RDY.
-	 * 1. Transition from the initial Type-C supplier to the first explicit
+	 * 1. Transition to 0A PDO: The Sink must transition to pSnkSusp = 25mW
+	 *    within min tSrcTransition = 25ms or possibly tSnkNewPower = 15ms.
+	 *    See PD r3.2 v1.1 ss 7.2.5 Zero Negotiated Current.
+	 * 2. Transition from the initial Type-C supplier to the first explicit
 	 *    contract, where the voltage is not 5V: The Sink must transition to
 	 *    iSnkStdby = 500mA within tSnkStdby = 15ms, but see note below.
-	 * 2. Transition between PDOs where the new PDO offers >0A and the
+	 * 3. Transition between PDOs where the new PDO offers >0A and the
 	 *    voltage is changing: Same as above.
-	 * 3. Transition from Type-C current or a PDO to a PDO where the voltage
+	 * 4. Transition from Type-C current or a PDO to a PDO where the voltage
 	 *    is not changing: The Sink does not need to transition until after
 	 *    receiving the PS_RDY from the Source, but the Sink must comply
 	 *    with required transient load behavior. See ss 7.2.6 Transient Load
 	 *    Behavior and also note below.
-	 * 4. Transitions involving types of PDOs not supported by TCPMv2: Not
+	 * 5. Transitions involving types of PDOs not supported by TCPMv2: Not
 	 *    treated here.
 	 *
 	 * Note: PD r3.2 v1.1 requires a Sink to draw <=iSnkStdby while voltage
@@ -3625,7 +3629,10 @@ static void pe_snk_apply_transition_current(int port)
 	 */
 	high_mv = MAX(charge_manager_get_charger_voltage(), request_mv);
 
-	if (high_mv == 0) {
+	if (request_ma == 0) {
+		/* Transition to 0A. */
+		current_limit = 0;
+	} else if (high_mv == 0) {
 		/* Transition to 0V should not be possible. Limit to iSnkStdby
 		 * out of caution.
 		 */
@@ -3643,7 +3650,10 @@ static void pe_snk_apply_transition_current(int port)
 		current_limit = PD_MIN_MA;
 	}
 
-	charge_manager_force_ceil(port, current_limit);
+	if (current_limit == 0)
+		charge_manager_invalidate_suppliers(port);
+	else
+		charge_manager_force_ceil(port, current_limit);
 }
 
 static void pe_snk_select_capability_run(int port)
@@ -3829,32 +3839,11 @@ static void pe_snk_transition_sink_run(int port)
 				dpm_evaluate_sink_fixed_pdo(
 					port, *pd_get_snk_caps(port));
 
-			/*
-			 * Per PD r3.1 v1.8 ss 6.4.1.2.2, when a source wants
-			 * a sink, consuming power from Vbus, to go to its
-			 * lowest power state, the voltage (bit 19:10) shall be
-			 * set to 5V and the maximum current shall be set to
-			 * 0mA. This is used in cases where the source wants the
-			 * sink to draw pSnkSusp (25mW).
-			 * This also can pass PD CTS TEST.PD.PS.SNK.1#11.
+			/* In the case where the current limit is 0A,
+			 * PE_SNK_Select_Capability has already applied that
+			 * limit.
 			 */
-			if (pe[port].curr_limit == 0) {
-				pd_set_input_current_limit(port, 0, 0);
-
-				if (IS_ENABLED(CONFIG_CHARGE_MANAGER)) {
-					typec_set_input_current_limit(port, 0,
-								      0);
-					charge_manager_set_ceil(
-						port, CEIL_REQUESTOR_PD,
-						CHARGE_CEIL_NONE);
-
-#ifdef CONFIG_USB_CHARGER
-					charge_manager_update_charge(
-						CHARGE_SUPPLIER_VBUS, port,
-						NULL);
-#endif
-				}
-			} else {
+			if (pe[port].curr_limit != 0) {
 				/*
 				 * Per PD r3.1 v1.8 ss 8.3.3.3.6, the PE should
 				 * start actually sinking according to the new
