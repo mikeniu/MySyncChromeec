@@ -107,6 +107,9 @@
 	cros-keyscan {
 		compatible = "cros-ec,keyscan";
 
+		debounce-down = <20000>;
+		debounce-up = <20000>;
+
 		actual-key-mask = <
 			0x08	/* C0 */
 			0xff	/* C1 */
