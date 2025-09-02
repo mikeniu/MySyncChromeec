@@ -68,6 +68,7 @@ config CROS_FLASH_RTKFP
 	depends on DT_HAS_REALTEK_RTKFP_CROS_FLASH_ENABLED
 	default y if PLATFORM_EC
 	select PLATFORM_EC_FLASH_CROS
+	select PLATFORM_EC_SPI_FLASH_REGS
 	help
 	  This option enables the flash driver for the rts5817 chip. We can
 	  access the flash by read, write and erase. The rts5817 flash size
