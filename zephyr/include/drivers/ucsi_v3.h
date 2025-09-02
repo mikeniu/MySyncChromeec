@@ -413,6 +413,19 @@ union battery_capability_t {
 	uint8_t raw_value[9];
 };
 
+/*
+ * @brief
+ * List of Response Message Types supported by the UCSI GET_PD_MESSAGE command.
+ */
+enum get_pd_message_response_type_t {
+	GET_PD_MESSAGE_SINK_CAP_EXT = 0,
+	GET_PD_MESSAGE_SRC_CAP_EXT = 1,
+	GET_PD_MESSAGE_BATTERY_CAP = 2,
+	GET_PD_MESSAGE_BATTERY_STATUS = 3,
+	GET_PD_MESSAGE_DISC_ID = 4,
+	GET_PD_MESSAGE_REVISION = 5,
+};
+
 /**
  * @brief CCI - USB Type-C Command Status and Connector Change Indication
  */

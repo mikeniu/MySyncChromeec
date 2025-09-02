@@ -287,6 +287,34 @@ static void tps6699x_emul_ucsi_set_pdos(struct tps6699x_emul_pdc_data *data,
 	}
 }
 
+static void
+tps699x_emul_get_pd_message(struct tps6699x_emul_pdc_data *data,
+			    const union get_pd_message_t *get_pd_message)
+{
+	switch (get_pd_message->response_message_type) {
+	case GET_PD_MESSAGE_DISC_ID:
+		data->response.result = TASK_COMPLETED_SUCCESSFULLY;
+		data->response.data.length =
+			sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT;
+		memcpy(data->response.data.pd_message, &data->identity,
+		       sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT);
+		memcpy(&data->reg_val[REG_DATA_FOR_CMD1], &data->response,
+		       sizeof(data->response));
+		break;
+	case GET_PD_MESSAGE_REVISION:
+		data->response.result = TASK_COMPLETED_SUCCESSFULLY;
+		data->response.data.length = sizeof(uint32_t);
+		memcpy(data->response.data.pd_message, &data->rmdo,
+		       sizeof(uint32_t));
+		memcpy(data->reg_val[REG_DATA_FOR_CMD1], &data->response,
+		       sizeof(data->response));
+		break;
+	default:
+		/* Unsupported GET_PD_MESSAGE command */
+		break;
+	}
+}
+
 static void tps6699x_emul_handle_ucsi(struct tps6699x_emul_pdc_data *data,
 				      uint8_t *data_reg)
 {
@@ -353,6 +381,10 @@ static void tps6699x_emul_handle_ucsi(struct tps6699x_emul_pdc_data *data,
 		break;
 	case UCSI_SET_PDOS:
 		tps6699x_emul_ucsi_set_pdos(data, data_reg);
+		break;
+	case UCSI_GET_PD_MESSAGE:
+		tps699x_emul_get_pd_message(
+			data, (union get_pd_message_t *)&data_reg[2]);
 		break;
 	default:
 		LOG_WRN("tps6699x_emul: Unimplemented UCSI command %#04x", cmd);
