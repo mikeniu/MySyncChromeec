@@ -10,21 +10,9 @@
 #include <zephyr/init.h>
 
 #include <atomic.h>
-#ifndef CONFIG_AP_PWRSEQ_DRIVER
 #include <x86_non_dsx_common_pwrseq_sm_handler.h>
-#else
-#include "ap_power/ap_pwrseq.h"
-#include "ap_power/ap_pwrseq_sm.h"
-#include "x86_non_dsx_common_pwrseq_sm_handler.h"
-#include "zephyr_console_shim.h"
-#endif
 
-/* Delay in ms when starting from G3 */
-static uint32_t start_from_g3_delay_ms;
-
-#ifdef CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND
-static bool in_debug_mode;
-#endif
+LOG_MODULE_REGISTER(ap_pwrseq, CONFIG_AP_PWRSEQ_LOG_LEVEL);
 
 /*
  * Flags, may be set/cleared from other threads.
@@ -36,19 +24,12 @@ enum {
 };
 static ATOMIC_DEFINE(flags, FLAGS_MAX);
 
-#ifndef CONFIG_AP_PWRSEQ_DRIVER
 static K_KERNEL_STACK_DEFINE(pwrseq_thread_stack, CONFIG_AP_PWRSEQ_STACK_SIZE);
 static struct k_thread pwrseq_thread_data;
 static struct pwrseq_context pwrseq_ctx = {
 	.power_state = SYS_POWER_STATE_UNINIT,
 };
 static struct k_sem pwrseq_sem;
-
-static void s5_inactive_timer_handler(struct k_timer *timer);
-/* S5 inactive timer*/
-K_TIMER_DEFINE(s5_inactive_timer, s5_inactive_timer_handler, NULL);
-
-LOG_MODULE_REGISTER(ap_pwrseq, CONFIG_AP_PWRSEQ_LOG_LEVEL);
 
 /**
  * @brief power_state names for debug
@@ -76,49 +57,7 @@ static const char *const pwrsm_dbg[] = {
 	[SYS_POWER_STATE_S0S0ix] = "S0S0ix",
 #endif
 };
-#else
-static void x86_non_dsx_timer_handler(struct k_timer *timer);
 
-K_TIMER_DEFINE(x86_non_dsx_timer, x86_non_dsx_timer_handler, NULL);
-
-LOG_MODULE_DECLARE(ap_pwrseq, CONFIG_AP_PWRSEQ_LOG_LEVEL);
-#endif /* CONFIG_AP_PWRSEQ_DRIVER */
-
-/*
- * Returns true if all signals in mask are valid.
- * This is only done for virtual wire signals.
- */
-static inline bool signals_valid(power_signal_mask_t signals)
-{
-#if defined(CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S3)
-	if ((signals & POWER_SIGNAL_MASK(PWR_SLP_S3)) &&
-	    power_signal_get(PWR_SLP_S3) < 0)
-		return false;
-#endif
-#if defined(CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S4)
-	if ((signals & POWER_SIGNAL_MASK(PWR_SLP_S4)) &&
-	    power_signal_get(PWR_SLP_S4) < 0)
-		return false;
-#endif
-#if defined(CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S5)
-	if ((signals & POWER_SIGNAL_MASK(PWR_SLP_S5)) &&
-	    power_signal_get(PWR_SLP_S5) < 0)
-		return false;
-#endif
-	return true;
-}
-
-static inline bool signals_valid_and_on(power_signal_mask_t signals)
-{
-	return signals_valid(signals) && power_signals_on(signals);
-}
-
-static inline bool signals_valid_and_off(power_signal_mask_t signals)
-{
-	return signals_valid(signals) && power_signals_off(signals);
-}
-
-#ifndef CONFIG_AP_PWRSEQ_DRIVER
 enum power_states_ndsx pwr_sm_get_state(void)
 {
 	return pwrseq_ctx.power_state;
@@ -138,39 +77,28 @@ void pwr_sm_set_state(enum power_states_ndsx new_state)
 	pwrseq_ctx.power_state = new_state;
 }
 
+void x86_non_dsx_start_from_g3(void)
+{
+	atomic_set_bit(flags, START_FROM_G3);
+}
+
 void ap_pwrseq_wake(void)
 {
 	k_sem_give(&pwrseq_sem);
 }
 
-/*
- * Set a flag to enable starting the AP once it is in G3.
- * This is called from ap_power_exit_hardoff() which checks
- * to ensure that the AP is in S5 or G3 state before calling
- * this function.
- * It can also be called via a hostcmd, which allows the flag
- * to be set in any AP state.
- */
-void request_start_from_g3(void)
+void s5_inactive_timer_handler(struct k_timer *timer)
 {
-	LOG_INF("Request start from G3");
-	atomic_set_bit(flags, START_FROM_G3);
-	/*
-	 * If in S5, restart the timer to give the CPU more time
-	 * to respond to a power button press (which is presumably
-	 * why we are being called). This avoids having the S5
-	 * inactivity timer expiring before the AP can process
-	 * the power button press and start up.
-	 */
-	if (pwr_sm_get_state() == SYS_POWER_STATE_S5) {
-		atomic_clear_bit(flags, S5_INACTIVE_TIMER_RUNNING);
+	if (atomic_test_bit(flags, S5_INACTIVE_TIMER_RUNNING)) {
+		ap_pwrseq_wake();
 	}
-	ap_pwrseq_wake();
 }
 
-static void s5_inactive_timer_handler(struct k_timer *timer)
+void start_from_g3_timer_handler(struct k_timer *timer)
 {
-	ap_pwrseq_wake();
+	if (atomic_test_bit(flags, START_FROM_G3)) {
+		ap_pwrseq_wake();
+	}
 }
 
 static void shutdown_and_notify(enum ap_power_shutdown_reason reason)
@@ -180,174 +108,6 @@ static void shutdown_and_notify(enum ap_power_shutdown_reason reason)
 	ap_power_ev_send_callbacks(AP_POWER_SHUTDOWN_COMPLETE);
 }
 
-void apshutdown(void)
-{
-	if (pwr_sm_get_state() != SYS_POWER_STATE_G3) {
-		shutdown_and_notify(AP_POWER_SHUTDOWN_G3);
-		pwr_sm_set_state(SYS_POWER_STATE_G3);
-	}
-}
-#else
-const char *const pwr_sm_get_state_name(enum ap_pwrseq_state state)
-{
-	return ap_pwrseq_get_state_str(state);
-}
-
-static void x86_non_dsx_timer_handler(struct k_timer *timer)
-{
-	if (atomic_test_bit(flags, S5_INACTIVE_TIMER_RUNNING)) {
-		ap_pwrseq_post_event(ap_pwrseq_get_instance(),
-				     AP_PWRSEQ_EVENT_POWER_TIMEOUT);
-	} else if (atomic_test_bit(flags, START_FROM_G3)) {
-		ap_pwrseq_post_event(ap_pwrseq_get_instance(),
-				     AP_PWRSEQ_EVENT_POWER_STARTUP);
-	}
-}
-
-void request_start_from_g3(void)
-{
-	const struct device *dev = ap_pwrseq_get_instance();
-
-	LOG_INF("Request start from G3");
-
-	if (!board_ap_power_is_startup_ok()) {
-		LOG_INF("Start from G3 inhibited"
-			" by !is_startup_ok");
-		return;
-	}
-
-	/*
-	 * If in S5, restart the timer to give the CPU more time
-	 * to respond to a power button press (which is presumably
-	 * why we are being called). This avoids having the S5
-	 * inactivity timer expiring before the AP can process
-	 * the power button press and start up.
-	 */
-	if ((ap_pwrseq_get_current_state(dev) == AP_POWER_STATE_S5) &&
-	    (AP_PWRSEQ_DT_VALUE(s5_inactivity_timeout) != 0)) {
-		k_timer_start(
-			&x86_non_dsx_timer,
-			K_SECONDS(AP_PWRSEQ_DT_VALUE(s5_inactivity_timeout)),
-			K_NO_WAIT);
-		return;
-	}
-
-	atomic_set_bit(flags, START_FROM_G3);
-	if (ap_pwrseq_get_current_state(dev) == AP_POWER_STATE_G3) {
-		if (start_from_g3_delay_ms) {
-			k_timer_start(&x86_non_dsx_timer,
-				      K_MSEC(start_from_g3_delay_ms),
-				      K_NO_WAIT);
-			start_from_g3_delay_ms = 0;
-		} else {
-			ap_pwrseq_post_event(dev,
-					     AP_PWRSEQ_EVENT_POWER_STARTUP);
-		}
-	}
-}
-
-void apshutdown(void)
-{
-	const struct device *dev = ap_pwrseq_get_instance();
-
-	ap_pwrseq_state_lock(dev);
-
-	if (ap_pwrseq_get_current_state(dev) != AP_POWER_STATE_G3) {
-		ap_power_force_shutdown(AP_POWER_SHUTDOWN_G3);
-	}
-
-	ap_pwrseq_state_unlock(dev);
-}
-#endif /* CONFIG_AP_PWRSEQ_DRIVER */
-
-void ap_power_force_shutdown(enum ap_power_shutdown_reason reason)
-{
-#ifdef CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND
-	/* This prevents force shutdown if debug mode is enabled */
-	if (in_debug_mode) {
-		LOG_WRN("debug_mode is enabled, preventing force shutdown");
-		return;
-	}
-#endif /* CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND */
-
-	report_ap_reset((enum chipset_shutdown_reason)reason);
-#ifdef CONFIG_AP_PWRSEQ_DRIVER
-	ap_pwrseq_post_event(ap_pwrseq_get_instance(),
-			     AP_PWRSEQ_EVENT_POWER_SHUTDOWN);
-#else
-	board_ap_power_force_shutdown();
-#endif
-}
-
-void set_start_from_g3_delay_seconds(uint32_t d_time)
-{
-	start_from_g3_delay_ms = d_time * USEC_PER_MSEC;
-}
-
-void ap_power_reset(enum ap_power_shutdown_reason reason)
-{
-	/*
-	 * Irrespective of cold_reset value, always toggle SYS_RESET_L to
-	 * perform an AP reset. RCIN# which was used earlier to trigger
-	 * a warm reset is known to not work in certain cases where the CPU
-	 * is in a bad state (crbug.com/721853).
-	 *
-	 * The EC cannot control warm vs cold reset of the AP using
-	 * SYS_RESET_L; it's more of a request.
-	 */
-	LOG_DBG("%s: %d", __func__, reason);
-
-	/*
-	 * Toggling SYS_RESET_L will not have any impact when it's already
-	 * low (i,e. AP is in reset state).
-	 */
-	if (power_signal_get(PWR_SYS_RST)) {
-		LOG_DBG("Chipset is in reset state");
-		return;
-	}
-
-	report_ap_reset((enum chipset_shutdown_reason)reason);
-
-	power_signal_set(PWR_SYS_RST, 1);
-	/*
-	 * Debounce time for SYS_RESET_L is 16 ms. Wait twice that period
-	 * to be safe.
-	 */
-	k_msleep(AP_PWRSEQ_DT_VALUE(sys_reset_delay));
-	power_signal_set(PWR_SYS_RST, 0);
-	ap_power_ev_send_callbacks(AP_POWER_RESET);
-}
-
-/* Check RSMRST is fine to move from S5 to higher state */
-int rsmrst_power_is_good(void)
-{
-	/* TODO: Check if this is still intact */
-	return power_signal_get(PWR_RSMRST_PWRGD);
-}
-
-/* Handling RSMRST signal is mostly common across x86 chipsets */
-void rsmrst_pass_thru_handler(void)
-{
-	/* Handle RSMRST passthrough */
-	/* TODO: Add additional conditions for RSMRST handling */
-	if (power_signal_get(PWR_RSMRST_PWRGD)) {
-		if (power_signal_get(PWR_EC_PCH_RSMRST)) {
-			/*
-			 * Delay `PWR_EC_PCH_RSMRST` de-assertion for at least
-			 * `rsmrst_delay` after detecting that power wells are
-			 * stable.
-			 */
-			k_msleep(AP_PWRSEQ_DT_VALUE(rsmrst_delay));
-			LOG_DBG("Deasserting PWR_EC_PCH_RSMRST");
-			power_signal_set(PWR_EC_PCH_RSMRST, 0);
-			update_ap_boot_time(RSMRST);
-		}
-	} else {
-		power_signal_set(PWR_EC_PCH_RSMRST, 1);
-	}
-}
-
-#ifndef CONFIG_AP_PWRSEQ_DRIVER
 /* Common power sequencing */
 static int common_pwr_sm_run(int state)
 {
@@ -368,17 +128,9 @@ static int common_pwr_sm_run(int state)
 		 * the AP. There may be a delay set, so only start
 		 * after that delay.
 		 */
-		if (atomic_test_and_clear_bit(flags, START_FROM_G3)) {
-			LOG_INF("Starting from G3, delay %d ms",
-				start_from_g3_delay_ms);
-			k_msleep(start_from_g3_delay_ms);
-			start_from_g3_delay_ms = 0;
-
-			if (!board_ap_power_is_startup_ok()) {
-				LOG_INF("Start from G3 inhibited"
-					" by !is_startup_ok");
-				break;
-			}
+		if (atomic_test_bit(flags, START_FROM_G3) &&
+		    get_remaining_start_from_g3_timer() == 0) {
+			atomic_clear_bit(flags, START_FROM_G3);
 			gen_hard_off_evt = true;
 			return SYS_POWER_STATE_G3S5;
 		}
@@ -400,7 +152,7 @@ static int common_pwr_sm_run(int state)
 			/* rsmrst is intact */
 			rsmrst_pass_thru_handler();
 			if (signals_valid_and_off(IN_PCH_SLP_S5)) {
-				k_timer_stop(&s5_inactive_timer);
+				stop_s5_inactive_timer();
 				/* Clear the timer running flag */
 				atomic_clear_bit(flags,
 						 S5_INACTIVE_TIMER_RUNNING);
@@ -409,6 +161,11 @@ static int common_pwr_sm_run(int state)
 				LOG_INF("Clearing request to exit G3");
 				return SYS_POWER_STATE_S5S4;
 			}
+		}
+
+		if (ap_power_in_debug_mode()) {
+			LOG_WRN("debug_mode is enabled, preventing shutdown");
+			break;
 		}
 		/*
 		 * S5 state has an inactivity timer, so moving
@@ -420,35 +177,28 @@ static int common_pwr_sm_run(int state)
 		 *  - give time for the power button to be pressed,
 		 *    which may set the START_FROM_G3 flag.
 		 */
-		if (AP_PWRSEQ_DT_VALUE(s5_inactivity_timeout) == 0)
-			return SYS_POWER_STATE_S5G3;
-		else if (AP_PWRSEQ_DT_VALUE(s5_inactivity_timeout) > 0) {
+
+		if (!atomic_test_and_set_bit(flags,
+					     S5_INACTIVE_TIMER_RUNNING)) {
 			/*
 			 * Test and set timer running flag.
 			 * If it was 0, then the timer wasn't running
 			 * and it is started (and the flag is set),
 			 * otherwise it is already set, so no change.
 			 */
-			if (!atomic_test_and_set_bit(
-				    flags, S5_INACTIVE_TIMER_RUNNING)) {
-				/*
-				 * Timer is not started, or needs
-				 * restarting.
-				 */
-				k_timer_start(&s5_inactive_timer,
-					      K_SECONDS(AP_PWRSEQ_DT_VALUE(
-						      s5_inactivity_timeout)),
-					      K_NO_WAIT);
-			} else if (k_timer_status_get(&s5_inactive_timer) > 0) {
-				/* Timer is expired */
-				atomic_clear_bit(flags,
-						 S5_INACTIVE_TIMER_RUNNING);
-				return SYS_POWER_STATE_S5G3;
-			}
+			start_s5_inactive_timer();
+		} else if (get_remaining_s5_inactive_timer() == 0) {
+			/* Either timer expired or its duration was set to `0`,
+			 * in either case we can move forward. */
+			atomic_clear_bit(flags, S5_INACTIVE_TIMER_RUNNING);
+			return SYS_POWER_STATE_S5G3;
 		}
 		break;
 
 	case SYS_POWER_STATE_S5G3:
+		if (atomic_test_bit(flags, START_FROM_G3)) {
+			start_start_from_g3_timer();
+		}
 		/* Nofity power event after we remove power rails */
 		ap_power_force_shutdown(AP_POWER_SHUTDOWN_G3);
 		return SYS_POWER_STATE_G3;
@@ -801,228 +551,3 @@ k_tid_t get_ap_pwrseq_thread(void)
  * the signals depend upon, such as GPIO, ADC etc.
  */
 SYS_INIT(pwrseq_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
-#else
-static int x86_non_dsx_g3_entry(void *data)
-{
-	if (!atomic_test_bit(flags, START_FROM_G3)) {
-		return 0;
-	}
-
-	if (start_from_g3_delay_ms) {
-		k_timer_start(&x86_non_dsx_timer,
-			      K_MSEC(start_from_g3_delay_ms), K_NO_WAIT);
-		start_from_g3_delay_ms = 0;
-	} else {
-		ap_pwrseq_post_event(ap_pwrseq_get_instance(),
-				     AP_PWRSEQ_EVENT_POWER_STARTUP);
-	}
-
-	return 0;
-}
-
-static int x86_non_dsx_g3_run(void *data)
-{
-	/*
-	 * If the START_FROM_G3 flag is set, begin starting
-	 * the AP. There may be a delay set, so only start
-	 * after that delay.
-	 */
-	if (!atomic_test_bit(flags, START_FROM_G3)) {
-		return 0;
-	}
-
-	if (k_timer_remaining_get(&x86_non_dsx_timer)) {
-		return 0;
-	}
-	/*
-	 * At this point all power rails and power signals are already checked
-	 * by application and chipset state action handlers, it is safe to move
-	 * forward to S5.
-	 */
-	return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S5);
-}
-
-static int x86_non_dsx_g3_exit(void *data)
-{
-	atomic_clear_bit(flags, START_FROM_G3);
-
-	return 0;
-}
-
-AP_POWER_ARCH_STATE_DEFINE(G3, x86_non_dsx_g3_entry, x86_non_dsx_g3_run,
-			   x86_non_dsx_g3_exit);
-
-static int x86_non_dsx_s5_entry(void *data)
-{
-	if (AP_PWRSEQ_DT_VALUE(s5_inactivity_timeout)) {
-		atomic_set_bit(flags, S5_INACTIVE_TIMER_RUNNING);
-		k_timer_start(
-			&x86_non_dsx_timer,
-			K_SECONDS(AP_PWRSEQ_DT_VALUE(s5_inactivity_timeout)),
-			K_NO_WAIT);
-	}
-
-	return 0;
-}
-
-static int x86_non_dsx_s5_run(void *data)
-{
-	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
-		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_G3);
-	}
-	/*
-	 * At this point, lower level action handlers of state machine should
-	 * have already checked that required power rails are OK.
-	 */
-	rsmrst_pass_thru_handler();
-	if (!power_signal_get(PWR_EC_PCH_RSMRST)) {
-		if (signals_valid_and_off(IN_PCH_SLP_S5)) {
-			return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S4);
-		}
-	}
-#ifdef CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND
-	/* This prevents force shutdown if debug mode is enabled */
-	if (in_debug_mode) {
-		LOG_WRN("debug_mode is enabled, preventing G3 transition");
-		return 0;
-	}
-#endif /* CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND */
-	/* S5 inactivity timeout, go to G3 */
-	if (AP_PWRSEQ_DT_VALUE(s5_inactivity_timeout) == 0) {
-		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_G3);
-	} else if (k_timer_remaining_get(&x86_non_dsx_timer) == 0) {
-		/* Timer is expired */
-		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_G3);
-	}
-
-	return 0;
-}
-
-static int x86_non_dsx_s5_exit(void *data)
-{
-	if (atomic_test_bit(flags, S5_INACTIVE_TIMER_RUNNING)) {
-		k_timer_stop(&x86_non_dsx_timer);
-		atomic_clear_bit(flags, S5_INACTIVE_TIMER_RUNNING);
-	}
-
-	return 0;
-}
-
-AP_POWER_ARCH_STATE_DEFINE(S5, x86_non_dsx_s5_entry, x86_non_dsx_s5_run,
-			   x86_non_dsx_s5_exit);
-
-static int x86_non_dsx_s4_run(void *data)
-{
-	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
-		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_G3);
-	}
-	if (power_signal_get(PWR_RSMRST_PWRGD) == 0 ||
-	    signals_valid_and_on(IN_PCH_SLP_S5)) {
-		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S5);
-	}
-
-	if (signals_valid_and_off(IN_PCH_SLP_S4)) {
-#if CONFIG_AP_PWRSEQ_S0IX
-		/*
-		 * Clearing the S0ix flag on the path to S0
-		 * to handle any reset conditions.
-		 */
-		ap_power_reset_host_sleep_state();
-#endif
-		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S3);
-	}
-
-	return 0;
-}
-
-AP_POWER_ARCH_STATE_DEFINE(S4, NULL, x86_non_dsx_s4_run, NULL);
-
-static int x86_non_dsx_s3_run(void *data)
-{
-	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
-		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_G3);
-	}
-	if (power_signal_get(PWR_RSMRST_PWRGD) == 0 ||
-	    signals_valid_and_on(IN_PCH_SLP_S4)) {
-		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S4);
-	}
-
-	if (signals_valid_and_on(IN_PCH_SLP_S3)) {
-		return 0;
-	}
-
-	/* All the power rails must be stable */
-	if (power_signal_get(PWR_ALL_SYS_PWRGD)) {
-		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S0);
-	}
-
-	return 0;
-}
-
-AP_POWER_ARCH_STATE_DEFINE(S3, NULL, x86_non_dsx_s3_run, NULL);
-
-static int x86_non_dsx_s0_entry(void *data)
-{
-	disable_sleep(SLEEP_MASK_AP_RUN);
-
-	return 0;
-}
-
-static int x86_non_dsx_s0_run(void *data)
-{
-	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
-		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_G3);
-	}
-	if (signals_valid_and_on(IN_PCH_SLP_S3)) {
-		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S3);
-	}
-#if CONFIG_AP_PWRSEQ_S0IX
-	if (ap_power_sleep_get_notify() == AP_POWER_SLEEP_SUSPEND &&
-	    power_signal_get(PWR_SLP_S0) != 0) {
-		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S0ix);
-	} else if (ap_power_sleep_get_notify() == AP_POWER_SLEEP_RESUME) {
-		ap_power_sleep_notify_transition(AP_POWER_SLEEP_RESUME);
-	} else if (power_signal_get(PWR_SLP_S0) == 0) {
-		disable_sleep(SLEEP_MASK_AP_RUN);
-	}
-#endif
-
-	return 0;
-}
-
-static int x86_non_dsx_s0_exit(void *data)
-{
-	enable_sleep(SLEEP_MASK_AP_RUN);
-
-	return 0;
-}
-
-AP_POWER_ARCH_STATE_DEFINE(S0, x86_non_dsx_s0_entry, x86_non_dsx_s0_run,
-			   x86_non_dsx_s0_exit);
-#endif /* CONFIG_AP_PWRSEQ_DRIVER */
-
-#ifdef CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND
-/*
- * Intel debugger puts SOC in boot halt mode for step debugging,
- * during this time EC may lose Sx lines, Adding this console
- * command to avoid force shutdown.
- */
-static int disable_force_shutdown(int argc, const char **argv)
-{
-	if (argc > 1) {
-		if (!strcmp(argv[1], "enable")) {
-			in_debug_mode = true;
-		} else if (!strcmp(argv[1], "disable")) {
-			in_debug_mode = false;
-		} else {
-			return EC_ERROR_PARAM1;
-		}
-	}
-	LOG_INF("debug_mode = %s", (in_debug_mode ? "enabled" : "disabled"));
-
-	return EC_SUCCESS;
-}
-
-DECLARE_CONSOLE_COMMAND(debug_mode, disable_force_shutdown, "[enable|disable]",
-			"Prevents force shutdown if enabled");
-#endif /* CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND */

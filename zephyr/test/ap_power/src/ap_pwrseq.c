@@ -16,6 +16,7 @@
 #include "system.h"
 #include "test_mocks.h"
 #include "test_state.h"
+#include "x86_non_dsx_common_pwrseq_sm_handler.h"
 #include "zephyr/sys/util.h"
 
 #include <zephyr/drivers/espi.h>
@@ -211,6 +212,14 @@ static void power_up_test_g3_to_s0_helper(void)
 	 * AP are set to high level.
 	 */
 	verify_ap_inputs(true);
+
+	zassert_equal(
+#ifdef CONFIG_AP_PWRSEQ_DRIVER
+		AP_POWER_STATE_S0,
+#else
+		SYS_POWER_STATE_S0,
+#endif
+		chipset_pwr_seq_get_state());
 }
 
 static bool get_cse_early_recovery_gpio_level(void)
@@ -421,6 +430,49 @@ ZTEST(ap_pwrseq, test_ap_pwrseq_2)
 		      "AP_POWER_HARD_OFF event not generated");
 }
 
+#if defined(CONFIG_TEST_AP_POWER_MTL) || defined(CONFIG_TEST_AP_POWER_ADL)
+ZTEST(ap_pwrseq, test_ap_pwrseq_2_1)
+{
+	struct ec_params_reboot_ap_on_g3_v1 params;
+
+	zassert_equal(
+		0,
+		power_signal_emul_load(EMUL_POWER_SIGNAL_TEST_PLATFORM(
+			tp_sys_g3_to_s0_power_down_to_s5)),
+		"Unable to load test platform `tp_sys_g3_to_s0_power_down_to_s5`");
+
+	/* Coverage for set_start_from_g3_delay_seconds function. */
+	params.reboot_ap_at_g3_delay = 0;
+	ec_cmd_reboot_ap_on_g3_v1(NULL, &params);
+
+	k_sleep(K_MSEC(S5_INACTIVITY_TIMEOUT_MS));
+	zassert_equal(1, power_shutdown_count,
+		      "AP_POWER_SHUTDOWN event not generated");
+	zassert_equal(1, power_shutdown_complete_count,
+		      "AP_POWER_SHUTDOWN_COMPLETE event not generated");
+	zassert_equal(1, power_suspend_count,
+		      "AP_POWER_SUSPEND event not generated");
+	/* At this point AP_POWER_HARD_OFF should not be generated, current
+	 * power state must be S5, G3 transition must happen once
+	 * S5_INACTIVITY_TIMEOUT_MS expires. */
+	zassert_true(ap_power_in_state(AP_POWER_STATE_SOFT_OFF));
+	zassert_equal(0, power_hard_off_count,
+		      "AP_POWER_HARD_OFF event is generated");
+
+	zassert_equal(
+#ifdef CONFIG_AP_PWRSEQ_DRIVER
+		AP_POWER_STATE_S5,
+#else
+		SYS_POWER_STATE_S5,
+#endif
+		chipset_pwr_seq_get_state());
+
+	k_sleep(K_MSEC(S5_INACTIVITY_TIMEOUT_MS * 0.5));
+	zassert_equal(1, power_hard_off_count,
+		      "AP_POWER_HARD_OFF event not generated");
+}
+#endif
+
 #if defined(CONFIG_AP_X86_INTEL_MTL)
 ZTEST(ap_pwrseq, test_ap_pwrseq_3_sleep_reset)
 {
@@ -498,21 +550,10 @@ ZTEST(ap_pwrseq, test_ap_pwrseq_3)
 		      "Unable to load test platform `tp_sys_s5_slp_sus_fail`");
 
 	ap_power_exit_hardoff();
-	k_msleep(500);
+	k_sleep(K_MSEC(S5_INACTIVITY_TIMEOUT_MS * 1.5));
 
-	/*
-	 * AP_PWRSEQ_DRIVER inhibits transition up from G3 due to slp_sus signal
-	 * error, whereas the other implementation goes to G3S5 then notices the
-	 * problem and goes back to G3, emitting a AP_POWER_HARD_OFF event in
-	 * the process.
-	 */
-	if (IS_ENABLED(CONFIG_AP_PWRSEQ_DRIVER)) {
-		zassert_equal(0, power_hard_off_count,
-			      "AP_POWER_HARD_OFF event generated");
-	} else {
-		zassert_equal(1, power_hard_off_count,
-			      "AP_POWER_HARD_OFF event not generated");
-	}
+	zassert_equal(1, power_hard_off_count,
+		      "AP_POWER_HARD_OFF event not generated");
 }
 
 ZTEST(ap_pwrseq, test_ap_pwrseq_4)
