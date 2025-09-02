@@ -18,6 +18,7 @@
 		cros-ec,flash = &flash0;
 		cros-ec,flash-controller = &cros_flash_controller;
 		cros-ec,bbram = &bbram;
+		cros-ec,watchdog = &watchdog;
 	};
 
 	retain_mem@20000000 {
