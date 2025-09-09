@@ -16,7 +16,7 @@ const static struct emul *emul = EMUL_DT_GET(DT_NODELABEL(ps8743_mux_1));
 
 ZTEST(usb_mux_tentacruel_init, test_mux_init_value)
 {
-	ps8743_eq_c1_setting();
+	ps8743_eq_c1_setting(usb_muxes[1].mux);
 	zassert_equal(ps8743_emul_peek_reg(emul, PS8743_REG_USB_EQ_RX), 0x90);
 }
 

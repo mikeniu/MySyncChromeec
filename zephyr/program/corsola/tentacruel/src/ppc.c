@@ -55,9 +55,9 @@ void bc12_interrupt(enum gpio_signal signal)
 #endif
 
 /* USB Mux C1 : board_init of PS8743 */
-int ps8743_eq_c1_setting(void)
+int ps8743_eq_c1_setting(const struct usb_mux *me)
 {
-	ps8743_write(usb_muxes[1].mux, PS8743_REG_USB_EQ_RX, 0x90);
+	ps8743_write(me, PS8743_REG_USB_EQ_RX, 0x90);
 	return EC_SUCCESS;
 }
 
