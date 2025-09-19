@@ -281,6 +281,29 @@ bool cros::dsp::service::Driver::HandleDecodedRequest() {
   }
 }
 
+cros::dsp::service::Driver::Driver(
+    uint16_t target_address,
+    const struct i2c_target_callbacks* target_callbacks,
+    const struct device* bus,
+    struct gpio_dt_spec interrupt)
+    : target_cfg_{},
+      bus_(bus),
+      interrupt_(interrupt),
+      transport_([this](bool has_data) {
+        LOG_DBG("NotifyClientCallback(%d)", has_data);
+        if (has_data) {
+          k_sem_give(&this->data_processing_semaphore_);
+          int rc = gpio_pin_set_dt(&this->interrupt_, CROS_DSP_GPIO_ON);
+          LOG_DBG("asserting GPIO (%d)", rc);
+        } else {
+          int rc = gpio_pin_set_dt(&this->interrupt_, CROS_DSP_GPIO_OFF);
+          LOG_DBG("deasserting GPIO (%d)", rc);
+        }
+      }) {
+  target_cfg_.address = target_address;
+  target_cfg_.callbacks = target_callbacks;
+}
+
 pw::Status cros::dsp::service::Driver::Init() {
   int rc = 0;
 #if DT_PROP(DT_DRV_INST(0), allow_runtime_disable)
@@ -313,18 +336,6 @@ pw::Status cros::dsp::service::Driver::Init() {
 
   rc |= gpio_pin_set_dt(&interrupt_, CROS_DSP_GPIO_OFF);
   PW_CHECK_INT_EQ(rc, 0);
-
-  transport_.SetNotifyClientCallback([this](bool has_data) {
-    LOG_DBG("NotifyClientCallback(%d)", has_data);
-    if (has_data) {
-      k_sem_give(&this->data_processing_semaphore_);
-      int rc = gpio_pin_set_dt(&this->interrupt_, CROS_DSP_GPIO_ON);
-      LOG_DBG("asserting GPIO (%d)", rc);
-    } else {
-      int rc = gpio_pin_set_dt(&this->interrupt_, CROS_DSP_GPIO_OFF);
-      LOG_DBG("deasserting GPIO (%d)", rc);
-    }
-  });
 
   LOG_INF("DSP Initialization rc=%d", rc);
   if (rc == 0) {
