@@ -28,7 +28,6 @@ i2c_port_ish: &i2c5 {};
 
 gpio_acok: &gpio_acok_od {};
 gpio_lid: &gpio_lid_open {};
-gpio_pwrbtn: &gpio_gsc_ec_pwr_btn_odl {};
 gpio_fan_control: &gpio_en_pp5000_fan {};
 gpio_all_sys_pwr_good: &gpio_all_sys_pwrgd_r {};
 gpio_temp_sensor_power_good: &gpio_en_s5_rails {};
@@ -49,7 +48,6 @@ tach_fan0: &tach0 {};
 #include "usba.dtsi"
 #include "usb_typec.dtsi"
 
-#include "../ite_hibernate.dtsi"
 #include "../rvp_temp_sensors.dtsi"
 
 /* matsu overrides follow... */

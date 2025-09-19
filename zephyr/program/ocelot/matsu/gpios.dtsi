@@ -48,21 +48,21 @@
 		gpio_ec_accel_db_int_l: ec_accel_db_int_l {
 			gpios = <&gpiof 6 (GPIO_INPUT)>;
 		};
-		gpio_gsc_ec_pwr_btn_odl: gsc_ec_pwr_btn_odl {
-			gpios = <&gpioe 4 (GPIO_INPUT)>;
+		gpio_ec_mech_pwr_btn_l: ec_mech_pwr_btn_l {
+			gpios = <&gpioq 0 (GPIO_INPUT)>;
 			enum-name = "GPIO_POWER_BUTTON_L";
 		};
 		gpio_acok_od: acok_od {
-			gpios = <&gpioc 0 (GPIO_INPUT)>;
+			gpios = <&gpioq 1 (GPIO_INPUT)>;
 			enum-name = "GPIO_AC_PRESENT";
 		};
 		/* I2C_PROG_SCL */
 		gpio_bga_pinm2: bga_pinm2 {
-			gpios = <&gpioc 7 (GPIO_INPUT)>;
+			gpios = <&gpiof 2 (GPIO_INPUT)>;
 		};
 		/* I2C_PROG_SDA */
 		gpio_bga_pinn1: bga_pinn1 {
-			gpios = <&gpiod 0 (GPIO_INPUT)>;
+			gpios = <&gpiof 3 (GPIO_INPUT)>;
 		};
 		gpio_amp_mute_odl: amp_mute_odl {
 			gpios = <&gpioh 0 (GPIO_OUTPUT_LOW | GPIO_OPEN_DRAIN)>;
@@ -148,7 +148,7 @@
 			enum-name = "GPIO_EC_INT_L";
 		};
 		gpio_lid_open: lid_open {
-			gpios = <&gpiod 3 (GPIO_INPUT)>;
+			gpios = <&gpioq 4 (GPIO_INPUT)>;
 			enum-name = "GPIO_LID_OPEN";
 		};
 		gpio_ec_soc_wake_odl: ec_soc_wake_odl {
@@ -199,24 +199,20 @@
 		compatible = "unused-gpios";
 
 		unused-gpios =
-			/* check IT82002 not used */
-			<&gpiob 3 0>, /* SPARE GPB3 */
-			<&gpiob 4 0>, /* SPARE GPB4 */
-			<&gpioe 6 0>, /* SPARE GPE6 */
-			<&gpiof 2 0>, /* SPARE GPF2 */
-			<&gpiof 3 0>, /* SPARE GPF3 */
-			<&gpiog 1 0>, /* SPARE GPG1 */
-
-			/* check both not used */
-			<&gpioa 4 0>, /* LED_3_R_L */
-			<&gpioa 5 0>, /* LED_4_R_L */
+			<&gpioa 4 0>, /* SPARE GPA4 (LED_3_R_L) */
+			<&gpioa 5 0>, /* SPARE GPA5 (LED_4_R_L) */
+			<&gpioc 0 0>, /* SPARE GPC0 (acok) */
+			<&gpiod 0 0>, /* SPARE GPD0 (prog_sda) */
+			<&gpiod 3 0>, /* SPARE GPD3 (led_open) */
+			<&gpioe 4 0>, /* SPARE GPE4 (gsc_ec_pwr_bnt)*/
+			<&gpioj 6 0>, /* SPARE GPJ6 (PD2_INT) */
+			/* Strap pins */
 			<&gpiog 0 0>, /* SPARE GPG0 */
 			<&gpiob 2 0>, /* SPARE GPB2 */
 			<&gpiog 3 0>, /* SPARE GPG3 */
 			<&gpiog 4 0>, /* SPARE GPG4 */
 			<&gpiog 5 0>, /* SPARE GPG5 */
-			<&gpiog 7 0>, /* SPARE GPG7 */
-			<&gpioj 6 0>; /* SPARE GPJ6 PD2_INT*/
+			<&gpiog 7 0>; /* SPARE GPG7 */
 	};
 };
 

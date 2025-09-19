@@ -1,0 +1,32 @@
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+&power_ctrl_elpm {
+	status = "okay";
+	// pinctrl-0 = <&xlpin0_gpq0_default &xlpin1_gpq1_default
+	// 	     &xlpin2_gpq2_default &xlpin4_gpq4_default>;
+	pinctrl-0 = <&xlpin4_gpq4_default>;
+	pinctrl-names = "default";
+
+	/* XLPIN[0](GPIO_G1): enabled, low-falling */
+	// xlpin0: xlpin@0 { reg = <0>; polarity = "low-falling"; };
+	/* XLPIN[0](GPIO_G1): enabled, high-rising */
+	// xlpin0: xlpin@0 { reg = <0>; polarity = "high-rising"; };
+
+	/* XLPIN[1](GPIO_B0): enabled, low-falling */
+	// xlpin1: xlpin@1 { reg = <1>; polarity = "low-falling"; };
+	/* XLPIN[1](GPIO_B0): enabled, high-rising */
+	// xlpin1: xlpin@1 { reg = <1>; polarity = "high-rising"; };
+
+	/* XLPIN[2](GPIO_B3): enabled, low-falling */
+	// xlpin2: xlpin@2 { reg = <2>; polarity = "low-falling"; };
+	/* XLPIN[2](GPIO_B3): enabled, high-rising */
+	// xlpin2: xlpin@2 { reg = <2>; polarity = "high-rising"; };
+
+	/* XLPIN[4](GPIO_B1): enabled, low-falling */
+	// xlpin4: xlpin@4 { reg = <4>; polarity = "low-falling"; };
+	/* XLPIN[4](GPIO_B1): enabled, high-rising */
+	xlpin4: xlpin@4 { reg = <4>; polarity = "high-rising"; };
+};

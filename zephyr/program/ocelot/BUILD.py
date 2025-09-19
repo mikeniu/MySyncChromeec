@@ -65,6 +65,37 @@ def register_it8xxx2_project(
     )
 
 
+def register_it82000_project(
+    project_name,
+    extra_kconfig_base_files=(),
+    extra_kconfig_proj_files=(),
+    inherited_from=None,
+):
+    """Register an it82000 based variant of ocelot."""
+    if inherited_from is None:
+        inherited_from = ["ocelot"]
+
+    register_binman_project(
+        project_name=project_name,
+        zephyr_board="it8xxx2/it82000bw",
+        dts_overlays=[
+            here / project_name / "project.overlay",
+            here / "it82000_elpm.overlay",
+        ],
+        kconfig_files=[
+            # Common to all projects.
+            here / "program.conf",
+            # Customization to apply before project-specific config.
+            *extra_kconfig_base_files,
+            # Project-specific KConfig customization.
+            here / project_name / "project.conf",
+            # Additional project-specific KConfig customization.
+            *extra_kconfig_proj_files,
+        ],
+        inherited_from=inherited_from,
+    )
+
+
 def register_mec172x_project(
     project_name,
     extra_kconfig_base_files=(),
@@ -163,7 +194,7 @@ register_rtk59_project(
     project_name="ojal",
 )
 
-register_it8xxx2_project(
+register_it82000_project(
     project_name="matsu",
 )
 
