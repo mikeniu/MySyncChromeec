@@ -1,0 +1,83 @@
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#define UFSC_BIT(dword, bit) ((dword) * 32 + (bit))
+
+/ {
+	cbi_ufsc: cbi-ufsc {
+		compatible = "cros-ec,cbi-ufsc";
+
+		form-factor {
+			enum-name = "UFSC_FORM_FACTOR";
+			start = <UFSC_BIT(2, 0)>;
+			size = <2>;
+		};
+		kb-backlight {
+			enum-name = "UFSC_KB_BACKLIGHT";
+			start = <UFSC_BIT(2, 2)>;
+			size = <1>;
+		};
+		kb-layout {
+			enum-name = "UFSC_KB_LAYOUT";
+			start = <UFSC_BIT(2, 3)>;
+			size = <2>;
+		};
+		kb-num-pad {
+			enum-name = "UFSC_KB_NUM_PAD";
+			start = <UFSC_BIT(2, 5)>;
+			size = <1>;
+		};
+		thermal-fan {
+			enum-name = "UFSC_THERMAL_FAN";
+			start = <UFSC_BIT(2, 6)>;
+			size = <1>;
+		};
+		lid-sensor {
+			enum-name = "UFSC_LID_SENSOR";
+			start = <UFSC_BIT(2, 9)>;
+			size = <3>;
+		};
+		base-sensor {
+			enum-name = "UFSC_BASE_SENSOR";
+			start = <UFSC_BIT(2, 12)>;
+			size = <3>;
+		};
+		sensor-hub {
+			enum-name = "UFSC_SENSOR_HUB";
+			start = <UFSC_BIT(2, 15)>;
+			size = <2>;
+		};
+		tablet-mode-orientation {
+			enum-name = "UFSC_TABLET_MODE_ORIENTATION";
+			start = <UFSC_BIT(2, 17)>;
+			size = <1>;
+		};
+		charger {
+			enum-name = "UFSC_CHARGER";
+			start = <UFSC_BIT(2, 18)>;
+			size = <3>;
+		};
+		pdc-port-0 {
+			enum-name = "UFSC_PDC_PORT_0";
+			start = <UFSC_BIT(2, 21)>;
+			size = <2>;
+		};
+		pdc-port-1 {
+			enum-name = "UFSC_PDC_PORT_1";
+			start = <UFSC_BIT(2, 23)>;
+			size = <2>;
+		};
+		pdc-port-2 {
+			enum-name = "UFSC_PDC_PORT_2";
+			start = <UFSC_BIT(2, 25)>;
+			size = <2>;
+		};
+		pdc-port-3 {
+			enum-name = "UFSC_PDC_PORT_3";
+			start = <UFSC_BIT(2, 27)>;
+			size = <2>;
+		};
+	};
+};
