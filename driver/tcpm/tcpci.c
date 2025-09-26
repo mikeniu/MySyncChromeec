@@ -1226,13 +1226,20 @@ void tcpci_tcpc_alert(int port)
 	 */
 	if (alert & TCPC_REG_ALERT_TX_COMPLETE) {
 		int tx_status;
+		CPRINTS("P%d: TX alert\n", port);
 
-		if (alert & TCPC_REG_ALERT_TX_SUCCESS)
+		if (alert & TCPC_REG_ALERT_TX_SUCCESS) {
 			tx_status = TCPC_TX_COMPLETE_SUCCESS;
-		else if (alert & TCPC_REG_ALERT_TX_DISCARDED)
+			CPRINTS("P%d: TX complete\n", port);
+		}
+		else if (alert & TCPC_REG_ALERT_TX_DISCARDED) {
 			tx_status = TCPC_TX_COMPLETE_DISCARDED;
-		else
+			CPRINTS("P%d: TX DISCARDED\n", port);
+		}
+		else {
 			tx_status = TCPC_TX_COMPLETE_FAILED;
+			CPRINTS("P%d: TX FAILED\n", port);
+		}
 
 		pd_transmit_complete(port, tx_status);
 	}

@@ -1141,6 +1141,8 @@ static void prl_tx_wait_for_phy_response_entry(const int port)
 
 static void prl_tx_wait_for_phy_response_run(const int port)
 {
+	CPRINTS("P%d: %s\n", port,
+			prl_tx_state_names[prl_tx_get_state(port)]);
 	/* Wait until TX is complete */
 
 	/*
@@ -1156,8 +1158,10 @@ static void prl_tx_wait_for_phy_response_run(const int port)
 		increment_msgid_counter(port);
 
 		/* Inform Policy Engine Message was sent */
-		if (IS_ENABLED(CONFIG_USB_PD_EXTENDED_MESSAGES))
+		if (IS_ENABLED(CONFIG_USB_PD_EXTENDED_MESSAGES)) {
 			PDMSG_SET_FLAG(port, PRL_FLAGS_TX_COMPLETE);
+			CPRINTS("P%d-PRL-TX\n", port);
+		}
 		else
 			pe_message_sent(port);
 
@@ -2002,6 +2006,7 @@ static void tch_sending_chunked_message_run(const int port)
 	/*
 	 * Transmission Error
 	 */
+	CPRINTS("P%d-tch-run\n", port);
 	if (PDMSG_CHK_FLAG(port, PRL_FLAGS_TX_ERROR)) {
 		tch[port].error = ERR_TCH_XMIT;
 		set_state_tch(port, TCH_REPORT_ERROR);
@@ -2012,12 +2017,14 @@ static void tch_sending_chunked_message_run(const int port)
 	 */
 	else if (tx_emsg[port].len == pdmsg[port].send_offset &&
 		 PDMSG_CHK_FLAG(port, PRL_FLAGS_TX_COMPLETE)) {
+		CPRINTS("P%d-PRL_TX_COMPLETE\n", port);
 		PDMSG_CLR_FLAG(port, PRL_FLAGS_TX_COMPLETE);
 		set_state_tch(port, TCH_MESSAGE_SENT);
 		/*
 		 * Any message received and not in state TCH_Wait_Chunk_Request
 		 */
 	} else if (TCH_CHK_FLAG(port, PRL_FLAGS_MSG_RECEIVED)) {
+		CPRINTS("P%d-PRL_MSG_RECEIVED\n", port);
 		TCH_CLR_FLAG(port, PRL_FLAGS_MSG_RECEIVED);
 		set_state_tch(port, TCH_MESSAGE_RECEIVED);
 	}
@@ -2027,6 +2034,7 @@ static void tch_sending_chunked_message_run(const int port)
 	 */
 	else if (pdmsg[port].send_offset < tx_emsg[port].len &&
 		 PDMSG_CHK_FLAG(port, PRL_FLAGS_TX_COMPLETE)) {
+		CPRINTS("P%d-PRL_TX_COMPLETE_CHUNKING\n", port);
 		PDMSG_CLR_FLAG(port, PRL_FLAGS_TX_COMPLETE);
 		set_state_tch(port, TCH_WAIT_CHUNK_REQUEST);
 	}
@@ -2116,6 +2124,7 @@ static void tch_message_received_entry(const int port)
 static void tch_message_received_run(const int port)
 {
 	set_state_tch(port, TCH_WAIT_FOR_MESSAGE_REQUEST_FROM_PE);
+	print_current_tch_state(port);
 }
 
 /*
@@ -2283,8 +2292,10 @@ static void prl_rx_wait_for_phy_message(const int port, int evt)
 		 * message is pending.
 		 */
 		if (prl_tx[port].xmit_status != TCPC_TX_COMPLETE_SUCCESS ||
-		    PRL_TX_CHK_FLAG(port, PRL_FLAGS_MSG_XMIT))
+		    PRL_TX_CHK_FLAG(port, PRL_FLAGS_MSG_XMIT)) {
+				CPRINTS("P%d-TX-Discard\n", port);
 			set_state_prl_tx(port, PRL_TX_DISCARD_MESSAGE);
+			}
 	}
 
 	/* Store Message Id */
