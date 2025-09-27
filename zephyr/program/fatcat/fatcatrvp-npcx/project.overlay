@@ -51,6 +51,23 @@
 	aliases {
 		gpio-wp = &gpio_wp_odl;
 	};
+
+	ec-console {
+		compatible = "ec-console";
+		disabled = "events",
+			   "lpc";
+/*
+		disabled = "DPTF",
+			   "events",
+			   "hostcmd",
+			   "host_event",
+			   "keyboard",
+			   "keyscan",
+			   "lpc",
+			   "motionsense",
+			   "port80";
+*/
+	};
 };
 
 &cbi_flash {
