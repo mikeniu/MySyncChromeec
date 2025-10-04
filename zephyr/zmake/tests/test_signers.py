@@ -39,6 +39,7 @@ def test_rwsig_sign(mock_futility, tmpdir):
         ["sign", "--type", "rwsig", "--data_size", "900"] + [mock.ANY] * 4,
         mock.ANY,
         mock.ANY,
+        mock.ANY,
     )
 
     # expect only path to ec.bin changed.
@@ -46,3 +47,38 @@ def test_rwsig_sign(mock_futility, tmpdir):
     assert signed[1][1] == "key.vbprik2"
     assert signed[2] == (Path("b"), "zephyr.ro.elf")
     assert signed[3] == (Path("c"), "zephyr.rw.elf")
+
+
+@mock.patch.object(signers.RochksumSigner, "_run_futility")
+def test_rochksum_sign(mock_futility, tmpdir):
+    """Test rochksum signing.
+
+    We can't call futility here, so this test only verifies the
+    number of bytes to sign is good.
+    """
+
+    signer = signers.RochksumSigner()
+
+    # fake files: 1000 bytes EC_RW and 32 bytes checksum
+    with open(tmpdir / "wp_ro", "wb") as wp_ro:
+        wp_ro.write(b"\0" * 1000)
+    with open(tmpdir / "ro.chksum", "wb") as chksum:
+        chksum.write(b"\0" * 32)
+
+    packer_output = [
+        (Path("a"), "ec.bin"),
+        (Path("b"), "zephyr.ro.elf"),
+        (Path("c"), "zephyr.rw.elf"),
+    ]
+
+    signed = list(signer.sign(packer_output, tmpdir, None))
+
+    mock_futility.assert_any_call(
+        ["sign", "--type", "rochksum", "--data_size", "968"] + [mock.ANY] * 2,
+        mock.ANY,
+        mock.ANY,
+        mock.ANY,
+    )
+
+    # expect only path to ec.bin changed.
+    assert signed[0][1] == "ec.bin"
