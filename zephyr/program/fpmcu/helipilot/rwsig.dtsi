@@ -13,6 +13,12 @@
 				offset = <0x1ec40>;
 				size = <0x400>;
 			};
+			ro-checksum {
+				compatible = "cros-ec,flash-layout";
+				type = "section";
+				offset = <0x1ffe0>;
+				size = <0x20>;
+			};
 		};
 	};
 
