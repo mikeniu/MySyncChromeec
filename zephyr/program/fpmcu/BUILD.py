@@ -113,7 +113,8 @@ helipilot = register_fpmcu_variant(
     signer=[
         signers.RwsigSigner(  # pylint: disable=undefined-variable
             here / "helipilot" / "dev_key.pem",
-        )
+        ),
+        signers.RochksumSigner(),  # pylint: disable=undefined-variable
     ],
     boards=["brya", "fatcat", "rauru", "rex"],
 )
