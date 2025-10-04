@@ -30,7 +30,7 @@ class BaseSigner(abc.ABC):  # pylint: disable=too-few-public-methods
 
         Args:
             files: An iterable of 2-tuples (output_path, output_name) of
-                   unsigned artifacts produced by output packer and their name.
+                unsigned artifacts produced by output packer and their name.
             work_dir: A directory to write outputs and temporary files into.
             jobclient: A JobClient object to use.
 
@@ -39,6 +39,34 @@ class BaseSigner(abc.ABC):  # pylint: disable=too-few-public-methods
             copied into the output directory, and the output filename.
         """
         raise NotImplementedError
+
+    def _run_futility(
+        self,
+        args: List[Union[str, Path]],
+        work_dir: Path,
+        jobclient: jobserver.JobClient,
+        logger,
+    ) -> None:
+        """Helper to execute futility command.
+
+        Args:
+            args: Command-line arguments.
+            work_dir: A directory to write outputs and temporary files into.
+            jobclient: A JobClient object to use.
+        """
+
+        proc = jobclient.popen(
+            [util.get_tool_path("futility"), *args],
+            cwd=work_dir,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            encoding="utf-8",
+        )
+        multiproc.LogWriter.log_output(logger, logging.DEBUG, proc.stdout)
+        multiproc.LogWriter.log_output(logger, logging.ERROR, proc.stderr)
+        proc.wait(timeout=60)
+        if proc.returncode:
+            raise subprocess.CalledProcessError(proc.returncode, proc.args)
 
 
 class NullSigner(BaseSigner):  # pylint: disable=too-few-public-methods
@@ -63,7 +91,7 @@ class RwsigSigner(BaseSigner):
         """Constructor.
 
         Arg:
-            key: Path to a RSA key in PEM format.
+                        key: Path to a RSA key in PEM format.
         """
         self.key = key
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -78,7 +106,7 @@ class RwsigSigner(BaseSigner):
 
         Args:
             files: An iterable of 2-tuples (output_path, output_name) of
-                   unsigned artifacts produced by output packer and their name.
+                unsigned artifacts produced by output packer and their name.
             work_dir: A directory to write outputs and temporary files into.
             jobclient: A JobClient object to use.
 
@@ -125,11 +153,15 @@ class RwsigSigner(BaseSigner):
             ],
             work_dir,
             jobclient,
+            self.logger,
         )
         data_size = os.path.getsize(ec_rw) - os.path.getsize(sig_file)
 
         self._run_futility(
-            ["create", self.key, work_dir / "key"], work_dir, jobclient
+            ["create", self.key, work_dir / "key"],
+            work_dir,
+            jobclient,
+            self.logger,
         )
 
         self._run_futility(
@@ -146,6 +178,7 @@ class RwsigSigner(BaseSigner):
             ],
             work_dir,
             jobclient,
+            self.logger,
         )
 
         self._run_futility(
@@ -159,33 +192,112 @@ class RwsigSigner(BaseSigner):
             ],
             work_dir,
             jobclient,
+            self.logger,
         )
 
         yield signed_bin, "ec.bin"
         yield pri_key, "key.vbprik2"
 
-    def _run_futility(
+
+class RochksumSigner(BaseSigner):
+    """Signer to calculate a checksum for the EC RO
+
+    This expects that the image is packed using FMAP, the image contains a
+    RO_CHECKSUM section at the end of its RO region to hold the SHA_256
+    checksum
+    """
+
+    def __init__(self):
+        """Constructor."""
+
+        self.logger = logging.getLogger(self.__class__.__name__)
+
+    def sign(
         self,
-        args: List[Union[str, Path]],
+        files: Iterable[Tuple[Path, str]],
         work_dir: Path,
         jobclient: jobserver.JobClient,
-    ) -> None:
-        """Helper to execute futility command.
+    ) -> Iterable[Tuple[Path, str]]:
+        """Sign a firmware image with calculated checksum
 
         Args:
-            args: Command-line arguments.
+            files: An iterable of 2-tuples (output_path, output_name) of
+                unsigned artifacts produced by output packer and their name.
             work_dir: A directory to write outputs and temporary files into.
             jobclient: A JobClient object to use.
+
+        Returns:
+            An iterable of 2-tuples (output_name, output_path) which should be
+            copied into the output directory, and the output filename.
         """
-        proc = jobclient.popen(
-            [util.get_tool_path("futility"), *args],
-            cwd=work_dir,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            encoding="utf-8",
+        for path, name in files:
+            if name == "ec.bin":
+                yield from self.checksum_ro(path, work_dir, jobclient)
+            else:
+                yield path, name
+
+    def checksum_ro(
+        self,
+        bin_file: Path,
+        work_dir: Path,
+        jobclient: jobserver.JobClient,
+    ) -> Iterable[Tuple[Path, str]]:
+        """Sign a EC binary.
+
+        Args:
+            bin_file: Path to the unsigned EC binary.
+            work_dir: A directory to write outputs and temporary files into.
+            jobclient: A JobClient object to use.
+
+        Yields:
+            2-tuples (output_name, output_path) which should be copied into
+            the output directory, and the output filename.
+        """
+        wp_ro = work_dir / "wp_ro"
+        chksum_file = work_dir / "ro.chksum"
+        signed_bin = work_dir / "ec-signed.bin"
+
+        self._run_futility(
+            [
+                "dump_fmap",
+                "-x",
+                bin_file,
+                f"WP_RO:{wp_ro}",
+                f"RO_CHECKSUM:{chksum_file}",
+            ],
+            work_dir,
+            jobclient,
+            self.logger,
         )
-        multiproc.LogWriter.log_output(self.logger, logging.DEBUG, proc.stdout)
-        multiproc.LogWriter.log_output(self.logger, logging.ERROR, proc.stderr)
-        proc.wait(timeout=60)
-        if proc.returncode:
-            raise subprocess.CalledProcessError(proc.returncode, proc.args)
+
+        data_size = os.path.getsize(wp_ro) - os.path.getsize(chksum_file)
+
+        self._run_futility(
+            [
+                "sign",
+                "--type",
+                "ro_chksum",
+                "--data_size",
+                str(data_size),
+                wp_ro,
+                chksum_file,
+            ],
+            work_dir,
+            jobclient,
+            self.logger,
+        )
+
+        self._run_futility(
+            [
+                "load_fmap",
+                "-o",
+                signed_bin,
+                bin_file,
+                f"RO_CHECKSUM:{chksum_file}",
+            ],
+            work_dir,
+            jobclient,
+            self.logger,
+        )
+
+        yield signed_bin, "ec.bin"
