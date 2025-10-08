@@ -148,6 +148,10 @@ static int usb_device_init(void)
 {
 	int err;
 
+#ifdef CONFIG_UDC_FOCALTECH
+	((struct usb_device_descriptor*)(usb_device.fs_desc))->bcdUSB = sys_cpu_to_le16(USB_SRN_1_1);
+#endif
+
 	err = usbd_add_descriptor(&usb_device, &lang);
 	if (err) {
 		LOG_ERR("failed to initialize language descriptor (%d)", err);
