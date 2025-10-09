@@ -14,6 +14,12 @@
 #include "temp_sensor/temp_sensor.h"
 #include "temp_sensor/thermistor.h"
 #include "temp_sensor/tmp112.h"
+#include "util.h"
+
+#include <zephyr/logging/log.h>
+#include <zephyr/shell/shell.h>
+
+LOG_MODULE_REGISTER(temp_sensor, LOG_LEVEL_INF);
 
 #if DT_HAS_COMPAT_STATUS_OKAY(TEMP_SENSORS_COMPAT)
 
@@ -286,6 +292,8 @@ const struct temp_sensor_t temp_sensors[] = { DT_FOREACH_CHILD_SEP(
 
 BUILD_ASSERT(ARRAY_SIZE(temp_sensors) == TEMP_SENSOR_COUNT);
 
+static int fake_temp[4] = { -1, -1, -1, -1 };
+
 static bool temp_sensor_check_power(const struct temp_sensor_t *sensor)
 {
 #if ANY_INST_HAS_POWER_GOOD_PIN
@@ -309,6 +317,11 @@ int temp_sensor_read(enum temp_sensor_id id, int *temp_ptr)
 	if (!temp_sensor_check_power(sensor))
 		return EC_ERROR_NOT_POWERED;
 
+	if (fake_temp[id] != -1) {
+		*temp_ptr = C_TO_K(fake_temp[id]);
+		return EC_SUCCESS;
+	}
+
 	return sensor->zephyr_info->read(sensor, temp_ptr);
 }
 
@@ -327,5 +340,45 @@ void temp_sensors_update(void)
 	}
 }
 DECLARE_HOOK(HOOK_SECOND, temp_sensors_update, HOOK_PRIO_TEMP_SENSOR);
+
+static int therm_set_fake_temp(int index, int degree_c)
+{
+	if ((index < 0) || (index >= 4))
+		return EC_ERROR_INVAL;
+
+	fake_temp[index] = degree_c;
+	LOG_INF("New degree will be updated 1 sec later\n\n");
+
+	return EC_SUCCESS;
+}
+
+/*****************************************************************************/
+/* Console commands */
+static int command_therm(const struct shell *sh, size_t argc, char **argv)
+{
+	char *e;
+	int data;
+	int offset;
+	int rv = 0;
+
+	offset = strtoi(argv[2], &e, 0);
+	if (*e || offset < 0 || offset > 255)
+		return EC_ERROR_PARAM2;
+
+	data = strtoi(argv[3], &e, 0);
+
+	if (!strcmp(argv[1], "fake")) {
+		shell_print(sh, "Hook temperature\n");
+		rv = therm_set_fake_temp(offset, data);
+	} else
+		return EC_ERROR_PARAM1;
+
+	return rv;
+}
+
+SHELL_CMD_ARG_REGISTER(therm, NULL,
+		       "Set fake temperature of thermistor"
+		       "[fake <index> <value>]",
+		       command_therm, 4, 0);
 
 #endif /* DT_HAS_COMPAT_STATUS_OKAY(TEMP_SENSORS_COMPAT) */
