@@ -866,13 +866,48 @@ class Zmake:
                     dirs,
                     version_string=version_string,
                 )
-                for output_file, output_name in project.signer.sign(
-                    unsigned_files, packer_work_dir, self.jobserver
-                ):
-                    shutil.copy2(output_file, output_dir / output_name)
+                # Start with the initial list of unsigned files
+                current_files = list(
+                    unsigned_files
+                )  # Convert the initial iterable to a list
+
+                # Ensure project.signer is iterable, handling both single objects and lists
+                # for backward compatibility with older BUILD.py files during compare-builds
+                signers_to_process = project.signer
+                if not isinstance(signers_to_process, list):
+                    signers_to_process = [signers_to_process]
+
+                for each_signer in signers_to_process:
                     self.logger.debug(
-                        "Output file '%s' created.", output_dir / output_name
+                        "signer name: %s.", each_signer.__class__.__name__
                     )
+
+                    # The current signer's input is the output of the previous one
+                    signed_files_iterator = each_signer.sign(
+                        current_files, packer_work_dir, self.jobserver
+                    )
+
+                    # Collect the results into a new list for the *next* signer
+                    next_files = []
+
+                    for output_file, output_name in signed_files_iterator:
+                        shutil.copy2(output_file, output_dir / output_name)
+                        self.logger.debug(
+                            "Output file '%s' created.",
+                            output_dir / output_name,
+                        )
+
+                        # decide if this file should be passed to the next signer
+                        if output_name == "ec.bin":
+                            # Only the main binary is processed by the next signer
+                            next_files.append(
+                                (output_dir / output_name, output_name)
+                            )
+                        # Non-firmware files (like keys) are just copied and dropped from the chain.
+
+                    # Update current_files for the next iteration
+                    current_files = next_files
+
                 project.packer.verify_rw_fwid(
                     packer_work_dir,
                 )

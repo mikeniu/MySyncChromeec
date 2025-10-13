@@ -31,6 +31,11 @@ def module_dts_overlay_name(modpath, board_name):
     return modpath / "zephyr" / "dts" / "board-overlays" / f"{board_name}.dts"
 
 
+def default_signer_list_factory():
+    """Returns the list of default signers, initialized with their arguments."""
+    return [signers.NullSigner()]
+
+
 @dataclasses.dataclass
 class ProjectConfig:
     """All the information needed to define a project."""
@@ -54,7 +59,12 @@ class ProjectConfig:
     inherited_from: typing.Iterable[str] = dataclasses.field(
         default_factory=list
     )
-    signer: signers.BaseSigner = signers.NullSigner()
+    signer: list["signers.BaseSigner"] = dataclasses.field(
+        default_factory=list,
+        metadata={
+            "help": "Additional signers to add to the project (e.g., for test keys)."
+        },
+    )
     skip_build_all: bool = False
 
     @property
