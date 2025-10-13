@@ -18,7 +18,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from typing import Dict, Optional, Set, Union
+from typing import Dict, Iterable, Optional, Set, Union
 
 from zmake import util
 import zmake.analyze_build_diff
@@ -914,19 +914,31 @@ class Zmake:
                     gcov=gcov,
                 )
             else:
-                unsigned_files = project.packer.pack_firmware(
+                files = project.packer.pack_firmware(
                     packer_work_dir,
                     self.jobserver,
                     dirs,
                     version_string=version_string,
                 )
-                for output_file, output_name in project.signer.sign(
-                    unsigned_files, packer_work_dir, self.jobserver
-                ):
+
+                signers = (
+                    project.signer
+                    if isinstance(project.signer, Iterable)
+                    else [project.signer]
+                )
+
+                for signer in signers:
+                    self.logger.debug(
+                        "Running signer %s.", signer.__class__.__name__
+                    )
+                    files = signer.sign(files, packer_work_dir, self.jobserver)
+
+                for output_file, output_name in files:
                     shutil.copy2(output_file, output_dir / output_name)
                     self.logger.debug(
                         "Output file '%s' created.", output_dir / output_name
                     )
+
                 project.packer.verify_rw_fwid(
                     packer_work_dir,
                 )
