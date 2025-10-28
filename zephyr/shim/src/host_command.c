@@ -10,6 +10,7 @@
 #include "task.h"
 
 #include <zephyr/kernel.h>
+#include <zephyr/mgmt/ec_host_cmd/backend.h>
 #include <zephyr/mgmt/ec_host_cmd/ec_host_cmd.h>
 #include <zephyr/sys/iterable_sections.h>
 
@@ -209,4 +210,18 @@ host_command_protocol_info(struct ec_host_cmd_handler_args *args)
 }
 EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_GET_PROTOCOL_INFO,
 			    host_command_protocol_info, EC_VER_MASK(0));
+#endif
+
+#if defined(CONFIG_EC_HOST_CMD_BACKEND_USB) && \
+	defined(CONFIG_PLATFORM_EC_MKBP_USE_CUSTOM)
+int mkbp_set_host_active_via_custom(int active, uint32_t *timestamp)
+{
+	if (timestamp) {
+		*timestamp = __hw_clock_source_read();
+	}
+	if (active) {
+		ec_host_cmd_backend_usb_trigger_event();
+	}
+	return EC_SUCCESS;
+}
 #endif
