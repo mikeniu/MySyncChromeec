@@ -18,10 +18,17 @@
 
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
 #include <zephyr/shell/shell.h>
 #include <zephyr/sys/atomic.h>
 
+LOG_MODULE_REGISTER(task_shim, LOG_LEVEL_INF);
+
 #include <soc.h>
+
+#define SAFE_THREAD_NAME(tid)                                           \
+	((tid) && k_thread_name_get((tid)) ? k_thread_name_get((tid)) : \
+					     "(unknown)")
 
 /* Ensure that the idle task is at lower priority than lowest priority task. */
 BUILD_ASSERT(EC_TASK_PRIORITY(EC_TASK_PRIO_LOWEST) < K_IDLE_PRIO,
@@ -203,7 +210,13 @@ task_id_t thread_id_to_task_id(k_tid_t thread_id)
 		}
 	}
 
-	__ASSERT(false, "Failed to map thread to task");
+	if (thread_id->base.thread_state & _THREAD_DUMMY) {
+		return TASK_ID_INVALID;
+	}
+
+	LOG_ERR("Failed to map thread to task: thread_id=%p, name=%s",
+		thread_id, SAFE_THREAD_NAME(thread_id));
+
 	return TASK_ID_INVALID;
 }
 
