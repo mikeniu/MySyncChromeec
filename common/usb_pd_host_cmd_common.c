@@ -128,8 +128,22 @@ static enum ec_status hc_usb_pd_control(struct host_cmd_handler_args *args)
 			    polarity_rm_dts(pd_get_polarity(p->port)));
 
 	if (p->swap == USB_PD_CTRL_SWAP_DATA) {
+<<<<<<< HEAD   (7eb080431ad6dd604462f07b5d6e655ac3c85a3c watchdog: Add host command to query watchdog info)
 		pd_request_data_swap(p->port);
 	} else if (IS_ENABLED(CONFIG_USB_PD_DUAL_ROLE)) {
+||||||| BASE   (abf415fa090ff64baae8e649b89cfd6d89644b1b power/qcom_exp: Ignore transient AC_PRESENT toggle during sw)
+		pd_request_data_swap(p->port);
+	} else if (IS_ENABLED(CONFIG_USB_PD_DUAL_ROLE) ||
+		   IS_ENABLED(CONFIG_USB_PD_CONTROLLER)) {
+=======
+		// TODO(b/458004422) fix pd_request_data_swap impl. for TCPMv2
+		if (IS_ENABLED(CONFIG_USB_PD_TCPMV2))
+			pd_dpm_request(p->port, DPM_REQUEST_DR_SWAP);
+		else
+			pd_request_data_swap(p->port);
+	} else if (IS_ENABLED(CONFIG_USB_PD_DUAL_ROLE) ||
+		   IS_ENABLED(CONFIG_USB_PD_CONTROLLER)) {
+>>>>>>> CHANGE (a93afb2343fa337fba0eeb365ae3b7f0ebbefeaa usbpd: Call pd_dpm_request for data role swap host cmd on TC)
 		if (p->swap == USB_PD_CTRL_SWAP_POWER)
 			pd_request_power_swap(p->port);
 		else if (IS_ENABLED(CONFIG_USBC_VCONN_SWAP) &&
