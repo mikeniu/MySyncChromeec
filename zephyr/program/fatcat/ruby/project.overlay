@@ -22,6 +22,7 @@
 #include "thermal.dtsi"
 #include "usba.dtsi"
 #include "usbc.dtsi"
+#include "ledstrip_policy.dtsi"
 
 /* ruby overrides follow... */
 
@@ -41,3 +42,18 @@
 	pinctrl-0 = <&espi_lpc_gp46_47_51_52_53_54_55_57>;
 	pinctrl-names = "default";
 };
+
+/* DT Overlay (e.g. project.overlay) for current-speed = <2500000> */
+&pcc {
+	clock-frequency = <DT_FREQ_M(80)>; /* OFMCLK runs at 80 MHz */
+    core-prescaler = <1>; /* CORE_CLK runs at 80 MHz */
+    apb1-prescaler = <4>; /* APB1_CLK runs at 20 MHz */
+    apb2-prescaler = <4>; /* APB2_CLK runs at 20 MHz */
+    apb3-prescaler = <4>; /* APB3_CLK runs at 20 MHz */
+    /*
+     * APB4_CLK runs at 80 MHz, required to support
+     * UART4 Baudrate=3.333333 MHz
+     */
+    apb4-prescaler = <1>;
+};
+

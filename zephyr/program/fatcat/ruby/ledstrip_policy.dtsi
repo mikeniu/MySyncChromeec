@@ -1,0 +1,54 @@
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+#include <dt-bindings/macros.h>
+#include <zephyr/dt-bindings/led/led.h>
+
+/ {
+
+    aliases {
+        led-strip  = &led_strip;
+    };
+    
+    ledstrip {
+        compatible = "cros-ec,led-lightbar";
+
+        ledstrip {
+            /* Identifies this ledstrip to the system */
+            led-id = "EC_LED_ID_LIGHTBAR_LED";
+
+            /* This links the color definitions to the driver node 
+             * configured in the section above.
+             */
+            strip = <&led_strip>;
+
+        };
+    };
+};
+
+&uart4 { /* Use the correct UART instance, e.g., uart4 for Nuvoton EC */
+    status = "okay";
+    current-speed = <3333333>;      // 2.5 MHz baud rate
+    pinctrl-0 = <&uart4_sout_gp35>; // Configure the specific TX pin
+    pinctrl-names = "default";
+    data-bits = <7>;                // (2+7=9, a multiple of 3)
+    tx-invert;                      // Mandatory for idle-low signal
+
+    led_strip: ws2812-strip {
+        compatible = "worldsemi,ws2812-uart";
+        status = "okay";
+
+        /* === Step 1: Physical Properties === */
+        chain-length = <8>;
+        color-mapping = <LED_COLOR_ID_GREEN
+                         LED_COLOR_ID_RED
+                         LED_COLOR_ID_BLUE>;
+
+        /* === Step 2: Timing Properties === */
+        reset-delay = <50>;
+        bits-per-symbol = <3>;
+        one-symbol = <BINARY(1,1,0)>;
+        zero-symbol = <BINARY(1,0,0)>;
+    };
+};
