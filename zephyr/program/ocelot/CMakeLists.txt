@@ -56,6 +56,7 @@ endif()
 
 if(DEFINED CONFIG_BOARD_OCELOTRVP_RTK)
 	project(ocelotrvp-rtk)
+	zephyr_library_sources("src/rvp_board_power.c")
 endif()
 
 zephyr_include_directories("include/")
