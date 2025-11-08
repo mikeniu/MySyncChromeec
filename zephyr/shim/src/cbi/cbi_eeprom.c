@@ -6,7 +6,7 @@
 #include "cbi_config.h"
 #include "console.h"
 #include "cros_board_info.h"
-#include "write_protect.h"
+#include "zephyr_write_protect.h"
 
 #include <zephyr/drivers/eeprom.h>
 #include <zephyr/drivers/gpio.h>

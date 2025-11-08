@@ -12,7 +12,7 @@
 #include "host_command.h"
 #include "system.h"
 #include "watchdog.h"
-#include "write_protect.h"
+#include "zephyr_write_protect.h"
 
 #include <zephyr/drivers/flash.h>
 #include <zephyr/kernel.h>

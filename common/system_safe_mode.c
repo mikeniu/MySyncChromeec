@@ -69,25 +69,6 @@ bool is_current_task_safe_mode_critical(void)
 	return is_task_safe_mode_critical(task_get_current());
 }
 
-#ifndef CONFIG_ZEPHYR
-
-int disable_non_safe_mode_critical_tasks(void)
-{
-	for (task_id_t task_id = 0; task_id < TASK_ID_COUNT; task_id++) {
-		/* Do not disable current task,
-		 * that is the responsibility of the panic handler.
-		 * If the current task is disabled while outside an interrupt
-		 * context, execution will halt.
-		 */
-		if (!is_task_safe_mode_critical(task_id) &&
-		    task_id != task_get_current())
-			task_disable_task(task_id);
-	}
-	return EC_SUCCESS;
-}
-
-#endif /* CONFIG_ZEPHYR */
-
 void handle_system_safe_mode_timeout(void)
 {
 	panic_printf("SSM timeout\n");

@@ -6,7 +6,7 @@
 #include "flash.h"
 #include "multistep_test.h"
 #include "system.h"
-#include "write_protect.h"
+#include "zephyr_write_protect.h"
 
 #ifdef CONFIG_EEPROM_CBI_WP
 #warning "EEPROM CBI WP tests not implemented."

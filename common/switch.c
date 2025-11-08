@@ -15,7 +15,7 @@
 #include "power_button.h"
 #include "switch.h"
 #include "util.h"
-#include "write_protect.h"
+#include "zephyr_write_protect.h"
 
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_SWITCH, outstr)

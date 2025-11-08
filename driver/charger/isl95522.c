@@ -5,9 +5,6 @@
  * Renesas (Intersil) ISL-95522 battery charger driver.
  */
 
-#ifndef CONFIG_ZEPHYR
-#include "adc.h"
-#endif
 #include "battery.h"
 #include "battery_smart.h"
 #include "charge_manager.h"

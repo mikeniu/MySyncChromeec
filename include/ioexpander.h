@@ -7,12 +7,8 @@
 #ifndef __CROS_EC_IOEXPANDER_H
 #define __CROS_EC_IOEXPANDER_H
 
-#ifdef CONFIG_ZEPHYR
 #define ioex_signal gpio_signal
 #include "gpio.h"
-#else
-enum ioex_signal; /* from gpio_signal.h */
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -89,8 +85,6 @@ struct ioexpander_config_t {
 };
 
 extern struct ioexpander_config_t ioex_config[];
-
-#ifdef CONFIG_ZEPHYR
 
 #define ioex_enable_interrupt gpio_enable_interrupt
 #define ioex_disable_interrupt gpio_disable_interrupt
@@ -247,8 +241,6 @@ int ioex_save_gpio_state(int ioex, int *state, int state_len);
  * @return		EC_SUCCESS if successful, non-zero if error.
  */
 int ioex_restore_gpio_state(int ioex, const int *state, int state_len);
-
-#endif /* CONFIG_ZEPHYR */
 
 #ifdef __cplusplus
 }

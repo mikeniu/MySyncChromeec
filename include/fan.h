@@ -13,20 +13,17 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef CONFIG_ZEPHYR
 #ifdef CONFIG_PLATFORM_EC_FAN
 
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/pwm.h>
 
 #endif
-#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifdef CONFIG_ZEPHYR
 #ifdef CONFIG_PLATFORM_EC_FAN
 
 #define NODE_ID_AND_COMMA(node_id) node_id,
@@ -51,7 +48,6 @@ extern struct fan_config fan_config[FAN_CH_COUNT];
 #endif
 
 #endif /* CONFIG_PLATFORM_EC_FAN */
-#endif /* CONFIG_ZEPHYR */
 
 /**
  * STOPPED means not spinning.
@@ -254,7 +250,6 @@ void fan_set_count(int count);
 
 int is_thermal_control_enabled(int idx);
 
-#ifdef CONFIG_ZEPHYR
 extern struct fan_data fan_data[];
 
 /**
@@ -278,7 +273,6 @@ enum fan_status board_override_fan_control_duty(int ch);
  * Return       Fan status (see fan_status enum definition)
  */
 enum fan_status fan_smart_control(int ch);
-#endif
 
 #ifdef __cplusplus
 }

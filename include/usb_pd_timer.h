@@ -9,7 +9,6 @@
 #define __CROS_EC_USB_PD_TIMER_H
 
 #include "atomic.h"
-#include "atomic_bit.h"
 
 #include <stdbool.h>
 

@@ -104,15 +104,6 @@ static enum cr50_comm_err send_to_cr50(const uint8_t *data, size_t size)
 
 	until.val = get_time().val + CR50_COMM_TIMEOUT;
 
-	/*
-	 * Make sure console task won't steal the response in case we exchange
-	 * packets after tasks start.
-	 */
-#ifndef CONFIG_ZEPHYR
-	if (task_start_called())
-		task_disable_task(TASK_ID_CONSOLE);
-#endif /* !CONFIG_ZEPHYR */
-
 	/* Wait for response from Cr50 */
 	for (i = 0; i < sizeof(res); i++) {
 		while (!timeout) {
@@ -127,10 +118,6 @@ static enum cr50_comm_err send_to_cr50(const uint8_t *data, size_t size)
 	}
 
 	uart_shell_start();
-#ifndef CONFIG_ZEPHYR
-	if (task_start_called())
-		task_enable_task(TASK_ID_CONSOLE);
-#endif /* CONFIG_ZEPHYR */
 
 	/* Exit packet mode */
 	board_enable_packet_mode(false);

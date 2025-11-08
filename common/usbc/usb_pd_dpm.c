@@ -22,6 +22,7 @@
 #include "task.h"
 #include "tcpm/tcpm.h"
 #include "temp_sensor.h"
+#include "temp_sensor/temp_sensor.h"
 #include "usb_dp_alt_mode.h"
 #include "usb_mode.h"
 #include "usb_mux.h"
@@ -35,10 +36,6 @@
 #include "usb_pe_sm.h"
 #include "usb_tbt_alt_mode.h"
 #include "usb_tc_sm.h"
-
-#ifdef CONFIG_ZEPHYR
-#include "temp_sensor/temp_sensor.h"
-#endif
 
 #ifdef CONFIG_USB_PD_DEBUG_LEVEL
 static const enum debug_level dpm_debug_level = CONFIG_USB_PD_DEBUG_LEVEL;
@@ -147,7 +144,6 @@ static void print_current_state(const int port)
 	CPRINTS("C%d: %s", port, dpm_state_names[get_state_dpm(port)]);
 }
 
-#ifdef CONFIG_ZEPHYR
 static int init_dpm_mutexes(void)
 {
 	int port;
@@ -159,28 +155,9 @@ static int init_dpm_mutexes(void)
 	return 0;
 }
 SYS_INIT(init_dpm_mutexes, POST_KERNEL, 50);
-#endif /* CONFIG_ZEPHYR */
 
 void pd_prepare_sysjump(void)
 {
-#ifndef CONFIG_ZEPHYR
-	int i;
-
-	/* Exit modes before sysjump so we can cleanly enter again later */
-	for (i = 0; i < board_get_usb_pd_port_count(); i++) {
-		/*
-		 * If the port is not capable of alternate mode, then there's no
-		 * need to send the event.
-		 */
-		if (!pd_alt_mode_capable(i))
-			continue;
-
-		sysjump_task_waiting = task_get_current();
-		task_set_event(PD_PORT_TO_TASK_ID(i), PD_EVENT_SYSJUMP);
-		task_wait_event_mask(TASK_EVENT_SYSJUMP_READY, -1);
-		sysjump_task_waiting = TASK_ID_INVALID;
-	}
-#endif /* CONFIG_ZEPHYR */
 }
 
 void notify_sysjump_ready(void)

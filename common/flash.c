@@ -6,9 +6,7 @@
 /* Flash memory module for Chrome EC - common functions */
 
 #include "builtin/assert.h"
-#ifdef CONFIG_ZEPHYR
 #include "cbi_flash.h"
-#endif /* CONFIG_ZEPHYR */
 #include "common.h"
 #include "console.h"
 #include "cros_board_info.h"
@@ -22,7 +20,7 @@
 #include "system.h"
 #include "util.h"
 #include "vboot_hash.h"
-#include "write_protect.h"
+#include "zephyr_write_protect.h"
 
 /*
  * Contents of erased flash, as a 32-bit value.  Most platforms erase flash
@@ -133,8 +131,7 @@ const uint32_t pstate_data __attribute__((section(".rodata.pstate"))) =
 #endif /* CONFIG_FLASH_PSTATE */
 
 /* Shim layer provides implementation of these functions based on Zephyr API */
-#if !defined(CONFIG_ZEPHYR) || \
-	!defined(CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT)
+#if !defined(CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT)
 #ifdef CONFIG_FLASH_MULTIPLE_REGION
 const struct ec_flash_bank *flash_bank_info(int bank)
 {
@@ -272,9 +269,7 @@ int crec_flash_total_banks(void)
 {
 	return PHYSICAL_BANKS;
 }
-#endif /* !defined(CONFIG_ZEPHYR) ||                                \
-	* !defined(CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT) \
-	*/
+#endif /* !defined(CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT) */
 
 static int flash_range_ok(int offset, int size_req, int align)
 {
@@ -726,7 +721,7 @@ int crec_flash_is_erased(uint32_t offset, int size)
 	return 1;
 }
 
-#if defined(CONFIG_ZEPHYR) && defined(CONFIG_PLATFORM_EC_CBI_FLASH)
+#if defined(CONFIG_PLATFORM_EC_CBI_FLASH)
 /**
  * Check if the passed section overlaps with CBI section on EC flash.
  *
@@ -784,7 +779,7 @@ test_mockable int crec_flash_unprotected_read(int offset, int size, char *data)
 int crec_flash_read(int offset, int size, char *data)
 {
 	RETURN_ERROR(crec_flash_unprotected_read(offset, size, data));
-#if defined(CONFIG_ZEPHYR) && defined(CONFIG_PLATFORM_EC_CBI_FLASH)
+#if defined(CONFIG_PLATFORM_EC_CBI_FLASH)
 	protect_cbi_overlapped_section(offset, size, data);
 #endif
 	return EC_SUCCESS;
@@ -837,7 +832,7 @@ int crec_flash_write(int offset, int size, const char *data)
 
 	flash_abort_or_invalidate_hash(offset, size);
 
-#if defined(CONFIG_ZEPHYR) && defined(CONFIG_PLATFORM_EC_CBI_FLASH)
+#if defined(CONFIG_PLATFORM_EC_CBI_FLASH)
 	if (check_cbi_section_overlap(offset, size)) {
 		int cbi_end = CBI_FLASH_OFFSET + CBI_FLASH_SIZE;
 		int sec_end = offset + size;
@@ -866,7 +861,7 @@ int crec_flash_erase(int offset, int size)
 
 	flash_abort_or_invalidate_hash(offset, size);
 
-#if defined(CONFIG_ZEPHYR) && defined(CONFIG_PLATFORM_EC_CBI_FLASH)
+#if defined(CONFIG_PLATFORM_EC_CBI_FLASH)
 	if (check_cbi_section_overlap(offset, size)) {
 		int cbi_end = CBI_FLASH_OFFSET + CBI_FLASH_SIZE;
 		int sec_end = offset + size;
@@ -1174,8 +1169,7 @@ static void flash_erase_deferred(void)
 DECLARE_DEFERRED(flash_erase_deferred);
 #endif
 
-#if !defined(CONFIG_ZEPHYR) || \
-	!defined(CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT)
+#if !defined(CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT)
 void crec_flash_print_region_info(void)
 {
 #ifdef CONFIG_FLASH_MULTIPLE_REGION

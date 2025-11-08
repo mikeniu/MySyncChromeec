@@ -15,9 +15,7 @@
 #include "task.h"
 #include "test_util.h"
 
-#ifdef CONFIG_ZEPHYR
 #include <linker.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {

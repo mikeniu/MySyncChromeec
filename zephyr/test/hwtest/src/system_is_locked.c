@@ -7,7 +7,7 @@
 #include "flash.h"
 #include "multistep_test.h"
 #include "system.h"
-#include "write_protect.h"
+#include "zephyr_write_protect.h"
 
 #include <zephyr/ztest.h>
 

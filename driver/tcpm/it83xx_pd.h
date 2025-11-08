@@ -364,7 +364,7 @@
 	IS_MASK_SET(IT83XX_USBPD_IFS(port), USBPD_REG_FAST_SWAP_DETECT_STAT)
 #endif
 
-#if defined(CONFIG_USB_PD_TCPM_ITE_ON_CHIP) && defined(CONFIG_ZEPHYR)
+#if defined(CONFIG_USB_PD_TCPM_ITE_ON_CHIP)
 /* Use the Zephyr names here. When upstreaming we can update this */
 #include <zephyr/dt-bindings/interrupt-controller/ite-intc.h>
 

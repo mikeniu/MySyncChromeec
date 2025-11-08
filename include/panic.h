@@ -64,43 +64,6 @@ void panic_data_print(const struct panic_data *pdata);
 void panic_data_ccprint(const struct panic_data *pdata);
 
 /**
- * Report an assertion failure and reset
- *
- * @param msg		Assertion expression or other message
- * @param func		Function name where assertion happened
- * @param fname		File name where assertion happened
- * @param linenum	Line number where assertion happened
- */
-#if !(defined(CONFIG_ZEPHYR))
-#ifdef CONFIG_DEBUG_ASSERT_BRIEF
-#if !(defined(TEST_FUZZ) || defined(CONFIG_ZTEST))
-__noreturn
-#endif
-	void
-	panic_assert_fail(const char *fname, int linenum);
-#else
-#if !(defined(TEST_FUZZ) || defined(CONFIG_ZTEST))
-__noreturn
-#endif
-	void
-	panic_assert_fail(const char *msg, const char *func, const char *fname,
-			  int linenum);
-#endif
-
-/**
- * Display a custom panic message and reset
- *
- * @param msg	Panic message
- */
-#if !(defined(TEST_FUZZ) || defined(CONFIG_ZTEST))
-__noreturn
-#endif
-	void
-	panic(const char *msg);
-
-#endif /* !CONFIG_ZEPHYR */
-
-/**
  * Display a default message and reset
  */
 #if !(defined(TEST_FUZZ) || defined(CONFIG_ZTEST))
@@ -108,18 +71,6 @@ __noreturn
 #endif
 	void
 	panic_reboot(void);
-
-#if !(defined(CONFIG_ZEPHYR))
-/**
- * Store a panic log and halt the system for a software-related reason, such as
- * stack overflow or assertion failure.
- */
-#if !(defined(TEST_FUZZ) || defined(CONFIG_ZTEST))
-__noreturn
-#endif
-	void
-	software_panic(uint32_t reason, uint32_t info);
-#endif /* !CONFIG_ZEPHYR */
 
 /**
  * Log a panic in the panic log, but don't halt the system. Normally
@@ -132,14 +83,12 @@ void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception);
  */
 void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception);
 
-#ifdef CONFIG_ZEPHYR
 /**
  * Zephyr utility for architecture specific logic to run when setting panic
  * reason.
  */
 __override_proto void arch_panic_set_reason(uint32_t reason, uint32_t info,
 					    uint8_t exception);
-#endif /* CONFIG_ZEPHYR */
 
 /**
  * Enable/disable bus fault handler

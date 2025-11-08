@@ -23,9 +23,7 @@
  * to create all the HAS_TASK_* definitions.  Since those are used in
  * config.h, we need to include that header first.
  */
-#ifdef CONFIG_ZEPHYR
 #include "shimmed_tasks.h"
-#endif /* CONFIG_ZEPHYR */
 
 #ifdef INCLUDE_ENV_CONFIG
 /*
@@ -299,11 +297,6 @@
  */
 #undef CONFIG_SYNC_INT_EVENT
 
-#ifndef CONFIG_ZEPHYR
-/* Compile chip support for digital-to-analog converter */
-#undef CONFIG_DAC
-#endif /* CONFIG_ZEPHYR */
-
 /*
  * Allow runtime configuration of the adc_channels[] array
  */
@@ -413,10 +406,6 @@
  */
 #undef CONFIG_ASSEMBLY_MULA32
 
-#ifndef CONFIG_ZEPHYR
-/* Support audio codec. */
-#undef CONFIG_AUDIO_CODEC
-#endif /* CONFIG_ZEPHYR */
 /* Audio codec caps. */
 #undef CONFIG_AUDIO_CODEC_CAP_WOV_AUDIO_SHM
 #undef CONFIG_AUDIO_CODEC_CAP_WOV_LANG_SHM
@@ -934,11 +923,6 @@
 
 /*****************************************************************************/
 /* Charger config */
-
-#ifndef CONFIG_ZEPHYR
-/* Compile common charge state code. */
-#undef CONFIG_CHARGER
-#endif
 
 /* Compile charger-specific code for these chargers (pick at most one) */
 #undef CONFIG_CHARGER_BD9995X
@@ -1502,12 +1486,6 @@
 
 /* AP chipset support; pick at most one */
 #undef CONFIG_CHIPSET_ALDERLAKE /* Intel Alderlake (x86) */
-#ifndef CONFIG_ZEPHYR
-#undef CONFIG_CHIPSET_ALDERLAKE_SLG4BD44540 /* Intel Alderlake (x86) \
-					     * with power sequencer  \
-					     * chip                  \
-					     */
-#endif /* CONFIG_ZEPHYR */
 #undef CONFIG_CHIPSET_APOLLOLAKE /* Intel Apollolake (x86) */
 #undef CONFIG_CHIPSET_CANNONLAKE /* Intel Cannonlake (x86) */
 #undef CONFIG_CHIPSET_COMETLAKE /* Intel Cometlake (x86) */
@@ -2142,11 +2120,6 @@
 /* Maximal EC sampling rate */
 #undef CONFIG_EC_MAX_SENSOR_FREQ_MILLIHZ
 
-#ifndef CONFIG_ZEPHYR
-/* Support EC chip internal data EEPROM */
-#undef CONFIG_EEPROM
-#endif /* CONFIG_ZEPHYR */
-
 /*
  * Support for sending emulated sysrq events to AP (on designs with a keyboard,
  * sysrq is passed as normal key presses).
@@ -2362,11 +2335,6 @@
 
 /* Allow EC serial console input to wake up the EC from STOP mode */
 #undef CONFIG_FORCE_CONSOLE_RESUME
-
-#ifndef CONFIG_ZEPHYR
-/* Enable support for floating point unit */
-#undef CONFIG_FPU
-#endif /* CONFIG_ZEPHYR */
 
 /* Enable warnings on FPU exceptions */
 #undef CONFIG_FPU_WARNINGS
@@ -2843,9 +2811,6 @@
 /*****************************************************************************/
 /* I2C configuration */
 
-#ifndef CONFIG_ZEPHYR
-#undef CONFIG_I2C
-#endif /* CONFIG_ZEPHYR */
 #undef CONFIG_I2C_DEBUG
 #undef CONFIG_I2C_DEBUG_PASSTHRU
 #undef CONFIG_I2C_PASSTHRU_RESTRICTED
@@ -2994,15 +2959,6 @@
  * Compile driver for INA219 or INA231 or INA3221.
  * Only one of these may be defined (if any).
  */
-#ifndef CONFIG_ZEPHYR
-/*
- * These symbols also exist as Kconfigs in Zephyr. Zephyr based boards
- * need to use the upstream driver, or these symbols need to be changed
- * downstream to not conflict.
- */
-#undef CONFIG_INA219
-#undef CONFIG_INA3221
-#endif /* CONFIG_ZEPHYR */
 #undef CONFIG_INA231
 
 /*****************************************************************************/
@@ -3343,14 +3299,6 @@
 /* Support common LED interface */
 #undef CONFIG_LED_COMMON
 
-#ifndef CONFIG_ZEPHYR
-/*
- * Support common PWM-controlled LEDs that conform to the Chrome OS LED
- * behaviour specification.
- */
-#undef CONFIG_LED_PWM
-#endif /* CONFIG_ZEPHYR */
-
 /*
  * Support common PWM-controlled LEDs that do not conform to the Chrom OS LED
  * behavior specification
@@ -3595,11 +3543,6 @@
 /* Size of low power RAM. */
 #undef CONFIG_LPRAM_SIZE
 
-#ifndef CONFIG_ZEPHYR
-/* Use Link-Time Optimizations to try to reduce the firmware code size */
-#undef CONFIG_LTO
-#endif /* CONFIG_ZEPHYR */
-
 /* Provide rudimentary malloc/free like services for shared memory. */
 #undef CONFIG_SHARED_MALLOC
 
@@ -3725,11 +3668,6 @@
  */
 #undef CONFIG_MKBP_INPUT_DEVICES
 
-#ifndef CONFIG_ZEPHYR
-/* Support memory protection unit (MPU) */
-#undef CONFIG_MPU
-#endif /* CONFIG_ZEPHYR */
-
 /* Support RAM write/fetch protection */
 #undef CONFIG_RAM_LOCK
 
@@ -3751,11 +3689,6 @@
  */
 #undef CONFIG_PANIC_DATA_BASE
 #undef CONFIG_PANIC_DATA_SIZE
-
-#ifndef CONFIG_ZEPHYR
-/* Support PECI interface to x86 processor */
-#undef CONFIG_PECI
-#endif /* CONFIG_ZEPHYR */
 
 /* Common code for PECI interface to x86 processor */
 #undef CONFIG_PECI_COMMON
@@ -3918,11 +3851,6 @@
  */
 #undef CONFIG_CPU_PROCHOT_GATE_ON_C10
 
-#ifndef CONFIG_ZEPHYR
-/* Support PS/2 interface */
-#undef CONFIG_PS2
-#endif /* CONFIG_ZEPHYR */
-
 /* Support Power Sourcing Equipment */
 #undef CONFIG_PSE_LTC4291
 
@@ -3935,11 +3863,6 @@
 #undef CONFIG_PVD
 
 /*****************************************************************************/
-#ifndef CONFIG_ZEPHYR
-/* Support PWM control */
-#undef CONFIG_PWM
-#endif /* CONFIG_ZEPHYR */
-
 /* Define clock input to PWM module. */
 #undef CONFIG_PWM_INPUT_LFCLK
 
@@ -3995,11 +3918,6 @@
  */
 #undef CONFIG_RGBKBD_DEMO_FLOW
 #undef CONFIG_RGBKBD_DEMO_DOT
-
-#ifndef CONFIG_ZEPHYR
-/* Support Real-Time Clock (RTC) */
-#undef CONFIG_RTC
-#endif /* CONFIG_ZEPHYR */
 
 /* Size of each RAM bank in chip, default is CONFIG_RAM_SIZE */
 #undef CONFIG_RAM_BANK_SIZE
@@ -4176,11 +4094,6 @@
  */
 /* #undef CONFIG_SMBUS */
 
-#ifndef CONFIG_ZEPHYR
-/* Support SPI interfaces */
-#undef CONFIG_SPI
-#endif /* CONFIG_ZEPHYR */
-
 /* Define the SPI port to use to access SPI accelerometer */
 #undef CONFIG_SPI_ACCEL_PORT
 
@@ -4208,11 +4121,6 @@
 
 /* Define the SPI port to use to access the fingerprint sensor */
 #undef CONFIG_SPI_FP_PORT
-
-#ifndef CONFIG_ZEPHYR
-/* Support JEDEC SFDP based Serial NOR flash */
-#undef CONFIG_SPI_NOR
-#endif /* CONFIG_ZEPHYR */
 
 /* Enable SPI_NOR debugging providing additional console output while
  * initializing Serial NOR Flash devices including SFDP discovery. */
@@ -4600,11 +4508,6 @@
 
 /* Baud rate for UARTs */
 #define CONFIG_UART_BAUD_RATE 115200
-
-#ifndef CONFIG_ZEPHYR
-/* UART index (number) for EC console */
-#undef CONFIG_UART_CONSOLE
-#endif /* CONFIG_ZEPHYR */
 
 /* UART index (number) for host UART, if present */
 #undef CONFIG_UART_HOST
@@ -5404,9 +5307,6 @@
 #undef CONFIG_USBC_PPC_AOZ1380
 #undef CONFIG_USBC_PPC_KTU1125
 #undef CONFIG_USBC_PPC_NX20P3481
-#ifndef CONFIG_ZEPHYR
-#undef CONFIG_USBC_PPC_NX20P3483
-#endif /* CONFIG_ZEPHYR */
 #undef CONFIG_USBC_PPC_RT1718S
 #undef CONFIG_USBC_PPC_SN5S330
 #undef CONFIG_USBC_PPC_SYV682C
@@ -5665,11 +5565,6 @@
 /* Support reporting of configuration bMaxPower in mA */
 #define CONFIG_USB_MAXPOWER_MA 500
 
-#ifndef CONFIG_ZEPHYR
-/* Support reporting as self powered in USB configuration. */
-#undef CONFIG_USB_SELF_POWERED
-#endif /* CONFIG_ZEPHYR */
-
 /* Support correct handling of USB suspend (host-initiated). */
 #undef CONFIG_USB_SUSPEND
 
@@ -5869,15 +5764,6 @@
 
 /*****************************************************************************/
 /* Watchdog config */
-
-/*
- * Compile watchdog timer support.  The watchdog timer will reboot the system
- * if the hook task (which is the lowest-priority task on the system) gets
- * starved for CPU time and isn't able to fire its HOOK_TICK event.
- */
-#ifndef CONFIG_ZEPHYR
-#define CONFIG_WATCHDOG
-#endif
 
 /*
  * Try to detect a watchdog that is about to fire, and print a trace.  This is
@@ -6092,27 +5978,12 @@
 #undef CONFIG_TEST_SM
 
 /*
- * This build is not a complete platform/ec based EC, but instead
- * using the platform/ec zephyr module.
- *
- * Note: this is here purely for stylistic purposes and documentation.
- */
-#ifndef CONFIG_ZEPHYR
-#undef CONFIG_ZEPHYR
-#endif
-
-/*
  * Define the following to drive CCD_MODE_ODL when a DTS accessory is
  * connected to the CCD USBC port.
  *
  * GPIO_CCD_MODE_ODL should be configured with GPIO_ODR_HIGH flag
  */
 #undef CONFIG_ASSERT_CCD_MODE_ON_DTS_CONNECT
-
-#ifndef CONFIG_ZEPHYR
-/* Define this to enable system boot time logging */
-#undef CONFIG_SYSTEM_BOOT_TIME_LOGGING
-#endif /* CONFIG_ZEPHYR */
 
 /*
  * The USB port used for CCD. Defaults to 0/C0.
@@ -6154,11 +6025,7 @@
 #endif
 
 #include "config_chip.h"
-#ifdef CONFIG_ZEPHYR
 #include "zephyr_shim.h"
-#else
-#include "board.h"
-#endif
 
 /* Default hcdebug mode, e.g. HCDEBUG_OFF or HCDEBUG_NORMAL */
 #if !defined(CONFIG_HOSTCMD_DEBUG_MODE)
@@ -6191,15 +6058,6 @@
 #error "S4_RESIDENCY needs eSPI support or SLP_S5 routed"
 #endif
 
-/*
- * Note that in Zephyr OS, eSPI can be enabled for virtual wires
- * without using eSPI for host commands.
- */
-#if (!defined(CONFIG_ZEPHYR) && defined(CONFIG_HOST_ESPI_VW_POWER_SIGNAL) && \
-     !defined(CONFIG_HOST_INTERFACE_ESPI))
-#error Must enable eSPI to enable virtual wires.
-#endif
-
 /******************************************************************************/
 /*
  * If CONFIG_USB_POWER_DELIVERY is enabled, make sure either
@@ -6228,20 +6086,6 @@
 #if !defined(CONFIG_USBC_SS_MUX) && !defined(CONFIG_USB_PD_CONTROLLER)
 #error CONFIG_USBC_SS_MUX must be enabled for TCPM USB4 mode support
 #endif
-#if !defined(CONFIG_ZEPHYR) && !defined(CONFIG_USB_PD_ALT_MODE_DFP)
-#error CONFIG_USB_PD_ALT_MODE_DFP must be enabled for USB4 mode support
-#endif
-#endif
-
-/******************************************************************************/
-/*
- * If CONFIG_USB_PD_ALT_MODE_DFP is set and this isn't a zephyr build (which
- * already did its preprocessing earlier), then enable DP Mode by default and
- * also enable discovery by default.
- */
-#if defined(CONFIG_USB_PD_ALT_MODE_DFP) && !defined(CONFIG_ZEPHYR)
-#define CONFIG_USB_PD_DP_MODE
-#define CONFIG_USB_PD_DISCOVERY
 #endif
 
 /******************************************************************************/
@@ -6612,28 +6456,6 @@
 #define CONFIG_USBC_OCP
 #endif
 
-#ifndef CONFIG_ZEPHYR
-/*****************************************************************************/
-/*
- * Define CONFIG_USB_PD_VBUS_MEASURE_CHARGER if the charger on the board
- * supports VBUS measurement.
- */
-#if defined(CONFIG_CHARGER_BD9995X) || defined(CONFIG_CHARGER_RT9466) ||      \
-	defined(CONFIG_CHARGER_RT9467) || defined(CONFIG_CHARGER_RT9490) ||   \
-	defined(CONFIG_CHARGER_MT6370) || defined(CONFIG_CHARGER_BQ25710) ||  \
-	defined(CONFIG_CHARGER_BQ25720) || defined(CONFIG_CHARGER_ISL9241) || \
-	defined(CONFIG_CHARGER_RAA489110) || defined(CONFIG_CHARGER_BQ25770)
-#if !defined(CONFIG_USB_PD_VBUS_MEASURE_TCPC) &&              \
-	!defined(CONFIG_USB_PD_VBUS_MEASURE_ADC_EACH_PORT) && \
-	!defined(CONFIG_USB_PD_VBUS_MEASURE_BY_BOARD)
-#define CONFIG_USB_PD_VBUS_MEASURE_CHARGER
-#endif /* VBUS_MEASURE options */
-
-#ifdef CONFIG_USB_PD_VBUS_MEASURE_NOT_PRESENT
-#error CONFIG_USB_PD_VBUS_MEASURE_NOT_PRESENT defined, but charger can measure
-#endif /* VBUS_NOT_PRESENT */
-#endif /* Charger chips */
-#endif /* CONFIG_ZEPHYR */
 /*****************************************************************************/
 /*
  * Define CONFIG_USB_PD_VBUS_MEASURE_TCPC if the tcpc on the board supports
@@ -6694,12 +6516,6 @@
 #ifdef CONFIG_DEDICATED_RECOVERY_BUTTON
 #define CONFIG_BUTTON_TRIGGERED_RECOVERY
 #endif /* defined(CONFIG_DEDICATED_RECOVERY_BUTTON) */
-
-#ifndef CONFIG_ZEPHYR
-#ifdef CONFIG_LED_PWM_COUNT
-#define CONFIG_LED_PWM
-#endif /* defined(CONFIG_LED_PWM_COUNT) */
-#endif /* CONFIG_ZEPHYR */
 
 #ifdef CONFIG_LED_PWM_ACTIVE_CHARGE_PORT_ONLY
 #define CONFIG_LED_PWM_CHARGE_STATE_ONLY
@@ -6798,9 +6614,6 @@
 #ifndef HAS_TASK_CHIPSET
 #undef CONFIG_AP_HANG_DETECT
 #undef CONFIG_CHIPSET_ALDERLAKE
-#ifndef CONFIG_ZEPHYR
-#undef CONFIG_CHIPSET_ALDERLAKE_SLG4BD44540
-#endif /* CONFIG_ZEPHYR */
 #undef CONFIG_CHIPSET_APOLLOLAKE
 #undef CONFIG_CHIPSET_CANNONLAKE
 #undef CONFIG_CHIPSET_COMETLAKE
@@ -6817,19 +6630,6 @@
 #undef CONFIG_CHIPSET_TIGERLAKE
 #undef CONFIG_POWER_COMMON
 #endif
-
-/*
- * If the chipset task is enabled, this implies there is an AP to manage power
- * for. In Zephyr this can be implied by multiple options, so we provide the
- * same symbol here instead of making code examine HAS_TASK_CHIPSET.
- */
-#ifndef CONFIG_ZEPHYR
-#ifndef CONFIG_AP_POWER_CONTROL
-#ifdef HAS_TASK_CHIPSET
-#define CONFIG_AP_POWER_CONTROL
-#endif /* HAS_TASK_CHIPSET */
-#endif /* CONFIG_AP_POWER_CONTROL */
-#endif /* CONFIG_ZEPHYR */
 
 /*
  * If a board has a chipset task, set the minimum charger power required for
@@ -7326,16 +7126,6 @@
 #error CONFIG_BODY_DETECTION_SENSOR must be defined to use body detection
 #endif /* ifndef(CONFIG_BODY_DETECTION_SENSOR) */
 
-/* Non-zephyr only support V1 version of the body detection algorithm. */
-#ifndef CONFIG_ZEPHYR
-#ifdef CONFIG_BODY_DETECTION_ALOGIRTHM_V2
-#error "Only V1 algo for body detection is supported."
-#endif
-#ifndef CONFIG_BODY_DETECTION_ALOGIRTHM_V1
-#define CONFIG_BODY_DETECTION_ALOGIRTHM_V1
-#endif
-#endif /* ifndef CONFIG_ZEPHYR */
-
 #ifndef CONFIG_BODY_DETECTION_MAX_WINDOW_SIZE
 #define CONFIG_BODY_DETECTION_MAX_WINDOW_SIZE 250 /* max sensor odr (Hz) */
 #endif
@@ -7438,28 +7228,6 @@
 #if defined(CONFIG_CBI_FLASH) && defined(CONFIG_CBI_GPIO)
 #error "CONFIG_CBI_FLASH and CONFIG_CBI_GPIO are mutually exclusive."
 #endif
-
-#if !defined(CONFIG_ZEPHYR) && !defined(CONFIG_ACCELGYRO_ICM_COMM_SPI) && \
-	!defined(CONFIG_ACCELGYRO_ICM_COMM_I2C)
-#ifdef I2C_PORT_ACCEL
-#define CONFIG_ACCELGYRO_ICM_COMM_I2C
-#else
-#define CONFIG_ACCELGYRO_ICM_COMM_SPI
-#endif
-#endif /* !CONFIG_ZEPHYR && !CONFIG_ACCELGYRO_ICM_COMM_SPI && \
-	* !CONFIG_ACCELGYRO_ICM_COMM_I2C                      \
-	*/
-
-#if !defined(CONFIG_ZEPHYR) && !defined(CONFIG_ACCELGYRO_BMI_COMM_SPI) && \
-	!defined(CONFIG_ACCELGYRO_BMI_COMM_I2C)
-#ifdef I2C_PORT_ACCEL
-#define CONFIG_ACCELGYRO_BMI_COMM_I2C
-#else
-#define CONFIG_ACCELGYRO_BMI_COMM_SPI
-#endif
-#endif /* !CONFIG_ZEPHYR && !CONFIG_ACCELGYRO_BMI_SPI && \
-	* !CONFIG_ACCELGYRO_BMI_I2C                      \
-	*/
 
 /* AMD STT requires AMD SB-RMI to be enabled */
 #if defined(CONFIG_AMD_STT) && !defined(CONFIG_AMD_SB_RMI)

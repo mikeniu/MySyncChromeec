@@ -4,7 +4,6 @@
  */
 
 #include "atomic.h"
-#include "atomic_bit.h"
 #include "clock_chip.h"
 #include "system.h"
 #include "test_util.h"

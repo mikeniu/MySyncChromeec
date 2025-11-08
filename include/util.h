@@ -17,14 +17,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <strings.h>
-#ifdef CONFIG_ZEPHYR
 #include <zephyr/sys/util.h>
+
+#include <strings.h>
 /**
  * TODO(b/237712836): Remove once Zephyr's libc has strcasecmp.
  */
 #include "builtin/strings.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,21 +60,6 @@ extern "C" {
 /* Returns true if string is not null and not empty */
 #define IS_NONEMPTY_STRING(s) ((s) && (s)[0])
 
-/**
- * Ensure that value `v` is between `min` and `max`.
- *
- * @param v The value of interest.
- * @param low The minimum allowed value for `v`.
- * @param high The maximum allowed value for `v`.
- * @return `v` if it is already between `low`/`high`, `low` if `v` was smaller
- * than `low`, `high` if `v` was bigger than `high`.
- */
-#ifndef __cplusplus
-#ifndef CONFIG_ZEPHYR
-#define clamp(v, low, high) min(high, max(v, low))
-#endif
-#endif
-
 /*
  * Convert a pointer to a base struct into a pointer to the struct that
  * contains the base struct.  This requires knowing where in the contained
@@ -86,11 +70,6 @@ extern "C" {
 
 /* True of x is a power of two */
 #define POWER_OF_TWO(x) ((x) && !((x) & ((x) - 1)))
-
-/* Macro to check if the value is in range */
-#ifndef CONFIG_ZEPHYR
-#define IN_RANGE(x, min, max) ((x) >= (min) && (x) <= (max))
-#endif
 
 /*
  * macros for integer division with various rounding variants

@@ -13,7 +13,7 @@
 #include "i2c.h"
 #include "test_util.h"
 #include "util.h"
-#include "write_protect.h"
+#include "zephyr_write_protect.h"
 
 static void test_setup(void)
 {

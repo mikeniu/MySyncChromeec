@@ -8,8 +8,9 @@
 #ifndef __CROS_EC_ATOMIC_H
 #define __CROS_EC_ATOMIC_H
 
-#include "atomic_t.h"
 #include "common.h"
+
+#include <zephyr/sys/atomic.h>
 
 /**
  * Implements atomic arithmetic operations on 32-bit integers.

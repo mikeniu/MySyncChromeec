@@ -93,34 +93,10 @@ static void set_led_color(int color)
 #endif /* CONFIG_LED_PWM_COUNT >= 2 */
 }
 
-static void set_pwm_led_enable(enum pwm_led_id id, int enable)
-{
-#ifndef CONFIG_ZEPHYR
-	const struct pwm_led *led = &pwm_leds[id];
-
-	if ((id >= CONFIG_LED_PWM_COUNT) || (id < 0))
-		return;
-
-	if (led->ch0 != PWM_LED_NO_CHANNEL)
-		led->enable(led->ch0, enable);
-	if (led->ch1 != PWM_LED_NO_CHANNEL)
-		led->enable(led->ch1, enable);
-	if (led->ch2 != PWM_LED_NO_CHANNEL)
-		led->enable(led->ch2, enable);
-#endif
-}
-
 static void init_leds_off(void)
 {
 	/* Turn off LEDs such that they are in a known state with zero duty. */
 	set_led_color(-1);
-
-	/* Enable pwm modules for each channels of LEDs */
-	set_pwm_led_enable(PWM_LED0, 1);
-
-#if CONFIG_LED_PWM_COUNT >= 2
-	set_pwm_led_enable(PWM_LED1, 1);
-#endif /* CONFIG_LED_PWM_COUNT >= 2 */
 }
 DECLARE_HOOK(HOOK_INIT, init_leds_off, HOOK_PRIO_POST_PWM);
 

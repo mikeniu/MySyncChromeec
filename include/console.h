@@ -10,13 +10,10 @@
 
 #include "common.h"
 #include "config.h"
+#include "zephyr_console_shim.h"
 
 #include <stdarg.h>
 #include <stdbool.h>
-
-#ifdef CONFIG_ZEPHYR
-#include "zephyr_console_shim.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,7 +27,6 @@ extern "C" {
  * will stop/start/stop the Zephyr shell from processing, they should be used
  * for briefly taking control of the uart.
  */
-#ifdef CONFIG_ZEPHYR
 int uart_shell_stop(void);
 void uart_shell_start(void);
 void uart_shell_rx_bypass(bool enable);
@@ -40,18 +36,6 @@ void uart_shell_rx_bypass(bool enable);
  * the uart backend.
  */
 const struct shell *get_ec_shell(void);
-#endif
-#else
-static inline int uart_shell_stop(void)
-{
-	return 0;
-}
-static inline void uart_shell_start(void)
-{
-}
-static inline void uart_shell_rx_bypass(bool enable)
-{
-}
 #endif
 
 /*
@@ -267,14 +251,7 @@ void console_has_input(void);
  * @param help          String with one-line description of command, or NULL.
  * @param flags         Per-command flags, if needed.
  */
-#if !defined(HAS_TASK_CONSOLE) && !defined(CONFIG_ZEPHYR)
-#define DECLARE_CONSOLE_COMMAND(NAME, ROUTINE, ARGDESC, HELP) \
-	static int(ROUTINE)(int argc, const char **argv) __attribute__((unused))
-#define DECLARE_SAFE_CONSOLE_COMMAND(NAME, ROUTINE, ARGDESC, HELP) \
-	static int(ROUTINE)(int argc, const char **argv) __attribute__((unused))
-#define DECLARE_CONSOLE_COMMAND_FLAGS(NAME, ROUTINE, ARGDESC, HELP, FLAGS) \
-	static int(ROUTINE)(int argc, const char **argv) __attribute__((unused))
-#elif defined(HAS_TASK_CONSOLE)
+#if defined(HAS_TASK_CONSOLE)
 
 /* We always provde help args, but we may discard them to save space. */
 #if defined(CONFIG_CONSOLE_CMDHELP)

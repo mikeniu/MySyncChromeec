@@ -17,34 +17,8 @@
  * If compiling with Zephyr, include the BATTERY_LEVEL_ definitions that are
  * shared with device tree
  */
-#ifdef CONFIG_ZEPHYR
 
 #include "dt-bindings/battery.h"
-
-#else /* !CONFIG_ZEPHYR */
-
-/* Stop charge when charging and battery level >= this percentage */
-#define BATTERY_LEVEL_FULL 100
-
-/*
- * Send battery-low host event when discharging and battery level <= this level
- */
-#define BATTERY_LEVEL_LOW 10
-
-/*
- * Send battery-critical host event when discharging and battery level <= this
- * level.
- */
-#define BATTERY_LEVEL_CRITICAL 5
-
-/*
- * Shut down main processor and/or hibernate EC when discharging and battery
- * level < this level. Setting this too low makes the battery discharge too
- * deeply, which isn't good for the battery health.
- */
-#define BATTERY_LEVEL_SHUTDOWN 3
-
-#endif /* CONFIG_ZEPHYR */
 
 #ifdef __cplusplus
 extern "C" {

@@ -123,7 +123,6 @@ extern struct queue const mux_queue[];
 extern mutex_t queue_lock[];
 #endif
 
-#ifdef CONFIG_ZEPHYR
 static int init_mux_mutex(void)
 {
 	int port;
@@ -140,7 +139,6 @@ static int init_mux_mutex(void)
 SYS_INIT(init_mux_mutex, POST_KERNEL,
 	 COND_CODE_1(IS_ENABLED(CONFIG_PDC_POWER_MGMT_USB_MUX),
 		     (CONFIG_USB_MUX_SYS_INIT_PRIORITY), (50)));
-#endif /* CONFIG_ZEPHYR */
 
 __maybe_unused static void
 mux_task_enqueue(int port, int index, enum mux_config_type type,
@@ -418,7 +416,7 @@ static int configure_mux(int port, int index, enum mux_config_type config,
 			if (IS_ENABLED(HAS_TASK_USB_MUX)) {
 				assert(task_get_current() == TASK_ID_USB_MUX);
 			} else {
-#if defined(CONFIG_ZEPHYR) && defined(TEST_BUILD)
+#if defined(TEST_BUILD)
 				assert(port == TASK_ID_TO_PD_PORT(
 						       task_get_current()) ||
 				       task_get_current() ==
@@ -426,7 +424,7 @@ static int configure_mux(int port, int index, enum mux_config_type config,
 #else
 				assert(port ==
 				       TASK_ID_TO_PD_PORT(task_get_current()));
-#endif /* defined(CONFIG_ZEPHYR) && defined(TEST_BUILD) */
+#endif /* defined(TEST_BUILD) */
 			}
 
 			/*

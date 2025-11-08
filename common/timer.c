@@ -17,12 +17,7 @@
 #include "util.h"
 #include "watchdog.h"
 
-#ifdef CONFIG_ZEPHYR
 #include <zephyr/kernel.h> /* For k_usleep() */
-#else
-extern __error("k_usleep() should only be called from Zephyr code") int32_t
-	k_usleep(int32_t);
-#endif /* CONFIG_ZEPHYR */
 
 #ifdef CONFIG_COMMON_RUNTIME
 #define CPRINTS(format, args...) cprints(CC_SYSTEM, format, ##args)
@@ -42,68 +37,6 @@ STATIC_IF_NOT(CONFIG_HWTIMER_64BIT) volatile uint32_t clksrc_high;
 /* Hardware timer routine IRQ number */
 static int timer_irq;
 
-#ifndef CONFIG_ZEPHYR
-/* Bitmap of currently running timers */
-static uint32_t timer_running;
-
-BUILD_ASSERT((sizeof(timer_running) * 8) > TASK_ID_COUNT);
-
-/* Deadlines of all timers */
-static timestamp_t timer_deadline[TASK_ID_COUNT];
-static uint32_t next_deadline = 0xffffffff;
-
-static void expire_timer(task_id_t tskid)
-{
-	/* we are done with this timer */
-	atomic_clear_bits((atomic_t *)&timer_running, 1 << tskid);
-	/* wake up the taks waiting for this timer */
-	task_set_event(tskid, TASK_EVENT_TIMER);
-}
-
-void process_timers(int overflow)
-{
-	uint32_t check_timer, running_t0;
-	timestamp_t next;
-	timestamp_t now;
-
-	if (!IS_ENABLED(CONFIG_HWTIMER_64BIT) && overflow)
-		clksrc_high++;
-
-	do {
-		next.val = -1ull;
-		now = get_time();
-		do {
-			/* read atomically the current state of timer running */
-			check_timer = running_t0 = timer_running;
-			while (check_timer) {
-				int tskid = __fls(check_timer);
-				/* timer has expired ? */
-				if (timer_deadline[tskid].val <= now.val)
-					expire_timer(tskid);
-				else if ((timer_deadline[tskid].le.hi ==
-					  now.le.hi) &&
-					 (timer_deadline[tskid].le.lo <
-					  next.le.lo))
-					next.val = timer_deadline[tskid].val;
-
-				check_timer &= ~BIT(tskid);
-			}
-			/* if there is a new timer, let's retry */
-		} while (timer_running & ~running_t0);
-
-		if (next.le.hi == 0xffffffff) {
-			/* no deadline to set */
-			__hw_clock_event_clear();
-			next_deadline = 0xffffffff;
-			return;
-		}
-
-		__hw_clock_event_set(next.le.lo);
-		next_deadline = next.le.lo;
-	} while (next.val <= get_time().val);
-}
-#endif /* !defined(CONFIG_ZEPHYR) */
-
 int timestamp_expired(timestamp_t deadline, const timestamp_t *now)
 {
 	timestamp_t now_val;
@@ -115,61 +48,6 @@ int timestamp_expired(timestamp_t deadline, const timestamp_t *now)
 
 	return ((int64_t)(now->val - deadline.val) >= 0);
 }
-
-/* Zephyr provides its own implementation in hwtimer shim. */
-#ifndef CONFIG_ZEPHYR
-void udelay(unsigned int us)
-{
-	unsigned int t0 = __hw_clock_source_read();
-
-	/*
-	 * udelay() may be called with interrupts disabled, so we can't rely on
-	 * process_timers() updating the top 32 bits.  So handle wraparound
-	 * ourselves rather than calling get_time() and comparing with a
-	 * deadline.
-	 *
-	 * This may fail for delays close to 2^32 us (~4000 sec), because the
-	 * subtraction below can overflow.  That's acceptable, because the
-	 * watchdog timer would have tripped long before that anyway.
-	 */
-	while (__hw_clock_source_read() - t0 <= us)
-		;
-}
-#endif
-
-/* Zephyr provides its own implementation in task shim */
-#ifndef CONFIG_ZEPHYR
-int timer_arm(timestamp_t event, task_id_t tskid)
-{
-	timestamp_t now = get_time();
-
-	ASSERT(tskid < TASK_ID_COUNT);
-
-	if (timer_running & BIT(tskid))
-		return EC_ERROR_BUSY;
-
-	timer_deadline[tskid] = event;
-	atomic_or((atomic_t *)&timer_running, BIT(tskid));
-
-	/* Modify the next event if needed */
-	if ((event.le.hi < now.le.hi) ||
-	    ((event.le.hi == now.le.hi) && (event.le.lo <= next_deadline)))
-		task_trigger_irq(timer_irq);
-
-	return EC_SUCCESS;
-}
-
-void timer_cancel(task_id_t tskid)
-{
-	ASSERT(tskid < TASK_ID_COUNT);
-
-	atomic_clear_bits((atomic_t *)&timer_running, BIT(tskid));
-	/*
-	 * Don't need to cancel the hardware timer interrupt, instead do
-	 * timer-related housekeeping when the next timer interrupt fires.
-	 */
-}
-#endif
 
 /*
  * For us < (2^31 - task scheduling latency)(~ 2147 sec), this function will
@@ -187,12 +65,10 @@ int crec_usleep(unsigned int us)
 		return 0;
 	}
 
-	if (IS_ENABLED(CONFIG_ZEPHYR)) {
-		while (us) {
-			us = k_usleep(us);
-		}
-		return 0;
+	while (us) {
+		us = k_usleep(us);
 	}
+	return 0;
 
 	t0 = __hw_clock_source_read();
 
@@ -325,17 +201,6 @@ void timer_print_info(void)
 		 "Active timers:\n",
 		 t.val, t.val, deadline, deadline - t.val);
 	cflush();
-
-#ifndef CONFIG_ZEPHYR
-	for (int tskid = 0; tskid < TASK_ID_COUNT; tskid++) {
-		if (timer_running & BIT(tskid)) {
-			ccprintf("  Tsk %2d  0x%016llx -> %11.6lld\n", tskid,
-				 timer_deadline[tskid].val,
-				 timer_deadline[tskid].val - t.val);
-			cflush();
-		}
-	}
-#endif /* !defined(CONFIG_ZEPHYR) */
 }
 
 void timer_init(void)

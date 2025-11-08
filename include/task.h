@@ -12,12 +12,13 @@
 extern "C" {
 #endif
 
-#include "atomic_t.h"
 #include "common.h"
 #include "compile_time_macros.h"
-#include "task_id.h"
+#include "shimmed_task_id.h"
 
 #include <stdbool.h>
+
+#include <zephyr/sys/atomic.h>
 
 /* Task event bitmasks */
 /* Tasks may use the bits in TASK_EVENT_CUSTOM_BIT for their own events */
@@ -90,37 +91,6 @@ void interrupt_enable(void);
  */
 bool is_interrupt_enabled(void);
 
-/*
- * Define irq_lock and irq_unlock that match the function signatures to Zephyr's
- * functions. In reality, these simply call the current implementation of
- * interrupt_disable() and interrupt_enable().
- */
-#ifndef CONFIG_ZEPHYR
-/**
- * Perform the same operation as interrupt_disable but allow nesting. The
- * return value from this function should be used as the argument to
- * irq_unlock. Do not attempt to parse the value, it is a representation
- * of the state and not an indication of any form of count.
- *
- * For more information see:
- * https://docs.zephyrproject.org/latest/reference/kernel/other/interrupts.html#c.irq_lock
- *
- * @return Lock key to use for restoring the state via irq_unlock.
- */
-uint32_t irq_lock(void);
-
-/**
- * Perform the same operation as interrupt_enable but allow nesting. The key
- * should be the unchanged value returned by irq_lock.
- *
- * For more information see:
- * https://docs.zephyrproject.org/latest/reference/kernel/other/interrupts.html#c.irq_unlock
- *
- * @param key The lock-out key used to restore the interrupt state.
- */
-void irq_unlock(uint32_t key);
-#endif /* CONFIG_ZEPHYR */
-
 /**
  * Return true if we are in interrupt context.
  */
@@ -171,22 +141,10 @@ static inline void task_wake(task_id_t tskid)
  */
 task_id_t task_get_current(void);
 
-#ifdef CONFIG_ZEPHYR
 /**
  * Check if this current task is running in deferred context
  */
 bool in_deferred_context(void);
-#else
-/* All ECOS deferred calls run from the HOOKS task */
-static inline bool in_deferred_context(void)
-{
-#ifdef HAS_TASK_HOOKS
-	return (task_get_current() == TASK_ID_HOOKS);
-#else
-	return false;
-#endif /* HAS_TASK_HOOKS */
-}
-#endif /* CONFIG_ZEPHYR */
 
 /**
  * Return a pointer to the bitmap of events of the task.
@@ -392,74 +350,10 @@ void task_clear_pending_irq(int irq);
  */
 bool task_is_irq_pending(int irq);
 
-#ifdef CONFIG_ZEPHYR
 typedef struct k_mutex mutex_t;
 
 #define mutex_lock(mtx) (k_mutex_lock(mtx, K_FOREVER))
 #define mutex_unlock(mtx) (k_mutex_unlock(mtx))
-
-#elif defined(CONFIG_COMMON_RECURSIVE_MUTEX)
-
-/* Use the common recursive implementation of mutex */
-
-#include "recursive_mutex.h"
-
-typedef struct mutex_r mutex_t;
-
-#define mutex_lock(mtx) (mutex_lock_recursive(mtx))
-#define mutex_try_lock(mtx) (mutex_try_lock_recursive(mtx))
-#define mutex_unlock(mtx) (mutex_unlock_recursive(mtx))
-#define k_mutex_init(mtx) (mutex_init_recursive(mtx))
-#define K_MUTEX_DEFINE(name) K_MUTEX_R_DEFINE(name)
-
-#else
-/* Use core specific non-recursive implementation of mutex */
-
-/* Non-recursive mutex struct */
-struct mutex_nr {
-	uint32_t lock;
-	atomic_t waiters;
-};
-
-typedef struct mutex_nr mutex_t;
-
-/**
- * K_MUTEX_DEFINE is a macro normally provided by the Zephyr kernel,
- * and allows creation of a static mutex without the need to
- * initialize it.  We provide the same macro for CrOS EC OS so that we
- * can use it in shared code.
- */
-#define K_MUTEX_DEFINE(name) mutex_t name = {}
-
-/**
- * Lock a mutex.
- *
- * This tries to lock the mutex mtx.  If the mutex is already locked by another
- * task, de-schedules the current task until the mutex is again unlocked.
- *
- * Must not be used in interrupt context!
- */
-void mutex_lock(mutex_t *mtx);
-
-/**
- * Attempt to lock a mutex
- *
- * This tries to lock the mutex mtx. If the mutex is already locked by another
- * thread this function returns 0. If the mutex is unlocked, lock the mutex and
- * return 1.
- *
- * Must not be used in interrupt context!
- */
-int mutex_try_lock(mutex_t *mtx);
-
-/**
- * Release a mutex previously locked by the same task.
- */
-void mutex_unlock(mutex_t *mtx);
-
-/** Zephyr will try to init the mutex using `k_mutex_init()`. */
-#define k_mutex_init(mutex) 0
-#endif /* CONFIG_ZEPHYR */
 
 struct irq_priority {
 	uint8_t irq;
@@ -482,29 +376,6 @@ struct irq_def {
 	 */
 	void (*handler)(void);
 };
-
-/*
- * Implement the DECLARE_IRQ(irq, routine, priority) macro which is
- * a core specific helper macro to declare an interrupt handler "routine".
- */
-#ifndef CONFIG_ZEPHYR
-#ifdef CONFIG_COMMON_RUNTIME
-#include "irq_handler.h"
-#else
-#define IRQ_HANDLER(irqname) CONCAT3(irq_, irqname, _handler)
-#define IRQ_HANDLER_OPT(irqname) CONCAT3(irq_, irqname, _handler_optional)
-#define DECLARE_IRQ(irq, routine, priority) DECLARE_IRQ_(irq, routine, priority)
-#define DECLARE_IRQ_(irq, routine, priority) \
-	static void __keep routine(void);    \
-	void IRQ_HANDLER_OPT(irq)(void) __attribute__((alias(#routine)))
-
-/* Include ec.irqlist here for compilation dependency */
-#define ENABLE_IRQ(x)
-#if !defined(CONFIG_DFU_BOOTMANAGER_MAIN)
-#include "ec.irqlist"
-#endif /* !defined(CONFIG_DFU_BOOTMANAGER_MAIN) */
-#endif /* CONFIG_COMMON_RUNTIME */
-#endif /* !CONFIG_ZEPHYR */
 
 #ifdef __cplusplus
 }

@@ -261,7 +261,6 @@ extern const struct accelgyro_drv icm426xx_drv;
 
 void icm426xx_interrupt(enum gpio_signal signal);
 
-#if defined(CONFIG_ZEPHYR)
 #if DT_NODE_EXISTS(DT_ALIAS(icm426xx_int))
 
 /* Get the motion sensor ID of the ICM426xx sensor that generates the interrupt.
@@ -277,6 +276,5 @@ void icm426xx_interrupt(enum gpio_signal signal);
 #define CONFIG_ACCELGYRO_ICM426XX_INT_EVENT \
 	TASK_EVENT_MOTION_SENSOR_INTERRUPT(SENSOR_ID(DT_ALIAS(icm426xx_int)))
 #endif
-#endif /* defined(CONFIG_ZEPHYR) */
 
 #endif /* __CROS_EC_ACCELGYRO_ICM426XX_H */

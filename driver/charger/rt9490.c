@@ -67,19 +67,6 @@ static const struct charger_info rt9490_charger_info = {
 	.input_current_step = INPUT_I_STEP,
 };
 
-#ifndef CONFIG_ZEPHYR
-const struct rt9490_init_setting rt9490_setting = {
-	/* b/230442545#comment28
-	 * With EOC-Force-CCM disabled, the real IEOC would be
-	 * 30~50mA lower than expected, so move eoc_current one step up
-	 */
-	.eoc_current = 240,
-	.mivr = 4000,
-	.boost_voltage = 5050,
-	.boost_current = 1500,
-};
-#endif
-
 static enum ec_error_list rt9490_read8(int chgnum, int reg, int *val)
 {
 	return i2c_read8(chg_chips[chgnum].i2c_port,
@@ -807,7 +794,7 @@ int rt9490_get_thermistor_val(const struct temp_sensor_t *sensor, int *temp_ptr)
 	uint16_t mv;
 	int idx = sensor->idx;
 	int val;
-#if IS_ENABLED(CONFIG_ZEPHYR) && IS_ENABLED(CONFIG_TEMP_SENSOR)
+#if IS_ENABLED(CONFIG_TEMP_SENSOR)
 	const struct thermistor_info *info = sensor->zephyr_info->thermistor;
 #else
 	const struct thermistor_info *info = &rt9490_thermistor_info;

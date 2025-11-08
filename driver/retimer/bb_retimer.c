@@ -737,7 +737,6 @@ void bb_retimer_hpd_update(const struct usb_mux *me, mux_state_t hpd_state,
 	mutex_unlock(&bb_retimer_lock[port]);
 }
 
-#ifdef CONFIG_ZEPHYR
 static void init_retimer_mutexes(void)
 {
 	int port;
@@ -747,7 +746,6 @@ static void init_retimer_mutexes(void)
 	}
 }
 DECLARE_HOOK(HOOK_INIT, init_retimer_mutexes, HOOK_PRIO_FIRST);
-#endif
 
 static int retimer_low_power_mode(const struct usb_mux *me)
 {

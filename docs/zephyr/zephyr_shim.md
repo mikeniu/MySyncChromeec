@@ -257,11 +257,6 @@ we follow the following pattern:
   `CONFIG_PLATFORM_EC_` as the prefix for EC software features in
   Kconfig.
 
-One special configuration option exists, `CONFIG_ZEPHYR`, which you
-can use to detect whether the OS is Zephyr OS.  This is the
-conventional way to add Zephyr-specific (or excluded) code in CrOS EC
-code.
-
 The typical EC macros for reducing `#ifdef` messes (e.g.,
 `IS_ENABLED`, `STATIC_IF`, etc.) work with both CrOS EC OS and Kconfig
 options, and should be used when possible.
@@ -282,7 +277,7 @@ there is no way to "override a header".
 If you feel the need to "override" a header, say `foo.h` in
 `include/`, the best way to do this is to give it a different name
 under `zephyr/shim/include` (e.g., `zephyr_foo_shim.h`), and include
-that in the `foo.h` header with a `#ifdef CONFIG_ZEPHYR` guard.
+that in the `foo.h` header
 
 The typical styling convention for includes (following existing
 conventions in `platform/ec` and other C codebases we have) is:

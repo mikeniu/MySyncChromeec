@@ -12,7 +12,7 @@
 #include "common.h"
 #include "compiler.h"
 #include "gpio_signal.h"
-#include "task_id.h"
+#include "shimmed_task_id.h"
 
 #ifdef __cplusplus
 extern "C" {

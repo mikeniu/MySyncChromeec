@@ -9,7 +9,7 @@
 #include "cros_board_info.h"
 #include "flash.h"
 #include "system.h"
-#include "write_protect.h"
+#include "zephyr_write_protect.h"
 
 #include <zephyr/devicetree.h>
 

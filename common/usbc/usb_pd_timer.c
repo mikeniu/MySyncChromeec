@@ -5,7 +5,6 @@
 
 #include "assert.h"
 #include "atomic.h"
-#include "atomic_bit.h"
 #include "common.h"
 #include "console.h"
 #include "limits.h"

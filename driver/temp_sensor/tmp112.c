@@ -10,12 +10,9 @@
 #include "hooks.h"
 #include "i2c.h"
 #include "math_util.h"
+#include "temp_sensor/temp_sensor.h"
 #include "temp_sensor/tmp112.h"
 #include "util.h"
-
-#ifdef CONFIG_ZEPHYR
-#include "temp_sensor/temp_sensor.h"
-#endif
 
 #define TMP112_RESOLUTION 12
 #define TMP112_SHIFT1 (16 - TMP112_RESOLUTION)
@@ -92,19 +89,6 @@ int tmp112_get_val_mk(int idx, int *temp_mk_ptr)
 	return EC_SUCCESS;
 }
 
-#ifndef CONFIG_ZEPHYR
-static void tmp112_poll(void)
-{
-	int s;
-	int temp_reg = 0;
-
-	for (s = 0; s < TMP112_COUNT; s++) {
-		if (get_reg_temp(s, &temp_reg) == EC_SUCCESS)
-			temp_mk_local[s] = tmp112_reg_to_mk(temp_reg);
-	}
-}
-DECLARE_HOOK(HOOK_SECOND, tmp112_poll, HOOK_PRIO_TEMP_SENSOR);
-#else
 static void tmp112_update_temperature(int idx)
 {
 	int temp_reg = 0;
@@ -115,7 +99,6 @@ static void tmp112_update_temperature(int idx)
 	if (get_reg_temp(idx, &temp_reg) == EC_SUCCESS)
 		temp_mk_local[idx] = tmp112_reg_to_mk(temp_reg);
 }
-#endif /* CONFIG_ZEPHYR */
 
 void tmp112_init(void)
 {

@@ -259,7 +259,7 @@ enum hook_type {
 	 */
 	HOOK_TICK,
 
-#if !defined(CONFIG_ZEPHYR) || defined(CONFIG_PLATFORM_EC_HOOK_SECOND)
+#if defined(CONFIG_PLATFORM_EC_HOOK_SECOND)
 	/*
 	 * Periodic tick, every second.
 	 *

@@ -223,7 +223,6 @@ int lis2dw12_set_power_mode(const struct motion_sensor_t *s,
 			    enum lis2sw12_lpmode lpmode);
 #endif
 
-#if defined(CONFIG_ZEPHYR)
 #if DT_NODE_EXISTS(DT_ALIAS(lis2dw12_int))
 /* Get the motion sensor ID of the LIS2DW12 sensor that generates the
  * interrupt. The interrupt is converted to the event and transferred to
@@ -237,7 +236,6 @@ int lis2dw12_set_power_mode(const struct motion_sensor_t *s,
  */
 #define CONFIG_ACCEL_LIS2DW12_INT_EVENT \
 	TASK_EVENT_MOTION_SENSOR_INTERRUPT(SENSOR_ID(DT_ALIAS(lis2dw12_int)))
-#endif
 #endif
 
 #endif /* __CROS_EC_ACCEL_LIS2DW12_H */

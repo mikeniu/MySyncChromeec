@@ -10,6 +10,7 @@
 #include "crc8.h"
 #include "host_command.h"
 #include "i2c.h"
+#include "i2c/i2c.h"
 #include "i2c_bitbang.h"
 #include "i2c_private.h"
 #include "printf.h"
@@ -17,11 +18,7 @@
 #include "task.h"
 #include "util.h"
 
-#ifdef CONFIG_ZEPHYR
-#include "i2c/i2c.h"
-
 #include <zephyr/drivers/i2c.h>
-#endif /* CONFIG_ZEPHYR */
 
 #define CPUTS(outstr) cputs(CC_I2C, outstr)
 #define CPRINTS(format, args...) cprints(CC_I2C, format, ##args)
@@ -38,7 +35,6 @@ static mutex_t port_mutex[I2C_CONTROLLER_COUNT + I2C_BITBANG_PORT_COUNT];
 static volatile uint32_t i2c_port_active_list;
 BUILD_ASSERT(ARRAY_SIZE(port_mutex) < 32);
 
-#ifdef CONFIG_ZEPHYR
 static int init_port_mutex(void)
 {
 	for (int i = 0; i < ARRAY_SIZE(port_mutex); ++i)
@@ -47,7 +43,6 @@ static int init_port_mutex(void)
 	return 0;
 }
 SYS_INIT(init_port_mutex, POST_KERNEL, 50);
-#endif /* CONFIG_ZEPHYR */
 
 /**
  * Non-deterministically test the lock status of the port.  If another task
@@ -199,7 +194,6 @@ int i2c_xfer_unlocked(const int port, const uint16_t addr_flags,
 	}
 
 	for (i = 0; i <= CONFIG_I2C_NACK_RETRY_COUNT; i++) {
-#ifdef CONFIG_ZEPHYR
 		struct i2c_msg msg[2];
 		int num_msgs = 0;
 
@@ -259,13 +253,6 @@ int i2c_xfer_unlocked(const int port, const uint16_t addr_flags,
 		default:
 			return EC_ERROR_UNKNOWN;
 		}
-#elif defined(CONFIG_I2C_XFER_LARGE_TRANSFER)
-		ret = i2c_xfer_no_retry(port, no_pec_af, out, out_size, in,
-					in_size, flags);
-#else
-		ret = chip_i2c_xfer_with_notify(port, no_pec_af, out, out_size,
-						in, in_size, flags);
-#endif /* CONFIG_I2C_XFER_LARGE_TRANSFER */
 		if (ret != EC_ERROR_BUSY)
 			break;
 	}
@@ -905,14 +892,12 @@ enum i2c_freq i2c_get_freq(int port)
 
 static enum ec_status i2c_command_control(struct host_cmd_handler_args *args)
 {
-#ifdef CONFIG_ZEPHYR
 	/* For Zephyr, convert the received remote port number to a port number
 	 * used in EC.
 	 */
 	((struct ec_params_i2c_control *)(args->params))->port =
 		i2c_get_port_from_remote_port(
 			((struct ec_params_i2c_control *)(args->params))->port);
-#endif
 	const struct ec_params_i2c_control *params = args->params;
 	struct ec_response_i2c_control *resp = args->response;
 	enum i2c_freq old_i2c_freq;

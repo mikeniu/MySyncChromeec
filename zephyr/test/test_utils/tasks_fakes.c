@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-#include "task_id.h"
+#include "shimmed_task_id.h"
 
 #include <zephyr/fff.h>
 #include <zephyr/sys/atomic.h>

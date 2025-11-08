@@ -22,9 +22,7 @@
 #include "usb_pd_tcpm.h"
 #include "util.h"
 
-#ifdef CONFIG_ZEPHYR
 #include <soc.h>
-#endif
 
 #ifdef CONFIG_USB_PD_TCPMV1
 #if defined(CONFIG_USB_PD_DUAL_ROLE_AUTO_TOGGLE) || \
@@ -903,11 +901,9 @@ static void it8xxx2_init(enum usbpd_port port, int role)
 	*usbpd_ctrl_regs[port].cc1 = cc_config;
 	*usbpd_ctrl_regs[port].cc2 = cc_config;
 	task_clear_pending_irq(usbpd_ctrl_regs[port].irq);
-#ifdef CONFIG_ZEPHYR
 	irq_connect_dynamic(usbpd_ctrl_regs[port].irq, 0,
 			    (void (*)(const void *))chip_pd_irq, (void *)port,
 			    0);
-#endif
 	task_enable_irq(usbpd_ctrl_regs[port].irq);
 	USBPD_START(port);
 	/*

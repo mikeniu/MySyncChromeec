@@ -140,45 +140,6 @@ void panic_reboot(void)
 	system_reset(0);
 }
 
-#if !(defined(CONFIG_ZEPHYR))
-/* Complete the processing of a panic, after the initial message is shown */
-test_mockable_static
-#if !(defined(TEST_FUZZ) || defined(CONFIG_ZTEST))
-	__noreturn
-#endif
-	void
-	complete_panic(const char *fname, int linenum)
-{
-	/* Top two bytes of info register is first two characters of file name.
-	 * Bottom two bytes of info register is line number.
-	 */
-	software_panic(PANIC_SW_ASSERT, (fname[0] << 24) | (fname[1] << 16) |
-						(linenum & 0xffff));
-}
-
-#ifdef CONFIG_DEBUG_ASSERT_BRIEF
-void panic_assert_fail(const char *fname, int linenum)
-{
-	panic_printf("\nASSERTION FAILURE at %s:%d\n", fname, linenum);
-	complete_panic(fname, linenum);
-}
-#else
-void panic_assert_fail(const char *msg, const char *func, const char *fname,
-		       int linenum)
-{
-	panic_printf("\nASSERTION FAILURE '%s' in %s() at %s:%d\n", msg, func,
-		     fname, linenum);
-	complete_panic(fname, linenum);
-}
-#endif
-
-void panic(const char *msg)
-{
-	panic_printf("\n** PANIC: %s\n", msg);
-	panic_reboot();
-}
-#endif /* !CONFIG_ZEPHYR */
-
 test_mockable struct panic_data *panic_get_data(void)
 {
 	BUILD_ASSERT(sizeof(struct panic_data) <= CONFIG_PANIC_DATA_SIZE);

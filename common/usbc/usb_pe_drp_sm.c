@@ -795,7 +795,6 @@ static void pe_init(int port)
 		set_state_pe(port, PE_SNK_STARTUP);
 }
 
-#ifdef CONFIG_ZEPHYR
 static int init_pe_drp_sm_mutexes(void)
 {
 	int port;
@@ -807,7 +806,6 @@ static int init_pe_drp_sm_mutexes(void)
 	return 0;
 }
 SYS_INIT(init_pe_drp_sm_mutexes, POST_KERNEL, 50);
-#endif /* CONFIG_ZEPHYR */
 
 int pe_is_running(int port)
 {
@@ -4842,9 +4840,7 @@ __maybe_unused static void pe_give_sink_cap_ext_entry(int port)
 
 	skedb.vid = USB_VID_GOOGLE;
 	skedb.pid = CONFIG_USB_PID;
-#ifdef CONFIG_ZEPHYR /* USB_PD_XID is not defined in CrosEC */
 	skedb.xid = CONFIG_USB_PD_XID;
-#endif
 	skedb.fw_version = 0;
 	skedb.hw_version = 0;
 	skedb.skedb_version = 1; /* version 1.0 */

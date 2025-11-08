@@ -14,38 +14,12 @@
 extern "C" {
 #endif
 
-#ifdef CONFIG_ZEPHYR
 /*
  * Zephyr driver is responsible for initializing, enabling and disabling
  * hardware. In this case, trng_init() and trng_exit() does nothing.
  */
 #define trng_init()
 #define trng_exit()
-#else
-/**
- * Initialize the true random number generator.
- *
- * Not supported by all platforms.
- **/
-void trng_init(void);
-
-/**
- * Generate true random number.
- *
- * Not supported by all platforms.
- **/
-uint32_t trng_rand(void);
-
-/**
- * Shutdown the true random number generator.
- *
- * The opposite operation of trng_init(), disable the hardware resources
- * used by the TRNG to save power.
- *
- * Not supported by all platforms.
- **/
-void trng_exit(void);
-#endif /* CONFIG_ZEPHYR */
 
 /**
  * Output len random bytes into buffer.

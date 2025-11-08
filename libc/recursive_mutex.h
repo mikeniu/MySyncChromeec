@@ -6,8 +6,9 @@
 #ifndef __LIBC_RECURSIVE_MUTEX_H
 #define __LIBC_RECURSIVE_MUTEX_H
 
-#include "atomic_t.h"
 #include "task.h"
+
+#include <zephyr/sys/atomic.h>
 
 enum mutex_r_state {
 	MUTEX_R_UNLOCKED = 0,

@@ -5,7 +5,7 @@
 
 #include "common.h"
 #include "test/drivers/test_state.h"
-#include "write_protect.h"
+#include "zephyr_write_protect.h"
 
 #include <zephyr/fff.h>
 #include <zephyr/kernel.h>

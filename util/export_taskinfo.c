@@ -7,7 +7,7 @@
  */
 
 #include "config.h"
-#include "task_id.h"
+#include "shimmed_task_id.h"
 
 #include <stdint.h>
 

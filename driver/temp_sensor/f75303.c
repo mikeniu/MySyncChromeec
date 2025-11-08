@@ -11,11 +11,8 @@
 #include "i2c.h"
 #include "math_util.h"
 #include "temp_sensor/f75303.h"
-#include "util.h"
-
-#ifdef CONFIG_ZEPHYR
 #include "temp_sensor/temp_sensor.h"
-#endif
+#include "util.h"
 
 #define F75303_RESOLUTION 11
 #define F75303_SHIFT1 (16 - F75303_RESOLUTION)
@@ -23,16 +20,6 @@
 
 static int temps[F75303_IDX_COUNT];
 static int8_t fake_temp[F75303_IDX_COUNT];
-
-#ifndef CONFIG_ZEPHYR
-/**
- * Read 8 bits register from temp sensor.
- */
-static int raw_read8(const int offset, int *data)
-{
-	return i2c_read8(I2C_PORT_THERMAL, F75303_I2C_ADDR_FLAGS, offset, data);
-}
-#else
 /**
  * Read 8 bits register from temp sensor.
  */
@@ -41,22 +28,7 @@ static int raw_read8(int sensor, const int offset, int *data)
 	return i2c_read8(f75303_sensors[sensor].i2c_port,
 			 f75303_sensors[sensor].i2c_addr_flags, offset, data);
 }
-#endif /* !CONFIG_ZEPHYR */
 
-#ifndef CONFIG_ZEPHYR
-static int get_temp(const int offset, int *temp)
-{
-	int rv;
-	int temp_raw = 0;
-
-	rv = raw_read8(offset, &temp_raw);
-	if (rv != 0)
-		return rv;
-
-	*temp = C_TO_K(temp_raw);
-	return EC_SUCCESS;
-}
-#else
 static int get_temp(int sensor, const int offset, int *temp)
 {
 	int rv;
@@ -69,7 +41,6 @@ static int get_temp(int sensor, const int offset, int *temp)
 	*temp = CELSIUS_TO_MILLI_KELVIN(temp_raw);
 	return EC_SUCCESS;
 }
-#endif /* !CONFIG_ZEPHYR */
 
 int f75303_get_val(int idx, int *temp)
 {
@@ -111,16 +82,6 @@ int f75303_get_val_mk(int idx, int *temp_mk_ptr)
 	*temp_mk_ptr = temps[idx];
 	return EC_SUCCESS;
 }
-
-#ifndef CONFIG_ZEPHYR
-static void f75303_sensor_poll(void)
-{
-	get_temp(F75303_TEMP_LOCAL_REGISTER, &temps[F75303_IDX_LOCAL]);
-	get_temp(F75303_TEMP_REMOTE1_REGISTER, &temps[F75303_IDX_REMOTE1]);
-	get_temp(F75303_TEMP_REMOTE2_REGISTER, &temps[F75303_IDX_REMOTE2]);
-}
-DECLARE_HOOK(HOOK_SECOND, f75303_sensor_poll, HOOK_PRIO_TEMP_SENSOR);
-#else
 void f75303_update_temperature(int idx)
 {
 	int temp_reg = 0;
@@ -147,7 +108,6 @@ void f75303_update_temperature(int idx)
 		temps[idx] = temp_reg;
 	}
 }
-#endif /* CONFIG_ZEPHYR */
 
 static int f75303_set_fake_temp(int argc, const char **argv)
 {

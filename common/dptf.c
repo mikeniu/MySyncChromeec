@@ -11,11 +11,8 @@
 #include "hooks.h"
 #include "host_command.h"
 #include "temp_sensor.h"
-#include "util.h"
-
-#ifdef CONFIG_ZEPHYR
 #include "temp_sensor/temp_sensor.h"
-#endif
+#include "util.h"
 
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_DPTF, outstr)

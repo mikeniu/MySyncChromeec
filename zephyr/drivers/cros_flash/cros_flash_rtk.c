@@ -9,7 +9,7 @@
 #include "flash.h"
 #include "spi_flash_reg.h"
 #include "watchdog.h"
-#include "write_protect.h"
+#include "zephyr_write_protect.h"
 
 #include <zephyr/drivers/bbram.h>
 #include <zephyr/drivers/flash.h>
