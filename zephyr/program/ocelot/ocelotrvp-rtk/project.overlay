@@ -34,7 +34,6 @@
 
 /delete-node/ &int_volume_down;
 /delete-node/ &int_volume_up;
-/delete-node/ &int_lid_open;
 /* Enabe nodes once b/458003667 is fixed. */
 /delete-node/ &pdc_ti_c0;
 /delete-node/ &pdc_ti_c1;
