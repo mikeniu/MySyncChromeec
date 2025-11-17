@@ -58,6 +58,7 @@ if(DEFINED CONFIG_BOARD_OCELOTRVP_RTK)
 	project(ocelotrvp-rtk)
 	zephyr_library_sources("../intelrvp/src/intel_rvp_board_id.c")
 	zephyr_library_sources("src/rvp_board_power.c")
+	zephyr_library_sources("src/rvp_usbc_runtime.c")
 endif()
 
 zephyr_include_directories("include/")
