@@ -32,8 +32,6 @@
 	pdc = <&pdc_rtk_c1>;
 };
 
-/delete-node/ &int_volume_down;
-/delete-node/ &int_volume_up;
 /* Enabe nodes once b/458003667 is fixed. */
 /delete-node/ &pdc_ti_c0;
 /delete-node/ &pdc_ti_c1;
