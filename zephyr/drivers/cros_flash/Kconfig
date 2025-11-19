@@ -193,3 +193,9 @@ config CROS_FLASH_FOCALTECH_INIT_PRIORITY
 	  Its priority must be lower than CONFIG_FLASH_INIT_PRIORITY.
 
 endif
+
+config CROS_FLASH_WP_LIBRARY_EM32F967
+    bool
+    help
+      If enabled, it indicates that the elan em32f967
+      flash write protect library is present.
