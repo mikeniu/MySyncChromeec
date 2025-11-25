@@ -25,6 +25,9 @@
 #ifdef CONFIG_PLATFORM_EC_ACCEL_BMA4XX
 #include "bma4xx-drvinfo.inc"
 #endif
+#ifdef CONFIG_PLATFORM_EC_ACCEL_BMA5XY
+#include "bma5xy-drvinfo.inc"
+#endif
 #ifdef CONFIG_PLATFORM_EC_ACCEL_KX022
 #include "kx022-drvinfo.inc"
 #endif

@@ -1,0 +1,19 @@
+# Copyright 2025 The Chromium OS Authors. All rights reserved.
+# Modifications Copyright (C) 2024 Bosch Sensortec GmbH
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: BMA5XY driver data node
+
+compatible: "cros-ec,drvdata-bma5xy"
+
+include: drvdata-base.yaml
+
+#
+# examples:
+#
+# bma5xy_data: bma5xy-drv-data {
+#       compatible = "cros-ec,drvdata-bma5xy";
+#       status = "okay";
+# };
+#
