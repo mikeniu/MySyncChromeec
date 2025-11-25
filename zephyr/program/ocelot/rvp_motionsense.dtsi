@@ -11,15 +11,14 @@
 		 * motion sense's <>_INT_EVENT is handled by alias. Using the
 		 * alias, each driver creates its own <>_INT_EVENT.
 		 */
-		bmi3xx-int = &base_accel;
-		bma4xx-int = &lid_accel;
+		bma5xy-int = &base_accel;
 	};
 
 	motionsense-mutex {
 		compatible = "cros-ec,motionsense-mutex";
-		mutex_bma4xx_lid: mutex-bma4xx-lid {
+		mutex_bma5xy_lid: mutex-bma5xy-lid {
 		};
-		mutex_bmi323_base: mutex-bmi323-base {
+		mutex_bma5xy_base: mutex-bma5xy-base {
 		};
 	};
 
@@ -40,12 +39,12 @@
 
 	/* Driver specific data */
 	motionsense-sensor-data {
-		base_data: bmi323-drv-data {
-			compatible = "cros-ec,drvdata-bmi3xx";
+		base_data: bma5xy-base-drv-data {
+			compatible = "cros-ec,drvdata-bma5xy";
 			status = "okay";
 		};
-		lid_data: bma422-drv-data {
-			compatible = "cros-ec,drvdata-bma4xx";
+		lid_data: bma5xy-lid-drv-data {
+			compatible = "cros-ec,drvdata-bma5xy";
 			status = "okay";
 		};
 	};
@@ -53,17 +52,17 @@
 	/* List of motion sensors that create motion_sensors array. */
 	motionsense-sensor {
 		lid_accel: lid-accel {
-			compatible = "cros-ec,bma4xx";
+			compatible = "cros-ec,bma5xy";
 			status = "okay";
 
 			active-mask = "SENSOR_ACTIVE_S0_S3";
 			location = "MOTIONSENSE_LOC_LID";
-			mutex = <&mutex_bma4xx_lid>;
+			mutex = <&mutex_bma5xy_lid>;
 			port = <&i2c_ish_sensor>;
 			rot-standard-ref = <&lid_rot_ref>;
 			default-range = <2>;
 			drv-data = <&lid_data>;
-			i2c-spi-addr-flags = "BMA4_I2C_ADDR_SECONDARY";
+			i2c-spi-addr-flags = "BMA5_I2C_ADDR";
 			configs {
 				compatible =
 					"cros-ec,motionsense-sensor-config";
@@ -78,17 +77,17 @@
 		};
 
 		base_accel: base-accel {
-			compatible = "cros-ec,bmi3xx-accel";
+			compatible = "cros-ec,bma5xy";
 			status = "okay";
 
 			active-mask = "SENSOR_ACTIVE_S0_S3";
 			location = "MOTIONSENSE_LOC_BASE";
-			mutex = <&mutex_bmi323_base>;
-			port = <&i2c_ish_sensor>;
+			mutex = <&mutex_bma5xy_base>;
+			port = <&i2c_ish1_sensor>;
 			rot-standard-ref = <&base_rot_ref>;
 			default-range = <2>;
 			drv-data = <&base_data>;
-			i2c-spi-addr-flags = "BMI3_ADDR_I2C_SEC";
+			i2c-spi-addr-flags = "BMA5_I2C_ADDR";
 			configs {
 				compatible =
 					"cros-ec,motionsense-sensor-config";
@@ -101,29 +100,11 @@
 				};
 			};
 		};
-
-		base_gyro: base-gyro {
-			compatible = "cros-ec,bmi3xx-gyro";
-			status = "okay";
-
-			active-mask = "SENSOR_ACTIVE_S0_S3";
-			location = "MOTIONSENSE_LOC_BASE";
-			mutex = <&mutex_bmi323_base>;
-			port = <&i2c_ish_sensor>;
-			i2c-spi-addr-flags = "BMI3_ADDR_I2C_SEC";
-			rot-standard-ref = <&base_rot_ref>;
-			drv-data = <&base_data>;
-		};
 	};
 
 	/* High level description info */
 	motionsense-sensor-info {
 		compatible = "cros-ec,motionsense-sensor-info";
-
-		/*
-		 * List of GPIO interrupts that have to be enabled at initial
-		 * stage.
-		 */
-		sensor-irqs = <&int_lid_accel &int_base_accel>;
+		sensor-irqs = <&int_base_accel>;
 	};
 };

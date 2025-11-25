@@ -1,0 +1,19 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: Emulator for the BMA5xy family of accelerometers.
+
+compatible: "cros,bma5xy-emul"
+
+include: base.yaml
+
+properties:
+  reg:
+    required: true
+  motionsense-sensor:
+    required: true
+    type: phandle
+    description: |
+      Reference to the /motionsense-sensor node representing the sensor
+      associated with this emulator.

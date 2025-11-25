@@ -10,5 +10,9 @@
 			/* Define i2c-port in project overlay */
 			enum-names = "I2C_PORT_SENSOR";
 		};
+        i2c_ish1_sensor: ish1-sensor {
+            /* Define i2c-port in project overlay */
+            enum-names = "I2C_PORT_ISH";
+        };
 	};
 };

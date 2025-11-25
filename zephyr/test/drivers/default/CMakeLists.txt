@@ -3,6 +3,7 @@ target_sources(app PRIVATE
     src/bb_retimer.c
     src/bma2x2.c
     src/bma4xx.c
+    src/bma5xy.c
     src/bmi_common.c
     src/bmi160.c
     src/bmi260.c
