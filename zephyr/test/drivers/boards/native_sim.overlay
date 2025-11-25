@@ -24,6 +24,7 @@
 
 	aliases {
 		bma4xx-int = &ms_bma4xx;
+		bma5xy-int = &ms_bma5xy;
 		bmi260-int = &ms_bmi260_accel;
 		bmi160-int = &ms_bmi160_accel;
 		tcs3400-int = &tcs3400_clear;
@@ -645,6 +646,9 @@
 		mutex_bma4xx: bma4xx-mutex {
 		};
 
+		mutex_bma5xy: bma5xy-mutex {
+		};
+
 		mutex_bmi260: bmi260-mutex {
 		};
 
@@ -666,8 +670,13 @@
 		};
 
 		bma4xx_data: bma4xx-drv-data {
-			compatible = "cros-ec,drvdata-bma4xx";
-			status = "okay";
+		    compatible = "cros-ec,drvdata-bma4xx";
+		    status = "okay";
+		};
+
+		bma5xy_data: bma5xy-drv-data {
+		    compatible = "cros-ec,drvdata-bma5xy";
+		    status = "okay";
 		};
 
 		bmi260_data: bmi260-drv-data {
@@ -832,15 +841,27 @@
 		};
 
 		ms_bma4xx: ms-bma4xx {
-			compatible = "cros-ec,bma4xx";
-			status = "okay";
+		    compatible = "cros-ec,bma4xx";
+		    status = "okay";
 
-			location = "MOTIONSENSE_LOC_LID";
-			mutex = <&mutex_bma4xx>;
-			port = <&named_i2c1>;
-			drv-data = <&bma4xx_data>;
+		    location = "MOTIONSENSE_LOC_LID";
+		    mutex = <&mutex_bma4xx>;
+		    port = <&named_i2c1>;
+		    drv-data = <&bma4xx_data>;
+		    default-range = <4>;
+		    i2c-spi-addr-flags = "BMA4_I2C_ADDR_SECONDARY";
+		};
+
+		ms_bma5xy: ms-bma5xy {
+		    compatible = "cros-ec,bma5xy";
+		    status = "okay";
+
+    	    location = "MOTIONSENSE_LOC_LID";
+	        mutex = <&mutex_bma5xy>;
+       		port = <&named_i2c1>;
+			drv-data = <&bma5xy_data>;
 			default-range = <4>;
-			i2c-spi-addr-flags = "BMA4_I2C_ADDR_SECONDARY";
+			i2c-spi-addr-flags = "BMA5_I2C_ADDR";
 		};
 
 		tcs3400_clear: tcs3400-clear {
@@ -920,11 +941,19 @@
 		};
 
 		bma422_emul: bma4xx@19 {
-			compatible = "cros,bma4xx-emul";
-			status = "okay";
-			reg = <0x19>;
-			motionsense-sensor = <&ms_bma4xx>;
+		    compatible = "cros,bma4xx-emul";
+		    status = "okay";
+		    reg = <0x19>;
+		    motionsense-sensor = <&ms_bma4xx>;
 		};
+
+		bma5xy_emul: bma5xy@18 {
+			compatible = "cros,bma5xy-emul";
+			status = "okay";
+			reg = <0x18>;
+			motionsense-sensor = <&ms_bma5xy>;
+		};
+
 	};
 
 	i2c2: i2c@500 {

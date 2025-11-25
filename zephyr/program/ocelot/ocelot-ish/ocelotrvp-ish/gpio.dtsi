@@ -9,11 +9,11 @@
 		compatible = "named-gpios";
 
 		gpio_accel_db_int_l: accel_db_int_l {
-			gpios = <&gpio0 6 GPIO_INPUT>;
+			gpios = <&gpio0 4 GPIO_INPUT>;
 		};
 
 		gpio_accel_mb_int_l: accel_mb_int_l {
-			gpios = <&gpio0 5 GPIO_INPUT>;
+			gpios = <&gpio0 7 GPIO_INPUT>;
 		};
 
 		ec_entering_rw {

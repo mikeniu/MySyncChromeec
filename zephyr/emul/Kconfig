@@ -49,6 +49,16 @@ config EMUL_BC12_DETECT_PI3USB9201
 	  detector/advertiser. The emulator supports reading and writing the
 	  4 I2C registers of the PI3USB9201 using the emulated I2C bus.
 
+config EMUL_BMA5XY
+	bool "BMA5xy emulator"
+	default y
+	depends on DT_HAS_CROS_BMA5XY_EMUL_ENABLED
+	select EMUL_COMMON_I2C
+	help
+	  Enable the BMA5xy emulator, used to test the bma5xy driver on an
+	  emulated I2C bus; emulator API is in
+	  zephyr/include/emul/emul_bma5xy.h.
+
 config EMUL_CHARGER_ISL9241
 	bool "Renesas buck-boost battery charger emulator"
 	default y
