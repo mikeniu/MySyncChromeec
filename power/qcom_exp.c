@@ -161,6 +161,9 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 /* Heartbeat wake interval (45 minutes) */
 #define HEARTBEAT_WAKE_INTERVAL_SEC (45 * 60)
 
+/* Wake after 5 seconds to boot the AP and enable charging */
+#define EXTPOWER_WAKE_INTERVAL_SEC 5
+
 /* Value to indicate an invalid or uninitialized SoC. */
 #define BATTERY_BAD_STATE_OF_CHARGE -1
 
@@ -363,6 +366,10 @@ void board_chipset_set_heartbeat_alarm_on_shutdown(void)
 		/* Move heart beat to RTC alarm based wake (45min) */
 		system_set_rtc_alarm(HEARTBEAT_WAKE_INTERVAL_SEC, 0);
 		heartbeat_mode = 0;
+	} else if (extpower_is_present()) {
+		/* If chipset shutdown and external power is connected, wake
+		 * after 5 seconds to boot the AP and enable charging */
+		system_set_rtc_alarm(EXTPOWER_WAKE_INTERVAL_SEC, 0);
 	}
 }
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN_COMPLETE,
