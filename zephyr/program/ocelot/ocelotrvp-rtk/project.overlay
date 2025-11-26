@@ -46,3 +46,14 @@
 	/* Add property once b/458003667 is fixed. */
 	/delete-property/ zephyr,deferred-init;
 };
+
+&ulpm {
+	status = "okay";
+	power_btn: wkup-pin@3 {
+		wkup-pin-mode = "vin";
+		wkup-pin-pol = "falling";
+	};
+	bc_acok: wkup-pin@0 {
+		wkup-pin-mode = "vin";
+	};
+};
