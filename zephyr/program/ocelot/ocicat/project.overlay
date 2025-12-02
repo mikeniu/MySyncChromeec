@@ -14,6 +14,7 @@
 #include "binman.dtsi"
 #include "generated.dtsi"
 #include "power_signals.dtsi"
+#include "keyboard.dtsi"
 
 /*
  * Map I2C buses to common names
@@ -43,7 +44,6 @@ tach_fan0: &tach0 {};
 #include "../rvp_battery.dtsi"
 #include "../rvp_i2c.dtsi"
 #include "../rvp_usbc.dtsi"
-#include "../rvp_keyboard.dtsi"
 
 #include <ite/it8801-common-cfg.dtsi>
 
@@ -83,9 +83,4 @@ tach_fan0: &tach0 {};
 
 &pdc_ti_c1 {
 	irq-gpios = <&gpiof 5 GPIO_ACTIVE_LOW>;
-};
-
-
-&kblight {
-	pwms = <&pwm1 PWM_CHANNEL_1 PWM_HZ(324) PWM_POLARITY_NORMAL>;
 };
