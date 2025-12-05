@@ -19,7 +19,7 @@ from typing import List, Optional
 DEFAULT_BOARD = "bloonchipper"
 DEFAULT_PROJECT = "ec"
 
-DARTMONKEY_CONSOLE = "sysbus.usart1"
+DARTMONKEY_CONSOLE = "sysbus.usart1" 
 
 CONSOLE_MAP: dict[str, str] = {
     "bloonchipper": "sysbus.usart2",
