@@ -22,6 +22,30 @@
       },
       "revId": "20720208fee6af08ff5a3092b5f2da52b8371def",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13b23f80_87ee9576",
+        "filename": "zephyr/shim/chip/egis/system.c",
+        "patchSetId": 39
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2025-12-05T12:41:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "46202700_83e702ae",
+      "range": {
+        "startLine": 10,
+        "startChar": 1,
+        "endLine": 10,
+        "endChar": 13
+      },
+      "revId": "20720208fee6af08ff5a3092b5f2da52b8371def",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
