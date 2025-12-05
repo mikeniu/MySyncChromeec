@@ -21,7 +21,7 @@ Start servod and JLink locally:
 Forward the FPMCU console on a TCP port:
 
 (local outside) $ socat $(dut-control -- raw_fpmcu_console_uart_pty | cut -d: -f2) \
-                  tcp4-listen:10000,fork
+                  tcp4-listen:10000,fork 
 
 Forward all the ports to the remote machine:
 

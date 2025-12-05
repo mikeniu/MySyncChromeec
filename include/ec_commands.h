@@ -99,7 +99,7 @@ extern "C" {
 /* I/O addresses for host command */
 #define EC_LPC_ADDR_HOST_DATA 0x200
 #define EC_LPC_ADDR_HOST_CMD 0x204
-
+  
 /* I/O addresses for host command args and params */
 /* Protocol version 2 */
 #define EC_LPC_ADDR_HOST_ARGS 0x800 /* And 0x801, 0x802, 0x803 */
