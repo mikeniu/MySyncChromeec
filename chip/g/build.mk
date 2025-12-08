@@ -185,7 +185,7 @@ ifneq ($(wildcard $(CODESIGNER_PATH)),)
 SIGNER := $(CODESIGNER_PATH)/codesigner
 # Set CFLAGS and CXX to avoid passing target configuration
 $(SIGNER):
-	CC="$(HOSTCC)" CFLAGS="-O2" CXX=$(HOSTCXX)" \
+	CC="$(HOSTCC)" CFLAGS="-O2" CXX="$(HOSTCXX)" \
 	$(MAKE) -C $(CODESIGNER_PATH) codesigner
 else
 $(error cr50-codesigner is not available!)

@@ -1988,6 +1988,18 @@ uint32_t board_cfg_reg_read(void)
 	return GREG32(PMU, PWRDN_SCRATCH21);
 }
 
+uint32_t get_sb_metrics(void)
+{
+	uint32_t board_cfg = get_board_cfg();
+	uint32_t status = 0;
+
+	if (board_cfg & BOARD_CFG_SB_DISABLE_SET)
+		status |= (1 << CR50_METRICSV_SB_DISABLE_SHIFT);
+	if (board_cfg & BOARD_CFG_SB_ENABLE_SET)
+		status |= (1 << CR50_METRICSV_SB_ENABLE_SHIFT);
+	return status;
+}
+
 static enum vendor_cmd_rc vc_get_cr50_metrics(struct vendor_cmd_params *p)
 {
 	struct cr50_stats_response response = {};
@@ -2003,6 +2015,7 @@ static enum vendor_cmd_rc vc_get_cr50_metrics(struct vendor_cmd_params *p)
 
 	response.misc_status = metrics_status;
 	response.misc_status |= get_rdd_metrics();
+	response.misc_status |= get_sb_metrics();
 	response.misc_status = htobe32(response.misc_status);
 
 	response.reset_time_s = htobe32(get_time().val / SECOND);

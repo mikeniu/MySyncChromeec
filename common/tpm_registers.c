@@ -931,11 +931,6 @@ static void tpm_reset_now(bool wipe_first, bool can_preserve_orderly)
 	/* Re-initialize our registers */
 	tpm_init();
 
-#ifdef CONFIG_STRONGBOX
-	/* Make it possible to enable Strongbox again, keep enable bit as is. */
-	reset_board_cfg(BOARD_CFG_SB_DISABLE_SET);
-#endif
-
 	if (can_preserve_orderly && !wipe_first)
 		tpm_orderly_state_restore(orderly_state_copy);
 

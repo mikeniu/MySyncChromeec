@@ -50,7 +50,6 @@ enum strongbox_cmd_cc {
 	/* SBS specific commands */
 	SB_GetDiceChain = 0xa0,
 	SB_SetHalBootInfo = 0xa1,
-	SB_SetStrongboxState = 0xa2,
 };
 
 /**

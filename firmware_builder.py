@@ -50,7 +50,8 @@ BUNDLE_FILES = [
     ("RW/ec.RW.dis", ""),
     ("RW/ec.RW.elf.fips", "ec.RW.elf"),
     ("RW/ec.RW.map", ""),
-    ("RW/board/cr50/dcrypto/fips_module.o", ""),
+    ("RW/space_free_ram.txt", ""),
+    ("RW/space_free_flash.txt", ""),
     ("../../util/signer/fuses.xml", ""),
     ("../../board/cr50/rma_key_blob.x25519.prod", ""),
     ("../../board/cr50/rma_key_blob.x25519.test", ""),
@@ -151,6 +152,34 @@ def build(opts):
         "dis",
         "CRYPTO_TEST=1",
         "H1_RED_BOARD=1",
+        "-j{}".format(opts.cpus),
+    ]
+    print(f'# Running {" ".join(cmd)}.')
+    subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
+
+    # Build MP Cr50 image
+    cmd = [
+        "make",
+        "out=build/mp_build",
+        "BOARD=cr50",
+        "BRANCH=MP",
+        "RW_SIGNER_EXTRAS=' --override-keyid'",
+        "all",
+        "dis",
+        "-j{}".format(opts.cpus),
+    ]
+    print(f'# Running {" ".join(cmd)}.')
+    subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
+
+    # Build PREPVT Cr50 image
+    cmd = [
+        "make",
+        "out=build/prepvt_build",
+        "BOARD=cr50",
+        "BRANCH=PREPVT",
+        "RW_SIGNER_EXTRAS=' --override-keyid'",
+        "all",
+        "dis",
         "-j{}".format(opts.cpus),
     ]
     print(f'# Running {" ".join(cmd)}.')

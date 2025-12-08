@@ -15,6 +15,7 @@
 #include "nvmem_vars.h"
 #include "pinweaver.h"
 #include "pinweaver_eal.h"
+#include "strongbox.h"
 #include "tpm_nvmem.h"
 #include "tpm_nvmem_ops.h"
 #include "dcrypto.h"
@@ -231,6 +232,16 @@ void _plat__StartupCallback(int shall_reset_state)
 	pinweaver_init();
 	board_update_fwmp_attributes();
 	boot_param_handle_tpm_startup(shall_reset_state);
+
+#ifdef CONFIG_STRONGBOX
+	/*
+	 * After boot from S5 clear the SB disable bit to make it possible to
+	 * enable Strongbox again. Don't clear the bit on S3 resume.
+	 * Keep SB enable bit as is.
+	 */
+	if (shall_reset_state)
+		reset_board_cfg(BOARD_CFG_SB_DISABLE_SET);
+#endif
 
 	/*
 	 * Eventually, we'll want to allow CCD unlock with no password, so
