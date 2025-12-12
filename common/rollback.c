@@ -24,6 +24,98 @@
 #include "util.h"
 
 #ifdef CONFIG_ROLLBACK_SECRET_SIZE
+#ifdef CONFIG_64BIT
+#define PR_ADDR "0x%016lx"
+#else
+#define PR_ADDR "0x%08lx"
+#endif
+
+#define PMPCFG_STRIDE sizeof(unsigned long)
+
+#define PMP_ADDR(addr) ((addr) >> 2)
+#define NAPOT_RANGE(size) (((size) - 1) >> 1)
+#define PMP_ADDR_NAPOT(addr, size) PMP_ADDR(addr | NAPOT_RANGE(size))
+
+static void print_pmp_entries(unsigned int pmp_start, unsigned int pmp_end,
+			      unsigned long *pmp_addr, unsigned long *pmp_cfg,
+			      const char *banner)
+{
+	uint8_t *pmp_n_cfg = (uint8_t *)pmp_cfg;
+	unsigned int index;
+
+	ccprints("PMP %s:", banner);
+	cflush();
+	for (index = pmp_start; index < pmp_end; index++) {
+		unsigned long start, end, tmp;
+
+		switch (pmp_n_cfg[index] & PMP_A) {
+		case PMP_TOR:
+			start = (index == 0) ? 0 : (pmp_addr[index - 1] << 2);
+			end = (pmp_addr[index] << 2) - 1;
+			break;
+		case PMP_NA4:
+			start = pmp_addr[index] << 2;
+			end = start + 3;
+			break;
+		case PMP_NAPOT:
+			tmp = (pmp_addr[index] << 2) | 0x3;
+			start = tmp & (tmp + 1);
+			end = tmp | (tmp + 1);
+			break;
+		default:
+			start = 0;
+			end = 0;
+			break;
+		}
+
+		if (end == 0) {
+			ccprints("%3d: " PR_ADDR " 0x%02x", index,
+				 pmp_addr[index], pmp_n_cfg[index]);
+			cflush();
+		} else {
+			ccprints("%3d: " PR_ADDR " 0x%02x --> " PR_ADDR
+				 "-" PR_ADDR " %c%c%c%s",
+				 index, pmp_addr[index], pmp_n_cfg[index],
+				 start, end,
+				 (pmp_n_cfg[index] & PMP_R) ? 'R' : '-',
+				 (pmp_n_cfg[index] & PMP_W) ? 'W' : '-',
+				 (pmp_n_cfg[index] & PMP_X) ? 'X' : '-',
+				 (pmp_n_cfg[index] & PMP_L) ? " LOCKED" : "");
+			cflush();
+		}
+	}
+}
+
+__unused static void dump_pmp_regs(const char *banner)
+{
+	unsigned long pmp_addr[CONFIG_PMP_SLOTS];
+	unsigned long pmp_cfg[CONFIG_PMP_SLOTS / PMPCFG_STRIDE];
+
+#define PMPADDR_READ(x) pmp_addr[x] = csr_read(pmpaddr##x)
+
+	FOR_EACH(PMPADDR_READ, (;), 0, 1, 2, 3, 4, 5, 6, 7);
+#if CONFIG_PMP_SLOTS > 8
+	FOR_EACH(PMPADDR_READ, (;), 8, 9, 10, 11, 12, 13, 14, 15);
+#endif
+
+#undef PMPADDR_READ
+
+#ifdef CONFIG_64BIT
+	pmp_cfg[0] = csr_read(pmpcfg0);
+#if CONFIG_PMP_SLOTS > 8
+	pmp_cfg[1] = csr_read(pmpcfg2);
+#endif
+#else
+	pmp_cfg[0] = csr_read(pmpcfg0);
+	pmp_cfg[1] = csr_read(pmpcfg1);
+#if CONFIG_PMP_SLOTS > 8
+	pmp_cfg[2] = csr_read(pmpcfg2);
+	pmp_cfg[3] = csr_read(pmpcfg3);
+#endif
+#endif
+
+	print_pmp_entries(0, CONFIG_PMP_SLOTS, pmp_addr, pmp_cfg, banner);
+}
 #ifdef CONFIG_BORINGSSL_CRYPTO
 #include "openssl/mem.h"
 #define secure_clear(buffer, size) OPENSSL_cleanse(buffer, size)
@@ -357,14 +449,41 @@ static int rollback_update(int32_t next_min_version, const uint8_t *entropy,
 	}
 
 	key = unlock_rollback();
+	unsigned long mstatus[1];
+	mstatus[0] = csr_read(mstatus);
+	ccprints("mstatus: 0x%08lx", mstatus[0]);
+	dump_pmp_regs("initial register dump");
+
 	if (crec_flash_erase(offset, erase_size)) {
+		ccprints("The offset: %d", offset);
+		ccprints("The erase_size: %d", erase_size);
 		ret = EC_ERROR_UNKNOWN;
 		lock_rollback(key);
+		mstatus[0] = csr_read(mstatus);
+		ccprints("mstatus: 0x%08lx", mstatus[0]);
+		dump_pmp_regs("initial register dump");
 		goto out;
 	}
 
+	mstatus[0] = csr_read(mstatus);
+	ccprints("mstatus: 0x%08lx", mstatus[0]);
+	dump_pmp_regs("initial register dump");
+
+	*block = 0x67U;
+	/*sys_write32(*block, 0x80041000);
+	ret = 0;*/
 	ret = crec_flash_write(offset, sizeof(block), block);
+	ccprints("The block is 0x%8x", *block);
+	ccprints("The offset: %d", offset);
+	ccprints("The sizeof(block): %d", sizeof(block));
+	mstatus[0] = csr_read(mstatus);
+	ccprints("mstatus: 0x%08lx", mstatus[0]);
+	dump_pmp_regs("initial register dump");
 	lock_rollback(key);
+
+	mstatus[0] = csr_read(mstatus);
+	ccprints("mstatus: 0x%08lx", mstatus[0]);
+	dump_pmp_regs("initial register dump");
 
 out:
 	clear_rollback(data);
