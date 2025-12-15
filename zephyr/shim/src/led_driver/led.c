@@ -191,7 +191,8 @@ static void set_color(int node_idx)
 			.led_color_node->api.led_set_color_with_pattern(
 				&patterns[i]);
 
-		if (GET_DURATION(patterns[i], patterns[i].cur_color) != 0) {
+		if (GET_DURATION(patterns[i], patterns[i].cur_color) != 0 ||
+		    patterns[i].cur_color != patterns[i].pattern_len - 1) {
 			patterns[i].elapsed_ms += HOOK_TICK_INTERVAL_MS;
 
 			while (patterns[i].elapsed_ms >=
@@ -207,7 +208,9 @@ static void set_color(int node_idx)
 				}
 
 				if (GET_DURATION(patterns[i],
-						 patterns[i].cur_color) == 0) {
+						 patterns[i].cur_color) == 0 &&
+				    patterns[i].cur_color ==
+					    patterns[i].pattern_len - 1) {
 					break;
 				}
 			}
