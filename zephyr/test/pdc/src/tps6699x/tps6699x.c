@@ -455,3 +455,301 @@ ZTEST_USER(tps6699x, test_get_pd_message_identity)
 		zassert_equal(disc_in[i], disc_out[i]);
 	}
 }
+<<<<<<< HEAD   (072dd13b4c9d88db82a162fd56c9f369524817e9 pdc: ti: Don't allow accessing chip info until fully ready)
+||||||| BASE   (07b68954f76b97e09bff306d1b6796b40fa0ec92 atriarvp-rtk: Add support for retimer FW update)
+
+/* Cover the tps6699x driver returning discover identity with GET_CURRENT_CAM */
+ZTEST_USER(tps6699x, test_get_current_cam)
+{
+	struct ucsi_memory_region ucsi_data;
+	struct ucsi_control_t *control = &ucsi_data.control;
+	uint32_t current_cam = 0;
+
+	access = ACCESS_OK;
+	RESET_FAKE(tps_rw_port_control);
+	tps_rw_port_control_fake.custom_fake = custom_fake_tps_rw_port_control;
+
+	/* Set fake CAM in PDC emulator */
+	emul_pdc_set_current_cam(emul, 0);
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Send GET_CURRENT_CAM */
+	zassert_ok(pdc_execute_ucsi_cmd(
+		dev, UCSI_GET_CURRENT_CAM, sizeof(uint32_t),
+		control->command_specific, ucsi_data.message_in, NULL));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Verify returned CAM matches emulator. */
+	memcpy(&current_cam, &ucsi_data.message_in, sizeof(uint32_t));
+	zassert_equal(current_cam, 0);
+
+	/* Set fake CAM in PDC emulator */
+	emul_pdc_set_current_cam(emul, 0x1);
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Send GET_CURRENT_CAM */
+	zassert_ok(pdc_execute_ucsi_cmd(
+		dev, UCSI_GET_CURRENT_CAM, sizeof(uint32_t),
+		control->command_specific, ucsi_data.message_in, NULL));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Verify returned CAM matches emulator. */
+	memcpy(&current_cam, &ucsi_data.message_in, sizeof(uint32_t));
+	zassert_equal(current_cam, 0x1);
+}
+
+/* Cover the tps6699x driver mapping SET_UOR from the PPM to CMD_SET_DRS */
+ZTEST_USER(tps6699x, test_ppm_set_uor)
+{
+	union uor_t in, out;
+	in.raw_value = 0;
+	out.raw_value = 0;
+	in.connector_number = 1;
+	in.accept_dr_swap = 1;
+
+	struct ucsi_memory_region ucsi_data;
+	struct ucsi_control_t *control = &ucsi_data.control;
+
+	access = ACCESS_OK;
+	RESET_FAKE(tps_rw_port_control);
+	tps_rw_port_control_fake.custom_fake = custom_fake_tps_rw_port_control;
+
+	/* Send SET_UOR to UFP through pdc_execute_ucsi_cmd() */
+	in.swap_to_ufp = 1;
+	in.swap_to_dfp = 0;
+	memcpy(&control->command_specific, &in.raw_value, sizeof(in.raw_value));
+	zassert_ok(pdc_execute_ucsi_cmd(dev, UCSI_SET_UOR, sizeof(uint32_t),
+					control->command_specific,
+					ucsi_data.message_in, NULL));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Verify UOR has swap_to_ufp set. */
+	zassert_ok(emul_pdc_get_uor(emul, &out));
+	zassert_equal(out.swap_to_ufp, 1);
+	zassert_equal(out.swap_to_dfp, 0);
+	zassert_equal(out.accept_dr_swap, 1);
+
+	in.swap_to_ufp = 0;
+	in.swap_to_dfp = 1;
+	memcpy(&control->command_specific, &in.raw_value, sizeof(in.raw_value));
+	zassert_ok(pdc_execute_ucsi_cmd(dev, UCSI_SET_UOR, sizeof(uint32_t),
+					control->command_specific,
+					ucsi_data.message_in, NULL));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Verify UOR has swap_to_dfp set. */
+	zassert_ok(emul_pdc_get_uor(emul, &out));
+	zassert_equal(out.swap_to_ufp, 0);
+	zassert_equal(out.swap_to_dfp, 1);
+	zassert_equal(out.accept_dr_swap, 1);
+}
+
+ZTEST_USER(tps6699x, test_ap_mode_override_off)
+{
+	struct capability_t caps_in, caps_out;
+	struct ucsi_memory_region ucsi_data;
+	struct ucsi_control_t *control = &ucsi_data.control;
+
+	access = ACCESS_OK;
+	RESET_FAKE(tps_rw_port_control);
+	tps_rw_port_control_fake.custom_fake = custom_fake_tps_rw_port_control;
+
+	/* Set alt mode override to 1 in emulator */
+	caps_in.bmOptionalFeatures.alt_mode_override = 1;
+	emul_pdc_set_capability(emul, &caps_in);
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Use UCSI command to get capabilities */
+	zassert_ok(pdc_execute_ucsi_cmd(
+		dev, UCSI_GET_CAPABILITY, sizeof(struct capability_t),
+		control->command_specific, ucsi_data.message_in, NULL));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Verify alt mode override is cleared when AP mode entry is disabled */
+	memcpy(&caps_out, &ucsi_data.message_in, sizeof(struct capability_t));
+	if (IS_ENABLED(CONFIG_USBC_PDC_DISABLE_AP_MODE_ENTRY))
+		zassert_false(caps_out.bmOptionalFeatures.alt_mode_override);
+	else
+		zassert_true(caps_out.bmOptionalFeatures.alt_mode_override);
+}
+
+ZTEST_USER(tps6699x, test_usb_comm_capable_as_device_config)
+{
+	struct pdc_info_t info;
+
+	/* usb_comm_capable_as_device should be false as it is not supported */
+	zassert_ok(pdc_get_info(dev, &info, true));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_false(info.usb_comm_capable_as_device);
+
+	zassert_ok(pdc_get_info(dev2, &info, true));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_false(info.usb_comm_capable_as_device);
+}
+=======
+
+/* Cover the tps6699x driver returning discover identity with GET_CURRENT_CAM */
+ZTEST_USER(tps6699x, test_get_current_cam)
+{
+	struct ucsi_memory_region ucsi_data;
+	struct ucsi_control_t *control = &ucsi_data.control;
+	uint32_t current_cam = 0;
+
+	access = ACCESS_OK;
+	RESET_FAKE(tps_rw_port_control);
+	tps_rw_port_control_fake.custom_fake = custom_fake_tps_rw_port_control;
+
+	/* Set fake CAM in PDC emulator */
+	emul_pdc_set_current_cam(emul, 0);
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Send GET_CURRENT_CAM */
+	zassert_ok(pdc_execute_ucsi_cmd(
+		dev, UCSI_GET_CURRENT_CAM, sizeof(uint32_t),
+		control->command_specific, ucsi_data.message_in, NULL));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Verify returned CAM matches emulator. */
+	memcpy(&current_cam, &ucsi_data.message_in, sizeof(uint32_t));
+	zassert_equal(current_cam, 0);
+
+	/* Set fake CAM in PDC emulator */
+	emul_pdc_set_current_cam(emul, 0x1);
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Send GET_CURRENT_CAM */
+	zassert_ok(pdc_execute_ucsi_cmd(
+		dev, UCSI_GET_CURRENT_CAM, sizeof(uint32_t),
+		control->command_specific, ucsi_data.message_in, NULL));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Verify returned CAM matches emulator. */
+	memcpy(&current_cam, &ucsi_data.message_in, sizeof(uint32_t));
+	zassert_equal(current_cam, 0x1);
+}
+
+/* Cover the tps6699x driver mapping SET_UOR from the PPM to CMD_SET_DRS */
+ZTEST_USER(tps6699x, test_ppm_set_uor)
+{
+	union uor_t in, out;
+	in.raw_value = 0;
+	out.raw_value = 0;
+	in.connector_number = 1;
+	in.accept_dr_swap = 1;
+
+	struct ucsi_memory_region ucsi_data;
+	struct ucsi_control_t *control = &ucsi_data.control;
+
+	access = ACCESS_OK;
+	RESET_FAKE(tps_rw_port_control);
+	tps_rw_port_control_fake.custom_fake = custom_fake_tps_rw_port_control;
+
+	/* Send SET_UOR to UFP through pdc_execute_ucsi_cmd() */
+	in.swap_to_ufp = 1;
+	in.swap_to_dfp = 0;
+	memcpy(&control->command_specific, &in.raw_value, sizeof(in.raw_value));
+	zassert_ok(pdc_execute_ucsi_cmd(dev, UCSI_SET_UOR, sizeof(uint32_t),
+					control->command_specific,
+					ucsi_data.message_in, NULL));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Verify UOR has swap_to_ufp set. */
+	zassert_ok(emul_pdc_get_uor(emul, &out));
+	zassert_equal(out.swap_to_ufp, 1);
+	zassert_equal(out.swap_to_dfp, 0);
+	zassert_equal(out.accept_dr_swap, 1);
+
+	in.swap_to_ufp = 0;
+	in.swap_to_dfp = 1;
+	memcpy(&control->command_specific, &in.raw_value, sizeof(in.raw_value));
+	zassert_ok(pdc_execute_ucsi_cmd(dev, UCSI_SET_UOR, sizeof(uint32_t),
+					control->command_specific,
+					ucsi_data.message_in, NULL));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Verify UOR has swap_to_dfp set. */
+	zassert_ok(emul_pdc_get_uor(emul, &out));
+	zassert_equal(out.swap_to_ufp, 0);
+	zassert_equal(out.swap_to_dfp, 1);
+	zassert_equal(out.accept_dr_swap, 1);
+}
+
+ZTEST_USER(tps6699x, test_ap_mode_override_off)
+{
+	struct capability_t caps_in, caps_out;
+	struct ucsi_memory_region ucsi_data;
+	struct ucsi_control_t *control = &ucsi_data.control;
+
+	access = ACCESS_OK;
+	RESET_FAKE(tps_rw_port_control);
+	tps_rw_port_control_fake.custom_fake = custom_fake_tps_rw_port_control;
+
+	/* Set alt mode override to 1 in emulator */
+	caps_in.bmOptionalFeatures.alt_mode_override = 1;
+	emul_pdc_set_capability(emul, &caps_in);
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Use UCSI command to get capabilities */
+	zassert_ok(pdc_execute_ucsi_cmd(
+		dev, UCSI_GET_CAPABILITY, sizeof(struct capability_t),
+		control->command_specific, ucsi_data.message_in, NULL));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Verify alt mode override is cleared when AP mode entry is disabled */
+	memcpy(&caps_out, &ucsi_data.message_in, sizeof(struct capability_t));
+	if (IS_ENABLED(CONFIG_USBC_PDC_DISABLE_AP_MODE_ENTRY))
+		zassert_false(caps_out.bmOptionalFeatures.alt_mode_override);
+	else
+		zassert_true(caps_out.bmOptionalFeatures.alt_mode_override);
+}
+
+ZTEST_USER(tps6699x, test_usb_comm_capable_as_device_config)
+{
+	struct pdc_info_t info;
+
+	/* usb_comm_capable_as_device should be false as it is not supported */
+	zassert_ok(pdc_get_info(dev, &info, true));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_false(info.usb_comm_capable_as_device);
+
+	zassert_ok(pdc_get_info(dev2, &info, true));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_false(info.usb_comm_capable_as_device);
+}
+
+ZTEST_USER(tps6699x, test_set_battery_capability)
+{
+	struct pdc_callback callback;
+	union battery_capability_t bc = { 0 };
+
+	callback.handler = test_cc_cb;
+	pdc_set_cc_callback(dev, &callback);
+	emul_pdc_fail_reg_write(emul, REG_TX_BATTERY_CAPABILITIES);
+	test_cc_cb_cci.raw_value = 0;
+	test_cc_cb_called = false;
+	pdc_set_battery_capability(dev, &bc);
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_true(test_cc_cb_called);
+	zassert_true(test_cc_cb_cci.command_completed);
+	zassert_true(test_cc_cb_cci.error);
+	pdc_set_cc_callback(dev, NULL);
+}
+
+ZTEST_USER(tps6699x, test_set_battery_status)
+{
+	struct pdc_callback callback;
+	union battery_status_t bs = { 0 };
+
+	callback.handler = test_cc_cb;
+	pdc_set_cc_callback(dev, &callback);
+	emul_pdc_fail_reg_write(emul,
+				REG_TRANSMITTED_BATTERY_STATUS_DATA_OBJECT);
+	test_cc_cb_cci.raw_value = 0;
+	test_cc_cb_called = false;
+	pdc_set_battery_status(dev, &bs);
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_true(test_cc_cb_called);
+	zassert_true(test_cc_cb_cci.command_completed);
+	zassert_true(test_cc_cb_cci.error);
+}
+>>>>>>> CHANGE (c6ab67bc9cadfb21785d7fcdcbeef09ac5e0b774 pdc_tps6699x: Add battery status/capability reporting)

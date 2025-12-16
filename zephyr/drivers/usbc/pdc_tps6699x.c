@@ -21,6 +21,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/smf.h>
 LOG_MODULE_REGISTER(tps6699x, CONFIG_USBC_LOG_LEVEL);
+#include "builtin/endian.h"
 #include "tps6699x_cmd.h"
 #include "tps6699x_reg.h"
 #include "usbc/pdc_utils.h"
@@ -193,6 +194,10 @@ enum cmd_t {
 	CMD_GET_ATTENTION_VDO,
 	/** Set Max PDP */
 	CMD_SET_MAX_PDP,
+	/** CMD_SET_BATTERY_CAPABILITY */
+	CMD_SET_BATTERY_CAPABILITY,
+	/** CMD_SET_BATTERY_STATUS */
+	CMD_SET_BATTERY_STATUS,
 };
 
 /**
@@ -347,6 +352,10 @@ struct pdc_data_t {
 	uint8_t sx_state;
 	/* Device Max PDP */
 	enum max_pdp_t max_pdp;
+	/* Battery status on device */
+	union battery_status_t battery_status;
+	/* Battery capability on device */
+	union battery_capability_t battery_capability;
 };
 
 /**
@@ -382,6 +391,8 @@ static void cmd_is_vconn_sourcing(struct pdc_data_t *data);
 static void cmd_set_sx_app_config(struct pdc_data_t *data);
 static void cmd_get_attention_vdo(struct pdc_data_t *data);
 static void cmd_set_max_pdp(struct pdc_data_t *data);
+static void cmd_set_battery_capability(struct pdc_data_t *data);
+static void cmd_set_battery_status(struct pdc_data_t *data);
 static void task_trig(struct pdc_data_t *data);
 static void task_gaid(struct pdc_data_t *data);
 static void task_srdy(struct pdc_data_t *data);
@@ -993,6 +1004,13 @@ static enum smf_state_result st_idle_run(void *o)
 			break;
 		case CMD_SET_MAX_PDP:
 			cmd_set_max_pdp(data);
+			break;
+		case CMD_SET_BATTERY_CAPABILITY:
+			cmd_set_battery_capability(data);
+			break;
+		case CMD_SET_BATTERY_STATUS:
+			cmd_set_battery_status(data);
+			break;
 		}
 	}
 
@@ -1936,6 +1954,75 @@ static void cmd_set_max_pdp(struct pdc_data_t *data)
 	rv = tps_rw_source_info(&cfg->i2c, &source_info, I2C_MSG_WRITE);
 	if (rv) {
 		LOG_ERR("TI%d: Write Source Info failed (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
+
+	/* Command has completed */
+	data->cci_event.command_completed = 1;
+	/* Inform the system of the event */
+	call_cci_event_cb(data);
+
+	/* Transition to idle state */
+	set_state(data, ST_IDLE);
+	return;
+
+error_recovery:
+	set_state(data, ST_ERROR_RECOVERY);
+}
+
+static void cmd_set_battery_status(struct pdc_data_t *data)
+{
+	struct pdc_config_t const *cfg = data->dev->config;
+	int rv;
+
+	union reg_battery_status battery_status = {
+		.reserved0 = data->battery_status.reserved,
+		.fixed_battery0_battery_info = data->battery_status.flags,
+		.fixed_battery0_present_capacity =
+			htobe16(data->battery_status.present_capacity),
+		.reserved1 = { 0 },
+	};
+
+	rv = tps_rw_battery_status(&cfg->i2c, &battery_status, I2C_MSG_WRITE);
+	if (rv) {
+		LOG_ERR("TI%d: Failed to write battery status (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
+
+	/* Command has completed */
+	data->cci_event.command_completed = 1;
+	/* Inform the system of the event */
+	call_cci_event_cb(data);
+
+	set_state(data, ST_IDLE);
+	return;
+
+error_recovery:
+	set_state(data, ST_ERROR_RECOVERY);
+}
+
+static void cmd_set_battery_capability(struct pdc_data_t *data)
+{
+	struct pdc_config_t const *cfg = data->dev->config;
+	int rv;
+
+	union reg_battery_capability battery_capability = {
+		.vid_0 = htobe16(data->battery_capability.vid),
+		.pid_0 = htobe16(data->battery_capability.pid),
+		.battery_design_capacity_0 =
+			htobe16(data->battery_capability.design_capacity),
+		.battery_last_full_charge_capacity_0 = htobe16(
+			data->battery_capability.last_full_charge_capacity),
+		.battery_type_0 = data->battery_capability.type,
+		.reserved = { 0 },
+	};
+
+	rv = tps_rw_battery_capability(&cfg->i2c, &battery_capability,
+				       I2C_MSG_WRITE);
+	if (rv) {
+		LOG_ERR("TI%d: Failed to write battery capability (%d)",
 			cfg->connector_number, rv);
 		goto error_recovery;
 	}
@@ -3120,6 +3207,35 @@ static int tps_set_max_pdp(const struct device *dev, enum max_pdp_t max_pdp)
 	return tps_post_command(dev, CMD_SET_MAX_PDP, NULL);
 }
 
+static int tps_set_battery_capability(const struct device *dev,
+				      union battery_capability_t *bcap)
+{
+	struct pdc_data_t *data = dev->data;
+
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	memcpy(&data->battery_capability, bcap,
+	       sizeof(union battery_capability_t));
+
+	return tps_post_command(dev, CMD_SET_BATTERY_CAPABILITY, bcap);
+}
+
+static int tps_set_battery_status(const struct device *dev,
+				  union battery_status_t *bstat)
+{
+	struct pdc_data_t *data = dev->data;
+
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	memcpy(&data->battery_status, bstat, sizeof(union battery_status_t));
+
+	return tps_post_command(dev, CMD_SET_BATTERY_STATUS, bstat);
+}
+
 static int tps_execute_ucsi_cmd(const struct device *dev, uint8_t ucsi_command,
 				uint8_t data_size, uint8_t *command_specific,
 				uint8_t *lpm_data_out,
@@ -3206,6 +3322,8 @@ static DEVICE_API(pdc, pdc_driver_api) = {
 	.set_bbr_cts = tps_set_bbr_cts,
 	.get_attention_vdo = tps_get_attention_vdo,
 	.set_max_pdp = tps_set_max_pdp,
+	.set_battery_capability = tps_set_battery_capability,
+	.set_battery_status = tps_set_battery_status,
 };
 
 static void pdc_interrupt_callback(const struct device *dev,

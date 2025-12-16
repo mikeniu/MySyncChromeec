@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "builtin/endian.h"
 #include "drivers/ucsi_v3.h"
 #include "emul/emul_common_i2c.h"
 #include "emul/emul_pdc.h"
@@ -1591,6 +1592,41 @@ static int emul_tps6699x_get_max_pdp(const struct emul *target,
 	return 0;
 }
 
+static int
+emul_tps6699x_get_battery_capability(const struct emul *target,
+				     union battery_capability_t *bcap)
+{
+	struct tps6699x_emul_pdc_data *data =
+		tps6699x_emul_get_pdc_data(target);
+	union battery_capability_t *_bcap =
+		(union battery_capability_t *)
+			data->reg_val[REG_TX_BATTERY_CAPABILITIES];
+
+	bcap->vid = be16toh(_bcap->vid);
+	bcap->pid = be16toh(_bcap->pid);
+	bcap->design_capacity = be16toh(_bcap->design_capacity);
+	bcap->last_full_charge_capacity =
+		be16toh(_bcap->last_full_charge_capacity);
+
+	return 0;
+}
+
+static int emul_tps6699x_get_battery_status(const struct emul *target,
+					    union battery_status_t *bstat)
+{
+	struct tps6699x_emul_pdc_data *data =
+		tps6699x_emul_get_pdc_data(target);
+	union battery_status_t *_bstat =
+		(union battery_status_t *)data
+			->reg_val[REG_TRANSMITTED_BATTERY_STATUS_DATA_OBJECT];
+
+	bstat->reserved = _bstat->reserved;
+	bstat->flags = _bstat->flags;
+	bstat->present_capacity = be16toh(_bstat->present_capacity);
+
+	return 0;
+}
+
 static DEVICE_API(emul_pdc, emul_tps6699x_api) = {
 	.reset = emul_tps6699x_reset,
 	.set_response_delay = emul_tps6699x_set_response_delay,
@@ -1631,6 +1667,8 @@ static DEVICE_API(emul_pdc, emul_tps6699x_api) = {
 	.set_current_cam = emul_tps6699x_set_current_cam,
 	.get_sbu_mux_mode = emul_tps6699x_get_sbu_mux_mode,
 	.get_max_pdp = emul_tps6699x_get_max_pdp,
+	.get_battery_capability = emul_tps6699x_get_battery_capability,
+	.get_battery_status = emul_tps6699x_get_battery_status,
 };
 
 /* clang-format off */
