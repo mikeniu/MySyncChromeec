@@ -2048,7 +2048,7 @@ static void run_src_policies(struct pdc_port_t *port)
 		queue_internal_cmd(port, CMD_PDC_SET_BATTERY_STATUS);
 		return;
 	} else if (atomic_test_and_clear_bit(
-			   port->snk_policy.flags,
+			   port->src_policy.flags,
 			   SRC_POLICY_UPDATE_BATTERY_CAPABILITY)) {
 		/* Update the PDC with the correct battery capabilities. */
 		queue_internal_cmd(port, CMD_PDC_SET_BATTERY_CAPABILITY);

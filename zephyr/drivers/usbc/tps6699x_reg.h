@@ -1572,6 +1572,36 @@ union reg_source_info {
 };
 
 /**
+ * @brief 4.81 Transmitted Battery Status Data Objects Register (Offset = 0x7B)
+ */
+union reg_battery_status {
+	struct {
+		/* Support one fixed battery on chrome devices */
+		uint32_t reserved0 : 8;
+		uint32_t fixed_battery0_battery_info : 8;
+		uint32_t fixed_battery0_present_capacity : 16;
+		uint32_t reserved1[3];
+	} __packed;
+	uint8_t raw_value[16];
+};
+
+/**
+ * @brief 4.82 Tx Battery Capabilities Register (Offset = 0x7D)
+ */
+union reg_battery_capability {
+	struct {
+		/* Support one fixed battery on chrome devices */
+		uint16_t vid_0;
+		uint16_t pid_0;
+		uint16_t battery_design_capacity_0;
+		uint16_t battery_last_full_charge_capacity_0;
+		uint8_t battery_type_0;
+		uint8_t reserved[27];
+	} __packed;
+	uint8_t raw_value[36];
+};
+
+/**
  * @brief - 10.6.1 SRDY switch settings
  */
 enum srdy_switch_select {
