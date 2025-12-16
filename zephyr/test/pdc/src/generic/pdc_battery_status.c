@@ -92,7 +92,8 @@ ZTEST_USER(pdc_battery_status, test_battery_status_snk_connection)
 
 	/* Verify emulator received correct battery capability */
 	zassert_ok(emul_pdc_get_battery_capability(emul, &bcap));
-	zassert_equal(bcap.vid, CONFIG_PLATFORM_EC_USB_VID);
+	zassert_equal(bcap.vid, CONFIG_PLATFORM_EC_USB_VID, "expect %x, get %x",
+		      bcap.vid, CONFIG_PLATFORM_EC_USB_VID);
 	zassert_equal(bcap.pid, CONFIG_PLATFORM_EC_USB_PID);
 	/* Design: 5000mAh * 7.7V = 38500mWh = 38.5Wh. In 0.1Wh units, this is
 	 * 385. */
@@ -134,8 +135,10 @@ ZTEST_USER(pdc_battery_status, test_battery_status_src_connection)
 
 	/* Verify emulator received correct battery capability */
 	zassert_ok(emul_pdc_get_battery_capability(emul, &bcap));
-	zassert_equal(bcap.vid, CONFIG_PLATFORM_EC_USB_VID);
-	zassert_equal(bcap.pid, CONFIG_PLATFORM_EC_USB_PID);
+	zassert_equal(bcap.vid, CONFIG_PLATFORM_EC_USB_VID, "expect %x, get %x",
+		      bcap.vid, CONFIG_PLATFORM_EC_USB_VID);
+	zassert_equal(bcap.pid, CONFIG_PLATFORM_EC_USB_PID, "expect %x, get %x",
+		      bcap.pid, CONFIG_PLATFORM_EC_USB_PID);
 	/* Design: 5000mAh * 7.7V = 38500mWh = 38.5Wh. In 0.1Wh units, this is
 	 * 385. */
 	zassert_equal(bcap.design_capacity, 385);

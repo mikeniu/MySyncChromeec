@@ -97,6 +97,8 @@ struct tps6699x_emul_pdc_data {
 	uint32_t rmdo;
 	uint32_t identity[PDC_DISC_IDENTITY_VDO_COUNT];
 	uint32_t current_cam;
+	union battery_capability_t battery_capability;
+	union battery_status_t battery_status;
 
 	struct tps6699x_response response;
 
