@@ -185,6 +185,10 @@ enum cmd_t {
 	CMD_GET_ATTENTION_VDO,
 	/** Set Max PDP */
 	CMD_SET_MAX_PDP,
+	/** CMD_SET_BATTERY_CAPABILITY */
+	CMD_SET_BATTERY_CAPABILITY,
+	/** CMD_SET_BATTERY_STATUS */
+	CMD_SET_BATTERY_STATUS,
 };
 
 /**
@@ -339,6 +343,10 @@ struct pdc_data_t {
 	uint8_t sx_state;
 	/* Device Max PDP */
 	enum max_pdp_t max_pdp;
+	/* Battery status on device */
+	union battery_status_t battery_status;
+	/* Battery capability on device */
+	union battery_capability_t battery_capability;
 };
 
 /**
@@ -374,6 +382,8 @@ static void cmd_is_vconn_sourcing(struct pdc_data_t *data);
 static void cmd_set_sx_app_config(struct pdc_data_t *data);
 static void cmd_get_attention_vdo(struct pdc_data_t *data);
 static void cmd_set_max_pdp(struct pdc_data_t *data);
+static void cmd_set_battery_capability(struct pdc_data_t *data);
+static void cmd_set_battery_status(struct pdc_data_t *data);
 static void task_trig(struct pdc_data_t *data);
 static void task_gaid(struct pdc_data_t *data);
 static void task_srdy(struct pdc_data_t *data);
@@ -1020,6 +1030,13 @@ static enum smf_state_result st_idle_run(void *o)
 			break;
 		case CMD_SET_MAX_PDP:
 			cmd_set_max_pdp(data);
+			break;
+		case CMD_SET_BATTERY_CAPABILITY:
+			cmd_set_battery_capability(data);
+			break;
+		case CMD_SET_BATTERY_STATUS:
+			cmd_set_battery_status(data);
+			break;
 		}
 	}
 
@@ -1974,6 +1991,75 @@ error_recovery:
 	set_state(data, ST_ERROR_RECOVERY);
 }
 
+static void cmd_set_battery_status(struct pdc_data_t *data)
+{
+	struct pdc_config_t const *cfg = data->dev->config;
+	int rv;
+
+	union reg_battery_status battery_status = {
+		.reserved0 = data->battery_status.reserved,
+		.fixed_battery0_battery_info = data->battery_status.flags,
+		.fixed_battery0_present_capacity =
+			data->battery_status.present_capacity,
+		.reserved1 = { 0 },
+	};
+
+	rv = tps_rw_battery_status(&cfg->i2c, &battery_status, I2C_MSG_WRITE);
+	if (rv) {
+		LOG_ERR("TI%d: Failed to write battery status (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
+
+	/* Command has completed */
+	data->cci_event.command_completed = 1;
+	/* Inform the system of the event */
+	call_cci_event_cb(data);
+
+	set_state(data, ST_IDLE);
+	return;
+
+error_recovery:
+	set_state(data, ST_ERROR_RECOVERY);
+}
+
+static void cmd_set_battery_capability(struct pdc_data_t *data)
+{
+	struct pdc_config_t const *cfg = data->dev->config;
+	int rv;
+
+	union reg_battery_capability battery_capability = {
+		.vid_0 = data->battery_capability.vid,
+		.pid_0 = data->battery_capability.pid,
+		.battery_design_capacity_0 =
+			data->battery_capability.design_capacity,
+		.battery_last_full_charge_capacity_0 =
+			data->battery_capability.last_full_charge_capacity,
+		.battery_type_0 = data->battery_capability.type,
+		.reserved = { 0 },
+	};
+
+	rv = tps_rw_battery_capability(&cfg->i2c, &battery_capability,
+				       I2C_MSG_WRITE);
+	if (rv) {
+		LOG_ERR("TI%d: Failed to write battery capability (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
+
+	/* Command has completed */
+	data->cci_event.command_completed = 1;
+	/* Inform the system of the event */
+	call_cci_event_cb(data);
+
+	/* Transition to idle state */
+	set_state(data, ST_IDLE);
+	return;
+
+error_recovery:
+	set_state(data, ST_ERROR_RECOVERY);
+}
+
 static int write_task_cmd(struct pdc_config_t const *cfg,
 			  enum command_task task, union reg_data *cmd_data)
 {
@@ -2077,9 +2163,9 @@ static void task_srdy(struct pdc_data_t *data)
 
 	if (data->snk_fet_en && !cur_sink_enabled) {
 		if (!atomic_get(&data->sink_enable_possible)) {
-			/* Retry this command within timeout if a new power
-			 * contract is seen. Otherwise, it will return an error
-			 * to the caller.
+			/* Retry this command within timeout if a new
+			 * power contract is seen. Otherwise, it will
+			 * return an error to the caller.
 			 */
 			/* Save CMD for callback function */
 			data->delayable_cmd = data->cmd;
@@ -2089,8 +2175,9 @@ static void task_srdy(struct pdc_data_t *data)
 			return;
 		}
 
-		/* TODO(b/358274846) - Check whether this can be moved to
-		 * appconfig so we don't have to select by port index on chip.
+		/* TODO(b/358274846) - Check whether this can be moved
+		 * to appconfig so we don't have to select by port index
+		 * on chip.
 		 */
 		cmd_data.data[0] = is_first_port_on_chip(data) ?
 					   SWITCH_SELECT_PP_EXT2 :
@@ -2101,7 +2188,8 @@ static void task_srdy(struct pdc_data_t *data)
 		/* Disable Sink FET */
 		rv = write_task_cmd(cfg, COMMAND_TASK_SRYR, NULL);
 	} else {
-		/* Sink already in desired state. Mark command completed */
+		/* Sink already in desired state. Mark command completed
+		 */
 		data->cci_event.command_completed = 1;
 		/* Inform the system of the event */
 		call_cci_event_cb(data);
@@ -2238,9 +2326,10 @@ static void task_ucsi(struct pdc_data_t *data, enum ucsi_command_t ucsi_command)
 	/* Connector Number: Byte 2, bits 6:0. Bit 7 is reserved */
 	cmd_data.data[2] = cfg->port_index_on_chip;
 
-	/* TODO(b/345783692): The bit shifts in this function come from the
-	 * awkward mapping between the structures in ucsi_v3.h and the TI
-	 * command format, but this can probably be cleaned up a bit.
+	/* TODO(b/345783692): The bit shifts in this function come from
+	 * the awkward mapping between the structures in ucsi_v3.h and
+	 * the TI command format, but this can probably be cleaned up a
+	 * bit.
 	 */
 	switch (data->cmd) {
 	case CMD_CONNECTOR_RESET:
@@ -2412,8 +2501,9 @@ static enum smf_state_result st_task_wait_run(void *o)
 
 	switch (data->cmd) {
 	case CMD_SET_NOTIFICATION_ENABLE:
-		/* Initialization for driver is done once notifications are
-		 * enabled. This flag is reset when the INIT state is entered.
+		/* Initialization for driver is done once notifications
+		 * are enabled. This flag is reset when the INIT state
+		 * is entered.
 		 */
 		data->init_done = true;
 		k_event_post(&data->pdc_event, PDC_IRQ_EVENT);
@@ -2432,17 +2522,18 @@ static enum smf_state_result st_task_wait_run(void *o)
 		struct capability_t *cp =
 			(struct capability_t *)&cmd_data.data[offset];
 		/*
-		 * TODO(b/414863461) get_pd_message is not being set by the PDC,
-		 * but this is required for the kernel UCSI driver to trigger it
-		 * sending UCSI_GET_PD_MESSAGE for populating discovery
-		 * information.
+		 * TODO(b/414863461) get_pd_message is not being set by
+		 * the PDC, but this is required for the kernel UCSI
+		 * driver to trigger it sending UCSI_GET_PD_MESSAGE for
+		 * populating discovery information.
 		 */
 		cp->bmOptionalFeatures.get_pd_message = 1;
 #ifdef CONFIG_USBC_PDC_DISABLE_AP_MODE_ENTRY
 		/*
-		 * TODO(b/503426083): Remove change to GET_CAPABILITY response
-		 * once AP Mode switching is ready. Clearing this bit will
-		 * prevent the kernel from exiting and entering alternate modes.
+		 * TODO(b/503426083): Remove change to GET_CAPABILITY
+		 * response once AP Mode switching is ready. Clearing
+		 * this bit will prevent the kernel from exiting and
+		 * entering alternate modes.
 		 */
 		cp->bmOptionalFeatures.alt_mode_override = 0;
 #endif
@@ -2462,10 +2553,11 @@ static enum smf_state_result st_task_wait_run(void *o)
 			*voltage = cs->voltage_reading * cs->voltage_scale * 5;
 		} else {
 			len = sizeof(union connector_status_t);
-			/* If we had previously cached the connection status
-			 * change, append those bits in GET_CONNECTOR_STATUS.
-			 * The PDC clears these after the first read but we want
-			 * these to be visible until they are ACK-ed.
+			/* If we had previously cached the connection
+			 * status change, append those bits in
+			 * GET_CONNECTOR_STATUS. The PDC clears these
+			 * after the first read but we want these to be
+			 * visible until they are ACK-ed.
 			 */
 			if (data->use_cached_conn_status_change) {
 				cs->raw_conn_status_change_bits |=
@@ -2473,8 +2565,8 @@ static enum smf_state_result st_task_wait_run(void *o)
 						.raw_conn_status_change_bits;
 			}
 
-			/* Cache result of GET_CONNECTOR_STATUS and use this for
-			 * subsequent calls.
+			/* Cache result of GET_CONNECTOR_STATUS and use
+			 * this for subsequent calls.
 			 */
 			data->cached_conn_status = *cs;
 			data->use_cached_conn_status_change = true;
@@ -2539,7 +2631,8 @@ data_out:
 		}
 	}
 
-	/* Set cci.data_len. This will be zero if no data is available. */
+	/* Set cci.data_len. This will be zero if no data is available.
+	 */
 	data->cci_event.data_len = len;
 	/* Command has completed */
 	data->cci_event.command_completed = 1;
@@ -2867,13 +2960,14 @@ static int tps_get_info(const struct device *dev, struct pdc_info_t *info,
 	if (live == false) {
 		k_mutex_lock(&data->mtx, K_FOREVER);
 
-		/* Check FW ver for valid value to ensure we have a resident
-		 * value.
+		/* Check FW ver for valid value to ensure we have a
+		 * resident value.
 		 */
 		if (data->info.fw_version == PDC_FWVER_INVALID) {
 			k_mutex_unlock(&data->mtx);
 
-			/* No cached value. Caller should request a live read */
+			/* No cached value. Caller should request a live
+			 * read */
 			return -EAGAIN;
 		}
 
@@ -3027,11 +3121,11 @@ static int tps_set_comms_state(const struct device *dev, bool comms_active)
 	struct pdc_data_t *data = dev->data;
 
 	if (comms_active) {
-		/* Re-enable communications. Clearing the suspend flag will
-		 * trigger a reset. Note: if the driver is in the disabled
-		 * state due to a previous comms failure, it will remain
-		 * disabled. (Thus, suspending/resuming comms on a disabled
-		 * PDC driver is a no-op)
+		/* Re-enable communications. Clearing the suspend flag
+		 * will trigger a reset. Note: if the driver is in the
+		 * disabled state due to a previous comms failure, it
+		 * will remain disabled. (Thus, suspending/resuming
+		 * comms on a disabled PDC driver is a no-op)
 		 */
 		enable_comms();
 		k_event_post(&data->pdc_event, PDC_IRQ_EVENT);
@@ -3040,13 +3134,13 @@ static int tps_set_comms_state(const struct device *dev, bool comms_active)
 		/** Allow 3 seconds for the driver to suspend itself. */
 		const int suspend_timeout_usec = 3 * USEC_PER_SEC;
 
-		/* Request communication to be stopped. This allows in-progress
-		 * operations to complete first.
+		/* Request communication to be stopped. This allows
+		 * in-progress operations to complete first.
 		 */
 		suspend_comms();
 
-		/* Signal the driver with the suspend request event in case the
-		 * thread is blocking on an event to process.
+		/* Signal the driver with the suspend request event in
+		 * case the thread is blocking on an event to process.
 		 */
 		k_event_post(&data->pdc_event, PDC_CMD_SUSPEND_REQUEST_EVENT);
 
@@ -3124,6 +3218,35 @@ static int tps_set_max_pdp(const struct device *dev, enum max_pdp_t max_pdp)
 	return tps_post_command(dev, CMD_SET_MAX_PDP, NULL);
 }
 
+static int tps_set_battery_capability(const struct device *dev,
+				      union battery_capability_t *bcap)
+{
+	struct pdc_data_t *data = dev->data;
+
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	memcpy(&data->battery_capability, bcap,
+	       sizeof(union battery_capability_t));
+
+	return tps_post_command(dev, CMD_SET_BATTERY_CAPABILITY, bcap);
+}
+
+static int tps_set_battery_status(const struct device *dev,
+				  union battery_status_t *bstat)
+{
+	struct pdc_data_t *data = dev->data;
+
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	memcpy(&data->battery_status, bstat, sizeof(union battery_status_t));
+
+	return tps_post_command(dev, CMD_SET_BATTERY_STATUS, bstat);
+}
+
 static int tps_execute_ucsi_cmd(const struct device *dev, uint8_t ucsi_command,
 				uint8_t data_size, uint8_t *command_specific,
 				uint8_t *lpm_data_out,
@@ -3134,10 +3257,11 @@ static int tps_execute_ucsi_cmd(const struct device *dev, uint8_t ucsi_command,
 	enum cmd_t cmd = CMD_RAW_UCSI;
 	int port_index_on_chip_byte_index;
 
-	/* The OS will send SET_UOR to request a data role swap. Sending SET_UOR
-	 * to the PDC will not clear the "initiate swap to DFP" bit, causing the
-	 * data role swap to immediately reverse. Intercept SET_UOR here and
-	 * call tps_set_uor() to issue a data role swap based on CMD_SET_DRS.
+	/* The OS will send SET_UOR to request a data role swap. Sending
+	 * SET_UOR to the PDC will not clear the "initiate swap to DFP"
+	 * bit, causing the data role swap to immediately reverse.
+	 * Intercept SET_UOR here and call tps_set_uor() to issue a data
+	 * role swap based on CMD_SET_DRS.
 	 */
 	if (ucsi_command == UCSI_SET_UOR) {
 		union uor_t uor;
@@ -3154,16 +3278,17 @@ static int tps_execute_ucsi_cmd(const struct device *dev, uint8_t ucsi_command,
 	 */
 	cmd_data.data[1] = 0;
 
-	/* If additional command specific bytes are provided, copy them. */
+	/* If additional command specific bytes are provided, copy them.
+	 */
 	if (data_size && command_specific) {
 		memcpy(&cmd_data.data[2], command_specific, data_size);
 	}
 
-	/* TI UCSI tasks always require a port index on chip even when the UCSI
-	 * spec doesn't require it. Except GET_ALTERNATE_MODES, all other
-	 * commands will fit the port index on chip on Byte 2, bits 6:0. For
-	 * GET_ALTERNATE_MODES, it is required and should be on Byte 3, bits
-	 * 14:8.
+	/* TI UCSI tasks always require a port index on chip even when
+	 * the UCSI spec doesn't require it. Except GET_ALTERNATE_MODES,
+	 * all other commands will fit the port index on chip on Byte 2,
+	 * bits 6:0. For GET_ALTERNATE_MODES, it is required and should
+	 * be on Byte 3, bits 14:8.
 	 */
 
 	port_index_on_chip_byte_index =
@@ -3222,6 +3347,8 @@ static DEVICE_API(pdc, pdc_driver_api) = {
 	.set_bbr_cts = tps_set_bbr_cts,
 	.get_attention_vdo = tps_get_attention_vdo,
 	.set_max_pdp = tps_set_max_pdp,
+	.set_battery_capability = tps_set_battery_capability,
+	.set_battery_status = tps_set_battery_status,
 };
 
 static void pdc_interrupt_callback(const struct device *dev,
@@ -3443,14 +3570,14 @@ DT_INST_FOREACH_STATUS_OKAY(TPS6699X_PDC_DEFINE)
 
 #define PDC_DATA_PTR_ENTRY(inst) &PDC_DATA_STRUCT_NAME(inst),
 
-/* Populate the pdc_data struct with a pointer to each TI PDC port's device
- * struct. */
+/* Populate the pdc_data struct with a pointer to each TI PDC port's
+ * device struct. */
 static struct pdc_data_t *const pdc_data[] = { DT_INST_FOREACH_STATUS_OKAY(
 	PDC_DATA_PTR_ENTRY) };
 
 #ifdef CONFIG_USBC_PDC_DRIVEN_CCD
-/* If PDC-driven CCD is used, one of the PDC driver nodes for each driver compat
- * type must be marked with the `ccd` property.
+/* If PDC-driven CCD is used, one of the PDC driver nodes for each
+ * driver compat type must be marked with the `ccd` property.
  */
 CHECK_ONE_CCD_PORT_COUNT_FOR_DRIVER();
 #endif /* CONFIG_USBC_PDC_DRIVEN_CCD */
@@ -3471,14 +3598,14 @@ bool pdc_tps6699x_test_idle_wait(void)
 		k_msleep(100);
 		for (int port = 0; port < ARRAY_SIZE(pdc_data); port++) {
 			if (!device_is_ready(pdc_data[port]->dev)) {
-				/* This port is not in use. Consider it finished
-				 * so we do not wait on it. */
+				/* This port is not in use. Consider it
+				 * finished so we do not wait on it. */
 				num_finished++;
 			}
 			if (get_state(pdc_data[port]) == ST_IDLE &&
 			    pdc_data[port]->cmd == CMD_NONE) {
-				/* Driver is in the idle state with no pending
-				 * commands. */
+				/* Driver is in the idle state with no
+				 * pending commands. */
 				num_finished++;
 			}
 		}
