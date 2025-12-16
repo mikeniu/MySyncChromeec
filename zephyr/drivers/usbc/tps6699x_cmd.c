@@ -249,6 +249,21 @@ int tps_rw_thunderbolt_configuration(const struct i2c_dt_spec *i2c,
 			    sizeof(union reg_thunderbolt_configuration), flag);
 }
 
+int tps_rw_battery_capability(const struct i2c_dt_spec *i2c,
+			      union reg_battery_capability *buf, int flag)
+{
+	return tps_xfer_reg(i2c, REG_TX_BATTERY_CAPABILITIES, buf->raw_value,
+			    sizeof(union reg_thunderbolt_configuration), flag);
+}
+
+int tps_rw_battery_status(const struct i2c_dt_spec *i2c,
+			  union reg_battery_status *buf, int flag)
+{
+	return tps_xfer_reg(i2c, REG_TRANSMITTED_BATTERY_STATUS_DATA_OBJECT,
+			    buf->raw_value,
+			    sizeof(union reg_thunderbolt_configuration), flag);
+}
+
 int tps_rd_power_path_status(const struct i2c_dt_spec *i2c,
 			     union reg_power_path_status *buf)
 {
