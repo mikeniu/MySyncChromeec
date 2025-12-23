@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16eedb43_c6c51399",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2025-12-23T13:22:06Z",
+      "side": 1,
+      "message": "Please adjust the emulator and tests to current state of driver",
+      "revId": "a275b5fa0730984ed50651cbbc6c758f89689e66",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
