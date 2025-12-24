@@ -1,0 +1,1 @@
+zephyr_library_sources_ifdef(CONFIG_CROS_EC_WOT wot.c)
