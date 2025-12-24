@@ -29,7 +29,9 @@
         /* GPB0: UART_EC_RX_GSC_DBG_TX */
         /* GPB1: UART_EC_TX_GSC_DBG_RX */
         /* GPB2: NC                    */
-		/* GPB3: tchscr_int_l		   */
+		gpio_ec_tchscr_int_l: ec_tchscr_int_l {
+            gpios = <&gpiob 3 (GPIO_INPUT)>;
+        };
         /* GPB4: CAMERA_WP_EC          */
 		gpio_ec_wp_od: ec_wp_od {
 			gpios = <&gpiob 5 (GPIO_INPUT | GPIO_ACTIVE_HIGH)>;
@@ -46,7 +48,9 @@
         /* GPC1: EC_I2C_PD_SCL          */
         /* GPC2: EC_I2C_PD_SDA          */
         /* GPC3: CPU_ID                 */
-		/* GPC4: tchscr_report_en		*/
+		gpio_tchscr_report_en: tchscr_report_en {
+			gpios = <&gpioc 4 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH )>;
+		};
         /* GPC5: EC_PROJECT_ID          */
 		gpio_ec_en_edp_bl: ec_en_edp_bl {
 			gpios = <&gpioc 6 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
@@ -186,7 +190,9 @@
 			gpios = <&gpioj 5 (GPIO_INPUT)>;
 			no-auto-init;
 		};
-        /* GPJ6: TS_WOT                 */
+		gpio_ts_wot_l: ts_wot_l {
+			gpios = <&gpioj 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW)>;
+		};
 		gpio_sys_rst_odl: sys_rst_odl {
 			gpios = <&gpioj 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
 			enum-name = "GPIO_SYS_RST_ODL";
@@ -198,6 +204,10 @@
 			gpios = <&gpiom 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW)>;
 			enum-name = "GPIO_EC_INT_L";
 		};
+		
+		gpio_ec_bl_detect: ec_bl_detect {
+			gpios = <&gpioi 6 (GPIO_INPUT)>;
+		};
 	};
 
 	unused-pins {
@@ -208,10 +218,10 @@
 			<&gpioa 4 0>, /* FN_LED_L */
 			<&gpioa 7 0>, /* ME_FLASH_EN_N */
 			<&gpiob 2 0>, /* PCSPKR */
-			<&gpiob 3 0>, /* tchscr_int_l */
+			// <&gpiob 3 0>, /* tchscr_int_l */
 			<&gpiob 4 0>, /* CAMERA_WP_EC */
 			<&gpioc 3 0>, /* CPU_ID */
-			<&gpioc 4 0>, /* TCHSCR_REPORT_EN */
+			// <&gpioc 4 0>, /* TCHSCR_REPORT_EN */
 			<&gpioc 5 0>, /* EC_PROJECT_ID */
 			<&gpiof 2 0>, /* PHASE_ID */
 			<&gpiof 3 0>, /* HDMI_GATE_EC */
@@ -225,8 +235,9 @@
 			<&gpiog 7 0>, /* SPI_EC_CLK */
 			<&gpioh 1 0>, /* WOL_PWEN */
 			<&gpioi 3 0>, /* I_ADP_EC */
-			<&gpioi 6 0>, /* EC_TOP_SWAP */
+			// <&gpioi 6 0>, /* EC_TOP_SWAP */
 			<&gpioj 4 0>; /* EC_AC_PRESENT_OD_R */
+			// <&gpioj 6 0>; /* TS_WOT */
 	};
 };
 
