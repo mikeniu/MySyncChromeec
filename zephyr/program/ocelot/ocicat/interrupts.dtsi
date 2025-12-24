@@ -22,5 +22,15 @@
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "lid_interrupt";
 		};
+		int_tchscr: tchscr {
+			irq-pin = <&gpio_ec_tchscr_int_l>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "tchscr_event";
+		};
+		int_ec_bl_detect: ec_bl_detect {
+                        irq-pin = <&gpio_ec_bl_detect>;
+                        flags = <GPIO_INT_EDGE_BOTH>;
+                        handler = "edp_backlight_interrupt";
+                };
 	};
 };

@@ -117,3 +117,18 @@ __override uint32_t board_override_feature_flags0(uint32_t flags0)
 	else
 		return flags0;
 }
+
+static void board_wot_init(void)
+{
+	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_tchscr));
+
+	LOG_INF("WOT: Interrupt enabled for touchscreen");
+}
+DECLARE_HOOK(HOOK_INIT, board_wot_init, HOOK_PRIO_DEFAULT);
+
+static void board_bl_int_init(void)
+{
+	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_ec_bl_detect));
+	LOG_INF("WOT: Interrupt enabled for backlight");
+}
+DECLARE_HOOK(HOOK_INIT, board_bl_int_init, HOOK_PRIO_DEFAULT);
