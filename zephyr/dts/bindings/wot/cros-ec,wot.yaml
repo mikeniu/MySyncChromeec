@@ -1,0 +1,30 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: ChromeOS EC Wake-On-Touch (WOT) Controller
+
+compatible: "cros-ec,wot"
+
+include: base.yaml
+
+properties:
+  report-en-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO to enable touch screen reporting
+
+  wot-l-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO to assert WOT state (Active Low)
+
+  bl-detect-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO to detect EDP backlight state
+
+  tchscr-int-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO for touch screen interrupt
