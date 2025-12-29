@@ -842,7 +842,7 @@ static void pchg_shutdown(void)
 	CPRINTS("%s", __func__);
 
 	for (p = 0; p < pchg_count; p++) {
-		ctx = &pchgs[0];
+		ctx = &pchgs[p];
 		gpio_disable_interrupt(ctx->cfg->irq_pin);
 		board_pchg_power_on(p, 0);
 	}
@@ -856,8 +856,20 @@ void wpc_hall_handler(void)
 {
 	if (!gpio_get_level(GPIO_HALL_CTL_PCHG))
 		pchg_startup();
-	else
+	else {
+		struct pchg *ctx;
+		int p;
+
 		pchg_shutdown();
+		for (p = 0; p < pchg_count; p++) {
+			ctx = &pchgs[p];
+			ctx->event = PCHG_EVENT_DEVICE_LOST;
+			ctx->battery_percent = 0;
+			ctx->state = PCHG_STATE_ENABLED;
+			reset_bist_cmd(ctx);
+			pchg_queue_host_event(ctx, EC_MKBP_PCHG_DEVICE_EVENT);
+		}
+	}
 }
 DECLARE_DEFERRED(wpc_hall_handler);
 
