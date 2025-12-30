@@ -366,4 +366,10 @@ config PLATFORM_EC_BATTERY_ACCESS_LIMIT
 	help
 	  Enabling this limits the access to the battery host commands from the EC console.
 
+config PLATFORM_EC_BATTERY_PRECHARGE_TIMEOUT
+	int "Set precharge timeout in seconds"
+	default 30
+	help
+	  Set precharge timeout in seconds.
+
 endif # PLATFORM_EC_BATTERY
