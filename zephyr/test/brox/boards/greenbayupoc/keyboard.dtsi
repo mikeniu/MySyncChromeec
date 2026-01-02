@@ -1,0 +1,3 @@
+&fake_keyboard {
+	#include "../../../../program/brox/greenbayupoc/keyboard_set2.dtsi"
+};
