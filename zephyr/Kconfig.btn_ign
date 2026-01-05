@@ -13,3 +13,17 @@ config PLATFORM_EC_BTN_IGN_OUT
 	depends on $(dt_alias_enabled,$(DT_ALIAS_BTN_IGN_OUT))
 
 DT_ALIAS_BTN_IGN_IN := gpio-btn-ign-in
+
+config PLATFORM_EC_BTN_IGN_IN
+	bool "Enable power button ignore input"
+	help
+	  Enables handling power button ignore state read from GPIO.
+	default y
+	depends on $(dt_alias_enabled,$(DT_ALIAS_BTN_IGN_IN))
+
+config PLATFORM_EC_BTN_IGN_IN_DELAY
+	int "Power button ignore delay"
+	default 4
+	depends on PLATFORM_EC_BTN_IGN_IN
+	help
+	  Time in seconds to ignore power button presses after BTN_IGN goes high.
