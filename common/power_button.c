@@ -5,6 +5,7 @@
 
 /* Power button module for Chrome EC */
 
+#include "btn_ign_in.h"
 #include "button.h"
 #include "chipset.h"
 #include "common.h"
@@ -173,9 +174,20 @@ DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, pb_chipset_shutdown,
 /**
  * Handle debounced power button changing state.
  */
+static void power_button_change_deferred(void);
+DECLARE_DEFERRED(power_button_change_deferred);
 static void power_button_change_deferred(void)
 {
-	const int new_pressed = raw_power_button_pressed();
+	int new_pressed = raw_power_button_pressed();
+
+#ifdef CONFIG_PLATFORM_EC_BTN_IGN_IN
+	int ignore_us = btn_ign_in_power_pressed(new_pressed);
+	if (ignore_us > 0) {
+		new_pressed = 0;
+		hook_call_deferred(&power_button_change_deferred_data,
+				   ignore_us);
+	}
+#endif
 
 	/* Re-enable keyboard scanning if power button is no longer pressed */
 	if (!new_pressed)
@@ -200,7 +212,6 @@ static void power_button_change_deferred(void)
 	if (new_pressed)
 		host_set_single_event(EC_HOST_EVENT_POWER_BUTTON);
 }
-DECLARE_DEFERRED(power_button_change_deferred);
 
 static void power_button_simulate_deferred(void)
 {
