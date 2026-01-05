@@ -120,6 +120,7 @@ add_subdirectory_ifdef(CONFIG_LINK_TEST_SUITE_WRITE_PROTECTION_CUSTOM write_prot
 add_subdirectory_ifdef(CONFIG_LINK_TEST_SUITE_IT8XXX2 it8xxx2)
 add_subdirectory_ifdef(CONFIG_LINK_TEST_SUITE_RT3645 rt3645)
 add_subdirectory_ifdef(CONFIG_LINK_TEST_SUITE_BTN_IGN_OUT btn_ign_out)
+add_subdirectory_ifdef(CONFIG_LINK_TEST_SUITE_BTN_IGN_IN btn_ign_in)
 
 get_target_property(TEST_SOURCES_NEW app SOURCES)
 

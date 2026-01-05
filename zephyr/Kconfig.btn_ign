@@ -15,3 +15,8 @@ config PLATFORM_EC_BTN_IGN_OUT_FINGERPRINT
 	bool "Integrate power button ignore output with fingerprint"
 	help
 	  Fingerprint application controls btn_ign
+
+config PLATFORM_EC_BTN_IGN_IN
+	bool "Enable power button ignore input"
+	help
+	  Enables handling power button ignore state read from GPIO.

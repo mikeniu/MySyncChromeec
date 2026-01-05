@@ -439,4 +439,7 @@ config LINK_TEST_SUITE_RT3645
 config LINK_TEST_SUITE_BTN_IGN_OUT
 	bool "Link and test the BTN_IGN as output tests"
 
+config LINK_TEST_SUITE_BTN_IGN_IN
+	bool "Link and test the BTN_IGN as input tests"
+
 source "Kconfig.zephyr"

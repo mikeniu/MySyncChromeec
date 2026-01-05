@@ -173,9 +173,41 @@ DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, pb_chipset_shutdown,
 /**
  * Handle debounced power button changing state.
  */
+static void power_button_change_deferred(void);
+DECLARE_DEFERRED(power_button_change_deferred);
 static void power_button_change_deferred(void)
 {
-	const int new_pressed = raw_power_button_pressed();
+	int new_pressed = raw_power_button_pressed();
+
+#ifdef CONFIG_PLATFORM_EC_BTN_IGN_IN
+	/*
+	 * If the power button ignore signal is active, we treat the power
+	 * button as released for the first 4 seconds. If it's held longer than
+	 * that, we let it through.
+	 */
+	static timestamp_t ign_start_time;
+
+	if (gpio_get_level(GPIO_BTN_IGN)) {
+		if (new_pressed) {
+			if (ign_start_time.val == 0)
+				ign_start_time = get_time();
+
+			int ignore_remaining_us =
+				4 * SECOND - time_since32(ign_start_time);
+
+			if (ignore_remaining_us > 0) {
+				new_pressed = 0;
+				hook_call_deferred(
+					&power_button_change_deferred_data,
+					ignore_remaining_us);
+			}
+		} else {
+			ign_start_time.val = 0;
+		}
+	} else {
+		ign_start_time.val = 0;
+	}
+#endif
 
 	/* Re-enable keyboard scanning if power button is no longer pressed */
 	if (!new_pressed)
@@ -200,7 +232,6 @@ static void power_button_change_deferred(void)
 	if (new_pressed)
 		host_set_single_event(EC_HOST_EVENT_POWER_BUTTON);
 }
-DECLARE_DEFERRED(power_button_change_deferred);
 
 static void power_button_simulate_deferred(void)
 {
