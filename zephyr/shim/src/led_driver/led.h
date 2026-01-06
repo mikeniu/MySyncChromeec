@@ -121,12 +121,12 @@ struct led_pins_node_t {
 };
 
 struct pattern_color_node_t {
-	struct led_pins_node_t *led_color_node;
+	const struct led_pins_node_t *led_color_node;
 	uint8_t duration;
 };
 
 struct led_pattern_node_t {
-	struct pattern_color_node_t *pattern_color;
+	const struct pattern_color_node_t *pattern_color;
 	uint8_t cur_color;
 	uint8_t ticks;
 	enum led_transition transition;

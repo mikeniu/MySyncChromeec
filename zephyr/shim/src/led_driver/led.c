@@ -28,7 +28,7 @@ LOG_MODULE_REGISTER(led, LOG_LEVEL_ERR);
 BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT) == 1,
 	     "Exactly one instance of cros-ec,led-policy should be defined.");
 
-#define DECLARE_PINS_NODE(id) extern struct led_pins_node_t PINS_NODE(id);
+#define DECLARE_PINS_NODE(id) extern const struct led_pins_node_t PINS_NODE(id);
 
 #if CONFIG_PLATFORM_EC_LED_DT_PWM
 DT_FOREACH_CHILD_STATUS_OKAY_VARGS(
@@ -53,8 +53,8 @@ DT_FOREACH_CHILD_STATUS_OKAY_VARGS(
 	},
 
 #define PATTERN_COLOR_ARRAY(id) DT_CAT(PATTERN_COLOR_, id)
-#define GEN_PATTERN_COLOR_ARRAY(id, fn)                  \
-	struct pattern_color_node_t PATTERN_COLOR_ARRAY( \
+#define GEN_PATTERN_COLOR_ARRAY(id, fn)                               \
+	static const struct pattern_color_node_t PATTERN_COLOR_ARRAY( \
 		id)[] = { fn(id, SET_PATTERN_COLOR_ARRAY) };
 DT_INST_FOREACH_CHILD_STATUS_OKAY_VARGS(0, DT_FOREACH_CHILD_VARGS,
 					GEN_PATTERN_COLOR_ARRAY,
@@ -80,7 +80,6 @@ struct node_prop_t {
 	int8_t charge_port;
 	struct led_pattern_node_t *led_patterns;
 	uint8_t num_patterns;
-	bool state_active;
 };
 
 #define PATTERN_NODE_ARRAY(id) DT_CAT(PATTERN_ARRAY_, id)
@@ -114,13 +113,13 @@ DT_INST_FOREACH_CHILD_STATUS_OKAY_VARGS(0, GEN_PATTERN_NODE_ARRAY,
 				    (DT_PROP(state_id, charge_port)), (-1)),  \
 		.led_patterns = PATTERN_NODE_ARRAY(state_id),                 \
 		.num_patterns = 0 fn(state_id, PLUS_ONE),                     \
-		.state_active = false,                                        \
 	},
 
-static struct node_prop_t node_array[] = {
+static const struct node_prop_t node_array[] = {
 	DT_INST_FOREACH_CHILD_STATUS_OKAY_VARGS(0, SET_LED_VALUES,
 						DT_FOREACH_CHILD)
 };
+static bool active_array[ARRAY_SIZE(node_array)];
 
 test_export_static enum power_state get_chipset_state(void)
 {
@@ -183,7 +182,7 @@ static int match_node(int node_idx)
 		enum led_pwr_state pwr_state = led_pwr_get_state();
 
 		if (node_array[node_idx].pwr_state != pwr_state) {
-			node_array[node_idx].state_active = false;
+			active_array[node_idx] = false;
 			return -1;
 		}
 
@@ -192,7 +191,7 @@ static int match_node(int node_idx)
 			int port = charge_manager_get_active_charge_port();
 
 			if (node_array[node_idx].charge_port != port) {
-				node_array[node_idx].state_active = false;
+				active_array[node_idx] = false;
 				return -1;
 			}
 		}
@@ -204,7 +203,7 @@ static int match_node(int node_idx)
 		enum power_state chipset_state = get_chipset_state();
 
 		if (node_array[node_idx].chipset_state != chipset_state) {
-			node_array[node_idx].state_active = false;
+			active_array[node_idx] = false;
 			return -1;
 		}
 	}
@@ -218,7 +217,7 @@ static int match_node(int node_idx)
 		if ((node_array[node_idx].batt_state_mask & batt_state) !=
 		    (node_array[node_idx].batt_state_mask &
 		     node_array[node_idx].batt_state)) {
-			node_array[node_idx].state_active = false;
+			active_array[node_idx] = false;
 			return -1;
 		}
 	}
@@ -232,14 +231,14 @@ static int match_node(int node_idx)
 
 		if ((curr_batt_lvl < node_array[node_idx].batt_lvl[0]) ||
 		    (curr_batt_lvl > node_array[node_idx].batt_lvl[1])) {
-			node_array[node_idx].state_active = false;
+			active_array[node_idx] = false;
 			return -1;
 		}
 	}
 
 	/* reset the color counter if pattern just activated */
-	if (node_array[node_idx].state_active == false) {
-		node_array[node_idx].state_active = true;
+	if (active_array[node_idx] == false) {
+		active_array[node_idx] = true;
 		for (int i = 0; i < node_array[node_idx].num_patterns; i++) {
 			node_array[node_idx].led_patterns[i].cur_color = 0;
 			node_array[node_idx].led_patterns[i].ticks = 0;
