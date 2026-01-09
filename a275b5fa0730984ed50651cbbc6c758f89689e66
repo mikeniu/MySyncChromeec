@@ -34,6 +34,24 @@
       "parentUuid": "16eedb43_c6c51399",
       "revId": "a275b5fa0730984ed50651cbbc6c758f89689e66",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9733551_ca133129",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-01-09T07:08:45Z",
+      "side": 1,
+      "message": "One is fine.",
+      "parentUuid": "61da13aa_feaa6065",
+      "revId": "a275b5fa0730984ed50651cbbc6c758f89689e66",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
