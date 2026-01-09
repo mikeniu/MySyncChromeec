@@ -16,6 +16,24 @@
       "message": "Please adjust the emulator and tests to current state of driver",
       "revId": "a275b5fa0730984ed50651cbbc6c758f89689e66",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61da13aa_feaa6065",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-01-09T07:08:00Z",
+      "side": 1,
+      "message": "@dawidn@google.com Do we need separate the test into 3 items as 9865, 9869 and 9849, or just 98xx with any one IMAGE_PROPS from the three sensors.",
+      "parentUuid": "16eedb43_c6c51399",
+      "revId": "a275b5fa0730984ed50651cbbc6c758f89689e66",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
