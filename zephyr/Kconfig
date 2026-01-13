@@ -1136,6 +1136,13 @@ config SYSTEM_BOOT_TIME_LOGGING
 	  This config enables boot time logging functionality in EC which
 	  is used for calculating system boot time.
 
+config PLATFORM_EC_CONSOLE_CMD_BOOTTIME
+	bool "Console command: boottime"
+	default y if SYSTEM_BOOT_TIME_LOGGING
+	help
+	  Enable the console command 'boottime'. This command is used to
+	  gather the time from system boot to S5 and S0.
+
 config PLATFORM_EC_CURVE25519
 	bool "curve25519 public key crypto"
 	help

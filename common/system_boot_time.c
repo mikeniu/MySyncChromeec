@@ -16,6 +16,11 @@
 static struct ec_response_get_boot_time ap_boot_time;
 #endif
 
+#ifdef CONFIG_PLATFORM_EC_CONSOLE_CMD_BOOTTIME
+#define UNINITIALIZED_TIME (-1ll)
+static uint64_t first_S0_time = UNINITIALIZED_TIME; /* When did we enter S0? */
+static uint64_t first_S5_time = UNINITIALIZED_TIME; /* When did we enter S5? */
+#endif
 /* This function updates timestamp for ap boot time params */
 void update_ap_boot_time(enum boot_time_param param)
 {
@@ -39,6 +44,13 @@ void update_ap_boot_time(enum boot_time_param param)
 	 * counter will be set to 0.
 	 */
 	switch (param) {
+#ifdef CONFIG_PLATFORM_EC_CONSOLE_CMD_BOOTTIME
+	case RSMRST:
+		if (first_S5_time == UNINITIALIZED_TIME) {
+			first_S5_time = ap_boot_time.timestamp[RSMRST];
+		}
+		break;
+#endif
 	case PLTRST_HIGH:
 		/* warm reboot happened */
 		if (ap_booted && pltrst_transition)
@@ -50,6 +62,11 @@ void update_ap_boot_time(enum boot_time_param param)
 			ap_booted = true;
 			pltrst_transition = false;
 		}
+#ifdef CONFIG_PLATFORM_EC_CONSOLE_CMD_BOOTTIME
+		if (first_S0_time == UNINITIALIZED_TIME) {
+			first_S0_time = ap_boot_time.timestamp[PLTRST_HIGH];
+		}
+#endif
 		break;
 	case PLTRST_LOW:
 		/* #PLTRST is in transition state */
@@ -93,4 +110,35 @@ host_command_get_boot_time(struct host_cmd_handler_args *args)
 
 DECLARE_HOST_COMMAND(EC_CMD_GET_BOOT_TIME, host_command_get_boot_time,
 		     EC_VER_MASK(0));
-#endif
+
+#ifdef CONFIG_PLATFORM_EC_CONSOLE_CMD_BOOTTIME
+static int command_boot_time(int argc, const char **argv)
+{
+	const char *state_name;
+	uint64_t display_time;
+
+	if (argc != 2) {
+		return EC_ERROR_PARAM_COUNT;
+	}
+
+	state_name = argv[1];
+	if (strcasecmp(state_name, "S0") == 0) {
+		display_time = first_S0_time;
+	} else if (strcasecmp(state_name, "S5") == 0) {
+		display_time = first_S5_time;
+	} else {
+		return EC_ERROR_PARAM1;
+	}
+
+	if (display_time == UNINITIALIZED_TIME) {
+		ccprints("first %s: %lldms", state_name, -1ll);
+	} else {
+		ccprints("first %s: %lldms", state_name,
+			 (int64_t)(display_time / MSEC));
+	}
+	return EC_SUCCESS;
+}
+DECLARE_CONSOLE_COMMAND(boottime, command_boot_time, "<S0|S5>",
+			"Expose boot time for firmware.BootTime.");
+#endif /* CONFIG_PLATFORM_EC_CONSOLE_CMD_BOOTTIME */
+#endif /* CONFIG_SYSTEM_BOOT_TIME_LOGGING */
