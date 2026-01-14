@@ -436,4 +436,7 @@ config LINK_TEST_SUITE_RT3645
 	help
 	  Verifies functionality of rt3645 IMVP driver
 
+config LINK_TEST_SUITE_BTN_IGN_OUT
+	bool "Link and test the BTN_IGN as output tests"
+
 source "Kconfig.zephyr"
