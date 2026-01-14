@@ -1846,3 +1846,12 @@ tests:
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - ./rt3645/imvp.dts
+  drivers.btn_ign_out:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_BTN_IGN_OUT=y
+    - CONFIG_PLATFORM_EC_BTN_IGN_OUT=y
+    extra_conf_files:
+    - prj.conf
+    extra_dtc_overlay_files:
+    - ./boards/native_sim.overlay
+    - btn_ign_out/btn_ign.dts

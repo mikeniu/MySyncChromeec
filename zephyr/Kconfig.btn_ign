@@ -1,0 +1,17 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config PLATFORM_EC_BTN_IGN_OUT
+	bool "Enable power button ignore output"
+	help
+	  Enables setting power button ignore state by GPIO.
+	  Enabled if the btn_ign node is defined in DT.
+	default y
+	depends on DT_HAS_CROS_EC_BTN_IGN_ENABLED
+	select PLATFORM_EC_BTN_IGN_OUT_FINGERPRINT
+
+config PLATFORM_EC_BTN_IGN_OUT_FINGERPRINT
+	bool "Integrate power button ignore output with fingerprint"
+	help
+	  Fingerprint application controls btn_ign

@@ -1,0 +1,15 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: |
+  Driver code to support power button ignore signal.
+
+compatible: "cros-ec,btn-ign"
+
+properties:
+  btn-ign-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      GPIO pin connected to the BTN_IGN signal on the platform.
