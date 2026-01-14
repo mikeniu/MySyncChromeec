@@ -16,6 +16,24 @@
       "message": "Let\u0027s give Jason a chance to chime in here, maybe the plan is to use it later",
       "revId": "520ac2208f2f96e3d3c932b273705442c5d94415",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "617ced75_9e00dd85",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-01-14T21:57:38Z",
+      "side": 1,
+      "message": "Ping. Note that this method can\u0027t be reused. The values of the `led_color` property are no longer integers (or enum accurately).",
+      "parentUuid": "4ca78dd4_dc07152e",
+      "revId": "520ac2208f2f96e3d3c932b273705442c5d94415",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
