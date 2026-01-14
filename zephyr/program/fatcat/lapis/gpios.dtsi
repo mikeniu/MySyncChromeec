@@ -173,6 +173,7 @@
 		/* FP_ATC */
 		gpio_fp_atc: fp_atc {
 			gpios = <&gpioa 0 GPIO_INPUT>;
+			enum-name = "GPIO_BTN_IGN";
 		};
 		/* FP_RST_EC GPIO089*/
 		gpio_fp_rst_ec: fp_rst_ec {
