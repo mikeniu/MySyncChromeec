@@ -1,0 +1,13 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+DT_CHOSEN_CROS_FP_BTN_IGN_OUT := cros-fp,btn-ign-out
+
+config PLATFORM_EC_BTN_IGN_OUT
+	bool "Enable power button ignore output"
+	help
+	  Enables setting power button ignore state by GPIO.
+	  Enabled if the btn_ign_out node is chosen in DT.
+	default y
+	depends on $(dt_chosen_enabled,$(DT_CHOSEN_CROS_FP_BTN_IGN_OUT))
