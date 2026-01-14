@@ -559,19 +559,23 @@ static void print_current_state(struct pdc_data_t *data)
 
 	if (st == ST_WRITE) {
 		if (data->cmd == CMD_RAW_UCSI) {
-			LOG_INF("ST%d: %s RAW:%s", cfg->connector_number,
+			LOG_INF("RTK%d: %s RAW:%s", cfg->connector_number,
 				state_names[st],
 				get_ucsi_command_name(data->active_ucsi_cmd));
 		} else {
-			LOG_INF("ST%d: %s %s", cfg->connector_number,
+			LOG_INF("RTK%d: %s %s", cfg->connector_number,
 				state_names[st], cmd_names[data->cmd]);
 		}
 	} else if (st == ST_ERROR_RECOVERY) {
-		LOG_INF("ST%d: %s %s %d", cfg->connector_number,
+		LOG_INF("RTK%d: %s %s %d", cfg->connector_number,
 			state_names[st], cmd_names[data->cmd],
 			data->error_recovery_counter);
+	} else if (st == ST_DISABLE || st == ST_SUSPENDED || st == ST_INIT) {
+		LOG_INF("RTK%d: %s", cfg->connector_number,
+			state_names[get_state(data)]);
 	} else {
-		LOG_INF("ST%d: %s", cfg->connector_number,
+		/* IDLE, PING_STATUS, READ */
+		LOG_DBG("RTK%d: %s", cfg->connector_number,
 			state_names[get_state(data)]);
 	}
 }
