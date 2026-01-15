@@ -33,6 +33,7 @@
 #include "util.h"
 #include "watchdog.h"
 
+#include <algorithm>
 #include <array>
 #include <variant>
 

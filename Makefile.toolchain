@@ -222,6 +222,11 @@ HOST_CFLAGS+=$(LIBFTDIUSB_HOST_CFLAGS)
 HOST_CFLAGS+=-DCHROMIUM_EC=$(EMPTY)
 HOST_CXXFLAGS=$(HOST_CFLAGS) -Wno-c99-designator
 HOST_CXXFLAGS+=$(LIBEC_HOST_CFLAGS)
+ifeq ($(CROSS_COMPILE_CXX_NAME),clang++)
+# TODO(b/498659924): move this to Makefile.rules so both gcc and clang use the same flags.
+HOST_CXXFLAGS+=-std=gnu++23
+endif
+
 ifneq (${SYSROOT},)
   LDFLAGS_EXTRA+=--sysroot=${SYSROOT}
 endif
