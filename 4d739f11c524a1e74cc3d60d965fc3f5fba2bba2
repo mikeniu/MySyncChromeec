@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "7d2777df_92679793",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-01-20T15:50:41Z",
+      "side": 1,
+      "message": "Actually, I added cleaning `fp_enc_buffer` on failed encryption. Added that in commit  message.",
+      "parentUuid": "9b3a35e9_2164e626",
+      "revId": "4d739f11c524a1e74cc3d60d965fc3f5fba2bba2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "f5389e9f_87802c64",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 5
@@ -48,6 +66,24 @@
       "writtenOn": "2026-01-20T08:55:53Z",
       "side": 1,
       "message": "Isn\u0027t it better to move `ScopedFastCpu fast_cpu;` to the `encrypt_template` function? Or you think it is up to caller if the fast CPU is needed or not?",
+      "revId": "4d739f11c524a1e74cc3d60d965fc3f5fba2bba2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ad1a39e_8a58bbf3",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 602,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-01-20T15:50:41Z",
+      "side": 1,
+      "message": "Yes, `encrypt_template()` is responsible for encrypting the template. It\u0027s caller decision if the fast CPU is needed or not. The caller could want to combine multiple operation in one fast CPU scope.",
+      "parentUuid": "0128add7_23e7aff6",
       "revId": "4d739f11c524a1e74cc3d60d965fc3f5fba2bba2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
