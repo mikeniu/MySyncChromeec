@@ -438,3 +438,28 @@ ZTEST(fan_common, test_memmap_not_present)
 			mapped[i]);
 	}
 }
+
+ZTEST(fan_common, test_fan_set_percent_needed)
+{
+	int initial_target;
+
+	/* Ensure thermal control is enabled for fan 0 */
+	set_thermal_control_enabled(0, 1);
+
+	/* Test: Setting 0% should set RPM target to 0 */
+	fan_set_percent_needed(0, 0);
+	zassert_equal(fan_get_rpm_target(0), 0,
+		      "Fan target should be 0 RPM at 0%%");
+
+	/* Test: Setting 100% should set RPM to max */
+	fan_set_percent_needed(0, 100);
+	zassert_equal(fan_get_rpm_target(0), fans[0].rpm->rpm_max,
+		      "Fan target should be max RPM at 100%%");
+
+	/* Test: Setting a mid-range percentage (e.g., 50%) */
+	fan_set_percent_needed(0, 50);
+	initial_target = fan_get_rpm_target(0);
+	zassert_true(initial_target > 0 &&
+			     initial_target <= fans[0].rpm->rpm_max,
+		     "Fan target at 50%% should be between 0 and max RPM");
+}
