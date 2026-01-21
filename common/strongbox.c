@@ -244,10 +244,9 @@ static const uint8_t g_keymint_var_name[] = { 'K', 'M' };
  * PRINTABLESTRING 0x13 <size = 0x14> "Android Keystore Key"
  */
 static const char g_default_subject_data[] = {
-	0x30, 0x1f, 0x31, 0x1d, 0x30, 0x1b, 0x06, 0x03, 0x55, 0x04,
-	0x03, 0x13, 0x14, 0x41, 0x6e, 0x64, 0x72, 0x6f, 0x69, 0x64,
-	0x20, 0x4b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x72, 0x65, 0x20,
-	0x4b, 0x65, 0x79
+	0x30, 0x1f, 0x31, 0x1d, 0x30, 0x1b, 0x06, 0x03, 0x55, 0x04, 0x03,
+	0x13, 0x14, 0x41, 0x6e, 0x64, 0x72, 0x6f, 0x69, 0x64, 0x20, 0x4b,
+	0x65, 0x79, 0x73, 0x74, 0x6f, 0x72, 0x65, 0x20, 0x4b, 0x65, 0x79
 };
 static const struct slice g_default_subject =
 	SLICE(g_default_subject_data, sizeof(g_default_subject_data));
@@ -2279,14 +2278,6 @@ static enum strongbox_error sb_GenerateCertificateReq(struct km *km,
 DECLARE_STRONGBOX_COMMAND(SB_RpcGenerateCertificateV2Request,
 			  sb_GenerateCertificateReq);
 
-/* Limit the size of long form encoded objects to < 64 kB. */
-#define MAX_ASN1_OBJ_LEN_BYTES 3
-
-/* Reserve space for TLV encoding */
-#define SEQ_SMALL  2 /* < 128 bytes (1B type, 1B 7-bit length) */
-#define SEQ_MEDIUM 3 /* < 256 bytes (1B type, 1B length size, 1B length) */
-#define SEQ_LARGE  4 /* < 65536 bytes (1B type, 1B length size, 2B length) */
-
 /* Tag related constants.
  * Bits 0..4 - number
  * Bit  5    - constructed (1) / primitive (0)
@@ -2329,470 +2320,210 @@ enum {
 	V_ASN1_CCL = V_ASN1_CONTEXT_SPECIFIC | V_ASN1_CONSTRUCTED,
 };
 
-struct asn1 {
+/* -------------------------------------------------------------------------
+ * Backward ASN.1 Encoder
+ * -------------------------------------------------------------------------
+ */
+struct asn1_out {
+	uint8_t *start; /* Lower bound of buffer (inclusive) */
+	uint8_t *curr; /* Current cursor (moves backwards from end) */
+};
+
+/* Forward writer context (for Signature generation) */
+struct asn1_in {
 	uint8_t *p;
 	size_t n;
 };
 
-#define SEQ_START(X, T, L)         \
-	do {                       \
-		int __old = (X).n; \
-		uint8_t __t = (T); \
-		int __l = (L);     \
-		(X).n += __l;
-#define SEQ_END(X)                                                       \
-	(X).n = asn1_seq((X).p + __old, __t, __l, (X).n - __old - __l) + \
-		__old;                                                   \
-	}                                                                \
-	while (0)
-
-#define OID(X) SLICE(OID_##X, sizeof(OID_##X))
-
-static const uint8_t OID_ecdsa_with_SHA256[8] = { 0x2A, 0x86, 0x48, 0xCE,
-						  0x3D, 0x04, 0x03, 0x02 };
-
-static const uint8_t OID_id_ecPublicKey[7] = { 0x2A, 0x86, 0x48, 0xCE,
-					       0x3D, 0x02, 0x01 };
-static const uint8_t OID_prime256v1[8] = { 0x2A, 0x86, 0x48, 0xCE,
-					   0x3D, 0x03, 0x01, 0x07 };
-
-static const uint8_t OID_keyUsage[3] = { 0x55, 0x1D, 0x0F };
-
-static const uint8_t OID_keymint[10] = {
-	0x2B, 0x06, 0x01, 0x04, 0x01, 0xD6, 0x79, 0x02, 0x01, 0x11,
-};
-
-/**
- * Encoding OID: 1.3.6.1.4.1.11129.2.1.30
- * The extension value consists of Concise Binary Object Representation (CBOR)
- * data that conforms to this Concise Data Definition Language (CDDL) schema:
- * {1 : int,       ; certificates issued
- *  4 : string,    ; validated attested entity (STRONG_BOX/TEE) }
- * The map is unversioned and new optional fields may be added.
- * certs_issued - An approximate number of certificates issued to the device in
- * the last 30 days. This value can be used as a signal for potential abuse if
- * the value is greater than average by some orders of magnitude.
- * validated_attested_entity -
- * The validated attested entity is a string that describes the type of device
- * that was confirmed by the provisioning server to be attested. For example,
- * STRONG_BOX or TEE.
- * https://source.android.com/docs/security/features/keystore/attestation#provisioninginfo_extension_schema
- */
-static const uint8_t OID_strongbox[10] = {
-	0x2B, 0x06, 0x01, 0x04, 0x01, 0xD6, 0x79, 0x02, 0x01, 0x1e,
-};
-static const uint8_t CBOR_strongbox[15] = { CBOR_HDR1(CBOR_MAJOR_MAP, 2),
-					    CBOR_HDR1(CBOR_MAJOR_UINT, 1),
-					    CBOR_HDR1(CBOR_MAJOR_UINT, 10),
-					    CBOR_HDR1(CBOR_MAJOR_UINT, 4),
-					    CBOR_HDR1(CBOR_MAJOR_TSTR, 10),
-					    'S',
-					    'T',
-					    'R',
-					    'O',
-					    'N',
-					    'G',
-					    '_',
-					    'B',
-					    'O',
-					    'X' };
-
-/* start a tag and return write ptr */
-static uint8_t *asn1_tag(struct asn1 *ctx, uint8_t tag)
+/* Push bytes backwards. Assumes buffer checks already done */
+static inline void push_bytes(struct asn1_out *ctx, const void *data,
+			      size_t len)
 {
-	ctx->p[(ctx->n)++] = tag;
-	return ctx->p + ctx->n;
+	ctx->curr -= len;
+	memcpy(ctx->curr, data, len);
 }
 
-static size_t asn1_len_len(size_t size)
+static inline void push_byte(struct asn1_out *ctx, uint8_t b)
 {
-	if (size < 128)
-		return 1;
-	if (size < 256)
-		return 2;
-	return 3;
+	*(--ctx->curr) = b;
 }
 
-/* DER encode length and return encoded size thereof */
-static size_t asn1_len(uint8_t *p, size_t size)
+/* Encodes length in DER format backwards */
+static void push_len(struct asn1_out *ctx, size_t len)
 {
-	if (size < 128) {
-		p[0] = size;
-		return 1;
-	} else if (size < 256) {
-		p[0] = 0x81;
-		p[1] = size;
-		return 2;
-	}
-	p[0] = 0x82;
-	p[1] = size >> 8;
-	p[2] = size;
-	return 3;
-}
-
-/*
- * close sequence and move encapsulated data if needed
- * return total length.
- */
-static size_t asn1_seq(uint8_t *p, uint8_t tag, size_t l, size_t size)
-{
-	size_t tl;
-
-	p[0] = tag;
-	tl = asn1_len(p + 1, size) + 1;
-	/* TODO: tl > l fail */
-	if (tl < l)
-		memmove(p + tl, p + l, size);
-
-	return tl + size;
-}
-
-static void asn1_be_int(struct asn1 *ctx, uint8_t tag, const uint8_t *b,
-			size_t n)
-{
-	uint8_t *p = asn1_tag(ctx, tag);
-	size_t i;
-
-	for (i = 0; i < n; ++i) {
-		if (b[i] != 0)
-			break;
-	}
-	if (i == n) {
-		/* Special case for zero bytes.*/
-		*p++ = 1;
-		*p++ = 0;
-	} else if (b[i] & 0x80) {
-		*p++ = n - i + 1;
-		*p++ = 0;
+	if (len < 128) {
+		push_byte(ctx, (uint8_t)len);
+	} else if (len < 256) {
+		push_byte(ctx, (uint8_t)len);
+		push_byte(ctx, 0x81);
 	} else {
-		*p++ = n - i;
+		/* Supports up to 16-bit length for embedded certs */
+		push_byte(ctx, (uint8_t)(len & 0xFF));
+		push_byte(ctx, (uint8_t)((len >> 8) & 0xFF));
+		push_byte(ctx, 0x82);
 	}
-	for (; i < n; ++i)
-		*p++ = b[i];
-
-	ctx->n = p - ctx->p;
 }
 
-/* DER encode (small positive) integer */
-static void asn1_int(struct asn1 *ctx, uint32_t val)
+/* Writes Tag and Length. Must be called AFTER the Value is written (logically).
+ */
+static void push_tag(struct asn1_out *ctx, uint8_t tag, size_t len)
 {
-	uint32_t be_val = htobe32(val);
-
-	asn1_be_int(ctx, V_ASN1_INT, (const uint8_t *)&be_val, sizeof(be_val));
+	push_len(ctx, len);
+	push_byte(ctx, tag);
 }
 
-static void asn1_int64(struct asn1 *ctx, uint64_t val)
+/* Writes a context specific tag (e.g. [1], [706]) backwards */
+static void push_context_tag(struct asn1_out *ctx, uint32_t tag_num)
+{
+	if (tag_num > 127) {
+		/* BF 8X XX */
+		push_byte(ctx, tag_num & 0x7F);
+		push_byte(ctx, 0x80 | (tag_num >> 7));
+		push_byte(ctx, V_ASN1_CCH);
+	} else if (tag_num > 30) {
+		/* BF XX */
+		push_byte(ctx, (uint8_t)tag_num);
+		push_byte(ctx, V_ASN1_CCH);
+	} else {
+		/* A1 */
+		push_byte(ctx, V_ASN1_CCL | (uint8_t)tag_num);
+	}
+}
+
+static void push_explicit_tag(struct asn1_out *ctx, uint32_t tag_num,
+			      size_t inner_len)
+{
+	/* Explicit tags wrap the inner TLV.
+	 * We assume the inner TLV has just been written with size 'inner_len'.
+	 * We now write the length of that inner TLV, then the context tag.
+	 */
+	push_len(ctx, inner_len);
+	push_context_tag(ctx, tag_num);
+}
+
+static void push_be_int(struct asn1_out *ctx, const uint8_t *buf, size_t n)
+{
+	size_t skip = 0, len;
+
+	/* Skip leading zeros, but keep at least one byte */
+	while (skip < n - 1 && buf[skip] == 0)
+		skip++;
+
+	/* If high bit is set, prepend 0x00 to make it positive */
+	if (buf[skip] & 0x80) {
+		push_bytes(ctx, buf + skip, n - skip);
+		push_byte(ctx, 0x00);
+		len = (n - skip) + 1;
+	} else {
+		push_bytes(ctx, buf + skip, n - skip);
+		len = n - skip;
+	}
+	push_tag(ctx, V_ASN1_INT, len);
+}
+
+static void push_int(struct asn1_out *ctx, uint64_t val)
 {
 	uint32_t be_val[2];
 
 	be_val[1] = htobe32((uint32_t)val);
 	be_val[0] = htobe32((uint32_t)(val >> 32));
-	asn1_be_int(ctx, V_ASN1_INT, (const uint8_t *)&be_val, sizeof(be_val));
+	push_be_int(ctx, (const uint8_t *)&be_val, sizeof(be_val));
 }
 
-static void asn1_enum(struct asn1 *ctx, uint32_t val)
+static inline void push_enum(struct asn1_out *ctx, uint32_t val)
 {
-	uint32_t be_val = htobe32(val);
+	/* Same as int logic but small optimization for known enum sizes */
+	uint8_t b = val & 0xFF;
 
-	asn1_be_int(ctx, V_ASN1_ENUM, (const uint8_t *)&be_val, sizeof(be_val));
+	push_byte(ctx, b);
+	push_tag(ctx, V_ASN1_ENUM, 1);
 }
 
-/* DER encode positive p256_int */
-static void asn1_p256_int(struct asn1 *ctx, const p256_int *n)
+static void push_bytes_tlv(struct asn1_out *ctx, uint8_t tag, struct slice s)
 {
-	uint8_t bn[P256_NBYTES];
-
-	p256_to_bin(n, bn);
-	asn1_be_int(ctx, V_ASN1_INT, bn, P256_NBYTES);
+	push_bytes(ctx, s.p, s.n);
+	push_tag(ctx, tag, s.n);
 }
 
-/* DER encode p256 signature */
-static void asn1_sig(struct asn1 *ctx, const p256_int *r, const p256_int *s)
-{
-	SEQ_START(*ctx, V_SEQ, SEQ_SMALL)
-	{
-		asn1_p256_int(ctx, r);
-		asn1_p256_int(ctx, s);
-	}
-	SEQ_END(*ctx);
-}
-
-/* DER encode bytes */
-static void asn1_bytes(struct asn1 *ctx, uint8_t tag, struct slice slice)
-{
-	const uint8_t *s = (const uint8_t *)slice.p;
-	size_t n = slice.n;
-	uint8_t *p = asn1_tag(ctx, tag);
-
-	p += asn1_len(p, n);
-	while (n--)
-		*p++ = *s++;
-
-	ctx->n = p - ctx->p;
-}
-
-/* DER encode printable string */
-static void asn1_string(struct asn1 *ctx, uint8_t tag, const char *s)
-{
-	size_t n = strlen(s);
-
-	asn1_bytes(ctx, tag, SLICE((const uint8_t *)s, n));
-}
-
-/* DER encode bytes */
-static void asn1_object(struct asn1 *ctx, struct slice obj)
-{
-	uint8_t *p = asn1_tag(ctx, V_ASN1_OBJ);
-	size_t n = obj.n;
-	const uint8_t *b = (const uint8_t *)obj.p;
-
-	p += asn1_len(p, n);
-	while (n--)
-		*p++ = *b++;
-
-	ctx->n = p - ctx->p;
-}
-
-/* DER encode p256 pk */
-static void asn1_pub(struct asn1 *ctx, const p256_int *x, const p256_int *y)
-{
-	uint8_t *p = asn1_tag(ctx, 4); /* uncompressed format */
-
-	p256_to_bin(x, p);
-	p += P256_NBYTES;
-	p256_to_bin(y, p);
-	p += P256_NBYTES;
-
-	ctx->n = p - ctx->p;
-}
-
-/* Verify that the `seq` slice is an asn.1 DER SEQ with the valid length.
- * Add it to `ctx` if the verification was successful and return 1.
- * Otherwise, return 0.
- *
- * Only shotr and long length forms are allowed, with up to 4 length bytes,
- * indefinite form for the length is not supported.
+/* -------------------------------------------------------------------------
+ * Complex Field Generation (Backward)
+ * -------------------------------------------------------------------------
  */
-static int verify_and_add_seq(struct asn1 *ctx, const struct slice *seq)
-{
-	unsigned char *p = (char *)seq->p;
-
-	/* 1. Verify */
-	if (p == NULL || seq->n < 2)
-		return 0;
-	if (p[0] != V_SEQ)
-		return 0;
-	if (p[1] < 128) {
-		/* short length form: 0x30 N <N bytes> */
-		size_t len = p[1];
-
-		if (seq->n != 2 + len)
-			return 0;
-	} else {
-		/* long or indefinite length form:
-		 * 0x30 0x80|M <M len bytes = N> <N bytes>
-		 */
-		size_t len_len = p[1] & 0x7f;
-		size_t len;
-		size_t i;
-
-		if (len_len == 0 || len_len > 4)
-			return 0;
-		if (seq->n < 2 + len_len)
-			return 0;
-		len = p[2 + len_len];
-		for (i = 1; i < len_len; i++) {
-			len <<= 8;
-			len |= p[2 + len_len + i];
-		}
-		if (seq->n != 2 + len_len + len)
-			return 0;
-	}
-
-	/* 2. Add the verified sequence */
-	memcpy(ctx->p + ctx->n, seq->p, seq->n);
-	ctx->n += seq->n;
-	return 1;
-}
-
-/*
- * Manually writes a context-specific, constructed tag.
- * Returns the number of bytes written (1-3).
- * Assumes tag_num is > 0.
- *
- * Example:
- * [706] -> BF 85 42 (constructed, context-specific, tag 706)
- * [1]   -> A1       (constructed, context-specific, tag 1)
- */
-static int asn1_write_context_tag(struct asn1 *ctx, uint32_t tag_num)
-{
-	/* Check for 3-byte tag (BF 85 42) */
-	if (tag_num > 127) {
-		/* Context-specific, Constructed, High-tag */
-		ctx->p[ctx->n++] = V_ASN1_CCH;
-		ctx->p[ctx->n++] = 0x80 | (tag_num >> 7);
-		ctx->p[ctx->n++] = tag_num & 0x7F;
-		return 3;
-	}
-	/* Check for 2-byte tag (BF 0F) */
-	if (tag_num > 30) {
-		ctx->p[ctx->n++] = V_ASN1_CCH;
-		ctx->p[ctx->n++] = (uint8_t)tag_num;
-		return 2;
-	}
-	/* Check for 1-byte tag (A1)
-	 * Context-specific, Constructed, Low-tag
-	 */
-	ctx->p[ctx->n++] = V_ASN1_CCL | (uint8_t)tag_num;
-	return 1;
-}
-
-/*
- * Helper to encode: [tag_num] EXPLICIT NULL
- */
-static void asn1_explicit_null(struct asn1 *ctx, uint32_t tag_num)
-{
-	/* 1. Write the EXPLICIT tag (e.g., [303]) */
-	asn1_write_context_tag(ctx, tag_num);
-
-	/* 2. Write the length of the inner payload (which is 2 bytes) */
-	asn1_len(ctx->p + ctx->n, 2);
-	/* asn1_len for <128 is 1 byte */
-	ctx->n += 1;
-
-	/* 3. Write the inner NULL TLV */
-	asn1_tag(ctx, V_ASN1_NULL);
-	/* Length 0 */
-	ctx->p[ctx->n++] = 0x00;
-}
-
-/*
- * Helper to encode: [tag_num] EXPLICIT INTEGER
- */
-static void asn1_explicit_int(struct asn1 *ctx, uint32_t tag_num, uint64_t val)
-{
-	/* 8-byte int + 0-padding + TLV = max ~12 bytes */
-	uint8_t int_buf[15];
-	struct asn1 int_ctx = {
-		int_buf,
-		0,
-	};
-	/* 1. Encode the inner INTEGER into a temp buffer */
-	/* int_ctx.n now holds the length of the inner TLV */
-	asn1_int64(&int_ctx, val);
-
-	/* 2. Write the EXPLICIT tag (e.g., [706]) */
-	asn1_write_context_tag(ctx, tag_num);
-
-	/* 3. Write the outer length (which is the length of the inner TLV) */
-	ctx->n += asn1_len(ctx->p + ctx->n, int_ctx.n);
-
-	/* 4. Write the inner TLV (the value) */
-	memcpy(ctx->p + ctx->n, int_buf, int_ctx.n);
-	ctx->n += int_ctx.n;
-}
-
-/*
- * Helper to encode: [tag_num] EXPLICIT OCTET_STRING
- * Used for: [709] attestationApplicationId, [710] attestationIdBrand, etc.
- */
-static void asn1_explicit_bytes(struct asn1 *ctx, uint32_t tag_num,
+static void push_explicit_bytes(struct asn1_out *ctx, uint32_t tag_num,
 				struct slice data)
 {
-	/* Calculate wrapped length */
-	size_t len = 1 + data.n + asn1_len_len(data.n);
-	/* Write the EXPLICIT tag (e.g., [709]) */
-	asn1_write_context_tag(ctx, tag_num);
-	/* Write the outer length (the length of the inner TLV) */
-	ctx->n += asn1_len(ctx->p + ctx->n, len);
-	/* Write actual data*/
-	asn1_bytes(ctx, V_ASN1_BYTES, data);
+	uint8_t *end = ctx->curr;
+
+	if (!data.n)
+		return;
+
+	push_bytes_tlv(ctx, V_ASN1_BYTES, data);
+	push_explicit_tag(ctx, tag_num, end - ctx->curr);
 }
 
-static void add_key_purpose(struct asn1 *ctx, uint32_t km_purpose)
+static void push_explicit_int(struct asn1_out *ctx, uint32_t tag_num,
+			      uint64_t val)
 {
+	uint8_t *end = ctx->curr;
+
+	push_int(ctx, val);
+	push_explicit_tag(ctx, tag_num, end - ctx->curr);
+}
+
+static void push_explicit_null(struct asn1_out *ctx, uint32_t tag_num)
+{
+	uint8_t *end = ctx->curr;
+	/* NULL is Tag (0x05) + Len (0x00) only. No value bytes. */
+	push_tag(ctx, V_ASN1_NULL, 0);
+	push_explicit_tag(ctx, tag_num, end - ctx->curr);
+}
+
+/* KeyUsage Bitstring */
+static void push_key_usage(struct asn1_out *ctx, uint32_t purpose_flags)
+{
+	uint8_t *seq_end = ctx->curr;
+	/* Inner BIT STRING */
+	uint8_t *bs_end = ctx->curr;
 	uint32_t purpose = 0;
-	/* id-ce-keyUsage OBJECT IDENTIFIER ::= { id-ce 15 }
-	 * KeyUsage ::= BIT STRING {
-	 *  digitalSignature        (0),
-	 *  nonRepudiation          (1),  -- recent editions of X.509 have
-	 *        -- renamed this bit to contentCommitment
-	 *  keyEncipherment         (2),
-	 *  dataEncipherment        (3),
-	 *  keyAgreement            (4),
-	 *  keyCertSign             (5),
-	 *  cRLSign                 (6),
-	 *  encipherOnly            (7),
-	 *  decipherOnly            (8) }
-	 */
-	if (km_purpose & (1U << KM_PURPOSE_SIGN))
+
+	if (purpose_flags & (1U << KM_PURPOSE_SIGN))
 		purpose |= 0x80;
-	if (km_purpose & (1U << KM_PURPOSE_ATTEST_KEY))
+	if (purpose_flags & (1U << KM_PURPOSE_ATTEST_KEY))
 		purpose |= 0x04;
-	if (km_purpose & (1U << KM_PURPOSE_AGREE_KEY))
+	if (purpose_flags & (1U << KM_PURPOSE_AGREE_KEY))
 		purpose |= 0x08;
-	if (km_purpose & (1U << KM_PURPOSE_WRAP_KEY))
+	if (purpose_flags & (1U << KM_PURPOSE_WRAP_KEY))
 		purpose |= 0x20;
-	if ((km_purpose &
+
+	if ((purpose_flags &
 	     ((1U << KM_PURPOSE_ENCRYPT) | (1U << KM_PURPOSE_DECRYPT))) ==
 	    ((1U << KM_PURPOSE_ENCRYPT) | (1U << KM_PURPOSE_DECRYPT)))
 		purpose |= 0x10;
-	else if (km_purpose & (1U << KM_PURPOSE_ENCRYPT))
+	else if (purpose_flags & (1U << KM_PURPOSE_ENCRYPT))
 		purpose |= 0x01;
-	else if (km_purpose & (1U << KM_PURPOSE_DECRYPT))
+	else if (purpose_flags & (1U << KM_PURPOSE_DECRYPT))
 		purpose |= 0x8000;
 
-	/* Wrap in OCTET_STRING */
-	SEQ_START(*ctx, V_ASN1_BYTES, SEQ_MEDIUM)
-	{
-		SEQ_START(*ctx, V_BITS, SEQ_MEDIUM)
-		{
-			if (purpose > 0xff) {
-				/* 7 unused bits */
-				ctx->p[ctx->n++] = 7;
-				ctx->p[ctx->n++] = purpose & 0xff;
-				ctx->p[ctx->n++] = (purpose >> 8) & 0xff;
-			} else {
-				ctx->p[ctx->n++] = __builtin_ctz(purpose);
-				ctx->p[ctx->n++] = purpose & 0xff;
-			}
-		}
-		SEQ_END(*ctx);
+	if (purpose > 0xff) {
+		push_byte(ctx, (purpose >> 8) & 0xFF);
+		push_byte(ctx, purpose & 0xFF);
+		push_byte(ctx, 7); /* unused bits */
+	} else {
+		push_byte(ctx, purpose & 0xFF);
+		push_byte(ctx, __builtin_ctz(purpose)); /* unused bits */
 	}
-	SEQ_END(*ctx);
+	push_tag(ctx, V_ASN1_BIT_STRING, bs_end - ctx->curr);
+
+	/* Wrapped in OCTET STRING */
+	push_tag(ctx, V_ASN1_BYTES, seq_end - ctx->curr);
 }
 
-static void add_set_int(struct asn1 *ctx, uint32_t tag, uint32_t value)
+/* Root Of Trust */
+static void push_root_of_trust(struct asn1_out *ctx,
+			       const struct km_key_params *params)
 {
-	uint8_t *p;
+	uint8_t *end = ctx->curr;
 
-	/* Write the EXPLICIT tag [1] */
-	asn1_write_context_tag(ctx, tag);
-	/* Location where to output length. It is known to be short */
-	p = ctx->p + ctx->n;
-	ctx->n++;
-	SEQ_START(*ctx, V_SET, SEQ_SMALL)
-	{
-		/* Up to 30 bits in length to have 1-byte encoding. */
-		for (size_t i = 0; i < 30; i++) {
-			if (value & (1U << i))
-				asn1_int(ctx, i);
-		}
-	}
-	SEQ_END(*ctx);
-	*p = ctx->n - (p - ctx->p) - 1;
-}
-
-static void add_root_of_trust(struct asn1 *ctx, bool device_locked,
-			      enum km_vb_state verified, struct slice data)
-{
-	/* Calculate wrapped length */
-	size_t len = 10 + (data.n + asn1_len_len(data.n)) * 2;
-
-	/* Write the EXPLICIT tag [704] */
-	asn1_write_context_tag(ctx, 704);
-	/* Write the outer length (the length of the inner TLV) */
-	ctx->n += asn1_len(ctx->p + ctx->n, len);
 	/*
 	 * RootOfTrust ::= SEQUENCE {
 	 * // A secure hash of the public key used to verify the integrity and
@@ -2810,339 +2541,541 @@ static void add_root_of_trust(struct asn1 *ctx, bool device_locked,
 	 *   SelfSigned                 (1),
 	 *   Unverified                 (2),
 	 *   Failed                     (3), }
+	 *
+	 * Reverse order: verifiedBootHash, verifiedBootState, deviceLocked,
+	 * verifiedBootKey
 	 */
-	SEQ_START(*ctx, V_SEQ, SEQ_SMALL)
-	{
-		/* TODO: Should we use some other constant? */
-		asn1_bytes(ctx, V_ASN1_BYTES, data);
-		ctx->p[ctx->n++] = V_ASN1_BOOL;
-		ctx->p[ctx->n++] = 1;
-		ctx->p[ctx->n++] = (device_locked) ? 255 : 0;
-		asn1_be_int(ctx, V_ASN1_ENUM, (uint8_t *)&verified, 1);
-		asn1_bytes(ctx, V_ASN1_BYTES, data);
-	}
-	SEQ_END(*ctx);
+
+	/* verifiedBootHash RoT Hash */
+	push_bytes_tlv(ctx, V_ASN1_BYTES, params->rootOfTrust);
+
+	/* VerifiedBootState: Verified(0) */
+	push_enum(ctx, 0);
+
+	/* deviceLocked BOOLEAN */
+	push_byte(ctx, 0xFF); /* TRUE */
+	push_tag(ctx, V_ASN1_BOOL, 1);
+
+	/* TODO: Should we use some other constant for the verifiedBootKey? */
+	push_bytes_tlv(ctx, V_ASN1_BYTES, params->rootOfTrust);
+
+	push_tag(ctx, V_SEQ, end - ctx->curr);
+	push_explicit_tag(ctx, 704, end - ctx->curr);
 }
 
-static void add_km_enforcements(struct asn1 *ctx,
-				const struct km_key_params *params)
+static void push_integer_set(struct asn1_out *ctx, uint32_t val, uint32_t tag)
 {
-	/* softwareEnforced */
-	SEQ_START(*ctx, V_SEQ, SEQ_LARGE)
-	{
-		if (params->creationDateTime)
-			asn1_explicit_int(ctx, 701, params->creationDateTime);
-		if (params->attestationApplicationId.n)
-			asn1_explicit_bytes(ctx, 709,
-					    params->attestationApplicationId);
-		if (params->moduleHash.n)
-			asn1_explicit_bytes(ctx, 724, params->moduleHash);
+	uint8_t *set_end = ctx->curr;
+
+	/* Start with high bits */
+	for (int i = 31; i >= 0; i--) {
+		if (val & (1U << i))
+			push_int(ctx, i);
 	}
-	SEQ_END(*ctx);
-
-	/* hardwareEnforced */
-	SEQ_START(*ctx, V_SEQ, SEQ_LARGE)
-	{
-		add_set_int(ctx, 1, params->attrs.purpose_flags);
-		asn1_explicit_int(ctx, 2, params->attrs.algorithm);
-		if (params->attrs.key_size)
-			asn1_explicit_int(ctx, 3, params->attrs.key_size);
-		if (params->attrs.digest_flags)
-			add_set_int(ctx, 5, params->attrs.digest_flags);
-
-		if (params->attrs.curve_id)
-			asn1_explicit_int(ctx, 10, params->attrs.curve_id);
-
-		if (params->rollbackResistance)
-			asn1_explicit_null(ctx, 303);
-		if (params->earlyBootOnly)
-			asn1_explicit_null(ctx, 304);
-
-		if (params->noAuthRequired)
-			asn1_explicit_null(ctx, 503);
-
-		asn1_explicit_int(ctx, 702, params->origin);
-
-		add_root_of_trust(ctx, true, KM_VB_VERIFIED,
-				  params->rootOfTrust);
-
-		if (params->osVersion)
-			asn1_explicit_int(ctx, 705, params->osVersion);
-		if (params->osPatchLevel)
-			asn1_explicit_int(ctx, 706, params->osPatchLevel);
-		if (params->attestationIdBrand.n)
-			asn1_explicit_bytes(ctx, 710,
-					    params->attestationIdBrand);
-		if (params->attestationIdDevice.n)
-			asn1_explicit_bytes(ctx, 711,
-					    params->attestationIdDevice);
-		if (params->attestationIdProduct.n)
-			asn1_explicit_bytes(ctx, 712,
-					    params->attestationIdProduct);
-		if (params->attestationIdSerial.n)
-			asn1_explicit_bytes(ctx, 713,
-					    params->attestationIdSerial);
-		if (params->attestationIdImei.n)
-			asn1_explicit_bytes(ctx, 714,
-					    params->attestationIdImei);
-		if (params->attestationIdMeid.n)
-			asn1_explicit_bytes(ctx, 715,
-					    params->attestationIdMeid);
-		if (params->attestationIdManufacturer.n)
-			asn1_explicit_bytes(ctx, 716,
-					    params->attestationIdManufacturer);
-		if (params->attestationIdModel.n)
-			asn1_explicit_bytes(ctx, 717,
-					    params->attestationIdModel);
-		if (params->vendorPatchLevel)
-			asn1_explicit_int(ctx, 718, params->vendorPatchLevel);
-		if (params->bootPatchLevel)
-			asn1_explicit_int(ctx, 719, params->vendorPatchLevel);
-	}
-	SEQ_END(*ctx);
+	push_tag(ctx, V_SET, set_end - ctx->curr);
+	push_explicit_tag(ctx, tag, set_end - ctx->curr);
 }
 
-/* https://source.android.com/docs/security/features/keystore/attestation */
-static void add_km_extension(struct asn1 *ctx,
-			     const struct km_key_params *params)
+/* KeyMint Extension */
+static void push_km_extension(struct asn1_out *ctx,
+			      const struct km_key_params *params)
 {
-	/* Wrap in OCTET_STRING */
-	SEQ_START(*ctx, V_ASN1_BYTES, SEQ_LARGE)
-	{
-		SEQ_START(*ctx, V_SEQ, SEQ_LARGE)
-		{
-			/* attestationVersion */
-			asn1_int(ctx, 400);
-			/* attestationSecurityLevel */
-			asn1_enum(ctx, KM_SECURITY_STRONGBOX);
-			/* keyMintVersion */
-			asn1_int(ctx, 400);
-			/* keyMintSecurityLevel */
-			asn1_enum(ctx, KM_SECURITY_STRONGBOX);
-
-			asn1_bytes(ctx, V_ASN1_BYTES,
-				   params->attestationChallenge);
-
-			/* A privacy-sensitive device identifier that system
-			 * apps can request at key generation time. If the
-			 * unique ID is not requested, this field is empty.
-			 * The Unique ID is a 128-bit value that identifies the
-			 * device, but only for a limited period of time. The
-			 * value is computed with: HMAC_SHA256(T || C || R, HBK)
-			 */
-			asn1_bytes(ctx, V_ASN1_BYTES, params->uniqueId);
-
-			add_km_enforcements(ctx, params);
-		}
-		SEQ_END(*ctx);
-	}
-	SEQ_END(*ctx);
-}
-
-static void add_cert_extension(struct asn1 *ctx,
-			       const struct km_key_params *params)
-{
-	/* Certificate extension:
-	 * extensions      [3]  EXPLICIT Extensions OPTIONAL
+	/* KeyMint Header Block (14 bytes, forward DER)
+	 * 1. attestationVersion       INTEGER 400 (0x190)
+	 * 2. attestationSecurityLevel ENUM 2 (StrongBox)
+	 * 3. keyMintVersion           INTEGER 400 (0x190)
+	 * 4. keyMintSecurityLevel     ENUM 2 (StrongBox)
 	 */
-	SEQ_START(*ctx, V_ASN1_CCL | 3, SEQ_LARGE)
-	{
-		/* Extensions  ::=  SEQUENCE SIZE (1..MAX) OF Extension */
-		SEQ_START(*ctx, V_SEQ, SEQ_LARGE)
-		{
-			/*
-			 * Extensions ::= SEQUENCE SIZE (1..MAX) OF Extension
-			 * Extension ::= SEQUENCE  {
-			 *   extnID      OBJECT IDENTIFIER,
-			 *   critical    BOOLEAN DEFAULT FALSE,
-			 *   extnValue   OCTET STRING }
-			 */
-			SEQ_START(*ctx, V_SEQ, SEQ_SMALL)
-			{
-				asn1_object(ctx, OID(keyUsage));
-				add_key_purpose(ctx,
-						params->attrs.purpose_flags);
-			}
-			SEQ_END(*ctx);
+	static const uint8_t BLOB_KM_HEADER[] = {
+		0x02, 0x02, 0x01, 0x90, /* INTEGER 400 */
+		0x0a, 0x01, 0x02, /* ENUMERATED 2 */
+		0x02, 0x02, 0x01, 0x90, /* INTEGER 400 */
+		0x0a, 0x01, 0x02 /* ENUMERATED 2 */
+	};
 
-			SEQ_START(*ctx, V_SEQ, SEQ_LARGE)
-			{
-				asn1_object(ctx, OID(keymint));
-				add_km_extension(ctx, params);
-			}
-			SEQ_END(*ctx);
+	uint8_t *seq_end = ctx->curr, *end = ctx->curr, *os_end;
 
-			SEQ_START(*ctx, V_SEQ, SEQ_SMALL)
-			{
-				asn1_object(ctx, OID(strongbox));
-				asn1_bytes(ctx, V_ASN1_BYTES,
-					   SLICE_OBJ(CBOR_strongbox));
-			}
-			SEQ_END(*ctx);
-		}
-		SEQ_END(*ctx);
-	}
-	SEQ_END(*ctx);
+	/* REVERSE: Hardware, Software, UniqueId, Challenge, KMLevel, KMVer,
+	 * AttestLevel, AttestVer
+	 */
+
+	/* HW Enforced Tags > 700 */
+	if (params->bootPatchLevel)
+		push_explicit_int(ctx, 719, params->bootPatchLevel);
+	if (params->vendorPatchLevel)
+		push_explicit_int(ctx, 718, params->vendorPatchLevel);
+	if (params->attestationIdModel.n)
+		push_explicit_bytes(ctx, 717, params->attestationIdModel);
+	if (params->attestationIdManufacturer.n)
+		push_explicit_bytes(ctx, 716,
+				    params->attestationIdManufacturer);
+	if (params->attestationIdMeid.n)
+		push_explicit_bytes(ctx, 715, params->attestationIdMeid);
+	if (params->attestationIdImei.n)
+		push_explicit_bytes(ctx, 714, params->attestationIdImei);
+	if (params->attestationIdSerial.n)
+		push_explicit_bytes(ctx, 713, params->attestationIdSerial);
+	if (params->attestationIdProduct.n)
+		push_explicit_bytes(ctx, 712, params->attestationIdProduct);
+	if (params->attestationIdDevice.n)
+		push_explicit_bytes(ctx, 711, params->attestationIdDevice);
+	if (params->attestationIdBrand.n)
+		push_explicit_bytes(ctx, 710, params->attestationIdBrand);
+	if (params->osPatchLevel)
+		push_explicit_int(ctx, 706, params->osPatchLevel);
+	if (params->osVersion)
+		push_explicit_int(ctx, 705, params->osVersion);
+	push_root_of_trust(ctx, params); /* 704 */
+	push_explicit_int(ctx, 702, params->origin);
+
+	/* Low Tags */
+	if (params->noAuthRequired)
+		push_explicit_null(ctx, 503);
+	if (params->earlyBootOnly)
+		push_explicit_null(ctx, 304);
+	if (params->rollbackResistance)
+		push_explicit_null(ctx, 303);
+	if (params->attrs.curve_id)
+		push_explicit_int(ctx, 10, params->attrs.curve_id);
+
+	/* Digest SET */
+	push_integer_set(ctx, params->attrs.digest_flags, 5);
+
+	if (params->attrs.key_size)
+		push_explicit_int(ctx, 3, params->attrs.key_size);
+	push_explicit_int(ctx, 2, params->attrs.algorithm);
+
+	/* Purpose SET */
+	push_integer_set(ctx, params->attrs.purpose_flags, 1);
+
+	push_tag(ctx, V_SEQ, end - ctx->curr);
+	end = ctx->curr;
+	/* Software Enforced */
+	if (params->moduleHash.n)
+		push_explicit_bytes(ctx, 724, params->moduleHash);
+	if (params->attestationApplicationId.n)
+		push_explicit_bytes(ctx, 709, params->attestationApplicationId);
+	if (params->creationDateTime)
+		push_explicit_int(ctx, 701, params->creationDateTime);
+
+	push_tag(ctx, V_SEQ, end - ctx->curr);
+
+	/* Remaining tags in reverse order */
+
+	/* A privacy-sensitive device identifier that system apps can request at
+	 * key generation time. If the unique ID is not requested, this field is
+	 * empty. The Unique ID is a 128-bit value that identifies the device,
+	 * but only for a limited period of time. The value is computed with:
+	 * HMAC_SHA256(T || C || R, HBK)
+	 */
+	push_bytes_tlv(ctx, V_ASN1_BYTES, params->uniqueId);
+	push_bytes_tlv(ctx, V_ASN1_BYTES, params->attestationChallenge);
+
+	/* OPTIMIZED: Replaces 4 calls (enums/ints) with one memcpy */
+	push_bytes(ctx, BLOB_KM_HEADER, sizeof(BLOB_KM_HEADER));
+
+	push_tag(ctx, V_SEQ, seq_end - ctx->curr);
+
+	/* Wrap entire extension in OCTET STRING */
+	os_end = ctx->curr;
+	/* This function body is the value of the OCTET STRING, so we just
+	 * calculate len. Note: Logic here is slightly recursive in ASN.1
+	 * structure, Extension -> extnValue -> OCTET STRING -> KeyDescription
+	 * SEQUENCE
+	 */
+	push_tag(ctx, V_ASN1_BYTES, seq_end - os_end);
 }
 
-static size_t SB_cert_name(const p256_int *d, const p256_int *pk_x,
-			   const p256_int *pk_y,
-			   const struct km_key_params *params, uint8_t *cert,
-			   const size_t n)
+/* Main Certificate Extensions */
+static void push_extensions(struct asn1_out *ctx,
+			    const struct km_key_params *params)
 {
-	struct asn1 ctx = { cert, 0 };
+	static const uint8_t OID_keyUsage[3] = { 0x55, 0x1D, 0x0F };
+	static const uint8_t OID_keymint[10] = {
+		0x2B, 0x06, 0x01, 0x04, 0x01, 0xD6, 0x79, 0x02, 0x01, 0x11,
+	};
+
+	/**
+	 * Encoding OID: 1.3.6.1.4.1.11129.2.1.30
+	 * The extension value consists of Concise Binary Object Representation
+	 * (CBOR) data that conforms to this Concise Data Definition Language
+	 * (CDDL) schema: {1 : int,       ; certificates issued 4 : string,    ;
+	 * validated attested entity (STRONG_BOX/TEE) } The map is unversioned
+	 * and new optional fields may be added. certs_issued - An approximate
+	 * number of certificates issued to the device in the last 30 days. This
+	 * value can be used as a signal for potential abuse if the value is
+	 * greater than average by some orders of magnitude.
+	 * validated_attested_entity -
+	 * The validated attested entity is a string that describes the type of
+	 * device that was confirmed by the provisioning server to be attested.
+	 * For example, STRONG_BOX or TEE.
+	 * https://source.android.com/docs/security/features/keystore/attestation#provisioninginfo_extension_schema
+	 */
+	static const uint8_t OID_strongbox[10] = {
+		0x2B, 0x06, 0x01, 0x04, 0x01, 0xD6, 0x79, 0x02, 0x01, 0x1e,
+	};
+	static const uint8_t CBOR_strongbox[15] = {
+		CBOR_HDR1(CBOR_MAJOR_MAP, 2),
+		CBOR_HDR1(CBOR_MAJOR_UINT, 1),
+		CBOR_HDR1(CBOR_MAJOR_UINT, 10),
+		CBOR_HDR1(CBOR_MAJOR_UINT, 4),
+		CBOR_HDR1(CBOR_MAJOR_TSTR, 10),
+		'S',
+		'T',
+		'R',
+		'O',
+		'N',
+		'G',
+		'_',
+		'B',
+		'O',
+		'X'
+	};
+
+	uint8_t *seq_end = ctx->curr;
+
+	/*
+	 * Extensions ::= SEQUENCE SIZE (1..MAX) OF Extension
+	 * Extension ::= SEQUENCE  {
+	 *   extnID      OBJECT IDENTIFIER,
+	 *   critical    BOOLEAN DEFAULT FALSE,
+	 *   extnValue   OCTET STRING }
+	 */
+
+	/* 3. StrongBox */
+	{
+		uint8_t *ext_end = ctx->curr;
+
+		push_bytes_tlv(ctx, V_ASN1_BYTES, SLICE_OBJ(CBOR_strongbox));
+		push_bytes_tlv(ctx, V_ASN1_OBJ, SLICE_OBJ(OID_strongbox));
+		push_tag(ctx, V_SEQ, ext_end - ctx->curr);
+	}
+
+	/* 2. KeyMint */
+	{
+		uint8_t *ext_end = ctx->curr;
+
+		push_km_extension(ctx, params);
+		push_bytes_tlv(ctx, V_ASN1_OBJ, SLICE_OBJ(OID_keymint));
+		push_tag(ctx, V_SEQ, ext_end - ctx->curr);
+	}
+
+	/* 1. KeyUsage */
+	{
+		uint8_t *ext_end = ctx->curr;
+
+		push_key_usage(ctx, params->attrs.purpose_flags);
+		push_bytes_tlv(ctx, V_ASN1_OBJ, SLICE_OBJ(OID_keyUsage));
+		push_tag(ctx, V_SEQ, ext_end - ctx->curr);
+	}
+
+	push_tag(ctx, V_SEQ, seq_end - ctx->curr); /* Extensions SEQUENCE */
+	push_explicit_tag(ctx, 3, seq_end - ctx->curr); /* [3] EXPLICIT */
+}
+
+/* -------------------------------------------------------------------------
+ * Top Level Logic
+ * -------------------------------------------------------------------------
+ */
+
+/* Forward writer helper for signature */
+static size_t asn1_write_sig_forward(uint8_t *buf, const p256_int *r,
+				     const p256_int *s)
+{
+	/* Use a temporary backward writer for the SEQUENCE { INT r, INT s } */
+	struct asn1_out ctx = { .start = buf, .curr = buf + 80 };
+	uint8_t *end = ctx.curr;
+
+	/* S */
+	uint8_t bin[32];
+	size_t total;
+
+	p256_to_bin(s, bin);
+	push_be_int(&ctx, bin, sizeof(bin));
+
+	/* R */
+	p256_to_bin(r, bin);
+
+	push_be_int(&ctx, bin, sizeof(bin));
+	push_tag(&ctx, V_SEQ, end - ctx.curr);
+
+	total = end - ctx.curr;
+	memmove(buf, ctx.curr, total);
+	return total;
+}
+
+/* Validates that the slice contains exactly one valid DER ASN.1 SEQUENCE.
+ * Returns true if valid, false otherwise.
+ */
+static bool is_valid_seq(const struct slice *s)
+{
+	const uint8_t *p = (const uint8_t *)s->p;
+	size_t len_bytes, len, total_len;
+
+	/* 1. Basic Header Check */
+	if (!p || s->n < 2)
+		return false;
+	if (p[0] != V_SEQ)
+		return false; /* Must be 0x30 */
+
+	/* 2. Decode Length */
+	if (p[1] < 0x80) {
+		/* Short form */
+		len = p[1];
+		total_len = 2 + len;
+	} else {
+		/* Long form */
+		len_bytes = p[1] & 0x7F;
+
+		/* Standard allows up to 127 bytes, but we limit to 3 */
+		if (len_bytes == 0 || len_bytes > 3)
+			return false;
+		if (s->n < 2 + len_bytes)
+			return false; /* Header incomplete */
+
+		len = 0;
+		for (size_t i = 0; i < len_bytes; i++)
+			len = (len << 8) | p[2 + i];
+
+		total_len = 2 + len_bytes + len;
+	}
+
+	/* 3. Verify Exact Match */
+	/* The slice size must match exactly the decoded ASN.1 length */
+	return (s->n == total_len);
+}
+
+size_t SB_cert_name(const p256_int *d, const p256_int *pk_x,
+		    const p256_int *pk_y, const struct km_key_params *params,
+		    uint8_t *cert_buf, size_t cert_size)
+{
+	/* X.509 Version 3 (5 bytes)
+	 * [0] EXPLICIT -> INTEGER 2
+	 */
+	static const uint8_t BLOB_X509_VER[] = { 0xA0, 0x03, 0x02, 0x01, 0x02 };
+
+	/* Validity: 2000-01-01 to 2099-12-31 (36 bytes)
+	 * SEQUENCE { GeneralizedTime, GeneralizedTime }
+	 */
+	static const uint8_t BLOB_VALIDITY[] = {
+		/* SEQUENCE (34 bytes) */
+		0x30, 0x22, 0x18, 0x0F,
+		/* GeneralizedTime Not Before */
+		'2', '0', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0',
+		'0', 'Z', 0x18, 0x0F,
+		/* GeneralizedTime Not After*/
+		'2', '0', '9', '9', '1', '2', '3', '1', '2', '3', '5', '9', '5',
+		'9', 'Z'
+	};
+
+	/* AlgorithmID: ecdsa-with-SHA256 (12 bytes)
+	 * SEQUENCE { OID }
+	 * BIT STRING, [length (skipped],  Value: Unused bits (0)
+	 */
+	static const uint8_t BLOB_ALG_ID_SIG[] = { 0x30, 0x0A, 0x06, 0x08,
+						   0x2A, 0x86, 0x48, 0xCE,
+						   0x3D, 0x04, 0x03, 0x02 };
+
+	/* SPKI Algorithm: ecPublicKey / prime256v1 (21 bytes)
+	 * SEQUENCE { OID ecPublicKey, OID prime256v1 }
+	 */
+	static const uint8_t BLOB_ALG_ID_SPKI[] = {
+		0x30, 0x13, 0x06, 0x07, 0x2A, 0x86,
+		0x48, 0xCE, 0x3D, 0x02, 0x01, /* ecPublicKey */
+		0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE,
+		0x3D, 0x03, 0x01, 0x07 /* prime256v1 */
+	};
+
+	/* Reserve size for the signature */
+	const size_t SIG_RESERVE = 128;
+
+	/* Rough length (with some reserve) of fixed parts of the certificate */
+	const size_t CERT_SIZE_FIXED = 532;
+
+	/* Size of constant length fields from start of certificate to SPKI */
+	const size_t START_TO_SPKI = 150;
+
+	uint8_t *tbs_start_ptr, *sig_ptr, *tbs_end_ptr, *len_ptr;
+	size_t tbs_len;
 	struct sha256_ctx sha;
 	p256_int h, r, s;
 	struct drbg_ctx drbg;
-	enum dcrypto_result result;
-	size_t total_slice_len = 0;
+	size_t final_size, sig_seq_len, total_content_len;
+	const struct sha256_digest *digest;
 
-	for (size_t i = KM_SLICE_TAG_CERT_START; i < ARRAY_SIZE(slice_tags);
-	     i++) {
-		struct slice *slice = (struct slice *)(((uint8_t *)params) +
-						       slice_tags[i].offset);
-
-		total_slice_len += slice->n;
-	}
-
-	/* Rough check that total variable inputs + known fixed sized fields
-	 * would fit into available space. It is not exact and adds small
-	 * buffer to account for variable length ASN.1. */
-	if (total_slice_len + 532 > n)
-		return 0;
-
-	/**
+	/* STRATEGY:
+	 * 1. Reserve SIG_RESERVE bytes at end for Signature.
+	 * 2. Generate TBS backwards from (cert_size - SIG_RESERVE).
+	 * 3. Hash TBS.
+	 * 4. Sign.
+	 * 5. Write Signature forward into the Gap.
+	 * 6. Wrap everything in outer SEQUENCE.
+	 *
 	 * RFC 5280: https://datatracker.ietf.org/doc/html/rfc5280
 	 * Certificate  ::=  SEQUENCE  {
 	 * tbsCertificate       TBSCertificate,
 	 * signatureAlgorithm   AlgorithmIdentifier,
 	 * signatureValue       BIT STRING  }
 	 */
-	SEQ_START(ctx, V_SEQ, SEQ_LARGE)
-	{ /* outer seq */
-		/*
-		 * Grab current pointer to data to hash later.
-		 * Note this will fail if cert body + cert sign is less
-		 * than 256 bytes (SEQ_MEDIUM) -- not likely.
-		 */
-		uint8_t *body = ctx.p + ctx.n;
 
-		/**
-		 * TBSCertificate  ::=  SEQUENCE  {
-		 *   version         [0]  EXPLICIT Version DEFAULT v1,
-		 *   serialNumber         CertificateSerialNumber,
-		 *   signature            AlgorithmIdentifier,
-		 *   issuer               Name,
-		 *   validity             Validity,
-		 *   subject              Name,
-		 *   subjectPublicKeyInfo SubjectPublicKeyInfo,
-		 *   issuerUniqueID  [1]  IMPLICIT UniqueIdentifier OPTIONAL,
-		 *       -- If present, version MUST be v2 or v3
-		 *   subjectUniqueID [2]  IMPLICIT UniqueIdentifier OPTIONAL,
-		 *       -- If present, version MUST be v2 or v3
-		 *   extensions      [3]  EXPLICIT Extensions OPTIONAL
-		 *       -- If present, version MUST be v3
-		 * }
-		 */
-		SEQ_START(ctx, V_SEQ, SEQ_LARGE)
-		{
-			/* X509 v3 */
-			SEQ_START(ctx, 0xa0, SEQ_SMALL)
-			{
-				asn1_int(&ctx, 2);
-			}
-			SEQ_END(ctx);
+	uint8_t *gap_start = cert_buf + cert_size - SIG_RESERVE;
+	struct asn1_out ctx = { .start = cert_buf, .curr = gap_start };
+	size_t total_slice_len = 0;
 
-			/* Serial number */
-			if (params->certificate_serial.n)
-				asn1_be_int(&ctx, V_ASN1_INT,
-					    params->certificate_serial.p,
-					    params->certificate_serial.n);
-			else
-				asn1_int(&ctx, 1);
-
-			/* Signature algorithm
-			 * AlgorithmIdentifier  ::=  SEQUENCE  {
-			 * algorithm               OBJECT IDENTIFIER,
-			 * parameters              ANY DEFINED BY algorithm
-			 * OPTIONAL  }
-			 */
-			SEQ_START(ctx, V_SEQ, SEQ_SMALL)
-			{
-				asn1_object(&ctx, OID(ecdsa_with_SHA256));
-			}
-			SEQ_END(ctx);
-
-			/* Issuer: Same as the subject field of the batch
-			 * attestation key.
-			 */
-			if (!verify_and_add_seq(&ctx,
-						&params->certificate_issuer))
-				return 0;
-
-			/* Expiry */
-			SEQ_START(ctx, V_SEQ, SEQ_SMALL)
-			{
-				asn1_string(&ctx, V_ASN1_TIME,
-					    "20000101000000Z");
-				asn1_string(&ctx, V_ASN1_TIME,
-					    "20991231235959Z");
-			}
-			SEQ_END(ctx);
-
-			/* Subject */
-			if (!verify_and_add_seq(&ctx,
-						&params->certificate_subject))
-				return 0;
-
-			/* Subject pk */
-			SEQ_START(ctx, V_SEQ, SEQ_SMALL)
-			{
-				/* pk parameters */
-				SEQ_START(ctx, V_SEQ, SEQ_SMALL)
-				{
-					asn1_object(&ctx, OID(id_ecPublicKey));
-					asn1_object(&ctx, OID(prime256v1));
-				}
-				SEQ_END(ctx);
-				/* pk bits */
-				SEQ_START(ctx, V_BITS, SEQ_SMALL)
-				{
-					/* No unused bit at the end */
-					asn1_tag(&ctx, 0);
-					asn1_pub(&ctx, pk_x, pk_y);
-				}
-				SEQ_END(ctx);
-			}
-			SEQ_END(ctx);
-
-			add_cert_extension(&ctx, params);
-		}
-		SEQ_END(ctx); /* Cert body */
-
-		/* Sign all of cert body */
-		SHA256_sw_init(&sha);
-		SHA256_sw_update(&sha, body, (ctx.p + ctx.n) - body);
-		p256_from_bin(SHA256_sw_final(&sha)->b8, &h);
-		hmac_drbg_init_rfc6979(&drbg, d, &h);
-		result = dcrypto_p256_ecdsa_sign(&drbg, d, &h, &r, &s);
-		drbg_exit(&drbg);
-		if (result != DCRYPTO_OK)
-			return 0;
-
-		/* Append X509 signature */
-		SEQ_START(ctx, V_SEQ, SEQ_SMALL);
-		asn1_object(&ctx, OID(ecdsa_with_SHA256));
-		SEQ_END(ctx);
-		SEQ_START(ctx, V_BITS, SEQ_SMALL)
-		{
-			/* Number of unused bits at the end (0-7). */
-			asn1_tag(&ctx, 0);
-			asn1_sig(&ctx, &r, &s);
-		}
-		SEQ_END(ctx);
+	/* Compute the length of all the variable input fields. */
+	for (size_t i = KM_SLICE_TAG_CERT_START; i < ARRAY_SIZE(slice_tags);
+	     i++) {
+		struct slice *slice = (struct slice *)(((uint8_t *)params) +
+						       slice_tags[i].offset);
+		total_slice_len += slice->n;
 	}
-	SEQ_END(ctx); /* end of outer seq */
 
-	return ctx.n;
+	/* Rough check that total variable inputs + known fixed sized fields
+	 * would fit into available space. It is not exact and adds small
+	 * buffer to account for variable length ASN.1. */
+	if (total_slice_len + CERT_SIZE_FIXED > cert_size)
+		return 0;
+	/* SECURITY: Verify input is a valid SEQUENCE before including */
+	if (!is_valid_seq(&params->certificate_subject))
+		return 0;
+	if (!is_valid_seq(&params->certificate_issuer))
+		return 0;
+
+	/**
+	 * --- 1. GENERATE TBS (Backward) ---
+	 *
+	 * TBSCertificate  ::=  SEQUENCE  {
+	 *   version         [0]  EXPLICIT Version DEFAULT v1,
+	 *   serialNumber         CertificateSerialNumber,
+	 *   signature            AlgorithmIdentifier,
+	 *   issuer               Name,
+	 *   validity             Validity,
+	 *   subject              Name,
+	 *   subjectPublicKeyInfo SubjectPublicKeyInfo,
+	 *   issuerUniqueID  [1]  IMPLICIT UniqueIdentifier OPTIONAL,
+	 *       -- If present, version MUST be v2 or v3
+	 *   subjectUniqueID [2]  IMPLICIT UniqueIdentifier OPTIONAL,
+	 *       -- If present, version MUST be v2 or v3
+	 *   extensions      [3]  EXPLICIT Extensions OPTIONAL
+	 *       -- If present, version MUST be v3
+	 * }
+	 */
+
+	tbs_end_ptr = ctx.curr;
+
+	/* 7. Extensions */
+	push_extensions(&ctx, params);
+
+	/* Security check that we didn't suddenly produced more than expected */
+	if (ctx.start + START_TO_SPKI + params->certificate_subject.n +
+		    params->certificate_issuer.n +
+		    params->certificate_serial.n >
+	    ctx.curr)
+		return 0;
+
+	/* 6. Subject Public Key Info */
+	{
+		uint8_t *spki_end = ctx.curr;
+		/* BIT STRING { 0x00, pubKey } */
+		uint8_t *bs_end = ctx.curr;
+		uint8_t pk_bin[64];
+
+		p256_to_bin(pk_x, pk_bin);
+		p256_to_bin(pk_y, pk_bin + 32);
+		push_bytes(&ctx, pk_bin, 64);
+		push_byte(&ctx, 0x04); /* Uncompressed */
+		push_byte(&ctx, 0x00); /* Unused bits */
+		push_tag(&ctx, V_ASN1_BIT_STRING, bs_end - ctx.curr);
+
+		/* OPTIMIZED: Algorithm Identifier */
+		push_bytes(&ctx, BLOB_ALG_ID_SPKI, sizeof(BLOB_ALG_ID_SPKI));
+
+		push_tag(&ctx, V_SEQ, spki_end - ctx.curr);
+	}
+
+	/* 5. Subject Name */
+	/* Assumes params->certificate_subject is a valid SEQUENCE */
+	push_bytes(&ctx, params->certificate_subject.p,
+		   params->certificate_subject.n);
+
+	/* 4. OPTIMIZED: Validity */
+	push_bytes(&ctx, BLOB_VALIDITY, sizeof(BLOB_VALIDITY));
+
+	/* 3. Issuer Name */
+	push_bytes(&ctx, params->certificate_issuer.p,
+		   params->certificate_issuer.n);
+
+	/* 2. OPTIMIZED: Signature Algorithm (Inner) */
+	push_bytes(&ctx, BLOB_ALG_ID_SIG, sizeof(BLOB_ALG_ID_SIG));
+
+	/* 1. Serial Number */
+	push_bytes_tlv(&ctx, V_ASN1_INT, params->certificate_serial);
+
+	/* 0. OPTIMIZED: Version [0] EXPLICIT 2 */
+	push_bytes(&ctx, BLOB_X509_VER, sizeof(BLOB_X509_VER));
+
+	/* Wrap TBS */
+	push_tag(&ctx, V_SEQ, tbs_end_ptr - ctx.curr);
+
+	tbs_start_ptr = ctx.curr;
+	tbs_len = tbs_end_ptr - tbs_start_ptr;
+
+	/* --- 2. HASH TBS --- */
+
+	SHA256_sw_init(&sha);
+	SHA256_sw_update(&sha, tbs_start_ptr, tbs_len);
+	digest = SHA256_sw_final(&sha);
+	p256_from_bin(digest->b8, &h);
+
+	/* --- 3. SIGN --- */
+	hmac_drbg_init_rfc6979(&drbg, d, &h);
+	if (dcrypto_p256_ecdsa_sign(&drbg, d, &h, &r, &s) != DCRYPTO_OK)
+		return 0;
+
+	/* --- 4. GENERATE SIGNATURE (Forward into Gap) ---
+	 * Layout in gap:
+	 * 1. AlgorithmIdentifier (SEQ)
+	 * 2. BIT STRING (SEQ { r, s })
+	 */
+	sig_ptr = gap_start;
+
+	/* Write Algo ID (re-use OID bytes manually for forward write to save
+	 * code).
+	 * SEQ (2+8) { OID (8) ... } -> 12 bytes total approx
+	 * Hardcoding the AlgoId copy for simplicity/speed in forward direction
+	 */
+	memcpy(sig_ptr, BLOB_ALG_ID_SIG, sizeof(BLOB_ALG_ID_SIG));
+	sig_ptr += sizeof(BLOB_ALG_ID_SIG);
+
+	/* Write Signature BIT STRING */
+	*sig_ptr++ = 0x03; /* Tag: BIT STRING */
+	len_ptr = sig_ptr++; /* Save pointer to Length byte */
+
+	/* Value: Unused bits (0) - Required for BIT STRING    */
+	*sig_ptr++ = 0x00;
+
+	/* Generate inner sequence {r, s} forward */
+	sig_seq_len = asn1_write_sig_forward(sig_ptr, &r, &s);
+
+	/* Update Length: Sequence length+1 byte for the "unused bits" prefix */
+	*len_ptr = sig_seq_len + 1;
+	sig_ptr += sig_seq_len;
+	/* --- 5. WRAP EVERYTHING --- */
+	total_content_len = tbs_len + (sig_ptr - gap_start);
+
+	/* We need to prepend the Outer SEQUENCE Tag/Len to tbs_start_ptr.
+	 * Fortunately, ctx.curr is currently at tbs_start_ptr. We can just
+	 * push!
+	 */
+	push_tag(&ctx, V_SEQ, total_content_len);
+
+	/* Move the finalized block to start of buffer if desired,
+	 * but currently it sits at ctx.curr.
+	 * Return the actual size, caller handles the offset.
+	 * Or memmove to start 0 to be nice C-style API.
+	 */
+	final_size = (sig_ptr - ctx.curr);
+	memmove(cert_buf, ctx.curr, final_size);
+
+	return final_size;
 }
