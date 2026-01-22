@@ -1,1 +1,0 @@
-../npcx/otp_key.c
