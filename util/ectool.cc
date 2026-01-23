@@ -12839,6 +12839,35 @@ static int cmd_s0ix_counter(int argc, char *argv[])
 	return 0;
 }
 
+static int cmd_ish_i2c_scan(int argc, char *argv[])
+{
+	struct ec_response_ish_i2c_scan r;
+	int cnt = 0;
+	int rv;
+
+	rv = ec_command(EC_CMD_ISH_I2C_SCAN, 0, 0, 0, &r, sizeof(r));
+	if (rv < 0)
+		return rv;
+
+	printf("     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\n");
+	for (uint8_t i = 0; i < MAX_ISH_I2C_SCAN_ADRESSES;
+	     i += ISH_I2C_SCAN_COLS) {
+		printf("%02x: ", i);
+		for (uint8_t j = 0; j < ISH_I2C_SCAN_COLS; j++) {
+			if (r.scan[i / ISH_I2C_SCAN_COLS] & (1 << j)) {
+				printf("%02x ", i + j);
+				++cnt;
+			} else {
+				printf("-- ");
+			}
+		}
+		printf("\n");
+	}
+	printf("%d devices found\n", cnt);
+
+	return 0;
+}
+
 /* NULL-terminated list of commands. Please keep sorted. */
 const struct command commands[] = {
 	{ "adcread", cmd_adc_read, "<channel>\n\tRead an ADC channel." },
@@ -12987,6 +13016,8 @@ const struct command commands[] = {
 	  "\tGet info about USB type-C accessory attached to port." },
 	{ "inventory", cmd_inventory,
 	  "\n\tReturn the list of supported features." },
+	{ "ishi2cscan", cmd_ish_i2c_scan,
+	  "\n\tScan for devices connected to ISH I2C bus" },
 	{ "kbfactorytest", cmd_keyboard_factory_test,
 	  "\n\tScan out keyboard if any pins are shorted." },
 	{ "kbgetconfig", cmd_keyboard_get_config,
