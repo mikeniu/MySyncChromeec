@@ -436,4 +436,7 @@ config LINK_TEST_SUITE_RT3645
 	help
 	  Verifies functionality of rt3645 IMVP driver
 
+config LINK_TEST_SUITE_I2C_SCAN
+	bool "Link and test the ish host command i2c_scan file"
+
 source "Kconfig.zephyr"
