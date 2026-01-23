@@ -686,6 +686,16 @@ tests:
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
+  drivers.i2c:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_I2C_SCAN=y
+    - CONFIG_PLATFORM_EC_SYSTEM_UNLOCKED=y
+    extra_conf_files:
+    - prj.conf
+    - i2c/prj.conf
+    extra_dtc_overlay_files:
+    - ./boards/native_sim.overlay
+    - ./i2c/i2c.dts
   drivers.icm42607:
     extra_configs:
     - CONFIG_PLATFORM_EC_ACCELGYRO_BMI160=n

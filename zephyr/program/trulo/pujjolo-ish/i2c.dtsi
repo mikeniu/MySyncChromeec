@@ -4,6 +4,10 @@
  */
 
 / {
+	chosen {
+		hc_i2c = &i2c0;
+	};
+
 	named-i2c-ports {
 		compatible = "named-i2c-ports";
 

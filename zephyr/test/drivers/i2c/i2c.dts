@@ -1,0 +1,46 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	chosen {
+		hc_i2c = &i2c4;
+	};
+
+	named-i2c-ports {
+		compatible = "named-i2c-ports";
+
+		named_i2c4: i2c4 {
+			i2c-port = <&i2c4>;
+			enum-names = "I2C_PORT_ISH_SENSOR";
+		};
+	};
+
+	i2c4: i2c@700 {
+		status = "okay";
+		compatible = "zephyr,i2c-emul-controller";
+		clock-frequency = <I2C_BITRATE_STANDARD>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0x700 4>;
+
+		bma_emul_ish: bma@19 {
+			  compatible = "zephyr,bma255-emul";
+			  reg = <0x19>;
+		};
+
+		accel_ish_1:  bmi_1@45 {
+			compatible = "zephyr,bmi-emul";
+			reg = <0x45>;
+			device-model = "BMI_EMUL_260";
+		};
+
+		accel_ish_2:  bmi_1@67 {
+			compatible = "zephyr,bmi-emul";
+			reg = <0x67>;
+			device-model = "BMI_EMUL_260";
+		};
+
+	};
+};
