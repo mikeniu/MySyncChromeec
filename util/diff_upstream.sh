@@ -17,15 +17,9 @@ declare -A repos=(
   ['android/platform/system/chre_internal']='https://chrome-internal.googlesource.com/chromeos/third_party/chre upstream/main'
   # pigweed-main-copybot-downstream.ini
   ['pigweed']='https://pigweed.googlesource.com/pigweed/pigweed main'
-  # zephyr-cmsis_6-copybot-downstream.ini
-  ['zephyr/cmsis_6']='https://github.com/zephyrproject-rtos/CMSIS_6.git main'
-  # zephyr-main-copybot-downstream.ini
-  ['zephyr/main']='https://github.com/zephyrproject-rtos/zephyr.git main'
-  # zephyr-nanopb-copybot-downstream.ini
-  ['zephyr/nanopb']='https://github.com/zephyrproject-rtos/nanopb.git zephyr'
-  # zephyr-picolibc-copybot-downstream.ini
-  ['zephyr/picolibc']='https://github.com/zephyrproject-rtos/picolibc.git main'
-  # zephyr-project-cmsis-copybot-downstream.ini
+  # config/zephyr/main.ini
+  ['zephyrproject/zephyr']='https://github.com/zephyrproject-rtos/zephyr.git main'
+  # config/zephyr/project-cmsis.ini
   ['zephyrproject/modules/hal/cmsis']='https://github.com/zephyrproject-rtos/cmsis.git master'
   # zephyr-project-egis_module-copybot-downstream.ini
   ['zephyrproject/modules/hal/egis_module']='https://github.com/EgisMCU/egis_module.git main'
@@ -39,16 +33,16 @@ declare -A repos=(
 
 # All expected diffs (FROMPULLs)
 declare -A expected_diffs=(
-  # b/389761200 4919881523df2ef5dae9cacebdeb3e72936ec793
+  # b/389761200 17452ff89d458b4201bc1ce2debbb30703f45c0d
   #   Revert "drivers: watchdog: stm32 iwdg: explicit single channel"
-  # b/460502081 69c7fccd5e707b3f016d0c4efd536791371ecb15
+  # b/460502081 97b8c4eef6a738f22120cc99448317245151de45
   #   FROMPULL: kernel: Add Kconfig option to disable LTO for kernel sources
-  # b/460504453 1797ed0688a1b226d9ea861bbb3675c1bd7bb650
+  # b/460504453 2bf08236a2a731e8a764d3b2265f0b533bf7ec95
   #   FROMPULL: soc: it8xxx2: Select KERNEL_NO_LTO only when LTO is enabled
-  ['zephyr/main']="\
-    4919881523df2ef5dae9cacebdeb3e72936ec793 \
-    69c7fccd5e707b3f016d0c4efd536791371ecb15 \
-    1797ed0688a1b226d9ea861bbb3675c1bd7bb650"
+  ['zephyrproject/zephyr']="\
+    17452ff89d458b4201bc1ce2debbb30703f45c0d \
+    97b8c4eef6a738f22120cc99448317245151de45 \
+    2bf08236a2a731e8a764d3b2265f0b533bf7ec95"
 )
 
 function die() {
