@@ -65,7 +65,7 @@
 			temp-host-release-high = <65>;
 			sensor = <&temp_ddr>;
 		};
-		skin {
+		sensor_skin: skin {
 			temp-fan-off = <15>;
 			temp-fan-max = <50>;
 			temp-host-high = <75>;
