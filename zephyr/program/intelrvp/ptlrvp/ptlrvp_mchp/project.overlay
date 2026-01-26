@@ -53,6 +53,27 @@
 		wp-gpios = <MCHP_GPIO_DECODE_076 GPIO_ACTIVE_LOW>;
 		wp-ex-gpios = <MCHP_GPIO_DECODE_056 GPIO_ACTIVE_LOW>;
 	};
+
+	dtt: dtt-sensors {
+		compatible ="intel,dtt-sensors";
+		interface = <&ec_peci>;
+		skin-temp0 {
+			type = "TEMP_SKIN";
+			sensor = <&sensor_skin>;
+			target = <40>;
+			gain = <2>;
+			min-perf-level = <125>;
+			period-s0 = <15000>;
+			period-s5 = <10000>;
+		};
+	};
+
+};
+
+&espi0 {
+	ec_peci: espi_peci {
+		compatible = "intel,espi-peci";
+	};
 };
 
 &symcr {
@@ -78,3 +99,5 @@
 &cros_imvp{
 		enable-gpios = <MCHP_GPIO_DECODE_226 GPIO_ACTIVE_HIGH>;
 };
+
+/delete-node/ &peci0;
