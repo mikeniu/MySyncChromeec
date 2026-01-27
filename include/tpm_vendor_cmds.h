@@ -220,6 +220,9 @@ enum vendor_cmd_cc {
 	/* Returns info to identify the specific GSC chip type. */
 	VENDOR_CC_GET_CHIP_ID = 75,
 
+	/* Get/Set SPI drive setting. */
+	VENDOR_CC_SPI_DRIVE = 82,
+
 	LAST_VENDOR_COMMAND = 65535,
 };
 
