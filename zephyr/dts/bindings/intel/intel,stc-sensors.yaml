@@ -1,0 +1,53 @@
+# Copyright (c) 2026
+# SPDX-License-Identifier: Apache-2.0
+
+description: Intel STC (Skin Temperature Control) sensors configuration
+
+compatible: "intel,stc-sensors"
+
+include: base.yaml
+
+properties:
+  interface:
+    type: phandle
+    required: true
+    description: |
+      Phandle to the PECI interface controller used to communicate with sensors.
+      Example: interface = &ec_peci;
+
+child-binding:
+  description: |
+    A STC sensor channel configuration. Each child node represents one thermal
+    channel (e.g., skin temperature sensor).
+  properties:
+    sensor:
+      type: phandle
+      required: true
+      description: |
+        Phandle to the underlying sensor device (e.g., an ADC, thermal sensor,
+        or virtual sensor node).
+
+    target:
+      type: int
+      required: true
+      description: Target temperature threshold (unit defined by the consumer, typically °C).
+
+    gain:
+      type: int
+      required: true
+      description: Gain factor used in STC control loop.
+
+    min-perf-level:
+      type: int
+      required: true
+      description: Minimum performance level to maintain.
+
+    period-s0:
+      type: int
+      required: true
+      description: Polling/control period in milliseconds for S0 (active) state.
+
+    period-s5:
+      type: int
+      required: true
+      description: Polling/control period in milliseconds for S5 (soft-off) state.
