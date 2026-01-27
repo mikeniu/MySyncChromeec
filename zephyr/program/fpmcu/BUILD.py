@@ -135,6 +135,11 @@ def register_et171_project(
 sanok = register_et171_project("sanok")
 assert_rw_fwid_DO_NOT_EDIT(project_name="sanok", addr=0x42104)
 
+# The address of RW_FWID is hardcoded in RO. You need to have REALLY
+# good reason to change it.
+srebrna = register_et171_project("srebrna")
+assert_rw_fwid_DO_NOT_EDIT(project_name="srebrna", addr=0x42104)
+
 niedzica = register_fpmcu_variant(
     project_name="niedzica",
     zephyr_board="32f967_dv",
