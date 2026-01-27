@@ -642,6 +642,26 @@ static const struct option_container cmd_line_options[] = {
 	  "in milliseconds" },
 	{ { "skip_bid_check", no_argument, &skip_bid_check, 1 },
 	  "Skips board id check and sends image to device." },
+<<<<<<< HEAD   (ee52149d2a01f50a039166de527ad182698feff7 boot_param: add stage2 fields for CfgDescr)
+||||||| BASE   (b1408be67f05d96966147cb1eee18861c153337f gsctool: add missing ti50 vendor commands)
+	{ { "device_ids", required_argument, NULL, 2 },
+	  "Get the device IDs "
+	  "[get_scratch|get_info|commit|delete_scratch|[id_type:value]" },
+	{ { "strongbox", required_argument, NULL, 3 },
+	  "[enable|disable]%Control strongbox" },
+	{ { "download_owner_config", no_argument, NULL, 4 },
+	  "Read RW owner config into a file, Opentitan only" },
+=======
+	{ { "device_ids", required_argument, NULL, 2 },
+	  "Get the device IDs "
+	  "[get_scratch|get_info|commit|delete_scratch|[id_type:value]" },
+	{ { "strongbox", required_argument, NULL, 3 },
+	  "[enable|disable]%Control strongbox" },
+	{ { "download_owner_config", no_argument, NULL, 4 },
+	  "Read RW owner config into a file, Opentitan only" },
+	{ { "spi_drive", optional_argument, NULL, 5 },
+	  "[spi_drive_setting]%Gets/sets spi_drive" },
+>>>>>>> CHANGE (999a9c433d574c6280b88d04b897e350b4cfea09 gsctool: add VENDOR_CC_SPI_DRIVE support)
 };
 
 /* Helper to print debug messages when verbose flag is specified. */
@@ -4041,6 +4061,49 @@ static void process_sn_inc_rma(struct transfer_descriptor *td, uint8_t arg)
 	}
 }
 
+/* Get/Set the SPI drive value. */
+static int process_spi_drive(struct transfer_descriptor *td, char *arg)
+{
+	char *e;
+	uint8_t drive = 0;
+	size_t expected_response_size = 0;
+	int message_size = 0;
+	int rv;
+	uint8_t spi_drive_response;
+	size_t response_size = sizeof(spi_drive_response);
+
+	if (arg) {
+		drive = strtoul(arg, &e, 10);
+		if (*e) {
+			fprintf(stderr, "invalid spi drive value \"%s\"\n",
+				arg);
+			return update_error;
+		}
+		expected_response_size = 0;
+		message_size = sizeof(drive);
+	} else {
+		expected_response_size = 1;
+		message_size = 0;
+	}
+
+	rv = send_vendor_command(td, VENDOR_CC_SPI_DRIVE, &drive, message_size,
+				 &spi_drive_response, &response_size);
+	if (rv) {
+		fprintf(stderr, "Error %d while sending vendor command\n", rv);
+		return update_error;
+	}
+
+	if (response_size != expected_response_size) {
+		fprintf(stderr, "Unexpected spi drive response");
+		exit(update_error);
+	}
+	if (response_size == 0)
+		return 0;
+	print_machine_output("SPI_DRIVE", "%u", spi_drive_response);
+	return 0;
+}
+
+
 /* Get/Set the primary seed of the info1 manufacture state. */
 static int process_endorsement_seed(struct transfer_descriptor *td,
 				    const char *endorsement_seed_str)
@@ -5127,6 +5190,8 @@ int main(int argc, char *argv[])
 	uint8_t sn_bits_arg[SN_BITS_SIZE];
 	int sn_inc_rma = 0;
 	uint8_t sn_inc_rma_arg = 0;
+	char *spi_drive_arg = NULL;
+	bool spi_drive = false;
 	int erase_ap_ro_hash = 0;
 	int set_capability = 0;
 	const char *capability_parameter = "";
@@ -5186,6 +5251,48 @@ int main(int argc, char *argv[])
 		if (check_boolean(omap, i))
 			continue;
 		switch (i) {
+<<<<<<< HEAD   (ee52149d2a01f50a039166de527ad182698feff7 boot_param: add stage2 fields for CfgDescr)
+||||||| BASE   (b1408be67f05d96966147cb1eee18861c153337f gsctool: add missing ti50 vendor commands)
+		case 2:
+			parse_device_ids = true;
+			device_ids_arg = optarg;
+			break;
+		case 3:
+			set_strongbox = true;
+			if (!strcasecmp(optarg, "enable")) {
+				set_strongbox_arg = 1;
+			} else if (!strcasecmp(optarg, "disable")) {
+				set_strongbox_arg = 0;
+			} else {
+				fprintf(stderr,
+					"Invalid strongbox argument: \"%s\"\n",
+					optarg);
+				errorcnt++;
+			}
+			break;
+=======
+		case 2:
+			parse_device_ids = true;
+			device_ids_arg = optarg;
+			break;
+		case 3:
+			set_strongbox = true;
+			if (!strcasecmp(optarg, "enable")) {
+				set_strongbox_arg = 1;
+			} else if (!strcasecmp(optarg, "disable")) {
+				set_strongbox_arg = 0;
+			} else {
+				fprintf(stderr,
+					"Invalid strongbox argument: \"%s\"\n",
+					optarg);
+				errorcnt++;
+			}
+			break;
+		case 5:
+			spi_drive_arg = optarg;
+			spi_drive = true;
+			break;
+>>>>>>> CHANGE (999a9c433d574c6280b88d04b897e350b4cfea09 gsctool: add VENDOR_CC_SPI_DRIVE support)
 		case 'A':
 			get_apro_hash = 1;
 			break;
@@ -5483,7 +5590,15 @@ int main(int argc, char *argv[])
 	    !show_fw_ver && !sn_bits && !sn_inc_rma && !start_apro_verify &&
 	    !openbox_desc_file && !tstamp && !tpm_mode && (wp == WP_NONE) &&
 	    !get_chassis_open && !get_dev_ids && !get_aprov_reset_counts &&
+<<<<<<< HEAD   (ee52149d2a01f50a039166de527ad182698feff7 boot_param: add stage2 fields for CfgDescr)
 	    !upload_owner_config) {
+||||||| BASE   (b1408be67f05d96966147cb1eee18861c153337f gsctool: add missing ti50 vendor commands)
+	    !upload_owner_config && !parse_device_ids && !set_strongbox &&
+	    !download_owner_config) {
+=======
+	    !upload_owner_config && !parse_device_ids && !set_strongbox &&
+	    !download_owner_config && !spi_drive) {
+>>>>>>> CHANGE (999a9c433d574c6280b88d04b897e350b4cfea09 gsctool: add VENDOR_CC_SPI_DRIVE support)
 		num_images = argc - optind;
 		if (num_images <= 0) {
 			fprintf(stderr,
@@ -5652,6 +5767,34 @@ int main(int argc, char *argv[])
 	if (sn_inc_rma)
 		process_sn_inc_rma(&td, sn_inc_rma_arg);
 
+<<<<<<< HEAD   (ee52149d2a01f50a039166de527ad182698feff7 boot_param: add stage2 fields for CfgDescr)
+||||||| BASE   (b1408be67f05d96966147cb1eee18861c153337f gsctool: add missing ti50 vendor commands)
+	if (set_strongbox) {
+		if (is_ti50_device()) {
+			printf("set strongbox not supported on Ti50\n");
+			exit(1);
+		}
+		exit(process_set_strongbox(&td, set_strongbox_arg));
+	}
+
+=======
+	if (spi_drive) {
+		if (!is_ti50_device()) {
+			printf("spi_drive not supported on Cr50\n");
+			exit(1);
+		}
+		exit(process_spi_drive(&td, spi_drive_arg));
+	}
+
+	if (set_strongbox) {
+		if (is_ti50_device()) {
+			printf("set strongbox not supported on Ti50\n");
+			exit(1);
+		}
+		exit(process_set_strongbox(&td, set_strongbox_arg));
+	}
+
+>>>>>>> CHANGE (999a9c433d574c6280b88d04b897e350b4cfea09 gsctool: add VENDOR_CC_SPI_DRIVE support)
 	if (get_apro_hash)
 		exit(process_get_apro_hash(&td));
 
