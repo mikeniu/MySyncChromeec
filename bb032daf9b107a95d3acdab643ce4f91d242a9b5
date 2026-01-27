@@ -16,6 +16,24 @@
       "message": "Is this still needed after upstreaming the SOC support?",
       "revId": "bb032daf9b107a95d3acdab643ce4f91d242a9b5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54a5d140_501a5021",
+        "filename": "zephyr/dts/bindings/vendor-prefixes.txt",
+        "patchSetId": 5
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-01-27T05:49:28Z",
+      "side": 0,
+      "message": "I tried this, if remove it, the twister run will fail.",
+      "parentUuid": "54195dc5_0da8921d",
+      "revId": "bb032daf9b107a95d3acdab643ce4f91d242a9b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
