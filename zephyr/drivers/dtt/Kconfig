@@ -1,0 +1,11 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config DTT
+	bool "Support PECI over eSPI"
+	depends on ESPI_PECI
+	default y
+	help
+	  EC supports Platform Environment Control Interface (PECI) over eSPI
+	  using OOB messages.
