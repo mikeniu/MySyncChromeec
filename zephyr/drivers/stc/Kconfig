@@ -1,0 +1,10 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config STC
+	bool "Support Skin Temperature Control"
+	depends on ESPI_PECI && AP_PWRSEQ_DRV
+	default y
+	help
+	  EC supports reporting STC to SOC using PECI over eSPI.
