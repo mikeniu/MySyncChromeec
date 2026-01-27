@@ -220,6 +220,47 @@ enum vendor_cmd_cc {
 	/* Returns info to identify the specific GSC chip type. */
 	VENDOR_CC_GET_CHIP_ID = 75,
 
+<<<<<<< HEAD   (ee52149d2a01f50a039166de527ad182698feff7 boot_param: add stage2 fields for CfgDescr)
+||||||| BASE   (1e399c1e783312a087f76cb736cfacdcd0e13eb1 cr50/strongbox: add validation and enforcement for DeviceInf)
+	/*
+	 * Loads and stores superblock macs for the Trusty storage application.
+	 */
+	VENDOR_CC_TRUSTY_STORAGE_MAC = 77,
+
+	/*
+	 * Ti50 get/set device IDs vendor commands
+	 * VENDOR_CC_SET_DEVICE_IDS = 78
+	 * VENDOR_CC_GET_DEVICE_IDS = 79
+	 */
+
+	/* Enables/disables strongbox commands. */
+	VENDOR_CC_SET_STRONGBOX_STATE = 80,
+
+=======
+	/*
+	 * Loads and stores superblock macs for the Trusty storage application.
+	 */
+	VENDOR_CC_TRUSTY_STORAGE_MAC = 77,
+
+	/*
+	 * Ti50 get/set device IDs vendor commands
+	 * VENDOR_CC_SET_DEVICE_IDS = 78
+	 * VENDOR_CC_GET_DEVICE_IDS = 79
+	 */
+
+	/* Enables/disables strongbox commands. */
+	VENDOR_CC_SET_STRONGBOX_STATE = 80,
+
+	/* Read or read and increment DRM counter. */
+	VENDOR_CC_HW_DRM_COUNTER = 81,
+
+	/* Get/Set SPI drive setting. */
+	VENDOR_CC_SPI_DRIVE = 82,
+
+	/* Read slice of Owner Configuration space */
+	VENDOR_CC_READ_OWNERS_CONFIG = 83,
+
+>>>>>>> CHANGE (ecd1feb69cacfd9c03da53332ff73e20ba28ca5e gsctool: add missing ti50 vendor commands)
 	LAST_VENDOR_COMMAND = 65535,
 };
 
