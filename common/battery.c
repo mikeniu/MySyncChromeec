@@ -38,6 +38,11 @@ const static int batt_host_shutdown_pct = CONFIG_BATT_HOST_SHUTDOWN_PERCENTAGE;
 #define CONFIG_BATTERY_CUTOFF_DELAY_US (2105 * MSEC)
 #endif
 
+#ifndef CONFIG_BATTERY_CUTOFF_RETRY_DELAY_US
+#define CONFIG_BATTERY_CUTOFF_RETRY_DELAY_US (500 * MSEC)
+#endif
+
+static int battery_cutoff_retry_left;
 static enum battery_cutoff_states battery_cutoff_state =
 	BATTERY_CUTOFF_STATE_NORMAL;
 
@@ -387,6 +392,7 @@ static int battery_cutoff_start(void)
 	/* Send a request to the battery. */
 	rv = board_cut_off_battery();
 	if (rv == EC_RES_SUCCESS) {
+		battery_cutoff_retry_left = 0;
 		cutoff_timeout.val = get_time().val +
 				     CONFIG_BATTERY_CUTOFF_TIMEOUT_MSEC * MSEC;
 		CUTOFFPRINTS("started (timeout in %u msec)",
@@ -394,6 +400,18 @@ static int battery_cutoff_start(void)
 		/* Start monitor loop. */
 		hook_call_deferred(&pending_cutoff_deferred_data, 0);
 	} else {
+		if (battery_cutoff_retry_left > 0) {
+			CUTOFFPRINTS("failed, retry left=%d",
+				     battery_cutoff_retry_left);
+			battery_cutoff_retry_left--;
+			/* Retry immediately */
+			battery_cutoff_state = BATTERY_CUTOFF_STATE_SCHEDULED;
+			hook_call_deferred(
+				&pending_cutoff_deferred_data,
+				CONFIG_BATTERY_CUTOFF_RETRY_DELAY_US);
+			return rv;
+		}
+
 		battery_cutoff_state = BATTERY_CUTOFF_STATE_NORMAL;
 		CUTOFFPRINTS("failed");
 	}
@@ -536,6 +554,7 @@ DECLARE_HOST_COMMAND(EC_CMD_BATTERY_CUT_OFF, battery_command_cutoff,
 static void check_pending_cutoff(void)
 {
 	if (battery_cutoff_state == BATTERY_CUTOFF_STATE_SCHEDULED) {
+		battery_cutoff_retry_left = CONFIG_BATTERY_CUTOFF_RETRY_COUNT;
 		CUTOFFPRINTS("deferred for %d secs",
 			     CONFIG_BATTERY_CUTOFF_DELAY_US / SECOND);
 		hook_call_deferred(&pending_cutoff_deferred_data,

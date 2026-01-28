@@ -590,6 +590,10 @@
  */
 #undef CONFIG_BATTERY_CUTOFF_DELAY_US
 
+#define CONFIG_BATTERY_CUTOFF_RETRY_DELAY_US 0
+
+#define CONFIG_BATTERY_CUTOFF_RETRY_COUNT (500 * MSEC)
+
 /*
  * After the EC executes battery cutoff, it'll wait for this amount of time in
  * msec before deciding the cutoff failed.
