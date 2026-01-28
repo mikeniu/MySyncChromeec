@@ -23,14 +23,6 @@ import textwrap
 
 BUG_NONE_PATTERN = re.compile("none", flags=re.IGNORECASE)
 
-ZEPHYR_MODULES = {
-    "picolibc": {
-        "path": "src/third_party/zephyr/picolibc",
-        "main": "main",
-    },
-}
-ZEPHYR_MODULE_LIST = list(ZEPHYR_MODULES.keys())
-
 
 def git_commit_msg(cros_main, branch, head, merge_head, rel_paths, cmd):
     """Generates a merge commit message based off of relevant changes.
@@ -380,34 +372,8 @@ def main(argv):
         action=("store_true"),
         help=("If set, treat the board as a Zephyr based program"),
     )
-    parser.add_argument(
-        "--zephyr-modules",
-        nargs="*",
-        default=ZEPHYR_MODULE_LIST,
-        help=(
-            "A list of Zephyr modules to merge. "
-            "Defaults to all known modules if not specified. "
-            "Provide the flag with no arguments to select no modules. "
-            "Only applies if --zephyr is also set. "
-            f"Known modules: {', '.join(ZEPHYR_MODULE_LIST)}"
-        ),
-    )
 
     opts = parser.parse_args(argv[1:])
-
-    if opts.zephyr_modules != ZEPHYR_MODULE_LIST and not opts.zephyr:
-        parser.error(
-            "The --zephyr-modules argument requires the --zephyr flag to be specified as well."
-        )
-
-    if opts.zephyr_modules:
-        for module_name in opts.zephyr_modules:
-            if module_name not in ZEPHYR_MODULES:
-                valid_modules = ", ".join(ZEPHYR_MODULE_LIST)
-                parser.error(
-                    f"Invalid Zephyr module specified: '{module_name}'. "
-                    f"Valid modules are: {valid_modules}."
-                )
 
     baseboard_dir = ""
     board_dir = ""
@@ -542,22 +508,6 @@ def main(argv):
             prunelist,
             [],
         )
-
-        for module_name in opts.zephyr_modules:
-            print(f"Merging Zephyr module: {module_name}")
-            module_info = ZEPHYR_MODULES[module_name]
-            module_path = os.path.join(opts.srcbase, module_info["path"])
-            module_cros_main = opts.remote_prefix + "/" + module_info["main"]
-
-            merge_repo(
-                module_path,
-                module_cros_main,
-                cmd_checkout,
-                strategy,
-                cmd,
-                prunelist,
-                [],
-            )
 
     print(
         (
