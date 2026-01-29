@@ -51,7 +51,7 @@ fpsensor_obj_image=$(HAS_TASK_FPSENSOR)
 
 ifeq ($(TEST_BUILD),y)
 # The "emulator" (TEST_BUILD=y with BOARD=host) runs the tests from the RO
-# image. For simplicity, the on-device tests (TEST_BUILD=y BOARD=bloonchipper)
+# image. For simplicity, the on-device tests (TEST_BUILD=y BOARD=dartmonkey)
 # also build the tests for RO (but we run them in RW).
 fpsensor_obj_image=y
 endif

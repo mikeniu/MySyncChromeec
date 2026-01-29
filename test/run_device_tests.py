@@ -2182,7 +2182,7 @@ def main():
     """Run unit tests on device and displays the results."""
     parser = argparse.ArgumentParser()
 
-    default_board = "bloonchipper"
+    default_board = "dartmonkey"
     parser.add_argument(
         "--board",
         "-b",
