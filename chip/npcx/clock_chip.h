@@ -59,6 +59,11 @@
 #define OSC_CLK 80000000
 /* Core clock prescaler */
 #define FPRED 1 /* CORE_CLK = OSC_CLK/2 */
+#elif defined(NPCX_CORE_ABP2_ABP3_CLOCK_45M)
+/* Target OSC_CLK freq */
+#define OSC_CLK 90000000
+/* Core clock prescaler */
+#define FPRED 1 /* CORE_CLK = OSC_CLK/2 */
 #else
 /* Target OSC_CLK freq */
 #define OSC_CLK 90000000
@@ -104,6 +109,17 @@
 #define APB3DIV 1 /* APB3 clock = OSC_CLK/2 */
 /* APB4 clock divider */
 #define APB4DIV 3 /* APB4 clock = OSC_CLK/4 */
+#elif defined(NPCX_CORE_ABP2_ABP3_CLOCK_45M)
+/* APB1 clock divider */
+#define APB1DIV 5 /* APB1 clock = OSC_CLK/6 */
+/* APB2 clock divider */
+#define APB2DIV 1 /* APB2 clock = OSC_CLK/2 */
+/* APB3 clock divider */
+#define APB3DIV 1 /* APB3 clock = OSC_CLK/2 */
+#if NPCX_FAMILY_VERSION >= NPCX_FAMILY_NPCX9
+/* APB4 clock divider */
+#define APB4DIV 5 /* APB4 clock = OSC_CLK/6 */
+#endif
 #else
 /* APB1 clock divider */
 #define APB1DIV 5 /* APB1 clock = OSC_CLK/6 */
