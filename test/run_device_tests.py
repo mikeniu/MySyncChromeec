@@ -532,6 +532,7 @@ class Renode(Platform):
 
         if zephyr and test_config.test_name in [
             "flash_physical",  # TODO(b/448407366)
+            "flash_protection_rw",  # TODO(b/485668014)
             "flash_write_protect",  # TODO(b/485668014)
             "fp_transport",  # TODO(b/485668240)
             "malloc",  # TODO(b/485669070)
@@ -561,6 +562,7 @@ class Renode(Platform):
         if test_config.test_name in [
             "bbram_retained_mem",  # TODO(b/487848806)
             "flash_physical",  # TODO(b/468410778)
+            "flash_protection_rw",  # TODO(b/487848806)
             "flash_write_protect",  # TODO(b/406944986)
             "panic_data",  # TODO(b/468407068)
             "reboot",  # TODO(b/488132215)
@@ -778,6 +780,11 @@ class AllTests:
                 test_name="flash_physical",
                 imagetype_to_use=ImageType.RO,
                 toggle_power=True,
+            ),
+            TestConfig(
+                test_name="flash_protection_rw",
+                imagetype_to_use=ImageType.RO,
+                enable_hw_write_protect=True,
             ),
             TestConfig(
                 test_name="flash_write_protect",
