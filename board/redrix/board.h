@@ -13,6 +13,8 @@
 /* Baseboard features */
 #include "baseboard.h"
 
+#define NPCX_CORE_ABP2_ABP3_CLOCK_45M
+
 /* Increase tx buffer size. */
 #undef CONFIG_UART_TX_BUF_SIZE
 #define CONFIG_UART_TX_BUF_SIZE 8192
