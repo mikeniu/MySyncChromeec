@@ -244,6 +244,10 @@ __overridable void board_pchg_power_on(int port, bool on)
 {
 }
 
+__overridable void board_pchg_full_strategy()
+{
+}
+
 /*
  * This handles two cases: asynchronous reset and synchronous reset.
  *
@@ -546,6 +550,10 @@ static void pchg_state_charging(struct pchg *ctx)
 		ctx->state = PCHG_STATE_INITIALIZED;
 		break;
 	case PCHG_EVENT_CHARGE_UPDATE:
+		if (ctx->battery_percent >= ctx->cfg->full_percent) {
+			CPRINTS("full strategy start");
+			board_pchg_full_strategy();
+		}
 		break;
 	case PCHG_EVENT_DEVICE_LOST:
 		ctx->battery_percent = 0;
@@ -795,7 +803,7 @@ void pchg_irq(enum gpio_signal signal)
 	}
 }
 
-static void pchg_startup(void)
+void pchg_startup(void)
 {
 	struct pchg *ctx;
 	int p;
@@ -834,7 +842,7 @@ static void pchg_startup(void)
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, pchg_startup, HOOK_PRIO_DEFAULT);
 #endif
 
-static void pchg_shutdown(void)
+void pchg_shutdown(void)
 {
 	struct pchg *ctx;
 	int p;
