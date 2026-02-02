@@ -23,6 +23,13 @@ extern "C" {
  */
 int get_ascp_claim(struct ec_response_fp_ascp_claim *res);
 
+/**
+ * Get ASCP secret ephemeral key.
+ *
+ * @return Pointer to the secret ephemeral key.
+ */
+const uint8_t *get_ascp_sk_f(void);
+
 #ifdef __cplusplus
 }
 #endif
