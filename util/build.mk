@@ -35,6 +35,12 @@ $(out)/util/uartupdatetool: HOST_CFLAGS+=-Iutil/
 stm32mon_static-objs = stm32mon.o
 $(out)/util/stm32mon_static: HOST_LDFLAGS+=-static
 
+host-util-bin-cxx-y += elaniap
+elaniap-objs = elan/src/iaptool.o elan/src/iapcontrol.o elan/src/filecontrol.o
+$(out)/util/elaniap: HOST_CXXFLAGS+=-Wno-vla-cxx-extension
+$(out)/util/elaniap: HOST_CFLAGS+=$(shell $(HOST_PKG_CONFIG) --cflags hidapi-hidraw)
+$(out)/util/elaniap: HOST_LDFLAGS+=$(shell $(HOST_PKG_CONFIG) --libs hidapi-hidraw)
+
 # If the util/ directory in the private repo is symlinked into util/private,
 # we want to build host-side tools from it, too.
 ifneq ("$(wildcard util/private/build.mk)","")
