@@ -1,0 +1,31 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: ASCP memory map
+compatible: "ascp,mem-map"
+properties:
+  pk-m:
+    type: int
+    required: true
+  s-goog:
+    type: int
+    required: true
+  pk-d:
+    type: int
+    required: true
+  s-m:
+    type: int
+    required: true
+  pk-f:
+    type: int
+    required: true
+  h-f:
+    type: int
+    required: true
+  s-d:
+    type: int
+    required: true
+  sk-f:
+    type: int
+    required: true

@@ -6,3 +6,9 @@ config ASCP
 	bool "Enable ASCP support"
 	help
 	  Enables support for ASCP (Authentication Service Control Protocol).
+
+config ASCP_MEM_MAP
+	bool "Enable ASCP memory mapped platform"
+	help
+	  Enables support for ASCP HW platforms where ASCP data is available in memory.
+	select ASCP
