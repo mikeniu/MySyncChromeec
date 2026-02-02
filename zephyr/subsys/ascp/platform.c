@@ -20,6 +20,12 @@ int get_ascp_claim(struct ec_response_fp_ascp_claim *res)
 	return EC_SUCCESS;
 }
 
+const uint8_t *get_ascp_sk_f()
+{
+	return (const uint8_t *)ASCP_ADDR_SK_F;
+}
+
 struct ascp_api ascp_api_instance = {
 	.get_claim = get_ascp_claim,
+	.get_sk_f = get_ascp_sk_f,
 };
