@@ -147,3 +147,13 @@ fp_command_load_pairing_key(struct host_cmd_handler_args *args)
 }
 DECLARE_HOST_COMMAND(EC_CMD_FP_LOAD_PAIRING_KEY, fp_command_load_pairing_key,
 		     EC_VER_MASK(0));
+
+enum ec_error_list generate_session_key_with_context(
+	std::span<const uint8_t, FP_CK_SESSION_NONCE_LEN> fpmcu_nonce,
+	std::span<const uint8_t, FP_CK_SESSION_NONCE_LEN> peer_nonce,
+	std::span<const uint8_t, FP_PAIRING_KEY_LEN> pairing_key,
+	std::span<uint8_t, SHA256_DIGEST_LENGTH> session_key)
+{
+	return generate_session_key(fpmcu_nonce, peer_nonce, pairing_key, {},
+				    session_key);
+}

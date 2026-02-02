@@ -12,6 +12,7 @@
 /** ASCP data access API. */
 struct ascp_api {
 	int (*get_claim)(struct ec_response_fp_ascp_claim *res);
+	const uint8_t *(*get_sk_f)(void);
 };
 
 /**
