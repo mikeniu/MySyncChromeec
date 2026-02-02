@@ -6,6 +6,9 @@
 #include "ec_commands.h"
 
 #include <ascp/ascp.h>
+#ifdef CONFIG_ASCP_ET171
+#include "et171.h"
+#endif
 
 int get_ascp_claim(struct ec_response_fp_ascp_claim *res)
 {

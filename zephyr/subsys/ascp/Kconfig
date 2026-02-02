@@ -12,3 +12,17 @@ config ASCP_MEM_PLATFORM
 	help
 	  Enables support for ASCP HW platforms where ASCP data is available in memory.
 	select ASCP
+
+choice
+	prompt "Select ASCP HW platform"
+	optional
+	help
+	  Selects the ASCP HW platform.
+
+config ASCP_ET171
+	bool "Enable ASCP for ET171"
+	help
+	  Enables ASCP support for ET171.
+	select ASCP_MEM_PLATFORM
+
+endchoice
