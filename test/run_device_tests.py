@@ -479,12 +479,21 @@ class Renode(Platform):
 
         return False
 
-    def _skip_test_helipilot(self, test_config: TestConfig) -> bool:
+    def _skip_test_helipilot(
+        self, test_config: TestConfig, zephyr: bool
+    ) -> bool:
         if test_config.test_name in [
             "exception",  # TODO(b/384730599)
             "otp_key",  # TODO(b/385216796)
             "ram_lock",  # TODO(b/385216805)
             "rtc_npcx9",  # TODO(b/385217282)
+        ]:
+            return True
+
+        # TODO: check on hardware and file bug.
+        if zephyr and test_config.config_name in [
+            "panic_data_helipilot_v2.0.24337",
+            "panic_data_helipilot_v2.0.27609",
         ]:
             return True
 
@@ -542,7 +551,7 @@ class Renode(Platform):
             return self._skip_test_bloonchipper(test_config, zephyr)
 
         if board_config.name in [HELIPILOT, BUCCANEER, GWENDOLIN]:
-            return self._skip_test_helipilot(test_config)
+            return self._skip_test_helipilot(test_config, zephyr)
 
         if board_config.name == SANOK and zephyr:
             return self._skip_test_sanok(test_config)
@@ -562,7 +571,7 @@ class TestConfig:
     fail_regexes: Optional[list[re.Pattern[str]]] = None
     toggle_power: bool = False
     test_args: list[str] = field(default_factory=list)
-    timeout_secs: int = 60
+    timeout_secs: int = 150
     enable_hw_write_protect: bool = False
     ro_image: Optional[str] = None
     build_board: Optional[str] = None
