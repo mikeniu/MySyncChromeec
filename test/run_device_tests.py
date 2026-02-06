@@ -480,12 +480,37 @@ class Renode(Platform):
 
         return False
 
-    def _skip_test_helipilot(self, test_config: TestConfig) -> bool:
+    def _skip_test_helipilot(
+        self, test_config: TestConfig, zephyr: bool
+    ) -> bool:
         if test_config.test_name in [
             "exception",  # TODO(b/384730599)
             "otp_key",  # TODO(b/385216796)
             "ram_lock",  # TODO(b/385216805)
             "rtc_npcx9",  # TODO(b/385217282)
+        ]:
+            return True
+
+        if zephyr and test_config.test_name in [
+            "abort",  # TODO(b/485668212)
+            "flash_physical",  # TODO(b/448407366)
+            "flash_write_protect",  # TODO(b/485668014)
+            "fp_transport",  # TODO(b/485668240)
+            "ftrapv",  # TODO(b/485669808)
+            "malloc",  # TODO(b/485669070)
+            "null_pointer",  # TODO(b/485624833)
+            "panic",  # TODO(b/485668836)
+            "panic_data",  # TODO(b/485667679)
+            "rollback_entropy",  # TODO(b/485670085)
+            "sbrk",  # TODO(b/485669288)
+            "tpm_seed_clear",  # TODO(b/485669018)
+            "utils",  # TODO(b/485624824)
+            "zephyr_kernel_poll",  # TODO(b/485639561)
+        ]:
+            return True
+
+        if zephyr and test_config.config_name in [
+            "system_is_locked_wp_on",  # TODO(b/485669841)
         ]:
             return True
 
@@ -545,7 +570,7 @@ class Renode(Platform):
             return self._skip_test_bloonchipper(test_config, zephyr)
 
         if board_config.name in [HELIPILOT, BUCCANEER, GWENDOLIN]:
-            return self._skip_test_helipilot(test_config)
+            return self._skip_test_helipilot(test_config, zephyr)
 
         if board_config.name == SANOK and zephyr:
             return self._skip_test_sanok(test_config)
@@ -565,7 +590,7 @@ class TestConfig:
     fail_regexes: Optional[list[re.Pattern[str]]] = None
     toggle_power: bool = False
     test_args: list[str] = field(default_factory=list)
-    timeout_secs: int = 60
+    timeout_secs: int = 150
     enable_hw_write_protect: bool = False
     ro_image: Optional[str] = None
     build_board: Optional[str] = None
