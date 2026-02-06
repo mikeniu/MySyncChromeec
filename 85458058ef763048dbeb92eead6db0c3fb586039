@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4dd7779_2cd2a9a7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1293716
+      },
+      "writtenOn": "2026-02-06T16:17:20Z",
+      "side": 1,
+      "message": "I will be out of town till 2/9, create CL and let ODM to have try on Monday, or I can try on Tue.",
+      "revId": "85458058ef763048dbeb92eead6db0c3fb586039",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
