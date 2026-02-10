@@ -84,7 +84,8 @@ AP_POWER_APP_STATE_DEFINE(G3, board_ap_power_action_g3_entry,
 static int board_ap_power_s0_run(void *data)
 {
 	/* Update the AC event during boot */
-	extpower_update_host_events(gpio_get_level(GPIO_AC_PRESENT));
+	extpower_update_host_events(
+		gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(bc_acok)));
 	return 0;
 }
 AP_POWER_APP_STATE_DEFINE(S0, NULL, board_ap_power_s0_run, NULL);

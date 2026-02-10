@@ -36,7 +36,6 @@
 		**/
 		bc_acok: bc-acok-ec-in {
 			gpios = <MCHP_GPIO_DECODE_155 GPIO_INPUT>;
-			enum-name = "GPIO_AC_PRESENT";
 		};
 		ps2-kb-clk {
 			gpios = <MCHP_GPIO_DECODE_007 GPIO_INPUT>;
