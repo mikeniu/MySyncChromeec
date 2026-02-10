@@ -12,8 +12,11 @@
 #include "i2c.dtsi"
 #include "power_signals.dtsi"
 
+#include "../rvp_battery.dtsi"
 #include "../rvp_i2c.dtsi"
 #include "../rvp_ioex_gpio.dtsi"
+#include "../rvp_rt_pd.dtsi"
+#include "../rvp_rt_usbc.dtsi"
 
 /* atriarvp-rtk overrides follow... */
 
@@ -23,4 +26,16 @@
 
 &sha0 {
 	status = "okay";
+};
+
+&pdc_ti_c0 {
+	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
+};
+
+&pdc_ti_c1 {
+	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
+};
+
+&pdc_ti_c2 {
+	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
 };
