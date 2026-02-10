@@ -206,6 +206,21 @@ static bool get_cse_early_recovery_gpio_level(void)
 	return gpio_emul_output_get_dt(&cse_early_rec_gpio);
 }
 
+#if defined(CONFIG_TEST_AP_POWER_ATRIARVP) && \
+	defined(CONFIG_TEST_AP_POWER_RECOVERY_MODE)
+/* For atriarvp the board directly drives cse_early_rec_sw, not the
+ * cse_early_recovery driver GPIO.  Read the actual output pin instead.
+ */
+static bool get_atriarvp_cse_early_rec_gpio_level(void)
+{
+	return gpio_emul_output_get(
+		DEVICE_DT_GET(
+			DT_GPIO_CTLR(DT_NODELABEL(cse_early_rec_sw), gpios)),
+		DT_GPIO_PIN(DT_NODELABEL(cse_early_rec_sw), gpios));
+}
+#endif /* CONFIG_TEST_AP_POWER_ATRIARVP && CONFIG_TEST_AP_POWER_RECOVERY_MODE \
+	*/
+
 ZTEST(ap_pwrseq, test_ap_pwrseq_0)
 {
 #ifdef CONFIG_TEST_AP_POWER_RECOVERY_MODE
@@ -219,8 +234,13 @@ ZTEST(ap_pwrseq, test_ap_pwrseq_0)
 	power_up_test_g3_to_s0_helper();
 
 #ifdef CONFIG_TEST_AP_POWER_RECOVERY_MODE
+#if defined(CONFIG_TEST_AP_POWER_ATRIARVP)
+	/* ATRIARVP drives cse_early_rec_sw directly; check that pin. */
+	zassert_equal(1, get_atriarvp_cse_early_rec_gpio_level());
+#else
 	/* This is a recovery boot. GPIO should be asserted. */
 	zassert_equal(1, get_cse_early_recovery_gpio_level());
+#endif
 #else
 	/* Not doing a recovery boot. GPIO should be deasserted. */
 	zassert_equal(0, get_cse_early_recovery_gpio_level());
