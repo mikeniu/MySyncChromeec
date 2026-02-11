@@ -4,3 +4,4 @@
 
 zephyr_library_sources_ifdef(CONFIG_CROS_RTC_NPCX	cros_rtc_npcx.c)
 zephyr_library_sources_ifdef(CONFIG_CROS_RTC_XEC	cros_rtc_xec.c)
+zephyr_library_sources_ifdef(CONFIG_CROS_RTC_IT82XX2	cros_rtc_it82xx2.c)
