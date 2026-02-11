@@ -18,6 +18,9 @@
 #include "usb_pd_tcpc.h"
 #include "util.h"
 
+#define CPRINTS(format, args...) cprints(CC_USBCHARGE, format, ## args)
+#define CPRINTF(format, args...) cprintf(CC_USBCHARGE, format, ## args)
+
 #if defined(CONFIG_USB_PD_DUAL_ROLE_AUTO_TOGGLE) || \
 	defined(CONFIG_USB_PD_DISCHARGE_TCPC)
 #error "Unsupported config options of fusb302 PD driver"
@@ -383,6 +386,7 @@ static int fusb302_tcpm_init(int port)
 {
 	int reg;
 
+	CPRINTS("fusb302_tcpm_init p%d", port);
 	/* set default */
 	state[port].cc_polarity = -1;
 
@@ -986,9 +990,11 @@ void fusb302_tcpc_alert(int port)
 		task_wake(PD_PORT_TO_TASK_ID(port));
 	}
 
+	CPRINTS("fusb302_tcpc_alert p%d TCPC_REG_INTERRUPTB_GCRCSENT: %d", port, (interruptb & TCPC_REG_INTERRUPTB_GCRCSENT)!=0);
 	if (interruptb & TCPC_REG_INTERRUPTB_GCRCSENT) {
 		/* Packet received and GoodCRC sent */
 		/* (this interrupt fires after the GoodCRC finishes) */
+		CPRINTS("fusb302_tcpc_alert p%d state[port].rx_enable: %d", port, state[port].rx_enable);
 		if (state[port].rx_enable) {
 			/* Pull all RX messages from TCPC into EC memory */
 			while (!fusb302_rx_fifo_is_empty(port) &&

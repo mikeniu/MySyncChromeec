@@ -516,6 +516,8 @@ int tcpm_enqueue_message(const int port)
 	struct cached_tcpm_message *const head =
 		&q->buffer[q->head & CACHE_DEPTH_MASK];
 
+	CPRINTS("C%d RX EC Buffer size %u/%u", port, q->head - q->tail, CACHE_DEPTH);
+
 	if (q->head - q->tail == CACHE_DEPTH) {
 		CPRINTS("C%d RX EC Buffer full!", port);
 		return EC_ERROR_OVERFLOW;
@@ -565,6 +567,7 @@ int tcpm_dequeue_message(const int port, uint32_t *const payload,
 
 	/* Increment atomically to ensure memcpy happens-before */
 	atomic_add(&q->tail, 1);
+	CPRINTS("C%d RX EC Buffer size %u/%u 2", port, q->head - q->tail, CACHE_DEPTH);
 
 	return EC_SUCCESS;
 }
