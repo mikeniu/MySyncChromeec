@@ -60,37 +60,39 @@ uint32_t system_get_rtc_sec(void)
 	return seconds;
 }
 
-void system_set_rtc(uint32_t seconds)
+int system_set_rtc(uint32_t seconds)
 {
-	cros_rtc_set_value(cros_rtc_dev, seconds);
+	return cros_rtc_set_value(cros_rtc_dev, seconds);
 }
 
-void system_reset_rtc_alarm(void)
+int system_reset_rtc_alarm(void)
 {
 	if (!cros_rtc_dev) {
 		/* TODO(b/183115086): check the error handler for NULL device */
 		LOG_ERR("rtc_dev hasn't initialized.");
-		return;
+		return -ENODEV;
 	}
 
-	cros_rtc_reset_alarm(cros_rtc_dev);
+	return cros_rtc_reset_alarm(cros_rtc_dev);
 }
 
 /*
  * For NPCX series, The alarm counter only stores wakeup time in seconds.
  * Microseconds will be ignored.
  */
-void system_set_rtc_alarm(uint32_t seconds, uint32_t microseconds)
+int system_set_rtc_alarm(uint32_t seconds, uint32_t microseconds)
 {
+	int ret;
+
 	if (!cros_rtc_dev) {
 		LOG_ERR("rtc_dev hasn't initialized.");
-		return;
+		return -ENODEV;
 	}
 
 	/* If time = 0, clear the current alarm */
 	if (seconds == EC_RTC_ALARM_CLEAR && microseconds == 0) {
-		system_reset_rtc_alarm();
-		return;
+		ret = system_reset_rtc_alarm();
+		return ret;
 	}
 
 	/*
@@ -101,7 +103,14 @@ void system_set_rtc_alarm(uint32_t seconds, uint32_t microseconds)
 	 */
 	seconds += system_get_rtc_sec() + 1;
 
-	cros_rtc_set_alarm(cros_rtc_dev, seconds, microseconds);
+	ret = cros_rtc_set_alarm(cros_rtc_dev, seconds, microseconds);
+	if (ret) {
+		return ret;
+	}
+
+	ccprintf("An alarm will trigger in %u sec\n", system_get_rtc_alarm());
+
+	return 0;
 }
 
 /*
@@ -131,7 +140,7 @@ void print_system_rtc(enum console_channel ch)
 {
 	uint32_t sec = system_get_rtc_sec();
 
-	cprintf(ch, "RTC: 0x%08x (%d.00 s)\n", sec, sec);
+	cprintf(ch, "RTC: 0x%08x (%u.00 s)\n", sec, sec);
 }
 
 /*
@@ -141,6 +150,8 @@ void print_system_rtc(enum console_channel ch)
 #ifdef CONFIG_PLATFORM_EC_CONSOLE_CMD_RTC
 static int command_system_rtc(int argc, const char **argv)
 {
+	int ret;
+
 	if (argc == 3 && !strcasecmp(argv[1], "set")) {
 		char *e;
 		unsigned int t = strtoi(argv[2], &e, 0);
@@ -148,7 +159,11 @@ static int command_system_rtc(int argc, const char **argv)
 		if (*e)
 			return EC_ERROR_PARAM2;
 
-		system_set_rtc(t);
+		ret = system_set_rtc(t);
+		if (ret) {
+			ccprintf("RTC set failed: %d\n", ret);
+			return ret;
+		}
 	} else if (argc > 1) {
 		return EC_ERROR_INVAL;
 	}
@@ -167,6 +182,7 @@ DECLARE_CONSOLE_COMMAND(rtc, command_system_rtc, "[set <seconds>]",
 static int command_rtc_alarm_test(int argc, const char **argv)
 {
 	int s = 1, us = 0;
+	int ret;
 	char *e;
 
 	if (argc > 1) {
@@ -182,7 +198,11 @@ static int command_rtc_alarm_test(int argc, const char **argv)
 
 	ccprintf("Setting RTC alarm\n");
 
-	system_set_rtc_alarm(s, us);
+	ret = system_set_rtc_alarm(s, us);
+	if (ret) {
+		ccprintf("RTC set alarm failed: %d\n", ret);
+		return ret;
+	}
 
 	return EC_SUCCESS;
 }

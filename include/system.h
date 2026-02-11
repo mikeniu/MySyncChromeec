@@ -720,8 +720,12 @@ void enable_deep_sleep(void);
  * This function is made visible for tests only, it allows overriding the RTC.
  *
  * @param seconds
+ *
+ * @return 0 on success.
+ * @return -ERANGE if the time is outside the supported RTC range.
+ * @return -ENOTSUP Not supported api function.
  */
-void system_set_rtc(uint32_t seconds);
+int system_set_rtc(uint32_t seconds);
 
 /**
  * Use hibernate module to set up an RTC interrupt at a given
@@ -732,8 +736,11 @@ void system_set_rtc(uint32_t seconds);
  *
  * @param seconds      Number of seconds before RTC interrupt
  * @param microseconds Number of microseconds before RTC interrupt
+ *
+ * @return 0 on success.
+ * @return -ENOTSUP Not supported api function.
  */
-void system_set_rtc_alarm(uint32_t seconds, uint32_t microseconds);
+int system_set_rtc_alarm(uint32_t seconds, uint32_t microseconds);
 
 /**
  * Return the seconds remaining before the RTC alarm goes off.
@@ -743,8 +750,10 @@ uint32_t system_get_rtc_alarm(void);
 
 /**
  * Disable and clear the RTC interrupt.
+ * @return 0 on success.
+ * @return -ENOTSUP Not supported api function.
  */
-void system_reset_rtc_alarm(void);
+int system_reset_rtc_alarm(void);
 
 /**
  * Return address of little FW to prepare for sysjump
