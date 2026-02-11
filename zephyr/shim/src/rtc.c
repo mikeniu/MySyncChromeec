@@ -60,9 +60,9 @@ uint32_t system_get_rtc_sec(void)
 	return seconds;
 }
 
-void system_set_rtc(uint32_t seconds)
+int system_set_rtc(uint32_t seconds)
 {
-	cros_rtc_set_value(cros_rtc_dev, seconds);
+	return cros_rtc_set_value(cros_rtc_dev, seconds);
 }
 
 void system_reset_rtc_alarm(void)
@@ -102,6 +102,8 @@ void system_set_rtc_alarm(uint32_t seconds, uint32_t microseconds)
 	seconds += system_get_rtc_sec() + 1;
 
 	cros_rtc_set_alarm(cros_rtc_dev, seconds, microseconds);
+
+	ccprintf("An alarm will trigger in %u sec\n", system_get_rtc_alarm());
 }
 
 /*
@@ -131,7 +133,7 @@ void print_system_rtc(enum console_channel ch)
 {
 	uint32_t sec = system_get_rtc_sec();
 
-	cprintf(ch, "RTC: 0x%08x (%d.00 s)\n", sec, sec);
+	cprintf(ch, "RTC: 0x%08x (%u.00 s)\n", sec, sec);
 }
 
 /*
@@ -141,6 +143,8 @@ void print_system_rtc(enum console_channel ch)
 #ifdef CONFIG_PLATFORM_EC_CONSOLE_CMD_RTC
 static int command_system_rtc(int argc, const char **argv)
 {
+	int ret;
+
 	if (argc == 3 && !strcasecmp(argv[1], "set")) {
 		char *e;
 		unsigned int t = strtoi(argv[2], &e, 0);
@@ -148,7 +152,11 @@ static int command_system_rtc(int argc, const char **argv)
 		if (*e)
 			return EC_ERROR_PARAM2;
 
-		system_set_rtc(t);
+		ret = system_set_rtc(t);
+		if (ret) {
+			ccprintf("RTC set failed: %d\n", ret);
+			return ret;
+		}
 	} else if (argc > 1) {
 		return EC_ERROR_INVAL;
 	}

@@ -720,8 +720,11 @@ void enable_deep_sleep(void);
  * This function is made visible for tests only, it allows overriding the RTC.
  *
  * @param seconds
+ *
+ * @return 0 on success.
+ * @return -ERANGE if the time is outside the supported RTC range.
  */
-void system_set_rtc(uint32_t seconds);
+int system_set_rtc(uint32_t seconds);
 
 /**
  * Use hibernate module to set up an RTC interrupt at a given
