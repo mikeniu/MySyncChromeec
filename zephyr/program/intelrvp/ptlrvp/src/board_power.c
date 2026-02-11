@@ -3,10 +3,12 @@
  * found in the LICENSE file.
  */
 
+#include "battery.h"
 #include "extpower.h"
 #include "gpio.h"
 #include "gpio_signal.h"
 #include "include/system.h"
+#include "power_button.h"
 #include "system_boot_time.h"
 
 #include <zephyr/drivers/gpio.h>
@@ -118,4 +120,15 @@ int board_power_signal_set(enum power_signal signal, int value)
 	default:
 		return -EINVAL;
 	}
+}
+
+enum battery_present battery_is_present(void)
+{
+	/* The GPIO is low when the battery is present */
+	return gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(batt_id)) ? BP_NO : BP_YES;
+}
+
+void board_pwrbtn_to_pch(int level)
+{
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(prwbtn), level);
 }

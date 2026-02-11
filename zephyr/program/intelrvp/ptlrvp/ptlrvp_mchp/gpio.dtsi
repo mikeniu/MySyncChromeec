@@ -133,14 +133,12 @@
 		};
 		prochot-ec-r {
 			gpios = <MCHP_GPIO_DECODE_171 GPIO_INPUT>;
-			enum-name = "GPIO_CPU_PROCHOT";
 		};
 		kbc-capslock {
 			gpios = <MCHP_GPIO_DECODE_127 GPIO_INPUT>;
 		};
 		all_sys_pwrgd: all-sys-pwrgd {
 			gpios = <MCHP_GPIO_DECODE_057 GPIO_INPUT>;
-			enum-name = "GPIO_PG_EC_ALL_SYS_PWRGD";
 		};
 		peci-ec {
 			gpios = <MCHP_GPIO_DECODE_042 GPIO_INPUT>;
@@ -240,24 +238,20 @@
 		};
 		pwrbtn: pwrbtn-ec-in-n {
 			gpios = <MCHP_GPIO_DECODE_106 GPIO_INPUT>;
-			enum-name = "GPIO_POWER_BUTTON_L";
 			no-auto-init;
 		};
 		en_pp3300_a: ec-pg3-r {
 			gpios = <MCHP_GPIO_DECODE_226 GPIO_OUTPUT_LOW>;
-			enum-name = "GPIO_EN_PP3300_A";
 		};
 		pm-pwrbtn-led {
 			gpios = <MCHP_GPIO_DECODE_241 GPIO_INPUT>;
 		};
 		vol_up_ec: vol-up-ec {
 			gpios = <MCHP_GPIO_DECODE_242 GPIO_INPUT>;
-			enum-name = "GPIO_VOLUME_UP_L";
 			no-auto-init;
 		};
 		vol_dn_ec: vol-downn-ec {
 			gpios = <MCHP_GPIO_DECODE_246 GPIO_INPUT>;
-			enum-name = "GPIO_VOLUME_DOWN_L";
 			no-auto-init;
 		};
 		m2-bt-led2-ec-n {
@@ -346,15 +340,12 @@
 		};
 		rsmrst_pwrgd: rsmrst-pwrgd-ec-n {
 			gpios = <MCHP_GPIO_DECODE_012 GPIO_INPUT>;
-			enum-name = "GPIO_PG_EC_RSMRST_ODL";
-			alias = "GPIO_TEMP_SENSOR_POWER";
 		};
 		cpu-c10-gate-n-r {
 			gpios = <MCHP_GPIO_DECODE_013 GPIO_INPUT>;
 		};
 		pch_slp_s0_n: pm-slp-s0-r-n {
 			gpios = <MCHP_GPIO_DECODE_052 GPIO_INPUT>;
-			enum-name = "GPIO_PCH_SLP_S0_L";
 		};
 		ec-spi-hold {
 			gpios = <MCHP_GPIO_DECODE_016 GPIO_INPUT>;
@@ -386,7 +377,6 @@
 		};
 		ec_pch_rsmrst_l: pm-rsmrst-ec-n {
 			gpios = <MCHP_GPIO_DECODE_054 GPIO_OUTPUT>;
-			enum-name = "GPIO_PCH_RSMRST_L";
 		};
 		sys-pwrok-ec-r {
 			gpios = <MCHP_GPIO_DECODE_015 GPIO_INPUT>;
@@ -394,9 +384,8 @@
 		ec-slatemode-hallout-snsr-r {
 			gpios = <MCHP_GPIO_DECODE_222 GPIO_INPUT>;
 		};
-		bat-id-r {
+		batt_id: bat-id-r {
 			gpios = <MCHP_GPIO_DECODE_162 GPIO_INPUT>;
-			enum-name = "GPIO_BATT_PRES_ODL";
 		};
 		peci-mux-ctrl-er-int {
 			gpios = <MCHP_GPIO_DECODE_161 GPIO_INPUT>;
@@ -448,7 +437,6 @@
 		};
 		ec_pch_pwrok_od: ec-pm-pch-pwrok {
 			gpios = <MCHP_GPIO_DECODE_100 GPIO_ODR_LOW>;
-			enum-name = "GPIO_PCH_PWROK";
 		};
 	};
 };

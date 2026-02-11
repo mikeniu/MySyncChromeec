@@ -36,6 +36,7 @@
 			temp-host-halt = <80>;
 			temp-host-release-high = <65>;
 			sensor = <&temp_ambient>;
+			power-good-pin = <&rsmrst_pwrgd>;
 		};
 
 		/*
@@ -64,6 +65,7 @@
 			temp-host-halt = <80>;
 			temp-host-release-high = <65>;
 			sensor = <&temp_ddr>;
+			power-good-pin = <&rsmrst_pwrgd>;
 		};
 		skin {
 			temp-fan-off = <15>;
@@ -72,6 +74,7 @@
 			temp-host-halt = <80>;
 			temp-host-release-high = <65>;
 			sensor = <&temp_skin>;
+			power-good-pin = <&rsmrst_pwrgd>;
 		};
 		vr {
 			temp-fan-off = <15>;
@@ -80,6 +83,7 @@
 			temp-host-halt = <80>;
 			temp-host-release-high = <65>;
 			sensor = <&temp_vr>;
+			power-good-pin = <&rsmrst_pwrgd>;
 		};
 	};
 };
