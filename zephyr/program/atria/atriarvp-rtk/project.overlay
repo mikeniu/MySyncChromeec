@@ -22,6 +22,11 @@
 
 /* atriarvp-rtk overrides follow... */
 
+&cbi_flash {
+	offset = <0x7F000>;
+	size = <0x1000>;
+};
+
 &espi0 {
 	status = "okay";
 };
