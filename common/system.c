@@ -50,9 +50,10 @@
 #define ROUNDUP4(x) (((x) + 3) & ~3)
 
 /**
- * Returns a pointer to the jump data structure.
+ * Initialize jump data.
  */
-struct jump_data *get_jump_data(void);
+static void init_jump_data(void);
+static uintptr_t get_jump_tag_head(void);
 
 /* Data for an individual jump tag */
 struct jump_tag {
@@ -63,11 +64,11 @@ struct jump_tag {
 	/* Followed by data_size bytes of data */
 };
 
-/* Jump data (at end of RAM, or preceding panic data) */
-static struct jump_data *jdata;
-
 static uint32_t reset_flags; /* EC_RESET_FLAG_* */
-static int jumped_to_image;
+static bool jumped_to_image; /* True if we jumped to this image */
+static bool jumping_to_image; /* True if we are in the process of jumping to
+				 another image */
+static bool jump_data_initialized; /* True if jump data has been initialized */
 static int disable_jump; /* Disable ALL jumps if system is locked */
 static int force_locked; /* Force system locked even if WP isn't enabled */
 static struct ec_params_reboot_ec reboot_at_shutdown;
@@ -224,23 +225,15 @@ test_mockable int system_is_locked(void)
 
 test_mockable uintptr_t system_usable_ram_end(void)
 {
-	/* This function can be called while initializing C++ objects with
-	 * static storage duration, which occurs before any calls to
-	 * set jdata. e.g., from __libc_init_array in init.S.
-	 */
-	if (!IS_ENABLED(CHIP_ISH) /* TODO(b/376875609) */
-	    && IS_ENABLED(CONFIG_COMMON_PANIC_OUTPUT) && jdata == NULL) {
-		jdata = get_jump_data();
-	}
+	uintptr_t tag_head = get_jump_tag_head();
+	if (tag_head)
+		return tag_head;
 
-	/* Leave space at the end of RAM for jump data and tags.
-	 *
-	 * Note that jump_tag_total is 0 on a reboot, so we have the maximum
-	 * amount of RAM available on a reboot; we only lose space for stored
-	 * tags after a sysjump.  When verified boot runs after a reboot, it'll
-	 * have as much RAM as we can give it; after verified boot jumps to
-	 * another image there'll be less RAM, but we'll care less too. */
-	return (uintptr_t)jdata - jdata->jump_tag_total;
+#ifdef CONFIG_RAM_SIZE
+	return CONFIG_RAM_BASE + CONFIG_RAM_SIZE;
+#else
+	return 0;
+#endif
 }
 
 void system_encode_save_flags(int flags, uint32_t *save_flags)
@@ -340,22 +333,56 @@ void system_print_banner(void)
 	}
 }
 
-#if defined(CONFIG_RAM_SIZE) && defined(CONFIG_COMMON_PANIC_OUTPUT)
-struct jump_data *get_jump_data(void)
+/* Returns the address at the end of the jump data structure. */
+static uintptr_t get_jump_data_end(void)
 {
-	uintptr_t addr;
+	uintptr_t addr = 0;
 
 	/*
 	 * Put the jump data before the panic data, or at the end of RAM if
 	 * panic data is not present.
 	 */
+#if defined(CONFIG_COMMON_PANIC_OUTPUT) || defined(BOARD_HOST) || \
+	defined(CONFIG_BOARD_NATIVE_SIM)
 	addr = get_panic_data_start();
+#endif
 	if (!addr)
+#ifdef CONFIG_RAM_SIZE
 		addr = CONFIG_RAM_BASE + CONFIG_RAM_SIZE;
+#else
+		addr = 0;
+#endif
 
-	return (struct jump_data *)(addr - sizeof(struct jump_data));
+	return addr;
 }
-#endif /* CONFIG_RAM_SIZE && CONFIG_COMMON_PANIC_OUTPUT */
+
+/* Returns the address of the head of the jump tags.
+ * Jump tags are stored above the jump data struct in RAM.
+ */
+static uintptr_t get_jump_tag_head(void)
+{
+	struct jump_data *jdata = get_jump_data();
+	if (!jdata)
+		return 0;
+	return (uintptr_t)jdata - jdata->jump_tag_total;
+}
+
+/*
+ * Returns the jump data structure.
+ */
+struct jump_data *get_jump_data(void)
+{
+	uintptr_t end;
+
+	/* Ensure jump data is initialized */
+	init_jump_data();
+
+	end = get_jump_data_end();
+	if (!end)
+		return NULL;
+
+	return (struct jump_data *)(end - sizeof(struct jump_data));
+}
 
 test_mockable int system_jumped_to_this_image(void)
 {
@@ -371,9 +398,18 @@ int system_add_jump_tag(uint16_t tag, int version, int size, const void *data)
 {
 	struct jump_tag *t;
 	size_t new_entry_size;
+	struct jump_data *jdata;
 
 	/* Only allowed during a sysjump */
-	if (!jdata || jdata->magic != JUMP_DATA_MAGIC)
+	if (!jumping_to_image)
+		return EC_ERROR_UNKNOWN;
+
+	jdata = get_jump_data();
+	if (!jdata)
+		return EC_ERROR_UNKNOWN;
+
+	/* Unexpected jump data version */
+	if (jdata->version != JUMP_DATA_VERSION)
 		return EC_ERROR_UNKNOWN;
 
 	/* Make room for the new tag */
@@ -382,14 +418,12 @@ int system_add_jump_tag(uint16_t tag, int version, int size, const void *data)
 
 	new_entry_size = ROUNDUP4(size) + sizeof(struct jump_tag);
 
-	if (system_usable_ram_end() - new_entry_size < JUMP_DATA_MIN_ADDRESS) {
-		CPRINTF("ERROR: out of space for jump tags\n");
+	if (get_jump_tag_head() - new_entry_size < JUMP_DATA_MIN_ADDRESS)
 		return EC_ERROR_INVAL;
-	}
 
 	jdata->jump_tag_total += new_entry_size;
 
-	t = (struct jump_tag *)system_usable_ram_end();
+	t = (struct jump_tag *)(get_jump_tag_head());
 	t->tag = tag;
 	t->data_size = size;
 	t->data_version = version;
@@ -404,18 +438,19 @@ test_mockable const uint8_t *system_get_jump_tag(uint16_t tag, int *version,
 {
 	const struct jump_tag *t;
 	int used = 0;
+	struct jump_data *jdata = get_jump_data();
 
 	if (!jdata)
 		return NULL;
 
-	/* Ensure system_usable_ram_end() is within bounds */
-	if (system_usable_ram_end() < JUMP_DATA_MIN_ADDRESS)
+	/* Unexpected jump data version */
+	if (jdata->version != JUMP_DATA_VERSION)
 		return NULL;
 
 	/* Search through tag data for a match */
 	while (used < jdata->jump_tag_total) {
 		/* Check the next tag */
-		t = (const struct jump_tag *)(system_usable_ram_end() + used);
+		t = (const struct jump_tag *)(get_jump_tag_head() + used);
 		used += sizeof(struct jump_tag) + ROUNDUP4(t->data_size);
 		if (t->tag != tag)
 			continue;
@@ -630,19 +665,30 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 	/* Flush UART output */
 	cflush();
 
-	/* Fill in preserved data between jumps */
-	jdata->reserved0 = 0;
-	jdata->magic = JUMP_DATA_MAGIC;
-	jdata->version = JUMP_DATA_VERSION;
-	jdata->reset_flags = reset_flags;
-	jdata->jump_tag_total = 0; /* Reset tags */
-	jdata->struct_size = sizeof(struct jump_data);
+	struct jump_data *jdata = get_jump_data();
+
+	if (jdata) {
+		/* Prepare jump data */
+		jdata->reserved0 = 0;
+		jdata->version = JUMP_DATA_VERSION;
+		jdata->struct_size = sizeof(struct jump_data);
+		jdata->reset_flags = reset_flags;
+		jdata->jump_tag_total = 0;
+		jumping_to_image = true;
+	}
 
 	/* Call other hooks; these may add tags */
 	hook_notify(HOOK_SYSJUMP);
 
 	/* Disable interrupts before jump */
 	interrupt_disable_all();
+
+	if (jdata) {
+		/* Set jump data magic to indicate to next image, that a jump
+		 * occurred
+		 */
+		jdata->magic = JUMP_DATA_MAGIC;
+	}
 
 #ifdef CONFIG_DMA_CROS
 	/* Disable all DMA channels to avoid memory corruption */
@@ -905,6 +951,83 @@ system_get_build_info(void)
 	return build_info;
 }
 
+/* Initialize jump data.
+ * Ensure that jump data is expanded to include new fields.
+ */
+void init_jump_data(void)
+{
+	int delta = 0;
+	int jump_tag_total = 0;
+	struct jump_data *jdata;
+	uintptr_t end;
+
+	if (jump_data_initialized)
+		return;
+
+	end = get_jump_data_end();
+	if (!end) {
+		jump_data_initialized = true;
+		return;
+	}
+
+	jdata = (struct jump_data *)(end - sizeof(struct jump_data));
+
+	if (jdata->magic == JUMP_DATA_MAGIC && jdata->version >= 1) {
+		if (jdata->version == 1) {
+			/* v1 has no tags */
+		} else if (jdata->version == 2) {
+			delta = sizeof(struct jump_data) - JUMP_DATA_SIZE_V2;
+			jump_tag_total = jdata->jump_tag_total;
+		} else { /* v3 or later */
+			int struct_size = jdata->struct_size;
+
+			if (struct_size < JUMP_DATA_SIZE_V3 ||
+			    struct_size > CONFIG_PRESERVED_END_OF_RAM_SIZE)
+				goto clear_jump_data;
+
+			if (jdata->version == 3 &&
+			    struct_size != JUMP_DATA_SIZE_V3)
+				goto clear_jump_data;
+
+			jump_tag_total = jdata->jump_tag_total;
+			delta = sizeof(struct jump_data) - struct_size;
+		}
+
+		/* Check bounds */
+		if (jump_tag_total < 0 ||
+		    jump_tag_total > CONFIG_PRESERVED_END_OF_RAM_SIZE ||
+		    ((uintptr_t)jdata - jump_tag_total - delta <
+		     JUMP_DATA_MIN_ADDRESS)) {
+			goto clear_jump_data;
+		}
+
+		/* Move jump tags to make room for new fields */
+		if (delta && jump_tag_total > 0) {
+			memmove((uint8_t *)jdata - delta - jump_tag_total,
+				(uint8_t *)jdata + delta - jump_tag_total,
+				jump_tag_total);
+		}
+
+		/* Clear the jump data magic number so it isn't used again */
+		jdata->magic = 0;
+		jumped_to_image = true;
+		reset_flags = jdata->reset_flags | EC_RESET_FLAG_SYSJUMP;
+	} else {
+		goto clear_jump_data;
+	}
+
+	/* Jump data struct is now aligned with current version */
+	jdata->jump_tag_total = jump_tag_total;
+	jdata->struct_size = sizeof(struct jump_data);
+	jdata->version = JUMP_DATA_VERSION;
+	jump_data_initialized = true;
+	return;
+
+clear_jump_data:
+	memset(jdata, 0, sizeof(struct jump_data));
+	jump_data_initialized = true;
+}
+
 void system_common_pre_init(void)
 {
 	/*
@@ -937,80 +1060,7 @@ void system_common_pre_init(void)
 			panic_set_reason(PANIC_SW_WATCHDOG, 0, 0);
 	}
 
-	/*
-	 * get_jump_data() is only available if CONFIG_COMMON_PANIC_OUTPUT is
-	 * enabled.
-	 */
-	if (!IS_ENABLED(CONFIG_COMMON_PANIC_OUTPUT)) {
-		return;
-	}
-
-	jdata = get_jump_data();
-
-	/*
-	 * Check jump data if this is a jump between images.
-	 */
-	if (jdata->magic == JUMP_DATA_MAGIC && jdata->version >= 1) {
-		/* Change in jump data struct size between the previous image
-		 * and this one. */
-		int delta;
-
-		/* Yes, we jumped to this image */
-		jumped_to_image = 1;
-		/* Restore the reset flags */
-		reset_flags = jdata->reset_flags | EC_RESET_FLAG_SYSJUMP;
-
-		/*
-		 * If the jump data structure isn't the same size as the
-		 * current one, shift the jump tags to immediately before the
-		 * current jump data structure, to make room for initalizing
-		 * the new fields below.
-		 */
-		if (jdata->version == 1)
-			delta = 0; /* No tags in v1, so no need for move */
-		else if (jdata->version == 2)
-			delta = sizeof(struct jump_data) - JUMP_DATA_SIZE_V2;
-		else
-			delta = sizeof(struct jump_data) - jdata->struct_size;
-
-		/*
-		 * Check if enough space for jump data.
-		 * Clear jump data and return if not.
-		 */
-		if (system_usable_ram_end() < JUMP_DATA_MIN_ADDRESS) {
-			/* TODO(b/251190975): This failure should be reported
-			 * in the panic data structure for more visibility.
-			 */
-			memset(jdata, 0, sizeof(struct jump_data));
-			return;
-		}
-
-		if (delta && jdata->jump_tag_total) {
-			uint8_t *d = (uint8_t *)system_usable_ram_end();
-			memmove(d, d + delta, jdata->jump_tag_total);
-		}
-
-		/* Initialize fields added after version 1 */
-		if (jdata->version < 2)
-			jdata->jump_tag_total = 0;
-
-		/* Initialize fields added after version 2 */
-		if (jdata->version < 3)
-			jdata->reserved0 = 0;
-
-		/* Struct size is now the current struct size */
-		jdata->struct_size = sizeof(struct jump_data);
-
-		/*
-		 * Clear the jump struct's magic number.  This prevents
-		 * accidentally detecting a jump when there wasn't one, and
-		 * disallows use of system_add_jump_tag().
-		 */
-		jdata->magic = 0;
-	} else {
-		/* Clear the whole jump_data struct */
-		memset(jdata, 0, sizeof(struct jump_data));
-	}
+	init_jump_data();
 }
 
 void system_enter_manual_recovery(void)
@@ -1571,14 +1621,19 @@ static int command_jumptags(int argc, const char **argv)
 {
 	const struct jump_tag *t;
 	int used = 0;
+	struct jump_data *jdata;
 
 	/* Jump tags valid only after a sysjump */
+	if (!system_jumped_to_this_image())
+		return EC_SUCCESS;
+
+	jdata = get_jump_data();
 	if (!jdata)
 		return EC_SUCCESS;
 
 	while (used < jdata->jump_tag_total) {
 		/* Check the next tag */
-		t = (const struct jump_tag *)(system_usable_ram_end() + used);
+		t = (const struct jump_tag *)(get_jump_tag_head() + used);
 		used += sizeof(struct jump_tag) + ROUNDUP4(t->data_size);
 
 		ccprintf("%08x: 0x%04x %c%c.%d %3d\n", (uintptr_t)t, t->tag,
@@ -1948,9 +2003,10 @@ __overridable int board_write_poweron_conf(const uint8_t *poweron_conf)
 
 __test_only void system_common_reset_state(void)
 {
-	jdata = 0;
 	reset_flags = 0;
-	jumped_to_image = 0;
+	jumped_to_image = false;
+	jumping_to_image = false;
+	jump_data_initialized = false;
 	system_info_flags = 0;
 }
 

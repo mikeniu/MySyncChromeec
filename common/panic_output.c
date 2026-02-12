@@ -34,26 +34,6 @@ static struct panic_data zephyr_panic_data;
 /* Panic data goes at the end of RAM. */
 static struct panic_data *const pdata_ptr = PANIC_DATA_PTR;
 
-/* Common SW Panic reasons strings */
-const char *const panic_sw_reasons[] = {
-	"PANIC_SW_DIV_ZERO",	 "PANIC_SW_STACK_OVERFLOW",
-	"PANIC_SW_PD_CRASH",	 "PANIC_SW_ASSERT",
-	"PANIC_SW_WATCHDOG",	 "PANIC_SW_RNG",
-	"PANIC_SW_PMIC_FAULT",	 "PANIC_SW_EXIT",
-	"PANIC_SW_WATCHDOG_WARN"
-};
-
-/**
- * Check an interrupt vector as being a valid software panic
- * @param reason	Reason for panic
- * @return 0 if not a valid software panic reason, otherwise non-zero.
- */
-int panic_sw_reason_is_valid(uint32_t reason)
-{
-	return (reason >= PANIC_SW_BASE &&
-		(reason - PANIC_SW_BASE) < ARRAY_SIZE(panic_sw_reasons));
-}
-
 /**
  * Add a character directly to the UART buffer.
  *
@@ -246,9 +226,7 @@ test_mockable struct panic_data *get_panic_data_write(void)
 	 * end of RAM.
 	 */
 	struct panic_data *const pdata_ptr = PANIC_DATA_PTR;
-	struct jump_data *jdata_ptr;
-	uintptr_t data_begin;
-	size_t move_size;
+	struct jump_data *jdata;
 	int delta;
 
 	/*
@@ -267,60 +245,25 @@ test_mockable struct panic_data *get_panic_data_write(void)
 	if (delta == 0)
 		return pdata_ptr;
 
-	/*
-	 * Expecting get_panic_data_start() will return a pointer to
-	 * the beginning of panic data, or NULL if no panic data available
-	 */
-	data_begin = get_panic_data_start();
-	if (!data_begin)
-		data_begin = CONFIG_RAM_BASE + CONFIG_RAM_SIZE;
-
-	jdata_ptr = (struct jump_data *)(data_begin - sizeof(struct jump_data));
-
-	/*
-	 * If we don't have valid jump_data structure we don't need to move
-	 * anything and can just return pdata_ptr (clear memory, set magic
-	 * and struct_size first).
-	 */
-	if (jdata_ptr->magic != JUMP_DATA_MAGIC || jdata_ptr->version < 1 ||
-	    jdata_ptr->version > 3) {
-		memset(pdata_ptr, 0, CONFIG_PANIC_DATA_SIZE);
-		pdata_ptr->magic = PANIC_DATA_MAGIC;
-		pdata_ptr->struct_size = CONFIG_PANIC_DATA_SIZE;
-
-		return pdata_ptr;
-	}
-
-	move_size = 0;
-	if (jdata_ptr->version == 1)
-		move_size = JUMP_DATA_SIZE_V1;
-	else if (jdata_ptr->version == 2)
-		move_size = JUMP_DATA_SIZE_V2 + jdata_ptr->jump_tag_total;
-	else if (jdata_ptr->version == 3)
-		move_size = jdata_ptr->struct_size + jdata_ptr->jump_tag_total;
+	jdata = get_jump_data();
 
 	/* Check if there's enough space for jump tags after move */
-	if (data_begin - move_size < JUMP_DATA_MIN_ADDRESS) {
-		/* Not enough room for jump tags, clear tags.
+	if ((uintptr_t)jdata - jdata->jump_tag_total - delta <
+	    JUMP_DATA_MIN_ADDRESS) {
+		/* Not enough room for jump tags, clear jump data.
 		 * TODO(b/251190975): This failure should be reported
 		 * in the panic data structure for more visibility.
 		 */
-		/* LCOV_EXCL_START - JUMP_DATA_MIN_ADDRESS is 0 in test builds
-		 * and we cannot go negative by subtracting unsigned ints.
-		 */
-		move_size -= jdata_ptr->jump_tag_total;
-		jdata_ptr->jump_tag_total = 0;
-		/* LCOV_EXCL_STOP */
+		memset(jdata, 0, sizeof(struct jump_data));
+		goto clear_panic_data;
 	}
 
-	data_begin -= move_size;
+	/* Move jump data and jump tags to make room for panic data */
+	uint8_t *src = (uint8_t *)jdata - jdata->jump_tag_total;
+	uint8_t *dst = src - delta;
+	memmove(dst, src, sizeof(struct jump_data) + jdata->jump_tag_total);
 
-	if (move_size != 0) {
-		/* Move jump_tags and jump_data */
-		memmove((void *)(data_begin - delta), (void *)data_begin,
-			move_size);
-	}
-
+clear_panic_data:
 	/*
 	 * Now we are sure that there is enough space for current
 	 * panic_data structure.

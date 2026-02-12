@@ -26,8 +26,10 @@
 #define PANIC_SW_WATCHDOG_WARN (PANIC_SW_BASE + 8)
 
 #ifndef __ASSEMBLER__
-extern const char *const panic_sw_reasons[];
-extern int panic_sw_reason_is_valid(uint32_t vec);
+static inline int panic_sw_reason_is_valid(uint32_t vec)
+{
+	return (vec >= PANIC_SW_BASE && vec <= PANIC_SW_WATCHDOG_WARN);
+}
 #endif
 
 #endif /* __CROS_EC_SOFTWARE_PANIC_H */
