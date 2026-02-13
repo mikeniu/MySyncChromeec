@@ -84,14 +84,19 @@ FAKE_VOID_FUNC(lsm6dso_interrupt, enum gpio_signal);
 FAKE_VOID_FUNC(bma4xx_interrupt, enum gpio_signal);
 FAKE_VOID_FUNC(lis2dw12_interrupt, enum gpio_signal);
 
-int button_disable_gpio(enum button button_type)
-{
-	return EC_SUCCESS;
-}
-
 static int get_gpio_output(const struct gpio_dt_spec *const spec)
 {
 	return gpio_emul_output_get(spec->port, spec->pin);
+}
+
+/* Normally implemented in zephyr/shim/src/espi.c */
+void lpc_keyboard_resume_irq(void)
+{
+}
+
+int clock_get_freq(void)
+{
+	return 16000000;
 }
 
 void board_usb_pd_count_init(void);
