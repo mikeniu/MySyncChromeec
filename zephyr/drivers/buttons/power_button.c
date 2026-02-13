@@ -97,6 +97,13 @@ __overridable int64_t get_time_dsw_pwrok(void)
 __overridable void board_pwrbtn_to_pch(int level)
 {
 }
+
+#ifdef CONFIG_POWER_BUTTON
+__overridable int power_button_is_eating_release(void)
+{
+	return 0;
+}
+#endif
 /* LCOV_EXCL_STOP */
 
 /*****************************************************************************/
