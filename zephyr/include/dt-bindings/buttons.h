@@ -11,4 +11,6 @@
 #define BUTTON_VOLUME_UP 3
 #define BUTTON_RECOVERY 4
 
+#define INPUT_KEY_RECOVERY 0xFFFF
+
 #endif /* DT_BINDINGS_BUTTON_H_ */
