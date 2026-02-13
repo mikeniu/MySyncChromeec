@@ -472,8 +472,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PERIPHERAL_CHARGER
                                                 "${PLATFORM_EC}/common/peripheral_charger.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PORT80
                                                 "${PLATFORM_EC}/common/port80.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWER_BUTTON
-                                                "${PLATFORM_EC}/common/power_button.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWERSEQ
                                                 "${PLATFORM_EC}/power/common.c")
 zephyr_library_sources_ifdef(CONFIG_CHIPSET_ALDERLAKE_SLG4BD44540
@@ -731,8 +729,10 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_PPC_RT1718S
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_VBOOT_HASH
                                                 "${PLATFORM_EC}/common/vboot_hash.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BUTTON
-                                                "${PLATFORM_EC}/common/button.c")
+if (CONFIG_PLATFORM_EC_BUTTON AND NOT DEFINED CONFIG_INPUT_GPIO_KEYS)
+	zephyr_library_sources("${PLATFORM_EC}/common/button.c")
+	zephyr_library_sources("${PLATFORM_EC}/common/power_button.c")
+endif ()
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_VBOOT_EFS2
                                                 "${PLATFORM_EC}/common/vboot/efs2.c")

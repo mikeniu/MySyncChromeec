@@ -483,7 +483,7 @@ static void ac_change(void)
 	    IS_ENABLED(CONFIG_CROS_EC_KEYBOARD_INPUT))
 		key = keyboard_scan_get_boot_keys() == BIT(BOOT_KEY_REFRESH);
 
-#ifdef CONFIG_VOLUME_BUTTONS
+#if defined(CONFIG_VOLUME_BUTTONS) && !defined(CONFIG_INPUT_GPIO_KEYS)
 	if (!key) {
 		/* Strictly vol-up only. */
 		key = button_get_boot_button() == BIT(BUTTON_VOLUME_UP);
