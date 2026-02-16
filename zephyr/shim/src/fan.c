@@ -348,6 +348,9 @@ void fan_set_duty(int ch, int percent)
 {
 	/* duty is zero */
 	if (!percent) {
+		 /* maintain minimum fan speed */
+		fan_data[ch].pwm_percent = 30;
+		return;
 		fan_data[ch].auto_status = FAN_STATUS_STOPPED;
 		if (fan_all_disabled()) {
 			enable_sleep(SLEEP_MASK_FAN);
@@ -376,6 +379,8 @@ void fan_set_rpm_target(int ch, int rpm)
 	if (rpm == 0) {
 		/* If rpm = 0, disable PWM immediately. Why?*/
 		fan_set_duty(ch, 0);
+		/* maintain minimum fan speed */
+		rpm = fans[ch].rpm->rpm_min;
 	} else {
 		/* This is the counterpart of disabling PWM above. */
 		if (!fan_get_enabled(ch)) {

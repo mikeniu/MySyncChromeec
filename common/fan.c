@@ -648,6 +648,10 @@ static void pwm_fan_control(int enable)
 {
 	int fan;
 
+	/* TODO: S0ix is not functional. AP hang detetced */
+	if (enable == 0)
+	    return;
+
 	/* TODO(crosbug.com/p/23530): Still treating all fans as one. */
 	for (fan = 0; fan < fan_count; fan++) {
 		set_thermal_control_enabled(fan, enable);
