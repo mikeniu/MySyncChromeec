@@ -42,13 +42,13 @@
 	named-temp-sensors {
 		compatible = "cros-ec,temp-sensors";
 		cpu {
-			temp-fan-off = <54>;
-			temp-fan-max = <100>;
-			temp-host-warn = <92>;
-			temp-host-high = <92>;
-			temp-host-halt = <105>;
-			temp-host-release-warn = <87>;
-			temp-host-release-high = <87>;
+			temp-fan-off = <12>;
+			temp-fan-max = <60>;
+			temp-host-warn = <45>;
+			temp-host-high = <85>;
+			temp-host-halt = <90>;
+			temp-host-release-warn = <80>;
+			temp-host-release-high = <80>;
 			temp-host-release-halt = <95>;
 			power-good-pin = <&gpio_en_pp5000_s5>;
 			sensor = <&temp_cpu>;
