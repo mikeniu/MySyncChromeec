@@ -55,6 +55,31 @@ def register_nuvoton_project(
     )
 
 
+def register_realtek_project(
+    project_name,
+    extra_kconfig_files=(),
+    extra_dt_overlays=(),
+):
+    """Register an Realtek variant of ec-aic."""
+
+    return register_rtk_project(
+        project_name=project_name,
+        zephyr_board="realtek/rts5912",
+        dts_overlays=[
+            here / "rts-aic" / "project.overlay",
+            *extra_dt_overlays,
+        ],
+        kconfig_files=[
+            # Common to all projects.
+            here / "program.conf",
+            # Project-specific KConfig customization.
+            here / "rts-aic" / "project.conf",
+            *extra_kconfig_files,
+        ],
+        inherited_from=["ec-aic"],
+    )
+
+
 # Base ITE project. This build assumes no additional hardware attached to the
 # AIC and serves as a minimal EC build.
 aic_ite = register_ite_project(
@@ -85,6 +110,13 @@ npcx_aic = register_nuvoton_project(
     project_name="npcx-aic",
 )
 
+# Base RTS (Realtek) project. This build assumes no additional hardware
+# attached to the AIC and serves as a minimal EC build.
+rts_aic = register_realtek_project(
+    project_name="rts-aic",
+)
+
 assert_rw_fwid_DO_NOT_EDIT(project_name="ite-aic", addr=0x60098)
 assert_rw_fwid_DO_NOT_EDIT(project_name="ite-aic-rtk-pdc", addr=0x60098)
 assert_rw_fwid_DO_NOT_EDIT(project_name="npcx-aic", addr=0x80144)
+assert_rw_fwid_DO_NOT_EDIT(project_name="rts-aic", addr=0xCFFE0)
