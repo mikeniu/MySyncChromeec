@@ -92,7 +92,7 @@ fp_command_establish_session(struct host_cmd_handler_args *args)
 	ScopedFastCpu fast_cpu;
 
 	enum ec_error_list ret = generate_session_key(
-		session_nonce, p->peer_nonce, pairing_key, session_key);
+		session_nonce, p->peer_nonce, pairing_key, {}, session_key);
 	if (ret != EC_SUCCESS) {
 		return EC_RES_INVALID_PARAM;
 	}
