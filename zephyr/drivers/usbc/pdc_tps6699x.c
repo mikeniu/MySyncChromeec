@@ -1731,6 +1731,7 @@ static int cmd_get_ic_status_sync_internal(const struct i2c_dt_spec *i2c,
 	info->driver_name[sizeof(info->driver_name) - 1] = '\0';
 
 	info->no_fw_update = cfg->no_fw_update;
+	info->frs_supported = cfg->frs_supported;
 
 	return 0;
 }
@@ -3413,6 +3414,7 @@ BUILD_ASSERT(
 		.create_thread = create_thread_##inst,                         \
 		.no_fw_update = DT_INST_PROP(inst, no_fw_update),              \
 		.ccd = DT_INST_PROP(inst, ccd),                                \
+		.frs_supported = DT_INST_PROP(inst, frs_supported),            \
 		.port_index_on_chip = DT_INST_PROP(inst, port_index_on_chip),  \
 	};                                                                     \
                                                                                \

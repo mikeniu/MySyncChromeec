@@ -36,6 +36,8 @@
 		reg = <0x20>;
 		irq-gpios = <&gpiof 5 GPIO_ACTIVE_LOW>;
 		port-index-on-chip = <0x1>;
+		zephyr,deferred-init;
+		frs-supported;
 		frs-supported;
 	};
 	pdc_power_p1: tps6699-pdc@24 {
@@ -46,6 +48,7 @@
 		no-fw-update;
 		ccd;
 		frs-supported;
+		frs-supported;
 	};
 	pdc_power_p2: tps6699-pdc@21 {
 		compatible = "ti,tps6699-pdc";
@@ -53,6 +56,7 @@
 		irq-gpios = <&gpioj 6 GPIO_ACTIVE_LOW>;
 		port-index-on-chip = <0x1>;
 		zephyr,deferred-init;
+		frs-supported;
 		frs-supported;
 	};
 };
