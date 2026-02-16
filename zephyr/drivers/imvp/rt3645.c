@@ -284,7 +284,17 @@ static void rt3645_initiate_update(const struct device *dev)
 	/* Reasonable delay for voltage to stabilize */
 	k_msleep(30);
 
-	if (gpio_pin_get_dt(&config->enable_gpio) == 1) {
+/*
+ * MCHP platforms have GPIO readback issues. b:485192207. Hence, assume
+ * that GPIO is set and skip the check for MCHP platforms, until issue
+ * is fixed.
+ */
+#ifdef CONFIG_SOC_MEC172X_NSZ
+	bool gpio_ready = true;
+#else
+	bool gpio_ready = (gpio_pin_get_dt(&config->enable_gpio) == 1);
+#endif
+	if (gpio_ready) {
 		/* Start Updation */
 		if (!rt3645_update(rt3645_dev))
 			LOG_INF("IMVP Update Success! ");
