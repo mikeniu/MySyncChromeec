@@ -13,17 +13,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-void panic_assert_fail(const char *msg, const char *func, const char *fname,
-		       int linenum)
+void panic_data_print(const struct panic_data *pdata)
 {
-	fprintf(stderr, "ASSERTION FAIL: %s:%d:%s - %s\n", fname, linenum, func,
-		msg);
-	task_dump_trace();
-
-	puts("Fail!"); /* Inform test runner */
-	fflush(stdout);
-
-	exit(1);
+	/* Not Implemented */
 }
 
 void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception)

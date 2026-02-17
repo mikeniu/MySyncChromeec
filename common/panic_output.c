@@ -195,7 +195,7 @@ test_mockable struct panic_data *panic_get_data(void)
  * Please note that it is not safe to interpret this
  * pointer as panic_data structure.
  */
-uintptr_t get_panic_data_start(void)
+test_mockable uintptr_t get_panic_data_start(void)
 {
 	if (pdata_ptr->magic != PANIC_DATA_MAGIC)
 		return 0;
