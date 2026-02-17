@@ -116,7 +116,8 @@ static int cros_flash_npcx_wait_ready_and_we(const struct device *dev)
 	}
 }
 
-static int cros_flash_npcx_set_write_enable(const struct device *dev)
+STATIC_IF_NOT(CONFIG_ZTEST)
+int cros_flash_npcx_set_write_enable(const struct device *dev)
 {
 	int ret;
 	struct npcx_ex_ops_uma_in op_in = {
@@ -143,7 +144,8 @@ static int cros_flash_npcx_set_write_enable(const struct device *dev)
 	return cros_flash_npcx_wait_ready_and_we(dev);
 }
 
-static int __maybe_unused
+STATIC_IF_NOT(CONFIG_ZTEST)
+int __maybe_unused
 	cros_flash_npcx_set_write_disable(const struct device *dev)
 {
 	int ret;
@@ -283,7 +285,8 @@ static bool flash_check_status_reg_srp(const struct device *dev)
 	return (sr1 & SPI_FLASH_SR1_SRP0);
 }
 
-static int is_int_flash_protected(const struct device *dev)
+STATIC_IF_NOT(CONFIG_ZTEST)
+int is_int_flash_protected(const struct device *dev)
 {
 	return cros_flash_npcx_write_protection_is_set(dev);
 }
