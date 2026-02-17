@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7411335c_49eb8dbf",
+        "filename": "util/renode/sanok_crypto_hooks.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-02-17T17:30:41Z",
+      "side": 1,
+      "message": "In `mc_AddCustomPythonHooks`, the `try...except` Exception: blocks are very broad. This will catch any error, potentially masking issues beyond a symbol not being found. If the only expected error is the symbol not existing, it would be better to catch a more specific exception if the Renode API provides one. At a minimum, consider logging a warning when a symbol is not found, e.g.:\n\n```\ntry:\n    results \u003d cpu.Bus.GetAllSymbolAddresses(\"sx_hash_feed\")\n    if not results:\n        logging.warning(\"Symbol not found: sx_hash_feed\")\n    for addr in results:\n        cpu.AddHook(addr, sx_hash_hooks.hook_feed)\nexcept Exception as e:\n    logging.error(f\"Error adding hook for sx_hash_feed: {e}\")\n```",
+      "range": {
+        "startLine": 110,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 12
+      },
+      "revId": "2821c76d08af1c9ccb32f9e55b1ed2610607efd4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
