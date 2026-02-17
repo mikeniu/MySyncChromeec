@@ -22,6 +22,30 @@
       },
       "revId": "a3704cb6b7ea74f61ad1d7666c855a3562ac1ed0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05eca7a9_b42d676e",
+        "filename": "zephyr/program/intelrvp/ptlrvp/src/board_power.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-02-17T22:21:59Z",
+      "side": 1,
+      "message": "cool - would that handle the EC console `apshutdown` case?\n\nif so, how about we submit this and update all the boards using the\nAP power seq driver when the extra signal sequencing is ready?",
+      "parentUuid": "bdd7097c_e64119a9",
+      "range": {
+        "startLine": 32,
+        "startChar": 1,
+        "endLine": 32,
+        "endChar": 17
+      },
+      "revId": "a3704cb6b7ea74f61ad1d7666c855a3562ac1ed0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
