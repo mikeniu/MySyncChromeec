@@ -34,6 +34,24 @@
       "parentUuid": "02033d46_2124f48a",
       "revId": "05ea7da134cefd7d3b0df60c4d0f5c089c6bf71d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c86980ca_eb2e449a",
+        "filename": "zephyr/program/fpmcu/bloonchipper/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-17T14:12:38Z",
+      "side": 1,
+      "message": "You are right.",
+      "parentUuid": "eb5d4212_28bdce61",
+      "revId": "05ea7da134cefd7d3b0df60c4d0f5c089c6bf71d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
