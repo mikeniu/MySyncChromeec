@@ -16,16 +16,27 @@
 #include <ap_power/ap_pwrseq_sm.h>
 #endif
 
+#if defined(CONFIG_AP_PWRSEQ_DRIVER)
+static void board_ap_power_shutdown(void)
+#else
 void board_ap_power_force_shutdown(void)
+#endif
 {
 	/* Turn off PCH_RMSRST to meet tPCH12 */
-	power_signal_set(PWR_EC_PCH_RSMRST, 0);
+	power_signal_set(PWR_EC_PCH_RSMRST, 1);
 
 	/* Turn off PRIM load switch. */
 	power_signal_set(PWR_EN_PP3300_A, 0);
 }
 
 #if defined(CONFIG_AP_PWRSEQ_DRIVER)
+static int board_ap_power_action_g3_entry(void *data)
+{
+	board_ap_power_shutdown();
+
+	return 0;
+}
+
 static int board_ap_power_g3_run(void *data)
 {
 	/* Turn on the PP3300_PRIM rail. */
@@ -34,7 +45,8 @@ static int board_ap_power_g3_run(void *data)
 	return 0;
 }
 
-AP_POWER_APP_STATE_DEFINE(G3, NULL, board_ap_power_g3_run, NULL);
+AP_POWER_APP_STATE_DEFINE(G3, board_ap_power_action_g3_entry,
+			  board_ap_power_g3_run, NULL);
 
 static int board_ap_power_s0_run(void *data)
 {
