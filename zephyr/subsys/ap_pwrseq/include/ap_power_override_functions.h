@@ -33,6 +33,7 @@
  */
 bool board_ap_power_is_startup_ok(void);
 
+#ifndef CONFIG_AP_PWRSEQ_DRIVER
 /**
  * @brief Force AP shutdown
  *
@@ -40,7 +41,6 @@ bool board_ap_power_is_startup_ok(void);
  */
 void board_ap_power_force_shutdown(void);
 
-#ifndef CONFIG_AP_PWRSEQ_DRIVER
 /**
  * @brief Called to transition from G3 to S5
  *
