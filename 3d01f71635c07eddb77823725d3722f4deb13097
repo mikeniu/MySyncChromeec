@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61fbd6ea_f6ce0010",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1793,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-02-17T17:23:37Z",
+      "side": 1,
+      "message": "The file operations within write_json_results should be wrapped in a try...except block to gracefully handle potential IOError or OSError exception:\n\n```\n   try:\n        with open(output_file, \"w\", encoding\u003d\"utf-8\") as f:\n            json.dump(json_output, f, indent\u003d2)\n        print(f\"Test results written to {output_file}\")\n    except (IOError, OSError) as e:\n        logging.error(f\"Failed to write JSON results to {output_file}: {e}\")\n```",
+      "range": {
+        "startLine": 1792,
+        "startChar": 4,
+        "endLine": 1793,
+        "endChar": 43
+      },
+      "revId": "3d01f71635c07eddb77823725d3722f4deb13097",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
