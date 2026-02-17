@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02033d46_2124f48a",
+        "filename": "zephyr/program/fpmcu/bloonchipper/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-17T06:09:11Z",
+      "side": 1,
+      "message": "2 questions:\n- do you think it makes sense to do such change in upstream? IMO rather not until we prove it really helps\n- How about increasing `exit-latency-us`? My feeling is that might be more important.",
+      "revId": "05ea7da134cefd7d3b0df60c4d0f5c089c6bf71d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
