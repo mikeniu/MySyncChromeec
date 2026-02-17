@@ -16,6 +16,24 @@
       "message": "2 questions:\n- do you think it makes sense to do such change in upstream? IMO rather not until we prove it really helps\n- How about increasing `exit-latency-us`? My feeling is that might be more important.",
       "revId": "05ea7da134cefd7d3b0df60c4d0f5c089c6bf71d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb5d4212_28bdce61",
+        "filename": "zephyr/program/fpmcu/bloonchipper/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-02-17T13:36:14Z",
+      "side": 1,
+      "message": "\u003e do you think it makes sense to do such a change in upstream?\n\nOnly after we confirm it improves the situation.\n\n\u003e How about increasing exit-latency-us?\n\nIIUC, `exit-latency-us` is time needed to fully wakeup (MCU is executing tasks). My idea is to get rid of very short sleeping, because we already know that RTC may not trigger an alarm.\n\nBasing on crash statistics, these situations are rare, though we know that some users are affected.",
+      "parentUuid": "02033d46_2124f48a",
+      "revId": "05ea7da134cefd7d3b0df60c4d0f5c089c6bf71d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
