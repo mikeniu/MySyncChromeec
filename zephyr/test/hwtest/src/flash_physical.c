@@ -5,6 +5,7 @@
 
 #include "flash.h"
 
+#include <zephyr/device.h>
 #include <zephyr/ztest.h>
 
 /*
@@ -49,3 +50,35 @@ ZTEST(flash_physical, test_flash_config)
 	zassert_equal(WP_BANK_COUNT, flash_info.write_protect_bank_count,
 		      "WP bank count mismatch");
 }
+
+#if defined(CONFIG_SOC_FAMILY_NPCX)
+
+int is_int_flash_protected(const struct device *dev);
+int cros_flash_npcx_set_write_enable(const struct device *dev);
+int cros_flash_npcx_set_write_disable(const struct device *dev);
+
+#undef DT_DRV_COMPAT
+#define DT_DRV_COMPAT nuvoton_npcx_cros_flash
+
+ZTEST(flash_physical, test_lock_option_bytes)
+{
+	const struct device *dev = DEVICE_DT_GET(DT_DRV_INST(0));
+
+	zassert_not_null(dev, "Flash device instance 0 not found");
+
+	int ret = cros_flash_npcx_set_write_enable(dev);
+	zassert_equal(ret, 0, "Failed to enable write: %d", ret);
+	zassert_true(is_int_flash_protected(dev),
+		     "Option bytes failed to re-lock");
+
+	ret = cros_flash_npcx_set_write_disable(dev);
+	zassert_equal(ret, 0, "Failed to disable write: %d", ret);
+	zassert_false(is_int_flash_protected(dev),
+		      "Option bytes failed to unlock on second attempt");
+
+	ret = cros_flash_npcx_set_write_enable(dev);
+	zassert_equal(ret, 0, "Failed to enable write: %d", ret);
+	zassert_true(is_int_flash_protected(dev),
+		     "Option bytes failed to re-lock");
+}
+#endif /* CONFIG_SOC_FAMILY_NPCX */
