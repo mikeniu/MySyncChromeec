@@ -53,6 +53,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9edcd730_c634e450",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 5702,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-02-17T22:57:23Z",
+      "side": 1,
+      "message": "Error log will now show the full allowed range. PD_MIN_MV and \u003cPD_MIN_MV cases are already being tested.",
+      "parentUuid": "f7a50c63_039b9131",
+      "revId": "c6f459410f21cf31fd652fc1a2e5d2f59a0004a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5c6475d_7d91f1ad",
@@ -70,6 +88,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c4983a1_42882296",
+        "filename": "zephyr/test/pdc/src/generic/pdc_power_mgmt_api.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 2162,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-02-17T22:57:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5c6475d_7d91f1ad",
+      "revId": "c6f459410f21cf31fd652fc1a2e5d2f59a0004a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f9217b41_b17fbaa5",
@@ -83,6 +119,24 @@
       "writtenOn": "2026-02-10T03:24:48Z",
       "side": 1,
       "message": "Instead of hard coded numbers can we test with\n - `CONFIG_PLATFORM_EC_USB_PD_MAX_VOLTAGE_MV - 1`\n - `CONFIG_PLATFORM_EC_USB_PD_MAX_VOLTAGE_MV`\n - `CONFIG_PLATFORM_EC_USB_PD_MAX_VOLTAGE_MV + 1`\n \nSo we make sure edge case scenarios are handled appropriately.",
+      "revId": "c6f459410f21cf31fd652fc1a2e5d2f59a0004a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6786efab_ccbc5b37",
+        "filename": "zephyr/test/pdc/src/generic/pdc_power_mgmt_api.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 2171,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-02-17T22:57:23Z",
+      "side": 1,
+      "message": "Done, but with `CONFIG_PLATFORM_EC_USB_PD_MAX_VOLTAGE_MV + 1` / `PD_MIN_MV - 1` as the limits +/-1; `CONFIG_PLATFORM_EC_USB_PD_MAX_VOLTAGE_MV` is covered by existing tests.",
+      "parentUuid": "f9217b41_b17fbaa5",
       "revId": "c6f459410f21cf31fd652fc1a2e5d2f59a0004a5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
