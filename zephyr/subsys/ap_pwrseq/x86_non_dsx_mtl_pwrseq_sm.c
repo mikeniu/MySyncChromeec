@@ -110,7 +110,8 @@ static int x86_non_dsx_mtl_s3_run(void *data)
 {
 	int all_sys_pwrgd_in = power_signal_get(PWR_ALL_SYS_PWRGD);
 
-	if (power_signal_get(PWR_RSMRST_PWRGD) == 0) {
+	if (power_signal_get(PWR_RSMRST_PWRGD) ||
+	    ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
 		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_G3);
 	}
 
@@ -142,7 +143,8 @@ AP_POWER_CHIPSET_STATE_DEFINE(S3, x86_non_dsx_mtl_s3_entry,
 
 static int x86_non_dsx_mtl_s0_run(void *data)
 {
-	if (power_signal_get(PWR_RSMRST_PWRGD) == 0) {
+	if (power_signal_get(PWR_RSMRST_PWRGD) ||
+	    ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
 		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_G3);
 	}
 
