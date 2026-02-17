@@ -680,10 +680,10 @@ class AllTests:
             ),
             TestConfig(test_name="benchmark", timeout_secs=120),
             TestConfig(test_name="boringssl_crypto"),
+            # TODO(b/468409589): Add RISC-V FPU test.
             TestConfig(
                 test_name="cortexm_fpu",
-                # TODO(b/468409589): Add RISC-V FPU test.
-                exclude_boards=[SANOK],
+                allowed_architectures=[Architecture.ARM],
             ),
             TestConfig(test_name="crc"),
             TestConfig(test_name="exception"),
@@ -780,25 +780,13 @@ class AllTests:
             TestConfig(
                 config_name="pmp_entries_ro",
                 test_name="pmp_entries",
-                exclude_boards=[
-                    BLOONCHIPPER,
-                    DARTMONKEY,
-                    HELIPILOT,
-                    BUCCANEER,
-                    GWENDOLIN,
-                ],
                 imagetype_to_use=ImageType.RO,
+                allowed_architectures=[Architecture.RISCV],
             ),
             TestConfig(
                 config_name="pmp_entries_rw",
                 test_name="pmp_entries",
-                exclude_boards=[
-                    BLOONCHIPPER,
-                    DARTMONKEY,
-                    HELIPILOT,
-                    BUCCANEER,
-                    GWENDOLIN,
-                ],
+                allowed_architectures=[Architecture.RISCV],
             ),
             TestConfig(test_name="printf"),
             TestConfig(test_name="queue"),
