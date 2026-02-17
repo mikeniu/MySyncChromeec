@@ -23,7 +23,11 @@ LOG_MODULE_DECLARE(ap_pwrseq, LOG_LEVEL_INF);
 /* Power cycling primary rail requires at least 30 ms 'off' time */
 #define BOARD_OCELOT_MINIMUM_POWER_DOWN_DELAY_MS 30
 
+#ifdef CONFIG_AP_PWRSEQ_DRIVER
+static void board_ap_power_shutdown(void)
+#else
 void board_ap_power_force_shutdown(void)
+#endif
 {
 	int timeout_ms = X86_NON_DSX_FORCE_SHUTDOWN_TO_MS;
 
@@ -46,7 +50,7 @@ void board_ap_power_force_shutdown(void)
 #ifdef CONFIG_AP_PWRSEQ_DRIVER
 int board_ap_power_action_g3_entry(void *data)
 {
-	board_ap_power_force_shutdown();
+	board_ap_power_shutdown();
 
 	return 0;
 }
