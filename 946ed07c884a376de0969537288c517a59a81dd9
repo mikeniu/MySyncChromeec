@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0575095d_f3a976af",
+        "filename": "zephyr/program/fatcat/moonstone/moonstone_vif.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-02-17T22:26:36Z",
+      "side": 1,
+      "message": "I\u0027m seeing 3.2 v1.0 on the traces.",
+      "range": {
+        "startLine": 70,
+        "startChar": 41,
+        "endLine": 70,
+        "endChar": 42
+      },
+      "revId": "946ed07c884a376de0969537288c517a59a81dd9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
