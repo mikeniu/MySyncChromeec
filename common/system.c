@@ -340,8 +340,7 @@ void system_print_banner(void)
 	}
 }
 
-#if defined(CONFIG_RAM_SIZE) && \
-	(defined(CONFIG_COMMON_PANIC_OUTPUT) || defined(BOARD_HOST))
+#if defined(CONFIG_RAM_SIZE) && defined(CONFIG_COMMON_PANIC_OUTPUT)
 struct jump_data *get_jump_data(void)
 {
 	uintptr_t addr;
@@ -356,7 +355,7 @@ struct jump_data *get_jump_data(void)
 
 	return (struct jump_data *)(addr - sizeof(struct jump_data));
 }
-#endif /* CONFIG_RAM_SIZE && (CONFIG_COMMON_PANIC_OUTPUT || BOARD_HOST) */
+#endif /* CONFIG_RAM_SIZE && CONFIG_COMMON_PANIC_OUTPUT */
 
 test_mockable int system_jumped_to_this_image(void)
 {
@@ -939,11 +938,10 @@ void system_common_pre_init(void)
 	}
 
 	/*
-	 * get_jump_data() is only available if one of the following are
+	 * get_jump_data() is only available if CONFIG_COMMON_PANIC_OUTPUT is
 	 * enabled.
 	 */
-	if (!(IS_ENABLED(CONFIG_COMMON_PANIC_OUTPUT) ||
-	      IS_ENABLED(BOARD_HOST))) {
+	if (!IS_ENABLED(CONFIG_COMMON_PANIC_OUTPUT)) {
 		return;
 	}
 
