@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d9fb350_cc244365",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-02-17T22:46:28Z",
+      "side": 1,
+      "message": "s/rts/rtk/\n\nAll the other EC projects use \"rtk\" as the prefix for Realtek EC based designs.",
+      "revId": "442b4386c558a5ce58aef3b34755a471ee694b14",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
