@@ -18,6 +18,7 @@
 #include <zephyr/drivers/spi.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/util.h>
 
 #include <drivers/cros_flash.h>
 #include <soc.h>
@@ -127,7 +128,8 @@ static int cros_flash_npcx_wait_write_enabled(const struct device *dev)
 	return cros_flash_npcx_wait_write_enable_state(dev, true);
 }
 
-static int cros_flash_npcx_set_write_enable(const struct device *dev)
+ZTESTABLE_STATIC
+int cros_flash_npcx_set_write_enable(const struct device *dev)
 {
 	int ret;
 	struct npcx_ex_ops_uma_in op_in = {
@@ -159,8 +161,8 @@ static int cros_flash_npcx_wait_write_disabled(const struct device *dev)
 	return cros_flash_npcx_wait_write_enable_state(dev, false);
 }
 
-static int __maybe_unused
-cros_flash_npcx_set_write_disable(const struct device *dev)
+ZTESTABLE_STATIC
+int __maybe_unused cros_flash_npcx_set_write_disable(const struct device *dev)
 {
 	int ret;
 	struct npcx_ex_ops_uma_in write_disable_op = {
@@ -263,7 +265,8 @@ static int cros_flash_npcx_write_protection_is_set(const struct device *dev)
  * @note Callers should always check if the return value is negative (error)
  *       before evaluating the truthiness of the lock state.
  */
-static int __maybe_unused flash_control_register_locked(const struct device *dev)
+ZTESTABLE_STATIC
+int __maybe_unused flash_control_register_locked(const struct device *dev)
 {
 	uint8_t reg;
 	int ret;
