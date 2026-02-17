@@ -85,6 +85,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d1c332f4_5f41cd7b",
+        "filename": "zephyr/include/ascp/ascp.h",
+        "patchSetId": 16
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-17T09:56:15Z",
+      "side": 1,
+      "message": "Changed back. It is more flexible to fill the structure. I can imagine I can do it without dependency on ec_commands.h but it would require adding same structure in ascp api and copying of data. Not sure if it is better. If you have other ideas please let me know.",
+      "parentUuid": "f5b40beb_849416b5",
+      "range": {
+        "startLine": 18,
+        "startChar": 24,
+        "endLine": 18,
+        "endChar": 51
+      },
+      "revId": "5589ce213ed3de1dea3bd8b577f77b63e89247ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9450438d_36b47eeb",
         "filename": "zephyr/linker/iterables-rom.ld",
         "patchSetId": 16

@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3fbaa113_439cfcba",
+        "filename": "zephyr/Kconfig.ascp",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-17T09:56:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c83caba2_f231f997",
+      "revId": "dbf7d25cb9e8034e7aec6a270770f36157aaf1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "38cbece8_99890f5e",
@@ -41,6 +59,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b73b1a1_6f179f0b",
+        "filename": "zephyr/Kconfig.ascp",
+        "patchSetId": 18
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-17T09:56:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "38cbece8_99890f5e",
+      "range": {
+        "startLine": 5,
+        "startChar": 7,
+        "endLine": 5,
+        "endChar": 31
+      },
+      "revId": "dbf7d25cb9e8034e7aec6a270770f36157aaf1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "17ede09e_ad61581d",
@@ -54,6 +96,30 @@
       "writtenOn": "2026-02-09T15:42:51Z",
       "side": 1,
       "message": "I think it\u0027s ET171.\n\n```suggestion\nconfig PLATFORM_EC_FINGERPRINT_ASCP_ET171\n\tbool \"Enable fingerprint ASCP ET171\"\n\thelp\n\t  Enables support for FP ASCP ET171.\n```",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 37
+      },
+      "revId": "dbf7d25cb9e8034e7aec6a270770f36157aaf1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "574f8afd_45f1e88b",
+        "filename": "zephyr/Kconfig.ascp",
+        "patchSetId": 18
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-17T09:56:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "17ede09e_ad61581d",
       "range": {
         "startLine": 23,
         "startChar": 0,
@@ -89,6 +155,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f3602566_10a42f37",
+        "filename": "zephyr/include/ascp/ascp.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-17T09:56:15Z",
+      "side": 1,
+      "message": "Changes to previous implementation with structure from ec_commands.",
+      "parentUuid": "3db3be9c_99b72278",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 33
+      },
+      "revId": "dbf7d25cb9e8034e7aec6a270770f36157aaf1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "95e04359_0563801f",
         "filename": "zephyr/subsys/ascp/Kconfig",
         "patchSetId": 18
@@ -100,6 +190,30 @@
       "writtenOn": "2026-02-09T15:42:51Z",
       "side": 1,
       "message": "This assumes that the SDCP claim is available at some address, which is a SoC/platform implementation detail. I theorize about some bootloader that gives us a callback to get claim (and/or operate on `sk_f`).\n\nI would move `memcpy()` to platform part. Also, there is no need to expose address as Kconfig options.",
+      "range": {
+        "startLine": 8,
+        "startChar": 6,
+        "endLine": 8,
+        "endChar": 13
+      },
+      "revId": "dbf7d25cb9e8034e7aec6a270770f36157aaf1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2502830c_8f76a261",
+        "filename": "zephyr/subsys/ascp/Kconfig",
+        "patchSetId": 18
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-17T09:56:15Z",
+      "side": 1,
+      "message": "The idea is that this is the one of the possibilities that data is just available in the memory. It works for multiple platforms with different memory offsets. With structure filling approach it is easier to implement alternative platforms.\n\nI moved addresses to header file (in a different CL).",
+      "parentUuid": "95e04359_0563801f",
       "range": {
         "startLine": 8,
         "startChar": 6,
@@ -133,6 +247,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "720d8114_226ee088",
+        "filename": "zephyr/subsys/ascp/Kconfig",
+        "patchSetId": 18
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-17T09:56:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10c5f7fe_13b719ad",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 58
+      },
+      "revId": "dbf7d25cb9e8034e7aec6a270770f36157aaf1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2c447225_a2986f31",
@@ -150,6 +288,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b864019b_0ddfa783",
+        "filename": "zephyr/subsys/ascp/claim.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-17T09:56:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2c447225_a2986f31",
+      "revId": "dbf7d25cb9e8034e7aec6a270770f36157aaf1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "488286e5_75ea51f7",
@@ -163,6 +319,30 @@
       "writtenOn": "2026-02-09T15:42:51Z",
       "side": 1,
       "message": "This declares EC console command that is later converted to Zephyr shell. Since this code will be used only on Zephyr, we can go with Zephyr shell https://docs.zephyrproject.org/latest/services/shell/index.html",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 23
+      },
+      "revId": "dbf7d25cb9e8034e7aec6a270770f36157aaf1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "007fb617_4a884a9d",
+        "filename": "zephyr/subsys/ascp/claim.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-17T09:56:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "488286e5_75ea51f7",
       "range": {
         "startLine": 76,
         "startChar": 0,
