@@ -5,9 +5,50 @@
 
 #include "flash.h"
 
+#include <zephyr/device.h>
+#include <zephyr/devicetree.h>
 #include <zephyr/ztest.h>
 
-ZTEST_SUITE(flash_physical, NULL, NULL, NULL, NULL, NULL);
+#if defined(CONFIG_SOC_FAMILY_NPCX)
+
+extern int flash_control_register_locked(const struct device *dev);
+extern int cros_flash_npcx_set_write_enable(const struct device *dev);
+extern int cros_flash_npcx_set_write_disable(const struct device *dev);
+
+#define cros_flash_dev DEVICE_DT_GET(DT_CHOSEN(cros_ec_flash_controller))
+
+#endif
+
+static void flash_physical_before(void *data)
+{
+#if defined(CONFIG_SOC_FAMILY_NPCX)
+	zassert_not_null(cros_flash_dev, "Flash device instance not found");
+
+	if (!device_is_ready(cros_flash_dev)) {
+		zassert_true(false, "Flash device is not ready");
+	}
+
+	/* Lock physical flash operations. */
+	crec_flash_lock_mapped_storage(1);
+#endif
+}
+
+static void flash_physical_after(void *data)
+{
+#if defined(CONFIG_SOC_FAMILY_NPCX)
+	/*
+	 * Guarantee flash is locked down after the test completes or
+	 * fails.
+	 */
+	cros_flash_npcx_set_write_disable(cros_flash_dev);
+
+	/* Unlock physical flash operations. */
+	crec_flash_lock_mapped_storage(0);
+#endif
+}
+
+ZTEST_SUITE(flash_physical, NULL, NULL, flash_physical_before,
+	    flash_physical_after, NULL);
 
 struct flash_info {
 	int num_flash_banks;
@@ -53,3 +94,35 @@ ZTEST(flash_physical, test_flash_config)
 	zassert_equal(WP_BANK_COUNT, flash_info.write_protect_bank_count,
 		      "WP bank count mismatch");
 }
+
+#if defined(CONFIG_SOC_FAMILY_NPCX)
+
+ZTEST(flash_physical, test_lock_flash_control_register)
+{
+	int ret;
+
+	/* Initial state: Verify it is locked */
+	zassert_true(flash_control_register_locked(cros_flash_dev),
+		     "Flash control register not locked initially");
+
+	/* Unlock the register */
+	ret = cros_flash_npcx_set_write_enable(cros_flash_dev);
+	zassert_equal(ret, 0, "Failed to enable write: %d", ret);
+	zassert_false(flash_control_register_locked(cros_flash_dev),
+		      "Flash control register failed to unlock");
+
+	/* Lock the register */
+	ret = cros_flash_npcx_set_write_disable(cros_flash_dev);
+	zassert_equal(ret, 0, "Failed to disable write: %d", ret);
+	zassert_true(flash_control_register_locked(cros_flash_dev),
+		     "Flash control register failed to lock");
+
+	/* Unlock the register again */
+	ret = cros_flash_npcx_set_write_enable(cros_flash_dev);
+	zassert_equal(ret, 0, "Failed to enable write: %d", ret);
+	zassert_false(
+		flash_control_register_locked(cros_flash_dev),
+		"Flash control register failed to unlock on second attempt");
+}
+
+#endif /* CONFIG_SOC_FAMILY_NPCX */
