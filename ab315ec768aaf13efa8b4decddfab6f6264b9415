@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a78cf56_006c3a23",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 8809,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-17T09:47:41Z",
+      "side": 1,
+      "message": "Fix applied.",
+      "parentUuid": "ea394b45_c522e8bc",
+      "revId": "ab315ec768aaf13efa8b4decddfab6f6264b9415",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "56f8da82_94cfbcc0",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-02-09T13:40:55Z",
       "side": 1,
       "message": "```suggestion\n/* ECC signature, P256v1 curve, P1363 encoding (r||s) */\n```",
+      "revId": "ab315ec768aaf13efa8b4decddfab6f6264b9415",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90a9e06c_74d698c9",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 8811,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-17T09:47:41Z",
+      "side": 1,
+      "message": "Fix applied.",
+      "parentUuid": "56f8da82_94cfbcc0",
       "revId": "ab315ec768aaf13efa8b4decddfab6f6264b9415",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -58,6 +94,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ab7dc88_ed398d93",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 8823,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-17T09:47:41Z",
+      "side": 1,
+      "message": "Fix applied.",
+      "parentUuid": "ec036971_c98319c9",
+      "range": {
+        "startLine": 8817,
+        "startChar": 0,
+        "endLine": 8823,
+        "endChar": 37
+      },
+      "revId": "ab315ec768aaf13efa8b4decddfab6f6264b9415",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2a986224_cc58d3dd",
@@ -71,6 +131,30 @@
       "writtenOn": "2026-02-09T13:40:55Z",
       "side": 1,
       "message": "```suggestion\n\t// TA\u0027s ephemeral public key.\n\tuint8_t pk_g[FP_ASCP_KEY_SIZE];\n```",
+      "range": {
+        "startLine": 8833,
+        "startChar": 1,
+        "endLine": 8833,
+        "endChar": 32
+      },
+      "revId": "ab315ec768aaf13efa8b4decddfab6f6264b9415",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3ecc695_3e7a89b8",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 8833,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-17T09:47:41Z",
+      "side": 1,
+      "message": "Fix applied.",
+      "parentUuid": "2a986224_cc58d3dd",
       "range": {
         "startLine": 8833,
         "startChar": 1,
