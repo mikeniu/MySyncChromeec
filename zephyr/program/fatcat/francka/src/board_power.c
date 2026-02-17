@@ -29,7 +29,7 @@ LOG_MODULE_DECLARE(ap_pwrseq, LOG_LEVEL_INF);
 test_export_static bool s0_stable;
 #endif
 
-void board_ap_power_force_shutdown(void)
+static void board_ap_power_shutdown(void)
 {
 	power_signal_set(PWR_EC_PCH_RSMRST, 1);
 
@@ -43,6 +43,11 @@ void board_ap_power_force_shutdown(void)
 }
 
 #ifndef CONFIG_AP_PWRSEQ_DRIVER
+void board_ap_power_force_shutdown(void)
+{
+	board_ap_power_shutdown();
+}
+
 void board_ap_power_action_g3_s5(void)
 {
 	LOG_DBG("Turning on PWR_EN_PP5000_A and PWR_EN_PP3300_A");
@@ -123,13 +128,17 @@ SYS_INIT(board_ap_power_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
 
 static int board_ap_power_g3_entry(void *data)
 {
-	board_ap_power_force_shutdown();
+	board_ap_power_shutdown();
 
 	return 0;
 }
 
 static int board_ap_power_g3_run(void *data)
 {
+	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
+		board_ap_power_shutdown();
+		return 1;
+	}
 	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_STARTUP)) {
 		LOG_INF("Turning on PWR_EN_PP5000_A and PWR_EN_PP3300_A");
 
