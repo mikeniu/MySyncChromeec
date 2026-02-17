@@ -22,6 +22,30 @@
       },
       "revId": "2821c76d08af1c9ccb32f9e55b1ed2610607efd4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cc4eeaa_a3455db7",
+        "filename": "util/renode/sanok_crypto_hooks.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-17T18:18:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7411335c_49eb8dbf",
+      "range": {
+        "startLine": 110,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 12
+      },
+      "revId": "2821c76d08af1c9ccb32f9e55b1ed2610607efd4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
