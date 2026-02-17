@@ -35,10 +35,17 @@ static int board_ap_power_action_g3_entry(void *data)
 
 static int board_ap_power_g3_run(void *data)
 {
-	/* Turn on the PP3300_PRIM rail. */
-	power_signal_set(PWR_EN_PP3300_A, 1);
+	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
+		board_ap_power_shutdown();
+		return 1;
+	}
 
-	return 0;
+	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_STARTUP)) {
+		/* Turn on the PP3300_PRIM rail. */
+		power_signal_set(PWR_EN_PP3300_A, 1);
+	}
+
+	return !power_signal_get(PWR_EN_PP3300_A);
 }
 
 AP_POWER_APP_STATE_DEFINE(G3, board_ap_power_action_g3_entry,
