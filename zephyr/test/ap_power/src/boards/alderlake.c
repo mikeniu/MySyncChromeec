@@ -64,10 +64,6 @@ int board_power_signal_get(enum power_signal signal)
 	}
 }
 
-void board_ap_power_force_shutdown(void)
-{
-}
-
 int board_ap_power_assert_pch_power_ok(void)
 {
 	power_signal_set(PWR_PCH_PWROK, 1);
@@ -84,6 +80,10 @@ static void generate_ec_soc_dsw_pwrok_handler(void)
 }
 
 #ifndef CONFIG_AP_PWRSEQ_DRIVER
+void board_ap_power_force_shutdown(void)
+{
+}
+
 void board_ap_power_action_g3_s5(void)
 {
 	power_signal_enable(PWR_DSW_PWROK);
