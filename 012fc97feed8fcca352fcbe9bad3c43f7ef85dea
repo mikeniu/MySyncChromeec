@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e38599a1_aa954e31",
+        "filename": "zephyr/drivers/i2c/CMakeLists.txt",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-02-17T22:39:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "508cdd72_6af15d60",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 23
+      },
+      "revId": "012fc97feed8fcca352fcbe9bad3c43f7ef85dea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "06c79b0e_ea34ce51",
@@ -95,6 +119,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9098448_ae176aab",
+        "filename": "zephyr/drivers/i2c/i2c_scan.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-02-17T22:39:44Z",
+      "side": 1,
+      "message": "I have removed the ish console prints from the ish_i2c_scan function as the result will be shown in either the AP console or the ADB shell. To clarify, the shell command can\u0027t easily be used for the ISH as the console isn\u0027t typically available and requires changing some configs to have write access.",
+      "parentUuid": "74e40ded_5f337a03",
+      "revId": "012fc97feed8fcca352fcbe9bad3c43f7ef85dea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "09350463_54893eeb",
@@ -108,6 +150,30 @@
       "writtenOn": "2026-02-11T22:32:20Z",
       "side": 1,
       "message": "Board changes should be in a separate CL from the functional changes.\n\nAlso, the main value of this command is for early bring-up.  I don\u0027t think this needs to be enabled on mature platforms.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 9
+      },
+      "revId": "012fc97feed8fcca352fcbe9bad3c43f7ef85dea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71238f18_de88c453",
+        "filename": "zephyr/program/trulo/kaladin-ish/i2c.dtsi",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-02-17T22:39:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09350463_54893eeb",
       "range": {
         "startLine": 7,
         "startChar": 0,
