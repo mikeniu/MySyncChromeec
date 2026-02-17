@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f55d625_1217a096",
+        "filename": "include/fpsensor/fpsensor_auth_crypto.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-02-17T14:42:10Z",
+      "side": 1,
+      "message": "The \"additional data\" that we pass to `generate_session_key()` is a [\"session context\"](https://source.corp.google.com/h/googleplex-android/platform/superproject/main/+/main:trusty/user/desktop/app/finger_guard/src/service.rs;l\u003d423;drc\u003d8f009ce2eecd3e170f5a12be653064a035a57adf). Could you update the parameter name and comments?",
+      "range": {
+        "startLine": 213,
+        "startChar": 14,
+        "endLine": 213,
+        "endChar": 53
+      },
+      "revId": "c787a7182e2f156dbcfa2c95c769526148b1f096",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
