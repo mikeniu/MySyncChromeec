@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0726f35_ec7b5678",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1487763
+      },
+      "writtenOn": "2026-02-17T19:49:51Z",
+      "side": 1,
+      "message": "Hi Boris,\n\nCould you please review this patchset of cherry-picked CLs?\nThis is practically the continuation of https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7571322 effort.\nIt just appeared that I had failed to notice there was a fix-up CL for response size of the `EC_CMD_PWM_GET_FAN_DUTY`; the commit additionally fixes a similar issue for `EC_CMD_THERMAL_AUTO_FAN_CTRL`, which is why I am cherrypicking the commits introducing the v2 of the command.\n\nRegards,\nAngela",
+      "revId": "f4befcd62fc7c053f48ddb5f1327a4f329a05988",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
