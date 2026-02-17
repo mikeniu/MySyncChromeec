@@ -143,6 +143,34 @@ static int cros_flash_npcx_set_write_enable(const struct device *dev)
 	return cros_flash_npcx_wait_ready_and_we(dev);
 }
 
+static int __maybe_unused
+cros_flash_npcx_set_write_disable(const struct device *dev)
+{
+	int ret;
+	struct npcx_ex_ops_uma_in op_in = {
+		.opcode = SPI_NOR_CMD_WRDI,
+		.tx_count = 0,
+		.addr_count = 0,
+	};
+	struct cros_flash_npcx_data *data = DRV_DATA(dev);
+
+	/* Wait for previous operation to complete */
+	ret = cros_flash_npcx_wait_ready(dev);
+	if (ret != 0) {
+		return ret;
+	}
+
+	/* Execute write disable command */
+	ret = flash_ex_op(data->flash_dev, FLASH_NPCX_EX_OP_EXEC_UMA,
+			  (uintptr_t)&op_in, NULL);
+	if (ret != 0) {
+		return ret;
+	}
+
+	/* Wait for flash is not busy */
+	return cros_flash_npcx_wait_ready(dev);
+}
+
 static int cros_flash_npcx_set_status_reg(const struct device *dev,
 					  uint8_t *reg)
 {
@@ -207,6 +235,16 @@ static int cros_flash_npcx_write_protection_is_set(const struct device *dev)
 	}
 
 	return (oper_out.oper & NPCX_EX_OP_INT_FLASH_WP) != 0 ? 1 : 0;
+}
+
+int __maybe_unused flash_control_register_locked(const struct device *dev)
+{
+	uint8_t reg;
+
+	cros_flash_npcx_get_status_reg(dev, SPI_NOR_CMD_RDSR, &reg);
+
+	return cros_flash_npcx_write_protection_is_set(dev) ||
+	       ((reg & SPI_NOR_WEL_BIT) == 0);
 }
 
 static int cros_flash_npcx_uma_lock(const struct device *dev, bool enable)
