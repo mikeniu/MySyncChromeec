@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdd7097c_e64119a9",
+        "filename": "zephyr/program/intelrvp/ptlrvp/src/board_power.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-17T19:50:40Z",
+      "side": 1,
+      "message": "I am considering that instead of adding these lines for every board variant, we could handle `AP_PWRSEQ_EVENT_POWER_SHUTDOWN` event inside `AP_POWER_ARCH_STATE_DEFINE` power states and use AP Power sequence driver do the transition to set all power signals.",
+      "range": {
+        "startLine": 32,
+        "startChar": 1,
+        "endLine": 32,
+        "endChar": 17
+      },
+      "revId": "a3704cb6b7ea74f61ad1d7666c855a3562ac1ed0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
