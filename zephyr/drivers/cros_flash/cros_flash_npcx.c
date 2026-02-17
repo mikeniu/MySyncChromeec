@@ -116,7 +116,8 @@ static int cros_flash_npcx_wait_ready_and_we(const struct device *dev)
 	}
 }
 
-static int cros_flash_npcx_set_write_enable(const struct device *dev)
+STATIC_IF_NOT(CONFIG_ZTEST)
+int cros_flash_npcx_set_write_enable(const struct device *dev)
 {
 	int ret;
 	struct npcx_ex_ops_uma_in op_in = {
@@ -258,7 +259,8 @@ static int cros_flash_npcx_write_protection_is_set(const struct device *dev)
 	return (oper_out.oper & NPCX_EX_OP_INT_FLASH_WP) != 0 ? 1 : 0;
 }
 
-static int __maybe_unused flash_control_register_locked(const struct device *dev)
+STATIC_IF_NOT(CONFIG_ZTEST)
+int __maybe_unused flash_control_register_locked(const struct device *dev)
 {
 	uint8_t reg;
 
