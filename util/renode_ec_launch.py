@@ -68,6 +68,10 @@ def launch(
     zephyr_bin: str,
     ec_project: str,
     uart: str,
+    bin_file_path: Optional[str] = None,
+    elf_ro_path: Optional[str] = None,
+    elf_rw_path: Optional[str] = None,
+    enable_gdb: bool = True,
 ) -> int:
     """Launches an EC image in Renode.
 
@@ -80,6 +84,10 @@ def launch(
         zephyr_bin: Path to Zephyr binary.
         ec_project: The name of the EC project.
         uart: Path to the UART PTY.
+        bin_file_path: Explicit path to the binary file.
+        elf_ro_path: Explicit path to the RO ELF file.
+        elf_rw_path: Explicit path to the RW ELF file.
+        enable_gdb: Enable the GDB server.
     Returns:
         0 on success, otherwise non-zero.
     """
@@ -89,7 +97,11 @@ def launch(
     script_path = pathlib.Path(__file__).parent.resolve()
     ec_dir = script_path.parent
 
-    if zephyr_bin:
+    if bin_file_path and elf_ro_path and elf_rw_path:
+        bin_file = pathlib.Path(bin_file_path)
+        elf_ro_file = pathlib.Path(elf_ro_path)
+        elf_rw_file = pathlib.Path(elf_rw_path)
+    elif zephyr_bin:
         bin_file = pathlib.Path(zephyr_bin)
         elf_ro_file = pathlib.Path(os.path.dirname(zephyr_bin)) / "zephyr.elf"
         # There is only a single ELF file in upstream Zephyr builds.
@@ -139,7 +151,8 @@ def launch(
     renode_execute.append("logLevel 3;")
     # https://renode.readthedocs.io/en/latest/debugging/gdb.html
     # (gdb) target remote :3333
-    renode_execute.append("machine StartGdbServer 3333;")
+    if enable_gdb:
+        renode_execute.append("machine StartGdbServer 3333;")
 
     if board in GPIO_WP_MAP:
         wp_state = GPIO_WP_ENABLE if enable_write_protect else GPIO_WP_DISABLE
@@ -235,6 +248,28 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
         help="Target path for the UART PTY symlink.",
     )
 
+    parser.add_argument(
+        "--bin-file",
+        type=str,
+        help="Explicit path to the binary file.",
+    )
+    parser.add_argument(
+        "--elf-ro",
+        type=str,
+        help="Explicit path to the RO ELF file.",
+    )
+    parser.add_argument(
+        "--elf-rw",
+        type=str,
+        help="Explicit path to the RW ELF file.",
+    )
+    parser.add_argument(
+        "--no-gdb",
+        action="store_false",
+        dest="enable_gdb",
+        help="Disable the GDB server.",
+    )
+
     opts = parser.parse_args(argv)
     return launch(
         board=opts.board,
@@ -243,6 +278,10 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
         zephyr_bin=opts.zephyr_bin,
         ec_project=opts.ec,
         uart=opts.uart,
+        bin_file_path=opts.bin_file,
+        elf_ro_path=opts.elf_ro,
+        elf_rw_path=opts.elf_rw,
+        enable_gdb=opts.enable_gdb,
     )
 
 

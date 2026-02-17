@@ -58,10 +58,12 @@ import logging
 import os
 from pathlib import Path
 import re
+import shutil
 import socket
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from typing import BinaryIO, Callable, Optional
 
@@ -287,6 +289,7 @@ class Platform(ABC):
         test_name: str,
         enable_hw_write_protect: bool,
         zephyr: bool,
+        **kwargs,
     ) -> bool:
         """Flash specified test to specified board."""
 
@@ -356,6 +359,7 @@ class Hardware(Platform):
         test_name: str,
         enable_hw_write_protect: bool,
         zephyr: bool,
+        **kwargs,
     ) -> bool:
         logging.info("Flashing test")
 
@@ -395,9 +399,10 @@ class Renode(Platform):
 
     def __init__(self):
         self.process = None
+        self.console_path = tempfile.mktemp(prefix="renode-uart-")
 
     def get_console(self, board_config: BoardConfig) -> Optional[str]:
-        return "/tmp/renode-uart"
+        return self.console_path
 
     def hw_write_protect(self, enable: bool) -> None:
         pass
@@ -415,21 +420,35 @@ class Renode(Platform):
         test_name: str,
         enable_hw_write_protect: bool,
         zephyr: bool,
+        **kwargs,
     ) -> bool:
         cmd = [
             "./util/renode-ec-launch",
             "--board",
             board_config.name,
+            "--uart",
+            self.console_path,
+            "--no-gdb",
         ]
-        if zephyr:
-            # We've adopted the convention that we prefix upstream Zephyr test
-            # names with "zephyr_".
-            if test_name.startswith("zephyr_"):
-                cmd.extend(["--zephyr-bin", image_path])
-            else:
-                cmd.append("--zephyr")
+
+        artifacts = kwargs.get("artifacts", {})
+        if artifacts:
+            if "bin" in artifacts:
+                cmd.extend(["--bin-file", artifacts["bin"]])
+            if "elf_ro" in artifacts:
+                cmd.extend(["--elf-ro", artifacts["elf_ro"]])
+            if "elf_rw" in artifacts:
+                cmd.extend(["--elf-rw", artifacts["elf_rw"]])
         else:
-            cmd.extend(["--ec", test_name])
+            if zephyr:
+                # We've adopted the convention that we prefix upstream Zephyr test
+                # names with "zephyr_".
+                if test_name.startswith("zephyr_"):
+                    cmd.extend(["--zephyr-bin", image_path])
+                else:
+                    cmd.append("--zephyr")
+            else:
+                cmd.extend(["--ec", test_name])
 
         if enable_hw_write_protect:
             cmd.append("--enable-write-protect")
@@ -442,7 +461,11 @@ class Renode(Platform):
         return True
 
     def cleanup(self) -> None:
-        self.process.kill()
+        if self.process:
+            self.process.kill()
+            self.process.wait()
+        if os.path.exists(self.console_path):
+            os.remove(self.console_path)
 
     def _skip_test_bloonchipper(
         self, test_config: TestConfig, zephyr: bool
@@ -1678,12 +1701,62 @@ def get_image_path(test: TestConfig, build_board: str, zephyr: bool):
     return image_path
 
 
+def get_artifact_paths(
+    test: TestConfig, build_board: str, zephyr: bool
+) -> dict[str, str]:
+    """Get paths to build artifacts."""
+    paths = {}
+
+    if zephyr:
+        if test.zephyr_name:
+            # Upstream Zephyr
+            twister_out = os.walk(ZEPHYR_TWISTER_BUILD_DIR)
+            image_path = None
+            for dirpath, _, filenames in twister_out:
+                # b/419617755#comment46: Use version with Nuvoton header if it exists.
+                for filename in ["zephyr.npcx.bin", "zephyr.bin"]:
+                    if filename in filenames:
+                        image_path = os.path.join(dirpath, filename)
+                        break
+                if image_path is not None:
+                    break
+
+            if image_path:
+                paths["bin"] = image_path
+                paths["elf_ro"] = os.path.join(
+                    os.path.dirname(image_path), "zephyr.elf"
+                )
+                paths["elf_rw"] = paths["elf_ro"]
+        else:
+            # Downstream Zephyr
+            out_dir = os.path.join(
+                EC_DIR, "build", "zephyr", build_board, "output"
+            )
+            paths["bin"] = os.path.join(out_dir, "ec.bin")
+            paths["elf_ro"] = os.path.join(out_dir, "zephyr.ro.elf")
+            paths["elf_rw"] = os.path.join(out_dir, "zephyr.rw.elf")
+    else:
+        # EC
+        if test.apptype_to_use == ApplicationType.PRODUCTION:
+            out_dir = os.path.join(EC_DIR, "build", build_board)
+            bin_name = "ec"
+        else:
+            out_dir = os.path.join(EC_DIR, "build", build_board, test.test_name)
+            bin_name = test.test_name
+
+        paths["bin"] = os.path.join(out_dir, f"{bin_name}.bin")
+        paths["elf_ro"] = os.path.join(out_dir, "RO", f"{bin_name}.RO.elf")
+        paths["elf_rw"] = os.path.join(out_dir, "RW", f"{bin_name}.RW.elf")
+
+    return paths
+
+
 def flash_and_run_test(
     test: TestConfig,
-    platform: Platform,
+    platform_class: type[Platform],
     board_config: BoardConfig,
     args: argparse.Namespace,
-    executor,
+    build_lock: threading.Lock,
 ) -> bool:
     """Run a single test using the test and board configuration specified"""
     build_board = board_config.name
@@ -1694,82 +1767,117 @@ def flash_and_run_test(
     elif test.zephyr_name is not None:
         build_board = board_config.zephyr_board_name
 
-    # attempt to build test binary, reporting a test failure on error
+    platform = platform_class()
+    temp_dir = None
+    artifacts = {}
+
     try:
-        build(
-            test,
-            build_board,
-            args.compiler,
-            args.zephyr,
-        )
-    except Exception as exception:  # pylint: disable=broad-except
-        logging.error("failed to build %s: %s", test.test_name, exception)
-        return False
+        with build_lock:
+            # attempt to build test binary, reporting a test failure on error
+            try:
+                build(
+                    test,
+                    build_board,
+                    args.compiler,
+                    args.zephyr,
+                )
+            except Exception as exception:  # pylint: disable=broad-except
+                logging.error(
+                    "failed to build %s: %s", test.test_name, exception
+                )
+                return False
 
-    image_path = get_image_path(test, build_board, args.zephyr)
-
-    logging.debug("image_path: %s", image_path)
-
-    if test.ro_image is not None:
-        try:
-            patch_image(test, image_path)
-        except Exception as exception:  # pylint: disable=broad-except
-            logging.warning(
-                "An exception occurred while patching image: %s", exception
+            image_path = get_image_path(test, build_board, args.zephyr)
+            artifact_paths = get_artifact_paths(
+                test, build_board, args.zephyr
             )
+
+            # Copy artifacts to a temporary directory to allow parallel execution.
+            temp_dir = tempfile.mkdtemp(prefix=f"test_artifacts_{test.test_name}_")
+            shutil.copy(image_path, os.path.join(temp_dir, "image.bin"))
+            image_path = os.path.join(temp_dir, "image.bin")
+            artifacts["bin"] = image_path
+
+            if "elf_ro" in artifact_paths and os.path.exists(artifact_paths["elf_ro"]):
+                shutil.copy(artifact_paths["elf_ro"], os.path.join(temp_dir, "ro.elf"))
+                artifacts["elf_ro"] = os.path.join(temp_dir, "ro.elf")
+
+            if "elf_rw" in artifact_paths and os.path.exists(artifact_paths["elf_rw"]):
+                shutil.copy(artifact_paths["elf_rw"], os.path.join(temp_dir, "rw.elf"))
+                artifacts["elf_rw"] = os.path.join(temp_dir, "rw.elf")
+
+            logging.debug("image_path: %s", image_path)
+
+            if test.ro_image is not None:
+                try:
+                    patch_image(test, image_path)
+                except Exception as exception:  # pylint: disable=broad-except
+                    logging.warning(
+                        "An exception occurred while patching image: %s",
+                        exception,
+                    )
+                    return False
+
+        # Get the console file before flashing to listen ASAP after flashing.
+        console_pty = platform.get_console(board_config)
+
+        # flash test binary
+        if not platform.flash(
+            board_config,
+            image_path,
+            args.flasher,
+            args.remote,
+            args.jlink_port,
+            test.test_name,
+            test.enable_hw_write_protect,
+            args.zephyr,
+            artifacts=artifacts,
+        ):
+            logging.debug("Flashing failed")
             return False
 
-    # Get the console file before flashing to listen ASAP after flashing.
-    console_pty = platform.get_console(board_config)
+        with ExitStack() as stack:
+            if args.remote and args.console_port:
+                console_socket = socket.socket(
+                    socket.AF_INET, socket.SOCK_STREAM
+                )
+                console_socket.connect((args.remote, args.console_port))
+                console = stack.enter_context(
+                    console_socket.makefile(mode="rwb", buffering=0)
+                )
+            else:
+                # pylint: disable-next=consider-using-with
+                console_file = open(console_pty, "wb+", buffering=0)
+                console = stack.enter_context(console_file)
 
-    # flash test binary
-    if not platform.flash(
-        board_config,
-        image_path,
-        args.flasher,
-        args.remote,
-        args.jlink_port,
-        test.test_name,
-        test.enable_hw_write_protect,
-        args.zephyr,
-    ):
-        logging.debug("Flashing failed")
-        return False
+            platform.hw_write_protect(test.enable_hw_write_protect)
 
-    with ExitStack() as stack:
-        if args.remote and args.console_port:
-            console_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            console_socket.connect((args.remote, args.console_port))
-            console = stack.enter_context(
-                console_socket.makefile(mode="rwb", buffering=0)
-            )
-        else:
-            # pylint: disable-next=consider-using-with
-            console_file = open(console_pty, "wb+", buffering=0)
-            console = stack.enter_context(console_file)
+            if test.toggle_power:
+                power_cycle(platform, board_config)
+            else:
+                # In some cases flash_ec leaves the board off, so just ensure it is on
+                platform.power(board_config, power_on=True)
 
-        platform.hw_write_protect(test.enable_hw_write_protect)
+            # run the test
+            logging.info('Running test: "%s"', test.config_name)
 
-        if test.toggle_power:
-            power_cycle(platform, board_config)
-        else:
-            # In some cases flash_ec leaves the board off, so just ensure it is on
-            platform.power(board_config, power_on=True)
+            # Create a dedicated executor for console I/O to avoid deadlock/starvation
+            # if the main executor is saturated.
+            with ThreadPoolExecutor(max_workers=1) as io_executor:
+                ret = run_test(
+                    test,
+                    board_config,
+                    console,
+                    executor=io_executor,
+                    zephyr=args.zephyr,
+                )
 
-        # run the test
-        logging.info('Running test: "%s"', test.config_name)
+            platform.cleanup()
 
-        ret = run_test(
-            test,
-            board_config,
-            console,
-            executor=executor,
-            zephyr=args.zephyr,
-        )
-
-        platform.cleanup()
-
-        return ret
+            return ret
+    finally:
+        if temp_dir:
+            shutil.rmtree(temp_dir)
 
 
 def write_json_results(
@@ -1921,6 +2029,13 @@ def main():
         help="Output file for test results in JSON format",
     )
 
+    parser.add_argument(
+        "--jobs",
+        type=int,
+        help="Number of parallel jobs to run",
+        default=1,
+    )
+
     args = parser.parse_args()
     logging.basicConfig(
         format="%(levelname)s:%(message)s", level=args.log_level
@@ -1934,23 +2049,43 @@ def main():
         board_config.expected_mcu_power = board_config.expected_mcu_power_zephyr
 
     if args.renode:
-        platform = Renode()
+        platform_class = Renode
     else:
-        platform = Hardware()
+        platform_class = Hardware
 
+    # Create a temporary platform instance to get the test list.
     test_list = get_test_list(
-        platform, board_config, args.tests, args.with_private, args.zephyr
+        platform_class(),
+        board_config,
+        args.tests,
+        args.with_private,
+        args.zephyr,
     )
     logging.debug("Running tests: %s", [test.config_name for test in test_list])
 
-    with ThreadPoolExecutor(max_workers=1) as executor:
+    build_lock = threading.Lock()
+    with ThreadPoolExecutor(max_workers=args.jobs) as executor:
+        futures = {}
         for test in test_list:
-            if (test.skip_for_zephyr and args.zephyr) or platform.skip_test(
-                test, board_config, args.zephyr
-            ):
+            if (
+                test.skip_for_zephyr and args.zephyr
+            ) or platform_class().skip_test(test, board_config, args.zephyr):
                 test.status = TestStatus.SKIP
                 continue
-            if flash_and_run_test(test, platform, board_config, args, executor):
+
+            future = executor.submit(
+                flash_and_run_test,
+                test,
+                platform_class,
+                board_config,
+                args,
+                build_lock,
+            )
+            futures[future] = test
+
+        for future in concurrent.futures.as_completed(futures):
+            test = futures[future]
+            if future.result():
                 test.status = TestStatus.PASS
             else:
                 test.status = TestStatus.FAIL
