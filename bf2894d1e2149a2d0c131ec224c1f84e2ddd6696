@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23f4a128_8922e71d",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1183,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-18T00:15:47Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by Spellchecker: \"Suport\" is a possible misspelling of \"Support\".\n\nTo bypass Spellchecker, add a ...\n\n\"Suport\" is a possible misspelling of \"Support\".\n\nTo bypass Spellchecker, add a footer with DISABLE_SPELLCHECKER",
+      "range": {
+        "startLine": 1183,
+        "startChar": 14,
+        "endLine": 1183,
+        "endChar": 20
+      },
+      "revId": "bf2894d1e2149a2d0c131ec224c1f84e2ddd6696",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "459babcf_07dc242c",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1200,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-18T00:15:47Z",
+      "side": 1,
+      "message": "I will update these bug numbers before submitting",
+      "range": {
+        "startLine": 1183,
+        "startChar": 2,
+        "endLine": 1200,
+        "endChar": 44
+      },
+      "revId": "bf2894d1e2149a2d0c131ec224c1f84e2ddd6696",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
