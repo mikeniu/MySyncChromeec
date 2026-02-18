@@ -16,6 +16,23 @@
       "message": "Hi @honscheid@google.com, @mike, @keith\n\nThe changes are verified on the reworked boards, This patch should to be merged once the HW changes are implemented in all the boards.",
       "revId": "63fcb9206bd5ce0fd03611cc90546ab43805cd4e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c0a364d_ccee3ef2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1369019
+      },
+      "writtenOn": "2026-02-18T16:28:26Z",
+      "side": 1,
+      "message": "This looks to be a duplicate of b/468084592\n\nhttps://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7254656",
+      "revId": "63fcb9206bd5ce0fd03611cc90546ab43805cd4e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
