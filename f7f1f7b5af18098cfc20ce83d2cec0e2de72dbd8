@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b06abfa2_20763754",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 6037,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-02-18T16:20:40Z",
+      "side": 1,
+      "message": "nitpick sorry: should this be `ISH_I2C_SCAN_ADRESSES_MAX`? coherent prefix is what I\u0027m thinking of",
+      "range": {
+        "startLine": 6037,
+        "startChar": 0,
+        "endLine": 6037,
+        "endChar": 37
+      },
+      "revId": "f7f1f7b5af18098cfc20ce83d2cec0e2de72dbd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "226ab6a8_a280b124",
+        "filename": "zephyr/drivers/i2c/i2c_scan.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-02-18T16:20:40Z",
+      "side": 1,
+      "message": "ok I think you can drop the double loop now, right? just go from first to last and set the bits, and I guess first and last could be defines",
+      "revId": "f7f1f7b5af18098cfc20ce83d2cec0e2de72dbd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "521b0376_f5650a4c",
+        "filename": "zephyr/drivers/i2c/i2c_scan.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-02-18T16:20:40Z",
+      "side": 1,
+      "message": "leftover?",
+      "revId": "f7f1f7b5af18098cfc20ce83d2cec0e2de72dbd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
