@@ -75,7 +75,7 @@ static void generate_ec_soc_dsw_pwrok_handler(void)
 	int in_sig_val = power_signal_get(PWR_DSW_PWROK);
 
 	if (in_sig_val != power_signal_get(PWR_EC_SOC_DSW_PWROK)) {
-		power_signal_set(PWR_EC_SOC_DSW_PWROK, 1);
+		power_signal_set(PWR_EC_SOC_DSW_PWROK, in_sig_val);
 	}
 }
 
@@ -114,8 +114,23 @@ bool board_ap_power_check_power_rails_enabled(void)
 }
 
 #else
+static int board_ap_power_g3_entry(void *data)
+{
+	power_signal_set(PWR_EC_SOC_DSW_PWROK, 0);
+	power_signal_set(PWR_EN_PP3300_A, 0);
+	power_signal_set(PWR_EN_PP5000_A, 0);
+
+	return 0;
+}
+
 static int board_ap_power_g3_run(void *data)
 {
+	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
+		power_signal_set(PWR_EC_SOC_DSW_PWROK, 0);
+		power_signal_set(PWR_EN_PP3300_A, 0);
+		power_signal_set(PWR_EN_PP5000_A, 0);
+		return 1;
+	}
 	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_STARTUP)) {
 		power_signal_enable(PWR_DSW_PWROK);
 		power_signal_enable(PWR_PG_PP1P05);
@@ -130,13 +145,17 @@ static int board_ap_power_g3_run(void *data)
 
 	generate_ec_soc_dsw_pwrok_handler();
 
-	if (!power_signal_get(PWR_EC_SOC_DSW_PWROK))
+	if (!power_signal_get(PWR_EN_PP3300_A) ||
+	    !power_signal_get(PWR_EN_PP5000_A) ||
+	    !power_signal_get(PWR_DSW_PWROK) ||
+	    !power_signal_get(PWR_EC_SOC_DSW_PWROK))
 		return 1;
 
 	return 0;
 }
 
-AP_POWER_APP_STATE_DEFINE(G3, NULL, board_ap_power_g3_run, NULL);
+AP_POWER_APP_STATE_DEFINE(G3, board_ap_power_g3_entry, board_ap_power_g3_run,
+			  NULL);
 
 static int board_ap_power_s0_run(void *data)
 {
