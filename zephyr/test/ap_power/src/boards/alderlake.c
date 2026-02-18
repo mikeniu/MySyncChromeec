@@ -20,6 +20,13 @@ static bool signal_PWR_ALL_SYS_PWRGD;
 static bool signal_PWR_DSW_PWROK;
 static bool signal_PWR_PG_PP1P05;
 
+static void board_ap_power_shutdown(void)
+{
+	power_signal_set(PWR_EC_SOC_DSW_PWROK, 0);
+	power_signal_set(PWR_EN_PP3300_A, 0);
+	power_signal_set(PWR_EN_PP5000_A, 0);
+}
+
 int power_signal_external_init(void)
 {
 	return 0;
@@ -75,13 +82,14 @@ static void generate_ec_soc_dsw_pwrok_handler(void)
 	int in_sig_val = power_signal_get(PWR_DSW_PWROK);
 
 	if (in_sig_val != power_signal_get(PWR_EC_SOC_DSW_PWROK)) {
-		power_signal_set(PWR_EC_SOC_DSW_PWROK, 1);
+		power_signal_set(PWR_EC_SOC_DSW_PWROK, in_sig_val);
 	}
 }
 
 #ifndef CONFIG_AP_PWRSEQ_DRIVER
 void board_ap_power_force_shutdown(void)
 {
+	board_ap_power_shutdown();
 }
 
 void board_ap_power_action_g3_s5(void)
@@ -114,8 +122,20 @@ bool board_ap_power_check_power_rails_enabled(void)
 }
 
 #else
+static int board_ap_power_g3_entry(void *data)
+{
+	board_ap_power_shutdown();
+
+	return 0;
+}
+
 static int board_ap_power_g3_run(void *data)
 {
+	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
+		board_ap_power_shutdown();
+		return 1;
+	}
+
 	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_STARTUP)) {
 		power_signal_enable(PWR_DSW_PWROK);
 		power_signal_enable(PWR_PG_PP1P05);
@@ -136,7 +156,8 @@ static int board_ap_power_g3_run(void *data)
 	return 0;
 }
 
-AP_POWER_APP_STATE_DEFINE(G3, NULL, board_ap_power_g3_run, NULL);
+AP_POWER_APP_STATE_DEFINE(G3, board_ap_power_g3_entry, board_ap_power_g3_run,
+			  NULL);
 
 static int board_ap_power_s0_run(void *data)
 {
