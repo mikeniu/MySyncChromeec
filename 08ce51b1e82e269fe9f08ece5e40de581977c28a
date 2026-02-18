@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff4fd801_b9e55a3a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-02-18T19:09:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4111c250_6f0b273b",
+      "revId": "08ce51b1e82e269fe9f08ece5e40de581977c28a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "86802a6a_baf9ad27",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-12-11T22:58:03Z",
       "side": 1,
       "message": "Please wait to release this CL until we coordinate rework on Intel\u0027s side.",
+      "revId": "08ce51b1e82e269fe9f08ece5e40de581977c28a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c8b2b7c_162f5f22",
+        "filename": "zephyr/program/ocelot/ocelotrvp-mchp/power_signals.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-02-18T19:09:08Z",
+      "side": 1,
+      "message": "Per https://issuetracker.google.com/issues/468084592#comment20 this is ready to merge.",
+      "parentUuid": "86802a6a_baf9ad27",
       "revId": "08ce51b1e82e269fe9f08ece5e40de581977c28a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
