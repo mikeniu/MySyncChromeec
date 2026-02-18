@@ -86,6 +86,24 @@
       "parentUuid": "86802a6a_baf9ad27",
       "revId": "08ce51b1e82e269fe9f08ece5e40de581977c28a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e2331e4_1e6b74ae",
+        "filename": "zephyr/program/ocelot/ocelotrvp-mchp/power_signals.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-02-18T19:09:23Z",
+      "side": 1,
+      "message": "Marked as resolved.",
+      "parentUuid": "6c8b2b7c_162f5f22",
+      "revId": "08ce51b1e82e269fe9f08ece5e40de581977c28a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
