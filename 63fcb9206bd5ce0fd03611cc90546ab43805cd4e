@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6211c74_38d5e6ba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-02-18T08:43:55Z",
+      "side": 1,
+      "message": "Hi @honscheid@google.com, @mike, @keith\n\nThe changes are verified on the reworked boards, This patch should to be merged once the HW changes are implemented in all the boards.",
+      "revId": "63fcb9206bd5ce0fd03611cc90546ab43805cd4e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
