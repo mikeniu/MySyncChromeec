@@ -16,6 +16,24 @@
       "message": "s/rts/rtk/\n\nAll the other EC projects use \"rtk\" as the prefix for Realtek EC based designs.",
       "revId": "442b4386c558a5ce58aef3b34755a471ee694b14",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4aa8a347_437fa9e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-02-18T19:05:49Z",
+      "side": 1,
+      "message": "alright, renamed",
+      "parentUuid": "9d9fb350_cc244365",
+      "revId": "442b4386c558a5ce58aef3b34755a471ee694b14",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
