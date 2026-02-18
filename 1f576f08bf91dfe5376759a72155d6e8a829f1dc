@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59795ae5_50abe18b",
+        "filename": "zephyr/test/hwtest/src/flash_physical.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-02-18T01:33:48Z",
+      "side": 1,
+      "message": "@chchang19@nuvoton.corp-partner.google.com\n\nCan you please advise why this is returning null?",
+      "range": {
+        "startLine": 63,
+        "startChar": 1,
+        "endLine": 64,
+        "endChar": 52
+      },
+      "revId": "1f576f08bf91dfe5376759a72155d6e8a829f1dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
