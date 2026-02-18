@@ -238,6 +238,13 @@ class FPSensorType(Enum):
     UNKNOWN = -1
 
 
+class Architecture(Enum):
+    """CPU architectures."""
+
+    ARM = "arm"
+    RISCV = "riscv"
+
+
 @dataclass
 # pylint: disable-next=too-many-instance-attributes
 class BoardConfig:
@@ -245,6 +252,7 @@ class BoardConfig:
 
     name: str
     sensor_type: FPSensorType
+    architecture: Architecture
     servo_uart_name: str
     servo_power_enable: str
     rollback_region0_regex: re.Pattern[str]
@@ -576,6 +584,7 @@ class TestConfig:
     num_fails: int = field(init=False, default=0)
     skip_for_zephyr: bool = False
     zephyr_name: Optional[str] = None
+    architectures: Optional[list[Architecture]] = None
 
     # The callbacks below are called before and after a test is executed and
     # may be used for additional test setup, post test activities, or other tasks
@@ -629,11 +638,17 @@ class AllTests:
         )
 
         all_tests = public_tests + private_tests + zephyr_upstream_tests
-        board_tests = list(
-            filter(
-                lambda e: (board_config.name not in e.exclude_boards), all_tests
-            )
-        )
+        board_tests = []
+        for test in all_tests:
+            if board_config.name in test.exclude_boards:
+                continue
+            if (
+                test.architectures is not None
+                and board_config.architecture not in test.architectures
+            ):
+                continue
+            board_tests.append(test)
+
         return board_tests
 
     @staticmethod
@@ -1039,6 +1054,7 @@ class AllTests:
 BLOONCHIPPER_CONFIG = BoardConfig(
     name=BLOONCHIPPER,
     sensor_type=FPSensorType.FPC,
+    architecture=Architecture.ARM,
     servo_uart_name="raw_fpmcu_console_uart_pty",
     servo_power_enable="fpmcu_pp3300",
     # TODO(b/410057326): add polling logic to reboot to RW, then decrease this timeout to 2s.
@@ -1074,6 +1090,7 @@ BLOONCHIPPER_CONFIG = BoardConfig(
 DARTMONKEY_CONFIG = BoardConfig(
     name=DARTMONKEY,
     sensor_type=FPSensorType.FPC,
+    architecture=Architecture.ARM,
     servo_uart_name="raw_fpmcu_console_uart_pty",
     servo_power_enable="fpmcu_pp3300",
     reboot_timeout=1.0,
@@ -1107,6 +1124,7 @@ DARTMONKEY_CONFIG = BoardConfig(
 HELIPILOT_CONFIG = BoardConfig(
     name=HELIPILOT,
     sensor_type=FPSensorType.FPC,
+    architecture=Architecture.ARM,
     servo_uart_name="raw_fpmcu_console_uart_pty",
     servo_power_enable="fpmcu_pp3300",
     reboot_timeout=3,
@@ -1165,6 +1183,7 @@ GWENDOLIN_CONFIG.mpu_regex = DATA_ACCESS_VIOLATION_20098000_REGEX
 SANOK_CONFIG = BoardConfig(
     name=SANOK,
     sensor_type=FPSensorType.EGIS,
+    architecture=Architecture.RISCV,
     servo_uart_name="raw_fpmcu_console_uart_pty",
     servo_power_enable="fpmcu_pp3300",
     reboot_timeout=1.0,
