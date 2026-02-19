@@ -78,16 +78,20 @@ void uart_init_buffer(void)
 int uart_tx_char_raw(void *context, int c)
 {
 	int tx_buf_next, tx_buf_new_tail;
+	uint32_t key;
 
 #if defined CONFIG_POLLING_UART
 	(void)tx_buf_next;
 	(void)tx_buf_new_tail;
+	(void)key;
 	uart_write_char(c);
 #else
-
+	key = irq_lock();
 	tx_buf_next = TX_BUF_NEXT(tx_buf_head);
-	if (tx_buf_next == tx_buf_tail)
+	if (tx_buf_next == tx_buf_tail) {
+		irq_unlock(key);
 		return 1;
+	}
 
 	/*
 	 * If we do a READ_RECENT, the buffer may have wrapped around, and
@@ -109,6 +113,7 @@ int uart_tx_char_raw(void *context, int c)
 
 	if (IS_ENABLED(CONFIG_PRESERVE_LOGS))
 		tx_checksum = uart_buffer_calc_checksum();
+	irq_unlock(key);
 #endif
 	return 0;
 }
