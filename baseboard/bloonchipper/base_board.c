@@ -27,6 +27,9 @@ int console_is_restricted(void)
 /* Must come after other header files and interrupt handler declarations */
 #include "gpio_list.h"
 
+/* Check if CONFIG_ROLLBACK_VERSION is set to expected value */
+BUILD_ASSERT(CONFIG_ROLLBACK_VERSION == 1);
+
 /*
  * Some platforms have a broken SLP_S0_L signal (stuck to 0 in S0)
  * if set, ignore it and only uses SLP_S3_L for the AP state.

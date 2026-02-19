@@ -32,6 +32,9 @@ int console_is_restricted(void)
 /* Must come after other header files and interrupt handler declarations */
 #include "gpio_list.h"
 
+/* Check if CONFIG_ROLLBACK_VERSION is set to expected value */
+BUILD_ASSERT(CONFIG_ROLLBACK_VERSION == 1);
+
 /* SPI devices */
 struct spi_device_t spi_devices[] = {
 	/* Fingerprint sensor (SCLK at 4Mhz) */
