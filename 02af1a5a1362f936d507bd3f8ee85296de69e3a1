@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c180a3d7_10a3da81",
+        "filename": "zephyr/shim/include/bbram.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-02-19T14:41:55Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "fb015a35_8a904166",
+      "revId": "02af1a5a1362f936d507bd3f8ee85296de69e3a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6c4418d2_dc5bdc30",
@@ -73,6 +91,30 @@
       "side": 1,
       "message": "I placed that in bbram.h as static inline. Does it work for you?",
       "parentUuid": "6c4418d2_dc5bdc30",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 66,
+        "endChar": 1
+      },
+      "revId": "02af1a5a1362f936d507bd3f8ee85296de69e3a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2818b21e_521fc1a9",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-02-19T14:41:55Z",
+      "side": 1,
+      "message": "oh yeah makes sense",
+      "parentUuid": "da084b21_33ecd7a5",
       "range": {
         "startLine": 31,
         "startChar": 0,
