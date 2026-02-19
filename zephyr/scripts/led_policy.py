@@ -67,6 +67,7 @@ def check_policy(
         for led_node in node.children.values():
             if led_node.props["led-id"].val == led_id:
                 ret += 1
+                break
 
     return ret
 
