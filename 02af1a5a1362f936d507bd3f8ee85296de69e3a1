@@ -290,6 +290,30 @@
       },
       "revId": "02af1a5a1362f936d507bd3f8ee85296de69e3a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5f145f5_086ec527",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-02-19T18:47:16Z",
+      "side": 1,
+      "message": "yeah what I meant was to write this like\n\n```\nvoid system_bbram_init(void)\n{\n        if (!bbram_dev) {\n                return;\n        }\n\n        if (!device_is_ready(bbram_dev)) {\n                LOG_ERR(\"device %s not ready\", bbram_dev-\u003ename);\n                return;\n        }\n        \n        if (system_bbram_init(bbram_dev)) {\n                LOG_ERR(\"Failed to init BBRAM\");\n                return -1;\n        }\n}\n```\n\nsame as now one less indent, but what you have now looks good to me as well",
+      "parentUuid": "57141d0f_6e8168e4",
+      "range": {
+        "startLine": 391,
+        "startChar": 0,
+        "endLine": 395,
+        "endChar": 0
+      },
+      "revId": "02af1a5a1362f936d507bd3f8ee85296de69e3a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
