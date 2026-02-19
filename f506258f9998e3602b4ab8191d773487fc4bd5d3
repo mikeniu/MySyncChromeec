@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdb2fe73_de188fca",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 11
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1442982
+      },
+      "writtenOn": "2026-02-19T09:49:49Z",
+      "side": 1,
+      "message": "Since the call to `update_btn_ign()` is within the while(1) loop after if/else statement, I suppose (haven\u0027t analysed all the branches though) we may end up calling this funciton even when there is no change really requiring us to update state of BTN_IGN pin. This will end up in extensive logging on the console.\n\nCan we isolate specific scenarios/branches which are of interest for us? We can also consider caching the state of btn_ign pin within the function and only do real action if state was changed.",
+      "revId": "f506258f9998e3602b4ab8191d773487fc4bd5d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be7d0e36_70671a0e",
+        "filename": "include/fpsensor/fpsensor_btn_ign.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1442982
+      },
+      "writtenOn": "2026-02-19T09:49:49Z",
+      "side": 1,
+      "message": "Regarding the FP_MODE_CAPTURE (used e.g. in factory flow) - shouldn\u0027t we also activate btn_ign then?",
+      "revId": "f506258f9998e3602b4ab8191d773487fc4bd5d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
