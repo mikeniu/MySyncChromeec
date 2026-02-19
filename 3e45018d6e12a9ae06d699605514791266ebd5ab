@@ -88,6 +88,24 @@
       "parentUuid": "57e7d7c5_f98a6a62",
       "revId": "3e45018d6e12a9ae06d699605514791266ebd5ab",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a77b058_78161e6c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-02-19T18:27:39Z",
+      "side": 1,
+      "message": "CL that moves `CONFIG_PLATFORM_EC_ROLLBACK_VERSION` https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7595353",
+      "parentUuid": "bc7e53d3_01ff1a6a",
+      "revId": "3e45018d6e12a9ae06d699605514791266ebd5ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
