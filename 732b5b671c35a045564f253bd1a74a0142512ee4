@@ -22,6 +22,30 @@
       },
       "revId": "732b5b671c35a045564f253bd1a74a0142512ee4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3116c3fe_ae8c6e51",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-02-19T23:26:52Z",
+      "side": 1,
+      "message": "Yes but added a clearer description.",
+      "parentUuid": "39add4b5_0f17216e",
+      "range": {
+        "startLine": 16,
+        "startChar": 5,
+        "endLine": 16,
+        "endChar": 16
+      },
+      "revId": "732b5b671c35a045564f253bd1a74a0142512ee4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
