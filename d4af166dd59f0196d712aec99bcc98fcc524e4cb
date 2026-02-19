@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1922e58d_591afc5a",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 2824,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-02-19T18:12:35Z",
+      "side": 1,
+      "message": "Before we can make this change, we need to confirm the behavior when allow_dr_swap bit is clear. It might be the case that we need to midify CMD_SET_DRS to also trigger a data role swap.",
+      "range": {
+        "startLine": 2824,
+        "startChar": 29,
+        "endLine": 2824,
+        "endChar": 41
+      },
+      "revId": "d4af166dd59f0196d712aec99bcc98fcc524e4cb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
