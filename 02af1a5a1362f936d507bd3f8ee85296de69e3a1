@@ -266,6 +266,30 @@
       },
       "revId": "02af1a5a1362f936d507bd3f8ee85296de69e3a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57141d0f_6e8168e4",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-19T18:23:20Z",
+      "side": 1,
+      "message": "\u003e And then you can just have an early return if bbram_dev is null\n\nBut again, that\u0027s not the current situation. The system can live without BBRAM, so I think it\u0027s fine to continue `system_preinitialize` and I don\u0027t want to change this logic. E.g. the `sys_dev` is assigned later on, so we wouldn\u0027t be able to even perform reboot if this function exits early.\n\nIMO a common if is the best solution here. For me a separate function, called once, with 2 simple ifs is an overkill.",
+      "parentUuid": "4ef0da94_1fc442ae",
+      "range": {
+        "startLine": 391,
+        "startChar": 0,
+        "endLine": 395,
+        "endChar": 0
+      },
+      "revId": "02af1a5a1362f936d507bd3f8ee85296de69e3a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
