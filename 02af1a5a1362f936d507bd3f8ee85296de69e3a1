@@ -218,6 +218,30 @@
       },
       "revId": "02af1a5a1362f936d507bd3f8ee85296de69e3a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31ca0894_5c4cc714",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-02-19T16:06:14Z",
+      "side": 1,
+      "message": "oh, sorry I see what you mean now, could you move these two do a separate void function then? And then you can just have an early return if `bbram_dev` is null and it\u0027s explicit that you just want to ignore the rest if there\u0027s no bbram_dev defined",
+      "parentUuid": "a085f544_86e03e8c",
+      "range": {
+        "startLine": 391,
+        "startChar": 0,
+        "endLine": 395,
+        "endChar": 0
+      },
+      "revId": "02af1a5a1362f936d507bd3f8ee85296de69e3a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
