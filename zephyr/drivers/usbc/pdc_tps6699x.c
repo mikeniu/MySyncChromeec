@@ -2821,7 +2821,7 @@ static int tps_set_uor(const struct device *dev, union uor_t uor)
 
 	data->uor = uor;
 
-	return tps_post_command(dev, CMD_SET_DRS, NULL);
+	return tps_post_command(dev, CMD_SET_UOR, NULL);
 }
 
 static int tps_set_pdr(const struct device *dev, union pdr_t pdr)
