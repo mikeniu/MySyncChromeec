@@ -761,12 +761,30 @@ static void tc_set_modes_exit(int port)
 static void tc_detached(int port)
 {
 	TC_CLR_FLAG(port, TC_FLAGS_TS_DTS_PARTNER);
+	pd_record_timestamp_start(port, HOOK_NOTIFY);
 	hook_notify(HOOK_USB_PD_DISCONNECT);
+	pd_record_timestamp_end(port, HOOK_NOTIFY);
+
+	pd_record_timestamp_start(port, TC_ENABLE_PD);
 	tc_enable_pd(port, 0);
+	pd_record_timestamp_end(port, TC_ENABLE_PD);
+
+	pd_record_timestamp_start(port, TC_PD_CONNECTION);
 	tc_pd_connection(port, 0);
+	pd_record_timestamp_end(port, TC_PD_CONNECTION);
+
+	pd_record_timestamp_start(port, TCPM_DEBUG_ACCESSORY);
 	tcpm_debug_accessory(port, 0);
+	pd_record_timestamp_end(port, TCPM_DEBUG_ACCESSORY);
+
+	pd_record_timestamp_start(port, SET_CCD_MODE);
 	set_ccd_mode(port, 0);
+	pd_record_timestamp_end(port, SET_CCD_MODE);
+
+	pd_record_timestamp_start(port, TC_SET_MODES_EXIT);
 	tc_set_modes_exit(port);
+	pd_record_timestamp_end(port, TC_SET_MODES_EXIT);
+
 	if (IS_ENABLED(CONFIG_USB_PRL_SM))
 		prl_set_default_pd_revision(port);
 
@@ -1507,7 +1525,9 @@ void tc_start_error_recovery(int port)
 	 *   The port should transition to the ErrorRecovery state
 	 *   from any other state when directed.
 	 */
+	pd_record_timestamp_start(port, PD_INTERVAL_TC_STATE_CHANGE);
 	set_state_tc(port, TC_ERROR_RECOVERY);
+	pd_record_timestamp_end(port, PD_INTERVAL_TC_STATE_CHANGE);
 }
 
 static void restart_tc_sm(int port, enum usb_tc_state start_state)
@@ -2828,14 +2848,17 @@ static void tc_attached_snk_run(const int port)
 
 static void tc_attached_snk_exit(const int port)
 {
+	pd_record_timestamp_start(port, PD_INTERVAL_ATTACHED_SNK_EXIT);
 	if (!TC_CHK_FLAG(port, TC_FLAGS_REQUEST_PR_SWAP)) {
 		/*
 		 * If supplying VCONN, the port shall cease to supply
 		 * it within tVCONNOFF of exiting Attached.SNK if not
 		 * PR swapping.
 		 */
+		pd_record_timestamp_start(port, PD_INTERVAL_VCONN_OFF_SNK_EXIT);
 		if (TC_CHK_FLAG(port, TC_FLAGS_VCONN_ON))
 			set_vconn(port, 0);
+		pd_record_timestamp_end(port, PD_INTERVAL_VCONN_OFF_SNK_EXIT);
 
 		/*
 		 * Attached.SNK exit - disable AutoDischargeDisconnect
@@ -2843,12 +2866,17 @@ static void tc_attached_snk_exit(const int port)
 		 * happen in tc_cc_open_entry if that is the path we are
 		 * taking.
 		 */
+		pd_record_timestamp_start(port,
+					  PD_INTERVAL_DISABLE_ADD_SNK_EXIT);
 		if (!TC_CHK_FLAG(port, TC_FLAGS_REQUEST_SUSPEND))
 			tcpm_enable_auto_discharge_disconnect(port, 0);
+		pd_record_timestamp_end(port, PD_INTERVAL_DISABLE_ADD_SNK_EXIT);
 	}
 
 	/* Stop drawing power */
+	pd_record_timestamp_start(port, PD_INTERVAL_STOP_SNK);
 	sink_stop_drawing_current(port);
+	pd_record_timestamp_end(port, PD_INTERVAL_STOP_SNK);
 
 	if (TC_CHK_FLAG(port, TC_FLAGS_TS_DTS_PARTNER) &&
 	    !TC_CHK_FLAG(port, TC_FLAGS_REQUEST_PR_SWAP)) {
@@ -2861,6 +2889,7 @@ static void tc_attached_snk_exit(const int port)
 	pd_timer_disable(port, TC_TIMER_CC_DEBOUNCE);
 	pd_timer_disable(port, TC_TIMER_TIMEOUT);
 	pd_timer_disable(port, TC_TIMER_VBUS_DEBOUNCE);
+	pd_record_timestamp_end(port, PD_INTERVAL_ATTACHED_SNK_EXIT);
 }
 
 /**
@@ -4003,10 +4032,16 @@ static void tc_cc_rp_entry(const int port)
 static void tc_cc_open_entry(const int port)
 {
 	/* Ensure we are not sourcing Vbus */
+	pd_record_timestamp_start(port, PD_INTERVAL_CC_OPEN_ENTRY);
+	pd_record_timestamp_end(port, PD_INTERVAL_ERR_REC_FLAG);
+	pd_record_timestamp_start(port, TC_SRC_POWER_OFF);
 	tc_src_power_off(port);
+	pd_record_timestamp_end(port, TC_SRC_POWER_OFF);
 
 	/* Disable VCONN */
+	pd_record_timestamp_start(port, PD_INTERVAL_VCONN_OFF_CC_OPEN);
 	set_vconn(port, 0);
+	pd_record_timestamp_end(port, PD_INTERVAL_VCONN_OFF_CC_OPEN);
 
 	/*
 	 * Ensure we disable discharging before setting CC lines to open.
@@ -4018,8 +4053,10 @@ static void tc_cc_open_entry(const int port)
 	 * sure the TCPC has managed its internal states for disconnecting
 	 * the only source of power it has.
 	 */
+	pd_record_timestamp_start(port, PD_INTERVAL_DISABLE_ADD_CC_OPEN);
 	if (battery_is_present())
 		tcpm_enable_auto_discharge_disconnect(port, 0);
+	pd_record_timestamp_end(port, PD_INTERVAL_DISABLE_ADD_CC_OPEN);
 
 	/*
 	 * We may brown out after applying CC open, so flush console first.
@@ -4027,20 +4064,35 @@ static void tc_cc_open_entry(const int port)
 	 * browning out, don't do it so we can meet certain compliance timing
 	 * requirements.
 	 */
+	pd_record_timestamp_start(port, PD_INTERVAL_PRINT);
 	CPRINTS_L2("C%d: Applying CC Open!", port);
+	pd_record_timestamp_end(port, PD_INTERVAL_PRINT);
 	if (!battery_is_present())
 		cflush();
 
 	/* Remove terminations from CC */
+	pd_record_timestamp_start(port, PD_INTERVAL_UPDATE_CC);
 	typec_select_pull(port, TYPEC_CC_OPEN);
 	typec_update_cc(port);
+	pd_record_timestamp_end(port, PD_INTERVAL_UPDATE_CC);
+	pd_record_timestamp_end(port, PD_INTERVAL_ERR_REC);
+	pd_record_timestamp_end(port, PD_INTERVAL_GOODCRC_TO_ERR_REC);
 
 	/*
 	 * While we've disconnected the partner, leave any OCP counts in place
 	 * to persist over ErrorRecovery
 	 */
+	pd_record_timestamp_start(port, TC_SET_PARTNER_ROLE);
 	tc_set_partner_role(port, PPC_DEV_DISCONNECTED, OCP_NO_ACTION);
+	pd_record_timestamp_end(port, TC_SET_PARTNER_ROLE);
+
+	pd_record_timestamp_start(port, TC_DETACHED);
 	tc_detached(port);
+	pd_record_timestamp_end(port, TC_DETACHED);
+
+	pd_record_timestamp_end(port, PD_INTERVAL_CC_OPEN_ENTRY);
+
+	pd_print_timestamps(port);
 }
 
 void tc_set_debug_level(enum debug_level debug_level)

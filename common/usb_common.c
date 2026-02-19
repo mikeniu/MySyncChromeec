@@ -877,6 +877,34 @@ struct pd_debug_timestamps pd_ts[CONFIG_USB_PD_PORT_MAX_COUNT]
 				[PD_INTERVAL_COUNT] = { 0 };
 const char *pd_ts_name[] = {
 	"Invalid interval",
+	"GoodCRC to CC open",
+	"SenderResponseTimer",
+	"Interrupt to interrupt task",
+	"Error Recovery",
+	"Error Recovery flag",
+	"PE state change",
+	"TC state change",
+	"Attached.SNK exit",
+	"VCONN off Attached.SNK exit",
+	"Disable ADD Attached.SNK exit",
+	"Stop drawing current",
+	"CC open entry",
+	"SenderResponseTimer disable",
+	"VBUS off",
+	"VCONN off CC open",
+	"Disable ADD CC open",
+	"Print",
+	"Update CC",
+	"tc_src_power_off",
+	"tc_set_partner_role",
+	"tc_detached",
+	"hook_notify",
+	"tc_enable_pd",
+	"tc_pd_connection",
+	"tcpm_debug_accessory",
+	"set_ccd_mode",
+	"tc_set_modes_exit",
+
 };
 BUILD_ASSERT(ARRAY_SIZE(pd_ts_name) == PD_INTERVAL_COUNT);
 

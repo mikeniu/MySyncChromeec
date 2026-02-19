@@ -2381,6 +2381,11 @@ static enum pe_msg_check pe_sender_response_msg_run(const int port)
 			 */
 			pd_timer_enable(port, PE_TIMER_SENDER_RESPONSE,
 					t_sender_response - offset);
+			pd_record_timestamp(port, PD_INTERVAL_SENDER_RESPONSE,
+					    PD_START, tx_success_ts);
+			pd_record_timestamp(port,
+					    PD_INTERVAL_GOODCRC_TO_ERR_REC,
+					    PD_START, tx_success_ts);
 			return PE_MSG_SEND_COMPLETED;
 		}
 		return PE_MSG_SEND_PENDING;
@@ -2396,7 +2401,9 @@ static enum pe_msg_check pe_sender_response_msg_run(const int port)
  */
 static void pe_sender_response_msg_exit(int port)
 {
+	pd_record_timestamp_start(port, PD_INTERVAL_SRT_DISABLE);
 	pd_timer_disable(port, PE_TIMER_SENDER_RESPONSE);
+	pd_record_timestamp_end(port, PD_INTERVAL_SRT_DISABLE);
 }
 
 /**
@@ -5682,6 +5689,7 @@ static void pe_prs_snk_src_send_swap_run(int port)
 	 *   1) The SenderResponseTimer times out.
 	 */
 	if (pd_timer_is_expired(port, PE_TIMER_SENDER_RESPONSE)) {
+		pd_record_timestamp_end(port, PD_INTERVAL_SENDER_RESPONSE);
 		set_state_pe(port, pe_in_frs_mode(port) ?
 					   PE_WAIT_FOR_ERROR_RECOVERY :
 					   PE_SNK_READY);
@@ -5696,12 +5704,17 @@ static void pe_prs_snk_src_send_swap_run(int port)
 	if (pe_in_frs_mode(port) &&
 	    PE_CHK_FLAG(port, PE_FLAGS_PROTOCOL_ERROR)) {
 		PE_CLR_FLAG(port, PE_FLAGS_PROTOCOL_ERROR);
+		pd_record_timestamp_start(port, PD_INTERVAL_PE_STATE_CHANGE);
 		set_state_pe(port, PE_WAIT_FOR_ERROR_RECOVERY);
+		pd_record_timestamp_end(port, PD_INTERVAL_PE_STATE_CHANGE);
 	}
 }
 
 static void pe_prs_snk_src_send_swap_exit(int port)
 {
+	pd_record_timestamp_start(port, PD_INTERVAL_ERR_REC);
+	pd_record_timestamp_start(port, PD_INTERVAL_ERR_REC_FLAG);
+
 	pe_sender_response_msg_exit(port);
 }
 
