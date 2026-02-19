@@ -194,6 +194,30 @@
       },
       "revId": "02af1a5a1362f936d507bd3f8ee85296de69e3a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a085f544_86e03e8c",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-19T15:11:04Z",
+      "side": 1,
+      "message": "But it changes logic. Current logic allows running entire `system_preinitialize` function with bbram_dev \u003d\u003d NULL. If I drop the `bbram_dev` NULL pointer check (`if (!device_is_ready(bbram_dev)) {`) `device_is_ready` will always be called and `system_preinitialize` will return early with `-1`.",
+      "parentUuid": "151bcfe5_749ef949",
+      "range": {
+        "startLine": 391,
+        "startChar": 0,
+        "endLine": 395,
+        "endChar": 0
+      },
+      "revId": "02af1a5a1362f936d507bd3f8ee85296de69e3a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
