@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af327749_78101b30",
+        "filename": "zephyr/shim/include/bbram.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-02-19T12:28:11Z",
+      "side": 1,
+      "message": "should this live in a `retained_mem_bbram.h` file?",
+      "revId": "02af1a5a1362f936d507bd3f8ee85296de69e3a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c4418d2_dc5bdc30",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-02-19T12:28:11Z",
+      "side": 1,
+      "message": "would it be worth putting these in a `system_bbram.c` file? Then once in its own file I\u0027m thinking you may consider having a single #idef block and redefine all three functions in a block, may read a bit better, no need to duplicate the error...",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 66,
+        "endChar": 1
+      },
+      "revId": "02af1a5a1362f936d507bd3f8ee85296de69e3a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51484833_8131394b",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-02-19T12:28:11Z",
+      "side": 1,
+      "message": "`device_is_ready` already checks for the argument being null, you can drop the check for `bbram_dev` from here and the one below, which would never be reached if bbram_dev is null",
+      "range": {
+        "startLine": 391,
+        "startChar": 0,
+        "endLine": 395,
+        "endChar": 0
+      },
+      "revId": "02af1a5a1362f936d507bd3f8ee85296de69e3a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
