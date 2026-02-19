@@ -242,6 +242,30 @@
       },
       "revId": "02af1a5a1362f936d507bd3f8ee85296de69e3a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ef0da94_1fc442ae",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-02-19T16:06:59Z",
+      "side": 1,
+      "message": "or put them under a single `if (bbram_dev)` but I think separate function is better, just have it isolated",
+      "parentUuid": "31ca0894_5c4cc714",
+      "range": {
+        "startLine": 391,
+        "startChar": 0,
+        "endLine": 395,
+        "endChar": 0
+      },
+      "revId": "02af1a5a1362f936d507bd3f8ee85296de69e3a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
