@@ -33,6 +33,7 @@
 /* Stop printing repeated host commands "+" after this count */
 #define HCDEBUG_MAX_REPEAT_COUNT 5
 
+static volatile bool hc_processing;
 static struct host_cmd_handler_args *pending_args;
 
 static enum {
@@ -226,6 +227,13 @@ void host_packet_receive(struct host_packet *pkt)
 	int csum = 0;
 	int i;
 
+	/* If the task is busy, don't stomp on its state. */
+	if (hc_processing) {
+		pkt->driver_result = EC_RES_BUSY;
+		pkt->send_response(pkt);
+		return;
+	}
+
 	/* Track the packet we're handling */
 	pkt0 = pkt;
 
@@ -390,9 +398,11 @@ void host_command_task(void *u)
 
 		/* Process it */
 		if ((evt & TASK_EVENT_CMD_PENDING) && pending_args) {
+			hc_processing = true;
 			pending_args->result =
 				host_command_process(pending_args);
 			host_send_response(pending_args);
+			hc_processing = false;
 		}
 
 		/* reset rate limiting if we have slept enough */
