@@ -16,6 +16,24 @@
       "message": "Would it work if you added a `BUILD_ASSERT` in the common fpsensor code somewhere? The only benefit would be that we don\u0027t have to add a check for each individual board.",
       "revId": "3e45018d6e12a9ae06d699605514791266ebd5ab",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e0391fd_f41b60b4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-02-19T17:18:29Z",
+      "side": 1,
+      "message": "Rollback version differs between boards. I would need to add another variable/config and check it in some other place. IMHO, the simpler solution is better here.",
+      "parentUuid": "64cdb44c_908579f2",
+      "revId": "3e45018d6e12a9ae06d699605514791266ebd5ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
