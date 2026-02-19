@@ -48,6 +48,9 @@
 #error "fpsensor code should not be in RO image."
 #endif
 
+/* Check if CONFIG_ROLLBACK_VERSION is set to expected value. */
+BUILD_ASSERT(CONFIG_ROLLBACK_VERSION == 1);
+
 /* Ready to encrypt a template. */
 static timestamp_t encryption_deadline;
 
