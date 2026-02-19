@@ -221,12 +221,25 @@ static int syv682x_vbus_source_enable(int port, int enable)
 		 * De-assert the FRS GPIO, which will be asserted if we got to
 		 * be a source via an FRS.
 		 */
+
+		pd_record_timestamp_start(
+			port, TC_SRC_POWER_OFF_PD_POWER_SUPPLY_GPIO_OR_IOEX);
+
 		regval |= SYV682X_CONTROL_1_PWR_ENB;
 		if (IS_ENABLED(CONFIG_USB_PD_FRS_PPC))
 			gpio_or_ioex_set_level(ppc_chips[port].frs_en, 0);
+
+		pd_record_timestamp_end(
+			port, TC_SRC_POWER_OFF_PD_POWER_SUPPLY_GPIO_OR_IOEX);
 	}
-	if (regval != oldval)
+	pd_record_timestamp_start(port,
+				  TC_SRC_POWER_OFF_PD_POWER_SUPPLY_WRITE_REG);
+
+	if (regval != oldval) {
 		rv = write_reg(port, SYV682X_CONTROL_1_REG, regval);
+	}
+	pd_record_timestamp_end(port,
+				TC_SRC_POWER_OFF_PD_POWER_SUPPLY_WRITE_REG);
 
 	if (rv)
 		return rv;

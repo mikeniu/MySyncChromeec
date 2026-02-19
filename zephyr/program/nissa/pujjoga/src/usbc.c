@@ -129,7 +129,9 @@ DECLARE_DEFERRED(notify_power_change);
 void pd_power_supply_reset(int port)
 {
 	/* Disable VBUS. */
+	pd_record_timestamp_start(port, TC_SRC_POWER_OFF_PD_POWER_SUPPLY);
 	ppc_vbus_source_enable(port, 0);
+	pd_record_timestamp_end(port, TC_SRC_POWER_OFF_PD_POWER_SUPPLY);
 
 	/* Enable discharge if we were previously sourcing 5V */
 	if (IS_ENABLED(CONFIG_USB_PD_DISCHARGE))
