@@ -107,7 +107,7 @@ ZTEST(system, test_system_common_pre_init__watch_dog_panic)
 	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
 	system_common_pre_init();
 	panic_get_reason(&reason, &info, &exception);
-	zassert_equal(reason, PANIC_SW_WATCHDOG);
+	zassert_equal(reason, PANIC_SW_WATCHDOG_HARD);
 	zassert_equal(info, 0);
 	zassert_equal(exception, 0);
 }
@@ -171,7 +171,7 @@ ZTEST(system, test_system_common_pre_init__watch_dog_panic_already_read)
 	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
 	system_common_pre_init();
 	panic_get_reason(&reason, &info, &exception);
-	zassert_equal(reason, PANIC_SW_WATCHDOG);
+	zassert_equal(reason, PANIC_SW_WATCHDOG_HARD);
 	zassert_equal(info, 0);
 	zassert_equal(exception, 0);
 }
@@ -332,3 +332,19 @@ ZTEST_USER(system, test_console_cmd_sysjump__addr_bad_number)
 
 ZTEST_SUITE(system, drivers_predicate_post_main, NULL, system_before_after,
 	    system_before_after, NULL);
+ZTEST(system,
+      test_system_common_pre_init__watch_dog_hard_panic_already_initialized)
+{
+	uint32_t reason;
+	uint32_t info;
+	uint8_t exception;
+
+	panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0x12, 0x34);
+
+	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
+	system_common_pre_init();
+	panic_get_reason(&reason, &info, &exception);
+	zassert_equal(reason, PANIC_SW_WATCHDOG_HARD);
+	zassert_equal(info, 0x12);
+	zassert_equal(exception, 0x34);
+}
