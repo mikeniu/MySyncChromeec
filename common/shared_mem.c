@@ -35,27 +35,27 @@ int shared_mem_size(void)
 
 int shared_mem_acquire(int size, char **dest_ptr)
 {
+	int ret = EC_SUCCESS;
+
 	if (size > shared_mem_size() || size <= 0)
 		return EC_ERROR_INVAL;
 
-	if (buf_in_use)
-		return EC_ERROR_BUSY;
+	interrupt_disable();
+	if (buf_in_use) {
+		ret = EC_ERROR_BUSY;
+	} else {
+		buf_in_use = size;
+		if (IS_ENABLED(CONFIG_FAKE_SHMEM))
+			*dest_ptr = fake_shmem_buf;
+		else
+			*dest_ptr = __shared_mem_buf;
 
-	/*
-	 * We could guard buf_in_use with a mutex, but since shared memory is
-	 * currently only used by debug commands, that's overkill.
-	 */
+		if (max_used < size)
+			max_used = size;
+	}
+	interrupt_enable();
 
-	buf_in_use = size;
-	if (IS_ENABLED(CONFIG_FAKE_SHMEM))
-		*dest_ptr = fake_shmem_buf;
-	else
-		*dest_ptr = __shared_mem_buf;
-
-	if (max_used < size)
-		max_used = size;
-
-	return EC_SUCCESS;
+	return ret;
 }
 
 void shared_mem_release(void *ptr)
