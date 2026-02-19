@@ -280,12 +280,12 @@ uint32_t system_get_reset_flags(void)
 
 void system_set_reset_flags(uint32_t flags)
 {
-	reset_flags |= flags;
+	atomic_or((atomic_t *)&reset_flags, flags);
 }
 
 void system_clear_reset_flags(uint32_t flags)
 {
-	reset_flags &= ~flags;
+	atomic_clear_bits((atomic_t *)&reset_flags, flags);
 }
 
 static void print_reset_flags(uint32_t flags)
