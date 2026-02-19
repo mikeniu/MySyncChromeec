@@ -128,6 +128,30 @@
       },
       "revId": "02af1a5a1362f936d507bd3f8ee85296de69e3a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "151bcfe5_749ef949",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-02-19T14:39:55Z",
+      "side": 1,
+      "message": "yeah but you don\u0027t need to do that, `device_is_ready` can be called with a null argument, it just returns false, and then you have a return -1 so you definitely don\u0027t need to check it in the if below",
+      "parentUuid": "5b31a2bf_0486d71d",
+      "range": {
+        "startLine": 391,
+        "startChar": 0,
+        "endLine": 395,
+        "endChar": 0
+      },
+      "revId": "02af1a5a1362f936d507bd3f8ee85296de69e3a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
