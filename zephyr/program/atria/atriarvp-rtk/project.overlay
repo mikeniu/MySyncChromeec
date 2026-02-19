@@ -9,6 +9,9 @@
 
 /* atriarvp-rtk project DTS includes */
 #include "gpio.dtsi"
+#include "i2c.dtsi"
+
+#include "../rvp_i2c.dtsi"
 
 /* atriarvp-rtk overrides follow... */
 
