@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c30ba30_2135ea3f",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 593,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-19T19:42:29Z",
+      "side": 1,
+      "message": "Need to adjust the individual timeouts, not the global one.",
+      "range": {
+        "startLine": 593,
+        "startChar": 0,
+        "endLine": 593,
+        "endChar": 27
+      },
+      "revId": "91d4ad1a0d54bdbc4ee9b19e0a2ea9bee7abedd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
