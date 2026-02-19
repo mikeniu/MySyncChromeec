@@ -98,10 +98,12 @@ int log_dequeue_event(struct event_log_entry *r)
 	size_t current_head;
 	uint32_t lock_key;
 
-retry:
+	lock_key = irq_lock();
 	current_head = log_head;
+
 	/* The log FIFO is empty */
 	if (log_tail == current_head) {
+		irq_unlock(lock_key);
 		memset(r, 0, UNIT_SIZE);
 		r->type = EVENT_LOG_NO_ENTRY;
 		return UNIT_SIZE;
@@ -114,15 +116,8 @@ retry:
 	if (first < total_size)
 		memcpy(r + first, log_events, (total_size - first) * UNIT_SIZE);
 
-	/* --- critical section : remove the entry from the queue --- */
-	lock_key = irq_lock();
-	if (log_head != current_head) { /* our entry was thrown away */
-		irq_unlock(lock_key);
-		goto retry;
-	}
 	log_head += total_size;
 	irq_unlock(lock_key);
-	/* --- end of critical section --- */
 
 	/* fixup the timestamp : number of milliseconds in the past */
 	r->timestamp = now - r->timestamp;
