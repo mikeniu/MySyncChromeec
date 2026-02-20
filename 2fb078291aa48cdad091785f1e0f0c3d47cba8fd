@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25dd475b_44b9a6a9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-02-20T22:50:54Z",
+      "side": 1,
+      "message": "these test enhancements should probably migrate to\nhttps://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7585754",
+      "revId": "2fb078291aa48cdad091785f1e0f0c3d47cba8fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
