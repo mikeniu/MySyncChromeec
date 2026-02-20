@@ -46,6 +46,10 @@ static void usart_tx_interrupt_handler_common(struct usart_config const *config,
 		return;
 
 	while (remove_data(config, &byte)) {
+		if (config->capture->enable && config->capture->tx_idx < USART_CAPTURE_SIZE) {
+			config->capture->tx_buf[config->capture->tx_idx++] = byte;
+		}
+
 		STM32_USART_TDR(base) = byte;
 
 		/*

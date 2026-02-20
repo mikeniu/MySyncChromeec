@@ -28,6 +28,10 @@ static void usart_rx_interrupt_handler(struct usart_config const *config)
 	if (status & STM32_USART_SR_RXNE) {
 		uint8_t byte = STM32_USART_RDR(base);
 
+		if (config->capture->enable && config->capture->rx_idx < USART_CAPTURE_SIZE) {
+			config->capture->rx_buf[config->capture->rx_idx++] = byte;
+		}
+
 		if (!queue_add_unit(config->producer.queue, &byte))
 			atomic_add((atomic_t *)&(config->state->rx_dropped), 1);
 	}

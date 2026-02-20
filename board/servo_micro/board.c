@@ -76,9 +76,14 @@ static struct queue const usb_to_usart2 =
 static struct usart_rx_dma const usart2_rx_dma =
 	USART_RX_DMA(STM32_DMAC_CH5, 32);
 
+static struct usart_capture usart2_capture;
+
+// static struct usart_config const usart2 =
+// 	USART_CONFIG(usart2_hw, usart_rx_interrupt, usart_tx_interrupt,
+// 		     115200, 0, usart2_to_usb, usb_to_usart2, &usart2_capture);
 static struct usart_config const usart2 =
 	USART_CONFIG(usart2_hw, usart2_rx_dma.usart_rx, usart_tx_interrupt,
-		     115200, 0, usart2_to_usb, usb_to_usart2);
+		     115200, 0, usart2_to_usb, usb_to_usart2, &usart2_capture);
 
 USB_STREAM_CONFIG_USART_IFACE(usart2_usb, USB_IFACE_USART2_STREAM,
 			      USB_STR_USART2_STREAM_NAME, USB_EP_USART2_STREAM,
@@ -102,7 +107,7 @@ static struct usart_rx_dma const usart3_rx_dma =
 
 static struct usart_config const usart3 =
 	USART_CONFIG(usart3_hw, usart3_rx_dma.usart_rx, usart_tx_interrupt,
-		     115200, 0, usart3_to_usb, usb_to_usart3);
+		     115200, 0, usart3_to_usb, usb_to_usart3, NULL);
 
 USB_STREAM_CONFIG_USART_IFACE(usart3_usb, USB_IFACE_USART3_STREAM,
 			      USB_STR_USART3_STREAM_NAME, USB_EP_USART3_STREAM,
@@ -124,7 +129,7 @@ static struct queue const usb_to_usart4 =
 
 static struct usart_config const usart4 =
 	USART_CONFIG(usart4_hw, usart_rx_interrupt, usart_tx_interrupt, 115200,
-		     0, usart4_to_usb, usb_to_usart4);
+		     0, usart4_to_usb, usb_to_usart4, NULL);
 
 USB_STREAM_CONFIG_USART_IFACE(usart4_usb, USB_IFACE_USART4_STREAM,
 			      USB_STR_USART4_STREAM_NAME, USB_EP_USART4_STREAM,
@@ -170,6 +175,47 @@ static int command_uart_parity(int argc, const char **argv)
 }
 DECLARE_CONSOLE_COMMAND(parity, command_uart_parity, "usart[2|3|4] [0|1|2]",
 			"Set parity on uart");
+
+static int command_usart_capture(int argc, const char **argv)
+{
+	struct usart_config const *usart = &usart2;
+	int enable;
+
+	if (argc < 2) {
+		if (usart->capture->enable) {
+			ccprintf("Tx Data (%2d) :", usart->capture->tx_idx);
+			for (int i = 0; i < usart->capture->tx_idx; i++) {
+				ccprintf("%02x ", usart->capture->tx_buf[i]);
+			}
+			ccprintf("\n");
+			ccprintf("Rx Data (%2d) :", usart->capture->rx_idx);
+			for (int i = 0; i < usart->capture->rx_idx; i++) {
+				ccprintf("%02x ", usart->capture->rx_buf[i]);
+			}
+			ccprintf("\n");
+			usart->capture->tx_idx = 0;
+			usart->capture->rx_idx = 0;
+
+			ccprintf("Rx DMA info:\n");
+			dma_chan_t *channel = dma_get_channel(usart2_rx_dma.channel);
+			ccprintf("  new_index = %d\n", dma_bytes_done(channel, usart2_rx_dma.fifo_size));
+			ccprintf("  old_index = %d\n", usart2_rx_dma.state->index);
+		} else {
+			ccprintf("EC USART capture disabled\n");
+		}
+		return EC_SUCCESS;
+	}
+
+	if (!parse_bool(argv[1], &enable))
+		return EC_ERROR_PARAM1;
+
+	ccprintf("EC USART capture: %d\n", enable);
+	usart->capture->enable = enable;
+
+	return EC_SUCCESS;
+}
+DECLARE_CONSOLE_COMMAND(capture, command_usart_capture, "capture [enable|disable]",
+	"Enabled/disable capture of data from the EC USART2");
 
 /******************************************************************************
  * Set baud rate setting on usarts.

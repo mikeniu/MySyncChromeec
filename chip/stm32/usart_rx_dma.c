@@ -57,6 +57,16 @@ static void usart_rx_dma_interrupt_common(struct usart_config const *config,
 	if (new_index > old_index) {
 		new_bytes = new_index - old_index;
 
+		if (config->capture->enable && config->capture->rx_idx < USART_CAPTURE_SIZE) {
+			for (int i = 0; i < new_bytes; i++) {
+				config->capture->rx_buf[config->capture->rx_idx++] =
+					*(uint8_t *)(dma_config->fifo_buffer + old_index + i);
+				if (config->capture->rx_idx >= USART_CAPTURE_SIZE) {
+					break;
+				}
+			}
+		}
+
 		added = add_data(config, dma_config->fifo_buffer + old_index,
 				 new_bytes);
 	} else if (new_index < old_index) {
@@ -67,6 +77,25 @@ static void usart_rx_dma_interrupt_common(struct usart_config const *config,
 		 */
 		new_bytes = dma_config->fifo_size - (old_index - new_index);
 
+		if (config->capture->enable && config->capture->rx_idx < USART_CAPTURE_SIZE) {
+			for (int i = 0; i < dma_config->fifo_size - old_index; i++) {
+				config->capture->rx_buf[config->capture->rx_idx++] =
+					*(uint8_t *)(dma_config->fifo_buffer + old_index + i);
+				if (config->capture->rx_idx >= USART_CAPTURE_SIZE) {
+					break;
+				}
+			}
+
+			if (config->capture->rx_idx < USART_CAPTURE_SIZE) {
+				for (int i = 0; i < new_index; i++) {
+					config->capture->rx_buf[config->capture->rx_idx++] =
+						*(uint8_t *)(dma_config->fifo_buffer + i);
+					if (config->capture->rx_idx >= USART_CAPTURE_SIZE) {
+						break;
+					}
+				}
+			}
+		}
 		added = add_data(config, dma_config->fifo_buffer + old_index,
 				 dma_config->fifo_size - old_index) +
 			add_data(config, dma_config->fifo_buffer, new_index);

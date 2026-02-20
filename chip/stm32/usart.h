@@ -107,11 +107,20 @@ struct usart_hw_config {
 	struct usart_hw_ops const *ops;
 };
 
+#define USART_CAPTURE_SIZE 32
 /*
  * Compile time Per-USART configuration stored in flash.  Instances of this
  * structure are provided by the user of the USART.  This structure binds
  * together all information required to operate a USART.
  */
+struct usart_capture {
+	bool enable;
+	int rx_idx;
+	int tx_idx;
+	uint8_t rx_buf[USART_CAPTURE_SIZE];
+	uint8_t tx_buf[USART_CAPTURE_SIZE];
+};
+
 struct usart_config {
 	/*
 	 * Pointer to USART HW configuration.  There is one HW configuration
@@ -132,6 +141,8 @@ struct usart_config {
 	 * Baud rate for USART.
 	 */
 	int baud;
+
+	struct usart_capture *capture;
 
 	/* Other flags (rx/tx inversion, half-duplex). */
 #define USART_CONFIG_FLAG_RX_INV BIT(0)
@@ -160,7 +171,7 @@ struct usart_config {
  * BUILD_ASSERT(RX_QUEUE.unit_bytes == 1);
  * BUILD_ASSERT(TX_QUEUE.unit_bytes == 1);
  */
-#define USART_CONFIG(HW, RX, TX, BAUD, FLAGS, RX_QUEUE, TX_QUEUE) \
+#define USART_CONFIG(HW, RX, TX, BAUD, FLAGS, RX_QUEUE, TX_QUEUE, CAPTURE) \
 	((struct usart_config const) {					\
 		.hw       = &HW,					\
 		.rx       = &RX,					\
@@ -176,6 +187,7 @@ struct usart_config {
 			.queue = &RX_QUEUE,				\
 			.ops   = &RX.producer_ops,			\
 		},							\
+		.capture = CAPTURE, \
 	})
 
 /*
