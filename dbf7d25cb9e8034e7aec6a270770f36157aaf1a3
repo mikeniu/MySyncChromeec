@@ -177,6 +177,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "07b806e1_734df36c",
+        "filename": "zephyr/include/ascp/ascp.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-02-20T10:52:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f3602566_10a42f37",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 33
+      },
+      "revId": "dbf7d25cb9e8034e7aec6a270770f36157aaf1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95e04359_0563801f",
@@ -214,6 +238,30 @@
       "side": 1,
       "message": "The idea is that this is the one of the possibilities that data is just available in the memory. It works for multiple platforms with different memory offsets. With structure filling approach it is easier to implement alternative platforms.\n\nI moved addresses to header file (in a different CL).",
       "parentUuid": "95e04359_0563801f",
+      "range": {
+        "startLine": 8,
+        "startChar": 6,
+        "endLine": 8,
+        "endChar": 13
+      },
+      "revId": "dbf7d25cb9e8034e7aec6a270770f36157aaf1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8d60432_79db1ac6",
+        "filename": "zephyr/subsys/ascp/Kconfig",
+        "patchSetId": 18
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-02-20T10:52:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2502830c_8f76a261",
       "range": {
         "startLine": 8,
         "startChar": 6,
