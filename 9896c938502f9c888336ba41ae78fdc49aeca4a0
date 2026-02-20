@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8da13e5e_05f16dec",
+        "filename": "zephyr/program/atria/rvp_i2c.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-02-20T16:41:03Z",
+      "side": 1,
+      "message": "it comes up fairly early this comment can probably be removed I prefer to leave them deferred init though",
+      "parentUuid": "7e49c5ff_229bb59d",
+      "revId": "9896c938502f9c888336ba41ae78fdc49aeca4a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "547a6db4_1bca9c5a",
         "filename": "zephyr/program/atria/rvp_ioex_gpio.dtsi",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "writtenOn": "2026-02-20T15:25:35Z",
       "side": 1,
       "message": "You\u0027ll need to change these all to 2026.",
+      "revId": "9896c938502f9c888336ba41ae78fdc49aeca4a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b85a3649_7b488eb4",
+        "filename": "zephyr/program/atria/rvp_ioex_gpio.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-02-20T16:41:03Z",
+      "side": 1,
+      "message": "dang I thought I caught most of them....the dang repoupload hooks don\u0027t catch the dts files apparently will go back through and fix any I missed.",
+      "parentUuid": "547a6db4_1bca9c5a",
       "revId": "9896c938502f9c888336ba41ae78fdc49aeca4a0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
