@@ -246,6 +246,14 @@ class Architecture(Enum):
     RISCV = "riscv"
 
 
+class HostInterface(Enum):
+    """Host command interface."""
+
+    UART = "uart"
+    SPI = "spi"
+    USB = "usb"
+
+
 @dataclass
 # pylint: disable-next=too-many-instance-attributes
 class BoardConfig:
@@ -268,6 +276,7 @@ class BoardConfig:
     expected_fp_power_zephyr: Optional[PowerUtilization] = None
     expected_mcu_power_zephyr: Optional[PowerUtilization] = None
     zephyr_board_name: Optional[str] = None
+    host_interfaces: list[HostInterface] = field(default_factory=list)
 
 
 class Platform(ABC):
@@ -648,6 +657,7 @@ class TestConfig:
     skip_for_zephyr: bool = False
     zephyr_name: Optional[str] = None
     architectures: Optional[list[Architecture]] = None
+    host_interfaces: Optional[list[HostInterface]] = None
 
     # The callbacks below are called before and after a test is executed and
     # may be used for additional test setup, post test activities, or other tasks
@@ -708,6 +718,10 @@ class AllTests:
             and (
                 test.architectures is None
                 or board_config.architecture in test.architectures
+            )
+            and (
+                test.host_interfaces is None
+                or any(t in board_config.host_interfaces for t in test.host_interfaces)
             )
         ]
 
@@ -1152,6 +1166,7 @@ BLOONCHIPPER_CONFIG = BoardConfig(
         },
     },
     zephyr_board_name="google_dragonclaw",
+    host_interfaces=[HostInterface.UART, HostInterface.SPI],
 )
 
 DARTMONKEY_CONFIG = BoardConfig(
@@ -1186,6 +1201,7 @@ DARTMONKEY_CONFIG = BoardConfig(
         },
     },
     zephyr_board_name="google_icetower",
+    host_interfaces=[HostInterface.UART, HostInterface.SPI],
 )
 
 HELIPILOT_CONFIG = BoardConfig(
@@ -1226,6 +1242,7 @@ HELIPILOT_CONFIG = BoardConfig(
         },
     },
     zephyr_board_name="google_quincy",
+    host_interfaces=[HostInterface.UART, HostInterface.SPI],
 )
 
 BUCCANEER_CONFIG = copy.deepcopy(HELIPILOT_CONFIG)
@@ -1269,6 +1286,7 @@ SANOK_CONFIG = BoardConfig(
     # TODO(b/468407068): configure variants.
     variants={},
     zephyr_board_name="egis_et171",
+    host_interfaces=[HostInterface.UART, HostInterface.SPI],
 )
 
 CHUDOW_CONFIG = BoardConfig(
@@ -1294,6 +1312,7 @@ CHUDOW_CONFIG = BoardConfig(
     # TODO(b/485656929): configure variants.
     variants={},
     zephyr_board_name="ft9001_eval",
+    host_interfaces=[HostInterface.UART, HostInterface.SPI],
 )
 
 BOARD_CONFIGS = {
