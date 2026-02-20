@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d797cbe_fa10afe6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-20T18:51:14Z",
+      "side": 1,
+      "message": "@dawidn@google.com Everything is in place to skip the [tests that are failing](http://b/issues/485264995/dependencies).\n\nI tested the Renode tests using https://crrev.com/c/6642119, https://crrev.com/c/7004850, and https://crrev.com/c/7004849 locally.\n\nThere are some merge conflicts, and I wasn\u0027t sure how you wanted those CLs structured, so I didn\u0027t touch them.\n\nOnce they are updated and chained correctly, we can use this CL to enable the CQ testing for `chudow`.",
+      "revId": "614d19813c690443b34923b7a6d64bd44d62414f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
