@@ -327,6 +327,30 @@
       },
       "revId": "09b0f500e7f349dd6f2719078ce170943ef097ab",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df45751a_dea8e8e4",
+        "filename": "zephyr/program/ocelot/program.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-02-20T16:31:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de339744_87dd8fa6",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 86,
+        "endChar": 31
+      },
+      "revId": "09b0f500e7f349dd6f2719078ce170943ef097ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
