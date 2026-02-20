@@ -16,6 +16,24 @@
       "message": "I don\u0027t think adding a new suite is right here. You mentioned something you need for the test is not enabled in RO but is in RW, but that would mean this is still broken when run as part of `drivers.power_host_sleep_ro` since this file is built and run in a total of four different configurations (everything in testcase.yaml that sets `CONFIG_LINK_TEST_SUITE_POWER_HOST_SLEEP\u003dy`).",
       "revId": "3d3d7e6755fd649aac8f2cad78fa20d233503818",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fec351a2_9330626d",
+        "filename": "zephyr/test/drivers/power_host_sleep/src/test_power_host_sleep.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 464,
+      "author": {
+        "id": 1381813
+      },
+      "writtenOn": "2026-02-20T01:03:35Z",
+      "side": 1,
+      "message": "I started creating a new test subdirectory power_host_sleep_rw and adding a new CONFIG_POWER_HOST_SLEEP_RW so we could compile it only into the drivers.power_hose_sleep_rw binary, but then I noticed Z_TEST_SKIP_IFNDEF() and did that instead.\n\nI can confirm that the test passes for\n```\n./twister -c -i -T zephyr/test/drivers/ -s drivers.power_host_sleep_rw -p native_sim\n```\n`twister-out/twister.json`:\n```\n...\n                {   \n                    \"identifier\": \"drivers.power_host_sleep_rw.power_host_sleep.sleep_signal_transitions\",\n                    \"execution_time\": \"0.00\",\n                    \"status\": \"passed\"\n                }\n...\n```\n\nis skipped for\n```\n./twister -c -i -T zephyr/test/drivers/ -s drivers.power_host_sleep_ro -p native_sim\n```\n--\u003e `twister-out/twister.json`:\n```\n...\n                {   \n                    \"identifier\": \"drivers.power_host_sleep_ro.power_host_sleep.sleep_signal_transitions\",\n                    \"execution_time\": \"0.00\",\n                    \"status\": \"skipped\",\n                    \"reason\": \"ztest skip\"\n                }\n...\n```\n\nand\n```\n./twister -c -i -T zephyr/test/drivers/ -s drivers.power_host_sleep -p native_sim\n```\n`twister-out/twister.json`:\n```\n...\n                {\n                    \"identifier\": \"drivers.power_host_sleep.power_host_sleep.sleep_signal_transitions\",\n                    \"execution_time\": \"0.00\",\n                    \"status\": \"skipped\",\n                    \"reason\": \"ztest skip\"\n                }\n...\n```\nLMKWYT",
+      "parentUuid": "c2a48787_ad9d7eb7",
+      "revId": "3d3d7e6755fd649aac8f2cad78fa20d233503818",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
