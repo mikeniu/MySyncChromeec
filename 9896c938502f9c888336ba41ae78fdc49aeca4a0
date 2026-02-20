@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bea399d3_df4cb5d9",
+        "filename": "zephyr/program/atria/atriarvp-rtk/i2c.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-02-20T17:59:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9930312c_5998812c",
+      "revId": "9896c938502f9c888336ba41ae78fdc49aeca4a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7e49c5ff_229bb59d",
@@ -53,6 +71,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2609af3_3101a905",
+        "filename": "zephyr/program/atria/rvp_i2c.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-02-20T17:59:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8da13e5e_05f16dec",
+      "revId": "9896c938502f9c888336ba41ae78fdc49aeca4a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "547a6db4_1bca9c5a",
@@ -84,6 +120,24 @@
       "side": 1,
       "message": "dang I thought I caught most of them....the dang repoupload hooks don\u0027t catch the dts files apparently will go back through and fix any I missed.",
       "parentUuid": "547a6db4_1bca9c5a",
+      "revId": "9896c938502f9c888336ba41ae78fdc49aeca4a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cf610a0_cbf0f487",
+        "filename": "zephyr/program/atria/rvp_ioex_gpio.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-02-20T17:59:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b85a3649_7b488eb4",
       "revId": "9896c938502f9c888336ba41ae78fdc49aeca4a0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
