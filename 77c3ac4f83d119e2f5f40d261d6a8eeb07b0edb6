@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e7a8878e_63ef5e89",
+        "filename": "zephyr/program/atria/atriarvp-rtk/i2c.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-02-20T16:36:52Z",
+      "side": 1,
+      "message": "This can probably all move to overlay. Originally I had a lot more in this file then separated it out to the rvp_i2c file.",
+      "parentUuid": "b0eca14c_62065c5a",
+      "revId": "77c3ac4f83d119e2f5f40d261d6a8eeb07b0edb6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0bc4bc59_c236897e",
         "filename": "zephyr/program/atria/rvp_i2c.dtsi",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2026-02-20T15:11:39Z",
       "side": 1,
       "message": "Does 1 correspond to the SoC port number or something like that?",
+      "revId": "77c3ac4f83d119e2f5f40d261d6a8eeb07b0edb6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b484d03_e7edb043",
+        "filename": "zephyr/program/atria/rvp_i2c.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-02-20T16:36:52Z",
+      "side": 1,
+      "message": "This is just leftover from some testing it can be changed to not have the 1",
+      "parentUuid": "0bc4bc59_c236897e",
       "revId": "77c3ac4f83d119e2f5f40d261d6a8eeb07b0edb6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
