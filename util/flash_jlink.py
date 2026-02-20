@@ -5,9 +5,19 @@
 
 # pylint: disable=logging-fstring-interpolation
 
-"""Flashes firmware using Segger J-Link.
+"""Flashes firmware using Segger J-Link or GDB.
 
 This script requires Segger hardware attached via JTAG/SWD.
+
+When flashing with GDB, start the server with:
+
+JLinkGDBServerCLExe -port 19020 -device STM32H743ZI -if SWD -nogui
+
+where device is one of:
+
+* STM32H743ZI (icetower)
+* STM32F412CG (dragonclaw)
+* NPCX998F (quincy)
 
 See
 https://chromium.googlesource.com/chromiumos/platform/ec/+/HEAD/docs/fingerprint/fingerprint-debugging.md#flash
@@ -35,6 +45,19 @@ loadfile {FIRMWARE} {FLASH_ADDRESS}
 r
 go
 exit
+"""
+
+# Commands for GDB flashing.
+GDB_COMMANDS = """
+target extended-remote {HOST}:{PORT}
+monitor device {DEVICE}
+monitor speed {SPEED}
+monitor reset
+restore {FIRMWARE} binary {FLASH_ADDRESS}
+monitor reset
+monitor go
+disconnect
+quit
 """
 
 
@@ -111,79 +134,80 @@ def is_tcp_port_open(host: str, tcp_port: int) -> bool:
     return True
 
 
-def create_jlink_command_file(firmware_file, config):
-    """Creates a jlink command file."""
-    tmp = tempfile.NamedTemporaryFile()  # pylint:disable=consider-using-with
-    tmp.write(
-        JLINK_COMMANDS.format(
+def flash_remote_gdb(
+    gdb_exe, host, port, device, speed, flash_address, firmware_file
+):
+    """Uses a local GDB client connected to remote GDB server to flash the device."""
+    logging.debug(f"Checking connection to {host}:{port}.")
+    if not is_tcp_port_open(host, port):
+        logging.error(f"GDB server not listening on {host}:{port}.")
+        logging.error(
+            "Ensure that JLinkGDBServerCLExe is running on the remote host."
+        )
+        return 1
+
+    tmp_cmd = tempfile.NamedTemporaryFile(mode="w", delete=False)
+    tmp_cmd.write(
+        GDB_COMMANDS.format(
+            HOST=host,
+            PORT=port,
+            DEVICE=device,
+            SPEED=speed,
+            FLASH_ADDRESS=flash_address,
             FIRMWARE=firmware_file,
-            FLASH_ADDRESS=config.flash_address,
-        ).encode("utf-8")
+        )
     )
-    tmp.flush()
-    return tmp
+    tmp_cmd.close()
 
-
-def flash(jlink_exe, remote, device, interface, speed, cmd_file):
-    """Uses jlink to flash device."""
     cmd = [
-        jlink_exe,
+        gdb_exe,
+        "-nx",  # Do not execute .gdbinit
+        "--batch",  # Exit after processing the script
+        "-x",
+        tmp_cmd.name,
     ]
 
-    if remote:
-        logging.debug(f"Connecting to J-Link over TCP/IP {remote}.")
-        remote_components = remote.split(":")
-        if len(remote_components) not in [1, 2]:
-            logging.debug(f'Given remote "{remote}" is malformed.')
-            return 1
-
-        host = remote_components[0]
-        try:
-            ip_addr = socket.gethostbyname(host)
-        except socket.gaierror as err:
-            logging.error(f'Failed to resolve host "{host}": {err}.')
-            return 1
-        logging.debug(f"Resolved {host} as {ip_addr}.")
-        port = DEFAULT_SEGGER_REMOTE_PORT
-
-        if len(remote_components) == 2:
-            try:
-                port = int(remote_components[1])
-            except ValueError:
-                logging.error(
-                    f'Given remote port "{remote_components[1]}" is malformed.'
-                )
-                return 1
-
-        remote = f"{ip_addr}:{port}"
-
-        logging.debug(f"Checking connection to {remote}.")
-        if not is_tcp_port_open(ip_addr, port):
-            logging.error(
-                f"JLink server doesn't seem to be listening on {remote}."
-            )
-            logging.error("Ensure that JLinkRemoteServerCLExe is running.")
-            return 1
-        cmd.extend(["-ip", remote])
-
-    cmd.extend(
-        [
-            "-device",
-            device,
-            "-if",
-            interface,
-            "-speed",
-            speed,
-            "-autoconnect",
-            "1",
-            "-NoGui",
-            "1",
-            "-CommandFile",
-            cmd_file,
-        ]
-    )
-    logging.debug('Running command: "%s"', " ".join(cmd))
+    logging.debug('Running GDB command: "%s"', " ".join(cmd))
     completed_process = subprocess.run(cmd, check=False)
+
+    os.remove(tmp_cmd.name)
+    logging.debug("GDB return code: %d", completed_process.returncode)
+    return completed_process.returncode
+
+
+def flash_local_jlink(
+    jlink_exe, device, interface, speed, flash_address, firmware_file
+):
+    """Uses jlink to flash device locally over USB."""
+    tmp_cmd = tempfile.NamedTemporaryFile(mode="wb", delete=False)
+    tmp_cmd.write(
+        JLINK_COMMANDS.format(
+            FIRMWARE=firmware_file,
+            FLASH_ADDRESS=flash_address,
+        ).encode("utf-8")
+    )
+    tmp_cmd.close()
+
+    cmd = [
+        jlink_exe,
+        "-device",
+        device,
+        "-if",
+        interface,
+        "-speed",
+        speed,
+        "-autoconnect",
+        "1",
+        "-NoGui",
+        "1",
+        "-CommandFile",
+        tmp_cmd.name,
+    ]
+
+    logging.debug('Running JLink command: "%s"', " ".join(cmd))
+    completed_process = subprocess.run(cmd, check=False)
+
+    os.remove(tmp_cmd.name)
     logging.debug("JLink return code: %d", completed_process.returncode)
     return completed_process.returncode
 
@@ -198,15 +222,24 @@ def main(argv: list):
     parser.add_argument(
         "--jlink",
         "-j",
-        help="JLinkExe path (default: " + default_jlink + ")",
+        help="JLinkExe path for local USB flashing (default: "
+        + default_jlink
+        + ")",
         default=default_jlink,
+    )
+
+    parser.add_argument(
+        "--gdb",
+        "-g",
+        help="GDB executable path for flashing (default: arm-none-eabi-gdb)",
+        default="arm-none-eabi-gdb",
     )
 
     parser.add_argument(
         "--remote",
         "-n",
-        help="Use TCP/IP host[:port] to connect to a J-Link or "
-        "JLinkRemoteServerCLExe. If unspecified, connect over USB.",
+        help="Use TCP/IP host[:port] to connect to JLinkGDBServerCLExe. "
+        "If unspecified, connect locally via USB using JLinkExe.",
     )
 
     default_board = "bloonchipper"
@@ -240,18 +273,47 @@ def main(argv: list):
     config = BOARD_CONFIGS[args.board]
 
     args.image = os.path.realpath(args.image)
-    args.jlink = args.jlink
 
-    cmd_file = create_jlink_command_file(args.image, config)
-    ret_code = flash(
-        args.jlink,
-        args.remote,
-        config.device,
-        config.interface,
-        config.speed,
-        cmd_file.name,
-    )
-    cmd_file.close()
+    if args.remote:
+        logging.debug(f"Connecting to remote GDB over TCP/IP {args.remote}.")
+        remote_components = args.remote.split(":")
+        host = remote_components[0]
+        port = DEFAULT_SEGGER_REMOTE_PORT
+
+        try:
+            ip_addr = socket.gethostbyname(host)
+        except socket.gaierror as err:
+            logging.error(f'Failed to resolve host "{host}": {err}.')
+            sys.exit(1)
+
+        if len(remote_components) == 2:
+            try:
+                port = int(remote_components[1])
+            except ValueError:
+                logging.error(
+                    f'Given remote port "{remote_components[1]}" is malformed.'
+                )
+                sys.exit(1)
+
+        ret_code = flash_remote_gdb(
+            gdb_exe=args.gdb,
+            host=ip_addr,
+            port=port,
+            device=config.device,
+            speed=config.speed,
+            flash_address=config.flash_address,
+            firmware_file=args.image,
+        )
+    else:
+        ret_code = flash_local_jlink(
+            jlink_exe=args.jlink,
+            device=config.device,
+            interface=config.interface,
+            speed=config.speed,
+            flash_address=config.flash_address,
+            firmware_file=args.image,
+        )
+
     return ret_code
 
 
