@@ -28,8 +28,13 @@ from chromite.api.gen_sdk.chromite.api import firmware_pb2
 
 ZEPHYR_BOARDS = [
     "bloonchipper",
+<<<<<<< PATCH SET (614d19813c690443b34923b7a6d64bd44d62414f util: renode: firmware_builder: Enable chudow in CQ)
+    "chudow",
+||||||| BASE      (9b965dbd8dcad272cbad0fe816d1f8b902dd8c8d WIP: zephyr: fpmcu: add FT9001 projects)
+=======
     "helipilot",
     "sanok",
+>>>>>>> BASE      (202ba7b71f12284c19282c1bb147577c62839b2f ocicat: Use CSE early recovery GPIO driver)
 ]
 
 
