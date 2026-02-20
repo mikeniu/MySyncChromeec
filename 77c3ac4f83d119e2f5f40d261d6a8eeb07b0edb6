@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0eca14c_62065c5a",
+        "filename": "zephyr/program/atria/atriarvp-rtk/i2c.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-02-20T15:11:39Z",
+      "side": 1,
+      "message": "Right now, it looks like you\u0027re doubly including this, here and in overlay.dts. My intuition is that the project-specific file should include the general file before its own content, in case the project needs to override something from the common configuration. How do the contents of the two files interact, or how will they interact as you add more stuff?",
+      "revId": "77c3ac4f83d119e2f5f40d261d6a8eeb07b0edb6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bc4bc59_c236897e",
+        "filename": "zephyr/program/atria/rvp_i2c.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-02-20T15:11:39Z",
+      "side": 1,
+      "message": "Does 1 correspond to the SoC port number or something like that?",
+      "revId": "77c3ac4f83d119e2f5f40d261d6a8eeb07b0edb6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
