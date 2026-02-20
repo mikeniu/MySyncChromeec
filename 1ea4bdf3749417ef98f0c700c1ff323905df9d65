@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "619387fd_59ac20f1",
+        "filename": "baseboard/bloonchipper/base_board.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-20T17:58:15Z",
+      "side": 1,
+      "message": "Can we delete the `bloonchipper` board in the `ec-legacy` branch since we\u0027ve transitioned to Zephyr?\n\nNo need to change anything for this CL.",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 43
+      },
+      "revId": "1ea4bdf3749417ef98f0c700c1ff323905df9d65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
