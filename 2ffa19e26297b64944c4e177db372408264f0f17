@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "557f2ad7_85c3acd2",
+        "filename": "common/fpsensor/fpsensor_auth_ascp.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-02-20T11:10:58Z",
+      "side": 1,
+      "message": "`session_context`?",
+      "range": {
+        "startLine": 61,
+        "startChar": 31,
+        "endLine": 61,
+        "endChar": 34
+      },
+      "revId": "2ffa19e26297b64944c4e177db372408264f0f17",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
