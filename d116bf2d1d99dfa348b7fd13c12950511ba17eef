@@ -16,6 +16,23 @@
       "message": "could you cross reference with\nhttps://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7569751\nto see if additional power signal asserts introduced there carry over\nto your changes here?",
       "revId": "d116bf2d1d99dfa348b7fd13c12950511ba17eef",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "590fb107_68908647",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-02-20T23:52:55Z",
+      "side": 1,
+      "message": "```\n/mnt/host/source/src/platform/ec/zephyr/test/intelrvp/tests/power/board_power.c:228:(.text._board_power_test_board_ap_power_force_shutdown_timeout_wrapper+0x26): undefined reference to `board_ap_power_force_shutdown\u0027\n```",
+      "revId": "d116bf2d1d99dfa348b7fd13c12950511ba17eef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
