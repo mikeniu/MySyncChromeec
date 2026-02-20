@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9930312c_5998812c",
+        "filename": "zephyr/program/atria/atriarvp-rtk/i2c.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-02-20T15:25:35Z",
+      "side": 1,
+      "message": "Nit: I\u0027m not sure our hooks enforce this in DTS files, but conventionally we would have a blank line between the local relative includes and the upstream system includes.",
+      "revId": "9896c938502f9c888336ba41ae78fdc49aeca4a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e49c5ff_229bb59d",
+        "filename": "zephyr/program/atria/rvp_i2c.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-02-20T15:25:35Z",
+      "side": 1,
+      "message": "This bug claims to be fixed. Is this still an issue?",
+      "revId": "9896c938502f9c888336ba41ae78fdc49aeca4a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "547a6db4_1bca9c5a",
+        "filename": "zephyr/program/atria/rvp_ioex_gpio.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-02-20T15:25:35Z",
+      "side": 1,
+      "message": "You\u0027ll need to change these all to 2026.",
+      "revId": "9896c938502f9c888336ba41ae78fdc49aeca4a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
