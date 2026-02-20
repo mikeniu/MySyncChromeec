@@ -8,14 +8,17 @@
 
 
 /* atriarvp-rtk project DTS includes */
+#include "adc.dtsi"
 #include "gpio.dtsi"
 #include "i2c.dtsi"
 #include "power_signals.dtsi"
 
 #include "../rvp_battery.dtsi"
+#include "../rvp_fan.dtsi"
 #include "../rvp_ioex_gpio.dtsi"
 #include "../rvp_rt_pd.dtsi"
 #include "../rvp_rt_usbc.dtsi"
+#include "../rvp_temp_sensors.dtsi"
 
 /* atriarvp-rtk overrides follow... */
 
@@ -49,3 +52,26 @@
 		wkup-pin-mode = "vin";
 	};
 };
+
+/* Map GPIO common names */
+gpio_temp_sensor_power_good: &gpio_en_pp3300 {};
+/* Map Tach to common name */
+tach_fan0: &tach0 {};
+
+&tach0 {
+       status = "okay";
+       pinctrl-0 = <&tacho0_gpio052>;
+       pinctrl-names = "default";
+       pulses-per-round = <2>;
+};
+
+&fan_0 {
+       pwms = <&pwm2 0 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
+};
+
+&pwm2 {
+        status = "okay";
+        pinctrl-0 = <&pwm2_gpio025>;
+        pinctrl-names = "default";
+};
+
