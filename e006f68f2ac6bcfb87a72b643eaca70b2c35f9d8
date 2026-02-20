@@ -22,6 +22,30 @@
       },
       "revId": "e006f68f2ac6bcfb87a72b643eaca70b2c35f9d8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4fecdc38_defec72a",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_mtl_pwrseq_sm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-20T20:24:40Z",
+      "side": 1,
+      "message": "Done, no need to `x86_non_dsx_mtl_g3_entry`, instead just `x86_non_dsx_mtl_s3_exit` and removing `x86_non_dsx_mtl_s3_entry`.",
+      "parentUuid": "3fc31921_2a38e250",
+      "range": {
+        "startLine": 103,
+        "startChar": 1,
+        "endLine": 104,
+        "endChar": 43
+      },
+      "revId": "e006f68f2ac6bcfb87a72b643eaca70b2c35f9d8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
