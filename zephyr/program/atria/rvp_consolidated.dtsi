@@ -8,7 +8,9 @@
   */
 
 #include "rvp_battery.dtsi"
+#include "rvp_fan.dtsi"
 #include "rvp_i2c.dtsi"
 #include "rvp_ioex_gpio.dtsi"
 #include "rvp_rt_pd.dtsi"
 #include "rvp_rt_usbc.dtsi"
+#include "rvp_temp_sensors.dtsi"
