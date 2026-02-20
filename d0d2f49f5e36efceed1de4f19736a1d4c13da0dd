@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15cd94ad_a974b571",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-02-20T11:29:56Z",
+      "side": 1,
+      "message": "Build assert can\u0027t be placed in fpsensor code, because host unit tests doesn\u0027t build.",
+      "revId": "d0d2f49f5e36efceed1de4f19736a1d4c13da0dd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
