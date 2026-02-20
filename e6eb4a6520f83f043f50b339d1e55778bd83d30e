@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3a5e54a_651e5c50",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-20T11:28:11Z",
+      "side": 1,
+      "message": "Please split adding the ASCP support to sanok to a different CL.",
+      "revId": "e6eb4a6520f83f043f50b339d1e55778bd83d30e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbfc6a9a_a7f9a9c3",
+        "filename": "zephyr/dts/bindings/ascp/ascp-mem-map.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-20T11:28:11Z",
+      "side": 1,
+      "message": "Please use phandle for all entries. Entries in flash should be defined as the fixed-paritions node. Entries in RAM should be defined as the current sanok \"SDCP\" node.",
+      "revId": "e6eb4a6520f83f043f50b339d1e55778bd83d30e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa8a595e_4f4f581a",
+        "filename": "zephyr/subsys/ascp/Kconfig",
+        "patchSetId": 8
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-20T11:28:11Z",
+      "side": 1,
+      "message": "Please enable by default if the `\"ascp,mem-map\"` node is defined.",
+      "revId": "e6eb4a6520f83f043f50b339d1e55778bd83d30e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4aa7cab2_076c83bb",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-20T11:28:11Z",
+      "side": 1,
+      "message": "Please add a BUILD_ASSERT to check if there is only one `\"ascp,mem-map\"` node.",
+      "revId": "e6eb4a6520f83f043f50b339d1e55778bd83d30e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "119cf543_04a8be2b",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-20T11:28:11Z",
+      "side": 1,
+      "message": "Use a `\"ascp,mem-map\"` node, instead of a hardcoded nodelabel.",
+      "revId": "e6eb4a6520f83f043f50b339d1e55778bd83d30e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
