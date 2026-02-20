@@ -11,6 +11,8 @@
 #include "gpio.dtsi"
 #include "i2c.dtsi"
 
+#include "../rvp_ioex_gpio.dtsi"
+
 /* atriarvp-rtk overrides follow... */
 
 &espi0 {

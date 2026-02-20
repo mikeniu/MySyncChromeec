@@ -30,3 +30,9 @@ i2c_port_pd: &i2c_3 {
 };
 
 #include "../rvp_i2c.dtsi"
+
+#include <ite/it8801-common-cfg.dtsi>
+
+&it8801_mfd {
+	irq-gpios = <&gpiof 5 GPIO_ACTIVE_LOW>;
+};
