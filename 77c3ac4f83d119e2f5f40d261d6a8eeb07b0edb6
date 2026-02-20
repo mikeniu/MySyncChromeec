@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c97be29b_89b47cf1",
+        "filename": "zephyr/program/atria/atriarvp-rtk/i2c.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-02-20T17:57:44Z",
+      "side": 1,
+      "message": "I ended up removing the rvp_i2c from the project.overlay instead I like keeping the i2c stuff separate from the overlay for readability.",
+      "parentUuid": "e7a8878e_63ef5e89",
+      "revId": "77c3ac4f83d119e2f5f40d261d6a8eeb07b0edb6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0bc4bc59_c236897e",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "This is just leftover from some testing it can be changed to not have the 1",
       "parentUuid": "0bc4bc59_c236897e",
+      "revId": "77c3ac4f83d119e2f5f40d261d6a8eeb07b0edb6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5234b0b4_d080ac52",
+        "filename": "zephyr/program/atria/rvp_i2c.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-02-20T17:57:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7b484d03_e7edb043",
       "revId": "77c3ac4f83d119e2f5f40d261d6a8eeb07b0edb6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
