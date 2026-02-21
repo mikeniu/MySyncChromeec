@@ -15,6 +15,7 @@
 LOG_MODULE_REGISTER(ftrapv_hw_test, LOG_LEVEL_INF);
 
 static void *expected_fault_addr;
+static void *expected_fault_end_addr;
 
 ZTEST_SUITE(ftrapv, NULL, NULL, NULL, NULL, NULL);
 
@@ -23,11 +24,10 @@ void ztest_post_fatal_error_hook(unsigned int reason,
 {
 	zassert_true(reason == K_ERR_CPU_EXCEPTION);
 	zassert_not_null(expected_fault_addr);
+	zassert_not_null(expected_fault_end_addr);
 
 	ztest_set_fault_valid(false);
 
-	/* Estimated end of a function. */
-	uint32_t fn_end = (uint32_t)expected_fault_addr + 0x40;
 #if defined(CONFIG_ARM)
 	uint32_t pc = pEsf->basic.pc;
 #elif defined(CONFIG_RISCV)
@@ -38,11 +38,14 @@ void ztest_post_fatal_error_hook(unsigned int reason,
 #endif
 	/* Make sure Program Counter is stored correctly and points at a
 		* function that causes a crash. */
-	zassert_true(((uint32_t)expected_fault_addr <= pc) && (fn_end >= pc),
-					"PC 0x%x not in range [0x%x, 0x%x]", pc,
-					(uint32_t)expected_fault_addr, fn_end);
+	zassert_true(((uint32_t)expected_fault_addr <= pc) &&
+			     ((uint32_t)expected_fault_end_addr >= pc),
+		     "PC 0x%x not in range [0x%x, 0x%x]", pc,
+		     (uint32_t)expected_fault_addr,
+		     (uint32_t)expected_fault_end_addr);
 
 	expected_fault_addr = NULL;
+	expected_fault_end_addr = NULL;
 }
 
 /*
@@ -50,20 +53,30 @@ void ztest_post_fatal_error_hook(unsigned int reason,
  */
 static void trapv_addition(void)
 {
-	int32_t test_overflow = INT32_MAX;
-	int32_t ret;
+	volatile int32_t test_overflow = INT32_MAX;
+	volatile int32_t ret;
 
 	LOG_INF("Testing signed integer addition overflow");
 	cflush();
+
+	expected_fault_addr = &&trap_start;
+	expected_fault_end_addr = &&trap_end;
+	__asm__ volatile("" ::: "memory");
+
+trap_start:
 	ret = test_overflow + 1;
+trap_end:
+	__asm__ volatile("nop");
 
 	/* Should never reach this. */
 	zassert_unreachable();
+	(void)ret;
 }
 
 ZTEST(ftrapv, test_trapv_addition)
 {
-	expected_fault_addr = (void *)trapv_addition;
+	expected_fault_addr = NULL;
+	expected_fault_end_addr = NULL;
 	ztest_set_fault_valid(true);
 	trapv_addition();
 }
@@ -73,20 +86,30 @@ ZTEST(ftrapv, test_trapv_addition)
  */
 static void ftrapv_subtraction(void)
 {
-	int32_t test_overflow = INT32_MIN;
-	int32_t ret;
+	volatile int32_t test_overflow = INT32_MIN;
+	volatile int32_t ret;
 
 	LOG_INF("Testing signed integer subtraction overflow");
 	cflush();
+
+	expected_fault_addr = &&trap_start;
+	expected_fault_end_addr = &&trap_end;
+	__asm__ volatile("" ::: "memory");
+
+trap_start:
 	ret = test_overflow - 1;
+trap_end:
+	__asm__ volatile("nop");
 
 	/* Should never reach this. */
 	zassert_unreachable();
+	(void)ret;
 }
 
 ZTEST(ftrapv, test_ftrapv_subtraction)
 {
-	expected_fault_addr = (void *)ftrapv_subtraction;
+	expected_fault_addr = NULL;
+	expected_fault_end_addr = NULL;
 	ztest_set_fault_valid(true);
 	ftrapv_subtraction();
 }
@@ -96,20 +119,30 @@ ZTEST(ftrapv, test_ftrapv_subtraction)
  */
 static void ftrapv_multiplication(void)
 {
-	int32_t test_overflow = INT32_MAX;
-	int32_t ret;
+	volatile int32_t test_overflow = INT32_MAX;
+	volatile int32_t ret;
 
 	LOG_INF("Testing signed integer multiplication overflow");
 	cflush();
+
+	expected_fault_addr = &&trap_start;
+	expected_fault_end_addr = &&trap_end;
+	__asm__ volatile("" ::: "memory");
+
+trap_start:
 	ret = test_overflow * 2;
+trap_end:
+	__asm__ volatile("nop");
 
 	/* Should never reach this. */
 	zassert_unreachable();
+	(void)ret;
 }
 
 ZTEST(ftrapv, test_ftrapv_multiplication)
 {
-	expected_fault_addr = (void *)ftrapv_multiplication;
+	expected_fault_addr = NULL;
+	expected_fault_end_addr = NULL;
 	ztest_set_fault_valid(true);
 	ftrapv_multiplication();
 }
@@ -119,20 +152,30 @@ ZTEST(ftrapv, test_ftrapv_multiplication)
  */
 static void ftrapv_negation(void)
 {
-	int32_t test_overflow = INT32_MIN;
-	int32_t ret;
+	volatile int32_t test_overflow = INT32_MIN;
+	volatile int32_t ret;
 
 	LOG_INF("Testing signed integer negation overflow");
 	cflush();
+
+	expected_fault_addr = &&trap_start;
+	expected_fault_end_addr = &&trap_end;
+	__asm__ volatile("" ::: "memory");
+
+trap_start:
 	ret = -test_overflow;
+trap_end:
+	__asm__ volatile("nop");
 
 	/* Should never reach this. */
 	zassert_unreachable();
+	(void)ret;
 }
 
 ZTEST(ftrapv, test_ftrapv_negation)
 {
-	expected_fault_addr = (void *)ftrapv_negation;
+	expected_fault_addr = NULL;
+	expected_fault_end_addr = NULL;
 	ztest_set_fault_valid(true);
 	ftrapv_negation();
 }
@@ -144,21 +187,30 @@ ZTEST(ftrapv, test_ftrapv_negation)
  */
 static void ftrapv_abs(void)
 {
-	int32_t test_overflow = INT32_MIN;
-	int32_t ret;
+	volatile int32_t test_overflow = INT32_MIN;
+	volatile int32_t ret;
 
 	LOG_INF("Testing signed integer absolute value overflow\n");
 	cflush();
 
+	expected_fault_addr = &&trap_start;
+	expected_fault_end_addr = &&trap_end;
+	__asm__ volatile("" ::: "memory");
+
+trap_start:
 	ret = abs(test_overflow);
+trap_end:
+	__asm__ volatile("nop");
 
 	/* Should never reach this. */
 	zassert_unreachable();
+	(void)ret;
 }
 
 ZTEST(ftrapv, test_ftrapv_abs)
 {
-	expected_fault_addr = (void *)ftrapv_abs;
+	expected_fault_addr = NULL;
+	expected_fault_end_addr = NULL;
 	ztest_set_fault_valid(true);
 	ftrapv_abs();
 }
