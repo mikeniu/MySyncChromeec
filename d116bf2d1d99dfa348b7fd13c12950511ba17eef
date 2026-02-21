@@ -33,6 +33,24 @@
       "message": "```\n/mnt/host/source/src/platform/ec/zephyr/test/intelrvp/tests/power/board_power.c:228:(.text._board_power_test_board_ap_power_force_shutdown_timeout_wrapper+0x26): undefined reference to `board_ap_power_force_shutdown\u0027\n```",
       "revId": "d116bf2d1d99dfa348b7fd13c12950511ba17eef",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "748f8c6b_e438e4fb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-21T00:18:51Z",
+      "side": 1,
+      "message": "CL:7585753 migrates `board_ap_power_force_shutdown` definition from `\u003cproject\u003e/src/board_power.c` into `zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c`.\n\nFor some reason CL:7569751 is not able to find it.",
+      "parentUuid": "590fb107_68908647",
+      "revId": "d116bf2d1d99dfa348b7fd13c12950511ba17eef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
