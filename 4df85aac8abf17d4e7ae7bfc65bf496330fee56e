@@ -16,6 +16,24 @@
       "message": "```\nmap\u003d/mnt/host/source/src/platform\u003dEC_BASE -msse -Wimplicit-fallthrough -Wint-conversion -std\u003dc17 -fno-exceptions -MD -MT modules/ec/zephyr/CMakeFiles/ec_shim.dir/emul/emul_realtek_rts54xx.c.obj -MF modules/ec/zephyr/CMakeFiles/ec_shim.dir/emul/emul_realtek_rts54xx.c.obj.d -o modules/ec/zephyr/CMakeFiles/ec_shim.dir/emul/emul_realtek_rts54xx.c.obj -c /mnt/host/source/src/platform/ec/zephyr/emul/emul_realtek_rts54xx.c\n/mnt/host/source/src/platform/ec/zephyr/emul/emul_realtek_rts54xx.c:131:2: error: incompatible operand types (\u0027int\u0027 and \u0027union pd_status_t\u0027)\n  131 |         LOG_INF(\"SET_NOTIFICATION_ENABLE port\u003d%d, data\u003d0x%X\", port,\n      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n  132 |                 data-\u003enotification_data[port]);\n      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n/mnt/host/source/src/third_party/zephyrproject/zephyr/include/zephyr/logging/log.h:83:22: note: expanded from macro \u0027LOG_INF\u0027\n   83 | #define LOG_INF(...) Z_LOG(LOG_LEVEL_INF, __VA_ARGS__)\n      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n/mnt/host/source/src/third_party/zephyrproject/zephyr/include/zephyr/logging/log_core.h:320:44: note: expanded from macro \u0027Z_LOG\u0027\n  320 | #define Z_LOG(_level, ...)                 Z_LOG2(_level, 0, Z_LOG_CURRENT_DATA(), __VA_ARGS__)\n      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n/mnt/host/source/src/third_party/zephyrproject/zephyr/include/zephyr/logging/log_core.h:308:3: note: expanded from macro \u0027Z_LOG2\u0027\n  308 |                 Z_LOG_MSG_CREATE(UTIL_NOT(IS_ENABLED(CONFIG_USERSPACE)), _mode,                    \\\n      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n  309 |                                  Z_LOG_LOCAL_DOMAIN_ID, _source, _level, NULL, 0, __VA_ARGS__);    \\\n      |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\nnote: (skipping 11 expansions in backtrace; use -fmacro-backtrace-limit\u003d0 to see all)\n/mnt/host/source/src/third_party/zephyrproject/zephyr/include/zephyr/sys/util_internal.h:64:49: note: expanded from macro \u0027__COND_CODE\u0027\n   64 |         __GET_ARG2_DEBRACKET(one_or_two_args _if_code, _else_code)\n      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~\n/mnt/host/source/src/third_party/zephyrproject/zephyr/include/zephyr/sys/util_internal.h:69:65: note: expanded from macro \u0027__GET_ARG2_DEBRACKET\u0027\n   69 | #define __GET_ARG2_DEBRACKET(ignore_this, val, ...) __DEBRACKET val\n      |                                                     ~~~~~~~~~~~~^~~\n/mnt/host/source/src/third_party/zephyrproject/zephyr/include/zephyr/sys/util_internal.h:72:26: note: expanded from macro \u0027__DEBRACKET\u0027\n   72 | #define __DEBRACKET(...) __VA_ARGS__\n      |                          ^~~~~~~~~~~\n1 error generated.\nninja: build stopped: subcommand failed.\n```",
       "revId": "4df85aac8abf17d4e7ae7bfc65bf496330fee56e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "568b28d1_1e272fca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-21T04:34:56Z",
+      "side": 1,
+      "message": "I experienced this same error locally, I thought it was something on the compiler, I fixed it with:\n```\n--- a/zephyr/emul/emul_realtek_rts54xx.c\n+++ b/zephyr/emul/emul_realtek_rts54xx.c\n@@ -129,7 +129,7 @@ static int set_notification_enable(struct rts5453p_emul_pdc_data *data,\n\n        data-\u003enotification_data[port] \u003d req-\u003eset_notification_enable.data;\n        LOG_INF(\"SET_NOTIFICATION_ENABLE port\u003d%d, data\u003d0x%X\", port,\n-               data-\u003enotification_data[port]);\n+               data-\u003enotification_data[port].raw_value);\n\n        memset(\u0026data-\u003eresponse, 0, sizeof(union rts54_response));\n        send_response(data);\n```\nShould I push this change in this CL?",
+      "parentUuid": "f32164ed_17b03465",
+      "revId": "4df85aac8abf17d4e7ae7bfc65bf496330fee56e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
