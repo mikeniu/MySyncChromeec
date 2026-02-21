@@ -22,6 +22,29 @@
       },
       "revId": "53b7dd857450c0ddff6904cdf49d0f7ff02c618b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "649b9e4d_0a4f5cd1",
+        "filename": "zephyr/test/hwtest/src/ftrapv.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-21T00:54:51Z",
+      "side": 1,
+      "message": "`zassert_equal` might be better here",
+      "range": {
+        "startLine": 24,
+        "startChar": 1,
+        "endLine": 24,
+        "endChar": 45
+      },
+      "revId": "53b7dd857450c0ddff6904cdf49d0f7ff02c618b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
