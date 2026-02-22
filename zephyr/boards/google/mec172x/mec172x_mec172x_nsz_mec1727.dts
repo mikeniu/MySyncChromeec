@@ -8,7 +8,7 @@
 #include "mec172x.dtsi"
 
 /* MEC1727 Internal SPI flash information */
-&spi0 {
+&qspi0 {
 	status = "okay";
 	compatible = "microchip,xec-qmspi-ldma";
 	clock-frequency = <12000000>;
