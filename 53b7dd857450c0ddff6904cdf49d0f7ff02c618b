@@ -88,6 +88,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "420ba5c5_7d639f0f",
+        "filename": "zephyr/test/hwtest/src/ftrapv.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-23T19:09:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d928728_186fba41",
+      "range": {
+        "startLine": 24,
+        "startChar": 1,
+        "endLine": 24,
+        "endChar": 45
+      },
+      "revId": "53b7dd857450c0ddff6904cdf49d0f7ff02c618b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4430d497_a41155ec",
@@ -101,6 +125,24 @@
       "writtenOn": "2026-02-23T09:10:14Z",
       "side": 1,
       "message": "Some formatting problems.",
+      "revId": "53b7dd857450c0ddff6904cdf49d0f7ff02c618b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84bfb058_972f431b",
+        "filename": "zephyr/test/hwtest/src/ftrapv.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-23T19:09:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4430d497_a41155ec",
       "revId": "53b7dd857450c0ddff6904cdf49d0f7ff02c618b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -128,6 +170,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f06561cb_e8763ee4",
+        "filename": "zephyr/test/hwtest/src/ftrapv.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-23T19:09:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e087bf2_5ae98ad8",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 70
+      },
+      "revId": "53b7dd857450c0ddff6904cdf49d0f7ff02c618b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5d78f933_41ba07a1",
@@ -141,6 +207,24 @@
       "writtenOn": "2026-02-23T09:10:14Z",
       "side": 1,
       "message": "Maybe move to before_test routine?",
+      "revId": "53b7dd857450c0ddff6904cdf49d0f7ff02c618b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "463955da_3e4388c0",
+        "filename": "zephyr/test/hwtest/src/ftrapv.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-23T19:09:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d78f933_41ba07a1",
       "revId": "53b7dd857450c0ddff6904cdf49d0f7ff02c618b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
