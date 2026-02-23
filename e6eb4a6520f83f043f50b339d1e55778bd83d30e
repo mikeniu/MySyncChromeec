@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ec26ec9_cbe58c18",
+        "filename": "zephyr/dts/bindings/ascp/ascp-mem-map.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-23T09:34:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fbfc6a9a_a7f9a9c3",
+      "revId": "e6eb4a6520f83f043f50b339d1e55778bd83d30e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aa8a595e_4f4f581a",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-02-20T11:28:11Z",
       "side": 1,
       "message": "Please enable by default if the `\"ascp,mem-map\"` node is defined.",
+      "revId": "e6eb4a6520f83f043f50b339d1e55778bd83d30e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "91f2f8c3_87baa340",
+        "filename": "zephyr/subsys/ascp/Kconfig",
+        "patchSetId": 8
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-23T09:34:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa8a595e_4f4f581a",
       "revId": "e6eb4a6520f83f043f50b339d1e55778bd83d30e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -69,6 +105,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "71459f81_2d264976",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-23T09:34:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4aa7cab2_076c83bb",
+      "revId": "e6eb4a6520f83f043f50b339d1e55778bd83d30e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "119cf543_04a8be2b",
@@ -82,6 +136,24 @@
       "writtenOn": "2026-02-20T11:28:11Z",
       "side": 1,
       "message": "Use a `\"ascp,mem-map\"` node, instead of a hardcoded nodelabel.",
+      "revId": "e6eb4a6520f83f043f50b339d1e55778bd83d30e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "813dc30d_7296740e",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-23T09:34:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "119cf543_04a8be2b",
       "revId": "e6eb4a6520f83f043f50b339d1e55778bd83d30e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
