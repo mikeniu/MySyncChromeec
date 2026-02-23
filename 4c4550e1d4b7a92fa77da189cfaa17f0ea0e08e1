@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d25d66bb_57509da9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-02-23T19:18:23Z",
+      "side": 1,
+      "message": "Is this only found when `CONFIG_I2C_LOG_LEVEL` is INF level or more verbose?",
+      "revId": "4c4550e1d4b7a92fa77da189cfaa17f0ea0e08e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
