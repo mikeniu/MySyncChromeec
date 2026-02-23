@@ -34,6 +34,24 @@
       "parentUuid": "d25d66bb_57509da9",
       "revId": "4c4550e1d4b7a92fa77da189cfaa17f0ea0e08e1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "904670a9_433b7cbb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-02-23T20:55:41Z",
+      "side": 1,
+      "message": "No, these tests run basically everywhere. The latest Zephyr postsubmit builder run passed these tests an hour ago.\n\nI agree with the fix but wondering how you hit this (or why we aren\u0027t). So no config changes? What toolchain are you on?",
+      "parentUuid": "b115c786_8659c78a",
+      "revId": "4c4550e1d4b7a92fa77da189cfaa17f0ea0e08e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
