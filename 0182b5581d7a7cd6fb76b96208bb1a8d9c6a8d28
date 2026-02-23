@@ -16,6 +16,24 @@
       "message": "```\nINFO    - 379/590 native_sim/native         intelrvp.ptlrvp_mchp.board_power                   ERROR Build failure (native \u003cllvm\u003e)\n...\nmake[1]: Entering directory \u0027/mnt/host/source/src/platform/ec/twister-out-llvm/native_sim_native/llvm/platform/ec/zephyr/test/intelrvp/intelrvp.ptlrvp_mchp.board_power/zephyr\u0027\nld.lld: error: undefined symbol: board_ap_power_force_shutdown\n```",
       "revId": "0182b5581d7a7cd6fb76b96208bb1a8d9c6a8d28",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "545baf26_c3b71694",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-23T22:38:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a9aa8fdb_993d407a",
+      "revId": "0182b5581d7a7cd6fb76b96208bb1a8d9c6a8d28",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
