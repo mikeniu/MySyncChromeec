@@ -16,6 +16,24 @@
       "message": "Hi Peter,\n\nIt seems something to gate to CQ. Could you help to give me the error log?",
       "revId": "0bf39cea3ec0873b8d3ef9c5ef6c45ae65ea5139",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28a41218_013b99ba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1361259
+      },
+      "writtenOn": "2026-02-23T06:00:06Z",
+      "side": 1,
+      "message": "```\n[quandiso2:rw] /mnt/host/source/src/platform/ec/zephyr/program/nissa/quandiso2/project.conf:62: warning: attempt to assign the value \u0027\"init.c errno.c fatal.c timer.c\"\u0027 to the undefined symbol KERNEL_LTO_ALLOWLIST\n[quandiso2:rw] Merged configuration \u0027/mnt/host/source/src/platform/ec/zephyr/program/nissa/program.conf\u0027\n[quandiso2:rw] Merged configuration \u0027/mnt/host/source/src/platform/ec/zephyr/program/nissa/it8xxx2_program.conf\u0027\n[quandiso2:rw] error: Aborting due to Kconfig warnings\n```\n\nIt looks like that\u0027s not a kconfig option; other boards set `KERNEL_LTO_FILES` in `program/nissa/CMakeLists.txt`.",
+      "parentUuid": "ca8dc798_47487c4e",
+      "revId": "0bf39cea3ec0873b8d3ef9c5ef6c45ae65ea5139",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
