@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e659eca1_5cccb62e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-23T09:10:14Z",
+      "side": 1,
+      "message": "Some nit comments, but overall super good. We are not testing panic data with this change, but that\u0027s not a point of this test.",
+      "revId": "53b7dd857450c0ddff6904cdf49d0f7ff02c618b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5dbb9631_a504c20b",
@@ -49,6 +66,47 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8d928728_186fba41",
+        "filename": "zephyr/test/hwtest/src/ftrapv.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-23T09:10:14Z",
+      "side": 1,
+      "message": "Agree",
+      "parentUuid": "649b9e4d_0a4f5cd1",
+      "range": {
+        "startLine": 24,
+        "startChar": 1,
+        "endLine": 24,
+        "endChar": 45
+      },
+      "revId": "53b7dd857450c0ddff6904cdf49d0f7ff02c618b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4430d497_a41155ec",
+        "filename": "zephyr/test/hwtest/src/ftrapv.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-23T09:10:14Z",
+      "side": 1,
+      "message": "Some formatting problems.",
+      "revId": "53b7dd857450c0ddff6904cdf49d0f7ff02c618b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6e087bf2_5ae98ad8",
         "filename": "zephyr/test/hwtest/src/ftrapv.c",
         "patchSetId": 7
@@ -66,6 +124,23 @@
         "endLine": 41,
         "endChar": 70
       },
+      "revId": "53b7dd857450c0ddff6904cdf49d0f7ff02c618b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d78f933_41ba07a1",
+        "filename": "zephyr/test/hwtest/src/ftrapv.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-23T09:10:14Z",
+      "side": 1,
+      "message": "Maybe move to before_test routine?",
       "revId": "53b7dd857450c0ddff6904cdf49d0f7ff02c618b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
