@@ -22,6 +22,30 @@
       },
       "revId": "2ffa19e26297b64944c4e177db372408264f0f17",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5f957dd_5df76f0c",
+        "filename": "common/fpsensor/fpsensor_auth_ascp.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-23T09:32:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "557f2ad7_85c3acd2",
+      "range": {
+        "startLine": 61,
+        "startChar": 31,
+        "endLine": 61,
+        "endChar": 34
+      },
+      "revId": "2ffa19e26297b64944c4e177db372408264f0f17",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
