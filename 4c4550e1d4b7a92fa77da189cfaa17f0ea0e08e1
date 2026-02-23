@@ -52,6 +52,24 @@
       "parentUuid": "b115c786_8659c78a",
       "revId": "4c4550e1d4b7a92fa77da189cfaa17f0ea0e08e1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6c71370_8dfeebea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-23T21:11:27Z",
+      "side": 1,
+      "message": "This is what is showing on test build.log\n```\n-- Found GnuLd: /usr/bin/x86_64-pc-linux-gnu-ld.bfd (found version \"2.45.0\")\n-- The C compiler identification is Clang 21.0.0\n-- The CXX compiler identification is Clang 21.0.0\n```\n\n`x86_64-pc-linux-gnu-gcc.real (GCC) 10.2.0`\nAny specific binary version?",
+      "parentUuid": "904670a9_433b7cbb",
+      "revId": "4c4550e1d4b7a92fa77da189cfaa17f0ea0e08e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
