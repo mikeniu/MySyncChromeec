@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ddefb40f_559df97f",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-23T19:34:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5dbb9631_a504c20b",
+      "range": {
+        "startLine": 500,
+        "startChar": 0,
+        "endLine": 500,
+        "endChar": 51
+      },
+      "revId": "53b7dd857450c0ddff6904cdf49d0f7ff02c618b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "649b9e4d_0a4f5cd1",
