@@ -16,6 +16,24 @@
       "message": "Is this only found when `CONFIG_I2C_LOG_LEVEL` is INF level or more verbose?",
       "revId": "4c4550e1d4b7a92fa77da189cfaa17f0ea0e08e1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b115c786_8659c78a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-23T20:06:58Z",
+      "side": 1,
+      "message": "Tests in `zephyr/test/pdc` set `CONFIG_I2C_LOG_LEVEL` to the same value `3`.\n\nThis is the first time this code is used for a program test. Is this correct?",
+      "parentUuid": "d25d66bb_57509da9",
+      "revId": "4c4550e1d4b7a92fa77da189cfaa17f0ea0e08e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
