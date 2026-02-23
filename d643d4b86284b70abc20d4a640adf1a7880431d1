@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2aa7992_901e42b0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1293716
+      },
+      "writtenOn": "2026-02-23T08:24:54Z",
+      "side": 1,
+      "message": "We still need to figure out the root cause why PDC cause such CRC error during EC reset, however, PLATFORM_EC_I2C_NACK_RETRY_COUNT seems a reasonable workaround to avoid such problem.\n\nhttps://source.corp.google.com/h/chrome-internal/chromeos/superproject/+/main:src/platform/ec/zephyr/Kconfig.i2c;l\u003d81?q\u003dI2C_NACK_RETRY_COUNT\u0026sq\u003dr:chrome-internal%2Fchromeos%2Fsuperproject%20b:main\u0026start\u003d81",
+      "revId": "d643d4b86284b70abc20d4a640adf1a7880431d1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
