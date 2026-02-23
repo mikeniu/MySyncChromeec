@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca8dc798_47487c4e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-02-23T01:15:04Z",
+      "side": 1,
+      "message": "Hi Peter,\n\nIt seems something to gate to CQ. Could you help to give me the error log?",
+      "revId": "0bf39cea3ec0873b8d3ef9c5ef6c45ae65ea5139",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
