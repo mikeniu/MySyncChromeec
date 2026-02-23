@@ -494,7 +494,6 @@ class Renode(Platform):
             "fp_transport",  # TODO(b/485316056)
             "otp_key",  # TODO(b/485316342)
             "rollback",  # TODO(b/485315275)
-            "abort",  # TODO(b/485316426)
             "exception",  # TODO(b/485315449)
             "flash_write_protect",  # TODO(b/485316223)
             "panic",  # TODO(b/485316364)
@@ -530,7 +529,6 @@ class Renode(Platform):
             return True
 
         if zephyr and test_config.test_name in [
-            "abort",  # TODO(b/485668212)
             "flash_physical",  # TODO(b/448407366)
             "flash_write_protect",  # TODO(b/485668014)
             "fp_transport",  # TODO(b/485668240)
@@ -565,7 +563,6 @@ class Renode(Platform):
             "rollback_entropy",  # TODO(b/468406461)
             "system_is_locked",  # TODO(b/483118063)
             "unaligned_access",  # TODO(b/483118717)
-            "abort",  # TODO(b/406944986)
             "exception",  # TODO(b/483118965)
             "fp_transport",  # TODO(b/483119844)
             "fpsensor_auth_crypto_stateful",  # TODO(b/483119679)
