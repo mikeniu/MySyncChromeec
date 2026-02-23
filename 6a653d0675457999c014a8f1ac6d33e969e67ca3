@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e79ed25e_ad33e81e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-02-23T23:36:42Z",
+      "side": 1,
+      "message": "Both of these changes already exist on ToT for WCL-RVP",
+      "revId": "6a653d0675457999c014a8f1ac6d33e969e67ca3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
