@@ -70,6 +70,24 @@
       "parentUuid": "904670a9_433b7cbb",
       "revId": "4c4550e1d4b7a92fa77da189cfaa17f0ea0e08e1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "540d29e7_9ed60606",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-02-23T21:44:30Z",
+      "side": 1,
+      "message": "I also have\n\n```\n-- Found GnuLd: /usr/bin/x86_64-pc-linux-gnu-ld.bfd (found version \"2.45.0\")\n-- The C compiler identification is Clang 21.0.0\n-- The CXX compiler identification is Clang 21.0.0\n```\n\nwhen running ./twister",
+      "parentUuid": "f6c71370_8dfeebea",
+      "revId": "4c4550e1d4b7a92fa77da189cfaa17f0ea0e08e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
