@@ -8,10 +8,32 @@
 /delete-node/ &sram;
 
 / {
-	sdcp: memory@0 {
+	sdcp: memory@90000000 {
 		device_type = "memory";
 		compatible = "mmio-sram";
-		reg = <0x00000000 256>;
+		reg = <0x90000000 256>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			sdcp_test: partition@1 {
+				reg = <0x1 32>;
+			};
+			sdcp_h_f: partition@0 {
+				reg = <0x0 32>;
+			};
+			sdcp_s_d: partition@20 {
+				reg = <0x20 64>;
+			};
+			sdcp_pk_f: partition@60 {
+				reg = <0x60 65>;
+			};
+			sdcp_sk_f: partition@a1 {
+				reg = <0xA1 32>;
+			};
+		};
 	};
 	sram: memory@400 {
 		device_type = "memory";
