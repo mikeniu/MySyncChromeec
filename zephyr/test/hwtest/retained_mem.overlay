@@ -1,0 +1,12 @@
+/ {
+	retained_mem: retained_mem {
+		compatible = "zephyr,retained-ram";
+		status = "okay";
+		reg = <0x400AF000 0x4>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+	};
+	aliases {
+		retained_mem = &retained_mem;
+	};
+};
