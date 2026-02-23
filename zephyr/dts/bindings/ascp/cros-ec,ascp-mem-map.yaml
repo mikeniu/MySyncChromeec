@@ -1,0 +1,31 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: ASCP memory map
+compatible: "cros-ec,ascp-mem-map"
+properties:
+  pk-m:
+    type: phandle
+    required: true
+  s-goog:
+    type: phandle
+    required: true
+  pk-d:
+    type: phandle
+    required: true
+  s-m:
+    type: phandle
+    required: true
+  pk-f:
+    type: phandle
+    required: true
+  h-f:
+    type: phandle
+    required: true
+  s-d:
+    type: phandle
+    required: true
+  sk-f:
+    type: phandle
+    required: true
