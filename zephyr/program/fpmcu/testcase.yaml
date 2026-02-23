@@ -6,9 +6,10 @@ tests:
   abort:
     extra_configs:
     - CONFIG_HW_TEST_ABORT=y
-    - CONFIG_ZTEST_FATAL_HOOK=y
     extra_conf_files:
     - prj_hw_tests.conf
+    extra_dtc_overlay_files:
+    - retained_mem.overlay
   aes:
     extra_configs:
     - CONFIG_HW_TEST_AES=y
@@ -41,6 +42,8 @@ tests:
     - CONFIG_HW_TEST_EXCEPTION=y
     extra_conf_files:
     - prj_hw_tests.conf
+    extra_dtc_overlay_files:
+    - retained_mem.overlay
   exit:
     extra_configs:
     - CONFIG_HW_TEST_EXIT=y
@@ -59,6 +62,8 @@ tests:
     - CONFIG_PM=n
     extra_conf_files:
     - prj_hw_tests.conf
+    extra_dtc_overlay_files:
+    - retained_mem.overlay
   fp_transport:
     extra_configs:
     - CONFIG_HW_TEST_FP_TRANSPORT=y
@@ -105,6 +110,8 @@ tests:
     - CONFIG_ZTEST_FATAL_HOOK=y
     extra_conf_files:
     - prj_hw_tests.conf
+    extra_dtc_overlay_files:
+    - retained_mem.overlay
   libc_printf:
     extra_configs:
     - CONFIG_HW_TEST_LIBC_PRINTF=y
@@ -139,12 +146,16 @@ tests:
     - CONFIG_PLATFORM_EC_PANIC_STRIP_GPR=n
     extra_conf_files:
     - prj_hw_tests.conf
+    extra_dtc_overlay_files:
+    - retained_mem.overlay
   panic_data:
     extra_configs:
     - CONFIG_HW_TEST_PANIC_DATA=y
     - CONFIG_PLATFORM_EC_DEBUG_ASSERT_REBOOTS=y
     extra_conf_files:
     - prj_hw_tests.conf
+    extra_dtc_overlay_files:
+    - retained_mem.overlay
   pmp_entries:
     extra_configs:
     - CONFIG_HW_TEST_PMP_ENTRIES=y
@@ -166,6 +177,8 @@ tests:
     - CONFIG_HW_TEST_RAM_LOCK=y
     extra_conf_files:
     - prj_hw_tests.conf
+    extra_dtc_overlay_files:
+    - retained_mem.overlay
   restricted_console:
     extra_configs:
     - CONFIG_HW_TEST_RESTRICTED_CONSOLE=y
@@ -242,6 +255,8 @@ tests:
     - CONFIG_HW_TEST_SYSTEM_IS_LOCKED=y
     extra_conf_files:
     - prj_hw_tests.conf
+    extra_dtc_overlay_files:
+    - retained_mem.overlay
   timer:
     extra_configs:
     - CONFIG_HW_TEST_TIMER=y
@@ -252,6 +267,8 @@ tests:
     - CONFIG_HW_TEST_TPM_SEED_CLEAR=y
     extra_conf_files:
     - prj_hw_tests.conf
+    extra_dtc_overlay_files:
+    - retained_mem.overlay
   unaligned_access:
     extra_configs:
     - CONFIG_HW_TEST_UNALIGNED_ACCESS=y
@@ -278,6 +295,8 @@ tests:
     - CONFIG_HW_TEST_WATCHDOG=y
     extra_conf_files:
     - prj_hw_tests.conf
+    extra_dtc_overlay_files:
+    - retained_mem.overlay
   stdlib:
     extra_configs:
     - CONFIG_HW_TEST_STDLIB=y
