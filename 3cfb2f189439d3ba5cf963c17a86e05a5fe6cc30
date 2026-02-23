@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ec6536a_26cc3793",
+        "filename": "zephyr/test/hwtest/src/flash_physical.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-02-23T19:01:52Z",
+      "side": 1,
+      "message": "@chlin56@nuvoton.corp-partner.google.com\n\nI am not seeing any issues with these 2 assertions:\n\n```\nzassert_not_null(cros_flash_dev, \"Flash device instance not found\");\n\tzassert_true(device_is_ready(cros_flash_dev),\n\t\t     \"Flash device is not ready\");\n```\n\nBased on my analysis of the code, I believe I should pass `cros_flash_dev` to the functions. I defined it as below:\n\n```\n#define cros_flash_dev DEVICE_DT_GET(DT_CHOSEN(cros_ec_flash_controller))\n```\n\nHowever, the below assertion is still failing:\n\n```\nzassert_true(is_int_flash_protected(cros_flash_dev),\n\t\t     \"Flash control register not locked initially\");\n```\n\nwhen I comment out this assertion, the below function hangs and times out.\n\n```\n\tret \u003d cros_flash_npcx_set_write_enable(cros_flash_dev);\n```",
+      "range": {
+        "startLine": 73,
+        "startChar": 1,
+        "endLine": 73,
+        "endChar": 13
+      },
+      "revId": "3cfb2f189439d3ba5cf963c17a86e05a5fe6cc30",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
