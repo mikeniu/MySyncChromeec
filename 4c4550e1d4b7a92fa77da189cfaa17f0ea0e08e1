@@ -88,6 +88,24 @@
       "parentUuid": "f6c71370_8dfeebea",
       "revId": "4c4550e1d4b7a92fa77da189cfaa17f0ea0e08e1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a5fa9b0_3c08a806",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-02-23T23:43:58Z",
+      "side": 1,
+      "message": "Pretty sure the reason is `zephyr/test/pdc` uses `CONFIG_LOG_MODE_IMMEDIATE` and your new `zephyr/test/intelrvp` test the in following CL uses `CONFIG_LOG_MODE_MINIMAL`.\n\nMINIMAL is a wrapper around `printk` so the type error is obvious. IMMEDIATE uses variable args and can only rely on the format string to infer type when picking values off the stack. In this case it happened to work in the PDC tests since the union has the same size as its sole 32-bit int member.",
+      "parentUuid": "540d29e7_9ed60606",
+      "revId": "4c4550e1d4b7a92fa77da189cfaa17f0ea0e08e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
