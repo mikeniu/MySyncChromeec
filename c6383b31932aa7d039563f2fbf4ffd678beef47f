@@ -70,6 +70,30 @@
       },
       "revId": "c6383b31932aa7d039563f2fbf4ffd678beef47f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "016f7666_d4b35541",
+        "filename": "zephyr/program/intelrvp/ptlrvp/ptlrvp_mchp/project.overlay",
+        "patchSetId": 12
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-24T22:31:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c6532582_70c22b05",
+      "range": {
+        "startLine": 81,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 25
+      },
+      "revId": "c6383b31932aa7d039563f2fbf4ffd678beef47f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
