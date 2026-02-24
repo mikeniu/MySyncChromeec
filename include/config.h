@@ -4562,6 +4562,13 @@
 /* USART stream config */
 #undef CONFIG_STREAM_USART
 
+/* By default, the STM32 USART samples each bit 3 times and generates an
+ * NF (noise detection flag) error if the 3 votes don't agree. This is meant
+ * for noisy environments. Enable the option to switch to one bit sampling,
+ * which disables NF errors.
+ */
+#undef CONFIG_STREAM_USART_ONEBIT
+
 /*
  * Each USART stream can be individually enabled and accessible using the
  * stream interface provided in the usart_config struct.
