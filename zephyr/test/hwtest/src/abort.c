@@ -56,6 +56,5 @@ ZTEST(abort_test, test_abort)
 	cflush();
 	abort();
 
-	/* Should never reach this. */
 	zassert_unreachable();
 }
