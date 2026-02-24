@@ -22,6 +22,30 @@
       },
       "revId": "3cfb2f189439d3ba5cf963c17a86e05a5fe6cc30",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0f603b5_edce73e3",
+        "filename": "zephyr/test/hwtest/src/flash_physical.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 3306924
+      },
+      "writtenOn": "2026-02-24T01:59:15Z",
+      "side": 1,
+      "message": "Hi,\n\nCould you check if `CONFIG_FLASH_EX_OP_ENABLED` is enabled?",
+      "parentUuid": "4ec6536a_26cc3793",
+      "range": {
+        "startLine": 73,
+        "startChar": 1,
+        "endLine": 73,
+        "endChar": 13
+      },
+      "revId": "3cfb2f189439d3ba5cf963c17a86e05a5fe6cc30",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
