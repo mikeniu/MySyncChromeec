@@ -46,6 +46,30 @@
       },
       "revId": "3cfb2f189439d3ba5cf963c17a86e05a5fe6cc30",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0c503f9_58a0503b",
+        "filename": "zephyr/test/hwtest/src/flash_physical.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-02-24T16:45:15Z",
+      "side": 1,
+      "message": "yes it is enabled:\n\n```\n(cr) fsammoura@fsammoura-glaptop /mnt/host/source/src/platform/ec $ more ./build/zephyr/helipilot/build-rw/zephyr/.config | grep FLASH_EX_OP\nCONFIG_FLASH_EX_OP_ENABLED\u003dy\n```",
+      "parentUuid": "d0f603b5_edce73e3",
+      "range": {
+        "startLine": 73,
+        "startChar": 1,
+        "endLine": 73,
+        "endChar": 13
+      },
+      "revId": "3cfb2f189439d3ba5cf963c17a86e05a5fe6cc30",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
