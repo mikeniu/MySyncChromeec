@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a385c4be_5c727280",
+        "filename": "common/fan.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-02-24T12:22:53Z",
+      "side": 1,
+      "message": "Done! Added `GPIO_UNIMPLEMENTED \u003d -1,` to the gpio_signal enum in gpio_signal.h.\n\nAlthough I am not able to successfully run the test as you suggested and getting below error logs.\n\n  BUILD   build/host/stdlib\nmake all is deprecated\ncp: cannot stat \u0027build/host/stdlib/stdlib.bin\u0027: No such file or directory\nmake: *** [Makefile.rules:134: test-stdlib] Error 1\n\nLooks like some environment dependencies.",
+      "parentUuid": "4978f1b0_d5a640bc",
+      "range": {
+        "startLine": 138,
+        "startChar": 36,
+        "endLine": 138,
+        "endChar": 54
+      },
+      "revId": "1ceb10dc4bb545f0cb4170d779cb5b40b11079c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5c326866_03e05189",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-02-17T23:51:40Z",
       "side": 1,
       "message": "Why does this path always enable automatic control?",
+      "range": {
+        "startLine": 170,
+        "startChar": 0,
+        "endLine": 171,
+        "endChar": 35
+      },
+      "revId": "1ceb10dc4bb545f0cb4170d779cb5b40b11079c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd6e9ebc_19dddada",
+        "filename": "common/fan.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-02-24T12:22:53Z",
+      "side": 1,
+      "message": "The automatic control mode is enabled here just to ensure that the fan hardware is in RPM mode.",
+      "parentUuid": "5c326866_03e05189",
       "range": {
         "startLine": 170,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c237a62f_b2f92e19",
+        "filename": "zephyr/program/ocelot/rvp_fans.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-02-24T12:22:53Z",
+      "side": 1,
+      "message": "Done, Added another CL.",
+      "parentUuid": "10743e37_5db20b27",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 17
+      },
+      "revId": "1ceb10dc4bb545f0cb4170d779cb5b40b11079c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aa4efa44_0b2f7205",
@@ -93,6 +165,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b97196c1_8db3ebc9",
+        "filename": "zephyr/shim/src/fan.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-02-24T12:22:53Z",
+      "side": 1,
+      "message": "Acknowledged.",
+      "parentUuid": "aa4efa44_0b2f7205",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 59
+      },
+      "revId": "1ceb10dc4bb545f0cb4170d779cb5b40b11079c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "586a9cdb_bfe1f0a0",
@@ -106,6 +202,30 @@
       "writtenOn": "2026-02-17T23:51:40Z",
       "side": 1,
       "message": "This test should also check that the GPIO gets turned off when the RPM target is 0.\n\nYou can use something like:\n```\nconst struct gpio_dt_spec *gp \u003d GPIO_DT_FROM_NODELABEL(gpio_test);\n\n/* Set RPM to 0 */\nzassert_equal(gpio_emul_get_output(gp-\u003eport, gp-\u003epin), 0);\n\n/* Set RPM to 100% */\nzassert_equal(gpio_emul_get_output(gp-\u003eport, gp-\u003epin), 1);",
+      "range": {
+        "startLine": 451,
+        "startChar": 0,
+        "endLine": 451,
+        "endChar": 40
+      },
+      "revId": "1ceb10dc4bb545f0cb4170d779cb5b40b11079c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6241a9d2_34a87850",
+        "filename": "zephyr/test/drivers/fan/src/fan.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 451,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-02-24T12:22:53Z",
+      "side": 1,
+      "message": "Acknowledged.",
+      "parentUuid": "586a9cdb_bfe1f0a0",
       "range": {
         "startLine": 451,
         "startChar": 0,
