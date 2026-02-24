@@ -52,6 +52,24 @@
       "parentUuid": "04ecf4e8_de07570d",
       "revId": "9ce98af57227645522779275840f481eebe33c41",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0567120_c0cae01f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-02-24T02:30:57Z",
+      "side": 1,
+      "message": "\u003e It is disabled.\n\nGot it.\n\n---\n\nI checked that only boards in ec-legacy define CONFIG_USB_PD_TCPM_FUSB302 so we don\u0027t need this in the main branch.",
+      "parentUuid": "c8a214a9_785925d6",
+      "revId": "9ce98af57227645522779275840f481eebe33c41",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
