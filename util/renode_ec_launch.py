@@ -69,6 +69,7 @@ def launch(
     zephyr_bin: str,
     ec_project: str,
     uart: str,
+    opts: argparse.Namespace = None,
 ) -> int:
     """Launches an EC image in Renode.
 
@@ -90,11 +91,31 @@ def launch(
     script_path = pathlib.Path(__file__).parent.resolve()
     ec_dir = script_path.parent
 
+    # If --zephyr-bin is used, treat it as --image with implicit --zephyr
     if zephyr_bin:
+        zephyr = True
         bin_file = pathlib.Path(zephyr_bin)
-        elf_ro_file = pathlib.Path(os.path.dirname(zephyr_bin)) / "zephyr.elf"
-        # There is only a single ELF file in upstream Zephyr builds.
-        elf_rw_file = elf_ro_file
+    elif opts.image:
+        bin_file = pathlib.Path(opts.image)
+    else:
+        bin_file = None
+
+    if bin_file:
+        out_dir = bin_file.parent
+        if zephyr:
+            # Check for upstream Zephyr (single ELF)
+            if (out_dir / "zephyr.elf").exists():
+                elf_ro_file = out_dir / "zephyr.elf"
+                elf_rw_file = elf_ro_file
+            else:
+                # Zmake builds (split ELFs)
+                elf_ro_file = out_dir / "zephyr.ro.elf"
+                elf_rw_file = out_dir / "zephyr.rw.elf"
+        else:
+            # EC builds
+            elf_ro_file = out_dir / "RO" / f"{ec_project}.RO.elf"
+            elf_rw_file = out_dir / "RW" / f"{ec_project}.RW.elf"
+
     elif zephyr:
         out_dir = ec_dir / "build" / "zephyr" / board / "output"
         bin_file = out_dir / "ec.bin"
@@ -223,6 +244,15 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
     )
 
     parser.add_argument(
+        "--image",
+        type=str,
+        help="""
+        Full path to the firmware image (binary).
+        If provided, ELF files are deduced from this path.
+        """,
+    )
+
+    parser.add_argument(
         "-w",
         "--enable-write-protect",
         action="store_true",
@@ -244,6 +274,7 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
         zephyr_bin=opts.zephyr_bin,
         ec_project=opts.ec,
         uart=opts.uart,
+        opts=opts,
     )
 
 
