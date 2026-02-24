@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab25a707_53d6bf92",
+        "filename": "zephyr/program/intelrvp/ptlrvp/ptlrvp_mchp/project.overlay",
+        "patchSetId": 12
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-02-24T00:16:41Z",
+      "side": 1,
+      "message": "I\u0027m confused by this. You\u0027re including `../rt_pd.dtsi` and `../rt_usbc.dtsi` which set up the dual TI/RTK driver support but then you eliminate the TI option here?",
+      "range": {
+        "startLine": 81,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 25
+      },
+      "revId": "c6383b31932aa7d039563f2fbf4ffd678beef47f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
