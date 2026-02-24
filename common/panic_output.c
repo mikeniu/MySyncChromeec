@@ -282,8 +282,9 @@ test_mockable struct panic_data *get_panic_data_write(void)
 	 * anything and can just return pdata_ptr (clear memory, set magic
 	 * and struct_size first).
 	 */
-	if (jdata_ptr->magic != JUMP_DATA_MAGIC || jdata_ptr->version < 1 ||
-	    jdata_ptr->version > 3) {
+	if ((jdata_ptr->magic != JUMP_DATA_MAGIC &&
+	     !system_jumped_to_this_image()) ||
+	    jdata_ptr->version < 1) {
 		memset(pdata_ptr, 0, CONFIG_PANIC_DATA_SIZE);
 		pdata_ptr->magic = PANIC_DATA_MAGIC;
 		pdata_ptr->struct_size = CONFIG_PANIC_DATA_SIZE;
@@ -296,7 +297,7 @@ test_mockable struct panic_data *get_panic_data_write(void)
 		move_size = JUMP_DATA_SIZE_V1;
 	else if (jdata_ptr->version == 2)
 		move_size = JUMP_DATA_SIZE_V2 + jdata_ptr->jump_tag_total;
-	else if (jdata_ptr->version == 3)
+	else
 		move_size = jdata_ptr->struct_size + jdata_ptr->jump_tag_total;
 
 	/* Check if there's enough space for jump tags after move */

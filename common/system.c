@@ -378,7 +378,7 @@ int system_add_jump_tag(uint16_t tag, int version, int size, const void *data)
 		return EC_ERROR_UNKNOWN;
 
 	/* Make room for the new tag */
-	if (size > JUMP_TAG_MAX_SIZE)
+	if (size < 0 || size > JUMP_TAG_MAX_SIZE)
 		return EC_ERROR_INVAL;
 
 	new_entry_size = ROUNDUP4(size) + sizeof(struct jump_tag);
@@ -908,12 +908,21 @@ system_get_build_info(void)
 
 void system_common_pre_init(void)
 {
+	uint32_t early_reset_flags = system_get_reset_flags();
+
+#if IS_ENABLED(CONFIG_COMMON_PANIC_OUTPUT) || IS_ENABLED(BOARD_HOST)
+	struct jump_data *peek_jdata = get_jump_data();
+	if (peek_jdata && peek_jdata->magic == JUMP_DATA_MAGIC &&
+	    peek_jdata->version >= 1)
+		early_reset_flags |= peek_jdata->reset_flags;
+#endif
+
 	/*
 	 * Log panic cause if watchdog caused reset and panic cause
 	 * was not already logged. This must happen before calculating
 	 * jump_data address because it might change panic pointer.
 	 */
-	if (system_get_reset_flags() & EC_RESET_FLAG_WATCHDOG) {
+	if (early_reset_flags & EC_RESET_FLAG_WATCHDOG) {
 		uint32_t reason;
 		uint32_t info;
 		uint8_t exception;
@@ -976,14 +985,35 @@ void system_common_pre_init(void)
 			delta = sizeof(struct jump_data) - jdata->struct_size;
 
 		/*
-		 * Check if enough space for jump data.
-		 * Clear jump data and return if not.
+		 * Validate sizes to prevent integer overflow or underflow
+		 * during the tag shift.
 		 */
-		if (system_usable_ram_end() < JUMP_DATA_MIN_ADDRESS) {
+		if (jdata->version >= 3 &&
+		    (jdata->struct_size < 0 ||
+		     jdata->struct_size >= CONFIG_PRESERVED_END_OF_RAM_SIZE)) {
+			memset(jdata, 0, sizeof(struct jump_data));
+			jumped_to_image = 0;
+			return;
+		}
+
+		if (jdata->version >= 2 && jdata->jump_tag_total < 0) {
+			memset(jdata, 0, sizeof(struct jump_data));
+			jumped_to_image = 0;
+			return;
+		}
+
+		/*
+		 * Check if enough space for jump data and tags, avoiding
+		 * pointer underflow which would bypass the bounds check.
+		 */
+		if ((uintptr_t)jdata < JUMP_DATA_MIN_ADDRESS ||
+		    (uintptr_t)jdata - JUMP_DATA_MIN_ADDRESS <
+			    jdata->jump_tag_total) {
 			/* TODO(b/251190975): This failure should be reported
 			 * in the panic data structure for more visibility.
 			 */
 			memset(jdata, 0, sizeof(struct jump_data));
+			jumped_to_image = 0;
 			return;
 		}
 
