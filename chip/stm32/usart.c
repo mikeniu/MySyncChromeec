@@ -54,6 +54,10 @@ void usart_init(struct usart_config const *config)
 	if (config->flags & USART_CONFIG_FLAG_HDSEL)
 		cr3 |= BIT(3);
 
+	if (IS_ENABLED(CONFIG_STREAM_USART_ONEBIT)) {
+		cr3 |= STM32_USART_CR3_ONEBIT;
+	}
+
 	STM32_USART_CR1(base) = 0x0000;
 	STM32_USART_CR2(base) = cr2;
 	STM32_USART_CR3(base) = cr3;
