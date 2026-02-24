@@ -66,7 +66,7 @@ def launch(
     board: str,
     enable_write_protect: bool,
     zephyr: bool,
-    zephyr_bin: str,
+    image: Optional[str],
     ec_project: str,
     uart: str,
 ) -> int:
@@ -78,7 +78,7 @@ def launch(
         board: The name of the EC/Zephyr board.
         enable_write_protect: Whether to enable hardware write protection.
         zephyr: True if running EC-based Zephyr image.
-        zephyr_bin: Path to Zephyr binary.
+        image: Path to the firmware image (binary).
         ec_project: The name of the EC project.
         uart: Path to the UART PTY.
     Returns:
@@ -90,11 +90,27 @@ def launch(
     script_path = pathlib.Path(__file__).parent.resolve()
     ec_dir = script_path.parent
 
-    if zephyr_bin:
-        bin_file = pathlib.Path(zephyr_bin)
-        elf_ro_file = pathlib.Path(os.path.dirname(zephyr_bin)) / "zephyr.elf"
-        # There is only a single ELF file in upstream Zephyr builds.
-        elf_rw_file = elf_ro_file
+    if image:
+        bin_file = pathlib.Path(image)
+    else:
+        bin_file = None
+
+    if bin_file:
+        out_dir = bin_file.parent
+        if zephyr:
+            # Check for upstream Zephyr (single ELF)
+            if (out_dir / "zephyr.elf").exists():
+                elf_ro_file = out_dir / "zephyr.elf"
+                elf_rw_file = elf_ro_file
+            else:
+                # Zmake builds (split ELFs)
+                elf_ro_file = out_dir / "zephyr.ro.elf"
+                elf_rw_file = out_dir / "zephyr.rw.elf"
+        else:
+            # EC builds
+            elf_ro_file = out_dir / "RO" / f"{ec_project}.RO.elf"
+            elf_rw_file = out_dir / "RW" / f"{ec_project}.RW.elf"
+
     elif zephyr:
         out_dir = ec_dir / "build" / "zephyr" / board / "output"
         bin_file = out_dir / "ec.bin"
@@ -212,13 +228,12 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
         "--zephyr", action="store_true", help="Run Zephyr."
     )
 
-    exclusive_group.add_argument(
-        "--zephyr-bin",
+    parser.add_argument(
+        "--image",
         type=str,
         help="""
-        Full path to a Zephyr binary.
-
-        Used for running upstream Zephyr binaries.
+        Full path to the firmware image (binary).
+        If provided, ELF files are deduced from this path.
         """,
     )
 
@@ -241,7 +256,7 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
         board=opts.board,
         enable_write_protect=opts.enable_write_protect,
         zephyr=opts.zephyr,
-        zephyr_bin=opts.zephyr_bin,
+        image=opts.image,
         ec_project=opts.ec,
         uart=opts.uart,
     )
