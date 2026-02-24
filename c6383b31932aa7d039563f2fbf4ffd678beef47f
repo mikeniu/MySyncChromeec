@@ -22,6 +22,30 @@
       },
       "revId": "c6383b31932aa7d039563f2fbf4ffd678beef47f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fad15c1a_23c0ff32",
+        "filename": "zephyr/program/intelrvp/ptlrvp/ptlrvp_mchp/project.overlay",
+        "patchSetId": 12
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-24T17:41:42Z",
+      "side": 1,
+      "message": "Yes, with parent CL I wanted to make this feature available for the program.\nThis CL was suppose to enable them both on `ptlrvp_mchp`, it turns out that we are almost out of memory and we cannot fit both PDC drivers. This is why I decided to remove TI support only for this project.",
+      "parentUuid": "ab25a707_53d6bf92",
+      "range": {
+        "startLine": 81,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 25
+      },
+      "revId": "c6383b31932aa7d039563f2fbf4ffd678beef47f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
