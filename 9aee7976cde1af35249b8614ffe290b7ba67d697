@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7fef4cd_f219fdf1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-24T23:25:08Z",
+      "side": 1,
+      "message": "nit: I usually like to refer to the commit that it\u0027s being restored from to leave breadcrumbs in the history.\n\ne.g., Copied from commit: `ABC123`.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 7
+      },
+      "revId": "9aee7976cde1af35249b8614ffe290b7ba67d697",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
