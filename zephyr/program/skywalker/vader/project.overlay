@@ -176,6 +176,11 @@
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "pmic_ec_resetb_interrupt";
 		};
+		int_tp_rst: tp-rst {
+			irq-pin = <&gpio_tp_rst>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "tp_rst";
+		};
 	};
 
 	named-gpios {
@@ -201,6 +206,9 @@
 		gpio_ccd_mode_l: ccd_mode_l {
 			gpios = <&gpioe 5 (GPIO_INPUT)>;
 		};
+		gpio_tp_rst: tp_rst {
+			gpios = <&gpioa 5 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+		};
 	};
 
 	unused-pins {
@@ -214,8 +222,7 @@
 			<&gpioc 3 0>,
 			<&gpiod 5 0>,
 			<&gpiod 7 0>,
-			<&gpioe 2 0>,
-			<&gpioe 4 0>;
+			<&gpioe 2 0>;
 	};
 };
 
