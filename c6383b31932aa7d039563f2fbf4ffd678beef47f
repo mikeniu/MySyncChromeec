@@ -46,6 +46,30 @@
       },
       "revId": "c6383b31932aa7d039563f2fbf4ffd678beef47f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6532582_70c22b05",
+        "filename": "zephyr/program/intelrvp/ptlrvp/ptlrvp_mchp/project.overlay",
+        "patchSetId": 12
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-02-24T17:44:43Z",
+      "side": 1,
+      "message": "Makes sense. Could you add a comment here explaining this?",
+      "parentUuid": "fad15c1a_23c0ff32",
+      "range": {
+        "startLine": 81,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 25
+      },
+      "revId": "c6383b31932aa7d039563f2fbf4ffd678beef47f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
