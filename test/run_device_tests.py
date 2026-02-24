@@ -1454,11 +1454,16 @@ def build_ec(
     board_name: str,
     compiler: str,
     app_type: ApplicationType,
+    out_dir: Optional[str] = None,
 ) -> list[str]:
     """Prepare a command to build test using CrosEC"""
     cmd = ["make"]
     if compiler == CLANG:
         cmd = cmd + ["CC=arm-none-eabi-clang"]
+
+    if out_dir:
+        cmd = cmd + [f"out={out_dir}"]
+
     cmd = cmd + [
         "BOARD=" + board_name,
         "-j",
@@ -1472,22 +1477,29 @@ def build_ec(
     return cmd
 
 
-def build_zephyr_upstream(test_name: str, board_name: str) -> list[str]:
+def build_zephyr_upstream(
+    test_name: str, board_name: str, out_dir: Optional[str] = None
+) -> list[str]:
     """Prepare a command to build Zephyr test"""
     # Build only with Zephyr and clobber a previous build
     cmd = [ZEPHYR_TWISTER] + ["-b"] + ["-c"]
     cmd = cmd + ["-p"] + [board_name]
-    cmd = cmd + ["-O"] + [ZEPHYR_TWISTER_BUILD_DIR]
+    if out_dir:
+        cmd = cmd + ["-O"] + [out_dir]
+    else:
+        cmd = cmd + ["-O"] + [ZEPHYR_TWISTER_BUILD_DIR]
     cmd = cmd + ["-s"] + [test_name]
     cmd = cmd + ["--no-upload-cros-rdb"]
 
     return cmd
 
 
-def build_zephyr(test: TestConfig, board_name: str) -> list[str]:
+def build_zephyr(
+    test: TestConfig, board_name: str, out_dir: Optional[str] = None
+) -> list[str]:
     """Prepare a command to build test using Zephyr"""
     if test.zephyr_name is not None:
-        return build_zephyr_upstream(test.zephyr_name, board_name)
+        return build_zephyr_upstream(test.zephyr_name, board_name, out_dir)
 
     test_name = test.test_name
     app_type = test.apptype_to_use
@@ -1495,6 +1507,9 @@ def build_zephyr(test: TestConfig, board_name: str) -> list[str]:
 
     cmd = ["zmake"] + ["build"]
     cmd = cmd + [board_name] + ["--clobber"]
+    if out_dir:
+        cmd = cmd + ["--build-dir", out_dir]
+
     if app_type != ApplicationType.TEST:
         return cmd
 
@@ -1541,13 +1556,18 @@ def build(
     board_name: str,
     compiler: str,
     zephyr: bool,
+    out_dir: Optional[str] = None,
 ) -> None:
     """Build specified test for specified board."""
     if zephyr:
-        cmd = build_zephyr(test, board_name)
+        cmd = build_zephyr(test, board_name, out_dir)
     else:
         cmd = build_ec(
-            test.test_name, board_name, compiler, test.apptype_to_use
+            test.test_name,
+            board_name,
+            compiler,
+            test.apptype_to_use,
+            out_dir,
         )
 
     logging.debug('Running command: "%s"', " ".join(cmd))
@@ -1767,12 +1787,15 @@ def get_test_list(
     return test_list
 
 
-def get_zephyr_image_path(test: TestConfig, build_board: str):
+def get_zephyr_image_path(
+    test: TestConfig, build_board: str, out_dir: Optional[str] = None
+):
     """Get a path to a Zephyr built image"""
     if test.zephyr_name is not None:
         # The path to binary differs depending on a test name, path and platform,
         # so just find the zephyr.npcx.bin or zephyr.bin in the build dir.
-        twister_out = os.walk(ZEPHYR_TWISTER_BUILD_DIR)
+        search_dir = out_dir if out_dir else ZEPHYR_TWISTER_BUILD_DIR
+        twister_out = os.walk(search_dir)
         image_path = None
         for dirpath, _, filenames in twister_out:
             # b/419617755#comment46: Use version with Nuvoton header if it exists.
@@ -1783,17 +1806,32 @@ def get_zephyr_image_path(test: TestConfig, build_board: str):
             if image_path is not None:
                 break
     else:
+        base_dir = out_dir if out_dir else os.path.join(EC_DIR, "build")
         image_path = os.path.join(
-            EC_DIR, "build", "zephyr", build_board, "output", "ec.bin"
+            base_dir, "zephyr", build_board, "output", "ec.bin"
         )
 
     return image_path
 
 
-def get_image_path(test: TestConfig, build_board: str, zephyr: bool):
+def get_image_path(
+    test: TestConfig,
+    build_board: str,
+    zephyr: bool,
+    out_dir: Optional[str] = None,
+):
     """Get a path to a built image"""
     if zephyr:
-        return get_zephyr_image_path(test, build_board)
+        return get_zephyr_image_path(test, build_board, out_dir)
+
+    if out_dir:
+        if test.apptype_to_use == ApplicationType.PRODUCTION:
+            return os.path.join(out_dir, "ec.bin")
+        return os.path.join(
+            out_dir,
+            test.test_name,
+            test.test_name + ".bin",
+        )
 
     if test.apptype_to_use == ApplicationType.PRODUCTION:
         image_path = os.path.join(EC_DIR, "build", build_board, "ec.bin")
@@ -1826,85 +1864,87 @@ def flash_and_run_test(
         build_board = board_config.zephyr_board_name
 
     # attempt to build test binary, reporting a test failure on error
-    try:
-        build(
-            test,
-            build_board,
-            args.compiler,
-            args.zephyr,
-        )
-    except Exception as exception:  # pylint: disable=broad-except
-        logging.error("failed to build %s: %s", test.test_name, exception)
-        return False
-
-    image_path = get_image_path(test, build_board, args.zephyr)
-
-    logging.debug("image_path: %s", image_path)
-
-    if test.ro_image is not None:
-        # Use the RO specified by the test. Replace KEY_RO and EC_RW (which
-        # encompasses both RW_FW and SIG_RW) in the RO image. This better
-        # reflects the production usecase in which the RW part is changed
-        # and other sections (e.g rollbacks) remain unchanged.
+    with tempfile.TemporaryDirectory() as out_dir:
         try:
-            _patch_image_with_new_rw(test, image_path)
-        except Exception as exception:  # pylint: disable=broad-except
-            logging.warning(
-                "An exception occurred while patching image: %s", exception
+            build(
+                test,
+                build_board,
+                args.compiler,
+                args.zephyr,
+                out_dir,
             )
+        except Exception as exception:  # pylint: disable=broad-except
+            logging.error("failed to build %s: %s", test.test_name, exception)
             return False
 
-    # Get the console file before flashing to listen ASAP after flashing.
-    console_pty = platform.get_console(board_config)
+        image_path = get_image_path(test, build_board, args.zephyr, out_dir)
 
-    # flash test binary
-    if not platform.flash(
-        board_config,
-        image_path,
-        args.flasher,
-        args.remote,
-        args.jlink_port,
-        test.test_name,
-        test.enable_hw_write_protect,
-        args.zephyr,
-    ):
-        logging.debug("Flashing failed")
-        return False
+        logging.debug("image_path: %s", image_path)
 
-    with ExitStack() as stack:
-        if args.remote and args.console_port:
-            console_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            console_socket.connect((args.remote, args.console_port))
-            console = stack.enter_context(
-                console_socket.makefile(mode="rwb", buffering=0)
-            )
-        else:
-            # pylint: disable-next=consider-using-with
-            console_file = open(console_pty, "wb+", buffering=0)
-            console = stack.enter_context(console_file)
+        if test.ro_image is not None:
+            # Use the RO specified by the test. Replace KEY_RO and EC_RW (which
+            # encompasses both RW_FW and SIG_RW) in the RO image. This better
+            # reflects the production usecase in which the RW part is changed
+            # and other sections (e.g rollbacks) remain unchanged.
+            try:
+                _patch_image_with_new_rw(test, image_path)
+            except Exception as exception:  # pylint: disable=broad-except
+                logging.warning(
+                    "An exception occurred while patching image: %s", exception
+                )
+                return False
 
-        platform.hw_write_protect(test.enable_hw_write_protect)
+        # Get the console file before flashing to listen ASAP after flashing.
+        console_pty = platform.get_console(board_config)
 
-        if test.toggle_power:
-            power_cycle(platform, board_config)
-        else:
-            # In some cases flash_ec leaves the board off, so just ensure it is on
-            platform.power(board_config, power_on=True)
-
-        # run the test
-        logging.info('Running test: "%s"', test.config_name)
-
-        ret = run_test(
-            test,
+        # flash test binary
+        if not platform.flash(
             board_config,
-            console,
-            executor=executor,
-            zephyr=args.zephyr,
-        )
+            image_path,
+            args.flasher,
+            args.remote,
+            args.jlink_port,
+            test.test_name,
+            test.enable_hw_write_protect,
+            args.zephyr,
+        ):
+            logging.debug("Flashing failed")
+            return False
 
-        platform.cleanup()
+        with ExitStack() as stack:
+            if args.remote and args.console_port:
+                console_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                console_socket.connect((args.remote, args.console_port))
+                console = stack.enter_context(
+                    console_socket.makefile(mode="rwb", buffering=0)
+                )
+            else:
+                # pylint: disable-next=consider-using-with
+                console_file = open(console_pty, "wb+", buffering=0)
+                console = stack.enter_context(console_file)
 
-        return ret
+            platform.hw_write_protect(test.enable_hw_write_protect)
+
+            if test.toggle_power:
+                power_cycle(platform, board_config)
+            else:
+                # In some cases flash_ec leaves the board off, so just ensure it is on
+                platform.power(board_config, power_on=True)
+
+            # run the test
+            logging.info('Running test: "%s"', test.config_name)
+
+            ret = run_test(
+                test,
+                board_config,
+                console,
+                executor=executor,
+                zephyr=args.zephyr,
+            )
+
+            platform.cleanup()
+
+            return ret
 
 
 def write_json_results(
