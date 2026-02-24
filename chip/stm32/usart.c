@@ -54,7 +54,17 @@ void usart_init(struct usart_config const *config)
 	if (config->flags & USART_CONFIG_FLAG_HDSEL)
 		cr3 |= BIT(3);
 
+<<<<<<< HEAD   (5e9611ca0cc495340e5ada771b320b185adc3f58 servov4: servov4p1: Fix argv out-of-bounds bug in `cc` conso)
 	STM32_USART_CR1(base) = 0x0000;
+||||||| BASE   (0f1d4c7b11d46a1d459d792fdc045b51f56babeb zork: update keyscan configs to better align with defaults)
+	STM32_USART_CR1(base) = cr1;
+=======
+	if (IS_ENABLED(CONFIG_STREAM_USART_ONEBIT)) {
+		cr3 |= STM32_USART_CR3_ONEBIT;
+	}
+
+	STM32_USART_CR1(base) = cr1;
+>>>>>>> CHANGE (dd852761f35ce0ab77035f62901907549acde391 stm32: Add option to enable one-bit mode on USARTs)
 	STM32_USART_CR2(base) = cr2;
 	STM32_USART_CR3(base) = cr3;
 
