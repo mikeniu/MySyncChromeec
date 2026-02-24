@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f36902cc_36237b0d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1365249
+      },
+      "writtenOn": "2026-02-24T17:20:06Z",
+      "side": 1,
+      "message": "Overall code coverage is still \u003e90% so bypassing the delta coverage -1.",
+      "revId": "27df4dc56d7624e8af0140d2070dc88da95f4f8a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
