@@ -16,6 +16,24 @@
       "message": "I thought the wdt change should not affect 8196?",
       "revId": "2d96439ecfa9adec9774bb329a6dfd79cb52f6d5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a295476_c08e80f8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1592857
+      },
+      "writtenOn": "2026-02-25T09:13:26Z",
+      "side": 1,
+      "message": "Thanks for reviewing. this change could be abandoned",
+      "parentUuid": "a84eed12_0d7dc889",
+      "revId": "2d96439ecfa9adec9774bb329a6dfd79cb52f6d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
