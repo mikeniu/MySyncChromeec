@@ -984,6 +984,7 @@ void system_common_pre_init(void)
 			 * in the panic data structure for more visibility.
 			 */
 			memset(jdata, 0, sizeof(struct jump_data));
+			jumped_to_image = 0;
 			return;
 		}
 
