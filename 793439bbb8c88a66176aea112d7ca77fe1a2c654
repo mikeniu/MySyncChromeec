@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67084100_6c280e9e",
+        "filename": "zephyr/test/pdc/src/generic/ppm_driver.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-02-25T01:09:03Z",
+      "side": 1,
+      "message": "NIT - you can use zassert_ok() for checking success.",
+      "range": {
+        "startLine": 137,
+        "startChar": 1,
+        "endLine": 137,
+        "endChar": 14
+      },
+      "revId": "793439bbb8c88a66176aea112d7ca77fe1a2c654",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
