@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "adf2c81d_666d0c4b",
+        "filename": "zephyr/program/bluey/program.conf",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1548775
+      },
+      "writtenOn": "2026-02-25T21:52:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "640e6efa_3e8c950f",
+      "revId": "65cac2c57e454060b059b625bdc7574a11827a87",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8744ad7b_d1427f5c",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-02-25T04:59:26Z",
       "side": 1,
       "message": "Tanjiro is Android. Remove this.",
+      "revId": "65cac2c57e454060b059b625bdc7574a11827a87",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3eb7c162_a3c367e7",
+        "filename": "zephyr/program/tanjiro/program.conf",
+        "patchSetId": 3
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1548775
+      },
+      "writtenOn": "2026-02-25T21:52:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8744ad7b_d1427f5c",
       "revId": "65cac2c57e454060b059b625bdc7574a11827a87",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -89,6 +125,30 @@
       "side": 1,
       "message": "Yes I think that\u0027s intended. Users can look at the \"version\" field to know the version.",
       "parentUuid": "5b09c3ea_a2ccf7b8",
+      "range": {
+        "startLine": 779,
+        "startChar": 23,
+        "endLine": 779,
+        "endChar": 41
+      },
+      "revId": "65cac2c57e454060b059b625bdc7574a11827a87",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b6a8877_81b1e090",
+        "filename": "zephyr/scripts/cme.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 779,
+      "author": {
+        "id": 1548775
+      },
+      "writtenOn": "2026-02-25T21:52:41Z",
+      "side": 1,
+      "message": "Yes.",
+      "parentUuid": "34491b9e_9dd66b67",
       "range": {
         "startLine": 779,
         "startChar": 23,
