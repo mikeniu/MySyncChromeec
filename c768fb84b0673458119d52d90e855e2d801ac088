@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1bf01d13_a9bcf784",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-25T11:28:23Z",
+      "side": 1,
+      "message": "I think it would be better to keep more \"raw\" function, which is `flash_em32_check_bank_protected`. In such scenario, additional functionality can be placed in this driver as source code, which is better. What do you think?",
+      "parentUuid": "2637f796_de18cdbd",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "627f5544_afc66b96",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
         "patchSetId": 7
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "You\u0027re right — the first protection range is indeed hardcoded.\nHowever, the original intention behind this API was to allow projects with different RO sizes to share the same library implementation.",
       "parentUuid": "627f5544_afc66b96",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6540e184_040f593b",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-25T11:28:23Z",
+      "side": 1,
+      "message": "I see, but it the protect range is hardcoded, the API in this shape doesn\u0027t make much sense. Is that right? Or I\u0027m missing something? Maybe we can add a function like \"get protection range of bank 1\" to make sure it matches RO size?",
+      "parentUuid": "ea374431_1eda8cc3",
       "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
