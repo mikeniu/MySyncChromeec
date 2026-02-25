@@ -909,36 +909,6 @@ system_get_build_info(void)
 void system_common_pre_init(void)
 {
 	/*
-	 * Log panic cause if watchdog caused reset and panic cause
-	 * was not already logged. This must happen before calculating
-	 * jump_data address because it might change panic pointer.
-	 */
-	if (system_get_reset_flags() & EC_RESET_FLAG_WATCHDOG) {
-		uint32_t reason;
-		uint32_t info;
-		uint8_t exception;
-		struct panic_data *pdata;
-
-		panic_get_reason(&reason, &info, &exception);
-		pdata = panic_get_data();
-
-		/* If the panic reason is a watchdog warning, then change
-		 * the reason to a regular watchdog reason while preserving
-		 * the info and exception from the watchdog warning.
-		 */
-		if (reason == PANIC_SW_WATCHDOG_WARN)
-			panic_set_reason(PANIC_SW_WATCHDOG, info, exception);
-		/* The watchdog panic info may have already been initialized by
-		 * the watchdog handler, so only set it here if the panic reason
-		 * is not a watchdog or the panic info has already been read,
-		 * i.e. an old watchdog panic.
-		 */
-		else if (reason != PANIC_SW_WATCHDOG || !pdata ||
-			 pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD)
-			panic_set_reason(PANIC_SW_WATCHDOG, 0, 0);
-	}
-
-	/*
 	 * get_jump_data() is only available if one of the following are
 	 * enabled.
 	 */
@@ -1016,17 +986,51 @@ void system_common_pre_init(void)
 
 		/* Struct size is now the current struct size */
 		jdata->struct_size = sizeof(struct jump_data);
-
-		/*
-		 * Clear the jump struct's magic number.  This prevents
-		 * accidentally detecting a jump when there wasn't one, and
-		 * disallows use of system_add_jump_tag().
-		 */
-		jdata->magic = 0;
 	} else {
 	clear_jump_data:
 		/* Clear the whole jump_data struct */
 		memset(jdata, 0, sizeof(struct jump_data));
+	}
+
+	/*
+	 * Clear the jump struct's magic number. This prevents accidentally
+	 * detecting a jump when there wasn't one, and disallows use of
+	 * system_add_jump_tag(). This must happen before logging the watchdog
+	 * panic because panic_set_reason() may shift the jump data in memory,
+	 * making the current 'jdata' pointer stale.
+	 */
+	if (jdata && jumped_to_image)
+		jdata->magic = 0;
+
+	/*
+	 * Log panic cause if watchdog caused reset and panic cause
+	 * was not already logged. This must happen after parsing jump_data
+	 * to ensure we have restored the reset flags passed from the previous
+	 * image (e.g. RO passing watchdog reset to RW).
+	 */
+	if (system_get_reset_flags() & EC_RESET_FLAG_WATCHDOG) {
+		uint32_t reason;
+		uint32_t info;
+		uint8_t exception;
+		struct panic_data *pdata;
+
+		panic_get_reason(&reason, &info, &exception);
+		pdata = panic_get_data();
+
+		/* If the panic reason is a watchdog warning, then change
+		 * the reason to a regular watchdog reason while preserving
+		 * the info and exception from the watchdog warning.
+		 */
+		if (reason == PANIC_SW_WATCHDOG_WARN)
+			panic_set_reason(PANIC_SW_WATCHDOG, info, exception);
+		/* The watchdog panic info may have already been initialized by
+		 * the watchdog handler, so only set it here if the panic reason
+		 * is not a watchdog or the panic info has already been read,
+		 * i.e. an old watchdog panic.
+		 */
+		else if (reason != PANIC_SW_WATCHDOG || !pdata ||
+			 pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD)
+			panic_set_reason(PANIC_SW_WATCHDOG, 0, 0);
 	}
 }
 
