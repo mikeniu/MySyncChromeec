@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bc4de87_2018b8f8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-25T21:45:16Z",
+      "side": 1,
+      "message": "FYI, this file will get [automatically copied to `ec-legacy` branch](http://b/480127970) by copybot, so you shouldn\u0027t need to do it manually",
+      "revId": "f69f9f26b0f9a5ed9b60b6322a64294933df2209",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
