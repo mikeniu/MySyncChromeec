@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "814f8def_a794b449",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-02-25T17:44:22Z",
+      "side": 1,
+      "message": "I think this is not critical to have the consistent log, but doing irq_lock() and disable interrupts for long periods of time in the uart context seems to be a bit excessive..",
+      "revId": "0de13108c2de23510edb6a7ab4ca19e3bdb72aec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
