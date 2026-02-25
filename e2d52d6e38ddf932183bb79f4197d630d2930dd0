@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "769927a5_838313b4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 56
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-25T10:49:57Z",
+      "side": 1,
+      "message": "Not needed since it\u0027s merged",
+      "revId": "e2d52d6e38ddf932183bb79f4197d630d2930dd0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbc6ef53_b8c6d6be",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 56
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-25T10:49:57Z",
+      "side": 1,
+      "message": "`Signed-off-by` is not used.",
+      "revId": "e2d52d6e38ddf932183bb79f4197d630d2930dd0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34a42887_b02cc41b",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.ft",
+        "patchSetId": 56
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-25T10:49:57Z",
+      "side": 1,
+      "message": "2026",
+      "range": {
+        "startLine": 1,
+        "startChar": 12,
+        "endLine": 1,
+        "endChar": 16
+      },
+      "revId": "e2d52d6e38ddf932183bb79f4197d630d2930dd0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc533467_df991d39",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 56
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-25T10:49:57Z",
+      "side": 1,
+      "message": "I don\u0027t think the `FINGERPRINT_ERROR_NO_IRQ` error is needed here. It is used for sensors that triggers interrupt during initialization (e.g. [fpc1145](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/fingerprint/fingerprint_fpc1145.c;l\u003d203)). Which is not a case for ft98xx based on the code.",
+      "revId": "e2d52d6e38ddf932183bb79f4197d630d2930dd0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e658f4c_ef8cfce3",
+        "filename": "zephyr/dts/bindings/fingerprint/ft,ft98xx.yaml",
+        "patchSetId": 56
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-25T10:49:57Z",
+      "side": 1,
+      "message": "Upstream uses \"focaltech,xxx\". How about aligning with this?",
+      "revId": "e2d52d6e38ddf932183bb79f4197d630d2930dd0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
