@@ -21,11 +21,17 @@
 #include "usb_console.h"
 #include "util.h"
 
+struct jump_data *get_jump_data(void);
+
 /*
  * For host tests, use a static area for panic data.
  */
 #if defined(CONFIG_BOARD_NATIVE_POSIX) || defined(CONFIG_BOARD_NATIVE_SIM)
-static struct panic_data zephyr_panic_data;
+uint8_t zephyr_panic_data_buf[CONFIG_PANIC_DATA_SIZE +
+			      CONFIG_PRESERVED_END_OF_RAM_SIZE] __aligned(4);
+#define zephyr_panic_data                               \
+	(*(struct panic_data *)(zephyr_panic_data_buf + \
+				CONFIG_PRESERVED_END_OF_RAM_SIZE))
 #undef PANIC_DATA_PTR
 #undef CONFIG_PANIC_DATA_BASE
 #define PANIC_DATA_PTR (&zephyr_panic_data)
@@ -245,9 +251,8 @@ test_mockable struct panic_data *get_panic_data_write(void)
 	 * and magic is safe because it is always placed at the
 	 * end of RAM.
 	 */
-	struct panic_data *const pdata_ptr = PANIC_DATA_PTR;
 	struct jump_data *jdata_ptr;
-	uintptr_t data_begin;
+	uint8_t *src, *dst;
 	size_t move_size;
 	int delta;
 
@@ -267,64 +272,53 @@ test_mockable struct panic_data *get_panic_data_write(void)
 	if (delta == 0)
 		return pdata_ptr;
 
-	/*
-	 * Expecting get_panic_data_start() will return a pointer to
-	 * the beginning of panic data, or NULL if no panic data available
-	 */
-	data_begin = get_panic_data_start();
-	if (!data_begin)
-		data_begin = CONFIG_RAM_BASE + CONFIG_RAM_SIZE;
-
-	jdata_ptr = (struct jump_data *)(data_begin - sizeof(struct jump_data));
+	jdata_ptr = get_jump_data();
 
 	/*
 	 * If we don't have valid jump_data structure we don't need to move
 	 * anything and can just return pdata_ptr (clear memory, set magic
 	 * and struct_size first).
 	 */
-	if (jdata_ptr->magic != JUMP_DATA_MAGIC || jdata_ptr->version < 1 ||
-	    jdata_ptr->version > 3) {
-		memset(pdata_ptr, 0, CONFIG_PANIC_DATA_SIZE);
-		pdata_ptr->magic = PANIC_DATA_MAGIC;
-		pdata_ptr->struct_size = CONFIG_PANIC_DATA_SIZE;
-
-		return pdata_ptr;
+	if ((jdata_ptr->magic != JUMP_DATA_MAGIC &&
+	     !system_jumped_to_this_image()) ||
+	    jdata_ptr->version < 1) {
+		goto init_pdata;
 	}
 
-	move_size = 0;
 	if (jdata_ptr->version == 1)
 		move_size = JUMP_DATA_SIZE_V1;
 	else if (jdata_ptr->version == 2)
 		move_size = JUMP_DATA_SIZE_V2 + jdata_ptr->jump_tag_total;
-	else if (jdata_ptr->version == 3)
+	else
 		move_size = jdata_ptr->struct_size + jdata_ptr->jump_tag_total;
 
 	/* Check if there's enough space for jump tags after move */
-	if (data_begin - move_size < JUMP_DATA_MIN_ADDRESS) {
+	if ((uintptr_t)pdata_ptr - move_size < JUMP_DATA_MIN_ADDRESS) {
 		/* Not enough room for jump tags, clear tags.
 		 * TODO(b/251190975): This failure should be reported
 		 * in the panic data structure for more visibility.
 		 */
-		/* LCOV_EXCL_START - JUMP_DATA_MIN_ADDRESS is 0 in test builds
-		 * and we cannot go negative by subtracting unsigned ints.
-		 */
 		move_size -= jdata_ptr->jump_tag_total;
 		jdata_ptr->jump_tag_total = 0;
-		/* LCOV_EXCL_STOP */
 	}
 
-	data_begin -= move_size;
+	/*
+	 * Move jump_tags and jump_data to immediately before the new
+	 * panic_data structure.
+	 */
+	src = (uint8_t *)jdata_ptr;
+	dst = (uint8_t *)pdata_ptr - move_size;
 
-	if (move_size != 0) {
-		/* Move jump_tags and jump_data */
-		memmove((void *)(data_begin - delta), (void *)data_begin,
-			move_size);
-	}
+	if (jdata_ptr->version >= 3)
+		src += sizeof(struct jump_data) - jdata_ptr->struct_size;
+
+	memmove(dst, src, move_size);
 
 	/*
 	 * Now we are sure that there is enough space for current
 	 * panic_data structure.
 	 */
+init_pdata:
 	memset(pdata_ptr, 0, CONFIG_PANIC_DATA_SIZE);
 	pdata_ptr->magic = PANIC_DATA_MAGIC;
 	pdata_ptr->struct_size = CONFIG_PANIC_DATA_SIZE;
