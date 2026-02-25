@@ -174,7 +174,6 @@ register_ish_project(
         here / "ruby-ish" / "project.overlay",
     ],
     kconfig_files=[
-        here / "dsp_comms.conf",
         here / "ruby-ish" / "project.conf",
     ],
     inherited_from=["fatcat"],
