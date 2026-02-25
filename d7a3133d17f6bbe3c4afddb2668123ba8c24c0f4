@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a838be70_07f33aaa",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 23
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-25T14:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8039bc3b_b81452e8",
+      "revId": "d7a3133d17f6bbe3c4afddb2668123ba8c24c0f4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fcb14b72_c0acca86",
@@ -141,6 +159,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "31361817_a17ca5b1",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 23
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-25T14:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a28f59e4_d3236753",
+      "revId": "d7a3133d17f6bbe3c4afddb2668123ba8c24c0f4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fdebcf32_5bc297ee",
@@ -172,6 +208,24 @@
       "side": 1,
       "message": "modified this",
       "parentUuid": "fdebcf32_5bc297ee",
+      "revId": "d7a3133d17f6bbe3c4afddb2668123ba8c24c0f4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a11a2b8_ce048b95",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 23
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-25T14:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c7e148ef_b1f35e26",
       "revId": "d7a3133d17f6bbe3c4afddb2668123ba8c24c0f4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -211,6 +265,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f2f0f5f_4eb838ee",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 23
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-25T14:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "729ba958_7133ef6f",
+      "revId": "d7a3133d17f6bbe3c4afddb2668123ba8c24c0f4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ece081a1_66272591",
@@ -246,6 +318,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2098e761_44d9f2f3",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 23
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-25T14:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d69617e8_de26e190",
+      "revId": "d7a3133d17f6bbe3c4afddb2668123ba8c24c0f4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7692d937_fe68cf51",
@@ -277,6 +367,24 @@
       "side": 1,
       "message": "modified this",
       "parentUuid": "7692d937_fe68cf51",
+      "revId": "d7a3133d17f6bbe3c4afddb2668123ba8c24c0f4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8002908d_f213c0ed",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 23
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-25T14:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e6e9725_53a4b529",
       "revId": "d7a3133d17f6bbe3c4afddb2668123ba8c24c0f4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
