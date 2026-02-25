@@ -24,7 +24,6 @@ BOARDS_THAT_COMPILE_SUCCESSFULLY_WITH_CLANG = [
     "bloonchipper",
     "bloonchipper-druid",
     "buccaneer",
-    "gwendolin",
     "helipilot",
     "nami_fp",
     "nucleo-dartmonkey",

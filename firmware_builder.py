@@ -100,7 +100,6 @@ EXPECTED_UNUSED_BOARDS = {
     "zed",  # Remove 2031-06
     # Fingerprint development
     "bloonchipper-druid",
-    "gwendolin",
     "hatch_fp",
     "nocturne_fp",
     "nucleo-dartmonkey",

@@ -40,7 +40,6 @@ CLANG_BOARDS:= \
 	bloonchipper-druid \
 	buccaneer \
 	dartmonkey \
-	gwendolin \
 	hatch_fp \
 	helipilot \
 	nami_fp \
