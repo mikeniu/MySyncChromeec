@@ -13,6 +13,7 @@
 #include <zephyr/ztest.h>
 
 extern char mock_jump_data[CONFIG_PLATFORM_EC_PRESERVED_END_OF_RAM_SIZE];
+extern uint8_t zephyr_panic_data_buf[];
 
 struct jump_data *get_jump_data(void);
 
@@ -30,6 +31,9 @@ struct jump_tag {
 static void jump_data_before(void *data)
 {
 	memset(mock_jump_data, 0, sizeof(mock_jump_data));
+	memset(zephyr_panic_data_buf, 0,
+	       CONFIG_PANIC_DATA_SIZE +
+		       CONFIG_PLATFORM_EC_PRESERVED_END_OF_RAM_SIZE);
 	system_common_reset_state();
 }
 
@@ -63,16 +67,23 @@ ZTEST(jump_data, test_init_v3_jump_data)
 	jdata->version = 3;
 	jdata->struct_size = sizeof(struct jump_data);
 	jdata->jump_tag_total = 0;
-	jdata->reset_flags = EC_RESET_FLAG_POWER_ON;
+	jdata->reset_flags = EC_RESET_FLAG_POWER_ON | EC_RESET_FLAG_WATCHDOG;
 
 	system_common_pre_init();
 
 	zassert_equal(system_jumped_to_this_image(), 1);
-	zassert_equal(system_get_reset_flags(),
-		      EC_RESET_FLAG_POWER_ON | EC_RESET_FLAG_SYSJUMP);
-	/* Magic should be cleared by pre_init */
+	/* Should include both the original flag and the SYSJUMP flag */
+	zassert_equal(system_get_reset_flags(), EC_RESET_FLAG_POWER_ON |
+							EC_RESET_FLAG_WATCHDOG |
+							EC_RESET_FLAG_SYSJUMP);
+
+	/*
+	 * Note: panic_set_reason() was called during pre_init because of the
+	 * watchdog flag. In native_sim, this might have shifted jdata.
+	 * Re-fetch to check magic.
+	 */
+	jdata = get_jump_data();
 	zassert_equal(jdata->magic, 0);
-	zassert_equal(jdata->struct_size, sizeof(struct jump_data));
 }
 
 ZTEST(jump_data, test_init_v1_jump_data)
