@@ -16,6 +16,24 @@
       "message": "FYI, this file will get [automatically copied to `ec-legacy` branch](http://b/480127970) by copybot, so you shouldn\u0027t need to do it manually",
       "revId": "f69f9f26b0f9a5ed9b60b6322a64294933df2209",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29a1b902_d275b6b9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-02-25T21:47:32Z",
+      "side": 1,
+      "message": "Thanks\n\nI limited the file removals in the ec-legacy branch to only those that do not have a corresponding duplicate in the ec repository, mainly those 2 CLs:\n\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7608577/3",
+      "parentUuid": "0bc4de87_2018b8f8",
+      "revId": "f69f9f26b0f9a5ed9b60b6322a64294933df2209",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
