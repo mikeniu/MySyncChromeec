@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2637f796_de18cdbd",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-02-25T07:51:43Z",
+      "side": 1,
+      "message": "Yes, you\u0027re correct — the functionality overlaps.\nI’m planning to remove check_bank_protected and refactor the logic to rely solely on check_region_protected instead.\nWould this approach match your expectation?",
+      "parentUuid": "32d42e85_847a0fef",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "627f5544_afc66b96",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
         "patchSetId": 7
@@ -54,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ea374431_1eda8cc3",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-02-25T07:51:43Z",
+      "side": 1,
+      "message": "You\u0027re right — the first protection range is indeed hardcoded.\nHowever, the original intention behind this API was to allow projects with different RO sizes to share the same library implementation.",
+      "parentUuid": "627f5544_afc66b96",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "264c1b63_888aadf5",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
         "patchSetId": 7
@@ -65,6 +101,24 @@
       "writtenOn": "2026-02-19T08:37:04Z",
       "side": 1,
       "message": "Is it possible to check if the protection settings are correct. I mean not to check if bank is protected or not. I mean if some internal configuration is correct. You cans see an example in a different [cros_flash driver](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/cros_flash/cros_flash_andestech_xip.c;l\u003d285-290). It checks the configuration register, not  the protection status itself.",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd3a0560_6fbf5f22",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-02-25T07:51:43Z",
+      "side": 1,
+      "message": "Thanks for the reference and the clarification.\nI’ll review the details more carefully and follow up with the appropriate updates.\nAppreciate your guidance!",
+      "parentUuid": "264c1b63_888aadf5",
       "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
