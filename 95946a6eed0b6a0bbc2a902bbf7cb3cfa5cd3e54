@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5374dd99_74053a74",
+        "filename": "zephyr/program/intelrvp/ptlrvp/rt_pd.dtsi",
+        "patchSetId": 23
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-25T21:45:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed6d2574_89017f66",
+      "revId": "95946a6eed0b6a0bbc2a902bbf7cb3cfa5cd3e54",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f3768906_87857d2b",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-02-25T01:09:19Z",
       "side": 1,
       "message": "how about we include `pd.dtsi` for RTK definitions and avoid\nduplication, then add the `zephyr,deferred-init` property to the nodes here?",
+      "range": {
+        "startLine": 10,
+        "startChar": 1,
+        "endLine": 10,
+        "endChar": 11
+      },
+      "revId": "95946a6eed0b6a0bbc2a902bbf7cb3cfa5cd3e54",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d01f7373_d1b6867b",
+        "filename": "zephyr/program/intelrvp/ptlrvp/rt_pd.dtsi",
+        "patchSetId": 23
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-25T21:45:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f3768906_87857d2b",
       "range": {
         "startLine": 10,
         "startChar": 1,
@@ -64,6 +106,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "49ef8eae_6b7bb6da",
+        "filename": "zephyr/program/intelrvp/ptlrvp/rt_pd.dtsi",
+        "patchSetId": 23
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-25T21:45:49Z",
+      "side": 1,
+      "message": "Done. I created separated file for TI PDC\u0027s definition.",
+      "parentUuid": "185385d0_ce1e0b8a",
+      "range": {
+        "startLine": 30,
+        "startChar": 1,
+        "endLine": 30,
+        "endChar": 10
+      },
+      "revId": "95946a6eed0b6a0bbc2a902bbf7cb3cfa5cd3e54",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6ed5bec3_a170b17c",
@@ -77,6 +143,30 @@
       "writtenOn": "2026-02-25T01:09:19Z",
       "side": 1,
       "message": "move to end of list for consistency with `pdc_rtk_c0`.\nalso, i\u0027d move `zephyr,deferred-init` to end of these lists\nso we group these meta-properties toward the end.",
+      "range": {
+        "startLine": 34,
+        "startChar": 2,
+        "endLine": 34,
+        "endChar": 5
+      },
+      "revId": "95946a6eed0b6a0bbc2a902bbf7cb3cfa5cd3e54",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55436342_1424e5a1",
+        "filename": "zephyr/program/intelrvp/ptlrvp/rt_pd.dtsi",
+        "patchSetId": 23
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-25T21:45:49Z",
+      "side": 1,
+      "message": "Done, created separate `runtimr_ti_pd.dtsi` to set `zephyr,deferred-init`.",
+      "parentUuid": "6ed5bec3_a170b17c",
       "range": {
         "startLine": 34,
         "startChar": 2,
@@ -110,6 +200,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "84ab402e_7b2da814",
+        "filename": "zephyr/program/intelrvp/ptlrvp/rt_pd.dtsi",
+        "patchSetId": 23
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-25T21:45:49Z",
+      "side": 1,
+      "message": "This one shares flash with C0. I have added `no-fw-update` flag.",
+      "parentUuid": "93d5a72d_68064f10",
+      "range": {
+        "startLine": 39,
+        "startChar": 1,
+        "endLine": 39,
+        "endChar": 10
+      },
+      "revId": "95946a6eed0b6a0bbc2a902bbf7cb3cfa5cd3e54",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2b3fc784_49aae289",
@@ -123,6 +237,30 @@
       "writtenOn": "2026-02-25T01:09:19Z",
       "side": 1,
       "message": "we could get most of this from `usbc.dtsi` and override the `pdc` property.",
+      "range": {
+        "startLine": 9,
+        "startChar": 1,
+        "endLine": 9,
+        "endChar": 5
+      },
+      "revId": "95946a6eed0b6a0bbc2a902bbf7cb3cfa5cd3e54",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16dc2146_48825e8d",
+        "filename": "zephyr/program/intelrvp/ptlrvp/rt_usbc.dtsi",
+        "patchSetId": 23
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-25T21:45:49Z",
+      "side": 1,
+      "message": "Done, I created `runtime_usbc.dtsi` and add flag `zephyr,deferred-init`.",
+      "parentUuid": "2b3fc784_49aae289",
       "range": {
         "startLine": 9,
         "startChar": 1,
