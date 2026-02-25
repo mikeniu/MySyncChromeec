@@ -841,15 +841,20 @@ static void i2c_controller_int_handler(int controller)
 	/* Condition 4: SDA status is set - transmit or receive */
 	if (IS_BIT_SET(NPCX_SMBST(controller), NPCX_SMBST_SDAST)) {
 		i2c_handle_sda_irq(controller);
-#if DEBUG_I2C
-		/* SDAST still issued with unexpected state machine */
+		/*
+		 * SDAST still issued with unexpected state machine.
+		 * Disable smb's interrupts to forbid ec to enter ISR again
+		 * before executing error recovery.
+		 */
 		if (IS_BIT_SET(NPCX_SMBST(controller), NPCX_SMBST_SDAST) &&
 		    p_status->oper_state != SMB_WRITE_SUSPEND) {
+#if DEBUG_I2C
 			cprints(CC_I2C, "i2c %d unknown state %d, error %d",
 				controller, p_status->oper_state,
 				p_status->err_code);
-		}
 #endif
+			task_disable_irq(i2c_irqs[controller]);
+		}
 	}
 }
 
