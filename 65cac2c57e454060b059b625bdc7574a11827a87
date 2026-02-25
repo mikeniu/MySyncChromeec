@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac5c317e_7a75194e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1548775
+      },
+      "writtenOn": "2026-02-25T02:19:07Z",
+      "side": 1,
+      "message": "I think I might have added the `version\u003d1` config to some boards that doesn\u0027t use CME. Not that it really effects anything.",
+      "revId": "65cac2c57e454060b059b625bdc7574a11827a87",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

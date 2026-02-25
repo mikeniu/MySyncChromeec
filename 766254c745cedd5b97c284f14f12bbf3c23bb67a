@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa3e52a2_6f72ffc7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1548775
+      },
+      "writtenOn": "2026-02-25T02:19:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d38a2af5_bb89c0a9",
+      "revId": "766254c745cedd5b97c284f14f12bbf3c23bb67a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "735499f2_8974cca4",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Let\u0027s move the discussion to b/477468333.",
       "parentUuid": "6bcdbd84_ff6bc445",
+      "revId": "766254c745cedd5b97c284f14f12bbf3c23bb67a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb633cba_9b9d6aa5",
+        "filename": "zephyr/CMakeLists.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1548775
+      },
+      "writtenOn": "2026-02-25T02:19:07Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7b6c0978_241c8deb",
       "revId": "766254c745cedd5b97c284f14f12bbf3c23bb67a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
