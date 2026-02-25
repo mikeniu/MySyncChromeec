@@ -70,6 +70,7 @@ ZTEST(jump_data, test_init_v3_jump_data)
 	zassert_equal(system_jumped_to_this_image(), 1);
 	zassert_equal(system_get_reset_flags(),
 		      EC_RESET_FLAG_POWER_ON | EC_RESET_FLAG_SYSJUMP);
+
 	/* Magic should be cleared by pre_init */
 	zassert_equal(jdata->magic, 0);
 	zassert_equal(jdata->struct_size, sizeof(struct jump_data));
@@ -148,18 +149,16 @@ ZTEST(jump_data, test_init_v2_with_tags)
 
 ZTEST(jump_data, test_init_v99_jump_data)
 {
-	int prev_struct_size = 28;
 	int tag_data_size = 4;
 	int total_tag_size = sizeof(struct jump_tag) + tag_data_size;
 
 	uint8_t *prev_jdata_ptr =
-		(uint8_t *)(mock_jump_data + sizeof(mock_jump_data) -
-			    prev_struct_size);
+		(uint8_t *)(mock_jump_data + sizeof(mock_jump_data) - 28);
 
 	uint32_t *u32_ptr = (uint32_t *)prev_jdata_ptr;
 	u32_ptr[0] = 0xaabbccdd; /* new_v99_field */
 	u32_ptr[1] = 0; /* reserved0 */
-	u32_ptr[2] = prev_struct_size;
+	u32_ptr[2] = 28;
 	u32_ptr[3] = total_tag_size;
 	u32_ptr[4] = EC_RESET_FLAG_HARD;
 	u32_ptr[5] = 99; /* version */
@@ -266,6 +265,30 @@ ZTEST(jump_data, test_init_corrupted_struct_size)
 
 	zassert_equal(jdata->magic, 0);
 	zassert_equal(system_jumped_to_this_image(), 1);
+}
+
+ZTEST(jump_data, test_init_watchdog_reset)
+{
+	struct jump_data *jdata = get_test_jdata_ptr();
+
+	jdata->magic = JUMP_DATA_MAGIC;
+	jdata->version = 3;
+	jdata->reset_flags = EC_RESET_FLAG_WATCHDOG;
+	jdata->struct_size = sizeof(struct jump_data);
+	jdata->jump_tag_total = 0;
+
+	system_common_pre_init();
+
+	/* Verify the watchdog flag was preserved and combined with sysjump */
+	zassert_equal(system_get_reset_flags(),
+		      EC_RESET_FLAG_WATCHDOG | EC_RESET_FLAG_SYSJUMP,
+		      "Reset flags: 0x%x", system_get_reset_flags());
+
+	/* Verify that a watchdog panic was logged because of the flag */
+	uint32_t reason, info;
+	uint8_t exception;
+	panic_get_reason(&reason, &info, &exception);
+	zassert_equal(reason, PANIC_SW_WATCHDOG, "Panic reason: %d", reason);
 }
 
 ZTEST_SUITE(jump_data, NULL, NULL, jump_data_before, NULL, NULL);
