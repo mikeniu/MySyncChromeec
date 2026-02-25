@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4880936_f6149772",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-25T10:51:03Z",
+      "side": 1,
+      "message": "`Signed-off-by` is not used.",
+      "revId": "6bc7341774e050d3a29073c64f3852cdd3749678",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "358fc3f7_866f7f35",
+        "filename": "zephyr/emul/Kconfig",
+        "patchSetId": 9
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-25T10:51:03Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by Trailing Whitespace: Please remove the trailing whitespace.\n\nPlease remove the trailing whitespace.",
+      "range": {
+        "startLine": 222,
+        "startChar": 11,
+        "endLine": 222,
+        "endChar": 15
+      },
+      "revId": "6bc7341774e050d3a29073c64f3852cdd3749678",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
