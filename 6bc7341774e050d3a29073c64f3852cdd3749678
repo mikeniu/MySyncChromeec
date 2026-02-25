@@ -39,6 +39,23 @@
       },
       "revId": "6bc7341774e050d3a29073c64f3852cdd3749678",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fa86f66_1d600081",
+        "filename": "zephyr/emul/emul_ft98xx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-25T10:54:57Z",
+      "side": 1,
+      "message": "It\u0027s not a correct usage of the `spi_buf_set` structure. Please check https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/emul/emul_fpc1025.c;l\u003d43.",
+      "revId": "6bc7341774e050d3a29073c64f3852cdd3749678",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
