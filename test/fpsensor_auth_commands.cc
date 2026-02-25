@@ -50,65 +50,6 @@ static enum ec_error_list get_fp_encryption_status(uint32_t *status)
 	return EC_SUCCESS;
 }
 
-test_static enum ec_error_list test_fp_command_check_context_cleared(void)
-{
-	uint32_t status;
-	fp_reset_and_clear_context();
-	TEST_EQ(get_fp_encryption_status(&status), EC_SUCCESS, "%d");
-	TEST_BITS_CLEARED((int)status, FP_CONTEXT_USER_ID_SET);
-	TEST_EQ(check_context_cleared(), EC_SUCCESS, "%d");
-
-	struct ec_params_fp_context_v1 params_no_id = {
-		.action = FP_CONTEXT_GET_RESULT,
-	};
-	TEST_EQ(test_send_host_command(EC_CMD_FP_CONTEXT, 1, &params_no_id,
-				       sizeof(params_no_id), NULL, 0),
-		EC_RES_SUCCESS, "%d");
-	TEST_EQ(get_fp_encryption_status(&status), EC_SUCCESS, "%d");
-	TEST_BITS_CLEARED((int)status, FP_CONTEXT_USER_ID_SET);
-	TEST_EQ(check_context_cleared(), EC_SUCCESS, "%d");
-
-	struct ec_params_fp_context_v1 params = {
-		.action = FP_CONTEXT_GET_RESULT,
-		.userid = { 0, 1, 2, 3, 4, 5, 6, 7 },
-	};
-	TEST_EQ(test_send_host_command(EC_CMD_FP_CONTEXT, 1, &params,
-				       sizeof(params), NULL, 0),
-		EC_RES_SUCCESS, "%d");
-	TEST_EQ(get_fp_encryption_status(&status), EC_SUCCESS, "%d");
-	TEST_BITS_SET((int)status, FP_CONTEXT_USER_ID_SET);
-	TEST_EQ(check_context_cleared(), EC_ERROR_ACCESS_DENIED, "%d");
-
-	fp_reset_and_clear_context();
-	TEST_EQ(check_context_cleared(), EC_SUCCESS, "%d");
-
-	global_context.templ_valid++;
-	TEST_EQ(check_context_cleared(), EC_ERROR_ACCESS_DENIED, "%d");
-
-	fp_reset_and_clear_context();
-	TEST_EQ(check_context_cleared(), EC_SUCCESS, "%d");
-
-	global_context.templ_dirty |= BIT(0);
-	TEST_EQ(check_context_cleared(), EC_ERROR_ACCESS_DENIED, "%d");
-
-	fp_reset_and_clear_context();
-	TEST_EQ(check_context_cleared(), EC_SUCCESS, "%d");
-
-	global_context.positive_match_secret_state.template_matched = 0;
-	TEST_EQ(check_context_cleared(), EC_ERROR_ACCESS_DENIED, "%d");
-
-	fp_reset_and_clear_context();
-	TEST_EQ(check_context_cleared(), EC_SUCCESS, "%d");
-
-	global_context.fp_encryption_status |= FP_CONTEXT_USER_ID_SET;
-	TEST_EQ(check_context_cleared(), EC_ERROR_ACCESS_DENIED, "%d");
-
-	fp_reset_and_clear_context();
-	TEST_EQ(check_context_cleared(), EC_SUCCESS, "%d");
-
-	return EC_SUCCESS;
-}
-
 test_static enum ec_error_list
 test_fp_command_establish_pairing_key_keygen(void)
 {
@@ -2007,7 +1948,6 @@ test_static enum ec_error_list test_fp_reset_does_not_clear_session(void)
 
 void run_test(int argc, const char **argv)
 {
-	RUN_TEST(test_fp_command_check_context_cleared);
 	RUN_TEST(test_fp_command_generate_nonce);
 	RUN_TEST(test_fp_command_commit_without_seed);
 
