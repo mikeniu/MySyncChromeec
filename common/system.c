@@ -908,12 +908,21 @@ system_get_build_info(void)
 
 void system_common_pre_init(void)
 {
+	uint32_t early_reset_flags = system_get_reset_flags();
+
+#if IS_ENABLED(CONFIG_COMMON_PANIC_OUTPUT) || IS_ENABLED(BOARD_HOST)
+	struct jump_data *peek_jdata = get_jump_data();
+	if (peek_jdata && peek_jdata->magic == JUMP_DATA_MAGIC &&
+	    peek_jdata->version >= 1)
+		early_reset_flags |= peek_jdata->reset_flags;
+#endif
+
 	/*
 	 * Log panic cause if watchdog caused reset and panic cause
 	 * was not already logged. This must happen before calculating
 	 * jump_data address because it might change panic pointer.
 	 */
-	if (system_get_reset_flags() & EC_RESET_FLAG_WATCHDOG) {
+	if (early_reset_flags & EC_RESET_FLAG_WATCHDOG) {
 		uint32_t reason;
 		uint32_t info;
 		uint8_t exception;
@@ -982,27 +991,23 @@ void system_common_pre_init(void)
 		if (jdata->version >= 3 &&
 		    (jdata->struct_size < 0 ||
 		     jdata->struct_size >= CONFIG_PRESERVED_END_OF_RAM_SIZE)) {
-			memset(jdata, 0, sizeof(struct jump_data));
-			return;
+			goto clear_jump_data;
 		}
 
 		if (jdata->version >= 2 && jdata->jump_tag_total < 0) {
-			memset(jdata, 0, sizeof(struct jump_data));
-			return;
+			goto clear_jump_data;
 		}
 
 		/*
 		 * Check if enough space for jump data and tags, avoiding
 		 * pointer underflow which would bypass the bounds check.
 		 */
-		if ((uintptr_t)jdata < JUMP_DATA_MIN_ADDRESS ||
-		    (uintptr_t)jdata - JUMP_DATA_MIN_ADDRESS <
-			    jdata->jump_tag_total) {
+		if ((uintptr_t)jdata - jdata->jump_tag_total <
+		    JUMP_DATA_MIN_ADDRESS) {
 			/* TODO(b/251190975): This failure should be reported
 			 * in the panic data structure for more visibility.
 			 */
-			memset(jdata, 0, sizeof(struct jump_data));
-			return;
+			goto clear_jump_data;
 		}
 
 		if (delta && jdata->jump_tag_total) {
@@ -1020,17 +1025,19 @@ void system_common_pre_init(void)
 
 		/* Struct size is now the current struct size */
 		jdata->struct_size = sizeof(struct jump_data);
-
-		/*
-		 * Clear the jump struct's magic number.  This prevents
-		 * accidentally detecting a jump when there wasn't one, and
-		 * disallows use of system_add_jump_tag().
-		 */
-		jdata->magic = 0;
 	} else {
+	clear_jump_data:
 		/* Clear the whole jump_data struct */
 		memset(jdata, 0, sizeof(struct jump_data));
 	}
+
+	/*
+	 * Finally, clear the jump struct's magic number. This prevents
+	 * accidentally detecting a jump when there wasn't one, and
+	 * disallows use of system_add_jump_tag().
+	 */
+	if (jdata && jumped_to_image)
+		jdata->magic = 0;
 }
 
 void system_enter_manual_recovery(void)
