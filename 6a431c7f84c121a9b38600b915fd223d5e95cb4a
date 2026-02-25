@@ -16,6 +16,24 @@
       "message": "FYI, this file will get [automatically copied to `ec-legacy` branch](http://b/480127970) by copybot, so you shouldn\u0027t need to do it manually",
       "revId": "6a431c7f84c121a9b38600b915fd223d5e95cb4a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae8e1e01_c8167a5a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-02-25T21:47:54Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c4cd793f_a5d7539f",
+      "revId": "6a431c7f84c121a9b38600b915fd223d5e95cb4a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
