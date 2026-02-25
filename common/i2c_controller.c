@@ -359,9 +359,14 @@ static int platform_ec_i2c_read(const int port, const uint16_t addr_flags,
   return i2c_xfer(port, addr_flags, &reg, 1, in, in_size - 1);
 }
 
-/* i2c_writeN with optional error checking */
+/*
+ * i2c_writeN with optional error checking
+ *
+ * out_size should the actual output size plus 1 to allow including the PEC byte
+ * in a single xfer call.
+ */
 static int platform_ec_i2c_write(const int port, const uint16_t addr_flags,
-                                 const uint8_t *out, int out_size) {
+                                 uint8_t *out, int out_size) {
   if (!IS_ENABLED(CONFIG_SMBUS_PEC) && I2C_USE_PEC(addr_flags))
     return EC_ERROR_UNIMPLEMENTED;
 
@@ -371,16 +376,13 @@ static int platform_ec_i2c_write(const int port, const uint16_t addr_flags,
     uint8_t pec;
 
     pec = cros_crc8(&addr_8bit, 1);
-    pec = cros_crc8_arg(out, out_size, pec);
+    pec = cros_crc8_arg(out, out_size - 1, pec);
+    out[out_size - 1] = pec;
 
     i2c_lock(port, 1);
     for (i = 0; i <= CONFIG_I2C_NACK_RETRY_COUNT; i++) {
       rv = i2c_xfer_unlocked(port, addr_flags, out, out_size, NULL, 0,
-                             I2C_XFER_START);
-      if (rv)
-        continue;
-
-      rv = i2c_xfer_unlocked(port, addr_flags, &pec, 1, NULL, 0, I2C_XFER_STOP);
+                             I2C_XFER_SINGLE);
       if (!rv)
         break;
     }
@@ -389,7 +391,7 @@ static int platform_ec_i2c_write(const int port, const uint16_t addr_flags,
     return rv;
   }
 
-  return i2c_xfer(port, addr_flags, out, out_size, NULL, 0);
+  return i2c_xfer(port, addr_flags, out, out_size - 1, NULL, 0);
 }
 
 int i2c_read32(const int port, const uint16_t addr_flags, int offset,
@@ -416,7 +418,7 @@ int i2c_read32(const int port, const uint16_t addr_flags, int offset,
 
 int i2c_write32(const int port, const uint16_t addr_flags, int offset,
                 int data) {
-  uint8_t buf[1 + sizeof(uint32_t)];
+  uint8_t buf[2 + sizeof(uint32_t)];
 
   buf[0] = offset & 0xff;
 
@@ -432,7 +434,7 @@ int i2c_write32(const int port, const uint16_t addr_flags, int offset,
     buf[4] = (data >> 24) & 0xff;
   }
 
-  return platform_ec_i2c_write(port, addr_flags, buf, sizeof(uint32_t) + 1);
+  return platform_ec_i2c_write(port, addr_flags, buf, sizeof(buf));
 }
 
 int i2c_read16(const int port, const uint16_t addr_flags, int offset,
@@ -457,7 +459,7 @@ int i2c_read16(const int port, const uint16_t addr_flags, int offset,
 
 int i2c_write16(const int port, const uint16_t addr_flags, int offset,
                 int data) {
-  uint8_t buf[1 + sizeof(uint16_t)];
+  uint8_t buf[2 + sizeof(uint16_t)];
 
   buf[0] = offset & 0xff;
 
@@ -469,7 +471,7 @@ int i2c_write16(const int port, const uint16_t addr_flags, int offset,
     buf[2] = (data >> 8) & 0xff;
   }
 
-  return platform_ec_i2c_write(port, addr_flags, buf, 1 + sizeof(uint16_t));
+  return platform_ec_i2c_write(port, addr_flags, buf, sizeof(buf));
 }
 
 int i2c_read8(const int port, const uint16_t addr_flags, int offset,
@@ -488,7 +490,7 @@ int i2c_read8(const int port, const uint16_t addr_flags, int offset,
 
 int i2c_write8(const int port, const uint16_t addr_flags, int offset,
                int data) {
-  uint8_t buf[2];
+  uint8_t buf[3];
 
   buf[0] = offset;
   buf[1] = data;
