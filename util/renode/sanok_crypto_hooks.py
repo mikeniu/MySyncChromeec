@@ -103,6 +103,17 @@ class SxHashHooks:
         cpu.PC = cpu.RA
 
 
+def hook_cache_data_flush_range(cpu, _):
+    """Hook for cache."""
+
+    # Always zero
+    reg_zero = cpu.GetRegister(0)
+    # Register 10 stores return value
+    cpu.SetRegister(10, reg_zero)
+
+    cpu.PC = cpu.RA
+
+
 def mc_AddCustomPythonHooks(cpu):  # pylint: disable=invalid-name
     """Adds custom Python hooks."""
     sx_hash_hooks = SxHashHooks()
@@ -134,3 +145,10 @@ def mc_AddCustomPythonHooks(cpu):  # pylint: disable=invalid-name
             cpu.AddHook(addr, hook__test_sha256)
     except Exception as e:  # pylint: disable=broad-except
         print("Error adding hook for test_sha256", e)
+
+    try:
+        results = cpu.Bus.GetAllSymbolAddresses("cache_data_flush_range")
+        for addr in results:
+            cpu.AddHook(addr, hook_cache_data_flush_range)
+    except Exception as e:  # pylint: disable=broad-except
+        print("Error adding hook for cache_data_flush_range", e)
