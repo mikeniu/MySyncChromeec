@@ -719,35 +719,37 @@ int i2c_read_sized_block(const int port, const uint16_t addr_flags, int offset,
 			uint8_t addr_8bit = I2C_STRIP_FLAGS(addr_flags) << 1;
 			uint8_t out[3] = { addr_8bit, reg, addr_8bit | 1 };
 			uint8_t pec, pec_remote;
-
-			rv = i2c_xfer_unlocked(port, addr_flags, 0, 0, data,
-					       data_length, 0);
-			if (rv)
-				continue;
+			int st, ed, flags, buffer_data_length;
+			uint8_t buffer[32];
+			bool is_last;
 
 			pec = cros_crc8(out, sizeof(out));
 			pec = cros_crc8_arg(&block_length, 1, pec);
-			pec = cros_crc8_arg(data, data_length, pec);
 
-			/* read all remaining bytes */
-			block_length -= data_length;
-			while (block_length) {
-				uint8_t byte;
-
+			for (st = 0; st < block_length + 1;
+			     st += sizeof(buffer)) {
+				ed = min(st + sizeof(buffer), block_length + 1);
+				is_last = ed == block_length + 1;
+				flags = is_last ? I2C_XFER_STOP : 0;
 				rv = i2c_xfer_unlocked(port, addr_flags, NULL,
-						       0, &byte, 1, 0);
+						       0, buffer, ed - st,
+						       flags);
 				if (rv)
 					break;
-				pec = cros_crc8_arg(&byte, 1, pec);
-				--block_length;
+				buffer_data_length =
+					(ed - st) + (is_last ? -1 : 0);
+				if (st < data_length) {
+					memcpy(data + st, buffer,
+					       min(data_length - st,
+						   buffer_data_length));
+				}
+				pec = cros_crc8_arg(buffer, buffer_data_length,
+						    pec);
 			}
 			if (rv)
 				continue;
 
-			rv = i2c_xfer_unlocked(port, addr_flags, NULL, 0,
-					       &pec_remote, 1, I2C_XFER_STOP);
-			if (rv)
-				continue;
+			pec_remote = buffer[buffer_data_length];
 
 			if (pec != pec_remote) {
 				rv = EC_ERROR_CRC;
