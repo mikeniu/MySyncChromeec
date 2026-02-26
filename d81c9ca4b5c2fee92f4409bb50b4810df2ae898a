@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e821d15_44c72ca3",
+        "filename": "zephyr/dts/bindings/ascp/cros-ec,ascp-mem-map.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-26T07:04:45Z",
+      "side": 1,
+      "message": "Please add a description and specify that all properties have to point to a RAM node or fixed-partition node.",
+      "revId": "d81c9ca4b5c2fee92f4409bb50b4810df2ae898a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1b60a70_ca5a13ae",
+        "filename": "zephyr/dts/bindings/ascp/cros-ec,ascp-mem-map.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-26T07:04:45Z",
+      "side": 1,
+      "message": "Add a description of all properties.",
+      "revId": "d81c9ca4b5c2fee92f4409bb50b4810df2ae898a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18661814_b4f19a78",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-26T07:04:45Z",
+      "side": 1,
+      "message": "Please add some comments describing the macros.",
+      "revId": "d81c9ca4b5c2fee92f4409bb50b4810df2ae898a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5047e777_56b702a8",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-26T07:04:45Z",
+      "side": 1,
+      "message": "Can you add BUILD_ASSERTs to make sure all properties point to a fixed-partition node or RAM node?",
+      "revId": "d81c9ca4b5c2fee92f4409bb50b4810df2ae898a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd440870_e1bf69e8",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-26T07:04:45Z",
+      "side": 1,
+      "message": "Thinking loudly - do we need to care about cache here in any scenario?",
+      "revId": "d81c9ca4b5c2fee92f4409bb50b4810df2ae898a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5ea9482_dd5e53c9",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-26T07:04:45Z",
+      "side": 1,
+      "message": "Please add an empty line.",
+      "revId": "d81c9ca4b5c2fee92f4409bb50b4810df2ae898a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
