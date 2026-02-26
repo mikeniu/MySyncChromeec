@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52faf6fd_46f8bce2",
+        "filename": "util/rtkupdate.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-02-26T15:11:54Z",
+      "side": 1,
+      "message": "wouldn\u0027t it be simpler to set uart_fd as non blocking and reading until you get a read error?",
+      "range": {
+        "startLine": 189,
+        "startChar": 0,
+        "endLine": 192,
+        "endChar": 25
+      },
+      "revId": "7f6966fbe45d4f9afeab0a0bb083d003bb727c25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
