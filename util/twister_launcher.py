@@ -44,6 +44,8 @@ ZEPHYR_TEST_PATHS = [
     Path("tests/lib/cpp/cxx"),
     Path("tests/subsys/pm"),
     Path("tests/subsys/shell"),
+    Path("tests/drivers/udc"),
+    Path("tests/subsys/usb/device"),
 ]
 
 # List of modules to use from the src/third_party/zephyrproject/modules directory

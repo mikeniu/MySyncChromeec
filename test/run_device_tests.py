@@ -135,6 +135,14 @@ DATA_ACCESS_VIOLATION_200A8000_REGEX = re.compile(
 This is 32K less than Helipilot's start address (0x200B0000). This corresponds
 to HELIPILOT_DATA_RAM_SIZE_BYTES being increased from 156KiB to 188KiB.
 """
+DATA_ACCESS_VIOLATION_20098000_REGEX = re.compile(
+    r"Data access violation, mfar = 20098000\r\n"
+)
+"""Gwendolin's data RAM starting address.
+
+This is 96K less than Helipilot's start address (0x200B0000). This corresponds
+to HELIPILOT_DATA_RAM_SIZE_BYTES being increased from 156KiB to 252KiB.
+"""
 
 # \r is added twice by Zephyr code.
 PRINTF_CALLED_REGEX = re.compile(r"printf called(\r){1,2}\n")
@@ -145,6 +153,7 @@ BLOONCHIPPER = "bloonchipper"
 BUCCANEER = "buccaneer"
 CHUDOW = "chudow"
 DARTMONKEY = "dartmonkey"
+GWENDOLIN = "gwendolin"
 HELIPILOT = "helipilot"
 SANOK = "sanok"
 
@@ -609,7 +618,7 @@ class Renode(Platform):
         if board_config.name == CHUDOW and zephyr:
             return self._skip_test_chudow(test_config)
 
-        if board_config.name in [HELIPILOT, BUCCANEER]:
+        if board_config.name in [HELIPILOT, BUCCANEER, GWENDOLIN]:
             return self._skip_test_helipilot(test_config, zephyr)
 
         if board_config.name == SANOK and zephyr:
@@ -924,6 +933,7 @@ class AllTests:
                     DARTMONKEY,
                     HELIPILOT,
                     BUCCANEER,
+                    GWENDOLIN,
                     SANOK,
                 ],
                 skip_for_zephyr=True,
@@ -1112,6 +1122,14 @@ class AllTests:
                 zephyr_name="kernel.poll",
                 test_name="zephyr_kernel_poll",
             ),
+            TestConfig(
+                zephyr_name="drivers.usb.udc",
+                test_name="zephyr_drivers_usb_udc",
+            ),
+            TestConfig(
+                zephyr_name="usb.device",
+                test_name="zephyr_usb_device",
+            ),
         ]
 
         for test in tests:
@@ -1250,6 +1268,11 @@ BUCCANEER_CONFIG.expected_fp_power = PowerUtilization(
     idle=RangedValue(0.25, 0.3), sleep=RangedValue(0.25, 0.3)
 )
 
+GWENDOLIN_CONFIG = copy.deepcopy(HELIPILOT_CONFIG)
+GWENDOLIN_CONFIG.name = GWENDOLIN
+GWENDOLIN_CONFIG.sensor_type = FPSensorType.EGIS
+GWENDOLIN_CONFIG.mpu_regex = DATA_ACCESS_VIOLATION_20098000_REGEX
+
 SANOK_CONFIG = BoardConfig(
     name=SANOK,
     sensor_type=FPSensorType.EGIS,
@@ -1306,6 +1329,7 @@ BOARD_CONFIGS = {
     "buccaneer": BUCCANEER_CONFIG,
     "chudow": CHUDOW_CONFIG,
     "dartmonkey": DARTMONKEY_CONFIG,
+    "gwendolin": GWENDOLIN_CONFIG,
     "helipilot": HELIPILOT_CONFIG,
     "sanok": SANOK_CONFIG,
 }
