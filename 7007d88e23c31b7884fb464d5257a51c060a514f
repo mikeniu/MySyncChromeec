@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f5a2a2d_b8710e79",
+        "filename": "zephyr/program/fatcat/francka/src/board_power.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-02-26T18:17:38Z",
+      "side": 1,
+      "message": "As a follow up CL, can we force all fatcat/ocelot boards to use  `CONFIG_AP_PWRSEQ_DRIVER` exclusively?  We shouldn\u0027t be using the older driver on new designs.",
+      "range": {
+        "startLine": 33,
+        "startChar": 8,
+        "endLine": 33,
+        "endChar": 31
+      },
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71b52de4_79ff4922",
+        "filename": "zephyr/program/nissa/src/board_power.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-02-26T18:17:38Z",
+      "side": 1,
+      "message": "Use a wrapper function so this is easier to read.\n```\n#ifndef CONFIG_AP_PWRSEQ_DRIVER\nvoid board_ap_power_force_shutdown(void)\n{\n    board_ap_power_shutdown();\n}\n```",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 40
+      },
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8bee7d5_730a6751",
+        "filename": "zephyr/program/ocelot/ocicat/src/board_power.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-02-26T18:17:38Z",
+      "side": 1,
+      "message": "Create a wrapper function.",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 41
+      },
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c005605c_ede97fc5",
+        "filename": "zephyr/program/rex/src/board_power.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-02-26T18:17:38Z",
+      "side": 1,
+      "message": "As a follow up, we should remove CONFIG_AP_PWRSEQ_DRIVER support from rex.  It is effectively dead code.",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 31
+      },
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f18523f_dacbf70f",
+        "filename": "zephyr/program/trulo/src/board_power.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-02-26T18:17:38Z",
+      "side": 1,
+      "message": "Create a wrapper.  A follow up CL should drop CONFIG_AP_PWRSEQ_DRIVER support.",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 40
+      },
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fec73f16_5767c415",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-02-26T18:17:38Z",
+      "side": 1,
+      "message": "Put this inline below so that CONFIG_AP_PWRSEQ_DRIVER builds don\u0027t define any version `board_ap_power_force_shutdown`.",
+      "range": {
+        "startLine": 264,
+        "startChar": 0,
+        "endLine": 264,
+        "endChar": 47
+      },
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "891e9f2d_0bf91986",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-02-26T18:17:38Z",
+      "side": 1,
+      "message": "```suggestion\n\tif (IS_ENABLED(CONFIG_AP_PWRSEQ_DRIVER)) {\n\t\tap_pwrseq_post_event();\n\t} else {\n\t\tboard_ap_power_force_shutdown();\n\t}\n```",
+      "range": {
+        "startLine": 281,
+        "startChar": 1,
+        "endLine": 281,
+        "endChar": 30
+      },
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
