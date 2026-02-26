@@ -33,6 +33,42 @@
       "message": "It looks like only two new tests fail in Renode with this change: `sbrk` and `malloc`. If these are only failing in Renode, I\u0027m fine with disabling them for now so that we can run more of the tests on real hardware. If you want to do that, you can add the tests to [this list](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/test/run_device_tests.py;l\u003d569-590;drc\u003dbaf61934dc1fe1f21d3573b23b01035b25112ecb) with a bug comment.",
       "revId": "6113a857f74d014e3c9be3dd3e302531371ae237",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a09afe0_7a3f2421",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-26T10:38:40Z",
+      "side": 1,
+      "message": "`sbrk` and `malloc` are disabled now anyway. The problem is that we can not enable tests that are blocked by lack of BBRAM.",
+      "parentUuid": "c031aedc_d5218206",
+      "revId": "6113a857f74d014e3c9be3dd3e302531371ae237",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78905f16_a5337465",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-26T10:38:40Z",
+      "side": 1,
+      "message": "I tried to do it - CL:7611409. Unfortunately, it doesn\u0027t work, because the function is somehow compiled out. During tests I noticed, that when I added some additional printk call, it worked. Is there any another way to handle it?",
+      "parentUuid": "017866de_df687c0b",
+      "revId": "6113a857f74d014e3c9be3dd3e302531371ae237",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
