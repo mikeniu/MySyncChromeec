@@ -885,6 +885,7 @@ class AllTests:
                     SANOK,
                 ],
             ),
+            TestConfig(test_name="reboot", toggle_power=True),
             TestConfig(test_name="restricted_console"),
             TestConfig(test_name="rng_benchmark"),
             TestConfig(
