@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4714bfe6_5b082992",
+        "filename": "common/panic_output.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-02-26T23:32:12Z",
+      "side": 0,
+      "message": "where did this condition go?",
+      "range": {
+        "startLine": 286,
+        "startChar": 5,
+        "endLine": 286,
+        "endChar": 27
+      },
+      "revId": "3eff8b67c589e0c4d8a85c2e9e38c62b89ca2e3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

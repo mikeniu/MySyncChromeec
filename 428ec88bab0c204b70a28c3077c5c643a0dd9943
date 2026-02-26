@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91d805cf_dbe3ddd6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-02-26T23:32:12Z",
+      "side": 1,
+      "message": "nit: create a bug?",
+      "range": {
+        "startLine": 20,
+        "startChar": 4,
+        "endLine": 20,
+        "endChar": 8
+      },
+      "revId": "428ec88bab0c204b70a28c3077c5c643a0dd9943",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
