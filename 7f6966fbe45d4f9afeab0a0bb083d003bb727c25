@@ -22,6 +22,30 @@
       },
       "revId": "7f6966fbe45d4f9afeab0a0bb083d003bb727c25",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f346d9a_6371d270",
+        "filename": "util/rtkupdate.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-02-26T19:20:03Z",
+      "side": 1,
+      "message": "This is a copy/paste from the itecomdbgr fix.  The next CL moves this flush code into a shared file. I\u0027ll investigate switching to non-blocking mode as a followup but I\u0027d like to get this in now.",
+      "parentUuid": "52faf6fd_46f8bce2",
+      "range": {
+        "startLine": 189,
+        "startChar": 0,
+        "endLine": 192,
+        "endChar": 25
+      },
+      "revId": "7f6966fbe45d4f9afeab0a0bb083d003bb727c25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
