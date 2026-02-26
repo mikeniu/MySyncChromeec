@@ -90,7 +90,7 @@ child-binding:
                                 Used during factory testing.
         LED_PWRS_CHARGE_NEAR_FULL - AC is connected, battery is charging
                                      and close to fully charged.
-      type: string
+      type: string-array
       enum:
         - LED_PWRS_CHARGE
         - LED_PWRS_DISCHARGE
@@ -108,7 +108,7 @@ child-binding:
       description: |
         If the LED color depends on chipset state, this property is used
         to describe it.
-      type: string
+      type: string-array
       enum:
         - POWER_S0
         - POWER_S3
