@@ -11,7 +11,7 @@
 
 LOG_MODULE_DECLARE(dsp_client, CONFIG_DSP_COMMS_LOG_LEVEL);
 
-static bool is_lid_switch_open;
+static bool is_lid_switch_open = true;
 
 void remote_lid_switch_set(bool is_open) {
   LOG_DBG("remote_lid_switch_set(%d)", is_open);
