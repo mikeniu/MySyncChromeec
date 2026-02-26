@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "798ee148_396deb40",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1520718
+      },
+      "writtenOn": "2026-02-26T12:37:52Z",
+      "side": 1,
+      "message": "Hi Keith, can we double check with other DUTs (different EC / GSC architecture)  also, as this change will influence servo_micro usage across all platforms, so I am afraid of any potential regressions",
+      "range": {
+        "startLine": 17,
+        "startChar": 32,
+        "endLine": 17,
+        "endChar": 33
+      },
+      "revId": "ee0ca060b306b29eb7a4a398972b173d339a877e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
