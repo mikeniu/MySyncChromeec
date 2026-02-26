@@ -2886,6 +2886,12 @@
 #undef CONFIG_SMBUS_PEC
 
 /*
+ * The buffer size for i2c_read_sized_block. Set this to 256 could ensure
+ * that i2c_read_sized_block only call i2c_xfer_unlocked twice each try.
+ */
+#define CONFIG_I2C_READ_SIZE_BUFFER 32
+
+/*
  * Add hosts-side support for entering programming mode for I2C ITE ECs.
  * Must define ite_dfu_config_t for configuration in board file.
  */
