@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "524ffc1d_47e5be9f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-26T18:26:40Z",
+      "side": 1,
+      "message": "I think this is good from a threat model perspective. @lziest@google.com, do you agree?\n\nActive Sessions: Modifying the pairing key mid-session does not invalidate the active session key, ensuring ongoing operations remain secure.\n\nHost Compromise: A compromised host that injects a malicious pairing key cannot hijack an active session or bypass the \"establish session\" context wipe.\n\nTA Compromise: If an attacker gains execution within the TA, it\u0027s game over anyway.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 5
+      },
+      "revId": "280b722975ab912369811ca5f1159ed1bcbabb5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba64e1b2_3fba55b1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-26T18:26:40Z",
+      "side": 1,
+      "message": "```suggestion\nBUG\u003db:485991259 b:485989491 b:478160541 b:446210433\n```",
+      "range": {
+        "startLine": 27,
+        "startChar": 40,
+        "endLine": 27,
+        "endChar": 41
+      },
+      "revId": "280b722975ab912369811ca5f1159ed1bcbabb5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
