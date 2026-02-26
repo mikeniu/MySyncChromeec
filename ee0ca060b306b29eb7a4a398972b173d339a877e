@@ -22,6 +22,30 @@
       },
       "revId": "ee0ca060b306b29eb7a4a398972b173d339a877e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd881876_ef097466",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-02-26T20:39:57Z",
+      "side": 1,
+      "message": "From the STM32 reference manual:\n\n\"select the single sample method (ONEBIT\u003d1) when the line is noise-free to\nincrease the receiver’s tolerance to clock deviations (see Section 27.5.5:\nTolerance of the USART receiver to clock deviation on page 718). In this case the\nNF bit will never be set\"\n\nSo this change should increase the reliability of USART communication to the EC/GSC/AP.\n\nI tested programming over UART to all supported ECs (Realtek, ITE, Nuvoton) in a loop and have seen zero failures.",
+      "parentUuid": "798ee148_396deb40",
+      "range": {
+        "startLine": 17,
+        "startChar": 32,
+        "endLine": 17,
+        "endChar": 33
+      },
+      "revId": "ee0ca060b306b29eb7a4a398972b173d339a877e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
