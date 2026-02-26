@@ -97,6 +97,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5caa6a16_edaec9e3",
+        "filename": "common/fan.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-02-26T19:01:22Z",
+      "side": 1,
+      "message": "I still don\u0027t understand why `fan_force_off` mode always uses RPM mode but normal fans don\u0027t need this.",
+      "parentUuid": "dd6e9ebc_19dddada",
+      "range": {
+        "startLine": 170,
+        "startChar": 0,
+        "endLine": 171,
+        "endChar": 35
+      },
+      "revId": "1ceb10dc4bb545f0cb4170d779cb5b40b11079c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "10743e37_5db20b27",
         "filename": "zephyr/program/ocelot/rvp_fans.dtsi",
         "patchSetId": 4
