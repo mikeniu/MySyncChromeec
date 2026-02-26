@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18e27f23_db093294",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-26T17:36:19Z",
+      "side": 1,
+      "message": "Can you mention something about how this affects the legacy approach? It looks like for that case, this should not change anything (other than order of operations) since `_fp_clear_context` calls `fp_reset_context`.",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 7
+      },
+      "revId": "5a3b8c72229cd1f6d64023cec793eb35d28b4789",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
