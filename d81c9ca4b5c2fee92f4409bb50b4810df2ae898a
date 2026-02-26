@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ff10143_739c09ac",
+        "filename": "zephyr/dts/bindings/ascp/cros-ec,ascp-mem-map.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-26T11:01:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4e821d15_44c72ca3",
+      "revId": "d81c9ca4b5c2fee92f4409bb50b4810df2ae898a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f1b60a70_ca5a13ae",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-02-26T07:04:45Z",
       "side": 1,
       "message": "Add a description of all properties.",
+      "revId": "d81c9ca4b5c2fee92f4409bb50b4810df2ae898a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ef946b5_270cead6",
+        "filename": "zephyr/dts/bindings/ascp/cros-ec,ascp-mem-map.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-26T11:01:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1b60a70_ca5a13ae",
       "revId": "d81c9ca4b5c2fee92f4409bb50b4810df2ae898a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -52,6 +88,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f28b792f_84c0cfe0",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-26T11:01:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "18661814_b4f19a78",
+      "revId": "d81c9ca4b5c2fee92f4409bb50b4810df2ae898a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5047e777_56b702a8",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-02-26T07:04:45Z",
       "side": 1,
       "message": "Can you add BUILD_ASSERTs to make sure all properties point to a fixed-partition node or RAM node?",
+      "revId": "d81c9ca4b5c2fee92f4409bb50b4810df2ae898a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4fe93e93_fb688411",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-26T11:01:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5047e777_56b702a8",
       "revId": "d81c9ca4b5c2fee92f4409bb50b4810df2ae898a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -88,6 +160,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a3154dd6_e89d8895",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-26T11:01:58Z",
+      "side": 1,
+      "message": "Data in flash is persistent, in RAM it is generated once per runtime during the boot. Nothing is written later. I do not see how cashing could be a problem here.",
+      "parentUuid": "cd440870_e1bf69e8",
+      "revId": "d81c9ca4b5c2fee92f4409bb50b4810df2ae898a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a5ea9482_dd5e53c9",
         "filename": "zephyr/subsys/ascp/mem_map.c",
         "patchSetId": 3
@@ -99,6 +189,24 @@
       "writtenOn": "2026-02-26T07:04:45Z",
       "side": 1,
       "message": "Please add an empty line.",
+      "revId": "d81c9ca4b5c2fee92f4409bb50b4810df2ae898a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49189965_26b5a854",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-02-26T11:01:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a5ea9482_dd5e53c9",
       "revId": "d81c9ca4b5c2fee92f4409bb50b4810df2ae898a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
