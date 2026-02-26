@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "017866de_df687c0b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-26T00:53:03Z",
+      "side": 1,
+      "message": "@dawidn@google.com Here\u0027s an example of how to add custom Python hook functions if you want to try making the cache flush a no-op.\n\nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/util/renode/sanok_crypto_hooks.py\nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/util/renode/sanok.resc;l\u003d31-33;drc\u003dc16e8a74f0a67934b0b60837ab88339b3097daaf",
+      "revId": "6113a857f74d014e3c9be3dd3e302531371ae237",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
