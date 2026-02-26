@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23a02d82_2f419044",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-02-26T19:32:09Z",
+      "side": 1,
+      "message": "Removing dsp_comms.conf is leading to compiler error when not using zmake build ruby-ish",
+      "revId": "6960eeb1e5c75dcefaf7c383e76564d8fca75e22",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
