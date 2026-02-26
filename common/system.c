@@ -1004,9 +1004,14 @@ void system_common_pre_init(void)
 	 * Log panic cause if watchdog caused reset and panic cause
 	 * was not already logged. This must happen after parsing jump_data
 	 * to ensure we have restored the reset flags passed from the previous
-	 * image (e.g. RO passing watchdog reset to RW).
+	 * image.
+	 *
+	 * Only update the panic reason in RW since RO may have an older panic
+	 * data version and updating the panic reason will cause new fields to
+	 * be overwritten.
 	 */
-	if (system_get_reset_flags() & EC_RESET_FLAG_WATCHDOG) {
+	if (IS_ENABLED(SECTION_IS_RW) &&
+	    system_get_reset_flags() & EC_RESET_FLAG_WATCHDOG) {
 		uint32_t reason;
 		uint32_t info;
 		uint8_t exception;
