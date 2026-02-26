@@ -16,6 +16,24 @@
       "message": "This is a test-only CL, as it still fails as described in b:478936338",
       "revId": "4b6fb6e1f2147dca789feb87a936e42791d38b83",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4ee449a_050e7a22",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-02-26T19:56:41Z",
+      "side": 1,
+      "message": "fixed",
+      "parentUuid": "d15e5371_6aab3775",
+      "revId": "4b6fb6e1f2147dca789feb87a936e42791d38b83",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
