@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a55593f_5d164f44",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-02-26T06:07:17Z",
+      "side": 1,
+      "message": "Could it be configured by \"cros-ec,fans\" instead of customization ?",
+      "revId": "33825d778aaace9df8597cb858386b618b97ae39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
