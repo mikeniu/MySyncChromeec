@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d56d2b47_e2fbf345",
+        "filename": "zephyr/program/intelrvp/ptlrvp/ti_pd.dtsi",
+        "patchSetId": 26
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-02-26T19:53:40Z",
+      "side": 1,
+      "message": "should this move to one of the `runtime_*.dtsi`?",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 0
+      },
+      "revId": "31ed70b0c255eec28920bde70b695034d918b9d6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
