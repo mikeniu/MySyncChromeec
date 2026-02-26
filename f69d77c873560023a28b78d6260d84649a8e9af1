@@ -46,6 +46,30 @@
       },
       "revId": "f69d77c873560023a28b78d6260d84649a8e9af1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a386ddbc_887d7406",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1544412
+      },
+      "writtenOn": "2026-02-26T05:57:42Z",
+      "side": 1,
+      "message": "Let\u0027s enable it for Tanjiro for now.",
+      "parentUuid": "437fc4df_c4098c42",
+      "range": {
+        "startLine": 9,
+        "startChar": 6,
+        "endLine": 9,
+        "endChar": 15
+      },
+      "revId": "f69d77c873560023a28b78d6260d84649a8e9af1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
