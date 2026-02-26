@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ee13807_f0378f2b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1132339
+      },
+      "writtenOn": "2026-02-26T05:14:13Z",
+      "side": 1,
+      "message": "Appreciate your enhancement for the NPCX I2c driver.  \nI have some questions about the issue:\n1) have you seen a I2C interrupt storm in an real case (Non Artificially forced state to IDLE while SDAST is active)?\nIf it is, under which conditions (BER or NEGACK) ?\na) For BER, it seems unlikely to happen because the driver [disable the I2C irq and return immediately](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec-legacy/chip/npcx/i2c.c;l\u003d790).\nb) For NEGACK, It seems still unlikely because the datasheet mentions \"When NEGACK bit is set to 1 after the transmission of a byte, SDAST is not set to 1. (see the description of SDAST in the SMBnST register.)\"\n \n\nBack to the fix of the CL, do you think if it is safer to `task_disable_irq(i2c_irqs[controller]);` when the state is in `IDLE` state?",
+      "revId": "4360ef3e339f69b127f89c98ef527f58f059631b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
