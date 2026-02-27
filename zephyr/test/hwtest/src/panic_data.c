@@ -44,11 +44,10 @@ static void check_panic_data(void)
 	/* Make sure Link Register is stored correctly and points at the
 	 * crash_system function. */
 	zassert_true((crash_addr <= lr) && (crash_end >= lr));
-
+#endif
 	/* Check panic flags. */
 	zassert_equal(pdata->flags, PANIC_DATA_FLAG_FRAME_VALID |
 					    PANIC_DATA_FLAG_OLD_HOSTEVENT);
-#endif
 }
 
 static void test_crash(void)
