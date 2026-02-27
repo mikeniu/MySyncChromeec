@@ -46,6 +46,30 @@
       },
       "revId": "7f6966fbe45d4f9afeab0a0bb083d003bb727c25",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0e48da6_5afe8f30",
+        "filename": "util/rtkupdate.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-02-27T00:36:15Z",
+      "side": 1,
+      "message": "I tried implementing this, but ran into issues where `read()` returns -1, but the receive buffer wasn\u0027t really empty because the next `read` returned data.  I was going to have to implement a retry of `read` for a few milliseconds to know that the flush was really complete, effectively re-implementing the original change CL:6089055.",
+      "parentUuid": "7f346d9a_6371d270",
+      "range": {
+        "startLine": 189,
+        "startChar": 0,
+        "endLine": 192,
+        "endChar": 25
+      },
+      "revId": "7f6966fbe45d4f9afeab0a0bb083d003bb727c25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
