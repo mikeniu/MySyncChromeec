@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5012406a_64f52cb7",
+        "filename": "zephyr/test/jump_data/src/main.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-02-27T10:26:31Z",
+      "side": 1,
+      "message": "hey seems like this never ran?",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 234,
+        "endChar": 10
+      },
+      "revId": "1e81e395a176b00267d1b1d41753b81d49914ad7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
