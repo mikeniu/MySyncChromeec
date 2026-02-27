@@ -363,6 +363,30 @@
       },
       "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4df318a8_8ff9fb49",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-27T20:32:06Z",
+      "side": 1,
+      "message": "I get errors when building projects with no `AP_PWRSEQ_DRIVER`:\n```\nec/zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c:276:17: error: implicit declaration of function \u0027ap_pwrseq_post_event\u0027 [-Wimplicit-function-declaration]```",
+      "parentUuid": "10b227a3_84f57327",
+      "range": {
+        "startLine": 281,
+        "startChar": 1,
+        "endLine": 281,
+        "endChar": 30
+      },
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
