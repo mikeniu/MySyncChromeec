@@ -52,6 +52,24 @@
       "parentUuid": "460d1d24_54d6a517",
       "revId": "5fb4b3a55d05376e3324a2a49ff4812587a2111e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c8055ef_4f895eca",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-27T18:19:13Z",
+      "side": 1,
+      "message": "Yep, I won\u0027t submit this without their input. Just wanted to get your thoughts.",
+      "parentUuid": "436d760c_5d162a95",
+      "revId": "5fb4b3a55d05376e3324a2a49ff4812587a2111e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
