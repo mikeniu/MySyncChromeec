@@ -60,7 +60,7 @@
 		level_2 {
 			temp-on = <66 0 0 68 0>;
 			temp-off = <51 0 0 50 0>;
-			rpm-target = <3700>;
+			rpm-target = <3800>;
 		};
 		level_3 {
 			temp-on = <99 0 0 99 0>;
