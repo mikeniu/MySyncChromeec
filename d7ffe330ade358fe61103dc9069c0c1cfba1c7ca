@@ -51,6 +51,24 @@
       "parentUuid": "0e8b14d2_0176be36",
       "revId": "d7ffe330ade358fe61103dc9069c0c1cfba1c7ca",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4228c774_4df161be",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1548775
+      },
+      "writtenOn": "2026-02-27T01:26:45Z",
+      "side": 1,
+      "message": "Or alternatively, just add `if led_id \u003d\u003d \"EC_LED_ID_LIGHTBAR_LED\"` in front of the break if we\u0027re not too worried about validating the specific functions of the lightbar.",
+      "parentUuid": "7c604c36_39bf8163",
+      "revId": "d7ffe330ade358fe61103dc9069c0c1cfba1c7ca",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
