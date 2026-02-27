@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0256bc3b_521cc7e5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-27T23:42:33Z",
+      "side": 1,
+      "message": "It\u0027s annoying to lose the history.\n\nCan you manually cherry-pick the changes? \n\nThat will also link the changes in Gerrit, so it will be easy to confirm that specific changes have landed in both `main` and the `ec-legacy` branch.",
+      "revId": "750b2d89481b1b078ba879c418cea0a3c1a16ba4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
