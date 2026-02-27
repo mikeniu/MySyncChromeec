@@ -575,7 +575,7 @@ static enum ec_status
 host_command_rollback_info(struct host_cmd_handler_args *args)
 {
 	int ret = EC_RES_UNAVAILABLE;
-	struct ec_response_rollback_info *r = args->response;
+	struct ec_response_rollback_info_1 *r = args->response;
 	int min_region;
 	struct rollback_data data;
 
@@ -587,8 +587,21 @@ host_command_rollback_info(struct host_cmd_handler_args *args)
 	r->id = data.id;
 	r->rollback_min_version = data.rollback_min_version;
 	r->rw_rollback_version = system_get_rollback_version(EC_IMAGE_RW);
+	r->is_secret_inited = 0;
 
-	args->response_size = sizeof(*r);
+#ifdef CONFIG_ROLLBACK_SECRET_SIZE
+	if ((args->version == 1) &&
+	    !bytes_are_trivial(data.secret, sizeof(data.secret))) {
+		r->is_secret_inited = 1;
+	}
+#endif
+
+	if (args->version == 1) {
+		args->response_size =
+			sizeof(struct ec_response_rollback_info_1);
+	} else {
+		args->response_size = sizeof(struct ec_response_rollback_info);
+	}
 	ret = EC_RES_SUCCESS;
 
 failed:
@@ -596,4 +609,4 @@ failed:
 	return ret;
 }
 DECLARE_HOST_COMMAND(EC_CMD_ROLLBACK_INFO, host_command_rollback_info,
-		     EC_VER_MASK(0));
+		     EC_VER_MASK(0) | EC_VER_MASK(1));
