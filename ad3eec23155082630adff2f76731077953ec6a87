@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9bc1c847_8f9118f7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1364246
+      },
+      "writtenOn": "2026-02-27T02:41:10Z",
+      "side": 1,
+      "message": "Thanks for following up on this failure! \n\nI think @weiluanwang@google.com is actively working on a fix for this issue. Nowadays personally I\u0027m not too worried about a test failure only in snapshot builders (but not in CQ) as long as 1) someone is working on that as at least a P1; 2) there is no real impact to users or the test owner is happy with that.\n\nWill leave it to Jason / Wei-Luan for input on whether we want to revert this patch (also seems that the cq failure is related to revert).",
+      "revId": "ad3eec23155082630adff2f76731077953ec6a87",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
