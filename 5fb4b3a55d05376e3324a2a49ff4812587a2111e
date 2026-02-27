@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b94fbde_9d9f4136",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-27T06:02:01Z",
+      "side": 1,
+      "message": "Hi Tom. The sys_dev is NULL on sanok renode, because `system_bbram_init` fails due to [the cache problem](b/487848806).",
+      "revId": "5fb4b3a55d05376e3324a2a49ff4812587a2111e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
