@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "39504689_f98079af",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1365384
+      },
+      "writtenOn": "2026-02-27T16:23:20Z",
+      "side": 1,
+      "message": "hi @honscheid@google.com,\nI tested this CL on WCL RVP with ITE.\nSystem entered recovery state and could see below log \"CSE early recovery signal asserted\" while entering recovery state. Also, sysinfo showed \"Recovery: yes\" .\nIn normal boot, below log  \"CSE early recovery signal de-asserted\" is observed.\nBut, good to add the gpio pin listed in generated.dtsi so, that pin state can also be observed using gpioget.",
+      "revId": "05e0f7210656b4ee2758572195592a53b7077dd0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
