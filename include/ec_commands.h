@@ -6996,6 +6996,13 @@ struct ec_response_rollback_info {
 	int32_t rw_rollback_version;
 } __ec_align4;
 
+struct ec_response_rollback_info_v1 {
+	int32_t id; /* Incrementing number to indicate which region to use. */
+	int32_t rollback_min_version;
+	int32_t rw_rollback_version;
+	uint8_t is_secret_inited;
+} __ec_align4;
+
 /* Issue AP reset */
 #define EC_CMD_AP_RESET 0x0125
 
