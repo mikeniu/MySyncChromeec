@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ea95826_2180cf7a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-02-27T03:53:19Z",
+      "side": 1,
+      "message": "This is existing implementation, we can avoid this description.",
+      "revId": "7bb4952477662b73552c444fa154cf1e301a5b20",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea21d387_06821ed3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-02-27T03:53:19Z",
+      "side": 1,
+      "message": "The change helps all the platforms where the ISH CBI implementation is not enabled. Without this change ISH reports unreliable lid angle when lid is moved.",
+      "revId": "7bb4952477662b73552c444fa154cf1e301a5b20",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
