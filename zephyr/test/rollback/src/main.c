@@ -225,29 +225,66 @@ ZTEST(rollback, test_add_entropy_copy_minimal_version)
 	zassert_equal(rollback.rollback_min_version, 1);
 }
 
-ZTEST(rollback, test_hostcmd_rollback_info)
+static void
+run_ec_cmd_rollback_info(int version,
+			 struct ec_response_rollback_info_v1 *response)
 {
-	struct ec_response_rollback_info response;
+	if (version == 0) {
+		zassert_ok(ec_cmd_rollback_info(
+			NULL, (struct ec_response_rollback_info *)response));
+	} else {
+		zassert_ok(ec_cmd_rollback_info_v1(NULL, response));
+	}
+}
 
-	zassert_ok(ec_cmd_rollback_info(NULL, &response));
+static void check_rollback_info(int version)
+{
+	struct ec_response_rollback_info_v1 response;
+
+	run_ec_cmd_rollback_info(version, &response);
 	zassert_equal(response.id, 0);
 	zassert_equal(response.rollback_min_version, 0);
+	zassert_equal(response.is_secret_inited, 0);
 
 	/* Update minimum rollback version to 1. */
 	zassert_equal(rollback_update_version(1), EC_SUCCESS);
 
 	/* Make sure correct rollback minimum version is returned. */
-	zassert_ok(ec_cmd_rollback_info(NULL, &response));
+	run_ec_cmd_rollback_info(version, &response);
 	zassert_equal(response.id, 1);
 	zassert_equal(response.rollback_min_version, 1);
+	zassert_equal(response.is_secret_inited, 0);
 
 	/* Update minimum rollback version to 2. */
 	zassert_equal(rollback_update_version(2), EC_SUCCESS);
 
 	/* Make sure correct rollback minimum version is returned. */
-	zassert_ok(ec_cmd_rollback_info(NULL, &response));
+	run_ec_cmd_rollback_info(version, &response);
 	zassert_equal(response.id, 2);
 	zassert_equal(response.rollback_min_version, 2);
+	zassert_equal(response.is_secret_inited, 0);
+
+	/* Make sure secret is initialized. */
+	zassert_equal(shell_execute_cmd(get_ec_shell(), "rollbackaddent"),
+		      EC_SUCCESS);
+	run_ec_cmd_rollback_info(version, &response);
+	zassert_equal(response.id, 3);
+	zassert_equal(response.rollback_min_version, 2);
+	if (version == 1) {
+		zassert_equal(response.is_secret_inited, 1);
+	} else {
+		zassert_equal(response.is_secret_inited, 0);
+	}
+}
+
+ZTEST(rollback, test_hostcmd_rollback_info)
+{
+	check_rollback_info(0);
+}
+
+ZTEST(rollback, test_hostcmd_rollback_info_v1)
+{
+	check_rollback_info(1);
 }
 
 ZTEST(rollback, test_hostcmd_add_entropy)
@@ -346,18 +383,18 @@ ZTEST(rollback, test_console_rollbackinfo_system_unlocked)
 		system_get_rollback_version(EC_IMAGE_RW));
 	zassert_not_null(strstr(outbuffer, format_buffer));
 
-	sprintf(format_buffer, "rollback %d: %08x %08x %08x [%02x..%02x] *",
+	sprintf(format_buffer, "rollback %d: %08x %08x %08x %s [%02x..%02x] *",
 		/* region */ 0,
 		/* id */ 2,
-		/* minimum version */ 1, CROS_EC_ROLLBACK_COOKIE,
+		/* minimum version */ 1, CROS_EC_ROLLBACK_COOKIE, "untrivial",
 		/* first byte of secret */ 0x3c,
 		/* last byte of secret */ 0xd9);
 	zassert_not_null(strstr(outbuffer, format_buffer));
 
-	sprintf(format_buffer, "rollback %d: %08x %08x %08x [%02x..%02x]",
+	sprintf(format_buffer, "rollback %d: %08x %08x %08x %s [%02x..%02x]",
 		/* region */ 1,
 		/* id */ 1,
-		/* minimum version */ 0, CROS_EC_ROLLBACK_COOKIE,
+		/* minimum version */ 0, CROS_EC_ROLLBACK_COOKIE, "untrivial",
 		/* first byte of secret */ 0x3c,
 		/* last byte of secret */ 0xd9);
 	zassert_not_null(strstr(outbuffer, format_buffer));
@@ -388,16 +425,16 @@ ZTEST(rollback, test_console_rollbackinfo_system_locked)
 
 	zassert_true(buffer_size > 0, NULL);
 
-	sprintf(format_buffer, "rollback %d: %08x %08x %08x *",
+	sprintf(format_buffer, "rollback %d: %08x %08x %08x %s *",
 		/* region */ 0,
 		/* id */ 2,
-		/* minimum version */ 1, CROS_EC_ROLLBACK_COOKIE);
+		/* minimum version */ 1, CROS_EC_ROLLBACK_COOKIE, "untrivial");
 	zassert_not_null(strstr(outbuffer, format_buffer));
 
-	sprintf(format_buffer, "rollback %d: %08x %08x %08x",
+	sprintf(format_buffer, "rollback %d: %08x %08x %08x %s",
 		/* region */ 1,
 		/* id */ 1,
-		/* minimum version */ 0, CROS_EC_ROLLBACK_COOKIE);
+		/* minimum version */ 0, CROS_EC_ROLLBACK_COOKIE, "untrivial");
 	zassert_not_null(strstr(outbuffer, format_buffer));
 
 	/* Make sure there is no secret in the output. */
