@@ -46,6 +46,30 @@
       },
       "revId": "3eff8b67c589e0c4d8a85c2e9e38c62b89ca2e3e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76e21caa_a46f795a",
+        "filename": "common/panic_output.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-02-27T17:52:50Z",
+      "side": 0,
+      "message": "Ah I see, since the `struct_size` is not read for ver \u003c 3 this condition is dropped. Thanks!",
+      "parentUuid": "34b7fbce_4fe6e04c",
+      "range": {
+        "startLine": 286,
+        "startChar": 5,
+        "endLine": 286,
+        "endChar": 27
+      },
+      "revId": "3eff8b67c589e0c4d8a85c2e9e38c62b89ca2e3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
