@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eca8f40d_e7009228",
+        "filename": "zephyr/CMakeLists.txt",
+        "patchSetId": 23
+      },
+      "lineNbr": 394,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-02-27T14:27:22Z",
+      "side": 1,
+      "message": "How about adding `choice` to [Kconfig.fingerprint](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/Kconfig.fingerprint)? The `CONFIG_PLATFORM_EC_FINGERPRINT_ASCP` would depend on `CONFIG_ASCP`.",
+      "range": {
+        "startLine": 394,
+        "startChar": 5,
+        "endLine": 394,
+        "endChar": 16
+      },
+      "revId": "c37e46bc9f3411527f48c90c3310c96472de01cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
