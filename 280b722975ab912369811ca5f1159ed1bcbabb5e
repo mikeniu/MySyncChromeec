@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a9ea552_5cf313c9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-02-27T16:16:04Z",
+      "side": 1,
+      "message": "Closing this comment to merge CL. @lziest@google.com, if you have any concerns please ping me. I will fix them in follow-up CLs.",
+      "parentUuid": "524ffc1d_47e5be9f",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 5
+      },
+      "revId": "280b722975ab912369811ca5f1159ed1bcbabb5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ba64e1b2_3fba55b1",
