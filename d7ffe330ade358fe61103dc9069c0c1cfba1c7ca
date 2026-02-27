@@ -33,6 +33,24 @@
       "message": "I think we just need to add segments as an additional thing to check for.\n\nI suspect changing it this way will cause Policies that actually cover multiple LEDs to fail.",
       "revId": "d7ffe330ade358fe61103dc9069c0c1cfba1c7ca",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c604c36_39bf8163",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1548775
+      },
+      "writtenOn": "2026-02-27T01:19:55Z",
+      "side": 1,
+      "message": "Hypothetically if someone made a typo like this the script would give a false positive:\n```\npower-state-high-left {\n\tcharge-state \u003d \"LED_PWRS_CHARGE\";\n\t/* Battery percent range 99..100 */\n\tbatt-lvl \u003d \u003c99 100\u003e;\n\n\tcharge-port \u003d \u003c0\u003e; /* Left port */\n\n\tright-led {\n\t\tled-id \u003d \"EC_LED_ID_RIGHT_LED\";\n\n\t\t/* Turn off the right LED */\n\t\tcolor-0 {\n\t\t\tled-color \u003d \u003c\u0026right_led_off\u003e;\n\t\t};\n\t};\n\n\tleft-led {\n\t\tled-id \u003d \"EC_LED_ID_RIGHT_LED\";   \u003c\u003c should be left\n\t\t/* Left LED to White */\n\t\tcolor-1 {\n\t\t\tled-color \u003d \u003c\u0026left_led_white\u003e;\n\t\t};\n\t};\n};\n```",
+      "parentUuid": "0e8b14d2_0176be36",
+      "revId": "d7ffe330ade358fe61103dc9069c0c1cfba1c7ca",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
