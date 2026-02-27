@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7ffcaea3_80ea6fae",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-27T04:30:00Z",
+      "side": 1,
+      "message": "What build is this? I do not see reference of `board_ap_power_shutdown` in that file: [ap_pwrseq_sm.c:215](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/subsys/ap_pwrseq/ap_pwrseq_sm.c;l\u003d215?q\u003dap_pwrseq_sm.c\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch).",
+      "parentUuid": "c96c7a22_5c1064b3",
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6f5a2a2d_b8710e79",
         "filename": "zephyr/program/fatcat/francka/src/board_power.c",
         "patchSetId": 5
@@ -31,6 +49,30 @@
       "writtenOn": "2026-02-26T18:17:38Z",
       "side": 1,
       "message": "As a follow up CL, can we force all fatcat/ocelot boards to use  `CONFIG_AP_PWRSEQ_DRIVER` exclusively?  We shouldn\u0027t be using the older driver on new designs.",
+      "range": {
+        "startLine": 33,
+        "startChar": 8,
+        "endLine": 33,
+        "endChar": 31
+      },
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1711a84_7048945e",
+        "filename": "zephyr/program/fatcat/francka/src/board_power.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-27T04:30:00Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "6f5a2a2d_b8710e79",
       "range": {
         "startLine": 33,
         "startChar": 8,
@@ -66,6 +108,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0e1cc989_071d86ad",
+        "filename": "zephyr/program/nissa/src/board_power.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-27T04:30:00Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "71b52de4_79ff4922",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 40
+      },
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f8bee7d5_730a6751",
         "filename": "zephyr/program/ocelot/ocicat/src/board_power.c",
         "patchSetId": 5
@@ -77,6 +143,30 @@
       "writtenOn": "2026-02-26T18:17:38Z",
       "side": 1,
       "message": "Create a wrapper function.",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 41
+      },
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f54615cb_938696f4",
+        "filename": "zephyr/program/ocelot/ocicat/src/board_power.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-27T04:30:00Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f8bee7d5_730a6751",
       "range": {
         "startLine": 27,
         "startChar": 0,
@@ -112,6 +202,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "77b46484_686b4543",
+        "filename": "zephyr/program/rex/src/board_power.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-27T04:30:00Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c005605c_ede97fc5",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 31
+      },
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3f18523f_dacbf70f",
         "filename": "zephyr/program/trulo/src/board_power.c",
         "patchSetId": 5
@@ -123,6 +237,30 @@
       "writtenOn": "2026-02-26T18:17:38Z",
       "side": 1,
       "message": "Create a wrapper.  A follow up CL should drop CONFIG_AP_PWRSEQ_DRIVER support.",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 40
+      },
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54125158_6648e1bf",
+        "filename": "zephyr/program/trulo/src/board_power.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-27T04:30:00Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "3f18523f_dacbf70f",
       "range": {
         "startLine": 46,
         "startChar": 0,
@@ -158,6 +296,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b6193636_a6800056",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-27T04:30:00Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "fec73f16_5767c415",
+      "range": {
+        "startLine": 264,
+        "startChar": 0,
+        "endLine": 264,
+        "endChar": 47
+      },
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "891e9f2d_0bf91986",
         "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c",
         "patchSetId": 5
@@ -169,6 +331,30 @@
       "writtenOn": "2026-02-26T18:17:38Z",
       "side": 1,
       "message": "```suggestion\n\tif (IS_ENABLED(CONFIG_AP_PWRSEQ_DRIVER)) {\n\t\tap_pwrseq_post_event();\n\t} else {\n\t\tboard_ap_power_force_shutdown();\n\t}\n```",
+      "range": {
+        "startLine": 281,
+        "startChar": 1,
+        "endLine": 281,
+        "endChar": 30
+      },
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10b227a3_84f57327",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-02-27T04:30:00Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "891e9f2d_0bf91986",
       "range": {
         "startLine": 281,
         "startChar": 1,
