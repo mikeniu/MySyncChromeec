@@ -69,6 +69,24 @@
       "parentUuid": "7c604c36_39bf8163",
       "revId": "d7ffe330ade358fe61103dc9069c0c1cfba1c7ca",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "535a1e74_9e6b47d6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-02-27T02:02:39Z",
+      "side": 1,
+      "message": "In your example, a BUILD_ASSERT would fail because the led-id didn\u0027t match the color node. This mistake is difficult to make as it would require multiple inconsistent changes.\n\nMy point is that the original intent of the script (b/303489645) was to ensure a 1:1 correspondence between policy nodes and system states **for each LED ID**, rather than a 1:1:1 mapping between policy nodes, system states, and LEDs.",
+      "parentUuid": "4228c774_4df161be",
+      "revId": "d7ffe330ade358fe61103dc9069c0c1cfba1c7ca",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
