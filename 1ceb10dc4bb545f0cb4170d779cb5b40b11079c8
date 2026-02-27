@@ -119,6 +119,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd0f780a_00bc4537",
+        "filename": "common/fan.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-02-27T11:54:16Z",
+      "side": 1,
+      "message": "Thanks Keith, I got your point. I removed and verified this. It works fine.",
+      "parentUuid": "5caa6a16_edaec9e3",
+      "range": {
+        "startLine": 170,
+        "startChar": 0,
+        "endLine": 171,
+        "endChar": 35
+      },
+      "revId": "1ceb10dc4bb545f0cb4170d779cb5b40b11079c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "10743e37_5db20b27",
