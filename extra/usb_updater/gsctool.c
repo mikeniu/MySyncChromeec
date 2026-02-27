@@ -4964,6 +4964,14 @@ static void print_ti50_misc_status(uint32_t misc_status, uint32_t version)
 	printf("  rdd_detected:          %d\n",
 	       (misc_status & METRICSV_RDD_IS_DETECTED_MASK) >>
 		       METRICSV_RDD_IS_DETECTED_SHIFT);
+	if (version < 5)
+		return;
+	printf("  valid_ek:              %d\n",
+	       (misc_status & METRICSV_VALID_EK_MASK) >>
+		       METRICSV_VALID_EK_SHIFT);
+	printf("  valid_uds_sk:          %d\n",
+	       (misc_status & METRICSV_VALID_UDS_SK_MASK) >>
+		       METRICSV_VALID_UDS_SK_SHIFT);
 }
 
 static int print_ti50_stats(struct ti50_stats_v0 *stats_v0, size_t size)
