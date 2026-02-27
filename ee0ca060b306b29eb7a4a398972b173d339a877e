@@ -46,6 +46,30 @@
       },
       "revId": "ee0ca060b306b29eb7a4a398972b173d339a877e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdf58b27_de88b57d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1520718
+      },
+      "writtenOn": "2026-02-27T10:36:14Z",
+      "side": 1,
+      "message": "Sounds good, thanks for this extra testing! For release servo_micro FW we are using this branch `firmware-servo-12768.B-master`, can I ask you port these two changes and test if that FW also fixes your current issues with Realtek chip. If all good  I will work on releasing new servo_micro FW to all users and fleet once the CPs are merged.",
+      "parentUuid": "cd881876_ef097466",
+      "range": {
+        "startLine": 17,
+        "startChar": 32,
+        "endLine": 17,
+        "endChar": 33
+      },
+      "revId": "ee0ca060b306b29eb7a4a398972b173d339a877e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
