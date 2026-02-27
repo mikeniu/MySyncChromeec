@@ -22,6 +22,30 @@
       },
       "revId": "3eff8b67c589e0c4d8a85c2e9e38c62b89ca2e3e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34b7fbce_4fe6e04c",
+        "filename": "common/panic_output.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-02-27T00:10:36Z",
+      "side": 0,
+      "message": "This logic changed to:\n```\n\tif ((jdata_ptr-\u003emagic !\u003d JUMP_DATA_MAGIC \u0026\u0026\n\t     !system_jumped_to_this_image()) ||\n\t    jdata_ptr-\u003eversion \u003c 1) {\n```\n\nThis fixes two bugs.\n1) JUMP_DATA_MAGIC signals that a jump occurred. It\u0027s zeroed early during system_pre_init to prevent unintentionally signaling that a jump occurred for the next image. So making this a criteria for valid jump data is inaccurate.\n2) This code should be forward compatible with future versions of the jump_data struct. Version 3 of the jump_data struct added a struct_size field. This field allows the move step below to work the same for any future version of the jump_data struct.\n\nWe could add a sanity check, e.g. version \u003c 100, to make this more robust against data corruption.",
+      "parentUuid": "4714bfe6_5b082992",
+      "range": {
+        "startLine": 286,
+        "startChar": 5,
+        "endLine": 286,
+        "endChar": 27
+      },
+      "revId": "3eff8b67c589e0c4d8a85c2e9e38c62b89ca2e3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
