@@ -892,6 +892,7 @@ class AllTests:
                 toggle_power=True
             ),
             TestConfig(test_name="restricted_console"),
+            TestConfig(test_name="retained_mem"),
             TestConfig(test_name="rng_benchmark"),
             TestConfig(
                 config_name="rollback_region0",

@@ -183,6 +183,13 @@ config HW_TEST_REBOOT
 	help
 	  The test verifies basic reboot functionality.
 
+config HW_TEST_RETAINED_MEM
+	bool "Retained memory test"
+	select ZTEST
+	depends on RETAINED_MEM
+	help
+	  The test verifies retained memory functionality.
+
 config HW_TEST_RNG_BENCHMARK
 	bool "RNG benchmark test"
 	select ZTEST
