@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c96c7a22_5c1064b3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-02-27T02:26:08Z",
+      "side": 1,
+      "message": "```\nld.lld: error: undefined symbol: board_ap_power_shutdown\n\u003e\u003e\u003e referenced by ap_pwrseq_sm.c:215 (/mnt/host/source/src/platform/ec/zephyr/subsys/ap_pwrseq/ap_pwrseq_sm.c:215)\n```",
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6f5a2a2d_b8710e79",
         "filename": "zephyr/program/fatcat/francka/src/board_power.c",
         "patchSetId": 5
