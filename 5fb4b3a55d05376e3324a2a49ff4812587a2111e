@@ -34,6 +34,24 @@
       "parentUuid": "7b94fbde_9d9f4136",
       "revId": "5fb4b3a55d05376e3324a2a49ff4812587a2111e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "436d760c_5d162a95",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-02-27T18:18:08Z",
+      "side": 1,
+      "message": "I agree. I just think we should involve some EC guys, maybe there is some deeper background why it\u0027s done this way.",
+      "parentUuid": "460d1d24_54d6a517",
+      "revId": "5fb4b3a55d05376e3324a2a49ff4812587a2111e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
