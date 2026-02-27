@@ -16,6 +16,24 @@
       "message": "super nit: unnecessary line removal",
       "revId": "5a3b8c72229cd1f6d64023cec793eb35d28b4789",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "86db059f_e21c2990",
+        "filename": "common/fpsensor/fpsensor_auth_commands.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-02-27T13:14:16Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "2768f9db_b5edde70",
+      "revId": "5a3b8c72229cd1f6d64023cec793eb35d28b4789",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
