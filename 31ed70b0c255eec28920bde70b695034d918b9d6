@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "862fa46b_236f4b7b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-02-27T00:57:53Z",
+      "side": 1,
+      "message": "```\nAll failed projects: ptlgcs\n\n\n[ptlgcs:rw] devicetree error: /mnt/host/source/src/platform/ec/zephyr/program/intelrvp/ptlrvp/ptlgcs/project.overlay:38 (column 15): parse error: undefined node label \u0027pd_pow_port2\u0027\n```",
+      "revId": "31ed70b0c255eec28920bde70b695034d918b9d6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d56d2b47_e2fbf345",
         "filename": "zephyr/program/intelrvp/ptlrvp/ti_pd.dtsi",
         "patchSetId": 26
