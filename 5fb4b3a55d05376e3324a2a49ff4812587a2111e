@@ -16,6 +16,24 @@
       "message": "Hi Tom. The sys_dev is NULL on sanok renode, because `system_bbram_init` fails due to [the cache problem](b/487848806).",
       "revId": "5fb4b3a55d05376e3324a2a49ff4812587a2111e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "460d1d24_54d6a517",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-02-27T17:16:19Z",
+      "side": 1,
+      "message": "It still seems strange to me that we have two methods of getting the sys_dev binding. It seems like we should use the same pattern everywhere for consistency, unless there\u0027s a good reason not to. As far as I can tell from the history, the static variable was added by Nuvoton in an initial commit, but there\u0027s no explicit reason why it has to be done that way (other than trying to optimize by avoiding calls to `device_get_binding`.",
+      "parentUuid": "7b94fbde_9d9f4136",
+      "revId": "5fb4b3a55d05376e3324a2a49ff4812587a2111e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
