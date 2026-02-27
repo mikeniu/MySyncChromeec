@@ -1,1 +1,1 @@
-../../scripts/firmware_builder_lib.py
+../../zephyr/scripts/firmware_builder_lib.py
