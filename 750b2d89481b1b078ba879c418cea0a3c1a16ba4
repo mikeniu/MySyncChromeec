@@ -34,6 +34,24 @@
       "parentUuid": "0256bc3b_521cc7e5",
       "revId": "750b2d89481b1b078ba879c418cea0a3c1a16ba4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10317c48_4a5ea4d7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-02-28T16:07:19Z",
+      "side": 1,
+      "message": "Portions of the changes would have landed as cherry-picked, I don\u0027t think it\u0027s worth trying to untangle.  You\u0027re welcome to do that, but keeping the repos in sync will be blocked until it\u0027s caught up.",
+      "parentUuid": "1e430f22_8f76d62f",
+      "revId": "750b2d89481b1b078ba879c418cea0a3c1a16ba4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
