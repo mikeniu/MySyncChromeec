@@ -16,6 +16,24 @@
       "message": "It\u0027s annoying to lose the history.\n\nCan you manually cherry-pick the changes? \n\nThat will also link the changes in Gerrit, so it will be easy to confirm that specific changes have landed in both `main` and the `ec-legacy` branch.",
       "revId": "750b2d89481b1b078ba879c418cea0a3c1a16ba4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e430f22_8f76d62f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-02-28T16:04:24Z",
+      "side": 1,
+      "message": "The commit message history is there, there isn\u0027t a good way to replay the history since the associated change-ids are there,",
+      "parentUuid": "0256bc3b_521cc7e5",
+      "revId": "750b2d89481b1b078ba879c418cea0a3c1a16ba4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
