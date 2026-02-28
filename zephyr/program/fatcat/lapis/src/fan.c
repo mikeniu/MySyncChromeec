@@ -16,6 +16,12 @@
 #define TEMP_VR TEMP_SENSOR_ID(DT_NODELABEL(temp_vr))
 #define TEMP_SSD TEMP_SENSOR_ID(DT_NODELABEL(temp_ssd))
 
+#define UP_COUNT 10
+#define DOWN_COUNT 5
+
+static uint8_t trigger_cnt = 0;
+static uint8_t release_cnt = 0;
+
 struct fan_step {
 	int on[TEMP_SENSOR_COUNT];
 	int off[TEMP_SENSOR_COUNT];
@@ -57,15 +63,29 @@ int fan_table_to_rpm(int fan, int *temp)
 		if ((temp[TEMP_VR] >=
 		     fan_step_table[current_level].on[TEMP_VR]) ||
 		    (temp[TEMP_SSD] >=
-		     fan_step_table[current_level].on[TEMP_SSD]))
-			current_level++;
+		     fan_step_table[current_level].on[TEMP_SSD])) {
+			if (++trigger_cnt >= UP_COUNT) {
+				current_level++;
+				trigger_cnt = 0;
+				release_cnt = 0;
+			}
+		} else {
+			trigger_cnt = 0;
+		}
 	} else if ((temp[TEMP_VR] < prev_tmp[TEMP_VR]) ||
 		   (temp[TEMP_SSD] < prev_tmp[TEMP_SSD])) {
 		if ((temp[TEMP_VR] <=
 		     fan_step_table[current_level].off[TEMP_VR]) &&
 		    (temp[TEMP_SSD] <=
-		     fan_step_table[current_level].off[TEMP_SSD]))
-			current_level--;
+		     fan_step_table[current_level].off[TEMP_SSD])) {
+			if (++release_cnt >= DOWN_COUNT) {
+				current_level--;
+				trigger_cnt = 0;
+				release_cnt = 0;
+			}
+		} else {
+			release_cnt = 0;
+		}
 	}
 
 	/* Keep fan level stay in fan steps */
