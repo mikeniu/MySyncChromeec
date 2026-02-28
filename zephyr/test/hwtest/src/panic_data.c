@@ -21,6 +21,10 @@ static const uint32_t crash_addr = (uint32_t)test_crash;
 static const uint32_t crash_addr = (uint32_t)crash_system;
 #endif
 
+#ifdef CONFIG_RISCV
+static const uint32_t RISCV_PANIC_REG_RA 29;
+#endif
+
 /* Estimated end of the crash function. */
 static const uint32_t crash_end = crash_addr + 0x20;
 
@@ -44,10 +48,20 @@ static void check_panic_data(void)
 	/* Make sure Link Register is stored correctly and points at the
 	 * crash_system function. */
 	zassert_true((crash_addr <= lr) && (crash_end >= lr));
-#endif
+
 	/* Check panic flags. */
 	zassert_equal(pdata->flags, PANIC_DATA_FLAG_FRAME_VALID |
 					    PANIC_DATA_FLAG_OLD_HOSTEVENT);
+#elif defined(CONFIG_RISCV)
+	uint32_t lr = pdata->riscv.regs[RISCV_PANIC_REG_RA];
+
+	/* Make sure Link Register is stored correctly and points at the
+	 * crash_system function. */
+	zassert_true((crash_addr <= lr) && (crash_end >= lr));
+
+	/* Check panic flags. */
+	zassert_equal(pdata->flags, PANIC_DATA_FLAG_OLD_HOSTEVENT);
+#endif
 }
 
 static void test_crash(void)
