@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cffdaf70_5b19feaa",
+        "filename": "zephyr/test/hwtest/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-02T06:24:58Z",
+      "side": 1,
+      "message": "Maybe `PLATFORM_EC_BBRAM_TYPE_RETAINED_MEM` instead?",
+      "revId": "89a5808167ddd2cd0933dd921d71ea7be9c80867",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
