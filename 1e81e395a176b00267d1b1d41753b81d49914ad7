@@ -22,6 +22,30 @@
       },
       "revId": "1e81e395a176b00267d1b1d41753b81d49914ad7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "11adfd0c_f13e2c70",
+        "filename": "zephyr/test/jump_data/src/main.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-03-02T22:43:30Z",
+      "side": 1,
+      "message": "Fixed. Required some refactor and https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7624255",
+      "parentUuid": "5012406a_64f52cb7",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 234,
+        "endChar": 10
+      },
+      "revId": "1e81e395a176b00267d1b1d41753b81d49914ad7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
