@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64f642b7_4d59c652",
+        "filename": "zephyr/program/atria/atriarvp-rtk/i2c.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-02T19:57:19Z",
+      "side": 1,
+      "message": "Nit: I still don\u0027t get why this is at the end. Does the DTC compiler require these nodes to come before the ones in `rvp_i2c.dtsi`? If so, it seems like the natural include relationship is inverted.\n\nIt looks like we do this on an ad hoc basis in other projects, and I\u0027m wondering if it\u0027s necessary. At first glance, I don\u0027t see anything like this upstream.",
+      "revId": "003049b965b18cb159c3bcbe1211374b6be61171",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
