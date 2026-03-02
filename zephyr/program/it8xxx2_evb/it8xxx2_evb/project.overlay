@@ -12,3 +12,14 @@
 #include "interrupts.dtsi"
 #include "pwm.dtsi"
 #include "shi.dtsi"
+
+/* For zephyr RTC driver */
+&rtc0 {
+	status = "okay";
+};
+
+/* For CROS RTC driver */
+&cros_rtc {
+	status = "okay";
+};
+
