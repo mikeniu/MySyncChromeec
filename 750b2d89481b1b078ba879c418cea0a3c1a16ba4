@@ -70,6 +70,24 @@
       "parentUuid": "10317c48_4a5ea4d7",
       "revId": "750b2d89481b1b078ba879c418cea0a3c1a16ba4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b6e4aee_5b69f1ac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-02T23:16:32Z",
+      "side": 1,
+      "message": "\u003e The commit message history is there, there isn\u0027t a good way to replay the history since the associated change-ids are there,\n\nI was confused by this, since for this CL I don\u0027t think I see any corresponding `Change-Id` for it in the `ec-legacy` branch (or Gerrit): https://crrev.com/c/7562250",
+      "parentUuid": "d61fa4fa_b368e03e",
+      "revId": "750b2d89481b1b078ba879c418cea0a3c1a16ba4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
