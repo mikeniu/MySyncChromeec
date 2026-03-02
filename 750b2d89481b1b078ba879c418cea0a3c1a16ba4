@@ -88,6 +88,24 @@
       "parentUuid": "d61fa4fa_b368e03e",
       "revId": "750b2d89481b1b078ba879c418cea0a3c1a16ba4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d44e05b_c9792c6c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-02T23:29:47Z",
+      "side": 1,
+      "message": "Ok, I see https://crrev.com/c/7613907 was \"partially\" cherry-picked by copybot. If all of the changes in this CL are like that, there\u0027s nothing we can do except this.\n\nCan you update the commit message to include links to all the original CLs in the `main` branch that this is \"copying\"? That will at least provide some pointers for people in the future trying to figure out where the code came from.",
+      "parentUuid": "1b6e4aee_5b69f1ac",
+      "revId": "750b2d89481b1b078ba879c418cea0a3c1a16ba4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
