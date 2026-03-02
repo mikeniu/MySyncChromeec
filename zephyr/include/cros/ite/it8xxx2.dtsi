@@ -15,6 +15,7 @@
 		cros-ec,raw-kb = &cros_kb_raw;
 		cros-ec,sha = &sha0;
 		cros-ec,watchdog = &twd0;
+		cros,rtc = &cros_rtc;
 	};
 
 	named-bbram-regions {
@@ -74,6 +75,15 @@
 				   &wuc_wu36   /* KSI[6] */
 				   &wuc_wu37>; /* KSI[7] */
 			status = "disabled";
+		};
+
+		cros_rtc: cros_rtc@f01200 {
+			compatible = "ite,it8xxx2-cros-rtc";
+			reg = <0x00f01200 6>;
+			interrupts = <IT8XXX2_IRQ_RTC0 IRQ_TYPE_EDGE_RISING
+				      IT8XXX2_IRQ_RTC1 IRQ_TYPE_EDGE_RISING>;
+			interrupt-parent = <&intc>;
+			status = "okay";
 		};
 	};
 
