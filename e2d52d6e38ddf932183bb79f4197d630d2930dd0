@@ -233,6 +233,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9183309c_6edd7d13",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 56
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-02T09:57:44Z",
+      "side": 1,
+      "message": "During ft_sensor_init",
+      "parentUuid": "ca87cc18_33e3027d",
+      "revId": "e2d52d6e38ddf932183bb79f4197d630d2930dd0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5e658f4c_ef8cfce3",
         "filename": "zephyr/dts/bindings/fingerprint/ft,ft98xx.yaml",
         "patchSetId": 56
