@@ -42,3 +42,11 @@
 		};
 	};
 };
+
+&pwm0 {
+	pwm-init-high;
+};
+
+&pwm1 {
+	pwm-init-high;
+};
