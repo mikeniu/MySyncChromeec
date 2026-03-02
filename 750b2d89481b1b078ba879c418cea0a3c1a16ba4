@@ -52,6 +52,24 @@
       "parentUuid": "1e430f22_8f76d62f",
       "revId": "750b2d89481b1b078ba879c418cea0a3c1a16ba4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d61fa4fa_b368e03e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-02T20:32:13Z",
+      "side": 1,
+      "message": "\u003e You\u0027re welcome to do that, but keeping the repos in sync will be blocked until it\u0027s caught up.\n\nThe branching was initiated by you and you volunteered to support it using your tools (that caused the problem), so I expect you to untangle it and unblock us.\n\nWhy won\u0027t manually cherry-picking each missing change work? Have things somehow been partially synced?",
+      "parentUuid": "10317c48_4a5ea4d7",
+      "revId": "750b2d89481b1b078ba879c418cea0a3c1a16ba4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
