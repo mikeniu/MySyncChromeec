@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed2c22dc_947200e6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 56
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-02T09:28:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c656a074_a20c4c62",
+      "revId": "e2d52d6e38ddf932183bb79f4197d630d2930dd0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cbc6ef53_b8c6d6be",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "fixed",
       "parentUuid": "cbc6ef53_b8c6d6be",
+      "revId": "e2d52d6e38ddf932183bb79f4197d630d2930dd0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cf5fb2a_0f4fffc9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 56
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-02T09:28:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "81be0bef_a77ba44a",
       "revId": "e2d52d6e38ddf932183bb79f4197d630d2930dd0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -118,6 +154,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b350e73d_04f88f17",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.ft",
+        "patchSetId": 56
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-02T09:28:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f74cc32_161aec19",
+      "range": {
+        "startLine": 1,
+        "startChar": 12,
+        "endLine": 1,
+        "endChar": 16
+      },
+      "revId": "e2d52d6e38ddf932183bb79f4197d630d2930dd0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc533467_df991d39",
@@ -149,6 +209,24 @@
       "side": 1,
       "message": "Our sensor will trigger a irq at init, We use this to check the sensor\u0027s irq function works or not.",
       "parentUuid": "bc533467_df991d39",
+      "revId": "e2d52d6e38ddf932183bb79f4197d630d2930dd0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca87cc18_33e3027d",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 56
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-02T09:28:14Z",
+      "side": 1,
+      "message": "`At init` - you mean after power on? Or during `ft_sensor_init` call?",
+      "parentUuid": "d68a6dab_fc1c9856",
       "revId": "e2d52d6e38ddf932183bb79f4197d630d2930dd0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
