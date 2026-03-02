@@ -16,6 +16,24 @@
       "message": "Could it be configured by \"cros-ec,fans\" instead of customization ?",
       "revId": "33825d778aaace9df8597cb858386b618b97ae39",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e92d2180_4497193a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3957207
+      },
+      "writtenOn": "2026-03-02T10:24:13Z",
+      "side": 1,
+      "message": "Because the ocicat project has different sensor temperature requirements for each fan level, I looked into \"cros-ec,fans\" and it seems that it can only use one set of temp / fan-max / off values per sensor to determine the fan levels. This probably can’t meet the ocicat requirements, so we will likely still need to use custom fan control.",
+      "parentUuid": "8a55593f_5d164f44",
+      "revId": "33825d778aaace9df8597cb858386b618b97ae39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
