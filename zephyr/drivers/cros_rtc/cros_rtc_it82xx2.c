@@ -16,7 +16,7 @@
 #include <drivers/cros_rtc.h>
 #include <soc.h>
 
-LOG_MODULE_REGISTER(cros_rtc, LOG_LEVEL_ERR);
+LOG_MODULE_REGISTER(cros_rtc, LOG_LEVEL_DBG);
 
 enum rtc_data_mode {
 	RTC_DAM_BCD,
