@@ -1,0 +1,37 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: ITE, it8xxx2 Real time clock (RTC) node
+
+compatible: "ite,it8xxx2-cros-rtc"
+
+include: base.yaml
+
+properties:
+  reg:
+    required: true
+
+  interrupts:
+    required: true
+
+  data-mode:
+    type: string
+    default: "bcd"
+    enum:
+      - "bcd"
+      - "bin"
+    description: |
+      RTC register data mode configuration.
+      "bcd": RTC registers use BCD format.
+      "bin": RTC registers use binary format.
+      Default: "bcd".
+
+  daylight-saving:
+    type: boolean
+    description: |
+      Enable daylight saving (DS) adjustment.
+      Spring: time advances from 1:59:59 AM to 3:00:00 AM
+              on the first Sunday in April.
+      Fall:   time returns from 1:59:59 AM to 1:00:00 AM
+              on the last Sunday in October.
