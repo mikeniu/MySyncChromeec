@@ -503,8 +503,10 @@ int sbat_emul_get_block_data(const struct emul *emul, int cmd, uint8_t **blk,
  *
  * @param data Pointer to smart battery emulator data
  * @param cmd Command for which PEC is calculated
+ * @param incorrect_pec If emulator should set an incorrect PEC
  */
-static void sbat_emul_append_pec(const struct emul *emul, int cmd)
+static void sbat_emul_append_pec(const struct emul *emul, int cmd,
+				 bool incorrect_pec)
 {
 	uint8_t pec;
 	struct sbat_emul_data *data = emul->data;
@@ -514,6 +516,9 @@ static void sbat_emul_append_pec(const struct emul *emul, int cmd)
 	    BATTERY_SPEC_VER_1_1_WITH_PEC) {
 		pec = sbat_emul_pec_head(cfg->addr, 1, cmd);
 		pec = cros_crc8_arg(data->msg_buf, data->num_to_read, pec);
+		if (incorrect_pec) {
+			pec++;
+		}
 		data->msg_buf[data->num_to_read] = pec;
 		data->num_to_read++;
 	}
@@ -521,7 +526,7 @@ static void sbat_emul_append_pec(const struct emul *emul, int cmd)
 
 /** Check description in emul_smart_battery.h */
 void sbat_emul_set_response(const struct emul *emul, int cmd, uint8_t *buf,
-			    int len, bool fail)
+			    int len, bool fail, bool incorrect_pec)
 {
 	struct sbat_emul_data *data;
 
@@ -536,7 +541,7 @@ void sbat_emul_set_response(const struct emul *emul, int cmd, uint8_t *buf,
 	data->num_to_read = MIN(len, MSG_BUF_LEN - 1);
 	memcpy(data->msg_buf, buf, data->num_to_read);
 	data->bat.error_code = STATUS_CODE_OK;
-	sbat_emul_append_pec(emul, cmd);
+	sbat_emul_append_pec(emul, cmd, incorrect_pec);
 }
 
 /**
@@ -581,7 +586,7 @@ static int sbat_emul_handle_read_msg(const struct emul *emul, int reg)
 		data->msg_buf[0] = word & 0xff;
 		data->msg_buf[1] = (word >> 8) & 0xff;
 		data->bat.error_code = STATUS_CODE_OK;
-		sbat_emul_append_pec(emul, reg);
+		sbat_emul_append_pec(emul, reg, false);
 
 		return 0;
 	}
@@ -596,7 +601,7 @@ static int sbat_emul_handle_read_msg(const struct emul *emul, int reg)
 		data->msg_buf[0] = len;
 		memcpy(&data->msg_buf[1], blk, len);
 		data->bat.error_code = STATUS_CODE_OK;
-		sbat_emul_append_pec(emul, reg);
+		sbat_emul_append_pec(emul, reg, false);
 
 		return 0;
 	}
