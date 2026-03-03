@@ -112,7 +112,6 @@
 #undef CONFIG_ACCELGYRO_BMI3XX
 #undef CONFIG_ACCELGYRO_ICM426XX
 #undef CONFIG_ACCELGYRO_ICM42607
-#undef CONFIG_ACCELGYRO_LSM6DS0
 /* Use CONFIG_ACCELGYRO_LSM6DSM for LSM6DSL, LSM6DSM, and/or LSM6DS3 */
 #undef CONFIG_ACCELGYRO_LSM6DSM
 #undef CONFIG_ACCELGYRO_LSM6DSO
@@ -147,7 +146,6 @@
 #undef CONFIG_AON_RAM_SIZE
 
 /* Add sensorhub function for LSM6DSM, required if 2nd device attached. */
-#undef CONFIG_SENSORHUB_LSM6DSM
 
 /* Specify type of Magnetometer attached. */
 #undef CONFIG_MAG_LIS2MDL
@@ -245,7 +243,6 @@
 #undef CONFIG_ACCELGYRO_BMI260_INT2_OUTPUT
 
 /* Specify type of Gyrometers attached. */
-#undef CONFIG_GYRO_L3GD20H
 
 /*
  * If this is defined, motion_sense sends sensor events to the AP in the format
@@ -323,14 +320,12 @@
  * Some ALS modules may be connected to the EC. We need the command, and
  * specific drivers for each module.
  */
-#undef CONFIG_ALS_AL3010
 #undef CONFIG_ALS_BH1730
 /*
  * If defined, BH1730 uses board specific lux calculation formula parameters.
  * If not defined, BH1730 uses default parameters to calculate lux.
  */
 #undef CONFIG_ALS_BH1730_LUXTH_PARAMS
-#undef CONFIG_ALS_ISL29035
 #undef CONFIG_ALS_OPT3001
 #undef CONFIG_ALS_CM32183
 /* Define the exact model ID present on the board: SI1141 = 41, SI1142 = 42, */
@@ -473,9 +468,7 @@
  * of this file. If you add a new config here, you'll need to update that
  * check.
  */
-#undef CONFIG_BATTERY_BQ20Z453
 #undef CONFIG_BATTERY_BQ27541
-#undef CONFIG_BATTERY_BQ27621
 #undef CONFIG_BATTERY_BQ4050
 #undef CONFIG_BATTERY_MAX17055
 #undef CONFIG_BATTERY_MM8013
@@ -938,9 +931,6 @@
 
 /* Compile charger-specific code for these chargers (pick at most one) */
 #undef CONFIG_CHARGER_BD9995X
-#undef CONFIG_CHARGER_BQ24715
-#undef CONFIG_CHARGER_BQ24770
-#undef CONFIG_CHARGER_BQ24773
 #undef CONFIG_CHARGER_BQ25710
 #undef CONFIG_CHARGER_BQ25720
 #undef CONFIG_CHARGER_BQ25770
@@ -948,16 +938,12 @@
 #undef CONFIG_CHARGER_ISL9238 /* For ISL9238 A/B */
 #undef CONFIG_CHARGER_ISL9238C
 #undef CONFIG_CHARGER_ISL9241
-#undef CONFIG_CHARGER_ISL95522
 #undef CONFIG_CHARGER_MT6370
 #undef CONFIG_CHARGER_RAA489000
 #undef CONFIG_CHARGER_RAA489110
 #undef CONFIG_CHARGER_RT9466
 #undef CONFIG_CHARGER_RT9467
-#undef CONFIG_CHARGER_RT9478
-#undef CONFIG_CHARGER_RT9490
 #undef CONFIG_CHARGER_SM5803
-#undef CONFIG_CHARGER_SY21612
 
 /* Allow run-time completion of the charger driver structure */
 #undef CONFIG_CHARGER_RUNTIME_CONFIG
@@ -1111,11 +1097,9 @@
  * to keep the bq25710 in performance mode when the AP is in S0.
  */
 #undef CONFIG_CHARGER_BQ25710_IDCHG_LIMIT_MA
-#undef CONFIG_CHARGER_RT9478_IDCHG_LIMIT_MA
 
 /* Enable if CONFIG_CHARGER_BQ25720_VSYS_TH2_DV should be applied */
 #undef CONFIG_CHARGER_BQ25720_VSYS_TH2_CUSTOM
-#undef CONFIG_CHARGER_RT9478_VSYS_TH2_CUSTOM
 
 /*
  * This config option is used to set the charger's VSYS voltage
@@ -1126,11 +1110,9 @@
  * 8.0v.
  */
 #undef CONFIG_CHARGER_BQ25720_VSYS_TH2_DV
-#undef CONFIG_CHARGER_RT9478_VSYS_TH2_DV
 
 /* Enable if CONFIG_CHARGER_BQ25720_VSYS_UVP should be applied */
 #undef CONFIG_CHARGER_BQ25720_VSYS_UVP_CUSTOM
-#undef CONFIG_CHARGER_RT9478_VSYS_UVP_CUSTOM
 
 /*
  * This config option is used to set the VSYS under voltage (VSYS_UVP)
@@ -1139,11 +1121,9 @@
  * in the range of 2.4 V to 8.0 V to be specified.
  */
 #undef CONFIG_CHARGER_BQ25720_VSYS_UVP
-#undef CONFIG_CHARGER_RT9478_VSYS_UVP
 
 /* Enable if CONFIG_CHARGER_BQ25720_IDCHG_DEG2 should be applied */
 #undef CONFIG_CHARGER_BQ25720_IDCHG_DEG2_CUSTOM
-#undef CONFIG_CHARGER_RT9478_IDCHG_DEG2_CUSTOM
 
 /*
  * This config option is used to set the 2nd battery discharge current
@@ -1152,11 +1132,9 @@
  * to 12 ms.
  */
 #undef CONFIG_CHARGER_BQ25720_IDCHG_DEG2
-#undef CONFIG_CHARGER_RT9478_IDCHG_DEG2
 
 /* Enable if CONFIG_CHARGER_BQ25720_IDCHG_TH2 should be applied */
 #undef CONFIG_CHARGER_BQ25720_IDCHG_TH2_CUSTOM
-#undef CONFIG_CHARGER_RT9478_IDCHG_TH2_CUSTOM
 
 /*
  * This config option is used to set the charger's 2nd battery discharge
@@ -1165,15 +1143,12 @@
  * 125% to 400%.
  */
 #undef CONFIG_CHARGER_BQ25720_IDCHG_TH2
-#undef CONFIG_CHARGER_RT9478_IDCHG_TH2
 
 /* Value of the bq25710 charge sense resistor, in mOhms */
 #undef CONFIG_CHARGER_BQ25710_SENSE_RESISTOR
-#undef CONFIG_CHARGER_RT9478_SENSE_RESISTOR
 
 /* Value of the bq25710 input current sense resistor, in mOhms */
 #undef CONFIG_CHARGER_BQ25710_SENSE_RESISTOR_AC
-#undef CONFIG_CHARGER_RT9478_SENSE_RESISTOR_IN
 
 /* Value of the bq25770 charge sense resistor, in mOhms */
 #undef CONFIG_CHARGER_BQ25770_SENSE_RESISTOR
@@ -1189,7 +1164,6 @@
  * enabled for meaningful results.
  */
 #undef CONFIG_CHARGER_BQ25710_PSYS_SENSING
-#undef CONFIG_CHARGER_RT9478_PSYS_SENSING
 
 /*
  * This config option is used to change the charger's internal
@@ -1198,7 +1172,6 @@
  * of 2.3 V.
  */
 #undef CONFIG_CHARGER_BQ25710_CMP_REF_1P2
-#undef CONFIG_CHARGER_RT9478_CMP_REF_1P2
 
 /*
  * This config option is used to change the charger's independent comparator
@@ -1206,11 +1179,9 @@
  * CMPOUT is LOW (internal hysteresis).
  */
 #undef CONFIG_CHARGER_BQ25710_CMP_POL_EXTERNAL
-#undef CONFIG_CHARGER_RT9478_CMP_POL_POSITIVE
 
 /* Enable if CONFIG_CHARGER_BQ25710_PKPWR_TOVLD_DEG should be applied */
 #undef CONFIG_CHARGER_BQ25710_PKPWR_TOVLD_DEG_CUSTOM
-#undef CONFIG_CHARGER_RT9478_PKPWR_TOVLD_DEG_CUSTOM
 
 /*
  * Input overload time when in peak power mode (PKPWR_TOVLD_DEG). This
@@ -1219,7 +1190,6 @@
  * bq25720 1 ms to 10 ms can be encoded.
  */
 #undef CONFIG_CHARGER_BQ25710_PKPWR_TOVLD_DEG
-#undef CONFIG_CHARGER_RT9478_PKPWR_TOVLD_DEG
 
 /*
  * This config option is used to enable the charger's AC over-current
@@ -1227,7 +1197,6 @@
  * reached. The threshold is selected using the ACOC_VTH bit.
  */
 #undef CONFIG_CHARGER_BQ25710_EN_ACOC
-#undef CONFIG_CHARGER_RT9478_EN_IBUS_OCP1
 
 /*
  * This config option selects which ACOC protection threshold is used
@@ -1235,7 +1204,6 @@
  * the default is 200% of ILIM2.
  */
 #undef CONFIG_CHARGER_BQ25710_ACOC_VTH_1P33
-#undef CONFIG_CHARGER_RT9478_IBUS_OCP1_TH_1P33
 
 /*
  * This config option selects the minimum BATOC protection threshold to
@@ -1244,7 +1212,6 @@
  * default threshold is 200% on both chips.
  */
 #undef CONFIG_CHARGER_BQ25710_BATOC_VTH_MINIMUM
-#undef CONFIG_CHARGER_RT9478_BATOC_VTH_MINIMUM
 
 /*
  * This config option sets the PP_INOM bit in Prochot Option 1
@@ -1253,7 +1220,6 @@
  * current setting).
  */
 #undef CONFIG_CHARGER_BQ25710_PP_INOM
-#undef CONFIG_CHARGER_RT9478_PP_INOM
 
 /*
  * This config option sets the PP_BATPRES bit in Prochot Option 1
@@ -1261,7 +1227,6 @@
  * removed.
  */
 #undef CONFIG_CHARGER_BQ25710_PP_BATPRES
-#undef CONFIG_CHARGER_RT9478_PP_BATGONE
 
 /*
  * This config option sets the PP_ACOK in Prochot Option 1
@@ -1269,7 +1234,6 @@
  * removed.
  */
 #undef CONFIG_CHARGER_BQ25710_PP_ACOK
-#undef CONFIG_CHARGER_RT9478_PP_VBUSOK
 
 /*
  * This config option sets the PP_COMP in Prochot Option 1
@@ -1277,7 +1241,6 @@
  * and its PROCHOT profile.
  */
 #undef CONFIG_CHARGER_BQ25710_PP_COMP
-#undef CONFIG_CHARGER_RT9478_PP_COMP
 
 /*
  * This config option sets the PP_IDCHG2 bit in the Charge Option 4
@@ -1285,11 +1248,9 @@
  */
 
 #undef CONFIG_CHARGER_BQ25720_PP_IDCHG2
-#undef CONFIG_CHARGER_RT9478_PP_IDCHG2
 
 /* Enable if CONFIG_CHARGER_BQ25710_VSYS_MIN_VOLTAGE_MV should be applied */
 #undef CONFIG_CHARGER_BQ25710_VSYS_MIN_VOLTAGE_CUSTOM
-#undef CONFIG_CHARGER_RT9478_VSYS_MIN_VOLTAGE_CUSTOM
 
 /*
  * This config option sets the minimum system voltage in
@@ -1300,10 +1261,6 @@
  * battery cells connected in series using the CELL_BATPRESZ strap.
  */
 #undef CONFIG_CHARGER_BQ25710_VSYS_MIN_VOLTAGE_MV
-#undef CONFIG_CHARGER_RT9478_VSYS_MIN_VOLTAGE_MV
-
-/* Enable if CONFIG_CHARGER_RT9478_IAICR2 should be applied */
-#undef CONFIG_CHARGER_RT9478_IAICR2_CUSTOM
 
 /*
  * This config option sets percentage of IAICR1 as threshold. ICRIT threshold is
@@ -1313,7 +1270,6 @@
  * 26 - 30: 250% - 450%, step is 50%.
  * 31: Out of range (ignored).
  */
-#undef CONFIG_CHARGER_RT9478_IAICR2
 /*
  * Board specific maximum input current limit, in mA.
  */
@@ -3021,7 +2977,6 @@
 /******************************************************************************/
 
 /* Support CCGXXF I/O expander built inside PD chip */
-#undef CONFIG_IO_EXPANDER_CCGXXF
 
 /*
  * Support IT8801 I/O expander.
@@ -3038,7 +2993,6 @@
 #undef CONFIG_IO_EXPANDER_NCT38XX
 
 /* Support NXP PCA9534 I/O expander. */
-#undef CONFIG_IO_EXPANDER_PCA9534
 
 /* Support NXP PCA9675 I/O expander. */
 #undef CONFIG_IO_EXPANDER_PCA9675
@@ -3429,10 +3383,8 @@
 #undef CONFIG_LED_POWER_ACTIVE_LOW
 
 /* Support for LED driver chip(s) */
-#undef CONFIG_LED_DRIVER_DS2413 /* Maxim DS2413, on one-wire interface */
 #undef CONFIG_LED_DRIVER_LM3509 /* LM3509, on I2C interface */
 #undef CONFIG_LED_DRIVER_LM3630A /* LM3630A, on I2C interface */
-#undef CONFIG_LED_DRIVER_LP5562 /* LP5562, on I2C interface */
 #undef CONFIG_LED_DRIVER_MP3385 /* MPS MP3385, on I2C */
 #undef CONFIG_LED_DRIVER_OZ554 /* O2Micro OZ554, on I2C */
 #undef CONFIG_LED_DRIVER_IS31FL3733B /* Lumissil IS31FL3733B on I2C */
@@ -3645,7 +3597,6 @@
  * Define Megachips DisplayPort to HDMI protocol converter/level shifter serial
  * interface.
  */
-#undef CONFIG_MCDP28X0
 
 /* Minute-IA watchdog timer vector number. */
 #define CONFIG_MIA_WDT_VEC 0xFF
@@ -3929,7 +3880,6 @@
 #undef CONFIG_PS2
 
 /* Support Power Sourcing Equipment */
-#undef CONFIG_PSE_LTC4291
 
 /*
  * Define this option to enable programmable voltage detector which will
@@ -4045,7 +3995,6 @@
 #undef CONFIG_ROM_SIZE
 
 /* Support IR357x Link voltage regulator debugging / reprogramming */
-#undef CONFIG_REGULATOR_IR357X
 
 /* Support RMA auth challenge-response */
 #undef CONFIG_RMA_AUTH
@@ -4426,22 +4375,14 @@
 #undef CONFIG_TEMP_SENSOR
 
 /* Support particular temperature sensor chips */
-#undef CONFIG_TEMP_SENSOR_ADT7481 /* ADT 7481 sensor, on I2C bus */
 #undef CONFIG_TEMP_SENSOR_BD99992GW /* BD99992GW PMIC, on I2C bus */
-#undef CONFIG_TEMP_SENSOR_EC_ADC /* Thermistors on EC's own ADC */
 #undef CONFIG_TEMP_SENSOR_G753 /* G753 sensor, on I2C bus */
-#undef CONFIG_TEMP_SENSOR_G781 /* G781 sensor, on I2C bus */
-#undef CONFIG_TEMP_SENSOR_G782 /* G782 sensor, on I2C bus */
 #undef CONFIG_TEMP_SENSOR_OTI502 /* OTI502 sensor, on I2C bus */
 #undef CONFIG_TEMP_SENSOR_PCT2075 /* PCT2075 sensor, on I2C bus */
 #undef CONFIG_TEMP_SENSOR_SB_TSI /* SB_TSI sensor, on I2C bus */
-#undef CONFIG_TEMP_SENSOR_TMP006 /* TI TMP006 sensor, on I2C bus */
 #undef CONFIG_TEMP_SENSOR_TMP112 /* TI TMP112 sensor, on I2C bus */
-#undef CONFIG_TEMP_SENSOR_TMP411 /* TI TMP411 sensor, on I2C bus */
 #undef CONFIG_TEMP_SENSOR_TMP432 /* TI TMP432 sensor, on I2C bus */
-#undef CONFIG_TEMP_SENSOR_TMP468 /* TI TMP468 sensor, on I2C bus */
 #undef CONFIG_TEMP_SENSOR_F75303 /* Fintek  F75303 sensor, on I2C bus */
-#undef CONFIG_TEMP_SENSOR_AMD_R19ME4070 /* AMD_R19ME4070 sensor, on I2C bus */
 
 /* Compile common code for thermistor support */
 #undef CONFIG_THERMISTOR
@@ -4536,7 +4477,6 @@
 #undef CONFIG_TOUCHPAD_ELAN
 
 /* Enable Goodix GT7288 driver */
-#undef CONFIG_TOUCHPAD_GT7288
 
 /* Enable ST driver */
 #undef CONFIG_TOUCHPAD_ST
@@ -5130,7 +5070,6 @@
 #undef CONFIG_USB_PD_TCPM_FUSB302
 #undef CONFIG_USB_PD_TCPM_ITE_ON_CHIP
 #undef CONFIG_USB_PD_TCPM_ANX3429
-#undef CONFIG_USB_PD_TCPM_ANX7406
 #undef CONFIG_USB_PD_TCPM_ANX740X
 #undef CONFIG_USB_PD_TCPM_ANX741X
 #undef CONFIG_USB_PD_TCPM_ANX7447
@@ -5141,9 +5080,7 @@
 #undef CONFIG_USB_PD_TCPM_RAA489000
 #undef CONFIG_USB_PD_TCPM_RT1715
 #undef CONFIG_USB_PD_TCPM_RT1718S
-#undef CONFIG_USB_PD_TCPM_FUSB307
 #undef CONFIG_USB_PD_TCPM_STM32GX
-#undef CONFIG_USB_PD_TCPM_CCGXXF
 
 /* PS8XXX series are all supported by a single driver with a build time config
  * listed below (CONFIG_USB_PD_TCPM_PS*) defined to enable the specific product.
@@ -5185,11 +5122,8 @@
 /*
  * Type-C retimer drivers to be used.
  */
-#undef CONFIG_USBC_RETIMER_ANX7483
-#undef CONFIG_USBC_RETIMER_ANX7452
 #undef CONFIG_USBC_RETIMER_INTEL_BB
 #undef CONFIG_USBC_RETIMER_KB800X
-#undef CONFIG_USBC_RETIMER_KB8010
 #undef CONFIG_USBC_RETIMER_NB7V904M
 #undef CONFIG_USBC_RETIMER_PI3DPX1207
 #undef CONFIG_USBC_RETIMER_PI3HDX1204
@@ -5201,7 +5135,6 @@
 /*
  * DP redriver drivers to be used.
  */
-#undef CONFIG_DP_REDRIVER_TDP142
 
 /*
  * Define this to enable Type-C retimer firmware update. Each Type-C retimer
@@ -5410,14 +5343,12 @@
 
 /* USB Type-C Power Path Controllers (PPC) */
 #undef CONFIG_USBC_PPC_AOZ1380
-#undef CONFIG_USBC_PPC_KTU1125
 #undef CONFIG_USBC_PPC_NX20P3481
 #undef CONFIG_USBC_PPC_NX20P3483
 #undef CONFIG_USBC_PPC_RT1718S
 #undef CONFIG_USBC_PPC_SN5S330
 #undef CONFIG_USBC_PPC_SYV682C
 #undef CONFIG_USBC_PPC_SYV682X
-#undef CONFIG_USBC_PPC_TCPCI
 
 /*
  * NX20P348x 5V SRC RCP trigger level at 10mV. Define to enable 5V SRC RCP
@@ -5752,7 +5683,6 @@
  * Support the Analogix ANX7440 USB Type-C Active mux with
  * Integrated Re-timers for USB3.1/DisplayPort.
  */
-#undef CONFIG_USB_MUX_ANX7440
 
 /*
  * Support the Analogix ANX7451 10G Active Mux (4x4) with
@@ -6518,8 +6448,7 @@
 
 /*****************************************************************************/
 /* Define CONFIG_BATTERY if board has a battery. */
-#if defined(CONFIG_BATTERY_BQ20Z453) || defined(CONFIG_BATTERY_BQ27541) ||    \
-	defined(CONFIG_BATTERY_BQ27621) || defined(CONFIG_BATTERY_BQ4050) ||  \
+#if defined(CONFIG_BATTERY_BQ27541) || defined(CONFIG_BATTERY_BQ4050) ||      \
 	defined(CONFIG_BATTERY_MAX17055) || defined(CONFIG_BATTERY_MM8013) || \
 	defined(CONFIG_BATTERY_SMART)
 #define CONFIG_BATTERY
@@ -6549,13 +6478,13 @@
 /*****************************************************************************/
 /* Define CONFIG_USBC_PPC if board has a USB Type-C Power Path Controller. */
 #if defined(CONFIG_USBC_PPC_AOZ1380) || defined(CONFIG_USBC_PPC_NX20P3483) || \
-	defined(CONFIG_USBC_PPC_SN5S330) || defined(CONFIG_USBC_PPC_TCPCI)
+	defined(CONFIG_USBC_PPC_SN5S330)
 #define CONFIG_USBC_PPC
 #endif /* "has a PPC" */
 
 /* Following chips use Power Path Control information from TCPC chip */
 #if defined(CONFIG_USBC_PPC_AOZ1380) || defined(CONFIG_USBC_PPC_NX20P3481) || \
-	defined(CONFIG_USBC_PPC_NX20P3483) || defined(CONFIG_USBC_PPC_TCPCI)
+	defined(CONFIG_USBC_PPC_NX20P3483)
 #define CONFIG_USB_PD_PPC
 #endif
 
@@ -6589,26 +6518,12 @@
 #endif
 #endif
 
-/* CCGXXF standard default defines */
-#if defined(CONFIG_USB_PD_TCPM_CCGXXF)
-#define CONFIG_USB_PD_DISCHARGE_TCPC
-#define CONFIG_USB_PD_DUAL_ROLE_AUTO_TOGGLE
-#define CONFIG_USB_PD_PPC
-#define CONFIG_USB_PD_TCPM_SBU
-#define CONFIG_USB_PD_TCPC_LOW_POWER
-#define CONFIG_USB_PD_TCPM_TCPCI
-#define CONFIG_USB_PD_VBUS_DETECT_TCPC
-#endif
-
 /*****************************************************************************/
 /* Define CONFIG_USBC_OCP if a component can detect overcurrent */
-#if defined(CONFIG_USBC_PPC_AOZ1380) || defined(CONFIG_USBC_PPC_KTU1125) ||   \
-	defined(CONFIG_USBC_PPC_NX20P3481) ||                                 \
+#if defined(CONFIG_USBC_PPC_AOZ1380) || defined(CONFIG_USBC_PPC_NX20P3481) || \
 	defined(CONFIG_USBC_PPC_NX20P3483) ||                                 \
 	defined(CONFIG_USBC_PPC_SN5S330) ||                                   \
-	defined(CONFIG_USBC_PPC_SYV682X) || defined(CONFIG_CHARGER_SM5803) || \
-	defined(CONFIG_USB_PD_TCPM_TCPCI) ||                                  \
-	defined(CONFIG_USB_PD_TCPM_ANX7406)
+	defined(CONFIG_USBC_PPC_SYV682X) || defined(CONFIG_CHARGER_SM5803)
 #define CONFIG_USBC_OCP
 #endif
 
@@ -6618,11 +6533,10 @@
  * supports VBUS measurement.
  */
 #if defined(CONFIG_CHARGER_BD9995X) || defined(CONFIG_CHARGER_RT9466) ||      \
-	defined(CONFIG_CHARGER_RT9467) || defined(CONFIG_CHARGER_RT9490) ||   \
-	defined(CONFIG_CHARGER_MT6370) || defined(CONFIG_CHARGER_BQ25710) ||  \
-	defined(CONFIG_CHARGER_BQ25720) || defined(CONFIG_CHARGER_ISL9241) || \
-	defined(CONFIG_CHARGER_RAA489110) ||                                  \
-	defined(CONFIG_CHARGER_BQ25770) || defined(CONFIG_CHARGER_RT9478)
+	defined(CONFIG_CHARGER_RT9467) || defined(CONFIG_CHARGER_MT6370) ||   \
+	defined(CONFIG_CHARGER_BQ25710) || defined(CONFIG_CHARGER_BQ25720) || \
+	defined(CONFIG_CHARGER_ISL9241) ||                                    \
+	defined(CONFIG_CHARGER_RAA489110) || defined(CONFIG_CHARGER_BQ25770)
 #if !defined(CONFIG_USB_PD_VBUS_MEASURE_TCPC) &&              \
 	!defined(CONFIG_USB_PD_VBUS_MEASURE_ADC_EACH_PORT) && \
 	!defined(CONFIG_USB_PD_VBUS_MEASURE_BY_BOARD)
@@ -6669,9 +6583,7 @@
 	defined(CONFIG_CHARGER_ISL9238C) || defined(CONFIG_CHARGER_ISL9241) || \
 	defined(CONFIG_CHARGER_RAA489000) || defined(CONFIG_CHARGER_SM5803) || \
 	defined(CONFIG_CHARGER_BQ25710) || defined(CONFIG_CHARGER_BQ25720) ||  \
-	defined(CONFIG_CHARGER_BQ25770) ||                                     \
-	defined(CONFIG_CHARGER_RAA489110) || defined(CONFIG_CHARGER_RT9490) || \
-	defined(CONFIG_CHARGER_RT9478)
+	defined(CONFIG_CHARGER_BQ25770) || defined(CONFIG_CHARGER_RAA489110)
 #define CONFIG_CHARGER_NARROW_VDC
 #endif
 
@@ -7128,13 +7040,6 @@
 #define CONFIG_MAG_BMM150
 #ifndef CONFIG_ACCELGYRO_SEC_ADDR_FLAGS
 #error "The i2c address of the magnetometer is not set."
-#endif
-#endif
-
-/* Verify sensorhub is enabled */
-#ifdef CONFIG_MAG_LSM6DSM_LIS2MDL
-#ifndef CONFIG_SENSORHUB_LSM6DSM
-#error "Enable SENSORHUB_LSM6DSM."
 #endif
 #endif
 
