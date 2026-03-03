@@ -416,21 +416,7 @@ board_allow_i2c_passthru(const struct i2c_cmd_desc_t *cmd_desc);
  */
 int board_is_i2c_port_powered(int port);
 
-/**
- * Defined in common/i2c_trace.c, used by i2c controller to notify tracing
- * functionality of transactions.
- *
- * @param port: I2C port number
- * @param addr_flags: peripheral device address
- * @param out_data: pointer to data written
- * @param out_size: size of data written
- * @param in_data: pointer to data read
- * @param in_size: size of data read
- * @param ret: return of i2c transaction (EC_SUCCESS or otherwise on failure)
- */
-void i2c_trace_notify(int port, uint16_t addr_flags, const uint8_t *out_data,
-		      size_t out_size, const uint8_t *in_data, size_t in_size,
-		      int ret);
+
 
 /**
  * Convert an enum i2c_freq constant to numeric frequency in kHz.

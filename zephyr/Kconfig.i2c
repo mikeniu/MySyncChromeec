@@ -17,16 +17,6 @@ config PLATFORM_EC_I2C
 
 if PLATFORM_EC_I2C
 
-config PLATFORM_EC_I2C_DEBUG
-	bool "I2C Tracing"
-	help
-	  This option enables I2C bus communication tracing. Use the console
-	  command "i2ctrace" to enable and disable tracing on specific I2C
-	  peripherals.
-
-	  Please see the I2C debugging documentation for more details:
-
-	  https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/docs/i2c-debugging.md
 
 config PLATFORM_EC_I2C_PASSTHRU_RESTRICTED
 	bool "Restrict I2C PASSTHRU command"

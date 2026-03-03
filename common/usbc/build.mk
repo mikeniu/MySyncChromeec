@@ -22,7 +22,6 @@ ifneq ($(CONFIG_USB_PE_SM),)
 common-usbc-$(CONFIG_USB_DRP_ACC_TRYSRC) += usbc_pd_policy.o
 common-usbc-$(CONFIG_USB_DRP_ACC_TRYSRC) += usb_pe_drp_sm.o
 common-usbc-$(CONFIG_USB_DRP_ACC_TRYSRC) += usb_pd_dpm.o
-common-usbc-$(CONFIG_USB_PD_VDM_AP_CONTROL) += ap_vdm_control.o
 common-usbc-$(CONFIG_USB_PD_DP_MODE) += dp_alt_mode.o
 common-usbc-$(CONFIG_USB_PD_DP_HPD_GPIO) += dp_hpd_gpio.o
 common-usbc-$(CONFIG_USB_PD_TBT_COMPAT_MODE) += tbt_alt_mode.o
