@@ -124,5 +124,9 @@
  * @param port: The Type-C port which triggered the interrupt.
  */
 __override_proto int board_nx20p348x_init(int port);
+int nx20p348x_dump(int port);
+int nx20p348x_discharge_vbus(int port, int enable);
+int nx20p3483_vbus_sink_enable(int port, int enable);
+int nx20p3483_vbus_source_enable(int port, int enable);
 
 #endif /* defined(__CROS_EC_NX20P348X_H) */

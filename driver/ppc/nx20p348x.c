@@ -102,7 +102,7 @@ static int nx20p348x_set_vbus_source_current_limit(int port,
 	return write_reg(port, NX20P348X_5V_SRC_OCP_THRESHOLD_REG, regval);
 }
 
-static int nx20p348x_discharge_vbus(int port, int enable)
+int nx20p348x_discharge_vbus(int port, int enable)
 {
 	int regval;
 	int newval;
@@ -196,7 +196,7 @@ __maybe_unused static int nx20p3481_vbus_source_enable(int port, int enable)
 	return EC_SUCCESS;
 }
 
-__maybe_unused static int nx20p3483_vbus_sink_enable(int port, int enable)
+int nx20p3483_vbus_sink_enable(int port, int enable)
 {
 	int rv;
 
@@ -210,6 +210,8 @@ __maybe_unused static int nx20p3483_vbus_sink_enable(int port, int enable)
 	rv = tcpm_set_snk_ctrl(port, enable);
 	if (rv)
 		return rv;
+	CPRINTS("nx20p3483_vbus_sink_enable");
+	nx20p348x_dump(port);
 
 	/*
 	 * The sink overvoltage protection is set to maximum possible value
@@ -240,7 +242,7 @@ __maybe_unused static int nx20p3483_vbus_sink_enable(int port, int enable)
 	return EC_ERROR_TIMEOUT;
 }
 
-__maybe_unused static int nx20p3483_vbus_source_enable(int port, int enable)
+int nx20p3483_vbus_source_enable(int port, int enable)
 {
 	int rv;
 
@@ -262,6 +264,8 @@ __maybe_unused static int nx20p3483_vbus_source_enable(int port, int enable)
 		else
 			nx20p348x_discharge_vbus(port, 1);
 	}
+	CPRINTS("nx20p3483_vbus_source_enable");
+	nx20p348x_dump(port);
 
 	/*
 	 * Wait up to NX20P348X_SWITCH_STATUS_DEBOUNCE_MSEC for the status
@@ -516,7 +520,7 @@ test_mockable void nx20p348x_interrupt(int port)
 }
 
 #ifdef CONFIG_CMD_PPC_DUMP
-static int nx20p348x_dump(int port)
+int nx20p348x_dump(int port)
 {
 	int reg_addr;
 	int reg;

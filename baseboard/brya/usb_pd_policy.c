@@ -10,8 +10,11 @@
 #include "common.h"
 #include "compile_time_macros.h"
 #include "console.h"
+#include "driver/tcpm/tcpci.h"
 #include "ec_commands.h"
 #include "gpio.h"
+#include "nct38xx.h"
+#include "nx20p348x.h"
 #include "timer.h"
 #include "usb_mux.h"
 #include "usb_pd.h"
@@ -53,20 +56,56 @@ void pd_power_supply_reset(int port)
 int pd_set_power_supply_ready(int port)
 {
 	int rv;
+	int reg;
 
-	/* Disable charging. */
+	CPRINTS("C%d: PD Set Power Supply Ready", port);
+
+	/* Disable charging */
 	rv = ppc_vbus_sink_enable(port, 0);
-	if (rv)
+	if (rv) {
+		CPRINTS("C%d: Failed to disable sink", port);
 		return rv;
+	}
 
-	pd_set_vbus_discharge(port, 0);
+	/* Read CTRL_OUT_EN to verify SNKEN/SRCEN */
+	rv = tcpc_read(port, NCT38XX_REG_CTRL_OUT_EN, &reg);
+	if (!rv) {
+		CPRINTS("C%d: CTRL_OUT_EN after sink disable: 0x%02x (SRCEN=%d, SNKEN=%d)",
+			port, reg, !!(reg & NCT38XX_REG_CTRL_OUT_EN_SRCEN),
+			!!(reg & NCT38XX_REG_CTRL_OUT_EN_SNKEN));
+	}
 
-	/* Provide Vbus. */
+	ppc_discharge_vbus(port, 0);
+
+	/* Read POWER_STATUS to confirm sink off */
+	rv = tcpc_read(port, TCPC_REG_POWER_STATUS, &reg);
+	if (!rv) {
+		CPRINTS("C%d: POWER_STATUS after sink disable: 0x%02x", port,
+			reg);
+	}
+
+	/* Provide Vbus */
 	rv = ppc_vbus_source_enable(port, 1);
-	if (rv)
+	if (rv) {
+		CPRINTS("C%d: Failed to enable source", port);
 		return rv;
+	}
 
-	/* Notify host of power info change. */
+	/* Read CTRL_OUT_EN to verify SRCEN/SNKEN */
+	rv = tcpc_read(port, NCT38XX_REG_CTRL_OUT_EN, &reg);
+	if (!rv) {
+		CPRINTS("C%d: CTRL_OUT_EN after source enable: 0x%02x (SRCEN=%d, SNKEN=%d)",
+			port, reg, !!(reg & NCT38XX_REG_CTRL_OUT_EN_SRCEN),
+			!!(reg & NCT38XX_REG_CTRL_OUT_EN_SNKEN));
+	}
+
+	/* Read POWER_STATUS to confirm source enabled */
+	rv = tcpc_read(port, TCPC_REG_POWER_STATUS, &reg);
+	if (!rv) {
+		CPRINTS("C%d: POWER_STATUS after source enable: 0x%02x", port,
+			reg);
+	}
+
 	pd_send_host_event(PD_EVENT_POWER_CHANGE);
 
 	return EC_SUCCESS;
