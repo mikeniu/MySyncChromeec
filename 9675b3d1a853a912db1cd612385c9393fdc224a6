@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01b94f96_7318569a",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx_private.h",
+        "patchSetId": 59
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-03T12:30:17Z",
+      "side": 1,
+      "message": "This is never called. Do we need to register the malloc and free functions?",
+      "revId": "9675b3d1a853a912db1cd612385c9393fdc224a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbb00511_6495a4c2",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx_private.h",
+        "patchSetId": 59
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-03T12:30:17Z",
+      "side": 1,
+      "message": "`dintance` seems to be a typo for `distance`.",
+      "range": {
+        "startLine": 270,
+        "startChar": 0,
+        "endLine": 270,
+        "endChar": 0
+      },
+      "revId": "9675b3d1a853a912db1cd612385c9393fdc224a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
