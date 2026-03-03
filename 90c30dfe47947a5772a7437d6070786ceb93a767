@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a16d0952_884fe3f4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-03T07:24:03Z",
+      "side": 1,
+      "message": "Have you checked if there are any Zephyr upstream enums that we can use?",
+      "revId": "90c30dfe47947a5772a7437d6070786ceb93a767",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
