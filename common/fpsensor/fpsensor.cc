@@ -252,15 +252,18 @@ extern "C" void fp_task(void)
 			uint32_t mode = global_context.sensor_mode;
 			gpio_disable_interrupt(GPIO_FPS_INT);
 			if ((mode ^ enroll_session) & FP_MODE_ENROLL_SESSION) {
+				int ret = 0;
 				if (mode & FP_MODE_ENROLL_SESSION) {
-					if (fp_enrollment_begin())
+					ret = fp_enrollment_begin();
+					if (ret)
 						global_context.sensor_mode &=
 							~FP_MODE_ENROLL_SESSION;
 				} else {
 					fp_enrollment_finish(nullptr);
 				}
-				enroll_session = global_context.sensor_mode &
-						 FP_MODE_ENROLL_SESSION;
+				enroll_session =
+					ret ? 0 :
+					      (mode & FP_MODE_ENROLL_SESSION);
 			}
 			if (!is_finger_needed(mode)) {
 				enum fp_capture_type capture_type =
