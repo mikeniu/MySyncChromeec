@@ -176,6 +176,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c760faa_f445ecda",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-03T12:25:33Z",
+      "side": 1,
+      "message": "My consideration was that some hw engine like SHA256 or DMA (controlled by bootloader) writes to the RAM and the cache is marked as valid for some reason. But I think it such case, this memory should be marked ad non-cacheable in dts per project so I think we are fine.",
+      "parentUuid": "a3154dd6_e89d8895",
+      "revId": "d81c9ca4b5c2fee92f4409bb50b4810df2ae898a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a5ea9482_dd5e53c9",

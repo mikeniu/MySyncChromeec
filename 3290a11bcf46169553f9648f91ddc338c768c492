@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c8dc993_bd6aba8b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-03T12:25:33Z",
+      "side": 1,
+      "message": "Have you consider adding tests for the memory-mapped SDCP implementation?",
+      "revId": "3290a11bcf46169553f9648f91ddc338c768c492",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9352dbe7_6a71bcba",
+        "filename": "zephyr/subsys/ascp/Kconfig",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-03T12:25:33Z",
+      "side": 1,
+      "message": "I think this should be reworked as a choice in the future, once there are more ASCP implementations, but let\u0027s keep it as it is for now.",
+      "revId": "3290a11bcf46169553f9648f91ddc338c768c492",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e661d303_41a3c338",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-03T12:25:33Z",
+      "side": 1,
+      "message": "Please check if the res is not NULL. I\u0027m not sure if you check all sub-buffers as well or not.",
+      "revId": "3290a11bcf46169553f9648f91ddc338c768c492",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19ee8a4d_f4def559",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-03T12:25:33Z",
+      "side": 1,
+      "message": "Please check if the buffer is not NULL.",
+      "revId": "3290a11bcf46169553f9648f91ddc338c768c492",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
