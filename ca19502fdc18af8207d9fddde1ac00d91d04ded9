@@ -22,6 +22,30 @@
       },
       "revId": "ca19502fdc18af8207d9fddde1ac00d91d04ded9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d72d7694_4647dfe1",
+        "filename": "zephyr/test/hwtest/src/panic_data.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-03T00:08:32Z",
+      "side": 1,
+      "message": "https://crrev.com/c/7624322",
+      "parentUuid": "675ae123_280a1da9",
+      "range": {
+        "startLine": 24,
+        "startChar": 1,
+        "endLine": 29,
+        "endChar": 46
+      },
+      "revId": "ca19502fdc18af8207d9fddde1ac00d91d04ded9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
