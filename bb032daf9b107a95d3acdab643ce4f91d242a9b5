@@ -72,6 +72,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e313f8d_9404f4ac",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-03T12:42:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07dafe6a_8a1d6aea",
+      "revId": "bb032daf9b107a95d3acdab643ce4f91d242a9b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1529addb_c25d9fac",
@@ -103,6 +121,24 @@
       "side": 1,
       "message": "Agree, do we need remove this \u0027ifdef\u0027, and move the ztest.h to the top of the file.",
       "parentUuid": "1529addb_c25d9fac",
+      "revId": "bb032daf9b107a95d3acdab643ce4f91d242a9b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9418a3bf_872f1acf",
+        "filename": "zephyr/emul/emul_ft98xx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-03T12:42:24Z",
+      "side": 1,
+      "message": "Yes.",
+      "parentUuid": "95f43734_fe065717",
       "revId": "bb032daf9b107a95d3acdab643ce4f91d242a9b5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

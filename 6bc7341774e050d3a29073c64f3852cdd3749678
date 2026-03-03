@@ -18,6 +18,23 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "29bfbd3d_aa29e83b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-03T12:42:24Z",
+      "side": 1,
+      "message": "Please address the comments are rebase on top of the latest driver implementation. The same applies to the test CL.",
+      "revId": "6bc7341774e050d3a29073c64f3852cdd3749678",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "358fc3f7_866f7f35",
