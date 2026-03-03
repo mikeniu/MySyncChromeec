@@ -38,10 +38,7 @@ def main() -> int:
                     # but it seems consistent.
                     # Also ignore test dirs that don't affect coverage numbers
                     if (  # pylint: disable=too-many-boolean-expressions
-                        not (
-                            "src/third_party/zephyrproject/modules/hal/"
-                            "cmsis/CMSIS/Core/Include/core_cm4.h"
-                        )
+                        not ("src/third_party/zephyrproject/modules/hal/")
                         in active_name
                         and not (
                             "src/third_party/zephyrproject/zephyr/"
