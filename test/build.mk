@@ -185,7 +185,6 @@ aes-y=aes.o
 always_memset-y=always_memset.o
 assert_builtin-y=assert_builtin.o
 assert_stdlib-y=assert_stdlib.o
-base32-y=base32.o
 battery_config-y=battery_config.o
 battery_get_params_smart-y=battery_get_params_smart.o
 benchmark-y=benchmark.o

@@ -6,7 +6,6 @@
 #ifndef __CROS_EC_BLUETOOTH_LE_LL_H
 #define __CROS_EC_BLUETOOTH_LE_LL_H
 
-#include "btle_hci_int.h"
 #include "common.h"
 
 #ifdef __cplusplus
