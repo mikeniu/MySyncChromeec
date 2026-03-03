@@ -9,6 +9,7 @@ This is the entry point for the custom firmware builder workflow recipe.  It
 gets invoked by chromite/api/controller/firmware.py.
 """
 
+import argparse
 import getpass
 import os
 from pathlib import Path
@@ -30,7 +31,7 @@ EC_BOARDS = [
 ]
 
 
-def build(opts):
+def build(opts: argparse.Namespace) -> int:
     """Build all the EC unit tests."""
 
     working_dir = Path(__file__).parents[2].resolve()
@@ -42,7 +43,7 @@ def build(opts):
     subprocess.run(cmd, cwd=working_dir, check=True)
 
 
-def bundle(opts):
+def bundle(opts: argparse.Namespace) -> int:
     """No-op."""
 
     # We don't produce any artifacts, but the info file is expected, so create
@@ -54,8 +55,10 @@ def bundle(opts):
             )
         )
 
+    return 0
 
-def run_device_tests(board: str, working_dir: Path):
+
+def run_device_tests(board: str, working_dir: Path) -> None:
     """Run device tests on Renode emulator."""
     cmd = [
         "test/run_device_tests.py",
@@ -73,7 +76,7 @@ def run_device_tests(board: str, working_dir: Path):
     )
 
 
-def test(_opts):
+def test(_opts: argparse.Namespace) -> int:
     """Runs EC unit tests with Renode."""
 
     working_dir = Path(__file__).parents[2].resolve()
@@ -133,8 +136,10 @@ def test(_opts):
     for board in EC_BOARDS:
         run_device_tests(board, working_dir)
 
+    return 0
 
-def main(args):
+
+def main(args: list[str]) -> int:
     """Builds, bundles, or tests.
 
     Additionally, the tool reports build metrics.
