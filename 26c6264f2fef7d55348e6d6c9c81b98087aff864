@@ -22,6 +22,30 @@
       },
       "revId": "26c6264f2fef7d55348e6d6c9c81b98087aff864",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba3786b4_d39e4b48",
+        "filename": "util/find_unused.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-03-03T23:05:41Z",
+      "side": 1,
+      "message": "Using pyelftools.",
+      "parentUuid": "ed210694_5b69a2b9",
+      "range": {
+        "startLine": 56,
+        "startChar": 4,
+        "endLine": 56,
+        "endChar": 7
+      },
+      "revId": "26c6264f2fef7d55348e6d6c9c81b98087aff864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
