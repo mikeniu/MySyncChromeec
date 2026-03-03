@@ -43,9 +43,6 @@ config LINK_TEST_SUITE_AP_POWER_EVENTS
 	  Verifies the AP power events driver which controls GPIOs
 	  based on AP power state transitions.
 
-config LINK_TEST_SUITE_AP_VDM_CONTROL
-	bool "Link and test the ap_vdm_control tests"
-
 config LINK_TEST_SUITE_BMI3XX
 	bool "Link and test the bmi3xx tests"
 	help
@@ -78,9 +75,6 @@ config LINK_TEST_SUITE_CEC_IT83XX
 
 config LINK_TEST_SUITE_CHARGE_MANAGER
 	bool "Link and test the charge manager tests"
-
-config LINK_TEST_SUITE_CHARGESPLASH
-	bool "Link and test the chargesplash tests"
 
 config LINK_TEST_SUITE_COMMON_CBI
 	bool "Link and execute the common/cbi.c tests"

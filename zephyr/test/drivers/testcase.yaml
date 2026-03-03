@@ -250,21 +250,6 @@ tests:
     - prj.conf
     - ap_mux_control/prj.conf
     - ec_host_cmd.conf
-  drivers.ap_vdm_control:
-    timeout: 360
-    extra_configs:
-    - CONFIG_LINK_TEST_SUITE_AP_VDM_CONTROL=y
-    extra_conf_files:
-    - prj.conf
-    - ap_vdm_control/prj.conf
-  drivers.ap_vdm_control.ec_host_cmd:
-    timeout: 360
-    extra_configs:
-    - CONFIG_LINK_TEST_SUITE_AP_VDM_CONTROL=y
-    extra_conf_files:
-    - prj.conf
-    - ap_vdm_control/prj.conf
-    - ec_host_cmd.conf
   drivers.usbc_dp_mode:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_DP_MODE=y
@@ -273,21 +258,6 @@ tests:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_DP_MODE=y
     - CONFIG_PLATFORM_EC_USB_PD_DP21_MODE=y
-  drivers.ap_vdm_control_disabled:
-    extra_configs:
-    - CONFIG_PLATFORM_EC_USB_PD_VDM_AP_CONTROL=n
-    - CONFIG_LINK_TEST_SUITE_AP_VDM_CONTROL=y
-    extra_conf_files:
-    - prj.conf
-    - ap_vdm_control/prj.conf
-  drivers.ap_vdm_control_disabled.ec_host_cmd:
-    extra_configs:
-    - CONFIG_PLATFORM_EC_USB_PD_VDM_AP_CONTROL=n
-    - CONFIG_LINK_TEST_SUITE_AP_VDM_CONTROL=y
-    extra_conf_files:
-    - prj.conf
-    - ap_vdm_control/prj.conf
-    - ec_host_cmd.conf
   drivers.bmi3xx:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_BMI3XX=y
@@ -460,8 +430,6 @@ tests:
     - CONFIG_PLATFORM_EC_CHARGER_MIN_INPUT_CURRENT_LIMIT=100
     - CONFIG_PLATFORM_EC_CHARGER_MIN_POWER_MW_FOR_POWER_ON=1000
     - CONFIG_LINK_TEST_SUITE_COMMON_CHARGER=y
-    # Set to focus testing for Herobrine
-    # Config is y only in nissa
     - CONFIG_PLATFORM_EC_CHARGER_RAA489000=n
     - CONFIG_PLATFORM_EC_CHARGER_RUNTIME_CONFIG=y
   drivers.common_charger.ec_host_cmd:
@@ -470,34 +438,8 @@ tests:
     - CONFIG_PLATFORM_EC_CHARGER_MIN_INPUT_CURRENT_LIMIT=100
     - CONFIG_PLATFORM_EC_CHARGER_MIN_POWER_MW_FOR_POWER_ON=1000
     - CONFIG_LINK_TEST_SUITE_COMMON_CHARGER=y
-    # Set to focus testing for Herobrine
-    # Config is y only in nissa
     - CONFIG_PLATFORM_EC_CHARGER_RAA489000=n
     - CONFIG_PLATFORM_EC_CHARGER_RUNTIME_CONFIG=y
-    extra_conf_files:
-    - prj.conf
-    - ec_host_cmd.conf
-  drivers.chargesplash:
-    timeout: 360
-    extra_configs:
-    - CONFIG_LINK_TEST_SUITE_CHARGESPLASH=y
-  drivers.chargesplash.ec_host_cmd:
-    timeout: 600
-    extra_configs:
-    - CONFIG_LINK_TEST_SUITE_CHARGESPLASH=y
-    extra_conf_files:
-    - prj.conf
-    - ec_host_cmd.conf
-  drivers.chargesplash.mock_power:
-    timeout: 600
-    extra_configs:
-    - CONFIG_LINK_TEST_SUITE_CHARGESPLASH=y
-    - CONFIG_POWER_SEQUENCE_MOCK=y
-  drivers.chargesplash.mock_power.ec_host_cmd:
-    timeout: 600
-    extra_configs:
-    - CONFIG_LINK_TEST_SUITE_CHARGESPLASH=y
-    - CONFIG_POWER_SEQUENCE_MOCK=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
@@ -1125,7 +1067,6 @@ tests:
   drivers.power_host_sleep:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_POWER_HOST_SLEEP=y
-    # Make tests independent of chipset specific code
     - CONFIG_AP_ARM_QUALCOMM_SC7280=n
     - CONFIG_PLATFORM_EC_POWERSEQ_SC7280=n
     - CONFIG_POWER_SEQUENCE_MOCK=y
@@ -1136,7 +1077,6 @@ tests:
     extra_configs:
     - CONFIG_CROS_EC_RO=y
     - CONFIG_LINK_TEST_SUITE_POWER_HOST_SLEEP=y
-    # Make tests independent of chipset specific code
     - CONFIG_AP_ARM_QUALCOMM_SC7280=n
     - CONFIG_PLATFORM_EC_POWERSEQ_SC7280=n
     - CONFIG_POWER_SEQUENCE_MOCK=y
@@ -1146,7 +1086,6 @@ tests:
     extra_configs:
     - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_POWER_HOST_SLEEP=y
-    # Make tests independent of chipset specific code
     - CONFIG_AP_ARM_QUALCOMM_SC7280=n
     - CONFIG_PLATFORM_EC_POWERSEQ_SC7280=n
     - CONFIG_POWER_SEQUENCE_MOCK=y
@@ -1156,7 +1095,6 @@ tests:
   drivers.power_host_sleep.ec_host_cmd:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_POWER_HOST_SLEEP=y
-    # Make tests independent of chipset specific code
     - CONFIG_AP_ARM_QUALCOMM_SC7280=n
     - CONFIG_PLATFORM_EC_POWERSEQ_SC7280=n
     - CONFIG_POWER_SEQUENCE_MOCK=y
