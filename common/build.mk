@@ -39,9 +39,7 @@ common-$(CONFIG_AP_HANG_DETECT)+=ap_hang_detect.o
 common-$(CONFIG_AUDIO_CODEC)+=audio_codec.o
 common-$(CONFIG_AUDIO_CODEC_DMIC)+=audio_codec_dmic.o
 common-$(CONFIG_AUDIO_CODEC_I2S_RX)+=audio_codec_i2s_rx.o
-common-$(CONFIG_AUDIO_CODEC_WOV)+=audio_codec_wov.o
 common-$(CONFIG_BACKLIGHT_LID)+=backlight_lid.o
-common-$(CONFIG_BASE32)+=base32.o
 common-$(CONFIG_BLINK)+=blink.o
 common-$(CONFIG_DETACHABLE_BASE)+=base_state.o
 common-$(CONFIG_BATTERY)+=battery.o math_util.o
@@ -51,7 +49,6 @@ common-$(CONFIG_BLUETOOTH_LE)+=bluetooth_le.o
 common-$(CONFIG_BLUETOOTH_LE_STACK)+=btle_hci_controller.o btle_ll.o
 common-$(CONFIG_BODY_DETECTION)+=body_detection.o body_detect_common.o \
 	body_detect_client.o
-common-$(CONFIG_CAPSENSE)+=capsense.o
 common-$(CONFIG_CEC)+=cec.o
 common-$(CONFIG_CBI_EEPROM)+=cbi.o cbi_common.o cbi_config.o cbi_eeprom.o
 common-$(CONFIG_USB_PD_FLAGS)+=usb_pd_flags.o
@@ -61,7 +58,6 @@ common-$(CONFIG_CHARGE_MANAGER)+=charge_manager.o
 endif
 common-$(CONFIG_CHARGE_RAMP_HW)+=charge_ramp.o
 common-$(CONFIG_CHARGE_RAMP_SW)+=charge_ramp.o charge_ramp_sw.o
-common-$(CONFIG_CHARGESPLASH)+=chargesplash.o
 common-$(CONFIG_CHIP_INIT_ROM_REGION)+=init_rom.o
 common-$(CONFIG_CMD_CHARGEN) += chargen.o
 common-$(CONFIG_CHARGER)+=charger.o
@@ -91,7 +87,6 @@ common-$(CONFIG_CURVE25519)+=curve25519-generic.o
 endif
 common-$(CONFIG_DEDICATED_RECOVERY_BUTTON)+=button.o
 common-$(CONFIG_DEVICE_EVENT)+=device_event.o
-common-$(CONFIG_DEVICE_STATE)+=device_state.o
 common-$(CONFIG_DPTF)+=dptf.o
 common-$(CONFIG_EC_EC_COMM_CLIENT)+=ec_ec_comm_client.o
 common-$(CONFIG_EC_EC_COMM_SERVER)+=ec_ec_comm_server.o
@@ -101,7 +96,6 @@ common-$(CONFIG_EXTPOWER)+=extpower_common.o
 common-$(CONFIG_FANS)+=fan.o pwm.o
 common-$(CONFIG_FLASH_CROS)+=flash.o
 common-$(CONFIG_FMAP)+=fmap.o
-common-$(CONFIG_GESTURE_SW_DETECTION)+=gesture.o
 common-$(CONFIG_HOSTCMD_EVENTS)+=host_event_commands.o
 common-$(CONFIG_HOSTCMD_GET_UPTIME_INFO)+=uptime.o
 common-$(CONFIG_HOSTCMD_PD)+=host_command_controller.o
@@ -111,7 +105,6 @@ common-$(CONFIG_I2C_DEBUG)+=i2c_trace.o
 common-$(CONFIG_I2C_CONTROLLER)+=i2c_controller.o
 common-$(CONFIG_I2C_CONTROLLER)+=i2c_controller_cros_ec.o
 common-$(CONFIG_I2C_CONTROLLER)+=i2c_passthru.o
-common-$(CONFIG_I2C_PERIPHERAL)+=i2c_peripheral.o
 common-$(CONFIG_I2C_BITBANG_CROS_EC)+=i2c_bitbang.o
 common-$(CONFIG_I2C_VIRTUAL_BATTERY)+=virtual_battery.o
 common-$(CONFIG_INDUCTIVE_CHARGING)+=inductive_charging.o
@@ -124,6 +117,7 @@ common-$(CONFIG_KEYBOARD_VIVALDI)+=keyboard_vivaldi.o
 common-$(CONFIG_KEYBOARD_STRAUSS)+=keyboard_strauss.o
 common-$(CONFIG_MKBP_INPUT_DEVICES)+=mkbp_input_devices.o mkbp_fifo.o \
 	mkbp_info.o
+common-$(CONFIG_ORIENTATION_SENSOR)+=motion_orientation.o
 common-$(CONFIG_LED_COMMON)+=led_common.o
 common-$(CONFIG_LED_PWM)+=led_pwm.o
 common-$(CONFIG_LED_ONOFF_STATES)+=led_onoff_states.o
@@ -135,13 +129,9 @@ common-$(CONFIG_MAG_CALIBRATE)+= mag_cal.o math_util.o vec3.o mat33.o mat44.o \
 	kasa.o
 common-$(CONFIG_MKBP_EVENT)+=mkbp_event.o mkbp_fifo.o
 common-$(CONFIG_OCPC)+=ocpc.o
-common-$(CONFIG_ONEWIRE)+=onewire.o
-common-$(CONFIG_ORIENTATION_SENSOR)+=motion_orientation.o
-common-$(CONFIG_PECI_COMMON)+=peci.o
 common-$(CONFIG_PERIPHERAL_CHARGER)+=peripheral_charger.o
 common-$(CONFIG_POWER_BUTTON)+=power_button.o
 common-$(CONFIG_POWER_BUTTON_X86)+=power_button_x86.o
-common-$(CONFIG_PSTORE)+=pstore_commands.o
 common-$(CONFIG_PWM)+=pwm.o
 common-$(CONFIG_PWM_KBLIGHT)+=pwm_kblight.o
 common-$(CONFIG_KEYBOARD_BACKLIGHT)+=keyboard_backlight.o
@@ -161,7 +151,6 @@ common-$(CONFIG_SOFTWARE_CTZ)+=ctz.o
 common-$(CONFIG_CMD_SPI_XFER)+=spi_commands.o
 common-$(CONFIG_SPI_FLASH)+=spi_flash.o spi_flash_reg.o
 common-$(CONFIG_SPI_FLASH_REGS)+=spi_flash_reg.o
-common-$(CONFIG_SPI_NOR)+=spi_nor.o
 common-$(CONFIG_SWITCH)+=switch.o
 common-$(CONFIG_SW_CRC)+=crc.o
 common-$(CONFIG_TABLET_MODE)+=tablet_mode.o
@@ -170,7 +159,6 @@ common-$(CONFIG_THROTTLE_AP)+=thermal.o throttle_ap.o
 common-$(CONFIG_THROTTLE_AP_ON_BAT_DISCHG_CURRENT)+=throttle_ap.o
 common-$(CONFIG_THROTTLE_AP_ON_BAT_VOLTAGE)+=throttle_ap.o
 common-$(CONFIG_USB_CHARGER)+=usb_charger.o
-common-$(CONFIG_USB_CONSOLE_STREAM)+=usb_console_stream.o
 common-$(CONFIG_HOST_INTERFACE_USB)+=usb_host_command.o
 common-$(CONFIG_USB_I2C)+=usb_i2c.o
 common-$(CONFIG_USB_PORT_POWER_DUMB)+=usb_port_power_dumb.o
@@ -207,7 +195,6 @@ endif
 endif
 common-$(CONFIG_VOLUME_BUTTONS)+=button.o
 common-$(CONFIG_VSTORE)+=vstore.o
-common-$(CONFIG_WEBUSB_URL)+=webusb_desc.o
 common-$(CONFIG_WIRELESS)+=wireless.o
 common-$(HAS_TASK_CHIPSET)+=chipset.o
 common-$(CONFIG_CMD_AP_RESET_LOG)+=ap_reset_log.o
@@ -219,13 +206,11 @@ common-$(HAS_TASK_PDCMD)+=host_command_pd.o
 common-$(HAS_TASK_KEYSCAN)+=keyboard_scan.o
 common-$(HAS_TASK_LIGHTBAR)+=lb_common.o lightbar.o
 common-$(HAS_TASK_MOTIONSENSE)+=motion_sense.o
-common-$(CONFIG_HOST_COMMAND_MEMORY_DUMP)+=host_command_memory_dump.o
 common-$(CONFIG_PRESERVED_RING_BUF)+=preserved_ring_buf.o
 common-$(CONFIG_PANIC_LOG)+=panic_log.o
 common-$(CONFIG_WATCHDOG)+=watchdog.o
 
 ifneq ($(HAVE_PRIVATE_AUDIO_CODEC_WOV_LIBS),y)
-common-$(CONFIG_AUDIO_CODEC_WOV)+=hotword_dsp_api.o
 endif
 
 ifeq ($(USE_BUILTIN_STDLIB), 0)
