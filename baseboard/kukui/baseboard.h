@@ -250,7 +250,6 @@
 
 /* Optional for testing */
 #undef CONFIG_PECI
-#undef CONFIG_PSTORE
 
 #define CONFIG_TASK_PROFILING
 #define CONFIG_MKBP_USE_GPIO
