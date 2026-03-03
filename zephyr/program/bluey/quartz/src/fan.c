@@ -5,6 +5,7 @@
 
 /* Quartz Fan configuration */
 
+#include "battery.h"
 #include "chipset.h"
 #include "common.h"
 #include "fan.h"
@@ -20,9 +21,19 @@
  */
 enum fan_status board_override_fan_control_duty(int ch)
 {
+	struct batt_params batt;
+
 	/* If the last power-on is due to AC, which enters the charging loop in
 	 * the AP firmware stop the fan */
 	if (POWER_ON_BY_AC_ON == chipset_get_power_on_reason()) {
+		fan_set_duty(ch, 0);
+		return FAN_STATUS_STOPPED;
+	}
+
+	battery_get_params(&batt);
+	if (batt.is_present == BP_YES &&
+	    !(batt.flags & BATT_FLAG_BAD_STATE_OF_CHARGE) &&
+	    batt.state_of_charge < BATTERY_LEVEL_CRITICAL) {
 		fan_set_duty(ch, 0);
 		return FAN_STATUS_STOPPED;
 	}
