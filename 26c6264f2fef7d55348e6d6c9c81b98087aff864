@@ -70,6 +70,30 @@
       },
       "revId": "26c6264f2fef7d55348e6d6c9c81b98087aff864",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5099d22e_5c0a3144",
+        "filename": "util/find_unused.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-03-03T23:20:33Z",
+      "side": 1,
+      "message": "pylint often can\u0027t find things. You probably have to suppress that warning.",
+      "parentUuid": "381ec584_1b70253e",
+      "range": {
+        "startLine": 56,
+        "startChar": 4,
+        "endLine": 56,
+        "endChar": 7
+      },
+      "revId": "26c6264f2fef7d55348e6d6c9c81b98087aff864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
