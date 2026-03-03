@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0de30419_6d1720f6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-03T19:03:41Z",
+      "side": 1,
+      "message": "I wasn\u0027t able to build this locally because of changes to the toolchains.  The firmware-servo branch expects the coreboot toolchain to be found at /opt/coreboot-sdk, but this is no longer available at the main branch point.",
+      "revId": "fc8f8ba48a917ef37957756b8599645c43a53496",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
