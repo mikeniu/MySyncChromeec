@@ -46,6 +46,30 @@
       },
       "revId": "26c6264f2fef7d55348e6d6c9c81b98087aff864",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "381ec584_1b70253e",
+        "filename": "util/find_unused.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-03-03T23:17:58Z",
+      "side": 1,
+      "message": "Actually this fails presubmit with:\n\n    Hook script \"cros lint --commit ${PRESUBMIT_COMMIT}\" failed with code 1:\n      ************* Module find_unused\n      util/find_unused.py:26:0: E0401: Unable to import \u0027elftools.elf.elffile\u0027 (import-error)\n      [P181391 15:14:07.131 waiter.go:41 W] [unzip  1/13] Could not acquire FS lock: retrying after 639ms...\n      15:14:27: NOTICE: Install staticcheck for additional go linting.\n      15:14:27: NOTICE: Install staticcheck for additional go linting.\n      15:14:33: ERROR: Found lint errors in 1 files in 33.475s.",
+      "parentUuid": "ba3786b4_d39e4b48",
+      "range": {
+        "startLine": 56,
+        "startChar": 4,
+        "endLine": 56,
+        "endChar": 7
+      },
+      "revId": "26c6264f2fef7d55348e6d6c9c81b98087aff864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
