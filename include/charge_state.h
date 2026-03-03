@@ -10,7 +10,6 @@
 #include "charger.h"
 #include "chipset.h"
 #include "common.h"
-#include "ec_ec_comm_client.h"
 #include "ocpc.h"
 #include "stdbool.h"
 #include "timer.h"

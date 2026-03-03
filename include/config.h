@@ -187,7 +187,6 @@
  * Define if either CONFIG_BMI_ORIENTATION_SENSOR or
  * CONFIG_KX022_ORIENTATION_SENSOR is set.
  */
-#undef CONFIG_ORIENTATION_SENSOR
 
 /* Support the orientation gesture */
 #undef CONFIG_GESTURE_ORIENTATION
@@ -414,13 +413,6 @@
 #undef CONFIG_AUDIO_CODEC_DMIC_MAX_SOFTWARE_GAIN
 /* Support audio codec on I2S RX. */
 #undef CONFIG_AUDIO_CODEC_I2S_RX
-/* Support audio codec on WoV. */
-#undef CONFIG_AUDIO_CODEC_WOV
-/* Audio codec buffers. */
-#undef CONFIG_AUDIO_CODEC_WOV_AUDIO_BUF_LEN
-#undef CONFIG_AUDIO_CODEC_WOV_AUDIO_BUF_TYPE
-#undef CONFIG_AUDIO_CODEC_WOV_LANG_BUF_LEN
-#undef CONFIG_AUDIO_CODEC_WOV_LANG_BUF_TYPE
 
 /*
  * Support controlling the display backlight based on the state of the lid
@@ -442,9 +434,6 @@
  * signal from the AP through EC.
  */
 #undef CONFIG_BACKLIGHT_REQ_GPIO
-
-/* Support base32 text encoding */
-#undef CONFIG_BASE32
 
 /*****************************************************************************/
 /* Battery config */
@@ -716,15 +705,6 @@
  */
 #undef CONFIG_CHARGE_STATE_DEBUG
 
-/* Include support for Bluetooth LE */
-#undef CONFIG_BLUETOOTH_LE
-
-/* Include support for testing the radio for Bluetooth LE */
-#undef CONFIG_BLUETOOTH_LE_RADIO_TEST
-
-/* Include support for the HCI and link layers for Bluetooth LE */
-#undef CONFIG_BLUETOOTH_LE_STACK
-
 /* Include debugging support for the Bluetooth link layer */
 #undef CONFIG_BLUETOOTH_LL_DEBUG
 
@@ -881,7 +861,6 @@
 /*
  * Capsense chip has buttons, too.
  */
-#undef CONFIG_CAPSENSE
 
 /*****************************************************************************/
 /* Support CEC */
@@ -924,11 +903,6 @@
 
 /* Compile input current ramping support using software control */
 #undef CONFIG_CHARGE_RAMP_SW
-
-/* Enable EC support for charging splashscreen */
-#undef CONFIG_CHARGESPLASH
-#undef CONFIG_CHARGESPLASH_PERIOD
-#undef CONFIG_CHARGESPLASH_MAX_REQUESTS_PER_PERIOD
 
 /*****************************************************************************/
 /* Charger config */
@@ -1744,7 +1718,6 @@
 #define CONFIG_CMD_HASH
 #define CONFIG_CMD_HCDEBUG
 #undef CONFIG_CMD_HOSTCMD
-#undef CONFIG_CMD_I2CWEDGE
 #undef CONFIG_CMD_I2C_PROTECT
 #define CONFIG_CMD_I2C_SCAN
 #undef CONFIG_CMD_I2C_SPEED
@@ -1831,13 +1804,6 @@
 
 /* When defined, it enables build assert for panic data structure size */
 #undef CONFIG_RO_PANIC_DATA_SIZE
-
-/*
- * Enables fetching a memory dump using host commands. This is useful when
- * debugging panics. May not dump all memory, e.g. sensitive memory will
- * not be dumped.
- */
-#undef CONFIG_HOST_COMMAND_MEMORY_DUMP
 
 /*
  * Panic on watchdog warning instead of waiting for a regular watchdog.
@@ -2026,18 +1992,6 @@
 #define CONFIG_HOSTCMD_CONSOLE_PRINT
 
 /*****************************************************************************/
-/* Support for EC-EC communication */
-
-/*
- * Board is client or server in EC-EC communication.
- */
-#undef CONFIG_EC_EC_COMM_CLIENT
-#undef CONFIG_EC_EC_COMM_SERVER
-
-/*
- * Board support battery-related functions in EC-EC communication.
- */
-#undef CONFIG_EC_EC_COMM_BATTERY
 
 /* Include CRC-8 utility function */
 #undef CONFIG_CRC8_CROS
@@ -2129,9 +2083,6 @@
 
 /* Support events from devices attached to the EC */
 #undef CONFIG_DEVICE_EVENT
-
-/* Monitor the states of other devices */
-#undef CONFIG_DEVICE_STATE
 
 /* Support DMA transfers inside the EC */
 #undef CONFIG_DMA_CROS
@@ -2522,9 +2473,6 @@
 /* Mask of all sensors used for gesture dectections */
 #undef CONFIG_GESTURE_DETECTION_MASK
 
-/* some gesture recognition done in software */
-#undef CONFIG_GESTURE_SW_DETECTION
-
 /* enable gesture host interface */
 #undef CONFIG_GESTURE_HOST_DETECTION
 
@@ -2701,9 +2649,6 @@
 #define CONFIG_HOSTCMD_RATE_LIMITING_MIN_REST (3 * MSEC)
 #define CONFIG_HOSTCMD_RATE_LIMITING_RECESS (20 * MSEC)
 
-/* PD MCU supports host commands */
-#undef CONFIG_HOSTCMD_PD
-
 /* EC supports EC_CMD_PD_CHIP_INFO */
 #define CONFIG_HOSTCMD_PD_CHIP_INFO
 
@@ -2717,15 +2662,6 @@
 
 /* EC supports EC_CMD_TYPEC_STATUS */
 #define CONFIG_HOSTCMD_TYPEC_STATUS
-
-/*
- * Use if PD MCU controls charging (selecting charging port and input
- * current limit).
- */
-#undef CONFIG_HOSTCMD_PD_CHG_CTRL
-
-/* Panic when status of PD MCU reflects that it has crashed */
-#undef CONFIG_HOSTCMD_PD_PANIC
 
 /* Board supports RTC host commands */
 #undef CONFIG_HOSTCMD_RTC
@@ -2751,9 +2687,6 @@
 
 /* Flash commands over PD */
 #define CONFIG_HOSTCMD_FLASHPD
-
-/* Host command to control USB-PD chip */
-#undef CONFIG_HOSTCMD_PD_CONTROL
 
 /* Set entry in PD MCU's device rw_hash table */
 #define CONFIG_HOSTCMD_RWHASHPD
@@ -2909,7 +2842,6 @@
 #undef CONFIG_I2C_CONTROLLER
 
 /* EC uses an I2C peripheral interface */
-#undef CONFIG_I2C_PERIPHERAL
 
 /* Defines I2C operation retry count when slave nack'd(EC_ERROR_BUSY) */
 #define CONFIG_I2C_NACK_RETRY_COUNT 0
@@ -3292,17 +3224,6 @@
  * Allow support multiple keyboard matrix for special key.
  */
 #undef CONFIG_KEYBOARD_MULTIPLE
-
-/*
- * Enable keyboard testing functionality. This enables a message which receives
- * a list of keyscan events from the AP and processes them.  This will cause
- * keypresses to appear on the AP through the same mechanism as a normal
- * keyboard press.
- *
- * This can be used to spoof keyboard events, so is not normally defined,
- * except during internal testing.
- */
-#undef CONFIG_KEYBOARD_TEST
 
 /*
  * Enable quasi-bidirectional buffers for KSO pins. It has an open-drain output
@@ -3748,9 +3669,6 @@
 /* Do not try hold I/O pins at frozen level during deep sleep */
 #undef CONFIG_NO_PINHOLD
 
-/* Support one-wire interface */
-#undef CONFIG_ONEWIRE
-
 /* Use OTP as a source of key material. */
 #undef CONFIG_OTP_KEY
 
@@ -3763,9 +3681,6 @@
 
 /* Support PECI interface to x86 processor */
 #undef CONFIG_PECI
-
-/* Common code for PECI interface to x86 processor */
-#undef CONFIG_PECI_COMMON
 
 /*
  * Maximum operating temperature in degrees Celcius used on some x86
@@ -3884,7 +3799,6 @@
 #undef CONFIG_POWER_SIGNAL_INTERRUPT_STORM_DETECT_THRESHOLD
 
 /* Use part of the EC's data EEPROM to hold persistent storage for the AP. */
-#undef CONFIG_PSTORE
 
 /* Support S0ix */
 #undef CONFIG_POWER_S0IX
@@ -4207,35 +4121,6 @@
 
 /* Define the SPI port to use to access the fingerprint sensor */
 #undef CONFIG_SPI_FP_PORT
-
-/* Support JEDEC SFDP based Serial NOR flash */
-#undef CONFIG_SPI_NOR
-
-/* Enable SPI_NOR debugging providing additional console output while
- * initializing Serial NOR Flash devices including SFDP discovery. */
-#undef CONFIG_SPI_NOR_DEBUG
-
-/* Maximum Serial NOR flash command size, in Bytes */
-#undef CONFIG_SPI_NOR_MAX_MESSAGE_SIZE
-
-/* Maximum Serial NOR flash read size, in Bytes */
-#undef CONFIG_SPI_NOR_MAX_READ_SIZE
-
-/* Maximum Serial NOR flash write size, in Bytes. Note this must be a power of
- * two. */
-#undef CONFIG_SPI_NOR_MAX_WRITE_SIZE
-
-/* If defined will enable block (64KiB) erase operations. */
-#undef CONFIG_SPI_NOR_BLOCK_ERASE
-
-/* If defined will read the sector/block to be erased first and only initiate
- * the erase operation if not already in an erased state. The read operation
- * (performed in CONFIG_SPI_NOR_MAX_READ_SIZE chunks) is aborted early if a
- * non "0xff" byte is encountered.
- * !! Make sure there is enough stack space to host a
- * !! CONFIG_SPI_NOR_MAX_READ_SIZE sized buffer before enabling.
- */
-#undef CONFIG_SPI_NOR_SMART_ERASE
 
 /* SPI controller feature */
 #undef CONFIG_SPI_CONTROLLER
@@ -4781,9 +4666,6 @@
  * direct the EC to enter a mode. This requires AP software support.
  */
 #undef CONFIG_USB_PD_REQUIRE_AP_MODE_ENTRY
-
-/* Allow the AP to compose VDMs for us to send */
-#undef CONFIG_USB_PD_VDM_AP_CONTROL
 
 /* Supports DP as UFP-D and requires HPD to DP_ATTEN converter */
 #undef CONFIG_USB_PD_ALT_MODE_UFP_DP
@@ -5561,7 +5443,6 @@
  * NOTE: CONFIG_USB_CONSOLE and CONFIG_USB_CONSOLE_STREAM should be defined
  * exclusively each other.
  */
-#undef CONFIG_USB_CONSOLE_STREAM
 
 /* USB serial console transmit buffer size in bytes. */
 #define CONFIG_USB_CONSOLE_TX_BUF_SIZE 2048
@@ -5918,16 +5799,6 @@
 	(CONFIG_WATCHDOG_PERIOD_MS - CONFIG_WATCHDOG_WARNING_LEADING_TIME_MS)
 
 /*****************************************************************************/
-/* WebUSB config */
-
-/*
- * Enable the WebUSB support and define its URL.
- * Export a WebUSB Platform Descriptor in the Binary Object Store descriptor.
- * The WebUSB landing page URL is equal to 'CONFIG_WEBUSB_URL' plus the
- * https:// prefix.
- * This requires CONFIG_USB_BOS.
- */
-#undef CONFIG_WEBUSB_URL
 
 /*****************************************************************************/
 
@@ -6025,9 +5896,6 @@
  * the board.
  */
 #undef CONFIG_EEPROM_CBI_WP
-
-/* Define this to support Cros Board Info from GPIO. */
-#undef CONFIG_CBI_GPIO
 
 /* Define this to support Cros Board Info from EC flash. */
 #undef CONFIG_CBI_FLASH
@@ -6707,24 +6575,6 @@
 #undef CONFIG_LED_PWM_OFF_IN_SUSPEND
 
 /*****************************************************************************/
-/*
- * Define derived configuration options for EC-EC communication
- */
-#ifdef CONFIG_EC_EC_COMM_BATTERY
-#ifdef CONFIG_EC_EC_COMM_CLIENT
-#define CONFIG_EC_EC_COMM_BATTERY_CLIENT
-#define CONFIG_BATTERY_INFO
-#define CONFIG_BATTERY_COUNT 2
-#endif
-
-#ifdef CONFIG_EC_EC_COMM_SERVER
-#define CONFIG_EC_EC_COMM_BATTERY_SERVER
-#define CONFIG_BATTERY_INFO
-#define CONFIG_BATTERY_COUNT 1
-#endif
-#endif /* CONFIG_EC_EC_COMM_BATTERY */
-
-/*****************************************************************************/
 /* Auto-enable battery v2 module with a single battery if battery is defined. */
 #if defined(CONFIG_BATTERY) && !defined(CONFIG_BATTERY_INFO)
 #define CONFIG_BATTERY_COUNT 1
@@ -6892,7 +6742,6 @@
 #endif
 
 #ifndef HAS_TASK_PDCMD
-#undef CONFIG_HOSTCMD_PD
 #endif
 
 #if defined(HAS_TASK_PD_INT_C0) || defined(HAS_TASK_PD_INT_C1) || \
@@ -7254,21 +7103,6 @@
 #endif /* CONFIG_USB_PD_DISCHARGE */
 #endif /* CONFIG_TEST_ENABLE_USB_PD_DISCHARGE */
 
-/* Chargesplash defaults */
-#ifdef CONFIG_CHARGESPLASH
-#ifndef CONFIG_CHARGESPLASH_PERIOD
-#define CONFIG_CHARGESPLASH_PERIOD 900
-#endif
-#ifndef CONFIG_CHARGESPLASH_MAX_REQUESTS_PER_PERIOD
-#define CONFIG_CHARGESPLASH_MAX_REQUESTS_PER_PERIOD 5
-#endif
-#endif
-
-/* EC Codec Wake-on-Voice related definitions */
-#ifdef CONFIG_AUDIO_CODEC_WOV
-#define CONFIG_SHA256_SW
-#endif
-
 #ifdef CONFIG_SMBUS_PEC
 #define CONFIG_CRC8_CROS
 #endif
@@ -7424,12 +7258,8 @@
 	"are mutually exclusive. "
 #endif /* CONFIG_BOARD_VERSION_CBI && CONFIG_BOARD_VERSION_GPIO */
 
-#if defined(CONFIG_CBI_EEPROM) && defined(CONFIG_CBI_GPIO)
-#error "CONFIG_CBI_EEPROM and CONFIG_CBI_GPIO are mutually exclusive."
-#endif
-
-#if defined(CONFIG_CBI_FLASH) && defined(CONFIG_CBI_GPIO)
-#error "CONFIG_CBI_FLASH and CONFIG_CBI_GPIO are mutually exclusive."
+#if defined(CONFIG_CBI_EEPROM) && defined(CONFIG_CBI_FLASH)
+#error "CONFIG_CBI_EEPROM and CONFIG_CBI_FLASH are mutually exclusive."
 #endif
 
 #if !defined(CONFIG_ACCELGYRO_ICM_COMM_SPI) && \
