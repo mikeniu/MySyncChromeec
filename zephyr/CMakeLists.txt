@@ -211,8 +211,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC
 # CONFIG
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWER_BUTTON_X86
                                                 "${PLATFORM_EC}/common/power_button_x86.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ACCEL_BMA255
-                                                "${PLATFORM_EC}/driver/accel_bma2x2.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ACCEL_BMA4XX
                                                 "${PLATFORM_EC}/driver/accel_bma4xx.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ACCEL_KX022
@@ -225,16 +223,12 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ACCEL_LIS2DW12
                                                 "${PLATFORM_EC}/driver/accel_lis2dw12.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ACCELGYRO_BMI
                                                 "${PLATFORM_EC}/driver/accelgyro_bmi_common.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ACCELGYRO_BMI160
-                                                "${PLATFORM_EC}/driver/accelgyro_bmi160.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ACCELGYRO_BMI260
                                                 "${PLATFORM_EC}/driver/accelgyro_bmi260.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ACCELGYRO_BMI3XX
                                                 "${PLATFORM_EC}/driver/accelgyro_bmi3xx.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ACCELGYRO_ICM
                                                 "${PLATFORM_EC}/driver/accelgyro_icm_common.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ACCELGYRO_ICM426XX
-                                                "${PLATFORM_EC}/driver/accelgyro_icm426xx.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ACCELGYRO_ICM42607
                                                 "${PLATFORM_EC}/driver/accelgyro_icm42607.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ACCELGYRO_LSM6DSO
@@ -261,10 +255,6 @@ zephyr_library_sources_ifdef(CONFIG_NAMED_ADC_CHANNELS
                                                 "${PLATFORM_EC}/common/adc.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ALS_TCS3400
                                                 "${PLATFORM_EC}/driver/als_tcs3400.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ALS_VEML3328
-                                                "${PLATFORM_EC}/driver/als_veml3328.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ALS_CM32183
-                                                "${PLATFORM_EC}/driver/als_cm32183.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ACPI
                                                 "${PLATFORM_EC}/common/acpi.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_AMD_SB_RMI
@@ -283,12 +273,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY_FUEL_GAUGE
                                                 "${PLATFORM_EC}/common/battery_fuel_gauge.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY_SMART
                                                 "${PLATFORM_EC}/driver/battery/smart.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BC12_DETECT_RT1718S
-                                                "${PLATFORM_EC}/driver/bc12/rt1718s.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BC12_DETECT_PI3USB9201
                                                 "${PLATFORM_EC}/driver/bc12/pi3usb9201.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BC12_DETECT_MT6360
-                                                "${PLATFORM_EC}/driver/bc12/mt6360.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_ISL9237
                                                 "${PLATFORM_EC}/driver/charger/isl923x.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_ISL9238
@@ -307,8 +293,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_BQ25720
                                                 "${PLATFORM_EC}/driver/charger/bq25710.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_BQ25770
                                                 "${PLATFORM_EC}/driver/charger/bq25710.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_RT9478
-                                                "${PLATFORM_EC}/driver/charger/rt9478.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_RT9490
                                                 "${PLATFORM_EC}/driver/charger/rt9490.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_SM5803
@@ -358,8 +342,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CEC
                                                 "${PLATFORM_EC}/common/cec.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CEC_BITBANG
                                                 "${PLATFORM_EC}/driver/cec/bitbang.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CEC_IT83XX
-                                                "${PLATFORM_EC}/driver/cec/it83xx.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CONSOLE_CMD_MEM
                                                 "${PLATFORM_EC}/common/memory_commands.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_DPTF
@@ -417,14 +399,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_CCGXXF
                                                 "${PLATFORM_EC}/driver/ioexpander/ccgxxf.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_IT8801
                                                 "${PLATFORM_EC}/driver/ioexpander/it8801.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_NCT38XX
-                                                "${PLATFORM_EC}/driver/ioexpander/ioexpander_nct38xx.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_PCA9675
                                                 "${PLATFORM_EC}/driver/ioexpander/pca9675.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_PCAL6408
-                                                "${PLATFORM_EC}/driver/ioexpander/pcal6408.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_TCA64XXA
-                                                "${PLATFORM_EC}/driver/ioexpander/tca64xxa.c")
 zephyr_library_sources_ifdef(CONFIG_HAS_TASK_KEYSCAN
                                                 "${PLATFORM_EC}/common/keyboard_scan.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_RGB_KEYBOARD
@@ -512,8 +488,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PANIC
                                                 "${PLATFORM_EC}/common/panic_output.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PRESERVED_RING_BUF "${PLATFORM_EC}/common/preserved_ring_buf.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PANIC_LOG "${PLATFORM_EC}/common/panic_log.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PSE_LTC4291
-                                                "${PLATFORM_EC}/driver/pse_ltc4291.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_RSA
                                                 "${PLATFORM_EC}/common/rsa.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_RWSIG
@@ -539,8 +513,6 @@ else()
 endif()
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SWITCH
                                                 "${PLATFORM_EC}/common/switch.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SWITCHCAP_LN9310
-                                                "${PLATFORM_EC}/driver/ln9310.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SPI_FLASH_REGS
                                                 "${PLATFORM_EC}/common/spi_flash_reg.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_STM_MEMS_COMMON
@@ -557,8 +529,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TEMP_SENSOR_PCT2075
                                                 "${PLATFORM_EC}/driver/temp_sensor/pct2075.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TEMP_SENSOR_SB_TSI
                                                 "${PLATFORM_EC}/driver/temp_sensor/sb_tsi.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TEMP_SENSOR_TMP112
-                                                "${PLATFORM_EC}/driver/temp_sensor/tmp112.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TEMP_SENSOR_F75303
                                                 "${PLATFORM_EC}/driver/temp_sensor/f75303.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TEMP_SENSOR_APL6012
@@ -624,22 +594,14 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_PS8802
                                                 "${PLATFORM_EC}/driver/retimer/ps8802.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_PS8818
                                                 "${PLATFORM_EC}/driver/retimer/ps8818.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_PS8828
-                                                "${PLATFORM_EC}/driver/retimer/ps8828.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_PS8833
-                                                "${PLATFORM_EC}/driver/retimer/ps8833.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_PS8811
                                                 "${PLATFORM_EC}/driver/retimer/ps8811.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_ANX3443
                                                 "${PLATFORM_EC}/driver/usb_mux/anx3443.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_ANX7451
-                                                "${PLATFORM_EC}/driver/usb_mux/anx7451.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_SS_MUX
                                                 "${PLATFORM_EC}/driver/usb_mux/usb_mux.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_MUX_AMD_FP6
                                                 "${PLATFORM_EC}/driver/usb_mux/amd_fp6.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_MUX_AMD_FP8
-                                                "${PLATFORM_EC}/driver/usb_mux/amd_fp8.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_MUX_IT5205
                                                 "${PLATFORM_EC}/driver/usb_mux/it5205.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_MUX_PS8743
@@ -695,16 +657,10 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_TCPM_RAA489000
                                                 "${PLATFORM_EC}/driver/tcpm/raa489000.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_TCPM_RT1715
                                                 "${PLATFORM_EC}/driver/tcpm/rt1715.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_TCPM_RT1718S
-                                                "${PLATFORM_EC}/driver/tcpm/rt1718s.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_TCPM_TUSB422
-                                                "${PLATFORM_EC}/driver/tcpm/tusb422.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_TCPM_TCPCI
                                                 "${PLATFORM_EC}/driver/tcpm/tcpci.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_TCPM_ITE_ON_CHIP
                                                 "${PLATFORM_EC}/driver/tcpm/ite_pd_intc.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_TCPM_DRIVER_IT83XX
-                                                "${PLATFORM_EC}/driver/tcpm/it83xx.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_TCPM_DRIVER_IT8XXX2
                                                 "${PLATFORM_EC}/driver/tcpm/it8xxx2.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_TCPM_FUSB302
@@ -726,8 +682,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_PPC_SN5S330
                                                 "${PLATFORM_EC}/driver/ppc/sn5s330.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_PPC_SYV682X
                                                 "${PLATFORM_EC}/driver/ppc/syv682x.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_PPC_RT1718S
-                                                "${PLATFORM_EC}/driver/ppc/rt1718s.c")
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_VBOOT_HASH
                                                 "${PLATFORM_EC}/common/vboot_hash.c")
@@ -745,8 +699,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MATH_UTIL
 						"${PLATFORM_EC}/common/math_util.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MAX695X_SEVEN_SEGMENT_DISPLAY
 						"${PLATFORM_EC}/driver/led/max695x.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LED_DRIVER_TLC59116F
-                                                "${PLATFORM_EC}/driver/led/tlc59116f.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOST_COMMAND_MEMORY_DUMP
                                                 "${PLATFORM_EC}/common/host_command_memory_dump.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_AP_HANG_DETECT
