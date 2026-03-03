@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "059fd934_53750e3e",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 11
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-03T08:50:09Z",
+      "side": 1,
+      "message": "There are some extra calls but I would not say it is excessive. I would prefer not to combine button ignore logic with above if-else mass. It would complicate it, would be more error prone and harder to test. I would rather add some internal checks in btn_ign driver if required.",
+      "parentUuid": "cdb2fe73_de188fca",
+      "revId": "f506258f9998e3602b4ab8191d773487fc4bd5d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "be7d0e36_70671a0e",
         "filename": "include/fpsensor/fpsensor_btn_ign.h",
         "patchSetId": 11
@@ -31,6 +49,24 @@
       "writtenOn": "2026-02-19T09:49:49Z",
       "side": 1,
       "message": "Regarding the FP_MODE_CAPTURE (used e.g. in factory flow) - shouldn\u0027t we also activate btn_ign then?",
+      "revId": "f506258f9998e3602b4ab8191d773487fc4bd5d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c9e33ad_f5be02a0",
+        "filename": "include/fpsensor/fpsensor_btn_ign.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-03T08:50:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be7d0e36_70671a0e",
       "revId": "f506258f9998e3602b4ab8191d773487fc4bd5d3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
