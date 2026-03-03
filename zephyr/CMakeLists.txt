@@ -313,8 +313,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_RT9490
                                                 "${PLATFORM_EC}/driver/charger/rt9490.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_SM5803
                                                 "${PLATFORM_EC}/driver/charger/sm5803.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGESPLASH
-                                                "${PLATFORM_EC}/common/chargesplash.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER
 						"${PLATFORM_EC}/common/charger.c"
 						"${PLATFORM_EC}/common/charge_state.c")
@@ -404,13 +402,9 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE
                                                 "${PLATFORM_EC}/common/uart_hostcmd.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_GET_UPTIME_INFO
                                                 "${PLATFORM_EC}/common/uptime.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_REGULATOR
-                                                "${PLATFORM_EC}/common/regulator.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_I2C
                                                 "${PLATFORM_EC}/common/i2c_controller.c"
                                                 "${PLATFORM_EC}/common/i2c_passthru.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_I2C_DEBUG
-                                                "${PLATFORM_EC}/common/i2c_trace.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_I2C_VIRTUAL_BATTERY
                                                 "${PLATFORM_EC}/common/virtual_battery.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_CCGXXF
@@ -439,8 +433,6 @@ zephyr_library_sources_ifdef(CONFIG_MKBP_PROTOCOL
                                                 "${PLATFORM_EC}/common/mkbp_info.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_MKBP
                                                 "${PLATFORM_EC}/common/keyboard_mkbp.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_STUB
-                                                "${PLATFORM_EC}/common/keyboard_protocol_stub.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MKBP_INPUT_DEVICES
                                                 "${PLATFORM_EC}/common/mkbp_input_devices.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PWM_KBLIGHT
@@ -680,8 +672,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_DUAL_ROLE
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_DP_HPD_GPIO
                                                 "${PLATFORM_EC}/common/usbc/dp_hpd_gpio.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_VDM_AP_CONTROL
-                                                "${PLATFORM_EC}/common/usbc/ap_vdm_control.c")
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_TCPM_ANX7447
                                                 "${PLATFORM_EC}/driver/tcpm/anx7447.c")
@@ -747,10 +737,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MAX695X_SEVEN_SEGMENT_DISPLAY
 						"${PLATFORM_EC}/driver/led/max695x.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LED_DRIVER_TLC59116F
                                                 "${PLATFORM_EC}/driver/led/tlc59116f.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOST_COMMAND_MEMORY_DUMP
-                                                "${PLATFORM_EC}/common/host_command_memory_dump.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_AP_HANG_DETECT
-                                                "${PLATFORM_EC}/common/ap_hang_detect.c")
 
 # Switch to ec_shim library for all Zephyr sources
 set(ZEPHYR_CURRENT_LIBRARY ec_shim)
