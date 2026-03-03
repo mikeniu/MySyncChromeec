@@ -5,7 +5,6 @@
  * Test Base-32 encoding/decoding
  */
 
-#include "base32.h"
 #include "common.h"
 #include "test_util.h"
 #include "util.h"
