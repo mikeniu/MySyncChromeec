@@ -106,6 +106,24 @@
       "parentUuid": "1b6e4aee_5b69f1ac",
       "revId": "750b2d89481b1b078ba879c418cea0a3c1a16ba4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8915de9_140a2514",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-03-03T17:14:47Z",
+      "side": 1,
+      "message": "```\nThe branching was initiated by you and you volunteered to support it using your tools (that caused the problem), so I expect you to untangle it and unblock us.\n\nWhy won\u0027t manually cherry-picking each missing change work? Have things somehow been partially synced?\n```\n\nThis is supporting it, this gets it back on track, and I uploaded the CL very quickly after being notified.\n\nYes, some CL\u0027s were partially synced since the absolute file paths worked and the directory filters did not.",
+      "parentUuid": "0d44e05b_c9792c6c",
+      "revId": "750b2d89481b1b078ba879c418cea0a3c1a16ba4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
