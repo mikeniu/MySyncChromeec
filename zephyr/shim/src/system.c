@@ -25,7 +25,6 @@ LOG_MODULE_REGISTER(shim_system, LOG_LEVEL_ERR);
 static const struct device *const bbram_dev =
 	COND_CODE_1(DT_HAS_CHOSEN(cros_ec_bbram),
 		    DEVICE_DT_GET(DT_CHOSEN(cros_ec_bbram)), NULL);
-static const struct device *sys_dev;
 
 /* Map idx to a bbram offset/size, or return -1 on invalid idx */
 static int bbram_lookup(enum system_bbram_idx idx, int *offset_out,
@@ -264,6 +263,10 @@ static int check_reset_cause(void)
 	uint32_t system_flags = chip_read_reset_flags(); /* system reset flag */
 	uint32_t chip_flags = 0; /* used to write back to the BBRAM */
 	int chip_reset_cause = 0; /* chip-level reset cause */
+	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
+
+	if (!sys_dev)
+		return -1;
 
 	chip_reset_cause = cros_system_get_reset_cause(sys_dev);
 	if (chip_reset_cause < 0)
@@ -363,7 +366,8 @@ test_export_static int system_preinitialize(void)
 		}
 	}
 
-	sys_dev = device_get_binding("CROS_SYSTEM");
+	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
+
 	if (!sys_dev) {
 		/*
 		 * TODO(b/183022804): This should not happen in normal
