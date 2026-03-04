@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9254b2b_973b4fc4",
+        "filename": "zephyr/program/atria/atriarvp-rtk/i2c.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-04T22:40:12Z",
+      "side": 1,
+      "message": "RTS5912_GPIO085?",
+      "revId": "762ca1c050a46211bbb03d94151aae0d455b5463",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b868154e_27e95bf1",
+        "filename": "zephyr/program/atria/rvp_i2c.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-04T22:40:12Z",
+      "side": 1,
+      "message": "Should the PCA95xx be in 0x44 - 0x47?",
+      "range": {
+        "startLine": 32,
+        "startChar": 20,
+        "endLine": 32,
+        "endChar": 22
+      },
+      "revId": "762ca1c050a46211bbb03d94151aae0d455b5463",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
