@@ -34,6 +34,24 @@
       "parentUuid": "b9363c07_67929d17",
       "revId": "5e40a2f6991432c2240eb827b2cffc83244049e2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d2623ba_196d25f0",
+        "filename": "zephyr/include/ascp/ascp.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-04T07:20:07Z",
+      "side": 1,
+      "message": "That\u0027s true. The function description has to specify the length of the buffer has to be at least X bytes.\n\nActually, you haven\u0027t been passing the buff len anyway, just number of sk_f bytes to copy. I was asking if there is any usecase not to copy full sk_f.",
+      "parentUuid": "e4b7b178_d5f82a1c",
+      "revId": "5e40a2f6991432c2240eb827b2cffc83244049e2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
