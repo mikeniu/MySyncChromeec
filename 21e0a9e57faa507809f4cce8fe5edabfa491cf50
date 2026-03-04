@@ -16,6 +16,24 @@
       "message": "should this line be gone as well?",
       "revId": "21e0a9e57faa507809f4cce8fe5edabfa491cf50",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "376217ac_4691b349",
+        "filename": "baseboard/kukui/baseboard.h",
+        "patchSetId": 14
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-03-04T21:47:47Z",
+      "side": 0,
+      "message": "No, it\u0027s still in config.h. Could be removed in the next round of cleanup though.",
+      "parentUuid": "5c62d793_5ad7693f",
+      "revId": "21e0a9e57faa507809f4cce8fe5edabfa491cf50",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
