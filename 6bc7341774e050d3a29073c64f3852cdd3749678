@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "75460eaa_4be4715e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-04T01:52:57Z",
+      "side": 1,
+      "message": "fixed.",
+      "parentUuid": "d4880936_f6149772",
+      "revId": "6bc7341774e050d3a29073c64f3852cdd3749678",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "29bfbd3d_aa29e83b",
@@ -60,6 +78,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e936ff1e_8c06895e",
+        "filename": "zephyr/emul/Kconfig",
+        "patchSetId": 9
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-04T01:52:57Z",
+      "side": 1,
+      "message": "fixed.",
+      "parentUuid": "358fc3f7_866f7f35",
+      "range": {
+        "startLine": 222,
+        "startChar": 11,
+        "endLine": 222,
+        "endChar": 15
+      },
+      "revId": "6bc7341774e050d3a29073c64f3852cdd3749678",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3fa86f66_1d600081",
         "filename": "zephyr/emul/emul_ft98xx.c",
         "patchSetId": 9
@@ -71,6 +113,24 @@
       "writtenOn": "2026-02-25T10:54:57Z",
       "side": 1,
       "message": "It\u0027s not a correct usage of the `spi_buf_set` structure. Please check https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/emul/emul_fpc1025.c;l\u003d43.",
+      "revId": "6bc7341774e050d3a29073c64f3852cdd3749678",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5e9433e_9667002e",
+        "filename": "zephyr/emul/emul_ft98xx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-04T01:52:57Z",
+      "side": 1,
+      "message": "I modified this.",
+      "parentUuid": "3fa86f66_1d600081",
       "revId": "6bc7341774e050d3a29073c64f3852cdd3749678",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
