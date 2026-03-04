@@ -21,13 +21,6 @@ static const uint32_t crash_addr = (uint32_t)test_crash;
 static const uint32_t crash_addr = (uint32_t)crash_system;
 #endif
 
-/*
- * This is the index of RA in the panic_data.riscv.regs array, not the
- * architectural register number. The layout is defined in
- * https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/panic.c;l=79;drc=f66d5f641b3a9aa8a715fb29bd0ce6b2bb96ac8a
- */
-static const uint32_t RISCV_PANIC_REG_RA = 29;
-
 /* Estimated end of the crash function. */
 static const uint32_t crash_end = crash_addr + 0x20;
 
