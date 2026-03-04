@@ -30,22 +30,22 @@ static const struct reg_vals expected_regs[] = {
 	{ .index = CORTEX_PANIC_REGISTER_R10, .val = 0xecec000a },
 	{ .index = CORTEX_PANIC_REGISTER_R11, .val = 0xecec000b },
 #elif defined(CONFIG_RISCV)
-	{ .index = 26, .val = 0xecec0001 }, /* a0 */
-	{ .index = 25, .val = 0xecec0002 }, /* a1 */
-	{ .index = 24, .val = 0xecec0003 }, /* a2 */
-	{ .index = 23, .val = 0xecec0004 }, /* a3 */
-	{ .index = 22, .val = 0xecec0005 }, /* a4 */
-	{ .index = 21, .val = 0xecec0006 }, /* a5 */
-	{ .index = 20, .val = 0xecec0007 }, /* a6 */
-	{ .index = 19, .val = 0xecec0008 }, /* a7 */
-	{ .index = 18, .val = 0xecec0009 }, /* t0 */
-	{ .index = 17, .val = 0xecec000a }, /* t1 */
-	{ .index = 16, .val = 0xecec000b }, /* t2 */
-	{ .index = 15, .val = 0xecec000c }, /* t3 */
-	{ .index = 14, .val = 0xecec000d }, /* t4 */
-	{ .index = 13, .val = 0xecec000e }, /* t5 */
-	{ .index = 12, .val = 0xecec000f }, /* t6 */
-	{ .index = 29, .val = 0xecec0010 }, /* ra */
+	{ .index = RISCV_PANIC_REG_A0, .val = 0xecec0001 },
+	{ .index = RISCV_PANIC_REG_A1, .val = 0xecec0002 },
+	{ .index = RISCV_PANIC_REG_A2, .val = 0xecec0003 },
+	{ .index = RISCV_PANIC_REG_A3, .val = 0xecec0004 },
+	{ .index = RISCV_PANIC_REG_A4, .val = 0xecec0005 },
+	{ .index = RISCV_PANIC_REG_A5, .val = 0xecec0006 },
+	{ .index = RISCV_PANIC_REG_A6, .val = 0xecec0007 },
+	{ .index = RISCV_PANIC_REG_A7, .val = 0xecec0008 },
+	{ .index = RISCV_PANIC_REG_T0, .val = 0xecec0009 },
+	{ .index = RISCV_PANIC_REG_T1, .val = 0xecec000a },
+	{ .index = RISCV_PANIC_REG_T2, .val = 0xecec000b },
+	{ .index = RISCV_PANIC_REG_T3, .val = 0xecec000c },
+	{ .index = RISCV_PANIC_REG_T4, .val = 0xecec000d },
+	{ .index = RISCV_PANIC_REG_T5, .val = 0xecec000e },
+	{ .index = RISCV_PANIC_REG_T6, .val = 0xecec000f },
+	{ .index = RISCV_PANIC_REG_RA, .val = 0xecec0010 }, /* ra */
 #endif
 };
 
