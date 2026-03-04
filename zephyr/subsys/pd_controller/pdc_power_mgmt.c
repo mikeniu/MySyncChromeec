@@ -1004,6 +1004,10 @@ struct pdc_port_t {
 	pdc_power_mgmt_board_unattached_cb board_unattach_cb;
 	/** board callback for DP Attention event */
 	pdc_power_mgmt_board_dp_attention_cb board_dp_attention_cb;
+	/** board callback for an Attached SNK entry */
+	pdc_power_mgmt_board_attached_snk_cb board_attached_snk_cb;
+	/** board callback for an Attached SRC entry */
+	pdc_power_mgmt_board_attached_src_cb board_attached_src_cb;
 	/** CMD_SET_BBR_CTS temp variable to communicate the desired state */
 	bool bbr_cts_enable;
 	/** Battery status */
@@ -2348,6 +2352,10 @@ static void pdc_src_attached_entry(void *obj)
 	 * sourcing state.
 	 */
 	atomic_clear_bit(port->snk_policy.flags, SNK_POLICY_EVAL_SWAP_TO_SRC);
+
+	if (port->board_attached_src_cb) {
+		port->board_attached_src_cb(port_number);
+	}
 }
 
 /**
@@ -2476,6 +2484,10 @@ static void pdc_snk_attached_entry(void *obj)
 		/* Update the PDC with the correct battery status. */
 		pdc_update_battery_capability(port);
 		pdc_update_battery_status(port, true);
+	}
+
+	if (port->board_attached_snk_cb) {
+		port->board_attached_snk_cb(port_number);
 	}
 }
 
@@ -5983,6 +5995,14 @@ int pdc_power_mgmt_register_board_callback(enum pdc_power_mgmt_board_cb_t type,
 		case PDC_BOARD_CB_DP_ATTENTION:
 			pdc->board_dp_attention_cb =
 				(pdc_power_mgmt_board_dp_attention_cb)callback;
+			break;
+		case PDC_BOARD_CB_ATTACHED_SNK:
+			pdc->board_attached_snk_cb =
+				(pdc_power_mgmt_board_attached_snk_cb)callback;
+			break;
+		case PDC_BOARD_CB_ATTACHED_SRC:
+			pdc->board_attached_src_cb =
+				(pdc_power_mgmt_board_attached_src_cb)callback;
 			break;
 		default:
 			break;
