@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "226ea724_6ed612dd",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx_private.h",
+        "patchSetId": 59
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-04T02:14:17Z",
+      "side": 1,
+      "message": "I removed them.",
+      "parentUuid": "01b94f96_7318569a",
+      "revId": "9675b3d1a853a912db1cd612385c9393fdc224a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fbb00511_6495a4c2",
         "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx_private.h",
         "patchSetId": 59
@@ -31,6 +49,30 @@
       "writtenOn": "2026-03-03T12:30:17Z",
       "side": 1,
       "message": "`dintance` seems to be a typo for `distance`.",
+      "range": {
+        "startLine": 270,
+        "startChar": 0,
+        "endLine": 270,
+        "endChar": 0
+      },
+      "revId": "9675b3d1a853a912db1cd612385c9393fdc224a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c38f4f2b_38fa5672",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx_private.h",
+        "patchSetId": 59
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-04T02:14:17Z",
+      "side": 1,
+      "message": "fixed.",
+      "parentUuid": "fbb00511_6495a4c2",
       "range": {
         "startLine": 270,
         "startChar": 0,
