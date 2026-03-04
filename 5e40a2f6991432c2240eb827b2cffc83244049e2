@@ -52,6 +52,24 @@
       "parentUuid": "e4b7b178_d5f82a1c",
       "revId": "5e40a2f6991432c2240eb827b2cffc83244049e2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c195cea_dc2cf2d1",
+        "filename": "zephyr/include/ascp/ascp.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-04T08:41:58Z",
+      "side": 1,
+      "message": "You are right, somehow it was not considered carefully. Now it is length of the buffer, giving less than 32 would be an error and 32 bytes would be always copied.",
+      "parentUuid": "2d2623ba_196d25f0",
+      "revId": "5e40a2f6991432c2240eb827b2cffc83244049e2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
