@@ -191,6 +191,16 @@ config AP_PWRSEQ_S0IX_COUNTER
 	  Enables counter which increases at every transitions to S0ix state.
 	  Counter can be read via host command.
 
+config AP_PWRSEQ_S0IX_HANDLE_AP_RESET
+	bool "handle AP warm reset in S0ix state"
+	depends on AP_PWRSEQ_DRIVER
+	depends on AP_PWRSEQ_S0IX
+	default n
+	help
+	  When enabled, AP power sequencer will detect assertion of the
+	  PLTRST (Platform Reset) virtual wire signal while in S0ix state
+	  and transition directly to S0.
+
 config AP_PWRSEQ_DEBUG_MODE_COMMAND
 	bool "Console commands to enable/disable AP debug mode"
 	depends on X86_NON_DSX_PWRSEQ
