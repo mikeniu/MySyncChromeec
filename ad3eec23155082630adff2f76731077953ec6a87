@@ -34,6 +34,24 @@
       "parentUuid": "9bc1c847_8f9118f7",
       "revId": "ad3eec23155082630adff2f76731077953ec6a87",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c3e4004_45938d81",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1364246
+      },
+      "writtenOn": "2026-03-04T03:08:44Z",
+      "side": 1,
+      "message": "\u003e the LED diagnostic feature ... are broken\n\nIs it fine from the perspective of the feature owner? \n\n\u003e I\u0027m just curious why it wasn\u0027t blocked by the CQ\n\nThat\u0027s a very good question -- It looks no test was run due to \"no builds to test\": https://screenshot.googleplex.com/3XyUyqJtojzDzyg\n\nMaybe something special in EC.\n\n@jasonyuan@chromium.org do you have any idea here?",
+      "parentUuid": "c06edd0b_952724fe",
+      "revId": "ad3eec23155082630adff2f76731077953ec6a87",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
