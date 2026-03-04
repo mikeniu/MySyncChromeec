@@ -9,6 +9,7 @@
 / {
 	chosen {
 		intel-ap-pwrseq,espi = &espi0;
+		intel-ap-pwrseq,pltrst = &pwr_pltrst;
 	};
 
 	common-pwrseq {
@@ -114,6 +115,14 @@
 		dbg-label = "SLP_S5 virtual wire input from PCH";
 		enum-name = "PWR_SLP_S5";
 		virtual-wire = "ESPI_VWIRE_SIGNAL_SLP_S5";
+		reset-val = <1>;
+		vw-invert;
+	};
+	pwr_pltrst: pwr-pltrst {
+		compatible = "intel,ap-pwrseq-vw";
+		dbg-label = "PLTRST virtual wire input from PCH";
+		enum-name = "PWR_PLTRST";
+		virtual-wire = "ESPI_VWIRE_SIGNAL_PLTRST";
 		reset-val = <1>;
 		vw-invert;
 	};
