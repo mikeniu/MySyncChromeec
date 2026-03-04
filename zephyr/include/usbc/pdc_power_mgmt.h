@@ -65,6 +65,10 @@ enum pdc_power_mgmt_board_cb_t {
 	PDC_BOARD_CB_UNATTACH,
 	/** DP Attention */
 	PDC_BOARD_CB_DP_ATTENTION,
+	/** Attached as sink */
+	PDC_BOARD_CB_ATTACHED_SNK,
+	/** Attached as source */
+	PDC_BOARD_CB_ATTACHED_SRC,
 
 	/** State count. Always leave as last item. */
 	PDC_BOARD_CB_COUNT,
@@ -700,6 +704,20 @@ typedef void (*pdc_power_mgmt_board_dp_attention_cb)(int port,
  * @param port USB-C port number
  */
 typedef void (*pdc_power_mgmt_board_unattached_cb)(int port);
+
+/**
+ * @brief Board hook for sink attached event
+ *
+ * @param port USB-C port number
+ */
+typedef void (*pdc_power_mgmt_board_attached_snk_cb)(int port);
+
+/**
+ * @brief Board hook for source attached event
+ *
+ * @param port USB-C port number
+ */
+typedef void (*pdc_power_mgmt_board_attached_src_cb)(int port);
 
 /**
  * @brief Get the latest DP Attention/Status VDO for the port.
