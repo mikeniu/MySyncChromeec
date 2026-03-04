@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3d0147ea_09faa3da",
+        "filename": "util/diff_upstream.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-03-04T19:34:07Z",
+      "side": 0,
+      "message": "yeah I was thinking about letting this bake for a week or two and then deleting the repo from the manifest and the copybot config",
+      "parentUuid": "1a1b6657_259af9b9",
+      "range": {
+        "startLine": 22,
+        "startChar": 4,
+        "endLine": 22,
+        "endChar": 35
+      },
+      "revId": "96e82eb51914213b53ed6684e08e9262aaeec6d0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f2155d2d_5c91a918",
         "filename": "util/diff_upstream.sh",
         "patchSetId": 1
@@ -37,6 +61,30 @@
       "writtenOn": "2026-03-04T18:51:48Z",
       "side": 0,
       "message": "This directory still exists.",
+      "range": {
+        "startLine": 23,
+        "startChar": 4,
+        "endLine": 23,
+        "endChar": 35
+      },
+      "revId": "96e82eb51914213b53ed6684e08e9262aaeec6d0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af418b01_6e0f8b00",
+        "filename": "util/diff_upstream.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-03-04T19:34:07Z",
+      "side": 0,
+      "message": "see the comment above",
+      "parentUuid": "f2155d2d_5c91a918",
       "range": {
         "startLine": 23,
         "startChar": 4,

@@ -22,6 +22,30 @@
       },
       "revId": "e6de13a8ec1a69f48a8d0ed62c75ca0b2bf42606",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b76ef96d_6cebc090",
+        "filename": "util/find_non_exec_lines.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-03-04T19:34:07Z",
+      "side": 1,
+      "message": "oh, yeah, sorry I somehow thought it was two different strings, fixed",
+      "parentUuid": "fe1b5a4c_2cbfd491",
+      "range": {
+        "startLine": 41,
+        "startChar": 24,
+        "endLine": 42,
+        "endChar": 38
+      },
+      "revId": "e6de13a8ec1a69f48a8d0ed62c75ca0b2bf42606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
