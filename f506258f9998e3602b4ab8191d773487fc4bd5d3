@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ad545652_d57937dc",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 11
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1442982
+      },
+      "writtenOn": "2026-03-04T15:07:55Z",
+      "side": 1,
+      "message": "OK, that\u0027s fine. By btn_ign driver you mean outside of update_btn_ign method?",
+      "parentUuid": "059fd934_53750e3e",
+      "revId": "f506258f9998e3602b4ab8191d773487fc4bd5d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "be7d0e36_70671a0e",
         "filename": "include/fpsensor/fpsensor_btn_ign.h",
         "patchSetId": 11
