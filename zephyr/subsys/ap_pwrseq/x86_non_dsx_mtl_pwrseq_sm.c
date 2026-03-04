@@ -175,6 +175,17 @@ static int x86_non_dsx_mtl_s0ix_run(void *data)
 		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S5);
 	}
 
+#if DT_HAS_CHOSEN(intel_ap_pwrseq_pltrst)
+	/* PLTRST assertion by CPU indicates CPU reset,
+	   leading to AP_POWER_SLEEP_RESUME event skipped from AP.
+	   EC should no longer wait for resume event and move to S0 state.
+	*/
+	if (power_signal_get(PWR_PLTRST)) {
+		ap_power_reset_host_sleep_state();
+		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S0);
+	}
+#endif /* DT_HAS_CHOSEN(intel_ap_pwrseq_pltrst) */
+
 	/* System in S0 if SLP_S0 and Sleep notification is received. */
 	if (ap_power_sleep_get_notify() == AP_POWER_SLEEP_RESUME &&
 	    /* Since this is a substate of S0, S3 signal is checked on S0
