@@ -16,6 +16,24 @@
       "message": "If I get it correctly, your driver is implemented mainly based on the [npcx driver](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/cros_flash/cros_flash_npcx.c). However, I believe a more appropriate example would be the [andes driver](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/cros_flash/cros_flash_andestech_xip.c). It also uses SPI NOR flash chip, controlled by setting the status registers. You would need to add also additional functionality to lock changing the status register.\n\nIIUC, your chip also doesn\u0027t use the hardware signal #WP, which is physically connected to the SPI NOR flash, right?",
       "revId": "58b01a806cb192c63beb81078bf8b831790f290d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d15e1e49_472dad33",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-04T03:11:07Z",
+      "side": 1,
+      "message": "Our driver is mainly based on the rtk driver. https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/cros_flash/cros_flash_rtk.c",
+      "parentUuid": "70fe6818_29aefe87",
+      "revId": "58b01a806cb192c63beb81078bf8b831790f290d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
