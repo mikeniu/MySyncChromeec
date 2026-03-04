@@ -324,7 +324,7 @@ void host_set_events(host_event_t mask)
 	/* Do not print a console event to avoid a printing loop. */
 	if (!IS_ENABLED(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT) ||
 	    (mask != EC_HOST_EVENT_MASK(EC_HOST_EVENT_CONSOLE_LOGS)))
-		HOST_EVENT_CPRINTS("event set", mask);
+		// HOST_EVENT_CPRINTS("event set", mask);
 
 	if (!IS_ENABLED(CONFIG_ZTEST) &&
 	    (mask & EC_HOST_EVENT_MASK(EC_HOST_EVENT_KEYBOARD_RECOVERY)))
@@ -374,7 +374,7 @@ void host_clear_events(host_event_t mask)
 	/* Do not print a console event to avoid a printing loop. */
 	if (!IS_ENABLED(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT) ||
 	    (mask != EC_HOST_EVENT_MASK(EC_HOST_EVENT_CONSOLE_LOGS)))
-		HOST_EVENT_CPRINTS("event clear", mask);
+		// HOST_EVENT_CPRINTS("event clear", mask);
 
 	host_events_atomic_clear(&events, mask);
 

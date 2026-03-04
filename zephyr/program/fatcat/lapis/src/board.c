@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "charge_state.h"
 #include "charger.h"
 #include "cros_board_info.h"
 #include "cros_cbi.h"
@@ -12,6 +13,12 @@
 #include "keyboard_config.h"
 #include "keyboard_protocol.h"
 #include "keyboard_raw.h"
+
+#include "driver/charger/isl9241.h"
+#include "extpower.h"
+
+#include "i2c.h"
+
 #include "lid_switch.h"
 
 LOG_MODULE_REGISTER(lapis_board, LOG_LEVEL_INF);
@@ -60,3 +67,66 @@ static void disable_sleep_bid(void)
 		disable_sleep(SLEEP_MASK_FORCE_NO_DSLEEP);
 }
 DECLARE_HOOK(HOOK_INIT, disable_sleep_bid, HOOK_PRIO_POST_I2C);
+
+static void set_chg_control3(void)
+{
+	int reg, rv;
+
+	rv = i2c_read16(chg_chips[0].i2c_port, chg_chips[0].i2c_addr_flags,
+		   ISL9241_REG_CONTROL3, &reg);
+	printk("--aconly read 0x4C_reg=0x%02x\n", reg);
+	if (rv)
+		return;
+
+	if (reg & ISL9241_CONTROL3_INPUT_CURRENT_LIMIT)
+		return;
+
+	reg |= ISL9241_CONTROL3_INPUT_CURRENT_LIMIT;
+
+	rv =  i2c_write16(chg_chips[0].i2c_port, chg_chips[0].i2c_addr_flags,
+		    ISL9241_REG_CONTROL3, reg);
+	printk("--aconly write 0x4C_reg=0x%02x\n", reg);
+	if (rv)
+		return;
+}
+
+static void restore_chg_control3(void)
+{
+	int reg, rv;
+
+	rv = i2c_read16(chg_chips[0].i2c_port, chg_chips[0].i2c_addr_flags,
+			ISL9241_REG_CONTROL3, &reg);
+	if (rv)
+		return;
+
+	printk("--restore read 0x4C_reg=0x%02x\n", reg);
+
+	if (!(reg & ISL9241_CONTROL3_INPUT_CURRENT_LIMIT))
+		return;
+
+	reg &= ~ISL9241_CONTROL3_INPUT_CURRENT_LIMIT;
+
+	rv = i2c_write16(chg_chips[0].i2c_port, chg_chips[0].i2c_addr_flags,
+			 ISL9241_REG_CONTROL3, reg);
+	printk("--restore write 0x4C_reg=0x%02x\n", reg);
+	if (rv)
+		return;
+}
+
+static void detect_aconly(void);
+DECLARE_DEFERRED(detect_aconly);
+static void detect_aconly(void)
+{
+	const struct batt_params *batt = charger_current_battery_params();
+
+	if (extpower_is_present()) {
+		if (batt->is_present == BP_NO) {
+			printk("----detect AC only----\n");
+			set_chg_control3();
+		} else {
+			restore_chg_control3();
+		}
+	}
+}
+DECLARE_HOOK(HOOK_INIT, detect_aconly, HOOK_PRIO_DEFAULT + 1);
+DECLARE_HOOK(HOOK_BATTERY_SOC_CHANGE, detect_aconly, HOOK_PRIO_DEFAULT + 1);
