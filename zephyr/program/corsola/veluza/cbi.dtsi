@@ -68,6 +68,26 @@
 		};
 
 		/*
+		 * FW_CONFIG field to defined for KB TYPE.
+		 */
+		kb_config: kb {
+			enum-name = "KB";
+			start = <3>;
+			size = <1>;
+
+			kb-test {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "KB_TEST";
+				value = <0>;
+			};
+			kb-default {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "KB_DEFAULT";
+				value = <1>;
+			};
+		};
+
+		/*
 		 * FW_CONFIG field to defined for AMP TYPE.
 		 */
 		amp {
