@@ -52,6 +52,24 @@
       "parentUuid": "c06edd0b_952724fe",
       "revId": "ad3eec23155082630adff2f76731077953ec6a87",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7009f12c_6bd41a8e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530527
+      },
+      "writtenOn": "2026-03-04T06:49:57Z",
+      "side": 1,
+      "message": "\u003e Is it fine from the perspective of the feature owner?\n\nWe think that\u0027s fine for now. Created crrev.com/c/7631537 to mark the test as informational. We will promote the test back to critical after we fix the issue.\n\nc.c. @menghuan@chromium.org",
+      "parentUuid": "3c3e4004_45938d81",
+      "revId": "ad3eec23155082630adff2f76731077953ec6a87",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
