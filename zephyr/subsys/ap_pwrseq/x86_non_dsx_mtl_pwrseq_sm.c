@@ -4,6 +4,7 @@
  */
 
 #include <x86_non_dsx_common_pwrseq_sm_handler.h>
+#include "signal_vw.h"
 #ifdef CONFIG_AP_PWRSEQ_DRIVER
 #include "ap_power/ap_pwrseq_sm.h"
 #endif
@@ -175,9 +176,16 @@ static int x86_non_dsx_mtl_s0ix_run(void *data)
 		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S5);
 	}
 
-	/* System in S0 only if SLP_S0 and SLP_S3 are de-asserted */
-	if (power_signals_off(IN_PCH_SLP_S0) &&
-	    power_signals_off(IN_PCH_SLP_S3)) {
+	/* System enters S0 if PLTRST asserted (CPU reset) or
+	 * SLP_S0 and SLP_S3 are de-asserted.
+	 */
+	if (
+#if ANY_INST_HAS_INTEL_AP_PWRSEQ_PLTRST
+	    power_signal_get(PWR_PLTRST) ||
+#endif
+	    (power_signals_off(IN_PCH_SLP_S0) &&
+	     power_signals_off(IN_PCH_SLP_S3))) {
+		ap_power_reset_host_sleep_state();
 		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S0);
 	}
 
