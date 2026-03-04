@@ -5,8 +5,11 @@
 
 #include "charger.h"
 #include "cros_board_info.h"
+#include "driver/charger/isl9241.h"
+#include "extpower.h"
 #include "gpio.h"
 #include "hooks.h"
+#include "i2c.h"
 #include "lid_switch.h"
 
 static void set_chg_reg_custom(void)
@@ -37,3 +40,40 @@ static void disable_sleep_bid(void)
 		disable_sleep(SLEEP_MASK_FORCE_NO_DSLEEP);
 }
 DECLARE_HOOK(HOOK_INIT, disable_sleep_bid, HOOK_PRIO_POST_I2C);
+
+static void aconly_isl9241(void)
+{
+	int reg, rv;
+
+	i2c_read16(chg_chips[0].i2c_port, chg_chips[0].i2c_addr_flags,
+		   ISL9241_REG_CONTROL3, &reg);
+	printk("--read 0x4C_reg=0x%02x\n", reg);
+	reg = reg | BIT(5);
+	i2c_write16(chg_chips[0].i2c_port, chg_chips[0].i2c_addr_flags,
+		    ISL9241_REG_CONTROL3, reg);
+	printk("--write 0x4C_reg=0x%02x\n", reg);
+
+	// rv = charger_set_voltage(0,9000);
+	// printk("--set voltage 9000mV\n");
+	// if (rv != EC_SUCCESS)
+	// 	printk("--set voltage fail!\n");
+}
+
+static void detect_aconly(void);
+DECLARE_DEFERRED(detect_aconly);
+static void detect_aconly(void)
+{
+	static int detect_cnt;
+
+	if (extpower_is_present()) {
+		if (battery_is_present() == BP_NO) {
+			aconly_isl9241();
+		} else if (detect_cnt < 3) {
+			detect_cnt++;
+			hook_call_deferred(&detect_aconly_data,
+					   CONFIG_BATTERY_PRECHARGE_TIMEOUT *
+						   USEC_PER_SEC);
+		}
+	}
+}
+DECLARE_HOOK(HOOK_INIT, detect_aconly, HOOK_PRIO_DEFAULT);
