@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "df4027d1_9227d42a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-04T02:01:47Z",
+      "side": 1,
+      "message": "fixed.",
+      "parentUuid": "5f3e1ac4_51db46ae",
+      "revId": "b83201e8c6a7c9b6a4fa1a57c536278c04e3b54f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c227fa51_6fbbf99d",
         "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
         "patchSetId": 8
@@ -31,6 +49,30 @@
       "writtenOn": "2026-02-25T11:02:19Z",
       "side": 1,
       "message": "I think you can add just one test `test_maintenance`, since it just returns 0. No need to check other scenarios like `small_buffer`.",
+      "range": {
+        "startLine": 114,
+        "startChar": 0,
+        "endLine": 129,
+        "endChar": 11
+      },
+      "revId": "b83201e8c6a7c9b6a4fa1a57c536278c04e3b54f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb10eeae_64746255",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-04T02:01:47Z",
+      "side": 1,
+      "message": "fixed.",
+      "parentUuid": "c227fa51_6fbbf99d",
       "range": {
         "startLine": 114,
         "startChar": 0,
