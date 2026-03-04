@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe1b5a4c_2cbfd491",
+        "filename": "util/find_non_exec_lines.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-03-04T18:51:48Z",
+      "side": 1,
+      "message": "I think you meant to delete this whole expression.",
+      "range": {
+        "startLine": 41,
+        "startChar": 24,
+        "endLine": 42,
+        "endChar": 38
+      },
+      "revId": "e6de13a8ec1a69f48a8d0ed62c75ca0b2bf42606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
