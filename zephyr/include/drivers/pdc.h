@@ -12,7 +12,7 @@
 #define ZEPHYR_INCLUDE_DRIVERS_PDC_H_
 
 #include "ec_commands.h"
-#include "power.h"
+#include "power_host_sleep.h"
 #include "ucsi_v3.h"
 #include "usb_pd.h"
 #include "usbc/utils.h"
