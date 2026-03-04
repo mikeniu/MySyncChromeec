@@ -39,6 +39,30 @@
       },
       "revId": "529d89873eaad4a050904b07bf662f01d0e5e975",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db04061f_d8dea271",
+        "filename": "zephyr/drivers/dsp_comms/client/remote_lid_switch.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-03-04T03:16:10Z",
+      "side": 1,
+      "message": "Hi @scott,\n\nTrulo devices has CBI DSP comms enabled hence we don\u0027t see this issue.\n\nThe initial value \"false\" indicates lid is closed. \nWe don\u0027t have a situation where the lid is in closed and the DUT boots to OS \u0026 ISH firmware is loaded. Hence i believe this is valid change.\n\nLet me know your thoughts.",
+      "parentUuid": "cf5ce5f3_135f5712",
+      "range": {
+        "startLine": 14,
+        "startChar": 31,
+        "endLine": 14,
+        "endChar": 37
+      },
+      "revId": "529d89873eaad4a050904b07bf662f01d0e5e975",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
