@@ -34,6 +34,24 @@
       "parentUuid": "64f642b7_4d59c652",
       "revId": "003049b965b18cb159c3bcbe1211374b6be61171",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed589a20_60967afb",
+        "filename": "zephyr/program/atria/atriarvp-rtk/i2c.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-04T20:42:11Z",
+      "side": 1,
+      "message": "I think that\u0027s probably the right choice. I would expect that there\u0027s this group of components that are physically on the RVP that should be part of the device tree for any RVP build, and including all of them in the project overlay would be a good way to make sure they\u0027re all there.\n\nWe could even have something like `atria/rvp.dtsi` that includes all of them and then just include that from the project overlay. That would be a little more foolproof.\n\nThe only reason I can think of that that wouldn\u0027t work is if different RVP builds needed to describe different subsets of the RVP hardware for some reason. Right now, we only have one RVP build, so that might be academic.",
+      "parentUuid": "dde1ba78_621bfebc",
+      "revId": "003049b965b18cb159c3bcbe1211374b6be61171",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
