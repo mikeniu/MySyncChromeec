@@ -462,6 +462,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "865bf573_a18449cc",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-05T00:21:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7185ae33_943fd13a",
+      "range": {
+        "startLine": 264,
+        "startChar": 0,
+        "endLine": 264,
+        "endChar": 47
+      },
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "891e9f2d_0bf91986",
@@ -547,6 +571,30 @@
       "side": 1,
       "message": "My goal is that the AP_PWRSEQ_DRIVER option never defines `board_ap_power_force_shutdown`.  These weakly defined board functions are not a good design pattern.\n\nUsing ifdefs seems like a good approach here.  The alternate would be to declare prototypes for both ap_pwrseq_post_event() and board_ap_power_force_shutdown() that are valid for both options types.\n\n```\nvoid ap_power_force_shutdown()\n#ifdef CONFIG_AP_PWRSEQ_DRIVER\n    ap_pwrseq_post_event();\n#else\n    board_ap_power_force_shutdown()\n#endif\n```",
       "parentUuid": "4df318a8_8ff9fb49",
+      "range": {
+        "startLine": 281,
+        "startChar": 1,
+        "endLine": 281,
+        "endChar": 30
+      },
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b58bebb_704e18c4",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-05T00:21:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5d246d0_548d182f",
       "range": {
         "startLine": 281,
         "startChar": 1,
