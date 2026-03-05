@@ -63,6 +63,30 @@
       },
       "revId": "529d89873eaad4a050904b07bf662f01d0e5e975",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7271279_f86d045a",
+        "filename": "zephyr/drivers/dsp_comms/client/remote_lid_switch.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-05T23:01:57Z",
+      "side": 1,
+      "message": "This assumption (AP boot implies lid open) is not correct.  \n\nIf there is an external display connected, [depthcharge](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/depthcharge/src/vboot/ui/loop.c;l\u003d67;drc\u003d405bdcd9598750a9047a8f6140ae79b2571ced57) allows the kernel to boot, even if the lid is closed.",
+      "parentUuid": "db04061f_d8dea271",
+      "range": {
+        "startLine": 14,
+        "startChar": 31,
+        "endLine": 14,
+        "endChar": 37
+      },
+      "revId": "529d89873eaad4a050904b07bf662f01d0e5e975",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
