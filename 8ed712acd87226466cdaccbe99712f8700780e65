@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d411868e_31f241b7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-05T23:58:52Z",
+      "side": 1,
+      "message": "This and the parent CL should be restructured.  The parent should enable PDC/battery/charging, and the follower CL enable the runtime config.\nThis provides a cleaner commit history for partners to follow - many partners won\u0027t need the runtime support.",
+      "revId": "8ed712acd87226466cdaccbe99712f8700780e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be2df4fb_7ac23b28",
+        "filename": "zephyr/program/atria/program.conf",
+        "patchSetId": 6
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-05T23:58:52Z",
+      "side": 1,
+      "message": "This should be in the previous CL that enables PDC.\n\nYou should also enable `CONFIG_USBC_PDC_TPS6699X_CONSOLE_FW_UPDATER` to allow PDC firmware updates through the EC console.",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 10
+      },
+      "revId": "8ed712acd87226466cdaccbe99712f8700780e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
