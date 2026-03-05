@@ -52,6 +52,24 @@
       "parentUuid": "dde1ba78_621bfebc",
       "revId": "003049b965b18cb159c3bcbe1211374b6be61171",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52ada738_bb5aea8f",
+        "filename": "zephyr/program/atria/atriarvp-rtk/i2c.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-05T16:45:37Z",
+      "side": 1,
+      "message": "I like the idea of one big rvp.dtsi that has all the includes I\u0027ll work on adding that starting with this patch",
+      "parentUuid": "ed589a20_60967afb",
+      "revId": "003049b965b18cb159c3bcbe1211374b6be61171",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
