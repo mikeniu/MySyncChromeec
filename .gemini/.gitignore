@@ -1,0 +1,11 @@
+# Ignore temporary agent files and session context
+tmp/
+*.tmp
+*.log
+.DS_Store
+
+# Keep the core configuration and instructions
+!GEMINI.md
+!README.md
+!skills/
+!commands/
