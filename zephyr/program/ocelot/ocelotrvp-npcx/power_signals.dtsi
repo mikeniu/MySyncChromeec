@@ -30,6 +30,3 @@
         /* ALL_SYS_PWRGD_R net */
 	gpios = <&gpio6 3 GPIO_ACTIVE_HIGH>;
 };
-&pwr_sys_rst {
-        gpios = <&gpioc 5 (GPIO_ACTIVE_LOW|GPIO_OPEN_DRAIN)>;
-};

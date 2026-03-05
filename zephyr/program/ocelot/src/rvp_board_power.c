@@ -86,6 +86,8 @@ int board_power_signal_get(enum power_signal signal)
 	switch (signal) {
 	case PWR_EC_PCH_SYS_PWROK:
 		return power_signal_get(PWR_PCH_PWROK);
+	case PWR_SYS_RST:
+		return gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(sys_rst_odl));
 	default:
 		return -EINVAL;
 	}
@@ -93,5 +95,11 @@ int board_power_signal_get(enum power_signal signal)
 
 int board_power_signal_set(enum power_signal signal, int value)
 {
-	return 0;
+	switch (signal) {
+	case PWR_SYS_RST:
+		return gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(sys_rst_odl),
+				       value);
+	default:
+		return -EINVAL;
+	}
 }
