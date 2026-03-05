@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82e80fd0_e9600c33",
+        "filename": "zephyr/program/skywalker/obiwan/src/thermal_policy.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-03-05T03:07:02Z",
+      "side": 1,
+      "message": "Should this be `retry_charger_cyc \u003e\u003d RETRY_CHARGER`?\n\nRETRY_CHARGER \u003d\u003d 3, consider the following steps:\n\n1. i2c_read16 fails 3 times\n2. retry_charger_cyc goes from 2 to 3\n3. pdc_power_mgmt_set_comms_state(false) is called because `retry_charger_cyc \u003e\u003d RETRY_CHARGER`\n4. `etry_charger_cyc \u003e RETRY_CHARGER` is false so the code call i2c_read16 again\n5. i2c_read16 fails again\n6. retry_charger_cyc goes from 3 to 4\n7. pdc_power_mgmt_set_comms_state(false) is called because `retry_charger_cyc \u003e\u003d RETRY_CHARGER`\n\nI think we intend to call pdc_power_mgmt_set_comms_state(false) once.",
+      "range": {
+        "startLine": 259,
+        "startChar": 6,
+        "endLine": 259,
+        "endChar": 39
+      },
+      "revId": "4d1fd35b241be92ffb512ed729961dbb93aed0d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
