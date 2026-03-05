@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a1458ec_cad9da07",
+        "filename": "zephyr/program/atria/rvp_consolidated.dtsi",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-05T21:59:43Z",
+      "side": 1,
+      "message": "Nit: If these includes can be in the previous commit, they probably should be.",
+      "revId": "e8f8311b9a8de67e65a27dc625e4ffa8c82295ff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
