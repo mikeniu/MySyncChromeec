@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d6778b9_060ec59d",
+        "filename": ".agents/AGENTS.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1270601
+      },
+      "writtenOn": "2026-03-05T22:45:57Z",
+      "side": 1,
+      "message": "`../docs`? Also does gemini cli dedup paths? I guess I would drop the @docs/zephyr to avoid dups.",
+      "range": {
+        "startLine": 36,
+        "startChar": 45,
+        "endLine": 36,
+        "endChar": 70
+      },
+      "revId": "142665dc60fd6bb1ceae49f1823d22957b1c1690",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "560c4c6d_44d61f3c",
+        "filename": ".agents/AGENTS.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1270601
+      },
+      "writtenOn": "2026-03-05T22:45:57Z",
+      "side": 1,
+      "message": "```suggestion\n* **Style**: Linux Kernel style (Tabs, 80 cols). See @../README.md. Use `cros format \u003cfile\u003e`.\n```",
+      "range": {
+        "startLine": 50,
+        "startChar": 54,
+        "endLine": 50,
+        "endChar": 63
+      },
+      "revId": "142665dc60fd6bb1ceae49f1823d22957b1c1690",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
