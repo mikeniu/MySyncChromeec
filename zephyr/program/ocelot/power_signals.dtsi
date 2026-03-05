@@ -88,11 +88,10 @@
 		/* Note - gpios property must be set by the board overlay */
 		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
 	};
-	pwr_sys_rst: pwr-sys-rst-l {
-		compatible = "intel,ap-pwrseq-gpio";
+	pwr-sys-rst-l {
+		compatible = "intel,ap-pwrseq-external";
 		dbg-label = "SYS_RESET# output to PCH";
 		enum-name = "PWR_SYS_RST";
-		output;
 	};
 	ap-power {
 		compatible = "ap-pwrseq-sub-states";
