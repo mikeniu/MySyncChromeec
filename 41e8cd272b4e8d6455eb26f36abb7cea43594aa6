@@ -16,6 +16,24 @@
       "message": "this isn\u0027t matched with an #if...",
       "revId": "41e8cd272b4e8d6455eb26f36abb7cea43594aa6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eda694fe_3c1752d9",
+        "filename": "zephyr/program/fatcat/francka/src/board_power.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-05T16:42:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f82d62c_4251610d",
+      "revId": "41e8cd272b4e8d6455eb26f36abb7cea43594aa6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
