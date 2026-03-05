@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfb43fa9_8c4b6255",
+        "filename": "zephyr/drivers/dsp_comms/client/dsp_client.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-03-05T16:43:55Z",
+      "side": 1,
+      "message": "\"k_work_submit\" should not execute if this failure occurs. Good to return from here in case of failure.\n```suggestion\n    LOG_ERR(\"Failed to write reset message\");\n    return rc;\n```",
+      "revId": "abf616b6570a6ebacb3ea4e6ad418dd760f6526d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
