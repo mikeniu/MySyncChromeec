@@ -12,3 +12,5 @@
 #include "rvp_ioex_gpio.dtsi"
 #include "rvp_pd.dtsi"
 #include "rvp_usbc.dtsi"
+#include "rvp_runtime_pd.dtsi"
+#include "rvp_runtime_usbc.dtsi"
