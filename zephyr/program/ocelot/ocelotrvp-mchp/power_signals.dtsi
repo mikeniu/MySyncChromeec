@@ -23,6 +23,3 @@
 &pwr_all_sys_pwrgd {
 	gpios = <MCHP_GPIO_DECODE_057 GPIO_ACTIVE_HIGH>;
 };
-&pwr_sys_rst {
-	gpios = <&ioex_it8801_port1 0 (GPIO_ACTIVE_LOW|GPIO_OPEN_DRAIN)>;
-};
