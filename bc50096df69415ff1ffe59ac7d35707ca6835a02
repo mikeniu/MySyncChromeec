@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d7d259c_2c810617",
+        "filename": "zephyr/program/atria/rvp_ioex_gpio.dtsi",
+        "patchSetId": 5
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-05T23:44:57Z",
+      "side": 1,
+      "message": "I prefer this only appears in the power sequencing file.  Generally we don\u0027t want developers to have access to manipulate power sequence signals from the command line.",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 4
+      },
+      "revId": "bc50096df69415ff1ffe59ac7d35707ca6835a02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
