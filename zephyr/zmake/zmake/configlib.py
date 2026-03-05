@@ -48,14 +48,14 @@ def register_binman_project(**kwargs):
 def register_npcx_project(**kwargs):
     """Register a project that uses NpcxPacker."""
     kwargs.setdefault("output_packer", zmake.output_packers.NpcxPacker)
-    kwargs.setdefault("modules", ["cmsis", "cmsis_6", "ec"])
+    kwargs.setdefault("modules", ["cmsis_6", "ec"])
     return register_binman_project(**kwargs)
 
 
 def register_mchp_project(**kwargs):
     """Register a project that uses MchpPacker."""
     kwargs.setdefault("output_packer", zmake.output_packers.MchpPacker)
-    kwargs.setdefault("modules", ["cmsis", "cmsis_6", "ec"])
+    kwargs.setdefault("modules", ["cmsis_6", "ec"])
     return register_binman_project(**kwargs)
 
 
@@ -63,12 +63,12 @@ def register_ish_project(**kwargs):
     """Register a project that uses IshBinPacker."""
     kwargs.setdefault("supported_toolchains", ["coreboot-sdk", "zephyr"])
     kwargs.setdefault("output_packer", zmake.output_packers.IshBinPacker)
-    kwargs.setdefault("modules", ["ec", "cmsis", "cmsis_6", "hal_intel_public"])
+    kwargs.setdefault("modules", ["ec", "cmsis_6", "hal_intel_public"])
     return _register_project(**kwargs)
 
 
 def register_rtk_project(**kwargs):
     """Register a project that uses RawBinPacker."""
     kwargs.setdefault("output_packer", zmake.output_packers.RTKBinmanPacker)
-    kwargs.setdefault("modules", ["cmsis", "cmsis_6", "ec"])
+    kwargs.setdefault("modules", ["cmsis_6", "ec"])
     return register_raw_project(**kwargs)
