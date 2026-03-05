@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8f7a6e6_28d6920b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-03-05T21:35:27Z",
+      "side": 1,
+      "message": "```\n/mnt/host/source/src/third_party/zephyrproject/zephyr/scripts/native_simulator/Makefile all --warn-undefined-variables -r NSI_CONFIG_FILE\u003d/mnt/host/source/src/platform/ec/twister-out-llvm/native_sim_native/llvm/platform/ec/zephyr/test/rex/rex.board_power.ap_pwrseq_drv/zephyr/NSI/nsi_config\nmake[1]: Entering directory \u0027/mnt/host/source/src/platform/ec/twister-out-llvm/native_sim_native/llvm/platform/ec/zephyr/test/rex/rex.board_power.ap_pwrseq_drv/zephyr\u0027\nld.lld: error: undefined symbol: board_ap_power_shutdown\n\u003e\u003e\u003e referenced by ap_pwrseq_sm.c:215 (/mnt/host/source/src/platform/ec/zephyr/subsys/ap_pwrseq/ap_pwrseq_sm.c:215)\n\u003e\u003e\u003e               /mnt/host/source/src/platform/ec/twister-out-llvm/native_sim_native/llvm/platform/ec/zephyr/test/rex/rex.board_power.ap_pwrseq_drv/zephyr/NSI/mnt/host/source/src/platform/ec/twister-out-llvm/native_sim_native/llvm/platform/ec/zephyr/test/rex/rex.board_power.ap_pwrseq_drv/zephyr/zephyr.elf.loc_cpusw.o:(_board_power_test_board_ap_power_force_shutdown_timeout_wrapper)\n\u003e\u003e\u003e did you mean: board_ap_power_shutdown\n\u003e\u003e\u003e defined in: /mnt/host/source/src/platform/ec/twister-out-llvm/native_sim_native/llvm/platform/ec/zephyr/test/rex/rex.board_power.ap_pwrseq_drv/zephyr/NSI/mnt/host/source/src/platform/ec/twister-out-llvm/native_sim_native/llvm/platform/ec/zephyr/test/rex/rex.board_power.ap_pwrseq_drv/zephyr/zephyr.elf.loc_cpusw.o\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\nmake[1]: *** [/mnt/host/source/src/third_party/zephyrproject/zephyr/scripts/native_simulator/Makefile:142: /mnt/host/source/src/platform/ec/twister-out-\n```",
+      "revId": "aba9e656ab0c63f448e9c4545bc595fee4c6d0a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
