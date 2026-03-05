@@ -17,6 +17,7 @@
 			pdc = <&pdc_ti_c0>;
 			pd-retimer;
 			policy = <&cros_policy>;
+			zephyr,deferred-init;
 		};
 		port1@1 {
 			compatible = "named-usbc-port";
@@ -24,6 +25,7 @@
 			pdc = <&pdc_ti_c1>;
 			pd-retimer;
 			policy = <&cros_policy>;
+			zephyr,deferred-init;
 		};
 		port2@2 {
 			compatible = "named-usbc-port";
@@ -31,6 +33,7 @@
 			pdc = <&pdc_ti_c2>;
 			pd-retimer;
 			policy = <&cros_policy>;
+			zephyr,deferred-init;
 		};
 		ppm-driver {
 			compatible = "ucsi-ppm";

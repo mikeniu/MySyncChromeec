@@ -9,6 +9,7 @@
 		reg = <0x20>;
 		port-index-on-chip = <0x1>;
 		frs-supported;
+		zephyr,deferred-init;
 	};
 	pdc_ti_c1: tps6699-pdc@24 {
 		compatible = "ti,tps6699-pdc";
@@ -16,11 +17,13 @@
 		port-index-on-chip = <0x2>;
 		frs-supported;
 		ccd;
+		zephyr,deferred-init;
 	};
 	pdc_ti_c2: tps6699-pdc@21 {
 		compatible = "ti,tps6699-pdc";
 		reg = <0x21>;
 		port-index-on-chip = <0x1>;
 		frs-supported;
+		zephyr,deferred-init;
 	};
 };
