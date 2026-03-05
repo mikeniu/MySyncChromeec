@@ -16,6 +16,24 @@
       "message": "Nit: Whatever we land on for the structure of the I2C includes, i.e. overlay includes RVP files vs individual project files include RVP files, let\u0027s do the same thing for the IOEX file and others.",
       "revId": "ba92915cee47f779afddda91fe9f6baf4362b67a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe49eea3_27940771",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.overlay",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-05T17:21:54Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c1d9e0d0_d547db3a",
+      "revId": "ba92915cee47f779afddda91fe9f6baf4362b67a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
