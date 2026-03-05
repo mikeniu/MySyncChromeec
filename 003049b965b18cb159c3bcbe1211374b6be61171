@@ -70,6 +70,24 @@
       "parentUuid": "ed589a20_60967afb",
       "revId": "003049b965b18cb159c3bcbe1211374b6be61171",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ab505e4_c71a64f2",
+        "filename": "zephyr/program/atria/atriarvp-rtk/i2c.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-05T17:22:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52ada738_bb5aea8f",
+      "revId": "003049b965b18cb159c3bcbe1211374b6be61171",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
