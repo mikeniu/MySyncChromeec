@@ -34,6 +34,24 @@
       "parentUuid": "6a1458ec_cad9da07",
       "revId": "e8f8311b9a8de67e65a27dc625e4ffa8c82295ff",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ddd70e32_7f19db21",
+        "filename": "zephyr/program/atria/rvp_consolidated.dtsi",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-05T23:07:00Z",
+      "side": 1,
+      "message": "Nah, I think you probably did it the right way. We\u0027ll need to turn stuff on incrementally like you\u0027re doing for the first project. After that, I would imagine any other RVP builds can copy-paste a config that satisfies the dependencies.",
+      "parentUuid": "a6e6ae34_3f0f4749",
+      "revId": "e8f8311b9a8de67e65a27dc625e4ffa8c82295ff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
