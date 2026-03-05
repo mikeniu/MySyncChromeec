@@ -375,12 +375,12 @@ pw::Status cros::dsp::service::Driver::Init() {
 
 void dsp_service_hook_lid_change() {
   bool is_lid_open = lid_is_open() != 0;
-  LOG_DBG("is_lid_open=%d", is_lid_open);
+  // LOG_DBG("is_lid_open=%d", is_lid_open);
   cros::dsp::service::driver.transport_.SetStatusBit(
       cros_dsp_comms_StatusFlag_STATUS_FLAG_LID_OPEN, is_lid_open);
 }
 DECLARE_HOOK(HOOK_LID_CHANGE, dsp_service_hook_lid_change, HOOK_PRIO_DEFAULT);
-DECLARE_HOOK(HOOK_INIT, dsp_service_hook_lid_change, HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_SECOND, dsp_service_hook_lid_change, HOOK_PRIO_DEFAULT);
 
 #ifdef CONFIG_PLATFORM_EC_TABLET_MODE
 void dsp_service_hook_tablet_mode_change() {
