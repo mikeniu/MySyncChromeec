@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac769b59_1001b893",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx_private.h",
+        "patchSetId": 59
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-05T07:24:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "226ea724_6ed612dd",
+      "revId": "9675b3d1a853a912db1cd612385c9393fdc224a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fbb00511_6495a4c2",
@@ -73,6 +91,30 @@
       "side": 1,
       "message": "fixed.",
       "parentUuid": "fbb00511_6495a4c2",
+      "range": {
+        "startLine": 270,
+        "startChar": 0,
+        "endLine": 270,
+        "endChar": 0
+      },
+      "revId": "9675b3d1a853a912db1cd612385c9393fdc224a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9a703f9_1b570a98",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx_private.h",
+        "patchSetId": 59
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-05T07:24:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c38f4f2b_38fa5672",
       "range": {
         "startLine": 270,
         "startChar": 0,
