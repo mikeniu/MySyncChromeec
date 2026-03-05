@@ -46,7 +46,13 @@
         /* GPC1: EC_I2C_PD_SCL          */
         /* GPC2: EC_I2C_PD_SDA          */
         /* GPC3: CPU_ID                 */
+<<<<<<< HEAD
 		/* GPC4: tchscr_report_en		*/
+=======
+		// gpio_tchscr_report_en: tchscr_report_en {
+		// 	gpios = <&gpioc 4 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH )>;
+		// };
+>>>>>>> c0d2491bbf (test: WOT disable gpj6 gpc4.)
         /* GPC5: EC_PROJECT_ID          */
 		gpio_ec_en_edp_bl: ec_en_edp_bl {
 			gpios = <&gpioc 6 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
@@ -186,7 +192,13 @@
 			gpios = <&gpioj 5 (GPIO_INPUT)>;
 			no-auto-init;
 		};
+<<<<<<< HEAD
         /* GPJ6: TS_WOT                 */
+=======
+		// gpio_ts_wot_l: ts_wot_l {
+		// 	gpios = <&gpioj 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW)>;
+		// };
+>>>>>>> c0d2491bbf (test: WOT disable gpj6 gpc4.)
 		gpio_sys_rst_odl: sys_rst_odl {
 			gpios = <&gpioj 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
 			enum-name = "GPIO_SYS_RST_ODL";
@@ -226,7 +238,8 @@
 			<&gpioh 1 0>, /* WOL_PWEN */
 			<&gpioi 3 0>, /* I_ADP_EC */
 			<&gpioi 6 0>, /* EC_TOP_SWAP */
-			<&gpioj 4 0>; /* EC_AC_PRESENT_OD_R */
+			<&gpioj 4 0>, /* EC_AC_PRESENT_OD_R */
+			<&gpioj 6 0>; /* TS_WOT */
 	};
 };
 
