@@ -16,6 +16,24 @@
       "message": "Nit: If these includes can be in the previous commit, they probably should be.",
       "revId": "e8f8311b9a8de67e65a27dc625e4ffa8c82295ff",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6e6ae34_3f0f4749",
+        "filename": "zephyr/program/atria/rvp_consolidated.dtsi",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-05T22:09:39Z",
+      "side": 1,
+      "message": "The issue with doing that is that the IRQ gpios are defined in the overlay so the previous patch won\u0027t build without this patch. Should I move them there anyway? This is probably why historically all the rvp files are included in overlay...I didn\u0027t even think about 2 way dependencies.",
+      "parentUuid": "6a1458ec_cad9da07",
+      "revId": "e8f8311b9a8de67e65a27dc625e4ffa8c82295ff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
