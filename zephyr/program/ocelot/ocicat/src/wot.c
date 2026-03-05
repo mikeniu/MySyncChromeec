@@ -34,43 +34,43 @@ static int tablet_mode_override = -1;
  */
 static int last_tablet_mode = -1;
 
-static void ts_sleep_to_wot_deferred(void)
-{
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_tchscr_report_en), 1);
+// static void ts_sleep_to_wot_deferred(void)
+// {
+// 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_tchscr_report_en), 1);
 
-	LOG_INF("WOT: WOT waiting 100ms set HIGH");
-}
-DECLARE_DEFERRED(ts_sleep_to_wot_deferred);
+// 	LOG_INF("WOT: WOT waiting 100ms set HIGH");
+// }
+// DECLARE_DEFERRED(ts_sleep_to_wot_deferred);
 
-static void ts_wot_mode(void)
-{
-	LOG_INF("WOT: wot mode");
+// static void ts_wot_mode(void)
+// {
+// 	LOG_INF("WOT: wot mode");
 
-	/* Step 1: WOT LOW */
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ts_wot_l), 1);
+// 	/* Step 1: WOT LOW */
+// 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ts_wot_l), 1);
 
-	/* Step 2 after 100ms */
-	hook_call_deferred(&ts_sleep_to_wot_deferred_data, TS_WOT_DELAY_MS);
-}
+// 	/* Step 2 after 100ms */
+// 	hook_call_deferred(&ts_sleep_to_wot_deferred_data, TS_WOT_DELAY_MS);
+// }
 
-static void ts_wot_to_sleep_deferred(void)
-{
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ts_wot_l), 0);
+// static void ts_wot_to_sleep_deferred(void)
+// {
+// 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ts_wot_l), 0);
 
-	LOG_INF("WOT: WOT waiting 100ms set LOW");
-}
-DECLARE_DEFERRED(ts_wot_to_sleep_deferred);
+// 	LOG_INF("WOT: WOT waiting 100ms set LOW");
+// }
+// DECLARE_DEFERRED(ts_wot_to_sleep_deferred);
 
-static void ts_wot_sleep_mode(void)
-{
-	LOG_INF("WOT: Sleep Mode");
+// static void ts_wot_sleep_mode(void)
+// {
+// 	LOG_INF("WOT: Sleep Mode");
 
-	/* Step 1: REPORT_EN LOW */
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_tchscr_report_en), 0);
+// 	/* Step 1: REPORT_EN LOW */
+// 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_tchscr_report_en), 0);
 
-	/* Step 2 after 100ms */
-	hook_call_deferred(&ts_wot_to_sleep_deferred_data, TS_WOT_DELAY_MS);
-}
+// 	/* Step 2 after 100ms */
+// 	hook_call_deferred(&ts_wot_to_sleep_deferred_data, TS_WOT_DELAY_MS);
+// }
 
 static void ts_wot_normal_mode(void)
 {
@@ -92,10 +92,14 @@ static void ts_wot_apply_state(bool tablet)
 {
 	if (tablet) {
 		LOG_INF("WOT apply: tablet -> WOT mode");
-		ts_wot_mode();
+		// ts_wot_mode();
+		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_tchscr_report_en), 1);
+		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ts_wot_l), 1);
 	} else {
 		LOG_INF("WOT apply: clamshell -> Sleep mode");
-		ts_wot_sleep_mode();
+		// ts_wot_sleep_mode();
+		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_tchscr_report_en), 0);
+		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ts_wot_l), 0);
 	}
 }
 
