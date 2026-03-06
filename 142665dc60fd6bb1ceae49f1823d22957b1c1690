@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "52e39216_3d430ba9",
+        "filename": ".agents/AGENTS.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-06T19:21:00Z",
+      "side": 1,
+      "message": "Non-blocking, the text lines are quite long.  Should this follow the 80 character limit or will that break the agent?",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 228
+      },
+      "revId": "142665dc60fd6bb1ceae49f1823d22957b1c1690",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1d6778b9_060ec59d",
         "filename": ".agents/AGENTS.md",
         "patchSetId": 5
