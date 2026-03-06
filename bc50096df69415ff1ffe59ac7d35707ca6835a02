@@ -22,6 +22,30 @@
       },
       "revId": "bc50096df69415ff1ffe59ac7d35707ca6835a02",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "979aad4c_9eb26e48",
+        "filename": "zephyr/program/atria/rvp_ioex_gpio.dtsi",
+        "patchSetId": 5
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-06T18:49:40Z",
+      "side": 1,
+      "message": "Understood removed it from here.",
+      "parentUuid": "6d7d259c_2c810617",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 4
+      },
+      "revId": "bc50096df69415ff1ffe59ac7d35707ca6835a02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
