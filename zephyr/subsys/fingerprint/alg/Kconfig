@@ -67,6 +67,14 @@ config FP_FT98XX_ALGORITHM
 	  Enable Focaltech FT98XX matching algorithm. To work properly, Focaltech
 	  private library is required.
 
+config FP_RTS5817MAA_ALGORITHM
+	bool "RTS5817MAA matching algorithm"
+	default y if FINGERPRINT_SENSOR_RTS5817MAA
+	select FPU
+	help
+	  Enable RTS5817MAA matching algorithm. To work properly, RTS private
+	  library is required.
+
 config FP_ALGORITHM_TEMPLATE_SIZE
 	int "Size of template size"
 	default 5092 if FINGERPRINT_SENSOR_FPC1025 && FP_FPC_BEP_ALGORITHM
@@ -78,6 +86,7 @@ config FP_ALGORITHM_TEMPLATE_SIZE
 	default 34800 if FINGERPRINT_SENSOR_ELANHV515RC && \
 			FP_ELAN_ELANHV515RC_ALGORITHM
 	default 86016 if FINGERPRINT_SENSOR_FT98XX && FP_FT98XX_ALGORITHM
+	default 20372 if FINGERPRINT_SENSOR_RTS5817MAA && FP_RTS5817MAA_ALGORITHM
 	default 0
 	help
 	  Constant value corresponding to the maximum template size.
@@ -98,6 +107,7 @@ config FP_MAX_FINGER_COUNT
 	  default 3 if FINGERPRINT_SENSOR_ELANI80SA && FP_ELAN_ELANI80SA_ALGORITHM
 	  default 3 if FINGERPRINT_SENSOR_ELANHV515RC && FP_ELAN_ELANHV515RC_ALGORITHM
 	  default 3 if FINGERPRINT_SENSOR_FT98XX && FP_FT98XX_ALGORITHM
+	  default 3 if FINGERPRINT_SENSOR_RTS5817MAA && FP_RTS5817MAA_ALGORITHM
 	  default 5
 	  help
 		Max number of templates stored / matched against. This limit comes
@@ -137,6 +147,12 @@ config HAVE_FT_LOCKER_PRIVATE_ALGORITHM
 	default n
 	help
 	  If enabled, it indicates that focaltech private algorithm is present.
+
+config HAVE_RTS5817MAA_PRIVATE_ALGORITHM
+	bool
+	default n
+	help
+	  If enabled, it indicates that RTS5817MAA private algorithm is present.
 
 config LIBFP_PRIVATE_DRIVER_HEAP_SIZE
 	int "Size of heap for FPC1145 driver"
