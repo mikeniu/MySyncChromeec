@@ -14,6 +14,11 @@
 #include "max695x.h"
 #include "util.h"
 
+#ifdef CONFIG_LINK_TEST_SUITE_LED_DRIVER_MAX695X
+/* Include console override for test builds to handle signature compatibility */
+#include "console_override.h"
+#endif
+
 #define CPRINTS(format, args...) cprints(CC_SYSTEM, format, ##args)
 
 static inline int max695x_i2c_write8(uint8_t offset, uint8_t data)
