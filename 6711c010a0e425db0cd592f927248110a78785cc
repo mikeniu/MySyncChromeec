@@ -98,6 +98,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "565dd807_682cb6c4",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_chipset_power_state.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-06T22:40:40Z",
+      "side": 1,
+      "message": "Ack on the `g3_entry` and `g3_run` difference.\n\nBecause every instace of `board_ap_power_action_g3_entry` calls `board_ap_power_shutdown()`, calling `board_ap_power_shutdown()` again in the `_g3_run` function seems redundant.  What scenarios require that `g3_run` also call `board_ap_power_shutdown()`?",
+      "parentUuid": "8c90c0b6_ab72d47d",
+      "range": {
+        "startLine": 256,
+        "startChar": 0,
+        "endLine": 256,
+        "endChar": 64
+      },
+      "revId": "6711c010a0e425db0cd592f927248110a78785cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "92d49c3e_d03ee427",
         "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_chipset_power_state.c",
         "patchSetId": 9
