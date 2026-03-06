@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f61787bd_20178ad8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-03-06T11:46:18Z",
+      "side": 1,
+      "message": "@phoenixshen@chromium.org,\n\nI missed a macro definition in include/config.h for non-zephyr ec build. Fix in the latest patchset. Please help review again when you are available.",
+      "revId": "cf6e9bbe269dba62ea6b5803074b31846de15e2a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
