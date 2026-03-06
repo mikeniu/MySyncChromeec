@@ -111,6 +111,30 @@
       },
       "revId": "529d89873eaad4a050904b07bf662f01d0e5e975",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a5a499a_279c3188",
+        "filename": "zephyr/drivers/dsp_comms/client/remote_lid_switch.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-03-06T00:05:56Z",
+      "side": 1,
+      "message": "I still don\u0027t think the initial value needs to be changed. I understand the point that it\u0027s a reasonable assumption the lid_switch is open when the ISH is initialized, but the source of truth is still the EC and it should suffice for the ISH to request the status as part of the ISH FW initialization.",
+      "parentUuid": "db04061f_d8dea271",
+      "range": {
+        "startLine": 14,
+        "startChar": 31,
+        "endLine": 14,
+        "endChar": 37
+      },
+      "revId": "529d89873eaad4a050904b07bf662f01d0e5e975",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
