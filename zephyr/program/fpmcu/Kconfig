@@ -37,9 +37,19 @@ endif
 
 config BOARD_REALTEKFP
 	bool "REALTEKFP FPMCU Board"
+	select HAS_COVERAGE_SUPPORT
+	select BOARD_FINGERPRINT
+	select FINGERPRINT_SUBSYSTEM if CROS_EC_RW
+	select FINGERPRINT_SENSOR if CROS_EC_RW
+	select FINGERPRINT_SHELL if CROS_EC_RW
+	select PLATFORM_EC_FINGERPRINT if CROS_EC_RW
+
+	# Make sure RSA parameters for bloonchipper are correct.
+	# depends on PLATFORM_EC_RSA_KEY_SIZE = 3072
+	# depends on PLATFORM_EC_RSA_EXPONENT_3
 	help
 	  Build the realtekfp FPMCU board. The board uses RTS5817 MCU
-	  and CB2000 sensor.
+	  and RTS5817MAA sensor.
 
 if BOARD_REALTEKFP
 
