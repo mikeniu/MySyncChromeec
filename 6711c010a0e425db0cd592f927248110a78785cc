@@ -122,6 +122,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "57610130_98b2a90f",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_chipset_power_state.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-06T23:49:10Z",
+      "side": 1,
+      "message": "Good question, this is in case evaluating power signals inside  `x86_non_dsx_mtl_g3_run` or `x86_non_dsx_adl_g3_run` do not assert, this could lead to keep power rails enabled indefinitely.\n\nLooks like SHUTDOWN should be generated in corresponding chipset run action handler if timeout occurs.",
+      "parentUuid": "565dd807_682cb6c4",
+      "range": {
+        "startLine": 256,
+        "startChar": 0,
+        "endLine": 256,
+        "endChar": 64
+      },
+      "revId": "6711c010a0e425db0cd592f927248110a78785cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "92d49c3e_d03ee427",
         "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_chipset_power_state.c",
         "patchSetId": 9
