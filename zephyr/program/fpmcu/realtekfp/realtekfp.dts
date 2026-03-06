@@ -19,6 +19,7 @@
 		cros-ec,flash-controller = &cros_flash_controller;
 		cros-ec,bbram = &bbram;
 		cros-ec,watchdog = &watchdog;
+		cros-fp,fingerprint-sensor = &fp_sensor;
 	};
 
 	retain_mem@20000000 {
@@ -190,4 +191,67 @@ zephyr_udc0: &usb {
 
 &ocotp {
 	status = "okay";
+};
+
+#define RTS5817MAA_DEFAULT_IMAGE_PROPS \
+	width = <80>; \
+	height = <64>; \
+	bits-per-pixel = <8>; \
+	frame-size = <5120>; \
+	image-data-offset-bytes = <0>; \
+	v4l2-pixel-format = "V4L2_PIX_FMT_GREY";
+
+&spi_dw0 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&sensor_spi_default>;
+};
+
+&spi0 {
+	status = "okay";
+	fp_sensor: fp_rts5817maa@0 {
+		compatible = "realtek,rts5817maa";
+		reg = <0>;
+		spi-max-frequency = <3000000>;
+
+		configs {
+			compatible = "fingerprint-image-frame-params";
+			config0 {
+				RTS5817MAA_DEFAULT_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE";
+			};
+			config1 {
+				RTS5817MAA_DEFAULT_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_PATTERN0";
+			};
+			config2 {
+				RTS5817MAA_DEFAULT_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_PATTERN1";
+			};
+			config3 {
+				RTS5817MAA_DEFAULT_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_DEFECT_PXL_TEST";
+			};
+			config4 {
+				RTS5817MAA_DEFAULT_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_ABNORMAL_TEST";
+			};
+			config5 {
+				RTS5817MAA_DEFAULT_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_NOISE_TEST";
+			};
+			config6 {
+				RTS5817MAA_DEFAULT_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_QUALITY_TEST";
+			};
+			config7 {
+				RTS5817MAA_DEFAULT_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT";
+			};
+		};
+
+		irq-gpios = <&gpio GPI_WAKE2 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio GPIO_SNR_RST GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
 };
