@@ -70,6 +70,30 @@
       },
       "revId": "3cfb2f189439d3ba5cf963c17a86e05a5fe6cc30",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e98202d_7cf191ac",
+        "filename": "zephyr/test/hwtest/src/flash_physical.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-06T23:54:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0c503f9_58a0503b",
+      "range": {
+        "startLine": 73,
+        "startChar": 1,
+        "endLine": 73,
+        "endChar": 13
+      },
+      "revId": "3cfb2f189439d3ba5cf963c17a86e05a5fe6cc30",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
