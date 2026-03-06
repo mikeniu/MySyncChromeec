@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0c23aa4_64d30b07",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 60
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-06T09:03:27Z",
+      "side": 1,
+      "message": "Shouldn\u0027t `ft_sensor_set_mode(FOCAL_SENSOR_MODE_IDLE)` be called here?",
+      "revId": "dcd3ad93fa17343217b160149bd11d80946feef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26b3b5d7_1a069112",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 60
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-06T09:03:27Z",
+      "side": 1,
+      "message": "What happens if we call the `get_info` function, before interrupts are enabled? Will it return the FINGERPRINT_ERROR_NO_IRQ? I understand that `ft_sensor_init` causes interrupt, but we need to enable it in the driver, but this is not a part of `ft98xx_init`.",
+      "revId": "dcd3ad93fa17343217b160149bd11d80946feef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6031409a_17c3c1a1",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 60
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-06T09:03:27Z",
+      "side": 1,
+      "message": "Please use `cfg-\u003esensor_info.num_capture_types` instead of `NUM_IMAGE_CAPTURE_TYPES`.",
+      "revId": "dcd3ad93fa17343217b160149bd11d80946feef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16613085_d5c02fa3",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 60
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-06T09:03:27Z",
+      "side": 1,
+      "message": "No need to init ret.",
+      "revId": "dcd3ad93fa17343217b160149bd11d80946feef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfa75cdd_a13e6b0f",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 60
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-06T09:03:27Z",
+      "side": 1,
+      "message": "Is the memset needed since `ft_sensor_acquire_image_with_mode` will fill the buffer anyway?",
+      "revId": "dcd3ad93fa17343217b160149bd11d80946feef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "250da273_79212e13",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx_private.h",
+        "patchSetId": 60
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-06T09:03:27Z",
+      "side": 1,
+      "message": "Use upper case for `xx`",
+      "revId": "dcd3ad93fa17343217b160149bd11d80946feef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
