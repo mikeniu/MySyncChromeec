@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ba0e02b0_6a89e946",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_chipset_power_state.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-06T21:21:17Z",
+      "side": 1,
+      "message": "The function’s output is forwarded to `ap_pwrseq_start`, which transitions the system to the `G3` power state and calls the corresponding `board_ap_power_action_g3_entry` function to handle the required shutdown operations.",
+      "parentUuid": "b3a15b80_2f7ffe59",
+      "range": {
+        "startLine": 256,
+        "startChar": 0,
+        "endLine": 256,
+        "endChar": 64
+      },
+      "revId": "6711c010a0e425db0cd592f927248110a78785cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "92d49c3e_d03ee427",
         "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_chipset_power_state.c",
         "patchSetId": 9
