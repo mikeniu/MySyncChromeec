@@ -74,6 +74,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8c90c0b6_ab72d47d",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_chipset_power_state.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-06T22:23:54Z",
+      "side": 1,
+      "message": "\u003e Each `board_ap_pwoer_action_g3_entry` checks for `AP_PWRSEQ_EVENT_POWER_SHUTDOWN`. That event is only set by `ap_power_force_shutdown()`.\n\nCorrection: it’s the corresponding `board_ap_power_action_g3_run()` that checks `AP_PWRSEQ_EVENT_POWER_SHUTDOWN`, not `board_ap_power_action_g3_entry()`. The `*_g3_entry()` handler is responsible for driving the power signals into the appropriate `G3`-safe state.\n\n\u003e It looks like these 2 error paths (power signals lost and can\u0027t determine CPU state) will no longer trigger a force shutdown.\n\nI will still trigger shutdown, those two error paths still transition the state machine to `AP_POWER_STATE_G3`. Once in `G3`, the sequencing is handled via `ap_pwrseq_start()` when starting the power sequence driver in `AP_POWER_STATE_G3`, which will invoke the board `G3` entry handling as expected.",
+      "parentUuid": "663ff791_6cad2ef3",
+      "range": {
+        "startLine": 256,
+        "startChar": 0,
+        "endLine": 256,
+        "endChar": 64
+      },
+      "revId": "6711c010a0e425db0cd592f927248110a78785cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "92d49c3e_d03ee427",
         "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_chipset_power_state.c",
         "patchSetId": 9
