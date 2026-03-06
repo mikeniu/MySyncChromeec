@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d58dcbf_505e4cc0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-06T18:15:58Z",
+      "side": 1,
+      "message": "Done, should I add `LOW_COVERAGE_REASON` for those project files that need coverage? There are trackers for each one (fatcat, ocelot, trulo).",
+      "parentUuid": "7ffcaea3_80ea6fae",
+      "revId": "7007d88e23c31b7884fb464d5257a51c060a514f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6f5a2a2d_b8710e79",
