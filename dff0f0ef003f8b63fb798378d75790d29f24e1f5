@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "39545e76_c51fab74",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-06T18:50:55Z",
+      "side": 1,
+      "message": "Restructured this commit and the previous one as suggested",
+      "revId": "dff0f0ef003f8b63fb798378d75790d29f24e1f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

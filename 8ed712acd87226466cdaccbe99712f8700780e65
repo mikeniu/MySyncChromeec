@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "03bbe7c6_afcb2f03",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-06T18:50:55Z",
+      "side": 1,
+      "message": "Good point I approached it as setting the framework than implementing it but I like the approach of just enabling it all first then enabling runtime after I will push updates to these 2 patches doing that.",
+      "parentUuid": "d411868e_31f241b7",
+      "revId": "8ed712acd87226466cdaccbe99712f8700780e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "be2df4fb_7ac23b28",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-03-05T23:58:52Z",
       "side": 1,
       "message": "This should be in the previous CL that enables PDC.\n\nYou should also enable `CONFIG_USBC_PDC_TPS6699X_CONSOLE_FW_UPDATER` to allow PDC firmware updates through the EC console.",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 10
+      },
+      "revId": "8ed712acd87226466cdaccbe99712f8700780e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43d0b03a_c7e607f1",
+        "filename": "zephyr/program/atria/program.conf",
+        "patchSetId": 6
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-06T18:50:55Z",
+      "side": 1,
+      "message": "Added in previous commit",
+      "parentUuid": "be2df4fb_7ac23b28",
       "range": {
         "startLine": 52,
         "startChar": 0,
