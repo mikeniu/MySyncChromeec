@@ -22,6 +22,30 @@
       },
       "revId": "4d1fd35b241be92ffb512ed729961dbb93aed0d3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "daabe389_053a24d0",
+        "filename": "zephyr/program/skywalker/obiwan/src/thermal_policy.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-03-06T01:31:32Z",
+      "side": 1,
+      "message": "Yes, we should do it once.",
+      "parentUuid": "82e80fd0_e9600c33",
+      "range": {
+        "startLine": 259,
+        "startChar": 6,
+        "endLine": 259,
+        "endChar": 39
+      },
+      "revId": "4d1fd35b241be92ffb512ed729961dbb93aed0d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
