@@ -132,10 +132,11 @@ void test_set_chipset_to_g3(void)
 
 	printk("%s: Forcing shutdown\n", __func__);
 	chipset_force_shutdown(CHIPSET_RESET_KB_SYSRESET);
-	k_sleep(K_SECONDS(20));
+
 	/* Check if chipset is in correct state */
-	zassert_equal(POWER_G3, power_get_state(), "Expected G3, got %d",
-		      power_get_state());
+	zassert_true(WAIT_FOR(power_get_state() == POWER_G3, 20000000,
+			      k_msleep(250)),
+		     "Expected G3. got %d", power_get_state());
 }
 
 #if DT_HAS_COMPAT_STATUS_OKAY(cros_isl923x_emul)

@@ -199,7 +199,7 @@ ZTEST_F(usb_pd_ctrl_msg_test_source, test_vconn_swap_reject)
 	/* pd_check_vconn_swap() in the test environment rejects Vconn swap in
 	 * G3 */
 	test_set_chipset_to_g3();
-	k_sleep(K_SECONDS(1));
+	k_sleep(K_SECONDS(2));
 
 	typec_status = host_cmd_typec_status(TEST_USB_PORT);
 
