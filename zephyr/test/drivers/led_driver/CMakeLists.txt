@@ -23,3 +23,13 @@ zephyr_library_sources_ifdef(CONFIG_LINK_TEST_SUITE_LED_DRIVER_SEQUENCE
     src/led_sequence.c
     src/stubs.c
 )
+zephyr_library_sources_ifdef(CONFIG_LINK_TEST_SUITE_LED_DRIVER_MAX695X
+    src/max695x_led_test_simple.c
+    src/stubs.c
+    ${PLATFORM_EC}/driver/led/max695x.c
+)
+
+# Define PORT80_I2C_ADDR for MAX695x testing
+if(CONFIG_LINK_TEST_SUITE_LED_DRIVER_MAX695X)
+    zephyr_compile_definitions(PORT80_I2C_ADDR=0x38)
+endif()
