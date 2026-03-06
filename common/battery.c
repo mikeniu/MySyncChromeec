@@ -291,6 +291,8 @@ static int command_battery(int argc, const char **argv)
 	int loop;
 	int sleep_ms = 0;
 	char *e;
+	char a[10];
+	memset(a, 0, sizeof(a));
 
 	if (argc > 1) {
 		repeat = strtoi(argv[1], &e, 0);
@@ -309,18 +311,27 @@ static int command_battery(int argc, const char **argv)
 	}
 
 	for (loop = 0; loop < repeat; loop++) {
-		print_battery_debug();
-
-		/*
-		 * Running with a high repeat count will take so long the
-		 * watchdog timer fires.  So reset the watchdog timer each
-		 * iteration.
-		 */
-		watchdog_reload();
-
-		if (sleep_ms)
-			crec_msleep(sleep_ms);
+		a[loop] = 'B';
 	}
+	a[repeat] = '\0';
+
+	print_battery_debug();
+
+	// for (loop = 0; loop < repeat; loop++) {
+	// 	print_battery_debug();
+
+	// 	/*
+	// 	 * Running with a high repeat count will take so long the
+	// 	 * watchdog timer fires.  So reset the watchdog timer each
+	// 	 * iteration.
+	// 	 */
+	// 	watchdog_reload();
+
+	// 	if (sleep_ms)
+	// 		crec_msleep(sleep_ms);
+	// }
+
+	CPRINTS("Power state: %s -> %s", "command_battery", a);
 
 	return EC_SUCCESS;
 }

@@ -8,3 +8,8 @@ include("${ZEPHYR_BASE}/cmake/compiler/gcc/compiler_flags.cmake")
 
 # gcc flags for coverage generation
 set_compiler_property(PROPERTY coverage -fprofile-arcs -ftest-coverage -fno-inline)
+
+add_compile_options(-fstack-protector-strong)
+message(WARNING "stack-protector-strong!!!")
+# add_compile_options(-fstack-usage)
+# message(WARNING "stack-usage!!!")
