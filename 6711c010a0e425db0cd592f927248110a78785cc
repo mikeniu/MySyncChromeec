@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3a15b80_2f7ffe59",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_chipset_power_state.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-06T19:36:16Z",
+      "side": 1,
+      "message": "Why is the call to `ap_power_force_shutdown()` dropped here?  Isn\u0027t that the only path that sets the `AP_PWRSEQ_EVENT_POWER_SHUTDOWN` event?\n\nThe error message needs an update if the force shutdown is not performed.",
+      "range": {
+        "startLine": 256,
+        "startChar": 0,
+        "endLine": 256,
+        "endChar": 64
+      },
+      "revId": "6711c010a0e425db0cd592f927248110a78785cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92d49c3e_d03ee427",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_chipset_power_state.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-06T19:36:16Z",
+      "side": 1,
+      "message": "Same comment as above.",
+      "range": {
+        "startLine": 310,
+        "startChar": 0,
+        "endLine": 310,
+        "endChar": 65
+      },
+      "revId": "6711c010a0e425db0cd592f927248110a78785cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
