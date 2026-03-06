@@ -16,6 +16,24 @@
       "message": "I feel like this is an overkill. Is there any reason to add full bindings + driver? btn_ign driver group doesn\u0027t seem correct. The only driver in btn_ign group is btn_ign",
       "revId": "29743ea8ce6bd6250805ed11c475b2029059fcd0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "237385aa_02e7f6cc",
+        "filename": "zephyr/dts/bindings/btn_ign/cros-ec,btn-ign.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-06T12:08:32Z",
+      "side": 1,
+      "message": "Implementation moved to FP app.",
+      "parentUuid": "e096b2d2_74e7bc67",
+      "revId": "29743ea8ce6bd6250805ed11c475b2029059fcd0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
