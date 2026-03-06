@@ -11,6 +11,15 @@
 
 LOG_MODULE_REGISTER(shim_npcx_system, LOG_LEVEL_ERR);
 
+/*
+ * Override default __stack_chk_fail for the fstack-protector.
+ */
+void __stack_chk_fail(void)
+{
+	LOG_ERR("\n\nStack smash detected!\n");
+	k_panic();
+}
+
 static void chip_bbram_status_check(void)
 {
 	const struct device *bbram_dev;
