@@ -142,6 +142,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "07c73a25_29e8c507",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 60
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-07T07:30:54Z",
+      "side": 1,
+      "message": "If ft_sensor_acquire_image_with_mode was called, but user don\u0027t touch the sensor, it will not fill the buffer, the image_buf data would be the last time captured, so I add memset before  ft_sensor_acquire_image_with_mode.",
+      "parentUuid": "cfa75cdd_a13e6b0f",
+      "revId": "dcd3ad93fa17343217b160149bd11d80946feef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "250da273_79212e13",
         "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx_private.h",
         "patchSetId": 60
