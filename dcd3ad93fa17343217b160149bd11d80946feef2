@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c2ae4bf6_6194b080",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 60
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-07T07:25:13Z",
+      "side": 1,
+      "message": "I added it.",
+      "parentUuid": "a0c23aa4_64d30b07",
+      "revId": "dcd3ad93fa17343217b160149bd11d80946feef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "26b3b5d7_1a069112",
         "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
         "patchSetId": 60
@@ -54,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "27267f96_4c57b705",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 60
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-07T07:25:13Z",
+      "side": 1,
+      "message": "Fixed.",
+      "parentUuid": "6031409a_17c3c1a1",
+      "revId": "dcd3ad93fa17343217b160149bd11d80946feef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "16613085_d5c02fa3",
         "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
         "patchSetId": 60
@@ -65,6 +101,24 @@
       "writtenOn": "2026-03-06T09:03:27Z",
       "side": 1,
       "message": "No need to init ret.",
+      "revId": "dcd3ad93fa17343217b160149bd11d80946feef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "efdec6bd_7304db87",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 60
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-07T07:25:13Z",
+      "side": 1,
+      "message": "Fixed.",
+      "parentUuid": "16613085_d5c02fa3",
       "revId": "dcd3ad93fa17343217b160149bd11d80946feef2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -99,6 +153,24 @@
       "writtenOn": "2026-03-06T09:03:27Z",
       "side": 1,
       "message": "Use upper case for `xx`",
+      "revId": "dcd3ad93fa17343217b160149bd11d80946feef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "945cd12a_43c5c7e0",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx_private.h",
+        "patchSetId": 60
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-07T07:25:13Z",
+      "side": 1,
+      "message": "Fixed.",
+      "parentUuid": "250da273_79212e13",
       "revId": "dcd3ad93fa17343217b160149bd11d80946feef2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
