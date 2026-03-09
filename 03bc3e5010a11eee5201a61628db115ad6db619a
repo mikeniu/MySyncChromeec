@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "4f0c7ac1_98a877ea",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-03-09T23:00:16Z",
+      "side": 1,
+      "message": "There could be a boot-time impact due to checking the current IMVP settings. Once all RVPs have the update we should turn this back off.",
+      "parentUuid": "9a042c50_97278f31",
+      "range": {
+        "startLine": 18,
+        "startChar": 44,
+        "endLine": 18,
+        "endChar": 70
+      },
+      "revId": "03bc3e5010a11eee5201a61628db115ad6db619a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "e17c0b42_ab062fb8",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
