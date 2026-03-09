@@ -16,6 +16,19 @@ __overridable void board_check_extpower(void)
 {
 }
 
+__overridable int board_extpower_is_present(void)
+{
+	return 0;
+}
+
+__overridable void board_extpower_enable_interrupt(void)
+{
+}
+
+__overridable void board_extpower_disable_interrupt(void)
+{
+}
+
 void extpower_update_host_events(int is_present)
 {
 	uint8_t *memmap_batt_flags;
