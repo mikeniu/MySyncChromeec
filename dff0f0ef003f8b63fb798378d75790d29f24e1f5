@@ -16,6 +16,40 @@
       "message": "Restructured this commit and the previous one as suggested",
       "revId": "dff0f0ef003f8b63fb798378d75790d29f24e1f5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e10b4f9_6e5c976f",
+        "filename": "zephyr/program/atria/CMakeLists.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-09T18:05:36Z",
+      "side": 1,
+      "message": "This would suggest that if someone disabled this config in `project.conf`, all 3 PDCs from `rvp_rt_pd.dtsi` would be statically enabled. However, the `deferred-init` lines in the DTS nodes are not config-controlled. Would disabling this config work, or would the PDC devices just never get initialized? Should the `deferred-init` be `#ifdef`ed?",
+      "revId": "dff0f0ef003f8b63fb798378d75790d29f24e1f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b43047a9_9d266c95",
+        "filename": "zephyr/program/atria/rvp_rt_pd.dtsi",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-09T18:05:36Z",
+      "side": 1,
+      "message": "Nit: Is the \"rt\" for runtime? That\u0027s a little confusing, since we also use \"rt\" for Realtek ECs and PDCs. (I thought it was Realtek before you reorganized the CLs.) Also, the way this is set up right now, there isn\u0027t an alternative file if you\u0027re not using runtime configuration. I\u0027d be inclined to leave the filename as-is.",
+      "revId": "dff0f0ef003f8b63fb798378d75790d29f24e1f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
