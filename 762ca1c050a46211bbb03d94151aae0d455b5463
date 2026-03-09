@@ -81,6 +81,30 @@
       },
       "revId": "762ca1c050a46211bbb03d94151aae0d455b5463",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a64684e9_65376c66",
+        "filename": "zephyr/program/atria/rvp_i2c.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-09T17:40:24Z",
+      "side": 1,
+      "message": "OOB discussion: The 0x44/45 from the schematic are 0x22 (7-bit) with the read/write bit added to the end, so this does match the schematic.",
+      "parentUuid": "6991411b_99f50b1d",
+      "range": {
+        "startLine": 32,
+        "startChar": 20,
+        "endLine": 32,
+        "endChar": 22
+      },
+      "revId": "762ca1c050a46211bbb03d94151aae0d455b5463",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
