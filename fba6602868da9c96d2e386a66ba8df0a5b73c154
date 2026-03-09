@@ -16,6 +16,24 @@
       "message": "This function executes the Write Disable instruction; therefore, verifying the Write Enable Latch bit is unnecessary. Invoking the `cros_flash_npcx_wait_ready` function is sufficient to ensure the operation completes.",
       "revId": "fba6602868da9c96d2e386a66ba8df0a5b73c154",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80597430_2a779035",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-09T16:16:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b389260_be9c5519",
+      "revId": "fba6602868da9c96d2e386a66ba8df0a5b73c154",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
