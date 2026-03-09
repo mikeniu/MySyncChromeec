@@ -258,6 +258,26 @@ static int cros_flash_npcx_write_protection_is_set(const struct device *dev)
 	return (oper_out.oper & NPCX_EX_OP_INT_FLASH_WP) != 0 ? 1 : 0;
 }
 
+static int __maybe_unused flash_control_register_locked(const struct device *dev)
+{
+	uint8_t reg;
+	int ret;
+	int wp_set;
+
+	ret = cros_flash_npcx_get_status_reg(dev, SPI_NOR_CMD_RDSR, &reg);
+
+	if (ret != 0) {
+		return ret;
+	}
+
+	wp_set = cros_flash_npcx_write_protection_is_set(dev);
+	if (wp_set < 0) {
+		return wp_set;
+	}
+
+	return wp_set || ((reg & SPI_NOR_WEL_BIT) == 0);
+}
+
 static int cros_flash_npcx_uma_lock(const struct device *dev, bool enable)
 {
 	struct npcx_ex_ops_qspi_oper_in oper_in = {
