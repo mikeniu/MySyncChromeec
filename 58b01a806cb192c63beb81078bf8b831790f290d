@@ -34,6 +34,24 @@
       "parentUuid": "70fe6818_29aefe87",
       "revId": "58b01a806cb192c63beb81078bf8b831790f290d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c27623a9_3080338a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-09T13:19:23Z",
+      "side": 1,
+      "message": "I think the same point that I made for npcx also applies to rtk driver. Can you physically control the #WP pin that is connected to the SPI NOR flash chip?",
+      "parentUuid": "d15e1e49_472dad33",
+      "revId": "58b01a806cb192c63beb81078bf8b831790f290d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
