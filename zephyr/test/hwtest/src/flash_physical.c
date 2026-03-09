@@ -57,10 +57,11 @@ ZTEST(flash_physical, test_flash_config)
 extern int flash_control_register_locked(const struct device *dev);
 extern int cros_flash_npcx_set_write_enable(const struct device *dev);
 extern int cros_flash_npcx_set_write_disable(const struct device *dev);
+extern void flash_protect_int_flash(const struct device *dev, bool enable);
 
 #define cros_flash_dev DEVICE_DT_GET(DT_CHOSEN(cros_ec_flash_controller))
 
-ZTEST(flash_physical, test_lock_flash_control_register)
+ZTEST(flash_physical, test_0lock_flash_control_register)
 {
 	int ret;
 
@@ -91,4 +92,34 @@ ZTEST(flash_physical, test_lock_flash_control_register)
 		flash_control_register_locked(cros_flash_dev),
 		"Flash control register failed to unlock on second attempt");
 }
+
+ZTEST(flash_physical, test_disable_flash_control_register)
+{
+	int ret;
+
+	zassert_not_null(cros_flash_dev, "Flash device instance not found");
+	zassert_true(device_is_ready(cros_flash_dev),
+		     "Flash device is not ready");
+
+	/* Unlock the register */
+	ret = cros_flash_npcx_set_write_enable(cros_flash_dev);
+	zassert_equal(ret, 0, "Failed to enable write: %d", ret);
+	zassert_false(
+		flash_control_register_locked(cros_flash_dev),
+		"Flash control register failed to unlock on second attempt");
+
+	/* Disable the flash control register */
+	flash_protect_int_flash(cros_flash_dev, /*enable=*/true);
+
+	zassert_true(flash_control_register_locked(cros_flash_dev),
+		     "Flash control register failed to lock");
+
+	ret = cros_flash_npcx_set_write_enable(cros_flash_dev);
+	zassert_equal(ret, 0, "Failed to enable write: %d", ret);
+
+	/* Control Register should still be locked */
+	zassert_true(flash_control_register_locked(cros_flash_dev),
+		     "Flash control register failed to lock");
+}
+
 #endif /* CONFIG_SOC_FAMILY_NPCX */
