@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a3d6c4f5_a562fd46",
+        "filename": "zephyr/program/atria/CMakeLists.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-09T18:13:49Z",
+      "side": 1,
+      "message": "This is specific for RVP so it should just always be included I only blocked it behind runtime as a safeguard but I don\u0027t think it is needed",
+      "parentUuid": "6e10b4f9_6e5c976f",
+      "revId": "dff0f0ef003f8b63fb798378d75790d29f24e1f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b43047a9_9d266c95",
         "filename": "zephyr/program/atria/rvp_rt_pd.dtsi",
         "patchSetId": 7
@@ -48,6 +66,24 @@
       "writtenOn": "2026-03-09T18:05:36Z",
       "side": 1,
       "message": "Nit: Is the \"rt\" for runtime? That\u0027s a little confusing, since we also use \"rt\" for Realtek ECs and PDCs. (I thought it was Realtek before you reorganized the CLs.) Also, the way this is set up right now, there isn\u0027t an alternative file if you\u0027re not using runtime configuration. I\u0027d be inclined to leave the filename as-is.",
+      "revId": "dff0f0ef003f8b63fb798378d75790d29f24e1f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1285fce_0e92d9d3",
+        "filename": "zephyr/program/atria/rvp_rt_pd.dtsi",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-09T18:13:49Z",
+      "side": 1,
+      "message": "are we using rt for Realtek? Typically it is RTS or RTK as far as I can see but I am fine changing this to just be the old names as there is no alternative. Since we only have one RVP board I do not see that changing",
+      "parentUuid": "b43047a9_9d266c95",
       "revId": "dff0f0ef003f8b63fb798378d75790d29f24e1f5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
