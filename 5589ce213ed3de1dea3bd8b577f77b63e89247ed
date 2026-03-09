@@ -107,6 +107,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "189d4d9e_e7bb4b9a",
+        "filename": "zephyr/include/ascp/ascp.h",
+        "patchSetId": 16
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-09T16:59:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1c332f4_5f41cd7b",
+      "range": {
+        "startLine": 18,
+        "startChar": 24,
+        "endLine": 18,
+        "endChar": 51
+      },
+      "revId": "5589ce213ed3de1dea3bd8b577f77b63e89247ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9450438d_36b47eeb",
@@ -138,6 +162,24 @@
       "side": 1,
       "message": "We do not need iterable sections for ascp_api. Neither do we need multiple backends so I simplified it just to extern struct. Currently it is only one backend that is used and the other one for test. In the future there could be more, but only one per build anyway.",
       "parentUuid": "9450438d_36b47eeb",
+      "revId": "5589ce213ed3de1dea3bd8b577f77b63e89247ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53fcc76a_a8839f66",
+        "filename": "zephyr/linker/iterables-rom.ld",
+        "patchSetId": 16
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-09T16:59:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d3222d90_20472e40",
       "revId": "5589ce213ed3de1dea3bd8b577f77b63e89247ed",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
