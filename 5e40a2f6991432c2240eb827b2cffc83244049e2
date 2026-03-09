@@ -70,6 +70,24 @@
       "parentUuid": "2d2623ba_196d25f0",
       "revId": "5e40a2f6991432c2240eb827b2cffc83244049e2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04cb2f1b_3dd78979",
+        "filename": "zephyr/include/ascp/ascp.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-09T12:03:35Z",
+      "side": 1,
+      "message": "Thanks for the changes.",
+      "parentUuid": "8c195cea_dc2cf2d1",
+      "revId": "5e40a2f6991432c2240eb827b2cffc83244049e2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
