@@ -122,6 +122,24 @@
       "parentUuid": "f1285fce_0e92d9d3",
       "revId": "dff0f0ef003f8b63fb798378d75790d29f24e1f5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d20e1c5_23536ced",
+        "filename": "zephyr/program/atria/rvp_rt_pd.dtsi",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-09T20:58:17Z",
+      "side": 1,
+      "message": "I was just looking at other programs and looks like there is a separate runtime_pd and runtime_usb that adds the deferred-init, I\u0027ll just switch to that approach so that the original files remain unchanged",
+      "parentUuid": "a7a3e3e7_3c149c1e",
+      "revId": "dff0f0ef003f8b63fb798378d75790d29f24e1f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
