@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ba45bbf8_8540cd75",
+        "filename": "zephyr/program/atria/CMakeLists.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-09T20:55:43Z",
+      "side": 1,
+      "message": "Yeah, I agree that this is window dressing. I think it would be reasonable for a variant to hardcode their library sources, since they\u0027ll know whether they\u0027re using this feature. That would also be a reasonable choice for RVPs.\n\nThere\u0027s a little value in having the config check, because it leaves breadcrumbs for someone looking through this code to figure out what they need to do to enable this feature on a variant or what they need to delete to disable it.\n\nBut consider this a nit.",
+      "parentUuid": "a3d6c4f5_a562fd46",
+      "revId": "dff0f0ef003f8b63fb798378d75790d29f24e1f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b43047a9_9d266c95",
         "filename": "zephyr/program/atria/rvp_rt_pd.dtsi",
         "patchSetId": 7
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "are we using rt for Realtek? Typically it is RTS or RTK as far as I can see but I am fine changing this to just be the old names as there is no alternative. Since we only have one RVP board I do not see that changing",
       "parentUuid": "b43047a9_9d266c95",
+      "revId": "dff0f0ef003f8b63fb798378d75790d29f24e1f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7a3e3e7_3c149c1e",
+        "filename": "zephyr/program/atria/rvp_rt_pd.dtsi",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-09T20:55:43Z",
+      "side": 1,
+      "message": "I think you\u0027re right that we don\u0027t use \"rt\" by itself for Realtek.\n\nIMO, the old names are adequate, and I\u0027d prefer them.\n\nEven if we wanted to support other AICs, I think we\u0027d still just add nodes to the same files you already created. I think the only reason we\u0027d need to specify \"runtime\" is if we had another RVP build with a static PDC config. In that case, I\u0027d probably go with \"_runtime\" to match the .c file.",
+      "parentUuid": "f1285fce_0e92d9d3",
       "revId": "dff0f0ef003f8b63fb798378d75790d29f24e1f5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
