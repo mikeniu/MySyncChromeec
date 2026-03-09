@@ -34,6 +34,24 @@
       "parentUuid": "eea4d25b_e2e54d7e",
       "revId": "23e2b18f0a36c443270d930598a1c555353ad929",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "250d7a3a_42a1de3b",
+        "filename": "zephyr/program/atria/CMakeLists.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-09T18:29:08Z",
+      "side": 1,
+      "message": "Hypothetically, the current structure would include these files for a non-RVP build with a dedicated charge port, which would be wrong. I don\u0027t expect that to exist, but it makes the logic of this file a little bit obscure.\n\nThe way I\u0027m thinking about this right now is that the most likely eventual state is that this is the only RVP build. In that case, I\u0027ll move all of the RVP-specific stuff into this build, and that would include moving this generic RVP reference into the atria RVP check above.\n\nAlternatively, if we maintain multiple RVP builds, I\u0027d like to do something here similar to how the include files are currently organized, where there\u0027s an RVP config, and the `CMakeLists.txt` includes the RVP directories conditional on that config. Then the individual RVP build configs would only include stuff specific to that build.\n\nFor now, let\u0027s keep this inside the atria RVP check.",
+      "parentUuid": "f337f0e9_33461f4e",
+      "revId": "23e2b18f0a36c443270d930598a1c555353ad929",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
