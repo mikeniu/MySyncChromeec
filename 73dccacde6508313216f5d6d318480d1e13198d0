@@ -22,6 +22,30 @@
       },
       "revId": "73dccacde6508313216f5d6d318480d1e13198d0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44841ea8_9de20d10",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_mtl_pwrseq_sm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-03-09T08:36:09Z",
+      "side": 1,
+      "message": "\"SYS_RST\" is an input signal to the SOC when asserted expected to triggers reset but PLT_RST is output from SOC indicates CPU reset.\n\nAs per PDG Document:\nThe Processor asserts PLTRST# to reset devices on the platform (e.g.,\nSIO, LAN etc.). Asserted during power-up and when S/W initiates a\nhard reset sequence through the Reset Control register.\n\nIf there are other scenarios ex: AP/OS hangs/asserts due to which CPU reset is triggered monitoring the \"SYS_RST\" signal will not help.",
+      "parentUuid": "31603fb7_5a945aa6",
+      "range": {
+        "startLine": 174,
+        "startChar": 22,
+        "endLine": 174,
+        "endChar": 33
+      },
+      "revId": "73dccacde6508313216f5d6d318480d1e13198d0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
