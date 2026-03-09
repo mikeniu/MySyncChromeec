@@ -16,6 +16,24 @@
       "message": "Should this be within the `ATRIARVP` section?",
       "revId": "23e2b18f0a36c443270d930598a1c555353ad929",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f337f0e9_33461f4e",
+        "filename": "zephyr/program/atria/CMakeLists.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-09T18:21:06Z",
+      "side": 1,
+      "message": "The theory behind not putting it under `ATRIARVP-RTK` is that there could be another RVP in the future so then any board with that config would get the files. I\u0027m fine putting them in either place",
+      "parentUuid": "eea4d25b_e2e54d7e",
+      "revId": "23e2b18f0a36c443270d930598a1c555353ad929",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
