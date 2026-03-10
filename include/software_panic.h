@@ -25,6 +25,7 @@
 #define PANIC_SW_EXIT (PANIC_SW_BASE + 7)
 #define PANIC_SW_WATCHDOG_WARN (PANIC_SW_BASE + 8)
 #define PANIC_SW_WATCHDOG_HARD (PANIC_SW_BASE + 9)
+#define PANIC_SW_STACK_CANARIES (PANIC_SW_BASE + 10)
 
 #ifndef __ASSEMBLER__
 extern const char *const panic_sw_reasons[];

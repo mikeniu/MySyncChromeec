@@ -377,6 +377,26 @@ ENABLE_CLANG_WARNING("-Winfinite-recursion")
 ENABLE_GCC_WARNING("-Winfinite-recursion")
 #endif
 
+static void stack_smash_recurse(char *a, char *b, size_t n)
+{
+	if (!n) {
+		return;
+	}
+	panic_printf("+%02X ", *a);
+	*b = 'F';
+	stack_smash_recurse(a + 1, b + 1, n - 1);
+	panic_printf("-%02X ", *b);
+}
+
+static void stack_smash()
+{
+	char a[10];
+	memset(a, 'B', sizeof(a));
+	a[sizeof(a) - 1] = '\0';
+	stack_smash_recurse(a, a, sizeof(a) + 4);
+	panic_printf("%s\n", a);
+}
+
 #ifdef CONFIG_CMD_CRASH_NESTED
 static bool command_crash_nested_enabled;
 static int command_crash_nested_argc;
@@ -476,6 +496,8 @@ static int command_crash(int argc, const char **argv)
 		volatile uintptr_t null_ptr = 0x0;
 		cflush();
 		ccprintf("%08x\n", *(volatile unsigned int *)null_ptr);
+	} else if (!strcasecmp(argv[1], "stack_smash")) {
+		stack_smash();
 	} else {
 		/* Disable nested crash on error */
 		if (IS_ENABLED(CONFIG_CMD_CRASH_NESTED))
@@ -496,6 +518,7 @@ DECLARE_CONSOLE_COMMAND(crash, command_crash,
 #ifndef CONFIG_ALLOW_UNALIGNED_ACCESS
 			" | unaligned"
 #endif /* !CONFIG_ALLOW_UNALIGNED_ACCESS */
+			" | stack_smash"
 			" | watchdog | hang | null]",
 			"Crash the system (for testing)."
 #ifndef CONFIG_CMD_CRASH_NESTED
