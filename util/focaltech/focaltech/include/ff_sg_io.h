@@ -37,6 +37,46 @@
 #define FT_SUBCMD_CODE_BIN 0x04
 #define FT_SUBCMD_ERASE_PAGE 0x08
 #define FT_SUBCMD_VERIFY 0xbb
+<<<<<<< PATCH SET (20382701f0d1b80db4dfe5c816c7c0450f8da27c     1.Re-implement the command parsing logic.)
+#define FT_SUBCMD_SOFT_RESET 0xdd
+#define FT_SUBCMD_FLASH_WP_SET 0xf7
+#define FT_SUBCMD_FLASH_WP_GET 0xf8
+
+/* Common target lengths */
+#define FT_CMD_LENGTH 16
+
+#define FT_PARA_UNSET 0
+#define FT_PARA_READ_SRAM_DIFF 1
+#define FT_PARA_READ_SRAM_SAME 2
+
+#define FT_BOOT_VERSION_MAX 36
+
+#define FT_WRITE_SRAM_ADDR (0x20002000)
+#define FT_READ_SRAM_ADDR (0x20003000)
+
+#define FT_EC_BIN_SIZE_MAX (2 * 1024 * 1024)
+
+typedef enum ft_hash_mode_e {
+	HASH_MODE_SM3,
+	HASH_MODE_SHA0,
+	HASH_MODE_SHA1,
+	HASH_MODE_SHA224,
+	HASH_MODE_SHA256,
+	HASH_MODE_SHA384,
+	HASH_MODE_SHA512,
+} ft_hash_mode_t;
+
+struct ft_cmd_format {
+	uint8_t opcode;
+	uint32_t para2;
+	uint32_t para3;
+	uint32_t para4;
+	uint8_t subcmd;
+	uint8_t sub_para;
+	uint8_t reserved;
+} __attribute__((packed));
+||||||| BASE      (2e6c46277614b9605a2c5ae9eba08e026a406e90 pdc: Add "USB Device Capable" to pdc info)
+=======
 #define FT_SUBCMD_EXEC_DISBOOT 0xcc
 #define FT_SUBCMD_SOFT_RESET 0xdd
 #define FT_SUBCMD_FLASH_WP_SET 0xF7
@@ -65,6 +105,7 @@ typedef enum ft_hash_mode_e {
 	HASH_MODE_SHA384,
 	HASH_MODE_SHA512,
 } ft_hash_mode_t;
+>>>>>>> BASE      (fcd9064294552a3cbf330ce87121caabb6c418c8 util: focaltech: Add focaltech IAP tool)
 
 typedef enum ft_soft_reset_e { SOFT_POR, SOFT_RST } ft_soft_reset_t;
 

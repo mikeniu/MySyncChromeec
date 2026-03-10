@@ -3,6 +3,58 @@
  * found in the LICENSE file.
  */
 
+<<<<<<< PATCH SET (20382701f0d1b80db4dfe5c816c7c0450f8da27c     1.Re-implement the command parsing logic.)
+#ifndef _NET_SERIAL_H
+#define _NET_SERIAL_H
+
+#include "libusb.h"
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct {
+	libusb_device_handle *handle;
+	libusb_device **devs;
+	libusb_context *ctx;
+	uint8_t endpoint_in;
+	uint8_t endpoint_out;
+	uint8_t interface;
+} ft_usb_context_t;
+
+#define FT_USB_DEVICE_REMOVE_MAGIC 0x55aa
+
+int ft_usb_connect(const uint32_t pid, const uint32_t vid);
+
+int ft_usb_reconnect(const uint32_t pid, const uint32_t vid);
+
+int ft_usb_send(const uint8_t *buf, uint32_t len);
+
+int ft_usb_recv_timeout(uint8_t *buf, uint32_t len, uint32_t timeout);
+
+void ft_usb_free(void);
+
+int ft_usb_exist(uint16_t *vid,uint16_t *pid);
+
+libusb_device ** ft_usb_get_devs(void);
+
+int focal_device_disable(libusb_device **);
+
+int LIBUSB_CALL usb_remove_event_callback(libusb_context *ctx,
+					  libusb_device *dev,
+					  libusb_hotplug_event event,
+					  void *user_data);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // _NET_SERIAL_H
+||||||| BASE      (2e6c46277614b9605a2c5ae9eba08e026a406e90 pdc: Add "USB Device Capable" to pdc info)
+=======
 #ifndef MBEDTLS_NET_SERIAL_H
 #define MBEDTLS_NET_SERIAL_H
 
@@ -77,3 +129,4 @@ int LIBUSB_CALL usb_remove_event_callback(libusb_context *ctx,
 #endif
 
 #endif // MBEDTLS_NET_SERIAL_H
+>>>>>>> BASE      (fcd9064294552a3cbf330ce87121caabb6c418c8 util: focaltech: Add focaltech IAP tool)
