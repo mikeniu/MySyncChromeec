@@ -70,6 +70,24 @@
       "parentUuid": "c27623a9_3080338a",
       "revId": "58b01a806cb192c63beb81078bf8b831790f290d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f645770_d980c5c4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-10T05:56:16Z",
+      "side": 1,
+      "message": "Okay, so IMO that\u0027s a fundamental difference to to rtk and npcx drivers. Can you check the andes_xip driver? From my current understanding, I think it\u0027s more similar to your case. I added there a [design description](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/cros_flash/cros_flash_andestech_xip.c;l\u003d6) at the begging of the driver, I hope this helps to understand what\u0027s going on there.",
+      "parentUuid": "20474e84_f043ac14",
+      "revId": "58b01a806cb192c63beb81078bf8b831790f290d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
