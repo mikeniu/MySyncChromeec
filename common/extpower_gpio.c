@@ -23,6 +23,24 @@ static int get_extpower_presence(void)
 #endif
 }
 
+void extpower_enable_interrupt(void)
+{
+#ifdef CONFIG_EXTPOWER_GPIO_CUSTOM
+	board_extpower_enable_interrupt();
+#else
+	gpio_enable_interrupt(GPIO_AC_PRESENT);
+#endif
+}
+
+void extpower_disable_interrupt(void)
+{
+#ifdef CONFIG_EXTPOWER_GPIO_CUSTOM
+	board_extpower_disable_interrupt();
+#else
+	gpio_disable_interrupt(GPIO_AC_PRESENT);
+#endif
+}
+
 test_mockable int extpower_is_present(void)
 {
 	return debounced_extpower_presence;
@@ -59,8 +77,6 @@ static void extpower_init(void)
 		extpower_update_host_events(debounced_extpower_presence);
 	}
 	/* Enable interrupts, now that we've initialized */
-#ifndef CONFIG_EXTPOWER_GPIO_CUSTOM
-	gpio_enable_interrupt(GPIO_AC_PRESENT);
-#endif
+	extpower_enable_interrupt();
 }
 DECLARE_HOOK(HOOK_INIT, extpower_init, HOOK_PRIO_INIT_EXTPOWER);
