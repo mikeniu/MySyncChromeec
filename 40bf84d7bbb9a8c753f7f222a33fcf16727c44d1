@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e965c33c_43538e52",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-10T18:29:43Z",
+      "side": 1,
+      "message": "Parent CL needs to land independently and uprev zephyr-build-tools before this can land.",
+      "revId": "40bf84d7bbb9a8c753f7f222a33fcf16727c44d1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
