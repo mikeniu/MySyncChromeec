@@ -38,7 +38,7 @@ typedef union {
 	uint8_t v;
 } u_endpoint_attr_t;
 
-static usb_context_t _usb_ctx, *usb_ctx = &_usb_ctx;
+static ft_usb_context_t _usb_ctx, *usb_ctx = &_usb_ctx;
 static libusb_hotplug_callback_handle callback_handle = 0;
 
 int LIBUSB_CALL usb_remove_event_callback(libusb_context *ctx,
@@ -73,6 +73,7 @@ int LIBUSB_CALL usb_remove_event_callback(libusb_context *ctx,
 	return FT_SUCCESS;
 }
 
+/* A successful registration should return 0 */
 int LIBUSB_CALL usb_event_callback(libusb_context *ctx, libusb_device *dev,
 				   libusb_hotplug_event event, void *user_data)
 {
@@ -91,40 +92,7 @@ int LIBUSB_CALL usb_event_callback(libusb_context *ctx, libusb_device *dev,
 		FF_LOGE("error getting device descriptor.");
 	}
 
-	if (LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED == event) {
-		FF_LOGD("usb device attached: %04x:%04x", desc.idVendor,
-			desc.idProduct);
-
-		if (usb_ctx->handle) {
-			libusb_close(usb_ctx->handle);
-			usb_ctx->handle = NULL;
-		}
-
-		r = libusb_open(dev, &usb_ctx->handle);
-		if (LIBUSB_SUCCESS != r) {
-			FF_LOGE("error opening device.");
-		} else {
-			if (libusb_kernel_driver_active(usb_ctx->handle, 0) ==
-			    1) { // find out if kernel driver is attached
-				FF_LOGD("kernel driver active");
-				if (libusb_detach_kernel_driver(usb_ctx->handle,
-								0) == 0)
-					FF_LOGD("kernel driver detach");
-			}
-			int r = libusb_claim_interface(usb_ctx->handle,
-						       0); // claim interface 0
-							   // (the first) of
-							   // device (mine had
-							   // just 1)
-			if (r < 0) {
-				FF_LOGE("libusb_claim_interface failed: %s",
-					libusb_error_name(r));
-				return FT_NO_SUCH_DEV;
-			}
-			g_no_device_flag = 1;
-			FF_LOGD("usb device open success %p", usb_ctx->handle);
-		}
-	} else if (LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT == event) {
+	if (LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT == event) {
 		FF_LOGW("usb device removed: %04x:%04x", desc.idVendor,
 			desc.idProduct);
 
@@ -134,17 +102,55 @@ int LIBUSB_CALL usb_event_callback(libusb_context *ctx, libusb_device *dev,
 
 		if (usb_ctx->handle) {
 			libusb_free_device_list(usb_ctx->devs, 1);
-			libusb_release_interface(usb_ctx->handle, 0);
+			libusb_release_interface(usb_ctx->handle,
+						 usb_ctx->interface);
 			libusb_close(usb_ctx->handle);
 			usb_ctx->handle = NULL;
 			g_no_device_flag = 0;
+			usb_ctx->interface = 0;
+		}
+		return 0;
+	}
+
+	if (LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED != event) {
+		return 0;
+	}
+
+	FF_LOGD("usb device attached: %04x:%04x", desc.idVendor,
+		desc.idProduct);
+
+	if (usb_ctx->handle) {
+		libusb_close(usb_ctx->handle);
+		usb_ctx->handle = NULL;
+	}
+
+	r = libusb_open(dev, &usb_ctx->handle);
+	if (LIBUSB_SUCCESS != r) {
+		FF_LOGE("error opening device.");
+		return 0;
+	}
+
+	if (libusb_kernel_driver_active(usb_ctx->handle, 0) == 1) {
+		FF_LOGD("kernel driver active");
+		if (libusb_detach_kernel_driver(usb_ctx->handle, 0) == 0) {
+			FF_LOGD("kernel driver detach");
 		}
 	}
 
-	return FT_SUCCESS;
+	r = libusb_claim_interface(usb_ctx->handle, 0);
+	if (r < 0) {
+		FF_LOGE("libusb_claim_interface failed: %s",
+			libusb_error_name(r));
+		return r;
+	}
+
+	g_no_device_flag = 1;
+	FF_LOGD("usb device open success %p", usb_ctx->handle);
+
+	return 0;
 }
 
-int mbedtls_usb_init(const uint32_t pid, const uint32_t vid)
+static int ft_usb_init(const uint16_t vid, const uint16_t pid)
 {
 	int ret = FT_SUCCESS;
 	usb_ctx->devs = NULL;
@@ -173,7 +179,7 @@ int mbedtls_usb_init(const uint32_t pid, const uint32_t vid)
 	return FT_SUCCESS;
 }
 
-int mbedtls_usb_exist(uint16_t *pid, uint16_t *vid)
+int ft_usb_exist(uint16_t *vid, uint16_t *pid)
 {
 	libusb_device *dev = NULL;
 	int ret = FT_NO_SUCH_DEV, i = 0;
@@ -216,8 +222,8 @@ int mbedtls_usb_exist(uint16_t *pid, uint16_t *vid)
 			ret = FT_SUCCESS;
 			*vid = desc.idVendor;
 			*pid = desc.idProduct;
-			FF_LOGI("find device pid %x:vid %x", desc.idProduct,
-				desc.idVendor);
+			FF_LOGI("find device vid %04x:pid %04x", desc.idVendor,
+				desc.idProduct);
 			break;
 		}
 	}
@@ -242,17 +248,20 @@ error:
 		}
 
 	} else {
-		ret = mbedtls_usb_init(*pid, *vid);
+		ret = ft_usb_init(*vid, *pid);
+		libusb_free_device_list(usb_ctx->devs, 1);
+		usb_ctx->devs = NULL;
 	}
 
 	return ret;
 }
 
-int mbedtls_usb_connect(const uint32_t pid, const uint32_t vid)
+int ft_usb_connect(const uint32_t pid, const uint32_t vid)
 {
 	libusb_device *dev = NULL;
 	libusb_context *context = NULL;
 	int ret = 0, i = 0, j = 0, k = 0, l = 0;
+	int dev_idx = 0;
 
 	ret = libusb_get_device_list(usb_ctx->ctx, &usb_ctx->devs);
 	if (ret < 0) {
@@ -260,7 +269,7 @@ int mbedtls_usb_connect(const uint32_t pid, const uint32_t vid)
 		goto error2;
 	}
 
-	while ((dev = usb_ctx->devs[i++]) != NULL) {
+	while ((dev = usb_ctx->devs[dev_idx++]) != NULL) {
 		struct libusb_device_descriptor desc;
 
 		ret = libusb_get_device_descriptor(dev, &desc);
@@ -270,50 +279,55 @@ int mbedtls_usb_connect(const uint32_t pid, const uint32_t vid)
 			goto error2;
 		}
 
-		if ((desc.idVendor == vid) && (desc.idProduct == pid)) {
-			for (i = 0; i < desc.bNumConfigurations; i++) {
-				struct libusb_config_descriptor *config;
-				ret = libusb_get_config_descriptor(dev, i,
-								   &config);
-				if (ret != LIBUSB_SUCCESS) {
-					FF_LOGE("couldn't retrieve descriptors.");
-					continue;
-				}
+		/* Guard clause: skip if VID/PID don't match */
+		if (desc.idVendor != vid || desc.idProduct != pid) {
+			continue;
+		}
 
-				for (j = 0; j < config->bNumInterfaces; j++) {
-					const struct libusb_interface *interface =
-						config->interface + j;
-					for (k = 0;
-					     k < interface->num_altsetting;
-					     k++) {
-						const struct libusb_interface_descriptor
-							*alt_interface =
-								interface->altsetting +
-								k;
-						for (l = 0;
-						     l <
-						     alt_interface
-							     ->bNumEndpoints;
-						     l++) {
-							const struct libusb_endpoint_descriptor
-								*endpoint =
-									alt_interface
-										->endpoint +
-									l;
-							u_endpoint_addr_t addr;
-							addr.v =
-								endpoint->bEndpointAddress;
+		for (i = 0; i < desc.bNumConfigurations; i++) {
+			struct libusb_config_descriptor *config;
+			ret = libusb_get_config_descriptor(dev, i, &config);
+			if (ret != LIBUSB_SUCCESS) {
+				FF_LOGE("couldn't retrieve descriptors.");
+				continue;
+			}
 
-							if (addr.s.dir == 1) {
-								if (endpoint->bmAttributes ==
-								    LIBUSB_TRANSFER_TYPE_BULK) {
-									usb_ctx->endpoint_in =
-										endpoint->bEndpointAddress;
-								}
-							} else {
-								usb_ctx->endpoint_out =
+			for (j = 0; j < config->bNumInterfaces; j++) {
+				const struct libusb_interface *interface =
+					config->interface + j;
+
+				/*For fingerprint devices, this value is 1.*/
+				for (k = 0; k < interface->num_altsetting;
+				     k++) {
+					const struct libusb_interface_descriptor
+						*alt_interface =
+							interface->altsetting +
+							k;
+					usb_ctx->interface =
+						alt_interface->bInterfaceNumber;
+					FF_LOGD("usb_ctx->interface=%d",
+						usb_ctx->interface);
+					for (l = 0;
+					     l < alt_interface->bNumEndpoints;
+					     l++) {
+						const struct libusb_endpoint_descriptor
+							*endpoint =
+								alt_interface
+									->endpoint +
+								l;
+						u_endpoint_addr_t addr;
+						addr.v =
+							endpoint->bEndpointAddress;
+
+						if (addr.s.dir == 1) {
+							if (endpoint->bmAttributes ==
+							    LIBUSB_TRANSFER_TYPE_BULK) {
+								usb_ctx->endpoint_in =
 									endpoint->bEndpointAddress;
 							}
+						} else {
+							usb_ctx->endpoint_out =
+								endpoint->bEndpointAddress;
 						}
 					}
 				}
@@ -339,17 +353,23 @@ int mbedtls_usb_connect(const uint32_t pid, const uint32_t vid)
 		FF_LOGE("failed to reset the device");
 	}
 
-	if (libusb_kernel_driver_active(usb_ctx->handle, 0) == 1) {
+	/*After a USB reset, you need to wait for the device to re-enumerate;
+	otherwise, USB communication may not succeed.*/
+	usleep(200 * 1000);
+
+	if (libusb_kernel_driver_active(usb_ctx->handle, usb_ctx->interface) ==
+	    1) {
 		FF_LOGD("kernel driver active, detach it ");
 
-		if (libusb_detach_kernel_driver(usb_ctx->handle, 0) == 0) {
+		if (libusb_detach_kernel_driver(usb_ctx->handle,
+						usb_ctx->interface) == 0) {
 			FF_LOGD("detached kernel driver");
 		} else {
 			goto error1;
 		}
 	}
 
-	ret = libusb_claim_interface(usb_ctx->handle, 0);
+	ret = libusb_claim_interface(usb_ctx->handle, usb_ctx->interface);
 
 	if (ret < 0) {
 		FF_LOGE("claim the device interface failed.");
@@ -359,11 +379,14 @@ int mbedtls_usb_connect(const uint32_t pid, const uint32_t vid)
 	}
 
 	return FT_SUCCESS;
+
 error1:
-	libusb_release_interface(usb_ctx->handle, 0);
+	libusb_release_interface(usb_ctx->handle, usb_ctx->interface);
+	usb_ctx->interface = 0;
 error2:
 	FF_LOGD("free device list.");
 	libusb_free_device_list(usb_ctx->devs, 1);
+
 error3:
 	FF_LOGD("close the device.");
 	libusb_close(usb_ctx->handle);
@@ -371,7 +394,7 @@ error3:
 	return FT_RESULT_FAIL;
 }
 
-int mbedtls_usb_reconnect(const uint32_t pid, const uint32_t vid)
+int ft_usb_reconnect(const uint32_t pid, const uint32_t vid)
 {
 	int ret = FT_SUCCESS;
 	while (g_no_device_flag == 0) {
@@ -386,55 +409,36 @@ int mbedtls_usb_reconnect(const uint32_t pid, const uint32_t vid)
 	return ret;
 }
 
-int mbedtls_usb_send(const uint8_t *buf, uint32_t len)
+int ft_usb_send(const uint8_t *buf, uint32_t len)
 {
-	int ret = FT_SUCCESS;
+	int ret = 0;
 	int actual_len = 0;
 
-	uint8_t edp2out = usb_ctx->endpoint_out;
+	uint8_t ep = usb_ctx->endpoint_out;
 	libusb_device_handle *handle = usb_ctx->handle;
 
-	FF_LOGD("ep out=%x", edp2out);
+	FF_LOGD("ep out=%x", ep);
 
-	ff_util_hexdump(0, "send:", buf, len);
-
-	ret = libusb_bulk_transfer(handle, edp2out, (uint8_t *)buf, len,
-				   &actual_len, 0);
+	ret = libusb_bulk_transfer(handle, ep, (uint8_t *)buf, len, &actual_len,
+				   0);
 	if (ret != LIBUSB_SUCCESS) {
-		return ret; // MBEDTLS_ERR_NET_SEND_FAILED;
+		return ret;
 	}
 
 	return (actual_len);
 }
 
-int mbedtls_usb_recv(uint8_t *buf, uint32_t len)
+int ft_usb_recv_timeout(uint8_t *buf, uint32_t len, uint32_t timeout)
 {
-	int ret = FT_SUCCESS;
-	int actual_len = 0;
-	uint8_t edp2in = usb_ctx->endpoint_in;
-	libusb_device_handle *handle = usb_ctx->handle;
-
-	ret = libusb_bulk_transfer(handle, edp2in, buf, len, &actual_len, 0);
-	if (ret != LIBUSB_SUCCESS) {
-		return MBEDTLS_ERR_NET_RECV_FAILED;
-	}
-	ff_util_hexdump(1, "recv:", buf, actual_len);
-
-	return (actual_len);
-}
-
-int mbedtls_usb_recv_timeout(uint8_t *buf, uint32_t len, uint32_t timeout)
-{
-	int ret = FT_SUCCESS;
+	int ret = 0;
 	int actual_len = 0;
 
-	uint8_t edp2in = usb_ctx->endpoint_in;
-	FF_LOGD("ep in=%x", edp2in);
+	uint8_t ep = usb_ctx->endpoint_in;
+	FF_LOGD("ep in=%x", ep);
 
 	libusb_device_handle *handle = usb_ctx->handle;
 
-	ret = libusb_bulk_transfer(handle, edp2in, buf, len, &actual_len,
-				   timeout);
+	ret = libusb_bulk_transfer(handle, ep, buf, len, &actual_len, timeout);
 
 	if (ret != LIBUSB_SUCCESS) {
 		return ret; // MBEDTLS_ERR_NET_RECV_FAILED;
@@ -444,28 +448,7 @@ int mbedtls_usb_recv_timeout(uint8_t *buf, uint32_t len, uint32_t timeout)
 	return (actual_len > len ? len : actual_len);
 }
 
-int mbedtls_usb_recv_timeout_with_ep(uint8_t *buf, uint32_t len,
-				     uint32_t timeout, uint8_t epin)
-{
-	int ret = FT_SUCCESS;
-	int actual_len = 0;
-
-	FF_LOGD("ep in=%x", epin);
-
-	libusb_device_handle *handle = usb_ctx->handle;
-
-	ret = libusb_bulk_transfer(handle, epin, buf, len, &actual_len,
-				   timeout);
-
-	if (ret != LIBUSB_SUCCESS) {
-		return MBEDTLS_ERR_NET_RECV_FAILED;
-	}
-	ff_util_hexdump(0, "recv:", buf, actual_len);
-
-	return (actual_len > len ? len : actual_len);
-}
-
-void mbedtls_usb_free(void)
+void ft_usb_free(void)
 {
 	FF_LOGD("release the device. ");
 	if (usb_ctx) {
@@ -481,8 +464,10 @@ void mbedtls_usb_free(void)
 		}
 
 		if (usb_ctx->handle) {
-			libusb_release_interface(usb_ctx->handle, 0);
+			libusb_release_interface(usb_ctx->handle,
+						 usb_ctx->interface);
 			libusb_close(usb_ctx->handle);
+			usb_ctx->interface = 0;
 		}
 
 		usb_ctx->devs = NULL;
@@ -493,4 +478,9 @@ void mbedtls_usb_free(void)
 		}
 		usb_ctx->ctx = NULL;
 	}
+}
+
+libusb_device **ft_usb_get_devs(void)
+{
+	return usb_ctx->devs;
 }

@@ -14,9 +14,7 @@
 extern "C" {
 #endif
 
-#define FOCAL_SOFT_VERSION "v1.0.1"
-
-#define FT_BULK_EP_IN 0x81
+#define FOCAL_SOFT_VERSION "v1.0.2"
 
 #define FOCAL_CONFIG_SIZE 4096
 
@@ -74,15 +72,6 @@ typedef struct ft_device_info_st {
 
 } ft_device_info_t;
 
-#define FT_ENTER_BOOT_CMD_STR "back_to_bootloader"
-#define FT_ENTER_ROM_CMD_STR "back_to_rom_boot"
-#define FT_ENTER_ENTER_USB_SUSPEND_CMD_STR "enter_usb_suspend"
-#define FT_ENTER_ENTER_USB_RESUME_CMD_STR "enter_usb_resume"
-#define FT_ENTER_GET_FLASH_WP_CMD_STR "flash_get_protect"
-#define FT_ENTER_SET_FLASH_WP_CMD_STR "flash_set_protect"
-#define FT_ENTER_GET_EC_VERSION_CMD_STR "get_ec_version"
-#define FT_ENTER_FORCE_UPDATE_CMD_STR "force_update_full_ec_bin"
-
 #define FT_SUCCESS 0
 #define FT_NO_SUCH_DEV -1
 #define FT_PARA_ERR -2
@@ -93,8 +82,8 @@ typedef struct ft_device_info_st {
 int mbedtls_usb_recv_timeout_with_ep(uint8_t *buf, uint32_t len,
 				     uint32_t timeout, uint8_t epin);
 
-void update_fw(ft_device_info_t *info);
-int focal_device_disable(void);
+int update_fw(ft_device_info_t *info);
+
 
 #ifdef __cplusplus
 }

@@ -6,13 +6,14 @@
 #include "ff_common.h"
 #include "ff_log.h"
 #include "ff_sg_io.h"
+#include "ff_util.h"
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <fcntl.h>
-#include <memory.h>
 #include <openssl/sha.h>
 #include <scsi/sg.h>
 #include <sys/ioctl.h>
@@ -20,14 +21,6 @@
 
 #define WRITE_DATA_TO_USB DIRECTION_OUT // SG_DXFER_TO_DEV
 #define READ_DATA_FROM_USB DIRECTION_IN // SG_DXFER_FROM_DEV
-
-#define CMD_LENGTH 0x10
-
-#define U32_SET(buf, u)                        \
-	(buf)[3] = (unsigned char)((u) >> 24); \
-	(buf)[2] = (unsigned char)((u) >> 16); \
-	(buf)[1] = (unsigned char)((u) >> 8);  \
-	(buf)[0] = (unsigned char)(u)
 
 struct ft_config_page {
 	uint32_t code_valid_control_word; /* 0x3AEC3721 for valid code */
@@ -47,12 +40,17 @@ struct ft_config_page {
 
 /* Helper to construct a standard 16-byte FT command block */
 static void build_ft_cmd(unsigned char *cmd_buf, uint8_t opcode, uint8_t subcmd,
-			 uint8_t para)
+			 uint32_t para2, uint32_t para3, uint32_t para4,
+			 uint8_t sub_para)
 {
 	memset(cmd_buf, 0, FT_CMD_LENGTH);
-	cmd_buf[0] = opcode;
-	cmd_buf[13] = subcmd;
-	cmd_buf[14] = para;
+	struct ft_cmd_format *cmd = (struct ft_cmd_format *)cmd_buf;
+	cmd->opcode = opcode;
+	cmd->subcmd = subcmd;
+	cmd->sub_para = sub_para;
+	cmd->para2 = para2;
+	cmd->para3 = para3;
+	cmd->para4 = para4;
 }
 
 /*
@@ -77,21 +75,18 @@ static int usb_init(uint16_t vid, uint16_t pid)
 
 	return ret;
 }
+
 /*
  * send the data to the usb device
  * return value : 0 - success ; other - fail
  */
-
 static int usb_write(unsigned char *cmd, int cmd_len, unsigned char *data,
-		     int data_len, int flag)
+		     int data_len, int flag, uint32_t timeout)
 {
-	struct sg_io_hdr io_hdr;
-
+	struct sg_io_hdr io_hdr = { 0 };
 	unsigned char sense[32];
-
 	int ret = 0;
 
-	memset(&io_hdr, 0, sizeof(io_hdr));
 	io_hdr.interface_id = 'S';
 
 	io_hdr.cmdp = cmd;
@@ -102,8 +97,8 @@ static int usb_write(unsigned char *cmd, int cmd_len, unsigned char *data,
 	io_hdr.dxfer_direction = flag;
 
 	io_hdr.sbp = sense;
-	io_hdr.mx_sb_len = 32; // sense length
-	io_hdr.timeout = 6000; // it will take 4.4s in bootloader erase page
+	io_hdr.mx_sb_len = sizeof(sense); // sense length
+	io_hdr.timeout = timeout; //
 
 	ret = ft_sg_io(&io_hdr);
 
@@ -116,16 +111,14 @@ static int ft_erase_page(int length, int addr)
 	int count = 0, ret_value;
 	FF_LOGD("ft_erase_page len=0x%x,addr=0x%x", length, addr);
 
-	build_ft_cmd(transfer_cmd, FT_CMD_ACTION, FT_SUBCMD_ERASE_PAGE,
-		     FT_PARA_UNSET);
+	count = ft_div_round_up(length, FOCAL_CONFIG_SIZE);
 
-	count = (length + FOCAL_CONFIG_SIZE - 1) / FOCAL_CONFIG_SIZE;
+	build_ft_cmd(transfer_cmd, FT_CMD_ACTION, FT_SUBCMD_ERASE_PAGE, addr,
+		     count, FT_PARA_UNSET, FT_PARA_UNSET);
 
-	U32_SET(&transfer_cmd[1], addr);
-	U32_SET(&transfer_cmd[5], count);
-
-	ret_value =
-		usb_write(transfer_cmd, CMD_LENGTH, NULL, 0, WRITE_DATA_TO_USB);
+	/*it will take 4.4s in bootloader erase page*/
+	ret_value = usb_write(transfer_cmd, FT_CMD_LENGTH, NULL, 0,
+			      WRITE_DATA_TO_USB, 6000);
 
 	return ret_value;
 }
@@ -138,12 +131,18 @@ static int ft_get_boot_version(char *version)
 	int data_len = sizeof(databuffer);
 
 	build_ft_cmd(transfer_cmd, FT_CMD_READ_INFO, FT_SUBCMD_READ_DATA,
+		     FT_PARA_UNSET, FT_PARA_UNSET, FT_PARA_UNSET,
 		     FT_PARA_UNSET);
 
-	ret_value = usb_write(transfer_cmd, CMD_LENGTH, databuffer, data_len,
-			      READ_DATA_FROM_USB);
-
-	FF_LOGI("get boot vesion:%s", databuffer);
+	ret_value = usb_write(transfer_cmd, FT_CMD_LENGTH, databuffer, data_len,
+			      READ_DATA_FROM_USB, 200);
+	if (ret_value) {
+		FF_LOGE("get boot version err");
+		return ret_value;
+	} else {
+		databuffer[FT_BOOT_VERSION_MAX - 1] = 0;
+		FF_LOGI("get boot vesion:%s", databuffer);
+	}
 
 	if (version) {
 		memcpy(version, databuffer, sizeof(databuffer));
@@ -155,16 +154,17 @@ static int ft_get_boot_version(char *version)
 static ft_flash_protect_area_t ft_get_flash_protect(void)
 {
 	ft_flash_protect_area_t wp_area = FLASH_WP_AREA_UNKNOWN;
-	unsigned char flash_wp_cmd[CMD_LENGTH] = { 0 };
+	unsigned char flash_wp_cmd[FT_CMD_LENGTH] = { 0 };
 
 	uint8_t data[512] = { 0 };
 	int len = sizeof(data);
 
 	build_ft_cmd(flash_wp_cmd, FT_CMD_ACTION, FT_SUBCMD_FLASH_WP_GET,
+		     FT_PARA_UNSET, FT_PARA_UNSET, FT_PARA_UNSET,
 		     FT_PARA_UNSET);
 
-	int ret_value = usb_write(flash_wp_cmd, CMD_LENGTH, data, len,
-				  READ_DATA_FROM_USB);
+	int ret_value = usb_write(flash_wp_cmd, FT_CMD_LENGTH, data, len,
+				  READ_DATA_FROM_USB, 200);
 
 	if (ret_value) {
 		FF_LOGE("ft_get_flash_protect err,ret=%d", ret_value);
@@ -174,7 +174,7 @@ static ft_flash_protect_area_t ft_get_flash_protect(void)
 		wp_area = data[0];
 	}
 
-	FF_LOGD("get flash write protect area=%d", wp_area);
+	FF_LOGI("get flash write protect area=%d", wp_area);
 
 	return wp_area;
 }
@@ -182,7 +182,7 @@ static ft_flash_protect_area_t ft_get_flash_protect(void)
 static int ft_set_flash_protect(ft_flash_protect_area_t wp_area)
 {
 	int ret = FT_SUCCESS;
-	unsigned char flash_wp_cmd[CMD_LENGTH] = { 0 };
+	unsigned char flash_wp_cmd[FT_CMD_LENGTH] = { 0 };
 
 	FF_LOGD("set flash write protect area=%d", wp_area);
 
@@ -196,13 +196,10 @@ static int ft_set_flash_protect(ft_flash_protect_area_t wp_area)
 	int len = sizeof(databuffer);
 
 	build_ft_cmd(flash_wp_cmd, FT_CMD_ACTION, FT_SUBCMD_FLASH_WP_SET,
-		     FT_PARA_UNSET);
+		     wp_area, ~wp_area, FT_PARA_UNSET, FT_PARA_UNSET);
 
-	U32_SET(&flash_wp_cmd[1], wp_area);
-	U32_SET(&flash_wp_cmd[5], ~wp_area);
-
-	ret = usb_write(flash_wp_cmd, CMD_LENGTH, databuffer, len,
-			READ_DATA_FROM_USB);
+	ret = usb_write(flash_wp_cmd, FT_CMD_LENGTH, databuffer, len,
+			READ_DATA_FROM_USB, 200);
 
 	if (ret) {
 		FF_LOGE("ft_set_flash_protect err");
@@ -221,34 +218,28 @@ static int ft_set_flash_protect(ft_flash_protect_area_t wp_area)
 static int ft_download_page(uint32_t downaddr, int per_len, unsigned char *p)
 {
 	int ret_value = FT_SUCCESS;
-	int tmpaddr = FT_WRITE_SRAM_ADDR;
 	unsigned char write_bin_cmd[FT_CMD_LENGTH] = { 0 };
 	unsigned char code_bin_cmd[FT_CMD_LENGTH] = { 0 };
 
 	build_ft_cmd(write_bin_cmd, FT_CMD_ACTION, FT_SUBCMD_WRITE_BIN,
-		     FT_PARA_UNSET);
-	build_ft_cmd(code_bin_cmd, FT_CMD_ACTION, FT_SUBCMD_CODE_BIN,
-		     FT_PARA_UNSET);
+		     FT_WRITE_SRAM_ADDR, per_len, FT_PARA_UNSET, FT_PARA_UNSET);
 
-	U32_SET(&write_bin_cmd[1], tmpaddr);
-	U32_SET(&write_bin_cmd[5], per_len);
+	build_ft_cmd(code_bin_cmd, FT_CMD_ACTION, FT_SUBCMD_CODE_BIN, downaddr,
+		     per_len, FT_WRITE_SRAM_ADDR, FT_PARA_UNSET);
 
-	ret_value = usb_write(write_bin_cmd, CMD_LENGTH, p, per_len,
-			      WRITE_DATA_TO_USB);
+	ret_value = usb_write(write_bin_cmd, FT_CMD_LENGTH, p, per_len,
+			      WRITE_DATA_TO_USB, 500);
 	if (ret_value) {
 		FF_LOGE("Write bin error!");
 		goto exit;
 	}
 
 	FF_LOGV("downaddr:%x", downaddr);
-	U32_SET(&code_bin_cmd[1], downaddr);
-	U32_SET(&code_bin_cmd[5], per_len);
-	U32_SET(&code_bin_cmd[9], tmpaddr);
-	ret_value =
-		usb_write(code_bin_cmd, CMD_LENGTH, NULL, 0, WRITE_DATA_TO_USB);
+
+	ret_value = usb_write(code_bin_cmd, FT_CMD_LENGTH, NULL, 0,
+			      WRITE_DATA_TO_USB, 500);
 	if (ret_value) {
 		FF_LOGE("code bin error!");
-		goto exit;
 	}
 
 exit:
@@ -283,9 +274,7 @@ static int ft_download_bin(char *name, int addr)
 		goto exit;
 	}
 
-	total_frame = file_len / FOCAL_CONFIG_SIZE;
-	if (file_len % FOCAL_CONFIG_SIZE)
-		total_frame++;
+	total_frame = ft_div_round_up(file_len, FOCAL_CONFIG_SIZE);
 
 	if (addr != FOCAL_BOOT_CFG_ADDR) {
 		ret_value =
@@ -304,14 +293,15 @@ static int ft_download_bin(char *name, int addr)
 
 	len = total_frame * FOCAL_CONFIG_SIZE;
 
-	buffer = (unsigned char *)malloc(len + 16);
+	buffer = (unsigned char *)malloc(len);
 
 	if (!buffer) {
 		FF_LOGE("Memory error!");
 		goto exit;
 	}
 
-	memset(buffer, 0xff, len); // 0xff means flash is not write
+	/*0xff means that no data has been written to the flash.*/
+	memset(buffer, 0xff, len);
 
 	cnt = fread(buffer, 1, file_len, file);
 	if (cnt != file_len) {
@@ -323,6 +313,11 @@ static int ft_download_bin(char *name, int addr)
 	p = buffer;
 
 	if (addr == FOCAL_BOOT_CFG_ADDR || addr == FOCAL_ROM_CFG_ADDR) {
+		/* The config page is written to flash in the last frame;
+		otherwise, the firmware is incomplete. However,
+		if the config contains data and the MCU encounters an abnormal
+		power failure, it will crash (run out of control).*/
+
 		FF_LOGI("should write cfg page last");
 		downaddr += FOCAL_CONFIG_SIZE;
 		p += FOCAL_CONFIG_SIZE;
@@ -344,9 +339,7 @@ static int ft_download_bin(char *name, int addr)
 	}
 
 	if (len) {
-		if (len % 4) {
-			len = (len + 3) / 4 * 4;
-		}
+		len = ft_div_round_up(len, 4);
 
 		ret_value = ft_download_page(downaddr, len, p);
 		if (ret_value) {
@@ -361,14 +354,16 @@ static int ft_download_bin(char *name, int addr)
 		ret_value = ft_download_page(addr, FOCAL_CONFIG_SIZE, buffer);
 		if (ret_value) {
 			FF_LOGE("code bin error!");
-			goto exit;
 		}
 
 		FF_LOGD("===download %d/%d ===", ++frame, total_frame);
 	}
 
 exit:
-	fclose(file);
+	if (file) {
+		fclose(file);
+	}
+
 	if (buffer) {
 		free(buffer);
 		buffer = NULL;
@@ -384,14 +379,21 @@ static int ft_verify_data(char *name, int addr)
 	unsigned char *buffer = NULL;
 	int ret_value = FT_SUCCESS;
 	int downaddr = addr;
-	unsigned char veriry_bin_cmd[FT_CMD_LENGTH] = { 0 };
-
-	build_ft_cmd(veriry_bin_cmd, FT_CMD_ACTION, FT_SUBCMD_VERIFY,
-		     HASH_MODE_SHA256);
-
+	unsigned char verify_bin_cmd[FT_CMD_LENGTH] = { 0 };
 	unsigned char read_hash[SHA256_DIGEST_LENGTH] = { 0 };
+
 	unsigned char pHash[SHA256_DIGEST_LENGTH] = { 0 };
+
 	int readhashlen = SHA256_DIGEST_LENGTH;
+	uint8_t hash_mode = HASH_MODE_SHA256;
+
+	if (addr == FOCAL_ROM_CFG_ADDR) {
+		/*When the MCU is in ROM mode,
+		this parameter differs and needs to be shifted.*/
+		hash_mode = HASH_MODE_SHA256 << 4;
+	}
+
+	FF_LOGD("hash_mode=0x%x", hash_mode);
 
 	file = fopen(name, "rb");
 	if (!file) {
@@ -410,7 +412,7 @@ static int ft_verify_data(char *name, int addr)
 	buffer = (unsigned char *)malloc(file_len + 16);
 
 	if (!buffer) {
-		FF_LOGE("Memory error!");
+		FF_LOGE("Memory alloc error!");
 		goto exit;
 	}
 	FF_LOGD("file len=%d", file_len);
@@ -421,10 +423,11 @@ static int ft_verify_data(char *name, int addr)
 		goto exit;
 	}
 
-	U32_SET(&veriry_bin_cmd[1], downaddr);
-	U32_SET(&veriry_bin_cmd[5], file_len);
-	ret_value = usb_write(veriry_bin_cmd, CMD_LENGTH, read_hash,
-			      readhashlen, READ_DATA_FROM_USB);
+	build_ft_cmd(verify_bin_cmd, FT_CMD_ACTION, FT_SUBCMD_VERIFY, downaddr,
+		     file_len, FT_PARA_UNSET, hash_mode);
+
+	ret_value = usb_write(verify_bin_cmd, FT_CMD_LENGTH, read_hash,
+			      readhashlen, READ_DATA_FROM_USB, 1000);
 
 	if (ret_value) {
 		FF_LOGE("veriry_bin_cmd bin error!");
@@ -434,7 +437,7 @@ static int ft_verify_data(char *name, int addr)
 	SHA256(buffer, file_len, pHash);
 
 	if (memcmp(pHash, read_hash, SHA256_DIGEST_LENGTH)) {
-		FF_LOGE("verify error!");
+		FF_LOGE("verify fail!");
 
 		FF_LOGD("pHash=%x,%x,%x,%x", pHash[0], pHash[1], pHash[2],
 			pHash[3]);
@@ -442,11 +445,16 @@ static int ft_verify_data(char *name, int addr)
 			read_hash[2], read_hash[3]);
 
 		ret_value = FT_RESULT_FAIL;
-		goto exit;
+
+	} else {
+		FF_LOGD("verify success!");
 	}
 
 exit:
-	fclose(file);
+	if (file) {
+		fclose(file);
+	}
+
 	if (buffer) {
 		free(buffer);
 		buffer = NULL;
@@ -455,132 +463,52 @@ exit:
 	return ret_value;
 }
 
-static int ft_disboot(unsigned int downaddr)
+static int ft_mcu_reset(unsigned int downaddr)
 {
 	int ret_value = FT_SUCCESS;
-	int tmpaddr = FT_WRITE_SRAM_ADDR;
-	int readaddr = FT_READ_SRAM_ADDR;
-	unsigned char readdata[1024] = { 0 };
-	int readlen = sizeof(readdata);
 
-	unsigned char disbootdata[1024] = {
-		0x2d, 0xe9, 0xf0, 0x41, 0x94, 0xb0, 0x2a, 0x48, 0x05, 0x90,
-		0x2a, 0x48, 0x06, 0x90, 0x00, 0x14, 0x29, 0x49, 0x4f, 0xf0,
-		0x80, 0x58, 0xcd, 0xe9, 0x08, 0x01, 0x4f, 0xf0, 0x10, 0x21,
-		0x0a, 0x91, 0x26, 0x49, 0x07, 0x90, 0x0e, 0x90, 0x0b, 0x91,
-		0x0f, 0x90, 0x44, 0xf6, 0x19, 0x26, 0x42, 0xf6, 0x61, 0x71,
-		0x42, 0xf6, 0x05, 0x75, 0x44, 0x46, 0x40, 0x46, 0x88, 0x47,
-		0x0a, 0xaa, 0x01, 0x21, 0x1f, 0x48, 0xa8, 0x47, 0x05, 0xaa,
-		0x05, 0x21, 0x1e, 0x48, 0xa8, 0x47, 0x20, 0x46, 0xb0, 0x47,
-		0xd4, 0xf8, 0x60, 0x01, 0x0c, 0x90, 0xd4, 0xf8, 0x64, 0x01,
-		0x0d, 0x90, 0xd4, 0xf8, 0x70, 0x01, 0x10, 0x90, 0x20, 0x6a,
-		0x11, 0x90, 0x18, 0x4f, 0x18, 0x4c, 0x00, 0x20, 0x05, 0xa9,
-		0x0c, 0xaa, 0x51, 0xf8, 0x20, 0xc0, 0x52, 0xf8, 0x20, 0x30,
-		0x63, 0x45, 0x01, 0xd0, 0x27, 0x60, 0x12, 0xe0, 0x40, 0x1c,
-		0x06, 0x28, 0xf4, 0xd3, 0x01, 0xf1, 0x18, 0x02, 0x01, 0x21,
-		0x40, 0x46, 0xa8, 0x47, 0x40, 0x46, 0xb0, 0x47, 0xd8, 0xf8,
-		0x00, 0x00, 0x12, 0x90, 0x12, 0x99, 0x0b, 0x98, 0x88, 0x42,
-		0xec, 0xd1, 0x0b, 0x48, 0x20, 0x60, 0x14, 0xb0, 0x00, 0x20,
-		0xbd, 0xe8, 0xf0, 0x81, 0x00, 0x00, 0x66, 0x99, 0x38, 0xc0,
-		0xeb, 0x0c, 0xff, 0xff, 0x02, 0x02, 0x21, 0x04, 0x21, 0x37,
-		0xec, 0x3a, 0x20, 0x00, 0x00, 0x10, 0x60, 0x01, 0x00, 0x10,
-		0x78, 0x56, 0x34, 0x12, 0x00, 0x30, 0x00, 0x20, 0xaa, 0x55,
-		0xaa, 0x55,
-	};
-
-	unsigned char write_disbootdata_cmd[FT_CMD_LENGTH] = { 0 };
-	unsigned char exec_disbootdata_cmd[FT_CMD_LENGTH] = { 0 };
-	unsigned char read_data_cmd[FT_CMD_LENGTH] = { 0 };
 	unsigned char soft_reset_cmd[FT_CMD_LENGTH] = { 0 };
 
-	build_ft_cmd(write_disbootdata_cmd, FT_CMD_ACTION, FT_SUBCMD_WRITE_BIN,
-		     FT_PARA_UNSET);
-	build_ft_cmd(exec_disbootdata_cmd, FT_CMD_ACTION,
-		     FT_SUBCMD_EXEC_DISBOOT, FT_PARA_UNSET);
-	build_ft_cmd(read_data_cmd, FT_CMD_ACTION, FT_SUBCMD_READ_DATA,
-		     FT_PARA_READ_SRAM_DIFF);
 	build_ft_cmd(soft_reset_cmd, FT_CMD_ACTION, FT_SUBCMD_SOFT_RESET,
-		     SOFT_POR);
+		     FT_PARA_UNSET, FT_PARA_UNSET, FT_PARA_UNSET, SOFT_POR);
 
 	if (downaddr == FOCAL_ROM_CFG_ADDR || downaddr == FOCAL_BOOT_CFG_ADDR) {
-		FF_LOGD("already has config,rst mcu");
-		ret_value = usb_write(soft_reset_cmd, CMD_LENGTH, NULL, 0,
-				      DIRECTION_NONE); // WRITE_DATA_TO_USB);
-		FF_LOGD("ret value=%d", ret_value);
+		ret_value = usb_write(soft_reset_cmd, FT_CMD_LENGTH, NULL, 0,
+				      DIRECTION_NONE, 200);
+		FF_LOGD("reset value=%d", ret_value);
 		return ret_value;
 	}
 
-	int disbootlen = sizeof(disbootdata);
+	FF_LOGE("reset addr err");
 
-	U32_SET(&write_disbootdata_cmd[1], tmpaddr);
-	U32_SET(&write_disbootdata_cmd[5], disbootlen);
-	ret_value = usb_write(write_disbootdata_cmd, CMD_LENGTH, disbootdata,
-			      disbootlen, WRITE_DATA_TO_USB);
-	if (ret_value) {
-		FF_LOGE("write disbootdata error!");
-		goto exit;
-	}
-
-	U32_SET(&exec_disbootdata_cmd[1], tmpaddr);
-	ret_value = usb_write(exec_disbootdata_cmd, CMD_LENGTH, NULL, 0,
-			      WRITE_DATA_TO_USB); // WRITE_DATA_TO_USB);
-	if (ret_value) {
-		FF_LOGE("exec disbootdata error!");
-		goto exit;
-	}
-
-	U32_SET(&read_data_cmd[1], readaddr);
-	U32_SET(&read_data_cmd[5], readlen);
-	ret_value = usb_write(read_data_cmd, CMD_LENGTH, readdata, readlen,
-			      READ_DATA_FROM_USB); // DIRECTION_NONE
-	// LOG_DATA(readdata, readlen);
-	if (ret_value) {
-		FF_LOGE("read disboot data error!");
-		goto exit;
-	}
-
-	if ((readdata[0] != 0xaa) || (readdata[1] != 0x55) ||
-	    (readdata[2] != 0xaa) || (readdata[3] != 0x55)) {
-		FF_LOGE("disboot error!");
-		FF_LOGD("readdata=%x,%x,%x,%x", readdata[0], readdata[1],
-			readdata[2], readdata[3]);
-		ret_value = FT_RESULT_FAIL;
-
-		goto exit;
-	} else {
-		U32_SET(&soft_reset_cmd[1], tmpaddr);
-		ret_value = usb_write(soft_reset_cmd, CMD_LENGTH, NULL, 0,
-				      DIRECTION_NONE); // WRITE_DATA_TO_USB);
-	}
-
-exit:
-	return ret_value;
+	return FT_RESULT_FAIL;
 }
 
-static int is_ec_bin_has_config_page(char *ec_bin, uint32_t *start_addr)
+static bool is_ec_bin_has_config_page(char *ec_bin, uint32_t *start_addr)
 {
 	FF_LOGV("%s start,ec_bin=%s", __func__, ec_bin);
 
-	int ret = 1, cnt;
+	bool ret = true;
+	int cnt;
 	unsigned char buff[FOCAL_CONFIG_SIZE];
 	struct ft_config_page *config = (struct ft_config_page *)buff;
 
 	FILE *fp = fopen(ec_bin, "rb");
 	if (!fp) {
 		FF_LOGE("can't open %s", ec_bin);
-		return FT_SUCCESS;
+		return false;
 	}
 
 	memset(buff, 0, FOCAL_CONFIG_SIZE);
 	cnt = fread(buff, 1, FOCAL_CONFIG_SIZE, fp);
 	if (cnt != FOCAL_CONFIG_SIZE) {
 		FF_LOGE("read config failed");
-		ret = FT_SUCCESS;
+		ret = false;
 		goto exit;
 	}
 
 	if (config->code_valid_control_word != FOCAL_CODE_VALID_MAGIC) {
-		ret = FT_SUCCESS;
+		ret = false;
 	} else {
 		*start_addr = config->code_start_address;
 	}
@@ -604,17 +532,17 @@ static int ft_back_to_rom_boot(void)
 {
 	int ret = FT_SUCCESS;
 	ft_erase_page(FOCAL_CONFIG_SIZE, FOCAL_ROM_CFG_ADDR);
-	ret = ft_disboot(FOCAL_ROM_CFG_ADDR);
+	ret = ft_mcu_reset(FOCAL_ROM_CFG_ADDR);
 	return ret;
 }
 
-void update_fw(ft_device_info_t *info)
+int update_fw(ft_device_info_t *info)
 {
-	int ret;
+	int ret = FT_SUCCESS;
 	char boot_version[FT_BOOT_VERSION_MAX];
 
 	int downaddr = FOCAL_ROM_CFG_ADDR; // 0x10000000;
-	int has_configue = 0;
+	bool has_configue = false;
 	uint32_t code_start_address = 0;
 
 	char *ec_bin = info->ec_bin;
@@ -634,7 +562,7 @@ void update_fw(ft_device_info_t *info)
 		ret = ft_get_boot_version(boot_version);
 		if (ret) {
 			FF_LOGE("Get_boot_version error!");
-			goto END;
+			goto exit;
 		}
 
 		if (info->next_mode == FORCE_UPDATE_MODE) {
@@ -650,7 +578,8 @@ void update_fw(ft_device_info_t *info)
 		if (info->next_mode == ROM_MODE) {
 			FF_LOGD("back to rom boot inner");
 			ft_back_to_rom_boot();
-			return;
+			ft_sg_close();
+			return ret;
 		}
 
 		break;
@@ -660,31 +589,34 @@ void update_fw(ft_device_info_t *info)
 	if (info->action == FT_ACTION_WP_GET) {
 		if (info->current_mode != BOOT_MODE) {
 			FF_LOGE("should get flash wp in boot mode");
-			exit(FT_RESULT_FAIL);
+			ft_sg_close();
+			return FT_RESULT_FAIL;
 		}
 
 		ret = ft_get_flash_protect();
-		if (!ret) {
-			exit(FT_RESULT_FAIL);
-		}
-		return;
+		return ret;
 	}
 
 	if (info->action == FT_ACTION_WP_SET) {
 		if (info->current_mode != BOOT_MODE) {
 			FF_LOGE("should set flash wp in boot mode");
-			exit(FT_RESULT_FAIL);
+			ft_sg_close();
+			return FT_RESULT_FAIL;
 		}
 
 		ret = ft_set_flash_protect(
 			(ft_flash_protect_area_t)info->action_para);
-		if (ret) {
-			exit(FT_RESULT_FAIL);
-		}
-		return;
+
+		ft_sg_close();
+		return ret;
 	}
 
 	has_configue = is_ec_bin_has_config_page(ec_bin, &code_start_address);
+	if (!has_configue) {
+		FF_LOGE("This firmware does not support upgrade. Please use the firmware with a config page.");
+		ft_sg_close();
+		return FT_RESULT_FAIL;
+	}
 
 	if (info->current_mode == BOOT_MODE) {
 		FF_LOGD("is in bootloader mode");
@@ -692,61 +624,64 @@ void update_fw(ft_device_info_t *info)
 
 		if (code_start_address != FOCAL_BOOT_RUN_ADDR) {
 			FF_LOGE("ec not for bootloader,don't use this ec");
-			return;
+			ft_sg_close();
+			return FT_RESULT_FAIL;
 		}
 	} else if (info->current_mode == ROM_MODE) {
 		if (code_start_address == FOCAL_BOOT_RUN_ADDR) {
 			FF_LOGE("ec not for rom,don't use this ec");
-			return;
+			ft_sg_close();
+			return FT_RESULT_FAIL;
 		}
-		if (!has_configue) {
-			downaddr += FOCAL_CONFIG_SIZE;
-		} else {
-			if (code_start_address != FOCAL_ROM_RUN_ADDR &&
-			    code_start_address !=
-				    (FOCAL_ROM_RUN_ADDR - FOCAL_CONFIG_SIZE)) {
-				FF_LOGE("ec not for rom,don't use this ec");
-				return;
-			}
+
+		if (code_start_address != FOCAL_ROM_RUN_ADDR &&
+		    code_start_address !=
+			    (FOCAL_ROM_RUN_ADDR - FOCAL_CONFIG_SIZE)) {
+			FF_LOGE("ec not for rom,don't use this ec");
+			ft_sg_close();
+			return FT_RESULT_FAIL;
 		}
+
 	} else {
 		FF_LOGE("is not in boot mode,please check again");
-		return;
+		ft_sg_close();
+		return FT_RESULT_FAIL;
 	}
 
 	// step 3: download bin
 	ret = ft_download_bin(ec_bin, downaddr);
 	if (ret) {
 		FF_LOGE("downloadbin error!");
-		goto END;
+		goto exit;
 	}
 
 	// step 4: verification
 	ret = ft_verify_data(ec_bin, downaddr);
 	if (ret) {
 		FF_LOGE("VerifyData error!");
-		goto END;
+		goto exit;
 	}
 
 	FF_LOGI("Down success!");
 
-	// step 5: disboot
-	ret = ft_disboot(downaddr);
+	// step 5: reset mcu
+	ret = ft_mcu_reset(downaddr);
 	if (ret) {
-		FF_LOGE("Disboot error!");
-		goto END;
+		FF_LOGE("mcu reset error!");
+		goto exit;
 	}
-	FF_LOGI("Disboot success!");
+	FF_LOGI("mcu reset success!");
+	ft_sg_close();
+	return ret;
 
-	return;
-
-END:
+exit:
 	if (downaddr == FOCAL_BOOT_CFG_ADDR || downaddr == FOCAL_ROM_CFG_ADDR) {
 		ft_erase_page(FOCAL_CONFIG_SIZE, downaddr);
-		FF_LOGI("stay in boot mode");
+		FF_LOGW("stay in %s mode",
+			downaddr == FOCAL_BOOT_CFG_ADDR ? "boot" : "rom");
 	}
 
 	FF_LOGE("Down failed!");
-	exit(FT_RESULT_FAIL);
-	return;
+	ft_sg_close();
+	return FT_RESULT_FAIL;
 }

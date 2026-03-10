@@ -17,16 +17,11 @@
 #include <linux/usb/ch9.h>
 #include <linux/usbdevice_fs.h>
 #include <pthread.h>
-#include <strings.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#define API_EXPORTED __attribute__((visibility("default")))
-
 #define USB_HUB_TIMEOUT 5000 /* milliseconds */
 
-// Copied from kernel's uapi/linux/usb/ch11.h. Should this be obtained
-// by plain #include ?
 #define USB_PORT_FEAT_ENABLE 1
 #define USB_PORT_FEAT_RESET 4
 
@@ -185,7 +180,8 @@ static int focal_dev_disable(void)
 }
 
 static int
-focal_usb_device_port_method_init(focal_usb_device_port_method_t *method)
+focal_usb_device_port_method_init(focal_usb_device_port_method_t *method,
+				  libusb_device **devs)
 {
 	FF_LOGD("%s enter\n", __func__);
 
@@ -193,26 +189,14 @@ focal_usb_device_port_method_init(focal_usb_device_port_method_t *method)
 		return FT_NO_SUCH_DEV;
 	}
 
-	libusb_device **devs;
-	int r;
-	ssize_t cnt;
+	if (devs == NULL) {
+		FF_LOGE("usb devs is null");
+		return FT_NO_SUCH_DEV;
+	}
 
 	memset(method, 0, sizeof(focal_usb_device_port_method_t));
 
-	r = libusb_init(NULL);
-	if (r < 0)
-		return r;
-
-	cnt = libusb_get_device_list(NULL, &devs);
-	if (cnt < 0) {
-		libusb_exit(NULL);
-		return (int)cnt;
-	}
-
 	ft_init_hub_device(devs);
-	libusb_free_device_list(devs, 1);
-
-	libusb_exit(NULL);
 
 	method->reset = focal_dev_reset;
 	method->disable = focal_dev_disable;
@@ -223,13 +207,13 @@ focal_usb_device_port_method_init(focal_usb_device_port_method_t *method)
 	return FT_SUCCESS;
 }
 
-int focal_device_disable(void)
+int focal_device_disable(libusb_device **devs)
 {
 	int ret = FT_SUCCESS;
 	focal_usb_device_port_method_t method;
 	memset(&method, 0, sizeof(focal_usb_device_port_method_t));
 
-	focal_usb_device_port_method_init(&method);
+	focal_usb_device_port_method_init(&method, devs);
 
 	if (method.init == V_INIT_SUCCESS) {
 		if (method.disable) {

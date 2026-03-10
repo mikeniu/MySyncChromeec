@@ -25,6 +25,7 @@ static libusb_context *ctx;
 static libusb_hotplug_callback_handle callback_handle = 0;
 
 static volatile int got_usb_remove = 0;
+static int msc_iface = 0;
 
 static struct ft_boot_ep_t {
 	uint8_t ep_bulk_out;
@@ -60,7 +61,7 @@ int ft_sg_open(uint16_t vendor_id, uint16_t product_id)
 		return FT_NO_SUCH_DEV;
 	}
 	libusb_reset_device(dev_handle);
-	usleep(100 * 1000);
+	usleep(200 * 1000);
 
 	if (!libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG)) {
 		FF_LOGW("Hotplug capabilities are not supported on this platform: %s",
@@ -78,7 +79,7 @@ int ft_sg_open(uint16_t vendor_id, uint16_t product_id)
 		}
 	}
 
-	// check MSC device
+	// check MASS_STORAGE device
 	struct libusb_device_descriptor desc;
 	libusb_device *dev = libusb_get_device(dev_handle);
 	libusb_get_device_descriptor(dev, &desc);
@@ -104,32 +105,35 @@ int ft_sg_open(uint16_t vendor_id, uint16_t product_id)
 				iface_desc->bInterfaceClass,
 				iface_desc->bInterfaceSubClass);
 
-			if (iface_desc->bInterfaceClass ==
-			    LIBUSB_CLASS_MASS_STORAGE) { // SCSI transparent
-				found_msc = 1;
+			/* Guard clause: Skip non-mass storage interfaces */
+			if (iface_desc->bInterfaceClass !=
+			    LIBUSB_CLASS_MASS_STORAGE) {
+				continue;
+			}
 
-				// find bulk endpoint
-				for (int k = 0; k < iface_desc->bNumEndpoints;
-				     k++) {
-					const struct libusb_endpoint_descriptor
-						*ep = &iface_desc->endpoint[k];
-					if ((ep->bmAttributes ==
-					     LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK) &&
-					    (((ep->bEndpointAddress) &
-					      LIBUSB_ENDPOINT_DIR_MASK) ==
-					     LIBUSB_ENDPOINT_IN)) {
-						g_ft_boot_ep.ep_bulk_in =
-							ep->bEndpointAddress;
-					}
+			found_msc = 1;
+			msc_iface = iface_desc->bInterfaceNumber;
 
-					if ((ep->bmAttributes ==
-					     LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK) &&
-					    (((ep->bEndpointAddress) &
-					      LIBUSB_ENDPOINT_DIR_MASK) ==
-					     LIBUSB_ENDPOINT_OUT)) {
-						g_ft_boot_ep.ep_bulk_out =
-							ep->bEndpointAddress;
-					}
+			// find bulk endpoint
+			for (int k = 0; k < iface_desc->bNumEndpoints; k++) {
+				const struct libusb_endpoint_descriptor *ep =
+					&iface_desc->endpoint[k];
+				if ((ep->bmAttributes ==
+				     LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK) &&
+				    (((ep->bEndpointAddress) &
+				      LIBUSB_ENDPOINT_DIR_MASK) ==
+				     LIBUSB_ENDPOINT_IN)) {
+					g_ft_boot_ep.ep_bulk_in =
+						ep->bEndpointAddress;
+				}
+
+				if ((ep->bmAttributes ==
+				     LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK) &&
+				    (((ep->bEndpointAddress) &
+				      LIBUSB_ENDPOINT_DIR_MASK) ==
+				     LIBUSB_ENDPOINT_OUT)) {
+					g_ft_boot_ep.ep_bulk_out =
+						ep->bEndpointAddress;
 				}
 			}
 		}
@@ -143,22 +147,28 @@ int ft_sg_open(uint16_t vendor_id, uint16_t product_id)
 		return FT_NO_SUCH_DEV;
 	}
 
-	if (libusb_kernel_driver_active(dev_handle, 0) == 1) {
+	if (libusb_kernel_driver_active(dev_handle, msc_iface) == 1) {
 		FF_LOGD("Detaching kernel driver");
-		libusb_detach_kernel_driver(dev_handle, 0);
+		libusb_detach_kernel_driver(dev_handle, msc_iface);
 	}
 
-	int r = libusb_claim_interface(dev_handle, 0);
+	int r = libusb_claim_interface(dev_handle, msc_iface);
 	if (r < 0) {
 		FF_LOGE("Failed to claim interface: %s", libusb_error_name(r));
+		libusb_release_interface(dev_handle, msc_iface);
 		libusb_close(dev_handle);
 		dev_handle = NULL;
+		msc_iface = 0;
 		return FT_NO_SUCH_DEV;
 	}
 
 	if (!g_ft_boot_ep.ep_bulk_out || !g_ft_boot_ep.ep_bulk_in) {
 		FF_LOGE("can't find bulk endpoint,ep in=%x,ep out=%x",
 			g_ft_boot_ep.ep_bulk_in, g_ft_boot_ep.ep_bulk_out);
+		libusb_release_interface(dev_handle, msc_iface);
+		libusb_close(dev_handle);
+		dev_handle = NULL;
+		msc_iface = 0;
 		return FT_NO_SUCH_DEV;
 	}
 
@@ -195,14 +205,14 @@ int ft_sg_io(struct sg_io_hdr *io_hdr)
 		return FT_NO_SUCH_DEV;
 	}
 
-	if (!io_hdr->cmdp || io_hdr->cmd_len == 0) {
+	// create CBW
+	struct bulk_cb_wrap cbw = { 0 };
+
+	if (!io_hdr->cmdp || io_hdr->cmd_len == 0 ||
+	    io_hdr->cmd_len > sizeof(cbw.cmd)) {
 		FF_LOGE("Invalid SCSI command");
 		return FT_NO_SUCH_DEV;
 	}
-
-	// create CBW
-	struct bulk_cb_wrap cbw;
-	memset(&cbw, 0, sizeof(cbw));
 
 	cbw.signature = htole32(USB_MS_CBW_SIGNATURE);
 	cbw.tag = htole32(cdb_tag++);
@@ -228,9 +238,7 @@ int ft_sg_io(struct sg_io_hdr *io_hdr)
 
 	// send CBW
 	int transferred;
-	int r = libusb_bulk_transfer(dev_handle,
-				     g_ft_boot_ep.ep_bulk_out, // Bulk OUT
-							       // endpoint
+	int r = libusb_bulk_transfer(dev_handle, g_ft_boot_ep.ep_bulk_out,
 				     (unsigned char *)&cbw, sizeof(cbw),
 				     &transferred, io_hdr->timeout);
 	if (r < 0) {
@@ -358,9 +366,9 @@ int ft_sg_io(struct sg_io_hdr *io_hdr)
 void ft_sg_close(void)
 {
 	if (dev_handle) {
-		libusb_release_interface(dev_handle, 0);
+		libusb_release_interface(dev_handle, msc_iface);
 
-		libusb_attach_kernel_driver(dev_handle, 0);
+		libusb_attach_kernel_driver(dev_handle, msc_iface);
 
 		libusb_close(dev_handle);
 		dev_handle = NULL;
@@ -378,4 +386,5 @@ void ft_sg_close(void)
 	}
 
 	cdb_tag = 1;
+	msc_iface = 0;
 }
