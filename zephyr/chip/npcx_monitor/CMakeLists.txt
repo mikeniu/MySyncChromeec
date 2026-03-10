@@ -26,6 +26,11 @@ target_include_directories(npcx_monitor PRIVATE
 target_include_directories(npcx_monitor PRIVATE "${zephyr_includes}")
 target_compile_options(npcx_monitor PRIVATE "${zephyr_compile_options};$<TARGET_PROPERTY:compiler,prohibit_lto>")
 
+# nostdlib so we cannot compile with -fstack-protector.
+if (DEFINED CONFIG_REQUIRES_STACK_CANARIES)
+  target_compile_options(npcx_monitor PRIVATE -fno-stack-protector)
+endif()
+
 target_link_options(npcx_monitor BEFORE PRIVATE
   -nostdlib
   -g

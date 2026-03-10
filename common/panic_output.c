@@ -414,6 +414,19 @@ int command_crash_nested_handler(void)
 }
 #endif /* CONFIG_CMD_CRASH_NESTED */
 
+#ifdef CONFIG_REQUIRES_STACK_CANARIES
+__attribute__((noinline)) static void stack_smash(int argc)
+{
+	char a[10];
+	int repeat = 14 + argc;
+
+	memset(a, 'A', repeat);
+	a[repeat] = '\0';
+
+	panic_printf("smash %s\n", a);
+}
+#endif /* CONFIG_REQUIRES_STACK_CANARIES */
+
 /*****************************************************************************/
 /* Console commands */
 static int command_crash(int argc, const char **argv)
@@ -474,6 +487,10 @@ static int command_crash(int argc, const char **argv)
 		volatile uintptr_t null_ptr = 0x0;
 		cflush();
 		ccprintf("%08x\n", *(volatile unsigned int *)null_ptr);
+#ifdef CONFIG_REQUIRES_STACK_CANARIES
+	} else if (!strcasecmp(argv[1], "smash")) {
+		stack_smash(argc);
+#endif /* CONFIG_REQUIRES_STACK_CANARIES */
 	} else {
 		/* Disable nested crash on error */
 		if (IS_ENABLED(CONFIG_CMD_CRASH_NESTED))
@@ -494,6 +511,9 @@ DECLARE_CONSOLE_COMMAND(crash, command_crash,
 #ifndef CONFIG_ALLOW_UNALIGNED_ACCESS
 			" | unaligned"
 #endif /* !CONFIG_ALLOW_UNALIGNED_ACCESS */
+#ifdef CONFIG_REQUIRES_STACK_CANARIES
+			" | smash"
+#endif /* CONFIG_REQUIRES_STACK_CANARIES */
 			" | watchdog | hang | null]",
 			"Crash the system (for testing)."
 #ifndef CONFIG_CMD_CRASH_NESTED

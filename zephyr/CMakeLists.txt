@@ -121,7 +121,6 @@ if(${double_promotion} IN_LIST warning_base_override)
   print(warning_base_override)
 endif()
 
-
 # The EC application is split into two libraries:
 #   app: contains all the legacy code
 #   ec_shim: contains all the code under platform/ec/shim
@@ -162,6 +161,11 @@ endfunction()
 
 cros_ec_library_include_directories(include)
 
+function(cros_ec_library_link_options)
+  target_link_options(app PUBLIC ${ARGN})
+  target_link_options(ec_shim PRIVATE ${ARGN})
+  target_link_options(cros_ec_interface INTERFACE ${ARGN})
+endfunction()
 if (DEFINED CONFIG_PLATFORM_EC)
   cros_ec_library_include_directories(
     "${PLATFORM_EC}/zephyr/shim/include"
@@ -171,6 +175,12 @@ if (DEFINED CONFIG_PLATFORM_EC)
     "${PLATFORM_EC}/include"
     "${PLATFORM_EC}/include/driver"
     "${PLATFORM_EC}/third_party")
+  if (DEFINED CONFIG_REQUIRES_STACK_CANARIES)
+    cros_ec_library_link_options(
+      ${LINKERFLAGPREFIX},--undefined=__stack_chk_guard
+      ${LINKERFLAGPREFIX},--wrap=__stack_chk_fail
+    )
+  endif()
 endif()
 
 if (ZEPHYR_PIGWEED_MODULE_DIR)
