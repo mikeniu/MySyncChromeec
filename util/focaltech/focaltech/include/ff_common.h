@@ -68,7 +68,7 @@ extern "C"
     int mbedtls_usb_recv_timeout_with_ep(uint8_t *buf, uint32_t len, uint32_t timeout, uint8_t epin);
 
     void update_fw(ft_device_info_t *info);
-	int focal_device_disable();
+	int focal_device_disable(void);
 
 #ifdef __cplusplus
 }
