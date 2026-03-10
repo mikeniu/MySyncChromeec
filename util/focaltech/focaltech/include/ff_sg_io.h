@@ -42,10 +42,10 @@ struct bulk_cs_wrap
 } __attribute__((packed));
 ;
 
-int ft_sg_init();
+int ft_sg_init(void);
 int ft_sg_open(uint16_t vendor_id, uint16_t product_id);
 int ft_sg_io(struct sg_io_hdr *io_hdr);
-void ft_sg_close();
+void ft_sg_close(void);
 
 
 

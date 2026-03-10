@@ -15,7 +15,7 @@
 #include "libusb.h"
 #include "net_usb.h"
 
-static int ft_switch_to_rom()
+static int ft_switch_to_rom(void)
 {
     int ret = 0;
     uint16_t tx_len = 8;
@@ -50,7 +50,7 @@ static int ft_switch_to_rom()
     return ret;
 }
 
-static int ft_switch_to_boot()
+static int ft_switch_to_boot(void)
 {
     int ret = 0;
     uint16_t tx_len = 8;
@@ -87,7 +87,7 @@ static int ft_switch_to_boot()
 
     return ret;
 }
-static int ft_get_ec_build_version()
+static int ft_get_ec_build_version(void)
 {
 #define MAX_RECV_LEN 0x400
 
@@ -275,14 +275,14 @@ int main(int argc, char **argv)
             update_fw(&info);
             return 0;
         }
-		
+
 		if (!memcmp(tmp, "enter_usb_suspend", sizeof("enter_usb_suspend")))
         {
             mbedtls_usb_free();
             focal_device_disable();
             return 0;
         }
-        
+
         if (!memcmp(tmp, "enter_usb_resume", sizeof("enter_usb_resume")))
         {
             mbedtls_usb_free();
@@ -294,7 +294,7 @@ int main(int argc, char **argv)
             info.next_mode = EC_MODE;
         }
     }
-    
+
     if (!memcmp(tmp, "get_ec_version", sizeof("get_ec_version")))
     {
             //already show fw version before.

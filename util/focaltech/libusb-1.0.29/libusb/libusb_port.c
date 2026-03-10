@@ -348,7 +348,7 @@ static void print_devs(libusb_device **devs) {
   }
 }
 
-static int focal_dev_reset() {
+static int focal_dev_reset(void) {
 
   FF_LOGD("%s enter\n", __func__);
   if (focal_dev_port.init != V_INIT_SUCCESS) {
@@ -380,7 +380,7 @@ static int focal_dev_reset() {
   return 0;
 }
 
-static int focal_dev_disable() {
+static int focal_dev_disable(void) {
 
   FF_LOGI("%s enter", __func__);
   if (focal_dev_port.init != V_INIT_SUCCESS) {
@@ -416,9 +416,9 @@ static int focal_dev_disable() {
   return 0;
 }
 
-static int get_port_status() { return focal_dev_port.disabled; }
+static int get_port_status(void) { return focal_dev_port.disabled; }
 
-static int reset_port_status() {
+static int reset_port_status(void) {
 
   focal_dev_port.disabled = 0;
   return 0;
@@ -463,7 +463,7 @@ static int focal_usb_device_port_method_init(focal_usb_device_port_method_t *met
   return 0;
 }
 
-int focal_device_disable() {
+int focal_device_disable(void) {
 
   int ret = 0;
   focal_usb_device_port_method_t method;
