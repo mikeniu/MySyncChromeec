@@ -121,6 +121,14 @@ if(${double_promotion} IN_LIST warning_base_override)
   print(warning_base_override)
 endif()
 
+if (DEFINED CONFIG_REQUIRES_STACK_CANARIES)
+  if (DEFINED CONFIG_LTO)
+    zephyr_link_libraries(${LINKERFLAGPREFIX},--undefined=__stack_chk_guard)
+    zephyr_link_libraries(${LINKERFLAGPREFIX},--undefined=__wrap___stack_chk_fail)
+    zephyr_link_libraries(${LINKERFLAGPREFIX},--undefined=getentropy)
+  endif()
+  zephyr_link_libraries(${LINKERFLAGPREFIX},--wrap=__stack_chk_fail)
+endif()
 
 # The EC application is split into two libraries:
 #   app: contains all the legacy code

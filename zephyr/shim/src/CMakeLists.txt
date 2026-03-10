@@ -68,6 +68,7 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MKBP_EVENT  mkbp_event.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MOTIONSENSE
                                                             motionsense_sensors.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PANIC       panic.c)
+zephyr_library_sources_ifdef(CONFIG_REQUIRES_STACK_CANARIES stack_chk_fail.c)
 zephyr_library_sources_ifdef(CONFIG_CROS_EC_POWER_SIGNAL_LIST
 							    power.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PWM_HC      pwm_hc.c)
