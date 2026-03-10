@@ -627,6 +627,11 @@ enum policy_common_t {
 	COMMON_POLICY_SET_POWER_STATE,
 	/** COMMON_POLICY_GET_ALERT */
 	COMMON_POLICY_GET_ALERT,
+	/** When set, run CMD_PDC_SET_SBU_MUX_MODE to set the port's SBU mux
+	 *  mode to force-debug. This should only be set on the port acting
+	 *  as the CCD port.
+	 */
+	COMMON_POLICY_SET_SBU_MUX_TO_FORCED_DEBUG,
 	/** COMMON_POLICY_COUNT */
 	COMMON_POLICY_COUNT,
 };
@@ -1741,6 +1746,15 @@ static bool run_common_policies(struct pdc_port_t *port)
 				      COMMON_POLICY_GET_ALERT)) {
 		/* Read latest ADO */
 		queue_internal_cmd(port, CMD_PDC_GET_ALERT);
+		return true;
+	}
+
+	if (atomic_test_and_clear_bit(
+		    port->common_policy.flags,
+		    COMMON_POLICY_SET_SBU_MUX_TO_FORCED_DEBUG)) {
+		/* Set the SBU mux operating mode to forced-debug */
+		port->sbu_mux_mode = PDC_SBU_MUX_MODE_FORCE_DBG;
+		queue_internal_cmd(port, CMD_PDC_SET_SBU_MUX_MODE);
 		return true;
 	}
 
@@ -5525,6 +5539,11 @@ uint8_t pdc_power_mgmt_get_product_type(int port)
 /** Allow 3s for the PDC SM to suspend itself. */
 #define SUSPEND_TIMEOUT_USEC (3 * USEC_PER_SEC)
 
+#ifdef CONFIG_USBC_PDC_DRIVEN_CCD
+/** Store the CCD port's SBU mux operating mode when suspending */
+static enum pdc_sbu_mux_mode previous_sbu_mux_mode = PDC_SBU_MUX_MODE_NORMAL;
+#endif /* CONFIG_USBC_PDC_DRIVEN_CCD */
+
 /* TODO(b/323371550): These functions should be adjusted to target individual PD
  * chips rather than all ports at once. It should take a chip ID as a param and
  * track current comms status by chip.
@@ -5539,6 +5558,17 @@ static int suspend_pdc_comms(void)
 	int status = 0;
 
 	uint8_t port_count = pdc_power_mgmt_get_usb_pd_port_count();
+
+#ifdef CONFIG_USBC_PDC_DRIVEN_CCD
+	/* Save current SBU mux override state so we can restore upon
+	 * PDC subsystem resume. */
+	ret = pdc_power_mgmt_get_sbu_mux_mode(&previous_sbu_mux_mode, NULL);
+	if (ret) {
+		LOG_ERR("PD: Cannot read current SBU mux mode: %d", ret);
+	} else {
+		LOG_INF("PD: Save SBU mux mode of %d", previous_sbu_mux_mode);
+	}
+#endif /* CONFIG_USBC_PDC_DRIVEN_CCD */
 
 	/* Request each port's PDC state machine to enter the suspend
 	 * state.
@@ -5592,6 +5622,22 @@ static int resume_pdc_comms(void)
 	int status = 0;
 
 	uint8_t port_count = pdc_power_mgmt_get_usb_pd_port_count();
+
+#ifdef CONFIG_USBC_PDC_DRIVEN_CCD
+	if (previous_sbu_mux_mode == PDC_SBU_MUX_MODE_FORCE_DBG) {
+		/* Set a flag on the CCD port to go back into force-debug mode.
+		 * This cannot be done immediately because the drivers need time
+		 * to re-initialize. If the previous SBU mux mode was normal
+		 * operation, that is the default and no action is necessary.
+		 */
+		int ccd_port = pdc_power_mgmt_get_ccd_port();
+
+		LOG_INF("PD: Restore C%d (CCD) SBU mux to forced-debug mode",
+			ccd_port);
+		atomic_set_bit(pdc_data[ccd_port]->port.common_policy.flags,
+			       COMMON_POLICY_SET_SBU_MUX_TO_FORCED_DEBUG);
+	}
+#endif /* CONFIG_USBC_PDC_DRIVEN_CCD */
 
 	/* Resume and reset the driver layer */
 	for (int p = 0; p < port_count; p++) {
