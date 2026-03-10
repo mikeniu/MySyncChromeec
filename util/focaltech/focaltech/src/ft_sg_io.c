@@ -97,12 +97,12 @@ int ft_sg_open(uint16_t vendor_id, uint16_t product_id)
                 for (int k = 0; k < iface_desc->bNumEndpoints; k++)
                 {
                     const struct libusb_endpoint_descriptor *ep = &iface_desc->endpoint[k];
-                    if ((ep->bmAttributes == LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK) && (IS_EPIN(ep->bEndpointAddress)))
+                    if ((ep->bmAttributes == LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK) && (((ep->bEndpointAddress) & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN))
                     {
                         g_ft_boot_ep.ep_bulk_in = ep->bEndpointAddress;
                     }
 
-                    if ((ep->bmAttributes == LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK) && (IS_EPOUT(ep->bEndpointAddress)))
+                    if ((ep->bmAttributes == LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK) && (((ep->bEndpointAddress) & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_OUT))
                     {
 
                         g_ft_boot_ep.ep_bulk_out = ep->bEndpointAddress;
