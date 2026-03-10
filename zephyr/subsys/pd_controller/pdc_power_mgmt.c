@@ -497,6 +497,10 @@ enum init_local_state_t {
 	 *  initialized.
 	 */
 	INIT_WAIT_FOR_READY,
+	/** INIT_SET_SBU_MUX - set the port's SBU mux to force-debug if the
+	 *  COMMON_POLICY_SET_SBU_MUX_TO_FORCED_DEBUG flag is set.
+	 */
+	INIT_SET_SBU_MUX_FORCED_DEBUG,
 	/** INIT_SET_SINK_PDOS - Set the sink PDOs (sink capabilities) on the
 	 *  PDC based on product configuration data.
 	 */
@@ -1749,14 +1753,8 @@ static bool run_common_policies(struct pdc_port_t *port)
 		return true;
 	}
 
-	if (atomic_test_and_clear_bit(
-		    port->common_policy.flags,
-		    COMMON_POLICY_SET_SBU_MUX_TO_FORCED_DEBUG)) {
-		/* Set the SBU mux operating mode to forced-debug */
-		port->sbu_mux_mode = PDC_SBU_MUX_MODE_FORCE_DBG;
-		queue_internal_cmd(port, CMD_PDC_SET_SBU_MUX_MODE);
-		return true;
-	}
+	/* Note: COMMON_POLICY_SET_SBU_MUX_TO_FORCED_DEBUG is checked in the
+	 * INIT state. */
 
 	return false;
 }
@@ -3935,9 +3933,24 @@ static enum smf_state_result pdc_init_run(void *obj)
 				&pdc_apply_power_state_policy_work.work);
 		}
 
-		port->init_local_state = INIT_SET_SINK_PDOS;
+		port->init_local_state = INIT_SET_SBU_MUX_FORCED_DEBUG;
 
 		/* Proceed directly to next sub-state */
+		__fallthrough;
+
+	case INIT_SET_SBU_MUX_FORCED_DEBUG:
+		port->init_local_state = INIT_SET_SINK_PDOS;
+
+		if (atomic_test_and_clear_bit(
+			    port->common_policy.flags,
+			    COMMON_POLICY_SET_SBU_MUX_TO_FORCED_DEBUG)) {
+			/* Set the SBU mux operating mode to forced-debug */
+			port->sbu_mux_mode = PDC_SBU_MUX_MODE_FORCE_DBG;
+			queue_internal_cmd(port, CMD_PDC_SET_SBU_MUX_MODE);
+			break;
+		}
+
+		/* If flag is unset, proceed directly to next sub-state */
 		__fallthrough;
 
 	case INIT_SET_SINK_PDOS:
