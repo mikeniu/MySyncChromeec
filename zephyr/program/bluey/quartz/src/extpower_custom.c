@@ -18,9 +18,14 @@ int board_extpower_is_present(void)
 		       GPIO_DT_FROM_NODELABEL(gpio_smb2360_b_chg_led_pg_odl));
 }
 
-static void enable_extpower_interrupts(void)
+void board_extpower_enable_interrupt(void)
 {
 	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_extpower_a));
 	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_extpower_b));
 }
-DECLARE_HOOK(HOOK_INIT, enable_extpower_interrupts, HOOK_PRIO_DEFAULT);
+
+void board_extpower_disable_interrupt(void)
+{
+	gpio_disable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_extpower_a));
+	gpio_disable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_extpower_b));
+}
