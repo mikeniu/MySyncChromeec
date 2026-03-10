@@ -127,6 +127,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8bde9586_72db4f62",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 60
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-10T05:36:04Z",
+      "side": 1,
+      "message": "I don\u0027t think it makes a difference in this case, because the `edge trigger` is a GPIO interrupt setting. In the fpc1145 driver, the interrupt is not even enabled during init, we just check the line state after reset to make sure sensor signaled IRQ (no real ISR on the FPMCU side). But feel free to implement it whatever you think is best for this driver.",
+      "parentUuid": "7f0006b2_48841a40",
+      "revId": "dcd3ad93fa17343217b160149bd11d80946feef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6031409a_17c3c1a1",
         "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
         "patchSetId": 60
