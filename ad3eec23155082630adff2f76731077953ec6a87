@@ -70,6 +70,24 @@
       "parentUuid": "3c3e4004_45938d81",
       "revId": "ad3eec23155082630adff2f76731077953ec6a87",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3ca9a1f_1e648075",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1548775
+      },
+      "writtenOn": "2026-03-10T22:27:13Z",
+      "side": 1,
+      "message": "We recently added a new color to the LED driver, at the same time we updated ectools as well to support the new color.\n\nI believe the problem is that on the older devices in the lab, we don\u0027t update the EC firmware but do update the OS image with new builds. So the updated `ectools` will be running on old EC.\n\nI\u0027m not too familiar with the CQ process but I\u0027m guessing that it only runs on up-to-date code so this error would not trigger the CQ and only appear in the lab.\n\n`ectools` doesn\u0027t have a problem with filling the `led query` array with less colors and defaulting the rest of the array to 0. I would guess that the problem with LED diagnostics is that at some point we validate the response from the EC query by checking the length of the array, which fails on older boards because we expect 7 colors now but older ECs still respond with only 6.\n\nI\u0027m not too familiar with how the diagnostic tools work but I\u0027m guessing updating it so that it no longer fails if the EC does not support the expected number of colors should fix the issue.",
+      "parentUuid": "7009f12c_6bd41a8e",
+      "revId": "ad3eec23155082630adff2f76731077953ec6a87",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
