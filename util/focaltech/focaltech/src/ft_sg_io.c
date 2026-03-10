@@ -1,7 +1,6 @@
 #include <endian.h>
 #include <errno.h>
 #include <libusb.h>
-#include <libusbi.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -156,9 +155,9 @@ static int ft_check_mcu_reset(void)
     while(retry--){
         memset(&timeout,0,sizeof(timeout));
         timeout.tv_sec=1;
-            
+
         libusb_handle_events_timeout_completed(ctx,&timeout,&complete);
-                    
+
         if(got_usb_reove==0x55aa)
         {
             FF_LOGI("got usb remove event");
@@ -217,18 +216,18 @@ int ft_sg_io(struct sg_io_hdr *io_hdr)
                                  (unsigned char *)&cbw, sizeof(cbw), &transferred, io_hdr->timeout);
     if (r < 0)
     {
-        
+
         if (io_hdr->dxfer_direction == DIRECTION_NONE){
             FF_LOGW("CBW transfer failed: %s,recheck mcu reset", libusb_error_name(r));
             if(ft_check_mcu_reset()==0){
                 return 0;
-            }    
+            }
         }
 
         FF_LOGE("CBW transfer failed: %s", libusb_error_name(r));
         io_hdr->driver_status = SG_IO_DRIVER_ERROR;
 
-        return -1;   
+        return -1;
     }
 
     if (transferred != sizeof(cbw))
@@ -237,7 +236,7 @@ int ft_sg_io(struct sg_io_hdr *io_hdr)
             FF_LOGW("Incomplete CBW transfer: %d/%zu bytes,recheck mcu reset", transferred, sizeof(cbw));
             if(ft_check_mcu_reset()==0){
                 return 0;
-            }    
+            }
         }
         FF_LOGE("Incomplete CBW transfer: %d/%zu bytes", transferred, sizeof(cbw));
         io_hdr->driver_status = SG_IO_DRIVER_ERROR;
@@ -265,7 +264,7 @@ int ft_sg_io(struct sg_io_hdr *io_hdr)
                 FF_LOGW("Data transfer failed: %s,recheck mcu reset", libusb_error_name(r));
                 if(ft_check_mcu_reset()==0){
                     return 0;
-                }    
+                }
             }
 
             FF_LOGE("Data transfer failed: %s", libusb_error_name(r));
@@ -341,7 +340,7 @@ int ft_sg_io(struct sg_io_hdr *io_hdr)
 // close device
 void ft_sg_close()
 {
-    
+
     if (dev_handle)
     {
 
@@ -362,5 +361,5 @@ void ft_sg_close()
         libusb_exit(ctx);
         ctx=NULL;
     }
-    
+
 }
