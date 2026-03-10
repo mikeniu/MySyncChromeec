@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e1f1801d_ddae3dbc",
+        "filename": "driver/accelgyro_icm426xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-03-10T22:16:55Z",
+      "side": 0,
+      "message": "used in ec/zephyr/program/nissa/teliks/project.conf;l\u003d48",
+      "range": {
+        "startLine": 6,
+        "startChar": 3,
+        "endLine": 7,
+        "endChar": 3
+      },
+      "revId": "f5dc870cde3b905a90216224c478ad49f60ce8fb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "65be0726_41c4b148",
         "filename": "driver/als_cm32183.c",
         "patchSetId": 5
@@ -42,6 +65,92 @@
         "startChar": 10,
         "endLine": 5,
         "endChar": 18
+      },
+      "revId": "f5dc870cde3b905a90216224c478ad49f60ce8fb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "952552dc_42d55cba",
+        "filename": "driver/ioexpander/ioexpander_nct38xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-03-10T22:16:55Z",
+      "side": 0,
+      "message": "rex and a few nissa boards use this ioex - example ec/zephyr/program/nissa/pujjoga/overlay.dtsi;l\u003d308",
+      "revId": "f5dc870cde3b905a90216224c478ad49f60ce8fb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49bd0144_7d6f0fb2",
+        "filename": "driver/ppc/rt1718s.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-03-10T22:16:55Z",
+      "side": 0,
+      "message": "this PPC seems to be used by corsola ec/zephyr/program/corsola/src/npcx_usbc.c;l\u003d88",
+      "range": {
+        "startLine": 6,
+        "startChar": 3,
+        "endLine": 6,
+        "endChar": 46
+      },
+      "revId": "f5dc870cde3b905a90216224c478ad49f60ce8fb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fac6ff1f_1ef41819",
+        "filename": "driver/tcpm/it83xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-03-10T22:16:55Z",
+      "side": 0,
+      "message": "I think this is used on some boards with it8320 EC - see a few nissa and 1 geralt boards that include it83xx_pd.h",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 36
+      },
+      "revId": "f5dc870cde3b905a90216224c478ad49f60ce8fb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be90d266_46040f14",
+        "filename": "driver/usb_mux/anx7451.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-03-10T22:16:55Z",
+      "side": 0,
+      "message": "used in Skyrim ec/zephyr/program/skyrim/program.conf;l\u003d85",
+      "range": {
+        "startLine": 5,
+        "startChar": 3,
+        "endLine": 5,
+        "endChar": 28
       },
       "revId": "f5dc870cde3b905a90216224c478ad49f60ce8fb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
