@@ -28,7 +28,7 @@ static struct ft_boot_ep_t
 } g_ft_boot_ep;
 
 // init libusb
-int ft_sg_init()
+int ft_sg_init(void)
 {
     int r = libusb_init(&ctx);
     if (r < 0)
@@ -338,7 +338,7 @@ int ft_sg_io(struct sg_io_hdr *io_hdr)
 }
 
 // close device
-void ft_sg_close()
+void ft_sg_close(void)
 {
 
     if (dev_handle)

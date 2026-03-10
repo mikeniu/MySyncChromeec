@@ -86,7 +86,7 @@ static int usb_write(unsigned char *cmd, int cmd_len, unsigned char *data, int d
 
     io_hdr.sbp = sense;
     io_hdr.mx_sb_len = 32; // sense length
-    io_hdr.timeout = 6000;//it will take 4.4s in bootloader erease page 
+    io_hdr.timeout = 6000;//it will take 4.4s in bootloader erease page
 
     ret = ft_sg_io(&io_hdr);
 
@@ -494,7 +494,7 @@ exit:
     return ret;
 }
 
-static int ft_back_to_rom_boot()
+static int ft_back_to_rom_boot(void)
 {
     int ret = 0;
     Erase_Page(FOCAL_CONFIG_SIZE, FOCAL_ROM_CFG_ADDR);
