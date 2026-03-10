@@ -1,0 +1,27 @@
+/* Copyright 2024 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "alderlake.dts"
+
+/ {
+	named-gpios {
+		compatible = "named-gpios";
+		gpio_cse_early_rec_sw: cse_early_rec_sw {
+			gpios = <&gpio0 30 GPIO_ACTIVE_HIGH>;
+		};
+		gpio_sys_rst_odl: sys_rst_odl {
+			gpios = <&gpio0 31 GPIO_ACTIVE_LOW>;
+		};
+		gpio_gsc_acok_ec_od: gsc_acok_ec_od {
+			gpios = <&gpio0 32 GPIO_ACTIVE_HIGH>;
+			enum-name = "GPIO_AC_PRESENT";
+		};
+	};
+
+	/* Compatibility with ap_pwrseq.c get_cse_early_recovery_gpio_level */
+	cse_early_recovery: cse-early-recovery {
+		cse_early_rec_gpios = <&gpio0 30 GPIO_ACTIVE_HIGH>;
+	};
+};

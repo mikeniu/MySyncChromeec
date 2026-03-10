@@ -629,5 +629,14 @@ void ap_pwrseq_teardown_suite(void *data)
 	ap_power_ev_remove_callback(&test_cb);
 }
 
+#ifdef CONFIG_TEST_AP_POWER_FATCAT
+ZTEST(ap_pwrseq, test_ap_pwrseq_fatcat)
+{
+	power_up_test_g3_to_s0_helper();
+	zassert_equal(1, extpower_update_host_events_fake.call_count,
+		      "extpower_update_host_events not called");
+}
+#endif
+
 ZTEST_SUITE(ap_pwrseq, ap_power_predicate_post_main, ap_pwrseq_setup_suite,
 	    NULL, ap_pwrseq_after_test, NULL);

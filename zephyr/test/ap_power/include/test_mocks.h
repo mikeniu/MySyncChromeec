@@ -16,6 +16,7 @@
 
 /* Mocks for common/extpower_gpio.c */
 DECLARE_FAKE_VALUE_FUNC(int, extpower_is_present);
+DECLARE_FAKE_VOID_FUNC(extpower_update_host_events, int);
 
 /* Mocks for common/system.c */
 DECLARE_FAKE_VOID_FUNC(system_hibernate, uint32_t, uint32_t);

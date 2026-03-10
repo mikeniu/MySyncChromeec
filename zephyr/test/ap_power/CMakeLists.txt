@@ -35,3 +35,7 @@ target_sources_ifdef(CONFIG_X86_NON_DSX_PWRSEQ_CONSOLE app PRIVATE
 # Project specific tests
 target_sources_ifdef(CONFIG_TEST_AP_POWER_BROX app PRIVATE
   ${PLATFORM_EC_PROGRAM_DIR}/brox/src/board_power.c)
+
+target_sources_ifdef(CONFIG_TEST_AP_POWER_FATCAT app PRIVATE
+  ${PLATFORM_EC_PROGRAM_DIR}/fatcat/kinmen/src/board_power.c
+  src/signals.c)
