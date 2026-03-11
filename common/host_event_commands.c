@@ -321,7 +321,9 @@ void host_set_events(host_event_t mask)
 	if (!((events & mask) != mask || (events_copy_b & mask) != mask))
 		return;
 
-	HOST_EVENT_CPRINTS("event set", mask);
+	// XXX: enabling the following printf can cause the AP to bounce
+	// between S0 and S0ix!
+	// HOST_EVENT_CPRINTS("event set", mask);
 
 	if (!IS_ENABLED(CONFIG_ZTEST) &&
 	    (mask & EC_HOST_EVENT_MASK(EC_HOST_EVENT_KEYBOARD_RECOVERY)))
@@ -368,7 +370,9 @@ void host_clear_events(host_event_t mask)
 	if (!(events & mask))
 		return;
 
-	HOST_EVENT_CPRINTS("event clear", mask);
+	// XXX: enabling the following printf can cause the AP to bounce
+	// between S0 and S0ix!
+	// HOST_EVENT_CPRINTS("event clear", mask);
 
 	host_events_atomic_clear(&events, mask);
 
