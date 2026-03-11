@@ -17,9 +17,9 @@
 #include "printf.h"
 #include "util.h"
 
-/* Console output macros */
-#define CPUTS(outstr) cputs(CC_CHARGER, outstr)
-#define CPRINTS(format, args...) cprints(CC_CHARGER, format, ##args)
+#include <zephyr/logging/log.h>
+
+LOG_MODULE_REGISTER(charger_common);
 
 /* DPTF current limit, -1 = none */
 static int dptf_limit_ma = -1;
@@ -303,7 +303,7 @@ enum ec_error_list charger_post_init(void)
 	int chgnum = 0;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -318,7 +318,7 @@ const struct charger_info *charger_get_info(void)
 	int chgnum = 0;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return NULL;
 	}
 
@@ -333,7 +333,7 @@ enum ec_error_list charger_get_status(int *status)
 	int chgnum = 0;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -348,7 +348,7 @@ enum ec_error_list charger_set_mode(int mode)
 	int chgnum = 0;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -361,7 +361,7 @@ enum ec_error_list charger_set_mode(int mode)
 enum ec_error_list charger_enable_otg_power(int chgnum, int enabled)
 {
 	if ((chgnum < 0) || (chgnum >= board_get_charger_chip_count())) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -376,7 +376,7 @@ enum ec_error_list charger_set_otg_current_voltage(int chgnum,
 						   int output_voltage)
 {
 	if ((chgnum < 0) || (chgnum >= board_get_charger_chip_count())) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -395,7 +395,7 @@ int charger_is_sourcing_otg_power(int port)
 		chgnum = port;
 
 	if ((chgnum < 0) || (chgnum >= board_get_charger_chip_count())) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return 0;
 	}
 
@@ -412,7 +412,7 @@ enum ec_error_list charger_get_actual_current(int chgnum, int *current)
 		return EC_ERROR_INVAL;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -429,7 +429,7 @@ enum ec_error_list charger_get_current(int chgnum, int *current)
 		return EC_ERROR_INVAL;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -442,7 +442,7 @@ enum ec_error_list charger_get_current(int chgnum, int *current)
 enum ec_error_list charger_set_current(int chgnum, int current)
 {
 	if ((chgnum < 0) || (chgnum >= board_get_charger_chip_count())) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -458,7 +458,7 @@ enum ec_error_list charger_get_actual_voltage(int chgnum, int *voltage)
 		return EC_ERROR_INVAL;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -474,7 +474,7 @@ enum ec_error_list charger_get_voltage(int chgnum, int *voltage)
 		return EC_ERROR_INVAL;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -492,7 +492,7 @@ test_mockable enum ec_error_list charger_get_minimum_charging_mv(int chgnum,
 		return EC_ERROR_INVAL;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -512,7 +512,7 @@ enum ec_error_list charger_set_acokref(int chgnum, int mv)
 	}
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -525,7 +525,7 @@ enum ec_error_list charger_set_acokref(int chgnum, int mv)
 enum ec_error_list charger_set_voltage(int chgnum, int voltage)
 {
 	if ((chgnum < 0) || (chgnum >= board_get_charger_chip_count())) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -574,7 +574,7 @@ static int charger_get_valid_chgnum(int port)
 		chgnum = port;
 
 	if ((chgnum < 0) || (chgnum >= board_get_charger_chip_count())) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return -1;
 	}
 
@@ -615,7 +615,7 @@ enum ec_error_list charger_set_input_current_limit(int chgnum,
 		return EC_ERROR_INVAL;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -634,7 +634,7 @@ enum ec_error_list charger_get_input_current_limit(int chgnum,
 		return EC_ERROR_INVAL;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -651,7 +651,7 @@ enum ec_error_list charger_get_input_current(int chgnum, int *input_current)
 		return EC_ERROR_INVAL;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -666,7 +666,7 @@ enum ec_error_list charger_manufacturer_id(int *id)
 	int chgnum = 0;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -681,7 +681,7 @@ enum ec_error_list charger_device_id(int *id)
 	int chgnum = 0;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -696,7 +696,7 @@ test_mockable enum ec_error_list charger_set_frequency(int freq_khz)
 	int chgnum = 0;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -711,7 +711,7 @@ enum ec_error_list charger_get_option(int *option)
 	int chgnum = 0;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -726,7 +726,7 @@ enum ec_error_list charger_set_option(int option)
 	int chgnum = 0;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -769,7 +769,7 @@ int chg_ramp_is_stable(void)
 	int chgnum = 0;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return 0;
 	}
 
@@ -784,7 +784,7 @@ int chg_ramp_is_detected(void)
 	int chgnum = 0;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return 0;
 	}
 
@@ -799,7 +799,7 @@ int chg_ramp_get_current_limit(void)
 	int chgnum = 0;
 
 	if (chgnum >= board_get_charger_chip_count()) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return 0;
 	}
 
@@ -815,7 +815,7 @@ charger_set_vsys_compensation(int chgnum, struct ocpc_data *ocpc,
 			      int current_ma, int voltage_mv)
 {
 	if ((chgnum < 0) || (chgnum >= board_get_charger_chip_count())) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -833,7 +833,7 @@ charger_set_vsys_compensation(int chgnum, struct ocpc_data *ocpc,
 enum ec_error_list charger_is_icl_reached(int chgnum, bool *reached)
 {
 	if ((chgnum < 0) || (chgnum >= board_get_charger_chip_count())) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
@@ -846,7 +846,7 @@ enum ec_error_list charger_is_icl_reached(int chgnum, bool *reached)
 enum ec_error_list charger_enable_linear_charge(int chgnum, bool enable)
 {
 	if ((chgnum < 0) || (chgnum >= board_get_charger_chip_count())) {
-		CPRINTS("%s(%d) Invalid charger!", __func__, chgnum);
+		LOG_ERR("%s(%d) Invalid charger!", __func__, chgnum);
 		return EC_ERROR_INVAL;
 	}
 
