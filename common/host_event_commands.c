@@ -321,8 +321,6 @@ void host_set_events(host_event_t mask)
 	if (!((events & mask) != mask || (events_copy_b & mask) != mask))
 		return;
 
-	HOST_EVENT_CPRINTS("event set", mask);
-
 	if (!IS_ENABLED(CONFIG_ZTEST) &&
 	    (mask & EC_HOST_EVENT_MASK(EC_HOST_EVENT_KEYBOARD_RECOVERY)))
 		system_enter_manual_recovery();
@@ -341,6 +339,8 @@ void host_set_events(host_event_t mask)
 	host_events_send_mkbp_event(events);
 #endif /* CONFIG_MKBP_EVENT */
 #endif /* !CONFIG_HOSTCMD_X86 */
+
+	HOST_EVENT_CPRINTS("event set", mask);
 }
 
 void host_set_single_event(enum host_event_code event)
@@ -368,8 +368,6 @@ void host_clear_events(host_event_t mask)
 	if (!(events & mask))
 		return;
 
-	HOST_EVENT_CPRINTS("event clear", mask);
-
 	host_events_atomic_clear(&events, mask);
 
 #ifdef CONFIG_HOSTCMD_X86
@@ -380,6 +378,8 @@ void host_clear_events(host_event_t mask)
 	host_events_send_mkbp_event(events);
 #endif
 #endif /* !CONFIG_HOSTCMD_X86 */
+
+	HOST_EVENT_CPRINTS("event clear", mask);
 }
 
 #ifndef CONFIG_HOSTCMD_X86
