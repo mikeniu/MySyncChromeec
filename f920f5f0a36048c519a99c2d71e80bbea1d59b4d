@@ -16,6 +16,24 @@
       "message": "In what case that you\u0027ll see the invalid temperature ? And would it be better to handle with a failsafe condition rather than return directly ?",
       "revId": "f920f5f0a36048c519a99c2d71e80bbea1d59b4d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eff2b01c_ecbc002f",
+        "filename": "zephyr/program/fatcat/lapis/src/thermal_policy.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1512583
+      },
+      "writtenOn": "2026-03-11T07:06:12Z",
+      "side": 1,
+      "message": "The temperature value will be out of range if the NTC is disconnected or short-circuited. We plan not to implement the limiting strategy for out-of-range values. Please help review it again, thanks.",
+      "parentUuid": "1c0e7daa_bf49819b",
+      "revId": "f920f5f0a36048c519a99c2d71e80bbea1d59b4d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
