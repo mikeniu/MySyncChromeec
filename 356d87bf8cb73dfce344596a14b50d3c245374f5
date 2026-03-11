@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c47e84eb_7723f67d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-11T07:38:01Z",
+      "side": 1,
+      "message": "Hi Tom, this is basically the [libusb](https://github.com/libusb/libusb) repo.  Do you think you can just copy it? And if it even make sense to copy the lib, maybe we should fetch it from github? Not sure what options we have in terms of infra/licensing",
+      "revId": "356d87bf8cb73dfce344596a14b50d3c245374f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
