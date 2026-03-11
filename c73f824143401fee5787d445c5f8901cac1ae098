@@ -118,6 +118,30 @@
       },
       "revId": "c73f824143401fee5787d445c5f8901cac1ae098",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2564a082_8de4f335",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-11T11:39:28Z",
+      "side": 1,
+      "message": "Test implemented in following CL.",
+      "parentUuid": "d7ac660f_15a879b2",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 67
+      },
+      "revId": "c73f824143401fee5787d445c5f8901cac1ae098",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
