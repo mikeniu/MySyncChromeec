@@ -509,6 +509,8 @@ static bool battery_want_charge(struct batt_params *batt)
 void battery_get_params(struct batt_params *batt)
 {
 	struct batt_params batt_new;
+	static int soc_first_read;
+	int soc_tmp;
 	int v;
 
 	/*
@@ -537,9 +539,21 @@ void battery_get_params(struct batt_params *batt)
 	if (fake_temperature >= 0)
 		batt_new.temperature = fake_temperature;
 
-	if (sb_read(SB_RELATIVE_STATE_OF_CHARGE, &batt_new.state_of_charge) &&
-	    fake_state_of_charge < 0)
-		batt_new.flags |= BATT_FLAG_BAD_STATE_OF_CHARGE;
+	if (!soc_first_read) {
+
+		if (sb_read(SB_RELATIVE_STATE_OF_CHARGE,
+			&batt_new.state_of_charge) && fake_state_of_charge < 0)
+			batt_new.flags |= BATT_FLAG_BAD_STATE_OF_CHARGE;
+		soc_first_read=1
+	} else {
+		if (sb_read(SB_RELATIVE_STATE_OF_CHARGE, &soc_tmp) &&
+		fake_state_of_charge < 0)
+			batt_new.flags |= BATT_FLAG_BAD_STATE_OF_CHARGE;
+		else
+			batt_new.state_of_charge =
+				(soc_tmp*5 + batt_new.state_of_charge*5)/10;
+
+	}
 
 	if (sb_read(SB_VOLTAGE, &batt_new.voltage))
 		batt_new.flags |= BATT_FLAG_BAD_VOLTAGE;
