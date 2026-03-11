@@ -9,7 +9,7 @@
 	width = <80>; \
 	height = <128>; \
 	bits-per-pixel = <8>; \
-	frame-size = <10240>; \
+	frame-size = <30720>; \
 	v4l2-pixel-format = "V4L2_PIX_FMT_GREY";
 
 &fp_sensor {
