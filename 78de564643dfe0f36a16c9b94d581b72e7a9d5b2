@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b732d983_afb72f3e",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 5558,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-11T22:48:05Z",
+      "side": 1,
+      "message": "Nit - `sbu_mux_mode_at_suspend`.",
+      "range": {
+        "startLine": 5558,
+        "startChar": 29,
+        "endLine": 5558,
+        "endChar": 50
+      },
+      "revId": "78de564643dfe0f36a16c9b94d581b72e7a9d5b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
