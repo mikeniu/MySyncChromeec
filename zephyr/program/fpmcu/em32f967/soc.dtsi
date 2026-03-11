@@ -17,6 +17,10 @@
 };
 
 / {
+	chosen {
+		cros-ec,bbram = &bbram0;
+	};
+
 	sdcp: memory@20043e00 {
 		compatible = "mmio-sram";
 		reg = <0x20043e00 512>;
