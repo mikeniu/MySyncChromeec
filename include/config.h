@@ -4329,6 +4329,17 @@
  */
 #define CONFIG_TASK_PROFILING
 
+/*
+ * Enable automatic periodic reset of task profiling stats.
+ *
+ * This will zero out task runtime, exception time, and other counters
+ * every X seconds. This is useful for monitoring current system load
+ * instead of total runtime since boot.
+ *
+ * Depends on CONFIG_TASK_PROFILING.
+ */
+#undef CONFIG_TASK_PROFILING_PERIODIC_RESET
+
 /*****************************************************************************/
 /* Mock config */
 

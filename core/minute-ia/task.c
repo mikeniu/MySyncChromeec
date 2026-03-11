@@ -504,6 +504,43 @@ void mutex_unlock(struct mutex_nr *mtx)
 
 #endif /* !CONFIG_COMMON_RECURSIVE_MUTEX */
 
+#ifdef CONFIG_TASK_PROFILING
+void task_reset_profiling(void)
+{
+	int i;
+
+	for (i = 0; i < TASK_ID_COUNT; i++) {
+		tasks[i].runtime = 0;
+	}
+	for (i = 0; i < ARRAY_SIZE(irq_dist); i++) {
+		irq_dist[i] = 0;
+	}
+	atomic_clear(&svc_calls);
+	task_switches = 0;
+	exc_total_time = 0;
+	task_start_time = get_time().val;
+}
+
+#ifdef CONFIG_TASK_PROFILING_PERIODIC_RESET
+static void task_periodic_reset(void);
+DECLARE_DEFERRED(task_periodic_reset);
+
+static void task_periodic_reset(void)
+{
+	task_reset_profiling();
+	hook_call_deferred(&task_periodic_reset_data,
+			   CONFIG_TASK_PROFILING_PERIODIC_RESET * SECOND);
+}
+
+static void task_periodic_reset_init(void)
+{
+	hook_call_deferred(&task_periodic_reset_data,
+			   CONFIG_TASK_PROFILING_PERIODIC_RESET * SECOND);
+}
+DECLARE_HOOK(HOOK_INIT, task_periodic_reset_init, HOOK_PRIO_DEFAULT);
+#endif
+#endif
+
 void task_print_list(void)
 {
 	int i;
