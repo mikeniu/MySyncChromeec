@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e863765_7bef700e",
+        "filename": "common/extpower_common.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-03-11T16:00:24Z",
+      "side": 1,
+      "message": "These functions are more like GPIO-specific. Can they be moved to `extpower_gpio.c`? This file should remain general enough to support other ways of detection, like I2C (though not there yet).",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 1
+      },
+      "revId": "39e0c41284b92c4a3fbb6c1a314cfb65bfe67646",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
