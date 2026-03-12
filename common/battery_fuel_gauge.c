@@ -27,6 +27,8 @@ test_export_static const struct batt_conf_embed *battery_conf;
 static char batt_manuf_name[SBS_MAX_STR_OBJ_SIZE];
 static char batt_device_name[SBS_MAX_STR_OBJ_SIZE];
 
+static bool battery_manuf_name_read;
+
 /* Copies of config and strings of a matching battery found in CBI. */
 static struct batt_conf_embed battery_conf_cache = {
 	.manuf_name = batt_manuf_name,
@@ -184,6 +186,11 @@ CONFIG_BATTERY_CONFIG_IN_CBI is enabled.
 #endif
 #endif
 
+bool get_battery_manuf_name_read(void)
+{
+	return battery_manuf_name_read;
+}
+
 void init_battery_type(void)
 {
 	int type;
@@ -203,6 +210,8 @@ void init_battery_type(void)
 		ret = battery_manufacturer_name(batt_manuf_name,
 						sizeof(batt_manuf_name));
 	}
+
+	battery_manuf_name_read = (ret == EC_SUCCESS);
 
 	if (ret) {
 		BCFGPRT("Manuf name not found");
