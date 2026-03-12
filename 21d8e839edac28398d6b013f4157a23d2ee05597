@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a629746_84001cad",
+        "filename": "zephyr/program/fpmcu/bloonchipper/bloonchipper.dts",
+        "patchSetId": 6
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-12T23:24:18Z",
+      "side": 1,
+      "message": "Indentation doesn\u0027t seem to match?\n\n\n\n```suggestion\n    image-data-offset-bytes \u003d \u003c400\u003e; \\\n```",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 35
+      },
+      "revId": "21d8e839edac28398d6b013f4157a23d2ee05597",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1739d1a_e6ced9ea",
+        "filename": "zephyr/program/fpmcu/helipilot/helipilot.dts",
+        "patchSetId": 6
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-12T23:24:18Z",
+      "side": 1,
+      "message": "Indentation doesn\u0027t seem to match?\n\n\n\n```suggestion\n    image-data-offset-bytes \u003d \u003c0\u003e; \\\n```",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 33
+      },
+      "revId": "21d8e839edac28398d6b013f4157a23d2ee05597",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b98f1d0_58be8894",
+        "filename": "zephyr/shim/include/fpsensor_driver.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-12T23:24:18Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be\n```suggestion\n#define FP_SENSOR_IMAGE_OFFSET IMAGE_OFFSET\n```",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 65
+      },
+      "revId": "21d8e839edac28398d6b013f4157a23d2ee05597",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
