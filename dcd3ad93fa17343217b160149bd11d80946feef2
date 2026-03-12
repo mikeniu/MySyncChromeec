@@ -181,6 +181,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4a70e03e_3cea52fe",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 60
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-12T08:40:41Z",
+      "side": 1,
+      "message": "I also updated the zephyr-ft9001-public to support this function, if you need check this on your side, you need sync it to the latest version.",
+      "parentUuid": "91928377_0dfc7ead",
+      "revId": "dcd3ad93fa17343217b160149bd11d80946feef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6031409a_17c3c1a1",
         "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
         "patchSetId": 60
