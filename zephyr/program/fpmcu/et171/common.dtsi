@@ -110,7 +110,7 @@
 &spi0 {
 	p25q16: qspi-nor-flash {
 		compatible = "andestech,qspi-nor-xip", "jedec,spi-nor";
-		size = <DT_SIZE_K(1024)>;
+		size = <DT_SIZE_K(2048)>;
 		status = "okay";
 	};
 };
@@ -134,6 +134,11 @@
 		rollback1: partition@41000 {
 			label = "rollback1";
 			reg = <0x41000 DT_SIZE_K(4)>;
+		};
+
+		instance_data: partition@100000 {
+			label = "instance_data";
+			reg = <0x100000 DT_SIZE_K(52)>;
 		};
 	};
 };
