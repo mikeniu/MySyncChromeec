@@ -187,7 +187,7 @@ CONFIG_BATTERY_CONFIG_IN_CBI is enabled.
 void init_battery_type(void)
 {
 	int type;
-	int dflt = board_get_default_battery_type();
+	int dflt;
 	int ret;
 
 	ret = battery_manufacturer_name(batt_manuf_name,
@@ -204,10 +204,18 @@ void init_battery_type(void)
 						sizeof(batt_manuf_name));
 	}
 
-	if (ret) {
-		BCFGPRT("Manuf name not found");
-		battery_conf = &board_battery_info[dflt];
-		return;
+	switch (ret) {
+	case EC_SUCCESS:
+		break;
+	case EC_ERROR_ACCESS_DENIED:
+		BCFGPRT("cutoff or in progress");
+		if (battery_conf != NULL) {
+			return;
+		}
+		goto fallback;
+	default:
+		BCFGPRT("Manuf name not found %d", ret);
+		goto fallback;
 	}
 
 	/* Don't carry over any previous name (in case i2c fail). */
@@ -251,6 +259,8 @@ void init_battery_type(void)
 		BCFGPRT("Config not found in CBI");
 	}
 
+fallback:
+	dflt = board_get_default_battery_type();
 	/* Battery config isn't in CBI. */
 	BCFGPRT("Fall back to config_fw[%d]", dflt);
 	battery_conf = &board_battery_info[dflt];
