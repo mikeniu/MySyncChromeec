@@ -18,6 +18,9 @@
 #define CPRINTS(format, args...) cprints(CC_CHARGER, format, ##args)
 #define BCFGPRT(format, args...) cprints(CC_CHARGER, "BCFG " format, ##args)
 
+#define BATTERY_RETRY_INTERVAL (500 * MSEC)
+#define BATTERY_MAX_RETRY 20
+
 /*
  * Pointer to an active config. It's battery_conf_cache if a config is found
  * in CBI or board_battery_info[x] if a config is found in FW.
@@ -26,6 +29,9 @@ test_export_static const struct batt_conf_embed *battery_conf;
 
 static char batt_manuf_name[SBS_MAX_STR_OBJ_SIZE];
 static char batt_device_name[SBS_MAX_STR_OBJ_SIZE];
+
+static bool manuf_retry_pending = false;
+static int manuf_retry_count;
 
 /* Copies of config and strings of a matching battery found in CBI. */
 static struct batt_conf_embed battery_conf_cache = {
@@ -184,6 +190,43 @@ CONFIG_BATTERY_CONFIG_IN_CBI is enabled.
 #endif
 #endif
 
+static void battery_retry(void);
+DECLARE_DEFERRED(battery_retry);
+
+static void battery_retry(void)
+{
+	int ret = EC_SUCCESS;
+
+	if (manuf_retry_pending) {
+		ret = battery_manufacturer_name(batt_manuf_name,
+						sizeof(batt_manuf_name));
+		if (ret == EC_SUCCESS) {
+			BCFGPRT("Battery manufacturer read OK after retry");
+			manuf_retry_pending = false;
+
+			init_battery_type();
+			return;
+		}
+	}
+
+	manuf_retry_count++;
+
+	if (!battery_is_present()) {
+		BCFGPRT("Battery removed, stop manufacturer retry");
+		manuf_retry_pending = false;
+		return;
+	}
+
+	if (manuf_retry_count >= BATTERY_MAX_RETRY) {
+		BCFGPRT("Manufacturer retry exceeded, using default battery");
+
+		manuf_retry_pending = false;
+		return;
+	}
+
+	hook_call_deferred(&battery_retry_data, BATTERY_RETRY_INTERVAL);
+}
+
 void init_battery_type(void)
 {
 	int type;
@@ -207,6 +250,10 @@ void init_battery_type(void)
 	if (ret) {
 		BCFGPRT("Manuf name not found");
 		battery_conf = &board_battery_info[dflt];
+
+		manuf_retry_pending = true;
+		manuf_retry_count = 0;
+		hook_call_deferred(&battery_retry_data, BATTERY_RETRY_INTERVAL);
 		return;
 	}
 
@@ -237,6 +284,10 @@ void init_battery_type(void)
 	if (type != BATTERY_TYPE_COUNT) {
 		BCFGPRT("Found config_fw[%d]", type);
 		battery_conf = &board_battery_info[type];
+
+		manuf_retry_pending = false;
+		manuf_retry_count = 0;
+		hook_call_deferred(&battery_retry_data, -1);
 		return;
 	}
 
