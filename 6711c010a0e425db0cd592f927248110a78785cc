@@ -168,6 +168,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfa950e2_28d4831f",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_chipset_power_state.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-12T04:40:52Z",
+      "side": 1,
+      "message": "Done, also added comment at [ap_pwrseq_task_start()](https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7585753/11/zephyr/subsys/ap_pwrseq/ap_power_interface.c).",
+      "parentUuid": "33f62374_12ac27ce",
+      "range": {
+        "startLine": 256,
+        "startChar": 0,
+        "endLine": 256,
+        "endChar": 64
+      },
+      "revId": "6711c010a0e425db0cd592f927248110a78785cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "92d49c3e_d03ee427",
@@ -181,6 +205,30 @@
       "writtenOn": "2026-03-06T19:36:16Z",
       "side": 1,
       "message": "Same comment as above.",
+      "range": {
+        "startLine": 310,
+        "startChar": 0,
+        "endLine": 310,
+        "endChar": 65
+      },
+      "revId": "6711c010a0e425db0cd592f927248110a78785cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5206645_733bab2d",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_chipset_power_state.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-12T04:40:52Z",
+      "side": 1,
+      "message": "Done, added comment.",
+      "parentUuid": "92d49c3e_d03ee427",
       "range": {
         "startLine": 310,
         "startChar": 0,
