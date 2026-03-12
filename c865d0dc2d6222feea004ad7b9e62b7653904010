@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d5fd7eb_20e93e6a",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 8604,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-12T21:33:21Z",
+      "side": 1,
+      "message": "nit: doxygen format for the comment\n\n```suggestion\n\tuint32_t image_data_offset_bytes; /**\u003c Byte offset of the image buffer */\n```",
+      "range": {
+        "startLine": 8604,
+        "startChar": 35,
+        "endLine": 8604,
+        "endChar": 72
+      },
+      "revId": "c865d0dc2d6222feea004ad7b9e62b7653904010",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
