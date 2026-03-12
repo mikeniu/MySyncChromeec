@@ -74,4 +74,10 @@ config LINK_TEST_SUITE_FINGERPRINT_FRAME_SIZE
 	  Link and execute fingerprint subsystem tests that focus
 	  on finger frame size.
 
+config LINK_TEST_SUITE_FINGERPRINT_LED
+	bool "Link fingerprint led tests"
+	help
+	  Link and execute fingerprint subsystem tests that focus
+	  on led.
+
 source "Kconfig.zephyr"
