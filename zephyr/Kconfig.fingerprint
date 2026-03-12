@@ -47,4 +47,14 @@ config PLATFORM_EC_FINGERPRINT_AUTH_METHOD_ASCP
 
 endchoice
 
+DT_ALIAS_PWM_FP_LED := pwm-fp-led
+
+config PLATFORM_EC_FP_LED
+	bool "Enable finger print sensor led"
+	help
+	  Enables controlling of finger print led.
+	  If enabled, the pwm-fp-led alias has to be defined in DT.
+	default y
+	depends on $(dt_alias_enabled,$(DT_ALIAS_PWM_FP_LED))
+
 endif # PLATFORM_EC_FINGERPRINT
