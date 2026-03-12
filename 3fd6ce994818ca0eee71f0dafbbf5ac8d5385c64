@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3f3c13b_c2b17752",
+        "filename": "common/fpsensor/fpsensor_debug.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-12T21:55:50Z",
+      "side": 1,
+      "message": "```suggestion\n\t\tccprintf(\"  %*s: %u\\n\", align, \"Image Data Offset (bytes)\",\n```",
+      "range": {
+        "startLine": 337,
+        "startChar": 34,
+        "endLine": 337,
+        "endChar": 46
+      },
+      "revId": "3fd6ce994818ca0eee71f0dafbbf5ac8d5385c64",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
