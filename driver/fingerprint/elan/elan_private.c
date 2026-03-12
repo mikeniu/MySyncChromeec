@@ -35,10 +35,10 @@ static struct fp_sensor_info elan_sensor_info = {
 	.version = VERSION,
 };
 
-#define ELAN_DEFAULT_IMAGE_PARAMS                                         \
-	.bpp = FP_SENSOR_RES_BPP_ELAN,                                    \
-	.frame_size = FP_SENSOR_RES_X_ELAN * FP_SENSOR_RES_Y_ELAN * 2,    \
-	.pixel_format = V4L2_PIX_FMT_GREY, .width = FP_SENSOR_RES_X_ELAN, \
+#define ELAN_DEFAULT_IMAGE_PARAMS                                             \
+	.bpp = FP_SENSOR_RES_BPP_ELAN, .offset = FP_SENSOR_IMAGE_OFFSET_ELAN, \
+	.frame_size = FP_SENSOR_RES_X_ELAN * FP_SENSOR_RES_Y_ELAN * 2,        \
+	.pixel_format = V4L2_PIX_FMT_GREY, .width = FP_SENSOR_RES_X_ELAN,     \
 	.height = FP_SENSOR_RES_Y_ELAN
 
 static const struct fp_image_frame_params elan_image_frame_params[] = {
