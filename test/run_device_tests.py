@@ -568,11 +568,9 @@ class Renode(Platform):
 
     def _skip_test_sanok(self, test_config: TestConfig) -> bool:
         if test_config.test_name in [
-            "bbram_retained_mem",  # TODO(b/487848806)
             "flash_physical",  # TODO(b/468410778)
             "flash_write_protect",  # TODO(b/406944986)
             "panic_data",  # TODO(b/468407068)
-            "reboot",  # TODO(b/488132215)
             "rollback",  # TODO(b/468406461)
             "rollback_entropy",  # TODO(b/468406461)
             "system_is_locked",  # TODO(b/483118063)
@@ -585,7 +583,6 @@ class Renode(Platform):
             "panic",  # TODO(b/483124098)
             "restricted_console",  # TODO(b/474439863)
             "sbrk",  # TODO(b/485454965)
-            "tpm_seed_clear",  # TODO(b/406944986)
             "utils",  # TODO(b/483126917)
             "zephyr_cpp_newlib",  # TODO(b/484366615)
             "zephyr_cpp_std20",  # TODO(b/484366615)
@@ -1295,6 +1292,8 @@ SANOK_CONFIG = BoardConfig(
     variants={},
     zephyr_board_name="egis_et171",
     host_interfaces={HostInterface.USB},
+    # TODO(b/487848806): Remove this when cache is fixed in Renode.
+    zephyr_extra_configs={Environment.RENODE: ["CONFIG_DCACHE=n", "CONFIG_ICACHE=n"]},
 )
 
 CHUDOW_CONFIG = BoardConfig(
