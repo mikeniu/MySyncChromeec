@@ -1826,6 +1826,9 @@
  */
 #define CONFIG_CMD_CRASH_NESTED
 
+/* Enable generic SVDM DFP identity response */
+#undef CONFIG_SVDM_RSP_DFP_ONLY
+
 /*
  * Provide the default GPIO abstraction layer.
  * You want this unless you are doing a really tiny firmware.
