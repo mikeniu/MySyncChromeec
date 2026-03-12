@@ -26,6 +26,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cfd8f6aa_5a5136ec",
+        "filename": "zephyr/program/fpmcu/et171/srebrna.dts",
+        "patchSetId": 6
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-12T23:26:12Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be:\n\n```suggestion\n\timage-data-offset-bytes \u003d \u003c172\u003e; \\\n```\n\nCaught by Gemini. Please do self-review.",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 35
+      },
+      "revId": "21d8e839edac28398d6b013f4157a23d2ee05597",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a574de13_37441a8c",
+        "filename": "zephyr/program/fpmcu/et171/stobnica.dts",
+        "patchSetId": 6
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-12T23:26:12Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be:\n\n```suggestion\n\timage-data-offset-bytes \u003d \u003c0\u003e; \\\n```\n\nCaught by Gemini. Please do self-review.",
+      "range": {
+        "startLine": 13,
+        "startChar": 1,
+        "endLine": 13,
+        "endChar": 33
+      },
+      "revId": "21d8e839edac28398d6b013f4157a23d2ee05597",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c1739d1a_e6ced9ea",
         "filename": "zephyr/program/fpmcu/helipilot/helipilot.dts",
         "patchSetId": 6
@@ -60,6 +106,30 @@
       "writtenOn": "2026-03-12T23:24:18Z",
       "side": 1,
       "message": "Shouldn\u0027t this be\n```suggestion\n#define FP_SENSOR_IMAGE_OFFSET IMAGE_OFFSET\n```",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 65
+      },
+      "revId": "21d8e839edac28398d6b013f4157a23d2ee05597",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "414f3e91_7472a70e",
+        "filename": "zephyr/shim/include/fpsensor_driver.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-12T23:26:12Z",
+      "side": 1,
+      "message": "Caught by Gemini. Please do self-review.",
+      "parentUuid": "1b98f1d0_58be8894",
       "range": {
         "startLine": 22,
         "startChar": 0,
