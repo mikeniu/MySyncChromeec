@@ -26,6 +26,7 @@ config BOARD_MICA
 	  Build Google MICA board. The board uses Nuvoton
 	  NPCX9 chip as the EC.
 
+
 module = Bluey
 module-str = Bluey board-specific code
 source "subsys/logging/Kconfig.template.log_config"
