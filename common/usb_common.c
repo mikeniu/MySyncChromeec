@@ -844,6 +844,60 @@ int pd_send_alert_msg(int port, uint32_t ado)
 #endif
 }
 
+int tcpmv2_svdm_identity(int port, uint32_t *payload)
+{
+	/* Only respond to PD SID */
+	if (PD_VDO_VID(payload[VDO_INDEX_HDR]) != USB_SID_PD)
+		return 0;
+
+	payload[VDO_I(CSTAT)] = VDO_CSTAT(CONFIG_USB_PD_XID);
+	payload[VDO_I(PRODUCT)] =
+		VDO_PRODUCT(CONFIG_USB_PID, CONFIG_USB_BCD_DEV);
+
+	if (pd_get_rev(port, TCPCI_MSG_SOP) < PD_REV30) {
+		payload[VDO_I(IDH)] = VDO_IDH(1, /* USB host */
+					      0, /* Not a USB device */
+					      IDH_PTYPE_UNDEF, 0, /* No alt
+								     modes */
+					      CONFIG_USB_VID);
+
+		return VDO_I(PRODUCT) + 1;
+	}
+
+	/* Determine host capability based on configuration */
+	uint32_t host_cap = VDO_DFP_HOST_CAPABILITY_USB32;
+
+#ifdef CONFIG_USB_PD_USB4
+	host_cap |= VDO_DFP_HOST_CAPABILITY_USB4;
+#endif
+
+#ifdef CONFIG_USB_PD_FRS
+	host_cap |= VDO_DFP_FRS_CAPABLE;
+#endif
+
+	/* PD 3.0 */
+	payload[VDO_I(IDH)] = VDO_IDH_REV30(
+		1, /* USB host */
+		0, /* Not a USB device */
+		IDH_PTYPE_UNDEF, 0, /* No alt modes */
+		IDH_PTYPE_DFP_HOST, USB_TYPEC_RECEPTACLE, CONFIG_USB_VID);
+
+	payload[VDO_I(PRODUCT) + 1] =
+		VDO_DFP(host_cap, USB_TYPEC_RECEPTACLE, port);
+
+	return VDO_I(PRODUCT) + 2;
+}
+
+static int tcpmv2_svdm_svids(int port, uint32_t *payload)
+{
+	return 0;
+}
+
+const struct svdm_response tcpmv2_svdm_rsp = {
+	.identity = tcpmv2_svdm_identity,
+	.svids = tcpmv2_svdm_svids,
+};
+
 #ifdef CONFIG_MKBP_EVENT
 static int dp_alt_mode_entry_get_next_event(uint8_t *data)
 {
