@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abfe019d_de28d849",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-12T20:22:11Z",
+      "side": 1,
+      "message": "@tomhughes@chromium.org\n\nI believe this is missing the changes for the tests. Before I make those changes, I would like to make sure we are aligned on this change. With the addition of the offset to the DTS, we do not need the config. The legacy assumes, everything is the same. However, this can potentially make the frame capture offset independent of a global config but rather a image config. We can run the info command and get the offset per type of deduce it in a similar way we did for the frame_size. \n\nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/common/fpsensor/fpsensor.cc;l\u003d575?q\u003dFP_SENSOR_IMAGE_OFFSET\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch:src%2Fplatform%2Fec%2F#:~:text\u003d574-,575,-576",
+      "revId": "6c123f6a6c2ba8719da12d210eb196f24bb07d8d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
