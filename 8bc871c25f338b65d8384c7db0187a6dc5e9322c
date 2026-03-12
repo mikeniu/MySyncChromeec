@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "076f33fc_943151b8",
+        "filename": "zephyr/drivers/board_id/board_id_intel_rvp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-12T23:36:08Z",
+      "side": 0,
+      "message": "This should be manageable with a macro.",
+      "range": {
+        "startLine": 251,
+        "startChar": 5,
+        "endLine": 251,
+        "endChar": 31
+      },
+      "revId": "8bc871c25f338b65d8384c7db0187a6dc5e9322c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
