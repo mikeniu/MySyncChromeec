@@ -3790,6 +3790,8 @@ struct pd_debug_timestamps {
 	timestamp_t end;
 };
 
+extern const struct svdm_response svdm_rsp;
+
 /* Record the start of an interval. This is equivalent to
  * pd_record_timestamp(port, interval, PD_START, get_time()). This function
  * should be called at the point in the code when the event to be measured
