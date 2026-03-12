@@ -97,6 +97,20 @@ extern "C" {
 	DT_PROP(DT_CHILD(DT_CHILD(node_id, configs), config##idx), frame_size)
 
 /**
+ * @brief Get fingerprint sensor image offset for a given configuration index.
+ *
+ * @param idx Index of the configuration to retrieve the offset from.
+ * @param node_id Devicetree node identifier for the sensor.
+ * @return Image offset in bytes.
+ */
+#define FINGERPRINT_SENSOR_IMAGE_OFFSET(idx, node_id)              \
+	DT_PROP(DT_CHILD(DT_CHILD(node_id, configs), config##idx), \
+		image_data_offset_bytes)
+
+#define IMAGE_OFFSET                       \
+	FINGERPRINT_SENSOR_IMAGE_OFFSET(0, \
+					DT_CHOSEN(cros_fp_fingerprint_sensor))
+/**
  * @brief Get the real size of the image pixel data in bytes.
  *
  * This macro calculates the **actual image size** in bytes for a specific
@@ -227,6 +241,8 @@ struct fingerprint_image_frame_params {
 	uint16_t height;
 	/** @brief Bits per pixel for the image. */
 	uint16_t bpp;
+	/** @brief Image offset in bytes from the start of the sensor buffer. */
+	uint32_t image_data_offset_bytes;
 	/**
 	 * @brief Type of image capture.
 	 * @see enum fingerprint_capture_type
