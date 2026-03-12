@@ -71,6 +71,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b199011c_63492ca9",
+        "filename": "zephyr/program/atria/CMakeLists.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-12T17:30:16Z",
+      "side": 1,
+      "message": "I tried to block the deferred-init behind config and seems that mechanic isn\u0027t working for dtsi files. I checked through the code and didn\u0027t notice any instances of dtsi or overlay using ifdefs which is pretty surprising to me. I refactored this code a little bit to have separate files for the runtime deferred-init additions so I\u0027m planning to leave this since the code is clearer as to what is added with this now",
+      "parentUuid": "ba45bbf8_8540cd75",
+      "revId": "dff0f0ef003f8b63fb798378d75790d29f24e1f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b43047a9_9d266c95",
@@ -138,6 +156,24 @@
       "side": 1,
       "message": "I was just looking at other programs and looks like there is a separate runtime_pd and runtime_usb that adds the deferred-init, I\u0027ll just switch to that approach so that the original files remain unchanged",
       "parentUuid": "a7a3e3e7_3c149c1e",
+      "revId": "dff0f0ef003f8b63fb798378d75790d29f24e1f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e01dd8fb_6d9a8267",
+        "filename": "zephyr/program/atria/rvp_rt_pd.dtsi",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-12T17:30:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d20e1c5_23536ced",
       "revId": "dff0f0ef003f8b63fb798378d75790d29f24e1f5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
