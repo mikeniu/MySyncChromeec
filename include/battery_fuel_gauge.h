@@ -58,6 +58,10 @@ void init_battery_type(void);
 const struct batt_conf_embed *get_batt_conf(void);
 
 /**
+ * Return battery manufacturer name ready status.
+ */
+bool get_battery_manuf_name_ready(void);
+/**
  * Return 1 if CFET is disabled, 0 if enabled. -1 if an error was encountered.
  * If the CFET mask is not defined, it will return 0.
  */
