@@ -16,6 +16,24 @@
       "message": "Please run `cros format` on all these files.",
       "revId": "753106a8f6d6023c2729487f8c01c266f7a93579",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "215b89e4_35f97fa1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1365384
+      },
+      "writtenOn": "2026-03-12T09:31:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07666ac0_f4dfbeba",
+      "revId": "753106a8f6d6023c2729487f8c01c266f7a93579",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
