@@ -530,6 +530,10 @@ static int common_pwr_sm_run(int state)
 
 #if CONFIG_AP_PWRSEQ_S0IX
 	case SYS_POWER_STATE_S0ix:
+		if (power_signal_get(PWR_SYS_RST)) {
+			ap_power_reset_host_sleep_state();
+			return SYS_POWER_STATE_S0ixS0;
+		}
 		/* System in S0 only if SLP_S0 and SLP_S3 are de-asserted */
 		if ((power_signals_off(IN_PCH_SLP_S0) &&
 		     signals_valid_and_off(IN_PCH_SLP_S3) &&
