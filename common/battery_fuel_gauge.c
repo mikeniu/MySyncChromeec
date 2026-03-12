@@ -27,6 +27,8 @@ test_export_static const struct batt_conf_embed *battery_conf;
 static char batt_manuf_name[SBS_MAX_STR_OBJ_SIZE];
 static char batt_device_name[SBS_MAX_STR_OBJ_SIZE];
 
+static bool retry_manuf = false;
+
 /* Copies of config and strings of a matching battery found in CBI. */
 static struct batt_conf_embed battery_conf_cache = {
 	.manuf_name = batt_manuf_name,
@@ -184,6 +186,29 @@ CONFIG_BATTERY_CONFIG_IN_CBI is enabled.
 #endif
 #endif
 
+static void battery_retry(void);
+DECLARE_DEFERRED(battery_retry);
+
+static void battery_retry(void)
+{
+	int ret = EC_SUCCESS;
+
+	if (retry_manuf) {
+		ret = battery_manufacturer_name(batt_manuf_name,
+						sizeof(batt_manuf_name));
+		if (ret == EC_SUCCESS)
+			retry_manuf = false;
+	}
+
+	if (!retry_manuf) {
+		/* manufacturer ready → re-init */
+		init_battery_type();
+		return;
+	}
+
+	hook_call_deferred(&battery_retry_data, 500 * MSEC);
+}
+
 void init_battery_type(void)
 {
 	int type;
@@ -207,6 +232,9 @@ void init_battery_type(void)
 	if (ret) {
 		BCFGPRT("Manuf name not found");
 		battery_conf = &board_battery_info[dflt];
+
+		retry_manuf = true;
+		hook_call_deferred(&battery_retry_data, 500 * MSEC);
 		return;
 	}
 
@@ -237,6 +265,8 @@ void init_battery_type(void)
 	if (type != BATTERY_TYPE_COUNT) {
 		BCFGPRT("Found config_fw[%d]", type);
 		battery_conf = &board_battery_info[type];
+		retry_manuf = false;
+		hook_call_deferred(&battery_retry_data, -1);
 		return;
 	}
 
@@ -254,6 +284,8 @@ void init_battery_type(void)
 	/* Battery config isn't in CBI. */
 	BCFGPRT("Fall back to config_fw[%d]", dflt);
 	battery_conf = &board_battery_info[dflt];
+	retry_manuf = true;
+	hook_call_deferred(&battery_retry_data, 500 * MSEC);
 }
 DECLARE_HOOK(HOOK_INIT, init_battery_type, HOOK_PRIO_BATTERY_INIT);
 
