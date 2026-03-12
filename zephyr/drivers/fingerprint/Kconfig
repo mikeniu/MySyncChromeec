@@ -38,19 +38,6 @@ config FINGERPRINT_SENSOR_IMAGE_SIZE
 	  Otherwise it will be obtained from width, height and bits per pixel
 	  properties.
 
-config FINGERPRINT_SENSOR_IMAGE_OFFSET
-	int
-	default 400 if FINGERPRINT_SENSOR_FPC1025
-	default 2340 if FINGERPRINT_SENSOR_FPC1145
-	default 0 if FINGERPRINT_SENSOR_EGIS630
-	default 172 if FINGERPRINT_SENSOR_EGIS660
-	default 0 if FINGERPRINT_SENSOR_ELAN80SERIES
-	help
-	  This is an offset of the raw fingerprint image in the image data
-	  buffer.
-
-	  This option overrides the default offset (0).
-
 # zephyr-keep-sorted-start
 rsource "Kconfig.egis"
 rsource "Kconfig.elan"
