@@ -22,6 +22,30 @@
       },
       "revId": "d2b1a48b77892698a2b057dbba28c45c38c94385",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4d000d3_e1978fc7",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 3
+      },
+      "lineNbr": 435,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-12T17:41:06Z",
+      "side": 1,
+      "message": "Setting 3 is [`HCDEBUG_PARAMS`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/common/host_command_task.c;l\u003d43;drc\u003d224f30052cf1392c1e550b76b3914cce55285bf3) which is very noisy.  \n\n\nThe default `HCDEBUG_OFF` is fine.  Projects can enable this extra debug if desired.",
+      "parentUuid": "74b0a773_e5faf3c7",
+      "range": {
+        "startLine": 432,
+        "startChar": 0,
+        "endLine": 435,
+        "endChar": 28
+      },
+      "revId": "d2b1a48b77892698a2b057dbba28c45c38c94385",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
