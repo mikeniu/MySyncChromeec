@@ -22,6 +22,30 @@
       },
       "revId": "39e0c41284b92c4a3fbb6c1a314cfb65bfe67646",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b6c1f45_e5854b6d",
+        "filename": "common/extpower_common.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-03-12T05:09:29Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7e863765_7bef700e",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 1
+      },
+      "revId": "39e0c41284b92c4a3fbb6c1a314cfb65bfe67646",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
