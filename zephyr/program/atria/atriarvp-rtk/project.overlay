@@ -11,6 +11,7 @@
 #include "adc.dtsi"
 #include "gpio.dtsi"
 #include "i2c.dtsi"
+#include "keyboard.dtsi"
 #include "power_signals.dtsi"
 
 #include "../rvp_consolidated.dtsi"
@@ -19,9 +20,16 @@
 
 /* atriarvp-rtk overrides follow... */
 
+/ {
+	chosen {
+		cros-ec,keyboard = &kbd;
+	};
+};
+
 &it8801_mfd {
 	irq-gpios = <RTS5912_GPIO085 GPIO_ACTIVE_LOW>;
 };
+
 
 &cbi_flash {
 	offset = <0x7F000>;
@@ -47,6 +55,9 @@
 &pdc_ti_c2 {
 	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
 };
+
+/* There is no kblight on rtk the pwm pulse fails causing issues so disabling it */
+/delete-node/ &kblight;
 
 &ulpm {
 	status = "okay";
@@ -80,4 +91,3 @@ tach_fan0: &tach0 {};
         pinctrl-0 = <&pwm2_gpio025>;
         pinctrl-names = "default";
 };
-
