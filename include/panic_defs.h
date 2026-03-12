@@ -97,9 +97,44 @@ struct nds32_n8_panic_data {
 	uint32_t ipsw;
 };
 
+enum riscv_panic_registers {
+	RISCV_PANIC_REG_S11 = 0,
+	RISCV_PANIC_REG_S10,
+	RISCV_PANIC_REG_S9,
+	RISCV_PANIC_REG_S8,
+	RISCV_PANIC_REG_S7,
+	RISCV_PANIC_REG_S6,
+	RISCV_PANIC_REG_S5,
+	RISCV_PANIC_REG_S4,
+	RISCV_PANIC_REG_S3,
+	RISCV_PANIC_REG_S2,
+	RISCV_PANIC_REG_S1,
+	RISCV_PANIC_REG_S0,
+	RISCV_PANIC_REG_T6,
+	RISCV_PANIC_REG_T5,
+	RISCV_PANIC_REG_T4,
+	RISCV_PANIC_REG_T3,
+	RISCV_PANIC_REG_T2,
+	RISCV_PANIC_REG_T1,
+	RISCV_PANIC_REG_T0,
+	RISCV_PANIC_REG_A7,
+	RISCV_PANIC_REG_A6,
+	RISCV_PANIC_REG_A5,
+	RISCV_PANIC_REG_A4,
+	RISCV_PANIC_REG_A3,
+	RISCV_PANIC_REG_A2,
+	RISCV_PANIC_REG_A1,
+	RISCV_PANIC_REG_A0,
+	RISCV_PANIC_REG_TP,
+	RISCV_PANIC_REG_GP,
+	RISCV_PANIC_REG_RA,
+	RISCV_PANIC_REG_SP,
+};
+
 /* RISC-V RV32I registers saved on panic */
 struct rv32i_panic_data {
-	uint32_t regs[31]; /* sp, ra, gp, tp, a0-a7, t0-t6, s0-s11 */
+	/** See @ref riscv_panic_registers for information about registers */
+	uint32_t regs[31];
 	uint32_t mepc; /* mepc */
 	uint32_t mcause; /* mcause */
 };
