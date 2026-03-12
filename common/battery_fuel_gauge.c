@@ -204,7 +204,13 @@ void init_battery_type(void)
 						sizeof(batt_manuf_name));
 	}
 
-	if (ret) {
+	switch (ret) {
+	case EC_SUCCESS:
+		break;
+	case EC_ERROR_ACCESS_DENIED:
+		BCFGPRT("cutoff or in progress");
+		return;
+	default:
 		BCFGPRT("Manuf name not found");
 		battery_conf = &board_battery_info[dflt];
 		return;
