@@ -33,6 +33,10 @@ extern "C" {
 #include "battery_enum.h"
 #endif
 
+#ifdef CONFIG_PLATFORM_EC_SVDM_RSP_DFP_ONLY
+#define CONFIG_SVDM_RSP_DFP_ONLY
+#endif
+
 /*
  * This file translates Kconfig options to platform/ec options.
  *
