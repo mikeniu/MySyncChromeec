@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11beaa85_4d545962",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-12T20:54:50Z",
+      "side": 1,
+      "message": "Since we\u0027re changing the ABI, can you add a comment on why this is safe? (i.e., we haven\u0027t released any firmware with the `fp_image_frame_params` yet -- please double-check the release branches to make sure this is true)",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 42
+      },
+      "revId": "5559afca0c5edfa729ad1dd34dc2fdd0225392a7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00f6dc1a_c6dcf970",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 8604,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-12T20:54:50Z",
+      "side": 1,
+      "message": "Let\u0027s make the name more explicit so it\u0027s clear exactly what it is.\n\nTwo options:\n\n1. Change to `image_data_offset_bytes`.\n1. Change to `metadata_size_bytes` (i.e., the amount we need to skip to get to the image.)",
+      "range": {
+        "startLine": 8604,
+        "startChar": 18,
+        "endLine": 8604,
+        "endChar": 55
+      },
+      "revId": "5559afca0c5edfa729ad1dd34dc2fdd0225392a7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
