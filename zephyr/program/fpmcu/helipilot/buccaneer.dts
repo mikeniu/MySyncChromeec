@@ -14,7 +14,8 @@
 	height = <80>; \
 	bits-per-pixel = <14>; \
 	frame-size = <12800>; \
-	v4l2-pixel-format = "V4L2_PIX_FMT_GREY";
+    image-data-offset-bytes = <0>; \
+    v4l2-pixel-format = "V4L2_PIX_FMT_GREY";
 
 / {
 	chosen {
