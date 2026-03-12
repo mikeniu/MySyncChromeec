@@ -34,6 +34,24 @@
       "parentUuid": "5a373b2b_6e429136",
       "revId": "dcc7fa8c781f59823578921ebdcd1c44da394708",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53bd108f_b05b3e26",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-03-12T11:22:58Z",
+      "side": 1,
+      "message": "Test fail, more comment\nhttps://partnerissuetracker.corp.google.com/issues/486779549#comment20",
+      "parentUuid": "6cf5f7ac_42e24537",
+      "revId": "dcc7fa8c781f59823578921ebdcd1c44da394708",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
