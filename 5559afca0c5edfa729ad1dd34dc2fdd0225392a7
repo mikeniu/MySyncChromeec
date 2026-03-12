@@ -45,6 +45,30 @@
       },
       "revId": "5559afca0c5edfa729ad1dd34dc2fdd0225392a7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "175e460c_3393fb08",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 8604,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-12T20:56:21Z",
+      "side": 1,
+      "message": "I guess 1 is slightly more consistent with the other variables have in https://crrev.com/c/7663171.",
+      "parentUuid": "00f6dc1a_c6dcf970",
+      "range": {
+        "startLine": 8604,
+        "startChar": 18,
+        "endLine": 8604,
+        "endChar": 55
+      },
+      "revId": "5559afca0c5edfa729ad1dd34dc2fdd0225392a7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
