@@ -162,7 +162,7 @@ charger_current_battery_params(void)
 	return &batt;
 }
 
-int charge_get_display_charge(void)
+__attribute__((weak)) int charge_get_display_charge(void)
 {
 	const struct batt_params *batt = charger_current_battery_params();
 

@@ -1731,7 +1731,7 @@ uint32_t charge_get_led_flags(void)
 	return flags;
 }
 
-enum led_pwr_state led_pwr_get_state(void)
+__attribute__((weak)) enum led_pwr_state led_pwr_get_state(void)
 {
 	uint32_t chflags = charge_get_led_flags();
 

@@ -1,0 +1,24 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config PLATFORM_EC_CHARGE_EMUL
+	bool "Emulator charge module"
+	help
+	  Enables the emulator charge module, allowing
+	  the LED driver to use it for LED detection without the full charge manager.
+
+if PLATFORM_EC_CHARGE_EMUL
+
+config PLATFORM_EC_CHARGE_EMUL_CONSOLE_COMMAND
+	bool "Console command for charge emulator"
+	default n
+	help
+	  Enables the 'emul_charge' console command for manual control
+	  of the charge emulator.
+
+module = PLATFORM_EC_CHARGE_EMUL
+module-str = charge_emul
+source "subsys/logging/Kconfig.template.log_config"
+
+endif # PLATFORM_EC_CHARGE_EMUL
