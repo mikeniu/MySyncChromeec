@@ -343,6 +343,8 @@ void vboot_main(void)
 		}
 		/* LCOV_EXCL_STOP */
 
+		CPRINTS("KB enable");
+
 		/* We'll enter recovery mode immediately, later, or never. */
 		return;
 	}
