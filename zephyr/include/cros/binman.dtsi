@@ -4,6 +4,14 @@
  */
 
 / {
+	chosen {
+		cros-ec,cros-system = &cros_system;
+	};
+
+	cros_system: cros-system {
+		compatible = "cros-ec,cros-system";
+	};
+
 	#address-cells = <1>;
 	#size-cells = <1>;
 	binman: binman {

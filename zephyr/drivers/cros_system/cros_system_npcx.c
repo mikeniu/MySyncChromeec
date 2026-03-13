@@ -45,6 +45,8 @@ struct cros_system_npcx_data {
 #define HAL_TWD_INST(dev) (struct twd_reg *)(DRV_CONFIG(dev)->base_twd)
 #define HAL_MSWC_INST(dev) (struct mswc_reg *)(DRV_CONFIG(dev)->base_mswc)
 
+#define DT_DRV_COMPAT cros_ec_cros_system
+
 #define DRV_DATA(dev) ((struct cros_system_npcx_data *)(dev)->data)
 
 #define SYSTEM_DT_NODE_SOC_ID_CONFIG DT_INST(0, nuvoton_npcx_soc_id)
@@ -684,10 +686,15 @@ static DEVICE_API(cros_system, cros_system_driver_npcx_api) = {
 #endif
 };
 
-DEVICE_DEFINE(cros_system_npcx_0, "CROS_SYSTEM", cros_system_npcx_init, NULL,
-	      &cros_system_npcx_dev_data, &cros_system_dev_cfg, PRE_KERNEL_1,
-	      CONFIG_CROS_SYSTEM_NPCX_INIT_PRIORITY,
-	      &cros_system_driver_npcx_api);
+#define CROS_SYSTEM_NPCX_INIT(inst)                                            \
+	static struct cros_system_npcx_data cros_system_npcx_dev_data_##inst;  \
+	DEVICE_DT_INST_DEFINE(inst, cros_system_npcx_init, NULL,               \
+			      &cros_system_npcx_dev_data_##inst,               \
+			      &cros_system_dev_cfg, PRE_KERNEL_1,              \
+			      CONFIG_CROS_SYSTEM_NPCX_INIT_PRIORITY,           \
+			      &cros_system_driver_npcx_api);
+
+DT_INST_FOREACH_STATUS_OKAY(CROS_SYSTEM_NPCX_INIT)
 
 #if DT_NODE_EXISTS(DT_NODELABEL(dbg))
 #define HAL_DBG_REG_BASE_ADDR \
