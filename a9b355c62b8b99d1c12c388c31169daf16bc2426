@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34a326c2_d28770a4",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-03-13T02:54:34Z",
+      "side": 1,
+      "message": "Does this change have the same effect changing this to 500 and setting CONFIG_BATTERY_INIT_TYPE_RETRY_COUNT to a larger value?",
+      "range": {
+        "startLine": 230,
+        "startChar": 14,
+        "endLine": 230,
+        "endChar": 17
+      },
+      "revId": "a9b355c62b8b99d1c12c388c31169daf16bc2426",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
