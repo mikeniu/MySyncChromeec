@@ -75,28 +75,28 @@
  * The assignments must match include/panic_defs.h
  */
 #define PANIC_ARCH PANIC_ARCH_RISCV_RV32I
-#define PANIC_REG_LIST(M, M_GPR)  \
-	M(ra, riscv.regs[29], ra) \
-	M(a0, riscv.regs[26], a0) \
-	M(a1, riscv.regs[25], a1) \
-	M(a2, riscv.regs[24], a2) \
-	M(a3, riscv.regs[23], a3) \
-	M(a4, riscv.regs[22], a4) \
-	M(a5, riscv.regs[21], a5) \
-	M(a6, riscv.regs[20], a6) \
-	M(a7, riscv.regs[19], a7) \
-	M(t0, riscv.regs[18], t0) \
-	M(t1, riscv.regs[17], t1) \
-	M(t2, riscv.regs[16], t2) \
-	M(t3, riscv.regs[15], t3) \
-	M(t4, riscv.regs[14], t4) \
-	M(t5, riscv.regs[13], t5) \
-	M(t6, riscv.regs[12], t6) \
+#define PANIC_REG_LIST(M, M_GPR)                  \
+	M(ra, riscv.regs[RISCV_PANIC_REG_RA], ra) \
+	M(a0, riscv.regs[RISCV_PANIC_REG_A0], a0) \
+	M(a1, riscv.regs[RISCV_PANIC_REG_A1], a1) \
+	M(a2, riscv.regs[RISCV_PANIC_REG_A2], a2) \
+	M(a3, riscv.regs[RISCV_PANIC_REG_A3], a3) \
+	M(a4, riscv.regs[RISCV_PANIC_REG_A4], a4) \
+	M(a5, riscv.regs[RISCV_PANIC_REG_A5], a5) \
+	M(a6, riscv.regs[RISCV_PANIC_REG_A6], a6) \
+	M(a7, riscv.regs[RISCV_PANIC_REG_A7], a7) \
+	M(t0, riscv.regs[RISCV_PANIC_REG_T0], t0) \
+	M(t1, riscv.regs[RISCV_PANIC_REG_T1], t1) \
+	M(t2, riscv.regs[RISCV_PANIC_REG_T2], t2) \
+	M(t3, riscv.regs[RISCV_PANIC_REG_T3], t3) \
+	M(t4, riscv.regs[RISCV_PANIC_REG_T4], t4) \
+	M(t5, riscv.regs[RISCV_PANIC_REG_T5], t5) \
+	M(t6, riscv.regs[RISCV_PANIC_REG_T6], t6) \
 	M(mepc, riscv.mepc, mepc) \
 	M(mstatus, riscv.mcause, mstatus)
 #define PANIC_REG_EXCEPTION(pdata) (pdata->riscv.mcause)
-#define PANIC_REG_REASON(pdata) (pdata->riscv.regs[11])
-#define PANIC_REG_INFO(pdata) (pdata->riscv.regs[10])
+#define PANIC_REG_REASON(pdata) (pdata->riscv.regs[RISCV_PANIC_REG_S0])
+#define PANIC_REG_INFO(pdata) (pdata->riscv.regs[RISCV_PANIC_REG_S1])
 #elif defined(CONFIG_X86)
 #define PANIC_ARCH PANIC_ARCH_X86
 #define PANIC_REG_LIST(M, M_GPR) \
@@ -137,8 +137,8 @@ void panic_data_print(const struct panic_data *pdata)
 {
 	PANIC_REG_LIST(PANIC_PRINT_REGS, PANIC_PRINT_REGS);
 #if defined(CONFIG_RISCV) && !defined(CONFIG_64BIT)
-	PANIC_PRINT_REGS(NULL, riscv.regs[10], S1);
-	PANIC_PRINT_REGS(NULL, riscv.regs[11], S0);
+	PANIC_PRINT_REGS(NULL, riscv.regs[RISCV_PANIC_REG_S1], S1);
+	PANIC_PRINT_REGS(NULL, riscv.regs[RISCV_PANIC_REG_S0], S0);
 #endif
 }
 
