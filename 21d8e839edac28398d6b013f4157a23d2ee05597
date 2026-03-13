@@ -258,6 +258,30 @@
       },
       "revId": "21d8e839edac28398d6b013f4157a23d2ee05597",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "900e898f_37731978",
+        "filename": "zephyr/shim/include/fpsensor_driver.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-13T04:19:29Z",
+      "side": 1,
+      "message": "another option is to completely remove `CONFIG_FINGERPRINT_SENSOR_IMAGE_OFFSET` and have only this definition\n\n```\n#define FP_SENSOR_IMAGE_OFFSET IMAGE_OFFSET\n```",
+      "parentUuid": "b0d3fa08_d029ff36",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 65
+      },
+      "revId": "21d8e839edac28398d6b013f4157a23d2ee05597",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
