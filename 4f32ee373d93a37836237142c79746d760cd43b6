@@ -16,6 +16,24 @@
       "message": "I don\u0027t think it\u0027s a good idea to bypass CONFIG_BATTERY_INIT_TYPE_RETRY_COUNT. The extra retries need a separate config variable (but I can\u0027t think of a good name for it right now)",
       "revId": "4f32ee373d93a37836237142c79746d760cd43b6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97c9bdba_754872e9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-03-13T16:19:29Z",
+      "side": 1,
+      "message": "Perhaps we can find a different way to fix this issue.",
+      "parentUuid": "ad64519b_3edc60a1",
+      "revId": "4f32ee373d93a37836237142c79746d760cd43b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
