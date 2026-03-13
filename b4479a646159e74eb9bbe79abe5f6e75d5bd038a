@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e311dae5_b04f5072",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-13T23:43:24Z",
+      "side": 1,
+      "message": "Moving this directly into the EC repo.  This allows twister to build, flash, and run the tests.\n\nThis leverages that twister by default includes board/\u003cboard_name\u003e.overlay into the build.",
+      "revId": "b4479a646159e74eb9bbe79abe5f6e75d5bd038a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
