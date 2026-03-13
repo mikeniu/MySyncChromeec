@@ -88,6 +88,24 @@
       "parentUuid": "5c8055ef_4f895eca",
       "revId": "5fb4b3a55d05376e3324a2a49ff4812587a2111e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5da2917c_e6aa5663",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-13T23:28:27Z",
+      "side": 1,
+      "message": "Good idea. Here\u0027s a draft of that idea: https://crrev.com/c/7665621.",
+      "parentUuid": "ea78fbe4_82ae6db7",
+      "revId": "5fb4b3a55d05376e3324a2a49ff4812587a2111e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
