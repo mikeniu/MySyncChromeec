@@ -7,6 +7,7 @@
 
 / {
 	chosen {
+		cros-ec,cros-system = &rcc;
 		cros-ec,bbram = &bbram;
 		cros-ec,flash = &flash0;
 		cros-ec,flash-controller = &flash_controller;
