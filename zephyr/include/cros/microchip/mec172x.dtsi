@@ -9,6 +9,7 @@
 
 / {
 	chosen {
+		cros-ec,cros-system = &pcr;
 		cros-ec,adc = &adc0;
 		cros-ec,bbram = &bbram;
 		cros-ec,espi = &espi0;

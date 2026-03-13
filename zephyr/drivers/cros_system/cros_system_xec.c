@@ -68,6 +68,8 @@ struct cros_system_xec_data {
 };
 
 /* Driver convenience defines */
+#define DT_DRV_COMPAT microchip_xec_pcr
+
 #define DRV_CONFIG(dev) ((const struct cros_system_xec_config *)(dev)->config)
 #define DRV_DATA(dev) ((struct cros_system_xec_data *)(dev)->data)
 
@@ -608,8 +610,6 @@ static int cros_system_xec_hibernate(const struct device *dev, uint32_t seconds,
 	return 0;
 }
 
-static struct cros_system_xec_data cros_system_xec_dev_data;
-
 static const struct cros_system_xec_config cros_system_dev_cfg = {
 	.base_pcr = DT_REG_ADDR_BY_NAME(DT_INST(0, microchip_xec_pcr), pcrr),
 	.base_vbr = DT_REG_ADDR_BY_NAME(DT_INST(0, microchip_xec_pcr), vbatr),
@@ -625,7 +625,12 @@ static DEVICE_API(cros_system, cros_system_driver_xec_api) = {
 	.chip_revision = cros_system_xec_get_chip_revision,
 };
 
-DEVICE_DEFINE(cros_system_xec_0, "CROS_SYSTEM", cros_system_xec_init, NULL,
-	      &cros_system_xec_dev_data, &cros_system_dev_cfg, PRE_KERNEL_1,
-	      CONFIG_CROS_SYSTEM_XEC_INIT_PRIORITY,
-	      &cros_system_driver_xec_api);
+#define CROS_SYSTEM_XEC_INIT(inst)                                             \
+	static struct cros_system_xec_data cros_system_xec_dev_data_##inst;    \
+	DEVICE_DT_INST_DEFINE(inst, cros_system_xec_init, NULL,                 \
+			      &cros_system_xec_dev_data_##inst,                 \
+			      &cros_system_dev_cfg, PRE_KERNEL_1,               \
+			      CONFIG_CROS_SYSTEM_XEC_INIT_PRIORITY,             \
+			      &cros_system_driver_xec_api);
+
+DT_INST_FOREACH_STATUS_OKAY(CROS_SYSTEM_XEC_INIT)

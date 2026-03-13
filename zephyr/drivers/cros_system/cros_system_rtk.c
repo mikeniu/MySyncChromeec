@@ -32,6 +32,8 @@ LOG_MODULE_REGISTER(cros_system, LOG_LEVEL_ERR);
 
 #define BBRAM_KEY_VALUE 0xA5
 
+#define DT_DRV_COMPAT realtek_rts5912_sccon
+
 /* Driver data */
 struct cros_system_rtk_data {
 	int reset; /* reset cause */
@@ -296,9 +298,12 @@ static const struct cros_system_driver_api cros_system_driver_rtk_api = {
 #error "CROS_SYSTEM must initialize before the SYSTEM_PRE initialization"
 #endif
 
-static struct cros_system_rtk_data cros_system_rtk_data_0;
+#define CROS_SYSTEM_RTK_INIT(inst)                                            \
+	static struct cros_system_rtk_data cros_system_rtk_dev_data_##inst;  \
+	DEVICE_DT_INST_DEFINE(inst, cros_system_rtk_init, NULL,               \
+			      &cros_system_rtk_dev_data_##inst, NULL,         \
+			      PRE_KERNEL_1,                                    \
+			      CONFIG_CROS_SYSTEM_REALTEK_INIT_PRIORITY,        \
+			      &cros_system_driver_rtk_api);
 
-DEVICE_DEFINE(cros_system_rtk_0, "CROS_SYSTEM", cros_system_rtk_init, NULL,
-	      &cros_system_rtk_data_0, NULL, PRE_KERNEL_1,
-	      CONFIG_CROS_SYSTEM_REALTEK_INIT_PRIORITY,
-	      &cros_system_driver_rtk_api);
+DT_INST_FOREACH_STATUS_OKAY(CROS_SYSTEM_RTK_INIT)
