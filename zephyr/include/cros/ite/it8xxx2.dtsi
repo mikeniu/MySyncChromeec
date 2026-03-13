@@ -7,6 +7,7 @@
 
 / {
 	chosen {
+		cros-ec,cros-system = &gctrl;
 		cros-ec,bbram = &bbram;
 		cros-ec,cec-counter = &counter0;
 		cros-ec,espi = &espi0;

@@ -15,6 +15,8 @@ struct cros_system_ft_data {
 	int reset; /* reset cause */
 };
 
+#define DT_DRV_COMPAT ft_ft90_rst
+
 #define DRV_DATA(dev) ((struct cros_system_ft_data *)(dev)->data)
 
 #if !DT_NODE_EXISTS(DT_NODELABEL(rst))
@@ -87,8 +89,6 @@ static int cros_system_ft_init(const struct device *dev)
 	return 0;
 }
 
-static struct cros_system_ft_data cros_system_ft_dev_data;
-
 static DEVICE_API(cros_system, cros_system_driver_ft_api) = {
 	.get_reset_cause = cros_system_ft_get_reset_cause,
 	.soc_reset = cros_system_ft_soc_reset,
@@ -97,10 +97,15 @@ static DEVICE_API(cros_system, cros_system_driver_ft_api) = {
 	.chip_revision = cros_system_ft_get_chip_revision,
 };
 
-DEVICE_DEFINE(cros_system_ft_0, "CROS_SYSTEM", cros_system_ft_init, NULL,
-	      &cros_system_ft_dev_data, NULL, PRE_KERNEL_1,
-	      CONFIG_CROS_SYSTEM_FT90_INIT_PRIORITY,
-	      &cros_system_driver_ft_api);
+#define CROS_SYSTEM_FT_INIT(inst)                                              \
+	static struct cros_system_ft_data cros_system_ft_dev_data_##inst;      \
+	DEVICE_DT_INST_DEFINE(inst, cros_system_ft_init, NULL,                 \
+			      &cros_system_ft_dev_data_##inst, NULL,           \
+			      PRE_KERNEL_1,                                    \
+			      CONFIG_CROS_SYSTEM_FT90_INIT_PRIORITY,           \
+			      &cros_system_driver_ft_api);
+
+DT_INST_FOREACH_STATUS_OKAY(CROS_SYSTEM_FT_INIT)
 
 #if CONFIG_CROS_SYSTEM_FT90_INIT_PRIORITY >= \
 	CONFIG_PLATFORM_EC_SYSTEM_PRE_INIT_PRIORITY
