@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-#define DT_DRV_COMPAT ite_it8xxx2_gctrl
+#define DT_DRV_COMPAT cros_ec_cros_system
 
 #include "drivers/cros_system.h"
 #include "gpio/gpio_int.h"
@@ -395,7 +395,11 @@ static DEVICE_API(cros_system, cros_system_driver_it8xxx2_api) = {
 	CONFIG_PLATFORM_EC_SYSTEM_PRE_INIT_PRIORITY
 #error "CROS_SYSTEM must initialize before the SYSTEM_PRE initialization"
 #endif
-DEVICE_DEFINE(cros_system_it8xxx2_0, "CROS_SYSTEM", cros_system_it8xxx2_init,
-	      NULL, NULL, NULL, PRE_KERNEL_1,
-	      CONFIG_CROS_SYSTEM_IT8XXX2_INIT_PRIORITY,
-	      &cros_system_driver_it8xxx2_api);
+
+#define CROS_SYSTEM_IT8XXX2_INIT(inst)                                         \
+	DEVICE_DT_INST_DEFINE(inst, cros_system_it8xxx2_init, NULL,            \
+			      NULL, NULL, PRE_KERNEL_1,                        \
+			      CONFIG_CROS_SYSTEM_IT8XXX2_INIT_PRIORITY,        \
+			      &cros_system_driver_it8xxx2_api);
+
+DT_INST_FOREACH_STATUS_OKAY(CROS_SYSTEM_IT8XXX2_INIT)
