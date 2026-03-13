@@ -3,6 +3,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8d57c1a5_9842b2cc",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 63
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-13T10:09:40Z",
+      "side": 1,
+      "message": "Are you sure 300us is enough?",
+      "revId": "2a2d8b23f02d8f955ef25b95198be92e920141b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b240624_4987da55",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 63
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-13T10:09:40Z",
+      "side": 1,
+      "message": "You can actually check\n```\nif (IS_ENABLED(CONFIG_HAVE_FT98XX_PRIVATE_DRIVER)) {\n```\nonce at the beginning of the function.",
+      "revId": "2a2d8b23f02d8f955ef25b95198be92e920141b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5b88e383_ffd04c3b",
         "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
         "patchSetId": 63
@@ -20,6 +54,64 @@
         "endLine": 135,
         "endChar": 17
       },
+      "revId": "2a2d8b23f02d8f955ef25b95198be92e920141b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1d2a9d8_7e41aaf9",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 63
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-13T10:09:40Z",
+      "side": 1,
+      "message": "I think current implementation is fine. Other vendors doesn\u0027t have to call a function from private library to set the `FINGERPRINT_SENSOR_MODE_IDLE`. In your case, you need to call `ft_sensor_set_mode`, so returning `-ENOTSUP` in case of missing private lib sounds fine. Please make sure to adjust tests to this logic if needed.",
+      "parentUuid": "5b88e383_ffd04c3b",
+      "range": {
+        "startLine": 135,
+        "startChar": 3,
+        "endLine": 135,
+        "endChar": 17
+      },
+      "revId": "2a2d8b23f02d8f955ef25b95198be92e920141b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86e8abc9_c2bca921",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 63
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-13T10:09:40Z",
+      "side": 1,
+      "message": "Typo: \"attempt\"",
+      "revId": "2a2d8b23f02d8f955ef25b95198be92e920141b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f765fdc8_140a83ab",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 63
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-13T10:09:40Z",
+      "side": 1,
+      "message": "If `ft98xx_pulse_hw_reset` fails, the `ft98xx_init` and can return success eventually. Do you think it is a good logic?",
       "revId": "2a2d8b23f02d8f955ef25b95198be92e920141b7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
