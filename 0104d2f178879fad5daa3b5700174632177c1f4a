@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ab1c694_73c9d8e6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-13T18:45:14Z",
+      "side": 1,
+      "message": "Should this be earlier in the chain? What happens if you flash an image without this?",
+      "revId": "0104d2f178879fad5daa3b5700174632177c1f4a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
