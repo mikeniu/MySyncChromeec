@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b88e383_ffd04c3b",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 63
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-13T01:29:02Z",
+      "side": 1,
+      "message": "@dawidn@google.com I noticed other venders just disbale irq at the case of FINGERPRINT_SENSOR_MODE_IDLE, so do we need just disbale irq if the CONFIG_HAVE_FT98XX_PRIVATE_DRIVER is not enabled, but not return -ENOTSUP?",
+      "range": {
+        "startLine": 135,
+        "startChar": 3,
+        "endLine": 135,
+        "endChar": 17
+      },
+      "revId": "2a2d8b23f02d8f955ef25b95198be92e920141b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
