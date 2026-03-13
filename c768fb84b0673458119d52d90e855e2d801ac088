@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7b88e559_caee6e67",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-13T02:51:25Z",
+      "side": 1,
+      "message": "I see, I\u0027ll keep raw bank protect function in library and move region protect function from library to driver source code on next update.",
+      "parentUuid": "1bf01d13_a9bcf784",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "627f5544_afc66b96",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
         "patchSetId": 7
@@ -126,6 +144,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0a558357_173d7568",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-13T02:51:25Z",
+      "side": 1,
+      "message": "I agree that the protected range is currently hardcoded in the CrOS flash driver. However, the protection logic is implemented in the library rather than the driver. That’s why I think we should pass the protected range as parameters. What do you think?",
+      "parentUuid": "6540e184_040f593b",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "264c1b63_888aadf5",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
         "patchSetId": 7
@@ -155,6 +191,24 @@
       "side": 1,
       "message": "Thanks for the reference and the clarification.\nI’ll review the details more carefully and follow up with the appropriate updates.\nAppreciate your guidance!",
       "parentUuid": "264c1b63_888aadf5",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49c579d9_b59cde0f",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-13T02:51:25Z",
+      "side": 1,
+      "message": "We are not checking protection by testing write behavior.\nOur implementation reads the hardware Protect Area configuration registers and determines protection based on the configured start address, size, and enable bit.\nFor reference, this is the register format we use:\n```\ntypedef union\n{\n    struct\n    {\n      __IO uint32_t STARTADDR : 20;\n      __IO uint32_t Reserved  : 4;\n      __IO uint32_t PAGES     : 7;\n      __IO uint32_t ENABLEN   : 1;\n    }Protect_S;\n        __IO uint32_t Protect;\n}Protect_U_t;\n```\nSo the logic is based on configured protection state, similar in spirit to how the reference driver checks SRP/WPS bits—but in our case the protection mechanism is implemented inside the MCU through these Protect Area registers. Does this make sense to you?",
+      "parentUuid": "fd3a0560_6fbf5f22",
       "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
