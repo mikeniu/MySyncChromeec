@@ -395,7 +395,7 @@ static DEVICE_API(cros_system, cros_system_driver_it8xxx2_api) = {
 	CONFIG_PLATFORM_EC_SYSTEM_PRE_INIT_PRIORITY
 #error "CROS_SYSTEM must initialize before the SYSTEM_PRE initialization"
 #endif
-DEVICE_DEFINE(cros_system_it8xxx2_0, "CROS_SYSTEM", cros_system_it8xxx2_init,
+DEVICE_DEFINE(cros_system, "CROS_SYSTEM", cros_system_it8xxx2_init,
 	      NULL, NULL, NULL, PRE_KERNEL_1,
 	      CONFIG_CROS_SYSTEM_IT8XXX2_INIT_PRIORITY,
 	      &cros_system_driver_it8xxx2_api);

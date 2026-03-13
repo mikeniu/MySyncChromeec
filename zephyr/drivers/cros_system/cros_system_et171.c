@@ -115,7 +115,7 @@ static DEVICE_API(cros_system, cros_system_driver_et171_api) = {
 #endif
 };
 
-DEVICE_DEFINE(cros_system_et171_0, "CROS_SYSTEM", cros_system_et171_init, NULL,
+DEVICE_DEFINE(cros_system, "CROS_SYSTEM", cros_system_et171_init, NULL,
 	      &cros_system_et171_dev_data, NULL, PRE_KERNEL_1,
 	      CONFIG_CROS_SYSTEM_ET171_INIT_PRIORITY,
 	      &cros_system_driver_et171_api);

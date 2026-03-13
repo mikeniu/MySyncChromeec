@@ -684,7 +684,7 @@ static DEVICE_API(cros_system, cros_system_driver_npcx_api) = {
 #endif
 };
 
-DEVICE_DEFINE(cros_system_npcx_0, "CROS_SYSTEM", cros_system_npcx_init, NULL,
+DEVICE_DEFINE(cros_system, "CROS_SYSTEM", cros_system_npcx_init, NULL,
 	      &cros_system_npcx_dev_data, &cros_system_dev_cfg, PRE_KERNEL_1,
 	      CONFIG_CROS_SYSTEM_NPCX_INIT_PRIORITY,
 	      &cros_system_driver_npcx_api);

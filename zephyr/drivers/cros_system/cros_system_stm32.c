@@ -140,7 +140,7 @@ static DEVICE_API(cros_system, cros_system_driver_stm32_api) = {
 #endif
 };
 
-DEVICE_DEFINE(cros_system_stm32_0, "CROS_SYSTEM", cros_system_stm32_init, NULL,
+DEVICE_DEFINE(cros_system, "CROS_SYSTEM", cros_system_stm32_init, NULL,
 	      &cros_system_stm32_dev_data, NULL, PRE_KERNEL_1,
 	      CONFIG_CROS_SYSTEM_STM32_INIT_PRIORITY,
 	      &cros_system_driver_stm32_api);

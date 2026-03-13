@@ -108,7 +108,7 @@ cros_system_driver_api cros_system_driver_native_posix_api = {
 };
 /* clang-format on */
 
-DEVICE_DEFINE(cros_system_native_posix_0, "CROS_SYSTEM",
+DEVICE_DEFINE(cros_system, "CROS_SYSTEM",
 	      cros_system_native_posix_init, NULL,
 	      &cros_system_native_posix_dev_data, &cros_system_dev_cfg,
 	      PRE_KERNEL_1, CONFIG_CROS_SYSTEM_NATIVE_POSIX_INIT_PRIORITY,

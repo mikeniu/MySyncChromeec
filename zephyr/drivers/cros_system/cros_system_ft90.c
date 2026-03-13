@@ -97,7 +97,7 @@ static DEVICE_API(cros_system, cros_system_driver_ft_api) = {
 	.chip_revision = cros_system_ft_get_chip_revision,
 };
 
-DEVICE_DEFINE(cros_system_ft_0, "CROS_SYSTEM", cros_system_ft_init, NULL,
+DEVICE_DEFINE(cros_system, "CROS_SYSTEM", cros_system_ft_init, NULL,
 	      &cros_system_ft_dev_data, NULL, PRE_KERNEL_1,
 	      CONFIG_CROS_SYSTEM_FT90_INIT_PRIORITY,
 	      &cros_system_driver_ft_api);

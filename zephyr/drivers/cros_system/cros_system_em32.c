@@ -250,7 +250,7 @@ static DEVICE_API(cros_system, cros_system_driver_em32_api) = {
 
 static struct cros_system_em32_data cros_system_em32_dev_data;
 
-DEVICE_DEFINE(cros_system_em32_0, "CROS_SYSTEM", cros_system_em32_init, NULL,
+DEVICE_DEFINE(cros_system, "CROS_SYSTEM", cros_system_em32_init, NULL,
 	      &cros_system_em32_dev_data, NULL, PRE_KERNEL_1,
 	      CONFIG_CROS_SYSTEM_EM32_INIT_PRIORITY,
 	      &cros_system_driver_em32_api);

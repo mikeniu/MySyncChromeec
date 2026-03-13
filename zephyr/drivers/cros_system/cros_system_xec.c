@@ -625,7 +625,7 @@ static DEVICE_API(cros_system, cros_system_driver_xec_api) = {
 	.chip_revision = cros_system_xec_get_chip_revision,
 };
 
-DEVICE_DEFINE(cros_system_xec_0, "CROS_SYSTEM", cros_system_xec_init, NULL,
+DEVICE_DEFINE(cros_system, "CROS_SYSTEM", cros_system_xec_init, NULL,
 	      &cros_system_xec_dev_data, &cros_system_dev_cfg, PRE_KERNEL_1,
 	      CONFIG_CROS_SYSTEM_XEC_INIT_PRIORITY,
 	      &cros_system_driver_xec_api);

@@ -298,7 +298,7 @@ static const struct cros_system_driver_api cros_system_driver_rtk_api = {
 
 static struct cros_system_rtk_data cros_system_rtk_data_0;
 
-DEVICE_DEFINE(cros_system_rtk_0, "CROS_SYSTEM", cros_system_rtk_init, NULL,
+DEVICE_DEFINE(cros_system, "CROS_SYSTEM", cros_system_rtk_init, NULL,
 	      &cros_system_rtk_data_0, NULL, PRE_KERNEL_1,
 	      CONFIG_CROS_SYSTEM_REALTEK_INIT_PRIORITY,
 	      &cros_system_driver_rtk_api);
