@@ -23,6 +23,11 @@
 		zephyr,host-cmd-uart-backend = &uart2;
 		zephyr,shell-uart = &uart1;
 		cros,rtc = &mtc;
+		cros-ec,cros-system = &cros_system;
+	};
+
+	cros_system: cros-system {
+		compatible = "cros-ec,cros-system";
 	};
 
 	binman {

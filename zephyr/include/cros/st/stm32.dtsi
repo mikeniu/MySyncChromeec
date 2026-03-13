@@ -11,7 +11,12 @@
 		cros-ec,flash = &flash0;
 		cros-ec,flash-controller = &flash_controller;
 		cros-ec,watchdog = &iwdg;
+		cros-ec,cros-system = &cros_system;
 		cros-ec,watchdog-helper = &wdg_helper;
+	};
+
+	cros_system: cros-system {
+		compatible = "cros-ec,cros-system";
 	};
 
 	soc {

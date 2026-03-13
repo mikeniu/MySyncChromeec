@@ -10,6 +10,11 @@
 	chosen {
 		zephyr,host-cmd-spi-backend = &spi0;
 		zephyr,host-cmd-uart-backend = &euart0;
+		cros-ec,cros-system = &cros_system;
+	};
+
+	cros_system: cros-system {
+		compatible = "cros-ec,cros-system";
 	};
 
 	/* GPIOs shared by all boards */

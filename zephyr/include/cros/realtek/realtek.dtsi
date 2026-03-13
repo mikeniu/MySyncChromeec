@@ -14,7 +14,12 @@
 		cros-ec,watchdog = &wdog;
 		cros-ec,watchdog-helper = &wdt_counter;
 		cros-ec,sha= &sha0;
+		cros-ec,cros-system = &cros_system;
     };
+
+	cros_system: cros-system {
+		compatible = "cros-ec,cros-system";
+	};
 
 	soc {
 		fiu0: cros-flash {

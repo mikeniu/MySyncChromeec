@@ -16,7 +16,12 @@
 		cros-ec,flash-controller = &fiu0;
 		cros-ec,raw-kb = &cros_kb_raw;
 		cros-ec,watchdog = &wdog;
+		cros-ec,cros-system = &cros_system;
 		cros,rtc = &crtc;
+	};
+
+	cros_system: cros-system {
+		compatible = "cros-ec,cros-system";
 	};
 
 	named-bbram-regions {

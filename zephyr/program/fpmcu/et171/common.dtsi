@@ -19,6 +19,11 @@
 		zephyr,flash = &p25q16;
 		zephyr,flash-controller = &p25q16;
 		flash-header = &flash_header;
+		cros-ec,cros-system = &cros_system;
+	};
+
+	cros_system: cros-system {
+		compatible = "cros-ec,cros-system";
 	};
 
 	named-bbram-regions {

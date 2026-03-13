@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-#define DT_DRV_COMPAT st_stm32_rcc
+#define DT_DRV_COMPAT cros_ec_cros_system
 
 #include "drivers/cros_system.h"
 #include "system.h"
@@ -127,8 +127,6 @@ static int cros_system_stm32_init(const struct device *dev)
 	return 0;
 }
 
-static struct cros_system_stm32_data cros_system_stm32_dev_data;
-
 static DEVICE_API(cros_system, cros_system_driver_stm32_api) = {
 	.get_reset_cause = cros_system_stm32_get_reset_cause,
 	.soc_reset = cros_system_stm32_soc_reset,
@@ -140,12 +138,17 @@ static DEVICE_API(cros_system, cros_system_driver_stm32_api) = {
 #endif
 };
 
-DEVICE_DEFINE(cros_system, "CROS_SYSTEM", cros_system_stm32_init, NULL,
-	      &cros_system_stm32_dev_data, NULL, PRE_KERNEL_1,
-	      CONFIG_CROS_SYSTEM_STM32_INIT_PRIORITY,
-	      &cros_system_driver_stm32_api);
-
 #if CONFIG_CROS_SYSTEM_STM32_INIT_PRIORITY >= \
 	CONFIG_PLATFORM_EC_SYSTEM_PRE_INIT_PRIORITY
 #error "CROS_SYSTEM must initialize before the SYSTEM_PRE initialization"
 #endif
+
+#define CROS_SYSTEM_STM32_INIT(inst)                                           \
+	static struct cros_system_stm32_data cros_system_stm32_dev_data_##inst; \
+	DEVICE_DT_INST_DEFINE(inst, cros_system_stm32_init, NULL,              \
+			      &cros_system_stm32_dev_data_##inst, NULL,        \
+			      PRE_KERNEL_1,                                    \
+			      CONFIG_CROS_SYSTEM_STM32_INIT_PRIORITY,          \
+			      &cros_system_driver_stm32_api);
+
+DT_INST_FOREACH_STATUS_OKAY(CROS_SYSTEM_STM32_INIT)
