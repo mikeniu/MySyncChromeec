@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "battery_fuel_gauge.h"
 #include "charger.h"
 #include "gpio.h"
 #include "gpio/gpio_int.h"
@@ -19,6 +20,11 @@
 #endif
 
 #include <zephyr/logging/log.h>
+
+#define BATTERY_RETRY_INTERVAL (500 * USEC_PER_MSEC)
+
+#define BATTERY_MAX_RETRY 18
+static int manuf_retry_count = 0;
 
 LOG_MODULE_REGISTER(skywalker_hook, LOG_LEVEL_INF);
 
@@ -88,3 +94,24 @@ void null_watchdog_interrupt(enum gpio_signal signal)
 {
 	LOG_INF("watchdog interrupt");
 }
+
+static void battery_type_retry(void);
+DECLARE_DEFERRED(battery_type_retry);
+
+static void battery_type_retry(void)
+{
+	LOG_INF("battery type retry %d", manuf_retry_count);
+	if (!battery_manuf_name_read_success())
+		init_battery_type();
+
+	if (!battery_manuf_name_read_success() &&
+	    manuf_retry_count++ < BATTERY_MAX_RETRY)
+		hook_call_deferred(&battery_type_retry_data,
+				   BATTERY_RETRY_INTERVAL);
+}
+
+void battery_type_check_init(void)
+{
+	hook_call_deferred(&battery_type_retry_data, USEC_PER_SEC);
+}
+DECLARE_HOOK(HOOK_INIT, battery_type_check_init, HOOK_PRIO_PRE_DEFAULT);
