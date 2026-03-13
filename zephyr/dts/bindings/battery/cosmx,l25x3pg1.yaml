@@ -20,7 +20,7 @@ properties:
   ship_mode_reg_addr:
     default: 0x34
   ship_mode_reg_data:
-    default: [0x0000, 0x1000]
+    default: [0x0010, 0x0010]
   flags:
     default: 0
   fet_reg_addr:
