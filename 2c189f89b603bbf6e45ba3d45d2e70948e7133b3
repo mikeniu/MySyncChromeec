@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9602e22_6a3b294f",
+        "filename": "zephyr/program/fatcat/lapis/src/battery.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-03-13T17:14:25Z",
+      "side": 1,
+      "message": "If the read is successful, then won\u0027t this function return BP_YES independent of the value of bit 12. Should the bit 12 check be made here?",
+      "range": {
+        "startLine": 25,
+        "startChar": 4,
+        "endLine": 25,
+        "endChar": 17
+      },
+      "revId": "2c189f89b603bbf6e45ba3d45d2e70948e7133b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
