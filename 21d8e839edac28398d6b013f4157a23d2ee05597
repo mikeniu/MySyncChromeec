@@ -282,6 +282,30 @@
       },
       "revId": "21d8e839edac28398d6b013f4157a23d2ee05597",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1973e03_85b9c0ea",
+        "filename": "zephyr/shim/include/fpsensor_driver.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-16T23:41:53Z",
+      "side": 1,
+      "message": "\u003e another option is to completely remove CONFIG_FINGERPRINT_SENSOR_IMAGE_OFFSET\n\nYes, I think it makes sense to completely remove if we\u0027re not going to use Kconfig for it anymore. You can do it in a followup CL if you want.",
+      "parentUuid": "900e898f_37731978",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 65
+      },
+      "revId": "21d8e839edac28398d6b013f4157a23d2ee05597",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
