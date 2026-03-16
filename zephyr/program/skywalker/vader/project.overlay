@@ -201,6 +201,9 @@
 		gpio_ccd_mode_l: ccd_mode_l {
 			gpios = <&gpioe 5 (GPIO_INPUT)>;
 		};
+		gpio_ec_ts_pwr_en: ec_ts_pwr_en {
+			gpios = <&gpioe 4 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
+		};
 	};
 
 	unused-pins {
@@ -214,8 +217,7 @@
 			<&gpioc 3 0>,
 			<&gpiod 5 0>,
 			<&gpiod 7 0>,
-			<&gpioe 2 0>,
-			<&gpioe 4 0>;
+			<&gpioe 2 0>;
 	};
 };
 

@@ -8,3 +8,4 @@ zephyr_library_sources_ifdef(
 zephyr_include_directories("include")
 zephyr_library_sources("src/sensor.c")
 zephyr_library_sources("src/touch_pad.c")
+zephyr_library_sources("src/backlight.c")
