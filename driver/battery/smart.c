@@ -617,6 +617,7 @@ int battery_wait_for_stable(void)
 	while (get_time().val < wait_timeout) {
 		/* Starting pinging battery */
 		if (battery_status(&status) != EC_SUCCESS) {
+			CPRINTS("battery_status fails");
 			crec_msleep(25); /* clock stretching could hold 25ms */
 			continue;
 		}
