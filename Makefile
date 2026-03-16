@@ -504,8 +504,14 @@ rw-deps := $(addsuffix .d, $(rw-objs))
 deps := $(ro-deps) $(rw-deps) $(deps-y)
 
 .PHONY: ro rw
+# The $(_task_cfg) and $(_flag_cfg) variables contain the configs that are
+# common to both the RO and RW images.
+#
+# The firmware packer expects that the .config file contains all the configs
+# for the RW image, so include the common and RW specific configs in the output.
 $(config): $(out)/$(PROJECT).bin
-	@printf '%s=y\n' $(_tsk_cfg) $(_flag_cfg) > $@
+	@printf '%s=y\n' $(_tsk_cfg) $(_tsk_cfg_rw) \
+		$(_flag_cfg) $(_flag_cfg_rw) > $@
 
 def_all_deps:=$(config) $(PROJECT_EXTRA) notice rw size utils
 ifeq ($(CONFIG_FW_INCLUDE_RO),y)
