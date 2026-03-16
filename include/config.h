@@ -557,6 +557,11 @@
 #define CONFIG_BATTERY_INIT_TYPE_RETRY_COUNT 0
 
 /*
+ * Retry count when reading the battery manufacturer name.
+ */
+#define CONFIG_BATTERY_MANUF_NAME_READ_RETRY_COUNT 10
+
+/*
  * Critical battery shutdown timeout (seconds)
  *
  * If the battery is at extremely low charge (and discharging) or extremely
