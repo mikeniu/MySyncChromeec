@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d1e2e09c_75a313a2",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 63
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-16T06:03:39Z",
+      "side": 1,
+      "message": "After pull down and pull up the sensor reset pin, the irq line will have pulse occurs cyclically, every pulse width is about 1ms, and the time between pulses about 50ms, and the first pulse occurs behind the reset about 2us, so 300us would be enough for the first pulse, maybe we need more attempt times, how do you think?",
+      "parentUuid": "8d57c1a5_9842b2cc",
+      "revId": "2a2d8b23f02d8f955ef25b95198be92e920141b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7b240624_4987da55",
         "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
         "patchSetId": 63
