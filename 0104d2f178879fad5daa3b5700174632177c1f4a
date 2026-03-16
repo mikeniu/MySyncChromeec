@@ -16,6 +16,24 @@
       "message": "Should this be earlier in the chain? What happens if you flash an image without this?",
       "revId": "0104d2f178879fad5daa3b5700174632177c1f4a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fb4bda7_3b4cb597",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-16T15:14:24Z",
+      "side": 1,
+      "message": "As far as I can tell there are no issues. I haven\u0027t looked deeply into the RTK flash script but I think its reading the flash map to  preserve CBI not expecting it to be in a certain area",
+      "parentUuid": "6ab1c694_73c9d8e6",
+      "revId": "0104d2f178879fad5daa3b5700174632177c1f4a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
