@@ -630,6 +630,7 @@ static int is_battery_critical(void)
 	if (battery_too_low() && !curr.batt_is_charging) {
 		CPRINTS("Low battery: %d%%, %dmV", curr.batt.state_of_charge,
 			curr.batt.voltage);
+		// return 0;
 		return 1;
 	}
 
