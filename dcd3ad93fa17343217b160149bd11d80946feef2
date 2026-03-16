@@ -217,6 +217,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f6380b00_0d710982",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 60
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-16T05:42:26Z",
+      "side": 1,
+      "message": "The pull up/down function of irq pin did not work, so I fixed it.",
+      "parentUuid": "f3a44128_d4faeb0d",
+      "revId": "dcd3ad93fa17343217b160149bd11d80946feef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6031409a_17c3c1a1",
         "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
         "patchSetId": 60
