@@ -965,7 +965,11 @@ static uint32_t check_boot_key(const uint8_t *state)
 	 * we don't want to accidentally enter recovery mode even if a refresh
 	 * key or whatever key is pressed (as previously allowed).
 	 */
-	if ((system_get_reset_flags() & EC_RESET_FLAG_RESET_PIN))
+	uint32_t system_get_reset_flags2 = system_get_reset_flags();
+	enum battery_present bp = battery_is_present();
+	CPRINTS("system_get_reset_flags(): 0x%08x, bp: 0x%08x",
+		system_get_reset_flags2, bp);
+	if ((system_get_reset_flags2 & EC_RESET_FLAG_RESET_PIN))
 		return check_key_list(state);
 
 #ifdef CONFIG_BATTERY
@@ -974,8 +978,7 @@ static uint32_t check_boot_key(const uint8_t *state)
 	 * Fixed an issue where recovery mode cannot be entered in AC-only
 	 * state.
 	 */
-	if ((system_get_reset_flags() & EC_RESET_FLAG_POWER_ON) &&
-	    battery_is_present() == BP_NO)
+	if ((system_get_reset_flags2 & EC_RESET_FLAG_POWER_ON) && bp != BP_YES)
 		return check_key_list(state);
 #endif
 
