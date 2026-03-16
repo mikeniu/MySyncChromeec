@@ -3,14 +3,21 @@
  * found in the LICENSE file.
  */
 
+#include "battery.h"
+#include "battery_smart.h"
+#include "charge_state.h"
 #include "chipset.h"
+#include "gpio.h"
 #include "gpio/gpio_int.h"
 #include "hooks.h"
 #include "timer.h"
 
 #include <zephyr/drivers/gpio.h>
+#include <zephyr/logging/log.h>
 
 #include <ap_power/ap_power.h>
+
+LOG_MODULE_REGISTER(board_init, LOG_LEVEL_INF);
 
 #define INT_RECHECK_US 5000
 
@@ -78,3 +85,68 @@ static void board_setup_init()
 	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_jd1));
 }
 DECLARE_HOOK(HOOK_INIT, board_setup_init, HOOK_PRIO_PRE_DEFAULT);
+
+// #ifndef CONFIG_BATTERY_PRESENT_GPIO
+// static enum battery_present battery_is_present_gpio(void)
+// {
+// 	/* The GPIO is low when the battery is present */
+// 	return gpio_get_level(GPIO_BATT_PRES_ODL) ? BP_NO : BP_YES;
+// }
+// static enum battery_present battery_is_present_smart(int *perf, size_t pn)
+// {
+// 	int manufacture_date;
+
+// 	for (size_t i = 0; i + 1 < pn; ++i) {
+// 		if (sb_read(SB_MANUFACTURE_DATE, &manufacture_date) == 0) {
+// 			perf[i]++;
+// 			return BP_YES;
+// 		}
+// 		if (i + 1 != pn - 1) {
+// 			k_busy_wait(1 * USEC_PER_MSEC);
+// 		}
+// 	}
+
+// 	perf[pn - 1]++;
+// 	return BP_NOT_SURE;
+// }
+// enum battery_present battery_is_present(void)
+// {
+// 	static const char *const batt_pres[] = {
+// 		"NO",
+// 		"YES",
+// 		"NOT_SURE",
+// 	};
+// 	static atomic_t a_number_of_mismatch = ATOMIC_INIT(0);
+// 	static atomic_t a_call_count = ATOMIC_INIT(0);
+// 	static atomic_t a_last_state = ATOMIC_INIT(false);
+// 	static int perf[2 + 1] = { 0 };
+
+// 	enum battery_present smart_result =
+// 		battery_is_present_smart(perf, ARRAY_SIZE(perf));
+// 	enum battery_present gpio_result = battery_is_present_gpio();
+// 	bool mismatch = smart_result != gpio_result;
+// 	bool last_state = atomic_set(&a_last_state, mismatch);
+// 	atomic_val_t number_of_mismatch =
+// 		atomic_add(&a_number_of_mismatch, mismatch) + mismatch;
+// 	atomic_val_t call_count = atomic_inc(&a_call_count) + 1;
+
+// 	if (call_count % 1024 == 0 || last_state != mismatch) {
+// 		LOG_INF("battery_is_present: called %ld times, "
+// 			"mismatch %ld times, smart=%s %s gpio=%s "
+// 			"===============================",
+// 			call_count, number_of_mismatch, batt_pres[smart_result],
+// 			mismatch ? "!=" : "==", batt_pres[gpio_result]);
+// 		for (int i = 0; i < ARRAY_SIZE(perf); ++i) {
+// 			LOG_INF("battery_is_present_smart perf[%d]=%8d", i,
+// 				perf[i]);
+// 		}
+// 	}
+// 	return smart_result;
+// }
+// #endif
+
+// enum critical_shutdown
+// board_critical_shutdown_check(struct charge_state_data *curr)
+// {
+// 	return CRITICAL_SHUTDOWN_IGNORE;
+// }
