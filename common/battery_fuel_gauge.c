@@ -18,6 +18,7 @@
 #define CPRINTS(format, args...) cprints(CC_CHARGER, format, ##args)
 #define BCFGPRT(format, args...) cprints(CC_CHARGER, "BCFG " format, ##args)
 
+#define BATTERY_MANUF_RETRY_INTERVAL (500 * MSEC)
 /*
  * Pointer to an active config. It's battery_conf_cache if a config is found
  * in CBI or board_battery_info[x] if a config is found in FW.
@@ -26,6 +27,8 @@ test_export_static const struct batt_conf_embed *battery_conf;
 
 static char batt_manuf_name[SBS_MAX_STR_OBJ_SIZE];
 static char batt_device_name[SBS_MAX_STR_OBJ_SIZE];
+
+static int manuf_retry_count = 0;
 
 /* Copies of config and strings of a matching battery found in CBI. */
 static struct batt_conf_embed battery_conf_cache = {
@@ -184,6 +187,7 @@ CONFIG_BATTERY_CONFIG_IN_CBI is enabled.
 #endif
 #endif
 
+DECLARE_DEFERRED(init_battery_type);
 void init_battery_type(void)
 {
 	int type;
@@ -207,6 +211,16 @@ void init_battery_type(void)
 	if (ret) {
 		BCFGPRT("Manuf name not found");
 		battery_conf = &board_battery_info[dflt];
+
+		if (manuf_retry_count <
+		    CONFIG_BATTERY_MANUF_NAME_READ_RETRY_COUNT) {
+			manuf_retry_count++;
+			BCFGPRT("Retry reading battery manuf name (%d/%d)",
+				manuf_retry_count,
+				CONFIG_BATTERY_MANUF_NAME_READ_RETRY_COUNT);
+			hook_call_deferred(&init_battery_type_data,
+					   BATTERY_MANUF_RETRY_INTERVAL);
+		}
 		return;
 	}
 
@@ -237,6 +251,8 @@ void init_battery_type(void)
 	if (type != BATTERY_TYPE_COUNT) {
 		BCFGPRT("Found config_fw[%d]", type);
 		battery_conf = &board_battery_info[type];
+		manuf_retry_count = 0;
+		hook_call_deferred(&init_battery_type_data, -1);
 		return;
 	}
 
