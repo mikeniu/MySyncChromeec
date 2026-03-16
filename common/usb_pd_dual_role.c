@@ -236,15 +236,14 @@ bool pd_is_battery_capable(void)
 	 * our only power source at the time.
 	 */
 	capable &= (battery_get_disconnect_state() == BATTERY_NOT_DISCONNECTED);
-#elif defined(CONFIG_BATTERY_PRESENT_CUSTOM) || \
-	defined(CONFIG_BATTERY_PRESENT_GPIO)
+#else
 	/*
 	 * When battery is cutoff in ship mode it may not be reliable to
 	 * check if battery is present with its state of charge.
 	 * Also check if battery is initialized and ready to provide power.
 	 */
 	capable &= (battery_is_present() == BP_YES);
-#endif /* CONFIG_BATTERY_PRESENT_[CUSTOM|GPIO] */
+#endif
 
 	return capable;
 }

@@ -219,6 +219,24 @@ void battery_override_params(struct batt_params *batt);
  * @return Whether there is a battery attached or not, or if we can't tell.
  */
 enum battery_present battery_is_present(void);
+/**
+ * Use for testing different battery_is_present implementations.
+ *
+ * @return Whether there is a battery attached or not, or if we can't tell.
+ */
+enum battery_present battery_is_present_gpio(void);
+/**
+ * Use for testing different battery_is_present implementations.
+ *
+ * @return Whether there is a battery attached or not, or if we can't tell.
+ */
+enum battery_present battery_is_present_custom(void);
+/**
+ * Use for testing different battery_is_present implementations.
+ *
+ * @return Whether there is a battery attached or not, or if we can't tell.
+ */
+enum battery_present battery_is_present_smart(void);
 #else
 /*
  * If battery support is not enabled and the board does not specifically

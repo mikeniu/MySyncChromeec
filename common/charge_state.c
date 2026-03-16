@@ -1187,7 +1187,8 @@ static void process_battery_present_change(const struct charger_info *info,
 {
 	prev_bp = curr.batt.is_present;
 
-	if (curr.batt.is_present && IS_ENABLED(CONFIG_BATTERY_FUEL_GAUGE)) {
+	if (curr.batt.is_present == BP_YES &&
+	    IS_ENABLED(CONFIG_BATTERY_FUEL_GAUGE)) {
 		/* Identify the attached battery. */
 		CPRINTS("Battery now present");
 		init_battery_type();
@@ -1487,6 +1488,7 @@ void charger_task(void *u)
 	bool is_full = false; /* battery not accepting current */
 	bool prev_full = false;
 	int prev_bf = 0;
+	int presence_changed_count = 0;
 
 	/* Set up the task - note that charger_init() has already run. */
 	charger_setup(info);
@@ -1514,10 +1516,12 @@ void charger_task(void *u)
 
 		if ((prev_bp != curr.batt.is_present) ||
 		    ((prev_bf ^ curr.batt.flags) & BATT_FLAG_RESPONSIVE)) {
-			CPRINTS("Battery presence changed: %d->%d 0x%x->0x%x",
+			++presence_changed_count;
+			CPRINTS("Battery presence changed: %d->%d 0x%x->0x%x %d",
 				prev_bp, curr.batt.is_present,
 				prev_bf & BATT_FLAG_RESPONSIVE,
-				curr.batt.flags & BATT_FLAG_RESPONSIVE);
+				curr.batt.flags & BATT_FLAG_RESPONSIVE,
+				presence_changed_count);
 			process_battery_present_change(info, chgnum);
 			need_static = (curr.batt.is_present == BP_YES);
 		}

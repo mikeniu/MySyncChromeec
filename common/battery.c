@@ -46,6 +46,20 @@ static enum battery_cutoff_states battery_cutoff_state =
 
 #endif
 
+#ifdef CONFIG_ZEPHYR
+enum battery_present battery_is_present_gpio(void)
+{
+	/* The GPIO is low when the battery is present */
+	return gpio_get_level(GPIO_BATT_PRES_ODL) ? BP_NO : BP_YES;
+}
+#elif defined CONFIG_BATTERY_PRESENT_GPIO
+enum battery_present battery_is_present_gpio(void)
+{
+	/* The GPIO is low when the battery is present */
+	return gpio_get_level(CONFIG_BATTERY_PRESENT_GPIO) ? BP_NO : BP_YES;
+}
+#endif
+
 #ifdef CONFIG_BATTERY_PRESENT_GPIO
 #ifdef CONFIG_BATTERY_PRESENT_CUSTOM
 #error "Don't define both CONFIG_BATTERY_PRESENT_CUSTOM and" \
@@ -56,8 +70,7 @@ static enum battery_cutoff_states battery_cutoff_state =
  */
 enum battery_present battery_is_present(void)
 {
-	/* The GPIO is low when the battery is present */
-	return gpio_get_level(CONFIG_BATTERY_PRESENT_GPIO) ? BP_NO : BP_YES;
+	return battery_is_present_gpio();
 }
 #endif
 
