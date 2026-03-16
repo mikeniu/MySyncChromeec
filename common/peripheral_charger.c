@@ -249,6 +249,10 @@ __overridable void board_pchg_full_strategy()
 {
 }
 
+__overridable void board_pchg_strategy()
+{
+}
+
 /*
  * This handles two cases: asynchronous reset and synchronous reset.
  *
@@ -567,6 +571,9 @@ static void pchg_state_charging(struct pchg *ctx)
 	case PCHG_EVENT_CHARGE_ENDED:
 	case PCHG_EVENT_CHARGE_STOPPED:
 		ctx->state = PCHG_STATE_CONNECTED;
+		if (ctx->event == PCHG_EVENT_CHARGE_ENDED) {
+			board_pchg_strategy();
+		}
 		break;
 	default:
 		break;
