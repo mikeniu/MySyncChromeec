@@ -606,6 +606,8 @@ void battery_get_params(struct batt_params *batt)
 }
 #endif /* !CONFIG_FUEL_GAUGE */
 
+static int bw_status = -1;
+
 /* Wait until battery is totally stable */
 int battery_wait_for_stable(void)
 {
@@ -619,10 +621,12 @@ int battery_wait_for_stable(void)
 	while (get_time().val < wait_timeout) {
 		/* Starting pinging battery */
 		if (battery_status(&status) != EC_SUCCESS) {
+			CPRINTS("battery_status fails");
 			crec_msleep(25); /* clock stretching could hold 25ms */
 			continue;
 		}
 
+		bw_status = status;
 #ifdef CONFIG_BATTERY_STBL_STAT
 		if (((status & CONFIG_BATT_ALARM_MASK1) ==
 		     CONFIG_BATT_ALARM_MASK1) ||
@@ -639,6 +643,14 @@ int battery_wait_for_stable(void)
 	CPRINTS("battery not responding with status %x", status);
 	return EC_ERROR_NOT_POWERED;
 }
+
+static int command_bwstatus(int argc, const char **argv)
+{
+	CPRINTS("bwstatus: %x", bw_status);
+
+	return EC_SUCCESS;
+}
+DECLARE_CONSOLE_COMMAND(bwstatus, command_bwstatus, NULL, "");
 
 #if defined(CONFIG_CMD_BATTFAKE)
 static int command_battfake(int argc, const char **argv)
