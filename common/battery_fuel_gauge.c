@@ -18,6 +18,7 @@
 #define CPRINTS(format, args...) cprints(CC_CHARGER, format, ##args)
 #define BCFGPRT(format, args...) cprints(CC_CHARGER, "BCFG " format, ##args)
 
+#define BATTERY_INIT_TYPE_DEFERRED_RETRY_DELAY (500 * MSEC)
 /*
  * Pointer to an active config. It's battery_conf_cache if a config is found
  * in CBI or board_battery_info[x] if a config is found in FW.
@@ -26,6 +27,8 @@ test_export_static const struct batt_conf_embed *battery_conf;
 
 static char batt_manuf_name[SBS_MAX_STR_OBJ_SIZE];
 static char batt_device_name[SBS_MAX_STR_OBJ_SIZE];
+
+static int battery_init_retry_count = 0;
 
 /* Copies of config and strings of a matching battery found in CBI. */
 static struct batt_conf_embed battery_conf_cache = {
@@ -188,6 +191,7 @@ CONFIG_BATTERY_CONFIG_IN_CBI is enabled.
 #endif
 #endif
 
+DECLARE_DEFERRED(init_battery_type);
 void init_battery_type(void)
 {
 	int type;
@@ -211,6 +215,19 @@ void init_battery_type(void)
 	if (ret) {
 		BCFGPRT("Manuf name not found");
 		battery_conf = &board_battery_info[dflt];
+
+		if (battery_init_retry_count <
+		    CONFIG_BATTERY_INIT_TYPE_DEFERRED_RETRY_COUNT) {
+			battery_init_retry_count++;
+			BCFGPRT("Retry battery init (%d/%d)",
+				battery_init_retry_count,
+				CONFIG_BATTERY_INIT_TYPE_DEFERRED_RETRY_COUNT);
+			hook_call_deferred(
+				&init_battery_type_data,
+				BATTERY_INIT_TYPE_DEFERRED_RETRY_DELAY);
+		} else {
+			battery_init_retry_count = 0;
+		}
 		return;
 	}
 
@@ -237,11 +254,39 @@ void init_battery_type(void)
 
 	BCFGPRT("Battery says %s,%s", batt_manuf_name, batt_device_name);
 
+<<<<<<< HEAD   (d451203bf516c3319c818b4ff5265ca03ab0e7f9 charge_manager: Disable sink path when forcing sink current )
 	if (IS_ENABLED(CONFIG_BATTERY_CONFIG_IN_CBI) &&
 	    board_batt_conf_enabled()) {
 		BCFGPRT("Searching in CBI");
+||||||| BASE   (8cc28a24717ca37147be098be02eca33cad6a3d8 util: update_release_branch: update zephyr path)
+	type = get_battery_type();
+	if (type != BATTERY_TYPE_COUNT) {
+		BCFGPRT("Found config_fw[%d]", type);
+		battery_conf = &board_battery_info[type];
+		return;
+	}
+
+	BCFGPRT("Config not found in FW");
+
+	if (IS_ENABLED(CONFIG_BATTERY_CONFIG_IN_CBI)) {
+=======
+	type = get_battery_type();
+	if (type != BATTERY_TYPE_COUNT) {
+		BCFGPRT("Found config_fw[%d]", type);
+		battery_conf = &board_battery_info[type];
+		battery_init_retry_count = 0;
+		hook_call_deferred(&init_battery_type_data, -1);
+		return;
+	}
+
+	BCFGPRT("Config not found in FW");
+
+	if (IS_ENABLED(CONFIG_BATTERY_CONFIG_IN_CBI)) {
+>>>>>>> CHANGE (ae4e1e2c56329b824327e15696589617e9771a70 Battery: Add deferred retry for battery type initialization)
 		if (bcfg_search_in_cbi(&battery_conf_cache) == EC_SUCCESS) {
 			battery_conf = &battery_conf_cache;
+			battery_init_retry_count = 0;
+			hook_call_deferred(&init_battery_type_data, -1);
 			return;
 		}
 	}
