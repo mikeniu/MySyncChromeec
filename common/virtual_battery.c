@@ -38,8 +38,6 @@ int virtual_battery_handler(struct ec_response_i2c_passthru *resp, int in_len,
 			    int *err_code, int xferflags, int read_len,
 			    int write_len, const uint8_t *out)
 {
-#if defined(CONFIG_BATTERY_PRESENT_GPIO) || \
-	defined(CONFIG_BATTERY_PRESENT_CUSTOM)
 	/*
 	 * If the battery isn't present, return a NAK (which we
 	 * would have gotten anyways had we attempted to talk to
@@ -49,7 +47,6 @@ int virtual_battery_handler(struct ec_response_i2c_passthru *resp, int in_len,
 		resp->i2c_status = EC_I2C_STATUS_NAK;
 		return EC_ERROR_INVAL;
 	}
-#endif
 	switch (sb_cmd_state) {
 	case IDLE:
 		/*
