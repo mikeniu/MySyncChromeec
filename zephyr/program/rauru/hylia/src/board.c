@@ -27,7 +27,7 @@
 #define BAD_DELAY (500 * USEC_PER_MSEC)
 #define GOOD_DELAY (30 * USEC_PER_SEC)
 
-LOG_MODULE_REGISTER(board_init, LOG_LEVEL_ERR);
+LOG_MODULE_REGISTER(board_init, LOG_LEVEL_INF);
 
 static void board_setup_init(void)
 {
@@ -89,10 +89,64 @@ static void update_battery_state_cache(void)
  */
 DECLARE_HOOK(HOOK_INIT, update_battery_state_cache, HOOK_PRIO_DEFAULT);
 
-enum battery_present battery_is_present(void)
+static enum battery_present battery_is_present_custom(void)
 {
 	if (gpio_get_level(GPIO_BATT_PRES_ODL)) {
 		return BP_NO;
 	}
 	return cached_batt_state;
 }
+
+#ifdef CONFIG_BATTERY_PRESENT_CUSTOM
+enum battery_present battery_is_present(void)
+{
+	return battery_is_present_custom();
+}
+#else
+static enum battery_present battery_is_present_smart(void)
+{
+	int manufacture_date;
+
+	if (sb_read(SB_MANUFACTURE_DATE, &manufacture_date)) {
+		/* Require 2 consecutive failures before declaring the
+		 * battery missing.
+		 */
+		k_busy_wait(1 * USEC_PER_MSEC);
+		if (sb_read(SB_MANUFACTURE_DATE, &manufacture_date)) {
+			return BP_NOT_SURE;
+		}
+	}
+
+	return BP_YES;
+}
+
+enum battery_present battery_is_present(void)
+{
+	static const char *const batt_pres[] = {
+		"NO",
+		"YES",
+		"NOT_SURE",
+	};
+	static atomic_t a_number_of_mismatch = ATOMIC_INIT(0);
+	static atomic_t a_call_count = ATOMIC_INIT(0);
+	static atomic_t a_last_state = ATOMIC_INIT(false);
+
+	enum battery_present smart_result = battery_is_present_smart();
+	enum battery_present custom_result = battery_is_present_custom();
+	bool mismatch = smart_result != custom_result;
+	bool last_state = atomic_set(&a_last_state, mismatch);
+	atomic_val_t number_of_mismatch =
+		atomic_add(&a_number_of_mismatch, mismatch) + mismatch;
+	atomic_val_t call_count = atomic_inc(&a_call_count) + 1;
+
+	if (call_count % 256 == 0 || last_state != mismatch) {
+		LOG_INF("battery_is_present: called %ld times, "
+			"mismatch %ld times, smart=%s %s custom=%s "
+			"===============================",
+			call_count, number_of_mismatch, batt_pres[smart_result],
+			mismatch ? "!=" : "==", batt_pres[custom_result]);
+	}
+
+	return smart_result;
+}
+#endif
