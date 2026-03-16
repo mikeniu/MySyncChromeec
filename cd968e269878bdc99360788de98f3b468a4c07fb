@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95e54e8a_2320c1b1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-16T20:28:58Z",
+      "side": 1,
+      "message": "is this CL still relevant? I do not see the change in `FP_SENSOR_IMAGE_OFFSET`?\n\nI can see that those 2 [CLs](https://chrome-internal-review.git.corp.google.com/c/chromeos/vendor/fingerprint/egis/+/9106841/1) are pending.\n\nPlease send the relevant CLs so that I can keep track of the required reviews. \n\nThis CL has also a merge conflict.",
+      "revId": "cd968e269878bdc99360788de98f3b468a4c07fb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
