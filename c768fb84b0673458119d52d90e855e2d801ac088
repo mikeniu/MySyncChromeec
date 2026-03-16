@@ -20,6 +20,142 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "387d80e9_3a2cb79f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-16T10:50:58Z",
+      "side": 1,
+      "message": "If you have some questions, I think the [cros_flash_andes_xip](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/cros_flash/cros_flash_andestech_xip.c;l\u003d6) driver is a good reference.",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a6c51f3_5f4f3478",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-16T10:50:58Z",
+      "side": 1,
+      "message": "Do not enable the flash protection automatically. `write_protect_is_asserted` rather means that flash protection can not be changed (or \"reduced?).",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59a7a6e5_e97ab1bd",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-16T10:50:58Z",
+      "side": 1,
+      "message": "Please remove LOG_INF so verbose logging",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "403c7313_3618d89b",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-16T10:50:58Z",
+      "side": 1,
+      "message": "This shouldn\u0027t depend on if `write_protect_is_asserted` is true or not.",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "601281ae_be310ac9",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-16T10:50:58Z",
+      "side": 1,
+      "message": "Are RO and RW (bank 1 and 2) protections independent?",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dbbcc101_84f3e902",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-16T10:50:58Z",
+      "side": 1,
+      "message": "It shouldn\u0027t be possible to reduce flash protecion if `write_protect_is_asserted` is true.",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83989935_cfe5248c",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-16T10:50:58Z",
+      "side": 1,
+      "message": "What\u0027s a difference between _AT_BOOT and _NOW protection flags in this driver.",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b2255d0_781c322e",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-16T10:50:58Z",
+      "side": 1,
+      "message": "I will disable the second protection range, but won\u0027t enable the second one.",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "32d42e85_847a0fef",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
         "patchSetId": 7
@@ -162,6 +298,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "115b6205_50d0bfca",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-16T10:50:58Z",
+      "side": 1,
+      "message": "\u003e I agree that the protected range is currently hardcoded in the CrOS flash driver. However, the protection logic is implemented in the library rather than the driver. \n\nWhat do you mean it is hardcoded in `CrOS flash driver`. Via configs? Can the cros_flash driver set different protection ranges using the same library and rom code?",
+      "parentUuid": "0a558357_173d7568",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "264c1b63_888aadf5",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
         "patchSetId": 7
@@ -209,6 +363,24 @@
       "side": 1,
       "message": "We are not checking protection by testing write behavior.\nOur implementation reads the hardware Protect Area configuration registers and determines protection based on the configured start address, size, and enable bit.\nFor reference, this is the register format we use:\n```\ntypedef union\n{\n    struct\n    {\n      __IO uint32_t STARTADDR : 20;\n      __IO uint32_t Reserved  : 4;\n      __IO uint32_t PAGES     : 7;\n      __IO uint32_t ENABLEN   : 1;\n    }Protect_S;\n        __IO uint32_t Protect;\n}Protect_U_t;\n```\nSo the logic is based on configured protection state, similar in spirit to how the reference driver checks SRP/WPS bits—but in our case the protection mechanism is implemented inside the MCU through these Protect Area registers. Does this make sense to you?",
       "parentUuid": "fd3a0560_6fbf5f22",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5c6ba8f_ab575747",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-16T10:50:58Z",
+      "side": 1,
+      "message": "Yes, this looks good. I meant rather if there is any \"error register\" or something like that indentifying any problems with flash protection.",
+      "parentUuid": "49c579d9_b59cde0f",
       "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
