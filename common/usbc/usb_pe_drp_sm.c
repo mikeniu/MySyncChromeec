@@ -1607,9 +1607,9 @@ static void pe_update_waiting_batt_flag(void)
 			 * flag and perform Hard Reset.
 			 */
 			PE_CLR_FLAG(i, PE_FLAGS_SNK_WAITING_BATT);
-			CPRINTS("C%d: Battery has enough charge (%d%%) "
-				"to withstand a hard reset",
-				i, batt_soc);
+			CPRINTS_L1("C%d: Battery has enough charge (%d%%) "
+				   "to withstand a hard reset",
+				   i, batt_soc);
 			pd_dpm_request(i, DPM_REQUEST_HARD_RESET_SEND);
 		}
 	}
@@ -1912,13 +1912,13 @@ static bool sink_dpm_requests(int port)
 	} else if (PE_CHK_DPM_REQUEST(port, DPM_REQUEST_EPR_MODE_ENTRY)) {
 		if (pe_snk_in_epr_mode(port)) {
 			PE_CLR_DPM_REQUEST(port, DPM_REQUEST_EPR_MODE_ENTRY);
-			CPRINTS("C%d: Already in EPR mode", port);
+			CPRINTS_L1("C%d: Already in EPR mode", port);
 			return false;
 		}
 
 		if (!pe_snk_can_enter_epr_mode(port)) {
 			PE_CLR_DPM_REQUEST(port, DPM_REQUEST_EPR_MODE_ENTRY);
-			CPRINTS("C%d: Not allowed to enter EPR", port);
+			CPRINTS_L1("C%d: Not allowed to enter EPR", port);
 			return false;
 		}
 
@@ -1929,7 +1929,7 @@ static bool sink_dpm_requests(int port)
 	} else if (PE_CHK_DPM_REQUEST(port, DPM_REQUEST_EPR_MODE_EXIT)) {
 		if (!pe_snk_in_epr_mode(port)) {
 			PE_CLR_DPM_REQUEST(port, DPM_REQUEST_EPR_MODE_EXIT);
-			CPRINTS("C%d: Not in EPR mode", port);
+			CPRINTS_L1("C%d: Not in EPR mode", port);
 			return false;
 		}
 
@@ -1949,7 +1949,7 @@ static bool sink_dpm_requests(int port)
 		 * Send an SPR RDO to negotiate an SPR contract.
 		 * Keep DPM_REQUEST_EPR_MODE_EXIT so that we can retry.
 		 */
-		CPRINTS("C%d: Request SPR before EPR exit", port);
+		CPRINTS_L1("C%d: Request SPR before EPR exit", port);
 		pd_set_max_voltage(PD_MAX_SPR_VOLTAGE);
 		pe_set_dpm_curr_request(port, DPM_REQUEST_NEW_POWER_LEVEL);
 		set_state_pe(port, PE_SNK_SELECT_CAPABILITY);
@@ -2035,9 +2035,9 @@ static bool pe_send_request_msg(int port)
 	/* Build and send request RDO */
 	pd_build_request(vpd_vdo, &rdo, &curr_limit, &supply_voltage, port);
 
-	CPRINTS("C%d: Req [%d] %dmV %dmA %s", port, RDO_POS(rdo),
-		supply_voltage, curr_limit,
-		rdo & RDO_CAP_MISMATCH ? "Mismatch" : "");
+	CPRINTS_L1("C%d: Req [%d] %dmV %dmA %s", port, RDO_POS(rdo),
+		   supply_voltage, curr_limit,
+		   rdo & RDO_CAP_MISMATCH ? "Mismatch" : "");
 
 	/* TODO(b/386401791): Repeated, identical Requests add noise to traces,
 	 * waste time, and interfere with some compliance tests. The charge
@@ -2047,8 +2047,8 @@ static bool pe_send_request_msg(int port)
 	if (get_last_state_pe(port) == PE_SNK_READY &&
 	    curr_limit == pe[port].curr_limit &&
 	    supply_voltage == pe[port].supply_voltage) {
-		CPRINTS("C%d: %s: Duplicate Request %u mV, %u mA", port,
-			__func__, supply_voltage, curr_limit);
+		CPRINTS_L1("C%d: %s: Duplicate Request %u mV, %u mA", port,
+			   __func__, supply_voltage, curr_limit);
 		return false;
 	}
 
@@ -2141,7 +2141,7 @@ static bool port_try_vconn_swap_on(int port)
 		return true;
 	}
 
-	CPRINTS("C%d: VCONN Swap counter exhausted", port);
+	CPRINTS_L1("C%d: VCONN Swap counter exhausted", port);
 	return false;
 }
 
@@ -4242,9 +4242,9 @@ static void pe_snk_hard_reset_entry(int port)
 	    ((port == charge_manager_get_active_charge_port() ||
 	      (charge_manager_get_active_charge_port() == CHARGE_PORT_NONE))) &&
 	    system_get_reset_flags() & EC_RESET_FLAG_SYSJUMP) {
-		CPRINTS("C%d: Disabling port to avoid brown out, "
-			"please reboot EC to enable port again",
-			port);
+		CPRINTS_L1("C%d: Disabling port to avoid brown out, "
+			   "please reboot EC to enable port again",
+			   port);
 		set_state_pe(port, PE_SRC_DISABLED);
 		return;
 	}
@@ -4259,7 +4259,8 @@ static void pe_snk_hard_reset_entry(int port)
 	    port == charge_manager_get_active_charge_port() &&
 	    (system_get_reset_flags() & EC_RESET_FLAG_STAY_IN_RO) &&
 	    system_get_image_copy() == EC_IMAGE_RO) {
-		CPRINTS("C%d: Preserve ap-off and stay-in-ro across PD reset",
+		CPRINTS_L1(
+			"C%d: Preserve ap-off and stay-in-ro across PD reset",
 			port);
 		chip_save_reset_flags(chip_read_reset_flags() |
 				      EC_RESET_FLAG_AP_OFF |
@@ -4284,9 +4285,9 @@ static void pe_snk_hard_reset_entry(int port)
 	if (batt_soc < CONFIG_USB_PD_RESET_MIN_BATT_SOC ||
 	    battery_get_disconnect_state() != BATTERY_NOT_DISCONNECTED) {
 		PE_SET_FLAG(port, PE_FLAGS_SNK_WAITING_BATT);
-		CPRINTS("C%d: Battery low %d%%! Stay in disabled state "
-			"until battery level reaches %d%%",
-			port, batt_soc, CONFIG_USB_PD_RESET_MIN_BATT_SOC);
+		CPRINTS_L1("C%d: Battery low %d%%! Stay in disabled state "
+			   "until battery level reaches %d%%",
+			   port, batt_soc, CONFIG_USB_PD_RESET_MIN_BATT_SOC);
 		set_state_pe(port, PE_SRC_DISABLED);
 		return;
 	}
@@ -5839,7 +5840,7 @@ static void pe_bist_tx_entry(int port)
 		 * sending Hard Reset Signaling to reset the UUT.
 		 */
 		if (tcpc_set_bist_test_mode(port, true) != EC_SUCCESS)
-			CPRINTS("C%d: Failed to enter BIST Test Mode", port);
+			CPRINTS_L1("C%d: Failed to enter BIST Test Mode", port);
 	} else if (IS_ENABLED(CONFIG_USB_PD_REV30) &&
 		   mode == BIST_SHARED_MODE_ENTER) {
 		/* Notify the DPM and return to ready */
@@ -5961,8 +5962,8 @@ static enum vdm_response_result parse_vdm_response_common(int port)
 			 * Don't fill in the discovery field so we re-probe in
 			 * tVDMBusy
 			 */
-			CPRINTS("C%d: Partner BUSY, request will be retried",
-				port);
+			CPRINTS_L1("C%d: Partner BUSY, request will be retried",
+				   port);
 			pd_timer_enable(port, PE_TIMER_DISCOVER_IDENTITY,
 					PD_T_VDM_BUSY);
 
@@ -5980,8 +5981,8 @@ static enum vdm_response_result parse_vdm_response_common(int port)
 		 * Partner gave us an incorrect size or command; mark discovery
 		 * as failed.
 		 */
-		CPRINTS("C%d: Unexpected VDM response: 0x%04x 0x%04x", port,
-			rx_emsg[port].header, payload[0]);
+		CPRINTS_L1("C%d: Unexpected VDM response: 0x%04x 0x%04x", port,
+			   rx_emsg[port].header, payload[0]);
 		return VDM_RESULT_NAK;
 	} else if (sop == pe[port].tx_type && ext == 0 && cnt == 0 &&
 		   type == PD_CTRL_NOT_SUPPORTED) {
@@ -6006,9 +6007,9 @@ static void pe_vdm_send_request_entry(int port)
 {
 	if (pe[port].tx_type == TCPCI_MSG_INVALID) {
 		if (IS_ENABLED(USB_PD_DEBUG_LABELS))
-			CPRINTS("C%d: %s: Tx type expected to be set, "
-				"returning",
-				port, pe_state_names[get_state_pe(port)]);
+			CPRINTS_L1("C%d: %s: Tx type expected to be set, "
+				   "returning",
+				   port, pe_state_names[get_state_pe(port)]);
 		set_state_pe(port, get_last_state_pe(port));
 		return;
 	}
@@ -6058,8 +6059,9 @@ static void pe_vdm_send_request_run(int port)
 	 * messages and reacting appropriately to unexpected messages.
 	 */
 	if (pd_timer_is_expired(port, PE_TIMER_VDM_RESPONSE)) {
-		CPRINTS("C%d: VDM %s Response Timeout", port,
-			pe[port].tx_type == TCPCI_MSG_SOP ? "Port" : "Cable");
+		CPRINTS_L1("C%d: VDM %s Response Timeout", port,
+			   pe[port].tx_type == TCPCI_MSG_SOP ? "Port" :
+							       "Cable");
 
 		/*
 		 * If timeout expires, extend it and keep waiting.
@@ -6068,7 +6070,8 @@ static void pe_vdm_send_request_run(int port)
 		 * highest observed time a partner has taken to respond.
 		 */
 		if (!pe[port].vdm_request_extend_timeout) {
-			CPRINTS("No response: extending VDM request timeout");
+			CPRINTS_L1(
+				"No response: extending VDM request timeout");
 			pd_timer_enable(port, PE_TIMER_VDM_RESPONSE,
 					PD_T_VDM_SNDR_RSP * 2);
 			pe[port].vdm_request_extend_timeout = true;
@@ -8289,14 +8292,14 @@ static void pe_enter_epr_mode(int port)
 	PE_CLR_FLAG(port, PE_FLAGS_ENTERING_EPR);
 	PE_CLR_FLAG(port, PE_FLAGS_EPR_EXPLICIT_EXIT);
 	PE_SET_FLAG(port, PE_FLAGS_IN_EPR);
-	CPRINTS("C%d: Entered EPR", port);
+	CPRINTS_L1("C%d: Entered EPR", port);
 }
 
 static void pe_exit_epr_mode(int port)
 {
 	PE_CLR_FLAG(port, PE_FLAGS_IN_EPR);
 	PE_CLR_DPM_REQUEST(port, DPM_REQUEST_EPR_MODE_EXIT);
-	CPRINTS("C%d: Exited EPR", port);
+	CPRINTS_L1("C%d: Exited EPR", port);
 }
 
 /*
@@ -8342,8 +8345,8 @@ static void pe_snk_epr_keep_alive_run(int port)
 		PE_CLR_FLAG(port, PE_FLAGS_MSG_RECEIVED);
 
 		if (cnt == 0 || ext == 0 || type != PD_EXT_CONTROL) {
-			CPRINTS("C%d: Protocol Error: 0x%04x", port,
-				rx_emsg[port].header);
+			CPRINTS_L1("C%d: Protocol Error: 0x%04x", port,
+				   rx_emsg[port].header);
 			pe_send_soft_reset(port, TCPCI_MSG_SOP);
 		} else if (ecdb->type == PD_EXT_CTRL_EPR_KEEPALIVE_ACK) {
 			pe_sender_response_msg_exit(port);
@@ -8459,8 +8462,8 @@ static void pe_snk_epr_mode_entry_wait_for_response_run(int port)
 				   PD_EPRMDO_ACTION_ENTER_FAILED) {
 				PE_CLR_FLAG(port, PE_FLAGS_ENTERING_EPR);
 				/* Table 6-50 EPR Mode Data Object */
-				CPRINTS("C%d: Failed to enter EPR for 0x%x",
-					port, eprmdo->data);
+				CPRINTS_L1("C%d: Failed to enter EPR for 0x%x",
+					   port, eprmdo->data);
 			}
 			/* Fall through to soft reset. */
 		} else if ((ext == 0) && (cnt == 0) &&
@@ -8545,7 +8548,8 @@ static void pe_snk_epr_mode_exit_received_entry(int port)
 	 * results in a hard reset (6.4.10.3.3 Exits due to errors).
 	 */
 	if (!pe_in_spr_contract(port)) {
-		CPRINTS("C%d: Received EPR exit while in EPR contract", port);
+		CPRINTS_L1("C%d: Received EPR exit while in EPR contract",
+			   port);
 		pe_set_hard_reset(port);
 		return;
 	}
@@ -8623,8 +8627,8 @@ void pd_set_src_caps(int port, int cnt, uint32_t *src_caps)
 	int i;
 
 	if (cnt > limit) {
-		CPRINTS("C%d: Trim PDOs (%d) exceeding limit (%d)", port, cnt,
-			limit);
+		CPRINTS_L1("C%d: Trim PDOs (%d) exceeding limit (%d)", port,
+			   cnt, limit);
 		cnt = limit;
 	}
 
