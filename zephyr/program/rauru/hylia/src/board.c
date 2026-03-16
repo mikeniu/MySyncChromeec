@@ -27,7 +27,7 @@
 #define BAD_DELAY (500 * USEC_PER_MSEC)
 #define GOOD_DELAY (30 * USEC_PER_SEC)
 
-LOG_MODULE_REGISTER(board_init, LOG_LEVEL_ERR);
+LOG_MODULE_REGISTER(board_init, LOG_LEVEL_INF);
 
 static void board_setup_init(void)
 {
@@ -89,10 +89,44 @@ static void update_battery_state_cache(void)
  */
 DECLARE_HOOK(HOOK_INIT, update_battery_state_cache, HOOK_PRIO_DEFAULT);
 
-enum battery_present battery_is_present(void)
+enum battery_present battery_is_present_custom(void)
 {
 	if (gpio_get_level(GPIO_BATT_PRES_ODL)) {
 		return BP_NO;
 	}
 	return cached_batt_state;
 }
+
+#ifdef CONFIG_BATTERY_PRESENT_CUSTOM
+enum battery_present battery_is_present(void)
+{
+	return battery_is_present_custom();
+}
+#elif defined CONFIG_BATTERY_PRESENT_NONE
+enum battery_present battery_is_present(void)
+{
+	static const char *const batt_pres[] = {
+		"NO",
+		"YES",
+		"NOT_SURE",
+	};
+	static int number_of_mismatch = 0;
+	static int call_count = 0;
+	enum battery_present smart_result = battery_is_present_smart();
+	enum battery_present custom_result = battery_is_present_custom();
+	bool mismatch = smart_result != custom_result;
+
+	number_of_mismatch += mismatch;
+	++call_count;
+
+	if (call_count % 256 == 0 || mismatch) {
+		LOG_INF("battery_is_present: called %d times, "
+			"mismatch %d times, smart=%s %s gpio=%s "
+			"===============================",
+			call_count, number_of_mismatch, batt_pres[smart_result],
+			mismatch ? "!=" : "==", batt_pres[custom_result]);
+	}
+
+	return custom_result;
+}
+#endif

@@ -18,6 +18,11 @@
 #define CPUTS(outstr) cputs(CC_CHARGER, outstr);
 #define CPRINTS(format, args...) cprints(CC_CHARGER, "SBS " format, ##args)
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/logging/log.h>
+LOG_MODULE_REGISTER(smart, LOG_LEVEL_INF);
+#endif /* CONFIG_ZEPHYR */
+
 #define BATTERY_NO_RESPONSE_TIMEOUT (1000 * MSEC)
 
 static int fake_state_of_charge = -1;
@@ -226,9 +231,7 @@ int battery_get_mode(int *mode)
 	return sb_read(SB_BATTERY_MODE, mode);
 }
 
-#if !defined(CONFIG_BATTERY_PRESENT_GPIO) && \
-	!defined(CONFIG_BATTERY_PRESENT_CUSTOM)
-__overridable enum battery_present battery_is_present(void)
+enum battery_present battery_is_present_smart(void)
 {
 	int manufacture_date;
 
@@ -243,6 +246,12 @@ __overridable enum battery_present battery_is_present(void)
 	}
 
 	return BP_YES;
+}
+
+#ifdef CONFIG_BATTERY_PRESENT_NONE
+__overridable enum battery_present battery_is_present(void)
+{
+	return battery_is_present_smart();
 }
 #endif
 
@@ -519,16 +528,13 @@ void battery_get_params(struct batt_params *batt)
 	memcpy(&batt_new, batt, sizeof(*batt));
 	batt_new.flags &= ~BATT_FLAG_VOLATILE;
 
-#if defined(CONFIG_BATTERY_PRESENT_CUSTOM) || \
-	defined(CONFIG_BATTERY_PRESENT_GPIO)
-	/* Hardware can tell us for certain */
 	batt_new.is_present = battery_is_present();
-	if (batt_new.is_present != BP_YES) {
+	if (batt_new.is_present == BP_NO) {
 		batt->is_present = BP_NO;
 		batt->flags = BATT_FLAG_BAD_ANY;
 		return;
 	}
-#endif
+
 	if (sb_read(SB_TEMPERATURE, &batt_new.temperature) &&
 	    fake_temperature < 0)
 		batt_new.flags |= BATT_FLAG_BAD_TEMPERATURE;
@@ -575,15 +581,6 @@ void battery_get_params(struct batt_params *batt)
 #ifdef CONFIG_BATTERY_MEASURE_IMBALANCE
 	if (battery_imbalance_mv() > CONFIG_BATTERY_MAX_IMBALANCE_MV)
 		batt_new.flags |= BATT_FLAG_IMBALANCED_CELL;
-#endif
-
-#if !defined(CONFIG_BATTERY_PRESENT_CUSTOM) && \
-	!defined(CONFIG_BATTERY_PRESENT_GPIO)
-	/* No hardware test, so we only know it's there if it responds */
-	if (batt_new.flags & BATT_FLAG_RESPONSIVE)
-		batt_new.is_present = BP_YES;
-	else
-		batt_new.is_present = BP_NOT_SURE;
 #endif
 
 	if (battery_want_charge(&batt_new))
