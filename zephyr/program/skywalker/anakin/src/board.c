@@ -3,14 +3,18 @@
  * found in the LICENSE file.
  */
 
+#include "battery.h"
 #include "chipset.h"
 #include "gpio/gpio_int.h"
 #include "hooks.h"
 #include "timer.h"
 
 #include <zephyr/drivers/gpio.h>
+#include <zephyr/logging/log.h>
 
 #include <ap_power/ap_power.h>
+
+LOG_MODULE_REGISTER(board_init, LOG_LEVEL_INF);
 
 #define INT_RECHECK_US 5000
 
@@ -78,3 +82,35 @@ static void board_setup_init()
 	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_jd1));
 }
 DECLARE_HOOK(HOOK_INIT, board_setup_init, HOOK_PRIO_PRE_DEFAULT);
+
+#ifdef CONFIG_BATTERY_PRESENT_NONE
+enum battery_present battery_is_present(void)
+{
+	static const char *const batt_pres[] = {
+		"NO",
+		"YES",
+		"NOT_SURE",
+	};
+	static int number_of_mismatch = 0;
+	static int call_count = 0;
+	static bool last_state_cache = false;
+	enum battery_present smart_result = battery_is_present_smart();
+	enum battery_present gpio_result = battery_is_present_gpio();
+	bool last_state = last_state_cache;
+	bool mismatch = smart_result != gpio_result;
+
+	number_of_mismatch += mismatch;
+	++call_count;
+	last_state_cache = mismatch;
+
+	if (call_count % 256 == 0 || last_state != mismatch) {
+		LOG_INF("battery_is_present: called %d times, "
+			"mismatch %d times, smart=%s %s gpio=%s "
+			"===============================",
+			call_count, number_of_mismatch, batt_pres[smart_result],
+			mismatch ? "!=" : "==", batt_pres[gpio_result]);
+	}
+
+	return smart_result;
+}
+#endif

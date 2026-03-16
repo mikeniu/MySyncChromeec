@@ -532,6 +532,7 @@
 #undef CONFIG_BATTERY_PRESENT_CUSTOM
 /* Battery is present if the GPIO named by this define reads logic-low. */
 #undef CONFIG_BATTERY_PRESENT_GPIO
+#undef CONFIG_BATTERY_PRESENT_NONE
 
 /*
  * Compile smart battery support
