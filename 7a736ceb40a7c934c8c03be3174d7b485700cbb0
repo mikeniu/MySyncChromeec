@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1dd528bc_74dbdfca",
+        "filename": "zephyr/test/drivers/led_driver/prj.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-03-17T22:08:55Z",
+      "side": 1,
+      "message": "we don\u0027t change existing copyright headers.",
+      "range": {
+        "startLine": 1,
+        "startChar": 15,
+        "endLine": 1,
+        "endChar": 16
+      },
+      "revId": "7a736ceb40a7c934c8c03be3174d7b485700cbb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "802636d4_db9aa71c",
+        "filename": "zephyr/test/drivers/led_driver/src/stubs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-03-17T22:08:55Z",
+      "side": 1,
+      "message": "is this section helpful?",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 6
+      },
+      "revId": "7a736ceb40a7c934c8c03be3174d7b485700cbb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
