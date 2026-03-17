@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3ec5333_d2df87a1",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_mtl_pwrseq_sm.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-17T22:35:56Z",
+      "side": 1,
+      "message": "I don\u0027t like the use of a chosen-node for this guard.  Can you experiment with detecting if a power signal contains the `enum-name` PWR_PLTRST at build time.\n\nSee the [`ANY_INST_HAS_POWER_GOOD_PIN`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/include/temp_sensor/temp_sensor.h;l\u003d44;drc\u003d0512af03f3f8b2a63e7891b2757c7b2eb658dd7b) definition for a way to search all child nodes.",
+      "range": {
+        "startLine": 178,
+        "startChar": 0,
+        "endLine": 178,
+        "endChar": 41
+      },
+      "revId": "fdfc6cf1e2dfe7171edf1eccf387e0f6c90a1fe7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
