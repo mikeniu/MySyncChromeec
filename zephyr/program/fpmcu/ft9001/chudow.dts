@@ -8,7 +8,7 @@
 #define FT9869_COMMON_IMAGE_PROPS \
 	width = <40>; \
 	height = <196>; \
-	bits-per-pixel = <8>; \
+	bits-per-pixel = <12>; \
 	frame-size = <28320>; \
 	v4l2-pixel-format = "V4L2_PIX_FMT_GREY";
 
