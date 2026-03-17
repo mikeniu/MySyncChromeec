@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "05c001af_c3025f73",
+        "filename": "common/i2c_controller.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 734,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-03-17T05:41:41Z",
+      "side": 1,
+      "message": "The reason is [CL:7080810](https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7080810) change MIN to min in ToT but it lands after 16469.0.0.",
+      "parentUuid": "6882d84e_1521d12c",
+      "range": {
+        "startLine": 734,
+        "startChar": 9,
+        "endLine": 734,
+        "endChar": 12
+      },
+      "revId": "37bfd1049dfd79bd228cc2d8476011915b985202",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8c221c53_d9074fe1",
         "filename": "common/i2c_controller.c",
         "patchSetId": 1
