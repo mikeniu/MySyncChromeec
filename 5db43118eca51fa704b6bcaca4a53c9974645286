@@ -16,6 +16,46 @@
       "message": "Aligning state callback API with zephyr callback pattern.\nPlease share your thoughts and concerns.",
       "revId": "5db43118eca51fa704b6bcaca4a53c9974645286",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9755bd0_ebe1cbe1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-17T22:54:04Z",
+      "side": 1,
+      "message": "Good enhancement.  Do you plan to also update `ap_power_ev_add_callback` to use iterable sections?",
+      "revId": "5db43118eca51fa704b6bcaca4a53c9974645286",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb9590c2_a1521b04",
+        "filename": "zephyr/drivers/board_id/board_id_intel_rvp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-17T22:54:04Z",
+      "side": 1,
+      "message": "From Bernardo\u0027s suggestion:\n```\nif (!DT_INST_PROP(0, defer_until_s5)) {\n  return;\n}\n```",
+      "range": {
+        "startLine": 196,
+        "startChar": 0,
+        "endLine": 196,
+        "endChar": 35
+      },
+      "revId": "5db43118eca51fa704b6bcaca4a53c9974645286",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
