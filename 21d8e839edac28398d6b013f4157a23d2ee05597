@@ -306,6 +306,30 @@
       },
       "revId": "21d8e839edac28398d6b013f4157a23d2ee05597",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "130e9f5c_ef9ee68b",
+        "filename": "zephyr/shim/include/fpsensor_driver.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-17T01:44:35Z",
+      "side": 1,
+      "message": "ok. I will remove it in a follow up CL",
+      "parentUuid": "c1973e03_85b9c0ea",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 65
+      },
+      "revId": "21d8e839edac28398d6b013f4157a23d2ee05597",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
