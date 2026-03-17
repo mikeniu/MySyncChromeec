@@ -11,6 +11,7 @@
 #include "rvp_fan.dtsi"
 #include "rvp_i2c.dtsi"
 #include "rvp_ioex_gpio.dtsi"
+#include "rvp_keyboard.dtsi"
 #include "rvp_pd.dtsi"
 #include "rvp_usbc.dtsi"
 #include "rvp_runtime_pdc.dtsi"
