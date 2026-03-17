@@ -16,6 +16,24 @@
       "message": "heya, you probably did something funny with git? I\u0027m listed as author, just do a `git commit --reset-author` and upload again, that should fix it",
       "revId": "ba27175e59469869609b40d6b7ef9cbf7f465391",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b819ba7_5e6563b3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4602941
+      },
+      "writtenOn": "2026-03-17T16:13:20Z",
+      "side": 1,
+      "message": "Amended the author on patch set 22.\nThank you for the suggestion.",
+      "parentUuid": "b0106f44_a4eadf93",
+      "revId": "ba27175e59469869609b40d6b7ef9cbf7f465391",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
