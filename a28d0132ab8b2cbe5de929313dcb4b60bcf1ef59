@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aea68160_b888958e",
+        "filename": "zephyr/program/skywalker/padme/src/board.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-03-17T08:33:15Z",
+      "side": 1,
+      "message": "Do we also need to replace this with pchg_shutdown?",
+      "range": {
+        "startLine": 126,
+        "startChar": 0,
+        "endLine": 128,
+        "endChar": 8
+      },
+      "revId": "a28d0132ab8b2cbe5de929313dcb4b60bcf1ef59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
