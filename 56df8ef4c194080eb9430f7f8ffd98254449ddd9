@@ -1,6 +1,29 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ff89b8a_16dd0221",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-03-17T19:37:01Z",
+      "side": 1,
+      "message": "`did not`\n\nyou could also just drop mention of the previously missing tests.\ni think the comments about adding or improving unit testing\nstand on their own. your choice.",
+      "range": {
+        "startLine": 9,
+        "startChar": 38,
+        "endLine": 9,
+        "endChar": 44
+      },
+      "revId": "56df8ef4c194080eb9430f7f8ffd98254449ddd9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "953f9ef5_cc1446cd",
@@ -14,6 +37,29 @@
       "writtenOn": "2026-03-13T17:58:12Z",
       "side": 1,
       "message": "Hi Google Team, \nPlz help me to check if unit test with code coverage has reached min of 90% code coverage with the latest patch.  Thanks.",
+      "revId": "56df8ef4c194080eb9430f7f8ffd98254449ddd9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c53c9394_97c25830",
+        "filename": "driver/led/max695x.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-03-17T19:37:01Z",
+      "side": 1,
+      "message": "can we resolve this with a 1 line fix in this driver?\n\nlooks like i missed the conversion here\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/3863941",
+      "range": {
+        "startLine": 18,
+        "startChar": 64,
+        "endLine": 18,
+        "endChar": 77
+      },
       "revId": "56df8ef4c194080eb9430f7f8ffd98254449ddd9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
