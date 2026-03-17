@@ -16,6 +16,23 @@
       "message": "Ping...",
       "revId": "a5f861bbd1e34d4a2daaafcea219aacfb0206d7b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4f76a23_ade6d6b4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-03-17T21:58:11Z",
+      "side": 1,
+      "message": "i tried this patch on ruby. seems OK but i see a bunch of\n```\nI: power state 2 \u003d S5, in 0x061c\nBoot Time: 2, 914720100\nec:\u003e [914.812900 can\u0027t read any temp sensors!]\n...\n```\non `apshutdown`. that seems new with this patch.\nthis looks like it\u0027s from `thermal_control()`.\ndo we need to change the `CHIPSET_STATE_HARD_OFF` check\nto `CHIPSET_STATE_SOFT_OFF`?\nthat probably makes sense on x86, but i don\u0027t know if\nthat\u0027s always true.\n\nthe handler also sends a `EC_HOST_EVENT_THERMAL` to the AP\nafter that print in response - i kinda doubt this has a\nlistener in `CHIPSET_STATE_SOFT_OFF` even if the sensors\nare in some always-on power domain.\n\ni\u0027m not sure that we need to block this change on the sensor\nread fails but it does suggest we should take a closer look\nat `thermal_control()`.",
+      "revId": "a5f861bbd1e34d4a2daaafcea219aacfb0206d7b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
