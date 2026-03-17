@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef4b9363_c55b6d0d",
+        "filename": "zephyr/test/ap_power/src/boards/alderlake.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-17T19:44:05Z",
+      "side": 1,
+      "message": "Nit - follow the convention of real boards create a helper for turning of the AP rails.",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 119,
+        "endChar": 43
+      },
+      "revId": "cae2f2b2e9cc78f116213fc563bde91029a90eb5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
