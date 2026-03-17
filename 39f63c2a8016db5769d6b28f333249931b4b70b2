@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cea2f74c_bacabbee",
+        "filename": "zephyr/test/fingerprint/drivers/egis660/src/egis660.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-17T08:31:19Z",
+      "side": 1,
+      "message": "Please restore implementation to the final one.",
+      "revId": "39f63c2a8016db5769d6b28f333249931b4b70b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
