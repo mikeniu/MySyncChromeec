@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55b56c02_43e88be4",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-17T21:56:56Z",
+      "side": 1,
+      "message": "Gemini review feedback:\n\n\n### 2. Post-Condition Verification\n**Severity: Medium**\nCurrently, after sending the `SPI_NOR_CMD_WRDI` (Write Disable) command, you call `cros_flash_npcx_wait_ready(dev)`. \n\n*   **The Issue:** `cros_flash_npcx_wait_ready` only verifies that the `SPI_NOR_WIP_BIT` (Write In Progress) is cleared. It does *not* verify that the command was successful in clearing the Write Enable Latch (WEL).\n*   **Suggestion:** For a robust implementation, you should verify that the WEL bit is actually set to 0. You already have a `cros_flash_npcx_wait_ready_and_we` function for the enable side. I recommend creating a companion function—e.g., `cros_flash_npcx_wait_ready_and_wd`—that polls the status register and checks that `(reg \u0026 SPI_NOR_WIP_BIT) \u003d\u003d 0 \u0026\u0026 (reg \u0026 SPI_NOR_WEL_BIT) \u003d\u003d 0`.\n\n### 3. Consistency in Pointer Validation\n**Severity: Minor**\nIn your new function, you extract the driver data and immediately dereference it:\n```c\nstruct cros_flash_npcx_data *data \u003d DRV_DATA(dev);\n// ...\nret \u003d flash_ex_op(data-\u003eflash_dev, ...);\n```\n\n*   **The Issue:** While `dev` and `data` are unlikely to be NULL in standard Zephyr driver contexts, the existing `cros_flash_npcx_set_status_reg` function explicitly checks this:\n    ```c\n    if (data \u003d\u003d 0) {\n        return -EINVAL;\n    }\n    ```\n*   **Suggestion:** To maintain consistency with the surrounding codebase, add a null check for `data` before attempting to access `data-\u003eflash_dev`. Alternatively, if the project is moving away from these defensive checks for internal driver structures, consider removing it from `cros_flash_npcx_set_status_reg` in a separate cleanup commit.",
+      "range": {
+        "startLine": 147,
+        "startChar": 0,
+        "endLine": 147,
+        "endChar": 59
+      },
+      "revId": "5a755c4eaae0b42f01355f4f68dd14abf20b592f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64dd4f8b_f39ed1de",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-17T21:56:56Z",
+      "side": 1,
+      "message": "We can make it a little bit more self-documenting if we rename this to something like:\n\n```suggestion\n\tstruct npcx_ex_ops_uma_in write_disable_op \u003d {\n```",
+      "range": {
+        "startLine": 150,
+        "startChar": 27,
+        "endLine": 150,
+        "endChar": 32
+      },
+      "revId": "5a755c4eaae0b42f01355f4f68dd14abf20b592f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfd11921_d5facc0b",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-17T21:56:56Z",
+      "side": 1,
+      "message": "```suggestion\n\t/* Wait for any previous operations to finish. */\n```",
+      "range": {
+        "startLine": 157,
+        "startChar": 0,
+        "endLine": 157,
+        "endChar": 46
+      },
+      "revId": "5a755c4eaae0b42f01355f4f68dd14abf20b592f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c1938f9_c6234061",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-17T21:56:56Z",
+      "side": 1,
+      "message": "I think you can remove this since it\u0027s clear once you do the rename above.",
+      "range": {
+        "startLine": 163,
+        "startChar": 0,
+        "endLine": 163,
+        "endChar": 36
+      },
+      "revId": "5a755c4eaae0b42f01355f4f68dd14abf20b592f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4198cca0_fa0d7981",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-17T21:56:56Z",
+      "side": 1,
+      "message": "This is just restating what the code already says, so I think we should remove it.",
+      "range": {
+        "startLine": 170,
+        "startChar": 0,
+        "endLine": 170,
+        "endChar": 33
+      },
+      "revId": "5a755c4eaae0b42f01355f4f68dd14abf20b592f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
