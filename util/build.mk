@@ -19,6 +19,7 @@ host-util-bin-cxx-y += iteflash
 host-util-bin-cxx-y += itecomdbgr
 host-util-bin-cxx-y += cbi-util
 host-util-bin-cxx-y += ec_coredump
+host-util-bin-cxx-y += et171_flash
 
 host-util-bin-cxx-y += rtkupdate
 build-util-art-y += util/export_taskinfo.so
@@ -66,6 +67,10 @@ $(out)/util/ec_parse_panicinfo: HOST_LDFLAGS+=$(LIBEC_HOST_LDLIBS)
 
 ec_coredump-objs=ec_coredump.o $(comm-objs)
 $(out)/util/ec_coredump: HOST_LDFLAGS+=$(LIBEC_HOST_LDLIBS)
+
+# ET171 Flash Tool
+et171_flash-objs=et171_flash.o bootrom.o usb_comm.o ec_comm.o
+$(out)/util/et171_flash: HOST_LDFLAGS+=-lusb-1.0 -lcrypto -lpthread -ldl
 
 # USB type-C Vendor Information File generation
 ifeq ($(CONFIG_USB_POWER_DELIVERY),y)
