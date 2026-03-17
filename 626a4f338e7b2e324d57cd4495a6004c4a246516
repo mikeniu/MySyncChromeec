@@ -16,6 +16,24 @@
       "message": "would it work if instead of writing this you include `program/ec-aic/rtk-aic/project.overlay`?",
       "revId": "626a4f338e7b2e324d57cd4495a6004c4a246516",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "309f04d2_4f6ceb85",
+        "filename": "zephyr/test/ec-aic/i2c/boards/realtek_rts5912.overlay",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-17T23:37:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fa9cc77_40e6d5e5",
+      "revId": "626a4f338e7b2e324d57cd4495a6004c4a246516",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
