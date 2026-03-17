@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e30ebc98_0bd7007e",
+        "filename": "zephyr/program/ocelot/power_signals.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-17T21:38:10Z",
+      "side": 1,
+      "message": "See my previous comment - can you just use `intel,ap-pwrseq-gpio` and point to the IO expander directly?",
+      "range": {
+        "startLine": 92,
+        "startChar": 0,
+        "endLine": 92,
+        "endChar": 42
+      },
+      "revId": "cc0163e16a686a4d2c33ceddb345b7347d29bb74",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
