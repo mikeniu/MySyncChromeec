@@ -42,6 +42,8 @@ include util/private/build.mk
 endif
 -include private/util_flags.mk
 
+include util/egis/build.mk
+
 comm-objs=$(util-lock-objs:%=lock/%) comm-host.o comm-dev.o
 comm-objs+=comm-lpc.o comm-i2c.o misc_util.o comm-usb.o
 
