@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54a55c28_76c7531f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-17T22:05:51Z",
+      "side": 1,
+      "message": "Gemini review:\n\n### 1. Missing Test Teardown (State Leak)\n**Severity: High**\nAt the end of `test_lock_flash_control_register`, the test deliberately leaves the flash control register in an unlocked state:\n```c\n\t/* Unlock the register again */\n\tret \u003d cros_flash_npcx_set_write_enable(cros_flash_dev);\n\t// ... assertions ...\n}\n```\n*   **The Issue:** Tests should generally be isolated and leave the system in the same state they found it. Leaving the flash control register unlocked (write-enabled) at the end of this test could cause subsequent tests in the suite to behave unpredictably or fail if they assume the flash is safely locked.\n*   **Suggestion:** Add a final teardown step at the end of the test to re-lock the register using `cros_flash_npcx_set_write_disable(cros_flash_dev);`, followed by an assertion to confirm it locked successfully.\n\n### 2. Device Tree Node Mismatch\n**Severity: Medium**\nIn the test file `flash_physical.c`, you are fetching the device instance using:\n```c\n#define cros_flash_dev DEVICE_DT_GET(DT_CHOSEN(cros_ec_flash_controller))\n```\n*   **The Issue:** In the actual driver file (`cros_flash_npcx.c`), the flash device is retrieved using a different chosen node: `#define FLASH_DEV DT_CHOSEN(zephyr_flash_controller)`. \n*   **Suggestion:** Ensure that `cros_ec_flash_controller` is indeed the correct chosen node for the test environment\u0027s device tree. If the driver relies on `zephyr_flash_controller`, the test should ideally use the exact same chosen node to guarantee it is testing the correct peripheral instance.\n\n### 3. Missing Mapped Storage Locking\n**Severity: Medium**\nThe test directly calls low-level UMA functions like `cros_flash_npcx_set_write_enable`. \n*   **The Issue:** In the driver code, whenever status registers are interacted with (e.g., in `flash_get_status` and `flash_set_status`), the physical flash operations are wrapped with `crec_flash_lock_mapped_storage(1)` and `crec_flash_lock_mapped_storage(0)`. This prevents concurrent memory-mapped reads from interfering with UMA commands. While ZTESTs often run synchronously, invoking low-level driver commands without holding the mapped storage lock skips the concurrency safety nets designed for this hardware.\n*   **Suggestion:** Wrap the direct calls to `cros_flash_npcx_set_write_enable` and `cros_flash_npcx_set_write_disable` inside the test with `crec_flash_lock_mapped_storage(1)` and `(0)` to mimic safe, real-world driver behavior.",
+      "revId": "983daabbe8eeabd8f1e1edd03f5fc02d1c8681e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
