@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "605d48ac_7c7719d5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1594262
+      },
+      "writtenOn": "2026-03-17T14:05:08Z",
+      "side": 1,
+      "message": "The previous build (https://cr-buildbucket.appspot.com/build/8687081337825502433) is being automatically retried for the following reasons:\n- Some tests are now retryable:rauru-cq.hylia.hw.fingerprint-cq\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
+      "revId": "12b224da80b7db5f327fbc2408cb4ae5f7d2a3b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
