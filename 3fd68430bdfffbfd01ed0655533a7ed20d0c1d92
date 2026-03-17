@@ -22,6 +22,30 @@
       },
       "revId": "3fd68430bdfffbfd01ed0655533a7ed20d0c1d92",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2772fb5c_4bcc2059",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/boards/native_sim.overlay",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-17T01:43:39Z",
+      "side": 1,
+      "message": "ok. will do this",
+      "parentUuid": "d8972bea_7a15c274",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 1
+      },
+      "revId": "3fd68430bdfffbfd01ed0655533a7ed20d0c1d92",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
