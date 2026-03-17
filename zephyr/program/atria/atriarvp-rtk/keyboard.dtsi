@@ -1,0 +1,63 @@
+&kbd {
+        status = "okay";
+        pinctrl-0 = <
+                &ksi0_gpio064
+                &ksi1_gpio065
+                &ksi2_gpio066
+                &ksi3_gpio067
+                &ksi4_gpio068
+                &ksi5_gpio069
+                &ksi6_gpio070
+                &ksi7_gpio071
+                &kso0_gpio041
+                &kso1_gpio042
+                &kso2_gpio043
+                &kso3_gpio044
+                &kso4_gpio045
+                &kso5_gpio046
+                &kso6_gpio047
+                &kso7_gpio048
+                &kso8_gpio049
+                &kso9_gpio050
+                &kso10_gpio051
+                &kso11_gpio055
+                &kso12_gpio056
+                &kso13_gpio057
+                &kso14_gpio058
+                &kso15_gpio059
+                &kso16_gpio060
+                &kso17_gpio061
+        >;
+        row-size = <8>;
+        col-size = <18>;
+        settle-time-us = <80>;
+        pinctrl-1 = <
+                &kso0_sleep_gpio041
+                &kso1_sleep_gpio042
+                &kso2_sleep_gpio043
+                &kso3_sleep_gpio044
+                &kso4_sleep_gpio045
+                &kso5_sleep_gpio046
+                &kso6_sleep_gpio047
+                &kso7_sleep_gpio048
+                &kso8_sleep_gpio049
+                &kso9_sleep_gpio050
+                &kso10_sleep_gpio051
+                &kso11_sleep_gpio055
+                &kso12_sleep_gpio056
+                &kso13_sleep_gpio057
+                &kso14_sleep_gpio058
+                &kso15_sleep_gpio059
+                &kso16_sleep_gpio060
+                &kso17_sleep_gpio061
+                &ksi0_gpio064
+                &ksi1_gpio065
+                &ksi2_gpio066
+                &ksi3_gpio067
+                &ksi4_gpio068
+                &ksi5_gpio069
+                &ksi6_gpio070
+                &ksi7_gpio071
+        >;
+        pinctrl-names = "default", "sleep";
+};
