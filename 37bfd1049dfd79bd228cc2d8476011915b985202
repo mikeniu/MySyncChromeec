@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "08c1c495_a69051e2",
+        "filename": "common/i2c_controller.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 734,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-03-17T06:40:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "05c001af_c3025f73",
+      "range": {
+        "startLine": 734,
+        "startChar": 9,
+        "endLine": 734,
+        "endChar": 12
+      },
+      "revId": "37bfd1049dfd79bd228cc2d8476011915b985202",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8c221c53_d9074fe1",
@@ -61,6 +85,30 @@
       "writtenOn": "2026-03-17T05:38:48Z",
       "side": 1,
       "message": "Same here.",
+      "range": {
+        "startLine": 745,
+        "startChar": 12,
+        "endLine": 745,
+        "endChar": 15
+      },
+      "revId": "37bfd1049dfd79bd228cc2d8476011915b985202",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "83c3ba6c_9e2488b3",
+        "filename": "common/i2c_controller.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 745,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-03-17T06:40:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c221c53_d9074fe1",
       "range": {
         "startLine": 745,
         "startChar": 12,
