@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c6aaf13_cf81a9f1",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_mtl_pwrseq_sm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-17T22:42:32Z",
+      "side": 1,
+      "message": "Also update the `test_ap_pwrseq_3_sleep_reset` to check the host sleep state after power is lost.  The test can register a callback for `AP_POWER_S0IX_RESET_TRACKING`.",
+      "range": {
+        "startLine": 178,
+        "startChar": 2,
+        "endLine": 178,
+        "endChar": 33
+      },
+      "revId": "db20e486ce347318882b83c5fe2878dcb27e0c2c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
