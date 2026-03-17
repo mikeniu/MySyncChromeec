@@ -154,11 +154,11 @@
 			batter-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = <&battery_led_red>;
+					led-color = "LED_RED";
 					period-ms = <1000>;
 				};
 				color-1 {
-					led-color = <&battery_led_off>;
+					led-color = "LED_OFF";
 					period-ms = <1000>;
 				};
 			};
