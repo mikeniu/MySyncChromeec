@@ -122,3 +122,8 @@
 	status = "okay";
 	pinctrl-names = "default";
 };
+
+&kbd {
+	poll-period-us = <3000>;
+	stable-poll-period-us = <9000>;
+};
