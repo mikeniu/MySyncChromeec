@@ -26,6 +26,144 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b907674e_2f0c2538",
+        "filename": "zephyr/test/drivers/led_driver/src/max695x_led_test_simple.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-03-17T22:21:29Z",
+      "side": 1,
+      "message": "`#include \"display_7seg.h\"` provides this already",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 23
+      },
+      "revId": "7a736ceb40a7c934c8c03be3174d7b485700cbb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c29e3777_183e246f",
+        "filename": "zephyr/test/drivers/led_driver/src/max695x_led_test_simple.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-03-17T22:21:29Z",
+      "side": 1,
+      "message": "This will pass for errors other than EC_ERROR_UNKNOWN.\n\n`zassert_ok(ret, \"...\")` will ensure the return value is EC_SUCCESS (0).",
+      "range": {
+        "startLine": 32,
+        "startChar": 1,
+        "endLine": 32,
+        "endChar": 59
+      },
+      "revId": "7a736ceb40a7c934c8c03be3174d7b485700cbb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02658952_7731d86b",
+        "filename": "zephyr/test/drivers/led_driver/src/max695x_led_test_simple.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-03-17T22:21:29Z",
+      "side": 1,
+      "message": "You can assume this will always be defined since you enabled it in `led_driver/prj.conf`",
+      "range": {
+        "startLine": 177,
+        "startChar": 0,
+        "endLine": 177,
+        "endChar": 59
+      },
+      "revId": "7a736ceb40a7c934c8c03be3174d7b485700cbb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "338f5c76_8d053d84",
+        "filename": "zephyr/test/drivers/led_driver/src/max695x_led_test_simple.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-03-17T22:21:29Z",
+      "side": 1,
+      "message": "How is this different from `test_console_command_valid_values`?",
+      "range": {
+        "startLine": 206,
+        "startChar": 1,
+        "endLine": 211,
+        "endChar": 4
+      },
+      "revId": "7a736ceb40a7c934c8c03be3174d7b485700cbb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4f163cc_a5fc2b14",
+        "filename": "zephyr/test/drivers/led_driver/src/max695x_led_test_simple.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-03-17T22:21:29Z",
+      "side": 1,
+      "message": "This doesn\u0027t test anything.",
+      "range": {
+        "startLine": 300,
+        "startChar": 1,
+        "endLine": 302,
+        "endChar": 63
+      },
+      "revId": "7a736ceb40a7c934c8c03be3174d7b485700cbb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab4dd79e_2507dc23",
+        "filename": "zephyr/test/drivers/led_driver/src/max695x_led_test_simple.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-03-17T22:21:29Z",
+      "side": 1,
+      "message": "Can be removed and replaced with NULL in ZTEST_SUITE",
+      "range": {
+        "startLine": 315,
+        "startChar": 0,
+        "endLine": 318,
+        "endChar": 1
+      },
+      "revId": "7a736ceb40a7c934c8c03be3174d7b485700cbb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "802636d4_db9aa71c",
         "filename": "zephyr/test/drivers/led_driver/src/stubs.c",
         "patchSetId": 4
