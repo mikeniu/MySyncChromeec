@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b54490d_95782ba8",
+        "filename": "zephyr/drivers/imvp/rt3645.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-03-17T15:49:51Z",
+      "side": 1,
+      "message": "I don\u0027t see a lot of value in having this check. We assert the GPIO immediately before and have a brief delay to allow the IMVP to react. Is there any scenario where this GPIO would *not* read high? I think we can just skip this and proceed to `if (!rt3645_update(rt3645_dev))...`",
+      "range": {
+        "startLine": 292,
+        "startChar": 0,
+        "endLine": 297,
+        "endChar": 18
+      },
+      "revId": "fffbd5bed251787a225f41a7a7ef2f9b8d2a6d4b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
