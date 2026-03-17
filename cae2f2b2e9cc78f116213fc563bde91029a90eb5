@@ -22,6 +22,30 @@
       },
       "revId": "cae2f2b2e9cc78f116213fc563bde91029a90eb5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46fcff2b_2e740bd9",
+        "filename": "zephyr/test/ap_power/src/boards/alderlake.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-17T20:49:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef4b9363_c55b6d0d",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 119,
+        "endChar": 43
+      },
+      "revId": "cae2f2b2e9cc78f116213fc563bde91029a90eb5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
