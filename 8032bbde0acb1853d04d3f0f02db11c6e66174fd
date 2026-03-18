@@ -16,6 +16,29 @@
       "message": "Gemini review (I haven\u0027t reviewed the locking in this file, so check to see if this is correct):\n\n\n*   **Missing Hardware Lock:** \n    In the existing driver code, `cros_flash_npcx_get_status_reg()` is called within a critical section that locks physical flash operations (as seen in `flash_get_status` and `flash_set_status` using `crec_flash_lock_mapped_storage()`). \n    Your new function, `flash_control_register_locked`, calls `cros_flash_npcx_get_status_reg()` *without* acquiring this lock. If this function is invoked while the mapped storage is being accessed elsewhere, it could lead to SPI bus contention or a race condition. \n    **Recommendation:** Wrap the status register read with the appropriate lock/unlock mechanism, or ensure it is explicitly documented that the caller must hold the mapped storage lock.",
       "revId": "8032bbde0acb1853d04d3f0f02db11c6e66174fd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc10e535_d643f046",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-18T21:39:31Z",
+      "side": 1,
+      "message": "Can you add a small comment here on *why* it\u0027s considered locked if *either* of these are true?",
+      "range": {
+        "startLine": 278,
+        "startChar": 0,
+        "endLine": 278,
+        "endChar": 49
+      },
+      "revId": "8032bbde0acb1853d04d3f0f02db11c6e66174fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
