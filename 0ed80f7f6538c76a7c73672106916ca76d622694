@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75371659_0d73d8c1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-18T17:31:32Z",
+      "side": 1,
+      "message": "I think the code here is a great start. A few notes on organization:\n\nGeneric code should land on `main` first, then cherry pick to `ec-legacy`. Code specific to legacy EC should land directly on `ec-legacy`.\n\n`usb_common.c` is for code shared by TCPMv1 and TCPMv2. Your function names suggest that this should be specific to TCPMv2, and I think that\u0027s a good idea. This code should go somewhere in `common/usbc`, but there\u0027s some nuance here:\n\n`svdm_rsp_dfp_only.c` already exists and does essentially what this CL does, but it\u0027s currently Zephyr-only. Also, obviously, it only covers the DFP case, and it doesn\u0027t support TBT3 and USB4. So here\u0027s probably how you should combine them:\n1. Enable `CONFIG_SVDM_RSP_DFP_ONLY` for one of the nissa boards that runs Zephyr. Make sure it does what you want.\n1. Add a corresponding config to `config.h`, translation in the shim in `config_chip.h`, and a line in `common/usbc/build.mk`, so it works with non-Zephyr. This is your first CL.\n1. Enable it in dedede and check that it still does what you want. This is your second CL.\n1. Enable it for other boards similar to dedede and nissa (no USB4, no FRS).\n1. Add support for USB4 and FRS like you have in this CL.\n1. Enable the config for boards that use those features.\n1. Add support for TBT3 as a UFP, which is used in some boards. This will mean that the feature is no-longer UFP-only. Change the name of the config and file to match.\n1. Enable the config for more boards. I think it should cover all normal boards at this point.\n1. Change the config to enabled by default. Explicitly disable it on the weird boards.",
+      "revId": "0ed80f7f6538c76a7c73672106916ca76d622694",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf8abec8_642c18e4",
+        "filename": "common/usb_common.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 893,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-18T17:31:32Z",
+      "side": 1,
+      "message": "At some point, we\u0027ll also need a common handler for enabling the Intel SVID and TBT mode VDO mode for testing. I think it\u0027s fine to not do that yet in this CL. dedede doesn\u0027t support TBT and won\u0027t need that.",
+      "revId": "0ed80f7f6538c76a7c73672106916ca76d622694",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
