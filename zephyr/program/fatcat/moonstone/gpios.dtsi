@@ -89,6 +89,9 @@
 			gpios = <&gpioc 6 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
 			enum-name = "GPIO_ENABLE_BACKLIGHT";
 		};
+		gpio_ec_en_pwrmon: ec_en_pwrmon {
+			gpios = <&gpiof 2 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
+		};
 		gpio_en_pp5000_usba: en_pp5000_usba {
 			gpios = <&gpiof 4 (GPIO_OUTPUT_LOW)>;
 		};
@@ -217,9 +220,6 @@
 			<&gpioa 0 0>,
 			<&gpioa 6 0>,
 			<&gpiob 2 0>,
-			<&gpiob 3 0>,
-			<&gpiob 4 0>,
-			<&gpiof 2 0>,
 			<&gpiof 3 0>,
 			<&gpiog 0 0>,
 			<&gpiog 3 0>,
