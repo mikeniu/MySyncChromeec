@@ -22,6 +22,30 @@
       },
       "revId": "f5fe08a3d8b42685daa3db56f318348d12760695",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "407cbb95_e92c9039",
+        "filename": "power/qcom_exp.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1532003
+      },
+      "writtenOn": "2026-03-18T13:55:41Z",
+      "side": 1,
+      "message": "\u003e Do we want to charge in off-mode even on shutdown from the OS?\n\nideally yes.",
+      "parentUuid": "8c751141_a589e160",
+      "range": {
+        "startLine": 362,
+        "startChar": 5,
+        "endLine": 362,
+        "endChar": 19
+      },
+      "revId": "f5fe08a3d8b42685daa3db56f318348d12760695",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
