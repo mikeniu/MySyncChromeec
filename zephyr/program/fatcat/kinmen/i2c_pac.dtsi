@@ -1,0 +1,439 @@
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "../../zephyr/drivers/sensor/microchip/pac194x/pac194x.h"
+
+&i2c0 {
+	status = "okay";
+
+    pinctrl-0 = <&i2c0_clk_gpb3_default
+		     &i2c0_data_gpb4_default>;
+	pinctrl-names = "default";
+
+    label = "I2C_PAC";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+
+    pac1954@10 {
+        compatible = "microchip,pac1954";
+        reg = <0x10>;
+        status = "okay";
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        channel@2 {
+	    reg = <0x2>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP1800_EC_Z1";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@3 {
+	    reg = <0x3>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP1800_Z1";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@4 {
+	    reg = <0x4>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PPVAR_BAT";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+    };
+
+    pac1954@11 {
+        compatible = "microchip,pac1954";
+        reg = <0x11>;
+        status = "okay";
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        channel@1 {
+	    reg = <0x1>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP3300_Z5";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@2 {
+	    reg = <0x2>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP1800_S5";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@4 {
+	    reg = <0x4>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP1800_SOC_S5";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+    };
+
+    pac1954@12 {
+        compatible = "microchip,pac1954";
+        reg = <0x12>;
+        status = "okay";
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        channel@1 {
+	    reg = <0x1>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP3300_FCAM_X";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@2 {
+	    reg = <0x2>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP3300_SOC_S5";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@3 {
+	    reg = <0x3>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP1500_RTC_Z5";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@4 {
+	    reg = <0x4>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PPVAR_SYS_EDP";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+    };
+
+    pac1954@13 {
+        compatible = "microchip,pac1954";
+        reg = <0x13>;
+        status = "okay";
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        channel@2 {
+	    reg = <0x2>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "VIN_PPVAR_VCCCORE_PH2";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@3 {
+	    reg = <0x3>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP5000_FAN_X";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@4 {
+	    reg = <0x4>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP5000_IMVP_S5";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+    };
+
+    pac1954@14 {
+        compatible = "microchip,pac1954";
+        reg = <0x14>;
+        status = "okay";
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        channel@2 {
+	    reg = <0x2>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP3300_DBG";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@3 {
+	    reg = <0x3>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP1065_MEM_S3";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@4 {
+	    reg = <0x4>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP0520_MEM_S3";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+    };
+
+    pac1954@15 {
+        compatible = "microchip,pac1954";
+        reg = <0x15>;
+        status = "okay";
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        channel@1 {
+	    reg = <0x1>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP3300_EDP_X";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@3 {
+	    reg = <0x3>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP3300_TCHSCR_X";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@4 {
+	    reg = <0x4>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP1800_TCHSCR_X";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+    };
+
+    pac1954@16 {
+        compatible = "microchip,pac1954";
+        reg = <0x16>;
+        status = "okay";
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        channel@1 {
+	    reg = <0x1>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP3300_EC_Z1";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@2 {
+	    reg = <0x2>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP3300_Z1";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@3 {
+	    reg = <0x3>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP1800_EC_S5";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@4 {
+	    reg = <0x4>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP3300_GSC_Z1";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+    };
+
+    pac1954@17 {
+        compatible = "microchip,pac1954";
+        reg = <0x17>;
+        status = "okay";
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        channel@1 {
+	    reg = <0x1>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PPVAR_VBUS_IN";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@2 {
+	    reg = <0x2>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP1800_GSC_Z1";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@4 {
+	    reg = <0x4>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP5000_S5";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+    };
+
+    pac1954@18 {
+        compatible = "microchip,pac1954";
+        reg = <0x18>;
+        status = "okay";
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        channel@1 {
+	    reg = <0x1>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP1800_MEM_S3";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@3 {
+	    reg = <0x3>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP3300_S5";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@4 {
+	    reg = <0x4>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "TP196_TP197";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+    };
+
+    pac1954@19 {
+        compatible = "microchip,pac1954";
+        reg = <0x19>;
+        status = "okay";
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        channel@1 {
+	    reg = <0x1>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP1250_SOC_S5";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@2 {
+	    reg = <0x2>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP1250_SOC_VIN";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@3 {
+	    reg = <0x3>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP0770_SOC_S3";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@4 {
+	    reg = <0x4>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP0770_SOC_S5";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+    };
+
+    pac1954@1a {
+        compatible = "microchip,pac1954";
+        reg = <0x1a>;
+        status = "okay";
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        channel@2 {
+	    reg = <0x2>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP3300_SSD_X";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@3 {
+	    reg = <0x3>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "PP1800_SSD_GEN5_X";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+    };
+
+    pac1954@1b {
+        compatible = "microchip,pac1954";
+        reg = <0x1b>;
+        status = "okay";
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        channel@1 {
+	    reg = <0x1>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "VIN_PPVAR_VCCLPECORE";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@2 {
+	    reg = <0x2>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "VIN_PPVAR_VCCGT";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@3 {
+	    reg = <0x3>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "VIN_PPVAR_VCCCORE_PH1";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+        channel@4 {
+	    reg = <0x4>;
+            shunt-resistor-micro-ohms = <1000>;
+            label = "VIN_PPVAR_VCCSA";
+            microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+            microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+        };
+    };
+
+};
+

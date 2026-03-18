@@ -11,6 +11,7 @@
 #include "fan.dtsi"
 #include "gpios.dtsi"
 #include "i2c.dtsi"
+#include "i2c_pac.dtsi"
 #include "interrupts.dtsi"
 #include "keyboard.dtsi"
 #include "temp_sensors.dtsi"
