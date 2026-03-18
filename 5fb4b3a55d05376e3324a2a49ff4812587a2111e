@@ -106,6 +106,24 @@
       "parentUuid": "ea78fbe4_82ae6db7",
       "revId": "5fb4b3a55d05376e3324a2a49ff4812587a2111e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0979056c_c79077ce",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-18T06:45:09Z",
+      "side": 1,
+      "message": "Looks good, we need EC team to review it.",
+      "parentUuid": "5da2917c_e6aa5663",
+      "revId": "5fb4b3a55d05376e3324a2a49ff4812587a2111e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
