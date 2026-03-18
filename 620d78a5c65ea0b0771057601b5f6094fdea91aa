@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fcea161_4a556b5b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-18T23:08:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "989d225c_4a84991b",
+      "revId": "620d78a5c65ea0b0771057601b5f6094fdea91aa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "20c46519_4b804d1d",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-03-18T21:58:44Z",
       "side": 1,
       "message": "It looks like `ZTESTABLE_STATIC` is the new upstream way to do this:\n\n* https://docs.zephyrproject.org/latest/doxygen/html/group__sys-util.html#ga7b4ab1185237b8cfc15fd92bf552305d\n* https://github.com/zephyrproject-rtos/zephyr/pull/104385",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 119,
+        "endChar": 27
+      },
+      "revId": "620d78a5c65ea0b0771057601b5f6094fdea91aa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "19325ad6_8a206a7b",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-18T23:08:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "20c46519_4b804d1d",
       "range": {
         "startLine": 119,
         "startChar": 0,
