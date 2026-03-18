@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa64f192_d494f408",
+        "filename": "zephyr/test/hwtest/src/flash_physical.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-18T22:41:15Z",
+      "side": 1,
+      "message": "Are you sure about these values other than it makes the test pass?\n\nCan you provide pointers to any docs or code that back up these values?",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 31
+      },
+      "revId": "f9ffa9c03c5af50ad5ce464f0a5f92754da124a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
