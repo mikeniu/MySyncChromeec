@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fcd4ca0_1d793974",
+        "filename": "zephyr/test/hwtest/src/flash_physical.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-18T22:42:47Z",
+      "side": 1,
+      "message": "Can you provide any links to documentation or code that backs up these values and add them as comments?\n\nFor example, it looks like `num_flash_banks` matches the [sectors shown here](https://chromium.googlesource.com/chromiumos/platform/ec/+/HEAD/docs/fingerprint/fingerprint-ram-and-flash.md#stm32f412cg-bloonchipper).\n\nHow about the others?",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 2
+      },
+      "revId": "f80662e1e5f08d64f334b2fec3294669f5527911",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
