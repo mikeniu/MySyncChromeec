@@ -46,6 +46,30 @@
       },
       "revId": "f5fe08a3d8b42685daa3db56f318348d12760695",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aafa7750_a4af4549",
+        "filename": "power/qcom_exp.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-03-18T16:26:09Z",
+      "side": 1,
+      "message": "Yes, we will enter off-mode even on shutdown from OS, we will merge this post ADSP-lite integration. crrev/c/7206613",
+      "parentUuid": "407cbb95_e92c9039",
+      "range": {
+        "startLine": 362,
+        "startChar": 5,
+        "endLine": 362,
+        "endChar": 19
+      },
+      "revId": "f5fe08a3d8b42685daa3db56f318348d12760695",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
