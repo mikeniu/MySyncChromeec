@@ -70,6 +70,30 @@
       },
       "revId": "f5fe08a3d8b42685daa3db56f318348d12760695",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d13be1d_1201e540",
+        "filename": "power/qcom_exp.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1552197
+      },
+      "writtenOn": "2026-03-18T16:48:04Z",
+      "side": 1,
+      "message": "Sure, lets do that as part of another CL.\n\nIt would be good to handle that case via RTC alarm to avoid the user notification.",
+      "parentUuid": "aafa7750_a4af4549",
+      "range": {
+        "startLine": 362,
+        "startChar": 5,
+        "endLine": 362,
+        "endChar": 19
+      },
+      "revId": "f5fe08a3d8b42685daa3db56f318348d12760695",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
