@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "00ebec67c10f4099b6e7ae3d2dee2338fe5e0a0f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22670ebc_268d5925",
+        "filename": "zephyr/program/fatcat/kinmen/i2c_pac.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1564607
+      },
+      "writtenOn": "2026-03-18T12:20:02Z",
+      "side": 1,
+      "message": "small nit - tabs to spaces? Please ignore if it is auto-formatted.",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 1
+      },
+      "revId": "00ebec67c10f4099b6e7ae3d2dee2338fe5e0a0f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
