@@ -22,6 +22,30 @@
       },
       "revId": "f80662e1e5f08d64f334b2fec3294669f5527911",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43cd8372_97588a20",
+        "filename": "zephyr/test/hwtest/src/flash_physical.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-18T23:11:47Z",
+      "side": 1,
+      "message": "those are from the legacy test [flash_physical.c](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec-legacy/test/flash_physical.c)",
+      "parentUuid": "2fcd4ca0_1d793974",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 2
+      },
+      "revId": "f80662e1e5f08d64f334b2fec3294669f5527911",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
