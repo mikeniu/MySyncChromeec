@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "730afc05_df11b976",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-18T03:50:50Z",
+      "side": 1,
+      "message": "Thanks for the reference, I will review the cros_flash_andes_xip driver for its design concepts.\n\nHowever, our platform uses an internal flash controller with non-volatile protection, which differs from the Andes XIP model based on external flash and software locking.\n\nDue to this difference, the driver implementation on our side will not be identical, but we will align with the overall design principles where applicable.",
+      "parentUuid": "387d80e9_3a2cb79f",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4a6c51f3_5f4f3478",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-03-16T10:50:58Z",
       "side": 1,
       "message": "Do not enable the flash protection automatically. `write_protect_is_asserted` rather means that flash protection can not be changed (or \"reduced?).",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba67c515_d0a98ee1",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-18T03:50:50Z",
+      "side": 1,
+      "message": "OK, I will remove enable RO protection automatically on next patch.",
+      "parentUuid": "4a6c51f3_5f4f3478",
       "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -71,6 +107,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "998cd43e_c6124670",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-18T03:50:50Z",
+      "side": 1,
+      "message": "OK, I will remove LOG_INF next patch set.",
+      "parentUuid": "59a7a6e5_e97ab1bd",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "403c7313_3618d89b",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 7
@@ -88,6 +142,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "74c51d88_39673a68",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-18T03:50:50Z",
+      "side": 1,
+      "message": "OK, I will remove `write_protect_is_asserted` condition to make `disable RW temporary` for our non-volatile flash on next patch.",
+      "parentUuid": "403c7313_3618d89b",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "601281ae_be310ac9",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 7
@@ -99,6 +171,24 @@
       "writtenOn": "2026-03-16T10:50:58Z",
       "side": 1,
       "message": "Are RO and RW (bank 1 and 2) protections independent?",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01b88131_fd6f6c4e",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-18T03:50:50Z",
+      "side": 1,
+      "message": "Yes, we have two independent protect area 1(for RO) and 2(for RW | RB).",
+      "parentUuid": "601281ae_be310ac9",
       "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -122,6 +212,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "51dd2c23_61d16f23",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-18T03:50:50Z",
+      "side": 1,
+      "message": "Got it. I will refer to [here](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/cros_flash/cros_flash_andestech_xip.c;l\u003d417) and update on next patch. Make sure flash protection can\u0027t reduce when `write_protect_is_asserted`",
+      "parentUuid": "dbbcc101_84f3e902",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "83989935_cfe5248c",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 7
@@ -139,6 +247,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5b2719fc_e933f411",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-18T03:50:50Z",
+      "side": 1,
+      "message": "Since our flash protection is non-volatile, both _AT_BOOT and _NOW flags effectively represent the same protection state on our platform.\n\nIn other words, the protection is preserved across reboots, so there is no distinction between \"protection set at boot\" and \"protection active at runtime.\"",
+      "parentUuid": "83989935_cfe5248c",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2b2255d0_781c322e",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 7
@@ -150,6 +276,24 @@
       "writtenOn": "2026-03-16T10:50:58Z",
       "side": 1,
       "message": "I will disable the second protection range, but won\u0027t enable the second one.",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b5a154f_d76d6424",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-18T03:50:50Z",
+      "side": 1,
+      "message": "That means I should handle only `all \u003d\u003d false` case to disable second protection range, right?",
+      "parentUuid": "2b2255d0_781c322e",
       "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -316,6 +460,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "44588673_3f21e8c2",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-18T03:50:50Z",
+      "side": 1,
+      "message": "Sorry for the confusion caused by the term \"hardcoded.\"\nWhat I actually meant is that the RO size is defined via DTS, not hardcoded in the driver.\n\n```\n#define CONFIG_WP_STORAGE_SIZE CONFIG_EC_PROTECTED_STORAGE_SIZE\n#define CONFIG_EC_PROTECTED_STORAGE_SIZE DT_PROP(_BINMAN_RO_PATH, size)\n```\nSo the protection range is determined by configuration (DTS) with different projects, rather than being fixed in the code.\n\n\u003eCan the cros_flash driver set different protection ranges using the same library and rom code?\n\nYes, we expect the cros_flash driver to support different RO sizes (e.g., CONFIG_WP_STORAGE_SIZE) while using the same library and ROM code.\n\nThat is why the API is designed to take parameters (e.g., uint32_t offset, size_t page_count) instead of relying on fixed values in library.",
+      "parentUuid": "115b6205_50d0bfca",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "264c1b63_888aadf5",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
         "patchSetId": 7
@@ -381,6 +543,24 @@
       "side": 1,
       "message": "Yes, this looks good. I meant rather if there is any \"error register\" or something like that indentifying any problems with flash protection.",
       "parentUuid": "49c579d9_b59cde0f",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "efae0509_390c5a63",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-18T03:50:50Z",
+      "side": 1,
+      "message": "We have confirmed with our team that there is no \"error register\" in the EM32F967.\nOnly two registers are available, both sharing the same format as described above.\nWe write to register A, and the hardware processes the operation and updates register B (read-only) accordingly.\nThe protection status is then determined by our library API through reading register B.",
+      "parentUuid": "c5c6ba8f_ab575747",
       "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
