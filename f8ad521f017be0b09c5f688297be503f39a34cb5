@@ -46,6 +46,30 @@
       },
       "revId": "f8ad521f017be0b09c5f688297be503f39a34cb5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e966f212_2fc3f180",
+        "filename": "zephyr/program/ocelot/ocelotrvp-ite/power_signals.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-18T15:39:00Z",
+      "side": 0,
+      "message": "Can you clarify - is the expectation that `powerindebug` should normally show PWR_SYS_RST with a value of 0 because the signal is active low.\n\nThe EC only asserts (logical state 1, physical state 0) PWR_SYS_RST for 16ms [here](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c;l\u003d312;drc\u003d4ec6cb1e1bb5744e8c68d6e75e392d4da8e7c03e)",
+      "parentUuid": "ddf6e2d2_df9e88d8",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 61
+      },
+      "revId": "f8ad521f017be0b09c5f688297be503f39a34cb5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
