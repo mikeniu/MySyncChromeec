@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "aec9fd91_879e92ee",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 63
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-18T10:19:49Z",
+      "side": 1,
+      "message": "So you are saying that the IRQ line is not active constantly after the reset, thare are pulses? If that\u0027s the case, I would check the state of IRQ line in a loop for ~2ms, without any sleep or prints between checks.",
+      "parentUuid": "d1e2e09c_75a313a2",
+      "revId": "2a2d8b23f02d8f955ef25b95198be92e920141b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7b240624_4987da55",
         "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
         "patchSetId": 63
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Fixed.",
       "parentUuid": "7b240624_4987da55",
+      "revId": "2a2d8b23f02d8f955ef25b95198be92e920141b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6521645_c3ea8431",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 63
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-18T10:19:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b1334b52_eebe71a6",
       "revId": "2a2d8b23f02d8f955ef25b95198be92e920141b7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -142,6 +178,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6967615_5f6af465",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 63
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-18T10:19:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "550eebb4_29049825",
+      "range": {
+        "startLine": 135,
+        "startChar": 3,
+        "endLine": 135,
+        "endChar": 17
+      },
+      "revId": "2a2d8b23f02d8f955ef25b95198be92e920141b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "86e8abc9_c2bca921",
@@ -177,6 +237,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7dadb1f_a3edf415",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 63
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-18T10:19:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f970098d_15bb6a0d",
+      "revId": "2a2d8b23f02d8f955ef25b95198be92e920141b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f765fdc8_140a83ab",
@@ -208,6 +286,24 @@
       "side": 1,
       "message": "Fixed.",
       "parentUuid": "f765fdc8_140a83ab",
+      "revId": "2a2d8b23f02d8f955ef25b95198be92e920141b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "552d87d7_f1df2a0b",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 63
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-18T10:19:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce991dd7_6a2fb394",
       "revId": "2a2d8b23f02d8f955ef25b95198be92e920141b7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
