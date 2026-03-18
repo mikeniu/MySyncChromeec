@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07f03d73_f2e46749",
+        "filename": "common/fpsensor/OWNERS",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-18T20:43:49Z",
+      "side": 0,
+      "message": "Not blocking: Do you remember why we deleted `OWNERS` in the release branch?\n\ngit log points to https://crrev.com/c/3155172",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 94
+      },
+      "revId": "4af0b17673dd8e924ae2a0c09008c422b2007f99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
