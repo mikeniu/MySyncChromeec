@@ -174,6 +174,9 @@
 			gpios = <&gpioe 6 GPIO_OUTPUT>;
 			enum-name = "GPIO_PACKET_MODE_EN";
 		};
+        gpio_ec_en_pwrmon: ec_en_pwrmon {
+            gpios = <&gpiof 2 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
+        };
 		gpio_usb_pd1_int_odl: usb_pd_int_odl {
 			gpios = <&gpiof 5 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 			no-auto-init;
