@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "77d6eac5_a8f17660",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-18T00:03:01Z",
+      "side": 1,
+      "message": "Sounds good, I can do that in a follow up CL.",
+      "parentUuid": "d9755bd0_ebe1cbe1",
+      "revId": "5db43118eca51fa704b6bcaca4a53c9974645286",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fb9590c2_a1521b04",
@@ -48,6 +66,30 @@
       "writtenOn": "2026-03-17T22:54:04Z",
       "side": 1,
       "message": "From Bernardo\u0027s suggestion:\n```\nif (!DT_INST_PROP(0, defer_until_s5)) {\n  return;\n}\n```",
+      "range": {
+        "startLine": 196,
+        "startChar": 0,
+        "endLine": 196,
+        "endChar": 35
+      },
+      "revId": "5db43118eca51fa704b6bcaca4a53c9974645286",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0e91f89_b087ebe2",
+        "filename": "zephyr/drivers/board_id/board_id_intel_rvp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-18T00:03:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fb9590c2_a1521b04",
       "range": {
         "startLine": 196,
         "startChar": 0,
