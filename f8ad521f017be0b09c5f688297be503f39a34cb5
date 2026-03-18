@@ -22,6 +22,30 @@
       },
       "revId": "f8ad521f017be0b09c5f688297be503f39a34cb5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddf6e2d2_df9e88d8",
+        "filename": "zephyr/program/ocelot/ocelotrvp-ite/power_signals.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-03-18T11:56:52Z",
+      "side": 0,
+      "message": "I have changed GPIO_ODR_HIGH to GPIO_OPEN_DARIN as compile error is seen,\n\ndevicetree_generated.h:18552:54: error: unsigned conversion from \u0027int\u0027 to \u0027short unsigned int\u0027 changes value from \u0027655367\u0027 to \u00277\u0027 [-Werror\u003doverflow]\n18552 | #define DT_N_S_pwr_sys_rst_l_P_gpios_IDX_0_VAL_flags 655367\n\nchanged as: gpios \u003d \u003c\u0026ioex_it8801_port1 0 (GPIO_OPEN_DARIN|GPIO_ACTIVE_LOW)\u003e;\n\n\"sysrst 1\" functionality works fine but in \"powerindebug\" the PWR_SYS_RST do not reflect the actual value, always set to 1.",
+      "parentUuid": "4575c148_45ced3e7",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 61
+      },
+      "revId": "f8ad521f017be0b09c5f688297be503f39a34cb5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
