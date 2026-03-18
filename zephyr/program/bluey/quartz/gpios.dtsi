@@ -33,10 +33,9 @@
 		};
 		gpio_ec_en_pp5000_s5: ec_en_pp5000_s5 {
 			gpios = <&gpio4 0 (GPIO_OUTPUT)>;
-			enum-name = "GPIO_EN_PP5000";
 		};
 		gpio_pp1800_l1i_s3_ec: pp1800_l1i_s3_ec {
-			gpios = <&gpio5 0 (GPIO_INPUT)>;
+			gpios = <&gpio5 0 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
 		};
 		gpio_dock_vdm_pwr_on: dock_vdm_pwr_on {
 			gpios = <&gpio5 4 (GPIO_INPUT)>;
@@ -48,7 +47,7 @@
 			gpios = <&gpio6 0 (GPIO_OUTPUT)>;
 		};
 		gpio_pg_pp5000_s5_od: pg_pp5000_s5_od {
-			gpios = <&gpio6 3 (GPIO_INPUT | GPIO_OPEN_DRAIN)>;
+			gpios = <&gpio6 3 (GPIO_INPUT)>;
 		};
 		gpio_ec_enavdd_oled: ec_enavdd_oled {
 			gpios = <&gpio6 7 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
@@ -66,6 +65,12 @@
 		gpio_fp_led_ca: fp_led_ca {
 			gpios = <&gpio8 0 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
 		};
+		ec_i2c_apps_sda {
+			gpios = <&gpio8 7 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+		};
+		ec_i2c_apps_scl {
+			gpios = <&gpio9 0 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+		};
 		gpio_sys_rst_odl: sys_rst_odl {
 			gpios = <&gpio9 3 (GPIO_INPUT)>;
 			enum-name = "GPIO_WARM_RESET_L";
@@ -78,10 +83,10 @@
 		};
 		gpio_ec_pmk_rst_1v8: ec_pmk_rst_1v8 {
 			gpios = <&gpio9 6 (GPIO_OUTPUT)>;
-			enum-name = "GPIO_PMIC_RESIN_L";
+			enum-name = "GPIO_PMIC_RESIN";
 		};
 		gpio_bl_off_odl: bl_off_odl {
-			gpios = <&gpio9 7 (GPIO_OUTPUT)>;
+			gpios = <&gpio9 7 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW | GPIO_OPEN_DRAIN )>;
 		};
 		gpio_sys_in_suspend: sys_in_suspend {
 			gpios = <&gpioa 0 (GPIO_INPUT)>;
@@ -151,20 +156,26 @@
 			gpios = <&gpiod 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
 		};
 		gpio_smb2360_b_chg_led_pg_odl: smb2360_b_chg_led_pg_odl {
-			gpios = <&gpioe 0 (GPIO_INPUT)>;
+			gpios = <&gpioe 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
 		gpio_ccd_mode_odl: ccd_mode_odl {
 			gpios = <&gpioe 5 (GPIO_INPUT)>;
 			enum-name = "GPIO_CCD_MODE_ODL";
 		};
 		gpio_smb2360_a_chg_led_pg_odl: smb2360_a_chg_led_pg_odl {
-			gpios = <&gpiof 0 (GPIO_INPUT)>;
+			gpios = <&gpiof 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
+		ec_i2c_sensor_sda {
+			gpios = <&gpiof 2 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+		};
+		ec_i2c_sensor_scl {
+			gpios = <&gpiof 3 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
 		};
 		gpio_led_ec_do_argb_di: led_ec_do_argb_di {
 			gpios = <&gpio3 5 (GPIO_OUTPUT)>;
 		};
 		gpio_en_pp5000_led_x: en_pp5000_led_x {
-			gpios = <&gpio6 6 (GPIO_OUTPUT)>;
+			gpios = <&gpio6 6 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_HIGH)>;
 		};
 		gpio_ec_rst_odl: ec_rst_odl {
 			gpios = <&gpio7 7 (GPIO_INPUT)>;
@@ -185,9 +196,13 @@
 			<&gpio6 2 0>,
 			<&gpio7 2 0>,
 			<&gpio7 4 0>,
+			<&gpio7 5 0>,
 			<&gpio8 1 0>,
+			<&gpio8 6 0>,
 			<&gpio9 1 0>,
 			<&gpio9 2 0>,
+			<&gpioc 2 0>,
+			<&gpioc 3 0>,
 			<&gpioc 5 0>,
 			<&gpiod 0 0>,
 			<&gpiod 1 0>,
@@ -214,12 +229,6 @@ gpio_ap_plt_rst_n: &gpio_plt_rst_odl {};
 gpio_sleep_indicator: &gpio_sys_in_suspend {};
 gpio_soc_ps_hold_ls: &gpio_soc_ps_hold_ls {};
 gpio_sys_rst_odl: &gpio_sys_rst_odl {};
-
-/*
- * Aliases power-rails to common names
- */
-gpio_ec_3v_s3_en: &gpio_ec_en_pp3300_s3 {};
-gpio_ec_en_ppvar_oled: &gpio_ec_enavdd_oled {};
 
 /*
  * Aliases switchcap to common names

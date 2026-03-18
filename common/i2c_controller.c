@@ -152,7 +152,7 @@ static int i2c_xfer_no_retry(const int port, const uint16_t addr_flags,
 	int offset;
 
 	for (offset = 0; offset < out_size;) {
-		int chunk_size = MIN(out_size - offset,
+		int chunk_size = min(out_size - offset,
 				     CONFIG_I2C_CHIP_MAX_TRANSFER_SIZE);
 		int out_flags = 0;
 
@@ -167,7 +167,7 @@ static int i2c_xfer_no_retry(const int port, const uint16_t addr_flags,
 		offset += chunk_size;
 	}
 	for (offset = 0; offset < in_size;) {
-		int chunk_size = MIN(in_size - offset,
+		int chunk_size = min(in_size - offset,
 				     CONFIG_I2C_CHIP_MAX_TRANSFER_SIZE);
 		int in_flags = 0;
 
@@ -330,7 +330,20 @@ void i2c_prepare_sysjump(void)
 		mutex_lock(port_mutex + i);
 }
 
-/* i2c_readN with optional error checking */
+static uint8_t i2c_header_crc8(const uint16_t addr_flags, uint8_t reg)
+{
+	/* addr_8bit = 7 bit addr_flags + 1 bit r/w */
+	uint8_t addr_8bit = I2C_STRIP_FLAGS(addr_flags) << 1;
+	uint8_t out[3] = { addr_8bit, reg, addr_8bit | 1 };
+	return cros_crc8(out, ARRAY_SIZE(out));
+}
+
+/*
+ * i2c_readN with optional error checking
+ *
+ * in_size should the actual input size plus 1 to allow including the PEC byte
+ * in a single xfer call.
+ */
 static int platform_ec_i2c_read(const int port, const uint16_t addr_flags,
 				uint8_t reg, uint8_t *in, int in_size)
 {
@@ -339,25 +352,18 @@ static int platform_ec_i2c_read(const int port, const uint16_t addr_flags,
 
 	if (IS_ENABLED(CONFIG_SMBUS_PEC) && I2C_USE_PEC(addr_flags)) {
 		int i, rv;
-		/* addr_8bit = 7 bit addr_flags + 1 bit r/w */
-		uint8_t addr_8bit = I2C_STRIP_FLAGS(addr_flags) << 1;
-		uint8_t out[3] = { addr_8bit, reg, addr_8bit | 1 };
+		uint8_t pec_header = i2c_header_crc8(addr_flags, reg);
 		uint8_t pec_local = 0, pec_remote;
 
 		i2c_lock(port, 1);
 		for (i = 0; i <= CONFIG_I2C_NACK_RETRY_COUNT; i++) {
 			rv = i2c_xfer_unlocked(port, addr_flags, &reg, 1, in,
-					       in_size, I2C_XFER_START);
+					       in_size, I2C_XFER_SINGLE);
 			if (rv)
 				continue;
 
-			rv = i2c_xfer_unlocked(port, addr_flags, NULL, 0,
-					       &pec_remote, 1, I2C_XFER_STOP);
-			if (rv)
-				continue;
-
-			pec_local = cros_crc8(out, ARRAY_SIZE(out));
-			pec_local = cros_crc8_arg(in, in_size, pec_local);
+			pec_remote = in[in_size - 1];
+			pec_local = cros_crc8_arg(in, in_size - 1, pec_header);
 			if (pec_local == pec_remote)
 				break;
 
@@ -368,12 +374,17 @@ static int platform_ec_i2c_read(const int port, const uint16_t addr_flags,
 		return rv;
 	}
 
-	return i2c_xfer(port, addr_flags, &reg, 1, in, in_size);
+	return i2c_xfer(port, addr_flags, &reg, 1, in, in_size - 1);
 }
 
-/* i2c_writeN with optional error checking */
+/*
+ * i2c_writeN with optional error checking
+ *
+ * out_size should the actual output size plus 1 to allow including the PEC byte
+ * in a single xfer call.
+ */
 static int platform_ec_i2c_write(const int port, const uint16_t addr_flags,
-				 const uint8_t *out, int out_size)
+				 uint8_t *out, int out_size)
 {
 	if (!IS_ENABLED(CONFIG_SMBUS_PEC) && I2C_USE_PEC(addr_flags))
 		return EC_ERROR_UNIMPLEMENTED;
@@ -384,17 +395,13 @@ static int platform_ec_i2c_write(const int port, const uint16_t addr_flags,
 		uint8_t pec;
 
 		pec = cros_crc8(&addr_8bit, 1);
-		pec = cros_crc8_arg(out, out_size, pec);
+		pec = cros_crc8_arg(out, out_size - 1, pec);
+		out[out_size - 1] = pec;
 
 		i2c_lock(port, 1);
 		for (i = 0; i <= CONFIG_I2C_NACK_RETRY_COUNT; i++) {
 			rv = i2c_xfer_unlocked(port, addr_flags, out, out_size,
-					       NULL, 0, I2C_XFER_START);
-			if (rv)
-				continue;
-
-			rv = i2c_xfer_unlocked(port, addr_flags, &pec, 1, NULL,
-					       0, I2C_XFER_STOP);
+					       NULL, 0, I2C_XFER_SINGLE);
 			if (!rv)
 				break;
 		}
@@ -403,17 +410,17 @@ static int platform_ec_i2c_write(const int port, const uint16_t addr_flags,
 		return rv;
 	}
 
-	return i2c_xfer(port, addr_flags, out, out_size, NULL, 0);
+	return i2c_xfer(port, addr_flags, out, out_size - 1, NULL, 0);
 }
 
 int i2c_read32(const int port, const uint16_t addr_flags, int offset, int *data)
 {
 	int rv;
-	uint8_t reg, buf[sizeof(uint32_t)];
+	uint8_t reg, buf[sizeof(uint32_t) + 1];
 
 	reg = offset & 0xff;
 	/* I2C read 32-bit word: transmit 8-bit offset, and read 32bits */
-	rv = platform_ec_i2c_read(port, addr_flags, reg, buf, sizeof(uint32_t));
+	rv = platform_ec_i2c_read(port, addr_flags, reg, buf, sizeof(buf));
 
 	if (rv)
 		return rv;
@@ -430,7 +437,7 @@ int i2c_read32(const int port, const uint16_t addr_flags, int offset, int *data)
 
 int i2c_write32(const int port, const uint16_t addr_flags, int offset, int data)
 {
-	uint8_t buf[1 + sizeof(uint32_t)];
+	uint8_t buf[2 + sizeof(uint32_t)];
 
 	buf[0] = offset & 0xff;
 
@@ -446,18 +453,17 @@ int i2c_write32(const int port, const uint16_t addr_flags, int offset, int data)
 		buf[4] = (data >> 24) & 0xff;
 	}
 
-	return platform_ec_i2c_write(port, addr_flags, buf,
-				     sizeof(uint32_t) + 1);
+	return platform_ec_i2c_write(port, addr_flags, buf, sizeof(buf));
 }
 
 int i2c_read16(const int port, const uint16_t addr_flags, int offset, int *data)
 {
 	int rv;
-	uint8_t reg, buf[sizeof(uint16_t)];
+	uint8_t reg, buf[sizeof(uint16_t) + 1];
 
 	reg = offset & 0xff;
 	/* I2C read 16-bit word: transmit 8-bit offset, and read 16bits */
-	rv = platform_ec_i2c_read(port, addr_flags, reg, buf, sizeof(uint16_t));
+	rv = platform_ec_i2c_read(port, addr_flags, reg, buf, sizeof(buf));
 
 	if (rv)
 		return rv;
@@ -472,7 +478,7 @@ int i2c_read16(const int port, const uint16_t addr_flags, int offset, int *data)
 
 int i2c_write16(const int port, const uint16_t addr_flags, int offset, int data)
 {
-	uint8_t buf[1 + sizeof(uint16_t)];
+	uint8_t buf[2 + sizeof(uint16_t)];
 
 	buf[0] = offset & 0xff;
 
@@ -484,28 +490,26 @@ int i2c_write16(const int port, const uint16_t addr_flags, int offset, int data)
 		buf[2] = (data >> 8) & 0xff;
 	}
 
-	return platform_ec_i2c_write(port, addr_flags, buf,
-				     1 + sizeof(uint16_t));
+	return platform_ec_i2c_write(port, addr_flags, buf, sizeof(buf));
 }
 
 int i2c_read8(const int port, const uint16_t addr_flags, int offset, int *data)
 {
 	int rv;
-	uint8_t reg = offset;
-	uint8_t buf;
+	uint8_t reg, buf[sizeof(uint8_t) + 1];
 
 	reg = offset;
 
-	rv = platform_ec_i2c_read(port, addr_flags, reg, &buf, sizeof(uint8_t));
+	rv = platform_ec_i2c_read(port, addr_flags, reg, buf, sizeof(buf));
 	if (!rv)
-		*data = buf;
+		*data = buf[0];
 
 	return rv;
 }
 
 int i2c_write8(const int port, const uint16_t addr_flags, int offset, int data)
 {
-	uint8_t buf[2];
+	uint8_t buf[3];
 
 	buf[0] = offset;
 	buf[1] = data;
@@ -717,41 +721,42 @@ int i2c_read_sized_block(const int port, const uint16_t addr_flags, int offset,
 			data_length = block_length;
 
 		if (IS_ENABLED(CONFIG_SMBUS_PEC) && I2C_USE_PEC(addr_flags)) {
-			uint8_t addr_8bit = I2C_STRIP_FLAGS(addr_flags) << 1;
-			uint8_t out[3] = { addr_8bit, reg, addr_8bit | 1 };
 			uint8_t pec, pec_remote;
+			int st, ed, buffer_data_length = 0;
+			uint8_t buffer[CONFIG_I2C_READ_SIZE_BUFFER];
+			bool is_last;
 
-			rv = i2c_xfer_unlocked(port, addr_flags, 0, 0, data,
-					       data_length, 0);
-			if (rv)
-				continue;
-
-			pec = cros_crc8(out, sizeof(out));
+			pec = i2c_header_crc8(addr_flags, reg);
 			pec = cros_crc8_arg(&block_length, 1, pec);
-			pec = cros_crc8_arg(data, data_length, pec);
 
-			/* read all remaining bytes */
-			block_length -= data_length;
-			while (block_length) {
-				uint8_t byte;
-
-				rv = i2c_xfer_unlocked(port, addr_flags, NULL,
-						       0, &byte, 1, 0);
+			for (st = 0; st < block_length + 1;
+			     st += sizeof(buffer)) {
+				ed = min(st + sizeof(buffer), block_length + 1);
+				is_last = ed == block_length + 1;
+				rv = i2c_xfer_unlocked(
+					port, addr_flags, NULL, 0, buffer,
+					ed - st, is_last ? I2C_XFER_STOP : 0);
 				if (rv)
 					break;
-				pec = cros_crc8_arg(&byte, 1, pec);
-				--block_length;
+				buffer_data_length =
+					(ed - st) + (is_last ? -1 : 0);
+				if (st < data_length) {
+					memcpy(data + st, buffer,
+					       min(data_length - st,
+						   buffer_data_length));
+				}
+				pec = cros_crc8_arg(buffer, buffer_data_length,
+						    pec);
 			}
 			if (rv)
 				continue;
 
-			rv = i2c_xfer_unlocked(port, addr_flags, NULL, 0,
-					       &pec_remote, 1, I2C_XFER_STOP);
-			if (rv)
-				continue;
+			pec_remote = buffer[buffer_data_length];
 
-			if (pec != pec_remote)
+			if (pec != pec_remote) {
 				rv = EC_ERROR_CRC;
+				continue;
+			}
 		} else {
 			rv = i2c_xfer_unlocked(port, addr_flags, 0, 0, data,
 					       data_length, I2C_XFER_STOP);

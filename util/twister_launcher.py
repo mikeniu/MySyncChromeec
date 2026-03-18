@@ -10,102 +10,6 @@ default parameters for the ChromiumOS EC project. For an overview of CLI
 parameters that may be used, please consult the Twister documentation.
 """
 
-# [VPYTHON:BEGIN]
-# python_version: "3.11"
-# wheel: <
-#   name: "infra/python/wheels/anytree-py2_py3"
-#   version: "version:2.8.0"
-# >
-# wheel: <
-#   name: "infra/python/wheels/colorama-py3"
-#   version: "version:0.4.1"
-# >
-# wheel: <
-#   name: "infra/python/wheels/docopt-py2_py3"
-#   version: "version:0.6.2"
-# >
-# wheel: <
-#   name: "infra/python/wheels/future-py2_py3"
-#   version: "version:0.18.2"
-# >
-# wheel: <
-#   name: "infra/python/wheels/junitparser-py2_py3"
-#   version: "version:2.8.0"
-# >
-# wheel: <
-#   name: "infra/python/wheels/natsort-py3"
-#   version: "version:8.3.1"
-# >
-# wheel: <
-#   name: "infra/python/wheels/packaging-py2_py3"
-#   version: "version:16.8"
-# >
-# wheel: <
-#   name: "infra/python/wheels/ply-py2_py3"
-#   version: "version:3.11"
-# >
-# wheel: <
-#   name: "infra/python/wheels/psutil/${vpython_platform}"
-#   version: "version:5.8.0.chromium.3"
-# >
-# wheel: <
-#   name: "infra/python/wheels/pyelftools-py2_py3"
-#   version: "version:0.29"
-# >
-# wheel: <
-#   name: "infra/python/wheels/pykwalify-py2_py3"
-#   version: "version:1.8.0"
-# >
-# wheel: <
-#   name: "infra/python/wheels/pyparsing-py3"
-#   version: "version:3.0.7"
-# >
-# wheel: <
-#   name: "infra/python/wheels/pyserial-py2_py3"
-#   version: "version:3.4"
-# >
-# wheel: <
-#   name: "infra/python/wheels/python-dateutil-py2_py3"
-#   version: "version:2.8.1"
-# >
-# wheel: <
-#   name: "infra/python/wheels/pyyaml-py3"
-#   version: "version:5.3.1"
-# >
-# wheel: <
-#   name: "infra/python/wheels/ruamel_yaml_clib/${vpython_platform}"
-#   version: "version:0.2.8"
-# >
-# wheel: <
-#   name: "infra/python/wheels/ruamel_yaml-py3"
-#   version: "version:0.17.16"
-# >
-# wheel: <
-#   name: "infra/python/wheels/six-py2_py3"
-#   version: "version:1.16.0"
-# >
-# wheel: <
-#   name: "infra/python/wheels/west-py3"
-#   version: "version:1.1.0"
-# >
-# wheel: <
-#   name: "infra/python/wheels/pytest-py3"
-#   version: "version:7.3.1"
-# >
-# wheel: <
-#   name: "infra/python/wheels/iniconfig-py3"
-#   version: "version:1.1.1"
-# >
-# wheel: <
-#   name: "infra/python/wheels/pluggy-py3"
-#   version: "version:0.13.1"
-# >
-# wheel: <
-#   name: "infra/python/wheels/tabulate-py3"
-#   version: "version:0.9.0"
-# >
-# [VPYTHON:END]
-
 import argparse
 import json
 import os
@@ -144,7 +48,11 @@ ZEPHYR_TEST_PATHS = [
 
 # List of modules to use from the src/third_party/zephyrproject/modules directory
 THIRD_PARTY_MODULES = [
+<<<<<<< HEAD   (d6c32f2441663510e20ae2d25d5edeb8956421b9 program,zmake: drop cmsis references)
     "hal/cmsis",
+||||||| BASE   (4f79cf3e850f16ecfb53fcd1c296c608faa9aef0 fpsensor: Add fingerprint_auth_enabled())
+=======
+>>>>>>> BRANCH (a2cd4a0be01528f87cbc369a0dffbfc2fe4673c1 imvp/rt3645: Remove gpio state check)
     "hal/cmsis_6",
     "lib/picolibc",
     "hal/stm32",

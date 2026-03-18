@@ -19,6 +19,10 @@
 #include "timer.h"
 #include "util.h"
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/mgmt/ec_host_cmd/backend.h>
+#endif
+
 #define CPUTS(outstr) cputs(CC_SYSTEM, outstr)
 #define CPRINTS(format, args...) cprints(CC_SYSTEM, format, ##args)
 #define CPRINTF(format, args...) cprintf(CC_SYSTEM, format, ##args)
@@ -154,6 +158,19 @@ static int mkbp_set_host_active_via_heci(int active, uint32_t *timestamp)
 }
 #endif
 
+#ifdef CONFIG_MKBP_USE_USB
+int mkbp_set_host_active_via_usb(int active, uint32_t *timestamp)
+{
+	if (timestamp) {
+		*timestamp = __hw_clock_source_read();
+	}
+	if (active) {
+		ec_host_cmd_backend_usb_trigger_event();
+	}
+	return EC_SUCCESS;
+}
+#endif
+
 /*
  * This communicates to the AP whether an MKBP event is currently available
  * for processing.
@@ -176,6 +193,8 @@ static int mkbp_set_host_active(int active, uint32_t *timestamp)
 	return mkbp_set_host_active_via_gpio(active, timestamp);
 #elif defined(CONFIG_MKBP_USE_HECI)
 	return mkbp_set_host_active_via_heci(active, timestamp);
+#elif defined(CONFIG_MKBP_USE_USB)
+	return mkbp_set_host_active_via_usb(active, timestamp);
 #endif
 }
 
@@ -494,7 +513,7 @@ static enum ec_status mkbp_get_next_event(struct host_cmd_handler_args *args)
 			max_size = member_size(
 				union ec_response_get_next_data_v3, key_matrix);
 		}
-		data_size = MIN(data_size, max_size);
+		data_size = min(data_size, max_size);
 	}
 
 	/* If there are no more events and we support the "more" flag, set it */

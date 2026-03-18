@@ -6,9 +6,11 @@
 #include "builtin/assert.h"
 #include "common.h"
 #include "panic.h"
-#include "system_safe_mode.h"
+#include "panic_utils.h"
+#include "task.h"
 
 #include <zephyr/arch/cpu.h>
+#include <zephyr/cache.h>
 #include <zephyr/fatal.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
@@ -147,14 +149,19 @@ static void copy_esf_to_panic_data(const struct arch_esf *esf,
 	memset(pdata, 0, CONFIG_PANIC_DATA_SIZE);
 	pdata->arch = PANIC_ARCH;
 	pdata->struct_version = 2;
-	pdata->flags = (PANIC_ARCH == PANIC_ARCH_CORTEX_M) ?
-			       PANIC_DATA_FLAG_FRAME_VALID :
-			       0;
+	pdata->flags = IS_ENABLED(SECTION_IS_RW) ? PANIC_DATA_FLAG_RW_IMAGE :
+						   PANIC_DATA_FLAG_RO_IMAGE;
+	pdata->flags |= (PANIC_ARCH == PANIC_ARCH_CORTEX_M) ?
+				PANIC_DATA_FLAG_FRAME_VALID :
+				0;
 	pdata->reserved = 0;
 	pdata->struct_size = sizeof(*pdata);
 	pdata->magic = PANIC_DATA_MAGIC;
 
 	PANIC_REG_LIST(PANIC_COPY_REGS, PANIC_COPY_REGS_GPR);
+
+	/* Flush the panic data to RAM before coming reboot. */
+	sys_cache_data_flush_range(pdata, sizeof(*pdata));
 }
 
 void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
@@ -190,19 +197,7 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
 
-	/* Start system safe mode if possible */
-	if (IS_ENABLED(CONFIG_PLATFORM_EC_SYSTEM_SAFE_MODE)) {
-		if (reason != K_ERR_KERNEL_PANIC &&
-		    start_system_safe_mode() == EC_SUCCESS) {
-			/* Returning from k_sys_fatal_error_handler will cause
-			 * the faulting thread to be aborted and resume the
-			 * kernel
-			 */
-			pdata->flags |= PANIC_DATA_FLAG_SAFE_MODE_STARTED;
-			return;
-		}
-		pdata->flags |= PANIC_DATA_FLAG_SAFE_MODE_FAIL_PRECONDITIONS;
-	}
+	sys_cache_data_flush_and_invd_all();
 
 	/*
 	 * Reboot immediately, don't wait for watchdog, otherwise
@@ -228,6 +223,8 @@ __override void assert_post_action(void)
 #else
 __override void assert_post_action(const char *path, unsigned int line)
 {
+	const k_tid_t thread = k_current_get();
+
 	/* Extract filename from path */
 	const char *last_slash = strrchr(path, '/');
 	const char *filename = last_slash ? last_slash + 1 : path;
@@ -241,6 +238,10 @@ __override void assert_post_action(const char *path, unsigned int line)
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
+
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_PRINT_STACK_ON_ASSERT)) {
+		print_stack_trace(thread);
+	}
 
 	panic_reboot();
 	__ASSERT_UNREACHABLE;
@@ -258,11 +259,16 @@ void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception)
 	pdata->struct_size = CONFIG_PANIC_DATA_SIZE;
 	pdata->struct_version = 2;
 	pdata->arch = PANIC_ARCH;
+	pdata->flags = IS_ENABLED(SECTION_IS_RW) ? PANIC_DATA_FLAG_RW_IMAGE :
+						   PANIC_DATA_FLAG_RO_IMAGE;
 
 	/* Log panic cause */
 	PANIC_REG_EXCEPTION(pdata) = exception;
 	PANIC_REG_REASON(pdata) = reason;
 	PANIC_REG_INFO(pdata) = info;
+
+	/* Flush the panic data to RAM before potential reboot. */
+	sys_cache_data_flush_range(pdata, sizeof(*pdata));
 
 	/* Allow architecture specific logic */
 	arch_panic_set_reason(reason, info, exception);

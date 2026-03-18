@@ -11,6 +11,7 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/fff.h>
+#include <zephyr/sys/util.h>
 #include <zephyr/ztest.h>
 #include <zephyr/ztest_assert.h>
 
@@ -28,12 +29,20 @@ DEFINE_FFF_GLOBALS;
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
 #define fp_sim DEVICE_DT_GET(DT_CHOSEN(cros_fp_fingerprint_sensor))
-#define IMAGE_SIZE                          \
-	FINGERPRINT_SENSOR_REAL_IMAGE_SIZE( \
-		DT_CHOSEN(cros_fp_fingerprint_sensor))
+#define IMAGE_SIZE                                                 \
+	MAX_FROM_LIST(LISTIFY(NUM_IMAGE_CAPTURE_TYPES,             \
+			      FINGERPRINT_SENSOR_FRAME_SIZE, (, ), \
+			      DT_CHOSEN(cros_fp_fingerprint_sensor)))
 static uint8_t image_buffer[IMAGE_SIZE];
 
 static const uint8_t fake_rollback_entropy[] = "some_rollback_entropy";
+
+static const size_t test_info_buffer_size =
+	sizeof(struct ec_response_fp_info_v2) +
+	sizeof(struct fp_image_frame_params) * FP_MAX_CAPTURE_TYPES;
+static uint8_t buffer[test_info_buffer_size];
+static struct ec_response_fp_info_v2 *test_info_buffer =
+	(struct ec_response_fp_info_v2 *)buffer;
 
 /* The fake TPM seed is "very_secret_32_bytes_of_tpm_seed" */
 #define FAKE_TPM_SEED                                                       \
@@ -181,9 +190,10 @@ ZTEST_USER(fpsensor_match, test_match_no_templates_mode_cleared)
 
 static int match_compare(const struct fingerprint_algorithm *const alg,
 			 void *templ, uint32_t templ_count,
-			 const uint8_t *const image, int32_t *match_index,
-			 uint32_t *update_bitmap)
+			 const uint8_t *const image, bool template_update,
+			 int32_t *match_index, uint32_t *update_bitmap)
 {
+	zassert_true(template_update);
 	zassert_equal(templ_count, 1);
 	zassert_mem_equal((uint8_t *)templ, example_template,
 			  CONFIG_FP_ALGORITHM_TEMPLATE_SIZE);
@@ -297,13 +307,67 @@ ZTEST_USER(fpsensor_match, test_match_no_match_mkbp_event)
 
 static int custom_match(const struct fingerprint_algorithm *const alg,
 			void *templ, uint32_t templ_count,
-			const uint8_t *const image, int32_t *match_index,
-			uint32_t *update_bitmap)
+			const uint8_t *const image, bool template_update,
+			int32_t *match_index, uint32_t *update_bitmap)
 {
 	*match_index = finger_index;
 	*update_bitmap = finger_updated_bitmap;
 
 	return match_result;
+}
+
+static int match_no_update(const struct fingerprint_algorithm *const alg,
+			   void *templ, uint32_t templ_count,
+			   const uint8_t *const image, bool template_update,
+			   int32_t *match_index, uint32_t *update_bitmap)
+{
+	zassert_false(template_update);
+	zassert_equal(templ_count, 1);
+
+	return 0;
+}
+
+ZTEST_USER(fpsensor_match, test_match_no_template_update)
+{
+	struct ec_params_fp_mode params = {
+		.mode = FP_MODE_MATCH | FP_MODE_MATCH_NO_TEMPLATE_UPDATE,
+	};
+	struct ec_response_fp_mode response;
+	struct fingerprint_sensor_state state;
+
+	/* Load example template. */
+	zassert_ok(ec_cmd_fp_template(
+		NULL,
+		(struct ec_params_fp_template *)example_template_encrypted,
+		sizeof(example_template_encrypted)));
+
+	/*
+	 * Use match_no_update function to check if FPSENSOR requested match
+	 * without template update.
+	 */
+	mock_alg_match_fake.custom_fake = match_no_update;
+
+	/* Switch mode to match. */
+	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
+	zassert_true(response.mode & FP_MODE_MATCH);
+	zassert_true(response.mode & FP_MODE_MATCH_NO_TEMPLATE_UPDATE);
+
+	/* Give opportunity for fpsensor task to change mode. */
+	k_msleep(1);
+
+	/* Put finger on the sensor. */
+	fingerprint_get_state(fp_sim, &state);
+	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
+	fingerprint_set_state(fp_sim, &state);
+
+	/* Ping fpsensor task. */
+	fingerprint_run_callback(fp_sim);
+
+	/* Give opportunity for fpsensor task process event. */
+	k_msleep(1);
+
+	/* Make sure that 'match' was called. */
+	zassert_equal(mock_alg_match_fake.call_count, 1);
 }
 
 ZTEST_USER(fpsensor_match, test_match_success_mkbp_event)
@@ -486,7 +550,6 @@ ZTEST_USER(fpsensor_match, test_match_success_template_updated_dirty_template)
 	};
 	struct ec_response_fp_mode response;
 	struct fingerprint_sensor_state state;
-	struct ec_response_fp_info info;
 
 	/* Load example template. */
 	zassert_ok(ec_cmd_fp_template(
@@ -521,8 +584,9 @@ ZTEST_USER(fpsensor_match, test_match_success_template_updated_dirty_template)
 	zassert_equal(mock_alg_match_fake.call_count, 1);
 
 	/* Confirm that dirty templates bitmap is correct. */
-	zassert_ok(ec_cmd_fp_info(NULL, &info));
-	zassert_equal(info.template_dirty, 0x1);
+	zassert_ok(ec_cmd_fp_info_v2(NULL, test_info_buffer,
+				     test_info_buffer_size));
+	zassert_equal(test_info_buffer->template_info.template_dirty, 0x1);
 }
 
 ZTEST_USER(fpsensor_match,
@@ -533,7 +597,6 @@ ZTEST_USER(fpsensor_match,
 	};
 	struct ec_response_fp_mode response;
 	struct fingerprint_sensor_state state;
-	struct ec_response_fp_info info;
 
 	/* Load example template. */
 	zassert_ok(ec_cmd_fp_template(
@@ -568,8 +631,9 @@ ZTEST_USER(fpsensor_match,
 	zassert_equal(mock_alg_match_fake.call_count, 1);
 
 	/* Confirm that dirty templates bitmap is correct. */
-	zassert_ok(ec_cmd_fp_info(NULL, &info));
-	zassert_equal(info.template_dirty, 0x0);
+	zassert_ok(ec_cmd_fp_info_v2(NULL, test_info_buffer,
+				     test_info_buffer_size));
+	zassert_equal(test_info_buffer->template_info.template_dirty, 0x0);
 }
 
 ZTEST_USER(fpsensor_match, test_match_success_no_template_update_dirty_template)
@@ -579,7 +643,6 @@ ZTEST_USER(fpsensor_match, test_match_success_no_template_update_dirty_template)
 	};
 	struct ec_response_fp_mode response;
 	struct fingerprint_sensor_state state;
-	struct ec_response_fp_info info;
 
 	/* Load example template. */
 	zassert_ok(ec_cmd_fp_template(
@@ -614,8 +677,55 @@ ZTEST_USER(fpsensor_match, test_match_success_no_template_update_dirty_template)
 	zassert_equal(mock_alg_match_fake.call_count, 1);
 
 	/* Confirm that dirty templates bitmap is correct. */
-	zassert_ok(ec_cmd_fp_info(NULL, &info));
-	zassert_equal(info.template_dirty, 0x0);
+	zassert_ok(ec_cmd_fp_info_v2(NULL, test_info_buffer,
+				     test_info_buffer_size));
+	zassert_equal(test_info_buffer->template_info.template_dirty, 0x0);
+}
+
+ZTEST_USER(fpsensor_match, test_match_no_template_update_dirty_template)
+{
+	struct ec_params_fp_mode params = {
+		.mode = FP_MODE_MATCH | FP_MODE_MATCH_NO_TEMPLATE_UPDATE,
+	};
+	struct ec_response_fp_mode response;
+	struct fingerprint_sensor_state state;
+
+	/* Load example template. */
+	zassert_ok(ec_cmd_fp_template(
+		NULL,
+		(struct ec_params_fp_template *)example_template_encrypted,
+		sizeof(example_template_encrypted)));
+
+	/* Return MATCH_YES but NOT updated because we requested no update. */
+	match_result = FP_MATCH_RESULT_MATCH;
+	finger_index = 0;
+	finger_updated_bitmap = 0x1;
+	mock_alg_match_fake.custom_fake = custom_match;
+
+	/* Switch mode to match. */
+	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
+	zassert_true(response.mode & FP_MODE_MATCH);
+	zassert_true(response.mode & FP_MODE_MATCH_NO_TEMPLATE_UPDATE);
+
+	/* Give opportunity for fpsensor task to change mode. */
+	k_msleep(1);
+
+	/* Put finger on the sensor. */
+	fingerprint_get_state(fp_sim, &state);
+	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
+	fingerprint_set_state(fp_sim, &state);
+
+	/* Ping fpsensor task. */
+	fingerprint_run_callback(fp_sim);
+
+	/* Give opportunity for fpsensor task process event. */
+	k_msleep(1);
+
+	/* Confirm that dirty templates bitmap is correct (no templates dirty).
+	 */
+	zassert_ok(ec_cmd_fp_info_v2(NULL, test_info_buffer,
+				     test_info_buffer_size));
+	zassert_equal(test_info_buffer->template_info.template_dirty, 0x0);
 }
 
 ZTEST_USER(fpsensor_match,
@@ -713,8 +823,8 @@ ZTEST_USER(fpsensor_match,
 	/* Make sure that 'match' was called. */
 	zassert_equal(mock_alg_match_fake.call_count, 1);
 
-	/* Wait at least 5 seconds for positive match secret to timeout. */
-	k_msleep(5000);
+	/* Wait at least 15 seconds for positive match secret to timeout. */
+	k_msleep(15000);
 
 	/* Confirm that we can't read positive match secret. */
 	secret_params.fgr = 0;

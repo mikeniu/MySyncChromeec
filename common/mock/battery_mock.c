@@ -6,8 +6,6 @@
 #include "battery.h"
 #include "string.h"
 
-/* LCOV_EXCL_START - These mocks just avoid linker errors with stubs. */
-
 /*****************************************************************************
  * Battery functions needed to enable CONFIG_BATTERY
  */
@@ -52,6 +50,17 @@ int battery_cycle_count(int *count)
 void set_battery_cycle_count(int new_value)
 {
 	battery_cycle_count_value = new_value;
+}
+
+static int battery_mf_date_year_value;
+static int battery_mf_date_month_value;
+static int battery_mf_date_day_value;
+int battery_manufacture_date(int *year, int *month, int *day)
+{
+	*year = battery_mf_date_year_value;
+	*month = battery_mf_date_month_value;
+	*day = battery_mf_date_day_value;
+	return EC_SUCCESS;
 }
 
 static int battery_design_voltage_value = 5000;
@@ -223,5 +232,3 @@ void battery_get_params(struct batt_params *batt)
 
 	memcpy(batt, &batt_new, sizeof(*batt));
 }
-
-/* LCOV_EXCL_STOP */

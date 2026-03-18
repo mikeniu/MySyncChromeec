@@ -356,6 +356,11 @@ static void intel_altmode_thread(void *unused1, void *unused2, void *unused3)
 	}
 }
 
+BUILD_ASSERT(EC_TASK_PRIORITY(EC_TASK_USBPD_ALTMODE_INTEL_PRIO) ==
+		     CONFIG_USBPD_ALTMODE_INTEL_THREAD_PRIORITY,
+	     "EC_TASK_USBPD_ALTMODE_INTEL_PRIO does not match "
+	     "CONFIG_USBPD_ALTMODE_INTEL_THREAD_PRIORITY.");
+
 K_THREAD_DEFINE(intel_altmode_tid, CONFIG_TASK_PD_ALTMODE_INTEL_STACK_SIZE,
 		intel_altmode_thread, NULL, NULL, NULL,
 		CONFIG_USBPD_ALTMODE_INTEL_THREAD_PRIORITY, 0, SYS_FOREVER_MS);
@@ -470,13 +475,11 @@ static int cmd_altmode_write(const struct shell *sh, size_t argc, char **argv)
 
 SHELL_STATIC_SUBCMD_SET_CREATE(
 	sub_altmode_cmds,
-	SHELL_CMD_ARG(read, NULL,
-		      "Read status register\n"
-		      "Usage: altmode read <port>",
+	SHELL_CMD_ARG(read, NULL, SHELL_HELP("Read status register", "<port>"),
 		      cmd_altmode_read, 2, 1),
 	SHELL_CMD_ARG(write, NULL,
-		      "Write control register\n"
-		      "Usage: altmode write <port> [<byte0>, ...]",
+		      SHELL_HELP("Write control register",
+				 "<port> [<byte0>, ...]"),
 		      cmd_altmode_write, 3,
 		      INTEL_ALTMODE_DATA_CONTROL_REG_LEN - 1),
 	SHELL_SUBCMD_SET_END);

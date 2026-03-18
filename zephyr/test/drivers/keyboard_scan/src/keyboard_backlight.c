@@ -6,12 +6,15 @@
 #include "console.h"
 #include "host_command.h"
 #include "keyboard_backlight.h"
+#include "lid_switch.h"
 #include "pwm_mock.h"
 #include "test/drivers/test_state.h"
+#include "test/drivers/utils.h"
 
 #include <stdint.h>
 #include <string.h>
 
+#include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/drivers/pwm.h>
 #include <zephyr/kernel.h>
 #include <zephyr/shell/shell_dummy.h>
@@ -145,6 +148,101 @@ ZTEST(keyboard_backlight, test_set_backlight__device_not_ready)
 	pwm_dev->state->initialized = initialized_saved;
 }
 
+#define GPIO_LID_OPEN_EC_NODE DT_NODELABEL(gpio_lid_open_ec)
+#define GPIO_LID_OPEN_EC_CTLR DT_GPIO_CTLR(GPIO_LID_OPEN_EC_NODE, gpios)
+#define GPIO_LID_OPEN_EC_PORT DT_GPIO_PIN(GPIO_LID_OPEN_EC_NODE, gpios)
+
+static void set_lid(bool open)
+{
+	const struct device *lid_switch_dev =
+		DEVICE_DT_GET(GPIO_LID_OPEN_EC_CTLR);
+
+	zassert_ok(gpio_emul_input_set(lid_switch_dev, GPIO_LID_OPEN_EC_PORT,
+				       open),
+		   "Failed to set lid switch GPIO");
+
+	while (lid_is_open() != open) {
+		k_usleep(CONFIG_LID_DEBOUNCE_US + 1);
+	}
+}
+
+/* Closing the lid should disable the kb backlight, and opening the lid should
+ * restore it. */
+ZTEST(keyboard_backlight, test_lid_disables_backlight)
+{
+	// Open lid and set backlight.
+	test_set_chipset_to_power_level(POWER_S0);
+	set_lid(true);
+	kblight_set(65);
+	kblight_enable(true);
+
+	zassert_equal(65, kblight_get(), NULL);
+	zassert_equal(1, kblight_get_current_enable(), NULL);
+
+	// Close lid.
+	set_lid(false);
+
+	zassert_equal(65, kblight_get(), NULL);
+	zassert_equal(0, kblight_get_current_enable(), NULL);
+
+	// Open lid.
+	set_lid(true);
+
+	zassert_equal(65, kblight_get(), NULL);
+	zassert_equal(1, kblight_get_current_enable(), NULL);
+}
+
+/* Entering suspend should disable the kb backlight, resuming should restore it.
+ */
+ZTEST(keyboard_backlight, test_suspend)
+{
+	test_set_chipset_to_power_level(POWER_S0);
+	kblight_set(42);
+	kblight_enable(true);
+
+	zassert_equal(42, kblight_get(), NULL);
+	zassert_equal(1, kblight_get_current_enable(), NULL);
+
+	test_set_chipset_to_power_level(POWER_S3);
+
+	zassert_equal(42, kblight_get(), NULL);
+	zassert_equal(0, kblight_get_current_enable(), NULL);
+
+	test_set_chipset_to_power_level(POWER_S0);
+	zassert_equal(42, kblight_get(), NULL);
+	zassert_equal(1, kblight_get_current_enable(), NULL);
+}
+
+/* Suspend and lid at the same time makes things slightly more complex. */
+ZTEST(keyboard_backlight, test_suspend_lid_closed)
+{
+	set_lid(true);
+	test_set_chipset_to_power_level(POWER_S0);
+	kblight_set(59);
+	kblight_enable(true);
+
+	zassert_equal(59, kblight_get(), NULL);
+	zassert_equal(1, kblight_get_current_enable(), NULL);
+
+	test_set_chipset_to_power_level(POWER_S3);
+
+	zassert_equal(59, kblight_get(), NULL);
+	zassert_equal(0, kblight_get_current_enable(), NULL);
+
+	set_lid(false);
+
+	zassert_equal(59, kblight_get(), NULL);
+	zassert_equal(0, kblight_get_current_enable(), NULL);
+
+	test_set_chipset_to_power_level(POWER_S0);
+	zassert_equal(59, kblight_get(), NULL);
+	zassert_equal(0, kblight_get_current_enable(), NULL);
+
+	set_lid(true);
+	zassert_equal(59, kblight_get(), NULL);
+	zassert_equal(1, kblight_get_current_enable(), NULL);
+}
+
 static void reset(void *data)
 {
 	ARG_UNUSED(data);
@@ -152,6 +250,8 @@ static void reset(void *data)
 	/* Reset the backlight to off and 0% brightness */
 	kblight_set(0);
 	kblight_enable(0);
+	test_set_chipset_to_power_level(POWER_S0);
+	set_lid(true);
 }
 
 ZTEST_SUITE(keyboard_backlight, drivers_predicate_post_main, NULL, reset, reset,

@@ -55,6 +55,15 @@ config PLATFORM_EC_BATTERY_SMART
 
 endchoice # PLATFORM_EC_BATTERY_SELECT
 
+config PLATFORM_EC_BATTERY_MANUF_INFO
+	bool "Support battery manufacture info"
+	default $(dt_nodelabel_bool_prop,default_battery,has_manuf_info)
+	help
+	  Enable accessing the battery manufacture info string. For
+	  smart batteries, register SB_MANUFACTURE_INFO (0x70) must be
+	  supported. Automatically enabled if nodelabel default_battery
+	  has property has_manuf_info.
+
 choice PLATFORM_EC_BATTERY_PRESENT_MODE
 	prompt "Method to use to detect the battery"
 	default PLATFORM_EC_BATTERY_PRESENT_GPIO if $(dt_path_enabled,/named-gpios/ec_batt_pres_odl)
@@ -166,6 +175,23 @@ config PLATFORM_EC_BATTERY_CUTOFF_TIMEOUT_MSEC
 	  After the EC executes battery cutoff, it'll wait for this amount of
 	  time in msec before deciding the cutoff failed.
 
+config PLATFORM_EC_BATTERY_CUTOFF_RETRY_COUNT
+	int "Battery cutoff retry count"
+	default 0
+	help
+	  Number of extra retry attempts after the first failure.
+	  Set to 0 to disable retry and perform only a single attempt.
+
+config PLATFORM_EC_BATTERY_CUTOFF_RETRY_DELAY_US
+	int "Battery cutoff retry delay (microseconds)"
+	default 500000
+	range 1000 60000000
+	help
+	  Delay time in microseconds between consecutive battery cutoff
+	  retry attempts.
+	  This value is only used when PLATFORM_EC_BATTERY_CUTOFF_RETRY_COUNT
+	  is greater than 0.
+
 config PLATFORM_EC_BATTERY_CUTOFF_VOL_UP_DISABLED
 	bool "Disable Volume Up button sequence for battery cutoff"
 	default n
@@ -197,6 +223,18 @@ config PLATFORM_EC_BATTERY_INIT_TYPE_RETRY_COUNT
 	  retry reading each of those fields from the battery
 	  (up to a total of COUNT + 1 attempts) after a short delay, allowing
 	  the battery time to complete its housekeeping.
+
+config PLATFORM_EC_BATTERY_INIT_TYPE_DEFERRED_RETRY_COUNT
+	int "Battery init type deferred retry count"
+	default 0
+	help
+	  Number of retries when initializing the battery type using a
+	  deferred retry mechanism.
+
+	  Some batteries may not respond immediately after exiting
+	  shutdown mode because the fuel gauge requires time to wake up.
+	  The EC will retry the initialization multiple times before
+	  failing back to the default battery configuration.
 
 config PLATFORM_EC_BATTERY_HW_PRESENT_CUSTOM
 	bool "Hardware check of battery presence"
@@ -291,7 +329,7 @@ config PLATFORM_EC_CHARGER_MIN_BAT_PCT_IMBALANCED_POWER_ON
 
 config PLATFORM_EC_BATT_FULL_CHIPSET_OFF_INPUT_LIMIT_MV
 	int "Voltage limit in mV when battery is full and AP is off"
-	depends on PLATFORM_EC_USB_PE_SM && PLATFORM_EC_CHARGE_MANAGER
+	depends on (PLATFORM_EC_USB_PE_SM || PLATFORM_EC_USB_PD_CONTROLLER) && PLATFORM_EC_CHARGE_MANAGER
 	default -1
 	help
 	  If set to a non-negative value, input voltage will be reduced to given
@@ -301,20 +339,13 @@ config PLATFORM_EC_BATT_FULL_CHIPSET_OFF_INPUT_LIMIT_MV
 
 choice PLATFORM_EC_BATTERY_API
 	prompt "Battery API version"
-	default PLATFORM_EC_BATTERY_V2
+	default PLATFORM_EC_BATTERY_INFO
 	help
 	  Select the battery API version. V2 is required on dual-battery-systems
 	  and hostless bases with a battery. V1 should not be used except for
 	  testing on legacy boards.
 
-config PLATFORM_EC_BATTERY_V1
-	bool "Enable battery API v1"
-	depends on !PLATFORM_EC_BATTERY_V2
-	help
-	  This enables battery API version 1, with support for only a single
-	  battery. Battery information strings are trimmed to 8 characters.
-
-config PLATFORM_EC_BATTERY_V2
+config PLATFORM_EC_BATTERY_INFO
 	bool "Enable battery API v2"
 	help
 	  This enables battery API version 2. This version can support multiple
@@ -323,25 +354,25 @@ config PLATFORM_EC_BATTERY_V2
 
 endchoice
 
-if PLATFORM_EC_BATTERY_V2
+if PLATFORM_EC_BATTERY_INFO
 
 config PLATFORM_EC_BATTERY_COUNT
 	int "Battery count"
 	default 1
 	help
 	  The number of batteries in the system. It matters only when
-	  PLATFORM_EC_BATTERY_V2 is enabled. Note this is different from
+	  PLATFORM_EC_BATTERY_INFO is enabled. Note this is different from
 	  BATTERY_TYPE_COUNT.
 
-config PLATFORM_EC_HOSTCMD_BATTERY_V2
+config PLATFORM_EC_HOSTCMD_BATTERY_INFO
 	bool "Enable host command battery API v2"
 	default y
 	help
 	  Include host commands to fetch battery information from
 	  ec_response_battery_static/dynamic_info structures, only make sense
-	  when PLATFORM_EC_BATTERY_V2 is enabled.
+	  when PLATFORM_EC_BATTERY_INFO is enabled.
 
-endif # PLATFORM_EC_BATTERY_V2
+endif # PLATFORM_EC_BATTERY_INFO
 
 if PLATFORM_EC_I2C_VIRTUAL_BATTERY
 
@@ -366,5 +397,11 @@ config PLATFORM_EC_BATTERY_CHARGING_OFFLOAD_TO_AP
 	help
 	  Enabling this setting offloads battery charging to the Application Processor,
 	  which disables the charging configuration for the EC.
+
+config PLATFORM_EC_BATTERY_ACCESS_LIMIT
+	bool "Limit access to the `battery` host command"
+	default n
+	help
+	  Enabling this limits the access to the battery host commands from the EC console.
 
 endif # PLATFORM_EC_BATTERY

@@ -22,25 +22,25 @@
 #include "util.h"
 
 /*
- * For host tests, use a static area for panic data.
+ * For host tests, use a static area for panic and jump data.
  */
 #if defined(CONFIG_BOARD_NATIVE_POSIX) || defined(CONFIG_BOARD_NATIVE_SIM)
-static struct panic_data zephyr_panic_data;
 #undef PANIC_DATA_PTR
-#undef CONFIG_PANIC_DATA_BASE
-#define PANIC_DATA_PTR (&zephyr_panic_data)
-#define CONFIG_PANIC_DATA_BASE (&zephyr_panic_data)
+#define PANIC_DATA_PTR                                        \
+	((struct panic_data *)(mock_end_of_ram_data +         \
+			       sizeof(mock_end_of_ram_data) - \
+			       sizeof(struct panic_data)))
 #endif
 /* Panic data goes at the end of RAM. */
 static struct panic_data *const pdata_ptr = PANIC_DATA_PTR;
 
 /* Common SW Panic reasons strings */
 const char *const panic_sw_reasons[] = {
-	"PANIC_SW_DIV_ZERO",	 "PANIC_SW_STACK_OVERFLOW",
-	"PANIC_SW_PD_CRASH",	 "PANIC_SW_ASSERT",
-	"PANIC_SW_WATCHDOG",	 "PANIC_SW_RNG",
-	"PANIC_SW_PMIC_FAULT",	 "PANIC_SW_EXIT",
-	"PANIC_SW_WATCHDOG_WARN"
+	"PANIC_SW_DIV_ZERO",	  "PANIC_SW_STACK_OVERFLOW",
+	"PANIC_SW_PD_CRASH",	  "PANIC_SW_ASSERT",
+	"PANIC_SW_WATCHDOG",	  "PANIC_SW_RNG",
+	"PANIC_SW_PMIC_FAULT",	  "PANIC_SW_EXIT",
+	"PANIC_SW_WATCHDOG_WARN", "PANIC_SW_WATCHDOG_HARD"
 };
 
 /**
@@ -143,7 +143,7 @@ void panic_reboot(void)
 #if !(defined(CONFIG_ZEPHYR))
 /* Complete the processing of a panic, after the initial message is shown */
 test_mockable_static
-#if !(defined(TEST_FUZZ) || defined(CONFIG_ZTEST))
+#if !(defined(CONFIG_ZTEST))
 	__noreturn
 #endif
 	void
@@ -247,7 +247,8 @@ test_mockable struct panic_data *get_panic_data_write(void)
 	 */
 	struct panic_data *const pdata_ptr = PANIC_DATA_PTR;
 	struct jump_data *jdata_ptr;
-	uintptr_t data_begin;
+	uintptr_t jdata_end;
+	uint8_t *src, *dst;
 	size_t move_size;
 	int delta;
 
@@ -271,36 +272,31 @@ test_mockable struct panic_data *get_panic_data_write(void)
 	 * Expecting get_panic_data_start() will return a pointer to
 	 * the beginning of panic data, or NULL if no panic data available
 	 */
-	data_begin = get_panic_data_start();
-	if (!data_begin)
-		data_begin = CONFIG_RAM_BASE + CONFIG_RAM_SIZE;
+	jdata_end = get_panic_data_start();
+	if (!jdata_end)
+		jdata_end = CONFIG_RAM_BASE + CONFIG_RAM_SIZE;
 
-	jdata_ptr = (struct jump_data *)(data_begin - sizeof(struct jump_data));
+	jdata_ptr = (struct jump_data *)(jdata_end - sizeof(struct jump_data));
 
-	/*
-	 * If we don't have valid jump_data structure we don't need to move
-	 * anything and can just return pdata_ptr (clear memory, set magic
-	 * and struct_size first).
-	 */
-	if (jdata_ptr->magic != JUMP_DATA_MAGIC || jdata_ptr->version < 1 ||
-	    jdata_ptr->version > 3) {
-		memset(pdata_ptr, 0, CONFIG_PANIC_DATA_SIZE);
-		pdata_ptr->magic = PANIC_DATA_MAGIC;
-		pdata_ptr->struct_size = CONFIG_PANIC_DATA_SIZE;
-
-		return pdata_ptr;
+	/* If no valid jump_data exists, skip the move and jump to
+	 * initialization. */
+	if ((jdata_ptr->magic != JUMP_DATA_MAGIC &&
+	     !system_jumped_to_this_image()) ||
+	    jdata_ptr->version < 1) {
+		goto init_pdata;
 	}
 
-	move_size = 0;
+	/* Calculate total size to move (header + version-specific tags). */
 	if (jdata_ptr->version == 1)
 		move_size = JUMP_DATA_SIZE_V1;
 	else if (jdata_ptr->version == 2)
 		move_size = JUMP_DATA_SIZE_V2 + jdata_ptr->jump_tag_total;
-	else if (jdata_ptr->version == 3)
+	else
 		move_size = jdata_ptr->struct_size + jdata_ptr->jump_tag_total;
 
 	/* Check if there's enough space for jump tags after move */
-	if (data_begin - move_size < JUMP_DATA_MIN_ADDRESS) {
+	if (jdata_ptr->version >= 2 &&
+	    (uintptr_t)jdata_end - move_size < JUMP_DATA_MIN_ADDRESS) {
 		/* Not enough room for jump tags, clear tags.
 		 * TODO(b/251190975): This failure should be reported
 		 * in the panic data structure for more visibility.
@@ -313,18 +309,20 @@ test_mockable struct panic_data *get_panic_data_write(void)
 		/* LCOV_EXCL_STOP */
 	}
 
-	data_begin -= move_size;
+	/* If even the jump_data struct doesn't fit, drop all jump data. */
+	if ((uintptr_t)jdata_end - move_size < JUMP_DATA_MIN_ADDRESS)
+		goto init_pdata;
 
-	if (move_size != 0) {
-		/* Move jump_tags and jump_data */
-		memmove((void *)(data_begin - delta), (void *)data_begin,
-			move_size);
-	}
+	/* Shift the jump block so it remains adjacent to the new panic_data. */
+	src = (uint8_t *)jdata_end - move_size;
+	dst = src - delta;
+	memmove(dst, src, move_size);
 
 	/*
 	 * Now we are sure that there is enough space for current
 	 * panic_data structure.
 	 */
+init_pdata:
 	memset(pdata_ptr, 0, CONFIG_PANIC_DATA_SIZE);
 	pdata_ptr->magic = PANIC_DATA_MAGIC;
 	pdata_ptr->struct_size = CONFIG_PANIC_DATA_SIZE;
@@ -430,6 +428,10 @@ static int command_crash(int argc, const char **argv)
 	}
 
 	if (!strcasecmp(argv[1], "assert")) {
+		if (!IS_ENABLED(CONFIG_DEBUG_ASSERT_REBOOTS)) {
+			ccprintf("Asserts are disabled\n");
+			return EC_ERROR_PARAM1;
+		}
 		ASSERT(0);
 	} else if (!strcasecmp(argv[1], "divzero")) {
 		volatile int one = 1;

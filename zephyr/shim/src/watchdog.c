@@ -6,7 +6,9 @@
 #include "config.h"
 #include "ec_tasks.h"
 #include "hooks.h"
+#include "host_command.h"
 #include "panic.h"
+#include "panic_utils.h"
 #include "task.h"
 #include "watchdog.h"
 
@@ -19,11 +21,23 @@
 
 LOG_MODULE_REGISTER(watchdog_shim, LOG_LEVEL_ERR);
 
+#ifdef CONFIG_PLATFORM_EC_WATCHDOG_DUMP_THREADS_CALL_STACK
+BUILD_ASSERT(CONFIG_AUX_TIMER_PERIOD_MS >= 500,
+	     "Make sure we have enough lead time to dump call stacks");
+#endif
+
 struct watchdog_info {
 	const struct device *wdt_dev;
 	struct wdt_timeout_cfg config;
 };
 
+/* Variables for tracking watchdog stats */
+static struct k_spinlock watchdog_stats_lock;
+static int64_t watchdog_reload_period_max_ts_ms;
+static int32_t watchdog_reload_period_max_ms;
+static int64_t watchdog_reload_last_ts_ms;
+static uint32_t watchdog_reload_count;
+static int64_t watchdog_stats_reset_ts_ms;
 __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 					       int channel_id);
 __maybe_unused static void
@@ -148,6 +162,23 @@ void watchdog_reload(void)
 	if (!watchdog_initialized)
 		return;
 
+	/* Use spinlock instead of mutex because watchdog_reload could be called
+	 * from an ISR */
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_HOSTCMD_WATCHDOG_INFO) ||
+	    IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_WATCHDOG_INFO)) {
+		K_SPINLOCK(&watchdog_stats_lock)
+		{
+			int32_t elapsed_ms = (int32_t)k_uptime_delta(
+				&watchdog_reload_last_ts_ms);
+			watchdog_reload_count++;
+			if (elapsed_ms > watchdog_reload_period_max_ms) {
+				watchdog_reload_period_max_ms = elapsed_ms;
+				watchdog_reload_period_max_ts_ms =
+					watchdog_reload_last_ts_ms;
+			}
+		}
+	}
+
 	for (int i = 0; i < ARRAY_SIZE(wdt_info); i++) {
 		if (wdt_chan[i] < 0)
 			continue;
@@ -155,40 +186,15 @@ void watchdog_reload(void)
 		wdt_feed(wdt_info[i].wdt_dev, wdt_chan[i]);
 	}
 }
-DECLARE_HOOK(HOOK_TICK, watchdog_reload, HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_TICK, watchdog_reload, HOOK_PRIO_LAST);
 
-static uint32_t get_stack_ptr(const struct k_thread *thread)
-{
-#if defined(CONFIG_ARM64)
-	/* We are assuming that the SP of interest is SP_EL1 */
-	return thread->callee_saved.sp_elx;
-#elif defined(CONFIG_ARM)
-	return thread->callee_saved.psp;
-#elif defined(CONFIG_X86)
-#if defined(CONFIG_X86_64)
-	return thread->callee_saved.rsp;
-#else
-	return thread->callee_saved.esp;
-#endif
-#elif defined(CONFIG_RISCV)
-	return thread->callee_saved.sp;
-#elif defined(CONFIG_ARCH_POSIX)
-	return (uint32_t)thread->callee_saved.thread_status;
-#endif
-}
-
-static void log_thread_info(const struct k_thread *thread, void *user_data)
+static void print_sp_pc(const struct k_thread *thread)
 {
 	uint32_t sp = get_stack_ptr(thread);
 	struct arch_esf *esf = (struct arch_esf *)sp;
 	char thread_name[16];
 
-#ifdef CONFIG_THREAD_NAME
-	snprintf(thread_name, sizeof(thread_name), "%s", thread->name);
-#else
-	snprintf(thread_name, sizeof(thread_name), "TASK_ID: %d",
-		 thread_id_to_task_id((k_tid_t)thread));
-#endif
+	get_thread_name(thread, thread_name, sizeof(thread_name));
 
 #if defined(CONFIG_ARM)
 	printk("%s [SP=%p, PC=%p, LR=%p]\n", thread_name, (void *)sp,
@@ -208,6 +214,14 @@ static void log_thread_info(const struct k_thread *thread, void *user_data)
 	/* Nothing useful within esf to be printed here */
 	ARG_UNUSED(esf);
 #endif
+}
+
+static void log_thread_info(const struct k_thread *thread, void *user_data)
+{
+	print_sp_pc(thread);
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_WATCHDOG_DUMP_THREADS_CALL_STACK)) {
+		print_stack_trace(thread);
+	}
 }
 
 __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
@@ -252,7 +266,7 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 #endif
 
 	if (IS_ENABLED(CONFIG_THREAD_MONITOR)) {
-		k_thread_foreach(log_thread_info, NULL);
+		k_thread_foreach_unlocked(log_thread_info, NULL);
 	}
 
 	/* Save the current task id in panic info.
@@ -270,3 +284,110 @@ wdt_warning_handler_with_enable(const struct device *wdt_dev, int channel_id)
 	/* Watchdog is disabled after calling handler. Re-enable it now. */
 	watchdog_enable(wdt_dev);
 }
+
+__maybe_unused static void reset_watchdog_stats(void)
+{
+	K_SPINLOCK(&watchdog_stats_lock)
+	{
+		watchdog_stats_reset_ts_ms = watchdog_reload_last_ts_ms;
+		watchdog_reload_period_max_ts_ms = 0;
+		watchdog_reload_period_max_ms = 0;
+		watchdog_reload_count = 0;
+	}
+}
+
+#if defined(CONFIG_PLATFORM_EC_HOSTCMD_WATCHDOG_INFO)
+
+static enum ec_status hostcmd_watchdog_info(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_hostcmd_watchdog_info *p = args->params;
+	struct ec_response_hostcmd_watchdog_info *r = args->response;
+
+	if (args->params_size < sizeof(*p))
+		return EC_RES_INVALID_PARAM;
+
+	r->watchdog_period_ms = CONFIG_WATCHDOG_PERIOD_MS;
+	r->watchdog_warning_period_ms = CONFIG_AUX_TIMER_PERIOD_MS;
+	r->watchdog_reload_period_nominal_ms =
+		HOOK_TICK_INTERVAL / USEC_PER_MSEC;
+	K_SPINLOCK(&watchdog_stats_lock)
+	{
+		r->watchdog_reload_period_max_ms =
+			watchdog_reload_period_max_ms;
+		r->watchdog_reload_period_max_ts_ms =
+			watchdog_reload_period_max_ts_ms;
+		r->watchdog_reload_count = watchdog_reload_count;
+		r->watchdog_stats_elapsed_ms =
+			watchdog_reload_last_ts_ms - watchdog_stats_reset_ts_ms;
+	}
+	if (p->reset_stats) {
+		reset_watchdog_stats();
+	}
+
+	args->response_size = sizeof(*r);
+	return EC_RES_SUCCESS;
+}
+
+DECLARE_HOST_COMMAND(EC_CMD_HOSTCMD_WATCHDOG_INFO, hostcmd_watchdog_info,
+		     EC_VER_MASK(0));
+
+#endif
+
+#if defined(CONFIG_PLATFORM_EC_CONSOLE_CMD_WATCHDOG_INFO)
+
+static void print_watchdog_info(const struct shell *shell)
+{
+	int64_t elapsed;
+	uint32_t count;
+	int32_t max_ms;
+	int64_t max_ts_ms;
+
+	shell_print(shell, "Watchdog Info:");
+	shell_print(shell, "Period: %d ms", CONFIG_WATCHDOG_PERIOD_MS);
+	shell_print(shell, "Warning Period: %d ms", CONFIG_AUX_TIMER_PERIOD_MS);
+	shell_print(shell, "Reload Period Nominal: %d ms",
+		    HOOK_TICK_INTERVAL / USEC_PER_MSEC);
+	K_SPINLOCK(&watchdog_stats_lock)
+	{
+		elapsed =
+			watchdog_reload_last_ts_ms - watchdog_stats_reset_ts_ms;
+		count = watchdog_reload_count;
+		max_ms = watchdog_reload_period_max_ms;
+		max_ts_ms = watchdog_reload_period_max_ts_ms;
+	}
+
+	shell_print(shell, "Stats Elapsed Time: %lld.%03lld s",
+		    elapsed / MSEC_PER_SEC, elapsed % MSEC_PER_SEC);
+	shell_print(shell, "Reload Count: %u", count);
+	shell_print(shell, "Reload Period Max: %d ms @ %lld.%03lld s", max_ms,
+		    max_ts_ms / MSEC_PER_SEC, max_ts_ms % MSEC_PER_SEC);
+	shell_print(shell, "Reload Period Avg: %lld ms",
+		    count > 0 ? elapsed / count : 0);
+}
+
+static int cmd_watchdoginfo(const struct shell *shell, size_t argc,
+			    char *argv[])
+{
+	bool reset_stats = false;
+	if (argc == 2) {
+		if (strcmp(argv[1], "reset_stats") == 0) {
+			reset_stats = true;
+		} else {
+			shell_error(shell, "Invalid argument: %s", argv[1]);
+			return -EINVAL;
+		}
+	}
+
+	print_watchdog_info(shell);
+	if (reset_stats) {
+		reset_watchdog_stats();
+		shell_print(shell, "Watchdog stats reset.");
+	}
+
+	return 0;
+}
+
+SHELL_CMD_REGISTER(watchdoginfo, NULL, "Watchdog Info [reset_stats]",
+		   cmd_watchdoginfo);
+
+#endif /* CONFIG_PLATFORM_EC_CONSOLE_CMD_WATCHDOG_INFO */

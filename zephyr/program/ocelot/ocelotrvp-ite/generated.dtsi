@@ -76,18 +76,12 @@
 		gpio_c_ioex_kbd_intr_r: c_ioex_kbd_intr_r {
 			gpios = <&gpioi 6 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
-		gpio_c_mecc_cse_early_sw_r: c_mecc_cse_early_sw_r {
-			// signal name was manually overriden from "x00085"
-			gpios = <&gpioj 3 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
-		};
 		gpio_ec_fan_pwr_disable_n_r: ec_fan_pwr_disable_n_r {
 			gpios = <&gpioc 4 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 		};
-		gpio_ec_ish_int_odl_c_ec_ish_alert_r: ec_ish_int_odl_c_ec_ish_alert_r {
-			gpios = <&gpioh 6 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
-		};
-		gpio_ec_slatemode_hallout_snsr_r: ec_slatemode_hallout_snsr_r {
+		gpio_tablet_mode_l: tablet-mode {
 			gpios = <&gpiod 1 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			enum-name = "GPIO_TABLET_MODE_L";
 		};
 		gpio_ec_soc_int_odl: ec_soc_int_odl {
 			gpios = <&gpioj 4 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
@@ -148,6 +142,12 @@
 		gpio_io_exp_int_mecc_r: io_exp_int_mecc_r {
 			gpios = <&gpioh 5 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
+		gpio_led_1: led_1 {
+			gpios = <&gpioa 2 (GPIO_OUTPUT)>;
+		};
+		gpio_led_2: led_2 {
+			gpios = <&gpioa 3 (GPIO_OUTPUT)>;
+		};
 		gpio_lid_open: lid_open {
 			gpios = <&gpiod 3 (GPIO_INPUT)>;
 			enum-name = "GPIO_LID_OPEN";
@@ -156,8 +156,8 @@
 			gpios = <&gpioe 3 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW)>;
 			enum-name = "GPIO_PCH_PWRBTN_L";
 		};
-		gpio_prochot_ec_n_r: prochot_ec_n_r {
-			gpios = <&gpioi 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		gpio_prochot_odl: prochot_odl {
+			gpios = <&gpioi 0 (GPIO_ODR_HIGH)>;
 		};
 		gpio_rst_push_n_d_r: rst_push_n_d_r {
 			gpios = <&gpioj 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;

@@ -26,6 +26,7 @@
 #include "usb_pd.h"
 #include "usb_pd_dpm_sm.h"
 #include "usb_pd_tcpm.h"
+#include "usbc_ppc.h"
 #include "util.h"
 #include "zephyr/include/usbc/pdc_dpm.h"
 #ifdef CONFIG_ZEPHYR
@@ -106,7 +107,8 @@ static enum dualrole_capabilities dualrole_capability[CHARGE_PORT_COUNT];
 static int save_log[CHARGE_PORT_COUNT];
 #endif
 
-#ifdef CONFIG_ZEPHYR
+/* Use mutexing to sync charge_manager_refresh and pdc_power_mgmt */
+#ifdef CONFIG_USB_PDC_POWER_MGMT
 K_MUTEX_DEFINE(cm_refresh);
 
 // #define CM_MUTEX_DEBUG
@@ -139,11 +141,12 @@ void charge_manager_dump_mutex_history()
 #define CM_MUTEX_LOCK(m) mutex_lock(m)
 #define CM_MUTEX_UNLOCK(m) mutex_unlock(m)
 #endif /* CM_MUTEX_DEBUG */
-#else
+
+#else /* CONFIG_USB_PDC_POWER_MGMT */
 /* TODO(b/427504021) - Legacy EC mutexes are not recursive */
 #define CM_MUTEX_LOCK(m)
 #define CM_MUTEX_UNLOCK(m)
-#endif /* CONFIG_ZEPHYR */
+#endif /* CONFIG_USB_PDC_POWER_MGMT */
 
 /* Store current state of port enable / charge current. */
 /* During charge_manager_refresh, the following data is considered stale. Make
@@ -158,6 +161,7 @@ static int override_port = OVERRIDE_OFF;
 
 static int delayed_override_port = OVERRIDE_OFF;
 static timestamp_t delayed_override_deadline;
+static bool charger_insufficient_adapter_found = false;
 
 /* Source-out Rp values for TCPMv1 */
 __maybe_unused static uint8_t source_port_rp[CONFIG_USB_PD_PORT_MAX_COUNT];
@@ -762,7 +766,7 @@ static int get_candidate_port_power(int supplier, int port)
 	 * This can happen in dead battery scenarios. */
 	if (IS_ENABLED(CONFIG_USB_PDC_POWER_MGMT) && is_pd_port(port)) {
 		candidate_port_power =
-			MAX(get_pd_port_max_power(port), candidate_port_power);
+			max(get_pd_port_max_power(port), candidate_port_power);
 	}
 
 	return candidate_port_power;
@@ -788,6 +792,17 @@ static bool is_battery_disconnected(void)
 		  battery_is_cut_off() != BATTERY_CUTOFF_STATE_NORMAL)));
 }
 
+static inline bool is_charge_available(const struct charge_port_info *info)
+{
+	return !(info->current == 0 || info->voltage == 0);
+}
+
+static inline bool is_voltage_sufficient(const struct charge_port_info *info,
+					 const uint32_t min_required_mv)
+{
+	return info->voltage >= min_required_mv;
+}
+
 /**
  * Select the best charge port or the override port, as defined by the supplier
  * hierarchy and the available power.
@@ -801,6 +816,8 @@ static void charge_manager_get_best_port(int *new_port, int *new_supplier)
 	int best_port = CHARGE_PORT_NONE;
 	int best_port_power = -1, candidate_port_power;
 	int sup_idx, port_idx;
+	uint32_t min_required_mv = 0;
+	bool verify_min_required_mv = false;
 
 	if (override_port == OVERRIDE_DONT_CHARGE) {
 		*new_port = CHARGE_PORT_NONE;
@@ -808,6 +825,15 @@ static void charge_manager_get_best_port(int *new_port, int *new_supplier)
 		return;
 	}
 
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_CHARGER_HYBRID_POWER_BOOST)) {
+		/* This only needs to be queried once. */
+		int chg_chip = charge_get_active_chg_chip();
+		verify_min_required_mv = charger_get_minimum_charging_mv(
+						 chg_chip, &min_required_mv) ==
+					 EC_SUCCESS;
+	}
+
+	charger_insufficient_adapter_found = false;
 	/*
 	 * Charge supplier selection logic:
 	 * 1. Prefer DPS charge port.
@@ -828,9 +854,21 @@ static void charge_manager_get_best_port(int *new_port, int *new_supplier)
 			 * Skip this supplier if there is no
 			 * available charge.
 			 */
-			if (available_charge[sup_idx][port_idx].current == 0 ||
-			    available_charge[sup_idx][port_idx].voltage == 0)
+			if (!is_charge_available(
+				    &available_charge[sup_idx][port_idx]))
 				continue;
+
+			/*
+			 * If supported, skip supplier that doesn't meet minimum
+			 * required voltage of charger IC.
+			 */
+			if (verify_min_required_mv &&
+			    !is_voltage_sufficient(
+				    &available_charge[sup_idx][port_idx],
+				    min_required_mv)) {
+				charger_insufficient_adapter_found = true;
+				continue;
+			}
 
 			/*
 			 * Don't select this port if we have a
@@ -1011,7 +1049,7 @@ static void charge_manager_refresh(void)
 		ceil = charge_manager_get_ceil(new_port);
 		if (left_safe_mode && ceil != CHARGE_CEIL_NONE)
 			new_charge_current =
-				MIN(ceil, new_charge_current_uncapped);
+				min(ceil, new_charge_current_uncapped);
 		else
 			new_charge_current = new_charge_current_uncapped;
 
@@ -1351,7 +1389,7 @@ void typec_set_input_current_limit(int port, typec_current_t max_ma,
 	 * if we can't ramp.
 	 */
 	if (dts)
-		charge.current = MIN(charge.current, 500);
+		charge.current = min(charge.current, 500);
 #endif
 
 	supplier = dts ? CHARGE_SUPPLIER_TYPEC_DTS : CHARGE_SUPPLIER_TYPEC;
@@ -1456,6 +1494,11 @@ void charge_manager_force_ceil(int port, int ceil)
 	 * waiting for our deferred task to run.
 	 */
 	if (left_safe_mode && port == charge_port && ceil < charge_current) {
+		/* TODO: Investigate whether boards that don't use PPCs need a
+		 * different action here */
+		if (IS_ENABLED(CONFIG_USBC_PPC) && ceil == 0) {
+			ppc_vbus_sink_enable(port, 0);
+		}
 		board_set_charge_limit(port, CHARGE_SUPPLIER_PD, ceil,
 				       charge_current_uncapped, charge_voltage);
 		/* Enforcing charge_ceil here prevents race conditions between
@@ -1551,6 +1594,12 @@ bool charge_manager_has_active_charge_port(void)
 	       CHARGE_PORT_NONE;
 }
 
+bool charge_manager_has_insufficient_adapter(void)
+{
+	return !charge_manager_has_active_charge_port() &&
+	       charger_insufficient_adapter_found;
+}
+
 int charge_manager_get_selected_charge_port(void)
 {
 	int port, supplier;
@@ -1570,7 +1619,7 @@ int charge_manager_get_charger_current(void)
 	return retval;
 }
 
-int charge_manager_get_charger_voltage(void)
+test_mockable int charge_manager_get_charger_voltage(void)
 {
 	int retval = 0;
 
@@ -1624,6 +1673,11 @@ int charge_manager_get_power_limit_uw(void)
 		return 0;
 	else
 		return current_ma * voltage_mv;
+}
+
+int charge_manager_set_acokref(int pdo_mv)
+{
+	return charger_set_acokref(charge_get_active_chg_chip(), pdo_mv);
 }
 
 #if defined(CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT) && \

@@ -39,16 +39,27 @@ def main() -> int:
                     # Also ignore test dirs that don't affect coverage numbers
                     if (  # pylint: disable=too-many-boolean-expressions
                         not (
+<<<<<<< HEAD   (d6c32f2441663510e20ae2d25d5edeb8956421b9 program,zmake: drop cmsis references)
                             "src/third_party/zephyrproject/modules/hal/"
                             "cmsis/CMSIS/Core/Include/core_cm4.h"
+||||||| BASE   (4f79cf3e850f16ecfb53fcd1c296c608faa9aef0 fpsensor: Add fingerprint_auth_enabled())
+                        in active_name
+=======
+                            "src/third_party/zephyrproject/zephyr/"
+                            "arch/arm/core/aarch32/mpu/arm_mpu.c"
+>>>>>>> BRANCH (a2cd4a0be01528f87cbc369a0dffbfc2fe4673c1 imvp/rt3645: Remove gpio state check)
                         )
                         in active_name
                         and not (
+<<<<<<< HEAD   (d6c32f2441663510e20ae2d25d5edeb8956421b9 program,zmake: drop cmsis references)
                             "src/third_party/zephyrproject/zephyr/"
                             "arch/arm/core/aarch32/mpu/arm_mpu.c"
                         )
                         in active_name
                         and not (
+||||||| BASE   (4f79cf3e850f16ecfb53fcd1c296c608faa9aef0 fpsensor: Add fingerprint_auth_enabled())
+=======
+>>>>>>> BRANCH (a2cd4a0be01528f87cbc369a0dffbfc2fe4673c1 imvp/rt3645: Remove gpio state check)
                             "src/third_party/zephyrproject/zephyr/drivers/"
                             "clock_control/clock_control_mchp_xec.c"
                             in active_name

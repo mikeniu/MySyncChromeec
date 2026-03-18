@@ -43,6 +43,8 @@ enum {
 	OPT_SSFC,
 	OPT_REWORK_ID,
 	OPT_FACTORY_CALIBRATION_DATA,
+	OPT_UFSC,
+	OPT_UFSC_HEX,
 	OPT_SIZE,
 	OPT_ERASE_BYTE,
 	OPT_SHOW_ALL,
@@ -62,6 +64,8 @@ static const struct option opts_create[] = {
 	{ "ssfc", 1, 0, OPT_SSFC },
 	{ "rework_id", 1, 0, OPT_REWORK_ID },
 	{ "factory_calibration_data", 1, 0, OPT_FACTORY_CALIBRATION_DATA },
+	{ "ufsc", 1, 0, OPT_UFSC },
+	{ "ufsc_hex", 1, 0, OPT_UFSC_HEX },
 	{ "size", 1, 0, OPT_SIZE },
 	{ "erase_byte", 1, 0, OPT_ERASE_BYTE },
 	{ NULL, 0, 0, 0 }
@@ -89,6 +93,7 @@ static const char *field_name[] = {
 	CBI_FIELD_NAME_ENTRY(BATTERY_CONFIG),
 	CBI_FIELD_NAME_ENTRY(BATTERY_CONFIG_15),
 	CBI_FIELD_NAME_ENTRY(PROVISION_MATRIX_VERSION),
+	CBI_FIELD_NAME_ENTRY(UFSC),
 };
 BUILD_ASSERT(ARRAY_SIZE(field_name) == CBI_TAG_COUNT);
 
@@ -113,6 +118,14 @@ const char help_create[] =
 	"  --ssfc <value>             Second Source Factory Cache bit-field\n"
 	"  --rework_id <lvalue>       REWORK_ID\n"
 	"  --factory_calibration_data <value>    Factory calibration data\n"
+	"  --ufsc <values>            Unified Firmware and Second-source\n"
+	"                               Config. <values> must be 4 comma-\n"
+	"                               separated 32-bit hex values for\n"
+	"                               DWORDs 0-3 respectively.\n"
+	"                               (eg, 0x1,0x202,0x30303,0x4040404)\n"
+	"  --ufsc_hex <hex_string>    UFSC data as a hex string (little-endian)\n"
+	"                               Must be exactly 32 hexadecimal characters.\n"
+	"                               (eg, 01000000020200000303030004040404)\n"
 	"\n"
 	"<value> must be a positive integer <= 0XFFFFFFFF, <lvalue> must be a\n"
 	"  positive integer <= 0xFFFFFFFFFFFFFFFF and field size can be\n"
@@ -311,6 +324,71 @@ static int parse_uint64_field(const char *arg, struct long_integer_field *f)
 	return 0;
 }
 
+static int parse_ufsc_field(const char *arg, struct cbi_ufsc *ufsc)
+{
+	char *arg_copy;
+	char *token;
+	char *saveptr;
+	int rv = -1;
+	int i;
+
+	/* Create a mutable copy as strtok modifies the string. */
+	arg_copy = strdup(arg);
+	if (!arg_copy) {
+		fprintf(stderr, "Failed to allocate memory for parsing\n");
+		return -1;
+	}
+
+	for (i = 0; i < CBI_UFSC_DATA_COUNT; i++) {
+		token = strtok_r(i == 0 ? arg_copy : NULL, ",", &saveptr);
+		if (!token) {
+			fprintf(stderr,
+				"Invalid UFSC format: expected %d values, found %d\n",
+				CBI_UFSC_DATA_COUNT, i);
+			goto out;
+		}
+		ufsc->data[i] = strtoul(token, NULL, 0);
+	}
+
+	if (strtok_r(NULL, ",", &saveptr)) {
+		fprintf(stderr,
+			"Invalid UFSC format: too many values, expected %d\n",
+			CBI_UFSC_DATA_COUNT);
+		goto out;
+	}
+	rv = 0;
+out:
+	free(arg_copy);
+	return rv;
+}
+
+static int parse_ufsc_hex_field(const char *arg, struct cbi_ufsc *ufsc)
+{
+	size_t len = strlen(arg);
+	uint8_t *raw_buf = (uint8_t *)ufsc;
+	char hex[3] = { 0 };
+	char *end;
+
+	if (len != sizeof(struct cbi_ufsc) * 2) {
+		fprintf(stderr,
+			"Invalid UFSC hex length. Expected %zu chars, got %zu\n",
+			sizeof(struct cbi_ufsc) * 2, len);
+		return -1;
+	}
+
+	for (size_t i = 0; i < sizeof(struct cbi_ufsc); i++) {
+		hex[0] = arg[i * 2];
+		hex[1] = arg[i * 2 + 1];
+		raw_buf[i] = (uint8_t)strtoul(hex, &end, 16);
+		if (*end != '\0') {
+			fprintf(stderr,
+				"Invalid hex character in UFSC string\n");
+			return -1;
+		}
+	}
+	return 0;
+}
+
 static int cmd_create(int argc, char **argv)
 {
 	uint8_t *cbi;
@@ -326,6 +404,7 @@ static int cmd_create(int argc, char **argv)
 		struct integer_field factory_calibration_data;
 		const char *dram_part_num;
 		const char *oem_name;
+		struct cbi_ufsc ufsc;
 	} bi;
 	struct cbi_header *h;
 	int rv;
@@ -334,6 +413,7 @@ static int cmd_create(int argc, char **argv)
 	uint32_t set_mask = 0;
 	uint16_t size;
 	uint8_t erase = 0xff;
+	int ufsc_present = 0;
 	int i;
 
 	memset(&bi, 0, sizeof(bi));
@@ -413,6 +493,24 @@ static int cmd_create(int argc, char **argv)
 						&bi.factory_calibration_data))
 				return -1;
 			break;
+		case OPT_UFSC:
+			if (ufsc_present) {
+				fprintf(stderr, "UFSC already specified\n");
+				return -1;
+			}
+			if (parse_ufsc_field(optarg, &bi.ufsc))
+				return -1;
+			ufsc_present = 1;
+			break;
+		case OPT_UFSC_HEX:
+			if (ufsc_present) {
+				fprintf(stderr, "UFSC already specified\n");
+				return -1;
+			}
+			if (parse_ufsc_hex_field(optarg, &bi.ufsc))
+				return -1;
+			ufsc_present = 1;
+			break;
 		}
 	}
 
@@ -450,6 +548,8 @@ static int cmd_create(int argc, char **argv)
 			 bi.factory_calibration_data.size);
 	p = cbi_set_string(p, CBI_TAG_DRAM_PART_NUM, bi.dram_part_num);
 	p = cbi_set_string(p, CBI_TAG_OEM_NAME, bi.oem_name);
+	if (ufsc_present)
+		p = cbi_set_data(p, CBI_TAG_UFSC, &bi.ufsc, sizeof(bi.ufsc));
 
 	h->total_size = p - cbi;
 	h->crc = cbi_crc8(h);
@@ -513,6 +613,35 @@ static void print_integer(const uint8_t *buf, enum cbi_data_tag tag)
 	}
 	printf("    %s: %llu (0x%llx, %u, %u)\n", name, (unsigned long long)v,
 	       (unsigned long long)v, d->tag, d->size);
+}
+
+static void print_ufsc(const uint8_t *buf, enum cbi_data_tag tag)
+{
+	struct cbi_data *d = cbi_find_tag(buf, tag);
+	const char *name;
+	struct cbi_ufsc *ufsc;
+	int i;
+
+	if (!d)
+		return;
+
+	name = d->tag < CBI_TAG_COUNT ? field_name[d->tag] : "???";
+
+	if (d->size != sizeof(struct cbi_ufsc)) {
+		printf("    %s: Invalid size %d, expected %zu\n", name, d->size,
+		       sizeof(struct cbi_ufsc));
+		return;
+	}
+
+	ufsc = (struct cbi_ufsc *)d->value;
+	printf("    %s: (%u, %u)\n", name, d->tag, d->size);
+	printf("      Hex: ");
+	for (i = 0; i < sizeof(struct cbi_ufsc); i++) {
+		printf("%02x", ((uint8_t *)ufsc)[i]);
+	}
+	printf("\n");
+	for (i = 0; i < CBI_UFSC_DATA_COUNT; i++)
+		printf("      DWORD[%d]: 0x%08x\n", i, ufsc->data[i]);
 }
 
 static int cmd_show(int argc, char **argv)
@@ -585,6 +714,7 @@ static int cmd_show(int argc, char **argv)
 	print_integer(buf, CBI_TAG_FACTORY_CALIBRATION_DATA);
 	print_string(buf, CBI_TAG_DRAM_PART_NUM);
 	print_string(buf, CBI_TAG_OEM_NAME);
+	print_ufsc(buf, CBI_TAG_UFSC);
 
 	free(buf);
 

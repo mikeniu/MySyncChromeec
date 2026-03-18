@@ -8,13 +8,13 @@
 #include "emul/emul_common_i2c.h"
 #include "emul/emul_isl923x.h"
 #include "emul/emul_smart_battery.h"
-#include "emul/emul_stub_device.h"
 #include "i2c.h"
 
 #include <errno.h>
 
 #include <zephyr/device.h>
 #include <zephyr/drivers/emul.h>
+#include <zephyr/drivers/emul_stub_device.h>
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/drivers/i2c_emul.h>
 #include <zephyr/logging/log.h>
@@ -149,8 +149,11 @@ isl923x_emul_get_cfg(const struct emul *emulator)
 #ifdef CONFIG_ZTEST
 static void isl923x_emul_reset(struct isl923x_emul_data *data)
 {
-	data->common.write_fail_reg = I2C_COMMON_EMUL_NO_FAIL_REG;
-	data->common.read_fail_reg = I2C_COMMON_EMUL_NO_FAIL_REG;
+	i2c_common_emul_set_fail_auto_clear(&data->common, false);
+	i2c_common_emul_set_write_fail_reg(&data->common,
+					   I2C_COMMON_EMUL_NO_FAIL_REG);
+	i2c_common_emul_set_read_fail_reg(&data->common,
+					  I2C_COMMON_EMUL_NO_FAIL_REG);
 }
 #endif
 

@@ -23,19 +23,16 @@ void board_ap_power_force_shutdown(void)
 {
 	int timeout_ms = X86_NON_DSX_FORCE_SHUTDOWN_TO_MS;
 
+	/* De-assert PCH_PWROK and EC_PCH_SYS_PWROK */
+	power_signal_set(PWR_PCH_PWROK, 0);
+	power_signal_set(PWR_EC_PCH_SYS_PWROK, 0);
+
 	/* Turn off PCH_RMSRST to meet tPCH12 */
 	power_signal_set(PWR_EC_PCH_RSMRST, 1);
 
 	/* Turn off PRIM load switch. */
 	power_signal_set(PWR_EN_PP3300_A, 0);
 
-	/*
-	 * TODO(b/430093425): Remove pwr_en_pp5000_a after moving to
-	 * revised RVP version for onboard EC.
-	 */
-#if DT_NODE_HAS_STATUS(DT_NODELABEL(pwr_en_pp5000_a), okay)
-	power_signal_set(PWR_EN_PP5000_A, 0);
-#endif
 	/* Wait RSMRST to be off. */
 	while (power_signal_get(PWR_RSMRST_PWRGD) && (timeout_ms > 0)) {
 		k_msleep(1);
@@ -59,24 +56,6 @@ static int board_ap_power_action_g3_run(void *data)
 {
 	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_STARTUP)) {
 		power_signal_set(PWR_EN_PP3300_A, 1);
-
-		/*
-		 * TODO(b/430093425): Remove pwr_en_pp5000_a after moving to
-		 * revised RVP version for onboard EC.
-		 */
-#if DT_NODE_HAS_STATUS(DT_NODELABEL(pwr_en_pp5000_a), okay)
-		k_msleep(10);
-		/* Turn on the PP5000_PRIM rail. */
-		power_signal_set(PWR_EN_PP5000_A, 1);
-#endif
-		/* Indication to soc on recovery boot */
-		if (system_is_manual_recovery()) {
-			gpio_pin_set_dt(
-				GPIO_DT_FROM_NODELABEL(cse_early_rec_sw), 1);
-		} else {
-			gpio_pin_set_dt(
-				GPIO_DT_FROM_NODELABEL(cse_early_rec_sw), 0);
-		}
 
 		update_ap_boot_time(ARAIL);
 	}

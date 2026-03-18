@@ -52,6 +52,10 @@ ZTEST_USER(smart_battery, test_battery_getters)
 		      NULL);
 	zassert_mem_equal(block, bat->mf_name, bat->mf_name_len, "%s != %s",
 			  block, bat->mf_name);
+	zassert_equal(EC_SUCCESS, get_battery_manufacture_info(block, 32),
+		      NULL);
+	zassert_mem_equal(block, bat->mf_info, bat->mf_info_len, "%s != %s",
+			  block, bat->mf_info);
 	zassert_equal(EC_SUCCESS, battery_device_name(block, 32));
 	zassert_mem_equal(block, bat->dev_name, bat->dev_name_len, "%s != %s",
 			  block, bat->dev_name);
@@ -356,6 +360,7 @@ struct mfgacc_data {
 	int reg;
 	uint8_t *buf;
 	int len;
+	int incorrect_pec_count;
 };
 
 static int mfgacc_read_func(const struct emul *emul, int reg, uint8_t *val,
@@ -364,7 +369,11 @@ static int mfgacc_read_func(const struct emul *emul, int reg, uint8_t *val,
 	struct mfgacc_data *conf = data;
 
 	if (bytes == 0 && conf->reg == reg) {
-		sbat_emul_set_response(emul, reg, conf->buf, conf->len, false);
+		sbat_emul_set_response(emul, reg, conf->buf, conf->len, false,
+				       conf->incorrect_pec_count > 0);
+		if (conf->incorrect_pec_count > 0) {
+			conf->incorrect_pec_count--;
+		}
 	}
 
 	return 1;
@@ -378,8 +387,8 @@ ZTEST_USER(smart_battery, test_battery_mfacc)
 	const struct emul *emul = EMUL_DT_GET(BATTERY_NODE);
 	struct i2c_common_emul_data *common_data =
 		emul_smart_battery_get_i2c_common_data(emul);
-	uint8_t recv_buf[10];
-	uint8_t mf_data[10];
+	uint8_t recv_buf[MSG_BUF_LEN - 1];
+	uint8_t mf_data[MSG_BUF_LEN - 1];
 	uint16_t cmd;
 	int len;
 
@@ -396,7 +405,7 @@ ZTEST_USER(smart_battery, test_battery_mfacc)
 		      NULL);
 
 	/* Set correct length for rest of the test */
-	len = 10;
+	len = sizeof(mf_data) - 1;
 
 	/* Test fail on writing SB_MANUFACTURER_ACCESS register */
 	i2c_common_emul_set_write_fail_reg(common_data, SB_MANUFACTURER_ACCESS);
@@ -414,16 +423,20 @@ ZTEST_USER(smart_battery, test_battery_mfacc)
 		      NULL);
 
 	/* Set arbitrary manufacturer data */
-	for (int i = 1; i < len; i++) {
-		mf_data[i] = i;
+	for (int i = 0; i < len; i++) {
+		mf_data[i + 1] = i + 1;
 	}
-	/* Set first byte of message as length */
+	/*
+	 * Set first byte of message as length.
+	 * The total number of bytes is length + 1.
+	 */
 	mf_data[0] = len;
 
 	/* Setup custom handler */
 	mfacc_conf.reg = SB_ALT_MANUFACTURER_ACCESS;
-	mfacc_conf.len = len;
+	mfacc_conf.len = len + 1;
 	mfacc_conf.buf = mf_data;
+	mfacc_conf.incorrect_pec_count = 0;
 	i2c_common_emul_set_read_func(common_data, mfgacc_read_func,
 				      &mfacc_conf);
 
@@ -444,6 +457,22 @@ ZTEST_USER(smart_battery, test_battery_mfacc)
 		      NULL);
 	/* Compare received data ignoring length byte */
 	zassert_mem_equal(mf_data + 1, recv_buf, len - 1, NULL);
+
+	if (IS_ENABLED(CONFIG_SMBUS_PEC)) {
+		/* Test pec error */
+		mfacc_conf.incorrect_pec_count = 100;
+		zassert_equal(EC_ERROR_CRC,
+			      sb_read_mfgacc(cmd, SB_ALT_MANUFACTURER_ACCESS,
+					     recv_buf, len),
+			      NULL);
+
+		/* Test pec error retry */
+		mfacc_conf.incorrect_pec_count = 1;
+		zassert_equal(EC_SUCCESS,
+			      sb_read_mfgacc(cmd, SB_ALT_MANUFACTURER_ACCESS,
+					     recv_buf, len),
+			      NULL);
+	}
 
 	/* Disable custom read function */
 	i2c_common_emul_set_read_func(common_data, NULL, NULL);
@@ -600,6 +629,8 @@ ZTEST_USER(smart_battery, test_battery_access_cutoff)
 	zassert_equal(params.flags, BATT_FLAG_BAD_ANY, "actual flags were %#x",
 		      params.flags);
 	zassert_equal(get_battery_manufacturer_name(str, sizeof(str)),
+		      EC_ERROR_ACCESS_DENIED);
+	zassert_equal(get_battery_manufacture_info(str, sizeof(str)),
 		      EC_ERROR_ACCESS_DENIED);
 	zassert_equal(sb_read_sized_block(0, NULL, 0), EC_ERROR_ACCESS_DENIED);
 	/*

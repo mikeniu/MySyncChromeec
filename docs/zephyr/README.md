@@ -35,8 +35,14 @@ Zephyr EC images rely on multiple Chromium repositories to build Zephyr EC image
 
 * [`third_party/zephyrproject/zephyr`] - Google's local mirror of the main Zephyr RTOS
   source located on [Github](https://github.com/zephyrproject-rtos/zephyr).
+<<<<<<< HEAD   (d6c32f2441663510e20ae2d25d5edeb8956421b9 program,zmake: drop cmsis references)
 * [`third_party/zephyrproject/modules/hal/cmsis`] - Google's local mirror of the CMSIS module source
   from [Github](https://github.com/zephyrproject-rtos/cmsis)
+||||||| BASE   (4f79cf3e850f16ecfb53fcd1c296c608faa9aef0 fpsensor: Add fingerprint_auth_enabled())
+* [`third_party/zephyr/cmsis`] - Google's local mirror of the CMSIS module source
+  from [Github](https://github.com/zephyrproject-rtos/cmsis)
+=======
+>>>>>>> BRANCH (a2cd4a0be01528f87cbc369a0dffbfc2fe4673c1 imvp/rt3645: Remove gpio state check)
 * [`platform/ec`] - local repository containing code shared by the legacy EC and
   the Zephyr EC
 
@@ -120,6 +126,11 @@ The following provides an overview of the sub-directories found under
 * `zephyr/zmake/` - Source code for the `zmake/` meta tool.
 
 [`third_party/zephyrproject/zephyr`]: https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr
+<<<<<<< HEAD   (d6c32f2441663510e20ae2d25d5edeb8956421b9 program,zmake: drop cmsis references)
 [`third_party/zephyrproject/modules/hal/cmsis`]: https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/modules/hal/cmsis
+||||||| BASE   (4f79cf3e850f16ecfb53fcd1c296c608faa9aef0 fpsensor: Add fingerprint_auth_enabled())
+[`third_party/zephyr/cmsis`]: https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyr/cmsis
+=======
+>>>>>>> BRANCH (a2cd4a0be01528f87cbc369a0dffbfc2fe4673c1 imvp/rt3645: Remove gpio state check)
 [`platform/ec`]: https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec
 [`ec_app_main()`]: https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/app/ec/ec_app_main.c
