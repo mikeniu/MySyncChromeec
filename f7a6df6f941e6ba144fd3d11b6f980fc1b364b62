@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "885bb100_852f6fc6",
+        "filename": "power/qcom_exp.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1552197
+      },
+      "writtenOn": "2026-03-18T16:43:52Z",
+      "side": 1,
+      "message": "Let\u0027s route it via RTC alarm to differentiate it from AC ON.",
+      "range": {
+        "startLine": 362,
+        "startChar": 0,
+        "endLine": 366,
+        "endChar": 29
+      },
+      "revId": "f7a6df6f941e6ba144fd3d11b6f980fc1b364b62",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
