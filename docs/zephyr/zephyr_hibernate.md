@@ -27,11 +27,12 @@ The Kconfig option [`CONFIG_PLATFORM_EC_HIBERNATE`] enables hibernation support
 in the EC application. The Kconfig option [`CONFIG_PLATFORM_EC_HIBERNATE_TYPE`]
 selects the hibernate driver used by the platform.
 
-There are 4 types of hibernate supported.  Click through to the [Kconfig.system]
+There are 5 types of hibernate supported.  Click through to the [Kconfig.system]
 file for details on each type of hibernation.
 
 1. [`CONFIG_PLATFORM_EC_HIBERNATE_PSL`]
 1. [`CONFIG_PLATFORM_EC_HIBERNATE_VCI`]
+1. [`CONFIG_PLATFORM_EC_HIBERNATE_ELPM`]
 1. [`CONFIG_PLATFORM_EC_HIBERNATE_WAKE_PINS`]
 1. [`CONFIG_PLATFORM_EC_HIBERNATE_Z5`]
 
@@ -97,6 +98,41 @@ Example from the [Rex project]:
 
 ```
 
+#### Hibernate Wake Source Detection
+
+The application can determine the source of the wake-up from hibernate using the
+`cros_system_get_hibernate_wake_source` API. Currently, this feature is only
+implemented for NPCX based platforms. Other platforms will return `-ENOSYS`.
+
+For NPCX based platforms using PSL, the driver maps the PSL input that caused
+the wake to a specific wake source (e.g., AC, Lid, Power Button). To enable
+this mapping, you must label the corresponding PSL input nodes in the
+devicetree with `wake_source_acok`, `wake_source_lid_open`, and
+`wake_source_pwr_btn`.
+
+Example from the [Bluey project]:
+
+```
+/* Power switch logic input pads */
+wake_source_lid_open: &psl_in1_gpd2 {
+	/* EC_LID_OPEN */
+	psl-in-mode = "edge";
+	psl-in-pol = "high-rising";
+};
+
+wake_source_pwr_btn: &psl_in2_gp00 {
+	/* EC_PWR_BTN_ODL */
+	psl-in-mode = "edge";
+	psl-in-pol = "low-falling";
+};
+
+wake_source_acok: &psl_in3_gp01 {
+	/* EC_ACOK_OD */
+	psl-in-mode = "edge";
+	psl-in-pol = "high-rising";
+};
+```
+
 ### `CONFIG_PLATFORM_EC_HIBERNATE_VCI`
 
 Supported by the Microchip EC family only.  An example configuration of
@@ -142,6 +178,21 @@ the [`cros-ec,hibernate-vci-pin`] driver is shown below.  This comes from the
 For details about configuring the VCI pin properties, refer to the
 [`cros-ec,hibernate-vci-pin`] schema file.
 
+### `CONFIG_PLATFORM_EC_HIBERNATE_ELPM`
+
+Supported exclusively on ITE SoC families. Here is the example overlay
+setting using the IT82000.BW SoC:
+
+```
+&power_ctrl_elpm {
+	status = "okay";
+	pinctrl-0 = <&xlpin0_gpq0_default>;
+	pinctrl-names = "default";
+
+	/* XLPIN[0](GPIO_G1): enabled, low-falling */
+	xlpin0: xlpin@0 { reg = <0>; polarity = "low-falling"; };
+};
+```
 
 ### `CONFIG_PLATFORM_EC_HIBERNATE_WAKE_PINS`
 
@@ -222,6 +273,7 @@ Use the `hibdelay` command to override the project's hibernation timeout.
 [Kconfig.system]:https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/Kconfig.system
 [`CONFIG_PLATFORM_EC_HIBERNATE_PSL`]:https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/Kconfig.system?q=%22config%20PLATFORM_EC_HIBERNATE_PSL%22
 [`CONFIG_PLATFORM_EC_HIBERNATE_VCI`]:https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/Kconfig.system?q=%22config%20PLATFORM_EC_HIBERNATE_VCI%22
+[`CONFIG_PLATFORM_EC_HIBERNATE_ELPM`]:https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/Kconfig.system?q=%22config%20PLATFORM_EC_HIBERNATE_ELPM%22
 [`CONFIG_PLATFORM_EC_HIBERNATE_WAKE_PINS`]:https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/Kconfig.system?q=%22config%20PLATFORM_EC_HIBERNATE_WAKE_PINS%22
 [`CONFIG_PLATFORM_EC_HIBERNATE_Z5`]:https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/Kconfig.system?q=%22config%20PLATFORM_EC_HIBERNATE_Z5%22
 [`nuvoton,npcx-power-psl`]:https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/dts/arm/nuvoton/npcx/npcx.dtsi?q=%22nuvoton,npcx-power-psl%22
@@ -235,3 +287,4 @@ Use the `hibdelay` command to override the project's hibernation timeout.
 [`cros-ec,hibernate-wake-pins`]:https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/dts/bindings/gpio/cros-ec,hibernate-wake-pins.yaml
 [`cros-ec,hibernate-z5`]:https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/dts/bindings/hibernate/cros-ec,hibernate-z5.yaml
 [brox project]:https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/program/brox/hibernate.dtsi
+[Bluey project]:https://source.corp.google.com/h/chrome-internal/chromeos/superproject/+/main:src/platform/ec/zephyr/program/bluey/psl.dtsi

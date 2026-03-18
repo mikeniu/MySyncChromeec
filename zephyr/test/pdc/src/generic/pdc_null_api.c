@@ -139,6 +139,11 @@ ZTEST(pdc_api_null_check, test_pdc_get_info)
 	EXPECT_ASSERT(pdc_get_info(&fake_pdc, NULL, false));
 }
 
+ZTEST(pdc_api_null_check, test_pdc_get_frs_supported)
+{
+	EXPECT_ASSERT(pdc_get_frs_supported(&fake_pdc));
+}
+
 ZTEST(pdc_api_null_check, test_pdc_get_hw_config)
 {
 	EXPECT_ASSERT(pdc_get_hw_config(&fake_pdc, NULL));
@@ -215,14 +220,6 @@ ZTEST(pdc_api_null_check, test_pdc_set_power_level)
 ZTEST(pdc_api_null_check, test_pdc_reconnect)
 {
 	int rv = pdc_reconnect(&fake_pdc);
-
-	zassert_equal(-ENOSYS, rv, "Got %d, expected -ENOSYS (%d)", rv,
-		      -ENOSYS);
-}
-
-ZTEST(pdc_api_null_check, test_pdc_get_current_flash_bank)
-{
-	int rv = pdc_get_current_flash_bank(&fake_pdc, NULL);
 
 	zassert_equal(-ENOSYS, rv, "Got %d, expected -ENOSYS (%d)", rv,
 		      -ENOSYS);
@@ -373,6 +370,24 @@ ZTEST(pdc_api_null_check, test_pdc_battery_capability)
 {
 	union battery_capability_t bc = { 0 };
 	int rv = pdc_set_battery_capability(&fake_pdc, &bc);
+
+	zassert_equal(-ENOSYS, rv, "Got %d, expected -ENOSYS (%d)", rv,
+		      -ENOSYS);
+}
+
+ZTEST(pdc_api_null_check, test_pdc_get_vendor_status)
+{
+	union vendor_status_change_bits_t *vendor_status = { 0 };
+	int rv = pdc_get_vendor_status(&fake_pdc, vendor_status);
+
+	zassert_equal(-ENOSYS, rv, "Got %d, expected -ENOSYS (%d)", rv,
+		      -ENOSYS);
+}
+
+ZTEST(pdc_api_null_check, test_pdc_get_alert)
+{
+	uint32_t *ado = NULL;
+	int rv = pdc_get_alert(&fake_pdc, ado);
 
 	zassert_equal(-ENOSYS, rv, "Got %d, expected -ENOSYS (%d)", rv,
 		      -ENOSYS);

@@ -129,7 +129,7 @@ static int set_notification_enable(struct rts5453p_emul_pdc_data *data,
 
 	data->notification_data[port] = req->set_notification_enable.data;
 	LOG_INF("SET_NOTIFICATION_ENABLE port=%d, data=0x%X", port,
-		data->notification_data[port]);
+		data->notification_data[port].raw_value);
 
 	memset(&data->response, 0, sizeof(union rts54_response));
 	send_response(data);
@@ -397,11 +397,11 @@ static int get_rtk_status(struct rts5453p_emul_pdc_data *data,
 		req->get_rtk_status.sts_len);
 
 	data->response.rtk_status.byte_count =
-		MIN(sizeof(struct get_rtk_status_response) - 1,
+		min(sizeof(struct get_rtk_status_response) - 1,
 		    req->get_rtk_status.sts_len);
 
 	/* Massage PD status into RTS54 response */
-	/* BYTE 1-4 */
+	/* BYTE 1-2 (UCSI status change bits) */
 	data->response.rtk_status.pd_status.external_supply_charge =
 		conn_status_change_bits.external_supply_change;
 	data->response.rtk_status.pd_status.power_operation_mode_change =
@@ -424,6 +424,12 @@ static int get_rtk_status(struct rts5453p_emul_pdc_data *data,
 		conn_status_change_bits.connect_change;
 	data->response.rtk_status.pd_status.error =
 		conn_status_change_bits.error;
+
+	/* BYTE 3-4 (RTK status change bits) */
+	if (data->ado == 0)
+		data->response.rtk_status.pd_status.alert_received = 0;
+	else
+		data->response.rtk_status.pd_status.alert_received = 1;
 
 	/* BYTE 5 */
 	data->response.rtk_status.supply = 0;
@@ -525,11 +531,26 @@ static int set_pdr(struct rts5453p_emul_pdc_data *data,
 	return 0;
 }
 
+static void delayed_sink_contract_negotiation_handler(struct k_work *work)
+{
+	struct k_work_delayable *dwork = k_work_delayable_from_work(work);
+	struct rts5453p_emul_pdc_data *data =
+		CONTAINER_OF(dwork, struct rts5453p_emul_pdc_data,
+			     delayed_sink_contract_negotiation_work);
+
+	LOG_INF("Adopting RDO (%08x, pos=%d) and setting negotiated_power_level",
+		data->pending_rdo, RDO_POS(data->pending_rdo));
+
+	data->pdo.rdo = data->pending_rdo;
+	data->connector_status.raw_conn_status_change_bits |=
+		UCSI_CHANGE_BITS_NEGOTIATED_POWER_LEVEL;
+}
+
 static int set_rdo(struct rts5453p_emul_pdc_data *data,
 		   const union rts54_request *req)
 {
-	LOG_INF("SET_RDO port=%d, rdo=0x%X", req->set_rdo.port_num,
-		req->set_rdo.rdo);
+	LOG_INF("SET_RDO port=%d, rdo=0x%X (pos=%d)", req->set_rdo.port_num,
+		req->set_rdo.rdo, RDO_POS(req->set_rdo.rdo));
 
 	/* The SET_RDO command triggers a Request Object to be sent
 	 * to the port partner when the LPM is a sink.
@@ -540,10 +561,17 @@ static int set_rdo(struct rts5453p_emul_pdc_data *data,
 		return -EINVAL;
 	}
 
-	data->pdo.rdo = req->set_rdo.rdo;
+	data->pending_rdo = req->set_rdo.rdo;
 
 	memset(&data->response, 0, sizeof(union rts54_response));
 	send_response(data);
+
+	if (!atomic_test_bit(data->features, EMUL_PDC_FEATURE_DONT_APPLY_RDO)) {
+		/* Simulate a delay in the port partner accepting the RDO
+		 * request */
+		k_work_reschedule(&data->delayed_sink_contract_negotiation_work,
+				  K_MSEC(400));
+	}
 
 	return 0;
 }
@@ -723,7 +751,7 @@ static int get_pdos(struct rts5453p_emul_pdc_data *data,
 	uint8_t pdo_count = req->get_pdos.ucsi.number_of_pdos + 1;
 
 	/* GET_PDOS stops at the end if there's a requested overflow. */
-	pdo_count = MIN(PDO_OFFSET_MAX - pdo_offset, pdo_count);
+	pdo_count = min(PDO_OFFSET_MAX - pdo_offset, pdo_count);
 
 	LOG_INF("GET_PDO source %d, type=%d, offset=%d, count=%d", pdo_source,
 		pdo_type, pdo_offset, pdo_count);
@@ -910,6 +938,19 @@ static int set_sys_pwr_state(struct rts5453p_emul_pdc_data *data,
 	return 0;
 }
 
+static int get_alert(struct rts5453p_emul_pdc_data *data,
+		     const union rts54_request *req)
+{
+	LOG_INF("GET_ALERT = %x", req->get_alert.port_num);
+	memset(&data->response, 0, sizeof(data->response));
+
+	data->response.get_alert.byte_count = sizeof(uint32_t);
+	data->response.get_alert.ado = data->ado;
+
+	send_response(data);
+	return 0;
+}
+
 struct commands {
 	uint8_t code;
 	enum {
@@ -970,6 +1011,7 @@ const struct commands sub_cmd_x08[] = {
 	{ .code = 0xA8, HANDLER_DEF(unsupported) },
 	{ .code = 0xA9, HANDLER_DEF(unsupported) },
 	{ .code = 0xAA, HANDLER_DEF(unsupported) },
+	{ .code = 0xB5, HANDLER_DEF(get_alert) },
 	{ .code = 0xE0, HANDLER_DEF(get_pch_data_status) },
 	{ .code = 0xE1, HANDLER_DEF(set_frs_function) },
 };
@@ -1272,6 +1314,9 @@ static int emul_realtek_rts54xx_reset(const struct emul *target)
 	emul_realtek_rts54xx_init_data(target);
 
 	data->dead_battery = 0;
+	data->pending_rdo = 0;
+
+	k_work_cancel_delayable(&data->delayed_sink_contract_negotiation_work);
 
 	return 0;
 }
@@ -1321,6 +1366,10 @@ static int rts5453p_emul_init(const struct emul *emul,
 
 	k_work_init_delayable(&data->pdc_data.delay_work,
 			      delayable_work_handler);
+
+	k_work_init_delayable(
+		&data->pdc_data.delayed_sink_contract_negotiation_work,
+		delayed_sink_contract_negotiation_handler);
 
 	return 0;
 }
@@ -1711,6 +1760,7 @@ static bool is_feature_flag_supported(enum emul_pdc_feature_flag feature)
 {
 	switch (feature) {
 	case EMUL_PDC_FEATURE_SBU_MUX_OVERRIDE:
+	case EMUL_PDC_FEATURE_DONT_APPLY_RDO:
 		return true;
 	default:
 		return false;
@@ -1829,6 +1879,36 @@ static int emul_realtek_rts54xx_get_sys_power_state(const struct emul *target,
 	return 0;
 }
 
+static int emul_realtek_rts54xx_set_alert(const struct emul *target,
+					  uint32_t ado)
+{
+	struct rts5453p_emul_pdc_data *data =
+		rts5453p_emul_get_pdc_data(target);
+
+	data->ado = ado;
+
+	/* No response data */
+	memset(&data->response, 0, sizeof(union rts54_response));
+	send_response(data);
+
+	return 0;
+}
+
+static int emul_realtek_rts54xx_get_sbu_mux_mode(const struct emul *target,
+						 enum pdc_sbu_mux_mode *mode)
+{
+	struct rts5453p_emul_pdc_data *data =
+		rts5453p_emul_get_pdc_data(target);
+
+	if (mode == NULL) {
+		return -EINVAL;
+	}
+
+	*mode = data->sbu_mux_mode;
+
+	return 0;
+}
+
 static DEVICE_API(emul_pdc, emul_realtek_rts54xx_api) = {
 	.reset = emul_realtek_rts54xx_reset,
 	.set_response_delay = emul_realtek_rts54xx_set_response_delay,
@@ -1869,6 +1949,8 @@ static DEVICE_API(emul_pdc, emul_realtek_rts54xx_api) = {
 	.get_battery_capability = emul_realtek_rts54xx_get_battery_capability,
 	.get_battery_status = emul_realtek_rts54xx_get_battery_status,
 	.get_sys_power_state = emul_realtek_rts54xx_get_sys_power_state,
+	.set_alert = emul_realtek_rts54xx_set_alert,
+	.get_sbu_mux_mode = emul_realtek_rts54xx_get_sbu_mux_mode,
 };
 
 #define RTS5453P_EMUL_DEFINE(n)                                             \

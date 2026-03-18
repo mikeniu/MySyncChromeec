@@ -16,7 +16,6 @@
 #include "printf.h"
 #include "shared_mem.h"
 #include "system.h"
-#include "system_safe_mode.h"
 #include "task.h"
 #include "timer.h"
 #include "util.h"
@@ -26,7 +25,7 @@
 #define CPRINTF(format, args...) cprintf(CC_HOSTCMD, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_HOSTCMD, format, ##args)
 
-#if !defined(CONFIG_HOSTCMD_X86) || defined(CONFIG_ZTEST)
+#if !defined(CONFIG_HOSTCMD_X86)
 /*
  * Simulated memory map.  Must be word-aligned, because some of the elements
  * in the memory map are words.
@@ -36,7 +35,7 @@ static uint8_t host_memmap[EC_MEMMAP_SIZE] __aligned(4);
 
 uint8_t *host_get_memmap(int offset)
 {
-#if defined(CONFIG_HOSTCMD_X86) && !defined(CONFIG_ZTEST)
+#if defined(CONFIG_HOSTCMD_X86)
 	return lpc_get_memmap_range() + offset;
 #else
 	return host_memmap + offset;
@@ -163,7 +162,7 @@ host_command_test_protocol(struct host_cmd_handler_args *args)
 {
 	const struct ec_params_test_protocol *p = args->params;
 	struct ec_response_test_protocol *r = args->response;
-	int copy_len = MIN(p->ret_len, sizeof(r->buf)); /* p,r bufs same size */
+	int copy_len = min(p->ret_len, sizeof(r->buf)); /* p,r bufs same size */
 
 	memset(r->buf, 0, sizeof(r->buf));
 	memcpy(r->buf, p->buf, copy_len);

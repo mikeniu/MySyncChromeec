@@ -6,9 +6,12 @@
 #include "charger.h"
 #include "chipset.h"
 #include "common.h"
+#include "driver/charger/rt9490.h"
 #include "extpower.h"
 #include "gpio/gpio_int.h"
 #include "hooks.h"
+#include "peripheral_charger.h"
+#include "power.h"
 #include "timer.h"
 
 #include <zephyr/drivers/gpio.h>
@@ -17,6 +20,9 @@
 #include <ap_power/ap_power.h>
 
 #define INT_RECHECK_US 5000
+/* Periodic check interval for stylus battery status in S3 */
+#define PCHG_POLICY_DELAY (1000 * USEC_PER_MSEC)
+static bool pchg_low_power_mode = false;
 
 static void board_backlight_handler(struct ap_power_ev_callback *cb,
 				    struct ap_power_ev_data data)
@@ -76,3 +82,64 @@ static int install_backlight_handler(void)
 }
 
 SYS_INIT(install_backlight_handler, APPLICATION, 1);
+
+__overridable void board_rt9490_adc_control(void)
+{
+	rt9490_enable_adc(CHARGER_SOLO, extpower_is_present());
+}
+
+static void board_hook_ac_change(void)
+{
+	board_rt9490_adc_control();
+}
+DECLARE_HOOK(HOOK_AC_CHANGE, board_hook_ac_change, HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_INIT, board_hook_ac_change, HOOK_PRIO_LAST);
+
+static void usm_enable(void)
+{
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_5p0va_pwr_mode), 1);
+}
+DECLARE_HOOK(HOOK_CHIPSET_RESUME, usm_enable, HOOK_PRIO_DEFAULT);
+
+static void usm_disable(void)
+{
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_5p0va_pwr_mode), 0);
+}
+DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, usm_disable, HOOK_PRIO_DEFAULT);
+
+static void pchg_policy(void);
+DECLARE_DEFERRED(pchg_policy);
+
+static void pchg_policy(void)
+{
+	enum power_state chipset_state = power_get_state();
+	if (chipset_state == POWER_S0) {
+		if (pchg_low_power_mode == true) {
+			pchg_low_power_mode = false;
+			ccprints("pchg: resume from low power (S0)");
+			pchg_startup();
+		}
+	} else if (chipset_state == POWER_S3) {
+		if (pchg_get_battery_percent(0) >= 100) {
+			if (pchg_low_power_mode == false) {
+				pchg_low_power_mode = true;
+				gpio_pin_set_dt(
+					GPIO_DT_FROM_NODELABEL(gpio_ec_pen_dis),
+					0);
+				ccprints("pchg: enter low power (S3, full)");
+			}
+		}
+	}
+	hook_call_deferred(&pchg_policy_data, PCHG_POLICY_DELAY);
+}
+
+void board_pchg_power_on(int port, bool on)
+{
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_pen_dis), on);
+	if (on) {
+		pchg_low_power_mode = false;
+		hook_call_deferred(&pchg_policy_data, 0);
+	} else {
+		hook_call_deferred(&pchg_policy_data, -1);
+	}
+}

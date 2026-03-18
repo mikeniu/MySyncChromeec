@@ -59,6 +59,16 @@ config EMUL_CHARGER_ISL9241
 	  battery charger which can communicate over I2C, and utilizes the
 	  emulated I2C bus.
 
+config EMUL_CHARGER_ISL95522
+	bool "Renesas hybrid power boost battery charger emulator"
+	default y
+	depends on ZTEST && DT_HAS_INTERSIL_ISL95522_ENABLED
+	select EMUL_COMMON_I2C
+	help
+	  Enable the ISL95522 emulator.  This chip is a hybrid power boost
+	  battery charger which can communicate over I2C, and utilizes the
+	  emulated I2C bus.
+
 config EMUL_PPC_NX20P348X
 	bool "NXP PPC emulator"
 	default y
@@ -159,6 +169,37 @@ config EMUL_CROS_FLASH
 	imply SYSTEM_FAKE
 	help
 	  This option enables the flash emulator for testing.
+
+config EMUL_EGIS630
+	bool "EGIS630 fingerprint sensor emulator"
+	depends on ZTEST && DT_HAS_EGIS_EGIS630_ENABLED && ARCH_POSIX
+	default y
+	help
+	  This option enables the EGIS630 fingerprint sensor emulator.
+	  It supports only basic commands (get hardware id, enter low power
+	  mode) that can be issued by the public driver (without EGIS private
+	  library)
+
+config EMUL_EGIS660
+	bool "EGIS660 fingerprint sensor emulator"
+	depends on ZTEST && DT_HAS_EGIS_EGIS660_ENABLED && ARCH_POSIX
+	default y
+	help
+	  This option enables the EGIS660 fingerprint sensor emulator.
+	  It supports only basic commands (get hardware id)
+	  that can be issued by the public driver (without EGIS private
+	  library)
+
+config EMUL_ELAN80SERIES
+	bool "ELAN80SERIES fingerprint sensor emulator"
+	depends on ZTEST && ARCH_POSIX
+	depends on DT_HAS_ELAN_ELAN80SG_ENABLED
+	default y
+	help
+	  This option enables the ELAN80SERIES fingerprint sensor emulator.
+	  It supports only basic commands (get hardware id, enter low power
+	  mode) that can be issued by the public driver (without ELAN private
+	  library)
 
 config EMUL_FPC1025
 	bool "FPC1025 fingerprint sensor emulator"
@@ -344,6 +385,14 @@ config EMUL_PPM_DRIVER
 	depends on ZTEST && DT_HAS_UCSI_PPM_ENABLED
 	help
 	  Enable the UCSI PPM emulator.
+
+config EMUL_RT3645
+	bool "RT3645 IMVP emulator"
+	default y
+	depends on DT_HAS_RICHTEK_RT3645_ENABLED
+	help
+	  Enable the RT3645 IMVP emulator. This driver use emulated I2C bus.
+	  Emulator API is available in zephyr/include/emul/emul_rt1739.h.
 
 rsource "Kconfig.ln9310"
 rsource "Kconfig.lis2dw12"

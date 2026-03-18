@@ -8,6 +8,7 @@
 #include "../drivers/flash/spi_nor.h"
 #include "flash.h"
 #include "spi_flash_reg.h"
+#include "system.h"
 #include "watchdog.h"
 #include "write_protect.h"
 
@@ -39,6 +40,15 @@ struct cros_flash_npcx_data {
 #define DRV_DATA(dev) ((struct cros_flash_npcx_data *)(dev)->data)
 
 #define SPI_NOR_CMD_RDSR2 0x35
+
+#define FLASH_SYSJUMP_TAG 0x5750 /* "WP" - Write Protect */
+#define FLASH_HOOK_VERSION 1
+/* The previous write protect state before sys jump */
+struct flash_wp_state {
+	int all_protected;
+	uint8_t saved_sr1;
+	uint8_t saved_sr2;
+};
 
 /* cros ec flash local functions */
 static int cros_flash_npcx_get_status_reg(const struct device *dev,
@@ -271,7 +281,7 @@ static int flash_set_status(const struct device *dev, uint8_t sr1, uint8_t sr2)
 	return rv;
 }
 
-static void flash_protect_int_flash(const struct device *dev, int enable)
+static void flash_protect_int_flash(const struct device *dev, bool enable)
 {
 	/*
 	 * Please notice the type of WP_IF bit is R/W1S. Once it's set,
@@ -355,7 +365,7 @@ static int flash_check_prot_reg(const struct device *dev, unsigned int offset,
 		return rv;
 
 	/* Check if ranges overlap */
-	if (MAX(start, offset) < MIN(start + len, offset + bytes))
+	if (max(start, offset) < min(start + len, offset + bytes))
 		return EC_ERROR_ACCESS_DENIED;
 
 	return EC_SUCCESS;
@@ -390,8 +400,8 @@ static int flash_check_prot_range(unsigned int offset, unsigned int bytes)
 		return EC_ERROR_INVAL;
 
 	/* Check if ranges overlap */
-	if (MAX(addr_prot_start, offset) <
-	    MIN(addr_prot_start + addr_prot_length, offset + bytes))
+	if (max(addr_prot_start, offset) <
+	    min(addr_prot_start + addr_prot_length, offset + bytes))
 		return EC_ERROR_ACCESS_DENIED;
 
 	return EC_SUCCESS;
@@ -414,6 +424,54 @@ static void flash_set_quad_enable(const struct device *dev, bool enable)
 	flash_set_status(dev, sr1, sr2);
 }
 
+/**
+ * @brief Restores flash WP status during initialization after a system jump.
+ *
+ * This function checks for a system jump (sysjump) and attempts to restore
+ * the flash write protection (WP) status, including Status Registers (SR1,
+ * SR2), and the 'all_protected' flag, if the system was previously running
+ * the EC RO.
+ *
+ * This restoration is crucial when transitioning from a legacy EC RO
+ * image. Such images used UMA_LOCK, preventing direct reads of the status
+ * registers after protection was enabled. The RO image would have saved SR1,
+ * SR2, and all_protected and the new Zephyr RW image must restore these to
+ * understand the true protection status. Zephyr itself doesn't use UMA_LOCK,
+ * but needs to honor the state set by the legacy EC RO.
+ *
+ * @retval true if WP status was restored.
+ * @retval false if WP status was not restored.
+ */
+static bool flash_physical_restore_state(void)
+{
+	uint32_t reset_flags = system_get_reset_flags();
+	int version, size;
+	const struct flash_wp_state *prev;
+
+	/*
+	 * If we have already jumped between images, an earlier image
+	 * could have applied write protection. Nothing additional needs
+	 * to be done.
+	 */
+	if (reset_flags & EC_RESET_FLAG_SYSJUMP) {
+		/*
+		 * FLASH_SYSJUMP_TAG is only set in EC RO:
+		 * https://crrev.com/c/4885833
+		 */
+		prev = (const struct flash_wp_state *)system_get_jump_tag(
+			FLASH_SYSJUMP_TAG, &version, &size);
+		if (prev && version == FLASH_HOOK_VERSION &&
+		    size == sizeof(*prev)) {
+			all_protected = prev->all_protected;
+			saved_sr1 = prev->saved_sr1;
+			saved_sr2 = prev->saved_sr2;
+			return true;
+		}
+	}
+
+	return false;
+}
+
 /* cros ec flash api functions */
 static int cros_flash_npcx_init(const struct device *dev)
 {
@@ -426,10 +484,54 @@ static int cros_flash_npcx_init(const struct device *dev)
 	flash_set_quad_enable(dev, false);
 
 	/*
+	 * Fix situation when flash protect bit (SRP0) is enabled, but the size
+	 * of protected area is 0 or it's not possible to decode protected range
+	 * from SR1 and SR2 registers (spi_flash_reg_to_protect() returned
+	 * error). This situation can occur if flashing was interrupted
+	 * e.g. flashrom was killed while reading from flash:
+	 * http://b/328066864#comment12
+	 *
+	 * Status registers can be modified only when the SRP0 bit and the WP_IF
+	 * bit (in DEV_CTL4 register) are not enabled at the same time. The
+	 * WP_IF bit is cleared when MCU reboots, it means that once enabled,
+	 * the bit can't be cleared by the software.
+	 *
+	 * The WP_IF bit is set by flash_protect_int_flash() function based on
+	 * GPIO_WP status. In our case, the WP_IF bit is clear in RO (because we
+	 * are after reboot), but not in RW (because it will be set later in
+	 * this function).
+	 *
+	 * Clearing the status registers before the WP_IF bit is enabled avoids
+	 * situation in which we protect status registers with size of protected
+	 * area set to 0. We rely on other parts of the system to enable
+	 * protection like we rely on them to enable protection when HW WP is
+	 * enabled for the first time.
+	 */
+	if (!is_int_flash_protected(dev)) {
+		uint8_t sr1, sr2;
+		unsigned int prot_start, prot_length;
+		int rv;
+
+		flash_get_status(dev, &sr1, &sr2);
+		rv = spi_flash_reg_to_protect(sr1, sr2, &prot_start,
+					      &prot_length);
+
+		if (rv || ((sr1 & SPI_FLASH_SR1_SRP0) && prot_length == 0)) {
+			rv = flash_set_status(dev, 0, 0);
+			if (rv) {
+				LOG_ERR("Failed to clear invalid status: %d",
+					rv);
+			}
+		}
+	}
+
+	/*
 	 * Protect status registers of internal spi-flash if WP# is active
 	 * during ec initialization.
 	 */
 	flash_protect_int_flash(dev, write_protect_is_asserted());
+
+	flash_physical_restore_state();
 
 	return 0;
 }
@@ -517,7 +619,7 @@ static int cros_flash_npcx_erase(const struct device *dev, int offset, int size)
 
 		/* Start erase */
 		ret = flash_erase(data->flash_dev, offset,
-				  MIN(reload_size, size));
+				  min(reload_size, size));
 		if (ret)
 			break;
 

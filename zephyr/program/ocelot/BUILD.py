@@ -31,6 +31,7 @@ def register_npcx9_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_proj_files,
         ],
+        modules=["cmsis_6", "ec", "pigweed", "nanopb"],
         inherited_from=inherited_from,
     )
 
@@ -40,14 +41,15 @@ def register_it8xxx2_project(
     extra_kconfig_base_files=(),
     extra_kconfig_proj_files=(),
     inherited_from=None,
+    chip="it8xxx2/it82002aw",
 ):
     """Register an it8xxx2 based variant of ocelot."""
     if inherited_from is None:
         inherited_from = ["ocelot"]
 
-    register_binman_project(
+    return register_binman_project(
         project_name=project_name,
-        zephyr_board="it8xxx2/it82002aw",
+        zephyr_board=chip,
         dts_overlays=[
             here / project_name / "project.overlay",
         ],
@@ -61,6 +63,7 @@ def register_it8xxx2_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_proj_files,
         ],
+        modules=["cmsis_6", "ec", "pigweed", "nanopb"],
         inherited_from=inherited_from,
     )
 
@@ -91,7 +94,7 @@ def register_mec172x_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_proj_files,
         ],
-        modules=["cmsis", "cmsis_6", "ec"],
+        modules=["cmsis_6", "ec"],
         inherited_from=inherited_from,
     )
 
@@ -118,7 +121,7 @@ def register_rtk59_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_proj_files,
         ],
-        modules=["cmsis", "cmsis_6", "ec"],
+        modules=["cmsis_6", "ec"],
     )
 
 
@@ -127,6 +130,7 @@ register_npcx9_project(
     project_name="ocelotrvp-npcx",
     extra_kconfig_base_files=[
         here / "rvp_program.conf",
+        here / "dsp_comms.conf",
     ],
 )
 
@@ -135,6 +139,7 @@ register_it8xxx2_project(
     project_name="ocelotrvp-ite",
     extra_kconfig_base_files=[
         here / "rvp_program.conf",
+        here / "dsp_comms.conf",
     ],
 )
 
@@ -155,6 +160,7 @@ register_ish_project(
     kconfig_files=[
         here / "ocelot-ish" / "prj.conf",
         here / "ocelot-ish" / "motionsense.conf",
+        here / "dsp_comms.conf",
     ],
 )
 
@@ -163,14 +169,63 @@ register_rtk59_project(
     project_name="ojal",
 )
 
-register_it8xxx2_project(
+register_rtk59_project(
+    project_name="kodkod",
+)
+
+matsu = register_it8xxx2_project(
     project_name="matsu",
+)
+
+matsu.variant(
+    project_name="matsu_it82000",
+    zephyr_board="it8xxx2/it82000bw",
+    dts_overlays=[
+        here / "matsu" / "it82000.overlay",
+    ],
+)
+
+
+register_ish_project(
+    project_name="matsu-ish",
+    zephyr_board="intel_ish_5_8_0",
+    dts_overlays=[
+        here / "matsu-ish" / "matsu-ish" / "project.overlay",
+    ],
+    kconfig_files=[
+        here / "matsu-ish" / "prj.conf",
+        here / "matsu-ish" / "motionsense.conf",
+    ],
+)
+
+ocicat = register_it8xxx2_project(
+    project_name="ocicat",
+    chip="it8xxx2/it82002bw",
+    extra_kconfig_base_files=[
+        here / "dsp_comms.conf",
+    ],
+)
+
+register_ish_project(
+    project_name="ocicat-ish",
+    zephyr_board="intel_ish_5_8_0",
+    dts_overlays=[
+        here / "ocicat-ish" / "project.overlay",
+    ],
+    kconfig_files=[
+        here / "ocicat-ish" / "prj.conf",
+        here / "ocicat-ish" / "motionsense.conf",
+        here / "dsp_comms.conf",
+    ],
 )
 
 # Note for reviews, do not let anyone edit these assertions, the addresses
 # must not change after the first RO release.
+assert_rw_fwid_DO_NOT_EDIT(project_name="kodkod", addr=0x80404)
 assert_rw_fwid_DO_NOT_EDIT(project_name="matsu", addr=0x60098)
+assert_rw_fwid_DO_NOT_EDIT(project_name="matsu_it82000", addr=0x60098)
 assert_rw_fwid_DO_NOT_EDIT(project_name="ocelotrvp-npcx", addr=0x80144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="ocelotrvp-ite", addr=0x60098)
 assert_rw_fwid_DO_NOT_EDIT(project_name="ocelotrvp-mchp", addr=0x40318)
 assert_rw_fwid_DO_NOT_EDIT(project_name="ojal", addr=0x80404)
+assert_rw_fwid_DO_NOT_EDIT(project_name="ocicat", addr=0x60098)

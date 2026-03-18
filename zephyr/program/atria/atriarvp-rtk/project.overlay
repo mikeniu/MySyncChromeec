@@ -1,0 +1,30 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* atria program common DTS includes */
+#include <cros/integrated_fwid.dtsi>
+
+
+/* atriarvp-rtk project DTS includes */
+#include "gpio.dtsi"
+#include "i2c.dtsi"
+
+#include "../rvp_consolidated.dtsi"
+
+#include <ite/it8801-common-cfg.dtsi>
+
+/* atriarvp-rtk overrides follow... */
+
+&it8801_mfd {
+	irq-gpios = <RTS5912_GPIO085 GPIO_ACTIVE_LOW>;
+};
+
+&espi0 {
+	status = "okay";
+};
+
+&sha0 {
+	status = "okay";
+};

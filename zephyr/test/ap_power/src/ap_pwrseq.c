@@ -7,10 +7,12 @@
 #include "ap_power/ap_power_interface.h"
 #include "chipset.h"
 #include "ec_commands.h"
+#include "ec_tasks.h"
 #include "emul/emul_power_signals.h"
 #include "host_command.h"
 #include "lpc.h"
 #include "power_signals.h"
+#include "system.h"
 #include "test_mocks.h"
 #include "test_state.h"
 #include "zephyr/sys/util.h"
@@ -173,7 +175,7 @@ static void verify_ap_inputs(bool in_s0)
 	}
 }
 
-ZTEST(ap_pwrseq, test_ap_pwrseq_0)
+static void power_up_test_g3_to_s0_helper(void)
 {
 	/* Verify all inputs to the AP start a physical level 0. */
 	verify_ap_inputs(false);
@@ -194,6 +196,35 @@ ZTEST(ap_pwrseq, test_ap_pwrseq_0)
 	 * AP are set to high level.
 	 */
 	verify_ap_inputs(true);
+}
+
+static bool get_cse_early_recovery_gpio_level(void)
+{
+	const static struct gpio_dt_spec cse_early_rec_gpio = GPIO_DT_SPEC_GET(
+		DT_NODELABEL(cse_early_recovery), cse_early_rec_gpios);
+
+	return gpio_emul_output_get_dt(&cse_early_rec_gpio);
+}
+
+ZTEST(ap_pwrseq, test_ap_pwrseq_0)
+{
+#ifdef CONFIG_TEST_AP_POWER_RECOVERY_MODE
+	/* When recovery boot is requested, the CSE early recovery GPIO driver
+	 * should assert a given GPIO pin when exiting G3.
+	 */
+	system_enter_manual_recovery();
+#endif /* CONFIG_TEST_AP_POWER_RECOVERY_MODE */
+
+	zassert_equal(0, get_cse_early_recovery_gpio_level());
+	power_up_test_g3_to_s0_helper();
+
+#ifdef CONFIG_TEST_AP_POWER_RECOVERY_MODE
+	/* This is a recovery boot. GPIO should be asserted. */
+	zassert_equal(1, get_cse_early_recovery_gpio_level());
+#else
+	/* Not doing a recovery boot. GPIO should be deasserted. */
+	zassert_equal(0, get_cse_early_recovery_gpio_level());
+#endif
 }
 
 /* Sleep hang test - this assumes the test is run after the test_ap_pwrseq_0
@@ -538,8 +569,44 @@ ZTEST(ap_pwrseq, test_insufficient_power_blocks_s5)
 		chipset_in_or_transitioning_to_state(CHIPSET_STATE_HARD_OFF));
 }
 
+/* Utilities for finding a Zephyr thread by name */
+static k_tid_t found_thread;
+static void find_thread_by_name_cb(const struct k_thread *thread,
+				   void *user_data)
+{
+	const char *name = (const char *)user_data;
+
+	if (strcmp(k_thread_name_get((k_tid_t)thread), name) == 0) {
+		found_thread = (k_tid_t)thread;
+	}
+}
+
+static k_tid_t find_thread_by_name(const char *name)
+{
+	found_thread = NULL;
+	k_thread_foreach_unlocked(find_thread_by_name_cb, (void *)name);
+	return found_thread;
+}
+
+ZTEST(ap_pwrseq, test_get_ap_pwrseq_thread)
+{
+	k_tid_t pwrseq_thread;
+	const char *pwrseq_name;
+
+	if (IS_ENABLED(CONFIG_AP_PWRSEQ_DRIVER))
+		pwrseq_name = "ap_pwrseq_tid";
+	else
+		pwrseq_name = "pwrseq_task";
+	pwrseq_thread = find_thread_by_name(pwrseq_name);
+	zassert_not_null(pwrseq_thread);
+	zassert_equal(pwrseq_thread, get_ap_pwrseq_thread());
+	zassert_equal(TASK_ID_AP_PWRSEQ, thread_id_to_task_id(pwrseq_thread));
+	zassert_equal(task_id_to_thread_id(TASK_ID_AP_PWRSEQ), pwrseq_thread);
+}
+
 void ap_pwrseq_after_test(void *data)
 {
+	system_exit_manual_recovery();
 	power_signal_emul_unload();
 	ap_pwrseq_reset_ev_counters();
 }

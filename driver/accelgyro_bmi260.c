@@ -280,6 +280,30 @@ end_perform_calib:
 	return ret;
 }
 
+static int enable_interrupt(const struct motion_sensor_t *s, bool enable)
+{
+	int ret, val;
+
+	/* Flush the FIFO */
+	bmi_write8(s->port, s->i2c_spi_addr_flags, BMI260_CMD_REG,
+		   BMI260_CMD_FIFO_FLUSH);
+
+	/* Manage Data interrupt mapping for both INT pins */
+	ret = bmi_read8(s->port, s->i2c_spi_addr_flags, BMI260_INT_MAP_DATA,
+			&val);
+	if (ret)
+		return ret;
+
+	if (enable)
+		val |= (BMI260_MAP_FFULL_INT | BMI260_MAP_FWM_INT);
+	else
+		val &= ~(BMI260_MAP_FFULL_INT | BMI260_MAP_FWM_INT);
+	ret = bmi_write8(s->port, s->i2c_spi_addr_flags, BMI260_INT_MAP_DATA,
+			 val);
+
+	return ret;
+}
+
 /**
  * config_interrupt - sets up the interrupt request output pin on the BMI260
  *
@@ -291,8 +315,6 @@ static __maybe_unused int config_interrupt(const struct motion_sensor_t *s)
 	int ret;
 
 	mutex_lock(s->mutex);
-	bmi_write8(s->port, s->i2c_spi_addr_flags, BMI260_CMD_REG,
-		   BMI260_CMD_FIFO_FLUSH);
 
 	/* configure int1 as an interrupt */
 	ret = bmi_write8(s->port, s->i2c_spi_addr_flags, BMI260_INT1_IO_CTRL,
@@ -308,9 +330,7 @@ static __maybe_unused int config_interrupt(const struct motion_sensor_t *s)
 				 BMI260_INT2_IO_CTRL, BMI260_INT2_INPUT_EN);
 
 	/* map fifo water mark to int 1 */
-	ret = bmi_write8(s->port, s->i2c_spi_addr_flags, BMI260_INT_MAP_DATA,
-			 BMI260_INT_MAP_DATA_REG(1, FWM) |
-				 BMI260_INT_MAP_DATA_REG(1, FFULL));
+	ret = enable_interrupt(s, true);
 
 	/*
 	 * Configure fifo watermark to int whenever there's any data in
@@ -408,6 +428,22 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 
 	return EC_SUCCESS;
 }
+
+static int bmi260_enable_interrupt(const struct motion_sensor_t *s, bool enable)
+{
+	int ret;
+
+	if (s->type != MOTIONSENSE_TYPE_ACCEL)
+		return EC_SUCCESS;
+
+	mutex_lock(s->mutex);
+
+	/* Manage Data interrupt mapping for both INT pins */
+	ret = enable_interrupt(s, enable);
+
+	mutex_unlock(s->mutex);
+	return ret;
+}
 #endif /* ACCELGYRO_BMI260_INT_ENABLE */
 
 /*
@@ -467,14 +503,14 @@ static int bmi_config_load(const struct motion_sensor_t *s)
 	 * I2C burst to the size of the RAM buffer.
 	 */
 	if (!bmi_config)
-		burst_write_len = MIN(BMI_RAM_BUFFER_SIZE, burst_write_len);
+		burst_write_len = min(BMI_RAM_BUFFER_SIZE, burst_write_len);
 
 	/* We have to write the config even bytes of data every time */
 	ASSERT(((burst_write_len & 1) == 0) && (burst_write_len != 0));
 
 	for (i = 0; i < bmi_config_tbin_len; i += burst_write_len) {
 		uint8_t addr[2];
-		const int len = MIN(burst_write_len, bmi_config_tbin_len - i);
+		const int len = min(burst_write_len, bmi_config_tbin_len - i);
 
 		addr[0] = (i / 2) & 0xF;
 		addr[1] = (i / 2) >> 4;
@@ -619,6 +655,8 @@ const struct accelgyro_drv bmi260_drv = {
 	.read_temp = bmi_read_temp,
 #ifdef ACCELGYRO_BMI260_INT_ENABLE
 	.irq_handler = irq_handler,
+	.enable_interrupt = bmi260_enable_interrupt,
+	.interrupt = bmi260_interrupt,
 #endif
 #ifdef CONFIG_GESTURE_HOST_DETECTION
 	.list_activities = bmi_list_activities,

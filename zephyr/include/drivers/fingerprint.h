@@ -25,25 +25,144 @@
 extern "C" {
 #endif
 
-/** Get fingerprint sensor width. */
-#define FINGERPRINT_SENSOR_RES_X(node_id) DT_PROP(node_id, width)
+/**
+ * @brief Get fingerprint sensor width for a given configuration index.
+ *
+ * @param idx Index of the configuration to retrieve the width from.
+ * @param node_id Devicetree node identifier for the sensor.
+ * @return Sensor width.
+ */
+#define FINGERPRINT_SENSOR_RES_X(idx, node_id) \
+	DT_PROP(DT_CHILD(DT_CHILD(node_id, configs), config##idx), width)
 
-/** Get fingerprint sensor height. */
-#define FINGERPRINT_SENSOR_RES_Y(node_id) DT_PROP(node_id, height)
+/**
+ * @brief Get fingerprint sensor height for a given configuration index.
+ *
+ * @param idx Index of the configuration to retrieve the height from.
+ * @param node_id Devicetree node identifier for the sensor.
+ * @return Sensor height.
+ */
+#define FINGERPRINT_SENSOR_RES_Y(idx, node_id) \
+	DT_PROP(DT_CHILD(DT_CHILD(node_id, configs), config##idx), height)
 
-/** Get fingerprint sensor resolution (bits per pixel). */
-#define FINGERPRINT_SENSOR_RES_BPP(node_id) DT_PROP(node_id, bits_per_pixel)
+/**
+ * @brief Get fingerprint sensor resolution (bits per pixel) for a given
+ * configuration index.
+ *
+ * @param idx Index of the configuration to retrieve the bits per pixel from.
+ * @param node_id Devicetree node identifier for the sensor.
+ * @return Sensor bits per pixel.
+ */
+#define FINGERPRINT_SENSOR_RES_BPP(idx, node_id)                   \
+	DT_PROP(DT_CHILD(DT_CHILD(node_id, configs), config##idx), \
+		bits_per_pixel)
 
-/** Get fingerprint sensor pixel format. */
-#define FINGERPRINT_SENSOR_V4L2_PIXEL_FORMAT(node_id) \
-	DT_STRING_TOKEN(node_id, v4l2_pixel_format)
+/**
+ * @brief Get fingerprint sensor capture type for a given configuration index.
+ *
+ * @param idx Index of the configuration to retrieve the capture type from.
+ * @param node_id Devicetree node identifier for the sensor.
+ * @return Sensor capture type (enum fp_capture_type).
+ */
+#define FINGERPRINT_SENSOR_CAPTURE_TYPE(idx, node_id)                      \
+	DT_STRING_TOKEN(DT_CHILD(DT_CHILD(node_id, configs), config##idx), \
+			capture_type)
 
-/** Get size of raw fingerprint image (in bytes). */
-#define FINGERPRINT_SENSOR_REAL_IMAGE_SIZE(node_id) \
-	((FINGERPRINT_SENSOR_RES_X(node_id) *       \
-	  FINGERPRINT_SENSOR_RES_Y(node_id) *       \
-	  FINGERPRINT_SENSOR_RES_BPP(node_id)) /    \
+/**
+ * @brief Get fingerprint sensor pixel format for a given configuration index.
+ *
+ * @param idx Index of the configuration to retrieve the pixel format from.
+ * @param node_id Devicetree node identifier for the sensor.
+ * @return Sensor V4L2 pixel format token.
+ */
+#define FINGERPRINT_SENSOR_V4L2_PIXEL_FORMAT(idx, node_id)                 \
+	DT_STRING_TOKEN(DT_CHILD(DT_CHILD(node_id, configs), config##idx), \
+			v4l2_pixel_format)
+
+/**
+ * @brief Get the total size of the raw fingerprint data frame in bytes for a
+ * given configuration index.
+ *
+ * This value is read from the 'frame_size' property in the Device Tree.
+ * The frame size may be larger than the actual underlying image pixel data
+ * size (see FINGERPRINT_SENSOR_REAL_IMAGE_SIZE, calculated by width * height *
+ * bpp) as it can include sensor-specific metadata, protocol overhead, or
+ * padding.
+ *
+ * @param idx Index of the configuration to retrieve the frame size from.
+ * @param node_id Devicetree node identifier for the sensor.
+ * @return Total raw frame size in bytes.
+ */
+#define FINGERPRINT_SENSOR_FRAME_SIZE(idx, node_id) \
+	DT_PROP(DT_CHILD(DT_CHILD(node_id, configs), config##idx), frame_size)
+
+/**
+ * @brief Get the real size of the image pixel data in bytes.
+ *
+ * This macro calculates the **actual image size** in bytes for a specific
+ * capture configuration defined in the Device Tree. It multiplies the width (X
+ * resolution), height (Y resolution), and bits-per-pixel (BPP), then divides
+ * the result by 8 to convert the total number of bits into bytes. This value
+ * represents the image data without any protocol overhead or metadata.
+ *
+ * @param idx Index of the configuration to retrieve the frame size from.
+ * @param node_id Devicetree node identifier for the sensor.
+ * @return The raw image size in bytes.
+ */
+#define FINGERPRINT_SENSOR_REAL_IMAGE_SIZE(idx, node_id) \
+	((FINGERPRINT_SENSOR_RES_X(idx, node_id) *       \
+	  FINGERPRINT_SENSOR_RES_Y(idx, node_id) *       \
+	  FINGERPRINT_SENSOR_RES_BPP(idx, node_id)) /    \
 	 8)
+
+/**
+ * @brief Get the maximum frame size supported by a specific fingerprint sensor.
+ *
+ * This macro uses the LISTIFY and MAX_FROM_LIST utilities to find the
+ * largest image frame size across all supported image capture types for the
+ * fingerprint sensor identified by @p node_id. The result is determined at
+ * compile time.
+ *
+ * @param node_id Devicetree node identifier for the sensor.
+ * @return The maximum supported frame size in bytes.
+ */
+#define MAX_FRAME_SIZE(node_id)                        \
+	MAX_FROM_LIST(LISTIFY(NUM_IMAGE_CAPTURE_TYPES, \
+			      FINGERPRINT_SENSOR_FRAME_SIZE, (, ), node_id))
+
+/**
+ * @brief Get the number of capture configurations defined for a fingerprint
+ * sensor node.
+ *
+ * This macro retrieves the number of capture configurations defined for a
+ * fingerprint sensor node from the specified Device Tree node. It assumes that
+ * all related array properties (e.g., height, bits_per_pixel, frame_size,
+ * capture_type) for the different sensor configurations have the same length as
+ * the 'width' array.
+ *
+ * @param node_id Devicetree node identifier for the sensor.
+ * @return The number of distinct capture configurations available for the
+ * sensor.
+ */
+#define FINGERPRINT_SENSOR_NUM_CONFIGS(node_id) \
+	DT_CHILD_NUM(DT_CHILD(node_id, configs))
+
+/**
+ * @brief Get the number of image capture configurations for the system's
+ * primary fingerprint sensor.
+ *
+ * This macro utilizes FINGERPRINT_SENSOR_NUM_CONFIGS to determine the
+ * number of different image capture setups (e.g., resolutions, formats)
+ * available for the fingerprint sensor instance designated by the
+ * 'cros_fp_fingerprint_sensor' chosen node in the Device Tree. This
+ * effectively counts the elements in the configuration arrays (like 'width',
+ * 'height', etc.) for the selected sensor.
+ *
+ * @return The number of image capture types supported by the chosen
+ * fingerprint sensor.
+ */
+#define NUM_IMAGE_CAPTURE_TYPES \
+	FINGERPRINT_SENSOR_NUM_CONFIGS(DT_CHOSEN(cros_fp_fingerprint_sensor))
 
 /** Dead pixels bitmask. */
 #define FINGERPRINT_ERROR_DEAD_PIXELS_MASK GENMASK(9, 0)
@@ -64,20 +183,57 @@ extern "C" {
 /** Sensor initialization failed. */
 #define FINGERPRINT_ERROR_INIT_FAIL BIT(15)
 
-/** Fingerprint sensor information structure. */
-struct fingerprint_info {
-	/* Sensor identification */
+/**
+ * @brief Fingerprint sensor identification.
+ *
+ * This structure holds information that is constant after sensor
+ * initialization, except for the errors field which can change at runtime.
+ */
+struct fingerprint_sensor_info {
+	/** @brief Sensor vendor ID. */
 	uint32_t vendor_id;
+	/** @brief Sensor product ID. */
 	uint32_t product_id;
+	/** @brief Sensor model ID. */
 	uint32_t model_id;
+	/** @brief Sensor hardware/firmware version. */
 	uint32_t version;
-	/* Image frame characteristics */
-	uint32_t frame_size;
-	uint32_t pixel_format; /* using V4L2_PIX_FMT_ */
-	uint16_t width;
-	uint16_t height;
-	uint16_t bpp;
+	/**
+	 * @brief Number of image capture types supported by the sensor.
+	 * @see enum fingerprint_capture_type
+	 */
+	uint16_t num_capture_types;
+	/** @brief Current sensor error flags (bitmask of FINGERPRINT_ERROR_*).
+	 */
 	uint16_t errors;
+};
+
+/**
+ * @brief Parameters for a single fingerprint image frame.
+ *
+ * This structure describes the properties of a captured image frame.
+ */
+struct fingerprint_image_frame_params {
+	/** @brief Total size of the frame data in bytes. */
+	uint32_t frame_size;
+	/**
+	 * @brief Pixel format of the image.
+	 * It is recommended to use V4L2_PIX_FMT_* definitions where applicable.
+	 */
+	uint32_t pixel_format;
+	/** @brief Image width in pixels. */
+	uint16_t width;
+	/** @brief Image height in pixels. */
+	uint16_t height;
+	/** @brief Bits per pixel for the image. */
+	uint16_t bpp;
+	/**
+	 * @brief Type of image capture.
+	 * @see enum fingerprint_capture_type
+	 */
+	uint8_t fp_capture_type;
+	/** @brief Reserved for padding and alignment. Should be zero. */
+	uint8_t reserved;
 };
 
 /** Fingerprint sensor operation mode. */
@@ -183,10 +339,18 @@ typedef int (*fingerprint_api_config_t)(const struct device *dev,
  * @brief Callback API for getting information about fingerprint sensor.
  *
  * @param dev Fingerprint sensor device.
- * @param info Pointer to fingerprint_info structure where data will be stored.
+ * @param sensor_info Pointer to a struct where the sensor's static information
+ * will be stored.
+ * @param image_frame_params_array Pointer to a struct where the sensor's
+ * image frame parameters (e.g., width, height, format) will be stored.
+ * @param[in,out] num_params On input, contains the number of elements allocated
+ * in image_frame_params_array. On output, contains the actual number of
+ * elements written to image_frame_params_array.
  */
-typedef int (*fingerprint_api_get_info_t)(const struct device *dev,
-					  struct fingerprint_info *info);
+typedef int (*fingerprint_api_get_info_t)(
+	const struct device *dev, struct fingerprint_sensor_info *sensor_info,
+	struct fingerprint_image_frame_params image_frame_params_array[],
+	uint8_t *num_params);
 
 /**
  * @typedef fingerprint_api_maintenance_t
@@ -322,18 +486,27 @@ static inline int z_impl_fingerprint_config(const struct device *dev,
  *
  * @param dev  Pointer to the device structure for the fingerprint sensor driver
  *	       instance.
- * @param info Pointer to 'fingerprint_info' structure where data will be
- *	       stored.
- *
+ * @param sensor_info Pointer to 'fingerprint_sensor_info' structure where the
+ * sensor's static information will be stored.
+ * @param image_frame_params Pointer to 'fingerprint_image_frame_params'
+ * structure where the sensor's image frame parameters (e.g., width, height,
+ * format) will be stored.
+ * @param[in,out] num_params On input, contains the number of elements allocated
+ * in image_frame_params_array. On output, contains the actual number of
+ * elements written to image_frame_params_array.
  * @retval 0 If successful.
  * @retval -ENOTSUP Not supported api function.
  * @retval other negative values indicates driver specific error.
  */
-__syscall int fingerprint_get_info(const struct device *dev,
-				   struct fingerprint_info *info);
+__syscall int fingerprint_get_info(
+	const struct device *dev, struct fingerprint_sensor_info *sensor_info,
+	struct fingerprint_image_frame_params *image_frame_params_array,
+	uint8_t *num_params);
 
-static inline int z_impl_fingerprint_get_info(const struct device *dev,
-					      struct fingerprint_info *info)
+static inline int z_impl_fingerprint_get_info(
+	const struct device *dev, struct fingerprint_sensor_info *sensor_info,
+	struct fingerprint_image_frame_params image_frame_params_array[],
+	uint8_t *num_params)
 {
 	const struct fingerprint_driver_api *api =
 		(const struct fingerprint_driver_api *)dev->api;
@@ -342,7 +515,8 @@ static inline int z_impl_fingerprint_get_info(const struct device *dev,
 		return -ENOTSUP;
 	}
 
-	return api->get_info(dev, info);
+	return api->get_info(dev, sensor_info, image_frame_params_array,
+			     num_params);
 }
 
 /**

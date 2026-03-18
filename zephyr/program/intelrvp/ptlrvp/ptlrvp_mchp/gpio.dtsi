@@ -229,7 +229,6 @@
 		en_pp3300_a: ec-pg3-r {
 			gpios = <MCHP_GPIO_DECODE_226 GPIO_OUTPUT_LOW>;
 			enum-name = "GPIO_EN_PP3300_A";
-			alias = "GPIO_TEMP_SENSOR_POWER";
 		};
 		pm-pwrbtn-led {
 			gpios = <MCHP_GPIO_DECODE_241 GPIO_INPUT>;
@@ -252,7 +251,7 @@
 			gpios = <MCHP_GPIO_DECODE_165 GPIO_INPUT>;
 		};
 		/* Keep low to prioritize AC brick power source selection */
-		std-adpt-cntrl-gpio-r {
+		std_adp_cntrl: std-adpt-cntrl-gpio-r {
 			gpios = <MCHP_GPIO_DECODE_254 GPIO_OUTPUT_LOW>;
 		};
 		usb-pb-ppc-int-od-n {
@@ -329,6 +328,7 @@
 		rsmrst_pwrgd: rsmrst-pwrgd-ec-n {
 			gpios = <MCHP_GPIO_DECODE_012 GPIO_INPUT>;
 			enum-name = "GPIO_PG_EC_RSMRST_ODL";
+			alias = "GPIO_TEMP_SENSOR_POWER";
 		};
 		cpu-c10-gate-n-r {
 			gpios = <MCHP_GPIO_DECODE_013 GPIO_INPUT>;
@@ -352,8 +352,9 @@
 		ec-spi-cs0-n {
 			gpios = <MCHP_GPIO_DECODE_055 GPIO_INPUT>;
 		};
-		ec-spi-clk {
-			gpios = <MCHP_GPIO_DECODE_056 GPIO_INPUT>;
+		mchp_wp_ex: ec-spi-clk {
+			gpios = <MCHP_GPIO_DECODE_056 0>;
+			no-auto-init;
 		};
 		ec-pd-usbc-i2c-int-n {
 			gpios = <MCHP_GPIO_DECODE_002 GPIO_INPUT>;

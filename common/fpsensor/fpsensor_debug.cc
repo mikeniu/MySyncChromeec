@@ -64,11 +64,12 @@
  * sudo screen -c ${HOME}/.screenrc /dev/pts/NN 115200
  *
  */
-test_export_static enum ec_error_list upload_pgm_image(uint8_t *frame,
-						       uint8_t bpp)
+test_export_static enum ec_error_list
+upload_pgm_image(uint8_t *frame,
+		 const struct fp_image_frame_params &image_frame_params)
 {
 	uint8_t *ptr = frame;
-	uint8_t bytes_per_pixel = DIV_ROUND_UP(bpp, 8);
+	uint8_t bytes_per_pixel = DIV_ROUND_UP(image_frame_params.bpp, 8);
 
 	if (bytes_per_pixel != 1 && bytes_per_pixel != 2) {
 		return EC_ERROR_UNKNOWN;
@@ -79,12 +80,13 @@ test_export_static enum ec_error_list upload_pgm_image(uint8_t *frame,
 	crec_msleep(2000); /* let the download program start */
 
 	/* Print 8-bpp or 16-bpp PGM ASCII header */
-	CPRINTF("P2\n%d %d\n%d\n", FP_SENSOR_RES_X, FP_SENSOR_RES_Y,
+	CPRINTF("P2\n%d %d\n%d\n", image_frame_params.width,
+		image_frame_params.height,
 		(bytes_per_pixel == 2) ? 65535 : 255);
 
-	for (int y = 0; y < FP_SENSOR_RES_Y; y++) {
+	for (int y = 0; y < image_frame_params.height; y++) {
 		watchdog_reload();
-		for (int x = 0; x < FP_SENSOR_RES_X;
+		for (int x = 0; x < image_frame_params.width;
 		     x++, ptr += bytes_per_pixel) {
 			CPRINTF("%d ", (bytes_per_pixel == 2) ?
 					       *(uint16_t *)ptr :
@@ -126,21 +128,9 @@ static enum ec_error_list fp_console_action(uint32_t mode)
 	return EC_ERROR_TIMEOUT;
 }
 
-test_export_static uint8_t get_sensor_bpp(void)
-{
-#if defined(HAVE_FP_PRIVATE_DRIVER) || defined(BOARD_HOST)
-	ec_response_fp_info info;
-	if (fp_sensor_get_info(&info) < 0) {
-		return EC_ERROR_UNKNOWN;
-	}
-	return info.bpp;
-#else
-	return EC_ERROR_UNKNOWN;
-#endif
-}
-
-__maybe_unused test_export_static int
-get_image_frame_params(struct fp_image_frame_params &image_frame_params)
+test_export_static int
+get_image_frame_params(struct fp_image_frame_params &image_frame_params,
+		       const enum fp_capture_type capture_type)
 {
 #if defined(HAVE_FP_PRIVATE_DRIVER) || defined(BOARD_HOST)
 	size_t fp_sensor_get_info_v2_size =
@@ -149,13 +139,13 @@ get_image_frame_params(struct fp_image_frame_params &image_frame_params)
 	std::vector<uint8_t> buffer(fp_sensor_get_info_v2_size);
 	auto *info = reinterpret_cast<ec_response_fp_info_v2 *>(buffer.data());
 
-	if (fp_sensor_get_info_v2(info, buffer.size()) < 0) {
+	if (fp_sensor_get_info(info, buffer.size()) < 0) {
 		return EC_ERROR_UNKNOWN;
 	}
 
 	for (uint8_t i = 0; i < info->sensor_info.num_capture_types; ++i) {
 		if (info->image_frame_params[i].fp_capture_type ==
-		    FP_CAPTURE_TYPE(global_context.sensor_mode)) {
+		    capture_type) {
 			image_frame_params = info->image_frame_params[i];
 			return EC_RES_SUCCESS;
 		}
@@ -186,9 +176,19 @@ static int command_fpcapture(int argc, const char **argv)
 			       FP_MODE_CAPTURE_TYPE_MASK);
 
 	const enum ec_error_list rc = fp_console_action(mode);
-	if (rc == EC_SUCCESS)
+	if (rc == EC_SUCCESS) {
+		struct fp_image_frame_params image_frame_params{};
+		int ret = get_image_frame_params(
+			image_frame_params,
+			global_context.current_capture_type);
+		if (ret != EC_RES_SUCCESS) {
+			CPRINTF("Failed to get image frame params, error: %d\n",
+				ret);
+			return ret;
+		}
 		return upload_pgm_image(fp_buffer + FP_SENSOR_IMAGE_OFFSET,
-					get_sensor_bpp());
+					image_frame_params);
+	}
 
 	return rc;
 }
@@ -243,8 +243,15 @@ static int command_fpdownload(int argc, const char **argv)
 	if (system_is_locked())
 		return EC_ERROR_ACCESS_DENIED;
 
+	struct fp_image_frame_params image_frame_params{};
+	int ret = get_image_frame_params(image_frame_params,
+					 global_context.current_capture_type);
+	if (ret != EC_RES_SUCCESS) {
+		CPRINTF("Failed to get image frame params, error: %d\n", ret);
+		return ret;
+	}
 	return upload_pgm_image(fp_buffer + FP_SENSOR_IMAGE_OFFSET,
-				get_sensor_bpp());
+				image_frame_params);
 }
 DECLARE_CONSOLE_COMMAND(fpdownload, command_fpdownload, nullptr,
 			"Copy fp image from fpmcu fpsensor buffer");
@@ -291,41 +298,6 @@ DECLARE_CONSOLE_COMMAND(fpenroll, command_fpenroll, nullptr,
 
 static int command_fpinfo(int argc, const char **argv)
 {
-	ec_response_fp_info info;
-
-#if defined(HAVE_FP_PRIVATE_DRIVER) || defined(BOARD_HOST)
-	if (fp_sensor_get_info(&info) < 0)
-		return EC_ERROR_UNKNOWN;
-#else
-	return EC_ERROR_UNKNOWN;
-#endif
-
-	constexpr int align = 15;
-
-	ccprintf("%*s: 0x%X (%s)\n", align, "Vendor ID", info.vendor_id,
-		 fourcc_to_string(info.vendor_id).c_str());
-	ccprintf("%*s: 0x%X\n", align, "Product ID", info.product_id);
-	ccprintf("%*s: 0x%X\n", align, "Model ID", info.model_id);
-	ccprintf("%*s: 0x%X\n", align, "Version", info.version);
-
-	ccprintf("%*s: %u x %u %ubpp\n", align, "Sensor (w x h)", info.width,
-		 info.height, info.bpp);
-	ccprintf("%*s: %u\n", align, "Frame Size", info.frame_size);
-	ccprintf("%*s: 0x%X (%s)\n", align, "Pixel Format", info.pixel_format,
-		 fourcc_to_string(info.pixel_format).c_str());
-
-	ccprintf("%*s: 0x%X\n", align, "Error State", info.errors);
-
-	ccprintf("%*s: %s\n", align, "Sensor Strap",
-		 fp_sensor_type_to_str(fpsensor_detect_get_type()));
-
-	return EC_SUCCESS;
-}
-DECLARE_SAFE_CONSOLE_COMMAND(fpinfo, command_fpinfo, nullptr,
-			     "Print fingerprint system info");
-
-static int command_fpinfo_v2(int argc, const char **argv)
-{
 #if defined(HAVE_FP_PRIVATE_DRIVER) || defined(BOARD_HOST)
 	size_t fp_sensor_get_info_v2_size =
 		sizeof(struct ec_response_fp_info_v2) +
@@ -333,7 +305,7 @@ static int command_fpinfo_v2(int argc, const char **argv)
 	std::vector<uint8_t> buffer(fp_sensor_get_info_v2_size);
 	auto *info = reinterpret_cast<ec_response_fp_info_v2 *>(buffer.data());
 
-	if (fp_sensor_get_info_v2(info, fp_sensor_get_info_v2_size) < 0) {
+	if (fp_sensor_get_info(info, buffer.size()) < 0) {
 		ccprintf("Failed to get fp_info_v2\n");
 		return EC_ERROR_UNKNOWN;
 	}
@@ -371,11 +343,11 @@ static int command_fpinfo_v2(int argc, const char **argv)
 
 	return EC_SUCCESS;
 #else
-	ccprintf("fpinfo2 command not supported on this firmware.\n");
+	ccprintf("fpinfo command not supported on this firmware.\n");
 	return EC_ERROR_UNKNOWN;
 #endif
 }
-DECLARE_SAFE_CONSOLE_COMMAND(fpinfo2, command_fpinfo_v2, nullptr,
+DECLARE_SAFE_CONSOLE_COMMAND(fpinfo, command_fpinfo, nullptr,
 			     "Print fingerprint system info");
 
 static int command_fpmatch(int argc, const char **argv)

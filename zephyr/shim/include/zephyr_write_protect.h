@@ -9,11 +9,15 @@
 #include "gpio/gpio_int.h"
 #include "gpio_signal.h"
 
+#include <stdbool.h>
+
 #include <zephyr/drivers/gpio.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+bool write_protect_is_asserted_custom(void);
 
 /**
  * Check the WP state. The function depends on the alias 'gpio_wp'. It is used
@@ -21,12 +25,18 @@ extern "C" {
  *
  * @return true if the WP is active, false otherwise.
  */
-static inline int write_protect_is_asserted(void)
+static inline bool write_protect_is_asserted(void)
 {
 #ifdef CONFIG_WP_ALWAYS
 	return true;
+#elif CONFIG_PLATFORM_EC_WP_CUSTOM
+	return write_protect_is_asserted_custom();
 #else
-	return gpio_pin_get_dt(GPIO_DT_FROM_ALIAS(gpio_wp));
+	/*
+	 * Read write protect GPIO. Return the protected state (more safe) in
+	 * case of any error.
+	 */
+	return gpio_pin_get_dt(GPIO_DT_FROM_ALIAS(gpio_wp)) != 0;
 #endif
 }
 

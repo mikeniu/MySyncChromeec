@@ -14,6 +14,7 @@
 #include "ioexpander.h"
 #include "power.h"
 #include "system.h"
+#include "timer.h"
 #include "usb_charge.h"
 #include "usb_pd.h"
 #include "usb_pd_flags.h"
@@ -96,7 +97,7 @@ int pd_get_retry_count(int port, enum tcpci_msg_type type)
 	return 3;
 }
 
-void pd_transmit_complete(int port, int status)
+void pd_transmit_complete(int port, int status, const timestamp_t *ts)
 {
 }
 
@@ -150,17 +151,6 @@ static enum ec_error_list charger_get_vbus_voltage_mock(int port, int *voltage)
 {
 	*voltage = mock_voltage;
 	return 0;
-}
-
-/* Helper functions for tests. */
-static int gpio_emul_output_get_dt(const struct gpio_dt_spec *dt)
-{
-	return gpio_emul_output_get(dt->port, dt->pin);
-}
-
-static int gpio_emul_input_set_dt(const struct gpio_dt_spec *dt, int value)
-{
-	return gpio_emul_input_set(dt->port, dt->pin, value);
 }
 
 static int toggle_pin_falling(const struct gpio_dt_spec *dt)

@@ -4,13 +4,13 @@
  */
 
 #include "battery_smart.h"
+#include "drivers/led.h"
 #include "ec_commands.h"
 #include "emul/emul_isl923x.h"
 #include "emul/emul_smart_battery.h"
 #include "emul/tcpc/emul_tcpci_partner_src.h"
 #include "gpio.h"
 #include "include/power.h"
-#include "led.h"
 #include "led_common.h"
 #include "pwm_mock.h"
 #include "test/drivers/test_state.h"
@@ -22,9 +22,13 @@
 #include <zephyr/ztest.h>
 #include <zephyr/ztest_assert.h>
 
+extern uint32_t led_test_apply_count;
+
+void set_board_led_alt_policy(int label);
+
 ZTEST_SUITE(led_pwm_fade, drivers_predicate_post_main, NULL, NULL, NULL, NULL);
 
-ZTEST(led_pwm_fade, test_led_fade)
+static void run_full_fade_test_sequence(void)
 {
 	const struct device *pwm_blue_left =
 		DEVICE_DT_GET(DT_NODELABEL(pwm_blue_left));
@@ -34,6 +38,7 @@ ZTEST(led_pwm_fade, test_led_fade)
 		DEVICE_DT_GET(DT_NODELABEL(pwm_amber_right));
 	const struct device *pwm_white_right =
 		DEVICE_DT_GET(DT_NODELABEL(pwm_white_right));
+	uint32_t hold_count;
 
 	/* make sure we're starting at the start of a pattern */
 	test_set_chipset_to_g3();
@@ -72,7 +77,12 @@ ZTEST(led_pwm_fade, test_led_fade)
 	zassert_equal(pwm_mock_get_duty(pwm_white_right, 0), 0, NULL);
 
 	int old_duty = pwm_mock_get_duty(pwm_blue_left, 0);
-	k_sleep(K_MSEC(50));
+	/* pwm driver uses 30ms update intervals.
+	 * Because k_sleep does not necessarily line up with real time, changes
+	 * in execution speed may cause a desync and can cause this test to
+	 * fail. Change as necessary.
+	 */
+	k_sleep(K_MSEC(100));
 	/* Even in small time increments, color changes slightly */
 	zassert_true(pwm_mock_get_duty(pwm_blue_left, 0) < old_duty, NULL);
 
@@ -169,4 +179,30 @@ ZTEST(led_pwm_fade, test_led_fade)
 	zassert_equal(pwm_mock_get_duty(pwm_white_left, 0), 0, NULL);
 	zassert_equal(pwm_mock_get_duty(pwm_amber_right, 0), 0, NULL);
 	zassert_equal(pwm_mock_get_duty(pwm_white_right, 0), 0, NULL);
+
+	/* Sleep to allow timing to settle */
+	k_sleep(K_MSEC(100));
+	hold_count = led_test_apply_count;
+
+	/* Run a few ticks to ensure no apply during hold state */
+	for (int i = 0; i < 10; i++) {
+		k_sleep(K_MSEC(250));
+		zassert_equal(led_test_apply_count, hold_count,
+			      "Apply count increased during hold state: %d.",
+			      led_test_apply_count);
+	}
+}
+
+ZTEST(led_pwm_fade, test_led_fade)
+{
+	/* Select the default policy */
+	set_board_led_alt_policy(1);
+	run_full_fade_test_sequence();
+}
+
+ZTEST(led_pwm_fade, test_led_fade_instant)
+{
+	/* Select the policy with extra 0-ms steps */
+	set_board_led_alt_policy(2);
+	run_full_fade_test_sequence();
 }
