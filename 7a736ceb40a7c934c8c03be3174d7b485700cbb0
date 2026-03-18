@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0f982c9_3e6bacab",
+        "filename": "zephyr/test/drivers/led_driver/prj.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1365384
+      },
+      "writtenOn": "2026-03-18T08:24:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1dd528bc_74dbdfca",
+      "range": {
+        "startLine": 1,
+        "startChar": 15,
+        "endLine": 1,
+        "endChar": 16
+      },
+      "revId": "7a736ceb40a7c934c8c03be3174d7b485700cbb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b907674e_2f0c2538",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-03-17T22:21:29Z",
       "side": 1,
       "message": "`#include \"display_7seg.h\"` provides this already",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 23
+      },
+      "revId": "7a736ceb40a7c934c8c03be3174d7b485700cbb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba6118e8_a33615ec",
+        "filename": "zephyr/test/drivers/led_driver/src/max695x_led_test_simple.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1365384
+      },
+      "writtenOn": "2026-03-18T08:24:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b907674e_2f0c2538",
       "range": {
         "startLine": 22,
         "startChar": 0,
@@ -70,6 +118,54 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6bdd043_9e64ed7b",
+        "filename": "zephyr/test/drivers/led_driver/src/max695x_led_test_simple.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1365384
+      },
+      "writtenOn": "2026-03-18T08:24:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c29e3777_183e246f",
+      "range": {
+        "startLine": 32,
+        "startChar": 1,
+        "endLine": 32,
+        "endChar": 59
+      },
+      "revId": "7a736ceb40a7c934c8c03be3174d7b485700cbb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d0cc774_1665dc47",
+        "filename": "zephyr/test/drivers/led_driver/src/max695x_led_test_simple.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1365384
+      },
+      "writtenOn": "2026-03-18T08:24:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c29e3777_183e246f",
+      "range": {
+        "startLine": 32,
+        "startChar": 1,
+        "endLine": 32,
+        "endChar": 59
+      },
+      "revId": "7a736ceb40a7c934c8c03be3174d7b485700cbb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "02658952_7731d86b",
@@ -83,6 +179,30 @@
       "writtenOn": "2026-03-17T22:21:29Z",
       "side": 1,
       "message": "You can assume this will always be defined since you enabled it in `led_driver/prj.conf`",
+      "range": {
+        "startLine": 177,
+        "startChar": 0,
+        "endLine": 177,
+        "endChar": 59
+      },
+      "revId": "7a736ceb40a7c934c8c03be3174d7b485700cbb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "776b6ca2_b3e9da2a",
+        "filename": "zephyr/test/drivers/led_driver/src/max695x_led_test_simple.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1365384
+      },
+      "writtenOn": "2026-03-18T08:24:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02658952_7731d86b",
       "range": {
         "startLine": 177,
         "startChar": 0,
@@ -116,6 +236,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e09baded_cac33792",
+        "filename": "zephyr/test/drivers/led_driver/src/max695x_led_test_simple.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1365384
+      },
+      "writtenOn": "2026-03-18T08:24:50Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "338f5c76_8d053d84",
+      "range": {
+        "startLine": 206,
+        "startChar": 1,
+        "endLine": 211,
+        "endChar": 4
+      },
+      "revId": "7a736ceb40a7c934c8c03be3174d7b485700cbb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c4f163cc_a5fc2b14",
@@ -129,6 +273,30 @@
       "writtenOn": "2026-03-17T22:21:29Z",
       "side": 1,
       "message": "This doesn\u0027t test anything.",
+      "range": {
+        "startLine": 300,
+        "startChar": 1,
+        "endLine": 302,
+        "endChar": 63
+      },
+      "revId": "7a736ceb40a7c934c8c03be3174d7b485700cbb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff94f5cb_3c95e8db",
+        "filename": "zephyr/test/drivers/led_driver/src/max695x_led_test_simple.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1365384
+      },
+      "writtenOn": "2026-03-18T08:24:50Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c4f163cc_a5fc2b14",
       "range": {
         "startLine": 300,
         "startChar": 1,
@@ -162,6 +330,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae460a14_4fe8ad3a",
+        "filename": "zephyr/test/drivers/led_driver/src/max695x_led_test_simple.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1365384
+      },
+      "writtenOn": "2026-03-18T08:24:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab4dd79e_2507dc23",
+      "range": {
+        "startLine": 315,
+        "startChar": 0,
+        "endLine": 318,
+        "endChar": 1
+      },
+      "revId": "7a736ceb40a7c934c8c03be3174d7b485700cbb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "802636d4_db9aa71c",
@@ -175,6 +367,30 @@
       "writtenOn": "2026-03-17T22:08:55Z",
       "side": 1,
       "message": "is this section helpful?",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 6
+      },
+      "revId": "7a736ceb40a7c934c8c03be3174d7b485700cbb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "18d44ebd_3cb7a31d",
+        "filename": "zephyr/test/drivers/led_driver/src/stubs.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1365384
+      },
+      "writtenOn": "2026-03-18T08:24:50Z",
+      "side": 1,
+      "message": "Removed.",
+      "parentUuid": "802636d4_db9aa71c",
       "range": {
         "startLine": 28,
         "startChar": 0,
