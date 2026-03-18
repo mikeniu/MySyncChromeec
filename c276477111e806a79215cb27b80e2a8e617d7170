@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49e385cd_cf2b2e25",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.overlay",
+        "patchSetId": 9
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-18T20:23:43Z",
+      "side": 1,
+      "message": "The schema doesn\u0027t mark `wkup-pin-pol` as required, by the [driver](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/soc/realtek/ec/rts5912/rts5912_ulpm.c;l\u003d73;drc\u003de1d91981b193728f6f97158c56230b9b56d68718) appears to require it.",
+      "range": {
+        "startLine": 59,
+        "startChar": 7,
+        "endLine": 59,
+        "endChar": 10
+      },
+      "revId": "c276477111e806a79215cb27b80e2a8e617d7170",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
