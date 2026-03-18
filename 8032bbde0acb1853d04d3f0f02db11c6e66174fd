@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8945770b_9f085dd7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-18T22:11:58Z",
+      "side": 1,
+      "message": "I do not see this happening in other functions",
+      "parentUuid": "6f514155_69f6be51",
+      "revId": "8032bbde0acb1853d04d3f0f02db11c6e66174fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bc10e535_d643f046",
         "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
         "patchSetId": 5
