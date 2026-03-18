@@ -22,6 +22,30 @@
       },
       "revId": "cc0163e16a686a4d2c33ceddb345b7347d29bb74",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d5673ba_e96540ec",
+        "filename": "zephyr/program/ocelot/power_signals.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-03-18T12:02:00Z",
+      "side": 1,
+      "message": "\"sysrst 1\" functionality works fine but in \"powerindebug\" the PWR_SYS_RST do not reflect the actual value, always set to 1.",
+      "parentUuid": "e30ebc98_0bd7007e",
+      "range": {
+        "startLine": 92,
+        "startChar": 0,
+        "endLine": 92,
+        "endChar": 42
+      },
+      "revId": "cc0163e16a686a4d2c33ceddb345b7347d29bb74",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
