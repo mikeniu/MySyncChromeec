@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f20c87e0_7a61652b",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-18T22:27:20Z",
+      "side": 1,
+      "message": "As a followup, let\u0027s unify these helper functions. Instead of using the signature suggested by Gemini below, let\u0027s call it `static int cros_flash_npcx_wait_ready_and_write_enable_state(const struct device *dev,\n\t\t\t\t\t\t\t     bool we_expected)`.\n\n----\n\nIf you look closely at the two functions, they are practically identical, but there is one critical difference beyond the bit check: **the original `cros_flash_npcx_wait_ready_and_we` function forgets to check the return value of `cros_flash_npcx_get_status_reg`.** It silently ignores SPI errors!\n\nBy refactoring this into a single shared helper function, you not only deduplicate the logic but also fix a latent bug in the existing codebase.\n\nHere is how you can unify them by passing in a boolean to represent the expected state of the Write Enable Latch (WEL) bit:\n\n### Proposed Shared Helper\n\n```c\n/* Wait for the BUSY bit to clear and the WEL bit to match the expected state */\nstatic int cros_flash_npcx_wait_ready_and_wel(const struct device *dev, bool wel_expected)\n{\n\tint wait_period_us \u003d 10; \n\tint timeout \u003d (10 * USEC_PER_SEC) / wait_period_us; /* 10 seconds */\n\n\tdo {\n\t\tuint8_t reg;\n\t\tint ret \u003d cros_flash_npcx_get_status_reg(dev, SPI_NOR_CMD_RDSR, \u0026reg);\n\t\t\n\t\t/* Fail fast if the SPI transaction itself failed */\n\t\tif (ret !\u003d 0) {\n\t\t\treturn ret;\n\t\t}\n\n\t\tbool wel_set \u003d (reg \u0026 SPI_NOR_WEL_BIT) !\u003d 0;\n\n\t\t/* Check if WIP is clear and WEL matches what we want */\n\t\tif ((reg \u0026 SPI_NOR_WIP_BIT) \u003d\u003d 0 \u0026\u0026 wel_set \u003d\u003d wel_expected) {\n\t\t\treturn 0;\n\t\t}\n\t\t\n\t\tk_usleep(wait_period_us);\n\t} while (--timeout);\n\n\treturn -ETIMEDOUT;\n}\n```\n\n### Refactoring the Callers\n\nWith that helper in place, your write-enable and write-disable functions become incredibly clean one-liners (after issuing their respective SPI commands):\n\n**For Write Enable (Existing code updated):**\n```c\nstatic int cros_flash_npcx_wait_ready_and_we(const struct device *dev)\n{\n\treturn cros_flash_npcx_wait_ready_and_wel(dev, true);\n}\n```\n\n**For Write Disable (Your new code):**\n```c\nstatic int cros_flash_npcx_wait_ready_and_write_disabled(const struct device *dev)\n{\n\treturn cros_flash_npcx_wait_ready_and_wel(dev, false);\n}\n```\n\n### Why this is better:\n1. **DRY (Don\u0027t Repeat Yourself):** Removes the redundant loop logic.\n2. **Bug Fix:** Applies the proper `ret !\u003d 0` check to the existing write-enable path.\n3. **Simpler Return Path:** Returning `0` immediately upon success inside the loop is cleaner than checking `if (timeout)` at the end.",
+      "range": {
+        "startLine": 96,
+        "startChar": 0,
+        "endLine": 117,
+        "endChar": 1
+      },
+      "revId": "700acfa56fb2d116865fbbf302a9afb4268283e2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c4626fe3_8b6acca2",
         "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
         "patchSetId": 11
