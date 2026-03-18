@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b9bf37d_b2e14a1e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-18T21:33:13Z",
+      "side": 1,
+      "message": "Gemini review:\n\n**1. Unhandled Return Value in Status Register Read**\nIn the newly added `cros_flash_npcx_wait_ready_and_wd` function, the return value of `cros_flash_npcx_get_status_reg` is ignored:\n\n```c\n// Current code:\ncros_flash_npcx_get_status_reg(dev, SPI_NOR_CMD_RDSR, \u0026reg);\nif ((reg \u0026 SPI_NOR_WIP_BIT) \u003d\u003d 0 \u0026\u0026 (reg \u0026 SPI_NOR_WEL_BIT) \u003d\u003d 0)\n    break;\n```\n\nIf the underlying SPI transaction fails, `reg` will remain uninitialized or contain stale memory, leading to unpredictable behavior or a false positive evaluation. \n\n*   **Remediation:** Check the return value and handle errors appropriately. Note that this same bug appears to exist in the pre-existing `cros_flash_npcx_wait_ready_and_we` function. I highly recommend fixing it in both places.\n\n```c\n// Suggested fix:\nint ret \u003d cros_flash_npcx_get_status_reg(dev, SPI_NOR_CMD_RDSR, \u0026reg);\nif (ret !\u003d 0) {\n    return ret; // Propagate the error upward\n}\nif ((reg \u0026 SPI_NOR_WIP_BIT) \u003d\u003d 0 \u0026\u0026 (reg \u0026 SPI_NOR_WEL_BIT) \u003d\u003d 0) {\n    break;\n}\n```",
+      "revId": "0d9cfaf317e5c786700dc6bceb12263db7360cde",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e5f6fb0_ca54ddcf",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-18T21:33:13Z",
+      "side": 1,
+      "message": "Rename to `wait_period_us` and remove the comment",
+      "range": {
+        "startLine": 149,
+        "startChar": 0,
+        "endLine": 149,
+        "endChar": 66
+      },
+      "revId": "0d9cfaf317e5c786700dc6bceb12263db7360cde",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e834b336_637ea7a9",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-18T21:33:13Z",
+      "side": 1,
+      "message": "rename to `timeout_secs` and remove the comment:\n\n```suggestion\n\tint timeout_secs \u003d (10 * USEC_PER_SEC) / wait_period;\n```",
+      "range": {
+        "startLine": 150,
+        "startChar": 0,
+        "endLine": 150,
+        "endChar": 66
+      },
+      "revId": "0d9cfaf317e5c786700dc6bceb12263db7360cde",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1230011_b3d00535",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-18T21:33:13Z",
+      "side": 1,
+      "message": "```suggestion\n    if (timeout) {\n        return 0;\n    }\n    return -ETIMEDOUT;\n```",
+      "range": {
+        "startLine": 162,
+        "startChar": 0,
+        "endLine": 166,
+        "endChar": 2
+      },
+      "revId": "0d9cfaf317e5c786700dc6bceb12263db7360cde",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
