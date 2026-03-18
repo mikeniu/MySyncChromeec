@@ -34,6 +34,24 @@
       "parentUuid": "54a55c28_76c7531f",
       "revId": "983daabbe8eeabd8f1e1edd03f5fc02d1c8681e9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "850c1995_7645d0f4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-18T20:55:25Z",
+      "side": 1,
+      "message": "For 1, fixed it.\n\nFor 2, `cros_ec_flash_controller` is the driver for calling the functions I am using.\n\nFor 3, I added `crec_flash_lock_mapped_storage` in both the test and `flash_physical_after`",
+      "parentUuid": "5b3fc2af_6d5fd000",
+      "revId": "983daabbe8eeabd8f1e1edd03f5fc02d1c8681e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
