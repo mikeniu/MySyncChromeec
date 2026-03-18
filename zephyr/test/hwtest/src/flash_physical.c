@@ -7,13 +7,17 @@
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
+#include <zephyr/logging/log.h>
 #include <zephyr/ztest.h>
+
+LOG_MODULE_REGISTER(flash_physical_test, LOG_LEVEL_INF);
 
 #if defined(CONFIG_SOC_FAMILY_NPCX)
 
 extern int flash_control_register_locked(const struct device *dev);
 extern int cros_flash_npcx_set_write_enable(const struct device *dev);
 extern int cros_flash_npcx_set_write_disable(const struct device *dev);
+extern void flash_protect_int_flash(const struct device *dev, bool enable);
 
 #define cros_flash_dev DEVICE_DT_GET(DT_CHOSEN(cros_ec_flash_controller))
 
@@ -83,7 +87,7 @@ ZTEST(flash_physical, test_flash_config)
 
 #if defined(CONFIG_SOC_FAMILY_NPCX)
 
-ZTEST(flash_physical, test_lock_flash_control_register)
+static void test_lock_flash_control_register(void)
 {
 	int ret;
 
@@ -119,6 +123,50 @@ ZTEST(flash_physical, test_lock_flash_control_register)
 
 	/* Unlock physical flash operations. */
 	crec_flash_lock_mapped_storage(0);
+}
+
+static void test_disable_flash_control_register(void)
+{
+	int ret;
+
+	zassert_not_null(cros_flash_dev, "Flash device instance not found");
+	zassert_true(device_is_ready(cros_flash_dev),
+		     "Flash device is not ready");
+
+	/* Lock physical flash operations. */
+	crec_flash_lock_mapped_storage(1);
+
+	/* Unlock the register */
+	ret = cros_flash_npcx_set_write_enable(cros_flash_dev);
+	zassert_equal(ret, 0, "Failed to enable write: %d", ret);
+	zassert_false(
+		flash_control_register_locked(cros_flash_dev),
+		"Flash control register failed to unlock on second attempt");
+
+	/* Disable the flash control register */
+	flash_protect_int_flash(cros_flash_dev, /*enable=*/true);
+
+	zassert_true(flash_control_register_locked(cros_flash_dev),
+		     "Flash control register failed to lock");
+
+	ret = cros_flash_npcx_set_write_enable(cros_flash_dev);
+	zassert_equal(ret, 0, "Failed to enable write: %d", ret);
+
+	/* Control Register should still be locked */
+	zassert_true(flash_control_register_locked(cros_flash_dev),
+		     "Flash control register failed to lock");
+
+	/* Unlock physical flash operations. */
+	crec_flash_lock_mapped_storage(0);
+}
+
+ZTEST(flash_physical, test_flash_control_register)
+{
+	LOG_INF("Step 1: Running lock control register test...");
+	test_lock_flash_control_register();
+
+	LOG_INF("Step 2: Running disable flash control register test...");
+	test_disable_flash_control_register();
 }
 
 #endif /* CONFIG_SOC_FAMILY_NPCX */
