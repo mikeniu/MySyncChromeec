@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3dc1023_8de1d2f9",
+        "filename": "zephyr/test/hwtest/src/flash_physical.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-19T17:45:02Z",
+      "side": 1,
+      "message": "@tomhughes@chromium.org\nare you ok with this comment?",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 4
+      },
+      "revId": "66937c6a0e16a282d176ced9410e73d99e7a7789",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

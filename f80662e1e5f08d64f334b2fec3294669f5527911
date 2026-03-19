@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6d67b08_a6d82937",
+        "filename": "zephyr/test/hwtest/src/flash_physical.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-19T17:45:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de5f063d_72d696e6",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 3
+      },
+      "revId": "f80662e1e5f08d64f334b2fec3294669f5527911",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2fcd4ca0_1d793974",
@@ -85,6 +109,30 @@
       "side": 1,
       "message": "Ok. Let\u0027s go ahead and add a comment link for `num_flash_banks` with the link in my previous comment so people have more context if they look at this test.",
       "parentUuid": "43cd8372_97588a20",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 2
+      },
+      "revId": "f80662e1e5f08d64f334b2fec3294669f5527911",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b946120b_7e7009a9",
+        "filename": "zephyr/test/hwtest/src/flash_physical.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-19T17:45:02Z",
+      "side": 1,
+      "message": "Marked as resolved.",
+      "parentUuid": "b61e75f8_3f900f80",
       "range": {
         "startLine": 23,
         "startChar": 0,
