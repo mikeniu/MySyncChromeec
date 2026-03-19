@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c39547b3_1693138c",
+        "filename": "zephyr/program/skywalker/r2d2/project.conf",
+        "patchSetId": 22
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4590738
+      },
+      "writtenOn": "2026-03-19T14:48:04Z",
+      "side": 1,
+      "message": "We can remove \"Customize Vol-up key position\".\nThose are defined in \"keyboard_customization.h\".\n#define KEYBOARD_DEFAULT_COL_VOL_UP 9\n#define KEYBOARD_DEFAULT_ROW_VOL_UP 3",
+      "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
