@@ -16,6 +16,24 @@
       "message": "Gemini review:\n\n### 2. Copy-Paste Error in Assertion Message\n**Severity: Minor**\nIn `test_disable_flash_control_register`, the first unlock assertion uses an inaccurate error message:\n```c\n\tret \u003d cros_flash_npcx_set_write_enable(cros_flash_dev);\n\tzassert_equal(ret, 0, \"Failed to enable write: %d\", ret);\n\tzassert_false(\n\t\tflash_control_register_locked(cros_flash_dev),\n\t\t\"Flash control register failed to unlock on second attempt\");\n```\n*   **The Issue:** The phrase `\"on second attempt\"` is copy-pasted from `test_lock_flash_control_register`. In this new function, it is the first attempt.\n*   **Suggestion:** Update the message to accurately reflect the context (e.g., `\"Flash control register failed to unlock before disable\"`).\n\n### 3. Missing Concurrency Locks (Carried Over)\n**Severity: Medium**\nSimilar to the previous patch iteration, the direct calls to `cros_flash_npcx_set_write_enable` and `cros_flash_npcx_set_write_disable` in both sub-tests bypass the EC\u0027s mapped storage locks.\n*   **The Issue:** Invoking low-level UMA commands without wrapping them in `crec_flash_lock_mapped_storage(1)` and `(0)` skips the concurrency protections designed to prevent memory-mapped reads from colliding with SPI commands. \n*   **Suggestion:** Wrap the direct driver calls inside your tests with the appropriate mapped storage lock/unlock calls.",
       "revId": "402f48f0d11313f92a0b4cad06d060385df4ea3f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07120c91_c0c515a6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-19T22:09:11Z",
+      "side": 1,
+      "message": "this was added to the after and before teardown.\n\nBy the way, per our discussion, disabling the write register is not removed without a reboot.",
+      "parentUuid": "06e3d87e_735a4601",
+      "revId": "402f48f0d11313f92a0b4cad06d060385df4ea3f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
