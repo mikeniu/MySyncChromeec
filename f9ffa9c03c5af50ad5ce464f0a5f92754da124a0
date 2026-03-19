@@ -213,6 +213,30 @@
       },
       "revId": "f9ffa9c03c5af50ad5ce464f0a5f92754da124a0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0636beb2_87ee829b",
+        "filename": "zephyr/test/hwtest/src/flash_physical.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-19T20:16:12Z",
+      "side": 1,
+      "message": "It seems that rebooting to RO is slow for some reason.\n\nCan you try [increasing the timeout](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/test/run_device_tests.py;l\u003d737-738;drc\u003dd9fd7244eba2b3e752b5d258767d9c3068d1b5d1) to see if it passes?",
+      "parentUuid": "e2660797_10979155",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 1
+      },
+      "revId": "f9ffa9c03c5af50ad5ce464f0a5f92754da124a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
