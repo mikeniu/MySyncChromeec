@@ -52,6 +52,24 @@
       "parentUuid": "5b3fc2af_6d5fd000",
       "revId": "983daabbe8eeabd8f1e1edd03f5fc02d1c8681e9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "026d5d4a_61e0481c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-19T01:26:50Z",
+      "side": 1,
+      "message": "I also added `flash_physical_before`, where I check that driver exist and is ready and then I lock. In the after, I disable and unlock.",
+      "parentUuid": "850c1995_7645d0f4",
+      "revId": "983daabbe8eeabd8f1e1edd03f5fc02d1c8681e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
