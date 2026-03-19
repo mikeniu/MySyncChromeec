@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1524e5c5_43379268",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1160139
+      },
+      "writtenOn": "2026-03-19T16:37:23Z",
+      "side": 1,
+      "message": "nit: better to have a bug# for tracking.",
+      "revId": "a54c2fbe3f448a16dd42ba96460c08cc5a2efaed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
