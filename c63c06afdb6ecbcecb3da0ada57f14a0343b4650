@@ -39,6 +39,30 @@
       },
       "revId": "c63c06afdb6ecbcecb3da0ada57f14a0343b4650",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de937ab9_af83f54b",
+        "filename": "zephyr/shim/include/fpsensor_driver.h",
+        "patchSetId": 14
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-03-19T09:14:18Z",
+      "side": 1,
+      "message": "Closing to unblock CQ",
+      "parentUuid": "d4d6b18f_8c3cffe7",
+      "range": {
+        "startLine": 15,
+        "startChar": 7,
+        "endLine": 15,
+        "endChar": 45
+      },
+      "revId": "c63c06afdb6ecbcecb3da0ada57f14a0343b4650",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
