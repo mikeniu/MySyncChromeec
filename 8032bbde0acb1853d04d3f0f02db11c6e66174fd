@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "df3f6671_6205966a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-19T17:58:38Z",
+      "side": 1,
+      "message": "@chlin56@nuvoton.corp-partner.google.com\n@chchang19@nuvoton.corp-partner.google.com\n\nCan you please advise whether a lock is required before calling `cros_flash_npcx_get_status_reg` per the gemini review in this function and the other functions?",
+      "parentUuid": "d914740e_d537c761",
+      "revId": "8032bbde0acb1853d04d3f0f02db11c6e66174fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bc10e535_d643f046",
         "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
         "patchSetId": 5
