@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38e03163_b5fec9aa",
+        "filename": "zephyr/test/hwtest/src/flash_physical.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-19T18:42:21Z",
+      "side": 1,
+      "message": "Gemini review:\n\n**1. False Positives in `zassert_true` with Error Codes**\nIn `flash_physical.c`, you are using `zassert_true(flash_control_register_locked(...))` to verify the lock state. However, looking at the implementation of `flash_control_register_locked` in `cros_flash_npcx.c`, the function returns a negative error code (e.g., `-ETIMEDOUT` or `-EINVAL`) if the underlying SPI transaction fails. \n\nBecause any non-zero integer is evaluated as \"true\" in C, an error code returned by the function will cause `zassert_true` to successfully pass the test, masking a potential hardware or driver failure.\n\n*   **Remediation:** Explicitly check for errors before asserting the boolean logic. I recommend evaluating the return value first:\n    ```c\n    int lock_status \u003d flash_control_register_locked(cros_flash_dev);\n    zassert_true(lock_status \u003e\u003d 0, \"Failed to read lock status, error: %d\", lock_status);\n    zassert_equal(lock_status, 1, \"Flash control register not locked initially\");\n    ```\n    Apply a similar pattern for `zassert_false` by checking `zassert_equal(lock_status, 0, ...)`.",
+      "range": {
+        "startLine": 104,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 54
+      },
+      "revId": "2c56f1c397f75cc3dabf89ad8bc2d746586d9163",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
