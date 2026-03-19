@@ -22,6 +22,30 @@
       },
       "revId": "1033f2c75ac0e628ffcc231760f20d1bec1280e0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42f59a16_e14b8ec6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-19T18:49:42Z",
+      "side": 1,
+      "message": "you are right. The tests that we added were for EC RO and Zephyr RW to catch the previous bug.\n\nI need to give this more thoughts because `system_is_locked` unit tests passes for the `Zephyr RO/RW` without this change. I need to understand whether this issue was a real thing or a cosmetic thing. I verified it on a board. With or without this CL, the `system_is_locked` behaves properly. The only difference is that `all_now` shows after reboot with this CL in `flashinfo`.\n\nMaybe we need to add a test to check that all_now is an enabled flag. However, I need to understand why even when `all_now` was not enabled, the system was locked.",
+      "parentUuid": "dadaeec5_64622539",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 38
+      },
+      "revId": "1033f2c75ac0e628ffcc231760f20d1bec1280e0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
