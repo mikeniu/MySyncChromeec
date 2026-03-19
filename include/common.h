@@ -533,6 +533,8 @@ enum ec_error_list {
 #define STATIC_IF_NOT(option) \
 	__cfg_select_build_assert(#option, option, extern, static)
 
+#define ZTESTABLE_STATIC static
+
 #ifdef __cplusplus
 }
 #endif

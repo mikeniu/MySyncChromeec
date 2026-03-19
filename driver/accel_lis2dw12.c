@@ -236,7 +236,7 @@ static int lis2dw12_enable_interrupt(const struct motion_sensor_t *s,
  * TODO: LIS2DW12_LOW_POWER_MODE_1 not implemented because output differ
  *       in resolution
  */
-STATIC_IF_NOT(CONFIG_ZTEST)
+ZTESTABLE_STATIC
 int lis2dw12_set_power_mode(const struct motion_sensor_t *s,
 			    enum lis2sw12_mode mode,
 			    enum lis2sw12_lpmode lpmode)

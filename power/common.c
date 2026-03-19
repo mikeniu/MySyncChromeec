@@ -690,7 +690,7 @@ void reset_boot_time()
 }
 #endif
 
-STATIC_IF_NOT(CONFIG_ZTEST)
+ZTESTABLE_STATIC
 void on_new_signal_or_state(enum power_state state, uint32_t this_in_signals)
 {
 	CPRINTS("power state %d = %s, in 0x%04x", state, state_names[state],

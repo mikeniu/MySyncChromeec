@@ -38,7 +38,7 @@ BUILD_ASSERT(ARRAY_SIZE(port_mutex) < 32);
  * will incorrectly return true.  However, callers which failed to statically
  * lock the port will fail quickly.
  */
-STATIC_IF_NOT(CONFIG_ZTEST)
+ZTESTABLE_STATIC
 int i2c_port_is_locked(int port)
 {
 #ifdef CONFIG_I2C_MULTI_PORT_CONTROLLER
