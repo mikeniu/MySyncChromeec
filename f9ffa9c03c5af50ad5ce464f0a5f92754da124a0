@@ -189,6 +189,30 @@
       },
       "revId": "f9ffa9c03c5af50ad5ce464f0a5f92754da124a0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2660797_10979155",
+        "filename": "zephyr/test/hwtest/src/flash_physical.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-19T19:42:45Z",
+      "side": 1,
+      "message": "seems unrelated though. I see this issue when I run aes test.",
+      "parentUuid": "5e0a6e8e_1d831b2a",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 1
+      },
+      "revId": "f9ffa9c03c5af50ad5ce464f0a5f92754da124a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
