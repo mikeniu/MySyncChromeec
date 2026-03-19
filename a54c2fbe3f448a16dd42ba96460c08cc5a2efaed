@@ -16,6 +16,24 @@
       "message": "nit: better to have a bug# for tracking.",
       "revId": "a54c2fbe3f448a16dd42ba96460c08cc5a2efaed",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17efadaf_961c9f24",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-03-19T17:15:52Z",
+      "side": 1,
+      "message": "ya, at least add the orginal b/451511238 used to add this file.\nif you observed strange behavior that you\u0027re fixing here,\nplease add bug for that.",
+      "parentUuid": "1524e5c5_43379268",
+      "revId": "a54c2fbe3f448a16dd42ba96460c08cc5a2efaed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
