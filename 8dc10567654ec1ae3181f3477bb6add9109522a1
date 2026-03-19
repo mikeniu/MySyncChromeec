@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72923422_f604daef",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 65
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-19T06:13:28Z",
+      "side": 1,
+      "message": "I mean read the pin state in a loop, without sleep or busy_wait, and check time every iteration, to make sure you check the state for 1-2ms.",
+      "revId": "8dc10567654ec1ae3181f3477bb6add9109522a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
