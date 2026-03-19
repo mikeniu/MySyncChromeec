@@ -50,6 +50,23 @@
       "message": "We can remove \"Customize Vol-up key position\".\nThose are defined in \"keyboard_customization.h\".\n#define KEYBOARD_DEFAULT_COL_VOL_UP 9\n#define KEYBOARD_DEFAULT_ROW_VOL_UP 3",
       "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0af98fe0_de70a48c",
+        "filename": "zephyr/program/skywalker/r2d2/project.overlay",
+        "patchSetId": 22
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4590738
+      },
+      "writtenOn": "2026-03-19T16:14:48Z",
+      "side": 1,
+      "message": "I think we can override the int_imu without \"/delete-node/ int_imu;\".\n\n(If it is necessary, \"/delete-node/ ec-imu\" seems more better. And, it needs to have \"/delete-node/ lid_accel;\" too.)",
+      "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
