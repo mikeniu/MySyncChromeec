@@ -63,6 +63,30 @@
       },
       "revId": "c63c06afdb6ecbcecb3da0ada57f14a0343b4650",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d84d496_1ec5394a",
+        "filename": "zephyr/shim/include/fpsensor_driver.h",
+        "patchSetId": 14
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-19T16:02:24Z",
+      "side": 1,
+      "message": "I was planning to remove the offset config in a follow-up CL now that we get this info from the fpinfo command.",
+      "parentUuid": "de937ab9_af83f54b",
+      "range": {
+        "startLine": 15,
+        "startChar": 7,
+        "endLine": 15,
+        "endChar": 45
+      },
+      "revId": "c63c06afdb6ecbcecb3da0ada57f14a0343b4650",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
