@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d914740e_d537c761",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-19T17:02:58Z",
+      "side": 1,
+      "message": "The `flash_get_status` locks before calling `cros_flash_npcx_get_status_reg` as mentioned by Gemini.\n\nIt does seem to indicate there might need to be a lock in these other functions. Please check with the original code authors.",
+      "parentUuid": "8945770b_9f085dd7",
+      "revId": "8032bbde0acb1853d04d3f0f02db11c6e66174fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bc10e535_d643f046",
         "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
         "patchSetId": 5
@@ -73,6 +91,30 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "bc10e535_d643f046",
+      "range": {
+        "startLine": 278,
+        "startChar": 0,
+        "endLine": 278,
+        "endChar": 49
+      },
+      "revId": "8032bbde0acb1853d04d3f0f02db11c6e66174fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f887d2e2_6c88bbf0",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-19T17:02:58Z",
+      "side": 1,
+      "message": "You added a comment that just restates what the code is doing. I\u0027m asking about a comment that explains the ***why***.",
+      "parentUuid": "14035853_101f0266",
       "range": {
         "startLine": 278,
         "startChar": 0,
