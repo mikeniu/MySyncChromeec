@@ -117,6 +117,30 @@
       },
       "revId": "f9ffa9c03c5af50ad5ce464f0a5f92754da124a0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a836f8f0_73ff3171",
+        "filename": "zephyr/test/hwtest/src/flash_physical.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-19T18:32:04Z",
+      "side": 1,
+      "message": "\u003e  building renode now\n\nFYI, you can also use the [prebuilt version](https://chromium.googlesource.com/chromiumos/platform/ec/+/HEAD/util/renode/README.md#installing-renode).",
+      "parentUuid": "e676f9f5_4179c016",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 1
+      },
+      "revId": "f9ffa9c03c5af50ad5ce464f0a5f92754da124a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
