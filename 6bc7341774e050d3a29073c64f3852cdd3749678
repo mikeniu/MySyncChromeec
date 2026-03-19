@@ -38,6 +38,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "e98335be_acd5e49b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-19T10:37:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "75460eaa_4be4715e",
+      "revId": "6bc7341774e050d3a29073c64f3852cdd3749678",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "29bfbd3d_aa29e83b",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 9
@@ -100,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "967c13c9_63678ffb",
+        "filename": "zephyr/emul/Kconfig",
+        "patchSetId": 9
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-19T10:37:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e936ff1e_8c06895e",
+      "range": {
+        "startLine": 222,
+        "startChar": 11,
+        "endLine": 222,
+        "endChar": 15
+      },
+      "revId": "6bc7341774e050d3a29073c64f3852cdd3749678",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3fa86f66_1d600081",
@@ -131,6 +173,24 @@
       "side": 1,
       "message": "I modified this.",
       "parentUuid": "3fa86f66_1d600081",
+      "revId": "6bc7341774e050d3a29073c64f3852cdd3749678",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73601141_93ddcf2f",
+        "filename": "zephyr/emul/emul_ft98xx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-19T10:37:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b5e9433e_9667002e",
       "revId": "6bc7341774e050d3a29073c64f3852cdd3749678",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

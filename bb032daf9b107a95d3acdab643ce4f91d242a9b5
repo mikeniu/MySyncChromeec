@@ -159,6 +159,24 @@
       "parentUuid": "9418a3bf_872f1acf",
       "revId": "bb032daf9b107a95d3acdab643ce4f91d242a9b5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12499150_10711e05",
+        "filename": "zephyr/emul/emul_ft98xx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-19T10:37:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "027157ac_45ddbdf5",
+      "revId": "bb032daf9b107a95d3acdab643ce4f91d242a9b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
