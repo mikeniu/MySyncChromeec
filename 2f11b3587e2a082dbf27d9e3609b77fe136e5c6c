@@ -34,6 +34,24 @@
       "parentUuid": "7727a200_63002656",
       "revId": "2f11b3587e2a082dbf27d9e3609b77fe136e5c6c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "404b3703_36832ada",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 64
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-19T10:33:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c41df704_c170e536",
+      "revId": "2f11b3587e2a082dbf27d9e3609b77fe136e5c6c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
