@@ -16,6 +16,24 @@
       "message": "I mean read the pin state in a loop, without sleep or busy_wait, and check time every iteration, to make sure you check the state for 1-2ms.",
       "revId": "8dc10567654ec1ae3181f3477bb6add9109522a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85e34818_8cf05cf1",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 65
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-19T09:12:45Z",
+      "side": 1,
+      "message": "fixed.",
+      "parentUuid": "72923422_f604daef",
+      "revId": "8dc10567654ec1ae3181f3477bb6add9109522a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
