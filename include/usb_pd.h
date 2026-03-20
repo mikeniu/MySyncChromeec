@@ -132,7 +132,7 @@ enum pdo_peak_overcurrent {
 #define PDO_FIXED_GET_DRP BIT(29)
 #define PDO_FIXED_GET_UNCONSTRAINED_PWR BIT(27)
 #define PDO_FIXED_GET_USB_COMM_CAPABLE BIT(26)
-
+#define PDO_FIXED_GET_PEAK_CURR(pdo) ((pdo >> 20) & 3)
 /* Mask of flag bits in a fixed PDO per USB-PD spec R3.2 V1.1, 6.4.1.2.1 */
 #define PDO_FIXED_FLAGS_MASK GENMASK(29, 23)
 
@@ -273,7 +273,13 @@ enum pdo_augmented_pps {
  * This value was experimentally determined to pass TEST.PD.PROT.SNK.5 and
  * TEST.PD.PROT.SRC.3 on various boards.
  */
+/* TODO(b/442730096):Debug pujjoga ErrorRecovery latency and remove this config
+ */
+#ifdef CONFIG_USBC_PD3_T_SENDER_RESPONSE_OVERRIDE
+#define PD3_T_SENDER_RESPONSE CONFIG_USBC_PD3_T_SENDER_RESPONSE_MS
+#else
 #define PD3_T_SENDER_RESPONSE (29 * MSEC)
+#endif
 #endif
 #define PD_T_PS_TRANSITION (500 * MSEC) /* between 450ms and 550ms */
 /*
@@ -985,9 +991,12 @@ struct pd_cable {
 
 #define PD_VDO_DPSTS_MF_MASK BIT(4)
 
+#define DP_STATUS_USB_CONFIG_REQ BIT(5)
+
 #define PD_VDO_DPSTS_HPD_IRQ(x) (((x) >> 8) & 1)
 #define PD_VDO_DPSTS_HPD_LVL(x) (((x) >> 7) & 1)
 #define PD_VDO_DPSTS_MF_PREF(x) (((x) >> 4) & 1)
+#define PD_VDO_DPSTS_SINK_DEVICE_CONNECTED(x) (((x) >> 1) & 1)
 
 /* Per DisplayPort Spec v1.3 Section 3.3 */
 #define HPD_USTREAM_DEBOUNCE_LVL (2 * MSEC)
@@ -3104,9 +3113,9 @@ void pd_execute_hard_reset(int port);
  *
  * @param port USB-C port number
  * @param status status of the transmission
+ * @param ts time at which the transmit completed
  */
-void pd_transmit_complete(int port, int status);
-
+void pd_transmit_complete(int port, int status, const timestamp_t *ts);
 /**
  * Get port polarity.
  *
@@ -3870,6 +3879,13 @@ int typec_update_cc(int port);
  */
 __override_proto enum pd_sdb_power_indicator
 board_get_pd_sdb_power_indicator(enum pd_sdb_power_state power_state);
+
+/*
+ * Return the number of USB Type-C ports that are allowed to source 3.0A
+ * simultaneously. Boards may override this to provide a custom or
+ * dynamic policy.
+ */
+__override_proto int pd_get_usb_pd_3a_ports(void);
 
 /****************************************************************************/
 

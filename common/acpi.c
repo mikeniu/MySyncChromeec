@@ -5,7 +5,7 @@
 
 #include "acpi.h"
 #include "battery.h"
-#include "body_detection.h"
+#include "body_detection_client.h"
 #include "common.h"
 #include "console.h"
 #include "dptf.h"
@@ -69,7 +69,7 @@ static int current_dptf_profile = DPTF_PROFILE_DEFAULT;
 
 /* Calculate size of valid cache based upon end of memmap data. */
 #define ACPI_VALID_CACHE_SIZE(addr)                                       \
-	(MIN(EC_ACPI_MEM_MAPPED_SIZE + EC_ACPI_MEM_MAPPED_BEGIN - (addr), \
+	(min(EC_ACPI_MEM_MAPPED_SIZE + EC_ACPI_MEM_MAPPED_BEGIN - (addr), \
 	     ACPI_READ_CACHE_SIZE))
 
 /*
@@ -169,7 +169,7 @@ static int acpi_read(uint8_t addr)
 static uint8_t strings_fifo_index;
 static size_t strings_fifo_offset;
 
-#ifdef CONFIG_BATTERY_V2
+#ifdef CONFIG_BATTERY_INFO
 static char read_battery_string(size_t field_offset, size_t field_size,
 				size_t str_offset)
 {
@@ -194,7 +194,7 @@ static char strings_fifo_read_work(size_t offset)
 		}
 		return 0;
 
-#ifdef CONFIG_BATTERY_V2
+#ifdef CONFIG_BATTERY_INFO
 	case EC_ACPI_MEM_STRINGS_FIFO_ID_BATTERY_MODEL:
 		return read_battery_string(
 			offsetof(struct battery_static_info, model_ext),
@@ -340,7 +340,7 @@ int acpi_ap_to_ec(int is_cmd, uint8_t value, uint8_t *resultptr)
 #ifdef CONFIG_USB_PORT_POWER_DUMB
 		case EC_ACPI_MEM_USB_PORT_POWER: {
 			int i;
-			const int port_count = MIN(8, USB_PORT_COUNT);
+			const int port_count = min(8, USB_PORT_COUNT);
 
 			/*
 			 * Convert each USB port power GPIO signal to a bit
@@ -379,7 +379,7 @@ int acpi_ap_to_ec(int is_cmd, uint8_t value, uint8_t *resultptr)
 		case EC_ACPI_MEM_TEST:
 			acpi_mem_test = data;
 			break;
-#ifdef CONFIG_BATTERY_V2
+#ifdef CONFIG_BATTERY_INFO
 		case EC_ACPI_MEM_BATTERY_INDEX:
 			CPRINTS("ACPI battery %d", data);
 			battery_memmap_set_index(data);
@@ -436,7 +436,7 @@ int acpi_ap_to_ec(int is_cmd, uint8_t value, uint8_t *resultptr)
 		case EC_ACPI_MEM_USB_PORT_POWER: {
 			int i;
 			int mode_field = data;
-			const int port_count = MIN(8, USB_PORT_COUNT);
+			const int port_count = min(8, USB_PORT_COUNT);
 
 			/*
 			 * Read the port power bit field (with max size 8 bits)

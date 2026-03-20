@@ -8,15 +8,25 @@ find_package(Zephyr REQUIRED HINTS "${ZEPHYR_BASE}")
 
 if(DEFINED CONFIG_BOARD_BLUEY)
 	project(bluey)
+	add_subdirectory(bluey)
 endif()
 
 if(DEFINED CONFIG_BOARD_QUENBI)
 	project(quenbi)
+	add_subdirectory(quenbi)
 endif()
 
 if(DEFINED CONFIG_BOARD_QUARTZ)
 	project(quartz)
+	add_subdirectory(quartz)
 endif()
 
+if(DEFINED CONFIG_BOARD_MICA)
+	project(mica)
+	add_subdirectory(mica)
+endif()
+
+zephyr_library_sources("src/battery.c")
 zephyr_library_sources("src/switchcap.c")
 zephyr_library_sources("src/chipset.c")
+zephyr_library_sources("src/adsp_i2c_mode.c")

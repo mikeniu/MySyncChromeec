@@ -16,15 +16,17 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/logging/log.h>
 
+#include <drivers/vivaldi_kbd.h>
+
 LOG_MODULE_DECLARE(board_init, LOG_LEVEL_INF);
 
 static bool has_backlight = FW_KB_BL_NOT_PRESENT;
 int8_t board_vivaldi_keybd_idx(void)
 {
 	if (has_backlight == FW_KB_BL_NOT_PRESENT) {
-		return DT_NODE_CHILD_IDX(DT_NODELABEL(kbd_config_0));
+		return VIVALDI_CFG_IDX(kbd_config_0);
 	} else {
-		return DT_NODE_CHILD_IDX(DT_NODELABEL(kbd_config_1));
+		return VIVALDI_CFG_IDX(kbd_config_1);
 	}
 }
 
@@ -58,7 +60,10 @@ DECLARE_HOOK(HOOK_INIT, kb_init, HOOK_PRIO_POST_I2C);
  */
 test_export_static void kb_layout_init(void)
 {
-	int ret;
+	int ret, tmp;
+#ifdef CONFIG_KEYBOARD_DEBUG
+	int label;
+#endif
 	uint32_t val;
 
 	ret = cros_cbi_get_fw_config(FW_KB_LAYOUT, &val);
@@ -69,13 +74,42 @@ test_export_static void kb_layout_init(void)
 	}
 	/*
 	 * If keyboard is US2(FW_KB_LAYOUT_US2), we need translate right ctrl
-	 * to backslash(\|) key.
+	 * to Europe2 key.
 	 */
 	if (val == FW_KB_LAYOUT_US2) {
-		set_scancode_set2(3, 14, get_scancode_set2(3, 11));
+		set_scancode_set2(3, 14, get_scancode_set2(2, 7));
 #ifdef CONFIG_KEYBOARD_DEBUG
-		set_keycap_label(3, 14, get_keycap_label(3, 11));
+		set_keycap_label(3, 14, get_keycap_label(2, 7));
 #endif
+		LOG_INF("CBI FW_CONFIG: FW_KB_LAYOUT_US2");
+	}
+
+	/*
+	 * If keyboard is JP(FW_KB_LAYOUT_JP), we need translate right alt,
+	 * right fn and henkan key.
+	 */
+	if (val == FW_KB_LAYOUT_JP) {
+		tmp = get_scancode_set2(0, 10);
+#ifdef CONFIG_KEYBOARD_DEBUG
+		label = get_keycap_label(0, 10);
+#endif
+		set_scancode_set2(0, 10, get_scancode_set2(5, 15));
+#ifdef CONFIG_KEYBOARD_DEBUG
+		set_keycap_label(0, 10, get_keycap_label(5, 15));
+#endif
+		set_scancode_set2(0, 13, get_scancode_set2(5, 15));
+#ifdef CONFIG_KEYBOARD_DEBUG
+		set_keycap_label(0, 13, get_keycap_label(5, 15));
+#endif
+		set_scancode_set2(5, 15, get_scancode_set2(1, 12));
+#ifdef CONFIG_KEYBOARD_DEBUG
+		set_keycap_label(5, 15, get_keycap_label(1, 12));
+#endif
+		set_scancode_set2(1, 12, tmp);
+#ifdef CONFIG_KEYBOARD_DEBUG
+		set_keycap_label(1, 12, label);
+#endif
+		LOG_INF("CBI FW_CONFIG: FW_KB_LAYOUT_JP");
 	}
 }
 DECLARE_HOOK(HOOK_INIT, kb_layout_init, HOOK_PRIO_POST_I2C);
@@ -134,3 +168,11 @@ static void sensor_init(void)
 	}
 }
 DECLARE_HOOK(HOOK_INIT, sensor_init, HOOK_PRIO_DEFAULT);
+
+static void ish_int_disable(void)
+{
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_sen_mode2_ec_ish_int_odl),
+			1);
+	LOG_INF("ISH interrupt forced LOW (hard off)");
+}
+DECLARE_HOOK(HOOK_CHIPSET_HARD_OFF, ish_int_disable, HOOK_PRIO_DEFAULT);

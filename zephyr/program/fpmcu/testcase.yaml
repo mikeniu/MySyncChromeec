@@ -6,12 +6,18 @@ tests:
   abort:
     extra_configs:
     - CONFIG_HW_TEST_ABORT=y
+    - CONFIG_ZTEST_FATAL_HOOK=y
     extra_conf_files:
     - prj_hw_tests.conf
   aes:
     extra_configs:
     - CONFIG_HW_TEST_AES=y
     - CONFIG_ZTEST_STACK_SIZE=3072
+    extra_conf_files:
+    - prj_hw_tests.conf
+  bbram_retained_mem:
+    extra_configs:
+    - CONFIG_HW_TEST_BBRAM_RETAINED_MEM=y
     extra_conf_files:
     - prj_hw_tests.conf
   benchmark:
@@ -54,6 +60,13 @@ tests:
   flash_write_protect:
     extra_configs:
     - CONFIG_HW_TEST_FLASH_WRITE_PROTECT=y
+    # Added to reduce RO flash usage
+    - CONFIG_PM=n
+    extra_conf_files:
+    - prj_hw_tests.conf
+  flash_protection_rw:
+    extra_configs:
+    - CONFIG_HW_TEST_FLASH_PROTECTION_RW=y
     # Added to reduce RO flash usage
     - CONFIG_PM=n
     extra_conf_files:
@@ -101,6 +114,7 @@ tests:
   ftrapv:
     extra_configs:
     - CONFIG_HW_TEST_FTRAPV=y
+    - CONFIG_ZTEST_FATAL_HOOK=y
     extra_conf_files:
     - prj_hw_tests.conf
   libc_printf:
@@ -123,9 +137,12 @@ tests:
   otp_key:
     extra_configs:
     - CONFIG_HW_TEST_OTP_KEY=y
+    extra_conf_files:
+    - prj_hw_tests.conf
   null_pointer:
     extra_configs:
     - CONFIG_HW_TEST_NULL_POINTER=y
+    - CONFIG_ZTEST_FATAL_HOOK=y
     extra_conf_files:
     - prj_hw_tests.conf
   panic:
@@ -138,6 +155,11 @@ tests:
     extra_configs:
     - CONFIG_HW_TEST_PANIC_DATA=y
     - CONFIG_PLATFORM_EC_DEBUG_ASSERT_REBOOTS=y
+    extra_conf_files:
+    - prj_hw_tests.conf
+  pmp_entries:
+    extra_configs:
+    - CONFIG_HW_TEST_PMP_ENTRIES=y
     extra_conf_files:
     - prj_hw_tests.conf
   printf:
@@ -156,6 +178,11 @@ tests:
     - CONFIG_HW_TEST_RAM_LOCK=y
     extra_conf_files:
     - prj_hw_tests.conf
+  reboot:
+    extra_configs:
+    - CONFIG_HW_TEST_REBOOT=y
+    extra_conf_files:
+    - prj_hw_tests.conf
   restricted_console:
     extra_configs:
     - CONFIG_HW_TEST_RESTRICTED_CONSOLE=y
@@ -172,11 +199,22 @@ tests:
     - CONFIG_HW_TEST_ROLLBACK=y
     extra_conf_files:
     - prj_hw_tests.conf
+  rollback_minimal_version:
+    extra_configs:
+    - CONFIG_HW_TEST_ROLLBACK_MINIMAL_VERSION=y
+    extra_conf_files:
+    - prj_hw_tests.conf
   rollback_entropy:
     extra_configs:
     - CONFIG_HW_TEST_ROLLBACK_ENTROPY=y
     # Added to reduce RO flash usage
     - CONFIG_PM=n
+    extra_conf_files:
+    - prj_hw_tests.conf
+  rollback_lock_panic:
+    extra_configs:
+    - CONFIG_HW_TEST_ROLLBACK_LOCK_PANIC=y
+    - CONFIG_ZTEST_FATAL_HOOK=y
     extra_conf_files:
     - prj_hw_tests.conf
   rtc_npcx9:
@@ -197,8 +235,13 @@ tests:
     extra_conf_files:
     - prj_hw_tests.conf
   sha256_unrolled:
+    # This test specifically verifies the unrolled software SHA256 implementation.
+    # Hardware acceleration (PLATFORM_EC_SHA256_HW_ZEPHYR) is explicitly disabled.
     extra_configs:
     - CONFIG_HW_TEST_SHA256_UNROLLED=y
+    - CONFIG_PLATFORM_EC_SHA256_SW=y
+    - CONFIG_PLATFORM_EC_SHA256_UNROLLED=y
+    - CONFIG_PLATFORM_EC_SHA256_HW_ZEPHYR=n
     extra_conf_files:
     - prj_hw_tests.conf
   static_if:
@@ -237,6 +280,7 @@ tests:
     extra_conf_files:
     - prj_hw_tests.conf
   utils:
+    timeout: 300
     extra_configs:
     - CONFIG_HW_TEST_UTILS=y
     extra_conf_files:

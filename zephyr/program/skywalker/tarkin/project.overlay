@@ -70,6 +70,15 @@
 		gpio_5p0va_pwr_mode: 5p0va_pwr_mode {
 			gpios = <&gpiod 7 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 		};
+		gpio_tp_vtsp_en: tp_vtsp_en {
+			gpios = <&gpioe 0 (GPIO_OUTPUT | GPIO_PUSH_PULL | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		gpio_tp_rst: tp_rst {
+			gpios = <&gpioe 7 (GPIO_OUTPUT | GPIO_PUSH_PULL  | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		gpio_tp_en: tp_en {
+			gpios = <&gpiof 2 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_OUTPUT_INIT_LOW)>;
+		};
 	};
 
 	named-i2c-ports {
@@ -84,17 +93,13 @@
 			<&gpiob 2 GPIO_INPUT_PULL_DOWN>,
 			<&gpiob 5 GPIO_INPUT_PULL_DOWN>,
 			<&gpiob 6 GPIO_INPUT_PULL_DOWN>,
-			<&gpiob 7 GPIO_INPUT_PULL_DOWN>,
 			<&gpioc 7 GPIO_INPUT_PULL_DOWN>,
 			<&gpiod 0 GPIO_INPUT_PULL_DOWN>,
 			<&gpiod 1 GPIO_INPUT_PULL_DOWN>,
 			<&gpiod 4 GPIO_INPUT_PULL_DOWN>,
-			<&gpioe 0 GPIO_INPUT_PULL_DOWN>,
 			<&gpioe 3 GPIO_INPUT_PULL_DOWN>,
 			<&gpioe 4 GPIO_INPUT_PULL_DOWN>,
-			<&gpioe 7 GPIO_INPUT_PULL_DOWN>,
 			<&gpiof 1 GPIO_INPUT_PULL_DOWN>,
-			<&gpiof 2 GPIO_INPUT_PULL_DOWN>,
 			<&gpiof 4 GPIO_INPUT_PULL_DOWN>,
 			<&gpiof 5 GPIO_INPUT_PULL_DOWN>,
 			<&gpioh 1 GPIO_INPUT_PULL_DOWN>,
@@ -134,7 +139,7 @@
 
 	kblight {
 		compatible = "cros-ec,kblight-pwm";
-		pwms = <&pwm3 PWM_CHANNEL_3 PWM_HZ(100) PWM_POLARITY_NORMAL>;
+		pwms = <&pwm3 PWM_CHANNEL_3 PWM_KHZ(24) PWM_POLARITY_NORMAL>;
 	};
 };
 

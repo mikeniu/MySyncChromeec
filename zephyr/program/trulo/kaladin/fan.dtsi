@@ -21,44 +21,44 @@
 	fan_steps {
 		compatible = "cros-ec,fan-steps";
 		level_0 {
-			temp-on = <0xff 55 0xff>;
+			temp-on = <0xff 53 0xff>;
 			temp-off = <0xff 0xff 0xff>;
 			rpm-target = <0>;
 		};
 		level_1 {
-			temp-on = <0xff 56 0xff>;
-			temp-off = <0xff 48 0xff>;
+			temp-on = <0xff 53 0xff>;
+			temp-off = <0xff 52 0xff>;
 			rpm-target = <3200>;
 		};
 		level_2 {
-			temp-on = <0xff 57 0xff>;
-			temp-off = <0xff 55 0xff>;
+			temp-on = <0xff 54 0xff>;
+			temp-off = <0xff 53 0xff>;
 			rpm-target = <3400>;
 		};
 		level_3 {
-			temp-on = <0xff 58 0xff>;
-			temp-off = <0xff 56 0xff>;
-			rpm-target = <3700>;
+			temp-on = <0xff 55 0xff>;
+			temp-off = <0xff 54 0xff>;
+			rpm-target = <3600>;
 		};
 		level_4 {
-			temp-on = <0xff 59 0xff>;
-			temp-off = <0xff 57 0xff>;
-			rpm-target = <4000>;
+			temp-on = <0xff 56 0xff>;
+			temp-off = <0xff 55 0xff>;
+			rpm-target = <3800>;
 		};
 		level_5 {
-			temp-on = <0xff 60 0xff>;
-			temp-off = <0xff 58 0xff>;
-			rpm-target = <4300>;
+			temp-on = <0xff 57 0xff>;
+			temp-off = <0xff 56 0xff>;
+			rpm-target = <4000>;
 		};
 		level_6 {
-			temp-on = <0xff 61 0xff>;
-			temp-off = <0xff 59 0xff>;
-			rpm-target = <4600>;
+			temp-on = <0xff 58 0xff>;
+			temp-off = <0xff 57 0xff>;
+			rpm-target = <4300>;
 		};
 		level_7 {
-			temp-on = <0xff 62 0xff>;
-			temp-off = <0xff 60 0xff>;
-			rpm-target = <5000>;
+			temp-on = <0xff 60 0xff>;
+			temp-off = <0xff 58 0xff>;
+			rpm-target = <4500>;
 		};
 	};
 };

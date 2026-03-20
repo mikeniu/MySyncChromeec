@@ -25,7 +25,6 @@
 		};
 		gpio_ec_en_pp5000_s5: ec_en_pp5000_s5 {
 			gpios = <&gpio4 0 (GPIO_OUTPUT)>;
-			enum-name = "GPIO_EN_PP5000";
 		};
 		gpio_ec_l1i_pwr_detect: ec_l1i_pwr_detect {
 			gpios = <&gpio5 0 (GPIO_INPUT)>;
@@ -40,7 +39,7 @@
 			gpios = <&gpio6 0 (GPIO_OUTPUT)>;
 		};
 		gpio_pg_pp5000_s5_od: pg_pp5000_s5_od {
-			gpios = <&gpio6 3 (GPIO_INPUT | GPIO_OPEN_DRAIN)>;
+			gpios = <&gpio6 3 (GPIO_INPUT)>;
 		};
 		gpio_en_ppvar_oled: en_ppvar_oled {
 			gpios = <&gpio6 7 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
@@ -68,7 +67,7 @@
 		};
 		gpio_ec_pmk_rst_1v8: ec_pmk_rst_1v8 {
 			gpios = <&gpio9 6 (GPIO_OUTPUT)>;
-			enum-name = "GPIO_PMIC_RESIN_L";
+			enum-name = "GPIO_PMIC_RESIN";
 		};
 		gpio_sys_in_suspend: sys_in_suspend {
 			gpios = <&gpioa 0 (GPIO_INPUT)>;
@@ -219,13 +218,6 @@ gpio_ap_plt_rst_n: &gpio_plt_rst_odl {};
 gpio_sleep_indicator: &gpio_sys_in_suspend {};
 gpio_soc_ps_hold_ls: &gpio_soc_ps_hold_ls {};
 gpio_sys_rst_odl: &gpio_sys_rst_odl {};
-
-/*
- * Aliases power-rails to common names
- */
-gpio_ec_usb_en: &gpio_ec_en_usba {};
-gpio_ec_3v_s3_en: &gpio_ec_en_pp3300_s3 {};
-gpio_ec_en_ppvar_oled: &gpio_en_ppvar_oled {};
 
 /*
  * Aliases switchcap to common names

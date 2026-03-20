@@ -28,10 +28,6 @@ ZEPHYR_MODULES = {
         "path": "src/third_party/zephyr/picolibc",
         "main": "main",
     },
-    "cmsis": {
-        "path": "src/third_party/zephyr/cmsis",
-        "main": "chromeos-main",
-    },
 }
 ZEPHYR_MODULE_LIST = list(ZEPHYR_MODULES.keys())
 
@@ -427,7 +423,7 @@ def main(argv):
         boards = get_relevant_boards(opts.baseboard)
     elif opts.board:
         if opts.zephyr:
-            board_dir = os.path.relpath("zephyr/program/" + opts.board)
+            board_dir = os.path.relpath("zephyr/program/fpmcu/" + opts.board)
         else:
             board_dir = os.path.relpath("board/" + opts.board)
         board_dir = os.path.relpath(os.path.realpath(board_dir))
@@ -499,7 +495,9 @@ def main(argv):
             f"with strategy option '{opts.strategy_option if opts.strategy_option else ''}'"
         ),
     )
-    cros_main = opts.remote_prefix + "/" + "main"
+    cros_main = (
+        opts.remote_prefix + "/" + ("main" if opts.zephyr else "ec-legacy")
+    )
     strategy = [
         opts.merge_strategy,
     ]
@@ -536,7 +534,7 @@ def main(argv):
             # to avoid any conflict with the modified branch file.
             prunelist.append("OWNERS")
         merge_repo(
-            os.path.join(opts.srcbase, "src/third_party/zephyr/main"),
+            os.path.join(opts.srcbase, "src/third_party/zephyrproject"),
             cros_main,
             cmd_checkout,
             strategy,

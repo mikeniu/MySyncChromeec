@@ -4,23 +4,20 @@
  */
 
 /* lapis program common DTS includes */
-
 #include <cros/integrated_fwid.dtsi>
 
+/* Include the standard and OEM schema templates */
+#include <cros/cbi_ufsc_std_schema.dtsi>
+#include <cros/cbi_ufsc_oem_schema.dtsi>
+
+/* Include the generated file that defines the values for this project */
+#include "lapis_ec_ufsc.dtsi"
+
 /* lapis project DTS includes */
-
-#include "gpios.dtsi"
-
-/*
- * Aliases to common names
- */
-gpio_ec_pch_wake_odl: &gpio_soc_wake_odl {};
-
 #include "battery.dtsi"
 #include "console.dtsi"
 #include "fan.dtsi"
 #include "gpios.dtsi"
-#include "hibernate.dtsi"
 #include "i2c.dtsi"
 #include "interrupts.dtsi"
 #include "keyboard.dtsi"
@@ -29,8 +26,17 @@ gpio_ec_pch_wake_odl: &gpio_soc_wake_odl {};
 #include "temp_sensors.dtsi"
 #include "led_pins.dtsi"
 #include "led_policy.dtsi"
+#include "spi.dtsi"
+#include "thermistor.dtsi"
 #include "usb_typec.dtsi"
 #include "usba.dtsi"
+#include "rtk_ulpm.dtsi"
+#include <lapis/overlay.dtsi>
+
+/*
+ * Aliases to common names
+ */
+gpio_ec_pch_wake_odl: &gpio_soc_wake_odl {};
 
 /* AP interface */
 &espi0 {

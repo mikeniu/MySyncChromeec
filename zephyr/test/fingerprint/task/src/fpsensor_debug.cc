@@ -9,16 +9,28 @@
 #include <stdio.h>
 
 #include <zephyr/fff.h>
+#include <zephyr/sys/util.h>
 #include <zephyr/ztest.h>
 
 #include <algorithm>
 #include <array>
 #include <ec_commands.h>
+#include <fingerprint/v4l2_types.h>
 #include <fpsensor/fpsensor_state_driver.h>
 #include <fpsensor/fpsensor_utils.h>
 #include <fpsensor_driver.h>
 #include <mkbp_event.h>
 #include <rollback.h>
+
+static const struct device *const fp_sensor_dev =
+	DEVICE_DT_GET(DT_CHOSEN(cros_fp_fingerprint_sensor));
+
+static_assert(sizeof(struct fp_image_frame_params) ==
+		      sizeof(struct fingerprint_image_frame_params),
+	      "Frame param structures must be the same size");
+
+int get_image_frame_params(struct fp_image_frame_params &image_frame_params,
+			   enum fp_capture_type capture_type);
 
 static int is_locked;
 
@@ -174,20 +186,79 @@ ZTEST(fpsensor_debug, test_command_fpenroll)
 	zassert_equal(rv, EC_ERROR_ACCESS_DENIED);
 }
 
-enum ec_error_list upload_pgm_image(uint8_t *frame, uint8_t bpp);
+enum ec_error_list
+upload_pgm_image(uint8_t *frame,
+		 const struct fp_image_frame_params &image_frame_params);
 
 ZTEST(fpsensor_debug, test_upload_pgm_image_wrong_bpp)
 {
 	std::array<uint8_t, 100> frame{};
 
-	zassert_equal(upload_pgm_image(frame.data(), 0), EC_ERROR_UNKNOWN);
-	zassert_equal(upload_pgm_image(frame.data(), 17), EC_ERROR_UNKNOWN);
-	zassert_equal(upload_pgm_image(frame.data(), 24), EC_ERROR_UNKNOWN);
+	zassert_equal(upload_pgm_image(frame.data(), { .bpp = 0 }),
+		      EC_ERROR_UNKNOWN);
+
+	zassert_equal(upload_pgm_image(frame.data(), { .bpp = 17 }),
+		      EC_ERROR_UNKNOWN);
+
+	zassert_equal(upload_pgm_image(frame.data(), { .bpp = 23 }),
+		      EC_ERROR_UNKNOWN);
 }
 
-uint8_t get_sensor_bpp(void);
-
-ZTEST(fpsensor_debug, test_get_sensor_bpp)
+ZTEST(fpsensor_debug, test_get_image_frame_params)
 {
-	zassert_equal(get_sensor_bpp(), 8);
+	struct fingerprint_sensor_info sensor_info{};
+	struct fingerprint_image_frame_params
+		image_frame_params_arr[NUM_IMAGE_CAPTURE_TYPES] = {};
+	uint8_t num_params = NUM_IMAGE_CAPTURE_TYPES;
+
+	zassert_ok(fingerprint_get_info(fp_sensor_dev, &sensor_info,
+					image_frame_params_arr, &num_params));
+	zassert_true(
+		num_params == NUM_IMAGE_CAPTURE_TYPES,
+		"fingerprint_get_info returned different params than expected");
+
+	constexpr auto kCaptureTypesArray = std::to_array(
+		{ FP_CAPTURE_VENDOR_FORMAT, FP_CAPTURE_DEFECT_PXL_TEST,
+		  FP_CAPTURE_ABNORMAL_TEST, FP_CAPTURE_NOISE_TEST,
+		  FP_CAPTURE_SIMPLE_IMAGE, FP_CAPTURE_PATTERN0,
+		  FP_CAPTURE_PATTERN1, FP_CAPTURE_QUALITY_TEST,
+		  FP_CAPTURE_RESET_TEST, FP_CAPTURE_TYPE_MAX });
+	constexpr struct fp_image_frame_params zero_params{};
+
+	for (enum fp_capture_type current_capture_type : kCaptureTypesArray) {
+		const struct fingerprint_image_frame_params *expected_params =
+			nullptr;
+		for (size_t j = 0; j < num_params; ++j) {
+			if (image_frame_params_arr[j].fp_capture_type ==
+			    current_capture_type) {
+				expected_params = &image_frame_params_arr[j];
+				break;
+			}
+		}
+
+		struct fp_image_frame_params image_frame_params{};
+		int rv = get_image_frame_params(image_frame_params,
+						current_capture_type);
+
+		if (expected_params) {
+			zassert_equal(
+				rv, EC_RES_SUCCESS,
+				"get_image_frame_params failed with error %d for capture type %d",
+				rv, current_capture_type);
+			zassert_mem_equal(
+				&image_frame_params, expected_params,
+				sizeof(struct fp_image_frame_params),
+				"Struct comparison failed for type %d",
+				current_capture_type);
+		} else {
+			zassert_equal(
+				rv, EC_ERROR_INVAL,
+				"Expected EC_ERROR_INVAL (%d), but got %d for invalid type",
+				EC_ERROR_INVAL, rv);
+			zassert_mem_equal(
+				&image_frame_params, &zero_params,
+				sizeof(struct fp_image_frame_params),
+				"Struct contents should not change on failure");
+		}
+	}
 }

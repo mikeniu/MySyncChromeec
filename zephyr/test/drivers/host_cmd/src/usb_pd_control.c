@@ -9,6 +9,7 @@
 #include "emul/tcpc/emul_ps8xxx.h"
 #include "emul/tcpc/emul_tcpci.h"
 #include "emul/tcpc/emul_tcpci_partner_snk.h"
+#include "hooks.h"
 #include "test/drivers/stubs.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
@@ -133,6 +134,7 @@ static void host_cmd_usb_pd_control_before(void *data)
 
 	/* Set the system into S0, since the AP would drive these commands */
 	test_set_chipset_to_s0();
+	hook_notify(HOOK_CHIPSET_RESUME);
 	k_sleep(K_SECONDS(1));
 }
 

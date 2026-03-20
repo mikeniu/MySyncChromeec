@@ -11,6 +11,7 @@
 #include "../ite_overlay.dtsi"
 #include "../ite_usbc.dtsi"
 #include "../power_signal.dtsi"
+#include "cbi.dtsi"
 #include "led_pins.dtsi"
 #include "led_policy.dtsi"
 #include "motionsense.dtsi"
@@ -46,8 +47,11 @@
 	};
 
 	batteries {
-		default_battery: b300049 {
-			compatible = "celxpert,b300049", "battery-smart";
+		default_battery: cosmx_cm32054 {
+			compatible = "cosmx,cm32054", "battery-smart";
+		};
+		celxpert_b300049 {
+			compatible = "celxpert,b300049","battery-smart";
 		};
 	};
 
@@ -56,12 +60,22 @@
 		int_imu: ec-imu {
 			irq-pin = <&gpio_imu_int_ec_l>;
 			flags = <GPIO_INT_EDGE_FALLING>;
-			handler = "bmi3xx_interrupt";
+			handler = "motion_interrupt";
 		};
 		pogo_prsnt_int: pogo-prsnt-int {
 			irq-pin = <&pogo_prsnt_int_l>;
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "base_detect_interrupt";
+		};
+		wpc_irq: wpc_irq{
+			irq-pin = <&gpio_wpc_irq>;
+			flags = <GPIO_INT_EDGE_FALLING>;
+			handler = "pchg_irq";
+		};
+		wpc_lid_irq: wpc_lid_irq{
+			irq-pin = <&gpio_pen_eject_od_l>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "wpc_hall_interrupt";
 		};
 	};
 
@@ -75,6 +89,7 @@
 		/delete-node/ lid_accel_int_ec_l;
 		/delete-node/ dp_aux_path_sel;
 		/delete-node/ en_pp5000_usba_vbus;
+		/delete-node/ ec_pen_chg_dis_odl;
 
 		// POGO_PRSNT_INT_L  GPI5
 		pogo_prsnt_int_l: pogo_prsnt_int_l{
@@ -99,8 +114,8 @@
 			gpios = <&gpioh 3 GPIO_INPUT>;
 		};
 
-		gpio_hp_jack_det_l_mb: hp_jack_det_l_mb {
-			gpios = <&gpiod 7 GPIO_INPUT>;
+		gpio_5p0va_pwr_mode: 5p0va_pwr_mode {
+			gpios = <&gpiod 5 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 		};
 
 		gpio_pen_eject: pen_eject {
@@ -115,6 +130,7 @@
 		//PEN_EJECT_OD_L GPD1
 		gpio_pen_eject_od_l: gpio_pen_eject_od_l {
 			gpios = <&gpiod 1 (GPIO_INPUT)>;
+			enum-name = "GPIO_HALL_CTL_PCHG";
 		};
 
 		//CCD_MODE_L GPE5
@@ -125,10 +141,15 @@
 		en_cc_lid_base_pu: en-cc-lid-base-pu {
 			gpios = <&gpioa 3 GPIO_INPUT>;
 		};
-	};
+		gpio_wpc_irq: gpio_wpc_irq{
+			gpios = <&gpiod 4 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			enum-name = "GPIO_WPC_IRQ";
+		};
 
-	named-i2c-ports {
-		/delete-node/ ec_i2c_pdc_s_scl_3v3;
+		gpio_ec_pen_dis: ec_pen_dis {
+			gpios = <&gpiof 5 (GPIO_OUTPUT_HIGH)>;
+			enum-name = "GPIO_QI_RESET_L";
+		};
 	};
 
 	unused-pins {
@@ -136,8 +157,7 @@
 		unused-gpios =
 			<&gpioa 7 GPIO_INPUT_PULL_DOWN>,
 			<&gpiob 6 GPIO_INPUT_PULL_DOWN>,
-			<&gpiob 7 GPIO_INPUT_PULL_DOWN>,
-			<&gpiod 4 GPIO_INPUT_PULL_DOWN>,
+			<&gpiod 7 GPIO_INPUT>,
 			<&gpiof 2 GPIO_INPUT_PULL_DOWN>,
 			<&gpiog 0 GPIO_INPUT_PULL_DOWN>,
 			<&gpiog 1 GPIO_INPUT_PULL_DOWN>,
@@ -166,11 +186,36 @@
 	};
 
 	named-i2c-ports {
-		/delete-node/ i2c_ec_i2c_pdc_s_scl_3v3;
+		i2c_ec_i2c_pdc_s_scl_3v3: ec_i2c_pdc_s_scl_3v3 {
+			remote-port = < 0x5 >;
+		};
 		i2c_detachable_base: detachable-base {
-			i2c-port = <&i2c4>;
+			i2c-port = <&i2c5>;
 			enum-names = "I2C_PORT_DETACHABLE_BASE";
 		};
+	};
+	cros-keyscan {
+		compatible = "cros-ec,keyscan";
+		actual-key-mask = <
+			0x08	/* C0 */
+			0xff	/* C1 */
+			0xff	/* C2 */
+			0xff	/* C3 */
+			0xff	/* C4 */
+			0xff	/* C5 */
+			0xff	/* C6 */
+			0xa4	/* C7 */
+			0xff	/* C8 */
+			0xf7	/* C9 */
+			0x55	/* C10 */
+			0xff	/* C11 */
+			0xff	/* C12 */
+			0x40	/* C13 */
+			0x0a	/* C14 */
+			0x40	/* C15 */
+			0xff	/* C16 */
+			0xff	/* C17 */
+		>;
 	};
 };
 
@@ -191,6 +236,12 @@
 		gpio-voltage = "1v8";
 	};
 	i2c4_data_gpe7_default: i2c4_data_gpe7_default {
+		gpio-voltage = "1v8";
+	};
+	i2c5_clk_gpe1_default: i2c5_clk_gpe1_default {
+		gpio-voltage = "1v8";
+	};
+	i2c5_data_gpe2_default: i2c5_data_gpe2_default {
 		gpio-voltage = "1v8";
 	};
 	uart2_rx_gpf0_default {
@@ -218,13 +269,21 @@
 };
 
 &i2c4 {
+	scp8601@41 {
+		compatible = "convenientpower,cps8601";
+		reg = <0x41>;
+		irq-gpios=<&gpiod 4 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+	};
+};
+
+&i2c5 {
 	/delete-node/ ps8747-mux-1@10;
 	/delete-node/ tusb546-mux-0@44;
 	label = "I2C_DETACHABLE_BASE";
 	status = "okay";
 	clock-frequency = <I2C_BITRATE_FAST>;
-	pinctrl-0 = <&i2c4_clk_gpe0_default
-		     &i2c4_data_gpe7_default>;
+	pinctrl-0 = <&i2c5_clk_gpe1_default
+		     &i2c5_data_gpe2_default>;
 	pinctrl-names = "default";
 	prescale-scl-low = <1>;
 
@@ -234,14 +293,14 @@
 
 		reg = <0x56>;
 		max-pressure = <255>;
-		logical-max-x = <2925>;
-		logical-max-y = <1426>;
-		physical-max-x = <929>;
-		physical-max-y = <457>;
+		logical-max-x = <3216>;
+		logical-max-y = <1844>;
+		physical-max-x = <1020>;
+		physical-max-y = <585>;
 
 		/* TODO(b/301380459): allocate pid */
 		vid = <0x18d1>;
-		pid = <0x50ff>;
+		pid = <0x507a>;
 
 		/* Zephyr preferred style for specifying ec_ap_hid_int_odl */
 		irq-gpios = <&gpioi 6 (GPIO_OPEN_DRAIN | GPIO_VOLTAGE_1P8 |

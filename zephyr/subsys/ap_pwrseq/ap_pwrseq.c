@@ -4,6 +4,7 @@
  */
 
 #include "ap_pwrseq_drv_sm.h"
+#include "task.h"
 
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
@@ -209,6 +210,11 @@ DEVICE_DEFINE(ap_pwrseq_dev, "ap_pwrseq_drv", ap_pwrseq_driver_init, NULL,
 	      &ap_pwrseq_task_data, NULL, POST_KERNEL,
 	      CONFIG_APPLICATION_INIT_PRIORITY, NULL);
 
+BUILD_ASSERT(
+	EC_TASK_PRIORITY(EC_TASK_AP_PWRSEQ_PRIO) ==
+		CONFIG_AP_PWRSEQ_THREAD_PRIORITY,
+	"EC_TASK_AP_PWRSEQ_PRIO does not match CONFIG_AP_PWRSEQ_THREAD_PRIORITY.");
+
 K_THREAD_DEFINE(ap_pwrseq_tid, CONFIG_AP_PWRSEQ_STACK_SIZE, ap_pwrseq_thread,
 		DEVICE_GET(ap_pwrseq_dev), NULL, NULL,
 		CONFIG_AP_PWRSEQ_THREAD_PRIORITY, 0, SYS_FOREVER_MS);
@@ -223,6 +229,11 @@ static int ap_pwrseq_driver_init(const struct device *dev)
 	k_event_init(&data->evt);
 
 	return 0;
+}
+
+k_tid_t get_ap_pwrseq_thread(void)
+{
+	return ap_pwrseq_tid;
 }
 
 /**

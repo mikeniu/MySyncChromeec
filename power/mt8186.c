@@ -352,16 +352,6 @@ enum power_state power_chipset_init(void)
 		}
 	} else if (system_get_reset_flags() & EC_RESET_FLAG_AP_OFF) {
 		exit_hard_off = 0;
-	} else if ((system_get_reset_flags() & EC_RESET_FLAG_HIBERNATE) &&
-		   gpio_get_level(GPIO_AC_PRESENT)) {
-		/*
-		 * If AC present, assume this is a wake-up by AC insert.
-		 * Boot EC only.
-		 *
-		 * Note that extpower module is not initialized at this point,
-		 * the only way is to ask GPIO_AC_PRESENT directly.
-		 */
-		exit_hard_off = 0;
 	}
 
 	/* If the init signal state is at S5, assigns it to G3 to match the
@@ -405,6 +395,11 @@ enum power_state power_handle_state(enum power_state state)
 
 	switch (state) {
 	case POWER_G3:
+#if CONFIG_CHARGER_MIN_BAT_PCT_FOR_POWER_ON
+		if (is_exiting_off && !power_is_enough()) {
+			is_exiting_off = false;
+		}
+#endif
 		if (next_state != POWER_G3)
 			return POWER_G3S5;
 		break;

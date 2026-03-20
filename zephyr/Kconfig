@@ -20,6 +20,7 @@ choice RTLIB_IMPLEMENTATION
 endchoice
 
 rsource "app/Kconfig"
+rsource "chip/Kconfig"
 rsource "drivers/Kconfig"
 rsource "emul/Kconfig"
 rsource "fake/Kconfig"
@@ -56,6 +57,8 @@ menuconfig PLATFORM_EC
 
 if PLATFORM_EC
 
+rsource "shim/chip/egis/Kconfig.egis"
+rsource "shim/chip/ft90/Kconfig.ft90"
 rsource "shim/chip/npcx/Kconfig.npcx"
 rsource "shim/chip/mchp/Kconfig.xec"
 rsource "Kconfig.adc"
@@ -66,6 +69,7 @@ rsource "Kconfig.chargesplash"
 rsource "Kconfig.board_version"
 rsource "Kconfig.cbi"
 rsource "Kconfig.cec"
+rsource "Kconfig.cme"
 rsource "Kconfig.console"
 rsource "Kconfig.console_cmd_mem"
 rsource "Kconfig.debug_assert"
@@ -156,6 +160,7 @@ config PLATFORM_EC_BACKLIGHT_LID
 	bool "Control the display backlight based on the lid switch"
 	depends on PLATFORM_EC_HOSTCMD
 	depends on PLATFORM_EC_LID_SWITCH
+	depends on !SOC_FAMILY_INTEL_ISH
 	default y
 	help
 	  Support controlling the display backlight based on the state of the
@@ -448,6 +453,16 @@ config PLATFORM_EC_EXTPOWER_GPIO
 	  project should define a GPIO pin named GPIO_AC_PRESENT, with
 	  extpower_interrupt configured as the handler.
 
+config PLATFORM_EC_EXTPOWER_GPIO_CUSTOM
+	bool "Custom GPIO-based external power detection"
+	depends on PLATFORM_EC_EXTPOWER_GPIO
+	help
+	  Enable custom logic for GPIO-based external power presence
+	  detection. When this is enabled, the board must provide
+	  board_extpower_is_present() which returns the current external
+	  power presence status. This is useful if the AC present signal
+	  is split across multiple GPIOs or requires complex logic.
+
 config PLATFORM_EC_EXTPOWER_DEBOUNCE_MS
 	int "Debounce time for external power signal"
 	default 30
@@ -483,9 +498,18 @@ config PLATFORM_EC_HOOKS
 
 config PLATFORM_EC_HOOK_SECOND
 	bool "Enable the one second period hook"
+	depends on !SOC_FAMILY_INTEL_ISH
 	default y
 	help
 	  Enable support for the one second hook. Disabling the hook save
+	  some memory and CPU time.
+
+config PLATFORM_EC_HOOK_TICK
+	bool "Enable the one tick period hook"
+	depends on !SOC_FAMILY_INTEL_ISH
+	default y
+	help
+	  Enable support for the one tick hook. Disabling the hook save
 	  some memory and CPU time.
 
 menuconfig PLATFORM_EC_HOSTCMD
@@ -532,7 +556,8 @@ config PLATFORM_EC_HOSTCMD_DEBUG_MODE
 choice PLATFORM_EC_HOSTCMD_DEBUG_MODE_CHOICE
 	prompt "Select method to use for HostCmd Debug Mode"
 	depends on PLATFORM_EC_HOSTCMD
-	default HCDEBUG_NORMAL
+	default HCDEBUG_NORMAL if PLATFORM_EC_BRINGUP
+	default HCDEBUG_OFF
 	help
 	  Sets the value of the host command debug mode to use on
 	  startup.
@@ -831,7 +856,7 @@ config PLATFORM_EC_RTC
 DT_CHOSEN_CROS_EC_SHA := cros-ec,sha
 
 config PLATFORM_EC_SHA256_HW_ZEPHYR
-	bool
+	bool "Use Zephyr SHA256 API with HW accelerator"
 	default "$(dt_chosen_enabled,$(DT_CHOSEN_CROS_EC_SHA))"
 	select CRYPTO
 	help
@@ -877,6 +902,7 @@ config PLATFORM_EC_SHA256_UNROLLED
 config PLATFORM_EC_SWITCH
 	bool "Memory mapped switches"
 	depends on PLATFORM_EC_HOSTCMD
+	depends on !SOC_FAMILY_INTEL_ISH
 	default y
 	help
 	  Enable the reporting of the platform switches state to the AP using
@@ -973,6 +999,7 @@ menuconfig PLATFORM_EC_TIMER
 
 config PLATFORM_EC_VBOOT_EFS2
 	bool "EFS2 verified EC boot"
+	depends on !SOC_FAMILY_INTEL_ISH
 	default y if !SOC_POSIX
 	help
 	  Enables Early Firmware Selection v2 (EFS2) verified boot. When booting
@@ -985,6 +1012,7 @@ config PLATFORM_EC_VBOOT_EFS2
 config PLATFORM_EC_VBOOT_HASH
 	bool "Host command: EC_CMD_VBOOT_HASH"
 	depends on PLATFORM_EC_HOSTCMD
+	depends on !SOC_FAMILY_INTEL_ISH
 	default y
 	help
 	  Allows the AP to request hashing functions from the EC.
@@ -1126,5 +1154,17 @@ config PLATFORM_EC_SHARED_MEM_LIBC
 	  Use version of shared memory implementation for applications
 	  that use libc with malloc. Malloc uses the same memory as
 	  shared_mem which can cause collisions if it is not synchronized.
+
+config PLATFORM_EC_WP_CUSTOM
+	bool "Custom Write Protection status"
+	help
+	  Use custom method to get the write protection status via the
+	  write_protect_is_asserted function. If enabled, the
+	  write_protect_is_asserted_custom function has to be provided, which
+	  returns current status of write protection.
+
+	  This is needed for EC based projects that don't have the WP pin
+	  connected via GPIO, e.g. USB FPMCU modules with limited number of
+	  pins in the connector.
 
 endif # PLATFORM_EC

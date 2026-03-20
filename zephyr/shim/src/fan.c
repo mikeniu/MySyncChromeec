@@ -38,6 +38,7 @@ BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT) == 1,
 			DT_NODE_HAS_PROP(node_id, enable_gpio),                \
 			(GPIO_SIGNAL(DT_PHANDLE(node_id, enable_gpio))),       \
 			(GPIO_UNIMPLEMENTED)),                                 \
+		.fan_force_off = DT_PROP(node_id, fan_force_off),              \
 	};                                                                     \
 	const struct fan_rpm node_id##_rpm = {                                 \
 		.rpm_min = DT_PROP(node_id, rpm_min),                          \
@@ -164,9 +165,9 @@ static void fan_adjust_duty(int ch, int rpm_diff, int duty)
 
 	/* Adjust fan duty step by step */
 	if (rpm_diff > 0) {
-		duty = MIN(duty + duty_step, 100);
+		duty = min(duty + duty_step, 100);
 	} else {
-		duty = MAX(duty - duty_step, 1);
+		duty = max(duty - duty_step, 1);
 	}
 
 	fan_set_duty(ch, duty);

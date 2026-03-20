@@ -114,8 +114,23 @@ struct pdc_info_t {
 	char driver_name[USB_PD_CHIP_INFO_DRIVER_NAME_LEN + 1];
 	/** If true, do not apply PDC FW updates to this port */
 	bool no_fw_update;
+	/** True if the PDC hardware supports FRS */
+	bool frs_supported;
 	/** Extra information (optional) */
 	uint16_t extra;
+};
+
+/**
+ * Connector status changes that PDCs can report through vendor defined
+ * interfaces. These events are not supported by GET_CONNECTOR_STATUS.
+ */
+union vendor_status_change_bits_t {
+	struct {
+		/* Set to 1 when PDC reports receiving a PD Alert message */
+		uint32_t alert_received : 1;
+		uint32_t reserved : 31;
+	};
+	uint32_t raw_value;
 };
 
 /**
@@ -242,13 +257,12 @@ typedef int (*pdc_get_info_t)(const struct device *dev, struct pdc_info_t *info,
 			      bool live);
 typedef int (*pdc_get_hw_config_t)(const struct device *dev,
 				   struct pdc_hw_config_t *config);
+typedef bool (*pdc_get_hw_frs_support_t)(const struct device *dev);
 typedef int (*pdc_get_current_pdo_t)(const struct device *dev, uint32_t *pdo);
 typedef int (*pdc_read_power_level_t)(const struct device *dev);
 typedef int (*pdc_set_power_level_t)(const struct device *dev,
 				     enum usb_typec_current_t tcc);
 typedef int (*pdc_reconnect_t)(const struct device *dev);
-typedef int (*pdc_get_current_flash_bank_t)(const struct device *dev,
-					    uint8_t *bank);
 typedef int (*pdc_update_retimer_fw_t)(const struct device *dev, bool enable);
 typedef bool (*pdc_is_init_done_t)(const struct device *dev);
 typedef int (*pdc_get_cable_property_t)(const struct device *dev,
@@ -290,6 +304,10 @@ typedef int (*pdc_set_battery_capability_t)(const struct device *dev,
 typedef int (*pdc_set_battery_status_t)(const struct device *dev,
 					union battery_status_t *bstat);
 typedef int (*pdc_set_bbr_cts_t)(const struct device *dev, bool enable);
+typedef int (*pdc_get_vendor_status_t)(
+	const struct device *dev,
+	union vendor_status_change_bits_t *vendor_status);
+typedef int (*pdc_get_alert_t)(const struct device *dev, uint32_t *ado);
 
 /**
  * @cond INTERNAL_HIDDEN
@@ -321,9 +339,9 @@ __subsystem struct pdc_driver_api {
 	pdc_read_power_level_t read_power_level;
 	pdc_get_info_t get_info;
 	pdc_get_hw_config_t get_hw_config;
+	pdc_get_hw_frs_support_t get_hw_frs_support;
 	pdc_set_power_level_t set_power_level;
 	pdc_reconnect_t reconnect;
-	pdc_get_current_flash_bank_t get_current_flash_bank;
 	pdc_update_retimer_fw_t update_retimer;
 	pdc_get_cable_property_t get_cable_property;
 	pdc_get_vdo_t get_vdo;
@@ -344,6 +362,8 @@ __subsystem struct pdc_driver_api {
 	pdc_set_battery_capability_t set_battery_capability;
 	pdc_set_battery_status_t set_battery_status;
 	pdc_set_bbr_cts_t set_bbr_cts;
+	pdc_get_vendor_status_t get_vendor_status;
+	pdc_get_alert_t get_alert;
 };
 /**
  * @endcond
@@ -878,7 +898,7 @@ static inline int pdc_get_hw_config(const struct device *dev,
 	const struct pdc_driver_api *api =
 		(const struct pdc_driver_api *)dev->api;
 
-	__ASSERT(api->get_hw_config != NULL, "GET_INFO is not optional");
+	__ASSERT(api->get_hw_config != NULL, "GET_HW_CONFIG is not optional");
 
 	return api->get_hw_config(dev, config);
 }
@@ -1009,30 +1029,6 @@ static inline int pdc_reconnect(const struct device *dev)
 	}
 
 	return api->reconnect(dev);
-}
-
-/**
- * @brief Get the current executing PDC flash bank
- * @note CCI Events set
- *           <none>
- *
- * @param dev PDC device structure pointer
- *
- * @retval 0 on API call success
- * @retval -ENOSYS if not implemented
- */
-static inline int pdc_get_current_flash_bank(const struct device *dev,
-					     uint8_t *bank)
-{
-	const struct pdc_driver_api *api =
-		(const struct pdc_driver_api *)dev->api;
-
-	/* This is an optional feature, so it might not be implemented */
-	if (api->get_current_flash_bank == NULL) {
-		return -ENOSYS;
-	}
-
-	return api->get_current_flash_bank(dev, bank);
 }
 
 /**
@@ -1479,6 +1475,24 @@ static inline int pdc_set_frs(const struct device *dev, bool enable)
 }
 
 /**
+ * @brief Get whether or not the PDC supports FRS.
+ *
+ * @param dev Pointer to the PDC device instance
+ * @param config Pointer to the PDC hardware configuration structure
+ * @return true if the PDC supports FRS, false otherwise.
+ */
+static inline bool pdc_get_frs_supported(const struct device *dev)
+{
+	const struct pdc_driver_api *api =
+		(const struct pdc_driver_api *)dev->api;
+
+	__ASSERT(api->get_hw_frs_support != NULL,
+		 "GET_FRS_SUPPORTED is not optional");
+
+	return api->get_hw_frs_support(dev);
+}
+
+/**
  * @brief UCSI command to request an Attention VDO received from the partner
  * @param dev PDC device structure pointer
  * @param get_attention_vdo_t pointer where the GET_ATTENTION_VDO response is
@@ -1619,6 +1633,34 @@ static inline int pdc_set_bbr_cts(const struct device *dev, bool enable)
 	}
 
 	return api->set_bbr_cts(dev, enable);
+}
+
+static inline int
+pdc_get_vendor_status(const struct device *dev,
+		      union vendor_status_change_bits_t *vendor_status)
+{
+	const struct pdc_driver_api *api =
+		(const struct pdc_driver_api *)dev->api;
+
+	/* This is an optional feature, so it might not be implemented */
+	if (api->get_vendor_status == NULL) {
+		return -ENOSYS;
+	}
+
+	return api->get_vendor_status(dev, vendor_status);
+}
+
+static inline int pdc_get_alert(const struct device *dev, uint32_t *ado)
+{
+	const struct pdc_driver_api *api =
+		(const struct pdc_driver_api *)dev->api;
+
+	/* This is an optional feature, so it might not be implemented */
+	if (api->get_alert == NULL) {
+		return -ENOSYS;
+	}
+
+	return api->get_alert(dev, ado);
 }
 
 #ifdef __cplusplus

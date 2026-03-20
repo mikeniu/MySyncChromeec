@@ -44,8 +44,7 @@ if(DEFINED CONFIG_PLATFORM_EC AND EXISTS "${EDT_PICKLE}")
     message(FATAL_ERROR "led_policy.py failed with return code: ${ret}")
   endif()
 
-  if(NOT DEFINED CONFIG_PLATFORM_EC_DETACHABLE_BASE AND
-    NOT DEFINED CONFIG_FINGERPRINT_SENSOR AND
+  if(NOT DEFINED CONFIG_FINGERPRINT_SENSOR AND
     DEFINED CONFIG_PLATFORM_EC_I2C)
 
     message(STATUS "Generating component manifest file")
@@ -54,6 +53,7 @@ if(DEFINED CONFIG_PLATFORM_EC AND EXISTS "${EDT_PICKLE}")
       --zephyr-base ${ZEPHYR_BASE}
       --edt-pickle ${EDT_PICKLE}
       --manifest-file "${CMAKE_BINARY_DIR}/zephyr/component_manifest.json"
+      --cme-version ${CONFIG_PLATFORM_EC_CME_VERSION}
       ${EXTRA_EC_VERSION_FLAGS_LIST}
     )
     execute_process(COMMAND ${CMD_CME} RESULT_VARIABLE ret)
@@ -165,7 +165,6 @@ cros_ec_library_include_directories(include)
 if (DEFINED CONFIG_PLATFORM_EC)
   cros_ec_library_include_directories(
     "${PLATFORM_EC}/zephyr/shim/include"
-    "${PLATFORM_EC}/fuzz"
     "${PLATFORM_EC}/test"
     "${PLATFORM_EC}"
     "${PLATFORM_EC}/include"
@@ -247,8 +246,14 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ACCEL_FIFO
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_AMD_STB_DUMP
                                                 "${PLATFORM_EC}/driver/amd_stb.c")
 # On body detection implementation
+if(CONFIG_PLATFORM_EC_DSP_REMOTE_BODY_DETECTION AND NOT CONFIG_PLATFORM_EC_BODY_DETECTION)
+   zephyr_library_sources("${PLATFORM_EC}/common/body_detect_client.c")
+endif()
+
 zephyr_library_sources_ifdef(CONFIG_BODY_DETECTION_ALOGIRTHM_V1
-                                                "${PLATFORM_EC}/common/body_detection.c")
+                                                "${PLATFORM_EC}/common/body_detection.c"
+                                                "${PLATFORM_EC}/common/body_detect_client.c"
+                                                "${PLATFORM_EC}/common/body_detect_common.c")
 zephyr_library_link_libraries_ifdef(CONFIG_BODY_DETECTION_ALOGIRTHM_V2
                                                 vsensor.body_detection)
 
@@ -272,10 +277,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_DETACHABLE_BASE
                                                 "${PLATFORM_EC}/common/base_state.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY
                                                 "${PLATFORM_EC}/common/battery.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY_V1
-                                                "${PLATFORM_EC}/common/battery_v1.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY_V2
-                                                "${PLATFORM_EC}/common/battery_v2.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY_INFO
+                                                "${PLATFORM_EC}/common/battery_info.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY_FUEL_GAUGE
                                                 "${PLATFORM_EC}/common/battery_fuel_gauge.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY_SMART
@@ -304,6 +307,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_BQ25720
                                                 "${PLATFORM_EC}/driver/charger/bq25710.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_BQ25770
                                                 "${PLATFORM_EC}/driver/charger/bq25710.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_RT9478
+                                                "${PLATFORM_EC}/driver/charger/rt9478.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_RT9490
                                                 "${PLATFORM_EC}/driver/charger/rt9490.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_SM5803
@@ -322,6 +327,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGE_RAMP_SW
                                                 "${PLATFORM_EC}/common/charge_ramp_sw.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CPS8100
                                                 "${PLATFORM_EC}/driver/wpc/cps8100.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CTN730
+                                                "${PLATFORM_EC}/driver/nfc/ctn730.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CURVE25519
                                                 "${PLATFORM_EC}/third_party/boringssl/common/curve25519.c")
 if (NOT DEFINED CONFIG_CPU_CORTEX_M0)
@@ -381,7 +388,13 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FINGERPRINT
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_auth_crypto_stateless.cc"
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_detect_strings.cc"
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_utils.cc"
+						"${PLATFORM_EC}/common/fpsensor/fpsensor_vendor_command.cc"
+            "${PLATFORM_EC}/common/fpsensor/fpsensor_frame_size.cc"
 						"${PLATFORM_EC}/crypto/elliptic_curve_key.cc")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FINGERPRINT_AUTH_METHOD_HANDSHAKE
+						"${PLATFORM_EC}/common/fpsensor/fpsensor_auth_handshake.cc")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FINGERPRINT_AUTH_METHOD_ASCP
+						"${PLATFORM_EC}/common/fpsensor/fpsensor_auth_ascp.cc")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
                                                 "${PLATFORM_EC}/common/host_command.c")
 if (NOT DEFINED CONFIG_EC_HOST_CMD)
@@ -422,6 +435,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_RGB_KEYBOARD
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_8042
                                                 "${PLATFORM_EC}/common/keyboard_8042.c"
                                                 "${PLATFORM_EC}/common/keyboard_8042_sharedlib.c")
+zephyr_library_sources_ifdef(CONFIG_KEYBOARD_FN_KEYS
+						"${PLATFORM_EC}/common/keyboard_8042_fn.c")
 zephyr_library_sources_ifdef(CONFIG_MKBP_PROTOCOL
                                                 "${PLATFORM_EC}/common/mkbp_fifo.c"
                                                 "${PLATFORM_EC}/common/mkbp_info.c")
@@ -444,8 +459,9 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LED_ONOFF_STATES
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LID_ANGLE
                                                 "${PLATFORM_EC}/common/motion_lid.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LID_ANGLE_UPDATE
-                                                "${PLATFORM_EC}/common/lid_angle_common.c"
                                                 "${PLATFORM_EC}/common/lid_angle.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LID_ANGLE_UPDATE_KEYBOARD_POLICY
+                                                "${PLATFORM_EC}/common/lid_angle_keyboard_policy.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LID_SWITCH
                                                 "${PLATFORM_EC}/common/lid_switch.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MKBP_EVENT
@@ -548,6 +564,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TEMP_SENSOR_TMP112
                                                 "${PLATFORM_EC}/driver/temp_sensor/tmp112.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TEMP_SENSOR_F75303
                                                 "${PLATFORM_EC}/driver/temp_sensor/f75303.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TEMP_SENSOR_APL6012
+                                                "${PLATFORM_EC}/driver/temp_sensor/apl6012.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_THROTTLE_AP
                                                 "${PLATFORM_EC}/common/throttle_ap.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TIMER
@@ -586,6 +604,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_CONTROLLER
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TOUCHPAD_ELAN
                                                 "${PLATFORM_EC}/driver/touchpad_elan.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TOUCHPAD_FOCAL
+                                                "${PLATFORM_EC}/driver/touchpad_focal.c")
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CONSOLE_CMD_CHARGEN
                                                 "${PLATFORM_EC}/common/chargen.c")
@@ -730,8 +750,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MAX695X_SEVEN_SEGMENT_DISPLAY
 						"${PLATFORM_EC}/driver/led/max695x.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LED_DRIVER_TLC59116F
                                                 "${PLATFORM_EC}/driver/led/tlc59116f.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SYSTEM_SAFE_MODE
-                                                "${PLATFORM_EC}/common/system_safe_mode.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOST_COMMAND_MEMORY_DUMP
                                                 "${PLATFORM_EC}/common/host_command_memory_dump.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_AP_HANG_DETECT

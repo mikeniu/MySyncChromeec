@@ -91,10 +91,6 @@ LOG_MODULE_REGISTER(tps6699x, CONFIG_USBC_LOG_LEVEL);
  */
 #define NUM_PDC_TPS6699X_PORTS DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT)
 
-/* TODO: b/323371550 */
-BUILD_ASSERT(NUM_PDC_TPS6699X_PORTS <= 2,
-	     "tps6699x driver supports a maximum of 2 ports");
-
 /* Make sure pdc_info_t::project_name has enough space for the config identifier
  * string stored in the customer-use register plus a NUL-terminator byte.
  */
@@ -223,6 +219,8 @@ struct pdc_config_t {
 	bool no_fw_update;
 	/** Whether or not this port supports CCD */
 	bool ccd;
+	/** Whether or not this port supports FRS */
+	bool frs_supported;
 	/** The index of the port on chip */
 	uint8_t port_index_on_chip;
 };
@@ -378,9 +376,12 @@ static void task_dbfg(struct pdc_data_t *data);
 static void task_aneg(struct pdc_data_t *data);
 static void task_disc(struct pdc_data_t *data);
 static void task_sbud(struct pdc_data_t *data);
+static void task_swdf(struct pdc_data_t *data);
+static void task_swuf(struct pdc_data_t *data);
 static void task_ucsi(struct pdc_data_t *data,
 		      enum ucsi_command_t ucsi_command);
 static void task_raw_ucsi(struct pdc_data_t *data);
+
 static int pdc_autonegotiate_sink_reset(struct pdc_data_t *data);
 static void tps_check_and_notify_irq(void);
 
@@ -465,9 +466,13 @@ static bool check_comms_suspended(void)
 static void print_current_state(struct pdc_data_t *data)
 {
 	struct pdc_config_t const *cfg = data->dev->config;
+	enum state_t s = get_state(data);
 
-	LOG_INF("TI%d: %s", cfg->connector_number,
-		state_names[get_state(data)]);
+	if (s == ST_IDLE || s == ST_TASK_WAIT) {
+		LOG_DBG("TI%d: %s", cfg->connector_number, state_names[s]);
+	} else {
+		LOG_INF("TI%d: %s", cfg->connector_number, state_names[s]);
+	}
 }
 
 static void call_cci_event_cb(struct pdc_data_t *data)
@@ -1147,7 +1152,7 @@ static void cmd_set_drs(struct pdc_data_t *data)
 	/*
 	 * Either uor.swap_to_dfp or uor.swap_to_ufp should be set. Having both
 	 * set is not allowed per the UCSI spec. SET_UOR can't be sent directly
-	 * as a UCSI command for two reasons.
+	 * as a UCSI command for a few reasons.
 	 *  1. If a hard reset occurs while the port is in a SNK power role then
 	 *     there is no mechanism to trigger a data role swap to the desired
 	 *     data role. Setting initiate_swap_to_dfp|ufp instructs the PDC to
@@ -1158,6 +1163,11 @@ static void cmd_set_drs(struct pdc_data_t *data)
 	 *     if the data role is DFP, then the TI PDC will clear the data role
 	 *     capable bit in the SRC/SNK CAP which then causes issues with
 	 *     complicance test TD 4.11.1
+	 *
+	 *  3. It doesn't update the "initiate_swap_to_dfp" or
+	 *     "initiate_swap_to_ufp" bits in the port control register which
+	 *     cause the PDC to revert data role swaps if the port control
+	 *     register conflicts with the SET_UOR command.
 	 *
 	 * So SET_UOR is instead mapped to the port control register which
 	 * provides the required control for data role swaps while still
@@ -1184,13 +1194,12 @@ static void cmd_set_drs(struct pdc_data_t *data)
 		goto error_recovery;
 	}
 
-	/* Command has completed */
-	data->cci_event.command_completed = 1;
-	/* Inform the system of the event */
-	call_cci_event_cb(data);
+	/* Start DR Swap task. */
+	if (data->uor.swap_to_dfp)
+		task_swdf(data);
+	else
+		task_swuf(data);
 
-	/* Transition to idle state */
-	set_state(data, ST_IDLE);
 	return;
 
 error_recovery:
@@ -1465,7 +1474,7 @@ static void cmd_set_rdo(struct pdc_data_t *data)
 		an_min_power = PDO_BATT_MAX_POWER(pdo) / 1000 / 250;
 	} else {
 		an_max_v = an_min_v = PDO_FIXED_VOLTAGE(pdo) / 50;
-		an_max_a = MIN(CONFIG_PLATFORM_EC_USB_PD_MAX_CURRENT_MA,
+		an_max_a = min(CONFIG_PLATFORM_EC_USB_PD_MAX_CURRENT_MA,
 			       PDO_FIXED_CURRENT(pdo)) /
 			   10;
 		an_min_power = (an_max_v * an_max_a) / 500;
@@ -1627,6 +1636,7 @@ static int cmd_get_ic_status_sync_internal(const struct pdc_config_t *cfg,
 	union reg_tx_identity tx_identity;
 	union reg_customer_use customer_val;
 	union reg_mode mode_reg;
+	union reg_boot_flags pdc_boot_flags;
 	int rv;
 
 	if (info == NULL) {
@@ -1676,7 +1686,13 @@ static int cmd_get_ic_status_sync_internal(const struct pdc_config_t *cfg,
 	info->pid = *(uint16_t *)tx_identity.product_id;
 
 	/* TI Running flash bank offset */
-	info->running_in_flash_bank = 0;
+	rv = tps_rd_boot_flags(&cfg->i2c, &pdc_boot_flags);
+	if (rv) {
+		LOG_ERR("TI%d: Read boot flags failed (%d)",
+			cfg->connector_number, rv);
+		return rv;
+	}
+	info->running_in_flash_bank = pdc_boot_flags.active_bank;
 
 	/* TI PD Revision (big-endian) */
 	info->pd_revision = 0x0000;
@@ -1706,6 +1722,7 @@ static int cmd_get_ic_status_sync_internal(const struct pdc_config_t *cfg,
 	info->driver_name[sizeof(info->driver_name) - 1] = '\0';
 
 	info->no_fw_update = cfg->no_fw_update;
+	info->frs_supported = cfg->frs_supported;
 
 	return 0;
 }
@@ -2099,6 +2116,36 @@ static void task_disc(struct pdc_data_t *data)
 	return;
 }
 
+static void task_swdf(struct pdc_data_t *data)
+{
+	struct pdc_config_t const *cfg = data->dev->config;
+	int rv;
+
+	rv = write_task_cmd(cfg, COMMAND_TASK_SWDF, NULL);
+	if (rv) {
+		set_state(data, ST_ERROR_RECOVERY);
+		return;
+	}
+
+	set_state(data, ST_TASK_WAIT);
+	return;
+}
+
+static void task_swuf(struct pdc_data_t *data)
+{
+	struct pdc_config_t const *cfg = data->dev->config;
+	int rv;
+
+	rv = write_task_cmd(cfg, COMMAND_TASK_SWUF, NULL);
+	if (rv) {
+		set_state(data, ST_ERROR_RECOVERY);
+		return;
+	}
+
+	set_state(data, ST_TASK_WAIT);
+	return;
+}
+
 static void task_ucsi(struct pdc_data_t *data, enum ucsi_command_t ucsi_command)
 {
 	struct pdc_config_t const *cfg = data->dev->config;
@@ -2358,6 +2405,10 @@ static enum smf_state_result st_task_wait_run(void *o)
 		offset = 1;
 		len = sizeof(union cable_property_t);
 		break;
+	case UCSI_GET_CURRENT_CAM:
+		offset = 1;
+		len = sizeof(uint32_t);
+		break;
 	case UCSI_GET_ALTERNATE_MODES:
 	case UCSI_GET_ERROR_STATUS:
 		offset = 2;
@@ -2372,6 +2423,25 @@ static enum smf_state_result st_task_wait_run(void *o)
 		}
 		break;
 	}
+	case UCSI_GET_PD_MESSAGE:
+		offset = 2;
+		union get_pd_message_t get_pd_message_cmd;
+		memcpy(&get_pd_message_cmd,
+		       &data->raw_ucsi_cmd_data.data[offset],
+		       sizeof(union get_pd_message_t));
+		switch (get_pd_message_cmd.response_message_type) {
+		case GET_PD_MESSAGE_DISC_ID:
+			len = sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT;
+			break;
+		case GET_PD_MESSAGE_REVISION:
+			len = sizeof(uint32_t);
+			break;
+		default:
+			/* Unsupported GET_PD_MESSAGE command */
+			offset = 0;
+			len = 0;
+		}
+		break;
 	default:
 		/* No data for this command */
 		len = 0;
@@ -2757,6 +2827,14 @@ static int tps_get_hw_config(const struct device *dev,
 	return 0;
 }
 
+static bool tps_get_hw_frs_support(const struct device *dev)
+{
+	const struct pdc_config_t *cfg =
+		(const struct pdc_config_t *)dev->config;
+
+	return cfg->frs_supported;
+}
+
 static int tps_get_vbus_voltage(const struct device *dev, uint16_t *voltage)
 {
 	if (voltage == NULL) {
@@ -2823,25 +2901,6 @@ static int tps_get_current_pdo(const struct device *dev, uint32_t *pdo)
 static int tps_is_vconn_sourcing(const struct device *dev, bool *vconn_sourcing)
 {
 	return tps_post_command(dev, CMD_IS_VCONN_SOURCING, vconn_sourcing);
-}
-
-static int tps_get_current_flash_bank(const struct device *dev, uint8_t *bank)
-{
-	const struct pdc_config_t *cfg =
-		(const struct pdc_config_t *)dev->config;
-	union reg_boot_flags pdc_boot_flags;
-	int rv;
-
-	rv = tps_rd_boot_flags(&cfg->i2c, &pdc_boot_flags);
-	if (rv) {
-		LOG_ERR("TI%d: Read boot flags failed (%d)",
-			cfg->connector_number, rv);
-		*bank = 0xff;
-		return rv;
-	}
-
-	*bank = pdc_boot_flags.active_bank;
-	return 0;
 }
 
 static int tps_get_cable_property(const struct device *dev,
@@ -2986,6 +3045,18 @@ static int tps_execute_ucsi_cmd(const struct device *dev, uint8_t ucsi_command,
 	enum cmd_t cmd = CMD_RAW_UCSI;
 	int port_index_on_chip_byte_index;
 
+	/* The OS will send SET_UOR to request a data role swap. Sending SET_UOR
+	 * to the PDC will not clear the "initiate swap to DFP" bit, causing the
+	 * data role swap to immediately reverse. Intercept SET_UOR here and
+	 * call tps_set_uor() to issue a data role swap based on CMD_SET_DRS.
+	 */
+	if (ucsi_command == UCSI_SET_UOR) {
+		union uor_t uor;
+
+		memcpy(&uor, command_specific, sizeof(union uor_t));
+		return tps_set_uor(dev, uor);
+	}
+
 	memset(cmd_data.data, 0, sizeof(cmd_data.data));
 	/* Byte 0: UCSI Command Code */
 	cmd_data.data[0] = ucsi_command;
@@ -3042,6 +3113,7 @@ static DEVICE_API(pdc, pdc_driver_api) = {
 	.read_power_level = tps_read_power_level,
 	.get_info = tps_get_info,
 	.get_hw_config = tps_get_hw_config,
+	.get_hw_frs_support = tps_get_hw_frs_support,
 	.set_power_level = tps_set_power_level,
 	.reconnect = tps_reconnect,
 	.get_cable_property = tps_get_cable_property,
@@ -3052,7 +3124,6 @@ static DEVICE_API(pdc, pdc_driver_api) = {
 	.set_comms_state = tps_set_comms_state,
 	.get_pch_data_status = tps_get_pch_data_status,
 	.is_vconn_sourcing = tps_is_vconn_sourcing,
-	.get_current_flash_bank = tps_get_current_flash_bank,
 	.update_retimer = tps_update_retimer_mode,
 	.execute_ucsi_cmd = tps_execute_ucsi_cmd,
 	.set_frs = tps_set_fast_role_swap,
@@ -3157,7 +3228,7 @@ static void tps_check_and_notify_irq(void)
 		cfg = data->dev->config;
 
 		if (!gpio_pin_get_dt(&cfg->irq_gpios)) {
-			break;
+			continue;
 		}
 
 		/* Read the pending interrupt events */
@@ -3214,6 +3285,11 @@ static void tps_thread(void *dev, void *unused1, void *unused2)
 
 #define PDC_DATA_STRUCT_NAME(inst) pdc_data_##inst
 
+BUILD_ASSERT(
+	EC_TASK_PRIORITY(EC_TASK_USBC_PDC_PRIO) ==
+		CONFIG_USBC_PDC_TPS6699X_THREAD_PRIORITY,
+	"EC_TASK_USBC_PDC_PRIO does not match USBC_PDC_TPS6699X_THREAD_PRIORITY.");
+
 #define TPS6699X_PDC_DEFINE(inst)                                              \
 	K_THREAD_STACK_DEFINE(tps6699x_thread_stack_area_##inst,               \
 			      CONFIG_USBC_PDC_TPS6699X_STACK_SIZE);            \
@@ -3262,6 +3338,7 @@ static void tps_thread(void *dev, void *unused1, void *unused2)
 		.create_thread = create_thread_##inst,                         \
 		.no_fw_update = DT_INST_PROP(inst, no_fw_update),              \
 		.ccd = DT_INST_PROP(inst, ccd),                                \
+		.frs_supported = DT_INST_PROP(inst, frs_supported),            \
 		.port_index_on_chip = DT_INST_PROP(inst, port_index_on_chip),  \
 	};                                                                     \
                                                                                \

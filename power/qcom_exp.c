@@ -22,6 +22,7 @@
  *  - If POWER_GOOD is dropped by the AP, then we power the AP off
  */
 
+#include "battery.h"
 #include "builtin/assert.h"
 #include "chipset.h"
 #include "common.h"
@@ -67,6 +68,7 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 /* Masks for power signals */
 #define IN_POWER_GOOD POWER_SIGNAL_MASK(QC_EXP_POWER_GOOD)
 #define IN_AP_RST_ASSERTED POWER_SIGNAL_MASK(QC_EXP_AP_RST_ASSERTED)
+#define IN_AP_PS_HOLD_DEASSERTED POWER_SIGNAL_MASK(QC_EXP_PS_HOLD)
 #define IN_SUSPEND POWER_SIGNAL_MASK(QC_EXP_AP_SUSPEND)
 
 /* Long power key press to force shutdown */
@@ -97,7 +99,7 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 /* Wait for polling the AP on signal */
 #define PMIC_POWER_AP_WAIT (1 * MSEC)
 
-/* The length of an issued low pulse to the PMIC_RESIN_L signal */
+/* The length of an issued low pulse to the PMIC_RESIN signal */
 #define PMIC_RESIN_PULSE_LENGTH (20 * MSEC)
 
 /* The timeout of the check if the system can boot AP */
@@ -107,10 +109,16 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 #define CAN_BOOT_AP_CHECK_WAIT (200 * MSEC)
 
 /* The timeout of the check if the switchcap outputs good voltage */
-#define SWITCHCAP_PG_CHECK_TIMEOUT (100 * MSEC)
+#define SWITCHCAP_PG_CHECK_TIMEOUT (800 * MSEC)
 
 /* Wait for polling if the switchcap outputs good voltage */
 #define SWITCHCAP_PG_CHECK_WAIT (6 * MSEC)
+
+/* The timeout of the check if the switchcap outputs reset voltage */
+#define SWITCHCAP_RESET_TIMEOUT (2000 * MSEC)
+
+/* Wait for polling if the switchcap outputs reset voltage */
+#define SWITCHCAP_RESET_CHECK_WAIT (6 * MSEC)
 
 /*
  * Delay between power-on the system and power-on the PMIC.
@@ -143,6 +151,19 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
  */
 #define AP_RST_TRANSITION_TIMEOUT (450 * MSEC)
 
+/*
+ * Duration to disable the AC_PRESENT interrupt to ignore the
+ * spurious toggle from the switchcap turning on/off.
+ * Based on o-scope measurements showing a ~500ms event.
+ */
+#define AC_IRQ_DISABLE_DURATION (2000 * MSEC)
+
+/* Heartbeat wake interval (45 minutes) */
+#define HEARTBEAT_WAKE_INTERVAL_SEC (45 * 60)
+
+/* Value to indicate an invalid or uninitialized SoC. */
+#define BATTERY_BAD_STATE_OF_CHARGE -1
+
 /* TODO(crosbug.com/p/25047): move to HOOK_POWER_BUTTON_CHANGE */
 /* 1 if the power button was pressed last time we checked */
 static char power_button_was_pressed;
@@ -152,6 +173,12 @@ static char lid_opened;
 
 /* 1 if ac-on event has been detected */
 static char ac_on;
+
+/* 1 if rtc-wake event has been detected */
+static char rtc_wake;
+
+/* 1 if the system is currently in the off-mode charging heartbeat state. */
+static char heartbeat_mode;
 
 /* Time where we will power off, if power button still held down */
 static timestamp_t power_off_deadline;
@@ -168,6 +195,26 @@ static char long_warm_reset;
  */
 static enum power_state power_state_before_warm_reset;
 
+#ifdef CONFIG_ZEPHYR
+static void qcom_rtc_set_host_event(void)
+{
+	host_set_single_event(EC_HOST_EVENT_RTC);
+}
+DECLARE_DEFERRED(qcom_rtc_set_host_event);
+
+void rtc_callback(const struct device *dev)
+{
+	ARG_UNUSED(dev);
+
+	hook_call_deferred(&qcom_rtc_set_host_event_data, 0);
+
+	if (chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
+		rtc_wake = 1;
+		task_wake(TASK_ID_CHIPSET);
+	}
+}
+#endif
+
 enum power_request_t {
 	POWER_REQ_NONE,
 	POWER_REQ_OFF,
@@ -182,6 +229,19 @@ enum power_request_t {
 
 static enum power_request_t power_request;
 
+/* Store the power-on reason */
+static enum power_on_event_t power_on_reason;
+
+/**
+ * Get the reason why the chipset was powered on.
+ *
+ * @return the power-on reason, uses the POWER_ON_BY_* enum
+ */
+enum power_on_event_t chipset_get_power_on_reason(void)
+{
+	return power_on_reason;
+}
+
 /**
  * Return values for check_for_power_off_event().
  */
@@ -195,22 +255,6 @@ enum power_off_event_t {
 	POWER_OFF_BY_POWER_REQ_RESET,
 
 	POWER_OFF_EVENT_COUNT,
-};
-
-/**
- * Return values for check_for_power_on_event().
- */
-enum power_on_event_t {
-	POWER_ON_CANCEL,
-	POWER_ON_BY_AUTO_POWER_ON,
-	POWER_ON_BY_AC_ON,
-	POWER_ON_BY_LID_OPEN,
-	POWER_ON_BY_LONG_WARM_RESET,
-	POWER_ON_BY_POWER_BUTTON_PRESSED,
-	POWER_ON_BY_POWER_REQ_ON,
-	POWER_ON_BY_POWER_REQ_RESET,
-
-	POWER_ON_EVENT_COUNT,
 };
 
 #ifdef CONFIG_CHIPSET_RESET_HOOK
@@ -284,10 +328,6 @@ DECLARE_HOOK(HOOK_POWER_BUTTON_CHANGE, powerbtn_changed, HOOK_PRIO_DEFAULT);
 
 static void power_ac_changed(void)
 {
-#ifdef CONFIG_PLATFORM_EC_PMIC_PASSTHRU_POWER_SIGNALS
-	if (!chipset_in_state(CHIPSET_STATE_HARD_OFF))
-		passthru_ac_on_to_pmic();
-#endif
 	/* Power task only cares when the external power is connected */
 	if (!extpower_is_present())
 		return;
@@ -297,6 +337,46 @@ static void power_ac_changed(void)
 	task_wake(TASK_ID_CHIPSET);
 }
 DECLARE_HOOK(HOOK_AC_CHANGE, power_ac_changed, HOOK_PRIO_DEFAULT);
+
+#ifdef CONFIG_PLATFORM_EC_HOSTCMD_ENABLE_OFFMODE_HEARTBEAT
+static enum ec_status
+host_command_offmode_charing_active(struct host_cmd_handler_args *args)
+{
+	/*
+	 * Set the flag to indicate we are entering the off-mode charging state.
+	 */
+	heartbeat_mode = 1;
+
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_ENABLE_OFFMODE_HEARTBEAT,
+		     host_command_offmode_charing_active, EC_VER_MASK(0));
+#endif
+
+/*
+ * On chipset shutdown complete, if we are in heartbeat mode, set an RTC alarm
+ * to wake up the EC for periodic charging checks.
+ */
+void board_chipset_set_heartbeat_alarm_on_shutdown(void)
+{
+	if (heartbeat_mode) {
+		/* Move heart beat to RTC alarm based wake (45min) */
+		system_set_rtc_alarm(HEARTBEAT_WAKE_INTERVAL_SEC, 0);
+		heartbeat_mode = 0;
+	}
+}
+DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN_COMPLETE,
+	     board_chipset_set_heartbeat_alarm_on_shutdown, HOOK_PRIO_DEFAULT);
+
+/*
+ * Clear the heartbeat RTC alarm on power-on to prevent re-triggering.
+ */
+void board_chipset_clear_heartbeat_alarm_on_poweron(void)
+{
+	system_set_rtc_alarm(EC_RTC_ALARM_CLEAR, 0);
+}
+DECLARE_HOOK(HOOK_CHIPSET_PRE_INIT,
+	     board_chipset_clear_heartbeat_alarm_on_poweron, HOOK_PRIO_DEFAULT);
 
 /**
  * Wait the switchcap GPIO0 PVC_PG signal asserted.
@@ -335,6 +415,27 @@ static int wait_switchcap_power_good(int enable)
 		return EC_ERROR_UNKNOWN;
 	}
 	return EC_SUCCESS;
+}
+
+/**
+ * Wait for the switchcap to reset to init state.
+ */
+static void wait_switchcap_power_reset(void)
+{
+	timestamp_t poll_deadline;
+
+	poll_deadline = get_time();
+	poll_deadline.val += SWITCHCAP_RESET_TIMEOUT;
+	while (!board_is_switchcap_power_reset() &&
+	       get_time().val < poll_deadline.val) {
+		crec_usleep(SWITCHCAP_RESET_CHECK_WAIT);
+	}
+
+	if (board_is_switchcap_power_reset()) {
+		CPRINTS("SWITCHCAP IS RESET!");
+	} else {
+		CPRINTS("SWITCHCAP NOT RESET!");
+	}
 }
 
 /**
@@ -452,6 +553,37 @@ void chipset_sys_rst_interrupt(enum gpio_signal signal)
 	}
 }
 
+/*
+ * Re-enables the AC interrupt after the "ignore" period and processes
+ * any settled state change.
+ */
+void notify_ac_irq_re_enable_and_check(void)
+{
+	/* Re-enable the AC interrupt */
+	extpower_enable_interrupt();
+
+	/*
+	 * Manually invoke the handler to process any genuine AC state
+	 * changes that may have occurred while the interrupt was
+	 * disabled. This synchronizes the system to the settled state.
+	 */
+	extpower_interrupt(GPIO_SIGNAL_ANY);
+}
+DECLARE_DEFERRED(notify_ac_irq_re_enable_and_check);
+
+/*
+ * Disables the AC interrupt to ignore the spurious toggle from the
+ * switchcap and schedules a deferred task to re-enable it.
+ */
+void start_ac_filter_window(void)
+{
+	/* Disable AC_PRESENT interrupt */
+	extpower_disable_interrupt();
+	/* Schedule the interrupt to be re-enabled after the event passes */
+	hook_call_deferred(&notify_ac_irq_re_enable_and_check_data,
+			   AC_IRQ_DISABLE_DURATION);
+}
+
 /**
  * Set the state of the system power signals but without any check.
  *
@@ -463,6 +595,18 @@ void chipset_sys_rst_interrupt(enum gpio_signal signal)
 static void set_system_power_no_check(int enable)
 {
 	board_set_switchcap_power(enable);
+}
+
+/**
+ * Initialize the System SwitchCap power.
+ *
+ * The system power signals are the enable pins of SwitchCap.
+ * The switchcap needs to be in the reset state during initialization.
+ */
+static void system_reset_switchcap_power(void)
+{
+	set_system_power_no_check(0);
+	wait_switchcap_power_reset();
 }
 
 /**
@@ -509,11 +653,11 @@ static int set_pmic_pwron(int enable, uint8_t event)
 
 	CPRINTS("%s(%d)", __func__, enable);
 
+	start_ac_filter_window();
+
 	/* Check the PMIC/AP power state */
 	if (enable == is_pmic_pwron())
 		return EC_SUCCESS;
-
-	/* TODO: b/420351157 confirm if PMIC is powered can be checked or not */
 
 	/*
 	 * Power-on sequence:
@@ -525,29 +669,30 @@ static int set_pmic_pwron(int enable, uint8_t event)
 	 * 4. Release PMIC_KPD_PWR
 	 *
 	 * Power-off sequence:
-	 * 1. Hold PMIC_KPD_PWR and PMIC_RESIN_L high, which is a power-off
+	 * 1. Hold PMIC_KPD_PWR and PMIC_RESIN high, which is a power-off
 	 *    trigger (requiring reprogramming PMIC registers to make
-	 *    PMIC_KPD_PWR + PMIC_RESIN_L as a shutdown trigger)
+	 *    PMIC_KPD_PWR + PMIC_RESIN as a shutdown trigger)
 	 * 2. PMIC stops supplying power to POWER_GOOD (This requires
 	 *    reprogramming the PMIC to set the stage-1 reset timer to 0
 	 *    and the stage-2 reset timer to 10ms for debouncing)
-	 * 3. Release PMIC_KPD_PWR and PMIC_RESIN_L
+	 * 3. Release PMIC_KPD_PWR and PMIC_RESIN
 	 *
 	 * If the above PMIC registers not programmed or programmed wrong, it
 	 * falls back to the next functions, which cuts off the system power.
 	 */
 
-	if (enable && event == POWER_ON_BY_AC_ON) {
+	if (enable &&
+	    (event == POWER_ON_BY_AC_ON || event == POWER_ON_BY_RTC_ALARM)) {
 		passthru_ac_on_to_pmic();
 		ret = wait_pmic_pwron(enable, PMIC_POWER_AP_RESPONSE_TIMEOUT);
 	} else {
 		gpio_set_level(GPIO_PMIC_KPD_PWR, 1);
 		if (!enable)
-			gpio_set_level(GPIO_PMIC_RESIN_L, 1);
+			gpio_set_level(GPIO_PMIC_RESIN, 1);
 		ret = wait_pmic_pwron(enable, PMIC_POWER_AP_RESPONSE_TIMEOUT);
 		gpio_set_level(GPIO_PMIC_KPD_PWR, 0);
 		if (!enable)
-			gpio_set_level(GPIO_PMIC_RESIN_L, 0);
+			gpio_set_level(GPIO_PMIC_RESIN, 0);
 	}
 	return ret;
 }
@@ -558,12 +703,13 @@ enum power_state power_chipset_init(void)
 	uint32_t reset_flags = system_get_reset_flags();
 
 	/*
-	 * Force the AP shutdown unless we are doing SYSJUMP. Otherwise,
-	 * the AP could stay in strange state.
+	 * Properly initialize the switchcap power unless we are doing SYSJUMP.
+	 * This ensures the switchcap is in a known reset state, preventing
+	 * the AP from being in an inconsistent state.
 	 */
 	if (!(reset_flags & EC_RESET_FLAG_SYSJUMP)) {
 		CPRINTS("not sysjump; forcing system shutdown");
-		set_system_power_no_check(0);
+		system_reset_switchcap_power();
 		init_power_state = POWER_G3;
 	} else {
 		/* In the SYSJUMP case, we check if the AP is on */
@@ -601,6 +747,26 @@ enum power_state power_chipset_init(void)
 	} else if (!(reset_flags & EC_RESET_FLAG_EFS) &&
 		   (reset_flags & EC_RESET_FLAG_SYSJUMP)) {
 		auto_power_on = 0;
+	} else if ((reset_flags & EC_RESET_FLAG_HIBERNATE)) {
+		/*
+		 * When exiting from hibernate, check the wake source. If it
+		 * was AC, we need to set ac_on = 1 so that the subsequent
+		 * power-on sequence uses POWER_ON_BY_AC_ON. This informs the
+		 * AP firmware that it was powered on by a cable insertion
+		 * (CBLPWR).
+		 */
+
+		/* b:431715716: Justification for using CONFIG_ZEPHYR in legacy
+		 * ec code, this power sequence flow will be ported to zephyr
+		 * ap-pwrseq driver.
+		 */
+		enum hibernate_wake_source wake_source;
+
+		if (system_get_hibernate_wake_source(&wake_source) == 0 &&
+		    wake_source == WAKE_SOURCE_ACOK) {
+			ac_on = 1;
+			auto_power_on = 0;
+		}
 	}
 
 	if (auto_power_on) {
@@ -622,6 +788,10 @@ enum power_state power_chipset_init(void)
  */
 static void power_off_seq(uint8_t shutdown_event)
 {
+	if (shutdown_event == POWER_OFF_BY_POWER_GOOD_LOST)
+		/* Filter AC toggles when power good is lost. */
+		start_ac_filter_window();
+
 	/* Check PMIC POWER_GOOD */
 	if (is_pmic_pwron()) {
 		if (shutdown_event == POWER_OFF_BY_POWER_GOOD_LOST) {
@@ -664,6 +834,12 @@ static int power_on_seq(uint8_t poweron_event)
 {
 	int ret;
 
+	/* Reset all the Passthru signal to the PMIC.
+	 * This ensures that the AP powers on with the
+	 * intended flow.
+	 */
+	reset_all_passthru_pmic_signal();
+
 	ret = set_system_power(1);
 	if (ret != EC_SUCCESS)
 		return ret;
@@ -678,6 +854,10 @@ static int power_on_seq(uint8_t poweron_event)
 	}
 
 	CPRINTS("POWER_GOOD seen");
+	/* if power-on is a success passthru the signals again */
+	passthru_ac_on_to_pmic();
+	passthru_lid_open_to_pmic();
+
 	return EC_SUCCESS;
 }
 
@@ -708,11 +888,14 @@ static uint8_t check_for_power_on_event(void)
 	} else if (ac_on) {
 		/* check if external power is connected */
 		ret = POWER_ON_BY_AC_ON;
+	} else if (rtc_wake) {
+		/* check for RTC alarm wake */
+		ret = POWER_ON_BY_RTC_ALARM;
 	} else if (power_button_is_pressed()) {
 		/* check for power button press */
 		ret = POWER_ON_BY_POWER_BUTTON_PRESSED;
 	} else {
-		ret = POWER_OFF_CANCEL;
+		ret = POWER_ON_CANCEL;
 	}
 
 	/* The flags are handled above. Clear them all. */
@@ -720,7 +903,9 @@ static uint8_t check_for_power_on_event(void)
 	auto_power_on = 0;
 	lid_opened = 0;
 	ac_on = 0;
+	rtc_wake = 0;
 
+	power_on_reason = (enum power_on_event_t)ret;
 	return ret;
 }
 
@@ -837,24 +1022,33 @@ static int warm_reset_seq(void)
 
 	/*
 	 * Warm reset sequence:
-	 * 1. Issue a low pulse to PMIC_RESIN_L, which triggers PMIC
+	 * 1. Issue a high pulse to PMIC_RESIN, which triggers PMIC
 	 *    to do a warm reset (requiring reprogramming PMIC registers
-	 *    to make PMIC_RESIN_L as a warm reset trigger).
-	 * 2. PMIC then issues a low pulse to AP_RST_L to reset AP.
-	 *    EC monitors the signal to see any low pulse.
-	 *    2.1. If a low pulse found, done.
-	 *    2.2. If a low pulse not found (the above PMIC registers
-	 *         not programmed or programmed wrong), issue a request
-	 *         to initiate a cold reset power sequence.
+	 *    to make PMIC_RESIN as a warm reset trigger).
+	 * 2. PMIC then issues a low pulse to AP_RST_L and high pulse to PS_HOLD
+	 *    to reset AP. EC monitors the signal to check for pulses.
+	 *    2.1. If both pulse found, done.
+	 *    2.2. If a pulse not found (the above PMIC registers not
+	 *         programmed or programmed wrong), issue a request to initiate
+	 *         a cold reset power sequence.
 	 */
 
-	gpio_set_level(GPIO_PMIC_RESIN_L, 0);
+	gpio_set_level(GPIO_PMIC_RESIN, 1);
 	crec_usleep(PMIC_RESIN_PULSE_LENGTH);
-	gpio_set_level(GPIO_PMIC_RESIN_L, 1);
+	gpio_set_level(GPIO_PMIC_RESIN, 0);
 
+	/* Check that the PMIC asserts PON_RESET_N*/
 	rv = power_wait_signals_timeout(IN_AP_RST_ASSERTED,
 					PMIC_POWER_AP_RESPONSE_TIMEOUT);
 
+	/* Exception case: PMIC not work as expected, request a cold reset */
+	if (rv != EC_SUCCESS)
+		return rv;
+
+	CPRINTS("AP_RST asserted, checking PS_HOLD.");
+	/* Wait until ps_hold_ls goes back high*/
+	rv = power_wait_signals_timeout(IN_AP_PS_HOLD_DEASSERTED,
+					PMIC_POWER_AP_RESPONSE_TIMEOUT);
 	/* Exception case: PMIC not work as expected, request a cold reset */
 	if (rv != EC_SUCCESS)
 		return rv;

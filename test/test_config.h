@@ -21,28 +21,21 @@
 
 /* Don't compile features unless specifically testing for them */
 #undef CONFIG_VBOOT_HASH
+#undef CONFIG_INDUCTIVE_CHARGING
 
 /* Only disable this if we didn't explicitly enable it in Kconfig */
 #ifndef CONFIG_PLATFORM_EC_USB_PD_LOGGING
 #undef CONFIG_USB_PD_LOGGING
 #endif
 
-#ifdef TEST_ALWAYS_MEMSET
-#define CONFIG_LIBCRYPTOC
-#endif
-
-#if defined(TEST_AES) || defined(TEST_CRYPTO_BENCHMARK)
+#if defined(TEST_CRYPTO_BENCHMARK)
 #define CONFIG_BORINGSSL_CRYPTO
-#endif
-
-#ifdef TEST_BASE32
-#define CONFIG_BASE32
 #endif
 
 #ifdef TEST_BATTERY_CONFIG
 #define CONFIG_BATTERY_FUEL_GAUGE
 #define CONFIG_BATTERY_CONFIG_IN_CBI
-#define CONFIG_HOSTCMD_BATTERY_V2
+#define CONFIG_HOSTCMD_BATTERY_INFO
 enum battery_type {
 	BATTERY_C214,
 	BATTERY_TYPE_COUNT,
@@ -50,17 +43,13 @@ enum battery_type {
 #define CONFIG_FUEL_GAUGE
 #endif
 
-#ifdef TEST_BKLIGHT_LID
-#define CONFIG_BACKLIGHT_LID
-#endif
-
 #ifdef TEST_BKLIGHT_PASSTHRU
 #define CONFIG_BACKLIGHT_LID
 #define CONFIG_BACKLIGHT_REQ_GPIO GPIO_PCH_BKLTEN
 #endif
 
-#ifdef TEST_CBI_WP
-#define CONFIG_EEPROM_CBI_WP
+#ifdef TEST_CBI
+#define CONFIG_CBI_EEPROM
 #endif
 
 #ifdef TEST_KB_8042
@@ -69,48 +58,23 @@ enum battery_type {
 #define CONFIG_KEYBOARD_DEBUG
 #endif
 
-#ifdef TEST_KB_MKBP
+#if defined(TEST_KB_SCAN)
 #define CONFIG_KEYBOARD_PROTOCOL_MKBP
 #define CONFIG_MKBP_EVENT
 #define CONFIG_MKBP_USE_GPIO
-#endif
-
-#if defined(TEST_KB_SCAN) || defined(TEST_KB_SCAN_STRICT)
-#define CONFIG_KEYBOARD_PROTOCOL_MKBP
-#define CONFIG_MKBP_EVENT
-#define CONFIG_MKBP_USE_GPIO
-#ifdef TEST_KB_SCAN_STRICT
-#define CONFIG_KEYBOARD_STRICT_DEBOUNCE
-#endif
 #endif
 
 #ifdef TEST_MATH_UTIL
 #define CONFIG_MATH_UTIL
 #endif
 
-#ifdef TEST_MAG_CAL
-#define CONFIG_MAG_CALIBRATE
-#endif
-
-#ifdef TEST_FLOAT
-#define CONFIG_FPU
-#define CONFIG_MAG_CALIBRATE
-#endif
-
-#ifdef TEST_FP
-#undef CONFIG_FPU
-#define CONFIG_MAG_CALIBRATE
-#endif
-
-#if defined(TEST_FP_TRANSPORT) || defined(TEST_FPSENSOR_STATE) ||       \
-	defined(TEST_FPSENSOR_CRYPTO) ||                                \
-	defined(TEST_FPSENSOR_CRYPTO_WITH_MOCK) ||                      \
-	defined(TEST_FPSENSOR_CRYPTO_WITH_MOCK_OTP) ||                  \
-	defined(TEST_FPSENSOR_DEBUG) || defined(TEST_FPSENSOR_UTILS) || \
-	defined(TEST_FPSENSOR_AUTH_CRYPTO_STATELESS) ||                 \
-	defined(TEST_FPSENSOR_AUTH_CRYPTO_STATEFUL) ||                  \
-	defined(TEST_FPSENSOR_AUTH_COMMANDS) ||                         \
-	defined(TEST_FPSENSOR_AUTH_COMMANDS_OTP) ||                     \
+#if defined(TEST_FPSENSOR_STATE) || defined(TEST_FPSENSOR_CRYPTO) || \
+	defined(TEST_FPSENSOR_CRYPTO_WITH_MOCK) ||                   \
+	defined(TEST_FPSENSOR_CRYPTO_WITH_MOCK_OTP) ||               \
+	defined(TEST_FPSENSOR_AUTH_CRYPTO_STATELESS) ||              \
+	defined(TEST_FPSENSOR_AUTH_CRYPTO_STATEFUL) ||               \
+	defined(TEST_FPSENSOR_AUTH_COMMANDS) ||                      \
+	defined(TEST_FPSENSOR_AUTH_COMMANDS_OTP) ||                  \
 	defined(TEST_HOST_COMMAND_FUZZ)
 #define CONFIG_FINGERPRINT_MCU
 #define CONFIG_BORINGSSL_CRYPTO
@@ -125,11 +89,6 @@ enum battery_type {
 
 #if defined(TEST_BORINGSSL_CRYPTO)
 #define CONFIG_BORINGSSL_CRYPTO
-#endif
-
-#if defined(TEST_OTP_KEY)
-#define CONFIG_BORINGSSL_CRYPTO
-#define CONFIG_OTP_KEY
 #endif
 
 #ifdef TEST_ROLLBACK_SECRET
@@ -147,27 +106,14 @@ enum battery_type {
 #define CONFIG_ACCEL_FIFO_THRES 10
 #endif
 
-#ifdef TEST_KASA
-#define CONFIG_FPU
-#define CONFIG_MAG_CALIBRATE
-#define CONFIG_MKBP_EVENT
-#define CONFIG_MKBP_USE_GPIO
-#endif
-
 #ifdef TEST_RGB_KEYBOARD
 #define CONFIG_RGB_KEYBOARD
 #define CONFIG_RGBKBD_DEMO_DOT
 #endif
 
-#ifdef TEST_NVIDIA_GPU
-#define CONFIG_GPU_NVIDIA
-#define GPIO_NVIDIA_GPU_ACOFF_ODL 123
-#endif
-
-#if defined(TEST_BODY_DETECTION) || defined(TEST_KASA) ||                \
-	defined(TEST_BODY_DETECTION) || defined(TEST_MOTION_ANGLE) ||    \
+#if defined(TEST_BODY_DETECTION) || defined(TEST_MOTION_ANGLE) ||        \
 	defined(TEST_MOTION_ANGLE_TABLET) || defined(TEST_MOTION_LID) || \
-	defined(TEST_MOTION_SENSE_FIFO) || defined(TEST_TABLET_BROKEN_SENSOR)
+	defined(TEST_MOTION_SENSE_FIFO)
 enum sensor_id {
 	BASE,
 	LID,
@@ -175,7 +121,7 @@ enum sensor_id {
 };
 
 #if defined(TEST_MOTION_ANGLE) || defined(TEST_MOTION_ANGLE_TABLET) || \
-	defined(TEST_MOTION_LID) || defined(TEST_TABLET_BROKEN_SENSOR)
+	defined(TEST_MOTION_LID) || defined(TEST_BODY_DETECTION)
 #define CONFIG_LID_ANGLE
 #define CONFIG_LID_ANGLE_SENSOR_BASE BASE
 #define CONFIG_LID_ANGLE_SENSOR_LID LID
@@ -199,14 +145,9 @@ enum sensor_id {
 	 (1 << CONFIG_LID_ANGLE_SENSOR_LID))
 #endif
 
-#if defined(TEST_TABLET_BROKEN_SENSOR) || defined(TEST_TABLET_NO_SENSOR) || \
-	defined(TEST_MOTION_LID)
+#if defined(TEST_MOTION_LID)
 #define CONFIG_TABLET_MODE
 #define CONFIG_GMR_TABLET_MODE
-#endif
-
-#ifdef TEST_TABLET_BROKEN_SENSOR
-#define CONFIG_DYNAMIC_MOTION_SENSOR_COUNT
 #endif
 
 #if defined(TEST_BODY_DETECTION)
@@ -217,14 +158,6 @@ enum sensor_id {
 #ifdef TEST_CRC
 #define CONFIG_CRC8_CROS
 #define CONFIG_SW_CRC
-#endif
-
-#ifdef TEST_RSA
-#define CONFIG_RSA
-#ifdef CONFIG_RSA_EXPONENT_3
-#error Your board uses RSA exponent 3, please build rsa3 test instead!
-#endif
-#define CONFIG_RWSIG_TYPE_RWSIG
 #endif
 
 #ifdef TEST_RSA3
@@ -243,13 +176,9 @@ enum sensor_id {
 #define CONFIG_SHA256_UNROLLED
 #endif
 
-#ifdef TEST_SHMALLOC
-#define CONFIG_SHARED_MALLOC
-#endif
-
 #ifdef TEST_SBS_CHARGING
 #define CONFIG_BATTERY
-#define CONFIG_BATTERY_V2
+#define CONFIG_BATTERY_INFO
 #define CONFIG_BATTERY_COUNT 1
 #define CONFIG_BATTERY_MOCK
 #define CONFIG_BATTERY_SMART
@@ -267,6 +196,7 @@ int board_discharge_on_ac(int enabled);
 #define CONFIG_BATTERY_LOW_VOLTAGE_PROTECTION
 #undef CONFIG_BATTERY_LOW_VOLTAGE_TIMEOUT
 #define CONFIG_BATTERY_LOW_VOLTAGE_TIMEOUT (2 * SECOND)
+#define CONFIG_PLATFORM_EC_CHARGER_HYBRID_POWER_BOOST
 #endif
 
 #ifdef TEST_THERMAL
@@ -286,54 +216,7 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #define CONFIG_FANS 1
 #endif
 
-#ifdef TEST_BUTTON
-#define CONFIG_KEYBOARD_PROTOCOL_8042
-#undef CONFIG_KEYBOARD_VIVALDI
-#define CONFIG_VOLUME_BUTTONS
-#define CONFIG_HOSTCMD_BUTTON
-#endif
-
-#ifdef TEST_BATTERY_GET_PARAMS_SMART
-#define CONFIG_BATTERY_MOCK
-#define CONFIG_BATTERY_SMART
-#define CONFIG_CHARGER_DEFAULT_CURRENT_LIMIT 4032
-#define CONFIG_I2C
-#define CONFIG_I2C_CONTROLLER
-#define I2C_PORT_MASTER 0
-#define I2C_PORT_BATTERY 0
-#define I2C_PORT_CHARGER 0
-#endif
-
-#ifdef TEST_LIGHTBAR
-#define CONFIG_I2C
-#define CONFIG_I2C_CONTROLLER
-#define I2C_PORT_LIGHTBAR 0
-#define CONFIG_ALS_LIGHTBAR_DIMMING 0
-#endif
-
-#ifdef TEST_USB_COMMON
-#define CONFIG_USB_POWER_DELIVERY
-#define CONFIG_USB_PD_TCPMV1
-#define CONFIG_USB_PD_PORT_MAX_COUNT 1
-#define CONFIG_USB_PD_TCPC
-#define CONFIG_USB_PD_TCPM_STUB
-#define CONFIG_SHA256_SW
-#define CONFIG_SW_CRC
-#endif
-
-#ifdef TEST_USB_PD_PDO_FIXED
-#define CONFIG_USB_POWER_DELIVERY
-#define CONFIG_USB_PD_TCPMV1
-#define CONFIG_USB_PD_PORT_MAX_COUNT 1
-#define CONFIG_USB_PD_TCPC
-#define CONFIG_USB_PD_TCPM_STUB
-#define CONFIG_SHA256_SW
-#define CONFIG_SW_CRC
-#define CONFIG_USB_PD_ONLY_FIXED_PDOS
-#endif
-
-#if defined(TEST_USB_SM_FRAMEWORK_H3) || defined(TEST_USB_SM_FRAMEWORK_H2) || \
-	defined(TEST_USB_SM_FRAMEWORK_H1) || defined(TEST_USB_SM_FRAMEWORK_H0)
+#if defined(TEST_USB_SM_FRAMEWORK_H3)
 #define CONFIG_TEST_SM
 #endif
 
@@ -518,37 +401,6 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #define CONFIG_USB_PD_3A_PORTS 0 /* Host does not define a 3.0 A PDO */
 #endif
 
-#ifdef TEST_USB_PD_INT
-#define CONFIG_USB_POWER_DELIVERY
-#define CONFIG_USB_PD_TCPMV1
-#define CONFIG_USB_PD_DUAL_ROLE
-#define CONFIG_USB_PD_PORT_MAX_COUNT 1
-#define CONFIG_USB_PD_TCPC
-#define CONFIG_USB_PD_TCPM_STUB
-#define CONFIG_SHA256_SW
-#define CONFIG_SW_CRC
-#endif
-
-#if defined(TEST_USB_PD) || defined(TEST_USB_PD_GIVEBACK) || \
-	defined(TEST_USB_PD_REV30)
-#define CONFIG_USB_POWER_DELIVERY
-#define CONFIG_USB_PD_TCPMV1
-#define CONFIG_USB_PD_DUAL_ROLE
-#define CONFIG_USB_PD_PORT_MAX_COUNT 2
-#define CONFIG_USB_PD_TCPC
-#define CONFIG_USB_PD_TCPM_STUB
-#define CONFIG_SHA256_SW
-#define CONFIG_SW_CRC
-#ifdef TEST_USB_PD_REV30
-#define CONFIG_USB_PD_REV30
-#define CONFIG_USB_PD_EXTENDED_MESSAGES
-#define CONFIG_USB_PID 0x5000
-#endif
-#ifdef TEST_USB_PD_GIVEBACK
-#define CONFIG_USB_PD_GIVE_BACK
-#endif
-#endif /* TEST_USB_PD || TEST_USB_PD_GIVEBACK || TEST_USB_PD_REV30 */
-
 #ifdef TEST_USB_PD_CONSOLE
 #define CONFIG_USB_PD_EPR
 #endif
@@ -577,26 +429,7 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #undef CONFIG_USB_DPM_SM
 #endif
 
-#if defined(TEST_CHARGE_MANAGER) || defined(TEST_CHARGE_MANAGER_DRP_CHARGING)
-#define CONFIG_CHARGE_MANAGER
-#define CONFIG_USB_CHARGER
-#define CONFIG_USB_PD_3A_PORTS 0 /* Host does not define a 3.0 A PDO */
-#define CONFIG_USB_PD_DUAL_ROLE
-#define CONFIG_USB_PD_PORT_MAX_COUNT 2
-#define CONFIG_USB_POWER_DELIVERY
-#define CONFIG_BATTERY
-#define CONFIG_BATTERY_SMART
-#define CONFIG_I2C
-#define CONFIG_I2C_CONTROLLER
-#define I2C_PORT_BATTERY 0
-#undef CONFIG_USB_PD_HOST_CMD
-#endif /* TEST_CHARGE_MANAGER_* */
-
-#ifdef TEST_CHARGE_MANAGER_DRP_CHARGING
-#define CONFIG_CHARGE_MANAGER_DRP_CHARGING
-#else
 #undef CONFIG_CHARGE_MANAGER_DRP_CHARGING
-#endif /* TEST_CHARGE_MANAGER_DRP_CHARGING */
 
 #ifdef TEST_CHARGE_RAMP
 #define CONFIG_CHARGE_RAMP_SW
@@ -630,20 +463,5 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #ifdef TEST_X25519
 #define CONFIG_CURVE25519
 #endif /* TEST_X25519 */
-
-#ifdef TEST_I2C_BITBANG
-#define CONFIG_I2C
-#define CONFIG_I2C_CONTROLLER
-#define CONFIG_I2C_BITBANG_CROS_EC
-#define I2C_BITBANG_PORT_COUNT 1
-#endif
-
-#ifdef TEST_PANIC
-#undef CONFIG_PANIC_STRIP_GPR
-#endif
-
-#ifdef HAVE_PRIVATE
-#include "private_test_config.h"
-#endif /* HAVE_PRIVATE */
 
 #endif /* __TEST_TEST_CONFIG_H */

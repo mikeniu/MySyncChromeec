@@ -13,8 +13,6 @@
 		 */
 		lis2dw12-int = &lid_accel;
 		bma4xx-int = &alt_lid_accel;
-		lis2dw12-int = &base_accel;
-		bma4xx-int = &alt_base_accel;
 	};
 
 	/*
@@ -104,10 +102,10 @@
 					"cros-ec,motionsense-sensor-config";
 				/* 50 Hz to support body detection. */
 				ec-s0 {
-					odr = <(50000 | ROUND_UP_FLAG)>;
+					odr = <(10000 | ROUND_UP_FLAG)>;
 				};
 				ec-s3 {
-					odr = <(50000 | ROUND_UP_FLAG)>;
+					odr = <(10000 | ROUND_UP_FLAG)>;
 				};
 			};
 		};
@@ -129,10 +127,10 @@
 					"cros-ec,motionsense-sensor-config";
 				/* 50 Hz to support body detection. */
 				ec-s0 {
-					odr = <(50000 | ROUND_UP_FLAG)>;
+					odr = <(10000 | ROUND_UP_FLAG)>;
 				};
 				ec-s3 {
-					odr = <(50000 | ROUND_UP_FLAG)>;
+					odr = <(10000 | ROUND_UP_FLAG)>;
 				};
 			};
 		};
@@ -156,10 +154,10 @@
 				compatible =
 					"cros-ec,motionsense-sensor-config";
 				ec-s0 {
-					odr = <(50000 | ROUND_UP_FLAG)>;
+					odr = <(10000 | ROUND_UP_FLAG)>;
 				};
 				ec-s3 {
-					odr = <(50000 | ROUND_UP_FLAG)>;
+					odr = <(10000 | ROUND_UP_FLAG)>;
 				};
 			};
 		};
@@ -181,10 +179,10 @@
 				compatible =
 					"cros-ec,motionsense-sensor-config";
 				ec-s0 {
-					odr = <(50000 | ROUND_UP_FLAG)>;
+					odr = <(10000 | ROUND_UP_FLAG)>;
 				};
 				ec-s3 {
-					odr = <(50000 | ROUND_UP_FLAG)>;
+					odr = <(10000 | ROUND_UP_FLAG)>;
 				};
 			};
 		};
@@ -193,6 +191,9 @@
 	motionsense-sensor-info {
 		compatible = "cros-ec,motionsense-sensor-info";
 
-		sensor-irqs = <&int_lid_imu &int_imu>;
+		sensor-irqs = <&int_lid_accel>;
+
+		/* List of sensors in force mode */
+		accel-force-mode-sensors = <&base_accel &alt_base_accel>;
 	};
 };
