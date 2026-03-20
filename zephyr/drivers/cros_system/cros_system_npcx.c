@@ -683,13 +683,13 @@ static DEVICE_API(cros_system, cros_system_driver_npcx_api) = {
 #endif
 };
 
-#define CROS_SYSTEM_NPCX_INIT(inst)                                            \
-	static struct cros_system_npcx_data cros_system_npcx_dev_data_##inst;  \
-	DEVICE_DEFINE(cros_system_npcx_##inst, "CROS_SYSTEM",                  \
-		      cros_system_npcx_init, NULL,                             \
-		      &cros_system_npcx_dev_data_##inst, &cros_system_dev_cfg, \
-		      PRE_KERNEL_1, CONFIG_CROS_SYSTEM_NPCX_INIT_PRIORITY,     \
-		      &cros_system_driver_npcx_api);
+#define CROS_SYSTEM_NPCX_INIT(inst)                                           \
+	static struct cros_system_npcx_data cros_system_npcx_dev_data_##inst; \
+	DEVICE_DT_INST_DEFINE(inst, cros_system_npcx_init, NULL,              \
+			      &cros_system_npcx_dev_data_##inst,              \
+			      &cros_system_dev_cfg, PRE_KERNEL_1,             \
+			      CONFIG_CROS_SYSTEM_NPCX_INIT_PRIORITY,          \
+			      &cros_system_driver_npcx_api);
 
 DT_INST_FOREACH_STATUS_OKAY(CROS_SYSTEM_NPCX_INIT)
 
