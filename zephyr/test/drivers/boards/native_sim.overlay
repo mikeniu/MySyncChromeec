@@ -145,7 +145,7 @@
 		gpio_ec_kso_02_inv: ec_kso_02_inv {
 			gpios = <&gpio0 3 (GPIO_INPUT | GPIO_OUTPUT_LOW)>;
 		};
-		pg_ec_dsw_pwrok {
+		gpio_pg_ec_dsw_pwrok: pg_ec_dsw_pwrok {
 			gpios = <&gpio0 4 GPIO_INPUT>;
 			enum-name = "GPIO_TEMP_SENSOR_POWER";
 		};
@@ -406,6 +406,7 @@
 	batteries {
 		default_battery: lgc_ac17a8m {
 			compatible = "lgc,ac17a8m", "battery-smart";
+			has_manuf_info;
 		};
 		ap16l5j {
 			compatible = "panasonic,ap16l5j", "battery-smart";
@@ -469,6 +470,53 @@
 				compatible = "cros-ec,cbi-fw-config-value";
 				enum-name = "FW_FIELD_2_X";
 				value = <1>;
+			};
+		};
+	};
+
+	cbi-ufsc {
+		compatible = "cros-ec,cbi-ufsc";
+
+		test-field-1 {
+			enum-name = "TEST_FIELD_1";
+			start = <0>;
+			size = <2>;
+			value_a: value-a {
+				compatible = "cros-ec,cbi-ufsc-value";
+				status = "okay";
+				value = <1>;
+				default;
+			};
+			value_b: value-b {
+				compatible = "cros-ec,cbi-ufsc-value";
+				status = "okay";
+				value = <2>;
+			};
+		};
+		test-field-2 {
+			enum-name = "TEST_FIELD_2";
+			start = <2>;
+			size = <3>;
+			value_c: value-c {
+				compatible = "cros-ec,cbi-ufsc-value";
+				status = "okay";
+				value = <5>;
+			};
+		};
+		test-field-3 {
+			enum-name = "TEST_FIELD_3";
+			start = <98>; /* 98 = 3*32 + 2. In data[3], bit 2 */
+			size = <1>;
+			value_d: value-d {
+				compatible = "cros-ec,cbi-ufsc-value";
+				status = "okay";
+				value = <1>;
+			};
+			value_e: value-e {
+				compatible = "cros-ec,cbi-ufsc-value";
+				status = "okay";
+				value = <0>;
+				default;
 			};
 		};
 	};
@@ -1047,22 +1095,22 @@
 		};
 	};
 
-	pwm-led-pins {
+	led_pins: pwm-led-pins {
 		compatible = "cros-ec,pwm-led-pins";
 
 		left-led {
 			led-id = "EC_LED_ID_LEFT_LED";
 			led-pwms = <&pwmled_blue_left &pwmled_white_left>;
 
-			color-off {
+			left_led_off: color-off {
 				led-color = "LED_OFF";
 				led-values = <0 0>;
 			};
-			color-blue {
+			left_led_blue: color-blue {
 				led-color = "LED_BLUE";
 				led-values = <100 0>;
 			};
-			color-white {
+			left_led_white: color-white {
 				led-color = "LED_WHITE";
 				led-values = <0 100>;
 			};
@@ -1072,19 +1120,19 @@
 			led-id = "EC_LED_ID_RIGHT_LED";
 			led-pwms = <&pwmled_amber_right &pwmled_white_right>;
 
-			color-off {
+			right_led_off: color-off {
 				led-color = "LED_OFF";
 				led-values = <0 0>;
 			};
-			color-amber {
+			right_led_amber: color-amber {
 				led-color = "LED_AMBER";
 				led-values = <100 0>;
 			};
-			color-white {
+			right_led_white: color-white {
 				led-color = "LED_WHITE";
 				led-values = <0 100>;
 			};
-			color-yellow {
+			right_led_yellow: color-yellow {
 				led-color = "LED_YELLOW";
 				led-values = <100 20>;
 			};
@@ -1093,6 +1141,7 @@
 
 	led-colors {
 		compatible = "cros-ec,led-policy";
+		led-pins = <&led_pins>;
 	};
 
 	kblight {

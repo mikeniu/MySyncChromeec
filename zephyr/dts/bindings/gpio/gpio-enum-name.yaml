@@ -53,6 +53,7 @@ properties:
       - GPIO_EN_PWR_A
       - GPIO_EN_S5_RAILS
       - GPIO_EN_USB_A_5V
+      - GPIO_HALL_CTL_PCHG
       - GPIO_IMVP9_VRRDY_OD
       - GPIO_KB_DISCRETE_INT
       - GPIO_KBD_KSO2
@@ -77,6 +78,7 @@ properties:
       - GPIO_PMIC_EC_RESETB
       - GPIO_PMIC_KPD_PWR
       - GPIO_PMIC_KPD_PWR_ODL
+      - GPIO_PMIC_RESIN
       - GPIO_PMIC_RESIN_L
       - GPIO_POE_CS_OUT_L
       - GPIO_POWER_BUTTON_L
@@ -138,8 +140,9 @@ properties:
       - GPIO_VCCST_PWRGD_OD
       - GPIO_VOLUME_DOWN_L
       - GPIO_VOLUME_UP_L
-      - GPIO_WARM_RESET_L
       - GPIO_QI_RESET_L
+      - GPIO_WARM_RESET_L
+      - GPIO_WLC_NRST_CONN
       - GPIO_WPC_IRQ
       - IOEX_USB_A1_RETIMER_EN
       - IOEX_USB_C0_BB_RETIMER_LS_EN

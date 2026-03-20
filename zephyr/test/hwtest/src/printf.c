@@ -208,9 +208,7 @@ ZTEST(printf, test_vsnprintf_long32_enabled)
 {
 	bool use_l32 = IS_ENABLED(CONFIG_PRINTF_LONG_IS_32BITS);
 
-	if (IS_ENABLED(CONFIG_BOARD_BLOONCHIPPER) ||
-	    IS_ENABLED(CONFIG_BOARD_DARTMONKEY) ||
-	    IS_ENABLED(CONFIG_BASEBOARD_HELIPILOT))
+	if (IS_ENABLED(CONFIG_BOARD_FINGERPRINT))
 		zassert_true(use_l32);
 	else
 		zassert_true(!use_l32);
@@ -537,8 +535,8 @@ ZTEST(printf, test_snprintf_hex_buffer)
 	char str_buf[5];
 	int rv;
 
-	__ASSERT(ARRAY_SIZE(buf_ff) == ARRAY_SIZE(str_bufs),
-		 "Invalid test arrays sizes");
+	BUILD_ASSERT(ARRAY_SIZE(buf_ff) == ARRAY_SIZE(str_buf),
+		     "Invalid test arrays sizes");
 
 	/* Success cases. */
 

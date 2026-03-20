@@ -117,6 +117,19 @@ known_modules = {
     "elan": lambda name, checkout: (
         checkout / "src" / "platform" / "fingerprint" / "elan"
     ),
+<<<<<<< HEAD   (d6c32f2441663510e20ae2d25d5edeb8956421b9 program,zmake: drop cmsis references)
+||||||| BASE   (4f79cf3e850f16ecfb53fcd1c296c608faa9aef0 fpsensor: Add fingerprint_auth_enabled())
+=======
+    "elan_module": lambda name, checkout: (
+        checkout
+        / "src"
+        / "third_party"
+        / "zephyrproject"
+        / "modules"
+        / "hal"
+        / "elan_module"
+    ),
+>>>>>>> BRANCH (98351621e96c0a9288be41db08b0e97738bbe1f1 padme: Add padme_rts5439s_vb_vif.xml)
     "focaltech_fp": lambda name, checkout: (
         checkout / "src" / "platform" / "fingerprint" / "focaltech"
     ),

@@ -140,6 +140,12 @@ config LINK_TEST_SUITE_LED_DRIVER
 config LINK_TEST_SUITE_LED_DRIVER_ALIAS_LED
 	bool "Link and test the led_driver tests with alias LEDs defined"
 
+config LINK_TEST_SUITE_LED_DRIVER_CUSTOM
+	bool "Link and test the LED custom pattern logic"
+
+config LINK_TEST_SUITE_LED_DRIVER_SEQUENCE
+	bool "Link and test the LED pattern sequence logic"
+
 config LINK_TEST_SUITE_LOCATE_CHIP_ALTS
 	bool "Link tests for alternate operations of the locate chip host cmd"
 	help
@@ -148,6 +154,13 @@ config LINK_TEST_SUITE_LOCATE_CHIP_ALTS
 
 config LINK_TEST_SUITE_LSM6DSM
 	bool "Link tests for lsm6dsm driver"
+
+config LINK_TEST_SUITE_LED_DRIVER_MAX695X
+	bool "Link and test the MAX695x 7-segment display driver tests"
+	help
+	  Include the MAX695x driver test suite.
+	  Tests the 7-segment LED display driver functionality including
+	  initialization, display operations, and console commands.
 
 config LINK_TEST_SUITE_MKBP
 	bool "Link and test the mkbp tests"
@@ -195,6 +208,13 @@ config LINK_TEST_SUITE_RT1715
 	help
 	  Link rt1715 test suite for the TCPM driver related function
 	  tests.
+
+config LINK_TEST_SUITE_IT8XXX2
+	bool "Link and test the it8xxx2 tests"
+	help
+	  Link it8xxx2 test suite for the TCPM driver related function
+	  tests.
+
 
 config LINK_TEST_SUITE_RT1718S
 	bool "Link and test the rt1718s tests"
@@ -404,10 +424,23 @@ config LINK_TEST_SUITE_ONE_WIRE_UART
 config LINK_TEST_SUITE_SMART_BATTERY
 	bool "Link and test the smart battery driver tests"
 
+config LINK_TEST_SUITE_SMART_BATTERY_PRESENT
+	bool "Link and test the smart battery present driver tests"
+
 config LINK_TEST_SUITE_TABLETMODE_INTERRUPT
 	bool "Link and test the tabletmode interrupt driver tests"
 	help
 	  Verifies a singleton driver which handles an external interrupt
 	  signaling to the EC when to switch in or out of tablet mode.
+
+config LINK_TEST_SUITE_WRITE_PROTECTION_CUSTOM
+	bool "Link and test the write protection tests"
+	help
+	  Verifies functionality of custom write protection
+
+config LINK_TEST_SUITE_RT3645
+	bool "Link and test rt3645 tests"
+	help
+	  Verifies functionality of rt3645 IMVP driver
 
 source "Kconfig.zephyr"

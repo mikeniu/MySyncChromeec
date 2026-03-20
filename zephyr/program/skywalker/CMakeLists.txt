@@ -13,6 +13,9 @@ target_sources(app PRIVATE
 target_sources_ifndef(CONFIG_BOARD_SKYWALKER_SINGLE_USB_TYPEC app PRIVATE
 	${PLATFORM_EC_PROGRAM_DIR}/skywalker/src/dp_alt_mode.c)
 
+target_sources_ifdef(CONFIG_BOARD_SKYWALKER_PMIC_RESETB_IRQ app PRIVATE
+	${PLATFORM_EC_PROGRAM_DIR}/skywalker/src/pmic_resetb_irq.c)
+
 if(DEFINED CONFIG_BOARD_SKYWALKER)
 	project(skywalker)
 	add_subdirectory(skywalker)
@@ -37,4 +40,16 @@ elseif(DEFINED CONFIG_BOARD_TARKIN)
 elseif(DEFINED CONFIG_BOARD_PADME)
 	project(padme)
 	add_subdirectory(padme)
+elseif(DEFINED CONFIG_BOARD_GROGU)
+	project(grogu)
+	add_subdirectory(grogu)
+elseif(DEFINED CONFIG_BOARD_DOOKU)
+	project(dooku)
+	add_subdirectory(dooku)
+elseif(DEFINED CONFIG_BOARD_VADER)
+	project(vader)
+	add_subdirectory(vader)
+elseif(DEFINED CONFIG_BOARD_JAINA)
+	project(jaina)
+	add_subdirectory(jaina)
 endif()

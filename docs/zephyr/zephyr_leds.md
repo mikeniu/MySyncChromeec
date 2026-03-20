@@ -30,6 +30,9 @@ Example:
 CONFIG_PLATFORM_EC_LED_COMMON=n
 ```
 
+The animation tick interval can be configured via `CONFIG_PLATFORM_EC_LED_ANIMATION_TICK_MS` (default `30ms`).
+Lower values result in smoother animations but increase CPU usage.
+
 Enable other [config options](../configuration/leds.md) supported in the legacy code.
 
 ## Devicetree Nodes
@@ -51,7 +54,7 @@ To set the LED color to amber, the yellow channel is enabled and the blue
 channel is disabled.
 
 ```
-gpio-led-pins {
+led_pins: gpio-led-pins {
 	compatible = "cros-ec,gpio-led-pins";
         /* Amber - turn on yellow LED */
 	color_amber: color-amber {
@@ -103,7 +106,7 @@ pwmleds {
 	};
 };
 
-pwm-led-pins {
+led_pins: pwm-led-pins {
 	compatible = "cros-ec,pwm-led-pins";
 	pwm-frequency = <100>;
 	/* Amber - turn on yellow LED */
@@ -160,6 +163,7 @@ is defined as below.
 ```
 led-policy {
 	compatible = "cros-ec,led-policy";
+	led-pins = <&led_pins>;
 	...
 	...
 	power-state-discharge-s3 {

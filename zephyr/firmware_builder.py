@@ -71,6 +71,16 @@ SPECIAL_BOARDS = [
     "ocelotrvp-ite",
 ]
 
+# List of boards that we run compare-builds.
+COMPARE_BUILDS_BOARDS = [
+    # Zephyr EC build
+    "ocelotrvp-ite",
+    # ISH build
+    "ocelotrvp-ish",
+    # Fingerprint build
+    "bloonchipper",
+]
+
 BINARY_SIZE_REGIONS = [
     "RO_FLASH",
     "RO_RAM",
@@ -139,6 +149,153 @@ def get_version():
     return None
 
 
+def get_projects():
+    """Get the filtered list of all projects."""
+    projects = []
+    platform_ec = ZEPHYR_DIR.parent
+    platform_ec_private = platform_ec.parent / "ec-private"
+    modules = zmake.modules.locate_from_checkout(find_checkout())
+    projects_path = zmake.modules.default_projects_dirs(modules)
+    for project in zmake.project.find_projects(projects_path).values():
+        # Skip some projects if ec-private dir is missing until the builders
+        # are fixed correctly.
+        if (
+            project.config.project_name
+            in ["lapis", "moonstone", "ruby", "sapphire", "quartz"]
+            and not platform_ec_private.exists()
+        ):
+            continue
+        projects.append(project)
+    return projects
+
+
+def build_host_utils(opts, platform_ec, env, extra_env):
+    """Build the utilities that ec-utils, ec-devutils, and ec-utils-test need"""
+
+    env = env.copy()
+    env.update(
+        {
+            "BOARD": "host",
+            "CROSS_COMPILE_CC_NAME": "clang",
+            "V": "1",
+        }
+    )
+    env.update(extra_env)
+    # Start with a clean build environment
+    cmd = ["make", "clobber"]
+    log_cmd(cmd, env=env, cwd=platform_ec)
+    subprocess.run(
+        cmd,
+        cwd=platform_ec,
+        check=True,
+        stdin=subprocess.DEVNULL,
+        env=env,
+    )
+
+    cmd = ["make", "utils-host", f"-j{opts.cpus}"]
+    log_cmd(cmd, env=env, cwd=platform_ec)
+    subprocess.run(
+        cmd,
+        cwd=platform_ec,
+        check=True,
+        stdin=subprocess.DEVNULL,
+        env=env,
+    )
+
+    cmd = ["make", "-C", "extra/rma_reset", "clean"]
+    log_cmd(cmd, env=env, cwd=platform_ec)
+    subprocess.run(
+        cmd,
+        cwd=platform_ec,
+        check=True,
+        stdin=subprocess.DEVNULL,
+        env=env,
+    )
+
+    cmd = ["make", "-C", "extra/rma_reset", f"-j{opts.cpus}"]
+    log_cmd(cmd, env=env, cwd=platform_ec)
+    subprocess.run(
+        cmd,
+        cwd=platform_ec,
+        check=True,
+        stdin=subprocess.DEVNULL,
+        env=env,
+    )
+
+    cmd = ["make", "-C", "extra/usb_updater", "clean"]
+    log_cmd(cmd, env=env, cwd=platform_ec)
+    subprocess.run(
+        cmd,
+        cwd=platform_ec,
+        check=True,
+        stdin=subprocess.DEVNULL,
+        env=env,
+    )
+
+    cmd = ["make", "-C", "extra/usb_updater", "usb_updater2", f"-j{opts.cpus}"]
+    log_cmd(cmd, env=env, cwd=platform_ec)
+    subprocess.run(
+        cmd,
+        cwd=platform_ec,
+        check=True,
+        stdin=subprocess.DEVNULL,
+        env=env,
+    )
+
+    cmd = ["make", "-C", "extra/touchpad_updater", "clean"]
+    log_cmd(cmd, env=env, cwd=platform_ec)
+    subprocess.run(
+        cmd,
+        cwd=platform_ec,
+        check=True,
+        stdin=subprocess.DEVNULL,
+        env=env,
+    )
+
+    cmd = [
+        "make",
+        "-C",
+        "extra/touchpad_updater",
+        "touchpad_updater",
+        f"-j{opts.cpus}",
+    ]
+    log_cmd(cmd, env=env, cwd=platform_ec)
+    subprocess.run(
+        cmd,
+        cwd=platform_ec,
+        check=True,
+        stdin=subprocess.DEVNULL,
+        env=env,
+    )
+
+
+def build_compare_builds():
+    """Runs compare-builds a select set of targets"""
+    env = os.environ.copy()
+    env.update(init_toolchain())
+    env.update(
+        {
+            "PYTHONPATH": str(ZEPHYR_DIR / "zmake"),
+        }
+    )
+
+    # Run compare-builds at the same git reference.  This forces the
+    # compare-builds step to compile only, skipping the firmware binary
+    # comparison.
+    cmd = ["zmake", "-D", "compare-builds", "--ref1", "HEAD", "--ref2", "HEAD"]
+    for board in COMPARE_BUILDS_BOARDS:
+        cmd.append(board)
+
+    log_cmd(cmd)
+    subprocess.run(
+        cmd,
+        cwd=ZEPHYR_DIR,
+        check=True,
+        stdin=subprocess.DEVNULL,
+        env=env,
+    )
+
+
 def build(opts):
     """Builds all Zephyr firmware targets"""
     metric_list = firmware_pb2.FwBuildMetricList()  # pylint: disable=no-member
@@ -151,21 +308,27 @@ def build(opts):
     )
 
     platform_ec = ZEPHYR_DIR.parent
-    modules = zmake.modules.locate_from_checkout(find_checkout())
-    projects_path = zmake.modules.default_projects_dirs(modules)
+
+    if not opts.code_coverage:
+        # Build the host utils first
+        build_host_utils(opts, platform_ec, env, {})
+        build_host_utils(opts, platform_ec, env, {"TEST_ASAN": "y"})
+        build_host_utils(opts, platform_ec, env, {"TEST_MSAN": "y"})
+        # Verify compare-builds isn't fundamentally broken
+        build_compare_builds()
 
     # Start with a clean build environment
-    cmd = ["make", "clobber"]
+    cmd = ["make", "-f", "Makefile.cq", "clobber"]
     log_cmd(cmd)
     subprocess.run(
         cmd,
-        cwd=platform_ec,
+        cwd=ZEPHYR_DIR,
         check=True,
         stdin=subprocess.DEVNULL,
         env=env,
     )
 
-    cmd = ["zmake", "-D", "build", "-a", "--static"]
+    cmd = ["zmake", "-D", "build", "--static"]
     if opts.code_coverage:
         cmd.append("--coverage")
     if opts.bcs_version:
@@ -174,6 +337,10 @@ def build(opts):
         version = get_version()
         if version:
             cmd.extend(["-v", version])
+
+    projects = get_projects()
+    for project in projects:
+        cmd.append(project.config.project_name)
 
     log_cmd(cmd)
     subprocess.run(
@@ -184,7 +351,7 @@ def build(opts):
         env=env,
     )
     if not opts.code_coverage:
-        for project in zmake.project.find_projects(projects_path).values():
+        for project in projects:
             build_dir = (
                 platform_ec / "build" / "zephyr" / project.config.project_name
             )
@@ -340,11 +507,9 @@ def bundle_firmware(opts):
 
     bundle_dir = get_bundle_dir(opts)
     platform_ec = ZEPHYR_DIR.parent
-    modules = zmake.modules.locate_from_checkout(find_checkout())
-    projects_path = zmake.modules.default_projects_dirs(modules)
     subprocesses = []
     per_board_targets = collections.defaultdict(list)
-    for project in zmake.project.find_projects(projects_path).values():
+    for project in get_projects():
         build_dir = (
             platform_ec / "build" / "zephyr" / project.config.project_name
         )
@@ -352,13 +517,18 @@ def bundle_firmware(opts):
         # karis.EC.15709.192.0.tar.bz2
         if version:
             tarball_name = f"{project.config.project_name}.EC.{version}.tar.bz2"
+            elf_tarball_name = (
+                f"{project.config.project_name}.EC_elf.{version}.tar.bz2"
+            )
         else:
             tarball_name = f"{project.config.project_name}.EC.tar.bz2"
-        tarball_path = bundle_dir.joinpath(tarball_name)
+            elf_tarball_name = f"{project.config.project_name}.EC_elf.tar.bz2"
         for board in set(project.config.inherited_from):
             per_board_targets[board].append(
                 f"{project.config.project_name}/output"
             )
+        # Package the bin file
+        tarball_path = bundle_dir.joinpath(tarball_name)
         cmd = [
             "tar",
             "--exclude=*.elf",
@@ -378,6 +548,30 @@ def bundle_firmware(opts):
         meta = info.objects.add()
         meta.tarball_info.board.extend(set(project.config.inherited_from))
         meta.file_name = tarball_name
+        meta.tarball_info.type = (
+            firmware_pb2.FirmwareArtifactInfo.TarballInfo.FirmwareType.EC  # pylint: disable=no-member
+        )
+        # Package the elf files
+        elf_tarball_path = bundle_dir.joinpath(elf_tarball_name)
+        cmd = [
+            "tar",
+            "--exclude=*.bin",
+            "--exclude=*.lst",
+            "-cjf",
+            elf_tarball_path,
+        ]
+        cmd.extend(
+            [x.relative_to(artifacts_dir) for x in artifacts_dir.glob("*")]
+        )
+        log_cmd(cmd, cwd=artifacts_dir)
+        subprocesses.append(
+            subprocess.Popen(  # pylint: disable=consider-using-with
+                cmd, cwd=artifacts_dir, stdin=subprocess.DEVNULL
+            )
+        )
+        meta = info.objects.add()
+        meta.tarball_info.board.extend(set(project.config.inherited_from))
+        meta.file_name = elf_tarball_name
         meta.tarball_info.type = (
             firmware_pb2.FirmwareArtifactInfo.TarballInfo.FirmwareType.EC  # pylint: disable=no-member
         )
@@ -456,8 +650,6 @@ def test(opts):
     platform_ec = ZEPHYR_DIR.parent
     twister_out_dir = platform_ec / "twister-out-llvm"
     twister_out_dir_gcc = platform_ec / "twister-out-host"
-    modules = zmake.modules.locate_from_checkout(find_checkout())
-    projects_path = zmake.modules.default_projects_dirs(modules)
 
     if opts.code_coverage:
         build_dir = platform_ec / "build" / "zephyr"
@@ -484,7 +676,7 @@ def test(opts):
             "ALL_FILTERED", metrics, build_dir / "lcov_no_tests.info"
         )
 
-        for project in zmake.project.find_projects(projects_path).values():
+        for project in get_projects():
             if project.config.project_name in SPECIAL_BOARDS:
                 _extract_lcov_summary(
                     f"BOARD_{project.config.full_name}".upper(),
@@ -503,11 +695,9 @@ def check_inherits(_opts):
     the boards and zephyr_ec targets with the zephyr inherited_from values.
     """
 
-    modules = zmake.modules.locate_from_checkout(find_checkout())
-    projects_path = zmake.modules.default_projects_dirs(modules)
     # Ec target name -> board name -> boolean if seen in Boxster
     ec_to_board = collections.defaultdict(dict)
-    for project in zmake.project.find_projects(projects_path).values():
+    for project in get_projects():
         board_dict = {}
         for board in project.config.inherited_from:
             board_dict[board] = False

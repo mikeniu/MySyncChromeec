@@ -97,7 +97,7 @@ static struct sink_policy_fixture fixture = {
 			.pdos = {
 				PDO_FIXED(5000, 1500, 0),
 				PDO_FIXED(9000, 3000, 0),
-				PDO_FIXED(20000, 3000, 0),
+				PDO_FIXED(20000, 5000, 0),
 			},
 		},
 	},
@@ -149,7 +149,7 @@ static int connect_sink(const struct pdc_fixture *pdc)
 	emul_pdc_set_rdo(pdc->emul_pdc, RDO_FIXED(1, 1500, 1500, 0));
 
 	zassert_ok(emul_pdc_connect_partner(pdc->emul_pdc, &cs));
-	zassert_ok(pdc_power_mgmt_wait_for_sync(pdc->port, 4300));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(pdc->port, 5000));
 
 	return 0;
 }
@@ -181,23 +181,92 @@ static void sink_policy_after(void *f)
 ZTEST_SUITE(sink_policy, NULL, sink_policy_setup, sink_policy_before,
 	    sink_policy_after, NULL);
 
-ZTEST_USER_F(sink_policy, test_sink_policy)
+static void test_sink_policy_helper(struct sink_policy_fixture *fixture,
+				    unsigned int port_num)
 {
 	union connector_status_t connector_status;
 	uint32_t rdo;
 
-	connect_sink(&fixture->pdc[TEST_USBC_PORT0]);
+	zassert_true(port_num < ARRAY_SIZE(fixture->pdc));
 
-	zassert_ok(pdc_power_mgmt_get_connector_status(TEST_USBC_PORT0,
+	connect_sink(&fixture->pdc[port_num]);
+
+	zassert_ok(pdc_power_mgmt_get_connector_status(port_num,
 						       &connector_status));
 	zassert_equal(connector_status.connect_status, 1);
 	zassert_equal(connector_status.power_direction, 0);
 	zassert_equal(connector_status.sink_path_status, 1);
 
 	/* Verify correct RDO is selected on PORT0 */
-	zassert_ok(
-		emul_pdc_get_rdo(fixture->pdc[TEST_USBC_PORT0].emul_pdc, &rdo));
+	zassert_ok(emul_pdc_get_rdo(fixture->pdc[port_num].emul_pdc, &rdo));
 	zassert_equal(RDO_POS(rdo), 3);
+
+	/* Check charge manager seeding */
+	zassert_true(TEST_WAIT_FOR(charge_manager_get_active_charge_port() ==
+					   port_num,
+				   PDC_TEST_TIMEOUT));
+
+	int charge_manager_mv = charge_manager_get_charger_voltage();
+	int charge_manager_ma = charge_manager_get_charger_current();
+	int charge_manager_mw = (charge_manager_mv * charge_manager_ma) / 1000;
+
+	zassert_true(
+		charge_manager_mv <= CONFIG_PLATFORM_EC_USB_PD_MAX_VOLTAGE_MV,
+		"Board max voltage is %umV, but charge manager seeded with %umV",
+		CONFIG_PLATFORM_EC_USB_PD_MAX_VOLTAGE_MV, charge_manager_mv);
+	zassert_true(
+		charge_manager_ma <= CONFIG_PLATFORM_EC_USB_PD_MAX_CURRENT_MA,
+		"Board max current is %umA, but charge manager seeded with %umA",
+		CONFIG_PLATFORM_EC_USB_PD_MAX_CURRENT_MA, charge_manager_ma);
+	zassert_true(
+		charge_manager_mw <= CONFIG_PLATFORM_EC_USB_PD_MAX_POWER_MW,
+		"Board max wattage is %umW, but charge manager seeded with %umW",
+		CONFIG_PLATFORM_EC_USB_PD_MAX_POWER_MW, charge_manager_mw);
+}
+
+/* Repeat test_sink_policy for two ports since they have different source cap
+ * PDOs configured. */
+
+ZTEST_USER_F(sink_policy, test_sink_policy_port0)
+{
+	test_sink_policy_helper(fixture, TEST_USBC_PORT0);
+}
+
+ZTEST_USER_F(sink_policy, test_sink_policy_port1)
+{
+	/* Ensure that the port 1 (high-power) source caps include a PDO that
+	 * exceeds the board max current and wattage values to test clamping
+	 */
+	zassert_true(PDO_FIXED_CURRENT(fixture->pdc[1].pdos[2]) >
+		     CONFIG_PLATFORM_EC_USB_PD_MAX_CURRENT_MA);
+
+	zassert_true((PDO_FIXED_CURRENT(fixture->pdc[1].pdos[2]) *
+		      PDO_FIXED_VOLTAGE(fixture->pdc[1].pdos[2])) >
+		     (CONFIG_PLATFORM_EC_USB_PD_MAX_POWER_MW * 1000));
+	test_sink_policy_helper(fixture, TEST_USBC_PORT1);
+}
+
+ZTEST_USER_F(sink_policy, test_sink_policy_set_rdo_fails)
+{
+	union connector_status_t connector_status;
+	uint32_t rdo;
+
+	/* Force emulator to not adopt the RDO we set. This is analogous to the
+	 * port partner not agreeing to our RDO request. pdc_power_mgmt should
+	 * time out and assume the RDO reported by the PDC */
+	emul_pdc_set_feature_flag(fixture->pdc[TEST_USBC_PORT0].emul_pdc,
+				  EMUL_PDC_FEATURE_DONT_APPLY_RDO);
+
+	/* This forces the emulator's reported RDO to have RDO_POS()==1 */
+	connect_sink(&fixture->pdc[TEST_USBC_PORT0]);
+
+	zassert_ok(pdc_power_mgmt_get_connector_status(TEST_USBC_PORT0,
+						       &connector_status));
+	zassert_ok(pdc_power_mgmt_get_rdo(TEST_USBC_PORT0, &rdo));
+
+	/* Verify original RDO is selected on PORT0 */
+	zassert_equal(RDO_POS(connector_status.rdo), 1);
+	zassert_equal(RDO_POS(rdo), 1);
 }
 
 ZTEST_USER_F(sink_policy, test_sink_policy_attach_better_charger)

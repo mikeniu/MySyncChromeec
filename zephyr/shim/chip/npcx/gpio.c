@@ -19,6 +19,8 @@ static const struct unused_pin_config unused_pin_configs[] = {
 	UNUSED_GPIO_CONFIG_LIST
 };
 
+UNUSED_GPIO_CONFIG_CHECK();
+
 int gpio_config_unused_pins(void)
 {
 	for (size_t i = 0; i < ARRAY_SIZE(unused_pin_configs); ++i) {
@@ -193,11 +195,17 @@ static int cmd_gpio_turn_off(const struct shell *sh, size_t argc, char **argv)
 
 SHELL_STATIC_SUBCMD_SET_CREATE(
 	sub_gpiodbg,
-	SHELL_CMD_ARG(list, NULL, "List all GPIOs used on platform by index",
+	SHELL_CMD_ARG(list, NULL,
+		      SHELL_HELP("List all GPIOs used on platform by index",
+				 NULL),
 		      cmd_gpio_list_all, 1, 0),
-	SHELL_CMD_ARG(on, NULL, "<index_in_list> Turn on GPIO's input buffer",
+	SHELL_CMD_ARG(on, NULL,
+		      SHELL_HELP("Turn on GPIO's input buffer",
+				 "<index_in_list>"),
 		      cmd_gpio_turn_on, 2, 0),
-	SHELL_CMD_ARG(off, NULL, "<index_in_list> Turn off GPIO's input buffer",
+	SHELL_CMD_ARG(off, NULL,
+		      SHELL_HELP("Turn off GPIO's input buffer",
+				 "<index_in_list>"),
 		      cmd_gpio_turn_off, 2, 0),
 	SHELL_SUBCMD_SET_END /* Array terminated. */
 );

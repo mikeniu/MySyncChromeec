@@ -59,12 +59,14 @@ struct tps6699x_response {
 				union error_status_t error;
 				struct ti_ccom ccom;
 				uint32_t pdos[4];
+				uint32_t pd_message[PDC_DISC_IDENTITY_VDO_COUNT];
 			};
 		} __packed;
 		union connector_status_t connector_status;
 		struct capability_t capability;
 		union connector_capability_t connector_capability;
 		union cable_property_t cable_property;
+		uint32_t current_cam;
 	} data;
 } __packed;
 
@@ -92,6 +94,9 @@ struct tps6699x_emul_pdc_data {
 	union cable_property_t cable_property;
 	union reg_port_control port_control;
 	bool frs_configured;
+	uint32_t rmdo;
+	uint32_t identity[PDC_DISC_IDENTITY_VDO_COUNT];
+	uint32_t current_cam;
 
 	struct tps6699x_response response;
 
@@ -102,9 +107,11 @@ struct tps6699x_emul_pdc_data {
 	enum ucsi_command_t fail_next_ucsi_cmd;
 	enum std_task_response fail_next_ucsi_cmd_with_response;
 
+	uint32_t pending_rdo;
 	struct emul_pdc_pdo_t pdo;
 	bool cmd_error;
 	struct k_work_delayable aneg_delay_work;
+	struct k_work_delayable delayed_sink_contract_negotiation_work;
 	/** PDC feature flags */
 	ATOMIC_DEFINE(features, EMUL_PDC_FEATURE_COUNT);
 };

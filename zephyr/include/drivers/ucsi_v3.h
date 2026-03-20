@@ -413,6 +413,19 @@ union battery_capability_t {
 	uint8_t raw_value[9];
 };
 
+/*
+ * @brief
+ * List of Response Message Types supported by the UCSI GET_PD_MESSAGE command.
+ */
+enum get_pd_message_response_type_t {
+	GET_PD_MESSAGE_SINK_CAP_EXT = 0,
+	GET_PD_MESSAGE_SRC_CAP_EXT = 1,
+	GET_PD_MESSAGE_BATTERY_CAP = 2,
+	GET_PD_MESSAGE_BATTERY_STATUS = 3,
+	GET_PD_MESSAGE_DISC_ID = 4,
+	GET_PD_MESSAGE_REVISION = 5,
+};
+
 /**
  * @brief CCI - USB Type-C Command Status and Connector Change Indication
  */
@@ -714,6 +727,20 @@ union connector_capability_t {
 	};
 	uint32_t raw_value;
 };
+
+#define UCSI_CHANGE_BITS_EXTERNAL_SUPPLY_CHANGE BIT(1)
+#define UCSI_CHANGE_BITS_PWR_OPERATION_MODE BIT(2)
+#define UCSI_CHANGE_BITS_ATTENTION BIT(3)
+#define UCSI_CHANGE_BITS_SUPPORTED_PROVIDER_CAPS BIT(5)
+#define UCSI_CHANGE_BITS_NEGOTIATED_POWER_LEVEL BIT(6)
+#define UCSI_CHANGE_BITS_PD_RESET_COMPLETE BIT(7)
+#define UCSI_CHANGE_BITS_SUPPORTED_CAM BIT(8)
+#define UCSI_CHANGE_BITS_BATTERY_CHARGING_STATUS BIT(9)
+#define UCSI_CHANGE_BITS_CONNECTOR_PARTNER BIT(11)
+#define UCSI_CHANGE_BITS_PWR_DIRECTION BIT(12)
+#define UCSI_CHANGE_BITS_SINK_PATH_STATUS_CHANGE BIT(13)
+#define UCSI_CHANGE_BITS_CONNECT_CHANGE BIT(14)
+#define UCSI_CHANGE_BITS_ERROR BIT(15)
 
 /**
  * @brief Connector Status Change Field

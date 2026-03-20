@@ -391,9 +391,6 @@
 /* Define which ALS sensor is used for dimming the lightbar when dark */
 #undef CONFIG_ALS_LIGHTBAR_DIMMING
 
-/* Link against third_party/cryptoc. */
-#undef CONFIG_LIBCRYPTOC
-
 /* Support AP hang detection host command and state machine */
 #undef CONFIG_AP_HANG_DETECT
 
@@ -560,6 +557,11 @@
 #define CONFIG_BATTERY_INIT_TYPE_RETRY_COUNT 0
 
 /*
+ * Number of deferred retries when initializing the battery type.
+ */
+#define CONFIG_BATTERY_INIT_TYPE_DEFERRED_RETRY_COUNT 0
+
+/*
  * Critical battery shutdown timeout (seconds)
  *
  * If the battery is at extremely low charge (and discharging) or extremely
@@ -589,6 +591,17 @@
  * different delay.
  */
 #undef CONFIG_BATTERY_CUTOFF_DELAY_US
+
+/* Delay between consecutive battery cutoff retry attempts (in microseconds).
+ * Can be overridden by CONFIG_PLATFORM_EC_BATTERY_CUTOFF_RETRY_DELAY_US.
+ */
+#define CONFIG_BATTERY_CUTOFF_RETRY_DELAY_US (500 * MSEC)
+
+/* Number of extra retry attempts after the first battery cutoff failure.
+ * Set to 0 to disable retry.
+ * Can be overridden by CONFIG_PLATFORM_EC_BATTERY_CUTOFF_RETRY_COUNT.
+ */
+#define CONFIG_BATTERY_CUTOFF_RETRY_COUNT 0
 
 /*
  * After the EC executes battery cutoff, it'll wait for this amount of time in
@@ -639,12 +652,6 @@
 #define CONFIG_BATTERY_LOW_VOLTAGE_TIMEOUT (30 * 60 * SECOND)
 
 /*
- * Use memory mapped region to store battery information. It supports only
- * single battery systems. V2 should be used unless there is a reason not to.
- */
-#undef CONFIG_BATTERY_V1
-
-/*
  * Use an alternative method to store battery information: Instead of writing
  * directly to host memory mapped region, this keeps the battery information in
  * ec_response_battery_static/dynamic_info structures, that can then be fetched
@@ -653,10 +660,10 @@
  *
  * This is required on dual-battery systems and hostless bases with a battery.
  */
-#undef CONFIG_BATTERY_V2
+#undef CONFIG_BATTERY_INFO
 
 /*
- * Number of batteries, only matters when CONFIG_BATTERY_V2 is used.
+ * Number of batteries, only matters when CONFIG_BATTERY_INFO is used.
  */
 #undef CONFIG_BATTERY_COUNT
 
@@ -964,6 +971,7 @@
 #undef CONFIG_CHARGER_RAA489110
 #undef CONFIG_CHARGER_RT9466
 #undef CONFIG_CHARGER_RT9467
+#undef CONFIG_CHARGER_RT9478
 #undef CONFIG_CHARGER_RT9490
 #undef CONFIG_CHARGER_SM5803
 #undef CONFIG_CHARGER_SY21612
@@ -1120,9 +1128,11 @@
  * to keep the bq25710 in performance mode when the AP is in S0.
  */
 #undef CONFIG_CHARGER_BQ25710_IDCHG_LIMIT_MA
+#undef CONFIG_CHARGER_RT9478_IDCHG_LIMIT_MA
 
 /* Enable if CONFIG_CHARGER_BQ25720_VSYS_TH2_DV should be applied */
 #undef CONFIG_CHARGER_BQ25720_VSYS_TH2_CUSTOM
+#undef CONFIG_CHARGER_RT9478_VSYS_TH2_CUSTOM
 
 /*
  * This config option is used to set the charger's VSYS voltage
@@ -1133,9 +1143,11 @@
  * 8.0v.
  */
 #undef CONFIG_CHARGER_BQ25720_VSYS_TH2_DV
+#undef CONFIG_CHARGER_RT9478_VSYS_TH2_DV
 
 /* Enable if CONFIG_CHARGER_BQ25720_VSYS_UVP should be applied */
 #undef CONFIG_CHARGER_BQ25720_VSYS_UVP_CUSTOM
+#undef CONFIG_CHARGER_RT9478_VSYS_UVP_CUSTOM
 
 /*
  * This config option is used to set the VSYS under voltage (VSYS_UVP)
@@ -1144,9 +1156,11 @@
  * in the range of 2.4 V to 8.0 V to be specified.
  */
 #undef CONFIG_CHARGER_BQ25720_VSYS_UVP
+#undef CONFIG_CHARGER_RT9478_VSYS_UVP
 
 /* Enable if CONFIG_CHARGER_BQ25720_IDCHG_DEG2 should be applied */
 #undef CONFIG_CHARGER_BQ25720_IDCHG_DEG2_CUSTOM
+#undef CONFIG_CHARGER_RT9478_IDCHG_DEG2_CUSTOM
 
 /*
  * This config option is used to set the 2nd battery discharge current
@@ -1155,9 +1169,11 @@
  * to 12 ms.
  */
 #undef CONFIG_CHARGER_BQ25720_IDCHG_DEG2
+#undef CONFIG_CHARGER_RT9478_IDCHG_DEG2
 
 /* Enable if CONFIG_CHARGER_BQ25720_IDCHG_TH2 should be applied */
 #undef CONFIG_CHARGER_BQ25720_IDCHG_TH2_CUSTOM
+#undef CONFIG_CHARGER_RT9478_IDCHG_TH2_CUSTOM
 
 /*
  * This config option is used to set the charger's 2nd battery discharge
@@ -1166,12 +1182,15 @@
  * 125% to 400%.
  */
 #undef CONFIG_CHARGER_BQ25720_IDCHG_TH2
+#undef CONFIG_CHARGER_RT9478_IDCHG_TH2
 
 /* Value of the bq25710 charge sense resistor, in mOhms */
 #undef CONFIG_CHARGER_BQ25710_SENSE_RESISTOR
+#undef CONFIG_CHARGER_RT9478_SENSE_RESISTOR
 
 /* Value of the bq25710 input current sense resistor, in mOhms */
 #undef CONFIG_CHARGER_BQ25710_SENSE_RESISTOR_AC
+#undef CONFIG_CHARGER_RT9478_SENSE_RESISTOR_IN
 
 /* Value of the bq25770 charge sense resistor, in mOhms */
 #undef CONFIG_CHARGER_BQ25770_SENSE_RESISTOR
@@ -1187,6 +1206,7 @@
  * enabled for meaningful results.
  */
 #undef CONFIG_CHARGER_BQ25710_PSYS_SENSING
+#undef CONFIG_CHARGER_RT9478_PSYS_SENSING
 
 /*
  * This config option is used to change the charger's internal
@@ -1195,6 +1215,7 @@
  * of 2.3 V.
  */
 #undef CONFIG_CHARGER_BQ25710_CMP_REF_1P2
+#undef CONFIG_CHARGER_RT9478_CMP_REF_1P2
 
 /*
  * This config option is used to change the charger's independent comparator
@@ -1202,9 +1223,11 @@
  * CMPOUT is LOW (internal hysteresis).
  */
 #undef CONFIG_CHARGER_BQ25710_CMP_POL_EXTERNAL
+#undef CONFIG_CHARGER_RT9478_CMP_POL_POSITIVE
 
 /* Enable if CONFIG_CHARGER_BQ25710_PKPWR_TOVLD_DEG should be applied */
 #undef CONFIG_CHARGER_BQ25710_PKPWR_TOVLD_DEG_CUSTOM
+#undef CONFIG_CHARGER_RT9478_PKPWR_TOVLD_DEG_CUSTOM
 
 /*
  * Input overload time when in peak power mode (PKPWR_TOVLD_DEG). This
@@ -1213,6 +1236,7 @@
  * bq25720 1 ms to 10 ms can be encoded.
  */
 #undef CONFIG_CHARGER_BQ25710_PKPWR_TOVLD_DEG
+#undef CONFIG_CHARGER_RT9478_PKPWR_TOVLD_DEG
 
 /*
  * This config option is used to enable the charger's AC over-current
@@ -1220,6 +1244,7 @@
  * reached. The threshold is selected using the ACOC_VTH bit.
  */
 #undef CONFIG_CHARGER_BQ25710_EN_ACOC
+#undef CONFIG_CHARGER_RT9478_EN_IBUS_OCP1
 
 /*
  * This config option selects which ACOC protection threshold is used
@@ -1227,6 +1252,7 @@
  * the default is 200% of ILIM2.
  */
 #undef CONFIG_CHARGER_BQ25710_ACOC_VTH_1P33
+#undef CONFIG_CHARGER_RT9478_IBUS_OCP1_TH_1P33
 
 /*
  * This config option selects the minimum BATOC protection threshold to
@@ -1235,6 +1261,7 @@
  * default threshold is 200% on both chips.
  */
 #undef CONFIG_CHARGER_BQ25710_BATOC_VTH_MINIMUM
+#undef CONFIG_CHARGER_RT9478_BATOC_VTH_MINIMUM
 
 /*
  * This config option sets the PP_INOM bit in Prochot Option 1
@@ -1243,6 +1270,7 @@
  * current setting).
  */
 #undef CONFIG_CHARGER_BQ25710_PP_INOM
+#undef CONFIG_CHARGER_RT9478_PP_INOM
 
 /*
  * This config option sets the PP_BATPRES bit in Prochot Option 1
@@ -1250,6 +1278,7 @@
  * removed.
  */
 #undef CONFIG_CHARGER_BQ25710_PP_BATPRES
+#undef CONFIG_CHARGER_RT9478_PP_BATGONE
 
 /*
  * This config option sets the PP_ACOK in Prochot Option 1
@@ -1257,6 +1286,7 @@
  * removed.
  */
 #undef CONFIG_CHARGER_BQ25710_PP_ACOK
+#undef CONFIG_CHARGER_RT9478_PP_VBUSOK
 
 /*
  * This config option sets the PP_COMP in Prochot Option 1
@@ -1264,6 +1294,7 @@
  * and its PROCHOT profile.
  */
 #undef CONFIG_CHARGER_BQ25710_PP_COMP
+#undef CONFIG_CHARGER_RT9478_PP_COMP
 
 /*
  * This config option sets the PP_IDCHG2 bit in the Charge Option 4
@@ -1271,9 +1302,11 @@
  */
 
 #undef CONFIG_CHARGER_BQ25720_PP_IDCHG2
+#undef CONFIG_CHARGER_RT9478_PP_IDCHG2
 
 /* Enable if CONFIG_CHARGER_BQ25710_VSYS_MIN_VOLTAGE_MV should be applied */
 #undef CONFIG_CHARGER_BQ25710_VSYS_MIN_VOLTAGE_CUSTOM
+#undef CONFIG_CHARGER_RT9478_VSYS_MIN_VOLTAGE_CUSTOM
 
 /*
  * This config option sets the minimum system voltage in
@@ -1284,7 +1317,20 @@
  * battery cells connected in series using the CELL_BATPRESZ strap.
  */
 #undef CONFIG_CHARGER_BQ25710_VSYS_MIN_VOLTAGE_MV
+#undef CONFIG_CHARGER_RT9478_VSYS_MIN_VOLTAGE_MV
 
+/* Enable if CONFIG_CHARGER_RT9478_IAICR2 should be applied */
+#undef CONFIG_CHARGER_RT9478_IAICR2_CUSTOM
+
+/*
+ * This config option sets percentage of IAICR1 as threshold. ICRIT threshold is
+ * set to be 110% of IAICR2. Input overcurrent protection (IBUS_OCP1) threshold
+ * is also 1.33x or 2x of IAICR2 (1.33x or 2x based on IBUS_OCP1_TH field).
+ * 1  - 25: 110% - 230%, step is 5%.
+ * 26 - 30: 250% - 450%, step is 50%.
+ * 31: Out of range (ignored).
+ */
+#undef CONFIG_CHARGER_RT9478_IAICR2
 /*
  * Board specific maximum input current limit, in mA.
  */
@@ -1804,18 +1850,6 @@
 
 /* When defined, it enables build assert for panic data structure size */
 #undef CONFIG_RO_PANIC_DATA_SIZE
-
-/*
- * When defined, it enables system safe mode. System safe mode allows the AP to
- * capture the EC state after a panic.
- */
-#undef CONFIG_SYSTEM_SAFE_MODE
-#define CONFIG_SYSTEM_SAFE_MODE_TIMEOUT_MSEC 4000
-/*
- * Prints the stack of the faulting task to the console buffer in system safe
- * mode.
- */
-#define CONFIG_SYSTEM_SAFE_MODE_PRINT_STACK
 
 /*
  * Enables fetching a memory dump using host commands. This is useful when
@@ -2648,12 +2682,9 @@
 /*
  * Include host commands to fetch battery information from
  * ec_response_battery_static/dynamic_info structures, only makes sense when
- * CONFIG_BATTERY_V2 is enabled.
+ * CONFIG_BATTERY_INFO is enabled.
  */
-#undef CONFIG_HOSTCMD_BATTERY_V2
-
-/* Default hcdebug mode, e.g. HCDEBUG_OFF or HCDEBUG_NORMAL */
-#define CONFIG_HOSTCMD_DEBUG_MODE HCDEBUG_NORMAL
+#undef CONFIG_HOSTCMD_BATTERY_INFO
 
 /* If we have host command task, assume we also are using host events. */
 #ifdef HAS_TASK_HOSTCMD
@@ -2973,6 +3004,12 @@
 #undef CONFIG_SMBUS_PEC
 
 /*
+ * The buffer size for i2c_read_sized_block. Set this to 256 could ensure
+ * that i2c_read_sized_block only call i2c_xfer_unlocked twice each try.
+ */
+#define CONFIG_I2C_READ_SIZE_BUFFER 1
+
+/*
  * Add hosts-side support for entering programming mode for I2C ITE ECs.
  * Must define ite_dfu_config_t for configuration in board file.
  */
@@ -3246,6 +3283,18 @@
 /* Add support for skipping lid close when the system into tablet mode. */
 #undef CONFIG_TABLET_MODE_SKIP_LID_CLOSE
 
+/* Add hall control to power on/off the WPC.*/
+#undef CONFIG_WPC_HALL_ENABLE
+
+/*
+ * The debounce time for the WPC HALL
+ * Default is 30ms.
+ */
+#define CONFIG_WPC_HALL_DEBOUNCE_US (30 * MSEC)
+
+/* Add AC S5 charge feature for the WPC */
+#undef CONFIG_WPC_AC_S5_CHARGE
+
 /*
  * Minimum CPU clocks between scans.  This ensures that keyboard scanning
  * doesn't starve the other EC tasks of CPU when running at a decreased system
@@ -3283,11 +3332,6 @@
  * Allow support multiple keyboard matrix for special key.
  */
 #undef CONFIG_KEYBOARD_MULTIPLE
-
-/*
- * Allow board-specific 8042 keyboard callback when a key state is changed.
- */
-#undef CONFIG_KEYBOARD_SCANCODE_CALLBACK
 
 /*
  * Enable keyboard testing functionality. This enables a message which receives
@@ -3753,9 +3797,6 @@
 /* Support one-wire interface */
 #undef CONFIG_ONEWIRE
 
-/* Support One Time Protection structure */
-#undef CONFIG_OTP
-
 /* Use OTP as a source of key material. */
 #undef CONFIG_OTP_KEY
 
@@ -4215,6 +4256,7 @@
 #undef CONFIG_SPI_FLASH_W25Q64
 #undef CONFIG_SPI_FLASH_W25Q80
 #undef CONFIG_SPI_FLASH_W25X40
+#undef CONFIG_SPI_FLASH_P25Q16
 
 /* SPI flash part supports SR2 register */
 #undef CONFIG_SPI_FLASH_HAS_SR2
@@ -4431,7 +4473,6 @@
  *
  * This is defined in the following two files:
  * test/{testname}.mocklist
- * fuzz/{fuzzname}.mocklist
  */
 #undef CONFIG_TEST_MOCK_LIST
 
@@ -5491,6 +5532,9 @@
 /* Support VCONN swap */
 #undef CONFIG_USBC_VCONN_SWAP
 
+#undef CONFIG_USBC_PD3_T_SENDER_RESPONSE_OVERRIDE
+#undef CONFIG_USBC_PD3_T_SENDER_RESPONSE_MS
+
 /*
  * The amount of time in microseconds that the board takes to turn VCONN on or
  * off after being directed to do so. Typically a property of the PPC. Default
@@ -6173,6 +6217,15 @@
 #include "board.h"
 #endif
 
+/* Default hcdebug mode, e.g. HCDEBUG_OFF or HCDEBUG_NORMAL */
+#if !defined(CONFIG_HOSTCMD_DEBUG_MODE)
+#if defined(CONFIG_BRINGUP)
+#define CONFIG_HOSTCMD_DEBUG_MODE HCDEBUG_NORMAL
+#else
+#define CONFIG_HOSTCMD_DEBUG_MODE HCDEBUG_OFF
+#endif /* defined(CONFIG_BRINGUP) */
+#endif /* !defined(CONFIG_HOSTCMD_DEBUG_MODE) */
+
 /*
  * Define CONFIG_HOST_ESPI_VW_POWER_SIGNAL if any power signals from the host
  * are configured as virtual wires.
@@ -6490,17 +6543,21 @@
 /******************************************************************************/
 /* MKBP events delivery methods. */
 #ifdef CONFIG_MKBP_EVENT
+/* clang-format off */
 #if !defined(CONFIG_MKBP_USE_CUSTOM) &&                  \
 	!defined(CONFIG_MKBP_USE_HOST_EVENT) &&          \
 	!defined(CONFIG_MKBP_USE_GPIO) &&                \
 	!defined(CONFIG_MKBP_USE_GPIO_AND_HOST_EVENT) && \
-	!defined(CONFIG_MKBP_USE_HECI)
+	!defined(CONFIG_MKBP_USE_HECI) &&                \
+	!defined(CONFIG_MKBP_USE_USB)
 #error Please define one of CONFIG_MKBP_USE_* macro.
 #endif
+/* clang-format on */
 
 #if defined(CONFIG_MKBP_USE_CUSTOM) + defined(CONFIG_MKBP_USE_GPIO) + \
 		defined(CONFIG_MKBP_USE_HOST_EVENT) +                 \
-		defined(CONFIG_MKBP_USE_HOST_HECI) >                  \
+		defined(CONFIG_MKBP_USE_HOST_HECI) +                  \
+		defined(CONFIG_MKBP_USE_HOST_USB) >                   \
 	1
 #error Must select only one type of MKBP event delivery method.
 #endif
@@ -6622,7 +6679,8 @@
 	defined(CONFIG_CHARGER_RT9467) || defined(CONFIG_CHARGER_RT9490) ||   \
 	defined(CONFIG_CHARGER_MT6370) || defined(CONFIG_CHARGER_BQ25710) ||  \
 	defined(CONFIG_CHARGER_BQ25720) || defined(CONFIG_CHARGER_ISL9241) || \
-	defined(CONFIG_CHARGER_RAA489110) || defined(CONFIG_CHARGER_BQ25770)
+	defined(CONFIG_CHARGER_RAA489110) ||                                  \
+	defined(CONFIG_CHARGER_BQ25770) || defined(CONFIG_CHARGER_RT9478)
 #if !defined(CONFIG_USB_PD_VBUS_MEASURE_TCPC) &&              \
 	!defined(CONFIG_USB_PD_VBUS_MEASURE_ADC_EACH_PORT) && \
 	!defined(CONFIG_USB_PD_VBUS_MEASURE_BY_BOARD)
@@ -6671,7 +6729,8 @@
 	defined(CONFIG_CHARGER_RAA489000) || defined(CONFIG_CHARGER_SM5803) || \
 	defined(CONFIG_CHARGER_BQ25710) || defined(CONFIG_CHARGER_BQ25720) ||  \
 	defined(CONFIG_CHARGER_BQ25770) ||                                     \
-	defined(CONFIG_CHARGER_RAA489110) || defined(CONFIG_CHARGER_RT9490)
+	defined(CONFIG_CHARGER_RAA489110) || defined(CONFIG_CHARGER_RT9490) || \
+	defined(CONFIG_CHARGER_RT9478)
 #define CONFIG_CHARGER_NARROW_VDC
 #endif
 
@@ -6715,22 +6774,22 @@
 #ifdef CONFIG_EC_EC_COMM_BATTERY
 #ifdef CONFIG_EC_EC_COMM_CLIENT
 #define CONFIG_EC_EC_COMM_BATTERY_CLIENT
-#define CONFIG_BATTERY_V2
+#define CONFIG_BATTERY_INFO
 #define CONFIG_BATTERY_COUNT 2
 #endif
 
 #ifdef CONFIG_EC_EC_COMM_SERVER
 #define CONFIG_EC_EC_COMM_BATTERY_SERVER
-#define CONFIG_BATTERY_V2
+#define CONFIG_BATTERY_INFO
 #define CONFIG_BATTERY_COUNT 1
 #endif
 #endif /* CONFIG_EC_EC_COMM_BATTERY */
 
 /*****************************************************************************/
 /* Auto-enable battery v2 module with a single battery if battery is defined. */
-#if defined(CONFIG_BATTERY) && !defined(CONFIG_BATTERY_V2)
+#if defined(CONFIG_BATTERY) && !defined(CONFIG_BATTERY_INFO)
 #define CONFIG_BATTERY_COUNT 1
-#define CONFIG_BATTERY_V2
+#define CONFIG_BATTERY_INFO
 #endif
 
 /*
@@ -7075,11 +7134,10 @@
 /*****************************************************************************/
 
 /*
- * Apply fuzzer and test config overrides last, since fuzzers and tests need to
+ * Apply test config overrides last, since tests need to
  * override some of the config flags in non-standard ways to mock only parts of
  * the system.
  */
-#include "fuzz_config.h"
 #ifdef TEST_BUILD
 #include "test_config.h"
 #endif
@@ -7325,6 +7383,16 @@
 #ifndef CONFIG_BODY_DETECTION_SENSOR
 #error CONFIG_BODY_DETECTION_SENSOR must be defined to use body detection
 #endif /* ifndef(CONFIG_BODY_DETECTION_SENSOR) */
+
+/* Non-zephyr only support V1 version of the body detection algorithm. */
+#ifndef CONFIG_ZEPHYR
+#ifdef CONFIG_BODY_DETECTION_ALOGIRTHM_V2
+#error "Only V1 algo for body detection is supported."
+#endif
+#ifndef CONFIG_BODY_DETECTION_ALOGIRTHM_V1
+#define CONFIG_BODY_DETECTION_ALOGIRTHM_V1
+#endif
+#endif /* ifndef CONFIG_ZEPHYR */
 
 #ifndef CONFIG_BODY_DETECTION_MAX_WINDOW_SIZE
 #define CONFIG_BODY_DETECTION_MAX_WINDOW_SIZE 250 /* max sensor odr (Hz) */

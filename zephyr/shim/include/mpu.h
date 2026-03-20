@@ -6,6 +6,8 @@
 #ifndef __CROS_EC_MPU_H
 #define __CROS_EC_MPU_H
 
+#include <stdbool.h>
+
 /* This matches up with core/cortex-m/include/mpu.h */
 
 /* Location of iram.text */
@@ -33,7 +35,15 @@ int mpu_lock_ro_flash(void);
 int mpu_lock_rw_flash(void);
 
 #ifdef CONFIG_PLATFORM_EC_ROLLBACK_MPU_PROTECT
-int mpu_lock_rollback(int lock);
+/**
+ * @brief Protects or unprotects the rollback region readback.
+ *
+ * @param lock true to lock (protect), false to unlock (unprotect).
+ *
+ * @retval 0 Success.
+ * @retval <0 Error occurred.
+ */
+int mpu_lock_rollback(bool lock);
 #endif
 
 #endif /* __CROS_EC_CPU_H */

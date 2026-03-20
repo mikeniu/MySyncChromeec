@@ -734,6 +734,11 @@ static void pwrseq_loop_thread(void *p1, void *p2, void *p3)
 	}
 }
 
+BUILD_ASSERT(
+	EC_TASK_PRIORITY(EC_TASK_AP_PWRSEQ_PRIO) ==
+		CONFIG_AP_PWRSEQ_THREAD_PRIORITY,
+	"EC_TASK_AP_PWRSEQ_PRIO does not match CONFIG_AP_PWRSEQ_THREAD_PRIORITY.");
+
 static inline void create_pwrseq_thread(void)
 {
 	k_thread_create(&pwrseq_thread_data, pwrseq_thread_stack,
@@ -777,6 +782,11 @@ static int pwrseq_init(void)
 	/* Create power sequence state handler core function thread */
 	create_pwrseq_thread();
 	return 0;
+}
+
+k_tid_t get_ap_pwrseq_thread(void)
+{
+	return &pwrseq_thread_data;
 }
 
 /*
@@ -935,6 +945,13 @@ static int x86_non_dsx_s3_run(void *data)
 
 AP_POWER_ARCH_STATE_DEFINE(S3, NULL, x86_non_dsx_s3_run, NULL);
 
+static int x86_non_dsx_s0_entry(void *data)
+{
+	disable_sleep(SLEEP_MASK_AP_RUN);
+
+	return 0;
+}
+
 static int x86_non_dsx_s0_run(void *data)
 {
 	if (signals_valid_and_on(IN_PCH_SLP_S3)) {
@@ -942,17 +959,27 @@ static int x86_non_dsx_s0_run(void *data)
 	}
 #if CONFIG_AP_PWRSEQ_S0IX
 	if (ap_power_sleep_get_notify() == AP_POWER_SLEEP_SUSPEND &&
-	    power_signals_on(IN_PCH_SLP_S0)) {
+	    power_signal_get(PWR_SLP_S0) != 0) {
 		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S0ix);
 	} else if (ap_power_sleep_get_notify() == AP_POWER_SLEEP_RESUME) {
 		ap_power_sleep_notify_transition(AP_POWER_SLEEP_RESUME);
+	} else if (power_signal_get(PWR_SLP_S0) == 0) {
+		disable_sleep(SLEEP_MASK_AP_RUN);
 	}
 #endif
 
 	return 0;
 }
 
-AP_POWER_ARCH_STATE_DEFINE(S0, NULL, x86_non_dsx_s0_run, NULL);
+static int x86_non_dsx_s0_exit(void *data)
+{
+	enable_sleep(SLEEP_MASK_AP_RUN);
+
+	return 0;
+}
+
+AP_POWER_ARCH_STATE_DEFINE(S0, x86_non_dsx_s0_entry, x86_non_dsx_s0_run,
+			   x86_non_dsx_s0_exit);
 #endif /* CONFIG_AP_PWRSEQ_DRIVER */
 
 #ifdef CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND

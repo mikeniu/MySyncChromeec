@@ -59,6 +59,8 @@ enum led_pwr_state {
 	LED_PWRS_CHARGE_NEAR_FULL,
 	/* Charging state machine error */
 	LED_PWRS_ERROR,
+	/* Insufficient charger is attached */
+	LED_PWRS_INSUFFICIENT_ADAPTER,
 	/*  Count of total states */
 	LED_PWRS_COUNT
 };

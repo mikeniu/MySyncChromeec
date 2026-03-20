@@ -56,7 +56,7 @@ union pd_status_t {
 		uint32_t power_control_request : 1;
 		uint32_t vdm_received : 1;
 		uint32_t source_sink_cap_received : 1;
-		uint32_t data_message_received : 1;
+		uint32_t alert_received : 1;
 		uint32_t reserved3 : 1;
 		uint32_t system_misc_change : 1;
 		uint32_t reserved4 : 1;
@@ -328,6 +328,11 @@ union rts54_request {
 		uint8_t port_num;
 		union battery_status_t bstat;
 	} __packed set_battery_status;
+
+	struct get_alert_req {
+		struct rts54_subcommand_header header;
+		uint8_t port_num;
+	} get_alert;
 };
 
 union rts54_response {
@@ -500,6 +505,11 @@ union rts54_response {
 		uint8_t byte_count;
 		union csd_op_mode_t op_mode;
 	} __packed get_tpc_csd_operation_mode;
+
+	struct get_alert_response {
+		uint8_t byte_count;
+		uint32_t ado;
+	} __packed get_alert;
 };
 
 struct ping_status {
@@ -546,6 +556,13 @@ struct rts5453p_emul_pdc_data {
 
 	uint16_t delay_ms;
 	struct k_work_delayable delay_work;
+	struct k_work_delayable delayed_sink_contract_negotiation_work;
+
+	/** An RDO sent by SET_RDO. The RDO gets "activated" by
+	 *  delayed_sink_contract_negotiation_handler() after a delay to
+	 *  simulate the time it takes the PDC to negotiate with the port
+	 *  partner. */
+	uint32_t pending_rdo;
 
 	struct emul_pdc_pdo_t pdo;
 
@@ -557,6 +574,7 @@ struct rts5453p_emul_pdc_data {
 	uint8_t sbu_mux_mode;
 	union battery_capability_t battery_capability;
 	union battery_status_t battery_status;
+	uint32_t ado;
 	/** PDC feature flags */
 	ATOMIC_DEFINE(features, EMUL_PDC_FEATURE_COUNT);
 	int dead_battery;

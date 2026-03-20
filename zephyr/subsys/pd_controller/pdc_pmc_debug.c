@@ -55,12 +55,11 @@ static int cmd_altmode_read(const struct shell *sh, size_t argc, char **argv)
 	return 0;
 }
 
-SHELL_STATIC_SUBCMD_SET_CREATE(sub_altmode_cmds,
-			       SHELL_CMD_ARG(read, NULL,
-					     "Read status register\n"
-					     "Usage: altmode read <port>",
-					     cmd_altmode_read, 2, 1),
-			       SHELL_SUBCMD_SET_END);
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	sub_altmode_cmds,
+	SHELL_CMD_ARG(read, NULL, SHELL_HELP("Read status register", "<port>"),
+		      cmd_altmode_read, 2, 1),
+	SHELL_SUBCMD_SET_END);
 
 SHELL_CMD_REGISTER(altmode, &sub_altmode_cmds, "PD Altmode commands", NULL);
 
@@ -88,10 +87,10 @@ static int command_typec(const struct shell *sh, int argc, const char **argv)
 
 	shell_fprintf(sh, SHELL_INFO,
 		      "Port %d: USB=%d DP=%d POLARITY=%s HPD_IRQ=%d "
-		      "HPD_LVL=%d TBT=%d USB4=%d\n",
+		      "HPD_LVL=%d TBT=%d USB4=%d DTS=%d\n",
 		      port, pd_altmode_is_usb_enabled(status), status.dp,
 		      status.conn_ori ? "INVERTED" : "NORMAL", status.dp_irq,
-		      status.hpd_lvl, status.tbt, status.usb4);
+		      status.hpd_lvl, status.tbt, status.usb4, status.dbg_acc);
 
 	return EC_SUCCESS;
 }

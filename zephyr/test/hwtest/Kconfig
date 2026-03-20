@@ -16,6 +16,13 @@ config HW_TEST_AES
 	help
 	  The test verifies AES functions.
 
+config HW_TEST_BBRAM_RETAINED_MEM
+	bool "BBRAM retained memory test"
+	select ZTEST
+	depends on PLATFORM_EC_BBRAM_TYPE_RETAINED_MEM
+	help
+	  The test verifies "BBRAM" using retained memory.
+
 config HW_TEST_BENCHMARK
 	bool "Benchmark test"
 	select ZTEST
@@ -40,6 +47,7 @@ config HW_TEST_CRC
 config HW_TEST_EXCEPTION
 	bool "Exception test"
 	select ZTEST
+	select ZTEST_FATAL_HOOK
 
 config HW_TEST_EXIT
 	bool "Exit test"
@@ -52,6 +60,11 @@ config HW_TEST_FLASH_PHYSICAL
 	bool "Flash physical test"
 	select ZTEST
 	depends on FLASH
+
+config HW_TEST_FLASH_PROTECTION_RW
+	bool "Flash protecion RW test"
+	select ZTEST
+	depends on PLATFORM_EC_FLASH_CROS
 
 config HW_TEST_FLASH_WRITE_PROTECT
 	bool "Flash write protect test"
@@ -121,6 +134,7 @@ config HW_TEST_OTP_KEY
 	select MOCK_OTP
 	help
 		The test verifies basic OTP key functionality
+
 config HW_TEST_NULL_POINTER
 	bool "null pointer test"
 	select ZTEST
@@ -130,7 +144,7 @@ config HW_TEST_NULL_POINTER
 config HW_TEST_PANIC
 	bool "Panic test"
 	select ZTEST
-	depends on ARM
+	depends on ARM || RISCV
 	help
 	  The test verifies panic data.
 
@@ -141,6 +155,13 @@ config HW_TEST_PANIC_DATA
 	select PLATFORM_EC_DEBUG_ASSERT
 	help
 	  It verifies panic data across different reboots.
+
+config HW_TEST_PMP_ENTRIES
+	bool "pmp entries test"
+	select ZTEST
+	depends on RISCV_PMP
+	help
+	  The test verifies the pmp entries in both RO and RW.
 
 config HW_TEST_PRINTF
 	bool "printf test"
@@ -168,6 +189,12 @@ config HW_TEST_RESTRICTED_CONSOLE
 	help
 	  The test verifies restricted console.
 
+config HW_TEST_REBOOT
+	bool "Reboot test"
+	select ZTEST
+	help
+	  The test verifies basic reboot functionality.
+
 config HW_TEST_RNG_BENCHMARK
 	bool "RNG benchmark test"
 	select ZTEST
@@ -182,6 +209,22 @@ config HW_TEST_ROLLBACK
 	depends on BOARD_FINGERPRINT
 	help
 	  The test verifies rollback regions functionality.
+
+config HW_TEST_ROLLBACK_MINIMAL_VERSION
+	bool "Rollback minimal version test"
+	select ZTEST
+	depends on BOARD_FINGERPRINT
+	depends on PLATFORM_EC_ROLLBACK
+	help
+	  The test verifies that the rollback minimal version matches the
+	  expected value.
+
+config HW_TEST_ROLLBACK_LOCK_PANIC
+	bool "Rollback lock panic test"
+	select ZTEST
+	depends on BOARD_FINGERPRINT
+	help
+	  The test verifies that panic occurs if function mpu_lock_rollback fails.
 
 config HW_TEST_ROLLBACK_ENTROPY
 	bool "Rollback entropy test"

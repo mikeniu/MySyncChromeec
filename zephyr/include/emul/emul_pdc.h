@@ -24,6 +24,8 @@ enum emul_pdc_feature_flag {
 	/** Enable support for SBU mux override commands, used on PDC-driven CCD
 	 *  DUTs */
 	EMUL_PDC_FEATURE_SBU_MUX_OVERRIDE,
+	/** Never update the effective RDO after processing SET_RDO */
+	EMUL_PDC_FEATURE_DONT_APPLY_RDO,
 	EMUL_PDC_FEATURE_COUNT,
 };
 
@@ -130,6 +132,15 @@ typedef int (*emul_pdc_get_autoneg_sink_t)(const struct emul *target,
 					   int *max_voltage, int *max_current);
 typedef int (*emul_pdc_get_sys_power_state_t)(const struct emul *target,
 					      enum power_state *state);
+typedef int (*emul_pdc_set_identity_t)(const struct emul *target,
+				       uint32_t *vdos);
+typedef int (*emul_pdc_set_revision_t)(const struct emul *target,
+				       uint32_t rmdo);
+typedef int (*emul_pdc_set_current_cam_t)(const struct emul *target,
+					  uint32_t current_cam);
+typedef int (*emul_pdc_set_alert_t)(const struct emul *target, uint32_t ado);
+typedef int (*emul_pdc_get_sbu_mux_mode_t)(const struct emul *target,
+					   enum pdc_sbu_mux_mode *mode);
 
 __subsystem struct emul_pdc_driver_api {
 	emul_pdc_set_response_delay_t set_response_delay;
@@ -178,6 +189,11 @@ __subsystem struct emul_pdc_driver_api {
 	emul_pdc_get_battery_capability_t get_battery_capability;
 	emul_pdc_get_battery_status_t get_battery_status;
 	emul_pdc_get_sys_power_state_t get_sys_power_state;
+	emul_pdc_set_identity_t set_identity;
+	emul_pdc_set_revision_t set_revision;
+	emul_pdc_set_current_cam_t set_current_cam;
+	emul_pdc_set_alert_t set_alert;
+	emul_pdc_get_sbu_mux_mode_t get_sbu_mux_mode;
 };
 
 static inline int emul_pdc_set_ucsi_version(const struct emul *target,
@@ -940,6 +956,77 @@ static inline int emul_pdc_get_sys_power_state(const struct emul *target,
 	const struct emul_pdc_driver_api *api = target->backend_api;
 	if (api->get_sys_power_state) {
 		return api->get_sys_power_state(target, state);
+	}
+	return -ENOSYS;
+}
+
+static inline int emul_pdc_set_identity(const struct emul *target,
+					uint32_t *identity)
+{
+	if (!target || !target->backend_api) {
+		return -ENOTSUP;
+	}
+
+	const struct emul_pdc_driver_api *api = target->backend_api;
+	if (api->set_identity) {
+		return api->set_identity(target, identity);
+	}
+	return -ENOSYS;
+}
+
+static inline int emul_pdc_set_revision(const struct emul *target,
+					const uint32_t rmdo)
+{
+	if (!target || !target->backend_api) {
+		return -ENOTSUP;
+	}
+
+	const struct emul_pdc_driver_api *api = target->backend_api;
+
+	if (api->set_revision) {
+		return api->set_revision(target, rmdo);
+	}
+	return -ENOSYS;
+}
+
+static inline int emul_pdc_set_current_cam(const struct emul *target,
+					   const uint32_t current_cam)
+{
+	if (!target || !target->backend_api) {
+		return -ENOTSUP;
+	}
+
+	const struct emul_pdc_driver_api *api = target->backend_api;
+	if (api->set_current_cam) {
+		return api->set_current_cam(target, current_cam);
+	}
+	return -ENOSYS;
+}
+
+static inline int emul_pdc_set_alert(const struct emul *target,
+				     const uint32_t ado)
+{
+	if (!target || !target->backend_api) {
+		return -ENOTSUP;
+	}
+
+	const struct emul_pdc_driver_api *api = target->backend_api;
+	if (api->set_alert) {
+		return api->set_alert(target, ado);
+	}
+	return -ENOSYS;
+}
+
+static inline int emul_pdc_get_sbu_mux_mode(const struct emul *target,
+					    enum pdc_sbu_mux_mode *mode)
+{
+	if (!target || !target->backend_api) {
+		return -ENOTSUP;
+	}
+
+	const struct emul_pdc_driver_api *api = target->backend_api;
+	if (api->get_sbu_mux_mode) {
+		return api->get_sbu_mux_mode(target, mode);
 	}
 	return -ENOSYS;
 }

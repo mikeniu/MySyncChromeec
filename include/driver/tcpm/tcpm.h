@@ -259,7 +259,7 @@ static inline int tcpm_set_rx_enable(int port, int enable)
 	return tcpc_config[port].drv->set_rx_enable(port, enable);
 }
 
-static inline void tcpm_enable_auto_discharge_disconnect(int port, int enable)
+static inline void tcpm_enable_auto_discharge_disconnect(int port, bool enable)
 {
 	const struct tcpm_drv *tcpc = tcpc_config[port].drv;
 
@@ -316,7 +316,7 @@ static inline int tcpm_set_src_ctrl(int port, int enable)
 		return EC_ERROR_UNIMPLEMENTED;
 }
 
-static inline int tcpc_get_vbus_voltage(int port)
+test_mockable_static_inline int tcpc_get_vbus_voltage(int port)
 {
 	int vbus;
 
@@ -601,7 +601,7 @@ int tcpm_set_rx_enable(int port, int enable);
  * @param port Type-C port number
  * @param enable true for enable, false for disable
  */
-void tcpm_enable_auto_discharge_disconnect(int port, int enable);
+void tcpm_enable_auto_discharge_disconnect(int port, bool enable);
 
 /**
  * Transmit PD message

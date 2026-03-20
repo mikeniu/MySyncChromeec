@@ -2,8 +2,14 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+config TEST_NO_PDC_INIT
+	bool "Do not autoinit pdc devices"
+
+config TEST_SUITE_PDC_API
+	bool "Enable generic PDC driver API tests"
+
 config TEST_SUITE_PDC_GENERIC
-	bool "Enable generic PDC tests"
+	bool "Enable generic pdc_power_mgmt tests"
 
 config TEST_SUITE_PDC_UTILS
 	bool "Enable PDC utility tests"
@@ -17,6 +23,9 @@ config TEST_SUITE_PDC_DEVICE_NOT_READY
 config TEST_SUITE_PDC_POLICY
 	bool "Enable PDC policy tests"
 
+config TEST_SUITE_PDC_POLICY_SRC_NO_3A
+	bool "Enable PDC src policy tests with no 3A port"
+
 config TEST_SUITE_PDC_POLICY_SINK
 	bool "Enable PDC policy sink tests"
 
@@ -25,6 +34,9 @@ config TEST_SUITE_PDC_BATTERY_STATUS
 
 config TEST_SUITE_PDC_POLICY_DEAD_BATTERY
 	bool "Enable PDC Dead Battery policy tests"
+
+config TEST_SUITE_PDC_COMMS_SUSPEND_RESUME
+	bool "Enable PDC communication suspend and resume tests"
 
 config TEST_PDC_POLICY_DEAD_BATTERY_TWO_CHARGERS
 	select TEST_SUITE_PDC_POLICY_DEAD_BATTERY
