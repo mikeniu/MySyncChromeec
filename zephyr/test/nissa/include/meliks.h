@@ -9,7 +9,6 @@
 void panel_power_detect_init(void);
 void lcd_reset_detect_init(void);
 void handle_tsp_ta(void);
-void meliks_callback_init(void);
 void power_handler(struct ap_power_ev_callback *cb,
 		   struct ap_power_ev_data data);
 void board_init_battery_type(void);

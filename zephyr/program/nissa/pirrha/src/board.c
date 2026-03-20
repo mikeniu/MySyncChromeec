@@ -142,14 +142,5 @@ static void power_handler(struct ap_power_ev_callback *cb,
 		break;
 	}
 }
-
-test_export_static void pirrha_callback_init(void)
-{
-	static struct ap_power_ev_callback pirrha_cb;
-
-	ap_power_ev_init_callback(&pirrha_cb, power_handler,
-				  AP_POWER_SHUTDOWN | AP_POWER_SUSPEND |
-					  AP_POWER_RESUME);
-	ap_power_ev_add_callback(&pirrha_cb);
-}
-DECLARE_HOOK(HOOK_INIT, pirrha_callback_init, HOOK_PRIO_DEFAULT);
+AP_POWER_EVENT_CALLBACK_DEFINE(power_handler, AP_POWER_SHUTDOWN,
+			       AP_POWER_SUSPEND, AP_POWER_RESUME);

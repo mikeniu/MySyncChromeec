@@ -19,7 +19,6 @@
 #include "usbc/usb_muxes.h"
 
 #include <zephyr/drivers/gpio.h>
-#include <zephyr/init.h>
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
 
@@ -116,6 +115,9 @@ DECLARE_HOOK(HOOK_INIT, board_usb_pd_count_init, HOOK_PRIO_INIT_I2C);
 static void hdmi_power_handler(struct ap_power_ev_callback *cb,
 			       struct ap_power_ev_data data)
 {
+	if (nissa_get_sb_type() != NISSA_SB_HDMI_A)
+		return;
+
 	/* Enable VCC on the HDMI port. */
 	const struct gpio_dt_spec *s3_rail =
 		GPIO_DT_FROM_ALIAS(gpio_hdmi_en_odl);
@@ -149,6 +151,9 @@ static void hdmi_power_handler(struct ap_power_ev_callback *cb,
 		break;
 	}
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(hdmi_power_handler, AP_POWER_PRE_INIT,
+			       AP_POWER_HARD_OFF, AP_POWER_STARTUP,
+			       AP_POWER_SHUTDOWN);
 
 static void hdmi_hpd_interrupt(const struct device *device,
 			       struct gpio_callback *callback,
@@ -211,6 +216,9 @@ static void soc_it8xxx2_disable_i2c4_alt(void)
 static void lte_power_handler(struct ap_power_ev_callback *cb,
 			      struct ap_power_ev_data data)
 {
+	if (nissa_get_sb_type() != NISSA_SB_C_LTE)
+		return;
+
 	/* Enable rails for S5 */
 	const struct gpio_dt_spec *s5_rail =
 		GPIO_DT_FROM_ALIAS(gpio_en_sub_s5_rails);
@@ -228,6 +236,8 @@ static void lte_power_handler(struct ap_power_ev_callback *cb,
 		break;
 	}
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(lte_power_handler, AP_POWER_HARD_OFF,
+			       AP_POWER_PRE_INIT);
 #endif
 
 /**
@@ -240,7 +250,6 @@ static void lte_power_handler(struct ap_power_ev_callback *cb,
 static void nereid_subboard_config(void)
 {
 	enum nissa_sub_board_type sb = nissa_get_sb_type();
-	static struct ap_power_ev_callback power_cb;
 
 #if USB_PORT_ENABLE_COUNT > 1
 	BUILD_ASSERT(USB_PORT_ENABLE_COUNT == 2,
@@ -315,12 +324,6 @@ static void nereid_subboard_config(void)
 		 * won't do anything if the corresponding pin isn't configured,
 		 * but that's okay.
 		 */
-		ap_power_ev_init_callback(
-			&power_cb, hdmi_power_handler,
-			AP_POWER_PRE_INIT | AP_POWER_HARD_OFF |
-				AP_POWER_STARTUP | AP_POWER_SHUTDOWN);
-		ap_power_ev_add_callback(&power_cb);
-
 		/*
 		 * Configure HPD input from sub-board; it's inverted by a buffer
 		 * on the sub-board.
@@ -358,10 +361,6 @@ static void nereid_subboard_config(void)
 		/* Control LTE power when CPU entering or
 		 * exiting S5 state.
 		 */
-		ap_power_ev_init_callback(&power_cb, lte_power_handler,
-					  AP_POWER_HARD_OFF |
-						  AP_POWER_PRE_INIT);
-		ap_power_ev_add_callback(&power_cb);
 #endif
 		break;
 

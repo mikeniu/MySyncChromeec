@@ -12,7 +12,6 @@
 #include "hooks.h"
 #include "i2c.h"
 
-#include <zephyr/init.h>
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_DECLARE(mp2964, CONFIG_LOG_DEFAULT_LEVEL);
@@ -131,8 +130,14 @@ const static struct mp2964_reg_val rail_b_uldrino[] = {
 static void mp2964_pre_init(struct ap_power_ev_callback *cb,
 			    struct ap_power_ev_data data)
 {
+	static bool initialized;
 	int status;
 	int ret;
+
+	/* Only run this once */
+	if (initialized)
+		return;
+	initialized = true;
 
 	/* Default uldrenite setting */
 	rail_a = rail_a_uldrenite;
@@ -162,9 +167,6 @@ static void mp2964_pre_init(struct ap_power_ev_callback *cb,
 		LOG_INF(" Uldrenite board ");
 	}
 
-	/* Only run this once */
-	ap_power_ev_remove_callback(cb);
-
 	LOG_DBG("attempting to tune PMIC");
 
 	status = mp2964_tune(rail_a, rail_a_size, rail_b, rail_b_size);
@@ -175,13 +177,4 @@ static void mp2964_pre_init(struct ap_power_ev_callback *cb,
 		LOG_ERR("could not update all settings");
 	}
 }
-
-static int mp2964_init(void)
-{
-	static struct ap_power_ev_callback cb;
-
-	ap_power_ev_init_callback(&cb, mp2964_pre_init, AP_POWER_STARTUP);
-	ap_power_ev_add_callback(&cb);
-	return 0;
-}
-SYS_INIT(mp2964_init, APPLICATION, 1);
+AP_POWER_EVENT_CALLBACK_DEFINE(mp2964_pre_init, AP_POWER_STARTUP);

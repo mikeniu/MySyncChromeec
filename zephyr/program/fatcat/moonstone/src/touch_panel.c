@@ -37,9 +37,10 @@ static K_WORK_DELAYABLE_DEFINE(touch_enable_deferred_data,
 			       touch_enable_deferred);
 
 /* Called on AP S3 -> S5 transition */
-void touch_enable_event_handler(struct ap_power_ev_callback *cb,
-				struct ap_power_ev_data data)
+static void touch_enable_event_handler(struct ap_power_ev_callback *cb,
+				       struct ap_power_ev_data data)
 {
+	ARG_UNUSED(cb);
 	switch (data.event) {
 	case AP_POWER_SHUTDOWN:
 		/* Cancel touch_enable touch_disable k_work. */
@@ -51,7 +52,8 @@ void touch_enable_event_handler(struct ap_power_ev_callback *cb,
 		return;
 	}
 }
-
+AP_POWER_EVENT_CALLBACK_DEFINE(touch_enable_event_handler, AP_POWER_SHUTDOWN,
+			       AP_POWER_HARD_OFF);
 void soc_edp_bl_interrupt(const struct device *device,
 			  struct gpio_callback *callback, gpio_port_pins_t pins)
 {
@@ -81,16 +83,11 @@ DECLARE_HOOK(HOOK_LID_CHANGE, touch_lid_change, HOOK_PRIO_DEFAULT);
 
 static void touch_enable_init(void)
 {
-	static struct ap_power_ev_callback power_cb;
 	static struct gpio_callback cb;
 	const struct gpio_dt_spec *const toggle_gpio =
 		GPIO_DT_FROM_NODELABEL(gpio_soc_edp_bl_en);
 
 	int rv, irq_key;
-
-	ap_power_ev_init_callback(&power_cb, touch_enable_event_handler,
-				  AP_POWER_SHUTDOWN | AP_POWER_HARD_OFF);
-	ap_power_ev_add_callback(&power_cb);
 
 	gpio_init_callback(&cb, soc_edp_bl_interrupt, BIT(toggle_gpio->pin));
 	gpio_add_callback(toggle_gpio->port, &cb);

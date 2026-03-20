@@ -45,20 +45,6 @@ static void espi_enable_callback(struct ap_power_ev_callback *cb,
 		break;
 	}
 }
-
-static int init_espi_enable_callback(void)
-{
-	static struct ap_power_ev_callback cb;
-
-	if (!device_is_ready(espi_device))
-		k_oops();
-
-	ap_power_ev_init_callback(&cb, espi_enable_callback,
-				  AP_POWER_INITIALIZED | AP_POWER_PRE_INIT |
-					  AP_POWER_HARD_OFF);
-	ap_power_ev_add_callback(&cb);
-
-	return 0;
-}
+AP_POWER_EVENT_CALLBACK_DEFINE(espi_enable_callback, AP_POWER_INITIALIZED,
+			       AP_POWER_PRE_INIT, AP_POWER_HARD_OFF);
 /* Should run before power sequencing init so INITIALIZED callback can fire */
-SYS_INIT(init_espi_enable_callback, APPLICATION, 0);
