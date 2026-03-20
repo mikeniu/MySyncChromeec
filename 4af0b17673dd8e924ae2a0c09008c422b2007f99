@@ -22,6 +22,30 @@
       },
       "revId": "4af0b17673dd8e924ae2a0c09008c422b2007f99",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bc60372_cec4cf4a",
+        "filename": "common/fpsensor/OWNERS",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-03-20T14:11:24Z",
+      "side": 0,
+      "message": "Isn\u0027t OWNERS approval necessary for merge commits e.g merging merge commit for `firmware-brya` required approval from FP team, because files under `common/fpsensor` were changed? Now we have `Owners-Override` for this, but maybe it was not available that time?\n\nI have some faint recollection that there was a problem with including OWNERS and firmware release branches. Something like, including OWNERS from `platform2/biod` was not possible on release branches, because `platform2` has no `firmware-fpmcu-bloonchipper-release`?\n\nIn this case, OWNERS was changed on ToT to include Copybot. Since the file doesn\u0027t exist on our firmware branch it caused `deleted by us` conflict.",
+      "parentUuid": "07f03d73_f2e46749",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 94
+      },
+      "revId": "4af0b17673dd8e924ae2a0c09008c422b2007f99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
