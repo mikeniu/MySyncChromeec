@@ -16,6 +16,24 @@
       "message": "A few general comments:\n- use repo upload for uploading CL and address all checks it reports\n- run cros format on all added/modified files\n- this algo driver will be probably re-used for other FT sensors, is that correct? Consider reworking it for something like FT98XX series driver, not sure about exact name. Just try to prepare the code for coming sensors as well.",
       "revId": "b1367473eb603607b0576166db92fdecd3d70d5f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13a57213_3ee15225",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-20T10:21:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9773362a_4ff60301",
+      "revId": "b1367473eb603607b0576166db92fdecd3d70d5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

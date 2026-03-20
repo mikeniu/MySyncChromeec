@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "31062ac6_51189a40",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-20T10:21:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba1eeda5_62b617b5",
+      "revId": "42f6be4145d83afe6fcf845c8346b5af3501a95e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "72961f45_8d012389",
@@ -84,6 +102,24 @@
       "writtenOn": "2025-10-29T12:48:24Z",
       "side": 1,
       "message": "This can not be defined as global. I know that the sensor driver uses it, but it is not a correct approach.",
+      "revId": "42f6be4145d83afe6fcf845c8346b5af3501a95e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "35f1bbfd_78e638f8",
+        "filename": "zephyr/subsys/fingerprint/alg/ft9865_bio_alg.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-20T10:21:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f203bfbb_cecbd2c3",
       "revId": "42f6be4145d83afe6fcf845c8346b5af3501a95e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

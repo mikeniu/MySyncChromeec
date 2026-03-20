@@ -144,6 +144,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "315c5ad3_32c35a00",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 23
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-20T10:21:53Z",
+      "side": 1,
+      "message": "I would say it\u0027s up to you if you want to modify these values per project or keep it constant.",
+      "parentUuid": "ce4d9ea6_3662ba72",
+      "revId": "d7a3133d17f6bbe3c4afddb2668123ba8c24c0f4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "06713ac0_b2bf939a",
         "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
         "patchSetId": 23
