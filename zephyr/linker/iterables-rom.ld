@@ -23,3 +23,7 @@ ITERABLE_SECTION_ROM(fingerprint_algorithm, 4)
 #ifdef CONFIG_ADSP_COMMS
 ITERABLE_SECTION_ROM(adsp_comms_callback, 4)
 #endif
+
+#ifdef CONFIG_AP_EVENTS
+ITERABLE_SECTION_ROM(ap_power_ev_callback, 4)
+#endif
