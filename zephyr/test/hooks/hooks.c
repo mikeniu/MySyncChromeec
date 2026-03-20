@@ -190,60 +190,38 @@ ZTEST(hooks_tests, test_deferred_avoids_k_no_wait)
 }
 
 /*
- * Structure passed to event listeners.
+ * Shared state for AP power event tests.
  */
-struct events {
-	struct ap_power_ev_callback cb;
-	enum ap_power_events event;
-	int count;
-};
+static int ev_count;
+static enum ap_power_events ev_last_event;
 
-/*
- * Common handler.
- * Increment count, and store event received.
- */
-static void ev_handler(struct ap_power_ev_callback *callback,
+static void ev_handler(struct ap_power_ev_callback *cb,
 		       struct ap_power_ev_data data)
 {
-	struct events *ev = CONTAINER_OF(callback, struct events, cb);
-
-	ev->count++;
-	ev->event = data.event;
+	ev_count++;
+	ev_last_event = data.event;
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(ev_handler, AP_POWER_SUSPEND, AP_POWER_RESUME,
+			       AP_POWER_STARTUP);
 
 ZTEST(hooks_tests, test_hook_ap_power_events)
 {
-	static struct events cb;
+	ev_count = 0;
+	ev_last_event = 0;
+	hook_notify(HOOK_CHIPSET_SUSPEND);
+	zassert_equal(1, ev_count, "Callback not called");
+	zassert_equal(AP_POWER_SUSPEND, ev_last_event, "Wrong event");
 
-	ap_power_ev_init_callback(&cb.cb, ev_handler, AP_POWER_SUSPEND);
-	ap_power_ev_add_callback(&cb.cb);
-	hook_notify(HOOK_CHIPSET_SUSPEND);
-	zassert_equal(1, cb.count, "Callback not called");
-	zassert_equal(AP_POWER_SUSPEND, cb.event, "Wrong event");
-	ap_power_ev_remove_callback(&cb.cb);
-	hook_notify(HOOK_CHIPSET_SUSPEND);
-	zassert_equal(1, cb.count, "Callback called");
-
-	cb.count = 0;
-	ap_power_ev_init_callback(&cb.cb, ev_handler,
-				  AP_POWER_SUSPEND | AP_POWER_RESUME);
-	ap_power_ev_add_callback(&cb.cb);
-	hook_notify(HOOK_CHIPSET_SUSPEND);
-	zassert_equal(1, cb.count, "Callbacks not called");
-	zassert_equal(AP_POWER_SUSPEND, cb.event, "Wrong event");
 	hook_notify(HOOK_CHIPSET_RESUME);
-	zassert_equal(2, cb.count, "Callbacks not called");
-	zassert_equal(AP_POWER_RESUME, cb.event, "Wrong event");
+	zassert_equal(2, ev_count, "Callback not called for RESUME");
+	zassert_equal(AP_POWER_RESUME, ev_last_event, "Wrong event");
 
-	ap_power_ev_remove_events(&cb.cb, AP_POWER_SUSPEND);
-	hook_notify(HOOK_CHIPSET_SUSPEND);
-	zassert_equal(2, cb.count, "Suspend allback called");
+	/* Verify unregistered event does not fire */
+	hook_notify(HOOK_CHIPSET_SHUTDOWN);
+	zassert_equal(2, ev_count, "Callback called for unregistered event");
 
 	hook_notify(HOOK_CHIPSET_STARTUP);
-	zassert_equal(2, cb.count, "Startup callback called");
-	ap_power_ev_add_events(&cb.cb, AP_POWER_STARTUP);
-	hook_notify(HOOK_CHIPSET_STARTUP);
-	zassert_equal(3, cb.count, "Startup callback not called");
+	zassert_equal(3, ev_count, "Startup callback not called");
 }
 
 ZTEST_SUITE(hooks_tests, NULL, NULL, NULL, NULL, NULL);

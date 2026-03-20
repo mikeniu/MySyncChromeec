@@ -104,6 +104,8 @@ static void ap_change(struct ap_power_ev_callback *callback,
 {
 	change_detected();
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(ap_change, AP_POWER_INITIALIZED,
+			       AP_POWER_HARD_OFF, AP_POWER_STARTUP);
 
 /*
  * Hook to listen for external power supply changes.
@@ -166,16 +168,3 @@ host_command_hibernation_delay(struct host_cmd_handler_args *args)
 }
 DECLARE_HOST_COMMAND(EC_CMD_HIBERNATION_DELAY, host_command_hibernation_delay,
 		     EC_VER_MASK(0));
-
-static int hibernate_init(void)
-{
-	static struct ap_power_ev_callback cb;
-
-	ap_power_ev_init_callback(&cb, ap_change,
-				  AP_POWER_INITIALIZED | AP_POWER_HARD_OFF |
-					  AP_POWER_STARTUP);
-	ap_power_ev_add_callback(&cb);
-	return 0;
-}
-
-SYS_INIT(hibernate_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
