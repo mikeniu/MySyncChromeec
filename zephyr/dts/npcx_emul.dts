@@ -7,6 +7,7 @@
  * To use, include this file, then the board's gpio definitions.
  */
 
+#include <board-overlays/native_sim.dts>
 #include <dt-bindings/gpio_defines.h>
 
 / {
