@@ -97,13 +97,13 @@ static DEVICE_API(cros_system, cros_system_driver_ft_api) = {
 	.chip_revision = cros_system_ft_get_chip_revision,
 };
 
-#define CROS_SYSTEM_FT_INIT(inst)                                          \
-	static struct cros_system_ft_data cros_system_ft_dev_data_##inst;  \
-	DEVICE_DEFINE(cros_system_ft_##inst, "CROS_SYSTEM",                \
-		      cros_system_ft_init, NULL,                           \
-		      &cros_system_ft_dev_data_##inst, NULL, PRE_KERNEL_1, \
-		      CONFIG_CROS_SYSTEM_FT90_INIT_PRIORITY,               \
-		      &cros_system_driver_ft_api);
+#define CROS_SYSTEM_FT_INIT(inst)                                         \
+	static struct cros_system_ft_data cros_system_ft_dev_data_##inst; \
+	DEVICE_DT_INST_DEFINE(inst, cros_system_ft_init, NULL,            \
+			      &cros_system_ft_dev_data_##inst, NULL,      \
+			      PRE_KERNEL_1,                               \
+			      CONFIG_CROS_SYSTEM_FT90_INIT_PRIORITY,      \
+			      &cros_system_driver_ft_api);
 
 DT_INST_FOREACH_STATUS_OKAY(CROS_SYSTEM_FT_INIT)
 
