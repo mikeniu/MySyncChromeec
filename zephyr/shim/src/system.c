@@ -26,6 +26,8 @@ static const struct device *const bbram_dev =
 	COND_CODE_1(DT_HAS_CHOSEN(cros_ec_bbram),
 		    DEVICE_DT_GET(DT_CHOSEN(cros_ec_bbram)), NULL);
 
+BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(cros_ec_cros_system) <= 1,
+	     "Multiple cros-system instances are not supported");
 static const struct device *const sys_dev =
 	DEVICE_DT_GET(DT_CHOSEN(cros_ec_cros_system));
 
