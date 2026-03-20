@@ -25,7 +25,11 @@ LOG_MODULE_REGISTER(shim_system, LOG_LEVEL_ERR);
 static const struct device *const bbram_dev =
 	COND_CODE_1(DT_HAS_CHOSEN(cros_ec_bbram),
 		    DEVICE_DT_GET(DT_CHOSEN(cros_ec_bbram)), NULL);
-static const struct device *sys_dev;
+
+BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(cros_ec_cros_system) <= 1,
+	     "Multiple cros-system instances are not supported");
+static const struct device *const sys_dev =
+	DEVICE_DT_GET(DT_CHOSEN(cros_ec_cros_system));
 
 /* Map idx to a bbram offset/size, or return -1 on invalid idx */
 static int bbram_lookup(enum system_bbram_idx idx, int *offset_out,
@@ -136,7 +140,6 @@ int system_get_scratchpad(uint32_t *value)
 
 test_mockable void system_hibernate(uint32_t seconds, uint32_t microseconds)
 {
-	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
 	int err;
 
 	/* Flush console before hibernating */
@@ -172,8 +175,6 @@ test_mockable void system_hibernate(uint32_t seconds, uint32_t microseconds)
  */
 static int command_idle_stats(int argc, const char **argv)
 {
-	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
-
 	timestamp_t ts = get_time();
 	uint64_t deep_sleep_ticks = cros_system_deep_sleep_ticks(sys_dev);
 
@@ -188,29 +189,21 @@ DECLARE_CONSOLE_COMMAND(idlestats, command_idle_stats, "",
 
 const char *system_get_chip_vendor(void)
 {
-	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
-
 	return cros_system_chip_vendor(sys_dev);
 }
 
 const char *system_get_chip_name(void)
 {
-	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
-
 	return cros_system_chip_name(sys_dev);
 }
 
 const char *system_get_chip_revision(void)
 {
-	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
-
 	return cros_system_chip_revision(sys_dev);
 }
 
 int system_get_hibernate_wake_source(enum hibernate_wake_source *source)
 {
-	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
-
 	return cros_system_get_hibernate_wake_source(sys_dev, source);
 }
 
@@ -219,8 +212,8 @@ test_mockable void system_reset(int flags)
 	int err;
 	uint32_t save_flags;
 
-	if (!sys_dev)
-		LOG_ERR("sys_dev get binding failed");
+	if (!device_is_ready(sys_dev))
+		LOG_ERR("sys_dev is not ready");
 
 	/* Disable interrupts to avoid task swaps during reboot */
 	interrupt_disable_all();
@@ -362,14 +355,13 @@ test_export_static int system_preinitialize(void)
 		}
 	}
 
-	sys_dev = device_get_binding("CROS_SYSTEM");
-	if (!sys_dev) {
+	if (!device_is_ready(sys_dev)) {
 		/*
 		 * TODO(b/183022804): This should not happen in normal
 		 * operation. Check whether the error check can be change to
 		 * build-time error, or at least a fatal run-time error.
 		 */
-		LOG_ERR("sys_dev gets binding failed");
+		LOG_ERR("sys_dev is not ready");
 		return -1;
 	}
 
