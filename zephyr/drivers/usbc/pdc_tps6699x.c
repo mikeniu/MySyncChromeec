@@ -18,7 +18,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/smf.h>
-LOG_MODULE_REGISTER(tps6699x, CONFIG_USBC_LOG_LEVEL);
+LOG_MODULE_REGISTER(tps6699x, LOG_LEVEL_DBG);
 #include "tps6699x_cmd.h"
 #include "tps6699x_reg.h"
 #include "usbc/pdc_utils.h"

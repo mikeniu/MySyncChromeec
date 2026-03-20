@@ -43,7 +43,7 @@
 #include <drivers/pdc.h>
 #include <usbc/utils.h>
 
-LOG_MODULE_REGISTER(pdc_power_mgmt, CONFIG_USB_PDC_LOG_LEVEL);
+LOG_MODULE_REGISTER(pdc_power_mgmt, LOG_LEVEL_DBG);
 
 #ifdef CONFIG_TEST_SNIFF_POWER_MGMT_PDC_APIS
 /* Faking PDC APIs directly causes compilation errors of the function being
