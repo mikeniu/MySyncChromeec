@@ -56,6 +56,8 @@ void board_power_event_handler(struct ap_power_ev_callback *cb,
 		return;
 	}
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(board_power_event_handler, AP_POWER_SHUTDOWN,
+			       AP_POWER_HARD_OFF);
 
 void soc_edp_bl_interrupt(const struct device *device,
 			  struct gpio_callback *callback, gpio_port_pins_t pins)
@@ -109,7 +111,6 @@ DECLARE_HOOK(HOOK_LID_CHANGE, touch_lid_change, HOOK_PRIO_DEFAULT);
 
 static void touch_enable_init(void)
 {
-	static struct ap_power_ev_callback power_cb;
 	static struct gpio_callback cb;
 	const struct gpio_dt_spec *const tpgpio_gpio =
 		GPIO_DT_FROM_NODELABEL(gpio_edp_bl_en_3v3);
@@ -153,10 +154,6 @@ static void touch_enable_init(void)
 	if (val != FW_PANEL_PWRSEQ_EC_CONTROL_ENABLE) {
 		return;
 	}
-
-	ap_power_ev_init_callback(&power_cb, board_power_event_handler,
-				  AP_POWER_SHUTDOWN | AP_POWER_HARD_OFF);
-	ap_power_ev_add_callback(&power_cb);
 
 	touch_sequence_enable = true;
 
