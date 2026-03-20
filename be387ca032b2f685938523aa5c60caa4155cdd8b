@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b22614a_b77f8cb6",
+        "filename": "zephyr/program/skywalker/jaina/src/keyboard_customization.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-03-20T09:39:23Z",
+      "side": 1,
+      "message": "Marked as resolved.",
+      "parentUuid": "172c378b_d05d3509",
+      "revId": "be387ca032b2f685938523aa5c60caa4155cdd8b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6f2f586d_3d8db065",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-03-20T09:34:16Z",
       "side": 1,
       "message": "add static\n```suggestion\nstatic void key_choose(void)\n```",
+      "revId": "be387ca032b2f685938523aa5c60caa4155cdd8b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8b6bd57_cb4e8601",
+        "filename": "zephyr/program/skywalker/jaina/src/keyboard_customization.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-03-20T09:39:23Z",
+      "side": 1,
+      "message": "Marked as resolved.",
+      "parentUuid": "6f2f586d_3d8db065",
       "revId": "be387ca032b2f685938523aa5c60caa4155cdd8b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
