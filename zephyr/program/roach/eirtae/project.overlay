@@ -38,8 +38,6 @@
 
 			/* gpiob6 */
 			<&gpiob 6 GPIO_INPUT_PULL_DOWN>,
-			/* gpiob7 */
-			<&gpiob 7 GPIO_INPUT_PULL_DOWN>,
 
 			/* gpioc0 */
 			<&gpioc 0 GPIO_INPUT_PULL_DOWN>,
@@ -170,16 +168,21 @@
 	data-hold-time = <9>;
 	prescale-scl-low = <4>;
 
-	touchpad@15 {
-		logical-max-x = <2644>;
-		logical-max-y = <1440>;
-		physical-max-x = <839>;
-		physical-max-y = <457>;
+	/delete-node/ touchpad@15;
+	touchpad@38 {
+		compatible = "focaltech,fts";
+		status = "okay";
+		reg = <0x38>;
+		irq = <&int_tchpad>;
+		logical-max-x = <3216>;
+		logical-max-y = <1844>;
+		physical-max-x = <1020>;
+		physical-max-y = <585>;
 	};
 };
 
 &touchpad_fw_hashes {
-	size = <((65536 / 1024) * 32)>;
+	size = <((55296 / 1024) * 32)>;
 };
 
 &{/binman/wp-ro/ec-ro} {

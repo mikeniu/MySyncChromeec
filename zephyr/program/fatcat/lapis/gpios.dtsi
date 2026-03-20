@@ -46,8 +46,8 @@
 		};
 
 		/* PS_ON_EC slp_z */
-		gpio_ps_on_ec: ps_on_ec {
-			gpios = <&gpioi 3 (GPIO_OUTPUT | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
+		gpio_en_slp_z: en_slp_z {
+			gpios = <&gpioi 3 GPIO_OUTPUT_HIGH>;
 		};
 		/* 5VSUS_ON */
 		gpio_5vsus_on: 5vsus_on {
@@ -134,9 +134,12 @@
 			gpios = <&gpioa 3 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
 			enum-name = "GPIO_EC_INT_L";
 		};
-		/* SOC_WAKE#, use EC_MSPI_CS instead, need EE confirm design */
+		/* SOC_WAKE#, use EC_MSPI_CS instead.
+		 * Not to be marked as active low, the lpc_update_wake() already
+		 * has the logic to invert the value.
+		 */
 		gpio_soc_wake_odl: soc_wake_odl {
-			gpios = <&gpiof 10 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
+			gpios = <&gpiof 10 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_OUTPUT_INIT_HIGH)>;
 		};
 		/* EC_RTC_RST */
 		gpio_ec_rtc_rst: ec_rtc_rst {
@@ -175,13 +178,18 @@
 		gpio_fp_rst_ec: fp_rst_ec {
 			gpios = <&gpiof 9 GPIO_INPUT>;
 		};
+
+		gpio_fp_rxd1: fp_rxd1 {
+			gpios = <&gpiob 6 (GPIO_OUTPUT | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
+		};
+
 		/* EDP_BIST_EN */
 		gpio_edp_bist_en: edp_bist_en {
 			gpios = <&gpiob 15 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 		};
 		/* TP_Disable */
 		gpio_tp_disable: tp_disable {
-			gpios = <&gpioh 11 GPIO_OUTPUT>;
+			gpios = <&gpioh 11 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_HIGH)>;
 		};
 		/* Amber LED */
 		gpio_led_amber: led_amber {
@@ -206,6 +214,14 @@
 		/* LCD_BACKOFF# */
 		gpio_lcd_backoff: lcd_backoff {
 			gpios = <&gpioa 2 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		/* EN_PP5000_LED_X */
+		gpio_en_pp5000_led: en_pp5000_led {
+			gpios = <&gpiog 1 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_HIGH)>;
+		};
+		/* EC_SOC_REC_SWITCH_ODL */
+		gpio_ec_soc_rec_switch_odl: ec_soc_rec_switch_odl {
+			gpios = <&gpioh 8 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 		};
 	};
 };

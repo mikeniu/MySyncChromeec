@@ -10,9 +10,7 @@
 _common_dir:=$(dir $(lastword $(MAKEFILE_LIST)))
 
 common-y=util.o
-common-y+=debug.o
 common-y+=version.o printf.o queue.o queue_policies.o irq_locking.o
-common-y+=gettimeofday.o
 
 common-$(CONFIG_ACCELGYRO_BMI160)+=math_util.o
 common-$(CONFIG_ACCELGYRO_BMI220)+=math_util.o
@@ -45,12 +43,12 @@ common-$(CONFIG_BASE32)+=base32.o
 common-$(CONFIG_BLINK)+=blink.o
 common-$(CONFIG_DETACHABLE_BASE)+=base_state.o
 common-$(CONFIG_BATTERY)+=battery.o math_util.o
-common-$(CONFIG_BATTERY_V1)+=battery_v1.o
-common-$(CONFIG_BATTERY_V2)+=battery_v2.o
+common-$(CONFIG_BATTERY_INFO)+=battery_info.o
 common-$(CONFIG_BATTERY_FUEL_GAUGE)+=battery_fuel_gauge.o
 common-$(CONFIG_BLUETOOTH_LE)+=bluetooth_le.o
 common-$(CONFIG_BLUETOOTH_LE_STACK)+=btle_hci_controller.o btle_ll.o
-common-$(CONFIG_BODY_DETECTION)+=body_detection.o
+common-$(CONFIG_BODY_DETECTION)+=body_detection.o body_detect_common.o \
+	body_detect_client.o
 common-$(CONFIG_CAPSENSE)+=capsense.o
 common-$(CONFIG_CEC)+=cec.o
 common-$(CONFIG_CBI_EEPROM)+=cbi.o cbi_common.o cbi_config.o cbi_eeprom.o
@@ -76,7 +74,7 @@ common-$(CONFIG_CMD_I2CWEDGE)+=i2c_wedge.o
 common-$(CONFIG_COMMON_GPIO)+=gpio.o gpio_commands.o
 common-$(CONFIG_IO_EXPANDER)+=ioexpander.o ioexpander_commands.o
 common-$(CONFIG_COMMON_PANIC_OUTPUT)+=panic_output.o
-common-$(CONFIG_COMMON_RUNTIME)+=hooks.o main.o system.o peripheral.o \
+common-$(CONFIG_COMMON_RUNTIME)+=hooks.o system.o peripheral.o \
 	system_boot_time.o
 ifeq ($(BOARD),host)
 common-$(CONFIG_COMMON_RECURSIVE_MUTEX)+=recursive_mutex.o
@@ -109,12 +107,10 @@ common-$(CONFIG_HOSTCMD_REGULATOR)+=regulator.o
 common-$(CONFIG_HOSTCMD_RTC)+=rtc.o
 common-$(CONFIG_I2C_DEBUG)+=i2c_trace.o
 common-$(CONFIG_I2C_CONTROLLER)+=i2c_controller.o
-common-$(CONFIG_I2C_CONTROLLER)+=i2c_controller_cros_ec.o
 common-$(CONFIG_I2C_CONTROLLER)+=i2c_passthru.o
 common-$(CONFIG_I2C_PERIPHERAL)+=i2c_peripheral.o
 common-$(CONFIG_I2C_BITBANG_CROS_EC)+=i2c_bitbang.o
 common-$(CONFIG_I2C_VIRTUAL_BATTERY)+=virtual_battery.o
-common-$(CONFIG_INDUCTIVE_CHARGING)+=inductive_charging.o
 common-$(CONFIG_KEYBOARD_PROTOCOL_8042)+=keyboard_8042.o \
 	keyboard_8042_sharedlib.o
 common-$(CONFIG_KEYBOARD_PROTOCOL_MKBP)+=keyboard_mkbp.o mkbp_fifo.o \
@@ -128,7 +124,7 @@ common-$(CONFIG_LED_COMMON)+=led_common.o
 common-$(CONFIG_LED_PWM)+=led_pwm.o
 common-$(CONFIG_LED_ONOFF_STATES)+=led_onoff_states.o
 common-$(CONFIG_LID_ANGLE)+=motion_lid.o math_util.o
-common-$(CONFIG_LID_ANGLE_UPDATE)+=lid_angle.o lid_angle_common.o
+common-$(CONFIG_LID_ANGLE_UPDATE)+=lid_angle.o lid_angle_keyboard_policy.o
 common-$(CONFIG_LID_SWITCH)+=lid_switch.o
 common-$(CONFIG_HOSTCMD_X86)+=acpi.o port80.o ec_features.o
 common-$(CONFIG_MAG_CALIBRATE)+= mag_cal.o math_util.o vec3.o mat33.o mat44.o \
@@ -146,7 +142,6 @@ common-$(CONFIG_PWM)+=pwm.o
 common-$(CONFIG_PWM_KBLIGHT)+=pwm_kblight.o
 common-$(CONFIG_KEYBOARD_BACKLIGHT)+=keyboard_backlight.o
 common-$(CONFIG_RGB_KEYBOARD)+=rgb_keyboard.o
-common-$(CONFIG_RNG)+=trng.o
 common-$(CONFIG_ROLLBACK)+=rollback.o
 common-$(CONFIG_RSA)+=rsa.o
 common-$(CONFIG_RWSIG)+=rwsig.o vboot/common.o
@@ -219,7 +214,6 @@ common-$(HAS_TASK_PDCMD)+=host_command_pd.o
 common-$(HAS_TASK_KEYSCAN)+=keyboard_scan.o
 common-$(HAS_TASK_LIGHTBAR)+=lb_common.o lightbar.o
 common-$(HAS_TASK_MOTIONSENSE)+=motion_sense.o
-common-$(CONFIG_SYSTEM_SAFE_MODE)+=system_safe_mode.o
 common-$(CONFIG_HOST_COMMAND_MEMORY_DUMP)+=host_command_memory_dump.o
 common-$(CONFIG_PRESERVED_RING_BUF)+=preserved_ring_buf.o
 common-$(CONFIG_PANIC_LOG)+=panic_log.o
@@ -296,28 +290,6 @@ ifneq ($(bootblock_ls),$(old_bootblock_ls))
 .PHONY: $(out)/.bootblock
 endif
 endif # CONFIG_BOOTBLOCK
-
-ifneq ($(CONFIG_TOUCHPAD_HASH_FW),)
-$(out)/RO/common/update_fw.o: $(out)/touchpad_fw_hash.h
-$(out)/RW/common/update_fw.o: $(out)/touchpad_fw_hash.h
-
-$(out)/touchpad_fw_hash.h: $(out)/util/gen_touchpad_hash $(out)/.touchpad_fw
-	$(call quiet,tp_hash,TPHASH )
-
-# We only want to recompute the hash if: $(TOUCHPAD_FW) variable value has
-# changed, or the file pointed at by $(TOUCHPAD_FW) has changed. We do this
-# by recording the latest $(TOUCHPAD_FW) file information in .touchpad_fw.
-
-touchpad_fw_ls := $(shell ls -l "$(TOUCHPAD_FW)" 2>&1)
-old_touchpad_fw_ls := $(shell cat $(out)/.touchpad_fw 2>/dev/null)
-
-$(out)/.touchpad_fw: $(TOUCHPAD_FW)
-	@echo "$(touchpad_fw_ls)" > $@
-
-ifneq ($(touchpad_fw_ls),$(old_touchpad_fw_ls))
-.PHONY: $(out)/.touchpad_fw
-endif
-endif
 
 ifeq ($(TEST_BUILD),)
 

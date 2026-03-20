@@ -108,24 +108,56 @@ helipilot = register_fpmcu_variant(
 # good reason to change it.
 assert_rw_fwid_DO_NOT_EDIT(project_name="helipilot", addr=0x40144)
 
-gwendolin = register_fpmcu_variant(
-    project_name="gwendolin",
-    zephyr_board="google_quincy",
-    register_func=register_npcx_project,
-    variant_modules=["cmsis_6"],
-    variant_optional_modules=["egis"],
+
+def register_et171_project(
+    project_name,
+):
+    """Register an fpmcu variant"""
+    dts_path = project_name + ".dts"
+    conf_path = project_name + ".conf"
+    return register_fpmcu_variant(
+        project_name=project_name,
+        zephyr_board="egis_et171",
+        register_func=register_binman_project,
+        variant_modules=["hal_egis", "egis_module"],
+        variant_optional_modules=["egis"],
+        variant_dts_overlays=[here / "et171" / dts_path],
+        variant_kconfig_files=[
+            here / "et171" / "prj.conf",
+            here / "et171" / conf_path,
+        ],
+        signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
+            here / "et171" / "dev_key.pem",
+        ),
+    )
+
+
+sanok = register_et171_project("sanok")
+assert_rw_fwid_DO_NOT_EDIT(project_name="sanok", addr=0x42104)
+
+srebrna = register_et171_project("srebrna")
+assert_rw_fwid_DO_NOT_EDIT(project_name="srebrna", addr=0x42104)
+
+stobnica = register_et171_project("stobnica")
+assert_rw_fwid_DO_NOT_EDIT(project_name="stobnica", addr=0x42104)
+
+niedzica = register_fpmcu_variant(
+    project_name="niedzica",
+    zephyr_board="32f967_dv",
+    register_func=register_binman_project,
+    variant_modules=["cmsis_6", "elan_module"],
+    variant_optional_modules=["elan"],
     variant_dts_overlays=[
-        here / "helipilot" / "gwendolin.dts",
+        here / "em32f967" / "niedzica.dts",
     ],
     variant_kconfig_files=[
-        here / "helipilot" / "prj.conf",
-        here / "helipilot" / "ec_quirks.conf",
+        here / "em32f967" / "prj.conf",
     ],
     signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
-        here / "helipilot" / "gwendolin" / "dev_key.pem",
+        here / "em32f967" / "dev_key.pem",
     ),
 )
 
 # The address of RW_FWID is hardcoded in RO. You need to have REALLY
 # good reason to change it.
-assert_rw_fwid_DO_NOT_EDIT(project_name="gwendolin", addr=0x40144)
+assert_rw_fwid_DO_NOT_EDIT(project_name="niedzica", addr=0x24144)

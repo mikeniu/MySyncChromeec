@@ -17,6 +17,8 @@ zephyr_include_directories(${PLATFORM_EC}/driver/ioexpander)
 target_sources(app PRIVATE "${PLATFORM_EC_PROGRAM_DIR}/intelrvp/src/dc_jack.c")
 target_sources(app PRIVATE "${PLATFORM_EC_PROGRAM_DIR}/intelrvp/src/intel_rvp_board_id.c")
 
+target_sources(app PRIVATE intelrvp/src/espi_host.c)
+
 if((CONFIG_TEST_PROJECT_MTLRVPP_NPCX) OR (CONFIG_TEST_PROJECT_MTLRVPP_MCHP) OR (CONFIG_TEST_PROJECT_MTLRVPP_COMMON))
 
 #Add sources for MTLRVP boards.
@@ -39,6 +41,7 @@ target_sources(app PRIVATE ${PLATFORM_EC_PROGRAM_DIR}/intelrvp/ptlrvp/src/board_
 target_sources_ifdef(CONFIG_TEST_PROJECT_MTL_BOARD_POWER app PRIVATE ${PLATFORM_EC_PROGRAM_DIR}/intelrvp/ptlrvp/src/board_power.c)
 target_sources(app PRIVATE ${PLATFORM_EC_PROGRAM_DIR}/intelrvp/ptlrvp/src/board_kbd.c)
 target_sources(app PRIVATE intelrvp/src/fakes.c)
+target_sources_ifdef(CONFIG_PDC_RUNTIME_PORT_CONFIG app PRIVATE ${PLATFORM_EC_PROGRAM_DIR}/intelrvp/ptlrvp/src/usbc_runtime.c)
 endif()
 
 target_sources_ifdef(CONFIG_TEST_PROJECT_MTL_BOARD_POWER app PRIVATE power/board_power.c)

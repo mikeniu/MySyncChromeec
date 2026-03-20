@@ -7,6 +7,7 @@
 #include "chipset.h"
 #include "driver/tcpm/nct38xx.h"
 #include "driver/tcpm/tcpci.h"
+#include "driver/tcpm/tcpm.h"
 #include "gpio.h"
 #include "hooks.h"
 #include "nissa_sub_board.h"
@@ -118,6 +119,13 @@ void reset_nct38xx_port(int port)
 	gpio_reset_port(ioex_port0);
 }
 
+static void notify_power_change(void)
+{
+	/* Notify host of power info change. */
+	pd_send_host_event(PD_EVENT_POWER_CHANGE);
+}
+DECLARE_DEFERRED(notify_power_change);
+
 void pd_power_supply_reset(int port)
 {
 	/* Disable VBUS. */
@@ -127,8 +135,7 @@ void pd_power_supply_reset(int port)
 	if (IS_ENABLED(CONFIG_USB_PD_DISCHARGE))
 		pd_set_vbus_discharge(port, 1);
 
-	/* Notify host of power info change. */
-	pd_send_host_event(PD_EVENT_POWER_CHANGE);
+	hook_call_deferred(&notify_power_change_data, 0);
 }
 
 int pd_set_power_supply_ready(int port)
@@ -150,8 +157,7 @@ int pd_set_power_supply_ready(int port)
 		return rv;
 	}
 
-	/* Notify host of power info change. */
-	pd_send_host_event(PD_EVENT_POWER_CHANGE);
+	hook_call_deferred(&notify_power_change_data, 0);
 
 	return EC_SUCCESS;
 }
@@ -176,4 +182,38 @@ int board_tcpc_post_init(int port)
 	 * otherwise the alert# pin stays low indefinitely */
 	schedule_deferred_pd_interrupt(port);
 	return EC_SUCCESS;
+}
+
+__override bool pd_check_vbus_level(int port, enum vbus_level level)
+{
+	int tcpc_vbus_voltage = 0;
+
+	/* Invalid argument guard */
+	if (level > VBUS_REMOVED)
+		return false;
+
+	/*
+	 * Attempt to read the VBUS voltage from the Type-C Port Controller
+	 * (TCPC). It helps in adjust thresholds to be more accurate during
+	 * VBUS Detection.
+	 */
+	tcpc_vbus_voltage = tcpc_get_vbus_voltage(port);
+
+	/* Check TCPC voltage path */
+	switch (level) {
+	case VBUS_PRESENT:
+		return tcpc_vbus_voltage >= PD_V_SAFE5V_MIN;
+	case VBUS_SAFE0V:
+		return tcpc_vbus_voltage <= PD_V_SAFE0V_MAX;
+	case VBUS_REMOVED:
+		/*
+		 * Experimentally, pujjoga requires an offset of at least 100 mV
+		 * to accurately detect VBUS disconnect in TD 4.6.3. 250 mV
+		 * accounts for the NCT3808's supposed maximum ADC error, 1% at
+		 * 20V.
+		 */
+		return tcpc_vbus_voltage <= PD_V_SINK_DISCONNECT_MAX - 250;
+	default:
+		return false;
+	}
 }

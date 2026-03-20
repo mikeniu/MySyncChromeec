@@ -4,13 +4,13 @@
  */
 
 #include "battery_smart.h"
+#include "drivers/led.h"
 #include "ec_commands.h"
 #include "emul/emul_isl923x.h"
 #include "emul/emul_smart_battery.h"
 #include "emul/tcpc/emul_tcpci_partner_src.h"
 #include "gpio.h"
 #include "include/power.h"
-#include "led.h"
 #include "led_common.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
@@ -26,10 +26,12 @@
 	{                                                                  \
 		const struct led_pins_node_t *pin_node =                   \
 			led_get_node(color, led_id);                       \
+		const struct gpio_pin_t *gpio_pins =                       \
+			(const struct gpio_pin_t *)pin_node->pins;         \
 		for (int j = 0; j < pin_node->pins_count; j++) {           \
-			int val = gpio_pin_get_dt(gpio_get_dt_spec(        \
-				pin_node->gpio_pins[j].signal));           \
-			int expecting = pin_node->gpio_pins[j].val;        \
+			int val = gpio_pin_get_dt(                         \
+				gpio_get_dt_spec(gpio_pins[j].signal));    \
+			int expecting = gpio_pins[j].val;                  \
 			zassert_equal(expecting, val, "[%d]: %d != %d", j, \
 				      expecting, val);                     \
 		}                                                          \

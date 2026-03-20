@@ -2,6 +2,29 @@ common:
   platform_allow:
   - native_sim
 tests:
+  pdc.driver.rts545x:
+    timeout: 500
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_API=y
+    - CONFIG_TEST_PDC_MESSAGE_TRACING=y
+    - CONFIG_USBC_PDC_TRACE_MSG=y
+    - CONFIG_USB_PDC_LOG_LEVEL_DBG=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.driver.tps6699x:
+    timeout: 300
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_API=y
+    - CONFIG_TEST_PDC_MESSAGE_TRACING=y
+    - CONFIG_USBC_PDC_TRACE_MSG=y
+    - CONFIG_USB_PDC_LOG_LEVEL_DBG=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_TODO_B_345292002=y
+    extra_dtc_overlay_files:
+    - "./boards/tps6699x.overlay"
+
   pdc.generic:
     timeout: 500
     extra_configs:
@@ -138,6 +161,18 @@ tests:
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
 
+  pdc.policy.no_3a_port:
+    timeout: 300
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_POLICY_SRC_NO_3A=y
+    - CONFIG_USBC_PDC_TRACE_MSG=y
+    - CONFIG_USB_PDC_LOG_LEVEL_DBG=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_PLATFORM_EC_USB_PD_FRS=n
+    - CONFIG_PLATFORM_EC_USB_PD_3A_PORTS=0
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
   pdc.policy.sink:
     timeout: 300
     extra_configs:
@@ -147,6 +182,23 @@ tests:
     - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
     - CONFIG_PLATFORM_EC_USB_PD_FRS=y
     - CONFIG_TEST_SNIFF_POWER_MGMT_PDC_APIS=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.policy.sink.wattage_limit:
+    timeout: 300
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_POLICY_SINK=y
+    - CONFIG_USBC_PDC_TRACE_MSG=y
+    - CONFIG_USB_PDC_LOG_LEVEL_DBG=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_PLATFORM_EC_USB_PD_FRS=y
+    - CONFIG_TEST_SNIFF_POWER_MGMT_PDC_APIS=y
+    # Max wattage is lower than max voltage x max current
+    - CONFIG_PLATFORM_EC_USB_PD_MAX_VOLTAGE_MV=20000
+    - CONFIG_PLATFORM_EC_USB_PD_MAX_POWER_MW=45000
+    - CONFIG_PLATFORM_EC_USB_PD_MAX_CURRENT_MA=3000
+    - CONFIG_PLATFORM_EC_USB_PD_PREFER_HIGH_VOLTAGE=y
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
 
@@ -169,6 +221,7 @@ tests:
     - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
     - CONFIG_PLATFORM_EC_USB_PD_FRS=y
     - CONFIG_TEST_SNIFF_POWER_MGMT_PDC_APIS=y
+    - CONFIG_TEST_NO_PDC_INIT=y
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
     - "./boards/pdc_deferred.overlay"
@@ -184,6 +237,7 @@ tests:
     - CONFIG_PLATFORM_EC_USB_PD_FRS=y
     - CONFIG_TEST_SNIFF_POWER_MGMT_PDC_APIS=y
     - CONFIG_PLATFORM_EC_CONSOLE_DEBUG=y
+    - CONFIG_TEST_NO_PDC_INIT=y
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
     - "./boards/pdc_deferred.overlay"
@@ -199,6 +253,7 @@ tests:
     - CONFIG_PLATFORM_EC_USB_PD_FRS=y
     - CONFIG_TEST_SNIFF_POWER_MGMT_PDC_APIS=y
     - CONFIG_PLATFORM_EC_CONSOLE_DEBUG=y
+    - CONFIG_TEST_NO_PDC_INIT=y
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
     - "./boards/pdc_deferred.overlay"
@@ -301,6 +356,7 @@ tests:
   pdc.console:
     extra_configs:
     - CONFIG_TEST_SUITE_PDC_CONSOLE=y
+    - CONFIG_SHELL_BACKEND_DUMMY_BUF_SIZE=8192
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
 
@@ -355,7 +411,6 @@ tests:
   pdc.ppm_console:
     extra_configs:
     - CONFIG_TEST_SUITE_PPM_CONSOLE=y
-    - CONFIG_UCSI_PPM_CONSOLE=y
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
 
@@ -433,3 +488,15 @@ tests:
     # b/406176587: These tests cause code coverage flakes. Continue running
     # the tests when unit testing, but skip when measuring code coverage.
     filter: not CONFIG_COVERAGE
+
+  pdc.comms_suspend_resume.rts54xx:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_COMMS_SUSPEND_RESUME=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.comms_suspend_resume.tps6699x:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_COMMS_SUSPEND_RESUME=y
+    extra_dtc_overlay_files:
+    - "./boards/tps6699x.overlay"

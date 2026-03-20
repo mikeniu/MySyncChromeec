@@ -20,6 +20,7 @@
 #include "panic.h"
 #include "tablet_mode.h"
 #include "usb_pd.h"
+#include "util.h"
 
 /* TODO(b/395723202): These macros from timer.h, included transitively in
  * usb_pd.h, conflict with constants declared in json_reader.h below. Ideally,
@@ -57,6 +58,7 @@
 #include <libec/mkbp_event.h>
 #include <libec/rand_num_command.h>
 #include <libec/versions_command.h>
+#include <map>
 #include <memory>
 #include <optional>
 #include <string>
@@ -104,7 +106,8 @@ static const char *const image_names[] = { "unknown", "RO", "RW" };
 
 /* Note: depends on enum ec_led_colors */
 static const char *const led_color_names[] = { "red",	 "green", "blue",
-					       "yellow", "white", "amber" };
+					       "yellow", "white", "amber",
+					       "magenta" };
 BUILD_ASSERT(ARRAY_SIZE(led_color_names) == EC_LED_COLOR_COUNT);
 
 /* Note: depends on enum ec_led_id */
@@ -705,6 +708,7 @@ static const char *const ec_feature_names[] = {
 	[EC_FEATURE_UCSI_PPM] = "UCSI PPM",
 	[EC_FEATURE_STRAUSS] = "Strauss",
 	[EC_FEATURE_POE] = "POE",
+	[EC_FEATURE_CHARGER_HYBRID_POWER_BOOST] = "Hybrid Power Boost charger",
 };
 
 int cmd_inventory(int argc, char *argv[])
@@ -1913,7 +1917,8 @@ int cmd_apreset(int argc, char *argv[])
  */
 static std::unique_ptr<std::vector<uint8_t> >
 fp_download_frame(struct SensorImage &sensor_image,
-		  struct TemplateInfo &template_info, int index)
+		  struct TemplateInfo &template_info, int index,
+		  uint8_t capture_type = FP_CAPTURE_VENDOR_FORMAT)
 {
 	ec::EcCommandFactory ec_command_factory;
 	ec::EcCommandVersionSupported ec_cmd_ver_supported;
@@ -1930,19 +1935,10 @@ fp_download_frame(struct SensorImage &sensor_image,
 	if (images.size() == 1) {
 		sensor_image = images[0];
 	} else {
-		ec::FpModeCommand fp_mode_command(
-			(ec::FpMode(ec::FpMode::Mode::kDontChange)));
-		if (!fp_mode_command.Run(comm_get_fd())) {
-			fprintf(stderr, "Failed to Run FpModeCommand.\n");
-			return nullptr;
-		}
-
 		bool found = false;
-		uint8_t current_fp_capture_type =
-			FP_CAPTURE_TYPE(fp_mode_command.Mode().RawVal());
 		for (const auto &image : fp_info_command->sensor_image())
 			if (image.fp_capture_type.has_value() &&
-			    *image.fp_capture_type == current_fp_capture_type) {
+			    *image.fp_capture_type == capture_type) {
 				sensor_image = image;
 				found = true;
 				break;
@@ -1954,10 +1950,15 @@ fp_download_frame(struct SensorImage &sensor_image,
 		}
 	}
 
+	/*
+	 * TODO(b/450381837): Remove raw/simple parameters and use fp_info
+	 * version 2 for frame size.
+	 */
 	size_t size;
 	if (index == FP_FRAME_INDEX_SIMPLE_IMAGE) {
-		size = (size_t)sensor_image.width * sensor_image.bpp / 8 *
-		       sensor_image.height;
+		size = (size_t)sensor_image.width *
+		       DIV_ROUND_UP(sensor_image.bpp, 8) * sensor_image.height;
+
 		index = FP_FRAME_INDEX_RAW_IMAGE;
 	} else if (index == FP_FRAME_INDEX_RAW_IMAGE) {
 		size = sensor_image.frame_size;
@@ -2025,6 +2026,12 @@ int cmd_fp_mode(int argc, char *argv[])
 			capture_type = FP_CAPTURE_QUALITY_TEST;
 		else if (!strncmp(argv[i], "test_reset", 10))
 			capture_type = FP_CAPTURE_RESET_TEST;
+		else if (!strncmp(argv[i], "test_defect_pixel", 17))
+			capture_type = FP_CAPTURE_DEFECT_PXL_TEST;
+		else if (!strncmp(argv[i], "test_abnormal", 13))
+			capture_type = FP_CAPTURE_ABNORMAL_TEST;
+		else if (!strncmp(argv[i], "test_noise", 10))
+			capture_type = FP_CAPTURE_NOISE_TEST;
 	}
 	if (mode & FP_MODE_CAPTURE)
 		mode |= capture_type << FP_MODE_CAPTURE_TYPE_SHIFT;
@@ -2196,12 +2203,12 @@ int cmd_fp_enc_status(int argc, char *argv[])
 			"FP Encryption Status returned with errors: %d\n", rv);
 		return rv;
 	}
-	printf("FPMCU encryption status: 0x%08x%s",
+	printf("FPMCU encryption status: 0x%08x%s\n",
 	       fp_encryptionstatus_command.GetStatus(),
 	       (ec::FpEncryptionStatusCommand::ParseFlags(
 			fp_encryptionstatus_command.GetStatus()))
 		       .c_str());
-	printf("Valid flags:             0x%08x%s",
+	printf("Valid flags:             0x%08x%s\n",
 	       fp_encryptionstatus_command.GetValidFlags(),
 	       (ec::FpEncryptionStatusCommand::ParseFlags(
 			fp_encryptionstatus_command.GetValidFlags()))
@@ -2216,10 +2223,48 @@ int cmd_fp_frame(int argc, char *argv[])
 {
 	struct SensorImage sensor_image{};
 	struct TemplateInfo template_info{};
-	int idx = (argc == 2 && !strcasecmp(argv[1], "raw")) ?
-			  FP_FRAME_INDEX_RAW_IMAGE :
-			  FP_FRAME_INDEX_SIMPLE_IMAGE;
-	auto fp_frame = fp_download_frame(sensor_image, template_info, idx);
+
+	int idx = FP_FRAME_INDEX_SIMPLE_IMAGE;
+	uint8_t capture_type = FP_CAPTURE_VENDOR_FORMAT;
+	bool capture_type_arg_seen = false;
+
+	static const std::map<std::string, uint8_t> capture_type_map = {
+		{ "vendor", FP_CAPTURE_VENDOR_FORMAT },
+		{ "pattern0", FP_CAPTURE_PATTERN0 },
+		{ "pattern1", FP_CAPTURE_PATTERN1 },
+		{ "qual", FP_CAPTURE_QUALITY_TEST },
+		{ "test_reset", FP_CAPTURE_RESET_TEST },
+		{ "test_defect_pixel", FP_CAPTURE_DEFECT_PXL_TEST },
+		{ "test_abnormal", FP_CAPTURE_ABNORMAL_TEST },
+		{ "test_noise", FP_CAPTURE_NOISE_TEST }
+	};
+
+	for (int i = 1; i < argc; i++) {
+		std::string arg = argv[i];
+		if (arg == "raw") {
+			idx = FP_FRAME_INDEX_RAW_IMAGE;
+		} else {
+			auto it = capture_type_map.find(arg);
+			if (it != capture_type_map.end()) {
+				if (capture_type_arg_seen) {
+					fprintf(stderr,
+						"Error: Multiple capture types specified ('%s'). Please specify"
+						" only one.\n ",
+						arg.c_str());
+					return -1;
+				}
+				capture_type = it->second;
+				capture_type_arg_seen = true;
+			} else {
+				fprintf(stderr,
+					"Warning: Ignoring unknown argument '%s'\n",
+					arg.c_str());
+			}
+		}
+	}
+
+	auto fp_frame = fp_download_frame(sensor_image, template_info, idx,
+					  capture_type);
 	if (!fp_frame) {
 		fprintf(stderr, "Failed to get FP sensor frame\n");
 		return -1;
@@ -3760,6 +3805,8 @@ static const struct {
 	{ ST_PRM_SIZE(set_v2par_thlds), 0 },
 	{ ST_CMD_SIZE, ST_RSP_SIZE(get_params_v2_colors) },
 	{ ST_PRM_SIZE(set_v2par_colors), 0 },
+	{ ST_CMD_SIZE, ST_RSP_SIZE(get_params_v3) },
+	{ ST_PRM_SIZE(set_program_ex), 0 },
 };
 BUILD_ASSERT(ARRAY_SIZE(lb_command_paramcount) == LIGHTBAR_NUM_CMDS);
 
@@ -5924,6 +5971,55 @@ static int cmd_motionsense(int argc, char **argv)
 	return ms_help(argv[0]);
 }
 
+static int cmd_watchdog_info(int argc, char *argv[])
+{
+	struct ec_params_hostcmd_watchdog_info p;
+	struct ec_response_hostcmd_watchdog_info r;
+	int rv;
+
+	if (argc == 1) {
+		p.reset_stats = false;
+	} else if (argc == 2) {
+		if (strcasecmp(argv[1], "reset_stats") == 0)
+			p.reset_stats = true;
+		else
+			goto usage;
+	} else {
+		goto usage;
+	}
+
+	rv = ec_command(EC_CMD_HOSTCMD_WATCHDOG_INFO, 0, &p, sizeof(p), &r,
+			sizeof(r));
+	if (rv < 0)
+		return rv;
+
+	printf("Watchdog Period: %d ms\n", r.watchdog_period_ms);
+	printf("Watchdog Warning Period: %d ms\n",
+	       r.watchdog_warning_period_ms);
+	printf("Watchdog Reload Period Nominal: %d ms\n",
+	       r.watchdog_reload_period_nominal_ms);
+	printf("Watchdog Stats Elapsed Time: %" PRId64 ".%03" PRId64 " s\n",
+	       r.watchdog_stats_elapsed_ms / 1000,
+	       r.watchdog_stats_elapsed_ms % 1000);
+	printf("Watchdog Reload Count: %u\n", r.watchdog_reload_count);
+	printf("Watchdog Reload Period Max: %d ms @ %" PRId64 ".%03" PRId64
+	       " s\n",
+	       r.watchdog_reload_period_max_ms,
+	       r.watchdog_reload_period_max_ts_ms / 1000,
+	       r.watchdog_reload_period_max_ts_ms % 1000);
+	printf("Watchdog Reload Period Average: %" PRId64 " ms\n",
+	       r.watchdog_reload_count > 0 ?
+		       r.watchdog_stats_elapsed_ms / r.watchdog_reload_count :
+		       0);
+	if (p.reset_stats)
+		printf("Watchdog stats reset.\n");
+	return 0;
+
+usage:
+	fprintf(stderr, "Usage: %s [reset_stats]\n", argv[0]);
+	return -1;
+}
+
 int cmd_next_event(int argc, char *argv[])
 {
 	uint8_t *rdata = (uint8_t *)ec_inbuf;
@@ -6834,6 +6930,7 @@ const char *action_key_names[] = {
 	[TK_DICTATE] = "Dictation",
 	[TK_ACCESSIBILITY] = "Accessibility",
 	[TK_DONOTDISTURB] = "Do Not Disturb",
+	[TK_HOME] = "Home",
 };
 
 BUILD_ASSERT(ARRAY_SIZE(action_key_names) == TK_COUNT);
@@ -8067,6 +8164,8 @@ static const char *const base_params[] = {
 	"chg_input_current_min",
 	"chg_input_current_max",
 	"chg_input_current_step",
+	"chg_minimum_charging_mv",
+	"chg_is_charger_sufficient",
 };
 BUILD_ASSERT(ARRAY_SIZE(base_params) == CS_NUM_BASE_PARAMS);
 
@@ -8788,7 +8887,7 @@ static void batt_conf_dump_in_c(const struct board_batt_params *conf,
 	printf("},\n"); /* end of board_batt_params */
 }
 
-static int read_u32_from_json(base::Value::Dict *dict, const char *key,
+static int read_u32_from_json(base::DictValue *dict, const char *key,
 			      uint32_t *value)
 {
 	std::string *str = dict->FindString(key);
@@ -8810,7 +8909,7 @@ static int read_u32_from_json(base::Value::Dict *dict, const char *key,
 	return 0;
 }
 
-static int read_u16_from_json(base::Value::Dict *dict, const char *key,
+static int read_u16_from_json(base::DictValue *dict, const char *key,
 			      uint16_t *value)
 {
 	std::string *str = dict->FindString(key);
@@ -8832,7 +8931,7 @@ static int read_u16_from_json(base::Value::Dict *dict, const char *key,
 	return 0;
 }
 
-static int read_u8_from_json(base::Value::Dict *dict, const char *key,
+static int read_u8_from_json(base::DictValue *dict, const char *key,
 			     uint8_t *value)
 {
 	const std::string *str = dict->FindString(key);
@@ -8854,13 +8953,13 @@ static int read_u8_from_json(base::Value::Dict *dict, const char *key,
 	return 0;
 }
 
-static int read_battery_config_from_json(base::Value::Dict *root_dict,
+static int read_battery_config_from_json(base::DictValue *root_dict,
 					 struct board_batt_params *config)
 {
 	int i;
 	char *e;
 
-	base::Value::Dict *fuel_gauge = root_dict->FindDict("fuel_gauge");
+	base::DictValue *fuel_gauge = root_dict->FindDict("fuel_gauge");
 	if (fuel_gauge == nullptr) {
 		fprintf(stderr, "Error. fuel_gauge not found.\n");
 		return -1;
@@ -8871,14 +8970,14 @@ static int read_battery_config_from_json(base::Value::Dict *root_dict,
 			       &config->fuel_gauge.board_flags))
 		return -1;
 
-	base::Value::Dict *ship_mode = fuel_gauge->FindDict("ship_mode");
+	base::DictValue *ship_mode = fuel_gauge->FindDict("ship_mode");
 	if (ship_mode != nullptr) {
 		struct ship_mode_info *sm = &config->fuel_gauge.ship_mode;
 
 		if (read_u8_from_json(ship_mode, "reg_addr", &sm->reg_addr))
 			return -1;
 
-		base::Value::List *reg_data = ship_mode->FindList("reg_data");
+		base::ListValue *reg_data = ship_mode->FindList("reg_data");
 		for (i = 0; i < reg_data->size() && i < SHIP_MODE_WRITES; ++i) {
 			const std::string *str = (*reg_data)[i].GetIfString();
 			sm->reg_data[i] = strtoul(str->c_str(), &e, 0);
@@ -8891,7 +8990,7 @@ static int read_battery_config_from_json(base::Value::Dict *root_dict,
 		};
 	}
 
-	base::Value::Dict *sleep_mode = fuel_gauge->FindDict("sleep_mode");
+	base::DictValue *sleep_mode = fuel_gauge->FindDict("sleep_mode");
 	if (sleep_mode != nullptr) {
 		struct sleep_mode_info *sm = &config->fuel_gauge.sleep_mode;
 
@@ -8901,7 +9000,7 @@ static int read_battery_config_from_json(base::Value::Dict *root_dict,
 			return -1;
 	}
 
-	base::Value::Dict *fet = fuel_gauge->FindDict("fet");
+	base::DictValue *fet = fuel_gauge->FindDict("fet");
 	if (fet != nullptr) {
 		struct fet_info *fi = &config->fuel_gauge.fet;
 
@@ -8918,7 +9017,7 @@ static int read_battery_config_from_json(base::Value::Dict *root_dict,
 			return -1;
 	}
 
-	base::Value::Dict *batt_info = root_dict->FindDict("batt_info");
+	base::DictValue *batt_info = root_dict->FindDict("batt_info");
 	if (batt_info == nullptr) {
 		fprintf(stderr, "Error. batt_info not found.\n");
 		return -1;
@@ -9176,7 +9275,7 @@ static int cmd_battery_config_set(int argc, char *argv[], bool search_only)
 		free(json);
 		return -1;
 	}
-	base::Value::Dict *dict = root->GetIfDict();
+	base::DictValue *dict = root->GetIfDict();
 	if (dict == nullptr) {
 		fprintf(stderr, "Failed to get dictionary from JSON file.\n");
 		free(json);
@@ -9188,7 +9287,7 @@ static int cmd_battery_config_set(int argc, char *argv[], bool search_only)
 	/* Clear the dst to ensure it'll be null-terminated. */
 	memset(identifier, 0, sizeof(identifier));
 	sprintf(identifier, "%s,%s", manuf_name, device_name);
-	base::Value::Dict *root_dict = nullptr;
+	base::DictValue *root_dict = nullptr;
 	int num_matches = 0;
 
 	for (const auto &identifier_in_json : *dict) {
@@ -9307,6 +9406,49 @@ int cmd_boottime(int argc, char *argv[])
 	return rv;
 }
 
+#define CBI_FIELD_NAME_ENTRY(tag) [CBI_TAG_##tag] = STRINGIFY(tag)
+
+static const char *const cbi_field_name[] = {
+	CBI_FIELD_NAME_ENTRY(BOARD_VERSION),
+	CBI_FIELD_NAME_ENTRY(OEM_ID),
+	CBI_FIELD_NAME_ENTRY(SKU_ID),
+	CBI_FIELD_NAME_ENTRY(DRAM_PART_NUM),
+	CBI_FIELD_NAME_ENTRY(OEM_NAME),
+	CBI_FIELD_NAME_ENTRY(MODEL_ID),
+	CBI_FIELD_NAME_ENTRY(FW_CONFIG),
+	CBI_FIELD_NAME_ENTRY(PCB_SUPPLIER),
+	CBI_FIELD_NAME_ENTRY(SSFC),
+	CBI_FIELD_NAME_ENTRY(REWORK_ID),
+	CBI_FIELD_NAME_ENTRY(FACTORY_CALIBRATION_DATA),
+	CBI_FIELD_NAME_ENTRY(COMMON_CONTROL),
+	CBI_FIELD_NAME_ENTRY(BATTERY_CONFIG),
+	CBI_FIELD_NAME_ENTRY(BATTERY_CONFIG_15),
+	CBI_FIELD_NAME_ENTRY(PROVISION_MATRIX_VERSION),
+	CBI_FIELD_NAME_ENTRY(UFSC),
+};
+BUILD_ASSERT(ARRAY_SIZE(cbi_field_name) == CBI_TAG_COUNT);
+
+static int cmd_cbi_is_string_field(enum cbi_data_tag tag)
+{
+	return tag == CBI_TAG_DRAM_PART_NUM || tag == CBI_TAG_OEM_NAME;
+}
+
+static int cmd_cbi_is_binary_field(enum cbi_data_tag tag)
+{
+	return (CBI_TAG_BATTERY_CONFIG <= tag &&
+		tag <= CBI_TAG_BATTERY_CONFIG_15) ||
+	       tag == CBI_TAG_UFSC;
+}
+
+static const char *get_cbi_tag_type_string(enum cbi_data_tag tag)
+{
+	if (cmd_cbi_is_string_field(tag))
+		return " (string)";
+	if (cmd_cbi_is_binary_field(tag))
+		return " (hex)";
+	return "";
+}
+
 static void cmd_cbi_help(char *cmd)
 {
 	fprintf(stderr,
@@ -9314,21 +9456,23 @@ static void cmd_cbi_help(char *cmd)
 		"  Usage: %s set <tag> <value> <size> [set_flag]\n"
 		"  Usage: %s set <tag> <string/hex> <*> [set_flag]\n"
 		"  Usage: %s remove <tag> [set_flag]\n"
-		"    <tag> is one of:\n"
-		"      0: BOARD_VERSION\n"
-		"      1: OEM_ID\n"
-		"      2: SKU_ID\n"
-		"      3: DRAM_PART_NUM (string)\n"
-		"      4: OEM_NAME (string)\n"
-		"      5: MODEL_ID\n"
-		"      6: FW_CONFIG\n"
-		"      7: PCB_VENDOR\n"
-		"      8: SSFC\n"
-		"      9: REWORK_ID\n"
-		"      10: FACTORY_CALIBRATION_DATA\n"
-		"      11: COMMON_CONTROL\n"
-		"      [12:27]: BATTERY_CONFIG_[0:15] (hex)\n"
-		"      28: PROVISION_MATRIX_VERSION\n"
+		"    <tag> is one of:\n",
+		cmd, cmd, cmd, cmd);
+	for (int tag = CBI_TAG_BOARD_VERSION; tag <= CBI_TAG_COMMON_CONTROL;
+	     ++tag) {
+		fprintf(stderr, "      %2d: %s%s\n", tag, cbi_field_name[tag],
+			get_cbi_tag_type_string(
+				static_cast<enum cbi_data_tag>(tag)));
+	}
+	fprintf(stderr, "      [%d:%d]: BATTERY_CONFIG_[0:15] (hex)\n",
+		CBI_TAG_BATTERY_CONFIG, CBI_TAG_BATTERY_CONFIG_15);
+	for (int tag = CBI_TAG_PROVISION_MATRIX_VERSION; tag < CBI_TAG_COUNT;
+	     ++tag) {
+		fprintf(stderr, "      %2d: %s%s\n", tag, cbi_field_name[tag],
+			get_cbi_tag_type_string(
+				static_cast<enum cbi_data_tag>(tag)));
+	}
+	fprintf(stderr,
 		"    <size> is the size of the data in byte. It should be zero for\n"
 		"      string types.\n"
 		"    <value/string> is an integer or a string to be set\n"
@@ -9338,19 +9482,7 @@ static void cmd_cbi_help(char *cmd)
 		"      01b: Invalidate cache and reload data from EEPROM\n"
 		"    [set_flag] is combination of:\n"
 		"      01b: Skip write to EEPROM. Use for back-to-back writes\n"
-		"      10b: Set all fields to defaults first\n",
-		cmd, cmd, cmd, cmd);
-}
-
-static int cmd_cbi_is_string_field(enum cbi_data_tag tag)
-{
-	return tag == CBI_TAG_DRAM_PART_NUM || tag == CBI_TAG_OEM_NAME;
-}
-
-static int cmd_cbi_is_binary_field(enum cbi_data_tag tag)
-{
-	return CBI_TAG_BATTERY_CONFIG <= tag &&
-	       tag <= CBI_TAG_BATTERY_CONFIG_15;
+		"      10b: Set all fields to defaults first\n");
 }
 
 /*
@@ -10040,6 +10172,19 @@ int cmd_set_alarm_slp_s0_dbg(int argc, char *argv[])
 		printf("Disabling alarm for SLP S0 Debug.\n");
 	else
 		printf("Wake host in %d secs for SLP_S0 Debug.\n", p.time);
+	return 0;
+}
+
+int cmd_sleep_signal_transitions(int argc, char *argv[])
+{
+	struct ec_response_host_sleep_signal_transitions resp;
+	if (ec_command(EC_CMD_HOST_SLEEP_SIGNAL_TRANSITIONS, 0, NULL, 0, &resp,
+		       sizeof(resp)) < 0) {
+		fprintf(stderr, "Host command failed\n");
+		return -1;
+	}
+	printf("0x%x\n", resp.sleep_signal_transitions);
+
 	return 0;
 }
 
@@ -13003,6 +13148,8 @@ const struct command commands[] = {
 	  "<sec>\n"
 	  "\tSet alarm to wake host in <sec> seconds, "
 	  "PS: EC won't wake host if SLP_S0 is not asserted" },
+	{ "sleepsignaltransitions", cmd_sleep_signal_transitions,
+	  "\n\tPrints current EC sleep_signal_transitions value" },
 	{ "sysinfo", cmd_sysinfo,
 	  "[flags|reset_flags|firmware_copy]\n"
 	  "\tDisplay system info." },
@@ -13082,6 +13229,9 @@ const struct command commands[] = {
 	  "\tWait for the MKBP event of type and display it.\n"
 	  "\tOptionaly, run the command and wait for the mkbp event.\n"
 	  "\tRun with no arguments for more information." },
+	{ "watchdoginfo", cmd_watchdog_info,
+	  "[reset_stats]\n"
+	  "\tGet watchdog info." },
 	{ "wireless", cmd_wireless,
 	  "<flags> [<mask> [<suspend_flags> <suspend_mask>]]\n"
 	  "\tEnable/disable WLAN/Bluetooth radio." },
@@ -13144,7 +13294,7 @@ int main(int argc, char *argv[])
 	int i2c_bus = -1;
 	char device_name[41] = CROS_EC_DEV_NAME;
 	uint16_t vid = USB_VID_GOOGLE, pid = USB_PID_HAMMER;
-	int rv = 1;
+	int rv = -1;
 	int parse_error = 0;
 	char *e;
 	int i;
@@ -13287,5 +13437,8 @@ out:
 	if (interfaces == COMM_USB)
 		comm_usb_exit();
 
-	return !!rv;
+	/* Negative values from the command handler should be treated as errors
+	 * return an exit code of 1. Some command handlers return 0 or the
+	 * number of bytes received upon success. */
+	return (rv < 0) ? 1 : 0;
 }

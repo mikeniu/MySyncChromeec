@@ -9,12 +9,27 @@ config FP_FPC_BEP_ALGORITHM
 	  Enable FPC BEP matching algorithm. To work properly, FPC private
 	  library is required.
 
-config FP_ELAN_ELAN80SG_ALGORITHM
-	  bool "ELAN ELAN80SG matching algorithm"
-	  default y if FINGERPRINT_SENSOR_ELAN80SG
+config FP_ELAN_ELAN80SERIES_ALGORITHM
+	  bool
 	  help
-	    Enable ELAN ELAN80SG matching algorithm. To work properly, ELAN
+	    Enable ELAN ELAN80SERIES matching algorithm. To work properly, ELAN
 		private library is required.
+
+config FP_ELAN_ELAN80SG_ALGORITHM
+      bool "ELAN ELAN80SG matching algorithm"
+      default y if FINGERPRINT_SENSOR_ELAN80SG
+      select FP_ELAN_ELAN80SERIES_ALGORITHM
+      help
+        Enable ELAN ELAN80SG matching algorithm. To work properly, ELAN
+        private library is required.
+
+config FP_ELAN_ELANI80SA_ALGORITHM
+      bool "ELAN ELANI80SA matching algorithm"
+      default y if FINGERPRINT_SENSOR_ELANI80SA
+      select FP_ELAN_ELAN80SERIES_ALGORITHM
+      help
+        Enable ELAN ELANI80SA matching algorithm. To work properly, ELAN
+        private library is required.
 
 config FP_FPC_LIBFP_ALGORITHM
 	bool "FPC LIBFP matching algorithm"
@@ -30,12 +45,21 @@ config FP_EGIS_EGIS630_ALGORITHM
 	  Enable EGIS EGIS630 matching algorithm. To work properly, EGIS private
 	  library is required.
 
+config FP_EGIS_EGIS660_ALGORITHM
+	bool "EGIS_EGIS660 matching algorithm"
+	default y if FINGERPRINT_SENSOR_EGIS660
+	help
+	  Enable EGIS EGIS660 matching algorithm. To work properly, EGIS private
+	  library is required.
+
 config FP_ALGORITHM_TEMPLATE_SIZE
 	int "Size of template size"
 	default 5092 if FINGERPRINT_SENSOR_FPC1025 && FP_FPC_BEP_ALGORITHM
 	default 47552 if FINGERPRINT_SENSOR_FPC1145 && FP_FPC_LIBFP_ALGORITHM
 	default 16384 if FINGERPRINT_SENSOR_EGIS630 && FP_EGIS_EGIS630_ALGORITHM
+	default 18004 if FINGERPRINT_SENSOR_EGIS660 && FP_EGIS_EGIS660_ALGORITHM
 	default 19320 if FINGERPRINT_SENSOR_ELAN80SG && FP_ELAN_ELAN80SG_ALGORITHM
+	default 34800 if FINGERPRINT_SENSOR_ELANI80SA && FP_ELAN_ELANI80SA_ALGORITHM
 	default 0
 	help
 	  Constant value corresponding to the maximum template size.
@@ -51,7 +75,9 @@ config FP_MAX_FINGER_COUNT
 	  default 5 if FINGERPRINT_SENSOR_FPC1025 && FP_FPC_BEP_ALGORITHM
 	  default 5 if FINGERPRINT_SENSOR_FPC1145 && FP_FPC_LIBFP_ALGORITHM
 	  default 3 if FINGERPRINT_SENSOR_EGIS630 && FP_EGIS_EGIS630_ALGORITHM
+	  default 3 if FINGERPRINT_SENSOR_EGIS660 && FP_EGIS_EGIS660_ALGORITHM
 	  default 3 if FINGERPRINT_SENSOR_ELAN80SG && FP_ELAN_ELAN80SG_ALGORITHM
+	  default 3 if FINGERPRINT_SENSOR_ELANI80SA && FP_ELAN_ELANI80SA_ALGORITHM
 	  default 5
 	  help
 		Max number of templates stored / matched against. This limit comes
@@ -75,10 +101,16 @@ config HAVE_EGIS630_PRIVATE_ALGORITHM
 	help
 	  If enabled, it indicates that EGIS630 private algorithm is present.
 
-config HAVE_ELAN80SG_PRIVATE_ALGORITHM
+config HAVE_EGIS660_PRIVATE_ALGORITHM
+	bool
+	default n
+	help
+	  If enabled, it indicates that EGIS660 private algorithm is present.
+
+config HAVE_ELAN80SERIES_PRIVATE_ALGORITHM
 	bool
 	help
-	  If enabled, it indicates that ELAN80SG private algorithm is present.
+	  If enabled, it indicates that ELAN80SERIES private algorithm is present.
 
 config LIBFP_PRIVATE_DRIVER_HEAP_SIZE
 	int "Size of heap for FPC1145 driver"

@@ -94,6 +94,7 @@ tests:
     - CONFIG_PLATFORM_EC_BATTERY_CUT_OFF=y
     - CONFIG_SHELL_BACKEND_DUMMY_BUF_SIZE=4096
     - CONFIG_PLATFORM_EC_KEYBOARD_STRAUSS=y
+    - CONFIG_PLATFORM_EC_CONSOLE_DEBUG=y
     extra_conf_files:
     - prj.conf
     - default/prj.conf
@@ -641,6 +642,7 @@ tests:
     - CONFIG_PLATFORM_EC_BATTERY=y
     - CONFIG_PLATFORM_EC_BATTERY_FUEL_GAUGE=y
     - CONFIG_PLATFORM_EC_CBI_EEPROM=y
+    - CONFIG_PLATFORM_EC_HOST_COMMAND_ENTER_BOOTLOADER=y
   drivers.host_cmd.ec_host_cmd:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_HOST_COMMANDS=y
@@ -648,6 +650,7 @@ tests:
     - CONFIG_PLATFORM_EC_USB_PD_LOGGING=y
     - CONFIG_PLATFORM_EC_LID_ANGLE_UPDATE=y
     - CONFIG_PLATFORM_EC_HOST_COMMAND_STATUS=y
+    - CONFIG_PLATFORM_EC_HOST_COMMAND_ENTER_BOOTLOADER=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
@@ -750,6 +753,7 @@ tests:
     - CONFIG_PLATFORM_EC_CHARGER_DUMP_PROCHOT=y
     - CONFIG_PLATFORM_EC_CONSOLE_CMD_CHARGER_DUMP=y
     - CONFIG_PLATFORM_EC_CHARGER_ISL9241=y
+    - CONFIG_PLATFORM_EC_CHARGER_SET_ACOKREF=y
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - ./isl9241/usbc.dts
@@ -833,6 +837,26 @@ tests:
     - ./boards/native_sim.overlay
     - ./led_driver/led_pins.dts
     - ./led_driver/led_policy_alias.dts
+  drivers.led_driver_custom:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_LED_DRIVER_CUSTOM=y
+    extra_conf_files:
+    - prj.conf
+    - led_driver/prj.conf
+    extra_dtc_overlay_files:
+    - ./boards/native_sim.overlay
+    - ./led_driver/led_pins.dts
+    - ./led_driver/led_policy_sequence.dts
+  drivers.led_driver_sequence:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_LED_DRIVER_SEQUENCE=y
+    extra_conf_files:
+    - prj.conf
+    - led_driver/prj.conf
+    extra_dtc_overlay_files:
+    - ./boards/native_sim.overlay
+    - ./led_driver/led_pins.dts
+    - ./led_driver/led_policy_sequence.dts
   drivers.led_driver.ec_host_cmd:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_LED_DRIVER=y
@@ -844,6 +868,15 @@ tests:
     - ./boards/native_sim.overlay
     - ./led_driver/led_pins.dts
     - ./led_driver/led_policy.dts
+  drivers.led_driver_max695x:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_LED_DRIVER_MAX695X=y
+    extra_conf_files:
+    - prj.conf
+    - led_driver/prj.conf
+    extra_dtc_overlay_files:
+    - ./boards/native_sim.overlay
+    - ./led_driver/max695x_led.overlay
   drivers.led_common:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_LED_COMMON=y
@@ -1057,6 +1090,15 @@ tests:
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
+  drivers.it8xxx2:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_IT8XXX2=y
+    - CONFIG_PLATFORM_EC_USB_PD_TCPC_VCONN=y
+    extra_conf_files:
+    - prj.conf
+    - it8xxx2/prj.conf
+    extra_dtc_overlay_files:
+    - ./boards/native_sim.overlay
   drivers.ps8743:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_PS8743=y
@@ -1195,6 +1237,13 @@ tests:
     - CONFIG_PLATFORM_EC_HOSTCMD=y
     extra_dtc_overlay_files:
     - boards/native_sim.overlay
+  drivers.shim_espi.no_temp_sensor:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_SHIM_ESPI=y
+    - CONFIG_PLATFORM_EC_HOSTCMD=y
+    extra_dtc_overlay_files:
+    - boards/native_sim.overlay
+    - shim_espi/no_temp_sensor.dtsi
   drivers.shim_gpio_id:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_SHIM_GPIO_ID=y
@@ -1264,6 +1313,15 @@ tests:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_SYSTEM=y
     - CONFIG_POWER_SEQUENCE_MOCK=y
+  drivers.system.rw:
+    tags:
+    - common
+    - system
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_SYSTEM=y
+    - CONFIG_POWER_SEQUENCE_MOCK=y
+    extra_args:
+    - EXTRA_CFLAGS=-DSECTION_IS_RW
   drivers.system.ec_host_cmd:
     tags:
     - common
@@ -1766,6 +1824,27 @@ tests:
     - default/prj.conf
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
+  drivers.smart_battery.present:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_SMART_BATTERY_PRESENT=y
+    - CONFIG_PLATFORM_EC_BATTERY_CUT_OFF=y
+    - CONFIG_PLATFORM_EC_BATTERY_PRESENT_NONE=y
+    extra_conf_files:
+    - prj.conf
+    - default/prj.conf
+    extra_dtc_overlay_files:
+    - default/boards/native_sim.overlay
+  drivers.smart_battery.pec:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_SMART_BATTERY=y
+    - CONFIG_PLATFORM_EC_BATTERY_CUT_OFF=y
+    - CONFIG_PLATFORM_EC_SMBUS_PEC=y
+    - CONFIG_PLATFORM_EC_I2C_NACK_RETRY_COUNT=1
+    extra_conf_files:
+    - prj.conf
+    - default/prj.conf
+    extra_dtc_overlay_files:
+    - default/boards/native_sim.overlay
   drivers.tabletmode_interrupt:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_TABLETMODE_INTERRUPT=y
@@ -1773,3 +1852,16 @@ tests:
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - ./tabletmode_interrupt/boards/native_sim.overlay
+  drivers.write_protection_custom:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_WRITE_PROTECTION_CUSTOM=y
+    - CONFIG_PLATFORM_EC_WP_CUSTOM=y
+  drivers.rt3645:
+    extra_conf_files:
+    - prj.conf
+    - rt3645/prj.conf
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_RT3645=y
+    extra_dtc_overlay_files:
+    - ./boards/native_sim.overlay
+    - ./rt3645/imvp.dts

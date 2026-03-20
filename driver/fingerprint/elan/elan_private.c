@@ -27,21 +27,6 @@
 static uint16_t errors;
 
 /* Sensor description */
-static struct ec_response_fp_info ec_fp_sensor_info = {
-	/* Sensor identification */
-	.vendor_id = FOURCC('E', 'L', 'A', 'N'),
-	.product_id = PID,
-	.model_id = MID,
-	.version = VERSION,
-	/* Image frame characteristics */
-	.frame_size = FP_SENSOR_RES_X_ELAN * FP_SENSOR_RES_Y_ELAN * 2,
-	.pixel_format = V4L2_PIX_FMT_GREY,
-	.width = FP_SENSOR_RES_X_ELAN,
-	.height = FP_SENSOR_RES_Y_ELAN,
-	.bpp = FP_SENSOR_RES_BPP_ELAN,
-};
-
-/* Sensor description */
 static struct fp_sensor_info elan_sensor_info = {
 	/* Sensor identification */
 	.vendor_id = FOURCC('E', 'L', 'A', 'N'),
@@ -51,10 +36,10 @@ static struct fp_sensor_info elan_sensor_info = {
 };
 
 #define ELAN_DEFAULT_IMAGE_PARAMS                                         \
-	.bpp = FP_SENSOR_RES_BPP_ELAN,                                    \
 	.frame_size = FP_SENSOR_RES_X_ELAN * FP_SENSOR_RES_Y_ELAN * 2,    \
+	.image_data_offset_bytes = FP_SENSOR_IMAGE_OFFSET_ELAN,           \
 	.pixel_format = V4L2_PIX_FMT_GREY, .width = FP_SENSOR_RES_X_ELAN, \
-	.height = FP_SENSOR_RES_Y_ELAN
+	.height = FP_SENSOR_RES_Y_ELAN, .bpp = FP_SENSOR_RES_BPP_ELAN
 
 static const struct fp_image_frame_params elan_image_frame_params[] = {
 	[ELAN_CAPTURE_VENDOR_FORMAT] =
@@ -192,31 +177,14 @@ int fp_sensor_deinit(void)
 }
 
 /**
- * Fill the 'ec_response_fp_info' buffer with the sensor information
+ * Fill the 'ec_response_fp_info_v2' buffer with the sensor information
  *
- * @param[out] resp      retrieve the version, sensor and template information
+ * @param[out] resp retrieve the version, sensor and template information
  *
  * @return EC_SUCCESS on success.
  * @return EC_RES_ERROR on error.
  */
-int fp_sensor_get_info(struct ec_response_fp_info *resp)
-{
-	uint16_t id = 0;
-
-	CPRINTF("========%s=======\n", __func__);
-	memcpy(resp, &ec_fp_sensor_info, sizeof(struct ec_response_fp_info));
-
-	if (elan_get_hwid(&id)) {
-		return EC_RES_ERROR;
-	}
-
-	resp->model_id = id;
-	resp->errors = errors;
-
-	return EC_SUCCESS;
-}
-
-int fp_sensor_get_info_v2(struct ec_response_fp_info_v2 *resp, size_t resp_size)
+int fp_sensor_get_info(struct ec_response_fp_info_v2 *resp, size_t resp_size)
 {
 	CPRINTF("========%s=======\n", __func__);
 
@@ -268,12 +236,13 @@ int fp_sensor_get_info_v2(struct ec_response_fp_info_v2 *resp, size_t resp_size)
  *   due to finger covering too little area of the sensor
  */
 int fp_finger_match(void *templ, uint32_t templ_count, uint8_t *image,
-		    int32_t *match_index, uint32_t *update_bitmap)
+		    bool template_update, int32_t *match_index,
+		    uint32_t *update_bitmap)
 {
 	int res;
 	CPRINTF("========%s=======\n", __func__);
 	res = elan_match(templ, templ_count, image, match_index, update_bitmap);
-	if (res == EC_MKBP_FP_ERR_MATCH_YES)
+	if (res == EC_MKBP_FP_ERR_MATCH_YES && template_update)
 		res = elan_template_update(templ, *match_index);
 
 	return res;
