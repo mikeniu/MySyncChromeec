@@ -433,8 +433,6 @@ ZTEST(pirrha, test_handle_tsp_ta)
 
 ZTEST(pirrha, test_pirrha_callback_init)
 {
-	pirrha_callback_init();
-
 	hook_notify(HOOK_CHIPSET_RESUME);
 	zassert_equal(isl923x_set_comparator_inversion_fake.call_count, 1);
 	zassert_equal(isl923x_set_comparator_inversion_fake.arg0_val, 1);

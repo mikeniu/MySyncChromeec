@@ -190,13 +190,4 @@ test_export_static void board_resume_change(struct ap_power_ev_callback *cb,
 		break;
 	}
 }
-
-void board_callback_init(void)
-{
-	static struct ap_power_ev_callback cb;
-
-	/* Setup a resume callback */
-	ap_power_ev_init_callback(&cb, board_resume_change, AP_POWER_STARTUP);
-	ap_power_ev_add_callback(&cb);
-}
-DECLARE_HOOK(HOOK_INIT, board_callback_init, HOOK_PRIO_DEFAULT);
+AP_POWER_EVENT_CALLBACK_DEFINE(board_resume_change, AP_POWER_STARTUP);

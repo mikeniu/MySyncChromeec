@@ -91,24 +91,20 @@ static void shi_power_change(struct ap_power_ev_callback *cb,
 #endif
 	}
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(shi_power_change, AP_POWER_STARTUP,
+			       AP_POWER_SHUTDOWN,
+#if CONFIG_PLATFORM_EC_CHIPSET_RESUME_INIT_HOOK
+			       AP_POWER_RESUME_INIT, AP_POWER_SUSPEND_COMPLETE
+#else
+			       AP_POWER_RESUME, AP_POWER_SUSPEND
+#endif
+);
 
 static int shi_init(void)
 {
-	static struct ap_power_ev_callback cb;
 #ifdef CONFIG_EC_HOST_CMD
 	const struct device *cros_shi_dev = DEVICE_DT_GET(SHI_NODE);
 #endif
-
-	ap_power_ev_init_callback(&cb, shi_power_change,
-				  AP_POWER_STARTUP | AP_POWER_SHUTDOWN |
-#if CONFIG_PLATFORM_EC_CHIPSET_RESUME_INIT_HOOK
-					  AP_POWER_RESUME_INIT |
-					  AP_POWER_SUSPEND_COMPLETE
-#else
-					  AP_POWER_RESUME | AP_POWER_SUSPEND
-#endif
-	);
-	ap_power_ev_add_callback(&cb);
 
 #ifdef CONFIG_EC_HOST_CMD
 	pm_device_runtime_enable(cros_shi_dev);

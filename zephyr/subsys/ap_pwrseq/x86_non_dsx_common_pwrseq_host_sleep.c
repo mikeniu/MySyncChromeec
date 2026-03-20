@@ -244,23 +244,8 @@ static void ap_power_sleep_event_handler(struct ap_power_ev_callback *cb,
 		break;
 	}
 }
-
-/*
- * Registers callback for s0ix events.
- */
-static int ap_power_sleep_s0ix_event(void)
-{
-	static struct ap_power_ev_callback cb;
-
-	/*
-	 * Register for all events.
-	 */
-	ap_power_ev_init_callback(
-		&cb, ap_power_sleep_event_handler,
-		AP_POWER_S0IX_SUSPEND_START | AP_POWER_S0IX_SUSPEND |
-			AP_POWER_S0IX_RESUME | AP_POWER_S0IX_RESUME_COMPLETE |
-			AP_POWER_S0IX_RESET_TRACKING);
-	ap_power_ev_add_callback(&cb);
-	return 0;
-}
-SYS_INIT(ap_power_sleep_s0ix_event, APPLICATION, 1);
+AP_POWER_EVENT_CALLBACK_DEFINE(ap_power_sleep_event_handler,
+			       AP_POWER_S0IX_SUSPEND_START,
+			       AP_POWER_S0IX_SUSPEND, AP_POWER_S0IX_RESUME,
+			       AP_POWER_S0IX_RESUME_COMPLETE,
+			       AP_POWER_S0IX_RESET_TRACKING);

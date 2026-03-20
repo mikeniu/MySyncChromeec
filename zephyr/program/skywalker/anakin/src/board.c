@@ -32,22 +32,8 @@ static void board_backlight_handler(struct ap_power_ev_callback *cb,
 		break;
 	}
 }
-
-static int install_backlight_handler(void)
-{
-	static struct ap_power_ev_callback cb;
-	/*
-	 * Add a callback for start/hardoff to
-	 * control the backlight load switch.
-	 */
-	ap_power_ev_init_callback(&cb, board_backlight_handler,
-				  AP_POWER_STARTUP | AP_POWER_HARD_OFF);
-	ap_power_ev_add_callback(&cb);
-
-	return 0;
-}
-
-SYS_INIT(install_backlight_handler, APPLICATION, 1);
+AP_POWER_EVENT_CALLBACK_DEFINE(board_backlight_handler, AP_POWER_STARTUP,
+			       AP_POWER_HARD_OFF);
 
 static void check_audio_jack(void)
 {

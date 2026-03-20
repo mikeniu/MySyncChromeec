@@ -9,6 +9,4 @@
 
 LOG_MODULE_REGISTER(mock_ap_power_events);
 
-DEFINE_FAKE_VALUE_FUNC(int, ap_power_ev_add_callback,
-		       struct ap_power_ev_callback *);
 DEFINE_FAKE_VOID_FUNC(ap_power_ev_send_callbacks, enum ap_power_events);

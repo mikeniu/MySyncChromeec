@@ -155,6 +155,10 @@ static void board_hdmi_handler(struct ap_power_ev_callback *cb,
 {
 	int value;
 
+	if (corsola_get_db_type() != CORSOLA_DB_HDMI) {
+		return;
+	}
+
 	switch (data.event) {
 	default:
 		return;
@@ -170,6 +174,8 @@ static void board_hdmi_handler(struct ap_power_ev_callback *cb,
 	gpio_pin_set_dt(GPIO_DT_FROM_ALIAS(gpio_en_hdmi_pwr), value);
 	gpio_pin_set_dt(GPIO_DT_FROM_ALIAS(gpio_ps185_pwrdn_odl), value);
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(board_hdmi_handler, AP_POWER_RESUME,
+			       AP_POWER_SUSPEND);
 #endif /* CONFIG_VARIANT_CORSOLA_DB_DETECTION */
 
 static void tasks_init_deferred(void)
@@ -207,13 +213,6 @@ test_export_static void baseboard_x_ec_gpio2_init(void)
 			GPIO_DT_FROM_ALIAS(gpio_usb_c1_ppc_int_odl),
 			GPIO_INT_EDGE_FALLING);
 		return;
-	}
-	if (corsola_get_db_type() == CORSOLA_DB_HDMI) {
-		static struct ap_power_ev_callback cb;
-
-		ap_power_ev_init_callback(&cb, board_hdmi_handler,
-					  AP_POWER_RESUME | AP_POWER_SUSPEND);
-		ap_power_ev_add_callback(&cb);
 	}
 
 	/* drop related C1 port drivers when it's a HDMI DB. */

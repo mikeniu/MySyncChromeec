@@ -99,22 +99,8 @@ static void check_audio_jack_handler(struct ap_power_ev_callback *cb,
 		break;
 	}
 }
-
-static int jack_detect_handler(void)
-{
-	static struct ap_power_ev_callback cb;
-	/*
-	 * Add a callback for suspend/resume/shutdowm to
-	 * control the jack_detect VCC.
-	 */
-	ap_power_ev_init_callback(&cb, check_audio_jack_handler,
-				  AP_POWER_RESUME | AP_POWER_SUSPEND |
-					  AP_POWER_SHUTDOWN);
-	ap_power_ev_add_callback(&cb);
-
-	return 0;
-}
-SYS_INIT(jack_detect_handler, APPLICATION, 1);
+AP_POWER_EVENT_CALLBACK_DEFINE(check_audio_jack_handler, AP_POWER_RESUME,
+			       AP_POWER_SUSPEND, AP_POWER_SHUTDOWN);
 
 enum battery_present battery_hw_present(void)
 {
@@ -326,19 +312,5 @@ static void board_backlight_handler(struct ap_power_ev_callback *cb,
 		break;
 	}
 }
-
-static int install_backlight_handler(void)
-{
-	static struct ap_power_ev_callback cb;
-	/*
-	 * Add a callback for start/hardoff to
-	 * control the backlight load swith.
-	 */
-	ap_power_ev_init_callback(&cb, board_backlight_handler,
-				  AP_POWER_STARTUP | AP_POWER_HARD_OFF);
-	ap_power_ev_add_callback(&cb);
-
-	return 0;
-}
-
-SYS_INIT(install_backlight_handler, APPLICATION, 1);
+AP_POWER_EVENT_CALLBACK_DEFINE(board_backlight_handler, AP_POWER_STARTUP,
+			       AP_POWER_HARD_OFF);

@@ -156,71 +156,21 @@ typedef void (*ap_power_ev_callback_handler_t)(struct ap_power_ev_callback *cb,
  * are unique pointers of struct ap_power_ev_callback.
  * The storage must be static.
  *
- * ap_power_ev_init_callback can be used to initialize this structure.
+ * AP_POWER_EVENT_CALLBACK_DEFINE can be used to define and register a
+ * callback of this type.
  */
 struct ap_power_ev_callback {
-	sys_snode_t node; /* Only usable by AP power event code */
 	ap_power_ev_callback_handler_t handler;
 	uint32_t events; /* Events to listen for */
 };
 /** @endcond */
 
-/**
- * @brief Initialise a struct ap_power_ev_callback properly.
- *
- * @param callback A valid ap_power_ev_callback structure pointer.
- * @param handler The function pointer to call.
- * @param events The bitmask of events to be called for.
- */
-static inline void
-ap_power_ev_init_callback(struct ap_power_ev_callback *cb,
-			  ap_power_ev_callback_handler_t handler,
-			  uint32_t events)
-{
-	__ASSERT(cb, "Callback pointer should not be NULL");
-	__ASSERT(handler, "Callback handler pointer should not be NULL");
-
-	cb->handler = handler;
-	cb->events = events;
-}
-
-/**
- * @brief Update a callback event mask to listen for new events
- *
- * @param callback A valid ap_power_ev_callback structure pointer.
- * @param events The bitmask of events to add.
- */
-void ap_power_ev_add_events(struct ap_power_ev_callback *cb, uint32_t events);
-
-/**
- * @brief Update a callback event mask to remove events
- *
- * @param callback A valid ap_power_ev_callback structure pointer.
- * @param events The bitmask of events to remove.
- */
-static inline void ap_power_ev_remove_events(struct ap_power_ev_callback *cb,
-					     uint32_t events)
-{
-	__ASSERT(cb, "Callback pointer should not be NULL");
-
-	cb->events &= ~events;
-}
-
-/**
- * @brief Add an AP event callback.
- *
- * @param callback A valid ap_power_ev_callback structure pointer.
- * @return 0 on success, negative errno on failure.
- */
-int ap_power_ev_add_callback(struct ap_power_ev_callback *cb);
-
-/**
- * @brief Remove an AP event callback.
- *
- * @param callback A valid ap_power_ev_callback structure pointer.
- * @return 0 on success, negative errno on failure.
- */
-int ap_power_ev_remove_callback(struct ap_power_ev_callback *cb);
+#define AP_POWER_EVENT_CALLBACK_DEFINE(cb_fn, ...)                        \
+	static const STRUCT_SECTION_ITERABLE(ap_power_ev_callback,        \
+					     ap_power_event__##cb_fn) = { \
+		.handler = (cb_fn),                                       \
+		.events = (FOR_EACH(, (|), __VA_ARGS__)),                 \
+	}
 
 #ifdef __cplusplus
 }

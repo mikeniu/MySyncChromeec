@@ -20,63 +20,39 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/ztest.h>
 
-/*
- * Structure passed to event listeners.
- */
-struct events {
-	struct ap_power_ev_callback cb;
-	enum ap_power_events event;
-	int count;
-};
+/* Shared state for tests */
+static int ev_count;
+static enum ap_power_events ev_last_event;
 
-/*
- * Common handler.
- * Increment count, and store event received.
- */
-static void ev_handler(struct ap_power_ev_callback *callback,
+static void ev_handler(struct ap_power_ev_callback *cb,
 		       struct ap_power_ev_data data)
 {
-	struct events *ev = CONTAINER_OF(callback, struct events, cb);
-
-	ev->count++;
-	ev->event = data.event;
+	ev_count++;
+	ev_last_event = data.event;
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(ev_handler, AP_POWER_RESET, AP_POWER_SUSPEND,
+			       AP_POWER_RESUME, AP_POWER_STARTUP,
+			       AP_POWER_SHUTDOWN);
 
 /**
  * @brief TestPurpose: Check registration
  *
  * @details
- * Validate that listeners can be registered, even multiple times
+ * Validate that the callback fires for its registered event and not for others.
  *
  * Expected Results
- *  - Multiple registrations do not result in multiple calls.
+ *  - Callback fires for registered events only.
  */
 ZTEST(events, test_registration)
 {
-	static struct events cb;
-
-	ap_power_ev_init_callback(&cb.cb, ev_handler, AP_POWER_RESET);
-	ap_power_ev_add_callback(&cb.cb);
+	ev_count = 0;
+	ev_last_event = 0;
 	ap_power_ev_send_callbacks(AP_POWER_RESET);
-	zassert_equal(1, cb.count, "Callback not called");
-	zassert_equal(AP_POWER_RESET, cb.event, "Wrong event");
-	ap_power_ev_send_callbacks(AP_POWER_SUSPEND);
-	zassert_equal(1, cb.count, "Callback called");
-
-	ap_power_ev_remove_callback(&cb.cb);
-	ap_power_ev_send_callbacks(AP_POWER_RESET);
-	zassert_equal(1, cb.count, "Callback called");
-	cb.count = 0; /* Reset to make it clear */
-	cb.event = 0;
-	/* Add it twice */
-	ap_power_ev_add_callback(&cb.cb);
-	ap_power_ev_add_callback(&cb.cb);
-	ap_power_ev_send_callbacks(AP_POWER_RESET);
-	zassert_equal(1, cb.count, "Callback not called");
-	zassert_equal(AP_POWER_RESET, cb.event, "Wrong event");
-	ap_power_ev_remove_callback(&cb.cb);
-	/* Second remove should be no-op */
-	ap_power_ev_remove_callback(&cb.cb);
+	zassert_equal(1, ev_count, "Callback not called");
+	zassert_equal(AP_POWER_RESET, ev_last_event, "Wrong event");
+	/* Verify unregistered event does not trigger callback */
+	ap_power_ev_send_callbacks(AP_POWER_HARD_OFF);
+	zassert_equal(1, ev_count, "Callback called for unregistered event");
 }
 
 /**
@@ -90,60 +66,41 @@ ZTEST(events, test_registration)
  */
 ZTEST(events, test_pltrst)
 {
-	static struct events cb;
 	const struct device *espi =
 		DEVICE_DT_GET_ANY(zephyr_espi_emul_controller);
 
 	zassert_not_null(espi, "Cannot get ESPI device");
-
-	ap_power_ev_init_callback(&cb.cb, ev_handler, AP_POWER_RESET);
-	ap_power_ev_add_callback(&cb.cb);
-
+	ev_count = 0;
+	ev_last_event = 0;
 	emul_espi_host_send_vw(espi, ESPI_VWIRE_SIGNAL_PLTRST, 0);
 	/*
 	 * Since the event is being sent via a deferred function,
 	 * wait for the deferral time.
 	 */
 	k_usleep(2 * 1000);
-	zassert_equal(1, cb.count, "Callback not called");
-	zassert_equal(AP_POWER_RESET, cb.event, "Wrong event");
+	zassert_equal(1, ev_count, "Callback not called");
+	zassert_equal(AP_POWER_RESET, ev_last_event, "Wrong event");
 }
 
 /**
- * @brief TestPurpose: Check event mask changes
+ * @brief TestPurpose: Check event mask
  *
  * @details
- * Validate that listeners adjust the event mask.
+ * Validate that the callback fires only for events in its static mask.
  *
  * Expected Results
- *  - Event mask changes are honoured
+ *  - Callback fires for registered events; unregistered events are ignored.
  */
 ZTEST(events, test_event_mask)
 {
-	static struct events cb;
-
-	ap_power_ev_init_callback(&cb.cb, ev_handler, 0);
-	ap_power_ev_add_callback(&cb.cb);
+	ev_count = 0;
 	ap_power_ev_send_callbacks(AP_POWER_RESET);
-	zassert_equal(0, cb.count, "Callback called");
-	ap_power_ev_init_callback(&cb.cb, ev_handler, AP_POWER_RESET);
-
-	ap_power_ev_send_callbacks(AP_POWER_RESET);
-	zassert_equal(1, cb.count, "Callback not called");
+	zassert_equal(1, ev_count, "Callback not called for RESET");
 	ap_power_ev_send_callbacks(AP_POWER_SUSPEND);
-	zassert_equal(1, cb.count, "Callback called");
-
-	/* Add interest in event */
-	cb.count = 0;
-	ap_power_ev_add_events(&cb.cb, AP_POWER_SUSPEND);
-	ap_power_ev_send_callbacks(AP_POWER_RESET);
-	zassert_equal(1, cb.count, "Callback not called");
-	zassert_equal(AP_POWER_RESET, cb.event, "Wrong event");
-	ap_power_ev_send_callbacks(AP_POWER_SUSPEND);
-	zassert_equal(2, cb.count, "Callback not called");
-	zassert_equal(AP_POWER_SUSPEND, cb.event, "Wrong event");
-
-	ap_power_ev_remove_callback(&cb.cb);
+	zassert_equal(2, ev_count, "Callback not called for SUSPEND");
+	/* Verify event not in mask does not fire */
+	ap_power_ev_send_callbacks(AP_POWER_HARD_OFF);
+	zassert_equal(2, ev_count, "Callback called for unregistered event");
 }
 
 static int count_hook_shutdown, count_hook_startup;

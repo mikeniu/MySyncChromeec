@@ -14,7 +14,6 @@
 #include "hooks.h"
 
 #include <zephyr/drivers/gpio.h>
-#include <zephyr/init.h>
 
 #include <ap_power/ap_power.h>
 
@@ -62,6 +61,10 @@ static void board_backlight_handler(struct ap_power_ev_callback *cb,
 {
 	int value;
 
+	if (board_version > 1) {
+		return;
+	}
+
 	switch (data.event) {
 	default:
 		return;
@@ -78,6 +81,8 @@ static void board_backlight_handler(struct ap_power_ev_callback *cb,
 	}
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_bl_en_od), value);
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(board_backlight_handler, AP_POWER_RESUME,
+			       AP_POWER_SUSPEND);
 
 static int install_backlight_handler(void)
 {
@@ -91,17 +96,6 @@ static int install_backlight_handler(void)
 			LOG_ERR("Failed to get board version.");
 			board_version = 0;
 		}
-	}
-
-	if (board_version <= 1) {
-		static struct ap_power_ev_callback cb;
-		/*
-		 * Add a callback for suspend/resume to
-		 * control the panel backlight.
-		 */
-		ap_power_ev_init_callback(&cb, board_backlight_handler,
-					  AP_POWER_RESUME | AP_POWER_SUSPEND);
-		ap_power_ev_add_callback(&cb);
 	}
 
 	return 0;

@@ -56,20 +56,9 @@ static void shi_power_shutdown_handler(struct ap_power_ev_callback *cb,
 		break;
 	}
 }
-
-static void install_power_change_handler(void)
-{
-	static struct ap_power_ev_callback cb;
-
-	/* Add a callback of power shutdown complete to enable sleep mask. */
-	ap_power_ev_init_callback(&cb, shi_power_shutdown_handler,
-				  AP_POWER_SHUTDOWN_COMPLETE |
-					  AP_POWER_PRE_INIT |
-					  AP_POWER_HARD_OFF);
-	ap_power_ev_add_callback(&cb);
-}
-/* Call hook after chipset sets initial power state */
-DECLARE_HOOK(HOOK_INIT, install_power_change_handler, HOOK_PRIO_POST_CHIPSET);
+AP_POWER_EVENT_CALLBACK_DEFINE(shi_power_shutdown_handler,
+			       AP_POWER_SHUTDOWN_COMPLETE, AP_POWER_PRE_INIT,
+			       AP_POWER_HARD_OFF);
 
 #ifndef CONFIG_EC_HOST_CMD
 /* Get protocol information */

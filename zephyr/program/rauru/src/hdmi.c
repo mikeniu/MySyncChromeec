@@ -110,14 +110,5 @@ static void board_hdmi_suspend(struct ap_power_ev_callback *cb,
 	}
 	gpio_pin_set_dt(GPIO_DT_FROM_ALIAS(gpio_en_hdmi_pwr), value);
 }
-
-static int board_hdmi_suspend_init(void)
-{
-	static struct ap_power_ev_callback cb = {
-		.handler = board_hdmi_suspend,
-		.events = AP_POWER_SUSPEND | AP_POWER_RESUME,
-	};
-	ap_power_ev_add_callback(&cb);
-	return 0;
-}
-SYS_INIT(board_hdmi_suspend_init, APPLICATION, 0);
+AP_POWER_EVENT_CALLBACK_DEFINE(board_hdmi_suspend, AP_POWER_SUSPEND,
+			       AP_POWER_RESUME);

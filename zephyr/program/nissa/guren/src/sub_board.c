@@ -20,7 +20,6 @@
 #include "usbc/usb_muxes.h"
 
 #include <zephyr/drivers/gpio.h>
-#include <zephyr/init.h>
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
 
@@ -170,9 +169,16 @@ __override void nissa_configure_hdmi_power_gpios(void)
 	nissa_configure_hdmi_rails();
 }
 
+#if DT_NODE_EXISTS(DT_ALIAS(gpio_en_sub_s5_rails))
 static void lte_power_handler(struct ap_power_ev_callback *cb,
 			      struct ap_power_ev_data data)
 {
+	enum guren_sub_board_type sb = guren_get_sb_type();
+
+	if (sb != GUREN_SB_1C_LTE && sb != GUREN_SB_HDMI_LTE &&
+	    sb != GUREN_SB_1C_5G)
+		return;
+
 	/* Enable rails for S5 */
 	const struct gpio_dt_spec *s5_rail =
 		GPIO_DT_FROM_ALIAS(gpio_en_sub_s5_rails);
@@ -190,6 +196,9 @@ static void lte_power_handler(struct ap_power_ev_callback *cb,
 		break;
 	}
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(lte_power_handler, AP_POWER_HARD_OFF,
+			       AP_POWER_PRE_INIT);
+#endif
 
 /**
  * Configure GPIOs (and other pin functions) that vary with present sub-board.
@@ -201,7 +210,6 @@ static void lte_power_handler(struct ap_power_ev_callback *cb,
 static void guren_subboard_config(void)
 {
 	enum guren_sub_board_type sb = guren_get_sb_type();
-	static struct ap_power_ev_callback power_cb;
 
 #if USB_PORT_ENABLE_COUNT > 1
 	BUILD_ASSERT(USB_PORT_ENABLE_COUNT == 2,
@@ -298,10 +306,6 @@ static void guren_subboard_config(void)
 		/* Control LTE power when CPU entering or
 		 * exiting S5 state.
 		 */
-		ap_power_ev_init_callback(&power_cb, lte_power_handler,
-					  AP_POWER_HARD_OFF |
-						  AP_POWER_PRE_INIT);
-		ap_power_ev_add_callback(&power_cb);
 #endif
 	}
 }

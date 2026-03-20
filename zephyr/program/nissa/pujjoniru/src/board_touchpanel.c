@@ -9,7 +9,6 @@
 #include "hooks.h"
 
 #include <zephyr/drivers/gpio.h>
-#include <zephyr/init.h>
 
 #include <ap_power/ap_power.h>
 static bool value_en;
@@ -71,20 +70,5 @@ static void board_backlight_handler(struct ap_power_ev_callback *cb,
 		break;
 	}
 }
-
-static int install_backlight_handler(void)
-{
-	static struct ap_power_ev_callback cb;
-	/*
-	 * Add a callback for suspend/resume/shutdowm to
-	 * control the touchpanel VCC.
-	 */
-	ap_power_ev_init_callback(&cb, board_backlight_handler,
-				  AP_POWER_RESUME | AP_POWER_SUSPEND |
-					  AP_POWER_SHUTDOWN);
-	ap_power_ev_add_callback(&cb);
-
-	return 0;
-}
-
-SYS_INIT(install_backlight_handler, APPLICATION, 1);
+AP_POWER_EVENT_CALLBACK_DEFINE(board_backlight_handler, AP_POWER_RESUME,
+			       AP_POWER_SUSPEND, AP_POWER_SHUTDOWN);
