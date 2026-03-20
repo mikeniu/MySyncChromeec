@@ -474,7 +474,6 @@ class Renode(Platform):
             "benchmark",  # TODO(b/390253975)
             # TODO(b/382705460): We have seen this flake in the CQ.
             # Re-enable when missing character bug is fixed.
-            "flash_physical",
             "fp_transport",  # TODO(b/384094788)
             "fpsensor_debug",  # TODO(b/384110894)
             "zephyr_flash_stm32f4",  # TODO(b/384974228)
@@ -542,7 +541,6 @@ class Renode(Platform):
             return True
 
         if zephyr and test_config.test_name in [
-            "flash_physical",  # TODO(b/448407366)
             "flash_protection_rw",  # TODO(b/485668014)
             "flash_write_protect",  # TODO(b/485668014)
             "fp_transport",  # TODO(b/485668240)
@@ -778,8 +776,9 @@ class AllTests:
             TestConfig(test_name="exit"),
             TestConfig(
                 test_name="flash_physical",
-                imagetype_to_use=ImageType.RO,
                 toggle_power=True,
+                # TODO(b/494296901): Runs slowly on helipilot Renode.
+                timeout_secs=150,
             ),
             TestConfig(
                 test_name="flash_protection_rw",
