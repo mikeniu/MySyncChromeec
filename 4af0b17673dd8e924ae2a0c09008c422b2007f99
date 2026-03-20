@@ -46,6 +46,30 @@
       },
       "revId": "4af0b17673dd8e924ae2a0c09008c422b2007f99",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dcdf47f2_e2cc6230",
+        "filename": "common/fpsensor/OWNERS",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-20T17:34:17Z",
+      "side": 0,
+      "message": "\u003e Isn\u0027t OWNERS approval necessary for merge commits e.g merging merge commit for firmware-brya required approval from FP team, because files under common/fpsensor were changed? Now we have Owners-Override for this, but maybe it was not available that time?\n\nYeah, I think that explains https://crrev.com/c/3155172. \n\n\u003e I have some faint recollection that there was a problem with including OWNERS and firmware release branches. Something like, including OWNERS from platform2/biod was not possible on release branches, because platform2 has no firmware-fpmcu-bloonchipper-release?\n\nThat sounds familiar. I think it will work now that [we are using the pattern](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/common/fpsensor/OWNERS;l\u003d6;drc\u003d235a22cf35005a1bd0bcb715663837382c0512ea) from  http://go/cros-shared-owners:design.\n\nMaybe we should try restoring the `OWNERS` files at some point.",
+      "parentUuid": "2bc60372_cec4cf4a",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 94
+      },
+      "revId": "4af0b17673dd8e924ae2a0c09008c422b2007f99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
