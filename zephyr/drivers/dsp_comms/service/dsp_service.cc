@@ -65,8 +65,6 @@ static void dsp_service_startup(struct ap_power_ev_callback* cb,
 }
 
 static int init_driver() {
-  static struct ap_power_ev_callback cb;
-
   ap_power_ev_init_callback(&cb, dsp_service_startup, AP_POWER_STARTUP);
   ap_power_ev_add_callback(&cb);
   return 0;

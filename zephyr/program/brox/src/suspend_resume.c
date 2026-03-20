@@ -44,29 +44,5 @@ static void brox_power_event_handler(struct ap_power_ev_callback *callback,
 	}
 }
 
-static int init_suspend_resume(void)
-{
-	static struct ap_power_ev_callback cb;
-	const struct gpio_dt_spec *en_pp3300_wlan =
-		GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp3300_wlan);
-	const struct gpio_dt_spec *amp_mute_l =
-		GPIO_DT_FROM_NODELABEL(gpio_amp_mute_l);
-
-	if (!gpio_is_ready_dt(en_pp3300_wlan)) {
-		LOG_ERR("device %s not ready", en_pp3300_wlan->port->name);
-		return -EINVAL;
-	}
-
-	if (!gpio_is_ready_dt(amp_mute_l)) {
-		LOG_ERR("device %s not ready", amp_mute_l->port->name);
-		return -EINVAL;
-	}
-
-	ap_power_ev_init_callback(&cb, brox_power_event_handler,
-				  AP_POWER_PRE_INIT | AP_POWER_STARTUP |
-					  AP_POWER_HARD_OFF);
-	ap_power_ev_add_callback(&cb);
-
-	return 0;
-}
-SYS_INIT(init_suspend_resume, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
+AP_POWER_EVENT_CALLBACK_DEFINE(brox_power_event_handler, AP_POWER_PRE_INIT,
+			       AP_POWER_STARTUP, AP_POWER_HARD_OFF);

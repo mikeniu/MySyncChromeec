@@ -63,25 +63,10 @@ static void board_suspend_handler(struct ap_power_ev_callback *cb,
 	}
 }
 
-static int install_backlight_handler(void)
-{
-	static struct ap_power_ev_callback cb;
-	static struct ap_power_ev_callback tp;
-	/*
-	 * Add a callback for start/hardoff to
-	 * control the backlight load switch.
-	 */
-	ap_power_ev_init_callback(&cb, board_backlight_handler,
-				  AP_POWER_STARTUP | AP_POWER_HARD_OFF);
-	ap_power_ev_init_callback(&tp, board_suspend_handler,
-				  AP_POWER_RESUME | AP_POWER_SUSPEND);
-	ap_power_ev_add_callback(&cb);
-	ap_power_ev_add_callback(&tp);
-
-	return 0;
-}
-
-SYS_INIT(install_backlight_handler, APPLICATION, 1);
+AP_POWER_EVENT_CALLBACK_DEFINE(board_backlight_handler, AP_POWER_STARTUP,
+			       AP_POWER_HARD_OFF);
+AP_POWER_EVENT_CALLBACK_DEFINE(board_suspend_handler, AP_POWER_RESUME,
+			       AP_POWER_SUSPEND);
 
 __overridable void board_rt9490_adc_control(void)
 {

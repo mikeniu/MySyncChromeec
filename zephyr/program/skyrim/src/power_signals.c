@@ -105,17 +105,11 @@ static void handle_prochot(bool asserted, void *data)
 
 test_export_static void baseboard_init(void)
 {
-	static struct ap_power_ev_callback cb;
 	const struct gpio_dt_spec *gpio_ec_sfh_int_h =
 		GPIO_DT_FROM_NODELABEL(gpio_ec_sfh_int_h);
 	const struct gpio_dt_spec *gpio_sfh_ec_int_h =
 		GPIO_DT_FROM_NODELABEL(gpio_sfh_ec_int_h);
 
-	/* Setup a suspend/resume callback */
-	ap_power_ev_init_callback(&cb, baseboard_suspend_change,
-				  AP_POWER_STARTUP | AP_POWER_SHUTDOWN |
-					  AP_POWER_RESUME | AP_POWER_SUSPEND);
-	ap_power_ev_add_callback(&cb);
 	/* Enable Power Group interrupts. */
 	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_pg_groupc_s0));
 	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_pg_lpddr_s0));
@@ -132,6 +126,9 @@ test_export_static void baseboard_init(void)
 	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_stb_dump));
 	amd_stb_dump_init(gpio_ec_sfh_int_h, gpio_sfh_ec_int_h);
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(baseboard_suspend_change, AP_POWER_STARTUP,
+			       AP_POWER_SHUTDOWN, AP_POWER_RESUME,
+			       AP_POWER_SUSPEND);
 DECLARE_HOOK(HOOK_INIT, baseboard_init, HOOK_PRIO_POST_I2C);
 
 /**

@@ -142,8 +142,6 @@ static void navi_power_event_handler(struct ap_power_ev_callback *callback,
  */
 static void init_suspend_resume_workaround(void)
 {
-	static struct ap_power_ev_callback power_event_cb;
-
 	if (board_version == PREINIT_VERSION) {
 		if (cbi_get_board_version(&board_version)) {
 			LOG_ERR("Getting board version failed.");
@@ -158,14 +156,11 @@ static void init_suspend_resume_workaround(void)
 
 	LOG_INF("Board version <= 1. Applying suspend/resume workaround.");
 
-	/* Register for AP power events */
-	ap_power_ev_init_callback(&power_event_cb, navi_power_event_handler,
-				  AP_POWER_RESUME_INIT | AP_POWER_SHUTDOWN);
-	ap_power_ev_add_callback(&power_event_cb);
-
 	/* Initialize the CS_L interrupt callback */
 	gpio_init_callback(&cs_callback, ap_wakeup_isr, BIT(cs_gpio.pin));
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(navi_power_event_handler, AP_POWER_RESUME_INIT,
+			       AP_POWER_SHUTDOWN);
 DECLARE_HOOK(HOOK_INIT, init_suspend_resume_workaround, HOOK_PRIO_LAST);
 
 __override void board_handle_host_sleep_event(enum host_sleep_event state)

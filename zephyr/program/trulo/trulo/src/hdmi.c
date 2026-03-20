@@ -8,7 +8,6 @@
 #include "hooks.h"
 
 #include <zephyr/drivers/gpio.h>
-#include <zephyr/init.h>
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
 
@@ -50,8 +49,6 @@ static void hdmi_hpd_interrupt(const struct device *device,
 
 static void trulo_hdmi_config(void)
 {
-	static struct ap_power_ev_callback power_cb;
-
 	const struct gpio_dt_spec *hpd_gpio = GPIO_DT_FROM_ALIAS(gpio_hpd_odl);
 	static struct gpio_callback hdmi_hpd_cb;
 	int rv, irq_key;
@@ -61,10 +58,6 @@ static void trulo_hdmi_config(void)
 	 * won't do anything if the corresponding pin isn't configured,
 	 * but that's okay.
 	 */
-	ap_power_ev_init_callback(&power_cb, hdmi_power_handler,
-				  AP_POWER_STARTUP | AP_POWER_SHUTDOWN);
-	ap_power_ev_add_callback(&power_cb);
-
 	/*
 	 * Configure HPD input from sub-board; it's inverted by a buffer
 	 * on the sub-board.
@@ -86,4 +79,6 @@ static void trulo_hdmi_config(void)
 	hdmi_hpd_interrupt(hpd_gpio->port, &hdmi_hpd_cb, BIT(hpd_gpio->pin));
 	irq_unlock(irq_key);
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(hdmi_power_handler, AP_POWER_STARTUP,
+			       AP_POWER_SHUTDOWN);
 DECLARE_HOOK(HOOK_INIT, trulo_hdmi_config, HOOK_PRIO_POST_FIRST);

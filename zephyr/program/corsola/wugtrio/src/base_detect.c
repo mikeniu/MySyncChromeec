@@ -104,12 +104,6 @@ static void base_startup_hook(struct ap_power_ev_callback *cb,
 
 static int base_init(void)
 {
-	static struct ap_power_ev_callback cb;
-
-	ap_power_ev_init_callback(&cb, base_startup_hook,
-				  AP_POWER_STARTUP | AP_POWER_SHUTDOWN);
-	ap_power_ev_add_callback(&cb);
-
 	if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
 		base_detect_enable(true);
 	}
@@ -117,6 +111,8 @@ static int base_init(void)
 	return 0;
 }
 
+AP_POWER_EVENT_CALLBACK_DEFINE(base_startup_hook, AP_POWER_STARTUP,
+			       AP_POWER_SHUTDOWN);
 SYS_INIT(base_init, APPLICATION, 1);
 
 void base_init_setting(void)

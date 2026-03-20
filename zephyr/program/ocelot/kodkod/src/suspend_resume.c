@@ -42,29 +42,5 @@ static void kodkod_power_event_handler(struct ap_power_ev_callback *callback,
 	}
 }
 
-static int init_suspend_resume(void)
-{
-	static struct ap_power_ev_callback cb;
-	const struct gpio_dt_spec *lan_pwr_en =
-		GPIO_DT_FROM_NODELABEL(gpio_ec_lan_pwr_en);
-	const struct gpio_dt_spec *amp_mute_l =
-		GPIO_DT_FROM_NODELABEL(gpio_ec_amp_mute_l);
-
-	if (!gpio_is_ready_dt(lan_pwr_en)) {
-		LOG_ERR("device %s not ready", lan_pwr_en->port->name);
-		return -EINVAL;
-	}
-
-	if (!gpio_is_ready_dt(amp_mute_l)) {
-		LOG_ERR("device %s not ready", amp_mute_l->port->name);
-		return -EINVAL;
-	}
-
-	ap_power_ev_init_callback(&cb, kodkod_power_event_handler,
-				  AP_POWER_PRE_INIT | AP_POWER_STARTUP |
-					  AP_POWER_HARD_OFF);
-	ap_power_ev_add_callback(&cb);
-
-	return 0;
-}
-SYS_INIT(init_suspend_resume, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
+AP_POWER_EVENT_CALLBACK_DEFINE(kodkod_power_event_handler, AP_POWER_PRE_INIT,
+			       AP_POWER_STARTUP, AP_POWER_HARD_OFF);

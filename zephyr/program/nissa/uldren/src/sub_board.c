@@ -18,7 +18,6 @@
 #include "usbc/usb_muxes.h"
 
 #include <zephyr/drivers/gpio.h>
-#include <zephyr/init.h>
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
 
@@ -144,8 +143,6 @@ static void sub_board_power_handler(struct ap_power_ev_callback *cb,
 static void uldren_subboard_config(void)
 {
 	enum uldren_sub_board_type sb = uldren_get_sb_type();
-	static struct ap_power_ev_callback power_cb;
-
 	gpio_pin_configure_dt(GPIO_DT_FROM_ALIAS(gpio_en_sub_s5_rails),
 			      GPIO_DISCONNECTED);
 
@@ -172,16 +169,14 @@ static void uldren_subboard_config(void)
 		/* Control sub_board power when CPU entering or
 		 * exiting S5 state.
 		 */
-		ap_power_ev_init_callback(&power_cb, sub_board_power_handler,
-					  AP_POWER_HARD_OFF |
-						  AP_POWER_PRE_INIT);
-		ap_power_ev_add_callback(&power_cb);
 		break;
 
 	default:
 		break;
 	}
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(sub_board_power_handler, AP_POWER_HARD_OFF,
+			       AP_POWER_PRE_INIT);
 DECLARE_HOOK(HOOK_INIT, uldren_subboard_config, HOOK_PRIO_POST_FIRST);
 
 /*

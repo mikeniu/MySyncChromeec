@@ -18,7 +18,6 @@
 #include "usbc/usb_muxes.h"
 
 #include <zephyr/drivers/gpio.h>
-#include <zephyr/init.h>
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
 
@@ -106,9 +105,6 @@ void pujjogatwin_configure_hdmi_vcc(void)
 static void pujjogatwin_subboard_config(void)
 {
 	enum pujjogatwin_sub_board_type sb = pujjogatwin_get_sb_type();
-#if CONFIG_NISSA_BOARD_HAS_HDMI_SUPPORT
-	static struct ap_power_ev_callback power_cb;
-#endif
 
 	BUILD_ASSERT(USB_PORT_ENABLE_COUNT == 1,
 		     "PujjogaTwin assumes no more than 1 USB-A ports");
@@ -131,17 +127,10 @@ static void pujjogatwin_subboard_config(void)
 		gpio_pin_configure_dt(GPIO_DT_FROM_ALIAS(gpio_en_usb_a1_vbus),
 				      GPIO_DISCONNECTED);
 	}
-
-#if CONFIG_NISSA_BOARD_HAS_HDMI_SUPPORT
-	/*
-	 * Control HDMI power according to AP power state. Some events
-	 * won't do anything if the corresponding pin isn't configured,
-	 * but that's okay.
-	 */
-	ap_power_ev_init_callback(&power_cb, hdmi_power_handler,
-				  AP_POWER_PRE_INIT | AP_POWER_HARD_OFF |
-					  AP_POWER_STARTUP | AP_POWER_SHUTDOWN);
-	ap_power_ev_add_callback(&power_cb);
-#endif
 }
+#if CONFIG_NISSA_BOARD_HAS_HDMI_SUPPORT
+AP_POWER_EVENT_CALLBACK_DEFINE(hdmi_power_handler, AP_POWER_PRE_INIT,
+			       AP_POWER_HARD_OFF, AP_POWER_STARTUP,
+			       AP_POWER_SHUTDOWN);
+#endif /* CONFIG_NISSA_BOARD_HAS_HDMI_SUPPORT */
 DECLARE_HOOK(HOOK_INIT, pujjogatwin_subboard_config, HOOK_PRIO_POST_FIRST);

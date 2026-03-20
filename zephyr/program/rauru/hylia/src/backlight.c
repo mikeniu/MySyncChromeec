@@ -11,7 +11,6 @@
 #include "timer.h"
 
 #include <zephyr/drivers/gpio.h>
-#include <zephyr/init.h>
 
 #include <ap_power/ap_power.h>
 
@@ -67,32 +66,5 @@ static void board_backlight_handler(struct ap_power_ev_callback *cb,
 	}
 }
 
-static int install_backlight_handler(void)
-{
-	/*
-	 * Check board version to enable older power sequence.
-	 * Only when the board ID is not greater than 1, the old sequence needs
-	 * to be enabled.
-	 */
-	uint32_t board_version;
-
-	if (cbi_get_board_version(&board_version) != EC_SUCCESS) {
-		LOG_ERR("Failed to get board version.");
-		board_version = 0;
-	}
-
-	if (board_version <= 1) {
-		static struct ap_power_ev_callback cb;
-
-		/*
-		 * Add a callback for suspend/resume to
-		 * control the keyboard backlight.
-		 */
-		ap_power_ev_init_callback(&cb, board_backlight_handler,
-					  AP_POWER_RESUME | AP_POWER_SUSPEND);
-		ap_power_ev_add_callback(&cb);
-	}
-	return 0;
-}
-
-SYS_INIT(install_backlight_handler, APPLICATION, 1);
+AP_POWER_EVENT_CALLBACK_DEFINE(board_backlight_handler, AP_POWER_RESUME,
+			       AP_POWER_SUSPEND);

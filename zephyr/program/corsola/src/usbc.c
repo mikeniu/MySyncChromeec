@@ -209,11 +209,6 @@ test_export_static void baseboard_x_ec_gpio2_init(void)
 		return;
 	}
 	if (corsola_get_db_type() == CORSOLA_DB_HDMI) {
-		static struct ap_power_ev_callback cb;
-
-		ap_power_ev_init_callback(&cb, board_hdmi_handler,
-					  AP_POWER_RESUME | AP_POWER_SUSPEND);
-		ap_power_ev_add_callback(&cb);
 	}
 
 	/* drop related C1 port drivers when it's a HDMI DB. */
@@ -240,6 +235,10 @@ test_export_static void baseboard_x_ec_gpio2_init(void)
 	 */
 	hook_call_deferred(&tasks_init_deferred_data, 500 * USEC_PER_MSEC);
 }
+#ifdef CONFIG_VARIANT_CORSOLA_DB_DETECTION
+AP_POWER_EVENT_CALLBACK_DEFINE(board_hdmi_handler, AP_POWER_RESUME,
+			       AP_POWER_SUSPEND);
+#endif /* CONFIG_VARIANT_CORSOLA_DB_DETECTION */
 DECLARE_HOOK(HOOK_INIT, baseboard_x_ec_gpio2_init, HOOK_PRIO_DEFAULT);
 
 __override uint8_t get_dp_pin_mode(int port)
