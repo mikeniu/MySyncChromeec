@@ -6,6 +6,8 @@
 /* LCOV_EXCL_START */
 /* This is test code, so it should be excluded from coverage */
 
+#define DT_DRV_COMPAT cros_ec_cros_system
+
 #include "common.h"
 #include "drivers/cros_system.h"
 
@@ -80,22 +82,19 @@ cros_system_native_posix_get_chip_revision(const struct device *dev)
 	return "NATIVE_POSIX_REVISION";
 }
 
-__maybe_unused test_mockable_static uint64_t
+#ifdef CONFIG_PM
+test_mockable_static uint64_t
 cros_system_native_posix_deep_sleep_ticks(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 
 	return 0;
 }
-
-static struct cros_system_native_posix_data cros_system_native_posix_dev_data;
-
-static const struct cros_system_native_posix_config cros_system_dev_cfg = {};
+#endif
 
 /* clang-format off */
 /* clang-format extends past 80 lines here */
-static const struct
-cros_system_driver_api cros_system_driver_native_posix_api = {
+static const struct cros_system_driver_api cros_system_driver_native_posix_api = {
 	.get_reset_cause = cros_system_native_posix_get_reset_cause,
 	.soc_reset = cros_system_native_posix_soc_reset,
 	.hibernate = cros_system_native_posix_hibernate,
@@ -108,10 +107,16 @@ cros_system_driver_api cros_system_driver_native_posix_api = {
 };
 /* clang-format on */
 
-DEVICE_DEFINE(cros_system_native_posix_0, "CROS_SYSTEM",
-	      cros_system_native_posix_init, NULL,
-	      &cros_system_native_posix_dev_data, &cros_system_dev_cfg,
-	      PRE_KERNEL_1, CONFIG_CROS_SYSTEM_NATIVE_POSIX_INIT_PRIORITY,
-	      &cros_system_driver_native_posix_api);
+static const struct cros_system_native_posix_config cros_system_dev_cfg = {};
+
+#define CROS_SYSTEM_NATIVE_POSIX_INIT(inst)                                            \
+	static struct cros_system_native_posix_data cros_system_native_posix_dev_data_##inst;  \
+	DEVICE_DT_INST_DEFINE(inst, cros_system_native_posix_init, NULL,               \
+			      &cros_system_native_posix_dev_data_##inst,               \
+			      &cros_system_dev_cfg, PRE_KERNEL_1,              \
+			      CONFIG_CROS_SYSTEM_NATIVE_POSIX_INIT_PRIORITY,           \
+			      &cros_system_driver_native_posix_api);
+
+DT_INST_FOREACH_STATUS_OKAY(CROS_SYSTEM_NATIVE_POSIX_INIT)
 
 /* LCOV_EXCL_STOP */
