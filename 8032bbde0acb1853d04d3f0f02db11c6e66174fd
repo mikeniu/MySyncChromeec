@@ -74,6 +74,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "11d2e33b_5d500ef5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3306924
+      },
+      "writtenOn": "2026-03-20T08:21:58Z",
+      "side": 1,
+      "message": "To prevent interference during Flash operations, it is a safer practice to acquire a lock beforehand. You can refer to crec_flash_lock_mapped_storage; however, please note that it is only implemented when CONFIG_EXTERNAL_STORAGE is enabled.",
+      "parentUuid": "df3f6671_6205966a",
+      "revId": "8032bbde0acb1853d04d3f0f02db11c6e66174fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bc10e535_d643f046",
         "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
         "patchSetId": 5
