@@ -117,11 +117,11 @@ static DEVICE_API(cros_system, cros_system_driver_et171_api) = {
 
 #define CROS_SYSTEM_ET171_INIT(inst)                                            \
 	static struct cros_system_et171_data cros_system_et171_dev_data_##inst; \
-	DEVICE_DEFINE(cros_system_et171_##inst, "CROS_SYSTEM",                  \
-		      cros_system_et171_init, NULL,                             \
-		      &cros_system_et171_dev_data_##inst, NULL, PRE_KERNEL_1,   \
-		      CONFIG_CROS_SYSTEM_ET171_INIT_PRIORITY,                   \
-		      &cros_system_driver_et171_api);
+	DEVICE_DT_INST_DEFINE(inst, cros_system_et171_init, NULL,               \
+			      &cros_system_et171_dev_data_##inst, NULL,         \
+			      PRE_KERNEL_1,                                     \
+			      CONFIG_CROS_SYSTEM_ET171_INIT_PRIORITY,           \
+			      &cros_system_driver_et171_api);
 
 DT_INST_FOREACH_STATUS_OKAY(CROS_SYSTEM_ET171_INIT)
 
