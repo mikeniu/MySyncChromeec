@@ -1294,10 +1294,6 @@ SANOK_CONFIG = BoardConfig(
     variants={},
     zephyr_board_name="egis_et171",
     host_interfaces={HostInterface.USB},
-    # TODO(b/487848806): Remove this when cache is fixed in Renode.
-    zephyr_extra_configs={
-        Environment.RENODE: ["CONFIG_DCACHE=n", "CONFIG_ICACHE=n"]
-    },
 )
 
 CHUDOW_CONFIG = BoardConfig(
