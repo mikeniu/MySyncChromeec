@@ -16,6 +16,23 @@
       "message": "The previous build (https://cr-buildbucket.appspot.com/build/8687081337825502433) is being automatically retried for the following reasons:\n- Some tests are now retryable:rauru-cq.hylia.hw.fingerprint-cq\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
       "revId": "4f8605d15bbcafc4c20405eee82b8940c4de3340",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fab95c39_7ec2f19e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1594262
+      },
+      "writtenOn": "2026-03-20T00:43:56Z",
+      "side": 1,
+      "message": "The previous build (https://cr-buildbucket.appspot.com/build/8686886583453172689) is being automatically retried for the following reasons:\n- Some tests are now retryable:rauru-cq.navi.hw.fingerprint-cq\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
+      "revId": "4f8605d15bbcafc4c20405eee82b8940c4de3340",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
