@@ -16,6 +16,24 @@
       "message": "Please restore implementation to the final one.",
       "revId": "39f63c2a8016db5769d6b28f333249931b4b70b2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50ae3985_70283601",
+        "filename": "zephyr/test/fingerprint/drivers/egis660/src/egis660.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-03-20T09:10:01Z",
+      "side": 1,
+      "message": "You mean using `sys_clock_cycle_get_64()` to calculate the time elapse?",
+      "parentUuid": "cea2f74c_bacabbee",
+      "revId": "39f63c2a8016db5769d6b28f333249931b4b70b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
