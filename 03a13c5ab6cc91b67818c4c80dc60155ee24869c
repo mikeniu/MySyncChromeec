@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ed22364_124b7df7",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 48
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-20T14:39:18Z",
+      "side": 1,
+      "message": "2026",
+      "revId": "03a13c5ab6cc91b67818c4c80dc60155ee24869c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4150d2d1_1c2c294e",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.h",
+        "patchSetId": 48
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-20T14:39:18Z",
+      "side": 1,
+      "message": "2026",
+      "revId": "03a13c5ab6cc91b67818c4c80dc60155ee24869c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
