@@ -1,0 +1,159 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef102144_57d05cb3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-20T23:17:51Z",
+      "side": 1,
+      "message": "I haven\u0027t reviewed all the files, but there are some common structural problems.\n\nBe careful not to delete runtime logic.  \n\nMove the `AP_POWER_EVENT_CALLBACK_DEFINE` instances to be adjacent to the callback function definition.",
+      "revId": "c62f496d36e01f54329c4122e38835b6cc01cc67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d655a644_360131ad",
+        "filename": "zephyr/drivers/dsp_comms/service/dsp_service.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-20T23:17:51Z",
+      "side": 1,
+      "message": "Isn\u0027t this missing `AP_POWER_EVENT_CALLBACK_DEFINE()`.  Does this compile?\n\nAlso note that `dsp_service_startup()` calls `ap_power_ev_remove_callback()` as the DSP service only needs the `AP_POWER_STARTUP` notification once.\n\nThis probably needs a static variable to track whether the `AP_POWER_STARTUP` callback has already been processed.",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 72
+      },
+      "revId": "c62f496d36e01f54329c4122e38835b6cc01cc67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8da3035_b359a4bb",
+        "filename": "zephyr/program/brox/juchi/src/touch_panel.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-20T23:17:51Z",
+      "side": 1,
+      "message": "Nit - move this adjacent to the `board_power_event_handler()` definition.",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 127,
+        "endChar": 76
+      },
+      "revId": "c62f496d36e01f54329c4122e38835b6cc01cc67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cadd7f06_c8a0dfae",
+        "filename": "zephyr/program/corsola/skitty/src/board_chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-20T23:17:51Z",
+      "side": 1,
+      "message": "This change lost the board_version check below.  `board_backlight_handler` needs a guard and early exit for `board_version \u003e 1`.",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 72
+      },
+      "revId": "c62f496d36e01f54329c4122e38835b6cc01cc67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2986d63e_bfc7e839",
+        "filename": "zephyr/program/corsola/squirtle/src/board_chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-20T23:17:51Z",
+      "side": 1,
+      "message": "Need to retain the board_version check.",
+      "range": {
+        "startLine": 78,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 30
+      },
+      "revId": "c62f496d36e01f54329c4122e38835b6cc01cc67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7d8ff9b_40dd5046",
+        "filename": "zephyr/program/corsola/src/usbc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-20T23:17:51Z",
+      "side": 1,
+      "message": "This code block is already guarded by CONFIG_VARIANT_CORSOLA_DB_DETECTION.\nMove the macro next to the callback function.",
+      "range": {
+        "startLine": 238,
+        "startChar": 0,
+        "endLine": 238,
+        "endChar": 42
+      },
+      "revId": "c62f496d36e01f54329c4122e38835b6cc01cc67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a1a98eb_860599f3",
+        "filename": "zephyr/program/corsola/starmie/src/base_detect.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-20T23:17:51Z",
+      "side": 1,
+      "message": "Move next the callback",
+      "range": {
+        "startLine": 137,
+        "startChar": 0,
+        "endLine": 137,
+        "endChar": 67
+      },
+      "revId": "c62f496d36e01f54329c4122e38835b6cc01cc67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
