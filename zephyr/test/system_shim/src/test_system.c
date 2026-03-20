@@ -116,7 +116,8 @@ ZTEST(system, test_system_hibernate)
 	 * Due to setjmp usage, this test provides no coverage, but does
 	 * actually cover the code. This is due to a bug in LCOV.
 	 */
-	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
+	const struct device *sys_dev =
+		DEVICE_DT_GET(DT_CHOSEN(cros_ec_cros_system));
 	int ret = setjmp(jmp_hibernate);
 	/* Validate 0th and last bit preserved*/
 	uint32_t secs = BIT(31) + 1;
@@ -143,7 +144,8 @@ ZTEST(system, test_system_hibernate)
 
 ZTEST(system, test_system_hibernate__failure)
 {
-	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
+	const struct device *sys_dev =
+		DEVICE_DT_GET(DT_CHOSEN(cros_ec_cros_system));
 	/* Validate 0th and last bit preserved*/
 	uint32_t secs = BIT(31) + 1;
 	uint32_t msecs = BIT(31) + 3;
@@ -163,7 +165,8 @@ ZTEST(system, test_system_hibernate__failure)
 
 ZTEST(system, test_system_get_chip_values)
 {
-	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
+	const struct device *sys_dev =
+		DEVICE_DT_GET(DT_CHOSEN(cros_ec_cros_system));
 
 	zassert_not_null(sys_dev);
 
@@ -206,7 +209,8 @@ ZTEST(system, test_system_reset)
 	 * Despite using setjmp this test consistently covers the code under
 	 * test. Context: https://github.com/llvm/llvm-project/issues/50119
 	 */
-	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
+	const struct device *sys_dev =
+		DEVICE_DT_GET(DT_CHOSEN(cros_ec_cros_system));
 	int ret = setjmp(jmp_hibernate);
 	uint32_t arbitrary_flags_w_reset_wait_ext = 0x1234 |
 						    SYSTEM_RESET_WAIT_EXT;
@@ -237,7 +241,8 @@ ZTEST(system, test_system_reset)
 
 ZTEST_USER(system, test_system_console_cmd__idlestats)
 {
-	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
+	const struct device *sys_dev =
+		DEVICE_DT_GET(DT_CHOSEN(cros_ec_cros_system));
 	const struct shell *shell_zephyr = get_ec_shell();
 	const char *outbuffer;
 	size_t buffer_size;
