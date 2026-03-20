@@ -53,7 +53,7 @@ extern "C" {
 /* Full-capacity change reqd for host event */
 #define LFCC_EVENT_THRESH 5
 
-/* Battery index, only used with CONFIG_BATTERY_V2. */
+/* Battery index, only used with CONFIG_BATTERY_INFO. */
 enum battery_index {
 	BATT_IDX_INVALID = -1,
 	BATT_IDX_MAIN = 0,
@@ -99,10 +99,20 @@ enum batt_threshold_type {
 	BATT_THRESHOLD_TYPE_SHUTDOWN
 };
 
+#ifdef CONFIG_BATTERY_ACCESS_LIMIT
+enum battery_access_type {
+	BATTERY_ACCESS_ALLOWED = 0,
+	BATTERY_ACCESS_NOT_ALLOWED
+};
+#endif
+
 struct battery_static_info {
 	uint16_t design_capacity;
 	uint16_t design_voltage;
 	uint32_t cycle_count;
+	uint16_t manuf_year;
+	uint8_t manuf_month;
+	uint8_t manuf_day;
 	/*
 	 * TODO: The fields below should be renamed & re-typed:
 	 * uint16_t serial[32];
@@ -117,10 +127,13 @@ struct battery_static_info {
 #ifdef CONFIG_BATTERY_VENDOR_PARAM
 	uint8_t vendor_param[SBS_MAX_STR_OBJ_SIZE];
 #endif
+#ifdef CONFIG_PLATFORM_EC_BATTERY_MANUF_INFO
+	char manuf_info[SBS_MAX_STR_OBJ_SIZE]; /* SB_MANUFACTURE_INFO */
+#endif /* CONFIG_PLATFORM_EC_BATTERY_MANUF_INFO */
 };
 
 extern struct battery_static_info battery_static[];
-extern struct ec_response_battery_dynamic_info battery_dynamic[];
+extern struct ec_response_battery_dynamic_info_v1 battery_dynamic[];
 
 /* Battery parameters */
 struct batt_params {
@@ -372,6 +385,26 @@ int battery_manufacturer_name(char *dest, int size);
 int get_battery_manufacturer_name(char *dest, int size);
 
 /**
+ * Read manufacture info string.
+ *
+ * @param dest		Destination buffer.
+ * @param size		Length of destination buffer in chars.
+ * @return non-zero if error.
+ */
+int battery_manufacture_info(char *dest, int size);
+
+/**
+ * Read manufacture info string.
+ *
+ * This can be overridden to return a chip or board custom string.
+ *
+ * @param dest		Destination buffer.
+ * @param size		Length of destination buffer in chars.
+ * @return non-zero if error.
+ */
+int get_battery_manufacture_info(char *dest, int size);
+
+/**
  * Read device name.
  *
  * @param dest		Destination buffer.
@@ -469,7 +502,7 @@ void print_battery_debug(void);
  */
 enum battery_disconnect_state battery_get_disconnect_state(void);
 
-#ifdef CONFIG_BATTERY_V2
+#ifdef CONFIG_BATTERY_INFO
 /**
  * Refresh battery information in host memory mapped region, if index is
  * currently presented.
@@ -480,7 +513,7 @@ void battery_memmap_refresh(enum battery_index index);
  * Set which index to present in host memory mapped region.
  */
 void battery_memmap_set_index(enum battery_index index);
-#endif /* CONFIG_BATTERY_V2 */
+#endif /* CONFIG_BATTERY_INFO */
 
 #ifdef CONFIG_CMD_I2C_STRESS_TEST_BATTERY
 extern struct i2c_stress_test_dev battery_i2c_stress_test_dev;
@@ -562,9 +595,31 @@ int update_static_battery_info(void);
  * @param params Pointer to the struct containing current battery data.
  * @param ac_present True if AC power is connected, false otherwise.
  * @param is_charging True if the battery is currently charging.
+ * @param sustainer_idle True if charge state is ST_IDLE, meaning the battery
+ *                       could be charged but is not currently charging.
  */
 void battery_set_dynamic_info(const struct batt_params *params, bool ac_present,
-			      bool is_charging);
+			      bool is_charging, bool sustainer_idle);
+
+/**
+ * Calculate if battery is full based on whether it is accepting charge.
+ *
+ * @param batt Battery parameters.
+ * @return true if battery is full, false otherwise.
+ */
+int battery_is_full(struct batt_params *batt);
+
+/**
+ * Determine if the battery is outside of allowable temperature range.
+ *
+ * @param batt Battery parameters.
+ * @return true if battery is outside charging temperature range.
+ */
+int battery_outside_charging_temperature(struct batt_params *batt);
+
+#ifdef CONFIG_BATTERY_ACCESS_LIMIT
+enum battery_access_type battery_check_access_limit(void);
+#endif
 
 #ifdef __cplusplus
 }

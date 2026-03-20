@@ -1,0 +1,16 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config ASCP
+	bool "Enable ASCP support"
+	help
+	  Enables support for ASCP (Authentication Service Control Protocol).
+
+config ASCP_MEM_MAP
+	bool "Enable ASCP memory mapped platform"
+	help
+	  Enables support for ASCP HW platforms where ASCP data is available in memory.
+	default y
+	depends on DT_HAS_CROS_EC_ASCP_MEM_MAP_ENABLED
+	select ASCP

@@ -1,0 +1,468 @@
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* Include the standard and OEM schema templates */
+#include <cros/cbi_ufsc_std_schema.dtsi>
+#include <cros/cbi_ufsc_oem_schema.dtsi>
+
+#include <cros/cbi_flash.dtsi>
+#include <cros/thermistor/thermistor.dtsi>
+#include <dt-bindings/motionsense/utils.h>
+
+#include "../arbitrage.dtsi"
+#include "../common.dtsi"
+#include "../pdc.dtsi"
+#include "../generated.dtsi"
+#include "../interrupts.dtsi"
+#include "../keyboard.dtsi"
+#include "../overlay.dtsi"
+#include "../power_signal.dtsi"
+#include "led.dtsi"
+#include "sapphire_ec_ufsc.dtsi"
+#include <sapphire/overlay.dtsi>
+
+/ {
+	aliases {
+		bmi3xx-int = &lid_accel;
+		lsm6dsm-int = &lid_accel;
+		tcs3400-int = &als_clear;
+	};
+
+	/* Rotation matrix used by drivers. */
+	motionsense-rotation-ref {
+		compatible = "cros-ec,motionsense-rotation-ref";
+		lid_rot_ref: lid-rotation-ref-bmi {
+			mat33 = <(-1) 0 0
+				 0 (-1) 0
+				 0 0 1>;
+		};
+		lid_rot_ref_lsm6dsm: lid-rotation-ref-lsm6dsm {
+			mat33 = <0 1 0
+				 (-1) 0 0
+				 0 0 1>;
+		};
+	};
+
+	motionsense-sensor-data {
+		bmi323_data: bmi323-drv-data {
+			compatible = "cros-ec,drvdata-bmi3xx";
+			status = "okay";
+		};
+		lsm6dsm_data_accel: lsm6dsm-accel-drv-data {
+			compatible = "cros-ec,drvdata-lsm6dsm";
+			status = "okay";
+		};
+		lsm6dsm_data_gyro: lsm6dsm-gyro-drv-data {
+			compatible = "cros-ec,drvdata-lsm6dsm";
+			status = "okay";
+		};
+
+		tcs_clear_data: tcs3400-clear-drv-data {
+			compatible = "cros-ec,drvdata-tcs3400-clear";
+			status = "okay";
+
+			als-drv-data {
+				compatible = "cros-ec,accelgyro-als-drv-data";
+				als-cal {
+					scale = <1>;
+					uscale = <0>;
+					offset = <0>;
+					als-channel-scale {
+					compatible =
+					"cros-ec,accelgyro-als-channel-scale";
+						k-channel-scale = <1>;
+						cover-scale = "1.0f";
+					};
+				};
+			};
+		};
+
+		tcs_rgb_data: tcs3400-rgb-drv-data {
+			compatible = "cros-ec,drvdata-tcs3400-rgb";
+			status = "okay";
+
+			/* node for rgb_calibration_t defined in accelgyro.h */
+			rgb_calibration {
+				compatible =
+					"cros-ec,accelgyro-rgb-calibration";
+
+				irt = <1>;
+
+				rgb-cal-x {
+					offset = <0>;
+					coeff = "0", "0", "0", "1";
+					als-channel-scale {
+					compatible =
+					"cros-ec,accelgyro-als-channel-scale";
+						k-channel-scale = <1>;
+						cover-scale = "1.0f";
+					};
+				};
+				rgb-cal-y {
+					offset = <0>;
+					coeff = "0", "0", "0", "1";
+					als-channel-scale {
+					compatible =
+					"cros-ec,accelgyro-als-channel-scale";
+						k-channel-scale = <1>;
+						cover-scale = "1.0f";
+					};
+				};
+				rgb-cal-z {
+					offset = <0>;
+					coeff = "0", "0", "0", "1";
+					als-channel-scale {
+					compatible =
+					"cros-ec,accelgyro-als-channel-scale";
+						k-channel-scale = <1>;
+						cover-scale = "1.0f";
+					};
+				};
+			};
+		};
+	};
+	/*
+	 * Declare mutexes used by sensor drivers.
+	 * A mutex node is used to create an instance of mutex_t.
+	 * A mutex node is referenced by a sensor node if the
+	 * corresponding sensor driver needs to use the
+	 * instance of the mutex.
+	 */
+	motionsense-mutex {
+		compatible = "cros-ec,motionsense-mutex";
+		lid_mutex: lid-mutex {
+		};
+	};
+
+	motionsense-sensor {
+		lid_accel: lid-accel {
+			compatible = "cros-ec,bmi3xx-accel";
+			status = "okay";
+
+			active-mask = "SENSOR_ACTIVE_S0";
+			location = "MOTIONSENSE_LOC_LID";
+			mutex = <&lid_mutex>;
+			port = <&i2c_ec_i2c_sensor_scl_1v8>;
+			rot-standard-ref = <&lid_rot_ref>;
+			drv-data = <&bmi323_data>;
+			configs {
+				compatible =
+					"cros-ec,motionsense-sensor-config";
+				ec-s0 {
+					odr = <(10000 | ROUND_UP_FLAG)>;
+				};
+			};
+		};
+
+		lid_gyro: lid-gyro {
+			compatible = "cros-ec,bmi3xx-gyro";
+			status = "okay";
+
+			active-mask = "SENSOR_ACTIVE_S0";
+			location = "MOTIONSENSE_LOC_LID";
+			mutex = <&lid_mutex>;
+			port = <&i2c_ec_i2c_sensor_scl_1v8>;
+			rot-standard-ref = <&lid_rot_ref>;
+			drv-data = <&bmi323_data>;
+		};
+
+		als_clear: lid-als-clear {
+			compatible = "cros-ec,tcs3400-clear";
+			status = "okay";
+
+			active-mask = "SENSOR_ACTIVE_S0";
+			location = "MOTIONSENSE_LOC_LID";
+			port = <&i2c_ec_i2c_sensor_scl_1v8>;
+			default-range = <0x10000>;
+			drv-data = <&tcs_clear_data>;
+			i2c-spi-addr-flags = "TCS3400_I2C_ADDR_FLAGS";
+			configs {
+				compatible =
+					"cros-ec,motionsense-sensor-config";
+				ec-s0 {
+					/* Run ALS sensor in S0 */
+					odr = <1000>;
+				};
+			};
+		};
+
+		lid-als-rgb {
+			compatible = "cros-ec,tcs3400-rgb";
+			status = "okay";
+
+			active-mask = "SENSOR_ACTIVE_S0";
+			location = "MOTIONSENSE_LOC_LID";
+			port = <&i2c_ec_i2c_sensor_scl_1v8>;
+			default-range = <0x10000>; /* scale = 1x, uscale = 0 */
+			drv-data = <&tcs_rgb_data>;
+		};
+	};
+
+	motionsense-sensor-alt {
+		alt_lid_accel: alt-lid-accel {
+			compatible = "cros-ec,lsm6dsm-accel";
+			status = "okay";
+
+			active-mask = "SENSOR_ACTIVE_S0";
+			location = "MOTIONSENSE_LOC_LID";
+			mutex = <&lid_mutex>;
+			port = <&i2c_ec_i2c_sensor_scl_1v8>;
+			rot-standard-ref = <&lid_rot_ref_lsm6dsm>;
+			drv-data = <&lsm6dsm_data_accel>;
+			alternate-for = <&lid_accel>;
+			alternate-ufsc-indicator = <&ufsc_lid_sensor_lsm6dsm>;
+			configs {
+				compatible =
+					"cros-ec,motionsense-sensor-config";
+				ec-s0 {
+					odr = <(12500 | ROUND_UP_FLAG)>;
+					ec-rate = <(100 * USEC_PER_MSEC)>;
+				};
+			};
+		};
+
+		alt_lid_gyro: alt-lid-gyro {
+			compatible = "cros-ec,lsm6dsm-gyro";
+			status = "okay";
+
+			active-mask = "SENSOR_ACTIVE_S0";
+			location = "MOTIONSENSE_LOC_LID";
+			mutex = <&lid_mutex>;
+			port = <&i2c_ec_i2c_sensor_scl_1v8>;
+			rot-standard-ref = <&lid_rot_ref_lsm6dsm>;
+			default-range = <(1000 | ROUND_UP_FLAG)>; /* dps */
+			drv-data = <&lsm6dsm_data_gyro>;
+			alternate-for = <&lid_gyro>;
+			alternate-ufsc-indicator = <&ufsc_lid_sensor_lsm6dsm>;
+		};
+	};
+
+	motionsense-sensor-info {
+		compatible = "cros-ec,motionsense-sensor-info";
+
+		/* list of entries for motion_als_sensors */
+		als-sensors = <&als_clear>;
+		/*
+		 * list of GPIO interrupts that have to
+		 * be enabled at initial stage
+		 */
+		sensor-irqs = <&int_imu &int_als_rgb>;
+		/* list of sensors in force mode */
+		accel-force-mode-sensors = <&als_clear>;
+	};
+
+	batteries {
+		default_battery: sunwoda_l25d2pk6 {
+			compatible = "sunwoda,l25d2pk6", "battery-smart";
+		};
+		atl_l25n2pk6 {
+			compatible = "atl,l25n2pk6", "battery-smart";
+		};
+	};
+
+	named-adc-channels {
+		/delete-node/ ec_adc0;
+		/delete-node/ ec_adc1;
+		/delete-node/ ec_adc6;
+
+		adc_temp_lcm: temp_sensor_lcm {
+			enum-name = "ADC_TEMP_SENSOR_2";
+			io-channels = <&adc0 0>;
+		};
+		adc_temp_sensor_5: temp_sensor5 {
+			enum-name = "ADC_TEMP_SENSOR_5";
+			io-channels = <&adc0 1>;
+		};
+		adc_temp_sensor_1: temp_sensor1 {
+			enum-name = "ADC_TEMP_SENSOR_1";
+			io-channels = <&adc0 4>;
+		};
+		adc_cc_lid_base_adc: cc_lid_base_adc {
+			enum-name = "ADC_BASE_DET";
+			io-channels = <&adc0 5>;
+		};
+		adc_temp_sensor_3: temp_sensor3 {
+			enum-name = "ADC_TEMP_SENSOR_3";
+			io-channels = <&adc0 6>;
+		};
+		adc_temp_sensor_4: temp_sensor4 {
+			enum-name = "ADC_TEMP_SENSOR_4";
+			io-channels = <&adc0 7>;
+		};
+	};
+
+	named-gpios {
+		/delete-node/ ec_gpa7;
+		/delete-node/ fp_btn_ign;
+		/delete-node/ pen_int_odl;
+		/delete-node/ pen_rst_l;
+		/delete-node/ ec_gpg1;
+		/delete-node/ ec_led1_odl;
+		/delete-node/ ec_led2_odl;
+		/delete-node/ ec_gpd3;
+		/delete-node/ en_cc_lid_base_pu_r;
+		/delete-node/ ec_gpd1;
+		/delete-node/ ec_gph1;
+		/delete-node/ ec_hid_int_odl;
+		/delete-node/ rsvd_kso17;
+
+		gsc_ec_voldn_btn_odl {
+			gpios = <&gpioe 3 (GPIO_INPUT | GPIO_PULL_UP)>;
+		};
+		gsc_ec_volup_btn_odl {
+			gpios = <&gpioe 4 (GPIO_INPUT | GPIO_PULL_UP)>;
+		};
+		gpio_ap_bl_en_odl: gpio_ap_bl_en_odl{
+			gpios = <&gpiod 7 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+		};
+		gpio_ec_tchscr_report_en_od: ec_tchscr_report_en_od {
+			gpios = <&gpioa 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		gpio_pen_int_odl: pen_int_odl {
+			gpios = <&gpiog 0 GPIO_INPUT>;
+			enum-name = "GPIO_WPC_IRQ";
+		};
+		gpio_pen_rst_l: pen_rst_l {
+			gpios = <&gpiog 3 (GPIO_OUTPUT | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
+			enum-name = "GPIO_WLC_NRST_CONN";
+		};
+		gpio_pen_pres: pen_pres_odl {
+			gpios = <&gpiog 1 (GPIO_INPUT)>;
+			enum-name = "GPIO_HALL_CTL_PCHG";
+		};
+		gpio_pp5000_wlc_en: pp5000_wlc_en {
+			gpios = <&gpiod 3 (GPIO_OUTPUT)>;
+		};
+		gpio_pp1800_wlc_en: pp1800_wlc_en {
+			gpios = <&gpioa 1 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		imu_int_ec_l {
+			gpios = <&gpiod 0 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+		};
+		gpio_ec_pac_en_odl: ec_pac_en_odl {
+			gpios = <&gpioc 5 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_OUTPUT_INIT_HIGH)>;
+		};
+		gpio_ec_pogo_low_pwr_sw: ec_pogo_low_pwr_sw{
+			gpios = <&gpioe 2 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
+		};
+	};
+
+	unused-pins {
+		compatible = "unused-gpios";
+
+		unused-gpios =
+			<&gpioa 3 GPIO_INPUT_PULL_DOWN>,
+			<&gpiod 1 GPIO_INPUT_PULL_DOWN>,
+			<&gpiof 0 GPIO_INPUT_PULL_DOWN>,
+			<&gpiof 1 GPIO_INPUT_PULL_DOWN>,
+			<&gpioh 1 GPIO_INPUT_PULL_DOWN>;
+	};
+
+	gpio-interrupts {
+		int_ap_bl_en: int_ap_bl_en{
+			irq-pin = <&gpio_ap_bl_en_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "ap_bl_en_interrupt";
+		};
+		int_imu: ec-imu {
+			handler = "motion_interrupt";
+		};
+		int_wpc: wpc{
+			irq-pin = <&gpio_pen_int_odl>;
+			flags = <GPIO_INT_EDGE_RISING>;
+			handler = "pchg_irq";
+		};
+		int_batt_pres_en: batt_pres_int{
+			irq-pin = <&gpio_ec_batt_pres_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "batt_pres_interrupt";
+		};
+		wpc_lid_irq: wpc_lid_irq{
+			irq-pin = <&gpio_pen_pres>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "wpc_hall_interrupt";
+		};
+	};
+
+	temp_vr_5v: vr_5v {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_51K1_47K_4050B>;
+		adc = <&adc_temp_sensor_1>;
+	};
+	temp_lcm: lcm {
+		 compatible = "cros-ec,temp-sensor-thermistor";
+		 thermistor = <&thermistor_3V3_100K_100K_4250B>;
+		 adc = <&adc_temp_lcm>;
+	 };
+	temp_charger: charger {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_51K1_47K_4050B>;
+		adc = <&adc_temp_sensor_3>;
+	};
+	temp_ambient: ambient {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_51K1_47K_4050B>;
+		adc = <&adc_temp_sensor_4>;
+	};
+	temp_cpu: cpu {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_51K1_47K_4050B>;
+		adc = <&adc_temp_sensor_5>;
+	};
+
+	named-temp-sensors {
+		compatible = "cros-ec,temp-sensors";
+		vr_5v {
+			sensor = <&temp_vr_5v>;
+		};
+		lcm {
+			sensor = <&temp_lcm>;
+		};
+		charger {
+			sensor = <&temp_charger>;
+		};
+		ambient {
+			sensor = <&temp_ambient>;
+		};
+		cpu {
+			sensor = <&temp_cpu>;
+		};
+	};
+};
+
+&adc0 {
+	status = "okay";
+	pinctrl-0 = <&adc0_ch0_gpi0_default
+		&adc0_ch1_gpi1_default
+		&adc0_ch2_gpi2_default
+		&adc0_ch3_gpi3_default
+		&adc0_ch4_gpi4_default
+		&adc0_ch5_gpi5_default
+		&adc0_ch6_gpi6_default
+		&adc0_ch7_gpi7_default>;
+	pinctrl-names = "default";
+};
+
+&thermistor_3V3_51K1_47K_4050B {
+	status = "okay";
+};
+
+&thermistor_3V3_100K_100K_4250B {
+	status = "okay";
+};
+
+&i2c0 {
+	ctn730@28 {
+		compatible = "nxp,ctn730";
+		reg = <0x28>;
+		irq-gpios=<&gpiog 0 GPIO_INPUT>;
+		rf-charge-msec = <1000>;
+		full-percent = <100>;
+	};
+};
+
+&i2c_ap_i2c_ec_scl_1v8 {
+	status = "disabled";
+};

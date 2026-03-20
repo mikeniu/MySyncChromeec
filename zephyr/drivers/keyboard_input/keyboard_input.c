@@ -4,6 +4,7 @@
  */
 
 #include "host_command.h"
+#include "keyboard_mkbp.h"
 #include "keyboard_protocol.h"
 #include "keyboard_scan.h"
 #include "system.h"
@@ -89,6 +90,14 @@ static int keyboard_input_init(void)
 
 SYS_INIT(keyboard_input_init, APPLICATION, 0);
 
+#if defined(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_MKBP) || defined(CONFIG_ZTEST)
+
+/* Max matrix size from ec_response_get_next_data_v3 */
+#define CROS_EC_KEYBOARD_COLS_MAX 18
+static uint8_t mkbp_data[CROS_EC_KEYBOARD_COLS_MAX];
+
+#endif
+
 static void keyboard_input_cb(struct input_event *evt, void *user_data)
 {
 	static int row;
@@ -107,10 +116,28 @@ static void keyboard_input_cb(struct input_event *evt, void *user_data)
 		break;
 	}
 
-	if (evt->sync) {
-		LOG_DBG("keyboard_state_changed %d %d %d", row, col, pressed);
-		keyboard_state_changed(row, col, pressed);
+	if (!evt->sync) {
+		return;
 	}
+
+	LOG_DBG("keyboard_state_changed %d %d %d", row, col, pressed);
+
+	keyboard_state_changed(row, col, pressed);
+
+#if defined(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_MKBP) || defined(CONFIG_ZTEST)
+	if (col >= CROS_EC_KEYBOARD_COLS_MAX) {
+		LOG_ERR("invalid col: %d", col);
+		return;
+	}
+
+	if (pressed) {
+		mkbp_data[col] |= BIT(row);
+	} else {
+		mkbp_data[col] &= ~BIT(row);
+	}
+
+	mkbp_keyboard_add(mkbp_data);
+#endif
 }
 INPUT_CALLBACK_DEFINE(kbd_dev, keyboard_input_cb, NULL);
 
@@ -194,7 +221,8 @@ static int cmd_kbpress(const struct shell *sh, size_t argc, char **argv)
 }
 
 SHELL_CMD_ARG_REGISTER(kbpress, NULL,
-		       "Simulate keypress: kbpress [clear | col row [0 | 1]]",
+		       SHELL_HELP("Simulate keypress",
+				  "[clear | col row [0 | 1]]"),
 		       cmd_kbpress, 1, 3);
 
 static enum ec_status

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
+#include "drivers/led.h"
 #include "ec_commands.h"
-#include "led.h"
 #include "led_common.h"
 #include "pwm_mock.h"
 #include "test/drivers/test_state.h"
@@ -22,13 +22,13 @@ ZTEST(pwm_led_driver, test_led_set_brightness)
 {
 	const uint8_t brightness_off[EC_LED_COLOR_COUNT] = {};
 	const uint8_t brightness_white[EC_LED_COLOR_COUNT] = {
-		[EC_LED_COLOR_WHITE] = 100
+		[EC_LED_COLOR_WHITE] = 0xff
 	};
 	const uint8_t brightness_amber[EC_LED_COLOR_COUNT] = {
-		[EC_LED_COLOR_AMBER] = 100
+		[EC_LED_COLOR_AMBER] = 0xff
 	};
 	const uint8_t brightness_yellow[EC_LED_COLOR_COUNT] = {
-		[EC_LED_COLOR_YELLOW] = 100
+		[EC_LED_COLOR_YELLOW] = 0xff
 	};
 	const struct device *pwm_blue_left =
 		DEVICE_DT_GET(DT_NODELABEL(pwm_blue_left));

@@ -6,6 +6,7 @@
 #include "atomic.h"
 #include "chipset.h"
 #include "common.h"
+#include "extpower.h"
 #include "gpio.h"
 #include "hooks.h"
 #include "host_command.h"
@@ -25,7 +26,7 @@
 /* Host event queue. Shared by all ports. */
 static struct queue const host_events =
 	QUEUE_NULL(PCHG_EVENT_QUEUE_SIZE, uint32_t);
-mutex_t host_event_mtx;
+static K_MUTEX_DEFINE(host_event_mtx);
 
 static int pchg_count;
 
@@ -134,6 +135,16 @@ static const char *_text_error(uint32_t error)
 
 	return "UNDEF";
 }
+#ifdef CONFIG_ZEPHYR
+static int init_pchg_mutex(void)
+{
+	for (int i = 0; i < board_get_pchg_count(); i++) {
+		k_mutex_init(&pchgs[i].mtx);
+	}
+	return 0;
+}
+SYS_INIT(init_pchg_mutex, POST_KERNEL, 50);
+#endif /* CONFIG_ZEPHYR */
 
 static void pchg_queue_event(struct pchg *ctx, enum pchg_event event)
 {
@@ -207,6 +218,11 @@ static void pchg_print_status(const struct pchg *ctx)
 		 _text_event(event));
 }
 
+int pchg_get_battery_percent(int port)
+{
+	return pchgs[port].battery_percent;
+}
+
 static void _clear_port(struct pchg *ctx)
 {
 	mutex_lock(&ctx->mtx);
@@ -226,6 +242,10 @@ static void reset_bist_cmd(struct pchg *ctx)
 }
 
 __overridable void board_pchg_power_on(int port, bool on)
+{
+}
+
+__overridable void board_pchg_full_strategy()
 {
 }
 
@@ -392,6 +412,9 @@ static void pchg_state_enabled(struct pchg *ctx)
 
 	switch (ctx->event) {
 	case PCHG_EVENT_RESET:
+		if (ctx->bist_cmd != PCHG_BIST_CMD_NONE) {
+			ctx->mode = PCHG_MODE_BIST;
+		}
 		ctx->state = pchg_reset(ctx);
 		break;
 	case PCHG_EVENT_DISABLE:
@@ -531,6 +554,10 @@ static void pchg_state_charging(struct pchg *ctx)
 		ctx->state = PCHG_STATE_INITIALIZED;
 		break;
 	case PCHG_EVENT_CHARGE_UPDATE:
+		if (ctx->battery_percent >= ctx->cfg->full_percent) {
+			CPRINTS("full strategy start");
+			board_pchg_full_strategy();
+		}
 		break;
 	case PCHG_EVENT_DEVICE_LOST:
 		ctx->battery_percent = 0;
@@ -780,7 +807,7 @@ void pchg_irq(enum gpio_signal signal)
 	}
 }
 
-static void pchg_startup(void)
+void pchg_startup(void)
 {
 	struct pchg *ctx;
 	int p;
@@ -815,9 +842,8 @@ static void pchg_startup(void)
 	if (active_pchg_count)
 		task_wake(TASK_ID_PCHG);
 }
-DECLARE_HOOK(HOOK_CHIPSET_STARTUP, pchg_startup, HOOK_PRIO_DEFAULT);
 
-static void pchg_shutdown(void)
+void pchg_shutdown(void)
 {
 	struct pchg *ctx;
 	int p;
@@ -825,12 +851,83 @@ static void pchg_shutdown(void)
 	CPRINTS("%s", __func__);
 
 	for (p = 0; p < pchg_count; p++) {
-		ctx = &pchgs[0];
+		ctx = &pchgs[p];
 		gpio_disable_interrupt(ctx->cfg->irq_pin);
 		board_pchg_power_on(p, 0);
+		ctx->battery_percent = 0;
+		pchg_queue_event(ctx, PCHG_EVENT_DEVICE_LOST);
+	}
+	task_wake(TASK_ID_PCHG);
+}
+
+#ifdef CONFIG_WPC_HALL_ENABLE
+static bool hall_allows_pchg;
+static void pchg_update_state(void);
+
+static void wpc_hall_handler(void)
+{
+	hall_allows_pchg = !gpio_get_level(GPIO_HALL_CTL_PCHG);
+	pchg_update_state();
+}
+DECLARE_DEFERRED(wpc_hall_handler);
+
+void wpc_hall_interrupt(enum gpio_signal signal)
+{
+	hook_call_deferred(&wpc_hall_handler_data, CONFIG_WPC_HALL_DEBOUNCE_US);
+}
+
+static void wpc_hall_init(void)
+{
+	hall_allows_pchg = false;
+	pchg_startup();
+	gpio_enable_interrupt(GPIO_HALL_CTL_PCHG);
+	hook_call_deferred(&wpc_hall_handler_data, CONFIG_WPC_HALL_DEBOUNCE_US);
+}
+DECLARE_HOOK(HOOK_INIT, wpc_hall_init, HOOK_PRIO_DEFAULT);
+#endif
+
+static bool pchg_allowed(void)
+{
+	bool system_off;
+
+	system_off =
+		chipset_in_or_transitioning_to_state(CHIPSET_STATE_ANY_OFF);
+
+#ifdef CONFIG_WPC_HALL_ENABLE
+	if (!hall_allows_pchg)
+		return false;
+#endif
+
+	if (!system_off)
+		return true;
+
+#ifdef CONFIG_WPC_AC_S5_CHARGE
+	if (extpower_is_present())
+		return true;
+#endif
+
+	return false;
+}
+
+static bool pchg_enabled;
+
+static void pchg_update_state(void)
+{
+	bool allow = pchg_allowed();
+
+	if (allow && !pchg_enabled) {
+		pchg_startup();
+		pchg_enabled = true;
+	} else if (!allow && pchg_enabled) {
+		pchg_shutdown();
+		pchg_enabled = false;
 	}
 }
-DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, pchg_shutdown, HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_CHIPSET_STARTUP, pchg_update_state, HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, pchg_update_state, HOOK_PRIO_DEFAULT);
+#ifdef CONFIG_WPC_AC_S5_CHARGE
+DECLARE_HOOK(HOOK_AC_CHANGE, pchg_update_state, HOOK_PRIO_POST_DEFAULT);
+#endif
 
 void pchg_task(void *u)
 {
@@ -962,7 +1059,11 @@ static enum ec_status hc_pchg_update(struct host_cmd_handler_args *args)
 
 	case EC_PCHG_UPDATE_CMD_OPEN:
 		HCPRINTS("Resetting to download mode");
-
+#ifdef CONFIG_WPC_HALL_ENABLE
+		hook_call_deferred(&wpc_hall_handler_data, -1);
+		pchg_startup();
+		ctx->bist_cmd = PCHG_BIST_CMD_NONE;
+#endif
 		gpio_disable_interrupt(ctx->cfg->irq_pin);
 		_clear_port(ctx);
 		ctx->mode = PCHG_MODE_DOWNLOAD;
@@ -1002,6 +1103,9 @@ static enum ec_status hc_pchg_update(struct host_cmd_handler_args *args)
 		HCPRINTS("Closing update session (crc=0x%x)", p->crc32);
 		ctx->update.crc32 = p->crc32;
 		pchg_queue_event(ctx, PCHG_EVENT_UPDATE_CLOSE);
+#ifdef CONFIG_WPC_HALL_ENABLE
+		hook_call_deferred(&wpc_hall_handler_data, 5 * SECOND);
+#endif
 		break;
 
 	case EC_PCHG_UPDATE_CMD_RESET:

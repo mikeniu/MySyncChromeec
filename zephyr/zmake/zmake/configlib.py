@@ -9,9 +9,7 @@ import zmake.output_packers
 
 
 def _register_project(**kwargs):
-    kwargs.setdefault(
-        "project_dir", here  # noqa: F821 pylint: disable=undefined-variable
-    )
+    kwargs.setdefault("project_dir", globals()["here"])
     return register_project(  # noqa: F821 pylint: disable=undefined-variable
         **kwargs
     )
@@ -63,7 +61,26 @@ def register_ish_project(**kwargs):
     """Register a project that uses IshBinPacker."""
     kwargs.setdefault("supported_toolchains", ["coreboot-sdk", "zephyr"])
     kwargs.setdefault("output_packer", zmake.output_packers.IshBinPacker)
+<<<<<<< HEAD   (d6c32f2441663510e20ae2d25d5edeb8956421b9 program,zmake: drop cmsis references)
     kwargs.setdefault("modules", ["ec", "cmsis_6", "hal_intel_public"])
+||||||| BASE   (4f79cf3e850f16ecfb53fcd1c296c608faa9aef0 fpsensor: Add fingerprint_auth_enabled())
+    kwargs.setdefault("modules", ["ec", "cmsis", "cmsis_6", "hal_intel_public"])
+=======
+    kwargs.setdefault(
+        "modules",
+        ["ec", "cmsis_6", "hal_intel_public", "pigweed", "nanopb"],
+    )
+    # TODO: remove once upstream fixes the RAM map for ISH
+    kwargs["dts_overlays"].append(
+        globals()["here"]
+        / ".."
+        / ".."
+        / "include"
+        / "cros"
+        / "intel"
+        / "ish.overlay"
+    )
+>>>>>>> BRANCH (98351621e96c0a9288be41db08b0e97738bbe1f1 padme: Add padme_rts5439s_vb_vif.xml)
     return _register_project(**kwargs)
 
 

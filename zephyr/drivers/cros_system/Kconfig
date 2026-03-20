@@ -141,4 +141,68 @@ config CROS_SYSTEM_REALTEK_INIT_PRIORITY
 
 endif # CROS_SYSTEM_REALTEK
 
+menuconfig CROS_SYSTEM_ET171
+	bool "Egis ET171 cros system driver"
+	depends on SOC_EGIS_ET171
+	select SYSCON
+	select HWINFO
+	default y
+	help
+	  This option enables the cros system driver for the Egis ET171 SOC.
+	  It uses AOSMU(Always On System Management Unit) custom Egis module.
+
+if CROS_SYSTEM_ET171
+
+config CROS_SYSTEM_ET171_INIT_PRIORITY
+	int "cros_system Egis ET171 SOC initialization priority"
+	default 10
+	help
+	  This sets the Egis ET171 SOC cros_system driver initialization
+	  priority.
+
+endif
+
+config CROS_SYSTEM_ELAN_EM32
+	bool "ELAN EM32 cros system driver"
+	depends on SOC_EM32F967
+	select HWINFO
+	default y
+	help
+	  This option enables the cros system driver for the elan em32 family of
+	  processors.
+
+if CROS_SYSTEM_ELAN_EM32
+
+config CROS_SYSTEM_EM32_INIT_PRIORITY
+	int "cros_system Elan EM32 initialization priority"
+	default 10
+	help
+	  This sets the elan em32 cros_system driver initialization priority.
+	  The cros_system driver provides access to the elan em32 reset cause
+	  and must be higher priority than
+	  CONFIG_PLATFORM_EC_SYSTEM_PRE_INIT_PRIORITY.
+
+endif # CROS_SYSTEM_ELAN_EM32
+
+config CROS_SYSTEM_FT90
+	bool "FT cros system driver"
+	depends on SOC_SERIES_FT90
+	default y
+	help
+	  This option enables the cros system driver for the Focaltech ft90 family of
+	  processors.
+
+if CROS_SYSTEM_FT90
+
+config CROS_SYSTEM_FT90_INIT_PRIORITY
+	int "cros_system FT initialization priority"
+	default 10
+	help
+	  This sets the Focaltech ft90 cros_system driver initialization priority.
+	  The cros_system driver provides access to the Focaltech ft90 reset cause
+	  and must be higher priority than
+	  CONFIG_PLATFORM_EC_SYSTEM_PRE_INIT_PRIORITY.
+
+endif # CROS_SYSTEM_FT90
+
 endif # PLATFORM_EC

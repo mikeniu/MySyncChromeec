@@ -8,6 +8,13 @@
 / {
 	led-colors {
 		compatible = "cros-ec,led-policy";
+		led-pins = <&led_pins>;
+
+		sysrq-alias = "EC_LED_ID_BATTERY_LED";
+		sysrq-led-control-color = "LED_WHITE";
+
+		recovery-hw-reinit-alias = "EC_LED_ID_BATTERY_LED";
+		recovery-hw-reinit-led-control-color = "LED_AMBER";
 
 		power-state-charge-lvl-1 {
 			charge-state = "LED_PWRS_CHARGE";
@@ -19,7 +26,7 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = "LED_AMBER";
+					led-color = <&battery_led_amber>;
 				};
 			};
 		};
@@ -34,7 +41,7 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = "LED_WHITE";
+					led-color = <&battery_led_white>;
 				};
 			};
 		};
@@ -46,7 +53,7 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = "LED_WHITE";
+					led-color = <&battery_led_white>;
 				};
 			};
 		};
@@ -61,7 +68,7 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = "LED_WHITE";
+					led-color = <&battery_led_white>;
 				};
 			};
 		};
@@ -77,11 +84,11 @@
 
 				/* Amber 1 sec on, 3 sec off */
 				color-0 {
-					led-color = "LED_AMBER";
+					led-color = <&battery_led_amber>;
 					period-ms = <1000>;
 				};
 				color-1 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 					period-ms = <3000>;
 				};
 			};
@@ -96,11 +103,11 @@
 
 				/* White 1 sec on, 3 sec off */
 				color-0 {
-					led-color = "LED_WHITE";
+					led-color = <&battery_led_white>;
 					period-ms = <1000>;
 				};
 				color-1 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 					period-ms = <3000>;
 				};
 			};
@@ -114,7 +121,7 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 				};
 			};
 		};
@@ -128,11 +135,11 @@
 
 				/* Amber 1 sec on, 1 sec off */
 				color-0 {
-					led-color = "LED_AMBER";
+					led-color = <&battery_led_amber>;
 					period-ms = <1000>;
 				};
 				color-1 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 					period-ms = <1000>;
 				};
 			};
@@ -147,11 +154,11 @@
 
 				/* White 1 sec on, 3 sec off */
 				color-0 {
-					led-color = "LED_WHITE";
+					led-color = <&battery_led_white>;
 					period-ms = <1000>;
 				};
 				color-1 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 					period-ms = <3000>;
 				};
 			};
@@ -165,7 +172,7 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 				};
 			};
 		};
@@ -178,11 +185,11 @@
 
 				/* Amber 2 sec on, White 2 sec on */
 				color-0 {
-					led-color = "LED_AMBER";
+					led-color = <&battery_led_amber>;
 					period-ms = <2000>;
 				};
 				color-1 {
-					led-color = "LED_WHITE";
+					led-color = <&battery_led_white>;
 					period-ms = <2000>;
 				};
 			};
@@ -197,7 +204,7 @@
 
 				/* LED off when S5, others do not change */
 				color-0 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 				};
 			};
 		};
@@ -210,7 +217,7 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = "LED_WHITE";
+					led-color = <&battery_led_white>;
 				};
 			};
 		};
@@ -224,11 +231,11 @@
 
 				/* White 1 sec on, 3 sec off */
 				color-0 {
-					led-color = "LED_WHITE";
+					led-color = <&battery_led_white>;
 					period-ms = <1000>;
 				};
 				color-1 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 					period-ms = <3000>;
 				};
 			};

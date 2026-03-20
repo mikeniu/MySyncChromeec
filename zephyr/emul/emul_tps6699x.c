@@ -230,7 +230,7 @@ static void tps699x_emul_get_pdos(struct tps6699x_emul_pdc_data *data,
 	enum pdo_type_t pdo_type = req->source ? SOURCE_PDO : SINK_PDO;
 	enum pdo_offset_t pdo_offset = req->pdo_offset;
 	uint8_t pdo_count =
-		MIN(PDO_OFFSET_MAX - req->pdo_offset, req->num_pdos + 1);
+		min(PDO_OFFSET_MAX - req->pdo_offset, req->num_pdos + 1);
 
 	LOG_INF("GET_PDO type=%d, offset=%d, count=%d, partner_pdo=%d",
 		pdo_type, pdo_offset, pdo_count, req->partner_pdo);
@@ -285,6 +285,43 @@ static void tps6699x_emul_ucsi_set_pdos(struct tps6699x_emul_pdc_data *data,
 				    source, pdos)) {
 		LOG_ERR("pdc_pdo_set_direct failed");
 	}
+}
+
+static void
+tps699x_emul_get_pd_message(struct tps6699x_emul_pdc_data *data,
+			    const union get_pd_message_t *get_pd_message)
+{
+	switch (get_pd_message->response_message_type) {
+	case GET_PD_MESSAGE_DISC_ID:
+		data->response.result = TASK_COMPLETED_SUCCESSFULLY;
+		data->response.data.length =
+			sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT;
+		memcpy(data->response.data.pd_message, &data->identity,
+		       sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT);
+		memcpy(&data->reg_val[REG_DATA_FOR_CMD1], &data->response,
+		       sizeof(data->response));
+		break;
+	case GET_PD_MESSAGE_REVISION:
+		data->response.result = TASK_COMPLETED_SUCCESSFULLY;
+		data->response.data.length = sizeof(uint32_t);
+		memcpy(data->response.data.pd_message, &data->rmdo,
+		       sizeof(uint32_t));
+		memcpy(data->reg_val[REG_DATA_FOR_CMD1], &data->response,
+		       sizeof(data->response));
+		break;
+	default:
+		/* Unsupported GET_PD_MESSAGE command */
+		break;
+	}
+}
+
+static void tps699x_emul_get_current_cam(struct tps6699x_emul_pdc_data *data)
+{
+	data->response.result = TASK_COMPLETED_SUCCESSFULLY;
+	data->response.data.current_cam = data->current_cam;
+
+	memcpy(data->reg_val[REG_DATA_FOR_CMD1], &data->response,
+	       sizeof(data->response));
 }
 
 static void tps6699x_emul_handle_ucsi(struct tps6699x_emul_pdc_data *data,
@@ -353,6 +390,13 @@ static void tps6699x_emul_handle_ucsi(struct tps6699x_emul_pdc_data *data,
 		break;
 	case UCSI_SET_PDOS:
 		tps6699x_emul_ucsi_set_pdos(data, data_reg);
+		break;
+	case UCSI_GET_PD_MESSAGE:
+		tps699x_emul_get_pd_message(
+			data, (union get_pd_message_t *)&data_reg[2]);
+		break;
+	case UCSI_GET_CURRENT_CAM:
+		tps699x_emul_get_current_cam(data);
 		break;
 	default:
 		LOG_WRN("tps6699x_emul: Unimplemented UCSI command %#04x", cmd);
@@ -429,6 +473,21 @@ static void aneg_delayable_work_handler(struct k_work *w)
 	gpio_emul_input_set(data->irq_gpios.port, data->irq_gpios.pin, 0);
 }
 
+static void delayed_sink_contract_negotiation_handler(struct k_work *work)
+{
+	struct k_work_delayable *dwork = k_work_delayable_from_work(work);
+	struct tps6699x_emul_pdc_data *data =
+		CONTAINER_OF(dwork, struct tps6699x_emul_pdc_data,
+			     delayed_sink_contract_negotiation_work);
+
+	LOG_INF("Adopting RDO (%08x, pos=%d) and setting negotiated_power_level",
+		data->pending_rdo, RDO_POS(data->pending_rdo));
+
+	data->pdo.rdo = data->pending_rdo;
+	data->connector_status.raw_conn_status_change_bits |=
+		UCSI_CHANGE_BITS_NEGOTIATED_POWER_LEVEL;
+}
+
 static void tps6699x_emul_handle_aneg(struct tps6699x_emul_pdc_data *data,
 				      uint8_t *data_reg)
 {
@@ -450,14 +509,22 @@ static void tps6699x_emul_handle_aneg(struct tps6699x_emul_pdc_data *data,
 
 		if ((min_mv / 50) == an_snk->auto_neg_min_voltage &&
 		    (max_mv / 50) == an_snk->auto_neg_max_voltage) {
-			LOG_INF("ANEg Found PDO pos=%d", i + 1);
 			active_rdo_contract->rdo = RDO_FIXED(i + 1, ma, ma, 0);
-			data->pdo.rdo = active_rdo_contract->rdo;
+			LOG_INF("ANEg Found PDO pos=%d. Set pending RDO to %08x",
+				i + 1, active_rdo_contract->rdo);
+			data->pending_rdo = active_rdo_contract->rdo;
 			break;
 		}
 	}
 	data_reg[0] = TASK_COMPLETED_SUCCESSFULLY;
 	k_work_schedule(&data->aneg_delay_work, K_MSEC(1));
+
+	if (!atomic_test_bit(data->features, EMUL_PDC_FEATURE_DONT_APPLY_RDO)) {
+		/* Simulate a delay in the port partner accepting the RDO
+		 * request */
+		k_work_reschedule(&data->delayed_sink_contract_negotiation_work,
+				  K_MSEC(400));
+	}
 }
 
 static void tps6699x_emul_handle_disc(struct tps6699x_emul_pdc_data *data,
@@ -489,7 +556,9 @@ static int tps6699x_emul_handle_sbud(struct tps6699x_emul_pdc_data *data,
 	}
 	/* LCOV_EXCL_STOP */
 
-	data->reg_val[REG_STATUS][3] = mode << 2;
+	union reg_status *r = (union reg_status *)data->reg_val[REG_STATUS];
+	r->sbumux_mode = mode;
+
 	data_reg[0] = TASK_COMPLETED_SUCCESSFULLY;
 
 	return 0;
@@ -969,7 +1038,7 @@ static int emul_tps6699x_get_supported_drp_modes(const struct emul *target,
 	enum drp_mode_t supported[] = { DRP_NORMAL, DRP_TRY_SRC };
 
 	memcpy(dm, supported,
-	       sizeof(enum drp_mode_t) * MIN(size, ARRAY_SIZE(supported)));
+	       sizeof(enum drp_mode_t) * min(size, ARRAY_SIZE(supported)));
 
 	*num = ARRAY_SIZE(supported);
 
@@ -1023,7 +1092,7 @@ static int emul_tps6699x_set_info(const struct emul *target,
 	*((uint16_t *)reg_tx_identity->product_id) = info->pid;
 	memset(reg_customer_use->data, 0, sizeof(reg_customer_use->data));
 	memcpy(reg_customer_use->data, info->project_name,
-	       MIN(sizeof(reg_customer_use->data), strlen(info->project_name)));
+	       min(sizeof(reg_customer_use->data), strlen(info->project_name)));
 
 	return 0;
 }
@@ -1132,6 +1201,9 @@ static int emul_tps6699x_reset(const struct emul *target)
 	attention_vdm->vdm_header = 0;
 	attention_vdm->vdo = 0x1;
 
+	data->pending_rdo = 0;
+	k_work_cancel_delayable(&data->delayed_sink_contract_negotiation_work);
+
 	return 0;
 }
 
@@ -1213,6 +1285,9 @@ static int tps6699x_emul_init(const struct emul *emul,
 			      delayable_work_handler);
 	k_work_init_delayable(&data->pdc_data.aneg_delay_work,
 			      aneg_delayable_work_handler);
+	k_work_init_delayable(
+		&data->pdc_data.delayed_sink_contract_negotiation_work,
+		delayed_sink_contract_negotiation_handler);
 
 	/* Init register to APP0 */
 	*((uint32_t *)reg_mode->data) = REG_MODE_APP0;
@@ -1387,6 +1462,7 @@ static bool is_feature_flag_supported(enum emul_pdc_feature_flag feature)
 {
 	switch (feature) {
 	case EMUL_PDC_FEATURE_SBU_MUX_OVERRIDE:
+	case EMUL_PDC_FEATURE_DONT_APPLY_RDO:
 		return true;
 	default:
 		return false;
@@ -1450,6 +1526,48 @@ static int emul_tps6699x_get_autoneg_sink(const struct emul *target,
 	return 0;
 }
 
+static int emul_tps6699x_set_identity(const struct emul *target, uint32_t *vdos)
+{
+	struct tps6699x_emul_pdc_data *data =
+		tps6699x_emul_get_pdc_data(target);
+	memcpy(&data->identity, vdos,
+	       sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT);
+	return 0;
+}
+
+static int emul_tps6699x_set_revision(const struct emul *target, uint32_t rmdo)
+{
+	struct tps6699x_emul_pdc_data *data =
+		tps6699x_emul_get_pdc_data(target);
+	data->rmdo = rmdo;
+	return 0;
+}
+
+static int emul_tps6699x_set_current_cam(const struct emul *target,
+					 uint32_t current_cam)
+{
+	struct tps6699x_emul_pdc_data *data =
+		tps6699x_emul_get_pdc_data(target);
+	data->current_cam = current_cam;
+	return 0;
+}
+
+static int emul_tps6699x_get_sbu_mux_mode(const struct emul *target,
+					  enum pdc_sbu_mux_mode *mode)
+{
+	struct tps6699x_emul_pdc_data *data =
+		tps6699x_emul_get_pdc_data(target);
+
+	if (mode == NULL) {
+		return -EINVAL;
+	}
+
+	union reg_status *r = (union reg_status *)data->reg_val[REG_STATUS];
+	*mode = r->sbumux_mode;
+
+	return 0;
+}
+
 static DEVICE_API(emul_pdc, emul_tps6699x_api) = {
 	.reset = emul_tps6699x_reset,
 	.set_response_delay = emul_tps6699x_set_response_delay,
@@ -1485,6 +1603,10 @@ static DEVICE_API(emul_pdc, emul_tps6699x_api) = {
 	.clear_feature_flag = emul_tps6699x_clear_feature_flag,
 	.reset_feature_flags = emul_tps6699x_reset_feature_flags,
 	.get_autoneg_sink = emul_tps6699x_get_autoneg_sink,
+	.set_identity = emul_tps6699x_set_identity,
+	.set_revision = emul_tps6699x_set_revision,
+	.set_current_cam = emul_tps6699x_set_current_cam,
+	.get_sbu_mux_mode = emul_tps6699x_get_sbu_mux_mode,
 };
 
 /* clang-format off */

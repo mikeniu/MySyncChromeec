@@ -10,10 +10,12 @@
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/kernel.h>
 
-#include "cros/dsp/service/cros_transport.hh"
+#include "cros_transport.hh"
 #include "proto/ec_dsp.pb.h"
 
 #define CROS_DSP_RESPONSE_BUFFER_SIZE 128
+/* Delay in milliseconds for mode handling work scheduling */
+#define DSP_SERVICE_MODE_HANDLE_DELAY_MS 10
 
 namespace cros::dsp::util {
 
@@ -47,6 +49,8 @@ int dsp_service_read_processed(struct i2c_target_config* cfg, uint8_t* out);
 int dsp_service_write_requested(struct i2c_target_config* cfg);
 int dsp_service_write_received(struct i2c_target_config* cfg, uint8_t in);
 int dsp_service_stop(struct i2c_target_config* cfg);
+void dsp_service_error(struct i2c_target_config* cfg,
+                       enum i2c_error_reason error_code);
 void dsp_service_buf_write_received(struct i2c_target_config* cfg,
                                     uint8_t* ptr,
                                     uint32_t len);
@@ -71,11 +75,7 @@ class Driver {
   Driver(uint16_t target_address,
          const struct i2c_target_callbacks* target_callbacks,
          const struct device* bus,
-         struct gpio_dt_spec interrupt)
-      : target_cfg_{}, bus_(bus), interrupt_(interrupt), transport_() {
-    target_cfg_.address = target_address;
-    target_cfg_.callbacks = target_callbacks;
-  }
+         struct gpio_dt_spec interrupt);
 
   pw::Status Init();
 
@@ -87,6 +87,8 @@ class Driver {
   friend int ::dsp_service_write_received(struct i2c_target_config* cfg,
                                           uint8_t in);
   friend int ::dsp_service_stop(struct i2c_target_config* cfg);
+  friend void ::dsp_service_error(struct i2c_target_config* cfg,
+                                  enum i2c_error_reason error_code);
   friend void ::dsp_service_buf_write_received(struct i2c_target_config* cfg,
                                                uint8_t* ptr,
                                                uint32_t len);
@@ -97,6 +99,7 @@ class Driver {
       struct k_work* work_item);
   friend void ::dsp_service_hook_lid_change();
   friend void ::dsp_service_hook_tablet_mode_change();
+  int get_mode_val() const { return mode_val; }
 
  private:
   constexpr static const size_t kRequestBufferSize =
@@ -108,6 +111,8 @@ class Driver {
   struct i2c_target_config target_cfg_;
   const struct device* bus_;
   const struct gpio_dt_spec interrupt_;
+
+  struct k_work_delayable mode_handling_work_ = {};
 
   struct k_work get_cbi_flags_work_ = {};
 
@@ -127,6 +132,7 @@ class Driver {
   uint8_t request_buffer_[kRequestBufferSize] = {};
   uint32_t request_buffer_size_ = 0;
   cros_dsp_comms_EcService pending_service_request_ = {};
+  uint8_t mode_val = 0;
 };
 
 extern Driver driver;

@@ -3,6 +3,7 @@
 / {
 	led-colors {
 		compatible = "cros-ec,led-policy";
+		led-pins = <&led_pins>;
 
 		power-state-charge {
 			charge-state = "LED_PWRS_CHARGE";
@@ -10,7 +11,7 @@
 			batter-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_WHITE";
+					led-color = <&battery_led_white>;
 				};
 			};
 		};
@@ -24,7 +25,7 @@
 			batter-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 				};
 			};
 		};
@@ -36,7 +37,7 @@
 			batter-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 				};
 			};
 		};
@@ -48,7 +49,7 @@
 			batter-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 				};
 			};
 		};
@@ -62,12 +63,12 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = "LED_WHITE";
+					led-color = <&battery_led_white>;
 					period-ms = <1000>;
 				};
 
 				color-1 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 					period-ms = <3000>;
 				};
 			};
@@ -80,11 +81,11 @@
 			batter-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_WHITE";
+					led-color = <&battery_led_white>;
 					period-ms = <1000>;
 				};
 				color-1 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 					period-ms = <1000>;
 				};
 			};
@@ -96,7 +97,7 @@
 			batter-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_WHITE";
+					led-color = <&battery_led_white>;
 				};
 			};
 		};
@@ -107,7 +108,7 @@
 			batter-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 				};
 			};
 		};
@@ -118,7 +119,7 @@
 			batter-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 				};
 			};
 		};
@@ -129,7 +130,7 @@
 			power-led {
 				led-id = "EC_LED_ID_POWER_LED";
 				color-0 {
-					led-color = "LED_WHITE";
+					led-color = <&power_led_white>;
 				};
 			};
 		};
@@ -140,11 +141,11 @@
 			power-led {
 				led-id = "EC_LED_ID_POWER_LED";
 				color-0 {
-					led-color = "LED_WHITE";
+					led-color = <&power_led_white>;
 					period-ms = <1000>;
 				};
 				color-1 {
-					led-color = "LED_OFF";
+					led-color = <&power_led_off>;
 					period-ms = <3000>;
 				};
 			};
@@ -156,7 +157,7 @@
 			power-led {
 				led-id = "EC_LED_ID_POWER_LED";
 				color-0 {
-					led-color = "LED_OFF";
+					led-color = <&power_led_off>;
 				};
 			};
 		};

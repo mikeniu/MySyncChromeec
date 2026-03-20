@@ -7,8 +7,8 @@
 
 #define DT_DRV_COMPAT cros_ec_gpio_led_pins
 
+#include "drivers/led.h"
 #include "ec_commands.h"
-#include "led.h"
 #include "util.h"
 
 #include <zephyr/devicetree.h>
@@ -32,12 +32,37 @@ BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT) == 1,
 
 DT_INST_FOREACH_CHILD_STATUS_OKAY_VARGS(0, DT_FOREACH_CHILD, GEN_PINS_ARRAY)
 
+static void gpio_set_color_with_pattern(void *p);
+static void gpio_asynchronous_apply_color(bool tmp);
+static void gpio_set_color(enum led_color color, enum ec_led_id led_id,
+			   uint8_t brightness);
+static void gpio_get_brightness_range(enum ec_led_id led_id,
+				      uint8_t *brightness_range);
+static int gpio_set_brightness(enum ec_led_id led_id,
+			       const uint8_t *brightness);
+
+static const struct led_driver_api gpio_led_driver_api = {
+	.asynchronous_apply_color = gpio_asynchronous_apply_color,
+	.set_color_with_pattern = gpio_set_color_with_pattern,
+	.set_color = gpio_set_color,
+	.get_brightness_range = gpio_get_brightness_range,
+	.set_brightness = gpio_set_brightness,
+};
+
+/* Generate one handle for the driver instance */
+const struct led_driver_t PINS_NODE(DT_DRV_INST(0)) = {
+	.led_id_mask = GET_DRIVER_ID_MASK(0),
+	.api = &gpio_led_driver_api,
+};
+
 /* EC_LED_COLOR maps to LED_COLOR - 1 */
-#define SET_PIN_NODE(node_id)                             \
-	{ .led_color = GET_PROP(node_id, led_color),      \
-	  .led_id = GET_PROP(DT_PARENT(node_id), led_id), \
-	  .gpio_pins = PINS_ARRAY(node_id),               \
-	  .pins_count = DT_PROP_LEN(node_id, led_values) }
+#define SET_PIN_NODE(node_id)                                   \
+	{                                                       \
+		.led_color = GET_PROP(node_id, led_color),      \
+		.led_id = GET_PROP(DT_PARENT(node_id), led_id), \
+		.pins = PINS_ARRAY(node_id),                    \
+		.pins_count = DT_PROP_LEN(node_id, led_values), \
+	}
 
 /*
  * Initialize led_pins_node_t struct for each pin node defined
@@ -62,10 +87,11 @@ const struct led_pins_node_t *pins_node[] = {
  */
 void led_set_color_with_node(const struct led_pins_node_t *pins_node)
 {
+	struct gpio_pin_t *gpio_pins = (struct gpio_pin_t *)pins_node->pins;
+
 	for (int j = 0; j < pins_node->pins_count; j++) {
-		gpio_pin_set_dt(
-			gpio_get_dt_spec(pins_node->gpio_pins[j].signal),
-			pins_node->gpio_pins[j].val);
+		gpio_pin_set_dt(gpio_get_dt_spec(gpio_pins[j].signal),
+				gpio_pins[j].val);
 	}
 }
 
@@ -74,8 +100,8 @@ void led_set_color_with_node(const struct led_pins_node_t *pins_node)
  * brightness unused, do not use brightness = 0 to turn LED off, use color =
  * LED_OFF
  */
-void led_set_color(enum led_color color, enum ec_led_id led_id,
-		   uint8_t brightness)
+static void gpio_set_color(enum led_color color, enum ec_led_id led_id,
+			   uint8_t brightness)
 {
 	for (int i = 0; i < ARRAY_SIZE(pins_node); i++) {
 		if ((pins_node[i]->led_color == color) &&
@@ -86,14 +112,16 @@ void led_set_color(enum led_color color, enum ec_led_id led_id,
 	}
 }
 
-void led_set_color_with_pattern(const struct led_pattern_node_t *led)
+static void gpio_set_color_with_pattern(void *p)
 {
-	struct led_pins_node_t *pins_node =
+	const struct led_pattern_node_t *led = (struct led_pattern_node_t *)p;
+	const struct led_pins_node_t *pins_node =
 		led->pattern_color[led->cur_color].led_color_node;
 	led_set_color_with_node(pins_node);
 }
 
-void led_get_brightness_range(enum ec_led_id led_id, uint8_t *brightness_range)
+static void gpio_get_brightness_range(enum ec_led_id led_id,
+				      uint8_t *brightness_range)
 {
 	for (int i = 0; i < ARRAY_SIZE(pins_node); i++) {
 		int br_color = pins_node[i]->led_color - 1;
@@ -103,7 +131,7 @@ void led_get_brightness_range(enum ec_led_id led_id, uint8_t *brightness_range)
 	}
 }
 
-int led_set_brightness(enum ec_led_id led_id, const uint8_t *brightness)
+static int gpio_set_brightness(enum ec_led_id led_id, const uint8_t *brightness)
 {
 	bool color_set = false;
 
@@ -124,7 +152,7 @@ int led_set_brightness(enum ec_led_id led_id, const uint8_t *brightness)
 	return EC_SUCCESS;
 }
 
-__override int led_is_supported(enum ec_led_id led_id)
+int gpio_is_supported(enum ec_led_id led_id)
 {
 	static int supported_leds = -1;
 
@@ -158,7 +186,7 @@ const struct led_pins_node_t *led_get_node(enum led_color color,
 
 // LCOV_EXCL_START
 /* Called by hook task every HOOK_TICK_INTERVAL_MS */
-void led_asynchronous_apply_color(bool tmp)
+static void gpio_asynchronous_apply_color(bool tmp)
 {
 	/*
 	 * GPIO LEDs can be applied when they are set and does not need to be

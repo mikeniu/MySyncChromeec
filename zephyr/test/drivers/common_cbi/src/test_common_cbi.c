@@ -4,9 +4,11 @@
  */
 
 #include "cros_board_info.h"
+#include "cros_cbi.h"
 #include "host_command.h"
 #include "test/drivers/test_mocks.h"
 #include "test/drivers/test_state.h"
+#include "test/drivers/utils.h"
 #include "test_util.h"
 
 #include <zephyr/drivers/eeprom.h>
@@ -534,6 +536,84 @@ ZTEST_USER(common_cbi, test_init_fails_when_locked)
 #endif /* CONFIG_SYSTEM_UNLOCKED */
 }
 
+ZTEST_USER(common_cbi, test_model_id_set)
+{
+	uint32_t model_id = 234;
+	int rv;
+
+	/* Turn off write-protect so we can actually write */
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear());
+
+	/* Set model ID directly */
+	rv = cbi_set_model_id(model_id);
+	zassert_equal(rv, EC_SUCCESS);
+}
+
+ZTEST_USER(common_cbi, test_model_id_hc_set_get)
+{
+	uint32_t model_id = 234;
+	uint32_t model_id_read;
+
+	struct actual_set_params {
+		struct ec_params_set_cbi params;
+		uint8_t actual_data[sizeof(model_id)];
+	};
+
+	struct actual_set_params hc_set_params = {
+	.params = {
+		.tag = CBI_TAG_MODEL_ID,
+		.flag = CBI_SET_INIT,  /* This is crucial! */
+		.size = sizeof(model_id),
+		},
+	};
+
+	struct host_cmd_handler_args set_args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_SET_CROS_BOARD_INFO, 0, hc_set_params);
+
+	memcpy(hc_set_params.params.data, &model_id, sizeof(model_id));
+
+	/* Turn off write-protect so we can actually write */
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear());
+
+	/* Set model ID via host command */
+	zassert_ok(host_command_process(&set_args));
+
+	/* Verify model ID was set correctly */
+	zassert_ok(cbi_get_model_id(&model_id_read));
+	zassert_equal(model_id_read, model_id);
+}
+
+ZTEST_USER(common_cbi, test_model_id_set_fail_bad_magic)
+{
+	uint32_t model_id = 456;
+
+	/* Turn off write-protect */
+	gpio_wp_l_set(1);
+
+	/* First create valid CBI */
+	zassert_ok(cbi_clear());
+	zassert_ok(cbi_set_model_id(model_id));
+
+	/* Now corrupt the magic in storage to make do_cbi_read() fail */
+	uint8_t bad_magic[4] = { 0xDE, 0xAD, 0xBE, 0xEF };
+
+	/* Write bad magic to EEPROM offset 0 */
+	const struct device *eeprom_dev = CBI_EEPROM_DEV;
+	zassert_ok(eeprom_write(eeprom_dev, 0, bad_magic, sizeof(bad_magic)));
+
+	/* Invalidate cache to force read from storage */
+	cbi_invalidate_cache();
+
+	/*
+	 * Try to set model ID.do_cbi_read() will fail due to bad magic.
+	 * But cbi_create() will be called, so function should succeed.
+	 */
+	int rv = cbi_set_model_id(model_id + 1);
+	zassert_ok(rv);
+}
+
 ZTEST_USER(common_cbi, test_board_id_fails_when_set)
 {
 	uint8_t board_id = 42;
@@ -594,6 +674,139 @@ ZTEST_USER(common_cbi, test_board_id_fails_when_set)
 	zassert_ok(host_command_process(&get_args));
 	zassert_equal(get_args.response_size, sizeof(board_id));
 	zassert_equal(hc_get_response.data[0], board_id);
+}
+
+ZTEST_USER(common_cbi, test_cbi_get_ufsc__read_write)
+{
+	const struct cbi_ufsc ufsc_to_write = {
+		.data = { 0x11223344, 0x55667788, 0x99aabbcc, 0xddeeff00 }
+	};
+	struct actual_set_params {
+		struct ec_params_set_cbi params;
+		struct cbi_ufsc data;
+	};
+	struct actual_set_params hc_params = {
+		.params = {
+			.tag = CBI_TAG_UFSC,
+			.size = sizeof(ufsc_to_write),
+		},
+		.data = ufsc_to_write,
+	};
+	struct host_cmd_handler_args args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_SET_CROS_BOARD_INFO, 0, hc_params);
+	struct cbi_ufsc ufsc_read;
+
+	/* Turn off write-protect so we can actually write. */
+	gpio_wp_l_set(1);
+
+	zassert_ok(host_command_process(&args), "Failed to set UFSC data");
+
+	/* Invalidate cache to force a read from storage. */
+	cbi_invalidate_cache();
+
+	zassert_ok(cbi_get_ufsc(&ufsc_read), "cbi_get_ufsc failed");
+	zassert_mem_equal(&ufsc_to_write, &ufsc_read, sizeof(struct cbi_ufsc),
+			  "Read UFSC data does not match written data");
+
+	/* Test the console command output for the written data. */
+	const char expected_scan[] = "4433221188776655ccbbaa9900ffeedd";
+	char ufsc_scan[sizeof(expected_scan)];
+	BUILD_ASSERT(sizeof(expected_scan) - 1 == 32);
+
+	SCAN_CONSOLE_LINE("cbi", EC_SUCCESS, "UFSC:", 1, "UFSC: %32s",
+			  ufsc_scan);
+	zassert_equal(strcmp(ufsc_scan, expected_scan), 0,
+		      "Console print of UFSC value does not match. "
+		      "Expected '%s', got '%s'",
+		      expected_scan, ufsc_scan);
+}
+
+ZTEST_USER(common_cbi, test_cbi_get_ufsc__not_found)
+{
+	struct cbi_ufsc ufsc_read;
+	int rv;
+
+	/* Clear CBI to ensure the tag is not present. */
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), "cbi_clear failed");
+
+	rv = cbi_get_ufsc(&ufsc_read);
+	zassert_equal(rv, EC_ERROR_UNKNOWN,
+		      "Expected EC_ERROR_UNKNOWN for missing tag, but got %d",
+		      rv);
+}
+
+ZTEST_USER(common_cbi, test_cros_cbi_ufsc_match)
+{
+	struct cbi_ufsc ufsc_to_write = { 0 };
+	struct actual_set_params {
+		struct ec_params_set_cbi params;
+		struct cbi_ufsc data;
+	};
+	struct actual_set_params hc_params = {
+		.params = {
+			.tag = CBI_TAG_UFSC,
+			.size = sizeof(ufsc_to_write),
+		},
+	};
+	struct host_cmd_handler_args args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_SET_CROS_BOARD_INFO, 0, hc_params);
+
+	/*
+	 * data[0]: Set test-field-1 (start=0, size=2) to value 2 and
+	 * test-field-2 (start=2, size=3) to value 5.
+	 * Value = (2 << 0) | (5 << 2) = 2 | 20 = 22 (0x16).
+	 */
+	ufsc_to_write.data[0] = 0x16;
+	/*
+	 * data[3]: Set test-field-3 (start=98, size=1) to value 1.
+	 * Bit offset in data[3] is 98 % 32 = 2. Value = BIT(2).
+	 */
+	ufsc_to_write.data[3] = BIT(2);
+	hc_params.data = ufsc_to_write;
+
+	gpio_wp_l_set(1);
+
+	zassert_ok(host_command_process(&args), "Failed to set UFSC data");
+
+	/* Re-initialize UFSC driver to pick up new CBI value */
+	cros_cbi_ufsc_init();
+
+	/* Field 1 was set to 2, which corresponds to value_b */
+	zassert_true(cros_cbi_ufsc_check_match(
+		CBI_UFSC_VALUE_ID(DT_NODELABEL(value_b))));
+	zassert_false(cros_cbi_ufsc_check_match(
+		CBI_UFSC_VALUE_ID(DT_NODELABEL(value_a))));
+
+	/* Field 2 was set to 5, which corresponds to value_c */
+	zassert_true(cros_cbi_ufsc_check_match(
+		CBI_UFSC_VALUE_ID(DT_NODELABEL(value_c))));
+
+	/* Field 3 was set to 1, which corresponds to value_d */
+	zassert_true(cros_cbi_ufsc_check_match(
+		CBI_UFSC_VALUE_ID(DT_NODELABEL(value_d))));
+	zassert_false(cros_cbi_ufsc_check_match(
+		CBI_UFSC_VALUE_ID(DT_NODELABEL(value_e))));
+}
+
+ZTEST_USER(common_cbi, test_cros_cbi_ufsc_default)
+{
+	/* Clear CBI so that driver uses defaults */
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), "cbi_clear failed");
+	cros_cbi_ufsc_init();
+
+	/* Field 1's default is value_a (value=1) */
+	zassert_true(cros_cbi_ufsc_check_match(
+		CBI_UFSC_VALUE_ID(DT_NODELABEL(value_a))));
+	zassert_false(cros_cbi_ufsc_check_match(
+		CBI_UFSC_VALUE_ID(DT_NODELABEL(value_b))));
+
+	/* Field 3's default is value_e (value=0) */
+	zassert_true(cros_cbi_ufsc_check_match(
+		CBI_UFSC_VALUE_ID(DT_NODELABEL(value_e))));
+	zassert_false(cros_cbi_ufsc_check_match(
+		CBI_UFSC_VALUE_ID(DT_NODELABEL(value_d))));
 }
 
 static void test_common_cbi_before_after(void *test_data)

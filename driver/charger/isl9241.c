@@ -45,10 +45,10 @@ static const struct charger_info isl9241_charger_info = {
 	.voltage_max = CHARGE_V_MAX,
 	.voltage_min = CHARGE_V_MIN,
 	.voltage_step = CHARGE_V_STEP,
-	.current_max = CHARGE_I_MAX,
+	.current_max = BC_REG_TO_CURRENT(CHARGE_I_MAX),
 	.current_min = BC_REG_TO_CURRENT(CHARGE_I_MIN),
 	.current_step = BC_REG_TO_CURRENT(CHARGE_I_STEP),
-	.input_current_max = INPUT_I_MAX,
+	.input_current_max = AC_REG_TO_CURRENT(INPUT_I_MAX),
 	.input_current_min = AC_REG_TO_CURRENT(INPUT_I_MIN),
 	.input_current_step = AC_REG_TO_CURRENT(INPUT_I_STEP),
 };
@@ -879,7 +879,7 @@ static enum ec_error_list isl9241_nvdc_to_bypass(int chgnum)
 		       MASK_SET);
 
 	/* 8*: Set MaxSysVoltage to VADP. */
-	vsys_target = MIN(charge_voltage - 256, CHARGE_V_MAX);
+	vsys_target = min(charge_voltage - 256, CHARGE_V_MAX);
 	isl9241_write(chgnum, ISL9241_REG_MAX_SYSTEM_VOLTAGE, vsys_target);
 
 	/* 9*: Wait until VSYS == MaxSysVoltage. */
@@ -1076,6 +1076,50 @@ static enum ec_error_list isl9241_enable_bypass_mode(int chgnum, bool enable)
 	return rv;
 }
 #endif /* CONFIG_CHARGER_BYPASS_MODE */
+
+static int pdo_mv_to_acokref_mv(int pdo_mv)
+{
+	if (pdo_mv == 5000) {
+		/* For 5V, the threshold is a fixed 3.6V, which is the default
+		 * used by the ISL9241 if ACOKREF is set to 0.
+		 */
+		return 0;
+	}
+	/* Calculation taken from  b/462138011 */
+	int vNew = (pdo_mv * 95) / 100;
+	int vValid = -500;
+	int vSinkPD_min1 = vNew - 750 + vValid;
+	int vSinkDisconnectPD_min = (vSinkPD_min1 * 9) / 10;
+	return vSinkDisconnectPD_min;
+}
+
+enum ec_error_list isl9241_set_acokref(int chgnum, int mv)
+{
+	enum ec_error_list rv;
+	int acokref_mv = pdo_mv_to_acokref_mv(mv);
+
+	mutex_lock(&control3_mutex_isl9241);
+
+	/* 1: Enable ADC for all modes.
+	 *    This prevents ACOK from a 1ms glitch.
+	 *    See http://b/462138011#comment12 for more details.
+	 */
+	isl9241_update(chgnum, ISL9241_REG_CONTROL3,
+		       ISL9241_CONTROL3_ENABLE_ADC, MASK_SET);
+
+	/* 2: Update ACOKREF. */
+	CPRINTS("Setting ACOKREF to %d mv (PDO %d mV)", acokref_mv, mv);
+	rv = isl9241_write(chgnum, ISL9241_REG_ACOK_REFERENCE,
+			   ISL9241_MV_TO_ACOK_REFERENCE(acokref_mv));
+
+	/* 3: Disable ADC. */
+	isl9241_update(chgnum, ISL9241_REG_CONTROL3,
+		       ISL9241_CONTROL3_ENABLE_ADC, MASK_CLR);
+
+	mutex_unlock(&control3_mutex_isl9241);
+
+	return rv;
+}
 
 /*****************************************************************************/
 /* ISL-9241 initialization */
@@ -1298,5 +1342,8 @@ const struct charger_drv isl9241_drv = {
 #endif
 #ifdef CONFIG_CHARGER_DUMP_PROCHOT
 	.dump_prochot = &isl9241_dump_prochot_status,
+#endif
+#ifdef CONFIG_PLATFORM_EC_CHARGER_SET_ACOKREF
+	.set_acokref = &isl9241_set_acokref,
 #endif
 };

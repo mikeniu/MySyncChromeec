@@ -12,17 +12,18 @@
 #include "fan.dtsi"
 #include "gpio.dtsi"
 #include "i2c.dts"
+#include "imvp.dtsi"
+#include "keyboard.dtsi"
 #include "vci.dtsi"
 #include "../battery.dtsi"
 #include "../gsc_board.dtsi"
 #include "../i2c.dtsi"
 #include "../ioex_gpio.dtsi"
 #include "../interrupts.dtsi"
-#include "../keyboard.dtsi"
-#include "../pd.dtsi"
+#include "../runtime_pd.dtsi"
 #include "../power_signals.dtsi"
 #include "../temp_sensor.dts"
-#include "../usbc.dtsi"
+#include "../runtime_usbc.dtsi"
 #include "../led_pins.dtsi"
 #include "../led_policy.dtsi"
 
@@ -32,9 +33,11 @@
 };
 
 / {
+	aliases {
+		gpio-wp = &mchp_wp_ex;
+	};
 	chosen {
 		cros-ec,sha = &symcr;
-                cros-ec,keyboard = &ioex_it8801_kbd;
 	};
 	named-gpios {
 		/delete-node/  ec-jtag-tms;
@@ -43,6 +46,12 @@
 	tabletmode_interrupt: tabletmode-interrupt {
 		compatible = "cros,tabletmode-interrupt";
 		irq-gpios = <MCHP_GPIO_DECODE_150 GPIO_ACTIVE_LOW>;
+	};
+
+	microchip-wp {
+		compatible ="microchip,write-protect";
+		wp-gpios = <MCHP_GPIO_DECODE_076 GPIO_ACTIVE_LOW>;
+		wp-ex-gpios = <MCHP_GPIO_DECODE_056 GPIO_ACTIVE_LOW>;
 	};
 };
 
@@ -66,3 +75,6 @@
           col-size = <13>;
 };
 
+&cros_imvp{
+		enable-gpios = <MCHP_GPIO_DECODE_226 GPIO_ACTIVE_HIGH>;
+};

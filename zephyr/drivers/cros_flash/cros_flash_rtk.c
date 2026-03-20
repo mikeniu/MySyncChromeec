@@ -152,7 +152,7 @@ static int flash_set_status(const struct device *dev, uint8_t sr1, uint8_t sr2)
 	return rv;
 }
 
-static void flash_protect_int_flash(const struct device *dev, int enable)
+static void flash_protect_int_flash(const struct device *dev, bool enable)
 {
 	/*
 	 * Please notice the type of WP_IF bit is R/W1S. Once it's set,
@@ -220,7 +220,7 @@ static int flash_check_prot_reg(const struct device *dev, unsigned int offset,
 	}
 
 	/* Check if ranges overlap */
-	if (MAX(start, offset) < MIN(start + len, offset + bytes)) {
+	if (max(start, offset) < min(start + len, offset + bytes)) {
 		return EC_ERROR_ACCESS_DENIED;
 	}
 
@@ -263,8 +263,8 @@ static int flash_check_prot_range(const struct device *dev, unsigned int offset,
 		return EC_ERROR_INVAL;
 	}
 
-	if (MAX(data->addr_prot_start, offset) <
-	    MIN(data->addr_prot_start + data->addr_prot_length,
+	if (max(data->addr_prot_start, offset) <
+	    min(data->addr_prot_start + data->addr_prot_length,
 		offset + bytes)) {
 		return EC_ERROR_ACCESS_DENIED;
 	}
@@ -436,7 +436,7 @@ static int cros_flash_rtk_protect_at_boot(const struct device *dev,
 {
 	struct cros_flash_rtk_data *data = DRV_DATA(dev);
 	uint8_t lock_flags = 0;
-	int ret;
+	int ret = 0;
 
 	if ((new_flags & (EC_FLASH_PROTECT_RO_AT_BOOT |
 			  EC_FLASH_PROTECT_ALL_AT_BOOT)) == 0) {
@@ -495,7 +495,7 @@ static int cros_flash_rtk_init(const struct device *dev)
 {
 	struct cros_flash_rtk_data *data = DRV_DATA(dev);
 	uint8_t lock_flags = 0;
-	int ret;
+	int ret = 0;
 
 	if (read_bbram_flags(&lock_flags)) {
 		LOG_ERR("read lock_flags failed");

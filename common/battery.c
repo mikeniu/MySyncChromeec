@@ -38,6 +38,9 @@ const static int batt_host_shutdown_pct = CONFIG_BATT_HOST_SHUTDOWN_PERCENTAGE;
 #define CONFIG_BATTERY_CUTOFF_DELAY_US (2105 * MSEC)
 #endif
 
+/* retry counter initialized when entering SCHEDULED state */
+static int battery_cutoff_retry_left = 0;
+
 static enum battery_cutoff_states battery_cutoff_state =
 	BATTERY_CUTOFF_STATE_NORMAL;
 
@@ -134,6 +137,13 @@ static void print_battery_strings(void)
 	if (check_print_error(battery_manufacturer_name(text, sizeof(text))))
 		ccprintf("%s\n", text);
 
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_BATTERY_MANUF_INFO)) {
+		print_item_name("ManufInfo:");
+		if (check_print_error(
+			    battery_manufacture_info(text, sizeof(text))))
+			ccprintf("%s\n", text);
+	}
+
 	print_item_name("Device:");
 	if (check_print_error(battery_device_name(text, sizeof(text))))
 		ccprintf("%s\n", text);
@@ -143,18 +153,26 @@ static void print_battery_strings(void)
 		ccprintf("%s\n", text);
 }
 
+__attribute__((weak)) const struct batt_params *
+charger_current_battery_params(void)
+{
+	static struct batt_params batt;
+
+	battery_get_params(&batt);
+	return &batt;
+}
+
+int charge_get_display_charge(void)
+{
+	const struct batt_params *batt = charger_current_battery_params();
+
+	return batt->display_charge;
+}
+
 static void print_battery_params(void)
 {
-#if defined(HAS_TASK_CHARGER)
 	/* Ask charger so that we don't need to ask battery again. */
 	const struct batt_params *batt = charger_current_battery_params();
-#else
-	/* This is for test code, where doesn't have charger task. */
-	struct batt_params _batt;
-	const struct batt_params *batt = &_batt;
-
-	battery_get_params(&_batt);
-#endif
 
 	print_item_name("Param flags:");
 	ccprintf("%08x\n", batt->flags);
@@ -204,6 +222,12 @@ static void print_battery_info(void)
 {
 	int value;
 	int hour, minute;
+	int year, month, day;
+
+	print_item_name("ManufDate:");
+	if (check_print_error(battery_manufacture_date(&year, &month, &day))) {
+		ccprintf("%04u-%02u-%02u\n", year, month, day);
+	}
 
 	print_item_name("Serial:");
 	if (check_print_error(battery_serial_number(&value)))
@@ -292,6 +316,11 @@ static int command_battery(int argc, const char **argv)
 	int sleep_ms = 0;
 	char *e;
 
+#ifdef CONFIG_BATTERY_ACCESS_LIMIT
+	if (BATTERY_ACCESS_NOT_ALLOWED == battery_check_access_limit())
+		return EC_ERROR_ACCESS_DENIED;
+#endif
+
 	if (argc > 1) {
 		repeat = strtoi(argv[1], &e, 0);
 		if (*e) {
@@ -374,10 +403,24 @@ static int battery_cutoff_start(void)
 		/* Start monitor loop. */
 		hook_call_deferred(&pending_cutoff_deferred_data, 0);
 	} else {
+		if (battery_cutoff_retry_left > 0) {
+			CUTOFFPRINTS(
+				"cutoff failed, retrying (%d retries left)",
+				battery_cutoff_retry_left);
+			battery_cutoff_retry_left--;
+			/* Retry immediately */
+			battery_cutoff_state = BATTERY_CUTOFF_STATE_SCHEDULED;
+			hook_call_deferred(
+				&pending_cutoff_deferred_data,
+				CONFIG_BATTERY_CUTOFF_RETRY_DELAY_US);
+			return rv;
+		}
+
 		battery_cutoff_state = BATTERY_CUTOFF_STATE_NORMAL;
 		CUTOFFPRINTS("failed");
 	}
 
+	battery_cutoff_retry_left = 0;
 	return rv;
 }
 
@@ -489,6 +532,7 @@ static void ac_change(void)
 
 	CPRINTS("Refresh+Unplug! Scheduling cutoff.");
 	battery_cutoff_state = BATTERY_CUTOFF_STATE_SCHEDULED;
+	battery_cutoff_retry_left = CONFIG_BATTERY_CUTOFF_RETRY_COUNT;
 	hook_call_deferred(&pending_cutoff_deferred_data,
 			   CONFIG_BATTERY_CUTOFF_DELAY_US);
 }
@@ -516,6 +560,7 @@ DECLARE_HOST_COMMAND(EC_CMD_BATTERY_CUT_OFF, battery_command_cutoff,
 static void check_pending_cutoff(void)
 {
 	if (battery_cutoff_state == BATTERY_CUTOFF_STATE_SCHEDULED) {
+		battery_cutoff_retry_left = CONFIG_BATTERY_CUTOFF_RETRY_COUNT;
 		CUTOFFPRINTS("deferred for %d secs",
 			     CONFIG_BATTERY_CUTOFF_DELAY_US / SECOND);
 		hook_call_deferred(&pending_cutoff_deferred_data,
@@ -732,6 +777,13 @@ test_mockable int battery_manufacturer_name(char *dest, int size)
 	return get_battery_manufacturer_name(dest, size);
 }
 
+#ifdef CONFIG_PLATFORM_EC_BATTERY_MANUF_INFO
+test_mockable int battery_manufacture_info(char *dest, int size)
+{
+	return get_battery_manufacture_info(dest, size);
+}
+#endif /* CONFIG_PLATFORM_EC_BATTERY_MANUF_INFO */
+
 __overridable enum battery_disconnect_state battery_get_disconnect_state(void)
 {
 	return BATTERY_NOT_DISCONNECTED;
@@ -746,8 +798,9 @@ __overridable enum battery_disconnect_state battery_get_disconnect_state(void)
 #endif
 
 #if !((defined(CONFIG_USB_PD_TCPMV1) && defined(CONFIG_USB_PD_DUAL_ROLE)) || \
-      (defined(CONFIG_USB_PD_TCPMV2) && defined(CONFIG_USB_PE_SM)))
-#error "Voltage reducing requires TCPM with Policy Engine"
+      (defined(CONFIG_USB_PD_TCPMV2) && defined(CONFIG_USB_PE_SM)) ||        \
+      defined(CONFIG_USB_PD_CONTROLLER))
+#error "Voltage reducing requires TCPM with Policy Engine or PDC"
 #endif
 
 /*
@@ -839,4 +892,48 @@ void battery_validate_params(struct batt_params *batt)
 			batt->state_of_charge);
 		batt->flags |= BATT_FLAG_BAD_STATE_OF_CHARGE;
 	}
+}
+
+/* Calculate if battery is full based on whether it is accepting charge */
+test_mockable int battery_is_full(struct batt_params *batt)
+{
+	static int ret;
+
+	/* If bad state of charge reading, return last value */
+	if (batt->flags & BATT_FLAG_BAD_STATE_OF_CHARGE ||
+	    batt->state_of_charge > 100)
+		return ret;
+
+	/*
+	 * Battery is full when SoC is above 90% and battery desired current
+	 * is 0. This is necessary because some batteries stop charging when
+	 * the SoC still reports <100%, so we need to check desired current
+	 * to know if it is actually full.
+	 */
+	ret = (batt->state_of_charge >= 90 && batt->desired_current == 0);
+	return ret;
+}
+
+/* Determine if the battery is outside of allowable temperature range */
+int battery_outside_charging_temperature(struct batt_params *batt)
+{
+	const struct battery_info *batt_info = battery_get_info();
+	int batt_temp_c = DECI_KELVIN_TO_CELSIUS(batt->temperature);
+	int max_c, min_c;
+
+	if (batt->flags & BATT_FLAG_BAD_TEMPERATURE)
+		return 0;
+
+	if ((batt->desired_voltage == 0) && (batt->desired_current == 0)) {
+		max_c = batt_info->start_charging_max_c;
+		min_c = batt_info->start_charging_min_c;
+	} else {
+		max_c = batt_info->charging_max_c;
+		min_c = batt_info->charging_min_c;
+	}
+
+	if ((batt_temp_c >= max_c) || (batt_temp_c <= min_c)) {
+		return 1;
+	}
+	return 0;
 }
