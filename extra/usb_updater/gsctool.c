@@ -586,6 +586,9 @@ static const struct option_container cmd_line_options[] = {
 	{ { "upload_owner_config", no_argument, NULL, 'j' },
 	  "<binary image> is a 2kB blob containing new owners configuration,"
 	  " OpenTitan only" },
+	{ { "upload_boot_svc_msg", no_argument, NULL, 'N' },
+	  "<binary image> is a 256B blob containing boot svc message,"
+	  " OpenTitan only" },
 	{ { "get_value", required_argument, NULL, 'K' },
 	  "[chassis_open|dev_ids]%Get properties values" },
 	{ { "ccd_lock", no_argument, NULL, 'k' }, "Lock CCD" },
@@ -1925,9 +1928,69 @@ static int supports_reordered_section_updates(struct signed_header_version *rw)
 }
 
 /*
- * Owner configuration updates on the NT chip can be triggered by placing a
- * properly signed ownership config blob into a certain INFO page on the
- * device.
+ * Boot services messages are a means of communicating between the owner code
+ * and ROM_EXT on Opentitan. The messages are supposed to be up to 256 bytes
+ * in size, on the chip they are placed into so called retention SRAM before
+ * resetting the chip, this triggers ROM_EXT action as requested by the
+ * message.
+ *
+ * Destination address value of 0x9000_0000 is used to indicate to the chip
+ * that the following data is meant to be written into the retention SRAM
+ * instead of flash.
+ *
+ * The signed boot services message is expected to be stored in the passed in
+ * file. This function always terminates the program with exit code indicating
+ * success/failure. Note that upon receiving this message the chip resets
+ * after confirming message reception to the host.
+ */
+static void send_boot_svc_msg(struct transfer_descriptor *td,
+			      const char *file_name)
+{
+#define BOOT_SVC_MAX_MSG_SIZE  256
+#define BOOT_SVC_MSG_BASE_ADDR 0x90000000
+
+	struct stat st;
+	FILE *f;
+	uint8_t boot_svc_msg[BOOT_SVC_MAX_MSG_SIZE];
+
+	/* Make sure the file is there and passes basic sаnity test. */
+	if (stat(file_name, &st) != 0) {
+		fprintf(stderr, "File %s not found\n", file_name);
+		exit(1);
+	}
+
+	if (st.st_size > (long)sizeof(boot_svc_msg)) {
+		fprintf(stderr,
+			"Unexpected size %zd of %s, expected below %zu\n",
+			st.st_size, file_name, sizeof(boot_svc_msg) + 1);
+		exit(1);
+	}
+
+	f = fopen(file_name, "rb");
+	if (!f) {
+		fprintf(stderr, "Failed to open  %s\n", file_name);
+		exit(1);
+	}
+	if (fread(boot_svc_msg, 1, st.st_size, f) != (size_t)st.st_size) {
+		fclose(f);
+		fprintf(stderr, "Failed to read  %s\n", file_name);
+		exit(1);
+	}
+	fclose(f);
+
+	setup_connection(td);
+
+	/*
+	 * Use the virtual address dedicated to transferring boot svc
+	 * messages.
+	 */
+	transfer_section(td, boot_svc_msg, BOOT_SVC_MSG_BASE_ADDR, st.st_size);
+	exit(0);
+}
+
+/*
+ * Owner configuration updates on the NT chip involve placing a properly
+ * signed ownership config blob into a certain INFO page on the device.
  *
  * The signed config blob is expected to be stored in the passed in file. This
  * function always terminates the program with exit code indicating
@@ -2128,7 +2191,7 @@ uint32_t send_vendor_command(struct transfer_descriptor *td,
 			     size_t command_body_size, void *response,
 			     size_t *response_size)
 {
-	int32_t rv;
+	int32_t rv = 0;
 
 	if (td->ep_type == usb_xfer) {
 		/*
@@ -5595,6 +5658,7 @@ int main(int argc, char *argv[])
 	bool set_strongbox = false;
 	uint8_t set_strongbox_arg = 0;
 	int upload_owner_config = 0;
+	int upload_boot_svc_msg = 0;
 	int download_owner_config = 0;
 
 	/*
@@ -5609,6 +5673,7 @@ int main(int argc, char *argv[])
 		{ 'H', &erase_ap_ro_hash },
 		{ 'j', &upload_owner_config },
 		{ 'k', &ccd_lock },
+		{ 'N', &upload_boot_svc_msg },
 		{ 'o', &ccd_open },
 		{ 'P', &password },
 		{ 'p', &td.post_reset },
@@ -5964,7 +6029,7 @@ int main(int argc, char *argv[])
 	    !openbox_desc_file && !tstamp && !tpm_mode && (wp == WP_NONE) &&
 	    !get_chassis_open && !get_dev_ids && !get_aprov_reset_counts &&
 	    !upload_owner_config && !parse_device_ids && !set_strongbox &&
-	    !download_owner_config && !spi_drive) {
+	    !download_owner_config && !upload_boot_svc_msg) {
 		num_images = argc - optind;
 		if (num_images <= 0) {
 			fprintf(stderr,
@@ -6000,7 +6065,8 @@ int main(int argc, char *argv[])
 		if (binary_vers)
 			exit(0);
 	} else {
-		if (optind < argc)
+		if (!download_owner_config && !upload_owner_config &&
+		    !upload_boot_svc_msg && (optind < argc))
 			printf("Ignoring binary image %s\n", argv[optind]);
 	}
 
@@ -6009,11 +6075,15 @@ int main(int argc, char *argv[])
 	     !!get_boot_mode + !!openbox_desc_file + !!factory_mode +
 	     (wp != WP_NONE) + !!get_endorsement_seed + !!erase_ap_ro_hash +
 	     !!set_capability + !!get_clog + !!get_console +
-	     !!upload_owner_config + !!download_owner_config) > 1) {
-		fprintf(stderr,
-			"Error: options "
-			"-e, -F, -g, -H, -I, -i, -j -k, -L, -l, -O, -o, -P, -Q,"
-			"-r, -U, -x and -w are mutually exclusive\n");
+	     !!upload_owner_config + !!download_owner_config +
+	     !!upload_boot_svc_msg) > 1) {
+		const char *opts = "eFgHIijkLlNOoPQrUXxw";
+		size_t i;
+
+		fprintf(stderr, "Error: options ");
+		for (i = 0; i < strlen(opts) - 1; i++)
+			fprintf(stderr, " -%c,", opts[i]);
+		fprintf(stderr, " and %c are mutually exclusive\n", opts[i]);
 		exit(update_error);
 	}
 
@@ -6055,11 +6125,21 @@ int main(int argc, char *argv[])
 	/* Perform run selection of GSC device now that we have a connection */
 	gsc_dev = determine_gsc_type(&td);
 
-	if (upload_owner_config || download_owner_config) {
+	if (upload_owner_config || download_owner_config ||
+	    upload_boot_svc_msg) {
 		if (gsc_dev != GSC_DEVICE_NT) {
-			fprintf(stderr, "Owner's config exists only "
-					"on opentitan devices\n");
+			fprintf(stderr, "Requested operation is supported  "
+					"on opentitan devices only\n");
 			exit(1);
+		}
+
+		if (upload_boot_svc_msg) {
+			if ((argc - optind) != 1) {
+				fprintf(stderr,
+					"Boot SVC blob file name is required\n");
+				exit(1);
+			}
+			send_boot_svc_msg(&td, argv[optind]);
 		}
 
 		if ((argc - optind) != 1) {
