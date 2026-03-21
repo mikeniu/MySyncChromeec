@@ -22,6 +22,7 @@
 #include "proto/ec_dsp.pb.h"
 #include "pw_assert/check.h"
 #include "pw_transport/proto/transport.pb.h"
+#include "service/include/cros/dsp/service/driver.hh"
 #include "tablet_mode.h"
 
 // DECLARE_FAKE_VALUE_FUNC(int, crec_flash_unprotected_read, int, int, char *);
@@ -63,6 +64,8 @@ constexpr const uint64_t kDefaultReworkId = 0x89abcdef01234567;
 constexpr const uint32_t kDefaultFactoryCalibrationData = 0x9abcdef0;
 constexpr const char* kDefaultDramPartNum = "DRAM-123";
 constexpr const char* kDefaultOemName = "Google";
+constexpr const uint32_t kDefaultUfsc[] = {
+    0x11223344, 0x55667788, 0x99aabbcc, 0xddeeff00};
 
 #define SUSPEND() k_usleep(1)
 
@@ -168,6 +171,11 @@ class DspComms : public ::testing::Test {
         cbi_set_board_info(CBI_TAG_OEM_NAME,
                            reinterpret_cast<const uint8_t*>(kDefaultOemName),
                            static_cast<uint8_t>(std::strlen(kDefaultOemName))));
+
+    ASSERT_EQ(0,
+              cbi_set_board_info(CBI_TAG_UFSC,
+                                 reinterpret_cast<const uint8_t*>(kDefaultUfsc),
+                                 static_cast<uint8_t>(sizeof(kDefaultUfsc))));
 
     gpio_callbacks_.handler = [](const struct device* port,
                                  struct gpio_callback*,
@@ -292,7 +300,7 @@ TEST_F(DspComms, ProcessingError) {
   // Create an invalid service request.
   ASSERT_EQ(-EINVAL,
             dsp_client_get_cbi_flags(
-                kClient, static_cast<cros_dsp_comms_CbiFlag>(11), nullptr));
+                kClient, static_cast<cros_dsp_comms_CbiFlag>(99), nullptr));
 }
 
 TEST_F(DspComms, ReadCbiVersion) {
@@ -418,6 +426,17 @@ TEST_F(DspComms, ReadCbiOemName) {
   ASSERT_LE(size, sizeof(out));
 }
 
+TEST_F(DspComms, ReadCbiUfsc) {
+  uint32_t out[4];
+  uint8_t size = sizeof(out);
+
+  ASSERT_EQ(0,
+            cbi_remote_get_board_info(
+                CBI_TAG_UFSC, reinterpret_cast<uint8_t*>(out), &size));
+  ASSERT_EQ(0, memcmp(out, kDefaultUfsc, sizeof(out)));
+  ASSERT_EQ(size, static_cast<uint8_t>(sizeof(out)));
+}
+
 TEST_F(DspComms, LidPosition) {
   // Remove the callbacks for the GPIO. These callbacks forward the interrupt
   // from the service to the client. In this test, we want to manually do the
@@ -434,6 +453,64 @@ TEST_F(DspComms, LidPosition) {
       IsFlagSet(status, cros_dsp_comms_StatusFlag_STATUS_FLAG_LID_OPEN));
   ASSERT_FALSE(
       IsFlagSet(status, cros_dsp_comms_StatusFlag_STATUS_FLAG_TABLET_MODE));
+}
+
+#ifdef CONFIG_PLATFORM_EC_DSP_REMOTE_LID_ANGLE
+TEST_F(DspComms, LidAnglePeripheralEnableIsNoOp) {
+  // Verify lid_angle_peripheral_enable can be called with enable=1
+  // This is a no-op function when DSP handles lid angle
+  lid_angle_peripheral_enable(1);
+
+  // Verify lid_angle_peripheral_enable can be called with enable=0
+  // This is a no-op function when DSP handles lid angle
+  lid_angle_peripheral_enable(0);
+
+  // No assertions needed - the function is a no-op
+  // The test verifies that the function exists and can be called without errors
+}
+#endif /* CONFIG_PLATFORM_EC_DSP_REMOTE_LID_ANGLE */
+
+TEST_F(DspComms, DspServiceNotebookMode) {
+  // Send a notebook mode change request
+  cros_dsp_comms_EcService service = {
+      .which_request = cros_dsp_comms_EcService_notify_notebook_mode_change_tag,
+      .request =
+          {
+              .notify_notebook_mode_change =
+                  {
+                      .new_mode =
+                          cros_dsp_comms_NotebookMode_NOTEBOOK_MODE_NOTEBOOK,
+                  },
+          },
+  };
+
+  // Reset tablet mode to ensure clean state
+  tablet_reset();
+
+  ASSERT_EQ(0, SendServiceRequest(service));
+
+  // Verify that mode_val is set to 0
+  ASSERT_EQ(0, cros::dsp::service::driver.get_mode_val());
+}
+
+TEST_F(DspComms, DspServiceTabletMode) {
+  // Send a tablet mode change request
+  cros_dsp_comms_EcService service = {
+      .which_request = cros_dsp_comms_EcService_notify_notebook_mode_change_tag,
+      .request =
+          {
+              .notify_notebook_mode_change =
+                  {
+                      .new_mode =
+                          cros_dsp_comms_NotebookMode_NOTEBOOK_MODE_TABLET,
+                  },
+          },
+  };
+
+  ASSERT_EQ(0, SendServiceRequest(service));
+
+  // Verify that mode_val is set to 1
+  ASSERT_EQ(1, cros::dsp::service::driver.get_mode_val());
 }
 
 }  // namespace

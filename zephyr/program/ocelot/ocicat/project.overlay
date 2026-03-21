@@ -1,0 +1,62 @@
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* ocelot program common DTS includes */
+
+#include <cros/integrated_fwid.dtsi>
+
+/* ocicat project DTS includes */
+
+#include "battery.dtsi"
+#include "interrupts.dtsi"
+#include "pwm.dtsi"
+#include "binman.dtsi"
+#include "generated.dtsi"
+#include "power_signals.dtsi"
+#include "usb_typec.dtsi"
+#include "i2c.dtsi"
+#include "console.dtsi"
+#include "fan.dtsi"
+#include "usba.dtsi"
+#include "adc.dtsi"
+#include "temp_sensors.dtsi"
+#include "keyboard.dtsi"
+#include "cbi.dtsi"
+#include <cros/cbi_ufsc_std_schema.dtsi>
+#include <cros/cbi_ufsc_oem_schema.dtsi>
+#include "ocicat_ec_ufsc.dtsi"
+#include "leds_pins.dtsi"
+#include "led_policy.dtsi"
+
+/*
+ * Map GPIOs used for interrupts to common names
+ */
+
+gpio_acok: &gpio_acok_od {};
+gpio_lid: &gpio_lid_open {};
+gpio_pwrbtn: &gpio_gsc_ec_pwr_btn_odl {};
+gpio_all_sys_pwr_good: &gpio_all_sys_pwrgd_r {};
+gpio_temp_sensor_power_good: &gpio_en_s5_rails {};
+
+
+/* Map tachometers to common names */
+tach_fan0: &tach0 {};
+
+#include "../ite_hibernate.dtsi"
+
+/* ocicat overrides follow... */
+/ {
+	chosen {
+		cros-ec,keyboard = &kbd;
+	};
+};
+
+&espi0 {
+	status = "okay";
+};
+
+&sha0 {
+	status = "okay";
+};

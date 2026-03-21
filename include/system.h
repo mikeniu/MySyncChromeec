@@ -20,6 +20,9 @@ extern "C" {
 #endif
 
 #ifdef CONFIG_ZEPHYR
+
+#include <drivers/cros_system.h>
+
 #ifdef CONFIG_CPU_CORTEX_M
 /*
  * For cortex-m we cannot use irq_lock() for disabling all the interrupts
@@ -38,6 +41,9 @@ extern "C" {
 /* Per chip implementation to save/read raw EC_RESET_FLAG_ flags. */
 void chip_save_reset_flags(uint32_t flags);
 uint32_t chip_read_reset_flags(void);
+
+/* Per chip implementation to enter bootloader mode. */
+void chip_enter_bootloader(uint8_t mode);
 
 /**
  * Checks if running image is RW or not
@@ -388,7 +394,7 @@ const char *system_get_build_info(void);
  *
  * @param flags		Reset flags; see SYSTEM_RESET_* above.
  */
-#if !(defined(TEST_FUZZ) || defined(CONFIG_ZTEST))
+#if !(defined(CONFIG_ZTEST))
 __noreturn
 #endif
 	void
@@ -512,6 +518,18 @@ enum system_bbram_idx {
  */
 int system_get_bbram(enum system_bbram_idx idx, uint8_t *value);
 int system_set_bbram(enum system_bbram_idx idx, uint8_t value);
+
+#ifdef CONFIG_ZEPHYR
+/**
+ * Get hibernate wake source.
+ *
+ * @param source Pointer to the variable where the hibernate wake source will be
+ * stored.
+ * @return 0 if successful.
+ * @return Negative errno code if failure.
+ */
+int system_get_hibernate_wake_source(enum hibernate_wake_source *source);
+#endif
 
 /**
  * Put the EC in hibernate (lowest EC power state).

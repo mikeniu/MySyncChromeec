@@ -43,6 +43,11 @@
 	label = "I2C_PORT_CHARGER";
 	clock-frequency = <I2C_BITRATE_STANDARD>;
 
+	imvp_rt3645: richtek-imvp@20 {
+		compatible = "richtek,rt3645";
+		status = "okay";
+		reg = <0x20>;
+	};
 	charger: raa489@9 {
 		compatible = "intersil,isl9241";
 		status = "okay";
@@ -69,6 +74,7 @@
 	rvp_board_id: rvp-board-id {
 		compatible = "intel,rvp-board-id";
 		defer-until-s5 = <&pca95xx_0>;
+		handler = "rvp_id_handler";
 		bom-gpios = <&pca95xx_0 14 0>, <&pca95xx_0 15 0>,
 			    <&pca95xx_0 0 0>;
 
@@ -77,6 +83,7 @@
 		board-gpios = <&pca95xx_0 8 0>, <&pca95xx_0 9 0>,
 			      <&pca95xx_0 10 0>, <&pca95xx_0 11 0>,
 			      <&pca95xx_0 12 0>, <&pca95xx_0 13 0>;
+		zephyr,deferred-init;
 	};
 	seven_seg_display: max695x-seven-seg-display@38 {
 		compatible = "maxim,max695x";
@@ -92,5 +99,9 @@
 
 &i2c_port_ish {
 	label = "I2C_PORT_ISH";
-	clock-frequency = <I2C_BITRATE_STANDARD>;
+	clock-frequency = <I2C_BITRATE_FAST>;
+	dsp_service: dsp-service@29 {
+		compatible = "cros,dsp-service";
+		reg = <0x29>;
+	};
 };

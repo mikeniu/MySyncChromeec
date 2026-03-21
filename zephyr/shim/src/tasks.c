@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "ap_power/ap_power_interface.h"
 #include "common.h"
 #include "ec_tasks.h"
 #include "host_command.h"
@@ -12,10 +13,17 @@
 
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
 #include <zephyr/shell/shell.h>
 #include <zephyr/sys/atomic.h>
 
+LOG_MODULE_REGISTER(task_shim, LOG_LEVEL_INF);
+
 #include <soc.h>
+
+#define SAFE_THREAD_NAME(tid)                                           \
+	((tid) && k_thread_name_get((tid)) ? k_thread_name_get((tid)) : \
+					     "(unknown)")
 
 /* Ensure that the idle task is at lower priority than lowest priority task. */
 BUILD_ASSERT(EC_TASK_PRIORITY(EC_TASK_PRIO_LOWEST) < K_IDLE_PRIO,
@@ -154,6 +162,11 @@ k_tid_t task_id_to_thread_id(task_id_t task_id)
 
 		case TASK_ID_SHELL:
 			return get_shell_thread();
+
+#ifdef CONFIG_AP_PWRSEQ
+		case TASK_ID_AP_PWRSEQ:
+			return get_ap_pwrseq_thread();
+#endif /* CONFIG_AP_PWRSEQ */
 		}
 	}
 	__ASSERT(false, "Failed to map task %d to thread", task_id);
@@ -191,6 +204,12 @@ task_id_t thread_id_to_task_id(k_tid_t thread_id)
 		return TASK_ID_SHELL;
 	}
 
+#ifdef CONFIG_AP_PWRSEQ
+	if (get_ap_pwrseq_thread() == thread_id) {
+		return TASK_ID_AP_PWRSEQ;
+	}
+#endif /* CONFIG_AP_PWRSEQ */
+
 	for (size_t i = 0; i < TASK_ID_COUNT; ++i) {
 		if (task_to_k_tid[i] == thread_id) {
 			return i;
@@ -201,14 +220,19 @@ task_id_t thread_id_to_task_id(k_tid_t thread_id)
 		return TASK_ID_INVALID;
 	}
 
-#ifndef CONFIG_ZTEST
-	__ASSERT(false, "Failed to map thread to task");
-#endif
+	LOG_ERR("Failed to map thread to task: thread_id=%p, name=%s",
+		thread_id, SAFE_THREAD_NAME(thread_id));
+
 	return TASK_ID_INVALID;
 }
 
 task_id_t task_get_current(void)
 {
+	/* k_current_get() is not valid pre kernel */
+	if (k_is_pre_kernel()) {
+		return TASK_ID_INVALID;
+	}
+
 	return thread_id_to_task_id(k_current_get());
 }
 
@@ -462,6 +486,10 @@ inline bool in_interrupt_context(void)
 
 inline bool in_deferred_context(void)
 {
+	/* k_current_get() is not valid pre kernel */
+	if (k_is_pre_kernel()) {
+		return false;
+	}
 	/*
 	 * Deferred calls run in the sysworkq.
 	 */

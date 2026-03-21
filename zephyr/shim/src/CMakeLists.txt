@@ -6,6 +6,7 @@ zephyr_library_sources(console.c)
 zephyr_library_sources(crc.c)
 zephyr_library_sources(gpio.c)
 zephyr_library_sources(gpio_int.c)
+zephyr_library_sources(panic_utils.c)
 zephyr_library_sources_ifdef(CONFIG_PM pm_state.c)
 
 add_subdirectory("buttons")
@@ -35,6 +36,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_ANX7452 anx7452_usb
 zephyr_library_sources_ifdef(CONFIG_NAMED_ADC_CHANNELS      adc.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY
                                                             battery.c)
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BBRAM_TYPE_RETAINED_MEM
+                                                            retained_mem_bbram.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BC12_DETECT_RT9490
                                                             bc12_rt9490.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CEC         cec.c)
@@ -98,7 +101,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_INTEL_BB
                                                             bb_retimer_usb_mux.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_INTEL_HB
                                                             bb_retimer_usb_mux.c)
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SYSTEM_SAFE_MODE system_safe_mode.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SHA256_HW_ZEPHYR
 	                                                    sha256_hw.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOST_COMMAND_MEMORY_DUMP
@@ -131,18 +133,20 @@ if(CONFIG_PIGWEED_LOG_TOKENIZED_LIB)
       pw_log_zephyr_tokenized.cc
     PUBLIC_INCLUDES
       ${PLATFORM_EC}/include
-      ${PLATFORM_EC}/fuzz/
       ${PLATFORM_EC}/zephyr/shim/chip/${CHIP}/include
       ${PLATFORM_EC}/zephyr/shim/include
     PUBLIC_DEPS
+      pw_log_tokenized.handler
       pw_log_zephyr.tokenized_lib
   )
-
+  zephyr_link_libraries(pw_log)
   pw_zephyrize_libraries_ifdef(CONFIG_PIGWEED_LOG_TOKENIZED_LIB
                               platform_ec_log.tokenized_handler
   )
 
   include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log_tokenized/backend.cmake")
   pw_set_backend(pw_log_tokenized.handler platform_ec_log.tokenized_handler)
+  include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log/backend.cmake")
+  pw_set_backend(pw_log pw_log_tokenized)
 
 endif()

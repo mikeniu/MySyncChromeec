@@ -18,7 +18,9 @@
 #include "drivers/ucsi_v3.h"
 #include "ec_commands.h"
 #include "hooks.h"
+#include "power_button.h"
 #include "test/util.h"
+#include "timer.h"
 #include "usb_common.h"
 #include "usb_mux.h"
 #include "usb_pd.h"
@@ -106,6 +108,20 @@ test_mockable_static_inline int sniff_pdc_set_rdo(const struct device *dev,
 #define PDC_CMD_TIMEOUT_MS 2000
 
 /**
+ * @brief Maximum time to wait for a contract to be established after sending
+ *        the SET_RDO command when entering the sink state.
+ *
+ * This value is set empirically based on a typical settling time (500-600ms)
+ * with a generous amount of extra time in case the PDC is slow to report the
+ * new RDO. Not knowing the true RDO could lead to incorrectly seeding
+ * charge_manager, so allow a lot of leeway. Most cases will pass through this
+ * state quickly. After this timeout, assume the RDO is not changing (for any
+ * reason, but likely external factors) and seed charge_manager based on the
+ * currently reported RDO, not what we attempted to set.
+ */
+#define NEW_CONTRACT_TIMEOUT K_MSEC(3000)
+
+/**
  * @brief Time to wait for typec only devices (Non PD) to settle
  */
 #define TYPEC_ONLY_SINK_DEBOUNCE_TIME_US (1000 * USEC_PER_MSEC)
@@ -124,7 +140,8 @@ test_mockable_static_inline int sniff_pdc_set_rdo(const struct device *dev,
 	CONFIG_PDC_POWER_MGMT_STATE_MACHINE_SETTLED_TIMEOUT_MS
 
 /** @brief Delay to wait for stable power state before running hooks */
-#define PDC_POWER_STATE_DEBOUNCE_S (K_SECONDS(2))
+#define PDC_POWER_STATE_DEBOUNCE_MS \
+	(K_MSEC(CONFIG_PDC_POWER_MGMT_POWER_STATE_DEBOUNCE_PERIOD_MS))
 
 /**
  * @brief maximum number of times to try and send a command, or wait for a
@@ -142,6 +159,16 @@ test_mockable_static_inline int sniff_pdc_set_rdo(const struct device *dev,
  * @brief Cached duration for VBUS voltage.
  */
 #define VBUS_READ_CACHE_MS 500
+
+/**
+ * @brief Minimum long button press in seconds.
+ */
+#define PD_POWER_BUTTON_LONG_PRESS 4
+
+/**
+ * @brief Button press timeout in seconds.
+ */
+#define PD_POWER_BUTTON_PRESS_TIMEOUT 8
 
 /**
  * @brief PDC driver commands
@@ -217,6 +244,10 @@ enum pdc_cmd_t {
 	CMD_PDC_SET_BATTERY_STATUS,
 	/** CMD_PDC_SET_BATTERY_CAPABILITY*/
 	CMD_PDC_SET_BATTERY_CAPABILITY,
+	/** CMD_PDC_GET_VENDOR_STATUS */
+	CMD_PDC_GET_VENDOR_STATUS,
+	/** CMD_PDC_GET_ALERT */
+	CMD_PDC_GET_ALERT,
 	/** CMD_PDC_COUNT */
 	CMD_PDC_COUNT
 };
@@ -283,6 +314,8 @@ enum snk_attached_local_state_t {
 	SNK_ATTACHED_GET_PDOS,
 	/** SNK_ATTACHED_GET_VDO */
 	SNK_ATTACHED_GET_VDO,
+	/** SNK_ATTACHED_WAIT_FOR_CONTRACT */
+	SNK_ATTACHED_WAIT_FOR_CONTRACT,
 	/** SNK_ATTACHED_SYNC_CHARGE_MGR */
 	SNK_ATTACHED_SYNC_CHARGE_MGR,
 	/** SNK_ATTACHED_SET_SINK_PATH */
@@ -297,7 +330,33 @@ enum snk_attached_local_state_t {
 	SNK_ATTACHED_READ_POWER_LEVEL,
 	/** SNK_ATTACHED_RUN */
 	SNK_ATTACHED_RUN,
+	/* Mark end of enum */
+	SNK_ATTACHED_INVALID,
 };
+
+#ifdef CONFIG_PDC_POWER_MGMT_LOG_SUBSTATES
+/* Names of the Sink-attached substates. */
+const static char *snk_attached_local_state_names[] = {
+	[SNK_ATTACHED_GET_CONNECTOR_CAPABILITY] = "GET_CONN_CAP",
+	[SNK_ATTACHED_ADD_PD_SRC] = "ADD_PD_SRC",
+	[SNK_ATTACHED_SET_DR_SWAP_POLICY] = "SET_DR_SWAP_POLICY",
+	[SNK_ATTACHED_SET_PR_SWAP_POLICY] = "SET_PR_SWAP_POLICY",
+	[SNK_ATTACHED_SET_FRS] = "SET_FRS",
+	[SNK_ATTACHED_GET_PDOS] = "GET_PDOS",
+	[SNK_ATTACHED_GET_VDO] = "GET_VDO",
+	[SNK_ATTACHED_WAIT_FOR_CONTRACT] = "WAIT_FOR_CNRCT",
+	[SNK_ATTACHED_SYNC_CHARGE_MGR] = "SYNC_CHARGE_MGR",
+	[SNK_ATTACHED_SET_SINK_PATH] = "SET_SINK_PATH",
+	[SNK_ATTACHED_EVALUATE_PDOS] = "EVAL_PDOS",
+	[SNK_ATTACHED_GET_SINK_PDO] = "GET_SINK_PDO",
+	[SNK_ATTACHED_GET_CABLE_PROPERTY] = "GET_CABLE_PROP",
+	[SNK_ATTACHED_READ_POWER_LEVEL] = "RD_PWR_LVL",
+	[SNK_ATTACHED_RUN] = "RUN",
+};
+
+BUILD_ASSERT(ARRAY_SIZE(snk_attached_local_state_names) == SNK_ATTACHED_INVALID,
+	     "Please update substate names array");
+#endif /* CONFIG_PDC_POWER_MGMT_LOG_SUBSTATES */
 
 /**
  * @brief SRC Attached Local States
@@ -319,7 +378,26 @@ enum src_attached_local_state_t {
 	SRC_ATTACHED_GET_CABLE_PROPERTY,
 	/** SRC_ATTACHED_RUN */
 	SRC_ATTACHED_RUN,
+	/* Mark end of enum */
+	SRC_ATTACHED_INVALID,
 };
+
+#ifdef CONFIG_PDC_POWER_MGMT_LOG_SUBSTATES
+/* Names of the Source-attached substates. */
+const static char *src_attached_local_state_names[] = {
+	[SRC_ATTACHED_SET_SINK_PATH_OFF] = "SET_SINK_PATH_OFF",
+	[SRC_ATTACHED_GET_CONNECTOR_CAPABILITY] = "GET_CONN_CAP",
+	[SRC_ATTACHED_SET_DR_SWAP_POLICY] = "SET_DR_SWAP_POLICY",
+	[SRC_ATTACHED_SET_PR_SWAP_POLICY] = "SET_PR_SWAP_POLICY",
+	[SRC_ATTACHED_READ_POWER_LEVEL] = "RD_PWR_LVL",
+	[SRC_ATTACHED_GET_VDO] = "GET_VDO",
+	[SRC_ATTACHED_GET_CABLE_PROPERTY] = "GET_CABLE_PROP",
+	[SRC_ATTACHED_RUN] = "RUN",
+};
+
+BUILD_ASSERT(ARRAY_SIZE(src_attached_local_state_names) == SRC_ATTACHED_INVALID,
+	     "Please update substate names array");
+#endif /* CONFIG_PDC_POWER_MGMT_LOG_SUBSTATES */
 
 /**
  * @brief TypeC SNK Attached Local States
@@ -333,7 +411,24 @@ enum snk_typec_attached_local_state_t {
 	SNK_TYPEC_READ_POWER_LEVEL,
 	/** SNK_TYPEC_ATTACHED_RUN */
 	SNK_TYPEC_ATTACHED_RUN,
+	/* Mark end of enum */
+	SNK_TYPEC_ATTACHED_INVALID,
 };
+
+#ifdef CONFIG_PDC_POWER_MGMT_LOG_SUBSTATES
+/* Names of the Type-C only Sink-attached substates. */
+const static char *snk_typec_attached_local_state_names[] = {
+	[SNK_TYPEC_ATTACHED_SET_CHARGE_CURRENT] = "SET_CHRG_CUR",
+	[SNK_TYPEC_ATTACHED_DEBOUNCE] = "DEBOUNCE",
+	[SNK_TYPEC_READ_POWER_LEVEL] = "RD_PWR_LVL",
+	[SNK_TYPEC_ATTACHED_RUN] = "RUN",
+
+};
+
+BUILD_ASSERT(ARRAY_SIZE(snk_typec_attached_local_state_names) ==
+		     SNK_TYPEC_ATTACHED_INVALID,
+	     "Please update substate names array");
+#endif /* CONFIG_PDC_POWER_MGMT_LOG_SUBSTATES */
 
 /**
  * @brief TypeC SRC Attached Local States
@@ -349,7 +444,24 @@ enum src_typec_attached_local_state_t {
 	SRC_TYPEC_READ_POWER_LEVEL,
 	/** SRC_TYPEC_ATTACHED_RUN */
 	SRC_TYPEC_ATTACHED_RUN,
+	/* Mark end of enum */
+	SRC_TYPEC_ATTACHED_INVALID,
 };
+
+#ifdef CONFIG_PDC_POWER_MGMT_LOG_SUBSTATES
+/* Names of the Type-C only Source-attached substates. */
+const static char *src_typec_attached_local_state_names[] = {
+	[SRC_TYPEC_ATTACHED_SET_SINK_PATH_OFF] = "SET_SINK_PATH_OFF",
+	[SRC_TYPEC_ATTACHED_DEBOUNCE] = "DEBOUNCE",
+	[SRC_TYPEC_ATTACHED_ADD_SINK] = "ADD_SINK",
+	[SRC_TYPEC_READ_POWER_LEVEL] = "RD_PWR_LVL",
+	[SRC_TYPEC_ATTACHED_RUN] = "RUN",
+};
+
+BUILD_ASSERT(ARRAY_SIZE(src_typec_attached_local_state_names) ==
+		     SRC_TYPEC_ATTACHED_INVALID,
+	     "Please update substate names array");
+#endif /* CONFIG_PDC_POWER_MGMT_LOG_SUBSTATES */
 
 /**
  * @brief Unattached Local States
@@ -359,7 +471,20 @@ enum unattached_local_state_t {
 	UNATTACHED_SET_SINK_PATH_OFF,
 	/** UNATTACHED_RUN */
 	UNATTACHED_RUN,
+	/* Mark end of enum */
+	UNATTACHED_INVALID,
 };
+
+#ifdef CONFIG_PDC_POWER_MGMT_LOG_SUBSTATES
+/* Names of the Source-attached substates. */
+const static char *unattached_local_state_names[] = {
+	[UNATTACHED_SET_SINK_PATH_OFF] = "SET_SINK_PATH_OFF",
+	[UNATTACHED_RUN] = "RUN",
+};
+
+BUILD_ASSERT(ARRAY_SIZE(unattached_local_state_names) == UNATTACHED_INVALID,
+	     "Please update substate names array");
+#endif /* CONFIG_PDC_POWER_MGMT_LOG_SUBSTATES */
 
 /**
  * @brief Initialization local states. Carry out these steps upon subsystem
@@ -372,16 +497,40 @@ enum init_local_state_t {
 	 *  initialized.
 	 */
 	INIT_WAIT_FOR_READY,
+	/** INIT_SET_SBU_MUX_FORCED_DEBUG - set the port's SBU mux to
+	 *  forced-debug if the COMMON_POLICY_SET_SBU_MUX_TO_FORCED_DEBUG flag
+	 *  is set.
+	 */
+	INIT_SET_SBU_MUX_FORCED_DEBUG,
 	/** INIT_SET_SINK_PDOS - Set the sink PDOs (sink capabilities) on the
 	 *  PDC based on product configuration data.
 	 */
 	INIT_SET_SINK_PDOS,
+	/** INIT_SET_SRC_PDOS - pdc sets src pdo in advance during
+	 *  initialization.
+	 */
+	INIT_SET_SRC_PDOS,
 	/** INIT_GET_CONNECTOR_STATUS - Get current status. This state does not
 	 *  return; the state machine will transition to the unattached or one
 	 *  of the attached run states after handling the response.
 	 */
 	INIT_GET_CONNECTOR_STATUS,
+	/* Mark end of enum */
+	INIT_INVALID,
 };
+
+#ifdef CONFIG_PDC_POWER_MGMT_LOG_SUBSTATES
+/* Names of the init substates. */
+const static char *init_local_state_names[] = {
+	[INIT_WAIT_FOR_READY] = "WAIT_FOR_READY",
+	[INIT_SET_SINK_PDOS] = "SET_SINK_PDOS",
+	[INIT_SET_SRC_PDOS] = "SET_SRC_PDOS",
+	[INIT_GET_CONNECTOR_STATUS] = "GET_CONN_STATUS",
+};
+
+BUILD_ASSERT(ARRAY_SIZE(init_local_state_names) == INIT_INVALID,
+	     "Please update substate names array");
+#endif /* CONFIG_PDC_POWER_MGMT_LOG_SUBSTATES */
 
 /**
  * @brief CCI Event Flags
@@ -395,6 +544,8 @@ enum cci_flag_t {
 	CCI_CMD_COMPLETED,
 	/** CCI_EVENT: Used to trigger querying connector status */
 	CCI_EVENT,
+	/** Used to query vendor defined connector change bits */
+	CCI_VENDOR_EVENT,
 	/** CCI_CAM_CHANGE */
 	CCI_CAM_CHANGE,
 	/** CCI_ACK */
@@ -446,6 +597,8 @@ test_export_static const char *const pdc_cmd_names[] = {
 	[CMD_PDC_SET_BBR_CTS] = "PDC_SET_BBR_CTS",
 	[CMD_PDC_SET_BATTERY_STATUS] = "PDC_SET_BATTERY_STATUS",
 	[CMD_PDC_SET_BATTERY_CAPABILITY] = "PDC_SET_BATTERY_CAPABILITY",
+	[CMD_PDC_GET_VENDOR_STATUS] = "PDC_GET_VENDOR_STATUS",
+	[CMD_PDC_GET_ALERT] = "PDC_GET_ALERT",
 };
 const int pdc_cmd_types = CMD_PDC_COUNT;
 
@@ -477,6 +630,13 @@ BUILD_ASSERT(ARRAY_SIZE(pdc_state_names) == PDC_STATE_COUNT,
 enum policy_common_t {
 	/** COMMON_POLICY_SET_POWER_STATE */
 	COMMON_POLICY_SET_POWER_STATE,
+	/** COMMON_POLICY_GET_ALERT */
+	COMMON_POLICY_GET_ALERT,
+	/** When set, run CMD_PDC_SET_SBU_MUX_MODE to set the port's SBU mux
+	 *  mode to force-debug. This should only be set on the port acting
+	 *  as the CCD port.
+	 */
+	COMMON_POLICY_SET_SBU_MUX_TO_FORCED_DEBUG,
 	/** COMMON_POLICY_COUNT */
 	COMMON_POLICY_COUNT,
 };
@@ -558,6 +718,8 @@ enum policy_snk_attached_t {
  * @brief Attached state
  */
 enum attached_state_t {
+	/* INIT_STATE */
+	INIT_STATE,
 	/** UNATTACHED_STATE */
 	UNATTACHED_STATE,
 	/** SRC_ATTACHED_STATE */
@@ -571,6 +733,7 @@ enum attached_state_t {
 };
 
 static const char *const attached_state_names[] = {
+	[INIT_STATE] = "Init",
 	[UNATTACHED_STATE] = "Unattached",
 	[SRC_ATTACHED_STATE] = "Attached.SRC",
 	[SNK_ATTACHED_STATE] = "Attached.SNK",
@@ -645,6 +808,10 @@ enum policy_src_attached_t {
 	 * balancing policy.
 	 */
 	SRC_POLICY_GET_RDO,
+	/** Get source caps from DRP sink partner */
+	SRC_POLICY_GET_SRC_CAPS,
+	/** Evaluate source PDOs from DRP sink partner */
+	SRC_POLICY_EVAL_SRC_PDOS,
 	/** Triggers an update of the allow_pr_swap bit in CMD_SET_DRP */
 	SRC_POLICY_UPDATE_ALLOW_PR_SWAP,
 	/** Update battery status */
@@ -777,6 +944,9 @@ struct pdc_port_t {
 	 * re-queried.
 	 */
 	k_timepoint_t vbus_expired;
+	/** Timeout for a new contract to be negotiated after sending SET_RDO
+	 *  in the sink entry flow. */
+	k_timepoint_t new_contract_timeout;
 	/** VBUS temp variable used with CMD_PDC_GET_VBUS_VOLTAGE command */
 	uint16_t vbus;
 	/** UOR variable used with CMD_PDC_SET_UOR command */
@@ -834,6 +1004,8 @@ struct pdc_port_t {
 	bool hpd_wake_watch;
 	/** Additional change bits to report to PPM. */
 	union conn_status_change_bits_t overlay_ppm_changes;
+	/** non-UCSI status change reported by PDC */
+	union vendor_status_change_bits_t vendor_status_change;
 	/** LPM should enable FRS. */
 	bool frs_enable;
 	/** Store response to the GET_ATTENTION_VDO command */
@@ -848,6 +1020,11 @@ struct pdc_port_t {
 	union battery_status_t bstat;
 	/** Battery capability */
 	union battery_capability_t bcap;
+	/* Store state of PD power button */
+	k_timepoint_t pb_long_press;
+	k_timepoint_t pb_press_timeout;
+	/* Alert Data Object */
+	uint32_t ado;
 };
 
 /**
@@ -933,7 +1110,7 @@ static void pd_chipset_resume(void);
 static void pd_chipset_suspend(void);
 static void pd_chipset_shutdown(void);
 
-static void pdc_update_battery_status(struct pdc_port_t *port);
+static void pdc_update_battery_status(struct pdc_port_t *port, bool force);
 static void pdc_update_battery_capability(struct pdc_port_t *port);
 
 static bool should_suspend(struct pdc_port_t *port)
@@ -1063,6 +1240,19 @@ static ALWAYS_INLINE void pdc_thread(void *pdc_dev, void *unused1,
 
 DT_INST_FOREACH_STATUS_OKAY(PDC_SUBSYS_INIT)
 
+#ifndef CONFIG_TEST_NO_PDC_INIT
+#define PDC_DEVICE_INIT_ONE(node_id) device_init(DEVICE_DT_GET(node_id));
+
+/* Explicitly initialized all ports defined with zephyr,deferred-init */
+static int pdc_device_init(void)
+{
+	DT_FOREACH_STATUS_OKAY(DT_DRV_COMPAT, PDC_DEVICE_INIT_ONE);
+	return 0;
+}
+
+SYS_INIT(pdc_device_init, POST_KERNEL, CONFIG_PDC_POWER_MGMT_INIT_PRIORITY);
+#endif
+
 /* Enforce initialization order constraints. This driver depends on the PDC
  * driver(s) and also charge manager (the latter is enforced by
  * `common/charge_manager.c`)
@@ -1107,13 +1297,23 @@ static void set_pdc_state(struct pdc_port_t *port, enum pdc_state_t next_state)
 	}
 }
 
-static void print_current_pdc_state(struct pdc_port_t *port)
-{
-	const struct pdc_config_t *const config = port->dev->config;
+#define SAFE_SUBSTATE_NAME(substate_idx, str_array)                   \
+	(IN_RANGE((substate_idx), 0, (ARRAY_SIZE((str_array)) - 1)) ? \
+		 (str_array)[(substate_idx)] :                        \
+		 "Invalid")
 
-	LOG_INF("C%d: %s", config->connector_num,
-		pdc_state_names[get_pdc_state(port)]);
-}
+#define PRINT_STATE_WITH_SUBSTATE(port_num, state_idx, substate_idx, \
+				  substate_strs)                     \
+	COND_CODE_1(IS_ENABLED(CONFIG_PDC_POWER_MGMT_LOG_SUBSTATES), \
+		    (LOG_INF("C%d State: %s.%s", (port_num),         \
+			     pdc_state_names[(state_idx)],           \
+			     SAFE_SUBSTATE_NAME((substate_idx),      \
+						(substate_strs)))),  \
+		    (LOG_INF("C%d State: %s (%d)", (port_num),       \
+			     pdc_state_names[(state_idx)], (substate_idx))))
+
+#define PRINT_STATE(port_num, state_idx) \
+	LOG_INF("C%d State: %s", (port_num), pdc_state_names[(state_idx)])
 
 static void set_attached_pdc_state(struct pdc_port_t *port,
 				   enum attached_state_t attached_state)
@@ -1203,7 +1403,7 @@ static void invalidate_charger_settings(struct pdc_port_t *port,
 
 	/* Invalidate PDOS */
 	port->snk_policy.pdo = 0;
-	memset(port->snk_policy.src.pdos, 0, sizeof(port->snk_policy.snk.pdos));
+	memset(port->snk_policy.src.pdos, 0, sizeof(port->snk_policy.src.pdos));
 	port->snk_policy.src.pdo_count = 0;
 	memset(port->src_policy.snk.pdos, 0, sizeof(port->src_policy.snk.pdos));
 	port->src_policy.snk.pdo_count = 0;
@@ -1288,8 +1488,8 @@ static void handle_connector_status(struct pdc_port_t *port)
 
 	conn_status_change_bits.raw_value = status->raw_conn_status_change_bits;
 
-	LOG_DBG("C%d: Connector Change: 0x%04x", port_number,
-		conn_status_change_bits.raw_value);
+	LOG_INF("C%d: Connector Change: 0x%04x, RDO: %d", port_number,
+		conn_status_change_bits.raw_value, RDO_POS(status->rdo));
 
 	if (port->sink_path_status != status->sink_path_status) {
 		LOG_DBG("C%d: Sink path status change: %d", port_number,
@@ -1424,6 +1624,19 @@ static void handle_connector_status(struct pdc_port_t *port)
 }
 
 /**
+ * @brief Reads vendor defined connector status change bits, this should only
+ * be used to process events which are not supported by UCSI.
+ */
+static void handle_vendor_status(struct pdc_port_t *port)
+{
+	if (port->vendor_status_change.alert_received) {
+		atomic_set_bit(port->common_policy.flags,
+			       COMMON_POLICY_GET_ALERT);
+		k_event_post(&port->sm_event, PDC_SM_EVENT);
+	}
+}
+
+/**
  * @brief Trigger connector status change on PPM
  *
  * The UCSI spec says that certain commands with side-effects (like SET_PDR) do
@@ -1453,6 +1666,9 @@ static void trigger_ppm_status_change(struct pdc_port_t *port)
 		break;
 	case CMD_PDC_SET_SINK_PATH:
 		status.sink_path_status_change = 1;
+		break;
+	case CMD_PDC_READ_POWER_LEVEL:
+		status.negotiated_power_level = 1;
 		break;
 
 	/* For all other commands, no need to trigger as there shouldn't be
@@ -1530,6 +1746,16 @@ static bool run_common_policies(struct pdc_port_t *port)
 		queue_internal_cmd(port, CMD_PDC_SET_AP_POWER_STATE);
 		return true;
 	}
+
+	if (atomic_test_and_clear_bit(port->common_policy.flags,
+				      COMMON_POLICY_GET_ALERT)) {
+		/* Read latest ADO */
+		queue_internal_cmd(port, CMD_PDC_GET_ALERT);
+		return true;
+	}
+
+	/* Note: COMMON_POLICY_SET_SBU_MUX_TO_FORCED_DEBUG is checked in the
+	 * INIT state. */
 
 	return false;
 }
@@ -1645,6 +1871,43 @@ static void handle_attention_vdo(struct pdc_port_t *port)
 	}
 }
 
+static void handle_alert(struct pdc_port_t *port, uint32_t ado)
+{
+	const struct pdc_config_t *config = port->dev->config;
+	int port_num = config->connector_num;
+	enum ado_extended_alert_event_type event_type;
+
+	if (pdc_power_mgmt_pd_get_data_role(port_num) != PD_ROLE_DFP ||
+	    !(ado & ADO_EXTENDED_ALERT_EVENT)) {
+		return;
+	}
+
+	event_type = ado & ADO_EXTENDED_ALERT_EVENT_TYPE;
+	if (event_type == ADO_POWER_BUTTON_PRESS) {
+		port->pb_press_timeout = sys_timepoint_calc(
+			K_SECONDS(PD_POWER_BUTTON_PRESS_TIMEOUT));
+		port->pb_long_press = sys_timepoint_calc(
+			K_SECONDS(PD_POWER_BUTTON_LONG_PRESS));
+	} else if (event_type == ADO_POWER_BUTTON_RELEASE) {
+		/* If the device is on and a long power button press is received
+		 * shutdown the device. Otherwise, simulate a short power button
+		 * press. Release alerts without a corresponding press are
+		 * treated as short power button presses.
+		 */
+		if (!sys_timepoint_expired(port->pb_press_timeout)) {
+			if (sys_timepoint_expired(port->pb_long_press) &&
+			    (chipset_in_state(CHIPSET_STATE_ANY_SUSPEND) |
+			     chipset_in_state(CHIPSET_STATE_ON))) {
+				chipset_force_shutdown(CHIPSET_SHUTDOWN_BUTTON);
+			} else {
+				pdc_power_mgmt_simulate_power_button_press(500);
+			}
+		}
+		port->pb_press_timeout = sys_timepoint_calc(K_FOREVER);
+		port->pb_long_press = sys_timepoint_calc(K_FOREVER);
+	}
+}
+
 static void run_snk_policies(struct pdc_port_t *port)
 {
 	const struct pdc_config_t *config = port->dev->config;
@@ -1717,7 +1980,7 @@ static void run_snk_policies(struct pdc_port_t *port)
 		return;
 	}
 
-	if (IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_FRS)) {
+	if (pdc_power_mgmt_get_frs_hw_supported(port_num)) {
 		/* When FRS is supported, the source current limits need
 		 * rebalancing when a DRP source is attached.
 		 */
@@ -1765,6 +2028,10 @@ static void run_typec_snk_policies(struct pdc_port_t *port)
 		port->sink_path_to_send =
 			charge_manager_get_active_charge_port() ==
 			config->connector_num;
+		if (port->sink_path_to_send) {
+			/* Set ACOKREF to 5000 */
+			charge_manager_set_acokref(5000);
+		}
 		queue_internal_cmd(port, CMD_PDC_SET_SINK_PATH);
 	} else if (atomic_test_and_clear_bit(port->snk_policy.flags,
 					     SNK_POLICY_UPDATE_SRC_CAPS)) {
@@ -1823,6 +2090,13 @@ static void run_src_policies(struct pdc_port_t *port)
 		/* Adjust source current limits if necessary */
 		pdc_dpm_eval_sink_fixed_pdo(port_num,
 					    port->src_policy.snk.pdos[0]);
+
+		/* If the partner is DRP capable, request source caps */
+		if (port->src_policy.snk.pdos[0] & PDO_FIXED_GET_DRP) {
+			atomic_set_bit(port->src_policy.flags,
+				       SRC_POLICY_GET_SRC_CAPS);
+		}
+
 		return;
 	} else if (atomic_test_and_clear_bit(port->src_policy.flags,
 					     SRC_POLICY_GET_SINK_CAPS)) {
@@ -1872,6 +2146,33 @@ static void run_src_policies(struct pdc_port_t *port)
 					     SRC_POLICY_GET_RDO)) {
 		/* Get the RDO from the port partner */
 		queue_internal_cmd(port, CMD_PDC_GET_RDO);
+		return;
+	} else if (atomic_test_and_clear_bit(port->src_policy.flags,
+					     SRC_POLICY_GET_SRC_CAPS)) {
+		/*
+		 * For evaluating swap to sink, we only request the partner's
+		 * first SRC PDO.
+		 */
+		port->get_pdo.num_pdos = 1;
+		port->get_pdo.pdo_offset = PDO_OFFSET_0;
+		port->get_pdo.pdo_type = SOURCE_PDO;
+		port->get_pdo.pdo_source = PARTNER_PDO;
+		port->get_pdo.updating = false;
+
+		atomic_set_bit(port->src_policy.flags,
+			       SRC_POLICY_EVAL_SRC_PDOS);
+		queue_internal_cmd(port, CMD_PDC_GET_PDOS);
+		return;
+	} else if (atomic_test_and_clear_bit(port->src_policy.flags,
+					     SRC_POLICY_EVAL_SRC_PDOS)) {
+		/* Request a swap to sink if the partner has unconstained power
+		 */
+		if (port->snk_policy.src.pdos[0] &
+		    PDO_FIXED_GET_UNCONSTRAINED_PWR) {
+			atomic_set_bit(port->src_policy.flags,
+				       SRC_POLICY_SWAP_TO_SNK);
+		}
+
 		return;
 	} else if (atomic_test_and_clear_bit(port->src_policy.flags,
 					     SRC_POLICY_UPDATE_ALLOW_PR_SWAP)) {
@@ -1935,7 +2236,9 @@ static void pdc_unattached_entry(void *obj)
 	const struct pdc_config_t *config = port->dev->config;
 	int port_number = config->connector_num;
 
-	print_current_pdc_state(port);
+	PRINT_STATE_WITH_SUBSTATE(port_number, get_pdc_state(port),
+				  port->unattached_local_state,
+				  unattached_local_state_names);
 
 	set_attached_pdc_state(port, UNATTACHED_STATE);
 	port->send_cmd.intern.pending = false;
@@ -1949,6 +2252,11 @@ static void pdc_unattached_entry(void *obj)
 
 	/* Clear VBUS cache timeout. */
 	port->vbus_expired = sys_timepoint_calc(K_NO_WAIT);
+
+	/* Reset PD button */
+	port->ado = 0;
+	port->pb_press_timeout = sys_timepoint_calc(K_FOREVER);
+	port->pb_long_press = sys_timepoint_calc(K_FOREVER);
 
 	if (get_pdc_state(port) != port->send_cmd_return_state) {
 		invalidate_charger_settings(port, true);
@@ -2005,6 +2313,8 @@ static enum smf_state_result pdc_unattached_run(void *obj)
 	case UNATTACHED_RUN:
 		run_unattached_policies(port);
 		break;
+	case UNATTACHED_INVALID:
+		__builtin_unreachable();
 	}
 	return SMF_EVENT_HANDLED;
 }
@@ -2018,7 +2328,10 @@ static void pdc_src_attached_entry(void *obj)
 	const struct pdc_config_t *config = port->dev->config;
 	int port_number = config->connector_num;
 
-	print_current_pdc_state(port);
+	PRINT_STATE_WITH_SUBSTATE(port_number, get_pdc_state(port),
+				  port->src_attached_local_state,
+				  src_attached_local_state_names);
+
 	set_attached_pdc_state(port, SRC_ATTACHED_STATE);
 
 	port->send_cmd.intern.pending = false;
@@ -2041,7 +2354,7 @@ static void pdc_src_attached_entry(void *obj)
 
 		/* Update the PDC with the correct battery status. */
 		pdc_update_battery_capability(port);
-		pdc_update_battery_status(port);
+		pdc_update_battery_status(port, true);
 	}
 
 	/* Clear a piece of sink policy as it is no longer relevant in the
@@ -2062,6 +2375,11 @@ static enum smf_state_result pdc_src_attached_run(void *obj)
 	 */
 	if (atomic_test_and_clear_bit(port->cci_flags, CCI_EVENT)) {
 		queue_internal_cmd(port, CMD_PDC_GET_CONNECTOR_STATUS);
+		return SMF_EVENT_HANDLED;
+	}
+
+	if (atomic_test_and_clear_bit(port->cci_flags, CCI_VENDOR_EVENT)) {
+		queue_internal_cmd(port, CMD_PDC_GET_VENDOR_STATUS);
 		return SMF_EVENT_HANDLED;
 	}
 
@@ -2128,6 +2446,8 @@ static enum smf_state_result pdc_src_attached_run(void *obj)
 	case SRC_ATTACHED_RUN:
 		run_src_policies(port);
 		break;
+	case SRC_ATTACHED_INVALID:
+		__builtin_unreachable();
 	}
 	return SMF_EVENT_HANDLED;
 }
@@ -2138,15 +2458,17 @@ static enum smf_state_result pdc_src_attached_run(void *obj)
 static void pdc_snk_attached_entry(void *obj)
 {
 	struct pdc_port_t *port = (struct pdc_port_t *)obj;
+	const struct pdc_config_t *config = port->dev->config;
+	int port_number = config->connector_num;
 
-	print_current_pdc_state(port);
+	PRINT_STATE_WITH_SUBSTATE(port_number, get_pdc_state(port),
+				  port->snk_attached_local_state,
+				  snk_attached_local_state_names);
+
 	set_attached_pdc_state(port, SNK_ATTACHED_STATE);
 
 	port->send_cmd.intern.pending = false;
 	if (get_pdc_state(port) != port->send_cmd_return_state) {
-		const struct pdc_config_t *config = port->dev->config;
-		int port_number = config->connector_num;
-
 		/* Reset local state */
 		port->snk_attached_local_state =
 			SNK_ATTACHED_GET_CONNECTOR_CAPABILITY;
@@ -2166,14 +2488,14 @@ static void pdc_snk_attached_entry(void *obj)
 
 		/* Update the PDC with the correct battery status. */
 		pdc_update_battery_capability(port);
-		pdc_update_battery_status(port);
+		pdc_update_battery_status(port, true);
 	}
 }
 
 static void pdc_print_pdo_info(int port, struct pdc_pdos_t *pdo)
 {
 	uint32_t max_ma, max_mv, max_mw, min_mv;
-	const char *type_str;
+	const char *type_str = NULL;
 
 	/* Prints a table of PDOs with key fields extracted
 	 *
@@ -2279,20 +2601,23 @@ pdc_snk_attached_send_set_rdo(struct pdc_port_t *port,
 			RDO_FIXED(snk_policy->pdo_index, max_ma, max_ma, flags);
 	}
 
-	LOG_INF("C%d: Send RDO: %d, battery_is_present=%d",
+	LOG_INF("C%d: Send RDO: %d (%08x), battery_is_present=%d, mismatch=%d",
 		config->connector_num, RDO_POS(snk_policy->rdo_to_send),
-		battery_is_present());
+		snk_policy->rdo_to_send, battery_is_present(),
+		!!(flags & RDO_CAP_MISMATCH));
+	LOG_INF("C%d: Power request: %umA, %umV, %umW, "
+		"pdo_max=%umW, board_max=%umW",
+		config->connector_num, max_ma, max_mv, max_mw, max_mw_pdo,
+		pdc_max_operating_power);
 	queue_internal_cmd(port, CMD_PDC_SET_RDO);
 }
 
 static void pdc_snk_seed_charge_manager(struct pdc_port_t *port, uint32_t pdo)
 {
 	const struct pdc_config_t *const config = port->dev->config;
-	uint32_t max_ma, max_mv, max_mw;
+	uint32_t max_ma, max_mv, max_mw, unused;
 
-	max_ma = MIN(PDO_FIXED_CURRENT(pdo),
-		     CONFIG_PLATFORM_EC_USB_PD_MAX_CURRENT_MA);
-	max_mv = PDO_FIXED_VOLTAGE(pdo);
+	pd_extract_pdo_power(pdo, &max_ma, &max_mv, &unused);
 	max_mw = max_ma * max_mv / 1000;
 
 	/* Only the fixed 5V PDO at index 0 has the UP and DRP bits set */
@@ -2301,9 +2626,10 @@ static void pdc_snk_seed_charge_manager(struct pdc_port_t *port, uint32_t pdo)
 	LOG_INF("C%d: Available charging (%sconstrained)",
 		config->connector_num,
 		(vsafe_5v_pdo & PDO_FIXED_GET_UNCONSTRAINED_PWR) ? "un" : "");
-	LOG_INF("  PDO: %08x", pdo);
+	LOG_INF("  PDO: %08x (RDO pos %d)", pdo,
+		RDO_POS(port->connector_status.rdo));
 	LOG_INF("  V: %d", max_mv);
-	LOG_INF("  C: %d", max_ma);
+	LOG_INF("  I: %d", max_ma);
 	LOG_INF("  P: %d", max_mw);
 
 	if (port->sink_path_status) {
@@ -2362,14 +2688,28 @@ static uint8_t pdc_get_snk_path_en_mask(void)
 	return snk_path_en_mask;
 }
 
+/** Return values for pdc_snk_attached_evaluate_pdos(), describing what
+ *  action was taken by the function.
+ */
+enum eval_pdo_outcome {
+	/** Multiple sink paths are enabled. Hold in current state until only
+	 *  one sink path is active. */
+	EVAL_PDO_OUTCOME_SINK_PATH_STATE,
+	/** Keep the current RDO. A new RDO has NOT been sent, so proceed */
+	EVAL_PDO_OUTCOME_RETAIN_CURRENT_RDO,
+	/** A new RDO has been sent. Wait for the the PDC to re-negotiate before
+	 *  proceeding. */
+	EVAL_PDO_OUTCOME_SEND_NEW_RDO,
+};
+
 /**
  * @brief Evaluate PDOs and send RDO when only one (or none) sink path is
  * enabled. The sink path is disabled on non-preferred ports.
  *
- * @return true - Proceed to next state
- *         false - Remain in current state.
+ * @return enum eval_pdo_outcome
  */
-static bool pdc_snk_attached_evaluate_pdos(struct pdc_port_t *port)
+static enum eval_pdo_outcome
+pdc_snk_attached_evaluate_pdos(struct pdc_port_t *port)
 {
 	const struct pdc_config_t *const config = port->dev->config;
 	int pdo_index = 0, selected_port;
@@ -2383,7 +2723,9 @@ static bool pdc_snk_attached_evaluate_pdos(struct pdc_port_t *port)
 
 	/* No valid PDOs found, move to next state */
 	if (pdo_index == -1) {
-		return true;
+		LOG_INF("C%d: No valid PDOs found. Keep current RDO.",
+			config->connector_num);
+		return EVAL_PDO_OUTCOME_RETAIN_CURRENT_RDO;
 	}
 
 	selected_port = charge_manager_get_active_charge_port();
@@ -2392,7 +2734,7 @@ static bool pdc_snk_attached_evaluate_pdos(struct pdc_port_t *port)
 				       pdo_index)) {
 		LOG_INF("C%d: Retaining PDO[%d]=0x%08X", config->connector_num,
 			pdo_index, selected_pdo);
-		return true;
+		return EVAL_PDO_OUTCOME_RETAIN_CURRENT_RDO;
 	}
 
 	uint8_t sink_path_mask = pdc_get_snk_path_en_mask();
@@ -2409,7 +2751,7 @@ static bool pdc_snk_attached_evaluate_pdos(struct pdc_port_t *port)
 		}
 
 		/* Remain in current state until only one sink path is enabled*/
-		return false;
+		return EVAL_PDO_OUTCOME_SINK_PATH_STATE;
 	}
 
 	/* if sink path is enabled, battery is not present, and AP is ON,
@@ -2417,7 +2759,9 @@ static bool pdc_snk_attached_evaluate_pdos(struct pdc_port_t *port)
 	 */
 	if (port->sink_path_status && battery_is_present() == BP_NO &&
 	    !chipset_in_state(CHIPSET_STATE_HARD_OFF)) {
-		return true;
+		LOG_INF("C%d: Dead battery detected. Keep current RDO.",
+			config->connector_num);
+		return EVAL_PDO_OUTCOME_RETAIN_CURRENT_RDO;
 	}
 
 	/* Only one sink path is enabled, safe to update RDO */
@@ -2425,7 +2769,7 @@ static bool pdc_snk_attached_evaluate_pdos(struct pdc_port_t *port)
 	port->snk_policy.pdo_index = pdo_index + 1;
 
 	pdc_snk_attached_send_set_rdo(port, &port->snk_policy);
-	return true;
+	return EVAL_PDO_OUTCOME_SEND_NEW_RDO;
 }
 
 static bool pdc_is_rdo_valid(const union connector_status_t *cs)
@@ -2459,6 +2803,14 @@ static bool pdc_snk_attached_set_sink_path(struct pdc_port_t *port)
 		if (sink_path_mask == 0) {
 			/* No other ports have sink path enabled,
 			 * proceed to enable */
+			int pdo_mv;
+			int pdo_ma;
+			int pdo_mw;
+			pd_extract_pdo_power_unclamped(port->snk_policy.pdo,
+						       &pdo_ma, &pdo_mv,
+						       &pdo_mw);
+			charge_manager_set_acokref(pdo_mv);
+
 			port->sink_path_to_send = true;
 			queue_internal_cmd(port, CMD_PDC_SET_SINK_PATH);
 			return true;
@@ -2485,12 +2837,18 @@ static enum smf_state_result pdc_snk_attached_run(void *obj)
 {
 	struct pdc_port_t *port = (struct pdc_port_t *)obj;
 	const struct pdc_config_t *config = port->dev->config;
+	union conn_status_change_bits_t conn_status_change_bits;
 
 	/* The CCI_EVENT is set to re-query connector status, so check the
 	 * connector status and take the appropriate action.
 	 */
 	if (atomic_test_and_clear_bit(port->cci_flags, CCI_EVENT)) {
 		queue_internal_cmd(port, CMD_PDC_GET_CONNECTOR_STATUS);
+		return SMF_EVENT_HANDLED;
+	}
+
+	if (atomic_test_and_clear_bit(port->cci_flags, CCI_VENDOR_EVENT)) {
+		queue_internal_cmd(port, CMD_PDC_GET_VENDOR_STATUS);
 		return SMF_EVENT_HANDLED;
 	}
 
@@ -2526,7 +2884,8 @@ static enum smf_state_result pdc_snk_attached_run(void *obj)
 
 	switch (port->snk_attached_local_state) {
 	case SNK_ATTACHED_GET_CONNECTOR_CAPABILITY:
-		if (IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_FRS)) {
+		if (pdc_power_mgmt_get_frs_hw_supported(
+			    config->connector_num)) {
 			port->snk_attached_local_state =
 				SNK_ATTACHED_ADD_PD_SRC;
 		} else {
@@ -2610,9 +2969,58 @@ static enum smf_state_result pdc_snk_attached_run(void *obj)
 		 * the best port and disable the sink path on all but the best
 		 * port.
 		 */
-		if (pdc_snk_attached_evaluate_pdos(port)) {
+		switch (pdc_snk_attached_evaluate_pdos(port)) {
+		case EVAL_PDO_OUTCOME_SINK_PATH_STATE:
+			/* Remain in this substate until only a single sink path
+			 * is active. */
+			break;
+		case EVAL_PDO_OUTCOME_RETAIN_CURRENT_RDO:
+			/* No RDO changes. Proceed directly to seeding charge
+			 * manager. */
 			port->snk_attached_local_state =
 				SNK_ATTACHED_SYNC_CHARGE_MGR;
+			break;
+		case EVAL_PDO_OUTCOME_SEND_NEW_RDO:
+			/* A new RDO was sent. Wait for the PD contract to be
+			 * negotiated by the PDC. */
+			port->new_contract_timeout =
+				sys_timepoint_calc(NEW_CONTRACT_TIMEOUT);
+			port->snk_attached_local_state =
+				SNK_ATTACHED_WAIT_FOR_CONTRACT;
+			break;
+		}
+		return SMF_EVENT_HANDLED;
+	case SNK_ATTACHED_WAIT_FOR_CONTRACT:
+		/* Poll GET_CONNECTOR_STATUS until the `negotiated_power_level`
+		 * bit is set. */
+		conn_status_change_bits.raw_value =
+			port->connector_status.raw_conn_status_change_bits;
+
+		LOG_INF("C%d: Wait for negotiated_power_level (%04x) "
+			"or correct RDO (req %d, curr %d)",
+			config->connector_num,
+			conn_status_change_bits.raw_value,
+			RDO_POS(port->snk_policy.rdo_to_send),
+			RDO_POS(port->connector_status.rdo));
+
+		if (conn_status_change_bits.negotiated_power_level ||
+		    RDO_POS(port->snk_policy.rdo_to_send) ==
+			    RDO_POS(port->connector_status.rdo)) {
+			/* New contract is in place. Seed charge_manager. */
+			port->snk_attached_local_state =
+				SNK_ATTACHED_SYNC_CHARGE_MGR;
+		} else if (sys_timepoint_expired(port->new_contract_timeout)) {
+			/* Timed out waiting for a contract. Proceed with the
+			 * RDO chosen by the PDC, even if suboptimal. Charge
+			 * manager will be seeded with the actual active RDO. */
+			LOG_ERR("C%d: New contract cannot be established. "
+				"Proceed with current contract.",
+				config->connector_num);
+			port->snk_attached_local_state =
+				SNK_ATTACHED_SYNC_CHARGE_MGR;
+		} else {
+			/* Poll GET_CONNECTOR_STATUS again */
+			queue_internal_cmd(port, CMD_PDC_GET_CONNECTOR_STATUS);
 		}
 		return SMF_EVENT_HANDLED;
 	case SNK_ATTACHED_SYNC_CHARGE_MGR:
@@ -2636,7 +3044,8 @@ static enum smf_state_result pdc_snk_attached_run(void *obj)
 	case SNK_ATTACHED_SET_SINK_PATH:
 
 		if (pdc_snk_attached_set_sink_path(port)) {
-			if (IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_FRS) &&
+			if (pdc_power_mgmt_get_frs_hw_supported(
+				    config->connector_num) &&
 			    port->ccaps.op_mode_drp) {
 				port->snk_attached_local_state =
 					SNK_ATTACHED_GET_SINK_PDO;
@@ -2651,7 +3060,8 @@ static enum smf_state_result pdc_snk_attached_run(void *obj)
 		port->snk_attached_local_state =
 			SNK_ATTACHED_GET_CABLE_PROPERTY;
 
-		if (IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_FRS)) {
+		if (pdc_power_mgmt_get_frs_hw_supported(
+			    config->connector_num)) {
 			/*
 			 * We only care about the first fixed PDO for FRS, so
 			 * only ask for the first sink PDO from the partner.
@@ -2670,7 +3080,9 @@ static enum smf_state_result pdc_snk_attached_run(void *obj)
 			queue_internal_cmd(port, CMD_PDC_GET_PDOS);
 			return SMF_EVENT_HANDLED;
 		}
-		/* If !CONFIG_PLATFORM_EC_USB_PD_FRS, fallthrough */
+		/* If
+		 * !pdc_power_mgmt_get_frs_hw_supported(config->connector_num),
+		 * fallthrough */
 		__fallthrough;
 	case SNK_ATTACHED_GET_CABLE_PROPERTY:
 		port->snk_attached_local_state = SNK_ATTACHED_READ_POWER_LEVEL;
@@ -2690,6 +3102,8 @@ static enum smf_state_result pdc_snk_attached_run(void *obj)
 			run_snk_policies(port);
 		}
 		break;
+	case SNK_ATTACHED_INVALID:
+		__builtin_unreachable();
 	}
 	return SMF_EVENT_HANDLED;
 }
@@ -2697,8 +3111,6 @@ static enum smf_state_result pdc_snk_attached_run(void *obj)
 static void pdc_send_cmd_start_entry(void *obj)
 {
 	struct pdc_port_t *port = (struct pdc_port_t *)obj;
-
-	print_current_pdc_state(port);
 
 	port->send_cmd_return_state = port->last_state;
 	port->send_cmd.wait_counter = 0;
@@ -2765,7 +3177,7 @@ static int send_pdc_cmd(struct pdc_port_t *port)
 	case CMD_PDC_GET_PDOS:
 		rv = pdc_get_pdos(port->pdc, port->get_pdo.pdo_type,
 				  port->get_pdo.pdo_offset,
-				  MIN(port->get_pdo.num_pdos,
+				  min(port->get_pdo.num_pdos,
 				      UCSI_GET_PDOS_MAX_NUM),
 				  port->get_pdo.pdo_source,
 				  get_pdc_pdos_ptr(port, &port->get_pdo)->pdos +
@@ -2890,6 +3302,13 @@ static int send_pdc_cmd(struct pdc_port_t *port)
 	case CMD_PDC_SET_BATTERY_CAPABILITY:
 		rv = pdc_set_battery_capability(port->pdc, &port->bcap);
 		break;
+	case CMD_PDC_GET_VENDOR_STATUS:
+		rv = pdc_get_vendor_status(port->pdc,
+					   &port->vendor_status_change);
+		break;
+	case CMD_PDC_GET_ALERT:
+		rv = pdc_get_alert(port->pdc, &port->ado);
+		break;
 	default:
 		LOG_ERR("C%d: Invalid command: %d", config->connector_num,
 			port->cmd->cmd);
@@ -2962,7 +3381,6 @@ static void pdc_send_cmd_wait_entry(void *obj)
 {
 	struct pdc_port_t *port = (struct pdc_port_t *)obj;
 
-	print_current_pdc_state(port);
 	port->send_cmd.wait_counter = 0;
 	port->send_cmd.resend_counter = 0;
 }
@@ -3030,9 +3448,11 @@ static enum smf_state_result pdc_send_cmd_wait_run(void *obj)
 		case CMD_PDC_GET_ATTENTION_VDO:
 			handle_attention_vdo(port);
 			break;
-		case CMD_PDC_SET_RDO:
-			port->connector_status.rdo =
-				port->snk_policy.rdo_to_send;
+		case CMD_PDC_GET_VENDOR_STATUS:
+			handle_vendor_status(port);
+			break;
+		case CMD_PDC_GET_ALERT:
+			handle_alert(port, port->ado);
 			break;
 		default:
 			break;
@@ -3107,6 +3527,7 @@ static void pdc_send_cmd_wait_exit(void *obj)
 	case CMD_PDC_SET_UOR:
 	case CMD_PDC_SET_PDOS:
 	case CMD_PDC_SET_SINK_PATH:
+	case CMD_PDC_READ_POWER_LEVEL:
 		trigger_ppm_status_change(port);
 		break;
 	default:
@@ -3120,7 +3541,10 @@ static void pdc_src_typec_only_entry(void *obj)
 	const struct pdc_config_t *config = port->dev->config;
 	int port_number = config->connector_num;
 
-	print_current_pdc_state(port);
+	PRINT_STATE_WITH_SUBSTATE(port_number, get_pdc_state(port),
+				  port->src_typec_attached_local_state,
+				  src_typec_attached_local_state_names);
+
 	set_attached_pdc_state(port, SRC_ATTACHED_TYPEC_ONLY_STATE);
 
 	if (get_pdc_state(port) != port->send_cmd_return_state) {
@@ -3195,6 +3619,8 @@ static enum smf_state_result pdc_src_typec_only_run(void *obj)
 	case SRC_TYPEC_ATTACHED_RUN:
 		run_typec_src_policies(port);
 		break;
+	case SRC_TYPEC_ATTACHED_INVALID:
+		__builtin_unreachable();
 	}
 	return SMF_EVENT_HANDLED;
 }
@@ -3228,7 +3654,10 @@ static void pdc_snk_typec_only_entry(void *obj)
 		}
 	}
 
-	print_current_pdc_state(port);
+	PRINT_STATE_WITH_SUBSTATE(port_number, get_pdc_state(port),
+				  port->snk_typec_attached_local_state,
+				  snk_typec_attached_local_state_names);
+
 	set_attached_pdc_state(port, SNK_ATTACHED_TYPEC_ONLY_STATE);
 }
 
@@ -3290,6 +3719,8 @@ static enum smf_state_result pdc_snk_typec_only_run(void *obj)
 	case SNK_TYPEC_ATTACHED_RUN:
 		run_typec_snk_policies(port);
 		break;
+	case SNK_TYPEC_ATTACHED_INVALID:
+		__builtin_unreachable();
 	}
 	return SMF_EVENT_HANDLED;
 }
@@ -3300,7 +3731,9 @@ static void pdc_init_entry(void *obj)
 	const struct pdc_config_t *config = port->dev->config;
 	int port_number = config->connector_num;
 
-	print_current_pdc_state(port);
+	PRINT_STATE_WITH_SUBSTATE(port_number, get_pdc_state(port),
+				  port->init_local_state,
+				  init_local_state_names);
 
 	if (get_pdc_state(port) != port->send_cmd_return_state) {
 		/* True if entering the init state for the first time, as
@@ -3376,6 +3809,8 @@ static void enforce_pd_chipset_suspend_policy_1(int port)
 {
 	LOG_DBG("C%d: Chipset Suspend Policy 1", port);
 
+	atomic_clear_bit(pdc_data[port]->port.snk_policy.flags,
+			 SNK_POLICY_EVAL_SWAP_TO_SRC);
 	pdc_power_mgmt_set_dual_role(port, PD_DRP_TOGGLE_OFF);
 }
 
@@ -3499,13 +3934,28 @@ static enum smf_state_result pdc_init_run(void *obj)
 				&pdc_apply_power_state_policy_work.work);
 		}
 
-		port->init_local_state = INIT_SET_SINK_PDOS;
+		port->init_local_state = INIT_SET_SBU_MUX_FORCED_DEBUG;
 
 		/* Proceed directly to next sub-state */
 		__fallthrough;
 
+	case INIT_SET_SBU_MUX_FORCED_DEBUG:
+		port->init_local_state = INIT_SET_SINK_PDOS;
+
+		if (atomic_test_and_clear_bit(
+			    port->common_policy.flags,
+			    COMMON_POLICY_SET_SBU_MUX_TO_FORCED_DEBUG)) {
+			/* Set the SBU mux operating mode to forced-debug */
+			port->sbu_mux_mode = PDC_SBU_MUX_MODE_FORCE_DBG;
+			queue_internal_cmd(port, CMD_PDC_SET_SBU_MUX_MODE);
+			break;
+		}
+
+		/* If flag is unset, proceed directly to next sub-state */
+		__fallthrough;
+
 	case INIT_SET_SINK_PDOS:
-		port->init_local_state = INIT_GET_CONNECTOR_STATUS;
+		port->init_local_state = INIT_SET_SRC_PDOS;
 
 		/* Set sink PDO(s) that reflects this board's max voltage and
 		 * current */
@@ -3519,12 +3969,31 @@ static enum smf_state_result pdc_init_run(void *obj)
 		queue_internal_cmd(port, CMD_PDC_SET_PDOS);
 		break;
 
+	case INIT_SET_SRC_PDOS:
+		port->init_local_state = INIT_GET_CONNECTOR_STATUS;
+		port->attached_state = INIT_STATE;
+
+		pdc_power_mgmt_set_current_limit(
+			config->connector_num,
+			pdc_power_mgmt_get_default_current_limit(
+				config->connector_num));
+
+		port->set_pdos = (struct set_pdos_t){
+			.count = 1,
+			.type = SOURCE_PDO,
+			.pdos = { port->src_policy.lpm_src_pdo },
+		};
+		queue_internal_cmd(port, CMD_PDC_SET_PDOS);
+		break;
+
 	case INIT_GET_CONNECTOR_STATUS:
 		/* Send the connector status command to determine which state to
 		 * enter
 		 */
 		queue_internal_cmd(port, CMD_PDC_GET_CONNECTOR_STATUS);
 		break;
+	case INIT_INVALID:
+		__builtin_unreachable();
 	}
 	return SMF_EVENT_HANDLED;
 }
@@ -3532,8 +4001,9 @@ static enum smf_state_result pdc_init_run(void *obj)
 static void pdc_suspended_entry(void *obj)
 {
 	struct pdc_port_t *port = (struct pdc_port_t *)obj;
+	const struct pdc_config_t *const config = port->dev->config;
 
-	print_current_pdc_state(port);
+	PRINT_STATE(config->connector_num, get_pdc_state(port));
 }
 
 static enum smf_state_result pdc_suspended_run(void *obj)
@@ -3636,6 +4106,7 @@ static void pdc_ci_handler_cb(const struct device *dev,
 	/* Handle generic vendor defined event from driver */
 	if (cci_event.vendor_defined_indicator) {
 		atomic_set_bit(port->cci_flags, CCI_EVENT);
+		atomic_set_bit(port->cci_flags, CCI_VENDOR_EVENT);
 		post_event = true;
 	}
 
@@ -3975,6 +4446,12 @@ int pdc_power_mgmt_set_active_charge_port(int charge_port)
 	}
 
 	return EC_SUCCESS;
+}
+
+void pdc_power_mgmt_check_pr_swap_needed(int port)
+{
+	atomic_set_bit(pdc_data[port]->port.snk_policy.flags,
+		       SNK_POLICY_EVAL_SWAP_TO_SRC);
 }
 
 int pdc_power_mgmt_set_new_power_request(int port)
@@ -4567,7 +5044,7 @@ static void clear_hpd_wake_watch(int port)
 static void pd_chipset_resume(void)
 {
 	k_work_reschedule(&pdc_apply_power_state_policy_work,
-			  PDC_POWER_STATE_DEBOUNCE_S);
+			  PDC_POWER_STATE_DEBOUNCE_MS);
 
 	LOG_INF("PD: S3->S0");
 }
@@ -4576,7 +5053,7 @@ DECLARE_HOOK(HOOK_CHIPSET_RESUME, pd_chipset_resume, HOOK_PRIO_DEFAULT);
 static void pd_chipset_suspend(void)
 {
 	k_work_reschedule(&pdc_apply_power_state_policy_work,
-			  PDC_POWER_STATE_DEBOUNCE_S);
+			  PDC_POWER_STATE_DEBOUNCE_MS);
 
 	LOG_INF("PD: S0->S3");
 }
@@ -4585,7 +5062,7 @@ DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, pd_chipset_suspend, HOOK_PRIO_DEFAULT);
 static void pd_chipset_startup(void)
 {
 	k_work_reschedule(&pdc_apply_power_state_policy_work,
-			  PDC_POWER_STATE_DEBOUNCE_S);
+			  PDC_POWER_STATE_DEBOUNCE_MS);
 
 	LOG_INF("PD: S5->S3");
 }
@@ -4594,7 +5071,7 @@ DECLARE_HOOK(HOOK_CHIPSET_STARTUP, pd_chipset_startup, HOOK_PRIO_DEFAULT);
 static void pd_chipset_shutdown(void)
 {
 	k_work_reschedule(&pdc_apply_power_state_policy_work,
-			  PDC_POWER_STATE_DEBOUNCE_S);
+			  PDC_POWER_STATE_DEBOUNCE_MS);
 
 	LOG_INF("PD: S3->S5");
 }
@@ -4609,20 +5086,27 @@ static void pdc_battery_status_changed(void)
 {
 	for (int i = 0; i < pdc_power_mgmt_get_usb_pd_port_count(); i++) {
 		if (pdc_power_mgmt_is_pdc_port_valid(i)) {
-			pdc_update_battery_status(&pdc_data[i]->port);
+			pdc_update_battery_status(&pdc_data[i]->port, false);
 		}
 	}
 }
 DECLARE_HOOK(HOOK_BATTERY_SOC_CHANGE, pdc_battery_status_changed,
 	     HOOK_PRIO_DEFAULT);
 
-static void pdc_update_battery_status(struct pdc_port_t *port)
+/**
+ * @brief Send updated battery status to the PDC
+ *
+ * @param port PDC port to update
+ * @param force If true, unconditionally send the battery status. Otherwise
+ * only send battery status if the battery information changed.
+ */
+static void pdc_update_battery_status(struct pdc_port_t *port, bool force)
 {
 	const struct pdc_config_t *config = port->dev->config;
 	int port_number = config->connector_num;
 	union battery_status_t bsdo = { 0 };
 
-	if (battery_is_present()) {
+	if (battery_is_present() == BP_YES) {
 		uint32_t v;
 		uint32_t c;
 
@@ -4664,7 +5148,12 @@ static void pdc_update_battery_status(struct pdc_port_t *port)
 			}
 		}
 	} else {
+		bsdo.battery_present = 0;
 		bsdo.present_capacity = BSDO_CAP_UNKNOWN;
+	}
+
+	if (!force && memcmp(&port->bstat, &bsdo, sizeof(bsdo)) == 0) {
+		return;
 	}
 
 	port->bstat = bsdo;
@@ -5064,107 +5553,157 @@ uint8_t pdc_power_mgmt_get_product_type(int port)
 /** Allow 3s for the PDC SM to suspend itself. */
 #define SUSPEND_TIMEOUT_USEC (3 * USEC_PER_SEC)
 
-/* TODO(b/323371550): This function should be adjusted to target individual PD
+#ifdef CONFIG_USBC_PDC_DRIVEN_CCD
+/** Store the CCD port's SBU mux operating mode when suspending */
+static enum pdc_sbu_mux_mode sbu_mux_mode_at_suspend = PDC_SBU_MUX_MODE_NORMAL;
+#endif /* CONFIG_USBC_PDC_DRIVEN_CCD */
+
+/* TODO(b/323371550): These functions should be adjusted to target individual PD
  * chips rather than all ports at once. It should take a chip ID as a param and
  * track current comms status by chip.
  */
-test_mockable int pdc_power_mgmt_set_comms_state(bool enable_comms)
+
+/**
+ * @brief Suspend/disable communication to the PDC
+ */
+static int suspend_pdc_comms(void)
 {
 	int ret;
 	int status = 0;
-	static bool current_comms_status = true;
 
 	uint8_t port_count = pdc_power_mgmt_get_usb_pd_port_count();
 
-	if (enable_comms) {
-		if (current_comms_status == true) {
-			/* Comms are already enabled */
-			return -EALREADY;
-		}
-
-		/* Resume and reset the driver layer */
-		for (int p = 0; p < port_count; p++) {
-			if (get_pdc_state(&pdc_data[p]->port) == PDC_DISABLED) {
-				/* Ignore disabled ports */
-				continue;
-			}
-
-			ret = pdc_set_comms_state(pdc_data[p]->port.pdc, true);
-			if (ret) {
-				LOG_ERR("Cannot resume port C%d driver: %d", p,
-					ret);
-				status = ret;
-			}
-		}
-
-		/* Release each PDC state machine. A reset is performed when
-		 * exiting the suspended state.
-		 */
-		for (int p = 0; p < port_count; p++) {
-			atomic_set(&pdc_data[p]->port.suspend, 0);
-		}
-
-		if (status == 0) {
-			/* Successfully re-enabled comms */
-			current_comms_status = true;
-		}
+#ifdef CONFIG_USBC_PDC_DRIVEN_CCD
+	/* Save current SBU mux override state so we can restore upon
+	 * PDC subsystem resume. */
+	ret = pdc_power_mgmt_get_sbu_mux_mode(&sbu_mux_mode_at_suspend, NULL);
+	if (ret) {
+		LOG_ERR("PD: Cannot read current SBU mux mode: %d", ret);
 	} else {
-		/* Disable/suspend communications */
+		LOG_INF("PD: Save SBU mux mode of %d", sbu_mux_mode_at_suspend);
+	}
+#endif /* CONFIG_USBC_PDC_DRIVEN_CCD */
 
-		if (current_comms_status == false) {
-			/* Comms are already disabled */
-			return -EALREADY;
+	/* Request each port's PDC state machine to enter the suspend
+	 * state.
+	 */
+	for (int p = 0; p < port_count; p++) {
+		atomic_set(&pdc_data[p]->port.suspend, 1);
+	}
+
+	/* Wait for each PDC state machine to enter suspended state */
+	for (int p = 0; p < port_count; p++) {
+		if (get_pdc_state(&pdc_data[p]->port) == PDC_DISABLED) {
+			/* Ignore disabled ports */
+			continue;
 		}
 
-		/* Request each port's PDC state machine to enter the suspend
-		 * state.
-		 */
-		for (int p = 0; p < port_count; p++) {
-			atomic_set(&pdc_data[p]->port.suspend, 1);
+		ret = WAIT_FOR(
+			get_pdc_state(&pdc_data[p]->port) == PDC_SUSPENDED,
+			SUSPEND_TIMEOUT_USEC, k_sleep(K_MSEC(LOOP_DELAY_MS)));
+		if (!ret) {
+			LOG_ERR("Timed out suspending PDC SM for port "
+				"C%d: %d",
+				p, ret);
+			status = -ETIMEDOUT;
+		}
+	}
+
+	/* Suspend the driver layer */
+	for (int p = 0; p < port_count; p++) {
+		if (get_pdc_state(&pdc_data[p]->port) == PDC_DISABLED) {
+			/* Ignore disabled ports */
+			continue;
 		}
 
-		/* Wait for each PDC state machine to enter suspended state */
-		for (int p = 0; p < port_count; p++) {
-			if (get_pdc_state(&pdc_data[p]->port) == PDC_DISABLED) {
-				/* Ignore disabled ports */
-				continue;
-			}
+		ret = pdc_set_comms_state(pdc_data[p]->port.pdc, false);
 
-			ret = WAIT_FOR(get_pdc_state(&pdc_data[p]->port) ==
-					       PDC_SUSPENDED,
-				       SUSPEND_TIMEOUT_USEC,
-				       k_sleep(K_MSEC(LOOP_DELAY_MS)));
-			if (!ret) {
-				LOG_ERR("Timed out suspending PDC SM for port "
-					"C%d: %d",
-					p, ret);
-				status = -ETIMEDOUT;
-			}
-		}
-
-		/* Suspend the driver layer */
-		for (int p = 0; p < port_count; p++) {
-			if (get_pdc_state(&pdc_data[p]->port) == PDC_DISABLED) {
-				/* Ignore disabled ports */
-				continue;
-			}
-
-			ret = pdc_set_comms_state(pdc_data[p]->port.pdc, false);
-
-			if (ret) {
-				LOG_ERR("Cannot suspend port C%d driver: %d", p,
-					ret);
-				status = ret;
-			}
-		}
-
-		if (status == 0) {
-			/* Successfully disabled comms */
-			current_comms_status = false;
+		if (ret) {
+			LOG_ERR("Cannot suspend port C%d driver: %d", p, ret);
+			status = ret;
 		}
 	}
 
 	return status;
+}
+
+/**
+ * @brief Resume/enable communication to the PDC
+ */
+static int resume_pdc_comms(void)
+{
+	int ret;
+	int status = 0;
+
+	uint8_t port_count = pdc_power_mgmt_get_usb_pd_port_count();
+
+#ifdef CONFIG_USBC_PDC_DRIVEN_CCD
+	if (sbu_mux_mode_at_suspend == PDC_SBU_MUX_MODE_FORCE_DBG) {
+		/* Set a flag on the CCD port to go back into force-debug mode.
+		 * This cannot be done immediately because the drivers need time
+		 * to re-initialize. If the previous SBU mux mode was normal
+		 * operation, that is the default and no action is necessary.
+		 */
+		int ccd_port = pdc_power_mgmt_get_ccd_port();
+
+		LOG_INF("PD: Restore C%d (CCD) SBU mux to forced-debug mode",
+			ccd_port);
+		atomic_set_bit(pdc_data[ccd_port]->port.common_policy.flags,
+			       COMMON_POLICY_SET_SBU_MUX_TO_FORCED_DEBUG);
+	}
+#endif /* CONFIG_USBC_PDC_DRIVEN_CCD */
+
+	/* Resume and reset the driver layer */
+	for (int p = 0; p < port_count; p++) {
+		if (get_pdc_state(&pdc_data[p]->port) == PDC_DISABLED) {
+			/* Ignore disabled ports */
+			continue;
+		}
+
+		ret = pdc_set_comms_state(pdc_data[p]->port.pdc, true);
+		if (ret) {
+			LOG_ERR("Cannot resume port C%d driver: %d", p, ret);
+			status = ret;
+		}
+	}
+
+	/* Release each PDC state machine. A reset is performed when
+	 * exiting the suspended state.
+	 */
+	for (int p = 0; p < port_count; p++) {
+		atomic_set(&pdc_data[p]->port.suspend, 0);
+	}
+
+	return status;
+}
+
+test_mockable int pdc_power_mgmt_set_comms_state(bool enable_comms)
+{
+	int ret;
+
+	static bool current_comms_status = true;
+
+	if (enable_comms == current_comms_status) {
+		LOG_ERR("PD: Unnecessary suspend or resume. "
+			"Current state already %d",
+			current_comms_status);
+		return -EALREADY;
+	}
+
+	if (enable_comms) {
+		LOG_INF("PD: Resume PDC communication");
+		ret = resume_pdc_comms();
+	} else {
+		LOG_INF("PD: Suspend PDC communication");
+		ret = suspend_pdc_comms();
+	}
+
+	if (ret == 0) {
+		/* Successfully changed comms state */
+		current_comms_status = enable_comms;
+	}
+
+	return ret;
 }
 
 test_mockable int
@@ -5254,6 +5793,14 @@ mux_state_t pdc_power_mgmt_get_dp_mux_mode(int port)
 
 void pdc_power_mgmt_set_max_voltage(unsigned int mv)
 {
+	if (mv < PD_MIN_MV || mv > CONFIG_PLATFORM_EC_USB_PD_MAX_VOLTAGE_MV) {
+		LOG_ERR("PD: Ignore invalid voltage request of %umV "
+			"(allowed range %u-%umV)",
+			mv, PD_MIN_MV,
+			CONFIG_PLATFORM_EC_USB_PD_MAX_VOLTAGE_MV);
+		return;
+	}
+
 	LOG_INF("PD: New maximum voltage: %dmV", mv);
 
 	pdc_max_request_mv = mv;
@@ -5304,7 +5851,8 @@ pdc_power_mgmt_get_cable_prop(int port, union cable_property_t *cable_prop)
 	return 0;
 }
 
-enum usb_typec_current_t pdc_power_mgmt_get_default_current_limit(int port)
+__overridable enum usb_typec_current_t
+pdc_power_mgmt_get_default_current_limit(int port)
 {
 	return TC_CURRENT_1_5A;
 }
@@ -5336,6 +5884,8 @@ int pdc_power_mgmt_set_current_limit(int port_num,
 
 	/* Further actions depend on the port attached state and power role */
 	switch (pdc->attached_state) {
+	case INIT_STATE:
+		break;
 	case SRC_ATTACHED_TYPEC_ONLY_STATE:
 		/*
 		 * Active TypeC only SRC connection. Because the connection is
@@ -5375,6 +5925,15 @@ int pdc_power_mgmt_set_current_limit(int port_num,
 	}
 
 	return EC_SUCCESS;
+}
+
+bool pdc_power_mgmt_get_frs_hw_supported(int port)
+{
+	if (!pdc_power_mgmt_is_pdc_port_valid(port)) {
+		LOG_ERR("get_frs_hw_supported: invalid port %d", port);
+		return false;
+	}
+	return pdc_get_frs_supported(pdc_data[port]->port.pdc);
 }
 
 int pdc_power_mgmt_frs_enable(int port_num, bool enable)
@@ -5635,6 +6194,14 @@ test_mockable int pdc_power_mgmt_set_ap_power_state(enum power_state state)
 	}
 
 	return 0;
+}
+
+test_mockable void pdc_power_mgmt_simulate_power_button_press(int ms)
+{
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_POWER_BUTTON))
+		return;
+
+	power_button_simulate_press(ms);
 }
 
 #ifdef CONFIG_ZTEST

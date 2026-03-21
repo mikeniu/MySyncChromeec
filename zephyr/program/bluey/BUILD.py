@@ -1,4 +1,4 @@
-# Copyright 2025 The ChromiumOS Authors
+# Copyright 2026 The ChromiumOS Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
@@ -10,6 +10,7 @@ def register_npcx9_project(
     zephyr_board="npcx9/npcx9m7f",
     extra_kconfig_files=(),
     inherited_from=None,
+    extra_modules=(),
 ):
     """Register an npcx9 based variant of bluey."""
     if inherited_from is None:
@@ -30,6 +31,7 @@ def register_npcx9_project(
             *extra_kconfig_files,
         ],
         inherited_from=inherited_from,
+        modules=["cmsis_6", "ec", *extra_modules],
     )
 
 
@@ -44,6 +46,12 @@ register_npcx9_project(
 register_npcx9_project(
     project_name="quartz",
     zephyr_board="npcx9/npcx9m7fb",
+    extra_modules=["google-private", "nanopb", "pigweed"],
+)
+
+register_npcx9_project(
+    project_name="mica",
+    zephyr_board="npcx9/npcx9m7fb",
 )
 
 # Note for reviews, do not let anyone edit these assertions, the addresses
@@ -51,3 +59,4 @@ register_npcx9_project(
 assert_rw_fwid_DO_NOT_EDIT(project_name="bluey", addr=0x80144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="quenbi", addr=0x80144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="quartz", addr=0x40144)
+assert_rw_fwid_DO_NOT_EDIT(project_name="mica", addr=0x40144)

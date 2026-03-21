@@ -279,6 +279,12 @@ static inline void nct38xx_tcpc_vendor_defined_alert(int port)
 #ifdef CONFIG_ZEPHYR
 	const struct device *dev = nct38xx_get_gpio_device_from_port(port);
 
+	if (!dev || !device_is_ready(dev)) {
+		if (dev)
+			CPRINTS("device %s not ready", dev->name);
+		return;
+	}
+
 	nct38xx_gpio_alert_handler(dev);
 #else
 	int ioexport;
@@ -310,7 +316,7 @@ static void nct38xx_tcpc_alert(int port)
 	}
 
 	/* Process normal TCPC ALERT event and clear status. */
-	tcpci_tcpc_alert(port);
+	tcpci_tcpc_alert_with_value(port, alert);
 
 	/*
 	 * If the IO expander feature is enabled, use the ALERT register

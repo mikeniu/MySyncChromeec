@@ -247,6 +247,13 @@ int charge_manager_get_active_charge_port_no_lock(void);
 bool charge_manager_has_active_charge_port(void);
 
 /**
+ * Get the presence of insufficient adapters.
+ *
+ * @return true	 if an insufficient adapter is attached.
+ */
+bool charge_manager_has_insufficient_adapter(void);
+
+/**
  * Get the current selected charge port, as determined by charge manager.
  * This is the charge port that is either active or that we may be
  * transitioning to because a better choice has been given as an option
@@ -338,6 +345,14 @@ void charge_manager_source_port(int port, int enable);
  * @return number of PDOs returned.
  */
 int charge_manager_get_source_pdo(const uint32_t **src_pdo, const int port);
+
+/**
+ * @brief  Set ACOK REF of charger IC
+ *
+ * @param pdo_mv Requested voltage in mV
+ * @return EC_SUCCESS upon success
+ */
+int charge_manager_set_acokref(int pdo_mv);
 
 /* Board-level callback functions */
 

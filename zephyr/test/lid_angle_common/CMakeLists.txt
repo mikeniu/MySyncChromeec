@@ -10,10 +10,9 @@ project(lid_angle_common)
 target_sources(testbinary PRIVATE
   fakes.c
   main.c
-  ../../../common/lid_angle_common.c
+  ../../../common/lid_angle_keyboard_policy.c
 )
 target_include_directories(testbinary PRIVATE
   include
   ../../../include
-  ../../../fuzz
 )

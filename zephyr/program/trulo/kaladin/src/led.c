@@ -40,6 +40,14 @@ LOG_MODULE_DECLARE(ap_pwrseq, LOG_LEVEL_INF);
 #define PWR_LED_CPU_DELAY K_MSEC(2000)
 #define PWR_LED_CPU_DELAY_S5 K_MSEC(4500)
 
+#define MINIMUM_CHARGING_MV 15000
+
+#define LOW_ADP_BLINK_END_STEP 60
+
+#define MINIMUM_LED_READY_DELAY 2
+
+static int blink_cnt;
+static int led_ready_counter;
 const enum ec_led_id supported_led_ids[] = { EC_LED_ID_BATTERY_LED,
 					     EC_LED_ID_POWER_LED };
 
@@ -214,12 +222,24 @@ static void batt_led_config_tick(uint32_t interval, int duty_inc,
 	batt_led_pulse.duty = 0;
 }
 
+static void low_adp_blink_init(void)
+{
+	blink_cnt = 0;
+}
+
 static void led_set_battery(void)
 {
 	static unsigned int battery_ticks;
 	static bool battery_low_triggeied = 0;
 	static bool battery_critical_triggeied = 0;
 	battery_ticks++;
+	/* Avoid LED flicker during EC init. curr.state defaults to ST_IDLE,
+	 * causing led_pwr_get_state() to return LED_PWRS_IDLE before init
+	 * completes. MINIMUM_LED_READY_DELAY * 500ms, Delay 1s */
+	if (led_ready_counter < MINIMUM_LED_READY_DELAY) {
+		led_ready_counter++;
+		return;
+	}
 
 	switch (led_pwr_get_state()) {
 	case LED_PWRS_CHARGE:
@@ -260,6 +280,24 @@ static void led_set_battery(void)
 			hook_call_deferred(&battery_set_pwm_led_tick_data, -1);
 		}
 		break;
+	case LED_PWRS_INSUFFICIENT_ADAPTER:
+		if (led_auto_control_is_enabled(EC_LED_ID_BATTERY_LED) &&
+		    (blink_cnt < LOW_ADP_BLINK_END_STEP)) {
+			/* 500ms on, 500ms off, blink three times, then
+			 * off 2 sec */
+			switch (blink_cnt % 10) {
+			case 0:
+			case 2:
+			case 4:
+				led_set_color_battery_duty(LED_AMBER, 100);
+				break;
+			default:
+				led_set_color_battery_duty(LED_OFF, 0);
+				break;
+			}
+			blink_cnt++;
+		}
+		break;
 	case LED_PWRS_ERROR:
 		if (led_auto_control_is_enabled(EC_LED_ID_BATTERY_LED)) {
 			led_set_color_battery_duty(
@@ -292,6 +330,9 @@ static void led_set_battery(void)
 		/* Other states don't alter LED behavior */
 		break;
 	}
+
+	if (led_pwr_get_state() != LED_PWRS_INSUFFICIENT_ADAPTER)
+		low_adp_blink_init();
 
 	if (led_pwr_get_state() != LED_PWRS_DISCHARGE) {
 		battery_low_triggeied = 0;
@@ -493,6 +534,9 @@ static void pwr_led_init(void)
 		pwr_led_suspend_hook();
 	else
 		pwr_led_shutdown_hook();
+
+	low_adp_blink_init();
+	led_ready_counter = 0;
 }
 DECLARE_HOOK(HOOK_INIT, pwr_led_init, HOOK_PRIO_DEFAULT);
 

@@ -95,18 +95,29 @@
 		panel {
 			enum-name = "FW_PANEL";
 			start = <4>;
-			size = <1>;
+			size = <2>;
 
-			panel-top {
+			panel-top-elan {
 				compatible = "cros-ec,cbi-fw-config-value";
-				enum-name = "PANEL_TOP";
+				enum-name = "PANEL_TOP_ELAN";
 				value = <0>;
 				default;
 			};
-			panel-dbts {
+			panel-dbts-elan {
 				compatible = "cros-ec,cbi-fw-config-value";
 				enum-name = "PANEL_DBTS";
 				value = <1>;
+			};
+			panel-top-gth563 {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "PANEL_TOP_GTH1563";
+				value = <2>;
+				default;
+			};
+			panel-top-gth7503 {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "PANEL_TOP_GTH7503";
+				value = <3>;
 			};
 		};
 
@@ -148,6 +159,11 @@
 				compatible = "cros-ec,cbi-fw-config-value";
 				enum-name = "FW_KB_LAYOUT_US2";
 				value = <1>;
+			};
+			kb-type-jp {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_KB_LAYOUT_JP";
+				value = <2>;
 			};
 		};
 		/*

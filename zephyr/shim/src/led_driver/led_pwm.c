@@ -7,9 +7,9 @@
 
 #define DT_DRV_COMPAT cros_ec_pwm_led_pins
 
+#include "drivers/led.h"
 #include "ec_commands.h"
 #include "hooks.h"
-#include "led.h"
 #include "util.h"
 
 #include <zephyr/devicetree.h>
@@ -51,12 +51,36 @@ DT_INST_FOREACH_CHILD_STATUS_OKAY(0, GEN_PINS_DATA)
 
 DT_INST_FOREACH_CHILD_STATUS_OKAY_VARGS(0, DT_FOREACH_CHILD, GEN_PINS_ARRAY)
 
+static void pwm_set_color_with_pattern(void *p);
+static void pwm_asynchronous_apply_color(bool has_transitions);
+static void pwm_set_color(enum led_color color, enum ec_led_id led_id,
+			  uint8_t brightness);
+static void pwm_get_brightness_range(enum ec_led_id led_id,
+				     uint8_t *brightness_range);
+static int pwm_set_brightness(enum ec_led_id led_id, const uint8_t *brightness);
+
+static const struct led_driver_api pwm_led_driver_api = {
+	.asynchronous_apply_color = pwm_asynchronous_apply_color,
+	.set_color_with_pattern = pwm_set_color_with_pattern,
+	.set_color = pwm_set_color,
+	.get_brightness_range = pwm_get_brightness_range,
+	.set_brightness = pwm_set_brightness,
+};
+
+/* Generate one handle for the driver instance */
+const struct led_driver_t PINS_NODE(DT_DRV_INST(0)) = {
+	.led_id_mask = GET_DRIVER_ID_MASK(0),
+	.api = &pwm_led_driver_api,
+};
+
 /* EC_LED_COLOR maps to LED_COLOR - 1 */
-#define SET_PIN_NODE(node_id)                             \
-	{ .led_color = GET_PROP(node_id, led_color),      \
-	  .led_id = GET_PROP(DT_PARENT(node_id), led_id), \
-	  .pwm_pins = PINS_ARRAY(node_id),                \
-	  .pins_count = DT_PROP_LEN(node_id, led_values) }
+#define SET_PIN_NODE(node_id)                                   \
+	{                                                       \
+		.led_color = GET_PROP(node_id, led_color),      \
+		.led_id = GET_PROP(DT_PARENT(node_id), led_id), \
+		.pins = PINS_ARRAY(node_id),                    \
+		.pins_count = DT_PROP_LEN(node_id, led_values), \
+	}
 
 /*
  * Initialize led_pins_node_t struct for each pin node defined
@@ -86,7 +110,7 @@ void led_set_color_with_pins(const struct pwm_pin_t *pwm_pins,
 {
 	for (int j = 0; j < pins_count; j++) {
 		pwm_pins[j].pwm->pulse_ns =
-			pwm_pins[j].pulse_ns * brightness / 100;
+			pwm_pins[j].pulse_ns * min(brightness, 100) / 100;
 		pwm_pins[j].pwm->pulse_step_ns = pwm_pins[j].pulse_step_ns;
 	}
 }
@@ -94,18 +118,19 @@ void led_set_color_with_pins(const struct pwm_pin_t *pwm_pins,
 /*
  * Iterate through LED pins nodes to find the color matching node.
  */
-void led_set_color(enum led_color color, enum ec_led_id led_id,
-		   uint8_t brightness)
+static void pwm_set_color(enum led_color color, enum ec_led_id led_id,
+			  uint8_t brightness)
 {
 	for (int i = 0; i < ARRAY_SIZE(pins_node); i++) {
 		if ((pins_node[i]->led_color == color) &&
 		    (pins_node[i]->led_id == led_id)) {
-			led_set_color_with_pins(pins_node[i]->pwm_pins,
-						pins_node[i]->pins_count,
-						brightness);
+			led_set_color_with_pins(
+				(struct pwm_pin_t *)pins_node[i]->pins,
+				pins_node[i]->pins_count, brightness);
 			break;
 		}
 	}
+	pwm_asynchronous_apply_color(false);
 }
 
 /*
@@ -128,24 +153,6 @@ void led_set_color(enum led_color color, enum ec_led_id led_id,
 #define LED_PROGRESS_PULSE(id) \
 	DT_FOREACH_PROP_ELEM(id, led_pwms, PIN_PROGRESS_PULSE)
 
-static void led_tick_control(struct k_work *work);
-static K_WORK_DELAYABLE_DEFINE(led_tick_control_data, led_tick_control);
-
-#define LED_STEP_TIME_MS 30
-
-static void led_tick_control(struct k_work *work)
-{
-	uint64_t elapsed;
-	uint64_t delay = 0;
-	uint64_t start = k_uptime_get();
-
-	DT_INST_FOREACH_CHILD_STATUS_OKAY(0, LED_APPLY_COLOR)
-	DT_INST_FOREACH_CHILD_STATUS_OKAY(0, LED_PROGRESS_PULSE)
-	elapsed = k_uptime_delta(&start);
-	delay = (LED_STEP_TIME_MS > elapsed) ? (LED_STEP_TIME_MS - elapsed) : 0;
-	k_work_schedule(&led_tick_control_data, K_MSEC(delay));
-}
-
 /*
  * For every HOOK_TICK_INTERVAL_MS interval, we calculate the beginning and end
  * color based on the desired pattern, then linearly interpolate smoother
@@ -156,20 +163,22 @@ static void led_tick_control(struct k_work *work)
  * approximately equal to 2^17. Because HOOK_TICK_INTERVAL_MS is on a 250ms
  * tick rate, this allows for 4s of transition without loss of accuracy.
  */
-void led_set_color_with_pattern(const struct led_pattern_node_t *pattern)
+static void pwm_set_color_with_pattern(void *p)
 {
+	struct led_pattern_node_t *pattern = (struct led_pattern_node_t *)p;
 	uint8_t pins_count = pattern->pattern_color[pattern->cur_color]
 				     .led_color_node->pins_count;
 	int32_t duration_ms =
 		pattern->pattern_color[pattern->cur_color].duration_ms;
 	struct pwm_pin_t *next_color =
-		pattern->pattern_color[pattern->cur_color]
-			.led_color_node->pwm_pins;
+		(struct pwm_pin_t *)pattern->pattern_color[pattern->cur_color]
+			.led_color_node->pins;
 	uint8_t prev_color_idx =
 		(pattern->cur_color + pattern->pattern_len - 1) %
 		pattern->pattern_len;
 	struct pwm_pin_t *prev_color =
-		pattern->pattern_color[prev_color_idx].led_color_node->pwm_pins;
+		(struct pwm_pin_t *)pattern->pattern_color[prev_color_idx]
+			.led_color_node->pins;
 	struct pwm_pin_t cur_color[pins_count];
 
 	for (int i = 0; i < pins_count; i++) {
@@ -185,7 +194,7 @@ void led_set_color_with_pattern(const struct led_pattern_node_t *pattern)
 			cur_color[i].pulse_step_ns = (next_color[i].pulse_ns -
 						      prev_color[i].pulse_ns) /
 						     duration_ms *
-						     LED_STEP_TIME_MS;
+						     LED_ANIMATION_TICK_MS;
 		}
 		/*
 		 * This algorithm first finds the ratio of the starting and end
@@ -203,16 +212,16 @@ void led_set_color_with_pattern(const struct led_pattern_node_t *pattern)
 			if (next_color[i].pulse_ns > prev_color[i].pulse_ns) {
 				int32_t scale =
 					next_color[i].pulse_ns /
-					MAX(prev_color[i].pulse_ns, PWM_MIN_NS);
+					max(prev_color[i].pulse_ns, PWM_MIN_NS);
 				cur_color[i].pulse_ns =
-					MAX(prev_color[i].pulse_ns, PWM_MIN_NS)
+					max(prev_color[i].pulse_ns, PWM_MIN_NS)
 					<< (MSB(scale) * pattern->elapsed_ms /
 					    duration_ms);
 			} else if (next_color[i].pulse_ns <
 				   prev_color[i].pulse_ns) {
 				int32_t scale =
 					prev_color[i].pulse_ns /
-					MAX(next_color[i].pulse_ns, PWM_MIN_NS);
+					max(next_color[i].pulse_ns, PWM_MIN_NS);
 				cur_color[i].pulse_ns =
 					prev_color[i].pulse_ns >>
 					(MSB(scale) * pattern->elapsed_ms /
@@ -230,7 +239,8 @@ void led_set_color_with_pattern(const struct led_pattern_node_t *pattern)
 	led_set_color_with_pins(cur_color, pins_count, 100);
 }
 
-void led_get_brightness_range(enum ec_led_id led_id, uint8_t *brightness_range)
+static void pwm_get_brightness_range(enum ec_led_id led_id,
+				     uint8_t *brightness_range)
 {
 	memset(brightness_range, 0, EC_LED_COLOR_COUNT);
 
@@ -247,7 +257,7 @@ void led_get_brightness_range(enum ec_led_id led_id, uint8_t *brightness_range)
 	}
 }
 
-int led_set_brightness(enum ec_led_id led_id, const uint8_t *brightness)
+static int pwm_set_brightness(enum ec_led_id led_id, const uint8_t *brightness)
 {
 	bool color_set = false;
 
@@ -270,31 +280,14 @@ int led_set_brightness(enum ec_led_id led_id, const uint8_t *brightness)
 	if (!color_set)
 		led_set_color(LED_OFF, led_id, 0);
 
-	led_asynchronous_apply_color(false);
+	pwm_asynchronous_apply_color(false);
 	return EC_SUCCESS;
 }
 
-__override int led_is_supported(enum ec_led_id led_id)
+static void pwm_asynchronous_apply_color(bool has_transitions)
 {
-	static int supported_leds = -1;
-
-	if (supported_leds == -1) {
-		supported_leds = 0;
-
-		for (int i = 0; i < ARRAY_SIZE(pins_node); i++)
-			supported_leds |= (1 << pins_node[i]->led_id);
-	}
-
-	return ((1 << (int)led_id) & supported_leds);
-}
-
-/* Called by hook task every HOOK_TICK_INTERVAL_MS */
-void led_asynchronous_apply_color(bool has_transitions)
-{
+	DT_INST_FOREACH_CHILD_STATUS_OKAY(0, LED_APPLY_COLOR)
 	if (has_transitions) {
-		k_work_schedule(&led_tick_control_data, K_NO_WAIT);
-	} else {
-		k_work_cancel_delayable(&led_tick_control_data);
-		DT_INST_FOREACH_CHILD_STATUS_OKAY(0, LED_APPLY_COLOR)
+		DT_INST_FOREACH_CHILD_STATUS_OKAY(0, LED_PROGRESS_PULSE)
 	}
 }

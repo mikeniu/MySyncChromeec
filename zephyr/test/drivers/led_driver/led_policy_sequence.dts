@@ -1,0 +1,125 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	led-colors {
+		compatible = "cros-ec,led-policy";
+		led-pins = <&led_pins>;
+
+		/* Label 1 is the standard default state: solid White */
+		seq-white {
+			board-led-alt-policy-label = <1>;
+			battery-led-logic {
+				led-id = "EC_LED_ID_BATTERY_LED";
+				color-0 {
+					led-color = <&battery_led_white>;
+				};
+			};
+		};
+
+		/* Label 2 triggers Infinite Loop (cycle-count = 0) */
+		seq-infinite {
+			board-led-alt-policy-label = <2>;
+
+			battery-led-logic {
+				led-id = "EC_LED_ID_BATTERY_LED";
+				cycle-count = <0>;
+				color-0 {
+					led-color = <&battery_led_blue>;
+					period-ms = <500>;
+				};
+				color-1 {
+					led-color = <&battery_led_white>;
+					period-ms = <500>;
+				};
+			};
+		};
+
+		/* Label 3 triggers Run-Once (cycle-count = 1) */
+		seq-once {
+			board-led-alt-policy-label = <3>;
+
+			battery-led-logic {
+				led-id = "EC_LED_ID_BATTERY_LED";
+				cycle-count = <1>;
+				color-0 {
+					led-color = <&battery_led_white>;
+					period-ms = <250>;
+				};
+				color-1 {
+					led-color = <&battery_led_blue>;
+					period-ms = <250>;
+				};
+			};
+		};
+
+		/* Label 4 triggers Instant Transition at start */
+		seq-instant-init {
+			board-led-alt-policy-label = <4>;
+			battery-led-logic {
+				led-id = "EC_LED_ID_BATTERY_LED";
+				color-0 {
+					led-color = <&battery_led_off>;
+					period-ms = <0>;
+				};
+				color-1 {
+					led-color = <&battery_led_blue>;
+					period-ms = <0>;
+				};
+				color-2 {
+					led-color = <&battery_led_white>;
+					period-ms = <250>;
+				};
+			};
+		};
+
+		/* Label 5 triggers All-Zero Pattern (Safety Guard) */
+		seq-all-zero {
+			board-led-alt-policy-label = <5>;
+			battery-led-logic {
+				led-id = "EC_LED_ID_BATTERY_LED";
+				color-0 {
+					led-color = <&battery_led_blue>;
+					period-ms = <0>;
+				};
+				color-1 {
+					led-color = <&battery_led_white>;
+					period-ms = <0>;
+				};
+			};
+		};
+
+		/* Label 6 triggers Instant Transition in middle */
+		seq-mid-instant {
+			board-led-alt-policy-label = <6>;
+			battery-led-logic {
+				led-id = "EC_LED_ID_BATTERY_LED";
+				color-0 {
+					led-color = <&battery_led_blue>;
+					period-ms = <250>;
+				};
+				color-1 {
+					led-color = <&battery_led_off>;
+					period-ms = <0>;
+				};
+				color-2 {
+					led-color = <&battery_led_white>;
+					period-ms = <250>;
+				};
+			};
+		};
+
+		/* Label 7: Solid Off (used for preemption test) */
+		seq-off {
+			board-led-alt-policy-label = <7>;
+			battery-led-logic {
+				led-id = "EC_LED_ID_BATTERY_LED";
+				color-0 {
+					led-color = <&battery_led_off>;
+				};
+			};
+		};
+	};
+};

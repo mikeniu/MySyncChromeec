@@ -1,0 +1,18 @@
+<<<<<<< HEAD   (d6c32f2441663510e20ae2d25d5edeb8956421b9 program,zmake: drop cmsis references)
+||||||| BASE   (4f79cf3e850f16ecfb53fcd1c296c608faa9aef0 fpsensor: Add fingerprint_auth_enabled())
+# Fingerprint Sensor
+
+# Don't inherit owners from elsewhere in the manifest
+set noparent
+
+include chromiumos/owners:v1:/firmware/OWNERS.cros_fp
+=======
+# Fingerprint Sensor
+
+# Don't inherit owners from elsewhere in the manifest
+set noparent
+
+include chromiumos/owners:v1:/firmware/OWNERS.cros_fp
+
+include chromiumos/owners:v1:/bots/OWNERS.copybot
+>>>>>>> BRANCH (98351621e96c0a9288be41db08b0e97738bbe1f1 padme: Add padme_rts5439s_vb_vif.xml)

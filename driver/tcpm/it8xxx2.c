@@ -679,6 +679,7 @@ static int it8xxx2_tcpm_transmit(int port, enum tcpci_msg_type type,
 {
 	int status = TCPC_TX_COMPLETE_FAILED;
 	bool pd_transmit_complete_called = false;
+	timestamp_t tx_ts = get_time();
 
 	switch (type) {
 	case TCPCI_MSG_SOP:
@@ -709,7 +710,7 @@ static int it8xxx2_tcpm_transmit(int port, enum tcpci_msg_type type,
 		break;
 	}
 	if (!pd_transmit_complete_called) {
-		pd_transmit_complete(port, status);
+		pd_transmit_complete(port, status, &tx_ts);
 	}
 
 	return EC_SUCCESS;
@@ -840,8 +841,17 @@ static void it8xxx2_init(enum usbpd_port port, int role)
 		const struct cc_para_t *ptr =
 			board_get_cc_tuning_parameter(port);
 
-		IT83XX_USBPD_CCPSR3_RISE(port) = ptr->rising_time;
-		IT83XX_USBPD_CCPSR4_FALL(port) = ptr->falling_time;
+		if (ptr->rc_filter != IT83XX_TX_RC_FILTER_TRIM) {
+			IT83XX_USBPD_CCPSR0(port) = ptr->rc_filter;
+		}
+
+		if (ptr->rising_time != IT83XX_TX_PRE_DRIVING_TIME_TRIM) {
+			IT83XX_USBPD_CCPSR3_RISE(port) = ptr->rising_time;
+		}
+
+		if (ptr->falling_time != IT83XX_TX_PRE_DRIVING_TIME_TRIM) {
+			IT83XX_USBPD_CCPSR4_FALL(port) = ptr->falling_time;
+		}
 	}
 	/* Reset and disable HW auto generate message header */
 	IT83XX_USBPD_PDMSR(port) &= ~USBPD_REG_MASK_DISABLE_AUTO_GEN_TX_HEADER;
@@ -904,6 +914,7 @@ static void it8xxx2_init(enum usbpd_port port, int role)
 	*usbpd_ctrl_regs[port].cc2 = cc_config;
 	task_clear_pending_irq(usbpd_ctrl_regs[port].irq);
 #ifdef CONFIG_ZEPHYR
+	task_disable_irq(usbpd_ctrl_regs[port].irq);
 	irq_connect_dynamic(usbpd_ctrl_regs[port].irq, 0,
 			    (void (*)(const void *))chip_pd_irq, (void *)port,
 			    0);

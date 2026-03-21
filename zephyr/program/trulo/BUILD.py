@@ -27,7 +27,7 @@ def register_trulo_project(
                 here / project_name / "project.overlay",
             ],
             kconfig_files=kconfig_files + [here / "dsp_comms.conf"],
-            modules=["cmsis", "cmsis_6", "picolibc", "ec", "pigweed", "nanopb"],
+            modules=["cmsis_6", "picolibc", "ec", "pigweed", "nanopb"],
             inherited_from=inherited_from,
             **kwargs,
         )
@@ -40,7 +40,7 @@ def register_trulo_project(
             ],
             kconfig_files=kconfig_files + [here / "dsp_comms.conf"],
             inherited_from=inherited_from,
-            modules=["cmsis", "cmsis_6", "picolibc", "ec", "pigweed", "nanopb"],
+            modules=["cmsis_6", "picolibc", "ec", "pigweed", "nanopb"],
             **kwargs,
         )
 
@@ -144,7 +144,6 @@ register_ish_project(
         # here / "trulo-ish" / "debug.conf",
         here / "dsp_comms.conf",
     ],
-    modules=["ec", "cmsis", "cmsis_6", "hal_intel_public", "pigweed", "nanopb"],
     inherited_from=["nissa"],
 )
 
@@ -160,7 +159,6 @@ register_ish_project(
         # here / "trulo-ish" / "debug.conf",
         here / "dsp_comms.conf",
     ],
-    modules=["ec", "cmsis", "cmsis_6", "hal_intel_public", "pigweed", "nanopb"],
     inherited_from=["nissa"],
 )
 
@@ -176,7 +174,6 @@ register_ish_project(
         # here / "pujjolo-ish" / "debug.conf",
         here / "dsp_comms.conf",
     ],
-    modules=["ec", "cmsis", "hal_intel_public", "pigweed", "nanopb"],
     inherited_from=["nissa"],
 )
 
@@ -190,7 +187,6 @@ register_ish_project(
         here / "kaladin-ish" / "project.conf",
         here / "dsp_comms.conf",
     ],
-    modules=["ec", "cmsis", "cmsis_6", "hal_intel_public", "pigweed", "nanopb"],
     inherited_from=["nissa"],
 )
 
@@ -203,7 +199,6 @@ register_ish_project(
     kconfig_files=[
         here / "lite-ish" / "project.conf",
     ],
-    modules=["ec", "cmsis", "hal_intel_public"],
 )
 # Note for reviews, do not let anyone edit these assertions, the addresses
 # must not change after the first RO release.

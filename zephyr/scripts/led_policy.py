@@ -39,7 +39,14 @@ def check_policy(
     for node in policies.children.values():
         # check_policy is a replica of the match_node() function in led.c
         if "charge-state" in node.props:
-            if charge_state != node.props["charge-state"].val:
+            match = False
+
+            for state in node.props["charge-state"].val:
+                if charge_state == state:
+                    match = True
+                    break
+
+            if not match:
                 continue
 
             if "charge-port" in node.props:
@@ -47,7 +54,14 @@ def check_policy(
                     continue
 
         if "chipset-state" in node.props:
-            if chipset_state != node.props["chipset-state"].val:
+            match = False
+
+            for state in node.props["chipset-state"].val:
+                if chipset_state == state:
+                    match = True
+                    break
+
+            if not match:
                 continue
 
         if "board-led-alt-policy-label" in node.props:
@@ -67,6 +81,7 @@ def check_policy(
         for led_node in node.children.values():
             if led_node.props["led-id"].val == led_id:
                 ret += 1
+                break
 
     return ret
 
@@ -137,21 +152,17 @@ def log_state(
     return True
 
 
-def iterate_power_states(edt, project_name):
+def iterate_power_states(edt, project_name, policies):
     """Iterate all combinations of states and test the led policy coverage.
 
     Args:
         edt: EDT object representation of a devicetree
+        project_name: Name of the board that is being built
+        policies: The specific led-policy node instance to check
 
     Returns:
         num_errors: Number of missing or overcoverage policies detected.
     """
-    led_policy_nodes = edt.compat2okay["cros-ec,led-policy"]
-
-    if len(led_policy_nodes) != 1:
-        return 0
-    policies = led_policy_nodes[0]
-
     charge_state_list = [None]
 
     charge_port_list = [None]
@@ -160,7 +171,7 @@ def iterate_power_states(edt, project_name):
 
     board_led_alt_policy_label_list = []
 
-    board_led_alt_policy_label_sum = 0
+    board_led_alt_policy_label_sum = 1
 
     led_id_list = []
 
@@ -318,7 +329,11 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
     if util.is_test(args.edt_pickle):
         return 0
 
-    if iterate_power_states(edt, project_dir.name):
+    num_errors = 0
+    for policy in edt.compat2okay["cros-ec,led-policy"]:
+        num_errors += iterate_power_states(edt, project_dir.name, policy)
+
+    if num_errors:
         return 1
 
     return 0

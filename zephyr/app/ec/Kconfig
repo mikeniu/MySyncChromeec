@@ -24,7 +24,7 @@ orsource "chip/$(ARCH)/*/Kconfig.*"
 # Override the maximum number of preemptive priority levels.
 #
 config NUM_PREEMPT_PRIORITIES
-	default 27
+	default 30
 
 #
 # In Zephyr, the default system workqueue thread priority level is the lowest
@@ -32,7 +32,7 @@ config NUM_PREEMPT_PRIORITIES
 # priority. (i.e. NUM_PREEMPT_PRIORITIES - 1)
 #
 config SYSTEM_WORKQUEUE_PRIORITY
-	default 24
+	default 29
 
 # eSPI is chatty, so default to Error only
 choice ESPI_LOG_LEVEL_CHOICE
@@ -115,6 +115,8 @@ config CROS_EC_RO_MEM_OFF
 config CROS_EC_RO_SIZE
 	hex "The size of the RO region."
 	default 0xb000 if ARCH_POSIX
+	default $(dt_node_int_prop_hex,/binman/wp-ro,image-size) \
+		if $(dt_node_has_prop,/binman/wp-ro,image-size)
 	default $(dt_node_int_prop_hex,/binman/wp-ro,size)
 	help
 		This will be used (along with SYSTEM_RO_MEM_OFF) to determine if the
@@ -133,6 +135,14 @@ config CROS_EC_RW_SIZE
 	help
 		This will be used (along with SYSTEM_RW_MEM_OFF) to determine if the
 		current PC is in the RW section.
+
+config CROS_EC_FIRMWARE_LOAD_OFF
+	hex "The offset in flash to load firmware"
+	default 0x0
+	help
+	  The offset in flash at which a firmware binary is loaded.
+	  The config is used to determine storage offsets properly in case the
+	  offset is not 0.
 
 # By default, a unit test doesn't need shimmed tasks.
 config SHIMMED_TASKS
@@ -192,5 +202,9 @@ config PWM_SHELL
 
 config WDT_SHELL
 	default y if WATCHDOG
+
+# Realtek ULPM support requires POWEROFF
+config POWEROFF
+	default y if SOC_RTS5912_ULPM
 
 endif # CROS_EC

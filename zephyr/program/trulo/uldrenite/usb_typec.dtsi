@@ -29,6 +29,14 @@
 	};
 };
 
+&usbc_port0 {
+	zephyr,deferred-init;
+};
+
+&usbc_port1 {
+	zephyr,deferred-init;
+};
+
 &i2c3_0 {
 	label = "I2C_PORT_PD";
 	clock-frequency = <I2C_BITRATE_FAST_PLUS>;
@@ -40,6 +48,7 @@
 		irq-gpios = <&gpio0 2 GPIO_ACTIVE_LOW>;
 		port-index-on-chip = <0x1>;
 		zephyr,deferred-init;
+		frs-supported;
 	};
 	pdc_power_p1: tps6699-pdc@24 {
 		compatible = "ti,tps6699-pdc";
@@ -49,6 +58,7 @@
 		port-index-on-chip = <0x2>;
 		no-fw-update;
 		zephyr,deferred-init;
+		frs-supported;
 	};
 };
 

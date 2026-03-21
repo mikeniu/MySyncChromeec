@@ -219,6 +219,7 @@
 
 	led-colors {
 		compatible = "cros-ec,led-policy";
+		led-pins = <&led_pins>;
 
 		/* Magikarp LED bat charge */
 		bat-power-state-charge {
@@ -229,7 +230,7 @@
 			battery-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_AMBER";
+					led-color = <&battery_led_amber>;
 				};
 			};
 		};
@@ -242,7 +243,7 @@
 			battery-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_WHITE";
+					led-color = <&battery_led_white>;
 				};
 			};
 		};
@@ -258,7 +259,7 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = "LED_WHITE";
+					led-color = <&battery_led_white>;
 				};
 			};
 		};
@@ -274,12 +275,12 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = "LED_AMBER";
+					led-color = <&battery_led_amber>;
 					period-ms = <1000>;
 				};
 
 				color-1 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 					period-ms = <3000>;
 				};
 			};
@@ -293,12 +294,12 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = "LED_WHITE";
+					led-color = <&battery_led_white>;
 					period-ms = <1000>;
 				};
 
 				color-1 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 					period-ms = <3000>;
 				};
 			};
@@ -311,7 +312,7 @@
 			battery-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 				};
 			};
 		};
@@ -325,12 +326,12 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = "LED_AMBER";
+					led-color = <&battery_led_amber>;
 					period-ms = <1000>;
 				};
 
 				color-1 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 					period-ms = <1000>;
 				};
 			};
@@ -344,12 +345,12 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = "LED_WHITE";
+					led-color = <&battery_led_white>;
 					period-ms = <1000>;
 				};
 
 				color-1 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 					period-ms = <3000>;
 				};
 			};
@@ -363,13 +364,13 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 				};
 			};
 		};
 	};
 
-	pwm-led-pins {
+	led_pins: pwm-led-pins {
 		compatible = "cros-ec,pwm-led-pins";
 
 		power_led: power-led {
@@ -377,7 +378,7 @@
 			led-pwms = <&led_power_white>;
 
 			/* Overwrite Power LED white to off */
-			color-power-white {
+			power_led_white: color-power-white {
 				led-color = "LED_WHITE";
 				led-values = <0>;
 			};

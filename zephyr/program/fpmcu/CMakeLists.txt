@@ -24,4 +24,20 @@ if (DEFINED CONFIG_BASEBOARD_HELIPILOT)
 	project(helipilot)
 endif()
 
+if (DEFINED CONFIG_BOARD_ET171)
+	add_subdirectory(et171)
+	project(et171)
+endif()
+
+if (DEFINED CONFIG_BOARD_EM32F967)
+	add_subdirectory(em32f967)
+	project(em32f967)
+endif()
+
+set(EXPECTED_ROLLBACK_VERSION 1)
+
+if(NOT CONFIG_PLATFORM_EC_ROLLBACK_VERSION EQUAL EXPECTED_ROLLBACK_VERSION)
+	message(FATAL_ERROR "Rollback version has changed! Expected ${EXPECTED_ROLLBACK_VERSION}, but ${CONFIG_PLATFORM_EC_ROLLBACK_VERSION} is set.")
+endif()
+
 zephyr_library_sources_ifdef(CONFIG_EC_HOST_CMD "src/fp_transport.c")

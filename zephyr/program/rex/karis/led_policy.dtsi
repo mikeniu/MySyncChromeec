@@ -3,6 +3,7 @@
 / {
 	led-colors {
 		compatible = "cros-ec,led-policy";
+		led-pins = <&led_pins>;
 
 		power-state-near-full {
 			charge-state = "LED_PWRS_CHARGE_NEAR_FULL";
@@ -11,7 +12,7 @@
 			batt-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_BLUE";
+					led-color = <&battery_led_blue>;
 				};
 			};
 		};
@@ -25,7 +26,7 @@
 			batt-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_BLUE";
+					led-color = <&battery_led_blue>;
 				};
 			};
 		};
@@ -39,7 +40,7 @@
 			batt-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_AMBER";
+					led-color = <&battery_led_amber>;
 				};
 			};
 		};
@@ -52,7 +53,7 @@
 			batt-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_BLUE";
+					led-color = <&battery_led_blue>;
 				};
 			};
 		};
@@ -65,11 +66,11 @@
 			batt-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_AMBER";
+					led-color = <&battery_led_amber>;
 					period-ms = <1000>;
 				};
 				color-1 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 					period-ms = <3000>;
 				};
 			};
@@ -83,7 +84,7 @@
 			batt-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 				};
 			};
 		};
@@ -95,11 +96,11 @@
 			batt-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_AMBER";
+					led-color = <&battery_led_amber>;
 					period-ms = <2000>;
 				};
 				color-1 {
-					led-color = "LED_BLUE";
+					led-color = <&battery_led_blue>;
 					period-ms = <2000>;
 				};
 			};
@@ -112,7 +113,7 @@
 			batt-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_BLUE";
+					led-color = <&battery_led_blue>;
 				};
 			};
 		};
@@ -124,11 +125,11 @@
 			batt-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = "LED_AMBER";
+					led-color = <&battery_led_amber>;
 					period-ms = <1000>;
 				};
 				color-1 {
-					led-color = "LED_OFF";
+					led-color = <&battery_led_off>;
 					period-ms = <1000>;
 				};
 			};
