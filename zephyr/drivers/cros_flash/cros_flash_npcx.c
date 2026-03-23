@@ -200,10 +200,6 @@ static int cros_flash_npcx_set_status_reg(const struct device *dev,
 	};
 	struct cros_flash_npcx_data *data = DRV_DATA(dev);
 
-	if (data == 0) {
-		return -EINVAL;
-	}
-
 	/* Enable write first */
 	ret = cros_flash_npcx_set_write_enable(dev);
 	if (ret != 0) {
@@ -626,7 +622,7 @@ static int cros_flash_npcx_write(const struct device *dev, int offset, int size,
 		return EC_ERROR_ACCESS_DENIED;
 
 	/* Invalid data pointer? */
-	if (src_data == 0) {
+	if (src_data == NULL) {
 		return -EINVAL;
 	}
 
