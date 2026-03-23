@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c95a944_31bae318",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 477,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-23T20:06:37Z",
+      "side": 1,
+      "message": "In a followup CL, you should enable the RW version of the test, by only skipping the RO version of the test. You\u0027ll need to check the `test_config_config_name` (see below) for an example.\n\nDo this for all of the boards.",
+      "range": {
+        "startLine": 475,
+        "startChar": 0,
+        "endLine": 477,
+        "endChar": 29
+      },
+      "revId": "f1e30e415b71712012393923943670d989e63d6d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
