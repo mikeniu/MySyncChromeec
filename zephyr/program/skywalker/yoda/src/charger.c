@@ -22,6 +22,11 @@ static const char *p2s_battery_models[] = {
 	"l26d2pk1", // MODEL_L26D2PK1
 };
 
+int pd_get_usb_pd_3a_ports(void)
+{
+	return (pre_battery_cells == BATT_2_CELLS) ? 0 : 1;
+}
+
 static bool is_2s_battery(const char *model)
 {
 	for (int i = 0; i < ARRAY_SIZE(p2s_battery_models); i++) {
