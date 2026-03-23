@@ -250,7 +250,6 @@
 
 /* Optional for testing */
 #undef CONFIG_PECI
-#undef CONFIG_PSTORE
 
 #define CONFIG_TASK_PROFILING
 #define CONFIG_MKBP_USE_GPIO
@@ -343,6 +342,7 @@
 /* Exclude PD state names from RO image to save space */
 #undef CONFIG_USB_PD_TCPMV1_DEBUG
 #undef CONFIG_TASK_PROFILING
+#undef CONFIG_HOSTCMD_WATCHDOG_INFO
 #endif /* SECTION_IS_RO */
 
 #elif defined(VARIANT_KUKUI_EC_IT81202)

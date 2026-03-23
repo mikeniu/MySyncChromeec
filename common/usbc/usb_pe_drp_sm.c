@@ -777,9 +777,24 @@ static void init_cable_rev(int port)
 #define prl_send_ext_data_msg DO_NOT_USE
 #define prl_send_ctrl_msg DO_NOT_USE
 
+static void pe_set_frs_enable(int port, int enable);
+
+static void pe_reset_flags(int port)
+{
+	if (PE_CHK_FLAG(port, PE_FLAGS_FAST_ROLE_SWAP_ENABLED)) {
+		/* Calling set_frs_enable(port, 1) twice in a roll may break the
+		 * state of registers.
+		 */
+		pe_set_frs_enable(port, 0);
+	}
+
+	/* Reset flags */
+	memset(&pe[port].flags_a, 0, sizeof(pe[port].flags_a));
+}
+
 static void pe_init(int port)
 {
-	memset(&pe[port].flags_a, 0, sizeof(pe[port].flags_a));
+	pe_reset_flags(port);
 	pe[port].dpm_request = 0;
 	pe[port].dpm_curr_request = 0;
 	pd_timer_disable_range(port, PE_TIMER_RANGE);
@@ -794,20 +809,6 @@ static void pe_init(int port)
 	else
 		set_state_pe(port, PE_SNK_STARTUP);
 }
-
-#ifdef CONFIG_ZEPHYR
-static int init_pe_drp_sm_mutexes(void)
-{
-	int port;
-
-	for (port = 0; port < CONFIG_USB_PD_PORT_MAX_COUNT; port++) {
-		k_mutex_init(&pe[port].ado_lock);
-	}
-
-	return 0;
-}
-SYS_INIT(init_pe_drp_sm_mutexes, POST_KERNEL, 50);
-#endif /* CONFIG_ZEPHYR */
 
 int pe_is_running(int port)
 {
@@ -2669,7 +2670,7 @@ static void pe_src_send_capabilities_run(int port)
 			 * ports.
 			 */
 			prl_set_rev(port, TCPCI_MSG_SOP,
-				    MIN(PD_REVISION,
+				    min(PD_REVISION,
 					PD_HEADER_REV(rx_emsg[port].header)));
 
 			init_cable_rev(port);
@@ -3299,8 +3300,7 @@ static void pe_src_transition_to_default_entry(int port)
 {
 	print_current_state(port);
 
-	/* Reset flags */
-	memset(&pe[port].flags_a, 0, sizeof(pe[port].flags_a));
+	pe_reset_flags(port);
 
 	/* Reset DPM Request */
 	pe[port].dpm_request = 0;
@@ -3530,7 +3530,7 @@ static void pe_snk_evaluate_capability_entry(int port)
 
 	/* Set to highest revision supported by both ports. */
 	prl_set_rev(port, TCPCI_MSG_SOP,
-		    MIN(PD_REVISION, PD_HEADER_REV(rx_emsg[port].header)));
+		    min(PD_REVISION, PD_HEADER_REV(rx_emsg[port].header)));
 
 	init_cable_rev(port);
 
@@ -3635,7 +3635,7 @@ static void pe_snk_apply_transition_current(int port)
 	 * input voltage, because both voltages may appear during the
 	 * transition.
 	 */
-	high_mv = MAX(charge_manager_get_charger_voltage(), request_mv);
+	high_mv = max(charge_manager_get_charger_voltage(), request_mv);
 
 	if (request_ma == 0) {
 		/* Transition to 0A. */
@@ -3657,11 +3657,15 @@ static void pe_snk_apply_transition_current(int port)
 		 */
 		current_limit = PD_MIN_MA;
 	}
+	/* charge_manager_invalidate_suppliers makes sure that no other supplier
+	 * will keep the limit above 0. charge_manager_force_ceil makes sure the
+	 * change takes effect ASAP.
+	 */
 
 	if (current_limit == 0)
 		charge_manager_invalidate_suppliers(port);
-	else
-		charge_manager_force_ceil(port, current_limit);
+
+	charge_manager_force_ceil(port, current_limit);
 }
 
 static void pe_snk_select_capability_run(int port)
@@ -4319,8 +4323,7 @@ static void pe_snk_transition_to_default_entry(int port)
 {
 	print_current_state(port);
 
-	/* Reset flags */
-	memset(&pe[port].flags_a, 0, sizeof(pe[port].flags_a));
+	pe_reset_flags(port);
 
 	/* Reset DPM Request */
 	pe[port].dpm_request = 0;
@@ -4658,7 +4661,7 @@ static void pe_give_battery_cap_entry(int port)
 			 * 10th of a Wh = Wh * 10
 			 */
 			msg[BCDB_FULL_CAP] = DIV_ROUND_NEAREST(
-				(design_cap * full_cap), 100000);
+				(full_cap * design_volt), 100000);
 		} else {
 			uint32_t v;
 			uint32_t c;
@@ -4838,9 +4841,6 @@ __maybe_unused static void pe_give_sink_cap_ext_entry(int port)
 
 	skedb.vid = USB_VID_GOOGLE;
 	skedb.pid = CONFIG_USB_PID;
-#ifdef CONFIG_ZEPHYR /* USB_PD_XID is not defined in CrosEC */
-	skedb.xid = CONFIG_USB_PD_XID;
-#endif
 	skedb.fw_version = 0;
 	skedb.hw_version = 0;
 	skedb.skedb_version = 1; /* version 1.0 */
@@ -5530,11 +5530,15 @@ static void pe_prs_snk_src_source_on_entry(int port)
 	print_current_state(port);
 
 	/*
-	 * VBUS was enabled when the TypeC state machine entered
-	 * Attached.SRC state
+	 * VBUS was enabled when the Type-C state machine entered Attached.SRC.
+	 * In the Fast Role Swap (FRS) case, the PPC/TCPC has already driven
+	 * VBUS to vSafe5V, so we don’t need to wait for the normal
+	 * PD_POWER_SUPPLY_TURN_ON_DELAY. A 0-tick timer ensures PS_RDY is sent
+	 * immediately.
 	 */
 	pd_timer_enable(port, PE_TIMER_PS_SOURCE,
-			PD_POWER_SUPPLY_TURN_ON_DELAY);
+			(pe_in_frs_mode(port) ? 0 :
+						PD_POWER_SUPPLY_TURN_ON_DELAY));
 }
 
 static void pe_prs_snk_src_source_on_run(int port)

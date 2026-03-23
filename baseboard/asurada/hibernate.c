@@ -22,9 +22,7 @@ __override void board_hibernate_late(void)
 	 * fallback to usual hibernate process.
 	 */
 	if (board_get_version() <= 1) {
-		if (IS_ENABLED(BOARD_ASURADA) ||
-		    (IS_ENABLED(CONFIG_ZEPHYR) &&
-		     IS_ENABLED(CONFIG_BOARD_ASURADA)))
+		if (IS_ENABLED(BOARD_ASURADA))
 			return;
 	}
 

@@ -1,0 +1,18 @@
+<<<<<<< HEAD   (8425edc75f37afbab1f49a0dbbae0ced50f1d910 Merge remote-tracking branch cros/main into firmware-fpmcu-d)
+||||||| BASE   (0a02ef2224a20eba93820738e1f05e7c0aef1254 pdc: tps6699x: Add support for returning GET_PD_MESSAGE resp)
+# Fingerprint Sensor
+
+# Don't inherit owners from elsewhere in the manifest
+set noparent
+
+include chromiumos/owners:v1:/firmware/OWNERS.cros_fp
+=======
+# Fingerprint Sensor
+
+# Don't inherit owners from elsewhere in the manifest
+set noparent
+
+include chromiumos/owners:v1:/firmware/OWNERS.cros_fp
+
+include chromiumos/owners:v1:/bots/OWNERS.copybot
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)

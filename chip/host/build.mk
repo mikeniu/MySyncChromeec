@@ -20,3 +20,4 @@ dirs-y += chip/host/dcrypto
 
 chip-$(CONFIG_I2C)+= i2c.o
 chip-$(CONFIG_OTP_KEY)+= otp_key.o
+chip-$(CONFIG_WATCHDOG)+= watchdog.o

@@ -90,10 +90,8 @@ __maybe_unused static const struct gpio_flag_description gpio_descriptions[] = {
 #ifdef GPIO_SEL_1P8V
 	{ GPIO_SEL_1P8V, "1P8" },
 #endif
-#ifndef CONFIG_ZEPHYR
 	{ GPIO_ANALOG, "A" },	    { GPIO_ALTERNATE, "ALT" },
 	{ GPIO_LOCKED, "LCK" }
-#endif
 };
 
 static void print_gpio_info(int gpio)
@@ -177,7 +175,6 @@ static int command_gpio_set(int argc, const char **argv)
 		flags = GPIO_OUT_HIGH;
 	else if (strcasecmp(argv[2], "0") == 0)
 		flags = GPIO_OUT_LOW;
-#ifndef CONFIG_ZEPHYR
 	else if (strcasecmp(argv[2], "A") == 0)
 		flags = GPIO_ANALOG;
 	else if (strcasecmp(argv[2], "ALT") == 0) {
@@ -188,9 +185,7 @@ static int command_gpio_set(int argc, const char **argv)
 				return EC_ERROR_PARAM2;
 		}
 		flags = GPIO_ALTERNATE;
-	}
-#endif
-	else
+	} else
 		return EC_ERROR_PARAM2;
 
 	/* Update alt function if requested. */

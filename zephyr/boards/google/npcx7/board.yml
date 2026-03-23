@@ -1,5 +1,0 @@
-board:
-  name: npcx7
-  vendor: google
-  socs:
-  - name: npcx7m7fc

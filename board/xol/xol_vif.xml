@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vif:VIF xmlns:opt="http://usb.org/VendorInfoFileOptionalContent.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:vif="http://usb.org/VendorInfoFile.xsd">
-  <vif:VIF_Specification>3.35</vif:VIF_Specification>
+  <vif:VIF_Specification>3.36</vif:VIF_Specification>
   <vif:VIF_App>
     <vif:Vendor>USB-IF</vif:Vendor>
     <vif:Name>VIF Editor</vif:Name>
-    <vif:Version>3.13.0.0</vif:Version>
+    <vif:Version>3.14.0.0</vif:Version>
   </vif:VIF_App>
   <vif:Vendor_Name>Google</vif:Vendor_Name>
   <vif:Model_Part_Number>xol</vif:Model_Part_Number>
@@ -33,9 +33,9 @@
     <!--;General PD-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <vif:PD_Spec_Revision_Major value="3">3</vif:PD_Spec_Revision_Major>
-    <vif:PD_Spec_Revision_Minor value="1">1</vif:PD_Spec_Revision_Minor>
+    <vif:PD_Spec_Revision_Minor value="2">2</vif:PD_Spec_Revision_Minor>
     <vif:PD_Spec_Version_Major value="1">1</vif:PD_Spec_Version_Major>
-    <vif:PD_Spec_Version_Minor value="3">3</vif:PD_Spec_Version_Minor>
+    <vif:PD_Spec_Version_Minor value="0">0</vif:PD_Spec_Version_Minor>
     <vif:PD_Specification_Revision value="2">Revision 3</vif:PD_Specification_Revision>
     <vif:SOP_Capable value="true" />
     <vif:SOP_P_Capable value="true" />
@@ -106,7 +106,7 @@
     <vif:EPR_Supported_As_Src value="false" />
     <vif:USB_Suspend_May_Be_Cleared value="true" />
     <vif:Sends_Pings value="false" />
-    <vif:FR_Swap_Type_C_Current_Capability_As_Initial_Sink value="3">3A @ 5V</vif:FR_Swap_Type_C_Current_Capability_As_Initial_Sink>
+    <vif:FR_Swap_Type_C_Current_Capability_As_Initial_Sink value="0">FR_Swap not supported</vif:FR_Swap_Type_C_Current_Capability_As_Initial_Sink>
     <vif:Master_Port value="false" />
     <vif:Has_Invariant_PDOs value="false" />
     <vif:Port_Managed_Guaranteed_Type value="0">Managed Capability</vif:Port_Managed_Guaranteed_Type>
@@ -166,7 +166,7 @@
     <vif:Accepts_PR_Swap_As_Snk value="true" />
     <vif:Requests_PR_Swap_As_Src value="true" />
     <vif:Requests_PR_Swap_As_Snk value="true" />
-    <vif:FR_Swap_Supported_As_Initial_Sink value="true" />
+    <vif:FR_Swap_Supported_As_Initial_Sink value="false" />
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <!--;SOP Discover ID-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
@@ -199,9 +199,9 @@
     <!--;General PD-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <vif:PD_Spec_Revision_Major value="3">3</vif:PD_Spec_Revision_Major>
-    <vif:PD_Spec_Revision_Minor value="1">1</vif:PD_Spec_Revision_Minor>
+    <vif:PD_Spec_Revision_Minor value="2">2</vif:PD_Spec_Revision_Minor>
     <vif:PD_Spec_Version_Major value="1">1</vif:PD_Spec_Version_Major>
-    <vif:PD_Spec_Version_Minor value="3">3</vif:PD_Spec_Version_Minor>
+    <vif:PD_Spec_Version_Minor value="0">0</vif:PD_Spec_Version_Minor>
     <vif:PD_Specification_Revision value="2">Revision 3</vif:PD_Specification_Revision>
     <vif:SOP_Capable value="true" />
     <vif:SOP_P_Capable value="true" />
@@ -272,7 +272,7 @@
     <vif:EPR_Supported_As_Src value="false" />
     <vif:USB_Suspend_May_Be_Cleared value="true" />
     <vif:Sends_Pings value="false" />
-    <vif:FR_Swap_Type_C_Current_Capability_As_Initial_Sink value="3">3A @ 5V</vif:FR_Swap_Type_C_Current_Capability_As_Initial_Sink>
+    <vif:FR_Swap_Type_C_Current_Capability_As_Initial_Sink value="0">FR_Swap not supported</vif:FR_Swap_Type_C_Current_Capability_As_Initial_Sink>
     <vif:Master_Port value="false" />
     <vif:Has_Invariant_PDOs value="false" />
     <vif:Port_Managed_Guaranteed_Type value="0">Managed Capability</vif:Port_Managed_Guaranteed_Type>
@@ -332,7 +332,7 @@
     <vif:Accepts_PR_Swap_As_Snk value="true" />
     <vif:Requests_PR_Swap_As_Src value="true" />
     <vif:Requests_PR_Swap_As_Snk value="true" />
-    <vif:FR_Swap_Supported_As_Initial_Sink value="true" />
+    <vif:FR_Swap_Supported_As_Initial_Sink value="false" />
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <!--;SOP Discover ID-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->

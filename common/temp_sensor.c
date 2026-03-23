@@ -15,11 +15,6 @@
 #include "timer.h"
 #include "util.h"
 
-#ifdef CONFIG_ZEPHYR
-#include "temp_sensor/temp_sensor.h"
-#endif
-
-#ifndef CONFIG_ZEPHYR
 int temp_sensor_read(enum temp_sensor_id id, int *temp_ptr)
 {
 	const struct temp_sensor_t *sensor;
@@ -30,7 +25,6 @@ int temp_sensor_read(enum temp_sensor_id id, int *temp_ptr)
 
 	return sensor->read(sensor->idx, temp_ptr);
 }
-#endif
 
 static void update_mapped_memory(void)
 {

@@ -18,10 +18,8 @@ extern "C" {
 #endif
 
 #ifdef CONFIG_FLASH_MULTIPLE_REGION
-#ifndef CONFIG_ZEPHYR
 extern struct ec_flash_bank const
 	flash_bank_array[CONFIG_FLASH_REGION_TYPE_COUNT];
-#endif
 
 /*
  * Return the bank the offset is in.
@@ -132,7 +130,7 @@ int crec_flash_response_fill_banks(struct ec_response_flash_info_2 *r,
 #endif
 #else /* CONFIG_FLASH_PSTATE && CONFIG_FLASH_PSTATE_BANK */
 /* Allow flashrom to program the entire write protected area */
-#define EC_FLASH_REGION_RO_SIZE CONFIG_WP_STORAGE_SIZE
+#define EC_FLASH_REGION_RO_SIZE (CONFIG_WP_STORAGE_SIZE - CONFIG_RO_STORAGE_OFF)
 #define PSTATE_BANK_COUNT 0
 #endif /* CONFIG_FLASH_PSTATE && CONFIG_FLASH_PSTATE_BANK */
 

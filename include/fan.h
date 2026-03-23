@@ -13,39 +13,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef CONFIG_ZEPHYR
-#ifdef CONFIG_PLATFORM_EC_FAN
-
-#include <zephyr/devicetree.h>
-#include <zephyr/drivers/pwm.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#define NODE_ID_AND_COMMA(node_id) node_id,
-enum fan_channel {
-#if DT_NODE_EXISTS(DT_INST(0, cros_ec_fans))
-	DT_FOREACH_CHILD(DT_INST(0, cros_ec_fans), NODE_ID_AND_COMMA)
-#endif /* cros_ec_fans */
-		FAN_CH_COUNT
-};
-
-BUILD_ASSERT(FAN_CH_COUNT == CONFIG_PLATFORM_EC_NUM_FANS);
-
-/* Data structure to define PWM and tachometer. */
-struct fan_config {
-	struct pwm_dt_spec pwm;
-
-	const struct device *tach;
-};
-
-#ifdef CONFIG_FAN_DYNAMIC_CONFIG
-extern struct fan_config fan_config[FAN_CH_COUNT];
-#endif
-
-#endif /* CONFIG_PLATFORM_EC_FAN */
-#endif /* CONFIG_ZEPHYR */
 
 /**
  * STOPPED means not spinning.
@@ -247,22 +217,6 @@ int fan_get_count(void);
 void fan_set_count(int count);
 
 int is_thermal_control_enabled(int idx);
-
-#ifdef CONFIG_ZEPHYR
-extern struct fan_data fan_data[];
-
-/**
- * This function sets PWM duty based on target RPM.
- *
- * The target and current RPM values in fan_data entry that
- * corresponds to selected fan has to be updated before this
- * function is called.
- *
- * @param ch    Fan number (index into fan_data[] and fans[])
- * Return       Fan status (see fan_status enum definition)
- */
-enum fan_status board_override_fan_control_duty(int ch);
-#endif
 
 #ifdef __cplusplus
 }

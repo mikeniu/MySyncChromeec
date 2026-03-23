@@ -1,1 +1,0 @@
-../../../../board_power/meteorlake.c

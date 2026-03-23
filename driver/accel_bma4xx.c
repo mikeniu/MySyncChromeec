@@ -343,7 +343,7 @@ static uint8_t bma4_odr_to_reg(uint32_t odr)
 	 * and the upper bound is limited to the highest non-reserved sample
 	 * rate (higher rates are documented but marked as reserved).
 	 */
-	odr = MIN(MAX(782 /* 25/32 Hz */, odr), 1600000);
+	odr = min(max(782 /* 25/32 Hz */, odr), 1600000);
 
 	/*
 	 * reg_to_odr (above) is fairly easy to understand, but this operation
@@ -405,7 +405,7 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int round)
 			 * the highest supported rate (odr_3k2 and higher are
 			 * documented but marked as reserved).
 			 */
-			odr_reg_val = MIN(BMA4_OUTPUT_DATA_RATE_1600HZ,
+			odr_reg_val = min(BMA4_OUTPUT_DATA_RATE_1600HZ,
 					  odr_reg_val + 1);
 
 		/* Determine the new value of control reg and write it. */
@@ -559,17 +559,14 @@ static int init(struct motion_sensor_t *s)
 
 	/* Configure interrupt-driven acquisition if desired */
 	if (IS_ENABLED(BMA4XX_USE_INTERRUPTS)) {
-		GOTO_ON_ERROR(out,
-			      bma4_write8(s, BMA4_CMD_ADDR, BMA4_FIFO_FLUSH));
+		/* Configure INT1 pin */
+		GOTO_ON_ERROR(out, bma4_write8(s, BMA4_INT1_IO_CTRL_ADDR,
+					       BMA4_INT1_OUTPUT_EN));
 		/*
-		 * Enable all interrupts on INT1 pin, active-low push-pull
-		 * output, latched until status register read.
+		 * Enable latched until status register read.
 		 */
 		GOTO_ON_ERROR(out, bma4_write8(s, BMA4_INT_LATCH_ADDR,
 					       BMA4_INT_LATCH));
-		GOTO_ON_ERROR(out, bma4_write8(s, BMA4_INT_MAP_DATA_ADDR,
-					       BMA4_INT1_DRDY | BMA4_INT1_FWM |
-						       BMA4_INT1_FFULL));
 		/* Enable FIFO in headerless mode, accel data only */
 		GOTO_ON_ERROR(out, bma4_write8(s, BMA4_FIFO_CONFIG_1_ADDR,
 					       BMA4_FIFO_ACC_EN));
@@ -598,9 +595,12 @@ static int bma4xx_enable_interrupt(const struct motion_sensor_t *s, bool enable)
 	/* Flush the FIFO */
 	GOTO_ON_ERROR(out, bma4_write8(s, BMA4_CMD_ADDR, BMA4_FIFO_FLUSH));
 
-	/* Configure INT1 pin */
-	GOTO_ON_ERROR(out, bma4_write8(s, BMA4_INT1_IO_CTRL_ADDR,
-				       enable ? BMA4_INT1_OUTPUT_EN : 0));
+	/* Enable/Disable all interrupts on INT1 pin, active-low push-pull
+	 * output */
+	GOTO_ON_ERROR(out, bma4_write8(s, BMA4_INT_MAP_DATA_ADDR,
+				       enable ? BMA4_INT1_DRDY | BMA4_INT1_FWM |
+							BMA4_INT1_FFULL :
+						0));
 
 	/* Read interrupt status, to clears any pending IRQs */
 	GOTO_ON_ERROR(out,
@@ -692,7 +692,7 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 			bma4_read16(s, BMA4_FIFO_LENGTH_0_ADDR, &fifo_depth));
 		while (fifo_depth > 0) {
 			uint8_t fifo_data[FIFO_BUFFER_SIZE];
-			int fifo_read = MIN(ARRAY_SIZE(fifo_data), fifo_depth);
+			int fifo_read = min(ARRAY_SIZE(fifo_data), fifo_depth);
 			int ret;
 
 			mutex_lock(s->mutex);

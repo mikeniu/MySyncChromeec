@@ -241,7 +241,6 @@ static int command_run_test(int argc, const char **argv)
 }
 DECLARE_CONSOLE_COMMAND(runtest, command_run_test, NULL, NULL);
 
-#ifndef CONFIG_ZEPHYR
 void z_ztest_run_test_suite(const char *name, struct unit_test *suite)
 {
 	test_reset();
@@ -260,4 +259,3 @@ void z_ztest_run_test_suite(const char *name, struct unit_test *suite)
 
 	test_print_result();
 }
-#endif /* CONFIG_ZEPHYR */

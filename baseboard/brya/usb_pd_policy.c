@@ -80,7 +80,6 @@ int board_vbus_source_enabled(int port)
 	return ppc_is_sourcing_vbus(port);
 }
 
-#ifdef CONFIG_USB_PD_TBT_COMPAT_MODE
 /* ----------------- Vendor Defined Messages ------------------ */
 /* Responses specifically for the enablement of TBT mode in the role of UFP */
 
@@ -149,17 +148,18 @@ static int svdm_tbt_compat_response_identity(int port, uint32_t *payload)
 		payload[VDO_I(PRODUCT)] = vdo_product;
 
 		if (pd_get_rev(port, TCPCI_MSG_SOP) == PD_REV30) {
+			payload[VDO_I(PTYPE_UFP2_VDO)] = 0;
+			payload[VDO_I(PTYPE_DFP_VDO)] = vdo_dfp;
 			/* PD Revision 3.0 */
 			if (tbt_ufp_ack_allowed[port]) {
 				payload[VDO_I(IDH)] = vdo_idh_rev30_tbt;
 				payload[VDO_I(PTYPE_UFP1_VDO)] = vdo_ufp1;
+				return VDO_I(PTYPE_DFP_VDO) + 1;
 			} else {
 				payload[VDO_I(IDH)] = vdo_idh_rev30_no_ufp;
 				payload[VDO_I(PTYPE_UFP1_VDO)] = 0;
+				return VDO_I(PTYPE_UFP1_VDO) + 1;
 			}
-			payload[VDO_I(PTYPE_UFP2_VDO)] = 0;
-			payload[VDO_I(PTYPE_DFP_VDO)] = vdo_dfp;
-			return VDO_I(PTYPE_DFP_VDO) + 1;
 		}
 
 		/* PD Revision 2.0 */
@@ -202,6 +202,8 @@ static int svdm_tbt_compat_response_modes(int port, uint32_t *payload)
 __override enum ec_status
 board_set_tbt_ufp_reply(int port, enum typec_tbt_ufp_reply reply)
 {
+	if (!IS_ENABLED(CONFIG_USB_PD_TBT_COMPAT_MODE))
+		return EC_RES_ERROR;
 	/* Note: Host command has already bounds-checked port */
 	if (reply == TYPEC_TBT_UFP_REPLY_ACK)
 		tbt_ufp_ack_allowed[port] = true;
@@ -265,4 +267,3 @@ const struct svdm_response svdm_rsp = {
 	.amode = NULL,
 	.exit_mode = NULL,
 };
-#endif /* CONFIG_USB_PD_TBT_COMPAT_MODE */

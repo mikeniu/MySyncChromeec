@@ -18,6 +18,10 @@
 #define CONFIG_LTO /* Link-Time Optimizations to reduce code size */
 #define CONFIG_EMULATED_SYSRQ
 
+/* Disable hcdebug because it is noisy */
+#undef CONFIG_HOSTCMD_DEBUG_MODE
+#define CONFIG_HOSTCMD_DEBUG_MODE HCDEBUG_OFF
+
 #undef CONFIG_UART_TX_BUF_SIZE
 #define CONFIG_UART_TX_BUF_SIZE 4096
 
@@ -152,9 +156,9 @@
 #define CONFIG_BATTERY_FUEL_GAUGE
 #define CONFIG_BATTERY_REVIVE_DISCONNECT
 #define CONFIG_BATTERY_SMART
-#define CONFIG_BATTERY_V2
+#define CONFIG_BATTERY_INFO
 #define CONFIG_BATTERY_COUNT 1
-#define CONFIG_HOSTCMD_BATTERY_V2
+#define CONFIG_HOSTCMD_BATTERY_INFO
 #define CONFIG_BC12_DETECT_PI3USB9201
 /* Enable PEC to detect potential corruption on read (b/230520109) */
 #define CONFIG_SMBUS_PEC

@@ -3,8 +3,6 @@
  * found in the LICENSE file.
  */
 
-/* Keyboard config common to ECOS and zephyr */
-
 #include "keyboard_raw.h"
 #include "keyboard_scan.h"
 #include "timer.h"
