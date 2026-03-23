@@ -21,4 +21,44 @@
 		compatible = "mmio-sram";
 		reg = <0x20043e00 512>;
 	};
+
+	sdcp_pk_m: memory@20043E14 {
+		compatible = "mmio-sram";
+		reg = <0x20043E14 65>;
+	};
+
+	sdcp_s_goog: memory@20043E55 {
+		compatible = "mmio-sram";
+		reg = <0x20043E55 64>;
+	};
+
+	sdcp_pk_d: memory@20043F35 {
+		compatible = "mmio-sram";
+		reg = <0x20043F35 65>;
+	};
+
+	sdcp_s_m: memory@20043E95 {
+		compatible = "mmio-sram";
+		reg = <0x20043E95 64>;
+	};
+
+	sdcp_pk_f: memory@20043F76 {
+		compatible = "mmio-sram";
+		reg = <0x20043F76 65>;
+	};
+
+	sdcp_h_f: memory@20043ED5 {
+		compatible = "mmio-sram";
+		reg = <0x20043ED5 32>;
+	};
+
+	sdcp_s_d: memory@20043EF5 {
+		compatible = "mmio-sram";
+		reg = <0x20043EF5 64>;
+	};
+
+	sdcp_sk_f: memory@20043FB7 {
+		compatible = "mmio-sram";
+		reg = <0x20043FB7 32>;
+	};
 };
