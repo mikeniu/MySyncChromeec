@@ -1,0 +1,74 @@
+// Copyright 2026 The ChromiumOS Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+#ifndef ELANAPP_IAPCONTROL_H
+#define ELANAPP_IAPCONTROL_H
+
+#include <cstdint>
+#include <format>
+#include <fstream>
+#include <functional>
+#include <iostream>
+#include <optional>
+#include <span>
+#include <string>
+#include <vector>
+
+struct FWVERINFO {
+	uint32_t fwVer;
+	uint8_t bootType;
+};
+
+namespace ElanApp
+{
+
+class iapcontrol {
+    public:
+	iapcontrol();
+	~iapcontrol();
+
+	int runIapProcess(std::span<const uint8_t> rom);
+
+	void setProgressCallback(std::function<void(int, int)> callback);
+
+    private:
+	int runIap(uint8_t iapMode);
+	int finishIap(uint32_t checksum);
+	int softwareReset();
+	std::optional<FWVERINFO> getFwVersion();
+	int abortProcess();
+	int writeRom(uint32_t length);
+	int writeRomFinish(uint32_t checksum);
+	int setRomAddress(uint32_t address);
+	int setOptionAddress(uint32_t address);
+	int readRom(uint32_t length);
+	int readRomFinish(uint32_t checksum);
+	int writeRomData(std::span<const uint8_t> buff);
+	int readRomData(std::span<uint8_t> buff);
+
+	int connectDevice(uint16_t vid, uint16_t pid);
+	int getDeviceCount(uint16_t vid, uint16_t pid);
+	int iapCommand(std::span<const uint8_t> buff);
+	int iapSendCommand(std::span<const uint8_t> buff);
+	int iapRecvStatus(std::span<uint8_t> buff);
+	int iapSendData(std::span<const uint8_t> buff);
+	int iapRecvData(std::span<uint8_t> buff);
+	int set32Le(std::span<uint8_t> buff, uint32_t value);
+	uint32_t get32Le(std::span<const uint8_t> buff);
+	std::optional<uint32_t> getChecksum(std::span<const uint8_t> buff);
+	void releaseResource();
+
+	template <typename... Args>
+	void logInfo(std::format_string<Args...> fmt, Args &&...args)
+	{
+		std::cout << std::format(fmt, std::forward<Args>(args)...);
+	}
+
+	std::function<void(int, int)> m_progressCallback;
+	int m_deviceStatus;
+	int m_deviceCount = 1;
+};
+}
+
+#endif
