@@ -42,7 +42,7 @@
 #define IWDG_PRESCALER_DIV (4 << IWDG_PRESCALER)
 
 #if !defined(CONFIG_DFU_BOOTMANAGER_MAIN)
-void watchdog_reload(void)
+void chip_watchdog_reload(void)
 {
 	/* Reload the watchdog */
 	STM32_IWDG_KR = STM32_IWDG_KR_RELOAD;
@@ -51,7 +51,6 @@ void watchdog_reload(void)
 	hwtimer_reset_watchdog();
 #endif
 }
-DECLARE_HOOK(HOOK_TICK, watchdog_reload, HOOK_PRIO_DEFAULT);
 #endif
 
 int watchdog_init(void)
@@ -69,7 +68,7 @@ int watchdog_init(void)
 	STM32_IWDG_PR = IWDG_PRESCALER & 7;
 
 	/* Set the reload value of the watchdog counter */
-	STM32_IWDG_RLR = MIN(STM32_IWDG_RLR_MAX,
+	STM32_IWDG_RLR = min(STM32_IWDG_RLR_MAX,
 			     CONFIG_WATCHDOG_PERIOD_MS *
 				     (LSI_CLOCK / IWDG_PRESCALER_DIV) / 1000);
 #ifdef CHIP_FAMILY_STM32L4

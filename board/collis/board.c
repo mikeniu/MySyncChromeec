@@ -88,7 +88,7 @@ board_vivaldi_keybd_config(void)
 
 /******************************************************************************/
 /*
- * FW_CONFIG defaults for Terrador if the CBI data is not initialized.
+ * FW_CONFIG defaults if the CBI data is not initialized.
  */
 union volteer_cbi_fw_config fw_config_defaults = {
 	.usb_db = DB_USB3_ACTIVE,

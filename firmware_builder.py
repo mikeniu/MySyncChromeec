@@ -23,10 +23,11 @@ from util.coreboot_sdk import init_toolchain
 
 # cros format puts this here
 import yaml  # pylint: disable=wrong-import-order
-import zephyr.scripts.firmware_builder_lib
 
 # pylint: disable=wrong-import-order
 from chromite.api.gen_sdk.chromite.api import firmware_pb2
+from chromite.lib.chromeos_version import VersionInfo
+import scripts.firmware_builder_lib
 
 
 DEFAULT_BUNDLE_DIRECTORY = "/tmp/artifact_bundles"
@@ -99,7 +100,6 @@ EXPECTED_UNUSED_BOARDS = {
     "zed",  # Remove 2031-06
     # Fingerprint development
     "bloonchipper-druid",
-    "gwendolin",
     "hatch_fp",
     "nocturne_fp",
     "nucleo-dartmonkey",
@@ -148,24 +148,6 @@ def build(opts):
     subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
 
     cmd = ["make", "buildall_only", f"-j{opts.cpus}"]
-    print(f"# Running {' '.join(cmd)}.")
-    subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
-
-    # extra/rma_reset is used in chromeos-base/ec-utils-test
-    cmd = ["make", "-C", "extra/rma_reset", "clean"]
-    print(f"# Running {' '.join(cmd)}.")
-    subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
-
-    cmd = ["make", "-C", "extra/rma_reset", f"-j{opts.cpus}"]
-    print(f"# Running {' '.join(cmd)}.")
-    subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
-
-    # extra/usb_updater is used in chromeos-base/ec-devutils
-    cmd = ["make", "-C", "extra/usb_updater", "clean"]
-    print(f"# Running {' '.join(cmd)}.")
-    subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
-
-    cmd = ["make", "-C", "extra/usb_updater", "usb_updater2", f"-j{opts.cpus}"]
     print(f"# Running {' '.join(cmd)}.")
     subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
 
@@ -303,32 +285,109 @@ def bundle_coverage(opts):
     write_metadata(opts, info)
 
 
+def get_version():
+    """Determine the current chroot version."""
+    ver = VersionInfo.from_repo(source_repo=find_checkout())
+    if ver:
+        return ver.VersionString()
+    return None
+
+
 def bundle_firmware(opts):
     """Bundles the artifacts from each target into its own tarball."""
     info = firmware_pb2.FirmwareArtifactInfo()  # pylint: disable=no-member
     info.bcs_version_info.version_string = opts.bcs_version
+    version = opts.bcs_version or get_version()
     bundle_dir = get_bundle_dir(opts)
     ec_dir = os.path.dirname(__file__)
+    cmd = ["make", "print-all-baseboards", f"-j{opts.cpus}"]
+    print(f"# Running {' '.join(cmd)}.")
+    baseboards = {}
+    env = os.environ.copy()
+    env.update(init_toolchain())
+    for line in subprocess.run(
+        cmd,
+        cwd=os.path.dirname(__file__),
+        check=True,
+        universal_newlines=True,
+        stdout=subprocess.PIPE,
+        env=env,
+    ).stdout.splitlines():
+        parts = line.split("=")
+        if len(parts) > 1:
+            baseboards[parts[0]] = parts[1]
+
     for build_target in sorted(os.listdir(os.path.join(ec_dir, "build"))):
         if build_target in ["host"]:
             continue
-        tarball_name = "".join([build_target, ".firmware.tbz2"])
+        artifacts_dir = pathlib.Path(
+            os.path.join(ec_dir, "build", build_target)
+        )
+        # karis.EC.15709.192.0.tar.bz2
+        if version:
+            tarball_name = f"{build_target}.EC.{version}.tar.bz2"
+            elf_tarball_name = f"{build_target}.EC_elf.{version}.tar.bz2"
+        else:
+            tarball_name = f"{build_target}.EC.tar.bz2"
+            elf_tarball_name = f"{build_target}.EC_elf.tar.bz2"
+
         tarball_path = os.path.join(bundle_dir, tarball_name)
         cmd = [
             "tar",
-            "cvfj",
+            r"--transform=s/\.config/ec.config/",
+            "-cvjf",
             tarball_path,
-            "--exclude=*.d",
-            "--exclude=*.o",
-            ".",
         ]
+        cmd.extend(
+            [
+                str(x.relative_to(artifacts_dir))
+                for x in artifacts_dir.glob("*.bin")
+            ]
+        )
+        cmd.extend(
+            [
+                str(x.relative_to(artifacts_dir))
+                for x in artifacts_dir.glob(".config")
+            ]
+        )
+        print(f"# Running {' '.join(cmd)}.")
         subprocess.run(
             cmd,
-            cwd=os.path.join(ec_dir, "build", build_target),
+            cwd=artifacts_dir,
             check=True,
+            stdin=subprocess.DEVNULL,
         )
         meta = info.objects.add()
+        if build_target in baseboards and baseboards[build_target]:
+            meta.tarball_info.board.append(baseboards[build_target])
         meta.file_name = tarball_name
+        meta.tarball_info.type = (
+            firmware_pb2.FirmwareArtifactInfo.TarballInfo.FirmwareType.EC  # pylint: disable=no-member
+        )
+        tarball_path = os.path.join(bundle_dir, elf_tarball_name)
+        cmd = [
+            "tar",
+            r"--transform=s/.*\///",
+            "-cvjf",
+            tarball_path,
+        ]
+        cmd.extend(
+            [
+                str(x.relative_to(artifacts_dir))
+                for x in artifacts_dir.glob("*/*.elf")
+            ]
+        )
+        print(f"# Running {' '.join(cmd)}.")
+        subprocess.run(
+            cmd,
+            cwd=artifacts_dir,
+            check=True,
+            stdin=subprocess.DEVNULL,
+        )
+        meta = info.objects.add()
+        if build_target in baseboards and baseboards[build_target]:
+            meta.tarball_info.board.append(baseboards[build_target])
+        meta.file_name = elf_tarball_name
         meta.tarball_info.type = (
             firmware_pb2.FirmwareArtifactInfo.TarballInfo.FirmwareType.EC  # pylint: disable=no-member
         )
@@ -351,9 +410,6 @@ def test(opts):
         cwd=os.path.dirname(__file__),
         check=True,
     )
-    subprocess.run(
-        ["util/run_tests.sh"], cwd=os.path.dirname(__file__), check=True
-    )
 
     # If building for code coverage, build the 'coverage' target, which
     # builds the posix-based unit tests for code coverage and assembles
@@ -370,7 +426,7 @@ def test(opts):
 
     if not opts.code_coverage:
         # Verify compilation of the on-device unit test binaries.
-        # TODO(b/172501728) These should build  for all boards, but they've bit
+        # TODO(b/172501728) These should build for all boards, but they've bit
         # rotted, so we only build the ones that compile.
         cmd = ["make", f"-j{opts.cpus}"]
         cmd.extend(["tests-" + b for b in BOARDS_UNIT_TEST])
@@ -384,16 +440,19 @@ def test(opts):
         print(f"# Deleting {host_dir}")
         shutil.rmtree(host_dir)
 
-        cmd = ["make", "TEST_ASAN=y", target, f"-j{opts.cpus}"]
+        cmd = ["make", "TEST_ASAN=y", target, f"-j{opts.cpus}", "BOARD=host"]
         print(f"# Running {' '.join(cmd)}.")
         subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
+
+        print(f"# Deleting {host_dir}")
+        shutil.rmtree(host_dir)
 
         # Use the x86_64-cros-linux-gnu- compiler also
         cmd = [
             "make",
-            "clean",
             "HOST_CROSS_COMPILE=x86_64-cros-linux-gnu-",
             "TEST_ASAN=y",
+            "BOARD=host",
             target,
             f"-j{opts.cpus}",
         ]
@@ -615,7 +674,7 @@ def main(args):
 
     Additionally, the tool reports build metrics.
     """
-    parser, sub_cmds = zephyr.scripts.firmware_builder_lib.create_arg_parser(
+    parser, sub_cmds = scripts.firmware_builder_lib.create_arg_parser(
         build, bundle, test
     )
     check_inherits_cmd = sub_cmds.add_parser(

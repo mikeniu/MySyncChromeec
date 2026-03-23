@@ -13,10 +13,6 @@
 
 #define ADC_READ_ERROR -1 /* Value returned by adc_read_channel() on error */
 
-#ifdef CONFIG_ZEPHYR
-#include <zephyr_adc.h>
-#endif /* CONFIG_ZEPHYR */
-
 #ifdef __cplusplus
 extern "C" {
 #endif

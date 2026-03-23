@@ -25,11 +25,7 @@ void otp_key_init(void)
 	status = otpi_power(true);
 	if (status != API_RET_OTP_STATUS_OK) {
 		ccprintf("ERROR! %s failed %x\n", __func__, status);
-#if defined(CONFIG_ZEPHYR)
-		k_oops();
-#else
 		software_panic(PANIC_SW_ASSERT, task_get_current());
-#endif
 	}
 }
 
@@ -102,11 +98,7 @@ enum ec_error_list otp_key_provision(void)
 
 	if (bytes_are_trivial(otp_key_buffer, OTP_KEY_SIZE_BYTES)) {
 		ccprintf("ERROR! %s RNG failed!\n", __func__);
-#if defined(CONFIG_ZEPHYR)
-		k_oops();
-#else
 		software_panic(PANIC_SW_BAD_RNG, task_get_current());
-#endif
 	}
 
 	ec_status = otp_key_write(otp_key_buffer);

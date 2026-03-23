@@ -336,8 +336,7 @@
 #endif
 
 /* WOV module (Optional) */
-#if defined(NPCX_WOV_SUPPORT) && (defined(CONFIG_AUDIO_CODEC_I2S_RX) || \
-				  defined(CONFIG_AUDIO_CODEC_WOV))
+#if defined(NPCX_WOV_SUPPORT) && defined(CONFIG_AUDIO_CODEC_I2S_RX)
 #define NPCX_ALT_GPIO_9_5 /* Disable SPIP module if WOV is supported */
 #define NPCX_ALT_GPIO_A_3 /* Disable SPIP module if WOV is supported */
 #define NPCX_ALT_GPIO_A_1 /* Disable SPIP module if WOV is supported */

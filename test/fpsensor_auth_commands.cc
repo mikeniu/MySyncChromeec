@@ -50,65 +50,6 @@ static enum ec_error_list get_fp_encryption_status(uint32_t *status)
 	return EC_SUCCESS;
 }
 
-test_static enum ec_error_list test_fp_command_check_context_cleared(void)
-{
-	uint32_t status;
-	fp_reset_and_clear_context();
-	TEST_EQ(get_fp_encryption_status(&status), EC_SUCCESS, "%d");
-	TEST_BITS_CLEARED((int)status, FP_CONTEXT_USER_ID_SET);
-	TEST_EQ(check_context_cleared(), EC_SUCCESS, "%d");
-
-	struct ec_params_fp_context_v1 params_no_id = {
-		.action = FP_CONTEXT_GET_RESULT,
-	};
-	TEST_EQ(test_send_host_command(EC_CMD_FP_CONTEXT, 1, &params_no_id,
-				       sizeof(params_no_id), NULL, 0),
-		EC_RES_SUCCESS, "%d");
-	TEST_EQ(get_fp_encryption_status(&status), EC_SUCCESS, "%d");
-	TEST_BITS_CLEARED((int)status, FP_CONTEXT_USER_ID_SET);
-	TEST_EQ(check_context_cleared(), EC_SUCCESS, "%d");
-
-	struct ec_params_fp_context_v1 params = {
-		.action = FP_CONTEXT_GET_RESULT,
-		.userid = { 0, 1, 2, 3, 4, 5, 6, 7 },
-	};
-	TEST_EQ(test_send_host_command(EC_CMD_FP_CONTEXT, 1, &params,
-				       sizeof(params), NULL, 0),
-		EC_RES_SUCCESS, "%d");
-	TEST_EQ(get_fp_encryption_status(&status), EC_SUCCESS, "%d");
-	TEST_BITS_SET((int)status, FP_CONTEXT_USER_ID_SET);
-	TEST_EQ(check_context_cleared(), EC_ERROR_ACCESS_DENIED, "%d");
-
-	fp_reset_and_clear_context();
-	TEST_EQ(check_context_cleared(), EC_SUCCESS, "%d");
-
-	global_context.templ_valid++;
-	TEST_EQ(check_context_cleared(), EC_ERROR_ACCESS_DENIED, "%d");
-
-	fp_reset_and_clear_context();
-	TEST_EQ(check_context_cleared(), EC_SUCCESS, "%d");
-
-	global_context.templ_dirty |= BIT(0);
-	TEST_EQ(check_context_cleared(), EC_ERROR_ACCESS_DENIED, "%d");
-
-	fp_reset_and_clear_context();
-	TEST_EQ(check_context_cleared(), EC_SUCCESS, "%d");
-
-	global_context.positive_match_secret_state.template_matched = 0;
-	TEST_EQ(check_context_cleared(), EC_ERROR_ACCESS_DENIED, "%d");
-
-	fp_reset_and_clear_context();
-	TEST_EQ(check_context_cleared(), EC_SUCCESS, "%d");
-
-	global_context.fp_encryption_status |= FP_CONTEXT_USER_ID_SET;
-	TEST_EQ(check_context_cleared(), EC_ERROR_ACCESS_DENIED, "%d");
-
-	fp_reset_and_clear_context();
-	TEST_EQ(check_context_cleared(), EC_SUCCESS, "%d");
-
-	return EC_SUCCESS;
-}
-
 test_static enum ec_error_list
 test_fp_command_establish_pairing_key_keygen(void)
 {
@@ -214,7 +155,7 @@ test_static enum ec_error_list test_fp_command_establish_pairing_key_fail(void)
 	return EC_SUCCESS;
 }
 
-test_static enum ec_error_list test_fp_command_load_pairing_key_fail(void)
+test_static enum ec_error_list test_fp_command_load_pairing_key_invalid(void)
 {
 	enum ec_status rv;
 	ec_response_fp_establish_pairing_key_keygen keygen_response;
@@ -263,28 +204,6 @@ test_static enum ec_error_list test_fp_command_load_pairing_key_fail(void)
 				    sizeof(load_params), NULL, 0);
 
 	TEST_EQ(rv, EC_RES_UNAVAILABLE, "%d");
-
-	/* Cannot be loaded if the context is not cleared. */
-	struct ec_params_fp_context_v1 params = {
-		.action = FP_CONTEXT_GET_RESULT,
-		.userid = { 0, 1, 2, 3, 4, 5, 6, 7 },
-	};
-	TEST_EQ(test_send_host_command(EC_CMD_FP_CONTEXT, 1, &params,
-				       sizeof(params), NULL, 0),
-		EC_RES_SUCCESS, "%d");
-
-	memcpy(&load_params.encrypted_pairing_key.info,
-	       &wrap_response.encrypted_pairing_key.info,
-	       sizeof(wrap_response.encrypted_pairing_key.info));
-
-	memcpy(load_params.encrypted_pairing_key.data,
-	       wrap_response.encrypted_pairing_key.data,
-	       sizeof(wrap_response.encrypted_pairing_key.data));
-
-	rv = test_send_host_command(EC_CMD_FP_LOAD_PAIRING_KEY, 0, &load_params,
-				    sizeof(load_params), NULL, 0);
-
-	TEST_EQ(rv, EC_RES_ACCESS_DENIED, "%d");
 
 	return EC_SUCCESS;
 }
@@ -376,7 +295,7 @@ static enum ec_error_list generate_valid_establish_session_request(
 	/* Obtain session key on our side */
 	std::array<uint8_t, SHA256_DIGEST_SIZE> session_key;
 	enum ec_error_list ret = generate_session_key(
-		fpmcu_nonce, session_nonce, pairing_key, session_key);
+		fpmcu_nonce, session_nonce, pairing_key, {}, session_key);
 	TEST_EQ(ret, EC_SUCCESS, "%d");
 
 	TEST_EQ(tpm_seed.size(), sizeof(session_params->enc_tpm_seed), "%zu");
@@ -424,6 +343,7 @@ test_static enum ec_error_list test_fp_command_establish_session(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(initialize_pairing_key(pairing_key), EC_SUCCESS, "%d");
 
@@ -454,7 +374,7 @@ test_static enum ec_error_list test_fp_command_establish_session(void)
 	TEST_EQ(get_fp_encryption_status(&status), EC_SUCCESS, "%d");
 	TEST_BITS_SET((int)status, FP_ENC_STATUS_SEED_SET);
 
-	TEST_EQ(global_context.templ_valid, 1u, "%d");
+	TEST_EQ(global_context.templ_valid, 0u, "%d");
 
 	return EC_SUCCESS;
 }
@@ -473,6 +393,7 @@ test_fp_command_establish_session_fail_different_pk(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(initialize_pairing_key(pairing_key), EC_SUCCESS, "%d");
 
@@ -514,10 +435,11 @@ test_static enum ec_error_list test_fp_command_establish_session_deny(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(initialize_pairing_key(pairing_key), EC_SUCCESS, "%d");
 
-	// Nonce context without generate nonce should fail.
+	// Establish session without generate nonce should fail.
 	rv = test_send_host_command(EC_CMD_FP_ESTABLISH_SESSION, 0,
 				    &session_params, sizeof(session_params),
 				    NULL, 0);
@@ -542,16 +464,6 @@ test_static enum ec_error_list test_fp_command_establish_session_deny(void)
 
 	TEST_EQ(rv, EC_RES_SUCCESS, "%d");
 
-	// Generate nonce should clear the existing nonce context user ID.
-	rv = test_send_host_command(EC_CMD_FP_GENERATE_NONCE, 0, NULL, 0,
-				    &nonce_response, sizeof(nonce_response));
-
-	TEST_EQ(rv, EC_RES_SUCCESS, "%d");
-
-	for (auto user_id_partial : global_context.user_id) {
-		TEST_EQ(user_id_partial, 0u, "%d");
-	}
-
 	return EC_SUCCESS;
 }
 
@@ -564,6 +476,7 @@ test_fp_command_establish_session_limit_without_generated_nonce(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(initialize_pairing_key(pairing_key), EC_SUCCESS, "%d");
 
@@ -594,6 +507,7 @@ test_fp_command_establish_session_limit_normal_context(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(initialize_pairing_key(pairing_key), EC_SUCCESS, "%d");
 
@@ -638,6 +552,7 @@ test_fp_command_establish_session_limit_twice_1(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(initialize_pairing_key(pairing_key), EC_SUCCESS, "%d");
 
@@ -681,6 +596,7 @@ test_fp_command_establish_session_limit_twice_2(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(initialize_pairing_key(pairing_key), EC_SUCCESS, "%d");
 
@@ -715,8 +631,7 @@ test_fp_command_establish_session_limit_twice_2(void)
 	return EC_SUCCESS;
 }
 
-test_static enum ec_error_list
-test_fp_command_establish_session_load_pk_deny(void)
+test_static enum ec_error_list test_fp_command_establish_session_load_pk(void)
 {
 	enum ec_status rv;
 	std::array<uint8_t, FP_PAIRING_KEY_LEN> pairing_key;
@@ -749,6 +664,7 @@ test_fp_command_establish_session_load_pk_deny(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(initialize_pairing_key(pairing_key), EC_SUCCESS, "%d");
 
@@ -793,11 +709,11 @@ test_fp_command_establish_session_load_pk_deny(void)
 
 	TEST_EQ(rv, EC_RES_SUCCESS, "%d");
 
-	/* Pairing key cannot be load during a nonce context. */
+	/* Pairing key can be loaded after the session was established. */
 	rv = test_send_host_command(EC_CMD_FP_LOAD_PAIRING_KEY, 0, &load_params,
 				    sizeof(load_params), NULL, 0);
 
-	TEST_EQ(rv, EC_RES_ACCESS_DENIED, "%d");
+	TEST_EQ(rv, EC_RES_SUCCESS, "%d");
 
 	return EC_SUCCESS;
 }
@@ -812,6 +728,7 @@ test_static enum ec_error_list test_fp_command_template_decrypted(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(initialize_pairing_key(pairing_key), EC_SUCCESS, "%d");
 
@@ -908,6 +825,7 @@ test_static enum ec_error_list test_fp_command_commit_v3(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(initialize_pairing_key(pairing_key), EC_SUCCESS, "%d");
 
@@ -989,6 +907,7 @@ test_static enum ec_error_list test_fp_command_commit_trivial_salt(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(initialize_pairing_key(pairing_key), EC_SUCCESS, "%d");
 
@@ -1166,7 +1085,7 @@ establish_session(std::span<uint8_t, SHA256_DIGEST_LENGTH> session_key)
 	};
 
 	TEST_EQ(generate_session_key(nonce_response.nonce, peer_nonce,
-				     pairing_key, session_key),
+				     pairing_key, {}, session_key),
 		EC_SUCCESS, "%d");
 
 	TEST_EQ(generate_valid_establish_session_request(
@@ -1190,6 +1109,7 @@ test_static enum ec_error_list test_fp_command_generate_challenge(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1240,6 +1160,7 @@ test_static enum ec_error_list test_fp_validate_request(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1275,6 +1196,7 @@ test_static enum ec_error_list test_fp_validate_request_fail_no_challenge(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1297,6 +1219,7 @@ test_fp_validate_request_fail_invalid_signature(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1327,6 +1250,7 @@ test_static enum ec_error_list test_fp_validate_request_fail_timeout(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1367,6 +1291,7 @@ test_static enum ec_error_list test_fp_sign_message(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1393,6 +1318,7 @@ test_static enum ec_error_list test_fp_sign_message_fail_no_session(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(sign_message(user_id, operation, challenge, mac),
 		EC_ERROR_ACCESS_DENIED, "%d");
@@ -1416,6 +1342,7 @@ test_static enum ec_error_list test_fp_mode_match_correct_signature(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1455,6 +1382,7 @@ test_static enum ec_error_list test_fp_mode_disable_match_no_signature(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1479,6 +1407,7 @@ test_static enum ec_error_list test_fp_mode_match_invalid_signature(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1520,6 +1449,7 @@ test_static enum ec_error_list test_fp_mode_enroll_correct_signature(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1560,6 +1490,7 @@ test_static enum ec_error_list test_fp_mode_disable_enroll_no_signature(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1585,6 +1516,7 @@ test_static enum ec_error_list test_fp_mode_enroll_invalid_signature(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1626,6 +1558,7 @@ test_static enum ec_error_list test_fp_mode_enroll_session_transitions(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1689,6 +1622,7 @@ test_static enum ec_error_list test_fp_mode_match_fail_version_0(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1724,6 +1658,7 @@ test_static enum ec_error_list test_fp_confirm_template_success(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1766,6 +1701,7 @@ test_fp_confirm_template_fail_invalid_signature(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1802,6 +1738,7 @@ test_fp_confirm_template_fail_state_mismatch(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1843,6 +1780,7 @@ test_static enum ec_error_list test_fp_sign_match_success(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1883,6 +1821,7 @@ test_static enum ec_error_list test_fp_sign_match_fail_no_match(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1913,6 +1852,7 @@ test_static enum ec_error_list test_fp_sign_match_fail_deadline_passed(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 
@@ -1971,6 +1911,7 @@ test_static enum ec_error_list test_fp_reset_does_not_clear_session(void)
 
 	fp_reset_and_clear_context();
 	reset_session();
+	global_context.sensor_mode = 0;
 
 	TEST_EQ(establish_session(session_key), EC_SUCCESS, "%d");
 	TEST_BITS_SET((int)global_context.fp_encryption_status,
@@ -2003,11 +1944,253 @@ test_static enum ec_error_list test_fp_reset_does_not_clear_session(void)
 	return EC_SUCCESS;
 }
 
+test_static enum ec_error_list
+test_fp_command_establish_session_clears_context(void)
+{
+	std::array<uint8_t, FP_PAIRING_KEY_LEN> pairing_key;
+	struct ec_response_fp_generate_nonce nonce_response;
+	struct ec_params_fp_establish_session session_params;
+	uint32_t status;
+
+	std::array<uint8_t, FP_CONTEXT_TPM_BYTES> tpm_seed_1 = {
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	};
+	std::array<uint8_t, FP_CONTEXT_TPM_BYTES> tpm_seed_2 = {
+		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	};
+
+	fp_reset_and_clear_context();
+	reset_session();
+	global_context.sensor_mode = 0;
+
+	TEST_EQ(initialize_pairing_key(pairing_key), EC_SUCCESS, "%d");
+
+	/* 1. Establish first session with tpm_seed_1 */
+	TEST_EQ(test_send_host_command(EC_CMD_FP_GENERATE_NONCE, 0, NULL, 0,
+				       &nonce_response, sizeof(nonce_response)),
+		EC_RES_SUCCESS, "%d");
+
+	TEST_EQ(generate_valid_establish_session_request(
+			pairing_key, nonce_response.nonce, tpm_seed_1,
+			&session_params),
+		EC_SUCCESS, "%d");
+
+	TEST_EQ(test_send_host_command(EC_CMD_FP_ESTABLISH_SESSION, 0,
+				       &session_params, sizeof(session_params),
+				       NULL, 0),
+		EC_RES_SUCCESS, "%d");
+
+	/* Set UserID and some templates */
+	struct ec_params_fp_context_v1 ctx_params = {
+		.action = FP_CONTEXT_GET_RESULT,
+		.userid = { 1, 2, 3, 4, 5, 6, 7, 8 },
+	};
+	TEST_EQ(test_send_host_command(EC_CMD_FP_CONTEXT, 1, &ctx_params,
+				       sizeof(ctx_params), NULL, 0),
+		EC_RES_SUCCESS, "%d");
+
+	global_context.templ_valid = 1;
+
+	/* Verify current state */
+	TEST_EQ(get_fp_encryption_status(&status), EC_SUCCESS, "%d");
+	TEST_BITS_SET((int)status, FP_ENC_STATUS_SEED_SET);
+	TEST_BITS_SET((int)status, FP_CONTEXT_USER_ID_SET);
+	TEST_EQ(global_context.templ_valid, 1u, "%u");
+	TEST_ASSERT_ARRAY_EQ(global_context.tpm_seed, tpm_seed_1,
+			     tpm_seed_1.size());
+
+	/* 2. Establish second session with tpm_seed_2 */
+	TEST_EQ(test_send_host_command(EC_CMD_FP_GENERATE_NONCE, 0, NULL, 0,
+				       &nonce_response, sizeof(nonce_response)),
+		EC_RES_SUCCESS, "%d");
+
+	TEST_EQ(generate_valid_establish_session_request(
+			pairing_key, nonce_response.nonce, tpm_seed_2,
+			&session_params),
+		EC_SUCCESS, "%d");
+
+	TEST_EQ(test_send_host_command(EC_CMD_FP_ESTABLISH_SESSION, 0,
+				       &session_params, sizeof(session_params),
+				       NULL, 0),
+		EC_RES_SUCCESS, "%d");
+
+	/* 3. Verify that context was cleared and TPM seed updated */
+	TEST_EQ(get_fp_encryption_status(&status), EC_SUCCESS, "%d");
+	TEST_BITS_SET((int)status, FP_ENC_STATUS_SEED_SET);
+	/* User ID should be cleared */
+	TEST_BITS_CLEARED((int)status, FP_CONTEXT_USER_ID_SET);
+	for (uint8_t val : global_context.user_id) {
+		TEST_EQ(val, 0, "%d");
+	}
+
+	/* Templates should be cleared */
+	TEST_EQ(global_context.templ_valid, 0u, "%u");
+
+	/* TPM seed should be updated to tpm_seed_2 */
+	TEST_ASSERT_ARRAY_EQ(global_context.tpm_seed, tpm_seed_2,
+			     tpm_seed_2.size());
+
+	return EC_SUCCESS;
+}
+
+test_static enum ec_error_list
+test_fp_command_establish_session_corrupted_seed(void)
+{
+	enum ec_status rv;
+	std::array<uint8_t, FP_PAIRING_KEY_LEN> pairing_key;
+	struct ec_response_fp_generate_nonce nonce_response;
+	struct ec_params_fp_establish_session session_params;
+	uint32_t status;
+	std::array<uint8_t, FP_CONTEXT_TPM_BYTES> tpm_seed = {
+		1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6,
+		7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2,
+	};
+
+	fp_reset_and_clear_context();
+	reset_session();
+	global_context.sensor_mode = 0;
+
+	TEST_EQ(initialize_pairing_key(pairing_key), EC_SUCCESS, "%d");
+
+	TEST_EQ(test_send_host_command(EC_CMD_FP_GENERATE_NONCE, 0, NULL, 0,
+				       &nonce_response, sizeof(nonce_response)),
+		EC_RES_SUCCESS, "%d");
+
+	TEST_EQ(generate_valid_establish_session_request(
+			pairing_key, nonce_response.nonce, tpm_seed,
+			&session_params),
+		EC_SUCCESS, "%d");
+
+	/* Corrupt the encrypted TPM seed */
+	session_params.enc_tpm_seed[0] ^= 0xFF;
+
+	rv = test_send_host_command(EC_CMD_FP_ESTABLISH_SESSION, 0,
+				    &session_params, sizeof(session_params),
+				    NULL, 0);
+
+	/* Expect failure in TPM Seed decryption. */
+	TEST_EQ(rv, EC_RES_ERROR, "%d");
+
+	/* Verify that TPM seed is NOT set and session is NOT established */
+	TEST_EQ(get_fp_encryption_status(&status), EC_SUCCESS, "%d");
+	TEST_BITS_CLEARED((int)status, FP_ENC_STATUS_SEED_SET);
+	TEST_BITS_CLEARED((int)status, FP_CONTEXT_STATUS_SESSION_ESTABLISHED);
+
+	return EC_SUCCESS;
+}
+
+test_static enum ec_error_list
+test_fp_command_reestablish_session_corrupted_seed(void)
+{
+	enum ec_status rv;
+	std::array<uint8_t, FP_PAIRING_KEY_LEN> pairing_key;
+	struct ec_response_fp_generate_nonce nonce_response;
+	struct ec_params_fp_establish_session session_params;
+	uint32_t status;
+	std::array<uint8_t, FP_CONTEXT_TPM_BYTES> tpm_seed_1 = {
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	};
+	std::array<uint8_t, FP_CONTEXT_TPM_BYTES> tpm_seed_2 = {
+		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	};
+
+	fp_reset_and_clear_context();
+	reset_session();
+	global_context.sensor_mode = 0;
+
+	TEST_EQ(initialize_pairing_key(pairing_key), EC_SUCCESS, "%d");
+
+	/* 1. Establish first session with tpm_seed_1 */
+	TEST_EQ(test_send_host_command(EC_CMD_FP_GENERATE_NONCE, 0, NULL, 0,
+				       &nonce_response, sizeof(nonce_response)),
+		EC_RES_SUCCESS, "%d");
+
+	TEST_EQ(generate_valid_establish_session_request(
+			pairing_key, nonce_response.nonce, tpm_seed_1,
+			&session_params),
+		EC_SUCCESS, "%d");
+
+	TEST_EQ(test_send_host_command(EC_CMD_FP_ESTABLISH_SESSION, 0,
+				       &session_params, sizeof(session_params),
+				       NULL, 0),
+		EC_RES_SUCCESS, "%d");
+
+	/* Verify current state */
+	TEST_EQ(get_fp_encryption_status(&status), EC_SUCCESS, "%d");
+	TEST_BITS_SET((int)status, FP_ENC_STATUS_SEED_SET);
+	TEST_BITS_SET((int)status, FP_CONTEXT_STATUS_SESSION_ESTABLISHED);
+
+	/* 2. Try to re-establish session with corrupted tpm_seed_2 */
+	TEST_EQ(test_send_host_command(EC_CMD_FP_GENERATE_NONCE, 0, NULL, 0,
+				       &nonce_response, sizeof(nonce_response)),
+		EC_RES_SUCCESS, "%d");
+
+	TEST_EQ(generate_valid_establish_session_request(
+			pairing_key, nonce_response.nonce, tpm_seed_2,
+			&session_params),
+		EC_SUCCESS, "%d");
+
+	/* Corrupt the encrypted TPM seed */
+	session_params.enc_tpm_seed[0] ^= 0xFF;
+
+	rv = test_send_host_command(EC_CMD_FP_ESTABLISH_SESSION, 0,
+				    &session_params, sizeof(session_params),
+				    NULL, 0);
+
+	/* Expect failure in TPM Seed decryption. */
+	TEST_EQ(rv, EC_RES_ERROR, "%d");
+
+	/* 3. Verify that the previous session is gone and new one is not set */
+	TEST_EQ(get_fp_encryption_status(&status), EC_SUCCESS, "%d");
+	TEST_BITS_CLEARED((int)status, FP_ENC_STATUS_SEED_SET);
+	TEST_BITS_CLEARED((int)status, FP_CONTEXT_STATUS_SESSION_ESTABLISHED);
+
+	return EC_SUCCESS;
+}
+
+test_static enum ec_error_list test_fp_command_establish_session_busy(void)
+{
+	enum ec_status rv;
+	struct ec_params_fp_establish_session session_params = {};
+	static constexpr uint32_t modes[] = {
+		FP_MODE_ENROLL_SESSION,
+		FP_MODE_ENROLL_IMAGE,
+		FP_MODE_MATCH,
+		FP_MODE_RESET_SENSOR,
+		FP_MODE_ENCRYPT_TEMPLATE,
+		FP_MODE_DECRYPT_TEMPLATE,
+	};
+
+	fp_reset_and_clear_context();
+	reset_session();
+
+	/* Pretend that the session nonce was generated. */
+	global_context.fp_encryption_status |= FP_CONTEXT_SESSION_NONCE_SET;
+
+	for (uint32_t mode : modes) {
+		/* Pretend that an operation on templates is running. */
+		global_context.sensor_mode = mode;
+
+		rv = test_send_host_command(EC_CMD_FP_ESTABLISH_SESSION, 0,
+					    &session_params,
+					    sizeof(session_params), NULL, 0);
+
+		TEST_EQ(rv, EC_RES_BUSY, "mode 0x%x");
+	}
+
+	global_context.sensor_mode = 0;
+
+	return EC_SUCCESS;
+}
+
 } // namespace
 
 void run_test(int argc, const char **argv)
 {
-	RUN_TEST(test_fp_command_check_context_cleared);
 	RUN_TEST(test_fp_command_generate_nonce);
 	RUN_TEST(test_fp_command_commit_without_seed);
 
@@ -2022,8 +2205,12 @@ void run_test(int argc, const char **argv)
 	RUN_TEST(test_fp_command_establish_pairing_key_fail);
 	RUN_TEST(test_fp_command_establish_pairing_key_keygen);
 	RUN_TEST(test_fp_command_establish_and_load_pairing_key);
-	RUN_TEST(test_fp_command_load_pairing_key_fail);
+	RUN_TEST(test_fp_command_load_pairing_key_invalid);
 	RUN_TEST(test_fp_command_establish_session);
+	RUN_TEST(test_fp_command_establish_session_busy);
+	RUN_TEST(test_fp_command_establish_session_clears_context);
+	RUN_TEST(test_fp_command_establish_session_corrupted_seed);
+	RUN_TEST(test_fp_command_reestablish_session_corrupted_seed);
 	RUN_TEST(test_fp_command_establish_session_fail_different_pk);
 	RUN_TEST(test_fp_command_establish_session_deny);
 	RUN_TEST(
@@ -2031,7 +2218,7 @@ void run_test(int argc, const char **argv)
 	RUN_TEST(test_fp_command_establish_session_limit_normal_context);
 	RUN_TEST(test_fp_command_establish_session_limit_twice_1);
 	RUN_TEST(test_fp_command_establish_session_limit_twice_2);
-	RUN_TEST(test_fp_command_establish_session_load_pk_deny);
+	RUN_TEST(test_fp_command_establish_session_load_pk);
 	RUN_TEST(test_fp_command_template_decrypted);
 	RUN_TEST(test_fp_command_commit_v3);
 	RUN_TEST(test_fp_command_commit_trivial_salt);

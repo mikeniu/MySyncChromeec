@@ -1,5 +1,0 @@
-board:
-  name: realtek
-  vendor: google
-  socs:
-    - name: rts5912

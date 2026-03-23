@@ -31,18 +31,19 @@ libcrypto.gcno
 __pycache__
 *.egg-info
 .hypothesis/
-zephyr/zmake/.coverage
-zephyr/zmake/htmlcov/
-zephyr/zmake/coverage.json
 
 # Clangd language server
 .cache/clangd/index/*
 compile_commands.json
 
-# Twister test output directories
-twister-out*
 flash.bin
 
 # Random binaries that don't build in the build dir
 util/cq-excludes/cq-excludes
 extra/touchpad_updater/touchpad_updater
+
+# Renode temporary files
+renode/.cipd
+renode/bin
+renode/lib
+renode/license.html.zst

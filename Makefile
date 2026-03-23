@@ -165,11 +165,13 @@ ifneq (,$(COREBOOT_SDK_ROOT_$(COREBOOT_TOOLCHAIN)))
 CROSS_COMPILE:=$(COREBOOT_SDK_ROOT_$(COREBOOT_TOOLCHAIN))/bin/$(CROSS_COREBOOT)-
 else
 ifneq (,$(USE_COREBOOT_SDK))
-ifeq ($(shell bazel --project fwsdk >/dev/null 2>&1; echo $$?),0)
-BAZEL_SUPPORTED=1
-CROSS_COMPILE:=$(shell bazel --project fwsdk run \
-	@ec-coreboot-sdk-$(CROSS_COMPILE_TOOLCHAIN)//:get_path)/bin/$(CROSS_COREBOOT)-
-else
+SDK_SCRIPT := util/coreboot_sdk.py
+SDK_FLAGS := --toolchain $(CROSS_COMPILE_TOOLCHAIN)
+SDK_COMMAND := $(SDK_SCRIPT) $(SDK_FLAGS)
+PYTHON_RESULT:=$(shell $(SDK_COMMAND); echo $$?)
+CROSS_COMPILE:=$(word 1,$(PYTHON_RESULT))/bin/$(CROSS_COREBOOT)-
+EXIT_CODE := $(word 2,$(PYTHON_RESULT))
+ifneq ($(EXIT_CODE),0)
 CROSS_COMPILE:=/opt/coreboot-sdk/bin/$(CROSS_COREBOOT)-
 endif
 endif
@@ -368,7 +370,6 @@ endif
 include test/build.mk
 include third_party/build.mk
 include util/build.mk
-include util/lock/build.mk
 
 
 ifeq ($(CONFIG_BORINGSSL_CRYPTO), y)
@@ -503,8 +504,14 @@ rw-deps := $(addsuffix .d, $(rw-objs))
 deps := $(ro-deps) $(rw-deps) $(deps-y)
 
 .PHONY: ro rw
+# The $(_task_cfg) and $(_flag_cfg) variables contain the configs that are
+# common to both the RO and RW images.
+#
+# The firmware packer expects that the .config file contains all the configs
+# for the RW image, so include the common and RW specific configs in the output.
 $(config): $(out)/$(PROJECT).bin
-	@printf '%s=y\n' $(_tsk_cfg) $(_flag_cfg) > $@
+	@printf '%s=y\n' $(_tsk_cfg) $(_tsk_cfg_rw) \
+		$(_flag_cfg) $(_flag_cfg_rw) > $@
 
 def_all_deps:=$(config) $(PROJECT_EXTRA) notice rw size utils
 ifeq ($(CONFIG_FW_INCLUDE_RO),y)

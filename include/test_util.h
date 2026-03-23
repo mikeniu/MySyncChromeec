@@ -190,11 +190,7 @@ int test_fuzz_one_input(const uint8_t *data, unsigned int size);
 void test_reset(void);
 
 /* Reports test pass */
-#ifdef CONFIG_ZEPHYR
-#define test_pass ztest_test_pass
-#else
 void test_pass(void);
-#endif
 
 /* Reports test failure */
 void test_fail(void);
@@ -375,27 +371,13 @@ int test_attach_i2c(const int port, const uint16_t addr_flags);
  *   return EC_SUCCESS;
  * }
  */
-#ifdef CONFIG_ZEPHYR
-#define DECLARE_EC_TEST(fname)                                                \
-	static int _stub_##fname(void);                                       \
-	static void fname(void)                                               \
-	{                                                                     \
-		zassert_equal(_stub_##fname(), EC_SUCCESS, #fname " failed"); \
-	}                                                                     \
-	static int _stub_##fname(void)
-#else
 #define DECLARE_EC_TEST(fname) static int fname(void)
-#endif
 
 /*
  * Create a Zephyr compatible task function. An EC task only has one void
  * parameter, while Zephyr takes in 3.
  */
-#ifdef CONFIG_ZEPHYR
-#define TASK_PARAMS void *p1, void *p2, void *p3
-#else
 #define TASK_PARAMS void *p1
-#endif
 
 /*
  * Create a TEST_MAIN macro to allow for Zephyr's test_main(void) to be used
@@ -414,10 +396,6 @@ int test_attach_i2c(const int port, const uint16_t addr_flags);
  *   ...
  * }
  */
-#ifdef CONFIG_ZEPHYR
-#define TEST_MAIN() void test_main(void)
-#define TEST_SUITE(name) void name(void)
-#else
 #define TEST_MAIN()                                \
 	void test_main(void);                      \
 	void run_test(int argc, const char **argv) \
@@ -428,13 +406,7 @@ int test_attach_i2c(const int port, const uint16_t addr_flags);
 	}                                          \
 	void test_main(void)
 #define TEST_SUITE(name) TEST_MAIN()
-#endif
 
-/*
- * Declare various Zephyr structs, functions, and macros so the same code can
- * used in platform/ec tests.
- */
-#ifndef CONFIG_ZEPHYR
 struct unit_test {
 	const char *name;
 	int (*test)(void);
@@ -499,9 +471,7 @@ void z_ztest_run_test_suite(const char *name, struct unit_test *suite);
  * @param suite The name of the test suite to run.
  */
 #define ztest_run_test_suite(suite) z_ztest_run_test_suite(#suite, suite)
-#endif /* CONFIG_ZEPHYR */
 
-#ifndef CONFIG_ZEPHYR
 /*
  * Map the Ztest assertions onto EC assertions. There are two significant
  * issues here.
@@ -525,7 +495,6 @@ void z_ztest_run_test_suite(const char *name, struct unit_test *suite);
 #define zassert_within(a, b, d, ...) TEST_NEAR((a), (b), (d), "%f")
 #define zassert_mem_equal(buf, exp, size, ...) \
 	TEST_ASSERT_ARRAY_EQ(buf, exp, size)
-#endif /* CONFIG_ZEPHYR */
 
 #ifdef __cplusplus
 }

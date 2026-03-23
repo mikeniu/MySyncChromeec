@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-/* brask family-specific CBI functions, shared with Zephyr */
+/* brask family-specific CBI functions */
 
 #ifndef __CROS_EC_BASEBOARD_CBI_H
 #define __CROS_EC_BASEBOARD_CBI_H

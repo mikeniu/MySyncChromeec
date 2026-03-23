@@ -161,8 +161,7 @@ DECLARE_CONSOLE_COMMAND(pwmduty, cc_pwm_duty,
 #endif /* CONFIG_PWM */
 
 /*
- * Initialize all PWM pins as functional.  This is not required under
- * Zephyr as pin configuration is automatically performed by chip driver
+ * Initialize all PWM pins as functional.
  */
 static void pwm_pin_init(void)
 {

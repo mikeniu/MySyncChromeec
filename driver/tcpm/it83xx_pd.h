@@ -364,26 +364,6 @@
 	IS_MASK_SET(IT83XX_USBPD_IFS(port), USBPD_REG_FAST_SWAP_DETECT_STAT)
 #endif
 
-#if defined(CONFIG_USB_PD_TCPM_ITE_ON_CHIP) && defined(CONFIG_ZEPHYR)
-/* Use the Zephyr names here. When upstreaming we can update this */
-#include <zephyr/dt-bindings/interrupt-controller/ite-intc.h>
-
-#define IT83XX_GPIO_GPCRF4 GPCRF4
-#define IT83XX_GPIO_GPCRF5 GPCRF5
-#define IT83XX_GPIO_GPCRH1 GPCRH1
-#define IT83XX_GPIO_GPCRH2 GPCRH2
-#define IT83XX_GPIO_GPCRP0 IT8XXX2_GPIO_GPCRP0
-#define IT83XX_GPIO_GPCRP1 IT8XXX2_GPIO_GPCRP1
-#define IT83XX_IRQ_USBPD0 IT8XXX2_IRQ_USBPD0
-#define IT83XX_IRQ_USBPD1 IT8XXX2_IRQ_USBPD1
-#define IT83XX_IRQ_USBPD2 IT8XXX2_IRQ_USBPD2
-#define USB_VID_ITE 0x048d
-
-/* ITE chip supports PD features */
-#define IT83XX_INTC_FAST_SWAP_SUPPORT
-#define IT83XX_INTC_PLUG_IN_OUT_SUPPORT
-#endif
-
 enum usbpd_port {
 	USBPD_PORT_A,
 	USBPD_PORT_B,
@@ -410,11 +390,24 @@ enum usbpd_power_role {
 	USBPD_POWER_ROLE_PROVIDER_CONSUMER,
 };
 
-enum tuning_unit {
-	IT83XX_TX_PRE_DRIVING_TIME_DEFAULT,
+enum tune_rc_filter {
+	IT83XX_TX_RC_FILTER_0_UNIT,
+	IT83XX_TX_RC_FILTER_1_UNIT,
+	IT83XX_TX_RC_FILTER_2_UNIT,
+	IT83XX_TX_RC_FILTER_3_UNIT,
+	IT83XX_TX_RC_FILTER_TRIM,
+};
+
+enum tune_rising_falling {
+	IT83XX_TX_PRE_DRIVING_TIME_0_UNIT,
 	IT83XX_TX_PRE_DRIVING_TIME_1_UNIT,
 	IT83XX_TX_PRE_DRIVING_TIME_2_UNIT,
 	IT83XX_TX_PRE_DRIVING_TIME_3_UNIT,
+	IT83XX_TX_PRE_DRIVING_TIME_4_UNIT,
+	IT83XX_TX_PRE_DRIVING_TIME_5_UNIT,
+	IT83XX_TX_PRE_DRIVING_TIME_6_UNIT,
+	IT83XX_TX_PRE_DRIVING_TIME_7_UNIT,
+	IT83XX_TX_PRE_DRIVING_TIME_TRIM,
 };
 
 struct usbpd_ctrl_t {
@@ -423,10 +416,14 @@ struct usbpd_ctrl_t {
 	uint8_t irq;
 };
 
-/* Data structure for board to adjust pd port rising and falling time */
+/*
+ * Data structure for board to adjust cc pin TX parameters,
+ * ex. RC filter, rising time, and falling time.
+ */
 struct cc_para_t {
-	enum tuning_unit rising_time;
-	enum tuning_unit falling_time;
+	enum tune_rc_filter rc_filter;
+	enum tune_rising_falling rising_time;
+	enum tune_rising_falling falling_time;
 };
 
 extern const struct usbpd_ctrl_t usbpd_ctrl_regs[];

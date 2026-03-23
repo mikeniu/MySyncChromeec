@@ -11,107 +11,6 @@
 #include "common.h"
 #include "console.h"
 
-#ifdef __REQUIRE_ZEPHYR_GPIOS__
-#error "Zephyr source files must use the Zephyr GPIO API"
-#endif
-
-/*
- * If compiling with Zephyr, include the GPIO_ definitions to deal with name
- * conflicts
- */
-#ifdef CONFIG_ZEPHYR
-#include <zephyr/drivers/gpio.h>
-#include <zephyr/dt-bindings/gpio/ite-it8xxx2-gpio.h>
-#include <zephyr/dt-bindings/gpio/nuvoton-npcx-gpio.h>
-
-#include <dt-bindings/native-posix-gpio.h>
-
-/*
- * Some flag definitions are duplicated by our private devicetree binding
- * in zephyr/include/dt-bindings/gpio_defines.h.
- *
- * Validate that these definitions haven't changed.
- */
-/* Validate that Zephyr's definition are the same for overlapping defines */
-#if BIT(16) != GPIO_INPUT
-#error GPIO_INPUT values are not the same!
-#elif BIT(17) != GPIO_OUTPUT
-#error GPIO_OUTPUT values are not the same!
-#elif BIT(18) != GPIO_OUTPUT_INIT_LOW
-#error GPIO_OUTPUT_INIT_LOW values are not the same!
-#elif BIT(19) != GPIO_OUTPUT_INIT_HIGH
-#error GPIO_OUTPUT_INIT_HIGH values are not the same!
-#elif BIT(20) != GPIO_OUTPUT_INIT_LOGICAL
-#error GPIO_OUTPUT_INIT_LOGICAL values are not the same!
-#elif BIT(21) != GPIO_INT_DISABLE
-#error GPIO_INT_DISABLE values are not the same!
-#elif BIT(22) != GPIO_INT_ENABLE
-#error GPIO_INT_ENABLE values are not the same!
-#elif BIT(23) != GPIO_INT_LEVELS_LOGICAL
-#error GPIO_INT_LEVELS_LOGICAL values are not the same!
-#elif BIT(24) != GPIO_INT_EDGE
-#error GPIO_INT_EDGE values are not the same!
-#elif BIT(25) != GPIO_INT_LOW_0
-#error GPIO_INT_LOW_0 values are not the same!
-#elif BIT(26) != GPIO_INT_HIGH_1
-#error GPIO_INT_HIGH_1 values are not the same!
-#endif
-
-/*
- * Map the legacy EC GPIO flags to the Zephyr equivalent.
- * Refer to the descriptions below.
- */
-#define GPIO_FLAG_NONE GPIO_DISCONNECTED
-/* GPIO_ANALOG	           not supported by Zephyr */
-/* GPIO_OPEN_DRAIN         already defined by Zephyr */
-/* GPIO_DEFAULT            not supported by Zephyr */
-/* GPIO_PULL_UP            already defined by Zephyr */
-/* GPIO_PULL_DOWN          already defined by Zephyr */
-#define GPIO_LOW GPIO_OUTPUT_INIT_LOW
-#define GPIO_HIGH GPIO_OUTPUT_INIT_HIGH
-/* GPIO_INPUT              already defined by Zephyr */
-/* GPIO_OUTPUT             already defined by Zephyr */
-
-/*
- * One to one mapping of interrupt flags isn't possible. So map these
- * flags to not conflict with any Zephyr flags.
- */
-#define GPIO_INT_F_RISING BIT(28)
-#define GPIO_INT_F_FALLING BIT(29)
-#define GPIO_INT_F_LOW BIT(30)
-#define GPIO_INT_F_HIGH BIT(31)
-/* GPIO_INT_DSLEEP         not supported by Zephyr */
-/* GPIO_INT_SHARED         not supported by Zephyr */
-
-#if DT_HAS_COMPAT_STATUS_OKAY(nuvoton_npcx_gpio)
-#define GPIO_VOLTAGE_1P8 NPCX_GPIO_VOLTAGE_1P8
-#define GPIO_SEL_1P8V GPIO_VOLTAGE_1P8
-#elif DT_HAS_COMPAT_STATUS_OKAY(ite_it8xxx2_gpio)
-#define GPIO_VOLTAGE_1P8 IT8XXX2_GPIO_VOLTAGE_1P8
-#define GPIO_SEL_1P8V GPIO_VOLTAGE_1P8
-#elif DT_HAS_COMPAT_STATUS_OKAY(zephyr_gpio_emul)
-#define GPIO_VOLTAGE_1P8 NATIVE_POSIX_GPIO_VOLTAGE_1P8
-#define GPIO_SEL_1P8V GPIO_VOLTAGE_1P8
-#elif DT_HAS_COMPAT_STATUS_OKAY(microchip_xec_gpio_v2)
-/*
- * Add GPIO_VOLTAGE_1P8 and GPIO_SEL_1P8V used in common code.
- * In MEC1727, GPIO_VOLTAGE_1P8 feature is not supported in GPIO control
- * register, GPIO driver will skip this bit configuration, but MEC1727
- * supports a group of GPIOs with 1.8V power rail, 1.8V design will be
- * considered and supported in board circuit design state.
- */
-#define GPIO_VOLTAGE_1P8 (1U << 11)
-#define GPIO_SEL_1P8V GPIO_VOLTAGE_1P8
-#endif
-/* GPIO_ALTERNATE          not supported by Zephyr */
-/* GPIO_LOCKED             not supported by Zephyr */
-/* GPIO_HIB_WAKE_HIGH      not supported by Zephyr */
-/* GPIO_HIB_WAKE_LOW       not supported by Zephyr */
-/* GPIO_HIB_WAKE_RISING    not supported by Zephyr */
-/* GPIO_HIB_WAKE_FALLING   not supported by Zephyr */
-/* GPIO_POWER_DOWN         not supported by Zephyr */
-
-#else /* !CONFIG_ZEPHYR */
 /*
  * All flags supported by gpio_info expect GPIO_ANALOG
  *
@@ -147,8 +46,6 @@
 #ifdef CONFIG_GPIO_POWER_DOWN
 #define GPIO_POWER_DOWN BIT(23) /* Pin and pad is powered off */
 #endif
-
-#endif /* CONFIG_ZEPHYR */
 
 #ifdef __cplusplus
 extern "C" {
@@ -327,26 +224,6 @@ int gpio_get_flags(enum gpio_signal signal);
  */
 int gpio_get_flags_by_mask(uint32_t port, uint32_t mask);
 
-#ifdef CONFIG_ZEPHYR
-
-/**
- * Convert flags from Zephyr to CrOS EC format
- *
- * @param zephyr	flags in Zephyr format
- * @returns		flags in CrOS EC format
- */
-int convert_from_zephyr_flags(const gpio_flags_t zephyr);
-
-/**
- * Convert flags from CrOS EC to Zephyr format
- *
- * @param ec_flags	flags in CrOS EC format
- * @returns		flags in Zephyr format
- */
-gpio_flags_t convert_to_zephyr_flags(int ec_flags);
-
-#endif
-
 /**
  * Get the default flags for a signal.
  *
@@ -402,42 +279,6 @@ int gpio_or_ioex_get_level(int signal, int *value);
  * @param signal	Signal to reset
  */
 void gpio_reset(enum gpio_signal signal);
-
-#ifdef CONFIG_ZEPHYR
-
-/**
- * @brief Save state of a GPIO controller port
- *
- * This function saves all pins current state from selected port.
- *
- * @param port	Port to save
- * @param flags	Buffer to hold gpio flags
- */
-int gpio_save_port_config(const struct device *port, gpio_flags_t *flags,
-			  int buff_size);
-
-/**
- * @brief Restore state of a GPIO controller port
- *
- * This function restore all pins current state from selected port.
- *
- * @param port	Port to restore
- * @param flags	Buffer with gpio flags saved by ioex_save_gpio_config
- */
-int gpio_restore_port_config(const struct device *port, gpio_flags_t *flags,
-			     int buff_size);
-
-/**
- * @brief Reset all the GPIOs to default state
- *
- * This returns all pins from selected port to default state. The default flags
- * are specified by the "named-gpios" node in the board devicetree.
- *
- * @param port	Port to reset
- */
-void gpio_reset_port(const struct device *port);
-
-#endif /* CONFIG_ZEPHYR */
 
 /**
  * Enable interrupts for the signal.
