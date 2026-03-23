@@ -71,6 +71,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ef683a4a_4a05d69a",
+        "filename": "zephyr/program/skywalker/r2d2/project.conf",
+        "patchSetId": 22
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4590738
+      },
+      "writtenOn": "2026-03-23T14:48:31Z",
+      "side": 1,
+      "message": "Please add the followings:\n```\n# Battery\nCONFIG_PLATFORM_EC_CHARGER_MIN_BAT_PCT_FOR_POWER_ON\u003d5\nCONFIG_PLATFORM_EC_I2C_VIRTUAL_BATTERY_ADDR\u003d0x0f\n```",
+      "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0af98fe0_de70a48c",
         "filename": "zephyr/program/skywalker/r2d2/project.overlay",
         "patchSetId": 22
