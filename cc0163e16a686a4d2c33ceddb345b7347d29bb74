@@ -46,6 +46,30 @@
       },
       "revId": "cc0163e16a686a4d2c33ceddb345b7347d29bb74",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a732c303_a6cb5e66",
+        "filename": "zephyr/program/ocelot/power_signals.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-03-23T07:17:27Z",
+      "side": 1,
+      "message": "Same as above comments,\n\n\"intel,ap-pwrseq-gpio\" declaration -\u003e invokes power_signal_gpio_get()-\u003egpio_pin_get_config_dt() to read an \u0027output\u0027 GPIO. For an \"output\" GPIO it returns the initial output voltage set on the GPIO pin rather than the voltage level on the pin at that instance. Hence value returned \"1\" always for SYSRST\n\n\"intel,ap-pwrseq-external\" declaration -\u003e invokes board_power_signal_get()-\u003egpio_pin_get_dt() to read a GPIO. hence returns the logical level of the pin at that instance.",
+      "parentUuid": "0d5673ba_e96540ec",
+      "range": {
+        "startLine": 92,
+        "startChar": 0,
+        "endLine": 92,
+        "endChar": 42
+      },
+      "revId": "cc0163e16a686a4d2c33ceddb345b7347d29bb74",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

@@ -70,6 +70,30 @@
       },
       "revId": "f8ad521f017be0b09c5f688297be503f39a34cb5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8d1155c_c074f3c3",
+        "filename": "zephyr/program/ocelot/ocelotrvp-ite/power_signals.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-03-23T07:17:27Z",
+      "side": 0,
+      "message": "Yes signal should normally show \u00270\u0027 but always set showing \u00271\u0027 in \"pwerindebug\"\n\nFor testing, I am controlling the SYSRST from GSC console using command \"sysrst 1\"/\"sysrst 0\" and verifying the signal state from ec console command \"powerindebug\"\n\nFurther debug, SYSRST value always shows \u00271\u0027 when declared as \"intel,ap-pwrseq-gpio\" as\n \n\"intel,ap-pwrseq-gpio\" declaration -\u003e invokes power_signal_gpio_get()-\u003egpio_pin_get_config_dt() to read an \u0027output\u0027 GPIO. For an \"output\" GPIO it returns the initial output voltage set on the GPIO pin rather than the voltage level on the pin at that instance. Hence value returned \"1\" always.\n\n\"intel,ap-pwrseq-external\" declaration -\u003e invokes board_power_signal_get()-\u003egpio_pin_get_dt() to read a GPIO. hence returns the logical level of the pin at that instance.\n\nHence i think its better to use the pin as \"intel,ap-pwrseq-external\"?",
+      "parentUuid": "e966f212_2fc3f180",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 61
+      },
+      "revId": "f8ad521f017be0b09c5f688297be503f39a34cb5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
