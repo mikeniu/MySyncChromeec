@@ -5,6 +5,7 @@
 
 /* Bluey ADSP I2C port configuration */
 
+#include "battery.h"
 #include "common.h"
 #include "gpio.h"
 #include "hooks.h"
@@ -98,3 +99,13 @@ void board_chipset_shutdown_complete_i2c_controller(void)
 }
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN_COMPLETE,
 	     board_chipset_shutdown_complete_i2c_controller, HOOK_PRIO_DEFAULT);
+
+void check_battery_cutoff_request(void)
+{
+	/* Battery cutoff is scheduled, re-configure ADSP I²C as a controller */
+	if (battery_cutoff_is_scheduled()) {
+		board_chipset_shutdown_complete_i2c_controller();
+	}
+}
+DECLARE_HOOK(HOOK_AC_CHANGE, check_battery_cutoff_request,
+	     HOOK_PRIO_POST_DEFAULT);
