@@ -88,6 +88,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "07eb8d02_712a5788",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-23T17:16:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba67c515_d0a98ee1",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "59a7a6e5_e97ab1bd",
@@ -123,6 +141,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3cea417_4cef55e8",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-23T17:16:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "998cd43e_c6124670",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "403c7313_3618d89b",
@@ -154,6 +190,24 @@
       "side": 1,
       "message": "OK, I will remove `write_protect_is_asserted` condition to make `disable RW temporary` for our non-volatile flash on next patch.",
       "parentUuid": "403c7313_3618d89b",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff7e42c5_6042f696",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-23T17:16:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "74c51d88_39673a68",
       "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -228,6 +282,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dae7860c_b9fdf047",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-23T17:16:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51dd2c23_61d16f23",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "83989935_cfe5248c",
@@ -294,6 +366,24 @@
       "side": 1,
       "message": "That means I should handle only `all \u003d\u003d false` case to disable second protection range, right?",
       "parentUuid": "2b2255d0_781c322e",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5592cb20_591a4464",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-03-23T17:16:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7b5a154f_d76d6424",
       "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
