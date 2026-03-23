@@ -22,6 +22,30 @@
       },
       "revId": "f1e30e415b71712012393923943670d989e63d6d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc21d0b6_acaf375d",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 477,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-23T20:42:18Z",
+      "side": 1,
+      "message": "I understand. I will do that. I was waiting for this CL to merge",
+      "parentUuid": "3c95a944_31bae318",
+      "range": {
+        "startLine": 475,
+        "startChar": 0,
+        "endLine": 477,
+        "endChar": 29
+      },
+      "revId": "f1e30e415b71712012393923943670d989e63d6d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
