@@ -18,13 +18,6 @@
 #include <string.h>
 
 #include <strings.h>
-#ifdef CONFIG_ZEPHYR
-#include <zephyr/sys/util.h>
-/**
- * TODO(b/237712836): Remove once Zephyr's libc has strcasecmp.
- */
-#include "builtin/strings.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -71,9 +64,7 @@ extern "C" {
  * than `low`, `high` if `v` was bigger than `high`.
  */
 #ifndef __cplusplus
-#ifndef CONFIG_ZEPHYR
 #define clamp(v, low, high) min(high, max(v, low))
-#endif
 #endif
 
 /*
@@ -88,9 +79,7 @@ extern "C" {
 #define POWER_OF_TWO(x) ((x) && !((x) & ((x) - 1)))
 
 /* Macro to check if the value is in range */
-#ifndef CONFIG_ZEPHYR
 #define IN_RANGE(x, min, max) ((x) >= (min) && (x) <= (max))
-#endif
 
 /*
  * macros for integer division with various rounding variants

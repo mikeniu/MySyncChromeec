@@ -21,10 +21,6 @@
 #include "task.h"
 #include "util.h"
 
-#ifdef CONFIG_ZEPHYR
-#include <zephyr/shell/shell.h>
-#endif
-
 #include <algorithm>
 #include <array>
 #include <variant>
@@ -66,6 +62,7 @@ struct fpsensor_context global_context = {
 			.val = 0,
 		}},
 	.fp_positive_match_salt = {{0}},
+        .template_encrypted_id = FP_NO_SUCH_TEMPLATE,
 };
 
 int fp_tpm_seed_is_set(void)
@@ -99,10 +96,13 @@ void fp_reset_context()
 		FP_ENC_STATUS_SEED_SET | FP_CONTEXT_SESSION_NONCE_SET |
 		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
 	OPENSSL_cleanse(&fp_enc_buffer, sizeof(fp_enc_buffer));
+	global_context.template_encrypted_id = FP_NO_SUCH_TEMPLATE;
 	OPENSSL_cleanse(global_context.user_id.data(),
 			sizeof(global_context.user_id));
 	fp_disable_positive_match_secret(
 		&global_context.positive_match_secret_state);
+	for (uint16_t idx = 0; idx < FP_MAX_FINGER_COUNT; idx++)
+		fp_clear_finger_context(idx);
 }
 
 /**
@@ -116,8 +116,6 @@ static void _fp_clear_context(void)
 	OPENSSL_cleanse(fp_buffer, sizeof(fp_buffer));
 	/* Reset capture type, as it is correlated with fp_buffer. */
 	global_context.current_capture_type = FP_CAPTURE_TYPE_INVALID;
-	for (uint16_t idx = 0; idx < FP_MAX_FINGER_COUNT; idx++)
-		fp_clear_finger_context(idx);
 }
 
 void fp_reset_and_clear_context(void)
@@ -385,7 +383,7 @@ int fp_enable_positive_match_secret(uint16_t fgr,
 	timestamp_t now = get_time();
 	state->template_matched = fgr;
 	state->readable = true;
-	state->deadline.val = now.val + (5 * SECOND);
+	state->deadline.val = now.val + (15 * SECOND); /* b/478160541 */
 	return EC_SUCCESS;
 }
 

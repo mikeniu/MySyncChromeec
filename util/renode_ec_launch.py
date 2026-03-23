@@ -24,12 +24,13 @@ DARTMONKEY_CONSOLE = "sysbus.usart1"
 CONSOLE_MAP: dict[str, str] = {
     "bloonchipper": "sysbus.usart2",
     "buccaneer": "sysbus.cr_uart1",
+    "chudow": "sysbus.usart2",
     "dartmonkey": DARTMONKEY_CONSOLE,
-    "gwendolin": "sysbus.cr_uart1",
     "helipilot": "sysbus.cr_uart1",
     "nami_fp": DARTMONKEY_CONSOLE,
     "nocturne_fp": DARTMONKEY_CONSOLE,
     "rosalia": "sysbus.cr_uart1",
+    "sanok": "sysbus.uart0",
 }
 
 DARTMONKEY_GPIO_WP = "sysbus.gpioPortB.GPIO_WP"
@@ -40,7 +41,6 @@ GPIO_WP_MAP: dict[str, str] = {
     "buccaneer": HELIPILOT_GPIO_WP,
     "dartmonkey": DARTMONKEY_GPIO_WP,
     "helipilot": HELIPILOT_GPIO_WP,
-    "gwendolin": HELIPILOT_GPIO_WP,
     "nami_fp": DARTMONKEY_GPIO_WP,
     "nocturne_fp": DARTMONKEY_GPIO_WP,
     "rosalia": HELIPILOT_GPIO_WP,
@@ -66,6 +66,7 @@ def launch(
     zephyr: bool,
     zephyr_bin: str,
     ec_project: str,
+    uart: str,
 ) -> int:
     """Launches an EC image in Renode.
 
@@ -77,6 +78,7 @@ def launch(
         zephyr: True if running EC-based Zephyr image.
         zephyr_bin: Path to Zephyr binary.
         ec_project: The name of the EC project.
+        uart: Path to the UART PTY.
     Returns:
         0 on success, otherwise non-zero.
     """
@@ -143,10 +145,11 @@ def launch(
         renode_execute.append(f"{GPIO_WP_MAP[board]} {wp_state};")
 
     if board in CONSOLE_MAP:
-        # Expose the console UART as a PTY on /tmp/renode-uart. You can connect to
-        # the PTY with minicom, screen, etc.
+        # Expose the console UART as a PTY on the given path (default:
+        # /tmp/renode-uart). You can connect to the PTY with minicom, screen,
+        # etc.
         renode_execute.append(
-            'emulation CreateUartPtyTerminal "term" "/tmp/renode-uart" True;'
+            f'emulation CreateUartPtyTerminal "term" "{uart}" True;'
         )
         renode_execute.append(
             "connector Connect " + CONSOLE_MAP[board] + " term;"
@@ -224,6 +227,13 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
         help="Enable the hardware write protect GPIO on startup",
     )
 
+    parser.add_argument(
+        "--uart",
+        type=str,
+        default="/tmp/renode-uart",
+        help="Target path for the UART PTY symlink.",
+    )
+
     opts = parser.parse_args(argv)
     return launch(
         board=opts.board,
@@ -231,6 +241,7 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
         zephyr=opts.zephyr,
         zephyr_bin=opts.zephyr_bin,
         ec_project=opts.ec,
+        uart=opts.uart,
     )
 
 

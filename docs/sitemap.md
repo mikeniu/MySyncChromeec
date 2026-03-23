@@ -23,15 +23,7 @@
 
 ## Fingerprint MCU (FPMCU)
 
-*   [Fingerprint MCU (FPMCU)](./fingerprint/fingerprint.md)
-*   [FPMCU Development for Partners](./fingerprint/fingerprint-dev-for-partners.md)
-*   [FPMCU Firmware Testing for Partners](./fingerprint/fingerprint-firmware-testing-for-partners.md)
-*   [FPMCU Debugging](./fingerprint/fingerprint-debugging.md)
-*   [Fingerprint Authentication Design Doc](./fingerprint/fingerprint-authentication-design-doc.md)
-*   [Fingerprint Factory Requirements](./fingerprint/fingerprint-factory-requirements.md)
-*   [Fingerprint Quick Factory Guide](./fingerprint/fingerprint-factory-quick-guide.md)
-*   [Dragonclaw Schematics and Layout](./schematics/dragonclaw)
-*   [Fingerprint MCU RAM and Flash](./fingerprint/fingerprint-ram-and-flash.md)
+Refer to the [fingerprint documentation on the `main` branch](https://chromium.googlesource.com/chromiumos/platform/ec/+/HEAD/docs/sitemap.md#fingerprint-mcu-fpmcu).
 
 ## Renode
 

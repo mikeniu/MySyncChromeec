@@ -23,6 +23,13 @@
 #define CONFIG_STREAM_USB
 #define CONFIG_CMD_USART_INFO
 
+/* b/486239564: the STM32 USART has falsely detected "noise error" from the
+ * the EC on some boards.  Switch the USART drivers to one-bit mode, which
+ * both disables the noise detection and improves the USART receiver baud
+ * rate tolerance.
+ */
+#define CONFIG_STREAM_USART_ONEBIT
+
 /* The UART console is on USART1 (PA9/PA10) */
 #undef CONFIG_UART_CONSOLE
 #define CONFIG_UART_CONSOLE 1

@@ -16,7 +16,7 @@
 # If env EXTERNAL_TRUNK_PATH is defined, we use this to build the
 # absolute path to the ec directory. Otherwise, we just take the abspath of ".".
 ide-ec-path-ext = \
-	$(if $(EXTERNAL_TRUNK_PATH),$(EXTERNAL_TRUNK_PATH)/src/platform/ec)
+	$(if $(EXTERNAL_TRUNK_PATH),$(EXTERNAL_TRUNK_PATH)/src/platform/ec-legacy)
 ide-ec-path-abs = $(abspath .)
 ide-ec-path = $(or $(ide-ec-path-ext),$(ide-ec-path-abs))
 

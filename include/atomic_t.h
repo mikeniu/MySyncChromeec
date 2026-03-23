@@ -8,7 +8,6 @@
 #ifndef __CROS_EC_ATOMIC_T_H
 #define __CROS_EC_ATOMIC_T_H
 
-#ifndef CONFIG_ZEPHYR
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -20,9 +19,6 @@ typedef long atomic_t;
 typedef atomic_t atomic_val_t;
 #ifdef __cplusplus
 }
-#endif
-#else
-#include <zephyr/sys/atomic.h>
 #endif
 
 #endif /* __CROS_EC_ATOMIC_T_H */

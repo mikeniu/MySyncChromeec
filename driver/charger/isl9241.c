@@ -5,10 +5,7 @@
  * Renesas (Intersil) ISL-9241 (and RAA489110) battery charger driver.
  */
 
-/* TODO(b/175881324) */
-#ifndef CONFIG_ZEPHYR
 #include "adc.h"
-#endif
 #include "battery.h"
 #include "battery_smart.h"
 #include "charge_manager.h"

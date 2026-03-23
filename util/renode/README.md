@@ -79,15 +79,6 @@ or a unit test image. For complete details, refer to the `--help` output.
 > runtest
 ```
 
-```bash
-# Build the bloonchipper Zephyr image.
-(chroot) $ zmake build bloonchipper
-# Run the image in Renode.
-(chroot) $ ./util/renode-ec-launch -b bloonchipper --zephyr
-# Connect to the console.
-(chroot) $ screen /tmp/renode-uart
-```
-
 [`renode-ec-launch`]: ../renode-ec-launch
 
 ## Connecting GDB to Renode
@@ -151,6 +142,40 @@ Action            | Renode command for `bloonchipper`
 Note, you can just type `sysbus`, `sysbus.gpioPortB`, or
 `sysbus.gpioPortB.GPIO_WP` to learn more about these modules and the available
 functions.
+
+## Updating Renode in the chroot and CQ
+
+To update the version of Renode used in the chroot and the CQ:
+
+1.  **Update the `renode` ebuild:** Update the [`app-emulation/renode` ebuild].
+    You'll need to rename the ebuild file to the new version, copy the source to
+    [`localmirror`], and update the `Manifest` file. See the `TEST` lines in the
+    example CL below.
+
+    *   Example CL: https://crrev.com/c/7563809
+
+2.  **Wait for the builder:** Once the ebuild update is merged, the
+    `build-chromiumos-sdk-subtools` builder will build the new package and
+    upload it to CIPD. This builder runs on a nightly basis; you can also
+    manually trigger a build with the scheduler.
+
+    *   **Scheduler:** [build-chromiumos-sdk-subtools]
+    *   **Builder:** [infra/build-chromiumos-sdk-subtools]
+
+    You can check for the new version in CIPD: [chromiumos/infra/tools/renode]
+
+3.  **Update `firmware_builder.py`:** Update the `cipd_renode_version` variable
+    in [`util/renode/firmware_builder.py`] with the new version string from CIPD
+    (e.g., `ebuild_source:app-emulation/renode-1.16.0_p20260209,...`).
+
+    *   Example CL: https://crrev.com/c/7568663
+
+[build-chromiumos-sdk-subtools]: https://luci-scheduler.appspot.com/jobs/chromeos/build-chromiumos-sdk-subtools
+[infra/build-chromiumos-sdk-subtools]: https://ci.chromium.org/p/chromeos/builders/infra/build-chromiumos-sdk-subtools
+[chromiumos/infra/tools/renode]: https://chrome-infra-packages.appspot.com/p/chromiumos/infra/tools/renode
+[`util/renode/firmware_builder.py`]: https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/util/renode/firmware_builder.py
+[`app-emulation/renode` ebuild]: https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/chromiumos-overlay/app-emulation/renode/
+[`localmirror`]: https://www.chromium.org/chromium-os/developer-library/reference/third-party/archive-mirrors/
 
 ## Highlights
 

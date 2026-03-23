@@ -30,7 +30,7 @@
 
 volatile int starve_dog = 0;
 
-void watchdog_reload(void)
+void chip_watchdog_reload(void)
 {
 	if (!starve_dog) {
 		/* Reset the watchdog */
@@ -38,7 +38,6 @@ void watchdog_reload(void)
 		MXC_WDT0->rst = 0x005A;
 	}
 }
-DECLARE_HOOK(HOOK_TICK, watchdog_reload, HOOK_PRIO_DEFAULT);
 
 int watchdog_init(void)
 {

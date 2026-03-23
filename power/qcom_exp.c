@@ -114,6 +114,12 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 /* Wait for polling if the switchcap outputs good voltage */
 #define SWITCHCAP_PG_CHECK_WAIT (6 * MSEC)
 
+/* The timeout of the check if the switchcap outputs reset voltage */
+#define SWITCHCAP_RESET_TIMEOUT (2000 * MSEC)
+
+/* Wait for polling if the switchcap outputs reset voltage */
+#define SWITCHCAP_RESET_CHECK_WAIT (6 * MSEC)
+
 /*
  * Delay between power-on the system and power-on the PMIC.
  * Some latest PMIC firmware needs this delay longer, for doing a cold
@@ -459,6 +465,27 @@ static int wait_switchcap_power_good(int enable)
 }
 
 /**
+ * Wait for the switchcap to reset to init state.
+ */
+static void wait_switchcap_power_reset(void)
+{
+	timestamp_t poll_deadline;
+
+	poll_deadline = get_time();
+	poll_deadline.val += SWITCHCAP_RESET_TIMEOUT;
+	while (!board_is_switchcap_power_reset() &&
+	       get_time().val < poll_deadline.val) {
+		crec_usleep(SWITCHCAP_RESET_CHECK_WAIT);
+	}
+
+	if (board_is_switchcap_power_reset()) {
+		CPRINTS("SWITCHCAP IS RESET!");
+	} else {
+		CPRINTS("SWITCHCAP NOT RESET!");
+	}
+}
+
+/**
  * Get the state of the system power signals.
  *
  * @return 1 if the system is powered, 0 if not
@@ -618,6 +645,18 @@ static void set_system_power_no_check(int enable)
 }
 
 /**
+ * Initialize the System SwitchCap power.
+ *
+ * The system power signals are the enable pins of SwitchCap.
+ * The switchcap needs to be in the reset state during initialization.
+ */
+static void system_reset_switchcap_power(void)
+{
+	set_system_power_no_check(0);
+	wait_switchcap_power_reset();
+}
+
+/**
  * Set the state of the system power signals.
  *
  * The system power signals are the enable pins of SwitchCap.
@@ -710,12 +749,13 @@ enum power_state power_chipset_init(void)
 	uint32_t reset_flags = system_get_reset_flags();
 
 	/*
-	 * Force the AP shutdown unless we are doing SYSJUMP. Otherwise,
-	 * the AP could stay in strange state.
+	 * Properly initialize the switchcap power unless we are doing SYSJUMP.
+	 * This ensures the switchcap is in a known reset state, preventing
+	 * the AP from being in an inconsistent state.
 	 */
 	if (!(reset_flags & EC_RESET_FLAG_SYSJUMP)) {
 		CPRINTS("not sysjump; forcing system shutdown");
-		set_system_power_no_check(0);
+		system_reset_switchcap_power();
 		init_power_state = POWER_G3;
 	} else {
 		/* In the SYSJUMP case, we check if the AP is on */
@@ -753,6 +793,26 @@ enum power_state power_chipset_init(void)
 	} else if (!(reset_flags & EC_RESET_FLAG_EFS) &&
 		   (reset_flags & EC_RESET_FLAG_SYSJUMP)) {
 		auto_power_on = 0;
+	} else if ((reset_flags & EC_RESET_FLAG_HIBERNATE)) {
+		/*
+		 * When exiting from hibernate, check the wake source. If it
+		 * was AC, we need to set ac_on = 1 so that the subsequent
+		 * power-on sequence uses POWER_ON_BY_AC_ON. This informs the
+		 * AP firmware that it was powered on by a cable insertion
+		 * (CBLPWR).
+		 */
+
+		/* b:431715716: Justification for using CONFIG_ZEPHYR in legacy
+		 * ec code, this power sequence flow will be ported to zephyr
+		 * ap-pwrseq driver.
+		 */
+		enum hibernate_wake_source wake_source;
+
+		if (system_get_hibernate_wake_source(&wake_source) == 0 &&
+		    wake_source == WAKE_SOURCE_ACOK) {
+			ac_on = 1;
+			auto_power_on = 0;
+		}
 	}
 
 	if (auto_power_on) {

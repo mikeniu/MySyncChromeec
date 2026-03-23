@@ -194,6 +194,12 @@
 #define USB_PD_PORT_ANX74XX 0
 #define USB_PD_PORT_PS8751 1
 
+/* Panic Handling Features */
+#ifdef SECTION_IS_RW
+#define CONFIG_PRESERVED_RING_BUF
+#define CONFIG_PANIC_LOG
+#endif
+
 #ifndef __ASSEMBLER__
 
 #include "gpio_signal.h"

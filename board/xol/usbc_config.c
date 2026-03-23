@@ -34,11 +34,6 @@
 #define CPRINTF(format, args...) cprintf(CC_USBPD, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_USBPD, format, ##args)
 
-#ifdef CONFIG_ZEPHYR
-enum ioex_port { IOEX_C0_NCT38XX = 0, IOEX_C2_NCT38XX, IOEX_PORT_COUNT };
-#endif /* CONFIG_ZEPHYR */
-
-#ifndef CONFIG_ZEPHYR
 /* USBC TCPC configuration */
 const struct tcpc_config_t tcpc_config[] = {
 	[USBC_PORT_C0] = {
@@ -62,21 +57,17 @@ const struct tcpc_config_t tcpc_config[] = {
 };
 BUILD_ASSERT(ARRAY_SIZE(tcpc_config) == USBC_PORT_COUNT);
 BUILD_ASSERT(CONFIG_USB_PD_PORT_MAX_COUNT == USBC_PORT_COUNT);
-#endif /* !CONFIG_ZEPHYR */
 
 /******************************************************************************/
 /* USB-A charging control */
 
-#ifndef CONFIG_ZEPHYR
 const int usb_port_enable[USB_PORT_COUNT] = {
 	GPIO_EN_PP5000_USBA_R,
 };
-#endif
 BUILD_ASSERT(ARRAY_SIZE(usb_port_enable) == USB_PORT_COUNT);
 
 /******************************************************************************/
 
-#ifndef CONFIG_ZEPHYR
 /* USBC PPC configuration */
 struct ppc_config_t ppc_chips[] = {
 	[USBC_PORT_C0] = {
@@ -136,7 +127,6 @@ struct ioexpander_config_t ioex_config[] = {
 	},
 };
 BUILD_ASSERT(ARRAY_SIZE(ioex_config) == CONFIG_IO_EXPANDER_PORT_COUNT);
-#endif /* !CONFIG_ZEPHYR */
 
 void board_reset_pd_mcu(void)
 {
@@ -149,26 +139,18 @@ static void board_tcpc_init(void)
 	 * C0/C2 TCPC, so they must be set up after the TCPC has
 	 * been taken out of reset.
 	 */
-#ifndef CONFIG_ZEPHYR
 	ioex_init(IOEX_C0_NCT38XX);
 	ioex_init(IOEX_C2_NCT38XX);
-#else
-	gpio_reset_port(DEVICE_DT_GET(DT_NODELABEL(ioex_port1)));
-	gpio_reset_port(DEVICE_DT_GET(DT_NODELABEL(ioex_port2)));
-#endif
 
 	/* Enable PPC interrupts. */
 	gpio_enable_interrupt(GPIO_USB_C0_PPC_INT_ODL);
 	gpio_enable_interrupt(GPIO_USB_C2_PPC_INT_ODL);
 
-#ifndef CONFIG_ZEPHYR
 	/* Enable TCPC interrupts. */
 	gpio_enable_interrupt(GPIO_USB_C0_C2_TCPC_INT_ODL);
-#endif /* !CONFIG_ZEPHYR */
 }
 DECLARE_HOOK(HOOK_INIT, board_tcpc_init, HOOK_PRIO_INIT_CHIPSET);
 
-#ifndef CONFIG_ZEPHYR
 uint16_t tcpc_get_alert_status(void)
 {
 	uint16_t status = 0;
@@ -178,7 +160,6 @@ uint16_t tcpc_get_alert_status(void)
 
 	return status;
 }
-#endif
 
 int ppc_get_alert_status(int port)
 {
@@ -189,7 +170,6 @@ int ppc_get_alert_status(int port)
 	return 0;
 }
 
-#ifndef CONFIG_ZEPHYR
 void tcpc_alert_event(enum gpio_signal signal)
 {
 	switch (signal) {
@@ -200,7 +180,6 @@ void tcpc_alert_event(enum gpio_signal signal)
 		break;
 	}
 }
-#endif
 
 void ppc_interrupt(enum gpio_signal signal)
 {
@@ -221,4 +200,32 @@ void ppc_interrupt(enum gpio_signal signal)
 __override bool board_is_dts_port(int port)
 {
 	return port == USBC_PORT_C0;
+}
+
+__override bool pd_check_vbus_level(int port, enum vbus_level level)
+{
+	int tcpc_vbus_voltage = 0;
+
+	/* Invalid argument guard */
+	if (level > VBUS_REMOVED)
+		return false;
+	/*
+	 * Attempt to read the VBUS voltage from the Type-C Port Controller
+	 * (TCPC) to improve VBUS level detection accuracy.
+	 *
+	 * xol requires an offset of at least 150 mV to reliably detect VBUS
+	 * disconnect during TD 4.6.3 compliance testing. See b/469616500 for
+	 * details and test data.
+	 */
+	tcpc_vbus_voltage = tcpc_get_vbus_voltage(port) + 150;
+	switch (level) {
+	case VBUS_PRESENT:
+		return tcpc_vbus_voltage >= PD_V_SAFE5V_MIN;
+	case VBUS_SAFE0V:
+		return tcpc_vbus_voltage <= PD_V_SAFE0V_MAX;
+	case VBUS_REMOVED:
+		return tcpc_vbus_voltage <= PD_V_SINK_DISCONNECT_MAX;
+	default:
+		return false;
+	}
 }

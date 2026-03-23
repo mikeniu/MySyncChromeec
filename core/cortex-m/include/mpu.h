@@ -11,6 +11,8 @@
 #include "common.h"
 #include "config.h" /* chips might override MPU attribute settings */
 
+#include <stdbool.h>
+
 /*
  * ARMv7-M SRAM region
  */
@@ -130,9 +132,14 @@ int mpu_lock_ro_flash(void);
 int mpu_lock_rw_flash(void);
 
 /**
- * Protect/unprotect rollback region readback.
+ * @brief Protects or unprotects the rollback region readback.
+ *
+ * @param lock true to lock (protect), false to unlock (unprotect).
+ *
+ * @retval 0 Success.
+ * @retval <0 Error occurred.
  */
-int mpu_lock_rollback(int lock);
+test_mockable int mpu_lock_rollback(bool lock);
 
 /**
  * Initialize MPU.
