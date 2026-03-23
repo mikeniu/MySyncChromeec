@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdc1685e_1e578897",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-23T20:20:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef102144_57d05cb3",
+      "revId": "c62f496d36e01f54329c4122e38835b6cc01cc67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d655a644_360131ad",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-03-20T23:17:51Z",
       "side": 1,
       "message": "Isn\u0027t this missing `AP_POWER_EVENT_CALLBACK_DEFINE()`.  Does this compile?\n\nAlso note that `dsp_service_startup()` calls `ap_power_ev_remove_callback()` as the DSP service only needs the `AP_POWER_STARTUP` notification once.\n\nThis probably needs a static variable to track whether the `AP_POWER_STARTUP` callback has already been processed.",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 72
+      },
+      "revId": "c62f496d36e01f54329c4122e38835b6cc01cc67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32baafdf_3dfa9011",
+        "filename": "zephyr/drivers/dsp_comms/service/dsp_service.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-23T20:20:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d655a644_360131ad",
       "range": {
         "startLine": 68,
         "startChar": 0,
@@ -64,6 +106,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "08ae4f9c_0e2a7e1a",
+        "filename": "zephyr/program/brox/juchi/src/touch_panel.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-23T20:20:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c8da3035_b359a4bb",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 127,
+        "endChar": 76
+      },
+      "revId": "c62f496d36e01f54329c4122e38835b6cc01cc67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cadd7f06_c8a0dfae",
@@ -77,6 +143,30 @@
       "writtenOn": "2026-03-20T23:17:51Z",
       "side": 1,
       "message": "This change lost the board_version check below.  `board_backlight_handler` needs a guard and early exit for `board_version \u003e 1`.",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 72
+      },
+      "revId": "c62f496d36e01f54329c4122e38835b6cc01cc67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d0f10f8_70784e25",
+        "filename": "zephyr/program/corsola/skitty/src/board_chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-23T20:20:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cadd7f06_c8a0dfae",
       "range": {
         "startLine": 80,
         "startChar": 0,
@@ -110,6 +200,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "717f0a3c_babc5a00",
+        "filename": "zephyr/program/corsola/squirtle/src/board_chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-23T20:20:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2986d63e_bfc7e839",
+      "range": {
+        "startLine": 78,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 30
+      },
+      "revId": "c62f496d36e01f54329c4122e38835b6cc01cc67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7d8ff9b_40dd5046",
@@ -133,6 +247,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6207bc9e_d1871085",
+        "filename": "zephyr/program/corsola/src/usbc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-23T20:20:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7d8ff9b_40dd5046",
+      "range": {
+        "startLine": 238,
+        "startChar": 0,
+        "endLine": 238,
+        "endChar": 42
+      },
+      "revId": "c62f496d36e01f54329c4122e38835b6cc01cc67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1a1a98eb_860599f3",
@@ -146,6 +284,30 @@
       "writtenOn": "2026-03-20T23:17:51Z",
       "side": 1,
       "message": "Move next the callback",
+      "range": {
+        "startLine": 137,
+        "startChar": 0,
+        "endLine": 137,
+        "endChar": 67
+      },
+      "revId": "c62f496d36e01f54329c4122e38835b6cc01cc67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ba93613_33565508",
+        "filename": "zephyr/program/corsola/starmie/src/base_detect.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-23T20:20:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a1a98eb_860599f3",
       "range": {
         "startLine": 137,
         "startChar": 0,

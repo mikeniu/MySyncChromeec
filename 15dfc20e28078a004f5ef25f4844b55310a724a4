@@ -22,6 +22,30 @@
       },
       "revId": "15dfc20e28078a004f5ef25f4844b55310a724a4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd552ab5_4024400e",
+        "filename": "zephyr/program/brox/src/suspend_resume.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-03-23T20:20:09Z",
+      "side": 0,
+      "message": "Done, should we add GPIO checks inside handler function?",
+      "parentUuid": "1b3bfb29_cc8cb70d",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 63,
+        "endChar": 2
+      },
+      "revId": "15dfc20e28078a004f5ef25f4844b55310a724a4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
