@@ -1,3 +1,4 @@
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 # Copyright 2025 The ChromiumOS Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
@@ -67,3 +68,63 @@ if(DEFINED CONFIG_BOARD_INTEL_ISH_5_8_0)
 endif()
 
 add_subdirectory(${PROJECT_NAME})
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+# Copyright 2025 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+cmake_minimum_required(VERSION 3.20.5)
+
+find_package(Zephyr REQUIRED HINTS "${ZEPHYR_BASE}")
+
+if(DEFINED CONFIG_BOARD_OCELOTRVP_ITE)
+	project(ocelotrvp-ite)
+	zephyr_library_sources("src/rvp_board_id.c")
+	zephyr_library_sources("src/rvp_keyboard_customization.c")
+	zephyr_library_sources("src/rvp_board_power.c")
+	zephyr_library_sources("src/rvp_usbc_runtime.c")
+endif()
+
+if(DEFINED CONFIG_BOARD_OCELOTRVP_NPCX)
+	project(ocelotrvp-npcx)
+	zephyr_library_sources("src/rvp_board_id.c")
+	zephyr_library_sources("src/rvp_keyboard_customization.c")
+	zephyr_library_sources("src/rvp_board_power.c")
+	zephyr_library_sources("src/rvp_usbc_runtime.c")
+endif()
+
+if(DEFINED CONFIG_BOARD_OCELOTRVP_MCHP)
+	project(ocelotrvp-mchp)
+	zephyr_library_sources("src/rvp_board_id.c")
+	zephyr_library_sources("src/rvp_board_power.c")
+	zephyr_library_sources("src/rvp_usbc_runtime.c")
+endif()
+
+if(DEFINED CONFIG_BOARD_OJAL)
+	project(ojal)
+	zephyr_library_sources("ojal/src/board_power.c")
+endif()
+
+if(DEFINED CONFIG_BOARD_MATSU)
+	project(matsu)
+	zephyr_library_sources("matsu/src/board_power.c")
+	zephyr_library_sources("matsu/src/suspend_resume.c")
+	zephyr_library_sources("matsu/src/touch_panel.c")
+	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_CUSTOMIZATION
+					"matsu/src/keyboard_customization.c")
+endif()
+
+zephyr_include_directories("include/")
+
+zephyr_include_directories_ifdef(CONFIG_PLATFORM_EC_DEDICATED_CHARGE_PORT
+  "../intelrvp/include")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_DEDICATED_CHARGE_PORT
+  "../intelrvp/src/dc_jack.c")
+
+if(DEFINED CONFIG_BOARD_INTEL_ISH_5_8_0)
+	project(ocelot-ish)
+endif()
+
+add_subdirectory(${PROJECT_NAME})
+=======
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)

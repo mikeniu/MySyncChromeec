@@ -8,10 +8,6 @@
 
 #include "compile_time_macros.h"
 
-#ifdef CONFIG_ZEPHYR
-#include "zephyr_gpio_signal.h"
-#else
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -58,7 +54,5 @@ BUILD_ASSERT(IOEX_SIGNAL_END < IOEX_LIMIT);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* !CONFIG_ZEPHYR */
 
 #endif /* __CROS_EC_GPIO_SIGNAL_H */

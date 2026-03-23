@@ -4,8 +4,7 @@
  */
 
 /*
- * This file is used for platform/ec implementations of irq_lock and irq_unlock
- * which are defined by Zephyr.
+ * This file is used for platform/ec implementations of irq_lock and irq_unlocks
  */
 
 #include "task.h"

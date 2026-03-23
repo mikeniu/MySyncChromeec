@@ -7,12 +7,7 @@
 #ifndef __CROS_EC_IOEXPANDER_H
 #define __CROS_EC_IOEXPANDER_H
 
-#ifdef CONFIG_ZEPHYR
-#define ioex_signal gpio_signal
-#include "gpio.h"
-#else
 enum ioex_signal; /* from gpio_signal.h */
-#endif
 
 #ifdef __cplusplus
 extern "C" {

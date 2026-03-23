@@ -95,7 +95,6 @@ static void set_led_color(int color)
 
 static void set_pwm_led_enable(enum pwm_led_id id, int enable)
 {
-#ifndef CONFIG_ZEPHYR
 	const struct pwm_led *led = &pwm_leds[id];
 
 	if ((id >= CONFIG_LED_PWM_COUNT) || (id < 0))
@@ -107,7 +106,6 @@ static void set_pwm_led_enable(enum pwm_led_id id, int enable)
 		led->enable(led->ch1, enable);
 	if (led->ch2 != PWM_LED_NO_CHANNEL)
 		led->enable(led->ch2, enable);
-#endif
 }
 
 static void init_leds_off(void)

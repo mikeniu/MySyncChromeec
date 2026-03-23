@@ -280,12 +280,12 @@ uint32_t system_get_reset_flags(void)
 
 void system_set_reset_flags(uint32_t flags)
 {
-	reset_flags |= flags;
+	atomic_or((atomic_t *)&reset_flags, flags);
 }
 
 void system_clear_reset_flags(uint32_t flags)
 {
-	reset_flags &= ~flags;
+	atomic_clear_bits((atomic_t *)&reset_flags, flags);
 }
 
 static void print_reset_flags(uint32_t flags)
@@ -440,7 +440,6 @@ test_mockable void system_disable_jump(void)
 
 #ifdef CONFIG_MPU
 	if (system_is_locked()) {
-#ifndef CONFIG_ZEPHYR
 		int ret;
 		enum ec_image __attribute__((unused)) copy;
 
@@ -494,7 +493,6 @@ test_mockable void system_disable_jump(void)
 			return;
 		}
 #endif /* !CONFIG_EXTERNAL_STORAGE */
-#endif /* !CONFIG_ZEPHYR */
 
 		/* All regions were configured successfully, enable MPU */
 		mpu_enable();
@@ -1890,8 +1888,6 @@ __overridable const char *board_read_serial(void)
 	if (IS_ENABLED(CONFIG_FLASH_PSTATE) &&
 	    IS_ENABLED(CONFIG_FLASH_PSTATE_BANK))
 		return crec_flash_read_pstate_serial();
-	else if (IS_ENABLED(CONFIG_OTP))
-		return otp_read_serial();
 	else
 		return "";
 }
@@ -1901,8 +1897,6 @@ __overridable int board_write_serial(const char *serialno)
 	if (IS_ENABLED(CONFIG_FLASH_PSTATE) &&
 	    IS_ENABLED(CONFIG_FLASH_PSTATE_BANK))
 		return crec_flash_write_pstate_serial(serialno);
-	else if (IS_ENABLED(CONFIG_OTP))
-		return otp_write_serial(serialno);
 	else
 		return EC_ERROR_UNIMPLEMENTED;
 }

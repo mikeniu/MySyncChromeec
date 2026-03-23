@@ -14,16 +14,6 @@
 #include "usb_charge.h"
 #include "usb_pd.h"
 
-/*
- * If compiling with Zephyr, include the USB_MUX_FLAG_ definitions that are
- * shared with device tree
- */
-#ifdef CONFIG_ZEPHYR
-
-#include "dt-bindings/usbc_mux.h"
-
-#else /* !CONFIG_ZEPHYR */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,8 +24,6 @@ extern "C" {
 #define USB_MUX_FLAG_RESETS_IN_G3 BIT(2) /* Mux chip will reset in G3 */
 #define USB_MUX_FLAG_POLARITY_INVERTED BIT(3) /* Mux polarity is inverted */
 #define USB_MUX_FLAG_CAN_IDLE BIT(4) /* MUX supports idle mode */
-
-#endif /* CONFIG_ZEPHYR */
 
 /* usb_mux.hpd_update API only specifies 2 relevant bits in mux_state */
 #define MUX_STATE_HPD_UPDATE_MASK (USB_PD_MUX_HPD_LVL | USB_PD_MUX_HPD_IRQ)

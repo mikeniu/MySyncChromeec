@@ -8,25 +8,21 @@
 
 #include "ec_commands.h"
 
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 #ifdef CONFIG_ZEPHYR
 #include <zephyr/drivers/pwm.h>
 #endif
 
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/drivers/pwm.h>
+
+=======
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifdef CONFIG_ZEPHYR
-#define PWM_LED_NO_CHANNEL NULL
-
-struct pwm_led {
-	const struct pwm_dt_spec *ch0;
-	const struct pwm_dt_spec *ch1;
-	const struct pwm_dt_spec *ch2;
-
-	void (*set_duty)(const struct pwm_dt_spec *pwm, int percent);
-};
-#else
 #define PWM_LED_NO_CHANNEL ((enum pwm_channel)(-1))
 
 struct pwm_led {
@@ -37,7 +33,6 @@ struct pwm_led {
 	void (*enable)(enum pwm_channel ch, int enabled);
 	void (*set_duty)(enum pwm_channel ch, int percent);
 };
-#endif
 
 struct pwm_led_color_map {
 	uint8_t ch0;

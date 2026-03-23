@@ -36,10 +36,10 @@ static struct fp_sensor_info elan_sensor_info = {
 };
 
 #define ELAN_DEFAULT_IMAGE_PARAMS                                         \
-	.bpp = FP_SENSOR_RES_BPP_ELAN,                                    \
 	.frame_size = FP_SENSOR_RES_X_ELAN * FP_SENSOR_RES_Y_ELAN * 2,    \
+	.image_data_offset_bytes = FP_SENSOR_IMAGE_OFFSET_ELAN,           \
 	.pixel_format = V4L2_PIX_FMT_GREY, .width = FP_SENSOR_RES_X_ELAN, \
-	.height = FP_SENSOR_RES_Y_ELAN
+	.height = FP_SENSOR_RES_Y_ELAN, .bpp = FP_SENSOR_RES_BPP_ELAN
 
 static const struct fp_image_frame_params elan_image_frame_params[] = {
 	[ELAN_CAPTURE_VENDOR_FORMAT] =
@@ -236,12 +236,13 @@ int fp_sensor_get_info(struct ec_response_fp_info_v2 *resp, size_t resp_size)
  *   due to finger covering too little area of the sensor
  */
 int fp_finger_match(void *templ, uint32_t templ_count, uint8_t *image,
-		    int32_t *match_index, uint32_t *update_bitmap)
+		    bool template_update, int32_t *match_index,
+		    uint32_t *update_bitmap)
 {
 	int res;
 	CPRINTF("========%s=======\n", __func__);
 	res = elan_match(templ, templ_count, image, match_index, update_bitmap);
-	if (res == EC_MKBP_FP_ERR_MATCH_YES)
+	if (res == EC_MKBP_FP_ERR_MATCH_YES && template_update)
 		res = elan_template_update(templ, *match_index);
 
 	return res;

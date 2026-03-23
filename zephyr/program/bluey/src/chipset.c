@@ -1,3 +1,4 @@
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 /* Copyright 2025 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
@@ -39,3 +40,57 @@ void reset_all_passthru_pmic_signal(void)
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_pmic_acok), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_pmic_lid_open_od), 0);
 }
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* Bluey chipset-specific configuration */
+
+#include "battery.h"
+#include "common.h"
+#include "extpower.h"
+#include "gpio.h"
+#include "hooks.h"
+#include "power/qcom.h"
+
+#define CPRINTS(format, args...) cprints(CC_CHIPSET, format, ##args)
+
+void board_chipset_pre_init(void)
+{
+	/* Cache the battery dynamic information before AP power on */
+	if (battery_is_present() == BP_YES) {
+		battery_poll_dynamic_info();
+		CPRINTS("battery dynamic information cached");
+	}
+}
+DECLARE_HOOK(HOOK_CHIPSET_PRE_INIT, board_chipset_pre_init, HOOK_PRIO_DEFAULT);
+
+void board_chipset_startup(void)
+{
+	/* Update the AC event during boot */
+	extpower_update_host_events(gpio_get_level(GPIO_AC_PRESENT));
+}
+DECLARE_HOOK(HOOK_CHIPSET_STARTUP, board_chipset_startup, HOOK_PRIO_DEFAULT);
+
+void passthru_lid_open_to_pmic(void)
+{
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_pmic_lid_open_od),
+			gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_lid_open)));
+}
+
+void passthru_ac_on_to_pmic(void)
+{
+	gpio_pin_set_dt(
+		GPIO_DT_FROM_NODELABEL(gpio_ec_pmic_acok),
+		gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_acok_od_z5)));
+}
+
+void reset_all_passthru_pmic_signal(void)
+{
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_pmic_acok), 0);
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_pmic_lid_open_od), 0);
+}
+=======
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)

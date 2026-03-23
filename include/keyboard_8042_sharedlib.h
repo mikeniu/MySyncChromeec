@@ -172,6 +172,12 @@ enum scancode_values {
 	SCANCODE_ACCESSIBILITY = 0xe00e, /* e029 in codeset 1 */
 	SCANCODE_DONOTDISTURB = 0xe052, /* e028 in codeset 1 */
 	SCANCODE_HOME = 0xe012, /* e02a in codeset 1 */
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+=======
+	SCANCODE_INSERT = 0xe070, /* e052 in codeset 1 */
+	SCANCODE_SCREENLOCK = 0xe05d, /* e02b in codeset 1 */
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)
 
 	SCANCODE_UP = 0xe075,
 	SCANCODE_DOWN = 0xe072,

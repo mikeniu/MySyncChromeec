@@ -75,6 +75,7 @@
 #undef CONFIG_FLASH_CROS
 #undef CONFIG_FMAP
 #undef CONFIG_SWITCH
+#undef CONFIG_CONSOLE_CMDHELP
 
 /* Undefined console commands */
 #undef CONFIG_CMD_HASH
@@ -84,6 +85,7 @@
 #undef CONFIG_CMD_POWER_AP
 #undef CONFIG_CMD_POWERINDEBUG
 #undef CONFIG_CMD_SHMEM
+#undef CONFIG_CMD_ACCELSPOOF
 
 /* power management definitions */
 #define CONFIG_LOW_POWER_IDLE

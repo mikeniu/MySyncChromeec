@@ -20,6 +20,7 @@ _fpsensor_detect_strings_obj:=$(_fpsensor_dir)fpsensor_detect_strings.o
 _fpsensor_debug_obj:=$(_fpsensor_dir)fpsensor_debug.o
 _fpsensor_utils_obj:=$(_fpsensor_dir)fpsensor_utils.o
 _fpsensor_auth_commands_obj:=$(_fpsensor_dir)fpsensor_auth_commands.o
+_fpsensor_auth_handshake_obj:=$(_fpsensor_dir)fpsensor_auth_handshake.o
 _fpsensor_auth_crypto_stateful_obj:=$(_fpsensor_dir)fpsensor_auth_crypto_stateful.o
 _fpsensor_auth_crypto_stateless_obj:=$(_fpsensor_dir)fpsensor_auth_crypto_stateless.o
 _fpsensor_frame_size_obj:=$(_fpsensor_dir)fpsensor_frame_size.o
@@ -31,6 +32,7 @@ $(out)/RW/$(_fpsensor_detect_strings_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_debug_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_utils_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_auth_commands_obj): CFLAGS+=$(fpsensor_CFLAGS)
+$(out)/RW/$(_fpsensor_auth_handshake_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_auth_crypto_stateful_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_auth_crypto_stateless_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_frame_size_obj): CFLAGS+=$(fpsensor_CFLAGS)
@@ -40,6 +42,11 @@ all-obj-$(HAS_TASK_FPSENSOR)+=$(_fpsensor_obj)
 all-obj-$(HAS_TASK_CONSOLE)+=$(_fpsensor_detect_strings_obj)
 all-obj-$(HAS_TASK_FPSENSOR)+=$(_fpsensor_debug_obj)
 all-obj-$(HAS_TASK_FPSENSOR)+=$(_fpsensor_auth_commands_obj)
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+=======
+all-obj-$(HAS_TASK_FPSENSOR)+=$(_fpsensor_auth_handshake_obj)
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)
 all-obj-$(HAS_TASK_FPSENSOR)+=$(_fpsensor_frame_size_obj)
 
 # Since we only include the FPSENSOR task in the RW image, HAS_TASK_FPSENSOR

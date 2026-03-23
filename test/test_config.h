@@ -35,10 +35,6 @@
 #define CONFIG_BORINGSSL_CRYPTO
 #endif
 
-#ifdef TEST_BASE32
-#define CONFIG_BASE32
-#endif
-
 #ifdef TEST_BATTERY_CONFIG
 #define CONFIG_BATTERY_FUEL_GAUGE
 #define CONFIG_BATTERY_CONFIG_IN_CBI
@@ -643,6 +639,16 @@ int ncp15wb_calculate_temp(uint16_t adc);
 
 #ifdef TEST_PANIC
 #undef CONFIG_PANIC_STRIP_GPR
+#endif
+
+#ifdef TEST_WATCHDOG
+#define CONFIG_WATCHDOG
+#endif
+
+#ifdef TEST_WATCHDOG_INFO
+#define CONFIG_WATCHDOG
+#define CONFIG_HOSTCMD_WATCHDOG_INFO
+#define CONFIG_CONSOLE_CMD_WATCHDOG_INFO
 #endif
 
 #ifdef HAVE_PRIVATE

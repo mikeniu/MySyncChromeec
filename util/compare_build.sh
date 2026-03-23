@@ -253,7 +253,12 @@ PARENT_DIR ?= $(realpath ../)
 BORINGSSL_DIR ?= $(realpath ../../third_party/boringssl)
 CRYPTOC_DIR ?= $(realpath ../../third_party/cryptoc)
 EIGEN3_DIR ?= $(realpath ../../third_party/eigen3)
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 ZEPHYR_BASE ?= $(realpath ../../../src/third_party/zephyrproject/zephyr)
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+ZEPHYR_BASE ?= $(realpath ../../../src/third_party/zephyr/main)
+=======
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)
 BOARDS ?= ${BOARDS[*]}
 LINKS ?= ${LINKS[*]}
 HEREDOC
@@ -281,7 +286,6 @@ build-%: ec-%
 		BORINGSSL_DIR=\$(BORINGSSL_DIR)                               \\
 		CRYPTOC_DIR=\$(CRYPTOC_DIR)                                   \\
 		EIGEN3_DIR=\$(EIGEN3_DIR)                                     \\
-		ZEPHYR_BASE=\$(ZEPHYR_BASE)                                   \\
 HEREDOC
 
 # Add the variables to the environment
