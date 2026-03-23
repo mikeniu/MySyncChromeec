@@ -16,6 +16,24 @@
       "message": "Perhaps it\u0027s worth clarifying that a 5-second wake-up after an OS-driven shutdown differs from a heartbeat-offmode shutdown, which has a 45-minute window. \n\nI\u0027d like to extend the window from 5 seconds to 30 seconds or perhaps a minute, to ensure we don\u0027t wake up immediately after powering off, thereby avoiding any race conditions during boot.",
       "revId": "b369a2791054bc1b325106c15de38c4fef951a20",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2922cf11_dee896ed",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-03-23T17:09:17Z",
+      "side": 1,
+      "message": "Acknowledged, Updated the timeout to be 30 secs after shutdown",
+      "parentUuid": "ca95a42d_d711fe35",
+      "revId": "b369a2791054bc1b325106c15de38c4fef951a20",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
