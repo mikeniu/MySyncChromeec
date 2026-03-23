@@ -1,5 +1,0 @@
-common:
-  platform_allow:
-    - native_sim
-tests:
-  boringssl.selftest: {}

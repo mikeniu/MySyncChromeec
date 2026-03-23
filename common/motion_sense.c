@@ -99,16 +99,6 @@ static atomic_t odr_event_required;
 /* Whether or not the FIFO interrupt should be enabled (set from the AP). */
 __maybe_unused static int fifo_int_enabled;
 
-#ifdef CONFIG_ZEPHYR
-static int init_sensor_mutex(void)
-{
-	k_mutex_init(&g_sensor_mutex);
-
-	return 0;
-}
-SYS_INIT(init_sensor_mutex, POST_KERNEL, 50);
-#endif /* CONFIG_ZEPHYR */
-
 #ifdef CONFIG_LID_ANGLE
 __attribute__((weak)) int sensor_board_is_lid_angle_available(void)
 {

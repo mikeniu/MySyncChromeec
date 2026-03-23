@@ -8,20 +8,12 @@
 #ifndef __CROS_EC_TIMER_H
 #define __CROS_EC_TIMER_H
 
-#ifndef CONFIG_ZEPHYR
+#include "common.h"
+#include "task_id.h"
+
 #include <time.h>
 
 #include <sys/types.h>
-#else
-#ifndef __clock_t_defined
-#define __clock_t_defined 1
-/* Data type for POSIX style clock() implementation */
-typedef long unsigned int clock_t;
-#endif
-#endif
-
-#include "common.h"
-#include "task_id.h"
 
 /* Time units in microseconds */
 #define MSEC 1000

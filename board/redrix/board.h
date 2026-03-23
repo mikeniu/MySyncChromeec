@@ -13,9 +13,15 @@
 /* Baseboard features */
 #include "baseboard.h"
 
+#define NPCX_CORE_ABP2_ABP3_CLOCK_45M
+
 /* Increase tx buffer size. */
 #undef CONFIG_UART_TX_BUF_SIZE
 #define CONFIG_UART_TX_BUF_SIZE 8192
+
+/* WATCHDOG_PERIOD_MS */
+#undef CONFIG_WATCHDOG_PERIOD_MS
+#define CONFIG_WATCHDOG_PERIOD_MS 2700
 
 /*
  * This will happen automatically on NPCX9 ES2 and later. Do not remove

@@ -53,6 +53,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from enum import Enum
 import io
+import json
 import logging
 import os
 from pathlib import Path
@@ -134,14 +135,6 @@ DATA_ACCESS_VIOLATION_200A8000_REGEX = re.compile(
 This is 32K less than Helipilot's start address (0x200B0000). This corresponds
 to HELIPILOT_DATA_RAM_SIZE_BYTES being increased from 156KiB to 188KiB.
 """
-DATA_ACCESS_VIOLATION_20098000_REGEX = re.compile(
-    r"Data access violation, mfar = 20098000\r\n"
-)
-"""Gwendolin's data RAM starting address.
-
-This is 96K less than Helipilot's start address (0x200B0000). This corresponds
-to HELIPILOT_DATA_RAM_SIZE_BYTES being increased from 156KiB to 252KiB.
-"""
 
 # \r is added twice by Zephyr code.
 PRINTF_CALLED_REGEX = re.compile(r"printf called(\r){1,2}\n")
@@ -150,8 +143,8 @@ NEVER_MATCH_REGEX = re.compile(r"(?!)")
 
 BLOONCHIPPER = "bloonchipper"
 BUCCANEER = "buccaneer"
+CHUDOW = "chudow"
 DARTMONKEY = "dartmonkey"
-GWENDOLIN = "gwendolin"
 HELIPILOT = "helipilot"
 SANOK = "sanok"
 
@@ -215,6 +208,14 @@ class ApplicationType(Enum):
     PRODUCTION = 2
 
 
+class TestStatus(Enum):
+    """Test execution status."""
+
+    PASS = "PASS"
+    FAIL = "FAIL"
+    SKIP = "SKIP"
+
+
 class FPSensorType(Enum):
     """Fingerprint sensor types."""
 
@@ -229,6 +230,29 @@ class FPSensorType(Enum):
     UNKNOWN = -1
 
 
+class Architecture(Enum):
+    """CPU architectures."""
+
+    ARM = "arm"
+    RISCV = "riscv"
+
+
+class HostInterface(Enum):
+    """Host command interface."""
+
+    UART = "uart"
+    SPI = "spi"
+    USB = "usb"
+
+
+class Environment(Enum):
+    """Test execution environment."""
+
+    RENODE = "renode"
+    HARDWARE = "hardware"
+    ALL = "all"
+
+
 @dataclass
 # pylint: disable-next=too-many-instance-attributes
 class BoardConfig:
@@ -236,6 +260,7 @@ class BoardConfig:
 
     name: str
     sensor_type: FPSensorType
+    architecture: Architecture
     servo_uart_name: str
     servo_power_enable: str
     rollback_region0_regex: re.Pattern[str]
@@ -250,6 +275,10 @@ class BoardConfig:
     expected_fp_power_zephyr: Optional[PowerUtilization] = None
     expected_mcu_power_zephyr: Optional[PowerUtilization] = None
     zephyr_board_name: Optional[str] = None
+    host_interfaces: set[HostInterface] = field(default_factory=set)
+    zephyr_extra_configs: dict[Environment, list[str]] = field(
+        default_factory=dict
+    )
 
 
 class Platform(ABC):
@@ -287,7 +316,7 @@ class Platform(ABC):
 
     @abstractmethod
     def skip_test(
-        self, test_name: str, board_config: BoardConfig, zephyr: bool
+        self, test_config: TestConfig, board_config: BoardConfig, zephyr: bool
     ) -> bool:
         """Returns true if the given test should be skipped."""
 
@@ -376,7 +405,7 @@ class Hardware(Platform):
         pass
 
     def skip_test(
-        self, test_name: str, board_config: BoardConfig, zephyr: bool
+        self, test_config: TestConfig, board_config: BoardConfig, zephyr: bool
     ) -> bool:
         return False
 
@@ -435,9 +464,141 @@ class Renode(Platform):
     def cleanup(self) -> None:
         self.process.kill()
 
-    def skip_test(
-        self, test_name: str, board_config: BoardConfig, zephyr: bool
+    def _skip_test_bloonchipper(
+        self, test_config: TestConfig, zephyr: bool
     ) -> bool:
+        test_name = test_config.test_name
+
+        # bloonchipper Zephyr tests to skip on Renode.
+        if zephyr and test_name in [
+            "benchmark",  # TODO(b/390253975)
+            # TODO(b/382705460): We have seen this flake in the CQ.
+            # Re-enable when missing character bug is fixed.
+            "flash_physical",
+            "fp_transport",  # TODO(b/384094788)
+            "fpsensor_debug",  # TODO(b/384110894)
+            "zephyr_flash_stm32f4",  # TODO(b/384974228)
+            # TODO(b/384975384)
+            "zephyr_counter_basic_api_stm32_subsec",
+            # TODO(b/390255521)
+            "timer",
+        ]:
+            return True
+
+        if zephyr and test_config.config_name in [
+            "panic_data_bloonchipper_v2.0.4277",  # TODO(b/484099558)
+            "panic_data_bloonchipper_v2.0.5938",  # TODO(b/484099558)
+        ]:
+            return True
+
+        # bloonchipper EC tests to skip on Renode.
+        if test_name in [
+            "rtc_stm32f4",  # TODO(b/384991107)
+        ]:
+            return True
+
+        return False
+
+    def _skip_test_chudow(self, test_config: TestConfig) -> bool:
+        if test_config.test_name in [
+            "flash_physical",  # TODO(b/485314159)
+            "otp_key",  # TODO(b/485316342)
+            "rollback",  # TODO(b/485315275)
+            "flash_write_protect",  # TODO(b/485316223)
+            "panic",  # TODO(b/485316364)
+            "panic_data",  # TODO(b/485315924)
+            "rollback_entropy",  # TODO(b/485315625)
+            "tpm_seed_clear",  # TODO(b/485316761)
+            "utils",  # TODO(b/485316718)
+            "fpsensor_debug",  # TODO(b/485315321)
+            "restricted_console",  # TODO(b/485315829)
+            "zephyr_cpp_newlib",  # TODO(b/485316816)
+            "zephyr_cpp_std20",  # TODO(b/485316816)
+            "zephyr_drivers_entropy",  # TODO(b/485898244)
+            "zephyr_kernel_poll",  # TODO(b/485316816)
+        ]:
+            return True
+
+        if test_config.config_name in [
+            "system_is_locked_wp_on",  # TODO(b/485316683)
+        ]:
+            return True
+
+        return False
+
+    def _skip_test_helipilot(
+        self, test_config: TestConfig, zephyr: bool
+    ) -> bool:
+        if test_config.test_name in [
+            "otp_key",  # TODO(b/385216796)
+            "ram_lock",  # TODO(b/385216805)
+            "rtc_npcx9",  # TODO(b/385217282)
+        ]:
+            return True
+
+        if not zephyr and test_config.test_name in [
+            "exception",  # TODO(b/384730599)
+        ]:
+            return True
+
+        if zephyr and test_config.test_name in [
+            "flash_physical",  # TODO(b/448407366)
+            "flash_protection_rw",  # TODO(b/485668014)
+            "flash_write_protect",  # TODO(b/485668014)
+            "fp_transport",  # TODO(b/485668240)
+            "malloc",  # TODO(b/485669070)
+            "null_pointer",  # TODO(b/485624833)
+            "panic",  # TODO(b/485668836)
+            "panic_data",  # TODO(b/485667679)
+            "reboot",  # TODO(b/488128262)
+            "rollback_entropy",  # TODO(b/485670085)
+            "sbrk",  # TODO(b/485669288)
+            "tpm_seed_clear",  # TODO(b/485669018)
+            "utils",  # TODO(b/485624824)
+            "zephyr_kernel_poll",  # TODO(b/485639561)
+        ]:
+            return True
+
+        if zephyr and test_config.config_name in [
+            "system_is_locked_wp_on",  # TODO(b/485669841)
+            "system_is_locked_wp_on_helipilot_v2.0.24337",  # TODO(b/485669841)
+            "system_is_locked_wp_on_helipilot_v2.0.27609",  # TODO(b/485669841)
+            "system_is_locked_wp_on_buccaneer_v2.0.26328",  # TODO(b/485669841)
+        ]:
+            return True
+
+        return False
+
+    def _skip_test_sanok(self, test_config: TestConfig) -> bool:
+        if test_config.test_name in [
+            "flash_physical",  # TODO(b/468410778)
+            "flash_protection_rw",  # TODO(b/487848806)
+            "flash_write_protect",  # TODO(b/406944986)
+            "panic_data",  # TODO(b/468407068)
+            "rollback",  # TODO(b/468406461)
+            "rollback_entropy",  # TODO(b/468406461)
+            "system_is_locked",  # TODO(b/483118063)
+            "unaligned_access",  # TODO(b/483118717)
+            "exception",  # TODO(b/483118965)
+            "fpsensor_auth_crypto_stateful",  # TODO(b/483119679)
+            "fpsensor_debug",  # TODO(b/474439863)
+            "otp_key",  # TODO(b/483121090)
+            "restricted_console",  # TODO(b/474439863)
+            "utils",  # TODO(b/483126917)
+            "zephyr_cpp_newlib",  # TODO(b/484366615)
+            "zephyr_cpp_std20",  # TODO(b/484366615)
+            "zephyr_drivers_entropy",  # TODO(b/484366615)
+            "zephyr_kernel_poll",  # TODO(b/484366615)
+        ]:
+            return True
+
+        return False
+
+    def skip_test(
+        self, test_config: TestConfig, board_config: BoardConfig, zephyr: bool
+    ) -> bool:
+        test_name = test_config.test_name
+
         # Tests failures that are independent of the board.
         if test_name in [
             "fpsensor_hw",  # TODO(b/384743080)
@@ -447,43 +608,17 @@ class Renode(Platform):
         ]:
             return True
 
-        if board_config.name in [BLOONCHIPPER, DARTMONKEY]:
-            if board_config.name == BLOONCHIPPER:
-                # bloonchipper Zephyr tests to skip on Renode.
-                if zephyr and test_name in [
-                    "abort",  # TODO(b/384094781)
-                    "benchmark",  # TODO(b/390253975)
-                    "exception",  # TODO(b/388327673)
-                    # TODO(b/382705460): We have seen this flake in the CQ.
-                    # Re-enable when missing character bug is fixed.
-                    "flash_physical",
-                    "fp_transport",  # TODO(b/384094788)
-                    "fpsensor_debug",  # TODO(b/384110894)
-                    "ftrapv",  # TODO(b/384095271)
-                    "null_pointer",  # TODO(b/436935088)
-                    "panic",  # TODO(b/384095226)
-                    "panic_data",  # TODO(b/384095623)
-                    "zephyr_flash_stm32f4",  # TODO(b/384974228)
-                    # TODO(b/384975384)
-                    "zephyr_counter_basic_api_stm32_subsec",
-                    # TODO(b/390255521)
-                    "timer",
-                ]:
-                    return True
+        if board_config.name == BLOONCHIPPER:
+            return self._skip_test_bloonchipper(test_config, zephyr)
 
-                # bloonchipper EC tests to skip on Renode.
-                if test_name in [
-                    "rtc_stm32f4",  # TODO(b/384991107)
-                ]:
-                    return True
-        elif board_config.name in [HELIPILOT, BUCCANEER, GWENDOLIN]:
-            if test_name in [
-                "exception",  # TODO(b/384730599)
-                "otp_key",  # TODO(b/385216796)
-                "ram_lock",  # TODO(b/385216805)
-                "rtc_npcx9",  # TODO(b/385217282)
-            ]:
-                return True
+        if board_config.name == CHUDOW and zephyr:
+            return self._skip_test_chudow(test_config)
+
+        if board_config.name in [HELIPILOT, BUCCANEER]:
+            return self._skip_test_helipilot(test_config, zephyr)
+
+        if board_config.name == SANOK and zephyr:
+            return self._skip_test_sanok(test_config)
 
         return False
 
@@ -507,11 +642,14 @@ class TestConfig:
     config_name: Optional[str] = None
     exclude_boards: list = field(default_factory=list)
     logs: list = field(init=False, default_factory=list)
-    passed: bool = field(init=False, default=False)
+    status: TestStatus = field(init=False, default=TestStatus.FAIL)
     num_passes: int = field(init=False, default=0)
     num_fails: int = field(init=False, default=0)
     skip_for_zephyr: bool = False
+    skip_for_ec_legacy: bool = False
     zephyr_name: Optional[str] = None
+    architectures: Optional[list[Architecture]] = None
+    host_interfaces: Optional[set[HostInterface]] = None
 
     # The callbacks below are called before and after a test is executed and
     # may be used for additional test setup, post test activities, or other tasks
@@ -565,12 +703,21 @@ class AllTests:
         )
 
         all_tests = public_tests + private_tests + zephyr_upstream_tests
-        board_tests = list(
-            filter(
-                lambda e: (board_config.name not in e.exclude_boards), all_tests
+        return [
+            test
+            for test in all_tests
+            if board_config.name not in test.exclude_boards
+            and (
+                test.architectures is None
+                or board_config.architecture in test.architectures
             )
-        )
-        return board_tests
+            and (
+                test.host_interfaces is None
+                or test.host_interfaces.intersection(
+                    board_config.host_interfaces
+                )
+            )
+        ]
 
     @staticmethod
     def get_public_tests(
@@ -585,7 +732,11 @@ class AllTests:
                 apptype_to_use=ApplicationType.PRODUCTION,
             ),
             TestConfig(test_name="abort"),
-            TestConfig(test_name="aes"),
+            TestConfig(
+                test_name="aes",
+                # TODO(b/485954886): Runs slowly on helipilot Renode.
+                timeout_secs=150,
+            ),
             # Cryptoc is not supported with Zephyr.
             # TODO(b/333039464) A new test for OPENSSL_cleanse has to be implemented.
             TestConfig(test_name="always_memset", skip_for_zephyr=True),
@@ -607,12 +758,20 @@ class AllTests:
                 # TODO(b/365628799): Need to port to Zephyr.
                 skip_for_zephyr=True,
             ),
-            TestConfig(test_name="benchmark", timeout_secs=120),
+            TestConfig(
+                test_name="bbram_retained_mem",
+                architectures=[Architecture.RISCV],
+            ),
+            TestConfig(
+                test_name="benchmark",
+                # TODO(b/485954886): Runs slowly on helipilot Renode.
+                timeout_secs=150,
+            ),
             TestConfig(test_name="boringssl_crypto"),
+            # TODO(b/468409589): Add RISC-V FPU test.
             TestConfig(
                 test_name="cortexm_fpu",
-                # TODO(b/468409589): Add RISC-V FPU test.
-                exclude_boards=[SANOK],
+                architectures=[Architecture.ARM],
             ),
             TestConfig(test_name="crc"),
             TestConfig(test_name="exception"),
@@ -621,6 +780,12 @@ class AllTests:
                 test_name="flash_physical",
                 imagetype_to_use=ImageType.RO,
                 toggle_power=True,
+            ),
+            TestConfig(
+                test_name="flash_protection_rw",
+                imagetype_to_use=ImageType.RO,
+                enable_hw_write_protect=True,
+                skip_for_ec_legacy=True,
             ),
             TestConfig(
                 test_name="flash_write_protect",
@@ -633,22 +798,26 @@ class AllTests:
                 test_name="fp_transport",
                 imagetype_to_use=ImageType.RO,
                 test_args=["spi"],
+                host_interfaces={HostInterface.SPI},
             ),
             TestConfig(
                 config_name="fp_transport_spi_rw",
                 test_name="fp_transport",
                 test_args=["spi"],
+                host_interfaces={HostInterface.SPI},
             ),
             TestConfig(
                 config_name="fp_transport_uart_ro",
                 test_name="fp_transport",
                 imagetype_to_use=ImageType.RO,
                 test_args=["uart"],
+                host_interfaces={HostInterface.UART},
             ),
             TestConfig(
                 config_name="fp_transport_uart_rw",
                 test_name="fp_transport",
                 test_args=["uart"],
+                host_interfaces={HostInterface.UART},
             ),
             TestConfig(test_name="fpsensor_auth_crypto_stateful"),
             TestConfig(test_name="fpsensor_auth_crypto_stateless"),
@@ -668,7 +837,11 @@ class AllTests:
             ),
             # Handled by Zephyr - cpp.main.* tests
             TestConfig(test_name="global_initialization", skip_for_zephyr=True),
-            TestConfig(test_name="libcxx"),
+            TestConfig(
+                test_name="libcxx",
+                # TODO(b/485954886): Runs slowly on helipilot Renode.
+                timeout_secs=120,
+            ),
             TestConfig(test_name="malloc", imagetype_to_use=ImageType.RO),
             # TODO(b/363277530): Add Zephyr MPU tests.
             TestConfig(
@@ -709,31 +882,29 @@ class AllTests:
             TestConfig(
                 config_name="pmp_entries_ro",
                 test_name="pmp_entries",
-                exclude_boards=[
-                    BLOONCHIPPER,
-                    DARTMONKEY,
-                    HELIPILOT,
-                    BUCCANEER,
-                    GWENDOLIN,
-                ],
                 imagetype_to_use=ImageType.RO,
+                architectures=[Architecture.RISCV],
             ),
             TestConfig(
                 config_name="pmp_entries_rw",
                 test_name="pmp_entries",
-                exclude_boards=[
-                    BLOONCHIPPER,
-                    DARTMONKEY,
-                    HELIPILOT,
-                    BUCCANEER,
-                    GWENDOLIN,
-                ],
+                architectures=[Architecture.RISCV],
             ),
             TestConfig(test_name="printf"),
             TestConfig(test_name="queue"),
             TestConfig(
                 test_name="ram_lock",
-                exclude_boards=[BLOONCHIPPER, DARTMONKEY],
+                exclude_boards=[
+                    BLOONCHIPPER,
+                    CHUDOW,
+                    DARTMONKEY,
+                    SANOK,
+                ],
+            ),
+            TestConfig(
+                test_name="reboot",
+                toggle_power=True,
+                skip_for_ec_legacy=True,
             ),
             TestConfig(test_name="restricted_console"),
             TestConfig(test_name="rng_benchmark"),
@@ -752,22 +923,28 @@ class AllTests:
             TestConfig(
                 test_name="rollback_entropy", imagetype_to_use=ImageType.RO
             ),
+            TestConfig(test_name="rollback_lock_panic"),
             # RTC is handled by Zephyr drivers, covered by Zephyr tests. Time
             # translation is covered by the utilities.time test.
             TestConfig(test_name="rtc", skip_for_zephyr=True),
             # TODO(b/468409316): Add RTC test for ET171.
             TestConfig(
                 test_name="rtc_npcx9",
-                exclude_boards=[BLOONCHIPPER, DARTMONKEY, SANOK],
+                exclude_boards=[
+                    BLOONCHIPPER,
+                    CHUDOW,
+                    DARTMONKEY,
+                    SANOK,
+                ],
             ),
             # Covered by Zephyr drivers.counter.basic_api.stm32_subsec test
             TestConfig(
                 test_name="rtc_stm32f4",
                 exclude_boards=[
+                    CHUDOW,
                     DARTMONKEY,
                     HELIPILOT,
                     BUCCANEER,
-                    GWENDOLIN,
                     SANOK,
                 ],
                 skip_for_zephyr=True,
@@ -833,6 +1010,17 @@ class AllTests:
                 finish_regexes=[RW_IMAGE_BOOTED_REGEX],
             ),
         ]
+
+        # Run rollback_minimal_version tests for all boards and RO versions.
+        for variant_name, variant_info in board_config.variants.items():
+            tests.append(
+                TestConfig(
+                    config_name=f"rollback_minimal_version_{variant_name}",
+                    test_name="rollback_minimal_version",
+                    ro_image=variant_info.get("ro_image_path"),
+                    build_board=variant_info.get("build_board"),
+                )
+            )
 
         # Run unaligned access tests for all boards and RO versions.
         for variant_name, variant_info in board_config.variants.items():
@@ -915,11 +1103,10 @@ class AllTests:
                 zephyr_name="cpp.main.newlib",
                 test_name="zephyr_cpp_newlib",
             ),
-            # TODO(b/380491850): Test hangs.
-            # TestConfig(
-            #    zephyr_name="cpp.main.cpp20",
-            #    test_name="zephyr_cpp_std20",
-            # ),
+            TestConfig(
+                zephyr_name="cpp.main.cpp20",
+                test_name="zephyr_cpp_std20",
+            ),
             TestConfig(
                 zephyr_name="drivers.entropy",
                 test_name="zephyr_drivers_entropy",
@@ -928,18 +1115,18 @@ class AllTests:
             TestConfig(
                 zephyr_name="drivers.flash.stm32.f4",
                 test_name="zephyr_flash_stm32f4",
-                exclude_boards=[DARTMONKEY, HELIPILOT, SANOK],
+                exclude_boards=[CHUDOW, DARTMONKEY, HELIPILOT, SANOK],
             ),
             TestConfig(
                 zephyr_name="drivers.flash.stm32.f4.block_registers",
                 test_name="zephyr_flash_stm32f4_block_registers",
-                exclude_boards=[DARTMONKEY, HELIPILOT, SANOK],
+                exclude_boards=[CHUDOW, DARTMONKEY, HELIPILOT, SANOK],
             ),
             # TODO(b/468410217): Add Zephyr counter tests for sanok.
             TestConfig(
                 zephyr_name="drivers.counter.basic_api.stm32_subsec",
                 test_name="zephyr_counter_basic_api_stm32_subsec",
-                exclude_boards=[DARTMONKEY, HELIPILOT, SANOK],
+                exclude_boards=[CHUDOW, DARTMONKEY, HELIPILOT, SANOK],
                 timeout_secs=60,
             ),
             TestConfig(
@@ -960,6 +1147,7 @@ class AllTests:
 BLOONCHIPPER_CONFIG = BoardConfig(
     name=BLOONCHIPPER,
     sensor_type=FPSensorType.FPC,
+    architecture=Architecture.ARM,
     servo_uart_name="raw_fpmcu_console_uart_pty",
     servo_power_enable="fpmcu_pp3300",
     # TODO(b/410057326): add polling logic to reboot to RW, then decrease this timeout to 2s.
@@ -990,11 +1178,13 @@ BLOONCHIPPER_CONFIG = BoardConfig(
         },
     },
     zephyr_board_name="google_dragonclaw",
+    host_interfaces={HostInterface.UART, HostInterface.SPI},
 )
 
 DARTMONKEY_CONFIG = BoardConfig(
     name=DARTMONKEY,
     sensor_type=FPSensorType.FPC,
+    architecture=Architecture.ARM,
     servo_uart_name="raw_fpmcu_console_uart_pty",
     servo_power_enable="fpmcu_pp3300",
     reboot_timeout=1.0,
@@ -1023,11 +1213,13 @@ DARTMONKEY_CONFIG = BoardConfig(
         },
     },
     zephyr_board_name="google_icetower",
+    host_interfaces={HostInterface.UART, HostInterface.SPI},
 )
 
 HELIPILOT_CONFIG = BoardConfig(
     name=HELIPILOT,
     sensor_type=FPSensorType.FPC,
+    architecture=Architecture.ARM,
     servo_uart_name="raw_fpmcu_console_uart_pty",
     servo_power_enable="fpmcu_pp3300",
     reboot_timeout=3,
@@ -1062,6 +1254,7 @@ HELIPILOT_CONFIG = BoardConfig(
         },
     },
     zephyr_board_name="google_quincy",
+    host_interfaces={HostInterface.UART, HostInterface.SPI},
 )
 
 BUCCANEER_CONFIG = copy.deepcopy(HELIPILOT_CONFIG)
@@ -1078,14 +1271,10 @@ BUCCANEER_CONFIG.expected_fp_power = PowerUtilization(
     idle=RangedValue(0.25, 0.3), sleep=RangedValue(0.25, 0.3)
 )
 
-GWENDOLIN_CONFIG = copy.deepcopy(HELIPILOT_CONFIG)
-GWENDOLIN_CONFIG.name = GWENDOLIN
-GWENDOLIN_CONFIG.sensor_type = FPSensorType.EGIS
-GWENDOLIN_CONFIG.mpu_regex = DATA_ACCESS_VIOLATION_20098000_REGEX
-
 SANOK_CONFIG = BoardConfig(
     name=SANOK,
     sensor_type=FPSensorType.EGIS,
+    architecture=Architecture.RISCV,
     servo_uart_name="raw_fpmcu_console_uart_pty",
     servo_power_enable="fpmcu_pp3300",
     reboot_timeout=1.0,
@@ -1104,13 +1293,44 @@ SANOK_CONFIG = BoardConfig(
     # TODO(b/468407068): configure variants.
     variants={},
     zephyr_board_name="egis_et171",
+    host_interfaces={HostInterface.USB},
+    # TODO(b/487848806): Remove this when cache is fixed in Renode.
+    zephyr_extra_configs={
+        Environment.RENODE: ["CONFIG_DCACHE=n", "CONFIG_ICACHE=n"]
+    },
+)
+
+CHUDOW_CONFIG = BoardConfig(
+    name=CHUDOW,
+    # TODO(b/485658538): support Focaltech sensor.
+    sensor_type=FPSensorType.UNKNOWN,
+    architecture=Architecture.ARM,
+    servo_uart_name="raw_fpmcu_console_uart_pty",
+    servo_power_enable="fpmcu_pp3300",
+    reboot_timeout=2.0,
+    # TODO(b/485656019): configure rollback regex.
+    rollback_region0_regex=NEVER_MATCH_REGEX,
+    rollback_region1_regex=NEVER_MATCH_REGEX,
+    # TODO(b/363277530): create Zephyr MPU tests.
+    mpu_regex=NEVER_MATCH_REGEX,
+    fp_power_supply="pp3300_fp_mw",
+    mcu_power_supply="pp3300_mcu_mw",
+    # TODO(b/485657292): configure power utilization.
+    expected_fp_power=INVALID_POWER_UTILIZATION,
+    expected_mcu_power=INVALID_POWER_UTILIZATION,
+    expected_fp_power_zephyr=INVALID_POWER_UTILIZATION,
+    expected_mcu_power_zephyr=INVALID_POWER_UTILIZATION,
+    # TODO(b/485656929): configure variants.
+    variants={},
+    zephyr_board_name="ft9001_eval",
+    host_interfaces={HostInterface.USB},
 )
 
 BOARD_CONFIGS = {
     "bloonchipper": BLOONCHIPPER_CONFIG,
     "buccaneer": BUCCANEER_CONFIG,
+    "chudow": CHUDOW_CONFIG,
     "dartmonkey": DARTMONKEY_CONFIG,
-    "gwendolin": GWENDOLIN_CONFIG,
     "helipilot": HELIPILOT_CONFIG,
     "sanok": SANOK_CONFIG,
 }
@@ -1132,13 +1352,6 @@ def find_section_offset_size(section: str, image: bytes) -> tuple[int, int]:
     areas = fmap.fmap_decode(image)["areas"]
     area = next(area for area in areas if area["name"] == section)
     return area["offset"], area["size"]
-
-
-def read_section(src: bytes, section: str) -> bytes:
-    """Read FMAP section content into byte array"""
-    (src_start, src_size) = find_section_offset_size(section, src)
-    src_end = src_start + src_size
-    return src[src_start:src_end]
 
 
 def write_section(data: bytes, image: bytearray, section: str):
@@ -1172,17 +1385,13 @@ def copy_section(src: bytes, dst: bytearray, section: str):
     dst[dst_start:dst_end] = src[src_start:src_end] + filling
 
 
-def replace_ro(image: bytearray, ro_section: bytes):
-    """Replace RO in image with provided one"""
-    # Backup RO public key since its private part was used to sign RW.
-    ro_pubkey = read_section(image, "KEY_RO")
+def replace_rw(src_image: bytes, dst_image: bytearray):
+    """Replace RW in destination image with RW from source image"""
+    # Copy RO public key since its private part was used to sign RW.
+    copy_section(src_image, dst_image, "KEY_RO")
 
-    # Copy RO part of the firmware to the image. Please note that RO public key
-    # is copied too since EC_RO area includes KEY_RO area.
-    copy_section(ro_section, image, "EC_RO")
-
-    # Restore RO public key.
-    write_section(ro_pubkey, image, "KEY_RO")
+    # Copy RW firmware.
+    copy_section(src_image, dst_image, "EC_RW")
 
 
 def set_sleep_mode(enter_sleep: bool) -> bool:
@@ -1275,7 +1484,9 @@ def build_ec(
     return cmd
 
 
-def build_zephyr_upstream(test_name: str, board_name: str) -> list[str]:
+def build_zephyr_upstream(
+    test_name: str, board_name: str, zephyr_extra_configs: list[str]
+) -> list[str]:
     """Prepare a command to build Zephyr test"""
     # Build only with Zephyr and clobber a previous build
     cmd = [ZEPHYR_TWISTER] + ["-b"] + ["-c"]
@@ -1284,13 +1495,20 @@ def build_zephyr_upstream(test_name: str, board_name: str) -> list[str]:
     cmd = cmd + ["-s"] + [test_name]
     cmd = cmd + ["--no-upload-cros-rdb"]
 
+    for config in zephyr_extra_configs:
+        cmd.extend(["-x", config])
+
     return cmd
 
 
-def build_zephyr(test: TestConfig, board_name: str) -> list[str]:
+def build_zephyr(
+    test: TestConfig, board_name: str, zephyr_extra_configs: list[str]
+) -> list[str]:
     """Prepare a command to build test using Zephyr"""
     if test.zephyr_name is not None:
-        return build_zephyr_upstream(test.zephyr_name, board_name)
+        return build_zephyr_upstream(
+            test.zephyr_name, board_name, zephyr_extra_configs
+        )
 
     test_name = test.test_name
     app_type = test.apptype_to_use
@@ -1336,18 +1554,29 @@ def build_zephyr(test: TestConfig, board_name: str) -> list[str]:
         if img_type == ImageType.RO:
             f_test_config.write("CONFIG_HW_TEST_RW_ONLY=n\n")
 
+        for config in zephyr_extra_configs:
+            f_test_config.write(f"{config}\n")
+
     return cmd
 
 
 def build(
     test: TestConfig,
     board_name: str,
+    board_config: BoardConfig,
     compiler: str,
     zephyr: bool,
+    env: Environment,
 ) -> None:
     """Build specified test for specified board."""
     if zephyr:
-        cmd = build_zephyr(test, board_name)
+        zephyr_extra_configs = []
+        for e in (Environment.ALL, env):
+            zephyr_extra_configs.extend(
+                board_config.zephyr_extra_configs.get(e, [])
+            )
+
+        cmd = build_zephyr(test, board_name, zephyr_extra_configs)
     else:
         cmd = build_ec(
             test.test_name, board_name, compiler, test.apptype_to_use
@@ -1357,15 +1586,17 @@ def build(
     subprocess.run(cmd, check=False).check_returncode()
 
 
-def patch_image(test: TestConfig, image_path: str):
-    """Replace RO part of the firmware with provided one."""
-    with open(image_path, "rb+") as image_file:
-        image = bytearray(image_file.read())
-        ro_section = read_file_gsutil(test.ro_image)
-        replace_ro(image, ro_section)
-        image_file.seek(0)
-        image_file.write(image)
-        image_file.truncate()
+def _patch_image_with_new_rw(test: TestConfig, image_path: str):
+    """Replace provided image with specified RO + RW from that image."""
+    dst_image = bytearray(read_file_gsutil(test.ro_image))
+    with open(image_path, "rb") as image_file:
+        src_image = bytes(image_file.read())
+
+    # Replace RW part in the destination image using source image
+    replace_rw(src_image, dst_image)
+
+    with open(image_path, "wb") as image_file:
+        image_file.write(dst_image)
 
 
 def erase_rw(image_path: str):
@@ -1379,7 +1610,7 @@ def erase_rw(image_path: str):
 
 
 def readline(
-    executor: ThreadPoolExecutor, file: BinaryIO, timeout_secs: int
+    executor: ThreadPoolExecutor, file: BinaryIO, timeout_secs: float
 ) -> Optional[bytes]:
     """Read a line with timeout."""
     future = executor.submit(file.readline)
@@ -1390,15 +1621,21 @@ def readline(
 
 
 def readlines_until_timeout(
-    executor, file: BinaryIO, timeout_secs: int
+    executor, file: BinaryIO, timeout_secs: float
 ) -> list[bytes]:
     """Continuously read lines for timeout_secs."""
     lines: list[bytes] = []
+    end_time = time.monotonic() + timeout_secs
+    remaining = timeout_secs
     while True:
-        line = readline(executor, file, timeout_secs)
+        if remaining <= 0:
+            return lines
+
+        line = readline(executor, file, remaining)
         if not line:
             return lines
         lines.append(line)
+        remaining = end_time - time.monotonic()
 
 
 def process_console_output_line(line: bytes, test: TestConfig):
@@ -1462,7 +1699,7 @@ def run_test(
     zephyr: bool,
 ) -> bool:
     """Run specified test."""
-    start = time.time()
+    start = time.monotonic()
 
     reboot_timeout = board_config.reboot_timeout
     logging.debug("Calling pre-test callback")
@@ -1493,7 +1730,7 @@ def run_test(
     while True:
         console.flush()
 
-        elapsed_secs = time.time() - start
+        elapsed_secs = time.monotonic() - start
         remaining_secs = int(test.timeout_secs - elapsed_secs)
         if remaining_secs <= 0:
             logging.debug("Test timed out")
@@ -1520,7 +1757,7 @@ def run_test(
                 # flush read the remaining
                 lines = readlines_until_timeout(executor, console, 1)
                 logging.debug(lines)
-                test.logs.append(lines)
+                test.logs.extend(lines)
 
                 for line in lines:
                     process_console_output_line(line, test)
@@ -1622,11 +1859,14 @@ def flash_and_run_test(
 
     # attempt to build test binary, reporting a test failure on error
     try:
+        env = Environment.RENODE if args.renode else Environment.HARDWARE
         build(
             test,
             build_board,
+            board_config,
             args.compiler,
             args.zephyr,
+            env,
         )
     except Exception as exception:  # pylint: disable=broad-except
         logging.error("failed to build %s: %s", test.test_name, exception)
@@ -1637,8 +1877,12 @@ def flash_and_run_test(
     logging.debug("image_path: %s", image_path)
 
     if test.ro_image is not None:
+        # Use the RO specified by the test. Replace KEY_RO and EC_RW (which
+        # encompasses both RW_FW and SIG_RW) in the RO image. This better
+        # reflects the production usecase in which the RW part is changed
+        # and other sections (e.g rollbacks) remain unchanged.
         try:
-            patch_image(test, image_path)
+            _patch_image_with_new_rw(test, image_path)
         except Exception as exception:  # pylint: disable=broad-except
             logging.warning(
                 "An exception occurred while patching image: %s", exception
@@ -1696,6 +1940,30 @@ def flash_and_run_test(
         platform.cleanup()
 
         return ret
+
+
+def write_json_results(
+    test_list: list[TestConfig],
+    output_file: str,
+):
+    """Writes test results to a JSON file."""
+    json_output = {"tests": []}
+    for test in test_list:
+        logs = [log_entry.decode(errors="replace") for log_entry in test.logs]
+
+        json_output["tests"].append(
+            {
+                "test_name": test.config_name,
+                "status": test.status.value,
+                "logs": "".join(logs),
+            }
+        )
+
+    try:
+        with open(output_file, "w", encoding="utf-8") as f:
+            json.dump(json_output, f, indent=2)
+    except OSError as e:
+        logging.error("Failed to write JSON results to %s: %s", output_file, e)
 
 
 def parse_remote_arg(remote: str) -> str:
@@ -1818,6 +2086,11 @@ def main():
         "--renode", help="Run tests with Renode emulator", action="store_true"
     )
 
+    parser.add_argument(
+        "--json",
+        help="Output file for test results in JSON format",
+    )
+
     args = parser.parse_args()
     logging.basicConfig(
         format="%(levelname)s:%(message)s", level=args.log_level
@@ -1842,31 +2115,35 @@ def main():
 
     with ThreadPoolExecutor(max_workers=1) as executor:
         for test in test_list:
-            if (test.skip_for_zephyr and args.zephyr) or platform.skip_test(
-                test.test_name, board_config, args.zephyr
+            if (
+                (test.skip_for_zephyr and args.zephyr)
+                or (test.skip_for_ec_legacy and not args.zephyr)
+                or platform.skip_test(test, board_config, args.zephyr)
             ):
+                test.status = TestStatus.SKIP
                 continue
-            test.passed = flash_and_run_test(
-                test, platform, board_config, args, executor
-            )
+            if flash_and_run_test(test, platform, board_config, args, executor):
+                test.status = TestStatus.PASS
+            else:
+                test.status = TestStatus.FAIL
 
         colorama.init()
         exit_code = 0
         for test in test_list:
             # print results
             print('Test "' + test.config_name + '": ', end="")
-            if (test.skip_for_zephyr and args.zephyr) or platform.skip_test(
-                test.test_name, board_config, args.zephyr
-            ):
+            if test.status == TestStatus.SKIP:
                 print(colorama.Fore.YELLOW + "SKIPPED")
+            elif test.status == TestStatus.PASS:
+                print(colorama.Fore.GREEN + "PASSED")
             else:
-                if test.passed:
-                    print(colorama.Fore.GREEN + "PASSED")
-                else:
-                    print(colorama.Fore.RED + "FAILED")
-                    exit_code = 1
+                print(colorama.Fore.RED + "FAILED")
+                exit_code = 1
 
             print(colorama.Style.RESET_ALL)
+
+        if args.json:
+            write_json_results(test_list, args.json)
 
         if exit_code != 0:
             print(

@@ -31,7 +31,6 @@ extern "C" {
 #define USB_DT_BOS 0x0f
 #define USB_DT_DEVICE_CAPABILITY 0x10
 
-#ifndef CONFIG_ZEPHYR
 /* USB Device Descriptor */
 struct usb_device_descriptor {
 	uint8_t bLength;
@@ -65,7 +64,6 @@ struct usb_string_descriptor {
 	uint8_t bDescriptorType;
 	uint16_t wData[1];
 } __packed;
-#endif /* CONFIG_ZEPHYR */
 
 #define USB_DT_DEVICE_SIZE 18
 

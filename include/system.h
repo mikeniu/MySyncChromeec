@@ -19,21 +19,7 @@
 extern "C" {
 #endif
 
-#ifdef CONFIG_ZEPHYR
-#ifdef CONFIG_CPU_CORTEX_M
-/*
- * For cortex-m we cannot use irq_lock() for disabling all the interrupts
- * because it leaves some (NMI and faults) still enabled.
- */
-#define interrupt_disable_all() __asm__("cpsid i")
-#elif CONFIG_ZTEST
-#define interrupt_disable_all()
-#else /* !CONFIG_CPU_CORTEX_M */
-#define interrupt_disable_all() irq_lock()
-#endif
-#else /* !CONFIG_ZEPHYR */
 #define interrupt_disable_all() interrupt_disable()
-#endif /* CONFIG_ZEPHYR */
 
 /* Per chip implementation to save/read raw EC_RESET_FLAG_ flags. */
 void chip_save_reset_flags(uint32_t flags);

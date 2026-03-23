@@ -1,9 +1,0 @@
-# Copyright 2022 The ChromiumOS Authors
-# Use of this source code is governed by a BSD-style license that can be
-# found in the LICENSE file.
-
-description: USB-C Virtual USB MUX
-
-include: ["base.yaml", "cros-ec,usbc-mux.yaml"]
-
-compatible: "cros-ec,usbc-mux-virtual"

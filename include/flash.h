@@ -18,10 +18,8 @@ extern "C" {
 #endif
 
 #ifdef CONFIG_FLASH_MULTIPLE_REGION
-#ifndef CONFIG_ZEPHYR
 extern struct ec_flash_bank const
 	flash_bank_array[CONFIG_FLASH_REGION_TYPE_COUNT];
-#endif
 
 /*
  * Return the bank the offset is in.

@@ -19,10 +19,6 @@
 #include "timer.h"
 #include "util.h"
 
-#ifdef CONFIG_ZEPHYR
-#include <zephyr/mgmt/ec_host_cmd/backend.h>
-#endif
-
 #define CPUTS(outstr) cputs(CC_SYSTEM, outstr)
 #define CPRINTS(format, args...) cprints(CC_SYSTEM, format, ##args)
 #define CPRINTF(format, args...) cprintf(CC_SYSTEM, format, ##args)
@@ -84,16 +80,6 @@ static uint32_t mkbp_event_wake_mask = CONFIG_MKBP_EVENT_WAKEUP_MASK;
 #ifdef CONFIG_MKBP_HOST_EVENT_WAKEUP_MASK
 static uint32_t mkbp_host_event_wake_mask = CONFIG_MKBP_HOST_EVENT_WAKEUP_MASK;
 #endif /* CONFIG_MKBP_HOST_EVENT_WAKEUP_MASK */
-
-#ifdef CONFIG_ZEPHYR
-static int init_mkbp_mutex(void)
-{
-	k_mutex_init(&state.lock);
-
-	return 0;
-}
-SYS_INIT(init_mkbp_mutex, POST_KERNEL, 50);
-#endif /* CONFIG_ZEPHYR */
 
 #if defined(CONFIG_MKBP_USE_GPIO) || \
 	defined(CONFIG_MKBP_USE_GPIO_AND_HOST_EVENT)
@@ -423,9 +409,6 @@ static int take_event_if_set(uint8_t event_type)
 
 static const struct mkbp_event_source *find_mkbp_event_source(uint8_t type)
 {
-#ifdef CONFIG_ZEPHYR
-	return zephyr_find_mkbp_event_source(type);
-#else
 	const struct mkbp_event_source *src;
 
 	for (src = __mkbp_evt_srcs; src < __mkbp_evt_srcs_end; ++src)
@@ -436,7 +419,6 @@ static const struct mkbp_event_source *find_mkbp_event_source(uint8_t type)
 		return NULL;
 
 	return src;
-#endif
 }
 
 static enum ec_status mkbp_get_next_event(struct host_cmd_handler_args *args)

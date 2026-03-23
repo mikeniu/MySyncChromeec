@@ -174,7 +174,7 @@ void print_flag(int port, int set_or_clear, int flag);
  * partner behavior (e.g. compliance tests), where strict tDRP
  * enforcement is required.
  */
-#define PD_DRP_SW_TOGGLE_LIMIT 10
+#define PD_DRP_SW_TOGGLE_LIMIT 14
 
 /*
  * The TypeC state machine uses this bit to disable/enable PD
@@ -510,12 +510,10 @@ __maybe_unused static bool is_try_src_enabled(int port)
  *       Functions prefixed with tc_ are defined int usb_tc_sm.h
  */
 
-/* The Zephyr shim does not currently support building TCPMv2 without the PRL or
- * PE, i.e. a type-C-only TCPM. These stubs are therefore difficult to cover
- * with tests, and the value of doing so is low.
+/*
  * LCOV_EXCL_START
  */
-#if !defined(CONFIG_ZEPHYR) && !defined(CONFIG_USB_PRL_SM)
+#if !defined(CONFIG_USB_PRL_SM)
 
 /*
  * These pd_ functions are implemented in common/usb_prl_sm.c
@@ -536,9 +534,9 @@ __overridable void pd_set_vbus_discharge(int port, int enable)
 	/* DO NOTHING */
 }
 
-#endif /* !CONFIG_ZEPHYR && !CONFIG_USB_PRL_SM */
+#endif /* !CONFIG_USB_PRL_SM */
 
-#if !defined(CONFIG_ZEPHYR) && !defined(CONFIG_USB_PE_SM)
+#if !defined(CONFIG_USB_PE_SM)
 
 /*
  * These pd_ functions are implemented in the PE layer
@@ -578,7 +576,7 @@ void pd_dpm_request(int port, enum pd_dpm_request req)
 
 /* LCOV_EXCL_STOP */
 
-#endif /* !CONFIG_ZEPHYR && !CONFIG_USB_PRL_SM */
+#endif /* !CONFIG_USB_PRL_SM */
 
 #ifndef CONFIG_AP_POWER_CONTROL
 __overridable enum pd_dual_role_states board_tc_get_initial_drp_mode(int port)

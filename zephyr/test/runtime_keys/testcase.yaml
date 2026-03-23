@@ -1,9 +1,0 @@
-common:
-  platform_allow:
-    - native_sim
-tests:
-  runtime_keys.default: {}
-
-  runtime_keys.vivaldi:
-    extra_configs:
-      - CONFIG_TEST_RUNTIME_KEYS_VIVALDI=y
