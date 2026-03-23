@@ -54,6 +54,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "117a0436_8ffd2c0d",
+        "filename": "zephyr/program/skywalker/r2d2/project.conf",
+        "patchSetId": 22
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4590738
+      },
+      "writtenOn": "2026-03-23T15:04:51Z",
+      "side": 1,
+      "message": "Please add the LID ANGLE.\n```\nCONFIG_PLATFORM_EC_LID_ANGLE\u003dy\nCONFIG_PLATFORM_EC_LID_ANGLE_UPDATE\u003dy\n```",
+      "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61c6c01b_38e271de",
+        "filename": "zephyr/program/skywalker/r2d2/project.conf",
+        "patchSetId": 22
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4590738
+      },
+      "writtenOn": "2026-03-23T15:04:51Z",
+      "side": 1,
+      "message": "r2d2 has\nCONFIG_PLATFORM_EC_DYNAMIC_MOTION_SENSOR_COUNT\u003dy",
+      "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c39547b3_1693138c",
         "filename": "zephyr/program/skywalker/r2d2/project.conf",
         "patchSetId": 22
