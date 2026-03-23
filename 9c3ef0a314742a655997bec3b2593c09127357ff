@@ -16,6 +16,24 @@
       "message": "Gemini review:\n\n### 1. Functionality \u0026 Bugs\n**Copy-Paste Error in Assertion Message:**\nIn `test_lock_flash_control_register`, after you unlock the register for the first time, the error message for the `zassert_equal` check incorrectly retains the string from the previous assertion:\n\n```c\n\t/* Unlock the register */\n\tret \u003d cros_flash_npcx_set_write_enable(cros_flash_dev);\n\tzassert_equal(ret, 0, \"Failed to enable write: %d\", ret);\n\tlock_status \u003d flash_control_register_locked(cros_flash_dev);\n\tzassert_true(lock_status \u003e\u003d 0, \"Failed to read lock status, error: %d\",\n\t\t     lock_status);\n\tzassert_equal(lock_status, 0,\n\t\t      \"Flash control register not locked initially\"); // \u003c-- Needs update\n```\n*   **Recommendation:** Change the string to accurately reflect the failure state, such as `\"Flash control register failed to unlock\"`.\n\n### 2. Consistency \u0026 Testing Structure\n**Suite-Wide vs. Test-Specific Fixtures:**\nYou modified the `ZTEST_SUITE` definition to include `flash_physical_before` and `flash_physical_after` as the `before` and `after` fixtures:\n\n```c\nZTEST_SUITE(flash_physical, NULL, NULL, flash_physical_before,\n\t    flash_physical_after, NULL);\n```\n\nIn Zephyr\u0027s Ztest framework, `before` and `after` run before and after *every single test* in the suite. This means `crec_flash_lock_mapped_storage()` and `cros_flash_npcx_set_write_disable()` will now wrap around `test_flash_config` as well. Because `test_flash_config` solely validates pre-processor macros and struct configurations, interacting with the physical flash lock state around it adds unnecessary hardware overhead and couples a purely logical test to a physical state.",
       "revId": "9c3ef0a314742a655997bec3b2593c09127357ff",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e8e6be2_cf45cc7b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 29
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-23T18:38:55Z",
+      "side": 1,
+      "message": "For (2), you can create a new suite in this file and keep the before/after for NPCX there. Something like `flash_physical_npcx`.",
+      "parentUuid": "c97dd65e_76deae54",
+      "revId": "9c3ef0a314742a655997bec3b2593c09127357ff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
