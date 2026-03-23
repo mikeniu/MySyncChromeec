@@ -88,6 +88,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2138810d_68f3e97f",
+        "filename": "zephyr/program/skywalker/r2d2/project.conf",
+        "patchSetId": 22
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4590738
+      },
+      "writtenOn": "2026-03-23T15:11:57Z",
+      "side": 1,
+      "message": "This is my mistake. Please ignore this comment.",
+      "parentUuid": "61c6c01b_38e271de",
+      "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c39547b3_1693138c",
         "filename": "zephyr/program/skywalker/r2d2/project.conf",
         "patchSetId": 22
