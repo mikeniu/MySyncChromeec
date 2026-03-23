@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1997d09c_9cbe8a13",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-23T18:48:20Z",
+      "side": 1,
+      "message": "Similar to [this comment](https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7685001/comment/1264a2b7_1c6fef3f/) we can probably drop the \"wait_ready\" part and just call it `cros_flash_npcx_wait_write_enabled`.",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 127,
+        "endChar": 44
+      },
+      "revId": "9a0ca94122dc562115f231717f5fbd8a39a83dff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
