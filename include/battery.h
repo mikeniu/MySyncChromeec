@@ -464,6 +464,11 @@ int battery_cutoff_in_progress(void);
 int battery_is_cut_off(void);
 
 /**
+ * Return if the battery cutoff is scheduled.
+ */
+int battery_cutoff_is_scheduled(void);
+
+/**
  * Read battery vendor parameter.
  *
  * Vendor parameter handlers are implemented in a board-specific battery.c
