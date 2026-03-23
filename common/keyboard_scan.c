@@ -33,10 +33,6 @@
 
 #include <string.h>
 
-#ifdef CONFIG_ZEPHYR
-#include "drivers/one_wire_uart.h"
-#endif
-
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_KEYSCAN, outstr)
 #define CPRINTF(format, args...) cprintf(CC_KEYSCAN, format, ##args)
@@ -1125,6 +1121,7 @@ void keyboard_scan_task(void *u)
 				keyboard_raw_drive_column(KEYBOARD_COLUMN_ALL);
 				udelay(keyscan_config.output_settle_us +
 				       COL2_DELAY_US);
+				force_poll |= local_disable_scanning;
 			} else if (!local_disable_scanning) {
 				/*
 				 * Scanning isn't enabled but it was last time
@@ -1175,9 +1172,6 @@ void keyboard_scan_task(void *u)
 			}
 		}
 
-		/* We're about to poll, so any existing forces are fulfilled */
-		force_poll = 0;
-
 		/* Enter polling mode */
 		CPRINTS5("poll");
 		keyboard_raw_enable_interrupt(0);
@@ -1187,8 +1181,12 @@ void keyboard_scan_task(void *u)
 		while (keyboard_scan_is_enabled()) {
 			start = get_time();
 
-			/* Check for keys down */
-			if (check_keys_changed(debounced_state)) {
+			/*
+			 * Check for keys down or force poll to debounce key
+			 * press during keyboard scan disablement.
+			 */
+			if (check_keys_changed(debounced_state) || force_poll) {
+				force_poll = 0;
 				poll_deadline.val =
 					start.val +
 					keyscan_config.poll_timeout_us;
@@ -1215,6 +1213,12 @@ void keyboard_scan_task(void *u)
 
 			crec_usleep(wait_time);
 		}
+
+		/*
+		 * Set force_poll in case that keyboard_scan_is_enabled is false
+		 * in the first iteration.
+		 */
+		force_poll = 0;
 	}
 }
 
@@ -1268,10 +1272,6 @@ int keyboard_factory_test_scan(void)
 	keyboard_scan_enable(0, KB_SCAN_DISABLE_LID_CLOSED);
 	flags = gpio_get_default_flags(GPIO_KBD_KSO2);
 
-	if (IS_ENABLED(CONFIG_ZEPHYR))
-		/* set all KSI/KSO pins to GPIO_ALT_FUNC_NONE */
-		keybaord_raw_config_alt(0);
-
 	/* Set all of KSO/KSI pins to internal pull-up and input */
 	for (i = 0; i < keyboard_factory_scan_pins_used; i++) {
 		if (keyboard_factory_scan_pins[i][0] < 0)
@@ -1280,9 +1280,6 @@ int keyboard_factory_test_scan(void)
 		port = keyboard_factory_scan_pins[i][0];
 		id = keyboard_factory_scan_pins[i][1];
 
-		if (!IS_ENABLED(CONFIG_ZEPHYR))
-			gpio_set_alternate_function(port, 1 << id,
-						    GPIO_ALT_FUNC_NONE);
 		gpio_set_flags_by_mask(port, 1 << id,
 				       GPIO_INPUT | GPIO_PULL_UP);
 	}
@@ -1315,10 +1312,7 @@ int keyboard_factory_test_scan(void)
 				       GPIO_INPUT | GPIO_PULL_UP);
 	}
 done:
-	if (IS_ENABLED(CONFIG_ZEPHYR))
-		keybaord_raw_config_alt(1);
-	else
-		gpio_config_module(MODULE_KEYBOARD_SCAN, 1);
+	gpio_config_module(MODULE_KEYBOARD_SCAN, 1);
 	gpio_set_flags(GPIO_KBD_KSO2, flags);
 	keyboard_scan_enable(1, KB_SCAN_DISABLE_LID_CLOSED);
 

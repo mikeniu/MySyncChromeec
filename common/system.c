@@ -280,12 +280,12 @@ uint32_t system_get_reset_flags(void)
 
 void system_set_reset_flags(uint32_t flags)
 {
-	reset_flags |= flags;
+	atomic_or((atomic_t *)&reset_flags, flags);
 }
 
 void system_clear_reset_flags(uint32_t flags)
 {
-	reset_flags &= ~flags;
+	atomic_clear_bits((atomic_t *)&reset_flags, flags);
 }
 
 static void print_reset_flags(uint32_t flags)
@@ -440,7 +440,6 @@ test_mockable void system_disable_jump(void)
 
 #ifdef CONFIG_MPU
 	if (system_is_locked()) {
-#ifndef CONFIG_ZEPHYR
 		int ret;
 		enum ec_image __attribute__((unused)) copy;
 
@@ -494,7 +493,6 @@ test_mockable void system_disable_jump(void)
 			return;
 		}
 #endif /* !CONFIG_EXTERNAL_STORAGE */
-#endif /* !CONFIG_ZEPHYR */
 
 		/* All regions were configured successfully, enable MPU */
 		mpu_enable();
@@ -859,7 +857,7 @@ int system_get_image_used(enum ec_image copy)
 {
 	const struct image_data *data = system_get_image_data(copy);
 
-	return data ? MAX((int)data->size, 0) : 0;
+	return data ? max((int)data->size, 0) : 0;
 }
 
 /*
@@ -1819,6 +1817,43 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 }
 DECLARE_HOST_COMMAND(EC_CMD_REBOOT_EC, host_command_reboot, EC_VER_MASK(0));
 
+#ifdef CONFIG_PLATFORM_EC_HOST_COMMAND_ENTER_BOOTLOADER
+static enum ec_status
+host_command_bootloader(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_enter_bootloader *p = args->params;
+	uint8_t mode = p->mode;
+
+	if (system_is_locked()) {
+		return EC_RES_ACCESS_DENIED;
+	}
+
+	/*
+	 * We trust bootloader by definition and system is unlocked,
+	 * so no need to clear secrets.
+	 */
+#ifndef CONFIG_EC_HOST_CMD
+	args->result = EC_RES_SUCCESS;
+	host_send_response(args);
+#else
+	ec_host_cmd_send_response(EC_HOST_CMD_SUCCESS,
+				  (struct ec_host_cmd_handler_args *)args);
+#endif
+	/*
+	 * Make sure to send response before entering bootloader, which can
+	 * break the communication.
+	 */
+	k_msleep(10);
+	/* TODO(b/460674359): Handle all security consequences. */
+	chip_enter_bootloader(mode);
+	CPRINTS("Failed to enter bootloader");
+
+	return EC_RES_ERROR;
+}
+DECLARE_HOST_COMMAND(EC_CMD_ENTER_BOOTLOADER, host_command_bootloader,
+		     EC_VER_MASK(0));
+#endif /* CONFIG_PLATFORM_EC_HOST_COMMAND_ENTER_BOOTLOADER */
+
 test_mockable int system_can_boot_ap(void)
 {
 	int soc = -1;
@@ -1853,8 +1888,6 @@ __overridable const char *board_read_serial(void)
 	if (IS_ENABLED(CONFIG_FLASH_PSTATE) &&
 	    IS_ENABLED(CONFIG_FLASH_PSTATE_BANK))
 		return crec_flash_read_pstate_serial();
-	else if (IS_ENABLED(CONFIG_OTP))
-		return otp_read_serial();
 	else
 		return "";
 }
@@ -1864,8 +1897,6 @@ __overridable int board_write_serial(const char *serialno)
 	if (IS_ENABLED(CONFIG_FLASH_PSTATE) &&
 	    IS_ENABLED(CONFIG_FLASH_PSTATE_BANK))
 		return crec_flash_write_pstate_serial(serialno);
-	else if (IS_ENABLED(CONFIG_OTP))
-		return otp_write_serial(serialno);
 	else
 		return EC_ERROR_UNIMPLEMENTED;
 }

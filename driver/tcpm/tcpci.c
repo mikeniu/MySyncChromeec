@@ -24,10 +24,13 @@
 #include "usb_pd_flags.h"
 #include "usb_pd_tcpc.h"
 #include "usb_pd_tcpm.h"
+#include "usb_pe_sm.h"
 #include "util.h"
 
 #define CPRINTF(format, args...) cprintf(CC_USBPD, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_USBPD, format, ##args)
+
+static bool tcpci_bist_mode[CONFIG_USB_PD_PORT_MAX_COUNT];
 
 STATIC_IF(CONFIG_USB_PD_DECODE_SOP)
 bool sop_prime_en[CONFIG_USB_PD_PORT_MAX_COUNT];
@@ -120,6 +123,12 @@ static int cached_rp[CONFIG_USB_PD_PORT_MAX_COUNT];
 
 /* Cache our Device Capabilities at init for later reference */
 static int dev_cap_1[CONFIG_USB_PD_PORT_MAX_COUNT];
+
+/* Cache add state */
+static bool cached_auto_discharge_disconnect[CONFIG_USB_PD_PORT_MAX_COUNT];
+
+/* Indicates if the cached auto-discharge state is synchronized with hardware */
+static bool cache_valid[CONFIG_USB_PD_PORT_MAX_COUNT];
 
 #ifdef CONFIG_USB_PD_TCPC_LOW_POWER
 int tcpc_addr_write(int port, int i2c_addr, int reg, int val)
@@ -403,8 +412,13 @@ void tcpci_tcpc_discharge_vbus(int port, int enable)
  * are connected and disabled after we are disconnected and
  * VBus is at SafeV0
  */
-void tcpci_tcpc_enable_auto_discharge_disconnect(int port, int enable)
+void tcpci_tcpc_enable_auto_discharge_disconnect(int port, bool enable)
 {
+	/* Skip redundant register access */
+	if (cache_valid[port] &&
+	    cached_auto_discharge_disconnect[port] == enable)
+		return;
+
 	if (IS_ENABLED(DEBUG_AUTO_DISCHARGE_DISCONNECT))
 		CPRINTS("C%d: AutoDischargeDisconnect %sABLED", port,
 			enable ? "EN" : "DIS");
@@ -412,6 +426,9 @@ void tcpci_tcpc_enable_auto_discharge_disconnect(int port, int enable)
 	tcpc_update8(port, TCPC_REG_POWER_CTRL,
 		     TCPC_REG_POWER_CTRL_AUTO_DISCHARGE_DISCONNECT,
 		     (enable) ? MASK_SET : MASK_CLR);
+
+	cached_auto_discharge_disconnect[port] = enable;
+	cache_valid[port] = true;
 }
 
 int tcpci_tcpc_debug_accessory(int port, bool enable)
@@ -839,13 +856,44 @@ clear:
 
 	return rv;
 }
+__maybe_unused static bool
+tcpci_tcpm_should_enter_bist_mode(int port, uint32_t *payload, int *head)
+{
+	uint32_t hdr = *head;
+	/*
+	 * Detect BIST message here and enable BIST mode.
+	 */
+	if (PD_HEADER_EXT(hdr) == 0 && PD_HEADER_CNT(hdr) > 0 &&
+	    PD_HEADER_TYPE(hdr) == PD_DATA_BIST &&
+	    BIST_MODE(payload[0]) == BIST_TEST_DATA && !tcpci_bist_mode[port] &&
+	    pd_vbus_valid_for_bist(port)) {
+		return true;
+	}
+
+	return false;
+}
 
 int tcpci_tcpm_get_message_raw(int port, uint32_t *payload, int *head)
 {
+	int ret = 0;
 	if (tcpc_config[port].flags & TCPC_FLAGS_TCPCI_REV2_0)
-		return tcpci_rev2_0_tcpm_get_message_raw(port, payload, head);
+		ret = tcpci_rev2_0_tcpm_get_message_raw(port, payload, head);
+	else
+		ret = tcpci_rev1_0_tcpm_get_message_raw(port, payload, head);
 
-	return tcpci_rev1_0_tcpm_get_message_raw(port, payload, head);
+	if (ret != EC_SUCCESS)
+		return ret;
+	/*
+	 * Minimize the latency of BIST Test Mode entry by checking immediately
+	 * after reading the message, instead of waiting for typical PE message
+	 * handling
+	 */
+#ifdef CONFIG_USB_PD_TCPMV2
+	if (tcpci_tcpm_should_enter_bist_mode(port, payload, head)) {
+		ret = tcpci_set_bist_test_mode(port, true);
+	}
+#endif /* CONFIG_USB_PD_TCPMV2 */
+	return ret;
 }
 
 /* Cache depth needs to be power of 2 */
@@ -941,6 +989,7 @@ int tcpci_tcpm_transmit(int port, enum tcpci_msg_type type, uint16_t header,
 {
 	int reg = TCPC_REG_TX_DATA;
 	int rv, cnt = 4 * PD_HEADER_CNT(header);
+	timestamp_t tx_ts = get_time();
 
 	/* If not SOP* transmission, just write to the transmit register */
 	if (type >= NUM_SOP_STAR_TYPES) {
@@ -1009,7 +1058,7 @@ int tcpci_tcpm_transmit(int port, enum tcpci_msg_type type, uint16_t header,
 	 * discarded and don't tell the TCPC to transmit.
 	 */
 	if (tcpm_has_pending_message(port)) {
-		pd_transmit_complete(port, TCPC_TX_COMPLETE_DISCARDED);
+		pd_transmit_complete(port, TCPC_TX_COMPLETE_DISCARDED, &tx_ts);
 		return EC_ERROR_BUSY;
 	}
 
@@ -1100,25 +1149,27 @@ int tcpci_hard_reset_reinit(int port)
 
 enum ec_error_list tcpci_set_bist_test_mode(const int port, const bool enable)
 {
-	int rv;
+	int rv = EC_SUCCESS;
 
-	rv = tcpc_update8(port, TCPC_REG_TCPC_CTRL,
-			  TCPC_REG_TCPC_CTRL_BIST_TEST_MODE,
-			  enable ? MASK_SET : MASK_CLR);
-	rv |= tcpc_update16(port, TCPC_REG_ALERT_MASK, TCPC_REG_ALERT_RX_STATUS,
-			    enable ? MASK_CLR : MASK_SET);
+	if (enable != tcpci_bist_mode[port]) {
+		rv = tcpc_update8(port, TCPC_REG_TCPC_CTRL,
+				  TCPC_REG_TCPC_CTRL_BIST_TEST_MODE,
+				  enable ? MASK_SET : MASK_CLR);
+		rv |= tcpc_update16(port, TCPC_REG_ALERT_MASK,
+				    TCPC_REG_ALERT_RX_STATUS,
+				    enable ? MASK_CLR : MASK_SET);
+	}
+
+	if (rv == EC_SUCCESS)
+		tcpci_bist_mode[port] = enable;
+
 	return rv;
 }
 
 enum ec_error_list tcpci_get_bist_test_mode(const int port, bool *enable)
 {
-	int rv;
-	int val;
-
-	rv = tcpc_read(port, TCPC_REG_TCPC_CTRL, &val);
-	*enable = !!(val & TCPC_REG_TCPC_CTRL_BIST_TEST_MODE);
-
-	return rv;
+	*enable = tcpci_bist_mode[port];
+	return EC_SUCCESS;
 }
 
 static int tcpci_clear_fault(int port, int fault)
@@ -1193,17 +1244,29 @@ static void tcpci_check_vbus_changed(int port, int alert, uint32_t *pd_event)
 void tcpci_tcpc_alert(int port)
 {
 	int alert = 0;
-	int alert_ext = 0;
-	int failed_attempts;
-	uint32_t pd_event = 0;
-	int retval = 0;
-	bool bist_mode;
 
 	/* Read the Alert register from the TCPC */
 	if (tcpm_alert_status(port, &alert)) {
 		CPRINTS("C%d: Failed to read alert register", port);
 		return;
 	}
+
+	/*
+	 * Call the function with the alert value. This function
+	 * now handles all the TCPC alert processing.
+	 */
+	tcpci_tcpc_alert_with_value(port, alert);
+}
+
+void tcpci_tcpc_alert_with_value(int port, int alert_value)
+{
+	int alert = alert_value;
+	int alert_ext = 0;
+	int failed_attempts;
+	uint32_t pd_event = 0;
+	int retval = 0;
+	bool bist_mode;
+	timestamp_t alert_ts = get_time();
 
 	/* Get Extended Alert register if needed */
 	if (alert & TCPC_REG_ALERT_ALERT_EXT)
@@ -1234,7 +1297,7 @@ void tcpci_tcpc_alert(int port)
 		else
 			tx_status = TCPC_TX_COMPLETE_FAILED;
 
-		pd_transmit_complete(port, tx_status);
+		pd_transmit_complete(port, tx_status, &alert_ts);
 	}
 
 	tcpc_get_bist_test_mode(port, &bist_mode);
@@ -1502,6 +1565,8 @@ int tcpci_tcpm_init(int port)
 
 	if (port >= board_get_usb_pd_port_count())
 		return EC_ERROR_INVAL;
+
+	cache_valid[port] = false;
 
 	while (1) {
 		error = tcpci_tcpm_get_power_status(port, &power_status);

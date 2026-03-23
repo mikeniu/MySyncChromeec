@@ -15,10 +15,6 @@
 #include "tcpm/tcpci.h"
 #include "usbc_ppc.h"
 
-#ifdef CONFIG_ZEPHYR
-#include "intelrvp.h"
-#endif /* CONFIG_ZEPHYR */
-
 #define CPRINTF(format, args...) cprintf(CC_USBPD, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_USBPD, format, ##args)
 
@@ -50,7 +46,6 @@ static void baseboard_tcpc_init(void)
 }
 DECLARE_HOOK(HOOK_INIT, baseboard_tcpc_init, HOOK_PRIO_INIT_CHIPSET);
 
-#ifndef CONFIG_ZEPHYR
 void tcpc_alert_event(enum gpio_signal signal)
 {
 	int i;
@@ -66,7 +61,6 @@ void tcpc_alert_event(enum gpio_signal signal)
 		}
 	}
 }
-#endif
 
 uint16_t tcpc_get_alert_status(void)
 {

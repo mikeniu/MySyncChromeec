@@ -16,6 +16,8 @@
 #include "task.h"
 #include "util.h"
 
+#include <stdbool.h>
+
 /**
  * @return Number of regions supported by the MPU. 0 means the processor does
  * not implement an MPU.
@@ -130,7 +132,7 @@ static int mpu_config_region_greedy(uint8_t region, uint32_t addr,
 	 * This is the minimum of the base address and size alignment, since
 	 * regions must be naturally aligned to their size.
 	 */
-	uint8_t natural_alignment = MIN(addr == 0 ? 32 : alignment_log2(addr),
+	uint8_t natural_alignment = min(addr == 0 ? 32 : alignment_log2(addr),
 					alignment_log2(size));
 	uint8_t subregion_disable = 0;
 
@@ -222,7 +224,7 @@ int mpu_config_region(uint8_t region, uint32_t addr, uint32_t size,
 	}
 
 	if (size > 0)
-		return EC_ERROR_OVERFLOW;
+		return -EC_ERROR_OVERFLOW;
 	return EC_SUCCESS;
 }
 
@@ -324,7 +326,7 @@ struct mpu_rw_regions mpu_get_rw_regions(void)
 	 * address used for an MPU region must be aligned to the size.
 	 */
 	aligned_size_bit = __fls(regions.addr[0] & -regions.addr[0]);
-	regions.size[0] = MIN(BIT(aligned_size_bit), CONFIG_RW_SIZE);
+	regions.size[0] = min(BIT(aligned_size_bit), CONFIG_RW_SIZE);
 	regions.addr[1] = regions.addr[0] + regions.size[0];
 	regions.size[1] = CONFIG_RW_SIZE - regions.size[0];
 	regions.num_regions = (regions.size[1] == 0) ? 1 : 2;
@@ -352,7 +354,7 @@ int mpu_lock_rw_flash(void)
 #endif /* !CONFIG_EXTERNAL_STORAGE */
 
 #ifdef CONFIG_ROLLBACK_MPU_PROTECT
-int mpu_lock_rollback(int lock)
+int mpu_lock_rollback(bool lock)
 {
 	int rv;
 	int num_mpu_regions = mpu_num_regions();
@@ -454,7 +456,7 @@ int mpu_pre_init(void)
 	}
 
 	if (IS_ENABLED(CONFIG_ROLLBACK_MPU_PROTECT)) {
-		rv = mpu_lock_rollback(1);
+		rv = mpu_lock_rollback(true);
 		if (rv != EC_SUCCESS)
 			return rv;
 	}

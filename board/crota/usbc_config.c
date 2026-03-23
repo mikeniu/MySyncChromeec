@@ -39,10 +39,6 @@
 #define CPRINTF(format, args...) cprintf(CC_USBPD, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_USBPD, format, ##args)
 
-#ifdef CONFIG_ZEPHYR
-enum ioex_port { IOEX_C0_NCT38XX = 0, IOEX_C1_NCT38XX, IOEX_PORT_COUNT };
-#endif /* CONFIG_ZEPHYR */
-
 /* USBC TCPC configuration */
 const struct tcpc_config_t tcpc_config[] = {
 	[USBC_PORT_C0] = {
@@ -149,7 +145,6 @@ const struct usb_mux_chain usb_muxes[] = {
 };
 BUILD_ASSERT(ARRAY_SIZE(usb_muxes) == USBC_PORT_COUNT);
 
-#ifndef CONFIG_ZEPHYR
 /* BC1.2 charger detect configuration */
 const struct pi3usb9201_config_t pi3usb9201_bc12_chips[] = {
 	[USBC_PORT_C0] = {
@@ -187,7 +182,6 @@ struct ioexpander_config_t ioex_config[] = {
 	},
 };
 BUILD_ASSERT(ARRAY_SIZE(ioex_config) == CONFIG_IO_EXPANDER_PORT_COUNT);
-#endif /* !CONFIG_ZEPHYR */
 
 #ifdef CONFIG_CHARGE_RAMP_SW
 
@@ -302,11 +296,9 @@ static void board_tcpc_init(void)
 	/* Enable TCPC interrupts. */
 	gpio_enable_interrupt(GPIO_USB_C0_C1_TCPC_INT_ODL);
 
-#ifndef CONFIG_ZEPHYR
 	/* Enable BC1.2 interrupts. */
 	gpio_enable_interrupt(GPIO_USB_C0_BC12_INT_ODL);
 	gpio_enable_interrupt(GPIO_USB_C1_BC12_INT_ODL);
-#endif /* !CONFIG_ZEPHYR */
 }
 DECLARE_HOOK(HOOK_INIT, board_tcpc_init, HOOK_PRIO_INIT_CHIPSET);
 

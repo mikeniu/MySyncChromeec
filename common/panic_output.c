@@ -10,6 +10,7 @@
 #include "hooks.h"
 #include "host_command.h"
 #include "panic.h"
+#include "panic_log.h"
 #include "printf.h"
 #include "software_panic.h"
 #include "sysjump.h"
@@ -64,6 +65,9 @@ int panic_sw_reason_is_valid(uint32_t reason)
 #ifndef CONFIG_DEBUG_PRINTF
 static int panic_txchar(void *context, int c)
 {
+	if (IS_ENABLED(CONFIG_PANIC_LOG))
+		panic_log_write_char(c);
+
 	if (c == '\n')
 		panic_txchar(context, '\r');
 
@@ -140,7 +144,6 @@ void panic_reboot(void)
 	system_reset(0);
 }
 
-#if !(defined(CONFIG_ZEPHYR))
 /* Complete the processing of a panic, after the initial message is shown */
 test_mockable_static
 #if !(defined(TEST_FUZZ) || defined(CONFIG_ZTEST))
@@ -177,7 +180,6 @@ void panic(const char *msg)
 	panic_printf("\n** PANIC: %s\n", msg);
 	panic_reboot();
 }
-#endif /* !CONFIG_ZEPHYR */
 
 test_mockable struct panic_data *panic_get_data(void)
 {
@@ -430,6 +432,10 @@ static int command_crash(int argc, const char **argv)
 	}
 
 	if (!strcasecmp(argv[1], "assert")) {
+		if (!IS_ENABLED(CONFIG_DEBUG_ASSERT_REBOOTS)) {
+			ccprintf("Asserts are disabled\n");
+			return EC_ERROR_PARAM1;
+		}
 		ASSERT(0);
 	} else if (!strcasecmp(argv[1], "divzero")) {
 		volatile int one = 1;

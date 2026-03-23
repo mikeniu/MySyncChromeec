@@ -1,4 +1,0 @@
-# The Elan code uses the term "dummy" multiple times, so unblock just that
-# specific usage.
-dummy
-master

@@ -284,6 +284,9 @@
 #define CONFIG_MPU
 #define CONFIG_ROLLBACK_MPU_PROTECT
 
+#undef CONFIG_ROLLBACK_VERSION
+#define CONFIG_ROLLBACK_VERSION 1
+
 /*
  * We do not use any "locally" generated entropy: this is normally used
  * to add local entropy when the main source of entropy is remote.

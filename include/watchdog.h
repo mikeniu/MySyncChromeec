@@ -49,9 +49,11 @@ void watchdog_warning_irq(void);
  */
 void watchdog_stop_and_unlock(void);
 
-/* Reload the watchdog counter */
 #ifdef CONFIG_WATCHDOG
+/* Reload the watchdog counter */
 void watchdog_reload(void);
+/* Chip specific watchdog reload */
+void chip_watchdog_reload(void);
 #else
 test_mockable_static_inline void watchdog_reload(void)
 {

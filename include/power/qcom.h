@@ -28,16 +28,36 @@ enum power_signal {
 	QC_EXP_AP_SUSPEND,
 	POWER_SIGNAL_COUNT,
 };
+
+/**
+ * Return values for check_for_power_on_event().
+ */
+enum power_on_event_t {
+	POWER_ON_CANCEL,
+	POWER_ON_BY_AUTO_POWER_ON,
+	POWER_ON_BY_AC_ON,
+	POWER_ON_BY_LID_OPEN,
+	POWER_ON_BY_LONG_WARM_RESET,
+	POWER_ON_BY_POWER_BUTTON_PRESSED,
+	POWER_ON_BY_POWER_REQ_ON,
+	POWER_ON_BY_POWER_REQ_RESET,
+
+	POWER_ON_EVENT_COUNT,
+};
+
+enum power_on_event_t chipset_get_power_on_reason(void);
 #endif
 
 /* Swithcap functions */
 void board_set_switchcap_power(int enable);
 int board_is_switchcap_enabled(void);
 int board_is_switchcap_power_good(void);
+int board_is_switchcap_power_reset(void);
 
 #if defined(CONFIG_PLATFORM_EC_PMIC_PASSTHRU_POWER_SIGNALS)
 void passthru_lid_open_to_pmic(void);
 void passthru_ac_on_to_pmic(void);
+void reset_all_passthru_pmic_signal(void);
 #endif
 
 #endif /* __CROS_EC_POWER_QCOM_H_ */
