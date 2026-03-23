@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8424fe79_f2576a32",
+        "filename": "zephyr/program/skywalker/r2d2/CMakeLists.txt",
+        "patchSetId": 22
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4590738
+      },
+      "writtenOn": "2026-03-23T14:10:37Z",
+      "side": 1,
+      "message": "Please remove this implementation, because Charger IC is not the same as our previous product.",
+      "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6ebe7c0c_e7137c15",
         "filename": "zephyr/program/skywalker/r2d2/motionsense.dtsi",
         "patchSetId": 22
@@ -65,6 +82,40 @@
       "writtenOn": "2026-03-19T16:14:48Z",
       "side": 1,
       "message": "I think we can override the int_imu without \"/delete-node/ int_imu;\".\n\n(If it is necessary, \"/delete-node/ ec-imu\" seems more better. And, it needs to have \"/delete-node/ lid_accel;\" too.)",
+      "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9f6b2bb_1e1d1dff",
+        "filename": "zephyr/program/skywalker/r2d2/project.overlay",
+        "patchSetId": 22
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 4590738
+      },
+      "writtenOn": "2026-03-23T14:10:37Z",
+      "side": 1,
+      "message": "Please remove ec_batt_pres_odl, because Charger IC is not the same as our previous product.",
+      "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7b090c3_da526df0",
+        "filename": "zephyr/program/skywalker/r2d2/src/battery_detection.c",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4590738
+      },
+      "writtenOn": "2026-03-23T14:10:37Z",
+      "side": 1,
+      "message": "Please remove this implementation, because Charger IC is not the same as our previous product.",
       "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
