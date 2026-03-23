@@ -81,16 +81,6 @@ static uint32_t mkbp_event_wake_mask = CONFIG_MKBP_EVENT_WAKEUP_MASK;
 static uint32_t mkbp_host_event_wake_mask = CONFIG_MKBP_HOST_EVENT_WAKEUP_MASK;
 #endif /* CONFIG_MKBP_HOST_EVENT_WAKEUP_MASK */
 
-#ifdef CONFIG_ZEPHYR
-static int init_mkbp_mutex(void)
-{
-	k_mutex_init(&state.lock);
-
-	return 0;
-}
-SYS_INIT(init_mkbp_mutex, POST_KERNEL, 50);
-#endif /* CONFIG_ZEPHYR */
-
 #if defined(CONFIG_MKBP_USE_GPIO) || \
 	defined(CONFIG_MKBP_USE_GPIO_AND_HOST_EVENT)
 static int mkbp_set_host_active_via_gpio(int active, uint32_t *timestamp)
@@ -154,6 +144,19 @@ static int mkbp_set_host_active_via_heci(int active, uint32_t *timestamp)
 }
 #endif
 
+#ifdef CONFIG_MKBP_USE_USB
+int mkbp_set_host_active_via_usb(int active, uint32_t *timestamp)
+{
+	if (timestamp) {
+		*timestamp = __hw_clock_source_read();
+	}
+	if (active) {
+		ec_host_cmd_backend_usb_trigger_event();
+	}
+	return EC_SUCCESS;
+}
+#endif
+
 /*
  * This communicates to the AP whether an MKBP event is currently available
  * for processing.
@@ -176,6 +179,8 @@ static int mkbp_set_host_active(int active, uint32_t *timestamp)
 	return mkbp_set_host_active_via_gpio(active, timestamp);
 #elif defined(CONFIG_MKBP_USE_HECI)
 	return mkbp_set_host_active_via_heci(active, timestamp);
+#elif defined(CONFIG_MKBP_USE_USB)
+	return mkbp_set_host_active_via_usb(active, timestamp);
 #endif
 }
 
@@ -404,9 +409,6 @@ static int take_event_if_set(uint8_t event_type)
 
 static const struct mkbp_event_source *find_mkbp_event_source(uint8_t type)
 {
-#ifdef CONFIG_ZEPHYR
-	return zephyr_find_mkbp_event_source(type);
-#else
 	const struct mkbp_event_source *src;
 
 	for (src = __mkbp_evt_srcs; src < __mkbp_evt_srcs_end; ++src)
@@ -417,7 +419,6 @@ static const struct mkbp_event_source *find_mkbp_event_source(uint8_t type)
 		return NULL;
 
 	return src;
-#endif
 }
 
 static enum ec_status mkbp_get_next_event(struct host_cmd_handler_args *args)
@@ -494,7 +495,7 @@ static enum ec_status mkbp_get_next_event(struct host_cmd_handler_args *args)
 			max_size = member_size(
 				union ec_response_get_next_data_v3, key_matrix);
 		}
-		data_size = MIN(data_size, max_size);
+		data_size = min(data_size, max_size);
 	}
 
 	/* If there are no more events and we support the "more" flag, set it */

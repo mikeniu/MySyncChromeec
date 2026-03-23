@@ -3,7 +3,6 @@
  * found in the LICENSE file.
  */
 
-/* Features common to ECOS and Zephyr */
 #include "cbi.h"
 #include "cbi_ec_fw_config.h"
 #include "common.h"

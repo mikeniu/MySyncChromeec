@@ -383,7 +383,7 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 				fifo_frame.available_fifo_len);
 
 		fifo_frame.available_fifo_len =
-			MIN(fifo_frame.available_fifo_len,
+			min(fifo_frame.available_fifo_len,
 			    ARRAY_SIZE(fifo_frame.data));
 		/* Read FIFO data */
 		rv = bmi3_read_n(
@@ -422,8 +422,11 @@ static int bmi3xx_enable_interrupt(const struct motion_sensor_t *s, bool enable)
 	if (s->type != MOTIONSENSE_TYPE_ACCEL)
 		return EC_SUCCESS;
 
-	if (enable)
-		return config_interrupt(s);
+	if (enable) {
+		RETURN_ERROR(config_interrupt(s));
+		bmi3xx_interrupt(0 /* unused */);
+		return EC_SUCCESS;
+	}
 
 	mutex_lock(s->mutex);
 

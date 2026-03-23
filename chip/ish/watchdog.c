@@ -53,7 +53,7 @@ int watchdog_init(void)
 	return EC_SUCCESS;
 }
 
-void watchdog_reload(void)
+void chip_watchdog_reload(void)
 {
 	/*
 	 * ISH Supplemental Registers Info, 1.2.6.2:
@@ -62,4 +62,3 @@ void watchdog_reload(void)
 	 */
 	WDT_RELOAD = 1;
 }
-DECLARE_HOOK(HOOK_TICK, watchdog_reload, HOOK_PRIO_DEFAULT);

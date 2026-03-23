@@ -891,7 +891,7 @@ static void inc_id(int port)
 	pd[port].msg_id = (pd[port].msg_id + 1) & PD_MESSAGE_ID_COUNT;
 }
 
-void pd_transmit_complete(int port, int status)
+void pd_transmit_complete(int port, int status, const timestamp_t *ts)
 {
 	if (status == TCPC_TX_COMPLETE_SUCCESS)
 		inc_id(port);
@@ -5354,7 +5354,7 @@ static enum ec_status hc_remote_flash(struct host_cmd_handler_args *args)
 		size = p->size / 4;
 		for (i = 0; i < size; i += VDO_MAX_SIZE - 1) {
 			pd_send_vdm(port, USB_VID_GOOGLE, VDO_CMD_FLASH_WRITE,
-				    data + i, MIN(size - i, VDO_MAX_SIZE - 1));
+				    data + i, min(size - i, VDO_MAX_SIZE - 1));
 			timeout.val = get_time().val + 500 * MSEC;
 
 			/* Wait until VDM is done */

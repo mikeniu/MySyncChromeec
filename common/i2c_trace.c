@@ -66,11 +66,7 @@ static int command_i2ctrace_list(void)
 		if (trace_entries[i].enabled) {
 			i2c_port = get_i2c_port(trace_entries[i].port);
 			ccprintf("%-2zd %d %-8s 0x%X", i, trace_entries[i].port,
-#ifndef CONFIG_ZEPHYR
 				 i2c_port ? i2c_port->name : "invalid",
-#else
-				 "",
-#endif /* CONFIG_ZEPHYR */
 				 trace_entries[i].addr_lo);
 			if (trace_entries[i].addr_hi !=
 			    trace_entries[i].addr_lo)

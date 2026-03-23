@@ -1,2 +1,0 @@
-cros.dsp.comms.GetCbiFlagsResponse.flags_string max_size:80
-cros.dsp.comms.GetCbiFlagsResponse.flags_string fixed_length:True

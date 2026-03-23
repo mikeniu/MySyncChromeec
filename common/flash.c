@@ -6,9 +6,6 @@
 /* Flash memory module for Chrome EC - common functions */
 
 #include "builtin/assert.h"
-#ifdef CONFIG_ZEPHYR
-#include "cbi_flash.h"
-#endif /* CONFIG_ZEPHYR */
 #include "common.h"
 #include "console.h"
 #include "cros_board_info.h"
@@ -132,9 +129,6 @@ const uint32_t pstate_data __attribute__((section(".rodata.pstate"))) =
 #endif /* !CONFIG_FLASH_PSTATE_BANK */
 #endif /* CONFIG_FLASH_PSTATE */
 
-/* Shim layer provides implementation of these functions based on Zephyr API */
-#if !defined(CONFIG_ZEPHYR) || \
-	!defined(CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT)
 #ifdef CONFIG_FLASH_MULTIPLE_REGION
 const struct ec_flash_bank *flash_bank_info(int bank)
 {
@@ -232,7 +226,7 @@ int crec_flash_response_fill_banks(struct ec_response_flash_info_2 *r,
 				   int num_banks)
 {
 	const struct ec_flash_bank *banks = flash_bank_array;
-	int banks_to_copy = MIN(ARRAY_SIZE(flash_bank_array), num_banks);
+	int banks_to_copy = min(ARRAY_SIZE(flash_bank_array), num_banks);
 
 	r->num_banks_desc = banks_to_copy;
 	r->num_banks_total = ARRAY_SIZE(flash_bank_array);
@@ -272,9 +266,6 @@ int crec_flash_total_banks(void)
 {
 	return PHYSICAL_BANKS;
 }
-#endif /* !defined(CONFIG_ZEPHYR) ||                                \
-	* !defined(CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT) \
-	*/
 
 static int flash_range_ok(int offset, int size_req, int align)
 {
@@ -708,7 +699,7 @@ int crec_flash_is_erased(uint32_t offset, int size)
 	int bsize;
 
 	while (size) {
-		bsize = MIN(size, sizeof(buf));
+		bsize = min(size, sizeof(buf));
 
 		if (crec_flash_read(offset, bsize, (char *)buf))
 			return 0;
@@ -725,44 +716,6 @@ int crec_flash_is_erased(uint32_t offset, int size)
 
 	return 1;
 }
-
-#if defined(CONFIG_ZEPHYR) && defined(CONFIG_PLATFORM_EC_CBI_FLASH)
-/**
- * Check if the passed section overlaps with CBI section on EC flash.
- *
- * @param offset	Flash offset.
- * @param size		Length of section in bytes.
- * @return true if there is overlap, or false if there is no overlap.
- */
-static bool check_cbi_section_overlap(int offset, int size)
-{
-	int cbi_start = CBI_FLASH_OFFSET;
-	int cbi_end = CBI_FLASH_OFFSET + CBI_FLASH_SIZE;
-	int sec_start = offset;
-	int sec_end = offset + size;
-
-	return !((sec_end <= cbi_start) || (sec_start >= cbi_end));
-}
-
-/**
- * Hide the information related to CBI(EC flash) if data contains any.
- *
- * @param offset	Flash offset.
- * @param size		Length of section in bytes.
- * @param data		Flash data.  Must be 32-bit aligned.
- */
-static void protect_cbi_overlapped_section(int offset, int size, char *data)
-{
-	if (check_cbi_section_overlap(offset, size)) {
-		int cbi_end = CBI_FLASH_OFFSET + CBI_FLASH_SIZE;
-		int sec_end = offset + size;
-		int cbi_fill_start = MAX(CBI_FLASH_OFFSET, offset);
-		int cbi_fill_size = MIN(cbi_end, sec_end) - cbi_fill_start;
-
-		memset(data + (cbi_fill_start - offset), 0xff, cbi_fill_size);
-	}
-}
-#endif
 
 test_mockable int crec_flash_unprotected_read(int offset, int size, char *data)
 {
@@ -784,9 +737,6 @@ test_mockable int crec_flash_unprotected_read(int offset, int size, char *data)
 int crec_flash_read(int offset, int size, char *data)
 {
 	RETURN_ERROR(crec_flash_unprotected_read(offset, size, data));
-#if defined(CONFIG_ZEPHYR) && defined(CONFIG_PLATFORM_EC_CBI_FLASH)
-	protect_cbi_overlapped_section(offset, size, data);
-#endif
 	return EC_SUCCESS;
 }
 
@@ -836,24 +786,6 @@ int crec_flash_write(int offset, int size, const char *data)
 		return EC_ERROR_INVAL; /* Invalid range */
 
 	flash_abort_or_invalidate_hash(offset, size);
-
-#if defined(CONFIG_ZEPHYR) && defined(CONFIG_PLATFORM_EC_CBI_FLASH)
-	if (check_cbi_section_overlap(offset, size)) {
-		int cbi_end = CBI_FLASH_OFFSET + CBI_FLASH_SIZE;
-		int sec_end = offset + size;
-
-		if (offset < CBI_FLASH_OFFSET) {
-			RETURN_ERROR(crec_flash_physical_write(
-				offset, CBI_FLASH_OFFSET - offset, data));
-		}
-		if (sec_end > cbi_end) {
-			RETURN_ERROR(crec_flash_physical_write(
-				cbi_end, sec_end - cbi_end,
-				data + cbi_end - offset));
-		}
-		return EC_SUCCESS;
-	}
-#endif
 	return crec_flash_physical_write(offset, size, data);
 }
 
@@ -865,23 +797,6 @@ int crec_flash_erase(int offset, int size)
 #endif
 
 	flash_abort_or_invalidate_hash(offset, size);
-
-#if defined(CONFIG_ZEPHYR) && defined(CONFIG_PLATFORM_EC_CBI_FLASH)
-	if (check_cbi_section_overlap(offset, size)) {
-		int cbi_end = CBI_FLASH_OFFSET + CBI_FLASH_SIZE;
-		int sec_end = offset + size;
-
-		if (offset < CBI_FLASH_OFFSET) {
-			RETURN_ERROR(crec_flash_physical_erase(
-				offset, CBI_FLASH_OFFSET - offset));
-		}
-		if (sec_end > cbi_end) {
-			RETURN_ERROR(crec_flash_physical_erase(
-				cbi_end, sec_end - cbi_end));
-		}
-		return EC_SUCCESS;
-	}
-#endif
 	return crec_flash_physical_erase(offset, size);
 }
 
@@ -1174,8 +1089,6 @@ static void flash_erase_deferred(void)
 DECLARE_DEFERRED(flash_erase_deferred);
 #endif
 
-#if !defined(CONFIG_ZEPHYR) || \
-	!defined(CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT)
 void crec_flash_print_region_info(void)
 {
 #ifdef CONFIG_FLASH_MULTIPLE_REGION
@@ -1197,7 +1110,6 @@ void crec_flash_print_region_info(void)
 	ccprintf("Protect: %4d B\n", CONFIG_FLASH_BANK_SIZE);
 #endif
 }
-#endif
 
 /*****************************************************************************/
 /* Console commands */
@@ -1439,7 +1351,7 @@ DECLARE_CONSOLE_COMMAND(flashwp, command_flash_wp,
  * correctly in flashrom, dump_fmap, etc. and remove EC_FLASH_REGION_START.
  */
 #define EC_FLASH_REGION_START \
-	MIN(CONFIG_EC_PROTECTED_STORAGE_OFF, CONFIG_EC_WRITABLE_STORAGE_OFF)
+	min(CONFIG_EC_PROTECTED_STORAGE_OFF, CONFIG_EC_WRITABLE_STORAGE_OFF)
 
 static enum ec_status flash_command_get_info(struct host_cmd_handler_args *args)
 {
@@ -1705,9 +1617,6 @@ flash_command_protect_v2(struct host_cmd_handler_args *args)
 	struct ec_response_flash_protect *r = args->response;
 	int rc;
 
-	flash_protect_async_data.mask = p->mask;
-	flash_protect_async_data.flags = p->flags;
-
 	/*
 	 * Handle requesting new flags.  Note that we ignore the return code
 	 * from flash_set_protect(), since errors will be visible to the caller
@@ -1721,6 +1630,10 @@ flash_command_protect_v2(struct host_cmd_handler_args *args)
 		if (rc == EC_RES_BUSY) {
 			return rc;
 		}
+
+		flash_protect_async_data.mask = p->mask;
+		flash_protect_async_data.flags = p->flags;
+
 		if (p->mask) {
 			hook_call_deferred(
 				&crec_flash_set_protect_deferred_data,

@@ -81,7 +81,7 @@ struct cbi_data *cbi_find_tag(const void *buf, enum cbi_data_tag tag)
 #define CPRINTF(format, args...) cprintf(CC_SYSTEM, "CBI " format, ##args)
 
 static int cache_status = CBI_CACHE_STATUS_INVALID;
-static uint8_t cbi[CBI_IMAGE_SIZE];
+static uint8_t cbi[CBI_IMAGE_SIZE] __attribute__((aligned(32)));
 static struct cbi_header *const head = (struct cbi_header *)cbi;
 
 int cbi_create(void)
@@ -389,7 +389,7 @@ DECLARE_HOST_COMMAND(EC_CMD_SET_CROS_BOARD_INFO, hc_cbi_set, EC_VER_MASK(0));
 static enum ec_status hc_cbi_bin_read(struct host_cmd_handler_args *args)
 {
 	const struct __ec_align4 ec_params_get_cbi_bin *p = args->params;
-	uint8_t size = MIN(args->response_max, UINT8_MAX);
+	uint8_t size = min(args->response_max, UINT8_MAX);
 
 	if (size < p->size) {
 		/* Insufficient buffer size */
@@ -541,10 +541,27 @@ static void print_uint64_tag(const char *const tag, int rv,
 		ccprintf(": (Error %d)\n", rv);
 }
 
+static void print_ufsc(const char *const tag, int rv,
+		       const struct cbi_ufsc *ufsc)
+{
+	int i;
+
+	ccprintf("%s", tag);
+	if (rv == EC_SUCCESS && ufsc) {
+		ccprintf(": ");
+		for (i = 0; i < sizeof(*ufsc); i++)
+			ccprintf("%02x", ((uint8_t *)ufsc)[i]);
+		ccprintf("\n");
+	} else {
+		ccprintf(": (Error %d)\n", rv);
+	}
+}
+
 static void dump_cbi(void)
 {
 	uint32_t val;
 	uint64_t lval;
+	struct cbi_ufsc ufsc;
 
 	/* Ensure we read the latest data from flash. */
 	cbi_invalidate_cache();
@@ -567,6 +584,7 @@ static void dump_cbi(void)
 	print_tag("PCB_SUPPLIER", cbi_get_pcb_supplier(&val), &val);
 	print_tag("SSFC", cbi_get_ssfc(&val), &val);
 	print_uint64_tag("REWORK_ID", cbi_get_rework_id(&lval), &lval);
+	print_ufsc("UFSC", cbi_get_ufsc(&ufsc), &ufsc);
 }
 
 /*
@@ -604,6 +622,9 @@ static int cc_cbi(int argc, const char **argv)
 		    setter->tag == CBI_TAG_OEM_NAME) {
 			setter->size = strlen(argv[3]) + 1;
 			memcpy(setter->data, argv[3], setter->size);
+		} else if (setter->tag == CBI_TAG_UFSC) {
+			/* TODO(b/463750635): Implement UFSC set command */
+			return EC_ERROR_UNIMPLEMENTED;
 		} else {
 			uint64_t val = strtoull(argv[3], &e, 0);
 
@@ -677,6 +698,27 @@ DECLARE_CONSOLE_COMMAND(cbi, cc_cbi,
 			"remove <tag>] [init | skip_write]",
 			"Print or change Cros Board Info from flash");
 #endif /* CONFIG_CMD_CBI */
+
+int cbi_set_model_id(uint32_t model_id)
+{
+	/* Check write protect status */
+	if (cbi_config->drv->is_protected())
+		return EC_ERROR_ACCESS_DENIED;
+
+	/* Ensure that CBI has been configured */
+	if (cbi_read())
+		cbi_create();
+
+	/* Update the MODEL_ID field */
+	cbi_set_board_info(CBI_TAG_MODEL_ID, (uint8_t *)&model_id, sizeof(int));
+
+	/* Update CRC calculation and write to the storage */
+	head->crc = cbi_crc8(head);
+	if (cbi_write())
+		return EC_ERROR_UNKNOWN;
+
+	return EC_SUCCESS;
+}
 
 #ifndef CONFIG_AP_POWER_CONTROL
 int cbi_set_fw_config(uint32_t fw_config)

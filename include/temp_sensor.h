@@ -41,12 +41,8 @@ struct temp_sensor_t {
 	 * TODO(b:201081891) Refactor temp_sensor_t references
 	 * to all use OO style sensor argument to get adc idx.
 	 */
-#ifdef CONFIG_ZEPHYR
-	const struct zephyr_temp_sensor *zephyr_info;
-#else
 	/* Read sensor value in K into temp_ptr; return non-zero if error. */
 	int (*read)(int idx, int *temp_ptr);
-#endif
 	/* Index among the same kind of sensors. */
 	int idx;
 };
