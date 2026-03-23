@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ecf93d1_40f7f803",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 51
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1594262
+      },
+      "writtenOn": "2026-03-23T23:33:26Z",
+      "side": 1,
+      "message": "The previous build (https://cr-buildbucket.appspot.com/build/8686542886707133185) is being automatically retried for the following reasons:\n- Some child builders are now retryable:nissa-cq\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
+      "revId": "05d0d81e15169b7569ebe50ebdd4efdad98d6c29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
