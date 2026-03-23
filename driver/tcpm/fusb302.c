@@ -7,6 +7,9 @@
 
 /* Type-C port manager for Fairchild's FUSB302 */
 
+/* This part is not meaningfully used in Zephyr builds */
+/* LCOV_EXCL_START */
+
 #include "console.h"
 #include "fusb302.h"
 #include "hooks.h"
@@ -955,6 +958,7 @@ void fusb302_tcpc_alert(int port)
 	int interrupt;
 	int interrupta;
 	int interruptb;
+	timestamp_t alert_ts = get_time();
 
 	/* reading interrupt registers clears them */
 
@@ -976,7 +980,7 @@ void fusb302_tcpc_alert(int port)
 
 	if (interrupt & TCPC_REG_INTERRUPT_COLLISION) {
 		/* packet sending collided */
-		pd_transmit_complete(port, TCPC_TX_COMPLETE_FAILED);
+		pd_transmit_complete(port, TCPC_TX_COMPLETE_FAILED, &alert_ts);
 	}
 
 #ifdef CONFIG_USB_PD_VBUS_DETECT_TCPC
@@ -996,12 +1000,12 @@ void fusb302_tcpc_alert(int port)
 
 	/* GoodCRC was received, our FIFO is now non-empty */
 	if (interrupta & TCPC_REG_INTERRUPTA_TX_SUCCESS) {
-		pd_transmit_complete(port, TCPC_TX_COMPLETE_SUCCESS);
+		pd_transmit_complete(port, TCPC_TX_COMPLETE_SUCCESS, &alert_ts);
 	}
 
 	if (interrupta & TCPC_REG_INTERRUPTA_RETRYFAIL) {
 		/* all retries have failed to get a GoodCRC */
-		pd_transmit_complete(port, TCPC_TX_COMPLETE_FAILED);
+		pd_transmit_complete(port, TCPC_TX_COMPLETE_FAILED, &alert_ts);
 	}
 
 	if (interrupta & TCPC_REG_INTERRUPTA_HARDSENT) {
@@ -1010,7 +1014,7 @@ void fusb302_tcpc_alert(int port)
 		/* bring FUSB302 out of reset */
 		fusb302_pd_reset(port);
 
-		pd_transmit_complete(port, TCPC_TX_COMPLETE_SUCCESS);
+		pd_transmit_complete(port, TCPC_TX_COMPLETE_SUCCESS, &alert_ts);
 	}
 
 	if (interrupta & TCPC_REG_INTERRUPTA_HARDRESET) {
@@ -1027,8 +1031,9 @@ void fusb302_tcpc_alert(int port)
 		/* (this interrupt fires after the GoodCRC finishes) */
 		if (state[port].rx_enable) {
 			/* Pull all RX messages from TCPC into EC memory */
-			while (!fusb302_rx_fifo_is_empty(port))
-				tcpm_enqueue_message(port);
+			while (!fusb302_rx_fifo_is_empty(port) &&
+			       tcpm_enqueue_message(port) == EC_SUCCESS)
+				;
 		} else {
 			/* flush rx fifo if rx isn't enabled */
 			fusb302_flush_rx_fifo(port);
@@ -1199,3 +1204,5 @@ const struct tcpm_drv fusb302_tcpm_drv = {
 	.enter_low_power_mode = &fusb302_tcpm_enter_low_power_mode,
 #endif
 };
+
+/* LCOV_EXCL_STOP */

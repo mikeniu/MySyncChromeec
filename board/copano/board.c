@@ -89,7 +89,7 @@ board_vivaldi_keybd_config(void)
 
 /******************************************************************************/
 /*
- * FW_CONFIG defaults for Terrador if the CBI data is not initialized.
+ * FW_CONFIG defaults if the CBI data is not initialized.
  */
 union volteer_cbi_fw_config fw_config_defaults = {
 	.usb_db = DB_USB3_PASSIVE,
@@ -239,7 +239,7 @@ DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, kb_backlight_disable, HOOK_PRIO_DEFAULT);
 
 void board_reset_pd_mcu(void)
 {
-	/* TODO(b/159025015): Terrador: check USB PD reset operation */
+	/* TODO(b/159025015): Check USB PD reset operation */
 }
 
 /* USBC mux configuration - Tiger Lake includes internal mux */
@@ -266,7 +266,7 @@ static void setup_mux(void)
 __override void board_cbi_init(void)
 {
 	/*
-	 * TODO(b/159025015): Terrador: check FW_CONFIG fields for USB DB type
+	 * TODO(b/159025015): Check FW_CONFIG fields for USB DB type
 	 */
 	setup_mux();
 	/* Reassign USB_C0_RT_RST_ODL */

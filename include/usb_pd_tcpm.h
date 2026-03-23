@@ -361,7 +361,7 @@ struct tcpm_drv {
 	 * @param port Type-C port number
 	 * @param enable Auto Discharge enable or disable
 	 */
-	void (*tcpc_enable_auto_discharge_disconnect)(int port, int enable);
+	void (*tcpc_enable_auto_discharge_disconnect)(int port, bool enable);
 
 	/**
 	 * Manual control of TCPC DebugAccessory enable
@@ -565,12 +565,6 @@ struct tcpm_drv {
 #endif
 };
 
-#ifdef CONFIG_ZEPHYR
-
-#include "dt-bindings/usb_pd_tcpm.h"
-
-#else /* !CONFIG_ZEPHYR */
-
 /*
  * Macros for tcpc_config_t flags field.
  *
@@ -597,8 +591,6 @@ struct tcpm_drv {
 #define TCPC_FLAGS_VBUS_MONITOR BIT(8)
 #define TCPC_FLAGS_SET_VCONN_IN_SYNC BIT(9)
 #define TCPC_FLAGS_VOLTAGE_ALARM BIT(10)
-
-#endif /* !CONFIG_ZEPHYR */
 
 struct tcpc_config_t {
 	enum ec_bus_type bus_type; /* enum ec_bus_type */

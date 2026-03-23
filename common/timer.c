@@ -17,12 +17,8 @@
 #include "util.h"
 #include "watchdog.h"
 
-#ifdef CONFIG_ZEPHYR
-#include <zephyr/kernel.h> /* For k_usleep() */
-#else
 extern __error("k_usleep() should only be called from Zephyr code") int32_t
 	k_usleep(int32_t);
-#endif /* CONFIG_ZEPHYR */
 
 #ifdef CONFIG_COMMON_RUNTIME
 #define CPRINTS(format, args...) cprints(CC_SYSTEM, format, ##args)
@@ -42,7 +38,6 @@ STATIC_IF_NOT(CONFIG_HWTIMER_64BIT) volatile uint32_t clksrc_high;
 /* Hardware timer routine IRQ number */
 static int timer_irq;
 
-#ifndef CONFIG_ZEPHYR
 /* Bitmap of currently running timers */
 static uint32_t timer_running;
 
@@ -102,7 +97,6 @@ void process_timers(int overflow)
 		next_deadline = next.le.lo;
 	} while (next.val <= get_time().val);
 }
-#endif /* !defined(CONFIG_ZEPHYR) */
 
 int timestamp_expired(timestamp_t deadline, const timestamp_t *now)
 {
@@ -116,8 +110,6 @@ int timestamp_expired(timestamp_t deadline, const timestamp_t *now)
 	return ((int64_t)(now->val - deadline.val) >= 0);
 }
 
-/* Zephyr provides its own implementation in hwtimer shim. */
-#ifndef CONFIG_ZEPHYR
 void udelay(unsigned int us)
 {
 	unsigned int t0 = __hw_clock_source_read();
@@ -135,10 +127,7 @@ void udelay(unsigned int us)
 	while (__hw_clock_source_read() - t0 <= us)
 		;
 }
-#endif
 
-/* Zephyr provides its own implementation in task shim */
-#ifndef CONFIG_ZEPHYR
 int timer_arm(timestamp_t event, task_id_t tskid)
 {
 	timestamp_t now = get_time();
@@ -169,7 +158,6 @@ void timer_cancel(task_id_t tskid)
 	 * timer-related housekeeping when the next timer interrupt fires.
 	 */
 }
-#endif
 
 /*
  * For us < (2^31 - task scheduling latency)(~ 2147 sec), this function will
@@ -184,13 +172,6 @@ int crec_usleep(unsigned int us)
 
 	/* If a wait is 0, return immediately. */
 	if (!us) {
-		return 0;
-	}
-
-	if (IS_ENABLED(CONFIG_ZEPHYR)) {
-		while (us) {
-			us = k_usleep(us);
-		}
 		return 0;
 	}
 
@@ -326,7 +307,6 @@ void timer_print_info(void)
 		 t.val, t.val, deadline, deadline - t.val);
 	cflush();
 
-#ifndef CONFIG_ZEPHYR
 	for (int tskid = 0; tskid < TASK_ID_COUNT; tskid++) {
 		if (timer_running & BIT(tskid)) {
 			ccprintf("  Tsk %2d  0x%016llx -> %11.6lld\n", tskid,
@@ -335,7 +315,6 @@ void timer_print_info(void)
 			cflush();
 		}
 	}
-#endif /* !defined(CONFIG_ZEPHYR) */
 }
 
 void timer_init(void)

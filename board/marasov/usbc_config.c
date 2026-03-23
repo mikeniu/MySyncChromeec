@@ -34,11 +34,6 @@
 #define CPRINTF(format, args...) cprintf(CC_USBPD, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_USBPD, format, ##args)
 
-#ifdef CONFIG_ZEPHYR
-enum ioex_port { IOEX_C0_NCT38XX = 0, IOEX_PORT_COUNT };
-#endif /* CONFIG_ZEPHYR */
-
-#ifndef CONFIG_ZEPHYR
 /* USBC TCPC configuration */
 const struct tcpc_config_t tcpc_config[] = {
 	[USBC_PORT_C0] = {
@@ -66,21 +61,17 @@ const struct tcpc_config_t tcpc_config[] = {
 };
 BUILD_ASSERT(ARRAY_SIZE(tcpc_config) == USBC_PORT_COUNT);
 BUILD_ASSERT(CONFIG_USB_PD_PORT_MAX_COUNT == USBC_PORT_COUNT);
-#endif /* !CONFIG_ZEPHYR */
 
 /******************************************************************************/
 /* USB-A charging control */
 
-#ifndef CONFIG_ZEPHYR
 const int usb_port_enable[USB_PORT_COUNT] = {
 	GPIO_EN_PP5000_USBA_R,
 };
-#endif
 BUILD_ASSERT(ARRAY_SIZE(usb_port_enable) == USB_PORT_COUNT);
 
 /******************************************************************************/
 
-#ifndef CONFIG_ZEPHYR
 /* USBC PPC configuration */
 struct ppc_config_t ppc_chips[] = {
 	[USBC_PORT_C0] = {
@@ -163,20 +154,13 @@ struct ioexpander_config_t ioex_config[] = {
 	},
 };
 BUILD_ASSERT(ARRAY_SIZE(ioex_config) == CONFIG_IO_EXPANDER_PORT_COUNT);
-#endif /* !CONFIG_ZEPHYR */
 
 __override int bb_retimer_power_enable(const struct usb_mux *me, bool enable)
 {
 	enum ioex_signal rst_signal;
 
 	if (me->usb_port == USBC_PORT_C0) {
-/* TODO: explore how to handle board id in zephyr*/
-#ifndef CONFIG_ZEPHYR
 		rst_signal = IOEX_USB_C0_RT_RST_ODL;
-#else
-		/* On Zephyr use bb_controls generated from DTS */
-		rst_signal = bb_controls[me->usb_port].retimer_rst_gpio;
-#endif /* !CONFIG_ZEPHYR */
 	} else {
 		return EC_ERROR_INVAL;
 	}
@@ -210,11 +194,7 @@ void board_reset_pd_mcu(void)
 {
 	enum gpio_signal tcpc_rst;
 
-#ifndef CONFIG_ZEPHYR
 	tcpc_rst = GPIO_USB_C0_TCPC_RST_ODL;
-#else
-	tcpc_rst = GPIO_UNIMPLEMENTED;
-#endif /* !CONFIG_ZEPHYR */
 
 	/*
 	 * TODO(b/179648104): figure out correct timing
@@ -248,11 +228,7 @@ static void board_tcpc_init(void)
 	 * C0 TCPC, so they must be set up after the TCPC has
 	 * been taken out of reset.
 	 */
-#ifndef CONFIG_ZEPHYR
 	ioex_init(IOEX_C0_NCT38XX);
-#else
-	gpio_reset_port(DEVICE_DT_GET(DT_NODELABEL(ioex_port1)));
-#endif
 
 	/* Enable PPC interrupts. */
 	gpio_enable_interrupt(GPIO_USB_C0_PPC_INT_ODL);

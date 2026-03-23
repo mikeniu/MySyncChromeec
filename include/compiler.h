@@ -6,11 +6,6 @@
 #ifndef __CROS_EC_COMPILER_H
 #define __CROS_EC_COMPILER_H
 
-#ifdef CONFIG_ZEPHYR
-/* Get the TOOLCHAIN_GCC_VERSION define. */
-#include <zephyr/toolchain.h>
-#endif /* CONFIG_ZEPHYR */
-
 /*
  * See https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
  */
@@ -21,7 +16,6 @@
  * If TOOLCHAIN_GCC_VERSION is defined, check if it equals to __GCC_VERSION
  * value expected by EC code. Otherwise, define it as __GCC_VERSION.
  *
- * Zephyr defines TOOLCHAIN_GCC_VERSION.
  */
 #ifdef TOOLCHAIN_GCC_VERSION
 #if TOOLCHAIN_GCC_VERSION != __GCC_VERSION
@@ -32,7 +26,7 @@
 #endif /* TOOLCHAIN_GCC_VERSION */
 
 /*
- * The EC codebase assumes that typeof() is available but it is not in Zephyr.
+ * The EC codebase assumes that typeof() is available
  * We use an #ifdef since arch/arm/include/aarch32/cortex_m/cmse.h defines this
  * macro.
  */

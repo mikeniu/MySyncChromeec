@@ -18,10 +18,6 @@
  * (CrOS EC) builds.
  */
 
-#ifdef CONFIG_ZEPHYR
-#error "Don't use this source in Zephyr builds"
-#endif
-
 /* Delay for bitbanging i2c corresponds roughly to 100kHz. */
 #define I2C_BITBANG_DELAY_US 5
 

@@ -390,26 +390,6 @@ static void show_charging_progress(bool is_full)
 	}
 }
 
-/* Calculate if battery is full based on whether it is accepting charge */
-test_mockable int calc_is_full(void)
-{
-	static int ret;
-
-	/* If bad state of charge reading, return last value */
-	if (curr.batt.flags & BATT_FLAG_BAD_STATE_OF_CHARGE ||
-	    curr.batt.state_of_charge > 100)
-		return ret;
-	/*
-	 * Battery is full when SoC is above 90% and battery desired current
-	 * is 0. This is necessary because some batteries stop charging when
-	 * the SoC still reports <100%, so we need to check desired current
-	 * to know if it is actually full.
-	 */
-	ret = (curr.batt.state_of_charge >= 90 &&
-	       curr.batt.desired_current == 0);
-	return ret;
-}
-
 __overridable int board_should_charger_bypass(void)
 {
 	return false;
@@ -440,7 +420,7 @@ int charge_request(bool use_curr, bool is_full)
 		if (is_full)
 			voltage = battery_get_info()->voltage_max;
 		/* And handle dead battery case */
-		voltage = MAX(voltage, battery_get_info()->voltage_normal);
+		voltage = max(voltage, battery_get_info()->voltage_normal);
 #else
 		voltage = current = 0;
 #endif
@@ -826,31 +806,6 @@ struct charge_state_data *charge_get_status(void)
 	return &curr;
 }
 
-/* Determine if the battery is outside of allowable temperature range */
-int battery_outside_charging_temperature(void)
-{
-	const struct battery_info *batt_info = battery_get_info();
-	int batt_temp_c = DECI_KELVIN_TO_CELSIUS(curr.batt.temperature);
-	int max_c, min_c;
-
-	if (curr.batt.flags & BATT_FLAG_BAD_TEMPERATURE)
-		return 0;
-
-	if ((curr.batt.desired_voltage == 0) &&
-	    (curr.batt.desired_current == 0)) {
-		max_c = batt_info->start_charging_max_c;
-		min_c = batt_info->start_charging_min_c;
-	} else {
-		max_c = batt_info->charging_max_c;
-		min_c = batt_info->charging_min_c;
-	}
-
-	if ((batt_temp_c >= max_c) || (batt_temp_c <= min_c)) {
-		return 1;
-	}
-	return 0;
-}
-
 static enum ec_charge_control_mode
 sustain_switch_mode(enum ec_charge_control_mode mode)
 {
@@ -1014,7 +969,7 @@ static int get_desired_input_current(const struct charger_info *const info)
 	int ilim = charge_manager_get_charger_current();
 	return ilim == CHARGE_CURRENT_UNINITIALIZED ?
 		       CHARGE_CURRENT_UNINITIALIZED :
-		       MAX(CONFIG_CHARGER_DEFAULT_CURRENT_LIMIT, ilim);
+		       max(CONFIG_CHARGER_DEFAULT_CURRENT_LIMIT, ilim);
 #else
 	return CONFIG_CHARGER_DEFAULT_CURRENT_LIMIT;
 #endif
@@ -1483,7 +1438,7 @@ static int process_charge_state(int *need_staticp, int sleep_usec)
 	}
 
 	if (IS_ENABLED(CONFIG_BATTERY_CHECK_CHARGE_TEMP_LIMITS) &&
-	    battery_outside_charging_temperature()) {
+	    battery_outside_charging_temperature(&curr.batt)) {
 		curr.requested_current = 0;
 		curr.requested_voltage = 0;
 		curr.batt.flags &= ~BATT_FLAG_WANT_CHARGE;
@@ -1498,13 +1453,17 @@ static int process_charge_state(int *need_staticp, int sleep_usec)
 		charge_manager_leave_safe_mode();
 
 	/* Keep the AP informed */
-	if (*need_staticp)
+	if (*need_staticp) {
 		*need_staticp = update_static_battery_info();
+		if (*need_staticp)
+			charge_problem(PR_STATIC_UPDATE, *need_staticp);
+	}
 
 	/* Wait on the dynamic info until the static info is good. */
 	if (!*need_staticp)
 		battery_set_dynamic_info(&curr.batt, curr.ac,
-					 curr.batt_is_charging);
+					 curr.batt_is_charging,
+					 curr.state == ST_IDLE);
 
 	notify_host_of_low_battery_charge();
 	notify_host_of_low_battery_voltage();
@@ -1567,7 +1526,7 @@ void charger_task(void *u)
 		sleep_usec = process_charge_state(&need_static, sleep_usec);
 
 		/* And the EC console */
-		is_full = calc_is_full();
+		is_full = battery_is_full(&curr.batt);
 
 		/* Run battery sustainer (no-op if not applicable). */
 		sustain_battery_soc();
@@ -1684,6 +1643,18 @@ bool charge_prevent_power_on(bool power_button_pressed)
 			prevent_power_on = 0;
 #endif
 	}
+
+	/*
+	 * Prevent power on if there is no battery and the minimum mW to
+	 * power on is not met. This should only be hit in edge cases, however
+	 * it needs to be checked to prevent brown outs
+	 */
+
+	if (!current_batt_params->is_present &&
+	    charge_manager_get_power_limit_uw() <
+		    CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON * 1000)
+		prevent_power_on = 1;
+
 #endif /* CONFIG_CHARGE_MANAGER && CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON */
 #endif /* CONFIG_CHARGER_MIN_BAT_PCT_FOR_POWER_ON */
 
@@ -1769,22 +1740,28 @@ enum led_pwr_state led_pwr_get_state(void)
 			return LED_PWRS_FORCED_IDLE;
 		else
 			return LED_PWRS_IDLE;
+
 	case ST_DISCHARGE:
-#ifdef CONFIG_PWR_STATE_DISCHARGE_FULL
-		if (battery_near_full())
+		if (IS_ENABLED(CONFIG_PWR_STATE_DISCHARGE_FULL) &&
+		    battery_near_full())
 			return LED_PWRS_DISCHARGE_FULL;
+		else if (charge_manager_has_insufficient_adapter())
+			return LED_PWRS_INSUFFICIENT_ADAPTER;
 		else
-#endif
 			return LED_PWRS_DISCHARGE;
+
 	case ST_CHARGE:
 		/* The only difference here is what the LEDs display. */
 		if (IS_ENABLED(CONFIG_CHARGE_MANAGER) &&
-		    charge_manager_get_active_charge_port() == CHARGE_PORT_NONE)
+		    charge_manager_get_active_charge_port() ==
+			    CHARGE_PORT_NONE) {
 			return LED_PWRS_DISCHARGE;
-		else if (battery_near_full())
+		} else if (battery_near_full()) {
 			return LED_PWRS_CHARGE_NEAR_FULL;
-		else
+		} else {
 			return LED_PWRS_CHARGE;
+		}
+
 	case ST_PRECHARGE:
 		/* we're in battery discovery mode */
 		if (chflags & CHARGE_LED_FLAG_FORCE_IDLE)
@@ -1806,11 +1783,6 @@ test_mockable int charge_get_percent(void)
 	 * anything.
 	 */
 	return local_state.is_full ? 100 : curr.batt.state_of_charge;
-}
-
-test_mockable int charge_get_display_charge(void)
-{
-	return curr.batt.display_charge;
 }
 
 int charge_get_battery_temp(int idx, int *temp_ptr)
@@ -1883,7 +1855,7 @@ int charge_set_input_current_limit(int ma, int mv)
 		"Charger minimum input current limit is unreasonably low."
 		" Consider unsetting it, and refer to the Kconfig help for details.");
 	if (CONFIG_CHARGER_MIN_INPUT_CURRENT_LIMIT > 0) {
-		ma = MAX(ma, CONFIG_CHARGER_MIN_INPUT_CURRENT_LIMIT);
+		ma = max(ma, CONFIG_CHARGER_MIN_INPUT_CURRENT_LIMIT);
 	}
 #endif
 
@@ -1939,7 +1911,7 @@ int charge_set_input_current_limit(int ma, int mv)
 
 #ifdef CONFIG_CHARGER_MAX_INPUT_CURRENT
 	/* Limit input current limit to max limit for this board */
-	ma = MIN(ma, CONFIG_CHARGER_MAX_INPUT_CURRENT);
+	ma = min(ma, CONFIG_CHARGER_MAX_INPUT_CURRENT);
 #endif
 
 	if (IS_ENABLED(CONFIG_CHARGE_MANAGER)) {
@@ -2209,6 +2181,17 @@ charge_command_charge_state(struct host_cmd_handler_args *args)
 			case CS_PARAM_CHG_INPUT_CURRENT_STEP:
 				val = info->input_current_step;
 				break;
+#ifdef CONFIG_PLATFORM_EC_CHARGER_HYBRID_POWER_BOOST
+			case CS_PARAM_CHG_MIN_REQUIRED_MV:
+				if (charger_get_minimum_charging_mv(chgnum,
+								    &val)) {
+					rv = EC_RES_INVALID_PARAM;
+				};
+				break;
+			case CS_PARAM_CHG_IS_ADAPTER_SUFFICIENT:
+				val = !charge_manager_has_insufficient_adapter();
+				break;
+#endif /* CONFIG_PLATFORM_EC_CHARGER_HYBRID_POWER_BOOST */
 			default:
 				rv = EC_RES_INVALID_PARAM;
 			}
@@ -2254,6 +2237,10 @@ charge_command_charge_state(struct host_cmd_handler_args *args)
 			case CS_PARAM_CHG_INPUT_CURRENT_MIN:
 			case CS_PARAM_CHG_INPUT_CURRENT_MAX:
 			case CS_PARAM_CHG_INPUT_CURRENT_STEP:
+#ifdef CONFIG_PLATFORM_EC_CHARGER_HYBRID_POWER_BOOST
+			case CS_PARAM_CHG_MIN_REQUIRED_MV:
+			case CS_PARAM_CHG_IS_ADAPTER_SUFFICIENT:
+#endif /* CONFIG_PLATFORM_EC_CHARGER_HYBRID_POWER_BOOST */
 				/* Can't set this */
 				rv = EC_RES_ACCESS_DENIED;
 				break;

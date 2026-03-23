@@ -47,7 +47,8 @@ GDBPORT = os.getenv("GDBPORT", DEFAULT_GDB_PORT)
 
 EC_DIR = pathlib.Path(
     os.getenv(
-        "EC_DIR", os.path.join(os.getenv("HOME"), "chromiumos/src/platform/ec")
+        "EC_DIR",
+        os.path.join(os.getenv("HOME"), "chromiumos/src/platform/ec-legacy"),
     )
 )
 

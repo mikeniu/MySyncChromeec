@@ -33,11 +33,6 @@
 #define CPRINTF(format, args...) cprintf(CC_USBPD, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_USBPD, format, ##args)
 
-#ifdef CONFIG_ZEPHYR
-enum ioex_port { IOEX_C0_NCT38XX = 0, IOEX_C2_NCT38XX, IOEX_PORT_COUNT };
-#endif /* CONFIG_ZEPHYR */
-
-#ifndef CONFIG_ZEPHYR
 /* USBC TCPC configuration */
 const struct tcpc_config_t tcpc_config[] = {
 	[USBC_PORT_C0] = {
@@ -63,21 +58,17 @@ const struct tcpc_config_t tcpc_config[] = {
 };
 BUILD_ASSERT(ARRAY_SIZE(tcpc_config) == USBC_PORT_COUNT);
 BUILD_ASSERT(CONFIG_USB_PD_PORT_MAX_COUNT == USBC_PORT_COUNT);
-#endif /* !CONFIG_ZEPHYR */
 
 /******************************************************************************/
 /* USB-A charging control */
 
-#ifndef CONFIG_ZEPHYR
 const int usb_port_enable[USB_PORT_COUNT] = {
 	GPIO_EN_PP5000_USBA_R,
 };
-#endif
 BUILD_ASSERT(ARRAY_SIZE(usb_port_enable) == USB_PORT_COUNT);
 
 /******************************************************************************/
 
-#ifndef CONFIG_ZEPHYR
 /* USBC PPC configuration */
 struct ppc_config_t ppc_chips[] = {
 	[USBC_PORT_C0] = {
@@ -117,7 +108,6 @@ const struct usb_mux_chain usb_muxes[] = {
 	},
 };
 BUILD_ASSERT(ARRAY_SIZE(usb_muxes) == USBC_PORT_COUNT);
-#endif /* !CONFIG_ZEPHYR */
 
 #ifdef CONFIG_CHARGE_RAMP_SW
 
@@ -175,7 +165,6 @@ static void board_tcpc_init(void)
 }
 DECLARE_HOOK(HOOK_INIT, board_tcpc_init, HOOK_PRIO_INIT_CHIPSET);
 
-#ifndef CONFIG_ZEPHYR
 uint16_t tcpc_get_alert_status(void)
 {
 	uint16_t status = 0;
@@ -188,7 +177,6 @@ uint16_t tcpc_get_alert_status(void)
 
 	return status;
 }
-#endif
 
 int ppc_get_alert_status(int port)
 {
@@ -199,7 +187,6 @@ int ppc_get_alert_status(int port)
 	return 0;
 }
 
-#ifndef CONFIG_ZEPHYR
 void tcpc_alert_event(enum gpio_signal signal)
 {
 	switch (signal) {
@@ -213,7 +200,6 @@ void tcpc_alert_event(enum gpio_signal signal)
 		break;
 	}
 }
-#endif
 
 void ppc_interrupt(enum gpio_signal signal)
 {

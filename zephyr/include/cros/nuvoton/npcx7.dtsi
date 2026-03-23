@@ -1,9 +1,0 @@
-/*
- * Copyright 2021 The ChromiumOS Authors
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
-#include <nuvoton/npcx/npcx7.dtsi>
-#include <cros/nuvoton/npcx.dtsi>
-#include <cros/nuvoton/npcx7_cros.dtsi>

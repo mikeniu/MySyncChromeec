@@ -72,8 +72,6 @@ IncludeCategories:
     Priority: 0
   - Regex: '^<(assert|complex|ctype|errno|fenv|float|inttypes|limits|locale|math|setjmp|signal|stdarg|stdbool|stddef|stdint|stdio|stdlib|string|tgmath|time|wchar|wctype)\.h>$'
     Priority: 1
-  - Regex: '^\<zephyr/.*\.h\>$'
-    Priority: 2
   - Regex: '.*'
     Priority: 3
 IndentCaseLabels: false

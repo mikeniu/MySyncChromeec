@@ -15,6 +15,7 @@
 #include "mpu.h"
 #endif
 #include "otp_key.h"
+#include "panic.h"
 #include "rollback.h"
 #include "rollback_private.h"
 #include "sha256.h"
@@ -22,6 +23,8 @@
 #include "task.h"
 #include "trng.h"
 #include "util.h"
+
+#include <stdbool.h>
 
 #ifdef CONFIG_ROLLBACK_SECRET_SIZE
 #ifdef CONFIG_BORINGSSL_CRYPTO
@@ -64,25 +67,50 @@ static int get_rollback_offset(int region)
 #endif
 }
 
+#ifdef CONFIG_ROLLBACK_MPU_PROTECT
+/**
+ * @brief Checks the return value from MPU lock/unlock operations and panics if
+ * that value is not success.
+ *
+ * @param rv The return value from the mpu_lock_rollback() function.
+ *           Expected to be EC_SUCCESS on success.
+ * @param func_name The name of the function that called mpu_lock_rollback()
+ */
+static void check_mpu_rv(int rv, const char *func_name)
+{
+	if (rv != EC_SUCCESS) {
+		ccprints("ERROR! %s failed to lock/unlock MPU, rv=%d",
+			 func_name, rv);
+#if defined(CONFIG_ZEPHYR)
+		k_panic();
+#else
+		software_panic(PANIC_SW_ASSERT, task_get_current());
+#endif
+	}
+}
+#endif /* CONFIG_ROLLBACK_MPU_PROTECT */
+
 /*
  * When MPU is available, read rollback with interrupts disabled, to minimize
  * time protection is left open.
  */
-static void lock_rollback(uint32_t key)
+test_export_static void lock_rollback(uint32_t key)
 {
 #ifdef CONFIG_ROLLBACK_MPU_PROTECT
-	mpu_lock_rollback(1);
+	int rv = mpu_lock_rollback(true);
+	check_mpu_rv(rv, __func__);
 	irq_unlock(key);
 #endif
 }
 
-static uint32_t unlock_rollback(void)
+test_export_static uint32_t unlock_rollback(void)
 {
 #ifdef CONFIG_ROLLBACK_MPU_PROTECT
 	uint32_t key;
 
 	key = irq_lock();
-	mpu_lock_rollback(0);
+	int rv = mpu_lock_rollback(false);
+	check_mpu_rv(rv, __func__);
 	return key;
 #else
 	return 0;
@@ -276,9 +304,11 @@ static int rollback_update(int32_t next_min_version, const uint8_t *entropy,
 	 * When doing flash_write operation, the data needs to be in blocks
 	 * of CONFIG_FLASH_WRITE_SIZE, pad rollback_data as required.
 	 */
-	uint8_t block[CONFIG_FLASH_WRITE_SIZE *
-		      DIV_ROUND_UP(sizeof(struct rollback_data),
-				   CONFIG_FLASH_WRITE_SIZE)];
+	uint8_t block
+		[CONFIG_FLASH_WRITE_SIZE *
+		 DIV_ROUND_UP(
+			 sizeof(struct rollback_data),
+			 CONFIG_FLASH_WRITE_SIZE)] __aligned(CONFIG_FLASH_WRITE_SIZE);
 	struct rollback_data *data = (struct rollback_data *)block;
 	BUILD_ASSERT(sizeof(block) >= sizeof(*data));
 	int erase_size, offset, region, ret;
@@ -525,6 +555,10 @@ static int command_rollback_info(int argc, const char **argv)
 		ccprintf("rollback %d: %08x %08x %08x", region, data.id,
 			 data.rollback_min_version, data.cookie);
 #ifdef CONFIG_ROLLBACK_SECRET_SIZE
+		ccprintf(" %s",
+			 bytes_are_trivial(data.secret, sizeof(data.secret)) ?
+				 "trivial" :
+				 "non-trivial");
 		if (!system_is_locked()) {
 			/* If system is unlocked, show some of the secret. */
 			ccprintf(" [%02x..%02x]", data.secret[0],
@@ -548,7 +582,7 @@ static enum ec_status
 host_command_rollback_info(struct host_cmd_handler_args *args)
 {
 	int ret = EC_RES_UNAVAILABLE;
-	struct ec_response_rollback_info *r = args->response;
+	struct ec_response_rollback_info_v1 *r = args->response;
 	int min_region;
 	struct rollback_data data;
 
@@ -561,7 +595,18 @@ host_command_rollback_info(struct host_cmd_handler_args *args)
 	r->rollback_min_version = data.rollback_min_version;
 	r->rw_rollback_version = system_get_rollback_version(EC_IMAGE_RW);
 
-	args->response_size = sizeof(*r);
+	if (args->version == 1) {
+		args->response_size =
+			sizeof(struct ec_response_rollback_info_v1);
+		r->is_secret_inited = 0;
+#ifdef CONFIG_ROLLBACK_SECRET_SIZE
+		if (!bytes_are_trivial(data.secret, sizeof(data.secret))) {
+			r->is_secret_inited = 1;
+		}
+#endif
+	} else {
+		args->response_size = sizeof(struct ec_response_rollback_info);
+	}
 	ret = EC_RES_SUCCESS;
 
 failed:
@@ -569,4 +614,4 @@ failed:
 	return ret;
 }
 DECLARE_HOST_COMMAND(EC_CMD_ROLLBACK_INFO, host_command_rollback_info,
-		     EC_VER_MASK(0));
+		     EC_VER_MASK(0) | EC_VER_MASK(1));

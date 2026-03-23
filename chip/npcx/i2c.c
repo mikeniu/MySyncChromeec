@@ -134,12 +134,16 @@ struct i2c_timing {
 
 /* I2C timing setting array of 400K & 1M Hz */
 static const struct i2c_timing i2c_400k_timings[] = {
+	{ 45, 15, 72, 48 },
+	{ 40, 13, 64, 42 },
 	{ 20, 7, 32, 22 },
 	{ 15, 7, 24, 18 },
 };
 const unsigned int i2c_400k_timing_used = ARRAY_SIZE(i2c_400k_timings);
 
 static const struct i2c_timing i2c_1m_timings[] = {
+	{ 45, 7, 28, 22 },
+	{ 40, 7, 26, 20 },
 	{ 20, 7, 16, 10 },
 	{ 15, 7, 14, 10 },
 };
@@ -305,7 +309,7 @@ static void i2c_fifo_write_data(int controller)
 	if (IS_ENABLED(NPCX_I2C_FIFO_SUPPORT)) {
 		len = p_status->sz_txbuf - p_status->idx_buf;
 		fifo_avail = I2C_TX_FIFO_AVAILABLE(controller);
-		len = MIN(len, fifo_avail);
+		len = min(len, fifo_avail);
 	}
 	for (i = 0; i < len; i++) {
 		I2C_WRITE_BYTE(controller,
@@ -839,15 +843,20 @@ static void i2c_controller_int_handler(int controller)
 	/* Condition 4: SDA status is set - transmit or receive */
 	if (IS_BIT_SET(NPCX_SMBST(controller), NPCX_SMBST_SDAST)) {
 		i2c_handle_sda_irq(controller);
-#if DEBUG_I2C
-		/* SDAST still issued with unexpected state machine */
+		/*
+		 * SDAST still issued with unexpected state machine.
+		 * Disable smb's interrupts to forbid ec to enter ISR again
+		 * before executing error recovery.
+		 */
 		if (IS_BIT_SET(NPCX_SMBST(controller), NPCX_SMBST_SDAST) &&
 		    p_status->oper_state != SMB_WRITE_SUSPEND) {
+#if DEBUG_I2C
 			cprints(CC_I2C, "i2c %d unknown state %d, error %d",
 				controller, p_status->oper_state,
 				p_status->err_code);
-		}
 #endif
+			task_disable_irq(i2c_irqs[controller]);
+		}
 	}
 }
 
