@@ -122,6 +122,7 @@ void boot_button_clear(enum button button);
 ZTEST_USER(host_cmd_battery_cut_off, test_cutoff_by_unplug)
 {
 	/* Starting with AC on (host_cmd_battery_cut_off_before) */
+	zassert_false(battery_cutoff_is_scheduled());
 	zassert_false(battery_cutoff_in_progress());
 	zassert_false(battery_is_cut_off());
 
@@ -140,6 +141,7 @@ ZTEST_USER(host_cmd_battery_cut_off, test_cutoff_by_unplug)
 	 */
 	set_ac_enabled(false);
 	hook_notify(HOOK_AC_CHANGE);
+	zassert_true(battery_cutoff_is_scheduled());
 	zassert_true(
 		WAIT_FOR(battery_cutoff_in_progress(), 2105000, k_msleep(250)));
 

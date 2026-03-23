@@ -367,6 +367,11 @@ test_mockable int battery_cutoff_in_progress(void)
 	return (battery_cutoff_state == BATTERY_CUTOFF_STATE_IN_PROGRESS);
 }
 
+test_mockable int battery_cutoff_is_scheduled(void)
+{
+	return (battery_cutoff_state == BATTERY_CUTOFF_STATE_SCHEDULED);
+}
+
 const struct deferred_data __keep pending_cutoff_deferred_data;
 /* Cutoff timeout */
 static timestamp_t cutoff_timeout;
