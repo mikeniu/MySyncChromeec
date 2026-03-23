@@ -44,6 +44,8 @@ endif
 
 include util/egis/build.mk
 
+include util/elan/build.mk
+
 comm-objs=$(util-lock-objs:%=lock/%) comm-host.o comm-dev.o
 comm-objs+=comm-lpc.o comm-i2c.o misc_util.o comm-usb.o
 
