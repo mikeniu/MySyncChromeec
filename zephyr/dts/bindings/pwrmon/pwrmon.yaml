@@ -1,0 +1,20 @@
+description: EC Power Monitoring subsystem
+
+compatible: "cros,pwrmon"
+
+include: [base.yaml]
+
+properties:
+  sample-rate:
+    type: int
+    required: true
+    description: Default sampling rate in Hz
+
+  power-monitors:
+    type: phandles
+    required: true
+    description: List of phandles pointing to power monitors sensors
+
+  gpios:
+    type: phandle-array
+    description: GPIO used to control the I2C between EC and GSC
