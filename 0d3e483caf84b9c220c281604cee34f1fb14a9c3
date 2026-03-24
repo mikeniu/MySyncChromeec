@@ -210,6 +210,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c059bd0b_30f6f5ab",
+        "filename": "zephyr/program/skywalker/r2d2/project.conf",
+        "patchSetId": 22
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4590738
+      },
+      "writtenOn": "2026-03-24T10:40:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef683a4a_4a05d69a",
+      "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0af98fe0_de70a48c",
