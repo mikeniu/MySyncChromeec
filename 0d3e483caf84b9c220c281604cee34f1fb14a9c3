@@ -158,6 +158,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca864f7c_7f618f17",
+        "filename": "zephyr/program/skywalker/r2d2/project.conf",
+        "patchSetId": 22
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4590738
+      },
+      "writtenOn": "2026-03-24T10:41:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "117a0436_8ffd2c0d",
+      "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb62f57b_4c5f0dd4",
+        "filename": "zephyr/program/skywalker/r2d2/project.conf",
+        "patchSetId": 22
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4590738
+      },
+      "writtenOn": "2026-03-24T10:41:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2138810d_68f3e97f",
+      "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c39547b3_1693138c",
