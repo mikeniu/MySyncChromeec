@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04a69f46_f33f2e5f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-24T14:34:03Z",
+      "side": 1,
+      "message": "In this situation, I think the revert on the nissa point branch is appropriate and sufficient. Let\u0027s not revert it on main.",
+      "revId": "13f0a4c74996680f2e34c99be818e78a9cd37f5d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
