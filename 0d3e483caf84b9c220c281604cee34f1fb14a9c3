@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "efbb2bcb_c65d9a1a",
+        "filename": "zephyr/program/skywalker/r2d2/motionsense.dtsi",
+        "patchSetId": 22
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 4590738
+      },
+      "writtenOn": "2026-03-24T10:30:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6ebe7c0c_e7137c15",
+      "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d4596c65_9097e7b4",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-03-19T15:40:56Z",
       "side": 1,
       "message": "Since most of the other projects use \"10000\", so let\u0027s follow that.\nodr \u003d \u003c(10000 | ROUND_UP_FLAG)\u003e;",
+      "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17305d8b_12a73dcd",
+        "filename": "zephyr/program/skywalker/r2d2/motionsense.dtsi",
+        "patchSetId": 22
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 4590738
+      },
+      "writtenOn": "2026-03-24T10:30:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d4596c65_9097e7b4",
       "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
