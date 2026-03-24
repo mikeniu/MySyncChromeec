@@ -28,6 +28,7 @@ egis_capture_mode_t convert_fp_capture_type_to_egis_capture_type(
 {
 	switch (capture_type) {
 	case FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT:
+		return EGIS_CAPTURE_IMAGE_COLLECTION;
 	case FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE:
 		return EGIS_CAPTURE_NORMAL_FORMAT;
 	case FINGERPRINT_CAPTURE_TYPE_PATTERN0:

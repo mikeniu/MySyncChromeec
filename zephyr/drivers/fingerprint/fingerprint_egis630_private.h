@@ -50,6 +50,8 @@ typedef enum {
 	EGIS_API_ERROR_NOT_SUPPORTED = -21,
 } egis_api_return_t;
 
+typedef struct FP_EGIS_IMAGE FP_EGIS_IMAGE;
+
 /**
  * enum egis_capture_mode_t - Specifies the "mode" when capturing images.
  *
@@ -78,6 +80,7 @@ typedef enum {
 	EGIS_CAPTURE_NOISE_TEST = 4,
 	EGIS_CAPTURE_ABNORMAL_TEST = 5,
 	EGIS_CAPTURE_RV_INT_TEST = 6,
+	EGIS_CAPTURE_IMAGE_COLLECTION = 7,
 	EGIS_CAPTURE_TYPE_MAX,
 } egis_capture_mode_t;
 
@@ -205,10 +208,11 @@ egis_api_return_t egis_check_int_status(void);
  *
  * @param[in,out] templ a pointer to the array of template buffers.
  * @param templ_count the number of buffers in the array of templates.
- * @param[in] image the buffer containing the finger image
+ * @param[in] imo the buffer containing the finger image object
  * @param match_index index of the matched finger in the template array if any.
- * @param[out] update_bitmap contains one bit per template, the bit is set if
- * the match has updated the given template.
+ * @param[out] update_bitmap Optional. Contains one bit per template, the bit
+ * is set if the match has updated the given template. If update_bitmap is
+ * NULL, updates are denied even if a match occurs.
  *
  * @return EGIS_API_MATCH_NOT_MATCHED on non-match
  * @return EGIS_API_MATCH_MATCHED for match when template was not updated with
@@ -226,7 +230,7 @@ egis_api_return_t egis_check_int_status(void);
  * @return EGIS_API_ERROR_EMFP_LIB_FAIL : on emfp lib fail
  */
 egis_api_return_t egis_finger_match(void *templ, uint32_t templ_count,
-				    uint8_t *image, int32_t *match_index,
+				    FP_EGIS_IMAGE *imo, int32_t *match_index,
 				    uint32_t *update_bitmap);
 
 /**
@@ -253,7 +257,7 @@ egis_api_return_t egis_enrollment_finish(void *templ);
 /**
  * Adds fingerprint image to the current enrollment session.
  *
- * @param[in] image Image to add to enrollment
+ * @param[in] imo Image object to add to enrollment
  * @param[out] completion The percentage of the enrollment process that is
  * complete: [0-100].
  *
@@ -272,7 +276,7 @@ egis_api_return_t egis_enrollment_finish(void *templ);
  * @return EGIS_API_ERROR_MATCHER_LIB_FAIL : on matcher lib fail
  * @return EGIS_API_ERROR_EMFP_LIB_FAIL : on emfp lib fail
  */
-egis_api_return_t egis_finger_enroll(uint8_t *image, int *completion);
+egis_api_return_t egis_finger_enroll(FP_EGIS_IMAGE *imo, int *completion);
 
 /**
  * apply sensor calibration from storage and do re-calibration.
