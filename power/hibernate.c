@@ -10,11 +10,10 @@
 #include "system.h"
 #include "util.h"
 
-#include <zephyr/init.h>
-#include <zephyr/logging/log.h>
-
 #include <ap_power/ap_power.h>
 #include <ap_power/ap_power_interface.h>
+#include <zephyr/init.h>
+#include <zephyr/logging/log.h>
 
 LOG_MODULE_DECLARE(ap_pwrseq, CONFIG_AP_PWRSEQ_LOG_LEVEL);
 

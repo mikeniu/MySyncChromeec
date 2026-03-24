@@ -11,9 +11,6 @@
 #if defined(CONFIG_HW_CRC) && !defined(HOST_TOOLS_BUILD)
 #include "crc_hw.h"
 #else
-#ifdef CONFIG_ZEPHYR
-#include <stdint.h>
-#endif /* CONFIG_ZEPHYR */
 
 #ifndef HOST_TOOLS_BUILD
 #ifdef __cplusplus

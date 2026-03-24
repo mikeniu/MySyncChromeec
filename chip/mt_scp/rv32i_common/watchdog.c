@@ -11,11 +11,10 @@
 #include "scp_watchdog.h"
 #include "watchdog.h"
 
-void watchdog_reload(void)
+void chip_watchdog_reload(void)
 {
 	SCP_CORE_WDT_KICK = BIT(0);
 }
-DECLARE_HOOK(HOOK_TICK, watchdog_reload, HOOK_PRIO_DEFAULT);
 
 void watchdog_disable(void)
 {

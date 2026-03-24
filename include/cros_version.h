@@ -32,15 +32,11 @@ struct image_data {
 
 	/*
 	 * Used by legacy EC code to make it easier to correlate EC and AP
-	 * versions, deprecated and unused with zephyr.
+	 * versions.
 	 */
 	char cros_fwid[32];
 	uint32_t cookie3;
 } __packed;
-/*
- * The offset is used in zephyr/include/cros/integrated_fwid.dtsi.
- * Be mindful of the FMAP's RO state when changing the offset.
- */
 BUILD_ASSERT(offsetof(struct image_data, version) == 4);
 
 /*

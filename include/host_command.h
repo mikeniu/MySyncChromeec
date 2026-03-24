@@ -301,9 +301,7 @@ __error("This function should only be called from Zephyr OS code")
 #endif
 	struct host_command *zephyr_find_host_command(int command);
 
-#if defined(CONFIG_ZEPHYR)
-#include "zephyr_host_command.h"
-#elif defined(HAS_TASK_HOSTCMD)
+#if defined(HAS_TASK_HOSTCMD)
 #define EXPAND(off, cmd) __host_cmd_(off, cmd)
 #define __host_cmd_(off, cmd) __host_cmd_##off##cmd
 #define EXPANDSTR(off, cmd) "__host_cmd_" #off #cmd
@@ -333,14 +331,14 @@ __error("This function should only be called from Zephyr OS code")
 			routine, EC_PRIVATE_HOST_COMMAND_VALUE(command),     \
 			version_mask                                         \
 		}
-#else /* !CONFIG_ZEPHYR && !HAS_TASK_HOSTCMD */
+#else /* !HAS_TASK_HOSTCMD */
 #define DECLARE_HOST_COMMAND(command, routine, version_mask)                \
 	static enum ec_status(routine)(struct host_cmd_handler_args * args) \
 		__attribute__((unused))
 
 #define DECLARE_PRIVATE_HOST_COMMAND(command, routine, version_mask) \
 	DECLARE_HOST_COMMAND(command, routine, version_mask)
-#endif /* CONFIG_ZEPHYR */
+#endif /* HAS_TASK_HOSTCMD */
 
 /**
  * Politely ask the CPU to enable/disable its own throttling.

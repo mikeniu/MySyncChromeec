@@ -273,7 +273,13 @@ enum pdo_augmented_pps {
  * This value was experimentally determined to pass TEST.PD.PROT.SNK.5 and
  * TEST.PD.PROT.SRC.3 on various boards.
  */
+/* TODO(b/442730096):Debug pujjoga ErrorRecovery latency and remove this config
+ */
+#ifdef CONFIG_USBC_PD3_T_SENDER_RESPONSE_OVERRIDE
+#define PD3_T_SENDER_RESPONSE CONFIG_USBC_PD3_T_SENDER_RESPONSE_MS
+#else
 #define PD3_T_SENDER_RESPONSE (29 * MSEC)
+#endif
 #endif
 #define PD_T_PS_TRANSITION (500 * MSEC) /* between 450ms and 550ms */
 /*
@@ -283,7 +289,11 @@ enum pdo_augmented_pps {
 #define PD_T_PS_SOURCE_OFF (835 * MSEC) /* between 750ms and 920ms */
 #define PD_T_PS_HARD_RESET (25 * MSEC) /* between 25ms and 35ms */
 #define PD_T_ERROR_RECOVERY (240 * MSEC) /* min 240ms if sourcing VConn */
+#ifdef CONFIG_USB_PD_T_CC_DEBOUNCE_MS_OVERRIDE
+#define PD_T_CC_DEBOUNCE (CONFIG_USB_PD_T_CC_DEBOUNCE_MS_OVERRIDE)
+#else
 #define PD_T_CC_DEBOUNCE (140 * MSEC) /* between 100ms and 200ms */
+#endif
 /* DRP_SNK + DRP_SRC must be between 50ms and 100ms with 30%-70% duty cycle */
 #define PD_T_DRP_SNK (40 * MSEC) /* toggle time for sink DRP */
 #define PD_T_DRP_SRC (30 * MSEC) /* toggle time for source DRP */
@@ -3873,6 +3883,13 @@ int typec_update_cc(int port);
  */
 __override_proto enum pd_sdb_power_indicator
 board_get_pd_sdb_power_indicator(enum pd_sdb_power_state power_state);
+
+/*
+ * Return the number of USB Type-C ports that are allowed to source 3.0A
+ * simultaneously. Boards may override this to provide a custom or
+ * dynamic policy.
+ */
+__override_proto int pd_get_usb_pd_3a_ports(void);
 
 /****************************************************************************/
 

@@ -1,3 +1,4 @@
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 /* Copyright 2024 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
@@ -27,3 +28,34 @@
 		};
 	};
 };
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+/* Copyright 2024 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/native_sim.dts>
+#include <dt-bindings/kbd.h>
+
+/ {
+	chosen {
+		cros-ec,keyboard = &fake_keyboard;
+	};
+
+	fake_keyboard: fake-device {
+		compatible = "gpio-kbd-matrix";
+		row-gpios = <&gpio0 0 0>;
+		col-gpios = <&gpio0 0 0>;
+		debounce-down-ms = <100>;
+
+		test_runtime_keys: runtime-keys {
+			compatible = "cros-ec,runtime-keys";
+			left-alt-rc = <KBD_RC(2, 3)>;
+			right-alt-rc = <KBD_RC(4, 5)>;
+			h-rc = <KBD_RC(6, 7)>;
+			r-rc = <KBD_RC(8, 9)>;
+		};
+	};
+};
+=======
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)

@@ -11,7 +11,7 @@
 #include "tfdp_chip.h"
 #include "watchdog.h"
 
-void watchdog_reload(void)
+void chip_watchdog_reload(void)
 {
 	MCHP_WDG_KICK = 1;
 
@@ -22,7 +22,6 @@ void watchdog_reload(void)
 		MCHP_TMR16_CTL(0) |= BIT(5);
 	}
 }
-DECLARE_HOOK(HOOK_TICK, watchdog_reload, HOOK_PRIO_DEFAULT);
 
 #if defined(CHIP_FAMILY_MEC152X) || defined(CHIP_FAMILY_MEC172X)
 static void wdg_intr_enable(int enable)

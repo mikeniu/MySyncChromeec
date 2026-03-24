@@ -1,3 +1,4 @@
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 # Copyright 2025 The ChromiumOS Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
@@ -17,3 +18,23 @@ properties:
     description: |
       GPIO pin connected to the EN_SLP_Z signal on the platform.  The driver
       asserts this signal to logic 1 when enabling hibernate mode.
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+# Copyright 2025 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: |
+  Driver code to support hibernate to the Z5 power state using discrete
+  logic on the board.
+
+compatible: "cros-ec,hibernate-z5"
+
+properties:
+  en-slp-z-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      GPIO pin connected to the EN_SLP_Z signal on the platform.  The driver
+      asserts this signal to logic 1 when enabling hibernate mode.
+=======
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)

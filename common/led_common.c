@@ -96,7 +96,6 @@ static enum ec_status led_command_control(struct host_cmd_handler_args *args)
 }
 DECLARE_HOST_COMMAND(EC_CMD_LED_CONTROL, led_command_control, EC_VER_MASK(1));
 
-#ifndef CONFIG_ZEPHYR
 __attribute__((weak)) void led_control(enum ec_led_id led_id,
 				       enum ec_led_state state)
 {
@@ -105,4 +104,3 @@ __attribute__((weak)) void led_control(enum ec_led_id led_id,
 	 * LED. Boards can provide their own implementation.
 	 */
 }
-#endif

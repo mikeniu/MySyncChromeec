@@ -6,6 +6,7 @@
 #include "atomic.h"
 #include "chipset.h"
 #include "common.h"
+#include "extpower.h"
 #include "gpio.h"
 #include "hooks.h"
 #include "host_command.h"
@@ -833,9 +834,14 @@ static void pchg_startup(void)
 	if (active_pchg_count)
 		task_wake(TASK_ID_PCHG);
 }
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 #ifndef CONFIG_WPC_HALL_ENABLE
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, pchg_startup, HOOK_PRIO_DEFAULT);
 #endif
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+DECLARE_HOOK(HOOK_CHIPSET_STARTUP, pchg_startup, HOOK_PRIO_DEFAULT);
+=======
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)
 
 static void pchg_shutdown(void)
 {
@@ -848,8 +854,76 @@ static void pchg_shutdown(void)
 		ctx = &pchgs[p];
 		gpio_disable_interrupt(ctx->cfg->irq_pin);
 		board_pchg_power_on(p, 0);
+		ctx->battery_percent = 0;
+		pchg_queue_event(ctx, PCHG_EVENT_DEVICE_LOST);
+	}
+	task_wake(TASK_ID_PCHG);
+}
+
+#ifdef CONFIG_WPC_HALL_ENABLE
+static bool hall_allows_pchg;
+static void pchg_update_state(void);
+
+static void wpc_hall_handler(void)
+{
+	hall_allows_pchg = !gpio_get_level(GPIO_HALL_CTL_PCHG);
+	pchg_update_state();
+}
+DECLARE_DEFERRED(wpc_hall_handler);
+
+void wpc_hall_interrupt(enum gpio_signal signal)
+{
+	hook_call_deferred(&wpc_hall_handler_data, CONFIG_WPC_HALL_DEBOUNCE_US);
+}
+
+static void wpc_hall_init(void)
+{
+	hall_allows_pchg = false;
+	pchg_startup();
+	gpio_enable_interrupt(GPIO_HALL_CTL_PCHG);
+	hook_call_deferred(&wpc_hall_handler_data, CONFIG_WPC_HALL_DEBOUNCE_US);
+}
+DECLARE_HOOK(HOOK_INIT, wpc_hall_init, HOOK_PRIO_DEFAULT);
+#endif
+
+static bool pchg_allowed(void)
+{
+	bool system_off;
+
+	system_off =
+		chipset_in_or_transitioning_to_state(CHIPSET_STATE_ANY_OFF);
+
+#ifdef CONFIG_WPC_HALL_ENABLE
+	if (!hall_allows_pchg)
+		return false;
+#endif
+
+	if (!system_off)
+		return true;
+
+#ifdef CONFIG_WPC_AC_S5_CHARGE
+	if (extpower_is_present())
+		return true;
+#endif
+
+	return false;
+}
+
+static bool pchg_enabled;
+
+static void pchg_update_state(void)
+{
+	bool allow = pchg_allowed();
+
+	if (allow && !pchg_enabled) {
+		pchg_startup();
+		pchg_enabled = true;
+	} else if (!allow && pchg_enabled) {
+		pchg_shutdown();
+		pchg_enabled = false;
 	}
 }
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 #ifndef CONFIG_WPC_HALL_ENABLE
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, pchg_shutdown, HOOK_PRIO_DEFAULT);
 #endif
@@ -893,6 +967,13 @@ static void wpc_hall_disable(void)
 
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, wpc_hall_enable, HOOK_PRIO_POST_DEFAULT);
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, wpc_hall_disable, HOOK_PRIO_DEFAULT);
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+=======
+DECLARE_HOOK(HOOK_CHIPSET_STARTUP, pchg_update_state, HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, pchg_update_state, HOOK_PRIO_DEFAULT);
+#ifdef CONFIG_WPC_AC_S5_CHARGE
+DECLARE_HOOK(HOOK_AC_CHANGE, pchg_update_state, HOOK_PRIO_POST_DEFAULT);
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)
 #endif
 
 void pchg_task(void *u)

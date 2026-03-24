@@ -1,3 +1,4 @@
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 /* Copyright 2025 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
@@ -55,3 +56,63 @@
 		&adc0_chan4_gp41
 		&adc0_chan6_gp34>;
 };
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	named-gpios {
+		gpio_fan_enable: fan-enable {
+			gpios = <&gpioa 3 GPIO_OUTPUT>;
+		};
+		gpio_fan_tach: fan-tach {
+			gpios = <&gpio9 3 GPIO_INPUT_PULL_UP>;
+		};
+	};
+
+	fans {
+		compatible = "cros-ec,fans";
+
+		fan_0 {
+			pwms = <&pwm6 6 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
+			rpm-min = <2200>;
+			rpm-start = <2200>;
+			rpm-max = <6900>;
+			tach = <&tach1>;
+			enable-gpio = <&gpio_fan_enable>;
+		};
+	};
+};
+
+&pwm6_gpc0 {
+	drive-open-drain;
+};
+
+&pwm6 {
+	status = "okay";
+	pinctrl-0 = <&pwm6_gpc0>;
+	pinctrl-names = "default";
+};
+
+/* Tachometer for fan speed measurement */
+&tach1 {
+	status = "okay";
+	pinctrl-0 = <&ta1_2_in_gp93>;
+	pinctrl-names = "default";
+	port = <NPCX_TACH_PORT_A>; /* port-A is selected */
+	sample-clk = <NPCX_TACH_FREQ_LFCLK>; /* Use LFCLK as sampling clock */
+	pulses-per-round = <2>; /* number of pulses per round of encoder */
+};
+
+/* Remove temp_sensor_4 ADC channel as it doesn't exist on the ORB */
+&adc0 {
+	pinctrl-0 = <&adc0_chan0_gp45
+		&adc0_chan1_gp44
+		&adc0_chan10_gpe0
+		&adc0_chan4_gp41
+		&adc0_chan6_gp34>;
+};
+=======
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)

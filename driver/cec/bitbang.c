@@ -18,11 +18,7 @@
 #define __soc_ram_code
 #endif
 
-#if defined(CONFIG_ZEPHYR) && defined(CONFIG_SOC_IT8XXX2)
-#define SOC_CEC_ISR_LATENCY CEC_US_TO_TICKS(150)
-#else
 #define SOC_CEC_ISR_LATENCY 0
-#endif
 
 #define CPRINTF(format, args...) cprintf(CC_CEC, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_CEC, format, ##args)

@@ -18,10 +18,6 @@
 
 #include <vector>
 
-#ifdef CONFIG_ZEPHYR
-#include <zephyr/shell/shell.h>
-#endif
-
 #ifdef CONFIG_CMD_FPSENSOR_DEBUG
 /* --- Debug console commands --- */
 
@@ -334,6 +330,8 @@ static int command_fpinfo(int argc, const char **argv)
 			 info->image_frame_params[i].bpp);
 		ccprintf("  %*s: %u\n", align, "Frame Size",
 			 info->image_frame_params[i].frame_size);
+		ccprintf("  %*s: %u\n", align, "Image Data Offset (bytes)",
+			 info->image_frame_params[i].image_data_offset_bytes);
 		ccprintf("  %*s: 0x%X (%s)\n", align, "Pixel Format",
 			 info->image_frame_params[i].pixel_format,
 			 fourcc_to_string(

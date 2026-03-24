@@ -46,14 +46,14 @@ static void acquire_console(void)
 #if !defined(CONFIG_USB_CONSOLE) && !defined(CONFIG_USB_CONSOLE_STREAM)
 	uart_shell_rx_bypass(true);
 #endif
-#if !defined(CONFIG_ZEPHYR) && !defined(BOARD_HOST)
+#if !defined(BOARD_HOST)
 	/* The legacy fw console does not have an rx bypass feature (it is
 	 * stubbed out).  Disable the console task so that it does not
 	 * steal character reads from chargen.
 	 */
 	if (task_start_called())
 		task_disable_task(TASK_ID_CONSOLE);
-#endif /* !CONFIG_ZEPHYR  && !BOARD_HOST */
+#endif /* !BOARD_HOST */
 }
 
 static void release_console(void)
@@ -61,10 +61,10 @@ static void release_console(void)
 #if !defined(CONFIG_USB_CONSOLE) && !defined(CONFIG_USB_CONSOLE_STREAM)
 	uart_shell_rx_bypass(false);
 #endif
-#if !defined(CONFIG_ZEPHYR) && !defined(BOARD_HOST)
+#if !defined(BOARD_HOST)
 	if (task_start_called())
 		task_enable_task(TASK_ID_CONSOLE);
-#endif /* !CONFIG_ZEPHYR  && !BOARD_HOST */
+#endif /* !BOARD_HOST */
 }
 
 static void run_chargen(void)
@@ -84,9 +84,6 @@ static void run_chargen(void)
 	while (uart_getc() != -1 || usb_getc() != -1)
 		; /* Drain received characters, if any. */
 
-#ifdef CONFIG_ZEPHYR
-	k_sched_lock();
-#endif
 	prev_watchdog_time = get_time();
 	while (uart_getc() != 'x' && usb_getc() != 'x') {
 		timestamp_t current_time;
@@ -108,9 +105,6 @@ static void run_chargen(void)
 			prev_watchdog_time.val = current_time.val;
 		}
 
-		if (IS_ENABLED(CONFIG_ZEPHYR) && c == '0')
-			watchdog_reload();
-
 		putc_(c++);
 
 		if (seq_number && (++seq_counter == seq_number))
@@ -129,9 +123,6 @@ static void run_chargen(void)
 		else if (c == ('9' + 1))
 			c = 'A';
 	}
-#ifdef CONFIG_ZEPHYR
-	k_sched_unlock();
-#endif
 
 	putc_('\n');
 

@@ -53,8 +53,6 @@ static int td_pd_vndi3_e3(enum pd_data_role data_role)
 	 * It won't pass items d)-i), so just verify that we received a VDM from
 	 * the mock.
 	 *
-	 * Link common/usbc/svdm_rsp_dfp_only.c if we want to verify some of the
-	 * items below.
 	 */
 	TEST_EQ(verify_tcpci_transmit(TCPCI_MSG_SOP, 0, PD_DATA_VENDOR_DEF),
 		EC_SUCCESS, "%d");

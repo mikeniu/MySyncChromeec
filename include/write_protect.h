@@ -6,9 +6,6 @@
 #ifndef __CROS_EC_WRITE_PROTECT_H
 #define __CROS_EC_WRITE_PROTECT_H
 
-#ifdef CONFIG_ZEPHYR
-#include "zephyr_write_protect.h"
-#else
 #include "gpio.h"
 
 #ifdef __cplusplus
@@ -46,5 +43,4 @@ static inline void write_protect_set(int value)
 }
 #endif
 
-#endif /* !CONFIG_ZEPHYR */
 #endif /* __CROS_EC_WRITE_PROTECT_H */

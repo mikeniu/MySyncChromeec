@@ -50,10 +50,29 @@ static struct fp_sensor_info fpc1025_sensor_info = {
 	.version = 1,
 };
 
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 #define FPC1025_DEFAULT_RAW_IMAGE_PARAMS                                      \
 	.bpp = FP_SENSOR_RES_BPP_FPC, .frame_size = FP_SENSOR_IMAGE_SIZE_FPC, \
 	.pixel_format = V4L2_PIX_FMT_GREY, .width = FP_SENSOR_RES_X_FPC,      \
 	.height = FP_SENSOR_RES_X_FPC
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+#define FPC1025_DEFAULT_IMAGE_PARAMS                                          \
+	.bpp = FP_SENSOR_RES_BPP_FPC, .frame_size = FP_SENSOR_IMAGE_SIZE_FPC, \
+	.pixel_format = V4L2_PIX_FMT_GREY, .width = FP_SENSOR_RES_X_FPC,      \
+	.height = FP_SENSOR_RES_X_FPC
+=======
+#define FPC1025_DEFAULT_RAW_IMAGE_PARAMS                                 \
+	.frame_size = FP_SENSOR_IMAGE_SIZE_FPC,                          \
+	.image_data_offset_bytes = FP_SENSOR_IMAGE_OFFSET_FPC,           \
+	.pixel_format = V4L2_PIX_FMT_GREY, .width = FP_SENSOR_RES_X_FPC, \
+	.height = FP_SENSOR_RES_Y_FPC, .bpp = FP_SENSOR_RES_BPP_FPC
+
+#define FPC1025_DEFAULT_REAL_IMAGE_PARAMS                                \
+	.frame_size = FP_SENSOR_REAL_IMAGE_SIZE_FPC,                     \
+	.image_data_offset_bytes = FP_SENSOR_IMAGE_OFFSET_FPC,           \
+	.pixel_format = V4L2_PIX_FMT_GREY, .width = FP_SENSOR_RES_X_FPC, \
+	.height = FP_SENSOR_RES_Y_FPC, .bpp = FP_SENSOR_RES_BPP_FPC
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)
 
 #define FPC1025_DEFAULT_REAL_IMAGE_PARAMS                                \
 	.bpp = FP_SENSOR_RES_BPP_FPC,                                    \
@@ -318,10 +337,12 @@ int fp_sensor_get_info(struct ec_response_fp_info_v2 *resp, size_t resp_size)
 }
 
 __overridable int fp_finger_match(void *templ, uint32_t templ_count,
-				  uint8_t *image, int32_t *match_index,
-				  uint32_t *update_bitmap)
+				  uint8_t *image, bool template_update,
+				  int32_t *match_index, uint32_t *update_bitmap)
 {
 	int rc;
+
+	/* TODO(b/479912675): Use template_update parameter. */
 
 	rc = bio_template_image_match_list(templ, templ_count, image,
 					   match_index, update_bitmap);

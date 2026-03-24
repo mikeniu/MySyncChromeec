@@ -95,7 +95,6 @@ bool is_interrupt_enabled(void);
  * functions. In reality, these simply call the current implementation of
  * interrupt_disable() and interrupt_enable().
  */
-#ifndef CONFIG_ZEPHYR
 /**
  * Perform the same operation as interrupt_disable but allow nesting. The
  * return value from this function should be used as the argument to
@@ -119,7 +118,6 @@ uint32_t irq_lock(void);
  * @param key The lock-out key used to restore the interrupt state.
  */
 void irq_unlock(uint32_t key);
-#endif /* CONFIG_ZEPHYR */
 
 /**
  * Return true if we are in interrupt context.
@@ -171,12 +169,6 @@ static inline void task_wake(task_id_t tskid)
  */
 task_id_t task_get_current(void);
 
-#ifdef CONFIG_ZEPHYR
-/**
- * Check if this current task is running in deferred context
- */
-bool in_deferred_context(void);
-#else
 /* All ECOS deferred calls run from the HOOKS task */
 static inline bool in_deferred_context(void)
 {
@@ -186,7 +178,6 @@ static inline bool in_deferred_context(void)
 	return false;
 #endif /* HAS_TASK_HOOKS */
 }
-#endif /* CONFIG_ZEPHYR */
 
 /**
  * Return a pointer to the bitmap of events of the task.
@@ -392,13 +383,7 @@ void task_clear_pending_irq(int irq);
  */
 bool task_is_irq_pending(int irq);
 
-#ifdef CONFIG_ZEPHYR
-typedef struct k_mutex mutex_t;
-
-#define mutex_lock(mtx) (k_mutex_lock(mtx, K_FOREVER))
-#define mutex_unlock(mtx) (k_mutex_unlock(mtx))
-
-#elif defined(CONFIG_COMMON_RECURSIVE_MUTEX)
+#if defined(CONFIG_COMMON_RECURSIVE_MUTEX)
 
 /* Use the common recursive implementation of mutex */
 
@@ -459,7 +444,7 @@ void mutex_unlock(mutex_t *mtx);
 
 /** Zephyr will try to init the mutex using `k_mutex_init()`. */
 #define k_mutex_init(mutex) 0
-#endif /* CONFIG_ZEPHYR */
+#endif /* CONFIG_COMMON_RECURSIVE_MUTEX */
 
 struct irq_priority {
 	uint8_t irq;
@@ -487,7 +472,6 @@ struct irq_def {
  * Implement the DECLARE_IRQ(irq, routine, priority) macro which is
  * a core specific helper macro to declare an interrupt handler "routine".
  */
-#ifndef CONFIG_ZEPHYR
 #ifdef CONFIG_COMMON_RUNTIME
 #include "irq_handler.h"
 #else
@@ -504,7 +488,6 @@ struct irq_def {
 #include "ec.irqlist"
 #endif /* !defined(CONFIG_DFU_BOOTMANAGER_MAIN) */
 #endif /* CONFIG_COMMON_RUNTIME */
-#endif /* !CONFIG_ZEPHYR */
 
 #ifdef __cplusplus
 }

@@ -7,6 +7,7 @@
 #
 
 # See Makefile for description.
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 host-util-bin-cxx-y += ectool
 host-util-bin-cxx-y += ec_parse_panicinfo
 host-util-bin-cxx-y += lbplay
@@ -21,9 +22,16 @@ host-util-bin-cxx-y += cbi-util
 host-util-bin-cxx-y += ec_coredump
 
 host-util-bin-y += rtkupdate
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+host-util-bin-cxx-y += ectool ec_parse_panicinfo lbplay stm32mon lbcc iteflash \
+	itecomdbgr cbi-util ec_coredump
+host-util-bin-y += rtkupdate
+=======
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)
 build-util-art-y += util/export_taskinfo.so
 
 build-util-bin-$(CHIP_NPCX) += ecst
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 host-util-bin-cxx-$(BOARD_NOCTURNE_FP) += ectool_servo
 
 host-util-bin-cxx-y += uartupdatetool
@@ -64,6 +72,41 @@ util/ectool.cc: $(out)/ec_version.h
 
 ec_parse_panicinfo-objs=ec_parse_panicinfo.o
 ec_coredump-objs=ec_coredump.o $(comm-objs)
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+host-util-bin-cxx-$(BOARD_NOCTURNE_FP) += ectool_servo
+
+host-util-bin-cxx-y += uartupdatetool
+uartupdatetool-objs=uut/main.o uut/cmd.o uut/opr.o uut/l_com_port.o \
+	uut/lib_crc.o
+$(out)/util/uartupdatetool: HOST_CFLAGS+=-Iutil/
+
+# If the util/ directory in the private repo is symlinked into util/private,
+# we want to build host-side tools from it, too.
+ifneq ("$(wildcard util/private/build.mk)","")
+include util/private/build.mk
+endif
+-include private/util_flags.mk
+
+comm-objs=$(util-lock-objs:%=lock/%) comm-host.o comm-dev.o
+comm-objs+=comm-lpc.o comm-i2c.o misc_util.o comm-usb.o
+
+iteflash-objs = iteflash.o usb_if.o
+itecomdbgr-objs = itecomdbgr.o
+rtkupdate-objs = rtkupdate.o
+ectool-objs=ectool.o ectool_keyscan.o ec_flash.o $(comm-objs)
+ectool-objs+=ectool_i2c.o
+ectool-objs+=ectool_pdc_trace.o
+ectool-objs+=ectool_pdc_pcap.o
+ectool-objs+=../common/crc.o
+ectool_servo-objs=$(ectool-objs) comm-servo-spi.o
+lbplay-objs=lbplay.o $(comm-objs)
+
+util/ectool.cc: $(out)/ec_version.h
+
+ec_parse_panicinfo-objs=ec_parse_panicinfo.o
+ec_coredump-objs=ec_coredump.o $(comm-objs)
+=======
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)
 
 # USB type-C Vendor Information File generation
 ifeq ($(CONFIG_USB_POWER_DELIVERY),y)
@@ -127,8 +170,6 @@ $(out)/util/gen_touchpad_hash: BUILD_LDFLAGS += $(BUILD_OPENSSL_LDFLAGS)
 
 deps-y += $(out)/util/gen_touchpad_hash.d
 endif # CONFIG_TOUCHPAD_VIRTUAL_OFF
-
-cbi-util-objs=../common/crc8.o ../common/cbi.o
 
 $(out)/util/export_taskinfo.so: $(out)/util/export_taskinfo_ro.o \
 			$(out)/util/export_taskinfo_rw.o

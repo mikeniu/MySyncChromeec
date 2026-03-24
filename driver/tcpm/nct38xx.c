@@ -14,31 +14,6 @@
 #include "tcpm/tcpci.h"
 #include "usb_common.h"
 
-#ifdef CONFIG_ZEPHYR
-#include "usbc/tcpc_nct38xx.h"
-
-#include <zephyr/device.h>
-#include <zephyr/drivers/gpio/gpio_nct38xx.h>
-#include <zephyr/drivers/mfd/nct38xx.h>
-#include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(nct38xx, LOG_LEVEL_INF);
-#endif
-
-#if defined(CONFIG_ZEPHYR) && defined(CONFIG_IO_EXPANDER_NCT38XX)
-#error CONFIG_IO_EXPANDER_NCT38XX cannot be used with Zephyr.
-#error Enable the Zephyr driver CONFIG_GPIO_NCT38XX instead.
-#endif
-
-/*
- * TODO(b/295587630): nct38xx: upstream gpio_nct38xx_alert.c driver
- * incompatible with downstream TCPC driver
- */
-#ifdef CONFIG_GPIO_NCT38XX_ALERT
-#error Zephyr driver CONFIG_GPIO_NCT38XX_ALERT cannot be used with the
-#error downstream CONFIG_PLATFORM_EC_USB_PD_TCPM_NCT38XX driver.
-#error Delete the nuvoton,nct38xx-gpio-alert node from the devicetree.
-#endif
-
 #if !defined(CONFIG_USB_PD_TCPM_TCPCI)
 #error "NCT38XX is using part of standard TCPCI control"
 #error "Please upgrade your board configuration"
@@ -167,15 +142,6 @@ int nct38xx_init(int port)
 	 */
 	if (IS_ENABLED(CONFIG_IO_EXPANDER_NCT38XX) ||
 	    IS_ENABLED(CONFIG_GPIO_NCT38XX)) {
-#ifdef CONFIG_ZEPHYR
-		const struct device *dev =
-			nct38xx_get_gpio_device_from_port(port);
-
-		if (!device_is_ready(dev)) {
-			CPRINTS("device %s not ready", dev->name);
-			return EC_ERROR_BUSY;
-		}
-#endif /* CONFIG_ZEPHYR */
 		reg |= TCPC_REG_ALERT_VENDOR_DEF;
 	}
 
@@ -276,16 +242,10 @@ __overridable int board_map_nct38xx_tcpc_port_to_ioex(int port)
 
 static inline void nct38xx_tcpc_vendor_defined_alert(int port)
 {
-#ifdef CONFIG_ZEPHYR
-	const struct device *dev = nct38xx_get_gpio_device_from_port(port);
-
-	nct38xx_gpio_alert_handler(dev);
-#else
 	int ioexport;
 
 	ioexport = board_map_nct38xx_tcpc_port_to_ioex(port);
 	nct38xx_ioex_event_handler(ioexport);
-#endif /* CONFIG_ZEPHYR */
 }
 
 static void nct38xx_tcpc_alert(int port)

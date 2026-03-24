@@ -10,9 +10,6 @@
 #include "common.h"
 #include "driver/charger/isl9241_public.h"
 #include "gpio.h"
-#ifdef CONFIG_ZEPHYR
-#include "usbc_config.h"
-#endif
 #include "usbc_ppc.h"
 #include "util.h"
 
