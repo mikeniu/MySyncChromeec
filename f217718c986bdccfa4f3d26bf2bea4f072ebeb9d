@@ -1,0 +1,211 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc13bf3c_945d421e",
+        "filename": "util/bootrom.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T23:19:22Z",
+      "side": 1,
+      "message": "Is this openssl or boringssl? We use boringssl.",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 24
+      },
+      "revId": "f217718c986bdccfa4f3d26bf2bea4f072ebeb9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c69c622_0183edc8",
+        "filename": "util/bootrom.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T23:19:22Z",
+      "side": 1,
+      "message": "Why not use the SHA256 implementation from OpenSSL (boringssl), which is already a dependency?",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 0
+      },
+      "revId": "f217718c986bdccfa4f3d26bf2bea4f072ebeb9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "364fba0d_488db960",
+        "filename": "util/bootrom.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T23:19:22Z",
+      "side": 1,
+      "message": "These should be constants defined at a wider scope, perhaps in the header or at the top of the .cc file.",
+      "range": {
+        "startLine": 251,
+        "startChar": 0,
+        "endLine": 251,
+        "endChar": 0
+      },
+      "revId": "f217718c986bdccfa4f3d26bf2bea4f072ebeb9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "598c7585_1056f0d7",
+        "filename": "util/bootrom.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T23:19:22Z",
+      "side": 1,
+      "message": "Prefer C++ casts like reinterpret_cast.",
+      "range": {
+        "startLine": 301,
+        "startChar": 0,
+        "endLine": 301,
+        "endChar": 0
+      },
+      "revId": "f217718c986bdccfa4f3d26bf2bea4f072ebeb9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "182dabc3_4af059d5",
+        "filename": "util/bootrom.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 451,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T23:19:22Z",
+      "side": 1,
+      "message": "Include \u003calgorithm\u003e for std::min.",
+      "range": {
+        "startLine": 451,
+        "startChar": 0,
+        "endLine": 451,
+        "endChar": 0
+      },
+      "revId": "f217718c986bdccfa4f3d26bf2bea4f072ebeb9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6f04c5b_7457df56",
+        "filename": "util/bootrom.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 489,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T23:19:22Z",
+      "side": 1,
+      "message": "Prefer std::cout for consistency.",
+      "range": {
+        "startLine": 489,
+        "startChar": 0,
+        "endLine": 489,
+        "endChar": 0
+      },
+      "revId": "f217718c986bdccfa4f3d26bf2bea4f072ebeb9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0fec9e7e_992642dd",
+        "filename": "util/build.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T23:19:22Z",
+      "side": 1,
+      "message": "Please do something like this: https://crrev.com/c/7654470",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 72
+      },
+      "revId": "f217718c986bdccfa4f3d26bf2bea4f072ebeb9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "762df3d7_e352ae9a",
+        "filename": "util/et171_flash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T23:19:22Z",
+      "side": 1,
+      "message": "Avoid extern global variables if possible.",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 0
+      },
+      "revId": "f217718c986bdccfa4f3d26bf2bea4f072ebeb9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55ca572f_b39d88cc",
+        "filename": "util/et171_flash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T23:19:22Z",
+      "side": 1,
+      "message": "Include \u003calgorithm\u003e for std::min.",
+      "range": {
+        "startLine": 265,
+        "startChar": 0,
+        "endLine": 265,
+        "endChar": 0
+      },
+      "revId": "f217718c986bdccfa4f3d26bf2bea4f072ebeb9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
