@@ -1782,6 +1782,10 @@ enum ec_feature_code {
 	 * The EC supports a hybrid boost charger
 	 */
 	EC_FEATURE_CHARGER_HYBRID_POWER_BOOST = 57,
+	/*
+	 * The EC supports a power monitors
+	 */
+	EC_FEATURE_PWRMON = 58,
 };
 
 #define EC_FEATURE_MASK_0(event_code) BIT(event_code % 32)
@@ -9266,6 +9270,72 @@ struct ec_response_get_boot_time {
  * configured threshold.
  */
 #define EC_CMD_ENABLE_OFFMODE_HEARTBEAT 0x0606
+
+#define EC_CMD_PWRMON 0x0607
+
+enum ec_pwrmon_cmd {
+	EC_PWRMON_GET_CHANNEL_COUNT = 0,
+	EC_PWRMON_DUMP_INFO = 1,
+	EC_PWRMON_SET_RATE = 2,
+	EC_PWRMON_GET_RATE = 3,
+	EC_PWRMON_START = 4,
+	EC_PWRMON_STOP = 5,
+	EC_PWRMON_GET = 6,
+	EC_PWRMON_LATCH = 7,
+};
+
+struct ec_params_pwrmon {
+    uint8_t cmd;
+    union {
+        struct {
+            uint16_t rate;
+        } set_rate;
+
+        struct {
+            uint8_t channel_id;
+        } get_dump_info;
+
+        struct {
+            uint8_t channel_id;
+        } get_channel_info;
+    } __ec_align1;
+
+    /*
+     * The following commands have no args:
+     *
+     * start, stop, latch
+     */
+} __ec_align1;
+
+struct pwrmon_get_rate {
+    uint16_t rate;
+} __ec_align1;
+
+struct pwrmon_channel_info {
+    uint8_t channel_id;
+    uint64_t samples;
+    uint64_t value;
+} __ec_align1;
+
+struct pwrmon_get_channel_count {
+    uint8_t count;
+} __ec_align1;
+
+struct pwrmon_dump_info {
+    uint8_t channel_id;
+    char channel_name[32];
+} __ec_align1;
+
+struct ec_response_pwrmon {
+    union {
+
+        struct pwrmon_get_rate get_rate;
+        struct pwrmon_get_channel_count channel_count;
+        struct pwrmon_channel_info channel_info;
+        struct pwrmon_dump_info dump_info;
+
+    } __ec_align1;
+} __ec_align1;
 
 /*****************************************************************************/
 /*
