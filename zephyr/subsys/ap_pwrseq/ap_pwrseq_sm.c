@@ -162,22 +162,57 @@ int ap_pwrseq_sm_run_state(void *const data, uint32_t events)
 	struct ap_pwrseq_sm_data *sm_data = data;
 	int ret;
 
+	LOG_INF("[SM_RUN] >>> Enter ap_pwrseq_sm_run_state");
+	LOG_INF("[SM_RUN] data=%p events=0x%x", data, events);
+
+	/* Thread check */
 	if (!IS_ENABLED(CONFIG_EMUL_AP_PWRSEQ_DRIVER) &&
 	    sm_data->tid != k_current_get()) {
-		/* Called by wrong thread */
+		LOG_ERR("[SM_RUN] Wrong thread! expected=%p current=%p",
+			sm_data->tid, k_current_get());
 		return -EPERM;
 	}
 
+	/* Current state check */
 	if (sm_data->smf.current == NULL) {
+		LOG_ERR("[SM_RUN] current state is NULL!");
 		return -EINVAL;
 	}
 
+	LOG_INF("[SM_RUN] current state=%p", sm_data->smf.current);
+
+	/* Dump state before run */
+	LOG_INF("[SM_RUN] before run:");
+	LOG_INF("  in_transition=%d", sm_data->in_transition);
+	LOG_INF("  entry=%d exit=%d", sm_data->entry, sm_data->exit);
+	LOG_INF("  run_handled=%d", sm_data->run_handled);
+
+	/* Setup run context */
 	sm_data->in_transition = false;
-	sm_data->entry = sm_data->exit = AP_POWER_STATE_UNDEF;
+	sm_data->entry = AP_POWER_STATE_UNDEF;
+	sm_data->exit = AP_POWER_STATE_UNDEF;
 	sm_data->run_handled = false;
 	sm_data->events = events;
 
+	LOG_INF("[SM_RUN] after setup:");
+	LOG_INF("  in_transition=%d", sm_data->in_transition);
+	LOG_INF("  entry=%d exit=%d", sm_data->entry, sm_data->exit);
+	LOG_INF("  run_handled=%d", sm_data->run_handled);
+	LOG_INF("  events=0x%x", sm_data->events);
+
+	/* Run state machine */
+	LOG_INF("[SM_RUN] >>> call smf_run_state()");
 	ret = smf_run_state((struct smf_ctx *const)sm_data);
+	LOG_INF("[SM_RUN] <<< return from smf_run_state() ret=%d", ret);
+
+	/* Dump state after run */
+	LOG_INF("[SM_RUN] after run:");
+	LOG_INF("  in_transition=%d", sm_data->in_transition);
+	LOG_INF("  entry=%d exit=%d", sm_data->entry, sm_data->exit);
+	LOG_INF("  run_handled=%d", sm_data->run_handled);
+	LOG_INF("  current state=%p", sm_data->smf.current);
+
+	LOG_INF("[SM_RUN] <<< Exit ap_pwrseq_sm_run_state\n");
 
 	return ret;
 }

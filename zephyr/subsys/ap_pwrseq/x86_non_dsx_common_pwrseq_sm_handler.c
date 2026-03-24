@@ -532,9 +532,9 @@ static int common_pwr_sm_run(int state)
 	case SYS_POWER_STATE_S0ix:
 		/* System in S0 only if SLP_S0 and SLP_S3 are de-asserted */
 		if ((power_signals_off(IN_PCH_SLP_S0) &&
-		     signals_valid_and_off(IN_PCH_SLP_S3) &&
-		     ap_power_sleep_get_notify() == AP_POWER_SLEEP_RESUME) ||
-		    power_signal_get(PWR_SYS_RST)) {
+		     signals_valid_and_off(IN_PCH_SLP_S3))
+		    //  ap_power_sleep_get_notify() == AP_POWER_SLEEP_RESUME) ||
+		    || power_signal_get(PWR_SYS_RST)) {
 			return SYS_POWER_STATE_S0ixS0;
 		} else if (!chipset_is_all_power_good())
 			return SYS_POWER_STATE_S0;
@@ -954,22 +954,88 @@ static int x86_non_dsx_s0_entry(void *data)
 
 static int x86_non_dsx_s0_run(void *data)
 {
-	if (signals_valid_and_on(IN_PCH_SLP_S3)) {
+	static int log_cnt;
+
+	int slp_s3 = signals_valid_and_on(IN_PCH_SLP_S3);
+	int slp_s0 = power_signal_get(PWR_SLP_S0);
+	int notify = ap_power_sleep_get_notify();
+
+	/* Throttle log to avoid flooding */
+	if (!(log_cnt++ % 2000)) {
+		LOG_INF("S0_RUN: SLP_S3=%d SLP_S0=%d notify=%d",
+			slp_s3, slp_s0, notify);
+	}
+
+	/* S0 -> S3 */
+	if (slp_s3) {
+		LOG_INF("[S0] -> S3 (SLP_S3 asserted)");
 		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S3);
 	}
+
 #if CONFIG_AP_PWRSEQ_S0IX
-	if (ap_power_sleep_get_notify() == AP_POWER_SLEEP_SUSPEND &&
-	    power_signal_get(PWR_SLP_S0) != 0) {
+
+	/* =========================
+	 * S0 -> S0ix (Suspend)
+	 * ========================= */
+	if (notify == AP_POWER_SLEEP_SUSPEND && slp_s0 != 0) {
+		LOG_INF("[S0] -> S0ix (notify=SUSPEND + SLP_S0=1)");
 		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S0ix);
-	} else if (ap_power_sleep_get_notify() == AP_POWER_SLEEP_RESUME) {
-		ap_power_sleep_notify_transition(AP_POWER_SLEEP_RESUME);
-	} else if (power_signal_get(PWR_SLP_S0) == 0) {
-		disable_sleep(SLEEP_MASK_AP_RUN);
 	}
+
+	/* =========================
+	 * Resume (你新增的邏輯)
+	 * 只看 SLP_S0
+	 * ========================= */
+	if (slp_s0 == 0) {
+		/* 原本 Zephyr 只 disable sleep */
+		disable_sleep(SLEEP_MASK_AP_RUN);
+
+		/* ⭐ 你新增：當作 resume */
+		// if (notify != AP_POWER_SLEEP_RESUME) {
+		LOG_INF("[S0] Resume detected by SLP_S0 deassert");
+
+			/* 強制觸發 resume flow */
+			// ap_power_sleep_notify_transition(AP_POWER_SLEEP_RESUME);
+		// }
+	}
+
+	/* =========================
+	 * 原本 host resume（保留）
+	 * ========================= */
+	if (notify == AP_POWER_SLEEP_RESUME) {
+		LOG_INF("[S0] Resume by HOST CMD");
+		ap_power_sleep_notify_transition(AP_POWER_SLEEP_RESUME);
+	}
+
 #endif
 
 	return 0;
 }
+
+// static void board_slp_s0_monitor(const char *tag)
+// {
+// 	static int prev_slp_s0 = -1;
+
+// 	int slp_s0 = power_signal_get(PWR_SLP_S0);
+
+// 	/* init */
+// 	if (prev_slp_s0 == -1) {
+// 		prev_slp_s0 = slp_s0;
+// 		return;
+// 	}
+
+// 	/* edge detect */
+// 	if (prev_slp_s0 != slp_s0) {
+
+// 		if (slp_s0) {
+// 			LOG_INF("[%s][SLP_S0] ASSERT (enter S0ix)", tag);
+// 		} else {
+// 			LOG_INF("[%s][SLP_S0] DEASSERT (resume)", tag);
+// 		}
+
+// 		prev_slp_s0 = slp_s0;
+// 	}
+// }
 
 static int x86_non_dsx_s0_exit(void *data)
 {

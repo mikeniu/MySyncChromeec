@@ -212,6 +212,7 @@ void ap_power_sleep_notify_transition(enum ap_power_sleep_type check_state)
 		atomic_inc(&s0ix_counter);
 #endif
 	} else if (check_state == AP_POWER_SLEEP_RESUME) {
+		LOG_INF("ap_power_sleep_notify resume....");
 		ap_power_ev_send_callbacks(AP_POWER_RESUME);
 		/*
 		 * Transition is done; reset sleep state after resume.

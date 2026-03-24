@@ -176,10 +176,20 @@ static void ap_pwrseq_thread(void *arg, void *unused1, void *unused2)
 			ap_pwrseq_state_lock(dev);
 
 			cur_state = ap_pwrseq_sm_get_cur_state(data->sm_data);
+
 			run_status =
 				ap_pwrseq_sm_run_state(data->sm_data, events);
+
 			new_state = ap_pwrseq_sm_get_cur_state(data->sm_data);
 
+			/* ⭐ 只在 state 有變時印 */
+			if (cur_state != new_state) {
+				LOG_INF("[SM] %s -> %s (events=0x%x, ret=%d)",
+					ap_pwrseq_get_state_str(cur_state),
+					ap_pwrseq_get_state_str(new_state),
+					events,
+					run_status);
+			}
 			ap_pwrseq_state_unlock(dev);
 			if (run_status) {
 				/* Was this terminated? */

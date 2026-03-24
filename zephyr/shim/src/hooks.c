@@ -231,35 +231,36 @@ int hook_call_deferred(const struct deferred_data *data, int us)
 static void ev_handler(struct ap_power_ev_callback *cb,
 		       struct ap_power_ev_data data)
 {
-	switch (data.event) {
-	/*
-	 * LCOV_EXCL_START unreachable case unless ap_power_ev_init_callback()
-	 * below adds an event without adding a case here.
-	 */
-	default:
-		break;
-		/* LCOV_EXCL_STOP */
+	cprints(CC_SYSTEM, "[ev_handler] event=0x%x", data.event);
 
-#define CASE_HOOK(h)                           \
-	case AP_POWER_##h:                     \
-		hook_notify(HOOK_CHIPSET_##h); \
+	switch (data.event) {
+
+	default:
+		cprints(CC_SYSTEM, "[ev_handler] unknown event=0x%x", data.event);
+		break;
+
+#define CASE_HOOK(h)                                                   \
+	case AP_POWER_##h:                                             \
+		cprints(CC_SYSTEM, "[ev_handler] -> hook_" #h);        \
+		hook_notify(HOOK_CHIPSET_##h);                          \
 		break
 
 		CASE_HOOK(PRE_INIT);
 		CASE_HOOK(STARTUP);
 		CASE_HOOK(RESUME);
 		CASE_HOOK(SUSPEND);
+
 #if CONFIG_PLATFORM_EC_CHIPSET_RESUME_INIT_HOOK
 		CASE_HOOK(RESUME_INIT);
 		CASE_HOOK(SUSPEND_COMPLETE);
 #endif
+
 		CASE_HOOK(SHUTDOWN);
 		CASE_HOOK(SHUTDOWN_COMPLETE);
 		CASE_HOOK(HARD_OFF);
 		CASE_HOOK(RESET);
 	}
 }
-
 /*
  * Events are received from the AP power event system and sent to the hooks.
  */

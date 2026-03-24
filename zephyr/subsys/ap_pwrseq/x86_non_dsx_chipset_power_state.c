@@ -92,73 +92,97 @@ enum power_states_ndsx chipset_pwr_seq_get_state(void)
 	return SYS_POWER_STATE_G3;
 }
 #else
-static void x86_non_dsx_chipset_state_entry_cb(const struct device *dev,
-					       const enum ap_pwrseq_state entry,
-					       const enum ap_pwrseq_state exit)
+static void x86_non_dsx_chipset_state_entry_cb(
+	const struct device *dev,
+	const enum ap_pwrseq_state entry,
+	const enum ap_pwrseq_state exit)
 {
+	LOG_INF("[ENTRY_CB] enter=%s exit=%s",
+		ap_pwrseq_get_state_str(entry),
+		ap_pwrseq_get_state_str(exit));
+
 	ap_power_set_active_wake_mask();
 
 	switch (entry) {
+
 	case AP_POWER_STATE_G3:
+		LOG_INF("[ENTRY_CB][G3] from %s", ap_pwrseq_get_state_str(exit));
+
 		if (exit > AP_POWER_STATE_S5) {
-			/* This may be a forced shutdown */
+			LOG_INF("[ENTRY_CB][G3] -> SHUTDOWN");
 			ap_power_ev_send_callbacks(AP_POWER_SHUTDOWN);
+
+			LOG_INF("[ENTRY_CB][G3] -> SHUTDOWN_COMPLETE");
 			ap_power_ev_send_callbacks(AP_POWER_SHUTDOWN_COMPLETE);
 		}
+
+		LOG_INF("[ENTRY_CB][G3] -> HARD_OFF");
 		ap_power_ev_send_callbacks(AP_POWER_HARD_OFF);
 		break;
 
 	case AP_POWER_STATE_S5:
+		LOG_INF("[ENTRY_CB][S5] from %s", ap_pwrseq_get_state_str(exit));
+
 		if (exit > AP_POWER_STATE_S5) {
+			LOG_INF("[ENTRY_CB][S5] -> SHUTDOWN");
 			ap_power_ev_send_callbacks(AP_POWER_SHUTDOWN);
+
+			LOG_INF("[ENTRY_CB][S5] -> SHUTDOWN_COMPLETE");
 			ap_power_ev_send_callbacks(AP_POWER_SHUTDOWN_COMPLETE);
 		}
 		break;
 
 	case AP_POWER_STATE_S3:
+		LOG_INF("[ENTRY_CB][S3] from %s", ap_pwrseq_get_state_str(exit));
+
 		if (exit < AP_POWER_STATE_S3) {
+			LOG_INF("[ENTRY_CB][S3] -> STARTUP");
 			ap_power_ev_send_callbacks(AP_POWER_STARTUP);
 		}
 #if CONFIG_PLATFORM_EC_CHIPSET_RESUME_INIT_HOOK
 		else {
-			/* Notify power event after suspend */
+			LOG_INF("[ENTRY_CB][S3] -> SUSPEND_COMPLETE");
 			ap_power_ev_send_callbacks(AP_POWER_SUSPEND_COMPLETE);
 		}
 #endif
 		break;
 
 	case AP_POWER_STATE_S0:
+		LOG_INF("[ENTRY_CB][S0] from %s", ap_pwrseq_get_state_str(exit));
+
 #if CONFIG_PLATFORM_EC_CHIPSET_RESUME_INIT_HOOK
 		if (exit == AP_POWER_STATE_S3) {
-			/* Notify power event before resume */
+			LOG_INF("[ENTRY_CB][S0] -> RESUME_INIT");
 			ap_power_ev_send_callbacks(AP_POWER_RESUME_INIT);
 		}
 #endif
-		/* Notify power event rails are up */
+
+		LOG_INF("[ENTRY_CB][S0] -> RESUME");
 		ap_power_ev_send_callbacks(AP_POWER_RESUME);
 		break;
 
 #if CONFIG_AP_PWRSEQ_S0IX
 	case AP_POWER_STATE_S0ix:
-		/*
-		 * Check sleep state and notify listeners of S0ix suspend if
-		 * HC already set sleep suspend state.
-		 */
+		LOG_INF("[ENTRY_CB][S0ix] from %s", ap_pwrseq_get_state_str(exit));
+
+		LOG_INF("[ENTRY_CB][S0ix] -> sleep_notify_transition(SUSPEND)");
 		ap_power_sleep_notify_transition(AP_POWER_SLEEP_SUSPEND);
-		/*
-		 * Enable idle task deep sleep. Allow the low power idle task
-		 * to go into deep sleep in S0ix.
-		 */
+
+		LOG_INF("[ENTRY_CB][S0ix] -> enable_sleep(AP_RUN)");
 		enable_sleep(SLEEP_MASK_AP_RUN);
 
+		LOG_INF("[ENTRY_CB][S0ix] -> S0IX_SUSPEND");
 		ap_power_ev_send_callbacks(AP_POWER_S0IX_SUSPEND);
+
 #if CONFIG_PLATFORM_EC_CHIPSET_RESUME_INIT_HOOK
+		LOG_INF("[ENTRY_CB][S0ix] -> SUSPEND_COMPLETE");
 		ap_power_ev_send_callbacks(AP_POWER_SUSPEND_COMPLETE);
 #endif
 		break;
 #endif
 
 	default:
+		LOG_INF("[ENTRY_CB][UNKNOWN] state=%d", entry);
 		break;
 	}
 }

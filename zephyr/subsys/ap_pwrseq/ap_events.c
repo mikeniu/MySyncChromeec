@@ -63,6 +63,7 @@ void ap_power_ev_send_callbacks(uint32_t event)
 	struct ap_power_ev_data data;
 	struct ap_power_ev_callback *cb, *tmp;
 
+	// LOG_INF("[EV_SEND] event=%d");
 	/*
 	 * If no callbacks for this event, don't run the queue.
 	 */
