@@ -94,7 +94,7 @@ enum power_states_ndsx chipset_pwr_seq_get_state(void)
 #else
 static void x86_non_dsx_chipset_state_entry_cb(const struct device *dev,
 					       const enum ap_pwrseq_state entry,
-					       const enum ap_pwrseq_state exit)
+					       const enum ap_pwrseq_state exit)			   
 {
 	ap_power_set_active_wake_mask();
 

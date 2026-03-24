@@ -220,3 +220,65 @@ static void ts_wot_lid_change(void)
 	}
 }
 DECLARE_HOOK(HOOK_LID_CHANGE, ts_wot_lid_change, HOOK_PRIO_DEFAULT);
+
+static void board_slp_s0_monitor(void)
+{
+	static int prev_slp_s0 = -1;
+
+	int slp_s0 = gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_sys_slp_s0ix_l));
+
+	/* 初始化 */
+	if (prev_slp_s0 == -1) {
+		prev_slp_s0 = slp_s0;
+		return;
+	}
+
+	/* Edge detect */
+	if (prev_slp_s0 != slp_s0) {
+
+		if (slp_s0) {
+			LOG_INF("[SLP_S0] ASSERT (enter S0ix)");
+		} else {
+			LOG_INF("[SLP_S0] DEASSERT (resume to S0)");
+		}
+
+		prev_slp_s0 = slp_s0;
+	}
+}
+DECLARE_HOOK(HOOK_TICK, board_slp_s0_monitor, HOOK_PRIO_DEFAULT);
+
+static void ts_wot_normal_mode1(void)
+{
+	// bool lid_open = lid_is_open();
+
+	LOG_INF("WOT2222: 222222");
+	// LOG_INF("WOT: lid open?%d", lid_open);
+	// if (lid_open) {
+	// 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_tchscr_report_en),
+	// 			1);
+	// 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ts_wot_l), 0);
+	// 	last_tablet_mode = -1;
+	// }
+}
+DECLARE_HOOK(HOOK_CHIPSET_RESUME_INIT, ts_wot_normal_mode1, HOOK_PRIO_FIRST);
+
+
+
+static void modechange(void)
+{
+	// bool lid_open = lid_is_open();
+
+	LOG_INF("Mode Change HOOK TEST...");
+	if (!(chipset_in_state(CHIPSET_STATE_STANDBY)))
+		LOG_INF("Power state IS s0...");
+	else LOG_INF("Power state IS s0ix...");
+
+	// LOG_INF("WOT: lid open?%d", lid_open);
+	// if (lid_open) {
+	// 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_tchscr_report_en),
+	// 			1);
+	// 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ts_wot_l), 0);
+	// 	last_tablet_mode = -1;
+	// }
+}
+DECLARE_HOOK(HOOK_TABLET_MODE_CHANGE, modechange, HOOK_PRIO_FIRST);

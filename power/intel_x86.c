@@ -307,6 +307,7 @@ enum power_state common_intel_x86_power_handle_state(enum power_state state)
 		break;
 
 	case POWER_S0:
+		LOG_INF("[POWER] Enter POWER_S0.");
 		if (power_has_failed()) {
 			chipset_force_shutdown(CHIPSET_SHUTDOWN_POWERFAIL);
 			return POWER_S0S3;
@@ -479,20 +480,24 @@ enum power_state common_intel_x86_power_handle_state(enum power_state state)
 		return POWER_S0ix;
 
 	case POWER_S0ixS0:
-		/*
-		 * Disable idle task deep sleep. This means that the low
-		 * power idle task will not go into deep sleep while in S0.
-		 */
+		LOG_INF("[POWER] Enter POWER_S0ixS0");
+
+		LOG_INF("[POWER] disable_sleep: SLEEP_MASK_AP_RUN");
 		disable_sleep(SLEEP_MASK_AP_RUN);
 
-#ifdef CONFIG_CHIPSET_RESUME_INIT_HOOK
+	#ifdef CONFIG_CHIPSET_RESUME_INIT_HOOK
+		LOG_INF("[POWER] notify HOOK_CHIPSET_RESUME_INIT");
 		hook_notify(HOOK_CHIPSET_RESUME_INIT);
-#endif
+	#endif
+
+		LOG_INF("[POWER] sleep_resume_transition (before), notify=%d",
+			sleep_notify);
 
 		sleep_resume_transition();
-		return POWER_S0;
-#endif
 
+		LOG_INF("[POWER] sleep_resume_transition (after)");
+
+	return POWER_S0;
 	case POWER_S3S5:
 		/* fallthrough */
 	case POWER_S4S5:
