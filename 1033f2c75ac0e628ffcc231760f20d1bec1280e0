@@ -46,6 +46,30 @@
       },
       "revId": "1033f2c75ac0e628ffcc231760f20d1bec1280e0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "749c2183_53e28b08",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-24T20:57:45Z",
+      "side": 1,
+      "message": "I just found out the @dawidn@google.com recently added a unit test to verify this. The test fails without this CL. It passes with this change",
+      "parentUuid": "42f59a16_e14b8ec6",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 38
+      },
+      "revId": "1033f2c75ac0e628ffcc231760f20d1bec1280e0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
