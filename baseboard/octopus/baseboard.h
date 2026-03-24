@@ -63,6 +63,12 @@
 #undef CONFIG_WATCHDOG_PERIOD_MS
 #define CONFIG_WATCHDOG_PERIOD_MS 2100
 
+/* Enable panic log in RW image to preserve log before panic */
+#ifdef SECTION_IS_RW
+#define CONFIG_PRESERVED_RING_BUF
+#define CONFIG_PANIC_LOG
+#endif
+
 #elif defined(VARIANT_OCTOPUS_EC_ITE8320)
 /* IT83XX config */
 #define CONFIG_IT83XX_VCC_1P8V
@@ -79,15 +85,14 @@
 
 /* EC variant determines USB-C variant */
 #define VARIANT_OCTOPUS_USBC_ITE_EC_TCPCS
-
-/*
- * Limit maximal ODR to 125Hz, the EC is using ~5ms per sample at
- * 48MHz core cpu clock.
- */
-#define CONFIG_EC_MAX_SENSOR_FREQ_MILLIHZ 125000
 #else
 #error Must define a VARIANT_OCTOPUS_EC
 #endif /* VARIANT_OCTOPUS_EC */
+
+/*
+ * Limit maximal ODR to 125Hz.
+ */
+#define CONFIG_EC_MAX_SENSOR_FREQ_MILLIHZ 125000
 
 /* Common EC defines */
 #define CONFIG_I2C
@@ -177,7 +182,7 @@
 #define CONFIG_BATTERY_PRESENT_GPIO GPIO_EC_BATT_PRES_L
 #define CONFIG_BATTERY_REVIVE_DISCONNECT
 #define CONFIG_BATTERY_SMART
-#define CONFIG_HOSTCMD_BATTERY_V2
+#define CONFIG_HOSTCMD_BATTERY_INFO
 
 /*******************************************************************************
  * USB-C Configs

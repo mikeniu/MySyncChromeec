@@ -76,7 +76,6 @@ bool console_channel_is_disabled(enum console_channel channel)
 }
 #endif /* CONFIG_CONSOLE_CHANNEL */
 
-#ifndef CONFIG_ZEPHYR
 /*****************************************************************************/
 /* Channel-based console output */
 
@@ -156,7 +155,6 @@ int cprints(enum console_channel channel, const char *format, ...)
 
 	return rv;
 }
-#endif /* CONFIG_ZEPHYR */
 
 void cflush(void)
 {

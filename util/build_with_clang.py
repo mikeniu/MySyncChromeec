@@ -24,7 +24,6 @@ BOARDS_THAT_COMPILE_SUCCESSFULLY_WITH_CLANG = [
     "bloonchipper",
     "bloonchipper-druid",
     "buccaneer",
-    "gwendolin",
     "helipilot",
     "nami_fp",
     "nucleo-dartmonkey",
@@ -131,6 +130,7 @@ BOARDS_THAT_COMPILE_SUCCESSFULLY_WITH_CLANG = [
     "kinox",
     "kohaku",
     "kuldax",
+    "kulnex",
     "lalala",
     "lazor",
     "liara",
@@ -148,6 +148,7 @@ BOARDS_THAT_COMPILE_SUCCESSFULLY_WITH_CLANG = [
     "moonbuggy",
     "morphius",
     "moxie",
+    "moxoe",
     "nami",
     "nautilus",
     "nightfury",
@@ -264,7 +265,6 @@ BOARDS_THAT_FAIL_WITH_CLANG = [
     "kodama",
     "krane",
     "makomo",
-    "terrador",
     "waddledoo",
 ]
 

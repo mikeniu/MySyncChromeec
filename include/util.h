@@ -18,13 +18,6 @@
 #include <string.h>
 
 #include <strings.h>
-#ifdef CONFIG_ZEPHYR
-#include <zephyr/sys/util.h>
-/**
- * TODO(b/237712836): Remove once Zephyr's libc has strcasecmp.
- */
-#include "builtin/strings.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,8 +26,10 @@ extern "C" {
 /* Standard macros / definitions */
 #define GENERIC_MAX(x, y) ((x) > (y) ? (x) : (y))
 #define GENERIC_MIN(x, y) ((x) < (y) ? (x) : (y))
-#ifndef MAX
-#define MAX(a, b)                            \
+
+#ifndef __cplusplus
+#ifndef max
+#define max(a, b)                            \
 	({                                   \
 		__typeof__(a) temp_a = (a);  \
 		__typeof__(b) temp_b = (b);  \
@@ -42,8 +37,8 @@ extern "C" {
 		GENERIC_MAX(temp_a, temp_b); \
 	})
 #endif
-#ifndef MIN
-#define MIN(a, b)                            \
+#ifndef min
+#define min(a, b)                            \
 	({                                   \
 		__typeof__(a) temp_a = (a);  \
 		__typeof__(b) temp_b = (b);  \
@@ -54,6 +49,7 @@ extern "C" {
 #ifndef NULL
 #define NULL ((void *)0)
 #endif
+#endif /* __cplusplus */
 
 /* Returns true if string is not null and not empty */
 #define IS_NONEMPTY_STRING(s) ((s) && (s)[0])
@@ -62,13 +58,13 @@ extern "C" {
  * Ensure that value `v` is between `min` and `max`.
  *
  * @param v The value of interest.
- * @param min The minimum allowed value for `v`.
- * @param max The maximum allowed value for `v`.
- * @return `v` if it is already between `min`/`max`, `min` if `v` was smaller
- * than `min`, `max` if `v` was bigger than `max`.
+ * @param low The minimum allowed value for `v`.
+ * @param high The maximum allowed value for `v`.
+ * @return `v` if it is already between `low`/`high`, `low` if `v` was smaller
+ * than `low`, `high` if `v` was bigger than `high`.
  */
-#ifndef CONFIG_ZEPHYR
-#define CLAMP(v, min, max) MIN(max, MAX(v, min))
+#ifndef __cplusplus
+#define clamp(v, low, high) min(high, max(v, low))
 #endif
 
 /*
@@ -83,9 +79,7 @@ extern "C" {
 #define POWER_OF_TWO(x) ((x) && !((x) & ((x) - 1)))
 
 /* Macro to check if the value is in range */
-#ifndef CONFIG_ZEPHYR
 #define IN_RANGE(x, min, max) ((x) >= (min) && (x) <= (max))
-#endif
 
 /*
  * macros for integer division with various rounding variants

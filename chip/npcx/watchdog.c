@@ -128,7 +128,7 @@ const struct irq_priority __keep IRQ_PRIORITY(ITIM_INT(ITIM_WDG_NO))
 							0 };
 /* put the watchdog at the highest priority */
 
-void watchdog_reload(void)
+void chip_watchdog_reload(void)
 {
 	/* Disable watchdog interrupt */
 	task_disable_irq(ITIM_INT(ITIM_WDG_NO));
@@ -143,7 +143,6 @@ void watchdog_reload(void)
 	/* Enable watchdog interrupt */
 	task_enable_irq(ITIM_INT(ITIM_WDG_NO));
 }
-DECLARE_HOOK(HOOK_TICK, watchdog_reload, HOOK_PRIO_DEFAULT);
 
 int watchdog_init(void)
 {

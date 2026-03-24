@@ -49,8 +49,7 @@ static int in_progress;
 #define VBOOT_HASH_BLOCKING false
 
 static
-#if (defined(CONFIG_SOC_IT8XXX2_SHA256_HW_ACCELERATE) && \
-     !defined(CONFIG_PLATFORM_EC_SHA256_HW_ZEPHYR))
+#if (defined(CONFIG_SOC_IT8XXX2_SHA256_HW_ACCELERATE))
 	__attribute__((section(".__sha256_ram_block")))
 #endif
 	struct sha256_ctx ctx;
@@ -140,7 +139,7 @@ static void vboot_hash_all_chunks(void)
 	char str_buf[hex_str_buf_size(SHA256_PRINT_SIZE)];
 
 	do {
-		size_t size = MIN(CHUNK_SIZE, data_size - curr_pos);
+		size_t size = min(CHUNK_SIZE, data_size - curr_pos);
 		hash_next_chunk(size);
 		curr_pos += size;
 	} while (curr_pos < data_size);
@@ -171,7 +170,7 @@ static void vboot_hash_next_chunk(void)
 	}
 
 	/* Compute the next chunk of hash */
-	size = MIN(CHUNK_SIZE, data_size - curr_pos);
+	size = min(CHUNK_SIZE, data_size - curr_pos);
 	hash_next_chunk(size);
 
 	curr_pos += size;

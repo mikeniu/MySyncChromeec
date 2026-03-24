@@ -125,7 +125,7 @@ void watchdog_warning_irq(void)
 	}
 }
 
-void watchdog_reload(void)
+void chip_watchdog_reload(void)
 {
 	/* Reset warning timer. */
 	IT83XX_ETWD_ETXCTRL(WDT_EXT_TIMER) = 0x03;
@@ -140,8 +140,6 @@ void watchdog_reload(void)
 
 	atomic_clear(&in_watchdog_extension_period);
 }
-DECLARE_HOOK(HOOK_TICK, watchdog_reload, HOOK_PRIO_DEFAULT);
-DECLARE_HOOK(HOOK_SYSJUMP, watchdog_reload, HOOK_PRIO_LAST);
 
 int watchdog_init(void)
 {

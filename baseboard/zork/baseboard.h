@@ -67,9 +67,9 @@
  * truncated in the memory mapped battery info; differentiating them requires
  * support for EC_CMD_BATTERY_GET_STATIC version 1.
  */
-#define CONFIG_BATTERY_V2
+#define CONFIG_BATTERY_INFO
 #define CONFIG_BATTERY_COUNT 1
-#define CONFIG_HOSTCMD_BATTERY_V2
+#define CONFIG_HOSTCMD_BATTERY_INFO
 
 #define CONFIG_BC12_DETECT_PI3USB9201
 
@@ -229,6 +229,10 @@
 #undef CONFIG_UART_TX_BUF_SIZE
 #define CONFIG_UART_TX_BUF_SIZE 4096
 
+/* Increase watchdog period to 3s to avoid false positives */
+#undef CONFIG_WATCHDOG_PERIOD_MS
+#define CONFIG_WATCHDOG_PERIOD_MS 3000
+
 #define I2C_PORT_TCPC0 NPCX_I2C_PORT0_0
 #define I2C_PORT_USBA0 NPCX_I2C_PORT0_0
 #define I2C_PORT_TCPC1 NPCX_I2C_PORT1_0
@@ -262,6 +266,8 @@
 
 /* Sensors */
 #define CONFIG_DYNAMIC_MOTION_SENSOR_COUNT
+/* Limit motion sensor frequency to 100 hz */
+#define CONFIG_EC_MAX_SENSOR_FREQ_MILLIHZ 100000
 
 /* Thermal */
 #define CONFIG_TEMP_SENSOR_SB_TSI

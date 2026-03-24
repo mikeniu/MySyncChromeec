@@ -15,7 +15,7 @@ def _ec_deps_impl(module_ctx):
             url = "https://storage.googleapis.com/%s/toolchains/%s/%s.tar.zst" % (bucket, toolchain_name, version),
         )
 
-    script = module_ctx.path(Label("@@//platform/ec/util:coreboot_sdk_portage_deps.py"))
+    script = module_ctx.path(Label("@@//platform/ec-legacy/util:coreboot_sdk_portage_deps.py"))
     script_output = module_ctx.execute([script])
 
     direct_deps = []

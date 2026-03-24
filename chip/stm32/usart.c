@@ -62,6 +62,10 @@ void usart_init(struct usart_config const *config)
 	cr1 |= STM32_USART_CR1_FIFOEN;
 #endif
 
+	if (IS_ENABLED(CONFIG_STREAM_USART_ONEBIT)) {
+		cr3 |= STM32_USART_CR3_ONEBIT;
+	}
+
 	STM32_USART_CR1(base) = cr1;
 	STM32_USART_CR2(base) = cr2;
 	STM32_USART_CR3(base) = cr3;

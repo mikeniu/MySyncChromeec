@@ -73,20 +73,6 @@ static struct {
 	bool hpd_pending;
 } ap_storage[CONFIG_USB_PD_PORT_MAX_COUNT];
 
-#ifdef CONFIG_ZEPHYR
-static int init_ap_vdm_mutexes(void)
-{
-	int port;
-
-	for (port = 0; port < CONFIG_USB_PD_PORT_MAX_COUNT; port++) {
-		k_mutex_init(&ap_storage[port].queue_lock);
-	}
-
-	return 0;
-}
-SYS_INIT(init_ap_vdm_mutexes, POST_KERNEL, 50);
-#endif /* CONFIG_ZEPHYR */
-
 static void init_attention_queue_structs(void)
 {
 	int i;

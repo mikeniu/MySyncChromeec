@@ -188,25 +188,4 @@ extern const struct accelgyro_drv bma4_accel_drv;
 
 void bma4xx_interrupt(enum gpio_signal signal);
 
-#if defined(CONFIG_ZEPHYR)
-#include <zephyr/devicetree.h>
-
-#if DT_NODE_EXISTS(DT_ALIAS(bma4xx_int))
-/*
- * Get the motion sensor ID of the BMA4xx sensor that generates the interrupt.
- * The interrupt is converted to the event and transferred to motion
- * sense task that actually handles the interrupt.
- *
- * Here, we use alias to get the motion sensor ID
- *
- * e.g) base_accel is the label of a child node in /motionsense-sensors
- * aliases {
- *     bma4xx-int = &base_accel;
- * };
- */
-#define CONFIG_ACCEL_BMA4XX_INT_EVENT \
-	TASK_EVENT_MOTION_SENSOR_INTERRUPT(SENSOR_ID(DT_ALIAS(bma4xx_int)))
-#endif /* DT_NODE_EXISTS */
-#endif /* CONFIG_ZEPHYR */
-
 #endif /* __CROS_EC_ACCEL_BMA4XX_H */

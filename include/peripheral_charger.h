@@ -278,6 +278,7 @@ struct pchg_update {
 	/* Driver data for firmware update */
 	union {
 		struct cps8x00_update cps8200_update;
+		struct cps8x00_update cps8601_update;
 		/* other driver data follows in the future */
 	} driver_data;
 };
@@ -390,12 +391,28 @@ void pchg_irq(enum gpio_signal signal);
 void pchg_task(void *u);
 
 /**
+ * The interrupt handler for controlling the power on/off of the WPC HALL.
+ *
+ * @param signal
+ */
+void wpc_hall_interrupt(enum gpio_signal signal);
+
+/**
  * Turn on/off power for a PCHG charger.
  *
  * @param port  Port number of the PCHG charger.
  * @param on
  */
 __override_proto void board_pchg_power_on(int port, bool on);
+
+/**
+ * pchg_get_battery_percent - Get the current battery percentage of a PCHG port.
+ *
+ * @port: The PCHG port index.
+ *
+ * Returns the battery remaining percentage (0–100) for the specified port.
+ */
+int pchg_get_battery_percent(int port);
 
 /**
  * Return counts for PCHG charger.

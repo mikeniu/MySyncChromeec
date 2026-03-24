@@ -19,9 +19,6 @@
 #include "system.h"
 #include "task.h"
 #include "temp_sensor.h"
-#ifdef CONFIG_ZEPHYR
-#include "usbc_config.h"
-#endif
 
 #define CPRINTS(format, args...) cprints(CC_CHIPSET, format, ##args)
 #define CPRINTF(format, args...) cprintf(CC_CHIPSET, format, ##args)

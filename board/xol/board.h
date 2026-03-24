@@ -13,6 +13,9 @@
 /* Baseboard features */
 #include "baseboard.h"
 
+/* Configure the APB2 and APB3 CLK to 40MHz */
+#define NPCX_CORE_ABP2_ABP3_CLOCK_40M
+
 /*
  * This will happen automatically on NPCX9 ES2 and later. Do not remove
  * until we can confirm all earlier chips are out of service.
@@ -62,9 +65,8 @@
 #define CONFIG_USBC_NX20P348X_RCP_5VSRC_MASK_ENABLE
 #define CONFIG_USBC_NX20P348X_VBUS_DISCHARGE_BY_SRC_EN
 
-/* TODO: b/177608416 - measure and check these values on brya */
 #define PD_POWER_SUPPLY_TURN_ON_DELAY 30000 /* us */
-#define PD_POWER_SUPPLY_TURN_OFF_DELAY 30000 /* us */
+#define PD_POWER_SUPPLY_TURN_OFF_DELAY 60000 /* us */
 #define PD_VCONN_SWAP_DELAY 5000 /* us */
 
 /* PD */
