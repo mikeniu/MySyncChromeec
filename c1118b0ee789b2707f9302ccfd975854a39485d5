@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f9c41340_e2293a9c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T23:03:41Z",
+      "side": 1,
+      "message": "You are missing this change: https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7538215/10/util/build.mk",
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "77996093_4c47d9d5",
         "filename": "util/elan/filecontrol.cc",
         "patchSetId": 1
