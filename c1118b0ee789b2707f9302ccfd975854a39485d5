@@ -1,0 +1,349 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f42331a_3c932643",
+        "filename": "util/elan/filecontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:00:01Z",
+      "side": 1,
+      "message": "If `pBinary` is NULL, the function only sets `*pLength`. This and the call site in `iaptool.cc` could be made clearer, perhaps by splitting into two functions: one to get size, one to read data.",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1e50bfa_89cac9fa",
+        "filename": "util/elan/filecontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:00:01Z",
+      "side": 1,
+      "message": "Consider using `reinterpret_cast\u003cchar*\u003e(pBinary)` or `static_cast` for C++ style.",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f0f7f24_c0290a82",
+        "filename": "util/elan/filecontrol.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:00:01Z",
+      "side": 1,
+      "message": "Avoid `using namespace std;` in header files. It can pollute the namespace of any file that includes this header. It\u0027s better to use `std::` prefixes in the header, or move the using directive inside the function scopes in the .cc file if necessary.",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77ec445a_3c77eb0d",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:00:01Z",
+      "side": 1,
+      "message": "The use of `goto Exit;` is frequent. While it works, consider using RAII or other C++ constructs to manage resources and cleanup, which might make the flow easier to follow.",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a30cd3f2_38709814",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 709,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:00:01Z",
+      "side": 1,
+      "message": "Remove commented-out code.",
+      "range": {
+        "startLine": 709,
+        "startChar": 0,
+        "endLine": 709,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "245d46b4_20f3156b",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 709,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:00:01Z",
+      "side": 1,
+      "message": "Remove commented-out code.",
+      "range": {
+        "startLine": 709,
+        "startChar": 0,
+        "endLine": 709,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b981e7b_e860da6b",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 751,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:00:01Z",
+      "side": 1,
+      "message": "`libusb_init` is called here. Ensure `libusb_exit` is always called to match. It might be better to initialize libusb once in main.",
+      "range": {
+        "startLine": 751,
+        "startChar": 0,
+        "endLine": 751,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ff12ebd_59f76581",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 881,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:00:01Z",
+      "side": 1,
+      "message": "Define these endpoint addresses as named constants for better readability.",
+      "range": {
+        "startLine": 881,
+        "startChar": 0,
+        "endLine": 881,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b2ffb97_352b2b80",
+        "filename": "util/elan/iapcontrol.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:00:01Z",
+      "side": 1,
+      "message": "Avoid `using namespace std;` in header files.",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b942fdc_d9ab35ba",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:00:01Z",
+      "side": 1,
+      "message": "Consider using `std::vector\u003cunsigned char\u003e pBinary(binSize);` to avoid manual memory management with `new`/`delete[]`.",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a57069e5_49f5dd9c",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:00:01Z",
+      "side": 1,
+      "message": "Remove commented-out code.",
+      "range": {
+        "startLine": 88,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3970beee_4211e941",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:00:01Z",
+      "side": 1,
+      "message": "Remove commented-out code.",
+      "range": {
+        "startLine": 88,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1b855b0_14a458c4",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:00:01Z",
+      "side": 1,
+      "message": "Define `pageSize` as a constant, perhaps near the EP size definitions.",
+      "range": {
+        "startLine": 116,
+        "startChar": 0,
+        "endLine": 116,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce39ef66_7fdafabb",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:00:01Z",
+      "side": 1,
+      "message": "Casting to `unsigned long *` might have alignment issues or not be portable. Consider a byte-by-byte accumulation or using `uint32_t` if the intent is to sum 32-bit words.",
+      "range": {
+        "startLine": 337,
+        "startChar": 0,
+        "endLine": 337,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9faf2ce0_a90b271b",
+        "filename": "util/elan/iaptool.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:00:01Z",
+      "side": 1,
+      "message": "Avoid `using namespace std;` in header files.",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
