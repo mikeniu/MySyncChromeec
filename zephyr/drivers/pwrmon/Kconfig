@@ -1,0 +1,48 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config PWRMON
+	bool "Power monitoring"
+	default y
+	depends on DT_HAS_CROS_PWRMON_ENABLED
+	help
+	  This option enables power monitoring which serves interface
+	  between AP and power monitors.
+
+config PWRMON_THREAD_STACK_SIZE
+	int "Pwrmon thread stack size (in bytes)"
+	default 1024
+	help
+	  Stack size of thread created for the pwrmon.
+
+config PWRMON_THREAD_PRIORITY
+	int "Pwrmon thread priority"
+	default 10
+	help
+	  Set thread priority of the pwrmon.
+
+config PWRMON_MSGQ_SIZE
+	int "Pwrmon message queue size"
+	default 16
+	help
+	  Set message queue size for the pwrmon.
+
+choice PWRMON_POWER_MONITOR
+	prompt "Select the power monitor shim"
+	default PWRMON_POWER_MONITOR_PAC194X if DT_HAS_MICROCHIP_PAC194X_ENABLED
+	default PWRMON_POWER_MONITOR_COMMON
+	depends on PWRMON
+
+config PWRMON_POWER_MONITOR_COMMON
+	bool "Common zephyr sensor channels and attributes"
+	help
+	  This option enables common sensor channels for power monitors.
+
+config PWRMON_POWER_MONITOR_PAC194X
+	bool "PAC194x power monitor shim"
+	help
+	  This option enables shim for Microchip PAC194x/PAC195x family
+	  of power monitors.
+
+endchoice
