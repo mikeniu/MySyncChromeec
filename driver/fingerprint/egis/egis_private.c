@@ -44,6 +44,11 @@ static struct fp_sensor_info egis_sensor_info = {
 	.pixel_format = V4L2_PIX_FMT_GREY, .width = FP_SENSOR_RES_X_EGIS, \
 	.height = FP_SENSOR_RES_Y_EGIS, .bpp = FP_SENSOR_TEST_BPP_EGIS
 
+#define EGIS_IMAGE_COLLECTION_PARAMS                                      \
+	.bpp = FP_SENSOR_DEFAULT_BPP_EGIS, .frame_size = 26200,           \
+	.pixel_format = V4L2_PIX_FMT_GREY, .width = FP_SENSOR_RES_X_EGIS, \
+	.height = FP_SENSOR_RES_Y_EGIS
+
 static const struct fp_image_frame_params egis_image_frame_params[] = {
 	[EGIS_CAPTURE_NORMAL_FORMAT] =
 	{
@@ -80,6 +85,11 @@ static const struct fp_image_frame_params egis_image_frame_params[] = {
 		EGIS_TEST_IMAGE_PARAMS,
 		.fp_capture_type = FP_CAPTURE_QUALITY_TEST,
 	},
+	[EGIS_CAPTURE_IMAGE_COLLECTION] =
+	{
+		EGIS_IMAGE_COLLECTION_PARAMS,
+		.fp_capture_type = FP_CAPTURE_VENDOR_FORMAT,
+	},
 };
 
 static int convert_egis_get_image_error_code(egis_api_return_t code)
@@ -105,6 +115,7 @@ convert_fp_capture_type_to_egis_capture_type(enum fp_capture_type capture_type)
 {
 	switch (capture_type) {
 	case FP_CAPTURE_VENDOR_FORMAT:
+		return EGIS_CAPTURE_IMAGE_COLLECTION;
 	case FP_CAPTURE_SIMPLE_IMAGE:
 		return EGIS_CAPTURE_NORMAL_FORMAT;
 	case FP_CAPTURE_PATTERN0:
