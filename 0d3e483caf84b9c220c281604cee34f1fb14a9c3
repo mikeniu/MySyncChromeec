@@ -209,6 +209,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5cf4ab24_434782e5",
+        "filename": "zephyr/program/skywalker/r2d2/project.overlay",
+        "patchSetId": 22
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4590738
+      },
+      "writtenOn": "2026-03-24T10:35:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0af98fe0_de70a48c",
+      "revId": "0d3e483caf84b9c220c281604cee34f1fb14a9c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f9f6b2bb_1e1d1dff",
