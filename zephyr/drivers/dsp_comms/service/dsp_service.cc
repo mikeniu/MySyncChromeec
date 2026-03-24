@@ -191,16 +191,23 @@ static inline int ReadCbiValue(cros_dsp_comms_GetCbiFlagsResponse& response,
   return rc;
 }
 
-static void mode_handling_delayed(struct k_work* work) {
-  ARG_UNUSED(work);
-  int mode_val = cros::dsp::service::driver.get_mode_val();
-  if (IS_ENABLED(CONFIG_PLATFORM_EC_TABLET_MODE)) {
+static void mode_handling_delayed(struct k_work* work)
+{
+    ARG_UNUSED(work);
+
+    LOG_INF("MODE_WORK START t=%lld", (long long)k_uptime_get());
+
+    LOG_INF("GET MODE BEFORE t=%lld", (long long)k_uptime_get());
+    int mode_val = cros::dsp::service::driver.get_mode_val();
+    LOG_INF("GET MODE AFTER t=%lld", (long long)k_uptime_get());
+
+    LOG_INF("TABLET_SET_MODE BEFORE t=%lld", (long long)k_uptime_get());
     tablet_set_mode(mode_val, TABLET_TRIGGER_LID);
-  }
-  if (IS_ENABLED(CONFIG_PLATFORM_EC_DSP_REMOTE_LID_ANGLE)) {
-    lid_angle_peripheral_enable(!mode_val);
-  }
+    LOG_INF("TABLET_SET_MODE AFTER t=%lld", (long long)k_uptime_get());
+
+    LOG_INF("MODE_WORK END t=%lld", (long long)k_uptime_get());
 }
+
 
 void dsp_service_handle_get_cbi_flags_request(struct k_work*) {
   const cros_dsp_comms_GetCbiFlagsRequest* request =

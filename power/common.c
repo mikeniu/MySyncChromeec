@@ -714,7 +714,6 @@ void chipset_task(void *u)
 	static enum power_state last_state;
 	uint32_t this_in_signals;
 	static uint32_t last_in_signals;
-
 	while (1) {
 		/*
 		 * In order to prevent repeated console spam, only print the
