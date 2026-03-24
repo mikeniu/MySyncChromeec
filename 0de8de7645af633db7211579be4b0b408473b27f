@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c2fe5c5_34751edf",
+        "filename": "zephyr/include/adsp_comms.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-03-24T18:47:25Z",
+      "side": 1,
+      "message": "Use `UTIL_CAT` to concat.",
+      "range": {
+        "startLine": 34,
+        "startChar": 23,
+        "endLine": 34,
+        "endChar": 57
+      },
+      "revId": "0de8de7645af633db7211579be4b0b408473b27f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ab13dba_1a1e1f31",
+        "filename": "zephyr/include/adsp_comms.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-03-24T18:47:25Z",
+      "side": 1,
+      "message": "Add () to support arguments passing as expressions.",
+      "range": {
+        "startLine": 35,
+        "startChar": 9,
+        "endLine": 35,
+        "endChar": 13
+      },
+      "revId": "0de8de7645af633db7211579be4b0b408473b27f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82761f15_306900e7",
+        "filename": "zephyr/subsys/adsp_comms/Kconfig",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-03-24T18:47:25Z",
+      "side": 1,
+      "message": "The size of the struct is 4. It seems overkilled to have this Kconfig. You can simply pass 4 to `K_MSGQ_DEFINE`.",
+      "range": {
+        "startLine": 32,
+        "startChar": 7,
+        "endLine": 32,
+        "endChar": 28
+      },
+      "revId": "0de8de7645af633db7211579be4b0b408473b27f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75d90171_6934e88a",
+        "filename": "zephyr/subsys/adsp_comms/adsp_i2c_mode.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-03-24T18:47:25Z",
+      "side": 1,
+      "message": "Define it as a constant.",
+      "range": {
+        "startLine": 22,
+        "startChar": 22,
+        "endLine": 22,
+        "endChar": 23
+      },
+      "revId": "0de8de7645af633db7211579be4b0b408473b27f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72f0021c_cda69747",
+        "filename": "zephyr/subsys/adsp_comms/adsp_i2c_mode.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-03-24T18:47:25Z",
+      "side": 1,
+      "message": "Is the return code !\u003d 0 handled properly for `rx_buf` being full? Or simply drop the byte silently as-is?",
+      "range": {
+        "startLine": 83,
+        "startChar": 1,
+        "endLine": 83,
+        "endChar": 2
+      },
+      "revId": "0de8de7645af633db7211579be4b0b408473b27f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d28c0733_5d61119e",
+        "filename": "zephyr/subsys/adsp_comms/adsp_i2c_mode.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-03-24T18:47:25Z",
+      "side": 1,
+      "message": "Use the constant.",
+      "range": {
+        "startLine": 105,
+        "startChar": 15,
+        "endLine": 105,
+        "endChar": 16
+      },
+      "revId": "0de8de7645af633db7211579be4b0b408473b27f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
