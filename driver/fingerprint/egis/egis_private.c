@@ -80,13 +80,18 @@ static const struct fp_image_frame_params_v2 egis_image_frame_params[] = {
 		EGIS_TEST_IMAGE_PARAMS,
 		.fp_capture_type = FP_CAPTURE_QUALITY_TEST,
 	},
+	[EGIS_CAPTURE_IMAGE_COLLECTION] =
+	{
+		EGIS_DEFAULT_IMAGE_PARAMS,
+		.fp_capture_type = FP_CAPTURE_VENDOR_FORMAT,
+	},
 };
 
 static int convert_egis_get_image_error_code(egis_api_return_t code)
 {
 	switch (code) {
 	case EGIS_API_IMAGE_QUALITY_GOOD:
-		return EC_SUCCESS;
+		return FINGERPRINT_SENSOR_SCAN_GOOD;
 	case EGIS_API_IMAGE_QUALITY_BAD:
 	case EGIS_API_IMAGE_QUALITY_WATER:
 		return FP_SENSOR_LOW_IMAGE_QUALITY;
@@ -94,6 +99,8 @@ static int convert_egis_get_image_error_code(egis_api_return_t code)
 		return FP_SENSOR_TOO_FAST;
 	case EGIS_API_IMAGE_QUALITY_PARTIAL:
 		return FP_SENSOR_LOW_SENSOR_COVERAGE;
+	case EGIS_API_ERROR:
+		return -EINVAL;
 	default:
 		assert(code < 0);
 		return code;
@@ -105,6 +112,7 @@ convert_fp_capture_type_to_egis_capture_type(enum fp_capture_type capture_type)
 {
 	switch (capture_type) {
 	case FP_CAPTURE_VENDOR_FORMAT:
+		return EGIS_CAPTURE_IMAGE_COLLECTION;
 	case FP_CAPTURE_SIMPLE_IMAGE:
 		return EGIS_CAPTURE_NORMAL_FORMAT;
 	case FP_CAPTURE_PATTERN0:
@@ -193,10 +201,9 @@ __overridable int fp_finger_match(void *templ, uint32_t templ_count,
 				  uint8_t *image, bool template_update,
 				  int32_t *match_index, uint32_t *update_bitmap)
 {
-	/* TODO(b/479912675): Use template_update parameter. */
-
-	egis_api_return_t ret = egis_finger_match(templ, templ_count, image,
-						  match_index, update_bitmap);
+	egis_api_return_t ret = egis_finger_match(
+		templ, templ_count, (FP_EGIS_IMAGE *)image, match_index,
+		template_update ? update_bitmap : NULL);
 
 	switch (ret) {
 	case EGIS_API_MATCH_MATCHED:
@@ -229,7 +236,8 @@ __overridable int fp_enrollment_finish(void *templ)
 
 __overridable int fp_finger_enroll(uint8_t *image, int *completion)
 {
-	egis_api_return_t ret = egis_finger_enroll(image, completion);
+	egis_api_return_t ret =
+		egis_finger_enroll((FP_EGIS_IMAGE *)image, completion);
 	switch (ret) {
 	case EGIS_API_ENROLL_FINISH:
 	case EGIS_API_ENROLL_IMAGE_OK:
@@ -261,7 +269,7 @@ int fp_acquire_image(uint8_t *image_data, enum fp_capture_type capture_type)
 		return -EINVAL;
 	}
 	return convert_egis_get_image_error_code(
-		egis_get_image_with_mode(image_data, rc));
+		egis_get_image_with_mode(image_data, FP_SENSOR_IMAGE_SIZE, rc));
 }
 
 enum finger_state fp_finger_status(void)
