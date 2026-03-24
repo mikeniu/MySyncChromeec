@@ -16,8 +16,12 @@ from typing import Tuple
 
 SHA256_DIGEST_LENGTH = 32
 
+patterns = [
+    rb"TOUCHPAD_FW_HASHES \d+ (\d+)",
+    rb"TOUCHPAD_FW_ALT_HASHES \d+ (\d+)"
+]
 
-def calculate_update_pdu_size(ec_fw: Path, tp_fw: Path) -> int:
+def calculate_update_pdu_size(ec_fw: Path, tp_fw: list) -> int:
     """Calculate the UPDATE_PDU_SIZE
 
     This function assumes EC correctly allocates the TOUCHPAD_FW_HASHES section,
@@ -32,21 +36,24 @@ def calculate_update_pdu_size(ec_fw: Path, tp_fw: Path) -> int:
     """
 
     proc = subprocess.run(
-        ["futility", "dump_fmap", "-p", ec_fw, "TOUCHPAD_FW_HASHES"],
+        ["futility", "dump_fmap", "-p", ec_fw, "TOUCHPAD_FW_HASHES", "TOUCHPAD_FW_ALT_HASHES"],
         check=True,
         capture_output=True,
     )
     # output will be something like:
     #   TOUCHPAD_FW_HASHES 350648 2048
-    if match := re.match(rb"TOUCHPAD_FW_HASHES \d+ (\d+)", proc.stdout):
-        sec_size = int(match.group(1))
-    else:
-        raise ValueError("TOUCHPAD_FW_HASHES not found")
+    for pattern in patterns:
+        match = re.search(pattern, proc.stdout)
+        if match:
+            sec_size += int(match.group(1))
 
-    tp_fw_size = tp_fw.stat().st_size
-    num_blocks = sec_size // SHA256_DIGEST_LENGTH
+    for ec_fw in tp_fw:
+            tp_fw = Path(ec_fw)
+            tp_fw_size = tp_fw.stat().st_size
+            num_blocks = sec_size // SHA256_DIGEST_LENGTH
+            total_blocks += tp_fw_size // num_blocks
 
-    return tp_fw_size // num_blocks
+    return total_blocks
 
 
 def calculate_hashes(tp_fw: Path, update_pdu_size: int) -> Tuple[bytes, bytes]:
@@ -89,6 +96,7 @@ def main():
         "--tp-fw",
         type=Path,
         required=True,
+        nargs='+',
         help="Path to the touchpad firmware",
     )
 
@@ -96,7 +104,11 @@ def main():
 
     update_pdu_size = calculate_update_pdu_size(args.ec_fw, args.tp_fw)
 
-    tp_hashes, tp_full_hash = calculate_hashes(args.tp_fw, update_pdu_size)
+    for tp_fw in args.tp_fw:
+            tp_fw_path = Path(tp_fw)
+            tp_hashes, tp_full_hash_value = calculate_hashes(tp_fw_path, update_pdu_size)
+
+            all_tp_hashes += tp_hashes
 
     # inject touchpad hashes
     with tempfile.TemporaryDirectory() as work_dir:
@@ -104,6 +116,9 @@ def main():
 
         temp_tp_hashes = work_dir_path / "tp_hashes"
         temp_tp_hashes.write_bytes(tp_hashes)
+
+        temp_tp_alt_hashes = work_dir_path / "all_tp_hashes"
+        temp_tp_alt_hashes.write_bytes(all_tp_hashes)
 
         temp_tp_full_hash = work_dir_path / "tp_full_hash"
         temp_tp_full_hash.write_bytes(tp_full_hash)
@@ -114,6 +129,7 @@ def main():
                 "load_fmap",
                 args.ec_fw,
                 f"TOUCHPAD_FW_HASHES:{temp_tp_hashes}",
+                f"TOUCHPAD_FW_ALT_HASHES:{temp_tp_alt_hashes}",
                 f"TOUCHPAD_FW_FULL_HASH:{temp_tp_full_hash}",
             ],
         )

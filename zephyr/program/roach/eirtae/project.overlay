@@ -185,6 +185,10 @@
 	size = <((55296 / 1024) * 32)>;
 };
 
+&touchpad_fw_alt_hashes {
+	size = <((65536 / 1024) * 32)>;
+};
+
 &{/binman/wp-ro/ec-ro} {
 	fmap {
 		offset = <0x3c800>;
