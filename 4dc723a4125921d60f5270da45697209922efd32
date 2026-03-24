@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "178d2375_ce94aecb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-03-24T12:09:37Z",
+      "side": 1,
+      "message": "Fixed wrong automatic resolutions to match state on `ec-legacy` branch. Now the only differences are OWNERS files and `# shellcheck disable\u003dSC1091` in scripts.",
+      "revId": "4dc723a4125921d60f5270da45697209922efd32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
