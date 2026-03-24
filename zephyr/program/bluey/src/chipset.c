@@ -5,6 +5,7 @@
 
 /* Bluey chipset-specific configuration */
 
+#include "adsp_comms.h"
 #include "battery.h"
 #include "chipset.h"
 #include "common.h"
@@ -15,6 +16,16 @@
 #include "power/qcom.h"
 
 #define CPRINTS(format, args...) cprints(CC_CHIPSET, format, ##args)
+
+#define FEATURE_ID_POWER_STATE 0x03
+#define REG_ADDR_POWER_STATE 0x11
+
+static void adsp_power_state_cb(uint8_t fid, uint8_t addr, uint16_t data)
+{
+	CPRINTS("ADSP Power State: 0x%04x", data);
+}
+ADSP_COMMS_REGISTER_CB(FEATURE_ID_POWER_STATE, REG_ADDR_POWER_STATE,
+		       adsp_power_state_cb);
 
 void board_chipset_startup(void)
 {
