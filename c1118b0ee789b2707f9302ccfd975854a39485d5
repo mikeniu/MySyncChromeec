@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c0c16324_732b40ba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T23:08:08Z",
+      "side": 1,
+      "message": "This fails to build:\n\n```\n(chroot) ~/chromiumos/src/platform/ec $ make utils-host -j\n```\n\n```\nutil/elan/iapcontrol.cc:596:10: error: use of undeclared identifier \u0027TIMEOUT_TRANSFER\u0027\n  596 |                                             TIMEOUT_TRANSFER);\n      |                                             ^~~~~~~~~~~~~~~~\nutil/elan/iapcontrol.cc:629:10: error: use of undeclared identifier \u0027TIMEOUT_TRANSFER\u0027\n  629 |                                             TIMEOUT_TRANSFER);\n      |                                             ^~~~~~~~~~~~~~~~\nutil/elan/iapcontrol.cc:663:10: error: use of undeclared identifier \u0027TIMEOUT_TRANSFER\u0027\n  663 |                                             TIMEOUT_TRANSFER);\n      |                                             ^~~~~~~~~~~~~~~~\nutil/elan/iapcontrol.cc:694:10: error: use of undeclared identifier \u0027TIMEOUT_TRANSFER\u0027\n  694 |                                             TIMEOUT_TRANSFER);\n      |                                             ^~~~~~~~~~~~~~~~\nutil/elan/iapcontrol.cc:841:22: error: use of undeclared identifier \u0027COUNT_INTERFACE\u0027\n  841 |         for (int i \u003d 0; i \u003c COUNT_INTERFACE; i++) {\n      |                             ^~~~~~~~~~~~~~~\n5 errors generated.\n```",
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ec6d9fa8_17458f62",
         "filename": "util/elan/build.mk",
         "patchSetId": 1
