@@ -3,6 +3,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "77996093_4c47d9d5",
+        "filename": "util/elan/filecontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:01:54Z",
+      "side": 1,
+      "message": "Remove commented out code",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 70
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc68de3a_c62f1836",
+        "filename": "util/elan/filecontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:01:54Z",
+      "side": 1,
+      "message": "Remove commented out code",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 52
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6f42331a_3c932643",
         "filename": "util/elan/filecontrol.cc",
         "patchSetId": 1
@@ -295,6 +341,98 @@
         "startChar": 0,
         "endLine": 116,
         "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "366f8585_0f5071fb",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:01:54Z",
+      "side": 1,
+      "message": "Remove commented out code",
+      "range": {
+        "startLine": 129,
+        "startChar": 0,
+        "endLine": 130,
+        "endChar": 41
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2202c5e3_5c15289f",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:01:54Z",
+      "side": 1,
+      "message": "Remove commented out code",
+      "range": {
+        "startLine": 159,
+        "startChar": 0,
+        "endLine": 160,
+        "endChar": 41
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5af2f733_84363fb6",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:01:54Z",
+      "side": 1,
+      "message": "Remove commented out code",
+      "range": {
+        "startLine": 202,
+        "startChar": 0,
+        "endLine": 203,
+        "endChar": 21
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cff4c33a_fb2775a1",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T22:01:54Z",
+      "side": 1,
+      "message": "Remove commented out code",
+      "range": {
+        "startLine": 206,
+        "startChar": 0,
+        "endLine": 206,
+        "endChar": 69
       },
       "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
