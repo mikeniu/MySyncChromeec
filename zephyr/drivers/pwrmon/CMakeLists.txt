@@ -1,0 +1,3 @@
+zephyr_library_include_directories(include)
+zephyr_library_sources_ifdef(CONFIG_PWRMON pwrmon.c)
+zephyr_library_sources_ifdef(CONFIG_PWRMON_POWER_MONITOR_PAC194X power_monitor_pac194x.c)
