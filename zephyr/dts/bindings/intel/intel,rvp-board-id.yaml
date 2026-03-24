@@ -1,3 +1,4 @@
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 # Copyright 2022 The ChromiumOS Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
@@ -37,3 +38,37 @@ properties:
     description: |
      The C function name to call as a notification event when the board
      ID is available.
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+# Copyright 2022 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: Intel RVP Board id
+
+compatible: "intel,rvp-board-id"
+
+properties:
+  bom-gpios:
+    type: phandle-array
+    description: |
+     A list contains GPIO pins corresponding to BOM ID bits.
+
+  fab-gpios:
+    type: phandle-array
+    description: |
+     A list contains GPIO pins corresponding to FAB ID bits.
+
+  board-gpios:
+    type: phandle-array
+    required: true
+    description: |
+     A list contains GPIO pins corresponding to BOARD ID bits.
+
+  defer-until-s5:
+    type: phandle
+    description: |
+     Define the IOEX device node which needs to be deferred
+     until EC boots to S5 for RVP, as the power rail to the
+     IOEX comes up in S5 state.
+=======
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)

@@ -66,10 +66,8 @@ int crec_vsnprintf(char *str, size_t size, const char *format, va_list args)
 
 	return (rv == EC_SUCCESS) ? (ctx.str - str) : -rv;
 }
-#ifndef CONFIG_ZEPHYR
 int vsnprintf(char *str, size_t size, const char *format, va_list args)
 	__attribute__((weak, alias("crec_vsnprintf")));
-#endif /* CONFIG_ZEPHYR */
 
 int crec_snprintf(char *str, size_t size, const char *format, ...)
 {
@@ -82,15 +80,9 @@ int crec_snprintf(char *str, size_t size, const char *format, ...)
 
 	return rv;
 }
-#ifndef CONFIG_ZEPHYR
 int snprintf(char *str, size_t size, const char *format, ...)
 	__attribute__((weak, alias("crec_snprintf")));
-#endif /* CONFIG_ZEPHYR */
 
-/*
- * TODO(b/237712836): Zephyr's libc should provide strcasecmp. For now we'll
- * use the EC implementation.
- */
 __stdlib_compat int strcasecmp(const char *s1, const char *s2)
 {
 	int diff;
@@ -103,11 +95,6 @@ __stdlib_compat int strcasecmp(const char *s1, const char *s2)
 	return 0;
 }
 
-/*
- * TODO(b/237712836): Remove this conditional once strcasecmp is added to
- * Zephyr's libc.
- */
-#ifndef CONFIG_ZEPHYR
 __stdlib_compat size_t strlen(const char *s)
 {
 	int len = 0;
@@ -462,4 +449,3 @@ __stdlib_compat int strncmp(const char *s1, const char *s2, size_t n)
 	}
 	return 0;
 }
-#endif /* !CONFIG_ZEPHYR */

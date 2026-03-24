@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-/* brya family-specific CBI functions, shared with Zephyr */
+/* brya family-specific CBI functions */
 
 #ifndef __CROS_EC_BASEBOARD_CBI_H
 #define __CROS_EC_BASEBOARD_CBI_H

@@ -36,10 +36,6 @@
 #include "usb_tbt_alt_mode.h"
 #include "usb_tc_sm.h"
 
-#ifdef CONFIG_ZEPHYR
-#include "temp_sensor/temp_sensor.h"
-#endif
-
 #ifdef CONFIG_USB_PD_DEBUG_LEVEL
 static const enum debug_level dpm_debug_level = CONFIG_USB_PD_DEBUG_LEVEL;
 #elif defined(CONFIG_USB_PD_INITIAL_DEBUG_LEVEL)
@@ -147,23 +143,8 @@ static void print_current_state(const int port)
 	CPRINTS("C%d: %s", port, dpm_state_names[get_state_dpm(port)]);
 }
 
-#ifdef CONFIG_ZEPHYR
-static int init_dpm_mutexes(void)
-{
-	int port;
-
-	for (port = 0; port < CONFIG_USB_PD_PORT_MAX_COUNT; port++) {
-		k_mutex_init(&dpm[port].vdm_req_mutex);
-	}
-
-	return 0;
-}
-SYS_INIT(init_dpm_mutexes, POST_KERNEL, 50);
-#endif /* CONFIG_ZEPHYR */
-
 void pd_prepare_sysjump(void)
 {
-#ifndef CONFIG_ZEPHYR
 	int i;
 
 	/* Exit modes before sysjump so we can cleanly enter again later */
@@ -180,7 +161,6 @@ void pd_prepare_sysjump(void)
 		task_wait_event_mask(TASK_EVENT_SYSJUMP_READY, -1);
 		sysjump_task_waiting = TASK_ID_INVALID;
 	}
-#endif /* CONFIG_ZEPHYR */
 }
 
 void notify_sysjump_ready(void)

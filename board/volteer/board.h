@@ -192,6 +192,7 @@
 #undef CONFIG_CMD_PECI
 #undef CONFIG_CMD_RETIMER
 #undef CONFIG_CMD_RW
+#undef CONFIG_CMD_CHARGEN
 
 /* Disable volume button in ectool */
 #undef CONFIG_HOSTCMD_BUTTON

@@ -71,23 +71,4 @@ enum lsm6dsm_status {
  */
 #define LSM6DSM_DISCARD_SAMPLES 5
 
-#ifdef CONFIG_ZEPHYR
-
-#include <zephyr/devicetree.h>
-/* Get the motion sensor ID of the LSM6DSM sensor that generates the
- * interrupt. The interrupt is converted to the event and transferred to
- * motion sense task that actually handles the interrupt.
- *
- * Here we use an alias (lsm6dsm_int) to get the motion sensor ID. This alias
- * MUST be defined for this driver to work.
- * aliases {
- *   lsm6dsm-int = &lid_accel;
- * };
- */
-#if DT_NODE_EXISTS(DT_ALIAS(lsm6dsm_int))
-#define CONFIG_ACCEL_LSM6DSM_INT_EVENT \
-	TASK_EVENT_MOTION_SENSOR_INTERRUPT(SENSOR_ID(DT_ALIAS(lsm6dsm_int)))
-#endif
-#endif /* CONFIG_ZEPHYR */
-
 #endif /* __CROS_EC_DRIVER_ACCELGYRO_LSM6DSM_PUBLIC_H */

@@ -11,11 +11,10 @@
 #include "registers.h"
 #include "watchdog.h"
 
-void watchdog_reload(void)
+void chip_watchdog_reload(void)
 {
 	SCP_WDT_RELOAD = SCP_WDT_RELOAD_VALUE;
 }
-DECLARE_HOOK(HOOK_TICK, watchdog_reload, HOOK_PRIO_DEFAULT);
 
 int watchdog_init(void)
 {

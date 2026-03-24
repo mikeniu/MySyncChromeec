@@ -33,6 +33,7 @@
 /* Stop printing repeated host commands "+" after this count */
 #define HCDEBUG_MAX_REPEAT_COUNT 5
 
+static volatile bool hc_processing;
 static struct host_cmd_handler_args *pending_args;
 
 static enum {
@@ -215,6 +216,8 @@ void host_packet_respond(struct host_cmd_handler_args *args)
 	pkt0->response_size = sizeof(*r) + r->data_len;
 	pkt0->driver_result = args->result;
 	pkt0->send_response(pkt0);
+
+	hc_processing = false;
 }
 
 void host_packet_receive(struct host_packet *pkt)
@@ -225,6 +228,14 @@ void host_packet_receive(struct host_packet *pkt)
 	uint8_t *itmp = (uint8_t *)pkt->request_temp;
 	int csum = 0;
 	int i;
+
+	/* If the task is busy, don't stomp on its state. */
+	if (hc_processing) {
+		pkt->driver_result = EC_RES_BUSY;
+		pkt->send_response(pkt);
+		return;
+	}
+	hc_processing = true;
 
 	/* Track the packet we're handling */
 	pkt0 = pkt;
@@ -336,9 +347,21 @@ host_packet_bad:
 
 const struct host_command *find_host_command(int command)
 {
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 	if (IS_ENABLED(CONFIG_ZEPHYR)) {
 		return zephyr_find_host_command(command);
 	} else if (IS_ENABLED(CONFIG_HOSTCMD_SECTION_SORTED)) {
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+	if (IS_ENABLED(CONFIG_SYSTEM_SAFE_MODE) && system_is_in_safe_mode()) {
+		if (!command_is_allowed_in_safe_mode(command))
+			return NULL;
+	}
+	if (IS_ENABLED(CONFIG_ZEPHYR)) {
+		return zephyr_find_host_command(command);
+	} else if (IS_ENABLED(CONFIG_HOSTCMD_SECTION_SORTED)) {
+=======
+	if (IS_ENABLED(CONFIG_HOSTCMD_SECTION_SORTED)) {
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)
 		const struct host_command *l, *r, *m;
 		uint32_t num;
 

@@ -36,6 +36,9 @@ int console_is_restricted(void)
 /* Must come after other header files. */
 #include "gpio_list.h"
 
+/* Check if CONFIG_ROLLBACK_VERSION is set to expected value */
+BUILD_ASSERT(CONFIG_ROLLBACK_VERSION == 1);
+
 static void ap_deferred(void)
 {
 	/*

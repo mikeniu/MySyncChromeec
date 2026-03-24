@@ -1,3 +1,4 @@
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 /* Copyright 2025 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
@@ -59,3 +60,67 @@
 	pinctrl-0 = <&pwm2_gpa2_default>;
 	pinctrl-names = "default";
 };
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	pwmleds {
+		compatible = "pwm-leds";
+		pwm_pwr_red_led: pwm_pwr_red_led {
+			pwms = <&pwm1 1 PWM_HZ(2000) PWM_POLARITY_INVERTED>;
+		};
+		pwm_pwr_blue_led: pwm_pwr_blue_led {
+			pwms = <&pwm2 2 PWM_HZ(2000) PWM_POLARITY_INVERTED>;
+		};
+	};
+
+	cros-pwmleds {
+		compatible = "cros-ec,pwm-leds";
+
+		leds = <&pwm_pwr_red_led>;
+		leds = <&pwm_pwr_blue_led>;
+	};
+
+	pwm-led-pins {
+		compatible = "cros-ec,pwm-led-pins";
+
+		power_led: power-led {
+			led-id = "EC_LED_ID_POWER_LED";
+			led-pwms = <&pwm_pwr_red_led &pwm_pwr_blue_led>;
+
+			color-power-off {
+				led-color = "LED_OFF";
+				led-values = <0 0>;
+			};
+
+			color-power-red {
+				led-color = "LED_RED";
+				led-values = <100 0>;
+			};
+
+			color-power-blue {
+				led-color = "LED_BLUE";
+				led-values = <0 100>;
+			};
+		};
+	};
+};
+
+&pwm1 {
+	status = "okay";
+	prescaler-cx = <PWM_PRESCALER_C4>;
+	pinctrl-0 = <&pwm1_gpa1_default>;
+	pinctrl-names = "default";
+};
+
+&pwm2 {
+	status = "okay";
+	prescaler-cx = <PWM_PRESCALER_C4>;
+	pinctrl-0 = <&pwm2_gpa2_default>;
+	pinctrl-names = "default";
+};
+=======
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)

@@ -17,12 +17,6 @@
 #include "task.h"
 #include "util.h"
 
-#ifdef CONFIG_ZEPHYR
-#include "i2c/i2c.h"
-
-#include <zephyr/drivers/i2c.h>
-#endif /* CONFIG_ZEPHYR */
-
 #define CPUTS(outstr) cputs(CC_I2C, outstr)
 #define CPRINTS(format, args...) cprints(CC_I2C, format, ##args)
 #define CPRINTF(format, args...) cprintf(CC_I2C, format, ##args)
@@ -37,17 +31,6 @@ static mutex_t port_mutex[I2C_CONTROLLER_COUNT + I2C_BITBANG_PORT_COUNT];
 /* A bitmap of the controllers which are currently servicing a request. */
 static volatile uint32_t i2c_port_active_list;
 BUILD_ASSERT(ARRAY_SIZE(port_mutex) < 32);
-
-#ifdef CONFIG_ZEPHYR
-static int init_port_mutex(void)
-{
-	for (int i = 0; i < ARRAY_SIZE(port_mutex); ++i)
-		k_mutex_init(port_mutex + i);
-
-	return 0;
-}
-SYS_INIT(init_port_mutex, POST_KERNEL, 50);
-#endif /* CONFIG_ZEPHYR */
 
 /**
  * Non-deterministically test the lock status of the port.  If another task
@@ -199,67 +182,7 @@ int i2c_xfer_unlocked(const int port, const uint16_t addr_flags,
 	}
 
 	for (i = 0; i <= CONFIG_I2C_NACK_RETRY_COUNT; i++) {
-#ifdef CONFIG_ZEPHYR
-		struct i2c_msg msg[2];
-		int num_msgs = 0;
-
-		/* Be careful to respect the flags passed in */
-		if (out_size) {
-			unsigned int wflags = I2C_MSG_WRITE;
-
-			msg[num_msgs].buf = (uint8_t *)out;
-			msg[num_msgs].len = out_size;
-
-			/* If this is the last write, add a stop */
-			if (!in_size && (flags & I2C_XFER_STOP))
-				wflags |= I2C_MSG_STOP;
-			msg[num_msgs].flags = wflags;
-			num_msgs++;
-		}
-		if (in_size) {
-			unsigned int rflags = I2C_MSG_READ;
-
-			msg[num_msgs].buf = (uint8_t *)in;
-			msg[num_msgs].len = in_size;
-			rflags = I2C_MSG_READ;
-
-			/* If a stop is requested, add it */
-			if (flags & I2C_XFER_STOP)
-				rflags |= I2C_MSG_STOP;
-
-			/*
-			 * If this read follows a write (above) then we need a
-			 * restart
-			 */
-			if (num_msgs || flags & I2C_XFER_RESTART)
-				rflags |= I2C_MSG_RESTART;
-			msg[num_msgs].flags = rflags;
-			num_msgs++;
-		}
-
-		/* Big endian flag is used in wrappers for this call */
-		if (no_pec_af & ~(I2C_ADDR_MASK | I2C_FLAG_BIG_ENDIAN))
-			CPRINTF("Ignoring flags from i2c addr_flags: %04x",
-				no_pec_af);
-
-		ret = i2c_transfer(i2c_get_device_for_port(port), msg, num_msgs,
-				   I2C_STRIP_FLAGS(no_pec_af));
-
-		if (IS_ENABLED(CONFIG_I2C_DEBUG)) {
-			i2c_trace_notify(port, addr_flags, out, out_size, in,
-					 in_size, ret);
-		}
-
-		switch (ret) {
-		case 0:
-			return EC_SUCCESS;
-		case -EIO:
-			ret = EC_ERROR_INVAL;
-			continue;
-		default:
-			return EC_ERROR_UNKNOWN;
-		}
-#elif defined(CONFIG_I2C_XFER_LARGE_TRANSFER)
+#if defined(CONFIG_I2C_XFER_LARGE_TRANSFER)
 		ret = i2c_xfer_no_retry(port, no_pec_af, out, out_size, in,
 					in_size, flags);
 #else
@@ -905,14 +828,6 @@ enum i2c_freq i2c_get_freq(int port)
 
 static enum ec_status i2c_command_control(struct host_cmd_handler_args *args)
 {
-#ifdef CONFIG_ZEPHYR
-	/* For Zephyr, convert the received remote port number to a port number
-	 * used in EC.
-	 */
-	((struct ec_params_i2c_control *)(args->params))->port =
-		i2c_get_port_from_remote_port(
-			((struct ec_params_i2c_control *)(args->params))->port);
-#endif
 	const struct ec_params_i2c_control *params = args->params;
 	struct ec_response_i2c_control *resp = args->response;
 	enum i2c_freq old_i2c_freq;

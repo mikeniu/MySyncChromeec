@@ -17,11 +17,6 @@
 #include "usbc_ppc.h"
 #include "util.h"
 
-#ifdef CONFIG_ZEPHYR
-#include "baseboard_usbc_config.h"
-#include "usbc_config.h"
-#endif
-
 /******************************************************************************/
 void tcpc_alert_event(enum gpio_signal signal)
 {

@@ -17,7 +17,6 @@
 #define CPRINTSUSB(format, args...) cprints(CC_USBCHARGE, format, ##args)
 #define CPRINTFUSB(format, args...) cprintf(CC_USBCHARGE, format, ##args)
 
-#ifndef CONFIG_ZEPHYR
 /* Charger Chip Configuration */
 const struct charger_config_t chg_chips[] = {
 	{
@@ -27,7 +26,6 @@ const struct charger_config_t chg_chips[] = {
 	},
 };
 BUILD_ASSERT(ARRAY_SIZE(chg_chips) == CHARGER_NUM);
-#endif
 
 int board_set_active_charge_port(int port)
 {

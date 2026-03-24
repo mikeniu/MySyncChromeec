@@ -194,6 +194,19 @@
 #define USB_PD_PORT_ANX74XX 0
 #define USB_PD_PORT_PS8751 1
 
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+/* System safe mode for improved panic debugging */
+#define CONFIG_SYSTEM_SAFE_MODE
+
+=======
+/* Panic Handling Features */
+#ifdef SECTION_IS_RW
+#define CONFIG_PRESERVED_RING_BUF
+#define CONFIG_PANIC_LOG
+#endif
+
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)
 #ifndef __ASSEMBLER__
 
 #include "gpio_signal.h"

@@ -7,3 +7,5 @@ include chromiumos/owners:v1:/firmware/OWNERS.cros_fp_lrs
 
 # Allow SIEs to maintain ec
 include chromiumos/owners:v1:/sie/OWNERS.chromeos_sie_lrs
+
+include chromiumos/owners:v1:/bots/OWNERS.copybot

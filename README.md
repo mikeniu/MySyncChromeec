@@ -5,7 +5,7 @@
 > **Note** - This document covers the legacy Chrome EC implementation. The
 > legacy EC implementation is used by all Chromebook reference designs prior to
 > July 2021. On newer Chromebook designs, the EC implementation is based on the
-> Zephyr RTOS. Refer to the [Zephyr EC Introduction](./docs/zephyr/README.md)
+> Zephyr RTOS. Refer to the [Zephyr EC Introduction](https://chromium.googlesource.com/chromiumos/platform/ec/+/main/docs/zephyr/README.md)
 > for details on the Zephyr EC implementation.
 
 ## Introduction

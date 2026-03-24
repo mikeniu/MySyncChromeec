@@ -1,3 +1,4 @@
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 /* Copyright 2025 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
@@ -61,3 +62,39 @@
 	apb3-prescaler = <4>;
 	apb4-prescaler = <1>;
 };
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* bluey program common DTS includes */
+
+#include <cros/integrated_fwid.dtsi>
+
+#include "../interrupts.dtsi"
+#include "../adc.dtsi"
+#include "../i2c.dtsi"
+#include "../common.dtsi"
+#include "../psl.dtsi"
+
+/* quartz project DTS includes */
+
+#include "gpios.dtsi"
+#include "battery.dtsi"
+#include "fan.dtsi"
+#include "keyboard.dtsi"
+#include "temp_sensors.dtsi"
+
+/* quartz overrides follow... */
+
+&cbi_flash {
+	/*
+	 * CBI section size is 0x1000 bytes, the CBI portion lies at the end of
+	 * EC_RO section.
+	 */
+	offset = <0x3e000>;
+	size = <0x1000>;
+};
+=======
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)

@@ -14,10 +14,6 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
-#ifdef CONFIG_ZEPHYR
-#include "zephyr_console_shim.h"
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -25,23 +21,8 @@ extern "C" {
 /*
  * Define uart_shell_stop(), uart_shell_start(), and
  * uart_shell_rx_bypass(enable) functions to start/stop/bypass the running
- * shell. To avoid having a guard on the build type, non-Zephyr builds will
- * have a stubbed function for these which is safe to call. These functions
- * will stop/start/stop the Zephyr shell from processing, they should be used
- * for briefly taking control of the uart.
+ * shell.
  */
-#ifdef CONFIG_ZEPHYR
-int uart_shell_stop(void);
-void uart_shell_start(void);
-void uart_shell_rx_bypass(bool enable);
-
-#ifdef TEST_BUILD
-/* Gets the pointer to the zephyr shell, since it might not always be
- * the uart backend.
- */
-const struct shell *get_ec_shell(void);
-#endif
-#else
 static inline int uart_shell_stop(void)
 {
 	return 0;
@@ -52,7 +33,6 @@ static inline void uart_shell_start(void)
 static inline void uart_shell_rx_bypass(bool enable)
 {
 }
-#endif
 
 /*
  * The EC code base has been using %h to print a hex buffer. Encode the
@@ -267,7 +247,7 @@ void console_has_input(void);
  * @param help          String with one-line description of command, or NULL.
  * @param flags         Per-command flags, if needed.
  */
-#if !defined(HAS_TASK_CONSOLE) && !defined(CONFIG_ZEPHYR)
+#if !defined(HAS_TASK_CONSOLE)
 #define DECLARE_CONSOLE_COMMAND(NAME, ROUTINE, ARGDESC, HELP) \
 	static int(ROUTINE)(int argc, const char **argv) __attribute__((unused))
 #define DECLARE_SAFE_CONSOLE_COMMAND(NAME, ROUTINE, ARGDESC, HELP) \

@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-/* Volteer family-specific functions, shared with Zephyr */
+/* Volteer family-specific functions */
 
 #include "cbi_ec_fw_config.h"
 #include "common.h"

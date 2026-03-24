@@ -1,3 +1,4 @@
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 /* Copyright 2022 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
@@ -166,3 +167,55 @@ ZTEST_USER(console_cmd_hcdebug, test_hcdebug_params)
 	run_command_and_check_output(&args, 5, expected, ARRAY_SIZE(expected),
 				     NULL);
 }
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+/* Copyright 2022 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "console.h"
+#include "ec_commands.h"
+#include "test/drivers/test_state.h"
+
+#include <zephyr/shell/shell.h>
+#include <zephyr/ztest.h>
+
+static void console_cmd_hcdebug_after(void *fixture)
+{
+	ARG_UNUSED(fixture);
+	shell_execute_cmd(get_ec_shell(), "hcdebug off");
+}
+
+ZTEST_SUITE(console_cmd_hcdebug, drivers_predicate_post_main, NULL, NULL,
+	    console_cmd_hcdebug_after, NULL);
+
+ZTEST_USER(console_cmd_hcdebug, test_too_many_args)
+{
+	int rv = shell_execute_cmd(get_ec_shell(), "hcdebug arg1 arg2");
+
+	zassert_not_equal(rv, EC_SUCCESS, "Expected %d, but got %d",
+			  EC_ERROR_PARAM_COUNT, rv);
+}
+
+ZTEST_USER(console_cmd_hcdebug, test_no_args)
+{
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "hcdebug"), NULL);
+}
+
+ZTEST_USER(console_cmd_hcdebug, test_invalid_arg)
+{
+	int rv = shell_execute_cmd(get_ec_shell(), "hcdebug bar");
+
+	zassert_equal(rv, EC_ERROR_PARAM1, "Expected %d, but got %d",
+		      EC_ERROR_PARAM1, rv);
+}
+
+ZTEST_USER(console_cmd_hcdebug, test_valid_args)
+{
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "hcdebug off"), NULL);
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "hcdebug normal"), NULL);
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "hcdebug every"), NULL);
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "hcdebug params"), NULL);
+}
+=======
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)

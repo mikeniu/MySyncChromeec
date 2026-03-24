@@ -1,3 +1,4 @@
+<<<<<<< HEAD   (453fd99d5363bf9651b2fb0d3ffbbab7386a6376 program,zmake: drop cmsis references)
 /* Copyright 2025 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
@@ -58,3 +59,62 @@
 &flash_controller {
 	status = "okay";
 };
+||||||| BASE   (0cb93ccd933607defa9592c423c9a9fb4946fd4d anakin: Set PDC source PDO overcurrent capability)
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <cros/realtek/realtek.dtsi>
+#include <dt-bindings/gpio_defines.h>
+#include <dt-bindings/gpio/realtek-gpio.h>
+#include <realtek/ec/rts5912-pinctrl.dtsi>
+#include <cros/vivaldi_kbd_default.dtsi>
+
+#define GPIO_VOLTAGE_1P8 RTS5912_GPIO_VOLTAGE_1V8
+
+/ {
+	model = "Google realtek Baseboard";
+
+	chosen {
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zephyr,flash-controller = &flash_controller;
+		zephyr,console = &uart0;
+		zephyr,shell-uart = &uart0;
+	};
+};
+
+&uart0 {
+	status = "okay";
+	current-speed = <115200>;
+};
+
+&uart0_wrapper {
+	status = "okay";
+	pinctrl-0 = <&uart_rx_gpio113 &uart_tx_gpio114>;
+	pinctrl-names = "default";
+	rx-gpios = <RTS5912_GPIO113 GPIO_ACTIVE_HIGH>;
+};
+
+&espi0 {
+	pinctrl-0 = < &espi_alert_gpio003 &espi_cs_gpio004
+				&espi_io3_gpio005 &espi_io2_gpio006
+				&espi_io1_gpio007 &espi_io0_gpio008
+				&espi_clk_gpio009 &espi_reset_gpio020>;
+	pinctrl-names = "default";
+};
+
+&bbram {
+	status = "okay";
+};
+
+&eflash {
+	status = "okay";
+};
+
+&flash_controller {
+	status = "okay";
+};
+=======
+>>>>>>> BRANCH (86da3bbeafeffe5727f5bfec7d9eed87995f2661 UPSTREAM: driver: add new ALS CM36781 driver code)
