@@ -92,6 +92,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "02532416_bb81b4c7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-24T18:18:29Z",
+      "side": 1,
+      "message": "ok, I added acquiring the lock before calling `flash_control_register_locked` and releasing it afterwards.\n\nbtw, I tried to acquire the lock twice:\n\n```\n\t/* Lock physical flash operations */\n\tcrec_flash_lock_mapped_storage(1);\n\tcrec_flash_lock_mapped_storage(1);\n\n\tret \u003d cros_flash_npcx_get_status_reg(dev, SPI_NOR_CMD_RDSR, \u0026reg);\n\n\t/* Unlock physical flash operations */\n\tcrec_flash_lock_mapped_storage(0);\n\tcrec_flash_lock_mapped_storage(0);\n```\n\nThe test still passes. I am 100% sure that `crec_flash_lock_mapped_storage` was called because I added a log and verified that `CONFIG_PLATFORM_EC_EXTERNAL_STORAGE` is enabled. Is my understanding correct:\n\n\"\"\"\nThe reason that the test does not freeze or deadlock despite multiple calls is that Zephyr\u0027s `K_MUTEX_DEFINE` creates a reentrant (recursive) mutex by default? Ia it true that in Zephyr `k_mutex` is designed to allow the owning thread to re-lock the same mutex multiple times without blocking?\n\"\"\"",
+      "parentUuid": "11d2e33b_5d500ef5",
+      "revId": "8032bbde0acb1853d04d3f0f02db11c6e66174fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bc10e535_d643f046",
         "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
         "patchSetId": 5
