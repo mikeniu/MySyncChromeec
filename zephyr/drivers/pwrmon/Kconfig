@@ -1,0 +1,9 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+menuconfig PWRMON
+	bool "Power monitoring"
+	help
+	  This option enables power monitoring which serves interface
+	  between AP and power monitors.

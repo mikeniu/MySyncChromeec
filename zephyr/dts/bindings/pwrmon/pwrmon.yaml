@@ -1,0 +1,48 @@
+description: EC Power Monitoring subsystem
+
+compatible: "cros,pwrmon"
+
+properties:
+  sample-rate:
+    type: int
+    required: true
+    description: Default sampling rate in Hz
+
+  power-monitors:
+    type: phandles
+    required: true
+    description: List of phandles pointing to power monitors sensors
+
+  pwrmon-gpios:
+      type: phandle-array
+      description: GPIO used to switch the I2C bus to the EC
+
+  pwrmon-sample-count:
+      type: int
+      required: true
+      description: Sensor channel for reading sample count
+
+  pwrmon-channel-enable-attr:
+      type: int
+      required: true
+      description: Attribute used to enable power monitor channel
+
+  pwrmon-channel-base:
+      type: int
+      description: Private sensor channel base for power measuments
+
+  pwrmon-latch-attr:
+      type: int
+      description: Attribute for latching power monitor
+
+  pwrmon-latch-val:
+      type: int
+      description: Value used to trigger latch
+
+  pwrmon-refresh-attr:
+      type: int
+      description: Attribute used to change refresh mode
+
+  pwrmon-refresh-val:
+      type: int
+      description: Power monitor refresh mode
