@@ -22,6 +22,30 @@
       },
       "revId": "35805a23b1b875d1810012cffd74879ae45c74d4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3483217c_0333436e",
+        "filename": "zephyr/drivers/cros_system/cros_system_rtk.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-24T23:25:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "adc26d79_7d044125",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 35
+      },
+      "revId": "35805a23b1b875d1810012cffd74879ae45c74d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
