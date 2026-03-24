@@ -1,0 +1,38 @@
+# Copyright 2024 Google LLC
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: |
+  GPIO IRQ bindinggs.
+
+compatible: "cros-ec,irq-gpio"
+
+child-binding:
+  description: GPIO IRQ definition.
+
+  properties:
+    gpios:
+      type: phandle-array
+      required: true
+      description: |
+        GPIO that will detect interruption.
+
+    flags:
+      type: int
+      description: The zephyr gpio interrupt config flags.
+
+    debounce-ms:
+      type: int
+      default: 0
+      description: |
+        Debounce time in milliseconds.
+
+    enable-on-init:
+      type: boolean
+      description: |
+        Defines if this irq is enabled once initialized..
+
+    fire-on-init:
+      type: boolean
+      description: |
+        Defines if this irq is fired one time after it has been initialized.
