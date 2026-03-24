@@ -1,0 +1,28 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config PWRMON
+	bool "Power monitoring"
+	default y
+	depends on DT_HAS_CROS_PWRMON_ENABLED
+	help
+	  This option enables power monitoring which serves interface
+	  between AP and power monitors.
+
+config PWRMON_POWER_MONITOR_COMMON
+	bool "Common zephyr sensor channels and attributes"
+	default y
+	depends on PWRMON
+	depends on !DT_HAS_MICROCHIP_PAC194X_ENABLED
+	help
+	  This option enables common sensor channels for power monitors.
+
+config PWRMON_POWER_MONITOR_PAC194X
+	bool "PAC194x power monitor shim"
+	default y
+	depends on PWRMON
+	depends on DT_HAS_MICROCHIP_PAC194X_ENABLED
+	help
+	  This option enables shim for Microchip PAC194x/PAC195x family
+	  of power monitors.
