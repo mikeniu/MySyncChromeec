@@ -69,6 +69,10 @@ static int cros_flash_npcx_get_status_reg(const struct device *dev,
 	};
 	struct cros_flash_npcx_data *data = DRV_DATA(dev);
 
+	if (data == NULL) {
+		return -EINVAL;
+	}
+
 	/* Execute UMA transaction */
 	return flash_ex_op(data->flash_dev, FLASH_NPCX_EX_OP_EXEC_UMA,
 			   (uintptr_t)&op_in, &op_out);
@@ -140,6 +144,10 @@ int cros_flash_npcx_set_write_enable(const struct device *dev)
 	};
 	struct cros_flash_npcx_data *data = DRV_DATA(dev);
 
+	if (data == NULL) {
+		return -EINVAL;
+	}
+
 	/* Wait for previous operation to complete */
 	ret = cros_flash_npcx_wait_ready(dev);
 	if (ret != 0) {
@@ -173,6 +181,10 @@ int __maybe_unused cros_flash_npcx_set_write_disable(const struct device *dev)
 	};
 	struct cros_flash_npcx_data *data = DRV_DATA(dev);
 
+	if (data == NULL) {
+		return -EINVAL;
+	}
+
 	/* Wait for any previous operations to finish. */
 	ret = cros_flash_npcx_wait_ready(dev);
 	if (ret != 0) {
@@ -200,7 +212,7 @@ static int cros_flash_npcx_set_status_reg(const struct device *dev,
 	};
 	struct cros_flash_npcx_data *data = DRV_DATA(dev);
 
-	if (data == 0) {
+	if (data == NULL) {
 		return -EINVAL;
 	}
 
@@ -229,6 +241,10 @@ static int cros_flash_npcx_write_protection_set(const struct device *dev,
 	};
 	struct cros_flash_npcx_data *data = DRV_DATA(dev);
 
+	if (data == NULL) {
+		return -EINVAL;
+	}
+
 	/* Write protection can be cleared only by core domain reset */
 	if (!enable) {
 		LOG_ERR("WP can be disabled only via core domain reset ");
@@ -244,6 +260,10 @@ static int cros_flash_npcx_write_protection_is_set(const struct device *dev)
 	int ret;
 	struct npcx_ex_ops_qspi_oper_out oper_out;
 	struct cros_flash_npcx_data *data = DRV_DATA(dev);
+
+	if (data == NULL) {
+		return -EINVAL;
+	}
 
 	ret = flash_ex_op(data->flash_dev, FLASH_NPCX_EX_OP_GET_QSPI_OPER,
 			  (uintptr_t)NULL, &oper_out);
@@ -310,6 +330,10 @@ static int cros_flash_npcx_uma_lock(const struct device *dev, bool enable)
 		.mask = NPCX_EX_OP_LOCK_UMA,
 	};
 	struct cros_flash_npcx_data *data = DRV_DATA(dev);
+
+	if (data == NULL) {
+		return -EINVAL;
+	}
 
 	oper_in.enable = enable;
 	return flash_ex_op(data->flash_dev, FLASH_NPCX_EX_OP_SET_QSPI_OPER,
@@ -638,6 +662,10 @@ static int cros_flash_npcx_write(const struct device *dev, int offset, int size,
 	int ret = 0;
 	struct cros_flash_npcx_data *data = DRV_DATA(dev);
 
+	if (data == NULL) {
+		return -EINVAL;
+	}
+
 	/* check protection */
 	if (all_protected)
 		return EC_ERROR_ACCESS_DENIED;
@@ -677,6 +705,10 @@ static int cros_flash_npcx_erase(const struct device *dev, int offset, int size)
 	int ret = 0;
 	struct cros_flash_npcx_data *data = DRV_DATA(dev);
 	size_t reload_size = FLASH_WATCHDOG_RELOAD_SIZE;
+
+	if (data == NULL) {
+		return -EINVAL;
+	}
 
 	/* check protection */
 	if (all_protected)
@@ -815,6 +847,10 @@ static int cros_flash_npcx_get_jedec_id(const struct device *dev,
 	uint8_t jedec_id[3];
 	struct cros_flash_npcx_data *data = DRV_DATA(dev);
 
+	if (data == NULL) {
+		return -EINVAL;
+	}
+
 	/* Lock physical flash operations */
 	crec_flash_lock_mapped_storage(1);
 
@@ -854,6 +890,10 @@ static DEVICE_API(cros_flash, cros_flash_npcx_driver_api) = {
 static int flash_npcx_init(const struct device *dev)
 {
 	struct cros_flash_npcx_data *data = DRV_DATA(dev);
+
+	if (data == NULL) {
+		return -EINVAL;
+	}
 
 	data->flash_dev = DEVICE_DT_GET(FLASH_DEV);
 	if (!device_is_ready(data->flash_dev)) {
