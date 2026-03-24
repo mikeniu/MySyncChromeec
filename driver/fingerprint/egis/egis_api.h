@@ -96,6 +96,9 @@ typedef enum {
  * @EGIS_CAPTURE_ABNORMAL_TEST: Capture for check abnormal pixel test with
  * 16-bits per pixel output
  * @EGIS_CAPTURE_RV_INT_TEST: Capture for RV test with 16-bits per pixel output
+ * @EGIS_CAPTURE_IMAGE_COLLECTION: Capture for data collection tool with
+ * matcher image(5120 Bytes) + metadata(20 Bytes) + Raw image(10530 Bytes) +
+ * BKG image(10530 Bytes)
  * @EGIS_CAPTURE_TYPE_MAX: End of enum
  *
  */
@@ -108,6 +111,7 @@ typedef enum {
 	EGIS_CAPTURE_NOISE_TEST = 4,
 	EGIS_CAPTURE_ABNORMAL_TEST = 5,
 	EGIS_CAPTURE_RV_INT_TEST = 6,
+	EGIS_CAPTURE_IMAGE_COLLECTION = 7,
 	EGIS_CAPTURE_TYPE_MAX,
 } egis_capture_mode_t;
 
@@ -237,8 +241,9 @@ egis_api_return_t egis_check_int_status(void);
  * @param templ_count the number of buffers in the array of templates.
  * @param[in] image the buffer containing the finger image
  * @param match_index index of the matched finger in the template array if any.
- * @param[out] update_bitmap contains one bit per template, the bit is set if
- * the match has updated the given template.
+ * @param[out] update_bitmap Optional. Contains one bit per template, the bit
+ * is set if the match has updated the given template. If update_bitmap is
+ * NULL, updates are denied even if a match occurs.
  *
  * @return EGIS_API_MATCH_NOT_MATCHED on non-match
  * @return EGIS_API_MATCH_MATCHED for match when template was not updated with

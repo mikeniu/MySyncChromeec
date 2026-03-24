@@ -99,11 +99,9 @@ static int egis_egis630_match(const struct fingerprint_algorithm *const alg,
 		return -ENOTSUP;
 	}
 
-	/* TODO(b/479912675): Use template_update parameter. */
-
-	egis_api_return_t ret = egis_finger_match(templ, templ_count,
-						  (uint8_t *)image, match_index,
-						  update_bitmap);
+	egis_api_return_t ret = egis_finger_match(
+		templ, templ_count, (uint8_t *)image, match_index,
+		template_update ? update_bitmap : NULL);
 
 	switch (ret) {
 	case EGIS_API_MATCH_MATCHED:
