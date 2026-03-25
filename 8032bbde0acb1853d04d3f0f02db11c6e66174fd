@@ -110,6 +110,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8bb5fa94_712ff4df",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-25T22:43:46Z",
+      "side": 1,
+      "message": "\u003e Is my understanding correct\n\nLooks like it:\nhttps://docs.zephyrproject.org/latest/kernel/services/synchronization/mutexes.html#reentrant-locking",
+      "parentUuid": "02532416_bb81b4c7",
+      "revId": "8032bbde0acb1853d04d3f0f02db11c6e66174fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bc10e535_d643f046",
         "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
         "patchSetId": 5
