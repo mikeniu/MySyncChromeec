@@ -1267,7 +1267,7 @@ static void decide_charge_state(int *need_staticp, int *battery_criticalp)
 		return;
 	}
 
-	/* Okay, we're on AC and we should have a battery. */
+	/* Okay, we're on AC. */
 
 	/* Used for factory tests. */
 	if (get_chg_ctrl_mode() != CHARGE_CONTROL_NORMAL) {
