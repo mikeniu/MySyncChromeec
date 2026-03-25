@@ -357,6 +357,27 @@ static void upgrade_out_handler(struct consumer const *consumer, size_t count)
 		return;
 	}
 
+	if (count > block_size) {
+		uint8_t buf[16];
+
+		CPRINTS("Overflow attempt, %d > %d", count,  block_size);
+
+		/* Drain the queue. */
+		while (count > 0) {
+			uint32_t to_read = MIN(sizeof(buf), count);
+
+			QUEUE_REMOVE_UNITS(consumer->queue, buf, to_read);
+			count -= to_read;
+		}
+
+		/* Release the buffer. */
+		shared_mem_release(block_buffer);
+
+
+		rx_state_ = rx_idle;
+		return;
+	}
+
 	/* Must be inside block. */
 	QUEUE_REMOVE_UNITS(consumer->queue, block_buffer + block_index, count);
 	block_index += count;
