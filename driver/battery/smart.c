@@ -519,16 +519,19 @@ void battery_get_params(struct batt_params *batt)
 	memcpy(&batt_new, batt, sizeof(*batt));
 	batt_new.flags &= ~BATT_FLAG_VOLATILE;
 
-#if defined(CONFIG_BATTERY_PRESENT_CUSTOM) || \
-	defined(CONFIG_BATTERY_PRESENT_GPIO)
-	/* Hardware can tell us for certain */
+	/*
+	 * For CONFIG_PLATFORM_EC_BATTERY_PRESENT_NONE=y, we could have a more
+	 * precise is_present by checking if any sb_read succeeds. However,
+	 * we prefer a value that is consistent with battery_is_present().
+	 */
 	batt_new.is_present = battery_is_present();
-	if (batt_new.is_present != BP_YES) {
+	/* Skip only if we *know* there's no battery. */
+	if (batt_new.is_present == BP_NO) {
 		batt->is_present = BP_NO;
 		batt->flags = BATT_FLAG_BAD_ANY;
 		return;
 	}
-#endif
+
 	if (sb_read(SB_TEMPERATURE, &batt_new.temperature) &&
 	    fake_temperature < 0)
 		batt_new.flags |= BATT_FLAG_BAD_TEMPERATURE;
@@ -575,15 +578,6 @@ void battery_get_params(struct batt_params *batt)
 #ifdef CONFIG_BATTERY_MEASURE_IMBALANCE
 	if (battery_imbalance_mv() > CONFIG_BATTERY_MAX_IMBALANCE_MV)
 		batt_new.flags |= BATT_FLAG_IMBALANCED_CELL;
-#endif
-
-#if !defined(CONFIG_BATTERY_PRESENT_CUSTOM) && \
-	!defined(CONFIG_BATTERY_PRESENT_GPIO)
-	/* No hardware test, so we only know it's there if it responds */
-	if (batt_new.flags & BATT_FLAG_RESPONSIVE)
-		batt_new.is_present = BP_YES;
-	else
-		batt_new.is_present = BP_NOT_SURE;
 #endif
 
 	if (battery_want_charge(&batt_new))
