@@ -225,6 +225,30 @@
       },
       "revId": "8032bbde0acb1853d04d3f0f02db11c6e66174fd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "252005a6_0dac1789",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 3306924
+      },
+      "writtenOn": "2026-03-25T10:32:10Z",
+      "side": 1,
+      "message": "This looks correct to me.",
+      "parentUuid": "dcd37ee6_87485862",
+      "range": {
+        "startLine": 278,
+        "startChar": 0,
+        "endLine": 278,
+        "endChar": 49
+      },
+      "revId": "8032bbde0acb1853d04d3f0f02db11c6e66174fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
