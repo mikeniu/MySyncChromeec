@@ -1,6 +1,29 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "cafedd7e_7192776b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-03-25T22:31:40Z",
+      "side": 1,
+      "message": "please add a tracker.",
+      "range": {
+        "startLine": 21,
+        "startChar": 4,
+        "endLine": 21,
+        "endChar": 8
+      },
+      "revId": "10448a6e9d32d425b7cbdd1a4178ea33e7de4f94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "0fb8ef8a_d964584c",
@@ -14,6 +37,75 @@
       "writtenOn": "2026-03-25T22:07:04Z",
       "side": 1,
       "message": "This is a WIP but wanted to get some feedback on if this was a change that would make sense. It could be extended to non RVPs but we would need a way to extend the base board_id as well.",
+      "revId": "10448a6e9d32d425b7cbdd1a4178ea33e7de4f94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05987cb2_f146baab",
+        "filename": "zephyr/drivers/board_id/board_id_intel_rvp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-03-25T22:31:40Z",
+      "side": 1,
+      "message": "do we need to store these bits in CBI so we don\u0027t have the same\nchip power domain issues we\u0027ve had on previous board(s)?",
+      "range": {
+        "startLine": 193,
+        "startChar": 9,
+        "endLine": 193,
+        "endChar": 34
+      },
+      "revId": "10448a6e9d32d425b7cbdd1a4178ea33e7de4f94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04607de0_870d72cc",
+        "filename": "zephyr/drivers/board_id/board_id_intel_rvp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-03-25T22:31:40Z",
+      "side": 1,
+      "message": "can we avoid overloading board version?\n\ncan we add a new `rvp_id_type` and handle this in `get_rvp_id_config()`?",
+      "range": {
+        "startLine": 193,
+        "startChar": 9,
+        "endLine": 193,
+        "endChar": 34
+      },
+      "revId": "10448a6e9d32d425b7cbdd1a4178ea33e7de4f94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65ea87ff_5ac98604",
+        "filename": "zephyr/drivers/board_id/board_id_intel_rvp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-03-25T22:31:40Z",
+      "side": 1,
+      "message": "is coreboot going to need to look at these new bits?",
+      "range": {
+        "startLine": 193,
+        "startChar": 9,
+        "endLine": 193,
+        "endChar": 34
+      },
       "revId": "10448a6e9d32d425b7cbdd1a4178ea33e7de4f94",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
