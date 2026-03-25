@@ -1,0 +1,113 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4181b57b_7a0bec41",
+        "filename": "zephyr/program/nissa/epic/src/sub_board.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-25T19:36:19Z",
+      "side": 1,
+      "message": "This function needs a guard\n```\nif (epic_get_sb_type() !\u003d EPIC_SB_A_HDMI_LTE)\n   return;\n```",
+      "revId": "2377023ff83e4e5af1a9a1fc62a9569806759517",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c2bbf74_077a6167",
+        "filename": "zephyr/program/nissa/gothrax/src/sub_board.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-25T19:36:19Z",
+      "side": 1,
+      "message": "This also needs a guard for the gothrax_get_sb_type() return type.",
+      "range": {
+        "startLine": 108,
+        "startChar": 12,
+        "endLine": 108,
+        "endChar": 30
+      },
+      "revId": "2377023ff83e4e5af1a9a1fc62a9569806759517",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e678f0ca_1fd9b0e4",
+        "filename": "zephyr/program/nissa/guren/src/sub_board.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-25T19:36:19Z",
+      "side": 1,
+      "message": "Needs a guard\n```\n\tif (sb !\u003d GUREN_SB_1C_LTE \u0026\u0026 !sb !\u003d GUREN_SB_HDMI_LTE \u0026\u0026\n\t    sb !\u003d GUREN_SB_1C_5G) {\n```",
+      "range": {
+        "startLine": 176,
+        "startChar": 11,
+        "endLine": 176,
+        "endChar": 16
+      },
+      "revId": "2377023ff83e4e5af1a9a1fc62a9569806759517",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d632a0e_2627fac8",
+        "filename": "zephyr/program/nissa/src/sub_board.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-25T19:36:19Z",
+      "side": 1,
+      "message": "Needs a guard for `!NISSA_SB_HDMI_A`",
+      "range": {
+        "startLine": 115,
+        "startChar": 12,
+        "endLine": 115,
+        "endChar": 30
+      },
+      "revId": "2377023ff83e4e5af1a9a1fc62a9569806759517",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af4b8bdc_c40576c7",
+        "filename": "zephyr/program/nissa/src/sub_board.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-25T19:36:19Z",
+      "side": 1,
+      "message": "Needs a guard for `!NISSA_SB_C_LTE`",
+      "range": {
+        "startLine": 213,
+        "startChar": 12,
+        "endLine": 213,
+        "endChar": 29
+      },
+      "revId": "2377023ff83e4e5af1a9a1fc62a9569806759517",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
