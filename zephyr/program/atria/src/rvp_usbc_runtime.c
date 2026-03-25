@@ -8,6 +8,8 @@
 #include "drivers/pdc.h"
 #include "usbc/pdc_runtime_port_config.h"
 
+#include <drivers/rvp_board_id.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -101,6 +103,27 @@ static void discover_tcss_modules()
 		ctx.detected_cards);
 
 	ctx.initialized = true;
+}
+
+/**
+ * Return a 4-bit port-population mask for board_get_version().
+ * Bit 0=C0 present, bit 1=C1 present, bit 2=C2 present, bit 3=C3 present.
+ */
+__override int board_get_tcss_population(void)
+{
+	int bits = 0;
+
+	discover_tcss_modules();
+
+	if (ctx.detected_cards & RVP_TCSS_C0_TI)
+		bits |= BIT(0);
+	if (ctx.detected_cards & RVP_TCSS_C1_TI)
+		bits |= BIT(1);
+	if (ctx.detected_cards & RVP_TCSS_C2_TI)
+		bits |= BIT(2);
+	/* BIT(3) reserved for a future C3 port */
+
+	return bits;
 }
 
 /** Supply pdc_power_mgmt with dynamic USB-C port configuration data */

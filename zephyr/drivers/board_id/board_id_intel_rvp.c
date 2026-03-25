@@ -162,8 +162,18 @@ void rvp_id_handler(void)
 	}
 }
 
+__overridable int board_get_tcss_population(void)
+{
+	return 0;
+}
+
 /*
  * Returns board version on success, -1 on error.
+ *
+ * Return value layout:
+ *   bits [5:0]  - board ID (BOARD_ID_MASK)
+ *   bits [9:6]  - TCSS port-population mask (TCSS_POPULATION_MASK):
+ *                 bit 6=C0, bit 7=C1, bit 8=C2, bit 9=C3
  */
 __override int board_get_version(void)
 {
@@ -179,8 +189,8 @@ __override int board_get_version(void)
 		rvp_model_id = id;
 	}
 
-	/* return only board id from model id */
-	return rvp_model_id & BOARD_ID_MASK;
+	return (rvp_model_id & BOARD_ID_MASK) |
+	       (board_get_tcss_population() << TCSS_POPULATION_SHIFT);
 }
 
 #define SAFE_DEV_NAME(dev) ((dev) && ((dev)->name) ? (dev)->name : "unknown")

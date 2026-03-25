@@ -42,4 +42,25 @@ typedef void (*rvp_board_id_handler)(void);
  */
 int get_rvp_id_config(enum rvp_id_type id_type);
 
+/**
+ * @brief Bit position of the TCSS population field within board_get_version().
+ *
+ * board_get_version() returns a board ID in bits [5:0].  Bits [9:6] carry a
+ * 4-bit TCSS port-population mask: bit N is set when USB-C port N is present
+ * (N = 0..3 corresponding to C0..C3).
+ */
+#define TCSS_POPULATION_SHIFT 6
+#define TCSS_POPULATION_MASK  (0xF << TCSS_POPULATION_SHIFT)
+
+/**
+ * @brief Return a 4-bit TCSS port-population bitmask (bit N = port N present).
+ *
+ * The default implementation returns 0 (no TCSS ports).  Platforms that
+ * perform runtime TCSS discovery should override this with
+ * @c __override.
+ *
+ * @return 4-bit value where bit 0=C0, bit 1=C1, bit 2=C2, bit 3=C3.
+ */
+int board_get_tcss_population(void);
+
 #endif /* ZEPHYR_INCLUDE_DRIVERS_RVP_BOARD_ID_H_ */
