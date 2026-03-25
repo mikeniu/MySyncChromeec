@@ -94,6 +94,30 @@
       },
       "revId": "f8ad521f017be0b09c5f688297be503f39a34cb5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03b8af7c_62160dcd",
+        "filename": "zephyr/program/ocelot/ocelotrvp-ite/power_signals.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-25T15:48:53Z",
+      "side": 0,
+      "message": "If `powerindebug` is not showing the correct state of the pin, then there must be a bug in the common GPIO handling.\n\nThe IO Expander drivers are mapped in as a GPIO controller, so the IO expander should have feature parity with the GPIO controller implemented directly by the EC.\n\nMapping PWR_SYS_RST as an `intel,ap-pwrseq-external` creates extra board specific code that doesn\u0027t have test coverage, and encourages partners to copy this for their designs.",
+      "parentUuid": "f8d1155c_c074f3c3",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 61
+      },
+      "revId": "f8ad521f017be0b09c5f688297be503f39a34cb5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
