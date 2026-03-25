@@ -519,16 +519,17 @@ void battery_get_params(struct batt_params *batt)
 	memcpy(&batt_new, batt, sizeof(*batt));
 	batt_new.flags &= ~BATT_FLAG_VOLATILE;
 
+	batt_new.is_present = battery_is_present();
 #if defined(CONFIG_BATTERY_PRESENT_CUSTOM) || \
 	defined(CONFIG_BATTERY_PRESENT_GPIO)
 	/* Hardware can tell us for certain */
-	batt_new.is_present = battery_is_present();
 	if (batt_new.is_present != BP_YES) {
 		batt->is_present = BP_NO;
 		batt->flags = BATT_FLAG_BAD_ANY;
 		return;
 	}
 #endif
+
 	if (sb_read(SB_TEMPERATURE, &batt_new.temperature) &&
 	    fake_temperature < 0)
 		batt_new.flags |= BATT_FLAG_BAD_TEMPERATURE;
@@ -580,10 +581,15 @@ void battery_get_params(struct batt_params *batt)
 #if !defined(CONFIG_BATTERY_PRESENT_CUSTOM) && \
 	!defined(CONFIG_BATTERY_PRESENT_GPIO)
 	/* No hardware test, so we only know it's there if it responds */
-	if (batt_new.flags & BATT_FLAG_RESPONSIVE)
+	if (batt_new.flags & BATT_FLAG_RESPONSIVE) {
 		batt_new.is_present = BP_YES;
-	else
-		batt_new.is_present = BP_NOT_SURE;
+	} else if (batt_new.is_present == BP_YES) {
+		/*
+		 * battery_is_present reads SB_MANUFACTURE_DATE which is not
+		 * included in BATT_FLAG_BAD_ANY.
+		 */
+		batt_new.flags |= BATT_FLAG_RESPONSIVE;
+	}
 #endif
 
 	if (battery_want_charge(&batt_new))
