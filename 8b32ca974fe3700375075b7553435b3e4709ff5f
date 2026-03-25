@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b30ecc14_f0d9f9a0",
+        "filename": "zephyr/drivers/cros_system/cros_system_rtk.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-25T20:18:48Z",
+      "side": 1,
+      "message": "The upstream [driver](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/drivers/watchdog/wdt_rts5912.c;l\u003d25;drc\u003d65e4717e8dc5e489446347ab1abbd46e65b67973) asserts that there is only 1 WDT timer.  This change doesn\u0027t hurt anything, but it wasn\u0027t necessary.",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 35
+      },
+      "revId": "8b32ca974fe3700375075b7553435b3e4709ff5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
