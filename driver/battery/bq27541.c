@@ -53,6 +53,8 @@
 #define BQ27542_FLAG_BATHI BIT(13)
 /* Over Temperature in discharge */
 #define BQ27542_FLAG_OTD BIT(11)
+/* Full-charged */
+#define BQ27542_FLAG_FC BIT(9)
 /* Over Temperature in charge */
 #define BQ27542_FLAG_OTC BIT(7)
 /* Charge allowed */
@@ -249,6 +251,8 @@ int battery_status(int *status)
 		if (rv)
 			return rv;
 
+		if (flag & BQ27542_FLAG_FC)
+			*status |= STATUS_FULLY_CHARGED;
 		if (flag & (BQ27542_FLAG_OTC | BQ27542_FLAG_OTD))
 			*status |= STATUS_OVERTEMP_ALARM;
 		if (flag & BQ27542_FLAG_DSG)
