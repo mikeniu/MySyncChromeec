@@ -3142,11 +3142,12 @@ static void tc_attached_src_entry(const int port)
 			/* Apply Rp */
 			typec_update_cc(port);
 
+			/* Attached.SRC - enable AutoDischargeDisconnect */
+			tcpm_enable_auto_discharge_disconnect(port, 1);
+
 			/*
 			 * Maintain VCONN supply state, whether ON or OFF, and
-			 * its data role / usb mux connections. Do not
-			 * re-enable AutoDischargeDisconnect until the swap is
-			 * completed and tc_pr_swap_complete is called.
+			 * its data role / usb mux connections.
 			 */
 		} else {
 			/*
