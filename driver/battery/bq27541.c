@@ -52,7 +52,15 @@
 /* Over-charge */
 #define BQ27542_FLAG_BATHI           BIT(13)
 /* Over Temperature in discharge */
+<<<<<<< HEAD   (b5b8d9f2c0df236d0fb0e5a503f3cd9c36080311 fusb302: Stop enqueuing when buffer is full)
 #define BQ27542_FLAG_OTD             BIT(11)
+||||||| BASE   (5ff1af44fe4b4320c809f7fbd538165665c7abb7 driver: cleanup unused drivers)
+#define BQ27542_FLAG_OTD BIT(11)
+=======
+#define BQ27542_FLAG_OTD BIT(11)
+/* Full-charged */
+#define BQ27542_FLAG_FC BIT(9)
+>>>>>>> CHANGE (055d2ec405700674be00d102bb7b06a0492cf09f bq27541: Report FULLY_CHARGED status when FC flag is set)
 /* Over Temperature in charge */
 #define BQ27542_FLAG_OTC             BIT(7)
 /* Charge allowed */
@@ -249,6 +257,8 @@ int battery_status(int *status)
 		if (rv)
 			return rv;
 
+		if (flag & BQ27542_FLAG_FC)
+			*status |= STATUS_FULLY_CHARGED;
 		if (flag & (BQ27542_FLAG_OTC | BQ27542_FLAG_OTD))
 			*status |= STATUS_OVERTEMP_ALARM;
 		if (flag & BQ27542_FLAG_DSG)
