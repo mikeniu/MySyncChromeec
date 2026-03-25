@@ -108,6 +108,78 @@
       },
       "revId": "10448a6e9d32d425b7cbdd1a4178ea33e7de4f94",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3dd761d4_1adc1bbe",
+        "filename": "zephyr/drivers/board_id/board_id_intel_rvp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-25T22:37:48Z",
+      "side": 1,
+      "message": "I don\u0027t think this is necessary as it should be implemented by the board specific code which typically relies on gpio or I2C to determine if a port is populated",
+      "parentUuid": "05987cb2_f146baab",
+      "range": {
+        "startLine": 193,
+        "startChar": 9,
+        "endLine": 193,
+        "endChar": 34
+      },
+      "revId": "10448a6e9d32d425b7cbdd1a4178ea33e7de4f94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9bff53f3_520ac97a",
+        "filename": "zephyr/drivers/board_id/board_id_intel_rvp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-25T22:37:48Z",
+      "side": 1,
+      "message": "The goal is to not require another call from Coreboot to EC for minimal impact to the boot time which is why I did it this way. we have 16 bits here so why not use it? I can see changing board_version to something like board_config",
+      "parentUuid": "04607de0_870d72cc",
+      "range": {
+        "startLine": 193,
+        "startChar": 9,
+        "endLine": 193,
+        "endChar": 34
+      },
+      "revId": "10448a6e9d32d425b7cbdd1a4178ea33e7de4f94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04613ff5_5269c636",
+        "filename": "zephyr/drivers/board_id/board_id_intel_rvp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-25T22:37:48Z",
+      "side": 1,
+      "message": "Coreboot is the consumer of the bits yes",
+      "parentUuid": "65ea87ff_5ac98604",
+      "range": {
+        "startLine": 193,
+        "startChar": 9,
+        "endLine": 193,
+        "endChar": 34
+      },
+      "revId": "10448a6e9d32d425b7cbdd1a4178ea33e7de4f94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
