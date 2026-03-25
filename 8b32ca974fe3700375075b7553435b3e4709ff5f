@@ -22,6 +22,30 @@
       },
       "revId": "8b32ca974fe3700375075b7553435b3e4709ff5f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa6650d7_48093bc5",
+        "filename": "zephyr/drivers/cros_system/cros_system_rtk.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-25T20:20:21Z",
+      "side": 1,
+      "message": "\u003e This change doesn\u0027t hurt anything, but it wasn\u0027t necessary.\n\nIt is needed for these changes:\n* https://crrev.com/c/7689313\n* https://crrev.com/c/7689314",
+      "parentUuid": "b30ecc14_f0d9f9a0",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 35
+      },
+      "revId": "8b32ca974fe3700375075b7553435b3e4709ff5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
