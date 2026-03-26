@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c53775e3_d479c028",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 3146,
+      "author": {
+        "id": 3900655
+      },
+      "writtenOn": "2026-03-26T14:04:59Z",
+      "side": 1,
+      "message": "`TEST.PD.PS.SNK.2` and `TEST.PD.PS.SNK.3` is fixed with this change.`TEST.PD.PS.SRC.3` fails in `GRL` but passes in `Teledyne`. Reports attached in the bug.",
+      "revId": "a27db70e13f286dd6a81486da0dc4303e9679f97",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
