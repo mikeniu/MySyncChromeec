@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d7b56c0_c2b79bcf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-26T19:32:23Z",
+      "side": 1,
+      "message": "These reverts look OK, but they still leave tSenderResponse as 29 ms. Shouldn\u0027t there be another CL at the beginning of this chain that changes the default value to 28 ms?",
+      "revId": "899707e04709b8f537d600ad421dd260853c9839",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
