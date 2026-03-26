@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65d650f7_5d53811c",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 74
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-26T12:56:35Z",
+      "side": 1,
+      "message": "NIT: you can move this to inside if.",
+      "revId": "2674001e5efb679e27a6082f13e37970740e44e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bd0c7f0_79a89fdf",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 74
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-26T12:56:35Z",
+      "side": 1,
+      "message": "Please use a standard return code e.g. `-EINVAL`. Based on the `ft_sensor_init` documentation, it can return a positive number on error.",
+      "revId": "2674001e5efb679e27a6082f13e37970740e44e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "760365eb_4e3b83e2",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 74
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-26T12:56:35Z",
+      "side": 1,
+      "message": "Please use a standard return code. Based on the ft_sensor_acquire_image_with_mode documentation, it can return a positive number on error.",
+      "revId": "2674001e5efb679e27a6082f13e37970740e44e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
