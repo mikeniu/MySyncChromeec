@@ -181,7 +181,8 @@ void report_panic(uint32_t *regs, uint32_t itype)
 	pdata->struct_size = CONFIG_PANIC_DATA_SIZE;
 	pdata->struct_version = 2;
 	pdata->arch = PANIC_ARCH_NDS32_N8;
-	pdata->flags = 0;
+	pdata->flags = IS_ENABLED(SECTION_IS_RW) ? PANIC_DATA_FLAG_RW_IMAGE :
+						   PANIC_DATA_FLAG_RO_IMAGE;
 	pdata->reserved = 0;
 
 	pdata->nds_n8.itype = itype;
