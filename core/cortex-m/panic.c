@@ -299,7 +299,8 @@ void __keep report_panic(void)
 	pdata->struct_size = sizeof(*pdata);
 	pdata->struct_version = 2;
 	pdata->arch = PANIC_ARCH_CORTEX_M;
-	pdata->flags = 0;
+	pdata->flags = IS_ENABLED(SECTION_IS_RW) ? PANIC_DATA_FLAG_RW_IMAGE :
+						   PANIC_DATA_FLAG_RO_IMAGE;
 	pdata->reserved = 0;
 
 	/* Choose the right sp (psp or msp) based on EXC_RETURN value */
