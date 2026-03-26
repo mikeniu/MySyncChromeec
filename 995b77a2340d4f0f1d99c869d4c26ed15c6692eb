@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6bb795ff_615541c2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-03-26T23:37:13Z",
+      "side": 1,
+      "message": "The `firmware-zephyr-cov-cq` build failed.\n\nIs the host coverage is building as EC, not Zephyr? (I didn\u0027t add a define for backwards compatibility with EC):\n\n```\ncollecting ... make[1]: *** [Makefile.rules:168: host-coverage-fpsensor_auth_crypto_stateful] Error 2\n  CXX     RO/common/fpsensor/fpsensor_utils.o\n  CXX     RO/common/fpsensor/fpsensor_debug.o\n  CC      RO/common/i2c_controller.o\n  CXX     RO/common/fpsensor/fpsensor_state.o\n  CC      RO/common/gpio.o\n  CC      RO/common/i2c_controller.o\nINFO    - Using Ninja..\n  CXX     RO/common/fpsensor/fpsensor_detect_strings.o\n  CXX     RO/common/fpsensor/fpsensor_detect_strings.o\ncommon/i2c_controller.c:58:17: error: expected ‘;’ before ‘int’\n   58 | ZTESTABLE_STATIC\n      |                 ^\n      |                 ;\n   59 | int i2c_port_is_locked(int port)\n      | ~~~              \n```",
+      "revId": "995b77a2340d4f0f1d99c869d4c26ed15c6692eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
