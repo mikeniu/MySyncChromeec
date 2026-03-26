@@ -4,6 +4,24 @@
  */
 
 / {
+	irqs {
+		compatible = "cros-ec,irq-gpio";
+		acok_gpio: irq-gpio-acok {
+			gpios = <MCHP_GPIO_DECODE_155 0>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			debounce-ms = <30>;
+			enable-on-init;
+			fire-on-init;
+		};
+		dc_jack: irq-gpio-dc-jack {
+			gpios = <MCHP_GPIO_DECODE_243 0>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			debounce-ms = <1>;
+			enable-on-init;
+			fire-on-init;
+		};
+	};
+
 	named-gpios {
 		compatible = "named-gpios";
 
@@ -19,6 +37,7 @@
 		**/
 		bc_acok: bc-acok-ec-in {
 			gpios = <MCHP_GPIO_DECODE_155 GPIO_INPUT>;
+			no-auto-init;
 			enum-name = "GPIO_AC_PRESENT";
 		};
 		ps2-kb-clk {
@@ -297,6 +316,7 @@
 		};
 		std_adp_prsnt: std-adp-prsnt-ec {
 			gpios = <MCHP_GPIO_DECODE_243 GPIO_INPUT>;
+			no-auto-init;
 		};
 		gpio_ec_pch_wake_odl: smc-wake-sci-ec {
 			gpios = <MCHP_GPIO_DECODE_034 GPIO_ODR_HIGH>;
