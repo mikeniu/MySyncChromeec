@@ -1,0 +1,215 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0fde0203_62488e4a",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-26T11:56:33Z",
+      "side": 1,
+      "message": "Why not to guard it with `CONFIG_PLATFORM_EC_BTN_IGN_OUT`?",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e937784_2d11477e",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-26T11:56:33Z",
+      "side": 1,
+      "message": "Just use `K_WORK_DELAYABLE_DEFINE`?",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ee6d6f7_3583b9d2",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-26T11:56:33Z",
+      "side": 1,
+      "message": "Why do we delay deactivation?",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b09b3b2b_684dabed",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-26T11:56:33Z",
+      "side": 1,
+      "message": "Use config?",
+      "range": {
+        "startLine": 56,
+        "startChar": 50,
+        "endLine": 56,
+        "endChar": 51
+      },
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29213b9c_f5a89195",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-26T11:56:33Z",
+      "side": 1,
+      "message": "This will be called every `fptask` loop interaction, which means there will be:\n- logging\n- handling k_work\n- gpio operations\n\nis that correct or I\u0027m missing something?",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 0
+      },
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2942397f_49812026",
+        "filename": "include/fpsensor/fpsensor_btn_ign_out.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-26T11:56:33Z",
+      "side": 1,
+      "message": "Missing `_OUT` in the include guard name: `__CROS_EC_FPSENSOR_FPSENSOR_BTN_IGN_OUT_H`?",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 0
+      },
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "417506f4_8983a330",
+        "filename": "include/fpsensor/fpsensor_btn_ign_out.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-26T11:56:33Z",
+      "side": 1,
+      "message": "Is there any reason to implement it as inline?",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13e6734c_4b6a9944",
+        "filename": "zephyr/CMakeLists.txt",
+        "patchSetId": 20
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-26T11:56:33Z",
+      "side": 1,
+      "message": "Formatting?",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1f14e98_ab074016",
+        "filename": "zephyr/Kconfig.btn_ign",
+        "patchSetId": 20
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-26T11:56:33Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be called something like PLATFORM_EC_BTN_IGN_OUT_FP since it is used in FP code?",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7d51e5f_902ab2b6",
+        "filename": "zephyr/Kconfig.btn_ign",
+        "patchSetId": 20
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-26T11:56:33Z",
+      "side": 1,
+      "message": "Unused.",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 38
+      },
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1788d3e3_434fa07c",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_btn_ign_out.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-26T11:56:33Z",
+      "side": 1,
+      "message": "Is this used?",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
