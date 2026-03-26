@@ -46,6 +46,30 @@
       },
       "revId": "8b32ca974fe3700375075b7553435b3e4709ff5f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21397170_85c50e44",
+        "filename": "zephyr/drivers/cros_system/cros_system_rtk.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-26T17:30:35Z",
+      "side": 1,
+      "message": "`DT_CHOSEN(cros_ec_watchdog)` is probably a better choice than `DT_NODELABEL(wdog)`.",
+      "parentUuid": "fa6650d7_48093bc5",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 35
+      },
+      "revId": "8b32ca974fe3700375075b7553435b3e4709ff5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
