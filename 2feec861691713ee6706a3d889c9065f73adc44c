@@ -37,6 +37,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "39f6e47a_5ec08b85",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 3140,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-03-26T13:10:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "48237b27_61b2bbb8",
+      "revId": "2feec861691713ee6706a3d889c9065f73adc44c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "3dd2bb03_71a20ed4",
         "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
         "patchSetId": 1
@@ -65,6 +83,24 @@
       "writtenOn": "2026-03-26T00:11:08Z",
       "side": 1,
       "message": "We consider CC stable when the timer expires. This might be the right time to enable ADD.\n\nIf you move it to here, you\u0027ll need to add PD_T_SRC_DISCONNECT to PD_POWER_SUPPLY_TURN_ON_DELAY for xol. That should be a separate CL.",
+      "revId": "2feec861691713ee6706a3d889c9065f73adc44c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bff7a057_fd95a2be",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 3340,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-03-26T13:10:12Z",
+      "side": 1,
+      "message": "We tested adding here, it fails with same late VBUS, Timer is OK to get CC stable But i think control will not get here until we satisfy CC open.",
+      "parentUuid": "a9a5c758_3bce49be",
       "revId": "2feec861691713ee6706a3d889c9065f73adc44c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
