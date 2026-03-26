@@ -280,7 +280,6 @@ enum pdo_augmented_pps {
 #else
 #define PD3_T_SENDER_RESPONSE (28 * MSEC)
 #endif
-#endif
 #define PD_T_PS_TRANSITION (500 * MSEC) /* between 450ms and 550ms */
 /*
  * This is adjusted for PD3.1 Compliance test TEST.PD.PROT.SRC.10.
