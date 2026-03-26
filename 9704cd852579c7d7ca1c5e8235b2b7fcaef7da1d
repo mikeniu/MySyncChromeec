@@ -34,6 +34,52 @@
       "parentUuid": "afac876a_c33f1543",
       "revId": "9704cd852579c7d7ca1c5e8235b2b7fcaef7da1d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c5bacb5_84fbe7ac",
+        "filename": "zephyr/program/fpmcu/et171/sanok.dts",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-26T16:37:50Z",
+      "side": 1,
+      "message": "I believe this is also wrong `EGIS` not `EGIS`. I am going to create a separate CL to fix this.",
+      "range": {
+        "startLine": 16,
+        "startChar": 8,
+        "endLine": 16,
+        "endChar": 32
+      },
+      "revId": "9704cd852579c7d7ca1c5e8235b2b7fcaef7da1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71b8186c_1454ecfa",
+        "filename": "zephyr/program/fpmcu/et171/sanok.dts",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-26T16:37:50Z",
+      "side": 1,
+      "message": "this is wrong. Please rename to `EGIS630_IMAGE_COLLECTION_PROPS`",
+      "range": {
+        "startLine": 24,
+        "startChar": 8,
+        "endLine": 24,
+        "endChar": 38
+      },
+      "revId": "9704cd852579c7d7ca1c5e8235b2b7fcaef7da1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
