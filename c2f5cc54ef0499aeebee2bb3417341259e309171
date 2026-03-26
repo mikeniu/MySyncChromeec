@@ -22,6 +22,30 @@
       },
       "revId": "c2f5cc54ef0499aeebee2bb3417341259e309171",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24e0fb04_2dd6f6f8",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 4684390
+      },
+      "writtenOn": "2026-03-26T09:16:56Z",
+      "side": 1,
+      "message": "Thanks for the feedback. I\u0027ve updated the code so that pre_battery_cells is only updated when register writes succeed, and added retry handling for failures. If the retry limit is exceeded, pre_battery_cells is forcefully updated to avoid continuous retries.",
+      "parentUuid": "cbf76afe_2b49639b",
+      "range": {
+        "startLine": 74,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 0
+      },
+      "revId": "c2f5cc54ef0499aeebee2bb3417341259e309171",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
