@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b648a9e0_1f3ac5ac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-26T00:11:08Z",
+      "side": 1,
+      "message": "In this patchset, the place where you turn on ADD is basically correct. There\u0027s another location that might be better, because CC would be more likely to be stable. In the general case, there might be a better way to handle CC stability.\n\nFor now, probably the best thing is to try both ways on xol and see if there\u0027s any difference in stability on the type-C and PRS tests. We can clean this up properly in subsequent CLs.",
+      "revId": "2feec861691713ee6706a3d889c9065f73adc44c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48237b27_61b2bbb8",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 3140,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-26T00:11:08Z",
+      "side": 1,
+      "message": "Technically, the order here should be `typec_update_cc`, then `tcpm_enable_auto_discharge_disconnect`, then `tc_src_power_on`. For now, you can just move ADD turn on to after update CC. Since ADD gates VBUS on xol, it would technically be an OK order of operations.\n\nThere\u0027s another possible location for ADD turn on. See below.",
+      "revId": "2feec861691713ee6706a3d889c9065f73adc44c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3dd2bb03_71a20ed4",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 3312,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-26T00:11:08Z",
+      "side": 1,
+      "message": "This is how we wait for CC to be stable, instead of checking it directly.",
+      "revId": "2feec861691713ee6706a3d889c9065f73adc44c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9a5c758_3bce49be",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 3340,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-26T00:11:08Z",
+      "side": 1,
+      "message": "We consider CC stable when the timer expires. This might be the right time to enable ADD.\n\nIf you move it to here, you\u0027ll need to add PD_T_SRC_DISCONNECT to PD_POWER_SUPPLY_TURN_ON_DELAY for xol. That should be a separate CL.",
+      "revId": "2feec861691713ee6706a3d889c9065f73adc44c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
