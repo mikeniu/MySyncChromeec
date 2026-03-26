@@ -38,12 +38,13 @@ static struct panic_data *const pdata_ptr = PANIC_DATA_PTR;
 
 /* Common SW Panic reasons strings */
 const char *const panic_sw_reasons[] = {
-	"PANIC_SW_DIV_ZERO",	 "PANIC_SW_STACK_OVERFLOW",
-	"PANIC_SW_PD_CRASH",	 "PANIC_SW_ASSERT",
-	"PANIC_SW_WATCHDOG",	 "PANIC_SW_RNG",
-	"PANIC_SW_PMIC_FAULT",	 "PANIC_SW_EXIT",
-	"PANIC_SW_WATCHDOG_WARN"
+	"PANIC_SW_DIV_ZERO",	  "PANIC_SW_STACK_OVERFLOW",
+	"PANIC_SW_PD_CRASH",	  "PANIC_SW_ASSERT",
+	"PANIC_SW_WATCHDOG",	  "PANIC_SW_RNG",
+	"PANIC_SW_PMIC_FAULT",	  "PANIC_SW_EXIT",
+	"PANIC_SW_WATCHDOG_WARN", "PANIC_SW_WATCHDOG_HARD"
 };
+BUILD_ASSERT(ARRAY_SIZE(panic_sw_reasons) == PANIC_SW_REASON_COUNT);
 
 /**
  * Check an interrupt vector as being a valid software panic
@@ -53,7 +54,7 @@ const char *const panic_sw_reasons[] = {
 int panic_sw_reason_is_valid(uint32_t reason)
 {
 	return (reason >= PANIC_SW_BASE &&
-		(reason - PANIC_SW_BASE) < ARRAY_SIZE(panic_sw_reasons));
+		(reason - PANIC_SW_BASE) < PANIC_SW_REASON_COUNT);
 }
 
 /**
