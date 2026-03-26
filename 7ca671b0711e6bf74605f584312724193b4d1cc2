@@ -16,6 +16,24 @@
       "message": "Please add support for the new property - CL:7662291",
       "revId": "7ca671b0711e6bf74605f584312724193b4d1cc2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "194da0e1_36046cd4",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 71
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-26T09:14:49Z",
+      "side": 1,
+      "message": "fixed.",
+      "parentUuid": "5c05b207_f4fce583",
+      "revId": "7ca671b0711e6bf74605f584312724193b4d1cc2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
