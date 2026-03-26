@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fee6c58_e4fb4f99",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-26T17:59:08Z",
+      "side": 1,
+      "message": "As an alternative - if you switch to a separate compatible for each EC type, and you drop the `cros_system_driver_api`, the build will fail due to duplicate definitions and you don\u0027t need this check.",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 63
+      },
+      "revId": "ff0bd68b8e8d5edbbacb52896bff04e9addd12b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
