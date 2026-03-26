@@ -61,6 +61,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d2a98b79_79594c46",
+        "filename": "zephyr/program/fpmcu/et171/sanok.dts",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-26T16:49:39Z",
+      "side": 1,
+      "message": "I created this [CL](https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7705094) to fix existing typo. Please fix your typo and rebase on top on my CL after it merges.",
+      "parentUuid": "7c5bacb5_84fbe7ac",
+      "range": {
+        "startLine": 16,
+        "startChar": 8,
+        "endLine": 16,
+        "endChar": 32
+      },
+      "revId": "9704cd852579c7d7ca1c5e8235b2b7fcaef7da1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "71b8186c_1454ecfa",
         "filename": "zephyr/program/fpmcu/et171/sanok.dts",
         "patchSetId": 2
