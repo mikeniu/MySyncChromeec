@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "afac876a_c33f1543",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1442982
+      },
+      "writtenOn": "2026-03-26T15:57:10Z",
+      "side": 1,
+      "message": "Adding Patryk to review template_update part.",
+      "revId": "9704cd852579c7d7ca1c5e8235b2b7fcaef7da1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
