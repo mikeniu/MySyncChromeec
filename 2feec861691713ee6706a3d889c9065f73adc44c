@@ -103,6 +103,24 @@
       "parentUuid": "a9a5c758_3bce49be",
       "revId": "2feec861691713ee6706a3d889c9065f73adc44c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c01b54b7_1f17862d",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 3340,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-26T15:47:52Z",
+      "side": 1,
+      "message": "For the purposes of this experiment, I meant that you should refactor this so that it checks the timer expiry first. Then if ADD isn\u0027t turned on, it turns it on, and if CC is open, it goes to unattached. (There would probably be a more efficient way to do that, but no need to worry about that if this placement doesn\u0027t even help.)",
+      "parentUuid": "bff7a057_fd95a2be",
+      "revId": "2feec861691713ee6706a3d889c9065f73adc44c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
