@@ -34,6 +34,24 @@
       "parentUuid": "c53775e3_d479c028",
       "revId": "a27db70e13f286dd6a81486da0dc4303e9679f97",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97c77b48_dc348f90",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 3146,
+      "author": {
+        "id": 3900655
+      },
+      "writtenOn": "2026-03-27T05:01:35Z",
+      "side": 1,
+      "message": "Opened a `TEST.PD.PS.SRC.3` GRL ticket.",
+      "parentUuid": "f4a7fb83_7e240d2e",
+      "revId": "a27db70e13f286dd6a81486da0dc4303e9679f97",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
