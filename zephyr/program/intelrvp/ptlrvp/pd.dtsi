@@ -10,19 +10,19 @@
 	pdc_rtk_c0: rts54-pdc@66 {
 		compatible = "realtek,rts54-pdc";
 		reg = <0x66>;
-		irq-gpios = <PD_POW_IRQ_GPIO GPIO_ACTIVE_LOW>;
+		irq-gpio = <&pdc_irq>;
 		ccd;
 	};
 	pdc_rtk_c1: rts54-pdc@67 {
 		compatible = "realtek,rts54-pdc";
 		reg = <0x67>;
-		irq-gpios = <PD_POW_IRQ_GPIO GPIO_ACTIVE_LOW>;
+		irq-gpio = <&pdc_irq>;
 		no-fw-update;
 	};
 	pdc_rtk_c2: rts54-pdc@68 {
 		compatible = "realtek,rts54-pdc";
 		reg = <0x68>;
-		irq-gpios = <PD_POW_IRQ_GPIO GPIO_ACTIVE_LOW>;
+		irq-gpio = <&pdc_irq>;
 	};
 };
 

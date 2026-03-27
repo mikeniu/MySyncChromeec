@@ -27,6 +27,10 @@
 			enable-on-init;
 			fire-on-init;
 		};
+		pdc_irq: irq-gpio-pdc {
+			gpios = <MCHP_GPIO_DECODE_143 GPIO_ACTIVE_LOW>;
+			flags = <GPIO_INT_EDGE_FALLING>;
+		};
 	};
 
 	named-gpios {
