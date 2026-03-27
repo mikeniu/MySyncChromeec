@@ -83,6 +83,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a81130b8_391bc664",
+        "filename": "zephyr/program/fpmcu/et171/sanok.dts",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-03-27T07:18:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d2a98b79_79594c46",
+      "range": {
+        "startLine": 16,
+        "startChar": 8,
+        "endLine": 16,
+        "endChar": 32
+      },
+      "revId": "9704cd852579c7d7ca1c5e8235b2b7fcaef7da1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "71b8186c_1454ecfa",
@@ -96,6 +120,30 @@
       "writtenOn": "2026-03-26T16:37:50Z",
       "side": 1,
       "message": "this is wrong. Please rename to `EGIS630_IMAGE_COLLECTION_PROPS`",
+      "range": {
+        "startLine": 24,
+        "startChar": 8,
+        "endLine": 24,
+        "endChar": 38
+      },
+      "revId": "9704cd852579c7d7ca1c5e8235b2b7fcaef7da1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25991d2e_6f1eabec",
+        "filename": "zephyr/program/fpmcu/et171/sanok.dts",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-03-27T07:18:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "71b8186c_1454ecfa",
       "range": {
         "startLine": 24,
         "startChar": 8,
