@@ -16,6 +16,24 @@
       "message": "Add a new line at the end of file.",
       "revId": "08e3f27084f8c7309c906b066dc600e590e1c857",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9393eb3d_d54d29c8",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx_pal_test_helpers.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-03-27T01:41:41Z",
+      "side": 1,
+      "message": "Fixed.",
+      "parentUuid": "cd5a4761_0b37eab2",
+      "revId": "08e3f27084f8c7309c906b066dc600e590e1c857",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
