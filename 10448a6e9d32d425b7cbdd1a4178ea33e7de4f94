@@ -204,6 +204,30 @@
       },
       "revId": "10448a6e9d32d425b7cbdd1a4178ea33e7de4f94",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbf533b8_9fecec1e",
+        "filename": "zephyr/drivers/board_id/board_id_intel_rvp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-03-27T15:56:02Z",
+      "side": 1,
+      "message": "Let me clarify with the Coreboot team on the goal of this. I know there are some PNP implications here but I am not fully clear on what they are. At a high level the goal is to selectively turn off SOC side USB depending on the populated typec C ports (applicable only to boards with different configs decided at runtime). I totally understand changing the definition of CBI_TAG_BOARD_VERSION not being the right approach, but depthcharge is too late to check this config Coreboot needs to be able to change SOC parameters, and the goal was to avoid adding additional EC host command calls",
+      "parentUuid": "8c294392_08521e69",
+      "range": {
+        "startLine": 193,
+        "startChar": 9,
+        "endLine": 193,
+        "endChar": 34
+      },
+      "revId": "10448a6e9d32d425b7cbdd1a4178ea33e7de4f94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
