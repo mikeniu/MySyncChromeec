@@ -50,6 +50,24 @@
       "message": "```\n        cros format zephyr/subsys/fingerprint/alg/egis_egis660_bio_alg.c\n```\n\nThis CL is not passing presubmit check.",
       "revId": "1cee4907f376727b7793a3cb0cb16d2c209d7aee",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fb7e2d5_bad00f95",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4333743
+      },
+      "writtenOn": "2026-03-27T01:18:26Z",
+      "side": 1,
+      "message": "update_bitmap \u003d NULL:  only do matching process\nupdate_bitmap !\u003d NULL: after matching process, if template update is required due to ALGO output, then template update will be applied",
+      "parentUuid": "62256320_ad46c1eb",
+      "revId": "1cee4907f376727b7793a3cb0cb16d2c209d7aee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
