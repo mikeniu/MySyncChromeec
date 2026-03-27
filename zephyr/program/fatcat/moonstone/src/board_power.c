@@ -78,13 +78,13 @@ static int board_ap_power_action_g3_run(void *data)
 AP_POWER_APP_STATE_DEFINE(G3, board_ap_power_action_g3_entry,
 			  board_ap_power_action_g3_run, NULL);
 
-static int board_ap_power_s0_run(void *data)
+static int board_ap_power_s0_entry(void *data)
 {
 	/* Update the AC event during boot */
 	extpower_update_host_events(gpio_get_level(GPIO_AC_PRESENT));
 	return 0;
 }
-AP_POWER_APP_STATE_DEFINE(S0, NULL, board_ap_power_s0_run, NULL);
+AP_POWER_APP_STATE_DEFINE(S0, board_ap_power_s0_entry, NULL, NULL);
 #endif /* CONFIG_AP_PWRSEQ_DRIVER */
 
 int power_signal_external_init(void)
