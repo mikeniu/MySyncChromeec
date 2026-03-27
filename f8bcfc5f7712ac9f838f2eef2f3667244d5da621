@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "65c38316_0de07fc2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-27T08:21:34Z",
+      "side": 1,
+      "message": "Some minor comments",
+      "revId": "f8bcfc5f7712ac9f838f2eef2f3667244d5da621",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8bffb29_ad983106",
+        "filename": "util/ectool_usb/ectool.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 510,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-27T08:21:34Z",
+      "side": 1,
+      "message": "Have you tried to use claim.response.pk_m.hex()?",
+      "range": {
+        "startLine": 510,
+        "startChar": 0,
+        "endLine": 510,
+        "endChar": 0
+      },
+      "revId": "f8bcfc5f7712ac9f838f2eef2f3667244d5da621",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cdcfe65_f54719c3",
+        "filename": "util/ectool_usb/ectool.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-27T08:21:34Z",
+      "side": 1,
+      "message": "Typo: \"Established\" -\u003e \"Establish\"",
+      "range": {
+        "startLine": 549,
+        "startChar": 0,
+        "endLine": 549,
+        "endChar": 0
+      },
+      "revId": "f8bcfc5f7712ac9f838f2eef2f3667244d5da621",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
