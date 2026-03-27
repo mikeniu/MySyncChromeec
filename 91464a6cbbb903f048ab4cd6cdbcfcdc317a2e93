@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dcd2542d_adcc6609",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-27T21:52:15Z",
+      "side": 1,
+      "message": "This alos need",
+      "revId": "91464a6cbbb903f048ab4cd6cdbcfcdc317a2e93",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22ddda1f_6c9f74a2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-27T21:52:15Z",
+      "side": 1,
+      "message": "This also needs a unit test.  You can cherry pick https://crrev.com/c/7709192 and add to your stack.",
+      "revId": "91464a6cbbb903f048ab4cd6cdbcfcdc317a2e93",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd2ee047_6265f571",
+        "filename": "common/extpower_common.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-27T21:52:15Z",
+      "side": 1,
+      "message": "This routine should be made private again as the final CL in the stack.",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 48
+      },
+      "revId": "91464a6cbbb903f048ab4cd6cdbcfcdc317a2e93",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29c10cd3_ff325c4a",
+        "filename": "common/extpower_common.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-27T21:52:15Z",
+      "side": 1,
+      "message": "Guard this function with `#ifdef HAS_TASK_HOSTCMD`",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 42
+      },
+      "revId": "91464a6cbbb903f048ab4cd6cdbcfcdc317a2e93",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
