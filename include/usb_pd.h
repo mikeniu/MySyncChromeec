@@ -271,7 +271,7 @@ enum pdo_augmented_pps {
  * This value was experimentally determined to pass TEST.PD.PROT.SNK.5 and
  * TEST.PD.PROT.SRC.3 on various boards.
  */
-#define PD3_T_SENDER_RESPONSE (29 * MSEC)
+#define PD3_T_SENDER_RESPONSE (28 * MSEC)
 #endif
 #define PD_T_PS_TRANSITION (500 * MSEC) /* between 450ms and 550ms */
 /*
