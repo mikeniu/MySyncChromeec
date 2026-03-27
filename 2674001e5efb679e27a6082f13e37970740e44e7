@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "718fc010_fa5fb2ec",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 74
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-27T11:31:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2274a21_79bdbcd4",
+      "revId": "2674001e5efb679e27a6082f13e37970740e44e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3bd0c7f0_79a89fdf",
@@ -71,6 +89,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3754072_5f29eb5b",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 74
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-27T11:31:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa45c137_6841b33d",
+      "revId": "2674001e5efb679e27a6082f13e37970740e44e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "760365eb_4e3b83e2",
@@ -102,6 +138,24 @@
       "side": 1,
       "message": "Fixed.",
       "parentUuid": "760365eb_4e3b83e2",
+      "revId": "2674001e5efb679e27a6082f13e37970740e44e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e1067cd_4473b1df",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 74
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-27T11:31:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "72c3cd87_65a60b7e",
       "revId": "2674001e5efb679e27a6082f13e37970740e44e7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
