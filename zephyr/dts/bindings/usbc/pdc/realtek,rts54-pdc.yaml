@@ -9,8 +9,8 @@ compatible: "realtek,rts54-pdc"
 include: ["i2c-device.yaml", "pdc-device.yaml"]
 
 properties:
-  irq-gpios:
-    type: phandle-array
+  irq-gpio:
+    type: phandle
     required: true
     description: |
       Interrupt line from the PD for power path (zephyr standard GPIO format)

@@ -27,6 +27,7 @@ LOG_MODULE_REGISTER(pdc_rts54, CONFIG_USBC_LOG_LEVEL);
 #include "usbc/pdc_utils.h"
 #include "usbc/utils.h"
 
+#include <drivers/cros_irq_gpio.h>
 #include <drivers/pdc.h>
 
 #define DT_DRV_COMPAT realtek_rts54_pdc
@@ -343,7 +344,7 @@ struct pdc_config_t {
 	/** I2C config */
 	struct i2c_dt_spec i2c;
 	/** pdc power path interrupt */
-	struct gpio_dt_spec irq_gpios;
+	const struct device *irq_gpio;
 	/** connector number of this port */
 	uint8_t connector_number;
 	/** Notification enable bits */
@@ -356,8 +357,6 @@ struct pdc_config_t {
 	bool ccd;
 	/** Whether or not this port supports FRS */
 	bool frs_supported;
-	/** Pointer to the device-specific callback function */
-	gpio_callback_handler_t callback_handler;
 };
 
 /**
@@ -404,8 +403,6 @@ struct pdc_data_t {
 	uint8_t *user_buf;
 	/** Command mutex */
 	struct k_mutex mtx;
-	/** GPIO interrupt callback */
-	struct gpio_callback gpio_cb;
 	/** Error status */
 	union error_status_t error_status;
 	/** CCI Event */
@@ -498,8 +495,8 @@ static const char *const state_names[] = {
 	[ST_SUSPENDED] = "PDC_SUSPENDED",
 };
 
-static struct gpio_dt_spec
-	rts54xx_irq_list[DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT)];
+static const struct device
+	*rts54xx_irq_list[DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT)];
 static const struct smf_state states[];
 static int rts54_enable(const struct device *dev);
 static int rts54_reset(const struct device *dev);
@@ -924,12 +921,11 @@ static enum smf_state_result st_init_run(void *o)
 static bool any_irq_gpio_asserted(void)
 {
 	for (int i = 0; i < ARRAY_SIZE(rts54xx_irq_list); i++) {
-		if (rts54xx_irq_list[i].port == NULL &&
-		    rts54xx_irq_list[i].pin == 0) {
+		if (rts54xx_irq_list[i] == NULL) {
 			/* This GPIO entry is blank, ignore it */
 			continue;
 		}
-		if (gpio_pin_get_dt(&rts54xx_irq_list[i])) {
+		if (irq_gpio_pin_get(rts54xx_irq_list[i])) {
 			return true;
 		}
 	}
@@ -3021,50 +3017,29 @@ static int pdc_init(const struct device *dev)
 		return -ENODEV;
 	}
 
-	rv = gpio_is_ready_dt(&cfg->irq_gpios);
+	rv = device_is_ready(cfg->irq_gpio);
 	if (rv < 0) {
-		LOG_ERR("RTK%d: device %s not ready", cfg->connector_number,
-			cfg->irq_gpios.port->name);
 		return -ENODEV;
 	}
 
 	k_event_init(&data->driver_event);
 
 	for (int i = 0; i < ARRAY_SIZE(rts54xx_irq_list); i++) {
-		if (rts54xx_irq_list[i].port == cfg->irq_gpios.port &&
-		    rts54xx_irq_list[i].pin == cfg->irq_gpios.pin) {
+		if (rts54xx_irq_list[i] == cfg->irq_gpio) {
 			irq_init_done = true;
 			break;
 		}
 
-		if (rts54xx_irq_list[i].port == NULL) {
-			rts54xx_irq_list[i] = cfg->irq_gpios;
+		if (rts54xx_irq_list[i] == NULL) {
+			rts54xx_irq_list[i] = cfg->irq_gpio;
 			break;
 		}
 	}
 
 	if (!irq_init_done) {
-		rv = gpio_pin_configure_dt(&cfg->irq_gpios, GPIO_INPUT);
+		rv = irq_gpio_enable(cfg->irq_gpio);
 		if (rv < 0) {
-			LOG_ERR("RTK%d: Unable to configure GPIO",
-				cfg->connector_number);
-			return rv;
-		}
-
-		gpio_init_callback(&data->gpio_cb, cfg->callback_handler,
-				   BIT(cfg->irq_gpios.pin));
-
-		rv = gpio_add_callback(cfg->irq_gpios.port, &data->gpio_cb);
-		if (rv < 0) {
-			LOG_ERR("RTK%d: Unable to add callback",
-				cfg->connector_number);
-			return rv;
-		}
-
-		rv = gpio_pin_interrupt_configure_dt(&cfg->irq_gpios,
-						     GPIO_INT_EDGE_FALLING);
-		if (rv < 0) {
-			LOG_ERR("RTK%d: Unable to configure interrupt",
+			LOG_ERR("RTK%d: Unable to enable interrupt",
 				cfg->connector_number);
 			return rv;
 		}
@@ -3126,6 +3101,14 @@ static void rts54xx_thread(void *dev, void *unused1, void *unused2)
 	}
 }
 
+static void pdc_interrupt_callback(const struct device *dev,
+					 void *data)
+{
+	struct pdc_data_t *pdc_data = (struct pdc_data_t *)data;
+
+	k_event_post(&pdc_data->driver_event, RTS54XX_IRQ_EVENT);
+}
+
 #define PDC_DATA_STRUCT_NAME(inst) pdc_data_##inst
 
 BUILD_ASSERT(
@@ -3153,17 +3136,14 @@ BUILD_ASSERT(
                                                                               \
 	static struct pdc_data_t PDC_DATA_STRUCT_NAME(inst);                  \
                                                                               \
-	static void pdc_interrupt_callback##inst(const struct device *dev,    \
-						 struct gpio_callback *cb,    \
-						 uint32_t pins)               \
-	{                                                                     \
-		k_event_post(&PDC_DATA_STRUCT_NAME(inst).driver_event,        \
-			     RTS54XX_IRQ_EVENT);                              \
-	}                                                                     \
+	CROS_IRQ_GPIO_CALLBACK_DEFINE_NAMED(                                  \
+		DEVICE_DT_GET(DT_INST_PROP(inst, irq_gpio)),                  \
+		pdc_interrupt_callback, &PDC_DATA_STRUCT_NAME(inst),          \
+			pdc_interrupt_callback##inst);                        \
                                                                               \
 	static const struct pdc_config_t pdc_config##inst = {                 \
 		.i2c = I2C_DT_SPEC_INST_GET(inst),                            \
-		.irq_gpios = GPIO_DT_SPEC_INST_GET(inst, irq_gpios),          \
+		.irq_gpio = DEVICE_DT_GET(DT_INST_PROP(inst, irq_gpio)),      \
 		.connector_number =                                           \
 			USBC_PORT_FROM_PDC_DRIVER_NODE(DT_DRV_INST(inst)),    \
 		.bits.command_completed = 1,                                  \
@@ -3187,7 +3167,6 @@ BUILD_ASSERT(
 		.no_fw_update = DT_INST_PROP(inst, no_fw_update),             \
 		.ccd = DT_INST_PROP(inst, ccd),                               \
 		.frs_supported = DT_INST_PROP(inst, frs_supported),           \
-		.callback_handler = pdc_interrupt_callback##inst,             \
 	};                                                                    \
                                                                               \
 	DEVICE_DT_INST_DEFINE(inst, pdc_init, NULL,                           \
