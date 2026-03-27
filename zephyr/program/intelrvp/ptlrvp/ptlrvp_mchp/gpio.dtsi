@@ -20,6 +20,13 @@
 			enable-on-init;
 			fire-on-init;
 		};
+		lid_irq: irq-gpio-lid-irq {
+			gpios = <MCHP_GPIO_DECODE_033 0>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			debounce-ms = <30>;
+			enable-on-init;
+			fire-on-init;
+		};
 	};
 
 	named-gpios {
@@ -301,6 +308,7 @@
 		smc_lid_n: smc-lid {
 			gpios = <MCHP_GPIO_DECODE_033 GPIO_INPUT>;
 			enum-name = "GPIO_LID_OPEN";
+			no-auto-init;
 		};
 		/**
 		NOTE: Used for tach0, do not define.

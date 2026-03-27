@@ -17,6 +17,7 @@
 #include "timer.h"
 #include "util.h"
 
+#include <drivers/cros_irq_gpio.h>
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_SWITCH, outstr)
 #define CPRINTS(format, args...) cprints(CC_SWITCH, format, ##args)
@@ -28,18 +29,6 @@
 
 static int debounced_lid_open; /* Debounced lid state */
 static int forced_lid_open; /* Forced lid open */
-
-/**
- * Get raw lid switch state.
- *
- * @return 1 if lid is open, 0 if closed.
- */
-static int raw_lid_open(void)
-{
-#define LID_GPIO(gpio) || gpio_get_level(gpio)
-	return (forced_lid_open CONFIG_LID_SWITCH_GPIO_LIST) ? 1 : 0;
-#undef LID_GPIO
-}
 
 /**
  * Handle lid open.
@@ -91,56 +80,32 @@ test_mockable int lid_is_open(void)
 }
 
 /**
- * Lid switch initialization code
+ * Get raw lid switch state.
+ *
+ * @return 1 if lid is open, 0 if closed.
  */
-static void lid_init(void)
+static int raw_lid_open(void)
 {
-	if (raw_lid_open())
-		debounced_lid_open = 1;
+	const struct device *dev = DEVICE_DT_GET(DT_NODELABEL(lid_irq));
 
-	/* Enable interrupts, now that we've initialized */
-#define LID_GPIO(gpio) gpio_enable_interrupt(gpio);
-	CONFIG_LID_SWITCH_GPIO_LIST
-#undef LID_GPIO
+	return irq_gpio_pin_get(dev);
 }
-DECLARE_HOOK(HOOK_INIT, lid_init, HOOK_PRIO_INIT_LID);
 
-/**
- * Handle debounced lid switch changing state.
- */
-static void lid_change_deferred(void)
+void lid_interrupt_irq(const struct device *dev, void *data)
 {
-	const int new_open = raw_lid_open();
-
-	/* If lid hasn't changed state, nothing to do */
-	if (new_open == debounced_lid_open)
-		return;
-
-	if (new_open)
-		lid_switch_open();
-	else
-		lid_switch_close();
+	debounced_lid_open = irq_gpio_pin_get(dev);
 }
-DECLARE_DEFERRED(lid_change_deferred);
-
-void lid_interrupt(enum gpio_signal signal)
-{
-	/* Reset lid debounce time */
-	hook_call_deferred(&lid_change_deferred_data, CONFIG_LID_DEBOUNCE_US);
-}
+CROS_IRQ_GPIO_CALLBACK_DEFINE(DEVICE_DT_GET(DT_NODELABEL(lid_irq)), lid_interrupt_irq, NULL);
 
 void enable_lid_detect(bool enable)
 {
+	const struct device *dev = DEVICE_DT_GET(DT_NODELABEL(lid_irq));
+
 	CPRINTS("lid detect %sabled", enable ? "en" : "dis");
 	if (enable) {
-#define LID_GPIO(gpio) gpio_enable_interrupt(gpio);
-		CONFIG_LID_SWITCH_GPIO_LIST
-#undef LID_GPIO
+		irq_gpio_enable(dev);
 	} else {
-#define LID_GPIO(gpio) gpio_disable_interrupt(gpio);
-		CONFIG_LID_SWITCH_GPIO_LIST
-#undef LID_GPIO
-		lid_switch_open();
+		irq_gpio_disable(dev);
 	}
 }
 
@@ -178,8 +143,18 @@ static enum ec_status hc_force_lid_open(struct host_cmd_handler_args *args)
 	forced_lid_open = p->enabled ? 1 : 0;
 
 	/* Make this take effect immediately; no debounce time */
-	if (forced_lid_open != old_state)
-		hook_call_deferred(&lid_change_deferred_data, 0);
+	if (forced_lid_open != old_state) {
+		const int new_open = raw_lid_open();
+
+		/* If lid hasn't changed state, nothing to do */
+		if (new_open == debounced_lid_open)
+			return EC_RES_SUCCESS;
+
+		if (new_open)
+			lid_switch_open();
+		else
+			lid_switch_close();
+	}
 
 	return EC_RES_SUCCESS;
 }
