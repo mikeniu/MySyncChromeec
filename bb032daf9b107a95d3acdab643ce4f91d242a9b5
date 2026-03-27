@@ -70,6 +70,24 @@
       "parentUuid": "d9c5ef1b_b5285df3",
       "revId": "bb032daf9b107a95d3acdab643ce4f91d242a9b5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "679298c2_09b81e39",
+        "filename": "zephyr/dts/bindings/vendor-prefixes.txt",
+        "patchSetId": 5
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-27T11:30:13Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "a497cf74_9fc08d4e",
+      "revId": "bb032daf9b107a95d3acdab643ce4f91d242a9b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
