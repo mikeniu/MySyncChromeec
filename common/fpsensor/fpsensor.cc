@@ -60,6 +60,7 @@ static uint32_t matching_time_us;
 static uint32_t overall_time_us;
 static timestamp_t overall_t0;
 static uint8_t timestamps_invalid;
+static int8_t template_matched;
 
 BUILD_ASSERT(sizeof(struct ec_fp_template_encryption_metadata) % 4 == 0);
 
@@ -141,6 +142,7 @@ static uint32_t fp_process_match(void)
 	uint32_t updated = 0;
 	int32_t fgr = FP_NO_SUCH_TEMPLATE;
 	timestamps_invalid = 0;
+	template_matched = static_cast<int8_t>(FP_NO_SUCH_TEMPLATE);
 
 	/* match finger against current templates */
 	fp_disable_positive_match_secret(
@@ -162,6 +164,7 @@ static uint32_t fp_process_match(void)
 			 * with EC_MKBP_FP_ERR_MATCH_NO_INTERNAL.
 			 */
 			if (fgr >= 0 && fgr < FP_MAX_FINGER_COUNT) {
+				template_matched = fgr;
 				fp_enable_positive_match_secret(
 					fgr,
 					&global_context
@@ -783,12 +786,7 @@ static enum ec_status fp_command_stats(struct host_cmd_handler_args *args)
 	r->overall_t0.lo = overall_t0.le.lo;
 	r->overall_t0.hi = overall_t0.le.hi;
 	r->timestamps_invalid = timestamps_invalid;
-	/*
-	 * Note that this is set to FP_NO_SUCH_TEMPLATE when positive match
-	 * secret is read/disabled, and we are not using this field in biod.
-	 */
-	r->template_matched =
-		global_context.positive_match_secret_state.template_matched;
+	r->template_matched = template_matched;
 
 	args->response_size = sizeof(*r);
 	return EC_RES_SUCCESS;
