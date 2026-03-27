@@ -35,6 +35,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9d2d86c_2c351cf8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "f9c41340_e2293a9c",
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df2a2dd8_30922806",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "c0c16324_732b40ba",
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ec6d9fa8_17458f62",
@@ -48,6 +84,30 @@
       "writtenOn": "2026-03-24T23:07:02Z",
       "side": 1,
       "message": "This needs to be changed to `libusb` now that you\u0027re using `libusb`.\n\n```suggestion\n$(_elaniap_bin): HOST_CFLAGS+\u003d$(shell $(HOST_PKG_CONFIG) --cflags libusb-1.0)\n$(_elaniap_bin): HOST_LDFLAGS+\u003d$(shell $(HOST_PKG_CONFIG) --libs libusb-1.0)\n```",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 79
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1589f07e_a137d064",
+        "filename": "util/elan/build.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "ec6d9fa8_17458f62",
       "range": {
         "startLine": 16,
         "startChar": 0,
@@ -81,6 +141,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "98806169_0711236a",
+        "filename": "util/elan/filecontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "77996093_4c47d9d5",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 70
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dc68de3a_c62f1836",
@@ -94,6 +178,30 @@
       "writtenOn": "2026-03-24T22:01:54Z",
       "side": 1,
       "message": "Remove commented out code",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 52
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59435669_0ed97758",
+        "filename": "util/elan/filecontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "dc68de3a_c62f1836",
       "range": {
         "startLine": 28,
         "startChar": 0,
@@ -127,6 +235,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5450572e_8744ebfd",
+        "filename": "util/elan/filecontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "6f42331a_3c932643",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b1e50bfa_89cac9fa",
@@ -140,6 +272,30 @@
       "writtenOn": "2026-03-24T22:00:01Z",
       "side": 1,
       "message": "Consider using `reinterpret_cast\u003cchar*\u003e(pBinary)` or `static_cast` for C++ style.",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ab6bd58_848d9a08",
+        "filename": "util/elan/filecontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "b1e50bfa_89cac9fa",
       "range": {
         "startLine": 42,
         "startChar": 0,
@@ -173,6 +329,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "19b39655_2fb05efa",
+        "filename": "util/elan/filecontrol.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "1f0f7f24_c0290a82",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b87e160_3d4d5a38",
@@ -196,6 +376,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5de18446_3db8f91c",
+        "filename": "util/elan/globalData.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "8b87e160_3d4d5a38",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 30
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "77ec445a_3c77eb0d",
@@ -209,6 +413,30 @@
       "writtenOn": "2026-03-24T22:00:01Z",
       "side": 1,
       "message": "The use of `goto Exit;` is frequent. While it works, consider using RAII or other C++ constructs to manage resources and cleanup, which might make the flow easier to follow.",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7c349ca_434f83c4",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "77ec445a_3c77eb0d",
       "range": {
         "startLine": 53,
         "startChar": 0,
@@ -265,6 +493,54 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec6c445d_80dc0b13",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 709,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "a30cd3f2_38709814",
+      "range": {
+        "startLine": 709,
+        "startChar": 0,
+        "endLine": 709,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "475f1016_57ea14e2",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 709,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "245d46b4_20f3156b",
+      "range": {
+        "startLine": 709,
+        "startChar": 0,
+        "endLine": 709,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0b981e7b_e860da6b",
@@ -278,6 +554,30 @@
       "writtenOn": "2026-03-24T22:00:01Z",
       "side": 1,
       "message": "`libusb_init` is called here. Ensure `libusb_exit` is always called to match. It might be better to initialize libusb once in main.",
+      "range": {
+        "startLine": 751,
+        "startChar": 0,
+        "endLine": 751,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a203536_d049a771",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 751,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "0b981e7b_e860da6b",
       "range": {
         "startLine": 751,
         "startChar": 0,
@@ -311,6 +611,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "836a34dc_c7785996",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 881,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "0ff12ebd_59f76581",
+      "range": {
+        "startLine": 881,
+        "startChar": 0,
+        "endLine": 881,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7b2ffb97_352b2b80",
@@ -334,6 +658,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9937513e_569be0c6",
+        "filename": "util/elan/iapcontrol.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "7b2ffb97_352b2b80",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2b942fdc_d9ab35ba",
@@ -347,6 +695,30 @@
       "writtenOn": "2026-03-24T22:00:01Z",
       "side": 1,
       "message": "Consider using `std::vector\u003cunsigned char\u003e pBinary(binSize);` to avoid manual memory management with `new`/`delete[]`.",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4095bf3_f41dcf06",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "2b942fdc_d9ab35ba",
       "range": {
         "startLine": 52,
         "startChar": 0,
@@ -403,6 +775,54 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "59b20280_12588f2f",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "3970beee_4211e941",
+      "range": {
+        "startLine": 88,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3382da69_d3f4ae33",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "a57069e5_49f5dd9c",
+      "range": {
+        "startLine": 88,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f1b855b0_14a458c4",
@@ -416,6 +836,30 @@
       "writtenOn": "2026-03-24T22:00:01Z",
       "side": 1,
       "message": "Define `pageSize` as a constant, perhaps near the EP size definitions.",
+      "range": {
+        "startLine": 116,
+        "startChar": 0,
+        "endLine": 116,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f02f83e_45a1a93e",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "f1b855b0_14a458c4",
       "range": {
         "startLine": 116,
         "startChar": 0,
@@ -449,6 +893,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "12437ddb_8c304a9c",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "366f8585_0f5071fb",
+      "range": {
+        "startLine": 129,
+        "startChar": 0,
+        "endLine": 130,
+        "endChar": 41
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2202c5e3_5c15289f",
@@ -462,6 +930,30 @@
       "writtenOn": "2026-03-24T22:01:54Z",
       "side": 1,
       "message": "Remove commented out code",
+      "range": {
+        "startLine": 159,
+        "startChar": 0,
+        "endLine": 160,
+        "endChar": 41
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bc3da26_15c824ad",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "2202c5e3_5c15289f",
       "range": {
         "startLine": 159,
         "startChar": 0,
@@ -495,6 +987,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4bf7568_cd66ad80",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "5af2f733_84363fb6",
+      "range": {
+        "startLine": 202,
+        "startChar": 0,
+        "endLine": 203,
+        "endChar": 21
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cff4c33a_fb2775a1",
@@ -508,6 +1024,30 @@
       "writtenOn": "2026-03-24T22:01:54Z",
       "side": 1,
       "message": "Remove commented out code",
+      "range": {
+        "startLine": 206,
+        "startChar": 0,
+        "endLine": 206,
+        "endChar": 69
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fc327cd_785077c5",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "cff4c33a_fb2775a1",
       "range": {
         "startLine": 206,
         "startChar": 0,
@@ -541,6 +1081,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e69a652e_8a0bf4e0",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "ce39ef66_7fdafabb",
+      "range": {
+        "startLine": 337,
+        "startChar": 0,
+        "endLine": 337,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9faf2ce0_a90b271b",
@@ -554,6 +1118,30 @@
       "writtenOn": "2026-03-24T22:00:01Z",
       "side": 1,
       "message": "Avoid `using namespace std;` in header files.",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 0
+      },
+      "revId": "c1118b0ee789b2707f9302ccfd975854a39485d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ad518e3_cfdfb353",
+        "filename": "util/elan/iaptool.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-03-27T03:14:24Z",
+      "side": 1,
+      "message": "Fixed on Patchset 2. Thanks!!",
+      "parentUuid": "9faf2ce0_a90b271b",
       "range": {
         "startLine": 15,
         "startChar": 0,
