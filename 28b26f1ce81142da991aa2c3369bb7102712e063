@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6148464_54082b28",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-27T16:21:57Z",
+      "side": 1,
+      "message": "This should have the same bug and test as the revert CLs.",
+      "revId": "28b26f1ce81142da991aa2c3369bb7102712e063",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
