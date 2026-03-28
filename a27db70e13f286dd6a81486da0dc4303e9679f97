@@ -1,6 +1,40 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "41fa490b_c3375829",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-28T00:35:27Z",
+      "side": 1,
+      "message": "@pranavayn@google.com Can you give this a second review?",
+      "revId": "a27db70e13f286dd6a81486da0dc4303e9679f97",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6dd1a6cd_f14985ea",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 3145,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-28T00:35:27Z",
+      "side": 1,
+      "message": "Can you add a comment like this?\n\n\u003e TODO(b:469587422): Remove the logic to enable Auto Discharge Disconnect in `tc_pr_swap_complete`. That\u0027s too late for a sink-to-source PRS.",
+      "revId": "a27db70e13f286dd6a81486da0dc4303e9679f97",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c53775e3_d479c028",
