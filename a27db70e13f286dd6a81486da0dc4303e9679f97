@@ -18,6 +18,23 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "519920f2_9acfc827",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-28T00:36:44Z",
+      "side": 1,
+      "message": "From my testing the last two days, it seems like all of the apparent failures are tester issues. We\u0027ll need to resolve those eventually, but this is an incremental improvement.",
+      "revId": "a27db70e13f286dd6a81486da0dc4303e9679f97",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6dd1a6cd_f14985ea",
