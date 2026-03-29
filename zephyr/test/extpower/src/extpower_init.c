@@ -18,6 +18,21 @@ ZTEST(extpower_init, test_extpower_init)
 	 * the extpower support.
 	 */
 	zassert_equal(extpower_is_present(), CONFIG_ACOK_INIT_VALUE);
+
+	/* Verify that the host events are updated during initialization */
+	if (IS_ENABLED(HAS_TASK_HOSTCMD)) {
+		if (CONFIG_ACOK_INIT_VALUE) {
+			zassert_true(
+				host_is_event_set(EC_HOST_EVENT_AC_CONNECTED));
+			zassert_false(host_is_event_set(
+				EC_HOST_EVENT_AC_DISCONNECTED));
+		} else {
+			zassert_false(
+				host_is_event_set(EC_HOST_EVENT_AC_CONNECTED));
+			zassert_true(host_is_event_set(
+				EC_HOST_EVENT_AC_DISCONNECTED));
+		}
+	}
 }
 
 ZTEST_SUITE(extpower_init, NULL, NULL, NULL, NULL, NULL);

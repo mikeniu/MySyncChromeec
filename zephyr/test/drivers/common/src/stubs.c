@@ -238,3 +238,8 @@ int clock_get_freq(void)
 {
 	return 16000000;
 }
+
+int extpower_is_present(void)
+{
+	return 1;
+}

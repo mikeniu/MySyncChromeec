@@ -8,6 +8,11 @@
 
 #include <zephyr/ztest.h>
 
+int extpower_is_present(void)
+{
+	return 1;
+}
+
 /* Test external variable defined in charge_state_v2 */
 extern int charge_prevent_power_on_automatic_power_on;
 

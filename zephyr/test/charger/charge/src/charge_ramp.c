@@ -12,6 +12,11 @@
 #include <zephyr/fff.h>
 #include <zephyr/ztest.h>
 
+int extpower_is_present(void)
+{
+	return 1;
+}
+
 FAKE_VALUE_FUNC(int, system_is_locked);
 
 static void charge_ramp_before(void *state)

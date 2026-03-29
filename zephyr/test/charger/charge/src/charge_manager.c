@@ -12,6 +12,11 @@
 
 #include <zephyr/ztest.h>
 
+int extpower_is_present(void)
+{
+	return 1;
+}
+
 #define RTS5453P_NODE DT_NODELABEL(pdc_emul1)
 static const struct emul *emul = EMUL_DT_GET(RTS5453P_NODE);
 

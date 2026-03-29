@@ -10,6 +10,11 @@
 
 #include <zephyr/ztest.h>
 
+int extpower_is_present(void)
+{
+	return 1;
+}
+
 ZTEST_SUITE(charge_manager_seeding_pre_main, charger_predicate_pre_main, NULL,
 	    NULL, NULL, NULL);
 
