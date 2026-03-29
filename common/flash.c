@@ -769,15 +769,19 @@ test_mockable int crec_flash_unprotected_read(int offset, int size, char *data)
 #ifdef CONFIG_MAPPED_STORAGE
 	const char *src;
 
-	if (crec_flash_dataptr(offset, size, 1, &src) < 0)
+	if (crec_flash_dataptr(offset, size, 1, &src) < 0) {
+
+		printk("%s: FAIL ================================================================\n", __func__);
+
 		return EC_ERROR_INVAL;
+	}
 
 	crec_flash_lock_mapped_storage(1);
 	memcpy(data, src, size);
 	crec_flash_lock_mapped_storage(0);
 	return EC_SUCCESS;
 #else
-	return crec_flash_physical_read(offset, size, data);
+xxx	return crec_flash_physical_read(offset, size, data);
 #endif
 }
 

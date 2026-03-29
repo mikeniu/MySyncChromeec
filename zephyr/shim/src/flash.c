@@ -129,6 +129,11 @@ test_mockable int crec_flash_physical_read(int offset, int size, char *data)
 	/* Unlock physical flash operations */
 	crec_flash_lock_mapped_storage(0);
 
+	if (rv != EC_SUCCESS) {
+		printk("%s: rv %d ================================================================ \n", __func__, rv);
+	}
+
+
 	return rv;
 }
 
