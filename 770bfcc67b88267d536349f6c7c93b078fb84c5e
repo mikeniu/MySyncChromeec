@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f47efe30_a04bac2a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-30T18:06:33Z",
+      "side": 1,
+      "message": "This CL depends on this CL: https://chrome-internal-review.git.corp.google.com/c/chromeos/vendor/fingerprint/egis/+/9106841\n\nam I right? If this is the case, can you please add \n\n`Cq-Depend: chrome-internal:9106841` to prevent this CL from being merge without its dependency?",
+      "revId": "770bfcc67b88267d536349f6c7c93b078fb84c5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
