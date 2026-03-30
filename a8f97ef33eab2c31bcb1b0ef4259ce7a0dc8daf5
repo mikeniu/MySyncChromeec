@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "222c9b89_df0e3f1c",
+        "filename": "util/rtkupdate.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-30T17:38:15Z",
+      "side": 1,
+      "message": "Nit: There could be one less level of nesting here without otherwise changing the code.",
+      "revId": "a8f97ef33eab2c31bcb1b0ef4259ce7a0dc8daf5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
