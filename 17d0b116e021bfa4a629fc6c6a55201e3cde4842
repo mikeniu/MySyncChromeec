@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0540f805_a17b0b3d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1262393
+      },
+      "writtenOn": "2026-03-30T07:39:38Z",
+      "side": 1,
+      "message": "@rex_chou@compal.corp-partner.google.com\nPlease help to update what test you validate on Jaina.",
+      "revId": "17d0b116e021bfa4a629fc6c6a55201e3cde4842",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
