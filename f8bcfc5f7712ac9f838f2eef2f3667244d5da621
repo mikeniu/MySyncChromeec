@@ -43,6 +43,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1b2e51bc_d62e4c8f",
+        "filename": "util/ectool_usb/ectool.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 510,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-30T09:59:35Z",
+      "side": 1,
+      "message": "Somehow I assumed hex() adds \u00270x\u0027 for each byte",
+      "parentUuid": "a8bffb29_ad983106",
+      "range": {
+        "startLine": 510,
+        "startChar": 0,
+        "endLine": 510,
+        "endChar": 0
+      },
+      "revId": "f8bcfc5f7712ac9f838f2eef2f3667244d5da621",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8cdcfe65_f54719c3",
         "filename": "util/ectool_usb/ectool.py",
         "patchSetId": 18
@@ -54,6 +78,30 @@
       "writtenOn": "2026-03-27T08:21:34Z",
       "side": 1,
       "message": "Typo: \"Established\" -\u003e \"Establish\"",
+      "range": {
+        "startLine": 549,
+        "startChar": 0,
+        "endLine": 549,
+        "endChar": 0
+      },
+      "revId": "f8bcfc5f7712ac9f838f2eef2f3667244d5da621",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e60d10e6_8e14734e",
+        "filename": "util/ectool_usb/ectool.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-30T09:59:35Z",
+      "side": 1,
+      "message": "All docstrings use third person so changed to  \u0027Establishes\u0027",
+      "parentUuid": "8cdcfe65_f54719c3",
       "range": {
         "startLine": 549,
         "startChar": 0,
