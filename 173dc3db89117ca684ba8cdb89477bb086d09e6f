@@ -1,0 +1,149 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6aa7e2c_8e5ca4a1",
+        "filename": "common/system.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 953,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-03-30T20:51:46Z",
+      "side": 1,
+      "message": "just a thought.. If this condition is replaced with \n```\nif (jdata-\u003emagic !\u003d JUMP_DATA_MAGIC || jdata-\u003eversion \u003c 1) {\n    goto clear_jump_data;\n}\n```\nthen this entire block could benefit from one less indentation. Welcome to ignore though",
+      "fixSuggestions": [
+        {
+          "fixId": "5ac7ee76_a7ab1562",
+          "description": "prompt_to_edit API",
+          "replacements": [
+            {
+              "path": "common/system.c",
+              "range": {
+                "startLine": 953,
+                "startChar": 0,
+                "endLine": 957,
+                "endChar": 0
+              },
+              "replacement": "\tif (jdata-\u003emagic !\u003d JUMP_DATA_MAGIC || jdata-\u003eversion \u003c 1) {\n\t\tgoto clear_jump_data;\n\t}\n"
+            },
+            {
+              "path": "common/system.c",
+              "range": {
+                "startLine": 958,
+                "startChar": 0,
+                "endLine": 962,
+                "endChar": 0
+              },
+              "replacement": "\t/* Change in jump data struct size between the previous image\n\t * and this one. */\n\tint delta;\n"
+            },
+            {
+              "path": "common/system.c",
+              "range": {
+                "startLine": 963,
+                "startChar": 0,
+                "endLine": 975,
+                "endChar": 0
+              },
+              "replacement": "\t/* Yes, we jumped to this image */\n\tjumped_to_image \u003d 1;\n\t/* Restore the reset flags */\n\treset_flags \u003d jdata-\u003ereset_flags | EC_RESET_FLAG_SYSJUMP;\n"
+            },
+            {
+              "path": "common/system.c",
+              "range": {
+                "startLine": 976,
+                "startChar": 0,
+                "endLine": 985,
+                "endChar": 0
+              },
+              "replacement": "\t/*\n\t * If the jump data structure isn\u0027t the same size as the\n\t * current one, shift the jump tags to immediately before the\n\t * current jump data structure, to make room for initalizing\n\t * the new fields below.\n\t */\n\tif (jdata-\u003eversion \u003d\u003d 1)\n\t\tdelta \u003d 0; /* No tags in v1, so no need for move */\n\telse if (jdata-\u003eversion \u003d\u003d 2)\n\t\tdelta \u003d sizeof(struct jump_data) - JUMP_DATA_SIZE_V2;\n\telse\n\t\tdelta \u003d sizeof(struct jump_data) - jdata-\u003estruct_size;\n"
+            },
+            {
+              "path": "common/system.c",
+              "range": {
+                "startLine": 986,
+                "startChar": 0,
+                "endLine": 989,
+                "endChar": 0
+              },
+              "replacement": "\t/*\n\t * Validate sizes to prevent integer overflow or underflow\n\t * during the tag shift.\n\t */\n\tif (jdata-\u003eversion \u003e\u003d 3 \u0026\u0026\n\t    (jdata-\u003estruct_size \u003c 0 ||\n\t     jdata-\u003estruct_size \u003e\u003d CONFIG_PRESERVED_END_OF_RAM_SIZE)) {\n\t\tgoto clear_jump_data;\n\t}\n"
+            },
+            {
+              "path": "common/system.c",
+              "range": {
+                "startLine": 990,
+                "startChar": 0,
+                "endLine": 993,
+                "endChar": 0
+              },
+              "replacement": "\tif (jdata-\u003eversion \u003e\u003d 2 \u0026\u0026 jdata-\u003ejump_tag_total \u003c 0) {\n\t\tgoto clear_jump_data;\n\t}\n\n\t/*\n\t * Check if enough space for jump data and tags, avoiding\n\t * pointer underflow which would bypass the bounds check.\n\t */\n\tif ((uintptr_t)jdata - jdata-\u003ejump_tag_total \u003c JUMP_DATA_MIN_ADDRESS) {\n\t\t/* TODO(b/251190975): This failure should be reported\n\t\t * in the panic data structure for more visibility.\n"
+            },
+            {
+              "path": "common/system.c",
+              "range": {
+                "startLine": 994,
+                "startChar": 0,
+                "endLine": 1001,
+                "endChar": 0
+              },
+              "replacement": "\t\tgoto clear_jump_data;\n\t}\n"
+            },
+            {
+              "path": "common/system.c",
+              "range": {
+                "startLine": 1002,
+                "startChar": 0,
+                "endLine": 1006,
+                "endChar": 0
+              },
+              "replacement": "\tif (delta \u0026\u0026 jdata-\u003ejump_tag_total) {\n\t\tuint8_t *d \u003d (uint8_t *)system_usable_ram_end();\n\t\tmemmove(d, d + delta, jdata-\u003ejump_tag_total);\n\t}\n"
+            },
+            {
+              "path": "common/system.c",
+              "range": {
+                "startLine": 1007,
+                "startChar": 0,
+                "endLine": 1010,
+                "endChar": 0
+              },
+              "replacement": "\t/* Initialize fields added after version 1 */\n\tif (jdata-\u003eversion \u003c 2)\n\t\tjdata-\u003ejump_tag_total \u003d 0;\n"
+            },
+            {
+              "path": "common/system.c",
+              "range": {
+                "startLine": 1011,
+                "startChar": 0,
+                "endLine": 1014,
+                "endChar": 0
+              },
+              "replacement": "\t/* Initialize fields added after version 2 */\n\tif (jdata-\u003eversion \u003c 3)\n\t\tjdata-\u003ereserved0 \u003d 0;\n"
+            },
+            {
+              "path": "common/system.c",
+              "range": {
+                "startLine": 1015,
+                "startChar": 0,
+                "endLine": 1017,
+                "endChar": 0
+              },
+              "replacement": "\t/* Struct size is now the current struct size */\n\tjdata-\u003estruct_size \u003d sizeof(struct jump_data);\n"
+            },
+            {
+              "path": "common/system.c",
+              "range": {
+                "startLine": 1018,
+                "startChar": 0,
+                "endLine": 1026,
+                "endChar": 0
+              },
+              "replacement": "\t/*\n\t * Clear the jump struct\u0027s magic number.  This prevents\n\t * accidentally detecting a jump when there wasn\u0027t one, and\n\t * disallows use of system_add_jump_tag().\n\t */\n\tjdata-\u003emagic \u003d 0;\n\treturn;\n"
+            }
+          ]
+        }
+      ],
+      "revId": "173dc3db89117ca684ba8cdb89477bb086d09e6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
