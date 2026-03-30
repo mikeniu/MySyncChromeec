@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4adeec18_0d811fc8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-30T17:51:32Z",
+      "side": 1,
+      "message": "CQ error:\n```\n[ocelotrvp-ite:ro] /tmp/zcompare-9rrfv8zc/7cf66a06fef8dfdbc5d9f0d7a7744f460fb7af8b/modules/ec/zephyr/drivers/dsp_comms/service/dsp_service.cc:59:62: error: unused parameter \u0027cb\u0027 [-Werror\u003dunused-parameter]\n[ocelotrvp-ite:ro]    59 | static void dsp_service_startup(struct ap_power_ev_callback* cb,\n[ocelotrvp-ite:ro]       |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~\n```",
+      "revId": "2a9d3173ff81f06ce9a5e89a95d7714cd1474eae",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
