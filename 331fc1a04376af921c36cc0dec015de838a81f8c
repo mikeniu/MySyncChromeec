@@ -22,6 +22,48 @@
       },
       "revId": "331fc1a04376af921c36cc0dec015de838a81f8c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e673016d_504321bf",
+        "filename": ".agents/AGENTS.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-03-30T17:10:25Z",
+      "side": 1,
+      "message": "Fix applied.",
+      "parentUuid": "1956c2ba_2a99bd08",
+      "range": {
+        "startLine": 95,
+        "startChar": 53,
+        "endLine": 95,
+        "endChar": 62
+      },
+      "fixSuggestions": [
+        {
+          "fixId": "d7751d2e_ffb22b9d",
+          "description": "GET_AI_FIX_FOR_COMMENT prompt_to_edit API",
+          "replacements": [
+            {
+              "path": ".agents/AGENTS.md",
+              "range": {
+                "startLine": 95,
+                "startChar": 0,
+                "endLine": 96,
+                "endChar": 0
+              },
+              "replacement": "   * `include/config.h` - Configuration header file. Individual boards may override\n"
+            }
+          ]
+        }
+      ],
+      "revId": "331fc1a04376af921c36cc0dec015de838a81f8c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
