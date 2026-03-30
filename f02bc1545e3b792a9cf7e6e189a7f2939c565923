@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a70373a6_1d739f78",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-30T15:25:06Z",
+      "side": 1,
+      "message": "the kingler.usbc test is failing.  You need to add a stub implementation of `extpower_is_present` to the kingler test.",
+      "revId": "f02bc1545e3b792a9cf7e6e189a7f2939c565923",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
