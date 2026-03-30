@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "784b5238_74e852ab",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-30T08:11:28Z",
+      "side": 1,
+      "message": "It is guarded in update() implementation in the header. One of the first comments in this review was about it. It makes it a little bit simpler here and a little more complex in the header.",
+      "parentUuid": "0fde0203_62488e4a",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5e937784_2d11477e",
         "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
         "patchSetId": 20
@@ -31,6 +49,24 @@
       "writtenOn": "2026-03-26T11:56:33Z",
       "side": 1,
       "message": "Just use `K_WORK_DELAYABLE_DEFINE`?",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70081ce7_32c3288e",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-30T08:11:28Z",
+      "side": 1,
+      "message": "Good hint!",
+      "parentUuid": "5e937784_2d11477e",
       "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -77,6 +113,48 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "01a4a060_8629b774",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-30T08:11:28Z",
+      "side": 1,
+      "message": "It is defined so in user experience requirements (https://docs.google.com/document/d/1P9-c0xA0vEwKa4XS7Ttqj4QQ2woQS18Opgdg99myUk8/edit?resourcekey\u003d0-h5uNQ6z_uDAVZnCOa4wznQ\u0026tab\u003dt.0)",
+      "parentUuid": "9ee6d6f7_3583b9d2",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "79210e97_8a6d26b5",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-30T08:11:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b09b3b2b_684dabed",
+      "range": {
+        "startLine": 56,
+        "startChar": 50,
+        "endLine": 56,
+        "endChar": 51
+      },
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "29213b9c_f5a89195",
         "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
         "patchSetId": 20
@@ -88,6 +166,30 @@
       "writtenOn": "2026-03-26T11:56:33Z",
       "side": 1,
       "message": "This will be called every `fptask` loop interaction, which means there will be:\n- logging\n- handling k_work\n- gpio operations\n\nis that correct or I\u0027m missing something?",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 0
+      },
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c74df818_626e2325",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-30T08:11:28Z",
+      "side": 1,
+      "message": "You are correct. Number of calls is not excessive in my opinion. However, You, Jan and Review Agent are concerned about it so I added simple bool flag to avoid extra calls.",
+      "parentUuid": "29213b9c_f5a89195",
       "range": {
         "startLine": 47,
         "startChar": 0,
@@ -121,6 +223,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2c1ac49_ce309ec3",
+        "filename": "include/fpsensor/fpsensor_btn_ign_out.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-30T08:11:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2942397f_49812026",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 0
+      },
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "417506f4_8983a330",
@@ -134,6 +260,24 @@
       "writtenOn": "2026-03-26T11:56:33Z",
       "side": 1,
       "message": "Is there any reason to implement it as inline?",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23a515a2_e02a6cb7",
+        "filename": "include/fpsensor/fpsensor_btn_ign_out.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-30T08:11:28Z",
+      "side": 1,
+      "message": "It is implemented in the header to guard it with defines so it has to use inline linkage in order not to cause multiple definition problem in linker.",
+      "parentUuid": "417506f4_8983a330",
       "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -155,6 +299,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd1db447_32df304a",
+        "filename": "zephyr/CMakeLists.txt",
+        "patchSetId": 20
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-30T08:11:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "13e6734c_4b6a9944",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c1f14e98_ab074016",
@@ -168,6 +330,24 @@
       "writtenOn": "2026-03-26T11:56:33Z",
       "side": 1,
       "message": "Shouldn\u0027t this be called something like PLATFORM_EC_BTN_IGN_OUT_FP since it is used in FP code?",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd0125b2_ff02a107",
+        "filename": "zephyr/Kconfig.btn_ign",
+        "patchSetId": 20
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-30T08:11:28Z",
+      "side": 1,
+      "message": "Changet to PLATFORM_EC_FINGERPRINT_BTN_IGN_OUT to match naming conventions.",
+      "parentUuid": "c1f14e98_ab074016",
       "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -195,6 +375,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e7fbccf_9341a3d3",
+        "filename": "zephyr/Kconfig.btn_ign",
+        "patchSetId": 20
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-30T08:11:28Z",
+      "side": 1,
+      "message": "Rebasing problem",
+      "parentUuid": "a7d51e5f_902ab2b6",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 38
+      },
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1788d3e3_434fa07c",
@@ -208,6 +412,24 @@
       "writtenOn": "2026-03-26T11:56:33Z",
       "side": 1,
       "message": "Is this used?",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d4e5569_01787176",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_btn_ign_out.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-30T08:11:28Z",
+      "side": 1,
+      "message": "Linker complains if it is not defined. It is also defined in all other tests files in this directory.",
+      "parentUuid": "1788d3e3_434fa07c",
       "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
