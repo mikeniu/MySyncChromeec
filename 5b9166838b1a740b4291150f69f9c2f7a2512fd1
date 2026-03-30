@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e222b435_21cd9a6b",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-30T14:52:55Z",
+      "side": 1,
+      "message": "Understood.",
+      "parentUuid": "784b5238_74e852ab",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5e937784_2d11477e",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Good hint!",
       "parentUuid": "5e937784_2d11477e",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff73f144_864ab274",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-30T14:52:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70081ce7_32c3288e",
       "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -200,6 +236,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "33cb3cff_742ff6d6",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-30T14:52:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c74df818_626e2325",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 0
+      },
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2942397f_49812026",
@@ -278,6 +338,24 @@
       "side": 1,
       "message": "It is implemented in the header to guard it with defines so it has to use inline linkage in order not to cause multiple definition problem in linker.",
       "parentUuid": "417506f4_8983a330",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ff0ae8d_3ae278c8",
+        "filename": "include/fpsensor/fpsensor_btn_ign_out.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-30T14:52:55Z",
+      "side": 1,
+      "message": "Maybe consider doing it as [Zephyr PM](https://github.com/zephyrproject-rtos/zephyr/blob/main/include/zephyr/pm/device.h#L737) - empty static inline if not defined and a function definition in a .c file if defined?",
+      "parentUuid": "23a515a2_e02a6cb7",
       "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
