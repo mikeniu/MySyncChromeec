@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b78e3bf6_9d3432d8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1544342
+      },
+      "writtenOn": "2026-03-30T14:27:45Z",
+      "side": 1,
+      "message": "b:488906616",
+      "range": {
+        "startLine": 12,
+        "startChar": 4,
+        "endLine": 12,
+        "endChar": 8
+      },
+      "revId": "fff2a60fb2c02fcfe486fe2f82ed46139e668082",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "95402d16_a66b227d",
         "filename": "zephyr/program/bluey/mica/gpios.dtsi",
         "patchSetId": 1
