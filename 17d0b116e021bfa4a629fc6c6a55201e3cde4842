@@ -16,6 +16,23 @@
       "message": "@rex_chou@compal.corp-partner.google.com\nPlease help to update what test you validate on Jaina.",
       "revId": "17d0b116e021bfa4a629fc6c6a55201e3cde4842",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dadbf86a_7d8a2570",
+        "filename": "zephyr/program/skywalker/jaina/src/led.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1262393
+      },
+      "writtenOn": "2026-03-30T08:19:28Z",
+      "side": 1,
+      "message": "How about to merge all is_battery_led_auto_control function that used in switch case.",
+      "revId": "17d0b116e021bfa4a629fc6c6a55201e3cde4842",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
