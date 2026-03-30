@@ -229,13 +229,27 @@ void host_packet_receive(struct host_packet *pkt)
 	int csum = 0;
 	int i;
 
+#if 1
+	static uint16_t hc_p_command;
+	static uint8_t hc_p_command_version;
+#endif
+
 	/* If the task is busy, don't stomp on its state. */
 	if (hc_processing) {
 		pkt->driver_result = EC_RES_BUSY;
 		pkt->send_response(pkt);
+#if 1
+		printk("%s: ================================\n", __func__);
+		printk("%s: saved cmd 0x%04x ver %d\n", __func__,
+		       hc_p_command, hc_p_command_version);
+#endif
 		return;
 	}
 	hc_processing = true;
+#if 1
+	hc_p_command = r->command;
+	hc_p_command_version = r->command_version;
+#endif
 
 	/* Track the packet we're handling */
 	pkt0 = pkt;
