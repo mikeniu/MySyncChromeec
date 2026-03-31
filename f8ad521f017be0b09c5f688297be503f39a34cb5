@@ -190,6 +190,30 @@
       },
       "revId": "f8ad521f017be0b09c5f688297be503f39a34cb5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "007cdbb5_84b435d5",
+        "filename": "zephyr/program/ocelot/ocelotrvp-ite/power_signals.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-03-31T07:58:37Z",
+      "side": 0,
+      "message": "As SYS_RST signal is an Open drain signal hence modifying the logic for push pull will not help this case, instead can we consider \"intel,ap-pwrseq-external\" to ensure gpio_pin_get_dt() is called?\n\nIn power_signal_gpio_get() reading of output signal level is not supported and from CL:3769706 commit message, I understand logic is added as WA for the issue seen in Open drain circuitry, may be board specific.",
+      "parentUuid": "a2df2439_cf0e004f",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 61
+      },
+      "revId": "f8ad521f017be0b09c5f688297be503f39a34cb5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
