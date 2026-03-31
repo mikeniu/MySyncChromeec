@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "11a2a67e_f94a6e35",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-31T11:42:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c81097_0bd9ef73",
+      "revId": "a334fdbf4dca79320ed780b97f938a8eab857247",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b6928368_e509f656",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-03-31T10:25:08Z",
       "side": 1,
       "message": "#ifdef?",
+      "revId": "a334fdbf4dca79320ed780b97f938a8eab857247",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94eb05eb_0c5de991",
+        "filename": "include/fpsensor/fpsensor_btn_ign_out.h",
+        "patchSetId": 23
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-31T11:42:39Z",
+      "side": 1,
+      "message": "Why? What is wrong with \u0027#if defined()\u0027? It is quite common in out code base.",
+      "parentUuid": "b6928368_e509f656",
       "revId": "a334fdbf4dca79320ed780b97f938a8eab857247",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

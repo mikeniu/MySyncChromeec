@@ -52,6 +52,24 @@
       "parentUuid": "d33d9864_cb176c92",
       "revId": "2705fd47246525c4c138eb4421db259f1a56126d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "872afb49_c4a1684c",
+        "filename": "include/fpsensor/fpsensor_btn_ign_out.h",
+        "patchSetId": 22
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-31T11:42:39Z",
+      "side": 1,
+      "message": "Heh, silly me. So I change it back to update. Together with namespace and param it says it all. For calling it from fp_set_sensor_mode. It is called from the commands handlers and sets main fp task to react to it. My idea was that it is better to handle GPIO state setting in a main task context rather than in commands handlers.",
+      "parentUuid": "3556ef11_9705d322",
+      "revId": "2705fd47246525c4c138eb4421db259f1a56126d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
