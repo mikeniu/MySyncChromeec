@@ -142,6 +142,30 @@
       },
       "revId": "f8ad521f017be0b09c5f688297be503f39a34cb5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a20c7fd_36c54b2a",
+        "filename": "zephyr/program/ocelot/ocelotrvp-ite/power_signals.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-03-31T04:11:12Z",
+      "side": 0,
+      "message": "The SYS_RST signal is an Open drain signal hence modifying the logic for push pull will not help this case.",
+      "parentUuid": "bfd0d32f_77b27afb",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 61
+      },
+      "revId": "f8ad521f017be0b09c5f688297be503f39a34cb5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
