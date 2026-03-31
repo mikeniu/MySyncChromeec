@@ -440,11 +440,11 @@ extern "C" void fp_task(void)
 
 static enum ec_status fp_command_info(struct host_cmd_handler_args *args)
 {
-	struct ec_response_fp_info_v2 *r =
-		static_cast<ec_response_fp_info_v2 *>(args->response);
+	struct ec_response_fp_info_v3 *r =
+		static_cast<ec_response_fp_info_v3 *>(args->response);
 	const size_t response_size =
-		sizeof(struct ec_response_fp_info_v2) +
-		FP_MAX_CAPTURE_TYPES * sizeof(struct fp_image_frame_params);
+		sizeof(struct ec_response_fp_info_v3) +
+		FP_MAX_CAPTURE_TYPES * sizeof(struct fp_image_frame_params_v2);
 
 	if (response_size > args->response_max) {
 		return EC_RES_OVERFLOW;
@@ -472,7 +472,7 @@ static enum ec_status fp_command_info(struct host_cmd_handler_args *args)
 
 	return EC_RES_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_INFO, fp_command_info, EC_VER_MASK(2));
+DECLARE_HOST_COMMAND(EC_CMD_FP_INFO, fp_command_info, EC_VER_MASK(3));
 
 BUILD_ASSERT(FP_CONTEXT_NONCE_BYTES == 12);
 
