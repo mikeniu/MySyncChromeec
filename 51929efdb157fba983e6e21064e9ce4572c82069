@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bd078ef_660a3bc4",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-31T16:00:23Z",
+      "side": 1,
+      "message": "This returns `bool`, but that immediately gets converted to a constant. Why not just have this function return the constant?",
+      "revId": "51929efdb157fba983e6e21064e9ce4572c82069",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "400c4adc_b36b4848",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-31T16:00:23Z",
+      "side": 1,
+      "message": "Maybe this case should return an error.",
+      "revId": "51929efdb157fba983e6e21064e9ce4572c82069",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26f5a402_73b77b95",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-31T16:00:23Z",
+      "side": 1,
+      "message": "Have you seen retries help here? If so, do you know why we need them? If not, should it just fail immediately on the first write failure?",
+      "revId": "51929efdb157fba983e6e21064e9ce4572c82069",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb1bbae2_84e0c97c",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-31T16:00:23Z",
+      "side": 1,
+      "message": "Line length",
+      "revId": "51929efdb157fba983e6e21064e9ce4572c82069",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b8b8543_feeb5c69",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-03-31T16:00:23Z",
+      "side": 1,
+      "message": "It looks like you\u0027re expecting that the size of the battery could change at runtime? Is that possible?",
+      "revId": "51929efdb157fba983e6e21064e9ce4572c82069",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
