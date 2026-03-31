@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45e7a903_e5ba9487",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-31T15:21:27Z",
+      "side": 1,
+      "message": "@dawidn@google.com\ncan I do this CL. It needs the libec changes to merged with it.",
+      "revId": "dd889830d29314b186bbc1f6faf08c5d8daa4c88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b2c7e21_651689ec",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-31T15:21:27Z",
+      "side": 1,
+      "message": "I do not believe you need to add 2 versions here. Just version 3.",
+      "range": {
+        "startLine": 503,
+        "startChar": 6,
+        "endLine": 503,
+        "endChar": 39
+      },
+      "revId": "dd889830d29314b186bbc1f6faf08c5d8daa4c88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
