@@ -166,6 +166,30 @@
       },
       "revId": "f8ad521f017be0b09c5f688297be503f39a34cb5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2df2439_cf0e004f",
+        "filename": "zephyr/program/ocelot/ocelotrvp-ite/power_signals.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-03-31T04:57:39Z",
+      "side": 0,
+      "message": "https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/3769706 CL introducing the change.\n\nThe reason (from commit message)\nOpen drain outputs sometimes use low voltages, and so reading the physical level on the pin may indicate a 0 for an output that has been set to 1.\n\nThis can happen if appropriate pull-up resistor values and total load not considered when designing open drain circuits.",
+      "parentUuid": "2a20c7fd_36c54b2a",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 61
+      },
+      "revId": "f8ad521f017be0b09c5f688297be503f39a34cb5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
