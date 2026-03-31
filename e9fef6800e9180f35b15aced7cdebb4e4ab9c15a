@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0165a695_7460a47b",
+        "filename": "zephyr/program/corsola/ponyta/src/alt_charger.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-03-31T03:50:04Z",
+      "side": 1,
+      "message": "CONFIG_SKYRIM_LOG_LEVEL is used by skyrim project. Just use `LOG_LEVEL_ERR`.",
+      "range": {
+        "startLine": 15,
+        "startChar": 27,
+        "endLine": 15,
+        "endChar": 50
+      },
+      "revId": "e9fef6800e9180f35b15aced7cdebb4e4ab9c15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
