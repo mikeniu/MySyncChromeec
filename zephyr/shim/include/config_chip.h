@@ -106,6 +106,11 @@ extern "C" {
 #define HOOK_TICK_INTERVAL CONFIG_CROS_EC_HOOK_TICK_INTERVAL
 #define HOOK_TICK_INTERVAL_MS (HOOK_TICK_INTERVAL / 1000)
 
+/* Map Zephyr config to EC config for enabling DFP-only SVDM response */
+#ifdef CONFIG_PLATFORM_EC_SVDM_RSP_DFP_ONLY
+#define CONFIG_SVDM_RSP_DFP_ONLY
+#endif
+
 /* Chipset and power configuration */
 #ifdef CONFIG_AP_ARM_QUALCOMM_SC7180
 #define CONFIG_CHIPSET_SC7180
