@@ -25,6 +25,13 @@ child-binding:
       - LID_SENSOR
       - LIGHTBAR
       - USB_SS_MUX
+<<<<<<< HEAD   (7e8d8b409223740d48382b13c0fa77b90a00cd7e ponyta: add alt charger)
+||||||| BASE   (ed7ae1b1ce066f55873101bd653b9694704b2149 utils: add FP_FRAME support in ectool_usb)
+      - PANEL_TYPE
+=======
+      - PANEL_TYPE
+      - FW_CHARGER
+>>>>>>> CHANGE (5a4578060f1d4633f03a92ffe59adc8000a305a3 ponyta: modified to distinguish chargers via SSFC)
     size:
       type: int
       required: true
