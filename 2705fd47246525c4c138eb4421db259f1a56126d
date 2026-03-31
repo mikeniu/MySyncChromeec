@@ -34,6 +34,24 @@
       "parentUuid": "7f5f9631_c8858589",
       "revId": "2705fd47246525c4c138eb4421db259f1a56126d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3556ef11_9705d322",
+        "filename": "include/fpsensor/fpsensor_btn_ign_out.h",
+        "patchSetId": 22
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T10:25:08Z",
+      "side": 1,
+      "message": "I didn\u0027t mean to change the function name. I meant to call the update function from the [fp_set_sensor_mode](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/common/fpsensor/fpsensor_state.cc;l\u003d279?q\u003dfp_set_sensor_mode\u0026sq\u003d\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch:src%2Fplatform%2Fec%2Fcommon%2F) function. You would need to make sure the mode is changed only via this function.",
+      "parentUuid": "d33d9864_cb176c92",
+      "revId": "2705fd47246525c4c138eb4421db259f1a56126d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

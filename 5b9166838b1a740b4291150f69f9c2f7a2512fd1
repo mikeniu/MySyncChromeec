@@ -378,6 +378,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "54920ba8_c880c8fe",
+        "filename": "include/fpsensor/fpsensor_btn_ign_out.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T10:25:08Z",
+      "side": 1,
+      "message": "Yes, thanks!",
+      "parentUuid": "771d0a0d_99d3ff6f",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "13e6734c_4b6a9944",
@@ -444,6 +462,24 @@
       "side": 1,
       "message": "Changet to PLATFORM_EC_FINGERPRINT_BTN_IGN_OUT to match naming conventions.",
       "parentUuid": "c1f14e98_ab074016",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee6d120a_522a6374",
+        "filename": "zephyr/Kconfig.btn_ign",
+        "patchSetId": 20
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T10:25:08Z",
+      "side": 1,
+      "message": "Thanks.",
+      "parentUuid": "cd0125b2_ff02a107",
       "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -526,6 +562,24 @@
       "side": 1,
       "message": "Linker complains if it is not defined. It is also defined in all other tests files in this directory.",
       "parentUuid": "1788d3e3_434fa07c",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b76b99ee_3e596f5c",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_btn_ign_out.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T10:25:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d4e5569_01787176",
       "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

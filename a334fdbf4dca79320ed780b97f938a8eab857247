@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99c81097_0bd9ef73",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T10:25:08Z",
+      "side": 1,
+      "message": "NIT: `fp_btn_ign_out`?",
+      "revId": "a334fdbf4dca79320ed780b97f938a8eab857247",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6928368_e509f656",
+        "filename": "include/fpsensor/fpsensor_btn_ign_out.h",
+        "patchSetId": 23
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T10:25:08Z",
+      "side": 1,
+      "message": "#ifdef?",
+      "revId": "a334fdbf4dca79320ed780b97f938a8eab857247",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
