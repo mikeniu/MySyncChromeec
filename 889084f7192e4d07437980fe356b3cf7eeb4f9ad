@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b49ffb3_2109bc63",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-31T16:26:26Z",
+      "side": 1,
+      "message": "Nit - keep the common changes (kbd.h) in a separate CL from any board specific changes (ruby/keyboard.dtsi).",
+      "revId": "889084f7192e4d07437980fe356b3cf7eeb4f9ad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
