@@ -129,6 +129,30 @@
       },
       "revId": "dd889830d29314b186bbc1f6faf08c5d8daa4c88",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b61e5fe_62bc27d4",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-31T17:43:59Z",
+      "side": 1,
+      "message": "it cannot be this way. Any libec changes will not work this way. It will either have v2 or v3.",
+      "parentUuid": "04266bd7_04a9c16a",
+      "range": {
+        "startLine": 503,
+        "startChar": 6,
+        "endLine": 503,
+        "endChar": 39
+      },
+      "revId": "dd889830d29314b186bbc1f6faf08c5d8daa4c88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
