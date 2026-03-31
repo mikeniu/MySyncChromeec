@@ -297,6 +297,30 @@
       },
       "revId": "dd889830d29314b186bbc1f6faf08c5d8daa4c88",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc04b3fb_07c70ee8",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T17:52:29Z",
+      "side": 1,
+      "message": "\u003e yes, true. However, if the new firmware does not have to support version 2. Libec has to support v2 and v3.\n\nNo, libec has to support old v2 anyway, to support older firmwares.",
+      "parentUuid": "8242697a_b964920e",
+      "range": {
+        "startLine": 503,
+        "startChar": 6,
+        "endLine": 503,
+        "endChar": 39
+      },
+      "revId": "dd889830d29314b186bbc1f6faf08c5d8daa4c88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
