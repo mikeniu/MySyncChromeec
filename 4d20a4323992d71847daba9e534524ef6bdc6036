@@ -1,0 +1,147 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "680614b4_19077b84",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 54
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T07:17:33Z",
+      "side": 1,
+      "message": "`\u003cstring.h\u003e` needs to be included for the `strlen` and `memset` functions.",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 0
+      },
+      "revId": "4d20a4323992d71847daba9e534524ef6bdc6036",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09c4bee5_a03a846a",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 54
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T07:17:33Z",
+      "side": 1,
+      "message": "Should the init continue with this error?",
+      "revId": "4d20a4323992d71847daba9e534524ef6bdc6036",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "264f533a_e83b2209",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 54
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T07:17:33Z",
+      "side": 1,
+      "message": "Should the init continue with this error?",
+      "revId": "4d20a4323992d71847daba9e534524ef6bdc6036",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d1beedb_1b7d330c",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 54
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T07:17:33Z",
+      "side": 1,
+      "message": "Consider using `snprintf` to avoid potential buffer overflows if `LIBFP_API_VERSION` is unexpectedly long.\n```c\n\tsnprintf(alg_version, sizeof(alg_version), \"api_%s_core_\", LIBFP_API_VERSION);\n```",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 0
+      },
+      "revId": "4d20a4323992d71847daba9e534524ef6bdc6036",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87d22133_a3adcac4",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 54
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T07:17:33Z",
+      "side": 1,
+      "message": "Can you somehow optimize this code. The completion calculation is duplicated in multiple places. One proposal (not tested):\n```\n\tif (ret !\u003d 0) {\n\t\tLOG_ERR(\"focal_getfeature failed: ret \u003d %d\", ret);\n\t\tret \u003d FP_ENROLLMENT_RESULT_LOW_QUALITY;\n\t} else {\n\t\tret \u003d focal_algo_enroll_step(data-\u003efeature_buf, enroll_index);\n\t\tif (ret \u003d\u003d 0) {\n\t\t\tdata-\u003eremain -\u003d 1;\n\t\t\t*completion \u003d (data-\u003emax_enroll_samples - data-\u003eremain) * 100 /\n\t\t\t\t\tdata-\u003emax_enroll_samples;\n\t\t\tret \u003d FP_ENROLLMENT_RESULT_OK;\n\t\t} else {\n\t\t\tLOG_ERR(\"enroll failed: %d\", ret);\n\t\t\tret \u003d FP_ENROLLMENT_RESULT_IMMOBILE;\n\t\t}\n\t}\n\t*completion \u003d (data-\u003emax_enroll_samples - data-\u003eremain) * 100 /\n\t\t\t      data-\u003emax_enroll_samples;\n\n\treturn ret;\n```",
+      "revId": "4d20a4323992d71847daba9e534524ef6bdc6036",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e42b0a64_20547ee8",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 54
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T07:17:33Z",
+      "side": 1,
+      "message": "`templ` is a `void *`, please cast it to uint8_t* if you want to do some arithmetic on it. Same line 218.",
+      "range": {
+        "startLine": 207,
+        "startChar": 0,
+        "endLine": 207,
+        "endChar": 0
+      },
+      "revId": "4d20a4323992d71847daba9e534524ef6bdc6036",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40b9afdc_5ca06637",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 54
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T07:17:33Z",
+      "side": 1,
+      "message": "Please use BIT(i) macro.",
+      "range": {
+        "startLine": 220,
+        "startChar": 22,
+        "endLine": 220,
+        "endChar": 34
+      },
+      "revId": "4d20a4323992d71847daba9e534524ef6bdc6036",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
