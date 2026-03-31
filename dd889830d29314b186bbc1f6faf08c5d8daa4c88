@@ -321,6 +321,30 @@
       },
       "revId": "dd889830d29314b186bbc1f6faf08c5d8daa4c88",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f694372c_73a64e6e",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-03-31T17:53:30Z",
+      "side": 1,
+      "message": "libec can support all versions",
+      "parentUuid": "fc04b3fb_07c70ee8",
+      "range": {
+        "startLine": 503,
+        "startChar": 6,
+        "endLine": 503,
+        "endChar": 39
+      },
+      "revId": "dd889830d29314b186bbc1f6faf08c5d8daa4c88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
