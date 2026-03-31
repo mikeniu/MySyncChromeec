@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd2bcfd1_86a80449",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-03-31T23:43:54Z",
+      "side": 1,
+      "message": "There\u0027s a few more unused variable errors:\n```\n[brox:rw] /mnt/host/source/src/platform/ec/zephyr/program/brox/src/suspend_resume.c:51:44: error: unused variable \u0027cb\u0027 [-Werror\u003dunused-variable]\n[brox:rw]    51 |         static struct ap_power_ev_callback cb;\n```\nAll the places where `ap_power_ev_init_callback` used to be called need to be checked for unused variables.",
+      "revId": "20eb897a479b7a4f8d037788556fa7748a036c66",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
