@@ -4417,7 +4417,8 @@ static int process_set_strongbox(struct transfer_descriptor *td, uint8_t arg)
 	 * support has been out for a while.
 	 */
 	if (targ.shv[1].major < 5 ||
-	    (targ.shv[1].major < 7 && targ.shv[1].minor < 320)) {
+	    (targ.shv[1].major < 7 &&
+	     (targ.shv[1].minor < 320 || targ.shv[1].minor == 350))) {
 		printf("%s: skip command\n", __func__);
 		return 0;
 	}
