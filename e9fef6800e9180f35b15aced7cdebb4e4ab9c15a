@@ -22,6 +22,30 @@
       },
       "revId": "e9fef6800e9180f35b15aced7cdebb4e4ab9c15a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4990466d_179a5d19",
+        "filename": "zephyr/program/corsola/ponyta/src/alt_charger.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1558277
+      },
+      "writtenOn": "2026-03-31T06:45:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0165a695_7460a47b",
+      "range": {
+        "startLine": 15,
+        "startChar": 27,
+        "endLine": 15,
+        "endChar": 50
+      },
+      "revId": "e9fef6800e9180f35b15aced7cdebb4e4ab9c15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
