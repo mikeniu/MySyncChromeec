@@ -249,6 +249,30 @@
       },
       "revId": "dd889830d29314b186bbc1f6faf08c5d8daa4c88",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b67df8e3_ba4dfbd7",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T17:51:21Z",
+      "side": 1,
+      "message": "\u003e they already have the firmware with version 2\n\nMaybe there are also cases we don\u0027t see now. I think we had a painful lesson in a past few days that we don\u0027t see some scenario.\n\n\u003e it cannot be this way. Any libec changes will not work this way. It will either have v2 or v3.\n\nThat\u0027s a whole point of this change that libec/ectool support both versions v2 (old) and new v3. Regardless if the newest fw supports also v2 or not.",
+      "parentUuid": "f83fee31_b97e0729",
+      "range": {
+        "startLine": 503,
+        "startChar": 6,
+        "endLine": 503,
+        "endChar": 39
+      },
+      "revId": "dd889830d29314b186bbc1f6faf08c5d8daa4c88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
