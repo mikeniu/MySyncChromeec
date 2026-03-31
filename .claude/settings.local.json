@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sudo -S chromite/bin/cros_sdk -- zmake build anakin2)"
+    ]
+  }
+}
