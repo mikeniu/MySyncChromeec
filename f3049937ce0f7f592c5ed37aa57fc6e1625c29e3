@@ -70,6 +70,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "edccbda5_6897f2ab",
+        "filename": "util/ectool_usb/command.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T06:14:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa685d6a_804b09c0",
+      "revId": "f3049937ce0f7f592c5ed37aa57fc6e1625c29e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a656d668_257d0eb7",
@@ -105,6 +123,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac00bb2e_b5b64eb2",
+        "filename": "util/ectool_usb/communication.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T06:14:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "84b64079_118c20af",
+      "revId": "f3049937ce0f7f592c5ed37aa57fc6e1625c29e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ff2d3958_bd4889a6",
@@ -136,6 +172,24 @@
       "side": 1,
       "message": "Yes, it is possible. Actually this is exactly what happens when making this call:\npython3 ectool.py fpmode mode_capture pattern1 \u0026\u0026 python3 ectool.py wait_for_event fingerprint\nMKBP related interrupt is raised before response to fpmode interrupt and \u0027wait\u0027 function consumes and ignores event interrupt. I handle this by checking if there are any waiting events in cmd_wait_for_event implementation in ectool.py. I think this is sufficient for sequential processing in python tool.",
       "parentUuid": "ff2d3958_bd4889a6",
+      "revId": "f3049937ce0f7f592c5ed37aa57fc6e1625c29e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffb11346_4cb940f0",
+        "filename": "util/ectool_usb/communication.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T06:14:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f8487a2_bbb9fcaa",
       "revId": "f3049937ce0f7f592c5ed37aa57fc6e1625c29e3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
