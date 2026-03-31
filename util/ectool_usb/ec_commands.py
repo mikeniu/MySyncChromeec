@@ -326,7 +326,7 @@ class FpInfoCmd2(ECCommand):
             ("template_version", "I"),
             ("image_frame_params", ""),
         ]
-        # fp_image_frame_params
+        # fp_image_frame_params_v2
         # 4 bytes of frame_size;
         # 4 bytes of pixel_format;
         # 2 bytes of width;
