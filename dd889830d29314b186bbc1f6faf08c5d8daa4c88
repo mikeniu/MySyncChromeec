@@ -105,6 +105,30 @@
       },
       "revId": "dd889830d29314b186bbc1f6faf08c5d8daa4c88",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04266bd7_04a9c16a",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-03-31T17:42:51Z",
+      "side": 1,
+      "message": "There are multiple factory images. I can see a world where factory image uses old v2, but there is a new firmware e.g. firmware is cherry-picked to the factor image or factory tool gets a newer image from FSI.",
+      "parentUuid": "2a2492eb_1e19ab0a",
+      "range": {
+        "startLine": 503,
+        "startChar": 6,
+        "endLine": 503,
+        "endChar": 39
+      },
+      "revId": "dd889830d29314b186bbc1f6faf08c5d8daa4c88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
