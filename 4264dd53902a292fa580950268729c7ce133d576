@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eecbd3e8_7318ac91",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-03-31T00:15:11Z",
+      "side": 1,
+      "message": "The term `emulator` seems confusing. In Zephyr, an emulator is strictly used for unit tests to mimic hardware. However, this is intended for production logic to mirror the ADSP states. Suggest to rename it to something with `proxy`, `virtual`, or `provider`.",
+      "range": {
+        "startLine": 7,
+        "startChar": 46,
+        "endLine": 7,
+        "endChar": 54
+      },
+      "revId": "4264dd53902a292fa580950268729c7ce133d576",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
