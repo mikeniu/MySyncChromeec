@@ -362,6 +362,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "771d0a0d_99d3ff6f",
+        "filename": "include/fpsensor/fpsensor_btn_ign_out.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-31T08:40:13Z",
+      "side": 1,
+      "message": "Something like this?",
+      "parentUuid": "7ff0ae8d_3ae278c8",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "13e6734c_4b6a9944",
         "filename": "zephyr/CMakeLists.txt",
         "patchSetId": 20

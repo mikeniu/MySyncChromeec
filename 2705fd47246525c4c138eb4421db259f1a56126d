@@ -16,6 +16,24 @@
       "message": "Would it make sense to call this function in the `fp_set_sensor_mode` function?",
       "revId": "2705fd47246525c4c138eb4421db259f1a56126d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d33d9864_cb176c92",
+        "filename": "include/fpsensor/fpsensor_btn_ign_out.h",
+        "patchSetId": 22
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-03-31T08:40:13Z",
+      "side": 1,
+      "message": "I made it \u0027fp_update_sensor_mode\u0027. This unit does not hold or own FP sensor state but reacts to its change so I think \u0027update\u0027 is more appropriate.",
+      "parentUuid": "7f5f9631_c8858589",
+      "revId": "2705fd47246525c4c138eb4421db259f1a56126d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
