@@ -16,6 +16,24 @@
       "message": "This CL depends on this CL: https://chrome-internal-review.git.corp.google.com/c/chromeos/vendor/fingerprint/egis/+/9106841\n\nam I right? If this is the case, can you please add \n\n`Cq-Depend: chrome-internal:9106841` to prevent this CL from being merge without its dependency?",
       "revId": "770bfcc67b88267d536349f6c7c93b078fb84c5e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebb6e02d_85ba4d35",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-03-31T02:49:40Z",
+      "side": 1,
+      "message": "They depend on each other.\nI\u0027ve already declared `Cq-Depend: chromium:7695805` within `chromium:9106841`.\nIf I continue declaring `Cq-Depend: chromium:9106841`, this should cause problems.",
+      "parentUuid": "f47efe30_a04bac2a",
+      "revId": "770bfcc67b88267d536349f6c7c93b078fb84c5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
