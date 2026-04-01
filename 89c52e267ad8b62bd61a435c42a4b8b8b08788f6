@@ -98,6 +98,24 @@
       "parentUuid": "0bf12cb1_57c30d3a",
       "revId": "89c52e267ad8b62bd61a435c42a4b8b8b08788f6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd1ed830_1b61b535",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_fp_info.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-01T16:42:28Z",
+      "side": 1,
+      "message": "\u003e do we need this test? we check fpinfo in multiple locations.\n\nI don\u0027t think there is another unit test testing implementation of FP_INFO itself. It is tested proxy in other tests, but this specific test verifies v2 vs v3 which is not verified in other tests.",
+      "parentUuid": "0a941abe_4945f635",
+      "revId": "89c52e267ad8b62bd61a435c42a4b8b8b08788f6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
