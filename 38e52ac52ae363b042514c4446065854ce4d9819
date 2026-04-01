@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a333369_06d89ff4",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-01T16:57:41Z",
+      "side": 1,
+      "message": "Nit: This should be the same type as the return value. Personally, I\u0027d make something like\n```\nenum battery_cells {\nBATTERY_CELLS_UNKNOWN,\nBATTERY_CELLS_2,\nBATTERY_CELLS_3,\n};\n```\nbut having them both be `int` or both `uint8_t` would be OK. Assigning from `int` to `uint8_t` does a narrowing conversion where none needs to exist.",
+      "revId": "38e52ac52ae363b042514c4446065854ce4d9819",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

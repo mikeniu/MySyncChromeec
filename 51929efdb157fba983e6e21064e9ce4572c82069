@@ -108,6 +108,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ef1fa538_0d2aabff",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-01T16:57:41Z",
+      "side": 1,
+      "message": "1. I\u0027m not disputing that you should check for errors on write. I\u0027m saying that unless you have any reason to believe that behavior might be different on retry, there\u0027s no reason to retry. If it fails, just return without setting `pre_battery_cells`.\n2. The way this is written now, after the retry count is exhausted, it will fall through to set `pre_battery_cells` anyway and reset `set_reg_err_count`. So if multiple retried _did_ fail every time, in would eventually become inconsistent, and it wouldn\u0027t actually stop trying.",
+      "parentUuid": "79ba512d_ec38a644",
+      "revId": "51929efdb157fba983e6e21064e9ce4572c82069",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bb1bbae2_84e0c97c",
         "filename": "zephyr/program/skywalker/yoda/src/charger.c",
         "patchSetId": 2
@@ -143,6 +161,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7c00c59a_91d4d21d",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-01T16:57:41Z",
+      "side": 1,
+      "message": "This is shorter, but it still goes over 80 columns. Are you running pre-upload checks with `repo upload`?",
+      "parentUuid": "8852a3e9_9b3cbec7",
+      "revId": "51929efdb157fba983e6e21064e9ce4572c82069",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1b8b8543_feeb5c69",
         "filename": "zephyr/program/skywalker/yoda/src/charger.c",
         "patchSetId": 2
@@ -172,6 +208,24 @@
       "side": 1,
       "message": "We recommend checking regularly, as the battery could potentially be replaced while the system is still connected to AC power.",
       "parentUuid": "1b8b8543_feeb5c69",
+      "revId": "51929efdb157fba983e6e21064e9ce4572c82069",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb93155e_16787811",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-01T16:57:41Z",
+      "side": 1,
+      "message": "To be clear, you\u0027re just talking about on the bench, right? This isn\u0027t a user-removable battery in the field? And there\u0027s no mechanism to directly detect when the change happens other than incidentally seeing the state of charge change?\n\nIf so, I\u0027d be inclined to say, \"Just don\u0027t swap batteries without power cycling the system.\" But you can do what you want.",
+      "parentUuid": "fb64bde5_d17e78cd",
       "revId": "51929efdb157fba983e6e21064e9ce4572c82069",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
