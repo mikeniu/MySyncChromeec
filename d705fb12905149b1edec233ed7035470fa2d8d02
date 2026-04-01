@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a23a20fe_f212f72a",
+        "filename": "zephyr/program/fatcat/lapis/keyboard.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1522152
+      },
+      "writtenOn": "2026-04-01T06:27:44Z",
+      "side": 1,
+      "message": "Not sure why we are changing these. The previous values are correct and have been verified.",
+      "revId": "d705fb12905149b1edec233ed7035470fa2d8d02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
