@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9ab6f23_681ba937",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4602883
+      },
+      "writtenOn": "2026-04-01T16:22:47Z",
+      "side": 1,
+      "message": "I tested this change on my fatcatrvp and moonstone, and it remediate the issue on both systems.",
+      "revId": "8fd166cf42a618432fe1e1f926b945a9074775ba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b08be5d8_21eb0f2d",
