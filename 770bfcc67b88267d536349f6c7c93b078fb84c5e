@@ -52,6 +52,24 @@
       "parentUuid": "ebb6e02d_85ba4d35",
       "revId": "770bfcc67b88267d536349f6c7c93b078fb84c5e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a60463a0_8e5f6bcb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-01T15:10:22Z",
+      "side": 1,
+      "message": "why does it cause problem?\nIf you do not add CQ-Depend here, I would assume you can merge this CL by itself.",
+      "parentUuid": "9d06c3e8_2b9228e4",
+      "revId": "770bfcc67b88267d536349f6c7c93b078fb84c5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
