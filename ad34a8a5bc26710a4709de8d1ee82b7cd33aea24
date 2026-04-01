@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38cce6f7_e2b7b0d0",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-01T09:53:32Z",
+      "side": 1,
+      "message": "`FP_MODE_ANY_CAPTURE` includes `FP_MODE_ENROLL_IMAGE` and `FP_MODE_MATCH`. Are you sure we should clear them?",
+      "range": {
+        "startLine": 303,
+        "startChar": 7,
+        "endLine": 303,
+        "endChar": 26
+      },
+      "revId": "ad34a8a5bc26710a4709de8d1ee82b7cd33aea24",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
