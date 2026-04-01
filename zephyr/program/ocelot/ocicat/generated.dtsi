@@ -206,7 +206,7 @@
 		};
 		
 		gpio_ec_bl_detect: ec_bl_detect {
-			gpios = <&gpioi 6 (GPIO_INPUT)>;
+			gpios = <&gpiof 2 (GPIO_INPUT)>;
 		};
 	};
 
@@ -223,7 +223,7 @@
 			<&gpioc 3 0>, /* CPU_ID */
 			// <&gpioc 4 0>, /* TCHSCR_REPORT_EN */
 			<&gpioc 5 0>, /* EC_PROJECT_ID */
-			<&gpiof 2 0>, /* PHASE_ID */
+			// <&gpiof 2 0>, /* PHASE_ID */
 			<&gpiof 3 0>, /* HDMI_GATE_EC */
 			<&gpiof 6 0>, /* EC_ACCEL_DB_INT_L */
 			<&gpiof 7 0>, /* EC_ACCEL_MB_INT_L */
@@ -235,7 +235,7 @@
 			<&gpiog 7 0>, /* SPI_EC_CLK */
 			<&gpioh 1 0>, /* WOL_PWEN */
 			<&gpioi 3 0>, /* I_ADP_EC */
-			// <&gpioi 6 0>, /* EC_TOP_SWAP */
+			<&gpioi 6 0>, /* EC_TOP_SWAP */
 			<&gpioj 4 0>; /* EC_AC_PRESENT_OD_R */
 			// <&gpioj 6 0>; /* TS_WOT */
 	};
