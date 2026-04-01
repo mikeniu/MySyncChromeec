@@ -16,6 +16,24 @@
       "message": "Not sure why we are changing these. The previous values are correct and have been verified.",
       "revId": "d705fb12905149b1edec233ed7035470fa2d8d02",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15660419_d52613d8",
+        "filename": "zephyr/program/fatcat/lapis/keyboard.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 4422389
+      },
+      "writtenOn": "2026-04-01T07:47:16Z",
+      "side": 1,
+      "message": "Done. lapis test device did not have the latest keyboard glyphs.",
+      "parentUuid": "a23a20fe_f212f72a",
+      "revId": "d705fb12905149b1edec233ed7035470fa2d8d02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
