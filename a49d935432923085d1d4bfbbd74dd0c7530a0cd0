@@ -34,6 +34,24 @@
       "parentUuid": "0e57581d_df71bc95",
       "revId": "a49d935432923085d1d4bfbbd74dd0c7530a0cd0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fbb67d5_194152d4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-04-01T10:02:13Z",
+      "side": 1,
+      "message": "Yes, 20V is supported. But if the adapter offers both 20V/2.25A and 15V/3A, the EC defaults to 15V to optimize performance. This is by design.\n\nIf the adapter only provides a single 45W profile (20V/2.25A), the EC will use it.",
+      "parentUuid": "f0f35fd4_eb1d7ff2",
+      "revId": "a49d935432923085d1d4bfbbd74dd0c7530a0cd0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
