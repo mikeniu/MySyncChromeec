@@ -39,6 +39,30 @@
       },
       "revId": "8fd166cf42a618432fe1e1f926b945a9074775ba",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89a78011_eedad7c3",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-04-01T22:42:50Z",
+      "side": 1,
+      "message": "i didn\u0027t find any cases where disabling interrupts would break assumptions\nin the implementation of `send_response`. in most cases, that\u0027s just a\nregister write (i.e. doorbell). however, SHI (bluey, corsola) does real work.\ni did find some critical sections in SHI-NPCX that are re-enabling interrupts\non exit instead of restoring them. i\u0027ve added a patch to fix those cases.",
+      "parentUuid": "b08be5d8_21eb0f2d",
+      "range": {
+        "startLine": 226,
+        "startChar": 1,
+        "endLine": 226,
+        "endChar": 27
+      },
+      "revId": "8fd166cf42a618432fe1e1f926b945a9074775ba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
