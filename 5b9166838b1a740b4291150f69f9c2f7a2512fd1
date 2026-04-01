@@ -189,6 +189,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "12dd85b8_14e546d3",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-01T07:09:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "01a4a060_8629b774",
+      "revId": "5b9166838b1a740b4291150f69f9c2f7a2512fd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "29213b9c_f5a89195",

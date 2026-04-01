@@ -69,6 +69,24 @@
       "parentUuid": "b6928368_e509f656",
       "revId": "a334fdbf4dca79320ed780b97f938a8eab857247",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa052fdb_9af4d97d",
+        "filename": "include/fpsensor/fpsensor_btn_ign_out.h",
+        "patchSetId": 23
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-01T07:09:16Z",
+      "side": 1,
+      "message": "Nothing, I\u0027m just used to use #ifdef if there is one config and #if defined(conf1) || defined(conf2) for multiple configs. But as you prefer.",
+      "parentUuid": "94eb05eb_0c5de991",
+      "revId": "a334fdbf4dca79320ed780b97f938a8eab857247",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
