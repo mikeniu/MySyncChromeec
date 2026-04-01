@@ -59,6 +59,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "539794dc_d235b84e",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-01T12:33:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d908915e_6e5604cd",
+      "range": {
+        "startLine": 443,
+        "startChar": 32,
+        "endLine": 443,
+        "endChar": 36
+      },
+      "revId": "dd889830d29314b186bbc1f6faf08c5d8daa4c88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "554b9733_efe93748",
@@ -72,6 +96,30 @@
       "writtenOn": "2026-04-01T11:09:00Z",
       "side": 1,
       "message": "```suggestion\n\t\t/* Convert to v2 format. The formats differ only in the frame\n\t\t * array, which is located at the end of the structures\n\t\t *\n\t\t * SAFETY: \u0027r-\u003eimage_frame_params\u0027 and r_v2-\u003eimage_frame_params\n\t\t * overlap inexactly, but copying data is safe because we copy\n\t\t * data forward (from the first field of the structure to the\n\t\t * last).\n\t\t */\n```",
+      "range": {
+        "startLine": 475,
+        "startChar": 0,
+        "endLine": 476,
+        "endChar": 60
+      },
+      "revId": "dd889830d29314b186bbc1f6faf08c5d8daa4c88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14da406f_64493609",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-01T12:33:25Z",
+      "side": 1,
+      "message": "Good suggestion, thanks.",
+      "parentUuid": "554b9733_efe93748",
       "range": {
         "startLine": 475,
         "startChar": 0,
