@@ -826,7 +826,6 @@ static void power_off_seq(uint8_t shutdown_event)
 		} else {
 			/* Do a graceful way to shutdown PMIC/AP first */
 			set_pmic_pwron(0, shutdown_event);
-			crec_usleep(PMIC_POWER_OFF_DELAY);
 		}
 	}
 
@@ -836,6 +835,7 @@ static void power_off_seq(uint8_t shutdown_event)
 	 */
 	power_signal_disable_interrupt(GPIO_AP_RST_L);
 
+	crec_usleep(PMIC_POWER_OFF_DELAY);
 	/* Check the switchcap status */
 	if (is_system_powered()) {
 		/* Force to switch off all rails */
