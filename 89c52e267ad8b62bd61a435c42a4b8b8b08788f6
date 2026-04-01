@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd6e8a5e_7d4d24ed",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 502,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-01T16:05:01Z",
+      "side": 1,
+      "message": "When we will be 100% sure that nobody uses it in any image.",
+      "parentUuid": "c8ce88fa_f043a5c2",
+      "range": {
+        "startLine": 471,
+        "startChar": 0,
+        "endLine": 502,
+        "endChar": 0
+      },
+      "revId": "89c52e267ad8b62bd61a435c42a4b8b8b08788f6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0bf12cb1_57c30d3a",
