@@ -116,6 +116,24 @@
       "parentUuid": "0a941abe_4945f635",
       "revId": "89c52e267ad8b62bd61a435c42a4b8b8b08788f6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12b1c3f7_a731278b",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_fp_info.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-01T17:05:18Z",
+      "side": 1,
+      "message": "Acknowledged.\nlet us reopen this topic after all things merge and we remove version2.",
+      "parentUuid": "fd1ed830_1b61b535",
+      "revId": "89c52e267ad8b62bd61a435c42a4b8b8b08788f6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
