@@ -43,6 +43,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "44ae8a31_3833d86e",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-01T10:17:50Z",
+      "side": 1,
+      "message": "I\u0027d usually call this `deactivation_dwork` and `deactivation_handler`, up to you really not sure what convention the fpmcu files use but maybe look into nearby code",
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "39cabf2c_1bd512f1",
         "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
         "patchSetId": 24
@@ -54,6 +71,23 @@
       "writtenOn": "2026-04-01T07:09:16Z",
       "side": 1,
       "message": "How about atomic variable? I\u0027m aware it\u0027s called in only one task but you don\u0027t know it here.",
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba31003c_7daa0349",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-01T10:17:50Z",
+      "side": 1,
+      "message": "static? also no need to init to false, globals are zero initialized automatically",
       "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -75,6 +109,29 @@
         "startLine": 67,
         "startChar": 47,
         "endLine": 67,
+        "endChar": 62
+      },
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2bdf1f6e_815fc92a",
+        "filename": "zephyr/Kconfig.btn_ign",
+        "patchSetId": 24
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-01T10:17:50Z",
+      "side": 1,
+      "message": "help should go last",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 11,
         "endChar": 62
       },
       "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
