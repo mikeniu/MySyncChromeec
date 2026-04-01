@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4fef4f9e_4cf239fd",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-04-01T12:46:05Z",
+      "side": 1,
+      "message": "This is case without FPS touching so btn_ign does not have to be set for it. I am wondering if we will not miss deactivation but btn_ign should be already active before we enter and later there would be no other reason to deactivate it. I am not sure if it is even possible.",
+      "parentUuid": "e97fd92c_35a74573",
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "18fc7725_02dd3b92",
         "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
         "patchSetId": 24
@@ -43,6 +61,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0cb5c2aa_bdefa8a4",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-04-01T12:46:05Z",
+      "side": 1,
+      "message": "Changed to fp_btn_ign_out",
+      "parentUuid": "18fc7725_02dd3b92",
+      "range": {
+        "startLine": 15,
+        "startChar": 20,
+        "endLine": 15,
+        "endChar": 27
+      },
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "44ae8a31_3833d86e",
         "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
         "patchSetId": 24
@@ -54,6 +96,24 @@
       "writtenOn": "2026-04-01T10:17:50Z",
       "side": 1,
       "message": "I\u0027d usually call this `deactivation_dwork` and `deactivation_handler`, up to you really not sure what convention the fpmcu files use but maybe look into nearby code",
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8808e640_26da2bf3",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-04-01T12:46:05Z",
+      "side": 1,
+      "message": "Somehow in EC codebase _data is more popular so I changed it to _data.",
+      "parentUuid": "44ae8a31_3833d86e",
       "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -94,6 +154,42 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "be66a427_6fead1af",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-04-01T12:46:05Z",
+      "side": 1,
+      "message": "It is anonymous namespace so it is static and only visible within this file.",
+      "parentUuid": "ba31003c_7daa0349",
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bee6d62_3b90d4fb",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-04-01T12:46:05Z",
+      "side": 1,
+      "message": "Atomic variable does not solve the issue with concurrent calls. It would be still possible to have inconsistent variable and GPIO states. I added mutex to solve this  but I am not sure if this is not an overkill.",
+      "parentUuid": "39cabf2c_1bd512f1",
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8a55545a_cf785c36",
         "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
         "patchSetId": 24
@@ -117,6 +213,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f0a6ecb7_2ea316a3",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-04-01T12:46:05Z",
+      "side": 1,
+      "message": "I am not sure. It is for sure MATCH when screen gets locked. Could be both MATCH and CAPTURE? To be honest I am not sure if we need CAPTURE here at all. I added it after comment about it.",
+      "parentUuid": "8a55545a_cf785c36",
+      "range": {
+        "startLine": 67,
+        "startChar": 47,
+        "endLine": 67,
+        "endChar": 62
+      },
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2bdf1f6e_815fc92a",
         "filename": "zephyr/Kconfig.btn_ign",
         "patchSetId": 24
@@ -128,6 +248,30 @@
       "writtenOn": "2026-04-01T10:17:50Z",
       "side": 1,
       "message": "help should go last",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 62
+      },
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08522f87_91c9da0d",
+        "filename": "zephyr/Kconfig.btn_ign",
+        "patchSetId": 24
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-04-01T12:46:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2bdf1f6e_815fc92a",
       "range": {
         "startLine": 9,
         "startChar": 0,
