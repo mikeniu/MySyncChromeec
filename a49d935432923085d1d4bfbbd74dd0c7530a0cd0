@@ -16,6 +16,24 @@
       "message": "You should set the max_charging_power to 45 to bypass the test\n\nexample: https://crrev.com/c/7317121",
       "revId": "a49d935432923085d1d4bfbbd74dd0c7530a0cd0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0f35fd4_eb1d7ff2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1395690
+      },
+      "writtenOn": "2026-04-01T09:27:32Z",
+      "side": 1,
+      "message": "The configuration for Jaina is as follows: \n```\nCONFIG_PLATFORM_EC_USB_PD_MAX_VOLTAGE_MV\u003d20000\nCONFIG_PLATFORM_EC_USB_PD_MAX_CURRENT_MA\u003d3000\nCONFIG_PLATFORM_EC_USB_PD_MAX_POWER_MW\u003d45000\n```\nSince we support up to 20V, the system must be able to switch power profiles when a 45W adapter (20V/2.25A) is plugged in.",
+      "parentUuid": "0e57581d_df71bc95",
+      "revId": "a49d935432923085d1d4bfbbd74dd0c7530a0cd0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
