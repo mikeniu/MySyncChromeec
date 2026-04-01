@@ -16,6 +16,46 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "89c52e267ad8b62bd61a435c42a4b8b8b08788f6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8ce88fa_f043a5c2",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 502,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-01T14:34:03Z",
+      "side": 1,
+      "message": "when we will delete this code?",
+      "range": {
+        "startLine": 471,
+        "startChar": 0,
+        "endLine": 502,
+        "endChar": 0
+      },
+      "revId": "89c52e267ad8b62bd61a435c42a4b8b8b08788f6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bf12cb1_57c30d3a",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_fp_info.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-01T14:34:03Z",
+      "side": 1,
+      "message": "do we need this test? we check fpinfo in multiple locations.",
+      "revId": "89c52e267ad8b62bd61a435c42a4b8b8b08788f6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
