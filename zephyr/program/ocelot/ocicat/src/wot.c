@@ -192,37 +192,48 @@ static int command_tablet(int argc, const char **argv)
 DECLARE_CONSOLE_COMMAND(wot, command_tablet, "on | off | auto",
 			"Force tablet mode for WOT debug");
 
+static void wot_trigger_wake_deferred(void)
+{
+	LOG_INF("WOT: Deferred task executing power button press");
+	power_button_simulate_press(PWR_BTN_DURATION);
+}
+DECLARE_DEFERRED(wot_trigger_wake_deferred);
+
 void tchscr_event(enum gpio_signal signal)
 {
+	LOG_INF("WOT: Ttchscr_event START");
+	if (gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_bl_detect)))
+		return;
+
+	if (gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_tchscr_int_l)))
+		return;
+
+	LOG_INF("WOT: Touch INT triggered (LOW), scheduling wake task");
+
+	hook_call_deferred(&wot_trigger_wake_deferred_data, 0);
+}
+
+static void tchscr_int_l_handler(void)
+{
+	/* Only care when system is suspended */
 	// if (!(chipset_in_state(CHIPSET_STATE_STANDBY)))
 	// 	return;
 
-	if (!prev_backlight_on) {
-		LOG_INF("WOT: skip, BL OFF");
+	if ((gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_bl_detect))))
+		// LOG_INF("WOT: skip, BL OFF");
 		return;
-	}
 
-	LOG_INF("WOT: Touch INT triggered");
+	if ((gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_tchscr_int_l))))
+		return;
 
-	power_button_simulate_press(PWR_BTN_DURATION);
+	// LOG_INF("WOT: Touch INT asserted, send power button wake");
+	LOG_INF("WOT: INT test, INT triggered....");
+
+	/* Send power button wake event, Press duration 200ms*/
+	// power_button_simulate_press(PWR_BTN_DURATION);
+	// ap_power_ev_send_callbacks(AP_POWER_S0IX_RESUME);
 }
-
-// static void tchscr_int_l_handler(void)
-// {
-// 	/* Only care when system is suspended */
-// 	if (!is_backlight_on)
-// 		return;
-
-// 	if (!(gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_tchscr_int_l))))
-// 		return;
-
-// 	LOG_INF("WOT: Touch INT asserted, send power button wake");
-
-// 	/* Send power button wake event, Press duration 200ms*/
-// 	power_button_simulate_press(PWR_BTN_DURATION);
-// 	// ap_power_ev_send_callbacks(AP_POWER_S0IX_RESUME);
-// }
-// DECLARE_HOOK(HOOK_TICK, tchscr_int_l_handler, HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_TICK, tchscr_int_l_handler, HOOK_PRIO_DEFAULT);
 
 static void ts_wot_lid_change(void)
 {

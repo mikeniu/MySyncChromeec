@@ -24,7 +24,7 @@
 		};
 		int_tchscr: tchscr {
 			irq-pin = <&gpio_ec_tchscr_int_l>;
-			flags = <GPIO_INT_EDGE_FALLING>;
+			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "tchscr_event";
 		};
 	};
