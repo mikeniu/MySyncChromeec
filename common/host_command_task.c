@@ -215,9 +215,17 @@ void host_packet_respond(struct host_cmd_handler_args *args)
 
 	pkt0->response_size = sizeof(*r) + r->data_len;
 	pkt0->driver_result = args->result;
-	pkt0->send_response(pkt0);
 
+	/*
+	 * Sending the HC response may immediately trigger the next
+	 * incoming request and associated interrupt. Make sure
+	 * hc_processing is released atomically to avoid false
+	 * EC_RES_BUSY responses.
+	 */
+	int key = irq_lock();
+	pkt0->send_response(pkt0);
 	hc_processing = false;
+	irq_unlock(key);
 }
 
 void host_packet_receive(struct host_packet *pkt)
