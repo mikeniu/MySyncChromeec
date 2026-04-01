@@ -22,6 +22,30 @@
       },
       "revId": "796ca0864e3b36e7249894ffa8066ec2af5e27fd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ece815a0_878ffd64",
+        "filename": "zephyr/program/mensa/CMakeLists.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-04-01T16:01:15Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "5b3c3bd5_2189e84f",
+      "range": {
+        "startLine": 13,
+        "startChar": 29,
+        "endLine": 13,
+        "endChar": 30
+      },
+      "revId": "796ca0864e3b36e7249894ffa8066ec2af5e27fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
