@@ -46,6 +46,30 @@
       },
       "revId": "ad34a8a5bc26710a4709de8d1ee82b7cd33aea24",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "60d05877_c86bf93b",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-01T10:00:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2f9ea97f_a945e0c1",
+      "range": {
+        "startLine": 303,
+        "startChar": 7,
+        "endLine": 303,
+        "endChar": 26
+      },
+      "revId": "ad34a8a5bc26710a4709de8d1ee82b7cd33aea24",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
