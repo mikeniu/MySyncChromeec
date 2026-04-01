@@ -52,6 +52,24 @@
       "parentUuid": "f0f35fd4_eb1d7ff2",
       "revId": "a49d935432923085d1d4bfbbd74dd0c7530a0cd0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc86a416_f146b0e8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1395690
+      },
+      "writtenOn": "2026-04-01T10:22:00Z",
+      "side": 1,
+      "message": "If a 45W adapter supports both 20V/2.25A and 15V/3A, Jaina should prioritize selecting the 20V/2.25A profile over 15V/3A",
+      "parentUuid": "f0f35fd4_eb1d7ff2",
+      "revId": "a49d935432923085d1d4bfbbd74dd0c7530a0cd0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
