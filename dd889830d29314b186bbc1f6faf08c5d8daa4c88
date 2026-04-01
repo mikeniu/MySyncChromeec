@@ -345,6 +345,30 @@
       },
       "revId": "dd889830d29314b186bbc1f6faf08c5d8daa4c88",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ae2f6a1_7972fb08",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-01T05:37:12Z",
+      "side": 1,
+      "message": "So what\u0027s a problem. I don\u0027t understand. Why can\u0027t firmware support both version of the fp_info command? Supporting both v2 and v3 gives us back-compatibility (new firmware works with old system).",
+      "parentUuid": "f694372c_73a64e6e",
+      "range": {
+        "startLine": 503,
+        "startChar": 6,
+        "endLine": 503,
+        "endChar": 39
+      },
+      "revId": "dd889830d29314b186bbc1f6faf08c5d8daa4c88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
