@@ -88,6 +88,24 @@
       "parentUuid": "a60463a0_8e5f6bcb",
       "revId": "770bfcc67b88267d536349f6c7c93b078fb84c5e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed94f205_57f49d6b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-02T02:49:59Z",
+      "side": 1,
+      "message": "I believe the one in internal repo is `chrome-internal:xxxxxxxx`\n\nNo this means, you trigger submit or Dry run together and they will merge together. I can technically hit submit to this CL one another Googler add +1. There is nothing that prevents this CL from merging alone as long as it passes the CQ.",
+      "parentUuid": "966d2f1f_936b588e",
+      "revId": "770bfcc67b88267d536349f6c7c93b078fb84c5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
