@@ -106,6 +106,24 @@
       "parentUuid": "978378a0_bca6878a",
       "revId": "2182f0b1f1550afd147003cc2b271b2cea8190df",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04d5ccee_d9c1dc61",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-04-02T17:12:45Z",
+      "side": 1,
+      "message": "Can you post the datasheet to the bug?\n\nThis just got a lot more complex since the PDC sink FETs can open and close even when the EC state machine for that port remains in sink-attached mode. Those sink FET changes can happen due to changes requested by charging policy action and also sink contract renegotiation events. Is the charger is liable to get reset by any Vbus interruptions, this callback won\u0027t catch them all.",
+      "parentUuid": "a9cbef6b_1fb19d1f",
+      "revId": "2182f0b1f1550afd147003cc2b271b2cea8190df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
