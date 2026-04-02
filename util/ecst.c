@@ -239,8 +239,7 @@ int main(int argc, char *argv[])
 		else if (str_cmp_no_case(hdr_args[arg_ind], "-mode") == 0) {
 			mode_choose = TRUE;
 			arg_ind++;
-			if ((hdr_args[arg_ind] == NULL) ||
-			    (sscanf(hdr_args[arg_ind], "%s", main_str_temp) !=
+			if ((sscanf(hdr_args[arg_ind], "%s", main_str_temp) !=
 			     1)) {
 				my_printf(TERR, "\nCannot read operation mode");
 				my_printf(TERR, ", bt, bh or api. !\n");
@@ -275,8 +274,7 @@ int main(int argc, char *argv[])
 
 		else if (str_cmp_no_case(hdr_args[arg_ind], "-chip") == 0) {
 			arg_ind++;
-			if ((hdr_args[arg_ind] == NULL) ||
-			    (sscanf(hdr_args[arg_ind], "%s", main_str_temp) !=
+			if ((sscanf(hdr_args[arg_ind], "%s", main_str_temp) !=
 			     1)) {
 				my_printf(TERR, "\nCannot read chip name %s.\n",
 					  supported_chips);
@@ -357,9 +355,10 @@ int main(int argc, char *argv[])
 					     (tmp_ind < tmp_arg_num) &&
 					     (arg_ind < MAX_ARGS);
 					     tmp_ind++) {
-						strncpy(hdr_args[arg_ind++],
-							tmp_hdr_args[tmp_ind],
-							ARG_SIZE);
+						snprintf(hdr_args[arg_ind++],
+							 ARG_SIZE, "%.*s",
+							 (int)(ARG_SIZE - 1),
+							 tmp_hdr_args[tmp_ind]);
 					}
 					arg_num = arg_ind;
 					arg_ind = cur_arg_index;
@@ -421,8 +420,7 @@ int main(int argc, char *argv[])
 		} else if (str_cmp_no_case(hdr_args[arg_ind], "-spimaxclk") ==
 			   0) {
 			arg_ind++;
-			if ((hdr_args[arg_ind] == NULL) ||
-			    (sscanf(hdr_args[arg_ind], "%d", &main_temp) !=
+			if ((sscanf(hdr_args[arg_ind], "%d", &main_temp) !=
 			     1)) {
 				my_printf(TERR, "\nCannot read SPI Flash Max");
 				my_printf(TERR, " Clock !\n");
@@ -434,8 +432,7 @@ int main(int argc, char *argv[])
 		} else if (str_cmp_no_case(hdr_args[arg_ind], "-spiclkratio") ==
 			   0) {
 			arg_ind++;
-			if ((hdr_args[arg_ind] == NULL) ||
-			    (sscanf(hdr_args[arg_ind], "%d", &main_temp) !=
+			if ((sscanf(hdr_args[arg_ind], "%d", &main_temp) !=
 			     1)) {
 				my_printf(TERR,
 					  "\nCannot read SPI Clock Ratio\n");
@@ -448,8 +445,7 @@ int main(int argc, char *argv[])
 		} else if (str_cmp_no_case(hdr_args[arg_ind], "-spireadmode") ==
 			   0) {
 			arg_ind++;
-			if ((hdr_args[arg_ind] == NULL) ||
-			    (sscanf(hdr_args[arg_ind], "%20s", main_str_temp) !=
+			if ((sscanf(hdr_args[arg_ind], "%20s", main_str_temp) !=
 			     1)) {
 				my_printf(TERR, "\nCannot read SPI Flash");
 				my_printf(TERR, " Read Mode !\n");
@@ -499,8 +495,7 @@ int main(int argc, char *argv[])
 		else if (str_cmp_no_case(hdr_args[arg_ind], "-fwloadaddr") ==
 			 0) {
 			arg_ind++;
-			if ((hdr_args[arg_ind] == NULL) ||
-			    (sscanf(hdr_args[arg_ind], "%x", &main_temp) !=
+			if ((sscanf(hdr_args[arg_ind], "%x", &main_temp) !=
 			     1)) {
 				my_printf(TERR, "\nCannot read FW Load ");
 				my_printf(TERR, "\nstart address !\n");
@@ -534,8 +529,7 @@ int main(int argc, char *argv[])
 				main_status = FALSE;
 			} else {
 				arg_ind++;
-				if ((hdr_args[arg_ind] == NULL) ||
-				    (sscanf(hdr_args[arg_ind], "%x",
+				if ((sscanf(hdr_args[arg_ind], "%x",
 					    &main_temp) != 1)) {
 					my_printf(TERR,
 						  "\nCan't read FW E-Point\n");
@@ -553,8 +547,7 @@ int main(int argc, char *argv[])
 		} else if (str_cmp_no_case(hdr_args[arg_ind], "-crcstart") ==
 			   0) {
 			arg_ind++;
-			if ((hdr_args[arg_ind] == NULL) ||
-			    (sscanf(hdr_args[arg_ind], "%x", &main_temp) !=
+			if ((sscanf(hdr_args[arg_ind], "%x", &main_temp) !=
 			     1)) {
 				my_printf(TERR, "\nCannot read FW CRC");
 				my_printf(TERR, " start address !\n");
@@ -573,11 +566,7 @@ int main(int argc, char *argv[])
 			   0) {
 			arg_ind++;
 			main_temp = 0x00;
-			if (hdr_args[arg_ind] == NULL)
-				end_ptr = NULL;
-			else
-				main_temp =
-					strtol(hdr_args[arg_ind], &end_ptr, 16);
+			main_temp = strtol(hdr_args[arg_ind], &end_ptr, 16);
 
 			if (hdr_args[arg_ind] == end_ptr) {
 				my_printf(TERR,
@@ -593,8 +582,7 @@ int main(int argc, char *argv[])
 		/* -fwlen, Get the FW length. */
 		else if (str_cmp_no_case(hdr_args[arg_ind], "-fwlen") == 0) {
 			arg_ind++;
-			if ((hdr_args[arg_ind] == NULL) ||
-			    (sscanf(hdr_args[arg_ind], "%x", &main_temp) !=
+			if ((sscanf(hdr_args[arg_ind], "%x", &main_temp) !=
 			     1)) {
 				my_printf(TERR, "\nCannot read FW length !\n");
 				main_status = FALSE;
@@ -607,8 +595,7 @@ int main(int argc, char *argv[])
 		else if (str_cmp_no_case(hdr_args[arg_ind], "-flashsize") ==
 			 0) {
 			arg_ind++;
-			if ((hdr_args[arg_ind] == NULL) ||
-			    (sscanf(hdr_args[arg_ind], "%d", &main_temp) !=
+			if ((sscanf(hdr_args[arg_ind], "%d", &main_temp) !=
 			     1)) {
 				my_printf(TERR, "\nCannot read Flash size !\n");
 				main_status = FALSE;
@@ -619,8 +606,7 @@ int main(int argc, char *argv[])
 		} else if (str_cmp_no_case(hdr_args[arg_ind], "-apisign") ==
 			   0) {
 			arg_ind++;
-			if ((hdr_args[arg_ind] == NULL) ||
-			    (sscanf(hdr_args[arg_ind], "%s", main_str_temp) !=
+			if ((sscanf(hdr_args[arg_ind], "%s", main_str_temp) !=
 			     1)) {
 				my_printf(TERR, "\nCannot read API sign, CRC,");
 				my_printf(TERR, " CheckSum or None. !\n");
@@ -650,8 +636,7 @@ int main(int argc, char *argv[])
 		} else if (str_cmp_no_case(hdr_args[arg_ind], "-pointer") ==
 			   0) {
 			arg_ind++;
-			if ((hdr_args[arg_ind] == NULL) ||
-			    (sscanf(hdr_args[arg_ind], "%x", &main_temp) !=
+			if ((sscanf(hdr_args[arg_ind], "%x", &main_temp) !=
 			     1)) {
 				my_printf(TERR,
 					  "\nCannot read FW Image address !\n");
@@ -686,11 +671,7 @@ int main(int argc, char *argv[])
 		else if (str_cmp_no_case(hdr_args[arg_ind], "-bhoffset") == 0) {
 			arg_ind++;
 			main_temp = 0x00;
-			if (hdr_args[arg_ind] == NULL)
-				end_ptr = NULL;
-			else
-				main_temp =
-					strtol(hdr_args[arg_ind], &end_ptr, 16);
+			main_temp = strtol(hdr_args[arg_ind], &end_ptr, 16);
 
 			if (hdr_args[arg_ind] == end_ptr) {
 				my_printf(TERR, "\nCannot read BootLoader");
