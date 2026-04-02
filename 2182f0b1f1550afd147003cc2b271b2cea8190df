@@ -70,6 +70,24 @@
       "parentUuid": "0ed99882_fe784b95",
       "revId": "2182f0b1f1550afd147003cc2b271b2cea8190df",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "978378a0_bca6878a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-04-02T17:03:56Z",
+      "side": 1,
+      "message": "How does the charger IC detect those events?",
+      "parentUuid": "b01b941f_11206e80",
+      "revId": "2182f0b1f1550afd147003cc2b271b2cea8190df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
