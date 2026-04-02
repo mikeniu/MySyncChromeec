@@ -26,7 +26,7 @@ int system_is_locked(void)
 	return is_locked;
 }
 
-int get_image_frame_params(struct fp_image_frame_params &image_frame_params,
+int get_image_frame_params(struct fp_image_frame_params_v2 &image_frame_params,
 			   enum fp_capture_type capture_type);
 
 // Smoke test the "fpinfo" console command and its underlying version retrieval.
@@ -252,21 +252,22 @@ test_static int test_get_image_frame_params(void)
 		  FP_CAPTURE_SIMPLE_IMAGE, FP_CAPTURE_PATTERN0,
 		  FP_CAPTURE_PATTERN1, FP_CAPTURE_QUALITY_TEST,
 		  FP_CAPTURE_RESET_TEST, FP_CAPTURE_TYPE_MAX });
-	constexpr struct fp_image_frame_params zero_params{};
+	constexpr struct fp_image_frame_params_v2 zero_params{};
 
-	size_t fp_sensor_get_info_v2_size =
-		sizeof(struct ec_response_fp_info_v2) +
-		sizeof(struct fp_image_frame_params) * FP_MAX_CAPTURE_TYPES;
-	std::vector<uint8_t> buffer(fp_sensor_get_info_v2_size);
-	auto *info = reinterpret_cast<ec_response_fp_info_v2 *>(buffer.data());
+	size_t fp_sensor_get_info_v3_size =
+		sizeof(struct ec_response_fp_info_v3) +
+		sizeof(struct fp_image_frame_params_v2) * FP_MAX_CAPTURE_TYPES;
+	std::vector<uint8_t> buffer(fp_sensor_get_info_v3_size);
+	auto *info = reinterpret_cast<ec_response_fp_info_v3 *>(buffer.data());
 
 	TEST_EQ(fp_sensor_get_info(info, buffer.size()), EC_SUCCESS, "%d");
 
-	struct fp_image_frame_params *image_frame_params_ptr =
+	struct fp_image_frame_params_v2 *image_frame_params_ptr =
 		info->image_frame_params;
 
 	for (enum fp_capture_type current_capture_type : kCaptureTypesArray) {
-		const struct fp_image_frame_params *expected_params = nullptr;
+		const struct fp_image_frame_params_v2 *expected_params =
+			nullptr;
 		for (size_t j = 0; j < info->sensor_info.num_capture_types;
 		     ++j) {
 			if (image_frame_params_ptr[j].fp_capture_type ==
@@ -276,19 +277,19 @@ test_static int test_get_image_frame_params(void)
 			}
 		}
 
-		struct fp_image_frame_params image_frame_params{};
+		struct fp_image_frame_params_v2 image_frame_params{};
 		int rv = get_image_frame_params(image_frame_params,
 						current_capture_type);
 
 		if (expected_params) {
 			TEST_EQ(rv, EC_RES_SUCCESS, "%d");
 			TEST_EQ(memcmp(&image_frame_params, expected_params,
-				       sizeof(struct fp_image_frame_params)),
+				       sizeof(struct fp_image_frame_params_v2)),
 				0, "%d");
 		} else {
 			TEST_EQ(rv, EC_ERROR_INVAL, "%d");
 			TEST_EQ(memcmp(&image_frame_params, &zero_params,
-				       sizeof(struct fp_image_frame_params)),
+				       sizeof(struct fp_image_frame_params_v2)),
 				0, "%d");
 		}
 	}
@@ -297,7 +298,7 @@ test_static int test_get_image_frame_params(void)
 
 enum ec_error_list
 upload_pgm_image(uint8_t *frame,
-		 const struct fp_image_frame_params &image_frame_params);
+		 const struct fp_image_frame_params_v2 &image_frame_params);
 
 test_static int test_upload_pgm_image_wrong_bpp(void)
 {
