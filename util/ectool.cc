@@ -76,6 +76,8 @@
 #define USB_VID_GOOGLE 0x18d1
 #define USB_PID_HAMMER 0x5022
 
+    constexpr auto kTestValue = 42z;
+
 /* Command line options */
 enum {
 	OPT_DEV = 1000,
