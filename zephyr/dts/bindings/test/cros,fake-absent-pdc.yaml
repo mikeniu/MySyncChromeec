@@ -1,0 +1,13 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: >
+  Fake absent PDC device for testing. Implements only pdc_get_hw_config(),
+  returning an I2C spec at the node's address. Since no emulator is registered
+  for this compatible, i2c_transfer_dt() fails and probe_pdc_chip() treats
+  the chip as not present.
+
+compatible: "cros,fake-absent-pdc"
+
+include: i2c-device.yaml
