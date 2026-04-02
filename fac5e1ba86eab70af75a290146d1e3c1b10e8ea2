@@ -1,0 +1,216 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74edb8c0_7328a7c9",
+        "filename": "zephyr/subsys/fingerprint/alg/Kconfig",
+        "patchSetId": 55
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T07:44:26Z",
+      "side": 1,
+      "message": "Typo: \"focaltech\" -\u003e \"Focaltech\"",
+      "range": {
+        "startLine": 59,
+        "startChar": -1,
+        "endLine": 59,
+        "endChar": 0
+      },
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "451a518b_e4457e11",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 55
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T07:44:26Z",
+      "side": 1,
+      "message": "LOG_ macros add new line by default.",
+      "range": {
+        "startLine": 79,
+        "startChar": 65,
+        "endLine": 79,
+        "endChar": 67
+      },
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b154f42_82546a6d",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 55
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T07:44:26Z",
+      "side": 1,
+      "message": "Would it make sense to check the template size here like `data-\u003etpl_finger_size \u003c\u003d CONFIG_FP_ALGORITHM_TEMPLATE_SIZE`?",
+      "range": {
+        "startLine": 81,
+        "startChar": -1,
+        "endLine": 81,
+        "endChar": 0
+      },
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee1cfed4_4dc6c260",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 55
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T07:44:26Z",
+      "side": 1,
+      "message": "Do we have any guarantee how much data will be written by this function?",
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ffa580d_b7ebb80c",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 55
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T07:44:26Z",
+      "side": 1,
+      "message": "Doesn\u0027t it mean something went wrong?",
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8436cc72_d06510e8",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 55
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T07:44:26Z",
+      "side": 1,
+      "message": "Is this define correct? Why do we get image features at 20kB offset?",
+      "range": {
+        "startLine": 137,
+        "startChar": 49,
+        "endLine": 137,
+        "endChar": 60
+      },
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89bfe719_fd918efa",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 55
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T07:44:26Z",
+      "side": 1,
+      "message": "You can drop the check",
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74039996_c64e09c4",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 55
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T07:44:26Z",
+      "side": 1,
+      "message": "Can you just use `CONFIG_FP_ALGORITHM_TEMPLATE_SIZE`?",
+      "range": {
+        "startLine": 208,
+        "startChar": 16,
+        "endLine": 208,
+        "endChar": 36
+      },
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa5c4377_dd9e0fdb",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.h",
+        "patchSetId": 55
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T07:44:26Z",
+      "side": 1,
+      "message": "XX",
+      "range": {
+        "startLine": 7,
+        "startChar": 14,
+        "endLine": 7,
+        "endChar": 16
+      },
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23ca0d00_cd1afaf9",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.h",
+        "patchSetId": 55
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T07:44:26Z",
+      "side": 1,
+      "message": "It is safer to wrap these macro definitions in parentheses to avoid operator precedence issues if they are ever used in mathematical expressions: `#define FT_ALGO_SIZE (140 * 1024)`",
+      "range": {
+        "startLine": 17,
+        "startChar": -1,
+        "endLine": 17,
+        "endChar": 0
+      },
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
