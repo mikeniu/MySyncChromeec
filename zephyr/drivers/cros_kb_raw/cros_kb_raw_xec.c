@@ -31,6 +31,10 @@ LOG_MODULE_REGISTER(cros_kb_raw, LOG_LEVEL_ERR);
 #define XEC_MAX_KEY_ROWS 8 /* Maximum columns of keyboard matrix */
 #define XEC_KB_ROW_MASK (BIT(XEC_MAX_KEY_ROWS) - 1)
 
+#if defined(CONFIG_PERCEPIO_TRACERECORDER)
+static TraceHandle_t trace_handle;
+#endif
+
 /* Device config */
 struct cros_kb_raw_xec_config {
 	/* keyboard scan controller base address */
@@ -141,9 +145,15 @@ static int cros_kb_raw_xec_drive_column(const struct device *dev, int col)
 
 static void cros_kb_raw_xec_ksi_isr(const struct device *dev)
 {
+#if defined(CONFIG_PERCEPIO_TRACERECORDER)
+	vTraceStoreISRBegin(handle);
+#endif
 	kb_raw_xec_clr_src(dev);
 	/* Wake-up keyboard scan task */
 	task_wake(TASK_ID_KEYSCAN);
+#if defined(CONFIG_PERCEPIO_TRACERECORDER)
+	vTraceStoreISREnd(0);
+#endif
 }
 
 static int cros_kb_raw_xec_init(const struct device *dev)
@@ -158,6 +168,9 @@ static int cros_kb_raw_xec_init(const struct device *dev)
 		return ret;
 
 	/* Set up Kscan IRQ and ISR */
+#if defined(CONFIG_PERCEPIO_TRACERECORDER)
+	trace_handle = xTraceSetISRProperties("KBISR", priority);
+#endif
 	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority),
 		    cros_kb_raw_xec_ksi_isr, DEVICE_DT_INST_GET(0), 0);
 

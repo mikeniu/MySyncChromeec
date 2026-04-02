@@ -37,6 +37,10 @@
 #define DEBUG_CPRINTS(...)
 #endif
 
+#if defined(CONFIG_PERCEPIO_TRACERECORDER)
+static TraceISRHandle_t trace_handle;
+#endif
+
 #ifdef CONFIG_ZEPHYR
 #define IT8XXX2_CEC_NODE DT_INST(0, ite_it8xxx2_cec_raw)
 #if DT_NODE_EXISTS(IT8XXX2_CEC_NODE)
@@ -486,7 +490,13 @@ void cec_interrupt(void)
 #if defined(CONFIG_ZEPHYR) && !defined(CONFIG_TEST)
 static void it83xx_cec_isr(const void *user)
 {
+#if defined(CONFIG_PERCEPIO_TRACERECORDER)
+	vTraceStoreISRBegin(handle);
+#endif
 	cec_interrupt();
+#if defined(CONFIG_PERCEPIO_TRACERECORDER)
+	vTraceStoreISREnd(0);
+#endif
 }
 #endif
 
@@ -541,6 +551,9 @@ static int it83xx_cec_set_enable(int port, uint8_t enable)
 		/* Enable CEC interrupt */
 		task_clear_pending_irq(IT83XX_IRQ_CEC);
 #if defined(CONFIG_ZEPHYR) && !defined(CONFIG_TEST)
+#if defined(CONFIG_PERCEPIO_TRACERECORDER)
+		trace_handle = xTraceSetISRProperties("IT83XX_ISR", 0);
+#endif
 		IRQ_CONNECT(IT83XX_IRQ_CEC, 0, it83xx_cec_isr, 0, 0);
 #endif
 		task_enable_irq(IT83XX_IRQ_CEC);

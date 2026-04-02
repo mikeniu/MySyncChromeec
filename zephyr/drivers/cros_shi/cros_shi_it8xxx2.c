@@ -33,6 +33,10 @@ LOG_MODULE_REGISTER(cros_shi, LOG_LEVEL_ERR);
 
 #define DRV_CONFIG(dev) ((struct cros_shi_it8xxx2_cfg *const)(dev)->config)
 
+#if defined(CONFIG_PERCEPIO_TRACERECORDER)
+static TraceHandle_t trace_handle;
+#endif
+
 /*
  * Strcture cros_shi_it8xxx2_cfg is about the setting of SHI,
  * this config will be used at initial time
@@ -254,6 +258,10 @@ static void spi_parse_header(void)
 
 static void shi_ite_int_handler(const void *arg)
 {
+#if defined(CONFIG_PERCEPIO_TRACERECORDER)
+	vTraceStoreISRBegin(handle);
+#endif
+
 	/*
 	 * The status of SPI end detection interrupt bit is set, it
 	 * means that host command parse has been completed and AP
@@ -287,6 +295,10 @@ static void shi_ite_int_handler(const void *arg)
 		/* Parse header for version of spi-protocol */
 		spi_parse_header();
 	}
+
+#if defined(CONFIG_PERCEPIO_TRACERECORDER)
+	vTraceStoreISREnd(0);
+#endif
 }
 
 void spi_event(enum gpio_signal signal)
@@ -369,6 +381,9 @@ static int cros_shi_ite_init(const struct device *dev)
 	}
 
 	/* Enable SPI peripheral interrupt */
+#if defined(CONFIG_PERCEPIO_TRACERECORDER)
+	trace_handle = xTraceSetISRProperties("IT8xxxISR", 0);
+#endif
 	IRQ_CONNECT(DT_INST_IRQN(0), 0, shi_ite_int_handler, 0, 0);
 	irq_enable(DT_INST_IRQN(0));
 

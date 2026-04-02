@@ -96,6 +96,7 @@ register_npcx9_project(
         here / ".." / "intelrvp" / "ptlrvp" / "pd.conf",
         here / "rvp_program.conf",
     ],
+    extra_modules=["percepio"],
 )
 
 register_it8xxx2_project(

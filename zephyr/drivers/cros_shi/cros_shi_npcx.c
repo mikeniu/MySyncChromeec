@@ -117,6 +117,11 @@ static uint8_t in_msg[SHI_MAX_REQUEST_SIZE] __aligned(4);
 /* Parameters used by host protocols */
 static struct host_packet shi_packet;
 
+/* Handle for Tracealyzer */
+#if defined(CONFIG_PERCEPIO_TRACERECORDER)
+static TraceHandle_t trace_handle;
+#endif
+
 enum cros_shi_npcx_state {
 	SHI_STATE_NONE = -1,
 	/* SHI not enabled (initial state, and when chipset is off) */
@@ -720,10 +725,14 @@ static void cros_shi_npcx_isr(const struct device *dev)
 	uint8_t stat2;
 	struct shi_reg *const inst = HAL_INSTANCE(dev);
 
+#if defined(CONFIG_PERCEPIO_TRACERECORDER)
+	vTraceStoreISRBegin(handle);
+#endif
+
 #ifdef CONFIG_CROS_SHI_NPCX_CS_DETECT_WORKAROUND
 
 	if (shi_params.is_entered_cs_asserted_wui_isr != true) {
-		return;
+		goto out;
 	}
 #endif
 
@@ -744,7 +753,7 @@ static void cros_shi_npcx_isr(const struct device *dev)
 		 */
 		if (!IS_BIT_SET(inst->SHICFG2, NPCX_SHICFG2_BUSY)) {
 			DEBUG_CPRINTF("CSNB-");
-			return;
+			goto out;
 		}
 		shi_handle_cs_assert(inst);
 	}
@@ -766,7 +775,8 @@ static void cros_shi_npcx_isr(const struct device *dev)
 		 * Mark not ready to abort next transaction
 		 */
 		DEBUG_CPRINTF("CSH-");
-		return shi_handle_cs_deassert(inst);
+		shi_handle_cs_deassert(inst);
+		goto out;
 	}
 #endif
 
@@ -788,7 +798,8 @@ static void cros_shi_npcx_isr(const struct device *dev)
 	 * Transaction is processing.
 	 */
 	if (IS_BIT_SET(stat, NPCX_EVSTAT_IBHF)) {
-		return shi_handle_input_buf_half_full(inst);
+		shi_handle_input_buf_half_full(inst);
+		goto out;
 	}
 
 	/*
@@ -796,15 +807,23 @@ static void cros_shi_npcx_isr(const struct device *dev)
 	 * Transaction is processing.
 	 */
 	if (IS_BIT_SET(stat, NPCX_EVSTAT_IBF)) {
-		return shi_handle_input_buf_full(inst);
+		shi_handle_input_buf_full(inst);
+		goto out;
 	}
 
 	if (IS_BIT_SET(stat, NPCX_EVSTAT_OBE)) {
-		return shi_handle_input_buf_full(inst);
+		shi_handle_input_buf_full(inst);
+		goto out;
 	}
 	if (IS_BIT_SET(stat, NPCX_EVSTAT_OBHE)) {
-		return shi_handle_input_buf_half_full(inst);
+		shi_handle_input_buf_half_full(inst);
+		goto out;
 	}
+
+out:
+#if defined(CONFIG_PERCEPIO_TRACERECORDER)
+	vTraceStoreISREnd(0);
+#endif
 }
 
 static void cros_shi_npcx_reset_prepare(struct shi_reg *const inst)
@@ -1032,6 +1051,9 @@ static int shi_npcx_init(const struct device *dev)
 #else
 	npcx_miwu_interrupt_configure(&config->shi_cs_wui, NPCX_MIWU_MODE_EDGE,
 				      NPCX_MIWU_TRIG_LOW);
+#endif
+#if defined(CONFIG_PERCEPIO_TRACERECORDER)
+	trace_handle = xTraceSetISRProperties("npcxISR", priority);
 #endif
 	/* SHI interrupt installation */
 	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority),

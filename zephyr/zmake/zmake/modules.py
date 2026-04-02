@@ -170,6 +170,15 @@ known_modules = {
         / "lib"
         / "nanopb"
     ),
+    "percepio": lambda name, checkout: (
+        checkout
+        / "src"
+        / "third_party"
+        / "zephyrproject"
+        / "modules"
+        / "debug"
+        / "percepio"
+    ),
     "pigweed": lambda name, checkout: (checkout / "src" / "third_party" / name),
     "picolibc": lambda name, checkout: (
         checkout
