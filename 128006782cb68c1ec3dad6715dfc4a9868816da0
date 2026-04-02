@@ -26,6 +26,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "546abfbe_20eb4325",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T05:18:59Z",
+      "side": 1,
+      "message": "This comment is not needed.",
+      "revId": "128006782cb68c1ec3dad6715dfc4a9868816da0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "97bfa238_be50b10b",
         "filename": "zephyr/drivers/fingerprint/Kconfig",
         "patchSetId": 4
