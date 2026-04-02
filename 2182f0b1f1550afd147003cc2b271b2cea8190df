@@ -34,6 +34,24 @@
       "parentUuid": "393b53a4_018c14d7",
       "revId": "2182f0b1f1550afd147003cc2b271b2cea8190df",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ed99882_fe784b95",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-04-02T16:26:31Z",
+      "side": 1,
+      "message": "Is there a reason not to just enable bypass once upon EC boot-up?",
+      "parentUuid": "9f5a44af_10c6bf1e",
+      "revId": "2182f0b1f1550afd147003cc2b271b2cea8190df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
