@@ -52,6 +52,24 @@
       "parentUuid": "9f5a44af_10c6bf1e",
       "revId": "2182f0b1f1550afd147003cc2b271b2cea8190df",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b01b941f_11206e80",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-02T16:42:58Z",
+      "side": 1,
+      "message": "it gets cleared by the IC anytime a device is connected or disconnected unfortunately. The IC is already HW strapped to be in bypass and that doesn\u0027t work as expected",
+      "parentUuid": "0ed99882_fe784b95",
+      "revId": "2182f0b1f1550afd147003cc2b271b2cea8190df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
