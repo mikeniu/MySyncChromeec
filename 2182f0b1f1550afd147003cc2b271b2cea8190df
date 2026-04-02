@@ -88,6 +88,24 @@
       "parentUuid": "b01b941f_11206e80",
       "revId": "2182f0b1f1550afd147003cc2b271b2cea8190df",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9cbef6b_1fb19d1f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-02T17:06:33Z",
+      "side": 1,
+      "message": "It\u0027s not clear by the datasheet but I suspect it is acting based on input current/voltage",
+      "parentUuid": "978378a0_bca6878a",
+      "revId": "2182f0b1f1550afd147003cc2b271b2cea8190df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
