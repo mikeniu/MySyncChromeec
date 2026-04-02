@@ -16,6 +16,213 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "6ff6e3777e85fb1d0a0bf8e781d42cd2010139f9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "844f97e7_dee65a74",
+        "filename": "common/trace.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-02T20:39:12Z",
+      "side": 1,
+      "message": "This file is zephyr specific.  The platform/ec repo has been converted to only support zephyr, but the common directory largely contains EC legacy code.\n\nI think a better place for this file is probably under platform/ec/zephyr/lib/trace\n\nIt would also be helpful to create a small README file for the trace library.",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 3,
+        "endChar": 29
+      },
+      "revId": "6ff6e3777e85fb1d0a0bf8e781d42cd2010139f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b7fbaf6_aceec82b",
+        "filename": "common/trace.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-02T20:39:12Z",
+      "side": 1,
+      "message": "We don\u0027t have a convention of leading underscores for static functions.",
+      "range": {
+        "startLine": 11,
+        "startChar": 12,
+        "endLine": 11,
+        "endChar": 23
+      },
+      "revId": "6ff6e3777e85fb1d0a0bf8e781d42cd2010139f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0e75a35_1320907a",
+        "filename": "common/trace.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-02T20:39:12Z",
+      "side": 1,
+      "message": "Use Zephyr\u0027s shell print directly.",
+      "range": {
+        "startLine": 26,
+        "startChar": 2,
+        "endLine": 26,
+        "endChar": 9
+      },
+      "revId": "6ff6e3777e85fb1d0a0bf8e781d42cd2010139f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7dc809f6_e2170bc1",
+        "filename": "common/trace.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-02T20:39:12Z",
+      "side": 1,
+      "message": "Use Zephyr shell APIs.  The legacy EC shell macros are deprecated and just redirect to the Zephyr shell anyway.",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 56
+      },
+      "revId": "6ff6e3777e85fb1d0a0bf8e781d42cd2010139f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de2b12a1_f9f05d1b",
+        "filename": "driver/cec/it83xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-02T20:39:12Z",
+      "side": 1,
+      "message": "What is your rationale for which ISRs to instrument?  Most of the ISR handlers will be in upstream Zephyr code.\n\nThis particular driver isn\u0027t used on any active projects, so probably doesn\u0027t need tracing built in just yet.",
+      "range": {
+        "startLine": 491,
+        "startChar": 0,
+        "endLine": 491,
+        "endChar": 44
+      },
+      "revId": "6ff6e3777e85fb1d0a0bf8e781d42cd2010139f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9515eb0_69ad14e8",
+        "filename": "zephyr/drivers/cros_kb_raw/cros_kb_raw_xec.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-02T20:39:12Z",
+      "side": 1,
+      "message": "I would drop all the ISR instrumentation for now.",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 34
+      },
+      "revId": "6ff6e3777e85fb1d0a0bf8e781d42cd2010139f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e92c8044_993b1147",
+        "filename": "zephyr/drivers/cros_shi/cros_shi_it8xxx2.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-02T20:39:12Z",
+      "side": 1,
+      "message": "Drop for now",
+      "range": {
+        "startLine": 262,
+        "startChar": 0,
+        "endLine": 262,
+        "endChar": 29
+      },
+      "revId": "6ff6e3777e85fb1d0a0bf8e781d42cd2010139f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8dd1f3ba_11ac219e",
+        "filename": "zephyr/drivers/cros_shi/cros_shi_npcx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 729,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-02T20:39:12Z",
+      "side": 1,
+      "message": "Drop for now.",
+      "range": {
+        "startLine": 729,
+        "startChar": 0,
+        "endLine": 729,
+        "endChar": 29
+      },
+      "revId": "6ff6e3777e85fb1d0a0bf8e781d42cd2010139f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29dbab2c_9ddd727a",
+        "filename": "zephyr/program/fatcat/BUILD.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-02T20:39:12Z",
+      "side": 1,
+      "message": "We don\u0027t want this on by default.  Plus board specific changes should be put in a separate CL when possible.",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 31
+      },
+      "revId": "6ff6e3777e85fb1d0a0bf8e781d42cd2010139f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
