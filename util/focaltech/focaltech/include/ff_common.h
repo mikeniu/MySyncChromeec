@@ -10,6 +10,8 @@ extern "C"
 {
 #endif
 
+#define FOCAL_SOFT_VERSION "v1.0.1"
+
 #define FT_BULK_EP_IN 0x81
 
 #define FOCAL_CONFIG_SIZE 4096
@@ -47,6 +49,17 @@ extern "C"
         RW_MODE,
         FORCE_UPDATE_MODE,
     } ft_device_mode_t;
+
+    typedef enum ft_hash_mode_e
+    {
+        HASH_MODE_SM3,
+        HASH_MODE_SHA0,
+        HASH_MODE_SHA1,
+        HASH_MODE_SHA224,
+        HASH_MODE_SHA256,
+        HASH_MODE_SHA384,
+        HASH_MODE_SHA512,
+    } ft_hash_mode_t;
 
     typedef struct ft_device_info_st
     {

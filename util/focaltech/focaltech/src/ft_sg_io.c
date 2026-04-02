@@ -52,7 +52,7 @@ int ft_sg_open(uint16_t vendor_id, uint16_t product_id)
     dev_handle = libusb_open_device_with_vid_pid(ctx, vendor_id, product_id);
     if (!dev_handle)
     {
-        fprintf(stderr, "Device not found");
+        FF_LOGE("Device not found");
         return -1;
     }
     libusb_reset_device(dev_handle);
@@ -361,5 +361,7 @@ void ft_sg_close(void)
         libusb_exit(ctx);
         ctx=NULL;
     }
+
+    cdb_tag=1;
 
 }

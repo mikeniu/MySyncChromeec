@@ -11,7 +11,7 @@ include $(CLEAR_VARS)
 
 LOCAL_CFLAGS += -pie -fPIE -O2
 LOCAL_LDFLAGS += -pie -fPIE
-LOCAL_LDLIBS    := -llog
+LOCAL_LDLIBS    := -llog -lssl -lcrypto
 
 LOCAL_SRC_FILES := 				                               \
   $(LOCAL_PATH)/libusb-1.0.29/libusb/libusb_port.c 			       \
@@ -25,7 +25,6 @@ LOCAL_SRC_FILES := 				                               \
   $(LOCAL_PATH)/libusb-1.0.29/libusb/os/events_posix.c 	 \
   $(LOCAL_PATH)/libusb-1.0.29/libusb/os/threads_posix.c  \
   $(LOCAL_PATH)/libusb-1.0.29/libusb/os/linux_netlink.c  \
-  $(LOCAL_PATH)/openssl_tiny/sm3.c				               \
   $(LOCAL_PATH)/focaltech/src/ff_util.c 			           \
   $(LOCAL_PATH)/focaltech/src/ft_sg_io.c       		       \
   $(LOCAL_PATH)/focaltech/src/net_usb.c 			           \

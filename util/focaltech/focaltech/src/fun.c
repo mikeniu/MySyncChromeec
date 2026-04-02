@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
+#include <openssl/sha.h>
 
 #include <memory.h>
 #include <string.h>
@@ -298,10 +299,11 @@ static int VerifyData(char *name, int addr)
     unsigned char *buffer = NULL;
     int ret_value = 0;
     int downaddr = addr;
-    unsigned char veriry_bin_cmd[] = {0xdc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xbb, 0, 0};
-    unsigned char read_hash[32] = {0};
-    unsigned char pHash[32] = {0};
-    int readhashlen = 32;
+    unsigned char veriry_bin_cmd[] = {0xdc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xbb, HASH_MODE_SHA256, 0};
+
+    unsigned char read_hash[SHA256_DIGEST_LENGTH] = {0};
+    unsigned char pHash[SHA256_DIGEST_LENGTH] = {0};
+    int readhashlen = SHA256_DIGEST_LENGTH;
     file = fopen(name, "rb");
     if (!file)
     {
@@ -331,17 +333,16 @@ static int VerifyData(char *name, int addr)
     U32_SET(&veriry_bin_cmd[1], downaddr);
     U32_SET(&veriry_bin_cmd[5], file_len);
     ret_value = usb_write(veriry_bin_cmd, CMD_LENGTH, read_hash, readhashlen, READ_DATA_FROM_USB);
-    // LOG_DATA(read_hash, readhashlen);
+
     if (ret_value)
     {
         FF_LOGE("veriry_bin_cmd bin error!");
         goto exit;
     }
 
-    openssl_get_hash(buffer, file_len, pHash);
-    // LOG_DATA(pHash, 32);
+    SHA256(buffer,file_len,pHash);
 
-    if (memcmp(pHash, read_hash, 32))
+    if (memcmp(pHash, read_hash, SHA256_DIGEST_LENGTH))
     {
         FF_LOGE("verify error!");
 
