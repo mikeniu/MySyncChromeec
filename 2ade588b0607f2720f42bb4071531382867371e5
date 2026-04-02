@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e900d9a_ffe458a0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T06:46:56Z",
+      "side": 1,
+      "message": "Please run `cros format driver/fingerprint/egis/egis_private.c zephyr/subsys/fingerprint/alg/egis_egis630_bio_alg.c`",
+      "revId": "2ade588b0607f2720f42bb4071531382867371e5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
