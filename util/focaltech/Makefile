@@ -26,7 +26,7 @@ STRIP	=strip
 CC      := gcc
 
 LIBS    :=
-LDFLAGS :=
+LDFLAGS :=-lssl -lcrypto
 DEFINES :=
 
 #i think you should do anything here
@@ -53,7 +53,6 @@ SOURCE  :=                                                \
   $(LOCAL_PATH)/libusb-1.0.29/libusb/os/events_posix.c 	 		\
   $(LOCAL_PATH)/libusb-1.0.29/libusb/os/threads_posix.c  		\
   $(LOCAL_PATH)/libusb-1.0.29/libusb/os/linux_netlink.c  		\
-  $(LOCAL_PATH)/openssl_tiny/sm3.c				               	\
   $(LOCAL_PATH)/focaltech/src/ff_util.c 			           	\
   $(LOCAL_PATH)/focaltech/src/ft_sg_io.c       		       		\
   $(LOCAL_PATH)/focaltech/src/net_usb.c 			           	\
@@ -82,5 +81,5 @@ veryclean : clean
 	rm -fr $(TARGET)
 	  
 $(TARGET) : $(OBJS)
-	$(CC) -o $(TARGET) $(OBJS)
+	$(CC) -o $(TARGET) $(OBJS) $(LDFLAGS)
 	$(STRIP)  -x $(TARGET)

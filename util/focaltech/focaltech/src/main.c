@@ -9,6 +9,9 @@
 #include <sys/vfs.h>
 #include <limits.h>
 
+#include <getopt.h>
+
+#include "ft_help.h"
 #include "ff_common.h"
 #include "ff_log.h"
 #include "ff_util.h"
@@ -202,6 +205,28 @@ int main(int argc, char **argv)
     ft_device_info_t info;
 
     char tmp[PATH_MAX];
+    
+    
+    struct option long_options[] = {
+    	{"help", no_argument, NULL, 'h'},
+    	{"version", no_argument, NULL, 'v'},
+    	{0, 0, 0, 0}
+    };
+
+	int option;
+	while ((option = getopt_long(argc, argv, "hv:", long_options, NULL)) != -1) {
+		switch (option) {
+		case 'h':
+			FF_LOGI("%s",ft_cmd_help_string);
+			return 0;
+		case 'v':
+			FF_LOGI("tool version is %s",FOCAL_SOFT_VERSION);
+			return 0;
+		default:
+			FF_LOGE("unknown: %c", optopt);
+			break;
+		}
+	}
 
     if (argc < 2 || argc > 3)
     {
