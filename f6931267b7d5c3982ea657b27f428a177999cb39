@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a6863e7_bf2cb00e",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-02T22:05:12Z",
+      "side": 1,
+      "message": "Non-blocking - we should verify that all instances of this callback don\u0027t attempt a context switch.",
+      "range": {
+        "startLine": 226,
+        "startChar": 0,
+        "endLine": 226,
+        "endChar": 27
+      },
+      "revId": "f6931267b7d5c3982ea657b27f428a177999cb39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
