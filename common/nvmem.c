@@ -333,7 +333,11 @@ enum ec_error_list nvmem_enable_commits(void)
 		return EC_SUCCESS;
 
 	if (nvmem_mutex.task != task_get_current()) {
-		CPRINTF("%s: locked by task %d, attempt to unlock by task %d\n",
+		/**
+		 * old message:
+		 * locked by task %d, attempt to unlock by task %d
+		 */
+		CPRINTF("%s: locked by %d, attempt to unlock by %d\n",
 			__func__, nvmem_mutex.task, task_get_current());
 		return EC_ERROR_INVAL;
 	}
@@ -355,13 +359,15 @@ enum ec_error_list nvmem_commit(void)
 {
 	enum ec_error_list rv;
 	if (nvmem_mutex.task == TASK_ID_COUNT) {
-		CPRINTF("%s: attempt to commit in unlocked state %d\n",
+		/* old message: attempt to commit in unlocked state %d */
+		CPRINTF("%s: %d can't commit. unlocked\n",
 			__func__, nvmem_mutex.task);
 		return EC_ERROR_OVERFLOW;  /* Noting to commit. */
 	}
 
 	if (nvmem_mutex.task != task_get_current()) {
-		CPRINTF("%s: locked by task %d, attempt to unlock by task %d\n",
+		/* old message: locked by task %d, attempt to unlock by task */
+		CPRINTF("%s: locked by %d, attempt to unlock by %d\n",
 			__func__, nvmem_mutex.task, task_get_current());
 		return EC_ERROR_INVAL;
 	}

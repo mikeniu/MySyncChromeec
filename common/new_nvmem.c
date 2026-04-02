@@ -415,7 +415,7 @@ static void *get_scratch_buffer(size_t size)
 		rv = shared_mem_acquire(size, &buf);
 		if (rv == EC_SUCCESS) {
 			if (i)
-				CPRINTS("%s: waited %d cycles!", __func__, i);
+				CPRINTS("%s: waited %d cycles", __func__, i);
 			return buf;
 		}
 		usleep(100 * MSEC);
@@ -689,7 +689,8 @@ static void remove_page_from_list(uint8_t index)
 		return;
 
 	bad_page = page_list[index];
-	CPRINTS("Removing page %u from list", page_list[index]);
+	/* old message: Removing page %u from list */
+	CPRINTS("Removing page %u", page_list[index]);
 	page_count--;
 	memmove(page_list + index, page_list + index + 1,
 		(page_count - index) * sizeof(page_list[0]));
@@ -1026,7 +1027,8 @@ test_export_static enum ec_error_list compact_nvmem(
 			if (at.mt.ph != fence_ph)
 				release_first_page(&at);
 			shared_mem_release(ch);
-			CPRINTS("Compaction failed status %d", rv);
+			/* old message: Compaction failed status %d */
+			CPRINTS("Compaction failed %d", rv);
 			log_no_payload_failure(NVMEMF_COMPACT_ERROR);
 			return EC_ERROR_INVAL;
 		}
@@ -1107,7 +1109,11 @@ test_export_static enum ec_error_list compact_nvmem(
 			log_no_payload_failure(NVMEMF_COMPACT_FINAL);
 	}
 
-	CPRINTS("Compaction [%x] done, went from %zd to %zd bytes, status %d",
+	/*
+	 * old message:
+	 * Compaction [%x] done, went from %zd to %zd bytes, status %d
+	 */
+	CPRINTS("Compaction [%x] done, %zd -> %zd bytes, status %d",
 		reason, before, total_used_size(), rv);
 
 	/* (b/262324344): debugging EPS status. */
@@ -1115,7 +1121,8 @@ test_export_static enum ec_error_list compact_nvmem(
 	if (eps_seed_len) /* Only record new error */
 		eps_seed_len = tpm_nv_tpm2b_len(NV_EP_SEED);
 	if (eps_seed_len == 0) {
-		CPRINTS("%s: EPS after is zero, rv is %d", __func__, rv);
+		/* old message: EPS after is zero, rv is %d */
+		CPRINTS("%s: EPS after is zero, rv %d", __func__, rv);
 		log_no_payload_failure(NVMEMF_COMPACT_EPS);
 	}
 #endif
@@ -1442,7 +1449,8 @@ static enum ec_error_list verify_empty_page(void *ph)
 
 	if (used_count) {
 		log_no_payload_failure(NVMEMF_CORRUPTED_EMPTY_PAGE);
-		CPRINTS("%s: corrupted page at %pP! %u word(s) unerased",
+		/* old message: corrupted page at %pP! %u word(s) unerased */
+		CPRINTS("%s: corrupted page %pP %u words unerased",
 			__func__, word_p, used_count);
 		return flash_physical_erase((uintptr_t)word_p -
 						    CONFIG_PROGRAM_MEMORY_BASE,
@@ -1525,7 +1533,8 @@ static void init_page_list(void)
 	}
 
 	if (!page_list_index) {
-		CPRINTS("Init nvmem from scratch");
+		/* old message: Init nvmem from scratch */
+		CPRINTS("Init nvmem");
 		set_first_page_header();
 		page_list_index++;
 	}
