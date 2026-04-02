@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "049520b5_f4a05766",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-02T06:17:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6711c5d4_28d0b20b",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 66
+      },
+      "revId": "128006782cb68c1ec3dad6715dfc4a9868816da0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "546abfbe_20eb4325",
@@ -41,6 +65,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "76effe96_35f1a7f0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-02T06:17:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "546abfbe_20eb4325",
+      "revId": "128006782cb68c1ec3dad6715dfc4a9868816da0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "97bfa238_be50b10b",
@@ -54,6 +96,30 @@
       "writtenOn": "2026-04-02T05:18:34Z",
       "side": 1,
       "message": "Please don\u0027t use the project name in the comment.",
+      "range": {
+        "startLine": 26,
+        "startChar": 16,
+        "endLine": 26,
+        "endChar": 25
+      },
+      "revId": "128006782cb68c1ec3dad6715dfc4a9868816da0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74cdb2bf_51834342",
+        "filename": "zephyr/drivers/fingerprint/Kconfig",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-02T06:17:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97bfa238_be50b10b",
       "range": {
         "startLine": 26,
         "startChar": 16,
