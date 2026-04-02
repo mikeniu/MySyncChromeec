@@ -16,6 +16,24 @@
       "message": "Please run `cros format driver/fingerprint/egis/egis_private.c zephyr/subsys/fingerprint/alg/egis_egis630_bio_alg.c`",
       "revId": "2ade588b0607f2720f42bb4071531382867371e5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c88224c_a8621f58",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-02T08:23:25Z",
+      "side": 1,
+      "message": "`cros format` isn\u0027t working properly in my environment.\nI\u0027m probably missing some setup steps.\nI\u0027m using `clang-format` instead.",
+      "parentUuid": "6e900d9a_ffe458a0",
+      "revId": "2ade588b0607f2720f42bb4071531382867371e5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
