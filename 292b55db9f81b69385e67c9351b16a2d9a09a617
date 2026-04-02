@@ -16,6 +16,24 @@
       "message": "Do we actually compile `charge_state.c` in the QC case? If it is disabled for these boards, there should not be a conflict for `led_pwr_get_state()` or `charge_manager_get_active_charge_port()`. If there is no conflict, we don\u0027t need to touch `charge_state.c` to make these functions weak.\n\nSetting up a new subsystem to hold two variables feels like overkill. Also, calling it a virtual charge_state is a bit of an overstatement as it doesn\u0027t provide major charge_state functionalities.\n\nAs we have a dedicated ADSP comm module, it might be cleaner to just define these `led_pwr_get_state()` functions directly inside `adsp_comms.c`. That way, the module that owns the data provides the state directly.",
       "revId": "292b55db9f81b69385e67c9351b16a2d9a09a617",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86cd7018_a46862ff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-04-02T18:14:18Z",
+      "side": 1,
+      "message": "Unmarked resolved.",
+      "parentUuid": "72e6005d_793b507b",
+      "revId": "292b55db9f81b69385e67c9351b16a2d9a09a617",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
