@@ -13,12 +13,6 @@
  * TODO: Declaration in this file should be removed once it can be replaced
  * by implementation in Zephyr code.
  */
-#if CONFIG_AP_PWRSEQ
-
-#include "ec_commands.h"
-#include "host_command.h"
-#include "lpc.h"
-#include "system.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,6 +49,13 @@ enum power_state {
 	POWER_S0S0ix, /* S0 -> S0ix */
 #endif
 };
+
+#if CONFIG_AP_PWRSEQ
+
+#include "ec_commands.h"
+#include "host_command.h"
+#include "lpc.h"
+#include "system.h"
 
 #if CONFIG_AP_PWRSEQ_HOST_SLEEP
 /* Context to pass to a host sleep command handler. */
