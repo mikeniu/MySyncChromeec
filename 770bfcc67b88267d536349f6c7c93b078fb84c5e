@@ -70,6 +70,24 @@
       "parentUuid": "9d06c3e8_2b9228e4",
       "revId": "770bfcc67b88267d536349f6c7c93b078fb84c5e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "966d2f1f_936b588e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-02T02:46:51Z",
+      "side": 1,
+      "message": "If `chromium:9106841` declares `Cq-Depend: chromium:7695805`,\nand `chromium:7695805` also declares `Cq-Depend: chromium:9106841`.\nI think CL will not merge them because they are both waiting for the other to merge first.\nAm I misunderstanding something?",
+      "parentUuid": "a60463a0_8e5f6bcb",
+      "revId": "770bfcc67b88267d536349f6c7c93b078fb84c5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
