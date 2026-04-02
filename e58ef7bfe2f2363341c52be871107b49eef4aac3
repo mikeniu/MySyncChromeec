@@ -16,6 +16,24 @@
       "message": "@jason.huang@egistec.corp-partner.google.com\n\nYou need to add the below to the commit message directly after `TEST`\n\n```\nLOW_COVERAGE_REASON\u003db:491473745, test was verified on an actual board\n```",
       "revId": "e58ef7bfe2f2363341c52be871107b49eef4aac3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d9ee045_67e17174",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-02T15:59:04Z",
+      "side": 1,
+      "message": "@jason.huang@egistec.corp-partner.google.com\n\nfriendly ping",
+      "parentUuid": "281c1d8f_b10418b3",
+      "revId": "e58ef7bfe2f2363341c52be871107b49eef4aac3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
