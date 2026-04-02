@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "314abaac_9111c852",
+        "filename": "common/usbc/build.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-02T17:07:47Z",
+      "side": 1,
+      "message": "See my comment on the `main` CL. This should be in the PE block. But if it works like this, it\u0027s OK to merge this cherry pick and clean it up in a later CL.",
+      "revId": "6115ff7ae34a254273bda8f243fabf37bb5a4fbc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
