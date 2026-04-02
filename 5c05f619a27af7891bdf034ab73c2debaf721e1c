@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ed1097b_791b2c00",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-04-02T02:59:25Z",
+      "side": 1,
+      "message": "@daxi.yang@luxshare.corp-partner.google.com,\n\nPlease mark previous comments as resolved.",
+      "revId": "5c05f619a27af7891bdf034ab73c2debaf721e1c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
