@@ -16,6 +16,24 @@
       "message": "What about the delete key at T15 for moonstone?",
       "revId": "9cd460ef56c6110c1513d9fd9c85db97436e070e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2bc6d8ea_c81de62d",
+        "filename": "zephyr/program/fatcat/moonstone/keyboard.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4422389
+      },
+      "writtenOn": "2026-04-02T06:58:07Z",
+      "side": 1,
+      "message": "Delete key in moonstone is not T15. I verified with ec `kbpress 9 2 1` and b/441853752 - https://screenshot.googleplex.com/9hXav9wdt8kHFN7.png",
+      "parentUuid": "14b0cb19_f83de89e",
+      "revId": "9cd460ef56c6110c1513d9fd9c85db97436e070e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
