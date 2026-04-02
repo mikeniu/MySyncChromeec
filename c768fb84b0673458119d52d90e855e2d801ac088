@@ -337,6 +337,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "290f134a_d03833a7",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T13:11:38Z",
+      "side": 1,
+      "message": "I see, but it\u0027s more complicated. The flash protection is complex topic since it\u0027s super hardware depended feature and we use common flags for all SOCs.\n\nFor my understanding, the conversion comes from the SPI NOR flash chips. The [*_AT_BOOT](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/include/ec_commands.h;l\u003d2033) flag means the flash protection is enable (Status Registers in the Flash NOR chip are set to enable flash protection). [*_NOW](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/include/ec_commands.h;l\u003d2038) flag means the flash protection is set and can not be changed till reboot (#WP line is asserted to the flash NOR chip + some proper configuration). We are trying to mimic this with what we have. E.g. in the andes_xip driver, a flash nor xip is connected, but there is no control over #WP line. So I added a [software lock](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/cros_flash/cros_flash_andestech_xip.c;l\u003d107)(+ [upstream](https://github.com/zephyrproject-rtos/zephyr/blob/main/drivers/flash/flash_andes_qspi_xip.c#L106)) in the Andes driver to block possibility of changing status registers (where the protection ranges are configured).",
+      "parentUuid": "5b2719fc_e933f411",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2b2255d0_781c322e",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 7
@@ -459,6 +477,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "26977e6e_360d6528",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T13:11:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7b88e559_caee6e67",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "627f5544_afc66b96",
@@ -566,6 +602,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d263c627_caa65552",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T13:11:38Z",
+      "side": 1,
+      "message": "I see, that\u0027s a good news. I assumed the protection ranges are constant / hardcoded in rom-code / your private flash lib.",
+      "parentUuid": "44588673_3f21e8c2",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "264c1b63_888aadf5",
@@ -651,6 +705,24 @@
       "side": 1,
       "message": "We have confirmed with our team that there is no \"error register\" in the EM32F967.\nOnly two registers are available, both sharing the same format as described above.\nWe write to register A, and the hardware processes the operation and updates register B (read-only) accordingly.\nThe protection status is then determined by our library API through reading register B.",
       "parentUuid": "c5c6ba8f_ab575747",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "918011fe_5d2fbe9d",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T13:11:38Z",
+      "side": 1,
+      "message": "Thanks for the explanation.",
+      "parentUuid": "efae0509_390c5a63",
       "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

@@ -1,0 +1,192 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "151c761e_e82dccc8",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T13:11:38Z",
+      "side": 1,
+      "message": "protect",
+      "range": {
+        "startLine": 46,
+        "startChar": 27,
+        "endLine": 46,
+        "endChar": 34
+      },
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57bf3a79_3d7c705c",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T13:11:38Z",
+      "side": 1,
+      "message": "It should be void function.",
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0fbc1909_a4acddb3",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T13:11:38Z",
+      "side": 1,
+      "message": "This comment is unnecessary here.",
+      "range": {
+        "startLine": 235,
+        "startChar": 0,
+        "endLine": 236,
+        "endChar": 39
+      },
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebc75d3e_5906ed55",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T13:11:38Z",
+      "side": 1,
+      "message": "I think you can just assign 0 here.",
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba0015c2_8b135d1e",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T13:11:38Z",
+      "side": 1,
+      "message": "Please lock irq here if possible, since this is security sensitive operation.",
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcc83b1c_9afa4af0",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T13:11:38Z",
+      "side": 1,
+      "message": "I know this comes from the andes_xip driver. It was adjusted. Can you adjust it as well?",
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6d64af4_e9ae6114",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T13:11:38Z",
+      "side": 1,
+      "message": "I think it would be easier to rely on `new_prot_end` here, e.g.:\n```\nif (new_prot_end \u003d\u003d (CONFIG_RW_MEM_OFF + CONFIG_RW_SIZE)) {\nflash_em32_write_protect_1(...);\nflash_em32_write_protect_2(...);\n} else if () {\n...\n\n```",
+      "range": {
+        "startLine": 270,
+        "startChar": 0,
+        "endLine": 293,
+        "endChar": 2
+      },
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a072204a_eb3c4a43",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T13:11:38Z",
+      "side": 1,
+      "message": "Return error in case of lack of library. The flash protection is not set.",
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8826ea75_c79564fa",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T13:11:38Z",
+      "side": 1,
+      "message": "How about calling `cros_flash_em32f967_protect_at_boot` here? This function assumes that the both protection ranges are already set.",
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4c5caaa_8be220ef",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T13:11:38Z",
+      "side": 1,
+      "message": "Can you add description of there functions? What they do, return values and parameters.",
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
