@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a123352f_b70b1623",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-02T15:53:37Z",
+      "side": 1,
+      "message": "you need to add `LOW_COVERAGE_REASON` line as shown below.\n\n```\nBUG\u003db:474304177\nTEST\u003dCQ\nLOW_COVERAGE_REASON\u003db:474304177, test was verified on an actual board\n\nCq-Depend: chrome-internal:9106841\nChange-Id: Ie7e2731b7474b5c369fc85093e06bdb3fd6ca7fc\n```",
+      "revId": "e8d807bd0bd14268eecd022801efa72fdfc64e23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
