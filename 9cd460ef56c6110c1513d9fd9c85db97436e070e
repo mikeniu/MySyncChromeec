@@ -34,6 +34,24 @@
       "parentUuid": "14b0cb19_f83de89e",
       "revId": "9cd460ef56c6110c1513d9fd9c85db97436e070e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2b3bb8e_f64b1a82",
+        "filename": "zephyr/program/fatcat/moonstone/keyboard.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1522152
+      },
+      "writtenOn": "2026-04-02T22:14:12Z",
+      "side": 1,
+      "message": "SGTM. Given the conflicting comments in the bug, lets make note to confirm that dvt+pvt don\u0027t move things around.",
+      "parentUuid": "2bc6d8ea_c81de62d",
+      "revId": "9cd460ef56c6110c1513d9fd9c85db97436e070e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
