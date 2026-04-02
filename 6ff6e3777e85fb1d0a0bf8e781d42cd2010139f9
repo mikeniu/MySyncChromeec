@@ -223,6 +223,30 @@
       },
       "revId": "6ff6e3777e85fb1d0a0bf8e781d42cd2010139f9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5213b064_e7038b51",
+        "filename": "zephyr/program/fatcat/BUILD.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-02T20:43:58Z",
+      "side": 1,
+      "message": "To make sure percepio stuff continues to build, I recommend adding a new project to program/minimal/BUILD.py\n\nI think you will need to land the change to zmake/modules.py so that zmake uprevs before you can create a project that depends on percepio.",
+      "parentUuid": "29dbab2c_9ddd727a",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 31
+      },
+      "revId": "6ff6e3777e85fb1d0a0bf8e781d42cd2010139f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
