@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6711c5d4_28d0b20b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T05:18:34Z",
+      "side": 1,
+      "message": "Edit proposal:\n\n```\nfpsensor: ec630: add support for skipping a template update\n\nAdd support for skipping the template update for the EC630 sensor during matching procedure. Also introduce a new capture format.\n\nBoth changes are needed for certification process.\n```",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 66
+      },
+      "revId": "128006782cb68c1ec3dad6715dfc4a9868816da0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97bfa238_be50b10b",
+        "filename": "zephyr/drivers/fingerprint/Kconfig",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-02T05:18:34Z",
+      "side": 1,
+      "message": "Please don\u0027t use the project name in the comment.",
+      "range": {
+        "startLine": 26,
+        "startChar": 16,
+        "endLine": 26,
+        "endChar": 25
+      },
+      "revId": "128006782cb68c1ec3dad6715dfc4a9868816da0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
