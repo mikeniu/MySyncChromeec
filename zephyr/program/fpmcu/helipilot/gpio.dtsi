@@ -19,7 +19,7 @@
 		};
 
 		ec_wp_l: write-protect {
-			gpios = <&gpioa 4 GPIO_INPUT>;
+			gpios = <&gpioa 4 (GPIO_INPUT | GPIO_PULL_UP)>;
 		};
 
 		fp_sensor_sel: fp_sensor_sel {
