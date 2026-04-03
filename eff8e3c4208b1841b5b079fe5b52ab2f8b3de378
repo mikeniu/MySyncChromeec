@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3b222fd_3089860a",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-03T13:04:27Z",
+      "side": 1,
+      "message": "Correct",
+      "range": {
+        "startLine": 10,
+        "startChar": 3,
+        "endLine": 10,
+        "endChar": 70
+      },
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86b425d3_0d51cf73",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-03T13:04:27Z",
+      "side": 1,
+      "message": "Is this also true for the Focaltech chip? Does it have possibility to control #WP pin to the flash chip?",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 76
+      },
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0aac1a1_1daca5c4",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-03T13:04:27Z",
+      "side": 1,
+      "message": "Please additional information about option bootloader at the beginning of the flash.",
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa761ab1_359d6672",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-03T13:04:27Z",
+      "side": 1,
+      "message": "This [define](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/chip/ft90/include/flash_chip.h;l\u003d10) has to be correct to make it work. Please double-check it.",
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a32e136c_f024c6f7",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-03T13:04:27Z",
+      "side": 1,
+      "message": "Have you made sure this `CONFIG_WP_STORAGE_OFF` is defined correctly? (end of bootloader)",
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
