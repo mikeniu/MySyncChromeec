@@ -46,6 +46,30 @@
       },
       "revId": "e905cda49133bf923491354df65558321dd06e8c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8331fbc3_e43ee3af",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-03T15:09:37Z",
+      "side": 1,
+      "message": "This is how you do it\n\n```\nCq-Depend: chrome-internal:9150518\n```",
+      "parentUuid": "d5f089f6_ea5646b9",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 50
+      },
+      "revId": "e905cda49133bf923491354df65558321dd06e8c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
