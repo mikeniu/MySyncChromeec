@@ -111,6 +111,91 @@
       "message": "I added the runtime usbc tests as a separate commit cause of the sheer size of the commit. Since there are 5 different USB topologies that need to be verified this got big very fast. Let me know if this approach looks good I can always change it but the only other way I can think to cover all of the possible scenarios involved overriding the production code and I was focusing on this only touching test code",
       "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ae3f9f0_28e85bcb",
+        "filename": "zephyr/shim/include/power_host_sleep.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-03T23:15:18Z",
+      "side": 1,
+      "message": "Does anything bad happen if these includes are conventionally unconditional at the top of the file?",
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2f46ed9_b7cfafbd",
+        "filename": "zephyr/test/atria/CMakeLists.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-03T23:15:18Z",
+      "side": 1,
+      "message": "Setting aside whether we need multiple test builds, if there\u0027s no non-runtime-configuration test build, then this file should be part of the sources unconditionally.",
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5585e59f_143bc5f6",
+        "filename": "zephyr/test/atria/src/rvp_usbc_runtime_2port_test.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-03T23:15:18Z",
+      "side": 1,
+      "message": "Nit: This will cover the caching path if it runs second. Technically, test ordering depends on twister invocation. Anyway, the required behavior of the caching path is that it produce the same result as the non-caching path. So I think it would be more obviously correct to call `board_get_pdc_for_port` a second time during `test_discovery_and_port0` and assert that the result is the same as it was the first time.",
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05d25456_e3f4ddc0",
+        "filename": "zephyr/test/atria/src/rvp_usbc_runtime_3port_test.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-03T23:15:18Z",
+      "side": 1,
+      "message": "The code coverage and checks for the out of range and caching tests should be the same between configurations. I guess technically you\u0027re checking that 2 is out of range in the 2-port configuration but in-range in the 3-port configuration. I\u0027m not sure that\u0027s worth having a separate test for 2 vs 3.",
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b723177d_a7c4e2eb",
+        "filename": "zephyr/test/atria/src/rvp_usbc_runtime_partial_test.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-03T23:15:18Z",
+      "side": 1,
+      "message": "Supposing that you do want to check the out-of-range value for multiple different configurations, I\u0027d say this is my preferred test structure. The existence of this test makes me even less enthused of the multiple special-purpose out-of-range tests.",
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
