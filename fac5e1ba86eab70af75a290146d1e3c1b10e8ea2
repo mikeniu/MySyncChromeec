@@ -178,6 +178,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "86a9ae2e_8d7e863e",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 55
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-03T08:16:54Z",
+      "side": 1,
+      "message": "I originally want use this to identifies the first step of enroll, since we have ft98xx_enroll_start, so maybe this is not necessary.",
+      "parentUuid": "3ffa580d_b7ebb80c",
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8436cc72_d06510e8",
         "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
         "patchSetId": 55
