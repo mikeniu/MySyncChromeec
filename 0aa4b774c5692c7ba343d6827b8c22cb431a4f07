@@ -1,6 +1,29 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b25c9d0_03d8d5f6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-03T16:30:14Z",
+      "side": 1,
+      "message": "You don\u0027t need these extra overlays.  The I2C emulator middle layer includes commands to force I2C reads and writes to fail.\n\n```\nstruct i2c_common_emul_data *i2c_common_data \u003d rts5453p_emul_get_i2c_common_data(emul);\ni2c_common_emul_set_read_fail_reg(i2c_common_data, I2C_COMMON_EMUL_FAIL_ALL_REG);\n```\n\nCalling this routine before the `board_get_pdc_for_port()` runs will do the same things as your `cros,fake-absent-pdc` driver.",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 10
+      },
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "ebf64224_3caf4d46",
