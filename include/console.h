@@ -139,6 +139,9 @@ void console_channel_enable(const char *name);
  */
 void console_channel_disable(const char *name);
 
+uint32_t console_channel_disable_all(void);
+void console_channel_restore(uint32_t mask);
+
 /**
  * Check if channel is disabled.
  *

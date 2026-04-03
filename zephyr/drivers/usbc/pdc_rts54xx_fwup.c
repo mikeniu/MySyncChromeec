@@ -5,7 +5,9 @@
 
 /* LCOV_EXCL_START - non-shipping code */
 
+#include "console.h"
 #include "drivers/pdc.h"
+#include "flash.h"
 #include "pdc_rts54xx.h"
 #include "usbc/pdc_power_mgmt.h"
 
@@ -37,11 +39,18 @@ LOG_MODULE_REGISTER(pdc_rts54_fwup, LOG_LEVEL_INF);
 #define RTS54XX_VALIDATE_ISP_CMD 0x16
 #define RTS54XX_GET_IC_STATUS_CMD 0x3A
 
+#define RTS54XX_FLASH_READ_0_64K_CMD 0x24
+#define RTS54XX_FLASH_READ_64K_128K_CMD 0x26
+#define RTS54XX_FLASH_READ_128K_192K_CMD 0x33
+#define RTS54XX_FLASH_READ_192K_256K_CMD 0x34
+
 static struct {
 	bool fwup_session_active;
+	bool read_operation;
 	struct i2c_dt_spec pdc_i2c;
 	struct pdc_info_t chip_info;
-	size_t bytes_written;
+	size_t bytes_transferred;
+	const struct shell *sh;
 } ctx;
 
 static int rts54xx_ping_status(const struct i2c_dt_spec *i2c,
@@ -96,6 +105,10 @@ static int rts54xx_block_out_transfer(const struct i2c_dt_spec *i2c, size_t len,
 	int ret;
 
 	if (len > RTS54XX_MAX_CMD_SIZE + 2) {
+		shell_error(ctx.sh,
+			    "Block-out transfer invalid size %d, max %d", len,
+			    RTS54XX_MAX_CMD_SIZE + 2);
+
 		return -EINVAL;
 	}
 
@@ -130,6 +143,30 @@ static int rts54xx_block_in_transfer(const struct i2c_dt_spec *i2c, size_t len,
 
 	return i2c_transfer_dt(i2c, msg, 2);
 }
+
+#if 0
+static int rts54xx_block_in_transfer_data_only(const struct i2c_dt_spec *i2c,
+					       size_t len, uint8_t *read_data,
+					       uint8_t *read_length)
+{
+	struct i2c_msg msg[3];
+	uint8_t read_data_transfer_cmd = RTS54XX_BLOCK_READ_CMD;
+
+	msg[0].buf = &read_data_transfer_cmd;
+	msg[0].len = 1;
+	msg[0].flags = I2C_MSG_WRITE;
+
+	msg[1].buf = read_length;
+	msg[1].len = 1;
+	msg[1].flags = I2C_MSG_RESTART | I2C_MSG_READ;
+
+	msg[2].buf = read_data;
+	msg[2].len = len;
+	msg[2].flags = I2C_MSG_READ | I2C_MSG_STOP;
+
+	return i2c_transfer_dt(i2c, msg, 2);
+}
+#endif
 
 /**
  * @brief Turn on vendor commands
@@ -305,7 +342,8 @@ static int rts54xx_write_flash_chunk(const struct i2c_dt_spec *i2c,
 	return -1;
 }
 
-static int pdc_rts54xx_fwup_start(const struct i2c_dt_spec *i2c)
+static int pdc_rts54xx_fwup_start(const struct i2c_dt_spec *i2c,
+				  bool read_operation)
 {
 	int rv;
 
@@ -329,6 +367,7 @@ static int pdc_rts54xx_fwup_start(const struct i2c_dt_spec *i2c)
 	}
 
 	ctx.pdc_i2c = *i2c;
+	ctx.read_operation = read_operation;
 
 	/* Enable vendor commands */
 	LOG_INF("Enabling vendor commands");
@@ -360,9 +399,10 @@ static int pdc_rts54xx_fwup_start(const struct i2c_dt_spec *i2c)
 		return rv;
 	}
 
-	if (ctx.chip_info.is_running_flash_code == false) {
-		/* In the ROM code update flow, perform an erase of the flash
-		 * to clear out any potentially corrupt firmware.
+	if (!ctx.read_operation &&
+	    ctx.chip_info.is_running_flash_code == false) {
+		/* In the ROM code update flow, perform an erase of the
+		 * flash to clear out any potentially corrupt firmware.
 		 */
 		LOG_INF("ROM mode: Erasing flash.");
 		rv = rts54xx_erase_flash(&ctx.pdc_i2c);
@@ -375,7 +415,7 @@ static int pdc_rts54xx_fwup_start(const struct i2c_dt_spec *i2c)
 	/* Ready for FW transfer */
 
 	ctx.fwup_session_active = true;
-	ctx.bytes_written = 0;
+	ctx.bytes_transferred = 0;
 
 	return 0;
 }
@@ -418,32 +458,15 @@ static int pdc_rts54xx_fwup_write(uint8_t *buffer, size_t buffer_len)
 			return rv;
 		}
 
-		ctx.bytes_written += rv;
+		ctx.bytes_transferred += rv;
 	}
 
-	return ctx.bytes_written;
+	return ctx.bytes_transferred;
 }
 
-static int pdc_rts54xx_fwup_finish(void)
+static int pdc_rts54xx_fwup_finish_write(void)
 {
 	int rv;
-
-	if (!ctx.fwup_session_active) {
-		/* Need to start a FWUP session w/ pdc_rts54xx_fwup_start() */
-		LOG_ERR("No FWUP session in progress");
-		return -ENODEV;
-	}
-
-	LOG_INF("Finishing update. Total FW bytes written: %u",
-		ctx.bytes_written);
-
-	/* Turn off flash access */
-	LOG_INF("Disabling flash access");
-	rv = rts54xx_disable_flash_access(&ctx.pdc_i2c);
-	if (rv) {
-		LOG_ERR("Cannot disable flash access: %d", rv);
-		return rv;
-	}
 
 	if (ctx.chip_info.is_running_flash_code) {
 		/* Validate new image. This feature is only available when
@@ -477,6 +500,34 @@ static int pdc_rts54xx_fwup_finish(void)
 	LOG_INF("Waiting for PDC to reboot");
 	k_sleep(RTS54XX_RESET_DELAY);
 
+	return 0;
+}
+
+static int pdc_rts54xx_fwup_finish(void)
+{
+	int rv;
+
+	if (!ctx.fwup_session_active) {
+		/* Need to start a FWUP session w/ pdc_rts54xx_fwup_start() */
+		LOG_ERR("No FWUP session in progress");
+		return -ENODEV;
+	}
+
+	LOG_INF("Finishing update. Total FW bytes transferred: %u",
+		ctx.bytes_transferred);
+
+	/* Turn off flash access */
+	LOG_INF("Disabling flash access");
+	rv = rts54xx_disable_flash_access(&ctx.pdc_i2c);
+	if (rv) {
+		LOG_ERR("Cannot disable flash access: %d", rv);
+		return rv;
+	}
+
+	if (!ctx.read_operation) {
+		rv = pdc_rts54xx_fwup_finish_write();
+	}
+
 	/* Re-enable the PDC stack */
 	LOG_INF("Re-enabling PDC stack");
 	rv = pdc_power_mgmt_set_comms_state(true);
@@ -484,6 +535,12 @@ static int pdc_rts54xx_fwup_finish(void)
 		LOG_ERR("Cannot restart PDC stack: %d", rv);
 		return rv;
 	}
+
+	/*
+	 * Let the PDC stack settle.
+	 * TODO: disable all logging during any FWUP operation?
+	 */
+	k_sleep(K_SECONDS(2));
 
 	LOG_INF("PDC FWUP successful");
 
@@ -542,17 +599,14 @@ static int pdc_rts54xx_fwup_abort(void)
 	return 0;
 }
 
-/*
- * Console interface
- */
-
-static int cmd_pdc_rtk_fwup_start(const struct shell *sh, size_t argc,
-				  char **argv)
+static int rtk_rwup_start_helper(const struct shell *sh, size_t argc,
+				 char **argv, struct i2c_dt_spec *i2c)
 {
 	int rv;
-	struct i2c_dt_spec i2c;
 	const struct device *dev;
 	char *e;
+
+	ctx.sh = sh;
 
 	/* A PDC chip can be specified in one of two ways:
 	 *
@@ -594,7 +648,7 @@ static int cmd_pdc_rtk_fwup_start(const struct shell *sh, size_t argc,
 			return rv;
 		}
 
-		i2c = hw_config.i2c;
+		*i2c = hw_config.i2c;
 
 	} else if (argc >= 3) {
 		/* User specified an I2C bus and target address */
@@ -623,22 +677,56 @@ static int cmd_pdc_rtk_fwup_start(const struct shell *sh, size_t argc,
 			return -EINVAL;
 		}
 
-		i2c = (struct i2c_dt_spec){
+		*i2c = (struct i2c_dt_spec){
 			.bus = dev,
 			.addr = i2c_addr,
 		};
 	}
 
 	shell_info(sh, "RTK_FWUP: Accessing PDC chip at %s:%02x",
-		   i2c.bus->name ? i2c.bus->name : "(unnamed bus)", i2c.addr);
+		   i2c->bus->name ? i2c->bus->name : "(unnamed bus)",
+		   i2c->addr);
 
-	rv = pdc_rts54xx_fwup_start(&i2c);
+	return 0;
+}
+
+/*
+ * Console interface
+ */
+
+static int cmd_pdc_rtk_fwup_start(const struct shell *sh, size_t argc,
+				  char **argv)
+{
+	int rv;
+	struct i2c_dt_spec i2c;
+
+	rv = rtk_rwup_start_helper(sh, argc, argv, &i2c);
+
+	rv = pdc_rts54xx_fwup_start(&i2c, false);
 	if (rv) {
 		shell_error(sh, "RTK_FWUP: Cannot start: %d", rv);
 		return rv;
 	}
 
-	shell_info(sh, "RTK_FWUP: Started");
+	shell_info(sh, "RTK_FWUP: Started write");
+	return 0;
+}
+
+static int cmd_pdc_rtk_fwup_start_read(const struct shell *sh, size_t argc,
+				       char **argv)
+{
+	int rv;
+	struct i2c_dt_spec i2c;
+
+	rv = rtk_rwup_start_helper(sh, argc, argv, &i2c);
+
+	rv = pdc_rts54xx_fwup_start(&i2c, true);
+	if (rv) {
+		shell_error(sh, "RTK_FWUP: Cannot start: %d", rv);
+		return rv;
+	}
+
+	shell_info(sh, "RTK_FWUP: Started read");
 	return 0;
 }
 
@@ -688,6 +776,150 @@ static int cmd_pdc_rtk_fwup_abort(const struct shell *sh, size_t argc,
 	return pdc_rts54xx_fwup_abort();
 }
 
+static int rts545x_read_flash(int address, int read_length, int buf_len,
+			      char *out_buf)
+{
+	uint8_t cmd;
+	uint8_t cmd_data[] = { 0, 0, 0, 0, 0 };
+	uint8_t temp_read_buffer[32];
+	union ping_status_t ping_status;
+	int ret;
+
+	if (address < 0 || address >= (256 * 1024)) {
+		shell_error(ctx.sh, "%s: Address (%#x) out of bounds", __func__,
+			    address);
+		return -1;
+	}
+
+	if (read_length > sizeof(temp_read_buffer)) {
+		shell_error(ctx.sh, "Length %d too long (max %d)", read_length,
+			    sizeof(temp_read_buffer));
+	}
+
+	int sector = address / 65536;
+	int offset_in_sector = address % 65536;
+
+	switch (sector) {
+	case 0:
+		cmd = RTS54XX_FLASH_READ_0_64K_CMD;
+		break;
+	case 1:
+		cmd = RTS54XX_FLASH_READ_64K_128K_CMD;
+		break;
+	case 2:
+		cmd = RTS54XX_FLASH_READ_128K_192K_CMD;
+		break;
+	case 3:
+		cmd = RTS54XX_FLASH_READ_192K_256K_CMD;
+		break;
+	default:
+		return -1;
+	}
+
+	cmd_data[0] = cmd;
+	cmd_data[1] = 3;
+	cmd_data[2] = (offset_in_sector) & 0xFF;
+	cmd_data[3] = (offset_in_sector >> 8) & 0xFF;
+	cmd_data[4] = read_length;
+
+	/* Send read request */
+	ret = rts54xx_block_out_transfer(&ctx.pdc_i2c, ARRAY_SIZE(cmd_data),
+					 cmd_data, &ping_status);
+	if (ret) {
+		shell_error(ctx.sh, "%s failed block-out xfer: %d", __func__,
+			    ret);
+		return ret;
+	}
+
+	int block_in_xfer_len = min(read_length, buf_len) + 1;
+
+	/* Receive response */
+	ret = rts54xx_block_in_transfer(&ctx.pdc_i2c, block_in_xfer_len,
+					(uint8_t *)temp_read_buffer);
+	if (ret < 0) {
+		shell_error(
+			ctx.sh,
+			"%s: Cannot read back response: %d (ping_status=%02x)",
+			__func__, ret, ping_status.raw_value);
+	}
+
+	memcpy(out_buf, &temp_read_buffer[1], min(read_length, buf_len));
+
+	return ret;
+}
+
+#define READ_SIZE 31
+static int cmd_pdc_rtk_fwup_read(const struct shell *sh, size_t argc,
+				 char **argv)
+{
+	uint32_t offset;
+	uint32_t length;
+	uint32_t bytes;
+	uint32_t read_size;
+	char out_buf[128];
+	uint8_t buf[READ_SIZE];
+	int err = 0;
+	size_t output_len;
+	uint32_t console_mask;
+
+	if (!ctx.fwup_session_active) {
+		/* Need to start a FWUP session w/ pdc_rts54xx_fwup_start() */
+		LOG_ERR("No FWUP session in progress");
+		return -ENODEV;
+	}
+
+	offset = shell_strtoul(argv[1], 0, &err);
+
+	if (err != 0) {
+		shell_error(sh, "Invalid offset argument: %s", argv[1]);
+		return err;
+	}
+
+	length = shell_strtoul(argv[2], 0, &err);
+
+	if (err != 0) {
+		shell_error(sh, "Invalid length argument: %s", argv[2]);
+		return err;
+	}
+
+	console_mask = console_channel_disable_all();
+
+	shell_info(sh, "RTK_FWUP: read 0x%08x bytes from offset 0x%08x", length,
+		   offset);
+
+	bytes = 0;
+	while (bytes < length) {
+		if ((length - bytes) > READ_SIZE) {
+			read_size = READ_SIZE;
+		} else {
+			read_size = length - bytes;
+		}
+
+		err = rts545x_read_flash(offset, read_size, sizeof(buf), buf);
+
+		if (err != 0) {
+			shell_error(sh,
+				    "RTK read flash failed at offset 0x%08x",
+				    offset);
+			break;
+		}
+
+		base64_encode(out_buf, sizeof(out_buf), &output_len, buf,
+			      read_size);
+
+		shell_info(sh, "%s", out_buf);
+
+		offset += read_size;
+		bytes += read_size;
+	}
+
+	ctx.bytes_transferred += length;
+
+	console_channel_restore(console_mask);
+
+	return err;
+}
+
 SHELL_STATIC_SUBCMD_SET_CREATE(
 	sub_pdc_rtk_fwup_cmds,
 	SHELL_CMD_ARG(start, NULL,
@@ -696,6 +928,12 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 				 "<device> <addr>\n"
 				 "(`device` is an I2C bus, likely I2C_PORT_PD)"),
 		      cmd_pdc_rtk_fwup_start, 2, 1),
+	SHELL_CMD_ARG(start_read, NULL,
+		      SHELL_HELP("Prepare the PDC for firmware reading",
+				 "<port>\n"
+				 "<device> <addr>\n"
+				 "(`device` is an I2C bus, likely I2C_PORT_PD)"),
+		      cmd_pdc_rtk_fwup_start_read, 2, 1),
 	SHELL_CMD_ARG(
 		write, NULL,
 		SHELL_HELP("Write packets of 29 FW payload bytes to the PDC",
@@ -711,6 +949,11 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 		SHELL_HELP("Recover from a failed or interrupted update session",
 			   NULL),
 		cmd_pdc_rtk_fwup_abort, 1, 0),
+	SHELL_CMD_ARG(
+		read, NULL,
+		SHELL_HELP("Recover from a failed or interrupted update session",
+			   "<offset> <length>"),
+		cmd_pdc_rtk_fwup_read, 3, 0),
 	SHELL_SUBCMD_SET_END);
 
 SHELL_CMD_REGISTER(pdc_rtk_fwup, &sub_pdc_rtk_fwup_cmds,

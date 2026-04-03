@@ -74,6 +74,17 @@ bool console_channel_is_disabled(enum console_channel channel)
 		return true;
 	return false;
 }
+
+uint32_t console_channel_disable_all(void)
+{
+	uint32_t old_mask = channel_mask;
+	channel_mask = 0;
+	return old_mask;
+}
+void console_channel_restore(uint32_t mask)
+{
+	channel_mask = mask;
+}
 #endif /* CONFIG_CONSOLE_CHANNEL */
 
 #ifndef CONFIG_ZEPHYR
