@@ -72,6 +72,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "027d4c22_c0c73065",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-03T18:00:19Z",
+      "side": 1,
+      "message": "true but it is calling discover_tcss_modules which uses the cached value that is not publicly exposed. Which is why I initially did this with all different overlays",
+      "parentUuid": "2f7da56e_622e29c1",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 10
+      },
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "ebf64224_3caf4d46",
