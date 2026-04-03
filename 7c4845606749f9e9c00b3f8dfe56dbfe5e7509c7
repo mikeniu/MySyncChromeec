@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec4b532d_db239166",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-04-03T00:21:34Z",
+      "side": 1,
+      "message": "this doesn\u0027t fix the host commands over HECI case.",
+      "revId": "7c4845606749f9e9c00b3f8dfe56dbfe5e7509c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
