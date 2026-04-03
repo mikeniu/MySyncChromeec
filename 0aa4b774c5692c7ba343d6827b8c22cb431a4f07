@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "85ae9582_1a260d28",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-03T16:49:03Z",
+      "side": 1,
+      "message": "That is a good point I\u0027ll see if that will work the main issue is that the ports are only probed once at system init and that might be too early I\u0027ll do some testing with the I2C emulater and see if that will work the same",
+      "parentUuid": "8b25c9d0_03d8d5f6",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 10
+      },
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "ebf64224_3caf4d46",
