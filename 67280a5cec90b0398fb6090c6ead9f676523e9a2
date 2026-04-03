@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0177aca0_209086dd",
+        "filename": "zephyr/emul/emul_ft98xx.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-03T12:37:02Z",
+      "side": 1,
+      "message": "Good, that\u0027s how it should work, thanks.",
+      "parentUuid": "68718412_94413fe1",
+      "revId": "67280a5cec90b0398fb6090c6ead9f676523e9a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "08c44690_861083e7",
@@ -73,6 +91,30 @@
       "side": 1,
       "message": "Fixed.",
       "parentUuid": "08c44690_861083e7",
+      "range": {
+        "startLine": 95,
+        "startChar": 28,
+        "endLine": 95,
+        "endChar": 31
+      },
+      "revId": "67280a5cec90b0398fb6090c6ead9f676523e9a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a381144c_ce5b4e16",
+        "filename": "zephyr/emul/emul_ft98xx.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-03T12:37:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "06f3ac15_88b1f141",
       "range": {
         "startLine": 95,
         "startChar": 28,
