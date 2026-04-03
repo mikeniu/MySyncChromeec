@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "be8c3c9c_341de886",
+        "filename": "zephyr/subsys/fingerprint/alg/Kconfig",
+        "patchSetId": 55
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-03T07:36:12Z",
+      "side": 1,
+      "message": "Fixed.",
+      "parentUuid": "74edb8c0_7328a7c9",
+      "range": {
+        "startLine": 59,
+        "startChar": -1,
+        "endLine": 59,
+        "endChar": 0
+      },
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "451a518b_e4457e11",
         "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
         "patchSetId": 55
@@ -49,6 +73,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e506a717_72333961",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 55
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-03T07:36:12Z",
+      "side": 1,
+      "message": "Fixed.",
+      "parentUuid": "451a518b_e4457e11",
+      "range": {
+        "startLine": 79,
+        "startChar": 65,
+        "endLine": 79,
+        "endChar": 67
+      },
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3b154f42_82546a6d",
         "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
         "patchSetId": 55
@@ -60,6 +108,30 @@
       "writtenOn": "2026-04-02T07:44:26Z",
       "side": 1,
       "message": "Would it make sense to check the template size here like `data-\u003etpl_finger_size \u003c\u003d CONFIG_FP_ALGORITHM_TEMPLATE_SIZE`?",
+      "range": {
+        "startLine": 81,
+        "startChar": -1,
+        "endLine": 81,
+        "endChar": 0
+      },
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6034527_1cd903dc",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 55
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-03T07:36:12Z",
+      "side": 1,
+      "message": "Fixed.",
+      "parentUuid": "3b154f42_82546a6d",
       "range": {
         "startLine": 81,
         "startChar": -1,
@@ -129,6 +201,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4a214b05_232a879c",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 55
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-03T07:36:12Z",
+      "side": 1,
+      "message": "The data in fp_buffer contains RAW image data + ISP data, RAW image data is 20kB will be used for anti spoof and the Google image data collection app. ISP data is used for enroll and verify.",
+      "parentUuid": "8436cc72_d06510e8",
+      "range": {
+        "startLine": 137,
+        "startChar": 49,
+        "endLine": 137,
+        "endChar": 60
+      },
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "89bfe719_fd918efa",
         "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
         "patchSetId": 55
@@ -146,6 +242,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bf70e106_0a763390",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 55
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-03T07:36:12Z",
+      "side": 1,
+      "message": "Fixed.",
+      "parentUuid": "89bfe719_fd918efa",
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "74039996_c64e09c4",
         "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
         "patchSetId": 55
@@ -157,6 +271,30 @@
       "writtenOn": "2026-04-02T07:44:26Z",
       "side": 1,
       "message": "Can you just use `CONFIG_FP_ALGORITHM_TEMPLATE_SIZE`?",
+      "range": {
+        "startLine": 208,
+        "startChar": 16,
+        "endLine": 208,
+        "endChar": 36
+      },
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "356fea02_c83c0be2",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 55
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-03T07:36:12Z",
+      "side": 1,
+      "message": "Fixed.",
+      "parentUuid": "74039996_c64e09c4",
       "range": {
         "startLine": 208,
         "startChar": 16,
@@ -192,6 +330,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "07315e8b_cb774a9e",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.h",
+        "patchSetId": 55
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-03T07:36:12Z",
+      "side": 1,
+      "message": "Fixed.",
+      "parentUuid": "fa5c4377_dd9e0fdb",
+      "range": {
+        "startLine": 7,
+        "startChar": 14,
+        "endLine": 7,
+        "endChar": 16
+      },
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "23ca0d00_cd1afaf9",
         "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.h",
         "patchSetId": 55
@@ -203,6 +365,30 @@
       "writtenOn": "2026-04-02T07:44:26Z",
       "side": 1,
       "message": "It is safer to wrap these macro definitions in parentheses to avoid operator precedence issues if they are ever used in mathematical expressions: `#define FT_ALGO_SIZE (140 * 1024)`",
+      "range": {
+        "startLine": 17,
+        "startChar": -1,
+        "endLine": 17,
+        "endChar": 0
+      },
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91526a4d_2fbec686",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.h",
+        "patchSetId": 55
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-03T07:36:12Z",
+      "side": 1,
+      "message": "Fixed.",
+      "parentUuid": "23ca0d00_cd1afaf9",
       "range": {
         "startLine": 17,
         "startChar": -1,
