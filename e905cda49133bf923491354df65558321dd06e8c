@@ -22,6 +22,30 @@
       },
       "revId": "e905cda49133bf923491354df65558321dd06e8c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5f089f6_ea5646b9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-03T07:33:49Z",
+      "side": 1,
+      "message": "this CL depends: https://chrome-internal-review.googlesource.com/c/chromeos/vendor/fingerprint/egis/+/9150518",
+      "parentUuid": "efde8187_776fe760",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 50
+      },
+      "revId": "e905cda49133bf923491354df65558321dd06e8c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
