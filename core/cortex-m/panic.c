@@ -224,29 +224,6 @@ static void panic_show_extra(const struct panic_data *pdata)
 	panic_printf("hfsr = %x, ", pdata->cm.hfsr);
 	panic_printf("dfsr = %x\n", pdata->cm.dfsr);
 }
-
-/*
- * Prints process stack contents stored above the exception frame.
- */
-static void panic_show_process_stack(const struct panic_data *pdata)
-{
-	panic_printf("\n=========== Process Stack Contents ===========");
-	if (pdata->flags & PANIC_DATA_FLAG_FRAME_VALID) {
-		uint32_t psp = get_panic_stack_pointer(pdata);
-		int i;
-		for (i = 0; i < 16; i++) {
-			if (psp + sizeof(uint32_t) >
-			    CONFIG_RAM_BASE + CONFIG_RAM_SIZE)
-				break;
-			if (i % 4 == 0)
-				panic_printf("\n%08x:", psp);
-			panic_printf(" %08x", *(uint32_t *)psp);
-			psp += sizeof(uint32_t);
-		}
-	} else {
-		panic_printf("\nBad psp");
-	}
-}
 #endif /* CONFIG_DEBUG_EXCEPTIONS */
 
 /*
@@ -342,13 +319,20 @@ void __keep report_panic(void)
 	uart_reset_default_pad_panic();
 #endif
 	panic_data_print(pdata);
-#ifdef CONFIG_DEBUG_EXCEPTIONS
-	panic_show_process_stack(pdata);
-	/*
-	 * TODO(crosbug.com/p/23760): Dump main stack contents as well if the
-	 * exception happened in a handler's context.
-	 */
-#endif
+
+	if (IS_ENABLED(CONFIG_DEBUG_EXCEPTIONS)) {
+		if (is_frame_in_handler_stack(
+			    pdata->cm.regs[CORTEX_PANIC_REGISTER_LR]))
+			panic_print_stack(
+				(const uint32_t *)pdata->cm
+					.regs[CORTEX_PANIC_REGISTER_MSP],
+				64);
+		else
+			panic_print_stack(
+				(const uint32_t *)pdata->cm
+					.regs[CORTEX_PANIC_REGISTER_PSP],
+				64);
+	}
 
 	/* Make sure that all changes are saved into RAM */
 	if (IS_ENABLED(CONFIG_ARMV7M_CACHE))
