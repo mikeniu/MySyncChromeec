@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75db1a3e_e8b9f51f",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.overlay",
+        "patchSetId": 13
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-06T22:22:42Z",
+      "side": 1,
+      "message": "If there\u0027s a bug for this, mention it in a comment.",
+      "revId": "27b7f6b14fb7dd700fa225722938ef63ca34d3f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76b33c4f_dbd5e29e",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.overlay",
+        "patchSetId": 13
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-06T22:22:42Z",
+      "side": 1,
+      "message": "Nit: line over 80 columns",
+      "revId": "27b7f6b14fb7dd700fa225722938ef63ca34d3f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
