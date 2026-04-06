@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a19ca4f6_e8b2209a",
+        "filename": "zephyr/program/rauru/navi/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-06T17:10:55Z",
+      "side": 0,
+      "message": "The config is disabled by default. Was this a no-op `\u003dn`? If not, is there something else that needs to be deleted for rauru?",
+      "revId": "d09700d090c379136180e437a4d222f7ee5b32de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
