@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ca8665a_d1520ed1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-06T22:26:19Z",
+      "side": 1,
+      "message": "Structurally, this looks fine. My review of whether this is a good idea is pending the use case.",
+      "revId": "90f439f16b84b9eb24844b2335ed2795173e6bdb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5e9f8d5_61332b2d",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 1021,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-06T22:26:19Z",
+      "side": 1,
+      "message": "Nit: Put this next to the unattached callback.",
+      "revId": "90f439f16b84b9eb24844b2335ed2795173e6bdb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
