@@ -35,6 +35,23 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d685e4cb_b87c7ff7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-06T17:07:36Z",
+      "side": 1,
+      "message": "There is also an entry in `Kconfig.ppc` that you\u0027ll need to remove, and there are several Zephyr projects that reference this config.",
+      "revId": "37311fc1c6187ce149b249141b6c0521e0d70d72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e7ed8f2c_dc28ca89",
