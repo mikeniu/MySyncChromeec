@@ -139,7 +139,7 @@ if(CONFIG_PIGWEED_LOG_TOKENIZED_LIB)
       pw_log_tokenized.handler
       pw_log_zephyr.tokenized_lib
   )
-  zephyr_link_libraries(pw_log)
+  target_link_libraries(app PUBLIC pw_log)
   pw_zephyrize_libraries_ifdef(CONFIG_PIGWEED_LOG_TOKENIZED_LIB
                               platform_ec_log.tokenized_handler
   )

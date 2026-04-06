@@ -19,7 +19,7 @@ pw_proto_library(dsp_comms.proto
     pw_third_party.nanopb.proto
 )
 
-zephyr_link_libraries(dsp_comms.proto.nanopb pw_transport.proto.nanopb)
+target_link_libraries(app PUBLIC dsp_comms.proto.nanopb pw_transport.proto.nanopb)
 
 add_subdirectory(service)
 add_subdirectory(client)
