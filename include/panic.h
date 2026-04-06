@@ -128,6 +128,14 @@ void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception);
 void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception);
 
 /**
+ * Print stack contents.
+ *
+ * @param stack	Pointer to the beginning of the stack
+ * @param depth	Number of 32-bit words to print
+ */
+void panic_print_stack(const uint32_t *stack, int depth);
+
+/**
  * Enable/disable bus fault handler
  *
  * @param ignored	Non-zero if ignoring bus fault

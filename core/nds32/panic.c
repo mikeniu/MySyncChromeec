@@ -193,6 +193,10 @@ void report_panic(uint32_t *regs, uint32_t itype)
 
 	print_panic_information(regs, itype, regs[16], regs[17]);
 
+	if (IS_ENABLED(CONFIG_DEBUG_EXCEPTIONS)) {
+		panic_print_stack((const uint32_t *)regs[15], 64);
+	}
+
 	if (IS_ENABLED(CONFIG_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
 

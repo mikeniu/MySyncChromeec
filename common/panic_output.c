@@ -32,6 +32,7 @@ static struct panic_data zephyr_panic_data;
 #define PANIC_DATA_PTR (&zephyr_panic_data)
 #define CONFIG_PANIC_DATA_BASE (&zephyr_panic_data)
 #endif
+
 /* Panic data goes at the end of RAM. */
 static struct panic_data *const pdata_ptr = PANIC_DATA_PTR;
 
@@ -237,6 +238,32 @@ __overridable uint32_t get_panic_stack_pointer(const struct panic_data *pdata)
 {
 	/* Not Implemented */
 	return 0;
+}
+
+/*
+ * Prints stack contents.
+ */
+void panic_print_stack(const uint32_t *stack, int depth)
+{
+	/* Align stack to 4 bytes */
+	stack = (const uint32_t *)((uintptr_t)stack & ~3);
+	panic_puts("Stack:");
+	for (int i = 0; i < depth; i++) {
+		if (i % 4 == 0)
+			panic_printf("\n  %08x: ", (uintptr_t)(stack + i));
+		/* Check bounds */
+		if ((uintptr_t)(stack + i) >
+		    (CONFIG_RAM_BASE + CONFIG_RAM_SIZE)) {
+			panic_puts("[out of bounds]\n");
+			return;
+		}
+		if (stack[i] == STACK_UNUSED_VALUE) {
+			panic_puts("[unused]\n");
+			return;
+		}
+		panic_printf("%08x ", stack[i]);
+	}
+	panic_puts("\n");
 }
 
 test_mockable struct panic_data *get_panic_data_write(void)
