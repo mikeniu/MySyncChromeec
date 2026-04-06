@@ -5500,9 +5500,6 @@
 /* SYV682 does not pass through CC, instead it bypasses to the TCPC */
 #undef CONFIG_USBC_PPC_SYV682X_NO_CC
 
-/* Define to enable SYV682X VBUS smart discharge. */
-#undef CONFIG_USBC_PPC_SYV682X_SMART_DISCHARGE
-
 /* PPC is capable of gating the SBU lines. */
 #undef CONFIG_USBC_PPC_SBU
 
