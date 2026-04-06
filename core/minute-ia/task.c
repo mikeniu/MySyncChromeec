@@ -541,33 +541,35 @@ void task_print_list(void)
 	}
 }
 
+void task_print_profiling(void)
+{
+#ifdef CONFIG_TASK_PROFILING
+	int total = 0;
+	int i;
+
+	ccputs("IRQ counts by type:\n");
+	for (i = 0; i < ARRAY_SIZE(irq_dist); i++) {
+		if (irq_dist[i]) {
+			ccprintf("%4d %8d\n", i, irq_dist[i]);
+			total += irq_dist[i];
+		}
+	}
+	ccprintf("Service calls:          %11d\n", (int)svc_calls);
+	ccprintf("Total exceptions:       %11d\n", total + (int)svc_calls);
+	ccprintf("Task switches:          %11d\n", task_switches);
+	ccprintf("Task switching started: %11.6lld s\n", task_start_time);
+	ccprintf("Time in tasks:          %11.6lld s\n",
+		 get_time().val - task_start_time);
+	ccprintf("Time in exceptions:     %11.6lld s\n", exc_total_time);
+	cflush();
+#endif
+}
+
 static int command_task_info(int argc, const char **argv)
 {
 	task_print_list();
 
-	if (IS_ENABLED(CONFIG_TASK_PROFILING)) {
-		int total = 0;
-		int i;
-
-		ccputs("IRQ counts by type:\n");
-		cflush();
-		for (i = 0; i < ARRAY_SIZE(irq_dist); i++) {
-			if (irq_dist[i]) {
-				ccprintf("%4d %8d\n", i, irq_dist[i]);
-				total += irq_dist[i];
-			}
-		}
-		ccprintf("Service calls:          %11d\n", (int)svc_calls);
-		ccprintf("Total exceptions:       %11d\n",
-			 total + (int)svc_calls);
-		ccprintf("Task switches:          %11d\n", task_switches);
-		ccprintf("Task switching started: %11.6lld s\n",
-			 task_start_time);
-		ccprintf("Time in tasks:          %11.6lld s\n",
-			 get_time().val - task_start_time);
-		ccprintf("Time in exceptions:     %11.6lld s\n",
-			 exc_total_time);
-	}
+	task_print_profiling();
 
 	return EC_SUCCESS;
 }
