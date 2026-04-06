@@ -187,14 +187,6 @@ config PLATFORM_EC_USBC_PPC_SYV682X_NO_CC
 	  should not source 5V VCONN. This config determines if
 	  sourcing VCONN should be enabled by default.
 
-config PLATFORM_EC_USBC_PPC_SYV682X_SMART_DISCHARGE
-	bool "Enable smart discharge on the SYV682X PPC"
-	help
-	  Enable the smart discharge feature on VBUS provided by the SYV682x
-	  PPC.  This should be enabled for revision C and above of the SYV682X.
-	  Earlier revisions of the chip block I2C transactions during smart
-	  discharge, causing USB PD compliance issues.
-
 config PLATFORM_EC_USBC_PPC_SYV682X_OVP_SET_15V
 	bool "15v power profile application"
 	help
