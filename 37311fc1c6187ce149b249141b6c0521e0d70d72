@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33b35ef9_b8b004fc",
+        "filename": "zephyr/program/nissa/pujjoga/project.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-06T17:12:31Z",
+      "side": 0,
+      "message": "Same question as for navi",
+      "revId": "37311fc1c6187ce149b249141b6c0521e0d70d72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
