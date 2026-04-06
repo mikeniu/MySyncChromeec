@@ -645,16 +645,14 @@ void task_print_list(void)
 	cflush();
 }
 
-static int command_task_info(int argc, const char **argv)
+void task_print_profiling(void)
 {
-#ifdef CONFIG_TASK_PROFILING
 	unsigned int total = 0;
 	int i;
-#endif
 
-	task_print_list();
+	if (!IS_ENABLED(CONFIG_TASK_PROFILING))
+		return;
 
-#ifdef CONFIG_TASK_PROFILING
 	ccputs("IRQ counts by type:\n");
 	cflush();
 	for (i = 0; i < ARRAY_SIZE(irq_dist); i++) {
@@ -671,7 +669,13 @@ static int command_task_info(int argc, const char **argv)
 	ccprintf("Time in tasks:          %11.6llu s\n",
 		 get_time().val - task_start_time);
 	ccprintf("Time in exceptions:     %11.6llu s\n", exc_total_time);
-#endif
+}
+
+static int command_task_info(int argc, const char **argv)
+{
+	task_print_list();
+
+	task_print_profiling();
 
 	return EC_SUCCESS;
 }
