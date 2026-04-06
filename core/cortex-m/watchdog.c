@@ -60,11 +60,13 @@ void __keep watchdog_trace(uint32_t excep_lr, uint32_t excep_sp)
 		panic_puts("(exc) ###\n");
 	else
 		panic_printf("(task %d) ###\n", task_get_current());
+	panic_print_stack(stack, 64);
 
 	/* If we are blocked in a high priority IT handler, the following debug
 	 * messages might not appear but they are useless in that situation. */
 	timer_print_info();
 	task_print_list();
+	task_print_profiling();
 
 	if (IS_ENABLED(CONFIG_PANIC_ON_WATCHDOG_WARNING))
 		software_panic(PANIC_SW_WATCHDOG, task_get_current());
