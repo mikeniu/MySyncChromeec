@@ -604,17 +604,20 @@ void task_print_list(void)
 
 	for (i = 0; i < TASK_ID_COUNT; i++) {
 		uint32_t *sp;
+
 		for (sp = tasks[i].stack;
 		     sp < (uint32_t *)tasks[i].sp && *sp == STACK_UNUSED_VALUE;
 		     sp++)
 			;
 
-		ccprintf("%c%3d %c %-16s %08x %11.6lld  %3d/%3d\n",
+		ccprintf("%c%3d %c %-16s %08x %11.6lld  %3d/%3d/%3d\n",
 			 (tasks + i == current_task) ? '*' : ' ', i,
 			 ((uint32_t)tasks_ready & BIT(i)) ? 'R' : ' ',
 			 task_names[i], (int)tasks[i].events, tasks[i].runtime,
-			 tasks_init[i].stack_size -
-				 ((uint32_t)sp - (uint32_t)tasks[i].stack),
+			 (int)(tasks_init[i].stack_size -
+			       (tasks[i].sp - (uint32_t)tasks[i].stack)),
+			 (int)(tasks_init[i].stack_size -
+			       ((uint32_t)sp - (uint32_t)tasks[i].stack)),
 			 tasks_init[i].stack_size);
 		cflush();
 	}
