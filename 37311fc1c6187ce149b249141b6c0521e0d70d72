@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00557f1a_247a79e4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-06T17:05:17Z",
+      "side": 1,
+      "message": "This should say something more about how this feature does not work as intended.",
+      "revId": "37311fc1c6187ce149b249141b6c0521e0d70d72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6557eda7_c80c0fd0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-06T17:05:17Z",
+      "side": 1,
+      "message": "The code looks fine.\n\nI think that the structure of this CL chain will break the build in the middle, because the boards will be setting a config that doesn\u0027t exist anymore. Even if the build still works, leaving a config set that doesn\u0027t exist muddies the waters a bit for posterity. Can you organize the CLs this way?\n1. Remove smart discharge behavior from driver. Leave a comment in the driver explaining why and a TODO in `config.h` explaining that the config is a no-op.\n2. Remove the config setting from any boards that use it.\n3. Remove the config from `config.h`, `config_chip.h`, and any other common locations where it\u0027s referenced.\n\nAll but step 1 should be no-ops. I think you should be able to verify that with the compare builds scripts.",
+      "revId": "37311fc1c6187ce149b249141b6c0521e0d70d72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7ed8f2c_dc28ca89",
+        "filename": "driver/ppc/syv682x.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-06T17:05:17Z",
+      "side": 1,
+      "message": "Can you put a block comment at the top about why we\u0027re choosing not to use smart discharge and mentioning the bug where this is discussed?",
+      "revId": "37311fc1c6187ce149b249141b6c0521e0d70d72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
