@@ -978,14 +978,16 @@ void task_print_list(void)
 {
 	int i;
 	int current_task = task_get_current();
+	bool in_interrupt = in_interrupt_context();
 
-	ccputs("Task Ready Name         Events      Time (s)  StkUsed\n");
+	ccputs("Task Ready Name         Events      Time (s)  StkUsed");
+	if (IS_ENABLED(CONFIG_TASKINFO_CONTEXT_REGS))
+		ccputs("      PC       LR");
 
 	for (i = 0; i < TASK_ID_COUNT; i++) {
 		char is_ready = ((uint32_t)tasks_ready & BIT(i)) ? 'R' : ' ';
 		char is_current = (i == current_task) ? '*' : ' ';
 		uint32_t *sp;
-
 		int max_stackused = tasks_init[i].stack_size;
 		int current_stack_used =
 			tasks_init[i].stack_size -
@@ -996,13 +998,35 @@ void task_print_list(void)
 		     sp++)
 			max_stackused -= sizeof(uint32_t);
 
-		ccprintf("%c%3d %c %-16s %08x %11.6lld  %3d/%3d/%3d\n",
+		ccprintf("\n%c%3d %c %-16s %08x %11.6lld  %3d/%3d/%4d",
 			 is_current, i, is_ready, task_names[i],
 			 (int)tasks[i].events, tasks[i].runtime,
 			 current_stack_used, max_stackused,
 			 tasks_init[i].stack_size);
-		cflush();
+
+		if (IS_ENABLED(CONFIG_TASKINFO_CONTEXT_REGS)) {
+			sp = (uint32_t *)(tasks[i].sp & ~1);
+			/* Don't print context regs for the current task if not
+			 * in interrupt context, since the stack pointer is not
+			 * valid in this case.
+			 */
+			if (!in_interrupt && i == current_task) {
+				continue;
+			}
+			if (IS_ENABLED(CONFIG_FPU) && (tasks[i].sp & 1)) {
+				/* Skip over extra FPU registers s16-s31 */
+				sp += 16;
+			}
+			/* Make sure sp address is valid before printing */
+			if ((uintptr_t)(sp + 16) <
+				    CONFIG_RAM_BASE + CONFIG_RAM_SIZE &&
+			    (uintptr_t)(sp) >= CONFIG_RAM_BASE) {
+				ccprintf(" %08x %08x", sp[14], sp[13]);
+			}
+		}
 	}
+	ccputs("\n");
+	cflush();
 }
 
 static int command_task_info(int argc, const char **argv)
