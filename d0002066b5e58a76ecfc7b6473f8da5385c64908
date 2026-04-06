@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46c1242e_0f0d8df4",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.overlay",
+        "patchSetId": 13
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-06T20:25:01Z",
+      "side": 1,
+      "message": "Do these labels get used?",
+      "revId": "d0002066b5e58a76ecfc7b6473f8da5385c64908",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
