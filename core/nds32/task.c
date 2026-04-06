@@ -703,16 +703,21 @@ void task_print_list(void)
 		char is_current = (i == current_task) ? '*' : ' ';
 		uint32_t *sp;
 
-		int stackused = tasks_init[i].stack_size;
+		int max_stackused = tasks_init[i].stack_size;
+		int current_stack_used =
+			tasks_init[i].stack_size -
+			(tasks[i].sp - (uint32_t)tasks[i].stack);
 
 		for (sp = tasks[i].stack;
 		     sp < (uint32_t *)tasks[i].sp && *sp == STACK_UNUSED_VALUE;
 		     sp++)
-			stackused -= sizeof(uint32_t);
+			max_stackused -= sizeof(uint32_t);
 
-		ccprintf("%c%3d %c %-16s %08x %11.6lld  %3d/%3d\n", is_current,
-			 i, is_ready, task_names[i], (int)tasks[i].events,
-			 tasks[i].runtime, stackused, tasks_init[i].stack_size);
+		ccprintf("%c%3d %c %-16s %08x %11.6lld  %3d/%3d/%3d\n",
+			 is_current, i, is_ready, task_names[i],
+			 (int)tasks[i].events, tasks[i].runtime,
+			 current_stack_used, max_stackused,
+			 tasks_init[i].stack_size);
 		cflush();
 	}
 }
