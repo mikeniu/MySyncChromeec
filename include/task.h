@@ -228,6 +228,13 @@ uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us);
 void task_print_list(void);
 
 /**
+ * Prints the task profiling information
+ *
+ * Uses the command output channel.  May be called from interrupt level.
+ */
+void task_print_profiling(void);
+
+/**
  * Returns the name of the task.
  */
 const char *task_get_name(task_id_t tskid);
