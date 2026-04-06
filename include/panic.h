@@ -12,6 +12,7 @@
 #include "common.h"
 #include "panic_defs.h"
 #include "software_panic.h"
+#include "task.h"
 
 #include <stdarg.h>
 #include <stdint.h>
@@ -126,6 +127,14 @@ void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception);
  * Retrieve the currently stored panic reason + info.
  */
 void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception);
+
+/**
+ * Print stack contents.
+ *
+ * @param stack	Pointer to the beginning of the stack
+ * @param depth	Number of 32-bit words to print
+ */
+void panic_print_stack(const uint32_t *stack, int depth);
 
 /**
  * Enable/disable bus fault handler

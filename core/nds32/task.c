@@ -35,9 +35,6 @@ typedef union {
 
 #define IDIVZE BIT(30)
 
-/* Value to store in unused stack */
-#define STACK_UNUSED_VALUE 0xdeadd00d
-
 /* declare task routine prototypes */
 #define TASK(n, r, d, s) void r(void *);
 void __idle(void);

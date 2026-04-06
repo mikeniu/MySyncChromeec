@@ -72,6 +72,9 @@ extern "C" {
 /* Maximum time for task_wait_event() */
 #define TASK_MAX_WAIT_US 0x7fffffff
 
+/* Value to store in unused stack */
+#define STACK_UNUSED_VALUE 0xdeadd00d
+
 /**
  * Disable CPU interrupt bit.
  *
