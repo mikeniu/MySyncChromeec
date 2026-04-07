@@ -22,6 +22,30 @@
       },
       "revId": "049f53b7e799ff442c3cfbf69e7c38489251e33e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8be85bcc_911e9a1a",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-07T07:28:10Z",
+      "side": 1,
+      "message": "No, there is no flash controller that introduces additional protection features.",
+      "parentUuid": "3b3d074f_7b690b4b",
+      "range": {
+        "startLine": 11,
+        "startChar": 49,
+        "endLine": 11,
+        "endChar": 77
+      },
+      "revId": "049f53b7e799ff442c3cfbf69e7c38489251e33e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
