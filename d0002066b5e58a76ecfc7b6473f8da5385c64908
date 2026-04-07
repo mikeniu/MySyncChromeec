@@ -52,6 +52,24 @@
       "parentUuid": "fbe9c380_f04b1957",
       "revId": "d0002066b5e58a76ecfc7b6473f8da5385c64908",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1b36803_9474dfe9",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.overlay",
+        "patchSetId": 13
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-07T20:28:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "717af819_2339e780",
+      "revId": "d0002066b5e58a76ecfc7b6473f8da5385c64908",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
