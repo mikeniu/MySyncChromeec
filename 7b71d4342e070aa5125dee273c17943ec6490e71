@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ecf603c_59192487",
+        "filename": "zephyr/dts/bindings/cbi/cros-ec,cbi-ufsc-pdc-selector.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1548775
+      },
+      "writtenOn": "2026-04-07T22:15:41Z",
+      "side": 1,
+      "message": "Same as below, I don\u0027t think we actually make use of any base properties we inherit.",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 18
+      },
+      "revId": "7b71d4342e070aa5125dee273c17943ec6490e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9be0c2ee_5c33fcd9",
+        "filename": "zephyr/dts/bindings/cbi/cros-ec,cbi-ufsc-pdc-selector.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1548775
+      },
+      "writtenOn": "2026-04-07T22:15:41Z",
+      "side": 1,
+      "message": "I don\u0027t think we need an address for these nodes. They\u0027re just abstract symbolic links between the PDC and the CBI. IT\u0027s not like they have a physical address and live on an actual bus.",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 12
+      },
+      "revId": "7b71d4342e070aa5125dee273c17943ec6490e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c3ebfc2_06674cf8",
+        "filename": "zephyr/dts/bindings/cbi/cros-ec,cbi-ufsc-pdc-selector.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1548775
+      },
+      "writtenOn": "2026-04-07T22:15:41Z",
+      "side": 1,
+      "message": "This should just be named port, reg is confusing.",
+      "range": {
+        "startLine": 19,
+        "startChar": 4,
+        "endLine": 19,
+        "endChar": 7
+      },
+      "revId": "7b71d4342e070aa5125dee273c17943ec6490e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bcb2705d_e06ccce1",
+        "filename": "zephyr/shim/src/cbi/ufsc/pdc_selector.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1548775
+      },
+      "writtenOn": "2026-04-07T22:15:41Z",
+      "side": 1,
+      "message": "I think we should use `#define DT_DRV_COMPAT cros_ec_cbi_ufsc_pdc_selector` and then `DT_INST_FOREACH_CHILD_STATUS_OKAY` to stick with convention",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 23
+      },
+      "revId": "7b71d4342e070aa5125dee273c17943ec6490e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
