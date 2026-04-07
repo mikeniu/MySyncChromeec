@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "375bc114_a8534c8e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-07T18:01:54Z",
+      "side": 1,
+      "message": "Looking better. Thanks for bearing with me.",
+      "revId": "46c81b619b8079f60a7c8193063b745aa79e7145",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d71653cb_1b4102c6",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-07T18:01:54Z",
+      "side": 1,
+      "message": "This should be `enum battery_cells pre_battery_cells`. Then you won\u0027t need the cast here or in `battery_policy()`.",
+      "revId": "46c81b619b8079f60a7c8193063b745aa79e7145",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e37063cb_48329fcf",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-07T18:01:54Z",
+      "side": 1,
+      "message": "This should return `enum get_battery_cells`.",
+      "revId": "46c81b619b8079f60a7c8193063b745aa79e7145",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69f31448_bbd5f0a4",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-07T18:01:54Z",
+      "side": 1,
+      "message": "Is there a reason you can\u0027t use `battery_static[BATT_IDX_MAIN].model_ext` like you were before? If the cached value would work fine, then I\u0027d suggest just using that. If it wouldn\u0027t work here, then a comment to explain why would probably be helpful.",
+      "revId": "46c81b619b8079f60a7c8193063b745aa79e7145",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
