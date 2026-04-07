@@ -22,6 +22,30 @@
       },
       "revId": "66a1522ad87af99bdd86c9e30a4a9d08fff8a1ea",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5a8dfca_87bf3b03",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.overlay",
+        "patchSetId": 13
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-07T20:28:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "32084233_666d4ffb",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 2
+      },
+      "revId": "66a1522ad87af99bdd86c9e30a4a9d08fff8a1ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
