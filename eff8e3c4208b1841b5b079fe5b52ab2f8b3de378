@@ -198,6 +198,24 @@
       "parentUuid": "a32e136c_f024c6f7",
       "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3f2ad72_3b7af1cd",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-07T03:14:06Z",
+      "side": 1,
+      "message": "The code link: \nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/include/config_chip.h;l\u003d699",
+      "parentUuid": "cfdd38d9_34d704d4",
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
