@@ -69,6 +69,24 @@
       "parentUuid": "75db1a3e_e8b9f51f",
       "revId": "27b7f6b14fb7dd700fa225722938ef63ca34d3f9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f1ba9d4_260e2064",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.overlay",
+        "patchSetId": 13
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-07T20:59:39Z",
+      "side": 1,
+      "message": "I\u0027d only file a bug if you think there\u0027s a chance that the backlight will be enabled on the Realtek RVP in the future. If I understand you right that it\u0027s not wired up, then there\u0027s no reason to file a bug.",
+      "parentUuid": "63048b97_b178b91f",
+      "revId": "27b7f6b14fb7dd700fa225722938ef63ca34d3f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
