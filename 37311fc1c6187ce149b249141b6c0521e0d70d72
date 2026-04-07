@@ -34,6 +34,24 @@
       "parentUuid": "33b35ef9_b8b004fc",
       "revId": "37311fc1c6187ce149b249141b6c0521e0d70d72",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1610c87f_4f1e0010",
+        "filename": "zephyr/program/nissa/pujjoga/project.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-07T14:03:33Z",
+      "side": 0,
+      "message": "Acknowledged",
+      "parentUuid": "1b942299_6bb459d9",
+      "revId": "37311fc1c6187ce149b249141b6c0521e0d70d72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
