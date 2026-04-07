@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ee65152_3f33f5df",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-07T14:17:53Z",
+      "side": 1,
+      "message": "I think it would be to add some unit tests. Gemini is pretty good at generating these.",
+      "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bef93e81_aa50c85a",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-07T14:17:53Z",
+      "side": 1,
+      "message": "Are we using `timestamps_invalid` really? Are we making some decisions based on it? I wonder if we could remove it and make our decisions basing on information passed in MKBP events.",
+      "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b60c2a2c_766044cd",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-07T14:17:53Z",
+      "side": 1,
+      "message": "Should we also set `FPSTATS_MATCHING_INV` when the library returns invalid finger id?",
+      "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43193811_4a6bd4b3",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-07T14:17:53Z",
+      "side": 1,
+      "message": "Should we also set `FPSTATS_MATCHING_INV` when there are no templates?",
+      "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83b64993_a0a1c29b",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-07T14:17:53Z",
+      "side": 1,
+      "message": "Looks like `overall_t0` is also change on every sensor IRQ and timer event. Should it also be moved? Maybe we should report `t0` from `fp_process_finger()` instead of `overall_t0` in FP_STATS command and use `overall_t0` only for `overall_time_us` calculating? Please explain your decision.",
+      "range": {
+        "startLine": 370,
+        "startChar": 3,
+        "endLine": 370,
+        "endChar": 13
+      },
+      "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
