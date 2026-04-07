@@ -33,6 +33,42 @@
       "message": "Nit: line over 80 columns",
       "revId": "27b7f6b14fb7dd700fa225722938ef63ca34d3f9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90a61c41_42322e73",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.overlay",
+        "patchSetId": 13
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-07T20:28:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "76b33c4f_dbd5e29e",
+      "revId": "27b7f6b14fb7dd700fa225722938ef63ca34d3f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63048b97_b178b91f",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.overlay",
+        "patchSetId": 13
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-07T20:28:45Z",
+      "side": 1,
+      "message": "No bug on this should I file one? I just assumed deleting the node was good enough",
+      "parentUuid": "75db1a3e_e8b9f51f",
+      "revId": "27b7f6b14fb7dd700fa225722938ef63ca34d3f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

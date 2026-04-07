@@ -16,6 +16,24 @@
       "message": "Should this now be explicitly enabled? I think the default should be disabled.",
       "revId": "23d6e01ed91a57e3a7b994d25b3e6e7cb91ffe07",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a2d4b8b_c06a9352",
+        "filename": "zephyr/program/atria/program.conf",
+        "patchSetId": 13
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-07T20:28:45Z",
+      "side": 0,
+      "message": "Switch defaults to y which is why it was set to n here. I checked the config and it is picking up yes. Line 902 zephyr/Kconfig",
+      "parentUuid": "cd800321_1fd4172e",
+      "revId": "23d6e01ed91a57e3a7b994d25b3e6e7cb91ffe07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
