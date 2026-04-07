@@ -150,6 +150,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "696449a1_c9300fcc",
+        "filename": "zephyr/shim/include/power_host_sleep.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-07T21:01:21Z",
+      "side": 1,
+      "message": "This whole change to this file might not work it breaks boards using the shimmed ap power driver since power.h declares the power_state enum also. Trying to figure out a clean way to do this",
+      "parentUuid": "7785e7cf_014776a4",
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b2f46ed9_b7cfafbd",
         "filename": "zephyr/test/atria/CMakeLists.txt",
         "patchSetId": 2
