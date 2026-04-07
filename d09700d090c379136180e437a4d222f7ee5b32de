@@ -16,6 +16,24 @@
       "message": "The config is disabled by default. Was this a no-op `\u003dn`? If not, is there something else that needs to be deleted for rauru?",
       "revId": "d09700d090c379136180e437a4d222f7ee5b32de",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d82bb4f5_4152531f",
+        "filename": "zephyr/program/rauru/navi/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-04-07T04:53:16Z",
+      "side": 0,
+      "message": "This looks like a no-op. \n\nSince there are no board-specific settings in the Rauru board code, I don\u0027t think anything else needs to be removed.",
+      "parentUuid": "a19ca4f6_e8b2209a",
+      "revId": "d09700d090c379136180e437a4d222f7ee5b32de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
