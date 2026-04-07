@@ -269,6 +269,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "30e02030_b8145ff3",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 55
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-07T05:24:08Z",
+      "side": 1,
+      "message": "How about `LIBFP_API_VERSION`? Not full `alg_version` buffer is reserved for `focal_algo_version`. Please add appropriate comments in the code.",
+      "parentUuid": "4e8c4251_fd7285cf",
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3ffa580d_b7ebb80c",
         "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
         "patchSetId": 55
@@ -334,6 +352,24 @@
       "side": 1,
       "message": "Okay removed.",
       "parentUuid": "151b4e95_902ce92b",
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac3f388a_89a998a1",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 55
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-07T05:24:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2c3ddb05_4fe10d21",
       "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
