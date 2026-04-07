@@ -304,6 +304,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2c3ddb05_4fe10d21",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 55
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-07T01:29:00Z",
+      "side": 1,
+      "message": "Okay removed.",
+      "parentUuid": "151b4e95_902ce92b",
+      "revId": "fac5e1ba86eab70af75a290146d1e3c1b10e8ea2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8436cc72_d06510e8",
         "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
         "patchSetId": 55
