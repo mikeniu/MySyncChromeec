@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6ff29f9_eca4cfd0",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-07T17:04:06Z",
+      "side": 1,
+      "message": "This will be calculated to 1,5MB, right? There is no such entry added in the `spi_flash_protect_ranges` table. Have you tried to enable it?\n\nThere is `Upper 3/4` protection entry in P25Q16. Maybe we can use it to protect Bootloader + RO + RW? This way we have renaming(unused) 0,5MB unprotected and available for potential future use. If we protect entire flash, this wouldn\u0027t be possible.",
+      "revId": "fcd19e04095c726076dbfb4a7f229721f70a4a75",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

@@ -184,6 +184,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c915d5ba_4c3bff2e",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-07T17:04:06Z",
+      "side": 1,
+      "message": "I see. If the WP is controlled internally, it\u0027s the same as using just a software variable so I don\u0027t see any sense of using the hardware #WP pin.",
+      "parentUuid": "6c02aeac_4b02a34c",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 76
+      },
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a0aac1a1_1daca5c4",
@@ -255,6 +279,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cb3ecdd_08cc7ff7",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-07T17:04:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c8fe8d9_b8686c53",
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fa761ab1_359d6672",
@@ -322,6 +364,24 @@
       "side": 1,
       "message": "Okay, Added.",
       "parentUuid": "1b185778_374276b7",
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f4d4f60_053c32eb",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-07T17:04:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "37cd8ae4_b2cfbfcf",
       "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },

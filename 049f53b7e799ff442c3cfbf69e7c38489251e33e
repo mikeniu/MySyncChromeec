@@ -46,6 +46,30 @@
       },
       "revId": "049f53b7e799ff442c3cfbf69e7c38489251e33e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "099fc4e7_426b3db6",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-07T17:04:06Z",
+      "side": 1,
+      "message": "Noted.",
+      "parentUuid": "8be85bcc_911e9a1a",
+      "range": {
+        "startLine": 11,
+        "startChar": 49,
+        "endLine": 11,
+        "endChar": 77
+      },
+      "revId": "049f53b7e799ff442c3cfbf69e7c38489251e33e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
