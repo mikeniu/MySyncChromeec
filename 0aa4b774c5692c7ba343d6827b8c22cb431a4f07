@@ -130,6 +130,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7785e7cf_014776a4",
+        "filename": "zephyr/shim/include/power_host_sleep.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-07T20:28:01Z",
+      "side": 1,
+      "message": "I moved this due to the PDC code using the power_state enum without having CONFIG_AP_PWRSEQ set. it probably would have no negative effects if they are just always included at the top of the file so I will check that and update if needed",
+      "parentUuid": "6ae3f9f0_28e85bcb",
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b2f46ed9_b7cfafbd",
@@ -143,6 +161,24 @@
       "writtenOn": "2026-04-03T23:15:18Z",
       "side": 1,
       "message": "Setting aside whether we need multiple test builds, if there\u0027s no non-runtime-configuration test build, then this file should be part of the sources unconditionally.",
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "399863ab_b3cf30a2",
+        "filename": "zephyr/test/atria/CMakeLists.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-07T20:28:01Z",
+      "side": 1,
+      "message": "Good point will update the CMake",
+      "parentUuid": "b2f46ed9_b7cfafbd",
       "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -164,6 +200,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "85a8bdc5_5044287a",
+        "filename": "zephyr/test/atria/src/rvp_usbc_runtime_2port_test.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-07T20:28:01Z",
+      "side": 1,
+      "message": "Looking back through the code testing caching probably isn\u0027t needed cause any subsequent checks after the first check already exercise the caching path removing the caching tests altogether",
+      "parentUuid": "5585e59f_143bc5f6",
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "05d25456_e3f4ddc0",
@@ -177,6 +231,24 @@
       "writtenOn": "2026-04-03T23:15:18Z",
       "side": 1,
       "message": "The code coverage and checks for the out of range and caching tests should be the same between configurations. I guess technically you\u0027re checking that 2 is out of range in the 2-port configuration but in-range in the 3-port configuration. I\u0027m not sure that\u0027s worth having a separate test for 2 vs 3.",
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0a14660_aaa44597",
+        "filename": "zephyr/test/atria/src/rvp_usbc_runtime_3port_test.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-07T20:28:01Z",
+      "side": 1,
+      "message": "Probably right for coverage purposes these tests are redundant. The out of range test should probably always check 3 as it will always be out of range for Atria (and should only execute in one of these test blocks)",
+      "parentUuid": "05d25456_e3f4ddc0",
       "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
