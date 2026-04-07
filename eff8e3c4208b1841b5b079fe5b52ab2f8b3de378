@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "11797252_b8908e88",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-07T05:30:54Z",
+      "side": 1,
+      "message": "Please double-check entire description.",
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e3b222fd_3089860a",
         "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
         "patchSetId": 6
@@ -38,6 +55,30 @@
       "side": 1,
       "message": "Fixed.",
       "parentUuid": "e3b222fd_3089860a",
+      "range": {
+        "startLine": 10,
+        "startChar": 3,
+        "endLine": 10,
+        "endChar": 70
+      },
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b66c1d0_f642a36f",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-07T05:30:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "92a1c6a0_418ac360",
       "range": {
         "startLine": 10,
         "startChar": 3,
@@ -97,6 +138,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "256acd84_ac74d52a",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-07T05:30:54Z",
+      "side": 1,
+      "message": "But is it possible to control it? E.g. change to normal SPI mode and manually set the pin state?",
+      "parentUuid": "723deb0a_996efae6",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 76
+      },
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a0aac1a1_1daca5c4",
         "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
         "patchSetId": 6
@@ -132,6 +197,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "575cccb7_92906a31",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-07T05:30:54Z",
+      "side": 1,
+      "message": "You can add it in [], as RB (Rollback) section, because it\u0027s optional.",
+      "parentUuid": "8fa3204c_eb32a603",
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fa761ab1_359d6672",
         "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
         "patchSetId": 6
@@ -161,6 +244,24 @@
       "side": 1,
       "message": "I checked the spi_flash_protect_ranges, I think it can meet our requirement, our flash size is 2MB, the lower 1/4 can used to protect bootloader, the lower 1/2 can used to protect bootloader+RO, do we need protect ALL? \nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/common/spi_flash_reg.c;l\u003d86",
       "parentUuid": "fa761ab1_359d6672",
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b185778_374276b7",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-07T05:30:54Z",
+      "side": 1,
+      "message": "Yes, it\u0027s also needed to protect all for bootloader + RO + RW protection, so I think you need to add additional entry to the `CONFIG_SPI_FLASH_P25Q16` protection table.",
+      "parentUuid": "7ef4bdb5_cd1c7bf3",
       "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -214,6 +315,24 @@
       "side": 1,
       "message": "The code link: \nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/include/config_chip.h;l\u003d699",
       "parentUuid": "cfdd38d9_34d704d4",
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c60760f7_3aa4beff",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-07T05:30:54Z",
+      "side": 1,
+      "message": "Thanks",
+      "parentUuid": "d3f2ad72_3b7af1cd",
       "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
