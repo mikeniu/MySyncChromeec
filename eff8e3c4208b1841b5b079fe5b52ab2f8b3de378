@@ -107,6 +107,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7ef4bdb5_cd1c7bf3",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-07T02:20:56Z",
+      "side": 1,
+      "message": "I checked the spi_flash_protect_ranges, I think it can meet our requirement, our flash size is 2MB, the lower 1/4 can used to protect bootloader, the lower 1/2 can used to protect bootloader+RO, do we need protect ALL? \nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/common/spi_flash_reg.c;l\u003d86",
+      "parentUuid": "fa761ab1_359d6672",
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a32e136c_f024c6f7",
         "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
         "patchSetId": 6
