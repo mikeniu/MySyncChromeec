@@ -215,6 +215,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5c8fe8d9_b8686c53",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-07T07:14:54Z",
+      "side": 1,
+      "message": "Fixed.",
+      "parentUuid": "575cccb7_92906a31",
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fa761ab1_359d6672",
         "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
         "patchSetId": 6
@@ -262,6 +280,24 @@
       "side": 1,
       "message": "Yes, it\u0027s also needed to protect all for bootloader + RO + RW protection, so I think you need to add additional entry to the `CONFIG_SPI_FLASH_P25Q16` protection table.",
       "parentUuid": "7ef4bdb5_cd1c7bf3",
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37cd8ae4_b2cfbfcf",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-07T07:14:54Z",
+      "side": 1,
+      "message": "Okay, Added.",
+      "parentUuid": "1b185778_374276b7",
       "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
