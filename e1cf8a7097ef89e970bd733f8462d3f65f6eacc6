@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "88619c38_63b461f6",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-07T09:48:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "151c761e_e82dccc8",
+      "range": {
+        "startLine": 46,
+        "startChar": 27,
+        "endLine": 46,
+        "endChar": 34
+      },
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "57bf3a79_3d7c705c",
@@ -37,6 +61,24 @@
       "writtenOn": "2026-04-02T13:11:38Z",
       "side": 1,
       "message": "It should be void function.",
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1f027b1_d86be771",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-07T09:48:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "57bf3a79_3d7c705c",
       "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -64,6 +106,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cea9d9d5_6d62dbdf",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-07T09:48:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0fbc1909_a4acddb3",
+      "range": {
+        "startLine": 235,
+        "startChar": 0,
+        "endLine": 236,
+        "endChar": 39
+      },
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ebc75d3e_5906ed55",
@@ -77,6 +143,24 @@
       "writtenOn": "2026-04-02T13:11:38Z",
       "side": 1,
       "message": "I think you can just assign 0 here.",
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7277c982_89de9461",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-07T09:48:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ebc75d3e_5906ed55",
       "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -98,6 +182,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd7e229b_c4d45cd3",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-07T09:48:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba0015c2_8b135d1e",
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dcc83b1c_9afa4af0",
@@ -111,6 +213,24 @@
       "writtenOn": "2026-04-02T13:11:38Z",
       "side": 1,
       "message": "I know this comes from the andes_xip driver. It was adjusted. Can you adjust it as well?",
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f6d5099_547174a4",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-07T09:48:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dcc83b1c_9afa4af0",
       "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -138,6 +258,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cfa8b4b_90464888",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-07T09:48:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a6d64af4_e9ae6114",
+      "range": {
+        "startLine": 270,
+        "startChar": 0,
+        "endLine": 293,
+        "endChar": 2
+      },
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a072204a_eb3c4a43",
@@ -151,6 +295,24 @@
       "writtenOn": "2026-04-02T13:11:38Z",
       "side": 1,
       "message": "Return error in case of lack of library. The flash protection is not set.",
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87e0b648_fde33ee2",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-07T09:48:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a072204a_eb3c4a43",
       "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -172,6 +334,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "539062ec_71daabb6",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-07T09:48:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8826ea75_c79564fa",
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b4c5caaa_8be220ef",
@@ -185,6 +365,24 @@
       "writtenOn": "2026-04-02T13:11:38Z",
       "side": 1,
       "message": "Can you add description of there functions? What they do, return values and parameters.",
+      "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14c9d5fe_4aee282f",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-07T09:48:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4c5caaa_8be220ef",
       "revId": "e1cf8a7097ef89e970bd733f8462d3f65f6eacc6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

@@ -355,6 +355,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d06b76ef_cb94d18d",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-07T09:48:20Z",
+      "side": 1,
+      "message": "Thanks for the clarification.\n\nIn the current implementation for EM32F967, we treat these flags with the same semantic split you described:\n\n- *_AT_BOOT reflects the protection state programmed in the flash itself\n  (derived from the protected range / status configuration, persistent across reboots).\n\n- *_NOW is reported only when there is an additional runtime mechanism preventing\n  modification of the flash protection configuration.\n\nOn our platform, this runtime condition is represented by write_protect_is_asserted(),\nso *_NOW flags are added only when write-protect is asserted. We do not assume that\n*_NOW always exists, and we avoid conflating *_AT_BOOT with *_NOW.\n\nprotect_now() therefore reuses protect_at_boot() to enforce the desired policy, while\nthe presence of *_NOW is solely determined by the runtime write-protect state, similar\nto how the Andes XIP driver models the software lock in absence of a controllable #WP pin.",
+      "parentUuid": "290f134a_d03833a7",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2b2255d0_781c322e",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 7
