@@ -317,13 +317,82 @@ void task_print_list(void)
 	}
 }
 
+#ifdef CONFIG_TASK_PROFILING
+#ifdef CONFIG_TASK_PROFILING_AUTO_RESET
+static int task_stats_auto_reset_enabled = 1;
+#else
+static int task_stats_auto_reset_enabled = 0;
+#endif
+static int task_stats_auto_reset_period_ms =
+	CONFIG_TASK_PROFILING_AUTO_RESET_PERIOD_MS;
+
+static void task_stats_reset_deferred(void);
+DECLARE_DEFERRED(task_stats_reset_deferred);
+
+static void task_stats_reset_deferred(void)
+{
+	if (task_stats_auto_reset_enabled) {
+		task_reset_stats();
+		hook_call_deferred(&task_stats_reset_deferred_data,
+				   task_stats_auto_reset_period_ms * MSEC);
+	}
+}
+
+static void task_stats_init(void)
+{
+	if (task_stats_auto_reset_enabled) {
+		hook_call_deferred(&task_stats_reset_deferred_data,
+				   task_stats_auto_reset_period_ms * MSEC);
+	}
+}
+DECLARE_HOOK(HOOK_INIT, task_stats_init, HOOK_PRIO_DEFAULT);
+
+void task_reset_stats(void)
+{
+	/* Dummy implementation for host */
+}
+#endif
+
 static int command_task_info(int argc, const char **argv)
 {
+#ifdef CONFIG_TASK_PROFILING
+	if (argc > 1) {
+		if (!strcasecmp(argv[1], "reset")) {
+			task_reset_stats();
+			ccprintf("Task stats reset.\n");
+			return EC_SUCCESS;
+		} else if (!strcasecmp(argv[1], "auto-reset")) {
+			if (argc > 2) {
+				if (!strcasecmp(argv[2], "on")) {
+					task_stats_auto_reset_enabled = 1;
+					if (argc > 3) {
+						task_stats_auto_reset_period_ms =
+							strtoi(argv[3], NULL, 10);
+					}
+					hook_call_deferred(
+						&task_stats_reset_deferred_data,
+						task_stats_auto_reset_period_ms *
+							MSEC);
+				} else if (!strcasecmp(argv[2], "off")) {
+					task_stats_auto_reset_enabled = 0;
+				}
+			}
+			ccprintf("Auto reset: %s",
+				 task_stats_auto_reset_enabled ? "on" : "off");
+			if (task_stats_auto_reset_enabled)
+				ccprintf(" (period: %d ms)",
+					 task_stats_auto_reset_period_ms);
+			ccputs("\n");
+			return EC_SUCCESS;
+		}
+	}
+#endif
 	task_print_list();
 
 	return EC_SUCCESS;
 }
-DECLARE_SAFE_CONSOLE_COMMAND(taskinfo, command_task_info, NULL,
+DECLARE_SAFE_CONSOLE_COMMAND(taskinfo, command_task_info,
+			     "[reset | auto-reset <on [ms] | off>]",
 			     "Print task info");
 
 static void _wait_for_task_started(int can_sleep)

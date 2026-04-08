@@ -45,6 +45,7 @@ static const char *const task_names[] = {
 
 #ifdef CONFIG_TASK_PROFILING
 static uint64_t task_start_time; /* Time task scheduling started */
+static uint32_t task_start_time_32; /* 32-bit start time for duration */
 /*
  * We only keep 32-bit values for exception start/end time, to avoid
  * accounting errors when we service interrupt when the timer wraps around.
@@ -55,6 +56,35 @@ static uint64_t exc_total_time; /* Total time in exceptions */
 static uint32_t svc_calls; /* Number of service calls */
 static uint32_t task_switches; /* Number of times active task changed */
 static uint32_t irq_dist[CONFIG_IRQ_COUNT]; /* Distribution of IRQ calls */
+
+#ifdef CONFIG_TASK_PROFILING_AUTO_RESET
+static int task_stats_auto_reset_enabled = 1;
+#else
+static int task_stats_auto_reset_enabled = 0;
+#endif
+static int task_stats_auto_reset_period_ms =
+	CONFIG_TASK_PROFILING_AUTO_RESET_PERIOD_MS;
+
+static void task_stats_reset_deferred(void);
+DECLARE_DEFERRED(task_stats_reset_deferred);
+
+static void task_stats_reset_deferred(void)
+{
+	if (task_stats_auto_reset_enabled) {
+		task_reset_stats();
+		hook_call_deferred(&task_stats_reset_deferred_data,
+				   task_stats_auto_reset_period_ms * MSEC);
+	}
+}
+
+static void task_stats_init(void)
+{
+	if (task_stats_auto_reset_enabled) {
+		hook_call_deferred(&task_stats_reset_deferred_data,
+				   task_stats_auto_reset_period_ms * MSEC);
+	}
+}
+DECLARE_HOOK(HOOK_INIT, task_stats_init, HOOK_PRIO_DEFAULT);
 #endif
 
 extern int __task_start(int *task_stack_ready);
@@ -603,6 +633,15 @@ void task_print_profiling(void)
 {
 	int total = 0;
 	int i;
+	uint32_t t_now = get_time().le.lo;
+	uint64_t total_time;
+
+	if (task_stats_auto_reset_enabled &&
+	    (task_stats_auto_reset_period_ms < 10000)) {
+		total_time = t_now - task_start_time_32;
+	} else {
+		total_time = get_time().val - task_start_time;
+	}
 
 	if (!IS_ENABLED(CONFIG_TASK_PROFILING))
 		return;
@@ -617,22 +656,88 @@ void task_print_profiling(void)
 	ccprintf("Service calls:          %11d\n", svc_calls);
 	ccprintf("Total exceptions:       %11d\n", total + svc_calls);
 	ccprintf("Task switches:          %11d\n", task_switches);
-	ccprintf("Task switching started: %11.6lld s\n", task_start_time);
 	ccprintf("Time in tasks:          %11.6lld s\n",
-		 get_time().val - task_start_time);
-	ccprintf("Time in exceptions:     %11.6lld s\n", exc_total_time);
+		 total_time - exc_total_time);
+	ccprintf("Time in exceptions:     %11.6llu s\n", exc_total_time);
 	cflush();
+
+	ccprintf("Current time:           %11.6lld s\n", get_time().val);
+	ccprintf("Task stats duration:    %11.6lld s\n", total_time);
+	ccprintf("Task stats mode:        %s",
+		 task_stats_auto_reset_enabled ? "auto-reset" : "manual");
+	if (task_stats_auto_reset_enabled)
+		ccprintf(" (period: %d ms)", task_stats_auto_reset_period_ms);
+	ccputs("\n");
+	cflush();
+}
+
+void task_reset_stats(void)
+{
+#ifdef CONFIG_TASK_PROFILING
+	int i;
+
+	interrupt_disable();
+
+	for (i = 0; i < TASK_ID_COUNT; i++) {
+		tasks[i].runtime = 0;
+	}
+
+	task_start_time = get_time().val;
+	task_start_time_32 = get_time().le.lo;
+	exc_start_time = exc_end_time = task_start_time_32;
+	exc_total_time = 0;
+	svc_calls = 0;
+	task_switches = 0;
+	memset(irq_dist, 0, sizeof(irq_dist));
+
+	interrupt_enable();
+#endif
 }
 
 static int command_task_info(int argc, const char **argv)
 {
+#ifdef CONFIG_TASK_PROFILING
+	if (argc > 1) {
+		if (!strcasecmp(argv[1], "reset")) {
+			task_reset_stats();
+			ccprintf("Task stats reset.\n");
+			return EC_SUCCESS;
+		} else if (!strcasecmp(argv[1], "auto-reset")) {
+			if (argc > 2) {
+				if (!strcasecmp(argv[2], "on")) {
+					task_stats_auto_reset_enabled = 1;
+					if (argc > 3) {
+						task_stats_auto_reset_period_ms =
+							strtoi(argv[3], NULL, 10);
+					}
+					hook_call_deferred(
+						&task_stats_reset_deferred_data,
+						task_stats_auto_reset_period_ms *
+							MSEC);
+				} else if (!strcasecmp(argv[2], "off")) {
+					task_stats_auto_reset_enabled = 0;
+				}
+			}
+			ccprintf("Auto reset: %s",
+				 task_stats_auto_reset_enabled ? "on" : "off");
+			if (task_stats_auto_reset_enabled)
+				ccprintf(" (period: %d ms)",
+					 task_stats_auto_reset_period_ms);
+			ccputs("\n");
+			return EC_SUCCESS;
+		}
+	}
+#endif
 	task_print_list();
 
 	task_print_profiling();
 
 	return EC_SUCCESS;
 }
-DECLARE_CONSOLE_COMMAND(taskinfo, command_task_info, NULL, "Print task info");
+DECLARE_SAFE_CONSOLE_COMMAND(taskinfo, command_task_info,
+			     "[reset | auto-reset <on [ms] | off>]",
+			     "Print task info");
+
 
 #ifdef CONFIG_CMD_TASKREADY
 static int command_task_ready(int argc, const char **argv)
@@ -704,6 +809,7 @@ int task_start(void)
 	timestamp_t t = get_time();
 
 	task_start_time = t.val;
+	task_start_time_32 = t.le.lo;
 	exc_end_time = t.le.lo;
 #endif
 
