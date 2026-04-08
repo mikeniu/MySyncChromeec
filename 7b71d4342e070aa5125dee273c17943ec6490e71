@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7bb3a20_7c228cea",
+        "filename": "zephyr/dts/bindings/cbi/cros-ec,cbi-ufsc-pdc-selector.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-04-08T02:12:13Z",
+      "side": 1,
+      "message": "The `status` property is defined there.",
+      "parentUuid": "7ecf603c_59192487",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 18
+      },
+      "revId": "7b71d4342e070aa5125dee273c17943ec6490e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9be0c2ee_5c33fcd9",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-04-07T22:15:41Z",
       "side": 1,
       "message": "I don\u0027t think we need an address for these nodes. They\u0027re just abstract symbolic links between the PDC and the CBI. IT\u0027s not like they have a physical address and live on an actual bus.",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 12
+      },
+      "revId": "7b71d4342e070aa5125dee273c17943ec6490e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7fa7bbf_eb381ab8",
+        "filename": "zephyr/dts/bindings/cbi/cros-ec,cbi-ufsc-pdc-selector.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-04-08T02:12:13Z",
+      "side": 1,
+      "message": "It is used for indexing the USB-C port. Because the child nodes use `reg`, the parent node must define #address-cells and #size-cells. Setting them to const: 1 and const: 0 enforces the correct format.",
+      "parentUuid": "9be0c2ee_5c33fcd9",
       "range": {
         "startLine": 10,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "feb4b585_431269f5",
+        "filename": "zephyr/dts/bindings/cbi/cros-ec,cbi-ufsc-pdc-selector.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-04-08T02:12:13Z",
+      "side": 1,
+      "message": "`reg` is a Devicetree conversion for indexing. They are commonly used in Zephyr, e.g. `named-usbc-port` [1]:\n```\n        usbc {  \n                #address-cells \u003d \u003c1\u003e;\n                #size-cells \u003d \u003c0\u003e;\n\n                /* Reg property is used to assign a port number */\n                port0@0 {\n                        compatible \u003d \"named-usbc-port\";\n                        reg \u003d \u003c0\u003e;\n                        bc12 \u003d \u003c\u0026bc12_port0\u003e;\n                };\n                port1@1 {\n                        compatible \u003d \"named-usbc-port\";\n                        reg \u003d \u003c1\u003e;\n                        bc12 \u003d \u003c\u0026bc12_port1\u003e;\n                };\n        };\n```\n\nThis matches the `named-usbc-port` definition better.\n\n[1] https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/dts/bindings/usbc/named-usbc-port.yaml",
+      "parentUuid": "5c3ebfc2_06674cf8",
+      "range": {
+        "startLine": 19,
+        "startChar": 4,
+        "endLine": 19,
+        "endChar": 7
+      },
+      "revId": "7b71d4342e070aa5125dee273c17943ec6490e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bcb2705d_e06ccce1",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-04-07T22:15:41Z",
       "side": 1,
       "message": "I think we should use `#define DT_DRV_COMPAT cros_ec_cbi_ufsc_pdc_selector` and then `DT_INST_FOREACH_CHILD_STATUS_OKAY` to stick with convention",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 23
+      },
+      "revId": "7b71d4342e070aa5125dee273c17943ec6490e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bca64b2b_f3981d1b",
+        "filename": "zephyr/shim/src/cbi/ufsc/pdc_selector.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-04-08T02:12:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bcb2705d_e06ccce1",
       "range": {
         "startLine": 15,
         "startChar": 0,
