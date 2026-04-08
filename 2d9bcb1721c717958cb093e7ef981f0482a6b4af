@@ -16,6 +16,24 @@
       "message": "I wonder if disabling PLATFORM_EC_PANIC_PRINT_STACK_ON_ASSERT would be enough?",
       "revId": "2d9bcb1721c717958cb093e7ef981f0482a6b4af",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52bcab26_b4b99fe8",
+        "filename": "zephyr/Kconfig.defaults-arm",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-08T15:35:54Z",
+      "side": 1,
+      "message": "let\u0027s check it on a followup, the flash usage grow was substantial it needs more investigation, it\u0027s a nice feature I\u0027m pretty sure we want it down the road anyway it\u0027s just a bad moment for diving into it",
+      "parentUuid": "4b811352_c6edeedb",
+      "revId": "2d9bcb1721c717958cb093e7ef981f0482a6b4af",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
