@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9a5b978_a26ef81b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-04-08T02:37:42Z",
+      "side": 1,
+      "message": "@daxi.yang@luxshare.corp-partner.google.com, Please rebase to resolve the merge conflict.",
+      "revId": "6c8b0847fd02bffa2f057a5e1b19199a0f776776",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
