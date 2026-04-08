@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e935502_e19d0f50",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-08T05:59:46Z",
+      "side": 1,
+      "message": "You can do it in one line",
+      "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fde85f18_c92da45c",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-08T05:59:46Z",
+      "side": 1,
+      "message": "Too verbose logging or increase the logging level to debug",
+      "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5096e439_9f560bbd",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-08T05:59:46Z",
+      "side": 1,
+      "message": "Maybe you can check if there is any inconsistency in the protection e.g bank 0 protectec, bank 1 unprotected and bank 2 protected again?",
+      "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b39831bf_c779fbb7",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-08T05:59:46Z",
+      "side": 1,
+      "message": "You can probably use the new `x_END` defines, right?",
+      "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a3b0a55_08b912b7",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-08T05:59:46Z",
+      "side": 1,
+      "message": "Can you use x_END defines?",
+      "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ca99d4b_cd9712e1",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-08T05:59:46Z",
+      "side": 1,
+      "message": "Avoid logging when interrupts are locked to reduce this period.",
+      "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88af89d0_99a08915",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-08T05:59:46Z",
+      "side": 1,
+      "message": "remove or use `offset` for calculations",
+      "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

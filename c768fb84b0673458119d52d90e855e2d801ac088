@@ -373,6 +373,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5e3f732e_b573d9d8",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-08T05:59:46Z",
+      "side": 1,
+      "message": "Thanks for the explanation. \n\nThis way, the cros-flash driver won\u0027t be able to set the _NOW flags independently from the `write_protect_is_asserted` state. In theory the \"protected now, until reboot\" state should be possible regardless of the #WP state. I\u0027m talking about  https://www.puyasemi.com/download_path/%E6%95%B0%E6%8D%AE%E6%89%8B%E5%86%8C/Flash%20%E8%8A%AF%E7%89%87/P25Q16U_Datasheet_V1.9.pdf 10.5, SRP0,SRP1 \u003d 0,1 \"Status Register is protected and cannot be written to again until the next Power-Down, Power-Up cycle\". However, I\u0027m not sure if it\u0027s even needed here. Let me think about it and let you know.",
+      "parentUuid": "d06b76ef_cb94d18d",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2b2255d0_781c322e",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 7
