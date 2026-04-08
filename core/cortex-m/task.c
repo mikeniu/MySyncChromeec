@@ -28,6 +28,8 @@ typedef union {
 		uint64_t runtime; /* Time spent in task */
 #ifdef CONFIG_TASK_PROFILING
 		uint32_t switches; /* Number of context switches */
+		uint64_t wait_time; /* Time spent in ready state */
+		uint32_t ready_time; /* Time task entered ready state */
 #endif
 		uint32_t *stack; /* Start of stack */
 	};
@@ -346,6 +348,10 @@ void svc_handler(int desched, task_id_t resched)
 		tasks_ready &= ~(1 << (current - tasks));
 	}
 	ASSERT(resched <= TASK_ID_COUNT);
+#ifdef CONFIG_TASK_PROFILING
+	if (!(tasks_ready & (1 << resched)))
+		tasks[resched].ready_time = get_time().le.lo;
+#endif
 	tasks_ready |= 1 << resched;
 
 	ASSERT(tasks_ready & tasks_enabled);
@@ -362,6 +368,14 @@ void svc_handler(int desched, task_id_t resched)
 	 */
 	current->runtime += (exc_start_time - exc_end_time);
 	exc_end_time = t;
+
+	/* If switching to a new task, account for its waiting time */
+	if (next != current) {
+		next->wait_time += (t - next->ready_time);
+		/* The task being switched out starts waiting if it's still ready */
+		if (tasks_ready & (1 << (current - tasks)))
+			current->ready_time = t;
+	}
 #else
 	/*
 	 * Don't chain here from interrupts until the next time an interrupt
@@ -484,6 +498,10 @@ void task_set_event(task_id_t tskid, uint32_t event)
 	/* Re-schedule if priorities have changed */
 	if (in_interrupt_context() || !is_interrupt_enabled()) {
 		/* The receiver might run again */
+#ifdef CONFIG_TASK_PROFILING
+		if (!(tasks_ready & (1 << tskid)))
+			tasks[tskid].ready_time = get_time().val;
+#endif
 		atomic_or(&tasks_ready, 1 << tskid);
 #ifndef CONFIG_TASK_PROFILING
 		if (start_called)
@@ -1014,7 +1032,7 @@ void task_print_list(void)
 
 	ccputs("Task Ready Name         Events      Time (s)  StkUsed");
 #ifdef CONFIG_TASK_PROFILING
-	ccputs(" Switches");
+	ccputs(" Switches  Wait (s)");
 #endif
 	if (IS_ENABLED(CONFIG_TASKINFO_CONTEXT_REGS))
 		ccputs("      PC       LR");
@@ -1040,7 +1058,7 @@ void task_print_list(void)
 			 tasks_init[i].stack_size);
 
 #ifdef CONFIG_TASK_PROFILING
-		ccprintf(" %8d", tasks[i].switches);
+		ccprintf(" %8d %11.6lld", tasks[i].switches, tasks[i].wait_time);
 #endif
 		cflush();
 
@@ -1123,6 +1141,8 @@ void task_print_profiling(void)
 	for (i = 0; i < TASK_ID_COUNT; i++) {
 		tasks[i].runtime = 0;
 		tasks[i].switches = 0;
+		tasks[i].wait_time = 0;
+		tasks[i].ready_time = get_time().le.lo;
 	}
 
 	task_start_time = get_time().val;

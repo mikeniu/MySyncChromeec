@@ -71,6 +71,18 @@ void task_print_profiling(void);
 void task_update_irq_time(int irq, uint32_t duration);
 
 /**
+ * Pause tracking of interrupt-disabled time.
+ * Used before entering sleep modes where interrupts are intentionally disabled.
+ */
+void task_pause_irq_disabled_timing(void);
+
+/**
+ * Resume tracking of interrupt-disabled time.
+ * Used after exiting sleep modes.
+ */
+void task_resume_irq_disabled_timing(void);
+
+/**
  * Returns the name of the task.
  */
 const char *task_get_name(task_id_t tskid);
