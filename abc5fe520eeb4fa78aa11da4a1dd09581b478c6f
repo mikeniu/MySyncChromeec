@@ -108,6 +108,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "76c0da91_59c8611e",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-08T13:53:25Z",
+      "side": 1,
+      "message": "So IIUC, the \"fragmented\" protection ranges are possible in theory, right? Like no protection -\u003e range 1 -\u003e no protection -\u003e range 2. Idea of this function is to check the current protection in hardware. I understand that the cros-flash driver doesn\u0027t expect/configure such state but I\u0027m talking about cases like a bug in code, other code changes protection ranges for any reason, uninitialized protection state, etc. So I\u0027m thinking it would be nice to check if everything is good with the hardware protection (expected state) if that\u0027s possible.",
+      "parentUuid": "c32d7250_299a9022",
+      "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b39831bf_c779fbb7",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 9
