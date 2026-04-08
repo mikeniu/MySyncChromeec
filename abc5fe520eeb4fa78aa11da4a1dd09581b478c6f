@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5620d8a1_6257b32b",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-08T07:27:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5e935502_e19d0f50",
+      "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fde85f18_c92da45c",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-08T05:59:46Z",
       "side": 1,
       "message": "Too verbose logging or increase the logging level to debug",
+      "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5136f74_9a492947",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-08T07:27:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fde85f18_c92da45c",
       "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -54,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c32d7250_299a9022",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-08T07:27:35Z",
+      "side": 1,
+      "message": "Good point.\n\nOn EM32F967 the flash write protection is configured using two Protect Area\nregisters. Each Protect Area describes a single **contiguous** protection\nregion using (start address, size, enable), and the hardware does not allow\nexpressing a non‑contiguous pattern within a single protection region.\n\nIt is possible to configure two protection regions with a gap between them\n(e.g. protect area 1 covers one range, protect area 2 covers a later range),\nwhich is an intentional hardware design and is handled by the driver’s policy\nwhen mapping protection ranges to EC semantics.\n\nHowever, the hardware cannot generate a pattern where a single protection\nregion itself is fragmented (e.g. protected → unprotected → protected again\nwithin one region). Given these constraints, the driver does not expect\narbitrary non‑contiguous bank patterns, and additional inconsistency checks\nfor such cases are not required here.",
+      "parentUuid": "5096e439_9f560bbd",
+      "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b39831bf_c779fbb7",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 9
@@ -65,6 +119,24 @@
       "writtenOn": "2026-04-08T05:59:46Z",
       "side": 1,
       "message": "You can probably use the new `x_END` defines, right?",
+      "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c565ea10_053f76ef",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-08T07:27:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b39831bf_c779fbb7",
       "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -86,6 +158,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "42e5d7e4_5adba3c4",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-08T07:27:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a3b0a55_08b912b7",
+      "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7ca99d4b_cd9712e1",
@@ -103,6 +193,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dbe8344f_3a000660",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-08T07:27:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ca99d4b_cd9712e1",
+      "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "88af89d0_99a08915",
@@ -116,6 +224,24 @@
       "writtenOn": "2026-04-08T05:59:46Z",
       "side": 1,
       "message": "remove or use `offset` for calculations",
+      "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c13fa125_6938142e",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-08T07:27:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "88af89d0_99a08915",
       "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
