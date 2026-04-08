@@ -1086,11 +1086,14 @@ void task_print_profiling(void)
 	if (!IS_ENABLED(CONFIG_TASK_PROFILING))
 		return;
 
-	ccputs("IRQ counts by type:\n");
+	ccputs("IRQ   Count    Time(ms)\n");
+	cflush();
 	for (i = 0; i < ARRAY_SIZE(irq_dist); i++) {
 		if (irq_dist[i]) {
-			ccprintf("%4d %8d\n", i, irq_dist[i]);
+			ccprintf("%4d %8d %11.3lld\n", i, irq_dist[i],
+				 (uint64_t)irq_time[i]);
 			total += irq_dist[i];
+			cflush();
 		}
 	}
 	ccprintf("Service calls:          %11d\n", svc_calls);
@@ -1129,11 +1132,19 @@ void task_print_profiling(void)
 	svc_calls = 0;
 	task_switches = 0;
 	memset(irq_dist, 0, sizeof(irq_dist));
+	memset(irq_time, 0, sizeof(irq_time));
 
 	interrupt_enable();
 	#endif
 	}
 
+	void task_update_irq_time(int irq, uint32_t duration)
+	{
+	#ifdef CONFIG_TASK_PROFILING
+	if (irq >= 0 && irq < ARRAY_SIZE(irq_time))
+		irq_time[irq] += duration;
+	#endif
+	}
 
 static int command_task_info(int argc, const char **argv)
 {

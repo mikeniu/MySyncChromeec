@@ -8,7 +8,10 @@
 #ifndef __CROS_EC_IRQ_HANDLER_H
 #define __CROS_EC_IRQ_HANDLER_H
 
+#include "timer.h"
+
 #ifdef CONFIG_TASK_PROFILING
+#define SAFE_DELTA(end, start) ((end) >= (start) ? (end) - (start) : 0)
 #define TASK_START_IRQ_HANDLER(excep_return) \
 	task_start_irq_handler(excep_return)
 #else
@@ -32,8 +35,11 @@
 	void IRQ_HANDLER(irq)(void)                                        \
 	{                                                                  \
 		void *ret = __builtin_return_address(0);                   \
+		uint32_t t_start = get_time().le.lo;                       \
 		TASK_START_IRQ_HANDLER(ret);                               \
 		routine();                                                 \
+		task_update_irq_time(irq, SAFE_DELTA(get_time().le.lo,     \
+						     t_start));            \
 		task_resched_if_needed(ret);                               \
 	}                                                                  \
 	const struct irq_priority __keep IRQ_PRIORITY(irq) __attribute__(( \

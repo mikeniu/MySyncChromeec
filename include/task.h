@@ -63,6 +63,14 @@ void task_print_list(void);
 void task_print_profiling(void);
 
 /**
+ * Update time spent in an IRQ.
+ *
+ * @param irq		IRQ number
+ * @param duration	Duration in microseconds
+ */
+void task_update_irq_time(int irq, uint32_t duration);
+
+/**
  * Returns the name of the task.
  */
 const char *task_get_name(task_id_t tskid);
