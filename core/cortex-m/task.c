@@ -26,6 +26,9 @@ typedef union {
 		uint32_t sp; /* Saved stack pointer for context switch */
 		atomic_t events; /* Bitmaps of received events */
 		uint64_t runtime; /* Time spent in task */
+#ifdef CONFIG_TASK_PROFILING
+		uint32_t switches; /* Number of context switches */
+#endif
 		uint32_t *stack; /* Start of stack */
 	};
 } task_;
@@ -374,6 +377,7 @@ void svc_handler(int desched, task_id_t resched)
 	/* Switch to new task */
 #ifdef CONFIG_TASK_PROFILING
 	task_switches++;
+	next->switches++;
 #endif
 	current_task = next;
 	__switchto(current, next);
@@ -1009,6 +1013,9 @@ void task_print_list(void)
 	bool in_interrupt = in_interrupt_context();
 
 	ccputs("Task Ready Name         Events      Time (s)  StkUsed");
+#ifdef CONFIG_TASK_PROFILING
+	ccputs(" Switches");
+#endif
 	if (IS_ENABLED(CONFIG_TASKINFO_CONTEXT_REGS))
 		ccputs("      PC       LR");
 
@@ -1031,6 +1038,11 @@ void task_print_list(void)
 			 (int)tasks[i].events, tasks[i].runtime,
 			 current_stack_used, max_stackused,
 			 tasks_init[i].stack_size);
+
+#ifdef CONFIG_TASK_PROFILING
+		ccprintf(" %8d", tasks[i].switches);
+#endif
+		cflush();
 
 		if (IS_ENABLED(CONFIG_TASKINFO_CONTEXT_REGS)) {
 			sp = (uint32_t *)(tasks[i].sp & ~1);
@@ -1107,6 +1119,7 @@ void task_print_profiling(void)
 
 	for (i = 0; i < TASK_ID_COUNT; i++) {
 		tasks[i].runtime = 0;
+		tasks[i].switches = 0;
 	}
 
 	task_start_time = get_time().val;
