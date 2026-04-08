@@ -23,9 +23,9 @@
   <vif:BC_1_2_Support value="0">None</vif:BC_1_2_Support>
   <vif:Captive_Cable value="false">No</vif:Captive_Cable>
   <vif:PD_Spec_Revision_Major value="3">3</vif:PD_Spec_Revision_Major>
-  <vif:PD_Spec_Revision_Minor value="1">1</vif:PD_Spec_Revision_Minor>
+  <vif:PD_Spec_Revision_Minor value="2">2</vif:PD_Spec_Revision_Minor>
   <vif:PD_Spec_Version_Major value="1">1</vif:PD_Spec_Version_Major>
-  <vif:PD_Spec_Version_Minor value="6">6</vif:PD_Spec_Version_Minor>
+  <vif:PD_Spec_Version_Minor value="1">1</vif:PD_Spec_Version_Minor>
   <vif:PD_Specification_Revision value="2">Revision 3</vif:PD_Specification_Revision>
   <vif:SOP_Capable value="true">Yes</vif:SOP_Capable>
   <vif:SOP_P_Capable value="true">Yes</vif:SOP_P_Capable>
@@ -74,8 +74,8 @@
   <vif:Host_Is_Embedded value="false">No</vif:Host_Is_Embedded>
   <vif:Host_Suspend_Supported value="true">Yes</vif:Host_Suspend_Supported>
   <vif:Is_DFP_On_Hub value="false">No</vif:Is_DFP_On_Hub>
-  <vif:PD_Power_As_Source value="15000">15000 mW</vif:PD_Power_As_Source>
-  <vif:PD_Power_As_Source_Guaranteed value="15000"/>
+  <vif:PD_Power_As_Source value="15000">15000</vif:PD_Power_As_Source>
+  <vif:PD_Power_As_Source_Guaranteed value="7500">7500</vif:PD_Power_As_Source_Guaranteed>
   <vif:EPR_Supported_As_Src value="false">No</vif:EPR_Supported_As_Src>
   <vif:USB_Suspend_May_Be_Cleared value="true">Yes</vif:USB_Suspend_May_Be_Cleared>
   <vif:Sends_Pings value="false">No</vif:Sends_Pings>
@@ -137,7 +137,7 @@
   <vif:Modal_Operation_Supported_SOP value="true">Yes</vif:Modal_Operation_Supported_SOP>
   <vif:USB_VID_SOP value="6353">18D1</vif:USB_VID_SOP>
   <vif:PID_SOP value="20607">507F</vif:PID_SOP>
-  <vif:bcdDevice_SOP value="4096">013D</vif:bcdDevice_SOP>
+  <vif:bcdDevice_SOP value="54">0036</vif:bcdDevice_SOP>
   <vif:SVID_Fixed_SOP value="false">No</vif:SVID_Fixed_SOP>
   <vif:Num_SVIDs_Min_SOP value="1"/>
   <vif:Num_SVIDs_Max_SOP value="1"/>
@@ -213,9 +213,9 @@
   <vif:BC_1_2_Support value="0">None</vif:BC_1_2_Support>
   <vif:Captive_Cable value="false">No</vif:Captive_Cable>
   <vif:PD_Spec_Revision_Major value="3">3</vif:PD_Spec_Revision_Major>
-  <vif:PD_Spec_Revision_Minor value="1">1</vif:PD_Spec_Revision_Minor>
+  <vif:PD_Spec_Revision_Minor value="2">2</vif:PD_Spec_Revision_Minor>
   <vif:PD_Spec_Version_Major value="1">1</vif:PD_Spec_Version_Major>
-  <vif:PD_Spec_Version_Minor value="6">6</vif:PD_Spec_Version_Minor>
+  <vif:PD_Spec_Version_Minor value="1">1</vif:PD_Spec_Version_Minor>
   <vif:PD_Specification_Revision value="2">Revision 3</vif:PD_Specification_Revision>
   <vif:SOP_Capable value="true">Yes</vif:SOP_Capable>
   <vif:SOP_P_Capable value="true">Yes</vif:SOP_P_Capable>
@@ -264,8 +264,8 @@
   <vif:Host_Is_Embedded value="false">No</vif:Host_Is_Embedded>
   <vif:Host_Suspend_Supported value="true">Yes</vif:Host_Suspend_Supported>
   <vif:Is_DFP_On_Hub value="false">No</vif:Is_DFP_On_Hub>
-  <vif:PD_Power_As_Source value="15000">15000 mW</vif:PD_Power_As_Source>
-  <vif:PD_Power_As_Source_Guaranteed value="15000"/>
+  <vif:PD_Power_As_Source value="15000">15000</vif:PD_Power_As_Source>
+  <vif:PD_Power_As_Source_Guaranteed value="7500">7500</vif:PD_Power_As_Source_Guaranteed>
   <vif:EPR_Supported_As_Src value="false">No</vif:EPR_Supported_As_Src>
   <vif:USB_Suspend_May_Be_Cleared value="true">Yes</vif:USB_Suspend_May_Be_Cleared>
   <vif:Sends_Pings value="false">No</vif:Sends_Pings>
@@ -327,7 +327,7 @@
   <vif:Modal_Operation_Supported_SOP value="true">Yes</vif:Modal_Operation_Supported_SOP>
   <vif:USB_VID_SOP value="6353">18D1</vif:USB_VID_SOP>
   <vif:PID_SOP value="20607">507F</vif:PID_SOP>
-  <vif:bcdDevice_SOP value="45">002D</vif:bcdDevice_SOP>
+  <vif:bcdDevice_SOP value="54">0036</vif:bcdDevice_SOP>
   <vif:SVID_Fixed_SOP value="false">No</vif:SVID_Fixed_SOP>
   <vif:Num_SVIDs_Min_SOP value="1"/>
   <vif:Num_SVIDs_Max_SOP value="1"/>
