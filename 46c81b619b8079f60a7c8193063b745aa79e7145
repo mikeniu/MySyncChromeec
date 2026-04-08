@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf8697d8_40cdfcc0",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4684390
+      },
+      "writtenOn": "2026-04-08T05:48:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d71653cb_1b4102c6",
+      "revId": "46c81b619b8079f60a7c8193063b745aa79e7145",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e37063cb_48329fcf",
@@ -52,6 +70,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f68bcdce_aae1a7ec",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 4684390
+      },
+      "writtenOn": "2026-04-08T05:48:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e37063cb_48329fcf",
+      "revId": "46c81b619b8079f60a7c8193063b745aa79e7145",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "69f31448_bbd5f0a4",
@@ -65,6 +101,24 @@
       "writtenOn": "2026-04-07T18:01:54Z",
       "side": 1,
       "message": "Is there a reason you can\u0027t use `battery_static[BATT_IDX_MAIN].model_ext` like you were before? If the cached value would work fine, then I\u0027d suggest just using that. If it wouldn\u0027t work here, then a comment to explain why would probably be helpful.",
+      "revId": "46c81b619b8079f60a7c8193063b745aa79e7145",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef875dbc_7c9c1b40",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4684390
+      },
+      "writtenOn": "2026-04-08T05:48:42Z",
+      "side": 1,
+      "message": "Thanks for the reply. After testing, we found `battery_static[BATT_IDX_MAIN].model_ext` only gets updated about 1 second after initialization, so the cached value isn’t available when our code runs. From the logs, we can see the cached value is empty at first and only becomes valid after 1 second.\n```\n26-04-02 14:16:49.149[0.467200 SBS battery supports pec: 1]\n26-04-02 14:16:49.155[0.475000 BCFG Battery says COSMX,L26X2PK1]\n26-04-02 14:16:49.157[0.476000 BCFG Found config_fw[9]]\n26-04-02 14:16:49.186[0.511200 gavin get EC_MEMMAP_BATT_MODEL: , i: 0]\n26-04-02 14:16:49.801[1.141500 gavin get EC_MEMMAP_BATT_MODEL: L26X2PK, i: 0]\n26-04-02 14:16:49.812[1.142700 gavin get EC_MEMMAP_BATT_MODEL: L26X2PK, i: 0]\n```\nIf you have any other suggestions or ideas, please feel free to let us know. Thank you.",
+      "parentUuid": "69f31448_bbd5f0a4",
       "revId": "46c81b619b8079f60a7c8193063b745aa79e7145",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
