@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99310454_e92db409",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1558277
+      },
+      "writtenOn": "2026-04-08T06:27:27Z",
+      "side": 1,
+      "message": "It seems the failure was due to insufficient RAM. Can try adding `CONFIG_PLATFORM_EC_DEBUG_ASSERT\u003dn`.",
+      "revId": "283b10dd510cb2abdba993ccf83057e79ef1ad93",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
