@@ -16,6 +16,24 @@
       "message": "Please run `zmake compare-builds -a`",
       "revId": "9376fa4b41b2ea114eeebfaafd8e31b56a3b934e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1b76bf3_2e9eb589",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2026-04-08T02:00:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0de74d5e_6dce4313",
+      "revId": "9376fa4b41b2ea114eeebfaafd8e31b56a3b934e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
