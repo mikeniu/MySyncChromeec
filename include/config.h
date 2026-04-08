@@ -23,8 +23,10 @@
  * specific to any board.
  */
 
+/* clang-format off */
 #include "config_chip.h"
 #include "board.h"
+/* clang-format on */
 
 /* Default hcdebug mode, e.g. HCDEBUG_OFF or HCDEBUG_NORMAL */
 #ifndef CONFIG_HCDEBUG_MODE

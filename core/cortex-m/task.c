@@ -30,6 +30,7 @@ typedef union {
 		uint32_t switches; /* Number of context switches */
 		uint64_t wait_time; /* Time spent in ready state */
 		uint32_t ready_time; /* Time task entered ready state */
+		uint64_t irq_off_time; /* Time task spent with interrupts disabled */
 #endif
 		uint32_t *stack; /* Start of stack */
 	};
@@ -63,6 +64,10 @@ static uint32_t svc_calls; /* Number of service calls */
 static uint32_t task_switches; /* Number of times active task changed */
 static uint32_t irq_dist[CONFIG_IRQ_COUNT]; /* Distribution of IRQ calls */
 static uint32_t irq_time[CONFIG_IRQ_COUNT]; /* Time spent in each IRQ */
+static uint32_t irq_disabled_start_time; /* Time interrupts were disabled */
+static uint64_t total_irq_disabled_time; /* Total time interrupts disabled */
+static uint32_t max_irq_disabled_time; /* Max time interrupts disabled */
+static int irq_disabled_depth; /* Nesting depth of interrupt_disable() */
 
 #ifdef CONFIG_TASK_PROFILING_AUTO_RESET
 static int task_stats_auto_reset_enabled = 1;
@@ -242,10 +247,26 @@ static inline task_ *__task_id_to_ptr(task_id_t id)
 void interrupt_disable(void)
 {
 	asm volatile("cpsid i");
+#ifdef CONFIG_TASK_PROFILING
+	if (irq_disabled_depth++ == 0)
+		irq_disabled_start_time = get_time().le.lo;
+#endif
 }
 
 void interrupt_enable(void)
 {
+#ifdef CONFIG_TASK_PROFILING
+	if (irq_disabled_depth > 0 && --irq_disabled_depth == 0) {
+		uint32_t t = get_time().le.lo;
+		uint32_t diff = t - irq_disabled_start_time;
+
+		total_irq_disabled_time += diff;
+		if (current_task)
+			current_task->irq_off_time += diff;
+		if (diff > max_irq_disabled_time)
+			max_irq_disabled_time = diff;
+	}
+#endif
 	asm volatile("cpsie i");
 }
 
@@ -1032,7 +1053,7 @@ void task_print_list(void)
 
 	ccputs("Task Ready Name         Events      Time (s)  StkUsed");
 #ifdef CONFIG_TASK_PROFILING
-	ccputs(" Switches  Wait (s)");
+	ccputs(" Switches  Wait (s)  IrqOff(s)");
 #endif
 	if (IS_ENABLED(CONFIG_TASKINFO_CONTEXT_REGS))
 		ccputs("      PC       LR");
@@ -1058,7 +1079,8 @@ void task_print_list(void)
 			 tasks_init[i].stack_size);
 
 #ifdef CONFIG_TASK_PROFILING
-		ccprintf(" %8d %11.6lld", tasks[i].switches, tasks[i].wait_time);
+		ccprintf(" %8d %11.6lld %11.6lld", tasks[i].switches,
+			 tasks[i].wait_time, tasks[i].irq_off_time);
 #endif
 		cflush();
 
@@ -1119,7 +1141,9 @@ void task_print_profiling(void)
 	ccprintf("Task switches:          %11d\n", task_switches);
 	ccprintf("Time in tasks:          %11.6lld s\n",
 		 total_time - exc_total_time);
-	ccprintf("Time in exceptions:     %11.6llu s\n", exc_total_time);
+	ccprintf("Time in exceptions: %11.6llu s\n", exc_total_time);
+	ccprintf("Time interrupts off:%11.6lld s (max %11.6lld s)\n",
+		 total_irq_disabled_time, (uint64_t)max_irq_disabled_time);
 	cflush();
 
 	ccprintf("Current time:           %11.6lld s\n", get_time().val);
@@ -1143,6 +1167,7 @@ void task_print_profiling(void)
 		tasks[i].switches = 0;
 		tasks[i].wait_time = 0;
 		tasks[i].ready_time = get_time().le.lo;
+		tasks[i].irq_off_time = 0;
 	}
 
 	task_start_time = get_time().val;
@@ -1153,6 +1178,10 @@ void task_print_profiling(void)
 	task_switches = 0;
 	memset(irq_dist, 0, sizeof(irq_dist));
 	memset(irq_time, 0, sizeof(irq_time));
+	total_irq_disabled_time = 0;
+	max_irq_disabled_time = 0;
+	irq_disabled_depth = 0;
+	irq_disabled_start_time = task_start_time_32;
 
 	interrupt_enable();
 	#endif
@@ -1161,11 +1190,40 @@ void task_print_profiling(void)
 	void task_update_irq_time(int irq, uint32_t duration)
 	{
 	#ifdef CONFIG_TASK_PROFILING
-	if (irq >= 0 && irq < ARRAY_SIZE(irq_time))
-		irq_time[irq] += duration;
+		if (irq >= 0 && irq < ARRAY_SIZE(irq_time))
+			irq_time[irq] += duration;
 	#endif
 	}
 
+	void task_pause_irq_disabled_timing(void)
+	{
+	#ifdef CONFIG_TASK_PROFILING
+		if (irq_disabled_depth > 0) {
+			uint32_t t = get_time().le.lo;
+			uint32_t diff = t - irq_disabled_start_time;
+
+			total_irq_disabled_time += diff;
+			if (current_task)
+				current_task->irq_off_time += diff;
+			if (diff > max_irq_disabled_time)
+				max_irq_disabled_time = diff;
+
+			/*
+			 * Update start time so if we resume or enable later, we don't
+			 * count this period again.
+			 */
+			irq_disabled_start_time = t;
+		}
+	#endif
+	}
+
+	void task_resume_irq_disabled_timing(void)
+	{
+	#ifdef CONFIG_TASK_PROFILING
+		if (irq_disabled_depth > 0)
+			irq_disabled_start_time = get_time().le.lo;
+	#endif
+	}
 static int command_task_info(int argc, const char **argv)
 {
 #ifdef CONFIG_TASK_PROFILING
