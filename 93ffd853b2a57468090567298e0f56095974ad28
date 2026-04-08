@@ -16,6 +16,24 @@
       "message": "You should leave this and the `config_chip.h` entry in until you remove the `config.h` entry.",
       "revId": "93ffd853b2a57468090567298e0f56095974ad28",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06b06672_4eef868a",
+        "filename": "zephyr/Kconfig.ppc",
+        "patchSetId": 6
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 3879739
+      },
+      "writtenOn": "2026-04-08T05:20:36Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "cd8cf7d8_6f6f1b22",
+      "revId": "93ffd853b2a57468090567298e0f56095974ad28",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bd32f4e_0f27280d",
+        "filename": "driver/ppc/syv682x.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 3879739
+      },
+      "writtenOn": "2026-04-08T05:20:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1d5f54b3_0df27542",
+      "revId": "f673f276914e0914e250e70a8af3826aa24ce7d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "465a586a_474ef0b5",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-07T17:47:51Z",
       "side": 1,
       "message": "Wouldn\u0027t that be BUSY \u003d 1 with no fault conditions? In any case, I wouldn\u0027t necessarily describe the problem as, \"does not always initiate VBUS discharge.\" The overall smart discharge pattern of behavior is triggering at unexpected times. It may or may not be actively discharging during that time, but that\u0027s secondary to the primary BUSY problem.\n\nI\u0027d suggest replacing this paragraph with\n\u003e When SDSG is enabled, the SYV682 sometimes engages smart discharge at unexpected times, i.e. with no fault condition. This leaves BUSY \u003d 1 for 50 - 400 ms, delaying normal operations and inducing compliance test failures.",
+      "revId": "f673f276914e0914e250e70a8af3826aa24ce7d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e184b809_36347001",
+        "filename": "driver/ppc/syv682x.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 3879739
+      },
+      "writtenOn": "2026-04-08T05:20:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "465a586a_474ef0b5",
       "revId": "f673f276914e0914e250e70a8af3826aa24ce7d5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
