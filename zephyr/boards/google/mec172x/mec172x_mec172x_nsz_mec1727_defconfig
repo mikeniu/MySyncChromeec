@@ -45,3 +45,6 @@ CONFIG_FLASH=y
 # SPI NOR driver implements read_jedec_id() and read_sfdp() public API’s
 # Both API's can be called by application
 CONFIG_FLASH_JESD216_API=y
+
+# Extra exception info causes a build failure on this platform.
+CONFIG_EXTRA_EXCEPTION_INFO=n
