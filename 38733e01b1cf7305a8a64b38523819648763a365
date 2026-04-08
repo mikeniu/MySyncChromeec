@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5aa0c1d_2c6da38c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-04-08T20:33:58Z",
+      "side": 1,
+      "message": "Keeping this comment open so this todo doesn\u0027t get forgotten.",
+      "revId": "38733e01b1cf7305a8a64b38523819648763a365",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
