@@ -1467,6 +1467,7 @@ def build_zephyr_upstream(test_name: str, board_name: str) -> list[str]:
     cmd = cmd + ["-O"] + [ZEPHYR_TWISTER_BUILD_DIR]
     cmd = cmd + ["-s"] + [test_name]
     cmd = cmd + ["--no-upload-cros-rdb"]
+    cmd = cmd + ["--force-toolchain"]
 
     return cmd
 
