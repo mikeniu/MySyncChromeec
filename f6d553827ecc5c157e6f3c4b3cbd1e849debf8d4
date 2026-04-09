@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9391854_57c93aaf",
+        "filename": "zephyr/program/atria/atriarvp-ish/ish.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-09T22:17:11Z",
+      "side": 1,
+      "message": "Nit - you could just put this into the project.overlay file.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 3
+      },
+      "revId": "f6d553827ecc5c157e6f3c4b3cbd1e849debf8d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20f4a26d_f95d4658",
+        "filename": "zephyr/program/atria/atriarvp-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-09T22:17:11Z",
+      "side": 1,
+      "message": "CONFIG_PLATFORM_EC_HOOK_TICK is disabled for ISH.  Is this config needed to compile?",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 33
+      },
+      "revId": "f6d553827ecc5c157e6f3c4b3cbd1e849debf8d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
