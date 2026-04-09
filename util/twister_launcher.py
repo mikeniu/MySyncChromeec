@@ -274,6 +274,7 @@ def main():
         sys.executable,
         str(zephyr_base / "scripts" / "twister"),  # Executable path
         "--ninja",
+        "--force-toolchain",
         f"-x=DTS_ROOT={str( ec_base / 'zephyr')}",
         f"-x=SYSCALL_INCLUDE_DIRS={str(ec_base / 'zephyr' / 'include' / 'drivers')}",
         f"-x=ZEPHYR_BASE={zephyr_base}",
