@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42bf19c5_4aacfe99",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-04-09T20:03:18Z",
+      "side": 1,
+      "message": "cq-depend is missing.",
+      "revId": "3b5ec226e103f35dff6c322fbdf39882c9cc2a84",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
