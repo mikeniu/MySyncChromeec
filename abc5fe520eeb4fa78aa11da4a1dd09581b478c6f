@@ -126,6 +126,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "16cd9def_0d8398a3",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-09T06:20:57Z",
+      "side": 1,
+      "message": "Yes, fragmented protection patterns are theoretically possible (e.g. due to\nbugs, unexpected code paths, or uninitialized state).\n\nIn the current implementation we now explicitly check the protection state\nreported by hardware while scanning flash banks. If a non‑monotonic pattern\nis detected (e.g. protected → unprotected → protected), the driver treats it\nas an invalid hardware state and reports it as inconsistent.\n\n\nThis way `get_prot_reg()` acts as a hardware validation step. Operations that\ndepend on valid protection state (protection state reporting, protection\nsetup, and write/erase) will reject or refuse to proceed when the protection\nconfiguration does not match the expected contiguous model.",
+      "parentUuid": "76c0da91_59c8611e",
+      "revId": "abc5fe520eeb4fa78aa11da4a1dd09581b478c6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b39831bf_c779fbb7",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 9
