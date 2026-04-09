@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dceb76d0_8e16e437",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.overlay",
+        "patchSetId": 15
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-09T21:13:33Z",
+      "side": 1,
+      "message": "This puts the CBI data outside of the RO image which is limited to 256 KiB.\nThe Realtek flash is 1 MiB, but due to RAM constraints, we limit the RO and RW image sizes to 256 KiB each.",
+      "range": {
+        "startLine": 34,
+        "startChar": 11,
+        "endLine": 34,
+        "endChar": 18
+      },
+      "revId": "f2d50793fa92b8a3bbcf77eb12191ce13281b068",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
