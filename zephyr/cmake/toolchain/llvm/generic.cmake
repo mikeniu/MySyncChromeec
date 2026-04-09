@@ -8,6 +8,9 @@ set(BINTOOLS llvm)
 
 if("${ARCH}" STREQUAL "posix")
 set(LINKER ld)
+set(TOOLCHAIN_HAS_NEWLIB OFF CACHE BOOL "True if toolchain supports newlib")
+else()
+set(TOOLCHAIN_HAS_NEWLIB ON CACHE BOOL "True if toolchain supports newlib")
 endif()
 
 set(TOOLCHAIN_HAS_LIBCXX ON CACHE BOOL "True if toolchain supports libc++")
