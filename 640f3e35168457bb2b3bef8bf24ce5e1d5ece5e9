@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e03fa479_70835456",
+        "filename": "chip/npcx/fan.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-04-09T17:07:35Z",
+      "side": 1,
+      "message": "Please review the logic in `ec-legacy/board/xol/fans.c`\nthat is making this undesirable call and maybe\n```\nstatic const struct fan_rpm fan_rpm_0 \u003d {\n\t.rpm_min \u003d 0,\n\t.rpm_start \u003d 1230,\n\t.rpm_max \u003d 4100,\n};\n```\nneeds to be adjusted.",
+      "range": {
+        "startLine": 386,
+        "startChar": 7,
+        "endLine": 386,
+        "endChar": 28
+      },
+      "revId": "640f3e35168457bb2b3bef8bf24ce5e1d5ece5e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
