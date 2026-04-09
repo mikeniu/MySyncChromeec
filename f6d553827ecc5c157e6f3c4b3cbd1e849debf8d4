@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "057d5139_42e6353f",
+        "filename": "zephyr/program/atria/atriarvp-ish/i2c.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-04-09T22:56:42Z",
+      "side": 1,
+      "message": "\u0026i2c2 {\n\tstatus \u003d \"okay\";\n\tclock-frequency \u003d \u003cI2C_BITRATE_FAST\u003e;\n};\nwill use 400Khz.",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 2
+      },
+      "revId": "f6d553827ecc5c157e6f3c4b3cbd1e849debf8d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a9391854_57c93aaf",
         "filename": "zephyr/program/atria/atriarvp-ish/ish.dtsi",
         "patchSetId": 1
@@ -26,6 +49,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d972b17d_a37ad38b",
+        "filename": "zephyr/program/atria/atriarvp-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-04-09T22:56:42Z",
+      "side": 1,
+      "message": "CONFIG_CROS_EC_RAM_BASE\u003d0xff200000\nCONFIG_CROS_EC_RAM_SIZE\u003d0x000A0000",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 34
+      },
+      "revId": "f6d553827ecc5c157e6f3c4b3cbd1e849debf8d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c3e5339_b75a9cd7",
+        "filename": "zephyr/program/atria/atriarvp-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-04-09T22:56:42Z",
+      "side": 1,
+      "message": "CONFIG_CROS_EC_RAM_BASE\u003d0xff200000\nCONFIG_CROS_EC_RAM_SIZE\u003d0x000A0000",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 34
+      },
+      "revId": "f6d553827ecc5c157e6f3c4b3cbd1e849debf8d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "20f4a26d_f95d4658",
         "filename": "zephyr/program/atria/atriarvp-ish/project.conf",
         "patchSetId": 1
@@ -42,6 +111,29 @@
         "startChar": 0,
         "endLine": 32,
         "endChar": 33
+      },
+      "revId": "f6d553827ecc5c157e6f3c4b3cbd1e849debf8d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1fc054a_9b27f428",
+        "filename": "zephyr/program/atria/atriarvp-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-04-09T22:56:42Z",
+      "side": 1,
+      "message": "have to set PM\u003dn now. There is slightly PM change comparing to fatcat; we are sill working on it.",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 9
       },
       "revId": "f6d553827ecc5c157e6f3c4b3cbd1e849debf8d4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
