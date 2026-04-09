@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5c2b4f7_2f3ee023",
+        "filename": "zephyr/firmware_builder.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-04-09T15:25:00Z",
+      "side": 1,
+      "message": "This is \"unused\" boards for when you are comparing the ec boards to the boxter boards, not \"unused\" in that we don\u0027t build them.",
+      "range": {
+        "startLine": 94,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 13
+      },
+      "revId": "47b3087cfcce67eb9d6405703b657bc49058e171",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
