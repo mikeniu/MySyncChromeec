@@ -83,6 +83,7 @@
 		adc = <&adc_temp_usb>;
 	};
 
+	// TODO: Update thresholds based on test
 	named-temp-sensors {
 		compatible = "cros-ec,temp-sensors";
 		temp_backcov: backcov {
@@ -93,6 +94,8 @@
 		};
 		temp_cpu: cpu {
 			sensor = <&temp_sensor_cpu>;
+			temp-host-high = <80>;
+			temp-host-release-high = <70>;
 		};
 		temp_wlan: wlan {
 			sensor = <&temp_sensor_wlan>;
@@ -102,12 +105,16 @@
 		};
 		temp_charger: charger {
 			sensor = <&temp_sensor_charger>;
+			temp-host-high = <85>;
+			temp-host-release-high = <75>;
 		};
 		temp_qtm_l: qtm_l {
 			sensor = <&temp_sensor_qtm_l>;
 		};
 		temp_usb: usb {
 			sensor = <&temp_sensor_usb>;
+			temp-host-high = <75>;
+			temp-host-release-high = <65>;
 		};
 	};
 };
