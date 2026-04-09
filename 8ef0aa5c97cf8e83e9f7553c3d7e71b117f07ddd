@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a9a8fa0_c1dbb64a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-04-09T15:03:06Z",
+      "side": 1,
+      "message": "Splitting out the TOOLCHAIN_HAS_LIBCXX change would make this more atomic.",
+      "revId": "8ef0aa5c97cf8e83e9f7553c3d7e71b117f07ddd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

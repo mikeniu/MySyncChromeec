@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "baf64005_75329246",
+        "filename": "zephyr/cmake/toolchain/host/generic.cmake",
+        "patchSetId": 7
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-04-09T15:03:06Z",
+      "side": 0,
+      "message": "A comment explaining this block would be helpful.",
+      "revId": "6f6756ff1186bc2dc70cb32261a74f8092440c4a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
