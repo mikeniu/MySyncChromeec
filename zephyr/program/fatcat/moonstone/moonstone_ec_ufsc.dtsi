@@ -36,3 +36,28 @@
 	};
 };
 
+&ufsc_lid_sensor {
+	ufsc_lid_sensor_lis2de: lid-sensor-lis2de {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		value = <0>;
+	};
+	ufsc_lid_sensor_bma4xx: lid-sensor-bma4xx {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		value = <1>;
+	};
+};
+
+&ufsc_base_sensor {
+	ufsc_base_sensor_lis2de: base-sensor-lis2de {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		value = <0>;
+	};
+	ufsc_base_sensor_bma4xx: base-sensor-bma4xx {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		value = <1>;
+	};
+};
