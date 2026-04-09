@@ -22,6 +22,30 @@
       },
       "revId": "47b3087cfcce67eb9d6405703b657bc49058e171",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a8bda7a_7b37387e",
+        "filename": "zephyr/firmware_builder.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-09T16:04:18Z",
+      "side": 1,
+      "message": "Thanks, I\u0027ve reworded the commit message.",
+      "parentUuid": "b5c2b4f7_2f3ee023",
+      "range": {
+        "startLine": 94,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 13
+      },
+      "revId": "47b3087cfcce67eb9d6405703b657bc49058e171",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
