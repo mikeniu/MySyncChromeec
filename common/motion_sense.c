@@ -153,8 +153,14 @@ bool motion_sensor_in_forced_mode(const struct motion_sensor_t *sensor)
 
 	if (cfg_index == SENSOR_CONFIG_EC_S0) {
 		/* Can't override interrupt mode in S0 */
+		CPRINTS("cfg_index = SENSOR_CONFIG_EC_S0: forced_mode ---> off");
 		return false;
 	}
+	CPRINTS("forced_mode = %d, cfg_index = %d, ec_rate = %d, odr = %d",
+		(sensor->config[cfg_index].ec_rate > 0) ||
+		(sensor->config[cfg_index].odr == 0), cfg_index,
+		sensor->config[cfg_index].ec_rate, sensor->config[cfg_index].odr);
+
 	return (sensor->config[cfg_index].ec_rate > 0) ||
 	       (sensor->config[cfg_index].odr == 0);
 }
@@ -662,9 +668,97 @@ static int motion_sense_read(struct motion_sensor_t *sensor)
 	return sensor->drv->read(sensor, sensor->raw_xyz);
 }
 
+
+#define ODR_LOG_LEN (1 << 4)
+#define ODR_LOG_MASK (ODR_LOG_LEN - 1)
+
+struct odr_poll_log {
+	uint32_t ts;
+	uint32_t ss;
+	int odr;
+	int delta;
+	int margin;
+	uint32_t gap;
+	int wr;
+};
+
+static struct odr_poll_log odr_log[SENSOR_COUNT][ODR_LOG_LEN];
+static int odr_log_wr[SENSOR_COUNT];
+static int odr_log_rd[SENSOR_COUNT];
+static int odr_log_freeze;
+
+static void dump_odr_log(void)
+{
+	int rd;
+	int i;
+	int j;
+
+	odr_log_freeze = 1;
+
+	for (i = 0; i < 2; i++) {
+		rd = (odr_log_wr[i]) & ODR_LOG_MASK;
+		CPRINTS("%s Accel: log_len = %d", i  ? "Base" : "Lid", ODR_LOG_LEN);
+		CPRINTS("\t\tCnt\t ts\t ss\t gap\t del\t margin rate");
+		CPRINTS("-----------------------------------------------------------------");
+		for (j = 0; j < ODR_LOG_LEN; j++) {
+			CPRINTS("[%08d]: %08x  %08x  %06d, %05d  %05d  %d",
+				odr_log[i][rd].wr,
+				odr_log[i][rd].ts,
+				odr_log[i][rd].ss,
+				odr_log[i][rd].gap,
+				odr_log[i][rd].delta,
+				odr_log[i][rd].margin,
+				odr_log[i][rd].odr);
+			rd = (rd + 1) & ODR_LOG_MASK;
+		}
+		CPRINTS("");
+		odr_log_rd[i] = odr_log_wr[i];
+	}
+
+	odr_log_freeze = 0;
+}
+
+static void log_odr_ts(uint32_t ts, uint32_t ss, uint32_t rate, int sensor_num)
+{
+	int delta;
+	int index;
+	uint32_t gap;
+
+	delta = (ts >= ss) ? ts - ss : ss - ts;
+	if (ts < ss) {
+		delta = -delta;
+	}
+
+	if (!odr_log_freeze) {
+		index = odr_log_wr[sensor_num] & ODR_LOG_MASK;
+
+		gap = ts - odr_log[sensor_num][(index-1) & ODR_LOG_MASK].ts;
+
+		odr_log[sensor_num][index].ts = ts;
+		odr_log[sensor_num][index].ss = ss;
+		odr_log[sensor_num][index].odr = rate;
+		odr_log[sensor_num][index].delta = delta;
+		odr_log[sensor_num][index].margin = rate - delta;
+		odr_log[sensor_num][index].gap = gap;
+		odr_log[sensor_num][index].wr = odr_log_wr[sensor_num];
+
+		odr_log_wr[sensor_num]++;
+
+		if (gap > ((rate * 2) - rate/2)) {
+			CPRINTS("Sensor[%d]: mind the gap!! gap = %d, rate = %d",
+				sensor_num, gap, rate);
+		}
+	}
+}
+
 static inline void increment_sensor_collection(struct motion_sensor_t *sensor,
 					       const timestamp_t *ts)
 {
+	int sensor_num = sensor - motion_sensors;
+
+	log_odr_ts(ts->le.lo, sensor->next_collection,
+		   sensor->collection_rate, sensor_num);
+
 	sensor->next_collection += sensor->collection_rate;
 
 	if (time_after(ts->le.lo, sensor->next_collection)) {
@@ -1278,6 +1372,8 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 				  BIT(sensor - motion_sensors));
 			task_set_event(TASK_ID_MOTIONSENSE,
 				       TASK_EVENT_MOTION_ODR_CHANGE);
+		} else {
+			dump_odr_log();
 		}
 
 		out->sensor_odr.ret = sensor->drv->get_data_rate(sensor);
