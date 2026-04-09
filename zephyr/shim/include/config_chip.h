@@ -784,6 +784,11 @@ extern char mock_jump_data[CONFIG_PLATFORM_EC_PRESERVED_END_OF_RAM_SIZE];
 #define CONFIG_CUSTOM_FAN_CONTROL
 #endif
 
+#undef CONFIG_FAN_START_DUTY
+#ifdef PLATFORM_EC_FAN_START_DUTY
+#define CONFIG_FAN_FAN_START_DUTY
+#endif
+
 #undef CONFIG_I2C_CONTROLLER
 #ifdef CONFIG_PLATFORM_EC_I2C
 /* Also see shim/include/i2c/i2c.h which defines the ports enum */

@@ -382,8 +382,13 @@ void fan_set_duty(int ch, int percent)
 		fan_status[ch].auto_status = FAN_STATUS_STOPPED;
 		if (fan_all_disabled())
 			enable_sleep(SLEEP_MASK_FAN);
-	} else
+	} else {
+#ifdef CONFIG_FAN_START_DUTY
+		if (percent < CONFIG_FAN_START_DUTY)
+			percent = CONFIG_FAN_START_DUTY;
+#endif
 		disable_sleep(SLEEP_MASK_FAN);
+	}
 
 	/* Set the duty cycle of PWM */
 	pwm_set_duty(pwm_id, percent);

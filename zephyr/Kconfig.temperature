@@ -159,3 +159,9 @@ config PLATFORM_EC_FAN_BYPASS_SLOW_RESPONSE
 	  signal to EC after EC outputs the PWM signal to the fan.
 	  During this period, the driver will read two consecutive RPM = 0.
 	  In this case, don't step the PWM duty too aggressively.
+
+config PLATFORM_EC_FAN_START_DUTY
+	bool "Set fan start duty"
+	default n
+	help
+	  Set fan start duty when the fan starts running
