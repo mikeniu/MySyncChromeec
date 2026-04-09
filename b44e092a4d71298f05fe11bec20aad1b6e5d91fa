@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "227d0625_c7157aff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-04-09T06:19:05Z",
+      "side": 1,
+      "message": "LGTM but please make sure you really want to exclude PDOs between 15W and 45W (e.g. 9V3A)",
+      "revId": "b44e092a4d71298f05fe11bec20aad1b6e5d91fa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
