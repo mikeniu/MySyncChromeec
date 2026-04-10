@@ -16,6 +16,23 @@
       "message": "LGTM but please make sure you really want to exclude PDOs between 15W and 45W (e.g. 9V3A)",
       "revId": "b44e092a4d71298f05fe11bec20aad1b6e5d91fa",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc620311_d46e3bb6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1594262
+      },
+      "writtenOn": "2026-04-10T04:34:12Z",
+      "side": 1,
+      "message": "The previous build (https://cr-buildbucket.appspot.com/build/8684951184299757329) is being automatically retried for the following reasons:\n- Some child builders are now retryable:cq-orchestrator\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
+      "revId": "b44e092a4d71298f05fe11bec20aad1b6e5d91fa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
