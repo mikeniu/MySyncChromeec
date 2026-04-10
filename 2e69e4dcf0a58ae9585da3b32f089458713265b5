@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40610a4a_5748132f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-04-10T17:35:59Z",
+      "side": 1,
+      "message": "this policy change is probably better implemented in the board specific\nfan control logic. if this is a general feature, it would make sense to\nadd to the common fan support code. i\u0027m having a hard time believing this\nneeds to go into the nuvoton chip specific subsystem.",
+      "revId": "2e69e4dcf0a58ae9585da3b32f089458713265b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
