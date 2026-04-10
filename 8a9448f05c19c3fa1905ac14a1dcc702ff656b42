@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04256707_9d3df6b3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-10T18:02:07Z",
+      "side": 1,
+      "message": "AFAICT the CQ failure was an unrelated build failure at ToT:\n\u003e src/go.chromium.org/chromiumos/test/lab/local/cmd/inventoryserver/inventoryserver.go:87:45: cannot use s (variable of type *InventoryServer) as \"go.chromium.org/chromiumos/config/go/test/lab/api\".InventoryServiceServer value in argument to api.RegisterInventoryServiceServer: *InventoryServer does not implement \"go.chromium.org/chromiumos/config/go/test/lab/api\".InventoryServiceServer (missing method GetStableVersion)\n\u003e * ERROR: dev-util/testlabenv-local-0.0.1-r12::chromiumos failed (compile phase):",
+      "revId": "8a9448f05c19c3fa1905ac14a1dcc702ff656b42",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
