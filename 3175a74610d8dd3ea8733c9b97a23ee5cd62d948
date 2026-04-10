@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b001c21_0c39421b",
+        "filename": "zephyr/cmake/toolchain/llvm/generic.cmake",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-10T14:31:24Z",
+      "side": 1,
+      "message": "hey, seems like this does not work because `ARCH` is not set at this point, this is currently causing the newlib check to be set to ON, then ci tries to build the the cpp newlib test and it fails\n\nthis if has to go on target.cmake",
+      "revId": "3175a74610d8dd3ea8733c9b97a23ee5cd62d948",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
