@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9efb2589_e43d5c5c",
+        "filename": "zephyr/subsys/fingerprint/alg/egis_egis660_bio_alg.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-10T07:54:25Z",
+      "side": 1,
+      "message": "Please update description of the `bio_template_image_match_list` function.",
+      "revId": "f2659cccaaaeeda5fc5cd1ee2790a477d3443398",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
