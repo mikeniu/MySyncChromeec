@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b640e135_d41c25e5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-10T20:10:17Z",
+      "side": 1,
+      "message": "AFAIK you can abandon this. We\u0027ve figured out how smart discharge behaves.",
+      "revId": "f2af8b0ea6386dd9f14fd5ab4356536b1724765e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
