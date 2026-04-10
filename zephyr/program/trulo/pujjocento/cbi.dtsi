@@ -52,5 +52,26 @@
 				default;
 			};
 		};
+
+		/*
+		 * FW_CONFIG field to indicate which pdc control
+		 * should be used.
+		 */
+		pdc-control {
+			enum-name = "FW_PDC_CONTROL";
+			start = <20>;
+			size = <1>;
+			pdc-control-rts-bypass {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_PDC_CONTROL_RTK_BYPASS";
+				value = <0>;
+				default;
+			};
+			pdc-control-ti-bypass {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_PDC_CONTROL_TI_BYPASS";
+				value = <1>;
+			};
+		};
 	};
 };

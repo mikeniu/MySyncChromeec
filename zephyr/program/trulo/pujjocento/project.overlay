@@ -43,6 +43,48 @@
     };
 };
 
+/* Set up runtime driver selection of TI and RTK PDCs */
+&usbc_port0 {
+	pdc = <&pdc_power_p0 &pdc_power_p0_ti>;
+	zephyr,deferred-init;
+};
+&usbc_port1 {
+	pdc = <&pdc_power_p1 &pdc_power_p1_ti>;
+	zephyr,deferred-init;
+};
+
+/* Modify Realtek RTS5452P/RTS5452G PDCs from parent DT */
+&pdc_power_p0 {
+	zephyr,deferred-init;
+};
+&pdc_power_p1 {
+	zephyr,deferred-init;
+};
+
+/* Add TI TPS6699 PDCs */
+&i2c2_0 {
+	pdc_power_p0_ti: tps6699-pdc@20 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x20>;
+		/* EC_PD_INT */
+		irq-gpios = <&gpio0 2 GPIO_ACTIVE_LOW>;
+		port-index-on-chip = <0x1>;
+		zephyr,deferred-init;
+		frs-supported;
+		ccd;
+	};
+	pdc_power_p1_ti: tps6699-pdc@24 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x24>;
+		/* EC_PD_INT */
+		irq-gpios = <&gpioe 1 GPIO_ACTIVE_LOW>;
+		port-index-on-chip = <0x2>;
+		no-fw-update;
+		zephyr,deferred-init;
+		frs-supported;
+	};
+};
+
 &cbi_flash {
 	/*
 	 * CBI section size is 0x1000 bytes, the CBI portion lies at the end of
