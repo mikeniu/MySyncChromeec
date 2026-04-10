@@ -22,6 +22,30 @@
       },
       "revId": "640f3e35168457bb2b3bef8bf24ce5e1d5ece5e9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "006d3a51_1db10246",
+        "filename": "chip/npcx/fan.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 1455860
+      },
+      "writtenOn": "2026-04-10T05:39:35Z",
+      "side": 1,
+      "message": "Regardless of rpm setting, duty is started at 0 and is increased by 1(because of `CONFIG_FAN_BYPASS_SLOW_RESPONSE`).  \nSo I would like to change it to 30(using start duty config) although duty is increased by 1 until EC get the actual rpm.",
+      "parentUuid": "e03fa479_70835456",
+      "range": {
+        "startLine": 386,
+        "startChar": 7,
+        "endLine": 386,
+        "endChar": 28
+      },
+      "revId": "640f3e35168457bb2b3bef8bf24ce5e1d5ece5e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
