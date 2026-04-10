@@ -16,6 +16,24 @@
       "message": "```\nchromeos-zephyr-0.0.1-r5273: All failed projects: [\u0027skitty\u0027, \u0027chinchou\u0027, \u0027krabby\u0027, \u0027kyogre\u0027, \u0027voltorb\u0027, \u0027ponyta\u0027, \u0027kingler\u0027, \u0027magikarp\u0027, \u0027squirtle\u0027, \u0027tentacruel\u0027, \u0027steelix\u0027]\n```\nThese boards failed to enable LTO, we likely need to disable some features to save flash space.\nCould we land CL:7727985 without this?",
       "revId": "1aa6c934097246fb099521b7a45b8ba3028f8543",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c40e893_c7d7de03",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-04-10T06:55:20Z",
+      "side": 1,
+      "message": "Should be fine. If you could please verify that it works and the kernel in ram changes actually applied I\u0027ll +2.",
+      "parentUuid": "2d69e999_0e5db677",
+      "revId": "1aa6c934097246fb099521b7a45b8ba3028f8543",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
