@@ -159,15 +159,18 @@ static int egis_bep_match(const struct fingerprint_algorithm *const alg,
 		return -ENOTSUP;
 	}
 
-	/* TODO(b/479912675): Use template_update parameter. */
-
 	/*
 	 * EGIS BEP library takes image as 'void *', so we are casting away
 	 * the 'const' here.
+	 * The update_bitmap parameter is explained as follows:
+	 * - update_bitmap = NULL: only do matching process.
+	 * - update_bitmap != NULL: after matching process, if template update
+	 *   is required due to ALGO output, then template update will be
+	 * applied
 	 */
-	rc = bio_template_image_match_list(templ, templ_count,
-					   (bio_image_t)image, match_index,
-					   update_bitmap);
+	rc = bio_template_image_match_list(
+		templ, templ_count, (bio_image_t)image, match_index,
+		template_update ? update_bitmap : NULL);
 	if (rc < 0) {
 		LOG_ERR("bio_template_image_match_list() failed, result %d",
 			rc);
