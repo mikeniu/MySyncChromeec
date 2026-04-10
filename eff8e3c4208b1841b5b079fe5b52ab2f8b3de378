@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c701a2f2_b6894d38",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-10T13:00:38Z",
+      "side": 1,
+      "message": "Ping.",
+      "parentUuid": "11797252_b8908e88",
+      "revId": "eff8e3c4208b1841b5b079fe5b52ab2f8b3de378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e3b222fd_3089860a",
         "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
         "patchSetId": 6
