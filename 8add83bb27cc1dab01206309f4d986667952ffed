@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e926d8d_e0598334",
+        "filename": "zephyr/drivers/cros_flash/Kconfig",
+        "patchSetId": 11
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-10T12:54:34Z",
+      "side": 1,
+      "message": "Can you follow [naming pattern](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/fingerprint/Kconfig.elan;l\u003d13) for \"private\u0027 libraries? Like HAS/HAVE_xxx?",
+      "revId": "8add83bb27cc1dab01206309f4d986667952ffed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
