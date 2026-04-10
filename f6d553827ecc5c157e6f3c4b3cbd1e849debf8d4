@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5576c09e_9d2d927f",
+        "filename": "zephyr/program/atria/atriarvp-ish/i2c.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-10T17:58:22Z",
+      "side": 1,
+      "message": "AFAICT, this is already being set [upstream](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/dts/x86/intel/intel_ish5.dtsi). From the build artifact `zephyr.dts`:\n```\n185-\t\t/* node \u0027/soc/i2c@4000\u0027 defined in zephyr/dts/x86/intel/intel_ish5.dtsi:159 */\n186:\t\ti2c2: i2c@4000 {\n187-\t\t\tcompatible \u003d \"intel,sedi-i2c\";    /* in zephyr/dts/x86/intel/intel_ish5.dtsi:160 */\n188-\t\t\tperipheral-id \u003d \u003c 0x2 \u003e;          /* in zephyr/dts/x86/intel/intel_ish5.dtsi:161 */\n189-\t\t\t#address-cells \u003d \u003c 0x1 \u003e;         /* in zephyr/dts/x86/intel/intel_ish5.dtsi:162 */\n190-\t\t\t#size-cells \u003d \u003c 0x0 \u003e;            /* in zephyr/dts/x86/intel/intel_ish5.dtsi:163 */\n191-\t\t\treg \u003d \u003c 0x4000 0x1000 \u003e;          /* in zephyr/dts/x86/intel/intel_ish5.dtsi:164 */\n192-\t\t\tclock-frequency \u003d \u003c 0x61a80 \u003e;    /* in zephyr/dts/x86/intel/intel_ish5.dtsi:168 */\n193-\t\t\tinterrupts \u003d \u003c 0x14 0x8100 0x2 \u003e; /* in zephyr/dts/x86/intel/intel_ish5_8.dtsi:53 */\n194-\t\t\tstatus \u003d \"okay\";                  /* in ../../platform/ec/zephyr/program/atria/atriarvp-ish/i2c.dtsi:17 */\n195-\t\t\tphandle \u003d \u003c 0x4 \u003e;                /* in ../../platform/ec/zephyr/program/atria/atriarvp-ish/i2c.dtsi:10 */\n196-\t\t};\n```",
+      "parentUuid": "057d5139_42e6353f",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 2
+      },
+      "revId": "f6d553827ecc5c157e6f3c4b3cbd1e849debf8d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a9391854_57c93aaf",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-04-09T22:17:11Z",
       "side": 1,
       "message": "Nit - you could just put this into the project.overlay file.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 3
+      },
+      "revId": "f6d553827ecc5c157e6f3c4b3cbd1e849debf8d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6db549d7_3f4ffb51",
+        "filename": "zephyr/program/atria/atriarvp-ish/ish.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-10T17:58:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a9391854_57c93aaf",
       "range": {
         "startLine": 7,
         "startChar": 0,
@@ -93,6 +141,54 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f130073_bcc48b13",
+        "filename": "zephyr/program/atria/atriarvp-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-10T17:58:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9c3e5339_b75a9cd7",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 34
+      },
+      "revId": "f6d553827ecc5c157e6f3c4b3cbd1e849debf8d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "11aa9a88_40cbdf2a",
+        "filename": "zephyr/program/atria/atriarvp-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-10T17:58:22Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d972b17d_a37ad38b",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 34
+      },
+      "revId": "f6d553827ecc5c157e6f3c4b3cbd1e849debf8d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "20f4a26d_f95d4658",
@@ -116,6 +212,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3224d8b5_0cc74da6",
+        "filename": "zephyr/program/atria/atriarvp-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-10T17:58:22Z",
+      "side": 1,
+      "message": "No. I\u0027ll make a follow-up CL to fix fatcat and whatever other ISH builds include this.",
+      "parentUuid": "20f4a26d_f95d4658",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 33
+      },
+      "revId": "f6d553827ecc5c157e6f3c4b3cbd1e849debf8d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b1fc054a_9b27f428",
@@ -129,6 +249,30 @@
       "writtenOn": "2026-04-09T22:56:42Z",
       "side": 1,
       "message": "have to set PM\u003dn now. There is slightly PM change comparing to fatcat; we are sill working on it.",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 9
+      },
+      "revId": "f6d553827ecc5c157e6f3c4b3cbd1e849debf8d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e987628d_533d122b",
+        "filename": "zephyr/program/atria/atriarvp-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-10T17:58:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b1fc054a_9b27f428",
       "range": {
         "startLine": 44,
         "startChar": 0,
