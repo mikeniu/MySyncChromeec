@@ -34,6 +34,24 @@
       "parentUuid": "9efb2589_e43d5c5c",
       "revId": "f2659cccaaaeeda5fc5cd1ee2790a477d3443398",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5fcbaab_00e1d3ff",
+        "filename": "zephyr/subsys/fingerprint/alg/egis_egis660_bio_alg.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-10T09:29:09Z",
+      "side": 1,
+      "message": "I mean in the function declaration.",
+      "parentUuid": "0054cc70_be5673f0",
+      "revId": "f2659cccaaaeeda5fc5cd1ee2790a477d3443398",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
