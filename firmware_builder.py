@@ -11,6 +11,7 @@ gets invoked by chromite/api/controller/firmware.py.
 """
 
 import argparse
+import glob
 import multiprocessing
 import os
 import re
@@ -50,6 +51,8 @@ BUNDLE_FILES = [
     ("RW/ec.RW.dis", ""),
     ("RW/ec.RW.elf.fips", "ec.RW.elf"),
     ("RW/ec.RW.map", ""),
+    ("RW/ec.RW.flat.hashes.hashes", "ec.RW.hashes"),
+    ("RW/ec.RW_B.flat.hashes.hashes", "ec.RW_B.hashes"),
     ("RW/space_free_ram.txt", ""),
     ("RW/space_free_flash.txt", ""),
     ("../../util/signer/fuses.xml", ""),
@@ -115,9 +118,12 @@ def build(opts):
         )
         return
 
-    cmd = ["make", "BOARD=cr50", "all", "dis", "-j{}".format(opts.cpus)]
+    cmd = ["make", "PROD_BUILD_MODE=1", "BOARD=cr50", "all", "dis", "-j{}".format(opts.cpus)]
     print(f'# Running {" ".join(cmd)}.')
     subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
+    build_dir = os.path.join(os.path.realpath(__file__),"build/cr50/")
+    print("Hashes:")
+    print(glob.glob(f"{build_dir}*hashes"))
     add_size_metrics(metrics, "ro-prod", f"{BUILD_DIR}/cr50/RO/ec.RO.map")
     add_size_metrics(metrics, "rw-prod", f"{BUILD_DIR}/cr50/RW/ec.RW.map")
     cmd = [
@@ -275,12 +281,18 @@ def create_artifact_dir(ec_dir, build_target):
     build_dir = os.path.join(ec_dir, "build", build_target)
     cmd = ["mkdir", build_target]
     subprocess.run(cmd, cwd=build_dir, check=True)
+    print(f"build target {build_dir}/RW contents:")
+    print(glob.glob(f"{build_dir}/RW/*hashes"))
     for src, dest in BUNDLE_FILES:
         dest = os.path.join(build_target, dest)
-        # The non-cr50 builds are DBG and crypto test images. Rename their elf
-        # files, so it's not possible for the signer to sign them.
-        if dest.endswith(".elf") and build_target != "cr50":
-            dest += ".test"
+        if build_target != "cr50":
+            if dest.endswith(".hashes"):
+                # Hashes are generated only for Cr50 images.
+                continue
+            # The non-cr50 builds are DBG and crypto test images. Rename their
+            # elf files, so it's not possible for the signer to sign them.
+            if dest.endswith(".elf"):
+                dest += ".test"
         cmd = ["cp", src, dest]
         subprocess.run(cmd, cwd=build_dir, check=True)
     return [build_target]
