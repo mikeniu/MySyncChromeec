@@ -77,7 +77,6 @@
 
 #define NVMEM_TPM_SIZE ((sizeof((struct nvmem_partition *)0)->buffer) \
 			- NVMEM_CR50_SIZE)
-
 /*
  * Make sure NV memory size definition in Implementation.h matches reality. It
  * should be set to
