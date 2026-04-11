@@ -50,6 +50,8 @@ BUNDLE_FILES = [
     ("RW/ec.RW.dis", ""),
     ("RW/ec.RW.elf.fips", "ec.RW.elf"),
     ("RW/ec.RW.map", ""),
+    ("RW/ec.RW.flat.hashes.hashes", "ec.RW.hashes"),
+    ("RW/ec.RW_B.flat.hashes.hashes", "ec.RW_B.hashes"),
     ("RW/space_free_ram.txt", ""),
     ("RW/space_free_flash.txt", ""),
     ("../../util/signer/fuses.xml", ""),
@@ -101,6 +103,13 @@ def init_toolchain():
 
     return result
 
+def build_codesigner():
+    """Build codesigner utility if it is not there"""
+    codesigner_root = os.path.realpath(os.path.join(
+        DIR, "../cr50-utils/software/tools/codesigner"))
+    cmd = [ "make", "codesigner" ]
+    print(f'# Running {" ".join(cmd)}.')
+    subprocess.run(cmd, cwd=codesigner_root, check=True, env=env)
 
 def build(opts):
     """Builds all Cr50 firmware targets"""
@@ -115,7 +124,10 @@ def build(opts):
         )
         return
 
-    cmd = ["make", "BOARD=cr50", "all", "dis", "-j{}".format(opts.cpus)]
+    # Codesigner is needed for images' hashes generation.
+    build_codesigner()
+
+    cmd = ["make", "PROD_BUILD_MODE=1", "BOARD=cr50", "all", "dis", "-j{}".format(opts.cpus)]
     print(f'# Running {" ".join(cmd)}.')
     subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
     add_size_metrics(metrics, "ro-prod", f"{BUILD_DIR}/cr50/RO/ec.RO.map")
@@ -277,10 +289,14 @@ def create_artifact_dir(ec_dir, build_target):
     subprocess.run(cmd, cwd=build_dir, check=True)
     for src, dest in BUNDLE_FILES:
         dest = os.path.join(build_target, dest)
-        # The non-cr50 builds are DBG and crypto test images. Rename their elf
-        # files, so it's not possible for the signer to sign them.
-        if dest.endswith(".elf") and build_target != "cr50":
-            dest += ".test"
+        if build_target != "cr50":
+            if dest.endswith(".hashes"):
+                # Hashes are generated only for Cr50 images.
+                continue
+            # The non-cr50 builds are DBG and crypto test images. Rename their
+            # elf files, so it's not possible for the signer to sign them.
+            if dest.endswith(".elf") and build_target != "cr50":
+                dest += ".test"
         cmd = ["cp", src, dest]
         subprocess.run(cmd, cwd=build_dir, check=True)
     return [build_target]
