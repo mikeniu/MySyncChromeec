@@ -12,6 +12,9 @@
 # that amd64 represents the entire x84_64 architecture including intel CPUs.
 # This is used to exclude build targets that depend on sanitizers such as
 # fuzzers on architectures that don't support sanitizers yet (e.g. arm).
+# Find all variables defined on the command line
+$(info Make Invocation: PROD_BUILD_MODE=$(PROD_BUILD_MODE) MAKECMDGOALS="$(MAKECMDGOALS)" BOARD="$(BOARD)")
+
 ARCH?=amd64
 export BOARD ?= cr50
 
