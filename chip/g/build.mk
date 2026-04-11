@@ -176,8 +176,13 @@ RW_SIGNER_EXTRAS += --swap $(RMA_KEY_BASE).test,$(RMA_KEY_BASE).prod
 endif
 
 ifeq ($(H1_DEVIDS),)
+ifneq ($(PROD_BUILD_MODE),)
+CR50_RW_KEY = cr50_RW-prod-2026.04.pem.pub
+RW_SIGNER_EXTRAS += --hashes=$@.hashes --override-keyid
+else
 # Signing with non-secret test key.
 CR50_RW_KEY = loader-testkey-A.pem
+endif
 else
 # Try to build signer from the known location, if it is missing
 ifeq ($(wildcard $(SIGNER)),)
