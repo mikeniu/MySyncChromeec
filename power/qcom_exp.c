@@ -1342,6 +1342,23 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		/* Call hooks after we drop power rails */
 		hook_notify(HOOK_CHIPSET_SHUTDOWN_COMPLETE);
 
+		if (IS_ENABLED(CONFIG_PLATFORM_EC_BATTERY_CUTOFF_AT_SHUTDOWN) &&
+		    battery_cutoff_is_scheduled()) {
+			battery_cutoff_at_shutdown();
+
+			/*
+			 * Feature: once the cut-off is done or failed and
+			 * the device is awake, we should restore the
+			 * power-state.
+			 */
+			if (extpower_is_present() || is_system_powered()) {
+				CPRINTS("Battery cutoff done/failed while awake. "
+					"Restoring power state.");
+				shutdown_from_on = 0;
+				return POWER_G3S5;
+			}
+		}
+
 		shutdown_from_on = 0;
 
 		/*
