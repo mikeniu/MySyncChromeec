@@ -28,7 +28,8 @@ K_MUTEX_DEFINE(modify_base_detection_mutex);
 #define BASE_DETECT_EN_DEBOUNCE_US (300 * USEC_PER_MSEC)
 #define BASE_DETECT_DIS_DEBOUNCE_US (0 * USEC_PER_MSEC)
 
-#define ATTACH_MAX_THRESHOLD_MV 2500
+#define BASE_ATTACH_TH_NORMAL_MV 2500
+#define BASE_ATTACH_TH_LOW_MV 1000
 #define BASE_SOC_THRESHOLD 10
 
 static bool attached;
@@ -55,9 +56,13 @@ DECLARE_DEFERRED(base_detect_tick);
 static void base_detect_tick(void)
 {
 	int next_us = BASE_DETECT_INTERVAL;
-
 	int mv = adc_read_channel(ADC_BASE_DET);
-	if ((mv > ATTACH_MAX_THRESHOLD_MV) && base_get_state()) {
+	int threshold = BASE_ATTACH_TH_NORMAL_MV;
+
+	if (gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_pogo_low_pwr_sw)))
+		threshold = BASE_ATTACH_TH_LOW_MV;
+
+	if ((mv > threshold) && base_get_state()) {
 		if (!debouncing) {
 			debouncing = true;
 			next_us = BASE_DETECT_DIS_DEBOUNCE_US;
@@ -67,7 +72,7 @@ static void base_detect_tick(void)
 			CPRINTS("Base detached (adc=%d mV)", mv);
 			base_update();
 		}
-	} else if (mv <= ATTACH_MAX_THRESHOLD_MV && !base_get_state()) {
+	} else if (mv <= threshold && !base_get_state()) {
 		if (!debouncing) {
 			debouncing = true;
 			next_us = BASE_DETECT_EN_DEBOUNCE_US;
@@ -132,7 +137,7 @@ SYS_INIT(base_init, APPLICATION, 1);
 
 void base_init_setting(void)
 {
-	if (adc_read_channel(ADC_BASE_DET) > ATTACH_MAX_THRESHOLD_MV) {
+	if (adc_read_channel(ADC_BASE_DET) > BASE_ATTACH_TH_NORMAL_MV) {
 		attached = false;
 		hook_call_deferred(&base_update_data, 0);
 	} else {
