@@ -720,8 +720,11 @@ system_run_image_copy_with_flags(enum ec_image copy, uint32_t add_reset_flags)
 	if (copy == EC_IMAGE_RO)
 		system_clear_reset_flags(EC_RESET_FLAG_EFS);
 
-	CPRINTS("Jumping to image %s (0x%08x)", ec_image_to_string(copy),
-		system_get_reset_flags());
+	CPRINTS("Jumping to image %s (0x%08x) %p CONFIG_PROGRAM_MEMORY_BASE=%08x"
+		"CONFIG_RO_MEM_OFF=%08x CONFIG_RW_MEM_OFF=%08x",
+		ec_image_to_string(copy), system_get_reset_flags(),
+		(void *)init_addr, CONFIG_PROGRAM_MEMORY_BASE,
+		CONFIG_RO_MEM_OFF, CONFIG_RW_MEM_OFF);
 
 	jump_to_image(init_addr);
 
