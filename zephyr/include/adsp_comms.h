@@ -58,6 +58,11 @@ struct adsp_comms_callback {
 		.cb = (_cb),                                            \
 	}
 
+/**
+ * Configure the ADSP I2C port back to controller mode.
+ */
+void adsp_i2c_set_controller_mode(void);
+
 #ifdef __cplusplus
 }
 #endif

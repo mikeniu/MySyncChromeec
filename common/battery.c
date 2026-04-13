@@ -10,6 +10,7 @@
 #include "button.h"
 #include "charge_manager.h"
 #include "charge_state.h"
+#include "chipset.h"
 #include "common.h"
 #include "console.h"
 #include "ec_ec_comm_client.h"
@@ -367,6 +368,36 @@ test_mockable int battery_cutoff_in_progress(void)
 	return (battery_cutoff_state == BATTERY_CUTOFF_STATE_IN_PROGRESS);
 }
 
+test_mockable int battery_cutoff_is_scheduled(void)
+{
+	return (battery_cutoff_state == BATTERY_CUTOFF_STATE_SCHEDULED);
+}
+
+int battery_cutoff_at_shutdown(void)
+{
+	int rv;
+
+	if (battery_cutoff_state != BATTERY_CUTOFF_STATE_SCHEDULED)
+		return EC_SUCCESS;
+
+	/*
+	 * Change state to in progress so that other tasks know we're
+	 * cutting off.
+	 */
+	battery_cutoff_state = BATTERY_CUTOFF_STATE_IN_PROGRESS;
+
+	rv = board_cut_off_battery();
+	if (rv == EC_RES_SUCCESS) {
+		battery_cutoff_state = BATTERY_CUTOFF_STATE_CUT_OFF;
+		CUTOFFPRINTS("at shutdown complete");
+	} else {
+		battery_cutoff_state = BATTERY_CUTOFF_STATE_NORMAL;
+		CUTOFFPRINTS("at shutdown failed");
+	}
+
+	return (rv == EC_RES_SUCCESS) ? EC_SUCCESS : EC_ERROR_UNKNOWN;
+}
+
 const struct deferred_data __keep pending_cutoff_deferred_data;
 /* Cutoff timeout */
 static timestamp_t cutoff_timeout;
@@ -465,6 +496,10 @@ static void pending_cutoff_deferred(void)
 		return;
 	} else if (battery_cutoff_state == BATTERY_CUTOFF_STATE_SCHEDULED) {
 		/* Delayed start */
+		if (IS_ENABLED(CONFIG_PLATFORM_EC_BATTERY_CUTOFF_AT_SHUTDOWN)) {
+			CUTOFFPRINTS("deferred until shutdown");
+			return;
+		}
 		CUTOFFPRINTS("starting scheduled cutoff");
 		battery_cutoff_start();
 		return;
@@ -543,6 +578,16 @@ static enum ec_status battery_command_cutoff(struct host_cmd_handler_args *args)
 {
 	const struct ec_params_battery_cutoff *p;
 
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_BATTERY_CUTOFF_AT_SHUTDOWN)) {
+		battery_cutoff_state = BATTERY_CUTOFF_STATE_SCHEDULED;
+		CUTOFFPRINTS("at-shutdown is scheduled");
+
+		if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
+			chipset_force_shutdown(CHIPSET_SHUTDOWN_HOST_CMD);
+			return EC_RES_SUCCESS;
+		}
+	}
+
 	if (args->version == 1) {
 		p = args->params;
 		if (p->flags & EC_BATTERY_CUTOFF_FLAG_AT_SHUTDOWN) {
@@ -559,6 +604,9 @@ DECLARE_HOST_COMMAND(EC_CMD_BATTERY_CUT_OFF, battery_command_cutoff,
 
 static void check_pending_cutoff(void)
 {
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_BATTERY_CUTOFF_AT_SHUTDOWN))
+		return;
+
 	if (battery_cutoff_state == BATTERY_CUTOFF_STATE_SCHEDULED) {
 		battery_cutoff_retry_left = CONFIG_BATTERY_CUTOFF_RETRY_COUNT;
 		CUTOFFPRINTS("deferred for %d secs",
@@ -571,6 +619,14 @@ DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, check_pending_cutoff, HOOK_PRIO_LAST);
 
 static int command_cutoff(int argc, const char **argv)
 {
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_BATTERY_CUTOFF_AT_SHUTDOWN)) {
+		battery_cutoff_state = BATTERY_CUTOFF_STATE_SCHEDULED;
+		if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
+			chipset_force_shutdown(CHIPSET_SHUTDOWN_CONSOLE_CMD);
+			return EC_SUCCESS;
+		}
+	}
+
 	if (argc > 1) {
 		if (!strcasecmp(argv[1], "at-shutdown")) {
 			battery_cutoff_state = BATTERY_CUTOFF_STATE_SCHEDULED;

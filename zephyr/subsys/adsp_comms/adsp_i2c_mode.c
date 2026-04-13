@@ -153,11 +153,7 @@ void board_chipset_startup_i2c_target(void)
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, board_chipset_startup_i2c_target,
 	     HOOK_PRIO_DEFAULT);
 
-/*
- * After the AP is powered-off turn back the I2C_PORT_ADSP to controller mode
- * allowing to access the battery pack
- */
-void board_chipset_shutdown_complete_i2c_controller(void)
+void adsp_i2c_set_controller_mode(void)
 {
 	int ret;
 	const struct device *i2c_dev = i2c_get_device_for_port(I2C_PORT_ADSP);
@@ -172,7 +168,7 @@ void board_chipset_shutdown_complete_i2c_controller(void)
 	ret = i2c_target_unregister(i2c_dev, &target_cfg);
 	if (ret < 0) {
 		LOG_ERR("Failed to unregister I2C target (err %d)", ret);
-		return;
+		/* Continue anyway, it might not be registered */
 	}
 
 	/* Re-configure as a controller. */
@@ -182,6 +178,15 @@ void board_chipset_shutdown_complete_i2c_controller(void)
 		LOG_ERR("Failed to re-configure I2C controller (err %d)", ret);
 		return;
 	}
+}
+
+/*
+ * After the AP is powered-off turn back the I2C_PORT_ADSP to controller mode
+ * allowing to access the battery pack
+ */
+void board_chipset_shutdown_complete_i2c_controller(void)
+{
+	adsp_i2c_set_controller_mode();
 }
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN_COMPLETE,
 	     board_chipset_shutdown_complete_i2c_controller, HOOK_PRIO_DEFAULT);
