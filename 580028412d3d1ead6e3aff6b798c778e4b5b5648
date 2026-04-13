@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e62fce68_19367e5a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-13T19:32:45Z",
+      "side": 1,
+      "message": "added unit tests in https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7757923",
+      "parentUuid": "9ee65152_3f33f5df",
+      "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bef93e81_aa50c85a",
         "filename": "common/fpsensor/fpsensor.cc",
         "patchSetId": 3
