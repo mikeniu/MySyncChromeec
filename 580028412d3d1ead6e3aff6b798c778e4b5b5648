@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "73bca93a_fbc5a426",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-13T18:23:38Z",
+      "side": 1,
+      "message": "yes, we make decisions based on it\n\nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform2/biod/cros_fp_device.cc;l\u003d261?q\u003dplatform2%2Fbiod%20timestamps_invalid\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch#:~:text\u003d260-,261,-262",
+      "parentUuid": "bef93e81_aa50c85a",
+      "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b60c2a2c_766044cd",
         "filename": "common/fpsensor/fpsensor.cc",
         "patchSetId": 3
@@ -48,6 +66,24 @@
       "writtenOn": "2026-04-07T14:17:53Z",
       "side": 1,
       "message": "Should we also set `FPSTATS_MATCHING_INV` when the library returns invalid finger id?",
+      "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc637448_5c3ab8bc",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-13T18:23:38Z",
+      "side": 1,
+      "message": "agreed. added that.",
+      "parentUuid": "b60c2a2c_766044cd",
       "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -69,6 +105,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ee2894c_e39ba9d8",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-13T18:23:38Z",
+      "side": 1,
+      "message": "agreed. Added that",
+      "parentUuid": "43193811_4a6bd4b3",
+      "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "83b64993_a0a1c29b",
@@ -82,6 +136,30 @@
       "writtenOn": "2026-04-07T14:17:53Z",
       "side": 1,
       "message": "Looks like `overall_t0` is also change on every sensor IRQ and timer event. Should it also be moved? Maybe we should report `t0` from `fp_process_finger()` instead of `overall_t0` in FP_STATS command and use `overall_t0` only for `overall_time_us` calculating? Please explain your decision.",
+      "range": {
+        "startLine": 370,
+        "startChar": 3,
+        "endLine": 370,
+        "endChar": 13
+      },
+      "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c429f9d6_4b92b038",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-13T18:23:38Z",
+      "side": 1,
+      "message": "I believe this is correct. The overall time is couple ms greater than the capture + matching time. It is reset after each IRQ, which makes sense to me. This is when fingerprint processing starts. The clearing after EVENT_TIMER is benign here.",
+      "parentUuid": "83b64993_a0a1c29b",
       "range": {
         "startLine": 370,
         "startChar": 3,
