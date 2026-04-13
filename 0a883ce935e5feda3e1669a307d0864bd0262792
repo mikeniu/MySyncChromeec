@@ -22,6 +22,30 @@
       },
       "revId": "0a883ce935e5feda3e1669a307d0864bd0262792",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e583bc58_4d32ee92",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-04-13T09:02:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d69a8a3e_a2c46b2a",
+      "range": {
+        "startLine": 64,
+        "startChar": 10,
+        "endLine": 64,
+        "endChar": 25
+      },
+      "revId": "0a883ce935e5feda3e1669a307d0864bd0262792",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
