@@ -16,6 +16,24 @@
       "message": "this policy change is probably better implemented in the board specific\nfan control logic. if this is a general feature, it would make sense to\nadd to the common fan support code. i\u0027m having a hard time believing this\nneeds to go into the nuvoton chip specific subsystem.",
       "revId": "2e69e4dcf0a58ae9585da3b32f089458713265b5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a49b44de_751bd0ad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1455860
+      },
+      "writtenOn": "2026-04-13T07:27:58Z",
+      "side": 1,
+      "message": "I think duty setting can be modified in chip(nuvoton) code.  If not, could you let me know how to modify start duty in fan rpm mode?",
+      "parentUuid": "40610a4a_5748132f",
+      "revId": "2e69e4dcf0a58ae9585da3b32f089458713265b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
