@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e120a2e_9a282420",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-13T18:27:28Z",
+      "side": 1,
+      "message": "The CQ failure is described and apparently fixed in b:501388846. Trying again.",
+      "revId": "8dc4feb35894113aafd45b937428bef3ed8264bf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
