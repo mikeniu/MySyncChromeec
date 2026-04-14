@@ -1,0 +1,35 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config TEST_ATRIA_RVP_USBC_RUNTIME_3PORT
+	bool "Atria RVP USB-C runtime tests — 3-port hardware config"
+	help
+	  Tests for rvp_usbc_runtime.c with all three TI TPS6699x PDC emulators
+	  present (RVP_TCSS_THREE_TI). Covers discover_tcss_modules(),
+	  board_get_pdc_for_port() THREE_TI paths, and result caching.
+
+config TEST_ATRIA_RVP_USBC_RUNTIME_2PORT
+	bool "Atria RVP USB-C runtime tests — 2-port hardware config"
+	help
+	  Tests for rvp_usbc_runtime.c with only C0 and C1 TI TPS6699x PDC
+	  emulators present (RVP_TCSS_DUAL_TI). Covers the NULL-dev guard in
+	  probe_pdc_chip(), discover_tcss_modules(), board_get_pdc_for_port()
+	  DUAL_TI paths, and result caching.
+
+config TEST_ATRIA_RVP_USBC_RUNTIME_NONE
+	bool "Atria RVP USB-C runtime tests — no PDCs detected"
+
+config TEST_ATRIA_RVP_USBC_RUNTIME_C0_ONLY
+	bool "Atria RVP USB-C runtime tests — C0 only"
+
+config TEST_ATRIA_RVP_USBC_RUNTIME_UNSUPPORTED
+	bool "Atria RVP USB-C runtime tests — unsupported PDC combo"
+
+config TEST_ATRIA_RVP_USBC_RUNTIME_PARTIAL
+	bool
+	default y if TEST_ATRIA_RVP_USBC_RUNTIME_NONE || \
+		     TEST_ATRIA_RVP_USBC_RUNTIME_C0_ONLY || \
+		     TEST_ATRIA_RVP_USBC_RUNTIME_UNSUPPORTED
+
+source "Kconfig.zephyr"
