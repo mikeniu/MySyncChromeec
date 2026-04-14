@@ -1,0 +1,92 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ *
+ * No-PDC overlay: both C0 and C1 are fake-absent; C2 is NULL
+ * (USB_PD_PORT_MAX_COUNT=2). All probes fail → RVP_TCSS_NONE detected.
+ */
+
+#include <board-overlays/native_sim.dts>
+#include <it8xxx2_emul.dts>
+#include <usbc-policy.dtsi>
+
+/ {
+	usbc: usbc-ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		usbc_p0: port0@0 {
+			compatible = "named-usbc-port";
+			reg = <0>;
+			pdc = <&pdc_ti_c0>;
+			chg = <&charger>;
+			policy = <&cros_policy>;
+			zephyr,deferred-init;
+		};
+
+		usbc_p1: port1@1 {
+			compatible = "named-usbc-port";
+			reg = <1>;
+			pdc = <&pdc_ti_c1>;
+			policy = <&cros_policy>;
+			zephyr,deferred-init;
+		};
+
+		ppm_driver_nodelabel: ppm-driver {
+			compatible = "ucsi-ppm";
+		};
+	};
+
+	named-i2c-ports {
+		compatible = "named-i2c-ports";
+		i2c_port_pd: i2c_pd {
+			i2c-port = <&i2c0>;
+			enum-names = "I2C_PORT_USB_C0_TCPC";
+		};
+		i2c_port_battery: i2c_battery {
+			i2c-port = <&i2c0>;
+			enum-names = "I2C_PORT_BATTERY";
+		};
+	};
+
+	batteries {
+		default_battery: lgc_ac17a8m {
+			compatible = "lgc,ac17a8m", "battery-smart";
+		};
+	};
+};
+
+&i2c0 {
+	battery: sb@b {
+		compatible = "zephyr,smart-battery-emul";
+		reg = <0xb>;
+		cycle-count = <6>;
+		version = "BATTERY_SPEC_VER_1_1_WITH_PEC";
+		desired-charg-volt = <11250>;
+		desired-charg-cur = <2400>;
+		mf-name = "LGC";
+		dev-name = "AP18C8K";
+	};
+
+	charger: isl9238@9 {
+		compatible = "cros,isl923x-emul";
+		status = "okay";
+		reg = <0x9>;
+		battery = <&battery>;
+	};
+
+	/* No real PDC emulators — both C0 and C1 are fake-absent nodes at
+	 * unregistered addresses so i2c_transfer_dt() fails for both.
+	 */
+	pdc_ti_c0: fake-absent-pdc@7c {
+		compatible = "cros,fake-absent-pdc";
+		reg = <0x7c>;
+		zephyr,deferred-init;
+	};
+
+	pdc_ti_c1: fake-absent-pdc@7d {
+		compatible = "cros,fake-absent-pdc";
+		reg = <0x7d>;
+		zephyr,deferred-init;
+	};
+};
