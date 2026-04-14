@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c00653e_bca3dd04",
+        "filename": "common/host_event_commands.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-14T13:28:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3e4065c0_726a6f7c",
+      "range": {
+        "startLine": 324,
+        "startChar": 0,
+        "endLine": 326,
+        "endChar": 40
+      },
+      "revId": "c02ccf559a97a55a0b707d9b3621ceaa57db56b1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "93913837_5bb510cf",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-04-14T12:25:18Z",
       "side": 1,
       "message": "I think it would be good to move it to seperate function, e.g `console_log_notify_host()`",
+      "range": {
+        "startLine": 88,
+        "startChar": 0,
+        "endLine": 110,
+        "endChar": 4
+      },
+      "revId": "c02ccf559a97a55a0b707d9b3621ceaa57db56b1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dadf8b3b_02dac127",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-14T13:28:32Z",
+      "side": 1,
+      "message": "Makes sense, done.",
+      "parentUuid": "93913837_5bb510cf",
       "range": {
         "startLine": 88,
         "startChar": 0,
