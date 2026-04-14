@@ -34,6 +34,24 @@
       "parentUuid": "3a3034b3_f66d7743",
       "revId": "d7cca27349900225b7bdcfcafd0d579ebc0c623d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba5c1c58_50ab1a8a",
+        "filename": "zephyr/shim/include/power_host_sleep.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-14T19:00:47Z",
+      "side": 1,
+      "message": "Refactor is done added a commit before this cleaning up the enum power_state definitions",
+      "parentUuid": "339e2856_d10641b1",
+      "revId": "d7cca27349900225b7bdcfcafd0d579ebc0c623d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

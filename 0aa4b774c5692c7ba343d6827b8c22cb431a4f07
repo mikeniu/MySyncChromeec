@@ -96,6 +96,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a92f505_aa68f0a0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-14T19:00:47Z",
+      "side": 1,
+      "message": "Any other input here? I\u0027m exploring possible ways to change this to only have 1 overlay but nothing concrete yet",
+      "parentUuid": "027d4c22_c0c73065",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 10
+      },
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "ebf64224_3caf4d46",
@@ -162,6 +186,24 @@
       "side": 1,
       "message": "This whole change to this file might not work it breaks boards using the shimmed ap power driver since power.h declares the power_state enum also. Trying to figure out a clean way to do this",
       "parentUuid": "7785e7cf_014776a4",
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec65b7c6_066c763a",
+        "filename": "zephyr/shim/include/power_host_sleep.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-14T19:00:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "696449a1_c9300fcc",
       "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
