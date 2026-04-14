@@ -4,4 +4,5 @@
 
 zephyr_library_sources(
 	bt_passthru_core.cc
+	zephyr_bt_sender.cc
 )
