@@ -88,6 +88,24 @@
       "parentUuid": "94c4f458_2b3515d6",
       "revId": "fcd19e04095c726076dbfb4a7f229721f70a4a75",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d35d1fe_7af17ca3",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-14T14:43:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2533e7eb_685e9feb",
+      "revId": "fcd19e04095c726076dbfb4a7f229721f70a4a75",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
