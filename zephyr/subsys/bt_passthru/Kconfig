@@ -47,4 +47,28 @@ config BT_BUF_ACL_RX_SIZE
 config BT_MAX_CONN
 	default 16
 
+config BT_PASSTHRU_INIT_PRIORITY
+	int "BT passthru stack init priority"
+	default 91
+	help
+	  Initialization priority of the BT passthrough subsystem during the
+	  POST_KERNEL phase. This should occur after the physical Bluetooth
+	  HCI hardware drivers are initialized.
+
+config BT_PASSTHRU_THREAD_PRIORITY
+	int "BT passthru RX thread priority"
+	default 5
+	help
+	  Set the priority of the dedicated BT passthrough RX thread.
+	  Note: If this thread handles time-sensitive HCI events, consider
+	  a higher (lower number) priority.
+
+config BT_PASSTHRU_STACK_SIZE
+	int "BT passthru thread stack size"
+	default 2048
+	help
+	  Size of the stack assigned to the BT passthrough RX thread.
+	  The thread handles incoming HCI packets and routes them to
+	  the Host Transport ring buffer.
+
 endif # BT_PASSTHRU
