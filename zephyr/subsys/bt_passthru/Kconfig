@@ -1,0 +1,17 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+menuconfig BT_PASSTHRU
+	bool "Enable Bluetooth passthrough"
+	help
+	  Enable Bluetooth passthrough host commands to route HCI data
+	  between the AP and the BT Controller.
+
+if BT_PASSTHRU
+
+module = BT_PASSTHRU
+module-str = BT Passthru
+source "subsys/logging/Kconfig.template.log_config"
+
+endif # BT_PASSTHRU
