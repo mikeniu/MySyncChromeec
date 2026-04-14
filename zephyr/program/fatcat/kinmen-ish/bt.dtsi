@@ -1,0 +1,22 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	chosen {
+		zephyr,bt-hci = &bt_hci_uart;
+		zephyr,bt-c2h-uart = &uart1;
+	};
+};
+
+&uart1 {
+	status = "okay";
+	current-speed = <115200>;
+	hw-flow-control;
+
+	bt_hci_uart: bt_hci_uart {
+		compatible = "zephyr,bt-hci-uart";
+		status = "okay";
+	};
+};

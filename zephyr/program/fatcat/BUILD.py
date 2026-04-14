@@ -168,6 +168,7 @@ register_ish_project(
     kconfig_files=[
         here / "dsp_comms.conf",
         here / "kinmen-ish" / "project.conf",
+        here / "kinmen-ish" / "bt.conf",
         here / ".." / ".." / "ish.conf",
     ],
     inherited_from=["fatcat"],

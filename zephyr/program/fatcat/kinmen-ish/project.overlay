@@ -4,6 +4,7 @@
  */
 
  /* kinmen-ish project DTSI includes */
+#include "bt.dtsi"
 #include "gpio.dtsi"
 #include "i2c.dtsi"
 #include "ish.dtsi"
