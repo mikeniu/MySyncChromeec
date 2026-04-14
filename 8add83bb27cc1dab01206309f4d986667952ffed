@@ -34,6 +34,24 @@
       "parentUuid": "0e926d8d_e0598334",
       "revId": "8add83bb27cc1dab01206309f4d986667952ffed",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "65f2505c_43c45259",
+        "filename": "zephyr/drivers/cros_flash/Kconfig",
+        "patchSetId": 11
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-14T13:34:40Z",
+      "side": 1,
+      "message": "Yes.",
+      "parentUuid": "afa08feb_708c1dce",
+      "revId": "8add83bb27cc1dab01206309f4d986667952ffed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
