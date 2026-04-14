@@ -22,6 +22,30 @@
       },
       "revId": "f2d50793fa92b8a3bbcf77eb12191ce13281b068",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f0d4c53_fd94d646",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.overlay",
+        "patchSetId": 15
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-14T16:16:57Z",
+      "side": 1,
+      "message": "I based this off the fmap of the EC which looks like this with the change:\n\n```\nEC_RW                      00080000    000d0000    00050000\n  RW_FW                      00080000    000bcd28    0003cd28\n  ZEPHYR_RW                  00080000    000bcd28    0003cd28  // DUPLICATE\n    RW_FWID                    00080404    00080424    00000020\n    ROLLBACK0                  00080000    00080000    00000000\n    ROLLBACK1                  00080000    00080000    00000000  // DUPLICATE\nWP_RO                      00000000    00080000    00080000\n  CBI                        00050000    00051000    00001000\n  EC_RO                      00000000    0004fe30    0004fe30\n    FMAP                       0004fc00    0004fe30    00000230\n    RO_FRID                    0003c9cc    0003c9ec    00000020\n    RO_FW                      00000000    0003c9cc    0003c9cc\n```\n\nThis doesn\u0027t seem to be putting it outside the RO region it\u0027s putting it right after the end of the EC_RO region",
+      "parentUuid": "dceb76d0_8e16e437",
+      "range": {
+        "startLine": 34,
+        "startChar": 11,
+        "endLine": 34,
+        "endChar": 18
+      },
+      "revId": "f2d50793fa92b8a3bbcf77eb12191ce13281b068",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
