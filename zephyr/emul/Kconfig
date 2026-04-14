@@ -258,6 +258,17 @@ config EMUL_PDC_TPS6699X
 	  bus. Emulator API is available in
 	  zephyr/include/emul/emul_tps6699x.h.
 
+config EMUL_FAKE_ABSENT_PDC
+	bool "Fake absent PDC driver for testing"
+	default y
+	depends on DT_HAS_CROS_FAKE_ABSENT_PDC_ENABLED && EMUL
+	help
+	  Minimal PDC driver that simulates an absent PDC chip. Implements only
+	  pdc_get_hw_config(), returning an I2C spec at the node's address.
+	  Because no I2C emulator is registered for this compatible,
+	  i2c_transfer_dt() fails and probe_pdc_chip() treats the chip as not
+	  present.
+
 config EMUL_RTC
 	bool "Emulated RTC driver for Zephyr shim"
 	default y
