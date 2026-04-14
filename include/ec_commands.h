@@ -4172,6 +4172,9 @@ enum ec_mkbp_event {
 	/* Peripheral device charger event */
 	EC_MKBP_EVENT_PCHG = 12,
 
+	/* Bluetooth passthrough event */
+	EC_MKBP_EVENT_BLUETOOTH = 13,
+
 	/* Number of MKBP events */
 	EC_MKBP_EVENT_COUNT,
 };
@@ -9266,6 +9269,24 @@ struct ec_response_get_boot_time {
  * configured threshold.
  */
 #define EC_CMD_ENABLE_OFFMODE_HEARTBEAT 0x0606
+
+/* BT Passthrough */
+#define EC_CMD_BT_COMMAND 0x0607
+
+/* ChromeOS Host Command limit is strictly <256 bytes */
+#define BT_MAX_COMMAND_SIZE 240
+struct ec_param_bt_command {
+	uint32_t size;
+	uint8_t data[BT_MAX_COMMAND_SIZE];
+} __ec_align4;
+
+#define EC_CMD_BT_READ_EVENT 0x0608
+
+#define BT_MAX_EVENT_SIZE 240
+struct ec_response_bt_read_event {
+	uint32_t num_events;
+	uint8_t events[BT_MAX_EVENT_SIZE];
+} __ec_align4;
 
 /*****************************************************************************/
 /*
