@@ -30,6 +30,7 @@ LOG_MODULE_REGISTER(boot_keys, LOG_LEVEL_INF);
 #define BOOT_KEYS_SETTLE_TIME_MS \
 	(DT_PROP(CROS_EC_KEYBOARD_NODE, debounce_down_ms) * 2)
 
+static uint8_t refresh_key_value;
 static uint32_t boot_keys_value;
 static uint32_t boot_keys_counter;
 static bool boot_keys_release_only;
@@ -93,7 +94,18 @@ static void process_key(uint8_t row, uint8_t col, bool pressed)
 		const struct boot_keys *key = &boot_keys[i];
 
 		if (row == key->row && col == key->col) {
-			WRITE_BIT(boot_keys_value, i, pressed);
+			WRITE_BIT(refresh_key_value, i, pressed);
+			if (!system_jumped_late()) {
+				WRITE_BIT(boot_keys_value, i, pressed);
+			} else {
+				if (i == BOOT_KEY_REFRESH) {
+					if (!pressed)
+						WRITE_BIT(boot_keys_value, i,
+							  pressed);
+				} else {
+					WRITE_BIT(boot_keys_value, i, pressed);
+				}
+			}
 			break;
 		}
 	}
@@ -142,12 +154,18 @@ static void power_button_change(void)
 	} else {
 		WRITE_BIT(boot_keys_value, BOOT_KEY_POWER, 0);
 		boot_keys_counter--;
+		if (refresh_key_value & BIT(BOOT_KEY_REFRESH)) {
+			WRITE_BIT(boot_keys_value, BOOT_KEY_REFRESH, 1);
+		} else {
+			WRITE_BIT(boot_keys_value, BOOT_KEY_REFRESH, 0);
+		}
 	}
 
 	LOG_DBG("boot_keys: boot_keys_value=0x%x counter=%d (power)",
 		boot_keys_value, boot_keys_counter);
 }
 DECLARE_HOOK(HOOK_POWER_BUTTON_CHANGE, power_button_change, HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_INIT, power_button_change, HOOK_PRIO_DEFAULT);
 
 uint32_t keyboard_scan_get_boot_keys(void)
 {
