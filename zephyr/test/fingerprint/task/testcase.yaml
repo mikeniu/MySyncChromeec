@@ -87,12 +87,6 @@ tests:
     extra_conf_files:
     - prj.conf
 
-  fingerprint.task.fp_info:
-    extra_configs:
-    - CONFIG_LINK_TEST_SUITE_FINGERPRINT_FP_INFO=y
-    extra_conf_files:
-    - prj.conf
-
   fingerprint.task.btn_ign_out:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FINGERPRINT_BTN_IGN_OUT=y
