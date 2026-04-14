@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6036ffb6_40346448",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-04-14T21:31:01Z",
+      "side": 1,
+      "message": "it looks like the omniknight issue is in part due to the long\nboard specific retry count on omnigul:\n```\n#define CONFIG_BATTERY_INIT_TYPE_RETRY_COUNT 10\n```\nfrom:\nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec-legacy/board/omnigul/board.h;l\u003d177\n\nwhich is turning out to be way too long.\ncould you try cherry-picking\nhttps://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7669378\ninstead? just drop the zephyr portions since they don\u0027t apply.",
+      "revId": "6b6cddc306b4db0ceb25289258cea12a6420dca6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
