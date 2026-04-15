@@ -16,6 +16,24 @@
       "message": "Out of scope of this change, but I wonder if the trace should also be redirected to a file with --trace-redirect.",
       "revId": "1e3487d7a37cbbd66340b7d4f1b17fcbe2c28920",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab12fece_a5622e90",
+        "filename": "zephyr/zmake/zmake/build_config.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-15T15:05:28Z",
+      "side": 1,
+      "message": "Does not sounds like a bad idea to me, that flag is incredibly loud, could probably also use a generic --extra-cmake-args flags or something, anyway yeah I can do an extra commit for that output",
+      "parentUuid": "823c9858_0ceac670",
+      "revId": "1e3487d7a37cbbd66340b7d4f1b17fcbe2c28920",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
