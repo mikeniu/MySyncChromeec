@@ -160,6 +160,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4755bce1_77e2023e",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-04-15T13:53:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a7ff857d_286f487a",
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "39cabf2c_1bd512f1",
@@ -250,6 +268,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3e5a47ee_6685dd66",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-04-15T13:53:10Z",
+      "side": 1,
+      "message": "Yes, I think it was possible before adding mutex. Now GPIO and is_acive state should remain consistent.",
+      "parentUuid": "c1c587b2_22700edc",
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8a55545a_cf785c36",
         "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
         "patchSetId": 24
@@ -309,6 +345,30 @@
       "side": 1,
       "message": "I\u0027m really wondering what\u0027s a proper approach here. If you lock a screen, the PB press will be ignored if I understand correctly. Can we get some clear requirements from Product Management when the power button should be ignored?",
       "parentUuid": "f0a6ecb7_2ea316a3",
+      "range": {
+        "startLine": 67,
+        "startChar": 47,
+        "endLine": 67,
+        "endChar": 62
+      },
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f78b4a38_67c3f034",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-04-15T13:53:10Z",
+      "side": 1,
+      "message": "I believe blocking PB when screen is locked and FPS is active is the intended behavior.",
+      "parentUuid": "56bb5a91_bdafccff",
       "range": {
         "startLine": 67,
         "startChar": 47,
