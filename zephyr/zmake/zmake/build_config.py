@@ -114,6 +114,10 @@ class BuildConfig:
         ]
         if cmake_trace:
             cmd.append("--trace")
+            # Needed for trace-redirect as build_dir does not exist at this
+            # point.
+            build_dir.mkdir()
+            cmd.append(f"--trace-redirect={build_dir}/cmake-build.trace")
         if cmake_graph:
             cmd.append(f"--graphviz={build_dir}/cmake-build.dot")
 

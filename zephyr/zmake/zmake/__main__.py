@@ -349,6 +349,7 @@ def add_common_configure_args(sub_parser: argparse.ArgumentParser):
         action="store_true",
         default=False,
         dest="cmake_trace",
+        help="Run cmake in trace mode and write the output to cmake-build.trace",
     )
     sub_parser.add_argument(
         "--cmake-graph",
