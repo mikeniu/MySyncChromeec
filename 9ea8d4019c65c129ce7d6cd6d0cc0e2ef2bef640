@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17c2662f_da7d3d7c",
+        "filename": "zephyr/subsys/pd_controller/pdc_host_cmd.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-04-15T16:44:05Z",
+      "side": 1,
+      "message": "I\u0027m forcing this to info-level instead of a Kconfig symbol so that it cannot get turned off.",
+      "range": {
+        "startLine": 18,
+        "startChar": 34,
+        "endLine": 18,
+        "endChar": 47
+      },
+      "revId": "9ea8d4019c65c129ce7d6cd6d0cc0e2ef2bef640",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
