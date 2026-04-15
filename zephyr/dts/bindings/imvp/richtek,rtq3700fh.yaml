@@ -1,0 +1,28 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: Richtek RTQ3700FH IMVP9.3 Controller
+
+include: i2c-device.yaml
+
+compatible: "richtek,rtq3700fh"
+
+properties:
+  enable-gpios:
+    type: phandle-array
+    required: true
+    description:
+      Power supply control for RTQ3700FH (zephyr standard GPIO format)
+  update-data:
+    type: array
+    required: true
+    description:
+      Array of NVM update entries generated using the dt-bindings macros.
+      RTQ_WRITE_BYTE(), RTQ_WRITE_WORD(), or RTQ_WRITE_BLOCK().
+      The driver sequentially parses the array as [page, reg, length, data...]
+      to support variable-length PMBus block writes.
+  update-crc:
+    type: int
+    required: false
+    description: Expected NVM Checksum.
