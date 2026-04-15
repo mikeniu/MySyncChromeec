@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4bfb968a_075c1ec8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 27
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-15T22:22:12Z",
+      "side": 1,
+      "message": "**1. Resource Leak / Deadlock on Error Paths**\nThe `flash_control_register_locked` function acquires a hardware lock via `crec_flash_lock_mapped_storage(1)` but fails to release it if either `cros_flash_npcx_get_status_reg` or `cros_flash_npcx_write_protection_is_set` returns an error. If an error occurs, the flash storage will remain permanently locked, likely causing a system hang or subsequent failures.\n\n* **Remediation:** Introduce an error-handling `goto` block or explicitly unlock before returning. \n\n```c\nstatic int __maybe_unused flash_control_register_locked(const struct device *dev)\n{\n\tuint8_t reg;\n\tint ret;\n\tint wp_set;\n\n\t/* Lock physical flash operations */\n\tcrec_flash_lock_mapped_storage(1);\n\n\tret \u003d cros_flash_npcx_get_status_reg(dev, SPI_NOR_CMD_RDSR, \u0026reg);\n\tif (ret !\u003d 0) {\n\t\tgoto unlock;\n\t}\n\n\twp_set \u003d cros_flash_npcx_write_protection_is_set(dev);\n\tif (wp_set \u003c 0) {\n\t\tret \u003d wp_set;\n\t\tgoto unlock;\n\t}\n\n\t/*\n\t * A write-lock is in effect if either:\n\t * * 1. Hardware Write Protection (WP) is physically active, preventing\n\t * register changes.\n\t * * 2. The Write Enable Latch (WEL) is unset, meaning the flash state\n\t * machine will reject any incoming write/erase commands per the SPI NOR\n\t * protocol.\n\t */\n\tret \u003d wp_set || ((reg \u0026 SPI_NOR_WEL_BIT) \u003d\u003d 0);\n\nunlock:\n\t/* Unlock physical flash operations */\n\tcrec_flash_lock_mapped_storage(0);\n\n\treturn ret;\n}\n```\n\n### Moderate Issues\n\n**2. Return Value Semantics and Ambiguity**\nThe function returns an `int` that serves a dual purpose: it returns negative error codes (e.g., `-EIO`) on failure, but acts as a boolean (`0` or `1`) on success. In C, any non-zero value evaluates to `true`. If the caller simply uses `if (flash_control_register_locked(dev))`, a negative error code will be incorrectly evaluated as \"locked\". \n* **Remediation:** Add Doxygen-style comments detailing the return values (`\u003c 0` on error, `0` for unlocked, `1` for locked) to ensure callers explicitly check for errors (e.g., `if (ret \u003c 0)`).",
+      "revId": "83fdbcd07aae79dc2d152d5de5dfce130f28eed4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
