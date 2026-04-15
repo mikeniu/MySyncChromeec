@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c2a53c3_b094f6fb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T05:19:15Z",
+      "side": 1,
+      "message": "No all systems already supports V2. Please wait with this change. I\u0027ve created a dedicated bug for this some time ago as we discussed b/498614014",
+      "revId": "c158121963b540cd77423f7cf0a7e4d059bb8cda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
