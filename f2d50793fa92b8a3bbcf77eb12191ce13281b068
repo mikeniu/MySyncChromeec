@@ -70,6 +70,30 @@
       },
       "revId": "f2d50793fa92b8a3bbcf77eb12191ce13281b068",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "630f3edd_2d0fdb09",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.overlay",
+        "patchSetId": 15
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-15T15:43:08Z",
+      "side": 1,
+      "message": "Well now I\u0027m a bit confused cause the devicetree is correct\n```\ncbi_flash: cbi {\n\t\t\t\tcompatible \u003d \"cros-ec,flash-layout\"; /* in ../../platform/ec/zephyr/include/cros/cbi_flash.dtsi:9 */\n\t\t\t\ttype \u003d \"fill\";                       /* in ../../platform/ec/zephyr/include/cros/cbi_flash.dtsi:10 */\n\t\t\t\tfill-byte \u003d [ FF ];                  /* in ../../platform/ec/zephyr/include/cros/cbi_flash.dtsi:13 */\n\t\t\t\timage-size \u003d \u003c 0x100 \u003e;              /* in ../../platform/ec/zephyr/include/cros/cbi_flash.dtsi:14 */\n\t\t\t\tpreserve;                            /* in ../../platform/ec/zephyr/include/cros/cbi_flash.dtsi:15 */\n\t\t\t\toffset \u003d \u003c 0x7f000 \u003e;                /* in ../../platform/ec/zephyr/program/atria/atriarvp-rtk/project.overlay:39 */\n\t\t\t\tsize \u003d \u003c 0x1000 \u003e;                   /* in ../../platform/ec/zephyr/program/atria/atriarvp-rtk/project.overlay:40 */\n\t\t\t};",
+      "parentUuid": "e72914f5_bf77e136",
+      "range": {
+        "startLine": 34,
+        "startChar": 11,
+        "endLine": 34,
+        "endChar": 18
+      },
+      "revId": "f2d50793fa92b8a3bbcf77eb12191ce13281b068",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
