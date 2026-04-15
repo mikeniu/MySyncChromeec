@@ -16,6 +16,24 @@
       "message": "Please add:\n```\n    LOW_COVERAGE_REASON\u003dHardware specific changes. Tested by hardware tests\n```",
       "revId": "30e349dd161a1b0c6beacfb424122c1620172b58",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb7da324_ca07acf9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 53
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T11:20:55Z",
+      "side": 1,
+      "message": "Igone.",
+      "parentUuid": "ee5bde0b_af52ee5c",
+      "revId": "30e349dd161a1b0c6beacfb424122c1620172b58",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
