@@ -286,6 +286,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "693a7d2f_187081df",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T16:19:19Z",
+      "side": 1,
+      "message": "Exactly.\n\nIn terms of mutex itself. I believe semaphore (much lighter) should be enough in this case.",
+      "parentUuid": "3e5a47ee_6685dd66",
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8a55545a_cf785c36",
         "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
         "patchSetId": 24
@@ -369,6 +387,30 @@
       "side": 1,
       "message": "I believe blocking PB when screen is locked and FPS is active is the intended behavior.",
       "parentUuid": "56bb5a91_bdafccff",
+      "range": {
+        "startLine": 67,
+        "startChar": 47,
+        "endLine": 67,
+        "endChar": 62
+      },
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4121112_4e7c34c2",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T16:19:19Z",
+      "side": 1,
+      "message": "Do we have clear requirements on this?",
+      "parentUuid": "f78b4a38_67c3f034",
       "range": {
         "startLine": 67,
         "startChar": 47,
