@@ -83,6 +83,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "291bb343_63abc953",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T12:48:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0cb5c2aa_bdefa8a4",
+      "range": {
+        "startLine": 15,
+        "startChar": 20,
+        "endLine": 15,
+        "endChar": 27
+      },
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "44ae8a31_3833d86e",
@@ -114,6 +138,24 @@
       "side": 1,
       "message": "Somehow in EC codebase _data is more popular so I changed it to _data.",
       "parentUuid": "44ae8a31_3833d86e",
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7ff857d_286f487a",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T12:48:16Z",
+      "side": 1,
+      "message": "`_data` is used for old HOOKs. IMO `_dwork` is better.",
+      "parentUuid": "8808e640_26da2bf3",
       "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -190,6 +232,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c1c587b2_22700edc",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T12:48:16Z",
+      "side": 1,
+      "message": "I think it\u0027s not an overkill. IMO the mutex/atomic variable(haven\u0027t analyzed if it\u0027s sufficient or not) is needed. I can see a case when the `deactivation_handler` is interrupted (please keep in mind that the work is executed by a different, dedicated thread) at line 28 (before setting gpio, after if), then the `activate` is called (`k_work_cancel_delayable` won\u0027t stop already started work), which sets the GPIO and `is_active \u003d true`, then `deactivation_handler` is finished, which sets the GPIO to 0, which is not an expected result.",
+      "parentUuid": "0bee6d62_3b90d4fb",
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8a55545a_cf785c36",
         "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
         "patchSetId": 24
@@ -225,6 +285,30 @@
       "side": 1,
       "message": "I am not sure. It is for sure MATCH when screen gets locked. Could be both MATCH and CAPTURE? To be honest I am not sure if we need CAPTURE here at all. I added it after comment about it.",
       "parentUuid": "8a55545a_cf785c36",
+      "range": {
+        "startLine": 67,
+        "startChar": 47,
+        "endLine": 67,
+        "endChar": 62
+      },
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56bb5a91_bdafccff",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T12:48:16Z",
+      "side": 1,
+      "message": "I\u0027m really wondering what\u0027s a proper approach here. If you lock a screen, the PB press will be ignored if I understand correctly. Can we get some clear requirements from Product Management when the power button should be ignored?",
+      "parentUuid": "f0a6ecb7_2ea316a3",
       "range": {
         "startLine": 67,
         "startChar": 47,

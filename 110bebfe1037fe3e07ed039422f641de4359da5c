@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6384dfc6_92ccc7d5",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 26
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T12:48:16Z",
+      "side": 1,
+      "message": "Please double check if `k_work_cancel_delayable_sync` is needed here.",
+      "revId": "110bebfe1037fe3e07ed039422f641de4359da5c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
