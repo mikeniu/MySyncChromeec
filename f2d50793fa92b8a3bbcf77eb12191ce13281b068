@@ -46,6 +46,30 @@
       },
       "revId": "f2d50793fa92b8a3bbcf77eb12191ce13281b068",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e72914f5_bf77e136",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.overlay",
+        "patchSetId": 15
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-15T15:37:59Z",
+      "side": 1,
+      "message": "This FMAP doesn\u0027t match your devictree setting.  Your FMAP shows that the CBI is still located at offset 0x50000 and not 0x7F000.  This setting might be getting overriden by another file.\n\nCheck the final devicetree (build/zephyr/atriarvp-rtk/build-ro/zephyr/zephyr.dts).  This file shows the source file that contributes every line of the final devicetree.\n\nAfter looking at the CBI support, it does make sense to put CBI at address 0x7f000, which gives us flexibility to increase the code size some.",
+      "parentUuid": "5f0d4c53_fd94d646",
+      "range": {
+        "startLine": 34,
+        "startChar": 11,
+        "endLine": 34,
+        "endChar": 18
+      },
+      "revId": "f2d50793fa92b8a3bbcf77eb12191ce13281b068",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
