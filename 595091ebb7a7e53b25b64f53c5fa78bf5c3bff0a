@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a30d008c_6746d005",
+        "filename": "zephyr/program/fpmcu/ft9001/chobienia.dts",
+        "patchSetId": 54
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T09:11:28Z",
+      "side": 1,
+      "message": "@wangyong@focaltech.corp-partner.google.com please double-confirm",
+      "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db1cbac2_7a60da3f",
+        "filename": "zephyr/program/fpmcu/ft9001/chudow.dts",
+        "patchSetId": 54
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T09:11:28Z",
+      "side": 1,
+      "message": "@wangyong@focaltech.corp-partner.google.com please double-confirm",
+      "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19342a98_25e77d68",
+        "filename": "zephyr/program/fpmcu/ft9001/soc.dtsi",
+        "patchSetId": 54
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T09:11:28Z",
+      "side": 1,
+      "message": "@wangyong@focaltech.corp-partner.google.com please double-check this is fine. I move the sdamd0 node, not to overwrite the SDCP items by DTCM memory region and reserved additional space for BBRAM (for reset flag and scratchpad used in tests). Can you please also confirm this memory `0x1fff80f0 - 0x1fff8100` is not overwritten by bootloader (it is not according to my tests).",
+      "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed9ddfc7_635f605e",
+        "filename": "zephyr/program/fpmcu/ft9001/src/config_page.c",
+        "patchSetId": 54
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T09:11:28Z",
+      "side": 1,
+      "message": "@wangyong@focaltech.corp-partner.google.com can you double-confirm uploading like this is fine?",
+      "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "948a6b10_249f9818",
+        "filename": "zephyr/program/fpmcu/ft9001/src/config_page.c",
+        "patchSetId": 54
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T09:11:28Z",
+      "side": 1,
+      "message": "@wangyong@focaltech.corp-partner.google.com are the spi_flash_param correct?",
+      "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4847bb58_7d8a7c23",
+        "filename": "zephyr/subsys/usbd_service/usbd_init.c",
+        "patchSetId": 54
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T09:11:28Z",
+      "side": 1,
+      "message": "@wangyong@focaltech.corp-partner.google.com this is necessary, right?",
+      "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
