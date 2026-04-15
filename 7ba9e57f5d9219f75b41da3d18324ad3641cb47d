@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cca6007_91eae620",
+        "filename": "common/peripheral_charger.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-04-15T06:17:08Z",
+      "side": 1,
+      "message": "rename this to board_pchg_end_strategy",
+      "range": {
+        "startLine": 252,
+        "startChar": 19,
+        "endLine": 252,
+        "endChar": 38
+      },
+      "revId": "7ba9e57f5d9219f75b41da3d18324ad3641cb47d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
