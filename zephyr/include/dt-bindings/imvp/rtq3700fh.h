@@ -1,0 +1,40 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#ifndef DT_BINDINGS_IMVP_H_
+#define DT_BINDINGS_IMVP_H_
+
+/* RTQ3700FH Pages (Quadruple-Channel) */
+#define RTQ3700FH_PAGE_VCCCORE 0x00
+#define RTQ3700FH_PAGE_VCCGT 0x01
+#define RTQ3700FH_PAGE_VCCSA 0x02
+#define RTQ3700FH_PAGE_VCC_LP_ECORE 0x03
+
+/* Common PMBus Registers for NVM/DT Updates */
+#define RTQ3700FH_REG_PAGE 0x00
+#define RTQ3700FH_REG_OPERATION 0x01
+#define RTQ3700FH_REG_ON_OFF_CONFIG 0x02
+#define RTQ3700FH_REG_VOUT_COMMAND 0x21
+#define RTQ3700FH_REG_VOUT_TRIM 0x22
+#define RTQ3700FH_REG_VOUT_MAX 0x24
+#define RTQ3700FH_REG_VOUT_MARGIN_HIGH 0x25
+#define RTQ3700FH_REG_VOUT_MARGIN_LOW 0x26
+#define RTQ3700FH_REG_VOUT_TRANSITION_RATE 0x27
+#define RTQ3700FH_REG_VOUT_DROOP 0x28
+#define RTQ3700FH_REG_IOUT_OC_FAULT_LIMIT 0x46
+#define RTQ3700FH_REG_OT_FAULT_LIMIT 0x4F
+#define RTQ3700FH_REG_TON_DELAY 0x60
+
+/* Richtek Specific (MFR) Registers */
+#define RTQ3700FH_REG_MFR_IC_DEVICE_ID 0xAD
+#define RTQ3700FH_REG_MFR_NVM_CTRL 0xED
+
+/* Generic MFR_SPECIFIC registers (If Richtek provides custom tuning configs) */
+#define RTQ3700FH_REG_MFR_SPECIFIC_00 0xD0
+#define RTQ3700FH_REG_MFR_SPECIFIC_01 0xD1
+#define RTQ3700FH_REG_MFR_SPECIFIC_02 0xD2
+#define RTQ3700FH_REG_MFR_SPECIFIC_03 0xD3
+
+#endif /* DT_BINDINGS_IMVP_H_ */
