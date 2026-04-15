@@ -16,6 +16,24 @@
       "message": "No all systems already supports V2. Please wait with this change. I\u0027ve created a dedicated bug for this some time ago as we discussed b/498614014",
       "revId": "c158121963b540cd77423f7cf0a7e4d059bb8cda",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab525666_cc35b8b7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-15T15:21:32Z",
+      "side": 1,
+      "message": "but support for v1, v2, and v3 is enabled on all images (AL and ChromeOS). I still do not understand your concern? What do you mean by not all systems support V2?",
+      "parentUuid": "5c2a53c3_b094f6fb",
+      "revId": "c158121963b540cd77423f7cf0a7e4d059bb8cda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
