@@ -810,7 +810,11 @@ static enum ec_charge_control_mode
 sustain_switch_mode(enum ec_charge_control_mode mode)
 {
 	enum ec_charge_control_mode new_mode = mode;
-	int soc = charge_get_display_charge() / 10;
+	/* Display state of charge has 0.1% precision which cannot be rounded
+	 * off, otherwise charge or discharge will terminate early. */
+	const int soc = charge_get_display_charge();
+	const int upper = sustain_soc.upper * 10;
+	const int lower = sustain_soc.lower * 10;
 
 	/*
 	 * The sustain range is defined by 'lower' and 'upper' where the equal
@@ -838,13 +842,13 @@ sustain_switch_mode(enum ec_charge_control_mode mode)
 	switch (mode) {
 	case CHARGE_CONTROL_NORMAL:
 		/* Currently charging */
-		if (sustain_soc.upper < soc) {
+		if (upper < soc) {
 			/*
 			 * We come here only if the soc is already above the
 			 * upper limit at the time the sustainer started.
 			 */
 			new_mode = CHARGE_CONTROL_DISCHARGE;
-		} else if (sustain_soc.upper == soc) {
+		} else if (upper == soc) {
 			/*
 			 * We've been charging and finally reached the upper.
 			 * Let's switch to IDLE to stay.
@@ -857,14 +861,14 @@ sustain_switch_mode(enum ec_charge_control_mode mode)
 		break;
 	case CHARGE_CONTROL_IDLE:
 		/* Discharging naturally */
-		if (soc < sustain_soc.lower)
+		if (soc < lower)
 			/*
 			 * Presumably, we stayed in the sustain range for a
 			 * while but finally fell off the range. Let's charge to
 			 * the upper.
 			 */
 			new_mode = CHARGE_CONTROL_NORMAL;
-		else if (sustain_soc.upper < soc)
+		else if (upper < soc)
 			/*
 			 * This can happen only if sustainer is restarted with
 			 * decreased upper limit. Let's discharge to the upper.
@@ -873,14 +877,14 @@ sustain_switch_mode(enum ec_charge_control_mode mode)
 		break;
 	case CHARGE_CONTROL_DISCHARGE:
 		/* Discharging actively. */
-		if (soc <= sustain_soc.upper &&
+		if (soc <= upper &&
 		    !(sustain_soc.flags & EC_CHARGE_CONTROL_FLAG_NO_IDLE))
 			/*
 			 * Normal case. We've been discharging and finally
 			 * reached the upper. Let's switch to IDLE to stay.
 			 */
 			new_mode = CHARGE_CONTROL_IDLE;
-		else if (soc < sustain_soc.lower)
+		else if (soc < lower)
 			/*
 			 * This can happen only if sustainer is restarted with
 			 * increase lower limit. Let's charge to the upper (then
