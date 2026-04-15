@@ -1,6 +1,40 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "c396678d_c6980a67",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T11:23:31Z",
+      "side": 1,
+      "message": "Please use b:450506126.",
+      "revId": "7c4a3a90bb6cad2fdbb60794d9a66bda611f504f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "785d7753_2c02210b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T11:23:31Z",
+      "side": 1,
+      "message": "Please add:\n```\n    LOW_COVERAGE_REASON\u003dHardware specific problem. Tested by hardware tests\n```",
+      "revId": "7c4a3a90bb6cad2fdbb60794d9a66bda611f504f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "5076e2d4_b7bba8e8",
