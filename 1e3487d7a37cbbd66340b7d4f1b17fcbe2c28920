@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "823c9858_0ceac670",
+        "filename": "zephyr/zmake/zmake/build_config.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-04-15T14:48:49Z",
+      "side": 1,
+      "message": "Out of scope of this change, but I wonder if the trace should also be redirected to a file with --trace-redirect.",
+      "revId": "1e3487d7a37cbbd66340b7d4f1b17fcbe2c28920",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
