@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53f1d37f_f9397769",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_npcx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-15T22:48:55Z",
+      "side": 1,
+      "message": "Since we\u0027re using this multiple times, let\u0027s make it a `#define` like `NPCX_FLASH_TIMEOUT_MS` and then use it directly in `k_usleep` rather than creating a variable here.",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 31
+      },
+      "revId": "5b1c3e84e55a0c360a51535a7f069a21245e0d8f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
