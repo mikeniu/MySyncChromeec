@@ -94,6 +94,30 @@
       },
       "revId": "f2d50793fa92b8a3bbcf77eb12191ce13281b068",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9b85583_7a706a3f",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.overlay",
+        "patchSetId": 15
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-15T15:45:15Z",
+      "side": 1,
+      "message": "image I checked must have been missing the CBI patch just build again and it looks right\n```\nWP_RO                      00000000    00080000    00080000\n  CBI                        0007f000    00080000    00001000\n    ROLLBACK0                  00080000    00080000    00000000\n    ROLLBACK1                  00080000    00080000    00000000  // DUPLICATE",
+      "parentUuid": "630f3edd_2d0fdb09",
+      "range": {
+        "startLine": 34,
+        "startChar": 11,
+        "endLine": 34,
+        "endChar": 18
+      },
+      "revId": "f2d50793fa92b8a3bbcf77eb12191ce13281b068",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
