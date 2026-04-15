@@ -254,6 +254,41 @@ ZTEST_USER(rts54xx, test_irq)
 				   IRQ_TEST_TIMEOUT_MS));
 }
 
+ZTEST_USER(rts54xx, test_usb_comm_capable_as_device)
+{
+	uint32_t idh;
+	union get_vdo_t vdo_req;
+	uint8_t vdo_type = VDO_INDEX_IDH;
+
+	vdo_req.raw_value = 0;
+	vdo_req.num_vdos = 1;
+	vdo_req.vdo_origin = 0; /* PDC origin */
+
+	/* Trigger re-init of the driver because it was already initialized at
+	 * boot, but emulator state was wiped by rts54xx_before_test.
+	 */
+	zassert_ok(pdc_reset(dev));
+	zassert_ok(pdc_reset(dev2));
+
+	/* Wait for driver to finish initialization */
+	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_ok(emul_pdc_idle_wait(emul2));
+
+	/* Verify port 0 (pdc_emul1) has USB Device bit set (bit 30) */
+	zassert_ok(pdc_get_vdo(dev, vdo_req, &vdo_type, &idh));
+	/* Wait for command to complete */
+	k_sleep(K_MSEC(500));
+	zassert_true(idh & BIT(30),
+							"IDH VDO should have USB Device bit set (0x%08x)", idh);
+
+	/* Verify port 1 (pdc_emul2) does not have USB Device bit set (bit 30) */
+	zassert_ok(pdc_get_vdo(dev2, vdo_req, &vdo_type, &idh));
+	/* Wait for command to complete */
+	k_sleep(K_MSEC(500));
+	zassert_false(idh & BIT(30),
+								"IDH VDO should not have USB Device bit set (0x%08x)", idh);
+}
+
 ZTEST_USER(rts54xx, test_alert_received)
 {
 	uint32_t ado = 0;
