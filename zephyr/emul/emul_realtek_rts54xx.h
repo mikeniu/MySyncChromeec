@@ -264,6 +264,14 @@ union rts54_request {
 		uint8_t vdo_type[7];
 	} get_vdo;
 
+	struct set_vdo_req {
+		struct rts54_subcommand_header header;
+		uint8_t port_num;
+		union get_vdo_t vdo_req;
+		uint8_t vdo_index;
+		uint32_t vdo_value;
+	} set_vdo;
+
 	struct get_ic_status_req {
 		uint8_t command_code;
 		uint8_t data_len;
