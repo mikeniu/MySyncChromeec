@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "378afcd0_baf489fd",
+        "filename": "zephyr/test/hwtest/src/flash_physical.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-15T22:30:28Z",
+      "side": 1,
+      "message": "Can you add a comment that this leaves the state locked until a reset and must remain as the last test?",
+      "range": {
+        "startLine": 168,
+        "startChar": 0,
+        "endLine": 168,
+        "endChar": 55
+      },
+      "revId": "920d44805834974177f778c4eb9cf4bb86d64d4d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
