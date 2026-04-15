@@ -22,6 +22,30 @@
       },
       "revId": "1cbb0419c78b22b7d023c9b64573dff3fd13850c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0cd15650_f1d3fa8d",
+        "filename": "zephyr/zmake/zmake/__main__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-15T17:41:29Z",
+      "side": 1,
+      "message": "Cool, squashed, dropping this.",
+      "parentUuid": "dda2174b_3893e827",
+      "range": {
+        "startLine": 352,
+        "startChar": 27,
+        "endLine": 352,
+        "endChar": 32
+      },
+      "revId": "1cbb0419c78b22b7d023c9b64573dff3fd13850c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
