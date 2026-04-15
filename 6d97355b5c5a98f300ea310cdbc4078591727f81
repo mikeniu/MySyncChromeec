@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e63d6537_1b2a459d",
+        "filename": "zephyr/zmake/zmake/__main__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-15T17:23:44Z",
+      "side": 1,
+      "message": "You need to run `zmake generate-readme`.",
+      "range": {
+        "startLine": 354,
+        "startChar": 0,
+        "endLine": 354,
+        "endChar": 24
+      },
+      "revId": "6d97355b5c5a98f300ea310cdbc4078591727f81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
