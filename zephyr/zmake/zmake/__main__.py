@@ -351,6 +351,13 @@ def add_common_configure_args(sub_parser: argparse.ArgumentParser):
         dest="cmake_trace",
     )
     sub_parser.add_argument(
+        "--cmake-graph",
+        action="store_true",
+        default=False,
+        dest="cmake_graph",
+        help="Create a cmake-graph.dot file to trace dependencies",
+    )
+    sub_parser.add_argument(
         "-B",
         "--build-dir",
         type=pathlib.Path,
