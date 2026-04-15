@@ -21,3 +21,23 @@ config IMVP_FACTORY_UPDATE
 	help
 	  Support update of RT3645 IMVP registers during system boot.
 endif
+
+config IMVP_RTQ3700FH
+	bool
+	default y if DT_HAS_RICHTEK_RTQ3700FH_ENABLED
+	help
+	  Enable support for richtek RTQ3700FH IMVP.
+
+if IMVP_RTQ3700FH
+
+config IMVP_RTQ3700FH_CONSOLE
+	bool "Enable IMVP RTQ3700FH console"
+	help
+	  Support accessing RTQ3700FH IMVP registers through console commands.
+
+config IMVP_FACTORY_UPDATE
+	bool "Support imvp update in factory"
+	depends on AP_PWRSEQ_DRIVER
+	help
+	  Support update of RTQ3700FH IMVP registers during system boot.
+endif
