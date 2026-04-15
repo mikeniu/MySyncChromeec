@@ -1,0 +1,24 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: Richtek RTQ3700FH IMVP9.3 Controller
+
+include: i2c-device.yaml
+
+compatible: "richtek,rtq3700fh"
+
+properties:
+  enable-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      Power supply control for RTQ3700FH (zephyr standard GPIO format)
+      
+  update-data:
+    type: array
+    required: true
+    description: |
+      Array of RTQ3700FH_UPDATE_ENTRY() entries. 
+      Each entry is a 32-bit integer packed with [page (8-bit), reg (8-bit), val (16-bit)] 
+      to configure the PMBus/NVM registers.
