@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9bf119bd_20b35378",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-15T11:38:49Z",
+      "side": 1,
+      "message": "Move this after the anti-spoofing check.",
+      "revId": "5bde27c280f24d56f1b07d4bccb98f7912f0f622",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
