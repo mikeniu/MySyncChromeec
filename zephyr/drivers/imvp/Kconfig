@@ -3,21 +3,33 @@
 # found in the LICENSE file.
 
 config IMVP_RT3645
-	bool
+	bool "Enable support for richtek RT3645 IMVP"
 	default y if DT_HAS_RICHTEK_RT3645_ENABLED
 	help
 	  Enable support for richtek RT3645 IMVP.
 
-if IMVP_RT3645
+config IMVP_RTQ3700FH
+	bool "Enable support for richtek RTQ3700FH IMVP"
+	default y if DT_HAS_RICHTEK_RTQ3700FH_ENABLED
+	help
+	  Enable support for richtek RTQ3700FH IMVP.
 
 config IMVP_RT3645_CONSOLE
 	bool "Enable IMVP RT3645 console"
+	depends on IMVP_RT3645
 	help
 	  Support accessing RT3645 IMVP registers through console commands.
+
+config IMVP_RTQ3700FH_CONSOLE
+	bool "Enable IMVP RTQ3700FH console"
+	depends on IMVP_RTQ3700FH
+	help
+	  Support accessing RTQ3700FH IMVP registers through console commands.
 
 config IMVP_FACTORY_UPDATE
 	bool "Support imvp update in factory"
 	depends on AP_PWRSEQ_DRIVER
+	depends on IMVP_RT3645 || IMVP_RTQ3700FH
+	default y
 	help
-	  Support update of RT3645 IMVP registers during system boot.
-endif
+	  Support update of IMVP registers during system boot.
