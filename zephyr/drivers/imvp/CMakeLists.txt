@@ -3,3 +3,4 @@
 # found in the LICENSE file.
 
 zephyr_library_sources_ifdef(CONFIG_IMVP_RT3645 "rt3645.c")
+zephyr_library_sources_ifdef(CONFIG_IMVP_RTQ3700FH "rtq3700fh.c")
