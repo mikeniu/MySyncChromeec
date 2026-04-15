@@ -128,6 +128,30 @@
       },
       "revId": "3489bc7e9cc914902d90ae656f098e589f82876d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a00f4b4c_83bb3bbb",
+        "filename": "zephyr/program/atria/rvp_keyboard.dtsi",
+        "patchSetId": 15
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-15T15:20:53Z",
+      "side": 1,
+      "message": "Hmm I thought I deleted it fixed in new push",
+      "parentUuid": "b3bb4d66_ef1fed5d",
+      "range": {
+        "startLine": 1,
+        "startChar": 13,
+        "endLine": 1,
+        "endChar": 17
+      },
+      "revId": "3489bc7e9cc914902d90ae656f098e589f82876d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
