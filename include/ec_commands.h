@@ -1790,6 +1790,10 @@ enum ec_feature_code {
 	 * Support signaling new console logs via host event
 	 */
 	EC_FEATURE_CONSOLE_LOG_EVENT = 58,
+	/*
+	 * The EC supports a power monitors
+	 */
+	EC_FEATURE_PWRMON = 59,
 };
 
 #define EC_FEATURE_MASK_0(event_code) BIT(event_code % 32)
@@ -4180,6 +4184,9 @@ enum ec_mkbp_event {
 	/* Peripheral device charger event */
 	EC_MKBP_EVENT_PCHG = 12,
 
+	/* Power monitor telemetry event */
+	EC_MKBP_EVENT_PWRMON = 13,
+
 	/* Number of MKBP events */
 	EC_MKBP_EVENT_COUNT,
 };
@@ -4201,6 +4208,7 @@ BUILD_ASSERT(EC_MKBP_EVENT_COUNT <= EC_MKBP_EVENT_TYPE_MASK);
 		[EC_MKBP_EVENT_DP_ALT_MODE_ENTERED] = "DP_ALT_MODE_ENTERED",   \
 		[EC_MKBP_EVENT_ONLINE_CALIBRATION] = "ONLINE_CALIBRATION",     \
 		[EC_MKBP_EVENT_PCHG] = "PCHG",                                 \
+		[EC_MKBP_EVENT_PWRMON] = "PWRMON",                             \
 	}
 /* clang-format on */
 
@@ -4227,6 +4235,12 @@ union __ec_align_offset1 ec_response_get_next_data {
 
 	/* CEC events from enum mkbp_cec_event */
 	uint32_t cec_events;
+
+	struct __ec_todo_packed {
+		uint8_t channel_id;
+		uint32_t samples;
+		int64_t value;
+	} pwrmon_data;
 };
 
 union __ec_align_offset1 ec_response_get_next_data_v1 {
@@ -4254,6 +4268,12 @@ union __ec_align_offset1 ec_response_get_next_data_v1 {
 	uint32_t cec_events;
 
 	uint8_t cec_message[16];
+
+	struct __ec_todo_packed {
+		uint8_t channel_id;
+		uint32_t samples;
+		int64_t value;
+	} pwrmon_data;
 };
 BUILD_ASSERT(sizeof(union ec_response_get_next_data_v1) == 16);
 
@@ -4282,6 +4302,12 @@ union __ec_align_offset1 ec_response_get_next_data_v3 {
 	uint32_t cec_events;
 
 	uint8_t cec_message[16];
+
+	struct __ec_todo_packed {
+		uint8_t channel_id;
+		uint32_t samples;
+		int64_t value;
+	} pwrmon_data;
 };
 BUILD_ASSERT(sizeof(union ec_response_get_next_data_v3) == 18);
 
@@ -9409,6 +9435,69 @@ struct ec_response_battery_get_misc_info {
 	uint32_t battery_status;
 	int32_t dfet_status;
 } __ec_align4;
+
+/**
+ * Power monitoring. Used to read power consumptions on rails
+ */
+#define EC_CMD_PWRMON 0x0608
+
+enum ec_pwrmon_cmd {
+	EC_PWRMON_GET_CHANNEL_COUNT = 0,
+	EC_PWRMON_DUMP_INFO = 1,
+	EC_PWRMON_SET_RATE = 2,
+	EC_PWRMON_GET_RATE = 3,
+	EC_PWRMON_START = 4,
+	EC_PWRMON_STOP = 5,
+	EC_PWRMON_LATCH = 6,
+};
+
+struct ec_params_pwrmon {
+	uint8_t cmd;
+	union {
+		uint16_t set_rate;
+		uint8_t channel_id;
+	} __ec_align2;
+
+	/*
+	 * The following commands have no args:
+	 *
+	 * start, stop, latch
+	 *
+	 */
+} __ec_align4;
+
+struct pwrmon_get_rate {
+	uint16_t rate;
+} __ec_align4;
+
+struct pwrmon_channel_info {
+	int8_t channel_id;
+	uint32_t samples;
+	int64_t value;
+} __ec_align4;
+
+struct pwrmon_channels_info {
+	struct pwrmon_channel_info channel_info[4];
+} __ec_align4;
+
+struct pwrmon_get_channel_count {
+	uint8_t count;
+} __ec_align2;
+
+struct pwrmon_dump_info {
+	uint8_t channel_id;
+	char channel_name[32];
+} __ec_align4;
+
+struct ec_response_pwrmon {
+	union {
+		struct pwrmon_get_rate get_rate;
+		struct pwrmon_channels_info channels_info;
+		struct pwrmon_get_channel_count channel_count;
+		struct pwrmon_dump_info dump_info;
+	} __ec_align4;
+} __ec_align4;
+
 /*****************************************************************************/
 /*
  * Reserve a range of host commands for board-specific, experimental, or
