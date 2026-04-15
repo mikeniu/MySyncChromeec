@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e88a05cb_8480491f",
+        "filename": "zephyr/program/atria/atriarvp-rtk/keyboard.dtsi",
+        "patchSetId": 15
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-15T15:18:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "632168c3_b89f067c",
+      "revId": "3489bc7e9cc914902d90ae656f098e589f82876d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "350f586f_3dd62b10",
@@ -41,6 +59,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7dee74d6_229559e5",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.overlay",
+        "patchSetId": 15
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-15T15:18:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "350f586f_3dd62b10",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 23
+      },
+      "revId": "3489bc7e9cc914902d90ae656f098e589f82876d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b3bb4d66_ef1fed5d",
@@ -54,6 +96,30 @@
       "writtenOn": "2026-04-09T21:22:21Z",
       "side": 1,
       "message": "Wrong year.\n\nAlso consider moving this file under the atriarvp-rtk directory.  We\u0027re not currently planning on supporting other ECs on this board.",
+      "range": {
+        "startLine": 1,
+        "startChar": 13,
+        "endLine": 1,
+        "endChar": 17
+      },
+      "revId": "3489bc7e9cc914902d90ae656f098e589f82876d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93ac6e46_106e082f",
+        "filename": "zephyr/program/atria/rvp_keyboard.dtsi",
+        "patchSetId": 15
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-15T15:18:47Z",
+      "side": 1,
+      "message": "This is now a duplicate file?",
+      "parentUuid": "b3bb4d66_ef1fed5d",
       "range": {
         "startLine": 1,
         "startChar": 13,
