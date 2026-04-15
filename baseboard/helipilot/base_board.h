@@ -285,7 +285,7 @@
 #define CONFIG_ROLLBACK_MPU_PROTECT
 
 #undef CONFIG_ROLLBACK_VERSION
-#define CONFIG_ROLLBACK_VERSION 1
+#define CONFIG_ROLLBACK_VERSION 0
 
 /*
  * We do not use any "locally" generated entropy: this is normally used

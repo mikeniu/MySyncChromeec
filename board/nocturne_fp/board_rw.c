@@ -33,7 +33,7 @@ int console_is_restricted(void)
 #include "gpio_list.h"
 
 /* Check if CONFIG_ROLLBACK_VERSION is set to expected value */
-BUILD_ASSERT(CONFIG_ROLLBACK_VERSION == 1);
+BUILD_ASSERT(CONFIG_ROLLBACK_VERSION == 0);
 
 /* SPI devices */
 struct spi_device_t spi_devices[] = {
