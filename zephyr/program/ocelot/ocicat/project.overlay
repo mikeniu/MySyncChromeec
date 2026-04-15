@@ -29,6 +29,7 @@
 #include "ocicat_ec_ufsc.dtsi"
 #include "leds_pins.dtsi"
 #include "led_policy.dtsi"
+#include "imvp.dtsi"
 
 /*
  * Map GPIOs used for interrupts to common names
