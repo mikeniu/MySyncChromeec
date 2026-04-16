@@ -16,6 +16,23 @@
       "message": "In line with the comment at\n[9106841/comments](https://chrome-internal-review.googlesource.com/c/chromeos/vendor/fingerprint/egis/+/9106841/comments/f3469aa8_53960721),\nthe cast from (FP_EGIS_IMAGE *) has been moved to the upper layer.",
       "revId": "5cceea8d8c4f3c54e28ac83a55d1f2fef442d2fe",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4dd1d04_8f6d8eaf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-16T16:10:00Z",
+      "side": 1,
+      "message": "can this be separated into 2 different CLs? The title and the commit message body do not match. It is slightly awkward.",
+      "revId": "5cceea8d8c4f3c54e28ac83a55d1f2fef442d2fe",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
