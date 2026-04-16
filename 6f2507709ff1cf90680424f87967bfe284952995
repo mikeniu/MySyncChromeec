@@ -16,6 +16,23 @@
       "message": "I need to check the driver on hardware now.",
       "revId": "6f2507709ff1cf90680424f87967bfe284952995",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "89b4c383_cb3ba0f0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-16T11:51:21Z",
+      "side": 1,
+      "message": "Johnny, I can see logs like:\n```\n[59.063000] \u003cinf\u003e elan_flash_wp: flash_em32_write_protect_2_disable wp2 was not protected.\n[59.071000] \u003cinf\u003e elan_flash_wp: flash_em32_write_protect_1: offset\u003d0x0, page_count\u003d16.\n[59.080000] \u003cinf\u003e elan_flash_wp: Target protected \u003d false.\n```\nPlease do not add them. It\u0027s probably comming from the private lib.",
+      "revId": "6f2507709ff1cf90680424f87967bfe284952995",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
