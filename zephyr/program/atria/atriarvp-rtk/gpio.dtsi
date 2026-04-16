@@ -93,6 +93,9 @@
 		gpio_ec_pch_wake_odl: ec-pg3-wake-3v3-pp {
 			gpios = <RTS5912_GPIO131 GPIO_OUTPUT>;
 		};
+		pwr-sys-rst {
+			gpios = <RTS5912_GPIO102 (GPIO_ACTIVE_LOW|GPIO_OPEN_DRAIN)>;
+		};
 	};
 
 	gpio-interrupts {
