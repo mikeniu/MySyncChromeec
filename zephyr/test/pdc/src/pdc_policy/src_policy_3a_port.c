@@ -906,6 +906,17 @@ ZTEST_USER_F(src_policy, test_src_policy_early_frs_enable_src_only)
 	zassert_false(frs_enabled);
 }
 
+/* Verify PDC reports 15W Max PDP on boards with 3A ports. */
+ZTEST_USER_F(src_policy, test_src_max_pdp)
+{
+	enum max_pdp_t max_pdp;
+
+	zassert_ok(emul_pdc_get_max_pdp(fixture->emul_pdc[TEST_USBC_PORT0],
+					&max_pdp));
+	zassert_equal(MAX_PDP_15W, max_pdp,
+		      "Expected max PDP to be 15W, got %d", max_pdp);
+}
+
 /* On systems with TBT support, verify the device issues a reset after
  */
 ZTEST_USER_F(src_policy, test_src_policy_tbt_reset)
