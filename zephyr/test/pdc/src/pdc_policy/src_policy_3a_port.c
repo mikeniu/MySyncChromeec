@@ -906,6 +906,7 @@ ZTEST_USER_F(src_policy, test_src_policy_early_frs_enable_src_only)
 	zassert_false(frs_enabled);
 }
 
+<<<<<<< HEAD   (f32cc77bcb523beb855705a0040aa118d67aa02d battery: Add kconfig to handle NULLs in manuf name)
 /* On systems with TBT support, verify the device issues a reset after
  */
 ZTEST_USER_F(src_policy, test_src_policy_tbt_reset)
@@ -1015,4 +1016,16 @@ ZTEST_USER_F(src_policy, test_src_policy_tbt_reset)
 	/* Disconnect non-DRP partner */
 	zassert_ok(emul_pdc_disconnect(fixture->emul_pdc[TEST_USBC_PORT0]));
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+||||||| BASE   (e6b22e13d951fcb2917e632e3a00a4f21660d904 ocelotrvp: Derive board_id from SKU ID)
+=======
+/* Verify PDC reports 15W Max PDP on boards with 3A ports. */
+ZTEST_USER_F(src_policy, test_src_max_pdp)
+{
+	enum max_pdp_t max_pdp;
+
+	zassert_ok(emul_pdc_get_max_pdp(fixture->emul_pdc[TEST_USBC_PORT0],
+					&max_pdp));
+	zassert_equal(MAX_PDP_15W, max_pdp,
+		      "Expected max PDP to be 15W, got %d", max_pdp);
+>>>>>>> CHANGE (2d5a1cffce4e5ac8a39442cb3b764d2d5e1cf794 pdc: Set Max PDP based on 3A port config)
 }
