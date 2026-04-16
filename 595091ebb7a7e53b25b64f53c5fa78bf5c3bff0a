@@ -281,6 +281,24 @@
       "parentUuid": "4847bb58_7d8a7c23",
       "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "65105028_1a143964",
+        "filename": "zephyr/subsys/usbd_service/usbd_init.c",
+        "patchSetId": 54
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-16T10:23:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6f5fb20_5fb9986e",
+      "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
