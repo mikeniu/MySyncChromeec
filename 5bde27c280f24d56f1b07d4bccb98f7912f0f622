@@ -34,6 +34,24 @@
       "parentUuid": "9bf119bd_20b35378",
       "revId": "5bde27c280f24d56f1b07d4bccb98f7912f0f622",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e20182ed_6cf630a4",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-16T10:09:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "96e4834b_30bed1e7",
+      "revId": "5bde27c280f24d56f1b07d4bccb98f7912f0f622",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
