@@ -391,6 +391,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "baad52d4_3b2c827e",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-16T12:49:42Z",
+      "side": 1,
+      "message": "I thought about it and IMO it would be good to add additional protection_lock variable that would differentiate _AT_BOOT and _NOW flags  (protection_lock \u003d true + actual protection \u003d _NOW). Maybe for the consistency reason with other applications and the same logic on the host side. Can you add this?",
+      "parentUuid": "5e3f732e_b573d9d8",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2b2255d0_781c322e",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 7
