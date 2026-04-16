@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d79b07a6_9f0e2868",
+        "filename": "zephyr/program/fpmcu/ft9001/chobienia.dts",
+        "patchSetId": 54
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-16T10:22:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1ea5da6b_2ca82702",
+      "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "db1cbac2_7a60da3f",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Confirmed, it\u0027s correct.",
       "parentUuid": "db1cbac2_7a60da3f",
+      "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea0dabfe_273e0588",
+        "filename": "zephyr/program/fpmcu/ft9001/chudow.dts",
+        "patchSetId": 54
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-16T10:22:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87807e3d_c33bc580",
       "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -141,6 +177,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d91c340_1d50ea3b",
+        "filename": "zephyr/program/fpmcu/ft9001/src/config_page.c",
+        "patchSetId": 54
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-16T10:22:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "36a6bd90_e7aabca5",
+      "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "948a6b10_249f9818",
@@ -172,6 +226,24 @@
       "side": 1,
       "message": "Yes, it\u0027s correct.",
       "parentUuid": "948a6b10_249f9818",
+      "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b6a42f7_40659536",
+        "filename": "zephyr/program/fpmcu/ft9001/src/config_page.c",
+        "patchSetId": 54
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-16T10:22:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "448fdd1c_31a96d97",
       "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
