@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a63f2842_5489740b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-04-16T16:03:35Z",
+      "side": 1,
+      "message": "dedede",
+      "range": {
+        "startLine": 11,
+        "startChar": 45,
+        "endLine": 11,
+        "endChar": 51
+      },
+      "revId": "662f660f8a23fc1154ec588a969e7e00f30b014b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfc698f0_aa9d526c",
+        "filename": "baseboard/dedede/baseboard.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-04-16T16:03:35Z",
+      "side": 1,
+      "message": "I\u0027m not sure if this is the correct value for all. It was empirically picked for IT8320, however for non-IT8320 boards, it could be different...",
+      "range": {
+        "startLine": 253,
+        "startChar": 36,
+        "endLine": 253,
+        "endChar": 39
+      },
+      "revId": "662f660f8a23fc1154ec588a969e7e00f30b014b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
