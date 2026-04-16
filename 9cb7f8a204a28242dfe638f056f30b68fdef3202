@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "102be734_8c81e059",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1525237
+      },
+      "writtenOn": "2026-04-16T04:11:02Z",
+      "side": 1,
+      "message": "+Ivan for vis, since this CL will disable pdc update console log.",
+      "revId": "9cb7f8a204a28242dfe638f056f30b68fdef3202",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
