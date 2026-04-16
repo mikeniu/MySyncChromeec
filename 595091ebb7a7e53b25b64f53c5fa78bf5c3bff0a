@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1ea5da6b_2ca82702",
+        "filename": "zephyr/program/fpmcu/ft9001/chobienia.dts",
+        "patchSetId": 54
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-16T03:31:09Z",
+      "side": 1,
+      "message": "Confirmed, it\u0027s correct.",
+      "parentUuid": "a30d008c_6746d005",
+      "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "db1cbac2_7a60da3f",
         "filename": "zephyr/program/fpmcu/ft9001/chudow.dts",
         "patchSetId": 54
