@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "65ff3bea_dfc54030",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-16T10:20:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70c0a005_0dffd547",
+      "revId": "7c4a3a90bb6cad2fdbb60794d9a66bda611f504f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "785d7753_2c02210b",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Fixed.",
       "parentUuid": "785d7753_2c02210b",
+      "revId": "7c4a3a90bb6cad2fdbb60794d9a66bda611f504f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "633471b5_fc0c06ca",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-16T10:20:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b952951b_978b38d6",
       "revId": "7c4a3a90bb6cad2fdbb60794d9a66bda611f504f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -172,6 +208,24 @@
       "side": 1,
       "message": "What is the value of ret for this error?",
       "parentUuid": "622b0d1f_4756b130",
+      "revId": "7c4a3a90bb6cad2fdbb60794d9a66bda611f504f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9dfd3dd2_c5709d62",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-16T10:20:09Z",
+      "side": 1,
+      "message": "https://github.com/focaltech-3545/zephyr-ft9001-public/blob/main/focaltech/drivers/flash/flash_ft_ft90.c#L635 it\u0027s hitting this if. The mask is zeroed so there shouldn\u0027t be any actions performed for this register(SR2).",
+      "parentUuid": "6afab8d8_861c8b75",
       "revId": "7c4a3a90bb6cad2fdbb60794d9a66bda611f504f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
