@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "399d04dd_bd2eebaa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-16T11:57:06Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by Spellchecker: \"projct\" is a possible misspelling of \"project\".\n\nTo bypass Spellchecker, add a ...\n\n\"projct\" is a possible misspelling of \"project\".\n\nTo bypass Spellchecker, add a footer with DISABLE_SPELLCHECKER",
+      "range": {
+        "startLine": 9,
+        "startChar": 60,
+        "endLine": 9,
+        "endChar": 66
+      },
+      "revId": "52f79673f989127f43c6697ac875a450eb42c889",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
