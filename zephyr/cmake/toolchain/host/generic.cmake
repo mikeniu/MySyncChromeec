@@ -30,7 +30,18 @@ if(TOOLCHAIN_VARIANT_COMPILER STREQUAL "gnu" OR
   message(STATUS "Found toolchain: host ${ARCH} (gcc/ld)")
 elseif(TOOLCHAIN_VARIANT_COMPILER STREQUAL "llvm")
   set(TOOLCHAIN_KCONFIG_DIR ${TOOLCHAIN_ROOT}/cmake/toolchain/host/llvm)
-  include("${TOOLCHAIN_ROOT}/cmake/toolchain/llvm/generic.cmake")
+
+  set(COMPILER clang)
+  set(LINKER lld)
+  set(BINTOOLS llvm)
+
+  if("${ARCH}" STREQUAL "posix")
+  set(LINKER ld)
+  endif()
+
+  set(TOOLCHAIN_HAS_LIBCXX ON CACHE BOOL "True if toolchain supports libc++")
+
+  set(TOOLCHAIN_VARIANT_COMPILER llvm CACHE STRING "Variant compiler being used")
 else()
   message(FATAL_ERROR "Unsupported TOOLCHAIN_VARIANT_COMPILER: ${TOOLCHAIN_VARIANT_COMPILER}")
 endif()
