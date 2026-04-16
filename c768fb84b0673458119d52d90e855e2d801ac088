@@ -409,6 +409,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "06776324_06a5f521",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-16T13:04:11Z",
+      "side": 1,
+      "message": "Sure, I can add this.\nJust to clarify—do you mean introducing a `protection_lock` variable to replace `write_protect_is_asserted()`? Then protection_lock variable is true + actual protection \u003d *_NOW.\n\nIn that case, how should the `protection_lock \u003d false` scenario be handled? Or is it intended to always be true without additional conditions?\n\n```\nif (write_protect_is_asserted()) {\n//set flag to *_NOW\n}\n```",
+      "parentUuid": "baad52d4_3b2c827e",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2b2255d0_781c322e",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 7
