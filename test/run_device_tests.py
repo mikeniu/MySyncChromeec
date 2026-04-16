@@ -1071,6 +1071,19 @@ class AllTests:
                 )
             )
 
+        # Run flash_protection_rw test for all boards and RO versions.
+        for variant_name, variant_info in board_config.variants.items():
+            tests.append(
+                TestConfig(
+                    config_name=f"flash_protection_rw_{variant_name}",
+                    test_name="flash_protection_rw",
+                    enable_hw_write_protect=True,
+                    skip_for_ec_legacy=True,
+                    ro_image=variant_info.get("ro_image_path"),
+                    build_board=variant_info.get("build_board"),
+                )
+            )
+
         return tests
 
     @staticmethod
