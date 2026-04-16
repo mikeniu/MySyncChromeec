@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ac7038e_98c989fc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000039
+      },
+      "writtenOn": "2026-04-16T18:58:56Z",
+      "side": 1,
+      "message": "I looks like the image was not rebuilt because there were no source code changes. I just added a noop source file change to see if this makes a difference.",
+      "revId": "3f8087e1e9a5c94e609d493acb3b15b6dd503989",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
