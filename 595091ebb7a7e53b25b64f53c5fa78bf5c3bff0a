@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "87807e3d_c33bc580",
+        "filename": "zephyr/program/fpmcu/ft9001/chudow.dts",
+        "patchSetId": 54
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-16T03:32:00Z",
+      "side": 1,
+      "message": "Confirmed, it\u0027s correct.",
+      "parentUuid": "db1cbac2_7a60da3f",
+      "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "19342a98_25e77d68",
         "filename": "zephyr/program/fpmcu/ft9001/soc.dtsi",
         "patchSetId": 54
