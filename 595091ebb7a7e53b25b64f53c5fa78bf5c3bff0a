@@ -107,6 +107,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "36a6bd90_e7aabca5",
+        "filename": "zephyr/program/fpmcu/ft9001/src/config_page.c",
+        "patchSetId": 54
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-16T05:47:34Z",
+      "side": 1,
+      "message": "Confirmed, it\u0027s fine.",
+      "parentUuid": "ed9ddfc7_635f605e",
+      "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "948a6b10_249f9818",
         "filename": "zephyr/program/fpmcu/ft9001/src/config_page.c",
         "patchSetId": 54
@@ -118,6 +136,24 @@
       "writtenOn": "2026-04-15T09:11:28Z",
       "side": 1,
       "message": "@wangyong@focaltech.corp-partner.google.com are the spi_flash_param correct?",
+      "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "448fdd1c_31a96d97",
+        "filename": "zephyr/program/fpmcu/ft9001/src/config_page.c",
+        "patchSetId": 54
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-16T05:47:34Z",
+      "side": 1,
+      "message": "Yes, it\u0027s correct.",
+      "parentUuid": "948a6b10_249f9818",
       "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
