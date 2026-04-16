@@ -102,6 +102,24 @@
       "message": "I\u0027m getting \n```\n--wrong value\n```\nerror while trying to write to SR2, even though the mask is zeroed.",
       "revId": "7c4a3a90bb6cad2fdbb60794d9a66bda611f504f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "622b0d1f_4756b130",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-16T01:56:12Z",
+      "side": 1,
+      "message": "Ok, I\u0027ll check this.",
+      "parentUuid": "f03369d8_2eb94481",
+      "revId": "7c4a3a90bb6cad2fdbb60794d9a66bda611f504f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
