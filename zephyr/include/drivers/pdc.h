@@ -185,6 +185,14 @@ enum pdc_power_policy {
 	PDC_POWER_POLICY_SOURCE_DISALLOW_SWAP,
 };
 
+/**
+ * Used to define device maximum source PDP
+ */
+enum max_pdp_t {
+	MAX_PDP_7_5W,
+	MAX_PDP_15W,
+};
+
 /** Helper macro to set the policy to sink and allow or disallow external swaps
  *  based on a boolean argument.
  */
@@ -290,6 +298,8 @@ typedef int (*pdc_set_battery_capability_t)(const struct device *dev,
 typedef int (*pdc_set_battery_status_t)(const struct device *dev,
 					union battery_status_t *bstat);
 typedef int (*pdc_set_bbr_cts_t)(const struct device *dev, bool enable);
+typedef int (*pdc_set_max_pdp_t)(const struct device *dev,
+				 enum max_pdp_t max_pdp);
 
 /**
  * @cond INTERNAL_HIDDEN
@@ -344,6 +354,7 @@ __subsystem struct pdc_driver_api {
 	pdc_set_battery_capability_t set_battery_capability;
 	pdc_set_battery_status_t set_battery_status;
 	pdc_set_bbr_cts_t set_bbr_cts;
+	pdc_set_max_pdp_t set_max_pdp;
 };
 /**
  * @endcond
@@ -1619,6 +1630,19 @@ static inline int pdc_set_bbr_cts(const struct device *dev, bool enable)
 	}
 
 	return api->set_bbr_cts(dev, enable);
+}
+
+static inline int pdc_set_max_pdp(const struct device *dev,
+				  enum max_pdp_t max_pdp)
+{
+	const struct pdc_driver_api *api =
+		(const struct pdc_driver_api *)dev->api;
+
+	if (api->set_max_pdp == NULL) {
+		return -ENOSYS;
+	}
+
+	return api->set_max_pdp(dev, max_pdp);
 }
 
 #ifdef __cplusplus

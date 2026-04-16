@@ -130,6 +130,8 @@ typedef int (*emul_pdc_set_dead_battery_t)(const struct emul *target,
 typedef int (*emul_pdc_get_dead_battery_t)(const struct emul *target);
 typedef int (*emul_pdc_get_autoneg_sink_t)(const struct emul *target,
 					   int *max_voltage, int *max_current);
+typedef int (*emul_pdc_get_max_pdp_t)(const struct emul *target,
+				      enum max_pdp_t *max_pdp);
 
 __subsystem struct emul_pdc_driver_api {
 	emul_pdc_set_response_delay_t set_response_delay;
@@ -177,6 +179,7 @@ __subsystem struct emul_pdc_driver_api {
 	emul_pdc_get_autoneg_sink_t get_autoneg_sink;
 	emul_pdc_get_battery_capability_t get_battery_capability;
 	emul_pdc_get_battery_status_t get_battery_status;
+	emul_pdc_get_max_pdp_t get_max_pdp;
 };
 
 static inline int emul_pdc_set_ucsi_version(const struct emul *target,
@@ -929,4 +932,18 @@ static inline int emul_pdc_get_autoneg_sink(const struct emul *target,
 	return -ENOSYS;
 }
 
+static inline int emul_pdc_get_max_pdp(const struct emul *target,
+				       enum max_pdp_t *max_pdp)
+{
+	if (!target || !target->backend_api) {
+		return -ENOTSUP;
+	}
+
+	const struct emul_pdc_driver_api *api = target->backend_api;
+
+	if (api->get_max_pdp) {
+		return api->get_max_pdp(target, max_pdp);
+	}
+	return -ENOSYS;
+}
 #endif /* ZEPHYR_INCLUDE_EMUL_PDC_H_ */

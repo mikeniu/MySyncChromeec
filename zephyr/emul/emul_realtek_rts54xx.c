@@ -929,6 +929,18 @@ static int set_sys_pwr_state(struct rts5453p_emul_pdc_data *data,
 	return 0;
 }
 
+static int set_max_pdp(struct rts5453p_emul_pdc_data *data,
+		       const union rts54_request *req)
+{
+	LOG_INF("SET_MAX_PDP max_pdp=%d", req->set_max_pdp.max_pdp);
+
+	data->max_pdp = req->set_max_pdp.max_pdp;
+
+	memset(&data->response, 0, sizeof(union rts54_response));
+	send_response(data);
+
+	return 0;
+}
 struct commands {
 	uint8_t code;
 	enum {
@@ -991,6 +1003,7 @@ const struct commands sub_cmd_x08[] = {
 	{ .code = 0xAA, HANDLER_DEF(unsupported) },
 	{ .code = 0xE0, HANDLER_DEF(get_pch_data_status) },
 	{ .code = 0xE1, HANDLER_DEF(set_frs_function) },
+	{ .code = 0xE2, HANDLER_DEF(set_max_pdp) },
 };
 
 const struct commands sub_cmd_x0E[] = {
@@ -1557,6 +1570,23 @@ static int emul_realtek_rts54xx_get_ccom(const struct emul *target,
 	return 0;
 }
 
+static int emul_realtek_rts54xx_get_max_pdp(const struct emul *target,
+					    enum max_pdp_t *max_pdp)
+{
+	struct rts5453p_emul_pdc_data *data =
+		rts5453p_emul_get_pdc_data(target);
+
+	if (data->max_pdp == 7) {
+		*max_pdp = MAX_PDP_7_5W;
+	} else if (data->max_pdp == 15) {
+		*max_pdp = MAX_PDP_15W;
+	} else {
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
 static int emul_realtek_rts54xx_get_sink_path(const struct emul *target,
 					      bool *en)
 {
@@ -1857,6 +1887,7 @@ static DEVICE_API(emul_pdc, emul_realtek_rts54xx_api) = {
 	.get_dead_battery = emul_realtek_rts54xx_get_dead_battery,
 	.get_battery_capability = emul_realtek_rts54xx_get_battery_capability,
 	.get_battery_status = emul_realtek_rts54xx_get_battery_status,
+	.get_max_pdp = emul_realtek_rts54xx_get_max_pdp,
 };
 
 #define RTS5453P_EMUL_DEFINE(n)                                             \

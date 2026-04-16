@@ -183,6 +183,8 @@ enum cmd_t {
 	CMD_SET_DRS,
 	/** Set Sx App Config register (AP power state) */
 	CMD_SET_SX_APP_CONFIG,
+	/** Set Max PDP */
+	CMD_SET_MAX_PDP,
 };
 
 /**
@@ -331,6 +333,8 @@ struct pdc_data_t {
 	union reg_data raw_ucsi_cmd_data;
 	/* Current AP power state */
 	uint8_t sx_state;
+	/* Device Max PDP */
+	enum max_pdp_t max_pdp;
 };
 
 /**
@@ -364,6 +368,7 @@ static void cmd_update_retimer(struct pdc_data_t *data);
 static void cmd_get_current_pdo(struct pdc_data_t *data);
 static void cmd_is_vconn_sourcing(struct pdc_data_t *data);
 static void cmd_set_sx_app_config(struct pdc_data_t *data);
+static void cmd_set_max_pdp(struct pdc_data_t *data);
 static void task_gaid(struct pdc_data_t *data);
 static void task_srdy(struct pdc_data_t *data);
 static void task_dbfg(struct pdc_data_t *data);
@@ -974,6 +979,8 @@ static enum smf_state_result st_idle_run(void *o)
 			break;
 		case CMD_SET_SX_APP_CONFIG:
 			cmd_set_sx_app_config(data);
+		case CMD_SET_MAX_PDP:
+			cmd_set_max_pdp(data);
 		}
 	}
 
@@ -1760,6 +1767,72 @@ static void cmd_set_sx_app_config(struct pdc_data_t *data)
 	rv = tps_rw_sx_app_config(&cfg->i2c, &pdc_sx_app_config, I2C_MSG_WRITE);
 	if (rv) {
 		LOG_ERR("Write sx app config failed");
+		goto error_recovery;
+	}
+
+	/* Command has completed */
+	data->cci_event.command_completed = 1;
+	/* Inform the system of the event */
+	call_cci_event_cb(data);
+
+	/* Transition to idle state */
+	set_state(data, ST_IDLE);
+	return;
+
+error_recovery:
+	set_state(data, ST_ERROR_RECOVERY);
+}
+
+static void cmd_set_max_pdp(struct pdc_data_t *data)
+{
+	struct pdc_config_t const *cfg = data->dev->config;
+	union reg_source_cap_ext_data_block source_cap_ext;
+	union reg_source_info source_info;
+	int rv;
+
+	/* Set Max PDP fields in SIDO1, SIDO2 and SCEDB */
+	rv = tps_rw_source_cap_ext_data_block(&cfg->i2c, &source_cap_ext,
+					      I2C_MSG_READ);
+	if (rv) {
+		LOG_ERR("TI%d: Read Source Cap Ext failed (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
+
+	rv = tps_rw_source_info(&cfg->i2c, &source_info, I2C_MSG_READ);
+	if (rv) {
+		LOG_ERR("TI%d: Read Source Info failed (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
+
+	if (data->max_pdp == MAX_PDP_7_5W) {
+		source_cap_ext.source_pdp = 7;
+		source_info.maximum_pdp = 7;
+		source_info.maximum_pdp_2 = 15;
+		source_info.port_managed_garunteed = 1;
+	} else if (data->max_pdp == MAX_PDP_15W) {
+		source_cap_ext.source_pdp = 15;
+		source_info.maximum_pdp = 15;
+		source_info.maximum_pdp_2 = 30;
+		source_info.port_managed_garunteed = 0;
+	} else {
+		LOG_ERR("TI%d: Invald Max PDP", cfg->connector_number);
+		goto error_recovery;
+	}
+
+	rv = tps_rw_source_cap_ext_data_block(&cfg->i2c, &source_cap_ext,
+					      I2C_MSG_WRITE);
+	if (rv) {
+		LOG_ERR("TI%d: Write Source Cap Ext failed (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
+
+	rv = tps_rw_source_info(&cfg->i2c, &source_info, I2C_MSG_WRITE);
+	if (rv) {
+		LOG_ERR("TI%d: Write Source Info failed (%d)",
+			cfg->connector_number, rv);
 		goto error_recovery;
 	}
 
@@ -2799,6 +2872,13 @@ static int tps_set_ap_power_state(const struct device *dev,
 	return tps_post_command(dev, CMD_SET_SX_APP_CONFIG, NULL);
 }
 
+static int tps_set_max_pdp(const struct device *dev, enum max_pdp_t max_pdp)
+{
+	struct pdc_data_t *data = dev->data;
+	data->max_pdp = max_pdp;
+	return tps_post_command(dev, CMD_SET_MAX_PDP, NULL);
+}
+
 static int tps_execute_ucsi_cmd(const struct device *dev, uint8_t ucsi_command,
 				uint8_t data_size, uint8_t *command_specific,
 				uint8_t *lpm_data_out,
@@ -2878,6 +2958,7 @@ static DEVICE_API(pdc, pdc_driver_api) = {
 	.set_sbu_mux_mode = tps_set_sbu_mux_mode,
 	.get_sbu_mux_mode = tps_get_sbu_mux_mode,
 	.set_ap_power_state = tps_set_ap_power_state,
+	.set_max_pdp = tps_set_max_pdp,
 };
 
 static void pdc_interrupt_callback(const struct device *dev,

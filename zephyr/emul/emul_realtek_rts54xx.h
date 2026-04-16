@@ -328,6 +328,11 @@ union rts54_request {
 		uint8_t port_num;
 		union battery_status_t bstat;
 	} __packed set_battery_status;
+	struct set_max_pdp_req {
+		struct rts54_subcommand_header header;
+		uint8_t reserved;
+		uint8_t max_pdp;
+	} set_max_pdp;
 };
 
 union rts54_response {
@@ -577,6 +582,7 @@ struct rts5453p_emul_pdc_data {
 	/** PDC feature flags */
 	ATOMIC_DEFINE(features, EMUL_PDC_FEATURE_COUNT);
 	int dead_battery;
+	uint8_t max_pdp;
 };
 
 /**
