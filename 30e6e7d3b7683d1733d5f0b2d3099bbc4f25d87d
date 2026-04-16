@@ -16,6 +16,24 @@
       "message": "could you move this to a separate paragraph since the serial JTAG\nconfig is not related to image tool?",
       "revId": "30e6e7d3b7683d1733d5f0b2d3099bbc4f25d87d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3208d418_3bd30adb",
+        "filename": "zephyr/boards/google/realtek/realtek_rts5912_defconfig",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-16T16:16:57Z",
+      "side": 1,
+      "message": "Lets get this fix merged.",
+      "parentUuid": "3b095ae1_fed1311e",
+      "revId": "30e6e7d3b7683d1733d5f0b2d3099bbc4f25d87d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
