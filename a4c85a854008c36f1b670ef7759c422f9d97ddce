@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9505561b_200f849d",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1086,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-16T22:51:52Z",
+      "side": 1,
+      "message": "@tomhughes@chromium.org\n\nI tried to create the EC RO variations. However, the test does not run because ztest is not recognized by the EC RO version.\n\n```\nDEBUG:[Image: RO, helipilot_v2.0.24337-2726e9f149 ...]\n...\nDEBUG:\u003e ztest run-all\nDEBUG:Command \u0027ztest\u0027 not found or ambiguous.\n```",
+      "range": {
+        "startLine": 1075,
+        "startChar": 0,
+        "endLine": 1086,
+        "endChar": 17
+      },
+      "revId": "a4c85a854008c36f1b670ef7759c422f9d97ddce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
