@@ -45,6 +45,30 @@
       },
       "revId": "662f660f8a23fc1154ec588a969e7e00f30b014b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d40c727_9e1fbcc5",
+        "filename": "baseboard/dedede/baseboard.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-04-16T19:40:28Z",
+      "side": 1,
+      "message": "Tested with the experimental code in https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/6967770. A interrupt storm of 500hz on port 0 and port 1 would cause a watchdog. So that\u0027s at least a high bound. Let me know what other critera should be used for selecting this value.",
+      "parentUuid": "bfc698f0_aa9d526c",
+      "range": {
+        "startLine": 253,
+        "startChar": 36,
+        "endLine": 253,
+        "endChar": 39
+      },
+      "revId": "662f660f8a23fc1154ec588a969e7e00f30b014b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
