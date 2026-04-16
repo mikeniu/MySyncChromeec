@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8740857_2444d0d3",
+        "filename": "zephyr/include/cros/ite/it8xxx2.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-04-16T21:00:42Z",
+      "side": 1,
+      "message": "This can\u0027t be hard coded to 60KB, it needs to be dynamic depending on the chip. I\u0027m investigating how to resolve this.",
+      "range": {
+        "startLine": 30,
+        "startChar": 28,
+        "endLine": 30,
+        "endChar": 30
+      },
+      "revId": "2f5bd1e81bc77a0d7564a427491de70d692405b4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
