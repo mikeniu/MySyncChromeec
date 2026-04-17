@@ -15,10 +15,30 @@
 
 LOG_MODULE_REGISTER(test_flash_protection_rw);
 
+/*
+ * Transition the system from RW to RO.
+ * This step is essential for variant testing. Some board variants have
+ * restricted consoles in RO. By starting the test in RW and jumping to RO via
+ * code, we ensure the ztest framework is properly initialized and reachable.
+ */
+static void test_jump_to_ro(void)
+{
+	zassert_equal(system_get_image_copy(), EC_IMAGE_RW,
+		      "Test must start in RW to perform initial jump");
+
+	LOG_INF("Jumping from RW to RO...");
+	cflush();
+
+	system_reset(SYSTEM_RESET_STAY_IN_RO);
+}
+
 static void test_set_ro_at_boot(void)
 {
 	int rv;
 	bool wp = write_protect_is_asserted();
+
+	zassert_equal(system_get_image_copy(), EC_IMAGE_RO,
+		      "Not in RO after reboot to RO");
 
 	zassert_true(wp, "WP must be enabled");
 	LOG_INF("WP enabled, setting RO_AT_BOOT");
@@ -53,9 +73,12 @@ static void test_check_all_now_in_ro(void)
 	LOG_INF("ALL_NOW not set in RO");
 }
 
-static void (*test_steps[])(void) = { test_set_ro_at_boot,
-				      test_check_all_now_in_rw,
-				      test_check_all_now_in_ro };
+static void (*test_steps[])(void) = {
+	test_jump_to_ro, /* Index 0: RW */
+	test_set_ro_at_boot, /* Index 1: RO */
+	test_check_all_now_in_rw, /* Index 2: RW */
+	test_check_all_now_in_ro /* Index 3: RO */
+};
 
 /*
  * Use custom method of multistep testing, because steps have to be run in a
@@ -71,14 +94,27 @@ static struct k_work multistep_test_work;
 static void multistep_test_handler(struct k_work *work)
 {
 	uint32_t step = 0;
-
 	system_get_scratchpad(&step);
-	if ((step > STEP_ZERO) && (step < STEP_ZERO + ARRAY_SIZE(test_steps))) {
-		/* Run only "test_check_all_now_in_ro" step in RO. */
-		if ((system_get_image_copy() == EC_IMAGE_RO) &&
-		    (test_steps[TEST_STEP(step)] != test_check_all_now_in_ro)) {
+
+	if ((step >= STEP_ZERO) &&
+	    (step < STEP_ZERO + ARRAY_SIZE(test_steps))) {
+		int index = TEST_STEP(step);
+		enum ec_image current_image = system_get_image_copy();
+
+		/*
+		 * Pattern Logic:
+		 * Even steps (0, 2) must run in RW.
+		 * Odd steps (1, 3) must run in RO.
+		 */
+		bool is_even_step = (index % 2 == 0);
+		bool in_rw = (current_image == EC_IMAGE_RW);
+
+		/* If the parity of the step doesn't match the image state,
+		 * return early */
+		if (is_even_step != in_rw) {
 			return;
 		}
+
 		ztest_run_test_suite(flash_protection_rw, false, 1, 1, NULL);
 	}
 }

@@ -67,6 +67,7 @@ tests:
   flash_protection_rw:
     extra_configs:
     - CONFIG_HW_TEST_FLASH_PROTECTION_RW=y
+    - CONFIG_HW_TEST_RW_ONLY=n
     # Added to reduce RO flash usage
     - CONFIG_PM=n
     extra_conf_files:
