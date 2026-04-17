@@ -1,0 +1,65 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <npcx_emul.dts>
+#include "board.h"
+#include "../power_signals.dtsi"
+#include "../interrupts.dtsi"
+
+/ {
+	aliases {
+		gpio-wp = &gpio_wp;
+	};
+
+	chosen {
+		cros-ec,espi = &espi0;
+	};
+
+	named-gpios {
+		compatible = "named-gpios";
+
+		gpio_acok_od: acok_od {
+			gpios = <&gpio1 0 GPIO_INPUT>;
+			enum-name = "GPIO_AC_PRESENT";
+		};
+		gpio_ec_batt_pres_odl: ec_batt_pres_odl {
+			gpios = <&gpio1 1 GPIO_INPUT>;
+			enum-name = "GPIO_BATT_PRES_ODL";
+		};
+		gpio_ec_soc_pwr_btn_odl: ec_soc_pwr_btn_odl {
+			gpios = <&gpio1 2 (GPIO_OUTPUT | GPIO_OPEN_DRAIN |
+					    GPIO_ACTIVE_HIGH |
+					    GPIO_OUTPUT_INIT_HIGH)>;
+			enum-name = "GPIO_PCH_PWRBTN_L";
+		};
+		gpio_mech_pwr_btn_odl: mech_pwr_btn_odl {
+			gpios = <&gpio1 3 GPIO_INPUT>;
+			enum-name = "GPIO_POWER_BUTTON_L";
+		};
+		gpio_wp: wp-l {
+			gpios = <&gpio1 4 GPIO_INPUT>;
+		};
+		gpio_ec_pch_wake_odl: ec_pch_wake_odl {
+			gpios = <&gpio1 5 (GPIO_OUTPUT | GPIO_OPEN_DRAIN |
+					    GPIO_ACTIVE_HIGH |
+					    GPIO_OUTPUT_INIT_LOW)>;
+		};
+	};
+
+	named-i2c-ports {
+		compatible = "named-i2c-ports";
+
+		i2c_charger: charger {
+			i2c-port = <&i2c_ctrl0>;
+			enum-names = "I2C_PORT_CHARGER",
+				"I2C_PORT_BATTERY",
+				"I2C_PORT_EEPROM";
+		};
+	};
+};
+
+&i2c_ctrl0 {
+	status = "okay";
+};
