@@ -11,4 +11,4 @@ include("${ZEPHYR_BASE}/cmake/linker/lld/linker_flags.cmake")
 include("${ZEPHYR_BASE}/cmake/linker/ld/${COMPILER}/linker_flags.cmake" OPTIONAL)
 
 # Add the -nopie option to the linker flags to match the compilation options
-set_property(TARGET linker PROPERTY no_position_independent "-nopie")
+set_property(TARGET linker PROPERTY no_position_independent "-no-pie")
