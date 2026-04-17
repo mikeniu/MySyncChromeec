@@ -789,7 +789,7 @@ class AllTests:
             ),
             TestConfig(
                 test_name="flash_protection_rw",
-                imagetype_to_use=ImageType.RO,
+                #imagetype_to_use=ImageType.RO,
                 enable_hw_write_protect=True,
                 skip_for_ec_legacy=True,
             ),
