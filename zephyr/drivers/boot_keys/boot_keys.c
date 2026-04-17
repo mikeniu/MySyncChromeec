@@ -80,10 +80,6 @@ static void process_key(uint8_t row, uint8_t col, bool pressed)
 	}
 
 	if (pressed) {
-		if (boot_keys_release_only) {
-			return;
-		}
-
 		boot_keys_counter++;
 	} else {
 		boot_keys_counter--;
@@ -92,10 +88,16 @@ static void process_key(uint8_t row, uint8_t col, bool pressed)
 	for (uint8_t i = 0; i < ARRAY_SIZE(boot_keys); i++) {
 		const struct boot_keys *key = &boot_keys[i];
 
-		if (row == key->row && col == key->col) {
-			WRITE_BIT(boot_keys_value, i, pressed);
+		if (!(row == key->row && col == key->col)) {
+			continue;
+		}
+
+		if (pressed && boot_keys_release_only) {
 			break;
 		}
+
+		WRITE_BIT(boot_keys_value, i, pressed);
+		break;
 	}
 
 	LOG_DBG("boot_keys: boot_keys_value=0x%x counter=%d "
@@ -132,17 +134,19 @@ INPUT_CALLBACK_DEFINE(DEVICE_DT_GET(CROS_EC_KEYBOARD_NODE), boot_keys_input_cb,
 
 static void power_button_change(void)
 {
-	if (power_button_is_pressed()) {
-		if (boot_keys_release_only) {
-			return;
-		}
+	bool pressed = power_button_is_pressed();
 
-		WRITE_BIT(boot_keys_value, BOOT_KEY_POWER, 1);
+	if (pressed) {
 		boot_keys_counter++;
 	} else {
-		WRITE_BIT(boot_keys_value, BOOT_KEY_POWER, 0);
 		boot_keys_counter--;
 	}
+
+	if (pressed && boot_keys_release_only) {
+		return;
+	}
+
+	WRITE_BIT(boot_keys_value, BOOT_KEY_POWER, pressed);
 
 	LOG_DBG("boot_keys: boot_keys_value=0x%x counter=%d (power)",
 		boot_keys_value, boot_keys_counter);
