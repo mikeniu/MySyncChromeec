@@ -338,6 +338,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc6ce9b9_7dc73dce",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-17T07:04:50Z",
+      "side": 1,
+      "message": "Thanks.",
+      "parentUuid": "dc3d2a0d_495d8a07",
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8a55545a_cf785c36",
@@ -471,6 +489,30 @@
       "side": 1,
       "message": "https://docs.google.com/document/d/1P9-c0xA0vEwKa4XS7Ttqj4QQ2woQS18Opgdg99myUk8/edit?resourcekey\u003d0-h5uNQ6z_uDAVZnCOa4wznQ\u0026tab\u003dt.0",
       "parentUuid": "a4121112_4e7c34c2",
+      "range": {
+        "startLine": 67,
+        "startChar": 47,
+        "endLine": 67,
+        "endChar": 62
+      },
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "660fa5fd_5725157f",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-17T07:04:50Z",
+      "side": 1,
+      "message": "Thanks, so doesn\u0027t it mean it will cause ignoring the power button press in S3, which is not expected?",
+      "parentUuid": "aa4d81c7_a70b5405",
       "range": {
         "startLine": 67,
         "startChar": 47,
