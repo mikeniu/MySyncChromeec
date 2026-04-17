@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa157fab_980a1349",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-17T22:32:09Z",
+      "side": 1,
+      "message": "I think you can avoid a lot of this test boiler plate by adding an ocelotrvp test to zephyr/test/ap_power.\n\nSee CL:7594364 for an example.  In that model, the test includes the actual power signals defined in zephyr/program/ocelot/power_signals.dtsi and you avoid having to create duplicate devictree nodes just for the test.",
+      "revId": "ce51c6133ff8e783ae50e7c807bbf15311efeedf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
