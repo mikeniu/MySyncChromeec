@@ -10,6 +10,10 @@
 
 #include <cros/cbi_flash.dtsi>
 
+&flash0 {
+    reg = <0x20000400 0x4b000>;
+};
+
 &binman {
 	pad-byte = <0xff>;
 	pad-after = <0x30000>;
