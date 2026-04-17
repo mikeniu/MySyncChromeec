@@ -1,0 +1,22 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+choice TEST_PROJECT_TYPE
+	prompt "Select Ocelot board variant for tests"
+	help
+	  Choose the board variant for which the tests will be compiled and run.
+
+config TEST_PROJECT_OCELOTRVP_NPCX
+	bool "Enable tests for board ocelotrvp_npcx"
+	help
+	  Enable tests specific to the ocelotrvp_npcx variant.
+
+endchoice
+
+config TEST_PROJECT_OCELOT_BOARD_POWER
+	bool "Run tests for rvp_board_power.c"
+	help
+	  Include rvp_board_power.c into the binary and test its functions.
+
+source "Kconfig.zephyr"
