@@ -16,6 +16,24 @@
       "message": "**1. Weakened Bitmask Assertion in Helper Function**\n* **Location:** `trigger_match_attempt(uint32_t mode)`\n* **Issue:** The new assertion `zassert_true(mode_resp.mode \u0026 mode);` introduces a regression in test strictness. In tests where multiple flags are passed (e.g., `test_match_no_template_update`, which passes `FP_MODE_MATCH | FP_MODE_MATCH_NO_TEMPLATE_UPDATE`), the bitwise `\u0026` operator will evaluate to `true` if *any* of the requested bits are present in `mode_resp.mode`. \n    * *Original code behavior:* Explicitly asserted both bits were set independently. \n    * *New code behavior:* If the sensor fails to set `FP_MODE_MATCH_NO_TEMPLATE_UPDATE` but successfully sets `FP_MODE_MATCH`, the assertion will still pass, masking a potential failure.\n* **Remediation:** Ensure that *all* requested bits are set by modifying the assertion to compare the masked result against the original input:\n    ```c\n    zassert_equal(mode_resp.mode \u0026 mode, mode, \"Failed to set all requested FP modes\");\n    ```\n\n---\n\n### **Minor Issues and Suggestions**\n\n**1. Uninitialized Struct on Stack**\n* **Location:** `test_match_no_templates_mode_cleared()`\n* **Issue:** The refactor changed `struct ec_params_fp_mode params \u003d { .mode \u003d FP_MODE_MATCH, };` to an uninitialized declaration: `struct ec_params_fp_mode params;`. While you later set `params.mode \u003d FP_MODE_DONT_CHANGE;`, leaving the rest of the struct uninitialized on the stack can lead to passing garbage data or uninitialized padding bytes to `ec_cmd_fp_mode()`. This can occasionally cause flaky behavior depending on the underlying ABI or future modifications to the struct.\n* **Remediation:** Initialize the struct when declaring it, or zero it out completely:\n    ```c\n    struct ec_params_fp_mode params \u003d {0};\n    // Then later:\n    params.mode \u003d FP_MODE_DONT_CHANGE;\n    ```\n\n---",
       "revId": "a9cb0b5d7ec2db4ccc1a5041a910ebb514b11304",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "66982e73_8ee41d3a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-17T18:16:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "feca7d67_6ed0deb5",
+      "revId": "a9cb0b5d7ec2db4ccc1a5041a910ebb514b11304",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
