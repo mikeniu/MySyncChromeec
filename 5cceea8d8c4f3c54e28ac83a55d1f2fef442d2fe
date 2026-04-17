@@ -33,6 +33,24 @@
       "message": "can this be separated into 2 different CLs? The title and the commit message body do not match. It is slightly awkward.",
       "revId": "5cceea8d8c4f3c54e28ac83a55d1f2fef442d2fe",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b6f13e5_32156efa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-17T03:32:29Z",
+      "side": 1,
+      "message": "I think this could become a bit complicated, because `skipping a template update` also depends on `chrome-internal:9106841`.\nEven if we separate it into a different CL, it would still need to be submitted after the `new capture format` CL in the current sequence.\nOtherwise, we would need to re‑implement the `skipping a template update`functionality separately from `chrome-internal:9106841`.\nI believe the main issue is that the current title does not fully describe the scope.\nAlthough the commit message explains the details, it might be clearer if we update the title to:\n`fpsensor: ec630: add support for skipping a template update and new capture format`\nWhat do you think about this approach?",
+      "parentUuid": "d4dd1d04_8f6d8eaf",
+      "revId": "5cceea8d8c4f3c54e28ac83a55d1f2fef442d2fe",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
