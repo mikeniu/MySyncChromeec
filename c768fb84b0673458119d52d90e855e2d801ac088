@@ -427,6 +427,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9d08130b_677cc368",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-17T07:21:56Z",
+      "side": 1,
+      "message": "I would like to use the same logic as in Andes driver:\n- lock disabled by default\n- [enabled](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/cros_flash/cros_flash_andestech_xip.c;l\u003d463) when the _NOW flag is set\n- [enabled](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/cros_flash/cros_flash_andestech_xip.c;l\u003d596) during boot is `write_protect_is_asserted` is true\n- despite the lock (and write_protect_is_asserted), [extending](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/cros_flash/cros_flash_andestech_xip.c;l\u003d417) protection range is allowed",
+      "parentUuid": "06776324_06a5f521",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2b2255d0_781c322e",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 7
