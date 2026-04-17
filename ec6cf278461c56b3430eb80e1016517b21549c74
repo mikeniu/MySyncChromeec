@@ -33,6 +33,24 @@
       "message": "actually it looks like this script builds images for different branches, needs some more work",
       "revId": "ec6cf278461c56b3430eb80e1016517b21549c74",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98a91864_3ba363cd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000039
+      },
+      "writtenOn": "2026-04-17T03:50:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09ea8a6d_80acada5",
+      "revId": "ec6cf278461c56b3430eb80e1016517b21549c74",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
