@@ -246,6 +246,24 @@
       "parentUuid": "9dfd3dd2_c5709d62",
       "revId": "7c4a3a90bb6cad2fdbb60794d9a66bda611f504f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46f42f9d_7053b468",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-17T07:09:42Z",
+      "side": 1,
+      "message": "the regs[2] is not set here so values can be random. The `masks` is used to specify which bits should be configured, according to values in `regs`.",
+      "parentUuid": "8e43d033_0c4994cd",
+      "revId": "7c4a3a90bb6cad2fdbb60794d9a66bda611f504f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
