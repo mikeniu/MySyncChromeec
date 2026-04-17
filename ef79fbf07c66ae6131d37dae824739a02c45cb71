@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6169640f_f36325b0",
+        "filename": "zephyr/drivers/boot_keys/boot_keys.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 3387694
+      },
+      "writtenOn": "2026-04-17T14:48:57Z",
+      "side": 1,
+      "message": "This will always set BOOT_KEY_REFRESH when refresh key pressed in RW even without press/release power button.\nIf EC is already in RW, and we only pressed refresh key and unplug AC, cutoff will be triggered.",
+      "revId": "ef79fbf07c66ae6131d37dae824739a02c45cb71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
