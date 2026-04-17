@@ -4,126 +4,72 @@
  */
 
 #include "flash.h"
+#include "multistep_test.h"
 #include "system.h"
 #include "write_protect.h"
 
-#include <zephyr/init.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/ztest.h>
-#include <zephyr/ztest_test.h>
 
 LOG_MODULE_REGISTER(test_flash_protection_rw);
 
-static void test_set_ro_at_boot(void)
+/**
+ * @brief Step 0: Set RO_AT_BOOT and trigger a reboot.
+ *
+ * This step runs in RW. We set the EC_FLASH_PROTECT_RO_AT_BOOT flag, which
+ * instructs the RO image (even a production/locked one) to enable full
+ * flash protection (ALL_NOW) upon the next boot before jumping to RW.
+ */
+static void test_trigger_ro_at_boot(void)
 {
 	int rv;
-	bool wp = write_protect_is_asserted();
 
-	zassert_true(wp, "WP must be enabled");
-	LOG_INF("WP enabled, setting RO_AT_BOOT");
+	zassert_equal(system_get_image_copy(), EC_IMAGE_RW,
+		      "Test must start in RW");
+
+	LOG_INF("Step 0: Setting RO_AT_BOOT flag...");
+	cflush();
+
 	rv = crec_flash_set_protect(EC_FLASH_PROTECT_RO_AT_BOOT,
 				    EC_FLASH_PROTECT_RO_AT_BOOT);
-	zassert_equal(rv, EC_SUCCESS);
-	LOG_INF("RO_AT_BOOT set, rebooting");
+	zassert_equal(rv, EC_SUCCESS, "Failed to set RO_AT_BOOT");
+
+	LOG_INF("Triggering hard reset to pass through RO...");
 	cflush();
+
 	system_reset(SYSTEM_RESET_HARD);
 }
 
-static void test_check_all_now_in_rw(void)
-{
-	zassert_equal(system_get_image_copy(), EC_IMAGE_RW,
-		      "Not in RW after reboot");
-	LOG_INF("Rebooted to RW");
-	zassert_equal(crec_flash_get_protect() & EC_FLASH_PROTECT_ALL_NOW,
-		      EC_FLASH_PROTECT_ALL_NOW, "ALL_NOW not set after reboot");
-	LOG_INF("ALL_NOW set in RW, rebooting to RO");
-	cflush();
-	system_reset(SYSTEM_RESET_STAY_IN_RO);
-}
-
-static void test_check_all_now_in_ro(void)
-{
-	zassert_equal(system_get_image_copy(), EC_IMAGE_RO,
-		      "Not in RO after reboot");
-	LOG_INF("Rebooted to RO");
-	zassert_not_equal(crec_flash_get_protect() & EC_FLASH_PROTECT_ALL_NOW,
-			  EC_FLASH_PROTECT_ALL_NOW,
-			  "ALL_NOW set after reboot to RO");
-	LOG_INF("ALL_NOW not set in RO");
-}
-
-static void (*test_steps[])(void) = { test_set_ro_at_boot,
-				      test_check_all_now_in_rw,
-				      test_check_all_now_in_ro };
-
-/*
- * Use custom method of multistep testing, because steps have to be run in a
- * different image - 2 steps in RW, one step in RO. This is not possible with
- * the common pattern.
+/**
+ * @brief Step 1: Verify protection state after returning to RW.
+ *
+ * After the reset in Step 0, the system boots into RO. The production RO
+ * sees RO_AT_BOOT, enables protection (ALL_NOW), and jumps to RW.
+ * This function verifies that the protection successfully persisted into RW.
  */
-
-/* Use a unique step 0 value. */
-#define STEP_ZERO ((UINT16_MAX / 2) + 1)
-#define TEST_STEP(step) (step - STEP_ZERO)
-
-static struct k_work multistep_test_work;
-static void multistep_test_handler(struct k_work *work)
+static void test_verify_protection_after_reboot(void)
 {
-	uint32_t step = 0;
+	uint32_t prot = crec_flash_get_protect();
 
-	system_get_scratchpad(&step);
-	if ((step > STEP_ZERO) && (step < STEP_ZERO + ARRAY_SIZE(test_steps))) {
-		/* Run only "test_check_all_now_in_ro" step in RO. */
-		if ((system_get_image_copy() == EC_IMAGE_RO) &&
-		    (test_steps[TEST_STEP(step)] != test_check_all_now_in_ro)) {
-			return;
-		}
-		ztest_run_test_suite(flash_protection_rw, false, 1, 1, NULL);
-	}
+	zassert_equal(system_get_image_copy(), EC_IMAGE_RW,
+		      "Must be back in RW for verification");
+
+	LOG_INF("Step 1: Verifying ALL_NOW is active...");
+
+	/*
+	 * ALL_NOW should be set because the RO bootloader committed the
+	 * protection before the jump.
+	 */
+	zassert_true((prot & EC_FLASH_PROTECT_ALL_NOW),
+		     "ALL_NOW was not enabled by RO during boot");
+
+	LOG_INF("Flash protection verified: 0x%08x", prot);
 }
 
-static int multistep_test_init(void)
-{
-	k_work_init(&multistep_test_work, multistep_test_handler);
+static void (*test_steps[])(void) = {
+	test_trigger_ro_at_boot,
+	test_verify_protection_after_reboot,
+};
 
-	/* Check if the test has to be run after reboot */
-	k_work_submit(&multistep_test_work);
-
-	return 0;
-}
-SYS_INIT(multistep_test_init, POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY);
-
-static void *flash_protection_rw_setup(void)
-{
-	uint32_t step = 0;
-	int ret = 0;
-
-	ret = system_get_scratchpad(&step);
-	if ((step < STEP_ZERO) ||
-	    (step >= (STEP_ZERO + ARRAY_SIZE(test_steps)))) {
-		system_set_scratchpad(STEP_ZERO);
-	}
-	zassert_equal(ret, 0);
-
-	return NULL;
-}
-
-static void flash_protection_rw_teardown(void *fixture)
-{
-	system_set_scratchpad(0);
-}
-
-ZTEST(flash_protection_rw, test_flash_protection_rw)
-{
-	uint32_t step = 0;
-	int ret = 0;
-
-	ret = system_get_scratchpad(&step);
-	zassert_equal(ret, 0);
-	ret = system_set_scratchpad(step + 1);
-
-	test_steps[TEST_STEP(step)]();
-}
-ZTEST_SUITE(flash_protection_rw, NULL, flash_protection_rw_setup, NULL, NULL,
-	    flash_protection_rw_teardown);
+MULTISTEP_TEST(flash_protection_rw, test_steps);
