@@ -29,7 +29,7 @@ endchoice
 
 # TODO: b/416020794, make the EC image size as big as the available code RAM.
 config CROS_EC_PROGRAM_MEMORY_BASE
-	default 0x2000b400
+	default 0x20000400
 
 config CROS_EC_RAM_BASE
 	default 0x20050000
