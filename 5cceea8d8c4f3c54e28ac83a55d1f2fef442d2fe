@@ -51,6 +51,24 @@
       "parentUuid": "d4dd1d04_8f6d8eaf",
       "revId": "5cceea8d8c4f3c54e28ac83a55d1f2fef442d2fe",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37d8cfb9_5e022771",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-17T16:30:00Z",
+      "side": 1,
+      "message": "maybe the new title is better `fpsensor: ec630: add support for skipping a template update and new capture format`",
+      "parentUuid": "3b6f13e5_32156efa",
+      "revId": "5cceea8d8c4f3c54e28ac83a55d1f2fef442d2fe",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
