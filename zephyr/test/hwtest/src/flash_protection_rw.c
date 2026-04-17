@@ -15,6 +15,23 @@
 
 LOG_MODULE_REGISTER(test_flash_protection_rw);
 
+/*
+ * Transition the system from RW to RO.
+ * This step is essential for variant testing. Some board variants have
+ * restricted consoles in RO. By starting the test in RW and jumping to RO via
+ * code, we ensure the ztest framework is properly initialized and reachable.
+ */
+static void test_jump_to_ro(void)
+{
+	zassert_equal(system_get_image_copy(), EC_IMAGE_RW,
+		      "Test must start in RW to perform initial jump");
+
+	LOG_INF("Jumping from RW to RO...");
+	cflush();
+
+	system_run_image_copy(EC_IMAGE_RO);
+}
+
 static void test_set_ro_at_boot(void)
 {
 	int rv;
@@ -53,7 +70,7 @@ static void test_check_all_now_in_ro(void)
 	LOG_INF("ALL_NOW not set in RO");
 }
 
-static void (*test_steps[])(void) = { test_set_ro_at_boot,
+static void (*test_steps[])(void) = { test_jump_to_ro, test_set_ro_at_boot,
 				      test_check_all_now_in_rw,
 				      test_check_all_now_in_ro };
 
