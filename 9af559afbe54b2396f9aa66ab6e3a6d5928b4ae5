@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec367683_df0125bc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-04-17T16:51:02Z",
+      "side": 1,
+      "message": "is volteer running out of space?\n\n```\n/home/chrome-bot/.cache/coreboot-sdk/arm-eabi/ea40ddd1d190c3b48435c474c0b545719371813a/bin/../lib/gcc/arm-eabi/14.2.0/../../../../arm-eabi/bin/ld:build/volteer/RW/ec.RW.lds:4557 cannot move location counter backwards (from 100c0064 to 100bffff)\n```",
+      "revId": "9af559afbe54b2396f9aa66ab6e3a6d5928b4ae5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
