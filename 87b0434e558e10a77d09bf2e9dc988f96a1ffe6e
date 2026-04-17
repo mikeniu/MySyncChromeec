@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5104e5b_25092ba0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-17T05:38:13Z",
+      "side": 1,
+      "message": "In line with the comment at\n[9106841/comment/#522](https://chrome-internal-review.googlesource.com/c/chromeos/vendor/fingerprint/egis/+/9106841/comment/17ba1d86_090a2c5c/)\nadd the `buf_size` as a parameter to `egis_get_image_with_mode`.",
+      "revId": "87b0434e558e10a77d09bf2e9dc988f96a1ffe6e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
