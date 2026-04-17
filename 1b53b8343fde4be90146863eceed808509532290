@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34bfabe7_97eb9214",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-04-17T00:29:10Z",
+      "side": 1,
+      "message": "Hey Keith,  \ncan you help review this? It is a change to the PDC drivers which will prevent the OS from attempting mode entry/exit.\n\nTI does not have an option in their AP config to set this bit. I\u0027ve added this as a driver update for both TI and RTK to be consistent across devices.",
+      "revId": "1b53b8343fde4be90146863eceed808509532290",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
