@@ -162,6 +162,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2f3c9c3c_fd937bba",
+        "filename": "zephyr/program/fpmcu/ft9001/soc.dtsi",
+        "patchSetId": 54
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-04-17T00:59:11Z",
+      "side": 1,
+      "message": "Yes, That\u0027s fine.",
+      "parentUuid": "22842e5a_24475590",
+      "revId": "595091ebb7a7e53b25b64f53c5fa78bf5c3bff0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ed9ddfc7_635f605e",
         "filename": "zephyr/program/fpmcu/ft9001/src/config_page.c",
         "patchSetId": 54
