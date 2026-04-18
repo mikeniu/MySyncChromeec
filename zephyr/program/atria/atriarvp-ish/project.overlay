@@ -5,6 +5,7 @@
 
 #include "gpio.dtsi"
 #include "i2c.dtsi"
+#include "motionsense.dtsi"
 
 / {
 	chosen {

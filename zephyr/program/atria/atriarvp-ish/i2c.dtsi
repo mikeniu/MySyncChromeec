@@ -4,6 +4,10 @@
  */
 
 / {
+	aliases {
+		i2c-2 = &i2c2;
+	};
+
 	named-i2c-ports {
 		compatible = "named-i2c-ports";
 		i2c_ec_i2c_sensor: sensor {
