@@ -45,6 +45,11 @@
 	chosen {
 		cros-ec,keyboard = &kbd;
 	};
+
+	tabletmode_interrupt: tabletmode-interrupt {
+		compatible = "cros,tabletmode-interrupt";
+		irq-gpios = <RTS5912_GPIO120 GPIO_ACTIVE_LOW>;
+	};
 };
 
 &it8801_mfd {
