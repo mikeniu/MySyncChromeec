@@ -456,8 +456,11 @@ extern "C" void fp_task(void)
 			}
 
 			if (st == FINGER_PRESENT &&
-			    global_context.sensor_mode & FP_MODE_ANY_CAPTURE)
+			    global_context.sensor_mode & FP_MODE_ANY_CAPTURE) {
+				CPRINTS("Finger!");
+				send_mkbp_event(EC_MKBP_FP_FINGER_DOWN);
 				fp_process_finger();
+			}
 
 			if (global_context.sensor_mode & FP_MODE_ANY_WAIT_IRQ) {
 				fp_configure_detect();
