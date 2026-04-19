@@ -190,17 +190,21 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step)
 	/* Give opportunity for fpsensor task process event. */
 	k_msleep(1);
 
-	/* Confirm MKBP event was sent. */
-	zassert_equal(mkbp_send_event_fake.call_count, 1);
-	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
+	/* Confirm MKBP events were sent twice. */
+	zassert_equal(mkbp_send_event_fake.call_count, 2);
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT);
+	zassert_equal(mkbp_send_event_fake.arg0_history[1],
+		      EC_MKBP_EVENT_FINGERPRINT);
 
 	/*
 	 * Confirm that:
-	 * - MKBP event is FP_ENROLL
+	 * - MKBP events are FIGNER_DOWN and FP_ENROLL
 	 * - No errors
 	 * - Reported enroll progress is correct
 	 */
 	fp_get_next_event((uint8_t *)&fp_events);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_ENROLL);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events), 0);
 	zassert_equal(EC_MKBP_FP_ENROLL_PROGRESS(fp_events), enroll_percent);
@@ -237,17 +241,21 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_failure)
 	/* Give opportunity for fpsensor task process event. */
 	k_msleep(1);
 
-	/* Confirm MKBP event was sent. */
-	zassert_equal(mkbp_send_event_fake.call_count, 1);
-	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
+	/* Confirm MKBP events were sent twice. */
+	zassert_equal(mkbp_send_event_fake.call_count, 2);
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT);
+	zassert_equal(mkbp_send_event_fake.arg0_history[1],
+		      EC_MKBP_EVENT_FINGERPRINT);
 
 	/*
 	 * Confirm that:
-	 * - MKBP event is FP_ENROLL
+	 * - MKBP events are FINGER_DOWN and FP_ENROLL
 	 * - Internal error is reported
 	 * - No progress is reported
 	 */
 	fp_get_next_event((uint8_t *)&fp_events);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_ENROLL);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
 		      EC_MKBP_FP_ERR_ENROLL_INTERNAL);
@@ -301,17 +309,21 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_low_quality_warning)
 	/* Give opportunity for fpsensor task process event. */
 	k_msleep(1);
 
-	/* Confirm MKBP event was sent. */
-	zassert_equal(mkbp_send_event_fake.call_count, 1);
-	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
+	/* Confirm MKBP events were sent twice. */
+	zassert_equal(mkbp_send_event_fake.call_count, 2);
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT);
+	zassert_equal(mkbp_send_event_fake.arg0_history[1],
+		      EC_MKBP_EVENT_FINGERPRINT);
 
 	/*
 	 * Confirm that:
-	 * - MKBP event is FP_ENROLL
+	 * - MKBP events are FINGER_DOWN and FP_ENROLL
 	 * - Low Quality warning is reported
 	 * - Correct progress is reported
 	 */
 	fp_get_next_event((uint8_t *)&fp_events);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_ENROLL);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
 		      EC_MKBP_FP_ERR_ENROLL_LOW_QUALITY);
@@ -367,17 +379,21 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_finish_failed)
 	/* Give opportunity for fpsensor task process event. */
 	k_msleep(1);
 
-	/* Confirm MKBP event was sent. */
-	zassert_equal(mkbp_send_event_fake.call_count, 1);
-	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
+	/* Confirm MKBP events were sent twice. */
+	zassert_equal(mkbp_send_event_fake.call_count, 2);
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT);
+	zassert_equal(mkbp_send_event_fake.arg0_history[1],
+		      EC_MKBP_EVENT_FINGERPRINT);
 
 	/*
 	 * Confirm that:
-	 * - MKBP event is FP_ENROLL
+	 * - MKBP events are FINGER_DOWN and FP_ENROLL
 	 * - Internal error was returned
 	 * - Reported enroll progress is correct
 	 */
 	fp_get_next_event((uint8_t *)&fp_events);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_ENROLL);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
 		      EC_MKBP_FP_ERR_ENROLL_INTERNAL);
@@ -433,17 +449,21 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_finish_success)
 	/* Confirm that 'enroll_finish' was called. */
 	zassert_equal(mock_alg_enroll_finish_fake.call_count, 1);
 
-	/* Confirm MKBP event was sent. */
-	zassert_equal(mkbp_send_event_fake.call_count, 1);
-	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
+	/* Confirm MKBP events were sent twice. */
+	zassert_equal(mkbp_send_event_fake.call_count, 2);
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT);
+	zassert_equal(mkbp_send_event_fake.arg0_history[1],
+		      EC_MKBP_EVENT_FINGERPRINT);
 
 	/*
 	 * Confirm that:
-	 * - MKBP event is FP_ENROLL
+	 * - MKBP events are FINGER_DOWN and FP_ENROLL
 	 * - Internal error was returned
 	 * - Reported enroll progress is correct
 	 */
 	fp_get_next_event((uint8_t *)&fp_events);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_ENROLL);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events), 0);
 	zassert_equal(EC_MKBP_FP_ENROLL_PROGRESS(fp_events), enroll_percent);
