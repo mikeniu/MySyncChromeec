@@ -198,6 +198,15 @@ ZTEST_USER(fpsensor_capture, test_finger_capture_simple_image_scan_too_fast)
 	/* Give opportunity for fpsensor task process event. */
 	k_msleep(1);
 
+	/* Confirm MKBP event was sent once (FINGER_DOWN). */
+	zassert_equal(mkbp_send_event_fake.call_count, 1);
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT);
+
+	uint32_t fp_events;
+	fp_get_next_event((uint8_t *)&fp_events);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
+
 	/* Confirm that capture mode is still enabled. */
 	params.mode = FP_MODE_DONT_CHANGE;
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
@@ -269,13 +278,27 @@ ZTEST_USER(fpsensor_capture,
 	/* Give opportunity for fpsensor task to process event. */
 	k_msleep(1);
 
-	/* Confirm MKBP event was sent. */
-	zassert_equal(mkbp_send_event_fake.call_count, 1);
-	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
+	/* Confirm MKBP events were sent twice. */
+	zassert_equal(mkbp_send_event_fake.call_count, 2);
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT,
+		      "First doorbell must be FINGERPRINT type");
+	zassert_equal(mkbp_send_event_fake.arg0_history[1],
+		      EC_MKBP_EVENT_FINGERPRINT,
+		      "Second doorbell must be FINGERPRINT type");
 
-	/* Confirm that FP_IMAGE_READY MKBP event is sent. */
+	/*
+	 * Confirm that both EC_MKBP_FP_FINGER_DOWN and FP_IMAGE_READY MKBP
+	 * events were sent.
+	 */
 	fp_get_next_event((uint8_t *)&fp_events);
-	zassert_true(fp_events & EC_MKBP_FP_IMAGE_READY);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN,
+		     "First event data should contain FINGER_DOWN (got 0x%08x)",
+		     fp_events);
+	zassert_true(
+		fp_events & EC_MKBP_FP_IMAGE_READY,
+		"Second event data should contain IMAGE_READY (got 0x%08x)",
+		fp_events);
 }
 
 ZTEST_USER(fpsensor_capture,
