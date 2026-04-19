@@ -293,6 +293,8 @@ extern "C" void fp_task(void)
 
 	global_context.fp_frame_size_cache.populate_cache(sizeof(fp_buffer));
 
+	enum finger_state prev_st = FINGER_NONE;
+
 	while (1) {
 		enum finger_state st = FINGER_NONE;
 
@@ -437,6 +439,10 @@ extern "C" void fp_task(void)
 			if (global_context.sensor_mode &
 			    FP_MODE_ANY_DETECT_FINGER) {
 				st = fp_finger_status();
+				bool finger_transition =
+					(st == FINGER_PRESENT &&
+					 prev_st == FINGER_NONE);
+
 				if (st == FINGER_PRESENT &&
 				    global_context.sensor_mode &
 					    FP_MODE_FINGER_DOWN) {
@@ -453,11 +459,24 @@ extern "C" void fp_task(void)
 					timeout_us = -1;
 					send_mkbp_event(EC_MKBP_FP_FINGER_UP);
 				}
+
+				/*
+				 * Send MKBP event on physical transition into
+				 * capture mode.
+				 */
+				if (finger_transition &&
+				    (global_context.sensor_mode &
+				     FP_MODE_ANY_CAPTURE)) {
+					send_mkbp_event(EC_MKBP_FP_FINGER_DOWN);
+				}
 			}
 
 			if (st == FINGER_PRESENT &&
-			    global_context.sensor_mode & FP_MODE_ANY_CAPTURE)
+			    global_context.sensor_mode & FP_MODE_ANY_CAPTURE) {
 				fp_process_finger();
+			}
+
+			prev_st = st;
 
 			if (global_context.sensor_mode & FP_MODE_ANY_WAIT_IRQ) {
 				fp_configure_detect();

@@ -30,6 +30,23 @@ FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 static uint8_t image_buffer[IMAGE_SIZE];
 static uint8_t frame_buffer[IMAGE_SIZE];
 
+/* Helper function to cycle finger state to trigger rising-edge finger
+ * transition. */
+static void cycle_finger_present(void)
+{
+	struct fingerprint_sensor_state state;
+
+	fingerprint_get_state(fp_sim, &state);
+	state.finger_state = FINGERPRINT_FINGER_STATE_NONE;
+	fingerprint_set_state(fp_sim, &state);
+	fingerprint_run_callback(fp_sim);
+	k_msleep(1);
+
+	fingerprint_get_state(fp_sim, &state);
+	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
+	fingerprint_set_state(fp_sim, &state);
+}
+
 ZTEST_USER(fpsensor_capture, test_finger_capture_simple_image_detection_enabled)
 {
 	struct ec_params_fp_mode params = {
@@ -71,7 +88,6 @@ ZTEST_USER(fpsensor_capture, test_finger_capture_simple_image_mode_is_correct)
 			(FP_CAPTURE_SIMPLE_IMAGE << FP_MODE_CAPTURE_TYPE_SHIFT),
 	};
 	struct ec_response_fp_mode response;
-	struct fingerprint_sensor_state state;
 
 	/* Switch mode to capture. */
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
@@ -82,9 +98,7 @@ ZTEST_USER(fpsensor_capture, test_finger_capture_simple_image_mode_is_correct)
 	k_msleep(1);
 
 	/* Put finger on the sensor. */
-	fingerprint_get_state(fp_sim, &state);
-	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
-	fingerprint_set_state(fp_sim, &state);
+	cycle_finger_present();
 
 	/* Ping fpsensor task. */
 	fingerprint_run_callback(fp_sim);
@@ -93,6 +107,7 @@ ZTEST_USER(fpsensor_capture, test_finger_capture_simple_image_mode_is_correct)
 	k_msleep(1);
 
 	/* Confirm that correct mode was passed to driver. */
+	struct fingerprint_sensor_state state;
 	fingerprint_get_state(fp_sim, &state);
 	zassert_equal(state.last_acquire_image_mode,
 		      FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE);
@@ -176,7 +191,6 @@ ZTEST_USER(fpsensor_capture, test_finger_capture_simple_image_scan_too_fast)
 			(FP_CAPTURE_SIMPLE_IMAGE << FP_MODE_CAPTURE_TYPE_SHIFT),
 	};
 	struct ec_response_fp_mode response;
-	struct fingerprint_sensor_state state;
 
 	/* Switch mode to capture. */
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
@@ -187,8 +201,9 @@ ZTEST_USER(fpsensor_capture, test_finger_capture_simple_image_scan_too_fast)
 	k_msleep(1);
 
 	/* Put finger on the sensor. */
+	cycle_finger_present();
+	struct fingerprint_sensor_state state;
 	fingerprint_get_state(fp_sim, &state);
-	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
 	state.acquire_image_result = FINGERPRINT_SENSOR_SCAN_TOO_FAST;
 	fingerprint_set_state(fp_sim, &state);
 
@@ -212,7 +227,6 @@ ZTEST_USER(fpsensor_capture,
 			(FP_CAPTURE_SIMPLE_IMAGE << FP_MODE_CAPTURE_TYPE_SHIFT),
 	};
 	struct ec_response_fp_mode response;
-	struct fingerprint_sensor_state state;
 
 	/* Switch mode to capture. */
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
@@ -223,9 +237,7 @@ ZTEST_USER(fpsensor_capture,
 	k_msleep(1);
 
 	/* Put finger on the sensor. */
-	fingerprint_get_state(fp_sim, &state);
-	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
-	fingerprint_set_state(fp_sim, &state);
+	cycle_finger_present();
 
 	/* Ping fpsensor task. */
 	fingerprint_run_callback(fp_sim);
@@ -242,40 +254,45 @@ ZTEST_USER(fpsensor_capture,
 ZTEST_USER(fpsensor_capture,
 	   test_finger_capture_simple_image_scan_success_mkbp_event)
 {
-	struct ec_params_fp_mode params = {
-		.mode = FP_MODE_CAPTURE |
-			(FP_CAPTURE_SIMPLE_IMAGE << FP_MODE_CAPTURE_TYPE_SHIFT),
-	};
-	struct ec_response_fp_mode response;
-	struct fingerprint_sensor_state state;
 	uint32_t fp_events;
 
-	/* Switch mode to capture. */
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_true(response.mode & FP_MODE_CAPTURE);
-	zassert_equal(FP_CAPTURE_TYPE(response.mode), FP_CAPTURE_SIMPLE_IMAGE);
+	/* Initialize the mock context and set capture mode */
+	global_context.sensor_mode = FP_MODE_CAPTURE;
 
-	/* Give opportunity for fpsensor task to change mode. */
+	/* Step 1: Initialize with no finger present so the state machine
+	 * registers a baseline */
+	struct fingerprint_sensor_state state;
+	fingerprint_get_state(fp_sim, &state);
+	state.finger_state = FINGERPRINT_FINGER_STATE_NONE;
+	fingerprint_set_state(fp_sim, &state);
+	fingerprint_run_callback(fp_sim);
 	k_msleep(1);
 
-	/* Put finger on the sensor. */
+	/* Reset mock call counters to ensure pure test isolation */
+	RESET_FAKE(mkbp_send_event);
+
+	/* Step 2: Now place the finger down to create a clean FINGER_NONE ->
+	 * FINGER_PRESENT edge transition */
 	fingerprint_get_state(fp_sim, &state);
 	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
 	fingerprint_set_state(fp_sim, &state);
-
-	/* Ping fpsensor task. */
 	fingerprint_run_callback(fp_sim);
-
-	/* Give opportunity for fpsensor task to process event. */
 	k_msleep(1);
 
-	/* Confirm MKBP event was sent. */
-	zassert_equal(mkbp_send_event_fake.call_count, 1);
-	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
+	/* Confirm MKBP events were sent twice (1st: FINGER_DOWN, 2nd:
+	 * IMAGE_READY) */
+	zassert_equal(mkbp_send_event_fake.call_count, 2,
+		      "Expected 2 MKBP events");
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT);
+	zassert_equal(mkbp_send_event_fake.arg0_history[1],
+		      EC_MKBP_EVENT_FINGERPRINT);
 
-	/* Confirm that FP_IMAGE_READY MKBP event is sent. */
 	fp_get_next_event((uint8_t *)&fp_events);
-	zassert_true(fp_events & EC_MKBP_FP_IMAGE_READY);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN,
+		     "First event must be FINGER_DOWN");
+	zassert_true(fp_events & EC_MKBP_FP_IMAGE_READY,
+		     "Second event must be IMAGE_READY");
 }
 
 ZTEST_USER(fpsensor_capture,
@@ -291,7 +308,6 @@ ZTEST_USER(fpsensor_capture,
 			(kCaptureType << FP_MODE_CAPTURE_TYPE_SHIFT),
 	};
 	struct ec_response_fp_mode response;
-	struct fingerprint_sensor_state state;
 	struct ec_params_fp_frame frame_request = {
 		.offset = FP_FRAME_INDEX_RAW_IMAGE << FP_FRAME_INDEX_SHIFT,
 		.size = image_size,
@@ -306,9 +322,7 @@ ZTEST_USER(fpsensor_capture,
 	k_msleep(1);
 
 	/* Put finger on the sensor. */
-	fingerprint_get_state(fp_sim, &state);
-	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
-	fingerprint_set_state(fp_sim, &state);
+	cycle_finger_present();
 
 	/* Prepare image. */
 	memset(image_buffer, 1, IMAGE_SIZE);
@@ -340,7 +354,6 @@ ZTEST_USER(fpsensor_capture,
 			(kCaptureType << FP_MODE_CAPTURE_TYPE_SHIFT),
 	};
 	struct ec_response_fp_mode response;
-	struct fingerprint_sensor_state state;
 	struct ec_params_fp_frame_v1 frame_request = {
 		.cmd = FP_FRAME_GET_RAW_IMAGE,
 		.offset = 0,
@@ -356,9 +369,7 @@ ZTEST_USER(fpsensor_capture,
 	k_msleep(1);
 
 	/* Put finger on the sensor. */
-	fingerprint_get_state(fp_sim, &state);
-	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
-	fingerprint_set_state(fp_sim, &state);
+	cycle_finger_present();
 
 	/* Prepare image. */
 	memset(image_buffer, 1, IMAGE_SIZE);
@@ -384,7 +395,6 @@ ZTEST_USER(fpsensor_capture, test_finger_capture_get_frame_v1_size_too_big)
 			(FP_CAPTURE_SIMPLE_IMAGE << FP_MODE_CAPTURE_TYPE_SHIFT),
 	};
 	struct ec_response_fp_mode response;
-	struct fingerprint_sensor_state state;
 	uint8_t buffer[IMAGE_SIZE + 1];
 	struct ec_params_fp_frame_v1 frame_request = {
 		.cmd = FP_FRAME_GET_RAW_IMAGE,
@@ -399,9 +409,7 @@ ZTEST_USER(fpsensor_capture, test_finger_capture_get_frame_v1_size_too_big)
 	k_msleep(1);
 
 	/* Put finger on the sensor. */
-	fingerprint_get_state(fp_sim, &state);
-	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
-	fingerprint_set_state(fp_sim, &state);
+	cycle_finger_present();
 
 	/* Ping fpsensor task. */
 	fingerprint_run_callback(fp_sim);
@@ -421,7 +429,6 @@ ZTEST_USER(fpsensor_capture, test_finger_capture_get_frame_v1_bad_offset)
 			(FP_CAPTURE_SIMPLE_IMAGE << FP_MODE_CAPTURE_TYPE_SHIFT),
 	};
 	struct ec_response_fp_mode response;
-	struct fingerprint_sensor_state state;
 	struct ec_params_fp_frame_v1 frame_request = {
 		.cmd = FP_FRAME_GET_RAW_IMAGE,
 		.offset = IMAGE_SIZE + 1,
@@ -435,9 +442,7 @@ ZTEST_USER(fpsensor_capture, test_finger_capture_get_frame_v1_bad_offset)
 	k_msleep(1);
 
 	/* Put finger on the sensor. */
-	fingerprint_get_state(fp_sim, &state);
-	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
-	fingerprint_set_state(fp_sim, &state);
+	cycle_finger_present();
 
 	/* Ping fpsensor task. */
 	fingerprint_run_callback(fp_sim);
