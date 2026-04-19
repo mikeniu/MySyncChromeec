@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "623fce93_12f155f0",
+        "filename": "zephyr/program/fatcat/moonstone-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-19T22:02:47Z",
+      "side": 1,
+      "message": "these two are in a choice, you can drop `CONFIG_SIZE_OPTIMIZATIONS_AGGRESSIVE\u003dn` just leave the first one",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 38
+      },
+      "revId": "a6d3e145d74461616dea543f613fafa5d9855996",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
