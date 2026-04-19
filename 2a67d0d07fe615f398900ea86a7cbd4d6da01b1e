@@ -1,0 +1,136 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d8d4a12_dfd4b5ea",
+        "filename": "zephyr/program/fatcat/Kconfig",
+        "patchSetId": 8
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-04-19T19:33:03Z",
+      "side": 1,
+      "message": "Please group this change and the changes to .conf files where this new configs are used in a separate commit that precedes the remainder of this CL.",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 61,
+        "endChar": 26
+      },
+      "revId": "2a67d0d07fe615f398900ea86a7cbd4d6da01b1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b08a4bb_bf9fc8bd",
+        "filename": "zephyr/program/fatcat/fatcat-ish-idle/project.conf",
+        "patchSetId": 8
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-04-19T19:33:03Z",
+      "side": 1,
+      "message": "Please group this change with the fatcat/Kconfig file change in a separate CL",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 29
+      },
+      "revId": "2a67d0d07fe615f398900ea86a7cbd4d6da01b1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cb44cd1_d17c5f23",
+        "filename": "zephyr/program/fatcat/kinmen-ish/project.conf",
+        "patchSetId": 8
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-04-19T19:33:03Z",
+      "side": 1,
+      "message": "Please group this change with the fatcat/Kconfig file change in a separate CL",
+      "revId": "2a67d0d07fe615f398900ea86a7cbd4d6da01b1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "309a0abf_2a6efa37",
+        "filename": "zephyr/program/fatcat/moonstone-ish/project.conf",
+        "patchSetId": 8
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-04-19T19:33:03Z",
+      "side": 1,
+      "message": "Please group this change with the fatcat/Kconfig file change in a separate CL",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 26
+      },
+      "revId": "2a67d0d07fe615f398900ea86a7cbd4d6da01b1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb17ef19_f50e4c62",
+        "filename": "zephyr/program/fatcat/moonstone-ish/src/sensor.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-04-19T19:33:03Z",
+      "side": 1,
+      "message": "These checks aren\u0027t doing anything and are repeated in motion_sensors_check_ufsc. However, we will likely need to handle the difference in interrupt configurations here until there is interrupt support for the lis2dh driver. And, even after that point, we will need to check for the lis2de12tr sensor to control if interrupt mode will be enabled for the base accel sensor as only one lis2de12tr sensor can be operated in interrupt mode.",
+      "range": {
+        "startLine": 17,
+        "startChar": 1,
+        "endLine": 17,
+        "endChar": 26
+      },
+      "revId": "2a67d0d07fe615f398900ea86a7cbd4d6da01b1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80c2307d_1d80b34b",
+        "filename": "zephyr/program/fatcat/ruby-ish/project.conf",
+        "patchSetId": 8
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-04-19T19:33:03Z",
+      "side": 1,
+      "message": "Please group this change with the fatcat/Kconfig file change in a separate CL",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 21
+      },
+      "revId": "2a67d0d07fe615f398900ea86a7cbd4d6da01b1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
