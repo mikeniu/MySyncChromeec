@@ -5,6 +5,7 @@
 
 # Disable check that incorrectly detects the "config_*" functions as unreachable.
 # shellcheck disable=SC2317
+# shellcheck disable=SC1091
 
 shflags_path=""
 for path in \
