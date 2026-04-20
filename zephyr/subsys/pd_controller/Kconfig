@@ -131,6 +131,12 @@ config USB_MUX_SYS_INIT_PRIORITY
 	  PDC power management initialization priority.
 endif
 
+config USBC_PDC_DPM_STICKY_LOCK
+	bool "Enable sticky lock for USB-C PD 1.5A current limit"
+	help
+	  Enables a sticky lock mechanism to prevent DPM from restoring
+	  3.0A current limit when throttled due to overload.
+
 module = USB_PDC
 module-str = USB PDC
 source "subsys/logging/Kconfig.template.log_config"
