@@ -337,3 +337,42 @@ int pdc_dpm_get_source_current(const int port)
 	 */
 	return 1500;
 }
+
+/*
+ * Set the source current limit for a specific port.
+ * This modifies the DPM ledger and triggers a re-evaluation of the PD contract.
+ */
+void pdc_dpm_set_source_current_limit(int port, uint16_t current_ma)
+{
+	/* Lock the mutex to prevent race conditions with the background
+	 * allocation task. */
+	k_mutex_lock(&max_current_claimed_mtx, K_FOREVER);
+
+	if (current_ma <= 1500) {
+		/* Downgrade the port current limit */
+
+		/* Remove this port from the 3A ledger. */
+		max_current_claimed &= ~BIT(port);
+
+		/* Clear its request queue bits to prevent the background task
+		 * from immediately re-allocating 3A to this port.
+		 */
+		atomic_clear_bit(&sink_max_pdo_requested, port);
+		atomic_clear_bit(&source_frs_max_requested, port);
+		atomic_clear_bit(&non_pd_sink_max_requested, port);
+
+	} else {
+		/* Restore the port current limit (e.g., 3000mA) */
+
+		/* Set the request bit and wake up the background task
+		 * to let it run the standard allocation logic.
+		 */
+		atomic_set_bit(&sink_max_pdo_requested, port);
+		k_work_reschedule(&dpm_work, K_NO_WAIT);
+	}
+
+	k_mutex_unlock(&max_current_claimed_mtx);
+
+	/* Notify the PDC to re-evaluate and send a new PD broadcast. */
+	pdc_power_mgmt_set_new_power_request(port);
+}
