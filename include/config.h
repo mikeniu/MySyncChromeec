@@ -344,6 +344,7 @@
 #undef CONFIG_ALS_ISL29035
 #undef CONFIG_ALS_OPT3001
 #undef CONFIG_ALS_CM32183
+#undef CONFIG_ALS_CM36781
 /* Define the exact model ID present on the board: SI1141 = 41, SI1142 = 42, */
 #undef CONFIG_ALS_SI114X
 /* Check if the device revision is supported */
@@ -1723,16 +1724,6 @@
 #undef CONFIG_CMD_PD_SRCCAPS_REDUCED_SIZE
 #undef CONFIG_CMD_VBUS
 
-/*
- * HAS_TASK_CHIPSET implies the GSC presence.
- * HAS_TASK_CONSOLE means UART console enabled.
- * chargen command is needed for UART stress test.
- */
-#if defined(HAS_TASK_CHIPSET) && defined(HAS_TASK_CONSOLE)
-#define CONFIG_CMD_CHARGEN
-#else
-#undef CONFIG_CMD_CHARGEN
-#endif
 #define CONFIG_CMD_CHARGER
 
 /* Extra debugging info for the charger */
@@ -1889,6 +1880,9 @@
  * including the `paniclog` console command.
  */
 #undef CONFIG_PANIC_LOG_DEBUG
+
+/* Enable generic SVDM DFP identity response */
+#undef CONFIG_SVDM_RSP_DFP_ONLY
 
 /*
  * noinit_end_of_ram is a memory section placed at the very end
@@ -5496,6 +5490,14 @@
 /* SYV682 does not pass through CC, instead it bypasses to the TCPC */
 #undef CONFIG_USBC_PPC_SYV682X_NO_CC
 
+/*
+ * TODO(b/445132756): This config is now a no-op.
+ *
+ * Smart discharge support in the SYV682x driver has been removed due to
+ * unreliable behavior (see bug for details). This config is kept temporarily
+ * to avoid breaking builds for boards that may still define it.
+ *
+ */
 /* Define to enable SYV682X VBUS smart discharge. */
 #undef CONFIG_USBC_PPC_SYV682X_SMART_DISCHARGE
 
@@ -5531,9 +5533,6 @@
 
 /* Support VCONN swap */
 #undef CONFIG_USBC_VCONN_SWAP
-
-#undef CONFIG_USBC_PD3_T_SENDER_RESPONSE_OVERRIDE
-#undef CONFIG_USBC_PD3_T_SENDER_RESPONSE_MS
 
 /*
  * The amount of time in microseconds that the board takes to turn VCONN on or

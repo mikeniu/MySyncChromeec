@@ -474,7 +474,6 @@ class Renode(Platform):
             "benchmark",  # TODO(b/390253975)
             # TODO(b/382705460): We have seen this flake in the CQ.
             # Re-enable when missing character bug is fixed.
-            "flash_physical",
             "fp_transport",  # TODO(b/384094788)
             "fpsensor_debug",  # TODO(b/384110894)
             "zephyr_flash_stm32f4",  # TODO(b/384974228)
@@ -542,7 +541,6 @@ class Renode(Platform):
             return True
 
         if zephyr and test_config.test_name in [
-            "flash_physical",  # TODO(b/448407366)
             "flash_protection_rw",  # TODO(b/485668014)
             "flash_write_protect",  # TODO(b/485668014)
             "fp_transport",  # TODO(b/485668240)
@@ -560,6 +558,7 @@ class Renode(Platform):
             return True
 
         if zephyr and test_config.config_name in [
+            "flash_physical_ro",  # TODO(b/448407366)
             "system_is_locked_wp_on",  # TODO(b/485669841)
             "system_is_locked_wp_on_helipilot_v2.0.24337",  # TODO(b/485669841)
             "system_is_locked_wp_on_helipilot_v2.0.27609",  # TODO(b/485669841)
@@ -777,8 +776,15 @@ class AllTests:
             TestConfig(test_name="exception"),
             TestConfig(test_name="exit"),
             TestConfig(
+                config_name="flash_physical_ro",
                 test_name="flash_physical",
                 imagetype_to_use=ImageType.RO,
+                toggle_power=True,
+            ),
+            TestConfig(
+                config_name="flash_physical_rw",
+                test_name="flash_physical",
+                imagetype_to_use=ImageType.RW,
                 toggle_power=True,
             ),
             TestConfig(
@@ -1494,6 +1500,7 @@ def build_zephyr_upstream(
     cmd = cmd + ["-O"] + [ZEPHYR_TWISTER_BUILD_DIR]
     cmd = cmd + ["-s"] + [test_name]
     cmd = cmd + ["--no-upload-cros-rdb"]
+    cmd = cmd + ["--force-toolchain"]
 
     for config in zephyr_extra_configs:
         cmd.extend(["-x", config])
@@ -1875,6 +1882,14 @@ def flash_and_run_test(
     image_path = get_image_path(test, build_board, args.zephyr)
 
     logging.debug("image_path: %s", image_path)
+
+    if image_path is None or not os.path.exists(image_path):
+        logging.error(
+            "Failed to locate built image for test %s. "
+            "The test might have been skipped or failed to build.",
+            test.test_name,
+        )
+        return False
 
     if test.ro_image is not None:
         # Use the RO specified by the test. Replace KEY_RO and EC_RW (which
