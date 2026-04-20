@@ -936,6 +936,9 @@ enum host_event_code {
 	/* Body detect (lap/desk) change event */
 	EC_HOST_EVENT_BODY_DETECT_CHANGE = 33,
 
+	/* New console logs since last snapshot */
+	EC_HOST_EVENT_CONSOLE_LOGS = 34,
+
 	/*
 	 * Only 64 host events are supported. This enum uses 1-based counting so
 	 * it can skip 0 (NONE), so the last legal host event number is 64.
@@ -983,6 +986,7 @@ enum host_event_code {
 		[EC_HOST_EVENT_WOV] = "WOV",                                   \
 		[EC_HOST_EVENT_INVALID] = "INVALID",                           \
 		[EC_HOST_EVENT_BODY_DETECT_CHANGE] = "BODY_DETECT_CHANGE",     \
+		[EC_HOST_EVENT_CONSOLE_LOGS] = "CONSOLE_LOGS",                 \
 	}
 /* clang-format on */
 
@@ -1782,6 +1786,10 @@ enum ec_feature_code {
 	 * The EC supports a hybrid boost charger
 	 */
 	EC_FEATURE_CHARGER_HYBRID_POWER_BOOST = 57,
+	/*
+	 * Support signaling new console logs via host event
+	 */
+	EC_FEATURE_CONSOLE_LOG_EVENT = 58,
 };
 
 #define EC_FEATURE_MASK_0(event_code) BIT(event_code % 32)
@@ -3026,6 +3034,7 @@ enum motionsensor_chip {
 	MOTIONSENSE_CHIP_BMI220 = 29,
 	MOTIONSENSE_CHIP_CM32183 = 30,
 	MOTIONSENSE_CHIP_VEML3328 = 31,
+	MOTIONSENSE_CHIP_CM36781 = 32,
 	MOTIONSENSE_CHIP_MAX,
 };
 
@@ -5887,6 +5896,16 @@ struct ec_params_get_panic_info_v1 {
 	uint8_t preserve_old_hostcmd_flag;
 } __ec_align1;
 
+struct ec_params_get_panic_info_v2 {
+	/* Do not modify PANIC_DATA_FLAG_OLD_HOSTCMD when reading panic info */
+	uint8_t preserve_old_hostcmd_flag;
+
+	/* Read panic_data struct from this offset.
+	 * Signal end of data with empty success.
+	 */
+	uint16_t read_offset;
+} __ec_align1;
+
 /*****************************************************************************/
 /*
  * Special commands
@@ -8437,6 +8456,8 @@ struct ec_params_fp_passthru {
 #define FP_MODE_ENCRYPT_TEMPLATE BIT(9)
 /* Decrypt template. */
 #define FP_MODE_DECRYPT_TEMPLATE BIT(10)
+/* Disable template update. */
+#define FP_MODE_MATCH_NO_TEMPLATE_UPDATE BIT(11)
 /* special value: don't change anything just read back current mode */
 #define FP_MODE_DONT_CHANGE BIT(31)
 
@@ -8445,7 +8466,7 @@ struct ec_params_fp_passthru {
 	 FP_MODE_CAPTURE | FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE |   \
 	 FP_MODE_MATCH | FP_MODE_RESET_SENSOR | FP_MODE_SENSOR_MAINTENANCE | \
 	 FP_MODE_ENCRYPT_TEMPLATE | FP_MODE_DECRYPT_TEMPLATE |               \
-	 FP_MODE_DONT_CHANGE)
+	 FP_MODE_MATCH_NO_TEMPLATE_UPDATE | FP_MODE_DONT_CHANGE)
 
 #define FP_MODES_WITH_AUTHENTICATION (FP_MODE_ENROLL_SESSION | FP_MODE_MATCH)
 #define FP_MODES_CRYPTO_IN_PROGRESS \
@@ -8619,6 +8640,31 @@ struct ec_response_fp_info_v2 {
 		image_frame_params[FLEXIBLE_ARRAY_MEMBER_SIZE];
 } __ec_align4;
 BUILD_ASSERT(sizeof(struct ec_response_fp_info_v2) == 36);
+
+struct fp_image_frame_params_v2 {
+	/* Image frame characteristics */
+	uint32_t frame_size;
+	uint32_t image_data_offset_bytes; /**< Byte offset of image buffer */
+	uint32_t pixel_format; /* using V4L2_PIX_FMT_ */
+	uint16_t width;
+	uint16_t height;
+	uint16_t bpp;
+	/** Type of image capture from enum fp_capture_type. */
+	uint8_t fp_capture_type;
+	uint8_t reserved; /**< padding for alignment */
+} __ec_align4;
+BUILD_ASSERT(sizeof(struct fp_image_frame_params_v2) == 20);
+
+struct ec_response_fp_info_v3 {
+	/* Sensor identification */
+	struct fp_sensor_info sensor_info;
+	/* Template/finger current information */
+	struct fp_template_info template_info;
+	/* fingerprint image frame parameters */
+	struct fp_image_frame_params_v2
+		image_frame_params[FLEXIBLE_ARRAY_MEMBER_SIZE];
+} __ec_align4;
+BUILD_ASSERT(sizeof(struct ec_response_fp_info_v3) == 36);
 
 /* Get the last captured finger frame or a template content */
 #define EC_CMD_FP_FRAME 0x0404
