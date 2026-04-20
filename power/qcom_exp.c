@@ -329,6 +329,9 @@ DECLARE_HOOK(HOOK_AC_CHANGE, power_ac_changed, HOOK_PRIO_DEFAULT);
 /* 1 if the system is currently in the off-mode charging heartbeat state. */
 static char heartbeat_mode;
 
+/* 1 if the heartbeat wake is enabled. */
+static int heartbeat_enabled = 1;
+
 #ifdef CONFIG_ZEPHYR
 static void qcom_rtc_set_host_event(void)
 {
@@ -362,6 +365,27 @@ host_command_offmode_charing_active(struct host_cmd_handler_args *args)
 DECLARE_HOST_COMMAND(EC_CMD_ENABLE_OFFMODE_HEARTBEAT,
 		     host_command_offmode_charing_active, EC_VER_MASK(0));
 
+static int command_heartbeat(int argc, const char **argv)
+{
+	int enabled;
+
+	if (argc < 2) {
+		CPRINTS("Heartbeat wake is %s",
+			heartbeat_enabled ? "on" : "off");
+		return EC_SUCCESS;
+	}
+
+	if (!parse_bool(argv[1], &enabled))
+		return EC_ERROR_PARAM1;
+
+	heartbeat_enabled = enabled;
+	CPRINTS("Heartbeat wake %s", heartbeat_enabled ? "on" : "off");
+
+	return EC_SUCCESS;
+}
+DECLARE_CONSOLE_COMMAND(heartbeat, command_heartbeat, "[on|off]",
+			"Toggle heartbeat wake");
+
 /*
  * On chipset shutdown complete, determine the next wake-up event.
  *
@@ -373,6 +397,11 @@ DECLARE_HOST_COMMAND(EC_CMD_ENABLE_OFFMODE_HEARTBEAT,
  */
 void board_chipset_set_heartbeat_alarm_on_shutdown(void)
 {
+	if (!heartbeat_enabled) {
+		heartbeat_mode = 0;
+		return;
+	}
+
 	if (heartbeat_mode) {
 		/* Move heart beat to RTC alarm based wake (45min) */
 		system_set_rtc_alarm(HEARTBEAT_WAKE_INTERVAL_SEC, 0);
