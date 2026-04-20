@@ -6,6 +6,7 @@
 #include "battery.h"
 #include "battery_fuel_gauge.h"
 #include "charge_manager.h"
+#include "charge_state.h"
 #include "charger.h"
 #include "charger/isl923x_public.h"
 #include "console.h"
@@ -66,4 +67,46 @@ __override int board_get_leave_safe_mode_delay_ms(void)
 		return 2000;
 	else
 		return 500;
+}
+
+int charger_profile_override(struct charge_state_data *curr)
+{
+	static int force_idle_en;
+
+	/* If either AC or battery is not present, nothing to do. */
+	if (!curr->ac || curr->batt.is_present != BP_YES)
+		return 0;
+
+	/*
+	 * Precharge must be executed when communication is failed on
+	 * dead battery.
+	 */
+	if (!(curr->batt.flags & BATT_FLAG_RESPONSIVE))
+		return 0;
+
+	if (curr->batt.state_of_charge >= 50) {
+		force_idle_en = 1;
+	} else if (curr->batt.state_of_charge < 40)
+	{
+		force_idle_en = 0;
+	}
+
+	if (force_idle_en) {
+		curr->state = ST_IDLE;
+	}
+	LOG_INF("Force idle: %d", force_idle_en);
+
+	return EC_SUCCESS;
+}
+
+enum ec_status charger_profile_override_get_param(uint32_t param,
+						  uint32_t *value)
+{
+	return EC_RES_INVALID_PARAM;
+}
+
+enum ec_status charger_profile_override_set_param(uint32_t param,
+						  uint32_t value)
+{
+	return EC_RES_INVALID_PARAM;
 }
