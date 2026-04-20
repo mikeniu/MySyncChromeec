@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4115101_80caeb13",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-04-20T17:09:37Z",
+      "side": 1,
+      "message": "In general I would recommend to finalize the feature first (cl:7697735), before establishing the API..",
+      "revId": "4b3bf79d5d5fee1905fa1be412f054da9daac370",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3626b0e6_b7533240",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 1794,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-04-20T17:09:37Z",
+      "side": 1,
+      "message": "nit: either \"a\" or \"monitors\"",
+      "range": {
+        "startLine": 1794,
+        "startChar": 19,
+        "endLine": 1794,
+        "endChar": 36
+      },
+      "revId": "4b3bf79d5d5fee1905fa1be412f054da9daac370",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
