@@ -117,6 +117,30 @@
       },
       "revId": "662f660f8a23fc1154ec588a969e7e00f30b014b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c782a09_f104e6f4",
+        "filename": "baseboard/dedede/baseboard.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-04-20T17:42:26Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c0ae52b8_75abed02",
+      "range": {
+        "startLine": 253,
+        "startChar": 36,
+        "endLine": 253,
+        "endChar": 39
+      },
+      "revId": "662f660f8a23fc1154ec588a969e7e00f30b014b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
