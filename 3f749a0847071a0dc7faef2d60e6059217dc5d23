@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0fdacf9_d12e5362",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-20T08:13:25Z",
+      "side": 1,
+      "message": "Last minor comment.",
+      "revId": "3f749a0847071a0dc7faef2d60e6059217dc5d23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "370e563a_da13d40d",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_ft.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-20T08:13:25Z",
+      "side": 1,
+      "message": "This `else if` branch uses `CONFIG_ROLLBACK_OFF` and `CONFIG_ROLLBACK_SIZE`, which are undefined when `CONFIG_ROLLBACK` is disabled. This will cause a compilation error. Please wrap this branch in `#ifdef CONFIG_ROLLBACK` (similar to how it is handled in `cros_flash_ft_xip_get_protect_flags`).",
+      "range": {
+        "startLine": 382,
+        "startChar": 0,
+        "endLine": 382,
+        "endChar": 0
+      },
+      "revId": "3f749a0847071a0dc7faef2d60e6059217dc5d23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
