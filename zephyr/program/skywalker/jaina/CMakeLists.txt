@@ -5,4 +5,5 @@
 # Jaina Makeifile
 zephyr_include_directories("include")
 zephyr_library_sources("src/sensor.c")
+zephyr_library_sources("src/typec_limit.c")
 zephyr_library_sources("src/keyboard_customization.c" "src/led.c")
