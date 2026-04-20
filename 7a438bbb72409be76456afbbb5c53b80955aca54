@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bff661fe_0e3d8880",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-20T17:12:38Z",
+      "side": 1,
+      "message": "Hmm, looks like the CQ is failing:\n\n```\n/build/ocelot/tmp/portage/sys-firmware/chromeos-fpmcu-release-bloonchipper-0.0.1-r153/work/chromeos-fpmcu-release-bloonchipper-0.0.1/zephyrproject/zephyr/scripts/kconfig/kconfig.py: /build/ocelot/tmp/portage/sys-firmware/chromeos-fpmcu-release-bloonchipper-0.0.1-r153/work/chromeos-fpmcu-release-bloonchipper-0.0.1/zephyrproject/modules/ec/zephyr/cmake/toolchain/host/llvm/Kconfig:33: \u0027/build/ocelot/tmp/portage/sys-firmware/chromeos-fpmcu-release-bloonchipper-0.0.1-r153/work/chromeos-fpmcu-release-bloonchipper-0.0.1/zephyrproject/zephyr/cmake/toolchain/host/llvm/Kconfig\u0027 not found (in \u0027source \"${ZEPHYR_BASE}/cmake/toolchain/host/llvm/Kconfig\"\u0027). Check that environment variables are set correctly (e.g. $srctree, which is set to \u0027/build/ocelot/tmp/portage/sys-firmware/chromeos-fpmcu-release-bloonchipper-0.0.1-r153/work/chromeos-fpmcu-release-bloonchipper-0.0.1/zephyrproject/zephyr\u0027). Also note that unset environment variables expand to the empty string.\n```\n\nIt\u0027s failing to find this file: `source \"${ZEPHYR_BASE}/cmake/toolchain/host/llvm/Kconfig`\n\nIt looks like it doesn\u0027t exist in the FPMCU release branch: https://chromium.googlesource.com/chromiumos/third_party/zephyrproject/+/refs/heads/firmware-fpmcu-bloonchipper-release/zephyr/cmake/toolchain/host/\n\nI think we\u0027ll need to merge or cherry-pick the [`zephyrproject` changes](https://source.chromium.org/chromiumos/_/chromium/chromiumos/third_party/zephyrproject/+/20d27244d875eff4338862006db18455710e5b30), since our Zephyr branch is older: https://chromium.googlesource.com/chromiumos/third_party/zephyrproject/+/refs/heads/firmware-fpmcu-bloonchipper-release.",
+      "revId": "7a438bbb72409be76456afbbb5c53b80955aca54",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
