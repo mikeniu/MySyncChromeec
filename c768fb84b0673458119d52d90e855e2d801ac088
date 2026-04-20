@@ -445,6 +445,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ad28d178_0afce655",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-20T07:57:58Z",
+      "side": 1,
+      "message": "Yes, the current implementation follows the same behavioral model.\n\n- The runtime lock is disabled by default.\n- When protect_now() is invoked, the driver enters a software-only\n  protection lock state, which is reflected via the *_NOW flags.\n- When the system is locked during boot, the protection is treated as\n  locked from the beginning.\n- While the lock is active, extending the protection range is allowed,\n  but reducing or removing protection is rejected.\n\nThe key difference on EM32F967 is that this lock is implemented explicitly\nas a driver-level software policy (software_protection_lock), and is not\nbacked by a flash-internal or controller-enforced mechanism.\n\nThis keeps the *_NOW semantics aligned with the Andes behavior, while\naccurately reflecting the limits of the underlying hardware.",
+      "parentUuid": "9d08130b_677cc368",
+      "revId": "c768fb84b0673458119d52d90e855e2d801ac088",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2b2255d0_781c322e",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 7
