@@ -16,6 +16,23 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "efcf83c6f37f4cbc62208da16a8e4e2b04fdc243",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f64c7a6_4d46effa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1532003
+      },
+      "writtenOn": "2026-04-20T13:35:43Z",
+      "side": 1,
+      "message": "@keith: It seems this expectation is incorrect. The AP FW log will be disabled in the production BIOS image (release image) for FSI. If we need to debug PDC FW update issues, it would be better to enable debug macros specifically for those instances, rather than impacting the boot time by ~20ms in production FW scenarios, which was heavily optimized to meet the \u003c 1.35-second target on Fatcat.\n\n```Log the PDC data returned in EC_CMD_PD_CHIP_INFO host command queries in\nthe EC console. This makes it easier to diagnose PDC FW update issues\nwhen the AP serial logs are disabled by logging key info in the EC\nconsole instead.```",
+      "revId": "efcf83c6f37f4cbc62208da16a8e4e2b04fdc243",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
