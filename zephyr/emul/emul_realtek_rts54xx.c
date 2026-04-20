@@ -788,24 +788,72 @@ static int get_cable_property(struct rts5453p_emul_pdc_data *data,
 	return 0;
 }
 
+static int set_vdo(struct rts5453p_emul_pdc_data *data,
+		   const union rts54_request *req)
+{
+	uint8_t num_vdos = req->set_vdo.vdo_req.num_vdos;
+	uint8_t vdo_origin = req->set_vdo.vdo_req.vdo_origin;
+
+	LOG_INF("SET_VDO num_vdos=%d, vdo_origin=%d", num_vdos, vdo_origin);
+
+	if (vdo_origin != 0) {
+		LOG_ERR("Only PDC origin supported for SET_VDO in emulator.");
+		return -1;
+	}
+
+	/* Emulator only supports setting 1 VDO for now */
+	if (num_vdos != 1) {
+		LOG_ERR("Only 1 VDO supported for SET_VDO in emulator, got %d.",
+			num_vdos);
+		return -1;
+	}
+
+	uint8_t index = req->set_vdo.vdo_index;
+	uint32_t value;
+
+	memcpy(&value, &req->set_vdo.vdo_value, sizeof(value));
+
+	if (index < RTS54_EMUL_VDO_COUNT) {
+		data->vdos[index] = value;
+	}
+	memset(&data->response, 0, sizeof(data->response));
+	send_response(data);
+	return 0;
+}
+
 static int get_vdo(struct rts5453p_emul_pdc_data *data,
 		   const union rts54_request *req)
 {
-	LOG_INF("GET_VDO = %x", req->get_vdo.vdo_req.raw_value);
+	uint8_t num_vdos = req->get_vdo.vdo_req.num_vdos;
+	uint8_t vdo_origin = req->get_vdo.vdo_req.vdo_origin;
+
+	LOG_INF("GET_VDO: num_vdos=%d, vdo_origin=%d", num_vdos, vdo_origin);
+
 	memset(&data->response, 0, sizeof(data->response));
 
-	if (req->get_vdo.vdo_req.num_vdos > PDC_DISC_IDENTITY_VDO_COUNT) {
-		LOG_ERR("Too many VDOs requested in GET_VDO.");
+	if (num_vdos > RTS54_EMUL_VDO_COUNT) {
+		LOG_ERR("Too many VDOs requested in GET_VDO: %d, max is %d.",
+			num_vdos, RTS54_EMUL_VDO_COUNT);
 		return -EINVAL;
 	}
 
-	for (uint8_t i = 0; i < req->get_vdo.vdo_req.num_vdos; i++) {
-		data->response.get_vdo.vdo[i] = data->vdos[i];
+	for (uint8_t i = 0; i < num_vdos; i++) {
+		/* Note: In the RTS5453P protocol, 'type' corresponds to the
+		 * index in the Discovery Identity VDO list (0=Header, 1=IDH,
+		 * etc.)
+		 */
+		uint8_t type = req->get_vdo.vdo_type[i];
+		if (type < RTS54_EMUL_VDO_COUNT) {
+			data->response.get_vdo.vdo[i] = data->vdos[type];
+			LOG_INF("  VDO[%d] type=%d: 0x%08x", i, type,
+				data->response.get_vdo.vdo[i]);
+		} else {
+			data->response.get_vdo.vdo[i] = 0;
+			LOG_WRN("  VDO[%d] type=%d: unsupported/out of bounds",
+				i, type);
+		}
 	}
-
-	data->response.get_vdo.byte_count =
-		sizeof(uint32_t) * req->get_vdo.vdo_req.num_vdos;
-
+	data->response.get_vdo.byte_count = sizeof(uint32_t) * num_vdos;
 	send_response(data);
 	return 0;
 }
@@ -985,7 +1033,7 @@ const struct commands sub_cmd_x08[] = {
 	{ .code = 0x44, HANDLER_DEF(unsupported) },
 	{ .code = 0x05, HANDLER_DEF(set_tpc_rp) },
 	{ .code = 0x19, HANDLER_DEF(unsupported) },
-	{ .code = 0x1A, HANDLER_DEF(unsupported) },
+	{ .code = 0x1A, HANDLER_DEF(set_vdo) },
 	{ .code = 0x1D, HANDLER_DEF(set_tpc_csd_operation_mode) },
 	{ .code = 0x1F, HANDLER_DEF(set_tpc_reconnect) },
 	{ .code = 0x20, HANDLER_DEF(unsupported) },
@@ -1300,6 +1348,8 @@ static int emul_realtek_rts54xx_init_data(const struct emul *target)
 	data->bbr_cts_mode = false;
 	data->sys_power_state = SX_RSVD; /* Power state unspecified */
 
+	memset(data->vdos, 0, sizeof(data->vdos));
+
 	/* Clear any feature flags */
 	emul_realtek_rts54xx_reset_feature_flags(target);
 
@@ -1359,6 +1409,8 @@ static int rts5453p_emul_init(const struct emul *emul,
 	data->pdc_data.capability.bcdUSBTypeCVersion = 0xCAFE;
 
 	data->pdc_data.connector_capability.op_mode_usb3 = 1;
+
+	data->pdc_data.info.vid = 0x0BDA;
 
 	data->pdc_data.set_tpc_reconnect_param = 0xAA;
 
@@ -1650,14 +1702,44 @@ static int emul_realtek_rts54xx_set_vdo(const struct emul *target,
 	struct rts5453p_emul_pdc_data *data =
 		rts5453p_emul_get_pdc_data(target);
 
-	if (num_vdos > PDC_DISC_IDENTITY_VDO_COUNT) {
+	if (num_vdos > RTS54_EMUL_VDO_COUNT) {
 		return -EINVAL;
 	}
+	memset(data->vdos, 0, sizeof(data->vdos));
 
+	/* Note: The generic emul_pdc_set_vdo() API passes a simple list of
+	 * VDOs. In the Realtek protocol, these must be mapped to their standard
+	 * Discovery Identity indices.
+	 */
 	for (uint8_t i = 0; i < num_vdos; i++) {
-		data->vdos[i] = vdos[i];
+		if (num_vdos == 1) {
+			/* Heuristic: If it looks like a DP Config VDO, map it
+			 * to VDO_PD_DP_CFG (15). Otherwise assume IDH.
+			 * VDO_DP_CFG(pin, sig, cfg) where sig=1, cfg=1 results
+			 * in lower 8 bits being 0x05.
+			 */
+			if ((vdos[i] & 0xFF) == 0x05) {
+				data->vdos[VDO_PD_DP_CFG] = vdos[i];
+			} else {
+				data->vdos[VDO_INDEX_IDH] = vdos[i];
+			}
+		} else {
+			switch (i) {
+			case 0:
+				data->vdos[VDO_INDEX_IDH] = vdos[i];
+				break;
+			case 1:
+				data->vdos[VDO_INDEX_PRODUCT] = vdos[i];
+				break;
+			default:
+				/* Other VDOs from the generic API are not
+				 * currently mapped to standard indices in this
+				 * emulator.
+				 */
+				break;
+			}
+		}
 	}
-
 	return 0;
 }
 
