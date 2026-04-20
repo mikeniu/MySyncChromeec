@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5aec3328_210e03a5",
+        "filename": "zephyr/app/ec/chip/arm/realtek_rtk/Kconfig.rtk",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-04-20T16:20:38Z",
+      "side": 1,
+      "message": "is this a special purpose area or can we use it for\nregular EC code as well? 19 KB seems like a significant\nhole in the memory map that should be explained.",
+      "range": {
+        "startLine": 23,
+        "startChar": 30,
+        "endLine": 23,
+        "endChar": 50
+      },
+      "revId": "0edb8c8dee7a45139918e622d7db8c06821bc1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b5ec6e68_77b5aaf2",
         "filename": "zephyr/app/ec/chip/arm/realtek_rtk/Kconfig.rtk",
         "patchSetId": 2
