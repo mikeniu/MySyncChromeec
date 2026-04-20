@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "751c2f46_a0501fd2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-20T23:19:24Z",
+      "side": 1,
+      "message": "Note that this option enables/disables the \"character generator\" test code via the \"chargen\" EC console command.  This doesn\u0027t relate to charging at all, but is used to test the GSC UART connection.\n\nThis is safe to disable.",
+      "revId": "bd788b91c30a4d4a62afcf62dd079b7d913056b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
