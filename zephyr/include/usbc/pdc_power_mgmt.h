@@ -814,4 +814,13 @@ int pdc_power_mgmt_set_ap_power_state(enum power_state state);
  */
 void pdc_power_mgmt_simulate_power_button_press(int ms);
 
+/**
+ * Set the source current limit for a specific port.
+ * This modifies the DPM ledger and triggers a re-evaluation of the PD contract.
+ *
+ * @param port       The Type-C port number.
+ * @param current_ma The target current limit in mA.
+ */
+void pdc_dpm_set_source_current_limit(int port, uint16_t current_ma);
+
 #endif /* __CROS_EC_PDC_POWER_MGMT_H */
