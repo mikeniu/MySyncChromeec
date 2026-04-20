@@ -21,9 +21,6 @@
 		std-adpt-cntrl-gpio-3v3-pp {
 			gpios = <RTS5912_GPIO001 GPIO_OUTPUT>;
 		};
-                cse_early_rec_sw: c-mecc-cse-early-sw-1v8-od {
-                        gpios = <RTS5912_GPIO015 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_VOLTAGE_1P8)>;
-                };
                 gpio_voldn: vol-dn-ec-3v3-i {
                         gpios = <RTS5912_GPIO029 GPIO_INPUT>;
                         enum-name = "GPIO_VOLUME_DOWN_L";
@@ -104,6 +101,21 @@
 			irq-pin = <&gpio_ec_acok_od>;
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "extpower_interrupt";
+		};
+		int_dc_jack_present: dc_jack_present {
+                        irq-pin = <&gpio_dc_jack_present>;
+                        flags = <GPIO_INT_EDGE_BOTH>;
+                        handler = "board_dc_jack_interrupt";
+                };
+		int_power_button: power_button {
+			irq-pin = <&gpio_ec_pwr_btn_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "power_button_interrupt";
+		};
+		int_lid_open: lid_open {
+			irq-pin = <&gpio_lid_open>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "lid_interrupt";
 		};
 	};
 };
