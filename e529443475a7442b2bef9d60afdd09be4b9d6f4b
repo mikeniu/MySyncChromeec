@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ebe6e97_9823d602",
+        "filename": "zephyr/shim/chip/it8xxx2/system.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-04-20T16:57:07Z",
+      "side": 1,
+      "message": "nit: This effectively remapping to DLM. The word \"cleanup\" might be misleading.",
+      "range": {
+        "startLine": 29,
+        "startChar": 8,
+        "endLine": 29,
+        "endChar": 27
+      },
+      "revId": "e529443475a7442b2bef9d60afdd09be4b9d6f4b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c24c631_d2c245a5",
+        "filename": "zephyr/shim/chip/it8xxx2/system.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-04-20T16:57:07Z",
+      "side": 1,
+      "message": "This write assumes NSDMA bit of SCARnH is not set. If I\u0027m reading the datasheet correctly,setting this bit will suppress the immediate DMA operation, which might speed up the remapping process (we don\u0027t really need to copy anything here..). What do you think?",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 54
+      },
+      "revId": "e529443475a7442b2bef9d60afdd09be4b9d6f4b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
