@@ -93,6 +93,30 @@
       },
       "revId": "662f660f8a23fc1154ec588a969e7e00f30b014b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0ae52b8_75abed02",
+        "filename": "baseboard/dedede/baseboard.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-04-20T17:25:37Z",
+      "side": 1,
+      "message": "I would blast N back-to-back interrupts and see for which N it starts to fail. I think testing only one port is enough, because it doesn\u0027t really matter which port caused the interrupt to cause system starvation. \nWe can start with 280 though, and fine tune later",
+      "parentUuid": "5d40c727_9e1fbcc5",
+      "range": {
+        "startLine": 253,
+        "startChar": 36,
+        "endLine": 253,
+        "endChar": 39
+      },
+      "revId": "662f660f8a23fc1154ec588a969e7e00f30b014b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
