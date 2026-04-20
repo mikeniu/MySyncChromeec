@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "159fd112_cce004e0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-20T21:41:12Z",
+      "side": 1,
+      "message": "You need to disable some shellchecks to pass fullcheckout-presubmit. You can use https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7775797, or create your own CL.",
+      "revId": "332e9964dfb491ad1018f5d27abba4a430c4b60f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
