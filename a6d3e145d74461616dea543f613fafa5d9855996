@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "124cf16d_b43b41c4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-20T14:00:39Z",
+      "side": 1,
+      "message": "Hey, I looked into how to apply this for all ISH platform, could not really figure how to do it with Kconfig as all of these are choice options and the system does not quite work when you have multiple defaults, tried with select but could not make that work either. Automatic overlay config are also a no-go as it does not work with how we have zmake setup, so I\u0027m proposing to have a separate ish config instead: crrev.com/c/7776729.\n\nIt\u0027s not pretty but at least it\u0027s simple, maybe down the road we can instrument zmake to pick it up automatically based on the soc name or something but it should close the gap for all ish platforms for now. I diffed the .config against this CL and it matched.",
+      "revId": "a6d3e145d74461616dea543f613fafa5d9855996",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "623fce93_12f155f0",
