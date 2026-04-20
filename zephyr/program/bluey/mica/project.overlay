@@ -22,6 +22,7 @@
 #include "fan.dtsi"
 #include "keyboard.dtsi"
 #include "temp_sensors.dtsi"
+#include "i2c.dtsi"
 
 /* mica overrides follow... */
 &cbi_flash {
