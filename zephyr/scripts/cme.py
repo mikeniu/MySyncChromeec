@@ -52,6 +52,7 @@ SENSOR_I2C_ADDRESSES = {
     "LSM6DSO_ADDR0_FLAGS": "0x6a",
     "LSM6DSO_ADDR1_FLAGS": "0x6b",
     "TCS3400_I2C_ADDR_FLAGS": "0x39",
+    "CM36781_I2C_ADDR_FLAGS": "0x51",
 }
 
 # A list of all ALS listed under the motionsense compatible.
@@ -134,8 +135,8 @@ def compress_expect_2(expect):
     if "reg" in expect and "write_data" in expect:
         expect["write_data"] = (
             "0x"
-            + expect["reg"].lstrip("0x")
-            + expect["write_data"].lstrip("0x")
+            + expect["reg"].removeprefix("0x")
+            + expect["write_data"].removeprefix("0x")
         )
         del expect["reg"]
 
