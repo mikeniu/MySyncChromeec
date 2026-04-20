@@ -5,10 +5,10 @@
 
 /* Bluey chipset-specific configuration */
 
+#include "adsp_comms.h"
 #include "battery.h"
 #include "chipset.h"
 #include "common.h"
-#include "extpower.h"
 #include "gpio.h"
 #include "gpio/gpio_int.h"
 #include "hooks.h"
@@ -16,12 +16,12 @@
 
 #define CPRINTS(format, args...) cprints(CC_CHIPSET, format, ##args)
 
-void board_chipset_startup(void)
+static void adsp_power_state_cb(uint8_t fid, uint8_t addr, uint16_t data)
 {
-	/* Update the AC event during boot */
-	extpower_update_host_events(gpio_get_level(GPIO_AC_PRESENT));
+	CPRINTS("ADSP Power State: 0x%04x", data);
 }
-DECLARE_HOOK(HOOK_CHIPSET_STARTUP, board_chipset_startup, HOOK_PRIO_DEFAULT);
+ADSP_COMMS_REGISTER_CB(ADSP_FEATURE_DEFAULT, ADSP_POWER_STATE_REG_VAL,
+		       adsp_power_state_cb);
 
 static void enable_acok_passthru_interrupt(void)
 {
