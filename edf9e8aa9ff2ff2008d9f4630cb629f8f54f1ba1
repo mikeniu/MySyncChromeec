@@ -52,6 +52,24 @@
       "parentUuid": "4ee993d7_42391b25",
       "revId": "edf9e8aa9ff2ff2008d9f4630cb629f8f54f1ba1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c260798_cf6a610a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-20T07:58:27Z",
+      "side": 1,
+      "message": "Hi Tom,\n  I have uploaded code to Patchset 3.\n\n  I have a question that I still got the failure when compile the source (with std::format) for aarch64-linux-android.\n  The error is shows “no member named ‘format’ in namespace ‘std’”.\n\n  But I can compile the same source code successfully for x86_64 platform.\n\n  I am not sure whether it is cause by toolchain or API level version. Following is my environment:\nNDK: android-ndk-r26b\nAPI 24\t\u003c\u003d change to 21/24/30 not work.\n\n  If possible, could you please try building the latest source code on your side, or let me know if you have any suggestions?\n\n  Thanks!!",
+      "parentUuid": "922f96a7_3b7d1e29",
+      "revId": "edf9e8aa9ff2ff2008d9f4630cb629f8f54f1ba1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
