@@ -8,9 +8,27 @@
 
 
 /* atriarvp-rtk project DTS includes */
+#include "adc.dtsi"
 #include "gpio.dtsi"
+#include "i2c.dtsi"
+#include "power_signals.dtsi"
+
+#include "../rvp_consolidated.dtsi"
+
+#include <ite/it8801-common-cfg.dtsi>
 
 /* atriarvp-rtk overrides follow... */
+
+/ {
+	cse_early_recovery: cse-early-recovery {
+		compatible = "cros-ec,cse-early-rec";
+	        cse-early-rec-gpios = <RTS5912_GPIO015 (GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_VOLTAGE_1P8)>;
+	};
+};
+
+&it8801_mfd {
+	irq-gpios = <RTS5912_GPIO085 GPIO_ACTIVE_LOW>;
+};
 
 &espi0 {
 	status = "okay";
@@ -19,3 +37,50 @@
 &sha0 {
 	status = "okay";
 };
+
+&pdc_ti_c0 {
+	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
+};
+
+&pdc_ti_c1 {
+	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
+};
+
+&pdc_ti_c2 {
+	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
+};
+
+&ulpm {
+	status = "okay";
+	/* BC_ACOK: AC power present, wakes EC on rising edge */
+	wkup-pin@0 {
+		wkup-pin-mode = "vin";
+		wkup-pin-pol = "rising";
+	};
+	/* Power button: active-low, wakes EC on falling edge */
+	wkup-pin@3 {
+		wkup-pin-mode = "vin";
+		wkup-pin-pol = "falling";
+	};
+};
+
+/* Map temp sensor power good */
+gpio_temp_sensor_power_good: &gpio_en_pp3300 {};
+/* Map Tach to common name */
+tach_fan0: &tach0 {
+       status = "okay";
+       pinctrl-0 = <&tacho0_gpio052>;
+       pinctrl-names = "default";
+       pulses-per-round = <2>;
+};
+
+&fan_0 {
+       pwms = <&pwm2 0 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
+};
+
+&pwm2 {
+        status = "okay";
+        pinctrl-0 = <&pwm2_gpio025>;
+        pinctrl-names = "default";
+};
+

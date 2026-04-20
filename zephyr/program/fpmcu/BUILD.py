@@ -22,7 +22,7 @@ def register_fpmcu_variant(
         zephyr_board=zephyr_board,
         modules=["ec", *variant_modules],
         optional_modules=[*variant_optional_modules],
-        supported_toolchains=["llvm", "zephyr"],
+        supported_toolchains=["host/llvm", "zephyr"],
         dts_overlays=[*variant_dts_overlays],
         kconfig_files=[here / "prj.conf", *variant_kconfig_files],
         signer=signer,
@@ -34,7 +34,7 @@ bloonchipper = register_fpmcu_variant(
     project_name="bloonchipper",
     zephyr_board="google_dragonclaw",
     register_func=register_binman_project,
-    variant_modules=["hal_stm32", "cmsis", "cmsis_6"],
+    variant_modules=["hal_stm32", "cmsis_6"],
     variant_optional_modules=["fpc"],
     variant_dts_overlays=[
         here / "bloonchipper" / "bloonchipper.dts",
@@ -58,7 +58,7 @@ buccaneer = register_fpmcu_variant(
     project_name="buccaneer",
     zephyr_board="google_quincy",
     register_func=register_npcx_project,
-    variant_modules=["cmsis", "cmsis_6"],
+    variant_modules=["cmsis_6"],
     variant_optional_modules=["elan"],
     variant_dts_overlays=[
         here / "helipilot" / "buccaneer.dts",
@@ -89,7 +89,7 @@ helipilot = register_fpmcu_variant(
     project_name="helipilot",
     zephyr_board="google_quincy",
     register_func=register_npcx_project,
-    variant_modules=["cmsis", "cmsis_6"],
+    variant_modules=["cmsis_6"],
     variant_optional_modules=["fpc"],
     variant_dts_overlays=[
         here / "helipilot" / "helipilot.dts",
@@ -134,6 +134,12 @@ def register_et171_project(
 
 sanok = register_et171_project("sanok")
 assert_rw_fwid_DO_NOT_EDIT(project_name="sanok", addr=0x42104)
+
+srebrna = register_et171_project("srebrna")
+assert_rw_fwid_DO_NOT_EDIT(project_name="srebrna", addr=0x42104)
+
+stobnica = register_et171_project("stobnica")
+assert_rw_fwid_DO_NOT_EDIT(project_name="stobnica", addr=0x42104)
 
 niedzica = register_fpmcu_variant(
     project_name="niedzica",
