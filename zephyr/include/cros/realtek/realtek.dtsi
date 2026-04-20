@@ -67,6 +67,10 @@
 			offset = <0x80>;
 			size = <0x01>;
 		};
+		wdt-warn {
+			offset = <0x81>;
+			size = <0x01>;
+		};
 	};
 };
 

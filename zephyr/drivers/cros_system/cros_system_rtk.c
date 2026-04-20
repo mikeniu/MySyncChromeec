@@ -31,6 +31,7 @@ LOG_MODULE_REGISTER(cros_system, LOG_LEVEL_ERR);
 #define RTK_VIVO_BACKUP1_REG (*((volatile uint32_t *)0x40104ffc))
 
 #define BBRAM_KEY_VALUE 0xA5
+#define RTK_WDT_WARN 0xA5
 
 /* Driver data */
 struct cros_system_rtk_data {
@@ -43,6 +44,20 @@ static const struct device *const watchdog =
 static const struct device *const bbram_dev =
 	COND_CODE_1(DT_HAS_CHOSEN(cros_ec_bbram),
 		    DEVICE_DT_GET(DT_CHOSEN(cros_ec_bbram)), NULL);
+
+void cros_chip_wdt_handler(const struct device *wdt_dev, int channel_id)
+{
+	const struct device *bbram_dev = DEVICE_DT_GET(DT_NODELABEL(bbram));
+	uint32_t value = RTK_WDT_WARN;
+
+	if (!device_is_ready(bbram_dev)) {
+		LOG_ERR("device %s not ready", bbram_dev->name);
+		return;
+	}
+
+	bbram_write(bbram_dev, BBRAM_REGION_OFFSET(wdt_warn),
+		    BBRAM_REGION_SIZE(wdt_warn), (uint8_t *)&value);
+}
 
 /* Soc specific system local functions */
 static int system_rtk_watchdog_stop(void)
@@ -162,27 +177,37 @@ static int cros_system_rtk_init(const struct device *dev)
 	uint32_t value = 0;
 	uint32_t invalid_value = 0;
 	/* In order to determine if reset from watchdog */
+	uint32_t wdt_warn_val = 0;
 	uint32_t flag = 0;
 	/* check reset cause */
 	data->reset = UNKNOWN_RST;
 
+	/* check if bbram's key remained */
+	bbram_read(bbram_dev, BBRAM_REGION_OFFSET(key), BBRAM_REGION_SIZE(key),
+		   (uint8_t *)&key_val);
+
 	/* is the WDT reset */
 	if (wdt_reg->STS & WDT_STS_RSTFLAG) {
-		data->reset = WATCHDOG_RST;
 		/* Clear watchdog reset status initially */
 		wdt_reg->CTRL |= WDT_CTRL_CLRRSTFLAG;
 		/* Setup flag if reset from watchdog */
-		flag = 1;
+		bbram_read(bbram_dev, BBRAM_REGION_OFFSET(wdt_warn),
+			   BBRAM_REGION_SIZE(wdt_warn),
+			   (uint8_t *)&wdt_warn_val);
+		if ((key_val == BBRAM_KEY_VALUE) &&
+		    (wdt_warn_val == RTK_WDT_WARN)) {
+			data->reset = WATCHDOG_RST;
+			flag = 1;
+			bbram_write(bbram_dev, BBRAM_REGION_OFFSET(wdt_warn),
+				    BBRAM_REGION_SIZE(wdt_warn),
+				    (uint8_t *)&value);
+		}
 	} else if ((vivo_reg0 ^ vivo_reg1) == UINT32_MAX) {
 		/* VIN3 (GPIO115) connect to power button */
 		if (vivo_reg1 & BIT(SYSTEM_VIVOCTRL_VIN3STS_Pos)) {
 			data->reset = POWERUP;
 		}
 	}
-
-	/* check if bbram's key remained */
-	bbram_read(bbram_dev, BBRAM_REGION_OFFSET(key), BBRAM_REGION_SIZE(key),
-		   (uint8_t *)&key_val);
 
 	/* If No, Init BBRAM reset_flags to 0x0 */
 	if (key_val != BBRAM_KEY_VALUE) {

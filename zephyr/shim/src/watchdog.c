@@ -226,6 +226,11 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	       (void *)esf->basic.pc, (void *)esf->basic.lr, task_id,
 	       thread_name);
 	exception_address = esf->basic.pc;
+#if CONFIG_SOC_RTS5912
+	extern void cros_chip_wdt_handler(const struct device *wdt_dev,
+					  int channel_id);
+	cros_chip_wdt_handler(wdt_dev, channel_id);
+#endif
 #else
 	/* TODO(b/176523207): watchdog warning message */
 	printk("Watchdog deadline is close! TASK_ID:%d THREAD_NAME:%s\n",
