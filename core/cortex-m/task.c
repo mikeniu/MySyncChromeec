@@ -981,19 +981,19 @@ void task_print_list(void)
 	ccputs("Task Ready Name         Events      Time (s)  StkUsed\n");
 
 	for (i = 0; i < TASK_ID_COUNT; i++) {
-		char is_ready = ((uint32_t)tasks_ready & BIT(i)) ? 'R' : ' ';
 		uint32_t *sp;
-
-		int stackused = tasks_init[i].stack_size;
-
 		for (sp = tasks[i].stack;
 		     sp < (uint32_t *)tasks[i].sp && *sp == STACK_UNUSED_VALUE;
 		     sp++)
-			stackused -= sizeof(uint32_t);
+			;
 
-		ccprintf("%4d %c %-16s %08x %11.6lld  %3d/%3d\n", i, is_ready,
+		ccprintf("%c%3d %c %-16s %08x %11.6lld  %3d/%3d\n",
+			 (tasks + i == current_task) ? '*' : ' ', i,
+			 ((uint32_t)tasks_ready & BIT(i)) ? 'R' : ' ',
 			 task_names[i], (int)tasks[i].events, tasks[i].runtime,
-			 stackused, tasks_init[i].stack_size);
+			 tasks_init[i].stack_size -
+				 ((uint32_t)sp - (uint32_t)tasks[i].stack),
+			 tasks_init[i].stack_size);
 		cflush();
 	}
 }
