@@ -154,6 +154,7 @@ static const struct smbus_cmd_t SET_TPC_RECONNECT = { 0x08, 0x03, 0x1F };
 static const struct smbus_cmd_t FORCE_SET_POWER_SWITCH = { 0x08, 0x03, 0x21 };
 static const struct smbus_cmd_t GET_RDO = { 0x08, 0x02, 0x84 };
 static const struct smbus_cmd_t GET_VDO = { 0x08, 0x03, 0x9A };
+static const struct smbus_cmd_t SET_VDO = { 0x08, 0x03, 0x1A };
 static const struct smbus_cmd_t SET_SYS_PWR_STATE = { 0x08, 0x03, 0x2B };
 static const struct smbus_cmd_t GET_CURRENT_PARTNER_SRC_PDO = { 0x08, 0x02,
 								0xA7 };
@@ -229,6 +230,8 @@ enum init_state_t {
 	INIT_PDC_GET_IC_STATUS,
 	/** Set the PDC Notifications */
 	INIT_PDC_SET_NOTIFICATION_ENABLE,
+	/** Set VDOs on the PDC */
+	INIT_PDC_SET_VDO,
 	/** Reset the PDC */
 	INIT_PDC_RESET,
 	/** Initialization complete */
@@ -301,6 +304,8 @@ enum cmd_t {
 	CMD_GET_CABLE_PROPERTY,
 	/** Get VDO(s) of PDC, Cable, or Port partner */
 	CMD_GET_VDO,
+	/** Set VDO(s) of PDC */
+	CMD_SET_VDO,
 	/** CMD_GET_IDENTITY_DISCOVERY */
 	CMD_GET_IDENTITY_DISCOVERY,
 	/** CMD_GET_IS_VCONN_SOURCING */
@@ -356,6 +361,9 @@ struct pdc_config_t {
 	bool ccd;
 	/** Whether or not this port supports FRS */
 	bool frs_supported;
+	/** Whether or not this port is capable of USB communication as a device
+	 */
+	bool usb_comm_capable_as_device;
 	/** Pointer to the device-specific callback function */
 	gpio_callback_handler_t callback_handler;
 };
@@ -464,7 +472,8 @@ static const char *const cmd_names[] = {
 	[CMD_SET_FRS_FUNCTION] = "SET_FRS_FUNCTION",
 	[CMD_SET_RETIMER_FW_UPDATE_MODE] = "SET_RETIMER_FW_UPDATE_MODE",
 	[CMD_GET_CABLE_PROPERTY] = "GET_CABLE_PROPERTY",
-	[CMD_GET_VDO] = "GET VDO",
+	[CMD_GET_VDO] = "GET_VDO",
+	[CMD_SET_VDO] = "SET_VDO",
 	[CMD_GET_IDENTITY_DISCOVERY] = "CMD_GET_IDENTITY_DISCOVERY",
 	[CMD_GET_IS_VCONN_SOURCING] = "CMD_GET_IS_VCONN_SOURCING",
 	[CMD_SET_PDO] = "CMD_SET_PDO",
@@ -510,6 +519,7 @@ static int rts54_get_info(const struct device *dev, struct pdc_info_t *info,
 			  bool live);
 static int rts54_get_error_status(const struct device *dev,
 				  union error_status_t *es);
+static int rts54_set_vdo_idh(const struct device *dev);
 
 /**
  * @brief PDC port data used in interrupt handler
@@ -828,6 +838,15 @@ static enum smf_state_result st_init_run(void *o)
 		if (rv) {
 			LOG_ERR("RTK%d:, Internal(INIT_PDC_SET_NOTIFICATION_ENABLE)",
 				cnum);
+			set_state(data, ST_DISABLE);
+			return SMF_EVENT_HANDLED;
+		}
+		init_write_cmd_and_change_state(data, INIT_PDC_SET_VDO);
+		return SMF_EVENT_HANDLED;
+	case INIT_PDC_SET_VDO:
+		rv = rts54_set_vdo_idh(data->dev);
+		if (rv) {
+			LOG_ERR("RTK%d:, Internal(INIT_PDC_SET_VDO)", cnum);
 			set_state(data, ST_DISABLE);
 			return SMF_EVENT_HANDLED;
 		}
@@ -1652,6 +1671,67 @@ static int rts54_post_command(const struct device *dev, enum cmd_t cmd,
 {
 	return rts54_post_command_with_callback(dev, cmd, buf, len, user_buf,
 						NULL);
+}
+
+/* Packs Origin and VDO count into a single byte. */
+static int get_vdo_num_origin(uint8_t num_vdos, uint8_t origin) {
+    const uint8_t max_num_vdos = 5;
+    const uint8_t max_origin = 1;
+
+    if (num_vdos > max_num_vdos) {
+        LOG_ERR("Number of VDOs (%d) exceeds maximum (5)", num_vdos);
+        return -EINVAL;
+    }
+
+    if (origin > max_origin) {
+        LOG_ERR("Origin (%d) exceeds 1-bit range", origin);
+        return -EINVAL;
+    }
+
+    // Bit Layout:
+    // [7:4] : Reserved (Must be 0)
+    // [3]   : Origin (1 bit: 0 = PDC, 1 = VDM)
+    // [2:0] : Number of VDOs (Valid range: 0-5)
+    uint8_t packed_val = (origin << 3) | (num_vdos & 0x07);
+    return (int)(packed_val & 0xF);
+}
+
+static int rts54_set_vdo_idh(const struct device *dev)
+{
+	struct pdc_data_t *data = dev->data;
+	const struct pdc_config_t *cfg = dev->config;
+	uint32_t idh;
+	uint8_t num_vdo = 1;
+	uint8_t origin = 0; /* PDC origin */
+
+	/* ID Header VDO (Discovery Identity response)
+	 * Bit 31: USB Host capable
+	 * Bit 30: USB Device capable
+	 * We assume the port is Host capable.
+	 */
+	idh = VDO_IDH(1, cfg->usb_comm_capable_as_device ? 1 : 0,
+		      IDH_PTYPE_UNDEF, 0, data->info.vid);
+
+	int num_origin = get_vdo_num_origin(num_vdo, origin);
+	if (num_origin < 0) {
+		return -EINVAL;
+	}
+
+	uint8_t payload[] = {
+		SET_VDO.cmd,
+		SET_VDO.len + 5, /*sub, port, origin_num, index, val(4) */
+		SET_VDO.sub,
+		0x00, /* internal port number */
+		(uint8_t)num_origin,
+		VDO_INDEX_IDH, /* ID Header VDO is index 1 */
+		BYTE0(idh),
+		BYTE1(idh),
+		BYTE2(idh),
+		BYTE3(idh),
+	};
+
+	return rts54_post_command(dev, CMD_SET_VDO, payload,
+				  ARRAY_SIZE(payload), NULL);
 }
 
 /**
@@ -3187,6 +3267,8 @@ BUILD_ASSERT(
 		.no_fw_update = DT_INST_PROP(inst, no_fw_update),             \
 		.ccd = DT_INST_PROP(inst, ccd),                               \
 		.frs_supported = DT_INST_PROP(inst, frs_supported),           \
+		.usb_comm_capable_as_device =                                 \
+			DT_INST_PROP(inst, usb_comm_capable_as_device),             \
 		.callback_handler = pdc_interrupt_callback##inst,             \
 	};                                                                    \
                                                                               \
