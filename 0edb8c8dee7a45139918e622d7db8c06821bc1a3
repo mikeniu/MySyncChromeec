@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5ec6e68_77b5aaf2",
+        "filename": "zephyr/app/ec/chip/arm/realtek_rtk/Kconfig.rtk",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-20T16:00:34Z",
+      "side": 1,
+      "message": "This CL fixes this bug.  You can delete the comments related to b/416020794",
+      "range": {
+        "startLine": 29,
+        "startChar": 10,
+        "endLine": 29,
+        "endChar": 19
+      },
+      "revId": "0edb8c8dee7a45139918e622d7db8c06821bc1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57b9b1a7_117d5400",
+        "filename": "zephyr/boards/google/realtek/realtek_rts5912.dts",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-20T16:00:34Z",
+      "side": 1,
+      "message": "Can this change be made updstream?",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 31
+      },
+      "revId": "0edb8c8dee7a45139918e622d7db8c06821bc1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f52f3549_26db445a",
+        "filename": "zephyr/shim/chip/rtk/system_download_from_flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-20T16:00:34Z",
+      "side": 1,
+      "message": "Delete this comment.",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 47
+      },
+      "revId": "0edb8c8dee7a45139918e622d7db8c06821bc1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
