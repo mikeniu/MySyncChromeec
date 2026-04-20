@@ -161,6 +161,15 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 /* Heartbeat wake interval (45 minutes) */
 #define HEARTBEAT_WAKE_INTERVAL_SEC (45 * 60)
 
+/*
+ * Wake interval after an OS-driven shutdown when external power is present
+ * (30 seconds). This short window ensures the AP boots into charging mode
+ * shortly after shutdown if it's still plugged in, while being long enough
+ * to avoid race conditions during the power-off/power-on transition.
+ * This differs from the 45-minute heartbeat-offmode shutdown window.
+ */
+#define EXTPOWER_WAKE_INTERVAL_SEC 30
+
 /* Value to indicate an invalid or uninitialized SoC. */
 #define BATTERY_BAD_STATE_OF_CHARGE -1
 
@@ -177,9 +186,6 @@ static char ac_on;
 /* 1 if rtc-wake event has been detected */
 static char rtc_wake;
 
-/* 1 if the system is currently in the off-mode charging heartbeat state. */
-static char heartbeat_mode;
-
 /* Time where we will power off, if power button still held down */
 static timestamp_t power_off_deadline;
 
@@ -194,26 +200,6 @@ static char long_warm_reset;
  *  This variable is initialized to 0 i.e. POWER_G3
  */
 static enum power_state power_state_before_warm_reset;
-
-#ifdef CONFIG_ZEPHYR
-static void qcom_rtc_set_host_event(void)
-{
-	host_set_single_event(EC_HOST_EVENT_RTC);
-}
-DECLARE_DEFERRED(qcom_rtc_set_host_event);
-
-void rtc_callback(const struct device *dev)
-{
-	ARG_UNUSED(dev);
-
-	hook_call_deferred(&qcom_rtc_set_host_event_data, 0);
-
-	if (chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
-		rtc_wake = 1;
-		task_wake(TASK_ID_CHIPSET);
-	}
-}
-#endif
 
 enum power_request_t {
 	POWER_REQ_NONE,
@@ -339,6 +325,30 @@ static void power_ac_changed(void)
 DECLARE_HOOK(HOOK_AC_CHANGE, power_ac_changed, HOOK_PRIO_DEFAULT);
 
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_ENABLE_OFFMODE_HEARTBEAT
+
+/* 1 if the system is currently in the off-mode charging heartbeat state. */
+static char heartbeat_mode;
+
+#ifdef CONFIG_ZEPHYR
+static void qcom_rtc_set_host_event(void)
+{
+	host_set_single_event(EC_HOST_EVENT_RTC);
+}
+DECLARE_DEFERRED(qcom_rtc_set_host_event);
+
+void rtc_callback(const struct device *dev)
+{
+	ARG_UNUSED(dev);
+
+	hook_call_deferred(&qcom_rtc_set_host_event_data, 0);
+
+	if (chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
+		rtc_wake = 1;
+		task_wake(TASK_ID_CHIPSET);
+	}
+}
+#endif
+
 static enum ec_status
 host_command_offmode_charing_active(struct host_cmd_handler_args *args)
 {
@@ -351,11 +361,15 @@ host_command_offmode_charing_active(struct host_cmd_handler_args *args)
 }
 DECLARE_HOST_COMMAND(EC_CMD_ENABLE_OFFMODE_HEARTBEAT,
 		     host_command_offmode_charing_active, EC_VER_MASK(0));
-#endif
 
 /*
- * On chipset shutdown complete, if we are in heartbeat mode, set an RTC alarm
- * to wake up the EC for periodic charging checks.
+ * On chipset shutdown complete, determine the next wake-up event.
+ *
+ * 1. Heartbeat mode: If enabled, set a 45-minute RTC alarm for periodic
+ *    charging/battery maintenance checks.
+ * 2. OS-driven shutdown with AC: If external power is connected, set a
+ *    30-second RTC alarm. This wakes the EC to boot the AP into charging
+ *    mode, ensuring charging continues after an OS-initiated shutdown.
  */
 void board_chipset_set_heartbeat_alarm_on_shutdown(void)
 {
@@ -363,6 +377,13 @@ void board_chipset_set_heartbeat_alarm_on_shutdown(void)
 		/* Move heart beat to RTC alarm based wake (45min) */
 		system_set_rtc_alarm(HEARTBEAT_WAKE_INTERVAL_SEC, 0);
 		heartbeat_mode = 0;
+	} else if (extpower_is_present()) {
+		/* If chipset shutdown and external power is connected, wake
+		 * after 30 seconds to boot the AP and enable charging.
+		 * This short delay ensures the system is fully powered down
+		 * before triggering a reboot, avoiding potential boot-time
+		 * race conditions. */
+		system_set_rtc_alarm(EXTPOWER_WAKE_INTERVAL_SEC, 0);
 	}
 }
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN_COMPLETE,
@@ -377,6 +398,7 @@ void board_chipset_clear_heartbeat_alarm_on_poweron(void)
 }
 DECLARE_HOOK(HOOK_CHIPSET_PRE_INIT,
 	     board_chipset_clear_heartbeat_alarm_on_poweron, HOOK_PRIO_DEFAULT);
+#endif
 
 /**
  * Wait the switchcap GPIO0 PVC_PG signal asserted.

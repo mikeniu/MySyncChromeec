@@ -273,13 +273,7 @@ enum pdo_augmented_pps {
  * This value was experimentally determined to pass TEST.PD.PROT.SNK.5 and
  * TEST.PD.PROT.SRC.3 on various boards.
  */
-/* TODO(b/442730096):Debug pujjoga ErrorRecovery latency and remove this config
- */
-#ifdef CONFIG_USBC_PD3_T_SENDER_RESPONSE_OVERRIDE
-#define PD3_T_SENDER_RESPONSE CONFIG_USBC_PD3_T_SENDER_RESPONSE_MS
-#else
-#define PD3_T_SENDER_RESPONSE (29 * MSEC)
-#endif
+#define PD3_T_SENDER_RESPONSE (28 * MSEC)
 #endif
 #define PD_T_PS_TRANSITION (500 * MSEC) /* between 450ms and 550ms */
 /*
