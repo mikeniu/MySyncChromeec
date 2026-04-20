@@ -6006,6 +6006,13 @@ pdc_power_mgmt_get_cable_prop(int port, union cable_property_t *cable_prop)
 __overridable enum usb_typec_current_t
 pdc_power_mgmt_get_default_current_limit(int port)
 {
+#ifdef CONFIG_USBC_PDC_DPM_STICKY_LOCK
+	/* Force default current limit to 1.5A if the port is locked by the DPM.
+	 */
+	if (pdc_dpm_is_port_locked_at_1500(port)) {
+		return TC_CURRENT_1_5A;
+	}
+#endif
 	return TC_CURRENT_1_5A;
 }
 
@@ -6020,6 +6027,18 @@ int pdc_power_mgmt_set_current_limit(int port_num,
 	if (!pdc_power_mgmt_is_pdc_port_valid(port_num)) {
 		return -ERANGE;
 	}
+#ifdef CONFIG_USBC_PDC_DPM_STICKY_LOCK
+	/* * Reject the request with -EBUSY to prevent the upper layer (AP/OS)
+	 * from falsely updating its state to 3.0A while the hardware is locked
+	 * at 1.5A.
+	 */
+	if (current == TC_CURRENT_3_0A &&
+	    pdc_dpm_is_port_locked_at_1500(port_num)) {
+		LOG_INF("C%d: Blocked attempt to restore 3.0A due to sticky lock",
+			port_num);
+		return -EBUSY;
+	}
+#endif
 
 	pdc = &pdc_data[port_num]->port;
 
