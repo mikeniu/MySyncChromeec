@@ -22,6 +22,30 @@
       },
       "revId": "2f5bd1e81bc77a0d7564a427491de70d692405b4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e80ec65_c89b3b96",
+        "filename": "zephyr/include/cros/ite/it8xxx2.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-04-20T16:22:10Z",
+      "side": 1,
+      "message": "Had to set the register size in the \nzephyr/boards/google/it8xxx2/* override files for this to be accurate.",
+      "parentUuid": "f8740857_2444d0d3",
+      "range": {
+        "startLine": 30,
+        "startChar": 28,
+        "endLine": 30,
+        "endChar": 30
+      },
+      "revId": "2f5bd1e81bc77a0d7564a427491de70d692405b4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
