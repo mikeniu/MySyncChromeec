@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a49f2b24_bee099cd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T22:00:41Z",
+      "side": 1,
+      "message": "### Wrapping `libusb` with C++ RAII\n\nManaging C APIs like `libusb` in C++ is best done by wrapping the raw pointers in `std::unique_ptr`. Since `libusb` requires specific cleanup functions (like `libusb_exit` instead of `delete`), we can provide custom \"deleters\". \n\nHere is how you can set up these smart pointers and use them:\n\n```cpp\n#include \u003cmemory\u003e\n#include \u003cexpected\u003e\n#include \u003clibusb.h\u003e\n\n// 1. Define custom deleters for the libusb resources\nstruct LibusbContextDeleter {\n    void operator()(libusb_context* ctx) const {\n        if (ctx) {\n            libusb_exit(ctx);\n        }\n    }\n};\n\nstruct LibusbDeviceHandleDeleter {\n    void operator()(libusb_device_handle* handle) const {\n        if (handle) {\n            libusb_close(handle);\n        }\n    }\n};\n\nstruct LibusbDeviceListDeleter {\n    void operator()(libusb_device** list) const {\n        if (list) {\n            // \u00271\u0027 ensures the individual device structures are unreferenced\n            libusb_free_device_list(list, 1); \n        }\n    }\n};\n\n// 2. Create modern type aliases for ease of use\nusing UsbContext \u003d std::unique_ptr\u003clibusb_context, LibusbContextDeleter\u003e;\nusing UsbDeviceHandle \u003d std::unique_ptr\u003clibusb_device_handle, LibusbDeviceHandleDeleter\u003e;\nusing UsbDeviceList \u003d std::unique_ptr\u003clibusb_device*, LibusbDeviceListDeleter\u003e;\n\n// Define a scoped error enum\nenum class UsbError {\n    InitFailed,\n    NoDevicesFound,\n    OpenFailed\n};\n```\n\n### Applying the Wrappers in Practice\n\nOnce the aliases are defined, you can write vastly simplified initialization and connection logic. Notice how there are no `goto` statements, no manual cleanup labels, and no risk of a memory leak:\n\n```cpp\n// Initialize the context safely\nauto initialize_usb() -\u003e std::expected\u003cUsbContext, UsbError\u003e {\n    libusb_context* raw_ctx \u003d nullptr;\n    if (libusb_init(\u0026raw_ctx) \u003c 0) {\n        return std::unexpected(UsbError::InitFailed);\n    }\n    // Hand ownership to the smart pointer\n    return UsbContext(raw_ctx); \n}\n\n// Find and open a device safely\nauto open_focaltech_device(libusb_context* ctx) -\u003e std::expected\u003cUsbDeviceHandle, UsbError\u003e {\n    libusb_device** raw_list \u003d nullptr;\n    ssize_t count \u003d libusb_get_device_list(ctx, \u0026raw_list);\n    \n    if (count \u003c 0) {\n        return std::unexpected(UsbError::NoDevicesFound);\n    }\n\n    // Wrap the list so it is automatically freed when this function returns!\n    UsbDeviceList dev_list(raw_list); \n\n    for (ssize_t i \u003d 0; i \u003c count; ++i) {\n        libusb_device* dev \u003d dev_list.get()[i];\n        libusb_device_descriptor desc{};\n        \n        if (libusb_get_device_descriptor(dev, \u0026desc) \u003c 0) {\n            continue; \n        }\n\n        if (desc.idVendor \u003d\u003d 0x2808 /* FOCAL_BOOT_VID */) {\n            libusb_device_handle* raw_handle \u003d nullptr;\n            if (libusb_open(dev, \u0026raw_handle) \u003d\u003d 0) {\n                // Hand ownership to the smart pointer\n                return UsbDeviceHandle(raw_handle);\n            }\n        }\n    }\n\n    return std::unexpected(UsbError::OpenFailed);\n}\n```\n\n**Why this is a massive upgrade:**\n1.  **Zero Memory Leaks:** When `open_focaltech_device` returns—whether successfully or via an error—`dev_list` goes out of scope and automatically calls `libusb_free_device_list`.\n2.  **Explicit Ownership:** Passing around a `UsbDeviceHandle` makes it explicitly clear who owns the resource and is responsible for its lifetime. \n3.  **Modern Error Handling:** `std::expected` forces the caller to check if the USB initialization actually succeeded before trying to dereference the context, eliminating subtle null-pointer bugs.",
+      "parentUuid": "dfc11b28_a9295c36",
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e48f291c_ee2e10ea",
         "filename": "util/focaltech/focaltech/include/net_usb.h",
         "patchSetId": 7
