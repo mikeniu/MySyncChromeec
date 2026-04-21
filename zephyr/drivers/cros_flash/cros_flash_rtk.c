@@ -8,6 +8,7 @@
 #include "bbram.h"
 #include "flash.h"
 #include "spi_flash_reg.h"
+#include "system.h"
 #include "watchdog.h"
 #include "write_protect.h"
 
@@ -22,7 +23,7 @@
 #include <drivers/cros_flash.h>
 #include <soc.h>
 
-LOG_MODULE_REGISTER(cros_flash, LOG_LEVEL_ERR);
+LOG_MODULE_REGISTER(cros_flash, LOG_LEVEL_DBG);
 
 #if !DT_NODE_EXISTS(DT_CHOSEN(zephyr_flash_controller))
 #error "No suitable devicetree overlay specified for zephyr_flash_controller"
@@ -81,7 +82,8 @@ static int cros_flash_rtk_write_protection_set(const struct device *dev,
 		return -ENOTSUP;
 	}
 
-	LOG_DBG("FLASH: SET HWWP");
+	// LOG_DBG("FLASH: SET HWWP");
+	LOG_DBG("@");
 
 	return flash_ex_op(cfg->flash_dev, FLASH_RTS5912_EX_OP_SET_WP,
 			   (uintptr_t)NULL, &enable);
@@ -168,8 +170,6 @@ static int flash_set_status_for_prot(const struct device *dev, int reg1,
 {
 	struct cros_flash_rtk_data *data = DRV_DATA(dev);
 	int rv;
-
-	data->all_protected = 0;
 
 	rv = flash_set_status(dev, reg1, reg2);
 	if (rv != EC_SUCCESS) {
@@ -448,12 +448,10 @@ static int cros_flash_rtk_protect_at_boot(const struct device *dev,
 
 	if (new_flags & EC_FLASH_PROTECT_ALL_AT_BOOT) {
 		data->all_protected = 1;
-		ret = flash_write_prot_reg(
-			dev, 0, CONFIG_PLATFORM_EC_FLASH_SIZE_BYTES, 1);
 		lock_flags |= EC_FLASH_PROTECT_ALL_AT_BOOT;
 	}
 
-	LOG_DBG("set AT_BOOT = %x", lock_flags);
+	LOG_DBG("set AT_BOOT = %x, new_flags = %x", lock_flags, new_flags);
 
 	write_bbram_flags(lock_flags);
 
@@ -463,18 +461,15 @@ static int cros_flash_rtk_protect_at_boot(const struct device *dev,
 static int cros_flash_rtk_protect_now(const struct device *dev, bool all)
 {
 	struct cros_flash_rtk_data *data = DRV_DATA(dev);
-	int ret = EC_SUCCESS;
 
 	if (all) {
 		data->all_protected = 1;
-		ret = flash_write_prot_reg(
-			dev, 0, CONFIG_PLATFORM_EC_FLASH_SIZE_BYTES, 1);
-	} else {
-		ret = flash_write_prot_reg(dev, CONFIG_WP_STORAGE_OFF,
-					   CONFIG_WP_STORAGE_SIZE, 1);
+		LOG_DBG("FLASH: ALL_NOW enabled");
+		return EC_SUCCESS;
 	}
 
-	return ret;
+	return flash_write_prot_reg(dev, CONFIG_WP_STORAGE_OFF,
+				    CONFIG_WP_STORAGE_SIZE, 1);
 }
 
 static int cros_flash_rtk_get_status(const struct device *dev, uint8_t *sr1,
@@ -497,7 +492,24 @@ static int cros_flash_rtk_init(const struct device *dev)
 		lock_flags = BBRAM_WP_FLAG_INVALID;
 	}
 
-	LOG_DBG("got AT_BOOT = %x", lock_flags);
+	LOG_DBG("got INIT = %x", lock_flags);
+
+	/* handle the *_AT_BOOT */
+	if (lock_flags != BBRAM_WP_FLAG_INVALID) {
+		if ((lock_flags & (EC_FLASH_PROTECT_RO_AT_BOOT |
+				   EC_FLASH_PROTECT_ALL_AT_BOOT)) == 0) {
+			/* Clear protection bits in status register */
+			ret = flash_set_status_for_prot(dev, 0, 0);
+		}
+		if ((lock_flags & EC_FLASH_PROTECT_ALL_AT_BOOT) &&
+		    (system_get_image_copy() == EC_IMAGE_RW)) {
+			data->all_protected = 1;
+		}
+		if (lock_flags & EC_FLASH_PROTECT_RO_AT_BOOT) {
+			ret |= flash_write_prot_reg(dev, CONFIG_WP_STORAGE_OFF,
+						    CONFIG_WP_STORAGE_SIZE, 1);
+		}
+	}
 
 	if (write_protect_is_asserted()) {
 		/*
@@ -505,30 +517,9 @@ static int cros_flash_rtk_init(const struct device *dev)
 		 * active during ec initialization.
 		 */
 		flash_protect_int_flash(dev, 1);
-		/* HWWP setup, not allow to change SWWP */
-		return EC_SUCCESS;
 	}
 
-	/* handle the *_AT_BOOT */
-	if (lock_flags != BBRAM_WP_FLAG_INVALID) {
-		if ((lock_flags & (EC_FLASH_PROTECT_RO_AT_BOOT |
-				   EC_FLASH_PROTECT_ALL_AT_BOOT)) == 0) {
-			/* Clear protection bits in status register */
-			return flash_set_status_for_prot(dev, 0, 0);
-		}
-
-		if (lock_flags & EC_FLASH_PROTECT_ALL_AT_BOOT) {
-			data->all_protected = 1;
-			ret = flash_write_prot_reg(
-				dev, 0, CONFIG_PLATFORM_EC_FLASH_SIZE_BYTES, 1);
-		} else if (lock_flags & EC_FLASH_PROTECT_RO_AT_BOOT) {
-			ret = flash_write_prot_reg(dev, CONFIG_WP_STORAGE_OFF,
-						   CONFIG_WP_STORAGE_SIZE, 1);
-		}
-		return ret;
-	}
-
-	return EC_SUCCESS;
+	return ret;
 }
 
 /* cros ec flash driver registration */
