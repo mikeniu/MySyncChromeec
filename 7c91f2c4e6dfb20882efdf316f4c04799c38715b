@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e48f291c_ee2e10ea",
+        "filename": "util/focaltech/focaltech/include/net_usb.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T21:49:53Z",
+      "side": 1,
+      "message": "Remove commented out code",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 6
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ea137ad_c7109720",
+        "filename": "util/focaltech/focaltech/src/ft_sg_io.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T21:49:53Z",
+      "side": 1,
+      "message": "Did you mean `got_usb_remove`?",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 29
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c10b6a1_43cc9341",
+        "filename": "util/focaltech/focaltech/src/ft_sg_io.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T21:49:53Z",
+      "side": 1,
+      "message": "#### **Unsafe Hotplug Registration in `ft_sg_io.c`**\n\nIn `ft_sg_open()`, you register a hotplug callback using `libusb_hotplug_register_callback()`. However, unlike `mbedtls_usb_init()` in `net_usb.c`, you do not verify if the underlying platform supports hotplug events via `libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG)`. On unsupported systems, this will silently fail or cause unpredictable behavior.",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 2
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1241c801_7241d42e",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T21:49:53Z",
+      "side": 1,
+      "message": "* **Magic Numbers:** `fun.c` relies heavily on raw hex bytes in the arrays (e.g., `write_bin_cmd[] \u003d { 0xdc, 0, 0, 0 ... 0x03, 0, 0 };`). While common in low-level SCSI/USB work, extracting these command opcodes (e.g., `0xdc`, `0x03`) into `#define` macros or `enums` in `ff_sg_io.h` will make the command construction highly readable.",
+      "range": {
+        "startLine": 103,
+        "startChar": 0,
+        "endLine": 173,
+        "endChar": 1
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d13e8f7f_c9a019c7",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T21:49:53Z",
+      "side": 1,
+      "message": "Did you mean `is_ec_bin_has_config_page`?",
+      "range": {
+        "startLine": 458,
+        "startChar": 11,
+        "endLine": 458,
+        "endChar": 37
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "641b8483_64f24f43",
+        "filename": "util/focaltech/focaltech/src/main.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T21:49:53Z",
+      "side": 1,
+      "message": "#### **Buffer Overflow in `main.c`**\n\nIn `main.c`, you are using `strcpy()` to copy user-provided command-line arguments (`argv[1]` and `argv[2]`) into fixed-size local buffers:\n\n```c\nchar tmp[PATH_MAX];\n// ...\nstrcpy(tmp, argv[2]); \n// ...\nstrcpy(tmp, argv[1]);\n```\n\nCommand-line arguments can exceed `PATH_MAX` (typically 4096 bytes), which will cause a buffer overflow, potentially leading to arbitrary code execution or segmentation faults.\n\n* **Suggested Remediation:** Use `strncpy` (or `strlcpy` if available in your environment) to explicitly limit the copy operation, ensuring the buffer is null-terminated.\n\n```c\nstrncpy(tmp, argv[1], sizeof(tmp) - 1);\ntmp[sizeof(tmp) - 1] \u003d \u0027\\0\u0027;\n```",
+      "range": {
+        "startLine": 240,
+        "startChar": 0,
+        "endLine": 256,
+        "endChar": 23
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d242c21_1c1ae9fe",
+        "filename": "util/focaltech/focaltech/src/net_usb.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T21:49:53Z",
+      "side": 1,
+      "message": "#### **Memory Leak in `net_usb.c`**\n\nIn `mbedtls_usb_exist()`, you request a list of devices using `libusb_get_device_list()`. If a target device is found, the loop breaks and the function returns `0`. However, this skips the `error:` label block where `libusb_free_device_list()` is called, resulting in a memory leak every time the device is successfully found.\n\n* **Suggested Remediation:** Ensure the device list is freed on the success path as well.\n\n```c\n        if ((desc.idVendor \u003d\u003d FOCAL_BOOT_VID) /* ... */) {\n            // ... logic ...\n            ret \u003d 0;\n            *vid \u003d desc.idVendor;\n            *pid \u003d desc.idProduct;\n            break;\n        }\n    }\n    \n    // Free device list here before returning on success\n    if (usb_ctx \u0026\u0026 usb_ctx-\u003edevs) {\n        libusb_free_device_list(usb_ctx-\u003edevs, 1);\n        usb_ctx-\u003edevs \u003d NULL;\n    }\n    \n    return ret; // Adjust flow so you don\u0027t fall through to error handling unless necessary\n```",
+      "range": {
+        "startLine": 214,
+        "startChar": 1,
+        "endLine": 218,
+        "endChar": 2
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
