@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b68ad8ce_430df0ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T22:02:32Z",
+      "side": 1,
+      "message": "Here is an example to demonstrate how to handle endianness and buffer serialization safely using C++23. \n\nThis approach replaces the fragile C macros (`U32_SET`) and platform-specific POSIX headers (`\u003cendian.h\u003e`, `htole32`) with standard, type-safe C++ features.\n\n### Safe Endianness and Bit Manipulation in C++23\n\nCurrently, the codebase relies on a custom macro (`U32_SET`) for buffer serialization and platform-specific POSIX functions (`htole32`, `le32toh`) for endianness conversions. \n\nWe can modernize this using C++23\u0027s `\u003cbit\u003e` header (`std::endian`, `std::byteswap`) alongside `std::span`. This provides strict compile-time bounds checking and compiles down to highly optimized native instructions.\n\n#### 1. Define Type-Safe Serialization Helpers\n\nInstead of a macro that does raw pointer arithmetic without checking bounds, you can create an inline helper that takes a fixed-size `std::span` (guaranteed to be exactly 4 bytes).\n\n```cpp\n#include \u003cbit\u003e\n#include \u003cspan\u003e\n#include \u003ccstring\u003e\n#include \u003ccstdint\u003e\n\n// 1. A portable, standard C++ way to convert host byte order to Little Endian\nconstexpr uint32_t host_to_le32(uint32_t value) noexcept {\n    if constexpr (std::endian::native \u003d\u003d std::endian::big) {\n        return std::byteswap(value); // C++23 byteswap\n    }\n    return value;\n}\n\nconstexpr uint32_t le32_to_host(uint32_t value) noexcept {\n    // The conversion is symmetric\n    return host_to_le32(value);\n}\n\n// 2. Safe buffer serialization replacing the U32_SET macro.\n// By enforcing std::span\u003cuint8_t, 4\u003e, the compiler guarantees we \n// cannot pass a buffer that is too small!\ninline void write_le32(std::span\u003cuint8_t, 4\u003e out_buffer, uint32_t value) noexcept {\n    uint32_t le_val \u003d host_to_le32(value);\n    // std::memcpy is optimized away by modern compilers into a single mov instruction.\n    // It is the standard-compliant way to type-pun without undefined behavior.\n    std::memcpy(out_buffer.data(), \u0026le_val, sizeof(le_val));\n}\n```\n\n#### 2. Applying the Helpers in Code\n\nHere is how you replace the `U32_SET` macro calls and the `cbw.signature \u003d htole32(...)` assignments using C++23 arrays and spans.\n\n**Before (C-style macro and pointer math):**\n```c\nunsigned char transfer_cmd[16] \u003d {0};\n// Prone to off-by-one errors and array out-of-bounds if offsets change\nU32_SET(\u0026transfer_cmd[1], addr);\nU32_SET(\u0026transfer_cmd[5], count);\n\n// Using platform-specific endian headers\ncbw.signature \u003d htole32(USB_MS_CBW_SIGNATURE);\n```\n\n**After (C++23 with spans):**\n```cpp\n#include \u003carray\u003e\n\nstd::array\u003cuint8_t, 16\u003e transfer_cmd{};\n\n// Create a view over the array to pass exactly 4 bytes.\n// .subspan\u003cOffset, Count\u003e() creates a bounds-checked sub-view at compile time.\nstd::span\u003cuint8_t\u003e cmd_span(transfer_cmd);\n\n// Writes to bytes 1-4 safely\nwrite_le32(cmd_span.subspan\u003c1, 4\u003e(), addr);\n\n// Writes to bytes 5-8 safely\nwrite_le32(cmd_span.subspan\u003c5, 4\u003e(), count);\n\n// Using standard C++ for struct assignments\ncbw.signature \u003d host_to_le32(USB_MS_CBW_SIGNATURE);\n```\n\n**Why this is a massive upgrade:**\n1. **No Macro Side-Effects:** The `U32_SET` macro evaluates its arguments directly. If you ever passed an expression with side effects (e.g., `U32_SET(buf, x++)`), it would increment `x` multiple times. The C++ helper completely eliminates this bug class.\n2. **Bounds Checking:** Using `.subspan\u003c1, 4\u003e()` ensures that if you accidentally type an offset that extends past the end of the 16-byte array, the code simply will not compile.\n3. **Portability:** Moving away from `\u003cendian.h\u003e` to `\u003cbit\u003e` ensures your code will cross-compile cleanly on any compliant compiler (Windows/MSVC, macOS/Clang, or Linux/GCC) without `#ifdef` platform guards.",
+      "parentUuid": "a49f2b24_bee099cd",
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e48f291c_ee2e10ea",
         "filename": "util/focaltech/focaltech/include/net_usb.h",
         "patchSetId": 7
