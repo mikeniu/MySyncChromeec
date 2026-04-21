@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "203f748a_5a12ed28",
+        "filename": "util/elan/build.mk",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T18:42:45Z",
+      "side": 1,
+      "message": "For now we will create a statically linked binary, so we can build in the ChromeOS chroot and run on Android:\n\n```suggestion\n$(_elaniap_bin): HOST_LDFLAGS+\u003d$(shell $(HOST_PKG_CONFIG) --libs --static libusb-1.0) -static\n```\n\nNote that in order to build this successfully inside the ChromeOS chroot for testing, you will need to follow these instructions: http://b/438746294#comment17",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 76
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f13b5bda_051aad15",
         "filename": "util/elan/filecontrol.cc",
         "patchSetId": 3
