@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c12a568b_68ca8d6a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T17:37:06Z",
+      "side": 1,
+      "message": "Once the other comments that I left have been addressed, you can work on the following as a followup CL:\n\nThese changes will make the code significantly more readable, safer, and idiomatic.\n\n### 1. Replace `\u003ciostream\u003e` and `\u003ciomanip\u003e` with `std::print` (C++23)\nThe patch is filled with verbose `std::cout` statements manipulating stream state (like `std::hex`, `std::dec`, `std::setfill`). C++23 introduced `std::print` and `std::println` (based on C++20 `std::format`), which dramatically cleans this up.\n\n**Before:**\n```cpp\nstd::cout \u003c\u003c \"Bootrom Version: 0x\" \u003c\u003c std::hex \u003c\u003c version\n          \u003c\u003c std::dec \u003c\u003c std::endl;\n```\n**After:**\n```cpp\n#include \u003cprint\u003e\n\nstd::println(\"Bootrom Version: 0x{:X}\", version);\n```\n\n### 2. Pass Buffers with `std::span` (C++20/23)\nThe codebase heavily uses `const std::vector\u003cuint8_t\u003e\u0026` and raw pointer/length pairs (e.g., in `aes_gcm_encrypt_openssl`) to pass data around. `std::span` is the modern, lightweight way to represent a contiguous view of memory. It eliminates unnecessary vector allocations and unifies pointer/length arguments.\n\n**Before:**\n```cpp\nbool aes_gcm_encrypt_openssl(const uint8_t *key, const uint8_t *iv, size_t iv_len, ...)\n\nint send_bootrom_command(const std::vector\u003cuint8_t\u003e \u0026data, ...)\n```\n**After:**\n```cpp\n#include \u003cspan\u003e\n\nbool aes_gcm_encrypt_openssl(std::span\u003cconst uint8_t\u003e key, std::span\u003cconst uint8_t\u003e iv, ...)\n\nint send_bootrom_command(std::span\u003cconst uint8_t\u003e data, ...)\n```\n\n### 3. Simplify Chunking with `std::views::chunk` (C++23)\nIn `write_flash` and `backup_flash`, the author manually calculates chunk sizes using `std::min`, offsets, and `while` loops. C++23 Ranges make this trivial and much less prone to off-by-one errors.\n\n**Before:**\n```cpp\nuint32_t done \u003d 0;\nwhile (done \u003c total_size) {\n    uint32_t current_chunk \u003d std::min(len_chunk, total_size - done);\n    // ... insert subset of vector ...\n    done +\u003d current_chunk;\n}\n```\n**After:**\n```cpp\n#include \u003cranges\u003e\n\nfor (auto chunk : data | std::views::chunk(32 * 1024)) {\n    // chunk is a view (span-like) of the data, automatically sized correctly!\n    cmd.insert(cmd.end(), chunk.begin(), chunk.end());\n}\n```\n\n### 4. Modernize Error Handling with `std::expected` (C++23)\nMany functions use out-parameters for return data and return an integer error code (e.g., `int send_bootrom_command(..., std::vector\u003cuint8_t\u003e \u0026resp_out)`). `std::expected` allows a function to return *either* the expected value or an error, removing the need for mutated reference parameters.\n\n**Before:**\n```cpp\nstd::vector\u003cuint8_t\u003e resp;\nint ret \u003d send_bootrom_command(cmd, 2, resp, 5000);\nif (ret !\u003d 0) { return -1; }\n```\n**After:**\n```cpp\n#include \u003cexpected\u003e\n\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, CommError\u003e send_bootrom_command(std::span\u003cconst uint8_t\u003e cmd, ...);\n\n// Usage:\nauto resp \u003d send_bootrom_command(cmd, 2, 5000);\nif (!resp.has_value()) {\n    return std::unexpected(resp.error());\n}\n// Use resp.value()\n```\n\n### 5. Use `std::string_view` for Read-Only Strings (C++17/23)\nFunctions taking `const std::string\u0026` force the caller to construct a `std::string` object if they pass a string literal. `std::string_view` is essentially a `std::span` for strings.\n\n**Before:**\n```cpp\nint backup_flash(const std::string \u0026filename, uint32_t total_size);\n```\n**After:**\n```cpp\nint backup_flash(std::string_view filename, uint32_t total_size);\n```\n\n### 6. Swap C-Style Arrays for `std::array`\nIn classes, raw C-style arrays don\u0027t have value semantics (they can\u0027t be easily copied or assigned) and lack bounds-checked access methods.\n\n**Before:**\n```cpp\nuint8_t aes_key_[32] \u003d { 0 };\nchar prod_name[9] \u003d { 0 };\n```\n**After:**\n```cpp\n#include \u003carray\u003e\n\nstd::array\u003cuint8_t, 32\u003e aes_key_{};\nstd::array\u003cchar, 9\u003e prod_name{};\n```",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "67e5fd6c_d172fb17",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 10
