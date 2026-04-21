@@ -37,7 +37,7 @@ get_tree_version() {
   local ver_major
 
   if ghash=`git rev-parse --short --verify HEAD 2>/dev/null`; then
-    if gdesc=`git describe --dirty --match='v*' 2>/dev/null`; then
+    if gdesc=`git describe --dirty --tags --match='v*' 2>/dev/null`; then
       IFS="-" fields=($gdesc)
       tag="${fields[0]}"
       IFS="." vernum=($tag)
