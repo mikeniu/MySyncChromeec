@@ -93,6 +93,30 @@
       },
       "revId": "fd7d5b60d55a5276a90bbfa7163682c3c3f00e3e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72e802dc_c1a61dc4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-04-21T20:09:56Z",
+      "side": 1,
+      "message": "looks like a couple failures in the moonstone line (sapphire, moonstone, lapis, quartz, ruby) looking into these before merging this patch",
+      "parentUuid": "569ee5d8_0bf21278",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 58
+      },
+      "revId": "fd7d5b60d55a5276a90bbfa7163682c3c3f00e3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
