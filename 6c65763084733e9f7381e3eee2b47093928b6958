@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b82f8c9_70ad62ea",
+        "filename": "board/xol/board.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-04-21T21:37:00Z",
+      "side": 1,
+      "message": "this case is here for extreme situation (for example, AP overheats) and the fan is turned to 100% to help cool it down. Are you getting PROCHOT asserted during boot?",
+      "range": {
+        "startLine": 155,
+        "startChar": 8,
+        "endLine": 155,
+        "endChar": 33
+      },
+      "revId": "6c65763084733e9f7381e3eee2b47093928b6958",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
