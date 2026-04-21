@@ -56,6 +56,98 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "636b600b_c980a20c",
+        "filename": "util/focaltech/focaltech/include/ff_common.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T22:28:51Z",
+      "side": 1,
+      "message": "This is no longer needed.",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 23
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6a6f17d_9fcefa59",
+        "filename": "util/focaltech/focaltech/include/ff_log.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T22:28:51Z",
+      "side": 1,
+      "message": "Doesn\u0027t appear to be used. Please remove.",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 39
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "482257dc_427d5dfb",
+        "filename": "util/focaltech/focaltech/include/ff_util.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T22:28:51Z",
+      "side": 1,
+      "message": "Doesn\u0027t appear to ever be defined. Please remove.",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 33
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7bede2b_f2737579",
+        "filename": "util/focaltech/focaltech/include/ff_util.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T22:28:51Z",
+      "side": 1,
+      "message": "Doesn\u0027t ever appear to be defined. Please remove.",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 73
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e48f291c_ee2e10ea",
         "filename": "util/focaltech/focaltech/include/net_usb.h",
         "patchSetId": 7
