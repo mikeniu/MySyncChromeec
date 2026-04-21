@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c11c2b3_d7f6d143",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 57
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-21T14:34:01Z",
+      "side": 1,
+      "message": "LGTM % nit",
+      "revId": "7cc8eb7d00124f2f8ff5a1c4e721a5dae2bfb8e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f69f01e5_8bb437c9",
+        "filename": "zephyr/program/fpmcu/ft9001/common.dtsi",
+        "patchSetId": 57
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-21T14:34:01Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\t\t/* SHA256 of RO firmware */\n\t\t\t\tro-checksum {\n```",
+      "revId": "7cc8eb7d00124f2f8ff5a1c4e721a5dae2bfb8e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
