@@ -936,6 +936,9 @@ enum host_event_code {
 	/* Body detect (lap/desk) change event */
 	EC_HOST_EVENT_BODY_DETECT_CHANGE = 33,
 
+	/* New console logs since last snapshot */
+	EC_HOST_EVENT_CONSOLE_LOGS = 34,
+
 	/*
 	 * Only 64 host events are supported. This enum uses 1-based counting so
 	 * it can skip 0 (NONE), so the last legal host event number is 64.
@@ -983,6 +986,7 @@ enum host_event_code {
 		[EC_HOST_EVENT_WOV] = "WOV",                                   \
 		[EC_HOST_EVENT_INVALID] = "INVALID",                           \
 		[EC_HOST_EVENT_BODY_DETECT_CHANGE] = "BODY_DETECT_CHANGE",     \
+		[EC_HOST_EVENT_CONSOLE_LOGS] = "CONSOLE_LOGS",                 \
 	}
 /* clang-format on */
 
@@ -1782,6 +1786,10 @@ enum ec_feature_code {
 	 * The EC supports a hybrid boost charger
 	 */
 	EC_FEATURE_CHARGER_HYBRID_POWER_BOOST = 57,
+	/*
+	 * Support signaling new console logs via host event
+	 */
+	EC_FEATURE_CONSOLE_LOG_EVENT = 58,
 };
 
 #define EC_FEATURE_MASK_0(event_code) BIT(event_code % 32)
@@ -3026,6 +3034,7 @@ enum motionsensor_chip {
 	MOTIONSENSE_CHIP_BMI220 = 29,
 	MOTIONSENSE_CHIP_CM32183 = 30,
 	MOTIONSENSE_CHIP_VEML3328 = 31,
+	MOTIONSENSE_CHIP_CM36781 = 32,
 	MOTIONSENSE_CHIP_MAX,
 };
 
@@ -5885,6 +5894,16 @@ struct ec_params_reboot_ec {
 struct ec_params_get_panic_info_v1 {
 	/* Do not modify PANIC_DATA_FLAG_OLD_HOSTCMD when reading panic info */
 	uint8_t preserve_old_hostcmd_flag;
+} __ec_align1;
+
+struct ec_params_get_panic_info_v2 {
+	/* Do not modify PANIC_DATA_FLAG_OLD_HOSTCMD when reading panic info */
+	uint8_t preserve_old_hostcmd_flag;
+
+	/* Read panic_data struct from this offset.
+	 * Signal end of data with empty success.
+	 */
+	uint16_t read_offset;
 } __ec_align1;
 
 /*****************************************************************************/
