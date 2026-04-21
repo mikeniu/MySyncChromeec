@@ -237,6 +237,29 @@
       },
       "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f36260cd_0707b516",
+        "filename": "util/focaltech/libusb-1.0.29/libusb/libusb_port.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T22:20:44Z",
+      "side": 1,
+      "message": "It looks like `libusb_port.c` contains a copy of a CLI utility (`hubpower`) adapted by building fake `argc`/`argv` string arrays to invoke its functions. We can remove hundreds of lines of code and avoid heap memory allocations (`malloc`/`free`) by stripping out the CLI parser and calling the underlying USB ioctls directly.\n\nFirst, delete the functions `usage()`, `port_status()`, and `change_port_status()`.\n\nNext, add this single helper function to send the control messages directly to the USB device file system:\n\n```c\n#include \u003cfcntl.h\u003e\n#include \u003csys/ioctl.h\u003e\n#include \u003clinux/usbdevice_fs.h\u003e\n#include \u003cunistd.h\u003e\n#include \u003cstdio.h\u003e\n#include \u003cerrno.h\u003e\n\n/* Helper to directly manipulate the hub\u0027s port feature without string parsing */\nstatic int set_hub_port_feature(int busnum, int devnum, int portnum, int feature, int enable)\n{\n\tchar dev_path[64];\n\tint fd, rc;\n\tstruct usbdevfs_ctrltransfer ctrl;\n\n\t// Safely format the device path\n\tsnprintf(dev_path, sizeof(dev_path), \"/dev/bus/usb/%03d/%03d\", busnum, devnum);\n\n\tfd \u003d open(dev_path, O_RDWR);\n\tif (fd \u003c 0) {\n\t\tFF_LOGE(\"Failed to open %s: %s\", dev_path, strerror(errno));\n\t\treturn -1;\n\t}\n\n\t// Build the exact ioctl command that change_port_status used to build\n\tctrl.bRequestType \u003d USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_OTHER;\n\tctrl.bRequest \u003d enable ? USB_REQ_SET_FEATURE : USB_REQ_CLEAR_FEATURE;\n\tctrl.wValue \u003d feature;\n\tctrl.wIndex \u003d portnum;\n\tctrl.wLength \u003d 0;\n\tctrl.timeout \u003d USB_HUB_TIMEOUT;\n\tctrl.data \u003d NULL;\n\n\trc \u003d ioctl(fd, USBDEVFS_CONTROL, \u0026ctrl);\n\tif (rc \u003d\u003d -1) {\n\t\tFF_LOGE(\"ioctl failed for port %d feature %d: %s\", portnum, feature, strerror(errno));\n\t}\n\n\tclose(fd);\n\treturn rc;\n}\n```\n\nNow, replace the heavily nested string allocations in your device control functions with simple calls to this new helper:\n\n```c\nstatic int focal_dev_reset(void)\n{\n\tint ret;\n\tFF_LOGD(\"%s enter\\n\", __func__);\n\tif (focal_dev_port.init !\u003d V_INIT_SUCCESS) {\n\t\treturn -1;\n\t}\n\n\t// USB_PORT_FEAT_RESET is 4. \u00271\u0027 means set/enable the feature.\n\tret \u003d set_hub_port_feature(focal_dev_port.bus, focal_dev_port.hub, \n\t                           focal_dev_port.port, USB_PORT_FEAT_RESET, 1);\n\tif (ret !\u003d -1) {\n\t\tfocal_dev_port.disabled \u003d 0;\n\t}\n\treturn (ret \u003d\u003d -1) ? -1 : 0;\n}\n\nstatic int focal_dev_disable(void)\n{\n\tint ret;\n\tFF_LOGI(\"%s enter\", __func__);\n\tif (focal_dev_port.init !\u003d V_INIT_SUCCESS) {\n\t\treturn -1;\n\t}\n\n\tif (focal_dev_port.disabled) {\n\t\treturn -2;\n\t}\n\n\t// USB_PORT_FEAT_ENABLE is 1. \u00270\u0027 means clear/disable the feature.\n\tret \u003d set_hub_port_feature(focal_dev_port.bus, focal_dev_port.hub, \n\t                           focal_dev_port.port, USB_PORT_FEAT_ENABLE, 0);\n\tif (ret !\u003d -1) {\n\t\tfocal_dev_port.disabled \u003d 1;\n\t}\n\treturn (ret \u003d\u003d -1) ? -1 : 0;\n}\n```\n\nThis cleans up the file immensely. It removes the magic number array boundaries (`cmd[16]`), eliminates the need to loop through and `free()` memory buffers, and makes the actual system calls much easier to debug.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 505,
+        "endChar": 1
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
