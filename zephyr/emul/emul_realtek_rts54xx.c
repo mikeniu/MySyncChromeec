@@ -793,6 +793,7 @@ static int get_vdo(struct rts5453p_emul_pdc_data *data,
 {
 	LOG_INF("GET_VDO = %x", req->get_vdo.vdo_req.raw_value);
 	memset(&data->response, 0, sizeof(data->response));
+
 	for (uint8_t i = 0; i < req->get_vdo.vdo_req.num_vdos; i++) {
 		uint8_t vdo_index = req->get_vdo.vdo_type[i];
 		if (vdo_index >= RTS54XX_VDO_MAX_NUM) {
@@ -805,6 +806,38 @@ static int get_vdo(struct rts5453p_emul_pdc_data *data,
 	data->response.get_vdo.byte_count =
 		sizeof(uint32_t) * req->get_vdo.vdo_req.num_vdos;
 
+	send_response(data);
+	return 0;
+}
+
+static int set_vdo(struct rts5453p_emul_pdc_data *data,
+		   const union rts54_request *req)
+{
+	uint8_t num_vdos = req->set_vdo.vdo_req.num_vdos;
+	uint8_t vdo_origin = req->set_vdo.vdo_req.vdo_origin;
+
+	LOG_INF("SET_VDO num_vdos=%d, vdo_origin=%d", num_vdos, vdo_origin);
+
+	if (num_vdos >= RTS54XX_SET_VDO_MAX_NUM) {
+		LOG_ERR("Too many VDOs passed in emul SET_VDO.");
+		return -EINVAL;
+	}
+
+	if (vdo_origin != 0) {
+		LOG_ERR("Only PDC origin supported for SET_VDO in emulator.");
+		return -EINVAL;
+	}
+
+	for (uint8_t i = 0; i < num_vdos; i++) {
+		uint8_t vdo_index = req->set_vdo.vdos[i].type;
+		if (vdo_index >= RTS54XX_VDO_MAX_NUM) {
+			LOG_ERR("Requested VDO type out of range.");
+			return -EINVAL;
+		}
+		data->vdos[vdo_index] = req->set_vdo.vdos[i].vdo;
+	}
+
+	memset(&data->response, 0, sizeof(data->response));
 	send_response(data);
 	return 0;
 }
@@ -984,7 +1017,7 @@ const struct commands sub_cmd_x08[] = {
 	{ .code = 0x44, HANDLER_DEF(unsupported) },
 	{ .code = 0x05, HANDLER_DEF(set_tpc_rp) },
 	{ .code = 0x19, HANDLER_DEF(unsupported) },
-	{ .code = 0x1A, HANDLER_DEF(unsupported) },
+	{ .code = 0x1A, HANDLER_DEF(set_vdo) },
 	{ .code = 0x1D, HANDLER_DEF(set_tpc_csd_operation_mode) },
 	{ .code = 0x1F, HANDLER_DEF(set_tpc_reconnect) },
 	{ .code = 0x20, HANDLER_DEF(unsupported) },
@@ -1299,6 +1332,8 @@ static int emul_realtek_rts54xx_init_data(const struct emul *target)
 	data->bbr_cts_mode = false;
 	data->sys_power_state = SX_RSVD; /* Power state unspecified */
 
+	memset(data->vdos, 0, sizeof(data->vdos));
+
 	/* Clear any feature flags */
 	emul_realtek_rts54xx_reset_feature_flags(target);
 
@@ -1358,6 +1393,8 @@ static int rts5453p_emul_init(const struct emul *emul,
 	data->pdc_data.capability.bcdUSBTypeCVersion = 0xCAFE;
 
 	data->pdc_data.connector_capability.op_mode_usb3 = 1;
+
+	data->pdc_data.info.vid = 0x0BDA;
 
 	data->pdc_data.set_tpc_reconnect_param = 0xAA;
 
@@ -1664,7 +1701,6 @@ static int emul_realtek_rts54xx_set_vdo(const struct emul *target,
 		}
 		data->vdos[vdo_index] = vdos[i];
 	}
-
 	return 0;
 }
 

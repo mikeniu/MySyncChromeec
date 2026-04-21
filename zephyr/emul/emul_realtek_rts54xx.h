@@ -77,6 +77,11 @@ union csd_op_mode_t {
 	};
 };
 
+struct vdo_entry {
+	uint8_t type;
+	uint32_t vdo;
+} __packed;
+
 union rts54_request {
 	uint8_t raw_data[0];
 	struct rts54_command {
@@ -101,51 +106,51 @@ union rts54_request {
 				uint8_t reserved : 6;
 			};
 		} sub_cmd3;
-	} vendor_cmd_enable;
+	} __packed vendor_cmd_enable;
 
 	struct set_notification_enable_req {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
 		union pd_status_t data;
-	} set_notification_enable;
+	} __packed set_notification_enable;
 
 	struct ppm_reset_req {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
-	} ppm_reset;
+	} __packed ppm_reset;
 
 	struct tcpm_reset_req {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
 		uint8_t reset_type : 2;
 		uint8_t reserved : 6;
-	} tcpm_reset;
+	} __packed tcpm_reset;
 
 	struct connector_reset_req {
 		struct rts54_subcommand_header header;
 		uint8_t data_len;
 		union connector_reset_t reset;
-	} connector_reset;
+	} __packed connector_reset;
 
 	struct get_capability_req {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
-	} get_capability;
+	} __packed get_capability;
 
 	struct get_connector_capability_req {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
-	} get_connector_capability;
+	} __packed get_connector_capability;
 
 	struct get_error_status_req {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
-	} get_error_status;
+	} __packed get_error_status;
 
 	struct get_connector_status_req {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
-	} get_connector_status;
+	} __packed get_connector_status;
 
 	struct get_rtk_status_req {
 		uint8_t command_code;
@@ -153,25 +158,25 @@ union rts54_request {
 		uint8_t offset;
 		uint8_t port_num;
 		uint8_t sts_len;
-	} get_rtk_status;
+	} __packed get_rtk_status;
 
 	struct set_uor_req {
 		struct rts54_subcommand_header header;
 		uint8_t data_len;
 		union uor_t uor;
-	} set_uor;
+	} __packed set_uor;
 
 	struct set_pdr_req {
 		struct rts54_subcommand_header header;
 		uint8_t data_len;
 		union pdr_t pdr;
-	} set_pdr;
+	} __packed set_pdr;
 
 	struct set_rdo_req {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
 		uint32_t rdo;
-	} set_rdo;
+	} __packed set_rdo;
 
 	struct set_pdo_req {
 		struct rts54_subcommand_header header;
@@ -188,7 +193,7 @@ union rts54_request {
 	struct get_rdo_req {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
-	} get_rdo;
+	} __packed get_rdo;
 
 	struct set_tpc_rp_req {
 		struct rts54_subcommand_header header;
@@ -202,20 +207,21 @@ union rts54_request {
 				uint8_t reserved1 : 2;
 			};
 		} tpc_rp;
-	} set_tpc_rp;
+	} __packed set_tpc_rp;
 
 	struct set_tpc_csd_operation_mode_req {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
 		union csd_op_mode_t op_mode;
-	} set_tpc_csd_operation_mode;
+	} __packed set_tpc_csd_operation_mode;
 
 	struct get_tpc_csd_operartion_mode_req {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
-	} get_tpc_csd_operartion_mode;
+	} __packed get_tpc_csd_operartion_mode;
 	struct set_ccom_req {
 		struct rts54_subcommand_header header;
+		uint8_t port_num;
 		union port_and_ccom_t {
 			uint16_t raw_value;
 			struct {
@@ -224,7 +230,7 @@ union rts54_request {
 				uint16_t reserved : 5;
 			};
 		} port_and_ccom;
-	} set_ccom;
+	} __packed set_ccom;
 
 	struct force_set_power_switch_req {
 		struct rts54_subcommand_header header;
@@ -236,18 +242,18 @@ union rts54_request {
 			uint8_t vbsin_en_control : 1;
 			uint8_t lp_en_control : 1;
 		} data;
-	} force_set_power_switch;
+	} __packed force_set_power_switch;
 
 	struct set_tpc_reconnect_req {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
 		uint8_t param0;
-	} set_tpc_reconnect;
+	} __packed set_tpc_reconnect;
 
 	struct read_power_level_req {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
-	} read_power_level;
+	} __packed read_power_level;
 
 	struct get_pdo {
 		struct rts54_subcommand_header header;
@@ -258,14 +264,21 @@ union rts54_request {
 	struct get_cable_property {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
-	} get_cable_property;
+	} __packed get_cable_property;
 
 	struct get_vdo_req {
 		struct rts54_subcommand_header header;
 		uint8_t data_len;
 		union get_vdo_t vdo_req;
 		uint8_t vdo_type[7];
-	} get_vdo;
+	} __packed get_vdo;
+
+	struct set_vdo_req {
+		struct rts54_subcommand_header header;
+		uint8_t port_num;
+		union get_vdo_t vdo_req;
+		struct vdo_entry vdos[5];
+	} __packed set_vdo;
 
 	struct get_ic_status_req {
 		uint8_t command_code;
@@ -273,12 +286,12 @@ union rts54_request {
 		uint8_t offset;
 		uint8_t reserved;
 		uint8_t sts_len;
-	} get_ic_status;
+	} __packed get_ic_status;
 
 	struct get_pch_data_status_req {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
-	} get_pch_data_status;
+	} __packed get_pch_data_status;
 
 	struct ack_cc_ci_req {
 		uint8_t command_code;
@@ -297,24 +310,24 @@ union rts54_request {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
 		uint8_t enable;
-	} set_frs_function;
+	} __packed set_frs_function;
 
 	struct get_attention_vdo_req {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
-	} get_attention_vdo;
+	} __packed get_attention_vdo;
 
 	struct set_bbr_cts {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
 		uint8_t enable;
-	} set_bbr_cts;
+	} __packed set_bbr_cts;
 
 	struct set_sys_pwr_state {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
 		uint8_t state;
-	} set_sys_pwr_state;
+	} __packed set_sys_pwr_state;
 
 	struct set_battery_capability_req {
 		uint8_t command_code;
@@ -335,7 +348,7 @@ union rts54_request {
 	struct get_alert_req {
 		struct rts54_subcommand_header header;
 		uint8_t port_num;
-	} get_alert;
+	} __packed get_alert;
 };
 
 union rts54_response {
