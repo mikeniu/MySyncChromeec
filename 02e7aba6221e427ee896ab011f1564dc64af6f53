@@ -112,6 +112,75 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4ab161f1_8fcae9bf",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T17:27:24Z",
+      "side": 1,
+      "message": "Use a header guard instead of `#pragma once`.",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 12
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b7660980_1c9fd5e0",
+        "filename": "util/egis/ec_comm.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T17:27:24Z",
+      "side": 1,
+      "message": "Use a header guard instead of `#pragma once`.",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 12
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98a16be8_62b1e5a3",
+        "filename": "util/egis/ec_protocol_defs.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T17:27:24Z",
+      "side": 1,
+      "message": "Use a header guard instead of `#pragma once`.",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 12
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2469a02e_7fb6765f",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 10
@@ -151,6 +220,29 @@
         "startChar": 0,
         "endLine": 193,
         "endChar": 4
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1450422_8c833f75",
+        "filename": "util/egis/usb_comm.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T17:27:24Z",
+      "side": 1,
+      "message": "Use a header guard instead of `#pragma once`.",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 12
       },
       "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
