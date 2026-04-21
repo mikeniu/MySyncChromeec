@@ -1,0 +1,159 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f279a0e_89d796dc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T17:13:03Z",
+      "side": 1,
+      "message": "Many files are missing newlines at the end. Please add those.",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67e5fd6c_d172fb17",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T17:13:03Z",
+      "side": 1,
+      "message": "**1\\. Unchecked BoringSSL API Return Values (`bootrom.cc`)** In `aes_gcm_encrypt_openssl` and `aes_gcm_decrypt_openssl`, the return values for `EVP_EncryptUpdate`, `EVP_EncryptFinal_ex`, `EVP_DecryptUpdate`, and `EVP_CIPHER_CTX_ctrl` are completely ignored.\n\n* **Risk:** If BoringSSL encounters an internal error or context issue, these functions can fail silently, leaving the output buffer uninitialized or containing partial data. In an encryption context, this can lead to transmitting corrupted data or bypassing authentication.  \n* **Remediation:** Check the return value (usually `1` for success) of every `EVP_*` call. If any call fails, clean up the context and return `false`.",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 1
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "546e44a8_e6d70d3c",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T17:13:03Z",
+      "side": 1,
+      "message": "**Hardcoded AAD in AES-GCM (`bootrom.cc`)** You have hardcoded the Additional Authenticated Data (AAD):\n\n```c\nuint8_t AAD[4] \u003d { 0x01, 0x00, 0x00, 0x00 };\n```\n\n* **Feedback:** If this is a protocol requirement for the bootrom, add a brief comment explaining *why* this specific AAD is used so future maintainers do not assume it\u0027s leftover debug code.",
+      "range": {
+        "startLine": 155,
+        "startChar": 1,
+        "endLine": 155,
+        "endChar": 45
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b7438d4_bf0d9221",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T17:13:03Z",
+      "side": 1,
+      "message": "**Strict Aliasing Violation (`bootrom.cc`)** In `send_bootrom_command_aes`:\n\n```c\nuint32_t rsp_wrapped_len \u003d *reinterpret_cast\u003cconst uint32_t *\u003e(\u0026ret[2]);\n```\n\n* **Risk:** Casting a byte array pointer to a `uint32_t` pointer and dereferencing it violates C++ strict aliasing rules and can lead to Undefined Behavior (UB), particularly on ARM architectures where unaligned memory access might cause faults.  \n* **Remediation:** Use `std::memcpy` to safely extract the value:\n\n```c\nuint32_t rsp_wrapped_len;\nstd::memcpy(\u0026rsp_wrapped_len, \u0026ret[2], sizeof(rsp_wrapped_len));\n```",
+      "range": {
+        "startLine": 179,
+        "startChar": 0,
+        "endLine": 180,
+        "endChar": 73
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "690c1cf8_1f8197bd",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T17:13:03Z",
+      "side": 1,
+      "message": "**. Magic Numbers vs. Defined Constants (`bootrom.cc`)** You have excellently defined command constants in `EgisBootrom` namespace within `bootrom.h` (e.g., `CMD_MEM_READ \u003d 0x20`), but you frequently fall back to magic numbers in the implementation:\n\n* In `backup_flash`: `data.push_back(0x20);` \\-\\\u003e Should be `EgisBootrom::CMD_MEM_READ`.  \n* In `get_otp_info`: `0x23` \\-\\\u003e Should be `EgisBootrom::CMD_OTP_READ`.  \n* **Remediation:** Replace all instances of `0x20`, `0x21`, `0x22`, and `0x23` in array initializations with their respective enum/namespace constants.",
+      "range": {
+        "startLine": 332,
+        "startChar": 0,
+        "endLine": 332,
+        "endChar": 23
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2469a02e_7fb6765f",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T17:13:03Z",
+      "side": 1,
+      "message": "**. Hex String Parsing Vulnerability (`et171_flash.cc`)** When parsing `-offset` and `-size` using `strtoul`:\n\n* **Risk:** If a user provides a negative number (e.g., `-offset -100`), `strtoul` will silently underflow and wrap around to a massive positive number, which will likely crash the flash loop.  \n* **Remediation:** Parse the string as a signed integer using `strtol` first, verify it is `\u003e 0`, and then cast to `uint32_t`.",
+      "range": {
+        "startLine": 154,
+        "startChar": 0,
+        "endLine": 176,
+        "endChar": 22
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d38ddb00_535bdc5a",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T17:13:03Z",
+      "side": 1,
+      "message": "**Firmware Size Override Out-of-Bounds Read (`et171_flash.cc`)** When handling the `-size` argument, the tool forces the read size:\n\n```c\nfw_size \u003d (fw_size_override \u003e 0) ? fw_size_override : fw_size;\nstd::vector\u003cuint8_t\u003e firmware(fw_size);\nif (!infile.read(reinterpret_cast\u003cchar *\u003e(firmware.data()), fw_size)) { ... }\n```\n\n* **Risk:** If a user specifies a `-size` larger than the actual file size, `infile.read()` will fail, and the program will abort. While it fails safely, the UX is poor.  \n* **Remediation:** Add a check to ensure `fw_size_override` does not exceed the actual file size on disk before attempting the read.",
+      "range": {
+        "startLine": 175,
+        "startChar": 0,
+        "endLine": 193,
+        "endChar": 4
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
