@@ -70,6 +70,24 @@
       "parentUuid": "922f96a7_3b7d1e29",
       "revId": "edf9e8aa9ff2ff2008d9f4630cb629f8f54f1ba1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb667186_99242314",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T18:29:30Z",
+      "side": 1,
+      "message": "\u003e I am not sure whether it is cause by toolchain or API level version. Following is my environment:\nNDK: android-ndk-r26b\nAPI 24 \u003c\u003d change to 21/24/30 not work.\n\u003e \n\u003e If possible, could you please try building the latest source code on your side, or let me know if you have any suggestions?\n\nFor now, please focus on making sure it builds in the ***ChromeOS chroot***. For now we can add `-static` to the link flags to create a statically linked binary, which will run on Android without any changes.\n\nEventually I will be building the source natively in Android, but as long as it builds in the ChromeOS chroot, it will build in our Android environment.\n\nI confirmed that this patch is building in the ChromeOS chroot.",
+      "parentUuid": "0c260798_cf6a610a",
+      "revId": "edf9e8aa9ff2ff2008d9f4630cb629f8f54f1ba1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

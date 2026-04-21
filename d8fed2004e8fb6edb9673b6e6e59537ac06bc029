@@ -1,0 +1,211 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f2fd2aa_80edf27f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T18:29:30Z",
+      "side": 1,
+      "message": "Remove the \"X\"",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 1
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f13b5bda_051aad15",
+        "filename": "util/elan/filecontrol.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T18:29:30Z",
+      "side": 1,
+      "message": "### Ambiguous File I/O Error Handling (`filecontrol.cc`)\n\n**Issue:** `getBinarySize` returns `0` upon failure to open the file.\n**Impact:** The caller cannot distinguish between an empty file (which legitimately has size `0`) and an I/O error (e.g., file not found, permission denied). \n**Recommendation:** Change the return type of `getBinarySize` to `std::optional\u003csize_t\u003e` to explicitly represent failure.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 1
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7a06434_01ec79c4",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T18:29:30Z",
+      "side": 1,
+      "message": "###  Global State for Device Handle (`iapcontrol.cc`)\n\n**Issue:** `g_devHandelPtr` is defined as a namespace-level global variable (`LibusbDeviceHandlePtr g_devHandelPtr;`). **Impact:** This breaks encapsulation and makes the `iapcontrol` class fundamentally unsafe to instantiate more than once. If multiple `iapcontrol` objects are created, they will silently overwrite and clobber each other\u0027s USB handles. **Recommendation:** Move `g_devHandelPtr` to be a private class member of `iapcontrol` (e.g., `m_devHandlePtr`).",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 86,
+        "endChar": 37
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8f6cde1_285a926a",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T18:29:30Z",
+      "side": 1,
+      "message": "* **Typo:** In `iapcontrol.cc` (`iapCommand` and `getFwVersion`), fix the typo in the error log: `\"return cmmmand code is not match\"` \\-\\\u003e `\"return command code does not match\"`.",
+      "range": {
+        "startLine": 336,
+        "startChar": 0,
+        "endLine": 336,
+        "endChar": 69
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0cfb362a_60221eea",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 655,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T18:29:30Z",
+      "side": 1,
+      "message": "### Unsafe Libusb Descriptor Handling (`iapcontrol.cc`)\n\n**Issue:** In `getDeviceCount`, you retrieve the configuration descriptor without checking the return value:\n\n```c\nlibusb_get_config_descriptor(found_dev, 0, \u0026config);\nfor (int i \u003d 0; i \u003c config-\u003ebNumInterfaces; i++) { ... }\n```\n\n**Impact:** If `libusb_get_config_descriptor` fails (e.g., due to permission issues or device errors), `config` will remain uninitialized or null, leading to a segmentation fault when dereferencing `config-\u003ebNumInterfaces`. **Recommendation:** Add an error check and handle the failure gracefully:\n\n```c\nif (libusb_get_config_descriptor(found_dev, 0, \u0026config) !\u003d 0) {\n    logInfo(\"[IAP] {} - get config descriptor failed\\n\", funcName);\n    return 0;\n}\n```",
+      "range": {
+        "startLine": 653,
+        "startChar": 1,
+        "endLine": 655,
+        "endChar": 0
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38e1406e_62fbbe8d",
+        "filename": "util/elan/iapcontrol.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T18:29:30Z",
+      "side": 1,
+      "message": "### Logic Flaw in Device Status Tracking (`iapcontrol.h` / `.cc`)\n\n**Issue:** In `iapcontrol.h`, `m_deviceCount` is initialized to `1` (`int m_deviceCount \u003d 1;`).\n**Impact:** When `connectDevice` is called for the first time, if a device is found (`count \u003e 0`), the code checks `if (m_deviceCount)` and immediately returns `DEVSTA_EXISTED` instead of `DEVSTA_INSERT`. It will never successfully register an insertion event.\n**Recommendation:** Initialize `m_deviceCount` to `0` in `iapcontrol.h`.",
+      "range": {
+        "startLine": 70,
+        "startChar": 0,
+        "endLine": 70,
+        "endChar": 23
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9152f763_5ffb1153",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T18:29:30Z",
+      "side": 1,
+      "message": "### CLI Parsing Fragility (`iaptool.cc`)\n\n**Issue:** `CommandLineManager` uses `strtol(buff[i + 1], nullptr, 16)` without checking if the conversion actually succeeded. Furthermore, if a flag is passed without a corresponding value at the end of the argument list, the loop bounds check (`i + 1 \u003c buff.size()`) protects it from a crash, but it silently ignores the flag. \n**Impact:** Passing invalid hex strings (e.g., `-V GXYZ`) results in `0` without warning the user. \n**Recommendation:** Use `std::strtol` and check the `endptr` to ensure successful parsing.",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 18
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ab31ffd_e66437c5",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T18:29:30Z",
+      "side": 1,
+      "message": "* **Unnecessary `.c_str()`:** In `setProgressBar`, you are using `\u003cformat\u003e` but extracting C-strings: `logInfo(\"\\r[{}{}]\", std::string(...).c_str(), std::string(...).c_str());` `std::format` natively supports `std::string`. You can drop the `.c_str()` calls for cleaner, safer code.",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 128,
+        "endChar": 51
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6c10c8f_7fe4b37d",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T18:29:30Z",
+      "side": 1,
+      "message": "### Integer Overflow Risk in Progress Bar (`iaptool.cc`)\n\n**Issue:** `percent \u003d (100 * (progress)) / totalSize;`\n**Impact:** `progress` is passed as an `int`. If a firmware file exceeds \\~21.4 MB, `100 * progress` will overflow a standard 32-bit signed integer, resulting in negative percentages. \n**Recommendation:** Change `progress` and `totalSize` to `size_t` in both the callback signature and the `setProgressBar` function.",
+      "range": {
+        "startLine": 121,
+        "startChar": 0,
+        "endLine": 134,
+        "endChar": 1
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
