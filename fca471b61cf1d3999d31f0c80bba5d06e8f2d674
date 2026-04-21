@@ -16,6 +16,24 @@
       "message": "Hey @kylelinck@google.com, \n\nI am not sure why this is required here ? we have no EC on the CRD",
       "revId": "fca471b61cf1d3999d31f0c80bba5d06e8f2d674",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3995f09f_48666f06",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-04-21T06:44:21Z",
+      "side": 1,
+      "message": "If this is only required to satisfy the builder, we can just use the mensa build target.",
+      "parentUuid": "1919428a_3c7232b0",
+      "revId": "fca471b61cf1d3999d31f0c80bba5d06e8f2d674",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
