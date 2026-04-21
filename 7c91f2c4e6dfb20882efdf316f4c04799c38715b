@@ -95,6 +95,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f02eb264_3b59626b",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T21:50:41Z",
+      "side": 1,
+      "message": "Here is a concrete example of how to refactor the magic numbers in `fun.c` into a more maintainable, structured format.\n\nCurrently, the commands are defined as opaque 16-byte arrays scattered throughout the functions. By defining the opcodes as constants and using a structured command builder, you immediately communicate the protocol\u0027s intent to future maintainers.\n\n### 1\\. Define the Protocol Constants\n\nFirst, add these definitions to either `ff_sg_io.h` or a dedicated protocol header. This documents the specific opcodes and sub-commands used by the FocalTech bootloader/firmware.\n\n```c\n/* FocalTech Vendor-Specific SCSI Command Opcodes */\n#define FT_CMD_READ_INFO        0xdb\n#define FT_CMD_ACTION           0xdc\n\n/* Sub-commands for FT_CMD_ACTION (typically placed at byte 13) */\n#define FT_SUBCMD_READ_DATA     0x01\n#define FT_SUBCMD_WRITE_BIN     0x03\n#define FT_SUBCMD_CODE_BIN      0x04\n#define FT_SUBCMD_ERASE_PAGE    0x08\n#define FT_SUBCMD_VERIFY        0xbb\n#define FT_SUBCMD_EXEC_DISBOOT  0xcc\n#define FT_SUBCMD_SOFT_RESET    0xdd\n\n/* Common target lengths */\n#define FT_CMD_LENGTH           16\n```\n\n### 2\\. Create a Command Builder Utility\n\nInstead of initializing arrays with zeros and manually setting offsets, you can create a localized helper struct or a builder function in `fun.c` to construct the 16-byte array safely.\n\n```c\n/* Helper to construct a standard 16-byte FT command block */\nstatic void build_ft_cmd(unsigned char *cmd_buf, uint8_t opcode, uint8_t subcmd)\n{\n    memset(cmd_buf, 0, FT_CMD_LENGTH);\n    cmd_buf[0] \u003d opcode;\n    cmd_buf[13] \u003d subcmd;\n}\n```\n\n### 3\\. Refactor the Functions in `fun.c`\n\nNow, replace the hardcoded arrays with your clean protocol definitions. Here is how `download_page` and `Erase_Page` look after the refactor:\n\n**Before:**\n\n```c\nstatic int Erase_Page(int length, int addr)\n{\n\tunsigned char transfer_cmd[] \u003d { 0xdc, 0, 0, 0, 0, 0,\t 0, 0,\n\t\t\t\t\t 0,\t  0, 0, 0, 0, 0x08, 0, 0 };\n    // ...\n```\n\n**After:**\n\n```c\nstatic int Erase_Page(int length, int addr)\n{\n\tunsigned char transfer_cmd[FT_CMD_LENGTH];\n\tint count \u003d 0, ret_value;\n    \n\tFF_LOGD(\"Erase_Page len\u003d0x%x,addr\u003d0x%x\", length, addr);\n\n\tcount \u003d (length + FOCAL_CONFIG_SIZE - 1) / FOCAL_CONFIG_SIZE;\n\n    // Build the command explicitly\n\tbuild_ft_cmd(transfer_cmd, FT_CMD_ACTION, FT_SUBCMD_ERASE_PAGE);\n\tU32_SET(\u0026transfer_cmd[1], addr);\n\tU32_SET(\u0026transfer_cmd[5], count);\n\n\tret_value \u003d usb_write(transfer_cmd, FT_CMD_LENGTH, NULL, 0, WRITE_DATA_TO_USB);\n\n\treturn ret_value;\n}\n```\n\n**Refactoring `download_page`:**\n\n```c\nstatic int download_page(uint32_t downaddr, int per_len, unsigned char *p)\n{\n\tint ret_value \u003d 0;\n\tint tmpaddr \u003d 0x20002000;\n\tunsigned char write_bin_cmd[FT_CMD_LENGTH];\n\tunsigned char code_bin_cmd[FT_CMD_LENGTH];\n\n    // Setup Write Bin Command\n\tbuild_ft_cmd(write_bin_cmd, FT_CMD_ACTION, FT_SUBCMD_WRITE_BIN);\n\tU32_SET(\u0026write_bin_cmd[1], tmpaddr);\n\tU32_SET(\u0026write_bin_cmd[5], per_len);\n\n\tret_value \u003d usb_write(write_bin_cmd, FT_CMD_LENGTH, p, per_len, WRITE_DATA_TO_USB);\n\tif (ret_value) {\n\t\tFF_LOGE(\"Write bin error!\");\n\t\treturn ret_value;\n\t}\n\n\tFF_LOGV(\"downaddr:%x\", downaddr);\n    \n    // Setup Code Bin Command\n\tbuild_ft_cmd(code_bin_cmd, FT_CMD_ACTION, FT_SUBCMD_CODE_BIN);\n\tU32_SET(\u0026code_bin_cmd[1], downaddr);\n\tU32_SET(\u0026code_bin_cmd[5], per_len);\n\tU32_SET(\u0026code_bin_cmd[9], tmpaddr);\n    \n\tret_value \u003d usb_write(code_bin_cmd, FT_CMD_LENGTH, NULL, 0, WRITE_DATA_TO_USB);\n\tif (ret_value) {\n\t\tFF_LOGE(\"code bin error!\");\n\t}\n\n\treturn ret_value;\n}\n```\n\n### Why this is better\n\n* **Self-Documenting:** Anyone reading `build_ft_cmd(..., FT_CMD_ACTION, FT_SUBCMD_ERASE_PAGE)` instantly knows what the USB transfer is trying to do without needing to memorize the manufacturer\u0027s protocol specification.  \n* **Less Error-Prone:** It is very easy to accidentally put a hex byte in the wrong index when writing out a 16-byte array manually. The `memset` in the builder function ensures no dirty memory is sent over the wire, and you are strictly handling the functional bytes.",
+      "parentUuid": "1241c801_7241d42e",
+      "range": {
+        "startLine": 103,
+        "startChar": 0,
+        "endLine": 173,
+        "endChar": 1
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d13e8f7f_c9a019c7",
         "filename": "util/focaltech/focaltech/src/fun.c",
         "patchSetId": 7
