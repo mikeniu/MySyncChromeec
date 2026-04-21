@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-/* mensa program common DTS includes */
+/* calypso program common DTS includes */
 
 #include <cros/integrated_fwid.dtsi>
 

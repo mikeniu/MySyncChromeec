@@ -9,7 +9,7 @@ def register_npcx9_project(
     project_name,
     extra_kconfig_files=(),
 ):
-    """Register an npcx9 based variant of mensa."""
+    """Register an npcx9 based variant of calypso."""
     register_npcx_project(
         project_name=project_name,
         zephyr_board="npcx9/npcx9m7fb",
@@ -28,9 +28,14 @@ def register_npcx9_project(
 
 
 register_npcx9_project(
+    project_name="calypso",
+)
+
+register_npcx9_project(
     project_name="mensa",
 )
 
 # Note for reviews, do not let anyone edit these assertions, the addresses
 # must not change after the first RO release.
+assert_rw_fwid_DO_NOT_EDIT(project_name="calypso", addr=0x40144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="mensa", addr=0x40144)

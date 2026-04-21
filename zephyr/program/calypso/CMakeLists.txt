@@ -6,6 +6,10 @@ cmake_minimum_required(VERSION 3.20.5)
 
 find_package(Zephyr REQUIRED HINTS "${ZEPHYR_BASE}")
 
+if(DEFINED CONFIG_BOARD_CALYPSO)
+	project(calypso)
+endif()
+
 if(DEFINED CONFIG_BOARD_MENSA)
 	project(mensa)
 endif()
