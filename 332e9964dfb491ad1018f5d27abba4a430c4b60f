@@ -16,6 +16,23 @@
       "message": "You need to disable some shellchecks to pass fullcheckout-presubmit. You can use https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7775797, or create your own CL.",
       "revId": "332e9964dfb491ad1018f5d27abba4a430c4b60f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42aa966f_6a83965c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1594262
+      },
+      "writtenOn": "2026-04-21T07:12:09Z",
+      "side": 1,
+      "message": "The previous build (https://cr-buildbucket.appspot.com/build/8683954929739172337) is being automatically retried for the following reasons:\n- Some tests are now retryable:rauru-cq.hylia.hw.fingerprint-cq\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
+      "revId": "332e9964dfb491ad1018f5d27abba4a430c4b60f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
