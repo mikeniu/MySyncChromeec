@@ -123,6 +123,8 @@
 /* System has back-lit keyboard */
 #define CONFIG_PWM_KBLIGHT
 
+#define CONFIG_USB_PD_DEBUG_INTERVALS
+
 /* I2C Bus Configuration */
 
 #define I2C_PORT_SENSOR NPCX_I2C_PORT0_0

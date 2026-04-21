@@ -806,6 +806,7 @@ void pd_request_data_swap(int port)
 	 */
 	if (IS_ATTACHED_SRC(port) || IS_ATTACHED_SNK(port)) {
 		TC_SET_FLAG(port, TC_FLAGS_REQUEST_DR_SWAP);
+		pd_record_timestamp_start(port, PD_TS_TC_SET_DATA_ROLE_UFP);
 		task_wake(PD_PORT_TO_TASK_ID(port));
 	}
 }
@@ -1851,6 +1852,7 @@ void tc_set_data_role(int port, enum pd_data_role role)
 
 	prev_data_role = tc[port].data_role;
 	tc[port].data_role = role;
+	pd_record_timestamp_end(port, PD_TS_TC_SET_DATA_ROLE_UFP);
 
 	if (IS_ENABLED(CONFIG_USBC_SS_MUX))
 		set_usb_mux_with_current_data_role(port);
@@ -1869,7 +1871,9 @@ void tc_set_data_role(int port, enum pd_data_role role)
 	bc12_role_change_handler(port, prev_data_role, tc[port].data_role);
 
 	/* Notify TCPC of role update */
+	pd_record_timestamp_start(port, PD_TS_TCPC_HDR_WRITE);
 	tcpm_set_msg_header(port, tc[port].power_role, tc[port].data_role);
+	pd_record_timestamp_end(port, PD_TS_TCPC_HDR_WRITE);
 }
 
 static void sink_stop_drawing_current(int port)

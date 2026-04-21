@@ -867,6 +867,11 @@ struct pd_debug_timestamps pd_ts[CONFIG_USB_PD_PORT_MAX_COUNT]
 				[PD_INTERVAL_COUNT] = { 0 };
 const char *pd_ts_name[] = {
 	"Invalid interval",
+	[PD_TS_PE_TX_COMPLETE_ACCEPT] = "PE Accept Tx flag to DRS change entry",
+	[PD_TS_TC_SET_DATA_ROLE_UFP] =
+		"TC set DR_Request to change Data_Role UFP",
+	[PD_TS_TCPC_HDR_WRITE] = "TCPC performs message header write function",
+	[PD_TS_PE_DATA_ROLE_CHANGED] = "Time taken to update Data role in PE",
 };
 BUILD_ASSERT(ARRAY_SIZE(pd_ts_name) == PD_INTERVAL_COUNT);
 

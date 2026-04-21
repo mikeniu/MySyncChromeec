@@ -4983,6 +4983,8 @@ static void pe_drs_evaluate_swap_run(int port)
 {
 	if (PE_CHK_FLAG(port, PE_FLAGS_TX_COMPLETE)) {
 		PE_CLR_FLAG(port, PE_FLAGS_TX_COMPLETE);
+		pd_record_timestamp_start(port, PD_TS_PE_TX_COMPLETE_ACCEPT);
+		pd_record_timestamp_start(port, PD_TS_PE_DATA_ROLE_CHANGED);
 
 		/* Accept Message sent. Transtion to PE_DRS_Change */
 		if (PE_CHK_FLAG(port, PE_FLAGS_ACCEPT)) {
@@ -5004,6 +5006,7 @@ static void pe_drs_evaluate_swap_run(int port)
 static void pe_drs_change_entry(int port)
 {
 	print_current_state(port);
+	pd_record_timestamp_end(port, PD_TS_PE_TX_COMPLETE_ACCEPT);
 
 	/*
 	 * PE_DRS_UFP_DFP_Change_to_DFP and PE_DRS_DFP_UFP_Change_to_UFP
@@ -5021,6 +5024,7 @@ static void pe_drs_change_run(int port)
 
 	/* Update the data role */
 	pe[port].data_role = pd_get_data_role(port);
+	pd_record_timestamp_end(port, PD_TS_PE_DATA_ROLE_CHANGED);
 	prl_set_data_role_check(port, true);
 
 	if (pe[port].data_role == PD_ROLE_DFP)
@@ -5030,6 +5034,7 @@ static void pe_drs_change_run(int port)
 	 * Port changed. Transition back to PE_SRC_Ready or
 	 * PE_SNK_Ready.
 	 */
+	pd_print_timestamps(port);
 	pe_set_ready_state(port);
 }
 
