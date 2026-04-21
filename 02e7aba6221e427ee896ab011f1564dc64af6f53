@@ -227,6 +227,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b313a3ee_fbcead5c",
+        "filename": "util/egis/usb_comm.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-21T17:30:39Z",
+      "side": 1,
+      "message": "**USB Kernel Driver Reattachment (`usb_comm.cc`)** In `connect()`, you successfully detach the kernel driver if it is active.\n\n* **Feedback:** You do not reattach the kernel driver in the destructor (`~UsbComm`). While the OS might reset the device upon exit, it is best practice in CLI flashers to attempt a `libusb_attach_kernel_driver` during teardown to restore the device state gracefully.",
+      "range": {
+        "startLine": 93,
+        "startChar": 1,
+        "endLine": 97,
+        "endChar": 3
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d1450422_8c833f75",
         "filename": "util/egis/usb_comm.h",
         "patchSetId": 10
