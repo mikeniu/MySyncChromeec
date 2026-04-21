@@ -10,25 +10,25 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		port0@0 {
+		usbc_p0: port0@0 {
 			compatible = "named-usbc-port";
 			reg = <0>;
 			chg = <&charger>;
-			pdc = <&pd_pow_port0>;
+			pdc = <&pdc_rtk_c0>;
 			pd-retimer;
 			policy = <&cros_policy>;
 		};
-		port1@1 {
+		usbc_p1: port1@1 {
 			compatible = "named-usbc-port";
 			reg = <1>;
-			pdc = <&pd_pow_port1>;
+			pdc = <&pdc_rtk_c1>;
 			pd-retimer;
 			policy = <&cros_policy>;
 		};
-		port2@2 {
+		usbc_p2: port2@2 {
 			compatible = "named-usbc-port";
 			reg = <2>;
-			pdc = <&pd_pow_port2>;
+			pdc = <&pdc_rtk_c2>;
 			pd-retimer;
 			policy = <&cros_policy>;
 		};

@@ -15,6 +15,11 @@ tests:
     - CONFIG_ZTEST_STACK_SIZE=3072
     extra_conf_files:
     - prj_hw_tests.conf
+  bbram_retained_mem:
+    extra_configs:
+    - CONFIG_HW_TEST_BBRAM_RETAINED_MEM=y
+    extra_conf_files:
+    - prj_hw_tests.conf
   benchmark:
     extra_configs:
     - CONFIG_HW_TEST_BENCHMARK=y
@@ -55,6 +60,13 @@ tests:
   flash_write_protect:
     extra_configs:
     - CONFIG_HW_TEST_FLASH_WRITE_PROTECT=y
+    # Added to reduce RO flash usage
+    - CONFIG_PM=n
+    extra_conf_files:
+    - prj_hw_tests.conf
+  flash_protection_rw:
+    extra_configs:
+    - CONFIG_HW_TEST_FLASH_PROTECTION_RW=y
     # Added to reduce RO flash usage
     - CONFIG_PM=n
     extra_conf_files:
@@ -164,6 +176,11 @@ tests:
   ram_lock:
     extra_configs:
     - CONFIG_HW_TEST_RAM_LOCK=y
+    extra_conf_files:
+    - prj_hw_tests.conf
+  reboot:
+    extra_configs:
+    - CONFIG_HW_TEST_REBOOT=y
     extra_conf_files:
     - prj_hw_tests.conf
   restricted_console:
