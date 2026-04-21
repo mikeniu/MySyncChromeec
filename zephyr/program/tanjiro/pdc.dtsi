@@ -45,6 +45,7 @@
 		reg = <0x66>;
 		irq-gpios = <&gpiod 4 GPIO_ACTIVE_LOW>;
 		ccd;
+		usb-comm-capable-as-device;
 	};
 	pdc_power_p1: rts54-pdc@67 {
 		compatible = "realtek,rts54-pdc";
