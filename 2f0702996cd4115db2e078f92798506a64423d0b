@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c94d5679_918196f4",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-21T07:56:34Z",
+      "side": 1,
+      "message": "Returning an error here will cause the Zephyr device initialization to fail, which marks the flash device as not ready. This breaks basic read/write/erase functionality when WP is disabled, directly contradicting the stated goal in the commit message. You should return `0` here instead to allow normal flash operations to proceed.",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 61,
+        "endChar": 0
+      },
+      "revId": "2f0702996cd4115db2e078f92798506a64423d0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dddd21e9_56f62389",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-21T07:56:34Z",
+      "side": 1,
+      "message": "Remove double space.",
+      "range": {
+        "startLine": 380,
+        "startChar": 16,
+        "endLine": 380,
+        "endChar": 17
+      },
+      "revId": "2f0702996cd4115db2e078f92798506a64423d0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6238b487_6ed7c3eb",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-21T07:56:34Z",
+      "side": 1,
+      "message": "Shouldn\u0027t it be `bank_count`?",
+      "revId": "2f0702996cd4115db2e078f92798506a64423d0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
