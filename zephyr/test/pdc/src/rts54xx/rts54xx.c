@@ -51,11 +51,13 @@ static void rts54xx_before_test(void *data)
 	emul_pdc_reset(emul);
 	emul_pdc_reset(emul2);
 	emul_pdc_set_response_delay(emul, 0);
+	emul_pdc_set_response_delay(emul2, 0);
 	if (IS_ENABLED(CONFIG_TEST_PDC_MESSAGE_TRACING)) {
 		set_pdc_trace_msg_mocks();
 	}
 
 	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_ok(emul_pdc_idle_wait(emul2));
 }
 
 static int emul_get_src_pdos(enum pdo_offset_t pdo_offset, uint8_t pdo_count,
@@ -252,6 +254,188 @@ ZTEST_USER(rts54xx, test_irq)
 	zassert_true(TEST_WAIT_FOR((port_interrupt(EMUL_PORT) &&
 				    port_interrupt(EMUL2_PORT)),
 				   IRQ_TEST_TIMEOUT_MS));
+}
+
+ZTEST_USER(rts54xx, test_emul_vdo_set_bounds)
+{
+	uint8_t types[6] = { 0 };
+	uint32_t vdos[6] = { 0 };
+
+	// Test Max Bound: num_vdos = 5 is valid, 6 is invalid
+	zassert_ok(emul_pdc_set_vdo(emul, 5, types, vdos),
+		   "Failed to set 5 valid VDOs");
+	zassert_equal(emul_pdc_set_vdo(emul, 6, types, vdos), -EINVAL,
+		      "Accepted 6 VDOs (limit is 5)");
+
+	// Test Type Bound: type 31 is valid, 32 is invalid
+	types[0] = 31;
+	zassert_ok(emul_pdc_set_vdo(emul, 1, types, vdos),
+		   "Failed to set VDO type 31");
+	types[0] = 32;
+	zassert_equal(emul_pdc_set_vdo(emul, 1, types, vdos), -EINVAL,
+		      "Accepted VDO type 32");
+}
+
+static union cci_event_t last_cci;
+
+static void test_cc_handler(const struct device *dev,
+			    const struct pdc_callback *callback,
+			    union cci_event_t cci_event)
+{
+	last_cci = cci_event;
+}
+
+ZTEST_USER(rts54xx, test_get_vdo_invalid_request)
+{
+	struct pdc_callback cb = { .handler = test_cc_handler };
+	// Register the callback to catch command completion events
+	pdc_set_cc_callback(dev, &cb);
+
+	// Set specific VDOs in emulator
+	uint8_t types[1] = { 1 };
+	uint32_t vdos[1] = { 0xAAAAAAAA };
+	zassert_ok(emul_pdc_set_vdo(emul, 1, types, vdos),
+		   "Failed to set VDO type 1");
+
+	union get_vdo_t vdo_req = { .num_vdos = 2 };
+	uint8_t vdo_types_get[] = { 1, 32 }; // 32 is invalid
+	uint32_t vdos_get[2] = { 0 };
+
+	// result will be 0 if the command was queued successfully
+	zassert_ok(pdc_get_vdo(dev, vdo_req, vdo_types_get, vdos_get));
+
+	// Wait for the driver thread to process the command and the emulator to
+	// return CMD_ERROR
+	zassert_ok(emul_pdc_idle_wait(emul));
+
+	// Now catch the error from the captured cci_event
+	zassert_true(last_cci.error, "Expected CCI error bit to be set");
+
+	// Verify vdos[0] was NOT updated because of the wrong value
+	zassert_equal(vdos_get[0], 0x0,
+		      "Buffer should not be modified on invalid type");
+	zassert_equal(vdos_get[1], 0x0,
+		      "Buffer should not be modified on invalid type");
+
+	// Check correct VDO types
+	vdo_types_get[0] = 31;
+	vdo_types_get[1] = 1;
+	zassert_ok(pdc_get_vdo(dev, vdo_req, vdo_types_get, vdos_get));
+	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_false(last_cci.error, "CCI error bit not expected");
+	// Verify vdos[0] was updated
+	zassert_equal(vdos_get[1], 0xAAAAAAAA);
+	zassert_equal(vdos_get[0], 0x0);
+
+	// 5. IMPORTANT: Unregister the callback before the function returns
+	// to prevent the driver from calling a dangling stack pointer in later
+	// tests.
+	pdc_set_cc_callback(dev, NULL);
+}
+
+ZTEST_USER(rts54xx, test_vdo_integrity_roundtrip)
+{
+	struct pdc_callback cb = { .handler = test_cc_handler };
+	// Register the callback to catch command completion events
+	pdc_set_cc_callback(dev, &cb);
+
+	union get_vdo_t vdo_req = { .raw_value = 0 };
+	uint8_t set_types[] = { 0, 10, 31 };
+	uint32_t set_vdos[] = { 0xAAAAAAAA, 0xBBBBBBBB, 0xCCCCCCCC };
+	uint8_t get_types[3];
+	uint32_t get_vdos[3] = { 0 };
+
+	// 1. Setup: Fill disparate VDO slots in the emulator
+	zassert_ok(emul_pdc_set_vdo(emul, 3, set_types, set_vdos));
+
+	// 2. Request: Read back those slots in a different order
+	vdo_req.num_vdos = 3;
+	get_types[0] = 31; // Should get 0xCCCCCCCC
+	get_types[1] = 0; // Should get 0xAAAAAAAA
+	get_types[2] = 10; // Should get 0xBBBBBBBB
+
+	zassert_ok(pdc_get_vdo(dev, vdo_req, get_types, get_vdos));
+	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_false(last_cci.error, "CCI error bit not expected");
+
+	// 3. Verify: Check that values match the requested types
+	zassert_equal(get_vdos[0], 0xCCCCCCCC, "VDO Type 31 mismatch");
+	zassert_equal(get_vdos[1], 0xAAAAAAAA, "VDO Type 0 mismatch");
+	zassert_equal(get_vdos[2], 0xBBBBBBBB, "VDO Type 10 mismatch");
+
+	// 5. IMPORTANT: Unregister the callback before the function returns
+	// to prevent the driver from calling a dangling stack pointer in later
+	// tests.
+	pdc_set_cc_callback(dev, NULL);
+}
+
+ZTEST_USER(rts54xx, test_usb_comm_capable_as_device)
+{
+	uint32_t idh;
+	union get_vdo_t vdo_req;
+	uint8_t vdo_types[] = { VDO_INDEX_IDH };
+
+	vdo_req.raw_value = 0;
+	vdo_req.num_vdos = 1;
+	vdo_req.vdo_origin = 0; /* PDC origin */
+
+	/* Trigger re-init of the driver because it was already initialized at
+	 * boot, but emulator state was wiped by rts54xx_before_test.
+	 */
+	zassert_ok(pdc_reset(dev));
+	zassert_ok(pdc_reset(dev2));
+
+	/* Wait for driver to finish initialization */
+	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_ok(emul_pdc_idle_wait(emul2));
+
+	/* Verify port 0 (pdc_emul1) has USB Device bit set (bit 30) */
+	zassert_ok(pdc_get_vdo(dev, vdo_req, vdo_types, &idh));
+	/* Wait for command to complete */
+	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_true(idh & BIT(30),
+		     "IDH VDO should have USB Device bit set (0x%08x)", idh);
+
+	/* Verify port 1 (pdc_emul2) does not have USB Device bit set (bit 30)
+	 */
+	zassert_ok(pdc_get_vdo(dev2, vdo_req, vdo_types, &idh));
+	/* Wait for command to complete */
+	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_false(idh & BIT(30),
+		      "IDH VDO should not have USB Device bit set (0x%08x)",
+		      idh);
+}
+
+ZTEST_USER(rts54xx, test_alert_received)
+{
+	uint32_t ado = 0;
+	union vendor_status_change_bits_t vendor_status = { 0 };
+
+	/* Clear alert in PDC emulator */
+	zassert_ok(emul_pdc_set_alert(emul, 0x0));
+
+	/* Verify PDC reports no alert received */
+	zassert_ok(pdc_get_vendor_status(dev, &vendor_status));
+	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_equal(vendor_status.alert_received, 0);
+
+	/* Verify GET_ALERT returns empty ADO */
+	zassert_ok(pdc_get_alert(dev, &ado));
+	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_equal(ado, 0x0);
+
+	/* Set power button press alert in PDC emulator */
+	zassert_ok(emul_pdc_set_alert(emul, 0x80000002));
+
+	/* Verify PDC reports alert received */
+	zassert_ok(pdc_get_vendor_status(dev, &vendor_status));
+	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_equal(vendor_status.alert_received, 1);
+
+	/* Verify GET_ALERT returns empty ADO */
+	zassert_ok(pdc_get_alert(dev, &ado));
+	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_equal(ado, 0x80000002);
 }
 
 /* UCSI command callback handler. */
