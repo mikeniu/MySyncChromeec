@@ -12,7 +12,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/ztest.h>
 
-LOG_MODULE_REGISTER(test_flash_protection_rw);
+LOG_MODULE_REGISTER(test_flash_protection);
 
 static void test_set_ro_at_boot(void)
 {
@@ -58,4 +58,4 @@ static void (*test_steps[])(void) = {
 	test_check_all_now_in_ro,
 };
 
-MULTISTEP_TEST(flash_protection_rw, test_steps);
+MULTISTEP_TEST(flash_protection, test_steps);
