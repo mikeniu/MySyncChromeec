@@ -167,6 +167,22 @@ config PLATFORM_EC_BATTERY_CUT_OFF
 	  Once defined, a board specific board_cut_off_battery() function
 	  has to be provided.
 
+config PLATFORM_EC_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN
+	bool "Battery cut-off at shutdown"
+	depends on PLATFORM_EC_BATTERY_CUT_OFF
+	help
+	  If this option is enabled, all battery cutoff commands will be
+	  deferred until the chipset is shutting down.
+
+	  Some boards can only execute a battery cutoff when the power state is
+	  G3 (fully off). This feature allows for that requirement by forcing
+	  a shutdown when a cutoff is requested and delaying the actual
+	  battery command until the transition to G3.
+
+	  When enabled, the board logic must ensure battery_cutoff_at_shutdown()
+	  is called at the appropriate time during the shutdown sequence to
+	  trigger the physical cutoff.
+
 config PLATFORM_EC_BATTERY_CUTOFF_TIMEOUT_MSEC
 	int "Timeout for battery cutoff completion"
 	depends on PLATFORM_EC_BATTERY_CUT_OFF
