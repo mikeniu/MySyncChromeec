@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88d8b665_413cc668",
+        "filename": "zephyr/emul/emul_realtek_rts54xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 797,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-04-22T17:01:11Z",
+      "side": 1,
+      "message": "Magic number",
+      "range": {
+        "startLine": 797,
+        "startChar": 37,
+        "endLine": 797,
+        "endChar": 38
+      },
+      "revId": "16c68e8c1d7057599e4747d864e27a6220951214",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37243ca9_c02b225e",
+        "filename": "zephyr/emul/emul_realtek_rts54xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1653,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-04-22T17:01:11Z",
+      "side": 1,
+      "message": "Magic number",
+      "range": {
+        "startLine": 1653,
+        "startChar": 16,
+        "endLine": 1653,
+        "endChar": 17
+      },
+      "revId": "16c68e8c1d7057599e4747d864e27a6220951214",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
