@@ -469,6 +469,11 @@ int battery_is_cut_off(void);
 int battery_cutoff_is_scheduled(void);
 
 /**
+ * Perform battery cutoff at shutdown.
+ */
+int battery_cutoff_at_shutdown(void);
+
+/**
  * Read battery vendor parameter.
  *
  * Vendor parameter handlers are implemented in a board-specific battery.c
