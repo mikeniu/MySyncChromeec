@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c981f010_1492a0d4",
+        "filename": "zephyr/program/fatcat/Kconfig",
+        "patchSetId": 8
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-04-22T02:55:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4d8d4a12_dfd4b5ea",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 61,
+        "endChar": 26
+      },
+      "revId": "2a67d0d07fe615f398900ea86a7cbd4d6da01b1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b08a4bb_bf9fc8bd",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-04-19T19:33:03Z",
       "side": 1,
       "message": "Please group this change with the fatcat/Kconfig file change in a separate CL",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 29
+      },
+      "revId": "2a67d0d07fe615f398900ea86a7cbd4d6da01b1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f7c05a7_c64db29f",
+        "filename": "zephyr/program/fatcat/fatcat-ish-idle/project.conf",
+        "patchSetId": 8
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-04-22T02:55:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8b08a4bb_bf9fc8bd",
       "range": {
         "startLine": 6,
         "startChar": 0,
@@ -64,6 +112,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "324ffbfd_de45f4db",
+        "filename": "zephyr/program/fatcat/kinmen-ish/project.conf",
+        "patchSetId": 8
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-04-22T02:55:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cb44cd1_d17c5f23",
+      "revId": "2a67d0d07fe615f398900ea86a7cbd4d6da01b1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "309a0abf_2a6efa37",
@@ -77,6 +143,30 @@
       "writtenOn": "2026-04-19T19:33:03Z",
       "side": 1,
       "message": "Please group this change with the fatcat/Kconfig file change in a separate CL",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 26
+      },
+      "revId": "2a67d0d07fe615f398900ea86a7cbd4d6da01b1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ae1c769_bf33e52d",
+        "filename": "zephyr/program/fatcat/moonstone-ish/project.conf",
+        "patchSetId": 8
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-04-22T02:55:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "309a0abf_2a6efa37",
       "range": {
         "startLine": 6,
         "startChar": 0,
@@ -110,6 +200,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "088e47a2_b06cf8a2",
+        "filename": "zephyr/program/fatcat/moonstone-ish/src/sensor.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-04-22T02:55:12Z",
+      "side": 1,
+      "message": "I have to removed it.",
+      "parentUuid": "bb17ef19_f50e4c62",
+      "range": {
+        "startLine": 17,
+        "startChar": 1,
+        "endLine": 17,
+        "endChar": 26
+      },
+      "revId": "2a67d0d07fe615f398900ea86a7cbd4d6da01b1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "80c2307d_1d80b34b",
@@ -123,6 +237,30 @@
       "writtenOn": "2026-04-19T19:33:03Z",
       "side": 1,
       "message": "Please group this change with the fatcat/Kconfig file change in a separate CL",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 21
+      },
+      "revId": "2a67d0d07fe615f398900ea86a7cbd4d6da01b1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfafd14d_b4f10b6c",
+        "filename": "zephyr/program/fatcat/ruby-ish/project.conf",
+        "patchSetId": 8
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-04-22T02:55:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "80c2307d_1d80b34b",
       "range": {
         "startLine": 6,
         "startChar": 0,
