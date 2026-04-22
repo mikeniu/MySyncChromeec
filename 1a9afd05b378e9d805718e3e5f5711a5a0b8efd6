@@ -39,6 +39,30 @@
       },
       "revId": "1a9afd05b378e9d805718e3e5f5711a5a0b8efd6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae2c827f_c5a8e1af",
+        "filename": "zephyr/program/fatcat/moonstone/moonstone_ec_ufsc.dtsi",
+        "patchSetId": 7
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-04-22T02:53:11Z",
+      "side": 1,
+      "message": "Auto-generated.",
+      "parentUuid": "4303f798_0e9b53f8",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 40
+      },
+      "revId": "1a9afd05b378e9d805718e3e5f5711a5a0b8efd6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
