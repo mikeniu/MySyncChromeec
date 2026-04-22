@@ -552,7 +552,9 @@ void task_print_list(void)
 {
 	int i;
 
-	ccputs("Task Ready Name         Events      Time (s)  StkUsed\n");
+	ccputs("Task Ready Name         Events      Time (s)  StkUsed");
+	if (IS_ENABLED(CONFIG_TASKINFO_CONTEXT_REGS))
+		ccputs("      PC       LR");
 
 	for (i = 0; i < TASK_ID_COUNT; i++) {
 		uint32_t *sp;
@@ -562,7 +564,7 @@ void task_print_list(void)
 		     sp++)
 			;
 
-		ccprintf("%c%3d %c %-16s %08x %11.6lld  %3d/%3d/%3d\n",
+		ccprintf("\n%c%3d %c %-16s %08x %11.6lld  %3d/%3d/%3d",
 			 (tasks + i == current_task) ? '*' : ' ', i,
 			 ((uint32_t)tasks_ready & BIT(i)) ? 'R' : ' ',
 			 task_names[i], (int)tasks[i].events, tasks[i].runtime,
@@ -571,8 +573,27 @@ void task_print_list(void)
 			 (int)(tasks_init[i].stack_size -
 			       ((uint32_t)sp - (uint32_t)tasks[i].stack)),
 			 tasks_init[i].stack_size);
+
+		if (!IS_ENABLED(CONFIG_TASKINFO_CONTEXT_REGS))
+			continue;
+
+		sp = (uint32_t *)tasks[i].sp;
+		/* Don't print context regs for the current task if not
+		 * in interrupt context, since the stack pointer is not
+		 * valid in this case.
+		 */
+		if ((tasks + i == current_task) && !in_interrupt_context())
+			continue;
+
+		/* Make sure sp address is valid before printing */
+		if ((uintptr_t)(sp + 16) < CONFIG_RAM_BASE + CONFIG_RAM_SIZE &&
+		    (uintptr_t)(sp) >= CONFIG_RAM_BASE) {
+			ccprintf(" %08x %08x", sp[14], sp[13]);
+		}
 		cflush();
 	}
+	ccputs("\n");
+	cflush();
 }
 
 void task_print_profiling(void)
