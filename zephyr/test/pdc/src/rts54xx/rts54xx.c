@@ -254,6 +254,84 @@ ZTEST_USER(rts54xx, test_irq)
 				   IRQ_TEST_TIMEOUT_MS));
 }
 
+ZTEST_USER(rts54xx, test_emul_vdo_set_bounds)
+{
+	uint8_t types[5] = { 0 };
+	uint32_t vdos[5] = { 0 };
+
+	// Test Max Bound: num_vdos = 4 is valid, 5 is invalid
+	zassert_ok(emul_pdc_set_vdo(emul, 4, types, vdos),
+		   "Failed to set 4 valid VDOs");
+	zassert_equal(emul_pdc_set_vdo(emul, 5, types, vdos), -EINVAL,
+		      "Accepted 5 VDOs (limit is 4)");
+
+	// Test Type Bound: type 31 is valid, 32 is invalid
+	types[0] = 31;
+	zassert_ok(emul_pdc_set_vdo(emul, 1, types, vdos),
+		   "Failed to set VDO type 31");
+	types[0] = 32;
+	zassert_equal(emul_pdc_set_vdo(emul, 1, types, vdos), -EINVAL,
+		      "Accepted VDO type 32");
+}
+
+ZTEST_USER(rts54xx, test_get_vdo_invalid_request)
+{
+	// Set specific VDOs in emulator
+	uint8_t types[1] = { 1 };
+	uint32_t vdos[1] = { 0xAAAAAAAA };
+	zassert_ok(emul_pdc_set_vdo(emul, 1, types, vdos),
+		   "Failed to set VDO type 1");
+
+	union get_vdo_t vdo_req = { .num_vdos = 2 };
+	uint8_t vdo_types_get[] = { 1, 32 }; // 32 is invalid
+	uint32_t vdos_get[2] = { 0 };
+
+	int result = pdc_get_vdo(dev, vdo_req, vdo_types_get, vdos_get);
+	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_equal(result, 0); // The error is not returned here
+	// Verify vdos[0] was NOT updated because of the wrong value
+	zassert_equal(vdos_get[0], 0x0,
+		      "Buffer should not be modified on invalid type");
+	zassert_equal(vdos_get[1], 0x0,
+		      "Buffer should not be modified on invalid type");
+
+	// Check correct VDO types
+	vdo_types_get[0] = 31;
+	vdo_types_get[1] = 1;
+	result = pdc_get_vdo(dev, vdo_req, vdo_types_get, vdos_get);
+	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_equal(result, 0);
+	// Verify vdos[0] was updated
+	zassert_equal(vdos_get[1], 0xAAAAAAAA);
+	zassert_equal(vdos_get[0], 0x0);
+}
+
+ZTEST_USER(rts54xx, test_vdo_integrity_roundtrip)
+{
+	union get_vdo_t vdo_req = { .raw_value = 0 };
+	uint8_t set_types[] = { 0, 10, 31 };
+	uint32_t set_vdos[] = { 0xAAAAAAAA, 0xBBBBBBBB, 0xCCCCCCCC };
+	uint8_t get_types[3];
+	uint32_t get_vdos[3] = { 0 };
+
+	// 1. Setup: Fill disparate VDO slots in the emulator
+	zassert_ok(emul_pdc_set_vdo(emul, 3, set_types, set_vdos));
+
+	// 2. Request: Read back those slots in a different order
+	vdo_req.num_vdos = 3;
+	get_types[0] = 31; // Should get 0xCCCCCCCC
+	get_types[1] = 0; // Should get 0xAAAAAAAA
+	get_types[2] = 10; // Should get 0xBBBBBBBB
+
+	zassert_ok(pdc_get_vdo(dev, vdo_req, get_types, get_vdos));
+	zassert_ok(emul_pdc_idle_wait(emul));
+
+	// 3. Verify: Check that values match the requested types
+	zassert_equal(get_vdos[0], 0xCCCCCCCC, "VDO Type 31 mismatch");
+	zassert_equal(get_vdos[1], 0xAAAAAAAA, "VDO Type 0 mismatch");
+	zassert_equal(get_vdos[2], 0xBBBBBBBB, "VDO Type 10 mismatch");
+}
+
 ZTEST_USER(rts54xx, test_alert_received)
 {
 	uint32_t ado = 0;
