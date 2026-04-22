@@ -22,6 +22,30 @@
       },
       "revId": "c233005bbb94d3869af3fc266eadb759a857271c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d5ed211_b541f4f6",
+        "filename": "firmware_builder.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1000039
+      },
+      "writtenOn": "2026-04-22T17:04:56Z",
+      "side": 1,
+      "message": "yes, I figured, and decided it was better to follow the same pattern for all branches, exactly to make sure that there are no problems when building them for signing.",
+      "parentUuid": "87f6592f_daedf31f",
+      "range": {
+        "startLine": 184,
+        "startChar": 0,
+        "endLine": 206,
+        "endChar": 60
+      },
+      "revId": "c233005bbb94d3869af3fc266eadb759a857271c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
