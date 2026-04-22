@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3503e39_f0a73862",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-22T02:23:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c94d5679_918196f4",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 61,
+        "endChar": 0
+      },
+      "revId": "2f0702996cd4115db2e078f92798506a64423d0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dddd21e9_56f62389",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b94393ae_b93e4a7f",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-22T02:23:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dddd21e9_56f62389",
+      "range": {
+        "startLine": 380,
+        "startChar": 16,
+        "endLine": 380,
+        "endChar": 17
+      },
+      "revId": "2f0702996cd4115db2e078f92798506a64423d0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6238b487_6ed7c3eb",
@@ -60,6 +108,24 @@
       "writtenOn": "2026-04-21T07:56:34Z",
       "side": 1,
       "message": "Shouldn\u0027t it be `bank_count`?",
+      "revId": "2f0702996cd4115db2e078f92798506a64423d0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d54a9dcd_b2649cd4",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-22T02:23:46Z",
+      "side": 1,
+      "message": "Good point. Updated both the header and the implementation (internal library) to use bank_count to align with EC terminology.",
+      "parentUuid": "6238b487_6ed7c3eb",
       "revId": "2f0702996cd4115db2e078f92798506a64423d0b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
