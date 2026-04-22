@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87f6592f_daedf31f",
+        "filename": "firmware_builder.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1136059
+      },
+      "writtenOn": "2026-04-22T17:00:03Z",
+      "side": 1,
+      "message": "We don\u0027t actually want to sign the mp_build or prepvt_build artifacts. They\u0027re just built, so we can verify there won\u0027t be issues building on the branches.",
+      "range": {
+        "startLine": 184,
+        "startChar": 0,
+        "endLine": 206,
+        "endChar": 60
+      },
+      "revId": "c233005bbb94d3869af3fc266eadb759a857271c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
