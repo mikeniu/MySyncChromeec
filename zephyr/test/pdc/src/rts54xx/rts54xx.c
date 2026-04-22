@@ -254,6 +254,80 @@ ZTEST_USER(rts54xx, test_irq)
 				   IRQ_TEST_TIMEOUT_MS));
 }
 
+ZTEST_USER(rts54xx, test_set_get_vdo)
+{
+	// Prepare device
+	zassert_ok(pdc_reset(dev));
+	zassert_ok(emul_pdc_idle_wait(emul));
+
+	// Prepare data
+	union get_vdo_t vdo_req;
+	uint8_t vdo_types[6] = { 0 };
+	uint32_t vdos[6] = { 0x0 };
+	int result;
+	vdo_req.raw_value = 0;
+	vdo_req.vdo_origin = 0; /* PDC origin */
+
+	// Wrong VDO type for get_vdo
+	// Set vdo vaules 0x1 0x2
+	vdo_req.num_vdos = 2;
+	vdo_types[0] = 0;
+	vdo_types[1] = 1;
+	vdos[0] = 0x1;
+	vdos[1] = 0x2;
+	result = emul_pdc_set_vdo(emul, 2, vdo_types, vdos);
+	zassert_equal(result, 0);
+
+	// Try to read - bad VDO type 32
+	vdo_req.num_vdos = 3;
+	vdo_types[0] = 0;
+	vdo_types[1] = 32;
+	vdo_types[2] = 1;
+	vdos[0] = 0x0;
+	vdos[1] = 0x0;
+	vdos[2] = 0x0;
+	result = pdc_get_vdo(dev, vdo_req, vdo_types, vdos);
+	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_equal(result, 0);
+	zassert_equal(vdos[0], 0x0);
+	zassert_equal(vdos[1], 0x0);
+	zassert_equal(vdos[2], 0x0);
+
+	// Try to reead - good VDO types
+	vdo_req.num_vdos = 3;
+	vdo_types[0] = 0;
+	vdo_types[1] = 31;
+	vdo_types[2] = 1;
+	result = pdc_get_vdo(dev, vdo_req, vdo_types, vdos);
+	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_equal(result, 0);
+	zassert_equal(vdos[0], 0x1);
+	zassert_equal(vdos[1], 0x0);
+	zassert_equal(vdos[2], 0x2);
+
+	// Wrong VDO numbers for set_vdo
+	vdo_req.num_vdos = 6;
+	vdo_types[0] = 0;
+	vdo_types[1] = 1;
+	vdo_types[2] = 2;
+	vdo_types[3] = 3;
+	vdo_types[4] = 4;
+	vdo_types[5] = 5;
+	vdos[0] = 0x1;
+	vdos[1] = 0x2;
+	vdos[2] = 0x3;
+	vdos[3] = 0x4;
+	vdos[4] = 0x5;
+	vdos[5] = 0x6;
+	result = emul_pdc_set_vdo(emul, 6, vdo_types, vdos);
+	zassert_equal(result, -EINVAL);
+
+	// Wrong VDO type for set_vdo
+	vdo_types[0] = 32;
+	result = emul_pdc_set_vdo(emul, 1, vdo_types, vdos);
+	zassert_equal(result, -EINVAL);
+}
+
 ZTEST_USER(rts54xx, test_alert_received)
 {
 	uint32_t ado = 0;
