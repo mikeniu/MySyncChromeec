@@ -263,7 +263,10 @@ HOST_CXXFLAGS+=$(LIBEC_HOST_CFLAGS)
 ifneq (${SYSROOT},)
   LDFLAGS_EXTRA+=--sysroot=${SYSROOT}
 endif
+# Ensure that -nostdlib is passed so we don't have the baremetal
+# toolchain try to escape the sysroot.
 LDFLAGS=-g -no-pie -Wl,-X -Wl,--gc-sections -Wl,--build-id=none \
+	-nostdlib -L=/usr/lib -lc++ -L=/lib -lc \
 	$(LDFLAGS_EXTRA) $(CFLAGS_CPU)
 ifeq ($(CROSS_COMPILE_CC_NAME),clang)
 	LDFLAGS+=--unwindlib=none
