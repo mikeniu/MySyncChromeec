@@ -16,6 +16,24 @@
       "message": "```\nDEBUG:Calling post-test callback\nTest \"flash_protection_rw\": PASSED\n\nTest \"flash_protection_rw_helipilot_v2.0.24337\": PASSED\n\nTest \"flash_protection_rw_helipilot_v2.0.27609\": PASSED\n\nTest \"flash_protection_rw_buccaneer_v2.0.26328\": PASSED\n\n```",
       "revId": "cb12e1690abf7a2b43c2f2e3310594c497037858",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93aab1c1_56cbddc6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-22T06:09:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "386fcdf8_f7b5ea82",
+      "revId": "cb12e1690abf7a2b43c2f2e3310594c497037858",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
