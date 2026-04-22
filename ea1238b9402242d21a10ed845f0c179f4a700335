@@ -16,6 +16,52 @@
       "message": "add bob for cherrypicking tracking",
       "revId": "ea1238b9402242d21a10ed845f0c179f4a700335",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d91f7336_25bbe38d",
+        "filename": "zephyr/program/fatcat/moonstone-ish/motionsense.dtsi",
+        "patchSetId": 9
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1273086
+      },
+      "writtenOn": "2026-04-22T00:49:00Z",
+      "side": 1,
+      "message": "Are these both supposed to be lis2de?",
+      "range": {
+        "startLine": 55,
+        "startChar": 33,
+        "endLine": 55,
+        "endChar": 39
+      },
+      "revId": "ea1238b9402242d21a10ed845f0c179f4a700335",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69dc77dc_fb6b0e59",
+        "filename": "zephyr/program/fatcat/moonstone-ish/motionsense.dtsi",
+        "patchSetId": 9
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1273086
+      },
+      "writtenOn": "2026-04-22T00:49:00Z",
+      "side": 1,
+      "message": "Are these both supposed to be LIS2DH?",
+      "range": {
+        "startLine": 80,
+        "startChar": 24,
+        "endLine": 80,
+        "endChar": 31
+      },
+      "revId": "ea1238b9402242d21a10ed845f0c179f4a700335",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
