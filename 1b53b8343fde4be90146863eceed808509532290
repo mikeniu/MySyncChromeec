@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "594be6b2_05555a6f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-04-22T16:51:03Z",
+      "side": 1,
+      "message": "I think this should come with a unit test. You could add a variant of the `pdc.generic` and `pdc.generic.tps6699x` testcases with the Kconfig symbol set. Both emulators already have a backend API for setting the GET_CAPABILITY response (`emul_pdc_set_capability()`) so you could just set that bit, read back through the drivers, and verify the bit is changed to 0. You could write the test once at the",
+      "revId": "1b53b8343fde4be90146863eceed808509532290",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "95e8486b_99e02333",
         "filename": "zephyr/program/fatcat/program.conf",
         "patchSetId": 1
