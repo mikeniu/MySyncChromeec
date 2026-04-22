@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a32d50fe_53546258",
+        "filename": "zephyr/shim/src/led_driver/led_gpio.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-04-22T19:33:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fbb0360_8e39f554",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 119,
+        "endChar": 63
+      },
+      "revId": "96288b29352670df78388835b26c97c6d41b6931",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "40221066_c115e767",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-04-22T18:53:58Z",
       "side": 1,
       "message": "Same comment here - note that the runtime lookup saves flash space,",
+      "range": {
+        "startLine": 160,
+        "startChar": 0,
+        "endLine": 160,
+        "endChar": 63
+      },
+      "revId": "96288b29352670df78388835b26c97c6d41b6931",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44b1d2b7_6cea0b7e",
+        "filename": "zephyr/shim/src/led_driver/led_pwm.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-04-22T19:33:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "40221066_c115e767",
       "range": {
         "startLine": 160,
         "startChar": 0,
