@@ -794,13 +794,14 @@ static int get_vdo(struct rts5453p_emul_pdc_data *data,
 	LOG_INF("GET_VDO = %x", req->get_vdo.vdo_req.raw_value);
 	memset(&data->response, 0, sizeof(data->response));
 
-	if (req->get_vdo.vdo_req.num_vdos > PDC_DISC_IDENTITY_VDO_COUNT) {
+	if (req->get_vdo.vdo_req.num_vdos > 7) {
 		LOG_ERR("Too many VDOs requested in GET_VDO.");
 		return -EINVAL;
 	}
 
 	for (uint8_t i = 0; i < req->get_vdo.vdo_req.num_vdos; i++) {
-		data->response.get_vdo.vdo[i] = data->vdos[i];
+		int vdo_index = req->get_vdo.vdo_type[i];
+		data->response.get_vdo.vdo[i] = data->vdos[vdo_index];
 	}
 
 	data->response.get_vdo.byte_count =
@@ -1645,17 +1646,20 @@ emul_realtek_rts54xx_set_lpm_ppm_info(const struct emul *target,
 }
 
 static int emul_realtek_rts54xx_set_vdo(const struct emul *target,
-					uint8_t num_vdos, const uint32_t *vdos)
+					uint8_t num_vdos,
+					const uint8_t *vdo_types,
+					const uint32_t *vdos)
 {
-	struct rts5453p_emul_pdc_data *data =
-		rts5453p_emul_get_pdc_data(target);
-
-	if (num_vdos > PDC_DISC_IDENTITY_VDO_COUNT) {
+	if (num_vdos > 5) {
 		return -EINVAL;
 	}
 
+	struct rts5453p_emul_pdc_data *data =
+		rts5453p_emul_get_pdc_data(target);
+
 	for (uint8_t i = 0; i < num_vdos; i++) {
-		data->vdos[i] = vdos[i];
+		int vdo_index = vdo_types[i];
+		data->vdos[vdo_index] = vdos[i];
 	}
 
 	return 0;
