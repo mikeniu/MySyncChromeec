@@ -580,6 +580,12 @@
 #undef CONFIG_BATTERY_CHECK_CHARGE_TEMP_LIMITS
 
 /*
+ * If this option is enabled, all battery cutoff commands will be
+ * deferred until the chipset is shutting down.
+ */
+#undef CONFIG_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN
+
+/*
  * Support battery cut-off as host command and console command.
  *
  * Once defined, you have to implement a board_cut_off_battery() function
