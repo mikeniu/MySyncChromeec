@@ -45,6 +45,30 @@
       },
       "revId": "e529443475a7442b2bef9d60afdd09be4b9d6f4b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6275f577_0c015271",
+        "filename": "zephyr/shim/chip/it8xxx2/system.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1273969
+      },
+      "writtenOn": "2026-04-22T04:59:54Z",
+      "side": 1,
+      "message": "The NSDMA bit you mentioned is only supported on the it8320 (legacy Chromium EC). On the it8xxx2 series, this bit is not implemented, so it cannot be configured here.(I have explained this in issue: https://partnerissuetracker.corp.google.com/issues/498130648#comment29)",
+      "parentUuid": "7c24c631_d2c245a5",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 54
+      },
+      "revId": "e529443475a7442b2bef9d60afdd09be4b9d6f4b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
