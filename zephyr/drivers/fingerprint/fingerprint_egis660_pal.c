@@ -26,6 +26,10 @@ LOG_MODULE_REGISTER(egis660_pal, LOG_LEVEL_INF);
 
 K_HEAP_DEFINE(fp_driver_heap, CONFIG_FINGERPRINT_SENSOR_EGIS660_HEAP_SIZE);
 
+extern int crec_flash_write(int offset, int size, const char *data);
+extern int crec_flash_erase(int offset, int size);
+extern int crec_flash_read(int offset, int size, char *data);
+
 int __unused egis_sensor_spi_write_read(uint8_t *data, size_t write_size,
 					size_t read_size,
 					bool leave_cs_asserted)
@@ -161,4 +165,47 @@ int __unused egis_sensor_wfi(uint16_t timeout_ms, egis_wfi_check_t enter_wfi,
 	return EGIS_BEP_RESULT_OK;
 }
 
+static const egis_storage_info_t storage_info =
+{
+    .read_align         = 1,    // min read unit
+    .write_align        = 256,  // min write unit
+    .erase_align        = 4096, // min erase unit
+    .is_memory_mapped   = false // default
+};
+
+#define APNS_DATA_ADDR DT_REG_ADDR(DT_NODELABEL(apns_data))
+#define APNS_DATA_SIZE DT_REG_SIZE(DT_NODELABEL(apns_data))
+
+int __unused egis_apns_data_erase(uint32_t offset, size_t size)
+{
+    if (offset + size > APNS_DATA_SIZE) {
+        LOG_ERR("%s: out of range %d", __func__, offset + size);
+        return -1;
+    }
+    size_t erase_size = (size + storage_info.erase_align) & ~(storage_info.erase_align - 1);
+    return crec_flash_erase(APNS_DATA_ADDR + offset, erase_size);
+}
+
+int __unused egis_apns_data_read(uint32_t offset, size_t size, void *data)
+{
+    if (offset + size > APNS_DATA_SIZE) {
+        LOG_ERR("%s: out of range %d", __func__, offset + size);
+        return -1;
+    }
+    return crec_flash_read(APNS_DATA_ADDR + offset, size, (char *)data);
+}
+
+int __unused egis_apns_data_write(uint32_t offset, const void *data, size_t size)
+{
+    if (offset + size > APNS_DATA_SIZE) {
+        LOG_ERR("%s: out of range %d", __func__, offset + size);
+        return -1;
+    }
+    return crec_flash_write(APNS_DATA_ADDR + offset, size, (const char *)data);
+}
+
+const egis_storage_info_t __unused *egis_apns_storage_get_info(void)
+{
+    return &storage_info;
+}
 /* LCOV_EXCL_STOP */
