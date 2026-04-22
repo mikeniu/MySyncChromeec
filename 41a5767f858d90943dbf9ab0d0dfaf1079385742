@@ -16,6 +16,24 @@
       "message": "could you flip it and do a `if (!IS_ENABLED(...)) { continue; }`? Save some indentation, same as the other ones",
       "revId": "41a5767f858d90943dbf9ab0d0dfaf1079385742",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f68da12b_6014834e",
+        "filename": "core/riscv-rv32i/task.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 629,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-04-22T22:15:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a66e6586_ea2b4208",
+      "revId": "41a5767f858d90943dbf9ab0d0dfaf1079385742",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
