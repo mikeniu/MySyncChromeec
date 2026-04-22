@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff469570_930b871f",
+        "filename": "zephyr/shim/chip/it8xxx2/system.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-04-22T14:08:56Z",
+      "side": 1,
+      "message": "Changed to \"disable\"",
+      "parentUuid": "6ebe6e97_9823d602",
+      "range": {
+        "startLine": 29,
+        "startChar": 8,
+        "endLine": 29,
+        "endChar": 27
+      },
+      "revId": "e529443475a7442b2bef9d60afdd09be4b9d6f4b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7c24c631_d2c245a5",
