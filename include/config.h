@@ -784,6 +784,9 @@
  */
 #undef CONFIG_DEBUG_BRINGUP
 
+/* Enable printing task PCs in taskinfo command */
+#define CONFIG_TASKINFO_CONTEXT_REGS
+
 /*****************************************************************************/
 
 /*
