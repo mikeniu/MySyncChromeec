@@ -589,4 +589,7 @@ struct rts5453p_emul_pdc_data {
 struct i2c_common_emul_data *
 rts5453p_emul_get_i2c_common_data(const struct emul *emul);
 
+#define RTS54XX_VDO_MAX_NUM 31
+#define RTS54XX_SET_VDO_MAX_NUM 4
+
 #endif /* __EMUL_REALTEK_RTS5453P_H */
