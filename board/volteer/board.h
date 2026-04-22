@@ -17,6 +17,9 @@
 /* Remove PRL state names to free flash space */
 #define CONFIG_USB_PD_DEBUG_LEVEL 0
 
+/* Disable PC/LR columns to save flash */
+#undef CONFIG_TASKINFO_CONTEXT_REGS
+
 #define CONFIG_VBOOT_EFS2
 
 #define CONFIG_POWER_BUTTON
