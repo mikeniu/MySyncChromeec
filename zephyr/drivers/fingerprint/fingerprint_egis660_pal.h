@@ -15,6 +15,22 @@
 typedef bool (*egis_wfi_check_t)(void);
 
 /**
+ * @brief Storage information.
+ *
+ * The alignment requirements are specified in number of bytes.
+ */
+typedef struct {
+    /** Required address and size alignment for read operations. */
+    uint32_t read_align;
+    /** Required address and size alignment for write operations. */
+    uint32_t write_align;
+    /** Required address and size alignment for erase operations. */
+    uint32_t erase_align;
+    /** True if flash can be read using memcpy. */
+    bool is_memory_mapped;
+} egis_storage_info_t;
+
+/**
  * @brief Writes and reads SPI data.
  *
  * Writes data to SPI interface and reads data from SPI interface, with chip
