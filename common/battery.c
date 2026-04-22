@@ -10,6 +10,7 @@
 #include "button.h"
 #include "charge_manager.h"
 #include "charge_state.h"
+#include "chipset.h"
 #include "common.h"
 #include "console.h"
 #include "ec_ec_comm_client.h"
@@ -540,6 +541,13 @@ static void ac_change(void)
 	CPRINTS("Refresh+Unplug! Scheduling cutoff.");
 	battery_cutoff_state = BATTERY_CUTOFF_STATE_SCHEDULED;
 	battery_cutoff_retry_left = CONFIG_BATTERY_CUTOFF_RETRY_COUNT;
+
+	if (IS_ENABLED(CONFIG_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN)) {
+		if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
+			chipset_force_shutdown(CHIPSET_SHUTDOWN_BATTERY_CUTOFF);
+			return;
+		}
+	}
 	hook_call_deferred(&pending_cutoff_deferred_data,
 			   CONFIG_BATTERY_CUTOFF_DELAY_US);
 }
@@ -549,6 +557,9 @@ DECLARE_HOOK(HOOK_INIT, ac_change, HOOK_PRIO_DEFAULT);
 static enum ec_status battery_command_cutoff(struct host_cmd_handler_args *args)
 {
 	const struct ec_params_battery_cutoff *p;
+
+	if (IS_ENABLED(CONFIG_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN))
+		return EC_RES_ERROR;
 
 	if (args->version == 1) {
 		p = args->params;
@@ -574,10 +585,19 @@ static void check_pending_cutoff(void)
 				   CONFIG_BATTERY_CUTOFF_DELAY_US);
 	}
 }
-DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, check_pending_cutoff, HOOK_PRIO_LAST);
+DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN_COMPLETE, check_pending_cutoff,
+	     HOOK_PRIO_LAST);
 
 static int command_cutoff(int argc, const char **argv)
 {
+	if (IS_ENABLED(CONFIG_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN)) {
+		battery_cutoff_state = BATTERY_CUTOFF_STATE_SCHEDULED;
+		if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
+			chipset_force_shutdown(CHIPSET_SHUTDOWN_BATTERY_CUTOFF);
+			return EC_SUCCESS;
+		}
+	}
+
 	if (argc > 1) {
 		if (!strcasecmp(argv[1], "at-shutdown")) {
 			battery_cutoff_state = BATTERY_CUTOFF_STATE_SCHEDULED;

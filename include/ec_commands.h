@@ -7005,6 +7005,8 @@ enum chipset_shutdown_reason {
 	CHIPSET_SHUTDOWN_BUTTON,
 	/* Force a chipset shutdown, because the AP wants to. */
 	CHIPSET_SHUTDOWN_HOST_CMD,
+	/* Forcing a shutdown for battery cutoff. */
+	CHIPSET_SHUTDOWN_BATTERY_CUTOFF,
 
 	CHIPSET_SHUTDOWN_COUNT, /* End of shutdown reasons. */
 };
