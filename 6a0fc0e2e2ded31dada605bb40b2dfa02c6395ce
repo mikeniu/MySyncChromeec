@@ -16,6 +16,23 @@
       "message": "add bob for cherrypicking tracking",
       "revId": "6a0fc0e2e2ded31dada605bb40b2dfa02c6395ce",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9328ea3a_8e5fe498",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-22T23:59:49Z",
+      "side": 1,
+      "message": "This should be squashed with the parent CL. No sense in adding a file in the parent CL just to delete in this CL.",
+      "revId": "6a0fc0e2e2ded31dada605bb40b2dfa02c6395ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
