@@ -333,6 +333,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1a5c7e86_c59a0237",
+        "filename": "util/focaltech/focaltech/src/net_usb.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-04-22T08:41:09Z",
+      "side": 1,
+      "message": "No, after the device is found, it still goes to the error label and releases the resources.",
+      "parentUuid": "6d242c21_1c1ae9fe",
+      "range": {
+        "startLine": 214,
+        "startChar": 1,
+        "endLine": 218,
+        "endChar": 2
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f36260cd_0707b516",
         "filename": "util/focaltech/libusb-1.0.29/libusb/libusb_port.c",
         "patchSetId": 7
