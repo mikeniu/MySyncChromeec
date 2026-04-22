@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b82d6d50_38fb3699",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1184140
+      },
+      "writtenOn": "2026-04-22T15:31:31Z",
+      "side": 1,
+      "message": "ec-legacy branch CL(https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7747284/1) was merged.",
+      "revId": "c9408612ff085d7f4411644e98878161e2f99895",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
