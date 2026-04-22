@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e1f6dd4_0d7ca7cb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-22T09:55:43Z",
+      "side": 1,
+      "message": "Fixed by Patchset 5.",
+      "parentUuid": "5f2fd2aa_80edf27f",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 1
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6912c933_408b0e95",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-04-21T18:58:27Z",
       "side": 1,
       "message": "This can be removed now that you\u0027re not using variable length arrays",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 54
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6504a26d_673641e8",
+        "filename": "util/elan/build.mk",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-22T09:55:43Z",
+      "side": 1,
+      "message": "Fixed by Patchset 5.",
+      "parentUuid": "6912c933_408b0e95",
       "range": {
         "startLine": 15,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ad2e7f1_63f1e240",
+        "filename": "util/elan/build.mk",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-22T09:55:43Z",
+      "side": 1,
+      "message": "Fixed by Patchset 5.",
+      "parentUuid": "203f748a_5a12ed28",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 76
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f13b5bda_051aad15",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-04-21T18:29:30Z",
       "side": 1,
       "message": "### Ambiguous File I/O Error Handling (`filecontrol.cc`)\n\n**Issue:** `getBinarySize` returns `0` upon failure to open the file.\n**Impact:** The caller cannot distinguish between an empty file (which legitimately has size `0`) and an I/O error (e.g., file not found, permission denied). \n**Recommendation:** Change the return type of `getBinarySize` to `std::optional\u003csize_t\u003e` to explicitly represent failure.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 1
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13f80c7a_e3d0bfcd",
+        "filename": "util/elan/filecontrol.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-22T09:55:43Z",
+      "side": 1,
+      "message": "Fixed by Patchset 5.",
+      "parentUuid": "f13b5bda_051aad15",
       "range": {
         "startLine": 14,
         "startChar": 0,
@@ -116,6 +212,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4544f7ed_7fba65bd",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-22T09:55:43Z",
+      "side": 1,
+      "message": "Fixed by Patchset 5.",
+      "parentUuid": "f7a06434_01ec79c4",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 86,
+        "endChar": 37
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c8f6cde1_285a926a",
@@ -129,6 +249,30 @@
       "writtenOn": "2026-04-21T18:29:30Z",
       "side": 1,
       "message": "* **Typo:** In `iapcontrol.cc` (`iapCommand` and `getFwVersion`), fix the typo in the error log: `\"return cmmmand code is not match\"` \\-\\\u003e `\"return command code does not match\"`.",
+      "range": {
+        "startLine": 336,
+        "startChar": 0,
+        "endLine": 336,
+        "endChar": 69
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f401c7ad_3989762a",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-22T09:55:43Z",
+      "side": 1,
+      "message": "Fixed by Patchset 5.",
+      "parentUuid": "c8f6cde1_285a926a",
       "range": {
         "startLine": 336,
         "startChar": 0,
@@ -162,6 +306,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2df3ca7_21580216",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 655,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-22T09:55:43Z",
+      "side": 1,
+      "message": "Fixed by Patchset 5.",
+      "parentUuid": "0cfb362a_60221eea",
+      "range": {
+        "startLine": 653,
+        "startChar": 1,
+        "endLine": 655,
+        "endChar": 0
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "38e1406e_62fbbe8d",
@@ -175,6 +343,30 @@
       "writtenOn": "2026-04-21T18:29:30Z",
       "side": 1,
       "message": "### Logic Flaw in Device Status Tracking (`iapcontrol.h` / `.cc`)\n\n**Issue:** In `iapcontrol.h`, `m_deviceCount` is initialized to `1` (`int m_deviceCount \u003d 1;`).\n**Impact:** When `connectDevice` is called for the first time, if a device is found (`count \u003e 0`), the code checks `if (m_deviceCount)` and immediately returns `DEVSTA_EXISTED` instead of `DEVSTA_INSERT`. It will never successfully register an insertion event.\n**Recommendation:** Initialize `m_deviceCount` to `0` in `iapcontrol.h`.",
+      "range": {
+        "startLine": 70,
+        "startChar": 0,
+        "endLine": 70,
+        "endChar": 23
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdd0fb8b_fdb3a4c7",
+        "filename": "util/elan/iapcontrol.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-22T09:55:43Z",
+      "side": 1,
+      "message": "Fixed by Patchset 5.",
+      "parentUuid": "38e1406e_62fbbe8d",
       "range": {
         "startLine": 70,
         "startChar": 0,
@@ -208,6 +400,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6e72a2c_709471b3",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-22T09:55:43Z",
+      "side": 1,
+      "message": "Fixed by Patchset 5.",
+      "parentUuid": "9152f763_5ffb1153",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 18
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4ab31ffd_e66437c5",
@@ -231,6 +447,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac871768_d2127dce",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-22T09:55:43Z",
+      "side": 1,
+      "message": "Fixed by Patchset 5.",
+      "parentUuid": "4ab31ffd_e66437c5",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 128,
+        "endChar": 51
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c6c10c8f_7fe4b37d",
@@ -244,6 +484,30 @@
       "writtenOn": "2026-04-21T18:29:30Z",
       "side": 1,
       "message": "### Integer Overflow Risk in Progress Bar (`iaptool.cc`)\n\n**Issue:** `percent \u003d (100 * (progress)) / totalSize;`\n**Impact:** `progress` is passed as an `int`. If a firmware file exceeds \\~21.4 MB, `100 * progress` will overflow a standard 32-bit signed integer, resulting in negative percentages. \n**Recommendation:** Change `progress` and `totalSize` to `size_t` in both the callback signature and the `setProgressBar` function.",
+      "range": {
+        "startLine": 121,
+        "startChar": 0,
+        "endLine": 134,
+        "endChar": 1
+      },
+      "revId": "d8fed2004e8fb6edb9673b6e6e59537ac06bc029",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d92c669_f30caccd",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-22T09:55:43Z",
+      "side": 1,
+      "message": "Fixed by Patchset 5.",
+      "parentUuid": "c6c10c8f_7fe4b37d",
       "range": {
         "startLine": 121,
         "startChar": 0,
