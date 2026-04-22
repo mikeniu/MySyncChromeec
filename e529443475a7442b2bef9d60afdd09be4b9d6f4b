@@ -69,6 +69,30 @@
       },
       "revId": "e529443475a7442b2bef9d60afdd09be4b9d6f4b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c235c34_a98829d2",
+        "filename": "zephyr/shim/chip/it8xxx2/system.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-04-22T05:09:00Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "6275f577_0c015271",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 54
+      },
+      "revId": "e529443475a7442b2bef9d60afdd09be4b9d6f4b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
