@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ad43978_b49d4e83",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-04-23T03:10:47Z",
+      "side": 1,
+      "message": "I\u0027m testing CQ with CL:7788710",
+      "revId": "2ce5dec6a7ac8370d7a4ff6afac4610b76619ef6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
