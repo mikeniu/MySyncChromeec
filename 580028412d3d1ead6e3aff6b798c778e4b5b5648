@@ -71,6 +71,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "712edbc6_fd829843",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-23T17:27:15Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "73bca93a_fbc5a426",
+      "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b60c2a2c_766044cd",
@@ -178,6 +196,30 @@
       "side": 1,
       "message": "I believe this is correct. The overall time is couple ms greater than the capture + matching time. It is reset after each IRQ, which makes sense to me. This is when fingerprint processing starts. The clearing after EVENT_TIMER is benign here.",
       "parentUuid": "83b64993_a0a1c29b",
+      "range": {
+        "startLine": 370,
+        "startChar": 3,
+        "endLine": 370,
+        "endChar": 13
+      },
+      "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac42a30d_0135c867",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-23T17:27:15Z",
+      "side": 1,
+      "message": "Have you verified the behavior on USB FPMCU boards?",
+      "parentUuid": "c429f9d6_4b92b038",
       "range": {
         "startLine": 370,
         "startChar": 3,
