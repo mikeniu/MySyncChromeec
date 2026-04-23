@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55b9b0aa_8ef2335f",
+        "filename": "zephyr/emul/emul_realtek_rts54xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 801,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-23T18:33:51Z",
+      "side": 1,
+      "message": "Previously, there was a check on `num_vdos`, and an invalid value would not write anything to `vdo`. Now, an invalid value of `vdo_index` will write to `vdo` up to that index. Furthermore, it now appears possible to use this function to read more times from `vdos` than it actually contains elements. Both of these properties seem surprising to me.\n\nIs this what the RTS54xx actually does?",
+      "revId": "b9914d391a6d94f86ba6e2502f42b79f068f7f72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0af06abb_13ee8608",
+        "filename": "zephyr/emul/emul_realtek_rts54xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 1664,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-23T18:33:51Z",
+      "side": 1,
+      "message": "Similar concern to above about partial writes",
+      "revId": "b9914d391a6d94f86ba6e2502f42b79f068f7f72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10ecbb0b_61c3da4f",
+        "filename": "zephyr/include/emul/emul_pdc.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-23T18:33:51Z",
+      "side": 1,
+      "message": "Do PDCs other than Realtek share the same VDO-type mapping? If not, it seems odd to make it part of the generic PDC emulator interace.",
+      "revId": "b9914d391a6d94f86ba6e2502f42b79f068f7f72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "014be133_5f22ff30",
+        "filename": "zephyr/test/pdc/src/rts54xx/rts54xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-23T18:33:51Z",
+      "side": 1,
+      "message": "Is there a test of the success case somewhere in here?",
+      "revId": "b9914d391a6d94f86ba6e2502f42b79f068f7f72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
