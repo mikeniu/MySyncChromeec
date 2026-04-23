@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4830b38f_a266efcb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-23T17:36:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e62fce68_19367e5a",
+      "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bef93e81_aa50c85a",
@@ -220,6 +238,30 @@
       "side": 1,
       "message": "Have you verified the behavior on USB FPMCU boards?",
       "parentUuid": "c429f9d6_4b92b038",
+      "range": {
+        "startLine": 370,
+        "startChar": 3,
+        "endLine": 370,
+        "endChar": 13
+      },
+      "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13e1e6b6_ee6e2322",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-23T17:36:27Z",
+      "side": 1,
+      "message": "I only verified it on Redrix (Brya) with FPC1025 (not USB FPMCU). \n\nIf such a change is needed, it should be in a separate CL. It does not fit into this CL.",
+      "parentUuid": "ac42a30d_0135c867",
       "range": {
         "startLine": 370,
         "startChar": 3,
