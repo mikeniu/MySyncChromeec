@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b46aca1_3ca76d99",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-23T14:07:52Z",
+      "side": 1,
+      "message": "Checked on the test commit above, seems like coverage for cbi.c works as it should again after this.",
+      "revId": "bf4ac1a47695247ee2a120076c8413f99ad0b190",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
