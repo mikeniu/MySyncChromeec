@@ -95,6 +95,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5c41d9dd_bd6ddf14",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-23T00:12:32Z",
+      "side": 1,
+      "message": "Here\u0027s a Gemini-generated example. Please review the code for correctness rather than just copying it verbatim:\n\n----\n\n```\n#include \u003cunistd.h\u003e\n#include \u003ciostream\u003e\n\nclass CommandLineManager {\npublic:\n    CommandLineManager(int argc, char *argv[]) {\n        parseCommandLine(argc, argv);\n    }\n\n    const std::optional\u003cCMDLINE\u003e\u0026 getCommandLine() const {\n        return m_cmdLine;\n    }\n\nprivate:\n    std::optional\u003cCMDLINE\u003e m_cmdLine;\n\n    void parseCommandLine(int argc, char *argv[]) {\n        CMDLINE cmd{};\n        int opt;\n\n        // The string \"F:V:P:\" tells getopt that -F, -V, and -P all require arguments.\n        while ((opt \u003d getopt(argc, argv, \"F:V:P:\")) !\u003d -1) {\n            switch (opt) {\n                case \u0027F\u0027:\n                    cmd.filePath \u003d optarg;\n                    break;\n                case \u0027V\u0027:\n                    if (auto val \u003d parseHex(optarg)) {\n                        cmd.vid \u003d *val;\n                    } else {\n                        std::cerr \u003c\u003c \"[IAP] Invalid VID format: \" \u003c\u003c optarg \u003c\u003c \"\\n\";\n                        return;\n                    }\n                    break;\n                case \u0027P\u0027:\n                    if (auto val \u003d parseHex(optarg)) {\n                        cmd.pid \u003d *val;\n                    } else {\n                        std::cerr \u003c\u003c \"[IAP] Invalid PID format: \" \u003c\u003c optarg \u003c\u003c \"\\n\";\n                        return;\n                    }\n                    break;\n                default: /* \u0027?\u0027 */\n                    // getopt automatically prints an error message to stderr for unknown flags.\n                    std::cerr \u003c\u003c \"Usage: \" \u003c\u003c argv[0] \u003c\u003c \" -F \u003cfilepath\u003e -V \u003cvid\u003e -P \u003cpid\u003e\\n\";\n                    return;\n            }\n        }\n\n        // Optional: Ensure required fields were actually provided\n        if (cmd.filePath.empty() || cmd.vid \u003d\u003d 0 || cmd.pid \u003d\u003d 0) {\n            std::cerr \u003c\u003c \"[IAP] Missing required arguments.\\n\";\n            std::cerr \u003c\u003c \"Usage: \" \u003c\u003c argv[0] \u003c\u003c \" -F \u003cfilepath\u003e -V \u003cvid\u003e -P \u003cpid\u003e\\n\";\n            return;\n        }\n\n        m_cmdLine \u003d cmd;\n    }\n\n    std::optional\u003cuint16_t\u003e parseHex(std::string_view strv) {\n        if (strv.empty()) return std::nullopt;\n\n        char *endptr \u003d nullptr;\n        errno \u003d 0;\n\n        std::string tmp(strv);\n        long val \u003d strtol(tmp.c_str(), \u0026endptr, 16);\n\n        if (errno \u003d\u003d ERANGE || endptr \u003d\u003d tmp.c_str() || *endptr !\u003d \u0027\\0\u0027 || \n            val \u003c 0 || val \u003e std::numeric_limits\u003cuint16_t\u003e::max()) {\n            return std::nullopt;\n        }\n\n        return static_cast\u003cuint16_t\u003e(val);\n    }\n};\n```",
+      "parentUuid": "a42a5c43_87d90a8e",
+      "range": {
+        "startLine": 50,
+        "startChar": 1,
+        "endLine": 50,
+        "endChar": 52
+      },
+      "revId": "eee15e6508ade570d3670bc2f00d613d0a77d9c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "76515257_66552b03",
         "filename": "util/elan/iaptool.cc",
         "patchSetId": 5
