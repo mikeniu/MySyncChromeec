@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9dea4e4_7659544d",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-23T16:31:19Z",
+      "side": 1,
+      "message": "**Ignored CLI Arguments (VID/PID)** In `iaptool.cc`, you\u0027ve implemented `CommandLineManager` to parse `-V` (VID) and `-P` (PID) from the user. However, these values are never passed to the device control layer.\n\n* In `iaptool.cc`: `iapCtrl.initialize()` is called without arguments.  \n* In `iapcontrol.cc`: `initialize()` hardcodes the search to `connectDevice(BOOT_VID, BOOT_PID);`.  \n* **Remediation:** Modify `iapcontrol::initialize(uint16_t vid, uint16_t pid)` to accept the parsed VID and PID.",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 97,
+        "endChar": 1
+      },
+      "revId": "a9ae4653beb18e714eb31c3825485624347d71c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f829f5e4_d2506f8d",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 539,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-23T16:31:19Z",
+      "side": 1,
+      "message": "Remove commented out code",
+      "range": {
+        "startLine": 510,
+        "startChar": 0,
+        "endLine": 539,
+        "endChar": 3
+      },
+      "revId": "a9ae4653beb18e714eb31c3825485624347d71c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eca4bd4d_dbd20c40",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 591,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-23T16:31:19Z",
+      "side": 1,
+      "message": "Remove commented out code",
+      "range": {
+        "startLine": 565,
+        "startChar": 0,
+        "endLine": 591,
+        "endChar": 3
+      },
+      "revId": "a9ae4653beb18e714eb31c3825485624347d71c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
