@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7b1a82a7_37e75200",
+        "filename": "util/elan/filecontrol.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-23T16:57:24Z",
+      "side": 1,
+      "message": "**Potential Allocation Crash on File Read Failure** In `filecontrol.cc` (`getBinary` and `getBinarySize`):\n\n```c\nauto size \u003d binFile.tellg();\nbinFile.seekg(0, std::ios::beg);\nstd::vector\u003cuint8_t\u003e buffer(size);\n```\n\nIf `tellg()` fails (e.g., due to file system errors despite the file descriptor opening successfully), it returns `-1`. Converting a `-1` `std::streampos` to `size_t` results in `SIZE_MAX`, causing `std::vector` to throw `std::bad_alloc` or OOM crash the system.\n\n* **Remediation:** Add a boundary check: `if (size \u003c\u003d 0) return std::nullopt;` before allocating the vector.",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 35
+      },
+      "revId": "a9ae4653beb18e714eb31c3825485624347d71c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d9dea4e4_7659544d",
         "filename": "util/elan/iapcontrol.cc",
         "patchSetId": 6
