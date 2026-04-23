@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c32a86fe_60ef7b19",
+        "filename": "zephyr/drivers/cros_system/cros_system_rtk.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 3513462
+      },
+      "writtenOn": "2026-04-23T03:48:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8640c180_3a998804",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 38
+      },
+      "revId": "0be3f1f3686a1f02060289a08da81bc5c9d19d15",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "53c3bd19_b596c9b1",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-04-22T18:40:47Z",
       "side": 1,
       "message": "`key_rev_val` is never read from BBRAM, so this code will always re-init the BBRAM.",
+      "range": {
+        "startLine": 192,
+        "startChar": 0,
+        "endLine": 192,
+        "endChar": 44
+      },
+      "revId": "0be3f1f3686a1f02060289a08da81bc5c9d19d15",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77f49282_3523390e",
+        "filename": "zephyr/drivers/cros_system/cros_system_rtk.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 3513462
+      },
+      "writtenOn": "2026-04-23T03:48:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53c3bd19_b596c9b1",
       "range": {
         "startLine": 192,
         "startChar": 0,
