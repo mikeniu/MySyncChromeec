@@ -34,6 +34,24 @@
       "parentUuid": "fa157fab_980a1349",
       "revId": "ce51c6133ff8e783ae50e7c807bbf15311efeedf",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5176440_815b14f7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-04-23T08:29:14Z",
+      "side": 1,
+      "message": "Thanks Keith, I uploaded another CL: https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7789470.\n\nI will abandon this CL once that will merge.",
+      "parentUuid": "4e391528_32b14a83",
+      "revId": "ce51c6133ff8e783ae50e7c807bbf15311efeedf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
