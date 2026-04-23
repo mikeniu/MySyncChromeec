@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5aea7633_b3263423",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-23T00:25:16Z",
+      "side": 1,
+      "message": "Here\u0027s an updated example of how to fix:\n\n----\n\n### Initialization Error Handling (`libusb`)\n\nIn the `iapcontrol` constructor, `libusb_init(nullptr)` is called, but its return value is ignored. If USB initialization fails (e.g., due to permissions or resource exhaustion), the constructor silently finishes, leaving the object in an invalid state. Subsequent calls to libusb functions later in the program\u0027s lifecycle will likely cause a crash or undefined behavior.\n\nSince ChromiumOS strictly disables C++ exceptions, we cannot `throw` from the constructor to signal a failure. The most idiomatic way to handle this in our codebase is **Two-Phase Initialization**. This keeps the constructor lightweight and moves hardware/library setup into a dedicated method that returns an error code, forcing the caller to handle failures explicitly.\n\nHere is how you can refactor this to ensure safe initialization:\n\n**1. Update `iapcontrol.h`:**\n```cpp\nclass IapControl {\npublic:\n    IapControl();  // Keep this lightweight\n    ~IapControl();\n\n    // Use [[nodiscard]] to ensure the caller checks the setup result\n    [[nodiscard]] int Initialize(); \n    \n    // ...\n};\n```\n\n**2. Update `iapcontrol.cc`:**\n```cpp\nIapControl::IapControl() : m_deviceStatus(DEVSTA_NON), m_deviceCount(0) {\n    // Only basic variable initialization here. \n    // Do not make hardware or library setup calls in the constructor.\n}\n\nint IapControl::Initialize() {\n    const char funcName[] \u003d \"iap control initial\";\n\n    int initResult \u003d libusb_init(nullptr);\n    if (initResult !\u003d 0) {\n        logInfo(\"[IAP] {} - libusb_init failed with code: {}\\n\", funcName, initResult);\n        return -1;\n    }\n\n    m_deviceStatus \u003d connectDevice(BOOT_VID, BOOT_PID);\n    if (m_deviceStatus \u003d\u003d DEVSTA_NON || m_deviceStatus \u003d\u003d DEVSTA_REMOVE) {\n        logInfo(\"[IAP] {} - device not found\\n\", funcName);\n        return -1;\n    }\n\n    return 0;\n}\n```\n\n**3. Update `main()` in `iaptool.cc`:**\n```cpp\nElanApp::IapControl iapCtrl;\n\n// Force explicit error handling before proceeding\nif (iapCtrl.Initialize() !\u003d 0) {\n    logInfo(\"[IAP] main - device initialization failed\\n\");\n    return -1;\n}\n```\n\nThis approach makes error handling explicit, keeps the control flow clean, and prevents the tool from attempting to run if the underlying USB context fails to set up.",
+      "parentUuid": "0b5dcf0c_6bdb593e",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 22
+      },
+      "revId": "eee15e6508ade570d3670bc2f00d613d0a77d9c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "08ed23af_4a7182ed",
         "filename": "util/elan/iapcontrol.cc",
         "patchSetId": 5
