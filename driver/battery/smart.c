@@ -640,6 +640,16 @@ int battery_wait_for_stable(void)
 	return EC_ERROR_NOT_POWERED;
 }
 
+void battery_set_fake_soc(int soc)
+{
+	fake_state_of_charge = soc;
+}
+
+int battery_get_fake_soc(void)
+{
+	return fake_state_of_charge;
+}
+
 #if defined(CONFIG_CMD_BATTFAKE)
 static int command_battfake(int argc, const char **argv)
 {
