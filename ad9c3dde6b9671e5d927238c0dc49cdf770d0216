@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0f9683d_c2d6f3b8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-04-23T21:31:29Z",
+      "side": 1,
+      "message": "Keith, let\u0027s add a two-way `Cq-Depend: chromium:7789614` to lock these two CLs together.",
+      "revId": "ad9c3dde6b9671e5d927238c0dc49cdf770d0216",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
