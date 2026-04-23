@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3aa04ec8_861f1217",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 545,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-23T14:03:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "75ed3449_1d0eaf71",
+      "range": {
+        "startLine": 545,
+        "startChar": 45,
+        "endLine": 545,
+        "endChar": 54
+      },
+      "revId": "5766e15ab6ab04b3abf25e1c6e358c642ebc2e3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "621103de_01dd43a9",
@@ -41,6 +65,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f17db44f_c1605ade",
+        "filename": "zephyr/test/hwtest/src/flash_protection_rw.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-23T14:03:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "621103de_01dd43a9",
+      "revId": "5766e15ab6ab04b3abf25e1c6e358c642ebc2e3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ec93e373_5f6dba2f",
@@ -54,6 +96,24 @@
       "writtenOn": "2026-04-23T10:18:05Z",
       "side": 1,
       "message": "No need to flush here.",
+      "revId": "5766e15ab6ab04b3abf25e1c6e358c642ebc2e3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b6bc0cd_3b20eff3",
+        "filename": "zephyr/test/hwtest/src/flash_protection_rw.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-23T14:03:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ec93e373_5f6dba2f",
       "revId": "5766e15ab6ab04b3abf25e1c6e358c642ebc2e3a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
