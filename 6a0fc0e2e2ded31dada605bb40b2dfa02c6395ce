@@ -51,6 +51,23 @@
       "parentUuid": "cf004ccf_59d291f9",
       "revId": "6a0fc0e2e2ded31dada605bb40b2dfa02c6395ce",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57e1642d_ae6b0059",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-04-23T18:22:09Z",
+      "side": 1,
+      "message": "This CL is no longer required as the same changes were pulled into the previous CL in the stack. I will abandon this CL",
+      "revId": "6a0fc0e2e2ded31dada605bb40b2dfa02c6395ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
