@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebdb92b7_cad485a8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-23T17:42:13Z",
+      "side": 1,
+      "message": "Nit: Just so future readers don\u0027t have to follow the bug link, can you say something in the commit bodies like, \"Avoid unexpected smart discharge activation.\"",
+      "revId": "6dedf840cf5542814721c8061c65696dd5aac64a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
