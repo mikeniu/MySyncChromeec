@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b5dcf0c_6bdb593e",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-23T00:06:04Z",
+      "side": 1,
+      "message": "**Missing `libusb_init` Error Handling:** In the `iapcontrol` constructor, `libusb_init(nullptr)` is called without checking its return value. If USB initialization fails (e.g., due to system resource exhaustion or permissions), the constructor silently continues, leading to an inevitable crash or undefined behavior down the line.\n\n**Remediation:** Check if `libusb_init` returns a non-zero error code. If it does, safely transition the class state to prevent `connectDevice` from running.",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 22
+      },
+      "revId": "eee15e6508ade570d3670bc2f00d613d0a77d9c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08ed23af_4a7182ed",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 537,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-23T00:06:04Z",
+      "side": 1,
+      "message": "**Out-of-Bounds Crash in `readRomData`:** In `util/elan/iapcontrol.cc`, `writeRomData` correctly calculates the remaining chunk size using `std::min(pageSize, buff.size() - offset)`. However, `readRomData` fails to do this:\n\n```c\n// Current implementation\nauto chunk \u003d std::span(buff).subspan(offset, pageSize);\n```\n\n  If the firmware size is not perfectly aligned to `BOOT_PAGE_SIZE` (64 bytes), `subspan` will throw a `std::out_of_range` exception on the final loop iteration. **Remediation:** Apply the same boundary calculation used in `writeRomData`:\n\n```c\nauto chunk \u003d std::span(buff).subspan(offset, std::min(pageSize, buff.size() - offset));\n```",
+      "range": {
+        "startLine": 537,
+        "startChar": 2,
+        "endLine": 537,
+        "endChar": 57
+      },
+      "revId": "eee15e6508ade570d3670bc2f00d613d0a77d9c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97a62105_2fbfb502",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 753,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-23T00:06:04Z",
+      "side": 1,
+      "message": "**Ignored Partial USB Transfers:** Throughout `iapcontrol.cc` (e.g., `iapSendCommand`, `iapSendData`, `iapRecvData`), `libusb_interrupt_transfer` is used. The code currently only checks if `errCode !\u003d 0`. However, USB transfers can succeed partially. If `transferred` is less than `buff.size()`, your protocol state will desync, but the code will silently treat it as a full success. \n\n**Remediation:** Explicitly check that `transferred \u003d\u003d static_cast\u003cint\u003e(buff.size())`. If it is less, treat it as a critical failure or implement a retry mechanism for the remaining bytes.",
+      "range": {
+        "startLine": 753,
+        "startChar": 0,
+        "endLine": 753,
+        "endChar": 61
+      },
+      "revId": "eee15e6508ade570d3670bc2f00d613d0a77d9c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a42a5c43_87d90a8e",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-23T00:06:04Z",
+      "side": 1,
+      "message": "**Fragile Command-Line Parsing:** The manual iteration through `argv` in `CommandLineManager::parseCommandLine` is brittle. If an unrecognized flag precedes `-F`, the `++i` increments can misalign, potentially causing the tool to parse a flag\u0027s value as the next flag.\n\n**Remediation:** Do not reinvent the wheel for CLI arguments. Use POSIX `getopt()` or `getopt_long()`, which is robust, standard across ChromiumOS host tools, and automatically handles edge cases like merged flags.",
+      "range": {
+        "startLine": 50,
+        "startChar": 1,
+        "endLine": 50,
+        "endChar": 52
+      },
+      "revId": "eee15e6508ade570d3670bc2f00d613d0a77d9c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76515257_66552b03",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-23T00:06:04Z",
+      "side": 1,
+      "message": "**Hex Parsing Truncation Risk:** In `CommandLineManager::parseHex`, `strtol` returns a `long`. You are directly assigning this to a `uint16_t`. If a user inputs a PID/VID larger than `0xFFFF`, it will silently truncate and attempt to connect to the wrong device.\n\n**Remediation:** Check if the parsed `long` exceeds `std::numeric_limits\u003cuint16_t\u003e::max()` before casting, and return `std::nullopt` if it overflows.",
+      "range": {
+        "startLine": 78,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 2
+      },
+      "revId": "eee15e6508ade570d3670bc2f00d613d0a77d9c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7dcbc912_0c0b9df3",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-23T00:06:04Z",
+      "side": 1,
+      "message": "**Potential Divide-by-Zero in Progress Bar:** In `iaptool.cc`, `setProgressBar` calculates the percentage with `percent \u003d (100 * (progress)) / totalSize;`. If `getBinary` somehow returns an empty buffer, `totalSize` will be `0`, resulting in a runtime crash.\n\n**Remediation:** Add an early return if `totalSize \u003d\u003d 0`.",
+      "range": {
+        "startLine": 151,
+        "startChar": 0,
+        "endLine": 151,
+        "endChar": 42
+      },
+      "revId": "eee15e6508ade570d3670bc2f00d613d0a77d9c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
