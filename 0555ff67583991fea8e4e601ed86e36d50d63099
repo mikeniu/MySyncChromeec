@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c03ab61_6d6fc517",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-23T22:29:41Z",
+      "side": 1,
+      "message": "Hey Scott, one of the options we set for that bug is confusing the CI coverage data, I think it wasn\u0027t really needed for fixing the stack overflow, could you test if it runs correctly with this config?",
+      "revId": "0555ff67583991fea8e4e601ed86e36d50d63099",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
