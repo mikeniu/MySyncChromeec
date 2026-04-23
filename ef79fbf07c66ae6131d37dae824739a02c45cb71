@@ -34,6 +34,24 @@
       "parentUuid": "6169640f_f36325b0",
       "revId": "ef79fbf07c66ae6131d37dae824739a02c45cb71",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94efe3b6_75065118",
+        "filename": "zephyr/drivers/boot_keys/boot_keys.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 3387694
+      },
+      "writtenOn": "2026-04-23T07:08:38Z",
+      "side": 1,
+      "message": "With this change, I can still reproduce issue when only press refresh key and then unplug ac.",
+      "parentUuid": "c260a907_673ed826",
+      "revId": "ef79fbf07c66ae6131d37dae824739a02c45cb71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
