@@ -118,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb061f97_64519b87",
+        "filename": "zephyr/boards/google/realtek/realtek_rts5912.dts",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 3513462
+      },
+      "writtenOn": "2026-04-23T11:18:47Z",
+      "side": 1,
+      "message": "ok, I will push one to upstream also,\nhowever, consider the schedule, we need adding this in app layer first.",
+      "parentUuid": "57b9b1a7_117d5400",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 31
+      },
+      "revId": "0edb8c8dee7a45139918e622d7db8c06821bc1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f52f3549_26db445a",
