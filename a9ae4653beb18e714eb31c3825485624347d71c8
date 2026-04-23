@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6a0d54b3_8d389cc0",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-23T16:33:14Z",
+      "side": 1,
+      "message": "We can make the commandline parser handle this and default to `BOOT_VID` and `BOOT_PID` if they are not specified:\n\n### 1. Expose the Default Macros\nYou will need to move `BOOT_VID` and `BOOT_PID` out of `iapcontrol.cc` and into `iapcontrol.h` (or a shared constants header) so that `iaptool.cc` can access them.\n\n```cpp\n// In iapcontrol.h\n#define BOOT_VID 0x04F3\n#define BOOT_PID 0x0910\n```\n\n### 2. Pre-fill the Defaults in the Parser\nIn `iaptool.cc`, you can keep `vid` and `pid` as standard `uint16_t` types and initialize them with the defaults right away. If the user provides `-V` or `-P`, they will simply overwrite these defaults.\n\n```cpp\n// In iaptool.cc\ntypedef struct _CMDLINE {\n\tuint16_t vid;\n\tuint16_t pid;\n\tstd::string filePath;\n} CMDLINE;\n\n// Inside CommandLineManager::parseCommandLine:\nCMDLINE cmd{BOOT_VID, BOOT_PID, \"\"}; // Pre-filled with defaults!\n\n// ... existing switch statement ...\ncase \u0027V\u0027:\n    if (auto val \u003d parseHex(optarg)) {\n        cmd.vid \u003d *val; // Overwrites default\n    }\n// ...\n```\n\n### 3. Simplify the Control Layer\nNow, `iapcontrol::initialize` doesn\u0027t need to know anything about defaults or `std::optional`. It just expects two integers:\n\n```cpp\n// In iapcontrol.h\n[[nodiscard]] int initialize(uint16_t vid, uint16_t pid);\n\n// In iapcontrol.cc\nint iapcontrol::initialize(uint16_t vid, uint16_t pid)\n{\n\t// ... libusb_init ...\n\n\tm_deviceStatus \u003d connectDevice(vid, pid);\n\n    // ...\n}\n```\n\n### 4. Wire it up in Main\nYour `main()` function then simply passes the guaranteed values:\n\n```cpp\n// In iaptool.cc main()\nif (iapCtrl.initialize(cmdLine-\u003evid, cmdLine-\u003epid) !\u003d 0) {\n    logInfo(\"[IAP] main - device initialization failed\\n\");\n    return -1;\n}\n```",
+      "parentUuid": "d9dea4e4_7659544d",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 97,
+        "endChar": 1
+      },
+      "revId": "a9ae4653beb18e714eb31c3825485624347d71c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f829f5e4_d2506f8d",
         "filename": "util/elan/iapcontrol.cc",
         "patchSetId": 6
