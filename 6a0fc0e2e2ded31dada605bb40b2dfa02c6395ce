@@ -33,6 +33,24 @@
       "message": "This should be squashed with the parent CL. No sense in adding a file in the parent CL just to delete in this CL.",
       "revId": "6a0fc0e2e2ded31dada605bb40b2dfa02c6395ce",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd8797c1_6f42c251",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1273086
+      },
+      "writtenOn": "2026-04-23T01:01:26Z",
+      "side": 1,
+      "message": "Note these will just contribute to a firmware build.  The only cherry-pick required to 26Q2 will be the pinning information from this ISH and/or EC release image.",
+      "parentUuid": "cf004ccf_59d291f9",
+      "revId": "6a0fc0e2e2ded31dada605bb40b2dfa02c6395ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
