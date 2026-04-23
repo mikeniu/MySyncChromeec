@@ -569,7 +569,7 @@ enum power_state power_handle_state(enum power_state state)
 						    IN_PMIC_AP_RST,
 						    PMIC_AP_RESET_TIMEOUT))
 			CPRINTS("PMIC reset AP timeout. Forcing PMIC off");
-		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(en_pp4200_s5), 0);
+		// gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(en_pp4200_s5), 0);
 #ifdef CONFIG_PLATFORM_EC_PP3700_DISCHARGE_TIME_MS
 		crec_msleep(CONFIG_PLATFORM_EC_PP3700_DISCHARGE_TIME_MS);
 #endif /* CONFIG_PLATFORM_EC_PP3700_DISCHARGE_TIME_MS */
