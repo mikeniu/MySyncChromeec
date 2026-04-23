@@ -336,7 +336,7 @@ int battery_time_at_rate(int rate, int *minutes);
  * @param status	Destination for status; see STATUS_* in battery_smart.h.
  * @return non-zero if error.
  */
-int battery_status(int *status);
+__override_proto int battery_status(int *status);
 
 /**
  * Read battery charge cycle count.
