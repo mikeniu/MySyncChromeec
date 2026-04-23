@@ -339,6 +339,20 @@ int battery_time_at_rate(int rate, int *minutes);
 __override_proto int battery_status(int *status);
 
 /**
+ * Set the fake state of charge.
+ *
+ * @param soc		Percentage (0-100) or -1 to use real level.
+ */
+void battery_set_fake_soc(int soc);
+
+/**
+ * Get the current fake state of charge.
+ *
+ * @return percentage or -1 if not faking.
+ */
+int battery_get_fake_soc(void);
+
+/**
  * Read battery charge cycle count.
  *
  * @param count		Destination for count.
