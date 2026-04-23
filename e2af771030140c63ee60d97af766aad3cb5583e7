@@ -16,6 +16,92 @@
       "message": "Can you write up a one page doc describing how this subsystem will be used?",
       "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6054a783_203e10d3",
+        "filename": "zephyr/program/fatcat/kinmen/project.conf",
+        "patchSetId": 15
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-23T20:48:33Z",
+      "side": 1,
+      "message": "General comment - board specific changes should live in a separate CL from the common functional changes.  Makes it easier to bisect or revert a feature on the specific board.",
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1614e2d_8d841699",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-23T20:48:33Z",
+      "side": 1,
+      "message": "This looks like you\u0027re expecting the GPIO flags in the devicetree to contain extensions beyond the lower 16-bits.  This convention is only needed by some of the legacy EC code.  Any new code should confirm to Zephyr\u0027s driver conventions..",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 59
+      },
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d60079a7_b842d2db",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-23T20:48:33Z",
+      "side": 1,
+      "message": "https://github.com/zephyrproject-rtos/zephyr/pull/105902\nadds a Microchip PAC driver directly to the Zephyr tree.\nDoes this subsystem work with that driver?\nYour CL doesn\u0027t declare a yaml schema for the \"microcip,pac194x\" comatible, so I don\u0027t know how this will be configured.",
+      "range": {
+        "startLine": 54,
+        "startChar": 27,
+        "endLine": 54,
+        "endChar": 44
+      },
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0b56a4e_4abad84c",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-23T20:48:33Z",
+      "side": 1,
+      "message": "This file is labeled as a generic \"power monitor\" but is tightly coupled to the Microchip sensor.\n\nI think a design doc is needed before adding this to our code.",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 61
+      },
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
