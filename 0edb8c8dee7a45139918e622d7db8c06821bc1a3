@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "255c6a98_8db770c8",
+        "filename": "zephyr/app/ec/chip/arm/realtek_rtk/Kconfig.rtk",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 3513462
+      },
+      "writtenOn": "2026-04-23T09:13:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5aec3328_210e03a5",
+      "range": {
+        "startLine": 23,
+        "startChar": 30,
+        "endLine": 23,
+        "endChar": 50
+      },
+      "revId": "0edb8c8dee7a45139918e622d7db8c06821bc1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b5ec6e68_77b5aaf2",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-04-20T16:00:34Z",
       "side": 1,
       "message": "This CL fixes this bug.  You can delete the comments related to b/416020794",
+      "range": {
+        "startLine": 29,
+        "startChar": 10,
+        "endLine": 29,
+        "endChar": 19
+      },
+      "revId": "0edb8c8dee7a45139918e622d7db8c06821bc1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "716a6d77_94cefc7b",
+        "filename": "zephyr/app/ec/chip/arm/realtek_rtk/Kconfig.rtk",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 3513462
+      },
+      "writtenOn": "2026-04-23T09:13:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b5ec6e68_77b5aaf2",
       "range": {
         "startLine": 29,
         "startChar": 10,
@@ -83,6 +131,30 @@
       "writtenOn": "2026-04-20T16:00:34Z",
       "side": 1,
       "message": "Delete this comment.",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 47
+      },
+      "revId": "0edb8c8dee7a45139918e622d7db8c06821bc1a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54f5dcd3_8fd2387f",
+        "filename": "zephyr/shim/chip/rtk/system_download_from_flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 3513462
+      },
+      "writtenOn": "2026-04-23T09:13:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f52f3549_26db445a",
       "range": {
         "startLine": 47,
         "startChar": 0,
