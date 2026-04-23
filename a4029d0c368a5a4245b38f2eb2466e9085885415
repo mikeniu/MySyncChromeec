@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a2b7e56_8e3f4642",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-23T11:38:38Z",
+      "side": 1,
+      "message": "The [physical_get_protect](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/include/flash.h;l\u003d215) should return true if `bank is protected until reboot`, so it means only if `software_protection_lock` is true.",
+      "revId": "a4029d0c368a5a4245b38f2eb2466e9085885415",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
