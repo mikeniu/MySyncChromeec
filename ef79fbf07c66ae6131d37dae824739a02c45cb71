@@ -52,6 +52,24 @@
       "parentUuid": "c260a907_673ed826",
       "revId": "ef79fbf07c66ae6131d37dae824739a02c45cb71",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5f1eba3_7b911d9e",
+        "filename": "zephyr/drivers/boot_keys/boot_keys.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-23T07:36:45Z",
+      "side": 1,
+      "message": "Well yeah, I\u0027m not trying to fix that problem with this change, as I mentioned\n\n\u003e FYI I also bumped into crrev.com/c/7772908 and fixed it\n\nFor the refresh and no power in rw issue I still have a pending question on crrev.com/c/7761684",
+      "parentUuid": "94efe3b6_75065118",
+      "revId": "ef79fbf07c66ae6131d37dae824739a02c45cb71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
