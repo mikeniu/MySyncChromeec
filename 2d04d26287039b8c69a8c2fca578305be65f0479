@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb6a1eb2_2ececcc7",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtk.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-23T17:30:47Z",
+      "side": 1,
+      "message": "This no longer updates the protection register.  When `all \u003d\u003d true`, the entire flash should be protected.\n\nRefer to the [API documentation](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/include/flash.h;l\u003d241;drc\u003db975ff14f8b9792fc1785dba3c6e720a4d9780b4).",
+      "range": {
+        "startLine": 466,
+        "startChar": 0,
+        "endLine": 466,
+        "endChar": 36
+      },
+      "revId": "2d04d26287039b8c69a8c2fca578305be65f0479",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
