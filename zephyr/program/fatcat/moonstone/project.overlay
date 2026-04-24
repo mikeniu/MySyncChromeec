@@ -13,6 +13,7 @@
 #include "i2c.dtsi"
 #include "interrupts.dtsi"
 #include "keyboard.dtsi"
+#include "pwrmon.dtsi"
 #include "temp_sensors.dtsi"
 #include "usb_typec.dtsi"
 
