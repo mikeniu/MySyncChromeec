@@ -270,6 +270,30 @@
       },
       "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ead82d74_dc95d36c",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-24T01:37:23Z",
+      "side": 1,
+      "message": "I tried on Ruby\n\n```\nfsammoura@fsammoura2:~/arsp$ adb shell ectool --name\u003dcros_fp fpstats\nFP Stats:\nCapture time:  56.8ms\nMatching time: 436.9ms\nOverall time:  495ms\nOverall t0:    0x000000000628bd50\nMatched index: None\nfsammoura@fsammoura2:~/arsp$ adb shell ectool --name\u003dcros_fp fpstats\nFP Stats:\nCapture time:  56.6ms\nMatching time: 443.4ms\nOverall time:  501.3ms\nOverall t0:    0x0000000006ecaa58\nMatched index: None\nfsammoura@fsammoura2:~/arsp$ adb shell ectool --name\u003dcros_fp fpstats\nFP Stats:\nCapture time:  56.8ms\nMatching time: 456.7ms\nOverall time:  514.5ms\nOverall t0:    0x000000000740d024\nMatched index: None\n```\n\nit is as I expected it.\n\n\nWhat is your concerns with usb devices?",
+      "parentUuid": "13e1e6b6_ee6e2322",
+      "range": {
+        "startLine": 370,
+        "startChar": 3,
+        "endLine": 370,
+        "endChar": 13
+      },
+      "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
