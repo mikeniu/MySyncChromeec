@@ -157,6 +157,13 @@ ZTEST(host_cmd_host_commands, test_ap_fw_state)
 	/* Flush the console buffer before we start. */
 	shell_backend_dummy_clear_output(shell_zephyr);
 
+	/* Test 0: Verify console command shows 0 states initially */
+	zassert_ok(shell_execute_cmd(shell_zephyr, "apfwscreens"));
+	outbuffer = shell_backend_dummy_get_output(shell_zephyr, &buffer_size);
+	zassert_true(strstr(outbuffer, "0 states:") != NULL,
+		     "Initial state count not zero: %s", outbuffer);
+
+	/* Test 1: Save first state */
 	params.state = 0x12345678;
 	rv = host_command_process(&args);
 	zassert_ok(rv, "Got %d", rv);
@@ -165,6 +172,96 @@ ZTEST(host_cmd_host_commands, test_ap_fw_state)
 
 	zassert_true(strstr(outbuffer, "AP_FW 12345678") != NULL,
 		     "Invalid console output %s", outbuffer);
+
+	/* Test 2: Verify console command shows it */
+	zassert_ok(shell_execute_cmd(shell_zephyr, "apfwscreens"));
+	outbuffer = shell_backend_dummy_get_output(shell_zephyr, &buffer_size);
+	zassert_true(strstr(outbuffer, ": 12345678") != NULL,
+		     "Console command output missing state: %s", outbuffer);
+
+	/* Test 3: Save second state */
+	params.state = 0x87654321;
+	rv = host_command_process(&args);
+	zassert_ok(rv, "Got %d", rv);
+
+	/* Test 4: Verify console command shows both */
+	zassert_ok(shell_execute_cmd(shell_zephyr, "apfwscreens"));
+	outbuffer = shell_backend_dummy_get_output(shell_zephyr, &buffer_size);
+	zassert_true(strstr(outbuffer, ": 12345678") != NULL,
+		     "Console command output missing first state: %s",
+		     outbuffer);
+	zassert_true(strstr(outbuffer, ": 87654321") != NULL,
+		     "Console command output missing second state: %s",
+		     outbuffer);
+
+	/* Test 5: Duplicate suppression */
+	params.state = 0x87654321;
+	rv = host_command_process(&args);
+	zassert_ok(rv, "Got %d", rv);
+
+	zassert_ok(shell_execute_cmd(shell_zephyr, "apfwscreens"));
+	outbuffer = shell_backend_dummy_get_output(shell_zephyr, &buffer_size);
+	/* The count should still be 2. */
+	zassert_true(strstr(outbuffer, "2 states:") != NULL,
+		     "Duplicate was saved! Output: %s", outbuffer);
+
+	/* Test 6: Buffer wraparound */
+	for (int i = 3; i <= 12; i++) {
+		params.state = i;
+		rv = host_command_process(&args);
+		zassert_ok(rv, "Got %d for state %d", rv, i);
+	}
+
+	zassert_ok(shell_execute_cmd(shell_zephyr, "apfwscreens"));
+	outbuffer = shell_backend_dummy_get_output(shell_zephyr, &buffer_size);
+	/* The count should be 10. */
+	zassert_true(strstr(outbuffer, "10 states:") != NULL,
+		     "Buffer count not 10! Output: %s", outbuffer);
+	/* State 0x12345678 should be gone. */
+	zassert_true(strstr(outbuffer, "12345678") == NULL,
+		     "Old state 12345678 not overwritten! Output: %s",
+		     outbuffer);
+	/* State 0x87654321 should be gone. */
+	zassert_true(strstr(outbuffer, "87654321") == NULL,
+		     "Old state 87654321 not overwritten! Output: %s",
+		     outbuffer);
+	/* State 12 (c in hex) should be there. */
+	zassert_true(strstr(outbuffer, ": c") != NULL,
+		     "New state 'c' not in buffer! Output: %s", outbuffer);
+
+	/* Test 7: Clear buffer */
+	zassert_ok(shell_execute_cmd(shell_zephyr, "apfwscreens clear"));
+	outbuffer = shell_backend_dummy_get_output(shell_zephyr, &buffer_size);
+	zassert_true(strstr(outbuffer, "Buffer cleared") != NULL,
+		     "Buffer clear failed! Output: %s", outbuffer);
+
+	/* Verify it's empty now */
+	zassert_ok(shell_execute_cmd(shell_zephyr, "apfwscreens"));
+	outbuffer = shell_backend_dummy_get_output(shell_zephyr, &buffer_size);
+	zassert_true(strstr(outbuffer, "0 states:") != NULL,
+		     "Buffer not empty after clear! Output: %s", outbuffer);
+
+	/* Test 8: Monotonically increasing timestamps */
+	/* Add first state */
+	params.state = 0x11111111;
+	rv = host_command_process(&args);
+	zassert_ok(rv);
+
+	/* Add second state */
+	params.state = 0x22222222;
+	rv = host_command_process(&args);
+	zassert_ok(rv);
+
+	zassert_ok(shell_execute_cmd(shell_zephyr, "apfwscreens"));
+	outbuffer = shell_backend_dummy_get_output(shell_zephyr, &buffer_size);
+
+	/* Parse output to get timestamps */
+	const char *p1 = strstr(outbuffer, "11111111");
+	const char *p2 = strstr(outbuffer, "22222222");
+	zassert_true(p1 != NULL && p2 != NULL, "States not found in output");
+
+	zassert_true(p1 < p2, "States in wrong order in output: p1=%p, p2=%p",
+		     p1, p2);
 }
 
 ZTEST_SUITE(host_cmd_host_commands, drivers_predicate_post_main, NULL, NULL,
