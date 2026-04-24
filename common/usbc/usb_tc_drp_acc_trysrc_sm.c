@@ -1867,9 +1867,6 @@ void tc_set_data_role(int port, enum pd_data_role role)
 	 * task and indicate the current data role.
 	 */
 	bc12_role_change_handler(port, prev_data_role, tc[port].data_role);
-
-	/* Notify TCPC of role update */
-	tcpm_set_msg_header(port, tc[port].power_role, tc[port].data_role);
 }
 
 static void sink_stop_drawing_current(int port)

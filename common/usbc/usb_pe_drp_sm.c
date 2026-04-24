@@ -4983,6 +4983,12 @@ static void pe_drs_evaluate_swap_run(int port)
 {
 	if (PE_CHK_FLAG(port, PE_FLAGS_TX_COMPLETE)) {
 		PE_CLR_FLAG(port, PE_FLAGS_TX_COMPLETE);
+		/* Predictively update TCPC header after DR_Swap Accept TX
+		 * complete to avoid GoodCRC role mismatch (PD 3.2). */
+		tcpm_set_msg_header(port, pe[port].power_role,
+				    pe[port].data_role == PD_ROLE_UFP ?
+					    PD_ROLE_DFP :
+					    PD_ROLE_UFP);
 
 		/* Accept Message sent. Transtion to PE_DRS_Change */
 		if (PE_CHK_FLAG(port, PE_FLAGS_ACCEPT)) {
