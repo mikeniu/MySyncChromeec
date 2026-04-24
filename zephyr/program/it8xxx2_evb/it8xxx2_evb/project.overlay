@@ -12,3 +12,7 @@
 #include "interrupts.dtsi"
 #include "pwm.dtsi"
 #include "shi.dtsi"
+
+&sha0 {
+	status = "okay";
+};
