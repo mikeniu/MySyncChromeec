@@ -102,6 +102,97 @@
       },
       "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "265f9cd2_e0722cec",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-24T11:53:46Z",
+      "side": 1,
+      "message": "`pwrmon_sample_fetch(void)`",
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be4c618f_e7dfb621",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-24T11:53:46Z",
+      "side": 1,
+      "message": "no need for the initializer, same in few other functions",
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba753231_c32387fa",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-24T11:53:46Z",
+      "side": 1,
+      "message": "this needs a bit of indentation work, have you ran the presubmit? also this function is fairly big I\u0027d consdier splitting the individual cases into separate functions",
+      "range": {
+        "startLine": 193,
+        "startChar": 0,
+        "endLine": 194,
+        "endChar": 19
+      },
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0858f6dc_062de24f",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-24T11:53:46Z",
+      "side": 1,
+      "message": "log channel_id, maybe pwrmon_data.channels_count as well while you are at it",
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa431e18_fefd0de3",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-24T11:53:46Z",
+      "side": 1,
+      "message": "log the error value",
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
