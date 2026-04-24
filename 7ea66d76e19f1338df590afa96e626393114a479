@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "279e07fd_2e670ed8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-24T05:34:23Z",
+      "side": 1,
+      "message": "Copy-pasting the failing test\n```\nSTART - test_acquire_image_small_buffer_size\n\n    Assertion failed at EC_BASE/ec/zephyr/test/fingerprint/drivers/egis630/src/egis630.c:232: egis630_test_acquire_image_small_buffer_size: fingerprint_acquire_image(fixture-\u003edev, capture_type, buffer, image_buf_size) not equal to -EINVAL\n\n FAIL - test_acquire_image_small_buffer_size in 0.000 seconds\n```\nYou should be re-run it locally withing chroot with:\n```\n./twister -s fingerprint.drivers.egis630 -vvv -c\n```\nPlease keep in mind, the tests don\u0027t use private library.",
+      "revId": "7ea66d76e19f1338df590afa96e626393114a479",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
