@@ -388,6 +388,15 @@ void tc_usb_firmware_fw_update_run(int port);
  */
 void tc_usb_firmware_fw_update_limited_run(int port);
 
+/**
+ * Update TCPC header after DR_Swap Accept TX complete
+ *
+ * Ensures GoodCRC uses the correct data role before TC updates it.
+ *
+ * @param port USB-C port number
+ */
+void tc_update_msg_header_after_dr_swap_accept(int port);
+
 #ifdef CONFIG_USB_CTVPD
 
 /**

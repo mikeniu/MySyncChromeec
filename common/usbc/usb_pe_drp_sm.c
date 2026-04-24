@@ -4983,6 +4983,14 @@ static void pe_drs_evaluate_swap_run(int port)
 {
 	if (PE_CHK_FLAG(port, PE_FLAGS_TX_COMPLETE)) {
 		PE_CLR_FLAG(port, PE_FLAGS_TX_COMPLETE);
+		/*
+		 * Update the TCPC message header immediately after Accept TX
+		 * complete (DR_Swap) instead of waiting for the TC state
+		 * machine. This reduces latency so that if the partner starts a
+		 * new AMS shortly after Accept, GoodCRC is sent with the
+		 * correct data role.
+		 */
+		tc_update_msg_header_after_dr_swap_accept(port);
 
 		/* Accept Message sent. Transtion to PE_DRS_Change */
 		if (PE_CHK_FLAG(port, PE_FLAGS_ACCEPT)) {

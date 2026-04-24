@@ -197,7 +197,7 @@ __maybe_unused static int test_power_role_set(void)
 
 	/* We are in Attached.SRC now */
 	TEST_EQ(mock_tcpc.last.power_role, PD_ROLE_SOURCE, "%d");
-	TEST_EQ(mock_tcpc.last.data_role, PD_ROLE_DFP, "%d");
+	TEST_EQ(pd_get_data_role(PORT0), PD_ROLE_DFP, "%d");
 
 	/*
 	 * We allow 2 separate calls to update the header since power and data
@@ -458,7 +458,7 @@ __maybe_unused static int test_try_src_disabled(void)
 	TEST_EQ(mock_tcpc.last.cc, TYPEC_CC_RD, "%d");
 	TEST_EQ(changes_to_rp, 0, "%d");
 	TEST_EQ(mock_tcpc.last.power_role, PD_ROLE_SINK, "%d");
-	TEST_EQ(mock_tcpc.last.data_role, PD_ROLE_UFP, "%d");
+	TEST_EQ(pd_get_data_role(PORT0), PD_ROLE_UFP, "%d");
 	TEST_EQ(mock_tcpc.last.polarity, POLARITY_CC2, "%d");
 	TEST_EQ(tc_is_attached_snk(PORT0), true, "%d");
 
@@ -520,7 +520,7 @@ __maybe_unused static int test_try_src_partner_switches(void)
 	/* Wait for tCCDebounce to elapse, then should be SRC */
 	task_wait_event(PD_T_CC_DEBOUNCE);
 	TEST_EQ(mock_tcpc.last.power_role, PD_ROLE_SOURCE, "%d");
-	TEST_EQ(mock_tcpc.last.data_role, PD_ROLE_DFP, "%d");
+	TEST_EQ(pd_get_data_role(PORT0), PD_ROLE_DFP, "%d");
 	TEST_EQ(mock_tcpc.last.polarity, POLARITY_CC2, "%d");
 	TEST_EQ(tc_is_attached_src(PORT0), true, "%d");
 
@@ -590,7 +590,7 @@ __maybe_unused static int test_try_src_partner_does_not_switch_vbus(void)
 	/* Once we debouce Vbus, then we should be connected */
 	task_wait_event(PD_T_CC_DEBOUNCE);
 	TEST_EQ(mock_tcpc.last.power_role, PD_ROLE_SINK, "%d");
-	TEST_EQ(mock_tcpc.last.data_role, PD_ROLE_UFP, "%d");
+	TEST_EQ(pd_get_data_role(PORT0), PD_ROLE_UFP, "%d");
 	TEST_EQ(mock_tcpc.last.polarity, POLARITY_CC2, "%d");
 	TEST_EQ(tc_is_attached_snk(PORT0), true, "%d");
 
@@ -661,7 +661,7 @@ __maybe_unused static int test_try_src_partner_does_not_switch_no_vbus(void)
 	/* Once we debouce Vbus, then we should be connected */
 	task_wait_event(PD_T_CC_DEBOUNCE);
 	TEST_EQ(mock_tcpc.last.power_role, PD_ROLE_SINK, "%d");
-	TEST_EQ(mock_tcpc.last.data_role, PD_ROLE_UFP, "%d");
+	TEST_EQ(pd_get_data_role(PORT0), PD_ROLE_UFP, "%d");
 	TEST_EQ(mock_tcpc.last.polarity, POLARITY_CC2, "%d");
 	TEST_EQ(tc_is_attached_snk(PORT0), true, "%d");
 
