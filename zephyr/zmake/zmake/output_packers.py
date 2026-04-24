@@ -278,6 +278,7 @@ class BinmanPacker(BasePacker):
         yield ro_dir / "zephyr" / "zephyr.lst", "zephyr.ro.lst"
         yield rw_dir / "zephyr" / "zephyr.elf", "zephyr.rw.elf"
         yield rw_dir / "zephyr" / "zephyr.lst", "zephyr.rw.lst"
+        yield dts_file_path, "zephyr.dts"
 
         cm_path = rw_dir / "zephyr" / "component_manifest.json"
         if os.path.exists(cm_path):
