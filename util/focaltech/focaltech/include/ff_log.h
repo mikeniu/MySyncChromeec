@@ -18,7 +18,7 @@
 #undef LOG_TAG
 #define LOG_TAG "focaltech"
 
-#define LOG_BUF_SIZE 1024
+#define LOG_BUF_SIZE 4096
 
 /**
  * Log level can be used in 'logcat <tag>[:priority]', and also be
@@ -43,8 +43,6 @@ typedef enum {
 
 /* Log level can be runtime configurable. */
 
-/* Human readable names. */
-extern const char *g_log_level_names[];
 
 #ifdef __cplusplus
 extern "C" {

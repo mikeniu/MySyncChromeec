@@ -23,13 +23,6 @@ typedef struct {
 	uint8_t endpoint_out;
 } usb_context_t;
 
-typedef struct __attribute__((__packed__)) {
-	unsigned char header;
-	unsigned short len;
-	unsigned char cmd;
-	// data//
-	unsigned char tail[1];
-} ff_packet;
 
 #define MBEDTLS_ERR_NET_SOCKET_FAILED -0x0042 /**< Failed to open a socket. */
 #define MBEDTLS_ERR_NET_CONNECT_FAILED \
@@ -56,25 +49,7 @@ typedef struct __attribute__((__packed__)) {
 	-0x0047 /**< Polling the net context failed. */
 #define MBEDTLS_ERR_NET_BAD_INPUT_DATA -0x0049 /**< Input invalid. */
 
-#if 0
-enum   libusb_error
-{
-   LIBUSB_SUCCESS = 0,
-   LIBUSB_ERROR_IO = -1,
-   LIBUSB_ERROR_INVALID_PARAM = -2,
-   LIBUSB_ERROR_ACCESS = -3,
-   LIBUSB_ERROR_NO_DEVICE = -4,
-   LIBUSB_ERROR_NOT_FOUND = -5,
-   LIBUSB_ERROR_BUSY = -6,
-   LIBUSB_ERROR_TIMEOUT = -7,
-   LIBUSB_ERROR_OVERFLOW = -8,
-   LIBUSB_ERROR_PIPE = -9,
-   LIBUSB_ERROR_INTERRUPTED = -10,
-   LIBUSB_ERROR_NO_MEM = -11,
-   LIBUSB_ERROR_NOT_SUPPORTED = -12,
-   LIBUSB_ERROR_OTHER = -99
- }
-#endif
+
 
 int mbedtls_usb_init(const uint32_t pid, const uint32_t vid);
 

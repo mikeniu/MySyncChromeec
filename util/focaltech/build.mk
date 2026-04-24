@@ -7,7 +7,7 @@ _cur_dir := $(notdir $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST)))))
 
 host-util-bin-y += focaltech_fingerprint_iap
 focaltech_fingerprint_iap-objs := $(addprefix $(_cur_dir)/, \
-	libusb-1.0.29/libusb/libusb_port.o \
+	focaltech/src/ft_usb_port.o \
 	focaltech/src/ff_util.o \
 	focaltech/src/ft_sg_io.o \
 	focaltech/src/net_usb.o \

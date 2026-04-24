@@ -22,7 +22,15 @@ If the MCU is in bootloader mode (VID 2808: PID 0001), it can only upgrade FW wi
 																	\n	\
 If the MCU is in bootloader mode (VID 2808: PID 0001), you can use the following command to revert to ROM mode.				\n	\
 ./focaltech_fingerprint_iap back_to_rom_boot												\n	\
+																							\n  \
+Use the following command to disable flash write protection. Note that it can only be executed in bootloader mode.			\n 	\
+1 represents disabling write protection for all flash addresses.															\n 	\
+2 represents disabling from the starting address up to the bootloader.														\n  \
+3 represents disabling from the starting address up to RO.																	\n 	\
+4 represents disabling from the starting address up to RW.																	\n 	\
+./focaltech_fingerprint_iap 1 get_flash_protect																				\n 	\
 "
+
 };
 
 #endif

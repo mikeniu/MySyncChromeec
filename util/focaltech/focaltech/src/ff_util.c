@@ -5,7 +5,6 @@
 
 #define _POSIX_C_SOURCE 200809L
 
-#include "ff_defs.h"
 #include "ff_log.h"
 #include "ff_util.h"
 
@@ -74,57 +73,6 @@ void ff_util_hexdump(uint8_t mak, const char *info, const uint8_t *buf,
 		printf("        | %s", tmp_buf);
 		printf("\r\n");
 	}
-}
-
-uint64_t ff_util_rand64(void)
-{
-	return ((uint64_t)rand() << 32) | ((uint64_t)rand());
-}
-
-uint64_t ff_util_timestamp(bool timing)
-{
-	static uint64_t t0;
-	struct timespec tp;
-	uint64_t ts;
-
-	clock_gettime(CLOCK_MONOTONIC, &tp);
-	ts = tp.tv_sec * 1000 + tp.tv_nsec / 1000000;
-
-	/* Timing. */
-	if (!timing) {
-		t0 = ts;
-	} else {
-		ts -= t0;
-	}
-
-	return ts;
-}
-
-void *ff_util_malloc(uint32_t size)
-{
-	return malloc(size);
-}
-
-void ff_util_free(void *buf)
-{
-	return free(buf);
-}
-
-void *ff_util_realloc(void *buf, uint32_t size)
-{
-	return realloc(buf, size);
-}
-
-int ff_util_sprintf(char *buf, const char *fmt, ...)
-{
-	int n = 0;
-	va_list args;
-
-	va_start(args, fmt);
-	n = vsprintf(buf, fmt, args);
-	va_end(args);
-
-	return n;
 }
 
 static void ft_get_time_local(char *time_buff)

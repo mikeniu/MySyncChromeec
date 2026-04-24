@@ -53,19 +53,20 @@ typedef enum ft_device_mode_e {
 	FORCE_UPDATE_MODE,
 } ft_device_mode_t;
 
-typedef enum ft_hash_mode_e {
-	HASH_MODE_SM3,
-	HASH_MODE_SHA0,
-	HASH_MODE_SHA1,
-	HASH_MODE_SHA224,
-	HASH_MODE_SHA256,
-	HASH_MODE_SHA384,
-	HASH_MODE_SHA512,
-} ft_hash_mode_t;
+typedef enum ft_device_action_e {
+	FT_ACTION_NORMAL,
+	FT_ACTION_WP_GET,
+	FT_ACTION_WP_SET,
+	FT_ACTION_TEST,
+	FT_ACTION_USB_EN,
+	FT_ACTION_USB_SUSPEND,
+} ft_device_action_t;
 
 typedef struct ft_device_info_st {
 	ft_device_mode_t current_mode;
 	ft_device_mode_t next_mode;
+	ft_device_action_t action;
+	uint32_t action_para;
 	uint32_t down_addr;
 
 	char *version;
@@ -73,10 +74,6 @@ typedef struct ft_device_info_st {
 
 } ft_device_info_t;
 
-/*get sm3 hash from openssl library*/
-
-unsigned char *openssl_get_hash(const unsigned char *src, size_t n,
-				unsigned char *md);
 
 /*usb transfer interface via libusb */
 int mbedtls_usb_recv_timeout_with_ep(uint8_t *buf, uint32_t len,

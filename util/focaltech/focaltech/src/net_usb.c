@@ -68,10 +68,6 @@ int LIBUSB_CALL usb_remove_event_callback(libusb_context *ctx,
 		}
 		FF_LOGW("usb device removed: %04x:%04x", desc.idVendor,
 			desc.idProduct);
-		// do sth
-		if (ret) {
-			*ret = 0x55aa;
-		}
 	}
 
 	return 0;
@@ -108,20 +104,13 @@ int LIBUSB_CALL usb_event_callback(libusb_context *ctx, libusb_device *dev,
 		if (LIBUSB_SUCCESS != r) {
 			FF_LOGE("error opening device.");
 		} else {
-#if 0
-            r = libusb_reset_device(usb_ctx->handle);
-            if (r < 0)
-            {
-                printf("failed to reset the device\r\n");
-            }
-#endif
-
 			if (libusb_kernel_driver_active(usb_ctx->handle, 0) ==
 			    1) { // find out if kernel driver is attached
 				FF_LOGD("kernel driver active");
 				if (libusb_detach_kernel_driver(usb_ctx->handle,
-								0) == 0) // detach
-									 // it
+								0) ==
+				    0) // detach
+				       // it
 					FF_LOGD("kernel driver detach");
 			}
 			int r = libusb_claim_interface(usb_ctx->handle,
@@ -140,23 +129,18 @@ int LIBUSB_CALL usb_event_callback(libusb_context *ctx, libusb_device *dev,
 	} else if (LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT == event) {
 		FF_LOGW("usb device removed: %04x:%04x", desc.idVendor,
 			desc.idProduct);
+
 		if (ret) {
 			*ret = 0x55aa;
 		}
 
 		if (usb_ctx->handle) {
-			if (ret) {
-				*ret = 0x55aa;
-			}
-
 			libusb_free_device_list(usb_ctx->devs, 1);
 			libusb_release_interface(usb_ctx->handle, 0);
 			libusb_close(usb_ctx->handle);
 			usb_ctx->handle = NULL;
 			g_no_device_flag = 0;
 		}
-	} else {
-		// todo
 	}
 
 	return 0;
@@ -190,6 +174,7 @@ int mbedtls_usb_init(const uint32_t pid, const uint32_t vid)
 			LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
 		0, vid, pid, LIBUSB_HOTPLUG_MATCH_ANY, usb_event_callback,
 		&callback_handle, &hp[0]);
+
 	if (LIBUSB_SUCCESS != ret) {
 		FF_LOGE("Error registering callback %s",
 			libusb_error_name(ret));
