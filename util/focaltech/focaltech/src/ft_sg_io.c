@@ -23,12 +23,11 @@ static uint32_t cdb_tag = 1;
 static libusb_context *ctx;
 static libusb_hotplug_callback_handle callback_handle = 0;
 
-static int got_usb_reove = 0;
+static int got_usb_remove = 0;
 
 static struct ft_boot_ep_t {
 	uint8_t ep_bulk_out;
 	uint8_t ep_bulk_in;
-
 } g_ft_boot_ep;
 
 // init libusb
@@ -62,14 +61,20 @@ int ft_sg_open(uint16_t vendor_id, uint16_t product_id)
 	libusb_reset_device(dev_handle);
 	usleep(100 * 1000);
 
-	int ret = libusb_hotplug_register_callback(
-		ctx,
-		LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED |
-			LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
-		0, vendor_id, product_id, LIBUSB_HOTPLUG_MATCH_ANY,
-		usb_remove_event_callback, &got_usb_reove, &callback_handle);
-	if (ret) {
-		FF_LOGW("hotplug_register failed");
+	if (!libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG)) {
+		FF_LOGW("Hotplug capabilities are not supported on this platform: %s",
+			libusb_error_name(0));
+	} else {
+		int ret = libusb_hotplug_register_callback(
+			ctx,
+			LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED |
+				LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
+			0, vendor_id, product_id, LIBUSB_HOTPLUG_MATCH_ANY,
+			usb_remove_event_callback, &got_usb_remove,
+			&callback_handle);
+		if (ret) {
+			FF_LOGW("hotplug_register failed");
+		}
 	}
 
 	// check MSC device
@@ -175,7 +180,7 @@ static int ft_check_mcu_reset(void)
 		libusb_handle_events_timeout_completed(ctx, &timeout,
 						       &complete);
 
-		if (got_usb_reove == 0x55aa) {
+		if (got_usb_remove == 0x55aa) {
 			FF_LOGI("got usb remove event");
 			return 0;
 		}
@@ -330,7 +335,7 @@ int ft_sg_io(struct sg_io_hdr *io_hdr)
 			return -1;
 		}
 
-		// set staus
+		// set status
 		io_hdr->status = csw.status;
 		io_hdr->resid = le32toh(csw.data_residue);
 

@@ -158,6 +158,8 @@ static int ft_device_init(ft_device_info_t *info)
 	if (info) {
 		memset(info, 0, sizeof(ft_device_info_t));
 
+		info->action = FT_ACTION_NORMAL;
+
 		switch (vid) {
 		case FOCAL_ROM_VID:
 			info->current_mode = ROM_MODE;
@@ -239,11 +241,18 @@ int main(int argc, char **argv)
 
 		if (argc == 3) {
 			memset(tmp, 0, sizeof(tmp));
-			strcpy(tmp, argv[2]);
+			strncpy(tmp, argv[2], sizeof(tmp) - 1);
+			tmp[PATH_MAX - 1] = '\0';
+
 			if (!memcmp(tmp, "force_update_full_ec_bin",
 				    sizeof("force_update_full_ec_bin"))) {
 				FF_LOGD("force update ec bin");
 				info.next_mode = FORCE_UPDATE_MODE;
+			} else if (!memcmp(tmp, "flash_set_protect",
+					   sizeof("flash_set_protect"))) {
+				FF_LOGD("flash_set_protect");
+				info.action = FT_ACTION_WP_SET;
+				info.action_para = atoi(argv[1]);
 			} else {
 				FF_LOGE("para err");
 				return -1;
@@ -253,7 +262,8 @@ int main(int argc, char **argv)
 		memset(tmp, 0, sizeof(tmp));
 		info.ec_bin = argv[1];
 
-		strcpy(tmp, argv[1]);
+		strncpy(tmp, argv[1], sizeof(tmp) - 1);
+		tmp[PATH_MAX - 1] = '\0';
 
 		if (!memcmp(tmp, "back_to_second_boot",
 			    sizeof("back_to_second_boot"))) {
@@ -297,6 +307,12 @@ int main(int argc, char **argv)
 			return 0;
 		}
 
+		if (!memcmp(tmp, "flash_get_protect",
+			    sizeof("flash_get_protect"))) {
+			FF_LOGD("flash_get_protect");
+			info.action = FT_ACTION_WP_GET;
+		}
+
 		if (info.next_mode != FORCE_UPDATE_MODE) {
 			info.next_mode = EC_MODE;
 		}
@@ -307,9 +323,11 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	if (access(info.ec_bin, F_OK)) {
-		FF_LOGE("can't find %s", info.ec_bin);
-		return -1;
+	if (info.action == FT_ACTION_NORMAL) {
+		if (access(info.ec_bin, F_OK)) {
+			FF_LOGE("can't find %s", info.ec_bin);
+			return -1;
+		}
 	}
 
 	if (info.current_mode == TEST_MODE) {
