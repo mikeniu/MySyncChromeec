@@ -25,8 +25,11 @@ import zmake.jobserver
 filenames = st.text(
     alphabet=set(string.printable) - {"/", ";"}, min_size=1, max_size=254
 ).filter(lambda name: name not in (".", ".."))
+
+_SAFE_ROOT = pathlib.Path(tempfile.gettempdir()) / "zmake-test"
 paths = st.builds(
-    lambda parts: pathlib.Path("/", *parts), st.iterables(filenames, min_size=1)
+    lambda parts: _SAFE_ROOT.joinpath(*parts),
+    st.iterables(filenames, min_size=1),
 )
 config_keys = st.text(alphabet=set(string.ascii_uppercase) | {"_"}, min_size=1)
 config_values = st.builds(str, st.just("y") | st.just("n") | st.integers())
