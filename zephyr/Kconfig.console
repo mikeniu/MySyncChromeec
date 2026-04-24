@@ -152,3 +152,12 @@ config PLATFORM_EC_HOSTCMD_CONSOLE_PRINT
 	help
 	  Enable the EC_CMD_CONSOLE_PRINT host command. This allows the host
 	  to print messages directly to the EC console.
+
+config PLATFORM_EC_AP_FW_STATE_BUFFER
+	bool "AP FW state buffer"
+	depends on PLATFORM_EC_HOSTCMD
+	default y
+	help
+	  Enable a circular buffer to store the last 10 AP FW states
+	  with timestamps, and a console command `apfwscreens` to view
+	  or clear them.
