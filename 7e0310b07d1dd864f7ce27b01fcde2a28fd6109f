@@ -16,6 +16,138 @@
       "message": "I found a problem in following scenario:\n- boot with `wp_gpio_asserted` as false\n- set `ro_at_boot` wirh `flashwp true`\n- I confirmed it ends up in the `cros_flash_em32f967_protect_at_boot` function and `} else if (new_prot_end \u003d\u003d RO_END) {`\n- check `flashinfo` and `ro_at_boot` is `OFF`. I checked and `get_prot_reg` returns `end` \u003d 0.",
       "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0eafc08e_2ee5aa8c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-24T18:46:50Z",
+      "side": 1,
+      "message": "I wrote some initial comments. Please let me know whether the protection is sector-based or range-based.",
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0fa07852_9718751b",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-24T18:46:50Z",
+      "side": 1,
+      "message": "Any non-zero value returned here will be recognized as \"protected\" (it\u0027s not even checked in `get_prot_reg()` below). I think we can only return 0 here and leave appropriate comment.",
+      "range": {
+        "startLine": 79,
+        "startChar": 2,
+        "endLine": 79,
+        "endChar": 32
+      },
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5d75d47_733d0900",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-24T18:46:50Z",
+      "side": 1,
+      "message": "It\u0027s zephyr driver where errno is used, so let\u0027s return `-EINVAL`. Same in other API functions.",
+      "range": {
+        "startLine": 204,
+        "startChar": 9,
+        "endLine": 204,
+        "endChar": 24
+      },
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1698b9ee_fdbdefd0",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-24T18:46:50Z",
+      "side": 1,
+      "message": "What would happen, if we skipped checking if the sector is protected, and proceed with writing?",
+      "range": {
+        "startLine": 207,
+        "startChar": 0,
+        "endLine": 216,
+        "endChar": 2
+      },
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f382606_ff546f2d",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-24T18:46:50Z",
+      "side": 1,
+      "message": "This should be moved to zephyr flash driver.",
+      "range": {
+        "startLine": 262,
+        "startChar": 0,
+        "endLine": 273,
+        "endChar": 2
+      },
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b529adc_78df77b0",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-24T18:46:50Z",
+      "side": 1,
+      "message": "Is the protection range-based or sector-based? I guess your flash protection is range-based.\n\nI would not emulate the other type of protection mechanism. Mixing both in one driver causes confusion.",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 53
+      },
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
