@@ -1025,7 +1025,7 @@ void tpm_task(void *u)
 	tpm_reset_now(false, false);
 	while (1) {
 		uint8_t *response = NULL;
-		unsigned response_size;
+		uint32_t response_size = 0;
 		uint32_t command_code;
 		struct tpm_cmd_header *tpmh;
 		size_t buffer_size;
@@ -1080,7 +1080,7 @@ void tpm_task(void *u)
 			}
 			continue;
 		}
-
+		response = (uint8_t *)tpmh;
 		command_code = be32toh(tpmh->command_code);
 		is_custom_command = IS_CUSTOM_CODE(command_code);
 		CPRINTST("%s: received %scommand 0x%04x", __func__,
@@ -1112,7 +1112,6 @@ void tpm_task(void *u)
 					0,    0,    9, 0x21 /* TPM_RC_LOCKOUT */
 				};
 				CPRINTST("%s: Ignoring TPM commands", __func__);
-				response = (uint8_t *)tpmh;
 				response_size = sizeof(tpm_broken_response);
 				memcpy(response, tpm_broken_response,
 				       response_size);
@@ -1132,6 +1131,9 @@ void tpm_task(void *u)
 				}
 				seed_err_flag = err_flag;
 #endif /* CONFIG_NVMEM_DEBUG_EPS */
+				/* ExecuteCommand() will set `response` and
+				 * and `response_size` to correct values.
+				 */
 				ExecuteCommand(tpm_.fifo_write_index,
 					       (uint8_t *)tpmh, &response_size,
 					       &response);
@@ -1161,7 +1163,6 @@ void tpm_task(void *u)
 						0x00, 0xc4, 0x00, 0x00, 0x00,
 						0x0a, 0x00, 0x00, 0x00, 0x1e
 					};
-					response = (uint8_t *)tpmh;
 					response_size = sizeof(bad_cmd_resp);
 					memcpy(response, bad_cmd_resp,
 					       response_size);
