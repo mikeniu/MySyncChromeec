@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dc0ed125_c9d91901",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-24T14:51:54Z",
+      "side": 1,
+      "message": "I shared design doc with you and Fabio.",
+      "parentUuid": "9925d4f9_1783b65c",
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6054a783_203e10d3",
         "filename": "zephyr/program/fatcat/kinmen/project.conf",
         "patchSetId": 15
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-23T20:48:33Z",
       "side": 1,
       "message": "General comment - board specific changes should live in a separate CL from the common functional changes.  Makes it easier to bisect or revert a feature on the specific board.",
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e26a828_c555ea21",
+        "filename": "zephyr/program/fatcat/kinmen/project.conf",
+        "patchSetId": 15
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-24T14:51:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6054a783_203e10d3",
       "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -83,6 +119,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e2b34c92_206fc300",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-24T14:51:54Z",
+      "side": 1,
+      "message": "Yes, pwrmon works with this drivver. I forgot to upload FROMPULL in the same topic. My bad.\n\nI will upload FROMPULL on Monday.",
+      "parentUuid": "d60079a7_b842d2db",
+      "range": {
+        "startLine": 54,
+        "startChar": 27,
+        "endLine": 54,
+        "endChar": 44
+      },
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d0b56a4e_4abad84c",
         "filename": "zephyr/subsys/pwrmon/pwrmon.c",
         "patchSetId": 15
@@ -94,6 +154,30 @@
       "writtenOn": "2026-04-23T20:48:33Z",
       "side": 1,
       "message": "This file is labeled as a generic \"power monitor\" but is tightly coupled to the Microchip sensor.\n\nI think a design doc is needed before adding this to our code.",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 61
+      },
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66097c75_ebc8396d",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-24T14:51:54Z",
+      "side": 1,
+      "message": "It is covered in [alpaca](https://docs.google.com/document/d/1Ox-eRjUp95Bv2WgCj8e0Ncvp2hnk_CCsTF6spu4i5f4/edit?tab\u003dt.0#heading\u003dh.piewi1b1nvxx) design doc, in section \u0027Hardware guidelines update\u0027. This proposal recommend that future platforms should use PAC1954s, hence current implementation is based on this specific chip.",
+      "parentUuid": "d0b56a4e_4abad84c",
       "range": {
         "startLine": 58,
         "startChar": 0,
@@ -138,6 +222,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "01096987_9fc0df43",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-24T14:51:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be4c618f_e7dfb621",
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ba753231_c32387fa",
@@ -178,6 +280,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "747014b2_9a1236c8",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-24T14:51:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0858f6dc_062de24f",
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fa431e18_fefd0de3",
@@ -191,6 +311,24 @@
       "writtenOn": "2026-04-24T11:53:46Z",
       "side": 1,
       "message": "log the error value",
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa491a8d_0b62b22d",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-24T14:51:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa431e18_fefd0de3",
       "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
