@@ -121,6 +121,9 @@ class BuildConfig:
         if cmake_graph:
             cmd.append(f"--graphviz={build_dir}/cmake-build.dot")
 
+        build_dir.mkdir(parents=True, exist_ok=True)
+        (build_dir / "cmake.cmd").write_text(util.repr_command(cmd) + "\n")
+
         return jobclient.popen(
             cmd,
             **kwargs,
