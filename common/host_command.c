@@ -20,6 +20,8 @@
 #include "timer.h"
 #include "util.h"
 
+#include <string.h>
+
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_HOSTCMD, outstr)
 #define CPRINTF(format, args...) cprintf(CC_HOSTCMD, format, ##args)
@@ -260,6 +262,17 @@ DECLARE_HOST_COMMAND(EC_CMD_GET_S0IX_COUNTER, host_command_get_s0ix_cnt,
 		     EC_VER_MASK(0));
 #endif
 
+#define AP_FW_STATE_BUF_SIZE 10
+
+struct ap_fw_state_entry {
+	uint32_t state;
+	uint64_t timestamp;
+};
+
+static struct ap_fw_state_entry ap_fw_states[AP_FW_STATE_BUF_SIZE];
+static size_t ap_fw_state_head = 0;
+static size_t ap_fw_state_count = 0;
+
 static enum ec_status
 host_command_ap_fw_state(struct host_cmd_handler_args *args)
 {
@@ -268,7 +281,50 @@ host_command_ap_fw_state(struct host_cmd_handler_args *args)
 	ccprintf("AP_FW %x\n", p->state);
 	args->response_size = 0;
 
+	/* Save the screen state if buffer is empty or different from last saved
+	 * state */
+	if (ap_fw_state_count == 0 ||
+	    ap_fw_states[(ap_fw_state_head + AP_FW_STATE_BUF_SIZE - 1) %
+			 AP_FW_STATE_BUF_SIZE]
+			    .state != p->state) {
+		ap_fw_states[ap_fw_state_head].state = p->state;
+		ap_fw_states[ap_fw_state_head].timestamp = get_time().val;
+		ap_fw_state_head =
+			(ap_fw_state_head + 1) % AP_FW_STATE_BUF_SIZE;
+		if (ap_fw_state_count < AP_FW_STATE_BUF_SIZE)
+			ap_fw_state_count++;
+	}
+
 	return EC_RES_SUCCESS;
 }
 DECLARE_HOST_COMMAND(EC_CMD_AP_FW_STATE, host_command_ap_fw_state,
 		     EC_VER_MASK(0));
+
+static int command_ap_fw_states(int argc, const char **argv)
+{
+	int i;
+	int idx;
+
+	if (argc > 1 && !strcasecmp(argv[1], "clear")) {
+		ap_fw_state_head = 0;
+		ap_fw_state_count = 0;
+		memset(ap_fw_states, 0,
+		       AP_FW_STATE_BUF_SIZE * sizeof(struct ap_fw_state_entry));
+		ccprintf("Buffer cleared\n");
+		return EC_SUCCESS;
+	}
+
+	/* Prints recorded states from oldest to newest */
+	ccprintf("%zu states:\n", ap_fw_state_count);
+	for (i = 0; i < ap_fw_state_count; i++) {
+		idx = (ap_fw_state_head - ap_fw_state_count + i +
+		       AP_FW_STATE_BUF_SIZE) %
+		      AP_FW_STATE_BUF_SIZE;
+		ccprintf(" %llu: %x\n", ap_fw_states[idx].timestamp,
+			 ap_fw_states[idx].state);
+		cflush();
+	}
+	return EC_SUCCESS;
+}
+DECLARE_SAFE_CONSOLE_COMMAND(apfwscreens, command_ap_fw_states, "[clear]",
+			     "Print/clear AP FW screens");
