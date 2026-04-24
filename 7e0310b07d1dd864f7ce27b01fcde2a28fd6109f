@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aeb82f85_501cfbab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-24T07:19:23Z",
+      "side": 1,
+      "message": "I found a problem in following scenario:\n- boot with `wp_gpio_asserted` as false\n- set `ro_at_boot` wirh `flashwp true`\n- I confirmed it ends up in the `cros_flash_em32f967_protect_at_boot` function and `} else if (new_prot_end \u003d\u003d RO_END) {`\n- check `flashinfo` and `ro_at_boot` is `OFF`. I checked and `get_prot_reg` returns `end` \u003d 0.",
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
