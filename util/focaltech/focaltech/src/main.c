@@ -43,7 +43,7 @@ static int ft_switch_to_rom(void)
 		}
 
 		ret = mbedtls_usb_recv_timeout((uint8_t *)rx_buffer, 4, 200);
-		FF_LOGD("ret=%x,recv %x,%x,%x,%x", ret, rx_buffer[0],
+		FF_LOGD("ret = %x,recv %x,%x,%x,%x", ret, rx_buffer[0],
 			rx_buffer[1], rx_buffer[2], rx_buffer[3]);
 		if (ret > 0 ||
 		    (ret == LIBUSB_ERROR_IO || ret == LIBUSB_ERROR_NO_DEVICE)) {
