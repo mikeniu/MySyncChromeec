@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11a455f9_7283c142",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtk.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-24T16:11:29Z",
+      "side": 1,
+      "message": "You can delete this - the protect_at_boot() routine only needs to set the BBRAM flags.  On the next power up, `cros_flash_rtk_init` will lock the RO region.",
+      "range": {
+        "startLine": 443,
+        "startChar": 0,
+        "endLine": 444,
+        "endChar": 35
+      },
+      "revId": "b549ea86a8c3ee1a876eb3c59ffd3ac2714e796c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9290bcb6_e9092094",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtk.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 514,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-24T16:11:29Z",
+      "side": 1,
+      "message": "This path needs to protect the entire flash.",
+      "range": {
+        "startLine": 514,
+        "startChar": 0,
+        "endLine": 514,
+        "endChar": 27
+      },
+      "revId": "b549ea86a8c3ee1a876eb3c59ffd3ac2714e796c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
