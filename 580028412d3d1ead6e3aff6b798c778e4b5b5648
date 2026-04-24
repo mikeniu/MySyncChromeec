@@ -294,6 +294,30 @@
       },
       "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2098173a_a62e02d1",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-24T01:45:26Z",
+      "side": 1,
+      "message": "t0 should be reported from when the IRQ was triggered, i.e. when the fingerprint sensor detected the finger presence if that IRQ was for a auth event. There might be some delay from IRQ until the sensor detects finger presence. This is how latency is calculated using a high speed camera (finger touch until first frame of screen unlock)",
+      "parentUuid": "ead82d74_dc95d36c",
+      "range": {
+        "startLine": 370,
+        "startChar": 3,
+        "endLine": 370,
+        "endChar": 13
+      },
+      "revId": "580028412d3d1ead6e3aff6b798c778e4b5b5648",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
