@@ -9,3 +9,5 @@ project(it8xxx2_evb)
 
 # Include board specific header files
 zephyr_include_directories(include)
+
+zephyr_library_sources_ifdef(CONFIG_BATTERY_AUTH "src/battery_auth.c")

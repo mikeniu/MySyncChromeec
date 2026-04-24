@@ -48,6 +48,11 @@
 	pinctrl-0 = <&i2c2_clk_gpf6_default
 		     &i2c2_data_gpf7_default>;
 	pinctrl-names = "default";
+
+	battery: battery@52 {
+		compatible = "ite,target-i2c";
+		reg = <0x0b>;
+	};
 };
 
 &i2c4 {
