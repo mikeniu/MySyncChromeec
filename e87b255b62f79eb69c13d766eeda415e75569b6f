@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca7b1265_4bee88df",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-24T11:17:05Z",
+      "side": 1,
+      "message": "Please run\n```\ncros format zephyr/drivers/fingerprint/fingerprint_egis630.c\n```",
+      "revId": "e87b255b62f79eb69c13d766eeda415e75569b6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
