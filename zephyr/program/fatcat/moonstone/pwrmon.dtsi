@@ -1,0 +1,11 @@
+/ {
+    pwrmon: pwrmon {
+        compatible = "cros,pwrmon";
+        power-monitors = <&pac1>, <&pac2>, <&pac3>, <&pac4>,
+                        <&pac5>, <&pac6>, <&pac7>, <&pac8>,
+                        <&pac9>, <&pac10>, <&pac11>, <&pac12>;
+        sample-rate = <1024>;
+        gpios = <&gpiof 2 GPIO_ACTIVE_HIGH>;
+        zephyr,deferred-init;
+    };
+};
