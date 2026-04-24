@@ -130,6 +130,17 @@ static int board_ap_power_g3_run(void *data)
 
 		power_signal_set(PWR_EN_PP5000_A, 1);
 
+		/* Indication to soc on recovery boot */
+		if (system_is_manual_recovery()) {
+			gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(
+						gpio_ec_soc_rec_switch_odl),
+					1);
+		} else {
+			gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(
+						gpio_ec_soc_rec_switch_odl),
+					0);
+		}
+
 		power_wait_signals_on_timeout(
 			AP_PWRSEQ_DT_VALUE(wait_signal_timeout));
 	}
