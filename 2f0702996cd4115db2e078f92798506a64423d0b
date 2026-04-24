@@ -128,6 +128,24 @@
       "parentUuid": "6238b487_6ed7c3eb",
       "revId": "2f0702996cd4115db2e078f92798506a64423d0b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1498149_1c4de7e8",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-24T06:32:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d54a9dcd_b2649cd4",
+      "revId": "2f0702996cd4115db2e078f92798506a64423d0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

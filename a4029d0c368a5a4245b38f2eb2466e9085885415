@@ -34,6 +34,24 @@
       "parentUuid": "6a2b7e56_8e3f4642",
       "revId": "a4029d0c368a5a4245b38f2eb2466e9085885415",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "093c0381_01d86948",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-24T06:32:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "83802426_e63b6578",
+      "revId": "a4029d0c368a5a4245b38f2eb2466e9085885415",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
