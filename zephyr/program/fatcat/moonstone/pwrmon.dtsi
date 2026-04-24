@@ -1,0 +1,29 @@
+/ {
+    pwrmon: pwrmon {
+        compatible = "cros,pwrmon";
+        power-monitors = <&pac1>, <&pac2>, <&pac3>, <&pac4>,
+                        <&pac5>, <&pac6>, <&pac7>, <&pac8>,
+                        <&pac9>, <&pac10>, <&pac11>, <&pac12>;
+        sample-rate = <1024>;
+        pwrmon-gpios = <&gpiof 2 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
+
+        // PAC194X_CHAN_ACC1_AVG
+        pwrmon-channel-base = <89>;
+        // PAC194X SENSOR_ATTR_CHANNEL_ENABLED
+        pwrmon-channel-enable-attr = <20>;
+
+        // PAC194X_CHAN_ACC_COUNT
+        pwrmon-sample-count = <93>;
+
+        // PAC194X SENSOR_ATTR_REFRESH_CMD
+        pwrmon-latch-attr = <22>;
+        // PAC194X_SENSOR_ATTR_FORCE_REFRESH_CMD_SINGLE
+        pwrmon-latch-val = <0>;
+
+        // PAC194X SENSOR_ATTR_REFRESH_MODE
+        pwrmon-refresh-attr = <21>;
+        // PAC194X_SENSOR_ATTR_REFRESH_MODE_MANUAL
+        pwrmon-refresh-val = <2>;
+
+    };
+};
