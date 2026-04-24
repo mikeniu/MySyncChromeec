@@ -16,6 +16,40 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "3c67b7f29876f82f1068895c5fb26489f636384b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5458c960_e5d6ac0c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-24T15:42:36Z",
+      "side": 1,
+      "message": "Please split into 2 CLs, one support for replace, one for adding it for sanok.",
+      "revId": "3c67b7f29876f82f1068895c5fb26489f636384b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0c72138_db3f3cd2",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-24T15:42:36Z",
+      "side": 1,
+      "message": "Any way to add support for replacing cert unconditionally?",
+      "revId": "3c67b7f29876f82f1068895c5fb26489f636384b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
