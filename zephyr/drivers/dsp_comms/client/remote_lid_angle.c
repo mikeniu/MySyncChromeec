@@ -31,7 +31,7 @@ static void lid_angle_remote_peripheral_enable() {
           },
   };
 
-  LOG_INF("Waiting for lock to send tablet_mode(%d)", is_tablet_mode);
+  LOG_ERR("Waiting for lock to send tablet_mode(%d)", is_tablet_mode);
   k_mutex_lock(&data->mutex, K_FOREVER);
   pb_ostream_t stream = pb_ostream_from_buffer(data->request_buffer,
                                                cros_dsp_comms_EcService_size);

@@ -1,0 +1,80 @@
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	/* ptl-ish fw_config fields (subset relevant to ISH). */
+	ptl-ish-fw-config {
+		compatible = "cros-ec,cbi-fw-config";
+
+		wifi {
+			enum-name = "FW_WIFI";
+			start = <4>;
+			size = <2>;
+
+			wifi-cnvi-6 {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_WIFI_CNVI_6";
+				value = <0>;
+				default;
+			};
+			wifi-cnvi-7 {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_WIFI_CNVI_7";
+				value = <1>;
+			};
+			wifi-pcie-6 {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_WIFI_PCIE_6";
+				value = <2>;
+			};
+			wifi-pcie-7 {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_WIFI_PCIE_7";
+				value = <3>;
+			};
+		};
+
+		touchpad {
+			enum-name = "FW_TOUCHPAD";
+			start = <11>;
+			size = <2>;
+
+			touchpad-none {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_TOUCHPAD_NONE";
+				value = <0>;
+				default;
+			};
+			touchpad-thc-i2c {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_TOUCHPAD_THC_I2C";
+				value = <1>;
+			};
+			touchpad-lpss-i2c {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_TOUCHPAD_LPSS_I2C";
+				value = <2>;
+			};
+		};
+
+		ish {
+			enum-name = "FW_ISH";
+			start = <24>;
+			size = <1>;
+
+			ish-disable {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_ISH_DISABLE";
+				value = <0>;
+				default;
+			};
+			ish-enable {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_ISH_ENABLE";
+				value = <1>;
+			};
+		};
+	};
+};

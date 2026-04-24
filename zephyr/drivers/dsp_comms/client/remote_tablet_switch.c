@@ -14,7 +14,7 @@ LOG_MODULE_DECLARE(dsp_client, CONFIG_DSP_COMMS_LOG_LEVEL);
 static int is_board_sensor_at_360;
 
 void remote_tablet_switch_set(bool is_360) {
-  LOG_DBG("remote_tablet_switch_set(%d)", is_360);
+  LOG_ERR("remote_tablet_switch_set(%d)", is_360);
   int new_value = is_360 ? 1 : 0;
   if (is_board_sensor_at_360 == new_value) {
     return;

@@ -4,6 +4,7 @@
  */
 
 /* ptl-ish project DTSI includes */
+#include "cbi.dtsi"
 #include "gpio.dtsi"
 #include "../i2c.dtsi"
 #include "interrupts.dtsi"

@@ -183,7 +183,7 @@ static void dsp_client_process_status(pw_transport_Status* status) {
   bool is_360 = is_status_bit_set(
       cros_dsp_comms_StatusFlag_STATUS_FLAG_TABLET_MODE, status);
 
-  LOG_DBG("is_lid_open=%d, is_360=%d", is_lid_open, is_360);
+  LOG_ERR("%s: is_lid_open=%d, is_360=%d", __func__, is_lid_open, is_360);
   if (IS_ENABLED(CONFIG_PLATFORM_EC_DSP_REMOTE_LID_SWITCH)) {
     remote_lid_switch_set(is_lid_open);
   }
@@ -225,16 +225,17 @@ int dsp_client_get_cbi_flags(const struct device* dev,
   __ASSERT_NO_MSG(encode_status);
 
   /* Write the message */
-  LOG_DBG("Writing %zu bytes", stream.bytes_written);
+  LOG_ERR("Writing %zu bytes", stream.bytes_written);
   rc = i2c_write_dt(&cfg->i2c, data->request_buffer, stream.bytes_written);
 
   if (rc != 0) {
     k_mutex_unlock(&data->mutex);
+	LOG_ERR("i2c_write_dt failed");
     return rc;
   }
 
   /* Wait for the EC to process the request */
-  LOG_DBG("Waiting...");
+  LOG_ERR("Waiting...");
   uint32_t events =
       k_event_wait(&data->response_ready_event,
                    UINT32_MAX,
@@ -247,9 +248,9 @@ int dsp_client_get_cbi_flags(const struct device* dev,
     dsp_client_enable_interrupt(data, true);
     return -EAGAIN;
   }
-  LOG_DBG("events = 0x%08x", events);
+  LOG_ERR("events = 0x%08x", events);
 
-  LOG_DBG("Expecting response of %u bytes", data->pending_response_length);
+  LOG_ERR("Expecting response of %u bytes", data->pending_response_length);
   if (data->pending_response_length == PENDING_RESPONSE_LENGTH_ERROR) {
     LOG_ERR("Remote failed to get value");
     k_mutex_unlock(&data->mutex);
@@ -276,6 +277,7 @@ int dsp_client_get_cbi_flags(const struct device* dev,
 
   k_mutex_unlock(&data->mutex);
   /* Handle any updates to lid switch or GMR sensor values */
+  LOG_ERR("%s: calling dsp_client_process_status", __func__);
   dsp_client_process_status(&data->status);
   return rc;
 }
@@ -288,7 +290,7 @@ static void dsp_client_gpio_callback(const struct device* port,
   ARG_UNUSED(port);
   ARG_UNUSED(pin);
 
-  LOG_DBG("***** DSP SERVICE FIRED INTERRUPT *****");
+  LOG_ERR("***** DSP SERVICE FIRED INTERRUPT *****");
   dsp_client_enable_interrupt(data, false);
   k_work_submit(&data->read_status_work);
 }
@@ -303,7 +305,7 @@ static void dsp_client_read_status(struct k_work* item) {
 
   /* Read the status */
   uint8_t status_buffer[pw_transport_Status_size + 4] = {0};
-  LOG_DBG("Reading Status bytes");
+  LOG_ERR("Reading Status bytes");
   rc = i2c_read_dt(&cfg->i2c, status_buffer, ARRAY_SIZE(status_buffer));
   dsp_client_enable_interrupt(data, true);
   if (rc != 0) {
@@ -326,13 +328,13 @@ static void dsp_client_read_status(struct k_work* item) {
       cros_dsp_comms_StatusFlag_STATUS_FLAG_PROCESSING_ERROR, &data->status);
 
   if (is_response_ready) {
-    LOG_DBG("response_ready? %d, response_length=%u",
+    LOG_ERR("response_ready? %d, response_length=%u",
             is_response_ready,
             data->status.response_length);
     data->pending_response_length = data->status.response_length;
     k_event_post(&data->response_ready_event, 1);
   } else if (is_processing_error) {
-    LOG_DBG("processing error? %d", is_processing_error);
+    LOG_ERR("processing error? %d", is_processing_error);
     data->pending_response_length = PENDING_RESPONSE_LENGTH_ERROR;
     k_event_post(&data->response_ready_event, 2);
   } else {
@@ -342,6 +344,7 @@ static void dsp_client_read_status(struct k_work* item) {
      * response is pending, then lid switch and/or GMR sensor status is handled
      * after the response handling is fully complete.
      */
+    LOG_ERR("%s: calling dsp_client_process_status", __func__);
     dsp_client_process_status(&data->status);
   }
 }
@@ -353,7 +356,7 @@ static int dsp_client_gpio_init(const struct device* dev) {
   int interrupt_rc;
 
   __ASSERT_NO_MSG(gpio_is_ready_dt(&config->interrupt));
-  LOG_INF("Initializing %s::%u with flags 0x%04x",
+  LOG_ERR("Initializing %s::%u with flags 0x%04x",
           config->interrupt.port->name,
           config->interrupt.pin,
           config->interrupt.dt_flags);
@@ -384,11 +387,11 @@ static int dsp_client_gpio_init(const struct device* dev) {
   __ASSERT_NO_MSG(rc == 0);
 
   if (data->interrupt_config == GPIO_INT_LEVEL_ACTIVE) {
-    LOG_INF("Interrupt configured to LEVEL_ACTIVE");
+    LOG_ERR("Interrupt configured to LEVEL_ACTIVE");
   } else if (data->interrupt_config == GPIO_INT_EDGE_TO_ACTIVE) {
-    LOG_INF("Interrupt configured to EDGE_TO_ACTIVE");
+    LOG_ERR("Interrupt configured to EDGE_TO_ACTIVE");
   } else {
-    LOG_INF("Interrupt configured to %d", data->interrupt_config);
+    LOG_ERR("Interrupt configured to %d", data->interrupt_config);
   }
 
   return rc;
@@ -429,6 +432,7 @@ static int dsp_client_init(const struct device* dev) {
     // Request status so ISH gets current value of lid_switch and tablet mode
     // from the EC
     k_work_submit(&data->read_status_work);
+    LOG_ERR("dsp_client_init done...");
   }
 
   return rc;

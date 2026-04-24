@@ -212,7 +212,7 @@ void dsp_service_handle_get_cbi_flags_request(struct k_work*) {
   cros_dsp_comms_GetCbiFlagsResponse response =
       cros_dsp_comms_GetCbiFlagsResponse_init_zero;
 
-  LOG_DBG("GOT: GetCbiFlagsRequest, which=%d", request->which);
+  LOG_ERR("GOT: GetCbiFlagsRequest, which=%d", request->which);
   rc = ParseGetCbiFlagsRequest(*request, response, tag);
 
   if (rc == 0) {
@@ -250,15 +250,15 @@ void cros::dsp::service::Driver::SetNotebookMode(
   }
   switch (mode) {
     case cros_dsp_comms_NotebookMode_NOTEBOOK_MODE_NOTEBOOK:
-      LOG_DBG("    NOTEBOOK mode, tablet_get_mode()=%d", tablet_get_mode());
+      LOG_ERR("    NOTEBOOK mode, tablet_get_mode()=%d", tablet_get_mode());
       cros::dsp::service::driver.mode_val = 0;
       break;
     case cros_dsp_comms_NotebookMode_NOTEBOOK_MODE_TABLET:
-      LOG_DBG("    TABLET mode, tablet_get_mode()=%d", tablet_get_mode());
+      LOG_ERR("    TABLET mode, tablet_get_mode()=%d", tablet_get_mode());
       cros::dsp::service::driver.mode_val = 1;
       break;
     default:
-      LOG_WRN("Unsupported notebook mode");
+      LOG_ERR("Unsupported notebook mode");
       return;
   }
   k_work_reschedule(&mode_handling_work_,
@@ -268,13 +268,13 @@ void cros::dsp::service::Driver::SetNotebookMode(
 bool cros::dsp::service::Driver::HandleDecodedRequest() {
   switch (pending_service_request_.which_request) {
     case cros_dsp_comms_EcService_notify_notebook_mode_change_tag:
-      LOG_DBG("GOT: NotifyNotebookModeChangeRequest");
+      LOG_ERR("GOT: NotifyNotebookModeChangeRequest");
       SetNotebookMode(pending_service_request_.request
                           .notify_notebook_mode_change.new_mode);
       return false;
 #ifdef CONFIG_PLATFORM_EC_DSP_REMOTE_BODY_DETECTION
     case cros_dsp_comms_EcService_notify_body_detection_change_tag:
-      LOG_DBG("GOT: NotifyBodyDetectionChangeRequest");
+      LOG_ERR("GOT: NotifyBodyDetectionChangeRequest");
       body_detect_change_state_extern(
           pending_service_request_.request.notify_body_detection_change.on_body
               ? BODY_DETECTION_ON_BODY
@@ -282,11 +282,11 @@ bool cros::dsp::service::Driver::HandleDecodedRequest() {
       return false;
 #endif
     case cros_dsp_comms_EcService_get_cbi_flags_tag:
-      LOG_DBG("Scheduling get_cbi_flags_work");
+      LOG_ERR("Scheduling get_cbi_flags_work");
       k_work_submit(&get_cbi_flags_work_);
       return true;
     case cros_dsp_comms_EcService_reset_connection_tag:
-      LOG_DBG("Resetting connection");
+      LOG_ERR("Resetting connection");
       // The connection is reset so flush all the pending messages from the old
       // session.
       while (transport_.ReadNextMessage().status().ok()) {
@@ -300,7 +300,7 @@ bool cros::dsp::service::Driver::HandleDecodedRequest() {
       }
       return false;
     default:
-      LOG_WRN("Unsupported request type");
+      LOG_ERR("Unsupported request type");
       cros::dsp::service::driver.transport_.SetStatusBit(
           cros_dsp_comms_StatusFlag_STATUS_FLAG_PROCESSING_ERROR, true);
       return false;
@@ -316,14 +316,14 @@ cros::dsp::service::Driver::Driver(
       bus_(bus),
       interrupt_(interrupt),
       transport_([this](bool has_data) {
-        LOG_DBG("NotifyClientCallback(%d)", has_data);
+        LOG_ERR("NotifyClientCallback(%d)", has_data);
         if (has_data) {
           k_sem_give(&this->data_processing_semaphore_);
           int rc = gpio_pin_set_dt(&this->interrupt_, CROS_DSP_GPIO_ON);
-          LOG_DBG("asserting GPIO (%d)", rc);
+          LOG_ERR("asserting GPIO (%d)", rc);
         } else {
           int rc = gpio_pin_set_dt(&this->interrupt_, CROS_DSP_GPIO_OFF);
-          LOG_DBG("deasserting GPIO (%d)", rc);
+          LOG_ERR("deasserting GPIO (%d)", rc);
         }
       }) {
   int rc = k_sem_init(&data_processing_semaphore_, 1, 1);
@@ -344,14 +344,14 @@ pw::Status cros::dsp::service::Driver::Init() {
 
   if (ish_enabled == ISH_DISABLED) {
     // Match, disable the service
-    LOG_INF("Disabling DSP comms service");
+    LOG_ERR("Disabling DSP comms service");
     return pw::OkStatus();
   }
 #endif
   k_work_init(&get_cbi_flags_work_, dsp_service_handle_get_cbi_flags_request);
   k_work_init_delayable(&mode_handling_work_, mode_handling_delayed);
 
-  LOG_INF("Setting up target %s::0x%02x", bus_->name, target_cfg_.address);
+  LOG_ERR("Setting up target %s::0x%02x", bus_->name, target_cfg_.address);
 
   rc |= i2c_target_register(bus_, &target_cfg_);
   PW_CHECK_INT_EQ(rc, 0);
@@ -364,7 +364,7 @@ pw::Status cros::dsp::service::Driver::Init() {
   rc |= gpio_pin_set_dt(&interrupt_, CROS_DSP_GPIO_OFF);
   PW_CHECK_INT_EQ(rc, 0);
 
-  LOG_INF("DSP Initialization rc=%d", rc);
+  LOG_ERR("DSP Initialization rc=%d", rc);
   if (rc == 0) {
     // Start off in notebook mode until DSP has a chance to calculate lid angle
     if (IS_ENABLED(CONFIG_PLATFORM_EC_DSP_REMOTE_LID_ANGLE)) {
@@ -382,7 +382,7 @@ pw::Status cros::dsp::service::Driver::Init() {
 
 void dsp_service_hook_lid_change() {
   bool is_lid_open = lid_is_open() != 0;
-  LOG_DBG("is_lid_open=%d", is_lid_open);
+  LOG_ERR("is_lid_open=%d", is_lid_open);
   cros::dsp::service::driver.transport_.SetStatusBit(
       cros_dsp_comms_StatusFlag_STATUS_FLAG_LID_OPEN, is_lid_open);
 }
@@ -392,7 +392,7 @@ DECLARE_HOOK(HOOK_INIT, dsp_service_hook_lid_change, HOOK_PRIO_DEFAULT);
 #ifdef CONFIG_PLATFORM_EC_TABLET_MODE
 void dsp_service_hook_tablet_mode_change() {
   bool is_in_tablet_mode = !gpio_get_level(GPIO_TABLET_MODE_L);
-  LOG_DBG("is_in_tablet_mode=%d", is_in_tablet_mode);
+  LOG_ERR("is_in_tablet_mode=%d", is_in_tablet_mode);
   cros::dsp::service::driver.transport_.SetStatusBit(
       cros_dsp_comms_StatusFlag_STATUS_FLAG_TABLET_MODE, is_in_tablet_mode);
 }
