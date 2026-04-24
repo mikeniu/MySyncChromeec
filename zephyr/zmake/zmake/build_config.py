@@ -121,6 +121,12 @@ class BuildConfig:
         if cmake_graph:
             cmd.append(f"--graphviz={build_dir}/cmake-build.dot")
 
+        # Build directory won't exist unti the cmake command is run.
+        # Preemptively create it so we can log the full cmake command
+        # for debugging.
+        build_dir.mkdir(parents=True, exist_ok=True)
+        (build_dir / "cmake.cmd").write_text(util.repr_command(cmd) + "\n")
+
         return jobclient.popen(
             cmd,
             **kwargs,
