@@ -10,13 +10,6 @@ charger_i2c: &i2c_smb_0 {
 	port-sel = <0>;
 	scl-gpios = <MCHP_GPIO_DECODE_004 GPIO_OPEN_DRAIN>;
 	sda-gpios = <MCHP_GPIO_DECODE_003 GPIO_OPEN_DRAIN>;
-
-
-	cros_imvp: richtek-imvp@20 {
-		compatible = "richtek,rt3645";
-		status = "okay";
-		reg = <0x20>;
-	};
 };
 
 /* typec-aic1-power */
