@@ -1313,6 +1313,60 @@ config_fatcat() {
   esac
 }
 
+#TODO: Sort out the specifics here
+config_ocelot() {
+  readonly USE_LEGACY_GPIO_API=0
+
+  readonly TRANSPORT="SPI"
+  readonly DEVICE="/dev/spidev0.0"
+
+  # Examine `cat /sys/kernel/debug/pinctrl/INTC1083:00/gpio-ranges` on a
+  # ocelot device to determine gpio number from pin number.
+
+  # cat /sys/kernel/debug/pinctrl/INTC10EC\:00/gpio-ranges                         <
+  # GPIO ranges handled:
+  # 0: INTC10EC:00 GPIOS [512 - 535] PINS [0 - 23]
+  # 24: INTC10EC:00 GPIOS [536 - 559] PINS [24 - 47]
+  # cat /sys/kernel/debug/pinctrl/INTC10EC\:01/gpio-ranges                          <
+  # GPIO ranges handled:
+  # 0: INTC10EC:01 GPIOS [560 - 585] PINS [0 - 25]
+  # 26: INTC10EC:01 GPIOS [586 - 610] PINS [26 - 50]
+  # cat /sys/kernel/debug/pinctrl/INTC10EC\:02/gpio-ranges                          <
+  # GPIO ranges handled:
+  # 0: INTC10EC:02 GPIOS [611 - 639] PINS [0 - 28]
+  # 29: INTC10EC:02 GPIOS [640 - 667] PINS [29 - 56]
+  # 57: INTC10EC:02 GPIOS [668 - 681] PINS [57 - 70]
+  # cat /sys/kernel/debug/pinctrl/INTC10EC\:03/gpio-ranges                          <
+  # GPIO ranges handled:
+  # 0: INTC10EC:03 GPIOS [682 - 689] PINS [0 - 7]
+  # 8: INTC10EC:03 GPIOS [690 - 704] PINS [8 - 22]
+  # t /sys/kernel/debug/pinctrl/INTC10EC\:04/gpio-ranges                          <
+  # GPIO ranges handled:
+  # 0: INTC10EC:04 GPIOS [705 - 731] PINS [0 - 26]
+  # 27: INTC10EC:04 GPIOS [732 - 758] PINS [27 - 53]
+  # 54: INTC10EC:04 GPIOS [759 - 776] PINS [54 - 71]
+
+  # Ref: https://edc.intel.com/content/www/us/en/secure/design/confidential/
+  #      publications/wildcat-lake-i-o-registers/gpio-community-1-registers/
+
+  readonly GPIO_CHIP="gpiochip0"
+
+  local model
+  model=$(cros_config / name)
+
+
+  case "${model}" in
+    *)
+      # FPMCU FPS_RST_N(RST_ODL) is on GPP_C15
+      readonly GPIO_NRST=0x1cc
+      # FPMCU FPMCU_FW_UPDATE(BOOT0) is on GPP_E20
+      readonly GPIO_BOOT0=0x01e8
+      # FPMCU_PWREN(FP_PWR_EN) is on GPP_E5
+      readonly GPIO_PWREN=0x01ac
+      ;;
+  esac
+}
+
 config_nissa() {
   readonly USE_LEGACY_GPIO_API=0
 
