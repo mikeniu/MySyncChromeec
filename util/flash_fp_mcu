@@ -1313,6 +1313,34 @@ config_fatcat() {
   esac
 }
 
+#TODO: Sort out the specifics here
+config_ocelot() {
+  readonly USE_LEGACY_GPIO_API=0
+
+  readonly TRANSPORT="SPI"
+  readonly DEVICE="/dev/spidev0.0"
+
+  # Examine `cat /sys/kernel/debug/pinctrl/INTC1083:00/gpio-ranges` on a
+  # ocelot device to determine gpio number from pin number.
+
+  readonly GPIO_CHIP="gpiochip0"
+
+  local model
+  model=$(cros_config / name)
+
+
+  case "${model}" in
+    *)
+      # FPMCU FPS_RST_N(RST_ODL) is on GPP_C15 = 24 + (39 - 24) = 39
+      readonly GPIO_NRST=39
+      # FPMCU FPMCU_FW_UPDATE(BOOT0) is on GPP_E20 = 26 + (46 - 26) = 46
+      readonly GPIO_BOOT0=46
+      # FPMCU_PWREN(FP_PWR_EN) is on GPP_E5 = 26 + (46 - 41) = 31 ???
+      readonly GPIO_PWREN=31
+      ;;
+  esac
+}
+
 config_nissa() {
   readonly USE_LEGACY_GPIO_API=0
 
