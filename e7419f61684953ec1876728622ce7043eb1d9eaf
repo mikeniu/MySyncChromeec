@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49cb0ecf_a49cc2f4",
+        "filename": "core/riscv-rv32i/task.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 649,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-27T12:14:57Z",
+      "side": 1,
+      "message": "hey same comment as in the other pr, no good common place to put these? I\u0027d imagine it may not be worth doing a major refactoring and you prob considered this already but I\u0027ve figure I\u0027d ask anyway",
+      "revId": "e7419f61684953ec1876728622ce7043eb1d9eaf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
