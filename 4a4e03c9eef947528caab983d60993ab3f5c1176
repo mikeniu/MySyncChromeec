@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db7486df_dcfa430d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1160139
+      },
+      "writtenOn": "2026-04-27T18:17:09Z",
+      "side": 1,
+      "message": "Please remember to do the cherry-picks once the CL has landed and verified on ToT build.",
+      "revId": "4a4e03c9eef947528caab983d60993ab3f5c1176",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
