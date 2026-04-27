@@ -119,6 +119,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bd1bdf0d_493e810c",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-27T16:29:44Z",
+      "side": 1,
+      "message": "**Variable Shadowing:** In `iapcontrol.cc` inside `runIapProcess`, the `result` variable is declared at the top level (`int result \u003d 0;`). Further down, it is shadowed multiple times:\n\n```c\nif (auto result \u003d getChecksum(rom)) {\n```\n\n  While valid C++, this can make debugging confusing. \n  \nIt looks like this `result` is never used in the function, so remove this variable and make the function `return 0` at the end.",
+      "range": {
+        "startLine": 104,
+        "startChar": 0,
+        "endLine": 104,
+        "endChar": 16
+      },
+      "revId": "53f5e96a6fdf9b8ef17bf51d73af71f1bcc80a46",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2ce2f863_dfe75f1c",
         "filename": "util/elan/iapcontrol.cc",
         "patchSetId": 7
