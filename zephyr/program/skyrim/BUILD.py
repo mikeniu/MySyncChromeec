@@ -22,6 +22,8 @@ def register_skyrim_project(
             here / project_name / "project.conf",
         ],
         inherited_from=["skyrim"],
+        modules=["cmsis_6", "picolibc", "ec", "pigweed", "nanopb"],
+        snippets=["pw-tokenize"],
     )
 
 
