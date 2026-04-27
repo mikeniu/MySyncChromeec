@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07888598_70253102",
+        "filename": "common/battery.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-04-27T17:43:02Z",
+      "side": 1,
+      "message": "You don\u0027t need this call and the following CL: https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7784915\n\nThe below SHUTDOWN hook and the `battery_cutoff_start()` process will do the job.",
+      "range": {
+        "startLine": 375,
+        "startChar": 0,
+        "endLine": 399,
+        "endChar": 1
+      },
+      "revId": "844b5c3cd679bae3147d080844ce14a96ed23f43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bbca846_2cb69304",
+        "filename": "common/battery.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 584,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-04-27T17:43:02Z",
+      "side": 1,
+      "message": "This condition is unnecessary. The host command can only be issued when the host is powered.",
+      "range": {
+        "startLine": 583,
+        "startChar": 56,
+        "endLine": 584,
+        "endChar": 46
+      },
+      "revId": "844b5c3cd679bae3147d080844ce14a96ed23f43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
