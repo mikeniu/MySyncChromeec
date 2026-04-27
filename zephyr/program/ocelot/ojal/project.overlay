@@ -19,6 +19,13 @@
 #include "keyboard.dtsi"
 #include "fan.dtsi"
 
+/ {
+	cse_early_recovery: cse-early-recovery {
+		compatible = "cros-ec,cse-early-rec";
+		cse-early-rec-gpios = <&gpioa 15 (GPIO_ACTIVE_HIGH)>;
+	};
+};
+
 /* ojal overrides follow... */
 
 &espi0 {
