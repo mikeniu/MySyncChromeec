@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e5a4c44_54927d23",
+        "filename": "core/cortex-m/task.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1013,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-27T12:12:45Z",
+      "side": 1,
+      "message": "this is the same for all arch right? isn\u0027t there a common file where it could go or there\u0027s a good reason to have it replicated for each arch?",
+      "range": {
+        "startLine": 1003,
+        "startChar": 0,
+        "endLine": 1013,
+        "endChar": 1
+      },
+      "revId": "2931e54c4e80a38aaade7bd43f069306f69d90b8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
