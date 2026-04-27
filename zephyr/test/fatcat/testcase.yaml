@@ -1,0 +1,21 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+common:
+  platform_allow:
+    - native_sim
+tests:
+  # Lapis project tests
+  fatcat.lapis:
+    extra_configs:
+      - CONFIG_TEST_PROJECT_LAPIS=y
+
+  fatcat.lapis.battery:
+    extra_dtc_overlay_files:
+      - boards/lapis/battery.dtsi
+    extra_configs:
+      - CONFIG_TEST_PROJECT_LAPIS=y
+      - CONFIG_TEST_PROJECT_BATTERY=y
+      - CONFIG_PLATFORM_EC_HOOKS=y
+      - CONFIG_PLATFORM_EC_BBRAM_TYPE_BBRAM=y
