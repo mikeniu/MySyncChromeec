@@ -50,6 +50,24 @@
       "message": "Any way to add support for replacing cert unconditionally?",
       "revId": "3c67b7f29876f82f1068895c5fb26489f636384b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b84e940_5c4a7089",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-04-27T07:36:57Z",
+      "side": 1,
+      "message": "Currently not. The easiest way to achieve this is to add ifdefs around memcmp depending on CONFIG_ASCP_S_GOOG_MATCH_FILE. If you see the use case for this I can add it. I am just not sure if we want to complicate the code for this.",
+      "parentUuid": "e0c72138_db3f3cd2",
+      "revId": "3c67b7f29876f82f1068895c5fb26489f636384b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
