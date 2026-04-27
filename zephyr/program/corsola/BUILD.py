@@ -14,8 +14,10 @@ def register_corsola_project(
 ):
     """Register a variant of corsola."""
     register_func = register_binman_project
+    modules = ["picolibc", "ec", "pigweed", "nanopb"]
     if chip.startswith("npcx"):
         register_func = register_npcx_project
+        modules.append("cmsis_6")
 
     chip_kconfig = {"it8xxx2/it81202bx": "ite", "npcx9/npcx9m3f": "npcx"}[chip]
     if inherited_from is None:
@@ -31,6 +33,8 @@ def register_corsola_project(
             here / project_name / "project.conf",
         ],
         inherited_from=inherited_from,
+        modules=modules,
+        snippets=["pw-tokenize"],
     )
 
 
