@@ -6,6 +6,11 @@
 #include "battery.h"
 #include "battery_smart.h"
 
+#include "charger.h"
+#include "gpio.h"
+#include "hooks.h"
+#include "chipset.h"
+
 enum battery_present battery_is_present(void)
 {
 	static int retry_cnt;
@@ -40,3 +45,41 @@ enum battery_present battery_is_present(void)
 
 	return BP_YES;
 }
+
+static int ac_poweron_flag;
+static int pwrbtn_poweron_flag;
+
+enum battery_present battery_hw_present(void)
+{
+	static int first_poweron;
+
+	first_poweron++;
+	printk("---%d times on\n", first_poweron);
+
+	if (ac_poweron_flag || pwrbtn_poweron_flag) {
+		return BP_NO;
+	}
+
+	return BP_YES;
+}
+
+static void ac_poweron(void)
+{
+	if (!ac_poweron_flag) {
+		ac_poweron_flag = 1;
+		pwrbtn_poweron_flag = 1;
+		chipset_power_on();
+	}
+}
+DECLARE_HOOK(HOOK_AC_CHANGE, ac_poweron, HOOK_PRIO_DEFAULT);
+
+static void powerbutton_poweron(void)
+{
+	if (!pwrbtn_poweron_flag) {
+		pwrbtn_poweron_flag = 1;
+		ac_poweron_flag = 1;
+		chipset_power_on();
+	}
+}
+DECLARE_HOOK(HOOK_POWER_BUTTON_CHANGE, powerbutton_poweron, HOOK_PRIO_DEFAULT);
+

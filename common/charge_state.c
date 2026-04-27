@@ -1575,6 +1575,23 @@ bool charge_prevent_power_on(bool power_button_pressed)
 	struct batt_params params;
 	struct batt_params *current_batt_params = &curr.batt;
 
+	/*
+	 * Factory override: Always allow power on if WP is disabled,
+	 * except when auto-power-on at EC startup and the battery
+	 * is physically present.
+	 */
+	printk("----prvt=%d before----\n", prevent_power_on);
+	prevent_power_on = (!system_is_locked() &&
+			     (charge_prevent_power_on_automatic_power_on
+#ifdef CONFIG_BATTERY_HW_PRESENT_CUSTOM
+
+			      && battery_hw_present() == BP_YES
+#endif
+			      ));
+
+	printk("----prvt=%d, lock=%d, autopo=%d----\n", prevent_power_on, system_is_locked(), charge_prevent_power_on_automatic_power_on);
+
+
 	/* If battery params seem uninitialized then retrieve them */
 	if (current_batt_params->is_present == BP_NOT_SURE) {
 		battery_get_params(&params);
@@ -1605,19 +1622,6 @@ bool charge_prevent_power_on(bool power_button_pressed)
 	    current_batt_params->state_of_charge <
 		    CONFIG_CHARGER_MIN_BAT_PCT_FOR_POWER_ON)
 		prevent_power_on = 1;
-
-	/*
-	 * Factory override: Always allow power on if WP is disabled,
-	 * except when auto-power-on at EC startup and the battery
-	 * is physically present.
-	 */
-	prevent_power_on &= (system_is_locked() ||
-			     (charge_prevent_power_on_automatic_power_on
-#ifdef CONFIG_BATTERY_HW_PRESENT_CUSTOM
-
-			      && battery_hw_present() == BP_YES
-#endif
-			      ));
 
 	/*
 	 * If the battery is too cold, is_battery_critical() would
