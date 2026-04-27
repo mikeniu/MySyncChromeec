@@ -5,6 +5,11 @@
 
 #include "battery.h"
 #include "battery_smart.h"
+#include "bbram.h"
+#include "chipset.h"
+#include "hooks.h"
+
+#include <zephyr/drivers/bbram.h>
 
 enum battery_present battery_is_present(void)
 {
@@ -40,3 +45,57 @@ enum battery_present battery_is_present(void)
 
 	return BP_YES;
 }
+
+static const struct device *const bbram_dev =
+	COND_CODE_1(DT_HAS_CHOSEN(cros_ec_bbram),
+		    DEVICE_DT_GET(DT_CHOSEN(cros_ec_bbram)), NULL);
+
+static int poweron_flag;
+
+enum battery_present battery_hw_present(void)
+{
+	static int try_cnt;
+
+	try_cnt++;
+	printk("---%d times try\n", try_cnt);
+
+	if (poweron_flag) {
+		return BP_NO;
+	}
+
+	return BP_YES;
+}
+
+static void control_poweron(void)
+{
+	if (!poweron_flag) {
+		poweron_flag = 1;
+		printk("--------power on!--------\n");
+		chipset_power_on();
+	}
+}
+DECLARE_HOOK(HOOK_AC_CHANGE, control_poweron, HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_POWER_BUTTON_CHANGE, control_poweron, HOOK_PRIO_DEFAULT);
+
+static void check_first_boot(void)
+{
+	uint32_t board_batt_keep_val = 0;
+
+	bbram_read(bbram_dev, BBRAM_REGION_OFFSET(board_batt_keep),
+		   BBRAM_REGION_SIZE(board_batt_keep),
+		   (uint8_t *)&board_batt_keep_val);
+
+	if (board_batt_keep_val == 0xA5A5A5A5) {
+		// batt exist before
+		poweron_flag = 1;
+		printk("----booted before\n");
+	} else {
+		board_batt_keep_val = 0xA5A5A5A5;
+		bbram_write(bbram_dev, BBRAM_REGION_OFFSET(board_batt_keep),
+			    BBRAM_REGION_SIZE(board_batt_keep),
+			    (uint8_t *)&board_batt_keep_val);
+		poweron_flag = 0;
+		printk("----first active\n");
+	}
+}
+DECLARE_HOOK(HOOK_INIT, check_first_boot, HOOK_PRIO_DEFAULT + 1);
