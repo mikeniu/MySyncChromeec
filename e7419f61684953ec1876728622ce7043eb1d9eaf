@@ -16,6 +16,24 @@
       "message": "hey same comment as in the other pr, no good common place to put these? I\u0027d imagine it may not be worth doing a major refactoring and you prob considered this already but I\u0027ve figure I\u0027d ask anyway",
       "revId": "e7419f61684953ec1876728622ce7043eb1d9eaf",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24f48747_eb1c318c",
+        "filename": "core/riscv-rv32i/task.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 649,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-04-27T20:47:28Z",
+      "side": 1,
+      "message": "There\u0027s no common task.c. Much of task.c is architecture specific. Some chunks could be moved to a common tasks.c file. I will investigate doing this in a separate CL.",
+      "parentUuid": "49cb0ecf_a49cc2f4",
+      "revId": "e7419f61684953ec1876728622ce7043eb1d9eaf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
