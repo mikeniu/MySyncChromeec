@@ -68,6 +68,24 @@
       "parentUuid": "e0c72138_db3f3cd2",
       "revId": "3c67b7f29876f82f1068895c5fb26489f636384b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1442bc39_f8aac2c0",
+        "filename": "zephyr/subsys/ascp/mem_map.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-27T13:06:59Z",
+      "side": 1,
+      "message": "I\u0027m fine with the current state for now. If needed, this can be added in the future.",
+      "parentUuid": "3b84e940_5c4a7089",
+      "revId": "3c67b7f29876f82f1068895c5fb26489f636384b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
