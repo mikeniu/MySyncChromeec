@@ -221,6 +221,8 @@ static inline bool charge_prevent_power_on(bool power_button_pressed)
 }
 #endif
 
+int custom_prevent_power_on(void);
+
 /**
  * Get the last polled battery/charger temperature.
  *
