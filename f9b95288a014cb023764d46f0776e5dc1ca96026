@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e98d6af3_7525c368",
+        "filename": "zephyr/program/ocelot/ojal/project.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-04-27T21:55:15Z",
+      "side": 1,
+      "message": "@mgoodey@google.com: All other Ocelot boards configure this as open-drain. Should this be as well? It appears Ojal has not been setting the CSE early recovery GPIO at all so far.",
+      "range": {
+        "startLine": 25,
+        "startChar": 24,
+        "endLine": 25,
+        "endChar": 55
+      },
+      "revId": "f9b95288a014cb023764d46f0776e5dc1ca96026",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
