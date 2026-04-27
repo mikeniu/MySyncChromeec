@@ -833,7 +833,8 @@ void i2c_master_int_handler (int controller)
 		 * Disable smb's interrupts to forbid ec to enter ISR again
 		 * before executing error recovery.
 		 */
-		    p_status->oper_state != SMB_WRITE_SUSPEND) {
+		if (IS_BIT_SET(NPCX_SMBST(controller), NPCX_SMBST_SDAST) &&
+		    p_status->oper_state == SMB_IDLE) {
 #if DEBUG_I2C
 			cprints(CC_I2C, "i2c %d unknown state %d, error %d\n",
 				controller, p_status->oper_state,
