@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a05c257a_03cada7c",
+        "filename": "zephyr/emul/emul_realtek_rts54xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 801,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-27T20:13:46Z",
+      "side": 1,
+      "message": "\u003e So this check was redundant, because get_vdo.vdo_req.num_vdos is defined as only 3 bits so max value is 7. I can add check for this but compiler already enforce check for num_vdos.\n\nAck\n\n\u003e I don\u0027t think we write up to vdo_index. We write the VDO at specific index meaning we can have VDOs arr as [0,0,0,0x1111,0,0] but this is what we want.\n\u003e\n\u003e I also check vdo_index \u003c RTS54XX_VDO_MAX_NUM so it is not possible to read outside of arr.\n\nWhat I mean is that if the index in element 2 is invalid, this function will read a store VDOs for the valid indices in elements 0 and 1 and then return an error. I would have expected that if any index was invalid, it would return an error, not modify `vdo` at all, and set `byte_count` to 0 or something.\n\nBut the behavior of the emulator should match the actual chip, which is why I asked about the observed behavior.\n\nIt looks like your test is now checking that `vdo` is not modified with an invalid index, so maybe I\u0027m still missing something here.",
+      "parentUuid": "5d8f1b5e_7fa2f8f6",
+      "revId": "b9914d391a6d94f86ba6e2502f42b79f068f7f72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0af06abb_13ee8608",
         "filename": "zephyr/emul/emul_realtek_rts54xx.c",
         "patchSetId": 6
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "In device API for PDCs there is no set_vdo at the moment. So this function is purely for testing purposes and there is no implementation of this for PDCs. \n\nBut get_vdo expects list of types for all PDCs. And with previous solution this was ignored since only num_of_vdo was taken into account. \n\nI am not sure what will be approach for setting VDO for other PDCs. It seems to be more complicated.",
       "parentUuid": "10ecbb0b_61c3da4f",
+      "revId": "b9914d391a6d94f86ba6e2502f42b79f068f7f72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84506598_43b07bdd",
+        "filename": "zephyr/include/emul/emul_pdc.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-27T20:13:46Z",
+      "side": 1,
+      "message": "Hmm, UCSI really isn\u0027t doing you any favors here. If you can think of a workable common interface, please use that. If not, you can leave a TODO here that the interface may need to change when we support other PDCs.",
+      "parentUuid": "d8e4cdca_6a3e6fbc",
       "revId": "b9914d391a6d94f86ba6e2502f42b79f068f7f72",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
