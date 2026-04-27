@@ -33,6 +33,40 @@
       "message": "The previous build (https://cr-buildbucket.appspot.com/build/8683434599885946033) is being automatically retried for the following reasons:\n- Some tests are now retryable:rauru-cq.navi.hw.fingerprint-cq, brya-cq.crota360.hw.fingerprint-cq\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
       "revId": "3e156254dd90f4eb666bff6341b62a85622979ec",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ccbbc4c_fc4c4640",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 1
+      },
+      "lineNbr": 1335,
+      "author": {
+        "id": 1369019
+      },
+      "writtenOn": "2026-04-27T17:23:08Z",
+      "side": 1,
+      "message": "Matsu is using USB2 instead of SPI for FPS.\nGPP_H17 is disconnected\nGPP_F20 should be the universal EC_SOC_REC_SWITCH_OD signal, not any FPS signal \nGPP_H03 is disconnected",
+      "revId": "3e156254dd90f4eb666bff6341b62a85622979ec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed0f7a94_84cef13a",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 1
+      },
+      "lineNbr": 1352,
+      "author": {
+        "id": 1369019
+      },
+      "writtenOn": "2026-04-27T17:23:08Z",
+      "side": 1,
+      "message": "Are these generic defaults unless overridden?  What are lines 1348 to 1353?\n\nWhile GPP_C15 is the FPS reset, GPP_E20 is firmware update, GPP_E19 is actually the FP_SOC_INT_L on both the RVP and Ocelot paper design.  GPP_E19 is *not* the FP_PWR_EN signal.  FP_PWR_EN is actually on GPP_E05.",
+      "revId": "3e156254dd90f4eb666bff6341b62a85622979ec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
