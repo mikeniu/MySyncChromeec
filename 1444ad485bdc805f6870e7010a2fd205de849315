@@ -47,6 +47,54 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bfa41c37_253515c5",
+        "filename": "common/battery.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-04-27T13:35:14Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "327ec25a_26c7b2c0",
+      "range": {
+        "startLine": 572,
+        "startChar": 46,
+        "endLine": 572,
+        "endChar": 47
+      },
+      "revId": "1444ad485bdc805f6870e7010a2fd205de849315",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51e2bd09_6e5579c2",
+        "filename": "common/battery.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-04-27T13:35:14Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "382a40e2_9f84b920",
+      "range": {
+        "startLine": 572,
+        "startChar": 26,
+        "endLine": 572,
+        "endChar": 45
+      },
+      "revId": "1444ad485bdc805f6870e7010a2fd205de849315",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e0c644c5_3a132577",
