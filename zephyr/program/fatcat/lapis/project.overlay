@@ -52,6 +52,13 @@ gpio_ec_pch_wake_odl: &gpio_soc_wake_odl {};
 		compatible = "cros-ec,cse-early-rec";
 		cse-early-rec-gpios = <&gpioh 8 (GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH)>;
 	};
+
+	named-bbram-regions {
+		board-batt-keep {
+			offset = <0x88>;
+			size = <0x04>;
+		};
+	};
 };
 
 /* AP interface */
