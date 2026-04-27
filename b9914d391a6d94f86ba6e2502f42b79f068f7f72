@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5d8f1b5e_7fa2f8f6",
+        "filename": "zephyr/emul/emul_realtek_rts54xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 801,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-04-27T14:35:27Z",
+      "side": 1,
+      "message": "So this check was redundant, because `get_vdo.vdo_req.num_vdos` is defined as only 3 bits so max value is 7. I can add check for this but compiler already enforce check for `num_vdos`.\n\nI don\u0027t think we write up to `vdo_index`. We write the VDO at specific index meaning we can have VDOs arr as [0,0,0,0x1111,0,0] but this is what we want. \n\nI also check `vdo_index \u003c RTS54XX_VDO_MAX_NUM` so it is not possible to read outside of arr. \n\nRtk spec says that we pass list of VDO types to `get_vdo` to specify what types we want to get. For `set_vdo` we have list `[uint8_t type1, uint32_t vdo1, uint8_t type2, uint32_t vdo2 ... ]`.   \n\nLet me know if I missed something. \n\n```\nstruct get_vdo_req {\n\t...\n\tunion get_vdo_t vdo_req;\n\tuint8_t vdo_type[7];\n} get_vdo;\n\nunion get_vdo_t {\n\tstruct {\n\t\tuint8_t num_vdos : 3;\n\t\tuint8_t vdo_origin : 2;\n\t\tuint8_t reserved : 3;\n\t};\n\tuint8_t raw_value;\n};\n```",
+      "parentUuid": "55b9b0aa_8ef2335f",
+      "revId": "b9914d391a6d94f86ba6e2502f42b79f068f7f72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0af06abb_13ee8608",
         "filename": "zephyr/emul/emul_realtek_rts54xx.c",
         "patchSetId": 6
@@ -54,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d8e4cdca_6a3e6fbc",
+        "filename": "zephyr/include/emul/emul_pdc.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-04-27T14:35:27Z",
+      "side": 1,
+      "message": "In device API for PDCs there is no set_vdo at the moment. So this function is purely for testing purposes and there is no implementation of this for PDCs. \n\nBut get_vdo expects list of types for all PDCs. And with previous solution this was ignored since only num_of_vdo was taken into account. \n\nI am not sure what will be approach for setting VDO for other PDCs. It seems to be more complicated.",
+      "parentUuid": "10ecbb0b_61c3da4f",
+      "revId": "b9914d391a6d94f86ba6e2502f42b79f068f7f72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "014be133_5f22ff30",
         "filename": "zephyr/test/pdc/src/rts54xx/rts54xx.c",
         "patchSetId": 6
@@ -65,6 +101,24 @@
       "writtenOn": "2026-04-23T18:33:51Z",
       "side": 1,
       "message": "Is there a test of the success case somewhere in here?",
+      "revId": "b9914d391a6d94f86ba6e2502f42b79f068f7f72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00d4be65_f321bcd9",
+        "filename": "zephyr/test/pdc/src/rts54xx/rts54xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-04-27T14:35:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "014be133_5f22ff30",
       "revId": "b9914d391a6d94f86ba6e2502f42b79f068f7f72",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
