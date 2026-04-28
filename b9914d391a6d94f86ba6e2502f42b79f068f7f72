@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8688c034_043ab73b",
+        "filename": "zephyr/emul/emul_realtek_rts54xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 801,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-04-28T08:54:14Z",
+      "side": 1,
+      "message": "I see, I was also thinking about this, but test shows that is not being written in the final response, that\u0027s why I left it like this. I can put checking before main loop to be sure that we are not changing it, let me know what works for you better.",
+      "parentUuid": "a05c257a_03cada7c",
+      "revId": "b9914d391a6d94f86ba6e2502f42b79f068f7f72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0af06abb_13ee8608",
         "filename": "zephyr/emul/emul_realtek_rts54xx.c",
         "patchSetId": 6
@@ -120,6 +138,24 @@
       "side": 1,
       "message": "Hmm, UCSI really isn\u0027t doing you any favors here. If you can think of a workable common interface, please use that. If not, you can leave a TODO here that the interface may need to change when we support other PDCs.",
       "parentUuid": "d8e4cdca_6a3e6fbc",
+      "revId": "b9914d391a6d94f86ba6e2502f42b79f068f7f72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "daf0b4ff_e240d8a5",
+        "filename": "zephyr/include/emul/emul_pdc.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-04-28T08:54:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "84506598_43b07bdd",
       "revId": "b9914d391a6d94f86ba6e2502f42b79f068f7f72",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
