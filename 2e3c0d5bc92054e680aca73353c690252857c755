@@ -3,6 +3,98 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "38417e5a_c0463540",
+        "filename": "util/elan/filecontrol.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-28T17:53:44Z",
+      "side": 1,
+      "message": "Use [`#define` guards](https://google.github.io/styleguide/cppguide.html#The__define_Guard) instead of `#pragma once`.",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 12
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa154754_a6e65543",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-28T17:53:44Z",
+      "side": 1,
+      "message": "Remove this comment. It\u0027s obvious that it\u0027s a constructor.",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 14
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08cedd80_416e8722",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-28T17:53:44Z",
+      "side": 1,
+      "message": "Remove this comment. It\u0027s obvious that it\u0027s a destructor.",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 13
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c7fa60e_ff711363",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-28T17:53:44Z",
+      "side": 1,
+      "message": "```suggestion\n\t\tlogInfo(\"[IAP] {} - return command code does not match (0x{:02X})\\n\",\n```",
+      "range": {
+        "startLine": 313,
+        "startChar": 0,
+        "endLine": 313,
+        "endChar": 71
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "10e3653b_5f7b12a9",
         "filename": "util/elan/iapcontrol.cc",
         "patchSetId": 8
@@ -14,6 +106,30 @@
       "writtenOn": "2026-04-28T17:13:40Z",
       "side": 1,
       "message": "* **Over-engineered State Machine in `connectDevice`:** The logic involving `m_deviceCount` and `DEVSTA_EXISTED` in `connectDevice` appears to be designed for an application that continuously polls for a USB device. Since `connectDevice` is only called *once* inside `initialize()`, `m_deviceCount` will always be `0`, making the `DEVSTA_EXISTED` and `DEVSTA_REMOVE` branches dead code.  \n    \n  * *Remediation:* Simplify the connection logic. Just check if the device is present, open it, and return a simple boolean or `0`/`-1` success code.",
+      "range": {
+        "startLine": 541,
+        "startChar": 0,
+        "endLine": 572,
+        "endChar": 1
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b640453_20803fdf",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-28T17:53:44Z",
+      "side": 1,
+      "message": "Double-check the above analysis from Gemini and the following suggestion before using it:\n\n----\n\n### The Original Code (The State Machine)\n\nHere is a simplified look at your original `connectDevice` logic:\n\n```cpp\nint iapcontrol::connectDevice(uint16_t vid, uint16_t pid)\n{\n\tint count \u003d getDeviceCount(vid, pid);\n\n\tif (count \u003e 0) {\n\t\tif (m_deviceCount) {\n\t\t\treturn DEVSTA_EXISTED; // Dead code\n\t\t}\n\n\t\tif (openDevice(vid, pid) !\u003d 0) {\n\t\t\treturn DEVSTA_NON;\n\t\t}\n\n\t\tm_deviceCount \u003d count;\n\t\treturn DEVSTA_INSERT;\n\t}\n\n\tif (m_deviceCount) {\n\t\treleaseResource();\n\t\tm_deviceCount \u003d 0;\n\t\treturn DEVSTA_REMOVE; // Dead code\n\t}\n\n\treturn DEVSTA_NON;\n}\n```\n\n### Why it is Over-engineered (The Reality)\n\nTo understand why this is overly complex, we have to look at **how** and **when** this function is called. In your patch, `connectDevice` is only called in one place: inside `initialize()`.\n\n```cpp\nint iapcontrol::initialize(uint16_t vid, uint16_t pid)\n{\n    // ... setup ...\n\tm_deviceStatus \u003d connectDevice(vid, pid);\n    // ...\n}\n```\n\nAnd `initialize()` is only called once, right after the `iapcontrol` object is created in `main()`:\n\n```cpp\nElanApp::iapcontrol iapCtrl;\nif (iapCtrl.initialize(cmdLine-\u003evid, cmdLine-\u003epid) !\u003d 0) { ... }\n```\n\nBecause `iapcontrol` is freshly created, its member variable `m_deviceCount` is always `0` when `connectDevice` runs. Because `m_deviceCount` is always `0`, **two of your branches are mathematically impossible to reach:**\n\n1.  **`DEVSTA_EXISTED`:** This requires `count \u003e 0` and `m_deviceCount !\u003d 0`. It will never happen.\n2.  **`DEVSTA_REMOVE`:** This requires `count \u003d\u003d 0` and `m_deviceCount !\u003d 0`. It will never happen.\n\nThe code was written as if `connectDevice()` was going to be called in a continuous `while (true)` loop on a background thread to monitor USB hot-plug events. Since it\u0027s just a one-shot initialization for a command-line tool, all that state-tracking is dead weight.\n\n### The Refactored Solution\n\nFor a command-line utility that runs once and exits, you don\u0027t need to track states or count devices. You just need to ask one question: **\"Can I find and open this device right now?\"**\n\nHere is how you can drastically simplify that function:\n\n```cpp\n// Returns 0 on success, or -1 on failure.\nint iapcontrol::connectDevice(uint16_t vid, uint16_t pid)\n{\n\t// We only care if AT LEAST one device exists.\n\tif (getDeviceCount(vid, pid) \u003c\u003d 0) {\n\t\tlogInfo(\"[IAP] {} - device not found\\n\", __func__);\n\t\treturn -1;\n\t}\n\n\t// Try to open it\n\tif (openDevice(vid, pid) !\u003d 0) {\n\t\tlogInfo(\"[IAP] {} - failed to open and claim usb device\\n\", __func__);\n\t\treturn -1;\n\t}\n\n\treturn 0; // Success!\n}\n```\n\nBy removing the `DEVSTA_*` macros and the `m_deviceCount` variable, your code becomes strictly linear, much easier to read, and does exactly what the tool requires without the unnecessary overhead.",
+      "parentUuid": "10e3653b_5f7b12a9",
       "range": {
         "startLine": 541,
         "startChar": 0,
@@ -65,6 +181,190 @@
         "startChar": 0,
         "endLine": 926,
         "endChar": 1
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6325603f_f02149ce",
+        "filename": "util/elan/iapcontrol.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-28T17:53:44Z",
+      "side": 1,
+      "message": "Use [`#define` guards](https://google.github.io/styleguide/cppguide.html#The__define_Guard) instead of `#pragma once`.",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 12
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6035bf36_f2bfd011",
+        "filename": "util/elan/iapcontrol.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-28T17:53:44Z",
+      "side": 1,
+      "message": "* **Class Naming Conventions:** The class `iapcontrol` violates standard ChromiumOS/C++ naming conventions.  \n    \n  * *Remediation:* Rename it to PascalCase (`IapControl`) to clearly distinguish it from variables and functions.",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 18
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24da4b83_bb1119e1",
+        "filename": "util/elan/iapcontrol.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-28T17:53:44Z",
+      "side": 1,
+      "message": "* **Duplicate and Redundant Logging:** You have defined `logInfo` twice—once as a method in `iapcontrol` and once as a global template in `iaptool.cc`. Both wrap `std::cout \u003c\u003c std::format(...)`.  \n    \n  * *Remediation:* Consolidate these into a single utility header or use standard output. Also, note that C++23 introduces `std::print`. If your build environment supports it, you can replace all of this custom logging with `std::println`.",
+      "range": {
+        "startLine": 91,
+        "startChar": 0,
+        "endLine": 95,
+        "endChar": 2
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb628ef3_9024a640",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-28T17:53:44Z",
+      "side": 1,
+      "message": "Typo in this comment. Let\u0027s just remove it.",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 16
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4aa8ad65_7c115325",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-28T17:53:44Z",
+      "side": 1,
+      "message": "This comment isn\u0027t really useful since it just repeats the class name. Let\u0027s remove it.",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 23
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc791768_a99445a7",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-28T17:53:44Z",
+      "side": 1,
+      "message": "```suggestion\n\tlogInfo(\"[IAP] Parse Command Line - File Path: {}\\n\",\n```",
+      "range": {
+        "startLine": 133,
+        "startChar": 0,
+        "endLine": 133,
+        "endChar": 55
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0d9561d_a7fde245",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-28T17:53:44Z",
+      "side": 1,
+      "message": "Let\u0027s remove this comment.",
+      "range": {
+        "startLine": 165,
+        "startChar": 0,
+        "endLine": 165,
+        "endChar": 18
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "839970ea_c1ef86e7",
+        "filename": "util/elan/iaptool.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-28T17:53:44Z",
+      "side": 1,
+      "message": "Use [`#define` guards](https://google.github.io/styleguide/cppguide.html#The__define_Guard) instead of `#pragma once`.",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 12
       },
       "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
