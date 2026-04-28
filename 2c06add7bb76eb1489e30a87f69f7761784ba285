@@ -70,6 +70,24 @@
       "parentUuid": "9c9fcadc_9766e9c1",
       "revId": "2c06add7bb76eb1489e30a87f69f7761784ba285",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14184f44_cf02a199",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-28T11:24:43Z",
+      "side": 1,
+      "message": "I\u0027m not saying we should remove the check in priv lib. So, the check would make sense for the minimal supported image size, right? Is that possible? If not, please adjust tests, not add a custom code only to pass the tests.",
+      "parentUuid": "9a736a3a_24d9f384",
+      "revId": "2c06add7bb76eb1489e30a87f69f7761784ba285",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
