@@ -34,6 +34,24 @@
       "parentUuid": "e096b2d2_74e7bc67",
       "revId": "29743ea8ce6bd6250805ed11c475b2029059fcd0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c578951c_ce14404c",
+        "filename": "zephyr/dts/bindings/btn_ign/cros-ec,btn-ign.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-28T10:23:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "237385aa_02e7f6cc",
+      "revId": "29743ea8ce6bd6250805ed11c475b2029059fcd0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
