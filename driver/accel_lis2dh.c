@@ -17,12 +17,255 @@
 #include "hwtimer.h"
 #include "i2c.h"
 #include "math_util.h"
+#include "motion_sense_fifo.h"
 #include "task.h"
 #include "util.h"
+
+#ifdef CONFIG_ACCEL_LIS2DH_INT_EVENT
+#define ACCEL_LIS2DH_INT_ENABLE
+#endif
 
 #define CPUTS(outstr) cputs(CC_ACCEL, outstr)
 #define CPRINTS(format, args...) cprints(CC_ACCEL, format, ##args)
 #define CPRINTF(format, args...) cprintf(CC_ACCEL, format, ##args)
+
+STATIC_IF(ACCEL_LIS2DH_INT_ENABLE)
+volatile uint32_t last_interrupt_timestamp;
+
+static int lis2dh_int_count;
+static int lis2dh_log_count;
+
+struct lis2dh_reg {
+	int reg;
+	int val;
+	char name[20];
+};
+
+static struct lis2dh_reg lis2dh_debug[] = {
+	{LIS2DH_CTRL1_ADDR, 0, "CTRL1_REG"},
+	{LIS2DH_CTRL2_ADDR, 0, "CTRL2_REG"},
+	{LIS2DH_CTRL3_ADDR, 0, "CTRL3_REG"},
+	{LIS2DH_CTRL4_ADDR, 0, "CTRL4_REG"},
+	{LIS2DH_CTRL5_ADDR, 0, "CTRL5_REG"},
+	{LIS2DH_CTRL6_ADDR, 0, "CTRL6_REG"},
+	{LIS2DH_STATUS_REG, 0, "STATUS_REG"},
+	{LIS2DH_FIFO_CTRL_ADDR, 0, "FIFO_CTRL"},
+	{LIS2DH_FIFO_SRC_ADDR, 0, "FIFO_SRC"},
+	{LIS2DH_INT1_SRC_ADDR, 0, "INT1_SRC"},
+};
+
+static void lis2dh_dump_regs(struct motion_sensor_t *s)
+{
+	int i;
+
+	for (i = 0; i < ARRAY_SIZE(lis2dh_debug); i++) {
+		st_raw_read8(s->port, s->i2c_spi_addr_flags,
+			     lis2dh_debug[i].reg, &lis2dh_debug[i].val);
+	}
+
+	for (i = 0; i < ARRAY_SIZE(lis2dh_debug); i++) {
+		CPRINTS("%s\t: 0x%02x", lis2dh_debug[i].name,
+			lis2dh_debug[i].val);
+	}
+}
+
+
+/**
+ * lis2dh_enable_fifo - Enable/Disable FIFO in LIS2DH
+ * @s: Motion sensor pointer
+ * @mode: fifo_modes
+ */
+static __maybe_unused int lis2dh_enable_fifo(const struct motion_sensor_t *s,
+					       enum lis2dh_fmode mode)
+{
+	return st_write_data_with_mask(s, LIS2DH_FIFO_CTRL_ADDR,
+				       LIS2DH_FIFO_MODE_MASK, mode);
+}
+
+/**
+ * lis2dh_config_interrupt- Configure interrupt for supported features.
+ * @s: Motion sensor pointer
+ *
+ * Must works with interface mutex locked
+ */
+static __maybe_unused int
+lis2dh_config_interrupt(const struct motion_sensor_t *s)
+{
+	/* Configure FIFO watermark level. */
+	RETURN_ERROR(st_write_data_with_mask(s, LIS2DH_FIFO_CTRL_ADDR,
+					     LIS2DH_FIFO_THRESHOLD_MASK, 1));
+
+	/* Enable FIFO */
+	RETURN_ERROR(st_write_data_with_mask(s, LIS2DH_CTRL5_ADDR,
+					     LIS2DH_CTRL5_FIFO_EN_MASK, 0x5));
+
+	/* Connect FIFO Trigger to INT1 */
+	RETURN_ERROR(st_write_data_with_mask(s, LIS2DH_FIFO_CTRL_ADDR,
+					     LIS2DH_FIFO_CTRL_TR_MASK, 0));
+
+	RETURN_ERROR(s->drv->enable_interrupt(s, true));
+	CPRINTS("lis2sh: Interupts enabled!!");
+
+	lis2dh_int_count = 0;
+	lis2dh_log_count = 0;
+
+	return EC_SUCCESS;
+}
+
+#ifdef ACCEL_LIS2DH_INT_ENABLE
+/**
+ * Load data from internal sensor FIFO.
+ * @s: Motion sensor pointer
+ */
+static int lis2dh_load_fifo(struct motion_sensor_t *s, int nsamples,
+			      uint32_t timestamp)
+{
+	int ret, left, length, i;
+	int *axis = s->raw_xyz;
+	uint8_t fifo[FIFO_READ_LEN];
+
+	/* Each sample are OUT_XYZ_SIZE bytes. */
+	left = nsamples * OUT_XYZ_SIZE;
+
+	do {
+		/*
+		 * Limit FIFO read data to burst of FIFO_READ_LEN size because
+		 * read operatios in under i2c mutex lock.
+		 */
+		if (left > FIFO_READ_LEN)
+			length = FIFO_READ_LEN;
+		else
+			length = left;
+
+		ret = st_raw_read_n(s->port, s->i2c_spi_addr_flags,
+				    LIS2DH_OUT_X_L_ADDR, fifo, length);
+		if (ret != EC_SUCCESS)
+			return ret;
+
+		for (i = 0; i < length; i += OUT_XYZ_SIZE) {
+			/* Apply precision, sensitivity and rotation vector. */
+			st_normalize(s, axis, &fifo[i]);
+
+			if (IS_ENABLED(CONFIG_ACCEL_SPOOF_MODE) &&
+			    s->flags & MOTIONSENSE_FLAG_IN_SPOOF_MODE)
+				axis = s->spoof_xyz;
+			if (IS_ENABLED(CONFIG_ACCEL_FIFO)) {
+				struct ec_response_motion_sensor_data vect;
+				/* Fill vector array. */
+				vect.data[X] = axis[X];
+				vect.data[Y] = axis[Y];
+				vect.data[Z] = axis[Z];
+				vect.flags = 0;
+				vect.sensor_num = s - motion_sensors;
+				motion_sense_fifo_stage_data(&vect, s, 3,
+							     timestamp);
+			} else {
+				motion_sense_push_raw_xyz(s);
+			}
+			left -= length;
+		}
+	} while (left > 0);
+
+	return EC_SUCCESS;
+}
+
+/**
+ * lis2dh_get_fifo_samples - check for stored FIFO samples.
+ */
+static int lis2dh_get_fifo_samples(struct motion_sensor_t *s, int *nsamples)
+{
+	int ret, tmp;
+
+	ret = st_raw_read8(s->port, s->i2c_spi_addr_flags,
+			   LIS2DH_FIFO_SRC_ADDR, &tmp);
+	if (ret != EC_SUCCESS)
+		return ret;
+
+	*nsamples = tmp & LIS2DH_FIFO_DIFF_MASK;
+
+	return EC_SUCCESS;
+}
+
+/**
+ * lis2dh_interrupt - interrupt from int pin of sensor
+ * Schedule Motion Sense Task to manage Interrupts.
+ */
+test_mockable void lis2dh_interrupt(enum gpio_signal signal)
+{
+	last_interrupt_timestamp = __hw_clock_source_read();
+
+	lis2dh_int_count++;
+	task_set_event(TASK_ID_MOTIONSENSE, CONFIG_ACCEL_LIS2DH_INT_EVENT);
+}
+
+/**
+ * lis2dh_irq_handler - bottom half of the interrupt stack.
+ */
+static int lis2dh_irq_handler(struct motion_sensor_t *s, uint32_t *event)
+{
+	uint32_t interrupt_timestamp = last_interrupt_timestamp;
+	bool commit_needed = false;
+	int nsamples;
+	/* int src, ctrl; */
+
+	/* if ((lis2dh_log_count % 10) == 0) { */
+	/* 	st_raw_read8(s->port, s->i2c_spi_addr_flags, */
+	/* 		     LIS2DH_FIFO_SRC_ADDR, &src); */
+	/* 	st_raw_read8(s->port, s->i2c_spi_addr_flags, */
+	/* 		     LIS2DH_FIFO_CTRL_ADDR, &ctrl); */
+	/* 	CPRINTS("[%d]: ctrl = %02x, src = %02x: int_count = %d", */
+	/* 		lis2dh_log_count, ctrl, src, */
+	/* 		lish2dh_int_count); */
+	/* } */
+
+	if ((lis2dh_log_count % 25) == 0) {
+		lis2dh_dump_regs(s);
+		CPRINTS("log_count = %d, int_count = %d",
+			lis2dh_log_count, lis2dh_int_count);
+	}
+	lis2dh_log_count++;
+
+	if ((!(*event & CONFIG_ACCEL_LIS2DH_INT_EVENT)) ||
+	    motion_sensor_in_forced_mode(s)) {
+		/* CPRINTS("[%d]: event %08x LIS2DH_INT_EVENT = %08x, forced = %d", */
+		/* 	lish2dh_int_count, */
+		/* 	*event,(uint32_t)CONFIG_ACCEL_LIS2DH_INT_EVENT, */
+		/* 	motion_sensor_in_forced_mode(s)); */
+		return EC_ERROR_NOT_HANDLED;
+	}
+
+	CPRINTS("lis2dh: irq_handle getting data");
+	do {
+		RETURN_ERROR(lis2dh_get_fifo_samples(s, &nsamples));
+
+		if (nsamples != 0) {
+			commit_needed = true;
+			RETURN_ERROR(lis2dh_load_fifo(s, nsamples,
+							interrupt_timestamp));
+		}
+	} while (nsamples != 0);
+
+	if (IS_ENABLED(CONFIG_ACCEL_FIFO) && commit_needed)
+		motion_sense_fifo_commit_data();
+	CPRINTS("lis2dh: fifo loaded");
+
+	return EC_SUCCESS;
+}
+
+static int lis2dh_enable_interrupt(const struct motion_sensor_t *s,
+				     bool enable)
+{
+	/* Enable interrupt on FIFO watermark and route to int1. */
+	RETURN_ERROR(st_write_data_with_mask(s, LIS2DH_INT1_FTH_ADDR,
+					     LIS2DH_INT1_FTH_MASK, enable));
+	/* Enable interrupt on FIFO watermark and route to int1. */
+	RETURN_ERROR(st_write_data_with_mask(s, LIS2DH_INT1_FTH_ADDR,
+					     0x10, enable));
+
+	return EC_SUCCESS;
+}
+#endif
+
 
 /**
  * set_range - set full scale range
@@ -32,8 +275,9 @@
  */
 static int set_range(struct motion_sensor_t *s, int range, int rnd)
 {
-	int err, normalized_range;
+	int normalized_range;
 	int val;
+	int err = EC_SUCCESS;
 
 	val = LIS2DH_FS_TO_REG(range);
 	normalized_range = ST_NORMALIZE_RATE(range);
@@ -57,15 +301,38 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 	 * to write accel parameters until we are done.
 	 */
 	mutex_lock(s->mutex);
+	/*
+	 * FIFO stop collecting events. Restart FIFO in Bypass mode.
+	 * If Range is changed all samples in FIFO must be discharged because
+	 * with a different sensitivity.
+	 */
+	if (IS_ENABLED(ACCEL_LIS2DH_INT_ENABLE)) {
+		err = lis2dh_enable_fifo(s, LIS2DH_FIFO_BYPASS_MODE);
+		if (err != EC_SUCCESS)
+			goto unlock_rate;
+	}
+
 	err = st_write_data_with_mask(s, LIS2DH_CTRL4_ADDR, LIS2DH_FS_MASK,
 				      val);
 
 	/* Save Gain in range for speed up data path */
-	if (err == EC_SUCCESS)
+	if (err == EC_SUCCESS) {
 		s->current_range = normalized_range;
+	} else {
+		goto unlock_rate;
+	}
 
+	/* FIFO restart collecting events in Stream  mode. */
+	if (IS_ENABLED(ACCEL_LIS2DH_INT_ENABLE))
+		err = lis2dh_enable_fifo(s, LIS2DH_STREAM_MODE);
+
+	CPRINTS("lis2dh: set_rate: stream mode enabled");
+	lis2dh_dump_regs(s);
+
+unlock_rate:
 	mutex_unlock(s->mutex);
-	return EC_SUCCESS;
+
+	return err;
 }
 
 static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
@@ -226,10 +493,27 @@ static int init(struct motion_sensor_t *s)
 	if (ret != EC_SUCCESS)
 		goto err_unlock;
 
+	/* Interrupt trigger level of power-on-reset is HIGH */
+	if (IS_ENABLED(ACCEL_LIS2DH_INT_ENABLE)) {
+		ret = st_write_data_with_mask(s, LIS2DH_H_ACTIVE_ADDR,
+					      LIS2DH_H_ACTIVE_MASK,
+					      LIS2DH_EN_BIT);
+		if (ret != EC_SUCCESS)
+			goto err_unlock;
+	}
+
+	if (IS_ENABLED(ACCEL_LIS2DH_INT_ENABLE)) {
+		ret = lis2dh_config_interrupt(s);
+		if (ret != EC_SUCCESS)
+			goto err_unlock;
+	}
+
 	mutex_unlock(s->mutex);
 
 	/* Set default resolution */
 	data->resol = LIS2DH_RESOLUTION;
+
+	lis2dh_dump_regs(s);
 
 	return sensor_init_done(s);
 
@@ -249,4 +533,8 @@ const struct accelgyro_drv lis2dh_drv = {
 	.get_data_rate = st_get_data_rate,
 	.set_offset = st_set_offset,
 	.get_offset = st_get_offset,
+#ifdef ACCEL_LIS2DH_INT_ENABLE
+	.enable_interrupt = lis2dh_enable_interrupt,
+	.irq_handler = lis2dh_irq_handler,
+#endif /* ACCEL_LIS2DW12_INT_ENABLE */
 };
