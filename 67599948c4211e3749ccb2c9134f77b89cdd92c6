@@ -51,6 +51,24 @@
       "parentUuid": "1dac540d_bb627786",
       "revId": "67599948c4211e3749ccb2c9134f77b89cdd92c6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c1b3ecc_983af26f",
+        "filename": "zephyr/test/pdc/src/rts54xx/rts54xx.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-04-28T14:40:00Z",
+      "side": 1,
+      "message": "So 0 was a result of running command not the result of the command itself I added check now for this.",
+      "parentUuid": "d7cd3efe_3ab7dcc5",
+      "revId": "67599948c4211e3749ccb2c9134f77b89cdd92c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
