@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82aa42d6_86ba4366",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-28T07:49:03Z",
+      "side": 1,
+      "message": "At this point, we don\u0027t know if the image size is validated in the priv lib or not. What\u0027s a problem with making the check also here, not only for test purposes.",
+      "revId": "2c06add7bb76eb1489e30a87f69f7761784ba285",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
