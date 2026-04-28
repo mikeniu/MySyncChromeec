@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac4df128_962f7f9d",
+        "filename": "common/host_command.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-04-28T02:15:38Z",
+      "side": 1,
+      "message": "Maybe \"AP_FW %x\" to match what is logged for simplicity.",
+      "range": {
+        "startLine": 292,
+        "startChar": 12,
+        "endLine": 292,
+        "endChar": 28
+      },
+      "revId": "afc7ad9236b350018b3aca303f64882cab36f7e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
