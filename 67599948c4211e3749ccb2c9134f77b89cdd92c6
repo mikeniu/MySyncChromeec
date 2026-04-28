@@ -33,6 +33,24 @@
       "message": "Why is the error not returned here?",
       "revId": "67599948c4211e3749ccb2c9134f77b89cdd92c6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7cd3efe_3ab7dcc5",
+        "filename": "zephyr/test/pdc/src/rts54xx/rts54xx.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-04-28T08:58:22Z",
+      "side": 1,
+      "message": "Not sure, it is being printed but not returned here, I check path and it should be accessible from here, but maybe EC captures it somewhere. Not sure how to enforce it here.",
+      "parentUuid": "1dac540d_bb627786",
+      "revId": "67599948c4211e3749ccb2c9134f77b89cdd92c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
