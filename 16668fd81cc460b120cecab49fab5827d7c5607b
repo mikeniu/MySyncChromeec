@@ -16,6 +16,24 @@
       "message": "Please see comments in b:500939790",
       "revId": "16668fd81cc460b120cecab49fab5827d7c5607b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fb385d0_fbf63f80",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1455860
+      },
+      "writtenOn": "2026-04-28T05:37:45Z",
+      "side": 1,
+      "message": "OK I see. I will abandon this change and update new CL.",
+      "parentUuid": "9e85d73e_9c617c55",
+      "revId": "16668fd81cc460b120cecab49fab5827d7c5607b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
