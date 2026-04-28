@@ -34,6 +34,24 @@
       "parentUuid": "82aa42d6_86ba4366",
       "revId": "2c06add7bb76eb1489e30a87f69f7761784ba285",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c9fcadc_9766e9c1",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-28T11:05:42Z",
+      "side": 1,
+      "message": "I see, but does the check against the maximum supported image size hurts us here? Just something like this, but not need to guard with ZTEST.\n```\n\tif (image_buf_size \u003c CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE)\n\t\treturn -EINVAL;\n```",
+      "parentUuid": "33eb928e_a3daefee",
+      "revId": "2c06add7bb76eb1489e30a87f69f7761784ba285",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
