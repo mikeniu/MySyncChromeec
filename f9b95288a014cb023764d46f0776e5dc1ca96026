@@ -39,6 +39,30 @@
       },
       "revId": "f9b95288a014cb023764d46f0776e5dc1ca96026",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0b5b4a8_088f2931",
+        "filename": "zephyr/program/ocelot/ojal/project.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1369019
+      },
+      "writtenOn": "2026-04-28T20:21:13Z",
+      "side": 1,
+      "message": "The normal case is open drain with an external pullup.  The bit is read by the CSME in S5, before coreboot can enable any integrated pullups.  If the BEP changes to push pull, they\u0027ll need to confirm the SoC is driven only when powered both during normal sequences and during any unusual shutdown cases.\n\nI would recommend they stay with open drain and add a pullup here.",
+      "parentUuid": "e98d6af3_7525c368",
+      "range": {
+        "startLine": 25,
+        "startChar": 24,
+        "endLine": 25,
+        "endChar": 55
+      },
+      "revId": "f9b95288a014cb023764d46f0776e5dc1ca96026",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
