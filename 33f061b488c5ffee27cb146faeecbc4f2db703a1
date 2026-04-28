@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4c6c2c2_42e90ce7",
+        "filename": "zephyr/zmake/tests/test_build_config.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-04-28T03:12:21Z",
+      "side": 0,
+      "message": "I don\u0027t think BuildConfig should be writing its own files, but if it must, I would change this to `lambda parts: pathlib.Path(*parts) ...` (leave paths relative), and in the `test_popen_cmake*` tests, combine them with a temporary directory provided by the pytest [tmp_path](https://docs.pytest.org/en/4.6.x/tmpdir.html) fixture:\n\n```py\ndef test_popen_cmake_blah(..., build_dir, tmp_path):\n    build_dir \u003d tmp_path / build_dir\n```",
+      "range": {
+        "startLine": 29,
+        "startChar": 4,
+        "endLine": 29,
+        "endChar": 80
+      },
+      "revId": "33f061b488c5ffee27cb146faeecbc4f2db703a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
