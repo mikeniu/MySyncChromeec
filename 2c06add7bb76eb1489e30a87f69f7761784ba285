@@ -16,6 +16,24 @@
       "message": "At this point, we don\u0027t know if the image size is validated in the priv lib or not. What\u0027s a problem with making the check also here, not only for test purposes.",
       "revId": "2c06add7bb76eb1489e30a87f69f7761784ba285",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33eb928e_a3daefee",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-28T09:00:30Z",
+      "side": 1,
+      "message": "I understand your point.\n\nThis behavior comes from an earlier review [comment](https://chrome-internal-review.googlesource.com/c/chromeos/vendor/fingerprint/egis/+/9106841/comment/17ba1d86_090a2c5c/).\nThe image size can vary depending on the capture type, and Tom requested that the buffer size validation be done inside the [function `egis_get_image_with_mode` ](https://chrome-internal.googlesource.com/chromeos/vendor/fingerprint/egis/+/525db5fd91fea3756e794b41abd6560494bfc49f/egis_api/egis_api.c#544), before data casting, based on the specific capture type requirements.\nFor this reason, the detailed size checks were moved from the public layer into the private library.\n\nHowever, ZTEST does not load the private library, so the validation is never performed and the test fails.\n\nThe public library only knows the maximum supported image size and does not have\nenough context to determine the required size for each capture type, which is\nwhy the check is implemented this way.",
+      "parentUuid": "82aa42d6_86ba4366",
+      "revId": "2c06add7bb76eb1489e30a87f69f7761784ba285",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
