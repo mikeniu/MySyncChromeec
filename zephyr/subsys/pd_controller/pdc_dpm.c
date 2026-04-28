@@ -314,6 +314,7 @@ void pdc_dpm_remove_source(int port)
 	atomic_clear_bit(&source_frs_max_requested, port);
 
 	/* Restore selected default Rp on the port */
+	pdc_power_mgmt_frs_enable(port, false);
 	rp = pdc_power_mgmt_get_default_current_limit(port);
 	pdc_power_mgmt_set_current_limit(port, rp);
 	pdc_dpm_balance_source_ports(&dpm_work.work);
