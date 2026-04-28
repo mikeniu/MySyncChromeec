@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "54e769b4_a111ee9b",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-28T10:23:17Z",
+      "side": 1,
+      "message": "Understood.",
+      "parentUuid": "4fef4f9e_4cf239fd",
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "18fc7725_02dd3b92",
@@ -537,6 +555,30 @@
       "side": 1,
       "message": "I am not sure if it is even possible to enter S3 on devices I am using for testing. Anyway, if FP authentication session is active in S3 PB would be blocked. I guess FP event would wake up the device in this case if PB is touched or pressed.",
       "parentUuid": "660fa5fd_5725157f",
+      "range": {
+        "startLine": 67,
+        "startChar": 47,
+        "endLine": 67,
+        "endChar": 62
+      },
+      "revId": "c2bbc322f2ea887f2782e9946aa54bf4634f3fcb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e92ca062_0a5b6fe5",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-28T10:23:17Z",
+      "side": 1,
+      "message": "Understood.",
+      "parentUuid": "d9f2d3d0_e60dfa42",
       "range": {
         "startLine": 67,
         "startChar": 47,

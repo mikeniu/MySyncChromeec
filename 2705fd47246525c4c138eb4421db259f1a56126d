@@ -70,6 +70,24 @@
       "parentUuid": "3556ef11_9705d322",
       "revId": "2705fd47246525c4c138eb4421db259f1a56126d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44bcb40c_c5cb3907",
+        "filename": "include/fpsensor/fpsensor_btn_ign_out.h",
+        "patchSetId": 22
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-28T10:23:17Z",
+      "side": 1,
+      "message": "Understood.",
+      "parentUuid": "872afb49_c4a1684c",
+      "revId": "2705fd47246525c4c138eb4421db259f1a56126d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
