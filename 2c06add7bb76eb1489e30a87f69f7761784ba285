@@ -88,6 +88,24 @@
       "parentUuid": "9a736a3a_24d9f384",
       "revId": "2c06add7bb76eb1489e30a87f69f7761784ba285",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "294817f5_fd997dcf",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-28T11:36:40Z",
+      "side": 1,
+      "message": "The example you mentioned is effectively the same as what existed before this CL.\nThat’s why I think we may not need to modify the original check in `egis630_acquire_image`:\n\n```\nstatic int egis630_acquire_image(const struct device *dev,\n\t\t\t\t enum fingerprint_capture_type capture_type,\n\t\t\t\t uint8_t *image_buf, size_t image_buf_size)\n{\n-\tif (image_buf_size \u003c CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE)\n-\t\treturn -EINVAL;\n-\n\tegis_capture_mode_t egis_capture_type \u003d\n```\nAlternatively, if it’s possible to extract all relevant configurations from [sanok.dts](https://chromium.googlesource.com/chromiumos/platform/ec/+/2c06add7bb76eb1489e30a87f69f7761784ba285/zephyr/program/fpmcu/et171/sanok.dts#31) and validate against them, that could be a cleaner approach.",
+      "parentUuid": "14184f44_cf02a199",
+      "revId": "2c06add7bb76eb1489e30a87f69f7761784ba285",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
