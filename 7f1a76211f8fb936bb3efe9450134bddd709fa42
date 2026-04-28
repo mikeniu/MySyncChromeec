@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d13bbc7_b9872452",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-04-28T00:29:41Z",
+      "side": 1,
+      "message": "Do we need more than 1 entry? It seems like having the current screen is really all that is needed.",
+      "revId": "7f1a76211f8fb936bb3efe9450134bddd709fa42",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
