@@ -25,6 +25,17 @@
 
 /* quartz overrides follow... */
 
+/ {
+	named-usbc-port {
+		usbc_port0: port0 {
+			compatible = "named-usbc-port";
+		};
+		usbc_port1: port1 {
+			compatible = "named-usbc-port";
+		};
+	};
+};
+
 &int_ac_present {
 	status = "disabled";
 };

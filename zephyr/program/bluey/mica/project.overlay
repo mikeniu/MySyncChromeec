@@ -34,6 +34,18 @@
 };
 
 /* mica overrides follow... */
+
+/ {
+	named-usbc-port {
+		usbc_port0: port0 {
+			compatible = "named-usbc-port";
+		};
+		usbc_port1: port1 {
+			compatible = "named-usbc-port";
+		};
+	};
+};
+
 &cbi_flash {
 	/*
 	 * CBI section size is 0x1000 bytes, the CBI portion lies at the end of
