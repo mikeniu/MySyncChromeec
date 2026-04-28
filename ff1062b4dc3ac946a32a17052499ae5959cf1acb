@@ -16,6 +16,23 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "ff1062b4dc3ac946a32a17052499ae5959cf1acb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9f43807_a2d3c857",
+        "filename": "zephyr/test/pdc/src/rts54xx/rts54xx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-28T20:40:52Z",
+      "side": 1,
+      "message": "Nit: For a future CL, you might want to use a fixture and register and unregister this callback in before and after functions. If it\u0027s only going to be these two tests that use it, I\u0027d say that\u0027s highly optional.",
+      "revId": "ff1062b4dc3ac946a32a17052499ae5959cf1acb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

@@ -72,6 +72,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f455af3_8c9046fc",
+        "filename": "zephyr/emul/emul_realtek_rts54xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 801,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-28T20:40:52Z",
+      "side": 1,
+      "message": "OK, I think I get how it works. Only in the success case does it call `send_response`. In the failure case, the response is edited but then discarded, and the caller sees a different blank response.\n\nIf that\u0027s accurate, then the behavior of this function is as I might have expected. I\u0027m not sure if that merits a comment or if it would be obvious to someone more familiar with Zephyr emulators. Up to you.",
+      "parentUuid": "8688c034_043ab73b",
+      "revId": "b9914d391a6d94f86ba6e2502f42b79f068f7f72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0af06abb_13ee8608",
@@ -85,6 +103,24 @@
       "writtenOn": "2026-04-23T18:33:51Z",
       "side": 1,
       "message": "Similar concern to above about partial writes",
+      "revId": "b9914d391a6d94f86ba6e2502f42b79f068f7f72",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc7a198c_2872b185",
+        "filename": "zephyr/emul/emul_realtek_rts54xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 1664,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-28T20:40:52Z",
+      "side": 1,
+      "message": "This one kind of does seem like it would do a partial write in the event of an invalid index after `vdo_types[0]`. Again, if you know the behavior of the actual part, this should emulate that.\n\nSince this is just used for tests, if no test case depends on this emulator behavior, then it\u0027s fine to leave it undecided for now. You might want to explain the current behavior in a comment.",
+      "parentUuid": "0af06abb_13ee8608",
       "revId": "b9914d391a6d94f86ba6e2502f42b79f068f7f72",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
