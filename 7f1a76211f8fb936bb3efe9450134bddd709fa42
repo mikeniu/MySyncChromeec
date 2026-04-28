@@ -16,6 +16,24 @@
       "message": "Do we need more than 1 entry? It seems like having the current screen is really all that is needed.",
       "revId": "7f1a76211f8fb936bb3efe9450134bddd709fa42",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44b49883_7683351b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1427718
+      },
+      "writtenOn": "2026-04-28T00:48:04Z",
+      "side": 1,
+      "message": "Doesn\u0027t need to be as many as 10 necessarily, but I was thinking some of the tests that navigate the menu/check the cbmem for a few screens in a sequence could maybe be updated to use this instead of cbmem maybe.",
+      "parentUuid": "9d13bbc7_b9872452",
+      "revId": "7f1a76211f8fb936bb3efe9450134bddd709fa42",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
