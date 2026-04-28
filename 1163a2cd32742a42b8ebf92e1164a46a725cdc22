@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c25eefac_eabbf292",
+        "filename": "common/flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 867,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-28T23:47:57Z",
+      "side": 1,
+      "message": "Nit - use braces around all conditional blocks.",
+      "range": {
+        "startLine": 867,
+        "startChar": 0,
+        "endLine": 867,
+        "endChar": 13
+      },
+      "revId": "1163a2cd32742a42b8ebf92e1164a46a725cdc22",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
