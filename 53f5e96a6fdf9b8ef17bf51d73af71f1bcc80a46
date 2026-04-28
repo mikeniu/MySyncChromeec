@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9506819_b3246130",
+        "filename": "util/elan/filecontrol.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-28T07:51:45Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 8.",
+      "parentUuid": "08196152_a7997ae3",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 1
+      },
+      "revId": "53f5e96a6fdf9b8ef17bf51d73af71f1bcc80a46",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e01fc737_6b02a844",
@@ -61,6 +85,30 @@
       "writtenOn": "2026-04-27T16:25:39Z",
       "side": 1,
       "message": "**Missing Header Guards:** Neither `util/elan/filecontrol.h` nor `util/elan/iaptool.h` have include guards (`#pragma once` or `#ifndef ...`). This will lead to Multiple Definition errors if these headers are ever included in multiple files or transitively.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 4,
+        "endChar": 0
+      },
+      "revId": "53f5e96a6fdf9b8ef17bf51d73af71f1bcc80a46",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcf3526d_858bf7fd",
+        "filename": "util/elan/filecontrol.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-28T07:51:45Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 8.",
+      "parentUuid": "e01fc737_6b02a844",
       "range": {
         "startLine": 1,
         "startChar": 0,
@@ -94,6 +142,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5faaee54_d3c84999",
+        "filename": "util/elan/filecontrol.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-28T07:51:45Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 8.",
+      "parentUuid": "aff850d2_fc656bb3",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 65
+      },
+      "revId": "53f5e96a6fdf9b8ef17bf51d73af71f1bcc80a46",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "327bd3ec_fd20d095",
@@ -107,6 +179,30 @@
       "writtenOn": "2026-04-27T16:25:39Z",
       "side": 1,
       "message": "**Replace `funcName` Arrays with `__func__`:** Almost every function in `iapcontrol.cc` and `filecontrol.cc` manually defines a local string for logging:\n\n```c\nconst char funcName[] \u003d \"get binary size\";\n```\n\n  This creates unnecessary boilerplate. C++ provides the standard `__func__` macro, which automatically yields the function\u0027s name. I recommend replacing the manual strings with `__func__`.",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 47
+      },
+      "revId": "53f5e96a6fdf9b8ef17bf51d73af71f1bcc80a46",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "21556a22_e9a56c6b",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-28T07:51:45Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 8.",
+      "parentUuid": "327bd3ec_fd20d095",
       "range": {
         "startLine": 75,
         "startChar": 0,
@@ -140,6 +236,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4487df4_71ffe954",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-28T07:51:45Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 8.",
+      "parentUuid": "bd1bdf0d_493e810c",
+      "range": {
+        "startLine": 104,
+        "startChar": 0,
+        "endLine": 104,
+        "endChar": 16
+      },
+      "revId": "53f5e96a6fdf9b8ef17bf51d73af71f1bcc80a46",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ce2f863_dfe75f1c",
@@ -163,6 +283,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5768b6a8_ee97c920",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 725,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-28T07:51:45Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 8.",
+      "parentUuid": "2ce2f863_dfe75f1c",
+      "range": {
+        "startLine": 725,
+        "startChar": 0,
+        "endLine": 725,
+        "endChar": 72
+      },
+      "revId": "53f5e96a6fdf9b8ef17bf51d73af71f1bcc80a46",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c0e04497_d35e80e0",
@@ -176,6 +320,30 @@
       "writtenOn": "2026-04-27T16:25:39Z",
       "side": 1,
       "message": "**Type Mismatch in Callback Signature:** In `util/elan/iapcontrol.h`, the setter method and the member variable have conflicting type signatures for the callback:\n\n```c\nvoid setProgressCallback(std::function\u003cvoid(int, int)\u003e callback); // Declaration\nstd::function\u003cvoid(size_t, size_t)\u003e m_progressCallback;           // Member\n```\n\n  Furthermore, in `iaptool.cc`, the implementation function `setProgressBar` uses `size_t`. This mismatch will cause compilation errors or warnings. Standardize on `size_t` for all progress-related variables to represent byte counts accurately.",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 61,
+        "endChar": 66
+      },
+      "revId": "53f5e96a6fdf9b8ef17bf51d73af71f1bcc80a46",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "faa261c2_ad458a91",
+        "filename": "util/elan/iapcontrol.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-28T07:51:45Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 8.",
+      "parentUuid": "c0e04497_d35e80e0",
       "range": {
         "startLine": 61,
         "startChar": 0,
