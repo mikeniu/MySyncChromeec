@@ -16,6 +16,24 @@
       "message": "This is too big a change for a single CL.  Please break this up into multiple commits.  You can stub out required routines in the initial commits and add the real implementation in later commits.\n\nYou also need to add an emulator and unit tests for this PDC driver.",
       "revId": "8c07f83e9d30fcf9bfa2929e0586e2a98c0c923e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c24dbea6_b243d43c",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 38
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-04-28T02:58:02Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f191f704_f36ebfb3",
+      "revId": "8c07f83e9d30fcf9bfa2929e0586e2a98c0c923e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
