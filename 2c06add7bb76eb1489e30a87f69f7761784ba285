@@ -106,6 +106,24 @@
       "parentUuid": "14184f44_cf02a199",
       "revId": "2c06add7bb76eb1489e30a87f69f7761784ba285",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58a367ce_d76673b1",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-28T11:59:31Z",
+      "side": 1,
+      "message": "Is there any problem with the original check? Why did you remove it?",
+      "parentUuid": "294817f5_fd997dcf",
+      "revId": "2c06add7bb76eb1489e30a87f69f7761784ba285",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
