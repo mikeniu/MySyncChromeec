@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45664ace_8a6e11d4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-28T05:34:35Z",
+      "side": 1,
+      "message": "Is the current implementation working?",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f42cbc44_cc64b729",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-28T05:34:35Z",
+      "side": 1,
+      "message": "Please move to `fingerprint_egis660_pal.h` as other functions.",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0ecca76_96408791",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-28T05:34:35Z",
+      "side": 1,
+      "message": "Should this be added for all projects using 660 sensor? Or maybe it should be hidden behind a config?",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aafc1413_b98a8ceb",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-28T05:34:35Z",
+      "side": 1,
+      "message": "Please get this values from other configs",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "977186c0_14c48691",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-28T05:34:35Z",
+      "side": 1,
+      "message": "Why not mapped?",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da2ecd46_345f2ce7",
+        "filename": "zephyr/program/fpmcu/et171/common.dtsi",
+        "patchSetId": 6
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-28T05:34:35Z",
+      "side": 1,
+      "message": "Please add this as a separate CL",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
