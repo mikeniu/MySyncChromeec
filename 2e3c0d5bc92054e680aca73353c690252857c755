@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10e3653b_5f7b12a9",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-28T17:13:40Z",
+      "side": 1,
+      "message": "* **Over-engineered State Machine in `connectDevice`:** The logic involving `m_deviceCount` and `DEVSTA_EXISTED` in `connectDevice` appears to be designed for an application that continuously polls for a USB device. Since `connectDevice` is only called *once* inside `initialize()`, `m_deviceCount` will always be `0`, making the `DEVSTA_EXISTED` and `DEVSTA_REMOVE` branches dead code.  \n    \n  * *Remediation:* Simplify the connection logic. Just check if the device is present, open it, and return a simple boolean or `0`/`-1` success code.",
+      "range": {
+        "startLine": 541,
+        "startChar": 0,
+        "endLine": 572,
+        "endChar": 1
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c53712a_8bfe4ac3",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 899,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-28T17:13:40Z",
+      "side": 1,
+      "message": "* **Ambiguous Error Return in `get32Le`:** In `iapcontrol::get32Le`, if the buffer size is less than 4, the function returns `-1`. Because the return type is `uint32_t`, `-1` evaluates to `0xFFFFFFFF`. This is indistinguishable from a perfectly valid 32-bit read where all bytes are `0xFF`.  \n    \n  * *Remediation:* Change the return type to `std::optional\u003cuint32_t\u003e` to safely handle and propagate the error state, aligning with the pattern you already used in `getChecksum`.",
+      "range": {
+        "startLine": 888,
+        "startChar": 0,
+        "endLine": 899,
+        "endChar": 1
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95a2a31b_347fa60f",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-28T17:13:40Z",
+      "side": 1,
+      "message": "* **Incomplete USB Cleanup:** In `openDevice`, you detach the kernel driver and claim the interface using `libusb_detach_kernel_driver` and `libusb_claim_interface`. However, in your cleanup routine (`releaseResource` / `LibusbDeviceHandleDeleter`), you only call `libusb_close()`.  \n    \n  * *Remediation:* It is best practice to explicitly call `libusb_release_interface()` before closing the device. Additionally, if you detached a kernel driver, you should attempt to reattach it using `libusb_attach_kernel_driver()` before closing so the OS can resume normal interaction with the device.",
+      "range": {
+        "startLine": 916,
+        "startChar": 0,
+        "endLine": 926,
+        "endChar": 1
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
