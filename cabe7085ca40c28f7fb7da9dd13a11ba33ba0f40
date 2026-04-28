@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96f2394b_fe9771b7",
+        "filename": "zephyr/zmake/zmake/build_config.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-04-28T03:01:17Z",
+      "side": 1,
+      "message": "I don\u0027t think this is the right place for this. This class is meant for preparing a recipe for a build but now it is jumping the gun and generating its own build artifact. The test code is also not expecting this class to actually produce any files hence the fake paths.\n\n`jobclient.popen()`\u0027s implementation would make more sense for storing the command (it already has a debug-level console log for this), but the job server is unaware of the build directory path, so it would not know where to write it.\n\nHave you looked at the `CMakeCache.txt` file that cmake already generates at `build/zephyr/\u003cboard\u003e/build-{rw|ro}/`? It has all the CMake variables and their values including internal ones that don\u0027t appear in the CLI args.",
+      "range": {
+        "startLine": 127,
+        "startChar": 8,
+        "endLine": 128,
+        "endChar": 75
+      },
+      "revId": "cabe7085ca40c28f7fb7da9dd13a11ba33ba0f40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
