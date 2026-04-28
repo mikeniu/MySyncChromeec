@@ -70,6 +70,24 @@
       "parentUuid": "2bdeac2a_5c93e2eb",
       "revId": "7f1a76211f8fb936bb3efe9450134bddd709fa42",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6557187c_9165fc17",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-04-28T00:58:56Z",
+      "side": 1,
+      "message": "Ram usage is precious in the EC. You have to justify every byte.\n\nCBMemLogUtils has to do that because you can\u0027t access the cbmem live, only after the os boots.",
+      "parentUuid": "26d6fa1c_b3e96a22",
+      "revId": "7f1a76211f8fb936bb3efe9450134bddd709fa42",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
