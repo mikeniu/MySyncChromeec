@@ -52,6 +52,24 @@
       "parentUuid": "33eb928e_a3daefee",
       "revId": "2c06add7bb76eb1489e30a87f69f7761784ba285",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a736a3a_24d9f384",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-28T11:18:06Z",
+      "side": 1,
+      "message": "With the existing code, this check would not cause an immediate issue.\nHowever, from a logical perspective, it is not entirely appropriate.\nWe currently support at least two different capture sizes, but this check compares against a single fixed size, which does not accurately reflect that.\nAt the moment, I don’t have a better solution for handling multiple capture types cleanly, so keeping the behavior as it was before this CL may be a possible way.",
+      "parentUuid": "9c9fcadc_9766e9c1",
+      "revId": "2c06add7bb76eb1489e30a87f69f7761784ba285",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
