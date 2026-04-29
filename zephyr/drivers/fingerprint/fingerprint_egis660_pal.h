@@ -14,6 +14,26 @@
 
 typedef bool (*egis_wfi_check_t)(void);
 
+extern int crec_flash_write(int offset, int size, const char *data);
+extern int crec_flash_erase(int offset, int size);
+extern int crec_flash_read(int offset, int size, char *data);
+
+/**
+ * @brief Storage information.
+ *
+ * The alignment requirements are specified in number of bytes.
+ */
+typedef struct {
+    /** Required address and size alignment for read operations. */
+    uint32_t read_align;
+    /** Required address and size alignment for write operations. */
+    uint32_t write_align;
+    /** Required address and size alignment for erase operations. */
+    uint32_t erase_align;
+    /** True if flash can be read using memcpy. */
+    bool is_memory_mapped;
+} egis_storage_info_t;
+
 /**
  * @brief Writes and reads SPI data.
  *
@@ -145,5 +165,64 @@ void *__unused egis_malloc(uint32_t size);
  * @param data Pointer to buffer that should be freed
  */
 void __unused egis_free(void *data);
+
+/**
+ * @brief Log variable/message with variable arguments.
+ *
+ * @param[in] source  Source identifier.
+ * @param[in] level   Log level.
+ * @param[in] format  Printf-style format string.
+ */
+void __unused egis_log_var(const char *source, uint8_t level,
+			   const char *format, ...);
+
+/**
+ * @brief Assert failure handler.
+ *
+ * Called by the private library when an assert fails.
+ *
+ * @param[in] file  Source file name.
+ * @param[in] line  Line number.
+ * @param[in] func  Function name.
+ * @param[in] expr  Assertion expression.
+ */
+void __unused egis_assert_fail(const char *file, uint32_t line,
+			       const char *func, const char *expr);
+
+/**
+ * @brief Get APNS flash storage information.
+ *
+ * @return Pointer to egis_storage_info_t with alignment requirements.
+ */
+const egis_storage_info_t __unused *egis_apns_storage_get_info(void);
+
+/**
+ * @brief Erase a region of APNS data storage.
+ *
+ * @param[in] offset  Offset within the APNS partition.
+ * @param[in] size    Number of bytes to erase.
+ * @return 0 on success, negative errno on failure.
+ */
+int __unused egis_apns_data_erase(uint32_t offset, size_t size);
+
+/**
+ * @brief Read data from APNS storage.
+ *
+ * @param[in]  offset  Offset within the APNS partition.
+ * @param[in]  size    Number of bytes to read.
+ * @param[out] data    Buffer to store read data.
+ * @return 0 on success, negative errno on failure.
+ */
+int __unused egis_apns_data_read(uint32_t offset, size_t size, void *data);
+
+/**
+ * @brief Write data to APNS storage.
+ *
+ * @param[in] offset  Offset within the APNS partition.
+ * @param[in] data    Data to write.
+ * @param[in] size    Number of bytes to write.
+ * @return 0 on success, negative errno on failure.
+ */
+int __unused egis_apns_data_write(uint32_t offset, const void *data, size_t size);
 
 #endif /* ZEPHYR_DRIVERS_FINGERPRINT_EGIS660_PAL_SENSOR_H_ */
