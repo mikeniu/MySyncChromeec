@@ -53,7 +53,7 @@ if(DEFINED CONFIG_PLATFORM_EC AND EXISTS "${EDT_PICKLE}")
       --zephyr-base ${ZEPHYR_BASE}
       --edt-pickle ${EDT_PICKLE}
       --manifest-file "${CMAKE_BINARY_DIR}/zephyr/component_manifest.json"
-      --version ${CONFIG_PLATFORM_EC_CME_VERSION}
+      --cme-version ${CONFIG_PLATFORM_EC_CME_VERSION}
       ${EXTRA_EC_VERSION_FLAGS_LIST}
     )
     execute_process(COMMAND ${CMD_CME} RESULT_VARIABLE ret)
@@ -265,6 +265,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ALS_VEML3328
                                                 "${PLATFORM_EC}/driver/als_veml3328.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ALS_CM32183
                                                 "${PLATFORM_EC}/driver/als_cm32183.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ALS_CM36781
+                                                "${PLATFORM_EC}/driver/als_cm36781.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_ACPI
                                                 "${PLATFORM_EC}/common/acpi.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_AMD_SB_RMI
@@ -384,7 +386,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FINGERPRINT
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_crypto.cc"
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_debug.cc"
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_auth_commands.cc"
-						"${PLATFORM_EC}/common/fpsensor/fpsensor_auth_handshake.cc"
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_auth_crypto_stateful.cc"
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_auth_crypto_stateless.cc"
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_detect_strings.cc"
@@ -392,6 +393,12 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FINGERPRINT
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_vendor_command.cc"
             "${PLATFORM_EC}/common/fpsensor/fpsensor_frame_size.cc"
 						"${PLATFORM_EC}/crypto/elliptic_curve_key.cc")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FINGERPRINT_AUTH_METHOD_HANDSHAKE
+						"${PLATFORM_EC}/common/fpsensor/fpsensor_auth_handshake.cc")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FINGERPRINT_AUTH_METHOD_ASCP
+						"${PLATFORM_EC}/common/fpsensor/fpsensor_auth_ascp.cc")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FINGERPRINT_BTN_IGN_OUT
+						"${PLATFORM_EC}/common/fpsensor/fpsensor_btn_ign_out.cc")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
                                                 "${PLATFORM_EC}/common/host_command.c")
 if (NOT DEFINED CONFIG_EC_HOST_CMD)
@@ -832,3 +839,35 @@ if (DEFINED CONFIG_SOC_INTEL_ISH_5_8_0)
       ${PLATFORM_EC}/third_party/ish/ish_header_5_8.bin
   )
 endif()
+
+# Pigweed libraries rely on Zephyr headers that transitively include
+# heap_constants.h. Because pigweed library targets are not created using
+# zephyr_library(), they lacks the implicit dependency on
+# zephyr_generated_headers.  We defer adding this dependency to the top-level
+# directory scope to ensure the Pigweed module has been fully evaluated and the
+# library targets exist.
+#
+# Lists all targets defined with pw_add_library() and pw_add_test()
+function(ec_add_pw_log_zephyr_deps)
+  foreach(lib pw_log_zephyr
+	      cros.dsp.test
+	      dsp.client
+	      dsp.service
+	      math.iir_decimator
+	      math.iir_decimator_test
+	      math.iir_filter
+	      math.iir_filter_test
+	      math.smoothing
+	      math.smoothing_test
+	      pw_fsm.fsm
+	      pw_fsm.fsm_test
+	      pw_transport.service
+	      pw_transport.service_test
+	      vsensor.body_detection
+      )
+    if(TARGET ${lib} AND TARGET zephyr_generated_headers)
+      add_dependencies(${lib} zephyr_generated_headers)
+    endif()
+  endforeach()
+endfunction()
+cmake_language(DEFER DIRECTORY ${CMAKE_SOURCE_DIR} CALL ec_add_pw_log_zephyr_deps)
