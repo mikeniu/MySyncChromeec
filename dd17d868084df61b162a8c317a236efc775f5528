@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ea603b4_392bada7",
+        "filename": "zephyr/program/fpmcu/ft9001/chudow.dts",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T08:02:08Z",
+      "side": 1,
+      "message": "The gpio_btn_ign_out is defined in gpio.dtsi, which is common for all ft9001 projects. I think you ca include it in common.dtsi with that logic.",
+      "revId": "dd17d868084df61b162a8c317a236efc775f5528",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
