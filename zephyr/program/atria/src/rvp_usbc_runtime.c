@@ -17,15 +17,19 @@
 LOG_MODULE_REGISTER(rvp_usbc, LOG_LEVEL_INF);
 
 /* Ports supported by dual PDC chip in AIC */
+#define DEV_PDC_C0_RTK DEVICE_DT_GET(DT_NODELABEL(pdc_rtk_c0))
 #define DEV_PDC_C0_TI DEVICE_DT_GET(DT_NODELABEL(pdc_ti_c0))
 
+#define DEV_PDC_C1_RTK DEVICE_DT_GET(DT_NODELABEL(pdc_rtk_c1))
 #define DEV_PDC_C1_TI DEVICE_DT_GET(DT_NODELABEL(pdc_ti_c1))
 
 #if CONFIG_USB_PD_PORT_MAX_COUNT > 2
 /* Port in modular TCSS AIC */
+#define DEV_PDC_C2_RTK DEVICE_DT_GET(DT_NODELABEL(pdc_rtk_c2))
 #define DEV_PDC_C2_TI DEVICE_DT_GET(DT_NODELABEL(pdc_ti_c2))
 #else
 /* named-usbc-port is not declared. */
+#define DEV_PDC_C2_RTK NULL
 #define DEV_PDC_C2_TI NULL
 #endif
 
@@ -37,11 +41,16 @@ LOG_MODULE_REGISTER(rvp_usbc, LOG_LEVEL_INF);
  */
 enum rvp_tcss_modules {
 	RVP_TCSS_NONE = 0,
+	RVP_TCSS_C0_RTK = BIT(0),
+	RVP_TCSS_C1_RTK = BIT(1),
+	RVP_TCSS_C2_RTK = BIT(2),
 	RVP_TCSS_C0_TI = BIT(3),
 	RVP_TCSS_C1_TI = BIT(4),
 	RVP_TCSS_C2_TI = BIT(5),
 	RVP_TCSS_DUAL_TI = BIT(3) | BIT(4),
+	RVP_TCSS_DUAL_RTK = BIT(0) | BIT(1),
 	RVP_TCSS_THREE_TI = BIT(3) | BIT(4) | BIT(5),
+	RVP_TCSS_THREE_RTK = BIT(0) | BIT(1) | BIT(2),
 };
 
 static struct {
@@ -67,7 +76,8 @@ static bool probe_pdc_chip(const struct device *dev)
 	}
 
 	struct i2c_msg msgs[1];
-	uint8_t dst;
+	/* RTK EC I2C driver requires this to be a valid register address */
+	uint8_t dst = 0x20;
 
 	msgs[0].buf = &dst;
 	msgs[0].len = 0U;
@@ -87,6 +97,15 @@ static void discover_tcss_modules()
 	/* Perform trial I2C operations against each PDC target to see
 	 * which are present.
 	 */
+	if (probe_pdc_chip(DEV_PDC_C0_RTK)) {
+		ctx.detected_cards |= RVP_TCSS_C0_RTK;
+	}
+	if (probe_pdc_chip(DEV_PDC_C1_RTK)) {
+		ctx.detected_cards |= RVP_TCSS_C1_RTK;
+	}
+	if (probe_pdc_chip(DEV_PDC_C2_RTK)) {
+		ctx.detected_cards |= RVP_TCSS_C2_RTK;
+	}
 	if (probe_pdc_chip(DEV_PDC_C0_TI)) {
 		ctx.detected_cards |= RVP_TCSS_C0_TI;
 	}
@@ -118,6 +137,39 @@ int board_get_pdc_for_port(int port, const struct device **dev)
 		LOG_INF("%s: PDC config: [---,---,---]", __func__);
 		*dev = NULL;
 		return 0;
+	case RVP_TCSS_C0_RTK:
+		/* Single RTK card on port 0 */
+		LOG_INF("%s: PDC config: [RTK,---,---]", __func__);
+		if (port == 0) {
+			*dev = DEV_PDC_C0_RTK;
+			return 0;
+		}
+		break;
+	case RVP_TCSS_DUAL_RTK:
+		/* Two RTK cards on port 0 and 1 */
+		LOG_INF("%s: PDC config: [RTK,RTK,---]", __func__);
+		if (port == 0) {
+			*dev = DEV_PDC_C0_RTK;
+			return 0;
+		} else if (port == 1) {
+			*dev = DEV_PDC_C1_RTK;
+			return 0;
+		}
+		break;
+	case RVP_TCSS_THREE_RTK:
+		/* Three RTK cards */
+		LOG_INF("%s: PDC config: [RTK,RTK,RTK]", __func__);
+		if (port == 0) {
+			*dev = DEV_PDC_C0_RTK;
+			return 0;
+		} else if (port == 1) {
+			*dev = DEV_PDC_C1_RTK;
+			return 0;
+		} else if (port == 2) {
+			*dev = DEV_PDC_C2_RTK;
+			return 0;
+		}
+		break;
 	case RVP_TCSS_C0_TI:
 		/* Only Port 0 */
 		LOG_INF("%s: PDC config: [TI,---,---]", __func__);
