@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a78e6912_7d117e74",
+        "filename": "zephyr/subsys/fingerprint/alg/egis_egis660_bio_apns.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T10:41:11Z",
+      "side": 1,
+      "message": "I think it\u0027s good to keep all PAL function in one file. Please just use #ifdef for the ASPN part.",
+      "revId": "f5e4390df498e85ca37f8b3ea51f9944947e9632",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a40435b4_3c7f610a",
+        "filename": "zephyr/subsys/fingerprint/alg/egis_egis660_bio_apns.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T10:41:11Z",
+      "side": 1,
+      "message": "Please add the function declarations to the header file.",
+      "revId": "f5e4390df498e85ca37f8b3ea51f9944947e9632",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "278ca65e_3c9204ef",
+        "filename": "zephyr/subsys/fingerprint/alg/egis_egis660_bio_apns.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T10:41:11Z",
+      "side": 1,
+      "message": "`is_memory_mapped` will this be used if `is_memory_mapped \u003d true`?",
+      "revId": "f5e4390df498e85ca37f8b3ea51f9944947e9632",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

@@ -404,6 +404,24 @@
       "parentUuid": "da2ecd46_345f2ce7",
       "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6be34a02_4db8c677",
+        "filename": "zephyr/program/fpmcu/et171/common.dtsi",
+        "patchSetId": 6
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T10:41:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "255a57d7_dd404010",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
