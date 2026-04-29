@@ -141,6 +141,30 @@
       },
       "revId": "71bf3fbaf20fc568179c93d0ac76e6c36ad8c267",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d2b7506_4fa59771",
+        "filename": "common/tpm_registers.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1138,
+      "author": {
+        "id": 1324172
+      },
+      "writtenOn": "2026-04-29T22:23:23Z",
+      "side": 1,
+      "message": "no. it was uninitialized before. it is only output value. max size is part of the TPM2 config",
+      "parentUuid": "215dc1e1_7c2a9c81",
+      "range": {
+        "startLine": 1138,
+        "startChar": 30,
+        "endLine": 1138,
+        "endChar": 43
+      },
+      "revId": "71bf3fbaf20fc568179c93d0ac76e6c36ad8c267",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
