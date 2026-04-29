@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54d5694c_6e20ee2f",
+        "filename": "zephyr/program/fpmcu/et171/common.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T09:56:08Z",
+      "side": 1,
+      "message": "It\u0027s not common for all et171 projects. Please move it to proper per project files. Can you also change a name for something like egis660_apns_data?",
+      "revId": "3409d5e44b9b2c0d81365645fde8c239c167e402",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
