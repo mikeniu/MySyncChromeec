@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "daec5d34_e841b3a7",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 4830,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-29T20:04:20Z",
+      "side": 1,
+      "message": "Isn\u0027t this the only change that is needed?",
+      "range": {
+        "startLine": 4828,
+        "startChar": 0,
+        "endLine": 4830,
+        "endChar": 2
+      },
+      "revId": "b503c742312da259984d139919f04898a6e84f2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
