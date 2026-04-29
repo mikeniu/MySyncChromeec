@@ -13,6 +13,7 @@
 #include "ec_commands.h"
 #include "fpsensor/fpsensor.h"
 #include "fpsensor/fpsensor_auth_commands.h"
+#include "fpsensor/fpsensor_btn_ign_out.h"
 #include "fpsensor/fpsensor_console.h"
 #include "fpsensor/fpsensor_crypto.h"
 #include "fpsensor/fpsensor_detect.h"
@@ -60,6 +61,11 @@ static uint32_t matching_time_us;
 static uint32_t overall_time_us;
 static timestamp_t overall_t0;
 static uint8_t timestamps_invalid;
+/*
+ * Last matched template index, persisted for telemetry (EC_CMD_FP_STATS).
+ * Unlike global_context, this is not cleared when the secret is read.
+ */
+static int8_t stats_template_matched;
 
 BUILD_ASSERT(sizeof(struct ec_fp_template_encryption_metadata) % 4 == 0);
 
@@ -140,6 +146,8 @@ static uint32_t fp_process_match(void)
 	int res = -1;
 	uint32_t updated = 0;
 	int32_t fgr = FP_NO_SUCH_TEMPLATE;
+	timestamps_invalid = 0;
+	stats_template_matched = static_cast<int8_t>(FP_NO_SUCH_TEMPLATE);
 
 	/* match finger against current templates */
 	fp_disable_positive_match_secret(
@@ -149,6 +157,8 @@ static uint32_t fp_process_match(void)
 	if (global_context.templ_valid) {
 		res = fp_finger_match(fp_template[0],
 				      global_context.templ_valid, fp_buffer,
+				      !(global_context.sensor_mode &
+					FP_MODE_MATCH_NO_TEMPLATE_UPDATE),
 				      &fgr, &updated);
 		CPRINTS("Match =>%d (finger %d)", res, fgr);
 
@@ -159,12 +169,14 @@ static uint32_t fp_process_match(void)
 			 * with EC_MKBP_FP_ERR_MATCH_NO_INTERNAL.
 			 */
 			if (fgr >= 0 && fgr < FP_MAX_FINGER_COUNT) {
+				stats_template_matched = fgr;
 				fp_enable_positive_match_secret(
 					fgr,
 					&global_context
 						 .positive_match_secret_state);
 			} else {
 				res = EC_MKBP_FP_ERR_MATCH_NO_INTERNAL;
+				timestamps_invalid |= FPSTATS_MATCHING_INV;
 			}
 		} else if (res < 0) {
 			/*
@@ -174,6 +186,7 @@ static uint32_t fp_process_match(void)
 			 * happened.
 			 */
 			res = EC_MKBP_FP_ERR_MATCH_NO_INTERNAL;
+			timestamps_invalid |= FPSTATS_MATCHING_INV;
 		}
 
 		if (res == EC_MKBP_FP_ERR_MATCH_YES_UPDATED)
@@ -181,10 +194,8 @@ static uint32_t fp_process_match(void)
 	} else {
 		CPRINTS("No enrolled templates");
 		res = EC_MKBP_FP_ERR_MATCH_NO_TEMPLATES;
-	}
-
-	if (!fp_match_success(res))
 		timestamps_invalid |= FPSTATS_MATCHING_INV;
+	}
 
 	matching_time_us = time_since32(t0);
 	return EC_MKBP_FP_MATCH | EC_MKBP_FP_ERRCODE(res) |
@@ -229,7 +240,8 @@ static void fp_process_finger(void)
 		evt = fp_process_match();
 
 	global_context.sensor_mode &=
-		~(FP_MODE_ANY_CAPTURE | FP_MODE_CAPTURE_TYPE_MASK);
+		~(FP_MODE_ANY_CAPTURE | FP_MODE_CAPTURE_TYPE_MASK |
+		  FP_MODE_MATCH_NO_TEMPLATE_UPDATE);
 	overall_time_us = time_since32(overall_t0);
 	send_mkbp_event(evt);
 }
@@ -296,7 +308,9 @@ extern "C" void fp_task(void)
 					global_context.current_capture_type =
 						capture_type;
 				}
-				global_context.sensor_mode &= ~FP_MODE_CAPTURE;
+				global_context.sensor_mode &=
+					~(FP_MODE_CAPTURE |
+					  FP_MODE_CAPTURE_TYPE_MASK);
 				send_mkbp_event(EC_MKBP_FP_IMAGE_READY);
 				continue;
 			} else if (global_context.sensor_mode &
@@ -364,7 +378,6 @@ extern "C" void fp_task(void)
 			}
 		} else if (evt & (TASK_EVENT_SENSOR_IRQ | TASK_EVENT_TIMER)) {
 			overall_t0 = get_time();
-			timestamps_invalid = 0;
 			/*
 			 * TODO(b/316859625): Remove CONFIG_ZEPHYR block after
 			 * migration to Zephyr is completed.
@@ -425,6 +438,7 @@ extern "C" void fp_task(void)
 				fp_sensor_low_power();
 			}
 		}
+		fp_btn_ign_out::update(global_context.sensor_mode);
 	}
 #else /* !HAVE_FP_PRIVATE_DRIVER */
 	while (1) {
@@ -437,11 +451,11 @@ extern "C" void fp_task(void)
 
 static enum ec_status fp_command_info(struct host_cmd_handler_args *args)
 {
-	struct ec_response_fp_info_v2 *r =
-		static_cast<ec_response_fp_info_v2 *>(args->response);
-	const size_t response_size =
-		sizeof(struct ec_response_fp_info_v2) +
-		FP_MAX_CAPTURE_TYPES * sizeof(struct fp_image_frame_params);
+	struct ec_response_fp_info_v3 *r =
+		static_cast<ec_response_fp_info_v3 *>(args->response);
+	size_t response_size =
+		sizeof(struct ec_response_fp_info_v3) +
+		FP_MAX_CAPTURE_TYPES * sizeof(struct fp_image_frame_params_v2);
 
 	if (response_size > args->response_max) {
 		return EC_RES_OVERFLOW;
@@ -465,11 +479,44 @@ static enum ec_status fp_command_info(struct host_cmd_handler_args *args)
 	r->template_info.template_dirty = global_context.templ_dirty;
 	r->template_info.template_version = FP_TEMPLATE_FORMAT_VERSION;
 
+	if (args->version == 2) {
+		struct ec_response_fp_info_v2 *r_v2 =
+			static_cast<ec_response_fp_info_v2 *>(args->response);
+		/* Convert to v2 format. The formats differ only in the frame
+		 * array, which is located at the end of the structures
+		 *
+		 * SAFETY: 'r->image_frame_params' and r_v2->image_frame_params
+		 * overlap inexactly, but copying data is safe because we copy
+		 * data forward (from the first field of the structure to the
+		 * last).
+		 */
+		for (int i = 0; i < FP_MAX_CAPTURE_TYPES; i++) {
+			r_v2->image_frame_params[i].frame_size =
+				r->image_frame_params[i].frame_size;
+			r_v2->image_frame_params[i].pixel_format =
+				r->image_frame_params[i].pixel_format;
+			r_v2->image_frame_params[i].width =
+				r->image_frame_params[i].width;
+			r_v2->image_frame_params[i].height =
+				r->image_frame_params[i].height;
+			r_v2->image_frame_params[i].bpp =
+				r->image_frame_params[i].bpp;
+			r_v2->image_frame_params[i].fp_capture_type =
+				r->image_frame_params[i].fp_capture_type;
+			r_v2->image_frame_params[i].reserved =
+				r->image_frame_params[i].reserved;
+		}
+		response_size = sizeof(struct ec_response_fp_info_v2) +
+				FP_MAX_CAPTURE_TYPES *
+					sizeof(struct fp_image_frame_params);
+	}
+
 	args->response_size = response_size;
 
 	return EC_RES_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_INFO, fp_command_info, EC_VER_MASK(2));
+DECLARE_HOST_COMMAND(EC_CMD_FP_INFO, fp_command_info,
+		     EC_VER_MASK(2) | EC_VER_MASK(3));
 
 BUILD_ASSERT(FP_CONTEXT_NONCE_BYTES == 12);
 
@@ -782,12 +829,7 @@ static enum ec_status fp_command_stats(struct host_cmd_handler_args *args)
 	r->overall_t0.lo = overall_t0.le.lo;
 	r->overall_t0.hi = overall_t0.le.hi;
 	r->timestamps_invalid = timestamps_invalid;
-	/*
-	 * Note that this is set to FP_NO_SUCH_TEMPLATE when positive match
-	 * secret is read/disabled, and we are not using this field in biod.
-	 */
-	r->template_matched =
-		global_context.positive_match_secret_state.template_matched;
+	r->template_matched = stats_template_matched;
 
 	args->response_size = sizeof(*r);
 	return EC_RES_SUCCESS;

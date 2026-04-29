@@ -22,7 +22,7 @@ def register_fpmcu_variant(
         zephyr_board=zephyr_board,
         modules=["ec", *variant_modules],
         optional_modules=[*variant_optional_modules],
-        supported_toolchains=["llvm", "zephyr"],
+        supported_toolchains=["host/llvm", "zephyr"],
         dts_overlays=[*variant_dts_overlays],
         kconfig_files=[here / "prj.conf", *variant_kconfig_files],
         signer=signer,
@@ -34,7 +34,7 @@ bloonchipper = register_fpmcu_variant(
     project_name="bloonchipper",
     zephyr_board="google_dragonclaw",
     register_func=register_binman_project,
-    variant_modules=["hal_stm32", "cmsis", "cmsis_6"],
+    variant_modules=["hal_stm32", "cmsis_6"],
     variant_optional_modules=["fpc"],
     variant_dts_overlays=[
         here / "bloonchipper" / "bloonchipper.dts",
@@ -58,7 +58,7 @@ buccaneer = register_fpmcu_variant(
     project_name="buccaneer",
     zephyr_board="google_quincy",
     register_func=register_npcx_project,
-    variant_modules=["cmsis", "cmsis_6"],
+    variant_modules=["cmsis_6"],
     variant_optional_modules=["elan"],
     variant_dts_overlays=[
         here / "helipilot" / "buccaneer.dts",
@@ -89,7 +89,7 @@ helipilot = register_fpmcu_variant(
     project_name="helipilot",
     zephyr_board="google_quincy",
     register_func=register_npcx_project,
-    variant_modules=["cmsis", "cmsis_6"],
+    variant_modules=["cmsis_6"],
     variant_optional_modules=["fpc"],
     variant_dts_overlays=[
         here / "helipilot" / "helipilot.dts",
@@ -135,6 +135,12 @@ def register_et171_project(
 sanok = register_et171_project("sanok")
 assert_rw_fwid_DO_NOT_EDIT(project_name="sanok", addr=0x42104)
 
+srebrna = register_et171_project("srebrna")
+assert_rw_fwid_DO_NOT_EDIT(project_name="srebrna", addr=0x42104)
+
+stobnica = register_et171_project("stobnica")
+assert_rw_fwid_DO_NOT_EDIT(project_name="stobnica", addr=0x42104)
+
 niedzica = register_fpmcu_variant(
     project_name="niedzica",
     zephyr_board="32f967_dv",
@@ -155,3 +161,35 @@ niedzica = register_fpmcu_variant(
 # The address of RW_FWID is hardcoded in RO. You need to have REALLY
 # good reason to change it.
 assert_rw_fwid_DO_NOT_EDIT(project_name="niedzica", addr=0x24144)
+
+
+def register_ft9001_project(
+    project_name,
+):
+    """Register an fpmcu variant"""
+    dts_path = project_name + ".dts"
+    conf_path = project_name + ".conf"
+    return register_fpmcu_variant(
+        project_name=project_name,
+        zephyr_board="ft9001_eval",
+        register_func=register_binman_project,
+        variant_modules=["cmsis_6", "focaltech_module"],
+        variant_optional_modules=["focaltech_fp"],
+        variant_dts_overlays=[
+            here / "ft9001" / dts_path,
+        ],
+        variant_kconfig_files=[
+            here / "ft9001" / "prj.conf",
+            here / "ft9001" / conf_path,
+        ],
+        signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
+            here / "ft9001" / "dev_key.pem",
+        ),
+    )
+
+
+chudow = register_ft9001_project("chudow")
+assert_rw_fwid_DO_NOT_EDIT(project_name="chudow", addr=0x82274)
+
+chobienia = register_ft9001_project("chobienia")
+assert_rw_fwid_DO_NOT_EDIT(project_name="chobienia", addr=0x82274)
