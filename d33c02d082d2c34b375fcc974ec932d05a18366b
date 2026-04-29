@@ -49,6 +49,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6b44681e_54772a1b",
+        "filename": "driver/fingerprint/egis/egis_private.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-29T06:15:42Z",
+      "side": 1,
+      "message": "That’s incorrect. I didn’t update this because I believed the architecture was no longer used.\nIf this path is still relevant, I can update the related changes.",
+      "parentUuid": "3372580a_93801514",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 0
+      },
+      "revId": "d33c02d082d2c34b375fcc974ec932d05a18366b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "767c1fd5_9b7a8206",
         "filename": "driver/fingerprint/egis/egis_private.c",
         "patchSetId": 15
@@ -60,6 +84,30 @@
       "writtenOn": "2026-04-29T05:49:03Z",
       "side": 1,
       "message": "`FINGERPRINT_SENSOR_SCAN_GOOD` is a Zephyr define. This part is for legacy EC. Please just use `EC_SUCCESS` here.",
+      "range": {
+        "startLine": 94,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 0
+      },
+      "revId": "d33c02d082d2c34b375fcc974ec932d05a18366b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24b819d0_ef4094c1",
+        "filename": "driver/fingerprint/egis/egis_private.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-29T06:15:42Z",
+      "side": 1,
+      "message": "Although `FINGERPRINT_SENSOR_SCAN_GOOD` currently has the same value as\n`EC_SUCCESS`, it is used here to match the [test expectation](https://chromium.googlesource.com/chromiumos/platform/ec/+/d33c02d082d2c34b375fcc974ec932d05a18366b/zephyr/test/fingerprint/drivers/egis630/src/egis630.c#96).\n```\nZTEST_F(egis630, test_convert_egis_get_image_error_code)\n{\n\tzassert_equal(\n\t\tconvert_egis_get_image_error_code(EGIS_API_IMAGE_QUALITY_GOOD),\n\t\tFINGERPRINT_SENSOR_SCAN_GOOD);\n```\nDo you think using `EC_SUCCESS` would be preferable from an interface or\nconsistency point of view?",
+      "parentUuid": "767c1fd5_9b7a8206",
       "range": {
         "startLine": 94,
         "startChar": 0,
@@ -106,6 +154,24 @@
       "writtenOn": "2026-04-29T05:49:03Z",
       "side": 1,
       "message": "Shouldn\u0027t this be a third macro instead of overwriting all existing capture types??",
+      "revId": "d33c02d082d2c34b375fcc974ec932d05a18366b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4aac8b6e_68d7070e",
+        "filename": "zephyr/program/fpmcu/et171/sanok.dts",
+        "patchSetId": 15
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-29T06:15:42Z",
+      "side": 1,
+      "message": "With the new capture format, `FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE` is also mapped to `FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT`.\nAs a result, there are only two effective image format left, and we are not introducing an additional one.",
+      "parentUuid": "48cf272f_d6ebeb98",
       "revId": "d33c02d082d2c34b375fcc974ec932d05a18366b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
