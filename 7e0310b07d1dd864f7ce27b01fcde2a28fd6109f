@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3a44743c_f3c3f387",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-29T08:12:21Z",
+      "side": 1,
+      "message": "I could reproduce your scenario.\nThis protect status was block by `software_protection_lock` at `cros_flash_em32f967_get_protect` function. If I remove it and I could get correct RO was protected by `flashinfo`\n\nShould I remove `\tif (!software_protection_lock) {\n\t\treturn 0;\n\t}`",
+      "parentUuid": "aeb82f85_501cfbab",
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0fa07852_9718751b",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 15
@@ -48,6 +66,30 @@
       "writtenOn": "2026-04-24T18:46:50Z",
       "side": 1,
       "message": "Any non-zero value returned here will be recognized as \"protected\" (it\u0027s not even checked in `get_prot_reg()` below). I think we can only return 0 here and leave appropriate comment.",
+      "range": {
+        "startLine": 79,
+        "startChar": 2,
+        "endLine": 79,
+        "endChar": 32
+      },
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02c440e0_a17ab704",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-29T08:12:21Z",
+      "side": 1,
+      "message": "Agreed. Since physical_get_protect is used as a boolean predicate,\nreturning any non-zero value would be interpreted as \"protected\".\nWhen the write-protect library is not available, returning 0 is the\nsafest and most correct behavior.\n\nget_prot_reg() is only called from paths that already verify the\nwrite-protect library is enabled. The helper assumes that invariant\nand focuses solely on validating the hardware protection state.",
+      "parentUuid": "0fa07852_9718751b",
       "range": {
         "startLine": 79,
         "startChar": 2,
@@ -83,6 +125,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "01412810_11bf19b9",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-29T08:12:21Z",
+      "side": 1,
+      "message": "Good point. I updated write/erase to return -EINVAL for invalid parameters,\nwhile keeping protection-policy errors unchanged.",
+      "parentUuid": "d5d75d47_733d0900",
+      "range": {
+        "startLine": 204,
+        "startChar": 9,
+        "endLine": 204,
+        "endChar": 24
+      },
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1698b9ee_fdbdefd0",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 15
@@ -94,6 +160,30 @@
       "writtenOn": "2026-04-24T18:46:50Z",
       "side": 1,
       "message": "What would happen, if we skipped checking if the sector is protected, and proceed with writing?",
+      "range": {
+        "startLine": 207,
+        "startChar": 0,
+        "endLine": 216,
+        "endChar": 2
+      },
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a4d683b_1b20cf72",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-29T08:12:21Z",
+      "side": 1,
+      "message": "The result would be non‑deterministic and hardware‑dependent.  \nWrites to protected regions may be silently ignored, partially applied,\nor fail inconsistently, which breaks EC API expectations.  \nWe therefore enforce protection checks in the driver to keep behavior\ndeterministic and policy‑controlled.",
+      "parentUuid": "1698b9ee_fdbdefd0",
       "range": {
         "startLine": 207,
         "startChar": 0,
@@ -129,6 +219,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2c249d5e_aa3886ee",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-29T08:12:21Z",
+      "side": 1,
+      "message": "I agree that looping page‑erase logic conceptually belongs in the\nZephyr flash driver. For this change, it’s kept in the cros_flash layer\nto avoid refactoring the underlying flash driver, since the focus here\nis protection semantics rather than erase mechanics.",
+      "parentUuid": "3f382606_ff546f2d",
+      "range": {
+        "startLine": 262,
+        "startChar": 0,
+        "endLine": 273,
+        "endChar": 2
+      },
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6b529adc_78df77b0",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
         "patchSetId": 15
@@ -140,6 +254,30 @@
       "writtenOn": "2026-04-24T18:46:50Z",
       "side": 1,
       "message": "Is the protection range-based or sector-based? I guess your flash protection is range-based.\n\nI would not emulate the other type of protection mechanism. Mixing both in one driver causes confusion.",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 53
+      },
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33441e10_2c8c4153",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-29T08:12:21Z",
+      "side": 1,
+      "message": "The protection mechanism is strictly range‑based.\n\nOn EM32F967, flash protection is configured only via contiguous protection\nranges using Protect Area registers. There is no sector‑ or bank‑level\nprotection configuration in hardware.\n\nThe `flash_em32_check_bank_protected()` helper does not introduce or emulate\na separate sector‑based protection mechanism. It simply answers whether a\ngiven bank falls within the currently configured protection range, as EC\nflash APIs are bank‑oriented for state reporting and policy decisions.\n\nSo the driver uses a single range‑based protection model, with bank‑based\nqueries only as a representation layer, not as a separate protection type.",
+      "parentUuid": "6b529adc_78df77b0",
       "range": {
         "startLine": 26,
         "startChar": 0,
