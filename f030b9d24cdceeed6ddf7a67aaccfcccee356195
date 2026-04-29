@@ -16,6 +16,24 @@
       "message": "I don\u0027t think this is a good approach. Maybe it\u0027s safer to set `is_memory_mapped` to false and make the libe always use `egis_apns_data_read`?\n\nThis memcpy is not needed here, just call `crec_flash_read`",
       "revId": "f030b9d24cdceeed6ddf7a67aaccfcccee356195",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab907425_a52e1e10",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T12:22:43Z",
+      "side": 1,
+      "message": "OK, I also found some issue with memcpy here, switch back now.",
+      "parentUuid": "9a56f6f5_cef04acd",
+      "revId": "f030b9d24cdceeed6ddf7a67aaccfcccee356195",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
