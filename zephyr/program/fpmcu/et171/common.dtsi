@@ -156,6 +156,11 @@
 			label = "rollback1";
 			reg = <0x41000 DT_SIZE_K(4)>;
 		};
+
+		apns_data: partition@100000 {
+			label = "apns_data";
+			reg = <0x100000 DT_SIZE_K(52)>;
+		};
 	};
 };
 
