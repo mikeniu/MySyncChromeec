@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eadd450f_e041ce41",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-29T11:47:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc0ed125_c9d91901",
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6054a783_203e10d3",
@@ -141,6 +159,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8eb2d78_e39051f3",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-29T11:47:47Z",
+      "side": 1,
+      "message": "https://github.com/zephyrproject-rtos/zephyr/pull/105902 was merged and already present on `cros/main` branch.",
+      "parentUuid": "e2b34c92_206fc300",
+      "range": {
+        "startLine": 54,
+        "startChar": 27,
+        "endLine": 54,
+        "endChar": 44
+      },
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d0b56a4e_4abad84c",
@@ -205,6 +247,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb8acef2_6e16e8cb",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-29T11:47:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "265f9cd2_e0722cec",
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "be4c618f_e7dfb621",
@@ -253,6 +313,30 @@
       "writtenOn": "2026-04-24T11:53:46Z",
       "side": 1,
       "message": "this needs a bit of indentation work, have you ran the presubmit? also this function is fairly big I\u0027d consdier splitting the individual cases into separate functions",
+      "range": {
+        "startLine": 193,
+        "startChar": 0,
+        "endLine": 194,
+        "endChar": 19
+      },
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca23fe5e_f1c8467b",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-29T11:47:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba753231_c32387fa",
       "range": {
         "startLine": 193,
         "startChar": 0,
