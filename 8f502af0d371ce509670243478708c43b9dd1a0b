@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "779871fa_deacea57",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1293716
+      },
+      "writtenOn": "2026-04-29T07:52:01Z",
+      "side": 1,
+      "message": "```\nchromeos-zephyr-0.0.1-r5275: /build/corsola/tmp/portage/chromeos-base/chromeos-zephyr-0.0.1-r5275/work/chromeos-zephyr-0.0.1/build/skitty/modules/ec/common/i2c_passthru.c:35:48: error: \u0027I2C_BITBANG_PORT_COUNT\u0027 undeclared here (not in a function); did you mean \u0027I2C_PORT_COUNT\u0027?\nchromeos-zephyr-0.0.1-r5275:    35 | static uint8_t port_protected[I2C_PORT_COUNT + I2C_BITBANG_PORT_COUNT];\nchromeos-zephyr-0.0.1-r5275:       |                                                ^~~~~~~~~~~~~~~~~~~~~~\nchromeos-zephyr-0.0.1-r5275:       |                                                I2C_PORT_COUNT\nchromeos-zephyr-0.0.1-r5275: /build/corsola/tmp/portage/chromeos-base/chromeos-zephyr-0.0.1-r5275/work/chromeos-zephyr-0.0.1/build/skitty/modules/ec/common/i2c_passthru.c:35:16: error: \u0027port_protected\u0027 defined but not used [-Werror\u003dunused-variable]\nchromeos-zephyr-0.0.1-r5275:    35 | static uint8_t port_protected[I2C_PORT_COUNT + I2C_BITBANG_PORT_COUNT];\nchromeos-zephyr-0.0.1-r5275:       |                ^~~~~~~~~~~~~~\n```",
+      "revId": "8f502af0d371ce509670243478708c43b9dd1a0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
