@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68dd96ab_0a1dd30b",
+        "filename": "zephyr/program/fpmcu/et171/gpio.dtsi",
+        "patchSetId": 25
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T05:53:50Z",
+      "side": 1,
+      "message": "This will configure `gpio_btn_ign_out` in all et171 projects, is that expected?",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 4
+      },
+      "revId": "b134417505b313541133874aaef131e4ee9fa260",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
