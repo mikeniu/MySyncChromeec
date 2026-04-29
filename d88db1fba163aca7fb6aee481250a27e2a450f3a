@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "405f666f_bb6684c9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-29T15:33:39Z",
+      "side": 1,
+      "message": "was the zephyr test issue resolved? Is so, how?",
+      "revId": "d88db1fba163aca7fb6aee481250a27e2a450f3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a24bf993_a7899617",
         "filename": "driver/fingerprint/egis/egis_api.h",
         "patchSetId": 16
@@ -53,6 +70,52 @@
         "startChar": 0,
         "endLine": 82,
         "endChar": 43
+      },
+      "revId": "d88db1fba163aca7fb6aee481250a27e2a450f3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83b28082_aa634d83",
+        "filename": "driver/fingerprint/egis/egis_private.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-29T15:33:39Z",
+      "side": 1,
+      "message": "```\n/* Ensure we are not just casting pointers blindly if alignment matters */\negis_api_return_t ret \u003d egis_finger_match(\n    templ, \n    templ_count, \n    (FP_EGIS_IMAGE *)image, // Add a static_assert here to verify size/alignment if possible\n    match_index,\n    template_update ? update_bitmap : NULL\n);\n```",
+      "range": {
+        "startLine": 204,
+        "startChar": 1,
+        "endLine": 206,
+        "endChar": 42
+      },
+      "revId": "d88db1fba163aca7fb6aee481250a27e2a450f3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ce39be9_f2a7988d",
+        "filename": "zephyr/drivers/fingerprint/Kconfig",
+        "patchSetId": 16
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-29T15:33:39Z",
+      "side": 1,
+      "message": "Instead of hardcoding 26200, use a descriptive calculation in the header:\n\n```\n/* \n * Data Collection Format: \n * Matcher(5120) + Metadata(20) + Raw(10530) + BKG(10530) \u003d 26200 \n */\n#define EGIS_COLLECTION_FORMAT_SIZE (5120 + 20 + 10530 + 10530)\n#define FP_SENSOR_IMAGE_SIZE_EGIS EGIS_COLLECTION_FORMAT_SIZE\n```",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 44
       },
       "revId": "d88db1fba163aca7fb6aee481250a27e2a450f3a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
