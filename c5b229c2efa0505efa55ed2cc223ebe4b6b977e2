@@ -16,6 +16,24 @@
       "message": "Look good, but I think it would be better to add this CL after CL:7660503 and also enable needed config.",
       "revId": "c5b229c2efa0505efa55ed2cc223ebe4b6b977e2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1b40ae7_6f6027ec",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T11:35:05Z",
+      "side": 1,
+      "message": "But if this CL is added after CL:7660503, apns_data cannot be found via DT_REG_ADDR(DT_NODELABEL(apns_data)).",
+      "parentUuid": "89d64058_14f5a771",
+      "revId": "c5b229c2efa0505efa55ed2cc223ebe4b6b977e2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
