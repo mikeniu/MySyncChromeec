@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c226da5_8c18910f",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T15:45:16Z",
+      "side": 1,
+      "message": "\"flash.h\" should come after \"fingerprint_*\"",
+      "revId": "9c4929b83a013862abf62a910cf9cec2dfb004cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

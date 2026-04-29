@@ -140,6 +140,24 @@
       "parentUuid": "36ae64a0_7510a3f7",
       "revId": "f5e4390df498e85ca37f8b3ea51f9944947e9632",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5fdfa8c_6b134d08",
+        "filename": "zephyr/subsys/fingerprint/alg/egis_egis660_bio_apns.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T15:45:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5881edfd_c093a44e",
+      "revId": "f5e4390df498e85ca37f8b3ea51f9944947e9632",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
