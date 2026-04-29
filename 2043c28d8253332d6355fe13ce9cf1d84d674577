@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d96764ca_11d711e4",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 662,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-29T23:27:38Z",
+      "side": 1,
+      "message": "**USB Interface Claiming Logic is Hardcoded and Contradictory** In `IapControl::openDevice`, the code correctly queries the device configuration to find the HID interface index. However, it subsequently ignores this discovered `interface` and blindly attempts to claim interfaces `0` through `3` (`COUNT_INTERFACE`):\n\n```c\nfor (int i \u003d 0; i \u003c COUNT_INTERFACE; i++) {\n    // ... libusb_claim_interface(handle, i)\n}\n```\n\n* **Issue:** If the specific ELAN device being targeted has fewer than 4 interfaces, `libusb_claim_interface` will return an error on the non-existent interfaces, causing the entire `openDevice` routine to fail and return `-1`.  \n* **Remediation:** Either iterate from `0` to `config-\u003ebNumInterfaces` or strictly claim the `interface` index that was dynamically discovered during the descriptor parsing loop.",
+      "range": {
+        "startLine": 651,
+        "startChar": 0,
+        "endLine": 662,
+        "endChar": 2
+      },
+      "revId": "2043c28d8253332d6355fe13ce9cf1d84d674577",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3586ddf2_09e61a68",
         "filename": "util/elan/iaptool.cc",
         "patchSetId": 9
