@@ -89,6 +89,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0df00ec5_51ca8afe",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T14:21:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "473b5d60_d2da0066",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b0ecca76_96408791",
@@ -262,6 +280,24 @@
       "side": 1,
       "message": "Thanks for your reminder, I will change to true.",
       "parentUuid": "977186c0_14c48691",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f1092f6_1ff78d2a",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T14:21:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53e99ddb_e7dd0110",
       "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },

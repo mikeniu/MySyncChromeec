@@ -90,6 +90,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1752d065_dce05ae1",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T14:21:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa291d08_e63c7163",
+      "revId": "0ca3b55197ff15fd889136823e9f774c42be44b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "23b23aa2_dce3e67e",
@@ -127,6 +145,30 @@
       "side": 1,
       "message": "Sorry, I didn\u0027t get it, where the error?",
       "parentUuid": "23b23aa2_dce3e67e",
+      "range": {
+        "startLine": 168,
+        "startChar": 0,
+        "endLine": 191,
+        "endChar": 0
+      },
+      "revId": "0ca3b55197ff15fd889136823e9f774c42be44b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03e57118_309b2ddf",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T14:21:13Z",
+      "side": 1,
+      "message": "Why do you add declaration of `egis_log_var` and `egis_assert_fail` functions here?",
+      "parentUuid": "feda452d_dc443c28",
       "range": {
         "startLine": 168,
         "startChar": 0,
