@@ -17,6 +17,13 @@
 	};
 };
 
+/* Configure existing simulated flash from native_sim.dts */
+&flash0 {
+	erase-block-size = <0x1000>;
+	write-block-size = <1>;
+	reg = <0x00000000 DT_SIZE_K(512)>;
+};
+
 &spi0 {
 	egis660: egis660@0 {
 		compatible = "egis,egis660";
