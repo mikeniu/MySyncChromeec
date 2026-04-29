@@ -104,6 +104,24 @@
       "parentUuid": "278ca65e_3c9204ef",
       "revId": "f5e4390df498e85ca37f8b3ea51f9944947e9632",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36ae64a0_7510a3f7",
+        "filename": "zephyr/subsys/fingerprint/alg/egis_egis660_bio_apns.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T12:08:02Z",
+      "side": 1,
+      "message": "I don\u0027t think the lib knows a proper address, right? Including the flash-mapped address + offset withing flash.",
+      "parentUuid": "66d8004a_cc34cbac",
+      "revId": "f5e4390df498e85ca37f8b3ea51f9944947e9632",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
