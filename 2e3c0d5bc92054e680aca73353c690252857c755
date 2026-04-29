@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c4d4c6c_d9901e44",
+        "filename": "util/elan/filecontrol.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-29T09:46:26Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 9.",
+      "parentUuid": "38417e5a_c0463540",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 12
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fa154754_a6e65543",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-04-28T17:53:44Z",
       "side": 1,
       "message": "Remove this comment. It\u0027s obvious that it\u0027s a constructor.",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 14
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2f954d1_c410a05a",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-29T09:46:26Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 9.",
+      "parentUuid": "fa154754_a6e65543",
       "range": {
         "startLine": 58,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca76eadb_adc519fb",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-29T09:46:26Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 9.",
+      "parentUuid": "08cedd80_416e8722",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 13
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1c7fa60e_ff711363",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-04-28T17:53:44Z",
       "side": 1,
       "message": "```suggestion\n\t\tlogInfo(\"[IAP] {} - return command code does not match (0x{:02X})\\n\",\n```",
+      "range": {
+        "startLine": 313,
+        "startChar": 0,
+        "endLine": 313,
+        "endChar": 71
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d480cba2_e83ad2e5",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-29T09:46:26Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 9.",
+      "parentUuid": "1c7fa60e_ff711363",
       "range": {
         "startLine": 313,
         "startChar": 0,
@@ -140,6 +236,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "78a6b8ce_92002377",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-29T09:46:26Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 9.",
+      "parentUuid": "5b640453_20803fdf",
+      "range": {
+        "startLine": 541,
+        "startChar": 0,
+        "endLine": 572,
+        "endChar": 1
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0c53712a_8bfe4ac3",
@@ -153,6 +273,30 @@
       "writtenOn": "2026-04-28T17:13:40Z",
       "side": 1,
       "message": "* **Ambiguous Error Return in `get32Le`:** In `iapcontrol::get32Le`, if the buffer size is less than 4, the function returns `-1`. Because the return type is `uint32_t`, `-1` evaluates to `0xFFFFFFFF`. This is indistinguishable from a perfectly valid 32-bit read where all bytes are `0xFF`.  \n    \n  * *Remediation:* Change the return type to `std::optional\u003cuint32_t\u003e` to safely handle and propagate the error state, aligning with the pattern you already used in `getChecksum`.",
+      "range": {
+        "startLine": 888,
+        "startChar": 0,
+        "endLine": 899,
+        "endChar": 1
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "417a156b_17f8eb41",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 899,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-29T09:46:26Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 9.",
+      "parentUuid": "0c53712a_8bfe4ac3",
       "range": {
         "startLine": 888,
         "startChar": 0,
@@ -186,6 +330,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf0b3cf7_cb33e35e",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-29T09:46:26Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 9.",
+      "parentUuid": "95a2a31b_347fa60f",
+      "range": {
+        "startLine": 916,
+        "startChar": 0,
+        "endLine": 926,
+        "endChar": 1
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6325603f_f02149ce",
@@ -209,6 +377,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "09aff7a0_383b3162",
+        "filename": "util/elan/iapcontrol.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-29T09:46:26Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 9.",
+      "parentUuid": "6325603f_f02149ce",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 12
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6035bf36_f2bfd011",
@@ -222,6 +414,30 @@
       "writtenOn": "2026-04-28T17:53:44Z",
       "side": 1,
       "message": "* **Class Naming Conventions:** The class `iapcontrol` violates standard ChromiumOS/C++ naming conventions.  \n    \n  * *Remediation:* Rename it to PascalCase (`IapControl`) to clearly distinguish it from variables and functions.",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 18
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c22a36c_0d6089cb",
+        "filename": "util/elan/iapcontrol.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-29T09:46:26Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 9.",
+      "parentUuid": "6035bf36_f2bfd011",
       "range": {
         "startLine": 30,
         "startChar": 0,
@@ -279,6 +495,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "abf0f6c7_13151b4c",
+        "filename": "util/elan/iapcontrol.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-29T09:46:26Z",
+      "side": 1,
+      "message": "My environment is not support C++23. I created a header file (utility.h) as a common template for print log.\nFixed and updated code to Patchset 9.",
+      "parentUuid": "ebbfe664_f4f6b0e5",
+      "range": {
+        "startLine": 91,
+        "startChar": 0,
+        "endLine": 95,
+        "endChar": 2
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fb628ef3_9024a640",
@@ -292,6 +532,30 @@
       "writtenOn": "2026-04-28T17:53:44Z",
       "side": 1,
       "message": "Typo in this comment. Let\u0027s just remove it.",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 16
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "285eba7b_d7d0fdc8",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-29T09:46:26Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 9.",
+      "parentUuid": "fb628ef3_9024a640",
       "range": {
         "startLine": 27,
         "startChar": 0,
@@ -325,6 +589,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4be4b17_db08141e",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-29T09:46:26Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 9.",
+      "parentUuid": "4aa8ad65_7c115325",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 23
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cc791768_a99445a7",
@@ -338,6 +626,30 @@
       "writtenOn": "2026-04-28T17:53:44Z",
       "side": 1,
       "message": "```suggestion\n\tlogInfo(\"[IAP] Parse Command Line - File Path: {}\\n\",\n```",
+      "range": {
+        "startLine": 133,
+        "startChar": 0,
+        "endLine": 133,
+        "endChar": 55
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f7e597e_87794960",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-29T09:46:26Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 9.",
+      "parentUuid": "cc791768_a99445a7",
       "range": {
         "startLine": 133,
         "startChar": 0,
@@ -371,6 +683,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9213247_dacd2c0d",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-29T09:46:26Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 9.",
+      "parentUuid": "a0d9561d_a7fde245",
+      "range": {
+        "startLine": 165,
+        "startChar": 0,
+        "endLine": 165,
+        "endChar": 18
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "839970ea_c1ef86e7",
@@ -384,6 +720,30 @@
       "writtenOn": "2026-04-28T17:53:44Z",
       "side": 1,
       "message": "Use [`#define` guards](https://google.github.io/styleguide/cppguide.html#The__define_Guard) instead of `#pragma once`.",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 12
+      },
+      "revId": "2e3c0d5bc92054e680aca73353c690252857c755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "327c5c34_6dc68ae2",
+        "filename": "util/elan/iaptool.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-04-29T09:46:26Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 9.",
+      "parentUuid": "839970ea_c1ef86e7",
       "range": {
         "startLine": 5,
         "startChar": 0,
