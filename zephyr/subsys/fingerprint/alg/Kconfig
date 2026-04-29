@@ -59,6 +59,13 @@ config FP_FT98XX_ALGORITHM
 	  Enable Focaltech FT98XX matching algorithm. To work properly, Focaltech
 	  private library is required.
 
+config FP_EGIS_EGIS660_APNS_STORAGE
+	bool "EGIS_EGIS660 apns storage"
+	default y if FINGERPRINT_SENSOR_EGIS660
+	help
+	  Enable EGIS EGIS660 apns storage. To work properly, EGIS private
+	  library is required.
+
 config FP_ALGORITHM_TEMPLATE_SIZE
 	int "Size of template size"
 	default 5092 if FINGERPRINT_SENSOR_FPC1025 && FP_FPC_BEP_ALGORITHM
