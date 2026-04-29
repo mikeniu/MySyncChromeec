@@ -74,6 +74,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "343a557e_acb498a7",
+        "filename": "common/tpm_registers.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1135,
+      "author": {
+        "id": 1000039
+      },
+      "writtenOn": "2026-04-29T22:44:06Z",
+      "side": 1,
+      "message": "please update this comment.",
+      "parentUuid": "ae060c57_60506b4d",
+      "range": {
+        "startLine": 1135,
+        "startChar": 7,
+        "endLine": 1135,
+        "endChar": 35
+      },
+      "revId": "71bf3fbaf20fc568179c93d0ac76e6c36ad8c267",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "83f6e968_c3bd9e41",
         "filename": "common/tpm_registers.c",
         "patchSetId": 1
@@ -205,6 +229,30 @@
       "side": 1,
       "message": "It is different TPM2. In Cr50 it is https://source.corp.google.com/h/chrome-internal/chromeos/superproject/+/main:src/third_party/tpm2/ExecCommand.c;l\u003d42\n\n- there is no read from `responseSize` and it is set in the https://source.corp.google.com/h/chrome-internal/chromeos/superproject/+/main:src/third_party/tpm2/ExecCommand.c;l\u003d292",
       "parentUuid": "872d9cd5_4d70c790",
+      "range": {
+        "startLine": 1138,
+        "startChar": 30,
+        "endLine": 1138,
+        "endChar": 43
+      },
+      "revId": "71bf3fbaf20fc568179c93d0ac76e6c36ad8c267",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "30871b21_fc21e5ce",
+        "filename": "common/tpm_registers.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1138,
+      "author": {
+        "id": 1000039
+      },
+      "writtenOn": "2026-04-29T22:44:06Z",
+      "side": 1,
+      "message": "ah, of course!",
+      "parentUuid": "fb56f57e_ed7cb03d",
       "range": {
         "startLine": 1138,
         "startChar": 30,
