@@ -344,6 +344,7 @@
 #undef CONFIG_ALS_ISL29035
 #undef CONFIG_ALS_OPT3001
 #undef CONFIG_ALS_CM32183
+#undef CONFIG_ALS_CM36781
 /* Define the exact model ID present on the board: SI1141 = 41, SI1142 = 42, */
 #undef CONFIG_ALS_SI114X
 /* Check if the device revision is supported */
@@ -555,6 +556,11 @@
  * Defines retry count for reading Manuf/Device name in init_battery_type
  */
 #define CONFIG_BATTERY_INIT_TYPE_RETRY_COUNT 0
+
+/*
+ * Number of deferred retries when initializing the battery type.
+ */
+#define CONFIG_BATTERY_INIT_TYPE_DEFERRED_RETRY_COUNT 0
 
 /*
  * Critical battery shutdown timeout (seconds)
@@ -1718,16 +1724,6 @@
 #undef CONFIG_CMD_PD_SRCCAPS_REDUCED_SIZE
 #undef CONFIG_CMD_VBUS
 
-/*
- * HAS_TASK_CHIPSET implies the GSC presence.
- * HAS_TASK_CONSOLE means UART console enabled.
- * chargen command is needed for UART stress test.
- */
-#if defined(HAS_TASK_CHIPSET) && defined(HAS_TASK_CONSOLE)
-#define CONFIG_CMD_CHARGEN
-#else
-#undef CONFIG_CMD_CHARGEN
-#endif
 #define CONFIG_CMD_CHARGER
 
 /* Extra debugging info for the charger */
@@ -1885,6 +1881,9 @@
  */
 #undef CONFIG_PANIC_LOG_DEBUG
 
+/* Enable generic SVDM DFP identity response */
+#undef CONFIG_SVDM_RSP_DFP_ONLY
+
 /*
  * noinit_end_of_ram is a memory section placed at the very end
  * of used ram, where it is least likely to overlap with RO ram.
@@ -1975,18 +1974,6 @@
 #define CONFIG_COMMON_TIMER
 
 /*****************************************************************************/
-
-/*
- * Make it possible for console to be output to different channels that can be
- * turned on and off.
- *
- * This is useful as a developer convenience when the console is crowded with
- * messages, to make it easier to use the interactive console.
- * FAFT and servod also use this feature.
- *
- * Boards may #undef this to reduce image size.
- */
-#define CONFIG_CONSOLE_CHANNEL
 
 /*
  * Provide additional help on console commands, such as the supported
@@ -2997,6 +2984,12 @@
  * This option also enables error checking function on smart batteries.
  */
 #undef CONFIG_SMBUS_PEC
+
+/*
+ * The buffer size for i2c_read_sized_block. Set this to 256 could ensure
+ * that i2c_read_sized_block only call i2c_xfer_unlocked twice each try.
+ */
+#define CONFIG_I2C_READ_SIZE_BUFFER 1
 
 /*
  * Add hosts-side support for entering programming mode for I2C ITE ECs.
@@ -5485,6 +5478,14 @@
 /* SYV682 does not pass through CC, instead it bypasses to the TCPC */
 #undef CONFIG_USBC_PPC_SYV682X_NO_CC
 
+/*
+ * TODO(b/445132756): This config is now a no-op.
+ *
+ * Smart discharge support in the SYV682x driver has been removed due to
+ * unreliable behavior (see bug for details). This config is kept temporarily
+ * to avoid breaking builds for boards that may still define it.
+ *
+ */
 /* Define to enable SYV682X VBUS smart discharge. */
 #undef CONFIG_USBC_PPC_SYV682X_SMART_DISCHARGE
 
@@ -5520,9 +5521,6 @@
 
 /* Support VCONN swap */
 #undef CONFIG_USBC_VCONN_SWAP
-
-#undef CONFIG_USBC_PD3_T_SENDER_RESPONSE_OVERRIDE
-#undef CONFIG_USBC_PD3_T_SENDER_RESPONSE_MS
 
 /*
  * The amount of time in microseconds that the board takes to turn VCONN on or
@@ -5756,9 +5754,12 @@
 /*
  * Maximum number of interrupts in a second. Exceeding this limit
  * will cause the TCPM to break the PD connection to avoid a
- * watchdog timeout crash
+ * watchdog timeout crash.
+ *
+ * The default of 500 (one every 2ms) is chosen to cover normal PD
+ * behavior while mitigating interrupt storms.
  */
-#define CONFIG_USB_PD_INT_STORM_MAX 1800
+#define CONFIG_USB_PD_INT_STORM_MAX 500
 
 /******************************************************************************/
 /* stm32f4 dwc usb configs. */

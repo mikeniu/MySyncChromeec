@@ -249,6 +249,10 @@ __overridable void board_pchg_full_strategy()
 {
 }
 
+__overridable void board_pchg_end_strategy()
+{
+}
+
 /*
  * This handles two cases: asynchronous reset and synchronous reset.
  *
@@ -555,7 +559,6 @@ static void pchg_state_charging(struct pchg *ctx)
 		break;
 	case PCHG_EVENT_CHARGE_UPDATE:
 		if (ctx->battery_percent >= ctx->cfg->full_percent) {
-			CPRINTS("full strategy start");
 			board_pchg_full_strategy();
 		}
 		break;
@@ -567,6 +570,9 @@ static void pchg_state_charging(struct pchg *ctx)
 	case PCHG_EVENT_CHARGE_ENDED:
 	case PCHG_EVENT_CHARGE_STOPPED:
 		ctx->state = PCHG_STATE_CONNECTED;
+		if (ctx->event == PCHG_EVENT_CHARGE_ENDED) {
+			board_pchg_end_strategy();
+		}
 		break;
 	default:
 		break;
@@ -909,19 +915,21 @@ static bool pchg_allowed(void)
 	return false;
 }
 
-static bool pchg_enabled;
+static int pchg_enabled = -1;
 
 static void pchg_update_state(void)
 {
 	bool allow = pchg_allowed();
 
-	if (allow && !pchg_enabled) {
+	if (allow == pchg_enabled)
+		return;
+
+	if (allow)
 		pchg_startup();
-		pchg_enabled = true;
-	} else if (!allow && pchg_enabled) {
+	else
 		pchg_shutdown();
-		pchg_enabled = false;
-	}
+
+	pchg_enabled = allow;
 }
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, pchg_update_state, HOOK_PRIO_DEFAULT);
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, pchg_update_state, HOOK_PRIO_DEFAULT);

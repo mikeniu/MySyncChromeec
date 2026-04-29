@@ -64,7 +64,7 @@ def test_find_dts_overlays(modules):
                     project_name=board,
                     zephyr_board=board,
                     output_packer=zmake.output_packers.ElfPacker,
-                    supported_toolchains=["llvm"],
+                    supported_toolchains=["host/llvm"],
                     project_dir=pathlib.Path("/fakebuild"),
                 )
             )
@@ -122,7 +122,7 @@ def test_prune_modules_unavailable():
             output_packer=zmake.output_packers.ElfPacker,
             supported_toolchains=["coreboot-sdk"],
             project_dir=pathlib.Path("/fake"),
-            modules=["hal_stm32", "cmsis", "cmsis_6"],
+            modules=["hal_stm32", "cmsis_6"],
         ),
     )
     with pytest.raises(KeyError):
