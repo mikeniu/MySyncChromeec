@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "16c4a1a1_f2fe27de",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-29T12:25:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2beb92c7_f0dc71ab",
+      "revId": "d8c9a3d8b55ef4338c35864efc53160541cfc8bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3ae40f35_cc21c08e",
@@ -52,6 +70,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3535a271_990d59dc",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-29T12:25:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3ae40f35_cc21c08e",
+      "revId": "d8c9a3d8b55ef4338c35864efc53160541cfc8bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "849579c1_389ec767",
@@ -65,6 +101,24 @@
       "writtenOn": "2026-04-29T12:14:17Z",
       "side": 1,
       "message": "line too long? surprised presubmit does not complain about, did you ran `cros format` on it?",
+      "revId": "d8c9a3d8b55ef4338c35864efc53160541cfc8bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f050a9a5_aff506d2",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-29T12:25:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "849579c1_389ec767",
       "revId": "d8c9a3d8b55ef4338c35864efc53160541cfc8bc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -92,6 +146,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4498c1ff_7fd7a5f3",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-29T12:25:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0a171d1_c345bdba",
+      "range": {
+        "startLine": 195,
+        "startChar": 0,
+        "endLine": 199,
+        "endChar": 23
+      },
+      "revId": "d8c9a3d8b55ef4338c35864efc53160541cfc8bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cd105347_a9f04bbe",
@@ -105,6 +183,24 @@
       "writtenOn": "2026-04-29T12:14:17Z",
       "side": 1,
       "message": "comments should use `/* */`",
+      "revId": "d8c9a3d8b55ef4338c35864efc53160541cfc8bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2367c00a_5771ee6e",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-29T12:25:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cd105347_a9f04bbe",
       "revId": "d8c9a3d8b55ef4338c35864efc53160541cfc8bc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -126,6 +222,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3299320_1a0e240d",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-29T12:25:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "854ce966_e94c686b",
+      "revId": "d8c9a3d8b55ef4338c35864efc53160541cfc8bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "65494417_9bd44f0a",
@@ -139,6 +253,30 @@
       "writtenOn": "2026-04-29T12:14:17Z",
       "side": 1,
       "message": "code under zephyr should always have braces on conditions",
+      "range": {
+        "startLine": 305,
+        "startChar": 0,
+        "endLine": 306,
+        "endChar": 14
+      },
+      "revId": "d8c9a3d8b55ef4338c35864efc53160541cfc8bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45c34222_81e3dcac",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-04-29T12:25:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "65494417_9bd44f0a",
       "range": {
         "startLine": 305,
         "startChar": 0,
