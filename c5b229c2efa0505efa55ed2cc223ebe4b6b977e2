@@ -34,6 +34,24 @@
       "parentUuid": "89d64058_14f5a771",
       "revId": "c5b229c2efa0505efa55ed2cc223ebe4b6b977e2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "81f887df_963be683",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T11:40:42Z",
+      "side": 1,
+      "message": "Yes, but it will be hidden behind a #ifdef CONFIG_xxx so it\u0027s not a problem.",
+      "parentUuid": "a1b40ae7_6f6027ec",
+      "revId": "c5b229c2efa0505efa55ed2cc223ebe4b6b977e2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
