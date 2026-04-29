@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fd46bf7_1c1e5573",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T09:00:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "67f1214f_898ea607",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f42cbc44_cc64b729",
@@ -108,6 +126,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f1816454_e58e1534",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T09:00:30Z",
+      "side": 1,
+      "message": "So please add a config to enable this feature",
+      "parentUuid": "9f1461c1_4e14e120",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "aafc1413_b98a8ceb",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
         "patchSetId": 6
@@ -143,6 +179,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1a7cdc9a_e3c27974",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T09:00:30Z",
+      "side": 1,
+      "message": "You can use\n```\n#define CONFIG_FLASH_WRITE_IDEAL_SIZE 256\n```\nfor `.write_align`\nand\n```\n#define CONFIG_FLASH_ERASE_SIZE 4096\n```\nfor `.erase_align`\n\nand just leave ` for `read_align`.",
+      "parentUuid": "03a72bd8_79aba9d4",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "977186c0_14c48691",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
         "patchSetId": 6
@@ -172,6 +226,57 @@
       "side": 1,
       "message": "Thanks for your reminder, I will change to true.",
       "parentUuid": "977186c0_14c48691",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4b771b2_e773f6d3",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T09:00:30Z",
+      "side": 1,
+      "message": "Please use defined return code.",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e3f086a_984eddfa",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T09:00:30Z",
+      "side": 1,
+      "message": "Please use defined return code.",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b6484e5_46212c43",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T09:00:30Z",
+      "side": 1,
+      "message": "Please use defined return code.",
       "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
