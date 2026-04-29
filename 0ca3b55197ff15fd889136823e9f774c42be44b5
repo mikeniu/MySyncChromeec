@@ -74,6 +74,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fa291d08_e63c7163",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T13:35:18Z",
+      "side": 1,
+      "message": "Fixed by changing `struct fp_sensor_info` to `struct fp_sensor_info_t`",
+      "parentUuid": "5de5018c_a86811f3",
+      "revId": "0ca3b55197ff15fd889136823e9f774c42be44b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "23b23aa2_dce3e67e",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.h",
         "patchSetId": 12
