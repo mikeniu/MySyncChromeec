@@ -16,6 +16,24 @@
       "message": "Please move above `/* unimplemented GPIOs */` comment.",
       "revId": "ef9aa1f4c5417f16a12e8e542e00d69b37d2ee6a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67d44b12_d258f6dc",
+        "filename": "zephyr/program/fpmcu/em32f967/gpio.dtsi",
+        "patchSetId": 12
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-04-29T06:55:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d19f8f7_b54bb0a2",
+      "revId": "ef9aa1f4c5417f16a12e8e542e00d69b37d2ee6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
