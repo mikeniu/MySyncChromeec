@@ -22,6 +22,30 @@
       },
       "revId": "b134417505b313541133874aaef131e4ee9fa260",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1f94837_489c104d",
+        "filename": "zephyr/program/fpmcu/et171/gpio.dtsi",
+        "patchSetId": 25
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-04-29T07:26:58Z",
+      "side": 1,
+      "message": "I assumed SOC will always have it on the same pin. Now I am not sure what to do when it is not used like in Srebrna. Firmware will not touch this pin in the runtime but if it is defined in named-gpios it will be configured and initialized. Do you think we should somehow disable, delete or define it per product? I have no idea if we have this feature in Stobinica/Mica.",
+      "parentUuid": "68dd96ab_0a1dd30b",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 4
+      },
+      "revId": "b134417505b313541133874aaef131e4ee9fa260",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
