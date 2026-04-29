@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "67f1214f_898ea607",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T08:17:29Z",
+      "side": 1,
+      "message": "Yes, the current implementation can work",
+      "parentUuid": "45664ace_8a6e11d4",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f42cbc44_cc64b729",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
         "patchSetId": 6
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-28T05:34:35Z",
       "side": 1,
       "message": "Please move to `fingerprint_egis660_pal.h` as other functions.",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "473b5d60_d2da0066",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T08:17:29Z",
+      "side": 1,
+      "message": "OK, I will do that.",
+      "parentUuid": "f42cbc44_cc64b729",
       "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -54,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9f1461c1_4e14e120",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T08:17:29Z",
+      "side": 1,
+      "message": "I think is\u0027s only needed for 6601 sensor.",
+      "parentUuid": "b0ecca76_96408791",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "aafc1413_b98a8ceb",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
         "patchSetId": 6
@@ -65,6 +119,24 @@
       "writtenOn": "2026-04-28T05:34:35Z",
       "side": 1,
       "message": "Please get this values from other configs",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03a72bd8_79aba9d4",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T08:17:29Z",
+      "side": 1,
+      "message": "How to get the values from other configs, sorry, I don\u0027t familiar with that.",
+      "parentUuid": "aafc1413_b98a8ceb",
       "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -88,6 +160,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "53e99ddb_e7dd0110",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T08:17:29Z",
+      "side": 1,
+      "message": "Thanks for your reminder, I will change to true.",
+      "parentUuid": "977186c0_14c48691",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "da2ecd46_345f2ce7",
         "filename": "zephyr/program/fpmcu/et171/common.dtsi",
         "patchSetId": 6
@@ -99,6 +189,24 @@
       "writtenOn": "2026-04-28T05:34:35Z",
       "side": 1,
       "message": "Please add this as a separate CL",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "255a57d7_dd404010",
+        "filename": "zephyr/program/fpmcu/et171/common.dtsi",
+        "patchSetId": 6
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T08:17:29Z",
+      "side": 1,
+      "message": "OK",
+      "parentUuid": "da2ecd46_345f2ce7",
       "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
