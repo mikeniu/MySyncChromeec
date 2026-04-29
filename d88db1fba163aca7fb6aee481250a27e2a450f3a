@@ -16,6 +16,46 @@
       "message": "@fsammoura@google.com for final approval.",
       "revId": "d88db1fba163aca7fb6aee481250a27e2a450f3a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ede41d9a_a3164af2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-29T15:27:45Z",
+      "side": 1,
+      "message": "The changes in `driver/fingerprint/egis/egis_api.h` are nearly identical to `zephyr/drivers/fingerprint/fingerprint_egis630_private.h`.\n\nIssue: Maintaining two identical headers for the same API increases the likelihood of them diverging during future maintenance.\n\nRecommendation: If possible, have the Zephyr driver include the central Egis header rather than duplicating the entire API definition and comments.",
+      "revId": "d88db1fba163aca7fb6aee481250a27e2a450f3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a24bf993_a7899617",
+        "filename": "driver/fingerprint/egis/egis_api.h",
+        "patchSetId": 16
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-29T15:27:45Z",
+      "side": 1,
+      "message": "1. Fragile API Change: Pointer Casting to Opaque Struct\nThe patch changes the signature of `egis_finger_match` and `egis_finger_enroll` to accept `FP_EGIS_IMAGE *` instead of `uint8_t *`.\n\n- Issue: In `egis_private.c` and `egis_egis630_bio_alg.c`, the code casts the raw image buffer `(a uint8_t *)` directly to `FP_EGIS_IMAGE *`.\n\n- Risk: Unless `FP_EGIS_IMAGE` is specifically designed to be a transparent alias for a byte array starting at the same address, this is a strict aliasing violation. If `FP_EGIS_IMAGE` is a struct with specific members, passing a raw buffer not aligned or structured correctly will cause undefined behavior or crashes.\n\nRecommendation: Verify the definition of `FP_EGIS_IMAGE`. If it is a structured object, the buffer should be wrapped or initialized properly rather than force-cast.",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 43
+      },
+      "revId": "d88db1fba163aca7fb6aee481250a27e2a450f3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
