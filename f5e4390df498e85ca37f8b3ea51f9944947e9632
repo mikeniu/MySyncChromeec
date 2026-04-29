@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b02c9ac_fcadc51a",
+        "filename": "zephyr/subsys/fingerprint/alg/egis_egis660_bio_apns.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T12:04:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a78e6912_7d117e74",
+      "revId": "f5e4390df498e85ca37f8b3ea51f9944947e9632",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a40435b4_3c7f610a",
@@ -35,6 +53,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed94d94d_1d0ff00d",
+        "filename": "zephyr/subsys/fingerprint/alg/egis_egis660_bio_apns.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T12:04:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a40435b4_3c7f610a",
+      "revId": "f5e4390df498e85ca37f8b3ea51f9944947e9632",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "278ca65e_3c9204ef",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-04-29T10:41:11Z",
       "side": 1,
       "message": "`is_memory_mapped` will this be used if `is_memory_mapped \u003d true`?",
+      "revId": "f5e4390df498e85ca37f8b3ea51f9944947e9632",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66d8004a_cc34cbac",
+        "filename": "zephyr/subsys/fingerprint/alg/egis_egis660_bio_apns.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T12:04:22Z",
+      "side": 1,
+      "message": "I think the library should choose to use `memcpy` or `egis_apns_data_read` based on `is_memory_mapped`.",
+      "parentUuid": "278ca65e_3c9204ef",
       "revId": "f5e4390df498e85ca37f8b3ea51f9944947e9632",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
