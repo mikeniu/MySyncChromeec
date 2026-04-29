@@ -142,6 +142,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ef1b341_f298e95e",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T10:30:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1816454_e58e1534",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aafc1413_b98a8ceb",
@@ -191,6 +209,24 @@
       "side": 1,
       "message": "You can use\n```\n#define CONFIG_FLASH_WRITE_IDEAL_SIZE 256\n```\nfor `.write_align`\nand\n```\n#define CONFIG_FLASH_ERASE_SIZE 4096\n```\nfor `.erase_align`\n\nand just leave ` for `read_align`.",
       "parentUuid": "03a72bd8_79aba9d4",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41172e7f_bf3f1bf5",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T10:30:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a7cdc9a_e3c27974",
       "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -247,6 +283,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e3fb51c_dd153936",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T10:30:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c4b771b2_e773f6d3",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1e3f086a_984eddfa",
@@ -264,6 +318,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "883c391a_7e961602",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T10:30:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e3f086a_984eddfa",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3b6484e5_46212c43",
@@ -277,6 +349,24 @@
       "writtenOn": "2026-04-29T09:00:30Z",
       "side": 1,
       "message": "Please use defined return code.",
+      "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f18d4846_90b14429",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T10:30:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3b6484e5_46212c43",
       "revId": "51889f86c773b3a27e354c114f403fe8d25d5558",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
