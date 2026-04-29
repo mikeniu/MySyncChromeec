@@ -231,6 +231,8 @@ enum init_state_t {
 	INIT_PDC_SET_NOTIFICATION_ENABLE,
 	/** Reset the PDC */
 	INIT_PDC_RESET,
+	/** Get the PDC Capabilities */
+	INIT_PDC_GET_CAPABILITY,
 	/** Initialization complete */
 	INIT_PDC_COMPLETE,
 	/** Initialization error */
@@ -503,6 +505,13 @@ static struct gpio_dt_spec
 static const struct smf_state states[];
 static int rts54_enable(const struct device *dev);
 static int rts54_reset(const struct device *dev);
+static int rts54_post_command(const struct device *dev, enum cmd_t cmd,
+			      const uint8_t *buf, uint8_t len,
+			      uint8_t *user_buf);
+static int rts54_post_command_with_callback(const struct device *dev,
+					    enum cmd_t cmd, const uint8_t *buf,
+					    uint8_t len, uint8_t *user_buf,
+					    struct pdc_callback *callback);
 static int rts54_set_notification_enable(const struct device *dev,
 					 union notification_enable_t bits,
 					 uint16_t ext_bits);
@@ -801,6 +810,8 @@ static enum smf_state_result st_init_run(void *o)
 
 	switch (data->init_local_state) {
 	case INIT_PDC_ENABLE:
+		LOG_INF("#custom RTK%d: Starting initialization sequence",
+			cnum);
 		rv = rts54_enable(data->dev);
 		if (rv) {
 			LOG_ERR("RTK%d:, Internal(INIT_PDC_ENABLE)", cnum);
@@ -834,19 +845,44 @@ static enum smf_state_result st_init_run(void *o)
 		init_write_cmd_and_change_state(data, INIT_PDC_RESET);
 		return SMF_EVENT_HANDLED;
 	case INIT_PDC_RESET:
+		LOG_INF("#custom RTK%d: Triggering PDC reset during init",
+			cnum);
 		rv = rts54_reset(data->dev);
 		if (rv) {
 			LOG_ERR("RTK%d:, Internal(INIT_PDC_RESET)", cnum);
 			set_state(data, ST_DISABLE);
 			return SMF_EVENT_HANDLED;
 		}
+		init_write_cmd_and_change_state(data, INIT_PDC_GET_CAPABILITY);
+		return SMF_EVENT_HANDLED;
+	case INIT_PDC_GET_CAPABILITY: {
+		uint8_t payload[] = {
+			RTS_UCSI_GET_CAPABILITY.cmd,
+			RTS_UCSI_GET_CAPABILITY.len,
+			RTS_UCSI_GET_CAPABILITY.sub, 0x00, /* Data Length -->
+							      set to 0x00 */
+		};
+
+		LOG_INF("#custom RTK%d: Triggering GET_CAPABILITY during init",
+			cnum);
+
+		rv = rts54_post_command(data->dev, CMD_GET_CAPABILITY, payload,
+					ARRAY_SIZE(payload), NULL);
+		if (rv) {
+			LOG_ERR("RTK%d:, Internal(INIT_PDC_GET_CAPABILITY) rv=%d",
+				cnum, rv);
+			set_state(data, ST_DISABLE);
+			return SMF_EVENT_HANDLED;
+		}
 		init_write_cmd_and_change_state(data, INIT_PDC_COMPLETE);
 		return SMF_EVENT_HANDLED;
+	}
 	case INIT_PDC_COMPLETE:
 		data->es.pdc_init_failed = 0;
 		/* Init is complete, so transition to Idle state */
 		set_state(data, ST_IDLE);
 		data->init_done = true;
+		LOG_INF("#custom RTK%d: Initialization complete", cnum);
 		return SMF_EVENT_HANDLED;
 	case INIT_ERROR:
 		/* Get error status, and re-start the init process */
@@ -864,6 +900,9 @@ static enum smf_state_result st_init_run(void *o)
 		}
 
 		if (data->cci_event.error) {
+			LOG_INF("#custom RTK%d: Init command failed. state=%d",
+				cfg->connector_number,
+				data->init_local_current_state);
 			/* I2C read Error. No way to recover, so disable the PDC
 			 */
 			if (data->error_status.i2c_read_error) {
@@ -1261,29 +1300,10 @@ static enum smf_state_result st_read_run(void *o)
 	int rv;
 
 	/*
-	 * The data->user_buf is checked for NULL before a command is queued.
-	 * The check here guards against an erroneous ping_status indicating
-	 * data is available for a command that doesn't send data.
+	 * The data->user_buf is checked for NULL before a command is queued
+	 * for public APIs. Internal commands may pass NULL if they handle
+	 * the response data locally in this function (e.g. CMD_GET_CAPABILITY).
 	 */
-	if (!data->user_buf) {
-		LOG_ERR("RTK%d: NULL read buffer pointer",
-			cfg->connector_number);
-		/*
-		 * The command was not successfully completed,
-		 * so set cci.error to 1b.
-		 */
-		data->cci_event.error = 1;
-		/* Command completed */
-		data->cci_event.command_completed = 1;
-		/* Null buffer error */
-		data->error_status.null_buffer_error = 1;
-		/* Notify system of status change */
-		call_cci_event_cb(data);
-
-		/* An error occurred, return to idle state */
-		TRANSITION_TO_INIT_OR_IDLE_STATE(data);
-	}
-
 	rv = rts54_i2c_read(data->dev);
 	if (rv < 0) {
 		if (max_i2c_retry_reached(data, I2C_MSG_READ)) {
@@ -1301,7 +1321,14 @@ static enum smf_state_result st_read_run(void *o)
 	/* Copy the received data to the user's buffer */
 	switch (data->cmd) {
 	case CMD_GET_IC_STATUS: {
-		struct pdc_info_t *info = (struct pdc_info_t *)data->user_buf;
+		struct pdc_info_t *info;
+		struct pdc_info_t info_buf;
+
+		if (data->user_buf) {
+			info = (struct pdc_info_t *)data->user_buf;
+		} else {
+			info = &info_buf;
+		}
 
 		rts54xx_unpack_get_ic_status_response(data->rd_buf, info);
 
@@ -1339,117 +1366,163 @@ static enum smf_state_result st_read_run(void *o)
 		break;
 	}
 	case CMD_GET_VBUS_VOLTAGE: {
-		union connector_status_t *status =
-			(union connector_status_t *)(data->rd_buf + offset);
-		*(uint16_t *)data->user_buf = status->voltage_reading *
-					      status->voltage_scale *
-					      VOLTAGE_SCALE_FACTOR;
+		if (data->user_buf) {
+			union connector_status_t *status =
+				(union connector_status_t *)(data->rd_buf +
+							     offset);
+			*(uint16_t *)data->user_buf = status->voltage_reading *
+						      status->voltage_scale *
+						      VOLTAGE_SCALE_FACTOR;
+		}
 		break;
 	}
 	case CMD_GET_ERROR_STATUS: {
-		/* Map Realtek GET_ERROR_STATUS bits to UCSI GET_ERROR_STATUS */
-		union error_status_t *es =
-			(union error_status_t *)data->user_buf;
+		if (data->user_buf) {
+			/* Map Realtek GET_ERROR_STATUS bits to UCSI
+			 * GET_ERROR_STATUS */
+			union error_status_t *es =
+				(union error_status_t *)data->user_buf;
 
-		/* Realtek Unrecognized command, Byte 1, Bit0 */
-		es->unrecognized_command = (data->rd_buf[1] & 1);
-		/* Realtek Non Existent Connector Number, Byte 1, Bit1 */
-		es->non_existent_connector_number =
-			((data->rd_buf[1] >> 1) & 1);
-		/* Realtek Invalid Command Specific Parameter, Byte 1, Bit2 */
-		es->invalid_command_specific_param =
-			((data->rd_buf[1] >> 2) & 1);
-		/* Realtek Incompatible Connector Partner, Byte 1, Bit3 */
-		es->incompatible_connector_partner =
-			((data->rd_buf[1] >> 3) & 1);
-		/* Realtek CC Communication Error, Byte 1, Bit4 */
-		es->cc_communication_error = ((data->rd_buf[1] >> 4) & 1);
-		/* Realtek Command unsuccessful Dead Battery condition, Byte 1,
-		 * Bit 5 */
-		es->cmd_unsuccessful_dead_batt = ((data->rd_buf[1] >> 5) & 1);
-		/* Realtek Contract negotiation fail, Byte 1, Bit6 */
-		es->contract_negotiation_failed = ((data->rd_buf[1] >> 6) & 1);
+			/* Realtek Unrecognized command, Byte 1, Bit0 */
+			es->unrecognized_command = (data->rd_buf[1] & 1);
+			/* Realtek Non Existent Connector Number, Byte 1, Bit1
+			 */
+			es->non_existent_connector_number =
+				((data->rd_buf[1] >> 1) & 1);
+			/* Realtek Invalid Command Specific Parameter, Byte 1,
+			 * Bit2 */
+			es->invalid_command_specific_param =
+				((data->rd_buf[1] >> 2) & 1);
+			/* Realtek Incompatible Connector Partner, Byte 1, Bit3
+			 */
+			es->incompatible_connector_partner =
+				((data->rd_buf[1] >> 3) & 1);
+			/* Realtek CC Communication Error, Byte 1, Bit4 */
+			es->cc_communication_error =
+				((data->rd_buf[1] >> 4) & 1);
+			/* Realtek Command unsuccessful Dead Battery condition,
+			 * Byte 1, Bit 5 */
+			es->cmd_unsuccessful_dead_batt =
+				((data->rd_buf[1] >> 5) & 1);
+			/* Realtek Contract negotiation fail, Byte 1, Bit6 */
+			es->contract_negotiation_failed =
+				((data->rd_buf[1] >> 6) & 1);
 
-		/* Not Set by Realtek */
-		es->overcurrent = 0;
-		es->undefined = 0;
-		es->port_partner_rejected_swap = 0;
-		/*
-		 * Note: If Realtek did indicate Hard Reset, then it would also
-		 * make sense to notify the host of PD_STATUS_EVENT_HARD_RESET.
-		 * However, this would be redundant with the notification that
-		 * will be generated later, upon completion of
-		 * GET_CONNECTOR_STATUS.
-		 */
-		es->hard_reset = 0;
-		es->ppm_policy_conflict = 0;
-		es->swap_rejected = 0;
-		es->reverse_current_protection = 0;
+			/* Not Set by Realtek */
+			es->overcurrent = 0;
+			es->undefined = 0;
+			es->port_partner_rejected_swap = 0;
+			/*
+			 * Note: If Realtek did indicate Hard Reset, then it
+			 * would also make sense to notify the host of
+			 * PD_STATUS_EVENT_HARD_RESET. However, this would be
+			 * redundant with the notification that will be
+			 * generated later, upon completion of
+			 * GET_CONNECTOR_STATUS.
+			 */
+			es->hard_reset = 0;
+			es->ppm_policy_conflict = 0;
+			es->swap_rejected = 0;
+			es->reverse_current_protection = 0;
+		}
+		break;
+	}
+	case CMD_GET_CAPABILITY: {
+		struct capability_t *caps =
+			(struct capability_t *)(data->rd_buf + offset);
 
-		/*
-		 * NOTE: Vendor Specific Error were already set in previous
-		 * states
-		 */
+		data->info.bNumAltModes = caps->bNumAltModes;
+		LOG_INF("#custom RTK%d: Stored bNumAltModes=%d",
+			cfg->connector_number, data->info.bNumAltModes);
+
+		if (data->user_buf) {
+			memcpy(data->user_buf, data->rd_buf + offset, len);
+		}
 		break;
 	}
 	case CMD_GET_IDENTITY_DISCOVERY: {
-		bool *disc_state = (bool *)data->user_buf;
+		if (data->user_buf) {
+			bool *disc_state = (bool *)data->user_buf;
 
-		/* Realtek Altmode related state, Byte 14 bits 0-2*/
-		*disc_state = (data->rd_buf[14] & 0x07);
+			/* Realtek Altmode related state, Byte 14 bits 0-2*/
+			*disc_state = (data->rd_buf[14] & 0x07);
+		}
 		break;
 	}
 	case CMD_GET_IS_VCONN_SOURCING: {
-		bool *vconn_sourcing = (bool *)data->user_buf;
+		if (data->user_buf) {
+			bool *vconn_sourcing = (bool *)data->user_buf;
 
-		/* Realtek PD Sourcing VCONN, Byte 11, bit 5 */
-		*vconn_sourcing = (data->rd_buf[11] & 0x20);
+			/* Realtek PD Sourcing VCONN, Byte 11, bit 5 */
+			*vconn_sourcing = (data->rd_buf[11] & 0x20);
+		}
 		break;
 	}
 	case CMD_GET_DRP_MODE: {
-		enum drp_mode_t *drp_mode = (enum drp_mode_t *)data->user_buf;
+		if (data->user_buf) {
+			enum drp_mode_t *drp_mode =
+				(enum drp_mode_t *)data->user_buf;
 
-		switch ((data->rd_buf[1] & GENMASK(5, 3)) >> 3) {
-		case 0x0:
-			*drp_mode = DRP_NORMAL;
-			break;
-		case 0x1:
-			*drp_mode = DRP_TRY_SRC;
-			break;
-		case 0x2:
-			*drp_mode = DRP_TRY_SNK;
-			break;
+			switch ((data->rd_buf[1] & GENMASK(5, 3)) >> 3) {
+			case 0x0:
+				*drp_mode = DRP_NORMAL;
+				break;
+			case 0x1:
+				*drp_mode = DRP_TRY_SRC;
+				break;
+			case 0x2:
+				*drp_mode = DRP_TRY_SNK;
+				break;
+			}
 		}
 		break;
 	}
 	case CMD_GET_VENDOR_STATUS: {
-		union vendor_status_change_bits_t *vendor_status =
-			(union vendor_status_change_bits_t *)data->user_buf;
-		vendor_status->raw_value = 0;
+		if (data->user_buf) {
+			union vendor_status_change_bits_t *vendor_status =
+				(union vendor_status_change_bits_t *)
+					data->user_buf;
+			vendor_status->raw_value = 0;
 
-		/* Realtek alert received is Byte 4, bit 3*/
-		if (data->rd_buf[4] & BIT(3)) {
-			vendor_status->alert_received = 1;
+			/* Realtek alert received is Byte 4, bit 3*/
+			if (data->rd_buf[4] & BIT(3)) {
+				vendor_status->alert_received = 1;
+			}
 		}
 		break;
 	}
-#ifdef CONFIG_USBC_PDC_DISABLE_AP_MODE_ENTRY
 	/*
 	 * TODO(b/503426083): Remove change to GET_CAPABILITY response once
 	 * AP Mode switching is ready. Clearing this bit will prevent the
 	 * kernel from exiting and entering alternate modes.
 	 */
 	case CMD_RAW_UCSI: {
-		memcpy(data->user_buf, data->rd_buf + offset, len);
+		struct capability_t *caps;
+
+		if (data->user_buf) {
+			memcpy(data->user_buf, data->rd_buf + offset, len);
+			caps = (struct capability_t *)data->user_buf;
+		} else {
+			caps = (struct capability_t *)(data->rd_buf + offset);
+		}
+
 		if (data->wr_buf[0] == REALTEK_PD_COMMAND &&
 		    data->wr_buf[2] == UCSI_GET_CAPABILITY) {
-			struct capability_t *caps =
-				(struct capability_t *)data->user_buf;
+			data->info.bNumAltModes = caps->bNumAltModes;
+			LOG_INF("#custom RTK%d: Stored bNumAltModes=%d (via RAW)",
+				cfg->connector_number, data->info.bNumAltModes);
+#ifdef CONFIG_USBC_PDC_DISABLE_AP_MODE_ENTRY
+			/*
+			 * TODO(b/503426083): Remove change to GET_CAPABILITY
+			 * response once AP Mode switching is ready. Clearing
+			 * this bit will prevent the kernel from exiting and
+			 * entering alternate modes.
+			 */
 			caps->bmOptionalFeatures.alt_mode_override = 0;
+#endif
 		}
 		break;
 	}
-#endif
 #ifdef CONFIG_USBC_PDC_DRIVEN_CCD
 	case CMD_GET_SBU_MUX_MODE: {
 		/* This is parsing a partial GET_IC_STATUS response (offset of

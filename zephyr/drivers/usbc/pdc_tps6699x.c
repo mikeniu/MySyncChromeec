@@ -761,6 +761,9 @@ static enum smf_state_result st_init_run(void *o)
 	union reg_interrupt pdc_interrupt = { .patch_loaded = 1 };
 	int rv;
 
+	LOG_INF("#custom TI%d: Starting initialization sequence",
+		cfg->connector_number);
+
 	/* Do not start executing commands if suspended */
 	if (check_comms_suspended()) {
 		set_state(data, ST_SUSPENDED);
@@ -831,6 +834,8 @@ static enum smf_state_result st_init_run(void *o)
 	}
 
 	/* Set PDC notifications */
+	LOG_INF("#custom TI%d: Initial step: SET_NOTIFICATION_ENABLE",
+		cfg->connector_number);
 	data->cmd = CMD_SET_NOTIFICATION_ENABLE;
 	/*
 	 * Need to post PDC_CMD_EVENT so the command isn't cleared in
@@ -2338,11 +2343,29 @@ static enum smf_state_result st_task_wait_run(void *o)
 
 	switch (data->cmd) {
 	case CMD_SET_NOTIFICATION_ENABLE:
-		/* Initialization for driver is done once notifications are
-		 * enabled. This flag is reset when the INIT state is entered.
-		 */
-		data->init_done = true;
-		k_event_post(&data->pdc_event, PDC_IRQ_EVENT);
+		if (!data->init_done) {
+			LOG_INF("#custom TI%d: SET_NOTIFICATION_ENABLE done chaining GET_CAPABILITY",
+				cfg->connector_number);
+			data->cmd = CMD_GET_CAPABILITY;
+			k_event_post(&data->pdc_event, PDC_CMD_EVENT);
+		} else {
+			LOG_INF("#custom TI%d: Notification enable confirmed (post-init)",
+				cfg->connector_number);
+			k_event_post(&data->pdc_event, PDC_IRQ_EVENT);
+		}
+		break;
+	case CMD_GET_CAPABILITY:
+		if (!data->init_done) {
+			/* Store capabilities and finish initialization */
+			struct capability_t *cp =
+				(struct capability_t *)&cmd_data.data[1];
+			data->info.bNumAltModes = cp->bNumAltModes;
+			LOG_INF("#custom TI%d: Stored bNumAltModes=%d, completing init",
+				cfg->connector_number, data->info.bNumAltModes);
+
+			data->init_done = true;
+			k_event_post(&data->pdc_event, PDC_IRQ_EVENT);
+		}
 		break;
 	case CMD_SET_RDO:
 		/* Re-set sink enable until after aNEG completes. */
@@ -2472,11 +2495,16 @@ data_out:
 	/* Inform the system of the event */
 	call_cci_event_cb(data);
 
-	if (data->init_done) {
+	if (data->init_done || ((data->cmd == CMD_SET_NOTIFICATION_ENABLE ||
+				 data->cmd == CMD_GET_CAPABILITY) &&
+				!data->cci_event.error)) {
 		/* Transition to idle state */
 		set_state(data, ST_IDLE);
 	} else {
 		/* Re-try init since we didn't complete successfully. */
+		LOG_INF("#custom TI%d: Init failed/incomplete, retrying. cmd=%d, error=%d",
+			cfg->connector_number, data->cmd,
+			data->cci_event.error);
 		set_state(data, ST_INIT);
 	}
 	return SMF_EVENT_HANDLED;

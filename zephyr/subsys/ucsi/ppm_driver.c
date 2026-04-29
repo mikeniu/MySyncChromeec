@@ -357,6 +357,23 @@ done:
 				(struct capability_t *)lpm_data_out;
 			caps->bNumConnectors =
 				ucsi_get_active_port_count(device);
+
+			uint8_t max_alt_modes = 0;
+
+			for (int i = 0; i < data->active_port_count; i++) {
+				struct pdc_info_t info;
+
+				if (pdc_get_info(data->lpm[i], &info, false) ==
+				    0) {
+					LOG_INF("#custom PPM: Port %d reports bNumAltModes=%d",
+						i, info.bNumAltModes);
+					max_alt_modes = MAX(max_alt_modes,
+							    info.bNumAltModes);
+				}
+			}
+			caps->bNumAltModes = max_alt_modes;
+			LOG_INF("#custom PPM: Aggregated max bNumAltModes=%d",
+				caps->bNumAltModes);
 			break;
 		}
 		default:

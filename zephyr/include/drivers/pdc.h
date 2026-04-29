@@ -116,6 +116,8 @@ struct pdc_info_t {
 	bool no_fw_update;
 	/** True if the PDC hardware supports FRS */
 	bool frs_supported;
+	/** Number of alternate modes supported by the PDC */
+	uint8_t bNumAltModes;
 	/** Extra information (optional) */
 	uint16_t extra;
 };
