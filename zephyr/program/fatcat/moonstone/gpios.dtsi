@@ -6,6 +6,7 @@
 / {
 	aliases {
 		gpio-wp = &gpio_ec_wp_od;
+		gpio-btn-ign-in = &gpio_fp_btn_ign;
 	};
 
 	named-adc-channels {
@@ -77,6 +78,9 @@
 		};
 		gpio_amp_mute_odl: amp_mute_odl {
 			gpios = <&gpioh 0 (GPIO_OUTPUT_LOW | GPIO_OPEN_DRAIN)>;
+		};
+		gpio_fp_btn_ign: fp_btn_ign {
+			gpios = <&gpioh 2 (GPIO_INPUT)>;
 		};
 		gpio_ec_wp_od: ec_wp_od {
 			gpios = <&gpiob 5 (GPIO_INPUT | GPIO_ACTIVE_HIGH)>;
@@ -174,14 +178,6 @@
 			gpios = <&gpioe 6 GPIO_OUTPUT>;
 			enum-name = "GPIO_PACKET_MODE_EN";
 		};
-		gpio_ec_volup_btn_odl: ec_volup_btn_odl {
-			gpios = <&gpioa 7 (GPIO_INPUT)>;
-			enum-name = "GPIO_VOLUME_UP_L";
-		};
-		gpio_ec_voldn_btn_odl: ec_voldn_btn_odl {
-			gpios = <&gpioa 0 (GPIO_INPUT)>;
-			enum-name = "GPIO_VOLUME_DOWN_L";
-		};
 		gpio_usb_pd1_int_odl: usb_pd_int_odl {
 			gpios = <&gpiof 5 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 			no-auto-init;
@@ -206,12 +202,19 @@
 		gpio_en_pp5000_led_x: en_pp5000_led_x {
 			gpios = <&gpiog 1 GPIO_OUTPUT_LOW>;
 		};
+		gpio_soc_edp_bl_en: soc_edp_bl_en {
+			gpios = <&gpioh 1 GPIO_INPUT>;
+		};
+		gpio_ec_touch_en: ec_touch_en {
+			gpios = <&gpioa 7 GPIO_OUTPUT_LOW>;
+		};
 	};
 
 	unused-pins {
 		compatible = "unused-gpios";
 
 		unused-gpios =
+			<&gpioa 0 0>,
 			<&gpioa 6 0>,
 			<&gpiob 2 0>,
 			<&gpiob 3 0>,
@@ -223,7 +226,6 @@
 			<&gpiog 4 0>,
 			<&gpiog 5 0>,
 			<&gpiog 7 0>,
-			<&gpioh 1 GPIO_INPUT>,
 			<&gpioh 2 GPIO_INPUT>,
 			<&gpioj 4 0>;
 	};
