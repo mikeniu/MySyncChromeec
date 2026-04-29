@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a095e20d_e126dacb",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T13:08:34Z",
+      "side": 1,
+      "message": "I tried adding `flash.h` to the source code, but a conflict error occurred during compilation. Do you know the proper header file can be included?",
+      "parentUuid": "c93fa709_3068d51a",
+      "revId": "0ca3b55197ff15fd889136823e9f774c42be44b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "23b23aa2_dce3e67e",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.h",
         "patchSetId": 12
