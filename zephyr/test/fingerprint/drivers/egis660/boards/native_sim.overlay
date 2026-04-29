@@ -14,7 +14,29 @@
 / {
 	chosen {
 		cros-fp,fingerprint-sensor = &egis660;
+		cros-ec,flash-controller = &flash_sim;
 	};
+
+	soc {
+		egis660_apns_data: egis660-apns-data@70000 {
+			compatible = "cros-ec,apns-storage";
+			reg = <0 0x70000 DT_SIZE_K(64)>;
+		};
+	};
+};
+
+/* Reference the flash simulator controller */
+&flashcontroller0 {
+	flash_sim: flash-sim-device {
+		compatible = "zephyr,flash-sim-device";
+	};
+};
+
+/* Configure existing simulated flash from native_sim.dts */
+&flash0 {
+	erase-block-size = <0x1000>;
+	write-block-size = <1>;
+	reg = <0x00000000 DT_SIZE_K(512)>;
 };
 
 &spi0 {
