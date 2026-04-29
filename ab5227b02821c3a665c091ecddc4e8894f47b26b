@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "73bca7d6_4e8a848f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-04-29T09:05:01Z",
+      "side": 1,
+      "message": "Acknowledged, But this CL no more required, It\u0027s identified as tester issue and got resolved with new Ellisys software version v3.1.9474",
+      "parentUuid": "f88aada0_2cd9536a",
+      "revId": "ab5227b02821c3a665c091ecddc4e8894f47b26b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9a2c3f3b_268a7852",
