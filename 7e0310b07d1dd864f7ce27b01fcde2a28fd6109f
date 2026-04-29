@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "53ffb487_9fdc7494",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T10:23:56Z",
+      "side": 1,
+      "message": "Oh, I see it now. I think `cros_flash_em32f967_get_protect` is correct. In my opinion, the `get_prot_reg` functions should check the hardware write protection, so it should use `flash_em32_check_bank_protected` directly instead of `cros_flash_em32f967_get_protect`",
+      "parentUuid": "3a44743c_f3c3f387",
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0fa07852_9718751b",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 15
