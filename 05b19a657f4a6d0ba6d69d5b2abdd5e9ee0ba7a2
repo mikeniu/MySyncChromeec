@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12a4400e_49fcba2e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-29T19:51:43Z",
+      "side": 1,
+      "message": "I think you need to rebase it onto https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7800939",
+      "revId": "05b19a657f4a6d0ba6d69d5b2abdd5e9ee0ba7a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
