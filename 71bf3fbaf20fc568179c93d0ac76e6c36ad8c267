@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ae060c57_60506b4d",
+        "filename": "common/tpm_registers.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1135,
+      "author": {
+        "id": 1000039
+      },
+      "writtenOn": "2026-04-29T22:16:52Z",
+      "side": 1,
+      "message": "This comment is very cryptic - what is `s_responseBuffer` anyway?\n\nWhy not just say `ExecuteCommand will set response to tpmh` or some such?",
+      "parentUuid": "379275a7_fa4a6a11",
+      "range": {
+        "startLine": 1135,
+        "startChar": 7,
+        "endLine": 1135,
+        "endChar": 35
+      },
+      "revId": "71bf3fbaf20fc568179c93d0ac76e6c36ad8c267",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "83f6e968_c3bd9e41",
         "filename": "common/tpm_registers.c",
         "patchSetId": 1
@@ -85,6 +109,30 @@
       "side": 1,
       "message": "it is also set in ExecuteCommand as output parameter.",
       "parentUuid": "83f6e968_c3bd9e41",
+      "range": {
+        "startLine": 1138,
+        "startChar": 30,
+        "endLine": 1138,
+        "endChar": 43
+      },
+      "revId": "71bf3fbaf20fc568179c93d0ac76e6c36ad8c267",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "215dc1e1_7c2a9c81",
+        "filename": "common/tpm_registers.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1138,
+      "author": {
+        "id": 1000039
+      },
+      "writtenOn": "2026-04-29T22:16:52Z",
+      "side": 1,
+      "message": "but doesn\u0027t it have to be set on input as the max size of the buffer?",
+      "parentUuid": "680e6996_d44f4035",
       "range": {
         "startLine": 1138,
         "startChar": 30,
