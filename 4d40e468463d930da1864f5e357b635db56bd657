@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d70aea8_22cea0fe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-29T16:41:42Z",
+      "side": 1,
+      "message": "Ah, that\u0027s a good idea, using snippets for this stuff, wondering if we can cleanup/unify some project config as well with them.",
+      "revId": "4d40e468463d930da1864f5e357b635db56bd657",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
