@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fab55575_00f21d5d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-29T13:28:01Z",
+      "side": 1,
+      "message": "I agree use `flash_em32_check_bank_protected` directly instead of `cros_flash_em32f967_get_protect`. But there is a same proble on your scenario. Is it expected or should be resolved?",
+      "parentUuid": "53ffb487_9fdc7494",
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0fa07852_9718751b",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 15
