@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "86ec7703_85581a47",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-04-29T00:10:11Z",
+      "side": 1,
+      "message": "This is passing for me, but it also passes when I change the conditions. I think there may be an issue with how our test cases are using IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_FRS)",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 34
+      },
+      "revId": "8a3f5e2f908c6b22f48f86e00e7ea4432b6cfc0e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
