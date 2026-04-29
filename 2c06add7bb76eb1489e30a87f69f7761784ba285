@@ -124,6 +124,24 @@
       "parentUuid": "294817f5_fd997dcf",
       "revId": "2c06add7bb76eb1489e30a87f69f7761784ba285",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3284a011_bbbf0bab",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-29T04:37:26Z",
+      "side": 1,
+      "message": "This case is only valid when `capture_type \u003d\u003d FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT`, where the required buffer size is 26200 bytes.\n\nOther capture types require smaller buffer sizes (\u003c 26200).\nZTEST, however, only validates the case where `capture_type \u003d\u003d FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT`.\n\nIn practice, the EC uses a single buffer that is sized to accommodate all supported capture types. As a result, there is no functional issue at runtime.\n\n---\n\nI tried to replace it with the following check:\n```\n#define CHECK_FRAME_SIZE(child, _type, _buf_size) \\\n\tif ((_type) \u003d\u003d DT_STRING_TOKEN(child, capture_type) \u0026\u0026 (_buf_size) \u003c DT_PROP(child, frame_size)) {\\\n\t\treturn -EINVAL;\\\n\t}\nDT_FOREACH_CHILD_VARGS(DT_INST_CHILD(0, configs), CHECK_FRAME_SIZE, capture_type, image_buf_size);\n```\nHowever, this approach still does not pass ZTEST.\nGiven that, it seems the original implementation is the most appropriate solution for now, so I’ve restored that part.",
+      "parentUuid": "58a367ce_d76673b1",
+      "revId": "2c06add7bb76eb1489e30a87f69f7761784ba285",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
