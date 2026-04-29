@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2551a7a8_0c67ca09",
+        "filename": "zephyr/program/fatcat/ruby/src/board_power.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-04-29T21:26:13Z",
+      "side": 1,
+      "message": "please add this in a separate patch.",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 0
+      },
+      "revId": "07bd97908a68017fcaddff6b2c865b18c28e79c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
