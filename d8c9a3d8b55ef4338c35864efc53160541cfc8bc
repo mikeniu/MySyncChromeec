@@ -1,0 +1,152 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7419b07f_8a1cf910",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-29T12:14:17Z",
+      "side": 1,
+      "message": "hey just an initial pass, few styling issues",
+      "revId": "d8c9a3d8b55ef4338c35864efc53160541cfc8bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2beb92c7_f0dc71ab",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-29T12:14:17Z",
+      "side": 1,
+      "message": "wrong indent? run `cros format`",
+      "revId": "d8c9a3d8b55ef4338c35864efc53160541cfc8bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ae40f35_cc21c08e",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-29T12:14:17Z",
+      "side": 1,
+      "message": "`pwrmon_latch(void)`",
+      "revId": "d8c9a3d8b55ef4338c35864efc53160541cfc8bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "849579c1_389ec767",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-29T12:14:17Z",
+      "side": 1,
+      "message": "line too long? surprised presubmit does not complain about, did you ran `cros format` on it?",
+      "revId": "d8c9a3d8b55ef4338c35864efc53160541cfc8bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0a171d1_c345bdba",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-29T12:14:17Z",
+      "side": 1,
+      "message": "could you use `abs`?",
+      "range": {
+        "startLine": 195,
+        "startChar": 0,
+        "endLine": 199,
+        "endChar": 23
+      },
+      "revId": "d8c9a3d8b55ef4338c35864efc53160541cfc8bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd105347_a9f04bbe",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-29T12:14:17Z",
+      "side": 1,
+      "message": "comments should use `/* */`",
+      "revId": "d8c9a3d8b55ef4338c35864efc53160541cfc8bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "854ce966_e94c686b",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-29T12:14:17Z",
+      "side": 1,
+      "message": "nit: drop these blanks after the `case`? keep the code a bit more comapct",
+      "revId": "d8c9a3d8b55ef4338c35864efc53160541cfc8bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65494417_9bd44f0a",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-04-29T12:14:17Z",
+      "side": 1,
+      "message": "code under zephyr should always have braces on conditions",
+      "range": {
+        "startLine": 305,
+        "startChar": 0,
+        "endLine": 306,
+        "endChar": 14
+      },
+      "revId": "d8c9a3d8b55ef4338c35864efc53160541cfc8bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
