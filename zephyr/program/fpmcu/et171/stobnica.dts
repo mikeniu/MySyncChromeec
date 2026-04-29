@@ -4,6 +4,7 @@
  */
 
 #include "common.dtsi"
+#include "egis660_common.dtsi"
 
 #define EGIS660_COMMON_IMAGE_PROPS \
 	width = <96>; \
