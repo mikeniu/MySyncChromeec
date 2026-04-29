@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "947985f29d7e82ad78196f6634bf4e862fc47c1d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8211512_04aebaca",
+        "filename": "common/host_command.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-29T15:29:58Z",
+      "side": 1,
+      "message": "This ifdef now guards the EC_CMD_AP_FW_STATE host command.\nI suggest renaming the config to `CONFIG_PLATFORM_EC_AP_FW_STATE` to better reflect its purpose.",
+      "range": {
+        "startLine": 265,
+        "startChar": 7,
+        "endLine": 265,
+        "endChar": 44
+      },
+      "revId": "947985f29d7e82ad78196f6634bf4e862fc47c1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
