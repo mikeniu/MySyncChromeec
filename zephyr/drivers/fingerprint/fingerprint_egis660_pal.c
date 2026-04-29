@@ -160,5 +160,4 @@ int __unused egis_sensor_wfi(uint16_t timeout_ms, egis_wfi_check_t enter_wfi,
 	/* Always OK */
 	return EGIS_BEP_RESULT_OK;
 }
-
 /* LCOV_EXCL_STOP */
