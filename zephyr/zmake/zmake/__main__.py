@@ -232,6 +232,12 @@ def get_argparser():
         action="store_true",
         help="Compare devicetrees of build outputs",
     )
+    compare_builds.add_argument(
+        "-D",
+        "--cmake-define",
+        action="append",
+        dest="cmake_defs",
+    )
     add_common_build_args(compare_builds)
 
     list_projects = sub.add_parser(
@@ -349,6 +355,14 @@ def add_common_configure_args(sub_parser: argparse.ArgumentParser):
         action="store_true",
         default=False,
         dest="cmake_trace",
+        help="Run cmake in trace mode and write the output to cmake-build.trace",
+    )
+    sub_parser.add_argument(
+        "--cmake-graph",
+        action="store_true",
+        default=False,
+        dest="cmake_graph",
+        help="Create a cmake-graph.dot file to trace dependencies",
     )
     sub_parser.add_argument(
         "-B",
