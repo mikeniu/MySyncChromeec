@@ -8,6 +8,7 @@
 #include "bbram.h"
 #include "flash.h"
 #include "spi_flash_reg.h"
+#include "system.h"
 #include "watchdog.h"
 #include "write_protect.h"
 
@@ -169,22 +170,15 @@ static int flash_set_status_for_prot(const struct device *dev, int reg1,
 	struct cros_flash_rtk_data *data = DRV_DATA(dev);
 	int rv;
 
-	if (write_protect_is_asserted()) {
-		return EC_ERROR_ACCESS_DENIED;
-	}
-
-	data->all_protected = 0;
-
-	/*
-	 * If WP# is active and ec doesn't protect the status registers of
-	 * internal spi-flash, protect it now before setting them.
-	 */
-	flash_protect_int_flash(dev, write_protect_is_asserted());
-
 	rv = flash_set_status(dev, reg1, reg2);
 	if (rv != EC_SUCCESS) {
 		return rv;
 	}
+	/*
+	 * If WP# is active and ec doesn't protect the status registers of
+	 * internal spi-flash, protect it now.
+	 */
+	flash_protect_int_flash(dev, write_protect_is_asserted());
 
 	spi_flash_reg_to_protect(reg1, reg2, &data->addr_prot_start,
 				 &data->addr_prot_length);
@@ -272,13 +266,13 @@ static int flash_check_prot_range(const struct device *dev, unsigned int offset,
 	return EC_SUCCESS;
 }
 
-static int read_bbram_flags(uint8_t *data)
+static int read_bbram_flags(uint32_t *data)
 {
 	const struct device *bbram_dev = DEVICE_DT_GET(DT_NODELABEL(bbram));
 	int ret;
 
 	ret = bbram_read(bbram_dev, BBRAM_REGION_OFFSET(wp_at_boot),
-			 BBRAM_REGION_SIZE(wp_at_boot), data);
+			 BBRAM_REGION_SIZE(wp_at_boot), (uint8_t *)data);
 
 	if ((*data) == BBRAM_WP_FLAG_INVALID) {
 		ret = EC_ERROR_INVAL;
@@ -435,7 +429,7 @@ static int cros_flash_rtk_protect_at_boot(const struct device *dev,
 					  uint32_t new_flags)
 {
 	struct cros_flash_rtk_data *data = DRV_DATA(dev);
-	uint8_t lock_flags = 0;
+	uint32_t lock_flags = 0;
 	int ret = 0;
 
 	if ((new_flags & (EC_FLASH_PROTECT_RO_AT_BOOT |
@@ -446,19 +440,15 @@ static int cros_flash_rtk_protect_at_boot(const struct device *dev,
 	}
 
 	if (new_flags & EC_FLASH_PROTECT_RO_AT_BOOT) {
-		ret = flash_write_prot_reg(dev, CONFIG_WP_STORAGE_OFF,
-					   CONFIG_WP_STORAGE_SIZE, 1);
 		lock_flags |= EC_FLASH_PROTECT_RO_AT_BOOT;
 	}
 
 	if (new_flags & EC_FLASH_PROTECT_ALL_AT_BOOT) {
 		data->all_protected = 1;
-		ret = flash_write_prot_reg(
-			dev, 0, CONFIG_PLATFORM_EC_FLASH_SIZE_BYTES, 1);
 		lock_flags |= EC_FLASH_PROTECT_ALL_AT_BOOT;
 	}
 
-	LOG_DBG("set AT_BOOT = %x", lock_flags);
+	LOG_DBG("set AT_BOOT = %x, new_flags = %x", lock_flags, new_flags);
 
 	write_bbram_flags(lock_flags);
 
@@ -468,18 +458,16 @@ static int cros_flash_rtk_protect_at_boot(const struct device *dev,
 static int cros_flash_rtk_protect_now(const struct device *dev, bool all)
 {
 	struct cros_flash_rtk_data *data = DRV_DATA(dev);
-	int ret = EC_SUCCESS;
 
 	if (all) {
 		data->all_protected = 1;
-		ret = flash_write_prot_reg(
+		LOG_DBG("FLASH: ALL_NOW enabled");
+		return flash_write_prot_reg(
 			dev, 0, CONFIG_PLATFORM_EC_FLASH_SIZE_BYTES, 1);
-	} else {
-		ret = flash_write_prot_reg(dev, CONFIG_WP_STORAGE_OFF,
-					   CONFIG_WP_STORAGE_SIZE, 1);
 	}
 
-	return ret;
+	return flash_write_prot_reg(dev, CONFIG_WP_STORAGE_OFF,
+				    CONFIG_WP_STORAGE_SIZE, 1);
 }
 
 static int cros_flash_rtk_get_status(const struct device *dev, uint8_t *sr1,
@@ -494,7 +482,7 @@ static int cros_flash_rtk_get_status(const struct device *dev, uint8_t *sr1,
 static int cros_flash_rtk_init(const struct device *dev)
 {
 	struct cros_flash_rtk_data *data = DRV_DATA(dev);
-	uint8_t lock_flags = 0;
+	uint32_t lock_flags = 0;
 	int ret = 0;
 
 	if (read_bbram_flags(&lock_flags)) {
@@ -502,7 +490,7 @@ static int cros_flash_rtk_init(const struct device *dev)
 		lock_flags = BBRAM_WP_FLAG_INVALID;
 	}
 
-	LOG_DBG("got AT_BOOT = %x", lock_flags);
+	LOG_DBG("got AT_INIT = %x", lock_flags);
 
 	if (write_protect_is_asserted()) {
 		/*
@@ -510,8 +498,6 @@ static int cros_flash_rtk_init(const struct device *dev)
 		 * active during ec initialization.
 		 */
 		flash_protect_int_flash(dev, 1);
-		/* HWWP setup, not allow to change SWWP */
-		return EC_SUCCESS;
 	}
 
 	/* handle the *_AT_BOOT */
@@ -519,21 +505,21 @@ static int cros_flash_rtk_init(const struct device *dev)
 		if ((lock_flags & (EC_FLASH_PROTECT_RO_AT_BOOT |
 				   EC_FLASH_PROTECT_ALL_AT_BOOT)) == 0) {
 			/* Clear protection bits in status register */
-			return flash_set_status_for_prot(dev, 0, 0);
+			ret = flash_set_status_for_prot(dev, 0, 0);
 		}
-
-		if (lock_flags & EC_FLASH_PROTECT_ALL_AT_BOOT) {
+		if ((lock_flags & EC_FLASH_PROTECT_ALL_AT_BOOT) &&
+		    (system_get_image_copy() == EC_IMAGE_RW)) {
 			data->all_protected = 1;
 			ret = flash_write_prot_reg(
 				dev, 0, CONFIG_PLATFORM_EC_FLASH_SIZE_BYTES, 1);
-		} else if (lock_flags & EC_FLASH_PROTECT_RO_AT_BOOT) {
-			ret = flash_write_prot_reg(dev, CONFIG_WP_STORAGE_OFF,
-						   CONFIG_WP_STORAGE_SIZE, 1);
 		}
-		return ret;
+		if (lock_flags & EC_FLASH_PROTECT_RO_AT_BOOT) {
+			ret |= flash_write_prot_reg(dev, CONFIG_WP_STORAGE_OFF,
+						    CONFIG_WP_STORAGE_SIZE, 1);
+		}
 	}
 
-	return EC_SUCCESS;
+	return ret;
 }
 
 /* cros ec flash driver registration */
