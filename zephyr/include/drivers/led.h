@@ -169,18 +169,7 @@ struct led_driver_t {
  * to alter in order to enable the given color.
  */
 struct led_pins_node_t {
-	/*
-	 * Link between color and pins node. Only used to support
-	 * ectool functionality.
-	 */
-	int led_color;
-
-	/*
-	 * Link between color and pins node. Only used to support
-	 * ectool functionality.
-	 */
-	enum ec_led_id led_id;
-
+	/* 4-byte members first */
 	/*
 	 * Pointer to driver-specific pin configuration data used to
 	 * enable a particular color. The underlying driver is responsible
@@ -188,31 +177,51 @@ struct led_pins_node_t {
 	 */
 	void *pins;
 
+	/* 1-byte members following */
+	/*
+	 * The color ID this node represents. Only used to support
+	 * ectool functionality.
+	 */
+	uint8_t led_color;
+
+	/*
+	 * The logical LED ID this node belongs to. Only used to support
+	 * ectool functionality.
+	 */
+	enum ec_led_id led_id;
+
+	/*
+	 * 0-based devicetree child index of the color.
+	 * Must be matched with led_id to resolve the actual pins_node.
+	 */
+	uint8_t color_idx;
+
 	/* Number of pins per color */
 	uint8_t pins_count;
-};
+} __packed;
 
 struct pattern_color_node_t {
-	const struct led_pins_node_t *led_color_node;
-	int32_t duration_ms;
-};
+	uint16_t duration_ms;
+	uint8_t color_idx;
+} __packed;
 
 struct led_pattern_node_t {
 	/* 4-byte members first */
-	int32_t elapsed_ms;
+	uint32_t elapsed_ms;
 	const struct pattern_color_node_t *pattern_color;
 
 	/* 1-byte members following */
+	enum ec_led_id led_id;
 	uint8_t cur_color;
 	uint8_t pattern_len;
 	uint8_t cycle_limit;
 	uint8_t cycle_curr;
 	enum led_transition transition;
 	bool needs_update;
-};
+} __packed;
 
-static inline int32_t get_step_duration(const struct led_pattern_node_t *cfg,
-					uint8_t step_idx)
+static inline uint32_t get_step_duration(const struct led_pattern_node_t *cfg,
+					 uint8_t step_idx)
 {
 	return cfg->pattern_color[step_idx].duration_ms;
 }
@@ -243,6 +252,9 @@ struct custom_led_patterns_t {
  *          The data pointed to must remain valid until execution completes.
  */
 void led_set_custom_patterns(struct custom_led_patterns_t *p);
+
+/* Reset any built-in patterns that match the given led_id */
+void reset_policy_patterns(enum ec_led_id led_id);
 
 #ifdef TEST_BUILD
 const struct led_pins_node_t *led_get_node(enum led_color color,

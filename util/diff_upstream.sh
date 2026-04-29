@@ -9,7 +9,7 @@ echo "3p root directory: ${THIRD_PARTY_DIR}"
 
 # This should include all the third_party modules that zmake can see.
 # And also any repos that copybot copies from indirectly, i.e.
-# zephyrproject-rtos/cmsis -> zephyr/cmsis -> zephyrproject/modules/hal/cmsis
+# zephyrproject-rtos/cmsis_6 -> zephyrproject/modules/hal/cmsis_6
 declare -A repos=(
   # config/chre/main-public.ini
   ['android/platform/system/chre']='https://android.googlesource.com/platform/system/chre main'
@@ -19,8 +19,6 @@ declare -A repos=(
   ['pigweed']='https://pigweed.googlesource.com/pigweed/pigweed main'
   # config/zephyr/main.ini
   ['zephyrproject/zephyr']='https://github.com/zephyrproject-rtos/zephyr.git main'
-  # config/zephyr/project-cmsis.ini
-  ['zephyrproject/modules/hal/cmsis']='https://github.com/zephyrproject-rtos/cmsis.git master'
   # config/zephyr/project-cmsis_6.ini
   ['zephyrproject/modules/hal/cmsis_6']='https://github.com/zephyrproject-rtos/CMSIS_6.git main'
   # config/zephyr/project-egis_module.ini
@@ -43,14 +41,9 @@ declare -A repos=(
 declare -A expected_diffs=(
   # b/389761200 17452ff89d458b4201bc1ce2debbb30703f45c0d
   #   Revert "drivers: watchdog: stm32 iwdg: explicit single channel"
-  # b/460502081 97b8c4eef6a738f22120cc99448317245151de45
-  #   FROMPULL: kernel: Add Kconfig option to disable LTO for kernel sources
-  # b/460504453 2bf08236a2a731e8a764d3b2265f0b533bf7ec95
-  #   FROMPULL: soc: it8xxx2: Select KERNEL_NO_LTO only when LTO is enabled
   ['zephyrproject/zephyr']="\
     17452ff89d458b4201bc1ce2debbb30703f45c0d \
-    97b8c4eef6a738f22120cc99448317245151de45 \
-    2bf08236a2a731e8a764d3b2265f0b533bf7ec95"
+    "
 )
 
 function die() {
@@ -76,10 +69,6 @@ for repo in "${all_repos[@]}"; do
     upstream_commit="${upstream_branch}"
   fi
   case "${upstream_commit}" in
-    # cmsis has some commits out of order
-    c3bd2094f92d574377f7af2aec147ae181aa5f8e)
-      upstream_commit=4b96cbb174678dcd3ca86e11e1f24bc5f8726da0
-      ;;
     # picolibc has a commit out of order
     b25f4a47784d2c24695977c903fe114565ae2bc6)
       upstream_commit=1c73900b79dbc02b80d09f5d637382249158e1ec
@@ -87,10 +76,6 @@ for repo in "${all_repos[@]}"; do
     # zephyrproject/modules/hal/intel switched upstream repos here
     8c6772bb56997da40e3f624192334de22ee5e5a8)
       upstream_commit=82a33b2de29523d9ce572b3d0110a808665cd3ff
-      ;;
-    # cmsis switched upstream repos here
-    818dedc88d61e87ffde020d245d007a548204d80)
-      upstream_commit=512cc7e895e8491696b61f7ba8066b4a182569b8
       ;;
     # hal_stm32 switched upstream repos here
     2a535edbfb51d2524578a1b8f8342e9644ac0864)
