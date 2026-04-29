@@ -22,6 +22,30 @@
       },
       "revId": "cabe7085ca40c28f7fb7da9dd13a11ba33ba0f40",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "851b3118_8e251cae",
+        "filename": "zephyr/zmake/zmake/build_config.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-29T15:35:09Z",
+      "side": 1,
+      "message": "Ack - I\u0027ll just abandon this CL.",
+      "parentUuid": "96f2394b_fe9771b7",
+      "range": {
+        "startLine": 127,
+        "startChar": 8,
+        "endLine": 128,
+        "endChar": 75
+      },
+      "revId": "cabe7085ca40c28f7fb7da9dd13a11ba33ba0f40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
