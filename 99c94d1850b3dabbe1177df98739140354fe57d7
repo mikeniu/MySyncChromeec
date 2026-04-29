@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1651b7b_eebc4a19",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.egis",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T14:30:03Z",
+      "side": 1,
+      "message": "Please add the config in the previous CL.",
+      "revId": "99c94d1850b3dabbe1177df98739140354fe57d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01ebb0f2_35ee0d0e",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.egis",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T14:30:03Z",
+      "side": 1,
+      "message": "Maybe add dependency on existing the egis660_apns_data node. Probably [$(dt_nodelabel_enabled,\u003cnode label\u003e)\n](https://docs.zephyrproject.org/latest/build/kconfig/preprocessor-functions.html#devicetree-related-functions) should work.",
+      "revId": "99c94d1850b3dabbe1177df98739140354fe57d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "820bf765_cc3f55c5",
+        "filename": "zephyr/program/fpmcu/et171/egis660_common.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-29T14:30:03Z",
+      "side": 1,
+      "message": "Please rename to egis660_apns_data",
+      "revId": "99c94d1850b3dabbe1177df98739140354fe57d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
