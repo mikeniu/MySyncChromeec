@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7db27c13_32c83f8c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-04-29T16:09:12Z",
+      "side": 1,
+      "message": "This is the same thing we did for one of the other nissas, right? Conceivably, this caching could be done in the SYV682 PPC driver to cover all of the models that use that PPC. I\u0027d consider that an optional exercise for a follow-up CL.",
+      "revId": "0e19c3b5d982be1983f3888ea513e300fee2faea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
