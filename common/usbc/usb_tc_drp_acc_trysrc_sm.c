@@ -3142,11 +3142,15 @@ static void tc_attached_src_entry(const int port)
 			/* Apply Rp */
 			typec_update_cc(port);
 
+			/* Attached.SRC - enable AutoDischargeDisconnect
+			 * TODO(b:469587422): Remove the logic to enable Auto
+			 * Discharge Disconnect in tc_pr_swap_complete. That's
+			 * too late for a sink-to-source PRS. */
+			tcpm_enable_auto_discharge_disconnect(port, 1);
+
 			/*
 			 * Maintain VCONN supply state, whether ON or OFF, and
-			 * its data role / usb mux connections. Do not
-			 * re-enable AutoDischargeDisconnect until the swap is
-			 * completed and tc_pr_swap_complete is called.
+			 * its data role / usb mux connections.
 			 */
 		} else {
 			/*
@@ -4002,6 +4006,7 @@ static void tc_cc_rp_entry(const int port)
  */
 static void tc_cc_open_entry(const int port)
 {
+	enum battery_present bp = battery_is_present();
 	/* Ensure we are not sourcing Vbus */
 	tc_src_power_off(port);
 
@@ -4018,7 +4023,7 @@ static void tc_cc_open_entry(const int port)
 	 * sure the TCPC has managed its internal states for disconnecting
 	 * the only source of power it has.
 	 */
-	if (battery_is_present())
+	if (bp == BP_YES)
 		tcpm_enable_auto_discharge_disconnect(port, 0);
 
 	/*
@@ -4028,7 +4033,7 @@ static void tc_cc_open_entry(const int port)
 	 * requirements.
 	 */
 	CPRINTS_L2("C%d: Applying CC Open!", port);
-	if (!battery_is_present())
+	if (bp != BP_YES)
 		cflush();
 
 	/* Remove terminations from CC */

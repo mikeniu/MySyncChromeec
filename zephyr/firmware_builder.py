@@ -92,7 +92,6 @@ BINARY_SIZE_REGIONS = [
 
 # Unused boards that are expected to be unused, such as dev boards.
 UNUSED_BOARDS = {
-    "dev-posix",
     "it8xxx2_evb",
     "it82002_evb",
     "minimal-posix",
@@ -161,7 +160,7 @@ def get_projects():
         # are fixed correctly.
         if (
             project.config.project_name
-            in ["lapis", "moonstone", "ruby", "sapphire", "quartz"]
+            in ["lapis", "moonstone", "ruby", "sapphire", "quartz", "mica"]
             and not platform_ec_private.exists()
         ):
             continue
