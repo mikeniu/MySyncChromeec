@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "365ecc3d_bb61833f",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.egis",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T15:39:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c1651b7b_eebc4a19",
+      "revId": "99c94d1850b3dabbe1177df98739140354fe57d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "01ebb0f2_35ee0d0e",
@@ -35,6 +53,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c60854f7_26de76a0",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.egis",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T15:39:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "01ebb0f2_35ee0d0e",
+      "revId": "99c94d1850b3dabbe1177df98739140354fe57d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "820bf765_cc3f55c5",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-04-29T14:30:03Z",
       "side": 1,
       "message": "Please rename to egis660_apns_data",
+      "revId": "99c94d1850b3dabbe1177df98739140354fe57d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb25b8f0_c39e9b6b",
+        "filename": "zephyr/program/fpmcu/et171/egis660_common.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-29T15:39:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "820bf765_cc3f55c5",
       "revId": "99c94d1850b3dabbe1177df98739140354fe57d7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
