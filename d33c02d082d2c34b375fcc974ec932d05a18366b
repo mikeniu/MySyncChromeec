@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fea6b54c_8b0a3186",
+        "filename": "driver/fingerprint/egis/egis_api.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-29T09:12:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e84e786b_101392d7",
+      "range": {
+        "startLine": 170,
+        "startChar": 0,
+        "endLine": 170,
+        "endChar": 0
+      },
+      "revId": "d33c02d082d2c34b375fcc974ec932d05a18366b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3372580a_93801514",
@@ -85,6 +109,30 @@
       "side": 1,
       "message": "It\u0027 relevant, please update it.",
       "parentUuid": "6b44681e_54772a1b",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 0
+      },
+      "revId": "d33c02d082d2c34b375fcc974ec932d05a18366b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd373206_93980f28",
+        "filename": "driver/fingerprint/egis/egis_private.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-29T09:12:56Z",
+      "side": 1,
+      "message": "Understood.",
+      "parentUuid": "e64606b7_3f2bee68",
       "range": {
         "startLine": 85,
         "startChar": 0,
@@ -166,6 +214,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8add5149_6905c7ba",
+        "filename": "driver/fingerprint/egis/egis_private.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-29T09:12:56Z",
+      "side": 1,
+      "message": "Understood.",
+      "parentUuid": "96ad965c_2610ab1f",
+      "range": {
+        "startLine": 94,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 0
+      },
+      "revId": "d33c02d082d2c34b375fcc974ec932d05a18366b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ad8412d0_fc1231e6",
@@ -179,6 +251,30 @@
       "writtenOn": "2026-04-29T05:49:03Z",
       "side": 1,
       "message": "Typo: missing space `ofimage_data` -\u003e `of image_data`.",
+      "range": {
+        "startLine": 138,
+        "startChar": 0,
+        "endLine": 138,
+        "endChar": 0
+      },
+      "revId": "d33c02d082d2c34b375fcc974ec932d05a18366b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "828de5dd_d0181517",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_private.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-29T09:12:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ad8412d0_fc1231e6",
       "range": {
         "startLine": 138,
         "startChar": 0,
