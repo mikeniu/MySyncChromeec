@@ -109,6 +109,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e2ea814f_5d84353d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-04-29T14:57:18Z",
+      "side": 1,
+      "message": "\u003e  it should be fine, right?\n\nIf you mean the resule of checking flashinfo and ro_at_boot, it still is `off` after I change to use `flash_em32_check_bank_protected` (test on patchset 17).",
+      "parentUuid": "ad9ff3c6_60343fca",
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0fa07852_9718751b",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 15
