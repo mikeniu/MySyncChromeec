@@ -1736,16 +1736,13 @@ static void discovery_info_init(struct pdc_port_t *port)
 /**
  * @brief This function gets the correct pointer for pdc_pdos_t struct
  *
- * These structs are used to store SRC/SNK CAPs PDOs of the partner device.
- * The pdo_req must specify PARTNER_PDO and the CAP type.
+ * get_pdc_pdos_ptr asserts if pdo_source is PARTNER_PDO and this function
+ * doesn't.
  */
-static struct pdc_pdos_t *get_pdc_pdos_ptr(struct pdc_port_t *port,
-					   struct get_pdo_t *pdo_req)
+static struct pdc_pdos_t *get_pdc_pdos_ptr_no_guard(struct pdc_port_t *port,
+						    struct get_pdo_t *pdo_req)
 {
 	struct pdc_pdos_t *pdc_pdos;
-
-	__ASSERT(pdo_req->pdo_source == PARTNER_PDO, "Invalid PDO source: %d",
-		 pdo_req->pdo_source);
 
 	if (pdo_req->pdo_type == SINK_PDO) {
 		pdc_pdos = &port->src_policy.partner_snk_pdos;
@@ -1754,6 +1751,21 @@ static struct pdc_pdos_t *get_pdc_pdos_ptr(struct pdc_port_t *port,
 	}
 
 	return pdc_pdos;
+}
+
+/**
+ * @brief This function gets the correct pointer for pdc_pdos_t struct
+ *
+ * These structs are used to store SRC/SNK CAPs PDOs of the partner device.
+ * The pdo_req must specify PARTNER_PDO and the CAP type.
+ */
+static struct pdc_pdos_t *get_pdc_pdos_ptr(struct pdc_port_t *port,
+					   struct get_pdo_t *pdo_req)
+{
+	__ASSERT(pdo_req->pdo_source == PARTNER_PDO, "Invalid PDO source: %d",
+		 pdo_req->pdo_source);
+
+	return get_pdc_pdos_ptr_no_guard(port, pdo_req);
 }
 
 static bool run_common_policies(struct pdc_port_t *port)
@@ -4813,8 +4825,11 @@ test_mockable bool pdc_power_mgmt_get_partner_data_swap_capable(int port)
 
 	pdc_port = &pdc_data[port]->port;
 
+	if (pdc_port->get_pdo.pdo_source != PARTNER_PDO) {
+		return false;
+	}
 	fixed_vsafe5v_pdo =
-		get_pdc_pdos_ptr(pdc_port, &pdc_port->get_pdo)->pdos[0];
+		get_pdc_pdos_ptr_no_guard(pdc_port, &pdc_port->get_pdo)->pdos[0];
 
 	/*
 	 * Error check that first PDO is fixed, as 6.4.1 Capabilities requires
