@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "16a9d53e_a15e852f",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.egis",
+        "patchSetId": 19
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-30T14:08:53Z",
+      "side": 1,
+      "message": "Sounds good. Thank you.",
+      "parentUuid": "563eac83_6b06e105",
+      "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4480c162_df1945cc",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "4480c162_df1945cc",
+      "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0625466b_e2f24568",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-30T14:08:53Z",
+      "side": 1,
+      "message": "Marked as unresolved.\n\nNow it uses function from shim layer. I asked to use driver function directly.",
+      "parentUuid": "02f1f2fd_178df56a",
       "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -172,6 +208,24 @@
       "side": 1,
       "message": "conflict with the same name `fp_sensor_info` in [ec_commands.h](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/include/ec_commands.h;l\u003d8599) before after include `flash.h`",
       "parentUuid": "1b316774_74418af8",
+      "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f589ccc6_627c3e1a",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_private.h",
+        "patchSetId": 19
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-30T14:08:53Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "28b2c781_b28426b9",
       "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
