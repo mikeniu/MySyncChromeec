@@ -844,6 +844,17 @@ __maybe_unused static int test_wake_tcpc_toggle_change(void)
 	return EC_SUCCESS;
 }
 
+__maybe_unused static int test_tc_set_msg_header_data_role(void)
+{
+	mock_tcpc.last.data_role = PD_ROLE_UFP;
+
+	tc_set_msg_header_data_role(PORT0, PD_ROLE_DFP);
+
+	TEST_EQ(mock_tcpc.last.data_role, PD_ROLE_DFP, "%d");
+
+	return EC_SUCCESS;
+}
+
 /* Reset the mocks before each test */
 void before_test(void)
 {
@@ -896,6 +907,7 @@ void run_test(int argc, const char **argv)
 	RUN_TEST(test_auto_toggle_delay_early_connect);
 
 	RUN_TEST(test_wake_tcpc_toggle_change);
+	RUN_TEST(test_tc_set_msg_header_data_role);
 
 	/* Do basic state machine validity checks last. */
 	RUN_TEST(test_tc_no_parent_cycles);
