@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a98bb6cf_0d93cd27",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T08:14:08Z",
+      "side": 1,
+      "message": "Okay, I\u0027ll use `IS_ALIGNED(offset, storage_info.erase_align)`, can I also use it to check `size`?",
+      "parentUuid": "0115c2fa_6902ad4e",
+      "revId": "006ae71b8764ff37b908c853ffdb7c833ecffeea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bb0899ba_265c7a73",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
         "patchSetId": 18
@@ -31,6 +49,30 @@
       "writtenOn": "2026-04-30T07:59:09Z",
       "side": 1,
       "message": "`crec_flash_erase` can return positive number on error.",
+      "range": {
+        "startLine": 205,
+        "startChar": 1,
+        "endLine": 205,
+        "endChar": 3
+      },
+      "revId": "006ae71b8764ff37b908c853ffdb7c833ecffeea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c6990d4_5b0277b2",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T08:14:08Z",
+      "side": 1,
+      "message": "So, do I need to return `-rc` to convert `rc` to a negative number?",
+      "parentUuid": "bb0899ba_265c7a73",
       "range": {
         "startLine": 205,
         "startChar": 1,
