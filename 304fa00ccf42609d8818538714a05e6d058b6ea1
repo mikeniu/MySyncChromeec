@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdc8164b_6dfdf424",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T07:12:22Z",
+      "side": 1,
+      "message": "Isn\u0027t the minimum read length 1 byte? Reading alignment in units of 1 byte works correctly.",
+      "parentUuid": "a9028c99_cc6eb6c7",
+      "revId": "304fa00ccf42609d8818538714a05e6d058b6ea1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "940e5327_3115714b",
@@ -94,6 +112,24 @@
       "writtenOn": "2026-04-30T06:42:35Z",
       "side": 1,
       "message": "Please also check the read alignment here.",
+      "revId": "304fa00ccf42609d8818538714a05e6d058b6ea1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0613709b_8acf9469",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T07:12:22Z",
+      "side": 1,
+      "message": "It will read fail with our current library design, report non-aligned.",
+      "parentUuid": "518a3cae_02078e6d",
       "revId": "304fa00ccf42609d8818538714a05e6d058b6ea1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
