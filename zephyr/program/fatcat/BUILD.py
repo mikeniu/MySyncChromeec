@@ -70,6 +70,9 @@ def register_realtek_project(
     extra_modules=(),
 ):
     """Register an realtek_ec based variant of fatcat."""
+    if inherited_from is None:
+        inherited_from = ["fatcat"]
+
     register_rtk_project(
         project_name=project_name,
         zephyr_board="realtek/rts5912",
