@@ -5,15 +5,34 @@
 
 #include "accelgyro.h"
 #include "cros_cbi.h"
+#include "driver/accel_lis2dh_public.h"
+#include "driver/accel_lis2dw12_public.h"
 #include "hooks.h"
 #include "motionsense_sensors.h"
 
 #include <zephyr/logging/log.h>
 
+static int base_use_alt_sensor;
+
 LOG_MODULE_REGISTER(moonstone_sensor, LOG_LEVEL_INF);
+
+void motion_base_interrupt(enum gpio_signal signal)
+{
+	if (base_use_alt_sensor) {
+		lis2dw12_interrupt(signal);
+	} else {
+		lis2dh_interrupt(signal);
+	}
+}
 
 static void sensor_init(void)
 {
+	base_use_alt_sensor = cros_cbi_ufsc_check_match(
+		CBI_UFSC_VALUE_ID(DT_NODELABEL(ufsc_base_lis2dw12)));
+
+	LOG_INF("sensor: base_accel = %s",
+		base_use_alt_sensor ? "lis2dw12" : "lis2de12tr");
+
 	motion_sensors_check_ufsc();
 }
 DECLARE_HOOK(HOOK_INIT, sensor_init, HOOK_PRIO_POST_I2C);
