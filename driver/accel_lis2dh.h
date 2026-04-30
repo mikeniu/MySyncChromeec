@@ -50,12 +50,14 @@
 
 #define LIS2DH_CTRL3_ADDR 0x22
 #define LIS2DH_CTRL3_RESET_VAL 0x00
+#define LIS2DH_CTRL3_I1_WM 0x04
 
 #define LIS2DH_CTRL4_ADDR 0x23
 #define LIS2DH_BDU_MASK 0x80
 
 #define LIS2DH_CTRL5_ADDR 0x24
 #define LIS2DH_CTRL5_RESET_VAL 0x00
+#define LIS2DH_CTRL5_FIFO_EN_MASK 0x40
 
 #define LIS2DH_CTRL6_ADDR 0x25
 #define LIS2DH_CTRL6_RESET_VAL 0x00
@@ -68,8 +70,37 @@
 #define LIS2DH_FS_8G_VAL 0x02
 #define LIS2DH_FS_16G_VAL 0x03
 
+#define LIS2DH_FIFO_CTRL_ADDR 0x2e
+#define LIS2DH_FIFO_CTRL_TR_MASK 0x40
+
+/* FIFO_CTRL bits. */
+#define LIS2DH_FIFO_MODE_MASK 0xC0
+
+/* List of supported FIFO mode. */
+enum lis2dh_fmode {
+	LIS2DH_FIFO_BYPASS_MODE = 0,
+	LIS2DH_FIFO_MODE = 1,
+	LIS2DH_STREAM_MODE = 2,
+	LIS2DH_STREAM_TO_FIFO_MODE = 3
+};
+
+#define LIS2DH_FIFO_THRESHOLD_MASK 0x1f
+
+#define LIS2DH_FIFO_SRC_ADDR 0x2f
+
+/* FIFO_SAMPLES bits. */
+#define LIS2DH_FIFO_DIFF_MASK 0x1f
+#define LIS2DH_FIFO_OVR_MASK 0x40
+#define LIS2DH_FIFO_FTH_MASK 0x80
+
 /* Interrupt source status register */
 #define LIS2DH_INT1_SRC_REG 0x31
+
+#define LIS2DH_INT1_FTH_ADDR LIS2DH_CTRL3_ADDR
+#define LIS2DH_INT1_FTH_MASK LIS2DH_CTRL3_I1_WM
+
+#define LIS2DH_H_ACTIVE_ADDR LIS2DH_CTRL6_ADDR
+#define LIS2DH_H_ACTIVE_MASK 0x02
 
 /* Output data rate Mask register */
 #define LIS2DH_ACC_ODR_MASK 0xf0
@@ -130,5 +161,24 @@ enum lis2dh_odr {
 #endif
 
 extern const struct accelgyro_drv lis2dh_drv;
+
+#if DT_NODE_EXISTS(DT_ALIAS(lis2dh_int))
+#define ACCEL_LIS2DH_INT_ENABLE
+#endif
+
+#ifdef ACCEL_LIS2DH_INT_ENABLE
+/* Get the motion sensor ID of the LIS2DH sensor that generates the
+ * interrupt. The interrupt is converted to the event and transferred to
+ * motion sense task that actually handles the interrupt.
+ *
+ * Here we use an alias (lis2dh_int) to get the motion sensor ID. This alias
+ * MUST be defined for this driver to work.
+ * aliases {
+ *   lis2dh-int = &lid_accel;
+ * };
+ */
+#define ACCEL_LIS2DH_INT_EVENT \
+	TASK_EVENT_MOTION_SENSOR_INTERRUPT(SENSOR_ID(DT_ALIAS(lis2dh_int)))
+#endif
 
 #endif /* __CROS_EC_ACCEL_LIS2DH_H */
