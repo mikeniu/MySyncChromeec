@@ -127,6 +127,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "287fafec_c82de5c5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T08:45:40Z",
+      "side": 1,
+      "message": "No, I though it will show ro_at_boot. It should come from the `cros_flash_em32f967_get_protect_flags` function:\n```\n\t} else if (prot_end \u003e\u003d RO_END) {\n\t\tflags |\u003d EC_FLASH_PROTECT_RO_AT_BOOT;\n\t}\n```\nDoes `ret \u003d get_prot_reg(dev, \u0026prot_start, \u0026prot_end);` still sets `prot_end` to 0, when `get_prot_reg` uses `flash_em32_check_bank_protected`?",
+      "parentUuid": "e2ea814f_5d84353d",
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0fa07852_9718751b",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 15
