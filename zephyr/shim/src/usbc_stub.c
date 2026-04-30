@@ -36,3 +36,7 @@ void pd_request_power_swap(int port)
 void pd_set_new_power_request(int port)
 {
 }
+
+void tc_set_msg_header_data_role(int port, enum pd_data_role data_role)
+{
+}
