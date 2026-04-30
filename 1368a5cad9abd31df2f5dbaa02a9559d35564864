@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1a5b0c5_76ab8a9d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-30T22:27:35Z",
+      "side": 1,
+      "message": "Bypassing code coverage for 2-line change.",
+      "revId": "1368a5cad9abd31df2f5dbaa02a9559d35564864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
