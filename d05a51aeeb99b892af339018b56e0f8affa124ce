@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99b505b6_37b830ff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T11:11:23Z",
+      "side": 1,
+      "message": "Tests are failing:\n```\nfingerprint.drivers.egis660.egis660.acquire_image_not_supported\nfingerprint.drivers.egis660.egis660.acquire_image_small_buffer_size\nfingerprint.drivers.egis660.egis660.acquire_image_wrong_capture_type\nfingerprint.drivers.egis660.egis660.convert_fp_capture_type_to_egis_capture_type\nfingerprint.drivers.egis660.egis660.deinit_success\nfingerprint.drivers.egis660.egis660.enter_idle\nfingerprint.drivers.egis660.egis660.finger_status_not_supported\nfingerprint.drivers.egis660.egis660.get_info\nfingerprint.drivers.egis660.egis660.init_success\nfingerprint.drivers.egis660.egis660.interrupt\n```\nYou can run them locally with `./twister -s fingerprint.drivers.egis660`",
+      "revId": "d05a51aeeb99b892af339018b56e0f8affa124ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
