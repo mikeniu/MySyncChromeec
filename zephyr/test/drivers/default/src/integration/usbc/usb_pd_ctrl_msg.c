@@ -16,6 +16,7 @@
 
 #include <stdint.h>
 
+#include <zephyr/sys/byteorder.h>
 #include <zephyr/ztest.h>
 
 #define TEST_USB_PORT 0
@@ -339,6 +340,72 @@ ZTEST_F(usb_pd_ctrl_msg_test_source, test_dpm_dr_swap)
 	typec_status = host_cmd_typec_status(TEST_USB_PORT);
 	zassert_equal(PD_ROLE_UFP, typec_status.data_role,
 		      "Returned data_role=%u", typec_status.data_role);
+}
+
+/**
+ * @brief Verify DR_Swap updates TCPC message header role
+ * immediately after Accept.
+ *
+ * @details
+ *  - TCPM starts as Sink/UFP
+ *  - Partner initiates DR_Swap
+ *  - DUT accepts DR_Swap
+ *  - Verify TCPC message headers use updated DFP role
+ *
+ * Expected Results
+ *  - PD packets after DR_Swap contain DFP data role
+ */
+ZTEST_F(usb_pd_ctrl_msg_test_sink, test_dr_swap_accept_updates_msg_header)
+{
+	struct usb_pd_ctrl_msg_test_fixture *super_fixture = &fixture->fixture;
+	struct tcpci_partner_log_msg *msg;
+	struct ec_response_typec_status typec_status = { 0 };
+	uint16_t header;
+	bool found_accept = false;
+	bool found_dfp_after_accept = false;
+	int rv;
+
+	/* Convert data role from DFP to UFP */
+	pd_dpm_request(TEST_USB_PORT, DPM_REQUEST_DR_SWAP);
+	k_sleep(K_SECONDS(1));
+
+	typec_status = host_cmd_typec_status(TEST_USB_PORT);
+	zassert_equal(PD_ROLE_UFP, typec_status.data_role,
+		      "Returned data_role=%u", typec_status.data_role);
+
+	tcpci_partner_common_enable_pd_logging(&super_fixture->partner_emul,
+					       true);
+
+	/* Partner initiates DR_SWAP */
+	rv = tcpci_partner_send_control_msg(&super_fixture->partner_emul,
+					    PD_CTRL_DR_SWAP, 0);
+
+	zassert_ok(rv, "Failed to send DR_SWAP request");
+
+	/* Allow DR_SWAP handshake to complete */
+	k_sleep(K_SECONDS(1));
+
+	tcpci_partner_common_enable_pd_logging(&super_fixture->partner_emul,
+					       false);
+
+	SYS_SLIST_FOR_EACH_CONTAINER(&super_fixture->partner_emul.msg_log, msg,
+				     node)
+	{
+		header = sys_get_le16(msg->buf);
+
+		if (PD_HEADER_TYPE(header) == PD_CTRL_ACCEPT) {
+			found_accept = true;
+			continue;
+		}
+
+		if (found_accept && PD_HEADER_DROLE(header) == PD_ROLE_DFP) {
+			found_dfp_after_accept = true;
+			break;
+		}
+	}
+
+	zassert_true(found_dfp_after_accept,
+		     "DFP data-role header observed after Accept");
 }
 
 /**
