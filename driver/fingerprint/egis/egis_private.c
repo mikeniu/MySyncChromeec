@@ -32,19 +32,19 @@ static struct fp_sensor_info egis_sensor_info = {
 };
 
 #define EGIS_DEFAULT_IMAGE_PARAMS                                         \
-	.bpp = FP_SENSOR_DEFAULT_BPP_EGIS,                                \
 	.frame_size = FP_SENSOR_RES_X_EGIS * FP_SENSOR_RES_Y_EGIS,        \
+	.image_data_offset_bytes = FP_SENSOR_IMAGE_OFFSET_EGIS,           \
 	.pixel_format = V4L2_PIX_FMT_GREY, .width = FP_SENSOR_RES_X_EGIS, \
-	.height = FP_SENSOR_RES_Y_EGIS
+	.height = FP_SENSOR_RES_Y_EGIS, .bpp = FP_SENSOR_DEFAULT_BPP_EGIS
 
 #define EGIS_TEST_IMAGE_PARAMS                                            \
-	.bpp = FP_SENSOR_TEST_BPP_EGIS,                                   \
 	.frame_size = FP_SENSOR_RES_X_EGIS * FP_SENSOR_RES_Y_EGIS *       \
 		      sizeof(uint16_t),                                   \
+	.image_data_offset_bytes = FP_SENSOR_IMAGE_OFFSET_EGIS,           \
 	.pixel_format = V4L2_PIX_FMT_GREY, .width = FP_SENSOR_RES_X_EGIS, \
-	.height = FP_SENSOR_RES_Y_EGIS
+	.height = FP_SENSOR_RES_Y_EGIS, .bpp = FP_SENSOR_TEST_BPP_EGIS
 
-static const struct fp_image_frame_params egis_image_frame_params[] = {
+static const struct fp_image_frame_params_v2 egis_image_frame_params[] = {
 	[EGIS_CAPTURE_NORMAL_FORMAT] =
 	{
 		EGIS_DEFAULT_IMAGE_PARAMS,
@@ -163,9 +163,9 @@ int fp_sensor_deinit(void)
 	return egis_sensor_deinit();
 }
 
-int fp_sensor_get_info(struct ec_response_fp_info_v2 *resp, size_t resp_size)
+int fp_sensor_get_info(struct ec_response_fp_info_v3 *resp, size_t resp_size)
 {
-	if (sizeof(struct ec_response_fp_info_v2) +
+	if (sizeof(struct ec_response_fp_info_v3) +
 		    sizeof(egis_image_frame_params) >
 	    resp_size) {
 		return EC_RES_OVERFLOW;
@@ -190,9 +190,11 @@ int fp_sensor_get_info(struct ec_response_fp_info_v2 *resp, size_t resp_size)
 }
 
 __overridable int fp_finger_match(void *templ, uint32_t templ_count,
-				  uint8_t *image, int32_t *match_index,
-				  uint32_t *update_bitmap)
+				  uint8_t *image, bool template_update,
+				  int32_t *match_index, uint32_t *update_bitmap)
 {
+	/* TODO(b/479912675): Use template_update parameter. */
+
 	egis_api_return_t ret = egis_finger_match(templ, templ_count, image,
 						  match_index, update_bitmap);
 

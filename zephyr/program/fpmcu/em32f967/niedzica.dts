@@ -17,11 +17,17 @@
 	height = <80>; \
 	bits-per-pixel = <14>; \
 	frame-size = <12800>; \
+	image-data-offset-bytes = <0>; \
 	v4l2-pixel-format = "V4L2_PIX_FMT_GREY";
 
 / {
 	chosen {
 		cros-fp,fingerprint-sensor = &fp_sensor;
+		cros-ec,cros-system = &cros_system;
+	};
+
+	cros_system: cros-system {
+		compatible = "cros-ec,cros-system";
 	};
 
 	named-bbram-regions {

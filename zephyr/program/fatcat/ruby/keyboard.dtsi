@@ -38,9 +38,9 @@
 	kbd_config_0: kbd-config-0 {
 		vivaldi-codes = <
 			VIVALDI_TK_BACK                 /* T1 */
-			VIVALDI_TK_REFRESH              /* T2 */
-			VIVALDI_TK_FULLSCREEN           /* T3 */
-			VIVALDI_TK_OVERVIEW             /* T4 */
+			VIVALDI_TK_HOME                 /* T2 */
+			VIVALDI_TK_OVERVIEW             /* T3 */
+			VIVALDI_TK_FULLSCREEN           /* T4 */
 			VIVALDI_TK_SNAPSHOT             /* T5 */
 			VIVALDI_TK_BRIGHTNESS_DOWN      /* T6 */
 			VIVALDI_TK_BRIGHTNESS_UP        /* T7 */
@@ -185,6 +185,11 @@
 			MATRIX_KEY(0, 11, KBD_SCANCODE_F14)
 
 			MATRIX_KEY(6, 15, KBD_SCANCODE_CAPSLOCK)
+			MATRIX_KEY(1, 11, KBD_SCANCODE_DELETE)
+			MATRIX_KEY(7, 11, KBD_SCANCODE_PAGEUP)
+			MATRIX_KEY(6, 11, KBD_SCANCODE_PAGEDOWN)
+			MATRIX_KEY(7, 12, KBD_SCANCODE_HOME)
+			MATRIX_KEY(6, 12, KBD_SCANCODE_END)
 		>;
 	};
 
@@ -207,7 +212,7 @@
 			col12-codes = <0x0000 0x0064 0xe07d 0x0067 0xe069 0xe07a 0xe074 0xe06b>;
 			col13-codes = <0x0000 0x0000 0x0000 0x0000 0x0000 0x0000 0x0011 0x0000>;
 			col14-codes = <0x0000 0x0014 0x0000 0xe014 0x0000 0x0000 0x0000 0x0000>;
-			col15-codes = <0x0000 0x0000 0x0000 0x0000 0x0000 0x0000 0xe070 0x0000>;
+			col15-codes = <0x0000 0x0000 0x0000 0x0000 0x0000 0x0000 0xe01a 0x0000>;
 			col16-codes = <0x0037 0x0000 0x0000 0x0000 0x0000 0x0000 0x0000 0x0000>;
 			col17-codes = <0x0000 0x0000 0x006a 0x0000 0x0000 0x0000 0x005d 0x0061>;
 		};

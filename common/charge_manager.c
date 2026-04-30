@@ -785,11 +785,13 @@ static bool is_dualrole_charging_capable(int port)
 
 static bool is_battery_disconnected(void)
 {
-	return (IS_ENABLED(CONFIG_BATTERY) &&
-		(battery_is_present() == BP_NO ||
-		 battery_is_present() == BP_NOT_SURE ||
-		 (battery_is_present() == BP_YES &&
-		  battery_is_cut_off() != BATTERY_CUTOFF_STATE_NORMAL)));
+	if (!IS_ENABLED(CONFIG_BATTERY)) {
+		return false;
+	}
+	enum battery_present bp = battery_is_present();
+	return (bp == BP_NO || bp == BP_NOT_SURE ||
+		(bp == BP_YES &&
+		 battery_is_cut_off() != BATTERY_CUTOFF_STATE_NORMAL));
 }
 
 static inline bool is_charge_available(const struct charge_port_info *info)
@@ -1677,14 +1679,7 @@ int charge_manager_get_power_limit_uw(void)
 
 int charge_manager_set_acokref(int pdo_mv)
 {
-	if (IS_ENABLED(CONFIG_PLATFORM_EC_CHARGER_SET_ACOKREF)) {
-		if (pdo_mv <= 0 || pdo_mv > CONFIG_USB_PD_MAX_VOLTAGE_MV) {
-			return EC_ERROR_INVAL;
-		}
-		charger_set_acokref(charge_get_active_chg_chip(), pdo_mv);
-	}
-
-	return 0;
+	return charger_set_acokref(charge_get_active_chg_chip(), pdo_mv);
 }
 
 #if defined(CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT) && \
