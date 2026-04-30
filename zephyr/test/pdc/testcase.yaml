@@ -325,11 +325,25 @@ tests:
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
 
+  pdc.rts54xx.ap_mode_override_off:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_RTS54XX=y
+    - CONFIG_USBC_PDC_DISABLE_AP_MODE_ENTRY=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
   pdc.tps6699x:
     extra_configs:
     - CONFIG_TEST_SUITE_PDC_TPS6699X=y
     - CONFIG_TEST_PDC_MESSAGE_TRACING=y
     - CONFIG_USBC_PDC_TRACE_MSG=y
+    extra_dtc_overlay_files:
+    - "./boards/tps6699x.overlay"
+
+  pdc.tps6699x.ap_mode_override_off:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_TPS6699X=y
+    - CONFIG_USBC_PDC_DISABLE_AP_MODE_ENTRY=y
     extra_dtc_overlay_files:
     - "./boards/tps6699x.overlay"
 
@@ -488,3 +502,15 @@ tests:
     # b/406176587: These tests cause code coverage flakes. Continue running
     # the tests when unit testing, but skip when measuring code coverage.
     filter: not CONFIG_COVERAGE
+
+  pdc.comms_suspend_resume.rts54xx:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_COMMS_SUSPEND_RESUME=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.comms_suspend_resume.tps6699x:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_COMMS_SUSPEND_RESUME=y
+    extra_dtc_overlay_files:
+    - "./boards/tps6699x.overlay"

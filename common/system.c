@@ -378,7 +378,7 @@ int system_add_jump_tag(uint16_t tag, int version, int size, const void *data)
 		return EC_ERROR_UNKNOWN;
 
 	/* Make room for the new tag */
-	if (size > JUMP_TAG_MAX_SIZE)
+	if (size < 0 || size > JUMP_TAG_MAX_SIZE)
 		return EC_ERROR_INVAL;
 
 	new_entry_size = ROUNDUP4(size) + sizeof(struct jump_tag);
@@ -884,16 +884,15 @@ __overridable int board_get_version(void)
  */
 test_mockable int system_get_board_version(void)
 {
-	int board_id;
-
 	if (IS_ENABLED(CONFIG_BOARD_VERSION_CBI)) {
+		uint32_t board_id;
 		int error;
 
 		error = cbi_get_board_version(&board_id);
 		if (error)
 			return -error;
 
-		return board_id;
+		return (int)board_id;
 	};
 
 	return board_get_version();
@@ -906,12 +905,23 @@ system_get_build_info(void)
 	return build_info;
 }
 
-void system_common_pre_init(void)
+static void handle_watchdog_reset(void)
 {
 	/*
+	 * Only update the panic reason in RW since RO may have an older panic
+	 * data version and updating the panic reason will cause new fields to
+	 * be overwritten.
+	 */
+	if (!IS_ENABLED(CONFIG_COMMON_PANIC_OUTPUT) ||
+	    !IS_ENABLED(SECTION_IS_RW)) {
+		return;
+	}
+
+	/*
 	 * Log panic cause if watchdog caused reset and panic cause
-	 * was not already logged. This must happen before calculating
-	 * jump_data address because it might change panic pointer.
+	 * was not already logged. This must happen after parsing jump_data
+	 * to ensure we have restored the reset flags passed from the previous
+	 * image.
 	 */
 	if (system_get_reset_flags() & EC_RESET_FLAG_WATCHDOG) {
 		uint32_t reason;
@@ -933,11 +943,16 @@ void system_common_pre_init(void)
 		 * is not a watchdog or the panic info has already been read,
 		 * i.e. an old watchdog panic.
 		 */
-		else if (reason != PANIC_SW_WATCHDOG || !pdata ||
-			 pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD)
-			panic_set_reason(PANIC_SW_WATCHDOG, 0, 0);
+		else if ((reason != PANIC_SW_WATCHDOG &&
+			  reason != PANIC_SW_WATCHDOG_HARD) ||
+			 !pdata || pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD) {
+			panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0, 0);
+		}
 	}
+}
 
+static void init_jump_data(void)
+{
 	/*
 	 * get_jump_data() is only available if one of the following are
 	 * enabled.
@@ -976,15 +991,29 @@ void system_common_pre_init(void)
 			delta = sizeof(struct jump_data) - jdata->struct_size;
 
 		/*
-		 * Check if enough space for jump data.
-		 * Clear jump data and return if not.
+		 * Validate sizes to prevent integer overflow or underflow
+		 * during the tag shift.
 		 */
-		if (system_usable_ram_end() < JUMP_DATA_MIN_ADDRESS) {
+		if (jdata->version >= 3 &&
+		    (jdata->struct_size < 0 ||
+		     jdata->struct_size >= CONFIG_PRESERVED_END_OF_RAM_SIZE)) {
+			goto clear_jump_data;
+		}
+
+		if (jdata->version >= 2 && jdata->jump_tag_total < 0) {
+			goto clear_jump_data;
+		}
+
+		/*
+		 * Check if enough space for jump data and tags, avoiding
+		 * pointer underflow which would bypass the bounds check.
+		 */
+		if ((uintptr_t)jdata - jdata->jump_tag_total <
+		    JUMP_DATA_MIN_ADDRESS) {
 			/* TODO(b/251190975): This failure should be reported
 			 * in the panic data structure for more visibility.
 			 */
-			memset(jdata, 0, sizeof(struct jump_data));
-			return;
+			goto clear_jump_data;
 		}
 
 		if (delta && jdata->jump_tag_total) {
@@ -1009,10 +1038,18 @@ void system_common_pre_init(void)
 		 * disallows use of system_add_jump_tag().
 		 */
 		jdata->magic = 0;
-	} else {
-		/* Clear the whole jump_data struct */
-		memset(jdata, 0, sizeof(struct jump_data));
+		return;
 	}
+
+clear_jump_data:
+	/* Clear the whole jump_data struct */
+	memset(jdata, 0, sizeof(struct jump_data));
+}
+
+void system_common_pre_init(void)
+{
+	init_jump_data();
+	handle_watchdog_reset();
 }
 
 void system_enter_manual_recovery(void)

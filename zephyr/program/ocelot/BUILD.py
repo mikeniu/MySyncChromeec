@@ -31,7 +31,7 @@ def register_npcx9_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_proj_files,
         ],
-        modules=["cmsis", "cmsis_6", "ec", "pigweed", "nanopb"],
+        modules=["cmsis_6", "ec", "pigweed", "nanopb"],
         inherited_from=inherited_from,
     )
 
@@ -63,7 +63,7 @@ def register_it8xxx2_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_proj_files,
         ],
-        modules=["cmsis", "cmsis_6", "ec", "pigweed", "nanopb"],
+        modules=["cmsis_6", "ec", "pigweed", "nanopb"],
         inherited_from=inherited_from,
     )
 
@@ -94,7 +94,7 @@ def register_mec172x_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_proj_files,
         ],
-        modules=["cmsis", "cmsis_6", "ec"],
+        modules=["cmsis_6", "ec"],
         inherited_from=inherited_from,
     )
 
@@ -121,7 +121,7 @@ def register_rtk59_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_proj_files,
         ],
-        modules=["cmsis", "cmsis_6", "ec"],
+        modules=["cmsis_6", "ec"],
     )
 
 
@@ -161,6 +161,7 @@ register_ish_project(
         here / "ocelot-ish" / "prj.conf",
         here / "ocelot-ish" / "motionsense.conf",
         here / "dsp_comms.conf",
+        here / ".." / ".." / "ish.conf",
     ],
 )
 
@@ -195,6 +196,7 @@ register_ish_project(
     kconfig_files=[
         here / "matsu-ish" / "prj.conf",
         here / "matsu-ish" / "motionsense.conf",
+        here / ".." / ".." / "ish.conf",
     ],
 )
 
@@ -216,6 +218,7 @@ register_ish_project(
         here / "ocicat-ish" / "prj.conf",
         here / "ocicat-ish" / "motionsense.conf",
         here / "dsp_comms.conf",
+        here / ".." / ".." / "ish.conf",
     ],
 )
 
