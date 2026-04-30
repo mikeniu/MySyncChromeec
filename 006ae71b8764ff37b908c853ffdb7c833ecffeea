@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fd1b1842_b390da04",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T08:19:29Z",
+      "side": 1,
+      "message": "Sure",
+      "parentUuid": "a98bb6cf_0d93cd27",
+      "revId": "006ae71b8764ff37b908c853ffdb7c833ecffeea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bb0899ba_265c7a73",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
         "patchSetId": 18
@@ -73,6 +91,30 @@
       "side": 1,
       "message": "So, do I need to return `-rc` to convert `rc` to a negative number?",
       "parentUuid": "bb0899ba_265c7a73",
+      "range": {
+        "startLine": 205,
+        "startChar": 1,
+        "endLine": 205,
+        "endChar": 3
+      },
+      "revId": "006ae71b8764ff37b908c853ffdb7c833ecffeea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea2cfc72_392a226b",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T08:19:29Z",
+      "side": 1,
+      "message": "You can return whatever. The negative value is the most important part. Just use `-EC_ERROR_UNKNOWN`? The lib doesn\u0027t know EC return codes anyway.",
+      "parentUuid": "9c6990d4_5b0277b2",
       "range": {
         "startLine": 205,
         "startChar": 1,
