@@ -54,6 +54,42 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "64c7433d_0daf290b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-30T04:24:35Z",
+      "side": 1,
+      "message": "Yes, they are nearly identical, but strictly speaking they serve two different\nimplementations.\n\n`egis_api.h` targets the legacy EC path, while\n`fingerprint_egis630_private.h` is specific to the Zephyr EC implementation.\nThey happen to look very similar because both consume the same private Egis\nlibrary, which defines the underlying interface and semantics.\n\nThis separation is consistent with other vendors as well. For example, the `Elan` driver follows the same pattern:\n\n- driver/fingerprint/elan/elan_sensor.h\n- zephyr/drivers/fingerprint/fingerprint_elan80series_private.h\n\nGiven this, could you clarify what change is being expected here? Are you suggesting consolidating the headers across legacy EC and Zephyr EC, or is there a specific maintenance concern you’d like to address?",
+      "parentUuid": "ede41d9a_a3164af2",
+      "revId": "d88db1fba163aca7fb6aee481250a27e2a450f3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a29d236_7e87611c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-30T04:24:35Z",
+      "side": 1,
+      "message": "Yes, the Zephyr test issue has been resolved.\n\nThe issue was caused by an earlier change made based on that [comment](https://chrome-internal-review.googlesource.com/c/chromeos/vendor/fingerprint/egis/+/9106841/comment/17ba1d86_090a2c5c/), where the\n`buf_size` validation was moved into the private library.\nHowever, the private library is not loaded in the ZTEST env, which caused the tests to fail.\n\nThe current approach is to keep the detailed validation in the private library,\nwhile also retaining the original size check at the caller side.\nThis ensures that ZTEST can still pass.",
+      "parentUuid": "405f666f_bb6684c9",
+      "revId": "d88db1fba163aca7fb6aee481250a27e2a450f3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a24bf993_a7899617",
         "filename": "driver/fingerprint/egis/egis_api.h",
         "patchSetId": 16
@@ -65,6 +101,30 @@
       "writtenOn": "2026-04-29T15:27:45Z",
       "side": 1,
       "message": "1. Fragile API Change: Pointer Casting to Opaque Struct\nThe patch changes the signature of `egis_finger_match` and `egis_finger_enroll` to accept `FP_EGIS_IMAGE *` instead of `uint8_t *`.\n\n- Issue: In `egis_private.c` and `egis_egis630_bio_alg.c`, the code casts the raw image buffer `(a uint8_t *)` directly to `FP_EGIS_IMAGE *`.\n\n- Risk: Unless `FP_EGIS_IMAGE` is specifically designed to be a transparent alias for a byte array starting at the same address, this is a strict aliasing violation. If `FP_EGIS_IMAGE` is a struct with specific members, passing a raw buffer not aligned or structured correctly will cause undefined behavior or crashes.\n\nRecommendation: Verify the definition of `FP_EGIS_IMAGE`. If it is a structured object, the buffer should be wrapped or initialized properly rather than force-cast.",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 43
+      },
+      "revId": "d88db1fba163aca7fb6aee481250a27e2a450f3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06f41a5b_09422565",
+        "filename": "driver/fingerprint/egis/egis_api.h",
+        "patchSetId": 16
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-30T04:24:35Z",
+      "side": 1,
+      "message": "This concern is essentially the same as the one discussed in [comment](https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7695805/comment/83b28082_aa634d83/).\n\nAt the moment, the system does not support a pure raw image format exclusively.\nAs a result, a forced cast is unavoidable somewhere in the call chain — the only difference is whether it happens inside or outside the private library.\n\nBased on Tom’s earlier [comment](https://chrome-internal-review.googlesource.com/c/chromeos/vendor/fingerprint/egis/+/9106841/comment/17ba1d86_090a2c5c/), we eventually chose to perform the cast at the API boundary rather than inside the private library.\n\nAnother constraint is that the FP APIs performing the cast do not receive `buf_size`, nor can they reliably apply `sizeof(FP_EGIS_IMAGE)`.\nUnder these conditions, fully validating the structure at the API boundary is not possible.\n\nFor this reason, exposing the full definition of `FP_EGIS_IMAGE` in the public header would only increase header dependencies without providing additional safety guarantees.\nInstead, we intentionally keep `FP_EGIS_IMAGE` opaque in the API and only expose it as a forward-declared pointer.\n\nI understand that this is largely a symbolic safeguard and does not allow the compiler to enforce strict type or layout checks.\nHowever, without changing the API contract itself, this is the best compromise we can make to limit coupling while keeping the existing interface intact.",
+      "parentUuid": "a24bf993_a7899617",
       "range": {
         "startLine": 82,
         "startChar": 0,
@@ -100,6 +160,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bfa9fa09_fc86bc51",
+        "filename": "driver/fingerprint/egis/egis_private.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-30T04:24:35Z",
+      "side": 1,
+      "message": "The FP APIs is designed to use a uint8_t * to transfer image data. However, at the moment there is no pure raw image format being supported. As a result, a forced cast has to exist somewhere in the pipeline.\nIn general, a safer implementation should validate the image type or buffer size before performing any casting.\nThat said, I believe the original design assumed the data would always be pure image data.\nBecause of that assumption, most of the APIs do not include an explicit size argument.\nGiven these constraints, I don’t think there is a fully robust way to prevent this issue without changing the interface itself.",
+      "parentUuid": "83b28082_aa634d83",
+      "range": {
+        "startLine": 204,
+        "startChar": 1,
+        "endLine": 206,
+        "endChar": 42
+      },
+      "revId": "d88db1fba163aca7fb6aee481250a27e2a450f3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6ce39be9_f2a7988d",
         "filename": "zephyr/drivers/fingerprint/Kconfig",
         "patchSetId": 16
@@ -111,6 +195,30 @@
       "writtenOn": "2026-04-29T15:33:39Z",
       "side": 1,
       "message": "Instead of hardcoding 26200, use a descriptive calculation in the header:\n\n```\n/* \n * Data Collection Format: \n * Matcher(5120) + Metadata(20) + Raw(10530) + BKG(10530) \u003d 26200 \n */\n#define EGIS_COLLECTION_FORMAT_SIZE (5120 + 20 + 10530 + 10530)\n#define FP_SENSOR_IMAGE_SIZE_EGIS EGIS_COLLECTION_FORMAT_SIZE\n```",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 44
+      },
+      "revId": "d88db1fba163aca7fb6aee481250a27e2a450f3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76025393_8c6d204e",
+        "filename": "zephyr/drivers/fingerprint/Kconfig",
+        "patchSetId": 16
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-04-30T04:24:35Z",
+      "side": 1,
+      "message": "I’m fine with using a descriptive calculation instead of hardcoding 26200.\n\nFrom what I’ve seen, apart from Elan—which describes a similar breakdown in the\nhelp description—I haven’t found other vendors adding explicit comments or\nmacros that explain how the final image size is calculated. Most implementations\nsimply define the resulting size directly.\n\nIf you agree that adding vendor-specific explanatory comments here is appropriate\nand improves readability and maintainability, then I’m okay with doing so.\nFor example,\n```\n\t# { 8bit image (5120) + metadata (20) + RAW (10530) + BKG (10530) }\n\tdefault 26200if FINGERPRINT_SENSOR_EGIS630\n```",
+      "parentUuid": "6ce39be9_f2a7988d",
       "range": {
         "startLine": 26,
         "startChar": 0,
