@@ -39,6 +39,30 @@
       },
       "revId": "d05a51aeeb99b892af339018b56e0f8affa124ce",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "60640525_f288d395",
+        "filename": "zephyr/program/fpmcu/et171/egis660_common.dtsi",
+        "patchSetId": 8
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T13:33:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f71fa3d3_3caa649a",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 2
+      },
+      "revId": "d05a51aeeb99b892af339018b56e0f8affa124ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
