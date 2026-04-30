@@ -39,23 +39,27 @@
 			/delete-node/ partitions;
 
 			partitions {
-				compatible = "fixed-partitions";
 				#address-cells = <1>;
 				#size-cells = <1>;
+				ranges;
 
 				ro: ro@800000 {
+					compatible = "zephyr,mapped-partition";
 					label = "ro";
 					reg = <0 DT_SIZE_K(256)>;
 				};
 				rw: rw@840000 {
+					compatible = "zephyr,mapped-partition";
 					label = "rw";
 					reg = <0x40000 DT_SIZE_K(256)>;
 				};
 				rollback0: rollback0@880000 {
+					compatible = "zephyr,mapped-partition";
 					label = "rollback0";
 					reg = <0x80000 DT_SIZE_K(4)>;
 				};
 				rollback1: rollback1@881000 {
+					compatible = "zephyr,mapped-partition";
 					label = "rollback1";
 					reg = <0x81000 DT_SIZE_K(4)>;
 				};

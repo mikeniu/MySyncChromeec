@@ -72,16 +72,18 @@
 
 &flash0 {
 	partitions {
-		compatible = "fixed-partitions";
 		#address-cells = <1>;
 		#size-cells = <1>;
+		ranges;
 
 		rollback0: partition@3e000 {
+			compatible = "zephyr,mapped-partition";
 			label = "rollback0";
 			reg = <0x3e000 DT_SIZE_K(4)>;
 		};
 
 		rollback1: partition@3f000 {
+			compatible = "zephyr,mapped-partition";
 			label = "rollback1";
 			reg = <0x3f000 DT_SIZE_K(4)>;
 		};

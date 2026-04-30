@@ -118,41 +118,48 @@
 
 &p25q16 {
 	partitions {
-		compatible = "fixed-partitions";
 		#address-cells = <1>;
 		#size-cells = <1>;
+		ranges;
 
 		sdcp_pk_d: partition@35 {
+			compatible = "zephyr,mapped-partition";
 			label = "sdcp_pk_d";
 			reg = <0x35 65>;
 		};
 
 		sdcp_s_m: partition@76 {
+			compatible = "zephyr,mapped-partition";
 			label = "sdcp_s_m";
 			reg = <0x76 64>;
 		};
 
 		sdcp_pk_m: partition@138 {
+			compatible = "zephyr,mapped-partition";
 			label = "sdcp_pk_m";
 			reg = <0x138 65>;
 		};
 
 		sdcp_s_goog: partition@179 {
+			compatible = "zephyr,mapped-partition";
 			label = "sdcp_s_goog";
 			reg = <0x179 64>;
 		};
 
 		mt_data: partition@1b9 {
+			compatible = "zephyr,mapped-partition";
 			label = "mt_data";
 			reg = <0x1b9 128>;
 		};
 
 		rollback0: partition@40000 {
+			compatible = "zephyr,mapped-partition";
 			label = "rollback0";
 			reg = <0x40000 DT_SIZE_K(4)>;
 		};
 
 		rollback1: partition@41000 {
+			compatible = "zephyr,mapped-partition";
 			label = "rollback1";
 			reg = <0x41000 DT_SIZE_K(4)>;
 		};

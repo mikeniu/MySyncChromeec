@@ -117,18 +117,20 @@
 
 &qspi_fiu0 {
 	partitions {
-		compatible = "fixed-partitions";
 		#address-cells = <1>;
 		#size-cells = <1>;
+		ranges;
 
 		/* First rollback section */
 		rollback0: partition@20000 {
+			compatible = "zephyr,mapped-partition";
 			label = "rollback0";
 			reg = <0x20000 DT_SIZE_K(64)>;
 		};
 
 		/* Second rollback section */
 		rollback1: partition@30000 {
+			compatible = "zephyr,mapped-partition";
 			label = "rollback1";
 			reg = <0x30000 DT_SIZE_K(64)>;
 		};

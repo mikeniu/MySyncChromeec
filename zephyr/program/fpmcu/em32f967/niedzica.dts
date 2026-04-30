@@ -119,24 +119,28 @@
 
 &flash0 {
 	partitions {
-		compatible = "fixed-partitions";
 		#address-cells = <1>;
 		#size-cells = <1>;
+		ranges;
 
 		rollback0: partition@20000 {
+			compatible = "zephyr,mapped-partition";
 			label = "rollback0";
 			reg = <0x20000 DT_SIZE_K(8)>;
 		};
 
 		rollback1: partition@22000 {
+			compatible = "zephyr,mapped-partition";
 			label = "rollback1";
 			reg = <0x22000 DT_SIZE_K(8)>;
 		};
 		base_image: partition@86000 {
+			compatible = "zephyr,mapped-partition";
 			label = "base_image";
 			reg = <0x86000 DT_SIZE_K(20)>;
 		};
 		ft_info: partition@8b000 {
+			compatible = "zephyr,mapped-partition";
 			label = "factory_test_info";
 			reg = <0x8b000 DT_SIZE_K(4)>;
 		};

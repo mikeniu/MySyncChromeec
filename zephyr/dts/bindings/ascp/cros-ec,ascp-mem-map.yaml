@@ -5,7 +5,7 @@
 description: ASCP memory map.
   It holds information about location of data needed for establishing secure
   connection between EC and AP using ASCP protocol. Properties are phandles
-  to the memory (mmio-sram compatible nodes) or flash regions (children of fixed-partitions node).
+  to the memory (mmio-sram compatible nodes) or flash regions (zephyr,mapped-partition nodes).
 compatible: "cros-ec,ascp-mem-map"
 properties:
   pk-m:

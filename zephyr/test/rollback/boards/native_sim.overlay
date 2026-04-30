@@ -33,17 +33,19 @@
 
 &flash0 {
 	partitions {
-		compatible = "fixed-partitions";
 		#address-cells = <1>;
 		#size-cells = <1>;
+		ranges;
 
 		/* Rollback region must have erase unit size. */
 		rollback0: partition@100000 {
+			compatible = "zephyr,mapped-partition";
 			label = "rollback0";
 			reg = <0x100000 DT_SIZE_K(4)>;
 		};
 
 		rollback1: partition@101000 {
+			compatible = "zephyr,mapped-partition";
 			label = "rollback1";
 			reg = <0x101000 DT_SIZE_K(4)>;
 		};
