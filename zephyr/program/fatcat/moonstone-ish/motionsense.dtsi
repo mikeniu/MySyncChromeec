@@ -11,6 +11,7 @@
 		/*
 		 * Interrupt bindings for sensor devices.
 		 */
+		lis2dh-int = &alt_lid_accel;
 		lis2dw12-int = &alt_base_accel;
 	};
 
@@ -174,7 +175,13 @@
 	motionsense-sensor-info {
 		compatible = "cros-ec,motionsense-sensor-info";
 
+		/*
+		 * List of GPIO interrupts that have to be enabled at initial
+		 * stage.sensor_alt_id
+		 */
+		sensor-irqs = <&int_base_accel>;
+
 		/* list of sensors in force mode */
-		accel-force-mode-sensors = <&lid_accel &base_accel>;
+		accel-force-mode-sensors = <&lid_accel>;
 	};
 };
