@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9028c99_cc6eb6c7",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T06:42:35Z",
+      "side": 1,
+      "message": "Actually align for read is sizeof(uint32_t).",
+      "revId": "304fa00ccf42609d8818538714a05e6d058b6ea1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "940e5327_3115714b",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T06:42:35Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Placing `__unused` between the type and the pointer asterisk (`*`) applies the attribute to the type rather than the function. To correctly mark the function itself as unused, it\u0027s better to place the attribute before the return type:\n```c\n__unused const egis_storage_info_t *egis_apns_storage_get_info(void)\n```\n\nPlacing `__unused` between the type and the pointer asterisk (`*`) applies the attribute to the type rather than the function. To correctly mark the function itself as unused, it\u0027s better to place the attribute before the return type:\n```c\n__unused const egis_storage_info_t *egis_apns_storage_get_info(void)\n```",
+      "range": {
+        "startLine": 178,
+        "startChar": 0,
+        "endLine": 178,
+        "endChar": 0
+      },
+      "revId": "304fa00ccf42609d8818538714a05e6d058b6ea1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c03aad13_5654fc7d",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T06:42:35Z",
+      "side": 1,
+      "message": "Applies to all return statements. These error codes are positive numbers, while on error should be returned a negative error code.",
+      "revId": "304fa00ccf42609d8818538714a05e6d058b6ea1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0da0cb98_23632435",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T06:42:35Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Consider defining and using an `abs_offset` variable here for consistency with `egis_apns_data_read` and `egis_apns_data_write`.",
+      "range": {
+        "startLine": 202,
+        "startChar": 0,
+        "endLine": 202,
+        "endChar": 0
+      },
+      "revId": "304fa00ccf42609d8818538714a05e6d058b6ea1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "518a3cae_02078e6d",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T06:42:35Z",
+      "side": 1,
+      "message": "Please also check the read alignment here.",
+      "revId": "304fa00ccf42609d8818538714a05e6d058b6ea1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
