@@ -22,6 +22,30 @@
       },
       "revId": "95b1a763a63e0cae02b116c6ee0a41fc8bb22f68",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69c78ee8_39d12221",
+        "filename": "zephyr/program/fpmcu/et171/stobnica.dts",
+        "patchSetId": 10
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-30T16:02:43Z",
+      "side": 1,
+      "message": "this should go into a separate CL. It does not fit in this CL. `stobnica` uses `ec660`, which has an offset of 172\n\nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/fingerprint/Kconfig;l\u003d46#:~:text\u003d45-,46,-47",
+      "parentUuid": "c7092f75_26dc1a4b",
+      "range": {
+        "startLine": 13,
+        "startChar": 28,
+        "endLine": 13,
+        "endChar": 31
+      },
+      "revId": "95b1a763a63e0cae02b116c6ee0a41fc8bb22f68",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
