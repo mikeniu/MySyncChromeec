@@ -34,6 +34,24 @@
       "parentUuid": "f191f704_f36ebfb3",
       "revId": "8c07f83e9d30fcf9bfa2929e0586e2a98c0c923e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de7296d9_0e04db6b",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 38
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-04-30T08:44:29Z",
+      "side": 1,
+      "message": "This CL currently only implements APIs for pdc init; and move connecttion required APIs to another CL.",
+      "parentUuid": "c24dbea6_b243d43c",
+      "revId": "8c07f83e9d30fcf9bfa2929e0586e2a98c0c923e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
