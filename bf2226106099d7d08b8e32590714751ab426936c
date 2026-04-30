@@ -1,0 +1,228 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26cad2e8_e3f341b0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 39
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-30T22:57:50Z",
+      "side": 1,
+      "message": "I haven\u0027t done thorough review yet.  Generally, this is still quite large and a lot of code to review.\n\nIt\u0027s clear that there was a copy/paste of the realtek driver followed by a search and replace.  Please make another pass through this CL to remove unused code and other quirks that only apply to the realtek driver.",
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f246a76_76f5d0cc",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 39
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-30T22:57:50Z",
+      "side": 1,
+      "message": "Nit - keep includes grouped together.  Move this after all the includes.",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 55
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35809e55_e9618be3",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 39
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-30T22:57:50Z",
+      "side": 1,
+      "message": "Drop unused macros.",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 31
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5f6b58f_fe349f71",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 39
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-30T22:57:50Z",
+      "side": 1,
+      "message": "This appears to be unused and is a copy/paste from the realtek driver. \nYou should be designing this driver to work efficiently with the IT5271, not just copying the realtek implementation with a search/replace.",
+      "range": {
+        "startLine": 105,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 24
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "126b6e5d_22695603",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 39
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-30T22:57:50Z",
+      "side": 1,
+      "message": "Delete the commands that are not used.",
+      "range": {
+        "startLine": 211,
+        "startChar": 5,
+        "endLine": 211,
+        "endChar": 10
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "652aea4b_8cdd9277",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 39
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-30T22:57:50Z",
+      "side": 1,
+      "message": "Please clean up the copy/paste from the realtek driver.  This bug is not applicable to this new driver.\n\nThis new driver should be setting up the state machine for efficient communication with the IT5271.",
+      "range": {
+        "startLine": 443,
+        "startChar": 0,
+        "endLine": 443,
+        "endChar": 73
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af873369_c1f0f46d",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 39
+      },
+      "lineNbr": 941,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-30T22:57:50Z",
+      "side": 1,
+      "message": "The it5271 is a single port device, correct?  Why are you looping over all possible ports here?",
+      "range": {
+        "startLine": 941,
+        "startChar": 0,
+        "endLine": 941,
+        "endChar": 67
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30cae164_58240317",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 39
+      },
+      "lineNbr": 968,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-30T22:57:50Z",
+      "side": 1,
+      "message": "General - comment, the nesting of this function is much too type and hard to read.  Consider splitting out helper functions.\n\nHopefully you can drop the outer for loop to start.",
+      "range": {
+        "startLine": 968,
+        "startChar": 0,
+        "endLine": 968,
+        "endChar": 50
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "548cde9e_dbb3289e",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.h",
+        "patchSetId": 39
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-30T22:57:50Z",
+      "side": 1,
+      "message": "Does this need to be inline?  I don\u0027t see anything performance critical, so better to make this a regular routine and let the compiler decide if if\u0027s better to inline or not.",
+      "range": {
+        "startLine": 89,
+        "startChar": 19,
+        "endLine": 89,
+        "endChar": 55
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9063fb5_0a08aea5",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.h",
+        "patchSetId": 39
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-30T22:57:50Z",
+      "side": 1,
+      "message": "Why is this here?  `struct pdc_info_t` is defined in pdc.h and has already fixed the project name length to be `USB_PD_CHIP_INFO_PROJECT_NAME_LEN + 1`.",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 127,
+        "endChar": 49
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
