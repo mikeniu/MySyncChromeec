@@ -54,6 +54,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3b63e39_ba0472a7",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T08:31:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fd1b1842_b390da04",
+      "revId": "006ae71b8764ff37b908c853ffdb7c833ecffeea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bb0899ba_265c7a73",
@@ -125,6 +143,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e07678d7_9c2c5643",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T08:31:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ea2cfc72_392a226b",
+      "range": {
+        "startLine": 205,
+        "startChar": 1,
+        "endLine": 205,
+        "endChar": 3
+      },
+      "revId": "006ae71b8764ff37b908c853ffdb7c833ecffeea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "47f28413_1a23c905",
@@ -148,6 +190,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "44da75df_38202ce7",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T08:31:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "47f28413_1a23c905",
+      "range": {
+        "startLine": 239,
+        "startChar": 6,
+        "endLine": 239,
+        "endChar": 21
+      },
+      "revId": "006ae71b8764ff37b908c853ffdb7c833ecffeea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4f781866_0768e2a2",
@@ -161,6 +227,30 @@
       "writtenOn": "2026-04-30T07:59:09Z",
       "side": 1,
       "message": "`crec_flash_write` can return positive number on error.",
+      "range": {
+        "startLine": 274,
+        "startChar": 6,
+        "endLine": 274,
+        "endChar": 22
+      },
+      "revId": "006ae71b8764ff37b908c853ffdb7c833ecffeea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ece38013_1b53a1b6",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T08:31:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f781866_0768e2a2",
       "range": {
         "startLine": 274,
         "startChar": 6,
