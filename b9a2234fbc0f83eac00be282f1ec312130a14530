@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ecd370f4_8fb64846",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.egis",
+        "patchSetId": 19
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-30T11:16:24Z",
+      "side": 1,
+      "message": "Let\u0027s assume that I disabled support for storing APNS data. Will it cause linking issues? Is the APNS storage mandatory? How library detects whether we provide the storage for APNS?",
+      "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4480c162_df1945cc",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-30T11:16:24Z",
+      "side": 1,
+      "message": "The `cros_flash_erase()` is EC function. Please use [`cros_flash_physical_erase()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/include/drivers/cros_flash.h;l\u003d142-143;drc\u003d5a1a8c3c94a18e6fc7e1db35563d892fdc9997b2) instead.",
+      "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "540d2a5e_16e29556",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-30T11:16:24Z",
+      "side": 1,
+      "message": "Same here.",
+      "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08e165d9_e250f6da",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-30T11:16:24Z",
+      "side": 1,
+      "message": "Same here.",
+      "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b316774_74418af8",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_private.h",
+        "patchSetId": 19
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-30T11:16:24Z",
+      "side": 1,
+      "message": "Why you changed the name here?",
+      "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
