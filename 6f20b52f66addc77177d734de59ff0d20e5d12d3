@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "70b1f679_7cf548d0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T05:15:08Z",
+      "side": 1,
+      "message": "What\u0027s the current status with Renode for Focaltech? What do we support?",
+      "revId": "6f20b52f66addc77177d734de59ff0d20e5d12d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
