@@ -16,6 +16,24 @@
       "message": "This feature was implemented with the Fingerprint MCU in mind. Why you need on on EC firmware branch?",
       "revId": "c0988323cdd83ff8fb413328b53e54ec2fa57129",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "567bf716_1b30434e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3685612
+      },
+      "writtenOn": "2026-04-30T01:12:31Z",
+      "side": 1,
+      "message": "Thank you for reminding us. If it\u0027s only for fingerprints, then we won\u0027t need it.",
+      "parentUuid": "d6ee2f58_3b6326d4",
+      "revId": "c0988323cdd83ff8fb413328b53e54ec2fa57129",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
