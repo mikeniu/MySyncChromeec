@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bf7ab57_be6b79cd",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T07:16:25Z",
+      "side": 1,
+      "message": "You are right, I checked incorrectly for [the erase function](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/common/flash.c;l\u003d696).",
+      "parentUuid": "bdc8164b_6dfdf424",
+      "revId": "304fa00ccf42609d8818538714a05e6d058b6ea1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "940e5327_3115714b",
