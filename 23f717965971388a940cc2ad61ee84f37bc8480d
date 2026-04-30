@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74dbbab8_62c81cb2",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-30T23:59:44Z",
+      "side": 1,
+      "message": "**. Redundant Class Member Initialization**\n\n* **Issue:** In `IapControl::IapControl()`, you explicitly call `m_hidInterfaces.clear();`.  \n* **Remediation:** This is redundant. A `std::vector` is empty upon default construction. You can safely remove this line.",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 25
+      },
+      "revId": "23f717965971388a940cc2ad61ee84f37bc8480d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2450a4f0_ae8d3861",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 669,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-30T23:59:44Z",
+      "side": 1,
+      "message": "**Exception Safety and Resource Leaks in `openDevice`**\n\n* **Issue:** In `IapControl::openDevice`, you manually manage the `handle` before wrapping it in the smart pointer:\n\n```c\nlibusb_device_handle *handle \u003d nullptr;\nif (libusb_open(found_dev, \u0026handle) !\u003d 0) { ... }\nfor (...) {\n    if (libusb_claim_interface(...) !\u003d 0) {\n        libusb_close(handle); // Manual cleanup\n        return -1;\n    }\n}\nm_devHandlePtr.reset(handle);\n```\n\n  If `libusb_detach_kernel_driver` or something else were to throw an exception or fail unexpectedly, the handle could leak.\n\n\n* **Remediation:** Pass ownership to your `unique_ptr` immediately after a successful open.\n\n```c\nlibusb_device_handle *handle \u003d nullptr;\nif (libusb_open(found_dev, \u0026handle) !\u003d 0) { ... return -1; }\nm_devHandlePtr.reset(handle); // Safely managed now\n\nfor (size_t i \u003d 0; i \u003c m_hidInterfaces.size(); i++) {\n    // use m_devHandlePtr.get() for operations\n    // No manual libusb_close() needed on failure!\n}\n```",
+      "range": {
+        "startLine": 649,
+        "startChar": 1,
+        "endLine": 669,
+        "endChar": 30
+      },
+      "revId": "23f717965971388a940cc2ad61ee84f37bc8480d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f743902_79ea16e1",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-30T23:59:44Z",
+      "side": 1,
+      "message": "**Unnecessary Explicit `std::span` Conversions**\n\n* **Issue:** In `iaptool.cc`, you call `iapCtrl.runIapProcess(std::span\u003cuint8_t\u003e(*binary))`.  \n* **Remediation:** `std::span` has implicit constructors for standard containers like `std::vector`. You can simply pass the vector directly:\n\n```c\niapCtrl.runIapProcess(*binary);\n\n```",
+      "range": {
+        "startLine": 143,
+        "startChar": 0,
+        "endLine": 143,
+        "endChar": 58
+      },
+      "revId": "23f717965971388a940cc2ad61ee84f37bc8480d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4202cd6_7761e494",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-04-30T23:59:44Z",
+      "side": 1,
+      "message": "**Inconsistent Output Buffers (`std::cout` vs `stdout`)**\n\n* **Issue:** In `utility.h`, `logInfo` writes to `std::cout`. However, in `iaptool.cc` `setProgressBar`, you explicitly call `fflush(stdout)`. Mixing C++ streams and C standard I/O streams can lead to interleaved or poorly synchronized console output.  \n* **Remediation:** Stick to the C++ streams. To flush `std::cout`, use `std::flush`:\n\n```c\nlogInfo(\" {} % [Data {} of {}]\", percent, progress, totalSize);\nstd::cout \u003c\u003c std::flush;\n```",
+      "range": {
+        "startLine": 165,
+        "startChar": 0,
+        "endLine": 165,
+        "endChar": 16
+      },
+      "revId": "23f717965971388a940cc2ad61ee84f37bc8480d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
