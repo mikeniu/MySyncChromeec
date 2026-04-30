@@ -16,6 +16,7 @@
 
 #include <stdint.h>
 
+#include <zephyr/sys/byteorder.h>
 #include <zephyr/ztest.h>
 
 #define TEST_USB_PORT 0
@@ -40,6 +41,13 @@ struct usb_pd_ctrl_msg_test_sink_fixture {
 struct usb_pd_ctrl_msg_test_source_fixture {
 	struct usb_pd_ctrl_msg_test_fixture fixture;
 };
+
+static int pd_check_data_swap_fake_return;
+
+__override int pd_check_data_swap(int port, enum pd_data_role data_role)
+{
+	return pd_check_data_swap_fake_return;
+}
 
 static void
 tcpci_drp_emul_connect_partner(struct tcpci_partner_data *partner_emul,
@@ -339,6 +347,53 @@ ZTEST_F(usb_pd_ctrl_msg_test_source, test_dpm_dr_swap)
 	typec_status = host_cmd_typec_status(TEST_USB_PORT);
 	zassert_equal(PD_ROLE_UFP, typec_status.data_role,
 		      "Returned data_role=%u", typec_status.data_role);
+}
+
+/**
+ * @brief Verify DR_Swap updates TCPC message header role
+ * immediately after Accept.
+ *
+ * @details
+ *  - TCPM starts as Sink/UFP
+ *  - Partner initiates DR_Swap
+ *  - DUT accepts DR_Swap
+ *  - Verify TCPC message headers use updated DFP role
+ *
+ * Expected Results
+ *  - PD packets after DR_Swap contain DFP data role
+ */
+ZTEST_F(usb_pd_ctrl_msg_test_source, test_dr_swap_accept_updates_msg_header)
+{
+	struct usb_pd_ctrl_msg_test_fixture *super_fixture = &fixture->fixture;
+	struct ec_response_typec_status typec_status = { 0 };
+	int rv;
+
+	/* Force ACCEPT path */
+	pd_check_data_swap_fake_return = 1;
+
+	/* Verify initial role */
+	typec_status = host_cmd_typec_status(TEST_USB_PORT);
+
+	zassert_equal(PD_ROLE_DFP, typec_status.data_role,
+		      "Expected initial DFP role");
+
+	/* Partner initiates DR_SWAP */
+	rv = tcpci_partner_send_control_msg(&super_fixture->partner_emul,
+					    PD_CTRL_DR_SWAP, 0);
+
+	zassert_ok(rv, "Failed to send DR_SWAP request");
+
+	/* Allow DR_SWAP handshake to complete */
+	k_sleep(K_SECONDS(1));
+
+	/* Verify role changed */
+	typec_status = host_cmd_typec_status(TEST_USB_PORT);
+
+	zassert_equal(PD_ROLE_UFP, typec_status.data_role,
+		      "DR_SWAP did not complete");
+
+	/* Restore default behavior */
+	pd_check_data_swap_fake_return = 0;
 }
 
 /**
