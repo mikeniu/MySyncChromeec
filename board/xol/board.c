@@ -233,22 +233,3 @@ static void set_register_charge_option(void)
 	}
 }
 DECLARE_HOOK(HOOK_TICK, set_register_charge_option, HOOK_PRIO_DEFAULT);
-
-#define BQ25710_PROCHOT_OPTION_1_MASK_ALL 0xFF
-static void disable_charger_prochot_option_1(void)
-{
-	int reg;
-	int rv;
-
-	rv = i2c_read16(I2C_PORT_CHARGER, BQ25710_SMBUS_ADDR1_FLAGS,
-			BQ25710_REG_PROCHOT_OPTION_1, &reg);
-
-	if (rv == EC_SUCCESS) {
-		/* disable all prochot option 1 */
-		reg &= ~(BQ25710_PROCHOT_OPTION_1_MASK_ALL);
-
-		i2c_write16(I2C_PORT_CHARGER, BQ25710_SMBUS_ADDR1_FLAGS,
-			    BQ25710_REG_PROCHOT_OPTION_1, reg);
-	}
-}
-DECLARE_HOOK(HOOK_INIT, disable_charger_prochot_option_1, HOOK_PRIO_DEFAULT);
