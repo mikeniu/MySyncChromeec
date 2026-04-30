@@ -139,3 +139,4 @@ config BOARD_FT9001
 
 rsource "et171/Kconfig"
 source "Kconfig.zephyr"
+
