@@ -109,6 +109,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8d218a42_9f7401cd",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T14:48:37Z",
+      "side": 1,
+      "message": "OK, but there is no `croc_flash_physical_read` function, keep `crec_flash_physical_read` now.",
+      "parentUuid": "0625466b_e2f24568",
+      "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "540d2a5e_16e29556",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
         "patchSetId": 19
