@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7092f75_26dc1a4b",
+        "filename": "zephyr/program/fpmcu/et171/stobnica.dts",
+        "patchSetId": 10
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-04-30T14:01:37Z",
+      "side": 1,
+      "message": "@fsammoura@google.com is this correct value?",
+      "range": {
+        "startLine": 13,
+        "startChar": 28,
+        "endLine": 13,
+        "endChar": 31
+      },
+      "revId": "95b1a763a63e0cae02b116c6ee0a41fc8bb22f68",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
