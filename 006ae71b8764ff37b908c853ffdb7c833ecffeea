@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0115c2fa_6902ad4e",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T07:59:09Z",
+      "side": 1,
+      "message": "There is a useful macro [IS_ALIGNED](https://github.com/zephyrproject-rtos/zephyr/blob/main/include/zephyr/sys/util.h#L313) if you want. Applies to all alignment checks.",
+      "revId": "006ae71b8764ff37b908c853ffdb7c833ecffeea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb0899ba_265c7a73",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T07:59:09Z",
+      "side": 1,
+      "message": "`crec_flash_erase` can return positive number on error.",
+      "range": {
+        "startLine": 205,
+        "startChar": 1,
+        "endLine": 205,
+        "endChar": 3
+      },
+      "revId": "006ae71b8764ff37b908c853ffdb7c833ecffeea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47f28413_1a23c905",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T07:59:09Z",
+      "side": 1,
+      "message": "`crec_flash_read` can return positive number on error.",
+      "range": {
+        "startLine": 239,
+        "startChar": 6,
+        "endLine": 239,
+        "endChar": 21
+      },
+      "revId": "006ae71b8764ff37b908c853ffdb7c833ecffeea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f781866_0768e2a2",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T07:59:09Z",
+      "side": 1,
+      "message": "`crec_flash_write` can return positive number on error.",
+      "range": {
+        "startLine": 274,
+        "startChar": 6,
+        "endLine": 274,
+        "endChar": 22
+      },
+      "revId": "006ae71b8764ff37b908c853ffdb7c833ecffeea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
