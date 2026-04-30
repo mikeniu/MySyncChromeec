@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55b8b8de_ab5cbe40",
+        "filename": "driver/accel_lis2dh.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-30T17:44:45Z",
+      "side": 1,
+      "message": "Nit - use braces on all conditionals",
+      "range": {
+        "startLine": 243,
+        "startChar": 0,
+        "endLine": 243,
+        "endChar": 24
+      },
+      "revId": "a0e01d14ee2661b8426cd33a0d94da2510b9d02f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac84ab59_5e2dc2d7",
+        "filename": "driver/accel_lis2dh.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-30T17:44:45Z",
+      "side": 1,
+      "message": "Don\u0027t add new CONFIG_ZEPHYR guards.  platform/ec only supports Zephyr builds.",
+      "range": {
+        "startLine": 165,
+        "startChar": 0,
+        "endLine": 165,
+        "endChar": 26
+      },
+      "revId": "a0e01d14ee2661b8426cd33a0d94da2510b9d02f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6fb409a7_e26c518d",
+        "filename": "driver/accel_lis2dh.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-30T17:44:45Z",
+      "side": 1,
+      "message": "Move the `ACCEL_LIS2DH_INT_ENABLE` definition here and then use that for all guards.\n\n```suggestion\n#if DT_NODE_EXISTS(DT_ALIAS(lis2dh_int))\n#define ACCEL_LIS2DH_INT_ENABLE\n#endif\n\n#ifdef ACCEL_LIS2DH_INT_ENABLE\n/* Get the motion sensor ID...\n```",
+      "range": {
+        "startLine": 166,
+        "startChar": 0,
+        "endLine": 166,
+        "endChar": 40
+      },
+      "revId": "a0e01d14ee2661b8426cd33a0d94da2510b9d02f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c9bab64_1809e494",
+        "filename": "driver/accel_lis2dh.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-30T17:44:45Z",
+      "side": 1,
+      "message": "Rename this so it\u0027s obvious that this is not set using Kconfig or the legacy config.h\n\n\n\n```suggestion\n#define LIS2DH_INT_EVENT \\\n```",
+      "range": {
+        "startLine": 177,
+        "startChar": 8,
+        "endLine": 177,
+        "endChar": 37
+      },
+      "revId": "a0e01d14ee2661b8426cd33a0d94da2510b9d02f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e6a8f27_8af326e0",
+        "filename": "include/config.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-30T17:44:45Z",
+      "side": 1,
+      "message": "These legacy configs are only needed for non-zephyr builds. Because you\u0027re setting the INT_EVENT directly from the devicetree, you can just delete this.",
+      "range": {
+        "startLine": 371,
+        "startChar": 0,
+        "endLine": 371,
+        "endChar": 36
+      },
+      "revId": "a0e01d14ee2661b8426cd33a0d94da2510b9d02f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "632c44de_b79f197b",
+        "filename": "util/config_allowed.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-04-30T17:44:45Z",
+      "side": 1,
+      "message": "This won\u0027t be needed if you don\u0027t add items to config.h",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 29
+      },
+      "revId": "a0e01d14ee2661b8426cd33a0d94da2510b9d02f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
