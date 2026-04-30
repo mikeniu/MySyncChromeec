@@ -88,6 +88,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5173e6eb_ce858f94",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-30T15:41:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "64c7433d_0daf290b",
+      "revId": "d88db1fba163aca7fb6aee481250a27e2a450f3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64eaccea_d59015c3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-30T15:41:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2a29d236_7e87611c",
+      "revId": "d88db1fba163aca7fb6aee481250a27e2a450f3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a24bf993_a7899617",
@@ -125,6 +161,30 @@
       "side": 1,
       "message": "This concern is essentially the same as the one discussed in [comment](https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7695805/comment/83b28082_aa634d83/).\n\nAt the moment, the system does not support a pure raw image format exclusively.\nAs a result, a forced cast is unavoidable somewhere in the call chain — the only difference is whether it happens inside or outside the private library.\n\nBased on Tom’s earlier [comment](https://chrome-internal-review.googlesource.com/c/chromeos/vendor/fingerprint/egis/+/9106841/comment/17ba1d86_090a2c5c/), we eventually chose to perform the cast at the API boundary rather than inside the private library.\n\nAnother constraint is that the FP APIs performing the cast do not receive `buf_size`, nor can they reliably apply `sizeof(FP_EGIS_IMAGE)`.\nUnder these conditions, fully validating the structure at the API boundary is not possible.\n\nFor this reason, exposing the full definition of `FP_EGIS_IMAGE` in the public header would only increase header dependencies without providing additional safety guarantees.\nInstead, we intentionally keep `FP_EGIS_IMAGE` opaque in the API and only expose it as a forward-declared pointer.\n\nI understand that this is largely a symbolic safeguard and does not allow the compiler to enforce strict type or layout checks.\nHowever, without changing the API contract itself, this is the best compromise we can make to limit coupling while keeping the existing interface intact.",
       "parentUuid": "a24bf993_a7899617",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 43
+      },
+      "revId": "d88db1fba163aca7fb6aee481250a27e2a450f3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b411bca_a0493e6a",
+        "filename": "driver/fingerprint/egis/egis_api.h",
+        "patchSetId": 16
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-30T15:41:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "06f41a5b_09422565",
       "range": {
         "startLine": 82,
         "startChar": 0,
@@ -182,6 +242,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6af687f5_f3ca201b",
+        "filename": "driver/fingerprint/egis/egis_private.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-30T15:41:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "bfa9fa09_fc86bc51",
+      "range": {
+        "startLine": 204,
+        "startChar": 1,
+        "endLine": 206,
+        "endChar": 42
+      },
+      "revId": "d88db1fba163aca7fb6aee481250a27e2a450f3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6ce39be9_f2a7988d",
@@ -219,6 +303,30 @@
       "side": 1,
       "message": "I’m fine with using a descriptive calculation instead of hardcoding 26200.\n\nFrom what I’ve seen, apart from Elan—which describes a similar breakdown in the\nhelp description—I haven’t found other vendors adding explicit comments or\nmacros that explain how the final image size is calculated. Most implementations\nsimply define the resulting size directly.\n\nIf you agree that adding vendor-specific explanatory comments here is appropriate\nand improves readability and maintainability, then I’m okay with doing so.\nFor example,\n```\n\t# { 8bit image (5120) + metadata (20) + RAW (10530) + BKG (10530) }\n\tdefault 26200if FINGERPRINT_SENSOR_EGIS630\n```",
       "parentUuid": "6ce39be9_f2a7988d",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 44
+      },
+      "revId": "d88db1fba163aca7fb6aee481250a27e2a450f3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "004eef2f_5b27e4b1",
+        "filename": "zephyr/drivers/fingerprint/Kconfig",
+        "patchSetId": 16
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-04-30T15:41:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "76025393_8c6d204e",
       "range": {
         "startLine": 26,
         "startChar": 0,
