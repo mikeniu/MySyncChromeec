@@ -77,6 +77,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6ea0b06_da56de89",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T07:16:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "940e5327_3115714b",
+      "range": {
+        "startLine": 178,
+        "startChar": 0,
+        "endLine": 178,
+        "endChar": 0
+      },
+      "revId": "304fa00ccf42609d8818538714a05e6d058b6ea1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c03aad13_5654fc7d",
@@ -94,6 +118,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cab7566f_b6a66447",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T07:16:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c03aad13_5654fc7d",
+      "revId": "304fa00ccf42609d8818538714a05e6d058b6ea1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0da0cb98_23632435",
@@ -107,6 +149,30 @@
       "writtenOn": "2026-04-30T06:42:35Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: Consider defining and using an `abs_offset` variable here for consistency with `egis_apns_data_read` and `egis_apns_data_write`.",
+      "range": {
+        "startLine": 202,
+        "startChar": 0,
+        "endLine": 202,
+        "endChar": 0
+      },
+      "revId": "304fa00ccf42609d8818538714a05e6d058b6ea1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9143612_aeb80b0f",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T07:16:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0da0cb98_23632435",
       "range": {
         "startLine": 202,
         "startChar": 0,
@@ -148,6 +214,24 @@
       "side": 1,
       "message": "It will read fail with our current library design, report non-aligned.",
       "parentUuid": "518a3cae_02078e6d",
+      "revId": "304fa00ccf42609d8818538714a05e6d058b6ea1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b637eed_682d68ef",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T07:16:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0613709b_8acf9469",
       "revId": "304fa00ccf42609d8818538714a05e6d058b6ea1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
