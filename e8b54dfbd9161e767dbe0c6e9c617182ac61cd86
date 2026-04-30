@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9039cf94_4063c188",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T05:30:16Z",
+      "side": 1,
+      "message": "Potential overflow, please change to:\n```\nif ((size \u003e APNS_STORAGE_SIZE) || (offset \u003e APNS_STORAGE_SIZE - size)) {\n```",
+      "range": {
+        "startLine": 187,
+        "startChar": 0,
+        "endLine": 187,
+        "endChar": 0
+      },
+      "revId": "e8b54dfbd9161e767dbe0c6e9c617182ac61cd86",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a15d0c7_2af9a595",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T05:30:16Z",
+      "side": 1,
+      "message": "Please make sure the `offset` and `size` are align to `CONFIG_FLASH_ERASE_SIZE`. In the current method, you can erase more than requested.",
+      "revId": "e8b54dfbd9161e767dbe0c6e9c617182ac61cd86",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3dae9bf8_4cda3d7b",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T05:30:16Z",
+      "side": 1,
+      "message": "Potential overflow, please change to:\n```\nif ((size \u003e APNS_STORAGE_SIZE) || (offset \u003e APNS_STORAGE_SIZE - size)) {\n```",
+      "revId": "e8b54dfbd9161e767dbe0c6e9c617182ac61cd86",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b7c60a1_ce40a2aa",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T05:30:16Z",
+      "side": 1,
+      "message": "Potential overflow, please change to:\n```\nif ((size \u003e APNS_STORAGE_SIZE) || (offset \u003e APNS_STORAGE_SIZE - size)) {\n```",
+      "revId": "e8b54dfbd9161e767dbe0c6e9c617182ac61cd86",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c90d1e2_70bfb3dc",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_private.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-04-30T05:30:16Z",
+      "side": 1,
+      "message": "Maybe re-name to something like `egis660_fp_sensor_info`. The `_t` is typically used with `typedef`.",
+      "revId": "e8b54dfbd9161e767dbe0c6e9c617182ac61cd86",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
