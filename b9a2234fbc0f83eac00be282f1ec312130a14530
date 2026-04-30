@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "563eac83_6b06e105",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.egis",
+        "patchSetId": 19
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T13:44:22Z",
+      "side": 1,
+      "message": "library has the weak functiones.",
+      "parentUuid": "ecd370f4_8fb64846",
+      "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4480c162_df1945cc",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
         "patchSetId": 19
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-30T11:16:24Z",
       "side": 1,
       "message": "The `cros_flash_erase()` is EC function. Please use [`cros_flash_physical_erase()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/include/drivers/cros_flash.h;l\u003d142-143;drc\u003d5a1a8c3c94a18e6fc7e1db35563d892fdc9997b2) instead.",
+      "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02f1f2fd_178df56a",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T13:44:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4480c162_df1945cc",
       "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -52,6 +88,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8332a10_dea4e8cd",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T13:44:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "540d2a5e_16e29556",
+      "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "08e165d9_e250f6da",
@@ -69,6 +123,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a84e654_52cd5fc7",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T13:44:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08e165d9_e250f6da",
+      "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1b316774_74418af8",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-04-30T11:16:24Z",
       "side": 1,
       "message": "Why you changed the name here?",
+      "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28b2c781_b28426b9",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_private.h",
+        "patchSetId": 19
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-04-30T13:44:22Z",
+      "side": 1,
+      "message": "conflict with the same name `fp_sensor_info` in [ec_commands.h](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/include/ec_commands.h;l\u003d8599) before after include `flash.h`",
+      "parentUuid": "1b316774_74418af8",
       "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
