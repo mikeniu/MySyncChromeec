@@ -16,6 +16,29 @@
       "message": "Merge conflicts resolved.",
       "revId": "83ef3d9a38773bdab25f096b5d0362d8f971d1b9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7053109f_632a8f01",
+        "filename": "zephyr/emul/emul_bma5xy.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-01T16:30:30Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by Trailing Whitespace: Please remove the trailing whitespace.\n\nPlease remove the trailing whitespace.\n\nMake sure you are running the [pre-submit checks](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/repohooks/README.md?q\u003dpre-upload.py%20f:%5C.md).",
+      "range": {
+        "startLine": 325,
+        "startChar": 11,
+        "endLine": 325,
+        "endChar": 12
+      },
+      "revId": "83ef3d9a38773bdab25f096b5d0362d8f971d1b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
