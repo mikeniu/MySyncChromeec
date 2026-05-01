@@ -22,6 +22,30 @@
       },
       "revId": "00b70df57f560b5475708acf7349780eaa4703f5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8190da2_8161e8e6",
+        "filename": "zephyr/test/ap_power/src/ap_pwrseq.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 635,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-05-01T20:45:39Z",
+      "side": 0,
+      "message": "Good catch on the teardown, it was indeed dead code.\n\nAlthough `ap_pwrseq.c` is linked into all test binaries under `zephyr/test/ap_power`, the other test suites are not affected by callbacks statically registered since each handler only modifies file-local variables with no external side effects.\n\nWhile other suites do generate events that increment `ap_pwrseq.c` local counters, `ap_pwrseq_after_test` resets them after each test in the `ap_pwrseq` suite, preventing any carry-over between tests.",
+      "parentUuid": "64c8f9b4_a6c9d8d9",
+      "range": {
+        "startLine": 635,
+        "startChar": 1,
+        "endLine": 635,
+        "endChar": 28
+      },
+      "revId": "00b70df57f560b5475708acf7349780eaa4703f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

@@ -56,6 +56,30 @@
       },
       "revId": "acd2e17afa5db730707d2695220157d6b0991c26",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48981960_cedc6140",
+        "filename": "zephyr/program/rauru/navi/src/suspend_resume.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-05-01T20:45:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ea01c71f_cafd3d27",
+      "range": {
+        "startLine": 121,
+        "startChar": 12,
+        "endLine": 121,
+        "endChar": 36
+      },
+      "revId": "acd2e17afa5db730707d2695220157d6b0991c26",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
