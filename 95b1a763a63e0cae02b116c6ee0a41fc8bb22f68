@@ -46,6 +46,30 @@
       },
       "revId": "95b1a763a63e0cae02b116c6ee0a41fc8bb22f68",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "955093ff_fbf4a9e6",
+        "filename": "zephyr/program/fpmcu/et171/stobnica.dts",
+        "patchSetId": 10
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-05-01T04:45:19Z",
+      "side": 1,
+      "message": "Keep the offset value as 0 on this CL, please help to separate a CL to update it to 172.",
+      "parentUuid": "69c78ee8_39d12221",
+      "range": {
+        "startLine": 13,
+        "startChar": 28,
+        "endLine": 13,
+        "endChar": 31
+      },
+      "revId": "95b1a763a63e0cae02b116c6ee0a41fc8bb22f68",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
