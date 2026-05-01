@@ -584,8 +584,8 @@ static const struct option_container cmd_line_options[] = {
 	  "[erase]%Retrieve boot trace from the chip, optionally erasing "
 	  "the trace buffer" },
 	{ { "upload_owner_config", no_argument, NULL, 'j' },
-	  "<binary image> is a 2kB blob containing new owners configuration,"
-	  " OpenTitan only" },
+	  "<binary image> is a blob containing either new owners configuration"
+	  " or an NT detached signature, OpenTitan only" },
 	{ { "upload_boot_svc_msg", no_argument, NULL, 'N' },
 	  "<binary image> is a 256B blob containing boot svc message,"
 	  " OpenTitan only" },
@@ -1989,21 +1989,35 @@ static void send_boot_svc_msg(struct transfer_descriptor *td,
 }
 
 /*
- * Owner configuration updates on the NT chip involve placing a properly
- * signed ownership config blob into a certain INFO page on the device.
+ * Owner configuration updates on the NT chip involve either placing a
+ * properly signed ownership config blob into a certain INFO page on the
+ * device, or in case of hybrid (ECDSA and SPX) signing - sending detached
+ * signatures to the device.
  *
- * The signed config blob is expected to be stored in the passed in file. This
- * function always terminates the program with exit code indicating
- * success/failure.
+ * The config page is handled on the chip in a special way, it does not
+ * require a valid image header. The detached signatures are sent as regular
+ * image updates, they do have to have a valid image header.
+
+ * Since the signature in the flash has to be aligned at the page boundary,
+ * the preamble in the passed in file is 2K in size, the first 1k of which is
+ * a rudimentary image header, it has enough fields set for the chip to accept
+ * it into the flash, the second 1K is empty and just provides alignment.
+ *
+ * Thus the input file is either the config page image (up to 2K) or one or
+ * two detached signatures, sizes exactly 10240 or 18432 bytes.
+ *
+ * This function always terminates the program with exit code indicating
+ * success/failure received from the chip.
  */
 static void send_owner_config(struct transfer_descriptor *td,
 			      const char *file_name)
 {
+#define DETACHED_SIG_SIZE 8192
 	struct stat st;
-	const size_t config_size = FLASH_PAGE_SIZE;
-	uint8_t config[config_size];
+	uint8_t config[FLASH_PAGE_SIZE + DETACHED_SIG_SIZE * 2];
 	FILE *f;
 	uint32_t fake_addr;
+	size_t config_size;
 
 	/* Make sure the file is there and passes basic sаnity test. */
 	if (stat(file_name, &st) != 0) {
@@ -2011,7 +2025,33 @@ static void send_owner_config(struct transfer_descriptor *td,
 		exit(1);
 	}
 
-	if (st.st_size != (long)config_size) {
+	config_size = st.st_size;
+	if (config_size <= 2048) {
+		/*
+		 * This is a config page. Encode the destination Info page
+		 * into the flat 32 bit value passed as the address in the PDU
+		 * header.
+		 *
+		 * The encoding is as follows:
+		 * Bit 31 set to 1 means that this is an Info page address
+		 * Bit 30 indicates the flash bank, 0 or 1
+		 * Bits 26..29 indicate the page number in the bank
+		 * Bits 0..25 are used for offset in the page, 11 bits is enough
+		 *     to cover the entire page address range (2k)
+		 *
+		 * The info page used for storing owners config updates is Page
+		 * 3 in Bank 1
+		 */
+		fake_addr = (1 << 31) + (1 << 30) + (3 << 26);
+	} else if (config_size == (sizeof(config) - DETACHED_SIG_SIZE) ||
+		   config_size == sizeof(config)) {
+		/*
+		 * This a single or double detached signature, it can be
+		 * anywhere in flash, let's send it to the base address of the
+		 * inactive RW.
+		 */
+		fake_addr = td->rw_offset;
+	} else {
 		fprintf(stderr, "Unexpected size %zd of %s\n", st.st_size,
 			file_name);
 		exit(1);
@@ -2029,23 +2069,6 @@ static void send_owner_config(struct transfer_descriptor *td,
 	}
 	fclose(f);
 
-	setup_connection(td);
-
-	/*
-	 * Encode the destination Info page into the flat 32 bit value passed
-	 * as the address in the PDU header.
-	 *
-	 * The encoding is as follows:
-	 * Bit 31 set to 1 means that this is an Info page address
-	 * Bit 30 indicates the flash bank, 0 or 1
-	 * Bits 26..29 indicate the page number in the bank
-	 * Bits 0..25 are used for offset in the page, 11 bits is enough to
-	 *     cover the entire page address range (2k)
-	 *
-	 * The info page used for storing owners config updates is Page 3 in
-	 * Bank 1
-	 */
-	fake_addr = (1 << 31) + (1 << 30) + (3 << 26);
 	transfer_section(td, config, fake_addr, config_size);
 	exit(0);
 }
