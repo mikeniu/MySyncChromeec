@@ -72,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6b43a0ef_ce2d4c3b",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 1
+      },
+      "lineNbr": 1335,
+      "author": {
+        "id": 1369019
+      },
+      "writtenOn": "2026-05-01T23:49:32Z",
+      "side": 1,
+      "message": "The Matsu section still seems here.  Can you confirm it\u0027s been blanked?",
+      "parentUuid": "62f53b42_eccba359",
+      "revId": "3e156254dd90f4eb666bff6341b62a85622979ec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ed0f7a94_84cef13a",
         "filename": "util/flash_fp_mcu",
         "patchSetId": 1
@@ -101,6 +119,24 @@
       "side": 1,
       "message": "I copied this from fatcat, but it seemed to match the schematic...",
       "parentUuid": "ed0f7a94_84cef13a",
+      "revId": "3e156254dd90f4eb666bff6341b62a85622979ec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5793dc48_42f461be",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 1
+      },
+      "lineNbr": 1352,
+      "author": {
+        "id": 1369019
+      },
+      "writtenOn": "2026-05-01T23:49:32Z",
+      "side": 1,
+      "message": "Ocelot schematic is here - https://gallegro.googleplex.com/sch#ocelot/ocelot/proto1/reference/ocelot_proto1_mlb/ocelot_proto1_mlb_fa67ab1b8a1e5a16de8e5acce3964e0d23933968.cpm~~PAGE,page10~~HIGHLIGHT,GPP_E19/RSVD",
+      "parentUuid": "060c3cab_fbabab89",
       "revId": "3e156254dd90f4eb666bff6341b62a85622979ec",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
