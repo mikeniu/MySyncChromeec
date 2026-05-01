@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "62f53b42_eccba359",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 1
+      },
+      "lineNbr": 1335,
+      "author": {
+        "id": 1273086
+      },
+      "writtenOn": "2026-05-01T23:04:47Z",
+      "side": 1,
+      "message": "I blanked out the matsu section, since none of this made sense to me.  We can re-visit.",
+      "parentUuid": "6ccbbc4c_fc4c4640",
+      "revId": "3e156254dd90f4eb666bff6341b62a85622979ec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ed0f7a94_84cef13a",
         "filename": "util/flash_fp_mcu",
         "patchSetId": 1
@@ -65,6 +83,24 @@
       "writtenOn": "2026-04-27T17:23:08Z",
       "side": 1,
       "message": "Are these generic defaults unless overridden?  What are lines 1348 to 1353?\n\nWhile GPP_C15 is the FPS reset, GPP_E20 is firmware update, GPP_E19 is actually the FP_SOC_INT_L on both the RVP and Ocelot paper design.  GPP_E19 is *not* the FP_PWR_EN signal.  FP_PWR_EN is actually on GPP_E05.",
+      "revId": "3e156254dd90f4eb666bff6341b62a85622979ec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "060c3cab_fbabab89",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 1
+      },
+      "lineNbr": 1352,
+      "author": {
+        "id": 1273086
+      },
+      "writtenOn": "2026-05-01T23:04:47Z",
+      "side": 1,
+      "message": "I copied this from fatcat, but it seemed to match the schematic...",
+      "parentUuid": "ed0f7a94_84cef13a",
       "revId": "3e156254dd90f4eb666bff6341b62a85622979ec",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
