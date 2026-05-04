@@ -199,5 +199,105 @@ ZTEST(host_cmd_host_commands, test_ap_fw_state)
 		     "Buffer not empty after clear! Output: %s", outbuffer);
 }
 
+ZTEST(host_cmd_host_commands, test_thread_info)
+{
+	struct ec_response_thread_info_list list;
+	struct host_cmd_handler_args list_args =
+		BUILD_HOST_COMMAND_RESPONSE(EC_CMD_THREAD_INFO_LIST, 0, list);
+	bool found_idle = false;
+	bool found_current = false;
+
+	/* Wait for thread to start and sleep */
+	k_sleep(K_MSEC(10));
+
+	/* Call list command */
+	zassert_equal(EC_RES_SUCCESS, host_command_process(&list_args));
+	zassert_true(list.thread_count > 0);
+
+	/* Verify threads */
+	for (uint32_t i = 0; i < list.thread_count; i++) {
+		struct ec_params_thread_info_detail p;
+		struct ec_response_thread_info_detail r;
+		struct host_cmd_handler_args detail_args =
+			BUILD_HOST_COMMAND(EC_CMD_THREAD_INFO_DETAIL, 0, r, p);
+
+		p.thread_id = list.thread_ids[i];
+		zassert_equal(EC_RES_SUCCESS,
+			      host_command_process(&detail_args));
+
+		if (r.is_idle) {
+			found_idle = true;
+		}
+		if (r.is_current) {
+			found_current = true;
+		}
+	}
+	zassert_true(found_idle, "No idle thread found");
+	zassert_true(found_current, "No current thread found");
+}
+
+#define TEST_STACK_SIZE 1024
+K_THREAD_STACK_DEFINE(extra_test_stack, TEST_STACK_SIZE);
+struct k_thread extra_test_thread;
+
+static void extra_test_thread_entry(void *p1, void *p2, void *p3)
+{
+	while (1) {
+		k_sleep(K_MSEC(100));
+	}
+}
+
+ZTEST(host_cmd_host_commands, test_thread_info_extra_coverage)
+{
+	k_tid_t tid;
+	struct ec_response_thread_info_list list;
+	struct host_cmd_handler_args list_args =
+		BUILD_HOST_COMMAND_RESPONSE(EC_CMD_THREAD_INFO_LIST, 0, list);
+	bool found = false;
+
+	/* Create an extra thread */
+	tid = k_thread_create(&extra_test_thread, extra_test_stack,
+			      TEST_STACK_SIZE, extra_test_thread_entry, NULL,
+			      NULL, NULL, 1, 0, K_NO_WAIT);
+	k_thread_name_set(tid, "extra_thread");
+
+	/* Wait for thread to start and sleep */
+	k_sleep(K_MSEC(10));
+
+	/* Call list command */
+	zassert_equal(EC_RES_SUCCESS, host_command_process(&list_args));
+	zassert_true(list.thread_count > 0);
+
+	/* Verify our thread is in the list */
+	for (uint32_t i = 0; i < list.thread_count; i++) {
+		if (list.thread_ids[i] == (uint32_t)(uintptr_t)tid) {
+			found = true;
+			break;
+		}
+	}
+	zassert_true(found, "Extra test thread not found in list");
+
+	/* Call detail command for our thread */
+	struct ec_params_thread_info_detail p;
+	struct ec_response_thread_info_detail r;
+	struct host_cmd_handler_args detail_args =
+		BUILD_HOST_COMMAND(EC_CMD_THREAD_INFO_DETAIL, 0, r, p);
+
+	p.thread_id = (uint32_t)(uintptr_t)tid;
+	zassert_equal(EC_RES_SUCCESS, host_command_process(&detail_args));
+
+	/* Verify details */
+	zassert_true(r.valid_flags & EC_THREAD_INFO_DETAIL_NAME_VALID);
+	zassert_str_equal(r.name, "extra_thread");
+	zassert_equal(r.prio, 1);
+	zassert_equal(r.stack_size, TEST_STACK_SIZE);
+	zassert_true(r.valid_flags & EC_THREAD_INFO_DETAIL_STACK_VALID);
+	zassert_true(r.stack_max <= r.stack_size);
+	zassert_true(r.stack_cur <= r.stack_size);
+
+	/* Clean up thread */
+	k_thread_abort(tid);
+}
+
 ZTEST_SUITE(host_cmd_host_commands, drivers_predicate_post_main, NULL, NULL,
 	    NULL, NULL);
