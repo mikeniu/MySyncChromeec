@@ -95,6 +95,17 @@ static uint8_t check_update_chunk(uint32_t block_offset, size_t body_size)
 		 * be erased.
 		 */
 		if (block_offset == base) {
+#ifdef HAS_TASK_RWSIG
+			/* Do not allow the erase if RWSIG is still running. */
+			enum rwsig_status status = rwsig_get_status();
+
+			if (status != RWSIG_INVALID &&
+			    status != RWSIG_ABORTED) {
+				CPRINTF("RWSIG not aborted or invalid (%d)\n",
+					status);
+				return UPDATE_RWSIG_BUSY;
+			}
+#endif
 			if (crec_flash_physical_erase(base, size) !=
 			    EC_SUCCESS) {
 				CPRINTF("%s:%d erase failure of 0x%x..+0x%x\n",
@@ -330,6 +341,18 @@ void fw_update_command_handler(void *body, size_t cmd_size,
 #endif
 
 	CPRINTF("update: 0x%x\n", block_offset + CONFIG_PROGRAM_MEMORY_BASE);
+#ifdef HAS_TASK_RWSIG
+	/* Do not allow the write if RWSIG is still running. */
+	{
+		enum rwsig_status status = rwsig_get_status();
+
+		if (status != RWSIG_INVALID && status != RWSIG_ABORTED) {
+			CPRINTF("RWSIG not aborted or invalid (%d)\n", status);
+			*error_code = UPDATE_RWSIG_BUSY;
+			return;
+		}
+	}
+#endif
 	if (crec_flash_physical_write(block_offset, body_size, update_data) !=
 	    EC_SUCCESS) {
 		*error_code = UPDATE_WRITE_FAILURE;
