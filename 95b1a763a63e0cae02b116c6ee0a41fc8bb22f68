@@ -94,6 +94,30 @@
       },
       "revId": "95b1a763a63e0cae02b116c6ee0a41fc8bb22f68",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34dc94e5_bfea6fb2",
+        "filename": "zephyr/program/fpmcu/et171/stobnica.dts",
+        "patchSetId": 10
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-05-04T13:38:25Z",
+      "side": 1,
+      "message": "Yes, the offset should be the same as srebrna.dts, which is 172.",
+      "parentUuid": "b38edb08_3526997e",
+      "range": {
+        "startLine": 13,
+        "startChar": 28,
+        "endLine": 13,
+        "endChar": 31
+      },
+      "revId": "95b1a763a63e0cae02b116c6ee0a41fc8bb22f68",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
