@@ -70,6 +70,21 @@ static int is_touchpad_block(uint32_t block_offset, size_t body_size)
 }
 #endif
 
+#ifdef HAS_TASK_RWSIG
+static uint8_t check_rwsig_busy(void)
+{
+	/* Do not allow the erase/write if RWSIG is still running. */
+	enum rwsig_status status = rwsig_get_status();
+
+	if (status != RWSIG_INVALID && status != RWSIG_ABORTED) {
+		CPRINTF("RWSIG not aborted or invalid (%d)\n", status);
+		return UPDATE_RWSIG_BUSY;
+	}
+
+	return UPDATE_SUCCESS;
+}
+#endif
+
 /*
  * Verify that the passed in block fits into the valid area. If it does, and
  * is destined to the base address of the area - erase the area contents.
@@ -95,6 +110,12 @@ static uint8_t check_update_chunk(uint32_t block_offset, size_t body_size)
 		 * be erased.
 		 */
 		if (block_offset == base) {
+#ifdef HAS_TASK_RWSIG
+			uint8_t rv = check_rwsig_busy();
+
+			if (rv != UPDATE_SUCCESS)
+				return rv;
+#endif
 			if (crec_flash_physical_erase(base, size) !=
 			    EC_SUCCESS) {
 				CPRINTF("%s:%d erase failure of 0x%x..+0x%x\n",
@@ -330,6 +351,11 @@ void fw_update_command_handler(void *body, size_t cmd_size,
 #endif
 
 	CPRINTF("update: 0x%x\n", block_offset + CONFIG_PROGRAM_MEMORY_BASE);
+#ifdef HAS_TASK_RWSIG
+	*error_code = check_rwsig_busy();
+	if (*error_code != UPDATE_SUCCESS)
+		return;
+#endif
 	if (crec_flash_physical_write(block_offset, body_size, update_data) !=
 	    EC_SUCCESS) {
 		*error_code = UPDATE_WRITE_FAILURE;
