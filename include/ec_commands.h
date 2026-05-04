@@ -6062,6 +6062,71 @@ struct ec_response_hostcmd_watchdog_info {
 	int64_t watchdog_stats_elapsed_ms;
 } __ec_align4;
 
+#define EC_CMD_THREAD_INFO_LIST 0x00E4
+
+struct ec_response_thread_info_list {
+	uint32_t thread_count;
+	uint32_t thread_ids[32];
+} __ec_align4;
+
+#define EC_CMD_THREAD_INFO_DETAIL 0x00E5
+
+#define EC_THREAD_INFO_STACK_VALID BIT(0) /* CONFIG_THREAD_STACK_INFO */
+#define EC_THREAD_INFO_RUNTIME_USAGE_VALID \
+	BIT(1) /* CONFIG_SCHED_THREAD_USAGE */
+#define EC_THREAD_INFO_USAGE_ANALYSIS_VALID \
+	BIT(2) /* CONFIG_SCHED_THREAD_USAGE_ANALYSIS */
+#define EC_THREAD_INFO_NAME_VALID BIT(3) /* CONFIG_THREAD_NAME */
+#define EC_THREAD_INFO_CPU_REGS_VALID BIT(4)
+
+struct ec_params_thread_info_detail {
+	uint32_t thread_id;
+} __ec_align4;
+
+/*
+ * These commands are ONLY applicable to Zephyr threads.
+ */
+struct ec_response_thread_info_detail {
+	/* Metadata flags */
+	uint64_t timestamp_us; /* System uptime when stats were collected */
+	uint32_t valid_flags; /* See EC_THREAD_INFO_*_VALID flags */
+
+	/* Basic information */
+	uint32_t entry_point;
+	uint32_t timeout_us; /* Remaining timeout in microseconds, 0 if none */
+	uint16_t user_options; /* From k_thread->base.user_options */
+	int8_t prio; /* From k_thread->base.prio */
+	uint8_t thread_state; /* From k_thread->base.thread_state */
+
+	/* Name (Only valid if EC_THREAD_INFO_NAME_VALID is set) */
+	char name[16];
+
+	/* Stack usage (Only valid if EC_THREAD_INFO_STACK_VALID is set) */
+
+	uint32_t stack_cur;
+	uint32_t stack_max;
+	uint32_t stack_size;
+
+	/* Timing (Only valid if EC_THREAD_INFO_RUNTIME_USAGE_VALID is set) */
+	uint32_t execution_time_us;
+
+	/* Analysis (Only valid if EC_THREAD_INFO_USAGE_ANALYSIS_VALID is set)
+	 */
+	uint32_t window_peak_us;
+	uint32_t window_avg_us;
+
+	/* CPU scheduling */
+	uint32_t wait_object; /* Address of object thread is blocked on */
+	uint8_t is_idle; /* 1 if per-CPU idle thread, 0 otherwise */
+	uint8_t is_current; /* 1 if thread is current, 0 otherwise */
+
+	/* CPU registers (Only valid if EC_THREAD_INFO_CPU_REGS_VALID is set) */
+
+	uint32_t pc;
+	uint32_t lr;
+	uint32_t sp;
+} __ec_align4;
+
 /*****************************************************************************/
 /*
  * PD commands
