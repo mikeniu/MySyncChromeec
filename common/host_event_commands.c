@@ -675,7 +675,7 @@ static enum ec_status host_event_action_set(struct host_cmd_handler_args *args)
 {
 	const struct ec_params_host_event *p = args->params;
 	int result = EC_RES_SUCCESS;
-	host_event_t mask_value __unused = (host_event_t)(p->value);
+	host_event_t mask_value EC_UNUSED = (host_event_t)(p->value);
 
 	switch (p->mask_type) {
 	case EC_HOST_EVENT_MAIN:

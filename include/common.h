@@ -92,10 +92,20 @@
 #endif
 
 /*
- * Define __unused in the same manner.
+ * EC_UNUSED marks declarations that may be intentionally unused.
+ *
+ * This used to be named '__unused', but identifiers starting with two
+ * underscores are reserved by the C/C++ standards for the compiler + stdlib
+ * implementation. Glibc >= 2.43 began using '__unused' as a field name in
+ * struct __pthread_mutex_s (see <bits/struct_mutex.h>), which would otherwise
+ * corrupt that struct in any translation unit that included this header before
+ * <pthread.h>.
+ *
+ * Notable exception is the Zephyr code which still uses '__unused', defined by
+ * the Zephyr toolchain headers.
  */
-#ifndef __unused
-#define __unused __attribute__((unused))
+#ifndef EC_UNUSED
+#define EC_UNUSED __attribute__((unused))
 #endif
 
 /*
@@ -201,7 +211,7 @@
  * Mark a symbol that is defined purely as a hook to be used by a static
  * library.
  */
-#define __staticlib_hook __unused
+#define __staticlib_hook EC_UNUSED
 
 /*
  * Attribute that will generate a compiler warning if the return value is not
