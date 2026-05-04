@@ -70,6 +70,30 @@
       },
       "revId": "95b1a763a63e0cae02b116c6ee0a41fc8bb22f68",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b38edb08_3526997e",
+        "filename": "zephyr/program/fpmcu/et171/stobnica.dts",
+        "patchSetId": 10
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-04T05:44:38Z",
+      "side": 1,
+      "message": "But the current offset is 172, not 0. So is it correct or not?",
+      "parentUuid": "955093ff_fbf4a9e6",
+      "range": {
+        "startLine": 13,
+        "startChar": 28,
+        "endLine": 13,
+        "endChar": 31
+      },
+      "revId": "95b1a763a63e0cae02b116c6ee0a41fc8bb22f68",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
