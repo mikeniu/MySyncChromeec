@@ -26,9 +26,9 @@ LOG_MODULE_REGISTER(egis660_pal, LOG_LEVEL_INF);
 
 K_HEAP_DEFINE(fp_driver_heap, CONFIG_FINGERPRINT_SENSOR_EGIS660_HEAP_SIZE);
 
-int __unused egis_sensor_spi_write_read(uint8_t *data, size_t write_size,
-					size_t read_size,
-					bool leave_cs_asserted)
+int EC_UNUSED egis_sensor_spi_write_read(uint8_t *data, size_t write_size,
+					 size_t read_size,
+					 bool leave_cs_asserted)
 {
 	const struct egis660_cfg *cfg = fp_sensor_dev->config;
 	struct spi_buf tx_buf[] = { { .buf = data, .len = write_size },
@@ -68,12 +68,12 @@ int __unused egis_sensor_spi_write_read(uint8_t *data, size_t write_size,
 	return EGIS_BEP_RESULT_OK;
 }
 
-int __unused egis_sensor_spi_get_duplex_mode(void)
+int EC_UNUSED egis_sensor_spi_get_duplex_mode(void)
 {
 	return 0;
 }
 
-bool __unused egis_sensor_check_irq(void)
+bool EC_UNUSED egis_sensor_check_irq(void)
 {
 	const struct egis660_cfg *cfg = fp_sensor_dev->config;
 	int ret = gpio_pin_get_dt(&cfg->interrupt);
@@ -86,12 +86,12 @@ bool __unused egis_sensor_check_irq(void)
 	return (ret == 1);
 }
 
-bool __unused egis_sensor_read_irq(void)
+bool EC_UNUSED egis_sensor_read_irq(void)
 {
 	return egis_sensor_check_irq();
 }
 
-void __unused egis_sensor_reset(bool state)
+void EC_UNUSED egis_sensor_reset(bool state)
 {
 	const struct egis660_cfg *cfg = fp_sensor_dev->config;
 	int ret = gpio_pin_set_dt(&cfg->reset_pin, state ? 1 : 0);
@@ -101,22 +101,22 @@ void __unused egis_sensor_reset(bool state)
 	}
 }
 
-uint32_t __unused egis_timebase_get_tick(void)
+uint32_t EC_UNUSED egis_timebase_get_tick(void)
 {
 	return k_uptime_get_32();
 }
 
-void __unused egis_timebase_delay_us(uint32_t us)
+void EC_UNUSED egis_timebase_delay_us(uint32_t us)
 {
 	k_busy_wait(us);
 }
 
-void __unused egis_timebase_delay_ms(uint32_t delay)
+void EC_UNUSED egis_timebase_delay_ms(uint32_t delay)
 {
 	k_msleep(delay);
 }
 
-void __unused *egis_malloc(uint32_t size)
+void EC_UNUSED *egis_malloc(uint32_t size)
 {
 	void *p = k_heap_aligned_alloc(&fp_driver_heap, sizeof(void *), size,
 				       K_NO_WAIT);
@@ -124,13 +124,13 @@ void __unused *egis_malloc(uint32_t size)
 	return p;
 }
 
-void __unused egis_free(void *data)
+void EC_UNUSED egis_free(void *data)
 {
 	k_heap_free(&fp_driver_heap, data);
 }
 
-void __unused egis_log_var(const char *source, uint8_t level,
-			   const char *format, ...)
+void EC_UNUSED egis_log_var(const char *source, uint8_t level,
+			    const char *format, ...)
 {
 	va_list args;
 
@@ -143,19 +143,19 @@ void __unused egis_log_var(const char *source, uint8_t level,
  * but they are doing nothing.
  */
 
-void __unused egis_assert_fail(const char *file, uint32_t line,
-			       const char *func, const char *expr)
+void EC_UNUSED egis_assert_fail(const char *file, uint32_t line,
+				const char *func, const char *expr)
 {
 	/* If need to debug library, implements this */
 }
 
-void __unused egis_sensor_spi_init(uint32_t speed_hz)
+void EC_UNUSED egis_sensor_spi_init(uint32_t speed_hz)
 {
 	/* Keep empty because spi is already initialised at other place */
 }
 
-int __unused egis_sensor_wfi(uint16_t timeout_ms, egis_wfi_check_t enter_wfi,
-			     bool enter_wfi_mode)
+int EC_UNUSED egis_sensor_wfi(uint16_t timeout_ms, egis_wfi_check_t enter_wfi,
+			      bool enter_wfi_mode)
 {
 	/* Always OK */
 	return EGIS_BEP_RESULT_OK;

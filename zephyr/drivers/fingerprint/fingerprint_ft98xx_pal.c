@@ -87,7 +87,7 @@ int ft_spi_write_then_read(uint8_t *tx_buffer, uint32_t tx_len,
 	return ret;
 }
 
-void *__unused focal_malloc(uint32_t size)
+void *EC_UNUSED focal_malloc(uint32_t size)
 {
 	void *p = k_heap_aligned_alloc(&fp_driver_heap, sizeof(void *), size,
 				       K_NO_WAIT);
@@ -99,7 +99,7 @@ void *__unused focal_malloc(uint32_t size)
 	return p;
 }
 
-void __unused focal_free(void *data)
+void EC_UNUSED focal_free(void *data)
 {
 	k_heap_free(&fp_driver_heap, data);
 }

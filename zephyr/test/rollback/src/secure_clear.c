@@ -24,7 +24,7 @@ static void run_memset(char **p, bool use_secure_clear)
 	 *
 	 * Without volatile, space will be optimized out.
 	 */
-	volatile char __unused space[EXTRA_STACK_SIZE] = {
+	volatile char EC_UNUSED space[EXTRA_STACK_SIZE] = {
 		[0 ... EXTRA_STACK_SIZE - 1] = 's'
 	};
 

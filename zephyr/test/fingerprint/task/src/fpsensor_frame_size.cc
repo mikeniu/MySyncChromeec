@@ -23,7 +23,7 @@ FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 	MAX_FROM_LIST(LISTIFY(NUM_IMAGE_CAPTURE_TYPES,             \
 			      FINGERPRINT_SENSOR_FRAME_SIZE, (, ), \
 			      DT_CHOSEN(cros_fp_fingerprint_sensor)))
-static uint8_t __unused image_buffer[IMAGE_SIZE];
+static uint8_t EC_UNUSED image_buffer[IMAGE_SIZE];
 
 #define FP_SIMULATOR_IMAGE_FRAME_PARAM_INITIALIZER(idx, node_id)            \
 	{                                                                   \

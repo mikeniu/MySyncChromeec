@@ -38,8 +38,8 @@ enum fpc_pal_irq {
  * @return 0 on success.
  *         negative value on error.
  */
-int __unused fpc_pal_spi_writeread(fpc_device_t device, uint8_t *tx_buffer,
-				   uint8_t *rx_buffer, uint32_t size);
+int EC_UNUSED fpc_pal_spi_writeread(fpc_device_t device, uint8_t *tx_buffer,
+				    uint8_t *rx_buffer, uint32_t size);
 
 /**
  * @brief Wait for IRQ
@@ -50,7 +50,7 @@ int __unused fpc_pal_spi_writeread(fpc_device_t device, uint8_t *tx_buffer,
  * @return 0 on success.
  *         negative value on error.
  */
-int __unused fpc_pal_wait_irq(fpc_device_t device, enum fpc_pal_irq irq_type);
+int EC_UNUSED fpc_pal_wait_irq(fpc_device_t device, enum fpc_pal_irq irq_type);
 
 /**
  * @brief Get time
@@ -63,7 +63,7 @@ int __unused fpc_pal_wait_irq(fpc_device_t device, enum fpc_pal_irq irq_type);
  * @return 0 on success.
  *         negative value on error.
  */
-int __unused fpc_pal_get_time(uint64_t *time_us);
+int EC_UNUSED fpc_pal_get_time(uint64_t *time_us);
 
 /**
  * @brief Delay function
@@ -76,7 +76,7 @@ int __unused fpc_pal_get_time(uint64_t *time_us);
  * @return 0 on success.
  *         negative value on error.
  */
-int __unused fpc_pal_delay_us(uint64_t us);
+int EC_UNUSED fpc_pal_delay_us(uint64_t us);
 
 /**
  * @brief Print SDK log strings
@@ -93,7 +93,7 @@ int __unused fpc_pal_delay_us(uint64_t us);
 #define FPC_SENSOR_SDK_LOG_LEVEL_INFO (2)
 #define FPC_SENSOR_SDK_LOG_LEVEL_ERROR (3)
 #define FPC_SENSOR_SDK_LOG_LEVEL_DISABLED (4)
-void __unused fpc_pal_log_entry(const char *tag, int log_level,
-				const char *format, ...);
+void EC_UNUSED fpc_pal_log_entry(const char *tag, int log_level,
+				 const char *format, ...);
 
 #endif /* ZEPHYR_DRIVERS_FINGERPRINT_FPC1145_PAL_SENSOR_H_ */

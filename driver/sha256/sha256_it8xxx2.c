@@ -66,7 +66,7 @@ void SHA256_init(struct sha256_ctx *ctx)
 
 static void SHA256_chip_calculation(struct sha256_ctx *ctx)
 {
-	uint8_t hash_ctrl __unused;
+	uint8_t hash_ctrl EC_UNUSED;
 	uint32_t key;
 
 	key = irq_lock();

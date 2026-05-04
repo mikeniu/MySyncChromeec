@@ -26,8 +26,8 @@ LOG_MODULE_REGISTER(fpc1025_pal, LOG_LEVEL_INF);
 
 K_HEAP_DEFINE(fp_driver_heap, CONFIG_FINGERPRINT_SENSOR_FPC1025_HEAP_SIZE);
 
-int __unused fpc_sensor_spi_write_read(uint8_t *write, uint8_t *read,
-				       size_t size, bool leave_cs_asserted)
+int EC_UNUSED fpc_sensor_spi_write_read(uint8_t *write, uint8_t *read,
+					size_t size, bool leave_cs_asserted)
 {
 	const struct fpc1025_cfg *cfg = fp_sensor_dev->config;
 	const struct spi_buf tx_buf[1] = { { .buf = write, .len = size } };
@@ -79,7 +79,7 @@ int __unused fpc_sensor_spi_write_read(uint8_t *write, uint8_t *read,
 	return FPC_BEP_RESULT_OK;
 }
 
-bool __unused fpc_sensor_spi_check_irq(void)
+bool EC_UNUSED fpc_sensor_spi_check_irq(void)
 {
 	const struct fpc1025_cfg *cfg = fp_sensor_dev->config;
 	int ret = gpio_pin_get_dt(&cfg->interrupt);
@@ -92,12 +92,12 @@ bool __unused fpc_sensor_spi_check_irq(void)
 	return (ret == 1);
 }
 
-bool __unused fpc_sensor_spi_read_irq(void)
+bool EC_UNUSED fpc_sensor_spi_read_irq(void)
 {
 	return fpc_sensor_spi_check_irq();
 }
 
-void __unused fpc_sensor_spi_reset(bool state)
+void EC_UNUSED fpc_sensor_spi_reset(bool state)
 {
 	const struct fpc1025_cfg *cfg = fp_sensor_dev->config;
 	int ret = gpio_pin_set_dt(&cfg->reset_pin, state ? 1 : 0);
@@ -107,17 +107,17 @@ void __unused fpc_sensor_spi_reset(bool state)
 	}
 }
 
-uint32_t __unused fpc_timebase_get_tick(void)
+uint32_t EC_UNUSED fpc_timebase_get_tick(void)
 {
 	return k_uptime_get_32();
 }
 
-void __unused fpc_timebase_busy_wait(uint32_t ms)
+void EC_UNUSED fpc_timebase_busy_wait(uint32_t ms)
 {
 	k_busy_wait(ms * 1000);
 }
 
-void __unused *fpc_malloc(uint32_t size)
+void EC_UNUSED *fpc_malloc(uint32_t size)
 {
 	void *p = k_heap_aligned_alloc(&fp_driver_heap, sizeof(void *), size,
 				       K_NO_WAIT);
@@ -131,13 +131,13 @@ void __unused *fpc_malloc(uint32_t size)
 	return p;
 }
 
-void __unused fpc_free(void *data)
+void EC_UNUSED fpc_free(void *data)
 {
 	k_heap_free(&fp_driver_heap, data);
 }
 
-void __unused fpc_log_var(const char *source, uint8_t level, const char *format,
-			  ...)
+void EC_UNUSED fpc_log_var(const char *source, uint8_t level,
+			   const char *format, ...)
 {
 	va_list args;
 
@@ -150,17 +150,17 @@ void __unused fpc_log_var(const char *source, uint8_t level, const char *format,
  * but they are doing nothing.
  */
 
-void __unused fpc_assert_fail(const char *file, uint32_t line, const char *func,
-			      const char *expr)
+void EC_UNUSED fpc_assert_fail(const char *file, uint32_t line,
+			       const char *func, const char *expr)
 {
 }
 
-void __unused fpc_sensor_spi_init(uint32_t speed_hz)
+void EC_UNUSED fpc_sensor_spi_init(uint32_t speed_hz)
 {
 }
 
-int __unused fpc_sensor_wfi(uint16_t timeout_ms, fpc_wfi_check_t enter_wfi,
-			    bool enter_wfi_mode)
+int EC_UNUSED fpc_sensor_wfi(uint16_t timeout_ms, fpc_wfi_check_t enter_wfi,
+			     bool enter_wfi_mode)
 {
 	return FPC_BEP_RESULT_OK;
 }

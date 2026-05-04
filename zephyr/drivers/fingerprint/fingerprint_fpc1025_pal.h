@@ -33,8 +33,8 @@ typedef bool (*fpc_wfi_check_t)(void);
  *                                           return.
  * @return ::fpc_bep_result_t
  */
-int __unused fpc_sensor_spi_write_read(uint8_t *write, uint8_t *read,
-				       size_t size, bool leave_cs_asserted);
+int EC_UNUSED fpc_sensor_spi_write_read(uint8_t *write, uint8_t *read,
+					size_t size, bool leave_cs_asserted);
 
 /**
  * @brief Read sensor IRQ status.
@@ -43,7 +43,7 @@ int __unused fpc_sensor_spi_write_read(uint8_t *write, uint8_t *read,
  *
  * @return true if the sensor IRQ is currently active, otherwise false.
  */
-bool __unused fpc_sensor_spi_check_irq(void);
+bool EC_UNUSED fpc_sensor_spi_check_irq(void);
 
 /**
  * @brief Read sensor IRQ status and then set status to false.
@@ -52,7 +52,7 @@ bool __unused fpc_sensor_spi_check_irq(void);
  *
  * @return true if the sensor IRQ has been active, otherwise false.
  */
-bool __unused fpc_sensor_spi_read_irq(void);
+bool EC_UNUSED fpc_sensor_spi_read_irq(void);
 
 /**
  * @brief Set sensor reset state.
@@ -63,7 +63,7 @@ bool __unused fpc_sensor_spi_read_irq(void);
  *                  true  => reset sensor, i.e. low GPIO state
  *                  false => normal operation, i.e. high GPIO state
  */
-void __unused fpc_sensor_spi_reset(bool state);
+void EC_UNUSED fpc_sensor_spi_reset(bool state);
 
 /**
  * @brief Initializes SPI controller.
@@ -72,7 +72,7 @@ void __unused fpc_sensor_spi_reset(bool state);
  *                      (unit Hz).
  *
  */
-void __unused fpc_sensor_spi_init(uint32_t speed_hz);
+void EC_UNUSED fpc_sensor_spi_init(uint32_t speed_hz);
 
 /**
  * @brief Set system in WFI mode while waiting sensor IRQ.
@@ -88,8 +88,8 @@ void __unused fpc_sensor_spi_init(uint32_t speed_hz);
  *                           by enter_wfi.
  * @return FPC_RESULT_OK, FPC_RESULT_TIMEOUT
  */
-int __unused fpc_sensor_wfi(uint16_t timeout_ms, fpc_wfi_check_t enter_wfi,
-			    bool enter_wfi_mode);
+int EC_UNUSED fpc_sensor_wfi(uint16_t timeout_ms, fpc_wfi_check_t enter_wfi,
+			     bool enter_wfi_mode);
 
 /**
  * @brief Reads the system tick counter.
@@ -103,7 +103,7 @@ int __unused fpc_sensor_wfi(uint16_t timeout_ms, fpc_wfi_check_t enter_wfi,
  *
  * @return Tick count since fpc_timebase_init() call. [ms]
  */
-uint32_t __unused fpc_timebase_get_tick(void);
+uint32_t EC_UNUSED fpc_timebase_get_tick(void);
 
 /**
  * @brief Busy wait.
@@ -112,7 +112,7 @@ uint32_t __unused fpc_timebase_get_tick(void);
  * 0 => return immediately
  * 1 => wait at least 1ms etc.
  */
-void __unused fpc_timebase_busy_wait(uint32_t ms);
+void EC_UNUSED fpc_timebase_busy_wait(uint32_t ms);
 
 /**
  * @brief Allocate memory
@@ -120,13 +120,13 @@ void __unused fpc_timebase_busy_wait(uint32_t ms);
  * @param size Allocation size
  * @return Address on successful allocation, panic otherwise
  */
-void *__unused fpc_malloc(uint32_t size);
+void *EC_UNUSED fpc_malloc(uint32_t size);
 
 /**
  * @brief Free previously allocated memory
  *
  * @param data Pointer to buffer that should be freed
  */
-void __unused fpc_free(void *data);
+void EC_UNUSED fpc_free(void *data);
 
 #endif /* ZEPHYR_DRIVERS_FINGERPRINT_FPC1025_PAL_SENSOR_H_ */

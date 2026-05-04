@@ -751,8 +751,8 @@ static int reg_adc_vbus_to_mv(int reg)
 	return reg * RT9478_ADC_VBUS_STEP_MV;
 }
 
-static enum ec_error_list rt9478_get_vbus_voltage(int chgnum, int port __unused,
-						  int *voltage)
+static enum ec_error_list
+rt9478_get_vbus_voltage(int chgnum, int port EC_UNUSED, int *voltage)
 {
 	int reg, rv;
 

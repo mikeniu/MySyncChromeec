@@ -24,8 +24,8 @@ LOG_MODULE_REGISTER(fpc1145_pal, LOG_LEVEL_INF);
 #define fp_sensor_dev DEVICE_DT_GET(DT_CHOSEN(cros_fp_fingerprint_sensor))
 #endif
 
-int __unused fpc_pal_spi_writeread(fpc_device_t device, uint8_t *tx_buffer,
-				   uint8_t *rx_buffer, uint32_t size)
+int EC_UNUSED fpc_pal_spi_writeread(fpc_device_t device, uint8_t *tx_buffer,
+				    uint8_t *rx_buffer, uint32_t size)
 {
 	const struct fpc1145_cfg *cfg = fp_sensor_dev->config;
 	const struct spi_buf tx_buf[1] = { { .buf = tx_buffer, .len = size } };
@@ -42,28 +42,28 @@ int __unused fpc_pal_spi_writeread(fpc_device_t device, uint8_t *tx_buffer,
 	return 0;
 }
 
-int __unused fpc_pal_wait_irq(fpc_device_t device, enum fpc_pal_irq irq_type)
+int EC_UNUSED fpc_pal_wait_irq(fpc_device_t device, enum fpc_pal_irq irq_type)
 {
 	/* TODO: b/72360575 */
 	return 0; /* just lie about it, libfpsensor prefers... */
 }
 
-int __unused fpc_pal_get_time(uint64_t *time_us)
+int EC_UNUSED fpc_pal_get_time(uint64_t *time_us)
 {
 	*time_us = k_ticks_to_us_near64(k_uptime_ticks());
 
 	return 0;
 }
 
-int __unused fpc_pal_delay_us(uint64_t us)
+int EC_UNUSED fpc_pal_delay_us(uint64_t us)
 {
 	k_usleep(us);
 
 	return 0;
 }
 
-void __unused fpc_pal_log_entry(const char *tag, int log_level,
-				const char *format, ...)
+void EC_UNUSED fpc_pal_log_entry(const char *tag, int log_level,
+				 const char *format, ...)
 {
 	va_list args;
 

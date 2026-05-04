@@ -68,13 +68,13 @@ int ft_spi_write_then_read(uint8_t *tx_buffer, uint32_t tx_len,
  *
  * @return Address on successful allocation, panic otherwise
  */
-void *__unused focal_malloc(uint32_t size);
+void *EC_UNUSED focal_malloc(uint32_t size);
 
 /**
  * @brief Free previously allocated memory
  *
  * @param data Pointer to buffer that should be freed
  */
-void __unused focal_free(void *data);
+void EC_UNUSED focal_free(void *data);
 
 #endif

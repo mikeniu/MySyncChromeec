@@ -34,9 +34,9 @@ typedef bool (*egis_wfi_check_t)(void);
  *                                           return.
  * @return ::egis_bep_result_t
  */
-int __unused egis_sensor_spi_write_read(uint8_t *data, size_t write_size,
-					size_t read_size,
-					bool leave_cs_asserted);
+int EC_UNUSED egis_sensor_spi_write_read(uint8_t *data, size_t write_size,
+					 size_t read_size,
+					 bool leave_cs_asserted);
 /**
  * @brief Read sensor spi duplex mode.
  *
@@ -45,7 +45,7 @@ int __unused egis_sensor_spi_write_read(uint8_t *data, size_t write_size,
  * @return 0 if the sensor spi mode is support deplex mode, 1 if half deplex
  * mode.
  */
-int __unused egis_sensor_spi_get_duplex_mode(void);
+int EC_UNUSED egis_sensor_spi_get_duplex_mode(void);
 /**
  * @brief Read sensor IRQ status.
  *
@@ -53,7 +53,7 @@ int __unused egis_sensor_spi_get_duplex_mode(void);
  *
  * @return true if the sensor IRQ is currently active, otherwise false.
  */
-bool __unused egis_sensor_check_irq(void);
+bool EC_UNUSED egis_sensor_check_irq(void);
 
 /**
  * @brief Read sensor IRQ status and then set status to false.
@@ -62,7 +62,7 @@ bool __unused egis_sensor_check_irq(void);
  *
  * @return true if the sensor IRQ has been active, otherwise false.
  */
-bool __unused egis_sensor_read_irq(void);
+bool EC_UNUSED egis_sensor_read_irq(void);
 
 /**
  * @brief Set sensor reset state.
@@ -73,7 +73,7 @@ bool __unused egis_sensor_read_irq(void);
  *                  true  => reset sensor, i.e. low GPIO state
  *                  false => normal operation, i.e. high GPIO state
  */
-void __unused egis_sensor_reset(bool state);
+void EC_UNUSED egis_sensor_reset(bool state);
 
 /**
  * @brief Initializes SPI controller.
@@ -82,7 +82,7 @@ void __unused egis_sensor_reset(bool state);
  *                      (unit Hz).
  *
  */
-void __unused egis_sensor_spi_init(uint32_t speed_hz);
+void EC_UNUSED egis_sensor_spi_init(uint32_t speed_hz);
 
 /**
  * @brief Set system in WFI mode while waiting sensor IRQ.
@@ -98,8 +98,8 @@ void __unused egis_sensor_spi_init(uint32_t speed_hz);
  *                           by enter_wfi.
  * @return EGIS_RESULT_OK, EGIS_RESULT_TIMEOUT
  */
-int __unused egis_sensor_wfi(uint16_t timeout_ms, egis_wfi_check_t enter_wfi,
-			     bool enter_wfi_mode);
+int EC_UNUSED egis_sensor_wfi(uint16_t timeout_ms, egis_wfi_check_t enter_wfi,
+			      bool enter_wfi_mode);
 
 /**
  * @brief Reads the system tick counter.
@@ -113,7 +113,7 @@ int __unused egis_sensor_wfi(uint16_t timeout_ms, egis_wfi_check_t enter_wfi,
  *
  * @return Tick count since egis_timebase_init() call. [ms]
  */
-uint32_t __unused egis_timebase_get_tick(void);
+uint32_t EC_UNUSED egis_timebase_get_tick(void);
 
 /**
  * @brief Delay us.
@@ -122,7 +122,7 @@ uint32_t __unused egis_timebase_get_tick(void);
  * 0 => return immediately
  * 1 => delay at least 1us etc.
  */
-void __unused egis_timebase_delay_us(uint32_t us);
+void EC_UNUSED egis_timebase_delay_us(uint32_t us);
 /**
  * @brief Delay ms.
  *
@@ -130,20 +130,20 @@ void __unused egis_timebase_delay_us(uint32_t us);
  * 0 => return immediately
  * 1 => delay at least 1ms etc.
  */
-void __unused egis_timebase_delay_ms(uint32_t delay);
+void EC_UNUSED egis_timebase_delay_ms(uint32_t delay);
 /**
  * @brief Allocate memory
  *
  * @param size Allocation size
  * @return Address on successful allocation, panic otherwise
  */
-void *__unused egis_malloc(uint32_t size);
+void *EC_UNUSED egis_malloc(uint32_t size);
 
 /**
  * @brief Free previously allocated memory
  *
  * @param data Pointer to buffer that should be freed
  */
-void __unused egis_free(void *data);
+void EC_UNUSED egis_free(void *data);
 
 #endif /* ZEPHYR_DRIVERS_FINGERPRINT_EGIS660_PAL_SENSOR_H_ */

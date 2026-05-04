@@ -68,7 +68,7 @@ typedef enum {
  * @param[in] level The desired debug level.
  *
  */
-void __unused set_debug_level(LOG_LEVEL level);
+void EC_UNUSED set_debug_level(LOG_LEVEL level);
 
 /**
  * @brief Formats and outputs a log message based on the provided level, tag,
@@ -84,9 +84,9 @@ void __unused set_debug_level(LOG_LEVEL level);
  * to the format string.
  *
  */
-void __unused output_log(LOG_LEVEL level, const char *tag,
-			 const char *file_name, const char *func, int line,
-			 const char *format, ...);
+void EC_UNUSED output_log(LOG_LEVEL level, const char *tag,
+			  const char *file_name, const char *func, int line,
+			  const char *format, ...);
 
 /**
  * @brief Issues a SPI transaction. Assumes SPI port has already been enabled.
@@ -105,8 +105,8 @@ void __unused output_log(LOG_LEVEL level, const char *tag,
  * @return 0 on success.
  * @return A value from @ref ec_error_list enum.
  */
-int __unused periphery_spi_write_read(uint8_t *write, uint32_t write_len,
-				      uint8_t *read, uint32_t read_len);
+int EC_UNUSED periphery_spi_write_read(uint8_t *write, uint32_t write_len,
+				       uint8_t *read, uint32_t read_len);
 
 /**
  * @brief Gets the current time in milliseconds.
@@ -114,7 +114,7 @@ int __unused periphery_spi_write_read(uint8_t *write, uint32_t write_len,
  * @return The current time in milliseconds.
  *
  */
-unsigned long long __unused plat_get_time(void);
+unsigned long long EC_UNUSED plat_get_time(void);
 
 /**
  * @brief Calculates the time difference in milliseconds between the current
@@ -125,7 +125,7 @@ unsigned long long __unused plat_get_time(void);
  * @return The time difference in milliseconds.
  *
  */
-unsigned long __unused plat_get_diff_time(unsigned long long begin);
+unsigned long EC_UNUSED plat_get_diff_time(unsigned long long begin);
 
 /**
  * @brief Busy-wait.
@@ -133,7 +133,7 @@ unsigned long __unused plat_get_diff_time(unsigned long long begin);
  * @param[in] msecs The delay time in milliseconds.
  *
  */
-void __unused plat_wait_time(unsigned long msecs);
+void EC_UNUSED plat_wait_time(unsigned long msecs);
 
 /**
  * @brief Sleep.
@@ -144,7 +144,7 @@ void __unused plat_wait_time(unsigned long msecs);
  * @param[in] timeInMs The sleep time in milliseconds.
  *
  */
-void __unused plat_sleep_time(unsigned long timeInMs);
+void EC_UNUSED plat_sleep_time(unsigned long timeInMs);
 
 #ifdef EGIS_SPEED_DBG
 #define TIME_MEASURE_START(name) \
@@ -178,7 +178,7 @@ void __unused plat_sleep_time(unsigned long timeInMs);
  *
  * @return Pointer to the allocated memory or NULL if the allocation failed.
  */
-void *__unused sys_alloc(size_t count, size_t size);
+void *EC_UNUSED sys_alloc(size_t count, size_t size);
 
 /**
  * @brief Releases a block of shared memory.
@@ -186,7 +186,7 @@ void *__unused sys_alloc(size_t count, size_t size);
  * @param[in] data A pointer to the memory block to be released.
  *
  */
-void __unused sys_free(void *data);
+void EC_UNUSED sys_free(void *data);
 
 static inline void plat_free(void *x)
 {

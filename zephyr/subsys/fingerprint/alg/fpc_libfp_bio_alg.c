@@ -208,7 +208,7 @@ FINGERPRINT_ALGORITHM_DEFINE(fpc_libfp_algorithm, &fpc_libfp_data,
 #ifdef CONFIG_HAVE_LIBFP_PRIVATE_DRIVER
 K_HEAP_DEFINE(libfp_heap, CONFIG_LIBFP_PRIVATE_DRIVER_HEAP_SIZE);
 
-int32_t __unused FpcMalloc(void **data, size_t size)
+int32_t EC_UNUSED FpcMalloc(void **data, size_t size)
 {
 	void *p = k_heap_aligned_alloc(&libfp_heap, sizeof(void *), size,
 				       K_NO_WAIT);
@@ -223,7 +223,7 @@ int32_t __unused FpcMalloc(void **data, size_t size)
 	return 0;
 }
 
-void __unused FpcFree(void **data)
+void EC_UNUSED FpcFree(void **data)
 {
 	k_heap_free(&libfp_heap, *data);
 	*data = NULL;

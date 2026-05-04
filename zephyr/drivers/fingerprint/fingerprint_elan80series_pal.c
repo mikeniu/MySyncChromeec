@@ -81,7 +81,7 @@ static int elan_spi_transaction_duplex(uint8_t *tx_buf, size_t tx_len,
 	return err;
 }
 
-int __unused elan_write_cmd(uint8_t fp_cmd)
+int EC_UNUSED elan_write_cmd(uint8_t fp_cmd)
 {
 	k_sem_take(&trx_buffer_lock, K_FOREVER);
 
@@ -102,7 +102,7 @@ int __unused elan_write_cmd(uint8_t fp_cmd)
 	return err;
 }
 
-int __unused elan_read_cmd(uint8_t fp_cmd, uint8_t *regdata)
+int EC_UNUSED elan_read_cmd(uint8_t fp_cmd, uint8_t *regdata)
 {
 	assert(regdata != NULL);
 
@@ -127,8 +127,8 @@ int __unused elan_read_cmd(uint8_t fp_cmd, uint8_t *regdata)
 	return err;
 }
 
-int __unused elan_spi_transaction(uint8_t *tx_data, int tx_len,
-				  uint8_t *rx_data, int rx_len)
+int EC_UNUSED elan_spi_transaction(uint8_t *tx_data, int tx_len,
+				   uint8_t *rx_data, int rx_len)
 {
 	assert(tx_data != NULL);
 	assert(rx_data != NULL);
@@ -154,7 +154,7 @@ int __unused elan_spi_transaction(uint8_t *tx_data, int tx_len,
 	return err;
 }
 
-int __unused elan_write_register(uint8_t regaddr, uint8_t regdata)
+int EC_UNUSED elan_write_register(uint8_t regaddr, uint8_t regdata)
 {
 	k_sem_take(&trx_buffer_lock, K_FOREVER);
 
@@ -175,14 +175,14 @@ int __unused elan_write_register(uint8_t regaddr, uint8_t regdata)
 	return err;
 }
 
-int __unused elan_read_register(uint8_t regaddr, uint8_t *regdata)
+int EC_UNUSED elan_read_register(uint8_t regaddr, uint8_t *regdata)
 {
 	assert(regdata != NULL);
 
 	return elan_read_cmd(READ_REG_HEAD + regaddr, regdata);
 }
 
-int __unused elan_write_page(uint8_t page)
+int EC_UNUSED elan_write_page(uint8_t page)
 {
 	k_sem_take(&trx_buffer_lock, K_FOREVER);
 
@@ -203,7 +203,7 @@ int __unused elan_write_page(uint8_t page)
 	return err;
 }
 
-int __unused elan_write_reg_vector(const uint8_t *reg_table, int length)
+int EC_UNUSED elan_write_reg_vector(const uint8_t *reg_table, int length)
 {
 	assert(reg_table != NULL);
 	assert(length % 2 == 0);
@@ -232,7 +232,7 @@ int __unused elan_write_reg_vector(const uint8_t *reg_table, int length)
  * @param short_raw Pointer to the buffer to store the image data.
  * @return 0 on success, negative error code on failure.
  */
-static __unused int elan_read_image_full(uint16_t *short_raw)
+static EC_UNUSED int elan_read_image_full(uint16_t *short_raw)
 {
 	assert(short_raw != NULL);
 
@@ -296,7 +296,7 @@ static __unused int elan_read_image_full(uint16_t *short_raw)
  * @param short_raw Pointer to the buffer to store the linewise image data.
  * @return 0 on success, negative error code on failure.
  */
-static __unused int elan_image_read_linewise(uint16_t *short_raw)
+static EC_UNUSED int elan_image_read_linewise(uint16_t *short_raw)
 {
 	assert(short_raw != NULL);
 
@@ -353,7 +353,7 @@ int elan_read_image(uint16_t *short_raw)
 #endif
 }
 
-int __unused elan_raw_capture(uint16_t *short_raw)
+int EC_UNUSED elan_raw_capture(uint16_t *short_raw)
 {
 	assert(short_raw != NULL);
 
@@ -374,7 +374,7 @@ int __unused elan_raw_capture(uint16_t *short_raw)
 	return ret;
 }
 
-int __unused elan_execute_calibration(void)
+int EC_UNUSED elan_execute_calibration(void)
 {
 	if (!IS_ENABLED(CONFIG_HAVE_ELAN80SERIES_PRIVATE_DRIVER)) {
 		return 0;
@@ -400,7 +400,7 @@ int __unused elan_execute_calibration(void)
 	return ret;
 }
 
-int __unused elan_set_hv_chip(bool state)
+int EC_UNUSED elan_set_hv_chip(bool state)
 {
 	int ret = 0;
 
@@ -478,12 +478,12 @@ int __unused elan_set_hv_chip(bool state)
 	return ret;
 }
 
-int __unused elan_usleep(unsigned int us)
+int EC_UNUSED elan_usleep(unsigned int us)
 {
 	return k_usleep(us);
 }
 
-void *__unused elan_malloc(uint32_t size)
+void *EC_UNUSED elan_malloc(uint32_t size)
 {
 	void *p = k_heap_aligned_alloc(&fp_driver_heap, sizeof(void *), size,
 				       K_NO_WAIT);
@@ -497,12 +497,12 @@ void *__unused elan_malloc(uint32_t size)
 	return p;
 }
 
-void __unused elan_free(void *data)
+void EC_UNUSED elan_free(void *data)
 {
 	k_heap_free(&fp_driver_heap, data);
 }
 
-void __unused elan_log_var(const char *format, ...)
+void EC_UNUSED elan_log_var(const char *format, ...)
 {
 	va_list args;
 
@@ -511,12 +511,12 @@ void __unused elan_log_var(const char *format, ...)
 	va_end(args);
 }
 
-uint32_t __unused elan_get_tick(void)
+uint32_t EC_UNUSED elan_get_tick(void)
 {
 	return k_uptime_get_32();
 }
 
-void __unused elan_sensor_set_rst(bool state)
+void EC_UNUSED elan_sensor_set_rst(bool state)
 {
 	const struct elan80series_cfg *cfg = fp_sensor_dev->config;
 	int ret = gpio_pin_set_dt(&cfg->reset_pin, state ? 1 : 0);

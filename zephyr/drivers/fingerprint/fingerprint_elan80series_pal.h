@@ -28,7 +28,7 @@
  * @return 0 on success.
  *         negative value on error.
  */
-int __unused elan_write_cmd(uint8_t fp_cmd);
+int EC_UNUSED elan_write_cmd(uint8_t fp_cmd);
 
 /**
  * @brief Read fp register data from the sensor
@@ -39,7 +39,7 @@ int __unused elan_write_cmd(uint8_t fp_cmd);
  * @return 0 on success.
  *         negative value on error.
  */
-int __unused elan_read_cmd(uint8_t fp_cmd, uint8_t *regdata);
+int EC_UNUSED elan_read_cmd(uint8_t fp_cmd, uint8_t *regdata);
 
 /**
  * @brief Transfers and receives SPI data.
@@ -53,8 +53,8 @@ int __unused elan_read_cmd(uint8_t fp_cmd, uint8_t *regdata);
  * @return 0 on success.
  *         negative value on error.
  */
-int __unused elan_spi_transaction(uint8_t *tx_data, int tx_len,
-				  uint8_t *rx_data, int rx_len);
+int EC_UNUSED elan_spi_transaction(uint8_t *tx_data, int tx_len,
+				   uint8_t *rx_data, int rx_len);
 
 /**
  * @brief Write fp register data to sensor
@@ -65,7 +65,7 @@ int __unused elan_spi_transaction(uint8_t *tx_data, int tx_len,
  * @return 0 on success.
  *         negative value on error.
  */
-int __unused elan_write_register(uint8_t regaddr, uint8_t regdata);
+int EC_UNUSED elan_write_register(uint8_t regaddr, uint8_t regdata);
 
 /**
  * @brief Read fp register data from sensor
@@ -76,7 +76,7 @@ int __unused elan_write_register(uint8_t regaddr, uint8_t regdata);
  * @return 0 on success.
  *         negative value on error.
  */
-int __unused elan_read_register(uint8_t regaddr, uint8_t *regdata);
+int EC_UNUSED elan_read_register(uint8_t regaddr, uint8_t *regdata);
 
 /**
  * @brief Select sensor RAM page of register
@@ -86,7 +86,7 @@ int __unused elan_read_register(uint8_t regaddr, uint8_t *regdata);
  * @return 0 on success.
  *         negative value on error.
  */
-int __unused elan_write_page(uint8_t page);
+int EC_UNUSED elan_write_page(uint8_t page);
 
 /**
  * @brief Write register table to fp sensor
@@ -101,7 +101,7 @@ int __unused elan_write_page(uint8_t page);
  * @return 0 on success.
  *         negative value on error.
  */
-int __unused elan_write_reg_vector(const uint8_t *reg_table, int length);
+int EC_UNUSED elan_write_reg_vector(const uint8_t *reg_table, int length);
 
 /**
  * Get 14bits raw image data from ELAN fingerprint sensor
@@ -113,7 +113,7 @@ int __unused elan_write_reg_vector(const uint8_t *reg_table, int length);
  * @return 0 on success.
  *         negative value on error.
  */
-int __unused elan_raw_capture(uint16_t *short_raw);
+int EC_UNUSED elan_raw_capture(uint16_t *short_raw);
 
 /**
  * Execute calibrate ELAN fingerprint sensor flow.
@@ -121,7 +121,7 @@ int __unused elan_raw_capture(uint16_t *short_raw);
  * @return 0 on success.
  *         negative value on error.
  */
-int __unused elan_execute_calibration(void);
+int EC_UNUSED elan_execute_calibration(void);
 
 /**
  * Runs a test for defective pixels.
@@ -131,7 +131,7 @@ int __unused elan_execute_calibration(void);
  * @return 0 on success.
  *         negative value on error.
  */
-int __unused elan_fp_sensor_maintenance(fp_sensor_info_t *fp_sensor_info);
+int EC_UNUSED elan_fp_sensor_maintenance(fp_sensor_info_t *fp_sensor_info);
 
 /**
  * @brief Set sensor reset state.
@@ -142,7 +142,7 @@ int __unused elan_fp_sensor_maintenance(fp_sensor_info_t *fp_sensor_info);
  *                  true  => reset sensor, i.e. low GPIO state
  *                  false => normal operation, i.e. high GPIO state
  */
-void __unused elan_sensor_set_rst(bool state);
+void EC_UNUSED elan_sensor_set_rst(bool state);
 
 /**
  * Enable or disable settings of high voltage chip for ELAN fingerprint sensor
@@ -156,7 +156,7 @@ void __unused elan_sensor_set_rst(bool state);
  * @return 0 on success.
  *         negative value on error.
  */
-int __unused elan_set_hv_chip(bool state);
+int EC_UNUSED elan_set_hv_chip(bool state);
 
 /**
  * @brief Sleep
@@ -164,7 +164,7 @@ int __unused elan_set_hv_chip(bool state);
  * @param[in] us    Number of microseconds to sleep.
  * @return 0 on success, negative on error
  */
-int __unused elan_usleep(unsigned int us);
+int EC_UNUSED elan_usleep(unsigned int us);
 
 /**
  * @brief Allocate memory
@@ -172,28 +172,28 @@ int __unused elan_usleep(unsigned int us);
  * @param size Allocation size
  * @return Address on successful allocation, panic otherwise
  */
-void *__unused elan_malloc(uint32_t size);
+void *EC_UNUSED elan_malloc(uint32_t size);
 
 /**
  * @brief Free previously allocated memory
  *
  * @param data Pointer to buffer that should be freed
  */
-void __unused elan_free(void *data);
+void EC_UNUSED elan_free(void *data);
 
 /**
  * @brief Output console message
  *
  * @param format Pointer to buffer that should be output console
  */
-void __unused elan_log_var(const char *format, ...);
+void EC_UNUSED elan_log_var(const char *format, ...);
 
 /**
  * @brief Reads the system tick counter.
  *
  * @return Tick count since system startup. [ms]
  */
-uint32_t __unused elan_get_tick(void);
+uint32_t EC_UNUSED elan_get_tick(void);
 
 /**
  * Set ELAN fingerprint sensor register initialization
@@ -201,6 +201,6 @@ uint32_t __unused elan_get_tick(void);
  * @return 0 on success.
  *         negative value on error.
  */
-int __unused elan_register_initialization(void);
+int EC_UNUSED elan_register_initialization(void);
 
 #endif /* ZEPHYR_DRIVERS_FINGERPRINT_ELAN80SERIES_PAL_SENSOR_H_ */

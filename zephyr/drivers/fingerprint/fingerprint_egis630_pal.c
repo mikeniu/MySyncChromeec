@@ -33,8 +33,8 @@ K_SEM_DEFINE(printf_buffer_lock, 1, 1);
 
 IF_DISABLED(CONFIG_ZTEST, (static)) char printf_buffer[256];
 
-int __unused periphery_spi_write_read(uint8_t *write, uint32_t write_len,
-				      uint8_t *read, uint32_t read_len)
+int EC_UNUSED periphery_spi_write_read(uint8_t *write, uint32_t write_len,
+				       uint8_t *read, uint32_t read_len)
 {
 	const struct egis630_cfg *cfg = fp_sensor_dev->config;
 	const struct spi_buf tx_buf[] = { { .buf = write, .len = write_len },
@@ -56,25 +56,25 @@ int __unused periphery_spi_write_read(uint8_t *write, uint32_t write_len,
 	return err;
 }
 
-unsigned long long __unused plat_get_time(void)
+unsigned long long EC_UNUSED plat_get_time(void)
 {
 	return k_uptime_get();
 }
 
-unsigned long __unused plat_get_diff_time(unsigned long long begin)
+unsigned long EC_UNUSED plat_get_diff_time(unsigned long long begin)
 {
 	unsigned long long nowTime = plat_get_time();
 
 	return (unsigned long)(nowTime - begin);
 }
 
-void __unused plat_wait_time(unsigned long msecs)
+void EC_UNUSED plat_wait_time(unsigned long msecs)
 {
 	k_busy_wait(msecs * USEC_PER_MSEC);
 	return;
 }
 
-void __unused plat_sleep_time(unsigned long timeInMs)
+void EC_UNUSED plat_sleep_time(unsigned long timeInMs)
 {
 	k_msleep(timeInMs);
 	return;
@@ -86,15 +86,15 @@ LOG_LEVEL g_log_level = LOG_DEBUG;
 LOG_LEVEL g_log_level = LOG_INFO;
 #endif
 
-void __unused set_debug_level(LOG_LEVEL level)
+void EC_UNUSED set_debug_level(LOG_LEVEL level)
 {
 	g_log_level = level;
 	output_log(LOG_ERROR, "RBS", "", "", 0, "set_debug_level %d", level);
 }
 
-void __unused output_log(LOG_LEVEL level, const char *tag,
-			 const char *file_path, const char *func, int line,
-			 const char *format, ...)
+void EC_UNUSED output_log(LOG_LEVEL level, const char *tag,
+			  const char *file_path, const char *func, int line,
+			  const char *format, ...)
 {
 	if (format == NULL)
 		return;
@@ -125,7 +125,7 @@ void __unused output_log(LOG_LEVEL level, const char *tag,
 	k_sem_give(&printf_buffer_lock);
 }
 
-void __unused *sys_alloc(size_t count, size_t size)
+void EC_UNUSED *sys_alloc(size_t count, size_t size)
 {
 	void *p = k_heap_aligned_alloc(&fp_driver_heap, sizeof(void *), size,
 				       K_NO_WAIT);
@@ -142,7 +142,7 @@ void __unused *sys_alloc(size_t count, size_t size)
 	return p;
 }
 
-void __unused sys_free(void *data)
+void EC_UNUSED sys_free(void *data)
 {
 	k_heap_free(&fp_driver_heap, data);
 }
