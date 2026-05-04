@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac9d8dbf_a0e72774",
+        "filename": "util/elan/filecontrol.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-04T17:23:29Z",
+      "side": 1,
+      "message": "Please use Google C++ style `#define` guards based on the file path to prevent naming collisions. For example:\n```cpp\n#ifndef UTIL_ELAN_FILECONTROL_H_\n#define UTIL_ELAN_FILECONTROL_H_\n```\n*(Please apply this to `iapcontrol.h`, `iaptool.h`, and `utility.h` as well).*",
+      "revId": "641b544cc171ddb2904300e8cfb5e179163706ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99d99212_695fa58d",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 11
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-04T17:23:29Z",
+      "side": 1,
+      "message": "Since you have already checked that `fwFwInfo` is not `std::nullopt` on line 102 and returned early, you can directly access the value here instead of using `value_or`:\n\n```cpp\n\tfwVer_Google \u003d fwFwInfo-\u003efwVer \u003e\u003e 8;\n```",
+      "revId": "641b544cc171ddb2904300e8cfb5e179163706ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9cce1e7_d3b33d60",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 11
+      },
+      "lineNbr": 619,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-04T17:23:29Z",
+      "side": 1,
+      "message": "`libusb_get_device_descriptor` can fail and return an error code. If it fails, `desc` remains uninitialized, leading to a read of uninitialized memory on the next line when you check `idVendor` and `idProduct`.\n\n**Recommendation:**\nInitialize `desc` to zero and check the return value:\n```cpp\n\t\tstruct libusb_device_descriptor desc \u003d {0};\n\t\tif (libusb_get_device_descriptor(list.get()[i], \u0026desc) \u003d\u003d 0) {\n\t\t\tif (desc.idVendor \u003d\u003d vid \u0026\u0026 desc.idProduct \u003d\u003d pid) {\n\t\t\t\tcount++;\n\t\t\t}\n\t\t}\n```\n*(Please also apply this to the identical loop in `openDevice` below).*",
+      "revId": "641b544cc171ddb2904300e8cfb5e179163706ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c836cadf_1dd98a34",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 11
+      },
+      "lineNbr": 910,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-04T17:23:29Z",
+      "side": 1,
+      "message": "### Integer Promotion / Undefined Behavior Risk\n\nThe `uint8_t` values from `buff` are implicitly promoted to `int` (which is signed) before the bitwise shift. If `buff[i + 3]` has its highest bit set (e.g., `0x80`), shifting it by 24 bits into a signed `int` triggers undefined behavior ([before C++20](https://en.cppreference.com/cpp/language/operator_arithmetic)), and typically results in sign extension when added to the `uint32_t checksum`. This will corrupt the checksum calculation.\n\n**Recommendation:**\nExplicitly cast the bytes to `uint32_t` before shifting, exactly as you correctly did in `get32Le`:\n```cpp\n\t\tchecksum +\u003d static_cast\u003cuint32_t\u003e(buff[i]) | \n\t\t\t    (static_cast\u003cuint32_t\u003e(buff[i + 1]) \u003c\u003c 8) | \n\t\t\t    (static_cast\u003cuint32_t\u003e(buff[i + 2]) \u003c\u003c 16) |\n\t\t\t    (static_cast\u003cuint32_t\u003e(buff[i + 3]) \u003c\u003c 24);\n```",
+      "revId": "641b544cc171ddb2904300e8cfb5e179163706ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cce0967_85169911",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 11
+      },
+      "lineNbr": 929,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-04T17:23:29Z",
+      "side": 1,
+      "message": "### Incomplete Cleanup and Early Return\n\n**Issue 1: Early Return on Failure**\nIf `libusb_release_interface` fails for one interface, you immediately `return -1;`. This skips the release of any remaining interfaces in `m_hidInterfaces`. Cleanup functions should generally make a best-effort attempt to release all resources.\n\n**Issue 2: Missing Kernel Driver Reattachment**\nAs noted in a previous review comment, if you detach a kernel driver during initialization, you should attempt to reattach it during cleanup using `libusb_attach_kernel_driver()`.\n\n**Recommendation:**\nContinue the loop even on failure, and attempt to reattach the kernel drivers:\n```cpp\n\tint ret \u003d 0;\n\tfor (size_t i \u003d 0; i \u003c m_hidInterfaces.size(); i++) {\n\t\tif (libusb_release_interface(m_devHandlePtr.get(),\n\t\t\t\t\t     m_hidInterfaces[i]) !\u003d 0) {\n\t\t\tlogInfo(\"[IAP] {} - release interface ({}) failed\\n\",\n\t\t\t\t__func__, m_hidInterfaces[i]);\n\t\t\tret \u003d -1;\n\t\t}\n\t\t// Make a best-effort attempt to reattach the kernel driver if we detached it earlier.\n\t\tlibusb_attach_kernel_driver(m_devHandlePtr.get(), m_hidInterfaces[i]);\n\t}\n\n\tm_devHandlePtr.reset();\n\n\tif (DEBUG_LOG)\n\t\tlogInfo(\"[IAP] {} - exit\\n\", __func__);\n\n\treturn ret;\n```",
+      "revId": "641b544cc171ddb2904300e8cfb5e179163706ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
