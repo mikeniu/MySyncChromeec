@@ -167,6 +167,7 @@ static void update_fw_before(void *f)
 {
 	FFF_FAKES_LIST(RESET_FAKE);
 	FFF_RESET_HISTORY();
+	rwsig_get_status_fake.return_val = RWSIG_ABORTED;
 }
 
 ZTEST_SUITE(update_fw, NULL, update_fw_setup, update_fw_before, NULL, NULL);
