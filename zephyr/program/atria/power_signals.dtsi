@@ -11,6 +11,8 @@
 	common-pwrseq {
 		compatible = "intel,ap-pwrseq";
 
+		rsmrst-delay = <2>;
+		/* TODO: Is this right? */
 		sys-pwrok-delay = <3>;
 		all-sys-pwrgd-timeout = <20>;
 		sys-reset-delay = <60>;
