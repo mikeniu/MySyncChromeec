@@ -74,6 +74,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ba93e6c8_86807c34",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-04T09:31:52Z",
+      "side": 1,
+      "message": "Dawid is right. Added return codes suggestions.",
+      "parentUuid": "841105df_ea77c9b8",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 19
+      },
+      "revId": "39aea29d8342e7730231aa2d8e8ceb641e7f701e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ae094902_7aa2cdc0",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
         "patchSetId": 20
@@ -103,6 +127,24 @@
       "side": 1,
       "message": "it needed for `crec_flash_physical_read`, there is no `croc_flash_physical_read` function",
       "parentUuid": "ae094902_7aa2cdc0",
+      "revId": "39aea29d8342e7730231aa2d8e8ceb641e7f701e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf27f67d_81d3a519",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-04T09:31:52Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2c350947_f238764f",
       "revId": "39aea29d8342e7730231aa2d8e8ceb641e7f701e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

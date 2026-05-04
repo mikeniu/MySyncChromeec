@@ -143,6 +143,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9407b6ad_3051c94a",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-04T09:31:52Z",
+      "side": 1,
+      "message": "I see that `crec_flash_physical_read()` takes lock internally. Let\u0027s use it for now.",
+      "parentUuid": "96cb962f_9b091bcd",
+      "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "540d2a5e_16e29556",

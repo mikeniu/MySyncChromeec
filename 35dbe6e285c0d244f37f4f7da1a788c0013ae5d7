@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea04b62e_e09d8363",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 22
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-04T09:31:52Z",
+      "side": 1,
+      "message": "```suggestion\n\t\treturn -EINVAL;\n```\n\nApply in other places also.",
+      "range": {
+        "startLine": 194,
+        "startChar": 10,
+        "endLine": 194,
+        "endChar": 24
+      },
+      "revId": "35dbe6e285c0d244f37f4f7da1a788c0013ae5d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77448e23_af51d7ac",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 22
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-04T09:31:52Z",
+      "side": 1,
+      "message": "```suggestion\n\t\treturn -EIO;\n```\n\nApply in other places also.",
+      "revId": "35dbe6e285c0d244f37f4f7da1a788c0013ae5d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
