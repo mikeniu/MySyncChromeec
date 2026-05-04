@@ -12898,6 +12898,80 @@ static int cmd_s0ix_counter(int argc, char *argv[])
 	return 0;
 }
 
+int cmd_thread_info(int argc, char *argv[])
+{
+	struct ec_response_thread_info_list list;
+	int rv;
+
+	rv = ec_command(EC_CMD_THREAD_INFO_LIST, 0, NULL, 0, &list,
+			sizeof(list));
+	if (rv < 0) {
+		return rv;
+	}
+
+	printf("Found %u threads in EC:\n", list.thread_count);
+
+	for (uint32_t i = 0; i < list.thread_count; i++) {
+		struct ec_params_thread_info_detail p;
+		struct ec_response_thread_info_detail r;
+
+		p.thread_id = list.thread_ids[i];
+		rv = ec_command(EC_CMD_THREAD_INFO_DETAIL, 0, &p, sizeof(p), &r,
+				sizeof(r));
+		if (rv < 0) {
+			fprintf(stderr,
+				"Failed to get thread detail for ID 0x%08x: %d\n",
+				p.thread_id, rv);
+			continue;
+		}
+
+		printf("\nThread ID 0x%08x (Timestamp: %" PRIu64 " us):\n",
+		       p.thread_id, r.timestamp_us);
+
+		if (r.valid_flags & EC_THREAD_INFO_NAME_VALID) {
+			printf("  Name:          %s\n", r.name);
+
+		} else {
+			printf("  Name:          (unknown)\n");
+		}
+		printf("  Entry Point:   0x%08x\n", r.entry_point);
+		if (r.timeout_us == 0xffffffff) {
+			printf("  Timeout:       None\n");
+		} else {
+			printf("  Timeout:       %u us\n", r.timeout_us);
+		}
+
+		printf("  User Options:  0x%04x\n", r.user_options);
+		printf("  Priority:      %d\n", r.prio);
+		printf("  Thread State:  0x%02x\n", r.thread_state);
+
+		if (r.valid_flags & EC_THREAD_INFO_STACK_VALID) {
+			printf("  Stack Cur:     %u bytes\n", r.stack_cur);
+			printf("  Stack Max:     %u bytes\n", r.stack_max);
+
+			printf("  Stack Size:    %u bytes\n", r.stack_size);
+		}
+		if (r.valid_flags & EC_THREAD_INFO_RUNTIME_USAGE_VALID) {
+			printf("  Execution:     %u us\n", r.execution_time_us);
+		}
+		if (r.valid_flags & EC_THREAD_INFO_USAGE_ANALYSIS_VALID) {
+			printf("  Window Peak:   %u us\n", r.window_peak_us);
+			printf("  Window Avg:    %u us\n", r.window_avg_us);
+		}
+		printf("  Wait Object:   0x%08x\n", r.wait_object);
+		if (r.valid_flags & EC_THREAD_INFO_CPU_REGS_VALID) {
+			printf("  PC:            0x%08x\n", r.pc);
+			printf("  LR:            0x%08x\n", r.lr);
+			printf("  SP:            0x%08x\n", r.sp);
+		}
+
+		printf("  Is Idle:       %s\n", r.is_idle ? "Yes" : "No");
+		printf("  Is Current:    %s\n", r.is_current ? "Yes" : "No");
+	}
+
+	return 0;
+}
+
 /* NULL-terminated list of commands. Please keep sorted. */
 const struct command commands[] = {
 	{ "adcread", cmd_adc_read, "<channel>\n\tRead an ADC channel." },
@@ -13278,6 +13352,8 @@ const struct command commands[] = {
 	{ "watchdoginfo", cmd_watchdog_info,
 	  "[reset_stats]\n"
 	  "\tGet watchdog info." },
+	{ "threadinfo", cmd_thread_info,
+	  "\n\tDumps Zephyr thread tracking and info." },
 	{ "wireless", cmd_wireless,
 	  "<flags> [<mask> [<suspend_flags> <suspend_mask>]]\n"
 	  "\tEnable/disable WLAN/Bluetooth radio." },
