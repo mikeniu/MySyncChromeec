@@ -16,6 +16,23 @@
       "message": "CQ fails to:\n```\n      07:48:33: WARNING: zephyr/drivers/fingerprint/fingerprint_egis660_pal.c: needs formatting\n      07:49:05: NOTICE: You can fix formatting errors by running:\n        cros format zephyr/drivers/fingerprint/fingerprint_egis660_pal.c\n```\nPlease do not skip hooks checks.",
       "revId": "983d9701b3adb15757c0a82ee8ef9c0d6db8afa6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e00093a_1fa4b680",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 23
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-04T16:37:33Z",
+      "side": 1,
+      "message": "Additionally, I check and test are still not passing. Please check:\n```\n./twister -s fingerprint.drivers.egis660\n```",
+      "revId": "983d9701b3adb15757c0a82ee8ef9c0d6db8afa6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
