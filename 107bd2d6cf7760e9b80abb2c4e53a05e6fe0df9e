@@ -22,6 +22,30 @@
       },
       "revId": "107bd2d6cf7760e9b80abb2c4e53a05e6fe0df9e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ac6bc14_777df797",
+        "filename": "zephyr/program/bluey/program.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-05-04T15:27:42Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e0ec941a_c645cbfb",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 28
+      },
+      "revId": "107bd2d6cf7760e9b80abb2c4e53a05e6fe0df9e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
