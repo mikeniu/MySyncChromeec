@@ -8,6 +8,13 @@ zephyr_library_sources(gpio.c)
 zephyr_library_sources(gpio_int.c)
 zephyr_library_sources(panic_utils.c)
 zephyr_library_sources_ifdef(CONFIG_PM pm_state.c)
+if (CONFIG_PLATFORM_EC_CONSOLE_CMD_THREADINFO OR CONFIG_PLATFORM_EC_HOSTCMD_THREAD_INFO OR CONFIG_PLATFORM_EC_WATCHDOG_DUMP_THREAD_INFO)
+    zephyr_library_sources(threadinfo.c)
+    zephyr_library_include_directories(.)
+endif()
+
+
+
 
 add_subdirectory("buttons")
 add_subdirectory("cbi")
