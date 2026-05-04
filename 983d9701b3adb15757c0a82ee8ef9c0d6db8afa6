@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ce78551_c381fef5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 23
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-04T16:34:39Z",
+      "side": 1,
+      "message": "CQ fails to:\n```\n      07:48:33: WARNING: zephyr/drivers/fingerprint/fingerprint_egis660_pal.c: needs formatting\n      07:49:05: NOTICE: You can fix formatting errors by running:\n        cros format zephyr/drivers/fingerprint/fingerprint_egis660_pal.c\n```\nPlease do not skip hooks checks.",
+      "revId": "983d9701b3adb15757c0a82ee8ef9c0d6db8afa6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
