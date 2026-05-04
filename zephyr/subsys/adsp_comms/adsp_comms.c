@@ -5,10 +5,21 @@
 
 #include "adsp_comms.h"
 #include "common.h"
+#include "console.h"
+#include "extpower.h"
 
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_DECLARE(adsp_comms, LOG_LEVEL_INF);
+
+static int command_chgstate(int argc, const char **argv)
+{
+	ccprintf("ac = %d\n", extpower_is_present());
+	/* TODO: b/493490329 add the rest of the details */
+	return EC_SUCCESS;
+}
+DECLARE_CONSOLE_COMMAND(chgstate, command_chgstate, NULL,
+			"Get charge state machine status");
 
 static void adsp_power_state_cb(uint8_t fid, uint8_t addr, uint16_t data)
 {
