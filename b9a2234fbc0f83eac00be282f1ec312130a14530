@@ -127,6 +127,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "96cb962f_9b091bcd",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-04T07:21:45Z",
+      "side": 1,
+      "message": "You can use the Zephyr function [flash_read](https://github.com/zephyrproject-rtos/zephyr/blob/main/include/zephyr/drivers/flash.h#L267) directly.",
+      "parentUuid": "8d218a42_9f7401cd",
+      "revId": "b9a2234fbc0f83eac00be282f1ec312130a14530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "540d2a5e_16e29556",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
         "patchSetId": 19

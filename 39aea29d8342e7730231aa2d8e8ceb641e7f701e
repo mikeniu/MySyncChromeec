@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "841105df_ea77c9b8",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-04T07:21:45Z",
+      "side": 1,
+      "message": "Actually, you should use Zephyr return codes here.",
+      "parentUuid": "e37ec552_8c4c480f",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 19
+      },
+      "revId": "39aea29d8342e7730231aa2d8e8ceb641e7f701e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ae094902_7aa2cdc0",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
         "patchSetId": 20
