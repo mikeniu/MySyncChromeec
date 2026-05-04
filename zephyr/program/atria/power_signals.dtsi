@@ -11,7 +11,9 @@
 	common-pwrseq {
 		compatible = "intel,ap-pwrseq";
 
-		sys-pwrok-delay = <3>;
+		rsmrst-delay = <2>;
+		/* See NVL PDG PWROK Generation Flow Diagram */
+		sys-pwrok-delay = <5>;
 		all-sys-pwrgd-timeout = <20>;
 		sys-reset-delay = <60>;
 		s0ix-entry-timeout = <20>;
@@ -53,6 +55,9 @@
 		/* Note - gpios property must be set by the board overlay */
 		output;
 	};
+	/* In NVL, SYS_PWROK is not used. Define it here to build, but don't
+	 * assign it a pin.
+	 */
 	pwr-ec-pch-sys-pwrok {
 		compatible = "intel,ap-pwrseq-external";
 		dbg-label = "SYS_PWROK output to PCH";
