@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a09df32e_fb6542a0",
+        "filename": "include/common.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1158719
+      },
+      "writtenOn": "2026-05-04T15:31:41Z",
+      "side": 1,
+      "message": "+1. \n\nformally, these identifiers are reserved by:\n\n- the C standard (https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3220.pdf, 6.4.2.1 p7)\n- the C++ standard (https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/n4950.pdf, 5.10 p3)\n\npractically, C impls often use `__`-prefixed names freely, since if doing so breaks users, it\u0027s the user that owns the breakage. linux gets to play by different rules because it fully owns its implementation (and it has significant influence over the compilers used to build it).\n\nideally, these should all (?) be migrated to a convention similar to what Adrian suggests, but i\u0027m not sure anyone has a bunch of SWE cycles lying around to facilitate that. :)",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 101,
+        "endChar": 65
+      },
+      "revId": "33e9705990f1eadc1aa0d7c1665fac64a008ad8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
