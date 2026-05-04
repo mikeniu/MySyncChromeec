@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c649b47_02a2e405",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-04T21:01:27Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by Spellchecker: \"referencs\" is a possible misspelling of \"references\".\n\nTo bypass Spellchecker, ...\n\n\"referencs\" is a possible misspelling of \"references\".\n\nTo bypass Spellchecker, add a footer with DISABLE_SPELLCHECKER",
+      "range": {
+        "startLine": 9,
+        "startChar": 23,
+        "endLine": 9,
+        "endChar": 32
+      },
+      "revId": "8a098b52a6e9ba86ccdc7aec2575cc128721ec46",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
