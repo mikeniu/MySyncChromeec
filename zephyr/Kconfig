@@ -535,6 +535,10 @@ config PLATFORM_EC_HOSTCMD_GET_UPTIME_INFO
 	  the EC has been powered up, the number of AP resets, an optional log
 	  of AP-reset events and some flags.
 
+
+
+
+
 config PLATFORM_EC_HOSTCMD_REGULATOR
 	bool "Host command of voltage regulator control"
 	help
