@@ -145,6 +145,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "69e3fcea_20dc084c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-05-04T07:00:43Z",
+      "side": 1,
+      "message": "I\u0027m sorry that I provided wrong information. Actually, the flag is ro_at_boot ON but all bank didn\u0027t protect now (test on patchset 17). [flashinfo](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/common/flash.c;l\u003d1288) command call `crec_flash_physical_get_protect()` directly and it was block by `software_protection_lock`.\n```\nfpmcu:~$ flashinfo\nUsable:   536 KB\nWrite:     16 B (ideal 16 B)\nErase:   8192 B (to 1-bits)\nProtect: 8192 B\ncrec_flash_get_protect clear RW_NOW flags\u003d0\ncrec_flash_get_protect flags\u003d0\n[28.586000] \u003cinf\u003e cros_flash: protect start\u003d0x0 end\u003d0x20000\n[28.592000] \u003cinf\u003e cros_flash: cros_flash_em32f967_get_protect_flags flags\u003d0x1.\nFlags:\n  wp_gpio_asserted: OFF\n  ro_at_boot: ON\n  all_at_boot: OFF\n  ro_now: OFF\n  all_now: OFF\n  STUCK: OFF\n  INCONSISTENT: OFF\n  UNKNOWN_ERROR: OFF\n  rollback_at_boot: OFF\n  rollback_now: OFF\nProtected now:\n    ........ ........ ........ ........\n    ........ ........ ........ ........\n    ...\n```",
+      "parentUuid": "287fafec_c82de5c5",
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0fa07852_9718751b",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 15
@@ -204,6 +222,30 @@
       "side": 1,
       "message": "\u003e get_prot_reg() is only called from paths that already verify the\nwrite-protect library is enabled. \n\nThis is very important information. Please add a comment above `get_prot_reg()` function.",
       "parentUuid": "02c440e0_a17ab704",
+      "range": {
+        "startLine": 79,
+        "startChar": 2,
+        "endLine": 79,
+        "endChar": 32
+      },
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ee33451_32220176",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-05-04T07:00:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0fc3635_89ca6e00",
       "range": {
         "startLine": 79,
         "startChar": 2,
@@ -322,6 +364,30 @@
       "side": 1,
       "message": "Could you add these information to comment in code? It\u0027s very important that writing on protected range is non-deterministic.",
       "parentUuid": "6a4d683b_1b20cf72",
+      "range": {
+        "startLine": 207,
+        "startChar": 0,
+        "endLine": 216,
+        "endChar": 2
+      },
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a525964_a854fdbe",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-05-04T07:00:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f495d9b_182d3848",
       "range": {
         "startLine": 207,
         "startChar": 0,
@@ -464,6 +530,30 @@
       "side": 1,
       "message": "\u003e The flash_em32_check_bank_protected() helper does not introduce or emulate\na separate sector‑based protection mechanism.\n\nIt **does** emulate sector based protection. It hides implementation details e.g. what if the \"sector\" is partialy protected.\n\n\u003e EC flash APIs are bank‑oriented\n\nYes, this is correct, but the emulation should happen **in this driver**, not in your private library.\n\nThe consequence of your design is that write protection check before writing/erasing rebuilds the protection range in a very expensive way. It would be much simpler if you could take protection ranges and check if requested write/erase falls in that.",
       "parentUuid": "33441e10_2c8c4153",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 53
+      },
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66c6ab49_7e608155",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-05-04T07:00:43Z",
+      "side": 1,
+      "message": "Thanks for the detailed explanation, I understand your concern.\n\nYou’re right that exposing only a bank‑level helper means the cros_flash\ndriver needs to iterate and effectively reconstruct the protection range\nwhen checking write/erase requests, which is both less clear and more\nexpensive than working directly with explicit ranges.\n\nIn this CL, this is the first introduction of flash write‑protection\nsupport on this platform, together with the initial private library.\nThe current bank‑based query was chosen to get correct and safe protection\nsemantics working end‑to‑end with existing EC bank‑oriented APIs.\n\nI agree that a cleaner long‑term model would be to expose protection ranges\n(start/end) from the library, and perform all range‑to‑bank mapping and\npolicy checks in the cros_flash driver itself (including write/erase and\nstate reporting paths).\n\nGiven that, would you prefer to do that refactor as part of this CL, or\nwould it be acceptable to address it in a follow‑up change to keep the\nscope of this one focused?",
+      "parentUuid": "667cbd33_b83c782f",
       "range": {
         "startLine": 26,
         "startChar": 0,
