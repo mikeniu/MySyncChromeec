@@ -10,6 +10,7 @@
 #include "panic.h"
 #include "panic_utils.h"
 #include "task.h"
+#include "threadinfo.h"
 #include "watchdog.h"
 
 #include <stdio.h>
@@ -21,7 +22,8 @@
 
 LOG_MODULE_REGISTER(watchdog_shim, LOG_LEVEL_ERR);
 
-#ifdef CONFIG_PLATFORM_EC_WATCHDOG_DUMP_THREADS_CALL_STACK
+#if defined(CONFIG_PLATFORM_EC_WATCHDOG_DUMP_THREADS_CALL_STACK) || \
+	defined(CONFIG_PLATFORM_EC_WATCHDOG_DUMP_THREAD_INFO)
 BUILD_ASSERT(CONFIG_AUX_TIMER_PERIOD_MS >= 500,
 	     "Make sure we have enough lead time to dump call stacks");
 #endif
@@ -224,6 +226,8 @@ static void log_thread_info(const struct k_thread *thread, void *user_data)
 	}
 }
 
+extern void threadinfo_dump(uint32_t mask, const struct shell *shell);
+
 __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 					       int channel_id)
 {
@@ -269,7 +273,28 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 		k_thread_foreach_unlocked(log_thread_info, NULL);
 	}
 
+#if defined(CONFIG_PLATFORM_EC_CONSOLE_CMD_THREADINFO) || \
+	defined(CONFIG_PLATFORM_EC_HOSTCMD_THREAD_INFO)
+	/* Select only the most critical columns to dump */
+	uint32_t threadinfo_mask =
+		BIT(THREADINFO_COL_STATE) | BIT(THREADINFO_COL_WAITOBJ) |
+		BIT(THREADINFO_COL_TIMEOUT) | BIT(THREADINFO_COL_TIME) |
+		BIT(THREADINFO_COL_PEAK) | BIT(THREADINFO_COL_AVG) |
+		BIT(THREADINFO_COL_STKCUR) | BIT(THREADINFO_COL_STKMAX) |
+		BIT(THREADINFO_COL_PC) | BIT(THREADINFO_COL_LR);
+	/* Fallback to entry to identify threads if thread name is not enabled
+	 */
+	if (IS_ENABLED(CONFIG_THREAD_NAME)) {
+		threadinfo_mask |= BIT(THREADINFO_COL_NAME);
+	} else {
+		threadinfo_mask |= BIT(THREADINFO_COL_ENTRY);
+	}
+
+	threadinfo_dump(threadinfo_mask, NULL);
+#endif
+
 	/* Save the current task id in panic info.
+
 	 * The PANIC_SW_WATCHDOG_WARN reason will be changed to a regular
 	 * PANIC_SW_WATCHDOG in system_common_pre_init if a watchdog reset
 	 * occurs.
