@@ -580,6 +580,30 @@
       },
       "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3993df6_3f4a72ef",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-04T18:01:38Z",
+      "side": 1,
+      "message": "\u003e Given that, would you prefer to do that refactor as part of this CL, or\nwould it be acceptable to address it in a follow‑up change to keep the\nscope of this one focused?\n\nPlease do the refactor in this CL.",
+      "parentUuid": "66c6ab49_7e608155",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 53
+      },
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
