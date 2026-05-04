@@ -30,7 +30,7 @@ static uintptr_t get_thread_pc(const struct k_thread *thread)
 	}
 #elif defined(CONFIG_RISCV)
 	return thread->callee_saved.ra; /* Return address as approximation */
-#endif
+#endif /* CONFIG_ARM || CONFIG_RISCV */
 
 	return 0;
 }
@@ -48,7 +48,7 @@ static uintptr_t get_thread_lr(const struct k_thread *thread)
 	if (psp != NULL) {
 		return psp[5]; /* LR is at index 5 in exception frame */
 	}
-#endif
+#endif /* CONFIG_ARM */
 
 	return 0;
 }
@@ -95,7 +95,7 @@ static bool thread_is_idle(const struct k_thread *thread)
 	return thread->base.is_idle;
 #else
 	return thread == &z_idle_threads[0];
-#endif
+#endif /* CONFIG_SMP */
 }
 
 struct detail_data {
@@ -152,7 +152,7 @@ static enum ec_status hc_thread_info_detail(struct host_cmd_handler_args *args)
 	if (k_thread_stack_space_get(thread, &unused_stack) == 0) {
 		r->stack_max = thread->stack_info.size - unused_stack;
 	}
-#endif
+#endif /* CONFIG_THREAD_STACK_INFO */
 
 #ifdef CONFIG_SCHED_THREAD_USAGE
 	r->valid_flags |= EC_THREAD_INFO_DETAIL_RUNTIME_USAGE_VALID;
@@ -161,13 +161,13 @@ static enum ec_status hc_thread_info_detail(struct host_cmd_handler_args *args)
 		r->execution_time_us =
 			k_cyc_to_us_near64(thread_stats.execution_cycles);
 	}
-#endif
+#endif /* CONFIG_SCHED_THREAD_USAGE */
 
 #ifdef CONFIG_SCHED_THREAD_USAGE_ANALYSIS
 	r->valid_flags |= EC_THREAD_INFO_DETAIL_USAGE_ANALYSIS_VALID;
 	r->window_peak_us = k_cyc_to_us_near64(thread_stats.peak_cycles);
 	r->window_avg_us = k_cyc_to_us_near64(thread_stats.average_cycles);
-#endif
+#endif /* CONFIG_SCHED_THREAD_USAGE_ANALYSIS */
 
 #ifdef CONFIG_THREAD_NAME
 	r->valid_flags |= EC_THREAD_INFO_DETAIL_NAME_VALID;
@@ -175,7 +175,7 @@ static enum ec_status hc_thread_info_detail(struct host_cmd_handler_args *args)
 	if (name) {
 		strncpy(r->name, name, sizeof(r->name) - 1);
 	}
-#endif
+#endif /* CONFIG_THREAD_NAME */
 
 	r->entry_point = (uint32_t)(uintptr_t)thread->entry.pEntry;
 
@@ -218,4 +218,4 @@ static enum ec_status hc_thread_info_detail(struct host_cmd_handler_args *args)
 DECLARE_HOST_COMMAND(EC_CMD_THREAD_INFO_DETAIL, hc_thread_info_detail,
 		     EC_VER_MASK(0));
 
-#endif
+#endif /* CONFIG_PLATFORM_EC_HOSTCMD_THREAD_INFO */
