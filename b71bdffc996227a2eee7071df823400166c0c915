@@ -1,0 +1,129 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6f44d6a_c2ab0589",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-05-04T07:56:44Z",
+      "side": 1,
+      "message": "Please review b/495309943#comment7 and update coordingly.",
+      "revId": "b71bdffc996227a2eee7071df823400166c0c915",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4fa29807_c0b6bcc2",
+        "filename": "zephyr/program/ocelot/ocicat/generated.dtsi",
+        "patchSetId": 17
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-05-04T07:56:44Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by Trailing Whitespace: Please remove the trailing whitespace.\n\nPlease remove the trailing whitespace.",
+      "range": {
+        "startLine": 207,
+        "startChar": 0,
+        "endLine": 207,
+        "endChar": 2
+      },
+      "revId": "b71bdffc996227a2eee7071df823400166c0c915",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7423aff1_749a41f0",
+        "filename": "zephyr/program/ocelot/ocicat/generated.dtsi",
+        "patchSetId": 17
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-05-04T07:56:44Z",
+      "side": 1,
+      "message": "Please remove it instead of comment out.",
+      "revId": "b71bdffc996227a2eee7071df823400166c0c915",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78ff1e6e_53914943",
+        "filename": "zephyr/program/ocelot/ocicat/src/wot.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-05-04T07:56:44Z",
+      "side": 1,
+      "message": "Could you define a enum for this ?",
+      "revId": "b71bdffc996227a2eee7071df823400166c0c915",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d3a56a1_34e885ec",
+        "filename": "zephyr/program/ocelot/ocicat/src/wot.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-05-04T07:56:44Z",
+      "side": 1,
+      "message": "Define -1 something like INIT_STATE ?",
+      "revId": "b71bdffc996227a2eee7071df823400166c0c915",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4bcc7833_ed744dfc",
+        "filename": "zephyr/program/ocelot/ocicat/src/wot.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-05-04T07:56:44Z",
+      "side": 1,
+      "message": "Use LOG_* instead.",
+      "revId": "b71bdffc996227a2eee7071df823400166c0c915",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8cf8fad_557f20dc",
+        "filename": "zephyr/program/ocelot/ocicat/src/wot.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-05-04T07:56:44Z",
+      "side": 1,
+      "message": "Could it be registered as interrupt ?",
+      "revId": "b71bdffc996227a2eee7071df823400166c0c915",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
