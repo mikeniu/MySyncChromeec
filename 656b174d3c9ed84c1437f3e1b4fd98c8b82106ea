@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfe11e94_d5bde081",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-05T17:17:31Z",
+      "side": 1,
+      "message": "**1. Replace `#define` Macros with `constexpr` Variables (`iapcontrol.cc`)**\nIn C, macros are standard for constants. However, in C++, macros are heavily discouraged because they bypass scope, lack type safety, and make debugging harder. \n*   **Action:** Replace your macros with `constexpr` variables inside an **anonymous namespace**. This ensures strict type safety (no casting needed when assigning to your `uint8_t` buffers) and ensures the constants don\u0027t leak into other files.\n    ```cpp\n    namespace ElanApp {\n    namespace {\n        // Safe, typed, and scoped to this file only\n        constexpr uint8_t kCmdRunIap \u003d 0x20;\n        constexpr uint8_t kErrStaSuccess \u003d 0x01;\n        constexpr size_t kEp1Length \u003d 8;\n        // ... (update the rest similarly)\n    } \n    }\n    ```",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 33
+      },
+      "revId": "656b174d3c9ed84c1437f3e1b4fd98c8b82106ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9cd943ee_b97a2b60",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-05T17:17:31Z",
+      "side": 1,
+      "message": "**Zero-Initialization with C-Style `memset` (`util/elan/iapcontrol.cc`)** There are many instances of `uint8_t dataSend[EP1_LENGTH]; memset(dataSend, 0x00, sizeof(dataSend));`. In modern C++, prefer value initialization, which is safer, prevents typo bugs, and reads cleaner.\n\n* **Remediation:** Replace with `uint8_t dataSend[EP1_LENGTH] \u003d {};`.",
+      "range": {
+        "startLine": 224,
+        "startChar": 0,
+        "endLine": 224,
+        "endChar": 42
+      },
+      "revId": "656b174d3c9ed84c1437f3e1b4fd98c8b82106ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
