@@ -81,6 +81,30 @@
       },
       "revId": "50a3e65612ed791813121c72c954a3ec1eaa3fb5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c7246ff_7e68e294",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-05T14:18:15Z",
+      "side": 1,
+      "message": "You should include [`config_chip.h`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/include/config_chip.h;l\u003d690;drc\u003df5f0a7d1697e8c9736fee7fd6cb02c528b09818a) which includes `flash_chip.h` for real board or `flash_chip_native_posix.h` for tests.",
+      "parentUuid": "f9f71d98_d28866b6",
+      "range": {
+        "startLine": 174,
+        "startChar": 0,
+        "endLine": 180,
+        "endChar": 6
+      },
+      "revId": "50a3e65612ed791813121c72c954a3ec1eaa3fb5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
