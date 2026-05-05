@@ -3041,16 +3041,26 @@ static void tc_attach_wait_src_run(const int port)
 	if (!IS_ENABLED(CONFIG_USB_PD_EVENT_DRIVEN_CC_STATE))
 		tcpm_get_cc(port, &tc[port].cc1, &tc[port].cc2);
 
-	if (cc_is_snk_dbg_acc(tc[port].cc1, tc[port].cc2) &&
-	    board_is_dts_port(port)) {
-		/*
-		 * Debug accessory.
-		 * A debug accessory in a non-DTS port will be
-		 * recognized by at_least_one_rd as UFP attached.
-		 */
-		new_cc_state = PD_CC_UFP_DEBUG_ACC;
+	/* Check for Debug Accessory FIRST to prevent false UFP detection */
+	if (cc_is_snk_dbg_acc(tc[port].cc1, tc[port].cc2)) {
+		if (board_is_dts_port(port)) {
+			/* Debug accessory on a supported DTS port */
+			new_cc_state = PD_CC_UFP_DEBUG_ACC;
+		} else {
+			/*
+			 * Debug accessory detected, but the port does not
+			 * support it. Do not fall through to
+			 * cc_is_at_least_one_rd. Return to unattached state to
+			 * ensure we DO NOT source VBUS.
+			 */
+			if (drp_state[port] == PD_DRP_FORCE_SOURCE)
+				set_state_tc(port, TC_UNATTACHED_SRC);
+			else
+				set_state_tc(port, TC_UNATTACHED_SNK);
+			return;
+		}
 	} else if (cc_is_at_least_one_rd(tc[port].cc1, tc[port].cc2)) {
-		/* UFP attached */
+		/* UFP attached (Standard Device) */
 		new_cc_state = PD_CC_UFP_ATTACHED;
 	} else if (cc_is_audio_acc(tc[port].cc1, tc[port].cc2)) {
 		/* AUDIO Accessory not supported. Just ignore */
