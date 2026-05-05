@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ce6d28b_1a9314ec",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-05T10:38:45Z",
+      "side": 1,
+      "message": "This is not a place to assume write size and erase size. The compilation should fail if these are not provided. What do you think about\n\n\n```suggestion\n#ifndef CONFIG_FLASH_WRITE_IDEAL_SIZE\n#error \"CONFIG_FLASH_WRITE_IDEAL_SIZE is not defined\"\n#endif\n\n#ifndef CONFIG_FLASH_ERASE_SIZE\n#error \"CONFIG_FLASH_ERASE_SIZE is not defined\"\n#endif\n```",
+      "range": {
+        "startLine": 174,
+        "startChar": 0,
+        "endLine": 180,
+        "endChar": 6
+      },
+      "revId": "50a3e65612ed791813121c72c954a3ec1eaa3fb5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
