@@ -844,6 +844,104 @@ __maybe_unused static int test_wake_tcpc_toggle_change(void)
 	return EC_SUCCESS;
 }
 
+__maybe_unused static int test_dbg_acc_dts_supported(void)
+{
+	ccprints("[Test] Debug accessory on DTS port → Attached.SRC");
+
+	pd_set_dual_role(PORT0, PD_DRP_TOGGLE_ON);
+
+	/* Rd/Rd — debug accessory signature */
+	mock_tcpc.cc1 = TYPEC_CC_VOLT_RD;
+	mock_tcpc.cc2 = TYPEC_CC_VOLT_RD;
+	mock_tcpc.vbus_level = 0;
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+
+	/* Wait through AttachWait.SRC debounce */
+	task_wait_event(PD_T_CC_DEBOUNCE + FUDGE);
+
+	/* DTS port: must transition to Attached.SRC */
+	TEST_EQ(tc_is_attached_src(PORT0), true, "%d");
+
+	return EC_SUCCESS;
+}
+
+__maybe_unused static int test_dbg_acc_no_dts_force_sink(void)
+{
+	ccprints("[Test] Debug accessory on non-DTS port, FORCE_SINK → "
+		 "Unattached.SNK");
+
+	/*
+	 * Force sink role — this is the only DRP policy that causes a
+	 * transition out of AttachWait.SRC when a non-DTS debug accessory
+	 * is detected.
+	 */
+	pd_set_dual_role(PORT0, PD_DRP_FORCE_SINK);
+
+	/* Rd/Rd — debug accessory signature */
+	mock_tcpc.cc1 = TYPEC_CC_VOLT_RD;
+	mock_tcpc.cc2 = TYPEC_CC_VOLT_RD;
+	mock_tcpc.vbus_level = 0;
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+
+	/* Allow the state machine to process */
+	task_wait_event(PD_T_CC_DEBOUNCE + FUDGE);
+
+	/* Must NOT have attached as SRC — must be in SNK states */
+	TEST_EQ(tc_is_attached_src(PORT0), false, "%d");
+	TEST_EQ(tc_is_attached_snk(PORT0), false, "%d");
+
+	return EC_SUCCESS;
+}
+
+__maybe_unused static int test_dbg_acc_no_dts_remain_attach_wait(void)
+{
+	ccprints("[Test] Debug accessory on non-DTS port, TOGGLE_ON → "
+		 "remain in AttachWait.SRC");
+
+	pd_set_dual_role(PORT0, PD_DRP_TOGGLE_ON);
+
+	/* Rd/Rd — debug accessory signature */
+	mock_tcpc.cc1 = TYPEC_CC_VOLT_RD;
+	mock_tcpc.cc2 = TYPEC_CC_VOLT_RD;
+	mock_tcpc.vbus_level = 0;
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+
+	/*
+	 * Wait well past tCCDebounce. If the pre-fix regression is present
+	 * the port would have incorrectly attached as SRC by now.
+	 */
+	task_wait_event(PD_T_CC_DEBOUNCE + FUDGE);
+
+	/*
+	 * Must NOT have attached as SRC — this is the regression guard.
+	 * Before the fix: tc_is_attached_src() would return true here.
+	 */
+	TEST_EQ(tc_is_attached_src(PORT0), false, "%d");
+
+	return EC_SUCCESS;
+}
+
+__maybe_unused static int test_ufp_attached(void)
+{
+	ccprints("[Test] Normal UFP (Rd/Open) → Attached.SRC");
+
+	pd_set_dual_role(PORT0, PD_DRP_TOGGLE_ON);
+
+	/* Rd/Open — normal UFP signature, not a debug accessory */
+	mock_tcpc.cc1 = TYPEC_CC_VOLT_RD;
+	mock_tcpc.cc2 = TYPEC_CC_VOLT_OPEN;
+	mock_tcpc.vbus_level = 0;
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+
+	/* Wait through AttachWait.SRC debounce */
+	task_wait_event(PD_T_CC_DEBOUNCE + FUDGE);
+
+	/* Normal UFP attach: must be in Attached.SRC */
+	TEST_EQ(tc_is_attached_src(PORT0), true, "%d");
+
+	return EC_SUCCESS;
+}
+
 /* Reset the mocks before each test */
 void before_test(void)
 {
@@ -896,6 +994,11 @@ void run_test(int argc, const char **argv)
 	RUN_TEST(test_auto_toggle_delay_early_connect);
 
 	RUN_TEST(test_wake_tcpc_toggle_change);
+
+	RUN_TEST(test_dbg_acc_dts_supported);
+	RUN_TEST(test_dbg_acc_no_dts_force_sink);
+	RUN_TEST(test_dbg_acc_no_dts_remain_attach_wait);
+	RUN_TEST(test_ufp_attached);
 
 	/* Do basic state machine validity checks last. */
 	RUN_TEST(test_tc_no_parent_cycles);
