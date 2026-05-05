@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "66be1bc2_9b4ff890",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 24
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-05T13:06:35Z",
+      "side": 1,
+      "message": "Can you add tests as for other [PAL functions](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/fingerprint/drivers/egis660/src/egis660.c)?",
+      "revId": "50a3e65612ed791813121c72c954a3ec1eaa3fb5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4ce6d28b_1a9314ec",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
         "patchSetId": 24
