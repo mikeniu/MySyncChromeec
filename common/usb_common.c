@@ -239,7 +239,7 @@ __overridable bool board_is_usb_pd_port_present(int port)
 
 __overridable bool board_is_dts_port(int port)
 {
-	return true;
+	return port == CONFIG_CCD_USBC_PORT_NUMBER;
 }
 
 int pd_get_retry_count(int port, enum tcpci_msg_type type)
