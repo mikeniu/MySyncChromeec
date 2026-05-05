@@ -44,6 +44,8 @@
 #define CPRINTF(format, args...)
 #endif
 
+#define PORT0 0
+
 #ifdef CONFIG_COMMON_RUNTIME
 struct ec_params_usb_pd_rw_hash_entry rw_hash_table[RW_HASH_ENTRIES];
 #endif /* CONFIG_COMMON_RUNTIME */
@@ -243,7 +245,7 @@ __overridable bool board_is_usb_pd_port_present(int port)
 
 __overridable bool board_is_dts_port(int port)
 {
-	return true;
+	return port == PORT0;
 }
 
 int pd_get_retry_count(int port, enum tcpci_msg_type type)
