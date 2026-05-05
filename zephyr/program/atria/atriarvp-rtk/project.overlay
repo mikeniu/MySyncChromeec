@@ -11,6 +11,7 @@
 #include "adc.dtsi"
 #include "gpio.dtsi"
 #include "i2c.dtsi"
+#include "keyboard.dtsi"
 #include "power_signals.dtsi"
 
 #include "../rvp_consolidated.dtsi"
@@ -24,10 +25,19 @@
 		compatible = "cros-ec,cse-early-rec";
 	        cse-early-rec-gpios = <RTS5912_GPIO015 (GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_VOLTAGE_1P8)>;
 	};
+
+	chosen {
+		cros-ec,keyboard = &kbd;
+	};
 };
 
 &it8801_mfd {
 	irq-gpios = <RTS5912_GPIO085 GPIO_ACTIVE_LOW>;
+};
+
+&cbi_flash {
+	offset = <0x7F000>;
+	size = <0x1000>;
 };
 
 &espi0 {
@@ -83,4 +93,3 @@ tach_fan0: &tach0 {
         pinctrl-0 = <&pwm2_gpio025>;
         pinctrl-names = "default";
 };
-
