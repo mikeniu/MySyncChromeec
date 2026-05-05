@@ -16,6 +16,7 @@ target_sources(app PRIVATE
     src/integration/usbc/usb_5v_0a_pd_source.c
     src/integration/usbc/usb_5v_3a_pd_source.c
     src/integration/usbc/usb_attach_src_snk.c
+    src/integration/usbc/usb_attach_wait_src.c
     src/integration/usbc/usb_charging_policy.c
     src/integration/usbc/usb_hard_reset.c
     src/integration/usbc/usb_pd_bist_shared.c
