@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1c7eabe1_4c7a0d6e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 24
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-05-05T13:21:53Z",
+      "side": 1,
+      "message": "OK, I will try.",
+      "parentUuid": "66be1bc2_9b4ff890",
+      "revId": "50a3e65612ed791813121c72c954a3ec1eaa3fb5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4ce6d28b_1a9314ec",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
         "patchSetId": 24
@@ -31,6 +49,30 @@
       "writtenOn": "2026-05-05T10:38:45Z",
       "side": 1,
       "message": "This is not a place to assume write size and erase size. The compilation should fail if these are not provided. What do you think about\n\n\n```suggestion\n#ifndef CONFIG_FLASH_WRITE_IDEAL_SIZE\n#error \"CONFIG_FLASH_WRITE_IDEAL_SIZE is not defined\"\n#endif\n\n#ifndef CONFIG_FLASH_ERASE_SIZE\n#error \"CONFIG_FLASH_ERASE_SIZE is not defined\"\n#endif\n```",
+      "range": {
+        "startLine": 174,
+        "startChar": 0,
+        "endLine": 180,
+        "endChar": 6
+      },
+      "revId": "50a3e65612ed791813121c72c954a3ec1eaa3fb5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9f71d98_d28866b6",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-05-05T13:21:53Z",
+      "side": 1,
+      "message": "it defined in [flash_chip.h](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/chip/egis/include/flash_chip.h), but will test fail with`./twister -s fingerprint.drivers.egis660`, report cannot find the `flash_chip.h` error.",
+      "parentUuid": "4ce6d28b_1a9314ec",
       "range": {
         "startLine": 174,
         "startChar": 0,
