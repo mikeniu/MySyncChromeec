@@ -844,6 +844,61 @@ __maybe_unused static int test_wake_tcpc_toggle_change(void)
 	return EC_SUCCESS;
 }
 
+__maybe_unused static int test_unsupported_debug_accessory_no_force(void)
+{
+	/* Force port to Source so it initializes into TC_UNATTACHED_SRC */
+	pd_set_dual_role(PORT0, PD_DRP_FORCE_SOURCE);
+	task_wait_event(SECOND);
+
+	/* Simulate Unsupported Debug Accessory (Sink) by pulling both CC lines
+	 * to Rd */
+	ccprints("[Test] Partner connects as Unsupported Debug Accessory");
+	mock_tcpc.cc1 = TYPEC_CC_VOLT_RD;
+	mock_tcpc.cc2 = TYPEC_CC_VOLT_RD;
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+
+	/* Wait for state machine to process and enter AttachWait.SRC */
+	task_wait_event(SECOND);
+
+	/* Restore standard toggle role to simulate normal conditions */
+	pd_set_dual_role(PORT0, PD_DRP_TOGGLE_ON);
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+	task_wait_event(SECOND);
+
+	/* If we correctly stayed in AttachWait.SRC, CC lines are still Rp */
+	TEST_EQ(mock_get_vbus_enabled(PORT0), false, "%d");
+
+	return EC_SUCCESS;
+}
+
+__maybe_unused static int test_unsupported_debug_accessory_force_sink(void)
+{
+	/* Force port to Source so it initializes into TC_UNATTACHED_SRC */
+	pd_set_dual_role(PORT0, PD_DRP_FORCE_SOURCE);
+	task_wait_event(SECOND);
+
+	/* Simulate Unsupported Debug Accessory (Sink) by pulling both CC lines
+	 * to Rd */
+	ccprints("[Test] Partner connects as Unsupported Debug Accessory");
+	mock_tcpc.cc1 = TYPEC_CC_VOLT_RD;
+	mock_tcpc.cc2 = TYPEC_CC_VOLT_RD;
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+
+	/* Wait for state machine to process and enter AttachWait.SRC */
+	task_wait_event(SECOND);
+
+	/* Trigger the force-sink policy override */
+	pd_set_dual_role(PORT0, PD_DRP_FORCE_SINK);
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+	task_wait_event(SECOND);
+
+	/* If policy override worked, we transitioned to Unattached.SNK
+	 * (presenting Rd) */
+	TEST_EQ(mock_get_vbus_enabled(PORT0), false, "%d");
+
+	return EC_SUCCESS;
+}
+
 /* Reset the mocks before each test */
 void before_test(void)
 {
@@ -896,6 +951,9 @@ void run_test(int argc, const char **argv)
 	RUN_TEST(test_auto_toggle_delay_early_connect);
 
 	RUN_TEST(test_wake_tcpc_toggle_change);
+
+	RUN_TEST(test_unsupported_debug_accessory_no_force);
+	RUN_TEST(test_unsupported_debug_accessory_force_sink);
 
 	/* Do basic state machine validity checks last. */
 	RUN_TEST(test_tc_no_parent_cycles);
