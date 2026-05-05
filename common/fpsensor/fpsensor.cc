@@ -13,6 +13,7 @@
 #include "ec_commands.h"
 #include "fpsensor/fpsensor.h"
 #include "fpsensor/fpsensor_auth_commands.h"
+#include "fpsensor/fpsensor_btn_ign_out.h"
 #include "fpsensor/fpsensor_console.h"
 #include "fpsensor/fpsensor_crypto.h"
 #include "fpsensor/fpsensor_detect.h"
@@ -60,6 +61,11 @@ static uint32_t matching_time_us;
 static uint32_t overall_time_us;
 static timestamp_t overall_t0;
 static uint8_t timestamps_invalid;
+/*
+ * Last matched template index, persisted for telemetry (EC_CMD_FP_STATS).
+ * Unlike global_context, this is not cleared when the secret is read.
+ */
+static int8_t stats_template_matched;
 
 BUILD_ASSERT(sizeof(struct ec_fp_template_encryption_metadata) % 4 == 0);
 
@@ -140,6 +146,8 @@ static uint32_t fp_process_match(void)
 	int res = -1;
 	uint32_t updated = 0;
 	int32_t fgr = FP_NO_SUCH_TEMPLATE;
+	timestamps_invalid = 0;
+	stats_template_matched = static_cast<int8_t>(FP_NO_SUCH_TEMPLATE);
 
 	/* match finger against current templates */
 	fp_disable_positive_match_secret(
@@ -161,12 +169,14 @@ static uint32_t fp_process_match(void)
 			 * with EC_MKBP_FP_ERR_MATCH_NO_INTERNAL.
 			 */
 			if (fgr >= 0 && fgr < FP_MAX_FINGER_COUNT) {
+				stats_template_matched = fgr;
 				fp_enable_positive_match_secret(
 					fgr,
 					&global_context
 						 .positive_match_secret_state);
 			} else {
 				res = EC_MKBP_FP_ERR_MATCH_NO_INTERNAL;
+				timestamps_invalid |= FPSTATS_MATCHING_INV;
 			}
 		} else if (res < 0) {
 			/*
@@ -176,6 +186,7 @@ static uint32_t fp_process_match(void)
 			 * happened.
 			 */
 			res = EC_MKBP_FP_ERR_MATCH_NO_INTERNAL;
+			timestamps_invalid |= FPSTATS_MATCHING_INV;
 		}
 
 		if (res == EC_MKBP_FP_ERR_MATCH_YES_UPDATED)
@@ -183,10 +194,8 @@ static uint32_t fp_process_match(void)
 	} else {
 		CPRINTS("No enrolled templates");
 		res = EC_MKBP_FP_ERR_MATCH_NO_TEMPLATES;
-	}
-
-	if (!fp_match_success(res))
 		timestamps_invalid |= FPSTATS_MATCHING_INV;
+	}
 
 	matching_time_us = time_since32(t0);
 	return EC_MKBP_FP_MATCH | EC_MKBP_FP_ERRCODE(res) |
@@ -369,7 +378,6 @@ extern "C" void fp_task(void)
 			}
 		} else if (evt & (TASK_EVENT_SENSOR_IRQ | TASK_EVENT_TIMER)) {
 			overall_t0 = get_time();
-			timestamps_invalid = 0;
 			/*
 			 * TODO(b/316859625): Remove CONFIG_ZEPHYR block after
 			 * migration to Zephyr is completed.
@@ -430,6 +438,7 @@ extern "C" void fp_task(void)
 				fp_sensor_low_power();
 			}
 		}
+		fp_btn_ign_out::update(global_context.sensor_mode);
 	}
 #else /* !HAVE_FP_PRIVATE_DRIVER */
 	while (1) {
@@ -820,12 +829,7 @@ static enum ec_status fp_command_stats(struct host_cmd_handler_args *args)
 	r->overall_t0.lo = overall_t0.le.lo;
 	r->overall_t0.hi = overall_t0.le.hi;
 	r->timestamps_invalid = timestamps_invalid;
-	/*
-	 * Note that this is set to FP_NO_SUCH_TEMPLATE when positive match
-	 * secret is read/disabled, and we are not using this field in biod.
-	 */
-	r->template_matched =
-		global_context.positive_match_secret_state.template_matched;
+	r->template_matched = stats_template_matched;
 
 	args->response_size = sizeof(*r);
 	return EC_RES_SUCCESS;
