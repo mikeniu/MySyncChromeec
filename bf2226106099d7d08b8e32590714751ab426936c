@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1be0c9a_006d3957",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 39
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-05-05T10:17:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f246a76_76f5d0cc",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 55
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35809e55_e9618be3",
@@ -54,6 +78,30 @@
       "writtenOn": "2026-04-30T22:57:50Z",
       "side": 1,
       "message": "Drop unused macros.",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 31
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c951bbc_84e6a0c7",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 39
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-05-05T10:17:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35809e55_e9618be3",
       "range": {
         "startLine": 41,
         "startChar": 0,
@@ -87,6 +135,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d48914a_0973d7f0",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 39
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-05-05T10:17:43Z",
+      "side": 1,
+      "message": "It\u0027s used in the following CL \"it52xx: implement required APIs in it52xx pdc driver\", I move these defines to there.",
+      "parentUuid": "d5f6b58f_fe349f71",
+      "range": {
+        "startLine": 105,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 24
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "126b6e5d_22695603",
@@ -110,6 +182,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "abd53fe7_b7189b43",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 39
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-05-05T10:17:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "126b6e5d_22695603",
+      "range": {
+        "startLine": 211,
+        "startChar": 5,
+        "endLine": 211,
+        "endChar": 10
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "652aea4b_8cdd9277",
@@ -123,6 +219,30 @@
       "writtenOn": "2026-04-30T22:57:50Z",
       "side": 1,
       "message": "Please clean up the copy/paste from the realtek driver.  This bug is not applicable to this new driver.\n\nThis new driver should be setting up the state machine for efficient communication with the IT5271.",
+      "range": {
+        "startLine": 443,
+        "startChar": 0,
+        "endLine": 443,
+        "endChar": 73
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1245da05_8a50bde6",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 39
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-05-05T10:17:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "652aea4b_8cdd9277",
       "range": {
         "startLine": 443,
         "startChar": 0,
@@ -158,6 +278,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "89d0b924_3ea4441b",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 39
+      },
+      "lineNbr": 941,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-05-05T10:17:43Z",
+      "side": 1,
+      "message": "Yes, it5271 supports one usb-c port, and I also use it to verify pdc functions.\nBecause we have another chip it5272 which supports two usb-c port, it\u0027s okay to add patch for it5272 (if needed) later after these CL are merged. I removed the outer for loop.",
+      "parentUuid": "af873369_c1f0f46d",
+      "range": {
+        "startLine": 941,
+        "startChar": 0,
+        "endLine": 941,
+        "endChar": 67
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "30cae164_58240317",
         "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
         "patchSetId": 39
@@ -169,6 +313,30 @@
       "writtenOn": "2026-04-30T22:57:50Z",
       "side": 1,
       "message": "General - comment, the nesting of this function is much too type and hard to read.  Consider splitting out helper functions.\n\nHopefully you can drop the outer for loop to start.",
+      "range": {
+        "startLine": 968,
+        "startChar": 0,
+        "endLine": 968,
+        "endChar": 50
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8731147_0e15e69d",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 39
+      },
+      "lineNbr": 968,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-05-05T10:17:43Z",
+      "side": 1,
+      "message": "Removed the outer for loop and rearranged the type.",
+      "parentUuid": "30cae164_58240317",
       "range": {
         "startLine": 968,
         "startChar": 0,
@@ -202,6 +370,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "30800dbe_56b2a480",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.h",
+        "patchSetId": 39
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-05-05T10:17:43Z",
+      "side": 1,
+      "message": "Needn\u0027t, because this function is not called frequently, \"inline\" is removed.",
+      "parentUuid": "548cde9e_dbb3289e",
+      "range": {
+        "startLine": 89,
+        "startChar": 19,
+        "endLine": 89,
+        "endChar": 55
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f9063fb5_0a08aea5",
@@ -215,6 +407,30 @@
       "writtenOn": "2026-04-30T22:57:50Z",
       "side": 1,
       "message": "Why is this here?  `struct pdc_info_t` is defined in pdc.h and has already fixed the project name length to be `USB_PD_CHIP_INFO_PROJECT_NAME_LEN + 1`.",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 127,
+        "endChar": 49
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "040bca85_614d2564",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.h",
+        "patchSetId": 39
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-05-05T10:17:43Z",
+      "side": 1,
+      "message": "Removed",
+      "parentUuid": "f9063fb5_0a08aea5",
       "range": {
         "startLine": 127,
         "startChar": 0,
