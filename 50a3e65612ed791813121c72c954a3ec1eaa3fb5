@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "80142d24_dad6e47e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 24
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-05T16:23:48Z",
+      "side": 1,
+      "message": "You can provide necessary functions in the test. These functions will just call zephyr flash functions. Zephyr provides simulated flash for tests.",
+      "parentUuid": "94363734_f0ead187",
+      "revId": "50a3e65612ed791813121c72c954a3ec1eaa3fb5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4ce6d28b_1a9314ec",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
         "patchSetId": 24
