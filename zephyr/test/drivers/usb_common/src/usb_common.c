@@ -5,6 +5,7 @@
 
 #include "ec_commands.h"
 #include "suite.h"
+#include "test_mocks.h"
 #include "timer.h"
 #include "usb_common.h"
 #include "usb_pd.h"
@@ -292,4 +293,63 @@ ZTEST_USER(usb_common, test_drp_auto_toggle_next_state_attached_to_sink)
 	zassert_equal(drp_sink_time, fake_time.val);
 
 	get_time_mock = NULL;
+}
+
+ZTEST_USER(usb_common, test_attach_wait_src_unsupported_debug_acc_no_force)
+{
+	/* Force port to Source so it initializes into TC_UNATTACHED_SRC */
+	pd_set_dual_role(TEST_PORT, PD_DRP_FORCE_SOURCE);
+	task_wait_event(USEC_PER_SEC);
+
+	/* Simulate Unsupported Debug Accessory (Sink) by pulling both CC lines
+	 * to Rd */
+	ccprints("[Test] Partner connects as Unsupported Debug Accessory");
+	mock_tcpc.cc1 = TYPEC_CC_VOLT_RD;
+	mock_tcpc.cc2 = TYPEC_CC_VOLT_RD;
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+
+	/* Wait for state machine to process and enter AttachWait.SRC */
+	task_wait_event(USEC_PER_SEC);
+
+	/* Restore standard toggle role to simulate normal conditions */
+	pd_set_dual_role(TEST_PORT, PD_DRP_TOGGLE_ON);
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+
+	/* Wait past tCCDebounce to ensure we do not proceed to Attached.SRC */
+	task_wait_event(PD_T_CC_DEBOUNCE + FUDGE);
+
+	/* If we correctly stayed in AttachWait.SRC, CC lines are still Rp */
+	zassert_false(
+		mock_get_vbus_enabled(TEST_PORT),
+		"VBUS should not be sourced for unsupported debug accessory");
+}
+
+ZTEST_USER(usb_common, test_attach_wait_src_unsupported_debug_acc_force_sink)
+{
+	/* Force port to Source so it initializes into TC_UNATTACHED_SRC */
+	pd_set_dual_role(TEST_PORT, PD_DRP_FORCE_SOURCE);
+	task_wait_event(USEC_PER_SEC);
+
+	/* Simulate Unsupported Debug Accessory (Sink) by pulling both CC lines
+	 * to Rd */
+	ccprints("[Test] Partner connects as Unsupported Debug Accessory");
+	mock_tcpc.cc1 = TYPEC_CC_VOLT_RD;
+	mock_tcpc.cc2 = TYPEC_CC_VOLT_RD;
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+
+	/* Wait for state machine to process and enter AttachWait.SRC */
+	task_wait_event(USEC_PER_SEC);
+
+	/* Trigger the force-sink policy override */
+	pd_set_dual_role(TEST_PORT, PD_DRP_FORCE_SINK);
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+	task_wait_event(USEC_PER_SEC);
+
+	/* If policy override worked, we transitioned to Unattached.SNK
+	 * (presenting Rd)
+	 */
+	zassert_equal(mock_tcpc.last.cc, TYPEC_CC_RD,
+		      "Policy override failed to present Rd in Unattached.SNK");
+	zassert_false(mock_get_vbus_enabled(TEST_PORT),
+		      "VBUS must remain off in SNK states");
 }
