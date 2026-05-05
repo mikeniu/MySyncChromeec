@@ -3054,14 +3054,25 @@ static void tc_attach_wait_src_run(const int port)
 	if (!IS_ENABLED(CONFIG_USB_PD_EVENT_DRIVEN_CC_STATE))
 		tcpm_get_cc(port, &tc[port].cc1, &tc[port].cc2);
 
-	if (cc_is_snk_dbg_acc(tc[port].cc1, tc[port].cc2) &&
-	    board_is_dts_port(port)) {
-		/*
-		 * Debug accessory.
-		 * A debug accessory in a non-DTS port will be
-		 * recognized by at_least_one_rd as UFP attached.
-		 */
-		new_cc_state = PD_CC_UFP_DEBUG_ACC;
+	/* Check for Debug Accessory FIRST to prevent false UFP detection */
+	if (cc_is_snk_dbg_acc(tc[port].cc1, tc[port].cc2)) {
+		if (board_is_dts_port(port)) {
+			/* Debug accessory on a supported DTS port */
+			new_cc_state = PD_CC_UFP_DEBUG_ACC;
+		} else {
+			/* Type-C r2.4 § 4.5.2.2.8.2 Exiting from
+			 * AttachWait.SRC State does not describe a state
+			 * transition when a port not supporting Debug
+			 * Accessory detects Rd on both CC lines, so, in this
+			 * case, the port is required to remain in
+			 * AttachWait.SRC indefinitely. TD 4.8.2 checks this
+			 * requirement. Only transition out of this state in
+			 * response to observed CC changes.
+			 * pd_update_dual_role_config will handle DRP policy
+			 * changes before this state runs.
+			 */
+			return;
+		}
 	} else if (cc_is_at_least_one_rd(tc[port].cc1, tc[port].cc2)) {
 		/* UFP attached */
 		new_cc_state = PD_CC_UFP_ATTACHED;
