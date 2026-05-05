@@ -79,6 +79,24 @@
       "message": "This feels like it is masking or working around a deeper problem. Have we looked into http://b/501584796#comment20 and http://b/501584796#comment22?\n\nWe must be either querying the wrong port due to a bug/oversight somewhere in our stack, or there is a PDC FW issue causing it to report bad info (the latter seems unlikely based on the bug discussion). Am I missing something?",
       "revId": "187d58a7cb9c5d6e7530a48b8c48c4f26e8e6184",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "652f5476_e88e8354",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-05-05T22:57:51Z",
+      "side": 1,
+      "message": "Hey Tristan\n\nThis command does not support a connector number, so the kernel hard codes this to 0. This is a spec limitation, not a bug. We get into this situation because the command is intended for the PPM (EC) but we forward the response from the LPM (PDC) so we are always forwarding Port 0 capabilities. Typically, this isn\u0027t an issue but we get into trouble when capabilities vary across ports.\n\nIf we wanted to solve this based on how the UCSI spec intends for this command to be used, the EC should construct the GET_CAPABILITY response based on DT or information queried from the PDC(s).\n\nSee https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git/tree/drivers/usb/typec/ucsi/ucsi.c?h\u003dusb-next#n226",
+      "parentUuid": "7815d0ef_23c420a3",
+      "revId": "187d58a7cb9c5d6e7530a48b8c48c4f26e8e6184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
