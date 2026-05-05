@@ -51,6 +51,24 @@
       "message": "phoenixshen@chromium.org, could you please review this CL.",
       "revId": "8ba284bdd160ab9752a7295bb866f9f2a2a4068f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbb36b6d_45587749",
+        "filename": "zephyr/shim/include/config_chip.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 3879739
+      },
+      "writtenOn": "2026-05-05T07:22:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23fa78c4_3ec9133a",
+      "revId": "8ba284bdd160ab9752a7295bb866f9f2a2a4068f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
