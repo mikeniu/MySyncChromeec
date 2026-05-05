@@ -604,6 +604,30 @@
       },
       "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1c3e7c1_d674cc82",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967_wp.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-05-05T15:37:40Z",
+      "side": 1,
+      "message": "Thanks for the clarification.\n\nThe refactor has now been done in this CL. The write‑protect library\nreports raw hardware protection ranges, and all range aggregation,\nconsistency checks, and policy decisions are handled in the\ncros_flash driver.\n\nIn particular:\n- Bank‑based protection emulation has been removed\n- Write/erase checks operate on protection ranges directly\n- Protection state aggregation and gap validation are centralized\n  in the driver\n- *_NOW semantics are implemented via a driver‑level software lock\n\nPlease let me know if you’d like any part of this split out further\nor adjusted.",
+      "parentUuid": "f3993df6_3f4a72ef",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 53
+      },
+      "revId": "7e0310b07d1dd864f7ce27b01fcde2a28fd6109f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
