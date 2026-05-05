@@ -1,6 +1,52 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e977486_a95b62d4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-05-05T22:00:49Z",
+      "side": 1,
+      "message": "nit: which",
+      "range": {
+        "startLine": 14,
+        "startChar": 17,
+        "endLine": 14,
+        "endChar": 21
+      },
+      "revId": "187d58a7cb9c5d6e7530a48b8c48c4f26e8e6184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23967ece_748b9fc2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-05-05T22:00:49Z",
+      "side": 1,
+      "message": "Does it have to be this way\n\nI would rather the DT property override it for all ports. The UCSI spec does not define a connector number for this command. The Kernel is only ever going to send this for port 0. Having this configurable for each individual port isn\u0027t useful here, within the UCSI specification the OPM can only send this command for C0.",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 52
+      },
+      "revId": "187d58a7cb9c5d6e7530a48b8c48c4f26e8e6184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "54d022fa_52c20a32",
