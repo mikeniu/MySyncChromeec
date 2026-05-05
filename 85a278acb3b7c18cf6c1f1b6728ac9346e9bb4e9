@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a995947_58477cff",
+        "filename": "zephyr/drivers/dsp_comms/service/dsp_service.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-05T21:30:31Z",
+      "side": 1,
+      "message": "This change affects all boards that move the sensors to the ISH.  Why does the lid state need to be checked every second?",
+      "range": {
+        "startLine": 390,
+        "startChar": 13,
+        "endLine": 390,
+        "endChar": 24
+      },
+      "revId": "85a278acb3b7c18cf6c1f1b6728ac9346e9bb4e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d2f04b9_4cd9fa34",
+        "filename": "zephyr/program/ocelot/ocicat/generated.dtsi",
+        "patchSetId": 13
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-05T21:30:31Z",
+      "side": 1,
+      "message": "Fix the formatting of this file.",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 10
+      },
+      "revId": "85a278acb3b7c18cf6c1f1b6728ac9346e9bb4e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "550e9516_9f1cac45",
+        "filename": "zephyr/program/ocelot/ocicat/generated.dtsi",
+        "patchSetId": 13
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-05T21:30:31Z",
+      "side": 1,
+      "message": "Just delete the GPIO references that are now used.\n\nAlso don\u0027t use C++ style comments.",
+      "range": {
+        "startLine": 221,
+        "startChar": 0,
+        "endLine": 221,
+        "endChar": 38
+      },
+      "revId": "85a278acb3b7c18cf6c1f1b6728ac9346e9bb4e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "443fe4df_a83601eb",
+        "filename": "zephyr/program/ocelot/ocicat/src/wot.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-05T21:30:31Z",
+      "side": 1,
+      "message": "This implements a WOT driver using the legacy EC driver conventions.\n\nNew code should use the Zephyr driver model.\n\nBy implementing a Zephyr driver, you can put this under platform/ec/zephyr/drivers/wot/wot.c.  This doesn\u0027t need to be a board specific file.\n\nLook at [hibernate_z5.c](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/hibernate/hibernate_z5.c) and the devicetree [schema file](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/dts/bindings/hibernate/cros-ec,hibernate-z5.yaml) for an example on how to create a Zephyr driver.",
+      "revId": "85a278acb3b7c18cf6c1f1b6728ac9346e9bb4e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
