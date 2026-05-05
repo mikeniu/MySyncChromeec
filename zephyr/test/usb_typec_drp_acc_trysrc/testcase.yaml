@@ -1,0 +1,17 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+tests:
+  usb_typec_drp_acc_trysrc.default:
+    platform_allow:
+      - native_sim
+      - native_sim/native
+    harness: ztest
+    harness_config:
+      type: one_line
+      regex:
+        - "PASS - usb_typec_drp_acc_trysrc.test_dbg_acc_dts_supported"
+        - "PASS - usb_typec_drp_acc_trysrc.test_dbg_acc_no_dts_force_sink"
+        - "PASS - usb_typec_drp_acc_trysrc.test_dbg_acc_no_dts_remain_wait"
+        - "PASS - usb_typec_drp_acc_trysrc.test_ufp_attached"
