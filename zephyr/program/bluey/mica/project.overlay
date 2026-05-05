@@ -24,6 +24,26 @@
 #include "temp_sensors.dtsi"
 
 /* mica overrides follow... */
+
+/ {
+	gpio-interrupts {
+		int_prochot: prochot {
+			irq-pin = <&gpio_ec_sys_throttle_mira>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "throttle_ap_prochot_input_interrupt";
+		};
+	};
+
+	named-usbc-port {
+		usbc_port0: port0 {
+			compatible = "named-usbc-port";
+		};
+		usbc_port1: port1 {
+			compatible = "named-usbc-port";
+		};
+	};
+};
+
 &cbi_flash {
 	/*
 	 * CBI section size is 0x1000 bytes, the CBI portion lies at the end of
