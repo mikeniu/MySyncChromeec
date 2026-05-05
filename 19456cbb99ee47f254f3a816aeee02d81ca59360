@@ -22,6 +22,30 @@
       },
       "revId": "19456cbb99ee47f254f3a816aeee02d81ca59360",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9c7e312_6ce6ab45",
+        "filename": "zephyr/test/pdc/testcase.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-05T19:35:34Z",
+      "side": 1,
+      "message": "SGTM",
+      "parentUuid": "8db37eb1_eae9fcae",
+      "range": {
+        "startLine": 263,
+        "startChar": 16,
+        "endLine": 263,
+        "endChar": 28
+      },
+      "revId": "19456cbb99ee47f254f3a816aeee02d81ca59360",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
