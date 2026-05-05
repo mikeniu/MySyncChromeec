@@ -2822,7 +2822,7 @@ pdc_snk_attached_evaluate_pdos(struct pdc_port_t *port)
 	/* if sink path is enabled, battery is not present, and AP is ON,
 	 * do not send RDO. Proceed to seed charge manager with current RDO.
 	 */
-	if (port->sink_path_status && battery_is_present() == BP_NO &&
+	if (port->sink_path_status && battery_is_present() != BP_YES &&
 	    !chipset_in_state(CHIPSET_STATE_HARD_OFF)) {
 		LOG_INF("C%d: Dead battery detected. Keep current RDO.",
 			config->connector_num);
@@ -4813,6 +4813,9 @@ test_mockable bool pdc_power_mgmt_get_partner_data_swap_capable(int port)
 
 	pdc_port = &pdc_data[port]->port;
 
+	if (pdc_port->get_pdo.pdo_source != PARTNER_PDO) {
+		return false;
+	}
 	fixed_vsafe5v_pdo =
 		get_pdc_pdos_ptr(pdc_port, &pdc_port->get_pdo)->pdos[0];
 
@@ -5260,7 +5263,7 @@ static void pdc_update_battery_capability(struct pdc_port_t *port)
 	/* Set PID */
 	bcdb.pid = CONFIG_PLATFORM_EC_USB_PID;
 
-	if (battery_is_present()) {
+	if (battery_is_present() == BP_YES) {
 		uint32_t v;
 		uint32_t c;
 
