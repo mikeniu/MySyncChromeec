@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29840577_630f0fbf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-05T19:50:58Z",
+      "side": 1,
+      "message": "I think the logic here correctly conforms to the test requirements, and it\u0027s a good catch. However, I\u0027m suspicious that the requirements here are not coherent. I\u0027ll describe in more detail on the bug.",
+      "revId": "2630fa9f1c94e7813c0f674d440dd11cc08c1f4b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
