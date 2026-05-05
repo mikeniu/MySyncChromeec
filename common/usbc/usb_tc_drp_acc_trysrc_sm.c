@@ -3043,16 +3043,19 @@ static void tc_attach_wait_src_run(const int port)
 	if (!IS_ENABLED(CONFIG_USB_PD_EVENT_DRIVEN_CC_STATE))
 		tcpm_get_cc(port, &tc[port].cc1, &tc[port].cc2);
 
-	if (cc_is_snk_dbg_acc(tc[port].cc1, tc[port].cc2) &&
-	    board_is_dts_port(port)) {
-		/*
-		 * Debug accessory.
-		 * A debug accessory in a non-DTS port will be
-		 * recognized by at_least_one_rd as UFP attached.
-		 */
-		new_cc_state = PD_CC_UFP_DEBUG_ACC;
+	/* Check for Debug Accessory FIRST to prevent false UFP detection */
+	if (cc_is_snk_dbg_acc(tc[port].cc1, tc[port].cc2)) {
+		if (board_is_dts_port(port)) {
+			/* Debug accessory on a supported DTS port */
+			new_cc_state = PD_CC_UFP_DEBUG_ACC;
+		} else {
+			if (drp_state[port] == PD_DRP_FORCE_SINK) {
+				set_state_tc(port, TC_UNATTACHED_SNK);
+			}
+			return;
+		}
 	} else if (cc_is_at_least_one_rd(tc[port].cc1, tc[port].cc2)) {
-		/* UFP attached */
+		/* UFP attached (Standard Device) */
 		new_cc_state = PD_CC_UFP_ATTACHED;
 	} else if (cc_is_audio_acc(tc[port].cc1, tc[port].cc2)) {
 		/* AUDIO Accessory not supported. Just ignore */
@@ -3078,14 +3081,14 @@ static void tc_attach_wait_src_run(const int port)
 		return;
 
 	/*
-	 * The port shall transition to Attached.SRC when VBUS is at vSafe0V
-	 * and the SRC.Rd state is detected on exactly one of the CC1 or CC2
-	 * pins for at least tCCDebounce.
+	 * The port shall transition to Attached.SRC when VBUS is at
+	 * vSafe0V and the SRC.Rd state is detected on exactly one of
+	 * the CC1 or CC2 pins for at least tCCDebounce.
 	 *
-	 * If the port supports Debug Accessory Mode, it shall transition to
-	 * UnorientedDebugAccessory.SRC when VBUS is at vSafe0V and the SRC.Rd
-	 * state is detected on both the CC1 and CC2 pins for at least
-	 * tCCDebounce.
+	 * If the port supports Debug Accessory Mode, it shall
+	 * transition to UnorientedDebugAccessory.SRC when VBUS is at
+	 * vSafe0V and the SRC.Rd state is detected on both the CC1 and
+	 * CC2 pins for at least tCCDebounce.
 	 */
 	if (pd_check_vbus_level(port, VBUS_SAFE0V)) {
 		if (new_cc_state == PD_CC_UFP_ATTACHED) {
@@ -3117,9 +3120,9 @@ static void tc_attached_src_entry(const int port)
 	pd_timer_disable(port, TC_TIMER_TIMEOUT);
 
 	/*
-	 * Known state of attach is SRC.  We need to apply this pull value
-	 * to make it set in hardware at the correct time but set the common
-	 * pull here.
+	 * Known state of attach is SRC.  We need to apply this pull
+	 * value to make it set in hardware at the correct time but set
+	 * the common pull here.
 	 *
 	 * Both CC1 and CC2 pins shall be independently terminated to
 	 * pulled up through Rp.
@@ -3143,20 +3146,22 @@ static void tc_attached_src_entry(const int port)
 			typec_update_cc(port);
 
 			/* Attached.SRC - enable AutoDischargeDisconnect
-			 * TODO(b:469587422): Remove the logic to enable Auto
-			 * Discharge Disconnect in tc_pr_swap_complete. That's
-			 * too late for a sink-to-source PRS. */
+			 * TODO(b:469587422): Remove the logic to enable
+			 * Auto Discharge Disconnect in
+			 * tc_pr_swap_complete. That's too late for a
+			 * sink-to-source PRS. */
 			tcpm_enable_auto_discharge_disconnect(port, 1);
 
 			/*
-			 * Maintain VCONN supply state, whether ON or OFF, and
-			 * its data role / usb mux connections.
+			 * Maintain VCONN supply state, whether ON or
+			 * OFF, and its data role / usb mux connections.
 			 */
 		} else {
 			/*
-			 * Set up CC's, Vconn, and ADD before Vbus, as per
-			 * Figure 4-24. DRP Initialization and Connection
-			 * Detection in TCPCI r2 v1.2 specification.
+			 * Set up CC's, Vconn, and ADD before Vbus, as
+			 * per Figure 4-24. DRP Initialization and
+			 * Connection Detection in TCPCI r2 v1.2
+			 * specification.
 			 */
 
 			/* Get connector orientation */
@@ -3164,7 +3169,8 @@ static void tc_attached_src_entry(const int port)
 			tc[port].polarity = get_src_polarity(cc1, cc2);
 			typec_set_polarity(port, tc[port].polarity);
 
-			/* Attached.SRC - enable AutoDischargeDisconnect */
+			/* Attached.SRC - enable AutoDischargeDisconnect
+			 */
 			tcpm_enable_auto_discharge_disconnect(port, 1);
 
 			/* Apply Rp */
@@ -3172,19 +3178,21 @@ static void tc_attached_src_entry(const int port)
 
 			/*
 			 * Initial data role for sink is DFP
-			 * This also sets the usb mux, which will be overridden
-			 * by the following usb_mux_set call: TODO(b/300694918)
+			 * This also sets the usb mux, which will be
+			 * overridden by the following usb_mux_set call:
+			 * TODO(b/300694918)
 			 */
 			tc_set_data_role(port, PD_ROLE_DFP);
 
 			/*
 			 * Attached.SRC requirements from the
-			 * "Universal Serial Bus Type-C Cable and Connector
-			 * Specification" Release 2.2 paragraph 4.5.2.2.9.1:
+			 * "Universal Serial Bus Type-C Cable and
+			 * Connector Specification" Release 2.2
+			 * paragraph 4.5.2.2.9.1:
 			 *
-			 * "If the port supports signaling on USB TX/RX pairs,
-			 * it shall:" with supplying Vconn, "Functionally
-			 * connect the USB TX/RX pairs"
+			 * "If the port supports signaling on USB TX/RX
+			 * pairs, it shall:" with supplying Vconn,
+			 * "Functionally connect the USB TX/RX pairs"
 			 */
 			if (IS_ENABLED(CONFIG_USBC_SS_MUX))
 				usb_mux_set(port, USB_PD_MUX_USB_ENABLED,
@@ -3195,7 +3203,8 @@ static void tc_attached_src_entry(const int port)
 			 * Start sourcing Vconn before Vbus to ensure
 			 * we are within USB Type-C Spec 1.4 tVconnON
 			 *
-			 * UnorientedDebugAccessory.SRC shall not drive Vconn
+			 * UnorientedDebugAccessory.SRC shall not drive
+			 * Vconn
 			 */
 			if (IS_ENABLED(CONFIG_USBC_VCONN) &&
 			    !TC_CHK_FLAG(port, TC_FLAGS_TS_DTS_PARTNER))
@@ -3204,7 +3213,8 @@ static void tc_attached_src_entry(const int port)
 			/* Enable VBUS */
 			if (tc_src_power_on(port)) {
 				/* Stop sourcing Vconn if Vbus failed
-				 * TODO(b/300691956): Take action on failure
+				 * TODO(b/300691956): Take action on
+				 * failure
 				 */
 				if (IS_ENABLED(CONFIG_USBC_VCONN))
 					set_vconn(port, 0);
@@ -3250,9 +3260,9 @@ static void tc_attached_src_entry(const int port)
 		 * "Universal Serial Bus Type-C Cable and Connector
 		 * Specification" Release 2.2 paragraph 4.5.2.2.9.1:
 		 *
-		 * "If the port supports signaling on USB TX/RX pairs, it
-		 * shall:" along with supplying Vconn, "Functionally connect
-		 * the USB TX/RX pairs"
+		 * "If the port supports signaling on USB TX/RX pairs,
+		 * it shall:" along with supplying Vconn, "Functionally
+		 * connect the USB TX/RX pairs"
 		 */
 		if (IS_ENABLED(CONFIG_USBC_SS_MUX))
 			usb_mux_set(port, USB_PD_MUX_USB_ENABLED,
@@ -3291,8 +3301,9 @@ static void tc_attached_src_entry(const int port)
 		typec_set_input_current_limit(port, 0, 0);
 
 	/*
-	 * Only notify if we're not performing a power role swap.  During a
-	 * power role swap, the port partner is not disconnecting/connecting.
+	 * Only notify if we're not performing a power role swap. During
+	 * a power role swap, the port partner is not
+	 * disconnecting/connecting.
 	 */
 	if (!TC_CHK_FLAG(port, TC_FLAGS_PR_SWAP_IN_PROGRESS)) {
 		hook_notify(HOOK_USB_PD_CONNECT);
@@ -3305,12 +3316,12 @@ static void tc_attached_src_entry(const int port)
 
 	/*
 	 * Some TCPCs require time to correctly return CC status after
-	 * changing the ROLE_CONTROL register. Due to that, we have to ignore
-	 * CC_NONE state until PD_T_SRC_DISCONNECT delay has elapsed.
-	 * From the "Universal Serial Bus Type-C Cable and Connector
-	 * Specification" Release 2.0 paragraph 4.5.2.2.9.2:
-	 * The Source shall detect the SRC.Open state within tSRCDisconnect,
-	 * but should detect it as quickly as possible
+	 * changing the ROLE_CONTROL register. Due to that, we have to
+	 * ignore CC_NONE state until PD_T_SRC_DISCONNECT delay has
+	 * elapsed. From the "Universal Serial Bus Type-C Cable and
+	 * Connector Specification" Release 2.0 paragraph 4.5.2.2.9.2:
+	 * The Source shall detect the SRC.Open state within
+	 * tSRCDisconnect, but should detect it as quickly as possible
 	 */
 	pd_timer_enable(port, TC_TIMER_CC_DEBOUNCE, PD_T_SRC_DISCONNECT);
 }
@@ -3330,14 +3341,14 @@ static void tc_attached_src_run(const int port)
 		tc[port].cc_state = PD_CC_UFP_ATTACHED;
 
 	/*
-	 * When the SRC.Open state is detected on the monitored CC pin, a DRP
-	 * shall transition to Unattached.SNK unless it strongly prefers the
-	 * Source role. In that case, it shall transition to TryWait.SNK.
-	 * This transition to TryWait.SNK is needed so that two devices that
-	 * both prefer the Source role do not loop endlessly between Source
-	 * and Sink. In other words, a DRP that would enter Try.SRC from
-	 * AttachWait.SNK shall enter TryWait.SNK for a Sink detach from
-	 * Attached.SRC.
+	 * When the SRC.Open state is detected on the monitored CC pin,
+	 * a DRP shall transition to Unattached.SNK unless it strongly
+	 * prefers the Source role. In that case, it shall transition to
+	 * TryWait.SNK. This transition to TryWait.SNK is needed so that
+	 * two devices that both prefer the Source role do not loop
+	 * endlessly between Source and Sink. In other words, a DRP that
+	 * would enter Try.SRC from AttachWait.SNK shall enter
+	 * TryWait.SNK for a Sink detach from Attached.SRC.
 	 */
 	if (tc[port].cc_state == PD_CC_NONE &&
 	    pd_timer_is_expired(port, TC_TIMER_CC_DEBOUNCE)) {
@@ -3375,7 +3386,8 @@ static void tc_attached_src_run(const int port)
 	 * Handle Hard Reset from Policy Engine
 	 */
 	if (TC_CHK_FLAG(port, TC_FLAGS_HARD_RESET_REQUESTED)) {
-		/* Ignoring Hard Resets while the power supply is resetting.*/
+		/* Ignoring Hard Resets while the power supply is
+		 * resetting.*/
 		if (!pd_timer_is_disabled(port, TC_TIMER_TIMEOUT) &&
 		    !pd_timer_is_expired(port, TC_TIMER_TIMEOUT))
 			return;
@@ -3433,22 +3445,24 @@ static void tc_attached_src_run(const int port)
 		}
 
 		/*
-		 * A DRP that supports Charge-Through VCONN-Powered USB Devices
-		 * shall transition to CTUnattached.SNK if the connected device
-		 * identifies itself as a Charge-Through VCONN-Powered USB
-		 * Device in its Discover Identity Command response.
+		 * A DRP that supports Charge-Through VCONN-Powered USB
+		 * Devices shall transition to CTUnattached.SNK if the
+		 * connected device identifies itself as a
+		 * Charge-Through VCONN-Powered USB Device in its
+		 * Discover Identity Command response.
 		 */
 
 		/*
-		 * A DRP that supports Charge-Through VCONN-Powered USB Devices
-		 * shall transition to CTUnattached.SNK if the connected device
-		 * identifies itself as a Charge-Through VCONN-Powered USB
-		 * Device in its Discover Identity Command response.
+		 * A DRP that supports Charge-Through VCONN-Powered USB
+		 * Devices shall transition to CTUnattached.SNK if the
+		 * connected device identifies itself as a
+		 * Charge-Through VCONN-Powered USB Device in its
+		 * Discover Identity Command response.
 		 *
-		 * If it detects that it is connected to a VCONN-Powered USB
-		 * Device, the port may remove VBUS and discharge it to
-		 * vSafe0V, while continuing to remain in this state with VCONN
-		 * applied.
+		 * If it detects that it is connected to a VCONN-Powered
+		 * USB Device, the port may remove VBUS and discharge it
+		 * to vSafe0V, while continuing to remain in this state
+		 * with VCONN applied.
 		 */
 		if (!TC_CHK_FLAG(port, TC_FLAGS_TS_DTS_PARTNER) &&
 		    TC_CHK_FLAG(port, TC_FLAGS_CTVPD_DETECTED)) {
@@ -3479,7 +3493,8 @@ static void tc_attached_src_exit(const int port)
 	tc_src_power_off(port);
 
 	if (!TC_CHK_FLAG(port, TC_FLAGS_REQUEST_PR_SWAP)) {
-		/* Attached.SRC exit - disable AutoDischargeDisconnect */
+		/* Attached.SRC exit - disable AutoDischargeDisconnect
+		 */
 		tcpm_enable_auto_discharge_disconnect(port, 0);
 
 		/*
@@ -3697,18 +3712,19 @@ static void tc_try_src_run(const int port)
 	}
 
 	/*
-	 * The port shall transition to Attached.SRC when the SRC.Rd state is
-	 * detected on exactly one of the CC1 or CC2 pins for at least
-	 * tTryCCDebounce.
+	 * The port shall transition to Attached.SRC when the SRC.Rd
+	 * state is detected on exactly one of the CC1 or CC2 pins for
+	 * at least tTryCCDebounce.
 	 */
 	if (new_cc_state == PD_CC_UFP_ATTACHED &&
 	    pd_timer_is_expired(port, TC_TIMER_CC_DEBOUNCE))
 		set_state_tc(port, TC_ATTACHED_SRC);
 
 	/*
-	 * The port shall transition to TryWait.SNK after tDRPTry and the
-	 * SRC.Rd state has not been detected and VBUS is within vSafe0V,
-	 * or after tTryTimeout and the SRC.Rd state has not been detected.
+	 * The port shall transition to TryWait.SNK after tDRPTry and
+	 * the SRC.Rd state has not been detected and VBUS is within
+	 * vSafe0V, or after tTryTimeout and the SRC.Rd state has not
+	 * been detected.
 	 */
 	if (new_cc_state == PD_CC_NONE) {
 		if ((pd_timer_is_expired(port, TC_TIMER_TRY_WAIT_DEBOUNCE) &&
@@ -3743,9 +3759,9 @@ static void tc_try_wait_snk_entry(const int port)
 	pd_timer_enable(port, TC_TIMER_TRY_WAIT_DEBOUNCE, PD_T_CC_DEBOUNCE);
 
 	/*
-	 * We were a SNK, tried to be a SRC and it didn't work out. Try to
-	 * go back to being a SNK.  Set the pull to indicate we want to be
-	 * a SNK and looking for a SRC.
+	 * We were a SNK, tried to be a SRC and it didn't work out. Try
+	 * to go back to being a SNK.  Set the pull to indicate we want
+	 * to be a SNK and looking for a SRC.
 	 *
 	 * Both CC1 and CC2 pins shall be independently terminated to
 	 * ground through Rd.
@@ -3778,8 +3794,9 @@ static void tc_try_wait_snk_run(const int port)
 	}
 
 	/*
-	 * The port shall transition to Unattached.SNK when the state of both
-	 * of the CC1 and CC2 pins is SNK.Open for at least tPDDebounce.
+	 * The port shall transition to Unattached.SNK when the state of
+	 * both of the CC1 and CC2 pins is SNK.Open for at least
+	 * tPDDebounce.
 	 */
 	if (new_cc_state == PD_CC_NONE &&
 	    pd_timer_is_expired(port, TC_TIMER_PD_DEBOUNCE)) {
@@ -3788,8 +3805,8 @@ static void tc_try_wait_snk_run(const int port)
 	}
 
 	/*
-	 * The port shall transition to Attached.SNK after tCCDebounce if or
-	 * when VBUS is detected.
+	 * The port shall transition to Attached.SNK after tCCDebounce
+	 * if or when VBUS is detected.
 	 */
 	if (pd_timer_is_expired(port, TC_TIMER_TRY_WAIT_DEBOUNCE) &&
 	    pd_is_vbus_present(port))
@@ -3895,7 +3912,8 @@ __maybe_unused static void tc_ct_unattached_snk_run(int port)
 	}
 
 	/*
-	 * The port shall transition to CTAttached.SNK when VBUS is detected.
+	 * The port shall transition to CTAttached.SNK when VBUS is
+	 * detected.
 	 */
 	if (pd_is_vbus_present(port))
 		set_state_tc(port, TC_CT_ATTACHED_SNK);
@@ -3922,8 +3940,9 @@ __maybe_unused static void tc_ct_attached_snk_entry(int port)
 
 	/*
 	 * Type-C r 2.2: The Host shall not advertise dual-role data or
-	 * dual-role power in its SourceCapability or SinkCapability messages -
-	 * Host changes its advertised capabilities to UFP role/sink only role.
+	 * dual-role power in its SourceCapability or SinkCapability
+	 * messages - Host changes its advertised capabilities to UFP
+	 * role/sink only role.
 	 */
 	tc_set_data_role(port, PD_ROLE_UFP);
 }
@@ -3944,9 +3963,9 @@ __maybe_unused static void tc_ct_attached_snk_run(int port)
 	}
 
 	/*
-	 * A port that is not in the process of a USB PD Hard Reset shall
-	 * transition to CTUnattached.SNK within tSinkDisconnect when VBUS
-	 * falls below vSinkDisconnect
+	 * A port that is not in the process of a USB PD Hard Reset
+	 * shall transition to CTUnattached.SNK within tSinkDisconnect
+	 * when VBUS falls below vSinkDisconnect
 	 */
 	if (pd_check_vbus_level(port, VBUS_REMOVED)) {
 		set_state_tc(port, TC_CT_UNATTACHED_SNK);
@@ -3955,8 +3974,9 @@ __maybe_unused static void tc_ct_attached_snk_run(int port)
 
 	/*
 	 *  The port shall operate in one of the Sink Power Sub-States
-	 *  and remain within the Sink Power Sub-States, until either VBUS is
-	 *  removed or a USB PD contract is established with the source.
+	 *  and remain within the Sink Power Sub-States, until either
+	 * VBUS is removed or a USB PD contract is established with the
+	 * source.
 	 */
 	if (!pe_is_explicit_contract(port))
 		sink_power_sub_states(port);
@@ -4014,23 +4034,24 @@ static void tc_cc_open_entry(const int port)
 	set_vconn(port, 0);
 
 	/*
-	 * Ensure we disable discharging before setting CC lines to open.
-	 * If we were sourcing above, then we already drained Vbus. If partner
-	 * is sourcing Vbus they will drain Vbus if they are PD-capable. This
-	 * should only be done if a battery is present as a batteryless
-	 * device will brown out when AutoDischargeDisconnect is disabled and
-	 * we do not want this to happen until the set_cc open/open to make
-	 * sure the TCPC has managed its internal states for disconnecting
-	 * the only source of power it has.
+	 * Ensure we disable discharging before setting CC lines to
+	 * open. If we were sourcing above, then we already drained
+	 * Vbus. If partner is sourcing Vbus they will drain Vbus if
+	 * they are PD-capable. This should only be done if a battery is
+	 * present as a batteryless device will brown out when
+	 * AutoDischargeDisconnect is disabled and we do not want this
+	 * to happen until the set_cc open/open to make sure the TCPC
+	 * has managed its internal states for disconnecting the only
+	 * source of power it has.
 	 */
 	if (bp == BP_YES)
 		tcpm_enable_auto_discharge_disconnect(port, 0);
 
 	/*
-	 * We may brown out after applying CC open, so flush console first.
-	 * Console flush can take a long time, so if we aren't in danger of
-	 * browning out, don't do it so we can meet certain compliance timing
-	 * requirements.
+	 * We may brown out after applying CC open, so flush console
+	 * first. Console flush can take a long time, so if we aren't in
+	 * danger of browning out, don't do it so we can meet certain
+	 * compliance timing requirements.
 	 */
 	CPRINTS_L2("C%d: Applying CC Open!", port);
 	if (bp != BP_YES)
@@ -4041,8 +4062,8 @@ static void tc_cc_open_entry(const int port)
 	typec_update_cc(port);
 
 	/*
-	 * While we've disconnected the partner, leave any OCP counts in place
-	 * to persist over ErrorRecovery
+	 * While we've disconnected the partner, leave any OCP counts in
+	 * place to persist over ErrorRecovery
 	 */
 	tc_set_partner_role(port, PPC_DEV_DISCONNECTED, OCP_NO_ACTION);
 	tc_detached(port);
@@ -4070,8 +4091,8 @@ void tc_usb_firmware_fw_update_run(int port)
 void tc_run(const int port)
 {
 	/*
-	 * If pd_set_suspend set TC_FLAGS_REQUEST_SUSPEND, go directly to
-	 * TC_DISABLED.
+	 * If pd_set_suspend set TC_FLAGS_REQUEST_SUSPEND, go directly
+	 * to TC_DISABLED.
 	 */
 	if (get_state_tc(port) != TC_DISABLED &&
 	    TC_CHK_FLAG(port, TC_FLAGS_REQUEST_SUSPEND)) {
@@ -4113,7 +4134,8 @@ static void pd_chipset_resume(void)
 						     ADO_POWER_STATE_CHANGE);
 		}
 
-		/* This needs to happen after dual-role state is updated. */
+		/* This needs to happen after dual-role state is
+		 * updated. */
 		if (IS_ENABLED(CONFIG_USB_PE_SM))
 			pd_resume_check_pr_swap_needed(i);
 	}
@@ -4151,12 +4173,14 @@ static void pd_chipset_reset(void)
 	for (i = 0; i < board_get_usb_pd_port_count(); i++) {
 		enum tcpci_msg_type tx;
 
-		/* Do not notify the AP of irrelevant past Hard Resets. */
+		/* Do not notify the AP of irrelevant past Hard Resets.
+		 */
 		pd_clear_events(i, PD_STATUS_EVENT_HARD_RESET);
 
 		/*
-		 * Re-set events for SOP and SOP' discovery complete so the
-		 * kernel knows to consume discovery information for them.
+		 * Re-set events for SOP and SOP' discovery complete so
+		 * the kernel knows to consume discovery information for
+		 * them.
 		 */
 		for (tx = TCPCI_MSG_SOP; tx <= TCPCI_MSG_SOP_PRIME; tx++) {
 			if (pd_get_identity_discovery(i, tx) !=
@@ -4189,8 +4213,8 @@ static void pd_chipset_startup(void)
 		/*
 		 * Request port discovery to restore any
 		 * alt modes.
-		 * TODO(b/158042116): Do not start port discovery if there
-		 * is an existing connection.
+		 * TODO(b/158042116): Do not start port discovery if
+		 * there is an existing connection.
 		 */
 		if (IS_ENABLED(CONFIG_USB_PE_SM))
 			pd_dpm_request(i, DPM_REQUEST_PORT_DISCOVERY);
@@ -4239,9 +4263,9 @@ DECLARE_DEFERRED(pd_set_power_change);
 static void pd_chipset_hard_off(void)
 {
 	/*
-	 * Wait 1 second to check our Vconn sourcing status, as the power rails
-	 * which were supporting it may take some time to change after entering
-	 * G3.
+	 * Wait 1 second to check our Vconn sourcing status, as the
+	 * power rails which were supporting it may take some time to
+	 * change after entering G3.
 	 */
 	hook_call_deferred(&pd_set_power_change_data, 1 * SECOND);
 }
@@ -4263,7 +4287,8 @@ DECLARE_HOOK(HOOK_CHIPSET_HARD_OFF, pd_chipset_hard_off, HOOK_PRIO_DEFAULT);
  * |	TC_ERROR_RECOVERY |
  * |----------------------|
  *
- * TC_ATTACHED_SNK    TC_ATTACHED_SRC    TC_DRP_AUTO_TOGGLE    TC_LOW_POWER_MODE
+ * TC_ATTACHED_SNK    TC_ATTACHED_SRC    TC_DRP_AUTO_TOGGLE
+ * TC_LOW_POWER_MODE
  *
  */
 static __const_data const struct usb_state tc_states[] = {
