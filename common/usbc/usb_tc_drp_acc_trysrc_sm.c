@@ -799,6 +799,12 @@ int pd_comm_is_enabled(int port)
 	return tc_get_pd_enabled(port);
 }
 
+void tc_set_msg_header_data_role(int port, enum pd_data_role data_role)
+{
+	/* Notify TCPC of role update */
+	tcpm_set_msg_header(port, tc[port].power_role, data_role);
+}
+
 void pd_request_data_swap(int port)
 {
 	/*
@@ -1870,8 +1876,11 @@ void tc_set_data_role(int port, enum pd_data_role role)
 	 */
 	bc12_role_change_handler(port, prev_data_role, tc[port].data_role);
 
-	/* Notify TCPC of role update */
-	tcpm_set_msg_header(port, tc[port].power_role, tc[port].data_role);
+	/*
+	 * TCPC message header update is handled earlier from
+	 * PE_DRS_Evaluate_Swap to reduce latency and ensure GoodCRC uses the
+	 * correct data role. Avoid redundant update here.
+	 */
 }
 
 static void sink_stop_drawing_current(int port)

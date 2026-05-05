@@ -78,7 +78,7 @@ test_mockable const char *system_get_chip_revision(void)
 	return "";
 }
 
-test_mockable void board_reset_pd_mcu(void)
+test_mockable void tc_update_msg_header_after_dr_swap_accept(int port)
 {
 }
 

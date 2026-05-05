@@ -155,6 +155,10 @@ void tc_request_power_swap(int port)
 {
 }
 
+void tc_update_msg_header_after_dr_swap_accept(int port)
+{
+}
+
 enum pd_dual_role_states pd_get_dual_role(int port)
 {
 	return PD_DRP_TOGGLE_ON;
