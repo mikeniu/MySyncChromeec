@@ -52,6 +52,24 @@
       "parentUuid": "788ebacd_47000660",
       "revId": "31b09b04b5d600191eed25998f9c524bfc75f23c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "baedc285_54411f19",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1158719
+      },
+      "writtenOn": "2026-05-05T20:28:05Z",
+      "side": 1,
+      "message": "the real bug here IMO is that this codebase is using identifiers that it shouldn\u0027t: https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7805782/comment/a09df32e_fb6542a0/\n\ni agree that if glibc specifically promises it won\u0027t stomp on `__unused` because of its popularity, we should take that patch, but there are N other `__*` here, and i\u0027m not sure glibc guarantees to play nice with all of them?",
+      "parentUuid": "0e3de293_91f290a6",
+      "revId": "31b09b04b5d600191eed25998f9c524bfc75f23c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
