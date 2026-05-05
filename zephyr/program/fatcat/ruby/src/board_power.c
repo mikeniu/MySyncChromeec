@@ -11,23 +11,18 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/atomic.h>
 
-#ifndef CONFIG_AP_PWRSEQ_DRIVER
 #include <ap_power/ap_power.h>
 #include <ap_power/ap_power_events.h>
-#else
-#include "ap_power/ap_pwrseq_sm.h"
-#endif
 #include <ap_power/ap_power_interface.h>
 #include <ap_power/ap_pwrseq.h>
 #include <ap_power_override_functions.h>
 #include <power_signals.h>
+#include <system.h>
 #include <x86_power_signals.h>
 
 LOG_MODULE_DECLARE(ap_pwrseq, LOG_LEVEL_INF);
 
-#ifndef CONFIG_AP_PWRSEQ_DRIVER
 test_export_static bool s0_stable;
-#endif
 
 void board_ap_power_force_shutdown(void)
 {
@@ -35,16 +30,22 @@ void board_ap_power_force_shutdown(void)
 
 	power_signal_set(PWR_EN_PP5000_A, 0);
 
-#ifndef CONFIG_AP_PWRSEQ_DRIVER
 	s0_stable = false;
-#endif
 }
 
-#ifndef CONFIG_AP_PWRSEQ_DRIVER
 void board_ap_power_action_g3_s5(void)
 {
 	LOG_DBG("Turning on PWR_EN_PP5000_A and PWR_EN_PP3300_A");
 	power_signal_set(PWR_EN_PP5000_A, 1);
+
+	/* Indication to soc on recovery boot */
+	if (system_is_manual_recovery()) {
+		gpio_pin_set_dt(
+			GPIO_DT_FROM_NODELABEL(gpio_ec_soc_rec_switch_odl), 1);
+	} else {
+		gpio_pin_set_dt(
+			GPIO_DT_FROM_NODELABEL(gpio_ec_soc_rec_switch_odl), 0);
+	}
 
 	update_ap_boot_time(ARAIL);
 	power_wait_signals_on_timeout(IN_PGOOD_ALL_CORE,
@@ -87,70 +88,6 @@ bool board_ap_power_check_power_rails_enabled(void)
 {
 	return power_signal_get(PWR_EN_PP5000_A);
 }
-#else
-#ifndef CONFIG_EMUL_AP_PWRSEQ_DRIVER
-/* This is called by AP Power Sequence driver only when AP exits S0 or S0IX */
-static void board_ap_power_cb(const struct device *dev,
-			      const enum ap_pwrseq_state entry,
-			      const enum ap_pwrseq_state exit)
-{
-	if (entry == AP_POWER_STATE_S0ix) {
-		/* Avoid enabling signals when entering S0IX */
-		return;
-	}
-}
-
-static int board_ap_power_init(void)
-{
-	const struct device *ap_pwrseq_dev = ap_pwrseq_get_instance();
-	static struct ap_pwrseq_state_callback exit_cb = {
-		.cb = board_ap_power_cb,
-		.states_bit_mask =
-			(BIT(AP_POWER_STATE_S0) | BIT(AP_POWER_STATE_S0ix)),
-	};
-
-	ap_pwrseq_register_state_exit_callback(ap_pwrseq_dev, &exit_cb);
-
-	return 0;
-}
-SYS_INIT(board_ap_power_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
-#endif /* CONFIG_EMUL_AP_PWRSEQ_DRIVER */
-
-static int board_ap_power_g3_entry(void *data)
-{
-	board_ap_power_force_shutdown();
-
-	return 0;
-}
-
-static int board_ap_power_g3_run(void *data)
-{
-	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_STARTUP)) {
-		LOG_INF("Turning on PWR_EN_PP5000_A and PWR_EN_PP3300_A");
-
-		power_signal_set(PWR_EN_PP5000_A, 1);
-
-		power_wait_signals_on_timeout(
-			AP_PWRSEQ_DT_VALUE(wait_signal_timeout));
-	}
-
-	if (power_signal_get(PWR_EN_PP5000_A)) {
-		return 0;
-	}
-
-	return 1;
-}
-
-AP_POWER_APP_STATE_DEFINE(G3, board_ap_power_g3_entry, board_ap_power_g3_run,
-			  NULL);
-
-static int board_ap_power_s0_run(void *data)
-{
-	return 0;
-}
-
-AP_POWER_APP_STATE_DEFINE(S0, NULL, board_ap_power_s0_run, NULL);
-#endif /* CONFIG_AP_PWRSEQ_DRIVER */
 
 int power_signal_external_init(void)
 {
@@ -197,12 +134,7 @@ void board_all_sys_pwrgd_interrupt(const struct device *unused_device,
 				   struct gpio_callback *unused_callback,
 				   gpio_port_pins_t unused_pin)
 {
-#ifndef CONFIG_AP_PWRSEQ_DRIVER
 	ap_pwrseq_wake();
-#else
-	ap_pwrseq_post_event(ap_pwrseq_get_instance(),
-			     AP_PWRSEQ_EVENT_POWER_SIGNAL);
-#endif
 }
 
 static int board_config_pwrgd_interrupt(void)

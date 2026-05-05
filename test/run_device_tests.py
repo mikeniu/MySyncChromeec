@@ -501,14 +501,12 @@ class Renode(Platform):
     def _skip_test_chudow(self, test_config: TestConfig) -> bool:
         if test_config.test_name in [
             "flash_physical",  # TODO(b/485314159)
+            "flash_protection",  # TODO(b/508240888)
+            "flash_protection_rw",  # TODO(b/508240888)
             "otp_key",  # TODO(b/485316342)
             "rollback",  # TODO(b/485315275)
             "flash_write_protect",  # TODO(b/485316223)
-            "panic",  # TODO(b/485316364)
-            "panic_data",  # TODO(b/485315924)
             "rollback_entropy",  # TODO(b/485315625)
-            "tpm_seed_clear",  # TODO(b/485316761)
-            "utils",  # TODO(b/485316718)
             "fpsensor_debug",  # TODO(b/485315321)
             "restricted_console",  # TODO(b/485315829)
             "zephyr_cpp_newlib",  # TODO(b/485316816)
@@ -541,7 +539,8 @@ class Renode(Platform):
             return True
 
         if zephyr and test_config.test_name in [
-            "flash_protection_rw",  # TODO(b/485668014)
+            "flash_protection",  # TODO(b/485668014)
+            "flash_protection_rw",  # TODO(b/485668836)
             "flash_write_protect",  # TODO(b/485668014)
             "fp_transport",  # TODO(b/485668240)
             "malloc",  # TODO(b/485669070)
@@ -571,9 +570,9 @@ class Renode(Platform):
     def _skip_test_sanok(self, test_config: TestConfig) -> bool:
         if test_config.test_name in [
             "flash_physical",  # TODO(b/468410778)
+            "flash_protection",  # TODO(b/487848806)
             "flash_protection_rw",  # TODO(b/487848806)
             "flash_write_protect",  # TODO(b/406944986)
-            "panic_data",  # TODO(b/468407068)
             "rollback",  # TODO(b/468406461)
             "rollback_entropy",  # TODO(b/468406461)
             "system_is_locked",  # TODO(b/483118063)
@@ -583,7 +582,6 @@ class Renode(Platform):
             "fpsensor_debug",  # TODO(b/474439863)
             "otp_key",  # TODO(b/483121090)
             "restricted_console",  # TODO(b/474439863)
-            "utils",  # TODO(b/483126917)
             "zephyr_cpp_newlib",  # TODO(b/484366615)
             "zephyr_cpp_std20",  # TODO(b/484366615)
             "zephyr_drivers_entropy",  # TODO(b/484366615)
@@ -788,8 +786,13 @@ class AllTests:
                 toggle_power=True,
             ),
             TestConfig(
-                test_name="flash_protection_rw",
+                test_name="flash_protection",
                 imagetype_to_use=ImageType.RO,
+                enable_hw_write_protect=True,
+                skip_for_ec_legacy=True,
+            ),
+            TestConfig(
+                test_name="flash_protection_rw",
                 enable_hw_write_protect=True,
                 skip_for_ec_legacy=True,
             ),
@@ -1067,6 +1070,19 @@ class AllTests:
                     test_args=["wp_on"],
                     toggle_power=True,
                     enable_hw_write_protect=True,
+                    ro_image=variant_info.get("ro_image_path"),
+                    build_board=variant_info.get("build_board"),
+                )
+            )
+
+        # Run flash_protection_rw test for all boards and RO versions.
+        for variant_name, variant_info in board_config.variants.items():
+            tests.append(
+                TestConfig(
+                    config_name=f"flash_protection_rw_{variant_name}",
+                    test_name="flash_protection_rw",
+                    enable_hw_write_protect=True,
+                    skip_for_ec_legacy=True,
                     ro_image=variant_info.get("ro_image_path"),
                     build_board=variant_info.get("build_board"),
                 )
