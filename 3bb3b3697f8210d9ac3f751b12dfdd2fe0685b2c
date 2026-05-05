@@ -33,6 +33,23 @@
       "message": "LGTM!",
       "revId": "3bb3b3697f8210d9ac3f751b12dfdd2fe0685b2c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "233f8aaa_d806b87b",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 3
+      },
+      "lineNbr": 1337,
+      "author": {
+        "id": 1160139
+      },
+      "writtenOn": "2026-05-05T00:06:14Z",
+      "side": 1,
+      "message": "Removed as ojal doesn\u0027t have the sensor.",
+      "revId": "3bb3b3697f8210d9ac3f751b12dfdd2fe0685b2c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
