@@ -16,6 +16,24 @@
       "message": "Is there any issue to manage the states with backlight only regardless the lid state ? Assuming lid off will turn backlight off and will be managed in backlight interrupt handler ?",
       "revId": "810280ae39830d424cfd3c4ef2a6327dea68806e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b907fb71_9553753e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 23
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3594165
+      },
+      "writtenOn": "2026-05-05T09:14:36Z",
+      "side": 1,
+      "message": "The Lid switch is an immediate hardware interrupt, but Backlight OFF is a software behavior. This creates a 0.5~1s delay. During this window, the screen is already physically touching the keyboard. If we don\u0027t use the Lid interrupt to kill touch reporting immediately, it could generate a massive amount of ghost touches, which can break the OS suspend flow.",
+      "parentUuid": "7a5a0ef2_ed6d1573",
+      "revId": "810280ae39830d424cfd3c4ef2a6327dea68806e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
