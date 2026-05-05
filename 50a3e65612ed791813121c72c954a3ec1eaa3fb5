@@ -147,6 +147,30 @@
       },
       "revId": "50a3e65612ed791813121c72c954a3ec1eaa3fb5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7ade04a_2cd3af6d",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-05T16:14:19Z",
+      "side": 1,
+      "message": "You can add `src/platform/ec/zephyr/test/fingerprint/drivers/egis660/include/config_chip.h` with something like:\n```\n#define CONFIG_FLASH_WRITE_IDEAL_SIZE 256 /* one page size for write */\n#define CONFIG_FLASH_ERASE_SIZE \\\n\tDT_PROP(DT_INST(0, soc_nv_flash), erase_block_size)\n```\n\nand add `zephyr_include_directories(include)` to `src/platform/ec/zephyr/test/fingerprint/drivers/egis660/CMakeLists.txt`",
+      "parentUuid": "a732a666_5e4278bf",
+      "range": {
+        "startLine": 174,
+        "startChar": 0,
+        "endLine": 180,
+        "endChar": 6
+      },
+      "revId": "50a3e65612ed791813121c72c954a3ec1eaa3fb5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
