@@ -63,6 +63,30 @@
       },
       "revId": "33e9705990f1eadc1aa0d7c1665fac64a008ad8e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "961673d6_89b1bbe6",
+        "filename": "include/common.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1474527
+      },
+      "writtenOn": "2026-05-05T13:14:32Z",
+      "side": 1,
+      "message": "Yes, thanks, I reworded to mention the standards in the code comment. Using new standards like C23 is one of the reasons why we also had to upgrade GCC for glibc 2.43, since these did not exist back in GCC 10. 😊\n\nI also added a note that the Zephyr code still uses __unused which is defined by the zephy toolchain, so I removed those changes which broke Zephyr, making de diff much smaller.",
+      "parentUuid": "bdb9b6aa_74a315c7",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 101,
+        "endChar": 65
+      },
+      "revId": "33e9705990f1eadc1aa0d7c1665fac64a008ad8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
