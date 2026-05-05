@@ -844,6 +844,127 @@ __maybe_unused static int test_wake_tcpc_toggle_change(void)
 	return EC_SUCCESS;
 }
 
+__maybe_unused static int
+test_attach_wait_src_unsupported_debug_acc_no_force(void)
+{
+	/* Force port to Source so it initializes into TC_UNATTACHED_SRC */
+	pd_set_dual_role(PORT0, PD_DRP_FORCE_SOURCE);
+	task_wait_event(SECOND);
+
+	/* Simulate Unsupported Debug Accessory (Sink) by pulling both CC lines
+	 * to Rd */
+	ccprints("[Test] Partner connects as Unsupported Debug Accessory");
+	mock_tcpc.cc1 = TYPEC_CC_VOLT_RD;
+	mock_tcpc.cc2 = TYPEC_CC_VOLT_RD;
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+
+	/* Wait for state machine to process and enter AttachWait.SRC */
+	task_wait_event(SECOND);
+
+	/* Restore standard toggle role to simulate normal conditions */
+	pd_set_dual_role(PORT0, PD_DRP_TOGGLE_ON);
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+	task_wait_event(SECOND);
+
+	/* If we correctly stayed in AttachWait.SRC, CC lines are still Rp */
+	TEST_EQ(mock_tcpc.last.cc, TYPEC_CC_RP, "%d");
+
+	return EC_SUCCESS;
+}
+
+__maybe_unused static int
+test_attach_wait_src_unsupported_debug_acc_force_sink(void)
+{
+	/* Force port to Source so it initializes into TC_UNATTACHED_SRC */
+	pd_set_dual_role(PORT0, PD_DRP_FORCE_SOURCE);
+	task_wait_event(SECOND);
+
+	/* Simulate Unsupported Debug Accessory (Sink) by pulling both CC lines
+	 * to Rd */
+	ccprints("[Test] Partner connects as Unsupported Debug Accessory");
+	mock_tcpc.cc1 = TYPEC_CC_VOLT_RD;
+	mock_tcpc.cc2 = TYPEC_CC_VOLT_RD;
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+
+	/* Wait for state machine to process and enter AttachWait.SRC */
+	task_wait_event(SECOND);
+
+	/* Trigger the force-sink policy override */
+	pd_set_dual_role(PORT0, PD_DRP_FORCE_SINK);
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+	task_wait_event(SECOND);
+
+	/* If policy override worked, we transitioned to Unattached.SNK
+	 * (presenting Rd) */
+	TEST_EQ(mock_tcpc.last.cc, TYPEC_CC_RD, "%d");
+
+	return EC_SUCCESS;
+}
+
+__maybe_unused static int test_attach_wait_src_supported_debug_acc(void)
+{
+	/* Force port to Source so it initializes into TC_UNATTACHED_SRC */
+	pd_set_dual_role(PORT0, PD_DRP_FORCE_SOURCE);
+	task_wait_event(SECOND);
+
+	/* Simulate Supported Debug Accessory (Sink) by pulling both CC lines to
+	 * Rd. */
+	ccprints("[Test] Partner connects as Supported Debug Accessory");
+	mock_tcpc.cc1 = TYPEC_CC_VOLT_RD;
+	mock_tcpc.cc2 = TYPEC_CC_VOLT_RD;
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+
+	/* Wait past tCCDebounce. Because it is a supported DTS port, it should
+	 * set new_cc_state = PD_CC_UFP_DEBUG_ACC and transition to
+	 * Attached.SRC.
+	 */
+	task_wait_event(PD_T_CC_DEBOUNCE + FUDGE);
+
+	/* If we correctly entered Attached.SRC for the debug accessory, VBUS is
+	 * ON */
+	TEST_EQ(mock_get_vbus_enabled(PORT0), true, "%d");
+
+	mock_tcpc.cc1 = TYPEC_CC_VOLT_OPEN;
+	mock_tcpc.cc2 = TYPEC_CC_VOLT_OPEN;
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+	task_wait_event(SECOND);
+
+	return EC_SUCCESS;
+}
+
+__maybe_unused static int test_attach_wait_src_no_ufp_force_sink(void)
+{
+	/* Force port to Source so it initializes into TC_UNATTACHED_SRC */
+	pd_set_dual_role(PORT0, PD_DRP_FORCE_SOURCE);
+	task_wait_event(SECOND);
+
+	/* Attach a normal UFP (single Rd) to enter AttachWait.SRC */
+	ccprints("[Test] Partner connects as Standard UFP");
+	mock_tcpc.cc1 = TYPEC_CC_VOLT_RD;
+	mock_tcpc.cc2 = TYPEC_CC_VOLT_OPEN;
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+
+	/* Wait a short time to process state, but NOT past tCCDebounce */
+	task_wait_event(PD_T_CC_DEBOUNCE / 2);
+
+	/* Disconnect the UFP (No UFP) and simultaneously Force Sink. */
+	ccprints("[Test] UFP disconnects while policy forces Sink");
+	mock_tcpc.cc1 = TYPEC_CC_VOLT_OPEN;
+	mock_tcpc.cc2 = TYPEC_CC_VOLT_OPEN;
+	pd_set_dual_role(PORT0, PD_DRP_FORCE_SINK);
+	task_set_event(TASK_ID_PD_C0, PD_EVENT_CC);
+	task_wait_event(SECOND);
+
+	/* * Because drp_state is PD_DRP_FORCE_SINK, the state machine should
+	 * evaluate the check and transition to TC_UNATTACHED_SNK (presenting
+	 * Rd).
+	 */
+	TEST_EQ(mock_tcpc.last.cc, TYPEC_CC_RD, "%d");
+	TEST_EQ(mock_get_vbus_enabled(PORT0), false, "%d");
+
+	return EC_SUCCESS;
+}
+
 /* Reset the mocks before each test */
 void before_test(void)
 {
@@ -896,6 +1017,11 @@ void run_test(int argc, const char **argv)
 	RUN_TEST(test_auto_toggle_delay_early_connect);
 
 	RUN_TEST(test_wake_tcpc_toggle_change);
+
+	RUN_TEST(test_attach_wait_src_unsupported_debug_acc_no_force);
+	RUN_TEST(test_attach_wait_src_unsupported_debug_acc_force_sink);
+	RUN_TEST(test_attach_wait_src_supported_debug_acc);
+	RUN_TEST(test_attach_wait_src_no_ufp_force_sink);
 
 	/* Do basic state machine validity checks last. */
 	RUN_TEST(test_tc_no_parent_cycles);
