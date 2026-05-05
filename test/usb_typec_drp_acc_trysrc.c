@@ -897,6 +897,9 @@ void run_test(int argc, const char **argv)
 
 	RUN_TEST(test_wake_tcpc_toggle_change);
 
+	RUN_TEST(test_unsupported_debug_accessory_no_force);
+	RUN_TEST(test_unsupported_debug_accessory_force_sink);
+
 	/* Do basic state machine validity checks last. */
 	RUN_TEST(test_tc_no_parent_cycles);
 	RUN_TEST(test_tc_all_states_named);
