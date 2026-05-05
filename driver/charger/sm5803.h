@@ -162,6 +162,10 @@ enum sm5803_gpio0_modes {
  */
 #define SM5803_VBUS_LOW_LEVEL 0x25
 #define SM5803_VBUS_HIGH_LEVEL 0x2C
+#define SM5803_VBUS_SAFE0V_LEVEL 0x22 /* ~0.8V */
+#define SM5803_VBUS_REMOVED_LEVEL 0x9E /* ~3.7V */
+#define SM5803_VBUS_PRESENT_LEVEL 0xCB /* ~4.75V */
+#define SM5803_VBUS_MAX_LEVEL 0xFF
 
 /*
  * TINT thresholds.  TINT steps are in 0.43 K with the upper threshold set to
