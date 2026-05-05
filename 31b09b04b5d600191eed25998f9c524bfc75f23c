@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aadede2d_2991e901",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-05-05T17:13:23Z",
+      "side": 1,
+      "message": "since the linked bug is about uprev-ing glibc to 2.43 and what you\u0027re\nworking around here is a bug in glibc 2.43, why don\u0027t we reject\n2.43 and use a better\npatch level of glibc 2.43 or 2.44 with this issue resolved?\nthis reads like the kind of problem that will show up in many\nother source trees as well.\n\ni\u0027m not sure where the glibc fix is tracked, but here\u0027s one reference\nto this getting fixed upstream:\n\nhttps://sourceware.org/git/?p\u003dglibc.git;a\u003dcommit;h\u003d243bdfec8f7cd4a85a8ce6e4e9a5a5accd3ce1aa",
+      "revId": "31b09b04b5d600191eed25998f9c524bfc75f23c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
