@@ -50,6 +50,24 @@
       "message": "Removed as ojal doesn\u0027t have the sensor.",
       "revId": "3bb3b3697f8210d9ac3f751b12dfdd2fe0685b2c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6217d18_28f743d9",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 3
+      },
+      "lineNbr": 1337,
+      "author": {
+        "id": 1273086
+      },
+      "writtenOn": "2026-05-05T03:49:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "233f8aaa_d806b87b",
+      "revId": "3bb3b3697f8210d9ac3f751b12dfdd2fe0685b2c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
