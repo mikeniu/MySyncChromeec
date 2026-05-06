@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cdc242eb_249c12e5",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 21
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-06T18:18:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce2b5fd5_5cb66a3f",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 2
+      },
+      "revId": "8ddbbb5c47a322af1edd769fc768d0220109f60c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0cc38d12_44cb06c9",
@@ -64,6 +88,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "248d85b6_71fc3315",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 21
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-06T18:18:57Z",
+      "side": 1,
+      "message": "I dropped `abs`, since power is stored in `int64_t`.",
+      "parentUuid": "0cc38d12_44cb06c9",
+      "range": {
+        "startLine": 212,
+        "startChar": 1,
+        "endLine": 215,
+        "endChar": 38
+      },
+      "revId": "8ddbbb5c47a322af1edd769fc768d0220109f60c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ad5ce37d_bdbc7166",
@@ -77,6 +125,30 @@
       "writtenOn": "2026-05-06T14:49:50Z",
       "side": 1,
       "message": "this is the default, just drop the `required: false` ones",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 21
+      },
+      "revId": "8ddbbb5c47a322af1edd769fc768d0220109f60c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ea2cb68_5a317415",
+        "filename": "zephyr/dts/bindings/pwrmon/pwrmon.yaml",
+        "patchSetId": 21
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-06T18:18:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ad5ce37d_bdbc7166",
       "range": {
         "startLine": 38,
         "startChar": 0,
