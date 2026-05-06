@@ -22,6 +22,30 @@
       },
       "revId": "10c72b9b3266e7c370ecc56632264217ddc904c2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dcbe8602_c221e3e6",
+        "filename": "zephyr/program/ocelot/ocelotrvp-rtk/gpio.dtsi",
+        "patchSetId": 9
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-05-06T22:24:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b31eb07f_85d2a445",
+      "range": {
+        "startLine": 16,
+        "startChar": 13,
+        "endLine": 16,
+        "endChar": 18
+      },
+      "revId": "10c72b9b3266e7c370ecc56632264217ddc904c2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
