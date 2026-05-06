@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc54c500_21a61eb2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-06T14:49:50Z",
+      "side": 1,
+      "message": "hey looking good just few more comments",
+      "revId": "8ddbbb5c47a322af1edd769fc768d0220109f60c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce2b5fd5_5cb66a3f",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 21
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-06T14:49:50Z",
+      "side": 1,
+      "message": "sorry only spotted this now: zephyr drivers normally have a `config` struct that is initialized as `const` and a `data` one that lives in RAM, I see most of these fields are not changing, you should split them off in a `config` struct and declare it as `const` so that it frees some sram.",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 2
+      },
+      "revId": "8ddbbb5c47a322af1edd769fc768d0220109f60c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0cc38d12_44cb06c9",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 21
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-06T14:49:50Z",
+      "side": 1,
+      "message": "woudl `*power \u003d llabs(sensor_value_to_micro(\u0026val));` work?",
+      "range": {
+        "startLine": 212,
+        "startChar": 1,
+        "endLine": 215,
+        "endChar": 38
+      },
+      "revId": "8ddbbb5c47a322af1edd769fc768d0220109f60c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad5ce37d_bdbc7166",
+        "filename": "zephyr/dts/bindings/pwrmon/pwrmon.yaml",
+        "patchSetId": 21
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-06T14:49:50Z",
+      "side": 1,
+      "message": "this is the default, just drop the `required: false` ones",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 21
+      },
+      "revId": "8ddbbb5c47a322af1edd769fc768d0220109f60c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
