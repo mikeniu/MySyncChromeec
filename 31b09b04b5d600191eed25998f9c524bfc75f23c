@@ -70,6 +70,24 @@
       "parentUuid": "0e3de293_91f290a6",
       "revId": "31b09b04b5d600191eed25998f9c524bfc75f23c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6ba6886_b3a4b649",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1474527
+      },
+      "writtenOn": "2026-05-06T13:15:23Z",
+      "side": 1,
+      "message": "The upstream glibc patch works and I created issue 510249930 to follow up on cleaning the EC codebases.\n\nThank you everyone, I\u0027m dropping this CL, since it\u0027s not necessary anymore.\n\nFuture discussions can continue in issue 510249930.  😊",
+      "parentUuid": "baedc285_54411f19",
+      "revId": "31b09b04b5d600191eed25998f9c524bfc75f23c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
