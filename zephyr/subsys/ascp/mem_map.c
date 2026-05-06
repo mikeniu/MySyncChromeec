@@ -17,8 +17,8 @@ static const uint8_t s_goog_replace[] = {
 #include "s_goog_replace.inc"
 };
 
-BUILD_ASSERT(sizeof(s_goog_match) == FP_ASCP_SIGNATURE_SIZE,
-	     "s_goog_match size must be 64 bytes");
+BUILD_ASSERT(sizeof(s_goog_match) <= FP_ASCP_SIGNATURE_SIZE,
+	     "s_goog_match size must be less than or equal to 64 bytes");
 BUILD_ASSERT(sizeof(s_goog_replace) == FP_ASCP_SIGNATURE_SIZE,
 	     "s_goog_replace size must be 64 bytes");
 #endif
@@ -68,7 +68,7 @@ int ascp_get_claim(struct ec_response_fp_ascp_claim *res)
 	memcpy(res->s_goog, (uint8_t *)S_GOOG_ADDR, sizeof(res->s_goog));
 
 #ifdef CONFIG_ASCP_REPLACE_S_GOOG
-	if (memcmp(res->s_goog, s_goog_match, sizeof(res->s_goog)) == 0) {
+	if (memcmp(res->s_goog, s_goog_match, sizeof(s_goog_match)) == 0) {
 		memcpy(res->s_goog, s_goog_replace, sizeof(res->s_goog));
 	}
 #endif
