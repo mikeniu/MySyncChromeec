@@ -75,6 +75,7 @@ int get_rvp_id_config(enum rvp_id_type id_type)
 		for (int i = 0; i < BOARD_GPIOS_COUNT; ++i) {
 			int pin = gpio_pin_get_dt(
 				&rvp_config->board_gpios_config[i]);
+			LOG_INF("RVP_ID BOARD[%d]: %d", i, pin);
 			if (pin < 0)
 				return pin;
 			board_id |= pin << i;
@@ -93,6 +94,7 @@ int get_rvp_id_config(enum rvp_id_type id_type)
 		for (int i = 0; i < BOM_GPIOS_COUNT; ++i) {
 			int pin = gpio_pin_get_dt(
 				&rvp_config->bom_gpios_config[i]);
+			LOG_INF("RVP_ID BOM[%d]: %d", i, pin);
 			if (pin < 0)
 				return pin;
 			bom_id |= pin << i;
@@ -110,6 +112,7 @@ int get_rvp_id_config(enum rvp_id_type id_type)
 		for (int i = 0; i < FAB_GPIOS_COUNT; ++i) {
 			int pin = gpio_pin_get_dt(
 				&rvp_config->fab_gpios_config[i]);
+			LOG_INF("RVP_ID FAB[%d]: %d", i, pin);
 			if (pin < 0)
 				return pin;
 			fab_id |= pin << i;
