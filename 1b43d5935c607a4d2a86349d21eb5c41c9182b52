@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21bec0fd_f5fff4a6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 23
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-06T23:04:28Z",
+      "side": 1,
+      "message": "This is no longer a subsystem.  But I think it makes sense to resolve the open topics on the design doc before you try to land any functional code.",
+      "range": {
+        "startLine": 7,
+        "startChar": 39,
+        "endLine": 7,
+        "endChar": 45
+      },
+      "revId": "1b43d5935c607a4d2a86349d21eb5c41c9182b52",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
