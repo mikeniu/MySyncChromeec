@@ -1,0 +1,53 @@
+diff --git a/zephyr/program/fatcat/lapis/lapis_ec_ufsc.dtsi b/zephyr/program/fatcat/lapis/lapis_ec_ufsc.dtsi
+index ff0ad2c9a0..2a18f72432 100644
+--- a/zephyr/program/fatcat/lapis/lapis_ec_ufsc.dtsi
++++ b/zephyr/program/fatcat/lapis/lapis_ec_ufsc.dtsi
+@@ -13,6 +13,19 @@
+ 	};
+ };
+ 
++&ufsc_keyboard_layout {
++	ufsc_kb_unknown: kb-unknown {
++		compatible = "cros-ec,cbi-ufsc-value";
++		status = "okay";
++		value = <0>;
++	};
++	ufsc_kb_canada: kb-canada {
++		compatible = "cros-ec,cbi-ufsc-value";
++		status = "okay";
++		value = <1>;
++	};
++};
++
+ &ufsc_sensor_hub {
+ 	ufsc_ish_absent: ish-absent {
+ 		compatible = "cros-ec,cbi-ufsc-value";
+diff --git a/zephyr/program/fatcat/lapis/src/board.c b/zephyr/program/fatcat/lapis/src/board.c
+index 6a897591cb..8fc1dea4aa 100644
+--- a/zephyr/program/fatcat/lapis/src/board.c
++++ b/zephyr/program/fatcat/lapis/src/board.c
+@@ -9,6 +9,24 @@
+ #include "hooks.h"
+ #include "lid_switch.h"
+ 
++LOG_MODULE_REGISTER(lapis_board, LOG_LEVEL_INF);
++
++static void kb_layout_init(void)
++{
++	if (cros_cbi_ufsc_check_match(CBI_UFSC_VALUE_ID(
++		    DT_NODELABEL(ufsc_kb_canada)))) {
++		/*
++		 * Canadian French keyboard (US layout),
++		 *   \| (key 45):     0x0061->0x61->0x56
++		 *   r-ctrl (key 64): 0xe014->0x14->0x1d
++		 * move key45 (row:7,col:17) to key64 (row:3,col:14)
++		 */
++		set_scancode_set2(3, 14, get_scancode_set2(7, 17));
++		LOG_INF("CBI USFC: FW_KB_LAYOUT_US2");
++	}
++}
++DECLARE_HOOK(HOOK_INIT, kb_layout_init, HOOK_PRIO_POST_FIRST);
++
+ static void set_chg_reg_custom(void)
+ {
+ 	charger_set_frequency(808);
