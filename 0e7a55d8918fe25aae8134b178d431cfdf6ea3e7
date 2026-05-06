@@ -22,6 +22,30 @@
       },
       "revId": "0e7a55d8918fe25aae8134b178d431cfdf6ea3e7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77629992_27a26144",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-05-06T01:40:09Z",
+      "side": 1,
+      "message": "Yes, simply override actual_key_mask is not working because it uses the Zephyr input subsystem keyboard matrix driver.\n\nI found the instructions of atcual_key_mask overriding in he ~/src/third_party/zephyrproject/zephyr/drivers/input/input_kbd_matrix.c\n\n---\u003e\nThe actual key mask can be changed at runtime by enabling\n:kconfig:option:`CONFIG_INPUT_KBD_ACTUAL_KEY_MASK_DYNAMIC` and the using the\n:c:func:`input_kbd_matrix_actual_key_mask_set` API.",
+      "parentUuid": "81a9c89a_4a0e7849",
+      "range": {
+        "startLine": 10,
+        "startChar": 18,
+        "endLine": 11,
+        "endChar": 68
+      },
+      "revId": "0e7a55d8918fe25aae8134b178d431cfdf6ea3e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
