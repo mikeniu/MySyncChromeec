@@ -1,0 +1,136 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "caf1cf39_4cdeb341",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-06T17:12:38Z",
+      "side": 1,
+      "message": "Please restore code from the previous patchset.\n\n```suggestion\n#define flash_ctrl_dev DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller))\n#define cros_flash_dev DEVICE_DT_GET(DT_CHOSEN(cros_ec_flash_controller))\n```",
+      "range": {
+        "startLine": 168,
+        "startChar": 0,
+        "endLine": 182,
+        "endChar": 6
+      },
+      "revId": "5ccab24cece00ffdc093c0351d1245aeec7e5f47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1bafaf5f_e412f7ee",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-06T17:12:38Z",
+      "side": 1,
+      "message": "Please use `cros_flash_physical_erase`",
+      "range": {
+        "startLine": 229,
+        "startChar": 6,
+        "endLine": 229,
+        "endChar": 17
+      },
+      "revId": "5ccab24cece00ffdc093c0351d1245aeec7e5f47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cb40cc7_d98c7c4b",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-06T17:12:38Z",
+      "side": 1,
+      "message": "Please use `cros_flash_physical_write`",
+      "range": {
+        "startLine": 300,
+        "startChar": 6,
+        "endLine": 300,
+        "endChar": 17
+      },
+      "revId": "5ccab24cece00ffdc093c0351d1245aeec7e5f47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31d39537_c25760a2",
+        "filename": "zephyr/test/fingerprint/drivers/egis660/boards/native_sim.overlay",
+        "patchSetId": 28
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-06T17:12:38Z",
+      "side": 1,
+      "message": "Use `cros_flash` here\n\n```suggestion\n\t\tcros-ec,flash-controller \u003d \u0026cros_flash;\n```",
+      "range": {
+        "startLine": 17,
+        "startChar": 30,
+        "endLine": 17,
+        "endChar": 39
+      },
+      "revId": "5ccab24cece00ffdc093c0351d1245aeec7e5f47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99a459de_5cdb39c0",
+        "filename": "zephyr/test/fingerprint/drivers/egis660/boards/native_sim.overlay",
+        "patchSetId": 28
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-06T17:12:38Z",
+      "side": 1,
+      "message": "Add new cros_flash emulator (it uses Zephyr emulator internally, so it\u0027s also necessary, but it\u0027s enabled by default).\n\n```suggestion\n\t};\n\n\tcros_flash: cros-flash {\n\t\tcompatible \u003d \"cros-ec,flash-emul\";\n\t};\n```",
+      "revId": "5ccab24cece00ffdc093c0351d1245aeec7e5f47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf76a912_4ea89f14",
+        "filename": "zephyr/test/fingerprint/drivers/egis660/boards/native_sim.overlay",
+        "patchSetId": 28
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-06T17:12:38Z",
+      "side": 1,
+      "message": "This is not necessary. Please remove.",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 2
+      },
+      "revId": "5ccab24cece00ffdc093c0351d1245aeec7e5f47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
