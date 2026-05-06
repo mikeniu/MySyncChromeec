@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7ff59224_d89a07ae",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 6
+      },
+      "lineNbr": 1329,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-06T20:05:07Z",
+      "side": 1,
+      "message": "Redundant case Statement Pattern:\nThe case \"${model}\" in *) ... esac block currently captures all models unconditionally under the * wildcard. If this platform is expected to have multi-model variants in the future, this structure is fine as a placeholder. However, if all \"ocelot\" devices share identical hardware pinouts, the case statement adds unnecessary nesting and complexity.\n\nRemediation: If there are no model-specific deviations, remove the case structure entirely and define the readonly variables directly in the function body. If multi-model support is expected, explicitly document or add a placeholder comment for expected variants.",
+      "range": {
+        "startLine": 1328,
+        "startChar": 2,
+        "endLine": 1329,
+        "endChar": 6
+      },
+      "revId": "ac4d0c0bb1d7ed28fd33997b881c20c67a363d25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6c96f8f5_68ddeca0",
         "filename": "util/flash_fp_mcu",
         "patchSetId": 6
