@@ -22,6 +22,30 @@
       },
       "revId": "7c5b2979d1c0677b7baf24c1fce1096f6f7da357",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64053f4e_96fbe399",
+        "filename": "zephyr/program/ocelot/ocelotrvp-rtk/power_signals.dtsi",
+        "patchSetId": 10
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-05-06T22:25:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3ba3e9a6_4403852c",
+      "range": {
+        "startLine": 11,
+        "startChar": 11,
+        "endLine": 11,
+        "endChar": 16
+      },
+      "revId": "7c5b2979d1c0677b7baf24c1fce1096f6f7da357",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
