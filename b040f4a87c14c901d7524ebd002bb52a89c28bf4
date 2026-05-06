@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "23bf1fdf_d8bcb685",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 25
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-06T09:13:50Z",
+      "side": 1,
+      "message": "Additionally, please check the repo upload check\n```\n        cros format zephyr/test/fingerprint/drivers/egis660/src/egis660.c zephyr/test/fingerprint/drivers/egis660/src/egis660_pal_test_helpers.c\n```",
+      "revId": "b040f4a87c14c901d7524ebd002bb52a89c28bf4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cd8f71d3_2d6e7214",
         "filename": "zephyr/test/fingerprint/drivers/egis660/src/egis660_pal_test_helpers.c",
         "patchSetId": 25
