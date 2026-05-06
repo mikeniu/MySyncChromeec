@@ -39,6 +39,30 @@
       },
       "revId": "83ef3d9a38773bdab25f096b5d0362d8f971d1b9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77cc8e6c_06f3bf14",
+        "filename": "zephyr/emul/emul_bma5xy.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 4495208
+      },
+      "writtenOn": "2026-05-06T02:34:00Z",
+      "side": 1,
+      "message": "I have run presubmit python script and fix all issues in patchset11.",
+      "parentUuid": "7053109f_632a8f01",
+      "range": {
+        "startLine": 325,
+        "startChar": 11,
+        "endLine": 325,
+        "endChar": 12
+      },
+      "revId": "83ef3d9a38773bdab25f096b5d0362d8f971d1b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
