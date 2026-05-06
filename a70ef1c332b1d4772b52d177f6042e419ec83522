@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "535fefaa_853a422f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-06T11:24:09Z",
+      "side": 1,
+      "message": "I tested Patchset#19 on hardware and works correctly",
+      "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
