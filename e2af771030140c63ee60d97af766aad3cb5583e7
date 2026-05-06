@@ -232,6 +232,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fd2c492b_fc0c5fd7",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-06T11:41:12Z",
+      "side": 1,
+      "message": "I\u0027ve decoupled code from PAC194X,",
+      "parentUuid": "66097c75_ebc8396d",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 61
+      },
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "265f9cd2_e0722cec",
         "filename": "zephyr/subsys/pwrmon/pwrmon.c",
         "patchSetId": 15
