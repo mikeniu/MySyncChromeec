@@ -22,6 +22,52 @@
       },
       "revId": "1b43d5935c607a4d2a86349d21eb5c41c9182b52",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8f731fe_bdbac968",
+        "filename": "zephyr/drivers/pwrmon/Kconfig",
+        "patchSetId": 23
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-06T23:16:21Z",
+      "side": 1,
+      "message": "This is a driver, it should be a plain `config PWRMON`.  Use the `depends on DT_HAS_PWRMON_ENABLED` to enable it automatically.",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 17
+      },
+      "revId": "1b43d5935c607a4d2a86349d21eb5c41c9182b52",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a36f1c2_ffb0b7ba",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 23
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-06T23:16:21Z",
+      "side": 1,
+      "message": "Model this like a normal zephyr driver.  Add  `DT_DRV_COMPAT` and use `DEVICE_DT_INST_DEFINE` instead of the `SYS_INIT` call.",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 62
+      },
+      "revId": "1b43d5935c607a4d2a86349d21eb5c41c9182b52",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
