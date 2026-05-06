@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c82df1c7_c0a0639e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-06T12:57:41Z",
+      "side": 1,
+      "message": "Again:\n```\n    Hook script \"cros format --check --exclude \"*.xml\" --exclude \"extra/usb_updater/*.json\" --exclude \"third_party/*\" --commit ${PRESUBMIT_COMMIT}\" failed with code 1:\n      05:43:21: WARNING: zephyr/test/fingerprint/drivers/egis660/src/egis660_pal_test_helpers.h: needs formatting\n      05:43:25: NOTICE: You can fix formatting errors by running:\n        cros format zephyr/test/fingerprint/drivers/egis660/src/egis660_pal_test_helpers.h\n```",
+      "revId": "c383b1ed70825463683abc62b403b9a64f656b56",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
