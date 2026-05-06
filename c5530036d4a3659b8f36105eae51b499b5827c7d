@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ae199f6_34886a72",
+        "filename": "zephyr/shim/src/led_driver/led.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 524,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-05-06T17:01:59Z",
+      "side": 1,
+      "message": "This Kconfig name does\u0027t not trivially connect to the charge manager. Can this be changed to a name with `CHARGE`? `COMMS` is a way to implement this `CHARGE` manager.",
+      "range": {
+        "startLine": 524,
+        "startChar": 23,
+        "endLine": 524,
+        "endChar": 33
+      },
+      "revId": "c5530036d4a3659b8f36105eae51b499b5827c7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
