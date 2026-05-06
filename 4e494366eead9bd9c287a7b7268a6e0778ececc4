@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fc4ebe0_7f48090b",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-06T11:42:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "49ac43ea_76ada49b",
+      "revId": "4e494366eead9bd9c287a7b7268a6e0778ececc4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f12ad0ed_317962be",
@@ -41,6 +59,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1502b7c6_71f68630",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-06T11:42:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f12ad0ed_317962be",
+      "range": {
+        "startLine": 212,
+        "startChar": 0,
+        "endLine": 214,
+        "endChar": 0
+      },
+      "revId": "4e494366eead9bd9c287a7b7268a6e0778ececc4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2562e450_667d9b55",
@@ -54,6 +96,24 @@
       "writtenOn": "2026-05-06T11:15:53Z",
       "side": 1,
       "message": "nit: drop the blank line",
+      "revId": "4e494366eead9bd9c287a7b7268a6e0778ececc4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e30cbda_e0f1e662",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-06T11:42:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2562e450_667d9b55",
       "revId": "4e494366eead9bd9c287a7b7268a6e0778ececc4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
