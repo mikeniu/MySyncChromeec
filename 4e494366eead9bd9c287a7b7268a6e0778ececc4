@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49ac43ea_76ada49b",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-06T11:15:53Z",
+      "side": 1,
+      "message": "should use `/*`, are you skipping presubmit? odd that it went through",
+      "revId": "4e494366eead9bd9c287a7b7268a6e0778ececc4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f12ad0ed_317962be",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-06T11:15:53Z",
+      "side": 1,
+      "message": "use `sensor_value_to_micro`",
+      "range": {
+        "startLine": 212,
+        "startChar": 0,
+        "endLine": 214,
+        "endChar": 0
+      },
+      "revId": "4e494366eead9bd9c287a7b7268a6e0778ececc4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2562e450_667d9b55",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-06T11:15:53Z",
+      "side": 1,
+      "message": "nit: drop the blank line",
+      "revId": "4e494366eead9bd9c287a7b7268a6e0778ececc4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
