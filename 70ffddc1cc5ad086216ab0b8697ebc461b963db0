@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5831fd83_8948b19e",
+        "filename": "common/update_fw.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-06T10:06:06Z",
+      "side": 1,
+      "message": "It\u0027s almost copy-paste of the same code. Maybe move to separate function?",
+      "range": {
+        "startLine": 98,
+        "startChar": 0,
+        "endLine": 108,
+        "endChar": 6
+      },
+      "revId": "70ffddc1cc5ad086216ab0b8697ebc461b963db0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
