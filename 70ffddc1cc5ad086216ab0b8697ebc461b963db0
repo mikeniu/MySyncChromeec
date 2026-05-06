@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a85e5878_866e7547",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-06T21:06:00Z",
+      "side": 1,
+      "message": "LGTM with Dawid\u0027s comment addressed.",
+      "revId": "70ffddc1cc5ad086216ab0b8697ebc461b963db0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5831fd83_8948b19e",
