@@ -28,7 +28,10 @@
 
 #define WRITE_TO_FLASH_COMPLETE (1ul << 0)
 #define WRITE_TO_FLASH_VERIFIED (1ul << 1)
-#define WRITE_TO_FLASH_WRITE_ERROR (1ul << 7)
+#define FLASH_READ_COMPLETE (1ul << 2)
+#define WRITE_TO_FLASH_ERASE_ERROR (0x10)
+#define WRITE_TO_FLASH_WRITE_ERROR (0x20)
+#define WRITE_TO_FLASH_NOT_ERASED_ERROR (0x30)
 
 /**********************
  *      TYPEDEFS
@@ -59,7 +62,9 @@ struct monitor_header_tag {
  *  STATIC PROTOTYPES
  **********************/
 
-static void eflash_erase(int offset, int size);
+static int32_t write_to_flash(uint32_t *flag_upload, int spi_offset,
+			      uint32_t sz_image, const char *image_base);
+static int32_t eflash_erase(int offset, int size);
 static int32_t eflash_write(int offset, int size, const char *data);
 static int eflash_verify(int offset, int size, const char *data);
 static void eflash_read(int offset, int size, const char *data);
@@ -168,25 +173,12 @@ int spic_flash_upload(void)
 	uint32_t *temp_to_load;
 	temp_to_load = (uint32_t *)RTS_CMD_SEL_ADDR;
 	if (*temp_to_load == 0xA5A5A5A5) {
-		*flag_upload |= 0x04;
+		*flag_upload |= FLASH_READ_COMPLETE;
 		eflash_read(spi_offset, sz_image, image_base);
 
 	} else {
-		/* Start to erase */
-		eflash_erase(spi_offset, sz_image);
-		/* Start to write */
-		if (image_base != NULL) {
-			ret = eflash_write(spi_offset, sz_image, image_base);
-			if (ret != 0) {
-				*flag_upload |= WRITE_TO_FLASH_WRITE_ERROR;
-			}
-
-			/* Verify data */
-			if (eflash_verify(spi_offset, sz_image, image_base) ==
-			    0) {
-				*flag_upload |= WRITE_TO_FLASH_VERIFIED;
-			}
-		}
+		ret = write_to_flash(flag_upload, spi_offset, sz_image,
+				     image_base);
 	}
 	/* Mark we have finished upload work */
 	*flag_upload |= WRITE_TO_FLASH_COMPLETE;
@@ -219,13 +211,54 @@ int spic_flash_upload(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-static void eflash_erase(int offset, int size)
+static int32_t write_to_flash(uint32_t *flag_upload, int spi_offset,
+			      uint32_t sz_image, const char *image_base)
 {
+	int32_t ret = 0;
+	/* Start to erase */
+	ret = eflash_erase(spi_offset, sz_image);
+	if (ret != 0) {
+		*flag_upload |= WRITE_TO_FLASH_ERASE_ERROR;
+		return ret;
+	}
+
+	/* Verify flash is erased */
+	if (eflash_verify(spi_offset, sz_image, NULL) != 0) {
+		*flag_upload |= WRITE_TO_FLASH_NOT_ERASED_ERROR;
+		return ret;
+	}
+
+	/* Start to write */
+	if (image_base != NULL) {
+		ret = eflash_write(spi_offset, sz_image, image_base);
+		if (ret != 0) {
+			*flag_upload |= WRITE_TO_FLASH_WRITE_ERROR;
+			return ret;
+		}
+
+		/* Verify data */
+		if (eflash_verify(spi_offset, sz_image, image_base) == 0) {
+			*flag_upload |= WRITE_TO_FLASH_VERIFIED;
+			return ret;
+		}
+	}
+
+	return ret;
+}
+
+static int32_t eflash_erase(int offset, int size)
+{
+	int32_t ret = 0;
 	/* Alignment has been checked in upper layer */
 	for (; size > 0; size -= FLASH_SECTOR_EARSE_SIZE,
 			 offset += FLASH_SECTOR_EARSE_SIZE) {
-		flash_erase_sector(offset, FLASH_ADDRESSING_3BYTE);
+		ret = flash_erase_sector(offset, FLASH_ADDRESSING_3BYTE);
+		if (ret != 0) {
+			return ret;
+		}
 	}
+
+	return ret;
 }
 
 static int32_t eflash_write(int offset, int size, const char *data)
@@ -312,13 +345,19 @@ static int eflash_verify(int offset, int size, const char *data)
 		flash_read(0x03, dest_addr, rd_buf, sz_page,
 			   FLASH_ADDRESSING_3BYTE);
 		for (i = 0; i < sz_page; i++) {
-			tmp = *(data + i);
+			if (data != NULL) {
+				tmp = *(data + i);
+			} else {
+				tmp = 0xff;
+			}
 			if (rd_buf[i] != tmp) {
 				return -1;
 			}
 		}
 
-		data += sz_page;
+		if (data != NULL) {
+			data += sz_page;
+		}
 		dest_addr += sz_page;
 	}
 
@@ -327,7 +366,11 @@ static int eflash_verify(int offset, int size, const char *data)
 		flash_read(0x03, dest_addr, rd_buf, size,
 			   FLASH_ADDRESSING_3BYTE);
 		for (i = 0; i < size; i++) {
-			tmp = *(data + i);
+			if (data != NULL) {
+				tmp = *(data + i);
+			} else {
+				tmp = 0xff;
+			}
 			if (rd_buf[i] != tmp) {
 				return -1;
 			}
