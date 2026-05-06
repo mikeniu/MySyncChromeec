@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8e3a7ef_43fbabe4",
+        "filename": "util/elan/filecontrol.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-06T09:25:30Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 13.",
+      "parentUuid": "fcca371c_38d836ee",
+      "revId": "656b174d3c9ed84c1437f3e1b4fd98c8b82106ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dfe11e94_d5bde081",
@@ -82,6 +100,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a93845e_4a22ce52",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-06T09:25:30Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 13.",
+      "parentUuid": "4b96e943_ff08f3d5",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 33
+      },
+      "revId": "656b174d3c9ed84c1437f3e1b4fd98c8b82106ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae59bdc9_ebf780c9",
@@ -99,6 +141,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "db70d467_015e0a20",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-06T09:25:30Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 13.",
+      "parentUuid": "ae59bdc9_ebf780c9",
+      "revId": "656b174d3c9ed84c1437f3e1b4fd98c8b82106ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c0663c47_42d03bd2",
@@ -112,6 +172,24 @@
       "writtenOn": "2026-05-05T17:18:45Z",
       "side": 1,
       "message": "[Gerrit AI Review] **Resource Leak: Multiple `libusb_init` calls**\n`libusb_init(nullptr)` is called unconditionally here. If `initialize()` is called multiple times by the caller, it will increment the libusb reference count multiple times. However, `libusb_exit(nullptr)` is only called once in the destructor. This will lead to a resource leak.\n*Remediation:* Track whether libusb has already been initialized, or move `libusb_init` to the constructor.",
+      "revId": "656b174d3c9ed84c1437f3e1b4fd98c8b82106ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "682ae5ae_27412ca5",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-06T09:25:30Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 13.",
+      "parentUuid": "c0663c47_42d03bd2",
       "revId": "656b174d3c9ed84c1437f3e1b4fd98c8b82106ea",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -139,6 +217,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bd7615c_de0af883",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-06T09:25:30Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 13.",
+      "parentUuid": "9cd943ee_b97a2b60",
+      "range": {
+        "startLine": 224,
+        "startChar": 0,
+        "endLine": 224,
+        "endChar": 42
+      },
+      "revId": "656b174d3c9ed84c1437f3e1b4fd98c8b82106ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce265e5d_73f93546",
@@ -152,6 +254,24 @@
       "writtenOn": "2026-05-05T17:18:45Z",
       "side": 1,
       "message": "[Gerrit AI Review] **Bug: Accumulation of interfaces in `m_hidInterfaces`**\nIf `initialize()` (and consequently `openDevice()`) is called more than once, `m_hidInterfaces.push_back(...)` will append to the existing elements, causing the size to grow beyond `COUNT_INTERFACE` and fail the validation check (`m_hidInterfaces.size() !\u003d COUNT_INTERFACE`).\n*Remediation:* Add `m_hidInterfaces.clear()` at the beginning of `openDevice()`, or inside `releaseResource()`.",
+      "revId": "656b174d3c9ed84c1437f3e1b4fd98c8b82106ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fecca2a2_be9fb755",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 667,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-06T09:25:30Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 13.",
+      "parentUuid": "ce265e5d_73f93546",
       "revId": "656b174d3c9ed84c1437f3e1b4fd98c8b82106ea",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -173,6 +293,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6452f728_91686c8b",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 928,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-06T09:25:30Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 13.",
+      "parentUuid": "ad37ec68_2f0ce881",
+      "revId": "656b174d3c9ed84c1437f3e1b4fd98c8b82106ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fb7ebd75_b42a0142",
@@ -186,6 +324,24 @@
       "writtenOn": "2026-05-05T17:18:45Z",
       "side": 1,
       "message": "[Gerrit AI Review] **Style:** Missing trailing underscore on include guard. Please use `#ifndef UTIL_ELAN_IAPCONTROL_H_`.",
+      "revId": "656b174d3c9ed84c1437f3e1b4fd98c8b82106ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f1cbbb6_1f33d44d",
+        "filename": "util/elan/iapcontrol.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-06T09:25:30Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 13.",
+      "parentUuid": "fb7ebd75_b42a0142",
       "revId": "656b174d3c9ed84c1437f3e1b4fd98c8b82106ea",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -207,6 +363,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f28db163_60504a45",
+        "filename": "util/elan/iaptool.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-06T09:25:30Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 13.",
+      "parentUuid": "dffdcca8_1f00f2ee",
+      "revId": "656b174d3c9ed84c1437f3e1b4fd98c8b82106ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "afb722d6_56446b43",
@@ -220,6 +394,24 @@
       "writtenOn": "2026-05-05T17:18:45Z",
       "side": 1,
       "message": "[Gerrit AI Review] **Style:** Missing trailing underscore on include guard. Please use `#ifndef UTIL_ELAN_UTILITY_H_`.",
+      "revId": "656b174d3c9ed84c1437f3e1b4fd98c8b82106ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c291ccfa_3855ce08",
+        "filename": "util/elan/utility.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-06T09:25:30Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 13.",
+      "parentUuid": "afb722d6_56446b43",
       "revId": "656b174d3c9ed84c1437f3e1b4fd98c8b82106ea",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
