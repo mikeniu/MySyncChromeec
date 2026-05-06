@@ -22,6 +22,30 @@
       },
       "revId": "537e37b92db66cedc1993c7ca16a55be72f90db6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49d12f48_a7c47f0c",
+        "filename": "zephyr/program/ocelot/ocelotrvp-rtk/project.overlay",
+        "patchSetId": 10
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-05-06T23:40:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cb2f2657_db4ca52d",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 44
+      },
+      "revId": "537e37b92db66cedc1993c7ca16a55be72f90db6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
