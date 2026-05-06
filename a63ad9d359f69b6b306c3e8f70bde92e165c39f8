@@ -39,6 +39,30 @@
       },
       "revId": "a63ad9d359f69b6b306c3e8f70bde92e165c39f8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "158ebe75_0b587083",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 5
+      },
+      "lineNbr": 1365,
+      "author": {
+        "id": 1273086
+      },
+      "writtenOn": "2026-05-06T19:59:51Z",
+      "side": 1,
+      "message": "It seems that Tom\u0027s new API does not apply to android.\n\nModified to match Fatcat style as Pranava suggested.",
+      "parentUuid": "186992ea_d6d2be30",
+      "range": {
+        "startLine": 1360,
+        "startChar": 0,
+        "endLine": 1365,
+        "endChar": 32
+      },
+      "revId": "a63ad9d359f69b6b306c3e8f70bde92e165c39f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
