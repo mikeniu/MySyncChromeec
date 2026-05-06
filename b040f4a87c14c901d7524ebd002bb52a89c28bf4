@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd8f71d3_2d6e7214",
+        "filename": "zephyr/test/fingerprint/drivers/egis660/src/egis660_pal_test_helpers.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-06T08:19:59Z",
+      "side": 1,
+      "message": "```suggestion\n\treturn egis_apns_data_erase(abs_offset, size);\n```",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 54
+      },
+      "revId": "b040f4a87c14c901d7524ebd002bb52a89c28bf4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af9a4225_531a266d",
+        "filename": "zephyr/test/fingerprint/drivers/egis660/src/egis660_pal_test_helpers.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-06T08:19:59Z",
+      "side": 1,
+      "message": "```suggestion\n\treturn egis_apns_data_read(abs_offset, data, size);\n```",
+      "range": {
+        "startLine": 74,
+        "startChar": 0,
+        "endLine": 81,
+        "endChar": 59
+      },
+      "revId": "b040f4a87c14c901d7524ebd002bb52a89c28bf4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64c9ff0e_3cddec90",
+        "filename": "zephyr/test/fingerprint/drivers/egis660/src/egis660_pal_test_helpers.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-06T08:19:59Z",
+      "side": 1,
+      "message": "```suggestion\n\treturn egis_apns_data_write(abs_offset, data, size)\n```",
+      "range": {
+        "startLine": 87,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 60
+      },
+      "revId": "b040f4a87c14c901d7524ebd002bb52a89c28bf4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
