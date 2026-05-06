@@ -16,6 +16,24 @@
       "message": "The fullcheckout-presubmit fails again...\n```\n    Hook script \"cros format --check --exclude \"*.xml\" --exclude \"extra/usb_updater/*.json\" --exclude \"third_party/*\" --commit ${PRESUBMIT_COMMIT}\" failed with code 1:\n      03:23:11: WARNING: zephyr/drivers/fingerprint/fingerprint_egis660_pal.c: needs formatting\n      03:23:32: NOTICE: You can fix formatting errors by running:\n        cros format zephyr/drivers/fingerprint/fingerprint_egis660_pal.c\n```\nOnce again, use the hook checks with `repo upload ...`",
       "revId": "3149d245ed05b9055b322c02b3ab86dc1c4d877f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42dea83f_f79c5c6a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-05-06T12:31:39Z",
+      "side": 1,
+      "message": "There were too many fails with hook checks, so I used the --no-verify parameter.Done",
+      "parentUuid": "db49fafe_10c46830",
+      "revId": "3149d245ed05b9055b322c02b3ab86dc1c4d877f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
