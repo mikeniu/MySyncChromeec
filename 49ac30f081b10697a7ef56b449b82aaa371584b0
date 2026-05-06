@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c26d011_7b3d6af6",
+        "filename": "driver/battery/smart.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-05-06T16:46:53Z",
+      "side": 1,
+      "message": "Though this works, I am not sure if there is other better way to do so. For example, wrap this as a high-level function which is intended to be overridden. If this is over-engineered, add a config to enable this override.",
+      "range": {
+        "startLine": 307,
+        "startChar": 0,
+        "endLine": 307,
+        "endChar": 13
+      },
+      "revId": "49ac30f081b10697a7ef56b449b82aaa371584b0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
