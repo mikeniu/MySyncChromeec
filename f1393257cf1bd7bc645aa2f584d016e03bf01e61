@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "737affea_59d8a043",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-05-06T18:46:09Z",
+      "side": 1,
+      "message": "Squash this change into https://crrev.com/c/7132616/",
+      "revId": "f1393257cf1bd7bc645aa2f584d016e03bf01e61",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
