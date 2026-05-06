@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd89964a_20a18dbe",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 6
+      },
+      "lineNbr": 1329,
+      "author": {
+        "id": 1273086
+      },
+      "writtenOn": "2026-05-06T21:04:53Z",
+      "side": 1,
+      "message": "We did see some differences in Matsu.  I can double check.   It was my intent to have the other board variants in place as well, but we need to get the fatcat rvp stuff sorted out first.",
+      "parentUuid": "61e25d9a_02578a7c",
+      "range": {
+        "startLine": 1328,
+        "startChar": 2,
+        "endLine": 1329,
+        "endChar": 6
+      },
+      "revId": "ac4d0c0bb1d7ed28fd33997b881c20c67a363d25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6c96f8f5_68ddeca0",
@@ -61,6 +85,30 @@
       "writtenOn": "2026-05-06T20:04:24Z",
       "side": 1,
       "message": "Remediation: Clarify what these magic numbers mean. For instance, if they represent a base offset plus a pin index relative to an Intel/AMD GPIO controller community pad, explicitly label them as such: # Base 24 + Pin 15 \u003d 39.",
+      "range": {
+        "startLine": 1330,
+        "startChar": 0,
+        "endLine": 1330,
+        "endChar": 68
+      },
+      "revId": "ac4d0c0bb1d7ed28fd33997b881c20c67a363d25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c191e8f_33b99656",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 6
+      },
+      "lineNbr": 1330,
+      "author": {
+        "id": 1273086
+      },
+      "writtenOn": "2026-05-06T21:04:53Z",
+      "side": 1,
+      "message": "OK.  I like that better.  It is still a bit of black magic to understand where \"base 24\" came from....",
+      "parentUuid": "6c96f8f5_68ddeca0",
       "range": {
         "startLine": 1330,
         "startChar": 0,
