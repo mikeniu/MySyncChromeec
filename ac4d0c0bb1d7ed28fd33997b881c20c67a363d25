@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "61e25d9a_02578a7c",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 6
+      },
+      "lineNbr": 1329,
+      "author": {
+        "id": 1369019
+      },
+      "writtenOn": "2026-05-06T20:24:00Z",
+      "side": 1,
+      "message": "We\u0027ll strongly encourage partners to follow the same signal mapping for GPIO assignment, but we may not be able to guarantee this.",
+      "parentUuid": "7ff59224_d89a07ae",
+      "range": {
+        "startLine": 1328,
+        "startChar": 2,
+        "endLine": 1329,
+        "endChar": 6
+      },
+      "revId": "ac4d0c0bb1d7ed28fd33997b881c20c67a363d25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6c96f8f5_68ddeca0",
         "filename": "util/flash_fp_mcu",
         "patchSetId": 6
