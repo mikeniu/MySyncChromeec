@@ -22,6 +22,30 @@
       },
       "revId": "9e55cac2026c09246e179e9876dfcb3f31c24a68",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c2c7d42_a12850e1",
+        "filename": "zephyr/program/ocelot/ocelotrvp-rtk/i2c.dtsi",
+        "patchSetId": 10
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-05-06T23:45:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "879656f9_31ebf265",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 41
+      },
+      "revId": "9e55cac2026c09246e179e9876dfcb3f31c24a68",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
