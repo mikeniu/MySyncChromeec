@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "a63ad9d359f69b6b306c3e8f70bde92e165c39f8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "186992ea_d6d2be30",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 5
+      },
+      "lineNbr": 1365,
+      "author": {
+        "id": 3436255
+      },
+      "writtenOn": "2026-05-06T19:18:29Z",
+      "side": 1,
+      "message": "I see that @tomhughes@chromium.org has updated this file to use new GPIO API and the gpio-ranges calculation is no longer relevant. \n\nI believe what we need here is the Pad number offset wrt first pad number in GPIO community. This matches fatcat configuration. By this logic,\n\nGPP_C15 \u003d 39\nGPP_E20 \u003d 46\nGPP_E05 \u003d 31\n\nI also see that GPIO_CHIP seems to correlate with GPIO communities on x86, I am not sure if gpiochip0 works for all GPIOs. @tomhughes@chromium.org @subratabanik@chromium.org any thoughts on this?",
+      "range": {
+        "startLine": 1360,
+        "startChar": 0,
+        "endLine": 1365,
+        "endChar": 32
+      },
+      "revId": "a63ad9d359f69b6b306c3e8f70bde92e165c39f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
