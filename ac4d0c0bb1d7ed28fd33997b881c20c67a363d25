@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c96f8f5_68ddeca0",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 6
+      },
+      "lineNbr": 1330,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-06T20:04:24Z",
+      "side": 1,
+      "message": "Remediation: Clarify what these magic numbers mean. For instance, if they represent a base offset plus a pin index relative to an Intel/AMD GPIO controller community pad, explicitly label them as such: # Base 24 + Pin 15 \u003d 39.",
+      "range": {
+        "startLine": 1330,
+        "startChar": 0,
+        "endLine": 1330,
+        "endChar": 68
+      },
+      "revId": "ac4d0c0bb1d7ed28fd33997b881c20c67a363d25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
