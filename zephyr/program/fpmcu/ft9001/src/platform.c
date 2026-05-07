@@ -6,7 +6,7 @@
 #include "system.h"
 
 /* TODO(b/434894113): Change based on the final solution of WP state. */
-int write_protect_is_asserted_custom(void)
+int write_protect_is_asserted_external(void)
 {
 	return 0;
 }
