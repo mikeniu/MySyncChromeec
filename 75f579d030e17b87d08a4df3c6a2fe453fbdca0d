@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0d06bca_c4976f99",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-07T11:53:24Z",
+      "side": 1,
+      "message": "Since the implementation is common for multiple boards, it\u0027s no longer custom. I would call it `software`. I would also rename `wp_custom` directory to `wp`.\n\nIn future we could migrate other WP policies (\"always\", \"gpio\") under that directory.",
+      "revId": "75f579d030e17b87d08a4df3c6a2fe453fbdca0d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ab9ca3a_79b2ad64",
+        "filename": "zephyr/drivers/wp_custom/wp_custom.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-07T11:53:24Z",
+      "side": 1,
+      "message": "Add `static` to avoid changing it accidentally somewhere. I would also change name to `unlocked` and explicitly initialize it to `false`.\n\n```suggestion\nstatic bool unlocked \u003d false;\n```",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 18
+      },
+      "revId": "75f579d030e17b87d08a4df3c6a2fe453fbdca0d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
