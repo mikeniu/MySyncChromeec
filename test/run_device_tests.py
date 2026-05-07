@@ -149,6 +149,7 @@ CHUDOW = "chudow"
 DARTMONKEY = "dartmonkey"
 HELIPILOT = "helipilot"
 SANOK = "sanok"
+REALTEKFP = "realtekfp"
 
 JTRACE = "jtrace"
 SERVO_MICRO = "servo_micro"
@@ -193,6 +194,47 @@ INVALID_POWER_UTILIZATION = PowerUtilization(
     idle=RangedValue(0, 0), sleep=RangedValue(0, 0)
 )
 
+def run_realtekfp(jlink_exe, remote, device, interface, speed):
+    """Run realtek fp after power on"""
+    cmd = [
+        jlink_exe,
+    ]
+
+    if remote:
+        cmd.extend(["-ip", remote])
+
+    with tempfile.NamedTemporaryFile() as tmp:
+        tmp.write(
+            """
+            exitonerror 1
+            r
+            go
+            exit
+            """.encode("utf-8")
+        )
+        tmp.flush()
+        tmp.seek(0)
+        logging.debug('JLink command file: "%s"', tmp.read())
+        cmd.extend(
+            [
+                "-device",
+                device,
+                "-if",
+                interface,
+                "-speed",
+                speed,
+                "-autoconnect",
+                "1",
+                "-NoGui",
+                "1",
+                "-CommandFile",
+                tmp.name,
+            ]
+        )
+        logging.debug('Running command: "%s"', " ".join(cmd))
+        completed_process = subprocess.run(cmd, check=False)
+        logging.debug("JLink return code: %d", completed_process.returncode)
+        return completed_process.returncode
 
 class ImageType(Enum):
     """EC Image type to use for the test."""
@@ -1000,6 +1042,7 @@ class AllTests:
                     CHUDOW,
                     DARTMONKEY,
                     SANOK,
+                    REALTEKFP,
                 ],
             ),
             TestConfig(
@@ -1036,6 +1079,7 @@ class AllTests:
                     CHUDOW,
                     DARTMONKEY,
                     SANOK,
+                    REALTEKFP,
                 ],
             ),
             # Covered by Zephyr drivers.counter.basic_api.stm32_subsec test
@@ -1047,6 +1091,7 @@ class AllTests:
                     HELIPILOT,
                     BUCCANEER,
                     SANOK,
+                    REALTEKFP,
                 ],
                 skip_for_zephyr=True,
             ),
@@ -1440,6 +1485,31 @@ CHUDOW_CONFIG = BoardConfig(
     host_interfaces={HostInterface.USB},
 )
 
+REALTEKFP_CONFIG = BoardConfig(
+    name=REALTEKFP,
+    sensor_type=FPSensorType.UNKNOWN,
+    architecture=Architecture.ARM,
+    servo_uart_name="raw_fpmcu_console_uart_pty",
+    servo_power_enable="fpmcu_pp3300",
+    reboot_timeout=8.0,
+    # TODO(b/532643220): configure rollback regex.
+    rollback_region0_regex=NEVER_MATCH_REGEX,
+    rollback_region1_regex=NEVER_MATCH_REGEX,
+    # TODO(b/363277530): create Zephyr MPU tests.
+    mpu_regex=NEVER_MATCH_REGEX,
+    fp_power_supply="pp3300_fp_mw",
+    mcu_power_supply="pp3300_mcu_mw",
+    # TODO(b/515573910): configure power utilization.
+    expected_fp_power=INVALID_POWER_UTILIZATION,
+    expected_mcu_power=INVALID_POWER_UTILIZATION,
+    expected_fp_power_zephyr=INVALID_POWER_UTILIZATION,
+    expected_mcu_power_zephyr=INVALID_POWER_UTILIZATION,
+    # TODO(b/468407068): configure variants.
+    variants={},
+    zephyr_board_name="rts5817_maa_evb",
+    host_interfaces={HostInterface.USB},
+)
+
 BOARD_CONFIGS = {
     "bloonchipper": BLOONCHIPPER_CONFIG,
     "buccaneer": BUCCANEER_CONFIG,
@@ -1447,6 +1517,7 @@ BOARD_CONFIGS = {
     "dartmonkey": DARTMONKEY_CONFIG,
     "helipilot": HELIPILOT_CONFIG,
     "sanok": SANOK_CONFIG,
+    "realtekfp": REALTEKFP_CONFIG,
 }
 
 
@@ -2039,6 +2110,10 @@ def flash_and_run_test(
         # Get the console file before flashing to listen ASAP after flashing.
         console_pty = platform.get_console(board_config)
 
+        # Toggle power before flashing for RTS5817
+        if board_config.name == "realtekfp":
+            power_cycle(platform, board_config)
+
         # flash test binary
         if not platform.flash(
             board_config,
@@ -2073,6 +2148,18 @@ def flash_and_run_test(
 
             if test.toggle_power:
                 power_cycle(platform, board_config)
+
+                # Use JLink to get RTS5817 running again
+                if board_config.name == "realtekfp":
+                    run_realtekfp(
+                        jlink_exe="JLinkExe",
+                        remote=f"{args.remote}:{args.jlink_port}"
+                        if (args.remote and args.jlink_port)
+                        else args.remote,
+                        device="RTS5817",
+                        interface="SWD",
+                        speed="4000",
+                    )
             else:
                 # In some cases flash_ec leaves the board off, so just ensure it is on
                 platform.power(board_config, power_on=True)
