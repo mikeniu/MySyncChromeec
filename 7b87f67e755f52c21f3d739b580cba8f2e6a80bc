@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee4888f6_0c0a91ee",
+        "filename": "common/update_fw.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-05-07T08:49:14Z",
+      "side": 1,
+      "message": "Done, moved outside to fw_update_command_handler.\n\nSince hammerd sends ABORT after fw_update_start, doing the rwsig check before starting the update is impossible without changing the entire update flow.",
+      "parentUuid": "01f9c269_0c143483",
+      "revId": "7b87f67e755f52c21f3d739b580cba8f2e6a80bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7f2c3baa_6ade4552",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-07T07:22:16Z",
       "side": 1,
       "message": "Isn\u0027t this check redundant? The RWSIG status should be check before erase. I don\u0027t think it is necessary to check it again once RWSIG is aborted or signature is invalid.",
+      "revId": "7b87f67e755f52c21f3d739b580cba8f2e6a80bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a00df0b2_fc836a40",
+        "filename": "common/update_fw.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-05-07T08:49:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f2c3baa_6ade4552",
       "revId": "7b87f67e755f52c21f3d739b580cba8f2e6a80bc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
