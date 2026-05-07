@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "87aeba5c_73642ec0",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-05-07T05:40:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "20efd7f4_d36db05a",
+      "range": {
+        "startLine": 168,
+        "startChar": 0,
+        "endLine": 182,
+        "endChar": 6
+      },
+      "revId": "5ccab24cece00ffdc093c0351d1245aeec7e5f47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1bafaf5f_e412f7ee",
@@ -71,6 +95,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "60c4157f_de48701d",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-05-07T05:40:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1bafaf5f_e412f7ee",
+      "range": {
+        "startLine": 229,
+        "startChar": 6,
+        "endLine": 229,
+        "endChar": 17
+      },
+      "revId": "5ccab24cece00ffdc093c0351d1245aeec7e5f47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2cb40cc7_d98c7c4b",
@@ -84,6 +132,30 @@
       "writtenOn": "2026-05-06T17:12:38Z",
       "side": 1,
       "message": "Please use `cros_flash_physical_write`",
+      "range": {
+        "startLine": 300,
+        "startChar": 6,
+        "endLine": 300,
+        "endChar": 17
+      },
+      "revId": "5ccab24cece00ffdc093c0351d1245aeec7e5f47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c81a9adb_cf6bc004",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-05-07T05:40:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2cb40cc7_d98c7c4b",
       "range": {
         "startLine": 300,
         "startChar": 6,
@@ -141,6 +213,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14d1895b_f74b104c",
+        "filename": "zephyr/test/fingerprint/drivers/egis660/boards/native_sim.overlay",
+        "patchSetId": 28
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-05-07T05:40:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "69f93cfe_bd5f8dc4",
+      "range": {
+        "startLine": 17,
+        "startChar": 30,
+        "endLine": 17,
+        "endChar": 39
+      },
+      "revId": "5ccab24cece00ffdc093c0351d1245aeec7e5f47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "99a459de_5cdb39c0",
@@ -176,6 +272,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c65cffb_5f7ef70c",
+        "filename": "zephyr/test/fingerprint/drivers/egis660/boards/native_sim.overlay",
+        "patchSetId": 28
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-05-07T05:40:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3579780e_e97acd5e",
+      "revId": "5ccab24cece00ffdc093c0351d1245aeec7e5f47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bf76a912_4ea89f14",
@@ -189,6 +303,30 @@
       "writtenOn": "2026-05-06T17:12:38Z",
       "side": 1,
       "message": "This is not necessary. Please remove.",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 2
+      },
+      "revId": "5ccab24cece00ffdc093c0351d1245aeec7e5f47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0e9300f_23bc9b38",
+        "filename": "zephyr/test/fingerprint/drivers/egis660/boards/native_sim.overlay",
+        "patchSetId": 28
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-05-07T05:40:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf76a912_4ea89f14",
       "range": {
         "startLine": 28,
         "startChar": 0,
