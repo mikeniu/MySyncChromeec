@@ -34,6 +34,24 @@
       "parentUuid": "2cbb174b_c53b934e",
       "revId": "7501c9c48b3a44c16f8f0e870e804a1a2e746515",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4fe4ea7b_99d51029",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 29
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-07T09:46:07Z",
+      "side": 1,
+      "message": "I got at the end of enrollement:\n```\n05-07 11:43:40.284  1241  1311 I crosfp-hal: timberslide: write_data_aligned - storage info is NULL (not implemented)\n05-07 11:43:40.284  1241  1311 I crosfp-hal: timberslide: write data failed(-4)\n05-07 11:43:40.284  1241  1311 I crosfp-hal: timberslide: bio_enrollment_finish - egis_bep_ext_save_apns_data return -4\n```\nand then on following boot\n```\n05-07 11:45:00.767  1229  1306 I crosfp-hal: timberslide: egis_apns_data_read - not implemented\n05-07 11:45:00.767  1229  1306 I crosfp-hal: timberslide: egis read apns length failed(-26), load default\n```",
+      "parentUuid": "df1553f6_2710f0b3",
+      "revId": "7501c9c48b3a44c16f8f0e870e804a1a2e746515",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
