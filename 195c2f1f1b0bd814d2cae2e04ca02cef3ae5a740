@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea443657_906b9839",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 534,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-07T20:40:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor Edge-Case: `m_hidInterfaces` Accumulation on Failure**\nWhile you successfully added `m_hidInterfaces.clear()` to `releaseResource()`, it is currently placed *after* the `if (m_devHandlePtr \u003d\u003d nullptr) return 0;` early-exit check.\n\nIf `openDevice` fails (for example, if it cannot find the expected `kCountInterface` HID interfaces), it will `return -1;` *before* `m_devHandlePtr` is assigned. If the caller subsequently attempts to run `initialize()` again, `releaseResource()` will hit the early exit and return `0` without clearing `m_hidInterfaces`. The second attempt to run `openDevice` will then append even more interfaces to the vector, guaranteeing failure.\n\n*Remediation:* The easiest and safest fix is to simply add `m_hidInterfaces.clear();` as the very first operation inside this `openDevice()` function.",
+      "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "159cf929_30670522",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-07T20:40:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Potential Build Error: Missing `\u003cunistd.h\u003e`**\nWhile pruning unused C-headers was a good step, `getopt` and `optarg` are POSIX functions defined in `\u003cunistd.h\u003e` (or `\u003cgetopt.h\u003e`). Since you are using `getopt` here, you should explicitly `#include \u003cunistd.h\u003e` at the top of `iaptool.cc` to guarantee it compiles reliably across different environments, as it may no longer be transitively included.",
+      "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a2cfe43_6c21bd31",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-07T20:40:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Style/Cleanup: Unused Macros**\nThe macros `CMDLINE_FILE_PATH`, `CMDLINE_VID`, and `CMDLINE_PID` are defined here but are never used since `getopt` uses a hardcoded `\"F:V:P:\"` string. You can safely remove these definitions.",
+      "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
