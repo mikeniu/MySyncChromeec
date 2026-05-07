@@ -66,6 +66,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d47c04be_fb98bb35",
+        "filename": "util/elan/iapcontrol.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-07T20:55:19Z",
+      "side": 1,
+      "message": "Consider replacing the preprocessor macros for the VID/PID with `constexpr` variables inside the `ElanApp` namespace. \n\n```cpp\n// Current:\n#define BOOT_VID 0x04F3\n#define BOOT_PID 0x0910\n\n// Suggested:\nnamespace ElanApp\n{\n\tconstexpr uint16_t kBootVid \u003d 0x04F3;\n\tconstexpr uint16_t kBootPid \u003d 0x0910;\n```\n\n**Reasoning:**\nSince we are using C++23, `constexpr` is highly preferred over `#define` for constants. It provides strict type safety (`uint16_t` matches exactly what `initialize()` and `connectDevice()` expect), prevents polluting the global namespace, and retains symbols for easier debugging. This also keeps the constant management perfectly consistent with the excellent use of `constexpr` you already have for internal constants in `iapcontrol.cc`. Make sure to update the references in `iaptool.cc` to `ElanApp::kBootVid` and `ElanApp::kBootPid` as well.",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 23
+      },
+      "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "159cf929_30670522",
         "filename": "util/elan/iaptool.cc",
         "patchSetId": 13
