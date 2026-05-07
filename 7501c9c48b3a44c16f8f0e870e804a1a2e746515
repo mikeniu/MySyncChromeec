@@ -52,6 +52,24 @@
       "parentUuid": "df1553f6_2710f0b3",
       "revId": "7501c9c48b3a44c16f8f0e870e804a1a2e746515",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01b00453_bbdda72b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 29
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-05-07T09:56:56Z",
+      "side": 1,
+      "message": "It seems that `fpmcu` will automatically update to the default ec.bin file?",
+      "parentUuid": "4fe4ea7b_99d51029",
+      "revId": "7501c9c48b3a44c16f8f0e870e804a1a2e746515",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
