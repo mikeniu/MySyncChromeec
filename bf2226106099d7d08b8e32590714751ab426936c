@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ed9a32df_aad06553",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 39
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-05-07T02:10:59Z",
+      "side": 1,
+      "message": "Pass through this CL and remove unused codes, done.",
+      "parentUuid": "26cad2e8_e3f341b0",
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5f246a76_76f5d0cc",
         "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
         "patchSetId": 39
