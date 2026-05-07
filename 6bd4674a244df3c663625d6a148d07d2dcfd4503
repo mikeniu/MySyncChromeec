@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1bd3182_cc248721",
+        "filename": "zephyr/shim/include/config_chip.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 3879739
+      },
+      "writtenOn": "2026-05-07T05:39:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3048bb2_fc10d103",
+      "revId": "6bd4674a244df3c663625d6a148d07d2dcfd4503",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4378d6f6_5c52044b",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-05T21:27:32Z",
       "side": 1,
       "message": "Can you put this next to other USB-C stuff? I think this would be a good place.",
+      "revId": "6bd4674a244df3c663625d6a148d07d2dcfd4503",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01f33d0c_e33edc71",
+        "filename": "zephyr/shim/include/config_chip.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 2086,
+      "author": {
+        "id": 3879739
+      },
+      "writtenOn": "2026-05-07T05:39:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4378d6f6_5c52044b",
       "revId": "6bd4674a244df3c663625d6a148d07d2dcfd4503",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
