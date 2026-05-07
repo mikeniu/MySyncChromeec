@@ -8,6 +8,7 @@
 
 #include "gpio/gpio_int.h"
 #include "gpio_signal.h"
+#include "wp_custom.h"
 
 #include <stdbool.h>
 
@@ -16,8 +17,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-bool write_protect_is_asserted_custom(void);
 
 /**
  * Check the WP state. The function depends on the alias 'gpio_wp'. It is used
