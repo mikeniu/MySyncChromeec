@@ -123,6 +123,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "42876e60_94a43534",
+        "filename": "util/elan/iaptool.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-07T21:30:06Z",
+      "side": 1,
+      "message": "It looks like `\u003cspanstream\u003e` and `std::views::chunk` are [not actually implemented in `libcxx` yet](https://en.cppreference.com/cpp/compiler_support/23), so we need to use something different for now.\n\nPlease double-check that the changes compile inside the chroot with [these instructions](http://b/438746294#comment17):\n\n\n### 1. Update `util/elan/iaptool.h`\nRemove the unsupported header.\n\n```cpp\n#ifndef UTIL_ELAN_IAPTOOL_H_\n#define UTIL_ELAN_IAPTOOL_H_\n\n#include \"filecontrol.h\"\n#include \"iapcontrol.h\"\n\n#include \u003ccstddef\u003e\n#include \u003ccstdint\u003e\n#include \u003coptional\u003e\n#include \u003cspan\u003e\n// REMOVED: #include \u003cspanstream\u003e\n#include \u003cstring\u003e\n#include \u003cvector\u003e\n\n#endif\n```\n\n---\n\n### 2. Update `util/elan/iaptool.cc`\nReplace `std::ispanstream` with the highly efficient `std::from_chars`.\n\n```cpp\n#include \"iaptool.h\"\n#include \"utility.h\"\n#include \u003ccharconv\u003e // Added for std::from_chars\n#include \u003cunistd.h\u003e // Ensure getopt is recognized\n\n// ... (CMDLINE struct and other code)\n\nstd::optional\u003cuint16_t\u003e parseHex(std::string_view strv)\n{\n\tif (strv.empty()) {\n\t\treturn std::nullopt;\n\t}\n\n\tuint16_t val;\n\t// std::from_chars is a non-allocating, fast hex parser\n\tauto [ptr, ec] \u003d std::from_chars(strv.data(), strv.data() + strv.size(), val, 16);\n\n\t// Success only if no error and the entire string was consumed\n\tif (ec \u003d\u003d std::errc() \u0026\u0026 ptr \u003d\u003d strv.data() + strv.size()) {\n\t\treturn val;\n\t}\n\n\treturn std::nullopt;\n}\n\n// ... (Rest of main and setProgressBar)\n```\n\n---\n\n### 3. Update `util/elan/iapcontrol.cc`\nReplace `std::views::chunk` with `subspan` logic. You will also need to add `\u003calgorithm\u003e` to support `std::min`.\n\n```cpp\n#include \"iapcontrol.h\"\n#include \"utility.h\"\n\n#include \u003calgorithm\u003e // Added for std::min\n#include \u003ccstring\u003e\n// REMOVED: #include \u003cranges\u003e\n\n// ... (Internal Constants and iapCommand logic)\n\nint IapControl::writeRomData(std::span\u003cconst uint8_t\u003e buff)\n{\n\tsize_t offset \u003d 0;\n\tconst size_t pageSize \u003d kBootPageSize;\n\n\tif (buff.empty())\n\t\treturn -1;\n\n\twhile (offset \u003c buff.size()) {\n\t\t// Calculate remaining bytes to avoid overflow in the final chunk\n\t\tsize_t currentChunkSize \u003d std::min(pageSize, buff.size() - offset);\n\t\t\n\t\t// Create a view of the current chunk\n\t\tauto chunk \u003d buff.subspan(offset, currentChunkSize);\n\n\t\tif (iapSendData(chunk)) {\n\t\t\tlogInfo(\"[IAP] {} - fail, count: {}\\n\", __func__, offset);\n\t\t\treturn -1;\n\t\t}\n\n\t\toffset +\u003d chunk.size();\n\n\t\tif (m_progressCallback) {\n\t\t\tm_progressCallback(offset, buff.size());\n\t\t}\n\t}\n\n\treturn 0;\n}\n\nint IapControl::readRomData(std::span\u003cuint8_t\u003e buff)\n{\n\tsize_t offset \u003d 0;\n\tconst size_t pageSize \u003d kBootPageSize;\n\n\tif (buff.empty())\n\t\treturn -1;\n\n\twhile (offset \u003c buff.size()) {\n\t\tsize_t currentChunkSize \u003d std::min(pageSize, buff.size() - offset);\n\t\t\n\t\t// Create a mutable view of the current chunk\n\t\tauto chunk \u003d buff.subspan(offset, currentChunkSize);\n\n\t\tif (iapRecvData(chunk)) {\n\t\t\tlogInfo(\"[IAP] {} - fail, count: {}\\n\", __func__, offset);\n\t\t\treturn -1;\n\t\t}\n\n\t\toffset +\u003d chunk.size();\n\n\t\tif (m_progressCallback) {\n\t\t\tm_progressCallback(offset, buff.size());\n\t\t}\n\t}\n\n\treturn 0;\n}\n\n// ... (Rest of the file)\n```\n\n### Why this works:\n*   **`std::from_chars`**: This is part of the C++17 elementary string conversions. It is much lighter than `stringstream` or `spanstream` because it doesn\u0027t involve locale handling or complex stream buffering.\n*   **`std::span::subspan`**: This was introduced in C++20. It provides exactly what `views::chunk` does—a \"view\" into a specific segment of memory—but it\u0027s handled via a manual offset.",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 21
+      },
+      "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a05a5413_105ab72c",
         "filename": "util/elan/utility.h",
         "patchSetId": 13
