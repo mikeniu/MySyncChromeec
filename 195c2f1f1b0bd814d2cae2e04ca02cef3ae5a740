@@ -96,6 +96,29 @@
       "message": "[Gerrit AI Review] **Style/Cleanup: Unused Macros**\nThe macros `CMDLINE_FILE_PATH`, `CMDLINE_VID`, and `CMDLINE_PID` are defined here but are never used since `getopt` uses a hardcoded `\"F:V:P:\"` string. You can safely remove these definitions.",
       "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a05a5413_105ab72c",
+        "filename": "util/elan/utility.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-07T20:51:11Z",
+      "side": 1,
+      "message": "**Upgrade `logInfo` to `std::print`**\n\nIn `util/elan/utility.h`, you are manually combining `std::cout` with `std::format`:\n\n```c\ntemplate \u003ctypename... Args\u003e\nvoid logInfo(std::format_string\u003cArgs...\u003e fmt, Args \u0026\u0026...args)\n{\n\tstd::cout \u003c\u003c std::format(fmt, std::forward\u003cArgs\u003e(args)...);\n}\n```\n\nC++23 introduced `\u003cprint\u003e`. You can directly use `std::print` (or `std::println`), which is inherently safer, faster, and avoids the overhead of intermediate string allocation:\n\n```c\n#include \u003cprint\u003e\n#include \u003cutility\u003e // Don\u0027t forget this for std::forward!\n\ntemplate \u003ctypename... Args\u003e\nvoid logInfo(std::format_string\u003cArgs...\u003e fmt, Args \u0026\u0026...args)\n{\n\tstd::print(fmt, std::forward\u003cArgs\u003e(args)...);\n}\n```",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 0
+      },
+      "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
