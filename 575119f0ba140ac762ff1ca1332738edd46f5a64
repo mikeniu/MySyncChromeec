@@ -45,6 +45,30 @@
       },
       "revId": "575119f0ba140ac762ff1ca1332738edd46f5a64",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "312845e9_6f4f6895",
+        "filename": "zephyr/chip/rtk_flame/spi_upload.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-07T20:28:57Z",
+      "side": 1,
+      "message": "This was done specifically to detect if the erase or write portion isn\u0027t working.\n\nIf we can\u0027t erase the sector, there is no point in continuing to the write portion.\n\nThis will slow down the process slightly, but I think the extra deubgging information is worth it.",
+      "parentUuid": "5cb5a7af_f780177c",
+      "range": {
+        "startLine": 226,
+        "startChar": 5,
+        "endLine": 226,
+        "endChar": 18
+      },
+      "revId": "575119f0ba140ac762ff1ca1332738edd46f5a64",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
