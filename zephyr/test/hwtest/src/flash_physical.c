@@ -51,6 +51,15 @@ struct flash_info flash_info = {
 	/* Sanok's wp-ro size is 256 KB and bank size is 4 KB => 64 banks */
 	.write_protect_bank_count = 64,
 };
+#elif defined(CONFIG_SOC_RTS5817)
+struct flash_info flash_info = {
+	.num_flash_banks = 512,
+	.write_protect_bank_offset = 0,
+	/* Realtekfp's CONFIG_RO_SIZE is 256 KB and write protect size is 4 KB,
+	 * so there should be 64 banks
+	 */
+	.write_protect_bank_count = 64,
+};
 #else
 #error "Flash config tests not defined for this chip. Please add it."
 #endif
