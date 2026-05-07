@@ -6,12 +6,6 @@
 #include "system.h"
 #include "write_protect.h"
 
-/* TODO(b/446109143): Change based on the final solution of WP state. */
-bool write_protect_is_asserted_custom(void)
-{
-	return false;
-}
-
 /* Actual implementation is placed in the private repository. */
 __weak void chip_enter_bootloader(uint8_t mode)
 {
