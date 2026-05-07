@@ -70,6 +70,24 @@
       "parentUuid": "4fe4ea7b_99d51029",
       "revId": "7501c9c48b3a44c16f8f0e870e804a1a2e746515",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "205306c8_07efdcb1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 29
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-07T11:02:01Z",
+      "side": 1,
+      "message": "My bad, I built the firmware incorrectly.",
+      "parentUuid": "01b00453_bbdda72b",
+      "revId": "7501c9c48b3a44c16f8f0e870e804a1a2e746515",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
