@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01f9c269_0c143483",
+        "filename": "common/update_fw.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-07T07:22:16Z",
+      "side": 1,
+      "message": "I feel like this function is not a good place for check of RWSIG status. It should only check if the offset/alignments are correct. I think the RWSIG check should be done earlier, before the update process starts. Or at least not withing this function.",
+      "revId": "7b87f67e755f52c21f3d739b580cba8f2e6a80bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f2c3baa_6ade4552",
+        "filename": "common/update_fw.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-07T07:22:16Z",
+      "side": 1,
+      "message": "Isn\u0027t this check redundant? The RWSIG status should be check before erase. I don\u0027t think it is necessary to check it again once RWSIG is aborted or signature is invalid.",
+      "revId": "7b87f67e755f52c21f3d739b580cba8f2e6a80bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
