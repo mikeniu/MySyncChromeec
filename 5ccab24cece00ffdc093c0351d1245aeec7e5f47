@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "20efd7f4_d36db05a",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-05-07T02:44:43Z",
+      "side": 1,
+      "message": "I changed to this because of your comment on patchset25. This is the simple way to resolve that.",
+      "parentUuid": "caf1cf39_4cdeb341",
+      "range": {
+        "startLine": 168,
+        "startChar": 0,
+        "endLine": 182,
+        "endChar": 6
+      },
+      "revId": "5ccab24cece00ffdc093c0351d1245aeec7e5f47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1bafaf5f_e412f7ee",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis660_pal.c",
         "patchSetId": 28
@@ -83,6 +107,30 @@
       "writtenOn": "2026-05-06T17:12:38Z",
       "side": 1,
       "message": "Use `cros_flash` here\n\n```suggestion\n\t\tcros-ec,flash-controller \u003d \u0026cros_flash;\n```",
+      "range": {
+        "startLine": 17,
+        "startChar": 30,
+        "endLine": 17,
+        "endChar": 39
+      },
+      "revId": "5ccab24cece00ffdc093c0351d1245aeec7e5f47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69f93cfe_bd5f8dc4",
+        "filename": "zephyr/test/fingerprint/drivers/egis660/boards/native_sim.overlay",
+        "patchSetId": 28
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-05-07T02:44:43Z",
+      "side": 1,
+      "message": "this way will introduce a lot changes for twister test. I will try.",
+      "parentUuid": "31d39537_c25760a2",
       "range": {
         "startLine": 17,
         "startChar": 30,
