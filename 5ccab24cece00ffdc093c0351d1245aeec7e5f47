@@ -160,6 +160,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3579780e_e97acd5e",
+        "filename": "zephyr/test/fingerprint/drivers/egis660/boards/native_sim.overlay",
+        "patchSetId": 28
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-05-07T02:49:04Z",
+      "side": 1,
+      "message": "I found the `cros-ec,flash-emul` is designed to work with the complete EC application, not standalone tests. It needs full EC stack dependencies.",
+      "parentUuid": "99a459de_5cdb39c0",
+      "revId": "5ccab24cece00ffdc093c0351d1245aeec7e5f47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bf76a912_4ea89f14",
         "filename": "zephyr/test/fingerprint/drivers/egis660/boards/native_sim.overlay",
         "patchSetId": 28
