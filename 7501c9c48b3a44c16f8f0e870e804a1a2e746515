@@ -16,6 +16,24 @@
       "message": "I tried it on my Ruby and got the following error\n```\n05-07 11:14:24.864  1241  1277 I crosfp-hal: timberslide: APNS HEADER ERROR STATE[0xFFFF], SIZE[65535]\n05-07 11:14:24.864  1241  1277 I crosfp-hal: timberslide: egis read apns length failed(-26), load default\n```\nis this expected?",
       "revId": "7501c9c48b3a44c16f8f0e870e804a1a2e746515",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df1553f6_2710f0b3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 29
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-05-07T09:33:37Z",
+      "side": 1,
+      "message": "Yes, this error message will appear on the first run because no information is written to the apns partition.",
+      "parentUuid": "2cbb174b_c53b934e",
+      "revId": "7501c9c48b3a44c16f8f0e870e804a1a2e746515",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
