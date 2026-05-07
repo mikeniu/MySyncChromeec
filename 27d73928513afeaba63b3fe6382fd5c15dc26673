@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8d17aae_dec182b8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3879739
+      },
+      "writtenOn": "2026-05-07T05:53:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23180585_9f718391",
+      "revId": "27d73928513afeaba63b3fe6382fd5c15dc26673",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0ead1c6d_59974da5",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-05T21:29:15Z",
       "side": 1,
       "message": "Can you add a line like, \"This CL copies the implementation in CL:3868882\"?\n\nI was going to say that you should cherry-pick that CL, but it touches a bunch of Zephyr files. Maybe you started that way, and it\u0027s so different now that it doesn\u0027t register as a cherry pick anymore. I\u0027m a little torn. It\u0027s probably appropriate to not have this be a cherry pick, but I think having a link would help people follow the change later.",
+      "revId": "27d73928513afeaba63b3fe6382fd5c15dc26673",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1eb8a355_eef50c40",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 3879739
+      },
+      "writtenOn": "2026-05-07T05:53:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0ead1c6d_59974da5",
       "revId": "27d73928513afeaba63b3fe6382fd5c15dc26673",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
