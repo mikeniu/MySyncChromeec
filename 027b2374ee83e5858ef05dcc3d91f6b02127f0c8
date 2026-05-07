@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f832450e_86ceb615",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 6070,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-07T21:56:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df42ffae_e147124d",
+      "revId": "027b2374ee83e5858ef05dcc3d91f6b02127f0c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9dbe6c73_19826db2",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-06T02:07:47Z",
       "side": 1,
       "message": "Add a macro for the name size as well.  This should help when porting changes over to Rust ectool.",
+      "revId": "027b2374ee83e5858ef05dcc3d91f6b02127f0c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ec82239_60f70dcf",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 6102,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-07T21:56:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9dbe6c73_19826db2",
       "revId": "027b2374ee83e5858ef05dcc3d91f6b02127f0c8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
