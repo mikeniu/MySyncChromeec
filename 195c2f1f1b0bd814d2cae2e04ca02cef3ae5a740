@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e1c31d9a_7d13c04b",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-07T20:49:04Z",
+      "side": 1,
+      "message": "**Leverage `std::ranges`** \n\nIn `util/elan/iapcontrol.cc` (`runIapProcess`), you use the legacy iterator-based approach to compare the ROMs:\n\n```c\nif (!std::equal(rom.begin(), rom.end(), romRead.begin(), romRead.end())) {\n```\n\nSince you are using C++23, you can use the much cleaner ranges algorithm:\n\n```c\nif (!std::ranges::equal(rom, romRead)) {\n```",
+      "range": {
+        "startLine": 203,
+        "startChar": 0,
+        "endLine": 207,
+        "endChar": 2
+      },
+      "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ea443657_906b9839",
         "filename": "util/elan/iapcontrol.cc",
         "patchSetId": 13
@@ -14,6 +37,29 @@
       "writtenOn": "2026-05-07T20:40:07Z",
       "side": 1,
       "message": "[Gerrit AI Review] **Minor Edge-Case: `m_hidInterfaces` Accumulation on Failure**\nWhile you successfully added `m_hidInterfaces.clear()` to `releaseResource()`, it is currently placed *after* the `if (m_devHandlePtr \u003d\u003d nullptr) return 0;` early-exit check.\n\nIf `openDevice` fails (for example, if it cannot find the expected `kCountInterface` HID interfaces), it will `return -1;` *before* `m_devHandlePtr` is assigned. If the caller subsequently attempts to run `initialize()` again, `releaseResource()` will hit the early exit and return `0` without clearing `m_hidInterfaces`. The second attempt to run `openDevice` will then append even more interfaces to the vector, guaranteeing failure.\n\n*Remediation:* The easiest and safest fix is to simply add `m_hidInterfaces.clear();` as the very first operation inside this `openDevice()` function.",
+      "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fd0ea11_75a7ffe4",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 625,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-07T20:49:04Z",
+      "side": 1,
+      "message": "**Redundant Pointer Check** In `util/elan/iapcontrol.cc` inside `openDevice`:\n\n```c\nconst struct libusb_interface_descriptor *alt \u003d \u0026inter-\u003ealtsetting[j];\nif (alt \u003d\u003d nullptr || alt-\u003ebInterfaceClass !\u003d LIBUSB_CLASS_HID) {\n```\n\n`alt` is assigned the address of an array element. It is impossible for it to be `nullptr`.\n\n* **Recommendation:** Remove the `alt \u003d\u003d nullptr` check to reduce clutter.",
+      "range": {
+        "startLine": 622,
+        "startChar": 3,
+        "endLine": 625,
+        "endChar": 4
+      },
       "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
