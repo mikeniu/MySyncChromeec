@@ -69,6 +69,30 @@
       },
       "revId": "575119f0ba140ac762ff1ca1332738edd46f5a64",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c832079_b1df48b7",
+        "filename": "zephyr/chip/rtk_flame/spi_upload.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-05-07T20:42:43Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "312845e9_6f4f6895",
+      "range": {
+        "startLine": 226,
+        "startChar": 5,
+        "endLine": 226,
+        "endChar": 18
+      },
+      "revId": "575119f0ba140ac762ff1ca1332738edd46f5a64",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
