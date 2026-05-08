@@ -64,6 +64,11 @@ __overridable void set_touchpad_report(struct usb_hid_touchpad_report *report)
 }
 #endif /* defined(CONFIG_CROS_EC_RO) && defined(CONFIG_USBD_HID_TOUCHPAD) */
 
+bool usb_is_suspended(void)
+{
+	return usbd_is_suspended(&usb_device);
+}
+
 int request_usb_wake(void)
 {
 	if (IS_ENABLED(CONFIG_USB_DEVICE_REMOTE_WAKEUP)) {
@@ -147,6 +152,14 @@ static int register_fs_classes(struct usbd_context *ctx)
 static int usb_device_init(void)
 {
 	int err;
+
+#ifdef CONFIG_UDC_FOCALTECH
+	/* USBD_DEVICE_DEFINE macro hardcodes bcdUSB to USB_SRN_2_0. Replace it
+	 * for Focaltech, which doesn't support USB_SRN_2_0.
+	 */
+	((struct usb_device_descriptor *)(usb_device.fs_desc))->bcdUSB =
+		sys_cpu_to_le16(USB_SRN_1_1);
+#endif
 
 	err = usbd_add_descriptor(&usb_device, &lang);
 	if (err) {
