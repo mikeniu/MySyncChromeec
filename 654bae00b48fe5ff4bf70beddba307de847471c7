@@ -70,6 +70,30 @@
       },
       "revId": "654bae00b48fe5ff4bf70beddba307de847471c7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7e290b8_9a71a206",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 7
+      },
+      "lineNbr": 1316,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T16:48:12Z",
+      "side": 1,
+      "message": "\u003e Where are the Base 24 and Base 26 values documented? This did not match the SOC documentation, so must be somewhere else. If it works because it matches Fatcat, we are OK, but I would like to understand the source of the values.\n\nI\u0027m not sure. From the `git blame`, it looks like `fatcat` was added in [this CL](https://crrev.com/c/6157867).\n\nI agree that it would be good to understand the source of the values.",
+      "parentUuid": "40ad4355_a73143fb",
+      "range": {
+        "startLine": 1316,
+        "startChar": 0,
+        "endLine": 1316,
+        "endChar": 34
+      },
+      "revId": "654bae00b48fe5ff4bf70beddba307de847471c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
