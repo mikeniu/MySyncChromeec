@@ -54,6 +54,7 @@ module_name_overrides = {
     "hal_stm32": "stm32",
     "hal_intel_public": "intel",
     "hal_egis": "egis",
+    "focaltech_module": "focaltech_module" + os.sep + "focaltech",
 }
 
 
@@ -92,15 +93,6 @@ known_modules = {
         checkout / "src" / "third_party" / name
     ),
     "chre": chre_module,
-    "cmsis": lambda name, checkout: (
-        checkout
-        / "src"
-        / "third_party"
-        / "zephyrproject"
-        / "modules"
-        / "hal"
-        / "cmsis"
-    ),
     "cmsis_6": lambda name, checkout: (
         checkout
         / "src"
@@ -111,7 +103,7 @@ known_modules = {
         / "cmsis_6"
     ),
     "ec": lambda name, checkout: (checkout / "src" / "platform" / "ec"),
-    "egis": lambda name, checkout: (
+    "egis_fp": lambda name, checkout: (
         checkout / "src" / "platform" / "fingerprint" / "egis"
     ),
     "egis_module": lambda name, checkout: (
@@ -123,7 +115,7 @@ known_modules = {
         / "hal"
         / "egis_module"
     ),
-    "elan": lambda name, checkout: (
+    "elan_fp": lambda name, checkout: (
         checkout / "src" / "platform" / "fingerprint" / "elan"
     ),
     "elan_module": lambda name, checkout: (
@@ -137,6 +129,16 @@ known_modules = {
     ),
     "focaltech_fp": lambda name, checkout: (
         checkout / "src" / "platform" / "fingerprint" / "focaltech"
+    ),
+    "focaltech_module": lambda name, checkout: (
+        checkout
+        / "src"
+        / "third_party"
+        / "zephyrproject"
+        / "modules"
+        / "hal"
+        / "focaltech_module"
+        / "focaltech"
     ),
     "fpc": lambda name, checkout: (
         checkout / "src" / "platform" / "fingerprint" / "fpc"
