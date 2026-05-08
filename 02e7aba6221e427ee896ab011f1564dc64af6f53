@@ -370,6 +370,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "db2030c2_ce060d3a",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T21:30:08Z",
+      "side": 1,
+      "message": "Here is Gemini generated code to fix this. Please review to make sure it\u0027s correct and make sure it compiles:\n\n----\n\n\\*\\*In `bootrom.h**` They will need `#include \u003carray\u003e`.\n\n*Before:*\n\n```c\nuint8_t aes_key_[32] \u003d { 0 };\n\n```\n\n*After:*\n\n```c\nstd::array\u003cuint8_t, 32\u003e aes_key_{};\n\n```\n\n**In `bootrom.cc` (Inside `send_bootrom_command_sha`)** *Before:*\n\n```c\nuint8_t hash[32];\nSHA256(data.data(), data.size(), hash);\ncmd.insert(cmd.end(), hash, hash + 32);\n\n```\n\n*After:*\n\n```c\nstd::array\u003cuint8_t, 32\u003e hash{};\n// Use .data() to interact with legacy C APIs like OpenSSL\nSHA256(data.data(), data.size(), hash.data()); \ncmd.insert(cmd.end(), hash.begin(), hash.end());\n\n```",
+      "parentUuid": "6b069fd4_c7a4a3ff",
+      "range": {
+        "startLine": 126,
+        "startChar": 0,
+        "endLine": 126,
+        "endChar": 30
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d8a1ed0d_76142e0c",
         "filename": "util/egis/ec_comm.cc",
         "patchSetId": 10
