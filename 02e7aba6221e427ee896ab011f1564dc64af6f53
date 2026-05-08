@@ -300,6 +300,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "369e197d_f8c304ee",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T21:29:18Z",
+      "side": 1,
+      "message": "Here is Gemini generated code to fix this. Please double-check that it is correct and that it compiles:\n\n----\n\nCurrently, flashing chunks of firmware forces the creation of a brand new, temporary `std::vector` every loop iteration. `std::span` fixes this by passing a lightweight, non-owning view of the memory.\n\n\\*\\*In `bootrom.h**` They will need `#include \u003cspan\u003e`.\n\n*Before:*\n\n```c\nint write_flash(uint32_t offset, const std::vector\u003cuint8_t\u003e \u0026data);\n\n```\n\n*After:*\n\n```c\nint write_flash(uint32_t offset, std::span\u003cconst uint8_t\u003e data);\n\n```\n\n**In `et171_flash.cc` (Inside the flash chunking loop)** *Before:*\n\n```c\nif (brom.write_flash(\n        flash_addr,\n        std::vector\u003cuint8_t\u003e(\n            firmware.begin() + file_pos,\n            firmware.begin() + file_pos + current_chunk)) !\u003d 0) {\n\n```\n\n*After:*\n\n```c\n// Creates a zero-allocation view of the chunk:\nstd::span\u003cconst uint8_t\u003e fw_chunk \u003d std::span{firmware}.subspan(file_pos, current_chunk);\n\nif (brom.write_flash(flash_addr, fw_chunk) !\u003d 0) {\n\n```",
+      "parentUuid": "83312c9d_0802218a",
+      "range": {
+        "startLine": 445,
+        "startChar": 0,
+        "endLine": 445,
+        "endChar": 79
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4ab161f1_8fcae9bf",
         "filename": "util/egis/bootrom.h",
         "patchSetId": 10
