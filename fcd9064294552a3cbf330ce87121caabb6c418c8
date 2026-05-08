@@ -394,6 +394,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "453d860a_fded1a66",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:41:26Z",
+      "side": 1,
+      "message": "* **`\u003cmemory.h\u003e`:** In `fun.c`, there is an `#include \u003cmemory.h\u003e`. This is an obsolete, non-standard header from early C days. `memset`, `memcpy`, and `memcmp` are standard POSIX functions defined in `\u003cstring.h\u003e`. You already `#include \u003cstring.h\u003e`, so `\u003cmemory.h\u003e` should be deleted.",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 19
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d597ab8b_08525d77",
         "filename": "util/focaltech/focaltech/src/fun.c",
         "patchSetId": 11
@@ -410,6 +433,29 @@
         "startChar": 0,
         "endLine": 24,
         "endChar": 23
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5715f3e_84b4af37",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:41:26Z",
+      "side": 1,
+      "message": "In several places, the code declares a struct and then uses `memset` to zero it out. Modern, idiomatic C allows you to zero-initialize a struct at the point of declaration using `\u003d {0};`. This removes an extra function call and cuts down on boilerplate.\n\n**Current Code (`ft_sg_io` / `ft_device_disable` / `usb_write`):**\n\n```c\n\tstruct sg_io_hdr io_hdr;\n\t// ... variable declarations ...\n\tmemset(\u0026io_hdr, 0, sizeof(io_hdr));\n\n\tstruct bulk_cb_wrap cbw;\n\tmemset(\u0026cbw, 0, sizeof(cbw));\n    \n\tfocal_usb_device_port_method_t method;\n\tmemset(\u0026method, 0, sizeof(focal_usb_device_port_method_t));\n\n```\n\n**Suggested Rewrite:**\n\n```c\n\tstruct sg_io_hdr io_hdr \u003d {0};\n\tstruct bulk_cb_wrap cbw \u003d {0};\n\tfocal_usb_device_port_method_t method \u003d {0};\n\n```\n\n*(Note: You already do this correctly for arrays like `unsigned char transfer_cmd[FT_CMD_LENGTH] \u003d { 0 };`. Apply the same pattern to structs.)*",
+      "range": {
+        "startLine": 94,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 36
       },
       "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -612,6 +658,29 @@
         "startChar": 0,
         "endLine": 685,
         "endChar": 2
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74e1d253_19581256",
+        "filename": "util/focaltech/focaltech/src/main.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:41:26Z",
+      "side": 1,
+      "message": "When allocating memory or clearing a pointer\u0027s destination, it is safer and more idiomatic to use `sizeof(*pointer)` rather than explicitly naming the type `sizeof(Type)`. If the type of the pointer ever changes during refactoring, `sizeof(*pointer)` automatically adapts, preventing buffer overflows.\n\n**Current Code (`ft_device_init`):**\n\n```c\n\tif (info) {\n\t\tmemset(info, 0, sizeof(ft_device_info_t));\n\n```\n\n**Suggested Rewrite:**\n\n```c\n\tif (info) {\n\t\tmemset(info, 0, sizeof(*info));\n\n```",
+      "range": {
+        "startLine": 160,
+        "startChar": 0,
+        "endLine": 160,
+        "endChar": 44
       },
       "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
