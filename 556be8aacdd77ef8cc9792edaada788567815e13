@@ -16,6 +16,24 @@
       "message": "Chump rationale:\n\n 1. This change only affects tooling used to flash the RTK EC and does not modify any EC FW images\n 2. Changes are needed urgently to unblock https://issuetracker.google.com/issues/509560273\n 3. No other builds beside Rauru CQ failed. Rauru does not use the RTK EC. EC firmware builders ran and passed.\n 4. Thorough manual testing of the changes was performed by author.\n \nPlease submit w/ parents if you concur.",
       "revId": "556be8aacdd77ef8cc9792edaada788567815e13",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a3a5bcc_90376c6b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-08T21:05:03Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "72126e6f_cd9c7633",
+      "revId": "556be8aacdd77ef8cc9792edaada788567815e13",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
