@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "347fdc66_c46e3a37",
+        "filename": "util/elan/filecontrol.h",
+        "patchSetId": 14
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T18:18:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] You can remove `#include \u003cspan\u003e` as it is no longer used in this header.",
+      "revId": "731961580f83a488bd8559a0dff00a710480610b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35a99032_4dbfdd02",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 14
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T18:18:31Z",
+      "side": 1,
+      "message": "When I build as described in [this comment](http://b/438746294#comment17), I get the following errors. Please verify that your changes compile.\n\n```\nutil/elan/iapcontrol.cc:35:19: error: unused variable \u0027kEp3Length\u0027\n      [-Werror,-Wunused-const-variable]\n   35 |         constexpr size_t kEp3Length \u003d 64;\n      |                          ^~~~~~~~~~\nutil/elan/iapcontrol.cc:36:19: error: unused variable \u0027kEp4Length\u0027\n      [-Werror,-Wunused-const-variable]\n   36 |         constexpr size_t kEp4Length \u003d 64;\n      |                          ^~~~~~~~~~\nutil/elan/iapcontrol.cc:48:20: error: unused variable \u0027kCmdWriteOption\u0027\n      [-Werror,-Wunused-const-variable]\n   48 |         constexpr uint8_t kCmdWriteOption \u003d 0xA2;\n      |                           ^~~~~~~~~~~~~~~\nutil/elan/iapcontrol.cc:49:20: error: unused variable \u0027kCmdWriteOptionFinish\u0027\n      [-Werror,-Wunused-const-variable]\n   49 |         constexpr uint8_t kCmdWriteOptionFinish \u003d 0xA3;\n      |                           ^~~~~~~~~~~~~~~~~~~~~\nutil/elan/iapcontrol.cc:54:20: error: unused variable \u0027kCmdReadOption\u0027\n      [-Werror,-Wunused-const-variable]\n   54 |         constexpr uint8_t kCmdReadOption \u003d 0xE2;\n      |                           ^~~~~~~~~~~~~~\nutil/elan/iapcontrol.cc:55:20: error: unused variable \u0027kCmdReadOptionFinish\u0027\n      [-Werror,-Wunused-const-variable]\n   55 |         constexpr uint8_t kCmdReadOptionFinish \u003d 0xE3;\n      |                           ^~~~~~~~~~~~~~~~~~~~\nutil/elan/iapcontrol.cc:60:20: error: unused variable \u0027kErrStaReady\u0027\n      [-Werror,-Wunused-const-variable]\n   60 |         constexpr uint8_t kErrStaReady \u003d 0x00;\n      |                           ^~~~~~~~~~~~\n7 errors generated.\n```",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 48
+      },
+      "revId": "731961580f83a488bd8559a0dff00a710480610b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d775b114_2e7684c8",
+        "filename": "util/elan/iaptool.h",
+        "patchSetId": 14
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T18:18:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] You can remove `#include \u003cspan\u003e` and the other standard library includes here, as this header doesn\u0027t declare any functions or classes that use them.",
+      "revId": "731961580f83a488bd8559a0dff00a710480610b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
