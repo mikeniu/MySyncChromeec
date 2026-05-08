@@ -821,6 +821,10 @@ static bool board_wants_reduced_input_voltage(void)
 	if (batt.flags & BATT_FLAG_WANT_CHARGE)
 		return false;
 
+	/* Battery in bad state so avoid reducing voltage */
+	if (batt.flags & BATT_FLAG_BAD_ANY)
+		return false;
+
 	return true;
 }
 
