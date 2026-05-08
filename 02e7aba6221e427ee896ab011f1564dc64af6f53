@@ -323,6 +323,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6b069fd4_c7a4a3ff",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T21:25:37Z",
+      "side": 1,
+      "message": "In modern C++, raw C-arrays should be avoided because they decay to pointers easily (losing size information) and don\u0027t integrate well with standard algorithms.\n\n**Before:**\n\n```c\nuint8_t aes_key_[32] \u003d { 0 };\nuint8_t hash[32];\n\n```\n\n**After:**\n\n```c\n#include \u003carray\u003e\n\nstd::array\u003cuint8_t, 32\u003e aes_key_{};\nstd::array\u003cuint8_t, 32\u003e hash{};\n\n// You can easily pass this to span-accepting functions, or use .data() for legacy APIs:\nSHA256(data.data(), data.size(), hash.data());\n\n```",
+      "range": {
+        "startLine": 126,
+        "startChar": 0,
+        "endLine": 126,
+        "endChar": 30
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8a1ed0d_76142e0c",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T21:25:37Z",
+      "side": 1,
+      "message": "In `ec_comm.cc`, you are instantiating a struct and assigning it line-by-line. Designated initializers make this much cleaner, more readable, and guarantee you don\u0027t accidentally leave a field uninitialized.\n\n**Before:**\n\n```c\nEcHostCommandRequest hdr;\nhdr.protocol_version \u003d 3;\nhdr.checksum \u003d 0;\nhdr.command_id \u003d cmd_id_;\nhdr.command_version \u003d cmd_ver_;\nhdr.reserved \u003d 0;\nhdr.data_length \u003d payload_.size();\n\n```\n\n**After:**\n\n```c\nEcHostCommandRequest hdr \u003d {\n    .protocol_version \u003d 3,\n    .checksum \u003d 0,\n    .command_id \u003d cmd_id_,\n    .command_version \u003d cmd_ver_,\n    .reserved \u003d 0,\n    .data_length \u003d static_cast\u003cuint16_t\u003e(payload_.size())\n};\n\n```",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 36
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b7660980_1c9fd5e0",
         "filename": "util/egis/ec_comm.h",
         "patchSetId": 10
