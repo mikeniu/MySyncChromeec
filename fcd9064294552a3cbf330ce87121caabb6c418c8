@@ -49,6 +49,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "26290249_bccb0c90",
+        "filename": "util/focaltech/focaltech/include/ff_util.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:31:27Z",
+      "side": 1,
+      "message": "**Feedback:** Rather than writing out the ceiling division math `(A + B - 1) / B` manually in multiple places, let\u0027s create a standard helper function. This makes the code\u0027s intent instantly readable and prevents accidental order-of-operations bugs.\n\n**1\\. Add the inline function to a header (e.g., `ff_util.h`):**\n\n```c\n/* Safely calculates the ceiling division of n / d */\nstatic inline uint32_t ft_div_round_up(uint32_t n, uint32_t d) \n{\n\treturn (n + d - 1) / d;\n}\n\n```\n\n*(Note: You can also implement this as a type-agnostic macro `#define FT_DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))`, which is the standard approach in the Linux kernel.)*\n\n**2\\. Update `ft_erase_page` in `fun.c`:**\n\n```c\n\t/* Old */\n\t// count \u003d (length + FOCAL_CONFIG_SIZE - 1) / FOCAL_CONFIG_SIZE;\n\n\t/* New */\n\tcount \u003d ft_div_round_up(length, FOCAL_CONFIG_SIZE);\n\n```\n\n**3\\. Update `ft_download_bin` in `fun.c`:**\n\n```c\n\t/* Old */\n\t// total_frame \u003d file_len / FOCAL_CONFIG_SIZE;\n\t// if (file_len % FOCAL_CONFIG_SIZE)\n\t// \ttotal_frame++;\n\n\t/* New */\n\ttotal_frame \u003d ft_div_round_up(file_len, FOCAL_CONFIG_SIZE);\n\n```",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 21
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "646228b7_bfcf2595",
         "filename": "util/focaltech/focaltech/include/ft_help.h",
         "patchSetId": 11
@@ -180,6 +203,29 @@
         "startChar": 0,
         "endLine": 79,
         "endChar": 46
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b707f8b_319c3ad4",
+        "filename": "util/focaltech/focaltech/src/ff_util.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:31:27Z",
+      "side": 1,
+      "message": "The logging function uses a chained `if/else if` block to determine the ANSI color code based on the log level. This can be simplified into a simple lookup array, matching the existing `log_level_char` array pattern.\n\n**Current Code:**\n\n```c\nif (level \u003d\u003d LOG_LEVEL_ERR) {\n\tprintf(\"\\033[31m[%s] %c [%s] %s \\033[0m\\n\", time_buff, log_level_char[level], tag, buf);\n} else if (level \u003d\u003d LOG_LEVEL_WRN) {\n\tprintf(\"\\033[33m[%s] %c [%s] %s \\033[0m\\n\", time_buff, log_level_char[level], tag, buf);\n} // ...\n\n```\n\n**Suggested Rewrite:** Use an array of color prefixes mapped to the `log_level_t` enum.\n\n```c\nstatic const char *log_colors[] \u003d {\n\t\"\",         /* ALL - no color */\n\t\"\",         /* VBS */\n\t\"\",         /* DBG */\n\t\"\\033[36m\", /* INF - Cyan */\n\t\"\\033[33m\", /* WRN - Yellow */\n\t\"\\033[31m\"  /* ERR - Red */\n};\n\n/* Inside log_printf: */\nconst char *color \u003d (level \u003c\u003d LOG_LEVEL_ERR) ? log_colors[level] : \"\";\nconst char *reset \u003d (color[0] !\u003d \u0027\\0\u0027) ? \"\\033[0m\" : \"\";\n\nprintf(\"%s[%s] %c [%s] %s %s\\n\", color, time_buff, log_level_char[level], tag, buf, reset);\n\n```",
+      "range": {
+        "startLine": 98,
+        "startChar": 0,
+        "endLine": 123,
+        "endChar": 2
       },
       "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -340,6 +386,29 @@
         "startLine": 202,
         "startChar": 0,
         "endLine": 202,
+        "endChar": 23
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d597ab8b_08525d77",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:31:27Z",
+      "side": 1,
+      "message": "The codebase currently maintains two identical macros for the SCSI command length, and mixes them indiscriminately in `fun.c`:\n\n* `#define FT_CMD_LENGTH 16` (in `ff_sg_io.h`)  \n* `#define CMD_LENGTH 0x10` (in `fun.c`)\n\n**Feedback:** Remove `#define CMD_LENGTH 0x10` from `fun.c` entirely. Standardize on `FT_CMD_LENGTH` everywhere to avoid confusing maintainers who might assume they represent different buffer sizes.",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
         "endChar": 23
       },
       "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
@@ -520,6 +589,29 @@
         "startChar": 0,
         "endLine": 205,
         "endChar": 69
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d6349df_b0f30ce9",
+        "filename": "util/focaltech/focaltech/src/main.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:31:27Z",
+      "side": 1,
+      "message": "The `main` function copies `argv` strings into a local `tmp` buffer just to use `strncmp`. This is a common anti-pattern. Command-line arguments in `argv` are guaranteed to be null-terminated, so copying them provides no additional safety and only clutters the code.\n\n**Current Code:**\n\n```c\nmemset(tmp, 0, sizeof(tmp));\nstrncpy(tmp, argv[2], sizeof(tmp) - 1);\ntmp[PATH_MAX - 1] \u003d \u0027\\0\u0027;\n\nif (!strncmp(tmp, FT_ENTER_FORCE_UPDATE_CMD_STR, strlen(FT_ENTER_FORCE_UPDATE_CMD_STR))) { ... }\n\n```\n\n**Suggested Rewrite:** You can discard the `tmp` buffer entirely and use `strcmp` directly against `argv`. This cuts about 15 lines of buffer management out of `main`.\n\n```c\nif (!strcmp(argv[2], FT_ENTER_FORCE_UPDATE_CMD_STR)) {\n\tFF_LOGD(\"cmd:%s\", FT_ENTER_FORCE_UPDATE_CMD_STR);\n\tinfo.next_mode \u003d FORCE_UPDATE_MODE;\n} else if (!strcmp(argv[2], FT_ENTER_SET_FLASH_WP_CMD_STR)) {\n// ...\n\n```",
+      "range": {
+        "startLine": 248,
+        "startChar": 3,
+        "endLine": 253,
+        "endChar": 23
       },
       "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
