@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "ff_command.h"
 #include "ff_common.h"
 #include "ff_log.h"
 #include "ff_util.h"
@@ -24,7 +25,7 @@
 
 static int ft_switch_to_rom(void)
 {
-	int ret = 0;
+	int ret = FT_SUCCESS;
 	uint16_t tx_len = 8;
 	uint8_t tx_buffer[64] = {
 		0x03, 0x00, 0xce, 0xfa, 0x00, 0xaa, 0x06,
@@ -34,7 +35,7 @@ static int ft_switch_to_rom(void)
 	int retry = 3;
 
 	while (retry--) {
-		ret = mbedtls_usb_send((uint8_t *)tx_buffer, tx_len);
+		ret = ft_usb_send((uint8_t *)tx_buffer, tx_len);
 		FF_LOGD("send ret=%x", ret);
 		if (ret != tx_len &&
 		    (ret == LIBUSB_ERROR_IO || ret == LIBUSB_ERROR_NO_DEVICE)) {
@@ -42,7 +43,7 @@ static int ft_switch_to_rom(void)
 			break;
 		}
 
-		ret = mbedtls_usb_recv_timeout((uint8_t *)rx_buffer, 4, 200);
+		ret = ft_usb_recv_timeout((uint8_t *)rx_buffer, 4, 200);
 		FF_LOGD("ret=%x,recv %x,%x,%x,%x", ret, rx_buffer[0],
 			rx_buffer[1], rx_buffer[2], rx_buffer[3]);
 		if (ret > 0 ||
@@ -57,9 +58,9 @@ static int ft_switch_to_rom(void)
 	return ret;
 }
 
-static int ft_switch_to_boot(void)
+static int ft_switch_to_boot(ft_device_info_t *info)
 {
-	int ret = 0;
+	int ret = FT_SUCCESS;
 	uint16_t tx_len = 8;
 	uint8_t tx_buffer[64] = {
 		0x03,
@@ -69,10 +70,20 @@ static int ft_switch_to_boot(void)
 	uint8_t rx_buffer[64] = { 0 };
 	FF_LOGD("%s enter", __func__);
 
+	if (info->current_mode == BOOT_MODE) {
+		FF_LOGW("already in bootloader now");
+		return FT_SUCCESS;
+	}
+
+	if (info->current_mode < TEST_MODE) {
+		FF_LOGW("It can only switch from EC mode to boot mode.");
+		return FT_RESULT_FAIL;
+	}
+
 	int retry = 3;
 
 	while (retry--) {
-		ret = mbedtls_usb_send((uint8_t *)tx_buffer, tx_len);
+		ret = ft_usb_send((uint8_t *)tx_buffer, tx_len);
 		FF_LOGD("send ret=%x", ret);
 		if (ret != tx_len &&
 		    (ret == LIBUSB_ERROR_IO || ret == LIBUSB_ERROR_NO_DEVICE)) {
@@ -80,7 +91,7 @@ static int ft_switch_to_boot(void)
 			break;
 		}
 
-		ret = mbedtls_usb_recv_timeout((uint8_t *)rx_buffer, 4, 200);
+		ret = ft_usb_recv_timeout((uint8_t *)rx_buffer, 4, 200);
 		FF_LOGD("ret=%x,recv %x,%x,%x,%x", ret, rx_buffer[0],
 			rx_buffer[1], rx_buffer[2], rx_buffer[3]);
 		if (ret > 0 ||
@@ -96,12 +107,12 @@ static int ft_switch_to_boot(void)
 }
 static int ft_get_ec_build_version(void)
 {
-#define MAX_RECV_LEN 0x400
+#define MAX_RECV_LEN 64
 
-	int ret = 0;
+	int ret = FT_SUCCESS;
 	int retry = 3;
 
-	uint8_t tx_buffer[128] = {
+	uint8_t tx_buffer[MAX_RECV_LEN] = {
 		0x03,
 		0xf9,
 		0x04,
@@ -114,11 +125,18 @@ static int ft_get_ec_build_version(void)
 	memset(info, 0, sizeof(info));
 
 	while (retry--) {
-		mbedtls_usb_send((uint8_t *)tx_buffer, tx_len);
-		ret = mbedtls_usb_recv_timeout((uint8_t *)rx_buffer, rx_len,
-					       200);
+		ret = ft_usb_send((uint8_t *)tx_buffer, tx_len);
+
+		if (ret <= 0) {
+			FF_LOGW("send err,ret=%x", ret);
+			continue;
+		}
+
+		ret = ft_usb_recv_timeout((uint8_t *)rx_buffer, rx_len, 200);
 		if (ret > 0) {
 			break;
+		} else {
+			FF_LOGW("ret=%x", ret);
 		}
 		usleep(10 * 1000);
 	}
@@ -126,6 +144,8 @@ static int ft_get_ec_build_version(void)
 	memcpy(info, rx_buffer + 8, sizeof(info) - 9);
 	FF_LOGV("rx_buffer =%x,%x,%x,%x", rx_buffer[0], rx_buffer[1],
 		rx_buffer[8], rx_buffer[9]);
+
+	info[MAX_RECV_LEN - 1] = 0;
 
 	FF_LOGI("ec build version: %s", info);
 
@@ -135,9 +155,9 @@ static int ft_get_ec_build_version(void)
 	    strstr(info, FT_PROJECT_NAME_9865) ||
 	    strstr(info, FT_PROJECT_NAME_9869) ||
 	    strstr(info, FT_PROJECT_NAME_9849)) {
-		ret = 0;
+		ret = FT_SUCCESS;
 	} else {
-		ret = -2;
+		ret = FT_NO_SUCH_DEV;
 	}
 
 	return ret;
@@ -145,18 +165,19 @@ static int ft_get_ec_build_version(void)
 
 static int ft_device_init(ft_device_info_t *info)
 {
-	uint16_t pid, vid;
-	int ret = 0;
+	uint16_t vid,pid;
+	int ret = FT_SUCCESS;
 
-	ret = mbedtls_usb_exist(&pid, &vid);
+	ret = ft_usb_exist(&vid, &pid);
 
 	if (ret) {
 		FF_LOGE("can't find focal device !");
+		ft_usb_free();
 		return -1;
 	}
 
 	if (info) {
-		memset(info, 0, sizeof(ft_device_info_t));
+		memset(info, 0, sizeof(*info));
 
 		info->action = FT_ACTION_NORMAL;
 
@@ -182,25 +203,47 @@ static int ft_device_init(ft_device_info_t *info)
 
 	if (!info->current_mode) {
 		FF_LOGE("can't find focal device,please check again");
-		return -1;
+		return FT_NO_SUCH_DEV;
 	}
 
-	mbedtls_usb_init(pid, vid);
-	ret = mbedtls_usb_connect(pid, vid);
+	ret = ft_usb_connect(pid, vid);
 	if (ret < 0) {
 		FF_LOGE("open vid(%x) pid(%x) failed\n", vid, pid);
 		return ret;
 	}
 
-	return 0;
+	return FT_SUCCESS;
+}
+
+static ft_cmd_t ft_get_command(int argc, char **argv)
+{
+	if (argc < 1 || argc > 2 || argv[0] == NULL) {
+		FF_LOGE("No subcommand specified.");
+		return UNKNOWN_CMD;
+	}
+
+	const char *cmd_name = argv[0];
+	for (int i = 0; cmd_table[i].name != NULL; i++) {
+		if (strcmp(cmd_table[i].name, cmd_name) == 0) {
+			FF_LOGD("cmd %s :", cmd_name);
+			return cmd_table[i].cmd;
+		}
+	}
+
+	/*find ec.bin,update the firmware*/
+	if (strstr(cmd_name, FT_UPDATE_CMD_STR)) {
+		return UPDATE_CMD;
+	}
+
+	FF_LOGE("Unknown subcommand: %s", cmd_name);
+	return UNKNOWN_CMD;
 }
 
 int main(int argc, char **argv)
 {
-	int ret = 0;
+	int ret = FT_SUCCESS;
 	ft_device_info_t info;
-
-	char tmp[PATH_MAX];
+	ft_cmd_t cmd = UNKNOWN_CMD;
 
 	struct option long_options[] = { { "help", no_argument, NULL, 'h' },
 					 { "version", no_argument, NULL, 'v' },
@@ -212,135 +255,118 @@ int main(int argc, char **argv)
 		switch (option) {
 		case 'h':
 			FF_LOGI("%s", ft_cmd_help_string);
-			return 0;
+			return FT_SUCCESS;
 		case 'v':
 			FF_LOGI("tool version is %s", FOCAL_SOFT_VERSION);
-			return 0;
+			cmd = GET_EC_VERSION_CMD;
+			break;
 		default:
 			FF_LOGE("unknown: %c", optopt);
 			break;
 		}
 	}
 
-	if (argc < 2 || argc > 3) {
+	if (cmd == UNKNOWN_CMD) {
+		cmd = ft_get_command(argc - 1, argv + 1);
+	}
+
+	if (cmd == UNKNOWN_CMD) {
 		FF_LOGE("para err");
-		return -1;
-	} else {
-		ret = ft_device_init(&info);
-		if (ret < 0) {
-			return -2;
-		}
+		return FT_PARA_ERR;
+	}
 
-		if (info.current_mode != ROM_MODE &&
-		    info.current_mode != BOOT_MODE) {
-			if (ft_get_ec_build_version()) {
-				FF_LOGE("This module is not focal device,please check again!");
-				return -2;
-			}
-		}
+	ret = ft_device_init(&info);
+	if (ret < 0) {
+		return FT_NO_SUCH_DEV;
+	}
 
-		if (argc == 3) {
-			memset(tmp, 0, sizeof(tmp));
-			strncpy(tmp, argv[2], sizeof(tmp) - 1);
-			tmp[PATH_MAX - 1] = '\0';
+	info.ec_bin = argv[1];
 
-			if (!memcmp(tmp, "force_update_full_ec_bin",
-				    sizeof("force_update_full_ec_bin"))) {
-				FF_LOGD("force update ec bin");
-				info.next_mode = FORCE_UPDATE_MODE;
-			} else if (!memcmp(tmp, "flash_set_protect",
-					   sizeof("flash_set_protect"))) {
-				FF_LOGD("flash_set_protect");
-				info.action = FT_ACTION_WP_SET;
-				info.action_para = atoi(argv[1]);
-			} else {
-				FF_LOGE("para err");
-				return -1;
-			}
-		}
-
-		memset(tmp, 0, sizeof(tmp));
-		info.ec_bin = argv[1];
-
-		strncpy(tmp, argv[1], sizeof(tmp) - 1);
-		tmp[PATH_MAX - 1] = '\0';
-
-		if (!memcmp(tmp, "back_to_second_boot",
-			    sizeof("back_to_second_boot"))) {
-			FF_LOGD("back to second boot");
-			info.next_mode = BOOT_MODE;
-
-			ft_switch_to_boot();
-			mbedtls_usb_free();
-			return 0;
-		}
-
-		if (!memcmp(tmp, "back_to_bootloader",
-			    sizeof("back_to_bootloader"))) {
-			FF_LOGD("back to  bootloader");
-			info.next_mode = BOOT_MODE;
-
-			ft_switch_to_boot();
-			mbedtls_usb_free();
-			return 0;
-		}
-
-		if (!memcmp(tmp, "back_to_rom_boot",
-			    sizeof("back_to_rom_boot"))) {
-			FF_LOGD("back to rom boot");
-			info.next_mode = ROM_MODE;
-			mbedtls_usb_free();
-			update_fw(&info);
-			return 0;
-		}
-
-		if (!memcmp(tmp, "enter_usb_suspend",
-			    sizeof("enter_usb_suspend"))) {
-			mbedtls_usb_free();
-			focal_device_disable();
-			return 0;
-		}
-
-		if (!memcmp(tmp, "enter_usb_resume",
-			    sizeof("enter_usb_resume"))) {
-			mbedtls_usb_free();
-			return 0;
-		}
-
-		if (!memcmp(tmp, "flash_get_protect",
-			    sizeof("flash_get_protect"))) {
-			FF_LOGD("flash_get_protect");
-			info.action = FT_ACTION_WP_GET;
-		}
-
-		if (info.next_mode != FORCE_UPDATE_MODE) {
-			info.next_mode = EC_MODE;
+	if (info.current_mode != ROM_MODE && info.current_mode != BOOT_MODE) {
+		if (ft_get_ec_build_version()) {
+			FF_LOGE("This module is not focal device,please check again!");
+			ft_usb_free();
+			return FT_NO_SUCH_DEV;
 		}
 	}
 
-	if (!memcmp(tmp, "get_ec_version", sizeof("get_ec_version"))) {
-		// already show fw version before.
-		return 0;
+	switch (cmd) {
+	case ENTER_BOOT_CMD:
+		info.next_mode = BOOT_MODE;
+		ret = ft_switch_to_boot(&info);
+		ft_usb_free();
+		return ret;
+	case ENTER_ROM_CMD:
+		info.next_mode = ROM_MODE;
+		ft_usb_free();
+		if (info.current_mode != BOOT_MODE) {
+			FF_LOGE("This command can only be executed in boot mode.");
+			return FT_RESULT_FAIL;
+		}
+		ret = update_fw(&info);
+		return ret;
+	case USB_SUSPEND_CMD:
+		ft_usb_free();
+		focal_device_disable();
+		return FT_SUCCESS;
+	case USB_RESUME_CMD:
+		/*usb will be resume by ft_device_init*/
+		ft_usb_free();
+		return FT_SUCCESS;
+	case GET_FLASH_WP_CMD:
+		if (info.current_mode != BOOT_MODE) {
+			FF_LOGE("This command can only be executed in boot mode.");
+			ft_usb_free();
+			return FT_RESULT_FAIL;
+		}
+		info.action = FT_ACTION_WP_GET;
+		break;
+
+	case SET_FLASH_WP_CMD:
+		if (info.current_mode != BOOT_MODE) {
+			FF_LOGE("This command can only be executed in boot mode.");
+			ft_usb_free();
+			return FT_RESULT_FAIL;
+		}
+		info.action = FT_ACTION_WP_SET;
+		info.action_para = atoi(argv[2]);
+		break;
+	case GET_EC_VERSION_CMD:
+		ft_usb_free();
+		/*already show fw version before.*/
+		return FT_SUCCESS;
+	case FORCE_UPDATE_CMD:
+		info.next_mode = FORCE_UPDATE_MODE;
+		info.ec_bin = argv[2];
+		break;
+
+	default:
+		break;
+	}
+
+	if (!info.next_mode) {
+		info.next_mode = EC_MODE;
 	}
 
 	if (info.action == FT_ACTION_NORMAL) {
 		if (access(info.ec_bin, F_OK)) {
 			FF_LOGE("can't find %s", info.ec_bin);
-			return -1;
+			ft_usb_free();
+			return FT_NO_SUCH_FILE;
 		}
 	}
 
 	if (info.current_mode == TEST_MODE) {
 		ft_switch_to_rom();
-		mbedtls_usb_free();
+		ft_usb_free();
 		usleep(2000 * 1000);
 		info.current_mode = ROM_MODE;
 	}
 
 	if (info.current_mode == EC_MODE &&
 	    info.next_mode == FORCE_UPDATE_MODE) {
-		ft_switch_to_boot();
-		mbedtls_usb_free();
+		ft_switch_to_boot(&info);
+		ft_usb_free();
 		usleep(2000 * 1000);
 		info.current_mode = BOOT_MODE;
 	}
@@ -349,8 +375,8 @@ int main(int argc, char **argv)
 		info.next_mode = EC_MODE;
 	}
 
-	mbedtls_usb_free();
-	update_fw(&info);
+	ft_usb_free();
+	ret = update_fw(&info);
 
-	return 0;
+	return ret;
 }

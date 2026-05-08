@@ -8,7 +8,9 @@
 
 #include <string.h> // strrchr(..)
 
+#ifndef NDEBUG
 #define __DEBUG_MODE__
+#endif
 
 /**
  * The default LOG_TAG is 'focaltech', using these two lines to define newtag.
@@ -42,7 +44,6 @@ typedef enum {
 #endif
 
 /* Log level can be runtime configurable. */
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -98,21 +99,20 @@ int log_printf(log_level_t level, const char *tag, const char *fmt, ...);
 		};                                                       \
 	} while (0)
 
-#define FF_LOGE(format, ...)                                            \
-	do {                                                            \
-		if (__LOG_LEVEL__ <= LOG_LEVEL_ERR) {                   \
-			const char *__fname__ = strrchr(__FILE__, '/'); \
-			if (!__fname__)                                 \
-				__fname__ = strrchr(__FILE__, '\\');    \
-			if (!__fname__)                                 \
-				__fname__ = __FILE__;                   \
-			else                                            \
-				__fname__ += 1;                         \
-			log_printf(LOG_LEVEL_ERR, LOG_TAG,              \
-				   "error at %s[%s:%d]: " format,       \
-				   __FUNCTION__, __fname__, __LINE__,   \
-				   ##__VA_ARGS__);                      \
-		};                                                      \
+#define FF_LOGE(format, ...)                                                \
+	do {                                                                \
+		if (__LOG_LEVEL__ <= LOG_LEVEL_ERR) {                       \
+			const char *__fname__ = strrchr(__FILE__, '/');     \
+			if (!__fname__)                                     \
+				__fname__ = strrchr(__FILE__, '\\');        \
+			if (!__fname__)                                     \
+				__fname__ = __FILE__;                       \
+			else                                                \
+				__fname__ += 1;                             \
+			log_printf(LOG_LEVEL_ERR, LOG_TAG,                  \
+				   "error at %s[%s:%d]: " format, __func__, \
+				   __fname__, __LINE__, ##__VA_ARGS__);     \
+		};                                                          \
 	} while (0)
 
 #endif /* __BASE_LOGGING_H__ */

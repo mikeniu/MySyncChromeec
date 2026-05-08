@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "ff_common.h"
 #include "ff_log.h"
 #include "ff_sg_io.h"
 #include "net_usb.h"
@@ -23,7 +24,7 @@ static uint32_t cdb_tag = 1;
 static libusb_context *ctx;
 static libusb_hotplug_callback_handle callback_handle = 0;
 
-static int got_usb_remove = 0;
+static volatile int got_usb_remove = 0;
 
 static struct ft_boot_ep_t {
 	uint8_t ep_bulk_out;
@@ -37,7 +38,7 @@ int ft_sg_init(void)
 	if (r < 0) {
 		FF_LOGE("Failed to initialize libusb: %s\n",
 			libusb_error_name(r));
-		return -1;
+		return FT_RESULT_FAIL;
 	}
 
 #ifdef LIBUSB_OPTION_LOG_LEVEL
@@ -46,7 +47,7 @@ int ft_sg_init(void)
 	libusb_set_debug(ctx, 3);
 #endif
 
-	return 0;
+	return FT_SUCCESS;
 }
 
 // open device by VID/PID
@@ -56,10 +57,10 @@ int ft_sg_open(uint16_t vendor_id, uint16_t product_id)
 		libusb_open_device_with_vid_pid(ctx, vendor_id, product_id);
 	if (!dev_handle) {
 		FF_LOGE("Device not found");
-		return -1;
+		return FT_NO_SUCH_DEV;
 	}
 	libusb_reset_device(dev_handle);
-	usleep(100 * 1000);
+	usleep(200 * 1000);
 
 	if (!libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG)) {
 		FF_LOGW("Hotplug capabilities are not supported on this platform: %s",
@@ -70,14 +71,14 @@ int ft_sg_open(uint16_t vendor_id, uint16_t product_id)
 			LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED |
 				LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
 			0, vendor_id, product_id, LIBUSB_HOTPLUG_MATCH_ANY,
-			usb_remove_event_callback, &got_usb_remove,
+			usb_remove_event_callback, (void *)&got_usb_remove,
 			&callback_handle);
 		if (ret) {
 			FF_LOGW("hotplug_register failed");
 		}
 	}
 
-	// check MSC device
+	// check MASS_STORAGE device
 	struct libusb_device_descriptor desc;
 	libusb_device *dev = libusb_get_device(dev_handle);
 	libusb_get_device_descriptor(dev, &desc);
@@ -104,10 +105,7 @@ int ft_sg_open(uint16_t vendor_id, uint16_t product_id)
 				iface_desc->bInterfaceSubClass);
 
 			if (iface_desc->bInterfaceClass ==
-			    LIBUSB_CLASS_MASS_STORAGE) // &&
-						       // iface_desc->bInterfaceSubClass
-						       // == 0x06)
-			{ // SCSI transparent
+			    LIBUSB_CLASS_MASS_STORAGE) { // SCSI transparent
 				found_msc = 1;
 
 				// find bulk endpoint
@@ -142,7 +140,7 @@ int ft_sg_open(uint16_t vendor_id, uint16_t product_id)
 		FF_LOGE("Not a Mass Storage Class device");
 		libusb_close(dev_handle);
 		dev_handle = NULL;
-		return -1;
+		return FT_NO_SUCH_DEV;
 	}
 
 	if (libusb_kernel_driver_active(dev_handle, 0) == 1) {
@@ -153,18 +151,22 @@ int ft_sg_open(uint16_t vendor_id, uint16_t product_id)
 	int r = libusb_claim_interface(dev_handle, 0);
 	if (r < 0) {
 		FF_LOGE("Failed to claim interface: %s", libusb_error_name(r));
+		libusb_release_interface(dev_handle, 0);
 		libusb_close(dev_handle);
 		dev_handle = NULL;
-		return -1;
+		return FT_NO_SUCH_DEV;
 	}
 
 	if (!g_ft_boot_ep.ep_bulk_out || !g_ft_boot_ep.ep_bulk_in) {
 		FF_LOGE("can't find bulk endpoint,ep in=%x,ep out=%x",
 			g_ft_boot_ep.ep_bulk_in, g_ft_boot_ep.ep_bulk_out);
-		return -1;
+		libusb_release_interface(dev_handle, 0);
+		libusb_close(dev_handle);
+		dev_handle = NULL;
+		return FT_NO_SUCH_DEV;
 	}
 
-	return 0;
+	return FT_SUCCESS;
 }
 
 static int ft_check_mcu_reset(void)
@@ -180,13 +182,13 @@ static int ft_check_mcu_reset(void)
 		libusb_handle_events_timeout_completed(ctx, &timeout,
 						       &complete);
 
-		if (got_usb_remove == 0x55aa) {
+		if (got_usb_remove == FT_USB_DEVICE_REMOVE_MAGIC) {
 			FF_LOGI("got usb remove event");
-			return 0;
+			return FT_SUCCESS;
 		}
 	}
 
-	return -1;
+	return FT_RESULT_FAIL;
 }
 
 // send SG_IO
@@ -194,17 +196,18 @@ int ft_sg_io(struct sg_io_hdr *io_hdr)
 {
 	if (!dev_handle) {
 		FF_LOGE("Device not opened");
-		return -1;
-	}
-
-	if (!io_hdr->cmdp || io_hdr->cmd_len == 0) {
-		FF_LOGE("Invalid SCSI command");
-		return -1;
+		return FT_NO_SUCH_DEV;
 	}
 
 	// create CBW
 	struct bulk_cb_wrap cbw;
 	memset(&cbw, 0, sizeof(cbw));
+
+	if (!io_hdr->cmdp || io_hdr->cmd_len == 0 ||
+	    io_hdr->cmd_len > sizeof(cbw.cmd)) {
+		FF_LOGE("Invalid SCSI command");
+		return FT_NO_SUCH_DEV;
+	}
 
 	cbw.signature = htole32(USB_MS_CBW_SIGNATURE);
 	cbw.tag = htole32(cdb_tag++);
@@ -231,8 +234,7 @@ int ft_sg_io(struct sg_io_hdr *io_hdr)
 	// send CBW
 	int transferred;
 	int r = libusb_bulk_transfer(dev_handle,
-				     g_ft_boot_ep.ep_bulk_out, // Bulk OUT
-							       // endpoint
+				     g_ft_boot_ep.ep_bulk_out, 
 				     (unsigned char *)&cbw, sizeof(cbw),
 				     &transferred, io_hdr->timeout);
 	if (r < 0) {
@@ -247,7 +249,7 @@ int ft_sg_io(struct sg_io_hdr *io_hdr)
 		FF_LOGE("CBW transfer failed: %s", libusb_error_name(r));
 		io_hdr->driver_status = SG_IO_DRIVER_ERROR;
 
-		return -1;
+		return FT_NO_SUCH_DEV;
 	}
 
 	if (transferred != sizeof(cbw)) {
@@ -255,13 +257,13 @@ int ft_sg_io(struct sg_io_hdr *io_hdr)
 			FF_LOGW("Incomplete CBW transfer: %d/%zu bytes,recheck mcu reset",
 				transferred, sizeof(cbw));
 			if (ft_check_mcu_reset() == 0) {
-				return 0;
+				return FT_SUCCESS;
 			}
 		}
 		FF_LOGE("Incomplete CBW transfer: %d/%zu bytes", transferred,
 			sizeof(cbw));
 		io_hdr->driver_status = SG_IO_DRIVER_ERROR;
-		return -1;
+		return FT_NO_SUCH_DEV;
 	}
 
 	// data transfer
@@ -282,14 +284,14 @@ int ft_sg_io(struct sg_io_hdr *io_hdr)
 				FF_LOGW("Data transfer failed: %s,recheck mcu reset",
 					libusb_error_name(r));
 				if (ft_check_mcu_reset() == 0) {
-					return 0;
+					return FT_SUCCESS;
 				}
 			}
 
 			FF_LOGE("Data transfer failed: %s",
 				libusb_error_name(r));
 			io_hdr->driver_status = SG_IO_DRIVER_ERROR;
-			return -1;
+			return FT_NO_SUCH_DEV;
 		}
 
 		io_hdr->resid = io_hdr->dxfer_len - transferred;
@@ -310,14 +312,14 @@ int ft_sg_io(struct sg_io_hdr *io_hdr)
 			FF_LOGE("CSW transfer failed: %s",
 				libusb_error_name(r));
 			io_hdr->driver_status = SG_IO_DRIVER_ERROR;
-			return -1;
+			return FT_NO_SUCH_DEV;
 		}
 
 		if (transferred != sizeof(csw)) {
 			FF_LOGE("Incomplete CSW transfer: %d/%zu bytes",
 				transferred, sizeof(csw));
 			io_hdr->driver_status = SG_IO_DRIVER_ERROR;
-			return -1;
+			return FT_NO_SUCH_DEV;
 		}
 
 		// check CSW
@@ -325,14 +327,14 @@ int ft_sg_io(struct sg_io_hdr *io_hdr)
 			FF_LOGE("Invalid CSW signature: 0x%08x",
 				le32toh(csw.signature));
 			io_hdr->driver_status = SG_IO_DRIVER_ERROR;
-			return -1;
+			return FT_NO_SUCH_DEV;
 		}
 
 		if (le32toh(csw.tag) != le32toh(cbw.tag)) {
 			FF_LOGE("CSW tag mismatch: sent=0x%08x, received=0x%08x",
 				le32toh(cbw.tag), le32toh(csw.tag));
 			io_hdr->driver_status = SG_IO_DRIVER_ERROR;
-			return -1;
+			return FT_NO_SUCH_DEV;
 		}
 
 		// set status
@@ -353,7 +355,7 @@ int ft_sg_io(struct sg_io_hdr *io_hdr)
 		}
 	}
 
-	return 0;
+	return FT_SUCCESS;
 }
 
 // close device

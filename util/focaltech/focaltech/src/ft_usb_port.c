@@ -17,16 +17,12 @@
 #include <linux/usb/ch9.h>
 #include <linux/usbdevice_fs.h>
 #include <pthread.h>
-#include <strings.h>
+
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#define API_EXPORTED __attribute__((visibility("default")))
-
 #define USB_HUB_TIMEOUT 5000 /* milliseconds */
 
-// Copied from kernel's uapi/linux/usb/ch11.h. Should this be obtained
-// by plain #include ?
 #define USB_PORT_FEAT_ENABLE 1
 #define USB_PORT_FEAT_RESET 4
 
@@ -67,7 +63,7 @@ static int ft_set_hub_port_feature(int busnum, int devnum, int portnum,
 	fd = open(dev_path, O_RDWR);
 	if (fd < 0) {
 		FF_LOGE("Failed to open %s: %s", dev_path, strerror(errno));
-		return -1;
+		return FT_NO_SUCH_DEV;
 	}
 
 	// Build the exact ioctl command that change_port_status used to build
@@ -80,9 +76,10 @@ static int ft_set_hub_port_feature(int busnum, int devnum, int portnum,
 	ctrl.data = NULL;
 
 	rc = ioctl(fd, USBDEVFS_CONTROL, &ctrl);
-	if (rc == -1) {
+	if (rc) {
 		FF_LOGE("ioctl failed for port %d feature %d: %s", portnum,
 			feature, strerror(errno));
+		rc = FT_NO_SUCH_DEV;
 	}
 
 	close(fd);
@@ -148,17 +145,17 @@ static int focal_dev_reset(void)
 	int ret;
 	FF_LOGD("%s enter\n", __func__);
 	if (focal_dev_port.init != V_INIT_SUCCESS) {
-		return -1;
+		return FT_NO_SUCH_DEV;
 	}
 
 	// USB_PORT_FEAT_RESET is 4. '1' means set/enable the feature.
 	ret = ft_set_hub_port_feature(focal_dev_port.bus, focal_dev_port.hub,
 				      focal_dev_port.port, USB_PORT_FEAT_RESET,
 				      1);
-	if (ret != -1) {
+	if (ret != FT_NO_SUCH_DEV) {
 		focal_dev_port.disabled = 0;
 	}
-	return (ret == -1) ? -1 : 0;
+	return (ret == FT_NO_SUCH_DEV) ? FT_NO_SUCH_DEV : FT_SUCCESS;
 }
 
 static int focal_dev_disable(void)
@@ -166,21 +163,21 @@ static int focal_dev_disable(void)
 	int ret;
 	FF_LOGI("%s enter", __func__);
 	if (focal_dev_port.init != V_INIT_SUCCESS) {
-		return -1;
+		return FT_NO_SUCH_DEV;
 	}
 
 	if (focal_dev_port.disabled) {
-		return -2;
+		return FT_RESULT_FAIL;
 	}
 
 	// USB_PORT_FEAT_ENABLE is 1. '0' means clear/disable the feature.
 	ret = ft_set_hub_port_feature(focal_dev_port.bus, focal_dev_port.hub,
 				      focal_dev_port.port, USB_PORT_FEAT_ENABLE,
 				      0);
-	if (ret != -1) {
+	if (ret != FT_NO_SUCH_DEV) {
 		focal_dev_port.disabled = 1;
 	}
-	return (ret == -1) ? -1 : 0;
+	return (ret == FT_NO_SUCH_DEV) ? FT_NO_SUCH_DEV : FT_SUCCESS;
 }
 
 static int
@@ -189,7 +186,7 @@ focal_usb_device_port_method_init(focal_usb_device_port_method_t *method)
 	FF_LOGD("%s enter\n", __func__);
 
 	if (method == NULL) {
-		return -1;
+		return FT_NO_SUCH_DEV;
 	}
 
 	libusb_device **devs;
@@ -219,12 +216,12 @@ focal_usb_device_port_method_init(focal_usb_device_port_method_t *method)
 	method->init = V_INIT_SUCCESS;
 
 	focal_dev_port.disabled = 0;
-	return 0;
+	return FT_SUCCESS;
 }
 
 int focal_device_disable(void)
 {
-	int ret = 0;
+	int ret = FT_SUCCESS;
 	focal_usb_device_port_method_t method;
 	memset(&method, 0, sizeof(focal_usb_device_port_method_t));
 

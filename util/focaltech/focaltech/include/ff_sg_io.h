@@ -28,22 +28,21 @@
 #define SG_IO_BAD_TARGET 4
 
 /* FocalTech Vendor-Specific SCSI Command Opcodes */
-#define FT_CMD_READ_INFO        0xdb
-#define FT_CMD_ACTION           0xdc
+#define FT_CMD_READ_INFO 0xdb
+#define FT_CMD_ACTION 0xdc
 
 /* Sub-commands for FT_CMD_ACTION (typically placed at byte 13) */
-#define FT_SUBCMD_READ_DATA     0x01
-#define FT_SUBCMD_WRITE_BIN     0x03
-#define FT_SUBCMD_CODE_BIN      0x04
-#define FT_SUBCMD_ERASE_PAGE    0x08
-#define FT_SUBCMD_VERIFY        0xbb
-#define FT_SUBCMD_EXEC_DISBOOT  0xcc
-#define FT_SUBCMD_SOFT_RESET    0xdd
-#define FT_SUBCMD_FLASH_WP_SET  0xF7
-#define FT_SUBCMD_FLASH_WP_GET  0xF8
+#define FT_SUBCMD_READ_DATA 0x01
+#define FT_SUBCMD_WRITE_BIN 0x03
+#define FT_SUBCMD_CODE_BIN 0x04
+#define FT_SUBCMD_ERASE_PAGE 0x08
+#define FT_SUBCMD_VERIFY 0xbb
+#define FT_SUBCMD_SOFT_RESET 0xdd
+#define FT_SUBCMD_FLASH_WP_SET 0xf7
+#define FT_SUBCMD_FLASH_WP_GET 0xf8
 
 /* Common target lengths */
-#define FT_CMD_LENGTH           16
+#define FT_CMD_LENGTH 16
 
 #define FT_PARA_UNSET 0
 #define FT_PARA_READ_SRAM_DIFF 1
@@ -53,6 +52,8 @@
 
 #define FT_WRITE_SRAM_ADDR (0x20002000)
 #define FT_READ_SRAM_ADDR (0x20003000)
+
+#define FT_EC_BIN_SIZE_MAX (2 * 1024 * 1024)
 
 typedef enum ft_hash_mode_e {
 	HASH_MODE_SM3,
@@ -64,17 +65,24 @@ typedef enum ft_hash_mode_e {
 	HASH_MODE_SHA512,
 } ft_hash_mode_t;
 
-typedef enum ft_soft_reset_e {
-	SOFT_POR,
-	SOFT_RST
-} ft_soft_reset_t;
+struct ft_cmd_format {
+	uint8_t opcode;
+	uint32_t para2;
+	uint32_t para3;
+	uint32_t para4;
+	uint8_t subcmd;
+	uint8_t sub_para;
+	uint8_t reserved;
+} __attribute__((packed));
+
+typedef enum ft_soft_reset_e { SOFT_POR, SOFT_RST } ft_soft_reset_t;
 
 typedef enum ft_flash_protect_area_e {
 	FLASH_WP_AREA_UNKNOWN,
 	FLASH_WP_AREA_ALL,
-	FLASH_WP_AREA_BOOT, 	//addr=0x10000000~0x10080000
-	FLASH_WP_AREA_RO,		//addr=0x10000000~0x10100000
-	FLASH_WP_AREA_RW,		//addr=0x10000000~0x10180000
+	FLASH_WP_AREA_BOOT, // addr=0x10000000~0x10080000
+	FLASH_WP_AREA_RO, // addr=0x10000000~0x10100000
+	FLASH_WP_AREA_RW, // addr=0x10000000~0x10180000
 	FLASH_WP_AREA_OUT_RANGE
 } ft_flash_protect_area_t;
 
@@ -95,7 +103,6 @@ struct bulk_cs_wrap {
 	uint32_t data_residue;
 	uint8_t status;
 } __attribute__((packed));
-
 
 int ft_sg_init(void);
 int ft_sg_open(uint16_t vendor_id, uint16_t product_id);

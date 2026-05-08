@@ -7,16 +7,14 @@
 #define __FF_COMMON_H__
 
 #include <stdbool.h>
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define FOCAL_SOFT_VERSION "v1.0.1"
-
-#define FT_BULK_EP_IN 0x81
+#define FOCAL_SOFT_VERSION "v1.0.2"
 
 #define FOCAL_CONFIG_SIZE 4096
 
@@ -74,12 +72,17 @@ typedef struct ft_device_info_st {
 
 } ft_device_info_t;
 
+#define FT_SUCCESS 0
+#define FT_NO_SUCH_DEV -1
+#define FT_PARA_ERR -2
+#define FT_NO_SUCH_FILE -3
+#define FT_RESULT_FAIL -4
 
 /*usb transfer interface via libusb */
 int mbedtls_usb_recv_timeout_with_ep(uint8_t *buf, uint32_t len,
 				     uint32_t timeout, uint8_t epin);
 
-void update_fw(ft_device_info_t *info);
+int update_fw(ft_device_info_t *info);
 int focal_device_disable(void);
 
 #ifdef __cplusplus

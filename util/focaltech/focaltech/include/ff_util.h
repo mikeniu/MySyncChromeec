@@ -6,6 +6,7 @@
 #ifndef __FF_UTIL_H__
 #define __FF_UTIL_H__
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -13,17 +14,12 @@
 extern "C" {
 #endif
 
-/*
- * Dump the memory content to logcat like 'hexdump -C'.
- *
- * @params
- *  buf: Memory buffer.
- *  len: Buffer length.
- */
-void ff_util_hexdump(uint8_t mak, const char *info, const uint8_t *buf,
-		     uint32_t len);
-
-
+/* Safely calculates the ceiling division of n / d */
+static inline uint32_t ft_div_round_up(uint32_t n, uint32_t d)
+{
+	assert(d != 0);
+	return (n + d - 1) / d;
+}
 
 #ifdef __cplusplus
 }
