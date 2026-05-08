@@ -277,6 +277,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "83312c9d_0802218a",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T21:23:26Z",
+      "side": 1,
+      "message": "Functions like `write_flash` take a `const std::vector\u003cuint8_t\u003e\u0026`. This forces the caller to use a `std::vector`. If the caller has a C-array, a `std::array`, or wants to pass a subset of a vector, they have to copy data. `std::span` is a lightweight, non-owning view of contiguous memory.\n\n**Before:**\n\n```c\nint write_flash(uint32_t offset, const std::vector\u003cuint8_t\u003e \u0026data);\n\n// Calling with a chunk (forces an allocation/copy!):\nwrite_flash(addr, std::vector\u003cuint8_t\u003e(firmware.begin() + file_pos, firmware.begin() + file_pos + current_chunk));\n\n```\n\n**After:**\n\n```c\n#include \u003cspan\u003e\n\nint write_flash(uint32_t offset, std::span\u003cconst uint8_t\u003e data);\n\n// Calling with a chunk (zero copies!):\nwrite_flash(addr, std::span{firmware}.subspan(file_pos, current_chunk));\n\n```",
+      "range": {
+        "startLine": 445,
+        "startChar": 0,
+        "endLine": 445,
+        "endChar": 79
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4ab161f1_8fcae9bf",
         "filename": "util/egis/bootrom.h",
         "patchSetId": 10
