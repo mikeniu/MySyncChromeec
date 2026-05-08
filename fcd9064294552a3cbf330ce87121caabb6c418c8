@@ -273,6 +273,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c3ecb240_9488f500",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:13:05Z",
+      "side": 1,
+      "message": "This appears to be ARM thumb assembly meant to be executed on the MCU.\n\n* **Recommendation:** Magic binary blobs are a maintainability and security risk. At an absolute minimum, include a comment block containing the disassembled source code (e.g., the original ARM assembly) that generated this blob.",
+      "parentUuid": "d52b245d_4d34bbd7",
+      "range": {
+        "startLine": 466,
+        "startChar": 0,
+        "endLine": 466,
+        "endChar": 36
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "069f2d47_2db327b9",
         "filename": "util/focaltech/focaltech/src/fun.c",
         "patchSetId": 11
@@ -289,6 +313,29 @@
         "startChar": 0,
         "endLine": 560,
         "endChar": 72
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f55f2fe_746f5a56",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 685,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:13:05Z",
+      "side": 1,
+      "message": "**Abrupt Program Termination (`fun.c`)** In the `update_fw` function, there are multiple instances where `exit(FT_RESULT_FAIL);` is called upon encountering an error (e.g., during WP set/get operations or download failures). Calling `exit()` deep within a business-logic function is an anti-pattern. It prevents the caller (`main()`) from executing necessary cleanup routines, such as `mbedtls_usb_free()`.\n\n* **Recommendation:** Replace `exit(FT_RESULT_FAIL);` with `return;` (since the function signature is `void update_fw()`) or ideally, change the signature to `int update_fw()` and `return FT_RESULT_FAIL;`, allowing `main()` to gracefully handle the failure, perform cleanup, and return a proper exit code.",
+      "range": {
+        "startLine": 660,
+        "startChar": 0,
+        "endLine": 685,
+        "endChar": 2
       },
       "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
