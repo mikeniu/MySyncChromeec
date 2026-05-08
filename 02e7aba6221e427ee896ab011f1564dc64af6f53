@@ -478,6 +478,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0c7527f4_6bd54a6a",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T21:23:01Z",
+      "side": 1,
+      "message": "The code is currently cluttered with `std::cout`, `std::hex`, `std::dec`, `std::setw`, and `std::setfill`. C++23\u0027s `std::print` (built on C++20\u0027s `std::format`) eliminates all of this boilerplate and is significantly faster.\n\n**Before:**\n\n```c\nstd::cout \u003c\u003c \"Flash Size : 0x\" \u003c\u003c std::hex \u003c\u003c std::uppercase\n          \u003c\u003c std::setfill(\u00270\u0027) \u003c\u003c std::setw(8) \u003c\u003c fw_size_override \n          \u003c\u003c std::dec \u003c\u003c std::endl;\n\n```\n\n**After (C++23):**\n\n```c\n#include \u003cprint\u003e\n\nstd::print(\"Flash Size : 0x{:08X}\\n\", fw_size_override);\n\n```",
+      "range": {
+        "startLine": 204,
+        "startChar": 0,
+        "endLine": 219,
+        "endChar": 61
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "56c6af0d_f3a8badf",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 10
