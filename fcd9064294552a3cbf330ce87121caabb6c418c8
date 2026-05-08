@@ -3,6 +3,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4b60488e_eb025cfe",
+        "filename": "util/focaltech/focaltech/include/ff_log.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:16:25Z",
+      "side": 1,
+      "message": "**Hardcoded Debug Mode (`ff_log.h`)** The file contains an unconditional `#define __DEBUG_MODE__` at the top, which forces logging on for all builds.\n\n* **Recommendation:** Wrap this in a conditional check that hooks into the build system (e.g., `#ifndef NDEBUG`), ensuring debug logs are stripped from production builds.",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 22
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f34c623_20bab2dd",
+        "filename": "util/focaltech/focaltech/include/ff_log.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:16:25Z",
+      "side": 1,
+      "message": "**`__FUNCTION__` vs `__func__` (`ff_log.h`)** In `FF_LOGE`, `__FUNCTION__` is used. While widely supported, `__func__` is the C99 standard identifier and is preferred for portability.\n\n* **Recommendation:** Replace `__FUNCTION__` with `__func__`.",
+      "range": {
+        "startLine": 112,
+        "startChar": 0,
+        "endLine": 112,
+        "endChar": 45
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "646228b7_bfcf2595",
         "filename": "util/focaltech/focaltech/include/ft_help.h",
         "patchSetId": 11
@@ -72,6 +118,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e41cc0c2_316c6258",
+        "filename": "util/focaltech/focaltech/src/ff_util.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:16:25Z",
+      "side": 1,
+      "message": "* **Print Formats:** In `ff_util.c`, `printf(\"%p  \", addr);` prints pointers. On a 64-bit host, this prints 16 characters (plus `0x`), misaligning the hex dump layout which seems tightly coded to assume specific column widths. Consider using `%08lX` cast to an integer type if fixed-width alignment is strictly required.",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 22
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4d89caf8_0a49f9de",
         "filename": "util/focaltech/focaltech/src/ff_util.c",
         "patchSetId": 11
@@ -118,6 +187,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9fa563c4_e1e70fa8",
+        "filename": "util/focaltech/focaltech/src/ft_sg_io.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:16:25Z",
+      "side": 1,
+      "message": "**Inconsistent Argument Ordering** The parameters for Vendor ID (VID) and Product ID (PID) are swapped inconsistently across the API:\n\n* `ft_sg_open(uint16_t vendor_id, uint16_t product_id)` (VID first)  \n* `mbedtls_usb_init(const uint32_t pid, const uint32_t vid)` (PID first)  \n* `mbedtls_usb_connect(const uint32_t pid, const uint32_t vid)` (PID first)  \n* **Recommendation:** Standardize the argument order to `(vid, pid)` throughout the codebase to prevent accidental swapping. Also, consistently use `uint16_t` for VID/PID instead of mixing `uint32_t` and `uint16_t`.",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 55
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8723ed29_01c2fb72",
         "filename": "util/focaltech/focaltech/src/ft_sg_io.c",
         "patchSetId": 11
@@ -134,6 +226,29 @@
         "startChar": 10,
         "endLine": 81,
         "endChar": 13
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a0fb15a_7004f877",
+        "filename": "util/focaltech/focaltech/src/ft_usb_port.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:16:25Z",
+      "side": 1,
+      "message": "* **Header Inclusion:** In `ft_usb_port.c`, `strings.h` is included alongside `string.h`. Unless you explicitly need legacy POSIX string functions, `strings.h` can be safely removed.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 20
       },
       "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -359,6 +474,29 @@
         "startChar": 0,
         "endLine": 205,
         "endChar": 69
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef0cfed6_c4017602",
+        "filename": "util/focaltech/focaltech/src/net_usb.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:16:25Z",
+      "side": 1,
+      "message": "**Libusb Callback Return Values (`net_usb.c`)** `usb_remove_event_callback` and `usb_event_callback` return `FT_SUCCESS` (which maps to `0`). In libusb, hotplug callbacks must return `0` to remain registered, or `1` (or `\u003e\u003d 1`) to deregister themselves. While `FT_SUCCESS` happens to be `0`, using a custom application error code macro for a strict library-defined boolean return value is semantically incorrect and fragile.\n\n* **Recommendation:** Explicitly `return 0;` and add a comment `/* Return 0 to keep the callback armed */`.",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 145,
+        "endChar": 1
       },
       "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
