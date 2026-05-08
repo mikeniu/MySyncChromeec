@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52aba43e_87e8173c",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-08T16:49:16Z",
+      "side": 1,
+      "message": "How did you determine this delay time?",
+      "revId": "b00b3fb7ea3b5d4542739f5b77b12d4207552f5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0cbf651_c97cc23e",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-08T16:49:16Z",
+      "side": 1,
+      "message": "This will run it twice during init hooks and then potentially every ~2 ms after that. Is that intended? Are both calls during init necessary?\n\nIs there some later time that it could just run once? If the battery is in cutoff initially, is there some point later when it will definitely be out of cutoff?",
+      "revId": "b00b3fb7ea3b5d4542739f5b77b12d4207552f5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
