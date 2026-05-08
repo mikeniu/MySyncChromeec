@@ -13,7 +13,6 @@
 #include "../power_signal.dtsi"
 #include "../usba.dtsi"
 #include "led_pins.dtsi"
-#include "led_policy.dtsi"
 #include "temp_sensor.dtsi"
 #include "cbi.dtsi"
 #include "motionsense.dtsi"
@@ -55,6 +54,11 @@
 			irq-pin = <&gpio_imu_int_ec_l>;
 			flags = <GPIO_INT_EDGE_FALLING>;
 			handler = "bmi260_interrupt";
+		};
+		int_pmic_ec_resetb: pmic-ec-resetb {
+			irq-pin = <&gpio_pmic_ec_resetb>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "pmic_ec_resetb_interrupt";
 		};
 	};
 

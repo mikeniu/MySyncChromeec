@@ -28,10 +28,6 @@ ZEPHYR_MODULES = {
         "path": "src/third_party/zephyr/picolibc",
         "main": "main",
     },
-    "cmsis": {
-        "path": "src/third_party/zephyr/cmsis",
-        "main": "chromeos-main",
-    },
 }
 ZEPHYR_MODULE_LIST = list(ZEPHYR_MODULES.keys())
 
@@ -538,7 +534,7 @@ def main(argv):
             # to avoid any conflict with the modified branch file.
             prunelist.append("OWNERS")
         merge_repo(
-            os.path.join(opts.srcbase, "src/third_party/zephyr/main"),
+            os.path.join(opts.srcbase, "src/third_party/zephyrproject"),
             cros_main,
             cmd_checkout,
             strategy,

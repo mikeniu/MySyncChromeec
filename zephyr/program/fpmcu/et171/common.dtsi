@@ -9,6 +9,7 @@
 #include "soc.dtsi"
 #include "gpio.dtsi"
 #include "rwsig.dtsi"
+#include "ascp.dtsi"
 
 #include <cros/integrated_fwid.dtsi>
 
@@ -110,7 +111,7 @@
 &spi0 {
 	p25q16: qspi-nor-flash {
 		compatible = "andestech,qspi-nor-xip", "jedec,spi-nor";
-		size = <DT_SIZE_K(1024)>;
+		size = <DT_SIZE_K(2048)>;
 		status = "okay";
 	};
 };
@@ -120,6 +121,26 @@
 		compatible = "fixed-partitions";
 		#address-cells = <1>;
 		#size-cells = <1>;
+
+		sdcp_pk_d: partition@35 {
+			label = "sdcp_pk_d";
+			reg = <0x35 65>;
+		};
+
+		sdcp_s_m: partition@76 {
+			label = "sdcp_s_m";
+			reg = <0x76 64>;
+		};
+
+		sdcp_pk_m: partition@138 {
+			label = "sdcp_pk_m";
+			reg = <0x138 65>;
+		};
+
+		sdcp_s_goog: partition@179 {
+			label = "sdcp_s_goog";
+			reg = <0x179 64>;
+		};
 
 		mt_data: partition@1b9 {
 			label = "mt_data";
