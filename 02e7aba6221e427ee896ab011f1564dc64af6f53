@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d20a37ab_631aaf2d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T21:19:02Z",
+      "side": 1,
+      "message": "**Mixed Naming Conventions** The codebase mixes `snake_case` and `CamelCase`.\n\n**Remediation:** Standardize the style. Google/Chrome C++ style generally prefers `CamelCase` for methods/functions and `snake_case` for variables. See https://google.github.io/styleguide/cppguide.html for details.",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f38b1852_3d996d3c",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 10
