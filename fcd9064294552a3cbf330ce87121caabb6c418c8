@@ -457,6 +457,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4270487e_00458a63",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:36:24Z",
+      "side": 1,
+      "message": "At the end of `ft_verify_data`, if the hash comparison fails, the code manually sets the return value and jumps to `exit`.\n\n**Current Code:**\n\n```c\n\tif (memcmp(pHash, read_hash, SHA256_DIGEST_LENGTH)) {\n\t\tFF_LOGE(\"verify error!\");\n\t\t// ... logs ...\n\t\tret_value \u003d FT_RESULT_FAIL;\n\t\tgoto exit;\n\t}\n\nexit:\n\n```\n\nSince this is literally the last block of code before the `exit` label, jumping is redundant. You can let it naturally fall through to the cleanup block.\n\n**Suggested Rewrite:**\n\n```c\n\tif (memcmp(pHash, read_hash, SHA256_DIGEST_LENGTH)) {\n\t\tFF_LOGE(\"verify error!\");\n\t\t// ... logs ...\n\t\tret_value \u003d FT_RESULT_FAIL;\n\t}\n\n\t/* Natural fallthrough to cleanup */\n\tif (file) fclose(file);\n\tif (buffer) free(buffer);\n\n\treturn ret_value;\n\n```",
+      "range": {
+        "startLine": 444,
+        "startChar": 0,
+        "endLine": 444,
+        "endChar": 29
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c046735e_7a62ac98",
         "filename": "util/focaltech/focaltech/src/fun.c",
         "patchSetId": 11
@@ -520,6 +543,29 @@
         "startChar": 0,
         "endLine": 466,
         "endChar": 36
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f255134c_cedf8ff0",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:36:24Z",
+      "side": 1,
+      "message": "The `goto` pattern is excellent for centralizing resource cleanup . However, in `ft_disboot` and `ft_download_page`, there are no dynamically allocated resources, locks, or open files to clean up. The `exit` label simply returns the error code.\n\nUsing `goto exit` here just adds visual noise and forces the reader to jump to the bottom of the function to see what happens.\n\n**Current Code (`ft_disboot`):**\n\n```c\n\tret_value \u003d usb_write(write_disbootdata_cmd, CMD_LENGTH, disbootdata,\n\t\t\t      disbootlen, WRITE_DATA_TO_USB);\n\tif (ret_value) {\n\t\tFF_LOGE(\"write disbootdata error!\");\n\t\tgoto exit;\n\t}\n// ...\nexit:\n\treturn ret_value;\n\n```\n\n**Suggested Rewrite:**\nRemove the `exit` label entirely and return immediately upon failure. This makes the functions strictly linear and easier to trace.\n\n```c\n\tret_value \u003d usb_write(write_disbootdata_cmd, CMD_LENGTH, disbootdata,\n\t\t\t      disbootlen, WRITE_DATA_TO_USB);\n\tif (ret_value) {\n\t\tFF_LOGE(\"write disbootdata error!\");\n\t\treturn ret_value;\n\t}\n\n```\n\n*(Apply this exact same simplification to `ft_download_page` as well).*",
+      "range": {
+        "startLine": 521,
+        "startChar": 0,
+        "endLine": 521,
+        "endChar": 12
       },
       "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
