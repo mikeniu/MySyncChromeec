@@ -11,7 +11,6 @@
 #include "host_command.h"
 #include "i2c.h"
 #include "i2c/i2c.h"
-#include "i2c_bitbang.h"
 #include "i2c_private.h"
 #include "printf.h"
 #include "system.h"
@@ -29,7 +28,7 @@
 #define I2C_CONTROLLER_COUNT I2C_PORT_COUNT
 #endif
 
-static mutex_t port_mutex[I2C_CONTROLLER_COUNT + I2C_BITBANG_PORT_COUNT];
+static mutex_t port_mutex[I2C_CONTROLLER_COUNT];
 
 /* A bitmap of the controllers which are currently servicing a request. */
 static volatile uint32_t i2c_port_active_list;
@@ -80,14 +79,6 @@ const struct i2c_port_t *get_i2c_port(const int port)
 		for (i = 0; i < i2c_ports_used; i++) {
 			if (i2c_ports[i].port == port)
 				return &i2c_ports[i];
-		}
-	}
-
-	if (IS_ENABLED(CONFIG_I2C_BITBANG_CROS_EC)) {
-		/* Find the matching port in i2c_bitbang_ports[] table. */
-		for (i = 0; i < i2c_bitbang_ports_used; i++) {
-			if (i2c_bitbang_ports[i].port == port)
-				return &i2c_bitbang_ports[i];
 		}
 	}
 

@@ -73,10 +73,6 @@ extern "C" {
 /* This port allows changing speed at runtime */
 #define I2C_PORT_FLAG_DYNAMIC_SPEED BIT(0)
 
-#ifndef CONFIG_I2C_BITBANG_CROS_EC
-#define I2C_BITBANG_PORT_COUNT 0
-#endif
-
 /*
  * Supported I2C CLK frequencies.
  * TODO(crbug.com/549286): Use this enum in i2c_port_t.
@@ -111,12 +107,6 @@ struct i2c_drv {
 /* Data structure to define I2C port configuration. */
 struct i2c_port_t {
 	int port; /* Port */
-#ifndef CONFIG_ZEPHYR
-	const char *name; /* Port name */
-	int kbps; /* Speed in kbps */
-	enum gpio_signal scl; /* Port SCL GPIO line */
-	enum gpio_signal sda; /* Port SDA GPIO line */
-#endif /* CONFIG_ZEPHYR */
 	/* When bus is protected, returns true if passthru allowed for address.
 	 * If the function is not defined, the default value is true. */
 	int (*passthru_allowed)(const struct i2c_port_t *port,
