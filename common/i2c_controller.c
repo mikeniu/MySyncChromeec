@@ -85,47 +85,6 @@ const struct i2c_port_t *get_i2c_port(const int port)
 	return NULL;
 }
 
-__maybe_unused static int chip_i2c_xfer_with_notify(const int port,
-						    const uint16_t addr_flags,
-						    const uint8_t *out,
-						    int out_size, uint8_t *in,
-						    int in_size, int flags)
-{
-	int ret;
-	uint16_t no_pec_af = addr_flags;
-	const struct i2c_port_t *i2c_port = get_i2c_port(port);
-
-	if (i2c_port == NULL)
-		return EC_ERROR_INVAL;
-
-	if (IS_ENABLED(CONFIG_I2C_XFER_BOARD_CALLBACK))
-		i2c_start_xfer_notify(port, addr_flags);
-
-	if (IS_ENABLED(CONFIG_SMBUS_PEC))
-		/*
-		 * Since we've done PEC processing here,
-		 * remove the flag so it won't confuse chip driver.
-		 */
-		no_pec_af &= ~I2C_FLAG_PEC;
-
-	if (i2c_port->drv)
-		ret = i2c_port->drv->xfer(i2c_port, no_pec_af, out, out_size,
-					  in, in_size, flags);
-	else
-		ret = chip_i2c_xfer(port, no_pec_af, out, out_size, in, in_size,
-				    flags);
-
-	if (IS_ENABLED(CONFIG_I2C_XFER_BOARD_CALLBACK))
-		i2c_end_xfer_notify(port, addr_flags);
-
-	if (IS_ENABLED(CONFIG_I2C_DEBUG)) {
-		i2c_trace_notify(port, addr_flags, out, out_size, in, in_size,
-				 ret);
-	}
-
-	return ret;
-}
-
 int i2c_xfer_unlocked(const int port, const uint16_t addr_flags,
 		      const uint8_t *out, int out_size, uint8_t *in,
 		      int in_size, int flags)
