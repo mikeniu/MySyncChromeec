@@ -26,9 +26,12 @@
 #define RTS_CMD_SEL_ADDR 0x2005F000ul
 #define RTS_SPI_PROGRAMMING_FLAG 0x20018000ul
 
+#define FLASH_READ_COMPLETE (1ul << 2)
+
 #define WRITE_TO_FLASH_COMPLETE (1ul << 0)
 #define WRITE_TO_FLASH_VERIFIED (1ul << 1)
-#define FLASH_READ_COMPLETE (1ul << 2)
+#define WRITE_TO_FLASH_SR_NOT_ZERO (1ul << 2)
+#define WRITE_TO_FLASH_SR2_NOT_ZERO (1ul << 3)
 #define WRITE_TO_FLASH_ERASE_ERROR (0x10)
 #define WRITE_TO_FLASH_WRITE_ERROR (0x20)
 #define WRITE_TO_FLASH_NOT_ERASED_ERROR (0x30)
@@ -216,6 +219,16 @@ static int32_t write_to_flash(uint32_t *flag_upload, int spi_offset,
 			      uint32_t sz_image, const uint8_t *image_base)
 {
 	int32_t ret = 0;
+	uint8_t sr;
+
+	sr = flash_read_sr();
+	if (sr != 0) {
+		*flag_upload |= sr & 0xFC;
+	}
+	// sr2 = flash_read_sr2();
+	// if (sr2 != 0) {
+	// 	*flag_upload |= WRITE_TO_FLASH_SR2_NOT_ZERO;
+	// }
 
 	/* Clear both status registers to ensure write protect is disabled */
 	ret = flash_write_status_reg(0, 0);

@@ -46,7 +46,6 @@ static int8_t config_command(struct spic_command *command, uint8_t cmd,
 			     uint8_t dumm_count);
 static int32_t flash_write_enable(void);
 static int32_t flash_write_disable(void);
-static uint8_t flash_read_sr(void);
 static int32_t flash_wait_till_ready(void);
 
 /**********************
@@ -362,7 +361,7 @@ static int32_t flash_write_disable(void)
 	return 0;
 }
 
-static uint8_t flash_read_sr(void)
+uint8_t flash_read_sr(void)
 {
 	struct spic_command *command = &command_default;
 
@@ -370,6 +369,19 @@ static uint8_t flash_read_sr(void)
 	uint8_t sr;
 
 	config_command(command, FLASH_CMD_RDSR, 0, 0, 0);
+	spic_read(command, &sr, &len);
+
+	return sr;
+}
+
+uint8_t flash_read_sr2(void)
+{
+	struct spic_command *command = &command_default;
+
+	uint32_t len = 1;
+	uint8_t sr;
+
+	config_command(command, FLASH_CMD_RDSR2, 0, 0, 0);
 	spic_read(command, &sr, &len);
 
 	return sr;

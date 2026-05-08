@@ -95,4 +95,7 @@ int32_t flash_program_page(uint32_t address, const uint8_t *data, uint32_t size,
 void slowtmr_dealy_us(uint32_t us);
 int32_t flash_write_status_reg(uint8_t sr1, uint8_t sr2);
 
+uint8_t flash_read_sr(void);
+uint8_t flash_read_sr2(void);
+
 #endif /* __FLASH_MAP_BACKEND_H__ */
