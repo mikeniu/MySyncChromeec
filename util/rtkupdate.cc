@@ -93,6 +93,7 @@ static struct termios saved_tty;
 static uint8_t tty_changed = TTY_NO_CHANGE;
 static int g_uart_fd;
 static int bootrom_timeouts;
+static int sr_non_zero_count;
 
 /* Function to calculate Tool-side checksum (sum of all bytes) */
 uint16_t calculate_checksum_tool(const unsigned char *data, size_t length)
@@ -596,6 +597,20 @@ int flash(int uart_fd, uint32_t spi_start, const char *file_name)
 				}
 				continue;
 			}
+
+			if ((response[0] == START_FRAME_TO_WRITE_TO_FLASH) &&
+			    ((response[1] & 0x3) == SUCCESS_PROGRAM_TO_FLASH)) {
+				/* For testing if status regs are ever
+				 * non-zero... */
+				if (response[1] != SUCCESS_PROGRAM_TO_FLASH) {
+					ERR_PRINT("\nOffset 0x%0x: SR = 0x%X\n",
+						  upload_header_spi_address,
+						  response[1] & 0xFC);
+					sr_non_zero_count++;
+				}
+				break;
+			}
+
 			if ((response[0] != START_FRAME_TO_WRITE_TO_FLASH) ||
 			    (response[1] != SUCCESS_PROGRAM_TO_FLASH)) {
 				ERR_PRINT(
@@ -622,8 +637,8 @@ int flash(int uart_fd, uint32_t spi_start, const char *file_name)
 		}
 	}
 
-	printf("\nFlash operation finished. bootrom timeout retries = %d\n",
-	       bootrom_timeouts);
+	printf("\nFlash operation finished. bootrom timeout retries = %d, SR count = %d\n",
+	       bootrom_timeouts, sr_non_zero_count);
 	fclose(file);
 	return 0;
 
