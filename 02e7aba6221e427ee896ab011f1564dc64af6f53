@@ -60,6 +60,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5b458b39_020e6e48",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:55:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] You previously received feedback about ignoring the return values of `EVP_*` calls in `aes_gcm_encrypt_openssl` and `aes_gcm_decrypt_openssl`. Those return values (e.g. from `EVP_EncryptUpdate` and `EVP_EncryptFinal_ex`) are still being ignored here. \n\nPlease check their return values (usually 1 for success) to ensure BoringSSL did not encounter an internal error. If an error occurs, clean up the context and return `false`.",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "546e44a8_e6d70d3c",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 10
@@ -77,6 +94,23 @@
         "endLine": 155,
         "endChar": 45
       },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5cc4399_51517c4b",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:55:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] There was a previous review comment asking for clarification on this hardcoded AAD (`uint8_t AAD[4] \u003d { 0x01, 0x00, 0x00, 0x00 };`). Please add a brief comment explaining why this specific AAD is required by the bootrom protocol.",
       "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -106,6 +140,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a1fd54f5_08664fe8",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:55:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This strict aliasing violation is still present. Casting a byte array pointer to a `uint32_t` pointer and dereferencing it can lead to Undefined Behavior. \n\nPlease use `std::memcpy` instead:\n```cpp\nuint32_t rsp_wrapped_len;\nstd::memcpy(\u0026rsp_wrapped_len, \u0026ret[2], sizeof(rsp_wrapped_len));\n```",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4e49a79_3e74bfb3",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:55:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Bug: Incorrect response parsing.** `CMD_MEM_READ` returns a 2-byte status header before the actual data, which `read_flash` and `backup_flash` correctly handle. However, `read_reg` copies the first 4 bytes of `resp` directly into `value_out`, meaning you are copying the status bytes instead of the register value!\n\nTo fix this, check the status bytes and skip them:\n```cpp\nif (send_bootrom_command(cmd, 6, resp) !\u003d 0 || resp.size() \u003c 6)\n    return -1;\nif (resp[0] !\u003d 0 || resp[1] !\u003d 0)\n    return -1;\nstd::memcpy(\u0026value_out, resp.data() + 2, 4);\n```",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "690c1cf8_1f8197bd",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 10
@@ -123,6 +191,23 @@
         "endLine": 332,
         "endChar": 23
       },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ceabebfb_83324d77",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:55:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This is still using a magic number (`0x20`). Please replace it with `EgisBootrom::CMD_MEM_READ` as mentioned in a previous review comment. There are also other instances like `0x23` in `get_otp_info` that should be replaced with `EgisBootrom::CMD_OTP_READ`.",
       "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -238,6 +323,57 @@
         "endLine": 193,
         "endChar": 4
       },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9a8c741_545a77a4",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:55:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] A previous review comment pointed out that if `fw_size_override` exceeds the actual file size, `infile.read()` will fail. There is still no check to prevent reading past the end of the file. Please add a bounds check to ensure `fw_size_override` does not exceed `fw_size`.",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83540cd5_a2067980",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 461,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:55:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Bug: Incorrect packet size calculation.** `dump_raw_cmd` uses `kScHeaderSizeAes` which is `2 + 4 + 12 (IV) + 16 (Tag) \u003d 34` bytes. However, here you calculate `total_packet_size` by adding an extra `4` bytes (`12 + 16 + 4 \u003d 32`, plus the `2 + 4`). This evaluates to 38 bytes total instead of 34 bytes!\n\nThis will cause the tool to read 4 bytes into the next command when parsing the dumped command file, causing it to lose synchronization and fail. Please remove the `+ 4` so it evaluates to `12 + 16`.",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a221ff90_241a434e",
+        "filename": "util/egis/usb_comm.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:55:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] A previous review comment suggested reattaching the kernel driver during teardown. While `libusb_release_interface` is called, you should also consider calling `libusb_attach_kernel_driver` here to gracefully restore the device state upon exit.",
       "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
