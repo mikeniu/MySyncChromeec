@@ -283,6 +283,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4818eb1c_7df4c4ae",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T21:13:34Z",
+      "side": 1,
+      "message": "The main application file `util/egis/et171_flash.cc` also unnecessarily includes the standard exception header:\n\n```c\n#include \u003cstdexcept\u003e // \u003c--- Remove this\n\n```\n\n**Remediation:** Delete this line.",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 20
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2469a02e_7fb6765f",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 10
@@ -419,6 +442,29 @@
         "startChar": 0,
         "endLine": 5,
         "endChar": 12
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71ac596b_33e0b901",
+        "filename": "util/egis/usb_comm.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T21:13:34Z",
+      "side": 1,
+      "message": "The [Google C++ style guide prohibits exceptions](https://google.github.io/styleguide/cppguide.html#Exceptions).\n\nThe file `util/egis/usb_comm.h` includes the `\u003cstdexcept\u003e` header and defines a custom exception class that inherits from `std::runtime_error`:\n\n```c\n#include \u003cstdexcept\u003e // \u003c--- Remove this\n\nclass UsbCommunicationError : public std::runtime_error { // \u003c--- Remove this entire class\n    public:\n\tUsbCommunicationError(const std::string \u0026msg)\n\t\t: std::runtime_error(msg)\n\t{\n\t}\n};\n\n```\n\n**Remediation:** Since you are already using return codes for error handling in `usb_comm.cc`, this class is completely unused. You should safely delete the `\u003cstdexcept\u003e` include and the `UsbCommunicationError` class definition.",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 0
       },
       "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
