@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9a05104_e4970a03",
+        "filename": "zephyr/program/ocelot/ocicat/i2c.dtsi",
+        "patchSetId": 10
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-08T15:00:10Z",
+      "side": 1,
+      "message": "this is redundant, nodes are enabled by default, the okay override is only needed if the node is declared as disabled somwhere else",
+      "revId": "14b26375aca45dec9b6eb3bdfbce2a12c1e4d3a7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f1cf68c_7b25cdcb",
+        "filename": "zephyr/program/ocelot/ocicat/imvp.dtsi",
+        "patchSetId": 10
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-08T15:00:10Z",
+      "side": 1,
+      "message": "i2c.dtsi is already included by project.overlay, just include imvp.dtsi after that and drop this one",
+      "revId": "14b26375aca45dec9b6eb3bdfbce2a12c1e4d3a7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd1772ba_1a50bca1",
+        "filename": "zephyr/program/ocelot/ocicat/imvp.dtsi",
+        "patchSetId": 10
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-08T15:00:10Z",
+      "side": 1,
+      "message": "this whole block should be indented one tab in",
+      "revId": "14b26375aca45dec9b6eb3bdfbce2a12c1e4d3a7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6595cb1_10bae338",
+        "filename": "zephyr/program/ocelot/ocicat/imvp.dtsi",
+        "patchSetId": 10
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-08T15:00:10Z",
+      "side": 1,
+      "message": "is this stuff unique for this device? you could declare it in a header so it can be reused and updated in one go",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 33
+      },
+      "revId": "14b26375aca45dec9b6eb3bdfbce2a12c1e4d3a7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
