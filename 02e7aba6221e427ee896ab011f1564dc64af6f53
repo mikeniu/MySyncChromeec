@@ -570,6 +570,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "997d3d1f_99ddc715",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T21:27:43Z",
+      "side": 1,
+      "message": "Here is Gemini-generated code to replace your existing functions. Please double-check that it\u0027s correct and that it compiles.\n\n----\n\nFirst, they will need to add `#include \u003cprint\u003e` to their files. If they need to print to `stderr` or flush the buffer, they will also need `#include \u003ccstdio\u003e`.\n\n### 1\\. Basic Formatting (Replacing string concatenation)\n\n`std::println` automatically adds a newline, replacing `std::endl` and making the code significantly shorter.\n\n\\*\\*In `et171_flash.cc**` *Before:*\n\n```c\nstd::cout \u003c\u003c \"Command SUCCESS.\\nReceived payload length: \"\n          \u003c\u003c payload.size() \u003c\u003c \" bytes.\\n\";\n\n```\n\n*After:*\n\n```c\nstd::println(\"Command SUCCESS.\\nReceived payload length: {} bytes.\", payload.size());\n\n```\n\n### 2\\. Hexadecimal \u0026 Padding (Replacing `std::hex`, `std::setw`, etc.)\n\nThis is where `std::format`/`std::print` shines. It uses Python-style format specifiers. `{:x}` means lowercase hex, `{:X}` means uppercase hex, and `{:08X}` means pad with zeros to 8 characters.\n\n\\*\\*In `et171_flash.cc**` *Before:*\n\n```c\nstd::cout \u003c\u003c \"Flash Offset  : 0x\" \u003c\u003c std::hex \u003c\u003c std::uppercase\n          \u003c\u003c std::setfill(\u00270\u0027) \u003c\u003c std::setw(8) \u003c\u003c flash_offset\n          \u003c\u003c std::endl;\n\n```\n\n*After:*\n\n```c\nstd::println(\"Flash Offset  : 0x{:08X}\", flash_offset);\n\n```\n\n\\*\\*In `bootrom.cc**` *Before:*\n\n```c\nstd::cout \u003c\u003c \"Erase Success: \" \u003c\u003c size \u003c\u003c \" bytes at 0x\"\n          \u003c\u003c std::hex \u003c\u003c addr \u003c\u003c std::dec \u003c\u003c std::endl;\n\n```\n\n*After:*\n\n```c\nstd::println(\"Erase Success: {} bytes at 0x{:x}\", size, addr);\n\n```\n\n### 3\\. Floating Point Precision (Replacing `std::fixed`, `std::setprecision`)\n\nFor the progress bars, they can use `{:.1f}` to specify exactly 1 decimal place.\n\n**In `et171_flash.cc` (Flashing Progress)** *Before:*\n\n```c\nstd::cout \u003c\u003c \"\\rFlashing Progress: \" \u003c\u003c done \u003c\u003c \" / \"\n          \u003c\u003c firmware.size() \u003c\u003c \" (\" \u003c\u003c std::fixed\n          \u003c\u003c std::setprecision(1)\n          \u003c\u003c (static_cast\u003cfloat\u003e(done) / firmware.size() * 100.0f)\n          \u003c\u003c \"%)\" \u003c\u003c std::flush;\n\n```\n\n*After:*\n\n```c\n// Use std::print (not println) so the carriage return (\\r) keeps it on one line.\nstd::print(\"\\rFlashing Progress: {} / {} ({:.1f}%)\", \n           done, firmware.size(), \n           (static_cast\u003cfloat\u003e(done) / firmware.size() * 100.0f));\nstd::fflush(stdout); // Replaces std::flush\n\n```\n\n### 4\\. Printing to standard error (`std::cerr`)\n\nTo print to the error stream, pass `stderr` as the first argument to `std::println`. Note that `std::println` inherently handles `uint8_t` natively, so they no longer need to cast them to `int` just to print them as numbers\\!\n\n\\*\\*In `bootrom.cc**` *Before:*\n\n```c\nstd::cerr \u003c\u003c \"\\n[ERROR] Bootrom status code abnormal: \"\n          \u003c\u003c static_cast\u003cint\u003e(resp[0]) \u003c\u003c \" \"\n          \u003c\u003c static_cast\u003cint\u003e(resp[1]) \u003c\u003c std::endl;\n\n```\n\n*After:*\n\n```c\nstd::println(stderr, \"\\n[ERROR] Bootrom status code abnormal: {} {}\", resp[0], resp[1]);\n\n```\n\n**In `bootrom.cc` (Another hex error example)** *Before:*\n\n```c\nstd::cerr \u003c\u003c \"[HALT] USB/Bulk transmission failed at 0x\"\n          \u003c\u003c std::hex \u003c\u003c addr \u003c\u003c std::dec\n          \u003c\u003c \", ret\u003d\" \u003c\u003c ret \u003c\u003c std::endl;\n\n```\n\n*After:*\n\n```c\nstd::println(stderr, \"[HALT] USB/Bulk transmission failed at 0x{:x}, ret\u003d{}\", addr, ret);\n\n```",
+      "parentUuid": "0c7527f4_6bd54a6a",
+      "range": {
+        "startLine": 204,
+        "startChar": 0,
+        "endLine": 219,
+        "endChar": 61
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "56c6af0d_f3a8badf",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 10
