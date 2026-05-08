@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae43256f_d5be4dd4",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 40
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-08T22:19:13Z",
+      "side": 1,
+      "message": "Is there a datasheet you can share on the bug?\n\nIt\u0027s not clear why all these states are needed for this driver.",
+      "range": {
+        "startLine": 350,
+        "startChar": 0,
+        "endLine": 350,
+        "endChar": 42
+      },
+      "revId": "124007e1bf5ef30dcf129fd3b556feaa085e72ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "deabe80f_053ee286",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 40
+      },
+      "lineNbr": 752,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-08T22:19:13Z",
+      "side": 1,
+      "message": "This logic is too complicated to perform inline.  Move to one or more helper functions to at least reduce the nesting.",
+      "range": {
+        "startLine": 752,
+        "startChar": 0,
+        "endLine": 752,
+        "endChar": 24
+      },
+      "revId": "124007e1bf5ef30dcf129fd3b556feaa085e72ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4df946e6_d536235a",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 40
+      },
+      "lineNbr": 1127,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-08T22:19:13Z",
+      "side": 1,
+      "message": "Same thing here - the nesting is too deep to effectively review this code for correctness.",
+      "range": {
+        "startLine": 1127,
+        "startChar": 0,
+        "endLine": 1127,
+        "endChar": 15
+      },
+      "revId": "124007e1bf5ef30dcf129fd3b556feaa085e72ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "367b8ed3_3578254b",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 40
+      },
+      "lineNbr": 2019,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-08T22:19:13Z",
+      "side": 1,
+      "message": "This shouldn\u0027t be needed.  The Realtek PDC used the SMBUS ARA for interrupt notification and required special handling to manage multiple ports.\n\nIf the it52xx has multiple ports, are the ports addresses independently as separate devices on the I2C bus?  If so, then each it5xx driver instance should be able to operate independently.\n\nIf there are any cross dependencies between the ports, then you should create parent device for common code shared by both ports.  See Zephyr\u0027s MFD framework for ways to do this.",
+      "range": {
+        "startLine": 2019,
+        "startChar": 0,
+        "endLine": 2019,
+        "endChar": 56
+      },
+      "revId": "124007e1bf5ef30dcf129fd3b556feaa085e72ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
