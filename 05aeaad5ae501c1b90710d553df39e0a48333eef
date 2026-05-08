@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1900cb08_3c439712",
+        "filename": "zephyr/drivers/wot/wot.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-08T23:27:13Z",
+      "side": 1,
+      "message": "Use K_WORK_DEFINE() and k_work_submit() instead of DECLARE_DEFERRED.",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 16
+      },
+      "revId": "05aeaad5ae501c1b90710d553df39e0a48333eef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02a54a22_5d8923e0",
+        "filename": "zephyr/dts/bindings/wot/cros-ec,wot.yaml",
+        "patchSetId": 25
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-08T23:27:13Z",
+      "side": 1,
+      "message": "Is this needed?  Can you query the AP chipset from the power sequencing driver using `chipset_in_state(CHIPSET_STATE_ON)` insted.",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 18
+      },
+      "revId": "05aeaad5ae501c1b90710d553df39e0a48333eef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32ce2e28_5b73415b",
+        "filename": "zephyr/program/ocelot/ocicat/generated.dtsi",
+        "patchSetId": 25
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-08T23:27:13Z",
+      "side": 1,
+      "message": "Move project specific changes into their own CL.\n\nFor any GPIOs used by the wot driver, delete the corresponding entry from this file.",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 41
+      },
+      "revId": "05aeaad5ae501c1b90710d553df39e0a48333eef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
