@@ -91,5 +91,22 @@
 				value = <2>;
 			};
 		};
+
+		charger-option {
+			enum-name = "FW_CHARGER";
+			size = <3>;
+
+			charger_0: charger-option-isl923x {
+				compatible = "cros-ec,cbi-ssfc-value";
+				status = "okay";
+				value = <0>;
+				default;
+			};
+			charger_1: charger-option-rt9490 {
+				compatible = "cros-ec,cbi-ssfc-value";
+				status = "okay";
+				value = <1>;
+			};
+		};
 	};
 };

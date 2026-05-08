@@ -97,6 +97,28 @@ extern "C" {
 	DT_PROP(DT_CHILD(DT_CHILD(node_id, configs), config##idx), frame_size)
 
 /**
+ * @brief Get fingerprint sensor image offset for a given configuration index.
+ *
+ * @param idx Index of the configuration to retrieve the offset from.
+ * @param node_id Devicetree node identifier for the sensor.
+ * @return Image offset in bytes.
+ */
+#define FINGERPRINT_SENSOR_IMAGE_OFFSET(idx, node_id)              \
+	DT_PROP(DT_CHILD(DT_CHILD(node_id, configs), config##idx), \
+		image_data_offset_bytes)
+
+/**
+ * @brief Byte offset of the image payload within the raw sensor buffer.
+ *
+ * This identifies the start of pixel data for the default configuration
+ * (index 0), excluding hardware headers or metadata.
+ *
+ * @return Number of bytes to skip to reach the first pixel.
+ */
+#define IMAGE_OFFSET                       \
+	FINGERPRINT_SENSOR_IMAGE_OFFSET(0, \
+					DT_CHOSEN(cros_fp_fingerprint_sensor))
+/**
  * @brief Get the real size of the image pixel data in bytes.
  *
  * This macro calculates the **actual image size** in bytes for a specific
@@ -216,6 +238,8 @@ struct fingerprint_sensor_info {
 struct fingerprint_image_frame_params {
 	/** @brief Total size of the frame data in bytes. */
 	uint32_t frame_size;
+	/** @brief Image offset in bytes from the start of the sensor buffer. */
+	uint32_t image_data_offset_bytes;
 	/**
 	 * @brief Pixel format of the image.
 	 * It is recommended to use V4L2_PIX_FMT_* definitions where applicable.
@@ -421,14 +445,11 @@ __syscall int fingerprint_init(const struct device *dev);
 
 static inline int z_impl_fingerprint_init(const struct device *dev)
 {
-	const struct fingerprint_driver_api *api =
-		(const struct fingerprint_driver_api *)dev->api;
-
-	if (api->init == NULL) {
+	if (DEVICE_API_GET(fingerprint, dev)->init == NULL) {
 		return -ENOTSUP;
 	}
 
-	return api->init(dev);
+	return DEVICE_API_GET(fingerprint, dev)->init(dev);
 }
 
 /**
@@ -445,14 +466,11 @@ __syscall int fingerprint_deinit(const struct device *dev);
 
 static inline int z_impl_fingerprint_deinit(const struct device *dev)
 {
-	const struct fingerprint_driver_api *api =
-		(const struct fingerprint_driver_api *)dev->api;
-
-	if (api->deinit == NULL) {
+	if (DEVICE_API_GET(fingerprint, dev)->deinit == NULL) {
 		return -ENOTSUP;
 	}
 
-	return api->deinit(dev);
+	return DEVICE_API_GET(fingerprint, dev)->deinit(dev);
 }
 
 /**
@@ -471,14 +489,11 @@ __syscall int fingerprint_config(const struct device *dev,
 static inline int z_impl_fingerprint_config(const struct device *dev,
 					    fingerprint_callback_t cb)
 {
-	const struct fingerprint_driver_api *api =
-		(const struct fingerprint_driver_api *)dev->api;
-
-	if (api->config == NULL) {
+	if (DEVICE_API_GET(fingerprint, dev)->config == NULL) {
 		return -ENOTSUP;
 	}
 
-	return api->config(dev, cb);
+	return DEVICE_API_GET(fingerprint, dev)->config(dev, cb);
 }
 
 /**
@@ -508,15 +523,13 @@ static inline int z_impl_fingerprint_get_info(
 	struct fingerprint_image_frame_params image_frame_params_array[],
 	uint8_t *num_params)
 {
-	const struct fingerprint_driver_api *api =
-		(const struct fingerprint_driver_api *)dev->api;
-
-	if (api->get_info == NULL) {
+	if (DEVICE_API_GET(fingerprint, dev)->get_info == NULL) {
 		return -ENOTSUP;
 	}
 
-	return api->get_info(dev, sensor_info, image_frame_params_array,
-			     num_params);
+	return DEVICE_API_GET(fingerprint, dev)
+		->get_info(dev, sensor_info, image_frame_params_array,
+			   num_params);
 }
 
 /**
@@ -536,14 +549,11 @@ __syscall int fingerprint_maintenance(const struct device *dev, uint8_t *buf,
 static inline int z_impl_fingerprint_maintenance(const struct device *dev,
 						 uint8_t *buf, size_t size)
 {
-	const struct fingerprint_driver_api *api =
-		(const struct fingerprint_driver_api *)dev->api;
-
-	if (api->maintenance == NULL) {
+	if (DEVICE_API_GET(fingerprint, dev)->maintenance == NULL) {
 		return -ENOTSUP;
 	}
 
-	return api->maintenance(dev, buf, size);
+	return DEVICE_API_GET(fingerprint, dev)->maintenance(dev, buf, size);
 }
 
 /**
@@ -563,14 +573,11 @@ __syscall int fingerprint_set_mode(const struct device *dev,
 static inline int z_impl_fingerprint_set_mode(const struct device *dev,
 					      enum fingerprint_sensor_mode mode)
 {
-	const struct fingerprint_driver_api *api =
-		(const struct fingerprint_driver_api *)dev->api;
-
-	if (api->set_mode == NULL) {
+	if (DEVICE_API_GET(fingerprint, dev)->set_mode == NULL) {
 		return -ENOTSUP;
 	}
 
-	return api->set_mode(dev, mode);
+	return DEVICE_API_GET(fingerprint, dev)->set_mode(dev, mode);
 }
 
 /**
@@ -599,14 +606,12 @@ z_impl_fingerprint_acquire_image(const struct device *dev,
 				 enum fingerprint_capture_type capture_type,
 				 uint8_t *image, size_t size)
 {
-	const struct fingerprint_driver_api *api =
-		(const struct fingerprint_driver_api *)dev->api;
-
-	if (api->acquire_image == NULL) {
+	if (DEVICE_API_GET(fingerprint, dev)->acquire_image == NULL) {
 		return -ENOTSUP;
 	}
 
-	return api->acquire_image(dev, capture_type, image, size);
+	return DEVICE_API_GET(fingerprint, dev)
+		->acquire_image(dev, capture_type, image, size);
 }
 
 /**
@@ -625,14 +630,11 @@ __syscall int fingerprint_finger_status(const struct device *dev);
 
 static inline int z_impl_fingerprint_finger_status(const struct device *dev)
 {
-	const struct fingerprint_driver_api *api =
-		(const struct fingerprint_driver_api *)dev->api;
-
-	if (api->finger_status == NULL) {
+	if (DEVICE_API_GET(fingerprint, dev)->finger_status == NULL) {
 		return -ENOTSUP;
 	}
 
-	return api->finger_status(dev);
+	return DEVICE_API_GET(fingerprint, dev)->finger_status(dev);
 }
 
 #ifdef __cplusplus

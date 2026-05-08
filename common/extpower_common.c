@@ -16,7 +16,7 @@ __overridable void board_check_extpower(void)
 {
 }
 
-void extpower_update_host_events(int is_present)
+static void extpower_update_host_events(int is_present)
 {
 	uint8_t *memmap_batt_flags;
 	memmap_batt_flags = host_get_memmap(EC_MEMMAP_BATT_FLAG);
@@ -37,6 +37,16 @@ void extpower_update_host_events(int is_present)
 	host_clear_events_b(mask);
 	host_clear_events(mask);
 }
+
+#ifdef HAS_TASK_HOSTCMD
+static void extpower_sync_host_events(void)
+{
+	extpower_update_host_events(extpower_is_present());
+}
+DECLARE_HOOK(HOOK_CHIPSET_STARTUP, extpower_sync_host_events,
+	     HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_INIT, extpower_sync_host_events, HOOK_PRIO_INIT_EXTPOWER + 1);
+#endif
 
 test_mockable void extpower_handle_update(int is_present)
 {
