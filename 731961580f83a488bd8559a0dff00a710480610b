@@ -43,6 +43,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3aa000b2_ac66e34f",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 14
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T18:19:54Z",
+      "side": 1,
+      "message": "We can either remove the variables or comment them out if you anticipate needing them in the future.",
+      "parentUuid": "35a99032_4dbfdd02",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 48
+      },
+      "revId": "731961580f83a488bd8559a0dff00a710480610b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d775b114_2e7684c8",
         "filename": "util/elan/iaptool.h",
         "patchSetId": 14
