@@ -67,6 +67,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e1a879e2_65d84d69",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 14
+      },
+      "lineNbr": 506,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T18:26:20Z",
+      "side": 1,
+      "message": "* **Issue:** `logInfo` prints many generic errors like `[IAP] writeRomData - fail, count: X`.  \n* **Remediation:** Include the underlying `libusb` error code (e.g., `libusb_error_name(errCode)`) in the output to make debugging failures easier in the field.",
+      "range": {
+        "startLine": 504,
+        "startChar": 0,
+        "endLine": 506,
+        "endChar": 13
+      },
+      "revId": "731961580f83a488bd8559a0dff00a710480610b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a02b7fa1_5a909326",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 14
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T18:26:20Z",
+      "side": 1,
+      "message": "**Mixing `std::print` and `std::cout`**\n\n* **Issue:** `setProgressBar` mixes `logInfo` (which wraps `std::print`) and `std::cout \u003c\u003c std::flush;`. These use different underlying I/O mechanisms (`stdout` vs iostreams) and can lead to interleaved or poorly synchronized terminal output.  \n* **Remediation:** Stick to one. When using `std::print`, force a flush by using `std::fflush(stdout);`.",
+      "range": {
+        "startLine": 162,
+        "startChar": 0,
+        "endLine": 162,
+        "endChar": 25
+      },
+      "revId": "731961580f83a488bd8559a0dff00a710480610b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d775b114_2e7684c8",
         "filename": "util/elan/iaptool.h",
         "patchSetId": 14
