@@ -28,6 +28,7 @@
 		bmi3xx-int = &lid_accel;
 		lsm6dsm-int = &lid_accel;
 		tcs3400-int = &als_clear;
+		gpio-btn-ign-in = &gpio_usb_fp_btn_ign;
 	};
 
 	/* Rotation matrix used by drivers. */
@@ -92,7 +93,7 @@
 
 				rgb-cal-x {
 					offset = <0>;
-					coeff = "0", "0", "0", "1";
+					coeff = "0.464318099", "-0.374639473", "0.059786474", "-0.749608515";
 					als-channel-scale {
 					compatible =
 					"cros-ec,accelgyro-als-channel-scale";
@@ -102,7 +103,7 @@
 				};
 				rgb-cal-y {
 					offset = <0>;
-					coeff = "0", "0", "0", "1";
+					coeff = "0.462807275", "-0.400565821", "-0.100519369", "-0.510790024";
 					als-channel-scale {
 					compatible =
 					"cros-ec,accelgyro-als-channel-scale";
@@ -112,7 +113,7 @@
 				};
 				rgb-cal-z {
 					offset = <0>;
-					coeff = "0", "0", "0", "1";
+					coeff = "-0.062110042", "-0.02692167", "0.359548949", "0.383362422";
 					als-channel-scale {
 					compatible =
 					"cros-ec,accelgyro-als-channel-scale";
@@ -344,6 +345,9 @@
 		gpio_ec_pac_en_odl: ec_pac_en_odl {
 			gpios = <&gpioc 5 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_OUTPUT_INIT_HIGH)>;
 		};
+		gpio_usb_fp_btn_ign: usb_fp_btn_ign {
+			gpios = <&gpioe 1 (GPIO_INPUT)>;
+		};
 		gpio_ec_pogo_low_pwr_sw: ec_pogo_low_pwr_sw{
 			gpios = <&gpioe 2 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 		};
@@ -353,6 +357,7 @@
 		compatible = "unused-gpios";
 
 		unused-gpios =
+			<&gpioa 0 GPIO_INPUT_PULL_DOWN>,
 			<&gpioa 3 GPIO_INPUT_PULL_DOWN>,
 			<&gpiod 1 GPIO_INPUT_PULL_DOWN>,
 			<&gpiof 0 GPIO_INPUT_PULL_DOWN>,

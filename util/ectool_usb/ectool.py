@@ -5,11 +5,21 @@
 """A USB version of ectool."""
 
 import argparse
+from functools import partial
 import sys
 import time
 
 import command
 import communication
+
+# pylint: disable=import-error
+# cryptography is not available in CROS SDK
+import cryptography.exceptions
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives.asymmetric import utils
+
+# pylint: enable=import-error
 import ec_commands as commands
 
 
@@ -123,7 +133,7 @@ def cmd_fp_mode(args, comm) -> int:
     if args.raw_mode:
         mode = args.raw_mode
     else:
-        capture_type = 0
+        capture_type = fp_capture_types["simple_image"]
         for arg in args.mode:
             mode |= fp_modes.get(arg, 0)
             capture_type = fp_capture_types.get(arg, capture_type)
@@ -166,7 +176,7 @@ def cmd_fp_info(_args, comm) -> int:
         print("Template valid: " + str(fp_info.response.template_valid))
         print("Template dirty: " + hex(fp_info.response.template_dirty))
         print("Template version: " + hex(fp_info.response.template_version))
-    elif fp_info.cmd_version == 2:
+    elif fp_info.cmd_version in (2, 3):
         print("Vendor ID: " + hex(fp_info.response.vendor_id))
         print("Product ID: " + hex(fp_info.response.product_id))
         print("Model ID: " + hex(fp_info.response.model_id))
@@ -186,6 +196,11 @@ def cmd_fp_info(_args, comm) -> int:
         ):
             print("Image frame params nr: " + str(i))
             print("\tFrame size: " + str(image_frame_params.frame_size))
+            if fp_info.cmd_version == 3:
+                print(
+                    "\tImage offset: "
+                    + str(image_frame_params.image_data_offset_bytes)
+                )
             print("\tPixel format: " + hex(image_frame_params.pixel_format))
             print("\tWidth: " + str(image_frame_params.width))
             print("\tHeight: " + str(image_frame_params.height))
@@ -214,18 +229,24 @@ def cmd_enter_bootloader(_args, comm) -> int:
     return enter_bootloader.run(comm)
 
 
+def get_max_res_size(comm) -> int:
+    """Gets max response size"""
+    pr_info = commands.ProtocolInfoCmd0()
+    ret = pr_info.run(comm)
+    if ret != commands.EcCommandResult.SUCCESS:
+        return -1
+    return (
+        pr_info.response.max_response_packet_size - command.RESPONSE_HEADER_LEN
+    )
+
+
 def flash_read_to_file(file: str, offset: int, size: int, comm) -> int:
     """Reads flash to a file."""
     read_bytes = 0
     ret = 0
-    # Get max response size
-    pr_info = commands.ProtocolInfoCmd0()
-    ret = pr_info.run(comm)
-    if ret != commands.EcCommandResult.SUCCESS:
-        return ret
-    max_res_size = (
-        pr_info.response.max_response_packet_size - command.RESPONSE_HEADER_LEN
-    )
+    max_res_size = get_max_res_size(comm)
+    if max_res_size < 0:
+        return -1
     with open(file, "wb") as out_file:
         while read_bytes < size:
             remaining_bytes = size - read_bytes
@@ -476,6 +497,196 @@ def cmd_reflash_rw(_args, comm) -> int:
     return _reboot_and_verify_rw(comm)
 
 
+def verify_raw(raw_public_key, raw_sig, data):
+    """Helper to verify raw signatures (converts back to DER for the library)."""
+
+    public_key = ec.EllipticCurvePublicKey.from_encoded_point(
+        ec.SECP256R1(), raw_public_key
+    )
+
+    r = int.from_bytes(raw_sig[:32], byteorder="big")
+    s = int.from_bytes(raw_sig[32:], byteorder="big")
+    der_sig = utils.encode_dss_signature(r, s)
+
+    public_key.verify(der_sig, data, ec.ECDSA(hashes.SHA256()))
+
+
+def cmd_fp_ascp_claim(args, comm) -> int:
+    """Gets ASCP claim and verifies it."""
+
+    claim = commands.FpAscpClaimCmd0()
+    ret = claim.run(comm)
+    if ret != commands.EcCommandResult.SUCCESS:
+        print(f"Failed to claim: {ret.name}")
+        return ret
+    print(f"pk_m: [{claim.response.pk_m.hex()}]")
+    print(f"s_goog: [{claim.response.s_goog.hex()}]")
+    print(f"pk_d: [{claim.response.pk_d.hex()}]")
+    print(f"s_m: [{claim.response.s_m.hex()}]")
+    print(f"pk_f: [{claim.response.pk_f.hex()}]")
+    print(f"h_f: [{claim.response.h_f.hex()}]")
+    print(f"s_d: [{claim.response.s_d.hex()}]")
+
+    try:
+        with open(args.pk_goog_file, "rb") as f:
+            pk_goog = f.read()
+            print("Checking s_goog...")
+            verify_raw(pk_goog, claim.response.s_goog, claim.response.pk_m)
+            print("s_goog is valid")
+            print("Checking s_m...")
+            verify_raw(
+                claim.response.pk_m, claim.response.s_m, claim.response.pk_d
+            )
+            print("s_m is valid")
+            print("Checking s_d...")
+            verify_raw(
+                claim.response.pk_d,
+                claim.response.s_d,
+                bytes([0xC0, 0x01]) + claim.response.h_f + claim.response.pk_f,
+            )
+            print("s_d is valid.\n")
+    except FileNotFoundError as e:
+        print(f"File not found: {e}")
+    except ValueError as e:
+        print(f"Wrong param: {e}")
+    except cryptography.exceptions.InvalidSignature:
+        print("Invalid signature.")
+
+    return ret
+
+
+def cmd_fp_ascp_establish(args, comm) -> int:
+    """Establishes ASCP."""
+    try:
+        with open(args.pk_g_file, "rb") as f:
+            pk_g = f.read()
+            establish = commands.FpAscpEstablishCmd0(pk_g)
+            ret = establish.run(comm)
+            if ret != commands.EcCommandResult.SUCCESS:
+                print(f"Failed to establish: {ret.name}")
+            return ret
+    except FileNotFoundError as e:
+        print(f"File not found: {e}")
+        return -1
+
+
+events = {
+    "key_matrix": 0,
+    "host_event": 1,
+    "sensor_fifo": 2,
+    "button": 3,
+    "switch": 4,
+    "fingerprint": 5,
+    "sysrq": 6,
+    "host_event64": 7,
+    "cec_event": 8,
+    "cec_message": 9,
+    "dp_alt_mode_entered": 10,
+    "online_calibration": 11,
+    "pchg": 12,
+}
+
+
+def receive_event(event_type: int, comm) -> bool:
+    """Receives MKBP events until event type received or no more events."""
+    get_next_event_cmd = commands.get_cmd(
+        commands.ECCommandsIds.GET_NEXT_EVENT, comm
+    )
+    if not get_next_event_cmd:
+        print("No supported get next event")
+        return False
+    while True:
+        get_next_event = get_next_event_cmd()
+        ret = get_next_event.run(comm)
+        if ret != commands.EcCommandResult.SUCCESS:
+            if ret == commands.EcCommandResult.UNAVAILABLE:
+                print("No events available")
+            else:
+                print(f"Failed to get next event: {ret.name}")
+            return False
+        if get_next_event.response.event_type & 0x7F == event_type:
+            print("Event type: " + hex(get_next_event.response.event_type))
+            print("Event data: " + str(get_next_event.response.event_data))
+            return True
+
+
+def cmd_wait_for_event(args, comm) -> int:
+    """Waits for MKBP event."""
+
+    if not receive_event(events[args.type], comm):
+        start_time = time.perf_counter()
+        remaining_time = args.timeout
+        while remaining_time > 0:
+            print(f"Wait for event {remaining_time}s")
+            if comm.wait_for_event(int(1000 * remaining_time)):
+                if receive_event(events[args.type], comm):
+                    return 0
+            remaining_time = args.timeout - (time.perf_counter() - start_time)
+        print(f"No event in {args.timeout}s")
+        return -1
+    return 0
+
+
+def get_frame_size(capture_type, comm) -> tuple[int, int]:
+    """Gets FP frame size."""
+
+    fp_info = commands.FpInfoCmd2()
+    ret = fp_info.run(comm)
+    if ret != commands.EcCommandResult.SUCCESS:
+        print(f"Failed to get FP info: {ret.name}")
+        return None
+
+    for image_frame_params in fp_info.response.image_frame_params:
+        if image_frame_params.fp_capture_type == capture_type:
+            return image_frame_params.width, image_frame_params.height
+
+    print(f"No matching capture type: {capture_type}")
+    return None
+
+
+def cmd_fp_frame(args, comm) -> int:
+    """Captures FP frame."""
+
+    capture_type = fp_capture_types[args.type or "simple_image"]
+    width, height = get_frame_size(capture_type, comm)
+    frame_size = width * height
+    max_res_size = get_max_res_size(comm)
+    if max_res_size < 0:
+        print("Failed to get max command size")
+        return -1
+    raw_data = bytes()
+
+    fp_frame_cmd = commands.get_cmd(commands.ECCommandsIds.FP_FRAME, comm)
+    if not fp_frame_cmd:
+        print("No supported FP frame")
+        return -1
+
+    if fp_frame_cmd == commands.FpFrameCmd1:
+        fp_frame_cmd = partial(fp_frame_cmd, 0, 0)
+    else:
+        fp_frame_cmd = partial(fp_frame_cmd, 0)
+
+    offset = 0
+    while offset < frame_size:
+        chunk_size = min(frame_size - offset, max_res_size)
+        fp_frame = fp_frame_cmd(offset, chunk_size)
+        ret = fp_frame.run(comm)
+        if ret != commands.EcCommandResult.SUCCESS:
+            print(f"Failed to get FP frame: {ret.name}")
+            return ret
+        offset += chunk_size
+        raw_data += fp_frame.response.data
+
+    header = f"P5\n{width} {height}\n255\n"
+
+    with open(args.file, "wb") as f:
+        f.write(header.encode("ascii"))
+        f.write(raw_data)
+
+    print(f"{len(raw_data)} bytes written to {args.file}")
+    return 0
+
+
 def auto_int(x) -> int:
     """Converts a string to an int, automatically detecting the base."""
     return int(x, 0)
@@ -574,6 +785,40 @@ subcommands = {
                 "choices": list(commands.RwSigAction),
                 "help": "RWSIG action",
             }
+        },
+    },
+    "fpascp": {
+        "help": "Get ASCP claim and verify it",
+        "func": cmd_fp_ascp_claim,
+        "args": {
+            "pk_goog_file": {"type": str},
+        },
+    },
+    "fpascp_establish": {
+        "help": "Establish ASCP",
+        "func": cmd_fp_ascp_establish,
+        "args": {
+            "pk_g_file": {"type": str},
+        },
+    },
+    "wait_for_event": {
+        "help": "Wait for the next MKBP event",
+        "func": cmd_wait_for_event,
+        "args": {
+            "type": {"type": str, "choices": list(events.keys())},
+            "timeout": {"type": auto_int, "help": "timeout in seconds"},
+        },
+    },
+    "fpframe": {
+        "help": "Capture FP frame",
+        "func": cmd_fp_frame,
+        "args": {
+            "file": {"type": str},
+            "type": {
+                "type": str,
+                "choices": list(fp_capture_types.keys()),
+                "nargs": "?",
+            },
         },
     },
 }
