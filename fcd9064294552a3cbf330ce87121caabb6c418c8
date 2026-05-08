@@ -210,6 +210,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "38c7a364_f58d4094",
+        "filename": "util/focaltech/focaltech/src/ff_util.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:49:38Z",
+      "side": 1,
+      "message": "In `ft_get_time_local`, the code formats a string into a local array, and then uses `snprintf` to append milliseconds into a second array.\n\n**Current Code:**\n\n```c\n\tstrftime(buff, sizeof(buff), \"%m-%d %H:%M:%S\", \u0026timeinfo);\n\tsnprintf(time_buff, sizeof(buff), \"%s.%03ld\", buff, tv.tv_usec / 1000);\n\n```\n\n**Feedback:** You can do this in-place. `strftime` returns the number of characters written. You can use that return value to append the milliseconds directly to the final buffer, eliminating the need for the intermediate `buff` completely.\n\n**Suggested Rewrite:**\n\n```c\nstatic void ft_get_time_local(char *time_buff, size_t max_len)\n{\n\tstruct timeval tv;\n\tstruct tm timeinfo;\n\n\tgettimeofday(\u0026tv, NULL);\n\tlocaltime_r(\u0026tv.tv_sec, \u0026timeinfo);\n\n\tsize_t len \u003d strftime(time_buff, max_len, \"%m-%d %H:%M:%S\", \u0026timeinfo);\n\tif (len \u003e 0 \u0026\u0026 len \u003c max_len) {\n\t\tsnprintf(time_buff + len, max_len - len, \".%03ld\", tv.tv_usec / 1000);\n\t}\n}\n\n```",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 90,
+        "endChar": 72
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3725d761_50cc6c3d",
+        "filename": "util/focaltech/focaltech/src/ff_util.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:49:38Z",
+      "side": 1,
+      "message": "In `log_printf`, the code calls `vsnprintf(buf, LOG_BUF_SIZE - 1, fmt, ap);`.\n\n**Feedback:** Subtracting `1` from the buffer size is a legacy anti-pattern from older, non-standard string functions. The standard C `vsnprintf` takes the **total size of the buffer** and guarantees it will write at most `size - 1` characters and append a null terminator. By passing `LOG_BUF_SIZE - 1`, you are permanently leaving the last byte of the buffer unused.\n\n* **Recommendation:** Pass the full size: `vsnprintf(buf, sizeof(buf), fmt, ap);`.",
+      "range": {
+        "startLine": 104,
+        "startChar": 0,
+        "endLine": 104,
+        "endChar": 44
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6b707f8b_319c3ad4",
         "filename": "util/focaltech/focaltech/src/ff_util.c",
         "patchSetId": 11
@@ -433,6 +479,29 @@
         "startChar": 0,
         "endLine": 24,
         "endChar": 23
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7e47a01_2a579664",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T20:49:38Z",
+      "side": 1,
+      "message": "`fun.c` defines a custom `U32_SET` macro to manually extract and shift bytes into a buffer in Little-Endian format:\n\n```c\n#define U32_SET(buf, u) \\\n\t(buf)[3] \u003d (unsigned char)((u) \u003e\u003e 24); \\\n\t/* ... etc ... */\n\n```\n\n**Feedback:** Since you are already using `#include \u003cendian.h\u003e` and `htole32()` in `ft_sg_io.c`, you shouldn\u0027t reinvent the wheel in `fun.c`. The standard library handles this safely and often more efficiently via compiler intrinsics.\n\n* **Recommendation:** Remove `U32_SET`. You can easily replace it using standard functions:\n\n```c\n/* Instead of: U32_SET(\u0026transfer_cmd[1], addr); */\nuint32_t le_addr \u003d htole32(addr);\nmemcpy(\u0026transfer_cmd[1], \u0026le_addr, sizeof(le_addr));\n\n```",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 30
       },
       "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
