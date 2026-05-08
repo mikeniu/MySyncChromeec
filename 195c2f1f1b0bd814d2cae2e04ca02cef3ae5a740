@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5b31b2d_28bfdc6b",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-08T06:36:41Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 14.",
+      "parentUuid": "e1c31d9a_7d13c04b",
+      "range": {
+        "startLine": 203,
+        "startChar": 0,
+        "endLine": 207,
+        "endChar": 2
+      },
+      "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ea443657_906b9839",
@@ -41,6 +65,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c833c4c1_8db7bd03",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 534,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-08T06:36:41Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 14.",
+      "parentUuid": "ea443657_906b9839",
+      "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2fd0ea11_75a7ffe4",
@@ -54,6 +96,30 @@
       "writtenOn": "2026-05-07T20:49:04Z",
       "side": 1,
       "message": "**Redundant Pointer Check** In `util/elan/iapcontrol.cc` inside `openDevice`:\n\n```c\nconst struct libusb_interface_descriptor *alt \u003d \u0026inter-\u003ealtsetting[j];\nif (alt \u003d\u003d nullptr || alt-\u003ebInterfaceClass !\u003d LIBUSB_CLASS_HID) {\n```\n\n`alt` is assigned the address of an array element. It is impossible for it to be `nullptr`.\n\n* **Recommendation:** Remove the `alt \u003d\u003d nullptr` check to reduce clutter.",
+      "range": {
+        "startLine": 622,
+        "startChar": 3,
+        "endLine": 625,
+        "endChar": 4
+      },
+      "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8555189a_903b306f",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 625,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-08T06:36:41Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 14.",
+      "parentUuid": "2fd0ea11_75a7ffe4",
       "range": {
         "startLine": 622,
         "startChar": 3,
@@ -87,6 +153,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "17fb8d70_7d504bd8",
+        "filename": "util/elan/iapcontrol.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-08T06:36:41Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 14.",
+      "parentUuid": "d47c04be_fb98bb35",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 23
+      },
+      "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "159cf929_30670522",
@@ -104,6 +194,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "08be1a96_a2d0a17f",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-08T06:36:41Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 14.",
+      "parentUuid": "159cf929_30670522",
+      "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4a2cfe43_6c21bd31",
@@ -117,6 +225,24 @@
       "writtenOn": "2026-05-07T20:40:07Z",
       "side": 1,
       "message": "[Gerrit AI Review] **Style/Cleanup: Unused Macros**\nThe macros `CMDLINE_FILE_PATH`, `CMDLINE_VID`, and `CMDLINE_PID` are defined here but are never used since `getopt` uses a hardcoded `\"F:V:P:\"` string. You can safely remove these definitions.",
+      "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63d96f8d_0e5b113b",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-08T06:36:41Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 14.",
+      "parentUuid": "4a2cfe43_6c21bd31",
       "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -144,6 +270,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f1c6094_b9c7e421",
+        "filename": "util/elan/iaptool.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-08T06:36:41Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 14.",
+      "parentUuid": "42876e60_94a43534",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 21
+      },
+      "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a05a5413_105ab72c",
@@ -157,6 +307,30 @@
       "writtenOn": "2026-05-07T20:51:11Z",
       "side": 1,
       "message": "**Upgrade `logInfo` to `std::print`**\n\nIn `util/elan/utility.h`, you are manually combining `std::cout` with `std::format`:\n\n```c\ntemplate \u003ctypename... Args\u003e\nvoid logInfo(std::format_string\u003cArgs...\u003e fmt, Args \u0026\u0026...args)\n{\n\tstd::cout \u003c\u003c std::format(fmt, std::forward\u003cArgs\u003e(args)...);\n}\n```\n\nC++23 introduced `\u003cprint\u003e`. You can directly use `std::print` (or `std::println`), which is inherently safer, faster, and avoids the overhead of intermediate string allocation:\n\n```c\n#include \u003cprint\u003e\n#include \u003cutility\u003e // Don\u0027t forget this for std::forward!\n\ntemplate \u003ctypename... Args\u003e\nvoid logInfo(std::format_string\u003cArgs...\u003e fmt, Args \u0026\u0026...args)\n{\n\tstd::print(fmt, std::forward\u003cArgs\u003e(args)...);\n}\n```",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 0
+      },
+      "revId": "195c2f1f1b0bd814d2cae2e04ca02cef3ae5a740",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "afc5de15_35818259",
+        "filename": "util/elan/utility.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-08T06:36:41Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 14.",
+      "parentUuid": "a05a5413_105ab72c",
       "range": {
         "startLine": 11,
         "startChar": 0,
