@@ -37,6 +37,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f38b1852_3d996d3c",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T21:18:26Z",
+      "side": 1,
+      "message": "**Verbose `const_cast` in Crypto Logic (`bootrom.cc`)** The double casting in `EVP_CIPHER_CTX_ctrl` is unnecessarily complex.\n\n**Remediation:** Simplify to a single `const_cast\u003cuint8_t*\u003e(tag)` if modifying the constness is strictly required by the OpenSSL API version you are targeting.",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 59
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "67e5fd6c_d172fb17",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 10
@@ -151,6 +174,29 @@
       "writtenOn": "2026-05-08T20:55:25Z",
       "side": 1,
       "message": "[Gerrit AI Review] This strict aliasing violation is still present. Casting a byte array pointer to a `uint32_t` pointer and dereferencing it can lead to Undefined Behavior. \n\nPlease use `std::memcpy` instead:\n```cpp\nuint32_t rsp_wrapped_len;\nstd::memcpy(\u0026rsp_wrapped_len, \u0026ret[2], sizeof(rsp_wrapped_len));\n```",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b51e6a2_f5925df2",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T21:18:26Z",
+      "side": 1,
+      "message": "**Inconsistent Response Payload Handling (`bootrom.cc`)** There is a structural inconsistency in how `resp_out` is populated across encryption modes. In `read_reg`, checking for `resp.size() \u003c 4` and using `memcpy` could result in copying status bytes instead of the actual register value.\n\n**Remediation:** Standardize `send_bootrom_command` to always strip the 2-byte status header (after verifying it equals `0x00 0x00`) so callers consistently receive the raw payload.",
+      "range": {
+        "startLine": 203,
+        "startChar": 0,
+        "endLine": 203,
+        "endChar": 71
+      },
       "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -306,6 +352,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "52e72436_1b321c8c",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T21:18:26Z",
+      "side": 1,
+      "message": "**AES Key Left in Memory (`et171_flash.cc` \u0026 `bootrom.cc`)** The AES key is read into memory but never cleared. Leaving cryptographic keys in memory is bad practice, even for a short-lived CLI tool.\n\n**Remediation:** Use `OPENSSL_cleanse` to wipe the key arrays before the tool exits.",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 1
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "847755c6_a3a93b57",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T21:18:26Z",
+      "side": 1,
+      "message": "**Uninitialized Memory in Struct Parsing (`et171_flash.cc`)** When parsing the `GetVersionResponse`, the `response` struct is not zero-initialized before `memcpy`. If the returned payload is smaller than the struct size, the remaining bytes will contain uninitialized garbage memory, leading to potential undefined behavior or stack memory leaks.\n\n**Remediation:** Zero-initialize the struct directly: `GetVersionResponse response \u003d {};`",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 51
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2469a02e_7fb6765f",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 10
@@ -363,6 +455,29 @@
       "writtenOn": "2026-05-08T20:55:25Z",
       "side": 1,
       "message": "[Gerrit AI Review] A previous review comment pointed out that if `fw_size_override` exceeds the actual file size, `infile.read()` will fail. There is still no check to prevent reading past the end of the file. Please add a bounds check to ensure `fw_size_override` does not exceed `fw_size`.",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56c6af0d_f3a8badf",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T21:18:26Z",
+      "side": 1,
+      "message": "**Magic Numbers (`et171_flash.cc`)** Hardcoding USB VIDs and PIDs makes the code difficult to maintain and read.\n\n**Remediation:** Define these as `constexpr uint16_t` constants at the top of the file.",
+      "range": {
+        "startLine": 229,
+        "startChar": 0,
+        "endLine": 239,
+        "endChar": 35
+      },
       "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
