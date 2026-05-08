@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a15c091_75f61fba",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T19:56:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Missing Null Terminator**\n\nIf the USB device responds with exactly `FT_BOOT_VERSION_MAX` (36) bytes of data without a null terminator, the `%s` format specifier here will read past the end of `databuffer` and cause a buffer overflow (reading garbage memory or crashing).\n\n**Remediation:** Explicitly null-terminate the buffer before logging it:\n```c\ndatabuffer[FT_BOOT_VERSION_MAX - 1] \u003d \u0027\\0\u0027;\nFF_LOGI(\"get boot vesion:%s\", databuffer);\n```",
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa6c96f9_dd142b1d",
+        "filename": "util/focaltech/focaltech/src/net_usb.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T19:56:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Memory Corruption via Hotplug Callback Pointer**\n\nThis callback registration is still incorrect. `\u0026callback_handle` is being passed as `user_data`, and `NULL` is passed as the `callback_handle`. \n\nInside `usb_event_callback`, it casts `user_data` to an `int *` and assigns `FT_USB_DEVICE_REMOVE_MAGIC` (`0x55aa`) to it. This means you are overwriting the libusb handle with a magic number, corrupting it, and preventing it from ever being properly deregistered.\n\n**Remediation:** You must pass `\u0026callback_handle` as the final argument, and pass a pointer to a dedicated flag (e.g., `\u0026g_no_device_flag`) as `user_data`.",
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af888dac_afcbc2d5",
+        "filename": "util/focaltech/focaltech/src/net_usb.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-08T19:56:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Memory Leak (Unfreed Device List)**\n\nThe author replied: \u0027No, after the device is found, it still goes to the error label and releases the resources.\u0027\n\nThis is mathematically impossible as written. When the device is found, `ret` is assigned `FT_SUCCESS` (which is `0`). Therefore, when execution hits `if (ret) {` on line 223, the condition evaluates to **false**, and it **skips** the `libusb_free_device_list` block entirely!\n\nFurthermore, `mbedtls_usb_connect()` calls `libusb_get_device_list(..., \u0026usb_ctx-\u003edevs);` *again*, which overwrites the `usb_ctx-\u003edevs` pointer. This permanently leaks the list that was allocated in this function. \n\n**Remediation:** You must unconditionally free the device list on the success path.",
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
