@@ -46,9 +46,9 @@ enum fp_sensor_type fpsensor_detect_get_type(void)
 	return FP_SENSOR_TYPE_FPC;
 #elif CROS_FP_HAS_COMPAT(elan_elan80sg) || CROS_FP_HAS_COMPAT(elan_elani80sa)
 	return FP_SENSOR_TYPE_ELAN;
-#elif CROS_FP_HAS_COMPAT(egis_egis630)
+#elif CROS_FP_HAS_COMPAT(egis_egis630) || CROS_FP_HAS_COMPAT(egis_egis660)
 	return FP_SENSOR_TYPE_EGIS;
-#elif CROS_FP_HAS_COMPAT(ft_ft9865)
+#elif CROS_FP_HAS_COMPAT(focaltech_ft98xx)
 	return FP_SENSOR_TYPE_FOCALTECH;
 #else
 #error "Unsupported sensor type"
@@ -110,14 +110,14 @@ int fp_sensor_deinit(void)
 	return 0;
 }
 
-int fp_sensor_get_info(struct ec_response_fp_info_v2 *resp, size_t resp_size)
+int fp_sensor_get_info(struct ec_response_fp_info_v3 *resp, size_t resp_size)
 {
 	if (resp == NULL) {
 		return -EINVAL;
 	}
 
 	const size_t expected_min_size =
-		sizeof(struct ec_response_fp_info_v2) +
+		sizeof(struct ec_response_fp_info_v3) +
 		NUM_IMAGE_CAPTURE_TYPES *
 			sizeof(struct fingerprint_image_frame_params);
 
@@ -216,10 +216,11 @@ int fp_enrollment_finish(void *templ)
 }
 
 int fp_finger_match(void *templ, uint32_t templ_count, uint8_t *image,
-		    int32_t *match_index, uint32_t *update_bitmap)
+		    bool template_update, int32_t *match_index,
+		    uint32_t *update_bitmap)
 {
 	return fingerprint_match(fp_algorithm, templ, templ_count, image,
-				 match_index, update_bitmap);
+				 template_update, match_index, update_bitmap);
 }
 
 void fp_sensor_low_power(void)

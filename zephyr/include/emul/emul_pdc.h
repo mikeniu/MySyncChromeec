@@ -98,7 +98,13 @@ typedef int (*emul_pdc_get_cable_property_t)(const struct emul *target,
 typedef int (*emul_pdc_set_cable_property_t)(
 	const struct emul *target, const union cable_property_t property);
 
+/*
+ * TODO(b/507299650)
+ * This interface may need adjustments to work well with few PDCs.
+ * For now we assume num_vdos, vdo_types and vdos are passed here.
+ */
 typedef int (*emul_pdc_set_vdo_t)(const struct emul *target, uint8_t num_vdos,
+				  const uint8_t *vdo_types,
 				  const uint32_t *vdos);
 
 typedef int (*emul_pdc_get_frs_t)(const struct emul *target, bool *enabled);
@@ -139,6 +145,8 @@ typedef int (*emul_pdc_set_revision_t)(const struct emul *target,
 typedef int (*emul_pdc_set_current_cam_t)(const struct emul *target,
 					  uint32_t current_cam);
 typedef int (*emul_pdc_set_alert_t)(const struct emul *target, uint32_t ado);
+typedef int (*emul_pdc_get_sbu_mux_mode_t)(const struct emul *target,
+					   enum pdc_sbu_mux_mode *mode);
 
 __subsystem struct emul_pdc_driver_api {
 	emul_pdc_set_response_delay_t set_response_delay;
@@ -191,6 +199,7 @@ __subsystem struct emul_pdc_driver_api {
 	emul_pdc_set_revision_t set_revision;
 	emul_pdc_set_current_cam_t set_current_cam;
 	emul_pdc_set_alert_t set_alert;
+	emul_pdc_get_sbu_mux_mode_t get_sbu_mux_mode;
 };
 
 static inline int emul_pdc_set_ucsi_version(const struct emul *target,
@@ -659,6 +668,7 @@ emul_pdc_set_cable_property(const struct emul *target,
 }
 
 static inline int emul_pdc_set_vdo(const struct emul *target, uint8_t num_vdos,
+				   const uint8_t *vdo_types,
 				   const uint32_t *vdos)
 {
 	if (!target || !target->backend_api) {
@@ -668,7 +678,7 @@ static inline int emul_pdc_set_vdo(const struct emul *target, uint8_t num_vdos,
 	const struct emul_pdc_driver_api *api = target->backend_api;
 
 	if (api->set_vdo) {
-		return api->set_vdo(target, num_vdos, vdos);
+		return api->set_vdo(target, num_vdos, vdo_types, vdos);
 	}
 	return -ENOSYS;
 }
@@ -1010,6 +1020,20 @@ static inline int emul_pdc_set_alert(const struct emul *target,
 	const struct emul_pdc_driver_api *api = target->backend_api;
 	if (api->set_alert) {
 		return api->set_alert(target, ado);
+	}
+	return -ENOSYS;
+}
+
+static inline int emul_pdc_get_sbu_mux_mode(const struct emul *target,
+					    enum pdc_sbu_mux_mode *mode)
+{
+	if (!target || !target->backend_api) {
+		return -ENOTSUP;
+	}
+
+	const struct emul_pdc_driver_api *api = target->backend_api;
+	if (api->get_sbu_mux_mode) {
+		return api->get_sbu_mux_mode(target, mode);
 	}
 	return -ENOSYS;
 }

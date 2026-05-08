@@ -6,6 +6,7 @@
 / {
 	aliases {
 		gpio-wp = &gpio_ec_wp_odl;
+		gpio-btn-ign-in = &gpio_fp_atc;
 	};
 
 	named-gpios {
@@ -27,7 +28,7 @@
 		};
 		/* EC_WP_ODL */
 		gpio_ec_wp_odl: ec_wp_odl {
-			gpios = <&gpiof 4 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+			gpios = <&gpiof 4 (GPIO_INPUT | GPIO_ACTIVE_LOW | GPIO_VOLTAGE_1P8)>;
 		};
 		/* EC_GSC_PACKET_MODE */
 		gpio_ec_gsc_packet_mode: ec_gsc_packet_mode {
@@ -218,10 +219,6 @@
 		/* EN_PP5000_LED_X */
 		gpio_en_pp5000_led: en_pp5000_led {
 			gpios = <&gpiog 1 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_HIGH)>;
-		};
-		/* EC_SOC_REC_SWITCH_ODL */
-		gpio_ec_soc_rec_switch_odl: ec_soc_rec_switch_odl {
-			gpios = <&gpioh 8 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 		};
 	};
 };
