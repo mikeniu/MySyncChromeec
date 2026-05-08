@@ -97,4 +97,13 @@ void battery_policy(void)
 			pre_battery_cells);
 	}
 }
+DECLARE_DEFERRED(battery_policy);
 DECLARE_HOOK(HOOK_INIT, battery_policy, HOOK_PRIO_POST_BATTERY_INIT + 1);
+
+static void battery_policy_check(void)
+{
+	if (pre_battery_cells == BATT_UNKNOWN) {
+		hook_call_deferred(&battery_policy_data, 2105 * USEC_PER_MSEC);
+	}
+}
+DECLARE_HOOK(HOOK_INIT, battery_policy_check, HOOK_PRIO_LAST);
