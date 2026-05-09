@@ -25,7 +25,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/spinlock.h>
 #include <zephyr/sys/util.h>
-LOG_MODULE_REGISTER(led, LOG_LEVEL_ERR);
+LOG_MODULE_REGISTER(led, LOG_LEVEL_INF);
 
 /* Extern the driver handles linked by 'led-pins' in the policies */
 #define DECLARE_DRIVER(inst)                        \
@@ -59,19 +59,24 @@ DT_INST_FOREACH_STATUS_OKAY(DECLARE_PINS_NODE_FOR_POLICY)
 		"The led-color node (" #id                                    \
 		") must belong to the same led-id defined in the policy.");
 
+#define ASSERT_PERIOD_MS_BOUNDS(id)                              \
+	BUILD_ASSERT(DT_PROP_OR(id, period_ms, 0) <= UINT16_MAX, \
+		     "period-ms in " #id " exceeds 16-bit (65535)");
+
 /* Generates the step-level pattern array for each rule */
-#define SET_PATTERN_COLOR_ARRAY(id)                                      \
-	{                                                                \
-		.led_color_node = &PINS_NODE(DT_PHANDLE(id, led_color)), \
-		.duration_ms = DT_PROP_OR(id, period_ms, 0),             \
+#define SET_PATTERN_COLOR_ARRAY(id)                                        \
+	{                                                                  \
+		.color_idx = DT_NODE_CHILD_IDX(DT_PHANDLE(id, led_color)), \
+		.duration_ms = DT_PROP_OR(id, period_ms, 0),               \
 	},
 
 #define PATTERN_COLOR_ARRAY(id) DT_CAT(PATTERN_COLOR_, id)
 
-#define GEN_PATTERN_COLOR_ARRAY(id, fn)                        \
-	const struct pattern_color_node_t PATTERN_COLOR_ARRAY( \
-		id)[] = { fn(id, SET_PATTERN_COLOR_ARRAY) };   \
-	fn(id, ASSERT_LEDS_HW_MATCH) fn(id, ASSERT_LEDS_ID_MATCH)
+#define GEN_PATTERN_COLOR_ARRAY(id, fn)                           \
+	const struct pattern_color_node_t PATTERN_COLOR_ARRAY(    \
+		id)[] = { fn(id, SET_PATTERN_COLOR_ARRAY) };      \
+	fn(id, ASSERT_LEDS_HW_MATCH) fn(id, ASSERT_LEDS_ID_MATCH) \
+		fn(id, ASSERT_PERIOD_MS_BOUNDS)
 
 #define GEN_PATTERN_COLOR_ARRAY_FOR_POLICY(inst)                              \
 	DT_INST_FOREACH_CHILD_STATUS_OKAY_VARGS(inst, DT_FOREACH_CHILD_VARGS, \
@@ -84,6 +89,7 @@ DT_INST_FOREACH_STATUS_OKAY(GEN_PATTERN_COLOR_ARRAY_FOR_POLICY)
 
 #define LED_PATTERN_INIT(node_id, fn)                               \
 	{                                                           \
+		.led_id = DT_STRING_TOKEN(node_id, led_id),         \
 		.cur_color = 0,                                     \
 		.elapsed_ms = 0,                                    \
 		.transition = GET_PROP(node_id, transition),        \
@@ -351,7 +357,7 @@ static void process_pattern_update(const struct policy_group *grp,
 }
 
 /* Reset any built-in patterns that match the given led_id */
-static void reset_policy_patterns(enum ec_led_id led_id)
+void reset_policy_patterns(enum ec_led_id led_id)
 {
 	for (int i = 0; i < ARRAY_SIZE(policy_groups); i++) {
 		const struct policy_group *grp = &policy_groups[i];
@@ -366,9 +372,7 @@ static void reset_policy_patterns(enum ec_led_id led_id)
 			for (int k = 0; k < node->num_patterns; k++) {
 				struct led_pattern_node_t *pat =
 					&node->led_patterns[k];
-				enum ec_led_id id =
-					pat->pattern_color[0]
-						.led_color_node->led_id;
+				enum ec_led_id id = pat->led_id;
 
 				if (id == led_id) {
 					led_init_pattern_state(pat);
@@ -454,9 +458,7 @@ static void cancel_custom_if_conflict(const struct node_prop_t *node)
 	key = k_spin_lock(&led_custom_lock);
 	if (g_custom_patterns) {
 		for (i = 0; i < node->num_patterns; i++) {
-			enum ec_led_id id = node->led_patterns[i]
-						    .pattern_color[0]
-						    .led_color_node->led_id;
+			enum ec_led_id id = node->led_patterns[i].led_id;
 
 			if (g_custom_patterns->led_id == id) {
 				conflict = true;
@@ -481,8 +483,7 @@ update_policy_node(const struct policy_group *grp,
 
 	for (int i = 0; i < node->num_patterns; i++) {
 		struct led_pattern_node_t *pattern = &patterns[i];
-		enum ec_led_id led_id =
-			pattern->pattern_color[0].led_color_node->led_id;
+		enum ec_led_id led_id = pattern->led_id;
 
 		/* If a custom pattern is active, skip default policy. */
 		if (is_custom_pattern_active(custom, led_id)) {
@@ -591,6 +592,11 @@ static int match_node(const struct policy_group *grp, int node_idx)
 	/* reset the color counter if pattern just activated */
 	if (!(*active)) {
 		*active = true;
+
+		if (node->num_patterns > 0) {
+			LOG_INF("Policy %d -> led %d", node_idx,
+				node->led_patterns[0].led_id);
+		}
 
 		/*
 		 * If a system state transition activates a policy for an LED
