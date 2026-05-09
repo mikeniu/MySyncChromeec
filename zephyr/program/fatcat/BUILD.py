@@ -30,7 +30,7 @@ def register_npcx9_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_files,
         ],
-        modules=["cmsis", "cmsis_6", "ec", *extra_modules],
+        modules=["cmsis_6", "ec", *extra_modules],
         inherited_from=inherited_from,
     )
 
@@ -67,9 +67,13 @@ def register_it8xxx2_project(
 def register_realtek_project(
     project_name,
     extra_kconfig_files=(),
+    inherited_from=None,
     extra_modules=(),
 ):
     """Register an realtek_ec based variant of fatcat."""
+    if inherited_from is None:
+        inherited_from = ["fatcat"]
+
     register_rtk_project(
         project_name=project_name,
         zephyr_board="realtek/rts5912",
@@ -84,7 +88,8 @@ def register_realtek_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_files,
         ],
-        modules=["cmsis", "cmsis_6", "ec", *extra_modules],
+        modules=["cmsis_6", "ec", *extra_modules],
+        inherited_from=inherited_from,
     )
 
 
@@ -163,6 +168,7 @@ register_ish_project(
     kconfig_files=[
         here / "dsp_comms.conf",
         here / "kinmen-ish" / "project.conf",
+        here / ".." / ".." / "ish.conf",
     ],
     inherited_from=["fatcat"],
 )
@@ -176,6 +182,7 @@ register_ish_project(
     kconfig_files=[
         here / "dsp_comms.conf",
         here / "ruby-ish" / "project.conf",
+        here / ".." / ".." / "ish.conf",
     ],
     inherited_from=["fatcat"],
 )
@@ -189,6 +196,7 @@ register_ish_project(
     kconfig_files=[
         here / "dsp_comms.conf",
         here / "moonstone-ish" / "project.conf",
+        here / ".." / ".." / "ish.conf",
     ],
     inherited_from=["fatcat"],
 )
@@ -201,6 +209,7 @@ register_ish_project(
     ],
     kconfig_files=[
         here / "fatcat-ish-idle" / "project.conf",
+        here / ".." / ".." / "ish.conf",
     ],
 )
 
