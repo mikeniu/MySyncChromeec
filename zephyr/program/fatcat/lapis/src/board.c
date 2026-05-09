@@ -4,6 +4,7 @@
  */
 
 #include "charger.h"
+#include "chipset.h"
 #include "cros_board_info.h"
 #include "cros_cbi.h"
 #include "gpio.h"
@@ -47,6 +48,17 @@ static void tp_enable(void)
 	}
 }
 DECLARE_HOOK(HOOK_LID_CHANGE, tp_enable, HOOK_PRIO_DEFAULT);
+
+static void bl_enable(void)
+{
+	if (lid_is_open() && !chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
+		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_lcd_backoff), true);
+	} else {
+		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_lcd_backoff),
+				false);
+	}
+}
+DECLARE_HOOK(HOOK_LID_CHANGE, bl_enable, HOOK_PRIO_DEFAULT);
 
 static void disable_sleep_bid(void)
 {
