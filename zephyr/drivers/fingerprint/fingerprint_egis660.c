@@ -12,6 +12,7 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/spi.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/pm/policy.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
 
@@ -317,7 +318,16 @@ static int egis660_acquire_image(const struct device *dev,
 		return -ENOTSUP;
 	}
 
+	/* Prevent system from entering suspend during image acquisition.
+	 * SPI clock switching during active transfer can desynchronize
+	 * the sensor's SPI state machine.
+	 */
+	pm_policy_state_lock_get(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+
 	rc = fp_sensor_acquire_image_with_mode(image_buf, rc);
+
+	pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+
 	if (rc < 0) {
 		LOG_ERR("Failed to acquire image with capture_type %d: %d",
 			capture_type, rc);
