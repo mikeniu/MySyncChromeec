@@ -55,7 +55,7 @@ egis_egis630_enroll_step(const struct fingerprint_algorithm *const alg,
 	}
 
 	egis_api_return_t ret =
-		egis_finger_enroll((uint8_t *)image, completion);
+		egis_finger_enroll((FP_EGIS_IMAGE *)image, completion);
 	switch (ret) {
 	case EGIS_API_ENROLL_FINISH:
 	case EGIS_API_ENROLL_IMAGE_OK:
@@ -92,16 +92,16 @@ egis_egis630_enroll_finish(const struct fingerprint_algorithm *const alg,
 
 static int egis_egis630_match(const struct fingerprint_algorithm *const alg,
 			      void *templ, uint32_t templ_count,
-			      const uint8_t *const image, int32_t *match_index,
-			      uint32_t *update_bitmap)
+			      const uint8_t *const image, bool template_update,
+			      int32_t *match_index, uint32_t *update_bitmap)
 {
 	if (!IS_ENABLED(CONFIG_HAVE_EGIS630_PRIVATE_ALGORITHM)) {
 		return -ENOTSUP;
 	}
 
-	egis_api_return_t ret = egis_finger_match(templ, templ_count,
-						  (uint8_t *)image, match_index,
-						  update_bitmap);
+	egis_api_return_t ret = egis_finger_match(
+		templ, templ_count, (FP_EGIS_IMAGE *)image, match_index,
+		template_update ? update_bitmap : NULL);
 
 	switch (ret) {
 	case EGIS_API_MATCH_MATCHED:
