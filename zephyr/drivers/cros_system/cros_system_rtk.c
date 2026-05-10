@@ -20,17 +20,20 @@
 #include <zephyr/sys/reboot.h>
 #include <zephyr/sys/util.h>
 
+#define DT_DRV_COMPAT cros_ec_cros_system
+
 LOG_MODULE_REGISTER(cros_system, LOG_LEVEL_ERR);
 
 #define RTK_SCCON_REG_BASE ((SYSTEM_Type *)(DT_REG_ADDR(DT_NODELABEL(sccon))))
 
-#define WDT_NODE DT_INST(0, realtek_rts5912_watchdog)
+#define WDT_NODE DT_NODELABEL(wdog)
 #define RTK_WDT_REG_BASE ((WDT_Type *)(DT_REG_ADDR(WDT_NODE)))
 
 #define RTK_VIVO_BACKUP0_REG (*((volatile uint32_t *)0x40104ff8))
 #define RTK_VIVO_BACKUP1_REG (*((volatile uint32_t *)0x40104ffc))
 
-#define BBRAM_KEY_VALUE 0xA5
+#define BBRAM_KEY_VALUE 0x52544b21 /* RTK! */
+#define BBRAM_KEY_REV_VALUE ~BBRAM_KEY_VALUE
 
 /* Driver data */
 struct cros_system_rtk_data {
@@ -158,7 +161,7 @@ static int cros_system_rtk_init(const struct device *dev)
 	WDT_Type *wdt_reg = RTK_WDT_REG_BASE;
 	uint32_t vivo_reg0 = RTK_VIVO_BACKUP0_REG;
 	uint32_t vivo_reg1 = RTK_VIVO_BACKUP1_REG;
-	uint32_t key_val = 0;
+	uint32_t key_val = 0, key_rev_val = 0;
 	uint32_t value = 0;
 	uint32_t invalid_value = 0;
 	/* In order to determine if reset from watchdog */
@@ -183,9 +186,12 @@ static int cros_system_rtk_init(const struct device *dev)
 	/* check if bbram's key remained */
 	bbram_read(bbram_dev, BBRAM_REGION_OFFSET(key), BBRAM_REGION_SIZE(key),
 		   (uint8_t *)&key_val);
+	bbram_read(bbram_dev, BBRAM_REGION_OFFSET(key_rev),
+		   BBRAM_REGION_SIZE(key_rev), (uint8_t *)&key_rev_val);
 
 	/* If No, Init BBRAM reset_flags to 0x0 */
-	if (key_val != BBRAM_KEY_VALUE) {
+	if ((key_val != BBRAM_KEY_VALUE) ||
+	    (key_rev_val != BBRAM_KEY_REV_VALUE)) {
 		bbram_write(bbram_dev, BBRAM_REGION_OFFSET(saved_reset_flags),
 			    BBRAM_REGION_SIZE(saved_reset_flags),
 			    (uint8_t *)&value);
@@ -208,8 +214,12 @@ static int cros_system_rtk_init(const struct device *dev)
 
 		/* Set key as BBRAM_KEY_VALUE  */
 		key_val = BBRAM_KEY_VALUE;
+		key_rev_val = BBRAM_KEY_REV_VALUE;
 		bbram_write(bbram_dev, BBRAM_REGION_OFFSET(key),
 			    BBRAM_REGION_SIZE(key), (uint8_t *)&key_val);
+		bbram_write(bbram_dev, BBRAM_REGION_OFFSET(key_rev),
+			    BBRAM_REGION_SIZE(key_rev),
+			    (uint8_t *)&key_rev_val);
 
 	} else {
 		/* If key remained and not reset from wdt, setup
@@ -296,9 +306,12 @@ static const struct cros_system_driver_api cros_system_driver_rtk_api = {
 #error "CROS_SYSTEM must initialize before the SYSTEM_PRE initialization"
 #endif
 
-static struct cros_system_rtk_data cros_system_rtk_data_0;
+#define CROS_SYSTEM_RTK_INIT(inst)                                          \
+	static struct cros_system_rtk_data cros_system_rtk_dev_data_##inst; \
+	DEVICE_DEFINE(cros_system_rtk_##inst, "CROS_SYSTEM",                \
+		      cros_system_rtk_init, NULL,                           \
+		      &cros_system_rtk_dev_data_##inst, NULL, PRE_KERNEL_1, \
+		      CONFIG_CROS_SYSTEM_REALTEK_INIT_PRIORITY,             \
+		      &cros_system_driver_rtk_api);
 
-DEVICE_DEFINE(cros_system_rtk_0, "CROS_SYSTEM", cros_system_rtk_init, NULL,
-	      &cros_system_rtk_data_0, NULL, PRE_KERNEL_1,
-	      CONFIG_CROS_SYSTEM_REALTEK_INIT_PRIORITY,
-	      &cros_system_driver_rtk_api);
+DT_INST_FOREACH_STATUS_OKAY(CROS_SYSTEM_RTK_INIT)
