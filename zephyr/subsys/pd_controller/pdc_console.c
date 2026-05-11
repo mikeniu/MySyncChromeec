@@ -249,7 +249,8 @@ static int print_pdc_info(const struct shell *sh, int port, bool live)
 		      "Project Name: '%s'\n"
 		      "Driver Name: '%s'\n"
 		      "FW Update: %c\n"
-		      "FRS Supported: %c\n",
+		      "FRS Supported: %c\n"
+		      "USB Comm Capable: %c\n",
 		      live, PDC_FWVER_GET_MAJOR(pdc_info.fw_version),
 		      PDC_FWVER_GET_MINOR(pdc_info.fw_version),
 		      PDC_FWVER_GET_PATCH(pdc_info.fw_version),
@@ -258,7 +259,8 @@ static int print_pdc_info(const struct shell *sh, int port, bool live)
 		      pdc_info.running_in_flash_bank,
 		      has_proj_name ? pdc_info.project_name : "<None>",
 		      pdc_info.driver_name, pdc_info.no_fw_update ? 'N' : 'Y',
-		      pdc_info.frs_supported ? 'Y' : 'N');
+		      pdc_info.frs_supported ? 'Y' : 'N',
+		      pdc_info.usb_comm_capable ? 'Y' : 'N');
 
 	return EC_SUCCESS;
 }
