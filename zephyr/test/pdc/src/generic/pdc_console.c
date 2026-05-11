@@ -695,6 +695,7 @@ ZTEST_USER(console_cmd_pdc, test_info)
 	zassert_not_null(strstr(outbuffer, "Project Name: 'ProjectName'"));
 	zassert_not_null(strstr(outbuffer, "Driver Name: 'driver_name'"));
 	zassert_not_null(strstr(outbuffer, "FW Update: N"));
+	zassert_not_null(strstr(outbuffer, "USB Comm Capable: N"));
 
 	RESET_FAKE(pdc_power_mgmt_get_info);
 
