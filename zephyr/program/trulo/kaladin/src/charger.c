@@ -17,6 +17,9 @@ LOG_MODULE_DECLARE(charger_init, LOG_LEVEL_INF);
 
 #define AC_PROCHOT_RATE 1.2
 
+#if 0
+#endif
+
 static enum ec_error_list isl95522_write(int chgnum, int offset, int value)
 {
 	int rv = i2c_write16(chg_chips[chgnum].i2c_port,
