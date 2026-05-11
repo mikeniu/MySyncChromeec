@@ -39,9 +39,12 @@
 #error Must select either CONFIG_SHELL_BACKEND_SERIAL or \
 	CONFIG_SHELL_BACKEND_DUMMY /* nocheck */
 #endif
+
+#if !defined(CONFIG_HW_TEST)
 #if defined(CONFIG_SHELL_BACKEND_SERIAL) && \
 	defined(CONFIG_SHELL_BACKEND_DUMMY) /* nocheck */
 #error Must select only one shell backend
+#endif
 #endif
 
 BUILD_ASSERT(EC_TASK_PRIORITY(EC_SHELL_PRIO) == CONFIG_SHELL_THREAD_PRIORITY,
