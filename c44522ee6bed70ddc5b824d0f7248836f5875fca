@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3746557_ae5dfaeb",
+        "filename": "zephyr/program/bluey/mica/src/keyboard_customization.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1544342
+      },
+      "writtenOn": "2026-05-11T03:12:21Z",
+      "side": 1,
+      "message": "Are these header files all necessary?",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 17
+      },
+      "revId": "c44522ee6bed70ddc5b824d0f7248836f5875fca",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
