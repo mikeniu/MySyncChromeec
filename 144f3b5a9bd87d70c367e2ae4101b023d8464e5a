@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "144f3b5a9bd87d70c367e2ae4101b023d8464e5a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e56f36d_16c94fd5",
+        "filename": "zephyr/program/bluey/src/battery.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1532003
+      },
+      "writtenOn": "2026-05-11T17:51:22Z",
+      "side": 1,
+      "message": "looks to me there is no need to wait for `battery_cutoff_start` as there is no indicator as such \n\ncode 1:\n\n```\n\t\tCUTOFFPRINTS(\"starting scheduled cutoff\");\n\t\tbattery_cutoff_start();\n\t\treturn;\n```\n\ncode 2:\n\n```\n\treturn battery_cutoff_start();\n```\n\ncode 3:\n\n```\n\treturn battery_cutoff_start() \u003d\u003d EC_RES_SUCCESS ? EC_SUCCESS :\n\t\t\t\t\t\t\t  EC_ERROR_UNKNOWN;\n```",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 26
+      },
+      "revId": "144f3b5a9bd87d70c367e2ae4101b023d8464e5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
