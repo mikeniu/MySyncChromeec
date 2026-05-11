@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7496b8f6_1c2306a2",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 4
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-11T23:51:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2c0b3ea2_13e7e7d6",
+      "revId": "ab928df67a66421046400152a48fb6720e5f8b03",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "996903b2_7512c6f0",
@@ -35,6 +53,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "078235ab_855afc9c",
+        "filename": "zephyr/shim/src/CMakeLists.txt",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-11T23:51:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "996903b2_7512c6f0",
+      "revId": "ab928df67a66421046400152a48fb6720e5f8b03",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "65bc6df0_b7aa9698",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-05-08T01:31:55Z",
       "side": 1,
       "message": "Would we ever expect this to be `true`? Since the `current` thread is whatever thread the host command is running filling in this response?",
+      "revId": "ab928df67a66421046400152a48fb6720e5f8b03",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ba6212f_58ed917b",
+        "filename": "zephyr/shim/src/threadinfo.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-11T23:51:58Z",
+      "side": 1,
+      "message": "It will be true for the host command thread when listing all threads. Agree that it may not be super useful in this context. More generally, a future variations of this function may be executed from a panic handler ISR, in that context it\u0027s useful info.",
+      "parentUuid": "65bc6df0_b7aa9698",
       "revId": "ab928df67a66421046400152a48fb6720e5f8b03",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
