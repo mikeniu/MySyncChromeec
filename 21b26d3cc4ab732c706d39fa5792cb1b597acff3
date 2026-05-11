@@ -33,6 +33,23 @@
       "message": "The previous build (https://cr-buildbucket.appspot.com/build/8682422187185026657) is being automatically retried for the following reasons:\n- Some tests are now retryable:rauru-cq.hylia.hw.fingerprint-cq\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
       "revId": "21b26d3cc4ab732c706d39fa5792cb1b597acff3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85110760_5b33fb46",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1273086
+      },
+      "writtenOn": "2026-05-11T02:40:01Z",
+      "side": 1,
+      "message": "This change only affects fatcat / ocelot devices.  They passed.  Rauru is not affected by this configuration",
+      "revId": "21b26d3cc4ab732c706d39fa5792cb1b597acff3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
