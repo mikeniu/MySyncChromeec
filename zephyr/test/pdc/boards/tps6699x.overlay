@@ -24,6 +24,7 @@
                 port-index-on-chip = <0x1>;
                 ccd;
                 frs-supported;
+                usb-comm-capable-as-device;
         };
 
         pdc_emul2: tps6699-pdc@24 {
