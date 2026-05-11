@@ -39,10 +39,7 @@
 #error Must select either CONFIG_SHELL_BACKEND_SERIAL or \
 	CONFIG_SHELL_BACKEND_DUMMY /* nocheck */
 #endif
-#if defined(CONFIG_SHELL_BACKEND_SERIAL) && \
-	defined(CONFIG_SHELL_BACKEND_DUMMY) /* nocheck */
-#error Must select only one shell backend
-#endif
+
 
 BUILD_ASSERT(EC_TASK_PRIORITY(EC_SHELL_PRIO) == CONFIG_SHELL_THREAD_PRIORITY,
 	     "EC_SHELL_PRIO does not match CONFIG_SHELL_THREAD_PRIORITY.");
