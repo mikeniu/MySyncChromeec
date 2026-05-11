@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "20264276_1cf4bca5",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 4684390
+      },
+      "writtenOn": "2026-05-11T07:29:10Z",
+      "side": 1,
+      "message": "The 2105 ms value is based on empirical measurement. In factory tests with new batteries, SBS data typically becomes available around 1.7–1.9 seconds after power-on. We chose 2105 ms as a conservative upper bound with margin to cover unit variation and EC scheduling delay, ensuring SBS is reliably ready before policy execution.",
+      "parentUuid": "52aba43e_87e8173c",
+      "revId": "b00b3fb7ea3b5d4542739f5b77b12d4207552f5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b0cbf651_c97cc23e",
         "filename": "zephyr/program/skywalker/yoda/src/charger.c",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-08T16:49:16Z",
       "side": 1,
       "message": "This will run it twice during init hooks and then potentially every ~2 ms after that. Is that intended? Are both calls during init necessary?\n\nIs there some later time that it could just run once? If the battery is in cutoff initially, is there some point later when it will definitely be out of cutoff?",
+      "revId": "b00b3fb7ea3b5d4542739f5b77b12d4207552f5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ada3d71c_a0eacb22",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 4684390
+      },
+      "writtenOn": "2026-05-11T07:29:10Z",
+      "side": 1,
+      "message": "The hook_call_deferred() in battery_policy_check() is a one-shot execution, and the deferred run happens after ~2s for SBS stabilization.\nAlternatively, we could consider adding a new hook at the battery wake-up stage, but it would require changes in common code, so we used a local deferred approach to minimize impact.",
+      "parentUuid": "b0cbf651_c97cc23e",
       "revId": "b00b3fb7ea3b5d4542739f5b77b12d4207552f5e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
