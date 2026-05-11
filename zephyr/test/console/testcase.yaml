@@ -2,6 +2,8 @@ common:
   platform_allow:
   - native_sim
 tests:
+
+
   # The UART API provides both interrupt driven and modes.
   console.output.interrupt:
     extra_conf_files:
@@ -51,6 +53,10 @@ tests:
     extra_configs:
     - CONFIG_TEST_CONSOLE_RESTRICTED=y
     - CONFIG_BOARD_FINGERPRINT=y
+    - CONFIG_SHELL=y
+    - CONFIG_SHELL_BACKEND_DUMMY=y
+    - CONFIG_SHELL_BACKEND_DUMMY_BUF_SIZE=1000
+
   console.output.start_shell_task:
     extra_conf_files:
     - console_output.conf

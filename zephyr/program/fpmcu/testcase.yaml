@@ -106,7 +106,11 @@ tests:
   fpsensor_debug:
     extra_configs:
     - CONFIG_HW_TEST_FPSENSOR_DEBUG=y
+    - CONFIG_SHELL=y
+    - CONFIG_SHELL_BACKEND_DUMMY=y
+    - CONFIG_SHELL_BACKEND_DUMMY_BUF_SIZE=1000
     extra_conf_files:
+
     - prj_hw_tests.conf
   fpsensor_hw:
     extra_configs:
@@ -193,7 +197,11 @@ tests:
   restricted_console:
     extra_configs:
     - CONFIG_HW_TEST_RESTRICTED_CONSOLE=y
+    - CONFIG_SHELL=y
+    - CONFIG_SHELL_BACKEND_DUMMY=y
+    - CONFIG_SHELL_BACKEND_DUMMY_BUF_SIZE=1000
     extra_conf_files:
+
     - prj_hw_tests.conf
   rng_benchmark:
     extra_configs:

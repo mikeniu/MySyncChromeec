@@ -6,6 +6,8 @@ common:
   platform_allow:
   - native_sim
 tests:
+
+
   fingerprint.task.capture:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FINGERPRINT_CAPTURE=y
@@ -58,7 +60,11 @@ tests:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FINGERPRINT_DEBUG=y
     - CONFIG_FINGERPRINT_SHELL=y
+    - CONFIG_SHELL=y
+    - CONFIG_SHELL_BACKEND_DUMMY=y
+    - CONFIG_SHELL_BACKEND_DUMMY_BUF_SIZE=1000
     extra_conf_files:
+
     - prj.conf
 
   fingerprint.task.commands:
