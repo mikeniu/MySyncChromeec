@@ -46,6 +46,30 @@
       },
       "revId": "c44522ee6bed70ddc5b824d0f7248836f5875fca",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29d6504b_5d6bb689",
+        "filename": "zephyr/program/bluey/mica/src/keyboard_customization.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-05-11T04:54:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1a49ceb_9d37b1af",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 17
+      },
+      "revId": "c44522ee6bed70ddc5b824d0f7248836f5875fca",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
