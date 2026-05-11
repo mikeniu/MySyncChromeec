@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8eb83068_350bb086",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-05-11T22:59:45Z",
+      "side": 1,
+      "message": "We disabled AP mode entry the main EC branch but some devices are running off the R148 branch. Can you help review this cherry-pick?",
+      "revId": "3b03684efe40363bba8f78da0b0d7bebecd0f080",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
