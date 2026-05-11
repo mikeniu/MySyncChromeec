@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3aaeb9a_7afc792e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-05-11T02:13:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a87049f7_74309981",
+      "range": {
+        "startLine": 10,
+        "startChar": 12,
+        "endLine": 10,
+        "endChar": 16
+      },
+      "revId": "7d717ce13ca7b26fc7ba6c596407882fcfeafa1b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c1acfeca_1d99a4e4",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-05-11T01:29:13Z",
       "side": 1,
       "message": "use tab",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 8
+      },
+      "revId": "7d717ce13ca7b26fc7ba6c596407882fcfeafa1b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f0fd030_c7291cde",
+        "filename": "zephyr/program/bluey/mica/src/keyboard_customization.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-05-11T02:13:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c1acfeca_1d99a4e4",
       "range": {
         "startLine": 71,
         "startChar": 0,
