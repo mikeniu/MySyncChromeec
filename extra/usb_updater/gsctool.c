@@ -3199,6 +3199,8 @@ static void print_ccd_info(void *response, size_t response_size,
 					     "Set" :
 					     "None";
 	if (show_machine_output) {
+		int factory_mode = ccd_info.ccd_flags &
+				   CCD_FLAG_FACTORY_MODE_ENABLED;
 		print_machine_output("STATE", "%s", state);
 		print_machine_output("PASSWORD", "%s", password);
 		print_machine_output("CCD_FLAGS", "%#06x", ccd_info.ccd_flags);
@@ -3206,10 +3208,13 @@ static void print_ccd_info(void *response, size_t response_size,
 			"CCD_FLAG_TESTLAB_MODE", "%c",
 			(ccd_info.ccd_flags & CCD_FLAG_TEST_LAB) ? 'Y' : 'N');
 		print_machine_output("CCD_FLAG_FACTORY_MODE", "%c",
-				     (ccd_info.ccd_flags &
-				      CCD_FLAG_FACTORY_MODE_ENABLED) ?
-					     'Y' :
-					     'N');
+				     factory_mode ? 'Y' : 'N');
+		print_machine_output(
+			"CCD_FLAG_RMA_MODE", "%c",
+			factory_mode && (ccd_info.ccd_flags &
+					 CCD_FLAG_RMA_MODE_ENABLED) ?
+				'Y' :
+				'N');
 	} else {
 		printf("State: %s\n", state);
 		printf("Password: %s\n", password);
