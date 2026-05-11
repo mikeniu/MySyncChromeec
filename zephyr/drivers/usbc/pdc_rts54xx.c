@@ -363,7 +363,7 @@ struct pdc_config_t {
 	bool frs_supported;
 	/** Whether or not this port is capable of USB communication as a device
 	 */
-	bool usb_comm_capable_as_device;
+	bool usb_device_capable;
 	/** Pointer to the device-specific callback function */
 	gpio_callback_handler_t callback_handler;
 };
@@ -1351,6 +1351,7 @@ static enum smf_state_result st_read_run(void *o)
 
 		info->no_fw_update = cfg->no_fw_update;
 		info->frs_supported = cfg->frs_supported;
+		info->usb_device_capable = cfg->usb_device_capable;
 
 		/* Retain a cached copy of this data */
 		data->info = *info;
@@ -1751,8 +1752,8 @@ static int rts54_set_vdo_idh(const struct device *dev)
 	 * Bit 30: USB Device capable
 	 * We assume the port is Host capable.
 	 */
-	idh[0] = VDO_IDH(1, cfg->usb_comm_capable_as_device ? 1 : 0,
-			 IDH_PTYPE_UNDEF, 0, data->info.vid);
+	idh[0] = VDO_IDH(1, cfg->usb_device_capable ? 1 : 0, IDH_PTYPE_UNDEF, 0,
+			 data->info.vid);
 
 	config.fields.num_vdos = 1;
 	config.fields.origin = RTS54XX_PDC_ORIGIN;
@@ -3293,7 +3294,7 @@ BUILD_ASSERT(
 		.no_fw_update = DT_INST_PROP(inst, no_fw_update),             \
 		.ccd = DT_INST_PROP(inst, ccd),                               \
 		.frs_supported = DT_INST_PROP(inst, frs_supported),           \
-		.usb_comm_capable_as_device =                                 \
+		.usb_device_capable =                                         \
 			DT_INST_PROP(inst, usb_comm_capable_as_device),       \
 		.callback_handler = pdc_interrupt_callback##inst,             \
 	};                                                                    \

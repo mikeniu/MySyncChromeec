@@ -369,10 +369,11 @@ ZTEST_USER(rts54xx, test_vdo_integrity_roundtrip)
 	pdc_set_cc_callback(dev, NULL);
 }
 
-ZTEST_USER(rts54xx, test_usb_comm_capable_as_device)
+ZTEST_USER(rts54xx, test_usb_device_capable)
 {
 	uint32_t idh;
 	union get_vdo_t vdo_req;
+	struct pdc_info_t info;
 	uint8_t vdo_types[] = { VDO_INDEX_IDH };
 
 	vdo_req.raw_value = 0;
@@ -390,6 +391,10 @@ ZTEST_USER(rts54xx, test_usb_comm_capable_as_device)
 	zassert_ok(emul_pdc_idle_wait(emul2));
 
 	/* Verify port 0 (pdc_emul1) has USB Device bit set (bit 30) */
+	zassert_ok(pdc_get_info(dev, &info, true));
+	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_true(info.usb_device_capable);
+
 	zassert_ok(pdc_get_vdo(dev, vdo_req, vdo_types, &idh));
 	/* Wait for command to complete */
 	zassert_ok(emul_pdc_idle_wait(emul));
@@ -398,6 +403,10 @@ ZTEST_USER(rts54xx, test_usb_comm_capable_as_device)
 
 	/* Verify port 1 (pdc_emul2) does not have USB Device bit set (bit 30)
 	 */
+	zassert_ok(pdc_get_info(dev2, &info, true));
+	zassert_ok(emul_pdc_idle_wait(emul2));
+	zassert_false(info.usb_device_capable);
+
 	zassert_ok(pdc_get_vdo(dev2, vdo_req, vdo_types, &idh));
 	/* Wait for command to complete */
 	zassert_ok(emul_pdc_idle_wait(emul));

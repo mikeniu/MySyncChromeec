@@ -623,3 +623,18 @@ ZTEST_USER(tps6699x, test_ap_mode_override_off)
 	else
 		zassert_true(caps_out.bmOptionalFeatures.alt_mode_override);
 }
+
+ZTEST_USER(tps6699x, test_usb_device_capable_config)
+{
+	struct pdc_info_t info;
+
+	/* dev (port 1) should have usb_device_capable = true */
+	zassert_ok(pdc_get_info(dev, &info, true));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_true(info.usb_device_capable);
+
+	/* dev2 (port 2) should have usb_device_capable = false (default) */
+	zassert_ok(pdc_get_info(dev2, &info, true));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_false(info.usb_device_capable);
+}

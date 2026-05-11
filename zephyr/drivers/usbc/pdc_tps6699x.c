@@ -221,6 +221,9 @@ struct pdc_config_t {
 	bool ccd;
 	/** Whether or not this port supports FRS */
 	bool frs_supported;
+	/** Whether or not this port is capable of USB communication as a device
+	 */
+	bool usb_device_capable;
 	/** The index of the port on chip */
 	uint8_t port_index_on_chip;
 };
@@ -1723,6 +1726,7 @@ static int cmd_get_ic_status_sync_internal(const struct pdc_config_t *cfg,
 
 	info->no_fw_update = cfg->no_fw_update;
 	info->frs_supported = cfg->frs_supported;
+	info->usb_device_capable = cfg->usb_device_capable;
 
 	return 0;
 }
@@ -3347,6 +3351,8 @@ BUILD_ASSERT(
 		.no_fw_update = DT_INST_PROP(inst, no_fw_update),              \
 		.ccd = DT_INST_PROP(inst, ccd),                                \
 		.frs_supported = DT_INST_PROP(inst, frs_supported),            \
+		.usb_device_capable =                                          \
+			DT_INST_PROP(inst, usb_comm_capable_as_device),        \
 		.port_index_on_chip = DT_INST_PROP(inst, port_index_on_chip),  \
 	};                                                                     \
                                                                                \
