@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 
+#include <zephyr/shell/shell_dummy.h>
 #include <zephyr/ztest.h>
 
 static int is_locked;
@@ -30,11 +31,11 @@ ZTEST(restricted_console, test_command_mem_dump)
 	snprintf(console_input, sizeof(console_input), "md %p", &valid_word);
 
 	is_locked = 0;
-	rv = shell_execute_cmd(get_ec_shell(), console_input);
+	rv = shell_execute_cmd(shell_backend_dummy_get_ptr(), console_input);
 	zassert_equal(rv, EC_SUCCESS);
 
 	is_locked = 1;
-	rv = shell_execute_cmd(get_ec_shell(), console_input);
+	rv = shell_execute_cmd(shell_backend_dummy_get_ptr(), console_input);
 	zassert_equal(rv, EC_ERROR_ACCESS_DENIED);
 }
 
@@ -53,14 +54,14 @@ ZTEST(restricted_console, test_command_read_write_word)
 		 &valid_word, new_value);
 
 	is_locked = 0;
-	rv = shell_execute_cmd(get_ec_shell(), console_input);
+	rv = shell_execute_cmd(shell_backend_dummy_get_ptr(), console_input);
 	zassert_equal(rv, EC_SUCCESS);
 	zassert_equal(new_value, valid_word);
 
 	is_locked = 1;
 	/* Reset valid word */
 	valid_word = old_value;
-	rv = shell_execute_cmd(get_ec_shell(), console_input);
+	rv = shell_execute_cmd(shell_backend_dummy_get_ptr(), console_input);
 	zassert_equal(rv, EC_ERROR_ACCESS_DENIED);
 	zassert_equal(old_value, valid_word);
 }
