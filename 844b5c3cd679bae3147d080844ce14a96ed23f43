@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2eb6c9e9_985c7f9f",
+        "filename": "common/battery.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-05-11T20:27:03Z",
+      "side": 1,
+      "message": "Sounds like the hook of triggering the cutoff is better moved from SHUTDOWN to SHUTDOWN_COMPLETE. As the cutoff has to wait all the cleanup work finish. The I2C mode switch is one of these cleanup work.",
+      "parentUuid": "59d3de44_685d6969",
+      "range": {
+        "startLine": 375,
+        "startChar": 0,
+        "endLine": 399,
+        "endChar": 1
+      },
+      "revId": "844b5c3cd679bae3147d080844ce14a96ed23f43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3bbca846_2cb69304",
         "filename": "common/battery.c",
         "patchSetId": 2
