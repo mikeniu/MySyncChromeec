@@ -278,12 +278,19 @@ def build_compare_builds():
         }
     )
 
-    # Run compare-builds at the same git reference.  This forces the
-    # compare-builds step to compile only, skipping the firmware binary
-    # comparison.
-    cmd = ["zmake", "-D", "compare-builds", "--ref1", "HEAD", "--ref2", "HEAD"]
-    for board in COMPARE_BUILDS_BOARDS:
-        cmd.append(board)
+    # Allow references to be overridden via environment variables (e.g. from CQ recipes).
+    # Defaulting to HEAD vs HEAD forces the compare-builds step to compile only,
+    # skipping the firmware binary comparison.
+    ref1 = os.environ.get("ZMAKE_COMPARE_REF1", "HEAD")
+    ref2 = os.environ.get("ZMAKE_COMPARE_REF2", "HEAD")
+
+    cmd = ["zmake", "-D", "compare-builds", "--ref1", ref1, "--ref2", ref2]
+
+    if os.environ.get("ZMAKE_COMPARE_ALL") == "true":
+        cmd.append("--all")
+    else:
+        for board in COMPARE_BUILDS_BOARDS:
+            cmd.append(board)
 
     log_cmd(cmd)
     subprocess.run(
@@ -293,6 +300,7 @@ def build_compare_builds():
         stdin=subprocess.DEVNULL,
         env=env,
     )
+
 
 
 def build(opts):
