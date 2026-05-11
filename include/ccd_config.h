@@ -45,6 +45,11 @@ enum ccd_flag {
 	 */
 	CCD_FLAG_FACTORY_MODE_ENABLED = BIT(2),
 
+	/*
+	 * RMA mode state
+	 */
+	CCD_FLAG_RMA_MODE_ENABLED = BIT(3),
+
 	/* (flags in the middle are unused) */
 
 	/*
