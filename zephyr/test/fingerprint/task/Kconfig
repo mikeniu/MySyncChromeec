@@ -62,10 +62,28 @@ config LINK_TEST_SUITE_FINGERPRINT_COMMANDS
 	  Link and execute fingerprint subsystem tests that focus
 	  on fingerprint host and console commands.
 
+config LINK_TEST_SUITE_FINGERPRINT_ASCP
+	bool "Link fingerprint ASCP tests"
+	help
+	  Link and execute fingerprint subsystem tests that focus
+	  on ASCP.
+
 config LINK_TEST_SUITE_FINGERPRINT_FRAME_SIZE
 	bool "Link fingerprint frame size tests"
 	help
 	  Link and execute fingerprint subsystem tests that focus
 	  on finger frame size.
+
+config LINK_TEST_SUITE_FINGERPRINT_FP_INFO
+	bool "Link fingerprint FP_INFO tests"
+	help
+	  Link and execute fingerprint subsystem tests that focus
+	  on FP_INFO host command.
+
+config LINK_TEST_SUITE_FINGERPRINT_BTN_IGN_OUT
+	bool "Link fingerprint btn ign out tests"
+	help
+	  Link and execute fingerprint subsystem tests that focus
+	  on btn ign out.
 
 source "Kconfig.zephyr"

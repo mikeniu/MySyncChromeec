@@ -47,12 +47,16 @@ class ECCommandsIds(IntEnum):
     FLASH_WRITE = 0x0012
     FLASH_ERASE = 0x0013
     FLASH_REGION_INFO = 0x0016
+    GET_NEXT_EVENT = 0x0067
     REBOOT_EC = 0x00D2
     ENTER_BOOTLOADER = 0x00E2
     RWSIG_ACTION = 0x011D
     FP_MODE = 0x0402
     FP_INFO = 0x0403
+    FP_FRAME = 0x0404
     FP_VENDOR = 0x040B
+    FP_ASCP_CLAIM = 0x0420
+    FP_ASCP_ESTABLISH = 0x0421
 
 
 class ImageType(IntEnum):
@@ -347,6 +351,107 @@ class FpInfoCmd2(ECCommand):
         )
 
 
+class FpInfoCmd3(ECCommand):
+    """Gets FP information (version 3)."""
+
+    def __init__(self):
+        # 4 bytes of vendor id
+        # 4 bytes of product id
+        # 4 bytes of model id
+        # 4 bytes of version
+        # 2 bytes of num of capture types
+        # 2 bytes of errors
+        # 4 bytes of template size
+        # 2 bytes of template max
+        # 2 bytes of template valid
+        # 4 bytes of template dirty
+        # 4 bytes of template version
+        # unknown number of image_frame
+        response_msg = [
+            ("vendor_id", "I"),
+            ("product_id", "I"),
+            ("model_id", "I"),
+            ("version", "I"),
+            ("num_capture_types", "H"),
+            ("errors", "H"),
+            ("template_size", "I"),
+            ("template_max", "H"),
+            ("template_valid", "H"),
+            ("template_dirty", "I"),
+            ("template_version", "I"),
+            ("image_frame_params", ""),
+        ]
+        # fp_image_frame_params
+        # 4 bytes of frame_size;
+        # 4 bytes of image offset;
+        # 4 bytes of pixel_format;
+        # 2 bytes of width;
+        # 2 bytes of height;
+        # 2 bytes of bpp;
+        # 1 byte of fp_capture_type;
+        # 1 byte of reserved;
+        image_frame = [
+            ("frame_size", "I"),
+            ("image_data_offset_bytes", "I"),
+            ("pixel_format", "I"),
+            ("width", "H"),
+            ("height", "H"),
+            ("bpp", "H"),
+            ("fp_capture_type", "B"),
+            ("reserved", "B"),
+        ]
+        super().__init__(
+            ECCommandsIds.FP_INFO,
+            3,
+            response_msg=response_msg,
+            variable_payload_msg=image_frame,
+        )
+
+
+class FpFrameCmd0(ECCommand):
+    """Gets FP frame (version 0)."""
+
+    def __init__(self, idx: int, offset: int, size: int):
+        # Variable number of bytes in response
+        response_msg = [("data", "")]
+        # 4 bytes of offset with index
+        # 4 bytes of size
+        idx_off = ((idx << 28) | (offset & 0x0FFFFFFF)) & 0xFFFFFFFF
+        request_msg = [
+            (idx_off, "I"),
+            (size, "I"),
+        ]
+        super().__init__(
+            ECCommandsIds.FP_FRAME,
+            0,
+            response_msg=response_msg,
+            request_msg=request_msg,
+        )
+
+
+class FpFrameCmd1(ECCommand):
+    """Gets FP frame (version 1)."""
+
+    def __init__(self, cmd: int, idx: int, offset: int, size: int):
+        # Variable number of bytes in response
+        response_msg = [("data", "")]
+        # 4 bytes of offset with index
+        # 4 bytes of size
+        request_msg = [
+            (cmd, "B"),
+            (0, "B"),
+            (idx, "H"),
+            (offset, "I"),
+            (size, "I"),
+        ]
+        super().__init__(
+            ECCommandsIds.FP_FRAME,
+            1,
+            response_msg=response_msg,
+            request_msg=request_msg,
+        )
+
+
 class FpVendorCmd0(ECCommand):
     """FP vendor command."""
 
@@ -427,6 +532,30 @@ class FlashRegionInfoCmd1(ECCommand):
         )
 
 
+class GetNextEventCmd2(ECCommand):
+    """Gets next MKBP event."""
+
+    def __init__(self):
+        # 1 byte of event_type
+        # 16 bytes of event_data
+        response_msg = [("event_type", "B"), ("event_data", "16s")]
+        super().__init__(
+            ECCommandsIds.GET_NEXT_EVENT, 2, response_msg=response_msg
+        )
+
+
+class GetNextEventCmd3(ECCommand):
+    """Gets next MKBP event."""
+
+    def __init__(self):
+        # 1 byte of event_type
+        # Up to 18 bytes of event_data
+        response_msg = [("event_type", "B"), ("event_data", "")]
+        super().__init__(
+            ECCommandsIds.GET_NEXT_EVENT, 3, response_msg=response_msg
+        )
+
+
 class RebootECCmd0(ECCommand):
     """Reboots the EC."""
 
@@ -448,6 +577,34 @@ class RwSigActionCmd0(ECCommand):
         super().__init__(ECCommandsIds.RWSIG_ACTION, 0, request_msg=request_msg)
 
 
+class FpAscpClaimCmd0(ECCommand):
+    """Gets ASCP claim."""
+
+    def __init__(self):
+        response_msg = [
+            ("pk_m", "65s"),
+            ("s_goog", "64s"),
+            ("pk_d", "65s"),
+            ("s_m", "64s"),
+            ("pk_f", "65s"),
+            ("h_f", "32s"),
+            ("s_d", "64s"),
+        ]
+        super().__init__(
+            ECCommandsIds.FP_ASCP_CLAIM, 0, response_msg=response_msg
+        )
+
+
+class FpAscpEstablishCmd0(ECCommand):
+    """Establishes ASCP session."""
+
+    def __init__(self, pk_g: bytearray):
+        request_msg = [(pk_g, "65s")]
+        super().__init__(
+            ECCommandsIds.FP_ASCP_ESTABLISH, 0, request_msg=request_msg
+        )
+
+
 VERSIONED_COMMANDS = {
     ECCommandsIds.GET_VERSION: {1: GetVersionCmd1},
     ECCommandsIds.GET_VERSIONS: {1: GetVersionsCmd1},
@@ -457,12 +614,16 @@ VERSIONED_COMMANDS = {
     ECCommandsIds.FLASH_WRITE: {0: FlashWriteCmd0},
     ECCommandsIds.FLASH_ERASE: {0: FlashEraseCmd0},
     ECCommandsIds.FLASH_REGION_INFO: {1: FlashRegionInfoCmd1},
+    ECCommandsIds.GET_NEXT_EVENT: {2: GetNextEventCmd2, 3: GetNextEventCmd3},
     ECCommandsIds.REBOOT_EC: {0: RebootECCmd0},
     ECCommandsIds.ENTER_BOOTLOADER: {0: EnterBootloaderCmd0},
     ECCommandsIds.FP_MODE: {0: FpModeCmd0},
-    ECCommandsIds.FP_INFO: {1: FpInfoCmd1, 2: FpInfoCmd2},
+    ECCommandsIds.FP_INFO: {1: FpInfoCmd1, 2: FpInfoCmd2, 3: FpInfoCmd3},
+    ECCommandsIds.FP_FRAME: {0: FpFrameCmd0, 1: FpFrameCmd1},
     ECCommandsIds.FP_VENDOR: {0: FpVendorCmd0},
     ECCommandsIds.RWSIG_ACTION: {0: RwSigActionCmd0},
+    ECCommandsIds.FP_ASCP_CLAIM: {0: FpAscpClaimCmd0},
+    ECCommandsIds.FP_ASCP_ESTABLISH: {0: FpAscpEstablishCmd0},
 }
 
 

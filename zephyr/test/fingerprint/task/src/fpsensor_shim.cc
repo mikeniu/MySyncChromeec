@@ -30,6 +30,8 @@ FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 #define FP_SIMULATOR_IMAGE_FRAME_PARAM_INITIALIZER(idx, node_id)            \
 	{                                                                   \
 		.frame_size = FINGERPRINT_SENSOR_FRAME_SIZE(idx, node_id),  \
+		.image_data_offset_bytes =                                  \
+			FINGERPRINT_SENSOR_IMAGE_OFFSET(idx, node_id),      \
 		.pixel_format =                                             \
 			FINGERPRINT_SENSOR_V4L2_PIXEL_FORMAT(idx, node_id), \
 		.width = FINGERPRINT_SENSOR_RES_X(idx, node_id),            \
@@ -47,11 +49,11 @@ static const struct fingerprint_image_frame_params
 		DT_NODELABEL(fpsensor_sim)) };
 
 static const size_t test_info_buffer_size =
-	sizeof(struct ec_response_fp_info_v2) +
-	sizeof(struct fp_image_frame_params) * FP_MAX_CAPTURE_TYPES;
+	sizeof(struct ec_response_fp_info_v3) +
+	sizeof(struct fp_image_frame_params_v2) * FP_MAX_CAPTURE_TYPES;
 static uint8_t buffer[test_info_buffer_size];
-static struct ec_response_fp_info_v2 *test_info_buffer =
-	(struct ec_response_fp_info_v2 *)buffer;
+static struct ec_response_fp_info_v3 *test_info_buffer =
+	(struct ec_response_fp_info_v3 *)buffer;
 
 ZTEST_USER(fpsensor_shim, test_shim_sensor_type_elan)
 {
