@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d2d84f0_18a11781",
+        "filename": "util/elan/filecontrol.h",
+        "patchSetId": 14
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-11T06:24:04Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 15.",
+      "parentUuid": "347fdc66_c46e3a37",
+      "revId": "731961580f83a488bd8559a0dff00a710480610b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35a99032_4dbfdd02",
@@ -65,6 +83,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d91e777_3e5ddb8f",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 14
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-11T06:24:04Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 15.",
+      "parentUuid": "3aa000b2_ac66e34f",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 48
+      },
+      "revId": "731961580f83a488bd8559a0dff00a710480610b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e1a879e2_65d84d69",
@@ -78,6 +120,30 @@
       "writtenOn": "2026-05-08T18:26:20Z",
       "side": 1,
       "message": "* **Issue:** `logInfo` prints many generic errors like `[IAP] writeRomData - fail, count: X`.  \n* **Remediation:** Include the underlying `libusb` error code (e.g., `libusb_error_name(errCode)`) in the output to make debugging failures easier in the field.",
+      "range": {
+        "startLine": 504,
+        "startChar": 0,
+        "endLine": 506,
+        "endChar": 13
+      },
+      "revId": "731961580f83a488bd8559a0dff00a710480610b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62bd4f69_dc2763d9",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 14
+      },
+      "lineNbr": 506,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-11T06:24:04Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 15.",
+      "parentUuid": "e1a879e2_65d84d69",
       "range": {
         "startLine": 504,
         "startChar": 0,
@@ -111,6 +177,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b46763c4_d4c36680",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 14
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-11T06:24:04Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 15.",
+      "parentUuid": "a02b7fa1_5a909326",
+      "range": {
+        "startLine": 162,
+        "startChar": 0,
+        "endLine": 162,
+        "endChar": 25
+      },
+      "revId": "731961580f83a488bd8559a0dff00a710480610b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d775b114_2e7684c8",
@@ -124,6 +214,24 @@
       "writtenOn": "2026-05-08T18:18:31Z",
       "side": 1,
       "message": "[Gerrit AI Review] You can remove `#include \u003cspan\u003e` and the other standard library includes here, as this header doesn\u0027t declare any functions or classes that use them.",
+      "revId": "731961580f83a488bd8559a0dff00a710480610b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d266e6fd_fb2948f1",
+        "filename": "util/elan/iaptool.h",
+        "patchSetId": 14
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-11T06:24:04Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 15.",
+      "parentUuid": "d775b114_2e7684c8",
       "revId": "731961580f83a488bd8559a0dff00a710480610b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
