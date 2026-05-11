@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3cbd13f5_86ec76cd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-11T23:52:03Z",
+      "side": 1,
+      "message": "Let\u0027s make sure to follow the [Google C++ style guide](https://google.github.io/styleguide/cppguide.html): \n\n### 1. Class Data Members\n\n**Rule:** Data members in classes should be named like ordinary nonmember variables (`snake_case`), but with a **trailing underscore**. The `m_` prefix or Hungarian notation is strictly prohibited.\n\n\u003e \"Please update class member variables to match the Google C++ Style Guide (`snake_case_` with a trailing underscore). The `m_` prefix and `camelCase` are not used in Chromium.\"\n\n* `m_progressCallback` ➔ `progress_callback_`\n* `m_hidInterfaces` ➔ `hid_interfaces_`\n* `m_hidDetachInterfaces` ➔ `hid_detach_interfaces_`\n* `m_devHandlePtr` ➔ `dev_handle_ptr_`\n* `m_libusbInitialized` ➔ `libusb_initialized_`\n* `m_deviceStatus` ➔ `device_status_`\n* `m_cmdLine` ➔ `cmd_line_`\n\n### 2. Functions and Methods\n\n**Rule:** Regular functions and class methods must be `PascalCase` (Capitalize the first letter of every word).\n\n\u003e \"Method and function names should be `PascalCase` rather than `camelCase` to align with the style guide.\"\n\n* **In `iapcontrol.h`/`.cc`:**\n* `initialize` ➔ `Initialize`\n* `runIapProcess` ➔ `RunIapProcess`\n* `setProgressCallback` ➔ `SetProgressCallback`\n* `getFwVersion` ➔ `GetFwVersion`\n* `set32Le` ➔ `Set32Le`\n* *...and all other private methods (`readRomData` ➔ `ReadRomData`, etc.)*\n\n\n* **In `filecontrol.h`/`.cc`:**\n* `getBinarySize` ➔ `GetBinarySize`\n* `getBinary` ➔ `GetBinary`\n\n\n* **In `iaptool.cc`:**\n* `parseCommandLine` ➔ `ParseCommandLine`\n* `setProgressBar` ➔ `SetProgressBar`\n\n\n* **In `utility.h`:**\n* `logInfo` ➔ `LogInfo`\n\n\n\n### 3. Local Variables, Struct Members, and Parameters\n\n**Rule:** Local variables, parameters, and `struct` data members should use `snake_case` (all lowercase, words separated by underscores).\n\n\u003e \"Please convert local variables, parameters, and struct members from `camelCase` to `snake_case`.\"\n\n* **Struct Members:**\n* `FWVERINFO::fwVer` ➔ `fw_ver`\n* `FWVERINFO::bootType` ➔ `boot_type`\n* `CMDLINE::filePath` ➔ `file_path`\n\n\n* **Local Variables \u0026 Parameters:**\n* `filePath` ➔ `file_path`\n* `errCode` ➔ `err_code`\n* `romRead` ➔ `rom_read`\n* `romAddr` ➔ `rom_addr`\n* `fwVer_Google` ➔ `fw_ver_google`\n* `iapMode` ➔ `iap_mode`\n* `fwFwInfo` ➔ `fw_info`\n* `dataSend` ➔ `data_send`\n* `statRecv` ➔ `stat_recv`\n* `currentChunkSize` ➔ `current_chunk_size`\n* `usbDeviceCount` ➔ `usb_device_count`\n* `debugVal` ➔ `debug_val`\n\n\n\n### 4. Structs and Namespaces\n\n**Rule:** Types (classes, structs, typedefs, using aliases) must be `PascalCase`. Namespaces must be `snake_case`.\n\n\u003e \"Type names need to be `PascalCase` (avoid `ALL_CAPS` for structs). Namespaces should be `snake_case`.\"\n\n* `struct FWVERINFO` ➔ `struct FwVerInfo`\n* `typedef struct _CMDLINE { ... } CMDLINE;` ➔ This is a C-style idiom. In C++, simply define it as: `struct CmdLine { ... };`\n* `namespace ElanApp` ➔ `namespace elan_app` (or simply `namespace elan`)",
+      "revId": "acc7bb07a0e6cf9d56d802ab87a30fab988c5b76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "72beb3bf_1bc9a345",
         "filename": "util/elan/iapcontrol.cc",
         "patchSetId": 15
