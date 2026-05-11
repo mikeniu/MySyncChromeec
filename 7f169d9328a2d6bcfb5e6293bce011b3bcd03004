@@ -39,6 +39,30 @@
       },
       "revId": "7f169d9328a2d6bcfb5e6293bce011b3bcd03004",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42e53813_1ffc0a04",
+        "filename": "zephyr/program/bluey/src/battery.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-05-11T17:49:27Z",
+      "side": 1,
+      "message": "Acknowledged, Instead of adding a loop to wait for the battery cuttoff to complete, I have added a small delay to ensure cut-off is completed.",
+      "parentUuid": "5f691dd6_c0111a71",
+      "range": {
+        "startLine": 73,
+        "startChar": 3,
+        "endLine": 73,
+        "endChar": 23
+      },
+      "revId": "7f169d9328a2d6bcfb5e6293bce011b3bcd03004",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
