@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "59d3de44_685d6969",
+        "filename": "common/battery.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-05-11T18:17:35Z",
+      "side": 1,
+      "message": "Hey Tom, \n\nThe issue with that approach is that the the i2c_controller mode switch occurs in shutdown_complete hook and not shutdown hook to ensure proper isolation. This will lead to cutoff failures. hence the manual flow.",
+      "parentUuid": "07888598_70253102",
+      "range": {
+        "startLine": 375,
+        "startChar": 0,
+        "endLine": 399,
+        "endChar": 1
+      },
+      "revId": "844b5c3cd679bae3147d080844ce14a96ed23f43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3bbca846_2cb69304",
         "filename": "common/battery.c",
         "patchSetId": 2
