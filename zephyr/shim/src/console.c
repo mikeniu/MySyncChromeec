@@ -40,7 +40,9 @@
 	CONFIG_SHELL_BACKEND_DUMMY /* nocheck */
 #endif
 #if defined(CONFIG_SHELL_BACKEND_SERIAL) && \
-	defined(CONFIG_SHELL_BACKEND_DUMMY) /* nocheck */
+	defined(CONFIG_SHELL_BACKEND_DUMMY) && \
+	/* b/474439863: Allow hardware tests to use both backends. */ \
+	!defined(CONFIG_HW_TEST) /* nocheck */
 #error Must select only one shell backend
 #endif
 
