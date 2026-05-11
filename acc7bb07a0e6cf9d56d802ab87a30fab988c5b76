@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72beb3bf_1bc9a345",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-11T18:17:10Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Optional: You use `std::format` here, but `\u003cformat\u003e` is not explicitly included in this file. To prevent potential build issues if the transitive inclusion ever breaks, consider adding `#include \u003cformat\u003e` at the top of the file.",
+      "revId": "acc7bb07a0e6cf9d56d802ab87a30fab988c5b76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63af65ac_a13f171a",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-11T18:17:10Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Optional: In C++, the `typedef struct` idiom is not necessary. You can simply write `struct CmdLine { ... };`. Additionally, all-caps names are typically reserved for macros in Google C++ style.",
+      "revId": "acc7bb07a0e6cf9d56d802ab87a30fab988c5b76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce92b45d_82220641",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-11T18:17:10Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Optional: `\u003cstring_view\u003e` is not explicitly included in this file. It is a good practice to \"Include What You Use\" and add `#include \u003cstring_view\u003e` at the top to prevent build breakages if other headers change.",
+      "revId": "acc7bb07a0e6cf9d56d802ab87a30fab988c5b76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
