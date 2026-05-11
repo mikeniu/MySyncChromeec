@@ -39,6 +39,30 @@
       },
       "revId": "144f3b5a9bd87d70c367e2ae4101b023d8464e5a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89f00bfe_37f0571e",
+        "filename": "zephyr/program/bluey/src/battery.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-05-11T17:53:07Z",
+      "side": 1,
+      "message": "Please check patchset#4 and let me know if that is okay.",
+      "parentUuid": "3e56f36d_16c94fd5",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 26
+      },
+      "revId": "144f3b5a9bd87d70c367e2ae4101b023d8464e5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
