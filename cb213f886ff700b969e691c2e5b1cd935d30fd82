@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a3eb3ea_6bb23e6f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4602883
+      },
+      "writtenOn": "2026-05-12T17:58:01Z",
+      "side": 1,
+      "message": "Based on conversations in weekly meeting, we believe this is worthwhile to add. This requires that the SKU ID is set in CBI, which is included in the C\u0026F doc. I will ensure that all lab RVPs have this set.",
+      "revId": "cb213f886ff700b969e691c2e5b1cd935d30fd82",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
