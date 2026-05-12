@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "309ae536_f1cb8092",
+        "filename": "zephyr/drivers/wot/wot.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 3594165
+      },
+      "writtenOn": "2026-05-12T09:16:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1900cb08_3c439712",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 16
+      },
+      "revId": "05aeaad5ae501c1b90710d553df39e0a48333eef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "02a54a22_5d8923e0",
@@ -64,6 +88,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b31c2c90_b3f93e10",
+        "filename": "zephyr/dts/bindings/wot/cros-ec,wot.yaml",
+        "patchSetId": 25
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 3594165
+      },
+      "writtenOn": "2026-05-12T09:16:09Z",
+      "side": 1,
+      "message": "Monitoring the backlight is a hard requirement explicitly mandated by the customer and highly recommended by the touch panel vendor. To strictly comply with their hardware specifications, we have to keep the bl-detect-gpios implementation.",
+      "parentUuid": "02a54a22_5d8923e0",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 18
+      },
+      "revId": "05aeaad5ae501c1b90710d553df39e0a48333eef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "32ce2e28_5b73415b",
@@ -77,6 +125,30 @@
       "writtenOn": "2026-05-08T23:27:13Z",
       "side": 1,
       "message": "Move project specific changes into their own CL.\n\nFor any GPIOs used by the wot driver, delete the corresponding entry from this file.",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 41
+      },
+      "revId": "05aeaad5ae501c1b90710d553df39e0a48333eef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10c4e9e5_0972eba4",
+        "filename": "zephyr/program/ocelot/ocicat/generated.dtsi",
+        "patchSetId": 25
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 3594165
+      },
+      "writtenOn": "2026-05-12T09:16:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "32ce2e28_5b73415b",
       "range": {
         "startLine": 32,
         "startChar": 0,
