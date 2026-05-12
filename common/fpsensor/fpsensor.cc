@@ -610,14 +610,6 @@ static enum ec_status get_frame(uint32_t offset, uint32_t size, uint8_t *output)
 		return EC_RES_INVALID_PARAM;
 	}
 
-	/*
-	 * Checks if the capture type is one where we only care about
-	 * the embedded/offset image bytes, like simple, pattern0,
-	 * pattern1, and reset_test.
-	 */
-	if (skip_image_offset(global_context.current_capture_type))
-		offset += FP_SENSOR_IMAGE_OFFSET;
-
 	uint32_t current_frame_size =
 		global_context.fp_frame_size_cache.get_frame_size(
 			global_context.current_capture_type);
@@ -629,6 +621,18 @@ static enum ec_status get_frame(uint32_t offset, uint32_t size, uint8_t *output)
 	ret = validate_fp_buffer_offset(current_frame_size, offset, size);
 	if (ret != EC_SUCCESS)
 		return EC_RES_INVALID_PARAM;
+
+	/*
+	 * Checks if the capture type is one where we only care about
+	 * the embedded/offset image bytes, like simple, pattern0,
+	 * pattern1, and reset_test.
+	 */
+	if (skip_image_offset(global_context.current_capture_type)) {
+		offset += FP_SENSOR_IMAGE_OFFSET;
+		if (offset + size > sizeof(fp_buffer)) {
+			return EC_RES_INVALID_PARAM;
+		}
+	}
 
 	memcpy(output, fp_buffer + offset, size);
 
