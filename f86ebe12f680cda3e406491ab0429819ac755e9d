@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0dba176f_8ad77bee",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-12T23:16:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/f0360b44-0ed8-4f8f-89e8-bb4aea35f524)]\n\n### Review Summary\n\n**Functionality**\nThe change correctly addresses the false validation failures on the final image chunk. By performing the frame buffer validation against `current_frame_size` before applying `FP_SENSOR_IMAGE_OFFSET`, it ensures that the host-requested chunk bounds are correctly evaluated.\n\n**Security**\n❌ **Critical Issue:** A potential Out-Of-Bounds (OOB) read vulnerability is introduced. Because `FP_SENSOR_IMAGE_OFFSET` is added to `offset` *after* `validate_fp_buffer_offset` completes, the new `offset` can cause the final read bounds (`offset + size`) to exceed the physical `sizeof(fp_buffer)` if `current_frame_size + FP_SENSOR_IMAGE_OFFSET \u003e sizeof(fp_buffer)`. An explicit bounds check against `sizeof(fp_buffer)` must be added before the `memcpy` operation. See the inline comment for a suggested fix.\n\n**Style \u0026 Consistency**\nThe code style is consistent with the surrounding codebase. The comment explaining the offset addition was appropriately moved alongside the logic.\n\n**Testing**\nThe CL description notes that manual testing using `ectool` was performed for different modes (vendor format and pattern), which is appropriate.",
+      "revId": "f86ebe12f680cda3e406491ab0429819ac755e9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be36206f_b3715ae1",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 631,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-12T23:16:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Security / OOB Read Risk:**\n\nMoving the offset addition here correctly fixes the false validation failure against the host-requested `current_frame_size`. However, by adding `FP_SENSOR_IMAGE_OFFSET` *after* `validate_fp_buffer_offset` has completed, you are bypassing the physical bounds check for `fp_buffer`.\n\nIf `current_frame_size + FP_SENSOR_IMAGE_OFFSET \u003e sizeof(fp_buffer)`, the updated `offset + size` could exceed `sizeof(fp_buffer)`, causing the `memcpy` below to read out of bounds.\n\nConsider adding an explicit bounds check against the physical buffer size here to ensure memory safety:\n\n```cpp\n\tif (skip_image_offset(global_context.current_capture_type)) {\n\t\toffset +\u003d FP_SENSOR_IMAGE_OFFSET;\n\t\tif (offset + size \u003e sizeof(fp_buffer)) {\n\t\t\treturn EC_RES_INVALID_PARAM;\n\t\t}\n\t}\n```",
+      "revId": "f86ebe12f680cda3e406491ab0429819ac755e9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
