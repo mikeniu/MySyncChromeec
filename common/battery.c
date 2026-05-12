@@ -381,7 +381,7 @@ static void battery_cutoff_clear(void)
 	hook_call_deferred(&pending_cutoff_deferred_data, -1);
 }
 
-static int battery_cutoff_start(void)
+int battery_cutoff_start(void)
 {
 	int rv;
 
@@ -816,6 +816,10 @@ static bool board_wants_reduced_input_voltage(void)
 		return false;
 
 	battery_get_params(&batt);
+
+	/* Battery in bad state so avoid reducing voltage */
+	if (batt.flags & BATT_FLAG_BAD_ANY)
+		return false;
 
 	/* Battery needs charge, so we don't want to reduce voltage */
 	if (batt.flags & BATT_FLAG_WANT_CHARGE)
