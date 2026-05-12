@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2a0cfa4e_b735a202",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-05-12T14:42:09Z",
+      "side": 1,
+      "message": "In the beginning there was a requirement to blink a custom number of times with custom on/off brightness and those drivers seemed to be not sufficient. Now implementation is simplified but I do not see benefit of using them. Maybe if we had more leds...",
+      "parentUuid": "b0abbd1c_ed0f623e",
+      "revId": "0f598c2a95b22d9d4c66e4254eedb8143a191447",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "123036a3_462c040e",
         "filename": "common/fpsensor/fpsensor_led.cc",
         "patchSetId": 10
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-12T13:04:57Z",
       "side": 1,
       "message": "Is this function used only in build-time? I\u0027m scared of using floating point type, since Elan chip doesn\u0027t have FPU, but we include standard libraries as it has it.",
+      "revId": "0f598c2a95b22d9d4c66e4254eedb8143a191447",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4b3ff3a_5507095a",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-05-12T14:42:09Z",
+      "side": 1,
+      "message": "Yes, it was only assigned to constexpr variables. I changed to \u0027consteval\u0027 to make it explicit.",
+      "parentUuid": "123036a3_462c040e",
       "revId": "0f598c2a95b22d9d4c66e4254eedb8143a191447",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -58,6 +94,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "beba766f_6b910b2f",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-05-12T14:42:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "abee0a2d_2623d3b7",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 0
+      },
+      "revId": "0f598c2a95b22d9d4c66e4254eedb8143a191447",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "23fc330c_26014764",
@@ -71,6 +131,30 @@
       "writtenOn": "2026-05-12T13:04:57Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: The `SYS_INIT` macro is used here, but `\u003czephyr/init.h\u003e` is not directly included. It\u0027s a best practice to explicitly include it to avoid relying on transitive includes, which can break the build if upstream Zephyr headers change in the future.\n\nThe `SYS_INIT` macro is used here, but `\u003czephyr/init.h\u003e` is not directly included. It\u0027s a best practice to explicitly include it to avoid relying on transitive includes, which can break the build if upstream Zephyr headers change in the future.",
+      "range": {
+        "startLine": 188,
+        "startChar": 0,
+        "endLine": 188,
+        "endChar": 0
+      },
+      "revId": "0f598c2a95b22d9d4c66e4254eedb8143a191447",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "30f89ec9_7525760a",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-05-12T14:42:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23fc330c_26014764",
       "range": {
         "startLine": 188,
         "startChar": 0,
