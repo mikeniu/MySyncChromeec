@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "afc29ac7_170f3204",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-12T20:33:54Z",
+      "side": 1,
+      "message": "Can you add a comment to the code explaining that rationale?",
+      "parentUuid": "20264276_1cf4bca5",
+      "revId": "b00b3fb7ea3b5d4542739f5b77b12d4207552f5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b0cbf651_c97cc23e",
         "filename": "zephyr/program/skywalker/yoda/src/charger.c",
         "patchSetId": 1
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "The hook_call_deferred() in battery_policy_check() is a one-shot execution, and the deferred run happens after ~2s for SBS stabilization.\nAlternatively, we could consider adding a new hook at the battery wake-up stage, but it would require changes in common code, so we used a local deferred approach to minimize impact.",
       "parentUuid": "b0cbf651_c97cc23e",
+      "revId": "b00b3fb7ea3b5d4542739f5b77b12d4207552f5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbff2fdb_30a6bf2e",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-12T20:33:54Z",
+      "side": 1,
+      "message": "Sorry, I was unclear. I meant that `battery policy` will run once during init and then again as a deferred call. If the init hook is too early to work, could it just run once as a deferred call?",
+      "parentUuid": "ada3d71c_a0eacb22",
       "revId": "b00b3fb7ea3b5d4542739f5b77b12d4207552f5e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
