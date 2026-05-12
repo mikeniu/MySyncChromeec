@@ -22,6 +22,30 @@
       },
       "revId": "51764659d55e8dd4da0501b58a1df816a9303cdc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a05f57fb_d8587019",
+        "filename": "board/buccaneer/gpio.inc",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-12T21:06:35Z",
+      "side": 1,
+      "message": "If we have to keep `buccaneer` separate, something like this *might* work:\n\n```\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n\n#include \"common.h\"\n#include \"gpio.h\"\n#include \"hooks.h\"\n\nstatic void buccaneer_board_init(void)\n{\n\t/* \n\t * The helipilot baseboard defines WP as a standard input. \n\t * Buccaneer specifically requires a pull-up on this line. \n\t */\n\tgpio_set_flags(GPIO_WP, GPIO_INPUT | GPIO_PULL_UP);\n}\n/* \n * The baseboard board_init runs at HOOK_PRIO_DEFAULT.\n * We run at HOOK_PRIO_DEFAULT + 1 to ensure we overwrite the flags \n * after the base system has initialized the GPIO array.\n */\nDECLARE_HOOK(HOOK_INIT, buccaneer_board_init, HOOK_PRIO_DEFAULT + 1);\n```",
+      "parentUuid": "6b31119e_f518b3fa",
+      "range": {
+        "startLine": 6,
+        "startChar": 1,
+        "endLine": 45,
+        "endChar": 6
+      },
+      "revId": "51764659d55e8dd4da0501b58a1df816a9303cdc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
