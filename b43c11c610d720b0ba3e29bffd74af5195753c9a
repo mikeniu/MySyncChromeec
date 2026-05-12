@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0fd4aa0_547eebfb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-05-12T18:04:23Z",
+      "side": 1,
+      "message": "Resolved the broken compare-builds on trulo boards for me.",
+      "revId": "b43c11c610d720b0ba3e29bffd74af5195753c9a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
