@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0abbd1c_ed0f623e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-12T13:04:57Z",
+      "side": 1,
+      "message": "More general question - have you checked [the Zephyr LED driver](https://github.com/zephyrproject-rtos/zephyr/blob/main/include/zephyr/drivers/led.h#L137)? Probably [the PWM one](https://github.com/zephyrproject-rtos/zephyr/blob/main/drivers/led/led_pwm.c). Can we use it?",
+      "revId": "0f598c2a95b22d9d4c66e4254eedb8143a191447",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "123036a3_462c040e",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-12T13:04:57Z",
+      "side": 1,
+      "message": "Is this function used only in build-time? I\u0027m scared of using floating point type, since Elan chip doesn\u0027t have FPU, but we include standard libraries as it has it.",
+      "revId": "0f598c2a95b22d9d4c66e4254eedb8143a191447",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abee0a2d_2623d3b7",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-12T13:04:57Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: `pwms.period` is represented in nanoseconds and can be quite large. If the PWM period in the device tree is ever configured to be greater than ~42.9ms, `pwms.period * percentage` will silently overflow a 32-bit unsigned integer. \n\nConsider casting to `uint64_t` for the intermediate calculation to prevent this:\n```cpp\nuint32_t pulse \u003d (static_cast\u003cuint64_t\u003e(pwms.period) * percentage) / 100;\n```\n\n`pwms.period` is represented in nanoseconds and can be quite large. If the PWM period in the device tree is ever configured to be greater than ~42.9ms, `pwms.period * percentage` will silently overflow a 32-bit unsigned integer. \n\nConsider casting to `uint64_t` for the intermediate calculation to prevent this:\n```cpp\nuint32_t pulse \u003d (static_cast\u003cuint64_t\u003e(pwms.period) * percentage) / 100;\n```",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 0
+      },
+      "revId": "0f598c2a95b22d9d4c66e4254eedb8143a191447",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23fc330c_26014764",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-12T13:04:57Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: The `SYS_INIT` macro is used here, but `\u003czephyr/init.h\u003e` is not directly included. It\u0027s a best practice to explicitly include it to avoid relying on transitive includes, which can break the build if upstream Zephyr headers change in the future.\n\nThe `SYS_INIT` macro is used here, but `\u003czephyr/init.h\u003e` is not directly included. It\u0027s a best practice to explicitly include it to avoid relying on transitive includes, which can break the build if upstream Zephyr headers change in the future.",
+      "range": {
+        "startLine": 188,
+        "startChar": 0,
+        "endLine": 188,
+        "endChar": 0
+      },
+      "revId": "0f598c2a95b22d9d4c66e4254eedb8143a191447",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
