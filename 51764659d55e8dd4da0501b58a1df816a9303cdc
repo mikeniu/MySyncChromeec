@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b31119e_f518b3fa",
+        "filename": "board/buccaneer/gpio.inc",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-12T21:04:45Z",
+      "side": 1,
+      "message": "We should avoid duplicating all of `base_gpio.inc` for this single change.\n\nThe simplest thing to do would be to put the change in `base_gpio.inc` itself. This will affect `helipilot` in addition to `buccaneer`.\n\n@dioyeh@google.com can you confirm if the pull up is safe to add for `helipilot`?",
+      "range": {
+        "startLine": 6,
+        "startChar": 1,
+        "endLine": 45,
+        "endChar": 6
+      },
+      "revId": "51764659d55e8dd4da0501b58a1df816a9303cdc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
