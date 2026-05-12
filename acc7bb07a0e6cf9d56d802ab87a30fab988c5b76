@@ -37,6 +37,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "99616dff_68471ec6",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 895,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-12T00:04:53Z",
+      "side": 1,
+      "message": "I think we can rewrite it as something like this (verify that it compiles):\n\n\n```\n#include \u003cbit\u003e\n#include \u003ccstdint\u003e\n#include \u003ccstring\u003e\n#include \u003coptional\u003e\n#include \u003cspan\u003e\n\nstd::optional\u003cuint32_t\u003e Get32Le(std::span\u003cconst uint8_t\u003e buff) {\n\tuint32_t value;\n\n\tif (buff.size() \u003c sizeof(value)) {\n\t\treturn std::nullopt;\n\t}\n\n\tstd::memcpy(\u0026value, buff.data(), sizeof(value));\n\n\tif constexpr (std::endian::native \u003d\u003d std::endian::big) {\n\t\tvalue \u003d std::byteswap(value);\n\t}\n\n\treturn value;\n}\n\nint Set32Le(std::span\u003cuint8_t\u003e buff, uint32_t value) {\n\tif (buff.size() \u003c sizeof(value)) {\n\t\treturn -1;\n\t}\n\n\tif constexpr (std::endian::native \u003d\u003d std::endian::big) {\n\t\tvalue \u003d std::byteswap(value);\n\t}\n\n\tstd::memcpy(buff.data(), \u0026value, sizeof(value));\n\n\treturn 0;\n}\n```\n\n### Why this is better than manual bit-shifting:\n\n1. **Alignment Safety:** Directly casting a byte array to a `uint32_t*` (e.g., `*reinterpret_cast\u003cconst uint32_t*\u003e(buff.data())`) is Undefined Behavior in C++ if the memory isn\u0027t properly aligned. `std::memcpy` completely bypasses this issue.\n2. **Zero Overhead:** Modern compilers (GCC, Clang, MSVC) recognize the `std::memcpy` pattern specifically for this use case. They will optimize it away completely and emit a single, highly efficient `mov` (or `bswap` if endianness dictates) CPU instruction, rather than executing four separate shifts and logical ORs.\n3. **`if constexpr` Magic:** Because `std::endian::native` is evaluated at compile time, the compiler completely ignores the `std::byteswap` logic if it is compiling for a standard Little-Endian machine (like x86). There is no runtime branching cost.",
+      "range": {
+        "startLine": 869,
+        "startChar": 0,
+        "endLine": 895,
+        "endChar": 1
+      },
+      "revId": "acc7bb07a0e6cf9d56d802ab87a30fab988c5b76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "63af65ac_a13f171a",
         "filename": "util/elan/iaptool.cc",
         "patchSetId": 15
