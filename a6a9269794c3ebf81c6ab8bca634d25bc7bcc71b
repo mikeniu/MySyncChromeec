@@ -64,6 +64,30 @@
       },
       "revId": "a6a9269794c3ebf81c6ab8bca634d25bc7bcc71b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "782b4fb0_f3eb05bb",
+        "filename": "zephyr/scripts/cme.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 767,
+      "author": {
+        "id": 1191329
+      },
+      "writtenOn": "2026-05-12T09:21:13Z",
+      "side": 1,
+      "message": "We should add `type\u003dint` to `add_argument`.\n\nPlease see the change of line 205 -\u003e line 269 in `cme.py`. This CL basically makes an incompatible change that the value type of \"manifest_version\" field in the generated component manifest file changes from int to string. Which cause the parser side (i.e. runtime_probe) fails.",
+      "parentUuid": "4ff5204e_b8248a84",
+      "range": {
+        "startLine": 767,
+        "startChar": 24,
+        "endLine": 767,
+        "endChar": 36
+      },
+      "revId": "a6a9269794c3ebf81c6ab8bca634d25bc7bcc71b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
