@@ -13,6 +13,24 @@ config PLATFORM_EC_TEST_CC_USBPD
 	help
 	  Enable USBPD console channel
 
+# ZTEST is enabled with Renode, we want these configs
+# for normal ZTEST built on native_posix
+if EC_HOST_CMD && ARCH_POSIX
+config EC_HOST_CMD_BACKEND_SIMULATOR
+	default y
+
+config EC_HOST_CMD_DEDICATED_THREAD
+	default y
+
+# Most standard host command transactions use smaller payloads
+# (e.g. 256 bytes for LPC/eSPI, 544 bytes for SPI/UART).
+config EC_HOST_CMD_HANDLER_RX_BUFFER_SIZE
+	default 544
+
+config EC_HOST_CMD_HANDLER_TX_BUFFER_SIZE
+	default 544
+endif # EC_HOST_CMD && ARCH_POSIX
+
 endif # ZTEST
 
 config HW_TEST
