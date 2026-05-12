@@ -116,21 +116,20 @@ k_tid_t get_main_thread(void)
 
 test_mockable k_tid_t get_hostcmd_thread(void)
 {
-#ifdef HAS_TASK_HOSTCMD
-#ifdef CONFIG_TASK_HOSTCMD_THREAD_MAIN
+#if defined(CONFIG_TASK_HOSTCMD_THREAD_MAIN) || \
+	(defined(CONFIG_EC_HOST_CMD) &&         \
+	 !defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD))
 	return get_main_thread();
-#else
-#ifndef CONFIG_EC_HOST_CMD
-	return task_to_k_tid[TASK_ID_HOSTCMD];
-#else
+#elif defined(CONFIG_EC_HOST_CMD)
 	const struct ec_host_cmd *hc = ec_host_cmd_get_hc();
 
 	return (k_tid_t)&hc->thread;
-#endif /* CONFIG_EC_HOST_CMD */
-#endif /* CONFIG_TASK_HOSTCMD_THREAD_MAIN */
-#endif /* HAS_TASK_HOSTCMD */
+#elif defined(HAS_TASK_HOSTCMD)
+	return task_to_k_tid[TASK_ID_HOSTCMD];
+#else
 	__ASSERT(false, "HOSTCMD task is not enabled");
 	return NULL;
+#endif
 }
 
 k_tid_t task_id_to_thread_id(task_id_t task_id)
@@ -184,11 +183,12 @@ task_id_t thread_id_to_task_id(k_tid_t thread_id)
 		return TASK_ID_SYSWORKQ;
 	}
 
-#ifdef HAS_TASK_HOSTCMD
+#if defined(HAS_TASK_HOSTCMD) || \
+	(!defined(CONFIG_SHIMMED_TASKS) && !defined(CONFIG_HAS_TEST_TASKS))
 	if (get_hostcmd_thread() == thread_id) {
 		return TASK_ID_HOSTCMD;
 	}
-#endif /* HAS_TASK_HOSTCMD */
+#endif
 
 #ifdef HAS_TASK_MAIN
 	if (get_main_thread() == thread_id) {
@@ -413,6 +413,17 @@ void start_ec_tasks(void)
 	for (size_t i = 0; i < TASK_ID_COUNT + EXTRA_TASK_COUNT; ++i) {
 		k_timer_init(&shimmed_tasks_timers[i], timer_expire, NULL);
 	}
+
+#if defined(CONFIG_EC_HOST_CMD) && defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD)
+	{
+		/* Rename upstream host command thread to match legacy */
+		k_tid_t hc_thread = get_hostcmd_thread();
+
+		if (hc_thread) {
+			k_thread_name_set(hc_thread, "HOSTCMD");
+		}
+	}
+#endif
 
 	for (size_t i = 0; i < TASK_ID_COUNT; ++i) {
 #ifdef TEST_BUILD

@@ -459,3 +459,10 @@
 
 	/delete-node/ tusb1064-mux-1;
 };
+/ {
+	chosen {
+		zephyr,host-cmd-shi-backend = &shi0;
+	};
+};
+
+/delete-node/ &int_spi0_cs;

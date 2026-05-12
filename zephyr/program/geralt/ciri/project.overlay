@@ -298,3 +298,11 @@
 &thermistor_3V3_100K_100K_4250B {
 	status = "okay";
 };
+
+/ {
+	chosen {
+		zephyr,host-cmd-shi-backend = &shi0;
+	};
+};
+
+/delete-node/ &int_spi0_cs;
