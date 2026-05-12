@@ -33,6 +33,24 @@
       "message": "[Gerrit AI Review] **Security / OOB Read Risk:**\n\nMoving the offset addition here correctly fixes the false validation failure against the host-requested `current_frame_size`. However, by adding `FP_SENSOR_IMAGE_OFFSET` *after* `validate_fp_buffer_offset` has completed, you are bypassing the physical bounds check for `fp_buffer`.\n\nIf `current_frame_size + FP_SENSOR_IMAGE_OFFSET \u003e sizeof(fp_buffer)`, the updated `offset + size` could exceed `sizeof(fp_buffer)`, causing the `memcpy` below to read out of bounds.\n\nConsider adding an explicit bounds check against the physical buffer size here to ensure memory safety:\n\n```cpp\n\tif (skip_image_offset(global_context.current_capture_type)) {\n\t\toffset +\u003d FP_SENSOR_IMAGE_OFFSET;\n\t\tif (offset + size \u003e sizeof(fp_buffer)) {\n\t\t\treturn EC_RES_INVALID_PARAM;\n\t\t}\n\t}\n```",
       "revId": "f86ebe12f680cda3e406491ab0429819ac755e9d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00978055_9b0e4ec9",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 631,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-12T23:20:04Z",
+      "side": 1,
+      "message": "this is not correct.",
+      "parentUuid": "be36206f_b3715ae1",
+      "revId": "f86ebe12f680cda3e406491ab0429819ac755e9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
