@@ -797,14 +797,25 @@ static uint16_t pass_args_to_sim(struct host_cmd_handler_args *args)
 	return tx_header->result;
 }
 
+int task_start_called(void);
+extern uint16_t host_command_process_shim(struct host_cmd_handler_args *args);
+
 uint16_t host_command_process(struct host_cmd_handler_args *args)
 {
-	return pass_args_to_sim(args);
+	if (task_start_called()) {
+		return pass_args_to_sim(args);
+	} else {
+		return host_command_process_shim(args);
+	}
 }
 
 void host_command_received(struct host_cmd_handler_args *args)
 {
-	pass_args_to_sim(args);
+	if (task_start_called()) {
+		pass_args_to_sim(args);
+	} else {
+		host_command_process_shim(args);
+	}
 }
 
 #endif

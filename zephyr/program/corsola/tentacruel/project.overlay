@@ -465,3 +465,10 @@
 		board-init = "ps8743_eq_c1_setting";
 	};
 };
+/ {
+	chosen {
+		zephyr,host-cmd-shi-backend = &shi0;
+	};
+};
+
+/delete-node/ &int_spi0_cs;
