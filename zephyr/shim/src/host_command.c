@@ -21,13 +21,22 @@ BUILD_ASSERT(0, "The upstream Host Command subsystem is supported only with "
 		"reusing the main thread.");
 #endif
 #else
-#if (defined(CONFIG_TASK_HOSTCMD_THREAD_DEDICATED) &&  \
-     !defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD)) || \
-	(defined(CONFIG_TASK_HOSTCMD_THREAD_MAIN) &&   \
-	 defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD))
+/* The ZTest framework runs on the main thread.
+ * Since the main thread is occupied by the test runner, the upstream host
+ * command subsystem cannot run on the main thread and is instead allocated to a
+ * dedicated thread (CONFIG_EC_HOST_CMD_DEDICATED_THREAD) to avoid blocking
+ * the execution of tests.  ASSERT on misconfigured tests.
+ */
+#if (defined(CONFIG_TASK_HOSTCMD_THREAD_MAIN) && \
+     defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD))
 BUILD_ASSERT(
-	0,
-	"Host command thread setting mismatch between ChromeOS EC and upstream.");
+	0, "Host command config error, upstream host command cannot run in the "
+	   "main thread");
+#endif
+#if (defined(CONFIG_TASK_HOSTCMD_THREAD_DEDICATED) && \
+     !defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD))
+BUILD_ASSERT(0, "Host command config error, upstream config "
+		"EC_HOST_CMD_DEDICATED_THREAD is missing.");
 #endif
 #endif /* CONFIG_ZTEST */
 #ifdef CONFIG_SUPPRESSED_HOST_COMMANDS
@@ -209,4 +218,49 @@ host_command_protocol_info(struct ec_host_cmd_handler_args *args)
 }
 EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_GET_PROTOCOL_INFO,
 			    host_command_protocol_info, EC_VER_MASK(0));
+
+uint16_t host_command_process_shim(struct host_cmd_handler_args *args)
+{
+	const struct ec_host_cmd_handler *found_handler = NULL;
+
+	STRUCT_SECTION_FOREACH(ec_host_cmd_handler, handler)
+	{
+		if (handler->id == args->command) {
+			found_handler = handler;
+			break;
+		}
+	}
+
+	if (found_handler == NULL) {
+		return EC_HOST_CMD_INVALID_COMMAND;
+	}
+
+	struct ec_host_cmd_handler_args *upstream_args =
+		(struct ec_host_cmd_handler_args *)args;
+
+	if (upstream_args->output_buf && upstream_args->output_buf_max) {
+		memset(upstream_args->output_buf, 0,
+		       upstream_args->output_buf_max);
+	}
+
+	if (found_handler->min_rqt_size > upstream_args->input_buf_size) {
+		return EC_HOST_CMD_REQUEST_TRUNCATED;
+	}
+
+	if (found_handler->min_rsp_size > upstream_args->output_buf_max) {
+		return EC_HOST_CMD_INVALID_RESPONSE;
+	}
+
+	if (upstream_args->version >= 16 ||
+	    !(found_handler->version_mask & BIT(upstream_args->version))) {
+		return EC_HOST_CMD_INVALID_VERSION;
+	}
+
+	return found_handler->handler(upstream_args);
+}
+
+__weak uint16_t host_command_process(struct host_cmd_handler_args *args)
+{
+	return host_command_process_shim(args);
+}
 #endif

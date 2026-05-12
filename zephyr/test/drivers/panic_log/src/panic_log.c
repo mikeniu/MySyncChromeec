@@ -449,8 +449,10 @@ ZTEST_USER(panic_log, test_host_cmd_read)
 			.command = EC_CMD_PANIC_LOG_READ,
 			.params = &read_params,
 			.params_size = sizeof(read_params),
-			.response = dump_buffer,
-			.response_max = response_max,
+			.response = dump_buffer + read_params.offset,
+			.response_max = MIN(response_max,
+					    CONFIG_PLATFORM_EC_PANIC_LOG_SIZE -
+						    read_params.offset),
 			.response_size = 0,
 		};
 		zassert_ok(host_command_process(&args));
