@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "988df997_67e8f0f4",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 40
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-05-12T10:29:48Z",
+      "side": 1,
+      "message": "Upload the it5271Ex spec on the bug.\nAbout the state machine, it\u0027s followed by UCSI spec, I also upload the pic on there.\n\nUCSI protocol flow:\n1.write [MSGOUT] \u0026 [CONTROL] in `[ST_WRITE]` state (may not have `[MSGOUT]`)\n2.INT assert, read [UCSI alert status] in `handle_irq()`\n3.read [CCI] in `[ST_GET_CCI]` state\n4.read [MSGIN] in  `[ST_READ]` state (may not have `[MSGIN]`)\n\n5.write [CONTROL: ACK_CC_CI cmd complete] in `[ST_WRITE_ACK]` state\n6.INT assert, read [UCSI alert status] in `handle_irq()`\n7.read [CCI] in `[ST_GET_CCI]` state\n\n\nAsynchronous interrupt (connector change indiacator) flow:\n1.INT assert, read [UCSI alert status] in `handle_irq()`\n2.read [CCI] in `[ST_GET_CCI]` state\n\n3.write [CONTROL: Get_Connector_Status] in `[ST_WRITE]` state\n4.INT assert, read [UCSI alert status] in `handle_irq()`\n5.read [CCI] in `[ST_GET_CCI]` state\n6.read [MSGIN] in  `[ST_READ]` state\n\n7.write [CONTROL: ACK_CC_CI cmd complete] in `[ST_WRITE_ACK]` state\n8.INT assert, read [UCSI alert status] in `handle_irq()`\n9.read [CCI] in `[ST_GET_CCI]` state",
+      "parentUuid": "ae43256f_d5be4dd4",
+      "range": {
+        "startLine": 350,
+        "startChar": 0,
+        "endLine": 350,
+        "endChar": 42
+      },
+      "revId": "124007e1bf5ef30dcf129fd3b556feaa085e72ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "deabe80f_053ee286",
         "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
         "patchSetId": 40
@@ -37,6 +61,30 @@
       "writtenOn": "2026-05-08T22:19:13Z",
       "side": 1,
       "message": "This logic is too complicated to perform inline.  Move to one or more helper functions to at least reduce the nesting.",
+      "range": {
+        "startLine": 752,
+        "startChar": 0,
+        "endLine": 752,
+        "endChar": 24
+      },
+      "revId": "124007e1bf5ef30dcf129fd3b556feaa085e72ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "846dfeca_cecf407b",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 40
+      },
+      "lineNbr": 752,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-05-12T10:29:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "deabe80f_053ee286",
       "range": {
         "startLine": 752,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f90a2ab_9aa5c3ba",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 40
+      },
+      "lineNbr": 1127,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-05-12T10:29:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4df946e6_d536235a",
+      "range": {
+        "startLine": 1127,
+        "startChar": 0,
+        "endLine": 1127,
+        "endChar": 15
+      },
+      "revId": "124007e1bf5ef30dcf129fd3b556feaa085e72ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "367b8ed3_3578254b",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-05-08T22:19:13Z",
       "side": 1,
       "message": "This shouldn\u0027t be needed.  The Realtek PDC used the SMBUS ARA for interrupt notification and required special handling to manage multiple ports.\n\nIf the it52xx has multiple ports, are the ports addresses independently as separate devices on the I2C bus?  If so, then each it5xx driver instance should be able to operate independently.\n\nIf there are any cross dependencies between the ports, then you should create parent device for common code shared by both ports.  See Zephyr\u0027s MFD framework for ways to do this.",
+      "range": {
+        "startLine": 2019,
+        "startChar": 0,
+        "endLine": 2019,
+        "endChar": 56
+      },
+      "revId": "124007e1bf5ef30dcf129fd3b556feaa085e72ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21402417_cb41f1b3",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 40
+      },
+      "lineNbr": 2019,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-05-12T10:29:48Z",
+      "side": 1,
+      "message": "About two usb-c port case, there would be two scenarios:\n1.`it5271` chip * 2 for two c-port: These two chip have independently  i2c addresses, so each it52xx driver instance can operate independently, then we needn\u0027t this for loop.\n\n2.`it5272` chip * 1 for two c-port: Two c-port share one i2c address,  then I think we need MFD to do this. \n\nBut so far I use `it5271` to verify the PDC functions, about `it5272` it\u0027s another topic/patch later, now we could just focus on `it5271`. Thanks for your MFD information!\n\nSince we discuss about `it5272` case, I would like to ask a question, is it available to create only one c-port thread, but it actually controls two physical c-port?\nBecause two port use the same i2c address, it only can finish one UCSI command at a time, \nex.\n`port0`: write `[control]` -\u003e INT -\u003e idle -\u003e get `[CCI]` -\u003e write `[ACK_CC_CI]` -\u003e INT -\u003e idle -\u003e get `[CCI]` -\u003e finish\n`port1`: pending \u0026 wait port0 finish -\u003e write `[control]` .....\n\nAlso, for asynchronous interrupt (connector change indiacator), we need to get `[CCI]` first to know which `port` \u0026 `event` (`CC` or `CI`) assert the interrupt, then start to handle it.",
+      "parentUuid": "367b8ed3_3578254b",
       "range": {
         "startLine": 2019,
         "startChar": 0,
