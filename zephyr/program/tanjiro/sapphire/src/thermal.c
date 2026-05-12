@@ -17,10 +17,9 @@ static uint8_t release_cnt = 0;
 static int current = -1;
 typedef enum {
 	LIMIT_NONE = 9999,
-	LIMIT_2500 = 2500,
-	LIMIT_2000 = 2000,
-	LIMIT_1500 = 1500,
-	LIMIT_700 = 700
+	LIMIT_1 = 2500,
+	LIMIT_2 = 1500,
+	LIMIT_3 = 500
 } charge_limit_t;
 
 typedef struct {
@@ -28,18 +27,19 @@ typedef struct {
 	uint8_t release_temp;
 } temp_limit_t;
 
-static const charge_limit_t limit_table[LIMIT_LEVELS] = {
-	LIMIT_NONE, LIMIT_2500, LIMIT_2000, LIMIT_1500, LIMIT_700
-};
+static const charge_limit_t limit_table[LIMIT_LEVELS] = { LIMIT_NONE, LIMIT_1,
+							  LIMIT_2, LIMIT_3 };
 
-static const temp_limit_t charge_temp_limits[LIMIT_LEVELS - 1] = { { 40, 35 },
-								   { 60, 57 },
-								   { 65, 62 },
-								   { 70, 67 } };
+static const temp_limit_t charge_temp_limits[LIMIT_LEVELS - 1] = {
+	{ 36, 34 },
+	{ 41, 38 },
+	{ 50, 46 },
+};
 
 static void update_charge_limit(void)
 {
 	int charger_temp_k, charger_temp;
+
 	if (power_get_state() != POWER_S0 || !extpower_is_present()) {
 		limit_level = 0;
 		trigger_cnt = 0;
