@@ -164,6 +164,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f7662577_0735ed3d",
+        "filename": "util/focaltech/focaltech/src/ff_util.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-12T16:13:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Potential Infinite Loop via Integer Overflow**\n\nThe loop counter `i` is declared as a `uint16_t`, but the input `len` is a `uint32_t`. If `ff_util_hexdump` is ever called with a `len` greater than 65535, `i` will overflow and wrap around to 0 before ever reaching `len`, resulting in an infinite loop.\n\n**Remediation:** Change the type of `i` to `uint32_t` to match the type of `len`.",
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e41cc0c2_316c6258",
         "filename": "util/focaltech/focaltech/src/ff_util.c",
         "patchSetId": 11
@@ -371,6 +388,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0d5253fe_975b0f9c",
+        "filename": "util/focaltech/focaltech/src/ft_sg_io.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-12T16:13:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Resource Leak on Error Path**\n\nIf the bulk endpoints cannot be found, the function returns `FT_NO_SUCH_DEV` but fails to release the interface and close the device handle. This will leave the device claimed and permanently leak the `dev_handle`.\n\n**Remediation:** Release the interface and close the device handle before returning:\n```c\nif (!g_ft_boot_ep.ep_bulk_out || !g_ft_boot_ep.ep_bulk_in) {\n    FF_LOGE(...);\n    libusb_release_interface(dev_handle, 0);\n    libusb_close(dev_handle);\n    dev_handle \u003d NULL;\n    return FT_NO_SUCH_DEV;\n}\n```",
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e40081a6_249a8db3",
+        "filename": "util/focaltech/focaltech/src/ft_sg_io.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-12T16:13:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Buffer Overflow Risk**\n\nThere is no bounds checking on `io_hdr-\u003ecmd_len` before it is used in the `memcpy` below (`memcpy(cbw.cmd, io_hdr-\u003ecmdp, io_hdr-\u003ecmd_len);`). If a caller passes an `io_hdr-\u003ecmd_len` greater than 16 (the size of `cbw.cmd`), it will cause a stack buffer overflow.\n\n**Remediation:** Add a boundary check:\n```c\nif (!io_hdr-\u003ecmdp || io_hdr-\u003ecmd_len \u003d\u003d 0 || io_hdr-\u003ecmd_len \u003e sizeof(cbw.cmd)) {\n    FF_LOGE(\"Invalid SCSI command length\");\n    return FT_NO_SUCH_DEV;\n}\n```",
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0a0fb15a_7004f877",
         "filename": "util/focaltech/focaltech/src/ft_usb_port.c",
         "patchSetId": 11
@@ -543,6 +594,23 @@
       "writtenOn": "2026-05-08T19:56:29Z",
       "side": 1,
       "message": "[Gerrit AI Review] **Missing Null Terminator**\n\nIf the USB device responds with exactly `FT_BOOT_VERSION_MAX` (36) bytes of data without a null terminator, the `%s` format specifier here will read past the end of `databuffer` and cause a buffer overflow (reading garbage memory or crashing).\n\n**Remediation:** Explicitly null-terminate the buffer before logging it:\n```c\ndatabuffer[FT_BOOT_VERSION_MAX - 1] \u003d \u0027\\0\u0027;\nFF_LOGI(\"get boot vesion:%s\", databuffer);\n```",
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94c558d8_d4c855e7",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-12T16:13:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Crash Risk: `fclose(NULL)`**\n\nIf `fopen()` fails to open the file, it returns `NULL`, and the code jumps to `goto exit;`.\nAt the `exit:` label, `fclose(file)` is called unconditionally. Passing a `NULL` pointer to `fclose()` causes undefined behavior, which on most systems will result in an immediate segmentation fault.\n\n**Remediation:** Add a null check before closing:\n```c\nif (file) {\n    fclose(file);\n}\n```\n*(Note: This exact same bug exists in `ft_verify_data()` at line 448).*",
       "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
