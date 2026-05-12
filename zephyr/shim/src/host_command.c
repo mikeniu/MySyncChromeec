@@ -19,13 +19,22 @@ BUILD_ASSERT(0, "The upstream Host Command subsystem is supported only with "
 		"reusing the main thread.");
 #endif
 #else
-#if (defined(CONFIG_TASK_HOSTCMD_THREAD_DEDICATED) &&  \
-     !defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD)) || \
-	(defined(CONFIG_TASK_HOSTCMD_THREAD_MAIN) &&   \
-	 defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD))
+/* The ZTest framework runs on the main thread.
+ * Since the main thread is occupied by the test runner, the upstream host
+ * command subsystem cannot run on the main thread and is instead allocated to a
+ * dedicated thread (CONFIG_EC_HOST_CMD_DEDICATED_THREAD) to avoid blocking
+ * the execution of tests.  ASSERT on misconfigured tests.
+ */
+#if (defined(CONFIG_TASK_HOSTCMD_THREAD_MAIN) && \
+     defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD))
 BUILD_ASSERT(
-	0,
-	"Host command thread setting mismatch between ChromeOS EC and upstream.");
+	0, "Host command config error, upstream host command cannot run in the "
+	   "main thread");
+#endif
+#if (defined(CONFIG_TASK_HOSTCMD_THREAD_DEDICATED) && \
+     !defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD))
+BUILD_ASSERT(0, "Host command config error, upstream config "
+		"EC_HOST_CMD_DEDICATED_THREAD is missing.");
 #endif
 #endif /* CONFIG_ZTEST */
 
@@ -124,6 +133,16 @@ int host_command_upstream_init(void)
 
 	/* Set the user callback for custom EC procedures */
 	ec_host_cmd_set_user_cb(ec_host_cmd_user_cb, NULL);
+
+#ifdef CONFIG_EC_HOST_CMD_DEDICATED_THREAD
+	/* Rename upstream host command thread to match legacy */
+	const struct ec_host_cmd *hc = ec_host_cmd_get_hc();
+	k_tid_t hc_thread = (k_tid_t)&hc->thread;
+
+	if (hc_thread) {
+		k_thread_name_set(hc_thread, "HOSTCMD");
+	}
+#endif
 
 	return 0;
 }

@@ -74,4 +74,10 @@ config I2C_TRANSFER_TIMEOUT_MS
 config DEVICE_API_ASSERT
 	default n
 
+config EC_HOST_CMD
+	default y if !HECI
+	depends on PLATFORM_EC_HOSTCMD
+	select EC_HOST_CMD_IN_PROGRESS_STATUS
+	select EC_HOST_CMD_DEDICATED_THREAD if TASK_HOSTCMD_THREAD_DEDICATED
+
 orsource "Kconfig.defaults-$(ARCH)"
