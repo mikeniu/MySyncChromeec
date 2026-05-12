@@ -126,14 +126,17 @@
 			0xff /* C4 */
 			0xff /* C5 */
 			0xff /* C6 */
-			0xa4 /* C7 */
+			0xa5 /* C7 */
 			0xff /* C8 */
-			0xf6 /* C9 */
+			0xff /* C9 */
 			0x55 /* C10 */
-			0xfe /* C11 */
+			0xff /* C11 */
 			0xff /* C12 */
 			0xff /* C13 */
 			0xff /* C14 */
+			0x60 /* C15 */
+			0xff /* C16 */
+			0xff /* C17 */
 		>;
 	};
 
@@ -204,7 +207,10 @@
 		     &kso11_default
 		     &kso12_default
 		     &kso13_default
-		     &kso14_default>;
+		     &kso14_default
+		     &kso15_default
+		     &kso16_default
+		     &kso17_default>;
 	pinctrl-1 = <&ksi0_sleep
 		     &ksi1_sleep
 		     &ksi2_sleep
@@ -227,7 +233,10 @@
 		     &kso11_sleep
 		     &kso12_sleep
 		     &kso13_sleep
-		     &kso14_sleep>;
+		     &kso14_sleep
+		     &kso15_sleep
+		     &kso16_sleep
+		     &kso17_sleep>;
 	pinctrl-names = "default", "sleep";
 };
 
