@@ -50,9 +50,9 @@
 	named-temp-sensors {
 		compatible = "cros-ec,temp-sensors";
 		temp_cpu: cpu {
-			temp-host-high = <85>;
-			temp-host-halt = <90>;
-			temp-host-release-high = <80>;
+			temp-host-high = <90>;
+			temp-host-halt = <97>;
+			temp-host-release-high = <85>;
 			sensor = <&temp_sensor_cpu>;
 		};
 		temp_pmc: pmc_otp {
