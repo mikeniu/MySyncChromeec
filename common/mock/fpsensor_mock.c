@@ -12,6 +12,7 @@
 #include "fpsensor/fpsensor.h"
 #include "mock/fpsensor_mock.h"
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -31,7 +32,7 @@ int fp_sensor_deinit(void)
 	return mock_ctrl_fp_sensor.fp_sensor_deinit_return;
 }
 
-int fp_sensor_get_info(struct ec_response_fp_info_v2 *resp, size_t resp_size)
+int fp_sensor_get_info(struct ec_response_fp_info_v3 *resp, size_t resp_size)
 {
 	memset(resp, 0, sizeof(*resp));
 
@@ -58,7 +59,8 @@ int fp_acquire_image(uint8_t *image_data, enum fp_capture_type capture_type)
 }
 
 int fp_finger_match(void *templ, uint32_t templ_count, uint8_t *image,
-		    int32_t *match_index, uint32_t *update_bitmap)
+		    bool template_update, int32_t *match_index,
+		    uint32_t *update_bitmap)
 {
 	return mock_ctrl_fp_sensor.fp_finger_match_return;
 }

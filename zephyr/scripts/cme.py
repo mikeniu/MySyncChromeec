@@ -52,6 +52,7 @@ SENSOR_I2C_ADDRESSES = {
     "LSM6DSO_ADDR0_FLAGS": "0x6a",
     "LSM6DSO_ADDR1_FLAGS": "0x6b",
     "TCS3400_I2C_ADDR_FLAGS": "0x39",
+    "CM36781_I2C_ADDR_FLAGS": "0x51",
 }
 
 # A list of all ALS listed under the motionsense compatible.
@@ -105,7 +106,12 @@ def parse_args(argv: Optional[List[str]] = None):
     parser.add_argument(
         "-v",
         "--version",
-        help="Base version string to use in build",
+        help="EC version string to use in build",
+    )
+
+    parser.add_argument(
+        "--cme-version",
+        help="CME version string to use in build",
     )
 
     parser.add_argument(
@@ -129,8 +135,8 @@ def compress_expect_2(expect):
     if "reg" in expect and "write_data" in expect:
         expect["write_data"] = (
             "0x"
-            + expect["reg"].lstrip("0x")
-            + expect["write_data"].lstrip("0x")
+            + expect["reg"].removeprefix("0x")
+            + expect["write_data"].removeprefix("0x")
         )
         del expect["reg"]
 
@@ -764,7 +770,7 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
             version=args.version,
             static=args.static_version,
         )
-    manifest = Manifest(args.version, ec_version_string)
+    manifest = Manifest(args.cme_version, ec_version_string)
 
     ret = iterate_usbc_components(edtlib, edt, i2c_portmap, manifest)
     if ret != 0:
