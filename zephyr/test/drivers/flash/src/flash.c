@@ -149,7 +149,8 @@ ZTEST_USER(flash, test_hostcmd_flash_read__overflow)
 ZTEST_USER(flash, test_hostcmd_flash_write_and_erase)
 {
 	uint8_t in_buf[TEST_BUF_SIZE];
-	uint8_t out_buf[sizeof(struct ec_params_flash_write) + TEST_BUF_SIZE];
+	uint8_t out_buf[sizeof(struct ec_params_flash_write) +
+			TEST_BUF_SIZE] __aligned(4);
 
 	struct ec_params_flash_read read_params = {
 		.offset = 0x10000,
@@ -523,7 +524,8 @@ ZTEST_USER(flash, test_console_cmd_flash_erase__bad_args)
  */
 static uint16_t write_flash_helper32(uint32_t offset, uint32_t data)
 {
-	uint8_t out_buf[sizeof(struct ec_params_flash_write) + sizeof(data)];
+	uint8_t out_buf[sizeof(struct ec_params_flash_write) +
+			sizeof(data)] __aligned(4);
 
 	/* The write host command structs need to be filled run-time */
 	struct ec_params_flash_write *write_params =
@@ -975,7 +977,7 @@ static void setup_flash_region_helper(uint32_t offset, uint32_t size,
 	if (make_write) {
 		/* Sized for flash_write header plus one byte of data */
 		uint8_t out_buf[sizeof(struct ec_params_flash_write) +
-				sizeof(uint8_t)];
+				sizeof(uint8_t)] __aligned(4);
 
 		struct ec_params_flash_write *write_params =
 			(struct ec_params_flash_write *)out_buf;
