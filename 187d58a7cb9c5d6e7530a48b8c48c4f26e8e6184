@@ -163,6 +163,24 @@
       "parentUuid": "652f5476_e88e8354",
       "revId": "187d58a7cb9c5d6e7530a48b8c48c4f26e8e6184",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c084ab92_a8d7663a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-05-12T23:13:53Z",
+      "side": 1,
+      "message": "We discussed during the meeting today and think this is the best approach for dealing with this UCSI limitation. Having the EC poll each of the PDCs would waste a lot of time on boot; we already have so much PDC activity happening then.",
+      "parentUuid": "4d26e4ba_0c9b67d0",
+      "revId": "187d58a7cb9c5d6e7530a48b8c48c4f26e8e6184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
