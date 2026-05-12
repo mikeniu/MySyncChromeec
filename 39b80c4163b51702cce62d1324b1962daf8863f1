@@ -16,6 +16,23 @@
       "message": "please hold the revert",
       "revId": "39b80c4163b51702cce62d1324b1962daf8863f1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "899ce5ab_4bbb3f17",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1532003
+      },
+      "writtenOn": "2026-05-12T13:46:16Z",
+      "side": 1,
+      "message": "If this is a risk, then the entire cutoff sequence is also at risk.\n\nyou need to add pre-req to ensure cutoff is not performed if charger is present to prevent the unintended state.",
+      "revId": "39b80c4163b51702cce62d1324b1962daf8863f1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
