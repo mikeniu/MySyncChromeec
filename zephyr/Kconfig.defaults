@@ -71,4 +71,8 @@ config CURRENT_THREAD_USE_TLS
 config I2C_TRANSFER_TIMEOUT_MS
 	default 100
 
+config EC_HOST_CMD
+	default y if !HECI
+	select EC_HOST_CMD_IN_PROGRESS_STATUS
+
 orsource "Kconfig.defaults-$(ARCH)"
