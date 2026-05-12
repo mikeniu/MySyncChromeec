@@ -118,6 +118,30 @@
       },
       "revId": "654bae00b48fe5ff4bf70beddba307de847471c7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76fed75c_26c097b1",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 7
+      },
+      "lineNbr": 1316,
+      "author": {
+        "id": 1369019
+      },
+      "writtenOn": "2026-05-12T16:27:38Z",
+      "side": 1,
+      "message": "I think I set the \"resolved\" bit mistakenly when I only intended to remove a stale comment I failed to fully send.\n\nIf the \"base\" values are understood, please close this comment.",
+      "parentUuid": "bfc7ef61_3ecf806e",
+      "range": {
+        "startLine": 1316,
+        "startChar": 0,
+        "endLine": 1316,
+        "endChar": 34
+      },
+      "revId": "654bae00b48fe5ff4bf70beddba307de847471c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
