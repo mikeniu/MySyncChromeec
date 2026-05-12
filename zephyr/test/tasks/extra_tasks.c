@@ -175,4 +175,19 @@ ZTEST_USER(extra_tasks, test_extra_task_unmapped)
 	zassert_equal(task_id, TASK_ID_INVALID);
 }
 
-ZTEST_SUITE(extra_tasks, NULL, NULL, NULL, NULL, NULL);
+static void *extra_tasks_setup(void)
+{
+#if defined(CONFIG_EC_HOST_CMD) && defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD)
+	/* Rename upstream host command thread name from "ec_host_cmd" to
+	 * "HOSTCMD" so that find_thread_by_name passes tests.
+	 */
+	k_tid_t hc_thread = get_hostcmd_thread();
+
+	if (hc_thread) {
+		k_thread_name_set(hc_thread, "HOSTCMD");
+	}
+#endif
+	return NULL;
+}
+
+ZTEST_SUITE(extra_tasks, NULL, extra_tasks_setup, NULL, NULL, NULL);
