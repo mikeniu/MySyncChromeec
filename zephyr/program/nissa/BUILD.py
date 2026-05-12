@@ -13,8 +13,14 @@ def register_nissa_project(
     project_name,
     chip="it8xxx2/it81302bx",
     kconfig_files=None,
+    modules=None,
+    snippets=None,
 ):
     """Register a variant of nissa."""
+    kwargs = {}
+    if modules:
+        kwargs["modules"] = modules
+
     register_func = register_binman_project
     if chip.startswith("npcx"):
         register_func = register_npcx_project
@@ -36,6 +42,9 @@ def register_nissa_project(
         dts_overlays=[here / project_name / "project.overlay"],
         kconfig_files=kconfig_files,
         inherited_from=["nissa"],
+        supported_toolchains=["coreboot-sdk", "zephyr"],
+        snippets=snippets,
+        **kwargs,
     )
 
 
@@ -104,6 +113,7 @@ pujjo = register_nissa_project(
 pujjoga = register_nissa_project(
     project_name="pujjoga",
     chip="npcx9/npcx9m3f",
+    snippets=["npcx-40mhz"],
 )
 
 pujjogatwin = register_nissa_project(
