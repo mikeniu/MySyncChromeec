@@ -69,6 +69,24 @@
       "parentUuid": "be36206f_b3715ae1",
       "revId": "f86ebe12f680cda3e406491ab0429819ac755e9d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10fd6830_c5c8104e",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 631,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-12T23:21:53Z",
+      "side": 1,
+      "message": "Why not?",
+      "parentUuid": "00978055_9b0e4ec9",
+      "revId": "f86ebe12f680cda3e406491ab0429819ac755e9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
