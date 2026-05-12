@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db490aba_0a380be0",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 921,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-12T16:22:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Style/Nit:** Missing space between `failed,` and `error code`. It will print as `failed,error code: ...`.",
+      "range": {
+        "startLine": 920,
+        "startChar": 0,
+        "endLine": 921,
+        "endChar": 28
+      },
+      "revId": "e85b4ed863b1eee3a53d35578e98f9e95b941207",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2ba6b76_a6ec07b3",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-12T16:22:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Style/Nit:** Typo: `file_Path` has a capital `P`. To fully match `snake_case` Google style, it should be `file_path`. (This will also require updating it below in `ParseCommandLine` and `main`).",
+      "revId": "e85b4ed863b1eee3a53d35578e98f9e95b941207",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
