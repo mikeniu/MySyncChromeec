@@ -3119,10 +3119,16 @@ static enum smf_state_result pdc_snk_attached_run(void *obj)
 
 		if (pdc_snk_attached_set_sink_path(port)) {
 			if (pdc_power_mgmt_get_frs_hw_supported(
-				    config->connector_num) &&
-			    port->ccaps.op_mode_drp) {
-				port->snk_attached_local_state =
-					SNK_ATTACHED_GET_SINK_PDO;
+				    config->connector_num)) {
+				if (port->ccaps.op_mode_drp) {
+					port->snk_attached_local_state =
+						SNK_ATTACHED_GET_SINK_PDO;
+				} else {
+					pdc_dpm_remove_source(
+						config->connector_num);
+					port->snk_attached_local_state =
+						SNK_ATTACHED_GET_CABLE_PROPERTY;
+				}
 			} else {
 				port->snk_attached_local_state =
 					SNK_ATTACHED_GET_CABLE_PROPERTY;
@@ -4813,6 +4819,9 @@ test_mockable bool pdc_power_mgmt_get_partner_data_swap_capable(int port)
 
 	pdc_port = &pdc_data[port]->port;
 
+	if (pdc_port->get_pdo.pdo_source != PARTNER_PDO) {
+		return false;
+	}
 	fixed_vsafe5v_pdo =
 		get_pdc_pdos_ptr(pdc_port, &pdc_port->get_pdo)->pdos[0];
 
