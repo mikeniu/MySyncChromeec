@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db3ef486_dfc3d8c5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-12T20:29:19Z",
+      "side": 1,
+      "message": "Don\u0027t worry about the coverage until we decide whether this is a good idea.",
+      "revId": "719cabbcd796e8db2938352dffa640a4c424b273",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c3ac72f_707f01a9",
+        "filename": "common/usb_common.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-12T20:29:19Z",
+      "side": 1,
+      "message": "This whole function can just be `return port \u003d\u003d PORT0;`.",
+      "revId": "719cabbcd796e8db2938352dffa640a4c424b273",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9be78c2c_4035b1d6",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 3058,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-12T20:29:19Z",
+      "side": 1,
+      "message": "As discussed OOB, the Type-C spec as of right now says that a non-debug-accessory Source is supposed to just sit in AttachWait.SNK if it detects a DTS Sink. Can you implement that, so we can check if it breaks FAFT or something?",
+      "revId": "719cabbcd796e8db2938352dffa640a4c424b273",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
