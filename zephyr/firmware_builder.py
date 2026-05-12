@@ -308,6 +308,32 @@ def build(opts):
 
     platform_ec = ZEPHYR_DIR.parent
 
+    print("############# look at git state ###############")
+
+    import pprint
+    pprint.pprint(sys.argv)
+    pprint.pprint(dict(os.environ))
+
+    cmd = ["git", "--no-pager", "log", "--pretty=oneline", "-n", "20"]
+    log_cmd(cmd)
+    subprocess.run(cmd, cwd=platform_ec, check=True, stdin=subprocess.DEVNULL,
+                   env=env)
+
+    cmd = ["git", "--no-pager", "show", "HEAD"]
+    log_cmd(cmd)
+    subprocess.run(cmd, cwd=platform_ec, check=True, stdin=subprocess.DEVNULL,
+                   env=env)
+
+    cmd = ["git", "--no-pager", "show", "cros/main"]
+    log_cmd(cmd)
+    subprocess.run(cmd, cwd=platform_ec, check=True, stdin=subprocess.DEVNULL,
+                   env=env)
+
+    cmd = ["git", "--no-pager", "show", "main"]
+    log_cmd(cmd)
+    subprocess.run(cmd, cwd=platform_ec, check=True, stdin=subprocess.DEVNULL,
+                   env=env)
+
     if not opts.code_coverage:
         # Build the host utils first
         build_host_utils(opts, platform_ec, env, {})
