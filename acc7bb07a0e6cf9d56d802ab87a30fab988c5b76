@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a3ba440b_ea086073",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-12T00:11:27Z",
+      "side": 1,
+      "message": "### 1. The Variable Block in `RunIapProcess`\n\n\u003e \"In `RunIapProcess`, there is a large block of C-style variable declarations at the very top of the function. Many of these aren\u0027t used until much later, and some do unnecessary work before early `return` checks. Please move these down to exactly where they are first needed.\"\n\n**Specific Fixes:**\n\n* `std::vector\u003cuint8_t\u003e romRead(rom.size());` allocates memory immediately, but the function might abort early. Move this down to right before `ReadRomData(romRead);`.\n* Move `uint8_t iapMode \u003d 0;` right above `RunIap(iapMode);`.\n* Move `uint32_t romAddr \u003d 0x0000;` and `uint32_t romLength \u003d rom.size();` right above the `SetRomAddress(romAddr)` call.\n* Initialize `fwVer_Google` directly: `uint8_t fwVer_Google \u003d fwFwInfo-\u003efwVer \u003e\u003e 8;`.\n* Declare `uint32_t checksum \u003d 0;` right before the first `GetChecksum(rom)` call, rather than at the top.\n\n---\n\n### 2. Variables Declared Before Early Returns\n\n\u003e \"Throughout the patch, variables are declared before pointer/empty checks. If those checks fail and the function returns early, those declarations were wasted. Move them after the early returns.\"\n\n**In `WriteRomData` and `ReadRomData`:**\n\n```cpp\n// BEFORE\nsize_t offset \u003d 0;\nconst size_t pageSize \u003d kEp3Length;\n\nif (buff.empty()) {\n    return -1;\n}\n\n```\n\n```cpp\n// AFTER\nif (buff.empty()) {\n    return -1;\n}\n\nsize_t offset \u003d 0;\nconst size_t pageSize \u003d kEp3Length;\n\n```\n\n**In USB transfer functions:**\nMove `uint8_t ep_out \u003d ...`, `int transferred \u003d 0;`, and `int errCode \u003d 0;` down below the `if (!m_devHandlePtr)` and `if (buff.size() \u003d\u003d 0)` guard clauses.\n\n---\n\n### 3. The `result` and `errCode` Pattern\n\n\u003e \"There is a repeating pattern of declaring `int result \u003d 0;` or `int errCode \u003d 0;` at the top of almost every helper function. Initialize these directly at the site of the function call to keep the scope tight.\"\n\n**In helper commands (`RunIap`, `FinishIap`, `SoftwareReset`, etc.):**\n\n```cpp\n// BEFORE\nint result \u003d 0;\ndataSend[0] \u003d kCmdRunIap;\ndataSend[4] \u003d iapMode;\n\nresult \u003d IapCommand(dataSend);\n\n```\n\n```cpp\n// AFTER\ndataSend[0] \u003d kCmdRunIap;\ndataSend[4] \u003d iapMode;\n\nint result \u003d IapCommand(dataSend); \n\n```\n\n---\n\n### 4. Struct Initialization in `GetFwVersion`\n\n\u003e \"In `GetFwVersion`, `FWVERINFO fwVerInfo;` is declared at the very top of the function, but is only populated at the very end after multiple potential failure points. Wait to declare it until you have the data, or just return the struct directly.\"\n\n```cpp\n// BEFORE\nFWVERINFO fwVerInfo;\n// ... (multiple lines of code and early returns) ...\nfwVerInfo.fwVer \u003d *fwVer;\nfwVerInfo.bootType \u003d statRecv[2];\n\nreturn fwVerInfo;\n\n```\n\n```cpp\n// AFTER\n// (Remove the declaration at the top entirely)\n// ...\nreturn FWVERINFO{\n    .fwVer \u003d *fwVer,\n    .bootType \u003d statRecv[2]\n};\n\n```",
+      "revId": "acc7bb07a0e6cf9d56d802ab87a30fab988c5b76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "72beb3bf_1bc9a345",
         "filename": "util/elan/iapcontrol.cc",
         "patchSetId": 15
