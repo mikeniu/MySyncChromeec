@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9208bc91_f8ecc79e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-05-12T11:56:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4e977486_a95b62d4",
+      "range": {
+        "startLine": 14,
+        "startChar": 17,
+        "endLine": 14,
+        "endChar": 21
+      },
+      "revId": "187d58a7cb9c5d6e7530a48b8c48c4f26e8e6184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "23967ece_748b9fc2",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-05-05T22:00:49Z",
       "side": 1,
       "message": "Does it have to be this way\n\nI would rather the DT property override it for all ports. The UCSI spec does not define a connector number for this command. The Kernel is only ever going to send this for port 0. Having this configurable for each individual port isn\u0027t useful here, within the UCSI specification the OPM can only send this command for C0.",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 52
+      },
+      "revId": "187d58a7cb9c5d6e7530a48b8c48c4f26e8e6184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5dfe958f_822ceb26",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-05-12T11:56:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23967ece_748b9fc2",
       "range": {
         "startLine": 15,
         "startChar": 0,
@@ -95,6 +143,24 @@
       "side": 1,
       "message": "Hey Tristan\n\nThis command does not support a connector number, so the kernel hard codes this to 0. This is a spec limitation, not a bug. We get into this situation because the command is intended for the PPM (EC) but we forward the response from the LPM (PDC) so we are always forwarding Port 0 capabilities. Typically, this isn\u0027t an issue but we get into trouble when capabilities vary across ports.\n\nIf we wanted to solve this based on how the UCSI spec intends for this command to be used, the EC should construct the GET_CAPABILITY response based on DT or information queried from the PDC(s).\n\nSee https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git/tree/drivers/usb/typec/ucsi/ucsi.c?h\u003dusb-next#n226",
       "parentUuid": "7815d0ef_23c420a3",
+      "revId": "187d58a7cb9c5d6e7530a48b8c48c4f26e8e6184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d26e4ba_0c9b67d0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-05-12T11:56:02Z",
+      "side": 1,
+      "message": "Conn number (1-3) in ppm is mapped to ports 0-2 in EC and finally mapped to port index based on usb_typec.dtsi, so \n```\nconn\u003d1 -\u003e port 0 -\u003e index 2\nconn\u003d2 -\u003e port 1 -\u003e index 1\nconn\u003d3 -\u003e port 2 -\u003e index 1\n```\n\nSo basically mapping works as expected. From PPM only conn 1 is queried.\n\nThis has been hardcoded since GET_CAPABILITY is port agnostic. We want to override it with DT property for platforms where different PDC supports different number of alt modes.",
+      "parentUuid": "652f5476_e88e8354",
       "revId": "187d58a7cb9c5d6e7530a48b8c48c4f26e8e6184",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
