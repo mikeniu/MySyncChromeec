@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "15322a43_2a86a0ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 25
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3594165
+      },
+      "writtenOn": "2026-05-12T09:23:13Z",
+      "side": 1,
+      "message": "Could you point me to any official SOP, documentation, or a good reference driver in our codebase for setting up and running Ztest? I want to make sure I follow the project\u0027s standard workflow.",
+      "parentUuid": "89b21ada_ccd9dc7b",
+      "revId": "05aeaad5ae501c1b90710d553df39e0a48333eef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1900cb08_3c439712",
