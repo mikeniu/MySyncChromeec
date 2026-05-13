@@ -16,6 +16,24 @@
       "message": "Can you add TODO(b/x) to remove this code in the feature?",
       "revId": "81e34c8583b20fb1761c24b6074db272a96b711d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8efbd8b_dba2b28c",
+        "filename": "zephyr/program/fpmcu/ft9001/CMakeLists.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-13T14:42:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "012e9ac9_13679f5b",
+      "revId": "81e34c8583b20fb1761c24b6074db272a96b711d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
