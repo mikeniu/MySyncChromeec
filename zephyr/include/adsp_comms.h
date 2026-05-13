@@ -6,6 +6,8 @@
 #ifndef __CROS_EC_ADSP_COMMS_H
 #define __CROS_EC_ADSP_COMMS_H
 
+#include "charge_manager.h"
+
 #include <stdint.h>
 
 #include <zephyr/sys/iterable_sections.h>
@@ -35,8 +37,20 @@ enum adsp_oem_custom_reg {
 	ADSP_OEM_CUSTOM_REG_BATTERY_LEVEL = 0x06,
 };
 
+enum adsp_oem_custom_charge_state {
+	ADSP_OEM_CUSTOM_CHARGE_STATE_CHARGE = 0x00,
+	ADSP_OEM_CUSTOM_CHARGE_STATE_DISCHARGE = 0x01,
+	ADSP_OEM_CUSTOM_CHARGE_STATE_ERROR = 0x02,
+	ADSP_OEM_CUSTOM_CHARGE_STATE_IDLE = 0x03,
+	ADSP_OEM_CUSTOM_CHARGE_STATE_FORCED_IDLE = 0x04,
+	ADSP_OEM_CUSTOM_CHARGE_STATE_NEAR_FULL = 0x05,
+};
+
 #define ADSP_OEM_CUSTOM_MAGIC_VAL 0xec
 #define ADSP_OEM_CUSTOM_VERSION_1 0x01
+#define ADSP_OEM_CUSTOM_CHARGE_PORT_DISABLED 0x00
+#define ADSP_OEM_CUSTOM_CHARGE_PORT_START 0x01
+#define ADSP_OEM_CUSTOM_CHARGE_PORT_COUNT CHARGE_PORT_COUNT
 
 typedef void (*adsp_comms_callback_t)(uint8_t fid, uint8_t addr, uint16_t data);
 
