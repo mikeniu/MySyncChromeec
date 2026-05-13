@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0dd13972_0e652a5a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-13T15:13:26Z",
+      "side": 1,
+      "message": "Nit: Can you say something like \"Pujjoga VIF\" or \"VIF fields\" to make it obvious from the headline that you\u0027re changing the VIF and not the board feature?",
+      "revId": "ebe1e6e633d7a1c1600242009d156be033ae81b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
