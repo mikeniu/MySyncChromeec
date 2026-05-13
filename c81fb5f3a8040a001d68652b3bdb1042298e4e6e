@@ -16,6 +16,24 @@
       "message": "It is not used by hook_call_deferred, suppose could be removed.",
       "revId": "c81fb5f3a8040a001d68652b3bdb1042298e4e6e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d5dd03c_ff3d2da2",
+        "filename": "zephyr/program/fatcat/lapis/src/board.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1512583
+      },
+      "writtenOn": "2026-05-13T01:37:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e8bf1dc_bbc4e694",
+      "revId": "c81fb5f3a8040a001d68652b3bdb1042298e4e6e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
