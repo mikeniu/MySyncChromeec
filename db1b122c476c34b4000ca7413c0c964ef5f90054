@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "506cbba3_26e953b7",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-13T10:26:29Z",
+      "side": 1,
+      "message": "Any chances to get it from config/dts. What if there is another project that have a different LED setup?",
+      "revId": "db1b122c476c34b4000ca7413c0c964ef5f90054",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
