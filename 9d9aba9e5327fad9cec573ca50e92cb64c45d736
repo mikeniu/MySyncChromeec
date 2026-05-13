@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6e8b2e8_03efd777",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-13T22:52:25Z",
+      "side": 1,
+      "message": "I think you can specify multiple \"TEST\u003d\" lines, so I would write it as:\n\nTEST\u003dCheck WP_L status correct.\nTEST\u003datest -s $DUT_HOSTNAME DesktopFirmwareFingerprintHostTestCases\nTEST\u003d./test/run_device_tests.py -b buccaneer --zephyr",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 56
+      },
+      "revId": "9d9aba9e5327fad9cec573ca50e92cb64c45d736",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
