@@ -30,6 +30,7 @@
 / {
 	aliases {
 		usb-hid-tp = &usb_hid_tp;
+		usb-hid-touch-screen = &usb_hid_touch_screen;
 	};
 };
 
@@ -61,6 +62,11 @@ zephyr_udc0: &usb0 {
 		max-pressure = <255>;
 	};
 
+	usb_hid_touch_screen: usb-hid-touch-screen {
+		compatible = "cros-ec,usb-hid-touch-screen";
+		reportid-max-count = <1>; /* TODO: CHECKME */
+	};
+
 	hid_kb_dev: hid-kb-dev {
 		compatible = "zephyr,hid-device";
 		label = "spikyrock keyboard";
@@ -73,10 +79,20 @@ zephyr_udc0: &usb0 {
 
 	hid_tp_dev: hid-tp-dev {
 		compatible = "zephyr,hid-device";
-		label = "spikyrock keyboard";
+		label = "spikyrock touchpad";
 		protocol-code = "mouse";
 		/* device cert (256 bytes) + some overhead */
 		out-report-size = <280>;
+		out-polling-period-us = <1000>;
+		in-report-size = <64>;
+		in-polling-period-us = <1000>;
+	};
+
+	hid_touch_screen_dev: hid-touch-screen-dev {
+		compatible = "zephyr,hid-device";
+		label = "spikyrock touch screen";
+		protocol-code = "none";
+		out-report-size = <64>; /* TODO: CHECK-ME */
 		out-polling-period-us = <1000>;
 		in-report-size = <64>;
 		in-polling-period-us = <1000>;

@@ -76,6 +76,20 @@ config USBD_HID_TOUCHPAD_QUEUE_SIZE
 	help
 	  The report queue size for Touchpad device.
 
+config USBD_HID_TOUCH_SCREEN
+	bool "Enable support USB HID touch screen"
+	depends on USB_DEVICE_STACK_NEXT
+	default n
+	help
+	  Enable touch screen support.
+
+config USBD_HID_TOUCH_SCREEN_QUEUE_SIZE
+	int "Touch screen report queue size"
+	depends on USBD_HID_TOUCH_SCREEN
+	default 8
+	help
+	  The report queue size for touch screen device.
+
 menu "USB device options"
 	depends on USB_DEVICE_STACK_NEXT
 
@@ -96,13 +110,6 @@ config USB_DEVICE_SN
 	default "0123456789ABCDEF"
 	help
 	  Placeholder for USB device serial number string.
-
-config USB_DEVICE_SN_HWINFO
-	bool "Use hwinfo driver for USB device serial number"
-	depends on HWINFO
-	help
-	  Use hwinfo driver to get USB device serial number,
-	  instead of a hardcoded string via USB_DEVICE_SN config.
 
 config USB_DEVICE_VID
 	hex "USB device Vendor ID"
