@@ -222,6 +222,9 @@
 /* Device version of product. */
 #define CONFIG_USB_BCD_DEV 0x0000
 
+#define CONFIG_USB_PD_XID 0
+#define CONFIG_SVDM_RSP_DFP_ONLY
+
 /*
  * These stack sizes were determined using "make analyzestack" for brya
  * and include about 15% headroom. Sizes are rounded to multiples of 64
