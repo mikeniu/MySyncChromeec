@@ -24,6 +24,12 @@ tests:
     extra_conf_files:
     - prj.conf
 
+  fingerprint.task.get_frame:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_FINGERPRINT_GET_FRAME=y
+    extra_conf_files:
+    - prj.conf
+
   fingerprint.task.init:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FINGERPRINT_INIT=y
