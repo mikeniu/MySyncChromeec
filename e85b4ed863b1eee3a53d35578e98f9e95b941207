@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2057fb77_6c31bd94",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-13T08:03:20Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 17.",
+      "parentUuid": "cdfbcbc0_2235091b",
+      "revId": "e85b4ed863b1eee3a53d35578e98f9e95b941207",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b6c2659e_41b8b800",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-05-12T23:34:27Z",
       "side": 1,
       "message": "In `iapcontrol.cc` within `OpenDevice`, the code iterates over `hid_interfaces_` to detach kernel drivers and claim interfaces.\n\n```cpp\nerr_code \u003d libusb_claim_interface(dev_handle_ptr_.get(), hid_interfaces_[i]);\nif (err_code !\u003d 0) {\n    LogInfo(\"[IAP] {} - claim interface ({}) failed...\", ...);\n    return -1; // \u003c-- LEAK\n}\n\n```\n\nIf this fails on a subsequent interface, the function returns `-1` immediately. Previously detached kernel drivers are not re-attached, and successfully claimed interfaces are never released.\n\n* **Remediation:** Call `ReleaseResource()` before returning `-1` to ensure graceful restoration of the OS driver state.",
+      "range": {
+        "startLine": 553,
+        "startChar": 0,
+        "endLine": 553,
+        "endChar": 54
+      },
+      "revId": "e85b4ed863b1eee3a53d35578e98f9e95b941207",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c940f2c_c975ca9a",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 553,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-13T08:03:20Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 17.",
+      "parentUuid": "b6c2659e_41b8b800",
       "range": {
         "startLine": 553,
         "startChar": 0,
@@ -64,6 +106,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a97d12a2_2b831758",
+        "filename": "util/elan/iapcontrol.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 921,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-13T08:03:20Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 17.",
+      "parentUuid": "db490aba_0a380be0",
+      "range": {
+        "startLine": 920,
+        "startChar": 0,
+        "endLine": 921,
+        "endChar": 28
+      },
+      "revId": "e85b4ed863b1eee3a53d35578e98f9e95b941207",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2ba6b76_a6ec07b3",
@@ -77,6 +143,24 @@
       "writtenOn": "2026-05-12T16:22:54Z",
       "side": 1,
       "message": "[Gerrit AI Review] **Style/Nit:** Typo: `file_Path` has a capital `P`. To fully match `snake_case` Google style, it should be `file_path`. (This will also require updating it below in `ParseCommandLine` and `main`).",
+      "revId": "e85b4ed863b1eee3a53d35578e98f9e95b941207",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c39b5807_fb68e924",
+        "filename": "util/elan/iaptool.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-13T08:03:20Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 17.",
+      "parentUuid": "a2ba6b76_a6ec07b3",
       "revId": "e85b4ed863b1eee3a53d35578e98f9e95b941207",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
