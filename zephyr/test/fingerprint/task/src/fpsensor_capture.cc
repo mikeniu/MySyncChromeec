@@ -313,10 +313,10 @@ ZTEST_USER(fpsensor_capture,
 	fingerprint_set_state(fp_sim, &state);
 
 	/* Prepare image. */
-	memset(image_buffer, 1, IMAGE_SIZE);
+	memset(image_buffer + IMAGE_OFFSET, 1, image_size);
 
 	/* Load image to simulator. */
-	fingerprint_load_image(fp_sim, image_buffer, image_size);
+	fingerprint_load_image(fp_sim, image_buffer, IMAGE_SIZE);
 
 	/* Ping fpsensor task. */
 	fingerprint_run_callback(fp_sim);
@@ -326,7 +326,8 @@ ZTEST_USER(fpsensor_capture,
 
 	/* Get fingerprint raw image and compare buffers. */
 	zassert_ok(ec_cmd_fp_frame(NULL, &frame_request, frame_buffer));
-	zassert_mem_equal(frame_buffer, image_buffer, image_size);
+	zassert_mem_equal(frame_buffer, image_buffer + IMAGE_OFFSET,
+			  image_size);
 }
 
 ZTEST_USER(fpsensor_capture,
@@ -363,10 +364,10 @@ ZTEST_USER(fpsensor_capture,
 	fingerprint_set_state(fp_sim, &state);
 
 	/* Prepare image. */
-	memset(image_buffer, 1, IMAGE_SIZE);
+	memset(image_buffer + IMAGE_OFFSET, 1, image_size);
 
 	/* Load image to simulator. */
-	fingerprint_load_image(fp_sim, image_buffer, image_size);
+	fingerprint_load_image(fp_sim, image_buffer, IMAGE_SIZE);
 
 	/* Ping fpsensor task. */
 	fingerprint_run_callback(fp_sim);
@@ -376,7 +377,8 @@ ZTEST_USER(fpsensor_capture,
 
 	/* Get fingerprint raw image and compare buffers. */
 	zassert_ok(ec_cmd_fp_frame_v1(NULL, &frame_request, frame_buffer));
-	zassert_mem_equal(frame_buffer, image_buffer, image_size);
+	zassert_mem_equal(frame_buffer, image_buffer + IMAGE_OFFSET,
+			  image_size);
 }
 
 ZTEST_USER(fpsensor_capture, test_finger_capture_get_frame_v1_size_too_big)

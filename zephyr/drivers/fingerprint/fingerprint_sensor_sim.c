@@ -128,21 +128,11 @@ static int fp_simulator_acquire_image(const struct device *dev,
 {
 	const struct fp_simulator_cfg *config = dev->config;
 	struct fp_simulator_data *data = dev->data;
-	uint32_t frame_size = 0;
-
-	for (uint8_t i = 0; i < config->sensor_info.num_capture_types; ++i) {
-		if (config->sensor_image_configs[i].fp_capture_type == mode) {
-			frame_size = config->sensor_image_configs[i].frame_size;
-			break;
-		}
-	}
-
-	size_t size = min(frame_size, image_buf_size);
 
 	data->state.last_acquire_image_mode = mode;
 
 	if (data->state.acquire_image_result == FINGERPRINT_SENSOR_SCAN_GOOD)
-		memcpy(image_buf, config->image_buffer, size);
+		memcpy(image_buf, config->image_buffer, image_buf_size);
 
 	return data->state.acquire_image_result;
 }
