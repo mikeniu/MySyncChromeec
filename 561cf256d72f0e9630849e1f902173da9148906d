@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db39f1a4_5837c4c7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1544342
+      },
+      "writtenOn": "2026-05-13T01:52:25Z",
+      "side": 1,
+      "message": "presubmit failed: 18:40:13: NOTICE: zephyr/program/bluey/mica/src/keyboard_customization.c: file should not be executable; chmod -x to fix",
+      "revId": "561cf256d72f0e9630849e1f902173da9148906d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
