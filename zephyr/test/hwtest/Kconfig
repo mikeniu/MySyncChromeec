@@ -86,6 +86,8 @@ config HW_TEST_FPSENSOR_AUTH_CRYPTO_STATEFUL
 	select ZTEST
 	select MOCK_ROLLBACK
 	select MOCK_OTP if NPCX_OTP_KEY
+	select MOCK_OTP if EGIS_ET171_OTP_KEY
+	select MOCK_OTP if FOCALTECH_OTP_KEY
 
 config HW_TEST_FPSENSOR_AUTH_CRYPTO_STATELESS
 	bool "FP sensor auth crypto stateless test"
@@ -235,6 +237,8 @@ config HW_TEST_ROLLBACK_ENTROPY
 	bool "Rollback entropy test"
 	select ZTEST
 	select MOCK_OTP if NPCX_OTP_KEY
+	select MOCK_OTP if EGIS_ET171_OTP_KEY
+	select MOCK_OTP if FOCALTECH_OTP_KEY
 	depends on PLATFORM_EC_ROLLBACK
 	help
 	  The test verifies rollback entropy functionality.
