@@ -395,11 +395,20 @@ static void tp_set_protocol(const struct device *dev, uint8_t protocol)
 	touchpad.report_protocol = protocol;
 }
 
+static int tp_set_report(const struct device *dev, const uint8_t type,
+			 const uint8_t id, const uint16_t len,
+			 const uint8_t *const buf)
+{
+	LOG_HEXDUMP_ERR(buf, len, "unsupported to set report:");
+	return -ENOTSUP;
+}
+
 static const struct hid_device_ops ops = {
 	.iface_ready = tp_iface_ready,
 	.get_report = tp_get_report,
 	.input_report_done = tp_in_ready,
 	.set_protocol = tp_set_protocol,
+	.set_report = tp_set_report,
 };
 
 __overridable void set_touchpad_report(struct usb_hid_touchpad_report *report)
