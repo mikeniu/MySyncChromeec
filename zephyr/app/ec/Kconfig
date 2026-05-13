@@ -207,4 +207,8 @@ config WDT_SHELL
 config POWEROFF
 	default y if SOC_RTS5912_ULPM
 
+# Turn off by default to save program memory
+config SHELL_ALIASES
+  default n
+
 endif # CROS_EC
