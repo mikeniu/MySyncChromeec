@@ -154,6 +154,12 @@ test_mockable void power_signal_interrupt(enum power_signal signal, int value)
 
 	atomic_set_bit_to(&power_signals, signal, value);
 	check_debug(signal);
+
+	if (signal == PWR_ALL_SYS_PWRGD) {
+		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_all_sys_pwrgd_out),
+			power_signal_get(PWR_ALL_SYS_PWRGD));
+	}
+
 	if (!IS_ENABLED(CONFIG_EMUL_AP_PWRSEQ_DRIVER)) {
 		ap_pwrseq_post_event(ap_pwrseq_dev,
 				     AP_PWRSEQ_EVENT_POWER_SIGNAL);
