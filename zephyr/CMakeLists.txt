@@ -609,6 +609,9 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TOUCHPAD_ELAN
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TOUCHPAD_FOCAL
                                                 "${PLATFORM_EC}/driver/touchpad_focal.c")
 
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TOUCH_SCREEN_ACER
+                                                "${PLATFORM_EC}/driver/touch_screen_acer.c")
+
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CONSOLE_CMD_CHARGEN
                                                 "${PLATFORM_EC}/common/chargen.c")
 

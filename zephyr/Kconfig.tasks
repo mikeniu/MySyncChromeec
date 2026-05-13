@@ -277,7 +277,22 @@ config TASK_TOUCHPAD_STACK_SIZE
 
 	  See b/176180736 for checking these stack sizes.
 
-endif # HAS_TASK_CHG_RAMP
+endif # HAS_TASK_TOUCHPAD
+
+config HAS_TASK_TOUCH_SCREEN
+	bool
+	help
+	  TODO
+
+if HAS_TASK_TOUCH_SCREEN
+
+config TASK_TOUCH_SCREEN_STACK_SIZE
+	int "TOUCH_SCREEN task stack size"
+	default 1280
+	help
+	  TODO
+
+endif # HAS_TASK_TOUCH_SCREEN
 
 config HAS_TASK_RWSIG
 	bool # Selected by PLATFORM_EC_RWSIG
