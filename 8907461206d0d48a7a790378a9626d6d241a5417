@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "411eda07_1b1775eb",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-13T22:39:18Z",
+      "side": 1,
+      "message": "Currently, the initialization phase traverses the entire USB bus twice (once in `GetDeviceCount`, again in `OpenDevice`), and uses `ConnectDevice` as an unnecessary wrapper.\n\n* **Action:** Delete `GetDeviceCount` and `ConnectDevice` entirely from `iap_control.cc` and `iap_control.h`.  \n* **Action:** Update `Initialize` to call `OpenDevice` directly:\n\n```c\nint IapControl::Initialize(uint16_t vid, uint16_t pid)\n{\n\tReleaseResource();\n\n\tif (!libusb_initialized_) {\n\t\tint err_code \u003d libusb_init(nullptr);\n\t\tif (err_code !\u003d 0) {\n\t\t\tLogInfo(\"[IAP] {} - libusb_init failed with code: {} ({})\\n\",\n\t\t\t\t__func__, err_code, libusb_error_name(err_code));\n\t\t\treturn -1;\n\t\t}\n\t\tlibusb_initialized_ \u003d true;\n\t}\n\n\tdevice_status_ \u003d OpenDevice(vid, pid);\n\tif (device_status_ \u003d\u003d -1) {\n\t\tLogInfo(\"[IAP] {} - failed to find or open device\\n\", __func__);\n\t\treturn -1;\n\t}\n\n\treturn 0;\n}\n\n```",
+      "range": {
+        "startLine": 94,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 42
+      },
+      "revId": "8907461206d0d48a7a790378a9626d6d241a5417",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3254c21e_9e2c7b6a",
+        "filename": "util/elan/iap_tool.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-13T22:39:18Z",
+      "side": 1,
+      "message": "* **Missing standard library headers:** `iap_tool.cc` utilizes `std::cerr` but doesn\u0027t `#include \u003ciostream\u003e`. It currently relies on transitively including it via `iap_control.h`. Explicitly add `#include \u003ciostream\u003e` to `iap_tool.cc`.",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 66,
+        "endChar": 29
+      },
+      "revId": "8907461206d0d48a7a790378a9626d6d241a5417",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91991931_d624ca59",
+        "filename": "util/elan/iap_tool.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-13T22:39:18Z",
+      "side": 1,
+      "message": "`std::from_chars` does not automatically ignore `0x` or `0X` prefixes. If a user passes standard hex notation (e.g., `-V 0x04F3`), the parser will fail and exit.\n\n* **Action:** Update `ParseHex` in `util/elan/iap_tool.cc` to strip the prefix before parsing:\n\n```c\nstd::optional\u003cuint16_t\u003e ParseHex(std::string_view strv)\n{\n\tif (strv.empty()) return std::nullopt;\n\n\t// Strip standard hex prefixes\n\tif (strv.starts_with(\"0x\") || strv.starts_with(\"0X\")) {\n\t\tstrv.remove_prefix(2);\n\t}\n\n\tuint16_t val;\n\tauto [ptr, ec] \u003d std::from_chars(\n\t\tstrv.data(), strv.data() + strv.size(), val, 16);\n\n\tif (ec \u003d\u003d std::errc() \u0026\u0026 ptr \u003d\u003d strv.data() + strv.size()) {\n\t\treturn val;\n\t}\n\treturn std::nullopt;\n}\n\n```",
+      "range": {
+        "startLine": 83,
+        "startChar": 0,
+        "endLine": 98,
+        "endChar": 2
+      },
+      "revId": "8907461206d0d48a7a790378a9626d6d241a5417",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e79bd20a_57d25e22",
+        "filename": "util/elan/utility.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-13T22:39:18Z",
+      "side": 1,
+      "message": "Currently, `LogInfo` handles both standard operational updates and critical failures. It is best practice in CLI utilities to route errors to standard error so users can cleanly pipe output.\n\n* **Action:** In `util/elan/utility.h`, leverage the C++23 `std::print` stream overload to add a `LogErr` function:\n\n```c\n#include \u003ccstdio\u003e\n#include \u003cprint\u003e\n#include \u003cutility\u003e\n\ntemplate \u003ctypename... Args\u003e\nvoid LogInfo(std::format_string\u003cArgs...\u003e fmt, Args \u0026\u0026...args)\n{\n\tstd::print(stdout, fmt, std::forward\u003cArgs\u003e(args)...);\n}\n\ntemplate \u003ctypename... Args\u003e\nvoid LogErr(std::format_string\u003cArgs...\u003e fmt, Args \u0026\u0026...args)\n{\n\tstd::print(stderr, fmt, std::forward\u003cArgs\u003e(args)...);\n}\n\n```\n\n* **Action:** Go through `iap_control.cc` and `iap_tool.cc` and swap `LogInfo` to `LogErr` for all error/failure cases.",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 1
+      },
+      "revId": "8907461206d0d48a7a790378a9626d6d241a5417",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
