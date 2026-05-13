@@ -94,6 +94,30 @@
       },
       "revId": "51764659d55e8dd4da0501b58a1df816a9303cdc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8312cac0_45e894bb",
+        "filename": "board/buccaneer/gpio.inc",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 3387694
+      },
+      "writtenOn": "2026-05-13T08:00:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a3993c17_991b5d43",
+      "range": {
+        "startLine": 6,
+        "startChar": 1,
+        "endLine": 45,
+        "endChar": 6
+      },
+      "revId": "51764659d55e8dd4da0501b58a1df816a9303cdc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
