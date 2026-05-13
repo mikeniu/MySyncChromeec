@@ -16,6 +16,24 @@
       "message": "```\nWARNING: zephyr/program/bluey/mica/src/keyboard_customization.c: needs formatting\nNOTICE: You can fix formatting errors by running:\n        cros format zephyr/program/bluey/mica/src/keyboard_customization.c\n```\n\nPlease fix the format.",
       "revId": "73e09eabf66e0830e94a29c28ad885d047993820",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77f5b100_fbd95f59",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-05-13T03:06:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b2e2beb8_225ad6ad",
+      "revId": "73e09eabf66e0830e94a29c28ad885d047993820",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
