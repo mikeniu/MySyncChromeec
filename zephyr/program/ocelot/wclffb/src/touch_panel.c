@@ -19,6 +19,7 @@ LOG_MODULE_DECLARE(touch_en, LOG_LEVEL_INF);
 #define TOUCH_ENABLE_DELAY_MS (500 * USEC_PER_MSEC)
 #define TOUCH_DISABLE_DELAY_MS (0 * USEC_PER_MSEC)
 
+#if 0
 void touch_disable(void)
 {
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_touch_en), 0);
@@ -70,3 +71,4 @@ static void touch_enable_init(void)
 	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_soc_edp_bl_en));
 }
 DECLARE_HOOK(HOOK_INIT, touch_enable_init, HOOK_PRIO_DEFAULT);
+#endif

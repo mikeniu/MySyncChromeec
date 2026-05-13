@@ -7,7 +7,7 @@
 		compatible = "cros-ec,fans";
 
 		fan0: fan_0 {
-			pwms = <&pwm6 PWM_CHANNEL_6 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
+			pwms = <&pwm1 PWM_CHANNEL_1 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
 			rpm-min = <2500>;
 			rpm-start = <2500>;
 			rpm-max = <6000>;
@@ -19,10 +19,10 @@
 	};
 };
 
-&pwm6 {
+&pwm1{
 	status = "okay";
 	prescaler-cx = <PWM_PRESCALER_C6>;
-	pinctrl-0 = <&pwm6_gpa6_default>;
+	pinctrl-0 = <&pwm1_gpa1_default>;
 	pinctrl-names = "default";
 };
 

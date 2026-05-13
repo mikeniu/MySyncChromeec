@@ -22,10 +22,12 @@
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "lid_interrupt";
 		};
+		/*
 		int_soc_edp_bl_en: soc_edp_bl_en {
 			irq-pin = <&gpio_soc_edp_bl_en>;
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "soc_edp_bl_interrupt";
 		};
+		*/
 	};
 };

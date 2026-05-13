@@ -6,7 +6,7 @@
  / {
 	usba {
 		compatible = "cros-ec,usba-port-enable-pins";
-		enable-pins = <&gpio_en_pp5000_usba>;
-		status = "okay";
+		/* enable-pins = <&gpio_en_pp5000_usba>; */
+		status = "disabled";
 	};
  };
