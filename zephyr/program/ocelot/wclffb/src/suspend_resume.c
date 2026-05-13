@@ -11,7 +11,7 @@
 
 LOG_MODULE_REGISTER(board_init, LOG_LEVEL_INF);
 
-static void matsu_power_event_handler(struct ap_power_ev_callback *callback,
+static void wclffb_power_event_handler(struct ap_power_ev_callback *callback,
 				      struct ap_power_ev_data data)
 {
 	switch (data.event) {
@@ -42,7 +42,7 @@ static int init_suspend_resume(void)
 		return -EINVAL;
 	}
 
-	ap_power_ev_init_callback(&cb, matsu_power_event_handler,
+	ap_power_ev_init_callback(&cb, wclffb_power_event_handler,
 				  AP_POWER_PRE_INIT | AP_POWER_STARTUP |
 					  AP_POWER_HARD_OFF);
 	ap_power_ev_add_callback(&cb);

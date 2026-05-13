@@ -6,12 +6,22 @@
 #include <cros/thermistor/thermistor.dtsi>
 
 / {
-	temp_ddr_soc_thermistor: ddr-soc-thermistor {
+	temp_soc_thermistor: soc-thermistor {
 		compatible = "cros-ec,temp-sensor-thermistor";
 		thermistor = <&thermistor_3V3_30K9_47K_4050B>;
-		adc = <&adc_ddr_soc_therm>;
+		adc = <&adc_soc_therm>;
 	};
-	temp_regulator_thermistor: regulator-thermistor {
+	temp_cpu_vr_thermistor: cpu-vr-thermistor {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_30K9_47K_4050B>;
+		adc = <&adc_cpu_vr_therm>;
+	};
+	temp_ssd_thermistor: ssd-thermistor {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_30K9_47K_4050B>;
+		adc = <&adc_ssd_therm>;
+	};
+	temp_regulator_thermistor: ambient-thermistor {
 		compatible = "cros-ec,temp-sensor-thermistor";
 		thermistor = <&thermistor_3V3_30K9_47K_4050B>;
 		adc = <&adc_temp_ambient>;
@@ -24,17 +34,33 @@
 
 	named-temp-sensors {
 		compatible = "cros-ec,temp-sensors";
-		temp_ddr_soc: ddr-soc-thermistor {
+		temp_soc: soc-thermistor {
 			temp-fan-off = <40>;
 			temp-fan-max = <70>;
 			temp-host-high = <75>;
 			temp-host-halt = <85>;
 			temp-host-release-high = <70>;
 			temp-host-release-halt = <80>;
-			sensor = <&temp_ddr_soc_thermistor>;
+			sensor = <&temp_soc_thermistor>;
 			power-good-pin = <&gpio_pg_vccio_od>;
 		};
-		temp_regulator: regulator-thermistor {
+		temp_cpu_vr: cpu-vr-thermistor {
+			temp-host-high = <75>;
+			temp-host-halt = <85>;
+			temp-host-release-high = <70>;
+			temp-host-release-halt = <80>;
+			sensor = <&temp_cpu_vr_thermistor>;
+			power-good-pin = <&gpio_pg_vccio_od>;
+		};
+		temp_ssd: ssd-thermistor {
+			temp-host-high = <75>;
+			temp-host-halt = <85>;
+			temp-host-release-high = <70>;
+			temp-host-release-halt = <80>;
+			sensor = <&temp_ssd_thermistor>;
+			power-good-pin = <&gpio_pg_vccio_od>;
+		};
+		temp_regulator: ambient-thermistor {
 			temp-host-high = <75>;
 			temp-host-halt = <85>;
 			temp-host-release-high = <70>;
