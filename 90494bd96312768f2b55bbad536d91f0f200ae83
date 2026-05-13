@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed856f66_0d633429",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 19
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1544342
+      },
+      "writtenOn": "2026-05-13T06:29:35Z",
+      "side": 1,
+      "message": "Add \"LOW_COVERAGE_REASON\u003dTest will be tracked in b:502101220\" here for Code-Coverage",
+      "revId": "90494bd96312768f2b55bbad536d91f0f200ae83",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
