@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bc73eb8_af59184c",
+        "filename": "zephyr/program/fpmcu/ft9001/CMakeLists.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-13T14:36:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91ee5f9f_eae6062b",
+      "revId": "71cf62c43b3931f42948db2ce2eae7695c2758dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "94eb173d_2b0b4ba2",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-05-13T14:14:13Z",
       "side": 1,
       "message": "Maybe even application level?",
+      "range": {
+        "startLine": 17,
+        "startChar": 25,
+        "endLine": 17,
+        "endChar": 36
+      },
+      "revId": "71cf62c43b3931f42948db2ce2eae7695c2758dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aab8f5e3_eb10842c",
+        "filename": "zephyr/program/fpmcu/ft9001/src/otp_init.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-13T14:36:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94eb173d_2b0b4ba2",
       "range": {
         "startLine": 17,
         "startChar": 25,
