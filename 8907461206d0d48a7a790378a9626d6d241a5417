@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1eb320fc_fff8ca91",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-13T22:46:13Z",
+      "side": 1,
+      "message": "Once the `.clang-format` is checked in, future `repo upload`s should warn if there is a problem with formatting and tell you how to run `cros format` to fix it.",
+      "parentUuid": "edc8a1b3_39599888",
+      "revId": "8907461206d0d48a7a790378a9626d6d241a5417",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "411eda07_1b1775eb",
         "filename": "util/elan/iap_control.cc",
         "patchSetId": 18
