@@ -54,6 +54,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "019af1ff_990741ac",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 4684390
+      },
+      "writtenOn": "2026-05-13T03:57:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "afc29ac7_170f3204",
+      "revId": "b00b3fb7ea3b5d4542739f5b77b12d4207552f5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b0cbf651_c97cc23e",
