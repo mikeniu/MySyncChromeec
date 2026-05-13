@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a3a1e78_5f6a3928",
+        "filename": "zephyr/program/ocelot/ocicat/project.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-05-13T05:59:24Z",
+      "side": 1,
+      "message": "Is it still needed ?",
+      "revId": "5f978713390ea4458d507a0eae5d5b9844066914",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
