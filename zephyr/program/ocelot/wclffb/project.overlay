@@ -1,0 +1,73 @@
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* ocelot program common DTS includes */
+
+#include <cros/integrated_fwid.dtsi>
+#include <cros/cbi_ufsc_std_schema.dtsi>
+#include <cros/cbi_ufsc_oem_schema.dtsi>
+#include "matsu_ec_ufsc.dtsi"
+
+/* matsu project DTS includes */
+
+#include "binman.dtsi"
+#include "gpios.dtsi"
+#include "power_signals.dtsi"
+
+/*
+ * Map I2C buses to common names
+ */
+
+i2c_port_pd1: &i2c1 {};
+i2c_port_pd2: &i2c3 {};
+i2c_port_charger: &i2c4 {};
+i2c_port_ish: &i2c5 {};
+
+/*
+ * Map GPIOs used for interrupts to common names
+ */
+
+gpio_acok: &gpio_acok_od {};
+gpio_lid: &gpio_lid_open {};
+gpio_pwrbtn: &gpio_gsc_ec_pwr_btn_odl {};
+gpio_fan_control: &gpio_en_pp5000_fan {};
+gpio_all_sys_pwr_good: &gpio_all_sys_pwrgd_r {};
+
+/* Map tachometers to common names */
+tach_fan0: &tach0 {};
+
+#include "adc.dtsi"
+#include "battery.dtsi"
+#include "console.dtsi"
+#include "fan.dtsi"
+#include "i2c.dtsi"
+#include "interrupts.dtsi"
+#include "keyboard.dtsi"
+#include "led_pins.dtsi"
+#include "led_policy.dtsi"
+#include "pwm.dtsi"
+#include "temp_sensors.dtsi"
+#include "usba.dtsi"
+#include "usb_typec.dtsi"
+
+#include "../ite_hibernate.dtsi"
+
+/ {
+	cse_early_recovery: cse-early-recovery {
+		compatible = "cros-ec,cse-early-rec";
+		cse-early-rec-gpios = <&gpioj 3 (GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH)>;
+	};
+};
+
+/* matsu overrides follow... */
+
+&espi0 {
+	status = "okay";
+};
+
+&sha0 {
+	status = "okay";
+};
+

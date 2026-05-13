@@ -178,6 +178,11 @@ matsu = register_it8xxx2_project(
     project_name="matsu",
 )
 
+wclffb = register_it8xxx2_project(
+    project_name="wclffb",
+    chip="it8xxx2/it82002bw",
+)
+
 matsu.variant(
     project_name="matsu_it82000",
     zephyr_board="it8xxx2/it82000bw",
@@ -226,6 +231,7 @@ register_ish_project(
 # must not change after the first RO release.
 assert_rw_fwid_DO_NOT_EDIT(project_name="kodkod", addr=0x80404)
 assert_rw_fwid_DO_NOT_EDIT(project_name="matsu", addr=0x60098)
+assert_rw_fwid_DO_NOT_EDIT(project_name="wclffb", addr=0x60098)
 assert_rw_fwid_DO_NOT_EDIT(project_name="matsu_it82000", addr=0x60098)
 assert_rw_fwid_DO_NOT_EDIT(project_name="ocelotrvp-npcx", addr=0x80144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="ocelotrvp-ite", addr=0x60098)
