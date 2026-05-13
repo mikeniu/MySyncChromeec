@@ -9275,6 +9275,28 @@ struct ec_response_get_boot_time {
  */
 #define EC_CMD_ENABLE_OFFMODE_HEARTBEAT 0x0606
 
+/* Get battery C-FET status */
+#define EC_CMD_BATTERY_GET_CFET_STATUS 0x0607
+
+/**
+ * struct ec_params_battery_cfet_status - Battery C-FET status parameters
+ * @index: Battery index.
+ */
+struct ec_params_battery_cfet_status {
+	uint8_t index;
+} __ec_align1;
+
+/**
+ * struct ec_response_battery_cfet_status - Battery C-FET status response
+ * @status: bitfield of C-FET status. See EC_CFET_STATUS_*
+ */
+struct ec_response_battery_cfet_status {
+	uint32_t status;
+} __ec_align4;
+
+/* C-FET is disabled */
+#define EC_CFET_STATUS_CHARGE_DISABLED BIT(0)
+
 /*****************************************************************************/
 /*
  * Reserve a range of host commands for board-specific, experimental, or
