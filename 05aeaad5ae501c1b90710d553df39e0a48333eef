@@ -54,6 +54,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "91f98903_f5107ad4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 25
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-13T15:47:15Z",
+      "side": 1,
+      "message": "You build and run the hibernate test using `./twister -ivc -T zephyr/test/hibernate_z5`.  So if you create a new test for wot, it might be `./twister -ivc -T zephyr/test/wot`.",
+      "parentUuid": "93f7cf02_43742526",
+      "revId": "05aeaad5ae501c1b90710d553df39e0a48333eef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1900cb08_3c439712",
