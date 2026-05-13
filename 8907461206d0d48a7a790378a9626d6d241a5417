@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "edc8a1b3_39599888",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-13T22:44:27Z",
+      "side": 1,
+      "message": "To ensure the code is formatted correctly, please add a `.clang-format` file in `util/elan` with the following contents:\n\n```\nBasedOnStyle: Google\n```\n\nAdd the file to this CL and then run `clang-format` on all of these files to format them correctly:\n\n```\nfind util/elan/ -iname \"*.h\" -o -iname \"*.cc\" | xargs clang-format -i\n```",
+      "revId": "8907461206d0d48a7a790378a9626d6d241a5417",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "411eda07_1b1775eb",
         "filename": "util/elan/iap_control.cc",
         "patchSetId": 18
