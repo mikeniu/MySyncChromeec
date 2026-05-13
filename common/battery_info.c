@@ -6,6 +6,7 @@
  */
 
 #include "battery.h"
+#include "battery_fuel_gauge.h"
 #include "charge_state.h"
 #include "common.h"
 #include "console.h"
@@ -25,6 +26,10 @@
  */
 struct battery_static_info battery_static[CONFIG_BATTERY_COUNT];
 struct ec_response_battery_dynamic_info_v1 battery_dynamic[CONFIG_BATTERY_COUNT];
+
+#ifdef CONFIG_HOSTCMD_BATTERY_CFET_STATUS
+static int battery_cfet_status[CONFIG_BATTERY_COUNT];
+#endif
 
 /*
  * Store the previous state of charge values to detect changes and trigger
@@ -222,6 +227,35 @@ DECLARE_HOST_COMMAND(EC_CMD_BATTERY_GET_DYNAMIC,
 		     EC_VER_MASK(0) | EC_VER_MASK(1));
 #endif /* CONFIG_HOSTCMD_BATTERY_INFO */
 
+#ifdef CONFIG_HOSTCMD_BATTERY_CFET_STATUS
+static enum ec_status
+host_command_battery_get_cfet_status(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_battery_cfet_status *p = args->params;
+	struct ec_response_battery_cfet_status *r = args->response;
+
+	if (p->index >= CONFIG_BATTERY_COUNT)
+		return EC_RES_INVALID_PARAM;
+
+	/*
+	 * TODO: battery_is_charge_fet_disabled() currently only supports the
+	 * active battery config. For systems with multiple batteries, this
+	 * might need to be updated to support an index.
+	 */
+	if (p->index != BATT_IDX_MAIN)
+		return EC_RES_INVALID_PARAM;
+
+	r->status = battery_cfet_status[p->index];
+	ccprintf("C-FET status: %d\n", r->status);
+
+	args->response_size = sizeof(*r);
+
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_BATTERY_GET_CFET_STATUS,
+		     host_command_battery_get_cfet_status, EC_VER_MASK(0));
+#endif /* CONFIG_HOSTCMD_BATTERY_CFET_STATUS */
+
 void battery_memmap_refresh(enum battery_index index)
 {
 	if (*host_get_memmap(EC_MEMMAP_BATT_INDEX) == index)
@@ -338,6 +372,10 @@ void battery_poll_dynamic_info(void)
 #endif
 
 	battery_set_dynamic_info(batt, ac_present, is_charging, charger_idle);
+
+#ifdef CONFIG_HOSTCMD_BATTERY_CFET_STATUS
+	battery_cfet_status[BATT_IDX_MAIN] = battery_is_charge_fet_disabled();
+#endif
 }
 
 int update_static_battery_info(void)
