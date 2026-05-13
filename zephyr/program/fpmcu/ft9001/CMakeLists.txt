@@ -23,4 +23,6 @@ add_custom_target(config_page_binary ALL
   VERBATIM
 )
 
+zephyr_library_sources_ifdef(CONFIG_FOCALTECH_OTP_KEY "src/otp_init.c")
+
 endif()
