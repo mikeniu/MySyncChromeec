@@ -38,6 +38,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4f0f8913_93175d93",
+        "filename": "util/elan/file_control.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-13T22:55:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This file does not use `\u003ciostream\u003e`. Please remove it.",
+      "revId": "8907461206d0d48a7a790378a9626d6d241a5417",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "411eda07_1b1775eb",
         "filename": "util/elan/iap_control.cc",
         "patchSetId": 18
@@ -55,6 +72,40 @@
         "endLine": 94,
         "endChar": 42
       },
+      "revId": "8907461206d0d48a7a790378a9626d6d241a5417",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c884caa_cf63f432",
+        "filename": "util/elan/iap_control.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-13T22:55:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This header does not use `\u003ciostream\u003e`. Please remove it to follow \"Include What You Use\" principles.",
+      "revId": "8907461206d0d48a7a790378a9626d6d241a5417",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9c8496a_d30a6189",
+        "filename": "util/elan/iap_tool.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-13T22:55:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] You are using `std::cerr` and `std::fflush(stdout)` below, but you have not included `\u003ciostream\u003e` or `\u003ccstdio\u003e`. Relying on transitive includes is discouraged. Please explicitly `#include \u003ciostream\u003e` and `#include \u003ccstdio\u003e` here.",
       "revId": "8907461206d0d48a7a790378a9626d6d241a5417",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
