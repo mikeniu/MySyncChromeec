@@ -24,3 +24,7 @@ add_custom_target(config_page_binary ALL
 )
 
 endif()
+
+if(DEFINED CONFIG_CROS_EC_RW AND DEFINED CONFIG_FOCALTECH_OTP_KEY)
+  zephyr_library_sources("src/otp_init.c")
+endif()
