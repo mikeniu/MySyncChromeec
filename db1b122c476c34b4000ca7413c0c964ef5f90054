@@ -16,6 +16,24 @@
       "message": "Any chances to get it from config/dts. What if there is another project that have a different LED setup?",
       "revId": "db1b122c476c34b4000ca7413c0c964ef5f90054",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b61d8971_3ddb947b",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-05-13T11:24:58Z",
+      "side": 1,
+      "message": "Moved to Kconfig.fingerprint. Anyway, I would expect that different setup might be RGB LED or simple ON/OFF LED. This would mean some rework in the code.",
+      "parentUuid": "506cbba3_26e953b7",
+      "revId": "db1b122c476c34b4000ca7413c0c964ef5f90054",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
