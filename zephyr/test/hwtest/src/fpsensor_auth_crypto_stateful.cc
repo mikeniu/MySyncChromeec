@@ -37,7 +37,7 @@ static_assert(kFakeUserId.size() == FP_CONTEXT_USERID_BYTES);
 
 void *setup_suite(void)
 {
-	if (IS_ENABLED(CONFIG_OTP_KEY)) {
+	if (IS_ENABLED(CONFIG_NPCX_OTP_KEY)) {
 		std::ranges::copy(default_fake_otp_key,
 				  mock_otp.otp_key_buffer);
 	}
