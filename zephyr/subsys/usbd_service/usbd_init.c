@@ -64,6 +64,16 @@ __overridable void set_touchpad_report(struct usb_hid_touchpad_report *report)
 }
 #endif /* defined(CONFIG_CROS_EC_RO) && defined(CONFIG_USBD_HID_TOUCHPAD) */
 
+#if defined(CONFIG_CROS_EC_RO) && defined(CONFIG_USBD_HID_TOUCH_SCREEN)
+#include "usb_hid_touch_screen.h"
+
+__overridable void
+set_touch_screen_report(struct usb_hid_touch_screen_report *report)
+{
+}
+#endif /* defined(CONFIG_CROS_EC_RO) && defined(CONFIG_USBD_HID_TOUCH_SCREEN) \
+	*/
+
 bool usb_is_suspended(void)
 {
 	return usbd_is_suspended(&usb_device);

@@ -12,5 +12,11 @@
 			flags = <GPIO_INT_EDGE_FALLING>;
 			handler = "touchpad_interrupt";
 		};
+
+		int_touch_screen: touch_screen {
+			irq-pin = <&touch_screen_int_odl>;
+			flags = <GPIO_INT_EDGE_FALLING>;
+			handler = "touch_screen_interrupt";
+		};
 	};
 };
