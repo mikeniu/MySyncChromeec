@@ -22,6 +22,29 @@
       },
       "revId": "9d9aba9e5327fad9cec573ca50e92cb64c45d736",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "098470ff_b2746b42",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-13T22:53:39Z",
+      "side": 1,
+      "message": "This isn\u0027t Zephyr, so you shouldn\u0027t run the tests with the `--zephyr` flag. Please mention which board and revision you are running the unit tests on (e.g., `quincy v3`)",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 56
+      },
+      "revId": "9d9aba9e5327fad9cec573ca50e92cb64c45d736",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
