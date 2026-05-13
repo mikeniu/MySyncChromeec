@@ -16,6 +16,24 @@
       "message": "I believe this should be moved to common fingerprint code.",
       "revId": "43fc6d5154c5839e069e04191ed2dcd17631ced7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fdda424f_2b1a2315",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-13T07:40:59Z",
+      "side": 1,
+      "message": "You mean shim or fpsensor.cc?",
+      "parentUuid": "33f87432_0aa0e51f",
+      "revId": "43fc6d5154c5839e069e04191ed2dcd17631ced7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
