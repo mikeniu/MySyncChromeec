@@ -63,7 +63,7 @@ int get_rvp_id_config(enum rvp_id_type id_type)
 
 	gpio_port = rvp_config->board_gpios_config[0].port;
 	if (!device_is_ready(gpio_port)) {
-		LOG_ERR("RVP_ID: gpio controller port is not initialized, cannot access it");
+		LOG_ERR_DEVICE_NOT_READY(gpio_port);
 		return -ENODEV;
 	}
 
@@ -206,8 +206,7 @@ static void ap_power_state_callback(const struct device *dev,
 		for (int i = 0; i < BOM_GPIOS_COUNT; i++) {
 			gpio_port = rvp_config->bom_gpios_config[i].port;
 			if (!device_is_ready(gpio_port)) {
-				LOG_DBG("RVP_ID: Initializing %s",
-					SAFE_DEV_NAME(gpio_port));
+				LOG_ERR_DEVICE_NOT_READY(gpio_port);
 				ret = device_init(gpio_port);
 				if (ret) {
 					LOG_ERR("RVP_ID: Cannot init driver '%s': %d (BOM GPIO %d)",
@@ -219,8 +218,7 @@ static void ap_power_state_callback(const struct device *dev,
 		for (int i = 0; i < FAB_GPIOS_COUNT; i++) {
 			gpio_port = rvp_config->fab_gpios_config[i].port;
 			if (!device_is_ready(gpio_port)) {
-				LOG_DBG("RVP_ID: Initializing %s",
-					SAFE_DEV_NAME(gpio_port));
+				LOG_ERR_DEVICE_NOT_READY(gpio_port);
 				ret = device_init(gpio_port);
 				if (ret) {
 					LOG_ERR("RVP_ID: Cannot init driver '%s': %d (FAB GPIO %d)",
@@ -232,8 +230,7 @@ static void ap_power_state_callback(const struct device *dev,
 		for (int i = 0; i < BOARD_GPIOS_COUNT; i++) {
 			gpio_port = rvp_config->board_gpios_config[i].port;
 			if (!device_is_ready(gpio_port)) {
-				LOG_DBG("RVP_ID: Initializing %s",
-					SAFE_DEV_NAME(gpio_port));
+				LOG_ERR_DEVICE_NOT_READY(gpio_port);
 				ret = device_init(gpio_port);
 				if (ret) {
 					LOG_ERR("RVP_ID: Cannot init driver '%s': %d (BOARD GPIO %d)",
