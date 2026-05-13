@@ -296,6 +296,45 @@ ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_overflow)
 			  "Output buffer modified during failure path");
 }
 
+ZTEST(fpsensor_get_frame, test_get_frame_physical_hardware_buffer_overflow)
+{
+	uint8_t output_buffer[kMaxReadSize];
+	memset(output_buffer, 0xA5, sizeof(output_buffer));
+
+	uint32_t size = kMaxReadSize;
+
+	/*
+	 * Land exactly 1 byte past the absolute array limit after the shift:
+	 * (offset + FP_SENSOR_IMAGE_OFFSET + size) == sizeof(fp_buffer) + 1
+	 */
+	uint32_t offset =
+		(sizeof(fp_buffer) + 1) - FP_SENSOR_IMAGE_OFFSET - size;
+
+	/* Verify that the offset calculation did not underflow. */
+	zassert_true(
+		(sizeof(fp_buffer) + 1) >= (FP_SENSOR_IMAGE_OFFSET + size),
+		"Test setup: Offset calculation wrapped. "
+		"FP_SENSOR_IMAGE_OFFSET + size must be <= sizeof(fp_buffer) + 1.");
+
+	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
+
+	/*
+	 * Cache Pollution: Use the test-only setter to override the cache value
+	 * without violating strict aliasing rules.
+	 */
+	global_context.fp_frame_size_cache.set_frame_size(
+		FP_CAPTURE_SIMPLE_IMAGE, sizeof(fp_buffer));
+
+	enum ec_status status = get_frame(offset, size, output_buffer);
+
+	zassert_equal(status, EC_RES_INVALID_PARAM,
+		      "Expected skipped offset overflow failure");
+
+	/* Verify buffer integrity remains intact */
+	zassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer),
+			  "Output buffer modified during failure path");
+}
+
 ZTEST(fpsensor_get_frame, test_get_frame_absolute_success)
 {
 	uint8_t output_buffer[kMaxReadSize];
