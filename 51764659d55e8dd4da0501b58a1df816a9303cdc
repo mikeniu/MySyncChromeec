@@ -46,6 +46,30 @@
       },
       "revId": "51764659d55e8dd4da0501b58a1df816a9303cdc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f279854_4411a3f4",
+        "filename": "board/buccaneer/gpio.inc",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 3387694
+      },
+      "writtenOn": "2026-05-13T02:05:34Z",
+      "side": 1,
+      "message": "Does helipilot only used on the `buccaneer`?\nIf yes, I think modifying base_gpio.inc in helipilot would be better.\nI just want to make sure this change only works on buccaneer.\n\nThe timing should be different between `change the flags by HOOK_INIT` and `init in gpio.inc`.\nIs there any side effect?",
+      "parentUuid": "a05f57fb_d8587019",
+      "range": {
+        "startLine": 6,
+        "startChar": 1,
+        "endLine": 45,
+        "endChar": 6
+      },
+      "revId": "51764659d55e8dd4da0501b58a1df816a9303cdc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
