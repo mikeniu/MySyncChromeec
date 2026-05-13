@@ -13,20 +13,14 @@
 		i2c_named_i2c_port_charger: named_i2c_port_charger {
 			i2c-port = <&i2c_port_charger>;
 			enum-names = "I2C_PORT_BATTERY",
-				"I2C_PORT_CHARGER",
-				"I2C_PORT_PORT80";
-		};
-		i2c_named_i2c_port_ish: named_i2c_port_ish {
-			i2c-port = <&i2c_port_ish>;
-			enum-names = "I2C_PORT_ISH";
+				"I2C_PORT_CHARGER";
 		};
 	};
 };
 
 &i2c_port_pd1 {
 	label = "I2C_PORT_PD";
-	clock-frequency = <I2C_BITRATE_STANDARD>;
-	data-hold-time = <10>;
+	clock-frequency = <I2C_BITRATE_FAST>;
 };
 
 &i2c_port_charger {
@@ -40,11 +34,6 @@
 	};
 };
 
-&i2c_port_ish {
-	label = "I2C_PORT_ISH";
-	clock-frequency = <I2C_BITRATE_STANDARD>;
-};
-
 &i2c1 {
 	status = "okay";
 	pinctrl-0 = <&i2c1_clk_gpc1_default
@@ -52,16 +41,31 @@
 	pinctrl-names = "default";
 };
 
-&i2c4 {
+&i2c2 {
 	status = "okay";
-	pinctrl-0 = <&i2c4_clk_gpe0_default
-		&i2c4_data_gpe7_default>;
+	pinctrl-0 = <&i2c2_clk_gpf6_default
+		&i2c2_data_gpf7_default>;
 	pinctrl-names = "default";
 };
 
+/* reserved for sensor */
+&i2c3 {
+	status = "okay";
+	clock-frequency = <I2C_BITRATE_FAST>;
+	pinctrl-0 = <&i2c3_clk_gpb2_default
+		&i2c3_data_gpb5_default>;
+	scl-gpios = <&gpiob 2 0>;
+	sda-gpios = <&gpiob 5 0>;
+	pinctrl-names = "default";
+};
+/* r
+eserved for acc sensor */
 &i2c5 {
 	status = "okay";
+	clock-frequency = <I2C_BITRATE_FAST>;
 	pinctrl-0 = <&i2c5_clk_gpe1_default
 		&i2c5_data_gpe2_default>;
+	scl-gpios = <&gpioe 1 0>;
+	sda-gpios = <&gpioe 2 0>;
 	pinctrl-names = "default";
 };

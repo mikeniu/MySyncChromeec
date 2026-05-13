@@ -35,7 +35,8 @@ void board_ap_power_force_shutdown(void)
 	power_signal_set(PWR_EC_PCH_RSMRST, 1);
 
 	/* Turn off PRIM load switch. */
-	power_signal_set(PWR_EN_PP5000_A, 0);
+	power_signal_set(PWR_EN_PP3300_A, 0);
+	power_signal_set(PWR_EN_PP1800_A, 0);
 
 	/* Wait RSMRST to be off. */
 	while (power_signal_get(PWR_RSMRST_PWRGD) && (timeout_ms > 0)) {
@@ -61,13 +62,14 @@ static int board_ap_power_action_g3_run(void *data)
 {
 	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_STARTUP)) {
 		LOG_DBG("Turning on EN_S5_RAILS");
-		power_signal_set(PWR_EN_PP5000_A, 1);
+		power_signal_set(PWR_EN_PP3300_A, 1);
+		power_signal_set(PWR_EN_PP1800_A, 1);
 
 		update_ap_boot_time(ARAIL);
 	}
 
 	/* Return 0 only if power rails have been enabled  */
-	return !power_signal_get(PWR_EN_PP5000_A);
+	return !power_signal_get(PWR_EN_PP3300_A);
 }
 
 AP_POWER_APP_STATE_DEFINE(G3, board_ap_power_action_g3_entry,

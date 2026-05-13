@@ -26,6 +26,7 @@ properties:
     - PWR_EC_PCH_RSMRST
     - PWR_EC_PCH_SYS_PWROK
     - PWR_EC_SOC_DSW_PWROK
+    - PWR_EN_PP1800_A
     - PWR_EN_PP3300_A
     - PWR_EN_PP5000_A
     - PWR_IMVP9_VRRDY
