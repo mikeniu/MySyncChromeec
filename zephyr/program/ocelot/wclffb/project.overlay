@@ -8,9 +8,9 @@
 #include <cros/integrated_fwid.dtsi>
 #include <cros/cbi_ufsc_std_schema.dtsi>
 #include <cros/cbi_ufsc_oem_schema.dtsi>
-#include "matsu_ec_ufsc.dtsi"
+#include "wclffb_ec_ufsc.dtsi"
 
-/* matsu project DTS includes */
+/* wclffb project DTS includes */
 
 #include "binman.dtsi"
 #include "gpios.dtsi"
@@ -61,7 +61,7 @@ tach_fan0: &tach0 {};
 	};
 };
 
-/* matsu overrides follow... */
+/* wclffb overrides follow... */
 
 &espi0 {
 	status = "okay";
