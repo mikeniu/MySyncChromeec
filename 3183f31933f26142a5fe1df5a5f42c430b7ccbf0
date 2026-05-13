@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2dcbe56_616af7ca",
+        "filename": "zephyr/drivers/imvp/CMakeLists.txt",
+        "patchSetId": 11
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-13T13:08:23Z",
+      "side": 1,
+      "message": "this should go in the previous commit, same as the Kconfig below",
+      "revId": "3183f31933f26142a5fe1df5a5f42c430b7ccbf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
