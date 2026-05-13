@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6caad916_710c7e90",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-13T15:57:19Z",
+      "side": 1,
+      "message": "Add `Cq-Depend: chromium:7844358` to the commit message so this merges after the dependent zephyr changes.",
+      "revId": "069fbd579b02411650ca6eb1f41ae7a47cc75ea0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
