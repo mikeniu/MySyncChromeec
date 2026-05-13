@@ -1,0 +1,16 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config PLATFORM_EC_TOUCH_SCREEN
+	bool "Touch screen support"
+	select HAS_TASK_TOUCH_SCREEN
+	help
+	  TODO
+
+config PLATFORM_EC_TOUCH_SCREEN_ACER
+	bool "Acer touch screen driver"
+	default y if DT_HAS_ACER_KL1400H_ENABLED
+	select PLATFORM_EC_TOUCH_SCREEN
+	help
+	  TODO
