@@ -33,7 +33,7 @@
 		compatible = "named-gpios";
 
 		gpio_all_sys_pwrgd_r: all_sys_pwrgd_r {
-			gpios = <&gpiod 5 (GPIO_INPUT)>;
+			gpios = <&gpiod 4 (GPIO_INPUT)>;
 		};
 		gpio_imvp9_vrrdy_od: imvp9_vrrdy_od {
 			gpios = <&gpioe 5 (GPIO_INPUT)>;
@@ -92,7 +92,7 @@
 			gpios = <&gpiod 1 (GPIO_INPUT)>;
 		};
 		gpio_en_slp_z: en_slp_z {
-			gpios = <&gpiod 4 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH)>;
+			gpios = <&gpioa 7 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH)>;
 		};
 		gpio_gpg6_r: gpg6_r {
 			gpios = <&gpiog 6 (GPIO_INPUT)>;
@@ -152,11 +152,11 @@
 			no-auto-init;
 		};
 		gpio_ec_gsc_packet_mode: ec_gsc_packet_mode {
-			gpios = <&gpiod 7 GPIO_OUTPUT>;
+			gpios = <&gpiog 1 GPIO_OUTPUT>;
 			enum-name = "GPIO_PACKET_MODE_EN";
 		};
 		gpio_ec_volup_btn_odl: ec_volup_btn_odl {
-			gpios = <&gpioa 7 (GPIO_INPUT)>;
+			gpios = <&gpiod 5 (GPIO_INPUT)>;
 			enum-name = "GPIO_VOLUME_UP_L";
 		};
 		gpio_ec_voldn_btn_odl: ec_voldn_btn_odl {
@@ -197,7 +197,6 @@
 			<&gpiob 4 0>, /* SPARE GPB4 */
 			<&gpiof 2 0>, /* SPARE GPF2 */
 			<&gpiof 3 0>, /* SPARE GPF3 */
-			<&gpiog 1 0>, /* SPARE GPG1 */
 
 			/* check both not used */
 			<&gpioa 4 0>, /* LED_3_R_L */

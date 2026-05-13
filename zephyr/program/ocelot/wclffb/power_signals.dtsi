@@ -91,7 +91,7 @@
 		enum-name = "PWR_ALL_SYS_PWRGD";
 		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
                 /* ALL_SYS_PWRGD_R net */
-	        gpios = <&gpiod 5 (GPIO_ACTIVE_HIGH | GPIO_VOLTAGE_1P8)>;
+	        gpios = <&gpiod 4 (GPIO_ACTIVE_HIGH | GPIO_VOLTAGE_1P8)>;
 	};
 	pwr_sys_rst: pwr-sys-rst-l {
 		compatible = "intel,ap-pwrseq-gpio";

@@ -8,9 +8,9 @@
 #include <cros/integrated_fwid.dtsi>
 #include <cros/cbi_ufsc_std_schema.dtsi>
 #include <cros/cbi_ufsc_oem_schema.dtsi>
-#include "matsu_ec_ufsc.dtsi"
+#include "wclffb_ec_ufsc.dtsi"
 
-/* matsu project DTS includes */
+/* wclffb project DTS includes */
 
 #include "binman.dtsi"
 #include "gpios.dtsi"
@@ -59,9 +59,14 @@ tach_fan0: &tach0 {};
 		compatible = "cros-ec,cse-early-rec";
 		cse-early-rec-gpios = <&gpioj 3 (GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH)>;
 	};
+
+	hibernate_z5: hibernate-z5 {
+		compatible = "cros-ec,hibernate-z5";
+		en-slp-z-gpios = <&gpioa 7 GPIO_ACTIVE_HIGH>;
+	};
 };
 
-/* matsu overrides follow... */
+/* wclffb overrides follow... */
 
 &espi0 {
 	status = "okay";
