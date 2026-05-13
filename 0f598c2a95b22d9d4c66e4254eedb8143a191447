@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "905d37d4_e06a8f4c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-13T08:01:41Z",
+      "side": 1,
+      "message": "There are classic benefits of using upstream like more tested code, easier maintenance etc. But I can see also 1 additional feature that is not added here - the per-device power management. It could be used in both cases - once we suspend entire system and for the runtime suspend once we want to turn-off the led.",
+      "parentUuid": "2a0cfa4e_b735a202",
+      "revId": "0f598c2a95b22d9d4c66e4254eedb8143a191447",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "123036a3_462c040e",
         "filename": "common/fpsensor/fpsensor_led.cc",
         "patchSetId": 10
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Yes, it was only assigned to constexpr variables. I changed to \u0027consteval\u0027 to make it explicit.",
       "parentUuid": "123036a3_462c040e",
+      "revId": "0f598c2a95b22d9d4c66e4254eedb8143a191447",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b31f615_ccad56be",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-13T08:01:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a4b3ff3a_5507095a",
       "revId": "0f598c2a95b22d9d4c66e4254eedb8143a191447",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
