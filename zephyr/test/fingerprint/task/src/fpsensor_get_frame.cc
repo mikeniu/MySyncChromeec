@@ -262,6 +262,43 @@ ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_overflow)
 			  "Output buffer modified during failure path");
 }
 
+ZTEST(fpsensor_get_frame, test_get_frame_physical_hardware_buffer_overflow)
+{
+	uint8_t output_buffer[kMaxReadSize];
+	memset(output_buffer, 0xA5, sizeof(output_buffer));
+
+	uint32_t size = kMaxReadSize;
+
+	/*
+	 * Land exactly 1 byte past the absolute array limit after the shift:
+	 * (offset + FP_SENSOR_IMAGE_OFFSET + size) == sizeof(fp_buffer) + 1
+	 */
+	uint32_t offset =
+		(sizeof(fp_buffer) + 1) - FP_SENSOR_IMAGE_OFFSET - size;
+
+	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
+
+	/*
+	 * Cache Pollution: Temporarily override the cache for SIMPLE_IMAGE to
+	 * return the absolute maximum size. This allows the large offset to
+	 * pass the first validator, dropping execution right into the target
+	 * check.
+	 */
+	auto *raw_storage =
+		reinterpret_cast<std::array<uint32_t, FP_CAPTURE_TYPE_MAX> *>(
+			&global_context.fp_frame_size_cache);
+	(*raw_storage)[FP_CAPTURE_SIMPLE_IMAGE] = sizeof(fp_buffer);
+
+	enum ec_status status = get_frame(offset, size, output_buffer);
+
+	zassert_equal(status, EC_RES_INVALID_PARAM,
+		      "Expected skipped offset overflow failure");
+
+	/* Verify buffer integrity remains intact */
+	zassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer),
+			  "Output buffer modified during failure path");
+}
+
 ZTEST(fpsensor_get_frame, test_get_frame_absolute_success)
 {
 	uint8_t output_buffer[kMaxReadSize];
