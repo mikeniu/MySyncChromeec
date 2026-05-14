@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a1322b4_85d12945",
+        "filename": "util/egis/build.mk",
+        "patchSetId": 11
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-14T21:59:40Z",
+      "side": 1,
+      "message": "@harry.chen@egistec.corp-partner.google.com I added `--static` and `-static` to build a statically linked binary.\n\ncc @fsammoura@google.com",
+      "range": {
+        "startLine": 18,
+        "startChar": 61,
+        "endLine": 18,
+        "endChar": 115
+      },
+      "revId": "eb36d6467b11c3146a27167d5f414b3eca31df04",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
