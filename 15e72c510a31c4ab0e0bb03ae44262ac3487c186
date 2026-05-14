@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3dfb46cb_fc707ffb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-05-14T21:06:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a8c8901d_a97e36ab",
+      "range": {
+        "startLine": 9,
+        "startChar": 48,
+        "endLine": 9,
+        "endChar": 51
+      },
+      "revId": "15e72c510a31c4ab0e0bb03ae44262ac3487c186",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1f0401c8_f981e6d6",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "010a8156_a9c8635e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-05-14T21:06:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f0401c8_f981e6d6",
+      "range": {
+        "startLine": 15,
+        "startChar": 5,
+        "endLine": 15,
+        "endChar": 13
+      },
+      "revId": "15e72c510a31c4ab0e0bb03ae44262ac3487c186",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2f8229fb_3ddb4a61",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-05-14T17:56:00Z",
       "side": 1,
       "message": "What about LID_OPEN?",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 7
+      },
+      "revId": "15e72c510a31c4ab0e0bb03ae44262ac3487c186",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3fe0633_f37e1d82",
+        "filename": "zephyr/program/ocelot/ocelotrvp-rtk/project.overlay",
+        "patchSetId": 10
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-05-14T21:06:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2f8229fb_3ddb4a61",
       "range": {
         "startLine": 41,
         "startChar": 0,
