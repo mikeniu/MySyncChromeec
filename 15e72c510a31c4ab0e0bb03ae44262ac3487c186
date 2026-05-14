@@ -22,6 +22,52 @@
       },
       "revId": "15e72c510a31c4ab0e0bb03ae44262ac3487c186",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f0401c8_f981e6d6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-14T17:56:00Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by Spellchecker: \"Platfrom\" is a possible misspelling of \"Platform\".\n\nTo bypass Spellchecker, add...\n\n\"Platfrom\" is a possible misspelling of \"Platform\".\n\nTo bypass Spellchecker, add a footer with DISABLE_SPELLCHECKER",
+      "range": {
+        "startLine": 15,
+        "startChar": 5,
+        "endLine": 15,
+        "endChar": 13
+      },
+      "revId": "15e72c510a31c4ab0e0bb03ae44262ac3487c186",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f8229fb_3ddb4a61",
+        "filename": "zephyr/program/ocelot/ocelotrvp-rtk/project.overlay",
+        "patchSetId": 10
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-14T17:56:00Z",
+      "side": 1,
+      "message": "What about LID_OPEN?",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 7
+      },
+      "revId": "15e72c510a31c4ab0e0bb03ae44262ac3487c186",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
