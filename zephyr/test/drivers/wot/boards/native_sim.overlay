@@ -1,0 +1,22 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/native_sim.dts>
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
+/ {
+        wot: wot-simulator {
+                compatible = "cros-ec,wot";
+                status = "okay";
+
+                report-en-gpios = <&gpio0 0 GPIO_ACTIVE_HIGH>;
+
+                wot-l-gpios = <&gpio0 1 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+
+                tchscr-int-gpios = <&gpio0 2 GPIO_ACTIVE_LOW>;
+
+                bl-detect-gpios = <&gpio0 3 GPIO_ACTIVE_HIGH>;
+        };
+};
