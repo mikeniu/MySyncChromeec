@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "91d7bf40_d6118a66",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-14T21:41:43Z",
+      "side": 1,
+      "message": "hey, they should always be non-functional, though some may remove some information, see my reply on the other comment for the reasoning, I\u0027d be almost tempted ot drop the messages for these entirely but unified message is good.\n\nlogging version of `device_is_ready` may also be valid but it needs a bit more thinking: the LOG functionality normally includes the log module prefix, you can\u0027t do that if you implement a common one",
+      "parentUuid": "3a5a61b7_bd01c43f",
+      "revId": "a66d6be74be4d12e9a4f6a598dd0344b53c5bc40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "80a49c7b_291d5354",
         "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
         "patchSetId": 1
@@ -31,6 +49,30 @@
       "writtenOn": "2026-05-14T18:08:34Z",
       "side": 1,
       "message": "will we still get indication of \nthe device instance info in the log (i.e. \"RTK%d\")?\n\nit would be good to preserve consistent output for log messages\nfrom specific drivers like this.",
+      "range": {
+        "startLine": 3155,
+        "startChar": 2,
+        "endLine": 3155,
+        "endChar": 26
+      },
+      "revId": "a66d6be74be4d12e9a4f6a598dd0344b53c5bc40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dae53601_b3aa3ea2",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 3155,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-14T21:41:43Z",
+      "side": 1,
+      "message": "hey, no the new macro only reports the name of the device itself, in this case it does print `cfg-\u003ei2c.bus-\u003ename`, so it is a bit less information, the reasoning though is that since we have build time init priority checking it should be really unlikely to hit this condition so the flash for a dedicated message is really wasted, if it happens you could find out which instance failed from \"device list\" on the shell though likely once you know which i2c bus failed to initialize it\u0027s probably enough.",
+      "parentUuid": "80a49c7b_291d5354",
       "range": {
         "startLine": 3155,
         "startChar": 2,
