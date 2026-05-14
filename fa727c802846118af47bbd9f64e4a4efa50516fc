@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44bd7244_c8be9a8d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-14T16:01:51Z",
+      "side": 1,
+      "message": "When you build this board, it should tell you how much flash space is used. Can you put the before and after in `TEST\u003d`?",
+      "revId": "fa727c802846118af47bbd9f64e4a4efa50516fc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be99e778_150a2b73",
+        "filename": "zephyr/program/intelrvp/mtlrvp/prj.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-14T16:01:51Z",
+      "side": 1,
+      "message": "Turning off help is pretty brutal. If you can find anything else to take away instead, that would probably be less painful for a future developer.",
+      "revId": "fa727c802846118af47bbd9f64e4a4efa50516fc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
