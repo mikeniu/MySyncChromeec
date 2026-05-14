@@ -29,22 +29,29 @@ static int svdm_identity(int port, uint32_t *payload)
 					      CONFIG_USB_VID);
 
 		return VDO_I(PRODUCT) + 1;
-	} else {
-		payload[VDO_I(IDH)] =
-			VDO_IDH_REV30(1, /* USB host */
-				      0, /* Not a USB device */
-				      IDH_PTYPE_UNDEF, /* Not a UFP */
-				      0, /* No alt modes (not a UFP) */
-				      IDH_PTYPE_DFP_HOST, /* PDUSB host */
-				      USB_TYPEC_RECEPTACLE, CONFIG_USB_VID);
-
-		/* Single VDO for DFP product type */
-		payload[VDO_I(PRODUCT) + 1] =
-			VDO_DFP(VDO_DFP_HOST_CAPABILITY_USB32,
-				USB_TYPEC_RECEPTACLE, port);
-
-		return VDO_I(PRODUCT) + 2;
 	}
+
+	/* Determine host capability based on configuration */
+	uint32_t host_cap = VDO_DFP_HOST_CAPABILITY_USB20 |
+			    VDO_DFP_HOST_CAPABILITY_USB32;
+
+#ifdef CONFIG_USB_PD_USB4
+	host_cap |= VDO_DFP_HOST_CAPABILITY_USB4;
+#endif
+
+	/* PD 3.0 */
+	payload[VDO_I(IDH)] = VDO_IDH_REV30(1, /* USB host */
+					    0, /* Not a USB device */
+					    IDH_PTYPE_UNDEF, /* Not a UFP */
+					    0, /* No alt modes (not a UFP) */
+					    IDH_PTYPE_DFP_HOST, /* PDUSB host */
+					    USB_TYPEC_RECEPTACLE,
+					    CONFIG_USB_VID);
+
+	payload[VDO_I(PRODUCT) + 1] =
+		VDO_DFP(host_cap, USB_TYPEC_RECEPTACLE, port);
+
+	return VDO_I(PRODUCT) + 2;
 }
 
 __override const struct svdm_response svdm_rsp = {
