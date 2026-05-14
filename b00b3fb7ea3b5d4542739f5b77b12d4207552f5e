@@ -92,6 +92,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "90aca12b_0a4d83c6",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-05-14T03:11:28Z",
+      "side": 1,
+      "message": "Maybe hook this function on HOOK_BATTERY_SOC_CHANGE instead of HOOK_INIT so we don\u0027t have to tune the delay.",
+      "parentUuid": "6a27aad0_f3aeac96",
+      "revId": "b00b3fb7ea3b5d4542739f5b77b12d4207552f5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b0cbf651_c97cc23e",
         "filename": "zephyr/program/skywalker/yoda/src/charger.c",
         "patchSetId": 1
