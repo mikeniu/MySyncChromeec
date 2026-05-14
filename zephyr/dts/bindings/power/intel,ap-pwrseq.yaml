@@ -23,6 +23,9 @@ properties:
     description: |
       Delay to set RSMRST from EC to SoC, in milliseconds.
 
+  # NVL does not specify SYS_PWROK. MTL power sequencing uses the same delay for
+  # PCH_PWROK/PLT_PWROK and SYS_PWROK, so on NVL, this delay is effectively the
+  # delay for PLT_PWROK.
   sys-pwrok-delay:
     type: int
     default: 45
