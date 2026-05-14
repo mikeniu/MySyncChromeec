@@ -16,6 +16,24 @@
       "message": "Nit: Can you say something like \"Pujjoga VIF\" or \"VIF fields\" to make it obvious from the headline that you\u0027re changing the VIF and not the board feature?",
       "revId": "ebe1e6e633d7a1c1600242009d156be033ae81b5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2197a62_14d8c868",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4253897
+      },
+      "writtenOn": "2026-05-14T05:28:59Z",
+      "side": 1,
+      "message": "Added vif fields to headlines.",
+      "parentUuid": "0dd13972_0e652a5a",
+      "revId": "ebe1e6e633d7a1c1600242009d156be033ae81b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
