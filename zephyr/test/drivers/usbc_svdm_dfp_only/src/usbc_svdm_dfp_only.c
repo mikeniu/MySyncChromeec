@@ -132,7 +132,7 @@ ZTEST_F(usbc_svdm_dfp_only, test_identity)
 		      (CONFIG_USB_PID << 16) | CONFIG_USB_BCD_DEV,
 		      "Product VDO value unexpected: %#x", response.vdos[3]);
 	/* DFP Product Type VDO: version 1.1, USB3.2 capable, receptacle */
-	zassert_equal(response.vdos[4], 0x22800000,
+	zassert_equal(response.vdos[4], 0x23800000,
 		      "DFP VDO had unexpected value %#x", response.vdos[4]);
 }
 
