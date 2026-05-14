@@ -56,6 +56,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7c0f0695_5321c309",
+        "filename": "zephyr/drivers/board_id/board_id_intel_rvp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-05-14T23:16:01Z",
+      "side": 1,
+      "message": "These aren\u0027t actually errors, it\u0027s detecting for deferred initialization.",
+      "range": {
+        "startLine": 209,
+        "startChar": 4,
+        "endLine": 209,
+        "endChar": 28
+      },
+      "revId": "a66d6be74be4d12e9a4f6a598dd0344b53c5bc40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "80a49c7b_291d5354",
         "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
         "patchSetId": 1
@@ -91,6 +114,30 @@
       "side": 1,
       "message": "hey, no the new macro only reports the name of the device itself, in this case it does print `cfg-\u003ei2c.bus-\u003ename`, so it is a bit less information, the reasoning though is that since we have build time init priority checking it should be really unlikely to hit this condition so the flash for a dedicated message is really wasted, if it happens you could find out which instance failed from \"device list\" on the shell though likely once you know which i2c bus failed to initialize it\u0027s probably enough.",
       "parentUuid": "80a49c7b_291d5354",
+      "range": {
+        "startLine": 3155,
+        "startChar": 2,
+        "endLine": 3155,
+        "endChar": 26
+      },
+      "revId": "a66d6be74be4d12e9a4f6a598dd0344b53c5bc40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e5d4685_68c670fd",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 3155,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-05-14T23:16:01Z",
+      "side": 1,
+      "message": "I think this is fine. These errors should only trigger when somebody messes up the init ordering for the various drivers.",
+      "parentUuid": "dae53601_b3aa3ea2",
       "range": {
         "startLine": 3155,
         "startChar": 2,
