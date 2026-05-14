@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c5a6764_23d6dc01",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-14T16:04:56Z",
+      "side": 1,
+      "message": "These should be below the commit message body, above the Change-Id.",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 26
+      },
+      "revId": "0b78b6ba48f5fde64d998f46ec936adb7c919346",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
