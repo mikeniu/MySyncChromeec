@@ -110,6 +110,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "95a02f39_701c0008",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 4684390
+      },
+      "writtenOn": "2026-05-14T08:45:32Z",
+      "side": 1,
+      "message": "Hi Abe, it\u0027s done.\n\nHi Yueh, it\u0027s not recommended to run this on HOOK_BATTERY_SOC_CHANGE, as it would be triggered too frequently and the battery cell count does not change at runtime.\n\nIf alternative approaches are preferred, we still recommend adding a new hook at the battery wake-up stage, and our policy can be triggered by it, but this would require changes in common code.",
+      "parentUuid": "90aca12b_0a4d83c6",
+      "revId": "b00b3fb7ea3b5d4542739f5b77b12d4207552f5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b0cbf651_c97cc23e",
         "filename": "zephyr/program/skywalker/yoda/src/charger.c",
         "patchSetId": 1
