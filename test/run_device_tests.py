@@ -1572,6 +1572,9 @@ def build_zephyr(
         if "extra_configs" in testcase_data["tests"][test_name]:
             for config in testcase_data["tests"][test_name]["extra_configs"]:
                 f_test_config.write(config + "\n")
+        if "extra_args" in testcase_data["tests"][test_name]:
+            for arg in testcase_data["tests"][test_name]["extra_args"]:
+                cmd.extend(["-D" + arg])
         # Include tests also in RO part. It is not done by default
         # because of lack of space
         if img_type == ImageType.RO:
