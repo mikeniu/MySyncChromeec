@@ -128,6 +128,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f05fabc6_97c7cbba",
+        "filename": "zephyr/program/skywalker/yoda/src/charger.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-05-14T08:56:48Z",
+      "side": 1,
+      "message": "The cost of battery_policy_check once pre_battery_cells is set is a if statement evaluation of `pre_battery_cells \u003d\u003d BATT_UNKNOWN`, which is fast when branch prediction works correctly.\n\nI\u0027m fine if you would like to update this delay every time adding a new battery.",
+      "parentUuid": "95a02f39_701c0008",
+      "revId": "b00b3fb7ea3b5d4542739f5b77b12d4207552f5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b0cbf651_c97cc23e",
         "filename": "zephyr/program/skywalker/yoda/src/charger.c",
         "patchSetId": 1
