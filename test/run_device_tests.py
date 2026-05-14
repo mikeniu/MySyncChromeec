@@ -1556,24 +1556,41 @@ def build_zephyr(
                 'testcase.yaml file doesn\'t contain "tests" section'
             )
         # Make sure the current test is supported
-        if test_name not in testcase_data["tests"]:
-            raise ValueError(test_name + " not present in testcase.yaml")
+        matched_test = None
+        for key, params in testcase_data["tests"].items():
+            if key == test_name or key.startswith(test_name + "."):
+                params = params or {}
+                platform_allow = params.get("platform_allow")
+                if platform_allow:
+                    if isinstance(platform_allow, str):
+                        platform_allow = [platform_allow]
+                    if board_name in platform_allow:
+                        matched_test = key
+                        break
+                elif matched_test is None:
+                    matched_test = key
+
+        if not matched_test:
+            raise ValueError(
+                f"{test_name} not present or not supported on {board_name} in testcase.yaml"
+            )
+
+        test_params = testcase_data["tests"][matched_test] or {}
+
         # Add configs needed for a specific test from "extra_conf_files"
         # and "extra_configs" sections
-        if "extra_conf_files" in testcase_data["tests"][test_name]:
-            for config_file in testcase_data["tests"][test_name][
-                "extra_conf_files"
-            ]:
+        if "extra_conf_files" in test_params:
+            for config_file in test_params["extra_conf_files"]:
                 config_file_path = os.path.join(ZEPHYR_FPMCU_DIR, config_file)
                 with open(
                     config_file_path, "r", encoding="utf-8"
                 ) as f_config_file:
                     f_test_config.write(f_config_file.read())
-        if "extra_configs" in testcase_data["tests"][test_name]:
-            for config in testcase_data["tests"][test_name]["extra_configs"]:
+        if "extra_configs" in test_params:
+            for config in test_params["extra_configs"]:
                 f_test_config.write(config + "\n")
-        if "extra_args" in testcase_data["tests"][test_name]:
-            for arg in testcase_data["tests"][test_name]["extra_args"]:
+        if "extra_args" in test_params:
+            for arg in test_params["extra_args"]:
                 cmd.extend(["-D" + arg])
         # Include tests also in RO part. It is not done by default
         # because of lack of space
