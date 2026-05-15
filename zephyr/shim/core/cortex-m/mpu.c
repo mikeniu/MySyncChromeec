@@ -19,11 +19,25 @@
 #include <cmsis_core.h>
 #include <kernel_arch_data.h>
 
+#if defined(CONFIG_CPU_CORTEX_M33)
+#include <cortex_m/cmse.h>
+#endif
+
 LOG_MODULE_REGISTER(shim_mpu, LOG_LEVEL_ERR);
 
 void mpu_enable(void)
 {
 	for (int index = 0; index < mpu_config.num_regions; index++) {
+#if defined(CONFIG_CPU_CORTEX_M33)
+	/* TODO: The number of static regions is more than
+	 * mpu_config.num_regions if
+	 * CONFIG_NULL_POINTER_EXCEPTION_DETECTION_MPU is enabled or more MPU
+	 * regions is defined in devicetree
+	 * */
+	MPU->RNR = index;
+	MPU->RLAR |= MPU_RLAR_EN_Msk;
+	LOG_DBG("[%d] %08x %08x", index, MPU->RBAR, MPU->RLAR);
+#else
 #if defined(CONFIG_NPCX_RAM_LOCK)
 		/*
 		 * Use the settings of mpu_regions to set RAM lock. Thus,
@@ -47,11 +61,21 @@ void mpu_enable(void)
 		MPU->RNR = index;
 		MPU->RASR |= MPU_RASR_ENABLE_Msk;
 		LOG_DBG("[%d] %08x %08x", index, MPU->RBAR, MPU->RASR);
+#endif /* CONFIG_CPU_CORTEX_M33 */
 	}
 }
 
 static int mpu_disable_fixed_regions(void)
 {
+#if defined(CONFIG_CPU_CORTEX_M33)
+	/* Don't disable fixed regions here for ARMv8-M, because in
+	 * `arm_core_mpu_configure_static_mpu_regions()`, underlying regions
+	 * need to be checked valid. If fixed regions (the flash region)
+	 * enabled in Zephyr init code is disabled here, an error occurs
+	 * when adding static rollback regions using
+	 * `arm_core_mpu_configure_static_mpu_regions()`.
+	 */
+#else
 	/* MPU is configured and enabled by the Zephyr init code, disable the
 	 * fixed sections by default.
 	 */
@@ -60,6 +84,7 @@ static int mpu_disable_fixed_regions(void)
 		MPU->RASR &= ~MPU_RASR_ENABLE_Msk;
 		LOG_DBG("[%d] %08x %08x", index, MPU->RBAR, MPU->RASR);
 	}
+#endif
 
 	return 0;
 }
@@ -90,6 +115,18 @@ static int mpu_static_rollback_region_id = -1;
  */
 static int mpu_add_static_rollback_regions(void)
 {
+#if defined(CONFIG_CPU_CORTEX_M33)
+	int region;
+
+	const struct z_arm_mpu_partition rollback_regions[] = {
+		{
+			.start = CONFIG_MAPPED_STORAGE_BASE +
+				 DT_REG_ADDR(DT_NODELABEL(rollback0)),
+			.size = CONFIG_ROLLBACK_SIZE,
+			.attr = K_MEM_PARTITION_P_RO_U_NA,
+		},
+	};
+#else
 	/*
 	 * We need to create two MPU regions for rollback because address of the
 	 * region must be aligned with size. For example, if both rollback
@@ -111,14 +148,24 @@ static int mpu_add_static_rollback_regions(void)
 			.attr = K_MEM_PARTITION_P_NA_U_NA,
 		},
 	};
-
+#endif /* CONFIG_CPU_CORTEX_M33 */
 	/*
 	 * Background_area_start and background_area_end arguments are unused
-	 * on ARMv7-M
+	 * on ARMv7-M and ARMv8-M
 	 */
 	arm_core_mpu_configure_static_mpu_regions(
 		rollback_regions, ARRAY_SIZE(rollback_regions), 0, 0);
 
+#if defined(CONFIG_CPU_CORTEX_M33)
+	region = arm_cmse_mpu_region_get(CONFIG_MAPPED_STORAGE_BASE +
+					 DT_REG_ADDR(DT_NODELABEL(rollback0)));
+	if (region != -EINVAL) {
+		mpu_static_rollback_region_id = region;
+		LOG_DBG("Rollback MPU region set at %d", region);
+		printk("Rollback MPU region set at %d", region);
+		return 0;
+	}
+#else
 	/*
 	 * Find newly added regions by iterating over regions in MPU. Zephyr
 	 * doesn't provide any convenient way to determine number of regions.
@@ -137,7 +184,7 @@ static int mpu_add_static_rollback_regions(void)
 			return 0;
 		}
 	}
-
+#endif
 	/* It's an error if we can't find rollback MPU regions. */
 	return -EINVAL;
 }
@@ -147,7 +194,16 @@ test_mockable int mpu_lock_rollback(bool lock)
 {
 	if (mpu_static_rollback_region_id < 0)
 		return -EINVAL;
+#if defined(CONFIG_CPU_CORTEX_M33)
+	/* One MPU region for Cortex-M33 */
+	MPU->RNR = mpu_static_rollback_region_id;
+	if (lock) {
+		MPU->RLAR |= MPU_RLAR_EN_Msk;
+	} else {
+		MPU->RLAR &= ~MPU_RLAR_EN_Msk;
+	}
 
+#else
 	for (int region = 0; region < 2; region++) {
 		MPU->RNR = mpu_static_rollback_region_id + region;
 		if (lock) {
@@ -156,7 +212,7 @@ test_mockable int mpu_lock_rollback(bool lock)
 			MPU->RASR &= ~MPU_RASR_ENABLE_Msk;
 		}
 	}
-
+#endif
 	return 0;
 }
 #endif
