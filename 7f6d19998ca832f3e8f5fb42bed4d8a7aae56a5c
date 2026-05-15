@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec1c1aa2_dc14330c",
+        "filename": "zephyr/program/ocelot/ocelotrvp-rtk/project.overlay",
+        "patchSetId": 12
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-15T19:48:03Z",
+      "side": 1,
+      "message": "The ulpm driver doesn\u0027t have an explicit default polarity, but appears to be rising edge.  Better to explicitly set it here. and on lid open.",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 24
+      },
+      "revId": "7f6d19998ca832f3e8f5fb42bed4d8a7aae56a5c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
