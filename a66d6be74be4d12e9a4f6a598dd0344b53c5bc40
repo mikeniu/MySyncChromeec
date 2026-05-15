@@ -77,6 +77,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f852cfa7_4915401c",
+        "filename": "zephyr/drivers/board_id/board_id_intel_rvp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-15T15:19:00Z",
+      "side": 1,
+      "message": "Oof, sorry I did not realize, reverted this block, thanks for spotting it.",
+      "parentUuid": "7c0f0695_5321c309",
+      "range": {
+        "startLine": 209,
+        "startChar": 4,
+        "endLine": 209,
+        "endChar": 28
+      },
+      "revId": "a66d6be74be4d12e9a4f6a598dd0344b53c5bc40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "80a49c7b_291d5354",
@@ -138,6 +162,30 @@
       "side": 1,
       "message": "I think this is fine. These errors should only trigger when somebody messes up the init ordering for the various drivers.",
       "parentUuid": "dae53601_b3aa3ea2",
+      "range": {
+        "startLine": 3155,
+        "startChar": 2,
+        "endLine": 3155,
+        "endChar": 26
+      },
+      "revId": "a66d6be74be4d12e9a4f6a598dd0344b53c5bc40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d22eb6a0_64cb8d93",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 3155,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-15T15:19:00Z",
+      "side": 1,
+      "message": "It\u0027s not even that, if you mess with the init order normally it\u0027d get caught at build time, more like if a device on a bus failed or you have an initialization bug, either way it\u0027s rare enough I think we are better off keeping the flash space.",
+      "parentUuid": "2e5d4685_68c670fd",
       "range": {
         "startLine": 3155,
         "startChar": 2,
