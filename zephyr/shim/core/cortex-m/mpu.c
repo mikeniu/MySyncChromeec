@@ -19,7 +19,22 @@
 #include <cmsis_core.h>
 #include <kernel_arch_data.h>
 
+#if defined(CONFIG_CPU_CORTEX_M33)
+#include <cortex_m/cmse.h>
+#endif
+
 LOG_MODULE_REGISTER(shim_mpu, LOG_LEVEL_ERR);
+
+static inline void mpu_arch_enable_region_by_id(int region_id)
+{
+#if defined(CONFIG_CPU_CORTEX_M33)
+    MPU->RNR = region_id;
+    MPU->RLAR |= MPU_RLAR_EN_Msk;
+#else
+    MPU->RNR = region_id;
+    MPU->RASR |= MPU_RASR_ENABLE_Msk;
+#endif
+}
 
 void mpu_enable(void)
 {
@@ -44,14 +59,21 @@ void mpu_enable(void)
 						    (CONFIG_SRAM_SIZE << 10));
 		}
 #endif
-		MPU->RNR = index;
-		MPU->RASR |= MPU_RASR_ENABLE_Msk;
-		LOG_DBG("[%d] %08x %08x", index, MPU->RBAR, MPU->RASR);
+		mpu_arch_enable_region_by_id(index);
 	}
 }
 
 static int mpu_disable_fixed_regions(void)
 {
+#if defined(CONFIG_CPU_CORTEX_M33)
+	/* Don't disable fixed regions here for ARMv8-M, because in
+	 * `arm_core_mpu_configure_static_mpu_regions()`, underlying regions
+	 * need to be checked valid. If fixed regions (the flash region)
+	 * enabled in Zephyr init code is diabled here, an error occurs
+	 * when adding static rollback regions using
+	 * `arm_core_mpu_configure_static_mpu_regions()`.
+	 */
+#else
 	/* MPU is configured and enabled by the Zephyr init code, disable the
 	 * fixed sections by default.
 	 */
@@ -60,6 +82,7 @@ static int mpu_disable_fixed_regions(void)
 		MPU->RASR &= ~MPU_RASR_ENABLE_Msk;
 		LOG_DBG("[%d] %08x %08x", index, MPU->RBAR, MPU->RASR);
 	}
+#endif
 
 	return 0;
 }
@@ -90,6 +113,32 @@ static int mpu_static_rollback_region_id = -1;
  */
 static int mpu_add_static_rollback_regions(void)
 {
+#if defined(CONFIG_CPU_CORTEX_M33)
+	int region;
+
+	/*
+	 * For ARMv8-M, two consecutive rollbacks can be protected
+	 * using a single MPU region.
+	 */
+	BUILD_ASSERT((DT_REG_ADDR(DT_NODELABEL(rollback0)) +
+			DT_REG_SIZE(DT_NODELABEL(rollback0)) ==
+			DT_REG_ADDR(DT_NODELABEL(rollback1))),
+			"The two rollback regions need to be consecutive.");
+
+	/*
+	 * For ARMv8-M, K_MEM_PARTITION_P_NA_U_NA is not supported yet,
+	 * so it can only be configured as K_MEM_PARTITION_P_RO_U_NA,
+	 * which means Privileged Read Only, Unprivileged No Access.
+	*/
+	const struct z_arm_mpu_partition rollback_regions[] = {
+		{
+			.start = CONFIG_MAPPED_STORAGE_BASE +
+				 DT_REG_ADDR(DT_NODELABEL(rollback0)),
+			.size = CONFIG_ROLLBACK_SIZE,
+			.attr = K_MEM_PARTITION_P_RO_U_NA,
+		},
+	};
+#else
 	/*
 	 * We need to create two MPU regions for rollback because address of the
 	 * region must be aligned with size. For example, if both rollback
@@ -111,14 +160,23 @@ static int mpu_add_static_rollback_regions(void)
 			.attr = K_MEM_PARTITION_P_NA_U_NA,
 		},
 	};
-
+#endif /* CONFIG_CPU_CORTEX_M33 */
 	/*
 	 * Background_area_start and background_area_end arguments are unused
-	 * on ARMv7-M
+	 * on ARMv7-M and ARMv8-M
 	 */
 	arm_core_mpu_configure_static_mpu_regions(
 		rollback_regions, ARRAY_SIZE(rollback_regions), 0, 0);
 
+#if defined(CONFIG_CPU_CORTEX_M33)
+	region = arm_cmse_mpu_region_get(CONFIG_MAPPED_STORAGE_BASE +
+					 DT_REG_ADDR(DT_NODELABEL(rollback0)));
+	if (region != -EINVAL) {
+		mpu_static_rollback_region_id = region;
+		LOG_DBG("Rollback MPU region set at %d", region);
+		return 0;
+	}
+#else
 	/*
 	 * Find newly added regions by iterating over regions in MPU. Zephyr
 	 * doesn't provide any convenient way to determine number of regions.
@@ -137,7 +195,7 @@ static int mpu_add_static_rollback_regions(void)
 			return 0;
 		}
 	}
-
+#endif
 	/* It's an error if we can't find rollback MPU regions. */
 	return -EINVAL;
 }
@@ -147,7 +205,16 @@ test_mockable int mpu_lock_rollback(bool lock)
 {
 	if (mpu_static_rollback_region_id < 0)
 		return -EINVAL;
+#if defined(CONFIG_CPU_CORTEX_M33)
+	/* One MPU region for Cortex-M33 */
+	MPU->RNR = mpu_static_rollback_region_id;
+	if (lock) {
+		MPU->RLAR |= MPU_RLAR_EN_Msk;
+	} else {
+		MPU->RLAR &= ~MPU_RLAR_EN_Msk;
+	}
 
+#else
 	for (int region = 0; region < 2; region++) {
 		MPU->RNR = mpu_static_rollback_region_id + region;
 		if (lock) {
@@ -156,7 +223,7 @@ test_mockable int mpu_lock_rollback(bool lock)
 			MPU->RASR &= ~MPU_RASR_ENABLE_Msk;
 		}
 	}
-
+#endif
 	return 0;
 }
 #endif
