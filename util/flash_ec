@@ -2095,6 +2095,7 @@ function flash_rtk_uart() {
 				"--method=flash" \
 				"--spi_start=${SPI_OFFSET}" \
 				"--file=${IMG}" \
+				"--monitor_file=${MON}" \
 				"--uart_device=${EC_UART}")
 
 		print_or_run timeout -k 10 -s 9 "${FLAGS_timeout}" \
