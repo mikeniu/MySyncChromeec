@@ -85,6 +85,29 @@
       },
       "revId": "479694a7a41fdfdbe80a1ad343975edd880994c0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e01ccbb4_a93b14a6",
+        "filename": "zephyr/test/drivers/write_protection_external/src/write_protection_external.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-15T23:35:40Z",
+      "side": 1,
+      "message": "You don\u0027t need this mock. You can call `enable_write_protect_external()`.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 58
+      },
+      "revId": "479694a7a41fdfdbe80a1ad343975edd880994c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
