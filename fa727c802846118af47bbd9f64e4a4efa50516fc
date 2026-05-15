@@ -69,6 +69,24 @@
       "parentUuid": "be99e778_150a2b73",
       "revId": "fa727c802846118af47bbd9f64e4a4efa50516fc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d1fa96d_104bf25c",
+        "filename": "zephyr/program/intelrvp/mtlrvp/prj.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-15T17:37:56Z",
+      "side": 1,
+      "message": "I meant, can you disable anything else and then re-enable help and tab completion and still save enough space for now? Of the things that it\u0027s possible to delete to save space, I would typically save console help for last and remove debug commands for individual features first.",
+      "parentUuid": "a2557a75_76d6662c",
+      "revId": "fa727c802846118af47bbd9f64e4a4efa50516fc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
