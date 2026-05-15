@@ -22,6 +22,30 @@
       },
       "revId": "eb36d6467b11c3146a27167d5f414b3eca31df04",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ea998e3_bc8f2775",
+        "filename": "util/egis/build.mk",
+        "patchSetId": 11
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a1322b4_85d12945",
+      "range": {
+        "startLine": 18,
+        "startChar": 61,
+        "endLine": 18,
+        "endChar": 115
+      },
+      "revId": "eb36d6467b11c3146a27167d5f414b3eca31df04",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

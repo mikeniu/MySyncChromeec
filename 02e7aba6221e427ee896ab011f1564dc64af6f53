@@ -52,6 +52,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aee527f5_305a1039",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f279a0e_89d796dc",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f38b1852_3d996d3c",
@@ -65,6 +83,30 @@
       "writtenOn": "2026-05-08T21:18:26Z",
       "side": 1,
       "message": "**Verbose `const_cast` in Crypto Logic (`bootrom.cc`)** The double casting in `EVP_CIPHER_CTX_ctrl` is unnecessarily complex.\n\n**Remediation:** Simplify to a single `const_cast\u003cuint8_t*\u003e(tag)` if modifying the constness is strictly required by the OpenSSL API version you are targeting.",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 59
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "590aea09_50c3175c",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f38b1852_3d996d3c",
       "range": {
         "startLine": 75,
         "startChar": 0,
@@ -115,6 +157,48 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35f5e3b0_ecc21e8e",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b458b39_020e6e48",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b49166fd_d0eb0b25",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "67e5fd6c_d172fb17",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 1
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "546e44a8_e6d70d3c",
@@ -151,6 +235,48 @@
       "writtenOn": "2026-05-08T20:55:25Z",
       "side": 1,
       "message": "[Gerrit AI Review] There was a previous review comment asking for clarification on this hardcoded AAD (`uint8_t AAD[4] \u003d { 0x01, 0x00, 0x00, 0x00 };`). Please add a brief comment explaining why this specific AAD is required by the bootrom protocol.",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34f74529_8210e728",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a5cc4399_51517c4b",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a598020_ce2b48e4",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "546e44a8_e6d70d3c",
+      "range": {
+        "startLine": 155,
+        "startChar": 1,
+        "endLine": 155,
+        "endChar": 45
+      },
       "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -195,6 +321,48 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "03ff36ec_3ceb8100",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a1fd54f5_08664fe8",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fcc2e9a_beb331a9",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b7438d4_bf0d9221",
+      "range": {
+        "startLine": 179,
+        "startChar": 0,
+        "endLine": 180,
+        "endChar": 73
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3b51e6a2_f5925df2",
@@ -218,6 +386,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a30f9bb5_af260aba",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3b51e6a2_f5925df2",
+      "range": {
+        "startLine": 203,
+        "startChar": 0,
+        "endLine": 203,
+        "endChar": 71
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f4e49a79_3e74bfb3",
@@ -231,6 +423,24 @@
       "writtenOn": "2026-05-08T20:55:25Z",
       "side": 1,
       "message": "[Gerrit AI Review] **Bug: Incorrect response parsing.** `CMD_MEM_READ` returns a 2-byte status header before the actual data, which `read_flash` and `backup_flash` correctly handle. However, `read_reg` copies the first 4 bytes of `resp` directly into `value_out`, meaning you are copying the status bytes instead of the register value!\n\nTo fix this, check the status bytes and skip them:\n```cpp\nif (send_bootrom_command(cmd, 6, resp) !\u003d 0 || resp.size() \u003c 6)\n    return -1;\nif (resp[0] !\u003d 0 || resp[1] !\u003d 0)\n    return -1;\nstd::memcpy(\u0026value_out, resp.data() + 2, 4);\n```",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "928c8c34_426054a2",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f4e49a79_3e74bfb3",
       "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -271,6 +481,48 @@
       "writtenOn": "2026-05-08T20:55:25Z",
       "side": 1,
       "message": "[Gerrit AI Review] This is still using a magic number (`0x20`). Please replace it with `EgisBootrom::CMD_MEM_READ` as mentioned in a previous review comment. There are also other instances like `0x23` in `get_otp_info` that should be replaced with `EgisBootrom::CMD_OTP_READ`.",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af089e64_bd34b746",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "690c1cf8_1f8197bd",
+      "range": {
+        "startLine": 332,
+        "startChar": 0,
+        "endLine": 332,
+        "endChar": 23
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51444878_245f14aa",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ceabebfb_83324d77",
       "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -322,6 +574,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9df63a3e_33789ad0",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "369e197d_f8c304ee",
+      "range": {
+        "startLine": 445,
+        "startChar": 0,
+        "endLine": 445,
+        "endChar": 79
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4ab161f1_8fcae9bf",
@@ -335,6 +611,30 @@
       "writtenOn": "2026-04-21T17:27:24Z",
       "side": 1,
       "message": "Use a header guard instead of `#pragma once`.",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 12
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d8e6a64_01a6d286",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4ab161f1_8fcae9bf",
       "range": {
         "startLine": 5,
         "startChar": 0,
@@ -392,6 +692,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1f3d351_c8c261b4",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db2030c2_ce060d3a",
+      "range": {
+        "startLine": 126,
+        "startChar": 0,
+        "endLine": 126,
+        "endChar": 30
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d8a1ed0d_76142e0c",
@@ -405,6 +729,30 @@
       "writtenOn": "2026-05-08T21:25:37Z",
       "side": 1,
       "message": "In `ec_comm.cc`, you are instantiating a struct and assigning it line-by-line. Designated initializers make this much cleaner, more readable, and guarantee you don\u0027t accidentally leave a field uninitialized.\n\n**Before:**\n\n```c\nEcHostCommandRequest hdr;\nhdr.protocol_version \u003d 3;\nhdr.checksum \u003d 0;\nhdr.command_id \u003d cmd_id_;\nhdr.command_version \u003d cmd_ver_;\nhdr.reserved \u003d 0;\nhdr.data_length \u003d payload_.size();\n\n```\n\n**After:**\n\n```c\nEcHostCommandRequest hdr \u003d {\n    .protocol_version \u003d 3,\n    .checksum \u003d 0,\n    .command_id \u003d cmd_id_,\n    .command_version \u003d cmd_ver_,\n    .reserved \u003d 0,\n    .data_length \u003d static_cast\u003cuint16_t\u003e(payload_.size())\n};\n\n```",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 36
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e37c7ab4_fbe01399",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8a1ed0d_76142e0c",
       "range": {
         "startLine": 42,
         "startChar": 0,
@@ -438,6 +786,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ad35d40_d6bd5075",
+        "filename": "util/egis/ec_comm.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b7660980_1c9fd5e0",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 12
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "98a16be8_62b1e5a3",
@@ -451,6 +823,30 @@
       "writtenOn": "2026-04-21T17:27:24Z",
       "side": 1,
       "message": "Use a header guard instead of `#pragma once`.",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 12
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d6bd4b4_64e2a681",
+        "filename": "util/egis/ec_protocol_defs.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98a16be8_62b1e5a3",
       "range": {
         "startLine": 5,
         "startChar": 0,
@@ -484,6 +880,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "67358f07_06404f7f",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4818eb1c_7df4c4ae",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 20
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "52e72436_1b321c8c",
@@ -497,6 +917,30 @@
       "writtenOn": "2026-05-08T21:18:26Z",
       "side": 1,
       "message": "**AES Key Left in Memory (`et171_flash.cc` \u0026 `bootrom.cc`)** The AES key is read into memory but never cleared. Leaving cryptographic keys in memory is bad practice, even for a short-lived CLI tool.\n\n**Remediation:** Use `OPENSSL_cleanse` to wipe the key arrays before the tool exits.",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 1
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "91d22489_34aff034",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52e72436_1b321c8c",
       "range": {
         "startLine": 22,
         "startChar": 0,
@@ -530,6 +974,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1982ad5e_c3d1bb3a",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "847755c6_a3a93b57",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 51
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2469a02e_7fb6765f",
@@ -543,6 +1011,30 @@
       "writtenOn": "2026-04-21T17:13:03Z",
       "side": 1,
       "message": "**. Hex String Parsing Vulnerability (`et171_flash.cc`)** When parsing `-offset` and `-size` using `strtoul`:\n\n* **Risk:** If a user provides a negative number (e.g., `-offset -100`), `strtoul` will silently underflow and wrap around to a massive positive number, which will likely crash the flash loop.  \n* **Remediation:** Parse the string as a signed integer using `strtol` first, verify it is `\u003e 0`, and then cast to `uint32_t`.",
+      "range": {
+        "startLine": 154,
+        "startChar": 0,
+        "endLine": 176,
+        "endChar": 22
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0eaa8998_47f735ce",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2469a02e_7fb6765f",
       "range": {
         "startLine": 154,
         "startChar": 0,
@@ -589,6 +1081,48 @@
       "writtenOn": "2026-05-08T20:55:25Z",
       "side": 1,
       "message": "[Gerrit AI Review] A previous review comment pointed out that if `fw_size_override` exceeds the actual file size, `infile.read()` will fail. There is still no check to prevent reading past the end of the file. Please add a bounds check to ensure `fw_size_override` does not exceed `fw_size`.",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fca41d76_f9f2a27b",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d38ddb00_535bdc5a",
+      "range": {
+        "startLine": 175,
+        "startChar": 0,
+        "endLine": 193,
+        "endChar": 4
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52f4e89b_5a10d329",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9a8c741_545a77a4",
       "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -640,6 +1174,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "63b2fb12_a311e613",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "997d3d1f_99ddc715",
+      "range": {
+        "startLine": 204,
+        "startChar": 0,
+        "endLine": 219,
+        "endChar": 61
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "56c6af0d_f3a8badf",
@@ -653,6 +1211,30 @@
       "writtenOn": "2026-05-08T21:18:26Z",
       "side": 1,
       "message": "**Magic Numbers (`et171_flash.cc`)** Hardcoding USB VIDs and PIDs makes the code difficult to maintain and read.\n\n**Remediation:** Define these as `constexpr uint16_t` constants at the top of the file.",
+      "range": {
+        "startLine": 229,
+        "startChar": 0,
+        "endLine": 239,
+        "endChar": 35
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff0ba811_5a9c730b",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "56c6af0d_f3a8badf",
       "range": {
         "startLine": 229,
         "startChar": 0,
@@ -680,6 +1262,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "09e25644_44437c06",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 461,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "83540cd5_a2067980",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a221ff90_241a434e",
@@ -697,6 +1297,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2824ede_1b90bf00",
+        "filename": "util/egis/usb_comm.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a221ff90_241a434e",
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b313a3ee_fbcead5c",
@@ -710,6 +1328,30 @@
       "writtenOn": "2026-04-21T17:30:39Z",
       "side": 1,
       "message": "**USB Kernel Driver Reattachment (`usb_comm.cc`)** In `connect()`, you successfully detach the kernel driver if it is active.\n\n* **Feedback:** You do not reattach the kernel driver in the destructor (`~UsbComm`). While the OS might reset the device upon exit, it is best practice in CLI flashers to attempt a `libusb_attach_kernel_driver` during teardown to restore the device state gracefully.",
+      "range": {
+        "startLine": 93,
+        "startChar": 1,
+        "endLine": 97,
+        "endChar": 3
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "18c95094_2c99d783",
+        "filename": "util/egis/usb_comm.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b313a3ee_fbcead5c",
       "range": {
         "startLine": 93,
         "startChar": 1,
@@ -743,6 +1385,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b46da99b_8c82f014",
+        "filename": "util/egis/usb_comm.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1450422_8c833f75",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 12
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "71ac596b_33e0b901",
@@ -756,6 +1422,30 @@
       "writtenOn": "2026-05-08T21:13:34Z",
       "side": 1,
       "message": "The [Google C++ style guide prohibits exceptions](https://google.github.io/styleguide/cppguide.html#Exceptions).\n\nThe file `util/egis/usb_comm.h` includes the `\u003cstdexcept\u003e` header and defines a custom exception class that inherits from `std::runtime_error`:\n\n```c\n#include \u003cstdexcept\u003e // \u003c--- Remove this\n\nclass UsbCommunicationError : public std::runtime_error { // \u003c--- Remove this entire class\n    public:\n\tUsbCommunicationError(const std::string \u0026msg)\n\t\t: std::runtime_error(msg)\n\t{\n\t}\n};\n\n```\n\n**Remediation:** Since you are already using return codes for error handling in `usb_comm.cc`, this class is completely unused. You should safely delete the `\u003cstdexcept\u003e` include and the `UsbCommunicationError` class definition.",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 0
+      },
+      "revId": "02e7aba6221e427ee896ab011f1564dc64af6f53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f19c3570_2cbca270",
+        "filename": "util/egis/usb_comm.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-15T08:02:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "71ac596b_33e0b901",
       "range": {
         "startLine": 22,
         "startChar": 0,
