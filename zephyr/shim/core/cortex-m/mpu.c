@@ -19,7 +19,19 @@
 #include <cmsis_core.h>
 #include <kernel_arch_data.h>
 
+#if defined(CONFIG_CPU_CORTEX_M33)
+#include <cortex_m/cmse.h>
+#endif
+
 LOG_MODULE_REGISTER(shim_mpu, LOG_LEVEL_ERR);
+
+#ifdef CONFIG_CPU_CORTEX_M33
+void mpu_enable(void)
+{
+	/* MPU is configured and enabled by zephyr init code. */
+}
+
+#else
 
 void mpu_enable(void)
 {
@@ -50,6 +62,7 @@ void mpu_enable(void)
 	}
 }
 
+
 static int mpu_disable_fixed_regions(void)
 {
 	/* MPU is configured and enabled by the Zephyr init code, disable the
@@ -60,11 +73,11 @@ static int mpu_disable_fixed_regions(void)
 		MPU->RASR &= ~MPU_RASR_ENABLE_Msk;
 		LOG_DBG("[%d] %08x %08x", index, MPU->RBAR, MPU->RASR);
 	}
-
 	return 0;
 }
 
 SYS_INIT(mpu_disable_fixed_regions, PRE_KERNEL_1, 50);
+#endif
 
 #ifdef CONFIG_PLATFORM_EC_ROLLBACK_MPU_PROTECT
 /*
@@ -90,6 +103,23 @@ static int mpu_static_rollback_region_id = -1;
  */
 static int mpu_add_static_rollback_regions(void)
 {
+#if defined(CONFIG_CPU_CORTEX_M33)
+	int region;
+
+	/* For CORTEX_M33, rollback_regions has already been defined
+	 * elsewhere (for example, in shim/chip/rtkfp/mpu_regions.c),
+	 * and the rollback region is added in z_arm_mpu_init()
+	 * so we only need to obtain the index of the rollback region here.
+	 */
+
+	region = arm_cmse_mpu_region_get(CONFIG_MAPPED_STORAGE_BASE +
+					 DT_REG_ADDR(DT_NODELABEL(rollback0)));
+	if (region != -EINVAL) {
+		mpu_static_rollback_region_id = region;
+		LOG_DBG("Rollback MPU region set at %d", region);
+		return 0;
+	}
+#else
 	/*
 	 * We need to create two MPU regions for rollback because address of the
 	 * region must be aligned with size. For example, if both rollback
@@ -119,6 +149,7 @@ static int mpu_add_static_rollback_regions(void)
 	arm_core_mpu_configure_static_mpu_regions(
 		rollback_regions, ARRAY_SIZE(rollback_regions), 0, 0);
 
+
 	/*
 	 * Find newly added regions by iterating over regions in MPU. Zephyr
 	 * doesn't provide any convenient way to determine number of regions.
@@ -137,7 +168,7 @@ static int mpu_add_static_rollback_regions(void)
 			return 0;
 		}
 	}
-
+#endif
 	/* It's an error if we can't find rollback MPU regions. */
 	return -EINVAL;
 }
@@ -147,7 +178,22 @@ test_mockable int mpu_lock_rollback(bool lock)
 {
 	if (mpu_static_rollback_region_id < 0)
 		return -EINVAL;
+#if defined(CONFIG_CPU_CORTEX_M33)
+	/* On ARMv8-M, MPU regions cannot be configured with
+	 * "Privileged No-Access" (P_NA) permissions.
+	 * Therefore, disabling the MPU region here relies entirely on the
+	 * default memory map being disabled
+	 * (CONFIG_MPU_DISABLE_BACKGROUND_MAP=y) to prevent privileged access.
+	 * So the rollback region is disabled here if lock.
+	 */
+	MPU->RNR = mpu_static_rollback_region_id;
+	if (lock) {
+		MPU->RLAR &= ~MPU_RLAR_EN_Msk;
+	} else {
+		MPU->RLAR |= MPU_RLAR_EN_Msk;
+	}
 
+#else
 	for (int region = 0; region < 2; region++) {
 		MPU->RNR = mpu_static_rollback_region_id + region;
 		if (lock) {
@@ -156,7 +202,7 @@ test_mockable int mpu_lock_rollback(bool lock)
 			MPU->RASR &= ~MPU_RASR_ENABLE_Msk;
 		}
 	}
-
+#endif
 	return 0;
 }
 #endif
