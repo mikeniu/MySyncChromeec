@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "285f83aa_975f09f9",
+        "filename": "zephyr/program/calypso/mensa/src/chipset.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1262393
+      },
+      "writtenOn": "2026-05-15T06:50:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8badf042_6167906b",
+      "range": {
+        "startLine": 6,
+        "startChar": 3,
+        "endLine": 6,
+        "endChar": 9
+      },
+      "revId": "f15bf173c4cdae5658fcaf3d2aea0af1d79f02e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9d4c23df_769700cf",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1550b5e_f334ded1",
+        "filename": "zephyr/program/calypso/mensa/src/chipset.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1262393
+      },
+      "writtenOn": "2026-05-15T06:50:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9d4c23df_769700cf",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 25
+      },
+      "revId": "f15bf173c4cdae5658fcaf3d2aea0af1d79f02e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e4e877f2_f1366f16",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-05-14T11:14:24Z",
       "side": 1,
       "message": "Please add as a seperate change.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 0
+      },
+      "revId": "f15bf173c4cdae5658fcaf3d2aea0af1d79f02e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2d7c9c2_4cc7e555",
+        "filename": "zephyr/program/calypso/mensa/temp_sensors.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1262393
+      },
+      "writtenOn": "2026-05-15T06:50:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e4e877f2_f1366f16",
       "range": {
         "startLine": 1,
         "startChar": 0,
