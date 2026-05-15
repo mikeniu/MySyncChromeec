@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e5ed4d16_e2bf5aba",
+        "filename": "zephyr/program/calypso/mensa/src/chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-05-15T07:34:17Z",
+      "side": 1,
+      "message": "Does mensa board also have active loadswitch that requires similar delay?",
+      "range": {
+        "startLine": 40,
+        "startChar": 11,
+        "endLine": 40,
+        "endChar": 72
+      },
+      "revId": "dbec7a7067fd49bdddfb59437224f6ed2d7c17df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5c1f3eda_cdc02b55",
         "filename": "zephyr/program/calypso/mensa/src/chipset.c",
         "patchSetId": 1
