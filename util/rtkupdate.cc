@@ -65,6 +65,11 @@
 #define MAX_PACKET_A_SIZE (PACKET_HEADER_LENGTH + PAGE_SIZE + CHECKSUM_LENGTH)
 #define RETRY_COUNT_FOR_SEND_PAGES 10
 
+#define RTS_CMD_FLASH_READ 0xA5A5A5A5ul
+#define RTS_CMD_PROBE_CAP_OFFSET 0x50524F42ul
+#define RTS_CMD_PROBE_CAP_SIZE 0x00000000ul
+#define RTK_FLAME_METADATA_MAGIC 0x464C414Dul
+
 /* Command type opcode */
 enum command_type {
 	SUCCESS_PROGRAM_TO_FLASH = 0x03,
@@ -424,6 +429,28 @@ int wait_for_response(int uart_fd, uint8_t expected_response,
 	return -1;
 }
 
+/* Function: Set command selection address value */
+int set_cmd_sel(int uart_fd, uint32_t val)
+{
+	uint32_t sram_address = SRAM_CMD_BASE_ADDRESS;
+	uint8_t data_buffer[4];
+	data_buffer[0] = val & 0xFF;
+	data_buffer[1] = (val >> 8) & 0xFF;
+	data_buffer[2] = (val >> 16) & 0xFF;
+	data_buffer[3] = (val >> 24) & 0xFF;
+
+	if (send_packet_a(uart_fd, WRITE_DATA_TO_SRAM, 4, sram_address,
+			  data_buffer) != 0) {
+		return -1;
+	}
+
+	if (wait_for_response(uart_fd, WRITE_DATA_TO_SRAM, RESPONSE_TIMEOUT) !=
+	    0) {
+		return -1;
+	}
+	return 0;
+}
+
 /* Function: Send a block of pages */
 int send_pages(int uart_fd, FILE *file, uint32_t sram_address,
 	       size_t *total_bytes_sent, size_t *page)
@@ -477,8 +504,113 @@ int send_pages(int uart_fd, FILE *file, uint32_t sram_address,
 	return 0;
 }
 
+bool probe_monitor(int uart_fd)
+{
+	DBG_PRINT("Probing monitor capabilities...\n");
+	if (send_upload_header(uart_fd, UPLOAD_HEADER_SRAM_ADDRESS,
+			       RTS_CMD_PROBE_CAP_OFFSET,
+			       RTS_CMD_PROBE_CAP_SIZE) != 0) {
+		return false;
+	}
+
+	if (wait_for_response(uart_fd, WRITE_DATA_TO_SRAM, RESPONSE_TIMEOUT) !=
+	    0) {
+		ERR_PRINT(
+			"\nFailed to receive expected response for probe upload header\n");
+		return false;
+	}
+
+	if (send_packet_b(uart_fd, START_FRAME_TO_WRITE_TO_FLASH,
+			  UPLOAD_FUNCTION_POINTER) != 0) {
+		return false;
+	}
+
+	if (wait_for_response(uart_fd, 0x06, RESPONSE_TIMEOUT) != 0) {
+		ERR_PRINT(
+			"\nFailed to receive expected response (first 0x06 for probe)\n");
+		return false;
+	}
+	usleep(100 * 1000);
+
+	unsigned char response[2];
+	int ret = read_exact(uart_fd, response, 2, 1000);
+	usleep(10 * 1000);
+	if (ret != 0) {
+		ERR_PRINT("\nExpected probe response, received: no data\n");
+		return false;
+	}
+
+	if (response[0] != START_FRAME_TO_WRITE_TO_FLASH) {
+		ERR_PRINT(
+			"\nExpected 0x06 probe response, received: 0x%X 0x%X\n",
+			response[0], response[1]);
+		return false;
+	}
+
+	if (response[1] == SUCCESS_PROGRAM_TO_FLASH) {
+		DBG_PRINT("Monitor probe successful (response 0x%X)\n",
+			  response[1]);
+		return true;
+	} else {
+		ERR_PRINT("\nUnexpected probe response status: 0x%X\n",
+			  response[1]);
+		return false;
+	}
+}
+
+bool get_monitor_metadata(const char *monitor_file, char *version_str,
+			  size_t version_len, uint32_t *features)
+{
+	FILE *f = fopen(monitor_file, "rb");
+	if (!f) {
+		perror("Unable to open monitor file");
+		return false;
+	}
+
+	fseek(f, 0, SEEK_END);
+	long size = ftell(f);
+	fseek(f, 0, SEEK_SET);
+
+	if (size <= 0 || size > 65536) {
+		fclose(f);
+		return false;
+	}
+
+	unsigned char *buf = (unsigned char *)malloc(size);
+	if (!buf) {
+		fclose(f);
+		return false;
+	}
+
+	if (fread(buf, 1, size, f) != size) {
+		free(buf);
+		fclose(f);
+		return false;
+	}
+	fclose(f);
+
+	bool found = false;
+	for (long i = 0; i <= size - 40; i += 4) {
+		uint32_t *p = (uint32_t *)&buf[i];
+		if (*p == RTK_FLAME_METADATA_MAGIC) {
+			if (version_str) {
+				strncpy(version_str, (char *)&buf[i + 4],
+					version_len - 1);
+				version_str[version_len - 1] = '\0';
+			}
+			if (features)
+				*features = *(uint32_t *)&buf[i + 36];
+			found = true;
+			break;
+		}
+	}
+	free(buf);
+	return found;
+}
+
 /* Function: Flash process to send data using Packet A */
-int flash(int uart_fd, uint32_t spi_start, const char *file_name)
+int flash(int uart_fd, uint32_t spi_start, const char *file_name,
+	  const char *monitor_file_name)
 {
 	FILE *file = fopen(file_name, "rb");
 	int chunks, total_chunks;
@@ -490,6 +622,31 @@ int flash(int uart_fd, uint32_t spi_start, const char *file_name)
 	}
 
 	printf("Flash operation initiated\n");
+	char monitor_version[32] = "";
+	uint32_t monitor_features = 0;
+
+	if (monitor_file_name) {
+		if (!probe_monitor(uart_fd)) {
+			fprintf(stderr,
+				"Monitor liveness probe failed. Ensure the "
+				"monitor loaded via 'frame' matches %s\n",
+				monitor_file_name);
+			fclose(file);
+			return -1;
+		}
+
+		if (get_monitor_metadata(monitor_file_name, monitor_version,
+					 sizeof(monitor_version),
+					 &monitor_features)) {
+			printf("Monitor version: %s\n", monitor_version);
+			printf("Monitor features: 0x%08X\n", monitor_features);
+		} else {
+			fprintf(stderr,
+				"Failed to parse monitor metadata from %s\n",
+				monitor_file_name);
+		}
+	}
+
 	size_t total_bytes_sent = 0;
 	size_t page = 0;
 	uint32_t upload_header_spi_address = spi_start;
@@ -636,6 +793,18 @@ flash_err:
 int frame(int uart_fd, const char *file_name)
 {
 	printf("Frame operation initiated\n");
+	char monitor_version[32] = "";
+	uint32_t monitor_features = 0;
+
+	if (get_monitor_metadata(file_name, monitor_version,
+				 sizeof(monitor_version), &monitor_features)) {
+		printf("Monitor version: %s\n", monitor_version);
+		printf("Monitor features: 0x%08X\n", monitor_features);
+	} else {
+		fprintf(stderr, "Failed to parse monitor metadata from %s\n",
+			file_name);
+	}
+
 	FILE *file = fopen(file_name, "rb");
 	if (!file) {
 		perror("Failed to open binary file");
@@ -886,6 +1055,7 @@ void usage_print(const char *progname)
 	       "Flash options:\n"
 	       "  -s, --spi_start <spi_start>: Specifies the SPI flash offset\n"
 	       "  -f, --file <binary_file>: File to program with into flash.\n"
+	       "  -n, --monitor_file <binary_file>: Monitor file to parse metadata.\n"
 	       "Frame options:\n"
 	       "  -f, --file <binary_file>: File to program into RAM.\n"
 	       "wp options:\n"
@@ -925,6 +1095,7 @@ int main(int argc, char *argv[])
 	const char *method = NULL;
 	uint32_t spi_start = 0xFFFFFFFF;
 	const char *file_name = NULL;
+	const char *monitor_file_name = NULL;
 	const char *uart_device = NULL;
 	uint32_t bin_length = 0;
 	uint32_t protect = 0xFFFFFFFF;
@@ -934,13 +1105,14 @@ int main(int argc, char *argv[])
 		{ "method", required_argument, 0, 'm' },
 		{ "spi_start", optional_argument, 0, 's' },
 		{ "file", optional_argument, 0, 'f' },
+		{ "monitor_file", optional_argument, 0, 'n' },
 		{ "uart_device", required_argument, 0, 'u' },
 		{ "bin_length", optional_argument, 0, 'o' },
 		{ "protect", optional_argument, 0, 'p' },
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((opt = getopt_long(argc, argv, "m:s:f:u:o:p:", long_options,
+	while ((opt = getopt_long(argc, argv, "m:s:f:n:u:o:p:", long_options,
 				  NULL)) != -1) {
 		switch (opt) {
 		case 'm':
@@ -951,6 +1123,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'f':
 			file_name = optarg;
+			break;
+		case 'n':
+			monitor_file_name = optarg;
 			break;
 		case 'u':
 			uart_device = optarg;
@@ -1017,7 +1192,10 @@ int main(int argc, char *argv[])
 		}
 		printf("SPI Start: 0x%08X\n", spi_start);
 		printf("Binary File: %s\n", file_name);
-		if (flash(uart_fd, spi_start, file_name) != 0) {
+		if (monitor_file_name)
+			printf("Monitor File: %s\n", monitor_file_name);
+		if (flash(uart_fd, spi_start, file_name, monitor_file_name) !=
+		    0) {
 			fprintf(stderr, "Flash process failed\n");
 			goto main_err;
 		}
