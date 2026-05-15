@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85a7e442_71da214e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1153134
+      },
+      "writtenOn": "2026-05-15T10:47:24Z",
+      "side": 1,
+      "message": "@Ruibin.Chang@ite.com.tw:\nPlease enabel tcpmv2 one port.\n- driver: PLATFORM_EC_USB_PD_TCPM_ANX7406\n- i2c port: i2c1\n- irq: gpioj 7",
+      "revId": "34616210830d44d6f384686086d3373fe52a45b0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
