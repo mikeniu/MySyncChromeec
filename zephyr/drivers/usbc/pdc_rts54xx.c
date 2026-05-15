@@ -154,6 +154,7 @@ static const struct smbus_cmd_t SET_TPC_RECONNECT = { 0x08, 0x03, 0x1F };
 static const struct smbus_cmd_t FORCE_SET_POWER_SWITCH = { 0x08, 0x03, 0x21 };
 static const struct smbus_cmd_t GET_RDO = { 0x08, 0x02, 0x84 };
 static const struct smbus_cmd_t GET_VDO = { 0x08, 0x03, 0x9A };
+static const struct smbus_cmd_t SET_VDO = { 0x08, 0x03, 0x1A };
 static const struct smbus_cmd_t SET_SYS_PWR_STATE = { 0x08, 0x03, 0x2B };
 static const struct smbus_cmd_t GET_CURRENT_PARTNER_SRC_PDO = { 0x08, 0x02,
 								0xA7 };
@@ -196,6 +197,7 @@ __maybe_unused static const struct smbus_cmd_t RTS_SET_SBU_MUX_MODE = { 0x30,
 									0x01 };
 static const struct smbus_cmd_t SET_BBR_CTS = { 0x08, 0x03, 0x27 };
 static const struct smbus_cmd_t GET_ALERT = { 0x08, 0x02, 0xB5 };
+static const struct smbus_cmd_t SET_MAX_PDP = { 0x08, 0x03, 0xE2 };
 
 /**
  * @brief States of the main state machine
@@ -229,6 +231,8 @@ enum init_state_t {
 	INIT_PDC_GET_IC_STATUS,
 	/** Set the PDC Notifications */
 	INIT_PDC_SET_NOTIFICATION_ENABLE,
+	/** Set VDOs on the PDC */
+	INIT_PDC_SET_VDO,
 	/** Reset the PDC */
 	INIT_PDC_RESET,
 	/** Initialization complete */
@@ -301,6 +305,8 @@ enum cmd_t {
 	CMD_GET_CABLE_PROPERTY,
 	/** Get VDO(s) of PDC, Cable, or Port partner */
 	CMD_GET_VDO,
+	/** Set VDO(s) of PDC */
+	CMD_SET_VDO,
 	/** CMD_GET_IDENTITY_DISCOVERY */
 	CMD_GET_IDENTITY_DISCOVERY,
 	/** CMD_GET_IS_VCONN_SOURCING */
@@ -334,6 +340,8 @@ enum cmd_t {
 	CMD_GET_VENDOR_STATUS,
 	/** CMD_GET_ALERT */
 	CMD_GET_ALERT,
+	/** CMD_SET_MAX_PDP */
+	CMD_SET_MAX_PDP,
 };
 
 /**
@@ -356,6 +364,9 @@ struct pdc_config_t {
 	bool ccd;
 	/** Whether or not this port supports FRS */
 	bool frs_supported;
+	/** Whether or not this port is capable of USB communication as a device
+	 */
+	bool usb_comm_capable_as_device;
 	/** Pointer to the device-specific callback function */
 	gpio_callback_handler_t callback_handler;
 };
@@ -464,7 +475,8 @@ static const char *const cmd_names[] = {
 	[CMD_SET_FRS_FUNCTION] = "SET_FRS_FUNCTION",
 	[CMD_SET_RETIMER_FW_UPDATE_MODE] = "SET_RETIMER_FW_UPDATE_MODE",
 	[CMD_GET_CABLE_PROPERTY] = "GET_CABLE_PROPERTY",
-	[CMD_GET_VDO] = "GET VDO",
+	[CMD_GET_VDO] = "GET_VDO",
+	[CMD_SET_VDO] = "SET_VDO",
 	[CMD_GET_IDENTITY_DISCOVERY] = "CMD_GET_IDENTITY_DISCOVERY",
 	[CMD_GET_IS_VCONN_SOURCING] = "CMD_GET_IS_VCONN_SOURCING",
 	[CMD_SET_PDO] = "CMD_SET_PDO",
@@ -481,6 +493,7 @@ static const char *const cmd_names[] = {
 	[CMD_SET_SYS_PWR_STATE] = "CMD_SET_SYS_PWR_STATE",
 	[CMD_GET_VENDOR_STATUS] = "CMD_GET_VENDOR_STATUS",
 	[CMD_GET_ALERT] = "CMD_GET_ALERT",
+	[CMD_SET_MAX_PDP] = "CMD_SET_MAX_PDP",
 };
 
 /**
@@ -510,6 +523,7 @@ static int rts54_get_info(const struct device *dev, struct pdc_info_t *info,
 			  bool live);
 static int rts54_get_error_status(const struct device *dev,
 				  union error_status_t *es);
+static int rts54_set_vdo_idh(const struct device *dev);
 
 /**
  * @brief PDC port data used in interrupt handler
@@ -828,6 +842,15 @@ static enum smf_state_result st_init_run(void *o)
 		if (rv) {
 			LOG_ERR("RTK%d:, Internal(INIT_PDC_SET_NOTIFICATION_ENABLE)",
 				cnum);
+			set_state(data, ST_DISABLE);
+			return SMF_EVENT_HANDLED;
+		}
+		init_write_cmd_and_change_state(data, INIT_PDC_SET_VDO);
+		return SMF_EVENT_HANDLED;
+	case INIT_PDC_SET_VDO:
+		rv = rts54_set_vdo_idh(data->dev);
+		if (rv) {
+			LOG_ERR("RTK%d:, Internal(INIT_PDC_SET_VDO)", cnum);
 			set_state(data, ST_DISABLE);
 			return SMF_EVENT_HANDLED;
 		}
@@ -1669,6 +1692,76 @@ static int rts54_post_command(const struct device *dev, enum cmd_t cmd,
 {
 	return rts54_post_command_with_callback(dev, cmd, buf, len, user_buf,
 						NULL);
+}
+
+static int rts54_set_vdo(const struct device *dev, const vdo_config_t *config,
+			 const uint8_t *vdo_types, const uint32_t *vdos)
+{
+	struct pdc_data_t *data = dev->data;
+	uint8_t payload[RTS54XX_SET_VDO_MSG_SIZE(RTS54XX_SET_VDO_MAX_VDOS)];
+	uint8_t num_of_vdos;
+	uint8_t total_size;
+	int i;
+
+	if (get_state(data) != ST_IDLE && !data->init_done) {
+		/* Allow SET_VDO during initialization */
+	} else if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	if (config == NULL || vdo_types == NULL || vdos == NULL) {
+		return -EINVAL;
+	}
+
+	num_of_vdos = config->fields.num_vdos;
+	if (num_of_vdos > RTS54XX_SET_VDO_MAX_VDOS) {
+		return -EINVAL;
+	}
+
+	payload[0] = SET_VDO.cmd;
+	payload[1] =
+		SET_VDO.len + (num_of_vdos * RTS54XX_VDO_TYPE_AND_VALUE_SIZE);
+	payload[2] = SET_VDO.sub;
+	payload[3] = 0x00; /* Internal port number */
+	payload[4] = config->raw;
+
+	for (i = 0; i < num_of_vdos; i++) {
+		payload[5 + (i * RTS54XX_VDO_TYPE_AND_VALUE_SIZE)] =
+			vdo_types[i];
+		payload[6 + (i * RTS54XX_VDO_TYPE_AND_VALUE_SIZE)] =
+			BYTE0(vdos[i]);
+		payload[7 + (i * RTS54XX_VDO_TYPE_AND_VALUE_SIZE)] =
+			BYTE1(vdos[i]);
+		payload[8 + (i * RTS54XX_VDO_TYPE_AND_VALUE_SIZE)] =
+			BYTE2(vdos[i]);
+		payload[9 + (i * RTS54XX_VDO_TYPE_AND_VALUE_SIZE)] =
+			BYTE3(vdos[i]);
+	}
+
+	total_size = RTS54XX_SET_VDO_MSG_SIZE(num_of_vdos);
+	return rts54_post_command(dev, CMD_SET_VDO, payload, total_size, NULL);
+}
+
+static int rts54_set_vdo_idh(const struct device *dev)
+{
+	struct pdc_data_t *data = dev->data;
+	const struct pdc_config_t *cfg = dev->config;
+	uint32_t idh[1];
+	vdo_config_t config = { .raw = 0 };
+	uint8_t vdo_type[] = { VDO_INDEX_IDH };
+
+	/* ID Header VDO (Discovery Identity response)
+	 * Bit 31: USB Host capable
+	 * Bit 30: USB Device capable
+	 * We assume the port is Host capable.
+	 */
+	idh[0] = VDO_IDH(1, cfg->usb_comm_capable_as_device ? 1 : 0,
+			 IDH_PTYPE_UNDEF, 0, data->info.vid);
+
+	config.fields.num_vdos = 1;
+	config.fields.origin = RTS54XX_PDC_ORIGIN;
+
+	return rts54_set_vdo(dev, &config, vdo_type, idh);
 }
 
 /**
@@ -2970,6 +3063,31 @@ static int rts54_get_alert(const struct device *dev, uint32_t *ado)
 				  ARRAY_SIZE(payload), (uint8_t *)ado);
 }
 
+static int rts54_set_max_pdp(const struct device *dev, enum max_pdp_t max_pdp)
+{
+	struct pdc_data_t *data = dev->data;
+	int max_pdp_num;
+
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	if (max_pdp == MAX_PDP_7_5W)
+		max_pdp_num = 7;
+	else if (max_pdp == MAX_PDP_15W)
+		max_pdp_num = 15;
+	else
+		return -EINVAL;
+
+	uint8_t payload[] = {
+		SET_MAX_PDP.cmd,    SET_MAX_PDP.len, SET_MAX_PDP.sub, 0x00,
+		BYTE0(max_pdp_num),
+	};
+
+	return rts54_post_command(dev, CMD_SET_MAX_PDP, payload,
+				  ARRAY_SIZE(payload), NULL);
+}
+
 static DEVICE_API(pdc, pdc_driver_api) = {
 	.start_thread = rts54_start_thread,
 	.is_init_done = rts54_is_init_done,
@@ -3022,6 +3140,7 @@ static DEVICE_API(pdc, pdc_driver_api) = {
 	.set_ap_power_state = rts54_set_ap_power_state,
 	.get_vendor_status = rts54_get_vendor_status,
 	.get_alert = rts54_get_alert,
+	.set_max_pdp = rts54_set_max_pdp,
 };
 
 static int pdc_init(const struct device *dev)
@@ -3204,6 +3323,8 @@ BUILD_ASSERT(
 		.no_fw_update = DT_INST_PROP(inst, no_fw_update),             \
 		.ccd = DT_INST_PROP(inst, ccd),                               \
 		.frs_supported = DT_INST_PROP(inst, frs_supported),           \
+		.usb_comm_capable_as_device =                                 \
+			DT_INST_PROP(inst, usb_comm_capable_as_device),       \
 		.callback_handler = pdc_interrupt_callback##inst,             \
 	};                                                                    \
                                                                               \
