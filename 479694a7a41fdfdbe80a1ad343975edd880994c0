@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22beb2b9_e69c41c1",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 1160,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-15T23:31:26Z",
+      "side": 1,
+      "message": "```suggestion\n\tbool \"External Write Protection status policy\"\n```",
+      "revId": "479694a7a41fdfdbe80a1ad343975edd880994c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2420ec11_e93ae9ad",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 1165,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-15T23:31:26Z",
+      "side": 1,
+      "message": "```suggestion\n\t  External write protection policy allows projects to decide whether\n\t  write protection is enabled or not depending on project-related factors.\n\t  The protection is enabled by default. It can be disabled by calling\n\t  enable_write_protect_external() function.\n```",
+      "range": {
+        "startLine": 1162,
+        "startChar": 0,
+        "endLine": 1165,
+        "endChar": 52
+      },
+      "revId": "479694a7a41fdfdbe80a1ad343975edd880994c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a03bd2db_da502b2f",
+        "filename": "zephyr/drivers/wp/wp_external.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-15T23:31:26Z",
+      "side": 1,
+      "message": "disable?",
+      "range": {
+        "startLine": 11,
+        "startChar": 5,
+        "endLine": 11,
+        "endChar": 11
+      },
+      "revId": "479694a7a41fdfdbe80a1ad343975edd880994c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcfbdd48_34c9cfa8",
+        "filename": "zephyr/drivers/wp/wp_external.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-15T23:31:26Z",
+      "side": 1,
+      "message": "You use `__weak` to temporarily override this function in platform (and forget to remove in later CLs 😊).\n\nLooks like `wp_external` needs some initial state. Maybe you should have some `choice` in Kconfig with the default set to enabled? You will also need to change `enable_write_protect_external()` to `set_write_protect_external(bool)`\n\nThis will allow you to avoid workarounding feature you are implementing.",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 7
+      },
+      "revId": "479694a7a41fdfdbe80a1ad343975edd880994c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
