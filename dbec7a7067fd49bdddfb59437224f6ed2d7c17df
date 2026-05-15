@@ -62,6 +62,24 @@
       "message": "Mensa",
       "revId": "dbec7a7067fd49bdddfb59437224f6ed2d7c17df",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abd4d939_7849fbfe",
+        "filename": "zephyr/program/calypso/mensa/src/chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1549034
+      },
+      "writtenOn": "2026-05-15T07:44:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c1f3eda_cdc02b55",
+      "revId": "dbec7a7067fd49bdddfb59437224f6ed2d7c17df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
