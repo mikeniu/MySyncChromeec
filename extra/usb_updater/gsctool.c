@@ -5150,10 +5150,15 @@ static int process_ti50_get_metrics(struct transfer_descriptor *td,
 
 static void print_ti50_device_id_field(const char *name,
 				       struct ti50_device_ids_field id,
+				       bool is_rma_field,
 				       bool show_machine_output)
 {
 	if (show_machine_output) {
 		printf("FIELD_%s_SIZE=%u\n", name, id.size);
+		printf("FIELD_%s_RMA=%s\n", name,
+		       id.size == 0xff ? "NA" :
+		       is_rma_field    ? "Y" :
+					 "N");
 		printf("FIELD_%s=", name);
 	} else {
 		printf("%12s (%3u): ", name, id.size);
@@ -5189,6 +5194,8 @@ static void print_ti50_device_id_header(struct ti50_device_ids_response *ids,
 
 	if (show_machine_output) {
 		print_machine_output("VERSION", "%u", ids->header.version);
+		print_machine_output("VERSION_MINOR", "%u",
+				     ids->header.version_minor);
 		print_machine_output("STATUS", "%u", ids->header.status);
 		print_machine_output("VALID", "%s", valid);
 		print_machine_output("FINALIZED", "%s", finalized);
@@ -5203,6 +5210,7 @@ static void print_ti50_device_id_header(struct ti50_device_ids_response *ids,
 		print_machine_output("TOTAL_FIELDS_SIZE", "%u", size);
 	} else {
 		printf("Version: %u\n", ids->header.version);
+		printf("Version Minor: %u\n", ids->header.version_minor);
 		printf("Status: %u\n", ids->header.status);
 		printf("Valid: %s\n", valid);
 		printf("Finalized: %s\n", finalized);
@@ -5234,19 +5242,25 @@ static int print_ti50_device_ids(struct ti50_device_ids_response *ids,
 				 bool show_machine_output)
 {
 	size_t i;
+	/* RMA status added in 1.0 */
+	bool supports_rma = ids->header.version > 1 ||
+			    ids->header.version != 0xff;
 
 	if (ids->header.version == 0xff) {
 		printf("fields unset");
 		return 0;
 	}
+
 	if (ids->header.version != TI50_DEVICE_IDS_VERSION) {
 		printf("unsupported device ids version");
 		return 1;
 	}
 
 	for (i = 0; i < ARRAY_SIZE(ti50_device_id_fields); i++) {
-		print_ti50_device_id_field(ti50_device_id_fields[i].name,
-					   ids->ids[i], show_machine_output);
+		print_ti50_device_id_field(
+			ti50_device_id_fields[i].name, ids->ids[i],
+			supports_rma && !!(ids->header.rma_fields & (1 << i)),
+			show_machine_output);
 	}
 	return 0;
 }
@@ -5338,6 +5352,9 @@ static int process_ti50_device_ids(struct transfer_descriptor *td,
 	} else if (!strcasecmp("get_info", arg)) {
 		return process_ti50_get_device_ids(td, STORAGE_INFO,
 						   show_machine_output);
+	} else if (!strcasecmp("get_rma", arg)) {
+		return process_ti50_get_device_ids(td, STORAGE_RMA,
+						   show_machine_output);
 	} else if (!strcasecmp("get_scratch", arg)) {
 		return process_ti50_get_device_ids(td, STORAGE_NVMEM,
 						   show_machine_output);
@@ -5346,6 +5363,9 @@ static int process_ti50_device_ids(struct transfer_descriptor *td,
 		request_size = 1;
 	} else if (!strcasecmp("delete_scratch", arg)) {
 		request.subcmd = DEVICE_ID_DELETE_SCRATCH;
+		request_size = 1;
+	} else if (!strcasecmp("delete_rma", arg)) {
+		request.subcmd = DEVICE_ID_DELETE_RMA;
 		request_size = 1;
 	} else {
 		/*
