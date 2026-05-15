@@ -211,6 +211,13 @@ int tps_rw_sx_app_config(const struct i2c_dt_spec *i2c,
 			    sizeof(union reg_sx_app_config), flag);
 }
 
+int tps_rw_sleep_control(const struct i2c_dt_spec *i2c,
+			 union reg_sleep_control *buf, int flag)
+{
+	return tps_xfer_reg(i2c, REG_SLEEP_CONTROL, buf->raw_value,
+			    sizeof(union reg_sleep_control), flag);
+}
+
 int tps_rd_active_rdo_contract(const struct i2c_dt_spec *i2c,
 			       union reg_active_rdo_contract *buf)
 {

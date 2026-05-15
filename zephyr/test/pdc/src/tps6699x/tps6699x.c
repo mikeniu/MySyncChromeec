@@ -623,3 +623,27 @@ ZTEST_USER(tps6699x, test_ap_mode_override_off)
 	else
 		zassert_true(caps_out.bmOptionalFeatures.alt_mode_override);
 }
+
+ZTEST_USER(tps6699x, test_sbu_mux_sleep_mode_allowed)
+{
+	struct i2c_dt_spec i2c_spec = I2C_DT_SPEC_GET(TPS6699X_NODE);
+	union reg_sleep_control sleep_reg;
+
+	zassert_ok(emul_pdc_set_feature_flag(
+		emul, EMUL_PDC_FEATURE_SBU_MUX_OVERRIDE));
+
+	zassert_ok(tps_rw_sleep_control(&i2c_spec, &sleep_reg, I2C_MSG_READ));
+	zassert_equal(sleep_reg.sleep_mode_allowed, 1);
+
+	zassert_ok(pdc_set_sbu_mux_mode(dev, PDC_SBU_MUX_MODE_FORCE_DBG));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	zassert_ok(tps_rw_sleep_control(&i2c_spec, &sleep_reg, I2C_MSG_READ));
+	zassert_equal(sleep_reg.sleep_mode_allowed, 0);
+
+	zassert_ok(pdc_set_sbu_mux_mode(dev, PDC_SBU_MUX_MODE_NORMAL));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	zassert_ok(tps_rw_sleep_control(&i2c_spec, &sleep_reg, I2C_MSG_READ));
+	zassert_equal(sleep_reg.sleep_mode_allowed, 1);
+}

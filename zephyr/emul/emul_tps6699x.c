@@ -1173,6 +1173,8 @@ static int emul_tps6699x_reset(const struct emul *target)
 	union reg_received_attention_vdm *attention_vdm =
 		(union reg_received_attention_vdm *)
 			data->reg_val[REG_RECEIVED_ATTENTION_VDM];
+	union reg_sleep_control *sleep_control =
+		(union reg_sleep_control *)data->reg_val[REG_SLEEP_CONTROL];
 	memset(data->reg_val, 0, sizeof(data->reg_val));
 
 	/* Reset PDOs. */
@@ -1194,6 +1196,7 @@ static int emul_tps6699x_reset(const struct emul *target)
 
 	/* Initialize reg_mode to APP0 to indicate running from flash. */
 	*((uint32_t *)reg_mode->data) = REG_MODE_APP0;
+	sleep_control->sleep_mode_allowed = 1;
 
 	/* Init received attention vdm */
 	attention_vdm->number_valid_vdos = 2;
@@ -1273,6 +1276,9 @@ static int tps6699x_emul_init(const struct emul *emul,
 	union reg_received_attention_vdm *attention_vdm =
 		(union reg_received_attention_vdm *)
 			data->pdc_data.reg_val[REG_RECEIVED_ATTENTION_VDM];
+	union reg_sleep_control *sleep_control =
+		(union reg_sleep_control *)
+			data->pdc_data.reg_val[REG_SLEEP_CONTROL];
 	LOG_INF("TPS669X emul init");
 
 	data->common.i2c = parent;
@@ -1291,6 +1297,7 @@ static int tps6699x_emul_init(const struct emul *emul,
 
 	/* Init register to APP0 */
 	*((uint32_t *)reg_mode->data) = REG_MODE_APP0;
+	sleep_control->sleep_mode_allowed = 1;
 
 	/* Init received attention vdm */
 	attention_vdm->number_valid_vdos = 2;
