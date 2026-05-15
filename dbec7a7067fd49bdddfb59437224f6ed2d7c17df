@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bb3e5cad_52e31368",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-05-15T07:57:09Z",
+      "side": 1,
+      "message": "power-rails",
+      "range": {
+        "startLine": 7,
+        "startChar": 11,
+        "endLine": 7,
+        "endChar": 16
+      },
+      "revId": "dbec7a7067fd49bdddfb59437224f6ed2d7c17df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7ea940a2_1e97cdb8",
         "filename": "zephyr/program/calypso/mensa/src/chipset.c",
         "patchSetId": 1
