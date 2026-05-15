@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1c4d77a_0bfa8fb7",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-15T22:23:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This TODO suggests that `mpu_config.num_regions` might be an unreliable limit for iterating over MPU regions on ARMv8-M. It would be better to address this now, e.g., by using the actual number of hardware regions from the `MPU_TYPE` register, to ensure all regions are correctly enabled.",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44866e67_b05978be",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-15T22:23:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The M33 path only adds `rollback0`, whereas the non-M33 path adds both `rollback0` and `rollback1`. If `rollback1` exists in the devicetree for M33 boards, it will be left unprotected by this code. Was this omission intentional?",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f25dfe15_e946d95d",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-15T22:23:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Inconsistency in size definition: M33 path uses `CONFIG_ROLLBACK_SIZE` while the non-M33 path uses `DT_REG_SIZE(DT_NODELABEL(rollback0))`. It would be better to stay consistent and use the devicetree-defined size if possible.",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea06a094_917c8dc3",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-15T22:23:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Why is the attribute for M33 changed to `K_MEM_PARTITION_P_RO_U_NA` (Privileged Read Only) from `K_MEM_PARTITION_P_NA_U_NA` (No Access) used in the `#else` block? Usually, rollback protection aims to completely hide the region until unlocked. Is this change intentional for ARMv8-M?",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21836980_285ffc89",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-15T22:23:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This `printk` seems to be a leftover from debugging, as it is redundant with the `LOG_DBG` call on the previous line. Please remove it.",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
