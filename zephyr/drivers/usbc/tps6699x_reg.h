@@ -1572,6 +1572,18 @@ union reg_source_info {
 };
 
 /**
+ * @brief 4.69 Sleep Control Register (Offset = 0x70)
+ */
+union reg_sleep_control {
+	struct {
+		uint8_t sleep_mode_allowed : 1;
+		uint8_t sleep_time : 2;
+		uint8_t reserved : 5;
+	} __packed;
+	uint8_t raw_value[1];
+};
+
+/**
  * @brief - 10.6.1 SRDY switch settings
  */
 enum srdy_switch_select {
