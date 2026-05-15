@@ -97,11 +97,21 @@ static void hook_tick_work(struct k_work *work)
 /*
  * Numerically lower priorities take precedence, so verify the hook
  * related threads cannot preempt any of the shimmed tasks.
+ *
+ * BT_HCI_RAW mode is the only legitimate exception: CONFIG_BT forces
+ * SYSTEM_WORKQUEUE_PRIORITY into the cooperative (negative) range, but in
+ * BT_HCI_RAW mode the BT driver (hci_cnvi) uses its own IRQ path and never
+ * submits work to the system workqueue, so the EC priority model is intact.
+ * With the full BT host stack (BT_HCI_HOST) the system workqueue IS used for
+ * HCI event processing, so the assert must still fire in that case.
  */
-BUILD_ASSERT(CONFIG_SYSTEM_WORKQUEUE_PRIORITY >= (EC_TASK_PRIO_COUNT - 1),
+BUILD_ASSERT(CONFIG_SYSTEM_WORKQUEUE_PRIORITY >= (EC_TASK_PRIO_COUNT - 1) ||
+		     IS_ENABLED(CONFIG_BT_HCI_RAW),
 	     "System workqueue priority must be lower than all EC tasks");
 BUILD_ASSERT(
-	CONFIG_SYSTEM_WORKQUEUE_PRIORITY == EC_TASK_PRIORITY(EC_SYSWORKQ_PRIO),
+	CONFIG_SYSTEM_WORKQUEUE_PRIORITY ==
+			EC_TASK_PRIORITY(EC_SYSWORKQ_PRIO) ||
+		IS_ENABLED(CONFIG_BT_HCI_RAW),
 	"EC_SYSWORKQ_PRIO does not match CONFIG_SYSTEM_WORKQUEUE_PRIORITY.");
 
 static int zephyr_shim_setup_hooks(void)
