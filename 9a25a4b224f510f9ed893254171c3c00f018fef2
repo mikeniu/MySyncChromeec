@@ -52,6 +52,24 @@
       "parentUuid": "4a4dd61e_0e44cc3a",
       "revId": "9a25a4b224f510f9ed893254171c3c00f018fef2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "faa5e929_fc792225",
+        "filename": "zephyr/test/hwtest/boards/ft9001_eval.overlay",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-15T08:24:39Z",
+      "side": 1,
+      "message": "Then, why are we using the mock on helipilot? I\u0027m more than happy to skip this test on renode, I\u0027ll prepare it ASAP.",
+      "parentUuid": "7580a267_eb5cabb2",
+      "revId": "9a25a4b224f510f9ed893254171c3c00f018fef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
