@@ -2158,8 +2158,31 @@ static void task_aneg(struct pdc_data_t *data)
 static void task_sbud(struct pdc_data_t *data)
 {
 	struct pdc_config_t const *cfg = data->dev->config;
+	union reg_sleep_control sleep_ctrl;
 	union reg_data cmd_data;
 	int rv;
+
+	rv = tps_rw_sleep_control(&cfg->i2c, &sleep_ctrl, I2C_MSG_READ);
+	if (rv) {
+		LOG_ERR("TI%d: Read sleep control failed (%d)",
+			cfg->connector_number, rv);
+		set_state(data, ST_ERROR_RECOVERY);
+		return;
+	}
+
+	if (data->sbumux_mode == PDC_SBU_MUX_MODE_FORCE_DBG) {
+		sleep_ctrl.sleep_mode_allowed = 0;
+	} else if (data->sbumux_mode == PDC_SBU_MUX_MODE_NORMAL) {
+		sleep_ctrl.sleep_mode_allowed = 1;
+	}
+
+	rv = tps_rw_sleep_control(&cfg->i2c, &sleep_ctrl, I2C_MSG_WRITE);
+	if (rv) {
+		LOG_ERR("TI%d: Write sleep control failed (%d)",
+			cfg->connector_number, rv);
+		set_state(data, ST_ERROR_RECOVERY);
+		return;
+	}
 
 	cmd_data.data[0] = data->sbumux_mode;
 	rv = write_task_cmd(cfg, COMMAND_TASK_SBUD, &cmd_data);
