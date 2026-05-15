@@ -1,0 +1,172 @@
+diff --git a/zephyr/drivers/usbc/pdc_rts54xx.c b/zephyr/drivers/usbc/pdc_rts54xx.c
+index 49f5bf3677..bd656c1aee 100644
+--- a/zephyr/drivers/usbc/pdc_rts54xx.c
++++ b/zephyr/drivers/usbc/pdc_rts54xx.c
+@@ -196,6 +196,7 @@ __maybe_unused static const struct smbus_cmd_t RTS_SET_SBU_MUX_MODE = { 0x30,
+ 									0x01 };
+ static const struct smbus_cmd_t SET_BBR_CTS = { 0x08, 0x03, 0x27 };
+ static const struct smbus_cmd_t GET_ALERT = { 0x08, 0x02, 0xB5 };
++static const struct smbus_cmd_t SET_MAX_PDP = {0x08, 0x05, 0xE2};
+ 
+ /**
+  * @brief States of the main state machine
+@@ -234,6 +235,7 @@ enum init_state_t {
+ 	/** Initialization complete */
+ 	INIT_PDC_COMPLETE,
+ 	/** Initialization error */
++	INIT_SET_MAX_PDP,
+ 	INIT_ERROR,
+ 	/** Wait for command to send */
+ 	INIT_PDC_CMD_WAIT
+@@ -334,6 +336,7 @@ enum cmd_t {
+ 	CMD_GET_VENDOR_STATUS,
+ 	/** CMD_GET_ALERT */
+ 	CMD_GET_ALERT,
++	CMD_SET_MAX_PDP,
+ };
+ 
+ /**
+@@ -481,6 +484,7 @@ static const char *const cmd_names[] = {
+ 	[CMD_SET_SYS_PWR_STATE] = "CMD_SET_SYS_PWR_STATE",
+ 	[CMD_GET_VENDOR_STATUS] = "CMD_GET_VENDOR_STATUS",
+ 	[CMD_GET_ALERT] = "CMD_GET_ALERT",
++	[CMD_SET_MAX_PDP] = "CMD_SET_MAX_PDP",
+ };
+ 
+ /**
+@@ -503,6 +507,7 @@ static struct gpio_dt_spec
+ static const struct smf_state states[];
+ static int rts54_enable(const struct device *dev);
+ static int rts54_reset(const struct device *dev);
++static int rts54_set_max_pdp(const struct device *dev);
+ static int rts54_set_notification_enable(const struct device *dev,
+ 					 union notification_enable_t bits,
+ 					 uint16_t ext_bits);
+@@ -840,7 +845,8 @@ static enum smf_state_result st_init_run(void *o)
+ 			set_state(data, ST_DISABLE);
+ 			return SMF_EVENT_HANDLED;
+ 		}
+-		init_write_cmd_and_change_state(data, INIT_PDC_COMPLETE);
++
++		init_write_cmd_and_change_state(data, INIT_SET_MAX_PDP);
+ 		return SMF_EVENT_HANDLED;
+ 	case INIT_PDC_COMPLETE:
+ 		data->es.pdc_init_failed = 0;
+@@ -848,6 +854,17 @@ static enum smf_state_result st_init_run(void *o)
+ 		set_state(data, ST_IDLE);
+ 		data->init_done = true;
+ 		return SMF_EVENT_HANDLED;
++	case INIT_SET_MAX_PDP:
++		if(!pd_get_usb_pd_3a_ports()){
++			rv = rts54_set_max_pdp(data->dev);
++			if (rv) {
++				LOG_ERR("RTK%d:, Internal(SET_MAX_PDP)", cnum);
++				set_state(data, ST_DISABLE);
++				return SMF_EVENT_HANDLED;
++			}
++		}
++		init_write_cmd_and_change_state(data, INIT_PDC_COMPLETE);
++		return SMF_EVENT_HANDLED;
+ 	case INIT_ERROR:
+ 		/* Get error status, and re-start the init process */
+ 		rts54_get_error_status(data->dev, &data->es);
+@@ -1824,6 +1841,27 @@ static int rts54_reset(const struct device *dev)
+ 				  ARRAY_SIZE(payload), NULL);
+ }
+ 
++static int rts54_set_max_pdp(const struct device *dev)
++{
++	const struct pdc_config_t *cfg = dev->config;
++	struct pdc_data_t *data = dev->data;
++
++	if (get_state(data) != ST_INIT) {
++		return -EBUSY;
++	}
++
++	uint8_t payload[] = {
++		SET_MAX_PDP.cmd,      SET_MAX_PDP.len,
++		SET_MAX_PDP.sub,      0x00, /* Port */
++		0x0F, 0x00, 0x07,
++	};
++
++	LOG_ERR("RTK%d: SET_MAX_PDP = 7W",cfg->connector_number);
++
++	return rts54_post_command(dev, CMD_SET_MAX_PDP, payload,
++				  ARRAY_SIZE(payload), NULL);
++}
++
+ static int rts54_connector_reset(const struct device *dev,
+ 				 union connector_reset_t reset)
+ {
+diff --git a/zephyr/program/skywalker/ite_usbc.dtsi b/zephyr/program/skywalker/ite_usbc.dtsi
+index 40706ba68f..5da7a54c41 100644
+--- a/zephyr/program/skywalker/ite_usbc.dtsi
++++ b/zephyr/program/skywalker/ite_usbc.dtsi
+@@ -16,6 +16,7 @@
+ 			chg = <&charger_bq25720>;
+ 			pdc = <&pdc_power_p0>;
+ 			policy = <&cros_policy>;
++			pd-retimer;
+ 		};
+ 
+ 		usbc_port1: port1@1 {
+@@ -23,6 +24,7 @@
+ 			reg = <1>;
+ 			pdc = <&pdc_power_p1>;
+ 			policy = <&cros_policy>;
++			pd-retimer;
+ 		};
+ 
+ 		ppm-driver {
+diff --git a/zephyr/program/skywalker/npcx_usbc.dtsi b/zephyr/program/skywalker/npcx_usbc.dtsi
+index 3083655b0c..b075ea59eb 100644
+--- a/zephyr/program/skywalker/npcx_usbc.dtsi
++++ b/zephyr/program/skywalker/npcx_usbc.dtsi
+@@ -16,6 +16,7 @@
+ 			chg = <&charger_bq25720>;
+ 			pdc = <&pdc_power_p0>;
+ 			policy = <&cros_policy>;
++			pd-retimer;
+ 		};
+ 
+ 		usbc_port1: port1@1 {
+@@ -23,6 +24,7 @@
+ 			reg = <1>;
+ 			pdc = <&pdc_power_p1>;
+ 			policy = <&cros_policy>;
++			pd-retimer;
+ 		};
+ 
+ 		ppm-driver {
+diff --git a/zephyr/program/skywalker/obiwan/project.conf b/zephyr/program/skywalker/obiwan/project.conf
+index 7cc0655ad2..9d4c06cf4a 100644
+--- a/zephyr/program/skywalker/obiwan/project.conf
++++ b/zephyr/program/skywalker/obiwan/project.conf
+@@ -32,8 +32,11 @@ CONFIG_PLATFORM_EC_CHARGER_PROFILE_OVERRIDE=y
+ # pdc
+ CONFIG_PDC_POWER_MGMT_SRC_PDO_PEAK_OCP_110=y
+ CONFIG_PLATFORM_EC_USB_PD_3A_PORTS_CUSTOM=y
++CONFIG_PLATFORM_EC_USB_PD_3A_PORTS=0
+ 
+ # System Lock
+ CONFIG_PLATFORM_EC_BRINGUP=n
+-CONFIG_PLATFORM_EC_SYSTEM_UNLOCKED=n
+-CONFIG_USBC_LOG_LEVEL_ERR=y
++CONFIG_PLATFORM_EC_SYSTEM_UNLOCKED=y
++CONFIG_PLATFORM_EC_USBC_RETIMER_FW_UPDATE=y
++CONFIG_USBC_PDC_RTS54XX_CONSOLE_FW_UPDATER=y
++CONFIG_USBC_PDC_DRIVEN_CCD=y
+diff --git a/zephyr/program/skywalker/padme/project.conf b/zephyr/program/skywalker/padme/project.conf
+index ac6950e6a8..75fbf4d4cf 100644
+--- a/zephyr/program/skywalker/padme/project.conf
++++ b/zephyr/program/skywalker/padme/project.conf
+@@ -60,5 +60,7 @@ CONFIG_PLATFORM_EC_WPC_HALL_ENABLE=y
+ 
+ # System lock
+ CONFIG_PLATFORM_EC_BRINGUP=n
+-CONFIG_PLATFORM_EC_SYSTEM_UNLOCKED=n
+-CONFIG_USBC_LOG_LEVEL_ERR=y
++CONFIG_PLATFORM_EC_SYSTEM_UNLOCKED=y
++CONFIG_PLATFORM_EC_USBC_RETIMER_FW_UPDATE=y
++CONFIG_USBC_PDC_RTS54XX_CONSOLE_FW_UPDATER=y
++CONFIG_USBC_PDC_DRIVEN_CCD=y
