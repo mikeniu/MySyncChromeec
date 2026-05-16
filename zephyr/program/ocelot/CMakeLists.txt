@@ -56,6 +56,11 @@ if(DEFINED CONFIG_BOARD_OCICAT)
 	zephyr_library_sources("ocicat/src/thermal.c")
 endif()
 
+if(DEFINED CONFIG_BOARD_OCELOTRVP_RTK)
+	project(ocelotrvp-rtk)
+	zephyr_library_sources("src/rvp_board_power.c")
+endif()
+
 zephyr_include_directories("include/")
 
 zephyr_include_directories_ifdef(CONFIG_PLATFORM_EC_DEDICATED_CHARGE_PORT
