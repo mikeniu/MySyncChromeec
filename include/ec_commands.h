@@ -6062,6 +6062,91 @@ struct ec_response_hostcmd_watchdog_info {
 	int64_t watchdog_stats_elapsed_ms;
 } __ec_align4;
 
+#define EC_THREAD_INFO_MAX_COUNT 32
+#define EC_THREAD_INFO_NAME_SIZE 16
+
+#define EC_CMD_THREAD_INFO_LIST 0x00E4
+
+struct ec_response_thread_info_list {
+	/* Total number of threads found, or EC_THREAD_INFO_MAX_COUNT if it
+	 * exceeds the limit.
+	 */
+	uint32_t thread_count;
+	uint32_t thread_ids[EC_THREAD_INFO_MAX_COUNT];
+} __ec_align4;
+
+#define EC_CMD_THREAD_INFO_DETAIL 0x00E5
+
+#define EC_THREAD_INFO_DETAIL_STACK_VALID  \
+	BIT(0) /* CONFIG_THREAD_STACK_INFO \
+		*/
+#define EC_THREAD_INFO_DETAIL_RUNTIME_USAGE_VALID \
+	BIT(1) /* CONFIG_SCHED_THREAD_USAGE */
+#define EC_THREAD_INFO_DETAIL_USAGE_ANALYSIS_VALID \
+	BIT(2) /* CONFIG_SCHED_THREAD_USAGE_ANALYSIS */
+#define EC_THREAD_INFO_DETAIL_NAME_VALID BIT(3) /* CONFIG_THREAD_NAME */
+#define EC_THREAD_INFO_DETAIL_PC_VALID BIT(4)
+#define EC_THREAD_INFO_DETAIL_LR_VALID BIT(5)
+#define EC_THREAD_INFO_DETAIL_SP_VALID BIT(6)
+
+struct ec_params_thread_info_detail {
+	uint32_t thread_id;
+} __ec_align4;
+
+/*
+ * These commands are ONLY applicable to Zephyr threads.
+ */
+struct ec_response_thread_info_detail {
+	/* Metadata */
+	uint64_t timestamp_us; /* System uptime when stats were collected */
+	uint32_t valid_flags; /* See EC_THREAD_INFO_DETAIL_*_VALID flags */
+
+	/* Name (Only valid if EC_THREAD_INFO_DETAIL_NAME_VALID is set).
+	 * Guaranteed to be null-terminated.
+	 */
+	char name[EC_THREAD_INFO_NAME_SIZE];
+
+	/* Basic information */
+	uint32_t entry_point; /* Thread entry point function address */
+	uint32_t timeout_us;
+	/*
+	 * Remaining timeout in us, 0xffffffff if forever,
+	 * 0 if none
+	 */
+
+	uint16_t user_options; /* From k_thread->base.user_options */
+	int8_t prio; /* From k_thread->base.prio */
+	uint8_t thread_state; /* From k_thread->base.thread_state */
+	uint8_t is_idle; /* 1 if per-CPU idle thread, 0 otherwise */
+	uint8_t is_current; /* 1 if thread is current, 0 otherwise */
+	uint8_t reserved[2]; /* Padding for alignment */
+
+	/* Stack usage (Only valid if EC_THREAD_INFO_DETAIL_STACK_VALID is set)
+	 */
+	uint32_t stack_cur;
+	uint32_t stack_max;
+	uint32_t stack_size;
+
+	/* Timing (Only valid if EC_THREAD_INFO_DETAIL_RUNTIME_USAGE_VALID is
+	 * set)
+	 */
+	uint32_t execution_time_us;
+
+	/* Analysis (Only valid if EC_THREAD_INFO_DETAIL_USAGE_ANALYSIS_VALID is
+	 * set)
+	 */
+	uint32_t window_peak_us;
+	uint32_t window_avg_us;
+
+	/* CPU scheduling */
+	uint32_t pending_on; /* Address of object thread is blocked on */
+
+	/* CPU registers (Valid flags: EC_THREAD_INFO_DETAIL_PC_VALID, etc.) */
+	uint32_t pc;
+	uint32_t lr;
+	uint32_t sp;
+} __ec_align4;
+
 /*****************************************************************************/
 /*
  * PD commands
@@ -8971,6 +9056,13 @@ struct ec_response_fp_sign_match {
 	uint8_t signature[FP_MAC_LENGTH];
 } __ec_align4;
 
+/* Unlock developer options via FingerGuard HMAC */
+#define EC_CMD_FP_UNLOCK_DEV_OPTIONS 0x0418
+
+struct ec_params_fp_unlock_dev_options {
+	uint8_t hmac[FP_MAC_LENGTH];
+} __ec_align4;
+
 /*
  * Fingerprint ASCP claim command.
  *
@@ -9275,6 +9367,29 @@ struct ec_response_get_boot_time {
  */
 #define EC_CMD_ENABLE_OFFMODE_HEARTBEAT 0x0606
 
+/* Get battery misc info */
+#define EC_CMD_BATTERY_GET_MISC_INFO 0x0607
+
+/**
+ * struct ec_params_battery_get_misc_info - Battery misc info parameters
+ * @index: Battery index.
+ */
+struct ec_params_battery_get_misc_info {
+	uint8_t index;
+} __ec_align1;
+
+/**
+ * struct ec_response_battery_get_misc_info - Battery misc info response
+ * @cfet_status: status of C-FET. 1: disabled, 0: enabled, -1: error.
+ * @battery_status: Battery status register.
+ * @dfet_status: status of D-FET. 0: disconnected, 1: not disconnected, -1:
+ * error.
+ */
+struct ec_response_battery_get_misc_info {
+	int32_t cfet_status;
+	uint32_t battery_status;
+	int32_t dfet_status;
+} __ec_align4;
 /*****************************************************************************/
 /*
  * Reserve a range of host commands for board-specific, experimental, or
