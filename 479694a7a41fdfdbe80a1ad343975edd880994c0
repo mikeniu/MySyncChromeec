@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1a88155_d778b4f4",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 1160,
+      "author": {
+        "id": 1442982
+      },
+      "writtenOn": "2026-05-16T00:33:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22beb2b9_e69c41c1",
+      "revId": "479694a7a41fdfdbe80a1ad343975edd880994c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2420ec11_e93ae9ad",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-05-15T23:31:26Z",
       "side": 1,
       "message": "```suggestion\n\t  External write protection policy allows projects to decide whether\n\t  write protection is enabled or not depending on project-related factors.\n\t  The protection is enabled by default. It can be disabled by calling\n\t  enable_write_protect_external() function.\n```",
+      "range": {
+        "startLine": 1162,
+        "startChar": 0,
+        "endLine": 1165,
+        "endChar": 52
+      },
+      "revId": "479694a7a41fdfdbe80a1ad343975edd880994c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c6a8275_25f947ed",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 1165,
+      "author": {
+        "id": 1442982
+      },
+      "writtenOn": "2026-05-16T00:33:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2420ec11_e93ae9ad",
       "range": {
         "startLine": 1162,
         "startChar": 0,
@@ -64,6 +106,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbb43d79_f12e650b",
+        "filename": "zephyr/drivers/wp/wp_external.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1442982
+      },
+      "writtenOn": "2026-05-16T00:33:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a03bd2db_da502b2f",
+      "range": {
+        "startLine": 11,
+        "startChar": 5,
+        "endLine": 11,
+        "endChar": 11
+      },
+      "revId": "479694a7a41fdfdbe80a1ad343975edd880994c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dcfbdd48_34c9cfa8",
@@ -87,6 +153,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d11b2db1_f62ac013",
+        "filename": "zephyr/drivers/wp/wp_external.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1442982
+      },
+      "writtenOn": "2026-05-16T00:33:58Z",
+      "side": 1,
+      "message": "Ended up with removing __weak and introducing SYS_INIT call to disable WP in this CL. Consecutive CLs just removes this SYS_INIT call per-platform.",
+      "parentUuid": "dcfbdd48_34c9cfa8",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 7
+      },
+      "revId": "479694a7a41fdfdbe80a1ad343975edd880994c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e01ccbb4_a93b14a6",
@@ -100,6 +190,30 @@
       "writtenOn": "2026-05-15T23:35:40Z",
       "side": 1,
       "message": "You don\u0027t need this mock. You can call `enable_write_protect_external()`.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 58
+      },
+      "revId": "479694a7a41fdfdbe80a1ad343975edd880994c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10ad9692_f5f29693",
+        "filename": "zephyr/test/drivers/write_protection_external/src/write_protection_external.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1442982
+      },
+      "writtenOn": "2026-05-16T00:33:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e01ccbb4_a93b14a6",
       "range": {
         "startLine": 14,
         "startChar": 0,
