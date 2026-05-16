@@ -137,7 +137,6 @@ known_modules = {
         / "modules"
         / "hal"
         / "focaltech_module"
-        / "focaltech"
     ),
     "fpc": lambda name, checkout: (
         checkout / "src" / "platform" / "fingerprint" / "fpc"
