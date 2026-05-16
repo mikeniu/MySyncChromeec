@@ -809,6 +809,24 @@ static int get_vdo(struct rts5453p_emul_pdc_data *data,
 	return 0;
 }
 
+static int set_vdo(struct rts5453p_emul_pdc_data *data,
+		   const union rts54_request *req)
+{
+	uint8_t num_vdos = req->set_vdo.vdo_req.num_vdos;
+	uint8_t vdo_origin = req->set_vdo.vdo_req.vdo_origin;
+
+	LOG_INF("SET_VDO num_vdos=%d, vdo_origin=%d", num_vdos, vdo_origin);
+
+	for (uint8_t i = 0; i < num_vdos; i++) {
+		uint8_t vdo_index = req->set_vdo.vdos[i].type;
+		data->vdos[vdo_index] = req->set_vdo.vdos[i].vdo;
+	}
+
+	memset(&data->response, 0, sizeof(data->response));
+	send_response(data);
+	return 0;
+}
+
 static int get_pch_data_status(struct rts5453p_emul_pdc_data *data,
 			       const union rts54_request *req)
 {
@@ -950,6 +968,19 @@ static int get_alert(struct rts5453p_emul_pdc_data *data,
 	return 0;
 }
 
+static int set_max_pdp(struct rts5453p_emul_pdc_data *data,
+		       const union rts54_request *req)
+{
+	LOG_INF("SET_MAX_PDP max_pdp=%d", req->set_max_pdp.max_pdp);
+
+	data->max_pdp = req->set_max_pdp.max_pdp;
+
+	memset(&data->response, 0, sizeof(union rts54_response));
+	send_response(data);
+
+	return 0;
+}
+
 struct commands {
 	uint8_t code;
 	enum {
@@ -984,7 +1015,7 @@ const struct commands sub_cmd_x08[] = {
 	{ .code = 0x44, HANDLER_DEF(unsupported) },
 	{ .code = 0x05, HANDLER_DEF(set_tpc_rp) },
 	{ .code = 0x19, HANDLER_DEF(unsupported) },
-	{ .code = 0x1A, HANDLER_DEF(unsupported) },
+	{ .code = 0x1A, HANDLER_DEF(set_vdo) },
 	{ .code = 0x1D, HANDLER_DEF(set_tpc_csd_operation_mode) },
 	{ .code = 0x1F, HANDLER_DEF(set_tpc_reconnect) },
 	{ .code = 0x20, HANDLER_DEF(unsupported) },
@@ -1013,6 +1044,7 @@ const struct commands sub_cmd_x08[] = {
 	{ .code = 0xB5, HANDLER_DEF(get_alert) },
 	{ .code = 0xE0, HANDLER_DEF(get_pch_data_status) },
 	{ .code = 0xE1, HANDLER_DEF(set_frs_function) },
+	{ .code = 0xE2, HANDLER_DEF(set_max_pdp) },
 };
 
 const struct commands sub_cmd_x0E[] = {
@@ -1299,6 +1331,8 @@ static int emul_realtek_rts54xx_init_data(const struct emul *target)
 	data->bbr_cts_mode = false;
 	data->sys_power_state = SX_RSVD; /* Power state unspecified */
 
+	memset(data->vdos, 0, sizeof(data->vdos));
+
 	/* Clear any feature flags */
 	emul_realtek_rts54xx_reset_feature_flags(target);
 
@@ -1358,6 +1392,8 @@ static int rts5453p_emul_init(const struct emul *emul,
 	data->pdc_data.capability.bcdUSBTypeCVersion = 0xCAFE;
 
 	data->pdc_data.connector_capability.op_mode_usb3 = 1;
+
+	data->pdc_data.info.vid = 0x0BDA;
 
 	data->pdc_data.set_tpc_reconnect_param = 0xAA;
 
@@ -1580,6 +1616,23 @@ static int emul_realtek_rts54xx_get_ccom(const struct emul *target,
 	return 0;
 }
 
+static int emul_realtek_rts54xx_get_max_pdp(const struct emul *target,
+					    enum max_pdp_t *max_pdp)
+{
+	struct rts5453p_emul_pdc_data *data =
+		rts5453p_emul_get_pdc_data(target);
+
+	if (data->max_pdp == 7) {
+		*max_pdp = MAX_PDP_7_5W;
+	} else if (data->max_pdp == 15) {
+		*max_pdp = MAX_PDP_15W;
+	} else {
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
 static int emul_realtek_rts54xx_get_sink_path(const struct emul *target,
 					      bool *en)
 {
@@ -1648,7 +1701,7 @@ static int emul_realtek_rts54xx_set_vdo(const struct emul *target,
 					const uint8_t *vdo_types,
 					const uint32_t *vdos)
 {
-	if (num_vdos >= RTS54XX_SET_VDO_MAX_NUM) {
+	if (num_vdos > RTS54XX_SET_VDO_MAX_NUM) {
 		LOG_ERR("Too many VDOs passed in emul SET_VDO.");
 		return -EINVAL;
 	}
@@ -1664,7 +1717,6 @@ static int emul_realtek_rts54xx_set_vdo(const struct emul *target,
 		}
 		data->vdos[vdo_index] = vdos[i];
 	}
-
 	return 0;
 }
 
@@ -1958,6 +2010,7 @@ static DEVICE_API(emul_pdc, emul_realtek_rts54xx_api) = {
 	.get_sys_power_state = emul_realtek_rts54xx_get_sys_power_state,
 	.set_alert = emul_realtek_rts54xx_set_alert,
 	.get_sbu_mux_mode = emul_realtek_rts54xx_get_sbu_mux_mode,
+	.get_max_pdp = emul_realtek_rts54xx_get_max_pdp,
 };
 
 #define RTS5453P_EMUL_DEFINE(n)                                             \
