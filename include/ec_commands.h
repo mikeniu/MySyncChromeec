@@ -9056,6 +9056,13 @@ struct ec_response_fp_sign_match {
 	uint8_t signature[FP_MAC_LENGTH];
 } __ec_align4;
 
+/* Unlock developer options via FingerGuard HMAC */
+#define EC_CMD_FP_UNLOCK_DEV_OPTIONS 0x0418
+
+struct ec_params_fp_unlock_dev_options {
+	uint8_t hmac[FP_MAC_LENGTH];
+} __ec_align4;
+
 /*
  * Fingerprint ASCP claim command.
  *
@@ -9360,6 +9367,29 @@ struct ec_response_get_boot_time {
  */
 #define EC_CMD_ENABLE_OFFMODE_HEARTBEAT 0x0606
 
+/* Get battery misc info */
+#define EC_CMD_BATTERY_GET_MISC_INFO 0x0607
+
+/**
+ * struct ec_params_battery_get_misc_info - Battery misc info parameters
+ * @index: Battery index.
+ */
+struct ec_params_battery_get_misc_info {
+	uint8_t index;
+} __ec_align1;
+
+/**
+ * struct ec_response_battery_get_misc_info - Battery misc info response
+ * @cfet_status: status of C-FET. 1: disabled, 0: enabled, -1: error.
+ * @battery_status: Battery status register.
+ * @dfet_status: status of D-FET. 0: disconnected, 1: not disconnected, -1:
+ * error.
+ */
+struct ec_response_battery_get_misc_info {
+	int32_t cfet_status;
+	uint32_t battery_status;
+	int32_t dfet_status;
+} __ec_align4;
 /*****************************************************************************/
 /*
  * Reserve a range of host commands for board-specific, experimental, or
