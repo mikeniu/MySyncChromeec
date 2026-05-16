@@ -690,6 +690,12 @@ system_run_image_copy_with_flags(enum ec_image copy, uint32_t add_reset_flags)
 		/* Jumping must still be enabled */
 		if (disable_jump)
 			return EC_ERROR_ACCESS_DENIED;
+
+#ifdef HAS_TASK_RWSIG
+		/* Double-check RWSIG status */
+		if (rwsig_get_status() != RWSIG_VALID)
+			return EC_ERROR_ACCESS_DENIED;
+#endif /* HAS_TASK_RWSIG */
 	}
 
 	/* Load the appropriate reset vector */
@@ -1098,6 +1104,9 @@ static int handle_pending_reboot(struct ec_params_reboot_ec *p)
 		return system_run_image_copy_with_flags(
 			EC_IMAGE_RO, EC_RESET_FLAG_STAY_IN_RO);
 	case EC_REBOOT_JUMP_RW:
+		if (IS_ENABLED(HAS_TASK_RWSIG) && system_is_locked())
+			return EC_ERROR_ACCESS_DENIED;
+
 		return system_run_image_copy(system_get_active_copy());
 	case EC_REBOOT_COLD:
 	case EC_REBOOT_COLD_AP_OFF:
@@ -1481,9 +1490,12 @@ static int command_sysjump(int argc, const char **argv)
 	if (!strcasecmp(argv[1], "RO"))
 		return system_run_image_copy_with_flags(
 			EC_IMAGE_RO, EC_RESET_FLAG_STAY_IN_RO);
-	else if (!strcasecmp(argv[1], "RW") || !strcasecmp(argv[1], "A"))
+	else if (!strcasecmp(argv[1], "RW") || !strcasecmp(argv[1], "A")) {
+		if (IS_ENABLED(HAS_TASK_RWSIG) && system_is_locked())
+			return EC_ERROR_ACCESS_DENIED;
+
 		return system_run_image_copy(EC_IMAGE_RW);
-	else if (!strcasecmp(argv[1], "B")) {
+	} else if (!strcasecmp(argv[1], "B")) {
 #ifdef CONFIG_RW_B
 		return system_run_image_copy(EC_IMAGE_RW_B);
 #else
