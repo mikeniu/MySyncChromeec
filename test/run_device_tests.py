@@ -501,25 +501,20 @@ class Renode(Platform):
     def _skip_test_chudow(self, test_config: TestConfig) -> bool:
         if test_config.test_name in [
             "flash_physical",  # TODO(b/485314159)
+            "flash_protection",  # TODO(b/508240888)
+            "flash_protection_rw",  # TODO(b/508240888)
+            "fpsensor_auth_crypto_stateful",  # TODO(b/485316342)
             "otp_key",  # TODO(b/485316342)
             "rollback",  # TODO(b/485315275)
             "flash_write_protect",  # TODO(b/485316223)
-            "panic",  # TODO(b/485316364)
-            "panic_data",  # TODO(b/485315924)
             "rollback_entropy",  # TODO(b/485315625)
-            "tpm_seed_clear",  # TODO(b/485316761)
-            "utils",  # TODO(b/485316718)
             "fpsensor_debug",  # TODO(b/485315321)
             "restricted_console",  # TODO(b/485315829)
+            "system_is_locked",  # TODO(b/485316683)
             "zephyr_cpp_newlib",  # TODO(b/485316816)
             "zephyr_cpp_std20",  # TODO(b/485316816)
             "zephyr_drivers_entropy",  # TODO(b/485898244)
             "zephyr_kernel_poll",  # TODO(b/485316816)
-        ]:
-            return True
-
-        if test_config.config_name in [
-            "system_is_locked_wp_on",  # TODO(b/485316683)
         ]:
             return True
 
@@ -575,7 +570,6 @@ class Renode(Platform):
             "flash_protection",  # TODO(b/487848806)
             "flash_protection_rw",  # TODO(b/487848806)
             "flash_write_protect",  # TODO(b/406944986)
-            "panic_data",  # TODO(b/468407068)
             "rollback",  # TODO(b/468406461)
             "rollback_entropy",  # TODO(b/468406461)
             "system_is_locked",  # TODO(b/483118063)
@@ -585,7 +579,6 @@ class Renode(Platform):
             "fpsensor_debug",  # TODO(b/474439863)
             "otp_key",  # TODO(b/483121090)
             "restricted_console",  # TODO(b/474439863)
-            "utils",  # TODO(b/483126917)
             "zephyr_cpp_newlib",  # TODO(b/484366615)
             "zephyr_cpp_std20",  # TODO(b/484366615)
             "zephyr_drivers_entropy",  # TODO(b/484366615)
