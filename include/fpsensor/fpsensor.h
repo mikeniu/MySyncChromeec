@@ -68,6 +68,14 @@ extern "C" {
 int fp_sensor_init(void);
 
 /**
+ * @brief The same as fp_sensor_init, but doesn't allow entering low-power mode
+ * during init.
+ *
+ * @return The same as fp_sensor_init
+ */
+int fp_sensor_init_pm(void);
+
+/**
  * De-initialize the sensor hardware.
  *
  * This function closes the fingerprint sensor. It also shuts down any ongoing

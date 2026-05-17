@@ -127,7 +127,7 @@ void fp_reset_and_clear_context(void)
 	if (fp_sensor_deinit() != EC_SUCCESS)
 		CPRINTS("Failed to deinit sensor");
 	_fp_clear_context();
-	if (fp_sensor_init() != EC_SUCCESS)
+	if (fp_sensor_init_pm() != EC_SUCCESS)
 		CPRINTS("Failed to init sensor");
 }
 
