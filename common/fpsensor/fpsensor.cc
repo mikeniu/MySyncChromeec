@@ -90,6 +90,17 @@ static void send_mkbp_event(uint32_t event)
  */
 static uint32_t enroll_session;
 
+static int fp_acquire_image_task(enum fp_capture_type capture_type)
+{
+	int ret;
+
+	pm_policy_state_lock_get(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+	ret = fp_acquire_image(fp_buffer, capture_type);
+	pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+
+	return ret;
+}
+
 static uint32_t fp_process_enroll(void)
 {
 	int percent = 0;
@@ -211,7 +222,7 @@ static void fp_process_finger(void)
 	global_context.current_capture_type = FP_CAPTURE_TYPE_INVALID;
 
 	CPRINTS("Capturing ...");
-	int res = fp_acquire_image(fp_buffer, capture_type);
+	int res = fp_acquire_image_task(capture_type);
 	capture_time_us = time_since32(t0);
 	if (res) {
 		timestamps_invalid |= FPSTATS_CAPTURE_INV;
@@ -287,12 +298,18 @@ extern "C" void fp_task(void)
 			if ((mode ^ enroll_session) & FP_MODE_ENROLL_SESSION) {
 				int ret = 0;
 				if (mode & FP_MODE_ENROLL_SESSION) {
+					pm_policy_state_lock_get(
+						PM_STATE_SUSPEND_TO_IDLE,
+						PM_ALL_SUBSTATES);
 					ret = fp_enrollment_begin();
 					if (ret)
 						global_context.sensor_mode &=
 							~FP_MODE_ENROLL_SESSION;
 				} else {
 					fp_enrollment_finish(nullptr);
+					pm_policy_state_lock_put(
+						PM_STATE_SUSPEND_TO_IDLE,
+						PM_ALL_SUBSTATES);
 				}
 				enroll_session =
 					ret ? 0 :
@@ -303,8 +320,7 @@ extern "C" void fp_task(void)
 					FP_CAPTURE_TYPE(mode);
 				global_context.current_capture_type =
 					FP_CAPTURE_TYPE_INVALID;
-				if (!fp_acquire_image(fp_buffer,
-						      capture_type)) {
+				if (!fp_acquire_image_task(capture_type)) {
 					global_context.current_capture_type =
 						capture_type;
 				}
@@ -342,9 +358,15 @@ extern "C" void fp_task(void)
 				global_context.sensor_mode &=
 					~FP_MODE_RESET_SENSOR;
 			} else if (mode & FP_MODE_SENSOR_MAINTENANCE) {
+				pm_policy_state_lock_get(
+					PM_STATE_SUSPEND_TO_IDLE,
+					PM_ALL_SUBSTATES);
 				fp_maintenance();
 				global_context.sensor_mode &=
 					~FP_MODE_SENSOR_MAINTENANCE;
+				pm_policy_state_lock_put(
+					PM_STATE_SUSPEND_TO_IDLE,
+					PM_ALL_SUBSTATES);
 			} else if (mode & FP_MODE_ENCRYPT_TEMPLATE) {
 				global_context.fp_encryption_status &=
 					~FP_ENCRYPTED_TEMPLATE_READY;
