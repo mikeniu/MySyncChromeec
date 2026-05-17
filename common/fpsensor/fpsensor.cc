@@ -38,6 +38,7 @@
 #include <variant>
 
 #ifdef CONFIG_ZEPHYR
+#include <zephyr/pm/policy.h>
 #include <zephyr/shell/shell.h>
 #endif
 
@@ -66,8 +67,21 @@ static uint8_t timestamps_invalid;
  * Unlike global_context, this is not cleared when the secret is read.
  */
 static int8_t stats_template_matched;
+/* PM locked during enrollment. Used only by the FP thread. */
+static bool enroll_pm_lock_held;
 
 BUILD_ASSERT(sizeof(struct ec_fp_template_encryption_metadata) % 4 == 0);
+
+#ifndef CONFIG_ZEPHYR
+/* Define the PM functions for compatibility with EC-legacy. */
+static inline void pm_policy_state_all_lock_get(void)
+{
+}
+
+static inline void pm_policy_state_all_lock_put(void)
+{
+}
+#endif /* CONFIG_ZEPHYR */
 
 /* Interrupt line from the fingerprint sensor */
 extern "C" void fps_event(enum gpio_signal signal)
@@ -90,6 +104,54 @@ static void send_mkbp_event(uint32_t event)
  */
 static uint32_t enroll_session;
 
+static int fp_acquire_image_pm(uint8_t *image_data,
+			       enum fp_capture_type capture_type)
+{
+	int ret;
+
+	pm_policy_state_all_lock_get();
+	ret = fp_acquire_image(fp_buffer, capture_type);
+	pm_policy_state_all_lock_put();
+
+	return ret;
+}
+
+static int fp_enrollment_begin_pm(void)
+{
+	int ret;
+	bool pm_lock_acquired = false;
+
+	if (!enroll_pm_lock_held) {
+		enroll_pm_lock_held = true;
+		pm_lock_acquired = true;
+		pm_policy_state_all_lock_get();
+	} else {
+		CPRINTS("Unbalanced enroll start");
+	}
+	ret = fp_enrollment_begin();
+	if (ret && pm_lock_acquired) {
+		pm_policy_state_all_lock_put();
+		enroll_pm_lock_held = false;
+	}
+
+	return ret;
+}
+
+static int fp_enrollment_finish_pm(void *templ)
+{
+	int ret;
+
+	ret = fp_enrollment_finish(templ);
+	if (enroll_pm_lock_held) {
+		pm_policy_state_all_lock_put();
+		enroll_pm_lock_held = false;
+	} else {
+		CPRINTS("Unbalanced enroll finish");
+	}
+
+	return ret;
+}
+
 static uint32_t fp_process_enroll(void)
 {
 	int percent = 0;
@@ -108,7 +170,7 @@ static uint32_t fp_process_enroll(void)
 		       EC_MKBP_FP_ERRCODE(EC_MKBP_FP_ERR_ENROLL_INTERNAL);
 	global_context.templ_dirty |= BIT(global_context.templ_valid);
 	if (percent == 100) {
-		res = fp_enrollment_finish(
+		res = fp_enrollment_finish_pm(
 			fp_template[global_context.templ_valid]);
 		if (res) {
 			res = EC_MKBP_FP_ERR_ENROLL_INTERNAL;
@@ -211,7 +273,7 @@ static void fp_process_finger(void)
 	global_context.current_capture_type = FP_CAPTURE_TYPE_INVALID;
 
 	CPRINTS("Capturing ...");
-	int res = fp_acquire_image(fp_buffer, capture_type);
+	int res = fp_acquire_image_pm(fp_buffer, capture_type);
 	capture_time_us = time_since32(t0);
 	if (res) {
 		timestamps_invalid |= FPSTATS_CAPTURE_INV;
@@ -287,12 +349,12 @@ extern "C" void fp_task(void)
 			if ((mode ^ enroll_session) & FP_MODE_ENROLL_SESSION) {
 				int ret = 0;
 				if (mode & FP_MODE_ENROLL_SESSION) {
-					ret = fp_enrollment_begin();
+					ret = fp_enrollment_begin_pm();
 					if (ret)
 						global_context.sensor_mode &=
 							~FP_MODE_ENROLL_SESSION;
 				} else {
-					fp_enrollment_finish(nullptr);
+					fp_enrollment_finish_pm(nullptr);
 				}
 				enroll_session =
 					ret ? 0 :
@@ -303,8 +365,8 @@ extern "C" void fp_task(void)
 					FP_CAPTURE_TYPE(mode);
 				global_context.current_capture_type =
 					FP_CAPTURE_TYPE_INVALID;
-				if (!fp_acquire_image(fp_buffer,
-						      capture_type)) {
+				if (!fp_acquire_image_pm(fp_buffer,
+							 capture_type)) {
 					global_context.current_capture_type =
 						capture_type;
 				}
@@ -342,9 +404,11 @@ extern "C" void fp_task(void)
 				global_context.sensor_mode &=
 					~FP_MODE_RESET_SENSOR;
 			} else if (mode & FP_MODE_SENSOR_MAINTENANCE) {
+				pm_policy_state_all_lock_get();
 				fp_maintenance();
 				global_context.sensor_mode &=
 					~FP_MODE_SENSOR_MAINTENANCE;
+				pm_policy_state_all_lock_put();
 			} else if (mode & FP_MODE_ENCRYPT_TEMPLATE) {
 				global_context.fp_encryption_status &=
 					~FP_ENCRYPTED_TEMPLATE_READY;
