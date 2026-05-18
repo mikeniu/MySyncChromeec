@@ -30,7 +30,12 @@
 namespace {
 constexpr const struct device* kClient =
     DEVICE_DT_GET_OR_NULL(DT_ALIAS(test_dsp_client));
+// GCC 15 warns that the address of a device will never be NULL, but
+// kClient is theoretically nullable if the devicetree node was missing.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waddress"
 static_assert(kClient != nullptr, "Missing alias 'test_dsp_client'");
+#pragma GCC diagnostic pop
 
 constexpr const struct i2c_dt_spec kClientBusSpec =
     I2C_DT_SPEC_GET(DT_ALIAS(test_dsp_client));
