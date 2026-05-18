@@ -2596,6 +2596,519 @@ static int process_get_apro_boot_status(struct transfer_descriptor *td)
 	return 0;
 }
 
+<<<<<<< HEAD   (8113d238fb985d73e7607510c89fcc3bfbe98052 alerts: ignore RTC_DEAD alerts)
+||||||| BASE   (d8bfff82fc4e6879dcc953570028d3fd76c09e2f gsctool: print CCD RMA flag state)
+static int process_arv_config_spi_addr_mode(struct transfer_descriptor *td,
+					    int arv_config_spi_addr_mode)
+{
+	enum ap_ro_config_spi_mode_e {
+		ap_ro_spi_config_3byte = 0,
+		ap_ro_spi_config_4byte = 1,
+	};
+
+	struct __attribute__((__packed__)) ap_ro_config_spi_mode_msg {
+		uint8_t version;
+		uint8_t command;
+		uint8_t state;
+		uint8_t mode;
+	};
+
+	struct ap_ro_config_spi_mode_msg msg = {
+		.version = ARV_CONFIG_SETTING_CURRENT_VERSION,
+		.command = arv_config_setting_command_spi_addressing_mode,
+		.state = arv_config_setting_state_present,
+		.mode = ap_ro_spi_config_4byte
+	};
+	size_t response_size = sizeof(msg);
+	int rv = 0;
+
+	switch (arv_config_spi_addr_mode) {
+	case arv_config_spi_addr_mode_get:
+		rv = send_vendor_command(td, VENDOR_CC_GET_AP_RO_VERIFY_SETTING,
+					 &msg, sizeof(msg), &msg,
+					 &response_size);
+		if (rv != VENDOR_RC_SUCCESS) {
+			fprintf(stderr,
+				"Error %d getting ap ro spi addr mode\n", rv);
+			return update_error;
+		}
+
+		if (response_size != sizeof(msg)) {
+			fprintf(stderr,
+				"Error getting ap ro spi addr mode response\n");
+			return update_error;
+		}
+
+		if (msg.state != arv_config_setting_state_present) {
+			switch (msg.state) {
+			case arv_config_setting_state_not_present:
+				fprintf(stderr, "not provisioned\n");
+				break;
+			case arv_config_setting_state_corrupted:
+				fprintf(stderr, "corrupted\n");
+				break;
+			case arv_config_setting_state_invalid:
+				fprintf(stderr, "invalid\n");
+				break;
+			default:
+				fprintf(stderr,
+					"unexpected message response state\n");
+				return update_error;
+			}
+			return 0;
+		}
+
+		switch (msg.mode) {
+		case ap_ro_spi_config_3byte:
+			printf("3byte\n");
+			break;
+		case ap_ro_spi_config_4byte:
+			printf("4byte\n");
+			break;
+		default:
+			fprintf(stderr, "unknown spi mode\n");
+			return update_error;
+		}
+
+		break;
+	case arv_config_spi_addr_mode_set_3byte:
+		msg.mode = ap_ro_spi_config_3byte;
+		/* Fallthrough */
+	case arv_config_spi_addr_mode_set_4byte:
+		/* The default is 4byte addressing */
+		rv = send_vendor_command(td, VENDOR_CC_SET_AP_RO_VERIFY_SETTING,
+					 &msg, sizeof(msg), &msg,
+					 &response_size);
+		if (rv != VENDOR_RC_SUCCESS) {
+			fprintf(stderr,
+				"Error %d setting ap ro spi addr mode\n", rv);
+			return update_error;
+		}
+		break;
+	default:
+		return update_error;
+	}
+
+	return 0;
+}
+
+/*
+ * Reads an ascii hex byte in the following forms:
+ *  - 0x01
+ *  - 0x1
+ *  - 01
+ *  - 0
+ *
+ * 1 is returned on success, 0 on failure.
+ */
+static int read_hex_byte_string(char *s, uint8_t *byte)
+{
+	uint8_t b = 0;
+
+	if (!strncmp(s, "0x", 2))
+		s += 2;
+
+	if (strlen(s) == 0)
+		return 0;
+
+	for (const char *end = s + 2; s < end; ++s) {
+		if (*s >= '0' && *s <= '9')
+			b = b * 16 + *s - '0';
+		else if (*s >= 'A' && *s <= 'F')
+			b = b * 16 + 10 + *s - 'A';
+		else if (*s >= 'a' && *s <= 'f')
+			b = b * 16 + 10 + *s - 'a';
+		else if (*s == '\0')
+			/* Single nibble, do nothing instead of `break`
+			 * to keep checkpatch happy
+			 */
+			;
+		else
+			/* Invalid nibble */
+			return 0;
+	}
+	*byte = b;
+	return 1;
+}
+
+static int parse_wpsrs(const char *opt, struct arv_config_wpds *wpds)
+{
+	size_t len = strlen(opt);
+	char *ptr, *p, *delim = " ";
+	uint8_t b;
+	int rv = 0;
+	struct arv_config_wpd *wpd;
+
+	ptr = malloc(len + 1);
+	strcpy(ptr, opt);
+	p = strtok(ptr, delim);
+
+	while (p != NULL) {
+		if (read_hex_byte_string(p, &b)) {
+			wpd = &wpds->data[rv / 2];
+			if (rv % 2 == 0) {
+				wpd->expected_value = b;
+			} else {
+				wpd->mask = b;
+				wpd->state = arv_config_setting_state_present;
+			}
+			rv++;
+		} else {
+			break;
+		}
+		p = strtok(NULL, delim);
+	}
+	free(ptr);
+
+	return rv;
+}
+
+static void print_wpd(size_t i, struct arv_config_wpd *wpd)
+{
+	if (wpd->state == arv_config_setting_state_not_present) {
+		printf("not provisioned");
+		return;
+	} else if (wpd->state == arv_config_setting_state_corrupted) {
+		printf("corrupted");
+		return;
+	} else if (wpd->state == arv_config_setting_state_invalid) {
+		printf("invalid");
+		return;
+	}
+
+	printf("%zu: %02x & %02x", i, wpd->expected_value, wpd->mask);
+}
+
+static int process_arv_config_wpds(struct transfer_descriptor *td,
+				   enum arv_config_wpsr_choice_e choice,
+				   struct arv_config_wpds *wpds)
+{
+	struct __attribute__((__packed__)) arv_config_wpds_message {
+		uint8_t version;
+		/* See `arv_config_setting_command_e` */
+		uint8_t command;
+		struct arv_config_wpds wpds;
+	};
+	int rv = 0;
+
+	struct arv_config_wpds_message msg = {
+		.version = ARV_CONFIG_SETTING_CURRENT_VERSION,
+		.command = arv_config_setting_command_write_protect_descriptors,
+	};
+	size_t response_size = sizeof(msg);
+
+	if (choice == arv_config_wpsr_choice_get) {
+		rv = send_vendor_command(td, VENDOR_CC_GET_AP_RO_VERIFY_SETTING,
+					 &msg, sizeof(msg), &msg,
+					 &response_size);
+		if (rv != VENDOR_RC_SUCCESS) {
+			fprintf(stderr,
+				"Error %d getting ap ro write protect descriptors\n",
+				rv);
+			return update_error;
+		}
+
+		if (response_size != sizeof(msg)) {
+			fprintf(stderr,
+				"Error getting ap ro write protect descriptors response\n");
+			return update_error;
+		}
+
+		if (msg.wpds.data[0].state ==
+		    arv_config_setting_state_present) {
+			printf("expected values: ");
+		}
+		print_wpd(1, &msg.wpds.data[0]);
+		if (msg.wpds.data[1].state !=
+		    arv_config_setting_state_not_present) {
+			printf(", ");
+			print_wpd(2, &msg.wpds.data[1]);
+		}
+		if (msg.wpds.data[2].state !=
+		    arv_config_setting_state_not_present) {
+			printf(", ");
+			print_wpd(3, &msg.wpds.data[2]);
+		}
+
+		printf("\n");
+	} else if (choice == arv_config_wpsr_choice_set) {
+		msg.wpds = *wpds;
+
+		rv = send_vendor_command(td, VENDOR_CC_SET_AP_RO_VERIFY_SETTING,
+					 &msg, sizeof(msg), &msg,
+					 &response_size);
+		if (rv != VENDOR_RC_SUCCESS) {
+			fprintf(stderr,
+				"Error %d setting ap ro write protect descriptors\n",
+				rv);
+			return update_error;
+		}
+	}
+
+	return 0;
+}
+
+=======
+static int process_arv_config_spi_addr_mode(struct transfer_descriptor *td,
+					    int arv_config_spi_addr_mode)
+{
+	enum ap_ro_config_spi_mode_e {
+		ap_ro_spi_config_3byte = 0,
+		ap_ro_spi_config_4byte = 1,
+	};
+
+	struct __attribute__((__packed__)) ap_ro_config_spi_mode_msg {
+		uint8_t version;
+		uint8_t command;
+		uint8_t state;
+		uint8_t mode;
+	};
+
+	struct ap_ro_config_spi_mode_msg msg = {
+		.version = ARV_CONFIG_SETTING_CURRENT_VERSION,
+		.command = arv_config_setting_command_spi_addressing_mode,
+		.state = arv_config_setting_state_present,
+		.mode = ap_ro_spi_config_4byte
+	};
+	size_t response_size = sizeof(msg);
+	int rv = 0;
+
+	switch (arv_config_spi_addr_mode) {
+	case arv_config_spi_addr_mode_get:
+		rv = send_vendor_command(td, VENDOR_CC_GET_AP_RO_VERIFY_SETTING,
+					 &msg, sizeof(msg), &msg,
+					 &response_size);
+		if (rv != VENDOR_RC_SUCCESS) {
+			fprintf(stderr,
+				"Error %d getting ap ro spi addr mode\n", rv);
+			return update_error;
+		}
+
+		if (response_size != sizeof(msg)) {
+			fprintf(stderr,
+				"Error getting ap ro spi addr mode response\n");
+			return update_error;
+		}
+
+		if (msg.state != arv_config_setting_state_present) {
+			switch (msg.state) {
+			case arv_config_setting_state_not_present:
+				fprintf(stderr, "not provisioned\n");
+				break;
+			case arv_config_setting_state_corrupted:
+				fprintf(stderr, "corrupted\n");
+				break;
+			case arv_config_setting_state_invalid:
+				fprintf(stderr, "invalid\n");
+				break;
+			default:
+				fprintf(stderr,
+					"unexpected message response state\n");
+				return update_error;
+			}
+			return 0;
+		}
+
+		switch (msg.mode) {
+		case ap_ro_spi_config_3byte:
+			printf("3byte\n");
+			break;
+		case ap_ro_spi_config_4byte:
+			printf("4byte\n");
+			break;
+		default:
+			fprintf(stderr, "unknown spi mode\n");
+			return update_error;
+		}
+
+		break;
+	case arv_config_spi_addr_mode_set_3byte:
+		msg.mode = ap_ro_spi_config_3byte;
+		/* Fallthrough */
+	case arv_config_spi_addr_mode_set_4byte:
+		/* The default is 4byte addressing */
+		rv = send_vendor_command(td, VENDOR_CC_SET_AP_RO_VERIFY_SETTING,
+					 &msg, sizeof(msg), &msg,
+					 &response_size);
+		if (rv != VENDOR_RC_SUCCESS) {
+			fprintf(stderr,
+				"Error %d setting ap ro spi addr mode\n", rv);
+			return update_error;
+		}
+		break;
+	default:
+		return update_error;
+	}
+
+	return 0;
+}
+
+/*
+ * Reads an ascii hex byte in the following forms:
+ *  - 0x01
+ *  - 0x1
+ *  - 01
+ *  - 0
+ *
+ * 1 is returned on success, 0 on failure.
+ */
+static int read_hex_byte_string(char *s, uint8_t *byte)
+{
+	uint8_t b = 0;
+
+	if (!strncmp(s, "0x", 2))
+		s += 2;
+
+	if (strlen(s) == 0)
+		return 0;
+
+	for (const char *end = s + 2; s < end; ++s) {
+		if (*s >= '0' && *s <= '9')
+			b = b * 16 + *s - '0';
+		else if (*s >= 'A' && *s <= 'F')
+			b = b * 16 + 10 + *s - 'A';
+		else if (*s >= 'a' && *s <= 'f')
+			b = b * 16 + 10 + *s - 'a';
+		else if (*s == '\0')
+			/* Single nibble, do nothing instead of `break`
+			 * to keep checkpatch happy
+			 */
+			;
+		else
+			/* Invalid nibble */
+			return 0;
+	}
+	*byte = b;
+	return 1;
+}
+
+static int parse_wpsrs(const char *opt, struct arv_config_wpds *wpds)
+{
+	size_t len = strlen(opt);
+	char *ptr, *p, *delim = " ";
+	uint8_t b;
+	int rv = 0;
+	struct arv_config_wpd *wpd;
+
+	ptr = malloc(len + 1);
+	if (!ptr)
+		return 0;
+	strcpy(ptr, opt);
+	p = strtok(ptr, delim);
+
+	while (p != NULL) {
+		if (read_hex_byte_string(p, &b)) {
+			/*
+			 * Currently we only support up to 3 register pairs in
+			 * struct arv_config_wpds.
+			 */
+			if (rv < 6) {
+				wpd = &wpds->data[rv / 2];
+				if (rv % 2 == 0) {
+					wpd->expected_value = b;
+				} else {
+					wpd->mask = b;
+					wpd->state =
+					  arv_config_setting_state_present;
+				}
+			}
+			rv++;
+		} else {
+			break;
+		}
+		p = strtok(NULL, delim);
+	}
+	free(ptr);
+
+	return rv;
+}
+
+static void print_wpd(size_t i, struct arv_config_wpd *wpd)
+{
+	if (wpd->state == arv_config_setting_state_not_present) {
+		printf("not provisioned");
+		return;
+	} else if (wpd->state == arv_config_setting_state_corrupted) {
+		printf("corrupted");
+		return;
+	} else if (wpd->state == arv_config_setting_state_invalid) {
+		printf("invalid");
+		return;
+	}
+
+	printf("%zu: %02x & %02x", i, wpd->expected_value, wpd->mask);
+}
+
+static int process_arv_config_wpds(struct transfer_descriptor *td,
+				   enum arv_config_wpsr_choice_e choice,
+				   struct arv_config_wpds *wpds)
+{
+	struct __attribute__((__packed__)) arv_config_wpds_message {
+		uint8_t version;
+		/* See `arv_config_setting_command_e` */
+		uint8_t command;
+		struct arv_config_wpds wpds;
+	};
+	int rv = 0;
+
+	struct arv_config_wpds_message msg = {
+		.version = ARV_CONFIG_SETTING_CURRENT_VERSION,
+		.command = arv_config_setting_command_write_protect_descriptors,
+	};
+	size_t response_size = sizeof(msg);
+
+	if (choice == arv_config_wpsr_choice_get) {
+		rv = send_vendor_command(td, VENDOR_CC_GET_AP_RO_VERIFY_SETTING,
+					 &msg, sizeof(msg), &msg,
+					 &response_size);
+		if (rv != VENDOR_RC_SUCCESS) {
+			fprintf(stderr,
+				"Error %d getting ap ro write protect descriptors\n",
+				rv);
+			return update_error;
+		}
+
+		if (response_size != sizeof(msg)) {
+			fprintf(stderr,
+				"Error getting ap ro write protect descriptors response\n");
+			return update_error;
+		}
+
+		if (msg.wpds.data[0].state ==
+		    arv_config_setting_state_present) {
+			printf("expected values: ");
+		}
+		print_wpd(1, &msg.wpds.data[0]);
+		if (msg.wpds.data[1].state !=
+		    arv_config_setting_state_not_present) {
+			printf(", ");
+			print_wpd(2, &msg.wpds.data[1]);
+		}
+		if (msg.wpds.data[2].state !=
+		    arv_config_setting_state_not_present) {
+			printf(", ");
+			print_wpd(3, &msg.wpds.data[2]);
+		}
+
+		printf("\n");
+	} else if (choice == arv_config_wpsr_choice_set) {
+		msg.wpds = *wpds;
+
+		rv = send_vendor_command(td, VENDOR_CC_SET_AP_RO_VERIFY_SETTING,
+					 &msg, sizeof(msg), &msg,
+					 &response_size);
+		if (rv != VENDOR_RC_SUCCESS) {
+			fprintf(stderr,
+				"Error %d setting ap ro write protect descriptors\n",
+				rv);
+			return update_error;
+		}
+	}
+
+	return 0;
+}
+
+>>>>>>> CHANGE (fe257f244e3e3cfb323bb7895500a462341692f3 gsctool: workaround for extended WP descriptors)
 static int process_get_boot_mode(struct transfer_descriptor *td)
 {
 	size_t response_size;
@@ -3459,6 +3972,102 @@ int main(int argc, char *argv[])
 			get_endorsement_seed = 1;
 			endorsement_seed_str = optarg;
 			break;
+<<<<<<< HEAD   (8113d238fb985d73e7607510c89fcc3bfbe98052 alerts: ignore RTC_DEAD alerts)
+||||||| BASE   (d8bfff82fc4e6879dcc953570028d3fd76c09e2f gsctool: print CCD RMA flag state)
+		case 'E':
+			if (!optarg) {
+				arv_config_wpsr_choice =
+					arv_config_wpsr_choice_get;
+			} else if (optarg && strlen(optarg) > 0) {
+				arv_config_wpds.data[0].state =
+					arv_config_setting_state_not_present;
+				arv_config_wpds.data[1].state =
+					arv_config_setting_state_not_present;
+				arv_config_wpds.data[2].state =
+					arv_config_setting_state_not_present;
+
+				rv = parse_wpsrs(optarg, &arv_config_wpds);
+				if (rv == 2 || rv == 4 || rv == 6) {
+					arv_config_wpsr_choice =
+						arv_config_wpsr_choice_set;
+				} else {
+					fprintf(stderr,
+						"Invalid write protect descriptors "
+						"hex string: \"%s\"\n",
+						optarg);
+					exit(update_error);
+				}
+			} else {
+				fprintf(stderr,
+					"Invalid the write protect descriptors "
+					"hex string length\n");
+				exit(update_error);
+			}
+
+			break;
+=======
+		case 'E':
+			if (!optarg) {
+				arv_config_wpsr_choice =
+					arv_config_wpsr_choice_get;
+			} else if (optarg && strlen(optarg) > 0) {
+				arv_config_wpds.data[0].state =
+					arv_config_setting_state_not_present;
+				arv_config_wpds.data[1].state =
+					arv_config_setting_state_not_present;
+				arv_config_wpds.data[2].state =
+					arv_config_setting_state_not_present;
+
+				rv = parse_wpsrs(optarg, &arv_config_wpds);
+
+				/*
+				 * TODO(b/514254290): Currently GSC firmware and
+				 * gsctool only support up to 3 register pairs.
+				 * Some newer flash chips (like Macronix)
+				 * provide more (e.g., Security and
+				 * Configuration registers). For now, we drop
+				 * any registers beyond SR3 and trim trailing
+				 * empty registers to remain compatible with
+				 * existing GSC firmware.
+				 */
+				if (rv > 6) {
+					printf("warning: ignoring registers "
+					  "beyond SR3 (b/514254290)\n");
+					rv = 6;
+				}
+
+				if (rv == 6 &&
+				    arv_config_wpds.data[2].mask == 0) {
+					rv = 4;
+					arv_config_wpds.data[2].state =
+					  arv_config_setting_state_not_present;
+				}
+				if (rv == 4 &&
+				    arv_config_wpds.data[1].mask == 0) {
+					rv = 2;
+					arv_config_wpds.data[1].state =
+					  arv_config_setting_state_not_present;
+				}
+
+				if (rv == 2 || rv == 4 || rv == 6) {
+					arv_config_wpsr_choice =
+						arv_config_wpsr_choice_set;
+				} else {
+					fprintf(stderr,
+						"Invalid write protect descriptors "
+						"hex string: \"%s\"\n",
+						optarg);
+					exit(update_error);
+				}
+			} else {
+				fprintf(stderr,
+					"Invalid the write protect descriptors "
+					"hex string length\n");
+				exit(update_error);
+			}
+
+			break;
+>>>>>>> CHANGE (fe257f244e3e3cfb323bb7895500a462341692f3 gsctool: workaround for extended WP descriptors)
 		case 'F':
 			factory_mode = 1;
 			factory_mode_arg = optarg;
