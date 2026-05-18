@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f16dad4_0d9f7965",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-18T18:35:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This vector copy is redundant. `usb_.BulkWrite` already accepts a `std::span`, and `data` is already a span. You can pass `data` directly to `BulkWrite`.",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd91245f_cb0b21f2",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-18T18:35:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Redundant vector allocation. You can pass `cmd` directly to `usb_.BulkWrite` since it takes a span.",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "210d20ce_4c756308",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-18T18:35:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Redundant vector allocation. You can pass `cmd` directly to `usb_.BulkWrite` since it takes a span.",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1234e1c_054bc037",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-18T18:35:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The return values of `WriteReg` calls in `DisableWatchdog` are ignored. It\u0027s better to check them and return early if any call fails.",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ee24ff5_90f810e3",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-18T18:35:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `GetSr1` returns 0 on error (if `ReadReg` fails). This is ambiguous as 0 might be a valid value for SR1. It would be better to return a `std::expected\u003cuint8_t, int\u003e`.",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9dbce402_ec42704c",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-18T18:35:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `CRYPTO_HMAC_SHA256` is defined in the enum but is not handled in `SendBootromCommand`. If it\u0027s not supported, it should be removed from the enum to avoid confusion.",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e52d667_809c65b8",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-18T18:35:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `wrapped_algo` should preferably be of type `EgisCryptoType` for better type safety, rather than `uint32_t`.",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da9b1aec_7528f929",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-18T18:35:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `LoadAesKey` should verify that the key file is exactly 32 bytes long. Currently, it only reads up to 32 bytes but doesn\u0027t check if there\u0027s trailing data, which could indicate the user provided the wrong file.",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bcb32e5_7f3a2da2",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-18T18:35:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This condition will always be false because `mode` is set to `\"flashfw\"` (without the leading dash) in the argument parsing loop (line 129). It should be `mode \u003d\u003d \"flashfw\"`.",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db4f8cff_54b97994",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-18T18:35:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The `local_aes_key` should be wiped from memory using `OPENSSL_cleanse` after it has been passed to `brom.SetAesKey`, as leaving cryptographic keys in memory is a security risk.",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4cd911b_9afa806b",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-18T18:35:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Redundant and potentially incorrect assignment. The variable `fw_path` was already correctly set during the argument parsing loop. Using `argv[2]` assumes a specific argument order which might not be true (e.g., if `-dumpcmd` was passed first).",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
