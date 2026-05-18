@@ -3505,17 +3505,26 @@ static int parse_wpsrs(const char *opt, struct arv_config_wpds *wpds)
 	struct arv_config_wpd *wpd;
 
 	ptr = malloc(len + 1);
+	if (!ptr)
+		return 0;
 	strcpy(ptr, opt);
 	p = strtok(ptr, delim);
 
 	while (p != NULL) {
 		if (read_hex_byte_string(p, &b)) {
-			wpd = &wpds->data[rv / 2];
-			if (rv % 2 == 0) {
-				wpd->expected_value = b;
-			} else {
-				wpd->mask = b;
-				wpd->state = arv_config_setting_state_present;
+			/*
+			 * Currently we only support up to 3 register pairs in
+			 * struct arv_config_wpds.
+			 */
+			if (rv < 6) {
+				wpd = &wpds->data[rv / 2];
+				if (rv % 2 == 0) {
+					wpd->expected_value = b;
+				} else {
+					wpd->mask = b;
+					wpd->state =
+					  arv_config_setting_state_present;
+				}
 			}
 			rv++;
 		} else {
@@ -4990,6 +4999,36 @@ int main(int argc, char *argv[])
 					arv_config_setting_state_not_present;
 
 				rv = parse_wpsrs(optarg, &arv_config_wpds);
+
+				/*
+				 * TODO(b/514254290): Currently GSC firmware and
+				 * gsctool only support up to 3 register pairs.
+				 * Some newer flash chips (like Macronix)
+				 * provide more (e.g., Security and
+				 * Configuration registers). For now, we drop
+				 * any registers beyond SR3 and trim trailing
+				 * empty registers to remain compatible with
+				 * existing GSC firmware.
+				 */
+				if (rv > 6) {
+					printf("warning: ignoring registers "
+					  "beyond SR3 (b/514254290)\n");
+					rv = 6;
+				}
+
+				if (rv == 6 &&
+				    arv_config_wpds.data[2].mask == 0) {
+					rv = 4;
+					arv_config_wpds.data[2].state =
+					  arv_config_setting_state_not_present;
+				}
+				if (rv == 4 &&
+				    arv_config_wpds.data[1].mask == 0) {
+					rv = 2;
+					arv_config_wpds.data[1].state =
+					  arv_config_setting_state_not_present;
+				}
+
 				if (rv == 2 || rv == 4 || rv == 6) {
 					arv_config_wpsr_choice =
 						arv_config_wpsr_choice_set;
