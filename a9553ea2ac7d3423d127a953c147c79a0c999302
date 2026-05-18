@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2bf0f7be_065e4107",
+        "filename": "zephyr/program/ocelot/src/rvp_suspend_resume.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-18T22:47:23Z",
+      "side": 1,
+      "message": "This is the 3rd implementation of board suspend/resume code in the ocelot project.\n\nDo you have bandwidth to implement this as a proper driver?\n\nI\u0027m thinking the devicetree should define an array of GPIOs that are de-asserted on `POWER_STARTUP` and asserted on `POWER_HARD_OFF`.\n\nThis could also replace some duplicate code in the fatcat projects.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 74
+      },
+      "revId": "a9553ea2ac7d3423d127a953c147c79a0c999302",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
