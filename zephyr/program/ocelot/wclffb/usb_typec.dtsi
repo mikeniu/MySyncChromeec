@@ -5,44 +5,51 @@
  */
 
 #include <usbc-policy.dtsi>
+#include <dt-bindings/usb_pd_tcpm.h>
 
  /{
 	usbc {
 		#address-cells = <1>;
 		#size-cells = <0>;
-		usbc_port0: port0@0 {
+
+		port0@0 {
 			compatible = "named-usbc-port";
 			reg = <0>;
+			/* bc12 = <&bc12_port0>; */
+			tcpc = <&tcpc_port0>;
 			chg = <&charger>;
-			pdc = <&pdc_rtk_c0>;
-			pd-retimer;
-			policy = <&cros_policy>;
+			usb-mux-chain-0 {
+				compatible = "cros-ec,usb-mux-chain";
+				usb-muxes = <&virtual_mux_0>;
+			};
 		};
-		usbc_port1: port1@1 {
-			compatible = "named-usbc-port";
-			reg = <1>;
-			pdc = <&pdc_rtk_c1>;
-			pd-retimer;
-			policy = <&cros_policy>;
-		};
-		ppm-driver {
-			compatible = "ucsi-ppm";
+		port0-muxes {
+			virtual_mux_0: virtual-mux-0 {
+				compatible = "cros-ec,usbc-mux-virtual";
+			};
 		};
 	};
 };
 
 &i2c_port_pd1 {
-	/* Define PDC IRQ GPIO(s) in board overlay */
-	pdc_rtk_c0: rts54-pdc@66 {
-		compatible = "realtek,rts54-pdc";
-		reg = <0x66>;
-		irq-gpios = <&gpiof 5 GPIO_ACTIVE_LOW>;
-		ccd;
-	};
-	pdc_rtk_c1: rts54-pdc@67 {
-		compatible = "realtek,rts54-pdc";
-		reg = <0x67>;
-		irq-gpios = <&gpiof 5 GPIO_ACTIVE_LOW>;
-		no-fw-update;
+	tcpc_port0: anx7447-tcpc@2c {
+		compatible = "analogix,anx7447-tcpc"; /* anx7406 => Invalid TCPC compatible on node */
+		status = "okay";
+		reg = <0x2c>;
+		tcpc-flags = <(
+			TCPC_FLAGS_VBUS_MONITOR |
+			TCPC_FLAGS_ALERT_OD |
+			TCPC_FLAGS_CONTROL_VCONN |
+			TCPC_FLAGS_CONTROL_FRS)>; /* same as kingler ? */
+		/* a duplicate of the <&gpio_usb_c0_tcpc_int_odl> node in
+		 * "named-gpios". This is the Zephyr preferred style,
+		 * the "named-gpios" node will be dealt with at a later date.
+		 */
+		irq-gpios = <&gpioj 7 GPIO_ACTIVE_LOW>;
+		/* a duplicate of the <&gpio_usb_c0_tcpc_rst> node in
+		 * "named-gpios". This is the Zephyr preferred style,
+		 * the "named-gpios" node will be dealt with at a later date.
+		 */
+		rst-gpios = <&gpioa 6 GPIO_ACTIVE_HIGH>;
 	};
 };
