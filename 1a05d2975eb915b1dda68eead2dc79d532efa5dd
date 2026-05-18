@@ -40,6 +40,30 @@
       },
       "revId": "1a05d2975eb915b1dda68eead2dc79d532efa5dd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1781509e_a8537bfb",
+        "filename": "zephyr/dts/bindings/usbc/ucsi-ppm.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-05-18T17:30:08Z",
+      "side": 1,
+      "message": "I think this is not what we want. For most of the cases it should fall back to old behaviour. \n\nrequired value -\u003e all platforms require this to be provided.\ndefault value -\u003e always overrides. \nleave it as it is -\u003e needs to be specified for some devices to work properly. \n\nAFAIK current implementation firstly checks if property is present and if yes it will use it.",
+      "parentUuid": "38b9f37f_02566db3",
+      "range": {
+        "startLine": 15,
+        "startChar": 4,
+        "endLine": 15,
+        "endChar": 15
+      },
+      "revId": "1a05d2975eb915b1dda68eead2dc79d532efa5dd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
