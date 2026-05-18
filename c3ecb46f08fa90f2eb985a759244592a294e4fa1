@@ -1,0 +1,45 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44a31867_332d99bf",
+        "filename": "driver/battery/smart.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 612,
+      "author": {
+        "id": 1182824
+      },
+      "writtenOn": "2026-05-18T20:22:51Z",
+      "side": 1,
+      "message": "typo",
+      "range": {
+        "startLine": 612,
+        "startChar": 48,
+        "endLine": 612,
+        "endChar": 53
+      },
+      "fixSuggestions": [
+        {
+          "fixId": "82a1ca13_e3619fc4",
+          "description": "prompt_to_edit API",
+          "replacements": [
+            {
+              "path": "driver/battery/smart.c",
+              "range": {
+                "startLine": 612,
+                "startChar": 0,
+                "endLine": 613,
+                "endChar": 0
+              },
+              "replacement": "\t/* timeout without a successful battery_status causes reading this\n"
+            }
+          ]
+        }
+      ],
+      "revId": "c3ecb46f08fa90f2eb985a759244592a294e4fa1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
