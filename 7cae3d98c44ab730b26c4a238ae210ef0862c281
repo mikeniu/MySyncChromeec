@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac8a0763_e5edb8ce",
+        "filename": "util/uart_utils.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-05-18T18:56:49Z",
+      "side": 1,
+      "message": "might as well break out of the loop here as well.\nthis error is unlikely to clear up meaningfully on retry.",
+      "range": {
+        "startLine": 51,
+        "startChar": 2,
+        "endLine": 51,
+        "endChar": 4
+      },
+      "revId": "7cae3d98c44ab730b26c4a238ae210ef0862c281",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
