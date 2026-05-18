@@ -90,6 +90,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd45af3d_7da09991",
+        "filename": "zephyr/dts/bindings/usbc/ucsi-ppm.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-05-18T22:03:56Z",
+      "side": 1,
+      "message": "Done in the next CL.",
+      "parentUuid": "f03f39ff_3ef4825b",
+      "range": {
+        "startLine": 15,
+        "startChar": 4,
+        "endLine": 15,
+        "endChar": 15
+      },
+      "revId": "1a05d2975eb915b1dda68eead2dc79d532efa5dd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c02fe5c8_793cc451",
@@ -103,6 +127,30 @@
       "writtenOn": "2026-05-18T21:00:18Z",
       "side": 1,
       "message": "This can be cleaned up with\n\n\n```suggestion\n#if DT_INST_NODE_HAS_PROP(0, b_num_alt_modes)\n\t\t\tcaps-\u003ebNumAltModes \u003d DT_INST_PROP_OR(0, b_num_alt_modes, 0);\n#endif\n```",
+      "range": {
+        "startLine": 360,
+        "startChar": 0,
+        "endLine": 362,
+        "endChar": 6
+      },
+      "revId": "1a05d2975eb915b1dda68eead2dc79d532efa5dd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2ca38dc_6ce245f4",
+        "filename": "zephyr/subsys/ucsi/ppm_driver.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-05-18T22:03:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c02fe5c8_793cc451",
       "range": {
         "startLine": 360,
         "startChar": 0,
