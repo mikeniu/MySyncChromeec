@@ -12,7 +12,7 @@
 		compatible = "named-gpios";
 
 		gpio_all_sys_pwrgd_r: all_sys_pwrgd_r {
-			gpios = <&gpioe 7 (GPIO_INPUT)>;
+			gpios = <&gpiof 4 (GPIO_INPUT)>;
 		};
 		gpio_ec_accel_mb_int_l: ec_accel_mb_int_l {
 			gpios = <&gpiof 0 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
@@ -43,6 +43,16 @@
 			enum-name = "GPIO_EN_KEYBOARD_BACKLIGHT";
 		};
 		/* Power sequencing signal */
+		gpio_vdd2_vr_pwrgd: vdd2_vr_pwrgd {
+			gpios = <&gpiod 1 GPIO_INPUT>;
+		};
+		gpio_vdd2_vr_en_s4_ec: vdd2_vr_en_s4_ec {
+			gpios = <&gpiod 7 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW | GPIO_OPEN_DRAIN)>;
+		};
+		gpio_prim_vr_en: prim_vr_en {
+			gpios = <&gpiod 5 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW | GPIO_OPEN_DRAIN)>;
+			no-auto-init;
+		};
 		gpio_en_pp3300_rails: en_pp3300_rails {
 			gpios = <&gpiog 6 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW | GPIO_OPEN_DRAIN)>;
 			no-auto-init;
@@ -66,8 +76,8 @@
 			gpios = <&gpioe 3 (GPIO_INPUT)>;
 			no-auto-init;
 		};
-		gpio_pg_vccio_od: pg_vccio_od {
-			gpios = <&gpiof 4 (GPIO_INPUT)>;
+		gpio_all_sys_pwrgd_out: all_sys_pwrgd_out {
+			gpios = <&gpioe 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 		};
 		gpio_sys_rst_odl: sys_rst_odl {
 			gpios = <&gpiof 3 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
@@ -98,7 +108,10 @@
 		};
 		/* ***** TODO  ****** */
 		gpio_en_slp_z: en_slp_z {
+			/*
 			gpios = <&gpioa 7 GPIO_INPUT>;
+			*/
+			gpios = <&gpioa 7 GPIO_OUTPUT_HIGH>;
 		};
 		gpio_ec_soc_int_odl: ec_soc_int_odl {
 			gpios = <&gpiom 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW)>;
@@ -139,20 +152,11 @@
 		gpio_anx7493_flip: anx7493_flip {
 			gpios = <&gpioc 6 GPIO_INPUT>;
 		};
-		gpio_vdd2_vr_pwrgd: vdd2_vr_pwrgd {
-			gpios = <&gpiod 1 GPIO_INPUT>;
-		};
 		gpio_fps_ec_contral: fps_ec_contral {
 			gpios = <&gpiod 3 GPIO_INPUT>;
 		};
 		gpio_ddr_adm_vrs_pwrgd: ddr_adm_vrs_pwrgd {
 			gpios = <&gpiod 4 GPIO_INPUT>;
-		};
-		gpio_prim_vr_en: prim_vr_en {
-			gpios = <&gpiod 5 GPIO_INPUT>;
-		};
-		gpio_vdd2_vr_en_s4_ec: vdd2_vr_en_s4_ec {
-			gpios = <&gpiod 7 GPIO_INPUT>;
 		};
 		gpio_imvp_vr_ready: imvp_vr_ready {
 			gpios = <&gpioe 0 GPIO_INPUT>;

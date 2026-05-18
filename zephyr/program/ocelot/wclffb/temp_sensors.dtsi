@@ -42,7 +42,7 @@
 			temp-host-release-high = <70>;
 			temp-host-release-halt = <80>;
 			sensor = <&temp_soc_thermistor>;
-			power-good-pin = <&gpio_pg_vccio_od>;
+			power-good-pin = <&gpio_all_sys_pwrgd_r>;
 		};
 		temp_cpu_vr: cpu-vr-thermistor {
 			temp-host-high = <75>;
@@ -50,7 +50,7 @@
 			temp-host-release-high = <70>;
 			temp-host-release-halt = <80>;
 			sensor = <&temp_cpu_vr_thermistor>;
-			power-good-pin = <&gpio_pg_vccio_od>;
+			power-good-pin = <&gpio_all_sys_pwrgd_r>;
 		};
 		temp_ssd: ssd-thermistor {
 			temp-host-high = <75>;
@@ -58,7 +58,7 @@
 			temp-host-release-high = <70>;
 			temp-host-release-halt = <80>;
 			sensor = <&temp_ssd_thermistor>;
-			power-good-pin = <&gpio_pg_vccio_od>;
+			power-good-pin = <&gpio_all_sys_pwrgd_r>;
 		};
 		temp_regulator: ambient-thermistor {
 			temp-host-high = <75>;
@@ -66,7 +66,7 @@
 			temp-host-release-high = <70>;
 			temp-host-release-halt = <80>;
 			sensor = <&temp_regulator_thermistor>;
-			power-good-pin = <&gpio_pg_vccio_od>;
+			power-good-pin = <&gpio_all_sys_pwrgd_r>;
 		};
 		temp_charger: charger-thermistor {
 			temp-host-high = <80>;
@@ -74,7 +74,7 @@
 			temp-host-release-high = <75>;
 			temp-host-release-halt = <85>;
 			sensor = <&temp_charger_thermistor>;
-			power-good-pin = <&gpio_pg_vccio_od>;
+			power-good-pin = <&gpio_all_sys_pwrgd_r>;
 		};
 	};
 };

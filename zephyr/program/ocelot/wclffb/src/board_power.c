@@ -35,6 +35,7 @@ void board_ap_power_force_shutdown(void)
 	power_signal_set(PWR_EC_PCH_RSMRST, 1);
 
 	/* Turn off PRIM load switch. */
+	power_signal_set(PWR_PRIM_VR, 0);
 	power_signal_set(PWR_EN_PP3300_A, 0);
 	power_signal_set(PWR_EN_PP1800_A, 0);
 
@@ -64,6 +65,8 @@ static int board_ap_power_action_g3_run(void *data)
 		LOG_DBG("Turning on EN_S5_RAILS");
 		power_signal_set(PWR_EN_PP3300_A, 1);
 		power_signal_set(PWR_EN_PP1800_A, 1);
+		k_busy_wait(5000);
+		power_signal_set(PWR_PRIM_VR, 1);
 
 		update_ap_boot_time(ARAIL);
 	}
@@ -74,6 +77,19 @@ static int board_ap_power_action_g3_run(void *data)
 
 AP_POWER_APP_STATE_DEFINE(G3, board_ap_power_action_g3_entry,
 			  board_ap_power_action_g3_run, NULL);
+
+static int board_ap_power_action_s4_exit(void *data)
+{
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_vdd2_vr_en_s4_ec),
+		!power_signal_get(PWR_SLP_S4));
+
+	k_busy_wait(5000);
+
+	//return 0;
+	return gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_vdd2_vr_pwrgd));
+}
+
+AP_POWER_APP_STATE_DEFINE(S4, NULL, NULL, board_ap_power_action_s4_exit);
 #endif /* CONFIG_AP_PWRSEQ_DRIVER */
 
 int power_signal_external_init(void)
