@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b90102ca_f0f6a65c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-05-18T21:24:03Z",
+      "side": 1,
+      "message": "This makes sense assuming you don\u0027t plan to support other EC AIC types.",
+      "revId": "d69886e790d66ff1dad50c1d2b57b1048ec6cb26",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
