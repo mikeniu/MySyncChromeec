@@ -298,6 +298,13 @@ static void print_battery_info(void)
 		value = !value;
 	print_item_name("C-FET:");
 	ccprintf("%d\n", value);
+
+	value = battery_get_disconnect_state();
+	print_item_name("D-FET:");
+	if (value == BATTERY_DISCONNECT_ERROR)
+		ccprintf("ERR\n");
+	else
+		ccprintf("%d\n", value);
 #endif
 }
 
@@ -816,6 +823,10 @@ static bool board_wants_reduced_input_voltage(void)
 		return false;
 
 	battery_get_params(&batt);
+
+	/* Battery in bad state so avoid reducing voltage */
+	if (batt.flags & BATT_FLAG_BAD_ANY)
+		return false;
 
 	/* Battery needs charge, so we don't want to reduce voltage */
 	if (batt.flags & BATT_FLAG_WANT_CHARGE)
