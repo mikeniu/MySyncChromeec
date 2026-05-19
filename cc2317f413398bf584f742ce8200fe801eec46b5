@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5febfd48_4b0e7b04",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T22:38:55Z",
+      "side": 1,
+      "message": "In `OpenDevice`:\n\n```c\nif (libusb_kernel_driver_active(dev_handle_ptr_.get(), hid_interfaces_[i])) {\n\n```\n\n`libusb_kernel_driver_active` returns `1` if active, `0` if not, and a *negative* error code if it fails. Because C++ treats any non-zero value as `true`, an error code will mistakenly trigger the detachment logic and log a confusing message.\n\n* **Action:** Explicitly check for `\u003d\u003d 1`:\n\n````c\n    int active \u003d libusb_kernel_driver_active(dev_handle_ptr_.get(), hid_interfaces_[i]);\n    if (active \u003d\u003d 1) {\n        libusb_detach_kernel_driver(...);\n    } else if (active \u003c 0) {\n        LogErr(\"[IAP] {} - Failed to check kernel driver: {}\\n\", __func__, libusb_error_name(active));\n    }\n```",
+      "range": {
+        "startLine": 561,
+        "startChar": 0,
+        "endLine": 561,
+        "endChar": 58
+      },
+      "revId": "cc2317f413398bf584f742ce8200fe801eec46b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5e8fd205_7642b433",
         "filename": "util/elan/iap_tool.cc",
         "patchSetId": 19
@@ -65,6 +88,29 @@
         "startChar": 4,
         "endLine": 135,
         "endChar": 14
+      },
+      "revId": "cc2317f413398bf584f742ce8200fe801eec46b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbc43943_5cc7169b",
+        "filename": "util/elan/iap_tool.h",
+        "patchSetId": 19
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T22:38:55Z",
+      "side": 1,
+      "message": "`util/elan/iap_tool.h` contains no declarations or definitions—it merely acts as a bucket of standard library includes for `iap_tool.cc`. Because `iap_tool.cc` contains `main()` and doesn\u0027t export an API, we don\u0027t need a header file for it.\n\n* **Action:** Delete `util/elan/iap_tool.h` entirely. Move all necessary includes (like `\u003cvector\u003e`, `\u003cstring\u003e`, `\"file_control.h\"`, etc.) directly to the top of `util/elan/iap_tool.cc`.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 6
       },
       "revId": "cc2317f413398bf584f742ce8200fe801eec46b5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
