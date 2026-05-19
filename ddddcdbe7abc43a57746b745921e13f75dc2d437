@@ -100,6 +100,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e6380dad_87918440",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T23:03:39Z",
+      "side": 1,
+      "message": "Here is a Gemini-generated example of how to fix it. Review for correctness.\n\n----\n\nHere is a clean, modern way to fix the redundant context issue using Dependency Injection and an RAII wrapper (Resource Acquisition Is Initialization).\n\nBy initializing the `libusb_context` once in `main()` and wrapping it in a `std::unique_ptr` with a custom deleter, we guarantee it gets passed efficiently to any `UsbComm` instance and is cleanly destroyed on any exit path—without leaking or double-freeing.\n\nHere is the code you can share with the author:\n\n### 1. Update `usb_comm.h`\n\nModify the constructor signature so `UsbComm` takes a pointer to an existing context instead of creating its own.\n\n```cpp\nclass UsbComm {\n    public:\n\t// Require the caller to provide the context\n\tUsbComm(libusb_context *ctx, uint16_t vid, uint16_t pid);\n\t~UsbComm();\n\n        // ... rest of the class ...\n\n```\n\n### 2. Update `usb_comm.cc`\n\nRemove `libusb_init` from the constructor and `libusb_exit` from the destructor. The `UsbComm` class should only manage the device handle (`handle_`), not the global context.\n\n```cpp\nUsbComm::UsbComm(libusb_context *ctx, uint16_t vid, uint16_t pid)\n\t: ctx_(ctx)\n\t, vid_(vid)\n\t, pid_(pid)\n{\n\t// Removed libusb_init()\n}\n\nUsbComm::~UsbComm()\n{\n\tif (handle_) {\n\t\tlibusb_release_interface(handle_, INTERFACE_NUMBER);\n\t\tif (kernel_driver_detached_) {\n\t\t\tint rc \u003d libusb_attach_kernel_driver(handle_, INTERFACE_NUMBER);\n\t\t\tif (rc \u003d\u003d 0) {\n\t\t\t\tstd::println(\"Kernel driver successfully reattached.\");\n\t\t\t} else {\n\t\t\t\tstd::println(stderr, \"[WARN] Failed to reattach kernel driver: {}\", LibusbErrorToString(rc));\n\t\t\t}\n\t\t}\n\t\tlibusb_close(handle_);\n\t}\n\t// Removed libusb_exit()\n}\n\n```\n\n### 3. Update `et171_flash.cc` (in `main`)\n\nInitialize the context once at the very beginning of `main()` and pass it down. Using a `std::unique_ptr` ensures `libusb_exit` is called automatically, even if the program hits an early `return -1;` during argument parsing or a failed flash.\n\n```cpp\nint main(int argc, char *argv[])\n{\n\t// 1. Initialize the global libusb context once\n\tlibusb_context* raw_ctx \u003d nullptr;\n\tint rc \u003d libusb_init(\u0026raw_ctx);\n\tif (rc !\u003d 0) {\n\t\tstd::println(stderr, \"[ERROR] Failed to initialize libusb: {}\", libusb_error_name(rc));\n\t\treturn -1;\n\t}\n\n\t// 2. Wrap it in a smart pointer for guaranteed cleanup on all exit paths\n\tstd::unique_ptr\u003clibusb_context, decltype(\u0026libusb_exit)\u003e usb_ctx(raw_ctx, \u0026libusb_exit);\n\n\t// ... [Your argument parsing code here] ...\n\n\t// 3. Pass the raw pointer to your comm instances\n\tUsbComm app_comm(usb_ctx.get(), kVidGoogle, kPidEgisApp);\n\tif (app_comm.Connect() \u003d\u003d 0) {\n\t\tExecuteGetVersion(app_comm);\n\t\tstd::println(\"--- Switching to Bootloader Mode ---\");\n\t\tExecuteBootLoader(app_comm);\n\t\tstd::this_thread::sleep_for(std::chrono::milliseconds(800));\n\t}\n\n\tUsbComm boot_comm(usb_ctx.get(), kVidEgis, kPidEgisBootloader);\n        \n        // ... [Rest of main logic] ...\n\n```",
+      "parentUuid": "94659f5f_1fd8fd54",
+      "range": {
+        "startLine": 251,
+        "startChar": 0,
+        "endLine": 251,
+        "endChar": 43
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "32ed4e69_5fccbda9",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 16
