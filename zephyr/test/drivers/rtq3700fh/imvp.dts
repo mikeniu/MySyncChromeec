@@ -1,0 +1,15 @@
+#include <zephyr/dt-bindings/gpio/gpio.h>
+#include <dt-bindings/imvp/rtq3700fh.h>
+
+&i2c0 {
+	rtq3700fh_emul: richtek-imvp@20 {
+		compatible = "richtek,rtq3700fh";
+		status = "okay";
+		reg = <0x20>;
+		enable-gpios = <&gpio0 7 GPIO_ACTIVE_HIGH>;
+		update-data = <
+			RTQ_WRITE_BYTE(0x50, 0x01, 0x10)
+		>;
+		update-crc = <0x01E8>;
+	};
+};
