@@ -16,6 +16,24 @@
       "message": "I realized this change breaks backward compatibility.  The older rtkupdate doesn\u0027t support the \"--monitor_file\" parameter, so running a new flash_ec with an older rtkupdate fails.\n\nI could change this so that the probe command returns metadata to rtkupdate instead of just a 2 byte response message.",
       "revId": "29ec1eeecb966d07697b85852f305f99537557b3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce40974c_fcda7e77",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-19T15:03:22Z",
+      "side": 1,
+      "message": "Updated to keep backward compatibility with flash_ec.",
+      "parentUuid": "f4833062_2ecc9359",
+      "revId": "29ec1eeecb966d07697b85852f305f99537557b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
