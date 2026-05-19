@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bebab8d8_5f70622c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-05-19T19:53:52Z",
+      "side": 1,
+      "message": "The GPIO should not be push-pull. ODM needs to decide if they want to rework/add a pull-up or disregard this feature.",
+      "revId": "f9b95288a014cb023764d46f0776e5dc1ca96026",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e98d6af3_7525c368",
         "filename": "zephyr/program/ocelot/ojal/project.overlay",
         "patchSetId": 1
