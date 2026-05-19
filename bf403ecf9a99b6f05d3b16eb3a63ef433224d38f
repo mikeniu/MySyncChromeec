@@ -211,6 +211,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d811fc44_8155ecf3",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T21:07:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "82928211_c65dd860",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2e52d667_809c65b8",

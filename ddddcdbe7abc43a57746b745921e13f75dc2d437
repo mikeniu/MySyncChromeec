@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eec15978_36d152a4",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T21:07:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] 🚨 **Critical Security Issue:** The return value of `GenerateGcmIv` is ignored. If `RAND_bytes` fails internally, the code will proceed with an uninitialized (or zeroed) IV. In AES-GCM, using a non-random or fixed IV with the same key is a critical security failure that compromises both confidentiality and authenticity.\n\nPlease check the return value and abort if it fails:\n```cpp\nif (GenerateGcmIv(std::span\u003cuint8_t\u003e(cmd_iv, kAesGcmIvSize)) !\u003d 0) {\n    return std::unexpected(-1);\n}\n```",
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dac808f9_4469b7a6",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 509,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T21:07:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] 🐛 **Bug:** You are calling `resp.error()` here, but this branch is only reached if `resp.has_value()` is true (checked at line 498). Calling `.error()` on a `std::expected` that holds a value is invalid and will likely cause a crash or exception.\n\nYou should report the size mismatch instead:\n```cpp\nstd::println(stderr, \"[ERROR] read_flash failed at addr 0x{:x} (size mismatch: got {}, expected {})\", flash_addr, resp-\u003esize(), current_read);\n```",
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0ccb455_136819f1",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T21:07:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] 🛡️ **Consistency Suggestion:** The `SendCommand` method currently trusts the response from the EC without verifying the checksum. Since you already have `UpdateChecksum` implemented for requests, it would be prudent to also verify the checksum of the received `EcHostCommandResponse` to ensure data integrity.",
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32ed4e69_5fccbda9",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 523,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T21:07:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ⚠️ **Logic Improvement:** The return value of `BulkWrite` is checked for errors (`\u003c 0`), but it doesn\u0027t verify that the number of bytes transferred matches the requested size. Short writes can happen in USB transfers and should be handled or treated as an error here.\n\nConsider checking:\n```cpp\nif (ret !\u003d static_cast\u003cint\u003e(buf.size())) {\n    // Handle short write error\n}\n```",
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
