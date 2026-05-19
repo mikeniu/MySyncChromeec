@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3534ab6d_0ce1a983",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T23:36:41Z",
+      "side": 1,
+      "message": "To ensure the code is formatted correctly, please add a `.clang-format` file in `util/egis` with the following contents:\n\n```\nBasedOnStyle: Google\n```\n\nAdd the file to this CL and then run `clang-format` on all of these files to format them correctly:\n\n```\nfind util/egis/ -iname \"*.h\" -o -iname \"*.cc\" | xargs clang-format -i\n```\n\nOnce the `.clang-format` is checked in, future `repo upload`s should warn if there is a problem with formatting and tell you how to run `cros format` to fix it.",
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "da86a805_912a78c3",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 16
