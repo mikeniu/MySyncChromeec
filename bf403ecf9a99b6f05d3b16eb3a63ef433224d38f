@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0fa16eed_3104ff06",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-19T07:48:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2f16dad4_0d9f7965",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd91245f_cb0b21f2",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-18T18:35:18Z",
       "side": 1,
       "message": "[Gerrit AI Review] Redundant vector allocation. You can pass `cmd` directly to `usb_.BulkWrite` since it takes a span.",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0140907_be903178",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-19T07:48:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd91245f_cb0b21f2",
       "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -52,6 +88,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e31ea07a_1f361f1f",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-19T07:48:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "210d20ce_4c756308",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f1234e1c_054bc037",
@@ -69,6 +123,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "81cd52cf_84c80c12",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-19T07:48:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1234e1c_054bc037",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9ee24ff5_90f810e3",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-05-18T18:35:18Z",
       "side": 1,
       "message": "[Gerrit AI Review] `GetSr1` returns 0 on error (if `ReadReg` fails). This is ambiguous as 0 might be a valid value for SR1. It would be better to return a `std::expected\u003cuint8_t, int\u003e`.",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "228649d7_40487a30",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-19T07:48:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ee24ff5_90f810e3",
       "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -105,6 +195,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "82928211_c65dd860",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-19T07:48:53Z",
+      "side": 1,
+      "message": "Kept for future protocol extension.\nI\u0027ve added error handling for it in the code.",
+      "parentUuid": "9dbce402_ec42704c",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2e52d667_809c65b8",
         "filename": "util/egis/bootrom.h",
         "patchSetId": 15
@@ -116,6 +224,24 @@
       "writtenOn": "2026-05-18T18:35:18Z",
       "side": 1,
       "message": "[Gerrit AI Review] `wrapped_algo` should preferably be of type `EgisCryptoType` for better type safety, rather than `uint32_t`.",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3054ca66_66d349e3",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-19T07:48:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e52d667_809c65b8",
       "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -137,6 +263,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1751935e_c9681adc",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-19T07:48:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da9b1aec_7528f929",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3bcb32e5_7f3a2da2",
@@ -150,6 +294,24 @@
       "writtenOn": "2026-05-18T18:35:18Z",
       "side": 1,
       "message": "[Gerrit AI Review] This condition will always be false because `mode` is set to `\"flashfw\"` (without the leading dash) in the argument parsing loop (line 129). It should be `mode \u003d\u003d \"flashfw\"`.",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0557d1c0_60d3a9fc",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-19T07:48:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3bcb32e5_7f3a2da2",
       "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -171,6 +333,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "68836684_73e0aa0b",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-19T07:48:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db4f8cff_54b97994",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c4cd911b_9afa806b",
@@ -184,6 +364,24 @@
       "writtenOn": "2026-05-18T18:35:18Z",
       "side": 1,
       "message": "[Gerrit AI Review] Redundant and potentially incorrect assignment. The variable `fw_path` was already correctly set during the argument parsing loop. Using `argv[2]` assumes a specific argument order which might not be true (e.g., if `-dumpcmd` was passed first).",
+      "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "271a1333_a921420f",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-19T07:48:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c4cd911b_9afa806b",
       "revId": "bf403ecf9a99b6f05d3b16eb3a63ef433224d38f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
