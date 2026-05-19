@@ -153,6 +153,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3ed73dca_c9500e1b",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 514,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T23:32:57Z",
+      "side": 1,
+      "message": "Regarding the 2ms/5ms pacing delays in `ReadFlash` and `BackupFlash`: Are these strictly necessary to prevent USB stalls on the device side? If the device firmware properly handles USB flow control (sending NAKs when its buffers are full), these host-side pacing sleeps should be safely removed to speed up the dump process.",
+      "range": {
+        "startLine": 514,
+        "startChar": 0,
+        "endLine": 514,
+        "endChar": 60
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8b9fbd9c_c7a27abd",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 16
