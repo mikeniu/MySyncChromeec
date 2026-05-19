@@ -54,15 +54,6 @@
 		reset-val = <1>;
 		output;
 	};
-	/* TODO */
-	pwr_slp_s0: pm-slp-s0-r-n {
-		compatible = "intel,ap-pwrseq-gpio";
-		dbg-label = "SLP_S0_L input from PCH";
-		enum-name = "PWR_SLP_S0";
-		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
-                /* PCH_SLP_S0_N_R net */
-	        gpios = <&gpioj 5 (GPIO_ACTIVE_LOW)>;
-	};
 	pwr_pch_pwrok: ec-pm-pch-pwrok {
 		compatible = "intel,ap-pwrseq-gpio";
 		dbg-label = "PCH_PWROK output to PCH";
@@ -117,8 +108,18 @@
                 gpios = <&gpiof 3 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
 		output;
 	};
+	/* TODO */
+	/*
+	pwr_slp_s0: pm-slp-s0-r-n {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "SLP_S0_L input from PCH";
+		enum-name = "PWR_SLP_S0";
+		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
+	        gpios = <&gpioj 5 (GPIO_ACTIVE_LOW)>;
+	};
 	ap-power {
 		compatible = "ap-pwrseq-sub-states";
 		chipset = "S0ix";
 	};
+	*/
 };
