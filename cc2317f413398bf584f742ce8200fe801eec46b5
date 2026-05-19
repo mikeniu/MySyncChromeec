@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b7d82c71_23f2952a",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T22:49:56Z",
+      "side": 1,
+      "message": "You can make the loops in `WriteRomData` and `ReadRomData` more concise by using a standard `for` loop with `subspan`.\n\n**Action:** Refactor `WriteRomData` (and apply similar logic to `ReadRomData`):\n\n```c\nint IapControl::WriteRomData(std::span\u003cconst uint8_t\u003e buff) {\n  if (buff.empty()) return -1;\n\n  for (size_t offset \u003d 0; offset \u003c buff.size(); offset +\u003d kEp3Length) {\n    size_t chunk_size \u003d std::min(kEp3Length, buff.size() - offset);\n    auto chunk \u003d buff.subspan(offset, chunk_size);\n\n    if (IapSendData(chunk)) {\n      LogErr(\"[IAP] {} - fail, count: {}\\n\", __func__, offset);\n      return -1;\n    }\n\n    if (progress_callback_) {\n      progress_callback_(offset + chunk.size(), buff.size());\n    }\n  }\n  return 0;\n}\n\n```",
+      "range": {
+        "startLine": 424,
+        "startChar": 0,
+        "endLine": 478,
+        "endChar": 1
+      },
+      "revId": "cc2317f413398bf584f742ce8200fe801eec46b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5febfd48_4b0e7b04",
         "filename": "util/elan/iap_control.cc",
         "patchSetId": 19
@@ -42,6 +65,29 @@
         "startChar": 0,
         "endLine": 561,
         "endChar": 58
+      },
+      "revId": "cc2317f413398bf584f742ce8200fe801eec46b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91801743_7a92ab7a",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 806,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T22:49:56Z",
+      "side": 1,
+      "message": "You can reuse your existing `Get32Le` function inside `GetChecksum` to avoid manual bit-shifting.\n\n**Action:** Refactor `GetChecksum`:\n\n```c\nstd::optional\u003cuint32_t\u003e IapControl::GetChecksum(std::span\u003cconst uint8_t\u003e buff) {\n  if ((buff.size() % 4) !\u003d 0) return std::nullopt;\n\n  uint32_t checksum \u003d 0;\n  for (size_t i \u003d 0; i \u003c buff.size(); i +\u003d 4) {\n    if (auto val \u003d Get32Le(buff.subspan(i, 4))) {\n      checksum +\u003d *val;\n    }\n  }\n  return checksum;\n}\n\n```",
+      "range": {
+        "startLine": 792,
+        "startChar": 0,
+        "endLine": 806,
+        "endChar": 0
       },
       "revId": "cc2317f413398bf584f742ce8200fe801eec46b5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
