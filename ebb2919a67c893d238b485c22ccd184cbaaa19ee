@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45c20dc5_a86bbf0a",
+        "filename": "zephyr/drivers/wot/wot.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-19T17:35:57Z",
+      "side": 1,
+      "message": "Don\u0027t use C++ style comments.",
+      "range": {
+        "startLine": 60,
+        "startChar": 0,
+        "endLine": 60,
+        "endChar": 77
+      },
+      "revId": "ebb2919a67c893d238b485c22ccd184cbaaa19ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41d36156_4113df69",
+        "filename": "zephyr/drivers/wot/wot.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-19T17:35:57Z",
+      "side": 1,
+      "message": "This is running in the interrupt context, don\u0027t call logging routines from the ISR directly.",
+      "range": {
+        "startLine": 132,
+        "startChar": 0,
+        "endLine": 132,
+        "endChar": 47
+      },
+      "revId": "ebb2919a67c893d238b485c22ccd184cbaaa19ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a84d385d_bda88400",
+        "filename": "zephyr/drivers/wot/wot.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-19T17:35:57Z",
+      "side": 1,
+      "message": "This logic needs to move into `wot_trigger_wake_work` to avoid doing too much at interrupt time.",
+      "range": {
+        "startLine": 144,
+        "startChar": 0,
+        "endLine": 156,
+        "endChar": 0
+      },
+      "revId": "ebb2919a67c893d238b485c22ccd184cbaaa19ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
