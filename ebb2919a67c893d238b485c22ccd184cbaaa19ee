@@ -68,6 +68,29 @@
       },
       "revId": "ebb2919a67c893d238b485c22ccd184cbaaa19ee",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b735c397_1fff1397",
+        "filename": "zephyr/drivers/wot/wot.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-19T17:39:33Z",
+      "side": 1,
+      "message": "Check all the GPIOs are initialized at the top if the function.  No sense in configuring GPIOs or registering interrupts when `wot_init` returns an error.",
+      "range": {
+        "startLine": 175,
+        "startChar": 6,
+        "endLine": 175,
+        "endChar": 22
+      },
+      "revId": "ebb2919a67c893d238b485c22ccd184cbaaa19ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
