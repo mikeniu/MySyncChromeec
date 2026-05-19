@@ -193,6 +193,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8699d5ff_4c2163fa",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T23:23:38Z",
+      "side": 1,
+      "message": "In `main()`, the exact same 15-line block of code is written twice to load `fw.bin` and `cmd.bin` into `std::vector\u003cuint8_t\u003e`. It also essentially repeats for `LoadAesKey`.\n\nExtracting this into a single helper function cleans up `main()` significantly.\n\n**The Helper:**\n\n```c\n#include \u003coptional\u003e\n\nstd::optional\u003cstd::vector\u003cuint8_t\u003e\u003e ReadBinaryFile(std::string_view path) {\n    std::ifstream file(std::string(path), std::ios::binary | std::ios::ate);\n    if (!file) return std::nullopt;\n\n    std::streamsize size \u003d file.tellg();\n    if (size \u003c\u003d 0) return std::nullopt;\n\n    file.seekg(0, std::ios::beg);\n    std::vector\u003cuint8_t\u003e buffer(size);\n    if (!file.read(reinterpret_cast\u003cchar*\u003e(buffer.data()), size)) {\n        return std::nullopt;\n    }\n    return buffer;\n}\n\n```\n\n**After (in `main`):**\n\n```c\nauto firmware_opt \u003d ReadBinaryFile(fw_path);\nif (!firmware_opt) {\n    std::println(stderr, \"[ERROR] Cannot open or read file: {}\", fw_path);\n    return -1;\n}\nstd::vector\u003cuint8_t\u003e\u0026 firmware \u003d firmware_opt.value();\n\n```",
+      "range": {
+        "startLine": 418,
+        "startChar": 2,
+        "endLine": 434,
+        "endChar": 17
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "32ed4e69_5fccbda9",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 16
