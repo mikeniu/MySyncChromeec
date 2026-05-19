@@ -124,6 +124,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3368b059_7ab6d7ee",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T23:04:31Z",
+      "side": 1,
+      "message": "**Hardcoded Sub-Strings** In `et171_flash.cc`, you have conditional checks for `\"AESGCM\"` and `\"SHA256\"` scattered throughout the CLI parsing and configuration steps.\n\n* **Remediation:** Parse the string once into an `enum class CryptoAlgo` variable during the argument parsing loop to prevent typos and simplify downstream switch/if statements.",
+      "range": {
+        "startLine": 298,
+        "startChar": 0,
+        "endLine": 298,
+        "endChar": 50
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "32ed4e69_5fccbda9",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 16
