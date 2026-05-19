@@ -66,6 +66,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a1cd9c20_e7d31c42",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T23:30:55Z",
+      "side": 1,
+      "message": "**Replace \"Magic Sleeps\" with Status Polling for Flash Writes** The fixed 10ms delays in `WriteEnable()`, `SetSr1()`, and `WriteFlash()` are risky. If the physical flash chip takes longer than 10ms to complete a page program or register write (due to chip wear or temperature), the next operation will overlap and potentially corrupt the flash. **Suggestion:** Instead of `sleep_for(10ms)`, standard practice is to read the SPI Flash Status Register 1 (SR1) in a `while` loop, checking the **WIP (Write In Progress) bit** (usually Bit 0). Keep polling until WIP goes to 0\\. This guarantees the operation is finished and optimizes speed by proceeding the exact millisecond the chip is ready.",
+      "range": {
+        "startLine": 373,
+        "startChar": 0,
+        "endLine": 373,
+        "endChar": 60
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dac808f9_4469b7a6",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 16
