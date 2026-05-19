@@ -89,6 +89,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7c638bbe_32983a43",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T23:32:08Z",
+      "side": 1,
+      "message": "Here is Gemini-generated code. Verify it\u0027s correct.\n\n----\n\n\nThis creates a `WaitForFlashReady` helper that continuously reads the Flash Status Register (SR1) until the **Write In Progress (WIP)** bit drops to 0, ensuring maximum speed and complete safety.\n\n### 1. Add the WIP bit definition to `bootrom.h`\n\nInside the `EgisBootrom` namespace, add the bitmask for the WIP bit:\n\n```cpp\n// Flash commands\nconst uint8_t FLASH_WREN \u003d 0x06;\nconst uint8_t FLASH_WRSR \u003d 0x01;\nconst uint8_t FLASH_RDSR \u003d 0x05;\nconst uint8_t FLASH_SR1_WIP \u003d 0x01; // \u003c--- Add this: Write In Progress bit\n\n```\n\n### 2. Add the `WaitForFlashReady` helper\n\nAdd this declaration to the private section of `BootromComm` in `bootrom.h`:\n\n```cpp\nint WaitForFlashReady(int timeout_ms \u003d 500);\n\n```\n\nThen, add the implementation in `bootrom.cc`:\n\n```cpp\nint BootromComm::WaitForFlashReady(int timeout_ms)\n{\n\tauto start_time \u003d std::chrono::steady_clock::now();\n\twhile (std::chrono::steady_clock::now() - start_time \u003c\n\t       std::chrono::milliseconds(timeout_ms)) {\n\t\t\n\t\tauto sr1 \u003d GetSr1();\n\t\tif (!sr1.has_value()) {\n\t\t\tstd::println(stderr, \"[ERROR] Failed to read SR1 during polling.\");\n\t\t\treturn sr1.error();\n\t\t}\n\n\t\t// If the Write In Progress (WIP) bit is 0, the operation is complete.\n\t\tif ((sr1.value() \u0026 EgisBootrom::FLASH_SR1_WIP) \u003d\u003d 0) {\n\t\t\treturn 0; \n\t\t}\n\n\t\t// Yield briefly before polling again to prevent pegging the host CPU\n\t\tstd::this_thread::sleep_for(std::chrono::milliseconds(1));\n\t}\n\t\n\tstd::println(stderr, \"[ERROR] Flash ready timeout.\");\n\treturn -1;\n}\n\n```\n\n### 3. Replace the magic sleeps in `bootrom.cc`\n\nNow the author can replace the `10ms` sleeps with robust polling in the functions that write to the flash chip.\n\n**In `WriteEnable()`:**\n\n```cpp\n    // Before:\n    // std::this_thread::sleep_for(std::chrono::milliseconds(10));\n    // return 0;\n\n    // After:\n    return WaitForFlashReady();\n\n```\n\n**In `SetSr1()`:**\n*(Note: Because `SetSr1` currently returns `void`, it should ideally be updated to return `int` or `std::expected\u003cvoid, int\u003e` so errors bubble up).*\n\n```cpp\n    // Before:\n    // std::this_thread::sleep_for(std::chrono::milliseconds(10));\n\n    // After:\n    if (WaitForFlashReady() !\u003d 0) {\n        std::println(stderr, \"[WARN] SetSr1 timed out waiting for flash.\");\n    }\n\n```\n\n**In `WriteFlash()`:**\n\n```cpp\n    // Before:\n    // std::this_thread::sleep_for(std::chrono::milliseconds(10));\n    // return 0;\n\n    // After:\n    if (WaitForFlashReady() !\u003d 0) {\n        std::println(stderr, \"\\n[HALT] Timeout waiting for flash write to complete at 0x{:x}\", addr);\n        return -1;\n    }\n    return 0;\n\n```\n\nThis setup guarantees that the tool waits *exactly* as long as the hardware needs—no longer, no shorter—which completely eliminates the risk of write corruption due to environmental variables or chip wear.",
+      "parentUuid": "a1cd9c20_e7d31c42",
+      "range": {
+        "startLine": 373,
+        "startChar": 0,
+        "endLine": 373,
+        "endChar": 60
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dac808f9_4469b7a6",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 16
