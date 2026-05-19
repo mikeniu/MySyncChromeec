@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fcfa9e4_92745a63",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T22:21:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Small optimization: The checksum for `rom` is calculated multiple times (here and at line 144). Since `rom` is constant, you could calculate it once at the start of `RunIapProcess` and reuse the value.",
+      "range": {
+        "startLine": 195,
+        "startChar": 0,
+        "endLine": 195,
+        "endChar": 39
+      },
+      "revId": "cc2317f413398bf584f742ce8200fe801eec46b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03c663dd_764204db",
+        "filename": "util/elan/iap_tool.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T22:21:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider using `EXIT_SUCCESS` and `EXIT_FAILURE` from `\u003ccstdlib\u003e` for return values in `main`. Returning `-1` is often interpreted as `255` in some shell environments.",
+      "range": {
+        "startLine": 135,
+        "startChar": 4,
+        "endLine": 135,
+        "endChar": 14
+      },
+      "revId": "cc2317f413398bf584f742ce8200fe801eec46b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
