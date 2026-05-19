@@ -77,6 +77,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "94659f5f_1fd8fd54",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T23:02:10Z",
+      "side": 1,
+      "message": "**Redundant libusb Contexts** In `et171_flash.cc`, you instantiate two `UsbComm` objects (`app_comm` and `boot_comm`). The `UsbComm` constructor blindly calls `libusb_init(\u0026ctx_)`. Calling `libusb_init` multiple times allocates multiple discrete libusb contexts.\n\n* **Remediation:** Initialize the `libusb_context` once globally (or in `main()`) and inject it into the `UsbComm` class via its constructor.",
+      "range": {
+        "startLine": 251,
+        "startChar": 0,
+        "endLine": 251,
+        "endChar": 43
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "32ed4e69_5fccbda9",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 16
