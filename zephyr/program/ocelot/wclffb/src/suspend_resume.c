@@ -20,10 +20,12 @@ static void wclffb_power_event_handler(struct ap_power_ev_callback *callback,
 	case AP_POWER_STARTUP:
 		/* Deassert AMP_MUTE_ODL when AP is on. */
 		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_amp_mute_odl), 1);
+		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_pwrbtn_led), 1);
 		break;
 	case AP_POWER_HARD_OFF:
 		/* Assert AMP_MUTE_ODL when powered off. */
 		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_amp_mute_odl), 0);
+		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_pwrbtn_led), 0);
 		break;
 	default:
 		/* Other events ignored */

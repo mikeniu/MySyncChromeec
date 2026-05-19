@@ -51,7 +51,7 @@
 		};
 		gpio_prim_vr_en: prim_vr_en {
 			gpios = <&gpiod 5 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW | GPIO_OPEN_DRAIN)>;
-			no-auto-init;
+			/* no-auto-init; */
 		};
 		gpio_en_pp3300_rails: en_pp3300_rails {
 			gpios = <&gpiog 6 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW | GPIO_OPEN_DRAIN)>;
@@ -106,6 +106,12 @@
 		gpio_led_2_l: led_2_l {
 			gpios = <&gpioa 3 (GPIO_OUTPUT_HIGH | GPIO_OPEN_DRAIN)>;
 		};
+		gpio_cpu_c10_gate_n_r: cpu_c10_gate_n_r {
+			gpios = <&gpioj 1 GPIO_INPUT>;
+		};
+		gpio_ec_pwrbtn_led: ec_pwrbtn_led {
+			gpios = <&gpioa 0 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
+		};
 		/* ***** TODO  ****** */
 		gpio_en_slp_z: en_slp_z {
 			/*
@@ -118,22 +124,16 @@
 			enum-name = "GPIO_EC_INT_L";
 		};
 		/* ***** TODO FIX ME ****** */
-		gpio_sys_slp_s0ix_l: sys_slp_s0ix_l {
-			gpios = <&gpioj 1 (GPIO_INPUT)>;
-			no-auto-init;
-		};
 		/*
-		gpio_cpu_c10_gate_n_r: cpu_c10_gate_n_r {
-			gpios = <&gpioj 1 GPIO_INPUT>;
+		gpio_sys_slp_s0ix_l: sys_slp_s0ix_l {
+			gpios = <&gpioj 5 (GPIO_INPUT)>;
+			no-auto-init;
 		};
 		gpio_ec_soc_wake_odl: ec_soc_wake_odl {
 			gpios = <&gpiob 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
 		};
 		*/
 		/* ===== TODO: Not implemented yet ===== */
-		gpio_ec_pwrbtn_led: ec_pwrbtn_led {
-			gpios = <&gpioa 0 GPIO_INPUT>;
-		};
 		gpio_ec_pd_rest_n: ec_pd_rest_n {
 			gpios = <&gpioa 6 GPIO_INPUT>;
 		};
