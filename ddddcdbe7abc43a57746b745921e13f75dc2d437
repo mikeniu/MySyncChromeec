@@ -20,6 +20,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5db3eb7c_72c8ee8a",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T23:21:54Z",
+      "side": 1,
+      "message": "In `bootrom.cc`, this bitwise shifting block appears **9 times** to serialize 32-bit integers into the command vectors:\n\n```c\n// Appears in WriteReg, ReadReg, BackupFlash, ReadFlash, EraseFlash, WriteFlash...\nfor (int i \u003d 0; i \u003c 4; i++)\n    cmd.push_back((addr \u003e\u003e (i * 8)) \u0026 0xFF);\n\n```\n\nSince you are already building a `ReadLittleEndian` helper, you can build its exact opposite to handle this safely and cleanly.\n\n**The Helper:**\n\n```c\ntemplate \u003cstd::integral T\u003e\nvoid AppendLittleEndian(std::vector\u003cuint8_t\u003e\u0026 vec, T value) {\n    if constexpr (std::endian::native !\u003d std::endian::little) {\n        value \u003d std::byteswap(value);\n    }\n    const auto* bytes \u003d reinterpret_cast\u003cconst uint8_t*\u003e(\u0026value);\n    // C++23 feature: append_range\n    vec.append_range(std::span(bytes, sizeof(T))); \n}\n\n```\n\n**Before (`EraseFlash`):**\n\n```c\nstd::vector\u003cuint8_t\u003e data;\ndata.push_back(EgisBootrom::CMD_FLASH_ERASE);\nuint32_t addr \u003d EgisBootrom::FLASH_BASE_ADDR + offset;\nfor (int i \u003d 0; i \u003c 4; i++) data.push_back((addr \u003e\u003e (i * 8)) \u0026 0xFF);\nfor (int i \u003d 0; i \u003c 4; i++) data.push_back((size \u003e\u003e (i * 8)) \u0026 0xFF);\n\n```\n\n**After:**\n\n```c\nstd::vector\u003cuint8_t\u003e data \u003d { EgisBootrom::CMD_FLASH_ERASE };\nAppendLittleEndian(data, EgisBootrom::FLASH_BASE_ADDR + offset);\nAppendLittleEndian(data, size);\n\n```",
+      "range": {
+        "startLine": 332,
+        "startChar": 0,
+        "endLine": 340,
+        "endChar": 43
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dac808f9_4469b7a6",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 16
@@ -31,6 +54,29 @@
       "writtenOn": "2026-05-19T21:07:13Z",
       "side": 1,
       "message": "[Gerrit AI Review] 🐛 **Bug:** You are calling `resp.error()` here, but this branch is only reached if `resp.has_value()` is true (checked at line 498). Calling `.error()` on a `std::expected` that holds a value is invalid and will likely cause a crash or exception.\n\nYou should report the size mismatch instead:\n```cpp\nstd::println(stderr, \"[ERROR] read_flash failed at addr 0x{:x} (size mismatch: got {}, expected {})\", flash_addr, resp-\u003esize(), current_read);\n```",
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b9fbd9c_c7a27abd",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 636,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T23:21:54Z",
+      "side": 1,
+      "message": "Currently, there are several places where integers are extracted from USB responses using raw pointer arithmetic and `std::memcpy`. This assumes the host machine is little-endian and bypasses bounds checking.\n\n**Locations to update in `bootrom.cc`:**\n\n* `GetBootromInfo()`: Parsing `version`, `max_size`, and `max_fw_upgrade_size`.  \n* `GetFlashInfo()`: Parsing `flash_size`.  \n* `ReadReg()`: Parsing `value_out`.  \n* `SendBootromCommandAes()`: Parsing `rsp_wrapped_len`.\n\n**Suggestion:** Since we are compiling with C++23, we can use `\u003cbit\u003e` and `std::span` to create a zero-cost, type-safe, and bounds-checked parsing helper.\n\n**1\\. Add this helper function (e.g., in `bootrom.cc` or a shared utility header):**\n\n```c\n#include \u003cbit\u003e\n#include \u003cconcepts\u003e\n#include \u003ccstring\u003e\n#include \u003cexpected\u003e\n#include \u003cspan\u003e\n\ntemplate \u003cstd::integral T\u003e\nstd::expected\u003cT, int\u003e ReadLittleEndian(std::span\u003cconst uint8_t\u003e buffer) {\n    if (buffer.size() \u003c sizeof(T)) return std::unexpected(-1);\n\n    T value;\n    std::memcpy(\u0026value, buffer.data(), sizeof(T));\n    \n    if constexpr (std::endian::native !\u003d std::endian::little) {\n        value \u003d std::byteswap(value);\n    }\n    return value;\n}\n\n```\n\n**2\\. Example replacement in `GetBootromInfo()`:**\n\n*Before:*\n\n```c\nif (resp-\u003esize() \u003e\u003d 12) {\n    uint32_t version, max_size, max_fw_upgrade_size;\n    std::memcpy(\u0026version, resp-\u003edata(), 4);\n    std::memcpy(\u0026max_size, resp-\u003edata() + 4, 4);\n    std::memcpy(\u0026max_fw_upgrade_size, resp-\u003edata() + 8, 4);\n    // ...\n\n```\n\n*After:*\n\n```c\nstd::span\u003cconst uint8_t\u003e payload \u003d resp.value();\n\nauto version \u003d ReadLittleEndian\u003cuint32_t\u003e(payload);\nauto max_size \u003d ReadLittleEndian\u003cuint32_t\u003e(payload.subspan(4));\nauto max_fw_up_size \u003d ReadLittleEndian\u003cuint32_t\u003e(payload.subspan(8));\n\nif (!version || !max_size || !max_fw_up_size) {\n    std::println(stderr, \"[ERROR] Truncated response in GetBootromInfo\");\n    return -1;\n}\n\nstd::println(\"Bootrom Version: 0x{:x}\", version.value());\nstd::println(\"Max Command Size: {} bytes\", max_size.value());\nstd::println(\"Max FW Upgrade Size: {} bytes\", max_fw_up_size.value());\n\n```\n\n**3\\. Example replacement in `SendBootromCommandAes()`:**\n\n*Before:*\n\n```c\nuint32_t rsp_wrapped_len \u003d 0;\nstd::memcpy(\u0026rsp_wrapped_len, \u0026ret[kStatusHeaderSize], sizeof(rsp_wrapped_len));\n\n```\n\n*After:*\n\n```c\nauto len_res \u003d ReadLittleEndian\u003cuint32_t\u003e(std::span(ret).subspan(kStatusHeaderSize));\nif (!len_res) return std::unexpected(-4); // Or appropriate error code\nuint32_t rsp_wrapped_len \u003d len_res.value();\n\n```",
+      "range": {
+        "startLine": 633,
+        "startChar": 0,
+        "endLine": 636,
+        "endChar": 57
+      },
       "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
