@@ -54,6 +54,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e6a704da_71089ba9",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T22:59:03Z",
+      "side": 1,
+      "message": "This would be much simpler and less error-prone with `getopt_long`.\n\nHere\u0027s Gemini-generated code that can fix it. Review it for correctness and make sure it compiles in the chroot.\n\n---\n\n### Why `getopt_long` is Better Here\n\n1. **Standard UX:** Your current implementation uses single dashes for long words (e.g., `-flashfw`). Standard POSIX convention dictates single dashes for single characters (`-f`) and double dashes for words (`--flashfw`). `getopt_long` natively enforces this standard, meaning users can also use standard assignments like `--offset\u003d0x1000`.\n2. **Eliminates Bounds Checking Clutter:** You currently have `if (i + 1 \u003c argc)` scattered throughout your loop to prevent segfaults when a user forgets to provide a value. `getopt_long` handles missing arguments automatically via the `required_argument` flag.\n3. **Scalability:** As the tool grows, a clean `switch` statement is much easier to read and maintain than a growing chain of `if-else` string comparisons.\n\n### Example Implementation\n\nHere is how you can refactor your `main` function to use `getopt_long`. This also includes the fix for the `strtol` underflow bug.\n\n```cpp\n#include \u003cgetopt.h\u003e\n#include \u003ccstdlib\u003e\n\n// ... inside main() ...\n\nint main(int argc, char *argv[]) {\n    std::string mode;\n    std::string fw_path;\n    std::string key_path;\n    std::string algo_type \u003d \"SHA256\";\n    uint32_t flash_offset \u003d 0x00001000;\n    uint32_t fw_size_override \u003d 0x0;\n    bool dump_cmd_fw \u003d false;\n\n    static struct option long_options[] \u003d {\n        {\"flashfw\",  required_argument, nullptr, \u0027f\u0027},\n        {\"flashcmd\", required_argument, nullptr, \u0027c\u0027},\n        {\"algo\",     required_argument, nullptr, \u0027a\u0027},\n        {\"key\",      required_argument, nullptr, \u0027k\u0027},\n        {\"offset\",   required_argument, nullptr, \u0027o\u0027},\n        {\"size\",     required_argument, nullptr, \u0027s\u0027},\n        {\"dumpcmd\",  no_argument,       nullptr, \u0027d\u0027},\n        {\"help\",     no_argument,       nullptr, \u0027h\u0027},\n        {nullptr, 0, nullptr, 0}\n    };\n\n    int opt;\n    int option_index \u003d 0;\n    \n    // The colon after a letter indicates it requires an argument.\n    while ((opt \u003d getopt_long_only(argc, argv, \"f:c:a:k:o:s:dh\", long_options, \u0026option_index)) !\u003d -1) {\n        switch (opt) {\n            case \u0027f\u0027:\n                mode \u003d \"flashfw\";\n                fw_path \u003d optarg;\n                break;\n            case \u0027c\u0027:\n                mode \u003d \"flashcmd\";\n                fw_path \u003d optarg;\n                break;\n            case \u0027a\u0027:\n                algo_type \u003d optarg;\n                break;\n            case \u0027k\u0027:\n                key_path \u003d optarg;\n                break;\n            case \u0027o\u0027:\n            case \u0027s\u0027: {\n                char *endptr \u003d nullptr;\n                // FIX: Use signed long to correctly catch negative inputs\n                long val \u003d std::strtol(optarg, \u0026endptr, 16);\n                if (endptr \u003d\u003d optarg || *endptr !\u003d \u0027\\0\u0027 || val \u003c 0) {\n                    std::println(stderr, \"[ERROR] Invalid hex value for argument: {}\", optarg);\n                    return -1;\n                }\n                if (opt \u003d\u003d \u0027o\u0027) flash_offset \u003d static_cast\u003cuint32_t\u003e(val);\n                if (opt \u003d\u003d \u0027s\u0027) fw_size_override \u003d static_cast\u003cuint32_t\u003e(val);\n                break;\n            }\n            case \u0027d\u0027:\n                dump_cmd_fw \u003d true;\n                break;\n            case \u0027h\u0027:\n            case \u0027?\u0027: // \u0027?\u0027 is returned when an unknown option is encountered\n                PrintHelp(); // Move your help text to a separate function\n                return 0;\n            default:\n                return -1;\n        }\n    }\n\n    // Check for missing mandatory arguments after parsing\n    if (mode.empty()) {\n        std::println(stderr, \"[ERROR] You must specify a mode (--flashfw or --flashcmd)\");\n        return -1;\n    }\n\n    // ... continue with USB connection logic ...\n\n```\n\n*Note: I used `getopt_long_only` in the example above. This function allows long options to be triggered with either a single `-` or a double `--`, which will preserve backwards compatibility with your current script usages while smoothly transitioning to standard POSIX double-dashes.*",
+      "range": {
+        "startLine": 108,
+        "startChar": 0,
+        "endLine": 248,
+        "endChar": 2
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "32ed4e69_5fccbda9",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 16
