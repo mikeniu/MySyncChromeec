@@ -1873,10 +1873,10 @@ tests:
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - ./tabletmode_interrupt/boards/native_sim.overlay
-  drivers.write_protection_external:
+  drivers.write_protection_custom:
     extra_configs:
-    - CONFIG_LINK_TEST_SUITE_WRITE_PROTECTION_EXTERNAL=y
-    - CONFIG_PLATFORM_EC_WP_EXTERNAL=y
+    - CONFIG_LINK_TEST_SUITE_WRITE_PROTECTION_CUSTOM=y
+    - CONFIG_PLATFORM_EC_WP_CUSTOM=y
   drivers.rt3645:
     extra_conf_files:
     - prj.conf
@@ -1886,3 +1886,12 @@ tests:
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - ./rt3645/imvp.dts
+  drivers.rtq3700fh:
+    extra_conf_files:
+    - prj.conf
+    - rtq3700fh/prj.conf
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_RTQ3700FH=y
+    extra_dtc_overlay_files:
+    - ./boards/native_sim.overlay
+    - ./rtq3700fh/imvp.dts
