@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "da86a805_912a78c3",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T23:25:08Z",
+      "side": 1,
+      "message": "In `SendBootromCommandSha` and `SendBootromCommandAes`, you construct the header using raw pointer arithmetic (`uint8_t *cmd_iv \u003d cmd_ptr + kStatusHeaderSize + kWrappedCommandSize;`). This is hard to read and prone to off-by-one errors.\n\nSince you already use `__attribute__((packed))` successfully in `ec_protocol_defs.h`, you can define your Secure Channel headers the same way.\n\n**The Struct:**\n\n```c\nstruct SecureCommandShaHeader {\n    uint8_t command_id \u003d EgisBootrom::CMD_SECURE_WRAPPED;\n    uint8_t algo \u003d CRYPTO_SHA_256;\n    uint32_t payload_len; // Ensure this is converted to LE before assignment\n    std::array\u003cuint8_t, 32\u003e hash;\n} __attribute__((packed));\n\n```\n\n**Simplified `SendBootromCommandSha` Setup:**\n\n```c\nSecureCommandShaHeader header;\nheader.payload_len \u003d htole32(static_cast\u003cuint32_t\u003e(data.size()));\nSHA256(data.data(), data.size(), header.hash.data());\n\nstd::vector\u003cuint8_t\u003e cmd;\ncmd.reserve(sizeof(header) + data.size());\nconst auto* header_bytes \u003d reinterpret_cast\u003cconst uint8_t*\u003e(\u0026header);\ncmd.append_range(std::span(header_bytes, sizeof(header)));\ncmd.append_range(data);\n\n```",
+      "range": {
+        "startLine": 180,
+        "startChar": 0,
+        "endLine": 193,
+        "endChar": 49
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "eec15978_36d152a4",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 16
@@ -54,6 +77,29 @@
       "writtenOn": "2026-05-19T21:07:13Z",
       "side": 1,
       "message": "[Gerrit AI Review] 🐛 **Bug:** You are calling `resp.error()` here, but this branch is only reached if `resp.has_value()` is true (checked at line 498). Calling `.error()` on a `std::expected` that holds a value is invalid and will likely cause a crash or exception.\n\nYou should report the size mismatch instead:\n```cpp\nstd::println(stderr, \"[ERROR] read_flash failed at addr 0x{:x} (size mismatch: got {}, expected {})\", flash_addr, resp-\u003esize(), current_read);\n```",
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "599cd50e_46138eca",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 513,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-19T23:25:08Z",
+      "side": 1,
+      "message": "In `SendBootromCommandSha` and `SendBootromCommandAes`, you construct the header using raw pointer arithmetic (`uint8_t *cmd_iv \u003d cmd_ptr + kStatusHeaderSize + kWrappedCommandSize;`). This is hard to read and prone to off-by-one errors.\n\nSince you already use `__attribute__((packed))` successfully in `ec_protocol_defs.h`, you can define your Secure Channel headers the same way.\n\n**The Struct:**\n\n```c\nstruct SecureCommandShaHeader {\n    uint8_t command_id \u003d EgisBootrom::CMD_SECURE_WRAPPED;\n    uint8_t algo \u003d CRYPTO_SHA_256;\n    uint32_t payload_len; // Ensure this is converted to LE before assignment\n    std::array\u003cuint8_t, 32\u003e hash;\n} __attribute__((packed));\n\n```\n\n**Simplified `SendBootromCommandSha` Setup:**\n\n```c\nSecureCommandShaHeader header;\nheader.payload_len \u003d htole32(static_cast\u003cuint32_t\u003e(data.size()));\nSHA256(data.data(), data.size(), header.hash.data());\n\nstd::vector\u003cuint8_t\u003e cmd;\ncmd.reserve(sizeof(header) + data.size());\nconst auto* header_bytes \u003d reinterpret_cast\u003cconst uint8_t*\u003e(\u0026header);\ncmd.append_range(std::span(header_bytes, sizeof(header)));\ncmd.append_range(data);\n\n```",
+      "range": {
+        "startLine": 513,
+        "startChar": 0,
+        "endLine": 513,
+        "endChar": 58
+      },
       "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
