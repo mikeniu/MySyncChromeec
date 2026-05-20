@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a128e1b_725d699d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:14:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/fb13632c-710d-45a8-a2cd-7abdd3c44d48)]\n\n### Review Summary\n\n**Functionality**\nThe change correctly addresses false validation failures by moving the `skip_image_offset` logic to occur after the host-provided offset and size have been validated against the expected frame size. This ensures that the host-visible chunking logic remains consistent.\n\n**Security**\nThe Out-of-Bounds (OOB) read risk identified in earlier discussions has been addressed in Patchset 3. An explicit check `if (offset + size \u003e sizeof(fp_buffer))` has been added after the offset adjustment to ensure memory safety when accessing the physical fingerprint buffer.\n\n**Style \u0026 Consistency**\nThe code adheres to the project style guidelines and maintainability standards. The placement of the offset logic is consistent with how similar checks are performed in the sensor codebase.\n\n**Testing**\nThe change was manually tested using `ectool` with various capture modes (vendor-format, pattern0, etc.), confirming that both the fix and the new bounds check work as expected on real hardware.",
+      "revId": "836ac31629c4f9e9efcc283fd2d54367eededf58",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
