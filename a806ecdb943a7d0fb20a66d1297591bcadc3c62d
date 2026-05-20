@@ -20,6 +20,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3c27c4c9_ebd7183d",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 17
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T16:33:05Z",
+      "side": 1,
+      "message": "Using `std::chrono::duration` types (like `std::chrono::milliseconds`) instead of raw `int` for timeouts is a widely recognized best practice in modern C++.\n\nHere is why it would significantly improve the patch, and how to implement it:\n\n### The Benefits\n\n1. **Type Safety \u0026 Self-Documenting Code:** A call like `SendBootromCommand(cmd, 0, 5000)` leaves the reader guessing whether 5000 means milliseconds, microseconds, or something else. If the parameter takes `std::chrono::milliseconds`, the caller can explicitly write `SendBootromCommand(cmd, 0, 5000ms)` or `SendBootromCommand(cmd, 0, 5s)`, completely eliminating ambiguity.  \n2. **Safer Internal Logic:** Inside `WaitForFlashReady`, the patch currently does this: `std::chrono::steady_clock::now() - start_time \u003c std::chrono::milliseconds(timeout_ms)` If you pass the timeout as a `std::chrono::milliseconds` directly, you remove the need to constantly cast/construct durations from raw integers, reducing the risk of conversion bugs.\n\n### How to Apply It\n\nYou would update the function signatures in your headers:\n\n```c\nusing namespace std::chrono_literals;\n\n// bootrom.h\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, int\u003e SendBootromCommand(\n    std::span\u003cconst uint8_t\u003e data, \n    size_t resp_size, \n    std::chrono::milliseconds timeout \u003d 200ms);\n\nint WaitForFlashReady(std::chrono::milliseconds timeout \u003d 500ms);\n\n// usb_comm.h\nint BulkWrite(uint8_t endpoint, std::span\u003cconst uint8_t\u003e data, std::chrono::milliseconds timeout);\n\n```\n\n**Bridging to C APIs (libusb)** The only friction is that the underlying C library, `libusb`, requires an `unsigned int` for milliseconds. You handle this right at the boundary in `usb_comm.cc` using the `.count()` method:\n\n```c\nint UsbComm::BulkWrite(uint8_t endpoint, std::span\u003cconst uint8_t\u003e data, std::chrono::milliseconds timeout) {\n  // ...\n  int rc \u003d libusb_bulk_transfer(\n      handle_, endpoint, const_cast\u003cuint8_t *\u003e(data.data()),\n      static_cast\u003cint\u003e(data.size()), \u0026transferred, \n      static_cast\u003cunsigned int\u003e(timeout.count()) // Extract the raw int for libusb\n  );\n  // ...\n}\n\n```\n\nBecause the patch already includes `\u003cchrono\u003e` and uses `std::this_thread::sleep_for(std::chrono::milliseconds(200));`, adopting `std::chrono::milliseconds` in your public signatures is a natural, zero-cost abstraction that immediately elevates the quality of the codebase.",
+      "range": {
+        "startLine": 140,
+        "startChar": 0,
+        "endLine": 151,
+        "endChar": 2
+      },
+      "revId": "a806ecdb943a7d0fb20a66d1297591bcadc3c62d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c1df4b4a_8f7c1d9a",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 17
