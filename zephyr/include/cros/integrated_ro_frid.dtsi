@@ -1,0 +1,23 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+&binman {
+	wp-ro {
+		ec-ro {
+			/delete-node/ ro-frid;
+
+			ro-frid {
+				compatible = "cros-ec,flash-layout";
+				type = "section";
+				offset-from-elf = <&zephyr_ro>, "current_image_data", <4>;
+				size = <32>;
+
+				/* As a result, it overlaps with the other. */
+				overlap;
+			};
+
+		};
+	};
+};
