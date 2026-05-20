@@ -66,6 +66,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "15c51f24_d0da5721",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T19:21:21Z",
+      "side": 1,
+      "message": "The `main` function is huge. Let\u0027s split it up. Here\u0027s a Gemini-suggested way to do it (verify it\u0027s correct):\n\n----\n\nSplitting up a monolithic `main` function is one of the best things you can do for the readability and maintainability of a CLI tool. Right now, your `main` handles argument parsing, USB lifecycle, mode switching, and two entirely different flashing algorithms.\n\nWe can apply the **Single Responsibility Principle** to break this down into a clean, pipeline-style architecture. Here is the step-by-step plan to refactor `et171_flash.cc`.\n\n### Step 1: Group State into a Config Struct\n\nInstead of declaring a dozen disconnected variables at the top of `main`, bundle them into a struct. This makes it trivial to pass user intentions around your program.\n\nPut this near the top of `et171_flash.cc` (inside the anonymous namespace):\n\n```c\nstruct AppConfig {\n  std::string mode;\n  std::string fw_path;\n  std::string key_path;\n  EgisCryptoType algo_type \u003d EgisCryptoType::kSha256;\n  uint32_t flash_offset \u003d 0x00001000;\n  uint32_t fw_size_override \u003d 0;\n  bool dump_cmd_fw \u003d false;\n};\n\n```\n\n### Step 2: Extract Argument Parsing\n\nMove the `getopt_long_only` loop and validation out of `main`. By returning `std::optional\u003cAppConfig\u003e`, we can signal to `main` whether to continue or exit (e.g., if the user just typed `--help` or made a mistake).\n\n```c\nstd::optional\u003cAppConfig\u003e ParseArgs(int argc, char *argv[]) {\n  AppConfig config;\n  // ... copy the long_options array here ...\n  \n  int opt;\n  while ((opt \u003d getopt_long_only(argc, argv, \"f:c:a:k:o:s:dh\", long_options, nullptr)) !\u003d -1) {\n     // ... copy the switch(opt) statement here, mapping into `config.xxx` ...\n  }\n\n  // ... copy validation logic ...\n  if (config.mode.empty()) {\n    std::println(stderr, \"[ERROR] You must specify a mode\");\n    PrintHelp(argv[0]);\n    return std::nullopt;\n  }\n  \n  return config;\n}\n\n```\n\n### Step 3: Extract USB Connection Logic\n\nConnecting to the app, dropping it into the bootloader, and reconnecting to the new bootloader PID is a distinct task. Let\u0027s isolate it.\n\n```c\n// Returns true if successfully connected to the bootloader\nbool ConnectToBootloader(libusb_context* usb_ctx, UsbComm\u0026 boot_comm) {\n  UsbComm app_comm(usb_ctx, kVidGoogle, kPidEgisApp);\n  if (app_comm.Connect() \u003d\u003d 0) {\n    ExecuteGetVersion(app_comm);\n    std::println(\"--- Switching to Bootloader Mode ---\");\n    ExecuteBootLoader(app_comm);\n    std::this_thread::sleep_for(std::chrono::milliseconds(800));\n  }\n\n  auto start_time \u003d std::chrono::steady_clock::now();\n  std::println(\"Connecting to Bootloader...\");\n  while (std::chrono::steady_clock::now() - start_time \u003c std::chrono::seconds(5)) {\n    if (boot_comm.Connect() \u003d\u003d 0) {\n      return true;\n    }\n    std::this_thread::sleep_for(std::chrono::milliseconds(200));\n  }\n  return false;\n}\n\n```\n\n### Step 4: Extract the Flashing Modes\n\nMove the two giant `if (mode \u003d\u003d ...)` blocks into their own dedicated runner functions. This isolates your application logic from your setup logic.\n\n```c\nint RunFlashFw(const AppConfig\u0026 config, BootromComm\u0026 brom) {\n  // Copy lines 251-361 here.\n  // Replace references to `algo_type`, `fw_path`, etc., with `config.algo_type`, `config.fw_path`.\n  // Example:\n  if (config.fw_path.empty()) { ... }\n}\n\nint RunFlashCmd(const AppConfig\u0026 config, UsbComm\u0026 boot_comm) {\n  // Copy lines 362-446 here.\n  // Note: This mode currently uses boot_comm directly instead of BootromComm.\n}\n\n```\n\n### Step 5: The New `main` Function\n\nWith all the heavy lifting extracted, your `main` function becomes a clean, readable orchestrator. It tells a story from top to bottom.\n\n```c\nint main(int argc, char *argv[]) {\n  // 1. Parse Arguments\n  auto config_opt \u003d ParseArgs(argc, argv);\n  if (!config_opt) return -1;\n  const AppConfig\u0026 config \u003d config_opt.value();\n\n  // 2. Initialize USB Context\n  libusb_context *raw_ctx \u003d nullptr;\n  if (libusb_init(\u0026raw_ctx) !\u003d 0) {\n    std::println(stderr, \"[ERROR] Failed to initialize libusb\");\n    return -1;\n  }\n  std::unique_ptr\u003clibusb_context, decltype(\u0026libusb_exit)\u003e usb_ctx(raw_ctx, \u0026libusb_exit);\n\n  // 3. Connect to Device\n  UsbComm boot_comm(usb_ctx.get(), kVidEgis, kPidEgisBootloader);\n  if (!ConnectToBootloader(usb_ctx.get(), boot_comm)) {\n    std::println(stderr, \"[ERROR] Connection timeout.\");\n    return -1;\n  }\n\n  BootromComm brom(boot_comm);\n  brom.SetWrappedAlgo(config.algo_type);\n\n  // 4. Dispatch to chosen mode\n  if (config.mode \u003d\u003d \"flashfw\") {\n    return RunFlashFw(config, brom);\n  } else if (config.mode \u003d\u003d \"flashcmd\") {\n    return RunFlashCmd(config, boot_comm);\n  }\n\n  return -1; // Should be unreachable if ParseArgs validated correctly\n}\n\n```",
+      "range": {
+        "startLine": 143,
+        "startChar": 0,
+        "endLine": 146,
+        "endChar": 33
+      },
+      "revId": "a806ecdb943a7d0fb20a66d1297591bcadc3c62d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c1df4b4a_8f7c1d9a",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 17
