@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c75cf16_3866e10e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:08:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n\n*   **Functionality**: The patch adds comprehensive unit tests for the `get_frame` function, covering normal operations and various error conditions (locked system, invalid parameters, overflows).\n*   **Security**: `get_frame` implementation (verified via `gerrit cat`) correctly implements access control checks and boundary validation.\n*   **Style**: The new test file is well-structured, follows Zephyr test conventions, and uses clear, descriptive test names and assertions.\n*   **Testing**: This CL significantly improves the test coverage for the fingerprint sensor subsystem by adding targeted unit tests for a critical frame-retrieval function.\n\n[[trajectory](go/traj/6565c1b6-e001-4b8b-b48a-29590e94556c)]",
+      "revId": "af2654a77628d13187a16998aa90cade6846060b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8026601a_c4bb84c1",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:08:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider using a defined constant from `ec_commands.h` (like `EC_PROTO2_MAX_PARAM_SIZE` or similar) instead of a hardcoded value here, or add a comment explaining the origin of 536 bytes to improve maintainability.",
+      "revId": "af2654a77628d13187a16998aa90cade6846060b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31b384cf_38d46e53",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:08:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This `reinterpret_cast` assumes that the layout of `global_context.fp_frame_size_cache` is identical to `std::array\u003cuint32_t, FP_CAPTURE_TYPE_MAX\u003e`. While the comment acknowledges this, it is inherently brittle and could lead to undefined behavior if the implementation of the cache class changes (e.g., adding private members or changing the storage type).\n\nConsider if there is a more robust way to inject invalid values into the cache for testing, perhaps by adding a test-only setter or making the internal storage accessible via a friend declaration for tests.",
+      "revId": "af2654a77628d13187a16998aa90cade6846060b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
