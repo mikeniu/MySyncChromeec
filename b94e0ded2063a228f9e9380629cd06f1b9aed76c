@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "950b1a21_0856abfb",
+        "filename": "zephyr/program/ocelot/kodkod/power_signals.dtsi",
+        "patchSetId": 6
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-20T21:32:32Z",
+      "side": 1,
+      "message": "Why is a chosen node needed?  The AP power signals are controlled directly using the `enum-name` property value.",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 39
+      },
+      "revId": "b94e0ded2063a228f9e9380629cd06f1b9aed76c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
