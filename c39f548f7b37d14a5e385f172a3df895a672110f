@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b594fa7_03b691f4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-20T19:51:22Z",
+      "side": 1,
+      "message": "I know I was a bad example by reusing this closed bug, but we should probably make a new bug for enabling a new PDC.",
+      "revId": "c39f548f7b37d14a5e385f172a3df895a672110f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb374551_6d6da707",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-20T19:51:22Z",
+      "side": 1,
+      "message": "What does this do to code size?",
+      "revId": "c39f548f7b37d14a5e385f172a3df895a672110f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
