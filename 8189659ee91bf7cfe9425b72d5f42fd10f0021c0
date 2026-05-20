@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab382a6b_7ece6084",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:21:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/8d6153e0-4dc4-4ec5-aeaf-0d12e64a467f)]\n\n### Review Summary\n\n**Functionality**\nThe test aims to verify SRAM MPU protection by attempting to write and read from code RAM. There is a potential logic flaw in `test_run_step1` where the test might not be marked as failed if the expected reboot doesn\u0027t happen but other assertions fail. Additionally, the test expects a reboot on READ, while a WRITE fault is typically expected for memory protection.\n\n**Style \u0026 Consistency**\nThe code follows the general pattern for EC multi-step tests. There is a minor naming inconsistency between `test_run_step1` and `run_test_step2`.\n\n**Testing**\nThe CL introduces a new test and integrates it into the build system and `run_device_tests.py`, which is excellent.\n\n**Overall Quality**\nThe CL is a valuable addition to ensure memory protection is working as expected. Addressing the logic in the multi-step state machine will make the test more robust against false positives.",
+      "revId": "8189659ee91bf7cfe9425b72d5f42fd10f0021c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c58fcf26_26a48282",
+        "filename": "test/sram_mpu_protection.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:21:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Is it intended that the READ (second `memcpy`) causes the reboot? Usually, if the SRAM is protected, the WRITE (line 64) should trigger a data access violation fault and reboot the system. If the write succeeds but the read faults, that would imply the region is Write-Only or has very specific MPU settings.",
+      "revId": "8189659ee91bf7cfe9425b72d5f42fd10f0021c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6132fbb8_df46aa88",
+        "filename": "test/sram_mpu_protection.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:21:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This `if` block is empty. If `test_get_error_count()` is non-zero, it means an assertion failed (like `system_is_locked()` returning 0 when 1 was expected). In this case, the test should probably be marked as failed explicitly, otherwise it might proceed to the next step if the reboot didn\u0027t happen.",
+      "revId": "8189659ee91bf7cfe9425b72d5f42fd10f0021c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b919013_e7c98c0d",
+        "filename": "test/sram_mpu_protection.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:21:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `test_reboot_to_next_step` is called in both branches of the `if`. In the `else` case, if the error count is 0, it reboots to `TEST_STATE_STEP_2`. However, at line 91, `test_set_next_step(TEST_STATE_STEP_2)` was already called. `test_reboot_to_next_step` usually performs a reboot. Is a reboot intended here even if the test passed without one?",
+      "revId": "8189659ee91bf7cfe9425b72d5f42fd10f0021c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "186a1778_21207d8f",
+        "filename": "test/sram_mpu_protection.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:21:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] For consistency with `test_run_step1`, maybe rename this to `test_run_step2`?",
+      "revId": "8189659ee91bf7cfe9425b72d5f42fd10f0021c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "039bece7_2450fc20",
+        "filename": "test/sram_mpu_protection.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:21:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] It\u0027s better to add a small comment explaining why `crec_msleep(30)` is necessary here (e.g., waiting for `TASK_ID_TEST` to initialize).",
+      "revId": "8189659ee91bf7cfe9425b72d5f42fd10f0021c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
