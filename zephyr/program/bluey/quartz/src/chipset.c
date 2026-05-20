@@ -5,6 +5,7 @@
 
 /* Quartz chipset-specific configuration */
 
+#include "battery.h"
 #include "common.h"
 #include "gpio.h"
 #include "gpio/gpio_int.h"
@@ -46,3 +47,11 @@ static void enable_s3_interrupt(void)
 	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_s3_power_monitor));
 }
 DECLARE_HOOK(HOOK_INIT, enable_s3_interrupt, HOOK_PRIO_DEFAULT);
+
+static void control_prochot(void)
+{
+	if (battery_is_present() != BP_YES) {
+		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_sys_throttle_mira), 1);
+	}
+}
+DECLARE_HOOK(HOOK_INIT, control_prochot, HOOK_PRIO_DEFAULT);
