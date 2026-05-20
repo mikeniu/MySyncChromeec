@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "77c2bf20_36dfd2e1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 29
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-05-20T06:00:14Z",
+      "side": 1,
+      "message": "Could you remove the LOW_COVERAGE_REASON if test is ready ?",
+      "revId": "ebb2919a67c893d238b485c22ccd184cbaaa19ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "45c20dc5_a86bbf0a",
         "filename": "zephyr/drivers/wot/wot.c",
         "patchSetId": 29
