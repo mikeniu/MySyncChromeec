@@ -1896,6 +1896,15 @@ tests:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_WRITE_PROTECTION_EXTERNAL=y
     - CONFIG_PLATFORM_EC_WP_EXTERNAL=y
+  drivers.ap_power_events:
+    extra_conf_files:
+    - prj.conf
+    - ap_power_events/prj.conf
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_AP_POWER_EVENTS=y
+    extra_dtc_overlay_files:
+    - ./boards/native_sim.overlay
+    - ./ap_power_events/boards/native_sim.overlay
   drivers.rt3645:
     extra_conf_files:
     - prj.conf
