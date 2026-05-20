@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a1274a7_90fb1e6c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:13:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/42cdd7da-4164-42f3-9322-1ec1e453cdf7)]\n\n### Review Summary\n- **Functionality:** The new test case correctly targets a potential hardware buffer overflow by manipulating the frame size cache to bypass initial validation.\n- **Style:** The test follows the existing ZTEST pattern in the file.\n- **Security:** The test improves the security posture of the fingerprint sensor code by verifying bounds checks against physical buffer limits.\n- **Overall quality:** High. The test is specific and addresses a non-trivial edge case.",
+      "revId": "ac2ed337cbf54383188a0c3ada23a4309531a009",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19f7f4e4_24e13db8",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:13:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Potential integer underflow risk: `(sizeof(fp_buffer) + 1) - FP_SENSOR_IMAGE_OFFSET - size` could underflow if the constants change in a way where `sizeof(fp_buffer) + 1 \u003c FP_SENSOR_IMAGE_OFFSET + size`. Consider adding a `zassert_true` to verify the calculation doesn\u0027t underflow, or use a safer way to define `offset`.",
+      "revId": "ac2ed337cbf54383188a0c3ada23a4309531a009",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69cf8afc_b7ddedb1",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:13:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] While the `reinterpret_cast` hack to \"pollute\" the cache is effective for this test, it relies on the internal layout of `FpFrameSizeCache`. If this pattern is used in multiple tests, consider adding a `__test_only` setter method to `FpFrameSizeCache` for better maintainability.",
+      "revId": "ac2ed337cbf54383188a0c3ada23a4309531a009",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
