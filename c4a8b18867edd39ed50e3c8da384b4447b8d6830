@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "261c50dd_fc88b187",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:40:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/7555eeae-c200-4be9-8559-cd6f5ebd974a)]\n\n### Review Summary\n\n- **Functionality**: The change correctly migrates zero-length arrays to the project-standard `FLEXIBLE_ARRAY_MEMBER_SIZE` macro. This improves portability and consistency without affecting the ABI or functionality.\n- **Style**: The changes adhere to the established coding patterns in `include/ec_commands.h`.\n- **Security**: No security vulnerabilities were introduced.\n- **Consistency**: The migration is consistent with other structures in the same file that already use this macro.\n\n**Minor Suggestion:**\nThe CL subject line mentions `ec_response_motion_sensor`, but the affected type is actually `ec_response_motion_sensor_data`. You might want to update the subject line for better accuracy, though it is not a blocking issue.",
+      "revId": "c4a8b18867edd39ed50e3c8da384b4447b8d6830",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
