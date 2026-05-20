@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f31bfd1d_d38c38af",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-20T06:33:41Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 20.",
+      "parentUuid": "3fcfa9e4_92745a63",
+      "range": {
+        "startLine": 195,
+        "startChar": 0,
+        "endLine": 195,
+        "endChar": 39
+      },
+      "revId": "cc2317f413398bf584f742ce8200fe801eec46b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b7d82c71_23f2952a",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-05-19T22:49:56Z",
       "side": 1,
       "message": "You can make the loops in `WriteRomData` and `ReadRomData` more concise by using a standard `for` loop with `subspan`.\n\n**Action:** Refactor `WriteRomData` (and apply similar logic to `ReadRomData`):\n\n```c\nint IapControl::WriteRomData(std::span\u003cconst uint8_t\u003e buff) {\n  if (buff.empty()) return -1;\n\n  for (size_t offset \u003d 0; offset \u003c buff.size(); offset +\u003d kEp3Length) {\n    size_t chunk_size \u003d std::min(kEp3Length, buff.size() - offset);\n    auto chunk \u003d buff.subspan(offset, chunk_size);\n\n    if (IapSendData(chunk)) {\n      LogErr(\"[IAP] {} - fail, count: {}\\n\", __func__, offset);\n      return -1;\n    }\n\n    if (progress_callback_) {\n      progress_callback_(offset + chunk.size(), buff.size());\n    }\n  }\n  return 0;\n}\n\n```",
+      "range": {
+        "startLine": 424,
+        "startChar": 0,
+        "endLine": 478,
+        "endChar": 1
+      },
+      "revId": "cc2317f413398bf584f742ce8200fe801eec46b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6841582d_078ba451",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-20T06:33:41Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 20.",
+      "parentUuid": "b7d82c71_23f2952a",
       "range": {
         "startLine": 424,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e074c727_467b41b9",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-20T06:33:41Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 20.",
+      "parentUuid": "5febfd48_4b0e7b04",
+      "range": {
+        "startLine": 561,
+        "startChar": 0,
+        "endLine": 561,
+        "endChar": 58
+      },
+      "revId": "cc2317f413398bf584f742ce8200fe801eec46b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "91801743_7a92ab7a",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-05-19T22:49:56Z",
       "side": 1,
       "message": "You can reuse your existing `Get32Le` function inside `GetChecksum` to avoid manual bit-shifting.\n\n**Action:** Refactor `GetChecksum`:\n\n```c\nstd::optional\u003cuint32_t\u003e IapControl::GetChecksum(std::span\u003cconst uint8_t\u003e buff) {\n  if ((buff.size() % 4) !\u003d 0) return std::nullopt;\n\n  uint32_t checksum \u003d 0;\n  for (size_t i \u003d 0; i \u003c buff.size(); i +\u003d 4) {\n    if (auto val \u003d Get32Le(buff.subspan(i, 4))) {\n      checksum +\u003d *val;\n    }\n  }\n  return checksum;\n}\n\n```",
+      "range": {
+        "startLine": 792,
+        "startChar": 0,
+        "endLine": 806,
+        "endChar": 0
+      },
+      "revId": "cc2317f413398bf584f742ce8200fe801eec46b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0a09614_347b6107",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 806,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-20T06:33:41Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 20.",
+      "parentUuid": "91801743_7a92ab7a",
       "range": {
         "startLine": 792,
         "startChar": 0,
@@ -116,6 +212,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9dd053c_e88f6abe",
+        "filename": "util/elan/iap_tool.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-20T06:33:41Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 20.",
+      "parentUuid": "5e8fd205_7642b433",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 3
+      },
+      "revId": "cc2317f413398bf584f742ce8200fe801eec46b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "03c663dd_764204db",
@@ -139,6 +259,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dade070a_c53c175a",
+        "filename": "util/elan/iap_tool.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-20T06:33:41Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 20.",
+      "parentUuid": "03c663dd_764204db",
+      "range": {
+        "startLine": 135,
+        "startChar": 4,
+        "endLine": 135,
+        "endChar": 14
+      },
+      "revId": "cc2317f413398bf584f742ce8200fe801eec46b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bbc43943_5cc7169b",
@@ -152,6 +296,30 @@
       "writtenOn": "2026-05-19T22:38:55Z",
       "side": 1,
       "message": "`util/elan/iap_tool.h` contains no declarations or definitions—it merely acts as a bucket of standard library includes for `iap_tool.cc`. Because `iap_tool.cc` contains `main()` and doesn\u0027t export an API, we don\u0027t need a header file for it.\n\n* **Action:** Delete `util/elan/iap_tool.h` entirely. Move all necessary includes (like `\u003cvector\u003e`, `\u003cstring\u003e`, `\"file_control.h\"`, etc.) directly to the top of `util/elan/iap_tool.cc`.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 6
+      },
+      "revId": "cc2317f413398bf584f742ce8200fe801eec46b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d72ddb5_80427888",
+        "filename": "util/elan/iap_tool.h",
+        "patchSetId": 19
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-20T06:33:41Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 20.",
+      "parentUuid": "bbc43943_5cc7169b",
       "range": {
         "startLine": 1,
         "startChar": 0,
