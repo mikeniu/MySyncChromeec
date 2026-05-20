@@ -65,6 +65,13 @@
 #define MAX_PACKET_A_SIZE (PACKET_HEADER_LENGTH + PAGE_SIZE + CHECKSUM_LENGTH)
 #define RETRY_COUNT_FOR_SEND_PAGES 10
 
+#define RTS_CMD_FLASH_READ 0xA5A5A5A5ul
+#define RTS_CMD_ERASE_ONLY 0x5A5A5A5Aul
+#define RTS_CMD_PROBE_CAP_OFFSET 0x50524F42ul
+#define RTS_CMD_PROBE_CAP_SIZE 0x00000000ul
+#define RTK_FLAME_FEATURE_ERASE_ONLY (1ul << 0)
+#define RTK_FLAME_METADATA_MAGIC 0x464C414Dul
+
 /* Command type opcode */
 enum command_type {
 	SUCCESS_PROGRAM_TO_FLASH = 0x03,
@@ -424,6 +431,75 @@ int wait_for_response(int uart_fd, uint8_t expected_response,
 	return -1;
 }
 
+/* Function: Set command selection address value */
+int set_cmd_sel(int uart_fd, uint32_t val)
+{
+	uint32_t sram_address = SRAM_CMD_BASE_ADDRESS;
+	uint8_t data_buffer[4];
+	data_buffer[0] = val & 0xFF;
+	data_buffer[1] = (val >> 8) & 0xFF;
+	data_buffer[2] = (val >> 16) & 0xFF;
+	data_buffer[3] = (val >> 24) & 0xFF;
+
+	if (send_packet_a(uart_fd, WRITE_DATA_TO_SRAM, 4, sram_address,
+			  data_buffer) != 0) {
+		return -1;
+	}
+
+	if (wait_for_response(uart_fd, WRITE_DATA_TO_SRAM, RESPONSE_TIMEOUT) !=
+	    0) {
+		return -1;
+	}
+	return 0;
+}
+
+int send_page_from_buf(int uart_fd, const unsigned char *data_buffer,
+		       size_t bytes_to_send, uint32_t sram_address,
+		       size_t *total_bytes_sent, size_t *page)
+{
+	int retry_count = 0;
+
+	if (bytes_to_send == 0) {
+		return 0;
+	}
+
+	while (1) {
+		retry_count++;
+		uart_flush(uart_fd);
+
+		DBG_PRINT("Page %zu, try %d time.\n", *page + 1, retry_count);
+
+		/* Send this page's data */
+		if (send_packet_a(uart_fd, WRITE_DATA_TO_SRAM, bytes_to_send,
+				  sram_address, data_buffer) != 0) {
+			return -1;
+		}
+
+		/* Wait for EC to respond with 0x09
+		 * (acknowledgment for this page) */
+		if (wait_for_response(uart_fd, WRITE_DATA_TO_SRAM,
+				      RESPONSE_TIMEOUT) == 0) {
+			break;
+		}
+
+		if (retry_count > RETRY_COUNT_FOR_SEND_PAGES) {
+			ERR_PRINT(
+				"Failed to receive expected response for data page %zu\n",
+				*page + 1);
+			return -1;
+		}
+
+		sleep(1);
+	}
+
+	*total_bytes_sent += bytes_to_send;
+	DBG_PRINT("Page %zu sent successfully. Total bytes sent: %zu\n",
+		  *page + 1, *total_bytes_sent);
+	(*page)++;
+
+	return 0;
+}
+
 /* Function: Send a block of pages */
 int send_pages(int uart_fd, FILE *file, uint32_t sram_address,
 	       size_t *total_bytes_sent, size_t *page)
@@ -477,6 +553,155 @@ int send_pages(int uart_fd, FILE *file, uint32_t sram_address,
 	return 0;
 }
 
+bool probe_monitor(int uart_fd, char *version_str, size_t version_len,
+		   uint32_t *features)
+{
+	DBG_PRINT("Probing monitor capabilities...\n");
+
+	/* Overload the WRITE_TO_FLASH command to probe whether the currently
+	 * running monitor code supports the metadata structure.
+	 * Set the SPI address to the magic value RTS_CMD_PROBE_CAP_OFFSET
+	 * and set the size to write to 0.
+	 * Legacy monitors skip the erase and write operation if the size
+	 * is zero, but still return the response bytes 0x06 0x03.
+	 */
+	if (send_upload_header(uart_fd, UPLOAD_HEADER_SRAM_ADDRESS,
+			       RTS_CMD_PROBE_CAP_OFFSET,
+			       RTS_CMD_PROBE_CAP_SIZE) != 0) {
+		return false;
+	}
+
+	if (wait_for_response(uart_fd, WRITE_DATA_TO_SRAM, RESPONSE_TIMEOUT) !=
+	    0) {
+		ERR_PRINT(
+			"\nFailed to receive expected response for probe upload header\n");
+		return false;
+	}
+
+	if (send_packet_b(uart_fd, START_FRAME_TO_WRITE_TO_FLASH,
+			  UPLOAD_FUNCTION_POINTER) != 0) {
+		return false;
+	}
+
+	if (wait_for_response(uart_fd, 0x06, RESPONSE_TIMEOUT) != 0) {
+		ERR_PRINT(
+			"\nFailed to receive expected response (first 0x06 for probe)\n");
+		return false;
+	}
+
+	/* Read first 2 bytes to distinguish between legacy and new monitor */
+	unsigned char header[2];
+	if (read_exact(uart_fd, header, 2, 1000) != 0) {
+		ERR_PRINT("Failed to read probe response header\n");
+		return false;
+	}
+
+	if (header[0] == 0x06 && header[1] == 0x03) {
+		DBG_PRINT("Legacy monitor detected (no metadata)\n");
+		if (version_str) {
+			strncpy(version_str, "legacy", version_len - 1);
+			version_str[version_len - 1] = '\0';
+		}
+		if (features) {
+			*features = 0;
+		}
+		return true;
+	}
+
+	/* Assume it is metadata, read the remaining 38 bytes */
+	unsigned char meta_rest[38];
+	if (read_exact(uart_fd, meta_rest, 38, 1000) != 0) {
+		ERR_PRINT("Failed to read remaining monitor metadata\n");
+		return false;
+	}
+
+	uint32_t magic;
+	unsigned char *m = (unsigned char *)&magic;
+	m[0] = header[0];
+	m[1] = header[1];
+	m[2] = meta_rest[0];
+	m[3] = meta_rest[1];
+
+	if (magic != RTK_FLAME_METADATA_MAGIC) {
+		ERR_PRINT("Invalid monitor magic: 0x%08X\n", magic);
+		return false;
+	}
+
+	if (version_str) {
+		strncpy(version_str, (char *)&meta_rest[2], version_len - 1);
+		version_str[version_len - 1] = '\0';
+	}
+	if (features) {
+		*features = *(uint32_t *)&meta_rest[34];
+	}
+
+	unsigned char response[2];
+	int ret = read_exact(uart_fd, response, 2, 1000);
+	if (ret != 0) {
+		ERR_PRINT("Failed to read final probe response\n");
+		return false;
+	}
+
+	if ((response[0] != START_FRAME_TO_WRITE_TO_FLASH) ||
+	    (response[1] != SUCCESS_PROGRAM_TO_FLASH)) {
+		ERR_PRINT("Expected 0x06 0x03 response, received: 0x%X 0x%X\n",
+			  response[0], response[1]);
+		return false;
+	}
+
+	return true;
+}
+
+bool get_monitor_metadata(const char *monitor_file, char *version_str,
+			  size_t version_len, uint32_t *features)
+{
+	FILE *f = fopen(monitor_file, "rb");
+	if (!f) {
+		perror("Unable to open monitor file");
+		return false;
+	}
+
+	fseek(f, 0, SEEK_END);
+	long size = ftell(f);
+	fseek(f, 0, SEEK_SET);
+
+	if (size <= 0 || size > 65536) {
+		fclose(f);
+		return false;
+	}
+
+	unsigned char *buf = (unsigned char *)malloc(size);
+	if (!buf) {
+		fclose(f);
+		return false;
+	}
+
+	if (fread(buf, 1, size, f) != size) {
+		free(buf);
+		fclose(f);
+		return false;
+	}
+	fclose(f);
+
+	bool found = false;
+	for (long i = 0; i <= size - 40; i += 4) {
+		uint32_t *p = (uint32_t *)&buf[i];
+		if (*p == RTK_FLAME_METADATA_MAGIC) {
+			if (version_str) {
+				strncpy(version_str, (char *)&buf[i + 4],
+					version_len - 1);
+				version_str[version_len - 1] = '\0';
+			}
+			if (features)
+				*features = *(uint32_t *)&buf[i + 36];
+			found = true;
+			break;
+		}
+	}
+	free(buf);
+	return found;
+}
+
 /* Function: Flash process to send data using Packet A */
 int flash(int uart_fd, uint32_t spi_start, const char *file_name)
 {
@@ -490,6 +715,28 @@ int flash(int uart_fd, uint32_t spi_start, const char *file_name)
 	}
 
 	printf("Flash operation initiated\n");
+	char monitor_version[32] = "";
+	uint32_t monitor_features = 0;
+	bool monitor_supports_erase_only = false;
+
+	if (!probe_monitor(uart_fd, monitor_version, sizeof(monitor_version),
+			   &monitor_features)) {
+		fprintf(stderr, "Monitor liveness probe failed.\n");
+		fclose(file);
+		return -1;
+	}
+
+	printf("Monitor version: %s\n", monitor_version);
+	printf("Monitor features: 0x%08X\n", monitor_features);
+
+	monitor_supports_erase_only =
+		(monitor_features & RTK_FLAME_FEATURE_ERASE_ONLY) != 0;
+	if (monitor_supports_erase_only) {
+		printf("Erase-only mode for blank sectors enabled\n");
+	} else {
+		printf("Erase-only mode for blank sectors disabled (legacy monitor)\n");
+	}
+
 	size_t total_bytes_sent = 0;
 	size_t page = 0;
 	uint32_t upload_header_spi_address = spi_start;
@@ -523,6 +770,22 @@ int flash(int uart_fd, uint32_t spi_start, const char *file_name)
 				PAGES_PER_ROUND * PAGE_SIZE :
 				remaining_data;
 
+		uint8_t round_buffer[PAGES_PER_ROUND * PAGE_SIZE];
+		size_t bytes_read =
+			fread(round_buffer, 1, data_size_to_write, file);
+		if (bytes_read != data_size_to_write) {
+			perror("Failed to read from file");
+			goto flash_err;
+		}
+
+		bool all_ff = true;
+		for (size_t j = 0; j < bytes_read; j++) {
+			if (round_buffer[j] != 0xFF) {
+				all_ff = false;
+				break;
+			}
+		}
+
 		/* Send upload header packet to inform EC of the remaining data
 		 * size */
 		DBG_PRINT("Sending upload header for new round\n");
@@ -540,16 +803,38 @@ int flash(int uart_fd, uint32_t spi_start, const char *file_name)
 			goto flash_err;
 		}
 
-		for (size_t i = 0;
-		     i < PAGES_PER_ROUND && total_bytes_sent < total_file_size;
-		     i++) {
-			uint32_t sram_address =
-				SRAM_BASE_ADDRESS + (i * PAGE_SIZE);
-
-			/* Just send pages to EC's ram */
-			if (send_pages(uart_fd, file, sram_address,
-				       &total_bytes_sent, &page) != 0) {
+		if (all_ff && monitor_supports_erase_only) {
+			DBG_PRINT(
+				"Block all 0xFF, sending erase only command\n");
+			if (set_cmd_sel(uart_fd, RTS_CMD_ERASE_ONLY) != 0) {
 				goto flash_err;
+			}
+		} else {
+			if (set_cmd_sel(uart_fd, 0x00000000) != 0) {
+				goto flash_err;
+			}
+			size_t round_bytes_sent = 0;
+			for (size_t i = 0; i < PAGES_PER_ROUND &&
+					   round_bytes_sent < bytes_read;
+			     i++) {
+				uint32_t sram_address =
+					SRAM_BASE_ADDRESS + (i * PAGE_SIZE);
+
+				size_t page_bytes =
+					bytes_read - round_bytes_sent >
+							PAGE_SIZE ?
+						PAGE_SIZE :
+						bytes_read - round_bytes_sent;
+
+				/* Just send pages to EC's ram from buffer */
+				if (send_page_from_buf(
+					    uart_fd,
+					    &round_buffer[round_bytes_sent],
+					    page_bytes, sram_address,
+					    &total_bytes_sent, &page) != 0) {
+					goto flash_err;
+				}
+				round_bytes_sent += page_bytes;
 			}
 		}
 
@@ -579,21 +864,21 @@ int flash(int uart_fd, uint32_t spi_start, const char *file_name)
 					printf("\nFailed to retry request EC to execute frame.\n");
 					goto flash_err;
 				}
+				usleep(100 * 1000);
 				continue;
 			}
-			usleep(100 * 1000);
 
 			/* Wait for EC to respond with 0x06 0x03 (execution
 			 * success) */
 			unsigned char response[2];
 			int ret = read_exact(uart_fd, response, 2, 1000);
-			usleep(200 * 1000);
 			if (ret != 0) {
 				ERR_PRINT(
 					"\nexpected 0x06 0x03 response, received: no data\n");
 				if (retry_round > FLASH_RETRY_CNT) {
 					goto flash_err;
 				}
+				usleep(100 * 1000);
 				continue;
 			}
 			if ((response[0] != START_FRAME_TO_WRITE_TO_FLASH) ||
@@ -607,11 +892,18 @@ int flash(int uart_fd, uint32_t spi_start, const char *file_name)
 						"\n Failed to retry receive frame result.\n");
 					goto flash_err;
 				}
+				usleep(100 * 1000);
 				continue;
 			}
 			/* Flash write was successful, continue to next chunk.
 			 */
 			success = true;
+		}
+		if (all_ff && monitor_supports_erase_only) {
+			// Restore CMD_SEL to default 0
+			set_cmd_sel(uart_fd, 0x00000000);
+			total_bytes_sent += bytes_read;
+			page += (bytes_read + PAGE_SIZE - 1) / PAGE_SIZE;
 		}
 		/* Update SPI address for next round */
 		upload_header_spi_address += SPI_INCREMENT;
@@ -636,6 +928,18 @@ flash_err:
 int frame(int uart_fd, const char *file_name)
 {
 	printf("Frame operation initiated\n");
+	char monitor_version[32] = "";
+	uint32_t monitor_features = 0;
+
+	if (get_monitor_metadata(file_name, monitor_version,
+				 sizeof(monitor_version), &monitor_features)) {
+		printf("Monitor version: %s\n", monitor_version);
+		printf("Monitor features: 0x%08X\n", monitor_features);
+	} else {
+		fprintf(stderr, "Failed to parse monitor metadata from %s\n",
+			file_name);
+	}
+
 	FILE *file = fopen(file_name, "rb");
 	if (!file) {
 		perror("Failed to open binary file");
@@ -769,26 +1073,10 @@ int read_bin(int uart_fd, uint32_t spi_start, const char *file_name,
 				"Failed to receive expected response for upload header\n");
 			goto read_bin_err1;
 		}
-		/* Calculate SRAM address, incremented per page */
 
-		data_buffer[0] = 0xA5;
-		data_buffer[1] = 0xA5;
-		data_buffer[2] = 0xA5;
-		data_buffer[3] = 0xA5;
-
-		/* Send this page's data */
-		if (send_packet_a(uart_fd, WRITE_DATA_TO_SRAM, 4, sram_address,
-				  data_buffer) != 0) {
+		/* Initiate the flash read */
+		if (set_cmd_sel(uart_fd, RTS_CMD_FLASH_READ)) {
 			goto read_bin_err2;
-		}
-
-		/* Wait for EC to respond with 0x09 (acknowledgment for
-		 * this page) */
-		if (wait_for_response(uart_fd, WRITE_DATA_TO_SRAM,
-				      RESPONSE_TIMEOUT) != 0) {
-			DBG_PRINT(
-				"Failed to receive expected response for data page %u\n",
-				page_read + 1);
 		}
 
 		if (send_packet_b(uart_fd, START_FRAME_TO_WRITE_TO_FLASH,
