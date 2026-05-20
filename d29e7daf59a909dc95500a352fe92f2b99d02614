@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8960820c_42aa7527",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:24:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/d5bffb51-ffc0-4c9d-9cf6-61051750655b)]\n\n### Review Summary\n- **Functionality:** The patch correctly restricts `CONFIG_RAM_LOCK` to the RW section of the `helipilot` baseboard. This is necessary because there is no mechanism to disable RAM lock before jumping from RO to RW. The `ram_lock` test is also appropriately updated to only run when `SECTION_IS_RW` is enabled.\n- **Style:** The code follows existing patterns and is clean.\n- **Security:** Restricting RAM lock to RW means RO wont have this protection, but this appears to be a conscious design choice to allow the jump to RW.\n- **Testing:** The test only runs in RW, ensure that the test runner correctly handles the skipped RO phase.",
+      "revId": "d29e7daf59a909dc95500a352fe92f2b99d02614",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7cfb345d_5aa9534c",
+        "filename": "test/ram_lock.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 606,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:24:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This change correctly ensures that the multi-step test only proceeds when in the RW section. However, since the task returns `EC_SUCCESS` immediately in RO, please confirm if the test runner expects any specific output or state from the RO phase of this test.",
+      "revId": "d29e7daf59a909dc95500a352fe92f2b99d02614",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
