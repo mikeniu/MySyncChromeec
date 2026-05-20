@@ -3199,6 +3199,8 @@ static void print_ccd_info(void *response, size_t response_size,
 					     "Set" :
 					     "None";
 	if (show_machine_output) {
+		int factory_mode = ccd_info.ccd_flags &
+				   CCD_FLAG_FACTORY_MODE_ENABLED;
 		print_machine_output("STATE", "%s", state);
 		print_machine_output("PASSWORD", "%s", password);
 		print_machine_output("CCD_FLAGS", "%#06x", ccd_info.ccd_flags);
@@ -3206,10 +3208,13 @@ static void print_ccd_info(void *response, size_t response_size,
 			"CCD_FLAG_TESTLAB_MODE", "%c",
 			(ccd_info.ccd_flags & CCD_FLAG_TEST_LAB) ? 'Y' : 'N');
 		print_machine_output("CCD_FLAG_FACTORY_MODE", "%c",
-				     (ccd_info.ccd_flags &
-				      CCD_FLAG_FACTORY_MODE_ENABLED) ?
-					     'Y' :
-					     'N');
+				     factory_mode ? 'Y' : 'N');
+		print_machine_output(
+			"CCD_FLAG_RMA_MODE", "%c",
+			factory_mode && (ccd_info.ccd_flags &
+					 CCD_FLAG_RMA_MODE_ENABLED) ?
+				'Y' :
+				'N');
 	} else {
 		printf("State: %s\n", state);
 		printf("Password: %s\n", password);
@@ -3924,17 +3929,26 @@ static int parse_wpsrs(const char *opt, struct arv_config_wpds *wpds)
 	struct arv_config_wpd *wpd;
 
 	ptr = malloc(len + 1);
+	if (!ptr)
+		return 0;
 	strcpy(ptr, opt);
 	p = strtok(ptr, delim);
 
 	while (p != NULL) {
 		if (read_hex_byte_string(p, &b)) {
-			wpd = &wpds->data[rv / 2];
-			if (rv % 2 == 0) {
-				wpd->expected_value = b;
-			} else {
-				wpd->mask = b;
-				wpd->state = arv_config_setting_state_present;
+			/*
+			 * Currently we only support up to 3 register pairs in
+			 * struct arv_config_wpds.
+			 */
+			if (rv < 6) {
+				wpd = &wpds->data[rv / 2];
+				if (rv % 2 == 0) {
+					wpd->expected_value = b;
+				} else {
+					wpd->mask = b;
+					wpd->state =
+					  arv_config_setting_state_present;
+				}
 			}
 			rv++;
 		} else {
@@ -5145,10 +5159,15 @@ static int process_ti50_get_metrics(struct transfer_descriptor *td,
 
 static void print_ti50_device_id_field(const char *name,
 				       struct ti50_device_ids_field id,
+				       bool is_rma_field,
 				       bool show_machine_output)
 {
 	if (show_machine_output) {
 		printf("FIELD_%s_SIZE=%u\n", name, id.size);
+		printf("FIELD_%s_RMA=%s\n", name,
+		       id.size == 0xff ? "NA" :
+		       is_rma_field    ? "Y" :
+					 "N");
 		printf("FIELD_%s=", name);
 	} else {
 		printf("%12s (%3u): ", name, id.size);
@@ -5184,6 +5203,8 @@ static void print_ti50_device_id_header(struct ti50_device_ids_response *ids,
 
 	if (show_machine_output) {
 		print_machine_output("VERSION", "%u", ids->header.version);
+		print_machine_output("VERSION_MINOR", "%u",
+				     ids->header.version_minor);
 		print_machine_output("STATUS", "%u", ids->header.status);
 		print_machine_output("VALID", "%s", valid);
 		print_machine_output("FINALIZED", "%s", finalized);
@@ -5198,6 +5219,7 @@ static void print_ti50_device_id_header(struct ti50_device_ids_response *ids,
 		print_machine_output("TOTAL_FIELDS_SIZE", "%u", size);
 	} else {
 		printf("Version: %u\n", ids->header.version);
+		printf("Version Minor: %u\n", ids->header.version_minor);
 		printf("Status: %u\n", ids->header.status);
 		printf("Valid: %s\n", valid);
 		printf("Finalized: %s\n", finalized);
@@ -5229,19 +5251,25 @@ static int print_ti50_device_ids(struct ti50_device_ids_response *ids,
 				 bool show_machine_output)
 {
 	size_t i;
+	/* RMA status added in 1.0 */
+	bool supports_rma = ids->header.version > 1 ||
+			    ids->header.version != 0xff;
 
 	if (ids->header.version == 0xff) {
 		printf("fields unset");
 		return 0;
 	}
+
 	if (ids->header.version != TI50_DEVICE_IDS_VERSION) {
 		printf("unsupported device ids version");
 		return 1;
 	}
 
 	for (i = 0; i < ARRAY_SIZE(ti50_device_id_fields); i++) {
-		print_ti50_device_id_field(ti50_device_id_fields[i].name,
-					   ids->ids[i], show_machine_output);
+		print_ti50_device_id_field(
+			ti50_device_id_fields[i].name, ids->ids[i],
+			supports_rma && !!(ids->header.rma_fields & (1 << i)),
+			show_machine_output);
 	}
 	return 0;
 }
@@ -5333,6 +5361,9 @@ static int process_ti50_device_ids(struct transfer_descriptor *td,
 	} else if (!strcasecmp("get_info", arg)) {
 		return process_ti50_get_device_ids(td, STORAGE_INFO,
 						   show_machine_output);
+	} else if (!strcasecmp("get_rma", arg)) {
+		return process_ti50_get_device_ids(td, STORAGE_RMA,
+						   show_machine_output);
 	} else if (!strcasecmp("get_scratch", arg)) {
 		return process_ti50_get_device_ids(td, STORAGE_NVMEM,
 						   show_machine_output);
@@ -5341,6 +5372,9 @@ static int process_ti50_device_ids(struct transfer_descriptor *td,
 		request_size = 1;
 	} else if (!strcasecmp("delete_scratch", arg)) {
 		request.subcmd = DEVICE_ID_DELETE_SCRATCH;
+		request_size = 1;
+	} else if (!strcasecmp("delete_rma", arg)) {
+		request.subcmd = DEVICE_ID_DELETE_RMA;
 		request_size = 1;
 	} else {
 		/*
@@ -5814,6 +5848,36 @@ int main(int argc, char *argv[])
 					arv_config_setting_state_not_present;
 
 				rv = parse_wpsrs(optarg, &arv_config_wpds);
+
+				/*
+				 * TODO(b/514254290): Currently GSC firmware and
+				 * gsctool only support up to 3 register pairs.
+				 * Some newer flash chips (like Macronix)
+				 * provide more (e.g., Security and
+				 * Configuration registers). For now, we drop
+				 * any registers beyond SR3 and trim trailing
+				 * empty registers to remain compatible with
+				 * existing GSC firmware.
+				 */
+				if (rv > 6) {
+					printf("warning: ignoring registers "
+					  "beyond SR3 (b/514254290)\n");
+					rv = 6;
+				}
+
+				if (rv == 6 &&
+				    arv_config_wpds.data[2].mask == 0) {
+					rv = 4;
+					arv_config_wpds.data[2].state =
+					  arv_config_setting_state_not_present;
+				}
+				if (rv == 4 &&
+				    arv_config_wpds.data[1].mask == 0) {
+					rv = 2;
+					arv_config_wpds.data[1].state =
+					  arv_config_setting_state_not_present;
+				}
+
 				if (rv == 2 || rv == 4 || rv == 6) {
 					arv_config_wpsr_choice =
 						arv_config_wpsr_choice_set;
