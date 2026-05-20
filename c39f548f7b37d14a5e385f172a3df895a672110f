@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "90da12c6_e2598d6a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-05-20T20:33:33Z",
+      "side": 1,
+      "message": "You\u0027re right we probably need a new bug for enabling RTS PD",
+      "parentUuid": "4b594fa7_03b691f4",
+      "revId": "c39f548f7b37d14a5e385f172a3df895a672110f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cb374551_6d6da707",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-20T19:51:22Z",
       "side": 1,
       "message": "What does this do to code size?",
+      "revId": "c39f548f7b37d14a5e385f172a3df895a672110f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e540212_f6969bbf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-05-20T20:33:33Z",
+      "side": 1,
+      "message": "Memory region         Used Size  Region Size  %age Used\n           FLASH:      265460 B       318 KB     81.52%\n             RAM:       54828 B      65024 B     84.32%\n        IDT_LIST:           0 B        32 KB      0.00%",
+      "parentUuid": "cb374551_6d6da707",
       "revId": "c39f548f7b37d14a5e385f172a3df895a672110f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
