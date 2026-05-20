@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6df7af9_6ef12e4d",
+        "filename": "util/elan/file_control.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T19:46:23Z",
+      "side": 1,
+      "message": "* **Redundant Type Spacing (`file_control.h`):** The declaration `std::optional\u003cstd::vector\u003cuint8_t\u003e \u003e GetBinary(...)` includes a space between the closing angle brackets. In C++11 and later, you can safely write `std::vector\u003cuint8_t\u003e\u003e` without the parser confusing it for a shift operator.",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 36
+      },
+      "revId": "931cb6d0f2cc8cbdd18bb4c4c8c0bb492850fd9b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64fa1c00_70b49b7d",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T19:46:23Z",
+      "side": 1,
+      "message": "* **Firmware Prefix Extraction (`iap_control.cc`):** The logic `uint8_t fw_ver_google \u003d fw_ver_info-\u003efw_ver \u003e\u003e 8;` shifts the 32-bit version right by 8 bits and casts it to an 8-bit integer, isolating bits 8–15. If the `0x10` prefix represents the most significant byte (e.g., `0x10XXXXXX`), this shift must be `\u003e\u003e 24`. If the device explicitly structures the version with `0x10` at bits 8–15, add a comment clarifying this unusual layout to prevent future regressions.",
+      "range": {
+        "startLine": 112,
+        "startChar": 0,
+        "endLine": 112,
+        "endChar": 51
+      },
+      "revId": "931cb6d0f2cc8cbdd18bb4c4c8c0bb492850fd9b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09f0e2ac_a46bb684",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 575,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T19:46:23Z",
+      "side": 1,
+      "message": "* **Double Error Logging (`iap_control.cc`):** Functions like `IapCommand` log an error when `IapSendCommand` fails. However, `IapSendCommand` already logs its own detailed error before returning `-1`. This pollutes standard output with duplicate failure paths. Strip the error logs from the higher-level wrappers and leave them strictly at the point of failure.",
+      "range": {
+        "startLine": 570,
+        "startChar": 0,
+        "endLine": 575,
+        "endChar": 0
+      },
+      "revId": "931cb6d0f2cc8cbdd18bb4c4c8c0bb492850fd9b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3df9e86b_0d869c02",
+        "filename": "util/elan/iap_tool.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T19:46:23Z",
+      "side": 1,
+      "message": "Use `EXIT_SUCCESS` here.",
+      "range": {
+        "startLine": 69,
+        "startChar": 20,
+        "endLine": 69,
+        "endChar": 21
+      },
+      "revId": "931cb6d0f2cc8cbdd18bb4c4c8c0bb492850fd9b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2430b48_9e312d63",
+        "filename": "util/elan/iap_tool.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T19:46:23Z",
+      "side": 1,
+      "message": "* **Missing Header (`iap_tool.cc`):** The `CommandLineManager` calls `std::exit(0);` when handling the `-h` flag, but `\u003ccstdlib\u003e` is not included.",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 23
+      },
+      "revId": "931cb6d0f2cc8cbdd18bb4c4c8c0bb492850fd9b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
