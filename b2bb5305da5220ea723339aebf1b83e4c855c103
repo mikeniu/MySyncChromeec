@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1330d9ea_cd65f112",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4495208
+      },
+      "writtenOn": "2026-05-20T01:52:35Z",
+      "side": 1,
+      "message": "Hello, I have updated source code which passed pre-submit checks. Are there any further requirements to fulfill?",
+      "revId": "b2bb5305da5220ea723339aebf1b83e4c855c103",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
