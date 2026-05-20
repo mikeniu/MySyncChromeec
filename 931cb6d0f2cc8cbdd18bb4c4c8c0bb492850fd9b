@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8a9016fd_bc287eee",
+        "filename": "util/elan/build.mk",
+        "patchSetId": 20
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T20:50:25Z",
+      "side": 1,
+      "message": "It looks like we don\u0027t have the statically built version of `libusb` in the chroot, so for now let\u0027s remove the `--static` and `-static` flags here.",
+      "range": {
+        "startLine": 17,
+        "startChar": 8,
+        "endLine": 17,
+        "endChar": 36
+      },
+      "revId": "931cb6d0f2cc8cbdd18bb4c4c8c0bb492850fd9b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c6df7af9_6ef12e4d",
         "filename": "util/elan/file_control.h",
         "patchSetId": 20
