@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e067f95e_ded3b8e3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:19:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/518a1cbe-1c85-4200-bae9-cdd93872b330)]\n\n### Review Summary:\n- **Functionality**: The CL correctly introduces `mpu_post_init()` to enable MPU protection for Code RAM at the appropriate stage of the boot process. The logic properly checks for system lock status and configuration flags.\n- **Security**: Enhances security by enforcing read-only protection on Code RAM when the system is locked, preventing unauthorized modifications.\n- **Style**: Adheres to the codebase\u0027s style, with a minor suggestion for log message consistency.\n- **Testing**: The change is a re-landing of a previous verified feature, and the logic is sound for the target architecture.",
+      "revId": "362bea6593ff6b1993795bc061514854f4368b50",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f28342c_c4b1920a",
+        "filename": "core/cortex-m/mpu.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:19:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Nit: Capitalize the log message for consistency with other system messages (e.g., \"Code RAM protected.\").",
+      "revId": "362bea6593ff6b1993795bc061514854f4368b50",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
