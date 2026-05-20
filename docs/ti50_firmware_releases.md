@@ -131,7 +131,7 @@ Released with RW 0.24.51
 Released with RW 0.24.81
 
 *   Updated header enforcing post personalization fuse settings.
-    [b/181261702](https://buganizer.corp.google.com/issues/181261702)
+    [b/181261702](https://b.corp.google.com/issues/181261702)
 
 ## 0.0.58 released on 08/16/2024 in M129
 
@@ -247,21 +247,21 @@ Known Issues:
     after upgrading from 0.21.1
 *   For i2c-based TPM devices, Ti50 won't communicate with AP on first attempt
     if GSC is in deep sleep and system wakes up due to lid open event. Shows up
-    as "0x63 Failed to get boot mode from Cr50" error (b/259510330, b/259663369)
+    as "0x63 Failed to get boot mode from Cr50" error ([b/259510330](https://b.corp.google.com/issues/259510330), [b/259663369](https://b.corp.google.com/issues/259663369))
 
 Feature Notes:
 
 *   Add AP RO Verification feature, but it does not hold system in reset upon
-    failure yet (b/161483233)
-*   Add Zero Touch Enrollment support (b/234857025)
+    failure yet ([b/161483233](https://b.corp.google.com/issues/161483233))
+*   Add Zero Touch Enrollment support ([b/234857025](https://b.corp.google.com/issues/234857025))
 *   Add Pinweaver support
 *   Add U2F support
 *   Add attestation support
 *   Add network recovery support
-*   Improve SPI and I2C TPM bus stability (b/237493220, b/247168128,
-    b/245034621, b/251191468)
-*   Fix connection issues with Google-A network (b/240506338)
-*   Improve boot time performance (b/241986964)
+*   Improve SPI and I2C TPM bus stability ([b/237493220](https://b.corp.google.com/issues/237493220), [b/247168128](https://b.corp.google.com/issues/247168128),
+    [b/245034621](https://b.corp.google.com/issues/245034621), [b/251191468](https://b.corp.google.com/issues/251191468))
+*   Fix connection issues with Google-A network ([b/240506338](https://b.corp.google.com/issues/240506338))
+*   Improve boot time performance ([b/241986964](https://b.corp.google.com/issues/241986964))
 *   General stability improvements for ti50
 
 ```
@@ -282,7 +282,7 @@ Manifest snapshot: gs://chromeos-manifest-versions/buildspecs/107/15224.5.0.xml
 **Added Features:**
 
 *   Fix "0x63 Failed to get boot mode from Cr50" error when waking i2c-based tpm
-    device with lid open wake event (b/259510330, b/259663369).
+    device with lid open wake event ([b/259510330](https://b.corp.google.com/issues/259510330), [b/259663369](https://b.corp.google.com/issues/259663369)).
 
 ```
 Build:   ti50_common:v0.0.2616-f4c7c42d
@@ -1231,14 +1231,14 @@ Build:   0.{2,3}3.242/ti50_common_mp-15980.B:v0.0.674-a85ab29e
 From post submit release
 [19748](https://luci-milo.appspot.com/ui/p/chromeos/builders/postsubmit/firmware-ti50-postsubmit/19748/overview).
 
-*   Add ChromeOS Identity/Attestation support (b/173326151)
-*   Adds U2F application (b/233971198)
-*   Add network recovery support (b/217278402)
+*   Add ChromeOS Identity/Attestation support ([b/173326151](https://b.corp.google.com/issues/173326151))
+*   Adds U2F application ([b/233971198](https://b.corp.google.com/issues/233971198))
+*   Add network recovery support ([b/217278402](https://b.corp.google.com/issues/217278402))
 *   Improve FAFT stability (e.g. FWMP and RMA unlock)
-*   Wait 10 seconds after RMA/CCD open until forced AP reboot (b/231222819)
+*   Wait 10 seconds after RMA/CCD open until forced AP reboot ([b/231222819](https://b.corp.google.com/issues/231222819))
 *   Fix `dut-control active_dut_controller` case insensitivity issue
-    (b/233283958)
-*   Fixed intermittent watchdog resets (b/235344334)
+    ([b/233283958](https://b.corp.google.com/issues/233283958))
+*   Fixed intermittent watchdog resets ([b/235344334](https://b.corp.google.com/issues/235344334))
 
 ```
 for d in $(repo list | sed 's/ .*//'); do
@@ -1291,15 +1291,15 @@ done
 From post submit release
 [21333](https://luci-milo.appspot.com/ui/p/chromeos/builders/postsubmit/firmware-ti50-postsubmit/21333/overview).
 
-*   Fix issue with I2C-based EC flashing (b/234422943)
-*   Add serial number and RMA support for zero touch enrollment (b/230491627)
-*   Improve platform level cold boot stress testing performance (b/228429691,
-    b/239642389, b/235185547, and b/235553213)
+*   Fix issue with I2C-based EC flashing ([b/234422943](https://b.corp.google.com/issues/234422943))
+*   Add serial number and RMA support for zero touch enrollment ([b/230491627](https://b.corp.google.com/issues/230491627))
+*   Improve platform level cold boot stress testing performance ([b/228429691](https://b.corp.google.com/issues/228429691),
+    [b/239642389](https://b.corp.google.com/issues/239642389), [b/235185547](https://b.corp.google.com/issues/235185547), and [b/235553213](https://b.corp.google.com/issues/235553213))
 *   Wipe GSC filesystem between developer and production image transition
 *   Fix UART race condition that causes intermittent watchdog resets
-    (b/235344334)
+    ([b/235344334](https://b.corp.google.com/issues/235344334))
 *   Add user presences timestamp detection for FPMCU automated testing
-    (b/217974287)
+    ([b/217974287](https://b.corp.google.com/issues/217974287))
 *   Detect factory mode differently. This causes GSC to re-enter factory mode
     after upgrade to 0.22.2 or later.
 
@@ -1329,13 +1329,13 @@ From post submit release
 
 **Known Issues:**
 
-*   Crypto faults causes issues with log in and GSC FW update (b/242744329)
+*   Crypto faults causes issues with log in and GSC FW update ([b/242744329](https://b.corp.google.com/issues/242744329))
 
 **Added Features:**
 
 *   Remove internal pull resistors, which prevents leakage current onto SoC
-    rails (b/239791508)
-*   Refresh key passed through to EC during power button press (b/239674288)
+    rails ([b/239791508](https://b.corp.google.com/issues/239791508))
+*   Refresh key passed through to EC during power button press ([b/239674288](https://b.corp.google.com/issues/239674288))
 *   Power consumption of normal sleep reduce by 25% down to 9mW
 *   Improve cancellation of long running crypto operation
     *   Improves reboot stress tests
@@ -1372,15 +1372,15 @@ From post submit release
 
 **Known Issues:**
 
-*   EC console lost after ITE EC programming; not a regression (b/243076325)
+*   EC console lost after ITE EC programming; not a regression ([b/243076325](https://b.corp.google.com/issues/243076325))
 *   Occasional TPM ready IRQ timeout for spi devices; not a regression
-    (b/242137071)
+    ([b/242137071](https://b.corp.google.com/issues/242137071))
 *   ZTE enrollment does not work due to serial number endianness issue; not a
-    regression (b/238137986)
+    regression ([b/238137986](https://b.corp.google.com/issues/238137986))
 
 **Added Features:**
 
-*   Improve stability around crypto faults (b/242744329)
+*   Improve stability around crypto faults ([b/242744329](https://b.corp.google.com/issues/242744329))
 *   Implement TPM version string command; less error message in ti50 and AP logs
 
 ```
@@ -1416,7 +1416,7 @@ from build page.
 
 **Known Issues:**
 
-*   DCRYPTO_FAULT occurring in 0.22.3+ (b/242744329)
+*   DCRYPTO_FAULT occurring in 0.22.3+ ([b/242744329](https://b.corp.google.com/issues/242744329))
 
 **Added Features:**
 
@@ -1451,18 +1451,18 @@ Manifest
 
 **Known Issues:**
 
-*   TPM_RC_HASH error connecting to Google Wifi (b/240506338).
+*   TPM_RC_HASH error connecting to Google Wifi ([b/240506338](https://b.corp.google.com/issues/240506338)).
 *   SPI communication issues on reboot that can lead to recovery screen
-    occasionally (~1/4000 rate) (b/247168128).
-*   Rare TPM_RC_POLICY_FAIL on login (b/248109533).
+    occasionally (~1/4000 rate) ([b/247168128](https://b.corp.google.com/issues/247168128)).
+*   Rare TPM_RC_POLICY_FAIL on login ([b/248109533](https://b.corp.google.com/issues/248109533)).
 
 **Added Features:**
 
-*   Crypto alert fixes (b/242744329).
-*   ZTE fixes (b/234857025).
-*   Boot time improvement: delay NV writes to flash (b/241986964).
-*   TPM version reporting (b/245950072).
-*   Owner seed reset (b/247811154).
+*   Crypto alert fixes ([b/242744329](https://b.corp.google.com/issues/242744329)).
+*   ZTE fixes ([b/234857025](https://b.corp.google.com/issues/234857025)).
+*   Boot time improvement: delay NV writes to flash ([b/241986964](https://b.corp.google.com/issues/241986964)).
+*   TPM version reporting ([b/245950072](https://b.corp.google.com/issues/245950072)).
+*   Owner seed reset ([b/247811154](https://b.corp.google.com/issues/247811154)).
 
 ```
 Build:   ti50_common:v0.0.2474-5fd512d0
@@ -1488,7 +1488,7 @@ Manifest
 
 **Known Issues:**
 
-*   False warnings about I2CP bus stuck when AP is in low power mode (b/5025966)
+*   False warnings about I2CP bus stuck when AP is in low power mode ([b/5025966](https://b.corp.google.com/issues/5025966))
 
 **Added Features:**
 
@@ -1526,24 +1526,24 @@ Manifest snapshot: gs://chromeos-manifest-versions/buildspecs/107/15086.13.0.xml
 **Known Issues:**
 
 *   Previously enrolled power button gnubby (G2F) may need to be re-enrolled
-    (b/252818957)
+    ([b/252818957](https://b.corp.google.com/issues/252818957))
 *   For i2c-based TPM devices, Ti50 won't communicate with AP on first attempt
     if GSC is in deep sleep and system wakes up due to lid open event. Shows up
-    as "0x63 Failed to get boot mode from Cr50" error (b/259510330, b/259663369)
+    as "0x63 Failed to get boot mode from Cr50" error ([b/259510330](https://b.corp.google.com/issues/259510330), [b/259663369](https://b.corp.google.com/issues/259663369))
 
 **Added Features:**
 
-*   Added AP RO verification feature without holding EC in reset (b/161483233)
-*   Improved SPI and I2C TPM bus stability (b/237493220, b/247168128,
-    b/245034621, b/251191468)
-*   Fixed connection issues with Google-A network (b/240506338)
+*   Added AP RO verification feature without holding EC in reset ([b/161483233](https://b.corp.google.com/issues/161483233))
+*   Improved SPI and I2C TPM bus stability ([b/237493220](https://b.corp.google.com/issues/237493220), [b/247168128](https://b.corp.google.com/issues/247168128),
+    [b/245034621](https://b.corp.google.com/issues/245034621), [b/251191468](https://b.corp.google.com/issues/251191468))
+*   Fixed connection issues with Google-A network ([b/240506338](https://b.corp.google.com/issues/240506338))
 *   Fixed transient leakage power on UART pins at GSC startup
 *   Changed how G2F (Power button as gnubby) serial numbers are generated
-    (b/252818957)
+    ([b/252818957](https://b.corp.google.com/issues/252818957))
 *   Improved EFS2 hash invalidation for firmware_UpdateFirmwareDataKeyVersion
-    and firmware_UpdateFirmwareVersion FAFT tests (b/253337357)
-*   Improved filesystem performance (b/253662388, b/235873536)
-*   Decreased flash size needed through more performant syscalls (b/236994893)
+    and firmware_UpdateFirmwareVersion FAFT tests ([b/253337357](https://b.corp.google.com/issues/253337357))
+*   Improved filesystem performance ([b/253662388](https://b.corp.google.com/issues/253662388), [b/235873536](https://b.corp.google.com/issues/235873536))
+*   Decreased flash size needed through more performant syscalls ([b/236994893](https://b.corp.google.com/issues/236994893))
 
 ```
 Build:   ti50_common:v0.0.2613-dbba229a
@@ -1569,7 +1569,7 @@ Manifest snapshot: gs://chromeos-manifest-versions/buildspecs/107/15086.14.0.xml
 **Added Features:**
 
 *   Fix "0x63 Failed to get boot mode from Cr50" error when waking i2c-based tpm
-    device with lid open wake event (b/259510330, b/259663369).
+    device with lid open wake event ([b/259510330](https://b.corp.google.com/issues/259510330), [b/259663369](https://b.corp.google.com/issues/259663369)).
 
 ```
 Build:   ti50_common:v0.0.2616-fe48da33
