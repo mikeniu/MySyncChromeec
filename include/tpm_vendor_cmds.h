@@ -455,6 +455,7 @@ enum ti50_set_device_id_subcmd {
 	DEVICE_ID_MEID,
 	DEVICE_ID_COMMIT,
 	DEVICE_ID_DELETE_SCRATCH,
+	DEVICE_ID_DELETE_RMA,
 };
 
 struct ti50_device_id_field_info {
@@ -468,6 +469,7 @@ struct ti50_device_id_field_info {
 enum vendor_cc_get_device_id_subcmd {
 	STORAGE_NVMEM = 1,
 	STORAGE_INFO = 2,
+	STORAGE_RMA = 3,
 };
 
 
@@ -489,7 +491,8 @@ struct ti50_device_ids_header {
 	uint8_t field_count;
 	uint8_t data_size[2];
 	uint8_t status;
-	uint8_t unused[2];
+	uint8_t rma_fields;
+	uint8_t version_minor;
 } __packed;
 
 struct ti50_device_ids_response {
