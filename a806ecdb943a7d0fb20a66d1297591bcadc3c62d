@@ -66,6 +66,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f967144b_9eb0b461",
+        "filename": "util/egis/build.mk",
+        "patchSetId": 17
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T20:57:58Z",
+      "side": 1,
+      "message": "I don\u0027t think this is necessary. We should be setting the default flags to C++23. Let me know if it doesn\u0027t compile so I can update the default flags if needed.",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 39
+      },
+      "revId": "a806ecdb943a7d0fb20a66d1297591bcadc3c62d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6fb0617_e4b11a6b",
+        "filename": "util/egis/build.mk",
+        "patchSetId": 17
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T20:57:58Z",
+      "side": 1,
+      "message": "It looks like our CQ build environment doesn\u0027t have the static version of `libusb`, so for now let\u0027s remove the `--static` flags. Also, we shouldn\u0027t need to explicitly link `pthread` and `dl`, so this should just be:\n\n```\n$(_egis_bin): HOST_LDFLAGS+\u003d$(shell $(HOST_PKG_CONFIG) --libs boringssl libusb-1.0)\n```\n\nVerify that it compiles locally with [these instructions](http://b/400734831#comment22).",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 116
+      },
+      "revId": "a806ecdb943a7d0fb20a66d1297591bcadc3c62d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "15c51f24_d0da5721",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 17
