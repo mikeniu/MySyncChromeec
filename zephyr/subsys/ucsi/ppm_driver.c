@@ -291,6 +291,12 @@ static int ucsi_ppm_execute_cmd_sync(const struct device *device,
 	}
 
 	data_size = ucsi_commands[ucsi_command].command_copy_length;
+	if (ucsi_command == UCSI_GET_ALTERNATE_MODES || ucsi_command == UCSI_GET_CAM_SUPPORTED ||
+	    ucsi_command == UCSI_GET_CURRENT_CAM || ucsi_command == UCSI_SET_NEW_CAM ||
+	    ucsi_command == UCSI_GET_PD_MESSAGE || ucsi_command == UCSI_GET_ATTENTION_VDO) {
+		LOG_ERR("custom: PPM level: Executing conn=%u cmd=0x%02x (%s)",
+			conn, ucsi_command, get_ucsi_command_name(ucsi_command));
+	}
 	LOG_DBG("%s: Executing conn=%u cmd=0x%02x data_size=%d", __func__, conn,
 		ucsi_command, data_size);
 

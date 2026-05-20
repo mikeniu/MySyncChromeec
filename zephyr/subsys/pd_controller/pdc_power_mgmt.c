@@ -1513,6 +1513,13 @@ static void handle_connector_status(struct pdc_port_t *port)
 {
 	union connector_status_t *status = &port->connector_status;
 	const struct pdc_config_t *config = port->dev->config;
+
+	LOG_ERR("custom: POWERMNG level: C%d status: conn=%d, pwr_dir=%d, flags=0x%02x (USB4=%d, AltMode=%d)",
+		config->connector_num, status->connect_status, status->power_direction,
+		status->conn_partner_flags,
+		(status->conn_partner_flags & (CONNECTOR_PARTNER_FLAG_USB4_GEN3 | CONNECTOR_PARTNER_FLAG_USB4_GEN4)) ? 1 : 0,
+		(status->conn_partner_flags & CONNECTOR_PARTNER_FLAG_ALTERNATE_MODE) ? 1 : 0);
+
 	int port_number = config->connector_num;
 	union conn_status_change_bits_t conn_status_change_bits;
 
@@ -3537,6 +3544,20 @@ static enum smf_state_result pdc_send_cmd_wait_run(void *obj)
 		LOG_DBG("C%d: CCI_CMD_COMPLETED", config->connector_num);
 
 		switch (port->cmd->cmd) {
+		case CMD_PDC_GET_PD_VDO_DP_CFG_SELF: {
+			uint8_t pin = (uint8_t)((port->vdo_dp_cfg >> 8) & 0xFF);
+			char pin_char = (pin == 0x04) ? 'C' : (pin == 0x08) ? 'D' : (pin == 0x10) ? 'E' : '?';
+			LOG_ERR("custom: POWERMNG level: C%d completed GET_PD_VDO_DP_CFG. Result: Pin Assignment %c (0x%02x)",
+				config->connector_num, pin_char, pin);
+			break;
+		}
+		case CMD_PDC_GET_PCH_DATA_STATUS:
+			LOG_ERR("custom: POWERMNG level: C%d completed GET_PCH_DATA_STATUS. Raw: %02x %02x %02x %02x %02x",
+				config->connector_num,
+				port->pch_data_status[0], port->pch_data_status[1],
+				port->pch_data_status[2], port->pch_data_status[3],
+				port->pch_data_status[4]);
+			break;
 		case CMD_PDC_GET_CONNECTOR_STATUS:
 			handle_connector_status(port);
 			return SMF_EVENT_HANDLED;
@@ -4233,6 +4254,9 @@ static void pdc_ci_handler_cb(const struct device *dev,
 static void init_port_variables(struct pdc_port_t *port,
 				bool reset_charge_manager)
 {
+	const struct pdc_config_t *const config = port->dev->config;
+	LOG_ERR("custom: POWERMNG level: C%d clearing all port variables (resetting pin assignment cache)",
+		config->connector_num);
 	/* This optionally seeds the Charge Manager */
 	invalidate_charger_settings(port, reset_charge_manager);
 
@@ -4246,6 +4270,7 @@ static void init_port_variables(struct pdc_port_t *port,
 	port->last_state = PDC_INIT;
 	port->next_state = PDC_INIT;
 	port->send_cmd_return_state = PDC_INVALID;
+	port->vdo_dp_cfg = 0;
 }
 
 /**
@@ -5873,12 +5898,24 @@ uint8_t pdc_power_mgmt_get_dp_pin_mode(int port)
 		return 0;
 	}
 
+	/* Check if Alternate Mode is actually active */
+	if (!(pdc_data[port]->port.connector_status.conn_partner_flags &
+	      CONNECTOR_PARTNER_FLAG_ALTERNATE_MODE)) {
+		LOG_ERR("custom: POWERMNG level: C%d get_dp_pin_mode returning 0 because AltMode bit is not set (Flags: 0x%02x)",
+			port, pdc_data[port]->port.connector_status.conn_partner_flags);
+		return 0;
+	}
+
 	/*
 	 * Byte 1 (bits 15:8) contains the DP Source Device Pin assignment.
 	 * The VDO pin assignments match our MODE_DP_PIN_x definitions.
 	 */
 	pin_mode = (pdc_data[port]->port.vdo_dp_cfg >> 8) & 0xFF;
+	char pin_char = (pin_mode == 0x04) ? 'C' : (pin_mode == 0x08) ? 'D' : (pin_mode == 0x10) ? 'E' : '?';
+	uint8_t flags = pdc_data[port]->port.connector_status.conn_partner_flags;
 
+	LOG_ERR("custom: POWERMNG level: C%d reported Pin Assignment %c (0x%02x). Link Flags: 0x%02x",
+		port, pin_char, pin_mode, flags);
 	LOG_INF("C%d: DP pin mode 0x%02x", port, pin_mode);
 
 	return pin_mode;
@@ -5889,15 +5926,21 @@ mux_state_t pdc_power_mgmt_get_dp_mux_mode(int port)
 	int pin_mode = get_dp_pin_mode(port);
 	/* Default dp_port_mf_allow is true */
 	int mf_pref = PD_VDO_DPSTS_MF_PREF(pdc_power_mgmt_get_dp_status(port));
+	mux_state_t mux_mode;
 
 	/*
 	 * Multi-function operation is only allowed if that pin config is
 	 * supported.
 	 */
 	if ((pin_mode & MODE_DP_PIN_MF_MASK) && mf_pref)
-		return USB_PD_MUX_DOCK;
+		mux_mode = USB_PD_MUX_DOCK;
 	else
-		return USB_PD_MUX_DP_ENABLED;
+		mux_mode = USB_PD_MUX_DP_ENABLED;
+
+	LOG_ERR("custom: POWERMNG level: C%d final MUX selection: %d (pin_mode=0x%02x, mf_pref=%d)",
+		port, mux_mode, pin_mode, mf_pref);
+
+	return mux_mode;
 }
 #endif
 

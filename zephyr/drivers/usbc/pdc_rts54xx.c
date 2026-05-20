@@ -630,6 +630,8 @@ static int get_ara(const struct device *dev, uint8_t *ara)
 
 static void perform_pdc_init(struct pdc_data_t *data)
 {
+	const struct pdc_config_t *cfg = data->dev->config;
+	LOG_ERR("custom: DRIVER level: RTK%d trigger HARD RESET / INIT", cfg->connector_number);
 	data->init_retry_counter = 0;
 	data->error_status.raw_value = 0;
 	/* Set initial local state of Init */
@@ -1315,6 +1317,19 @@ static enum smf_state_result st_read_run(void *o)
 		return SMF_EVENT_HANDLED;
 	}
 
+	/* Log everything read from the PDC */
+	LOG_ERR("custom: DRIVER level: RTK%d cmd %s (%d). Raw Read: %02x %02x %02x %02x %02x %02x %02x %02x",
+		cfg->connector_number, cmd_names[data->cmd], data->cmd,
+		data->rd_buf[0], data->rd_buf[1], data->rd_buf[2], data->rd_buf[3],
+		data->rd_buf[4], data->rd_buf[5], data->rd_buf[6], data->rd_buf[7]);
+
+	if (data->cmd == CMD_GET_VDO && len >= 2) {
+		uint8_t pin = data->rd_buf[2];
+		char pin_char = (pin == 0x04) ? 'C' : (pin == 0x08) ? 'D' : (pin == 0x10) ? 'E' : '?';
+		LOG_ERR("custom: DRIVER level: RTK%d reports Pin Assignment %c (0x%02x)",
+			cfg->connector_number, pin_char, pin);
+	}
+
 	/* Get length of data returned */
 	len = data->rd_buf[0];
 
@@ -1663,6 +1678,14 @@ static int rts54_post_command_with_callback(const struct device *dev,
 	data->user_buf = user_buf;
 	data->cmd = cmd;
 	data->cc_cb_tmp = callback;
+
+	if (cmd == CMD_GET_VDO || cmd == CMD_RAW_UCSI || cmd == CMD_GET_ATTENTION_VDO) {
+		LOG_ERR("custom: DRIVER level: RTK%d posting cmd %s (%d). Raw Write: %02x %02x %02x %02x %02x %02x %02x %02x",
+			((const struct pdc_config_t *)(dev->config))->connector_number,
+			cmd_names[cmd], cmd,
+			data->wr_buf[0], data->wr_buf[1], data->wr_buf[2], data->wr_buf[3],
+			data->wr_buf[4], data->wr_buf[5], data->wr_buf[6], data->wr_buf[7]);
+	}
 
 	/* If sending a raw UCSI command, byte[2] is the actual UCSI command
 	 * being executed.
