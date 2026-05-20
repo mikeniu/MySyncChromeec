@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5711f3a_5cee7e94",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-05-20T20:44:42Z",
+      "side": 1,
+      "message": "Bypassing the coverage vote because the only changed line is an uncalled UT stub function.",
+      "revId": "42419c56d6af88df8d82a8bfdf33b4f0d6da6232",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
