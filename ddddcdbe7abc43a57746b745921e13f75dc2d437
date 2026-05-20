@@ -35,6 +35,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2c50c2c_f6f0b478",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-20T08:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "78766c63_9a783e3c",
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "310f4b66_e0e21fa9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-20T08:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3534ab6d_0ce1a983",
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "da86a805_912a78c3",
@@ -48,6 +84,30 @@
       "writtenOn": "2026-05-19T23:25:08Z",
       "side": 1,
       "message": "In `SendBootromCommandSha` and `SendBootromCommandAes`, you construct the header using raw pointer arithmetic (`uint8_t *cmd_iv \u003d cmd_ptr + kStatusHeaderSize + kWrappedCommandSize;`). This is hard to read and prone to off-by-one errors.\n\nSince you already use `__attribute__((packed))` successfully in `ec_protocol_defs.h`, you can define your Secure Channel headers the same way.\n\n**The Struct:**\n\n```c\nstruct SecureCommandShaHeader {\n    uint8_t command_id \u003d EgisBootrom::CMD_SECURE_WRAPPED;\n    uint8_t algo \u003d CRYPTO_SHA_256;\n    uint32_t payload_len; // Ensure this is converted to LE before assignment\n    std::array\u003cuint8_t, 32\u003e hash;\n} __attribute__((packed));\n\n```\n\n**Simplified `SendBootromCommandSha` Setup:**\n\n```c\nSecureCommandShaHeader header;\nheader.payload_len \u003d htole32(static_cast\u003cuint32_t\u003e(data.size()));\nSHA256(data.data(), data.size(), header.hash.data());\n\nstd::vector\u003cuint8_t\u003e cmd;\ncmd.reserve(sizeof(header) + data.size());\nconst auto* header_bytes \u003d reinterpret_cast\u003cconst uint8_t*\u003e(\u0026header);\ncmd.append_range(std::span(header_bytes, sizeof(header)));\ncmd.append_range(data);\n\n```",
+      "range": {
+        "startLine": 180,
+        "startChar": 0,
+        "endLine": 193,
+        "endChar": 49
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1be02172_cecb2a86",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-20T08:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da86a805_912a78c3",
       "range": {
         "startLine": 180,
         "startChar": 0,
@@ -75,6 +135,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e41c9f69_a39b8916",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-20T08:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eec15978_36d152a4",
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5db3eb7c_72c8ee8a",
@@ -88,6 +166,30 @@
       "writtenOn": "2026-05-19T23:21:54Z",
       "side": 1,
       "message": "In `bootrom.cc`, this bitwise shifting block appears **9 times** to serialize 32-bit integers into the command vectors:\n\n```c\n// Appears in WriteReg, ReadReg, BackupFlash, ReadFlash, EraseFlash, WriteFlash...\nfor (int i \u003d 0; i \u003c 4; i++)\n    cmd.push_back((addr \u003e\u003e (i * 8)) \u0026 0xFF);\n\n```\n\nSince you are already building a `ReadLittleEndian` helper, you can build its exact opposite to handle this safely and cleanly.\n\n**The Helper:**\n\n```c\ntemplate \u003cstd::integral T\u003e\nvoid AppendLittleEndian(std::vector\u003cuint8_t\u003e\u0026 vec, T value) {\n    if constexpr (std::endian::native !\u003d std::endian::little) {\n        value \u003d std::byteswap(value);\n    }\n    const auto* bytes \u003d reinterpret_cast\u003cconst uint8_t*\u003e(\u0026value);\n    // C++23 feature: append_range\n    vec.append_range(std::span(bytes, sizeof(T))); \n}\n\n```\n\n**Before (`EraseFlash`):**\n\n```c\nstd::vector\u003cuint8_t\u003e data;\ndata.push_back(EgisBootrom::CMD_FLASH_ERASE);\nuint32_t addr \u003d EgisBootrom::FLASH_BASE_ADDR + offset;\nfor (int i \u003d 0; i \u003c 4; i++) data.push_back((addr \u003e\u003e (i * 8)) \u0026 0xFF);\nfor (int i \u003d 0; i \u003c 4; i++) data.push_back((size \u003e\u003e (i * 8)) \u0026 0xFF);\n\n```\n\n**After:**\n\n```c\nstd::vector\u003cuint8_t\u003e data \u003d { EgisBootrom::CMD_FLASH_ERASE };\nAppendLittleEndian(data, EgisBootrom::FLASH_BASE_ADDR + offset);\nAppendLittleEndian(data, size);\n\n```",
+      "range": {
+        "startLine": 332,
+        "startChar": 0,
+        "endLine": 340,
+        "endChar": 43
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "65fb182c_b9ed54e5",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-20T08:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5db3eb7c_72c8ee8a",
       "range": {
         "startLine": 332,
         "startChar": 0,
@@ -145,6 +247,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9f6ff14_f57aa7a5",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-20T08:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c638bbe_32983a43",
+      "range": {
+        "startLine": 373,
+        "startChar": 0,
+        "endLine": 373,
+        "endChar": 60
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dac808f9_4469b7a6",
@@ -162,6 +288,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c195ac17_e1644c0a",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 509,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-20T08:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dac808f9_4469b7a6",
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "599cd50e_46138eca",
@@ -175,6 +319,30 @@
       "writtenOn": "2026-05-19T23:25:08Z",
       "side": 1,
       "message": "In `SendBootromCommandSha` and `SendBootromCommandAes`, you construct the header using raw pointer arithmetic (`uint8_t *cmd_iv \u003d cmd_ptr + kStatusHeaderSize + kWrappedCommandSize;`). This is hard to read and prone to off-by-one errors.\n\nSince you already use `__attribute__((packed))` successfully in `ec_protocol_defs.h`, you can define your Secure Channel headers the same way.\n\n**The Struct:**\n\n```c\nstruct SecureCommandShaHeader {\n    uint8_t command_id \u003d EgisBootrom::CMD_SECURE_WRAPPED;\n    uint8_t algo \u003d CRYPTO_SHA_256;\n    uint32_t payload_len; // Ensure this is converted to LE before assignment\n    std::array\u003cuint8_t, 32\u003e hash;\n} __attribute__((packed));\n\n```\n\n**Simplified `SendBootromCommandSha` Setup:**\n\n```c\nSecureCommandShaHeader header;\nheader.payload_len \u003d htole32(static_cast\u003cuint32_t\u003e(data.size()));\nSHA256(data.data(), data.size(), header.hash.data());\n\nstd::vector\u003cuint8_t\u003e cmd;\ncmd.reserve(sizeof(header) + data.size());\nconst auto* header_bytes \u003d reinterpret_cast\u003cconst uint8_t*\u003e(\u0026header);\ncmd.append_range(std::span(header_bytes, sizeof(header)));\ncmd.append_range(data);\n\n```",
+      "range": {
+        "startLine": 513,
+        "startChar": 0,
+        "endLine": 513,
+        "endChar": 58
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03500250_df788321",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 513,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-20T08:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "599cd50e_46138eca",
       "range": {
         "startLine": 513,
         "startChar": 0,
@@ -208,6 +376,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0cf31711_1c4040f8",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 514,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-20T08:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3ed73dca_c9500e1b",
+      "range": {
+        "startLine": 514,
+        "startChar": 0,
+        "endLine": 514,
+        "endChar": 60
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b9fbd9c_c7a27abd",
@@ -221,6 +413,30 @@
       "writtenOn": "2026-05-19T23:21:54Z",
       "side": 1,
       "message": "Currently, there are several places where integers are extracted from USB responses using raw pointer arithmetic and `std::memcpy`. This assumes the host machine is little-endian and bypasses bounds checking.\n\n**Locations to update in `bootrom.cc`:**\n\n* `GetBootromInfo()`: Parsing `version`, `max_size`, and `max_fw_upgrade_size`.  \n* `GetFlashInfo()`: Parsing `flash_size`.  \n* `ReadReg()`: Parsing `value_out`.  \n* `SendBootromCommandAes()`: Parsing `rsp_wrapped_len`.\n\n**Suggestion:** Since we are compiling with C++23, we can use `\u003cbit\u003e` and `std::span` to create a zero-cost, type-safe, and bounds-checked parsing helper.\n\n**1\\. Add this helper function (e.g., in `bootrom.cc` or a shared utility header):**\n\n```c\n#include \u003cbit\u003e\n#include \u003cconcepts\u003e\n#include \u003ccstring\u003e\n#include \u003cexpected\u003e\n#include \u003cspan\u003e\n\ntemplate \u003cstd::integral T\u003e\nstd::expected\u003cT, int\u003e ReadLittleEndian(std::span\u003cconst uint8_t\u003e buffer) {\n    if (buffer.size() \u003c sizeof(T)) return std::unexpected(-1);\n\n    T value;\n    std::memcpy(\u0026value, buffer.data(), sizeof(T));\n    \n    if constexpr (std::endian::native !\u003d std::endian::little) {\n        value \u003d std::byteswap(value);\n    }\n    return value;\n}\n\n```\n\n**2\\. Example replacement in `GetBootromInfo()`:**\n\n*Before:*\n\n```c\nif (resp-\u003esize() \u003e\u003d 12) {\n    uint32_t version, max_size, max_fw_upgrade_size;\n    std::memcpy(\u0026version, resp-\u003edata(), 4);\n    std::memcpy(\u0026max_size, resp-\u003edata() + 4, 4);\n    std::memcpy(\u0026max_fw_upgrade_size, resp-\u003edata() + 8, 4);\n    // ...\n\n```\n\n*After:*\n\n```c\nstd::span\u003cconst uint8_t\u003e payload \u003d resp.value();\n\nauto version \u003d ReadLittleEndian\u003cuint32_t\u003e(payload);\nauto max_size \u003d ReadLittleEndian\u003cuint32_t\u003e(payload.subspan(4));\nauto max_fw_up_size \u003d ReadLittleEndian\u003cuint32_t\u003e(payload.subspan(8));\n\nif (!version || !max_size || !max_fw_up_size) {\n    std::println(stderr, \"[ERROR] Truncated response in GetBootromInfo\");\n    return -1;\n}\n\nstd::println(\"Bootrom Version: 0x{:x}\", version.value());\nstd::println(\"Max Command Size: {} bytes\", max_size.value());\nstd::println(\"Max FW Upgrade Size: {} bytes\", max_fw_up_size.value());\n\n```\n\n**3\\. Example replacement in `SendBootromCommandAes()`:**\n\n*Before:*\n\n```c\nuint32_t rsp_wrapped_len \u003d 0;\nstd::memcpy(\u0026rsp_wrapped_len, \u0026ret[kStatusHeaderSize], sizeof(rsp_wrapped_len));\n\n```\n\n*After:*\n\n```c\nauto len_res \u003d ReadLittleEndian\u003cuint32_t\u003e(std::span(ret).subspan(kStatusHeaderSize));\nif (!len_res) return std::unexpected(-4); // Or appropriate error code\nuint32_t rsp_wrapped_len \u003d len_res.value();\n\n```",
+      "range": {
+        "startLine": 633,
+        "startChar": 0,
+        "endLine": 636,
+        "endChar": 57
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3bd1580_61052ab9",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 636,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-20T08:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8b9fbd9c_c7a27abd",
       "range": {
         "startLine": 633,
         "startChar": 0,
@@ -248,6 +464,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6d2eb99_69238331",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-20T08:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c0ccb455_136819f1",
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e6a704da_71089ba9",
@@ -261,6 +495,30 @@
       "writtenOn": "2026-05-19T22:59:03Z",
       "side": 1,
       "message": "This would be much simpler and less error-prone with `getopt_long`.\n\nHere\u0027s Gemini-generated code that can fix it. Review it for correctness and make sure it compiles in the chroot.\n\n---\n\n### Why `getopt_long` is Better Here\n\n1. **Standard UX:** Your current implementation uses single dashes for long words (e.g., `-flashfw`). Standard POSIX convention dictates single dashes for single characters (`-f`) and double dashes for words (`--flashfw`). `getopt_long` natively enforces this standard, meaning users can also use standard assignments like `--offset\u003d0x1000`.\n2. **Eliminates Bounds Checking Clutter:** You currently have `if (i + 1 \u003c argc)` scattered throughout your loop to prevent segfaults when a user forgets to provide a value. `getopt_long` handles missing arguments automatically via the `required_argument` flag.\n3. **Scalability:** As the tool grows, a clean `switch` statement is much easier to read and maintain than a growing chain of `if-else` string comparisons.\n\n### Example Implementation\n\nHere is how you can refactor your `main` function to use `getopt_long`. This also includes the fix for the `strtol` underflow bug.\n\n```cpp\n#include \u003cgetopt.h\u003e\n#include \u003ccstdlib\u003e\n\n// ... inside main() ...\n\nint main(int argc, char *argv[]) {\n    std::string mode;\n    std::string fw_path;\n    std::string key_path;\n    std::string algo_type \u003d \"SHA256\";\n    uint32_t flash_offset \u003d 0x00001000;\n    uint32_t fw_size_override \u003d 0x0;\n    bool dump_cmd_fw \u003d false;\n\n    static struct option long_options[] \u003d {\n        {\"flashfw\",  required_argument, nullptr, \u0027f\u0027},\n        {\"flashcmd\", required_argument, nullptr, \u0027c\u0027},\n        {\"algo\",     required_argument, nullptr, \u0027a\u0027},\n        {\"key\",      required_argument, nullptr, \u0027k\u0027},\n        {\"offset\",   required_argument, nullptr, \u0027o\u0027},\n        {\"size\",     required_argument, nullptr, \u0027s\u0027},\n        {\"dumpcmd\",  no_argument,       nullptr, \u0027d\u0027},\n        {\"help\",     no_argument,       nullptr, \u0027h\u0027},\n        {nullptr, 0, nullptr, 0}\n    };\n\n    int opt;\n    int option_index \u003d 0;\n    \n    // The colon after a letter indicates it requires an argument.\n    while ((opt \u003d getopt_long_only(argc, argv, \"f:c:a:k:o:s:dh\", long_options, \u0026option_index)) !\u003d -1) {\n        switch (opt) {\n            case \u0027f\u0027:\n                mode \u003d \"flashfw\";\n                fw_path \u003d optarg;\n                break;\n            case \u0027c\u0027:\n                mode \u003d \"flashcmd\";\n                fw_path \u003d optarg;\n                break;\n            case \u0027a\u0027:\n                algo_type \u003d optarg;\n                break;\n            case \u0027k\u0027:\n                key_path \u003d optarg;\n                break;\n            case \u0027o\u0027:\n            case \u0027s\u0027: {\n                char *endptr \u003d nullptr;\n                // FIX: Use signed long to correctly catch negative inputs\n                long val \u003d std::strtol(optarg, \u0026endptr, 16);\n                if (endptr \u003d\u003d optarg || *endptr !\u003d \u0027\\0\u0027 || val \u003c 0) {\n                    std::println(stderr, \"[ERROR] Invalid hex value for argument: {}\", optarg);\n                    return -1;\n                }\n                if (opt \u003d\u003d \u0027o\u0027) flash_offset \u003d static_cast\u003cuint32_t\u003e(val);\n                if (opt \u003d\u003d \u0027s\u0027) fw_size_override \u003d static_cast\u003cuint32_t\u003e(val);\n                break;\n            }\n            case \u0027d\u0027:\n                dump_cmd_fw \u003d true;\n                break;\n            case \u0027h\u0027:\n            case \u0027?\u0027: // \u0027?\u0027 is returned when an unknown option is encountered\n                PrintHelp(); // Move your help text to a separate function\n                return 0;\n            default:\n                return -1;\n        }\n    }\n\n    // Check for missing mandatory arguments after parsing\n    if (mode.empty()) {\n        std::println(stderr, \"[ERROR] You must specify a mode (--flashfw or --flashcmd)\");\n        return -1;\n    }\n\n    // ... continue with USB connection logic ...\n\n```\n\n*Note: I used `getopt_long_only` in the example above. This function allows long options to be triggered with either a single `-` or a double `--`, which will preserve backwards compatibility with your current script usages while smoothly transitioning to standard POSIX double-dashes.*",
+      "range": {
+        "startLine": 108,
+        "startChar": 0,
+        "endLine": 248,
+        "endChar": 2
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea5f7e68_f6a88187",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-20T08:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e6a704da_71089ba9",
       "range": {
         "startLine": 108,
         "startChar": 0,
@@ -318,6 +576,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0da96249_c0462ad5",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-20T08:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e6380dad_87918440",
+      "range": {
+        "startLine": 251,
+        "startChar": 0,
+        "endLine": 251,
+        "endChar": 43
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3368b059_7ab6d7ee",
@@ -331,6 +613,30 @@
       "writtenOn": "2026-05-19T23:04:31Z",
       "side": 1,
       "message": "**Hardcoded Sub-Strings** In `et171_flash.cc`, you have conditional checks for `\"AESGCM\"` and `\"SHA256\"` scattered throughout the CLI parsing and configuration steps.\n\n* **Remediation:** Parse the string once into an `enum class CryptoAlgo` variable during the argument parsing loop to prevent typos and simplify downstream switch/if statements.",
+      "range": {
+        "startLine": 298,
+        "startChar": 0,
+        "endLine": 298,
+        "endChar": 50
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c36fef60_10dfdcc4",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-20T08:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3368b059_7ab6d7ee",
       "range": {
         "startLine": 298,
         "startChar": 0,
@@ -364,6 +670,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "88834633_3cee2b01",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-20T08:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8699d5ff_4c2163fa",
+      "range": {
+        "startLine": 418,
+        "startChar": 2,
+        "endLine": 434,
+        "endChar": 17
+      },
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "32ed4e69_5fccbda9",
@@ -377,6 +707,24 @@
       "writtenOn": "2026-05-19T21:07:13Z",
       "side": 1,
       "message": "[Gerrit AI Review] ⚠️ **Logic Improvement:** The return value of `BulkWrite` is checked for errors (`\u003c 0`), but it doesn\u0027t verify that the number of bytes transferred matches the requested size. Short writes can happen in USB transfers and should be handled or treated as an error here.\n\nConsider checking:\n```cpp\nif (ret !\u003d static_cast\u003cint\u003e(buf.size())) {\n    // Handle short write error\n}\n```",
+      "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99c19a08_d485faa1",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 523,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-20T08:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "32ed4e69_5fccbda9",
       "revId": "ddddcdbe7abc43a57746b745921e13f75dc2d437",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
