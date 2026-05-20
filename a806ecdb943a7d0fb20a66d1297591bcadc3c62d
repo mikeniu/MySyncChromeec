@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80d2d8cd_b244a163",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T16:28:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `data.size()` is `size_t`. If it exceeds `UINT32_MAX`, it will be truncated when cast to `uint32_t`. While the tool currently uses 32KB chunks, it might be safer to add a check or use a more robust conversion if larger payloads are ever supported.",
+      "revId": "a806ecdb943a7d0fb20a66d1297591bcadc3c62d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1df4b4a_8f7c1d9a",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T16:28:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The short options string `\"f:c:b:r:a:k:o:s:dh\"` contains `b:` and `r:` which do not have corresponding entries in `long_options`. Are these intended to be used, or are they leftovers from a previous version?",
+      "revId": "a806ecdb943a7d0fb20a66d1297591bcadc3c62d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f49b1eac_32d43aa3",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T16:28:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Using `strtol` for hex values can be problematic if the values exceed the range of `long` (especially on 32-bit systems, though less likely here). For addresses and sizes, `strtoul` or `strtoull` is generally safer as it explicitly handles unsigned values.",
+      "revId": "a806ecdb943a7d0fb20a66d1297591bcadc3c62d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dacdd6ae_7ce0b385",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T16:28:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Resizing the firmware vector here might interact unexpectedly with the `subspan(flash_offset)` at line 408. If `flash_offset` is non-zero, the total amount of data flashed will be `fw_size_override - flash_offset`. Is this the intended behavior for the `--size` argument?",
+      "revId": "a806ecdb943a7d0fb20a66d1297591bcadc3c62d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a4bb5fb_e184e2a7",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T16:28:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The `flash_offset` is used here as an offset into the input firmware file, but at line 410 it is also used as the starting address on the device flash.\n\nThis coupling means you cannot flash the beginning of a file to a non-zero address, or flash from a non-zero file offset to address 0. Consider separating these into `--src-offset` and `--dst-offset`, or clarifying if this dual use is intended behavior.",
+      "revId": "a806ecdb943a7d0fb20a66d1297591bcadc3c62d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
