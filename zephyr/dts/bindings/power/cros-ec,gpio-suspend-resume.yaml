@@ -1,0 +1,23 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: |
+  Driver to control GPIOs based on AP power state.
+  GPIOs referenced by their named-gpio node phandles are asserted
+  (set active) on AP POWER_STARTUP / POWER_PRE_INIT and de-asserted
+  (set inactive) on AP POWER_HARD_OFF.
+
+  The driver reads GPIO specs from the referenced named-gpio nodes,
+  using the same flags and pin configuration already defined there.
+
+compatible: "cros-ec,gpio-suspend-resume"
+
+properties:
+  gpio-list:
+    type: phandles
+    required: true
+    description: |
+      Array of phandles to named-gpio nodes. These GPIOs are asserted
+      (set active) on POWER_STARTUP and de-asserted (set inactive) on
+      POWER_HARD_OFF.
