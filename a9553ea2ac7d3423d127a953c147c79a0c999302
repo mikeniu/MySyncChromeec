@@ -46,6 +46,30 @@
       },
       "revId": "a9553ea2ac7d3423d127a953c147c79a0c999302",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad82a254_2d311b0b",
+        "filename": "zephyr/program/ocelot/src/rvp_suspend_resume.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-05-20T07:01:14Z",
+      "side": 1,
+      "message": "Sure Keith, I am working on implementing driver. Here is the WIP CL for that.\nhttps://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7862463",
+      "parentUuid": "44bb61d6_b644b7b0",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 74
+      },
+      "revId": "a9553ea2ac7d3423d127a953c147c79a0c999302",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
