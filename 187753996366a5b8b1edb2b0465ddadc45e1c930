@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8eb02748_9ef7492a",
+        "filename": "common/i2c_controller.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-05-20T15:34:37Z",
+      "side": 1,
+      "message": "FYI: Removing this condition here breaks compare-builds. But none of the remaining build targets ever use the i2c_drv API interface (only bitbang driver used it, which was never used with Zephyr and is now being removed). It is always the Zephyr pathway in i2c_xfer_unlocked or chip_i2c_xfer.",
+      "range": {
+        "startLine": 116,
+        "startChar": 0,
+        "endLine": 116,
+        "endChar": 73
+      },
+      "revId": "187753996366a5b8b1edb2b0465ddadc45e1c930",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
