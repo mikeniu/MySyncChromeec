@@ -20,6 +20,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4d1f6772_5da0c3b5",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T16:41:50Z",
+      "side": 1,
+      "message": "Right now, if a function like `SendBootromCommandSha` fails, it returns `-1`, `-2`, `-3`, or `-4`. If a user or developer sees an error like `[ERROR] read_flash failed at addr 0x80001000 with code -3`, they have to manually trace the source code to figure out that `-3` means \"USB payload was too small.\"\n\nHere is why an `enum class` is the best approach, especially since the patch already uses C++23\u0027s `std::expected`:\n\n### 1\\. Synergy with `std::expected`\n\nYou are currently using `std::expected\u003cstd::vector\u003cuint8_t\u003e, int\u003e`. By defining an error enum, you make the failure modes self-documenting.\n\n```c\nenum class BootromError {\n  kSuccess \u003d 0,\n  kUsbWriteFailed,\n  kUsbReadFailed,\n  kResponseTruncated,\n  kInvalidStatusHeader,\n  kAuthenticationFailed,\n  kTimeout\n};\n\n// The signature becomes infinitely more readable:\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e SendBootromCommandSha(...);\n\n```\n\n### 2\\. Eliminates Ambiguity\n\nIn `BootromComm::SendBootromCommandAes`, you currently have error codes cascading down to `-7`:\n\n```c\nif (transferred \u003c\u003d 0) return std::unexpected(-3);\n// ...\nif (transferred \u003c kScHeaderSizeAes) return std::unexpected(-4);\n// ...\nif (ret[0] !\u003d 0 || ret[1] !\u003d 0) return std::unexpected(-5);\n\n```\n\nChanging these to named constants prevents the developer from having to keep a mental map of what `-5` means versus `-6`.\n\n```c\nif (transferred \u003c\u003d 0) return std::unexpected(BootromError::kUsbReadFailed);\nif (transferred \u003c kScHeaderSizeAes) return std::unexpected(BootromError::kResponseTruncated);\nif (ret[0] !\u003d 0 || ret[1] !\u003d 0) return std::unexpected(BootromError::kInvalidStatusHeader);\n\n```\n\n### 3\\. Better Error Logging\n\nBy using an `enum class`, you can easily write a helper function to convert the error into a string for logging, rather than printing the raw integer.\n\n```c\nconstexpr std::string_view ToString(BootromError err) {\n  switch (err) {\n    case BootromError::kUsbWriteFailed: return \"USB Write Failed\";\n    case BootromError::kAuthenticationFailed: return \"AES-GCM Authentication Failed\";\n    // ...\n    default: return \"Unknown Error\";\n  }\n}\n\n// Usage:\nauto resp \u003d SendBootromCommand(cmd, current_read);\nif (!resp.has_value()) {\n  std::println(stderr, \"[ERROR] read_flash failed: {}\", ToString(resp.error()));\n}\n\n```\n\n### Suggested Implementation Strategy\n\nCreate two distinct enums for the two main domains of failure:\n\n1. **`UsbError`** in `usb_comm.h` (wrapping standard libusb errors).  \n2. **`BootromError`** in `bootrom.h` (for protocol-specific errors like tag mismatches, invalid headers, or timeout polling).",
+      "range": {
+        "startLine": 272,
+        "startChar": 0,
+        "endLine": 272,
+        "endChar": 31
+      },
+      "revId": "a806ecdb943a7d0fb20a66d1297591bcadc3c62d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3c27c4c9_ebd7183d",
         "filename": "util/egis/bootrom.h",
         "patchSetId": 17
