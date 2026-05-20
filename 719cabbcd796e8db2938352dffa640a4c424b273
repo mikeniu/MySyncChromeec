@@ -53,6 +53,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3fbceb6_52b2b1b3",
+        "filename": "common/usb_common.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-20T16:00:12Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b7956c7f_a64f8d16",
+      "revId": "719cabbcd796e8db2938352dffa640a4c424b273",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9be78c2c_4035b1d6",
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "Checked 4.8.2 with this change and the test is passing.",
       "parentUuid": "9be78c2c_4035b1d6",
+      "revId": "719cabbcd796e8db2938352dffa640a4c424b273",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48c89c5b_f70bced1",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 3058,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-20T16:00:12Z",
+      "side": 1,
+      "message": "Calling `set_state_tc` again seems wrong. We wouldn\u0027t want to run the enter function again. I think this case should just return early, like in the case where tCCDebounce is still running.\n\nAlso, I think the force-source check is orthogonal to DTS or at least redundant. The behavior by default here should be to stay in AttachWait.SRC. If we were going to transition to a sink state, we\u0027d have to transit Unattached.SNK. There\u0027s no transition defined from AttachWait.SRC to AttachWait.SNK. Ignoring a policy flag change, this should just be\n```\nif (debug sink and debug port)\n   Debug accessory state\nelse if (debug sink)\n    return\nelse ...\n```\nThe double check on debug sink/reduced nesting is because I think it might make the overall flow simpler. See below.\n\nThis change would mean that in the condition with a non-TS port attached to a DTS sink, we effectively don\u0027t respond to the force-sink flag. This was already the case, but we would have exited this state and handled it in the subsequent unattached or attached state. Now that we\u0027re staying in this state, we need handling for that. I think that was basically what you were trying to do here.\n\nI think there are two options here:\n1. Add a check for force-sink _first_, before the actual CC checks. \\\n   Pros: Simple, obviously prioritizes policy over CC state, transitions ASAP \\\n   Cons: Redundant with checks in other states in every case but this one\n2. Add a check for force-sink in the DTS/non-TS case \\\n   Pros: Only covers the case that is not already covered \\\n   Cons: More subtle than the other way\n   \nI\u0027d try option 1 first.",
+      "parentUuid": "175040bd_63021673",
       "revId": "719cabbcd796e8db2938352dffa640a4c424b273",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
