@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cc09139_79c0e496",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:06:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/5c05102b-3189-4a65-b226-caf912bb0e7e)]\n\n### Review Summary\n*   **Functionality**: The CL correctly implements image data offset handling in the fingerprint simulator. It shifts the destination pointer based on the devicetree configuration and appropriately excludes raw/vendor capture types.\n*   **Security**: Robust bounds checking has been added to ensure that the combination of offset and frame size does not result in an out-of-bounds write to the destination buffer.\n*   **Style**: The code follows the established patterns in the simulator driver and is easy to read.\n*   **Testing**: The devicetree overlay for the native simulator test has been updated to exercise the new offset logic.",
+      "revId": "88bb519de65caf4b68a93647b778096283451c79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c617fef_375dca23",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:06:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The `offset \u003c image_buf_size` check is a good safety measure to prevent buffer underflow when calculating `safe_buf_size` and subsequent OOB writes to `image_buf`.",
+      "revId": "88bb519de65caf4b68a93647b778096283451c79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15fdb3c7_00bc4f0e",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T18:06:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Should the source pointer `config-\u003eimage_buffer` also be shifted by `offset` if the simulator is loaded with a full raw frame? Currently, it always copies from the start of `config-\u003eimage_buffer`. If the simulator is intended to be loaded with only the pixel data (and then place it at `offset` in the target), this is correct. However, if it\u0027s loaded with a full frame, this might copy the header into the image area.",
+      "revId": "88bb519de65caf4b68a93647b778096283451c79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
