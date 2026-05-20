@@ -40,6 +40,11 @@
 #define LIS2DH_INT2_ON_INT1_MASK 0x20
 
 #define LIS2DH_OUT_X_L_ADDR 0x28
+#define LIS2DH_OUT_X_H_ADDR 0x29
+#define LIS2DH_OUT_Y_L_ADDR 0x2A
+#define LIS2DH_OUT_Y_H_ADDR 0x2B
+#define LIS2DH_OUT_Z_L_ADDR 0x2C
+#define LIS2DH_OUT_Z_H_ADDR 0x2D
 
 #define LIS2DH_CTRL1_ADDR 0x20
 #define LIS2DH_INT2_ON_INT1_MASK 0x20
@@ -103,6 +108,7 @@ enum lis2dh_fmode {
 #define LIS2DH_H_ACTIVE_MASK 0x02
 
 /* Output data rate Mask register */
+#define LIS2DH_ACC_ODR_ADDR LIS2DH_CTRL1_ADDR
 #define LIS2DH_ACC_ODR_MASK 0xf0
 
 /* Acc data rate */
@@ -123,16 +129,16 @@ enum lis2dh_odr {
 #define LIS2DH_ODR_MAX_VAL MOTION_MAX_SENSOR_FREQUENCY(400000, 25000)
 
 /* Return ODR reg value based on data rate set */
-#define LIS2DH_ODR_TO_REG(_odr)                 \
-	(_odr <= 1000)	? LIS2DH_ODR_1HZ_VAL :  \
-	(_odr <= 10000) ? LIS2DH_ODR_10HZ_VAL : \
-			  ((31 - __builtin_clz(_odr / 25000))) + 3
+#define LIS2DH_ODR_TO_REG(_odr)                \
+	(_odr <= 1000) ? LIS2DH_ODR_1HZ_VAL :  \
+	(_odr < 25000) ? LIS2DH_ODR_10HZ_VAL : \
+			 ((31 - __builtin_clz(_odr / 25000))) + 3
 
 /* Return ODR real value normalized to sensor capabilities */
 #define LIS2DH_ODR_TO_NORMALIZE(_odr) \
-	(_odr <= 1000)	? 1000 :      \
-	(_odr <= 10000) ? 10000 :     \
-			  (25000 * (1 << (31 - __builtin_clz(_odr / 25000))))
+	(_odr <= 1000) ? 1000 :       \
+	(_odr < 25000) ? 10000 :      \
+			 (25000 * (1 << (31 - __builtin_clz(_odr / 25000))))
 
 /* Return ODR real value normalized to sensor capabilities from reg value */
 #define LIS2DH_REG_TO_NORMALIZE(_reg)           \
@@ -159,6 +165,12 @@ enum lis2dh_odr {
 #elif defined(CONFIG_ACCEL_LIS2DH)
 #define LIS2DH_RESOLUTION 10
 #endif
+
+/** Maximum possible sample */
+#define LIS2DH_SAMPLE_MAX ((1 << (LIS2DH_RESOLUTION - 1)) - 1)
+
+/** Smallest possible sample */
+#define LIS2DH_SAMPLE_MIN (-(1 << (LIS2DH_RESOLUTION - 1)))
 
 extern const struct accelgyro_drv lis2dh_drv;
 
