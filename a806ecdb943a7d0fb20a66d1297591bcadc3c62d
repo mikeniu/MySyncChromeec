@@ -123,6 +123,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "31e15b3c_e27d4db5",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-20T19:33:13Z",
+      "side": 1,
+      "message": "A safer modern C++ way is to use `from_chars`. Here\u0027s a Gemini-generated example:\n\n----\n\n```cpp\n#include \u003ccharconv\u003e\n#include \u003cconcepts\u003e\n#include \u003cexpected\u003e\n#include \u003cstring_view\u003e\n#include \u003csystem_error\u003e\n\ntemplate \u003cstd::integral T\u003e\nstd::expected\u003cT, std::errc\u003e ParseHex(std::string_view strv) {\n  if (strv.empty()) return std::unexpected(std::errc::invalid_argument);\n\n  // Strip standard hex prefixes\n  if (strv.starts_with(\"0x\") || strv.starts_with(\"0X\")) {\n    strv.remove_prefix(2);\n  }\n  \n  if (strv.empty()) return std::unexpected(std::errc::invalid_argument);\n\n  T val;\n  auto [ptr, ec] \u003d std::from_chars(strv.data(), strv.data() + strv.size(), val, 16);\n\n  // Catch overflow or formatting errors natively reported by from_chars\n  if (ec !\u003d std::errc{}) {\n    return std::unexpected(ec);\n  }\n\n  // Catch trailing garbage (e.g., \"1000xyz\")\n  if (ptr !\u003d strv.data() + strv.size()) {\n    return std::unexpected(std::errc::invalid_argument);\n  }\n\n  return val;\n}\n\n```\n\n### Upgrading the Caller\n\nNow, inside your `switch` statement, you can inspect the error and provide precise feedback to the user if they make a mistake:\n\n```cpp\n      case \u0027o\u0027:\n      case \u0027s\u0027: {\n        auto parsed_val \u003d ParseHex\u003cuint32_t\u003e(optarg);\n        if (!parsed_val) {\n          if (parsed_val.error() \u003d\u003d std::errc::result_out_of_range) {\n            std::println(stderr, \"[ERROR] Hex value \u0027{}\u0027 is too large (exceeds 32-bit limit).\", optarg);\n          } else {\n            std::println(stderr, \"[ERROR] Invalid characters found in hex argument: {}\", optarg);\n          }\n          return -1;\n        }\n        \n        if (opt \u003d\u003d \u0027o\u0027) flash_offset \u003d parsed_val.value();\n        if (opt \u003d\u003d \u0027s\u0027) fw_size_override \u003d parsed_val.value();\n        break;\n      }\n\n```",
+      "parentUuid": "f49b1eac_32d43aa3",
+      "revId": "a806ecdb943a7d0fb20a66d1297591bcadc3c62d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dacdd6ae_7ce0b385",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 17
