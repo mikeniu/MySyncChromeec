@@ -16,6 +16,138 @@
       "message": "I tested Patchset#19 on hardware and works correctly",
       "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01835013_d64ef05e",
+        "filename": "zephyr/drivers/cros_flash/Kconfig",
+        "patchSetId": 19
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-20T15:46:05Z",
+      "side": 1,
+      "message": "This change seems to be unnecessary.",
+      "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55d8466b_7a46c560",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-20T15:46:05Z",
+      "side": 1,
+      "message": "```suggestion\n\t\tLOG_ERR(\"Flash write protection is not continuous\");\n```",
+      "range": {
+        "startLine": 147,
+        "startChar": 31,
+        "endLine": 147,
+        "endChar": 53
+      },
+      "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f68ac37_b4292a41",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-20T15:46:05Z",
+      "side": 1,
+      "message": "Few things here:\n- I think it would be cleaner without `ranges_overlap()`, because it\u0027s easy to confuse parameters. (if you use `check_prot_reg()` in `cros_flash_em32f967_get_protect()` then `ranges_overlap()` will be called here only).\n- Please add a comment that we return that the region is protected even if it\u0027s protected only partially.",
+      "range": {
+        "startLine": 190,
+        "startChar": 5,
+        "endLine": 190,
+        "endChar": 63
+      },
+      "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ab0c391_b781c1a1",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-20T15:46:05Z",
+      "side": 1,
+      "message": "Can we use `check_prot_reg()` to avoid code duplication?",
+      "range": {
+        "startLine": 309,
+        "startChar": 0,
+        "endLine": 318,
+        "endChar": 69
+      },
+      "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a429da3a_cb2bdd09",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-20T15:46:05Z",
+      "side": 1,
+      "message": "If the protection is not enabled we have no flags to report. I think we can return early here.\n\n\n```suggestion\n\tif (!state.enabled) {\n\t\tgoto exit_flash;\n\t}\n\n\tprot_start \u003d state.start;\n\tprot_end \u003d state.end;\n```",
+      "range": {
+        "startLine": 341,
+        "startChar": 0,
+        "endLine": 347,
+        "endChar": 2
+      },
+      "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e916c83e_8d72cae4",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-20T15:46:05Z",
+      "side": 1,
+      "message": "Can we change this to take protection start and protection end? I just don\u0027t want to worry about possible bank size mismatch between your private library and this driver.",
+      "range": {
+        "startLine": 470,
+        "startChar": 2,
+        "endLine": 470,
+        "endChar": 28
+      },
+      "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
