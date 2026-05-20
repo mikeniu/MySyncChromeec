@@ -152,6 +152,9 @@ config LINK_TEST_SUITE_LOCATE_CHIP_ALTS
 	  Compile a binary that allows the non herobrine paths of the locate
 	  chip command to execute
 
+config LINK_TEST_SUITE_LIS2DH
+	bool "Link tests for lis2dh driver"
+
 config LINK_TEST_SUITE_LSM6DSM
 	bool "Link tests for lsm6dsm driver"
 
