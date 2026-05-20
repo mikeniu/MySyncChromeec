@@ -366,6 +366,15 @@ config EMUL_ICM42607
 	help
 	  Enable the ICM42607 accelerometer and gyroscope emulator.
 
+config EMUL_LIS2DH
+	bool "lis2dh emulator"
+	default y
+	depends on DT_HAS_CROS_LIS2DH_ENABLED
+	select EMUL_COMMON_I2C
+	select SENSOR
+	help
+	  Enable the LIS2DH accelerometer.
+
 config EMUL_LSM6DSM
 	bool "lsm6dsm emulator"
 	default y
