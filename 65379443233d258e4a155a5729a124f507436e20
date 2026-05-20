@@ -16,6 +16,24 @@
       "message": "Is this still needed?",
       "revId": "65379443233d258e4a155a5729a124f507436e20",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f139add2_6bd110e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-05-20T08:02:53Z",
+      "side": 1,
+      "message": "Yes. The query sent from pdc_power_mgmt should be handled in ti driver.",
+      "parentUuid": "b4da025c_5c2539bd",
+      "revId": "65379443233d258e4a155a5729a124f507436e20",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
