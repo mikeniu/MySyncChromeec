@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa5a1adf_0238b611",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T19:21:29Z",
+      "side": 1,
+      "message": "We\u0027re now ready to convert this to modern C++23. This simplifies the code and makes it much safer through use of RAII. Here is the Gemini-generated code. Review for correctness and make sure it compiles. You\u0027ll need to change the `build.mk` file to compile C++:\n\n```\nhost-util-bin-cxx-y +\u003d focaltech_fingerprint_iap\n```",
+      "revId": "f0e1f5401782cba4cabda434dcc978aec0463cf4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

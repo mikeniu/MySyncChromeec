@@ -54,6 +54,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "85a8a910_fc759b54",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T19:21:29Z",
+      "side": 1,
+      "message": "I think we\u0027re now at the point where we can rewrite chunks in safer C++. I\u0027ll open a new thread for that.",
+      "parentUuid": "b68ad8ce_430df0ed",
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "636b600b_c980a20c",
