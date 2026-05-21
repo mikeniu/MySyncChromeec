@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bff45804_888a8cab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:15:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/25be5a02-0efb-4919-a487-7740afd2fc06)]\n\n### Review Summary\n- **Functionality:** The new test case correctly targets a potential hardware buffer overflow by manipulating the frame size cache to bypass initial validation. It effectively verifies that `get_frame` catches bounds violations when an offset-shifted read straddles the absolute edge of the physical `fp_buffer`.\n- **Style:** The test follows the existing ZTEST pattern in the file and includes helpful comments explaining the test setup and the \"Cache Pollution\" technique.\n- **Security:** This test improves the security posture of the fingerprint sensor code by verifying that bounds checks are correctly enforced against physical buffer limits, preventing potential out-of-bounds reads.\n- **Overall quality:** High. The test is specific, addresses a non-trivial edge case, and includes a safety check for the offset calculation to avoid setup-related underflows.",
+      "revId": "c368a2dd4adee1b819243e46405c8152ff947d12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
