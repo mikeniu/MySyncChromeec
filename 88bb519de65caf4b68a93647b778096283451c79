@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "19060a9e_ad53954a",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T15:51:52Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7c617fef_375dca23",
+      "revId": "88bb519de65caf4b68a93647b778096283451c79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "15fdb3c7_00bc4f0e",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-05-20T18:06:44Z",
       "side": 1,
       "message": "[Gerrit AI Review] Should the source pointer `config-\u003eimage_buffer` also be shifted by `offset` if the simulator is loaded with a full raw frame? Currently, it always copies from the start of `config-\u003eimage_buffer`. If the simulator is intended to be loaded with only the pixel data (and then place it at `offset` in the target), this is correct. However, if it\u0027s loaded with a full frame, this might copy the header into the image area.",
+      "revId": "88bb519de65caf4b68a93647b778096283451c79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "466c4725_fae39bf7",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T15:51:52Z",
+      "side": 1,
+      "message": "No. `config-\u003eimage_buffer` is the image buffer that we trying to inject. There is no offset here.",
+      "parentUuid": "15fdb3c7_00bc4f0e",
       "revId": "88bb519de65caf4b68a93647b778096283451c79",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
