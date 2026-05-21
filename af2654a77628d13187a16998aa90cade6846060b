@@ -35,6 +35,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a8b923c_af09d3fe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T16:20:21Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "0c75cf16_3866e10e",
+      "revId": "af2654a77628d13187a16998aa90cade6846060b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f814985e_db3c6130",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T16:20:21Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "472158a9_ee0e898d",
+      "revId": "af2654a77628d13187a16998aa90cade6846060b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8026601a_c4bb84c1",
@@ -122,6 +158,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a9e3638_f5190d84",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T16:20:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d3407239_7f4bbdbe",
+      "revId": "af2654a77628d13187a16998aa90cade6846060b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8934d259_74d88657",
@@ -139,6 +193,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0beed901_dfa03f43",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T16:20:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8934d259_74d88657",
+      "revId": "af2654a77628d13187a16998aa90cade6846060b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "85bf6ba2_12849cf0",
@@ -152,6 +224,24 @@
       "writtenOn": "2026-05-21T15:58:17Z",
       "side": 1,
       "message": "[Gerrit AI Review] Consider initializing `output_buffer` with a canary value (e.g., `memset(output_buffer, 0xA5, sizeof(output_buffer))`) before calling `get_frame`. While `fp_buffer` is zeroed in `get_frame_before`, explicit initialization of the output buffer makes the test more robust against future changes in the test environment.",
+      "revId": "af2654a77628d13187a16998aa90cade6846060b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c323d1cb_93547838",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T16:20:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "85bf6ba2_12849cf0",
       "revId": "af2654a77628d13187a16998aa90cade6846060b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
