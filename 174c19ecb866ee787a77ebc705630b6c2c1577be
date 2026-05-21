@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "78801c67_fdb2bfc0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T16:44:12Z",
+      "side": 1,
+      "message": "Throughout bootrom.cc and ec\\_comm.cc, buffers are pre-allocated and timeouts are passed inline:\n\n* std::vector\\\u003cuint8\\_t\\\u003e ret(4096 \\+ kStatusHeaderSize, 0);  \n* std::vector\\\u003cuint8\\_t\\\u003e resp\\_buf(512);  \n* SendBootromCommand(data, current\\_read, 5000ms);  \n* std::this\\_thread::sleep\\_for(std::chrono::milliseconds(800)); (in et171\\_flash.cc)\n\n**The Fix:** Centralize these limits at the top of their respective classes or in a shared config block:\n\n```c\n// In bootrom.h\nclass BootromComm {\n public:\n  static constexpr size_t kMaxPayloadSize \u003d 4096;\n  static constexpr auto kFlashEraseTimeout \u003d std::chrono::milliseconds(5000);\n  // ...\n};\n\n// In ec_comm.h\nclass EcComm {\n public:\n  static constexpr size_t kMaxResponseSize \u003d 512;\n  // ...\n};\n\n```\n\nThen use kMaxPayloadSize \\+ kStatusHeaderSize and kFlashEraseTimeout in the implementation. It immediately tells the reader *why* that specific size or duration was chosen.",
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "259dde0a_7ea05190",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 19
