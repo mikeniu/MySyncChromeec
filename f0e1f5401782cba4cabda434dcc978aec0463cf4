@@ -69,6 +69,52 @@
       "message": "To ensure the new C++ code is formatted correctly, please add a `.clang-format` file in `util/focaltech` with the following contents:\n\n```\nBasedOnStyle: Google\n```\n\nAdd the file to this CL and then run `clang-format` on all of these files to format them correctly:\n\n```\nfind util/focaltech/ -iname \"*.h\" -o -iname \"*.cc\" | xargs clang-format -i\n```\n\nOnce the `.clang-format` is checked in, future `repo upload`s should warn if there is a problem with formatting and tell you how to run `cros format` to fix it.",
       "revId": "f0e1f5401782cba4cabda434dcc978aec0463cf4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e08c97c2_3cb32853",
+        "filename": "util/focaltech/build.mk",
+        "patchSetId": 12
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T19:30:59Z",
+      "side": 1,
+      "message": "For C++, this will need to change to:\n\n```\nhost-util-bin-cxx-y +\u003d focaltech_fingerprint_iap\n```",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 44
+      },
+      "revId": "f0e1f5401782cba4cabda434dcc978aec0463cf4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dabe7619_5946002d",
+        "filename": "util/focaltech/build.mk",
+        "patchSetId": 12
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T19:30:59Z",
+      "side": 1,
+      "message": "Is this needed?",
+      "range": {
+        "startLine": 19,
+        "startChar": 52,
+        "endLine": 19,
+        "endChar": 68
+      },
+      "revId": "f0e1f5401782cba4cabda434dcc978aec0463cf4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
