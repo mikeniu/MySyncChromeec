@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0a1faf6_9ed3f749",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T16:21:10Z",
+      "side": 1,
+      "message": "In et171\\_flash.cc (RunFlashFw), a pointer to a local file stream is handed to the brom object:\n\n```c\nbrom.SetRawCmdDump(\u0026raw_cmd_fw_file);\n\n```\n\nWhile brom effectively goes out of scope soon after RunFlashFw returns, leaving a pointer to a destroyed local variable inside a longer-lived object (brom is allocated in main()) is an anti-pattern.\n\n**Remediation:** Clear the pointer right before exiting RunFlashFw (brom.SetRawCmdDump(nullptr);), or better yet, move the file management strictly inside the BootromComm class.",
+      "range": {
+        "startLine": 368,
+        "startChar": 0,
+        "endLine": 368,
+        "endChar": 41
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "810c8dc1_5dfc2d49",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 512,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T16:21:10Z",
+      "side": 1,
+      "message": "In et171\\_flash.cc (RunFlashCmd), the size of the wrapped command is extracted directly via std::memcpy:\n\n```c\nuint32_t wrapped_cmd_size \u003d 0;\nstd::memcpy(\u0026wrapped_cmd_size, \u0026firmware[done + 2], sizeof(uint32_t));\n\n```\n\nThis fails entirely if the host tool is compiled on a big-endian architecture. You correctly handle endianness elsewhere via ReadLittleEndian.\n\n**Remediation:** Use your utility function for consistency and safety:\n\n```c\nauto size_opt \u003d ReadLittleEndian\u003cuint32_t\u003e(std::span\u003cconst uint8_t\u003e(\u0026firmware[done + 2], 4));\nif (!size_opt) { /* handle error */ }\nuint32_t wrapped_cmd_size \u003d size_opt.value();\n\n```",
+      "range": {
+        "startLine": 512,
+        "startChar": 0,
+        "endLine": 512,
+        "endChar": 74
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
