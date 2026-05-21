@@ -52,6 +52,23 @@
       "parentUuid": "fc6efc18_6d55f71c",
       "revId": "f0e1f5401782cba4cabda434dcc978aec0463cf4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5dbca370_65fb9720",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T19:28:33Z",
+      "side": 1,
+      "message": "To ensure the new C++ code is formatted correctly, please add a `.clang-format` file in `util/focaltech` with the following contents:\n\n```\nBasedOnStyle: Google\n```\n\nAdd the file to this CL and then run `clang-format` on all of these files to format them correctly:\n\n```\nfind util/focaltech/ -iname \"*.h\" -o -iname \"*.cc\" | xargs clang-format -i\n```\n\nOnce the `.clang-format` is checked in, future `repo upload`s should warn if there is a problem with formatting and tell you how to run `cros format` to fix it.",
+      "revId": "f0e1f5401782cba4cabda434dcc978aec0463cf4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
