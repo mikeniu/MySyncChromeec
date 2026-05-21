@@ -72,6 +72,9 @@ static const char *cros_system_rtk_get_chip_vendor(const struct device *dev)
 #define RTK_CHIP_INFO_BASE 0x40010B80
 #define CHIP_ID_OFFSET 0x70
 #define RTK_CHIP_INFO_REG (RTK_CHIP_INFO_BASE + CHIP_ID_OFFSET)
+#define CHIP_VERSION_OFFSET 0x74
+#define RTK_CHIP_VERSION_REG (RTK_CHIP_INFO_BASE + CHIP_VERSION_OFFSET)
+
 #define RTK_PUF_INFO_BASE 0x40010800UL
 #define OTP_OFFSET_BASE 0x680UL
 #define OTP_CTRL_REGISTER 0x24
@@ -84,7 +87,8 @@ static const char *cros_system_rtk_get_chip_vendor(const struct device *dev)
 #define PUF_OPERATION_STAGE_ACTIVE 1ul
 #define PUF_OPERATION_STATE_SLEEP 0ul
 #define OTP_TIMEROUT_WAIT 50
-static uint32_t get_otp_chip_info(void)
+
+static void get_otp_chip_data(uint32_t *chip_info, uint32_t *chip_version)
 {
 	uint32_t timeout = k_ms_to_cyc_ceil32(OTP_TIMEROUT_WAIT);
 	uint32_t start, temp_time;
@@ -99,11 +103,10 @@ static uint32_t get_otp_chip_info(void)
 		temp_time = k_cycle_get_32();
 	}
 
-	uint32_t chip_info = *((volatile uint32_t *)RTK_CHIP_INFO_REG);
+	*chip_info = *((volatile uint32_t *)RTK_CHIP_INFO_REG);
+	*chip_version = *((volatile uint32_t *)RTK_CHIP_VERSION_REG);
 
 	*(volatile uint32_t *)RTK_OTP_CTRL_REG = PUF_OPERATION_STATE_SLEEP;
-
-	return chip_info;
 }
 
 union rtk_chip_info_reg {
@@ -115,9 +118,19 @@ union rtk_chip_info_reg {
 	} __packed;
 };
 
+union rtk_chip_version_reg {
+	uint32_t raw;
+	struct {
+		uint16_t reserved;
+		uint8_t sub_version;
+		uint8_t main_version;
+	} __packed;
+};
+
 static struct {
 	bool initialized;
 	union rtk_chip_info_reg info;
+	union rtk_chip_version_reg version;
 } cached_otp;
 
 static void ensure_otp_initialized(void)
@@ -125,30 +138,20 @@ static void ensure_otp_initialized(void)
 	if (cached_otp.initialized)
 		return;
 
-	cached_otp.info.raw = get_otp_chip_info();
+	get_otp_chip_data(&cached_otp.info.raw, &cached_otp.version.raw);
 	cached_otp.initialized = true;
-}
-
-static uint32_t system_get_chip_id(void)
-{
-	ensure_otp_initialized();
-	return cached_otp.info.main_id;
-}
-
-static uint8_t system_get_chip_version(void)
-{
-	ensure_otp_initialized();
-	return cached_otp.info.sub_id;
 }
 
 static const char *cros_system_rtk_get_chip_name(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 
-	static char buf[8];
-	uint32_t chip_id = system_get_chip_id();
+	ensure_otp_initialized();
 
-	snprintf(buf, sizeof(buf), "rts%04x", (uint16_t)chip_id);
+	static char buf[9];
+
+	snprintf(buf, sizeof(buf), "rts%04x%c", cached_otp.info.main_id,
+		 cached_otp.info.sub_id);
 
 	return buf;
 }
@@ -157,10 +160,17 @@ static const char *cros_system_rtk_get_chip_revision(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 
-	static char buf[5];
-	uint8_t rev = system_get_chip_version();
+	ensure_otp_initialized();
 
-	snprintf(buf, sizeof(buf), "%c", rev);
+	static char buf[5];
+	uint8_t main_version = cached_otp.version.main_version;
+	uint8_t sub_version = cached_otp.version.sub_version;
+
+	if (main_version == 0x0)
+		sub_version = sub_version - 5;
+
+	buf[0] = main_version + 'F';
+	snprintf(buf + 1, sizeof(buf) - 1, "%d", sub_version);
 
 	return buf;
 }
