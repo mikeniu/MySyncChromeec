@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3821962b_aa2268f5",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T17:11:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19f7f4e4_24e13db8",
+      "revId": "ac2ed337cbf54383188a0c3ada23a4309531a009",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "69cf8afc_b7ddedb1",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-05-20T18:13:04Z",
       "side": 1,
       "message": "[Gerrit AI Review] While the `reinterpret_cast` hack to \"pollute\" the cache is effective for this test, it relies on the internal layout of `FpFrameSizeCache`. If this pattern is used in multiple tests, consider adding a `__test_only` setter method to `FpFrameSizeCache` for better maintainability.",
+      "revId": "ac2ed337cbf54383188a0c3ada23a4309531a009",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e9c836a_f79269e8",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T17:11:17Z",
+      "side": 1,
+      "message": "can potentially do that.",
+      "parentUuid": "69cf8afc_b7ddedb1",
       "revId": "ac2ed337cbf54383188a0c3ada23a4309531a009",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
