@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5bafda7c_77e674ff",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 23
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-21T14:18:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "21bec0fd_f5fff4a6",
+      "range": {
+        "startLine": 7,
+        "startChar": 39,
+        "endLine": 7,
+        "endChar": 45
+      },
+      "revId": "1b43d5935c607a4d2a86349d21eb5c41c9182b52",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f8f731fe_bdbac968",
@@ -49,6 +73,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "80a65055_b310bf7c",
+        "filename": "zephyr/drivers/pwrmon/Kconfig",
+        "patchSetId": 23
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-21T14:18:55Z",
+      "side": 1,
+      "message": "I will fix it in the next iteration.",
+      "parentUuid": "f8f731fe_bdbac968",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 17
+      },
+      "revId": "1b43d5935c607a4d2a86349d21eb5c41c9182b52",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6a36f1c2_ffb0b7ba",
         "filename": "zephyr/drivers/pwrmon/pwrmon.c",
         "patchSetId": 23
@@ -60,6 +108,30 @@
       "writtenOn": "2026-05-06T23:16:21Z",
       "side": 1,
       "message": "Model this like a normal zephyr driver.  Add  `DT_DRV_COMPAT` and use `DEVICE_DT_INST_DEFINE` instead of the `SYS_INIT` call.",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 62
+      },
+      "revId": "1b43d5935c607a4d2a86349d21eb5c41c9182b52",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33b34142_70c2e176",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 23
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-21T14:18:55Z",
+      "side": 1,
+      "message": "I will fix it in the next iteration.",
+      "parentUuid": "6a36f1c2_ffb0b7ba",
       "range": {
         "startLine": 17,
         "startChar": 0,
