@@ -49,6 +49,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e494f7a7_90945686",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T16:44:01Z",
+      "side": 1,
+      "message": "In bootrom.cc, various read/write methods inject 0x04 or 0x01 into the command buffer without any explanation:\n\n```c\n// Old:\nstd::vector\u003cuint8_t\u003e cmd \u003d {EgisBootrom::kCmdMemRead};\nAppendLittleEndian(cmd, addr);\ncmd.push_back(0x04); // What is 0x04?\n\n```\n\nThese appear to be access sizes or memory space identifiers (e.g., 0x04 for Word/Register access, 0x01 for Byte/Flash access).\n\n**The Fix:** Define these inside the EgisBootrom namespace in bootrom.h:\n\n```c\n// In bootrom.h\nnamespace EgisBootrom {\n  constexpr uint8_t kAccessSizeByte \u003d 0x01;\n  constexpr uint8_t kAccessSizeWord \u003d 0x04;\n}\n\n// In bootrom.cc\ncmd.push_back(EgisBootrom::kAccessSizeWord);\n\n```",
+      "range": {
+        "startLine": 392,
+        "startChar": 0,
+        "endLine": 392,
+        "endChar": 22
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8fa49487_2b188f54",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 612,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T16:44:01Z",
+      "side": 1,
+      "message": "The DisableWatchdog function in bootrom.cc blasts several unexplained hex values into registers:\n\n```c\n// Old:\nWriteReg(EgisBootrom::kRegPwmCtrl, 0x00000004);\nWriteReg(EgisBootrom::kRegPwmReload, 0x00070a21);\n\n```\n\n**The Fix:** These should be defined as constexpr bitmasks alongside the register addresses in bootrom.h. Even if the exact bitfields aren\u0027t fully documented by the vendor, naming the *entire* payload after its purpose is better than raw hex:\n\n```c\n// In bootrom.h\nconstexpr uint32_t kPwmCtrlDisableMask \u003d 0x00000004;\nconstexpr uint32_t kPwmReloadTimeoutVal \u003d 0x00070a21;\n\n// In bootrom.cc\nWriteReg(EgisBootrom::kRegPwmCtrl, kPwmCtrlDisableMask);\n\n```",
+      "range": {
+        "startLine": 603,
+        "startChar": 0,
+        "endLine": 612,
+        "endChar": 12
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "127a73ac_1a0bac39",
         "filename": "util/egis/bootrom.h",
         "patchSetId": 19
