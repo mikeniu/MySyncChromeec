@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29294644_e18bf5a2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:00:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n\n*   **Functionality**: The CL adds a comprehensive set of unit tests for the `get_frame` function, covering normal operations and various error conditions (locked system, invalid parameters, overflows). The tests effectively use the FFF framework and Zephyr\u0027s ztest.\n*   **Security**: `get_frame` implementation correctly implements access control checks (`system_is_locked`) and boundary validation, which are critical for security and stability. The tests verify these paths.\n*   **Style**: The new test file is well-structured, follows Zephyr test conventions, and uses clear, descriptive test names and assertions.\n*   **Testing**: This CL significantly improves the test coverage for the fingerprint sensor subsystem by adding targeted unit tests for a critical frame-retrieval function.\n\n[[trajectory](go/traj/91a1f3f4-b43f-4a3b-b43c-539417eec878)]",
+      "revId": "a2f615006164252fa8ac3ae68a8a65aa6391e3de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c61c7053_3947f942",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:00:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This test setup check only verifies that the first two bytes are within `fp_buffer` bounds. To ensure the test setup is fully valid and that the subsequent `get_frame` call (which reads `size` bytes) doesn\u0027t encounter an intentional boundary error, consider checking the entire range: `zassert_true(absolute_destination + size \u003c\u003d FP_SENSOR_IMAGE_SIZE, ...)`. (Note: `absolute_destination + size` is the inclusive end of the read)",
+      "revId": "a2f615006164252fa8ac3ae68a8a65aa6391e3de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13f16dd1_f5b5d349",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:00:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since `fp_buffer` is zeroed in `get_frame_before`, you could strengthen this test by verifying that the entire `output_buffer` matches the expected state (e.g., zeroes for the rest of the `size` bytes) instead of just checking the first two bytes. This would confirm that `get_frame` correctly copied the entire requested range.",
+      "revId": "a2f615006164252fa8ac3ae68a8a65aa6391e3de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "083fa098_fb965dc3",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:00:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Similar to the shifted layout test, this boundary check should ideally cover the entire requested `size` to guarantee the test setup is valid for the whole `memcpy` operation: `zassert_true(absolute_destination + size \u003c\u003d FP_SENSOR_IMAGE_SIZE, ...)`.",
+      "revId": "a2f615006164252fa8ac3ae68a8a65aa6391e3de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14d2227a_45cee897",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:00:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider adding a boundary check for the test setup here as well, for consistency and robustness against future changes to `kMaxReadSize` or `FP_SENSOR_IMAGE_SIZE`: `zassert_true(offset + size \u003c\u003d FP_SENSOR_IMAGE_SIZE, ...)`.",
+      "revId": "a2f615006164252fa8ac3ae68a8a65aa6391e3de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
