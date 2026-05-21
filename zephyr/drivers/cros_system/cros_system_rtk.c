@@ -100,22 +100,29 @@ static uint32_t get_otp_chip_info(void)
 	return chip_info;
 }
 
+union rtk_chip_info_reg {
+	uint32_t raw;
+	struct {
+		uint8_t reserved;
+		uint8_t sub_id;
+		uint16_t main_id;
+	} __packed;
+};
+
 static uint32_t system_get_chip_id(void)
 {
-	/* [31:16] main id */
-	uint32_t raw_id = get_otp_chip_info();
-	uint16_t main_id = (raw_id >> 16) & 0xFFFF;
+	union rtk_chip_info_reg reg;
 
-	return main_id;
+	reg.raw = get_otp_chip_info();
+	return reg.main_id;
 }
 
 static uint8_t system_get_chip_version(void)
 {
-	/* [15:8] chip version */
-	uint32_t raw_id = get_otp_chip_info();
-	uint16_t sub_id = (raw_id >> 8) & 0xFF;
+	union rtk_chip_info_reg reg;
 
-	return sub_id;
+	reg.raw = get_otp_chip_info();
+	return reg.sub_id;
 }
 
 const char *cros_system_chip_name(void)
