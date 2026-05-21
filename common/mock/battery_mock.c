@@ -230,5 +230,8 @@ void battery_get_params(struct batt_params *batt)
 	batt_new.status = battery_status_value;
 	batt_new.is_present = battery_is_present_value;
 
+	if (IS_ENABLED(CONFIG_CMD_BATTFAKE))
+		battery_apply_fake_params(&batt_new);
+
 	memcpy(batt, &batt_new, sizeof(*batt));
 }

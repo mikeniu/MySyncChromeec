@@ -353,6 +353,27 @@ void battery_set_fake_soc(int soc);
 int battery_get_fake_soc(void);
 
 /**
+ * Set the fake battery temperature.
+ *
+ * @param temp		Temperature in 0.1 K or -1 to use real temperature.
+ */
+void battery_set_fake_temp(int temp);
+
+/**
+ * Get the current fake battery temperature.
+ *
+ * @return temperature or -1 if not faking.
+ */
+int battery_get_fake_temp(void);
+
+/**
+ * Apply faked parameters if faking is enabled.
+ *
+ * @param batt		Battery parameters to modify
+ */
+void battery_apply_fake_params(struct batt_params *batt);
+
+/**
  * Read battery charge cycle count.
  *
  * @param count		Destination for count.
