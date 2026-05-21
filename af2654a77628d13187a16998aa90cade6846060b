@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "472158a9_ee0e898d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T15:58:17Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n\n*   **Functionality**: The CL adds a comprehensive set of unit tests for the `get_frame` function in the fingerprint sensor subsystem. It covers various error paths (locked system, invalid capture types, overflows) and success paths (absolute reads, shifted layout reads).\n*   **Security**: The tests verify that `get_frame` correctly handles access control (system locked) and boundary checks, which are critical for security and stability.\n*   **Style**: The new test file follows Zephyr test conventions and uses clear, descriptive test names.\n*   **Testing**: This CL significantly improves the test coverage for a critical piece of the fingerprint sensor driver.\n\n[[trajectory](go/traj/a4d56242-337b-45a6-ae29-edf0c7f4b55b)]",
+      "revId": "af2654a77628d13187a16998aa90cade6846060b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8026601a_c4bb84c1",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
         "patchSetId": 8
@@ -84,6 +101,57 @@
       "side": 1,
       "message": "`fp_frame_size_cache ` is an instance of `FpFrameSizeCache`. \n\n`FpFrameSizeCache` has one private element `frame_sizes_` which is defined as `std::array\u003cuint32_t, FP_CAPTURE_TYPE_MAX\u003e frame_sizes_ \u003d {};`",
       "parentUuid": "31b384cf_38d46e53",
+      "revId": "af2654a77628d13187a16998aa90cade6846060b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3407239_7f4bbdbe",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T15:58:17Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider initializing `output_buffer` with a canary value (e.g., `memset(output_buffer, 0xA5, sizeof(output_buffer))`) before calling `get_frame`. This ensures that the test isn\u0027t accidentally passing due to stale data in the buffer and provides a stronger guarantee that `get_frame` actually wrote the expected values.",
+      "revId": "af2654a77628d13187a16998aa90cade6846060b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8934d259_74d88657",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T15:58:17Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider initializing `output_buffer` with a canary value (e.g., `memset(output_buffer, 0xA5, sizeof(output_buffer))`) before calling `get_frame`. This is consistent with other test cases in this file and helps ensure that the output buffer is truly updated by the function under test.",
+      "revId": "af2654a77628d13187a16998aa90cade6846060b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85bf6ba2_12849cf0",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T15:58:17Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider initializing `output_buffer` with a canary value (e.g., `memset(output_buffer, 0xA5, sizeof(output_buffer))`) before calling `get_frame`. While `fp_buffer` is zeroed in `get_frame_before`, explicit initialization of the output buffer makes the test more robust against future changes in the test environment.",
       "revId": "af2654a77628d13187a16998aa90cade6846060b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
