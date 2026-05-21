@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c165d1ae_e70fde45",
+        "filename": "util/focaltech/focaltech/src/ft_sg_io.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5449f0c_3b9fa2dd",
+      "range": {
+        "startLine": 328,
+        "startChar": 9,
+        "endLine": 328,
+        "endChar": 14
+      },
+      "revId": "d7cd2053738fa43cd2f3bbca630d003f248c9211",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "319a3141_17f0d3cf",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-04-21T21:27:58Z",
       "side": 1,
       "message": "?",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 66,
+        "endChar": 11
+      },
+      "revId": "d7cd2053738fa43cd2f3bbca630d003f248c9211",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3eb4ec5d_34d4dce6",
+        "filename": "util/focaltech/focaltech/src/net_usb.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "319a3141_17f0d3cf",
       "range": {
         "startLine": 66,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "545fcbbd_89f70f87",
+        "filename": "util/focaltech/focaltech/src/net_usb.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dfa11921_0e168c7a",
+      "range": {
+        "startLine": 106,
+        "startChar": 0,
+        "endLine": 112,
+        "endChar": 6
+      },
+      "revId": "d7cd2053738fa43cd2f3bbca630d003f248c9211",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "587cb0fc_0e0b5485",
@@ -93,6 +165,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "160a7027_f982966d",
+        "filename": "util/focaltech/focaltech/src/net_usb.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "fixed",
+      "parentUuid": "587cb0fc_0e0b5485",
+      "range": {
+        "startLine": 126,
+        "startChar": 13,
+        "endLine": 126,
+        "endChar": 17
+      },
+      "revId": "d7cd2053738fa43cd2f3bbca630d003f248c9211",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5b3ca6ae_774f21dc",
@@ -106,6 +202,30 @@
       "writtenOn": "2026-04-21T21:27:58Z",
       "side": 1,
       "message": "?",
+      "range": {
+        "startLine": 154,
+        "startChar": 0,
+        "endLine": 154,
+        "endChar": 9
+      },
+      "revId": "d7cd2053738fa43cd2f3bbca630d003f248c9211",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cbb44f4d_4f44eea1",
+        "filename": "util/focaltech/focaltech/src/net_usb.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b3ca6ae_774f21dc",
       "range": {
         "startLine": 154,
         "startChar": 0,

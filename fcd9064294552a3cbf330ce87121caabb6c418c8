@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "85913e80_61599123",
+        "filename": "util/focaltech/focaltech/include/ff_log.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4b60488e_eb025cfe",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 22
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0f34c623_20bab2dd",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-05-08T20:16:25Z",
       "side": 1,
       "message": "**`__FUNCTION__` vs `__func__` (`ff_log.h`)** In `FF_LOGE`, `__FUNCTION__` is used. While widely supported, `__func__` is the C99 standard identifier and is preferred for portability.\n\n* **Recommendation:** Replace `__FUNCTION__` with `__func__`.",
+      "range": {
+        "startLine": 112,
+        "startChar": 0,
+        "endLine": 112,
+        "endChar": 45
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5779c9cb_c7fe8980",
+        "filename": "util/focaltech/focaltech/include/ff_log.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f34c623_20bab2dd",
       "range": {
         "startLine": 112,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4d70ed1_59b7dcca",
+        "filename": "util/focaltech/focaltech/include/ff_util.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "26290249_bccb0c90",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 21
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "646228b7_bfcf2595",
@@ -93,6 +165,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee889ab9_2bb785af",
+        "filename": "util/focaltech/focaltech/include/ft_help.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "646228b7_bfcf2595",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 2
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e34836bb_6b088fcc",
@@ -106,6 +202,30 @@
       "writtenOn": "2026-05-08T20:09:46Z",
       "side": 1,
       "message": "* In `net_usb.h`, `mbedtls_usb_*` prefixes are used, but the commit notes mention eliminating the `openssl_tiny` dependency, and no `mbedtls` libraries appear linked. Rename these to `ft_usb_*` to reflect the current state of the architecture and avoid naming confusion.",
+      "range": {
+        "startLine": 26,
+        "startChar": 1,
+        "endLine": 68,
+        "endChar": 52
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "584b9bd2_37c4082c",
+        "filename": "util/focaltech/focaltech/include/net_usb.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e34836bb_6b088fcc",
       "range": {
         "startLine": 26,
         "startChar": 1,
@@ -162,6 +282,54 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d17c22bf_c8efe9f1",
+        "filename": "util/focaltech/focaltech/src/ff_util.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Remove this func",
+      "parentUuid": "d3a223e3_231f70a9",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 71
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a125b448_0c28e087",
+        "filename": "util/focaltech/focaltech/src/ff_util.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b7512839_4f13a227",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 71
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7662577_0735ed3d",
@@ -179,6 +347,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8676275d_8993a2ee",
+        "filename": "util/focaltech/focaltech/src/ff_util.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Remove this func",
+      "parentUuid": "f7662577_0735ed3d",
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e41cc0c2_316c6258",
@@ -192,6 +378,30 @@
       "writtenOn": "2026-05-08T20:16:25Z",
       "side": 1,
       "message": "* **Print Formats:** In `ff_util.c`, `printf(\"%p  \", addr);` prints pointers. On a 64-bit host, this prints 16 characters (plus `0x`), misaligning the hex dump layout which seems tightly coded to assume specific column widths. Consider using `%08lX` cast to an integer type if fixed-width alignment is strictly required.",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 22
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76c688f4_e4e8438f",
+        "filename": "util/focaltech/focaltech/src/ff_util.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e41cc0c2_316c6258",
       "range": {
         "startLine": 42,
         "startChar": 0,
@@ -225,6 +435,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "25919e6b_c574ee1f",
+        "filename": "util/focaltech/focaltech/src/ff_util.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4d89caf8_0a49f9de",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 46
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "38c7a364_f58d4094",
@@ -238,6 +472,30 @@
       "writtenOn": "2026-05-08T20:49:38Z",
       "side": 1,
       "message": "In `ft_get_time_local`, the code formats a string into a local array, and then uses `snprintf` to append milliseconds into a second array.\n\n**Current Code:**\n\n```c\n\tstrftime(buff, sizeof(buff), \"%m-%d %H:%M:%S\", \u0026timeinfo);\n\tsnprintf(time_buff, sizeof(buff), \"%s.%03ld\", buff, tv.tv_usec / 1000);\n\n```\n\n**Feedback:** You can do this in-place. `strftime` returns the number of characters written. You can use that return value to append the milliseconds directly to the final buffer, eliminating the need for the intermediate `buff` completely.\n\n**Suggested Rewrite:**\n\n```c\nstatic void ft_get_time_local(char *time_buff, size_t max_len)\n{\n\tstruct timeval tv;\n\tstruct tm timeinfo;\n\n\tgettimeofday(\u0026tv, NULL);\n\tlocaltime_r(\u0026tv.tv_sec, \u0026timeinfo);\n\n\tsize_t len \u003d strftime(time_buff, max_len, \"%m-%d %H:%M:%S\", \u0026timeinfo);\n\tif (len \u003e 0 \u0026\u0026 len \u003c max_len) {\n\t\tsnprintf(time_buff + len, max_len - len, \".%03ld\", tv.tv_usec / 1000);\n\t}\n}\n\n```",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 90,
+        "endChar": 72
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "70c50d09_4cb78828",
+        "filename": "util/focaltech/focaltech/src/ff_util.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "38c7a364_f58d4094",
       "range": {
         "startLine": 89,
         "startChar": 0,
@@ -271,6 +529,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ec42705_2603962a",
+        "filename": "util/focaltech/focaltech/src/ff_util.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3725d761_50cc6c3d",
+      "range": {
+        "startLine": 104,
+        "startChar": 0,
+        "endLine": 104,
+        "endChar": 44
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b707f8b_319c3ad4",
@@ -284,6 +566,30 @@
       "writtenOn": "2026-05-08T20:31:27Z",
       "side": 1,
       "message": "The logging function uses a chained `if/else if` block to determine the ANSI color code based on the log level. This can be simplified into a simple lookup array, matching the existing `log_level_char` array pattern.\n\n**Current Code:**\n\n```c\nif (level \u003d\u003d LOG_LEVEL_ERR) {\n\tprintf(\"\\033[31m[%s] %c [%s] %s \\033[0m\\n\", time_buff, log_level_char[level], tag, buf);\n} else if (level \u003d\u003d LOG_LEVEL_WRN) {\n\tprintf(\"\\033[33m[%s] %c [%s] %s \\033[0m\\n\", time_buff, log_level_char[level], tag, buf);\n} // ...\n\n```\n\n**Suggested Rewrite:** Use an array of color prefixes mapped to the `log_level_t` enum.\n\n```c\nstatic const char *log_colors[] \u003d {\n\t\"\",         /* ALL - no color */\n\t\"\",         /* VBS */\n\t\"\",         /* DBG */\n\t\"\\033[36m\", /* INF - Cyan */\n\t\"\\033[33m\", /* WRN - Yellow */\n\t\"\\033[31m\"  /* ERR - Red */\n};\n\n/* Inside log_printf: */\nconst char *color \u003d (level \u003c\u003d LOG_LEVEL_ERR) ? log_colors[level] : \"\";\nconst char *reset \u003d (color[0] !\u003d \u0027\\0\u0027) ? \"\\033[0m\" : \"\";\n\nprintf(\"%s[%s] %c [%s] %s %s\\n\", color, time_buff, log_level_char[level], tag, buf, reset);\n\n```",
+      "range": {
+        "startLine": 98,
+        "startChar": 0,
+        "endLine": 123,
+        "endChar": 2
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9087f876_7c6408cb",
+        "filename": "util/focaltech/focaltech/src/ff_util.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b707f8b_319c3ad4",
       "range": {
         "startLine": 98,
         "startChar": 0,
@@ -363,6 +669,78 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e0772db_07111194",
+        "filename": "util/focaltech/focaltech/src/ft_sg_io.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c663e5c_62c0f357",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 55
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0a9186c_e95e1e01",
+        "filename": "util/focaltech/focaltech/src/ft_sg_io.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fa563c4_e1e70fa8",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 55
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40a9ee30_fa7a4795",
+        "filename": "util/focaltech/focaltech/src/ft_sg_io.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eb095660_23d697ab",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 55
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8723ed29_01c2fb72",
@@ -376,6 +754,30 @@
       "writtenOn": "2026-05-08T20:09:46Z",
       "side": 1,
       "message": "What is MSC? Write it out in the comment and put the abbreviation in parenthesis.",
+      "range": {
+        "startLine": 81,
+        "startChar": 10,
+        "endLine": 81,
+        "endChar": 13
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94dc1bf5_43a0b07b",
+        "filename": "util/focaltech/focaltech/src/ft_sg_io.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8723ed29_01c2fb72",
       "range": {
         "startLine": 81,
         "startChar": 10,
@@ -403,6 +805,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6a855ea_0685e05d",
+        "filename": "util/focaltech/focaltech/src/ft_sg_io.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d5253fe_975b0f9c",
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e40081a6_249a8db3",
@@ -420,6 +840,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac578401_b0bb1330",
+        "filename": "util/focaltech/focaltech/src/ft_sg_io.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e40081a6_249a8db3",
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0a0fb15a_7004f877",
@@ -433,6 +871,30 @@
       "writtenOn": "2026-05-08T20:16:25Z",
       "side": 1,
       "message": "* **Header Inclusion:** In `ft_usb_port.c`, `strings.h` is included alongside `string.h`. Unless you explicitly need legacy POSIX string functions, `strings.h` can be safely removed.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 20
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c428255f_37c29381",
+        "filename": "util/focaltech/focaltech/src/ft_usb_port.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a0fb15a_7004f877",
       "range": {
         "startLine": 20,
         "startChar": 0,
@@ -466,6 +928,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b5639e5_936198f0",
+        "filename": "util/focaltech/focaltech/src/ft_usb_port.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5abf6e4c_a162a292",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 22
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "db39ced0_61ecbafa",
@@ -479,6 +965,30 @@
       "writtenOn": "2026-05-08T20:09:46Z",
       "side": 1,
       "message": "* **Inconsistent libusb Contexts:** The codebase mixes isolated contexts and the default context. `ft_sg_io.c` initializes an explicit context (`ctx`), `net_usb.c` uses another (`usb_ctx-\u003ectx`), and `ft_usb_port.c` passes `NULL` (`libusb_init(NULL)`), relying on the default context.  \n    \n* *Suggestion:* Unify libusb initialization to share a single application-wide `libusb_context*` to prevent duplicate device polling, resource leaks, and hotplug callback conflicts.",
+      "range": {
+        "startLine": 202,
+        "startChar": 0,
+        "endLine": 202,
+        "endChar": 23
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ccaffb68_6cb6eb7f",
+        "filename": "util/focaltech/focaltech/src/ft_usb_port.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db39ced0_61ecbafa",
       "range": {
         "startLine": 202,
         "startChar": 0,
@@ -512,6 +1022,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "82fdde4c_a0b37a41",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "453d860a_fded1a66",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 19
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d597ab8b_08525d77",
@@ -525,6 +1059,30 @@
       "writtenOn": "2026-05-08T20:31:27Z",
       "side": 1,
       "message": "The codebase currently maintains two identical macros for the SCSI command length, and mixes them indiscriminately in `fun.c`:\n\n* `#define FT_CMD_LENGTH 16` (in `ff_sg_io.h`)  \n* `#define CMD_LENGTH 0x10` (in `fun.c`)\n\n**Feedback:** Remove `#define CMD_LENGTH 0x10` from `fun.c` entirely. Standardize on `FT_CMD_LENGTH` everywhere to avoid confusing maintainers who might assume they represent different buffer sizes.",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 23
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c92cf573_f848f625",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d597ab8b_08525d77",
       "range": {
         "startLine": 24,
         "startChar": 0,
@@ -558,6 +1116,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "85035345_1884caf5",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d7e47a01_2a579664",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 30
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b5715f3e_84b4af37",
@@ -571,6 +1153,30 @@
       "writtenOn": "2026-05-08T20:41:26Z",
       "side": 1,
       "message": "In several places, the code declares a struct and then uses `memset` to zero it out. Modern, idiomatic C allows you to zero-initialize a struct at the point of declaration using `\u003d {0};`. This removes an extra function call and cuts down on boilerplate.\n\n**Current Code (`ft_sg_io` / `ft_device_disable` / `usb_write`):**\n\n```c\n\tstruct sg_io_hdr io_hdr;\n\t// ... variable declarations ...\n\tmemset(\u0026io_hdr, 0, sizeof(io_hdr));\n\n\tstruct bulk_cb_wrap cbw;\n\tmemset(\u0026cbw, 0, sizeof(cbw));\n    \n\tfocal_usb_device_port_method_t method;\n\tmemset(\u0026method, 0, sizeof(focal_usb_device_port_method_t));\n\n```\n\n**Suggested Rewrite:**\n\n```c\n\tstruct sg_io_hdr io_hdr \u003d {0};\n\tstruct bulk_cb_wrap cbw \u003d {0};\n\tfocal_usb_device_port_method_t method \u003d {0};\n\n```\n\n*(Note: You already do this correctly for arrays like `unsigned char transfer_cmd[FT_CMD_LENGTH] \u003d { 0 };`. Apply the same pattern to structs.)*",
+      "range": {
+        "startLine": 94,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 36
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf23b1b1_b0b49478",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b5715f3e_84b4af37",
       "range": {
         "startLine": 94,
         "startChar": 0,
@@ -598,6 +1204,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90c21ae1_afcfd40a",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a15c091_75f61fba",
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "94c558d8_d4c855e7",
@@ -615,6 +1239,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d43131b9_39f8433e",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94c558d8_d4c855e7",
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "83717d59_c2ff2eeb",
@@ -628,6 +1270,30 @@
       "writtenOn": "2026-05-08T20:09:46Z",
       "side": 1,
       "message": "Typo: should be `verify_bin_cmd`",
+      "range": {
+        "startLine": 387,
+        "startChar": 15,
+        "endLine": 387,
+        "endChar": 29
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5e27444_dd6f2311",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "83717d59_c2ff2eeb",
       "range": {
         "startLine": 387,
         "startChar": 15,
@@ -661,6 +1327,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5cbcf372_e5852776",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4270487e_00458a63",
+      "range": {
+        "startLine": 444,
+        "startChar": 0,
+        "endLine": 444,
+        "endChar": 29
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c046735e_7a62ac98",
@@ -674,6 +1364,30 @@
       "writtenOn": "2026-05-08T20:09:46Z",
       "side": 1,
       "message": "What does \"disboot\" mean? Can you add a comment?",
+      "range": {
+        "startLine": 458,
+        "startChar": 0,
+        "endLine": 458,
+        "endChar": 44
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "31d5fb4d_cd3b139c",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c046735e_7a62ac98",
       "range": {
         "startLine": 458,
         "startChar": 0,
@@ -731,6 +1445,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfef60a2_c239187f",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "This code only writes the config page. The FW we release later comes with its own config, so this action is no longer needed. Remove this code.",
+      "parentUuid": "c3ecb240_9488f500",
+      "range": {
+        "startLine": 466,
+        "startChar": 0,
+        "endLine": 466,
+        "endChar": 36
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f255134c_cedf8ff0",
@@ -744,6 +1482,30 @@
       "writtenOn": "2026-05-08T20:36:24Z",
       "side": 1,
       "message": "The `goto` pattern is excellent for centralizing resource cleanup . However, in `ft_disboot` and `ft_download_page`, there are no dynamically allocated resources, locks, or open files to clean up. The `exit` label simply returns the error code.\n\nUsing `goto exit` here just adds visual noise and forces the reader to jump to the bottom of the function to see what happens.\n\n**Current Code (`ft_disboot`):**\n\n```c\n\tret_value \u003d usb_write(write_disbootdata_cmd, CMD_LENGTH, disbootdata,\n\t\t\t      disbootlen, WRITE_DATA_TO_USB);\n\tif (ret_value) {\n\t\tFF_LOGE(\"write disbootdata error!\");\n\t\tgoto exit;\n\t}\n// ...\nexit:\n\treturn ret_value;\n\n```\n\n**Suggested Rewrite:**\nRemove the `exit` label entirely and return immediately upon failure. This makes the functions strictly linear and easier to trace.\n\n```c\n\tret_value \u003d usb_write(write_disbootdata_cmd, CMD_LENGTH, disbootdata,\n\t\t\t      disbootlen, WRITE_DATA_TO_USB);\n\tif (ret_value) {\n\t\tFF_LOGE(\"write disbootdata error!\");\n\t\treturn ret_value;\n\t}\n\n```\n\n*(Apply this exact same simplification to `ft_download_page` as well).*",
+      "range": {
+        "startLine": 521,
+        "startChar": 0,
+        "endLine": 521,
+        "endChar": 12
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa4fb81d_10848afc",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f255134c_cedf8ff0",
       "range": {
         "startLine": 521,
         "startChar": 0,
@@ -777,6 +1539,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ce56c6f_17cd6fcb",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 560,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "069f2d47_2db327b9",
+      "range": {
+        "startLine": 560,
+        "startChar": 0,
+        "endLine": 560,
+        "endChar": 72
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0f55f2fe_746f5a56",
@@ -790,6 +1576,30 @@
       "writtenOn": "2026-05-08T20:13:05Z",
       "side": 1,
       "message": "**Abrupt Program Termination (`fun.c`)** In the `update_fw` function, there are multiple instances where `exit(FT_RESULT_FAIL);` is called upon encountering an error (e.g., during WP set/get operations or download failures). Calling `exit()` deep within a business-logic function is an anti-pattern. It prevents the caller (`main()`) from executing necessary cleanup routines, such as `mbedtls_usb_free()`.\n\n* **Recommendation:** Replace `exit(FT_RESULT_FAIL);` with `return;` (since the function signature is `void update_fw()`) or ideally, change the signature to `int update_fw()` and `return FT_RESULT_FAIL;`, allowing `main()` to gracefully handle the failure, perform cleanup, and return a proper exit code.",
+      "range": {
+        "startLine": 660,
+        "startChar": 0,
+        "endLine": 685,
+        "endChar": 2
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "922fc203_f4275c5e",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 685,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f55f2fe_746f5a56",
       "range": {
         "startLine": 660,
         "startChar": 0,
@@ -823,6 +1633,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f285826_dfd06df6",
+        "filename": "util/focaltech/focaltech/src/main.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "74e1d253_19581256",
+      "range": {
+        "startLine": 160,
+        "startChar": 0,
+        "endLine": 160,
+        "endChar": 44
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2e8f1698_3505b5e1",
@@ -836,6 +1670,30 @@
       "writtenOn": "2026-05-08T20:09:46Z",
       "side": 1,
       "message": "* **CLI Argument Parsing \u0026 Help Text Mismatch (`main.c` \u0026 `ft_help.h`):** There is a disconnect between the documented commands and what `main.c` actually accepts.  \n    \n* The help text says: `./focaltech_fingerprint_iap 1 get_flash_protect`. However, if `argc \u003d\u003d 3` (e.g., passing `1` and a command), `main.c` strictly checks for `force_update_full_ec_bin` or `flash_set_protect`. If you pass a 3-argument command for getting the flash status, it hits the `else { return FT_PARA_ERR; }` block.  \n    \n* The string in `ft_help.h` uses `get_flash_protect`, but the macro `FT_ENTER_GET_FLASH_WP_CMD_STR` expects `flash_get_protect`.  \n    \n* *Suggestion:* Re-evaluate the CLI parsing logic to separate the binary path from operations that don\u0027t require a binary. Use `getopt_long` (which you already include) for sub-commands instead of rigid positional string matching.",
+      "range": {
+        "startLine": 205,
+        "startChar": 0,
+        "endLine": 205,
+        "endChar": 69
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8022560_fc5e0d18",
+        "filename": "util/focaltech/focaltech/src/main.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e8f1698_3505b5e1",
       "range": {
         "startLine": 205,
         "startChar": 0,
@@ -869,6 +1727,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "af300425_3bb0cf9e",
+        "filename": "util/focaltech/focaltech/src/main.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d6349df_b0f30ce9",
+      "range": {
+        "startLine": 248,
+        "startChar": 3,
+        "endLine": 253,
+        "endChar": 23
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35485cb9_b3ddf0eb",
@@ -882,6 +1764,30 @@
       "writtenOn": "2026-05-08T20:21:07Z",
       "side": 1,
       "message": "**Feedback:** The `LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED` branch uses an `else` block that holds the entire initialization logic, which further nests more `if` statements. Handling the `DEVICE_LEFT` event first and using early returns removes the need for `else` branches entirely.\n\nThe following was generated by Gemini, so review for correctness:\n\n-----\n\n**Suggested Rewrite:**\n\n```c\n\tif (LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT \u003d\u003d event) {\n\t\tFF_LOGW(\"usb device removed: %04x:%04x\", desc.idVendor, desc.idProduct);\n\n\t\tif (ret) {\n\t\t\t*ret \u003d FT_USB_DEVICE_REMOVE_MAGIC;\n\t\t}\n\n\t\tif (usb_ctx-\u003ehandle) {\n\t\t\tlibusb_free_device_list(usb_ctx-\u003edevs, 1);\n\t\t\tlibusb_release_interface(usb_ctx-\u003ehandle, 0);\n\t\t\tlibusb_close(usb_ctx-\u003ehandle);\n\t\t\tusb_ctx-\u003ehandle \u003d NULL;\n\t\t\tg_no_device_flag \u003d 0;\n\t\t}\n\t\treturn FT_SUCCESS;\n\t}\n\n\tif (LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED !\u003d event) {\n\t\treturn FT_SUCCESS;\n\t}\n\n\tFF_LOGD(\"usb device attached: %04x:%04x\", desc.idVendor, desc.idProduct);\n\n\tif (usb_ctx-\u003ehandle) {\n\t\tlibusb_close(usb_ctx-\u003ehandle);\n\t\tusb_ctx-\u003ehandle \u003d NULL;\n\t}\n\n\tr \u003d libusb_open(dev, \u0026usb_ctx-\u003ehandle);\n\tif (LIBUSB_SUCCESS !\u003d r) {\n\t\tFF_LOGE(\"error opening device.\");\n\t\treturn FT_SUCCESS; \n\t}\n\n\tif (libusb_kernel_driver_active(usb_ctx-\u003ehandle, 0) \u003d\u003d 1) {\n\t\tFF_LOGD(\"kernel driver active\");\n\t\tif (libusb_detach_kernel_driver(usb_ctx-\u003ehandle, 0) \u003d\u003d 0) {\n\t\t\tFF_LOGD(\"kernel driver detach\");\n\t\t}\n\t}\n\n\tr \u003d libusb_claim_interface(usb_ctx-\u003ehandle, 0); \n\tif (r \u003c 0) {\n\t\tFF_LOGE(\"libusb_claim_interface failed: %s\", libusb_error_name(r));\n\t\treturn FT_NO_SUCH_DEV;\n\t}\n\t\n\tg_no_device_flag \u003d 1;\n\tFF_LOGD(\"usb device open success %p\", usb_ctx-\u003ehandle);\n\t\n\treturn FT_SUCCESS;\n\n```",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 75
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0793e242_c3372361",
+        "filename": "util/focaltech/focaltech/src/net_usb.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35485cb9_b3ddf0eb",
       "range": {
         "startLine": 76,
         "startChar": 0,
@@ -915,6 +1821,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "505d2046_d6a2ddfc",
+        "filename": "util/focaltech/focaltech/src/net_usb.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef0cfed6_c4017602",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 145,
+        "endChar": 1
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fa6c96f9_dd142b1d",
@@ -932,6 +1862,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd88db9b_6777b89a",
+        "filename": "util/focaltech/focaltech/src/net_usb.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa6c96f9_dd142b1d",
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "af888dac_afcbc2d5",
@@ -945,6 +1893,24 @@
       "writtenOn": "2026-05-08T19:56:29Z",
       "side": 1,
       "message": "[Gerrit AI Review] **Memory Leak (Unfreed Device List)**\n\nThe author replied: \u0027No, after the device is found, it still goes to the error label and releases the resources.\u0027\n\nThis is mathematically impossible as written. When the device is found, `ret` is assigned `FT_SUCCESS` (which is `0`). Therefore, when execution hits `if (ret) {` on line 223, the condition evaluates to **false**, and it **skips** the `libusb_free_device_list` block entirely!\n\nFurthermore, `mbedtls_usb_connect()` calls `libusb_get_device_list(..., \u0026usb_ctx-\u003edevs);` *again*, which overwrites the `usb_ctx-\u003edevs` pointer. This permanently leaks the list that was allocated in this function. \n\n**Remediation:** You must unconditionally free the device list on the success path.",
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a0a13e8_ab7aaaa1",
+        "filename": "util/focaltech/focaltech/src/net_usb.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "af888dac_afcbc2d5",
       "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -985,6 +1951,54 @@
       "writtenOn": "2026-05-08T20:20:25Z",
       "side": 1,
       "message": "**Feedback:** The endpoint discovery logic in this function nests 6 levels deep (`while` → `if` → `for` → `for` → `for` → `for` → `if`), making it very difficult to read. We can drastically flatten this by using `continue` to skip non-matching devices and endpoints early.\n\nThe following was generated by Gemini, so please double-check for correctness:\n\n-----\n\n**Suggested Rewrite:**\n\n```c\n\twhile ((dev \u003d usb_ctx-\u003edevs[i++]) !\u003d NULL) {\n\t\tstruct libusb_device_descriptor desc;\n\n\t\tret \u003d libusb_get_device_descriptor(dev, \u0026desc);\n\t\tif (ret \u003c 0) {\n\t\t\tFF_LOGE(\"failed to get device descriptor\");\n\t\t\tgoto error2;\n\t\t}\n\n\t\t/* Guard clause: skip if VID/PID don\u0027t match */\n\t\tif (desc.idVendor !\u003d vid || desc.idProduct !\u003d pid) {\n\t\t\tcontinue;\n\t\t}\n\n\t\tfor (int c \u003d 0; c \u003c desc.bNumConfigurations; c++) {\n\t\t\tstruct libusb_config_descriptor *config;\n\t\t\tret \u003d libusb_get_config_descriptor(dev, c, \u0026config);\n\t\t\tif (ret !\u003d LIBUSB_SUCCESS) {\n\t\t\t\tFF_LOGE(\"couldn\u0027t retrieve descriptors.\");\n\t\t\t\tcontinue;\n\t\t\t}\n\n\t\t\tfor (j \u003d 0; j \u003c config-\u003ebNumInterfaces; j++) {\n\t\t\t\tconst struct libusb_interface *interface \u003d config-\u003einterface + j;\n\t\t\t\tfor (k \u003d 0; k \u003c interface-\u003enum_altsetting; k++) {\n\t\t\t\t\tconst struct libusb_interface_descriptor *alt_interface \u003d interface-\u003ealtsetting + k;\n\t\t\t\t\tfor (l \u003d 0; l \u003c alt_interface-\u003ebNumEndpoints; l++) {\n\t\t\t\t\t\tconst struct libusb_endpoint_descriptor *endpoint \u003d alt_interface-\u003eendpoint + l;\n\t\t\t\t\t\t\n\t\t\t\t\t\t/* Guard clause: only care about BULK endpoints */\n\t\t\t\t\t\tif (endpoint-\u003ebmAttributes !\u003d LIBUSB_TRANSFER_TYPE_BULK) {\n\t\t\t\t\t\t\tcontinue;\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\tu_endpoint_addr_t addr;\n\t\t\t\t\t\taddr.v \u003d endpoint-\u003ebEndpointAddress;\n\n\t\t\t\t\t\tif (addr.s.dir \u003d\u003d 1) {\n\t\t\t\t\t\t\tusb_ctx-\u003eendpoint_in \u003d endpoint-\u003ebEndpointAddress;\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\tusb_ctx-\u003eendpoint_out \u003d endpoint-\u003ebEndpointAddress;\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t\tlibusb_free_config_descriptor(config);\n\t\t}\n\t\tbreak; /* Found our device, exit the while loop */\n\t}\n\n```",
+      "range": {
+        "startLine": 251,
+        "startChar": 0,
+        "endLine": 251,
+        "endChar": 63
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "662117b8_b1470f61",
+        "filename": "util/focaltech/focaltech/src/net_usb.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a1bc896e_f1742345",
+      "range": {
+        "startLine": 251,
+        "startChar": 0,
+        "endLine": 251,
+        "endChar": 63
+      },
+      "revId": "fcd9064294552a3cbf330ce87121caabb6c418c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88e677e2_3725aa3b",
+        "filename": "util/focaltech/focaltech/src/net_usb.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30b695ea_c772d04d",
       "range": {
         "startLine": 251,
         "startChar": 0,

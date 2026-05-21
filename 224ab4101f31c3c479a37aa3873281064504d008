@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e58c33f_eeb38d2b",
+        "filename": "util/focaltech/focaltech/include/ff_defs.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Deleted this file.",
+      "parentUuid": "14c11ee2_de9e0887",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 31
+      },
+      "revId": "224ab4101f31c3c479a37aa3873281064504d008",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8174ddc0_c3bdf94b",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-04-27T16:58:48Z",
       "side": 1,
       "message": "**Potentially Unsafe Sprintf (`ff_util.c`)** In `ft_get_time_local`, `sprintf(time_buff, \"%s.%03ld\", buff, tv.tv_usec / 1000);` is used. While the sizes are statically known and safe in this exact context (`time_buff` is 64 bytes, `buff` is 32), it is best practice to enforce safety.\n\n**Remediation:** Use `snprintf(time_buff, 64, ...)`.",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 57
+      },
+      "revId": "224ab4101f31c3c479a37aa3873281064504d008",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a1cb61e_8977ec4b",
+        "filename": "util/focaltech/focaltech/src/ff_util.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Fixed:https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7831968/1/util/focaltech/focaltech/src/ff_util.c#90",
+      "parentUuid": "8174ddc0_c3bdf94b",
       "range": {
         "startLine": 89,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d823942a_83186a3c",
+        "filename": "util/focaltech/focaltech/src/ft_sg_io.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Fixed it.",
+      "parentUuid": "57b2821c_121b25ba",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 30
+      },
+      "revId": "224ab4101f31c3c479a37aa3873281064504d008",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "02596bbc_4624b5f2",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-04-27T16:58:48Z",
       "side": 1,
       "message": "Remove this commented out code",
+      "range": {
+        "startLine": 107,
+        "startChar": 37,
+        "endLine": 109,
+        "endChar": 24
+      },
+      "revId": "224ab4101f31c3c479a37aa3873281064504d008",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcb6f262_23ce4157",
+        "filename": "util/focaltech/focaltech/src/ft_sg_io.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Fixed",
+      "parentUuid": "02596bbc_4624b5f2",
       "range": {
         "startLine": 107,
         "startChar": 37,
@@ -116,6 +212,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1fa1f682_225bf695",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Fixed:https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7831968/1/util/focaltech/focaltech/src/fun.c#b113",
+      "parentUuid": "b7e58fdb_f446dc1a",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 0
+      },
+      "revId": "224ab4101f31c3c479a37aa3873281064504d008",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "98986cb0_49acc514",
@@ -129,6 +249,30 @@
       "writtenOn": "2026-04-27T16:58:48Z",
       "side": 1,
       "message": "**Missing Error Check on File Length (`fun.c`)** The function `calc_file_len` uses `fseek` and `ftell`, returning an `int`. If `ftell` fails, it returns `-1`. The calling code (`downloadbin` and `VerifyData`) does not check for negative values.\n\n```c\nfile_len \u003d calc_file_len(file); // If this returns -1...\nbuffer \u003d (unsigned char *)malloc(file_len + 16); // malloc(15) due to integer overflow/truncation\ncnt \u003d fread(buffer, 1, file_len, file); // Attempts to read MAX_UINT bytes into a 15-byte buffer.\n```\n\n  **Remediation:** Check `if (file_len \u003c 0)` immediately after returning from `calc_file_len` and exit gracefully.",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 70,
+        "endChar": 1
+      },
+      "revId": "224ab4101f31c3c479a37aa3873281064504d008",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71be8833_ba6e66b6",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Fixed:https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7831968/1/util/focaltech/focaltech/src/fun.c#b279",
+      "parentUuid": "98986cb0_49acc514",
       "range": {
         "startLine": 61,
         "startChar": 0,
@@ -162,6 +306,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c156e8b_10dfe66a",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "fixed",
+      "parentUuid": "9c5024aa_a22b9d54",
+      "range": {
+        "startLine": 300,
+        "startChar": 45,
+        "endLine": 300,
+        "endChar": 63
+      },
+      "revId": "224ab4101f31c3c479a37aa3873281064504d008",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "df1c1318_0e0d5d6d",
@@ -175,6 +343,30 @@
       "writtenOn": "2026-04-27T16:58:48Z",
       "side": 1,
       "message": "**Double Initialization / Resource Leak (`net_usb.c` \u0026 `main.c`)** In `main.c`, `ft_device_init` makes these consecutive calls:  \n    \n  1. `mbedtls_usb_exist(\u0026pid, \u0026vid);`  \n  2. `mbedtls_usb_init(pid, vid);`\n\n\n  Both functions contain this logic: `ret \u003d libusb_init(\u0026usb_ctx-\u003ectx);`. Because `usb_ctx-\u003ectx` is initialized twice without a corresponding `libusb_exit`, the original context is leaked, and the internal state of `libusb` is corrupted. **Remediation:** Refactor context management. Call `libusb_init` exactly once during application startup (or carefully pair each init with an exit).",
+      "range": {
+        "startLine": 146,
+        "startChar": 0,
+        "endLine": 146,
+        "endChar": 49
+      },
+      "revId": "224ab4101f31c3c479a37aa3873281064504d008",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3a4928a_83fc2038",
+        "filename": "util/focaltech/focaltech/src/main.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Fixed it:https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7831968/1/util/focaltech/focaltech/src/main.c#b188",
+      "parentUuid": "df1c1318_0e0d5d6d",
       "range": {
         "startLine": 146,
         "startChar": 0,
@@ -208,6 +400,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7908bd69_0e94ed6e",
+        "filename": "util/focaltech/focaltech/src/main.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Fixed:https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7831968/1/util/focaltech/focaltech/src/main.c#b248",
+      "parentUuid": "a8ec2c4d_576ec8f3",
+      "range": {
+        "startLine": 246,
+        "startChar": 0,
+        "endLine": 259,
+        "endChar": 4
+      },
+      "revId": "224ab4101f31c3c479a37aa3873281064504d008",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f51f62b5_8287b2dc",
@@ -221,6 +437,30 @@
       "writtenOn": "2026-04-27T16:58:48Z",
       "side": 1,
       "message": "**Memory Corruption via Hotplug Callback Pointer (`net_usb.c`)** In `mbedtls_usb_init`, the arguments passed to `libusb_hotplug_register_callback` are misaligned:\n\n```c\nret \u003d libusb_hotplug_register_callback(\n    usb_ctx-\u003ectx, ..., usb_event_callback,\n    \u0026callback_handle, \u0026hp[0]);\n```\n\n  Here, `\u0026callback_handle` is passed as the `user_data` argument, and `\u0026hp[0]` is passed as the handle pointer. Inside `usb_event_callback`, `user_data` is cast to an `int*` and overwritten:\n\n```c\nint *ret \u003d (int *)user_data;\nif (ret) {\n    *ret \u003d 0x55aa;\n}\n```\n\n  This overwrites `callback_handle` with `0x55aa`. Later, `mbedtls_usb_free` tries to deregister the callback using this corrupted handle, which will fail or crash. **Remediation:** Pass a proper flag variable pointer (like `\u0026g_no_device_flag` or a dedicated status variable) for `user_data`, and pass `\u0026callback_handle` as the final argument.",
+      "range": {
+        "startLine": 149,
+        "startChar": 0,
+        "endLine": 149,
+        "endChar": 60
+      },
+      "revId": "224ab4101f31c3c479a37aa3873281064504d008",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7978e3b_ff31213c",
+        "filename": "util/focaltech/focaltech/src/net_usb.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "fixed",
+      "parentUuid": "f51f62b5_8287b2dc",
       "range": {
         "startLine": 149,
         "startChar": 0,

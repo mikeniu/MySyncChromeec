@@ -77,6 +77,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcbd3f63_76c5024e",
+        "filename": "util/focaltech/focaltech/include/ff_common.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "636b600b_c980a20c",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 23
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e6a6f17d_9fcefa59",
@@ -90,6 +114,30 @@
       "writtenOn": "2026-04-21T22:28:51Z",
       "side": 1,
       "message": "Doesn\u0027t appear to be used. Please remove.",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 39
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9491ed5_1eb118aa",
+        "filename": "util/focaltech/focaltech/include/ff_log.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e6a6f17d_9fcefa59",
       "range": {
         "startLine": 46,
         "startChar": 0,
@@ -123,6 +171,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "775fe6c5_e7f56dca",
+        "filename": "util/focaltech/focaltech/include/ff_util.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "482257dc_427d5dfb",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 33
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7bede2b_f2737579",
@@ -136,6 +208,30 @@
       "writtenOn": "2026-04-21T22:28:51Z",
       "side": 1,
       "message": "Doesn\u0027t ever appear to be defined. Please remove.",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 73
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe9cadc1_0972d1fa",
+        "filename": "util/focaltech/focaltech/include/ff_util.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7bede2b_f2737579",
       "range": {
         "startLine": 73,
         "startChar": 0,
@@ -169,6 +265,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "61db121a_070700a7",
+        "filename": "util/focaltech/focaltech/include/net_usb.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e48f291c_ee2e10ea",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 6
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1ea137ad_c7109720",
@@ -192,6 +312,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a1b55d8_c29035c8",
+        "filename": "util/focaltech/focaltech/src/ft_sg_io.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1ea137ad_c7109720",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 29
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7c10b6a1_43cc9341",
@@ -205,6 +349,30 @@
       "writtenOn": "2026-04-21T21:49:53Z",
       "side": 1,
       "message": "#### **Unsafe Hotplug Registration in `ft_sg_io.c`**\n\nIn `ft_sg_open()`, you register a hotplug callback using `libusb_hotplug_register_callback()`. However, unlike `mbedtls_usb_init()` in `net_usb.c`, you do not verify if the underlying platform supports hotplug events via `libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG)`. On unsupported systems, this will silently fail or cause unpredictable behavior.",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 2
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9e2b60e_d0f54a68",
+        "filename": "util/focaltech/focaltech/src/ft_sg_io.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c10b6a1_43cc9341",
       "range": {
         "startLine": 65,
         "startChar": 0,
@@ -262,6 +430,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "474dd608_c3db058b",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f02eb264_3b59626b",
+      "range": {
+        "startLine": 103,
+        "startChar": 0,
+        "endLine": 173,
+        "endChar": 1
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d13e8f7f_c9a019c7",
@@ -285,6 +477,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7733bc7_218c9628",
+        "filename": "util/focaltech/focaltech/src/fun.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d13e8f7f_c9a019c7",
+      "range": {
+        "startLine": 458,
+        "startChar": 11,
+        "endLine": 458,
+        "endChar": 37
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "641b8483_64f24f43",
@@ -298,6 +514,30 @@
       "writtenOn": "2026-04-21T21:49:53Z",
       "side": 1,
       "message": "#### **Buffer Overflow in `main.c`**\n\nIn `main.c`, you are using `strcpy()` to copy user-provided command-line arguments (`argv[1]` and `argv[2]`) into fixed-size local buffers:\n\n```c\nchar tmp[PATH_MAX];\n// ...\nstrcpy(tmp, argv[2]); \n// ...\nstrcpy(tmp, argv[1]);\n```\n\nCommand-line arguments can exceed `PATH_MAX` (typically 4096 bytes), which will cause a buffer overflow, potentially leading to arbitrary code execution or segmentation faults.\n\n* **Suggested Remediation:** Use `strncpy` (or `strlcpy` if available in your environment) to explicitly limit the copy operation, ensuring the buffer is null-terminated.\n\n```c\nstrncpy(tmp, argv[1], sizeof(tmp) - 1);\ntmp[sizeof(tmp) - 1] \u003d \u0027\\0\u0027;\n```",
+      "range": {
+        "startLine": 240,
+        "startChar": 0,
+        "endLine": 256,
+        "endChar": 23
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ffbc6e8_6d113d7f",
+        "filename": "util/focaltech/focaltech/src/main.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "641b8483_64f24f43",
       "range": {
         "startLine": 240,
         "startChar": 0,
@@ -355,6 +595,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4886473_d335e01b",
+        "filename": "util/focaltech/focaltech/src/net_usb.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a5c7e86_c59a0237",
+      "range": {
+        "startLine": 214,
+        "startChar": 1,
+        "endLine": 218,
+        "endChar": 2
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f36260cd_0707b516",
@@ -368,6 +632,30 @@
       "writtenOn": "2026-04-21T22:20:44Z",
       "side": 1,
       "message": "It looks like `libusb_port.c` contains a copy of a CLI utility (`hubpower`) adapted by building fake `argc`/`argv` string arrays to invoke its functions. We can remove hundreds of lines of code and avoid heap memory allocations (`malloc`/`free`) by stripping out the CLI parser and calling the underlying USB ioctls directly.\n\nFirst, delete the functions `usage()`, `port_status()`, and `change_port_status()`.\n\nNext, add this single helper function to send the control messages directly to the USB device file system:\n\n```c\n#include \u003cfcntl.h\u003e\n#include \u003csys/ioctl.h\u003e\n#include \u003clinux/usbdevice_fs.h\u003e\n#include \u003cunistd.h\u003e\n#include \u003cstdio.h\u003e\n#include \u003cerrno.h\u003e\n\n/* Helper to directly manipulate the hub\u0027s port feature without string parsing */\nstatic int set_hub_port_feature(int busnum, int devnum, int portnum, int feature, int enable)\n{\n\tchar dev_path[64];\n\tint fd, rc;\n\tstruct usbdevfs_ctrltransfer ctrl;\n\n\t// Safely format the device path\n\tsnprintf(dev_path, sizeof(dev_path), \"/dev/bus/usb/%03d/%03d\", busnum, devnum);\n\n\tfd \u003d open(dev_path, O_RDWR);\n\tif (fd \u003c 0) {\n\t\tFF_LOGE(\"Failed to open %s: %s\", dev_path, strerror(errno));\n\t\treturn -1;\n\t}\n\n\t// Build the exact ioctl command that change_port_status used to build\n\tctrl.bRequestType \u003d USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_OTHER;\n\tctrl.bRequest \u003d enable ? USB_REQ_SET_FEATURE : USB_REQ_CLEAR_FEATURE;\n\tctrl.wValue \u003d feature;\n\tctrl.wIndex \u003d portnum;\n\tctrl.wLength \u003d 0;\n\tctrl.timeout \u003d USB_HUB_TIMEOUT;\n\tctrl.data \u003d NULL;\n\n\trc \u003d ioctl(fd, USBDEVFS_CONTROL, \u0026ctrl);\n\tif (rc \u003d\u003d -1) {\n\t\tFF_LOGE(\"ioctl failed for port %d feature %d: %s\", portnum, feature, strerror(errno));\n\t}\n\n\tclose(fd);\n\treturn rc;\n}\n```\n\nNow, replace the heavily nested string allocations in your device control functions with simple calls to this new helper:\n\n```c\nstatic int focal_dev_reset(void)\n{\n\tint ret;\n\tFF_LOGD(\"%s enter\\n\", __func__);\n\tif (focal_dev_port.init !\u003d V_INIT_SUCCESS) {\n\t\treturn -1;\n\t}\n\n\t// USB_PORT_FEAT_RESET is 4. \u00271\u0027 means set/enable the feature.\n\tret \u003d set_hub_port_feature(focal_dev_port.bus, focal_dev_port.hub, \n\t                           focal_dev_port.port, USB_PORT_FEAT_RESET, 1);\n\tif (ret !\u003d -1) {\n\t\tfocal_dev_port.disabled \u003d 0;\n\t}\n\treturn (ret \u003d\u003d -1) ? -1 : 0;\n}\n\nstatic int focal_dev_disable(void)\n{\n\tint ret;\n\tFF_LOGI(\"%s enter\", __func__);\n\tif (focal_dev_port.init !\u003d V_INIT_SUCCESS) {\n\t\treturn -1;\n\t}\n\n\tif (focal_dev_port.disabled) {\n\t\treturn -2;\n\t}\n\n\t// USB_PORT_FEAT_ENABLE is 1. \u00270\u0027 means clear/disable the feature.\n\tret \u003d set_hub_port_feature(focal_dev_port.bus, focal_dev_port.hub, \n\t                           focal_dev_port.port, USB_PORT_FEAT_ENABLE, 0);\n\tif (ret !\u003d -1) {\n\t\tfocal_dev_port.disabled \u003d 1;\n\t}\n\treturn (ret \u003d\u003d -1) ? -1 : 0;\n}\n```\n\nThis cleans up the file immensely. It removes the magic number array boundaries (`cmd[16]`), eliminates the need to loop through and `free()` memory buffers, and makes the actual system calls much easier to debug.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 505,
+        "endChar": 1
+      },
+      "revId": "7c91f2c4e6dfb20882efdf316f4c04799c38715b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "486b5c86_514a0660",
+        "filename": "util/focaltech/libusb-1.0.29/libusb/libusb_port.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-21T01:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f36260cd_0707b516",
       "range": {
         "startLine": 1,
         "startChar": 0,
