@@ -69,9 +69,11 @@ static const char *cros_system_rtk_get_chip_vendor(const struct device *dev)
 	return "rtk";
 }
 
-#define RTK_CHIP_INFO_BASE 0x40010B80
-#define CHIP_ID_OFFSET 0x70
+#define RTK_CHIP_INFO_BASE 0x40010BF0
+#define CHIP_ID_OFFSET 0x00
+#define CHIP_VERSION_OFFSET 0x04
 #define RTK_CHIP_INFO_REG (RTK_CHIP_INFO_BASE + CHIP_ID_OFFSET)
+#define RTK_CHIP_VERSION_REG (RTK_CHIP_INFO_BASE + CHIP_VERSION_OFFSET)
 #define RTK_PUF_INFO_BASE 0x40010800UL
 #define OTP_OFFSET_BASE 0x680UL
 #define OTP_CTRL_REGISTER 0x24
@@ -106,32 +108,62 @@ static uint32_t get_otp_chip_info(void)
 	return chip_info;
 }
 
+static uint32_t get_otp_chip_version(void)
+{
+	uint32_t timeout = k_ms_to_cyc_ceil32(OTP_TIMEROUT_WAIT);
+	uint32_t start, temp_time;
+
+	start = k_cycle_get_32();
+	temp_time = start;
+	*(volatile uint32_t *)RTK_OTP_CTRL_REG = PUF_OPERATION_STAGE_ACTIVE;
+	while ((OTP_STS_PDSTB_MSK !=
+		(*(volatile uint32_t *)RTK_OTP_STS_REG &
+		 (OTP_STS_BUSY_MSK | OTP_STS_PDSTB_MSK))) &&
+	       (temp_time - start < timeout)) {
+		temp_time = k_cycle_get_32();
+	}
+
+	uint32_t chip_version = *((volatile uint32_t *)RTK_CHIP_VERSION_REG);
+
+	*(volatile uint32_t *)RTK_OTP_CTRL_REG = PUF_OPERATION_STATE_SLEEP;
+
+	return chip_version;
+}
+
 static uint32_t system_get_chip_id(void)
 {
-	/* [31:16] main id */
+	/* [31:16] main id
+	 * [15:8] sub id
+	 */
 	uint32_t raw_id = get_otp_chip_info();
-	uint16_t main_id = (raw_id >> 16) & 0xFFFF;
+	uint32_t main_id = (raw_id >> 16) & 0xFFFF;
+	uint32_t sub_id = (raw_id >> 8) & 0xFF;
+
+	main_id = (main_id << 8) + sub_id;
 
 	return main_id;
 }
 
-static uint8_t system_get_chip_version(void)
+static uint16_t system_get_chip_version(void)
 {
-	/* [15:8] chip version */
-	uint32_t raw_id = get_otp_chip_info();
-	uint16_t sub_id = (raw_id >> 8) & 0xFF;
+	/* [31:24] main version
+	 * [23:16] sub version
+	 */
+	uint32_t raw_id = get_otp_chip_version();
+	uint16_t version_id = (raw_id >> 16) & 0xFFFF;
 
-	return sub_id;
+	return version_id;
 }
 
 static const char *cros_system_rtk_get_chip_name(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 
-	static char buf[8] = { 'r', 't', 's' };
+	static char buf[9] = { 'r', 't', 's' };
 	uint32_t chip_id = system_get_chip_id();
 
-	snprintf(buf + 3, sizeof(buf) - 3, "%04x", (uint16_t)chip_id);
+	snprintf(buf + 3, sizeof(buf) - 4, "%04x", (uint16_t)(chip_id >> 8));
+	snprintf(buf + 7, sizeof(buf) - 7, "%c", (uint8_t)chip_id);
 
 	return buf;
 }
@@ -141,9 +173,17 @@ static const char *cros_system_rtk_get_chip_revision(const struct device *dev)
 	ARG_UNUSED(dev);
 
 	static char buf[5];
-	uint8_t rev = system_get_chip_version();
+	uint16_t rev = system_get_chip_version();
+	uint8_t main_version, sub_version;
 
-	snprintf(buf, sizeof(buf), "%c", rev);
+	main_version = (rev >> 8 & 0xFF);
+	sub_version = (rev & 0xFF);
+
+	if (main_version == 0x0)
+		sub_version = sub_version - 5;
+
+	buf[0] = main_version + 'F';
+	snprintf(buf + 1, sizeof(buf) - 1, "%d", sub_version);
 
 	return buf;
 }
