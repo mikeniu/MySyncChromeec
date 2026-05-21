@@ -35,6 +35,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7766326e_cda1460c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T16:59:32Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2cc09139_79c0e496",
+      "revId": "88bb519de65caf4b68a93647b778096283451c79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f99fb2c7_5c38726a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T16:59:32Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "ebb21e4e_7b31d9f3",
+      "revId": "88bb519de65caf4b68a93647b778096283451c79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7c617fef_375dca23",
@@ -87,6 +123,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "734fb7b4_dc1479c3",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T16:59:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7d1ae67_da3dd59b",
+      "revId": "88bb519de65caf4b68a93647b778096283451c79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "15fdb3c7_00bc4f0e",
@@ -135,6 +189,24 @@
       "writtenOn": "2026-05-21T15:56:52Z",
       "side": 1,
       "message": "[Gerrit AI Review] For `FP_SIMULATOR_REAL_IMAGE_PROPS`, the `frame-size` of 25600 matches the pixel data size (160 * 160). However, since an `image-data-offset-bytes` of 400 is now applied, the total buffer size needed to avoid truncation is 26000. If the fingerprint task uses `frame_size` to allocate its buffer, the image data will be truncated by 400 bytes in the simulator. Should `frame-size` be updated to 26000 here?",
+      "revId": "88bb519de65caf4b68a93647b778096283451c79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c628931_84ced78a",
+        "filename": "zephyr/test/fingerprint/task/boards/native_sim.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T16:59:32Z",
+      "side": 1,
+      "message": "for real_image_props, the offset does not apply.",
+      "parentUuid": "a2ddd2a8_f295fa67",
       "revId": "88bb519de65caf4b68a93647b778096283451c79",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
