@@ -377,9 +377,9 @@ void board_chipset_set_heartbeat_alarm_on_shutdown(void)
 		/* Move heart beat to RTC alarm based wake (45min) */
 		system_set_rtc_alarm(HEARTBEAT_WAKE_INTERVAL_SEC, 0);
 		heartbeat_mode = 0;
-	} else if (extpower_is_present()) {
-		/* If chipset shutdown and external power is connected, wake
-		 * after 30 seconds to boot the AP and enable charging.
+	} else if (extpower_is_present() && battery_is_present() == BP_YES) {
+		/* If chipset shutdown, external power, and battery are present,
+		 * wake after 30 seconds to boot the AP and enable charging.
 		 * This short delay ensures the system is fully powered down
 		 * before triggering a reboot, avoiding potential boot-time
 		 * race conditions. */
