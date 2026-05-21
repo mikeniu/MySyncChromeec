@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e231888_65b0aabc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:03:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details regarding a contradiction between the driver logic and devicetree configuration that will cause image acquisition to fail for most capture types.\n\n### Review Summary\n*   **Functionality**: The logic to apply `image_data_offset_bytes` and the associated bounds checking are correctly implemented in the driver. However, the current devicetree configuration for `REAL_IMAGE_PROPS` sets an offset of 400 while keeping the `frame-size` at 25600. This combination will cause `fp_simulator_acquire_image` to return `-EINVAL` because the total required buffer size (offset + frame_size \u003d 26000) exceeds the provided buffer size (25600).\n*   **Security**: The added bounds checking is robust and prevents potential out-of-bounds writes to the destination buffer.\n*   **Consistency**: There is an inconsistency between the author\u0027s statement that \"the offset does not apply\" to real image properties and the actual changes in the overlay which set the offset to 400 for those properties.\n*   **Testing**: The `native_sim.overlay` updates exercise the new code path but currently do so with incompatible parameters for several capture types.\n\n[[trajectory](go/traj/561c1540-812b-4705-852c-23dd8ea99932)]",
+      "revId": "add45d94dea0a62e23117d8540da21be405e212e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c96285b_ee6a7323",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:03:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The bounds check correctly prevents out-of-bounds writes. However, there appears to be a contradiction between the driver logic and the devicetree configuration in the simulator overlay.\n\nFor capture types using `REAL_IMAGE_PROPS` (e.g., `SIMPLE_IMAGE`), the `frame-size` is 25600 and `image-data-offset-bytes` is now 400. In `fp_simulator_acquire_image`, `apply_image_offset` will be `true` for these modes, setting `offset` to 400. Consequently, `offset + frame_size` (26000) will exceed `image_buf_size` if the caller allocates based on the provided `frame_size` (25600), causing this check to return `-EINVAL`.\n\nIf these modes are intended to have an offset, `frame-size` in the overlay should be increased to 26000. If they are NOT intended to have an offset (as suggested in your previous response), then `image-data-offset-bytes` should remain 0 in `REAL_IMAGE_PROPS`, or these capture types should be added to the exclusion list in the driver code.",
+      "revId": "add45d94dea0a62e23117d8540da21be405e212e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36c32214_716b01c2",
+        "filename": "zephyr/test/fingerprint/task/boards/native_sim.overlay",
+        "patchSetId": 4
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:03:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Setting `image-data-offset-bytes \u003d \u003c400\u003e` here while keeping `frame-size \u003d \u003c25600\u003e` will cause `fp_simulator_acquire_image` to return `-EINVAL` for any capture types using these properties (like `SIMPLE_IMAGE`), because the driver now applies this offset and checks that `offset + frame_size \u003c\u003d image_buf_size`.\n\nPlease either increase `frame-size` to 26000 or revert the offset to 0 if it shouldn\u0027t apply to real image capture types.",
+      "revId": "add45d94dea0a62e23117d8540da21be405e212e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
