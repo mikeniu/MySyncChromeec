@@ -65,6 +65,7 @@ static mutex_t flow1_access_lock[CHARGER_NUM];
 static mutex_t flow2_access_lock[CHARGER_NUM];
 
 static int charger_vbus[CHARGER_NUM];
+static enum vbus_level vbus_state[CHARGER_NUM];
 
 /* Tracker for charging failures per port */
 struct {
@@ -836,11 +837,19 @@ static void sm5803_init(int chgnum)
 	rv |= meas_write8(chgnum, SM5803_REG_TINT_LOW_TH,
 			  SM5803_TINT_MIN_LEVEL);
 
-	/*
-	 * Configure TINT interrupt to fire after thresholds are set.
-	 */
-	rv |= main_write8(chgnum, SM5803_REG_INT2_EN, SM5803_INT2_TINT);
+	/* Set VBUS interrupts for higher threshold to 4.75V */
+	rv |= meas_write8(chgnum, SM5803_REG_VBUS_HIGH_TH,
+			  SM5803_VBUS_PRESENT_LEVEL);
+	/* Set VBUS interrupts for lower threshold to 0 */
+	rv |= meas_write8(chgnum, SM5803_REG_VBUS_LOW_TH,
+			  SM5803_VBUS_MIN_LEVEL);
 
+	/*
+	 * Configure TINT & VBUS interrupt to fire after thresholds are set.
+	 */
+	rv |= main_read8(chgnum, SM5803_REG_INT2_EN, &reg);
+	reg |= SM5803_INT2_TINT | SM5803_INT2_VBUS;
+	rv |= main_write8(chgnum, SM5803_REG_INT2_EN, reg);
 	/*
 	 * Configure CHG_ENABLE to only be set through I2C by setting
 	 * HOST_MODE_EN bit (all other register bits are 0 by default)
@@ -1299,6 +1308,44 @@ void sm5803_handle_interrupt(int chgnum)
 		 */
 	}
 
+	/*
+	 * VBUS threshold interrupt handling
+	 */
+	if (int_reg & SM5803_INT2_VBUS) {
+		int volt_bits, voltage;
+		rv = meas_read8(chgnum, SM5803_REG_VBUS_MEAS_MSB, &meas_reg);
+		volt_bits = meas_reg << 2;
+		rv = meas_read8(chgnum, SM5803_REG_VBUS_MEAS_LSB, &meas_reg);
+		volt_bits |= meas_reg & SM5803_VBUS_MEAS_LSB;
+
+		/* Vbus ADC is in 23.4 mV steps */
+		voltage = (volt_bits * 234) / 10;
+		if (voltage <= SM5803_VBUS_SAFE0V_LEVEL) {
+			vbus_state[chgnum] = VBUS_SAFE0V;
+			/*
+			 * Set back higher threshold to 4.75V and set lower
+			 * threshold to 0.
+			 */
+			rv |= meas_write8(chgnum, SM5803_REG_VBUS_LOW_TH,
+					  SM5803_VBUS_MIN_LEVEL);
+			rv |= meas_write8(chgnum, SM5803_REG_VBUS_HIGH_TH,
+					  SM5803_VBUS_PRESENT_LEVEL);
+		} else if (voltage >= SM5803_VBUS_PRESENT_LEVEL) {
+			vbus_state[chgnum] = VBUS_PRESENT;
+			/*
+			 * Set back lower threshold to 0.8V and set higher
+			 * threshold to maximum.
+			 */
+			rv |= meas_write8(chgnum, SM5803_REG_VBUS_HIGH_TH,
+					  SM5803_VBUS_MAX_LEVEL);
+			rv |= meas_write8(chgnum, SM5803_REG_VBUS_LOW_TH,
+					  SM5803_VBUS_SAFE0V_LEVEL);
+		} else if ((voltage < SM5803_VBUS_REMOVED_LEVEL) &&
+			   (voltage > SM5803_VBUS_SAFE0V_LEVEL)) {
+			vbus_state[chgnum] = VBUS_REMOVED;
+		}
+	}
+
 	/* TODO(b/159376384): Take action on fatal BFET power alert. */
 	rv = main_read8(chgnum, SM5803_REG_INT3_REQ, &int_reg);
 	if (rv) {
@@ -1702,48 +1749,17 @@ static enum ec_error_list sm5803_get_vbus_voltage(int chgnum, int port,
 
 bool sm5803_check_vbus_level(int chgnum, enum vbus_level level)
 {
-	int rv, vbus_voltage;
-
-	/*
-	 * Analog reading of VBUS is more accurate and helps reliability when
-	 * doing power role swaps, but if the charger is in LPM with the GPADCs
-	 * disabled then the reading won't update.
-	 *
-	 * Digital VBUS presence (with transitions flagged by STATUS1_CHG_DET
-	 * interrupt) still works when GPADCs are off, and shouldn't otherwise
-	 * impact performance because the GPADCs should be enabled in any
-	 * situation where we're doing a PRS.
-	 */
-	rv = sm5803_get_vbus_voltage(chgnum, chgnum, &vbus_voltage);
-	if (rv == EC_ERROR_NOT_POWERED) {
-		/* VBUS ADC is disabled, use digital presence */
-		switch (level) {
-		case VBUS_PRESENT:
-			return sm5803_is_vbus_present(chgnum);
-		case VBUS_SAFE0V:
-		case VBUS_REMOVED:
-			return !sm5803_is_vbus_present(chgnum);
-		default:
-			CPRINTS("%s: unrecognized vbus_level value: %d",
-				__func__, level);
-			return false;
-		}
-	}
-	if (rv != EC_SUCCESS) {
-		/* Unhandled communication error; assume unsatisfied */
-		return false;
-	}
-
 	switch (level) {
 	case VBUS_PRESENT:
-		return vbus_voltage > PD_V_SAFE5V_MIN;
-	case VBUS_SAFE0V:
-		return vbus_voltage < PD_V_SAFE0V_MAX;
+		return vbus_state[chgnum] == VBUS_PRESENT;
+
 	case VBUS_REMOVED:
-		return vbus_voltage < PD_V_SINK_DISCONNECT_MAX;
+		return vbus_state[chgnum] == VBUS_REMOVED;
+
+	case VBUS_SAFE0V:
+		return vbus_state[chgnum] == VBUS_SAFE0V;
+
 	default:
-		CPRINTS("%s: unrecognized vbus_level value: %d", __func__,
-			level);
 		return false;
 	}
 }
