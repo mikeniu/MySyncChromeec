@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ed15147_5ca07ee1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T17:13:52Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "0e231888_65b0aabc",
+      "revId": "add45d94dea0a62e23117d8540da21be405e212e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5c96285b_ee6a7323",
@@ -35,6 +53,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "03e5224d_9fb76220",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T17:13:52Z",
+      "side": 1,
+      "message": "it is a bit misleading. The offset is uniform across all the images. However, it does not mean that we will add an offset for all the images. There is another check for the offset addition:\n\n```\nuint32_t offset \u003d 0;\n\n\tbool apply_image_offset \u003d\n\t\t(mode !\u003d FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT \u0026\u0026\n\t\t mode !\u003d FINGERPRINT_CAPTURE_TYPE_QUALITY_TEST);\n```",
+      "parentUuid": "5c96285b_ee6a7323",
+      "revId": "add45d94dea0a62e23117d8540da21be405e212e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "36c32214_716b01c2",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-05-21T17:03:07Z",
       "side": 1,
       "message": "[Gerrit AI Review] Setting `image-data-offset-bytes \u003d \u003c400\u003e` here while keeping `frame-size \u003d \u003c25600\u003e` will cause `fp_simulator_acquire_image` to return `-EINVAL` for any capture types using these properties (like `SIMPLE_IMAGE`), because the driver now applies this offset and checks that `offset + frame_size \u003c\u003d image_buf_size`.\n\nPlease either increase `frame-size` to 26000 or revert the offset to 0 if it shouldn\u0027t apply to real image capture types.",
+      "revId": "add45d94dea0a62e23117d8540da21be405e212e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "538171fe_a8891cc0",
+        "filename": "zephyr/test/fingerprint/task/boards/native_sim.overlay",
+        "patchSetId": 4
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T17:13:52Z",
+      "side": 1,
+      "message": "it is a bit misleading. The offset is uniform across all the images. However, it does not mean that we will add an offset for all the images. There is another check for the offset addition:\n\n```\nuint32_t offset \u003d 0;\n\n\tbool apply_image_offset \u003d\n\t\t(mode !\u003d FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT \u0026\u0026\n\t\t mode !\u003d FINGERPRINT_CAPTURE_TYPE_QUALITY_TEST);\n```",
+      "parentUuid": "36c32214_716b01c2",
       "revId": "add45d94dea0a62e23117d8540da21be405e212e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
