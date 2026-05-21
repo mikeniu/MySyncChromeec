@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3dae73dc_cdeb92f0",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T15:56:22Z",
+      "side": 1,
+      "message": "I already have a comment\n\n```\n/* Standard host data payload chunk size. */\n```\n\nthe same number is used in libec testing.",
+      "parentUuid": "8026601a_c4bb84c1",
+      "revId": "af2654a77628d13187a16998aa90cade6846060b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "31b384cf_38d46e53",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-05-20T18:08:16Z",
       "side": 1,
       "message": "[Gerrit AI Review] This `reinterpret_cast` assumes that the layout of `global_context.fp_frame_size_cache` is identical to `std::array\u003cuint32_t, FP_CAPTURE_TYPE_MAX\u003e`. While the comment acknowledges this, it is inherently brittle and could lead to undefined behavior if the implementation of the cache class changes (e.g., adding private members or changing the storage type).\n\nConsider if there is a more robust way to inject invalid values into the cache for testing, perhaps by adding a test-only setter or making the internal storage accessible via a friend declaration for tests.",
+      "revId": "af2654a77628d13187a16998aa90cade6846060b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f825721e_cdccc672",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T15:56:22Z",
+      "side": 1,
+      "message": "`fp_frame_size_cache ` is an instance of `FpFrameSizeCache`. \n\n`FpFrameSizeCache` has one private element `frame_sizes_` which is defined as `std::array\u003cuint32_t, FP_CAPTURE_TYPE_MAX\u003e frame_sizes_ \u003d {};`",
+      "parentUuid": "31b384cf_38d46e53",
       "revId": "af2654a77628d13187a16998aa90cade6846060b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
