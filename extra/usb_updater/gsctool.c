@@ -584,8 +584,8 @@ static const struct option_container cmd_line_options[] = {
 	  "[erase]%Retrieve boot trace from the chip, optionally erasing "
 	  "the trace buffer" },
 	{ { "upload_owner_config", no_argument, NULL, 'j' },
-	  "<binary image> is a 2kB blob containing new owners configuration,"
-	  " OpenTitan only" },
+	  "<binary image> is a blob containing either new owners configuration"
+	  " or an NT detached signature, OpenTitan only" },
 	{ { "upload_boot_svc_msg", no_argument, NULL, 'N' },
 	  "<binary image> is a 256B blob containing boot svc message,"
 	  " OpenTitan only" },
@@ -1989,21 +1989,35 @@ static void send_boot_svc_msg(struct transfer_descriptor *td,
 }
 
 /*
- * Owner configuration updates on the NT chip involve placing a properly
- * signed ownership config blob into a certain INFO page on the device.
+ * Owner configuration updates on the NT chip involve either placing a
+ * properly signed ownership config blob into a certain INFO page on the
+ * device, or in case of hybrid (ECDSA and SPX) signing - sending detached
+ * signatures to the device.
  *
- * The signed config blob is expected to be stored in the passed in file. This
- * function always terminates the program with exit code indicating
- * success/failure.
+ * The config page is handled on the chip in a special way, it does not
+ * require a valid image header. The detached signatures are sent as regular
+ * image updates, they do have to have a valid image header.
+
+ * Since the signature in the flash has to be aligned at the page boundary,
+ * the preamble in the passed in file is 2K in size, the first 1k of which is
+ * a rudimentary image header, it has enough fields set for the chip to accept
+ * it into the flash, the second 1K is empty and just provides alignment.
+ *
+ * Thus the input file is either the config page image (up to 2K) or one or
+ * two detached signatures, sizes exactly 10240 or 18432 bytes.
+ *
+ * This function always terminates the program with exit code indicating
+ * success/failure received from the chip.
  */
 static void send_owner_config(struct transfer_descriptor *td,
 			      const char *file_name)
 {
+#define DETACHED_SIG_SIZE 8192
 	struct stat st;
-	const size_t config_size = FLASH_PAGE_SIZE;
-	uint8_t config[config_size];
+	uint8_t config[FLASH_PAGE_SIZE + DETACHED_SIG_SIZE * 2];
 	FILE *f;
 	uint32_t fake_addr;
+	size_t config_size;
 
 	/* Make sure the file is there and passes basic sаnity test. */
 	if (stat(file_name, &st) != 0) {
@@ -2011,7 +2025,33 @@ static void send_owner_config(struct transfer_descriptor *td,
 		exit(1);
 	}
 
-	if (st.st_size != (long)config_size) {
+	config_size = st.st_size;
+	if (config_size <= 2048) {
+		/*
+		 * This is a config page. Encode the destination Info page
+		 * into the flat 32 bit value passed as the address in the PDU
+		 * header.
+		 *
+		 * The encoding is as follows:
+		 * Bit 31 set to 1 means that this is an Info page address
+		 * Bit 30 indicates the flash bank, 0 or 1
+		 * Bits 26..29 indicate the page number in the bank
+		 * Bits 0..25 are used for offset in the page, 11 bits is enough
+		 *     to cover the entire page address range (2k)
+		 *
+		 * The info page used for storing owners config updates is Page
+		 * 3 in Bank 1
+		 */
+		fake_addr = (1 << 31) + (1 << 30) + (3 << 26);
+	} else if (config_size == (sizeof(config) - DETACHED_SIG_SIZE) ||
+		   config_size == sizeof(config)) {
+		/*
+		 * This a single or double detached signature, it can be
+		 * anywhere in flash, let's send it to the base address of the
+		 * inactive RW.
+		 */
+		fake_addr = td->rw_offset;
+	} else {
 		fprintf(stderr, "Unexpected size %zd of %s\n", st.st_size,
 			file_name);
 		exit(1);
@@ -2029,23 +2069,6 @@ static void send_owner_config(struct transfer_descriptor *td,
 	}
 	fclose(f);
 
-	setup_connection(td);
-
-	/*
-	 * Encode the destination Info page into the flat 32 bit value passed
-	 * as the address in the PDU header.
-	 *
-	 * The encoding is as follows:
-	 * Bit 31 set to 1 means that this is an Info page address
-	 * Bit 30 indicates the flash bank, 0 or 1
-	 * Bits 26..29 indicate the page number in the bank
-	 * Bits 0..25 are used for offset in the page, 11 bits is enough to
-	 *     cover the entire page address range (2k)
-	 *
-	 * The info page used for storing owners config updates is Page 3 in
-	 * Bank 1
-	 */
-	fake_addr = (1 << 31) + (1 << 30) + (3 << 26);
 	transfer_section(td, config, fake_addr, config_size);
 	exit(0);
 }
@@ -3176,6 +3199,8 @@ static void print_ccd_info(void *response, size_t response_size,
 					     "Set" :
 					     "None";
 	if (show_machine_output) {
+		int factory_mode = ccd_info.ccd_flags &
+				   CCD_FLAG_FACTORY_MODE_ENABLED;
 		print_machine_output("STATE", "%s", state);
 		print_machine_output("PASSWORD", "%s", password);
 		print_machine_output("CCD_FLAGS", "%#06x", ccd_info.ccd_flags);
@@ -3183,10 +3208,13 @@ static void print_ccd_info(void *response, size_t response_size,
 			"CCD_FLAG_TESTLAB_MODE", "%c",
 			(ccd_info.ccd_flags & CCD_FLAG_TEST_LAB) ? 'Y' : 'N');
 		print_machine_output("CCD_FLAG_FACTORY_MODE", "%c",
-				     (ccd_info.ccd_flags &
-				      CCD_FLAG_FACTORY_MODE_ENABLED) ?
-					     'Y' :
-					     'N');
+				     factory_mode ? 'Y' : 'N');
+		print_machine_output(
+			"CCD_FLAG_RMA_MODE", "%c",
+			factory_mode && (ccd_info.ccd_flags &
+					 CCD_FLAG_RMA_MODE_ENABLED) ?
+				'Y' :
+				'N');
 	} else {
 		printf("State: %s\n", state);
 		printf("Password: %s\n", password);
@@ -3901,17 +3929,26 @@ static int parse_wpsrs(const char *opt, struct arv_config_wpds *wpds)
 	struct arv_config_wpd *wpd;
 
 	ptr = malloc(len + 1);
+	if (!ptr)
+		return 0;
 	strcpy(ptr, opt);
 	p = strtok(ptr, delim);
 
 	while (p != NULL) {
 		if (read_hex_byte_string(p, &b)) {
-			wpd = &wpds->data[rv / 2];
-			if (rv % 2 == 0) {
-				wpd->expected_value = b;
-			} else {
-				wpd->mask = b;
-				wpd->state = arv_config_setting_state_present;
+			/*
+			 * Currently we only support up to 3 register pairs in
+			 * struct arv_config_wpds.
+			 */
+			if (rv < 6) {
+				wpd = &wpds->data[rv / 2];
+				if (rv % 2 == 0) {
+					wpd->expected_value = b;
+				} else {
+					wpd->mask = b;
+					wpd->state =
+					  arv_config_setting_state_present;
+				}
 			}
 			rv++;
 		} else {
@@ -5122,10 +5159,15 @@ static int process_ti50_get_metrics(struct transfer_descriptor *td,
 
 static void print_ti50_device_id_field(const char *name,
 				       struct ti50_device_ids_field id,
+				       bool is_rma_field,
 				       bool show_machine_output)
 {
 	if (show_machine_output) {
 		printf("FIELD_%s_SIZE=%u\n", name, id.size);
+		printf("FIELD_%s_RMA=%s\n", name,
+		       id.size == 0xff ? "NA" :
+		       is_rma_field    ? "Y" :
+					 "N");
 		printf("FIELD_%s=", name);
 	} else {
 		printf("%12s (%3u): ", name, id.size);
@@ -5161,6 +5203,8 @@ static void print_ti50_device_id_header(struct ti50_device_ids_response *ids,
 
 	if (show_machine_output) {
 		print_machine_output("VERSION", "%u", ids->header.version);
+		print_machine_output("VERSION_MINOR", "%u",
+				     ids->header.version_minor);
 		print_machine_output("STATUS", "%u", ids->header.status);
 		print_machine_output("VALID", "%s", valid);
 		print_machine_output("FINALIZED", "%s", finalized);
@@ -5175,6 +5219,7 @@ static void print_ti50_device_id_header(struct ti50_device_ids_response *ids,
 		print_machine_output("TOTAL_FIELDS_SIZE", "%u", size);
 	} else {
 		printf("Version: %u\n", ids->header.version);
+		printf("Version Minor: %u\n", ids->header.version_minor);
 		printf("Status: %u\n", ids->header.status);
 		printf("Valid: %s\n", valid);
 		printf("Finalized: %s\n", finalized);
@@ -5206,19 +5251,25 @@ static int print_ti50_device_ids(struct ti50_device_ids_response *ids,
 				 bool show_machine_output)
 {
 	size_t i;
+	/* RMA status added in 1.0 */
+	bool supports_rma = ids->header.version > 1 ||
+			    ids->header.version != 0xff;
 
 	if (ids->header.version == 0xff) {
 		printf("fields unset");
 		return 0;
 	}
+
 	if (ids->header.version != TI50_DEVICE_IDS_VERSION) {
 		printf("unsupported device ids version");
 		return 1;
 	}
 
 	for (i = 0; i < ARRAY_SIZE(ti50_device_id_fields); i++) {
-		print_ti50_device_id_field(ti50_device_id_fields[i].name,
-					   ids->ids[i], show_machine_output);
+		print_ti50_device_id_field(
+			ti50_device_id_fields[i].name, ids->ids[i],
+			supports_rma && !!(ids->header.rma_fields & (1 << i)),
+			show_machine_output);
 	}
 	return 0;
 }
@@ -5310,6 +5361,9 @@ static int process_ti50_device_ids(struct transfer_descriptor *td,
 	} else if (!strcasecmp("get_info", arg)) {
 		return process_ti50_get_device_ids(td, STORAGE_INFO,
 						   show_machine_output);
+	} else if (!strcasecmp("get_rma", arg)) {
+		return process_ti50_get_device_ids(td, STORAGE_RMA,
+						   show_machine_output);
 	} else if (!strcasecmp("get_scratch", arg)) {
 		return process_ti50_get_device_ids(td, STORAGE_NVMEM,
 						   show_machine_output);
@@ -5318,6 +5372,9 @@ static int process_ti50_device_ids(struct transfer_descriptor *td,
 		request_size = 1;
 	} else if (!strcasecmp("delete_scratch", arg)) {
 		request.subcmd = DEVICE_ID_DELETE_SCRATCH;
+		request_size = 1;
+	} else if (!strcasecmp("delete_rma", arg)) {
+		request.subcmd = DEVICE_ID_DELETE_RMA;
 		request_size = 1;
 	} else {
 		/*
@@ -5791,6 +5848,36 @@ int main(int argc, char *argv[])
 					arv_config_setting_state_not_present;
 
 				rv = parse_wpsrs(optarg, &arv_config_wpds);
+
+				/*
+				 * TODO(b/514254290): Currently GSC firmware and
+				 * gsctool only support up to 3 register pairs.
+				 * Some newer flash chips (like Macronix)
+				 * provide more (e.g., Security and
+				 * Configuration registers). For now, we drop
+				 * any registers beyond SR3 and trim trailing
+				 * empty registers to remain compatible with
+				 * existing GSC firmware.
+				 */
+				if (rv > 6) {
+					printf("warning: ignoring registers "
+					  "beyond SR3 (b/514254290)\n");
+					rv = 6;
+				}
+
+				if (rv == 6 &&
+				    arv_config_wpds.data[2].mask == 0) {
+					rv = 4;
+					arv_config_wpds.data[2].state =
+					  arv_config_setting_state_not_present;
+				}
+				if (rv == 4 &&
+				    arv_config_wpds.data[1].mask == 0) {
+					rv = 2;
+					arv_config_wpds.data[1].state =
+					  arv_config_setting_state_not_present;
+				}
+
 				if (rv == 2 || rv == 4 || rv == 6) {
 					arv_config_wpsr_choice =
 						arv_config_wpsr_choice_set;
