@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c3d3b71_351226cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T17:47:47Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f149c7eb_a889f35f",
+      "revId": "5718c7ba752828cd845bf7e53c7404dd8654539f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cc4ce8c1_23601b58",
@@ -52,6 +70,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd5c534c_483736f7",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 11
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T17:47:47Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "cc4ce8c1_23601b58",
+      "revId": "5718c7ba752828cd845bf7e53c7404dd8654539f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f3ee38ca_4061ed2a",
@@ -65,6 +101,24 @@
       "writtenOn": "2026-05-21T17:37:44Z",
       "side": 1,
       "message": "[Gerrit AI Review] For consistency with other success tests in this file (e.g., `test_get_frame_shifted_layout_success`), consider using `zassert_mem_equal` to verify the entire `output_buffer` against an expected reference buffer. This provides a stronger guarantee that the entire requested range was correctly copied and that no other parts of the buffer were unexpectedly modified.",
+      "revId": "5718c7ba752828cd845bf7e53c7404dd8654539f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73003bf1_c3df6924",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 11
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T17:47:47Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f3ee38ca_4061ed2a",
       "revId": "5718c7ba752828cd845bf7e53c7404dd8654539f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
