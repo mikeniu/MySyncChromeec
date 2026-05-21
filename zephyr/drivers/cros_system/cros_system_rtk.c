@@ -193,6 +193,16 @@ static int cros_system_rtk_init(void)
 	uint32_t invalid_value = 0;
 	/* In order to determine if reset from watchdog */
 	uint32_t flag = 0;
+
+	/* Apply deep-sleep workaround for RTS5915-VF or earlier silicon
+	 * (b/515078423)
+	 */
+	ensure_otp_initialized();
+	if (cached_otp.version.main_version == 0 &&
+	    cached_otp.version.sub_version <= 5) {
+		disable_sleep(SLEEP_MASK_FORCE_NO_DSLEEP);
+	}
+
 	/* check reset cause */
 	reset_cause = UNKNOWN_RST;
 
