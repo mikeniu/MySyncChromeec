@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5051883_93b3124a",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T18:25:29Z",
+      "side": 1,
+      "message": "* **Location:** mpu\\_enable()  \n* **Issue:** The comment states: /\\* TODO: The number of static regions is more than mpu\\_config.num\\_regions... \\*/. However, the loop still strictly bounds itself to index \\\u003c mpu\\_config.num\\_regions.  \n* **Impact:** It is unclear if the loop is intentionally ignoring the extra static regions, or if this is a bug where the loop bound should actually be modified for Cortex-M33.  \n* **Suggestion:** If the current loop logic is correct, clarify the comment to explain *why* it is safe to only iterate up to mpu\\_config.num\\_regions despite there being more static regions. If it\u0027s a bug, adjust the loop bounds.",
+      "range": {
+        "startLine": 32,
+        "startChar": 1,
+        "endLine": 36,
+        "endChar": 6
+      },
+      "revId": "b77b5c4509f6140ec7b50fe532f2997d8d3bbd59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfc00122_5c0a6b4d",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T18:25:29Z",
+      "side": 1,
+      "message": "* **Location:** mpu\\_enable()  \n* **Issue:** In the Cortex-M33 block, the code only asserts the enable bit: MPU-\\\u003eRLAR |\u003d MPU\\_RLAR\\_EN\\_Msk;. Unlike the ARMv7-M block (which configures RAM locks if defined) or standard Zephyr initialization, this assumes that the MPU-\\\u003eRBAR (Base Address Register) and the rest of the MPU-\\\u003eRLAR (Limit Address and Attributes) are already perfectly configured for indices 0 to mpu\\_config.num\\_regions \\- 1\\.  \n* **Impact:** If those regions were not fully pre-configured by Zephyr initialization before this function is called, enabling them will result in unpredictable memory protection faults (MemManage exceptions).  \n* **Suggestion:** Ensure that the regions are fully configured before enabling them, or add a safety check/comment explaining where these specific regions are pre-initialized.",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 56
+      },
+      "revId": "b77b5c4509f6140ec7b50fe532f2997d8d3bbd59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "948f43f4_72f50ec9",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T18:25:29Z",
+      "side": 1,
+      "message": "* **Issue:** The file is becoming heavily fragmented with \\#if defined(CONFIG\\_CPU\\_CORTEX\\_M33) and \\#else blocks inside function bodies (e.g., mpu\\_enable, mpu\\_lock\\_rollback).  \n* **Suggestion:** To improve maintainability, consider abstracting the architecture-specific MPU register manipulations into static inline helper functions. For example:\n\n```c\nstatic inline void mpu_arch_enable_region_by_id(int region_id) {\n#if defined(CONFIG_CPU_CORTEX_M33)\n    MPU-\u003eRNR \u003d region_id;\n    MPU-\u003eRLAR |\u003d MPU_RLAR_EN_Msk;\n#else\n    MPU-\u003eRNR \u003d region_id;\n    MPU-\u003eRASR |\u003d MPU_RASR_ENABLE_Msk;\n#endif\n}\n```",
+      "range": {
+        "startLine": 31,
+        "startChar": 1,
+        "endLine": 65,
+        "endChar": 2
+      },
+      "revId": "b77b5c4509f6140ec7b50fe532f2997d8d3bbd59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
