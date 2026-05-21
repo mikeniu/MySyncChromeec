@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9f6a1a8_97f99a75",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-21T13:00:45Z",
+      "side": 1,
+      "message": "Have you thought about adding `fp_led::update_match(fp_match_success(res));` here, when the match mode is cleared? E.g. if `global_context.templ_valid` is false, the `update_match` won\u0027t be called. Is this expected?",
+      "revId": "6b287ec2f838e4ab139e96943ce790929c6f3b21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c6d2d78_79a8e41c",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-21T13:00:45Z",
+      "side": 1,
+      "message": "What does it check? If a new work hasn\u0027t been scheduled?",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 83,
+        "endChar": 59
+      },
+      "revId": "6b287ec2f838e4ab139e96943ce790929c6f3b21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f55ed57c_7a394ae4",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-21T13:00:45Z",
+      "side": 1,
+      "message": "Shouldn\u0027t `k_work_cancel_delayable_sync` be called here? `k_work_cancel_delayable` doesn\u0027t wait for the work to finish.",
+      "range": {
+        "startLine": 95,
+        "startChar": 1,
+        "endLine": 95,
+        "endChar": 24
+      },
+      "revId": "6b287ec2f838e4ab139e96943ce790929c6f3b21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6440ea3c_3ce6a70d",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-21T13:00:45Z",
+      "side": 1,
+      "message": "Do we know what happens if `led_update_handler` is already running, another one is scheduled and we call this one more time?",
+      "revId": "6b287ec2f838e4ab139e96943ce790929c6f3b21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

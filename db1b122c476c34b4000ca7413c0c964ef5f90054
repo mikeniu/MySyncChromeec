@@ -34,6 +34,24 @@
       "parentUuid": "506cbba3_26e953b7",
       "revId": "db1b122c476c34b4000ca7413c0c964ef5f90054",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df13f79b_db44a9de",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-21T13:00:45Z",
+      "side": 1,
+      "message": "Current status works for me. I think we should have more or less unified LED behavior. If there are such differences per project, it should go to the per project code.",
+      "parentUuid": "b61d8971_3ddb947b",
+      "revId": "db1b122c476c34b4000ca7413c0c964ef5f90054",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
