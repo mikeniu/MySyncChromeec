@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1eea4b7a_27bfce95",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T18:11:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Using `CONFIG_ROLLBACK_SIZE` to cover both `rollback0` and `rollback1` in a single region is efficient for ARMv8-M. However, this assumes they are always contiguous in memory. While this is likely true for current boards, adding a compile-time check or explicitly including both in the array (even if they result in one region if contiguous) would be safer.",
+      "parentUuid": "75e3b0d6_1ae4e471",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f25dfe15_e946d95d",
         "filename": "zephyr/shim/core/cortex-m/mpu.c",
         "patchSetId": 2
@@ -143,6 +161,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1baf009c_92e8e96e",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T18:11:57Z",
+      "side": 1,
+      "message": "Can you add a comment explaining this?",
+      "parentUuid": "9b878d50_8b1e72c8",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "21836980_285ffc89",
         "filename": "zephyr/shim/core/cortex-m/mpu.c",
         "patchSetId": 2
@@ -172,6 +208,24 @@
       "side": 1,
       "message": "Removed",
       "parentUuid": "21836980_285ffc89",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55037259_ef12dae9",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T18:11:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "93d40624_83407c94",
       "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
