@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8b2faea8_c7d339a9",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-05-21T02:48:03Z",
+      "side": 1,
+      "message": "Regions number from MPU_TYPE cannot be used here, because we don\u0027t know how many static regions are configured in zephyr.\nIn zephyr, the static regions can came from devicetree or custom defined mpu_regions.",
+      "parentUuid": "e1c4d77a_0bfa8fb7",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "44866e67_b05978be",
         "filename": "zephyr/shim/core/cortex-m/mpu.c",
         "patchSetId": 2
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-15T22:23:45Z",
       "side": 1,
       "message": "[Gerrit AI Review] The M33 path only adds `rollback0`, whereas the non-M33 path adds both `rollback0` and `rollback1`. If `rollback1` exists in the devicetree for M33 boards, it will be left unprotected by this code. Was this omission intentional?",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75e3b0d6_1ae4e471",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-05-21T02:48:03Z",
+      "side": 1,
+      "message": "Based on the current configuration, the rollback region is a contiguous region, so one MPU region should be sufficient.",
+      "parentUuid": "44866e67_b05978be",
       "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -54,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1a9ce889_0250f3c4",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-05-21T02:48:03Z",
+      "side": 1,
+      "message": "The CONFIG_ROLLBACK_SIZE is defined as rollback0_size + rollback1_size, is that OK",
+      "parentUuid": "f25dfe15_e946d95d",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ea06a094_917c8dc3",
         "filename": "zephyr/shim/core/cortex-m/mpu.c",
         "patchSetId": 2
@@ -71,6 +125,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9b878d50_8b1e72c8",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-05-21T02:48:03Z",
+      "side": 1,
+      "message": "In ARMv8-M, K_MEM_PARTITION_P_NA_U_NA is not support",
+      "parentUuid": "ea06a094_917c8dc3",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "21836980_285ffc89",
         "filename": "zephyr/shim/core/cortex-m/mpu.c",
         "patchSetId": 2
@@ -82,6 +154,24 @@
       "writtenOn": "2026-05-15T22:23:45Z",
       "side": 1,
       "message": "[Gerrit AI Review] This `printk` seems to be a leftover from debugging, as it is redundant with the `LOG_DBG` call on the previous line. Please remove it.",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93d40624_83407c94",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-05-21T02:48:03Z",
+      "side": 1,
+      "message": "Removed",
+      "parentUuid": "21836980_285ffc89",
       "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
