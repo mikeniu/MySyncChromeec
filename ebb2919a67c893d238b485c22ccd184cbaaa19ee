@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4331dd9a_ef9d6114",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 29
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 3594165
+      },
+      "writtenOn": "2026-05-21T05:35:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "77c2bf20_36dfd2e1",
+      "revId": "ebb2919a67c893d238b485c22ccd184cbaaa19ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "45c20dc5_a86bbf0a",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-05-19T17:35:57Z",
       "side": 1,
       "message": "Don\u0027t use C++ style comments.",
+      "range": {
+        "startLine": 60,
+        "startChar": 0,
+        "endLine": 60,
+        "endChar": 77
+      },
+      "revId": "ebb2919a67c893d238b485c22ccd184cbaaa19ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eee8fce9_ba1b82ff",
+        "filename": "zephyr/drivers/wot/wot.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 3594165
+      },
+      "writtenOn": "2026-05-21T05:35:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45c20dc5_a86bbf0a",
       "range": {
         "startLine": 60,
         "startChar": 0,
@@ -64,6 +106,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a908ce7f_f9936631",
+        "filename": "zephyr/drivers/wot/wot.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 3594165
+      },
+      "writtenOn": "2026-05-21T05:35:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "41d36156_4113df69",
+      "range": {
+        "startLine": 132,
+        "startChar": 0,
+        "endLine": 132,
+        "endChar": 47
+      },
+      "revId": "ebb2919a67c893d238b485c22ccd184cbaaa19ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a84d385d_bda88400",
@@ -87,6 +153,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9432c4b8_b6237265",
+        "filename": "zephyr/drivers/wot/wot.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 3594165
+      },
+      "writtenOn": "2026-05-21T05:35:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a84d385d_bda88400",
+      "range": {
+        "startLine": 144,
+        "startChar": 0,
+        "endLine": 156,
+        "endChar": 0
+      },
+      "revId": "ebb2919a67c893d238b485c22ccd184cbaaa19ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b735c397_1fff1397",
@@ -100,6 +190,30 @@
       "writtenOn": "2026-05-19T17:39:33Z",
       "side": 1,
       "message": "Check all the GPIOs are initialized at the top if the function.  No sense in configuring GPIOs or registering interrupts when `wot_init` returns an error.",
+      "range": {
+        "startLine": 175,
+        "startChar": 6,
+        "endLine": 175,
+        "endChar": 22
+      },
+      "revId": "ebb2919a67c893d238b485c22ccd184cbaaa19ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6249cf0_1151f409",
+        "filename": "zephyr/drivers/wot/wot.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 3594165
+      },
+      "writtenOn": "2026-05-21T05:35:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b735c397_1fff1397",
       "range": {
         "startLine": 175,
         "startChar": 6,
