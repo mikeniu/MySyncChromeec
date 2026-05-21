@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ebb21e4e_7b31d9f3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T15:56:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details regarding potential image truncation and devicetree configuration.\n\n### Review Summary\n*   **Functionality**: The simulator now correctly applies the `image_data_offset_bytes` when acquiring images for non-vendor capture types. However, the current implementation silently truncates images if the provided buffer is too small to fit the frame at the specified offset.\n*   **Security**: Robust bounds checking has been added to `fp_simulator_acquire_image` to prevent out-of-bounds writes.\n*   **Testing**: The `native_sim.overlay` was updated to test the offset logic, but the `frame-size` for real images likely needs adjustment to account for the new 400-byte offset and avoid truncation.\n*   **Style**: The code follows established patterns and is readable.\n\n[[trajectory](go/traj/729c0c83-0556-4955-bcad-8f7387e67059)]",
+      "revId": "88bb519de65caf4b68a93647b778096283451c79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7c617fef_375dca23",
         "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
         "patchSetId": 1
@@ -55,6 +72,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f7d1ae67_da3dd59b",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T15:56:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] While the `offset \u003c image_buf_size` check prevents a buffer overflow, if this condition is false (or if `safe_buf_size` is smaller than `frame_size`), the image will be silently truncated or not copied at all, while the function still returns `FINGERPRINT_SENSOR_SCAN_GOOD`. Consider returning an error like `-EINVAL` if the provided buffer cannot accommodate the full frame at the specified offset.",
+      "revId": "88bb519de65caf4b68a93647b778096283451c79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "15fdb3c7_00bc4f0e",
         "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
         "patchSetId": 1
@@ -84,6 +118,23 @@
       "side": 1,
       "message": "No. `config-\u003eimage_buffer` is the image buffer that we trying to inject. There is no offset here.",
       "parentUuid": "15fdb3c7_00bc4f0e",
+      "revId": "88bb519de65caf4b68a93647b778096283451c79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2ddd2a8_f295fa67",
+        "filename": "zephyr/test/fingerprint/task/boards/native_sim.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T15:56:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] For `FP_SIMULATOR_REAL_IMAGE_PROPS`, the `frame-size` of 25600 matches the pixel data size (160 * 160). However, since an `image-data-offset-bytes` of 400 is now applied, the total buffer size needed to avoid truncation is 26000. If the fingerprint task uses `frame_size` to allocate its buffer, the image data will be truncated by 400 bytes in the simulator. Should `frame-size` be updated to 26000 here?",
       "revId": "88bb519de65caf4b68a93647b778096283451c79",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
