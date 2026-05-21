@@ -112,6 +112,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e0781113_771e9c0a",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 650,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T16:45:19Z",
+      "side": 1,
+      "message": "In GetBootromInfo and GetFlashInfo (bootrom.cc), the code uses raw offsets to extract data:\n\n```c\n// Old:\nauto version \u003d ReadLittleEndian\u003cuint32_t\u003e(payload);\nauto max_size \u003d ReadLittleEndian\u003cuint32_t\u003e(payload.subspan(4));\nauto max_fw_upgrade_size \u003d ReadLittleEndian\u003cuint32_t\u003e(payload.subspan(8));\n\n```\n\nWhile using span is safer than raw pointers, this is still \"magic offset\" math. Because the underlying protocol is sending a structured binary header, you should represent it as a struct (just like you already did for EcHostCommandRequest in ec\\_protocol\\_defs.h).\n\n**The Fix:**\n\n```c\n// In bootrom.h\nstruct BootromInfoResponse {\n  uint32_t version;\n  uint32_t max_cmd_size;\n  uint32_t max_fw_upgrade_size;\n} __attribute__((packed));\n\n// In bootrom.cc (GetBootromInfo)\nif (payload.size() \u003c sizeof(BootromInfoResponse)) {\n    return std::unexpected(BootromError::kResponseTruncated);\n}\nauto* info \u003d reinterpret_cast\u003cconst BootromInfoResponse*\u003e(payload.data());\nstd::println(\"Bootrom Version: 0x{:x}\", info-\u003eversion); // *Remember to handle endianness if necessary\n\n```\n\n*(Note: If endianness conversion is strictly required here for cross-platform support, you can retain ReadLittleEndian, but calculate offsets using offsetof(BootromInfoResponse, max\\_cmd\\_size) instead of raw 4 and 8).*",
+      "range": {
+        "startLine": 648,
+        "startChar": 0,
+        "endLine": 650,
+        "endChar": 78
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "127a73ac_1a0bac39",
         "filename": "util/egis/bootrom.h",
         "patchSetId": 19
