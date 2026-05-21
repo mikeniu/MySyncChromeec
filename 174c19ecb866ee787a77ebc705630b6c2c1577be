@@ -37,6 +37,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3d04314d_de712253",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T18:38:22Z",
+      "side": 1,
+      "message": "**The Problem:** SendBootromCommandRaw, SendBootromCommandSha, and SendBootromCommandAes all duplicate the exact same USB transmission logic, memory allocation, error handling, and status header checking (about 15 lines of identical code in three different places).\n\n**The Fix:** Extract the core USB transmit/receive and status-check loop into a single private helper function inside BootromComm.\n\n**Add this helper to bootrom.cc:**\n\n```c\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e BootromComm::DoUsbTransfer(\n    std::span\u003cconst uint8_t\u003e tx_cmd, \n    size_t min_expected_rx_size,\n    std::chrono::milliseconds timeout) {\n  \n  DumpRawCmd(tx_cmd);\n\n  if (auto res \u003d usb_.BulkWrite(kBootromEpOutBulk, tx_cmd, timeout); !res)\n    return std::unexpected(BootromError::kUsbWriteFailed);\n\n  std::vector\u003cuint8_t\u003e ret(4096 + min_expected_rx_size, 0);\n  auto read_res \u003d usb_.BulkRead(kBootromEpInBulk, ret, timeout);\n  \n  if (!read_res || read_res.value() \u003c\u003d 0)\n    return std::unexpected(BootromError::kUsbReadFailed);\n\n  ret.resize(read_res.value());\n\n  if (ret.size() \u003c min_expected_rx_size)\n    return std::unexpected(BootromError::kResponseTruncated);\n\n  // All valid Bootrom responses start with a 0x00 0x00 status header\n  if (ret[0] !\u003d 0 || ret[1] !\u003d 0)\n    return std::unexpected(BootromError::kInvalidStatusHeader);\n\n  return ret;\n}\n\n```\n\nNow, SendBootromCommandSha becomes incredibly clean—it just packs the header and calls the helper:\n\n```c\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e\nBootromComm::SendBootromCommandSha(...) {\n  // ... [Pack the SHA header and append data into `cmd`] ...\n\n  auto ret_res \u003d DoUsbTransfer(cmd, kScHeaderSizeSha, timeout);\n  if (!ret_res) return std::unexpected(ret_res.error());\n\n  // Return everything after the header\n  return std::vector\u003cuint8_t\u003e(ret_res-\u003ebegin() + kScHeaderSizeSha, ret_res-\u003eend());\n}\n\n```\n\n*(Apply this exact same simplification to the Raw and Aes variants).*",
+      "range": {
+        "startLine": 185,
+        "startChar": 0,
+        "endLine": 189,
+        "endChar": 19
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "259dde0a_7ea05190",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 19
@@ -238,6 +261,29 @@
         "startChar": 0,
         "endLine": 368,
         "endChar": 41
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0729420f_71f046d6",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 509,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T18:38:22Z",
+      "side": 1,
+      "message": "The while loop in `RunFlashCmd` is doing too much heavy lifting: identifying crypto algorithms, calculating header offsets, performing endian math, managing USB transfers, and updating the CLI progress bar.\nBy extracting the boundary calculations into a pure `GetNextPacketSize` helper, we achieve two things:\n\n* **Readability:** The `RunFlashCmd `loop is reduced to four easily digestible phases: Parse Bounds -\u003e Send Data -\u003e Receive Response -\u003e Advance.\n* **Testability:** The complex packet-parsing logic (GetNextPacketSize) is now completely decoupled from libusb. If we want to write unit tests for it later, we can test it against mock byte arrays without needing to mock the entire USB connection.",
+      "range": {
+        "startLine": 454,
+        "startChar": 2,
+        "endLine": 509,
+        "endChar": 5
       },
       "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
