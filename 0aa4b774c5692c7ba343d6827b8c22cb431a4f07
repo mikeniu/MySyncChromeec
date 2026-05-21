@@ -120,6 +120,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "66fd5ae8_19712c98",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-21T16:14:57Z",
+      "side": 1,
+      "message": "A simple but dirty way would be to externally link `ctx` in test code. Then you could set `ctx.initialized` to false before each test, and `board_get_pdc_for_port` would take the non-cached path for each run.\n\nA less dirty but more verbose way would be to arrange the test cases so that each of them is its own test config/executable. Then each one would be the first thing to call `board_get_pdc_for_port` when it runs and take the non-cached path. You\u0027d have a bit more YAML and Kconfig boilerplate than you do now but less DTS and emulator boilerplate. I think it would be incrementally simpler.",
+      "parentUuid": "6a92f505_aa68f0a0",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 10
+      },
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "ebf64224_3caf4d46",
