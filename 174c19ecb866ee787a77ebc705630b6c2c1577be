@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "11a06f62_59122d20",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T16:27:15Z",
+      "side": 1,
+      "message": "In bootrom.cc, BootromComm::SendBootromCommandAes() performs a bounds check on the response length:\n\n```c\nif (rsp_wrapped_len + kScHeaderSizeAes \u003e ret.size()) {\n  rsp_wrapped_len \u003d ret.size() - kScHeaderSizeAes;\n}\n\n```\n\nIf a malicious or corrupted bootrom returns an extremely large rsp\\_wrapped\\_len (e.g., 0xFFFFFFF0), the addition can wrap around on 32-bit host architectures. This bypasses the condition and leads to out-of-bounds memory access during AES-GCM decryption.\n\n**Remediation:** Rewrite the condition using subtraction to completely avoid overflow risk:\n\n```c\nif (rsp_wrapped_len \u003e ret.size() - kScHeaderSizeAes) {\n  rsp_wrapped_len \u003d ret.size() - kScHeaderSizeAes;\n}\n\n```",
+      "range": {
+        "startLine": 320,
+        "startChar": 0,
+        "endLine": 322,
+        "endChar": 3
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6729905d_f8129163",
         "filename": "util/egis/ec_comm.cc",
         "patchSetId": 19
