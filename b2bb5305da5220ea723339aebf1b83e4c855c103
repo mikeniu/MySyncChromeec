@@ -33,6 +33,24 @@
       "message": "I haven\u0027t yet completed the review, but there is a build failure:\n\n```\nIn file included from /mnt/host/source/src/platform/ec/zephyr/shim/src/motionsense_driver/bma5xy-drvinfo.inc:7,\n                 from /mnt/host/source/src/platform/ec/zephyr/shim/src/motionsense_driver/sensor_drv_list.inc:29,\n                 from /mnt/host/source/src/platform/ec/zephyr/shim/src/motionsense_sensors.c:127:\n/mnt/host/source/src/platform/ec/driver/accel_bma5xy.h:193:2: error: #endif without #if\n  193 | #endif /* __CROS_EC_ACCEL_BMA5XY_H */\n      |  ^~~~~\n```",
       "revId": "b2bb5305da5220ea723339aebf1b83e4c855c103",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1703a097_84513899",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-21T21:20:38Z",
+      "side": 1,
+      "message": "The failure was on the test `drivers.write_protection_external` and others.\n\nThis should reproduce the failure.\n```\n./twister -ivc -s drivers.write_protection_external\n```",
+      "parentUuid": "824ea07a_a566857c",
+      "revId": "b2bb5305da5220ea723339aebf1b83e4c855c103",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
