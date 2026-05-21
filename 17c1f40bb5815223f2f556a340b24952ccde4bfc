@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "084e6a2f_33734797",
+        "filename": "zephyr/program/fatcat/moonstone/gpios.dtsi",
+        "patchSetId": 18
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-21T20:29:43Z",
+      "side": 1,
+      "message": "Your pwrmon driver needs to call gpio_pin_configure_dt() to initialize the GPIO to the desired state.\n\nnamed-gpios is deprecated and should not be used by new drivers.",
+      "parentUuid": "d70a088b_4daf18da",
+      "range": {
+        "startLine": 181,
+        "startChar": 0,
+        "endLine": 181,
+        "endChar": 35
+      },
+      "revId": "17c1f40bb5815223f2f556a340b24952ccde4bfc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bdced5d3_0c2d01cd",
         "filename": "zephyr/program/fatcat/program.conf",
         "patchSetId": 18
