@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "960dc31d_ab51379b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T16:23:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n\n*   **Functionality**: The CL adds a comprehensive set of unit tests for the `get_frame` function in the fingerprint sensor subsystem. It covers various error paths (locked system, invalid capture types, overflows) and success paths (absolute reads, shifted layout reads). The tests are well-structured and use the FFF framework effectively.\n*   **Security**: The tests verify that `get_frame` correctly handles access control (system locked) and boundary checks (integer overflows and buffer limits), which are critical for security and stability.\n*   **Style**: The new test file follows Zephyr test conventions and uses clear, descriptive test names. The use of a shared setup function (`get_frame_before`) ensures consistent state across tests.\n*   **Testing**: This CL significantly improves the test coverage for a critical piece of the fingerprint sensor driver. The added tests provide high confidence in the robustness of the frame retrieval logic.\n\n[[trajectory](go/traj/cf601c32-c97c-465f-924c-6945f30196b5)]",
+      "revId": "f8ef1236cdb993cfa75c9f1b364c04479f96723f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a253fad_43400eac",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T16:23:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Potential out-of-bounds write to `fp_buffer`. If `FP_SENSOR_IMAGE_OFFSET + offset` exceeds `FP_SENSOR_IMAGE_SIZE`, this will write past the end of the buffer. Consider adding a `zassert` to verify bounds before writing, or ensure `active_frame_size` is appropriately capped in the cache.",
+      "revId": "f8ef1236cdb993cfa75c9f1b364c04479f96723f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff56677e_da2559bd",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T16:23:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Similar to the shifted layout test, this write to `fp_buffer[absolute_destination]` might be out-of-bounds if `active_frame_size` is large and `FP_SENSOR_IMAGE_OFFSET \u003e 0`. Adding a boundary check would make the test more robust.",
+      "revId": "f8ef1236cdb993cfa75c9f1b364c04479f96723f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a0dab14_5aad17dc",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T16:23:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider adding a test case for `get_frame` with `size \u003d 0` to ensure it handles zero-length requests gracefully (e.g., returning `EC_RES_SUCCESS` without modifying the output buffer).",
+      "revId": "f8ef1236cdb993cfa75c9f1b364c04479f96723f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
