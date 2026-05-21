@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6729905d_f8129163",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T16:26:23Z",
+      "side": 1,
+      "message": "In ec\\_comm.cc (EcComm::SendCommand), the payload length check fails silently:\n\n```c\nif (header_len + resp_hdr-\u003edata_length \u003c\u003d resp_buf.size()) {\n  resp_out.assign(...);\n}\n\n```\n\nIf the device claims a data\\_length larger than what was actually received in resp\\_buf, the inner block is bypassed, and the function returns an empty successful response rather than raising an error.\n\n**Remediation:** \n\n```cpp\n  std::vector\u003cuint8_t\u003e resp_out;\n  if (resp_hdr-\u003edata_length \u003e 0) {\n    size_t header_len \u003d sizeof(EcHostCommandResponse);\n    \n    // Guard clause: error out immediately if the payload is truncated\n    if (header_len + resp_hdr-\u003edata_length \u003e resp_buf.size()) {\n      std::println(stderr, \"[ERROR] EC response data truncated. Claimed: {}, Actual: {}\", \n                   resp_hdr-\u003edata_length, resp_buf.size() - header_len);\n      return std::unexpected(EcError::kResponseTooShort);\n    }\n\n    // Happy path: no extra nesting needed\n    resp_out.assign(resp_buf.begin() + header_len,\n                    resp_buf.begin() + header_len + resp_hdr-\u003edata_length);\n  }\n\n  return resp_out;\n\n```\n\n### Why this is better:\n\n* **Readability:** The \"happy path\" (assigning the vector) isn\u0027t buried inside an if/else block.\n* **Fail-Fast:** By handling the error condition (\u003e resp_buf.size()) immediately, the cognitive load on the reader is reduced. They don\u0027t have to keep the if condition in their head while reading the success logic just to figure out what the else does.\n* **Logging:** It naturally provides a clean place to log exactly *why* it failed before returning the unexpected state.",
+      "range": {
+        "startLine": 114,
+        "startChar": 0,
+        "endLine": 114,
+        "endChar": 64
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c0a1faf6_9ed3f749",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 19
