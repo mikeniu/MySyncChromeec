@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ddc6a6b_bc51e319",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T16:44:03Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "960dc31d_ab51379b",
+      "revId": "f8ef1236cdb993cfa75c9f1b364c04479f96723f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9a253fad_43400eac",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-21T16:23:26Z",
       "side": 1,
       "message": "[Gerrit AI Review] Potential out-of-bounds write to `fp_buffer`. If `FP_SENSOR_IMAGE_OFFSET + offset` exceeds `FP_SENSOR_IMAGE_SIZE`, this will write past the end of the buffer. Consider adding a `zassert` to verify bounds before writing, or ensure `active_frame_size` is appropriately capped in the cache.",
+      "revId": "f8ef1236cdb993cfa75c9f1b364c04479f96723f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3856cbe4_9026d883",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T16:44:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a253fad_43400eac",
       "revId": "f8ef1236cdb993cfa75c9f1b364c04479f96723f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -52,6 +88,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "67137106_b481b1ac",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T16:44:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff56677e_da2559bd",
+      "revId": "f8ef1236cdb993cfa75c9f1b364c04479f96723f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0a0dab14_5aad17dc",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-05-21T16:23:26Z",
       "side": 1,
       "message": "[Gerrit AI Review] Consider adding a test case for `get_frame` with `size \u003d 0` to ensure it handles zero-length requests gracefully (e.g., returning `EC_RES_SUCCESS` without modifying the output buffer).",
+      "revId": "f8ef1236cdb993cfa75c9f1b364c04479f96723f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed37a8fa_ef7bdd07",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T16:44:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a0dab14_5aad17dc",
       "revId": "f8ef1236cdb993cfa75c9f1b364c04479f96723f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
