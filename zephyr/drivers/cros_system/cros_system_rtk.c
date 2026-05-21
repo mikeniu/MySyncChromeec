@@ -127,10 +127,10 @@ static uint8_t system_get_chip_version(void)
 
 const char *cros_system_chip_name(void)
 {
-	static char buf[8] = { 'r', 't', 's' };
+	static char buf[8];
 	uint32_t chip_id = system_get_chip_id();
 
-	snprintf(buf + 3, sizeof(buf) - 3, "%04x", (uint16_t)chip_id);
+	snprintf(buf, sizeof(buf), "rts%04x", (uint16_t)chip_id);
 
 	return buf;
 }
