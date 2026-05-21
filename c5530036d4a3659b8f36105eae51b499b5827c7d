@@ -22,6 +22,30 @@
       },
       "revId": "c5530036d4a3659b8f36105eae51b499b5827c7d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9a444ae_c1b4ef48",
+        "filename": "zephyr/shim/src/led_driver/led.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 524,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-05-21T14:24:09Z",
+      "side": 1,
+      "message": "Acknowledged, addressed in crrev/c/7866506",
+      "parentUuid": "4ae199f6_34886a72",
+      "range": {
+        "startLine": 524,
+        "startChar": 23,
+        "endLine": 524,
+        "endChar": 33
+      },
+      "revId": "c5530036d4a3659b8f36105eae51b499b5827c7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
