@@ -33,6 +33,24 @@
       "message": "[Gerrit AI Review] Consider using `zassert_mem_equal` to verify the entire `output_buffer` against an expected reference buffer, and adding a bounds check for the test setup, consistent with the other success test cases in this file (e.g., `test_get_frame_shifted_layout_success`). This would confirm that the entire requested range is correctly copied and that the test setup itself is valid.",
       "revId": "5718c7ba752828cd845bf7e53c7404dd8654539f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0903e2a9_baf32f0f",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 11
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T17:34:34Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "0d07250e_7fd5b8b5",
+      "revId": "5718c7ba752828cd845bf7e53c7404dd8654539f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
