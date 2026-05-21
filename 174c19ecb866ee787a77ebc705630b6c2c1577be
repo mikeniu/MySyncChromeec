@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "259dde0a_7ea05190",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T16:39:58Z",
+      "side": 1,
+      "message": "In bootrom.cc (SendBootromCommandAes), raw pointers and pointer arithmetic are used to slice up the AES-GCM response:\n\n```c\n// Old:\nuint8_t *rsp_iv \u003d ret.data() + kStatusHeaderSize + kWrappedCommandSize;\nuint8_t *rsp_tag \u003d rsp_iv + kAesGcmIvSize;\nuint8_t *rsp_payload \u003d rsp_tag + kAesGcmTagSize;\n\n```\n\n**The Risk:** Pointer math completely circumvents bounds checking and makes off-by-one errors easy to introduce. **The Fix:** You already have std::span ret\\_span \\\u003d ret; declared just above this block. Use subspan() to safely carve out the regions:\n\n```c\n// New:\nsize_t offset \u003d kStatusHeaderSize + kWrappedCommandSize;\nauto rsp_iv \u003d ret_span.subspan(offset, kAesGcmIvSize);\noffset +\u003d kAesGcmIvSize;\nauto rsp_tag \u003d ret_span.subspan(offset, kAesGcmTagSize);\noffset +\u003d kAesGcmTagSize;\nauto rsp_payload \u003d ret_span.subspan(offset, rsp_wrapped_len);\n\n```\n\n*(Note: Be sure to update the AesGcmDecryptOpenssl call below it to accept these spans directly instead of reconstructing spans from pointers).*",
+      "range": {
+        "startLine": 316,
+        "startChar": 0,
+        "endLine": 318,
+        "endChar": 50
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "11a06f62_59122d20",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 19
@@ -18,6 +41,29 @@
         "startLine": 320,
         "startChar": 0,
         "endLine": 322,
+        "endChar": 3
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "127a73ac_1a0bac39",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 19
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T16:39:58Z",
+      "side": 1,
+      "message": "In bootrom.h, the AES key setter accepts a raw byte pointer:\n\n```c\n// Old:\nvoid SetAesKey(const uint8_t *key) {\n  std::memcpy(aes_key_.data(), key, aes_key_.size());\n}\n\n```\n\n**The Risk:** This assumes the caller provides exactly 32 bytes. If the caller accidentally passes a shorter array, memcpy will read out of bounds. **The Fix:** Use a fixed-size std::span to enforce the exact length at compile time.\n\n```c\n// New:\nvoid SetAesKey(std::span\u003cconst uint8_t, 32\u003e key) {\n  std::copy(key.begin(), key.end(), aes_key_.begin());\n}\n\n```",
+      "range": {
+        "startLine": 150,
+        "startChar": 0,
+        "endLine": 152,
         "endChar": 3
       },
       "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
@@ -112,6 +158,29 @@
         "startChar": 0,
         "endLine": 512,
         "endChar": 74
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c957f012_a8133335",
+        "filename": "util/egis/usb_comm.h",
+        "patchSetId": 19
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T16:39:58Z",
+      "side": 1,
+      "message": "In usb\\_comm.h, the USB device handle is managed as a raw pointer:\n\n```c\n// Old:\nlibusb_device_handle *handle_ \u003d nullptr;\n\n```\n\n**The Risk:** While UsbComm encapsulates this handle and calls libusb\\_close(handle\\_) in its destructor, manual resource management violates the \"Rule of Zero\". If exceptions were ever thrown from UsbComm, or if the class was improperly moved, the handle could leak. **The Fix:** You already correctly wrapped the libusb\\_context in main() using a custom-deleter unique\\_ptr. Apply the exact same pattern to the handle.\n\n```c\n// New (in usb_comm.h):\n#include \u003cmemory\u003e\n\nclass UsbComm {\n  // ...\n private:\n  std::unique_ptr\u003clibusb_device_handle, decltype(\u0026libusb_close)\u003e handle_{nullptr, \u0026libusb_close};\n};\n\n```\n\nWhen connecting in usb\\_comm.cc, you would reset it:\n\n```c\nhandle_.reset(libusb_open_device_with_vid_pid(ctx_, vid_, pid_));\n\n```\n\n*(This allows you to completely remove libusb\\_close(handle\\_) from the destructor and error paths, as it will clean itself up automatically).*",
+      "range": {
+        "startLine": 90,
+        "startChar": 0,
+        "endLine": 90,
+        "endChar": 42
       },
       "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
