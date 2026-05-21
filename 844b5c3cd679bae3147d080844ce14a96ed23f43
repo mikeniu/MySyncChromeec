@@ -117,6 +117,30 @@
       },
       "revId": "844b5c3cd679bae3147d080844ce14a96ed23f43",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56f9d41b_3e9b885c",
+        "filename": "common/battery.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 584,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-05-21T11:35:33Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "3bbca846_2cb69304",
+      "range": {
+        "startLine": 583,
+        "startChar": 56,
+        "endLine": 584,
+        "endChar": 46
+      },
+      "revId": "844b5c3cd679bae3147d080844ce14a96ed23f43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
