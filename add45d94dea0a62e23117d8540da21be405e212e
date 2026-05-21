@@ -38,6 +38,57 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1d30201e_8185926b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:17:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/b09a8b10-2844-4fcf-b88b-2480d696713d)]\n\n### Review Summary\n*   **Functionality**: The logic to apply `image_data_offset_bytes` and the associated bounds checking are correctly implemented in the driver. However, the current devicetree configuration for `REAL_IMAGE_PROPS` sets an offset of 400 while keeping the `frame-size` at 25600. This combination will cause `fp_simulator_acquire_image` to return `-EINVAL` because the total required buffer size (offset + frame_size \u003d 26000) exceeds the likely provided buffer size (25600).\n*   **Logic**: There is a potential issue with the `memcpy` source pointer. If the simulator is loaded with a raw frame, `acquire_image` for non-raw modes should probably skip the header in the source buffer by applying the offset.\n*   **Security**: The added bounds checking is robust and prevents potential out-of-bounds writes to the destination buffer.\n*   **Consistency**: There is an inconsistency between the owner\u0027s statement that the offset does not apply to real image properties and the actual changes in the overlay which set the offset to 400 for those properties.",
+      "revId": "add45d94dea0a62e23117d8540da21be405e212e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "213e49a0_4b33a17a",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:17:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] There appears to be a mismatch between this logic and the `REAL_IMAGE_PROPS` in the devicetree overlay.\n\nFor `FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE`, `apply_image_offset` will be `true`, so `offset` will be 400. Since `frame-size` is 25600, `offset + frame_size` equals 26000. If the caller allocates based on the reported `frame-size` (25600), this check will return `-EINVAL`, effectively breaking simple image acquisition.\n\nIf `SIMPLE_IMAGE` should NOT have an offset, it should be added to the exclusion list here, or `image-data-offset-bytes` should remain 0 in `REAL_IMAGE_PROPS`.",
+      "revId": "add45d94dea0a62e23117d8540da21be405e212e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3585e234_5ef89997",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:17:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Regarding the source pointer: if `config-\u003eimage_buffer` was loaded with a full raw frame (e.g., via `z_impl_fingerprint_load_image`), then `config-\u003eimage_buffer` begins with the 400-byte header.\n\nWhen `offset` is 400 (as for `SIMPLE_IMAGE`), this `memcpy` will copy the *header* into the destination buffer (at `image_buf + 400`) instead of the pixel data. Should the source also be shifted by `offset`?\n\n```c\nmemcpy(image_buf + offset, config-\u003eimage_buffer + offset, frame_size);\n```",
+      "revId": "add45d94dea0a62e23117d8540da21be405e212e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5c96285b_ee6a7323",
         "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
         "patchSetId": 4
@@ -102,6 +153,23 @@
       "side": 1,
       "message": "it is a bit misleading. The offset is uniform across all the images. However, it does not mean that we will add an offset for all the images. There is another check for the offset addition:\n\n```\nuint32_t offset \u003d 0;\n\n\tbool apply_image_offset \u003d\n\t\t(mode !\u003d FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT \u0026\u0026\n\t\t mode !\u003d FINGERPRINT_CAPTURE_TYPE_QUALITY_TEST);\n```",
       "parentUuid": "36c32214_716b01c2",
+      "revId": "add45d94dea0a62e23117d8540da21be405e212e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39c8744b_afd7eb47",
+        "filename": "zephyr/test/fingerprint/task/boards/native_sim.overlay",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:17:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Setting `image-data-offset-bytes \u003d \u003c400\u003e` here while keeping `frame-size \u003d \u003c25600\u003e` will cause acquisition failures in the simulator for all capture types using these properties (like `SIMPLE_IMAGE`), because the driver now enforces `offset + frame_size \u003c\u003d image_buf_size`.\n\nIf these modes are intended to have an offset, `frame-size` should likely be increased to 26000 to reflect the required buffer size. Otherwise, this offset should remain 0.",
       "revId": "add45d94dea0a62e23117d8540da21be405e212e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
