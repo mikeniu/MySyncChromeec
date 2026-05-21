@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e654c070_0dd0fe3a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:32:05Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details regarding a configuration mismatch between the driver and devicetree that will cause image acquisition to fail.\n\n### Review Summary\n*   **Functionality**: The implementation of `image_data_offset_bytes` handling and bounds checking is technically sound. However, the devicetree overlay for `REAL_IMAGE_PROPS` sets an offset of 400 while keeping `frame-size` at 25600. This combination will cause `fp_simulator_acquire_image` to return `-EINVAL` for capture types like `SIMPLE_IMAGE` because the required buffer size (offset + frame_size \u003d 26000) exceeds the reported frame size (25600).\n*   **Security**: The added bounds checking is robust and effectively prevents out-of-bounds writes to the destination buffer.\n*   **Consistency**: There is an unresolved inconsistency between the driver\\s exclusion logic and the overlay properties. If the offset is not intended to apply to real image types, it should either be 0 in the DT or the modes should be explicitly excluded in the driver.\n*   **Style**: The code is well-structured and adheres to established patterns in the simulator driver.\n\n[[trajectory](go/traj/65652dec-86cc-4b3d-aaec-cae73ed3072b)]",
+      "revId": "76eb1d9464bed119e8e716461ebc952fe30762ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34b82eb8_5810d532",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:32:05Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The exclusion list here does not match the author\\s stated intent that \"for real_image_props, the offset does not apply\". \n\nModes like `FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE` are NOT excluded here, yet they use `REAL_IMAGE_PROPS` which now has a 400-byte offset in the devicetree. This will cause the driver to attempt to apply the offset and subsequently fail the bounds check if the buffer size matches the reported `frame-size`. \n\nConsider either:\n1. Adding all \"real image\" capture types to this exclusion list.\n2. Reverting the offset to 0 in `REAL_IMAGE_PROPS` in the devicetree.\n3. Increasing the `frame-size` in `REAL_IMAGE_PROPS` to account for the offset.",
+      "revId": "76eb1d9464bed119e8e716461ebc952fe30762ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "857492a8_6ce7e460",
+        "filename": "zephyr/test/fingerprint/task/boards/native_sim.overlay",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:32:05Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Setting `image-data-offset-bytes \u003d \u003c400\u003e` here while keeping `frame-size \u003d \u003c25600\u003e` creates an impossible configuration for the driver.\n\nFor `FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE`, the driver now calculates `offset \u003d 400` and `frame_size \u003d 25600`. It then checks if `offset + frame_size \u003e image_buf_size`. If the caller provides a buffer of `frame_size` (25600), the check will fail: `400 + 25600 (26000) \u003e 25600` is true, so the driver will return `-EINVAL`.\n\nIf this mode is not supposed to have an offset, this value should be 0. If it IS supposed to have an offset, `frame-size` must be increased to at least 26000 to accommodate both the offset and the pixel data.",
+      "revId": "76eb1d9464bed119e8e716461ebc952fe30762ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
