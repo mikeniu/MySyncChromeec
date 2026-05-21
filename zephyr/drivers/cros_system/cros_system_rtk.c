@@ -109,20 +109,30 @@ union rtk_chip_info_reg {
 	} __packed;
 };
 
+static struct {
+	bool initialized;
+	union rtk_chip_info_reg info;
+} cached_otp;
+
+static void ensure_otp_initialized(void)
+{
+	if (cached_otp.initialized)
+		return;
+
+	cached_otp.info.raw = get_otp_chip_info();
+	cached_otp.initialized = true;
+}
+
 static uint32_t system_get_chip_id(void)
 {
-	union rtk_chip_info_reg reg;
-
-	reg.raw = get_otp_chip_info();
-	return reg.main_id;
+	ensure_otp_initialized();
+	return cached_otp.info.main_id;
 }
 
 static uint8_t system_get_chip_version(void)
 {
-	union rtk_chip_info_reg reg;
-
-	reg.raw = get_otp_chip_info();
-	return reg.sub_id;
+	ensure_otp_initialized();
+	return cached_otp.info.sub_id;
 }
 
 const char *cros_system_chip_name(void)
