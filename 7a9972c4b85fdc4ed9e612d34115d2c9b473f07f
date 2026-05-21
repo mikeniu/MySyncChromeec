@@ -22,6 +22,30 @@
       },
       "revId": "7a9972c4b85fdc4ed9e612d34115d2c9b473f07f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "941a9dde_b91f4316",
+        "filename": "zephyr/subsys/ap_pwrseq/include/signal_vw.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-05-21T05:35:11Z",
+      "side": 1,
+      "message": "I have enabled it for ocelot https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7633065/6 \n\nAs PLTRST is VW signal(no physical GPIO) needed, i will extend for other platforms too.",
+      "parentUuid": "74e5d87d_5ee30c73",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 45
+      },
+      "revId": "7a9972c4b85fdc4ed9e612d34115d2c9b473f07f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
