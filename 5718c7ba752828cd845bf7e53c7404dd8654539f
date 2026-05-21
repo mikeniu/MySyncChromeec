@@ -20,6 +20,57 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "08f4adf4_e841d9e5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:37:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n\n*   **Functionality**: The CL adds a comprehensive set of unit tests for the `get_frame` function in the fingerprint sensor subsystem. It covers various error paths (locked system, invalid capture types, overflows) and success paths (absolute reads, shifted layout reads). The tests are well-structured and use the FFF framework effectively.\n*   **Security**: The tests verify that `get_frame` correctly handles access control (system locked) and boundary checks (integer overflows and buffer limits), which are critical for security and stability.\n*   **Style**: The new test file follows Zephyr test conventions and uses clear, descriptive test names. The use of a shared setup function ensures consistent state across tests.\n*   **Testing**: This CL significantly improves the test coverage for a critical piece of the fingerprint sensor driver. The added tests provide high confidence in the robustness of the frame retrieval logic.\n\n[[trajectory](go/traj/c97b6e8c-fa72-45c3-b5a5-cac4afb4b3c5)]",
+      "revId": "5718c7ba752828cd845bf7e53c7404dd8654539f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc4ce8c1_23601b58",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 11
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:37:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This `reinterpret_cast` assumes that the layout of `global_context.fp_frame_size_cache` is identical to `std::array\u003cuint32_t, FP_CAPTURE_TYPE_MAX\u003e`. While effective for testing, it is inherently brittle. If the implementation of `FpFrameSizeCache` changes (e.g., adding members or changing the storage type), this test could fail or cause memory corruption.\n\nConsider adding a test-only setter to `FpFrameSizeCache` or using a `friend` declaration to allow tests to safely manipulate its internal state.",
+      "revId": "5718c7ba752828cd845bf7e53c7404dd8654539f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3ee38ca_4061ed2a",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 11
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T17:37:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] For consistency with other success tests in this file (e.g., `test_get_frame_shifted_layout_success`), consider using `zassert_mem_equal` to verify the entire `output_buffer` against an expected reference buffer. This provides a stronger guarantee that the entire requested range was correctly copied and that no other parts of the buffer were unexpectedly modified.",
+      "revId": "5718c7ba752828cd845bf7e53c7404dd8654539f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0d07250e_7fd5b8b5",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
         "patchSetId": 11
