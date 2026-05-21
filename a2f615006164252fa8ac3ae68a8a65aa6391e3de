@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9100a90c_675c9a60",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T17:28:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c61c7053_3947f942",
+      "revId": "a2f615006164252fa8ac3ae68a8a65aa6391e3de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "13f16dd1_f5b5d349",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-05-21T17:00:55Z",
       "side": 1,
       "message": "[Gerrit AI Review] Since `fp_buffer` is zeroed in `get_frame_before`, you could strengthen this test by verifying that the entire `output_buffer` matches the expected state (e.g., zeroes for the rest of the `size` bytes) instead of just checking the first two bytes. This would confirm that `get_frame` correctly copied the entire requested range.",
+      "revId": "a2f615006164252fa8ac3ae68a8a65aa6391e3de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5fa4f21_6d7ed64a",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T17:28:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "13f16dd1_f5b5d349",
       "revId": "a2f615006164252fa8ac3ae68a8a65aa6391e3de",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -69,6 +105,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c94a3d17_366fe535",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T17:28:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "083fa098_fb965dc3",
+      "revId": "a2f615006164252fa8ac3ae68a8a65aa6391e3de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "14d2227a_45cee897",
@@ -82,6 +136,24 @@
       "writtenOn": "2026-05-21T17:00:55Z",
       "side": 1,
       "message": "[Gerrit AI Review] Consider adding a boundary check for the test setup here as well, for consistency and robustness against future changes to `kMaxReadSize` or `FP_SENSOR_IMAGE_SIZE`: `zassert_true(offset + size \u003c\u003d FP_SENSOR_IMAGE_SIZE, ...)`.",
+      "revId": "a2f615006164252fa8ac3ae68a8a65aa6391e3de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "79a4d15d_ffcee795",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-21T17:28:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14d2227a_45cee897",
       "revId": "a2f615006164252fa8ac3ae68a8a65aa6391e3de",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
