@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "20b7a4fd_27dc9a8d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-21T16:50:36Z",
+      "side": 1,
+      "message": "While the lower-level communication classes (BootromComm, UsbComm, EcComm) make excellent and consistent use of std::expected, the application layer (et171\\_flash.cc) falls back to legacy error-handling patterns like std::optional, bool, and C-style int return codes.\n\nUsing std::expected in these areas would drastically improve the architecture by separating the *logic* from the *logging*, removing hidden stderr prints from utility functions.\n\nHere are the key places that should be refactored to use std::expected:\n\n### 1\\. File I/O: ReadBinaryFile\n\nCurrently, this returns std::optional\\\u003cstd::vector\\\u003cuint8\\_t\\\u003e\\\u003e. std::optional is semantically for things that *might not exist* (like an optional regex match), but file operations fail for specific reasons (e.g., permission denied, I/O error). Furthermore, it logs directly to stderr.\n\n**The Fix:** Return std::expected containing the system error code (std::errc).\n\n```c\n// Old:\nstd::optional\u003cstd::vector\u003cuint8_t\u003e\u003e ReadBinaryFile(std::string_view path) {\n  // ...\n  if (!file) {\n    std::println(stderr, \" -\u003e System error: {}\", std::strerror(errno));\n    return std::nullopt;\n  }\n  // ...\n}\n\n// New:\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, std::errc\u003e ReadBinaryFile(std::string_view path) {\n  // ...\n  if (!file) {\n    return std::unexpected(static_cast\u003cstd::errc\u003e(errno));\n  }\n  // ...\n}\n\n```\n\n### 2\\. High-Level Routines: ExecuteGetVersion \u0026 ExecuteBootLoader\n\nThese functions return C-style int codes (0 for success, \\-1 for failure). Because they internally call EcComm::SendCommand (which uses std::expected), they are forced to unwrap the modern error handling and downgrade it into an int, while eagerly printing to stderr.\n\n**The Fix:** Propagate the EcError upward.\n\n```c\n// Old:\nint ExecuteBootLoader(UsbComm \u0026comm) {\n  // ...\n  auto resp \u003d ec_comm.SendCommand(...);\n  if (!resp) {\n    std::println(stderr, \"[ERROR] ...\", ToString(resp.error()));\n    return -1;\n  }\n  return 0;\n}\n\n// New:\nstd::expected\u003cvoid, EcError\u003e ExecuteBootLoader(UsbComm \u0026comm) {\n  EcComm ec_comm(comm);\n  auto resp \u003d ec_comm.SendCommand(static_cast\u003cuint16_t\u003e(EcCommandId::kEcCmdEnterBootloader), 0);\n  if (!resp) {\n    return std::unexpected(resp.error());\n  }\n  return {};\n}\n\n```\n\n### 3\\. Key Loading \u0026 Bootloader Connection\n\nBoth LoadAesKey and ConnectToBootloader return bool. When a function returns bool for a complex operation, the caller has no idea *why* it failed, which forces the function itself to print the error before returning false.\n\n**The Fix for ConnectToBootloader:** Return the UsbError directly so the caller decides how to handle the timeout.\n\n```c\n// Old:\nbool ConnectToBootloader(libusb_context *usb_ctx, UsbComm \u0026boot_comm);\n\n// New:\nstd::expected\u003cvoid, UsbError\u003e ConnectToBootloader(libusb_context *usb_ctx, UsbComm \u0026boot_comm) {\n  // ...\n  while (...) {\n    if (auto res \u003d boot_comm.Connect(); res) {\n      return {};\n    }\n  }\n  return std::unexpected(UsbError::kTimeout);\n}\n\n```\n\n### Why this matters architecturally\n\nBy changing these to std::expected, you achieve **Pure Utility Functions**. Functions like ReadBinaryFile, LoadAesKey, and ConnectToBootloader should never call std::println(stderr, ...).\n\nIf you use std::expected, the utilities simply return their failure state. Then, inside main() or the top-level RunFlashFw, you can handle the error centrally:\n\n```c\n// Inside main() or RunFlashFw():\nif (auto fw_res \u003d ReadBinaryFile(config.fw_path); !fw_res) {\n  std::println(stderr, \"[FATAL] Failed to read firmware file \u0027{}\u0027: {}\", \n               config.fw_path, std::make_error_code(fw_res.error()).message());\n  return EXIT_FAILURE;\n}\nauto\u0026 firmware \u003d fw_res.value();\n\n```\n\nThis makes the code vastly easier to test, reuse, and maintain.",
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "259dde0a_7ea05190",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 19
