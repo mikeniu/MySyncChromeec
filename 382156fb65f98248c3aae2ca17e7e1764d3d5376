@@ -51,6 +51,24 @@
       "parentUuid": "86c22ca3_176abdfe",
       "revId": "382156fb65f98248c3aae2ca17e7e1764d3d5376",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c44819c8_ebbf4247",
+        "filename": "zephyr/program/bluey/quartz/src/chipset.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-05-22T12:37:55Z",
+      "side": 1,
+      "message": "Sounds good, consider using `HOOK_CHIPSET_PRE_INIT` instead of `HOOK_CHIPSET_STARTUP`.",
+      "parentUuid": "042ff8b7_b9f617a5",
+      "revId": "382156fb65f98248c3aae2ca17e7e1764d3d5376",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
