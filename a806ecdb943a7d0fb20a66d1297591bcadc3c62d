@@ -475,6 +475,24 @@
       "parentUuid": "3a4bb5fb_e184e2a7",
       "revId": "a806ecdb943a7d0fb20a66d1297591bcadc3c62d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9ecebe3_6ac94e90",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T17:20:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9cd47649_f2a049a6",
+      "revId": "a806ecdb943a7d0fb20a66d1297591bcadc3c62d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
