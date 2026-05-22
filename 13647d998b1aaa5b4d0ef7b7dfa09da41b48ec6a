@@ -38,6 +38,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b6ed3e86_deeeff62",
+        "filename": "util/elan/file_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T17:04:06Z",
+      "side": 1,
+      "message": "Let\u0027s remove this comment. It was just there to help you understand when the code was shared.",
+      "range": {
+        "startLine": 30,
+        "startChar": 45,
+        "endLine": 30,
+        "endChar": 78
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "876d39e6_7e134747",
+        "filename": "util/elan/file_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T17:04:06Z",
+      "side": 1,
+      "message": "Let\u0027s remove this comment. It was just there to help you understand when the code was shared.",
+      "range": {
+        "startLine": 43,
+        "startChar": 16,
+        "endLine": 43,
+        "endChar": 79
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b172b9f2_a1b7d33b",
         "filename": "util/elan/iap_control.cc",
         "patchSetId": 21
@@ -54,6 +100,29 @@
         "startChar": 0,
         "endLine": 18,
         "endChar": 36
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8960bc9c_cf19f893",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T17:04:06Z",
+      "side": 1,
+      "message": "In `RunIapProcess`, the ROM address is hardcoded twice using a magic number:\n\n```c\n  if (auto res \u003d SetRomAddress(0x0000); !res)\n\n```\n\n* **Recommendation:** Define a constant (e.g., `constexpr uint32_t kBaseRomAddress \u003d 0x0000;`) in `iap_control.h` or in the anonymous namespace, and use it in both the Read and Write phases.",
+      "range": {
+        "startLine": 106,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 45
       },
       "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
