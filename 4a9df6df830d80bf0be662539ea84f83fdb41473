@@ -89,6 +89,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c4b43b0d_1bd67362",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T18:03:50Z",
+      "side": 1,
+      "message": "Using raw hex (like `0x00200000`) or raw decimal values (like `32768`) for memory sizes forces developers to do mental math to understand the capacity. Relying on comments to clarify these values (e.g., `// 2 MB`) is a dangerous anti-pattern: if the code is updated but the comment is forgotten, the contradiction causes serious confusion. Using explicit multiplication (e.g., `32 * 1024`) is the industry-standard way to make memory sizes self-documenting.\n\nFurthermore, burying operation limits as local variables (like `len_chunk`) inside individual methods hides critical hardware constraints from anyone reading the header. It also allows inconsistencies to creep in—such as `BackupFlash` using a 4 KB chunk while `ReadFlash` uses a 1 KB chunk for the exact same underlying command. Lifting these limits into unified `constexpr` class members documents the hardware\u0027s exact capabilities in the public interface and guarantees uniform behavior.\n\n### Detailed Fix\n\n**1\\. Location:** `util/egis/bootrom.h` Update the namespace flash capacity constant to use explicit math, and add/update the unified class constants for payload boundaries.\n\n```c\nnamespace EgisBootrom {\n// ...\nconstexpr uint32_t kFlashBaseAddr \u003d 0x80000000;\n// Fix: Replace 0x00200000 and the comment with explicit math\nconstexpr uint32_t kFlashTotalSize \u003d 2 * 1024 * 1024; \n// ...\n}\n\nclass BootromComm {\n public:\n  // ...\n  // Fix: Replace 4096 and 32768 with explicit math\n  static constexpr size_t kMaxPayloadSize \u003d 4 * 1024;\n  static constexpr size_t kMaxFlashWriteSize \u003d 32 * 1024;\n  \n  // Fix: Add a unified constant for flash read chunks\n  static constexpr size_t kMaxFlashReadSize \u003d 4 * 1024;\n\n```\n\n**2\\. Location:** `util/egis/bootrom.cc` inside `BootromComm::BackupFlash()` Remove the local `len_chunk` variable and use the unified class constant.\n\n```c\nstd::expected\u003cvoid, BootromError\u003e BootromComm::BackupFlash(\n    std::string_view filename, uint32_t total_size) {\n  std::ofstream outfile(std::string(filename),\n                        std::ios::binary | std::ios::trunc);\n  if (!outfile.is_open())\n    return std::unexpected(BootromError::kFileOperationFailed);\n\n  // Fix: Removed local `const uint32_t len_chunk \u003d 4096;`\n\n  std::println(\"--- Executing CMD_MEM_READ (0x20) ---\");\n\n  for (uint32_t addr \u003d 0; addr \u003c total_size; addr +\u003d kMaxFlashReadSize) {\n    uint32_t current_read \u003d std::min\u003cuint32_t\u003e(kMaxFlashReadSize, total_size - addr);\n\n    std::vector\u003cuint8_t\u003e data \u003d {EgisBootrom::kCmdMemRead};\n    uint32_t flash_addr \u003d EgisBootrom::kFlashBaseAddr + addr;\n    // ... rest of method\n\n```\n\n**3\\. Location:** `util/egis/bootrom.cc` inside `BootromComm::ReadFlash()` Remove the local `len_chunk` variable (which was inconsistently set to 1024\\) and use the unified 4 KB class constant.\n\n```c\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e BootromComm::ReadFlash(\n    uint32_t offset, uint32_t length) {\n  std::vector\u003cuint8_t\u003e buffer;\n  \n  // Fix: Removed local `const uint32_t len_chunk \u003d 1024;`\n\n  for (uint32_t addr_offset \u003d 0; addr_offset \u003c length;\n       addr_offset +\u003d kMaxFlashReadSize) {\n    uint32_t current_read \u003d std::min\u003cuint32_t\u003e(kMaxFlashReadSize, length - addr_offset);\n    uint32_t addr \u003d offset + addr_offset;\n\n    std::vector\u003cuint8_t\u003e cmd \u003d {EgisBootrom::kCmdMemRead};\n    uint32_t flash_addr \u003d EgisBootrom::kFlashBaseAddr + addr;\n    // ... rest of method\n\n```",
+      "range": {
+        "startLine": 130,
+        "startChar": 0,
+        "endLine": 130,
+        "endChar": 57
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "987bdcb1_48cbc6ca",
         "filename": "util/egis/bootrom.h",
         "patchSetId": 20
