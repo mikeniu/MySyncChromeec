@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38d857c9_fea314fe",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 5880,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-05-22T16:55:06Z",
+      "side": 1,
+      "message": "nit: I don\u0027t think we need a logline here",
+      "range": {
+        "startLine": 5880,
+        "startChar": 2,
+        "endLine": 5880,
+        "endChar": 9
+      },
+      "revId": "695f665d5c38af68011558a95d84f5a7864e347e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
