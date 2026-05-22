@@ -89,6 +89,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "987bdcb1_48cbc6ca",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T17:55:01Z",
+      "side": 1,
+      "message": "Instead of scattering `std::chrono::milliseconds(200)` and `std::chrono::milliseconds(500)` across your function declarations, define them as named constants at the top of the `BootromComm` class alongside your other timeouts.\n\n**1\\. Define the Constants in `bootrom.h`:**\n\n```c\nclass BootromComm {\n public:\n  // ... existing constants ...\n  static constexpr auto kFlashTimeout \u003d std::chrono::milliseconds(5000);\n  static constexpr auto kResetTimeout \u003d std::chrono::milliseconds(500);\n  \n  // Add these new constants:\n  static constexpr auto kDefaultCommandTimeout \u003d std::chrono::milliseconds(200);\n  static constexpr auto kFlashReadyPollTimeout \u003d std::chrono::milliseconds(500);\n\n```\n\n**2\\. Update the Function Declarations in `bootrom.h`:** Replace the hardcoded values with your new constants in the `private` section of the class.\n\n```c\n private:\n  // ...\n  \n  std::expected\u003cvoid, BootromError\u003e WaitForFlashReady(\n      std::chrono::milliseconds timeout \u003d kFlashReadyPollTimeout);\n\n  // ...\n\n  std::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e SendBootromCommandRaw(\n      std::span\u003cconst uint8_t\u003e data, size_t resp_size,\n      std::chrono::milliseconds timeout \u003d kDefaultCommandTimeout);\n\n  std::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e SendBootromCommandSha(\n      std::span\u003cconst uint8_t\u003e data, size_t resp_size,\n      std::chrono::milliseconds timeout \u003d kDefaultCommandTimeout);\n\n  std::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e SendBootromCommandAes(\n      std::span\u003cconst uint8_t\u003e data, size_t resp_size,\n      std::chrono::milliseconds timeout \u003d kDefaultCommandTimeout);\n\n  std::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e SendBootromCommand(\n      std::span\u003cconst uint8_t\u003e data, size_t resp_size,\n      std::chrono::milliseconds timeout \u003d kDefaultCommandTimeout);\n\n```\n\n### Why this is better:\n\n1. **DRY (Don\u0027t Repeat Yourself):** The 200ms timeout was repeated four times. Now it is defined in exactly one place.  \n2. **Self-Documenting:** `kDefaultCommandTimeout` and `kFlashReadyPollTimeout` explicitly communicate *what* these durations are used for, eliminating ambiguity.  \n3. **Maintainability:** If you ever need to tune these timings for a slower board or a noisier USB environment, you only have to update the values at the top of the class definition rather than hunting down magic numbers buried in method signatures.",
+      "range": {
+        "startLine": 214,
+        "startChar": 0,
+        "endLine": 228,
+        "endChar": 74
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "427bff8f_c39298a8",
         "filename": "util/egis/ec_comm.cc",
         "patchSetId": 20
