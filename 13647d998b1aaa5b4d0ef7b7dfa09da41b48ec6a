@@ -84,6 +84,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f2b4717c_dd281574",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T17:00:28Z",
+      "side": 1,
+      "message": "There is a massive opportunity to DRY up the command formatting. If you look at `iap_control.cc`, you have six different functions that do the exact same thing: initialize an 8-byte array, set the first byte to a command code, put a 32-bit payload at byte offset 4, and send it.\n\nYou can cut out nearly 60 lines of boilerplate by implementing two small helper functions and taking advantage of **tail returns** for `std::expected`.\n\n### 1. The Command Helpers\n\nAdd these two private methods to `IapControl`:\n\n```cpp\nstd::expected\u003cvoid, IapError\u003e IapControl::SendCmdOnly(uint8_t cmd_code) {\n  uint8_t data_send[kEp1Length] \u003d {cmd_code};\n  return IapCommand(data_send);\n}\n\nstd::expected\u003cvoid, IapError\u003e IapControl::SendCmdWithU32Payload(\n    uint8_t cmd_code, uint32_t payload) {\n  uint8_t data_send[kEp1Length] \u003d {};\n  data_send[0] \u003d cmd_code;\n\n  if (auto res \u003d Set32Le(std::span\u003cuint8_t\u003e(data_send + 4, 4), payload); !res) {\n    return res;\n  }\n\n  return IapCommand(data_send);\n}\n\n```\n\n*Note on tail returns:* Notice how we just do `return IapCommand(...)` at the end instead of checking `!res` and returning `std::unexpected(res.error())` or `{}`? Because the return types match exactly (`std::expected\u003cvoid, IapError\u003e`), you can just return the result of the inner function directly.\n\n### 2. Refactoring the Callers\n\nNow you can collapse eight different functions down to single-liners.\n\n**Commands with a 32-bit Payload:**\n\n```cpp\nstd::expected\u003cvoid, IapError\u003e IapControl::WriteRom(uint32_t length) {\n  return SendCmdWithU32Payload(kCmdWriteRom, length);\n}\n\nstd::expected\u003cvoid, IapError\u003e IapControl::WriteRomFinish(uint32_t checksum) {\n  return SendCmdWithU32Payload(kCmdWriteRomFinish, checksum);\n}\n\nstd::expected\u003cvoid, IapError\u003e IapControl::SetRomAddress(uint32_t address) {\n  return SendCmdWithU32Payload(kCmdSetRomAddress, address);\n}\n\nstd::expected\u003cvoid, IapError\u003e IapControl::ReadRom(uint32_t length) {\n  return SendCmdWithU32Payload(kCmdReadRom, length);\n}\n\nstd::expected\u003cvoid, IapError\u003e IapControl::ReadRomFinish(uint32_t checksum) {\n  return SendCmdWithU32Payload(kCmdReadRomFinish, checksum);\n}\n\nstd::expected\u003cvoid, IapError\u003e IapControl::FinishIap(uint32_t checksum) {\n  return SendCmdWithU32Payload(kCmdFinishedIap, checksum);\n}\n\n```\n\n**Commands without a Payload:**\n\n```cpp\nstd::expected\u003cvoid, IapError\u003e IapControl::SoftwareReset() {\n  return SendCmdOnly(kCmdSoftwareReset);\n}\n\nstd::expected\u003cvoid, IapError\u003e IapControl::AbortProcess() {\n  return SendCmdOnly(kCmdAbortProcess);\n}\n\n```\n\n**Custom Payload (RunIap):**\n`RunIap` sets a `uint8_t` payload at index 4 instead of a 32-bit one, so it can\u0027t use the `U32` helper, but you can still use the direct return trick:\n\n```cpp\nstd::expected\u003cvoid, IapError\u003e IapControl::RunIap(uint8_t iap_mode) {\n  uint8_t data_send[kEp1Length] \u003d {};\n  data_send[0] \u003d kCmdRunIap;\n  data_send[4] \u003d iap_mode;\n  return IapCommand(data_send);\n}\n\n```\n\nBy adding those two helpers and returning `std::expected` directly, you remove dozens of redundant array initializations and identical error-checking blocks, making the protocol logic much easier to read at a glance.",
+      "range": {
+        "startLine": 236,
+        "startChar": 0,
+        "endLine": 249,
+        "endChar": 0
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f2f2ca05_3062b6dc",
         "filename": "util/elan/iap_control.cc",
         "patchSetId": 21
