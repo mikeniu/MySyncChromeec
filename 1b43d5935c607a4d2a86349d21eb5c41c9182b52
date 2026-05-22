@@ -95,6 +95,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1418c55_ff6d158d",
+        "filename": "zephyr/drivers/pwrmon/Kconfig",
+        "patchSetId": 23
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-22T15:04:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "80a65055_b310bf7c",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 17
+      },
+      "revId": "1b43d5935c607a4d2a86349d21eb5c41c9182b52",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6a36f1c2_ffb0b7ba",
@@ -132,6 +156,30 @@
       "side": 1,
       "message": "I will fix it in the next iteration.",
       "parentUuid": "6a36f1c2_ffb0b7ba",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 62
+      },
+      "revId": "1b43d5935c607a4d2a86349d21eb5c41c9182b52",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfca4051_cd1c94dd",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 23
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-22T15:04:20Z",
+      "side": 1,
+      "message": "I\u0027ve done that, but I feel that it would be better to split `pwrmon.c` into two parts: `pwrmon_host_cmd.c` and `pwrmon_driver.c`. Then `pwrmon_init` could be called in `ec_app_main.c`. I saw that `subsys/ucsi` does this.",
+      "parentUuid": "33b34142_70c2e176",
       "range": {
         "startLine": 17,
         "startChar": 0,
