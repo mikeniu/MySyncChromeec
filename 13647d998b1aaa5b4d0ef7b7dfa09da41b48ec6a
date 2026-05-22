@@ -61,6 +61,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e247bddf_1dad0a9b",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T16:59:31Z",
+      "side": 1,
+      "message": "In `util/elan/iap_control.cc`, `RunIapProcess` writes the ROM data to the device *before* verifying if the data size meets the checksum\u0027s alignment requirements:\n\n```c\n  if (auto res \u003d WriteRomData(rom); !res) return std::unexpected(res.error());\n  \n  auto checksum \u003d GetChecksum(rom); // Checks if size % 4 \u003d\u003d 0\n  if (!checksum) return std::unexpected(checksum.error());\n\n```\n\nIf the provided binary size is not a multiple of 4, `GetChecksum` will fail and abort the process *after* partially or fully erasing/writing the ROM, effectively bricking the device.\n\n* **Recommendation:** Move the `GetChecksum(rom)` validation to the very beginning of `RunIapProcess`, before any USB commands (like `kCmdRunIap`) are sent to the microcontroller.",
+      "range": {
+        "startLine": 109,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 58
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f2f2ca05_3062b6dc",
         "filename": "util/elan/iap_control.cc",
         "patchSetId": 21
