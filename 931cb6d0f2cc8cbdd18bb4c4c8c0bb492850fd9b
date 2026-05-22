@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8724a3d3_e0b0678e",
+        "filename": "util/elan/build.mk",
+        "patchSetId": 20
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-22T07:59:30Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 21.",
+      "parentUuid": "8a9016fd_bc287eee",
+      "range": {
+        "startLine": 17,
+        "startChar": 8,
+        "endLine": 17,
+        "endChar": 36
+      },
+      "revId": "931cb6d0f2cc8cbdd18bb4c4c8c0bb492850fd9b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c6df7af9_6ef12e4d",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "91620569_64d4ee3d",
+        "filename": "util/elan/file_control.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-22T07:59:30Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 21.",
+      "parentUuid": "c6df7af9_6ef12e4d",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 36
+      },
+      "revId": "931cb6d0f2cc8cbdd18bb4c4c8c0bb492850fd9b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "64fa1c00_70b49b7d",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-05-20T19:46:23Z",
       "side": 1,
       "message": "* **Firmware Prefix Extraction (`iap_control.cc`):** The logic `uint8_t fw_ver_google \u003d fw_ver_info-\u003efw_ver \u003e\u003e 8;` shifts the 32-bit version right by 8 bits and casts it to an 8-bit integer, isolating bits 8–15. If the `0x10` prefix represents the most significant byte (e.g., `0x10XXXXXX`), this shift must be `\u003e\u003e 24`. If the device explicitly structures the version with `0x10` at bits 8–15, add a comment clarifying this unusual layout to prevent future regressions.",
+      "range": {
+        "startLine": 112,
+        "startChar": 0,
+        "endLine": 112,
+        "endChar": 51
+      },
+      "revId": "931cb6d0f2cc8cbdd18bb4c4c8c0bb492850fd9b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "66d87bcd_a63f66cf",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-22T07:59:30Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 21.",
+      "parentUuid": "64fa1c00_70b49b7d",
       "range": {
         "startLine": 112,
         "startChar": 0,
@@ -117,6 +189,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e352e7d3_7df5e86e",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 575,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-22T07:59:30Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 21.",
+      "parentUuid": "06effee5_c12fccfc",
+      "range": {
+        "startLine": 570,
+        "startChar": 0,
+        "endLine": 575,
+        "endChar": 0
+      },
+      "revId": "931cb6d0f2cc8cbdd18bb4c4c8c0bb492850fd9b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3df9e86b_0d869c02",
@@ -153,6 +249,54 @@
       "writtenOn": "2026-05-20T19:46:23Z",
       "side": 1,
       "message": "* **Missing Header (`iap_tool.cc`):** The `CommandLineManager` calls `std::exit(0);` when handling the `-h` flag, but `\u003ccstdlib\u003e` is not included.",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 23
+      },
+      "revId": "931cb6d0f2cc8cbdd18bb4c4c8c0bb492850fd9b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13245651_ed87b7ea",
+        "filename": "util/elan/iap_tool.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-22T07:59:30Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 21.",
+      "parentUuid": "3df9e86b_0d869c02",
+      "range": {
+        "startLine": 69,
+        "startChar": 20,
+        "endLine": 69,
+        "endChar": 21
+      },
+      "revId": "931cb6d0f2cc8cbdd18bb4c4c8c0bb492850fd9b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f51b2b1_3263733a",
+        "filename": "util/elan/iap_tool.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-22T07:59:30Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 21.",
+      "parentUuid": "b2430b48_9e312d63",
       "range": {
         "startLine": 69,
         "startChar": 0,
