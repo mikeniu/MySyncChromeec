@@ -16,6 +16,24 @@
       "message": "Compilation is failing:\n\n```\nutil/elan/iap_tool.cc:71:9: error: unannotated fall-through between switch labels [-Werror,-Wimplicit-fallthrough]\n   71 |         case \u0027F\u0027:\n      |         ^\nutil/elan/iap_tool.cc:71:9: note: insert \u0027[[fallthrough]];\u0027 to silence this warning\n   71 |         case \u0027F\u0027:\n      |         ^\n      |         [[fallthrough]]; \nutil/elan/iap_tool.cc:71:9: note: insert \u0027break;\u0027 to avoid fall-through\n   71 |         case \u0027F\u0027:\n      |         ^\n      |         break; \n1 error generated.\n```",
       "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c955cf2_06cd650d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T16:33:07Z",
+      "side": 1,
+      "message": "Looks like you only used the constant `EXIT_SUCCESS` instead of `std::exit(EXIT_SUCCESS)`.\n\nPlease verify compilation locally whenever you make changes.",
+      "parentUuid": "3021ad71_15faccfb",
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
