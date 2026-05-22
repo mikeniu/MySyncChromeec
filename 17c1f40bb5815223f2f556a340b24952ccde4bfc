@@ -98,6 +98,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "42707b52_0a73d475",
+        "filename": "zephyr/program/fatcat/moonstone/gpios.dtsi",
+        "patchSetId": 18
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-22T18:01:21Z",
+      "side": 1,
+      "message": "There a multiple ways to handle the init sequence issues.\n1. PAC drivers can add the `zephyr,deferred-init` property.  This prevents the Zephyr kernel from automatically initializing the devices.   This might be the best approach because we can delay initializing the PACs completely until the host sends the ENABLE command.\n1. The priority of DEVICE_INIT used by `pwrmon.c` can be changed if needed to occur before the PAC194x driver.\n1. We could go back to using SYS_INIT instead of DEVICE_INIT since the pwrmon driver doesn\u0027t actually expose an API.  It is self contained, so no callers in the EC application need to reference the `struct device *dev` handle for the pwrmon driver.",
+      "parentUuid": "a3b8b0dd_df36938f",
+      "range": {
+        "startLine": 181,
+        "startChar": 0,
+        "endLine": 181,
+        "endChar": 35
+      },
+      "revId": "17c1f40bb5815223f2f556a340b24952ccde4bfc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bdced5d3_0c2d01cd",
         "filename": "zephyr/program/fatcat/program.conf",
         "patchSetId": 18
