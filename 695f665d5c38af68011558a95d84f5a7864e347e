@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cbd7bcdf_1fb702ef",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 4249,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-22T17:49:07Z",
+      "side": 1,
+      "message": "How about calling `discovery_info_init()` instead?",
+      "range": {
+        "startLine": 4249,
+        "startChar": 7,
+        "endLine": 4249,
+        "endChar": 17
+      },
+      "revId": "695f665d5c38af68011558a95d84f5a7864e347e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "38d857c9_fea314fe",
         "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
         "patchSetId": 4
