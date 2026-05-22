@@ -74,6 +74,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a3b8b0dd_df36938f",
+        "filename": "zephyr/program/fatcat/moonstone/gpios.dtsi",
+        "patchSetId": 18
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-22T15:04:29Z",
+      "side": 1,
+      "message": "I think this might get problematic, \n1) `PAC194X` driver needs to identify chip via I2C bus, which needs to be enabled at boot time. \n2) `pwrmon.dtsi` have phandles to pacs, so it can\u0027t have higher priority then senors.\n\nThis can be avoided by doing `SYS_INIT` higher priority in `pwrmon.c`, however `pwrmon` should be modeled as driver.",
+      "parentUuid": "084e6a2f_33734797",
+      "range": {
+        "startLine": 181,
+        "startChar": 0,
+        "endLine": 181,
+        "endChar": 35
+      },
+      "revId": "17c1f40bb5815223f2f556a340b24952ccde4bfc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bdced5d3_0c2d01cd",
         "filename": "zephyr/program/fatcat/program.conf",
         "patchSetId": 18
