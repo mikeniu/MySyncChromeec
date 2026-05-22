@@ -32,6 +32,8 @@ struct gpio_config {
 	gpio_flags_t init_flags;
 	/* From DTS, skips initialisation */
 	bool no_auto_init;
+	/* From DTS, force output initialisation */
+	bool force_output_init;
 };
 
 /*
@@ -48,12 +50,13 @@ struct gpio_config {
 		.dt_flags = 0xFF & (DT_GPIO_FLAGS(id, gpios)),  \
 	}
 
-#define GPIO_CONFIG(id)                                    \
-	{                                                  \
-		.spec = OUR_DT_SPEC(id),                   \
-		.name = DT_NODE_FULL_NAME(id),             \
-		.init_flags = DT_GPIO_FLAGS(id, gpios),    \
-		.no_auto_init = DT_PROP(id, no_auto_init), \
+#define GPIO_CONFIG(id)                                              \
+	{                                                            \
+		.spec = OUR_DT_SPEC(id),                             \
+		.name = DT_NODE_FULL_NAME(id),                       \
+		.init_flags = DT_GPIO_FLAGS(id, gpios),              \
+		.no_auto_init = DT_PROP(id, no_auto_init),           \
+		.force_output_init = DT_PROP(id, force_output_init), \
 	},
 #define GPIO_IMPL_CONFIG(id) \
 	COND_CODE_1(DT_NODE_HAS_PROP(id, gpios), (GPIO_CONFIG(id)), ())
@@ -298,7 +301,8 @@ test_export_static int init_gpios(const struct device *dev)
 		/*
 		 * For warm boot, do not set the output state.
 		 */
-		if (is_sys_jumped && (flags & GPIO_OUTPUT)) {
+		if (!configs[i].force_output_init && is_sys_jumped &&
+		    (flags & GPIO_OUTPUT)) {
 			flags &=
 				~(GPIO_OUTPUT_INIT_LOW | GPIO_OUTPUT_INIT_HIGH);
 		}
