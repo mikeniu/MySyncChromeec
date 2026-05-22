@@ -92,6 +92,24 @@
 		SIMPLO_CP856932 {
 			compatible = "SIMPLO,CP856932", "battery-smart";
 		};
+		SIMPLO_CP870432 {
+			compatible = "SIMPLO,CP870432", "battery-smart";
+		};
+		SIMPLO_CP87886601 {
+			compatible = "SIMPLO,CP87886601", "battery-smart";
+		};
+		SIMPLO_CP87522501 {
+			compatible = "SIMPLO,CP87522501", "battery-smart";
+		};
+		SIMPLO_SB1FB00013 {
+			compatible = "SIMPLO,SB1FB00013", "battery-smart";
+		};
+		SIMPLO_SB1FB00014 {
+			compatible = "SIMPLO,SB1FB00014", "battery-smart";
+		};
+		SIMPLO_SB1FB00015 {
+			compatible = "SIMPLO,SB1FB00015", "battery-smart";
+		};
 	};
 
 	cros-keyscan {
