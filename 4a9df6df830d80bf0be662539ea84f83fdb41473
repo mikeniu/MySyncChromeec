@@ -267,6 +267,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "13b343fd_a277145e",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 512,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T18:10:27Z",
+      "side": 1,
+      "message": "`RunFlashFw` suffers from doing too many things at different levels of abstraction: it handles file I/O, crypto key management, bootrom configuration, bounds math, and the actual hardware flash loop all in one massive monolithic block.\n\nWe can significantly simplify this by extracting the core hardware loop into a dedicated helper function.\n\n### Rationale\n\nExtracting the hardware interaction (erasing, chunking, writing, and printing progress) into a `ProgramFlashPayload` helper separates the \"orchestration\" (loading files, checking boundaries, setting up crypto) from the \"execution\". This cuts the size of `RunFlashFw` nearly in half and makes both functions extremely focused and readable.\n\n### Detailed Fix\n\n**1\\. Location:** `util/egis/et171_flash.cc` (Above `RunFlashFw`) Create the new `ProgramFlashPayload` helper function to handle the erase and chunked write logic.\n\n```c\nint ProgramFlashPayload(BootromComm \u0026brom, uint32_t flash_offset, \n                        std::span\u003cconst uint8_t\u003e payload) {\n  std::println(\"--- Erasing Flash ---\");\n  if (auto res \u003d brom.EraseFlash(flash_offset, payload.size()); !res) {\n    std::println(stderr, \"\\n[HALT] Flash Erase failed at offset 0x{:X}: {}\",\n                 flash_offset, ToString(res.error()));\n    return -1;\n  }\n\n  std::println(\"--- Writing Flash ---\");\n  const size_t chunk_size \u003d BootromComm::kMaxFlashWriteSize;\n  uint32_t current_addr \u003d flash_offset;\n  size_t done \u003d 0;\n\n  for (size_t i \u003d 0; i \u003c payload.size(); i +\u003d chunk_size) {\n    auto chunk \u003d payload.subspan(i, std::min(chunk_size, payload.size() - i));\n    if (auto res \u003d brom.WriteFlash(current_addr, chunk); !res) {\n      std::println(stderr, \"\\n[HALT] Flash Write failed at address 0x{:X}: {}\",\n                   current_addr, ToString(res.error()));\n      return -1;\n    }\n    current_addr +\u003d chunk.size();\n    done +\u003d chunk.size();\n    std::print(\"\\rWriting Progress: {} / {} ({:.1f}%)\", done, payload.size(),\n               (static_cast\u003cfloat\u003e(done) / payload.size() * 100.0f));\n    std::fflush(stdout);\n  }\n\n  std::println(\"\\n[OK] Flash Full Binary Write successful\");\n  return 0;\n}\n\n```\n\n**2\\. Location:** `util/egis/et171_flash.cc` inside `RunFlashFw()` Replace the entire bottom half of the function (everything starting from `std::println(\"--- Flashing Full Binary with Key ---\");`) with a single call to your new helper.\n\n*Note: Since we already moved `SystemReset()` to `main()` in an earlier step, we just return the result of the flash operation.*\n\n```c\n  // ... (previous bounds checking logic remains unchanged) ...\n  \n  if (config.flash_offset + size_to_flash \u003e firmware.size()) {\n    std::println(stderr,\n                 \"[ERROR] The specified range (offset 0x{:X} + size 0x{:X}) \"\n                 \"exceeds the file size (0x{:X}).\",\n                 config.flash_offset, size_to_flash, firmware.size());\n    return -1;\n  }\n\n  std::println(\"--- Flashing Full Binary with Key ---\");\n  auto fw_payload \u003d std::span\u003cconst uint8_t\u003e(firmware).subspan(\n      config.flash_offset, size_to_flash);\n\n  // Fix: Defer all erase/write logic to the new helper\n  return ProgramFlashPayload(brom, config.flash_offset, fw_payload);\n}\n\n```",
+      "range": {
+        "startLine": 400,
+        "startChar": 0,
+        "endLine": 512,
+        "endChar": 0
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "63d6ab7f_2f3af979",
         "filename": "util/egis/usb_comm.cc",
         "patchSetId": 20
