@@ -42,8 +42,14 @@ LOG_MODULE_REGISTER(tps6699x, CONFIG_USBC_LOG_LEVEL);
 /** @brief Trigger thread to send command complete back to
  *         PDC Power Mgmt thread */
 #define PDC_CMD_COMPLETE_EVENT BIT(4)
-/** @brief Bit mask of all PDC events */
-#define PDC_ALL_EVENTS BIT_MASK(5)
+/** @brief Set when initial PDC chip info is fully populated. This event should
+ *         not be cleared until the driver is re-initialized.
+ */
+#define PDC_CHIP_INFO_AVAIL_EVENT BIT(5)
+/** @brief Bit mask of all PDC events that should wake the PDC thread */
+#define PDC_ALL_THREAD_WAKE_EVENTS                                       \
+	(PDC_IRQ_EVENT | PDC_CMD_EVENT | PDC_CMD_SUSPEND_REQUEST_EVENT | \
+	 PDC_INTERNAL_EVENT | PDC_CMD_COMPLETE_EVENT)
 
 /** @brief Time between checking TI CMDx register for data ready */
 #define PDC_TI_DATA_READY_TIME_MS (10)
@@ -798,6 +804,9 @@ static enum smf_state_result st_init_run(void *o)
 		goto error;
 	}
 
+	/* Cached chip info is now available */
+	k_event_post(&data->pdc_event, PDC_CHIP_INFO_AVAIL_EVENT);
+
 	LOG_INF("TI%d: FW Version %u.%u.%u, config='%s' (flash=%d)",
 		cfg->connector_number,
 		PDC_FWVER_GET_MAJOR(data->info.fw_version),
@@ -1094,6 +1103,11 @@ static enum smf_state_result st_suspended_run(void *o)
 	}
 
 	data->init_attempt = 0;
+
+	/* Invalidate cached chip info data until it is re-read during the
+	 * INIT state. */
+	k_event_clear(&data->pdc_event, PDC_CHIP_INFO_AVAIL_EVENT);
+
 	set_state(data, ST_INIT);
 	return SMF_EVENT_HANDLED;
 }
@@ -2896,13 +2910,20 @@ static int tps_get_info(const struct device *dev, struct pdc_info_t *info,
 	if (live == false) {
 		k_mutex_lock(&data->mtx, K_FOREVER);
 
-		/* Check FW ver for valid value to ensure we have a resident
-		 * value.
+		/* Check for an event flag to ensure we have a cached value.
+		 * Callers expect non-live reads to return immediately, so do
+		 * not block by waiting.
+		 *
+		 * Do not clear PDC_CHIP_INFO_AVAIL_EVENT to permit further
+		 * cached reads.
 		 */
-		if (data->info.fw_version == PDC_FWVER_INVALID) {
+		uint32_t events = k_event_test(&data->pdc_event,
+					       PDC_CHIP_INFO_AVAIL_EVENT);
+		if (!events) {
 			k_mutex_unlock(&data->mtx);
 
-			/* No cached value. Caller should request a live read */
+			/* No cached value. Caller may try again later or
+			 * request a live read. */
 			return -EAGAIN;
 		}
 
@@ -3372,8 +3393,9 @@ static void tps_thread(void *dev, void *unused1, void *unused2)
 		smf_run_state(SMF_CTX(data));
 
 		/* Wait for event to handle */
-		data->events = k_event_wait(&data->pdc_event, PDC_ALL_EVENTS,
-					    false, K_FOREVER);
+		data->events = k_event_wait(&data->pdc_event,
+					    PDC_ALL_THREAD_WAKE_EVENTS, false,
+					    K_FOREVER);
 		LOG_INF("TI%d: state=%s events=0x%X", cfg->connector_number,
 			state_names[get_state(data)], data->events);
 
@@ -3522,6 +3544,19 @@ bool pdc_tps6699x_test_idle_wait(void)
 	}
 
 	return false;
+}
+
+/**
+ * @brief For testing only, wipe the cached chip info from the driver and clear
+ *        the flag that indicates cached data is available.
+ */
+void pdc_tps6699x_test_invalidate_chip_info(const struct device *dev)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)dev->data;
+
+	k_event_clear(&data->pdc_event, PDC_CHIP_INFO_AVAIL_EVENT);
+
+	memset(&data->info, 0, sizeof(data->info));
 }
 /* LCOV_EXCL_STOP */
 
