@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0879453_e24b9607",
+        "filename": "zephyr/drivers/pwrmon/power_monitor_pac194x.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-22T17:16:42Z",
+      "side": 1,
+      "message": "I don\u0027t think this module needs to handle `struct device *dev` at all.  You should limit this module to mapping the correct sensor channel or attribute based on the channel ID.\n\nLeave all calls to the sensor APIs to the pwrmon driver.\n\nBut please also explore the alternate solution of an MFD device with the PAC channels added as separate devictree nodes.\n\nThe driver specific channels `pac194x_sensor_channel` can likely be eliminated entirely.\n\nThe driver specific attributes can potentially be mapped onto the existing SENSOR_ATTR_FEATURE_MASK.",
+      "range": {
+        "startLine": 6,
+        "startChar": 4,
+        "endLine": 6,
+        "endChar": 22
+      },
+      "revId": "0a4a46d1866d419717550a6f90f64687788f718b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
