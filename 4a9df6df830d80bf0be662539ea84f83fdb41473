@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ae119102_dd8472d8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T17:44:22Z",
+      "side": 1,
+      "message": "Defining common names like `UsbComm` or `EcError` in the global namespace in a C++ utility creates a high risk of One Definition Rule (ODR) collisions if this tool is linked with or compiled alongside other utilities in the codebase. Wrapping the module in a dedicated namespace prevents these conflicts entirely. Furthermore, adhering to the Google C++ Style Guide means strictly avoiding *using-directives* (like `using namespace egis;`), so integration into the `main()` entry point must be done via explicit qualification.\n\n### Detailed Fix\n\n**Location:** All `.h` and `.cc` files in the module.\n\nOpen a namespace after your `#include` blocks and close it at the bottom of the file.\n\n**In Headers (e.g., `ec_comm.h`):**\n\n```c\n#include \"usb_comm.h\"\n\nnamespace egis {\n\nenum class EcError { ... };\nclass EcComm { ... };\n\n}  // namespace egis\n\n#endif  // UTIL_EGIS_EC_COMM_H_\n\n```\n\n**In Standard Source Files (e.g., `ec_comm.cc`):**\n\n```c\n#include \"ec_comm.h\"\n// ... other includes\n\nnamespace egis {\n\nnamespace {\nbool VerifyResponseChecksum(...) { ... }\n} // namespace\n\nEcComm::EcComm(UsbComm \u0026usb) : usb_(usb) {}\n// ... implementation\n\n}  // namespace egis\n\n```\n\n**In the Entry Point File (`et171_flash.cc`):** Place all helper structures and application logic (`AppConfig`, `ParseArgs`, `RunFlashFw`, etc.) inside the `egis` namespace. Leave **only** the `main()` function in the global namespace, and explicitly qualify the types and functions called from within `main()`.\n\n```c\n#include \"bootrom.h\"\n#include \"ec_comm.h\"\n// ... other includes\n\nnamespace egis {\n\nnamespace {\n// Constants, enums, and static helpers go here\nconstexpr uint16_t kVidGoogle \u003d 0x18D1;\n// ...\n} // namespace\n\n// AppConfig, ParseArgs, RunFlashFw, RunFlashCmd, etc. are defined here\nstruct AppConfig { ... };\nstd::optional\u003cAppConfig\u003e ParseArgs(...) { ... }\nint RunFlashFw(...) { ... }\nint RunFlashCmd(...) { ... }\n\n}  // namespace egis\n\n// main() MUST remain in the global namespace\nint main(int argc, char *argv[]) {\n  // Explicitly qualify the namespace for the entry-point calls\n  auto config_opt \u003d egis::ParseArgs(argc, argv);\n  if (!config_opt) {\n    return -1;\n  }\n  const egis::AppConfig \u0026config \u003d config_opt.value();\n\n  // ... (libusb init) ...\n\n  egis::UsbComm boot_comm(usb_ctx.get(), egis::kVidEgis, egis::kPidEgisBootloader);\n  \n  // ... (connect logic) ...\n  \n  egis::BootromComm brom(boot_comm);\n  brom.SetWrappedAlgo(config.algo_type);\n\n  int status \u003d -1;\n  if (config.mode \u003d\u003d \"flashfw\") {\n    status \u003d egis::RunFlashFw(config, brom);\n  } else if (config.mode \u003d\u003d \"flashcmd\") {\n    status \u003d egis::RunFlashCmd(config, boot_comm, brom);\n  } else {\n    std::println(stderr, \"[ERROR] Unknown or unhandled mode: {}\", config.mode);\n  }\n\n  // Execute system reset centrally on success\n  if (status \u003d\u003d 0) {\n    if (auto res \u003d brom.SystemReset(); !res) {\n      std::println(stderr, \"[WARN] System reset command failed: {}\", egis::ToString(res.error()));\n    }\n  }\n\n  return status;\n}\n\n```",
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "aebbed54_6ab7833b",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 20
