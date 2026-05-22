@@ -221,6 +221,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "80c5249d_94eee56f",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T18:06:23Z",
+      "side": 1,
+      "message": "In `ConnectToBootloader`, the polling interval (`200ms`) and the absolute timeout limit (`5s`) are hardcoded directly into the loop. If a specific host machine or USB hub takes longer to enumerate the device after the reboot, a developer would have to hunt through the function logic to tune the backoff and timeout. Lifting these values to the top of the file alongside the existing `kBootloaderTransitionDelay` groups all USB transition timings in one highly visible place.\n\n### Detailed Fix\n\n**1\\. Location:** `util/egis/et171_flash.cc` (near the top, inside the anonymous namespace) Add constants for the connection timeout and the polling interval right next to `kBootloaderTransitionDelay`.\n\n```c\nnamespace {\nconstexpr uint16_t kVidGoogle \u003d 0x18D1;\nconstexpr uint16_t kPidEgisApp \u003d 0x5401;\nconstexpr uint16_t kVidEgis \u003d 0x1C7A;\nconstexpr uint16_t kPidEgisBootloader \u003d 0x1002;\n\nconstexpr auto kBootloaderTransitionDelay \u003d std::chrono::milliseconds(800);\n// Fix: Add these connection timing constants\nconstexpr auto kBootloaderConnectTimeout \u003d std::chrono::seconds(5);\nconstexpr auto kBootloaderConnectPollInterval \u003d std::chrono::milliseconds(200);\n\n```\n\n**2\\. Location:** `util/egis/et171_flash.cc` inside `ConnectToBootloader` Replace the hardcoded `std::chrono::seconds(5)` and `std::chrono::milliseconds(200)` with your new constants.\n\n```c\n  auto start_time \u003d std::chrono::steady_clock::now();\n  std::println(\"Connecting to Bootloader...\");\n  \n  // Fix: Use the named timeout constant\n  while (std::chrono::steady_clock::now() - start_time \u003c\n         kBootloaderConnectTimeout) {\n    if (auto res \u003d boot_comm.Connect(); res) {\n      return {};\n    }\n    // Fix: Use the named polling interval constant\n    std::this_thread::sleep_for(kBootloaderConnectPollInterval);\n  }\n  return std::unexpected(UsbError::kTimeout);\n\n```",
+      "range": {
+        "startLine": 371,
+        "startChar": 0,
+        "endLine": 378,
+        "endChar": 64
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "afd4b775_1b0eb81d",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 20
