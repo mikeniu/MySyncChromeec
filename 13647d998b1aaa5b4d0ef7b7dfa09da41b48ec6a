@@ -34,6 +34,52 @@
       "parentUuid": "3021ad71_15faccfb",
       "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b172b9f2_a1b7d33b",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T16:41:29Z",
+      "side": 1,
+      "message": "Is this used anywhere? If not, just remove it rather than commenting it out.",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 36
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2f2ca05_3062b6dc",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 488,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T16:41:29Z",
+      "side": 1,
+      "message": "In your four USB transfer functions (`IapSendCommand`, `IapRecvStatus`, `IapSendData`, `IapRecvData`), you are casting `buff.size()` to an `int` twice per function—once for the `libusb` call and once for the validation check.\n\nYou can halve the number of casts by storing the integer size upfront.\n\n**Instead of this:**\n\n```cpp\n  err_code \u003d libusb_interrupt_transfer(\n      dev_handle_ptr_.get(), ep_out, const_cast\u003cunsigned char *\u003e(buff.data()),\n      static_cast\u003cint\u003e(buff.size()), \u0026transferred, kTimeoutTransferMs);\n  // ...\n  if (transferred !\u003d static_cast\u003cint\u003e(buff.size())) {\n\n```\n\n**Do this:**\n\n```cpp\n  const int transfer_len \u003d static_cast\u003cint\u003e(buff.size());\n  \n  err_code \u003d libusb_interrupt_transfer(\n      dev_handle_ptr_.get(), ep_out, const_cast\u003cuint8_t*\u003e(buff.data()),\n      transfer_len, \u0026transferred, kTimeoutTransferMs);\n  // ...\n  if (transferred !\u003d transfer_len) {\n\n```\n\n*(Note: I also changed `unsigned char *` to `uint8_t*` in the `const_cast`, as `uint8_t` is universally an alias for `unsigned char` and matches your span\u0027s type perfectly).*",
+      "range": {
+        "startLine": 478,
+        "startChar": 1,
+        "endLine": 488,
+        "endChar": 53
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
