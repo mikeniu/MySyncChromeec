@@ -16,6 +16,23 @@
       "message": "Hi Jayvik and Derek, could you help review the CL? Thanks.",
       "revId": "382156fb65f98248c3aae2ca17e7e1764d3d5376",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86c22ca3_176abdfe",
+        "filename": "zephyr/program/bluey/quartz/src/chipset.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-05-22T11:06:25Z",
+      "side": 1,
+      "message": "Could we assert and deassert in start-up and shutdown hooks ?",
+      "revId": "382156fb65f98248c3aae2ca17e7e1764d3d5376",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
