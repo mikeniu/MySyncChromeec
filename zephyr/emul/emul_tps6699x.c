@@ -31,6 +31,7 @@ LOG_MODULE_REGISTER(tps6699x_emul);
 
 /* TODO(b/349609367): Do not rely on this test-only driver function. */
 bool pdc_tps6699x_test_idle_wait(void);
+void pdc_tps6699x_test_invalidate_chip_info(const struct device *dev);
 
 /* TODO(b/345292002): Implement this emulator to the point where
  * pdc.generic.tps6699x passes.
@@ -1066,6 +1067,16 @@ static int emul_tps6699x_set_info(const struct emul *target,
 {
 	struct tps6699x_emul_pdc_data *data =
 		tps6699x_emul_get_pdc_data(target);
+
+	if (info == NULL) {
+		LOG_INF("%s: info is NULL. "
+			"Invalidate driver's chip info cache.",
+			__func__);
+
+		pdc_tps6699x_test_invalidate_chip_info(target->dev);
+
+		return 0;
+	}
 
 	union reg_version *reg_version =
 		(union reg_version *)data->reg_val[REG_VERSION];
