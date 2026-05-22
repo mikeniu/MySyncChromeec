@@ -1,0 +1,113 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aebbed54_6ab7833b",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T17:44:00Z",
+      "side": 1,
+      "message": "Both `SendBootromCommandSha` and `SendBootromCommandAes` contain identical, verbose logic to read the inner payload length from the response buffer, calculate the safe payload boundary, and protect against out-of-bounds reads. Extracting this into a single helper method removes duplicate code and centralizes boundary validation.\n\n### Detailed Fix\n\n**Location:** `util/egis/bootrom.h` (Declaration) and `util/egis/bootrom.cc` (Implementation)\n\nDeclare the private helper in `BootromComm`:\n\n```c\n  std::expected\u003cstd::span\u003cconst uint8_t\u003e, BootromError\u003e ExtractWrappedPayload(\n      std::span\u003cconst uint8_t\u003e response, size_t header_size);\n\n```\n\nImplement it:\n\n```c\nstd::expected\u003cstd::span\u003cconst uint8_t\u003e, BootromError\u003e\nBootromComm::ExtractWrappedPayload(std::span\u003cconst uint8_t\u003e response,\n                                   size_t header_size) {\n  auto len_res \u003d\n      ReadLittleEndian\u003cuint32_t\u003e(response.subspan(kStatusHeaderSize));\n  if (!len_res) return std::unexpected(BootromError::kResponseTruncated);\n\n  uint32_t rsp_wrapped_len \u003d std::min\u003cuint32_t\u003e(\n      len_res.value(), response.size() - header_size);\n\n  return response.subspan(header_size, rsp_wrapped_len);\n}\n\n```\n\nUpdate `SendBootromCommandSha`:\n\n```c\n  // ... (send logic) ...\n  auto ret_res \u003d DoUsbTransfer(cmd, kScHeaderSizeSha, timeout);\n  if (!ret_res) return std::unexpected(ret_res.error());\n\n  auto payload_res \u003d ExtractWrappedPayload(ret_res.value(), kScHeaderSizeSha);\n  if (!payload_res) return std::unexpected(payload_res.error());\n\n  return std::vector\u003cuint8_t\u003e(payload_res-\u003ebegin(), payload_res-\u003eend());\n\n```\n\nUpdate `SendBootromCommandAes`:\n\n```c\n  // ... (send logic) ...\n  auto ret_res \u003d DoUsbTransfer(cmd, kScHeaderSizeAes, timeout);\n  if (!ret_res) return std::unexpected(ret_res.error());\n  \n  auto payload_res \u003d ExtractWrappedPayload(ret_res.value(), kScHeaderSizeAes);\n  if (!payload_res) return std::unexpected(payload_res.error());\n\n  // Extract IV and Tag dynamically from the response buffer\n  size_t offset \u003d kStatusHeaderSize + kWrappedCommandSize;\n  auto rsp_iv \u003d std::span(ret_res.value()).subspan(offset, kAesGcmIvSize);\n  offset +\u003d kAesGcmIvSize;\n  auto rsp_tag \u003d std::span(ret_res.value()).subspan(offset, kAesGcmTagSize);\n  \n  std::span\u003cconst uint8_t\u003e rsp_payload \u003d payload_res.value();\n  std::vector\u003cuint8_t\u003e decrypted_payload(rsp_payload.size());\n\n  if (!AesGcmDecryptOpenssl(aes_key_, rsp_iv, aad, rsp_payload, rsp_tag,\n                            decrypted_payload)) {\n    std::println(stderr, \"[ERROR] AES-GCM Authentication Failed (Tag mismatch)\");\n    return std::unexpected(BootromError::kGcmAuthenticationFailed);\n  }\n\n  return decrypted_payload;\n\n```",
+      "range": {
+        "startLine": 243,
+        "startChar": 0,
+        "endLine": 243,
+        "endChar": 65
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4a5d921_642f6900",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T17:44:00Z",
+      "side": 1,
+      "message": "The EC protocol transmits its headers in little-endian. While the packing logic correctly uses `std::byteswap` to handle this when sending data, the receiving logic reads the multi-byte `result` and `data_length` fields natively. If this tool is executed on a big-endian architecture, it will misinterpret these fields (e.g., a length of `0x0001` would be read as `0x0100`), leading to false error detections and out-of-bounds memory access.\n\n### Detailed Fix\n\n**Location:** `util/egis/ec_comm.cc` inside `EcComm::SendCommand()`\n\nExtract the fields into local variables using the endianness helper (defined in Fix 3 below) immediately after checksum validation.\n\n```c\n  EcHostCommandResponse *resp_hdr \u003d\n      reinterpret_cast\u003cEcHostCommandResponse *\u003e(resp_buf.data());\n      \n  // Fix: Convert little-endian fields to native host endianness\n  uint16_t result \u003d FromLittleEndian(resp_hdr-\u003eresult);\n  uint16_t data_length \u003d FromLittleEndian(resp_hdr-\u003edata_length);\n\n  if (result !\u003d 0) {\n    std::println(stderr, \"[ERROR] EC device returned error code: {}\", result);\n    return std::unexpected(EcError::kDeviceError);\n  }\n\n  std::vector\u003cuint8_t\u003e resp_out;\n  if (data_length \u003e 0) {\n    size_t header_len \u003d sizeof(EcHostCommandResponse);\n    if (header_len + data_length \u003e resp_buf.size()) {\n      std::println(\n          stderr, \"[ERROR] EC response data truncated. Claimed: {}, Actual: {}\",\n          data_length, resp_buf.size() - header_len);\n      return std::unexpected(EcError::kResponseTooShort);\n    }\n    resp_out.assign(resp_buf.begin() + header_len,\n                    resp_buf.begin() + header_len + data_length);\n  }\n\n```",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 65
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "deb775e9_c49d5684",
+        "filename": "util/egis/egis_util.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T17:44:00Z",
+      "side": 1,
+      "message": "There are multiple places in the code that manually check `if constexpr (std::endian::native !\u003d std::endian::little)` and apply `std::byteswap`. This is repetitive and error-prone. Creating generic `ToLittleEndian` and `FromLittleEndian` templates centralizes this logic, significantly reducing boilerplate and making struct assignments cleaner.\n\n### Detailed Fix\n\n**Location:** `util/egis/egis_util.h`\n\nAdd the templates and refactor the existing `AppendLittleEndian` and `ReadLittleEndian` to use them.\n\n```c\ntemplate \u003cstd::integral T\u003e\nconstexpr T ToLittleEndian(T value) {\n  return (std::endian::native \u003d\u003d std::endian::little) ? value : std::byteswap(value);\n}\n\n// Semantic alias for reading\ntemplate \u003cstd::integral T\u003e\nconstexpr T FromLittleEndian(T value) {\n  return ToLittleEndian(value);\n}\n\ntemplate \u003cstd::integral T\u003e\nvoid AppendLittleEndian(std::vector\u003cuint8_t\u003e \u0026vec, T value) {\n  T le_value \u003d ToLittleEndian(value);\n  const auto *bytes \u003d reinterpret_cast\u003cconst uint8_t *\u003e(\u0026le_value);\n  vec.append_range(std::span(bytes, sizeof(T)));\n}\n\ntemplate \u003cstd::integral T\u003e\nstd::expected\u003cT, int\u003e ReadLittleEndian(std::span\u003cconst uint8_t\u003e buffer) {\n  if (buffer.size() \u003c sizeof(T)) return std::unexpected(-1);\n  T value;\n  std::memcpy(\u0026value, buffer.data(), sizeof(T));\n  return FromLittleEndian(value);\n}\n\n```\n\n*(Once added, replace manual byte-swapping blocks in `ec_comm.cc` and `bootrom.cc` with inline calls to `ToLittleEndian()`.)*",
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "afd4b775_1b0eb81d",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T17:44:00Z",
+      "side": 1,
+      "message": "Both the `RunFlashFw` and `RunFlashCmd` subroutines duplicate the exact same code block to trigger a system reset upon successful completion before returning `0`. Lifting this logic to `main()` centralizes the success-path behavior and cleanly separates flash logic from teardown logic.\n\n### Detailed Fix\n\n**Location:** `util/egis/et171_flash.cc`\n\nDelete the `brom.SystemReset()` blocks from the bottom of `RunFlashFw` and `RunFlashCmd`. Then, implement it conditionally at the end of `main()`.\n\n```c\n  // 4. Dispatch to chosen mode\n  int status \u003d -1;\n  if (config.mode \u003d\u003d \"flashfw\") {\n    status \u003d RunFlashFw(config, brom);\n  } else if (config.mode \u003d\u003d \"flashcmd\") {\n    status \u003d RunFlashCmd(config, boot_comm, brom);\n  } else {\n    std::println(stderr, \"[ERROR] Unknown or unhandled mode: {}\", config.mode);\n  }\n\n  // Execute system reset centrally on success\n  if (status \u003d\u003d 0) {\n    if (auto res \u003d brom.SystemReset(); !res) {\n      std::println(stderr, \"[WARN] System reset command failed: {}\", ToString(res.error()));\n    }\n  }\n\n  return status;\n}\n\n```",
+      "range": {
+        "startLine": 383,
+        "startChar": 0,
+        "endLine": 383,
+        "endChar": 60
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63d6ab7f_2f3af979",
+        "filename": "util/egis/usb_comm.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T17:44:00Z",
+      "side": 1,
+      "message": "In `UsbComm::Wait()`, the code relies on a retry counter (`retries`) to bound the wait time for a specific interrupt. However, if the device returns an unexpected interrupt payload, the code simply falls through the `if/else` block without incrementing `retries`. If the device spams invalid interrupts, the loop will spin infinitely, causing the flash tool to hang permanently. Incrementing the counter on unexpected payloads ensures the loop eventually terminates and returns an error.\n\n### Detailed Fix\n\n**Location:** `util/egis/usb_comm.cc` inside `UsbComm::Wait()`\n\nUpdate the `rc \u003d\u003d 0` block to increment `retries` when the interrupt is successfully received but doesn\u0027t match the expected `kResponseReadyIrq`.\n\n```c\n  while (retries \u003c kMaxRetries) {\n    int rc \u003d libusb_interrupt_transfer(handle_.get(), kEpInInt, irq_buf.data(),\n                                       irq_buf.size(), \u0026transferred,\n                                       kTransferTimeout.count());\n\n    if (rc \u003d\u003d 0) {\n      if (transferred \u003e 0 \u0026\u0026 irq_buf[0] \u003d\u003d kResponseReadyIrq) {\n        return {};\n      }\n      // Fix: Unexpected IRQ payload received; count as a retry\n      retries++;\n    } else if (rc \u003d\u003d LIBUSB_ERROR_TIMEOUT) {\n      retries++;\n    } else {\n      std::println(stderr, \"[ERROR] Interrupt IN error: {}\",\n                   LibusbErrorToString(rc));\n      break;\n    }\n  }\n\n```",
+      "range": {
+        "startLine": 144,
+        "startChar": 0,
+        "endLine": 144,
+        "endChar": 47
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
