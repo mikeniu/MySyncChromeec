@@ -107,6 +107,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "55f48c74_187e2f75",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T17:06:09Z",
+      "side": 1,
+      "message": "You won\u0027t need to comment out the unused `kErrStaReady` constant if you do this:\n\n```\nenum IapStatus : uint8_t {\n  kErrStaReady   \u003d 0x00,\n  kErrStaSuccess \u003d 0x01\n};\n```",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 40
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8960bc9c_cf19f893",
         "filename": "util/elan/iap_control.cc",
         "patchSetId": 21
