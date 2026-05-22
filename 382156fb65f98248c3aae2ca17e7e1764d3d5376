@@ -69,6 +69,24 @@
       "parentUuid": "042ff8b7_b9f617a5",
       "revId": "382156fb65f98248c3aae2ca17e7e1764d3d5376",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f901a6fe_95a3b521",
+        "filename": "zephyr/program/bluey/quartz/src/chipset.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-05-22T12:43:01Z",
+      "side": 1,
+      "message": "Done. Thanks.",
+      "parentUuid": "c44819c8_ebbf4247",
+      "revId": "382156fb65f98248c3aae2ca17e7e1764d3d5376",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
