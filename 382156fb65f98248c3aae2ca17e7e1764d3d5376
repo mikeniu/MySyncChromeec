@@ -33,6 +33,24 @@
       "message": "Could we assert and deassert in start-up and shutdown hooks ?",
       "revId": "382156fb65f98248c3aae2ca17e7e1764d3d5376",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "042ff8b7_b9f617a5",
+        "filename": "zephyr/program/bluey/quartz/src/chipset.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-05-22T12:03:32Z",
+      "side": 1,
+      "message": "Thanks for the suggestion.\n\nI2C_PORT_ADSP will be configured as Target in`DECLARE_HOOK(HOOK_CHIPSET_STARTUP, board_chipset_startup_i2c_target, HOOK_PRIO_DEFAULT)`, so bind `control_prochot_startup` to `HOOK_CHIPSET_STARTUP` with `HOOK_PRIO_PRE_DEFAULT` so that we can access the battery, then deassert prochot in `HOOK_CHIPSET_SHUTDOWN` unconditionally",
+      "parentUuid": "86c22ca3_176abdfe",
+      "revId": "382156fb65f98248c3aae2ca17e7e1764d3d5376",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
