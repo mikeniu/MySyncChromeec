@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "971a00cf_e46b9eff",
+        "filename": "zephyr/drivers/cros_flash/Kconfig",
+        "patchSetId": 19
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-05-22T08:10:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "01835013_d64ef05e",
+      "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "55d8466b_7a46c560",
@@ -48,6 +66,30 @@
       "writtenOn": "2026-05-20T15:46:05Z",
       "side": 1,
       "message": "```suggestion\n\t\tLOG_ERR(\"Flash write protection is not continuous\");\n```",
+      "range": {
+        "startLine": 147,
+        "startChar": 31,
+        "endLine": 147,
+        "endChar": 53
+      },
+      "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0698247_797741bf",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-05-22T08:10:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55d8466b_7a46c560",
       "range": {
         "startLine": 147,
         "startChar": 31,
@@ -83,6 +125,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f4b542f8_e7915c14",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-05-22T08:10:41Z",
+      "side": 1,
+      "message": "OK, Update on patchset 20.\n- Removed ranges_overlap() and inlined the overlap condition in\n  check_prot_reg() for better readability and to avoid parameter confusion\n- Added a comment clarifying that partial overlap with a protected region\n  is considered protected",
+      "parentUuid": "8f68ac37_b4292a41",
+      "range": {
+        "startLine": 190,
+        "startChar": 5,
+        "endLine": 190,
+        "endChar": 63
+      },
+      "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5ab0c391_b781c1a1",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 19
@@ -94,6 +160,30 @@
       "writtenOn": "2026-05-20T15:46:05Z",
       "side": 1,
       "message": "Can we use `check_prot_reg()` to avoid code duplication?",
+      "range": {
+        "startLine": 309,
+        "startChar": 0,
+        "endLine": 318,
+        "endChar": 69
+      },
+      "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b495f69f_50f2fc67",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-05-22T08:10:41Z",
+      "side": 1,
+      "message": "OK, update on patchset 20.\n- Reused check_prot_reg() in cros_flash_em32f967_get_protect() to\n  avoid duplicating overlap logic and keep protection checks centralized",
+      "parentUuid": "5ab0c391_b781c1a1",
       "range": {
         "startLine": 309,
         "startChar": 0,
@@ -129,6 +219,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "17830f92_67a1adb6",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-05-22T08:10:41Z",
+      "side": 1,
+      "message": "Good point, this simplifies the flow. Updated to return early when no\nprotection is configured and removed the redundant validation logic.",
+      "parentUuid": "a429da3a_cb2bdd09",
+      "range": {
+        "startLine": 341,
+        "startChar": 0,
+        "endLine": 347,
+        "endChar": 2
+      },
+      "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e916c83e_8d72cae4",
         "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
         "patchSetId": 19
@@ -140,6 +254,30 @@
       "writtenOn": "2026-05-20T15:46:05Z",
       "side": 1,
       "message": "Can we change this to take protection start and protection end? I just don\u0027t want to worry about possible bank size mismatch between your private library and this driver.",
+      "range": {
+        "startLine": 470,
+        "startChar": 2,
+        "endLine": 470,
+        "endChar": 28
+      },
+      "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc1f2e95_b6418bdb",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-05-22T08:10:41Z",
+      "side": 1,
+      "message": "Good point.\n\nThe write-protection APIs have been updated to use byte ranges (start/end)\ninstead of bank/page counts. This removes the dependency on\nCONFIG_FLASH_BANK_SIZE and avoids any potential mismatch between the\ndriver and the underlying hardware representation.\n\nThe conversion from byte ranges to hardware-specific protection settings\nis now fully handled within the private library, keeping the driver\naligned with the range-based abstraction used throughout the patch.",
+      "parentUuid": "e916c83e_8d72cae4",
       "range": {
         "startLine": 470,
         "startChar": 2,
