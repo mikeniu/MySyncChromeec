@@ -35,6 +35,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dea6ce41_9ec79f17",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-22T08:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "78801c67_fdb2bfc0",
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "276daa68_cd6bfa39",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-22T08:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "20b7a4fd_27dc9a8d",
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3d04314d_de712253",
@@ -48,6 +84,30 @@
       "writtenOn": "2026-05-21T18:38:22Z",
       "side": 1,
       "message": "**The Problem:** SendBootromCommandRaw, SendBootromCommandSha, and SendBootromCommandAes all duplicate the exact same USB transmission logic, memory allocation, error handling, and status header checking (about 15 lines of identical code in three different places).\n\n**The Fix:** Extract the core USB transmit/receive and status-check loop into a single private helper function inside BootromComm.\n\n**Add this helper to bootrom.cc:**\n\n```c\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e BootromComm::DoUsbTransfer(\n    std::span\u003cconst uint8_t\u003e tx_cmd, \n    size_t min_expected_rx_size,\n    std::chrono::milliseconds timeout) {\n  \n  DumpRawCmd(tx_cmd);\n\n  if (auto res \u003d usb_.BulkWrite(kBootromEpOutBulk, tx_cmd, timeout); !res)\n    return std::unexpected(BootromError::kUsbWriteFailed);\n\n  std::vector\u003cuint8_t\u003e ret(4096 + min_expected_rx_size, 0);\n  auto read_res \u003d usb_.BulkRead(kBootromEpInBulk, ret, timeout);\n  \n  if (!read_res || read_res.value() \u003c\u003d 0)\n    return std::unexpected(BootromError::kUsbReadFailed);\n\n  ret.resize(read_res.value());\n\n  if (ret.size() \u003c min_expected_rx_size)\n    return std::unexpected(BootromError::kResponseTruncated);\n\n  // All valid Bootrom responses start with a 0x00 0x00 status header\n  if (ret[0] !\u003d 0 || ret[1] !\u003d 0)\n    return std::unexpected(BootromError::kInvalidStatusHeader);\n\n  return ret;\n}\n\n```\n\nNow, SendBootromCommandSha becomes incredibly clean—it just packs the header and calls the helper:\n\n```c\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e\nBootromComm::SendBootromCommandSha(...) {\n  // ... [Pack the SHA header and append data into `cmd`] ...\n\n  auto ret_res \u003d DoUsbTransfer(cmd, kScHeaderSizeSha, timeout);\n  if (!ret_res) return std::unexpected(ret_res.error());\n\n  // Return everything after the header\n  return std::vector\u003cuint8_t\u003e(ret_res-\u003ebegin() + kScHeaderSizeSha, ret_res-\u003eend());\n}\n\n```\n\n*(Apply this exact same simplification to the Raw and Aes variants).*",
+      "range": {
+        "startLine": 185,
+        "startChar": 0,
+        "endLine": 189,
+        "endChar": 19
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d5da6a8_d55f8caf",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-22T08:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d04314d_de712253",
       "range": {
         "startLine": 185,
         "startChar": 0,
@@ -81,6 +141,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b62dc71a_d9fa5fb5",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-22T08:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "259dde0a_7ea05190",
+      "range": {
+        "startLine": 316,
+        "startChar": 0,
+        "endLine": 318,
+        "endChar": 50
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "11a06f62_59122d20",
@@ -94,6 +178,30 @@
       "writtenOn": "2026-05-21T16:27:15Z",
       "side": 1,
       "message": "In bootrom.cc, BootromComm::SendBootromCommandAes() performs a bounds check on the response length:\n\n```c\nif (rsp_wrapped_len + kScHeaderSizeAes \u003e ret.size()) {\n  rsp_wrapped_len \u003d ret.size() - kScHeaderSizeAes;\n}\n\n```\n\nIf a malicious or corrupted bootrom returns an extremely large rsp\\_wrapped\\_len (e.g., 0xFFFFFFF0), the addition can wrap around on 32-bit host architectures. This bypasses the condition and leads to out-of-bounds memory access during AES-GCM decryption.\n\n**Remediation:** Rewrite the condition using subtraction to completely avoid overflow risk:\n\n```c\nif (rsp_wrapped_len \u003e ret.size() - kScHeaderSizeAes) {\n  rsp_wrapped_len \u003d ret.size() - kScHeaderSizeAes;\n}\n\n```",
+      "range": {
+        "startLine": 320,
+        "startChar": 0,
+        "endLine": 322,
+        "endChar": 3
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9bdd166b_d805e929",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-22T08:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "11a06f62_59122d20",
       "range": {
         "startLine": 320,
         "startChar": 0,
@@ -127,6 +235,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7db7f2e_1468be18",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-22T08:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e494f7a7_90945686",
+      "range": {
+        "startLine": 392,
+        "startChar": 0,
+        "endLine": 392,
+        "endChar": 22
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8fa49487_2b188f54",
@@ -140,6 +272,30 @@
       "writtenOn": "2026-05-21T16:44:01Z",
       "side": 1,
       "message": "The DisableWatchdog function in bootrom.cc blasts several unexplained hex values into registers:\n\n```c\n// Old:\nWriteReg(EgisBootrom::kRegPwmCtrl, 0x00000004);\nWriteReg(EgisBootrom::kRegPwmReload, 0x00070a21);\n\n```\n\n**The Fix:** These should be defined as constexpr bitmasks alongside the register addresses in bootrom.h. Even if the exact bitfields aren\u0027t fully documented by the vendor, naming the *entire* payload after its purpose is better than raw hex:\n\n```c\n// In bootrom.h\nconstexpr uint32_t kPwmCtrlDisableMask \u003d 0x00000004;\nconstexpr uint32_t kPwmReloadTimeoutVal \u003d 0x00070a21;\n\n// In bootrom.cc\nWriteReg(EgisBootrom::kRegPwmCtrl, kPwmCtrlDisableMask);\n\n```",
+      "range": {
+        "startLine": 603,
+        "startChar": 0,
+        "endLine": 612,
+        "endChar": 12
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df108533_5ca657dd",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 612,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-22T08:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8fa49487_2b188f54",
       "range": {
         "startLine": 603,
         "startChar": 0,
@@ -173,6 +329,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d32ebb8f_9a73a542",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 650,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-22T08:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e0781113_771e9c0a",
+      "range": {
+        "startLine": 648,
+        "startChar": 0,
+        "endLine": 650,
+        "endChar": 78
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "127a73ac_1a0bac39",
@@ -196,6 +376,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3a90ff8_adf0b6dc",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 19
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-22T08:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "127a73ac_1a0bac39",
+      "range": {
+        "startLine": 150,
+        "startChar": 0,
+        "endLine": 152,
+        "endChar": 3
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6729905d_f8129163",
@@ -209,6 +413,30 @@
       "writtenOn": "2026-05-21T16:26:23Z",
       "side": 1,
       "message": "In ec\\_comm.cc (EcComm::SendCommand), the payload length check fails silently:\n\n```c\nif (header_len + resp_hdr-\u003edata_length \u003c\u003d resp_buf.size()) {\n  resp_out.assign(...);\n}\n\n```\n\nIf the device claims a data\\_length larger than what was actually received in resp\\_buf, the inner block is bypassed, and the function returns an empty successful response rather than raising an error.\n\n**Remediation:** \n\n```cpp\n  std::vector\u003cuint8_t\u003e resp_out;\n  if (resp_hdr-\u003edata_length \u003e 0) {\n    size_t header_len \u003d sizeof(EcHostCommandResponse);\n    \n    // Guard clause: error out immediately if the payload is truncated\n    if (header_len + resp_hdr-\u003edata_length \u003e resp_buf.size()) {\n      std::println(stderr, \"[ERROR] EC response data truncated. Claimed: {}, Actual: {}\", \n                   resp_hdr-\u003edata_length, resp_buf.size() - header_len);\n      return std::unexpected(EcError::kResponseTooShort);\n    }\n\n    // Happy path: no extra nesting needed\n    resp_out.assign(resp_buf.begin() + header_len,\n                    resp_buf.begin() + header_len + resp_hdr-\u003edata_length);\n  }\n\n  return resp_out;\n\n```\n\n### Why this is better:\n\n* **Readability:** The \"happy path\" (assigning the vector) isn\u0027t buried inside an if/else block.\n* **Fail-Fast:** By handling the error condition (\u003e resp_buf.size()) immediately, the cognitive load on the reader is reduced. They don\u0027t have to keep the if condition in their head while reading the success logic just to figure out what the else does.\n* **Logging:** It naturally provides a clean place to log exactly *why* it failed before returning the unexpected state.",
+      "range": {
+        "startLine": 114,
+        "startChar": 0,
+        "endLine": 114,
+        "endChar": 64
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d5d79a2_47bc248b",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-22T08:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6729905d_f8129163",
       "range": {
         "startLine": 114,
         "startChar": 0,
@@ -266,6 +494,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "18530fdb_26523b4a",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-22T08:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1634f834_5c8d8458",
+      "range": {
+        "startLine": 368,
+        "startChar": 0,
+        "endLine": 368,
+        "endChar": 41
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0729420f_71f046d6",
@@ -313,6 +565,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2c86c7f_349e0818",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 509,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-22T08:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4576226d_10553a13",
+      "range": {
+        "startLine": 454,
+        "startChar": 2,
+        "endLine": 509,
+        "endChar": 5
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "810c8dc1_5dfc2d49",
@@ -336,6 +612,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7156fe49_a994f67d",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 512,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-22T08:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "810c8dc1_5dfc2d49",
+      "range": {
+        "startLine": 512,
+        "startChar": 0,
+        "endLine": 512,
+        "endChar": 74
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c957f012_a8133335",
@@ -349,6 +649,30 @@
       "writtenOn": "2026-05-21T16:39:58Z",
       "side": 1,
       "message": "In usb\\_comm.h, the USB device handle is managed as a raw pointer:\n\n```c\n// Old:\nlibusb_device_handle *handle_ \u003d nullptr;\n\n```\n\n**The Risk:** While UsbComm encapsulates this handle and calls libusb\\_close(handle\\_) in its destructor, manual resource management violates the \"Rule of Zero\". If exceptions were ever thrown from UsbComm, or if the class was improperly moved, the handle could leak. **The Fix:** You already correctly wrapped the libusb\\_context in main() using a custom-deleter unique\\_ptr. Apply the exact same pattern to the handle.\n\n```c\n// New (in usb_comm.h):\n#include \u003cmemory\u003e\n\nclass UsbComm {\n  // ...\n private:\n  std::unique_ptr\u003clibusb_device_handle, decltype(\u0026libusb_close)\u003e handle_{nullptr, \u0026libusb_close};\n};\n\n```\n\nWhen connecting in usb\\_comm.cc, you would reset it:\n\n```c\nhandle_.reset(libusb_open_device_with_vid_pid(ctx_, vid_, pid_));\n\n```\n\n*(This allows you to completely remove libusb\\_close(handle\\_) from the destructor and error paths, as it will clean itself up automatically).*",
+      "range": {
+        "startLine": 90,
+        "startChar": 0,
+        "endLine": 90,
+        "endChar": 42
+      },
+      "revId": "174c19ecb866ee787a77ebc705630b6c2c1577be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca266274_e09114ed",
+        "filename": "util/egis/usb_comm.h",
+        "patchSetId": 19
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-22T08:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c957f012_a8133335",
       "range": {
         "startLine": 90,
         "startChar": 0,

@@ -177,6 +177,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8c7c506_f45ad5a6",
+        "filename": "util/egis/build.mk",
+        "patchSetId": 17
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-22T08:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "13d5568c_d74981cd",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 39
+      },
+      "revId": "a806ecdb943a7d0fb20a66d1297591bcadc3c62d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d6fb0617_e4b11a6b",
@@ -214,6 +238,30 @@
       "side": 1,
       "message": "I got a compilation error on my local build, so I will try updating my cros_sdk first and test again.",
       "parentUuid": "d6fb0617_e4b11a6b",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 116
+      },
+      "revId": "a806ecdb943a7d0fb20a66d1297591bcadc3c62d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5a309fc_b41f4617",
+        "filename": "util/egis/build.mk",
+        "patchSetId": 17
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-22T08:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc18c2d9_bc07700e",
       "range": {
         "startLine": 19,
         "startChar": 0,
