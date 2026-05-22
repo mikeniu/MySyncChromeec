@@ -3268,6 +3268,20 @@ bool pdc_rts54xx_test_idle_wait(void)
 
 	return false;
 }
+
+/**
+ * @brief For testing only, wipe the cached chip info from the driver.
+ */
+void pdc_rts54xx_test_invalidate_chip_info(const struct device *dev)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)dev->data;
+
+	data->info = (struct pdc_info_t){
+		.fw_version = PDC_FWVER_INVALID,
+		.vid = PDC_VID_INVALID,
+		.pid = PDC_PID_INVALID,
+	};
+}
 /* LCOV_EXCL_STOP */
 
 #endif
