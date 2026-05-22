@@ -23,6 +23,14 @@ child-binding:
         When not set, the GPIO h/w is configured and initialised at startup
         according to the flags in the gpios node.
       type: boolean
+    force-output-init:
+      description:
+        When set, the GPIO is initialised at startup even if it is a warm boot.
+
+        This is useful for GPIOs that are used to control hardware that
+        needs to be in a specific state after system jump and GPIO configuration
+        does not guarantee the desired state.
+      type: boolean
     alias:
       description:
         When set, defines an alias for this GPIO's enum-name.

@@ -14,6 +14,7 @@ DEFINE_FAKE_VALUE_FUNC(int, init_rom_copy, int, int, int);
 
 /* Mocks for common/system.c */
 DEFINE_FAKE_VALUE_FUNC(int, system_jumped_late);
+DEFINE_FAKE_VALUE_FUNC(int, system_jumped_to_this_image);
 DEFINE_FAKE_VALUE_FUNC(int, system_is_locked);
 DEFINE_FAKE_VOID_FUNC(system_reset, int);
 
@@ -40,6 +41,7 @@ static void fff_reset_rule_before(const struct ztest_unit_test *test,
 	RESET_FAKE(init_rom_unmap);
 	RESET_FAKE(init_rom_copy);
 	RESET_FAKE(system_jumped_late);
+	RESET_FAKE(system_jumped_to_this_image);
 	RESET_FAKE(system_is_locked);
 	RESET_FAKE(system_reset);
 	RESET_FAKE(lid_angle_peripheral_enable);

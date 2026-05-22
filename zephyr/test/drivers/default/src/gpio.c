@@ -340,6 +340,42 @@ ZTEST(gpio, test_gpio_no_auto_init)
 }
 
 /**
+ * @brief TestPurpose: Verify GPIO force-output-init.
+ *
+ * @details
+ * Validate force-output-init device tree property,
+ * which will initialise the GPIO at startup even if system jumped.
+ *
+ * Expected Results
+ *  - Success
+ */
+ZTEST(gpio, test_gpio_force_output_init)
+{
+	enum gpio_signal signal_force =
+		GPIO_SIGNAL(DT_NODELABEL(gpio_force_init));
+	gpio_flags_t flags;
+
+	/* Mock system jumped to this image */
+	system_jumped_to_this_image_fake.return_val = 1;
+
+	/* Reset the GPIO flags to 0 first to ensure init_gpios actually does
+	 * something */
+	gpio_set_flags(signal_force, GPIO_DISCONNECTED);
+
+	/* Call init_gpios. This should initialize gpio_force_init because it
+	 * has force-output-init, even though system_jumped_to_this_image()
+	 * returns true.
+	 */
+	zassert_ok(init_gpios(NULL));
+
+	/* gpio_force_init should be initialized with output high */
+	flags = gpio_helper_get_flags(signal_force);
+	zassert_true(flags & GPIO_OUTPUT, "Expected GPIO_OUTPUT to be set");
+	zassert_true(flags & GPIO_OUTPUT_INIT_HIGH,
+		     "Expected GPIO_OUTPUT_INIT_HIGH to be set");
+}
+
+/**
  * @brief TestPurpose: Verify GPIO reset.
  *
  * @details

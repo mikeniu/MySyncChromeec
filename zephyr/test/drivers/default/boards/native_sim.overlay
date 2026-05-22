@@ -31,4 +31,15 @@
 			};
 		};
 	};
+
+	named-gpios {
+		gpio_force_init: force_init {
+			gpios = <&gpio1 21 (GPIO_OUTPUT_HIGH)>;
+			force-output-init;
+		};
+	};
+};
+
+&gpio1 {
+	ngpios = <22>;
 };
