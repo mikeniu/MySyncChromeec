@@ -22,6 +22,30 @@
       },
       "revId": "b94e0ded2063a228f9e9380629cd06f1b9aed76c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad27cb20_36e23265",
+        "filename": "zephyr/program/ocelot/kodkod/power_signals.dtsi",
+        "patchSetId": 6
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-05-22T09:43:54Z",
+      "side": 1,
+      "message": "this was added part of earlier implementation, removed now. Thanks.",
+      "parentUuid": "950b1a21_0856abfb",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 39
+      },
+      "revId": "b94e0ded2063a228f9e9380629cd06f1b9aed76c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
