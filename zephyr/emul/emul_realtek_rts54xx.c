@@ -33,6 +33,7 @@ LOG_MODULE_REGISTER(realtek_rts5453_emul);
 
 /* TODO(b/349609367): Do not rely on this test-only driver function. */
 bool pdc_rts54xx_test_idle_wait(void);
+void pdc_rts54xx_test_invalidate_chip_info(const struct device *dev);
 
 static bool send_response(struct rts5453p_emul_pdc_data *data);
 
@@ -1654,6 +1655,16 @@ static int emul_realtek_rts54xx_set_info(const struct emul *target,
 {
 	struct rts5453p_emul_pdc_data *data =
 		rts5453p_emul_get_pdc_data(target);
+
+	if (info == NULL) {
+		LOG_INF("%s: info is NULL. "
+			"Invalidate driver's chip info cache.",
+			__func__);
+
+		pdc_rts54xx_test_invalidate_chip_info(target->dev);
+
+		return 0;
+	}
 
 	data->info = *info;
 

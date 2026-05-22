@@ -61,6 +61,11 @@ static K_EVENT_DEFINE(pdc_event);
 		k_event_set(&pdc_event, 0); \
 	} while (0)
 
+#define PDC_RESTART_DELAY()            \
+	do {                           \
+		k_sleep(K_MSEC(5000)); \
+	} while (0)
+
 /** Callback called by PDC driver upon command completion */
 static void pdc_cc_handler_cb(const struct device *dev,
 			      const struct pdc_callback *callback,
@@ -613,19 +618,6 @@ ZTEST_USER(pdc_api, test_reconnect)
 	zassert_equal(expected, val);
 }
 
-/**
- * @brief Clears the cached PDC FW info struct inside the driver.
- */
-void helper_clear_cached_chip_info(void)
-{
-	struct pdc_info_t init = { 0 }, out;
-
-	init.fw_version = PDC_FWVER_INVALID;
-	emul_pdc_set_info(emul, &init);
-	zassert_ok(pdc_get_info(dev, &out, true));
-	PDC_WAIT_FOR_COMPLETION();
-}
-
 #define ZEPHYR_USER_NODE DT_PATH(zephyr_user)
 #if DT_NODE_EXISTS(ZEPHYR_USER_NODE)
 static const struct pdc_info_t info_in1 = {
@@ -676,11 +668,31 @@ ZTEST_USER(pdc_api, test_get_info)
 
 	/* Part 0: Cached read, but driver does not have valid cached info */
 
-	helper_clear_cached_chip_info();
+	emul_pdc_set_info(emul, NULL);
 	zassert_equal(-EAGAIN, pdc_get_info(dev, &out, false));
 
-	/* Part 1: Live read -- Set `info_in1`, `out` should match `info_in1` */
+	/* Restart the driver so it reads chip info upon init */
+	emul_pdc_set_info(emul, &info_in2);
+	pdc_set_comms_state(dev, false);
+	pdc_set_comms_state(dev, true);
+	PDC_RESTART_DELAY();
 
+	/* Part 1: Cached read. Driver should have info_in2 cached from when it
+	 * started up. */
+	zassert_ok(pdc_get_info(dev, &out, false));
+
+	zassert_equal(info_in2.fw_version, out.fw_version, "in=0x%X, out=0x%X",
+		      info_in2.fw_version, out.fw_version);
+	zassert_equal(info_in2.pd_version, out.pd_version);
+	zassert_equal(info_in2.pd_revision, out.pd_revision);
+	zassert_equal(info_in2.vid, out.vid, "in=0x%X, out=0x%X", info_in2.vid,
+		      out.vid);
+	zassert_equal(info_in2.pid, out.pid, "in=0x%X, out=0x%X", info_in2.pid,
+		      out.pid);
+	zassert_mem_equal(info_in2.project_name, out.project_name,
+			  sizeof(info_in2.project_name));
+
+	/* Part 2: Live read -- Set `info_in1`, `out` should match `info_in1` */
 	emul_pdc_set_info(emul, &info_in1);
 	zassert_ok(pdc_get_info(dev, &out, true));
 	PDC_WAIT_FOR_COMPLETION();
@@ -697,7 +709,7 @@ ZTEST_USER(pdc_api, test_get_info)
 	zassert_mem_equal(info_in1.project_name, out.project_name,
 			  sizeof(info_in1.project_name));
 
-	/* Part 2: Cached read -- Set `info_in2`, `out` should match the cached
+	/* Part 3: Cached read -- Set `info_in2`, `out` should match the cached
 	 * `info_in1` again
 	 */
 
