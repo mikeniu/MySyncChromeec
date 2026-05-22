@@ -290,6 +290,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "955b363a_730b9613",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 588,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T18:12:10Z",
+      "side": 1,
+      "message": "`RunFlashFCmd` handles file I/O, error checking, and configuration, but then immediately dives into a massive `while` loop that handles low-level byte parsing, bound checking, and raw USB endpoint transmission (`boot_comm.BulkWrite`).\n\n### Rationale\n\nExtracting the hardware loop into a `ProgramRawCommandPayload` helper brings perfect symmetry to your tool. Both high-level run functions (`RunFlashFw` and `RunFlashCmd`) will now solely handle file I/O and configuration, and then hand off a `std::span` to their respective hardware execution helpers.\n\nAs a bonus: because we moved `SystemReset()` into `main()` in an earlier step, `RunFlashCmd` no longer needs the `BootromComm` object at all\\! It only needs the `UsbComm` object.\n\n### Detailed Fix\n\n**1\\. Location:** `util/egis/et171_flash.cc` (Above `RunFlashCmd`) Create the new `ProgramRawCommandPayload` helper to handle the raw parsing and USB transmission loop.\n\n```c\nint ProgramRawCommandPayload(UsbComm \u0026boot_comm,\n                             std::span\u003cconst uint8_t\u003e firmware) {\n  std::println(\"--- Flash RAW CMD Binary Flashing ---\");\n  size_t done \u003d 0;\n  \n  while (done \u003c firmware.size()) {\n    std::span\u003cconst uint8_t\u003e remaining \u003d firmware.subspan(done);\n\n    // 1. Parse bounds\n    auto packet_size_res \u003d GetNextPacketSize(remaining);\n    if (!packet_size_res) {\n      std::println(stderr, \"\\n[ERROR] Parse failed at offset 0x{:X}: {}\", done,\n                   ToString(packet_size_res.error()));\n      return -1;\n    }\n\n    size_t packet_size \u003d packet_size_res.value();\n    if (packet_size \u003e remaining.size()) {\n      std::println(\n          stderr,\n          \"\\n[ERROR] Packet truncated at offset 0x{:X}. Expected {} bytes.\",\n          done, packet_size);\n      return -1;\n    }\n\n    std::span\u003cconst uint8_t\u003e packet \u003d remaining.first(packet_size);\n\n    // 2. Send Data\n    auto res \u003d boot_comm.BulkWrite(BootromComm::kBootromEpOutBulk, packet,\n                                   UsbComm::kTransferTimeout);\n    if (!res || res.value() !\u003d static_cast\u003cint\u003e(packet.size())) {\n      std::println(stderr, \"\\n[ERROR] USB write failed at 0x{:X}: {}\", done,\n                   !res ? ToString(res.error()) : \"Incomplete write\");\n      return -1;\n    }\n\n    // 3. Receive Response (System reset commands do not generate responses)\n    if (packet[0] !\u003d EgisBootrom::kCmdSystemReset) {\n      std::vector\u003cuint8_t\u003e resp(128, 0);\n      auto read_res \u003d boot_comm.BulkRead(BootromComm::kBootromEpInBulk, resp,\n                                         UsbComm::kTransferTimeout);\n      if (!read_res || read_res.value() \u003c\u003d 0) {\n        std::println(stderr, \"\\n[ERROR] Device no response at 0x{:X}\", done);\n        return -1;\n      }\n    }\n\n    // 4. Advance and print progress\n    done +\u003d packet_size;\n    std::print(\"\\rFlashing Progress: {} / {} ({:.1f}%)\", done, firmware.size(),\n               (static_cast\u003cfloat\u003e(done) / firmware.size() * 100.0f));\n    std::fflush(stdout);\n  }\n  \n  std::println(\"\\n[OK] RAW CMD Flashing Finished\");\n  return 0;\n}\n\n```\n\n**2\\. Location:** `util/egis/et171_flash.cc` inside `RunFlashCmd` Remove the `brom` parameter (since it\u0027s unused now) and replace the entire `while` loop with a call to the new helper.\n\n```c\n// Fix: Removed \u0027BootromComm \u0026brom\u0027 from signature\nint RunFlashCmd(const AppConfig \u0026config, UsbComm \u0026boot_comm) {\n  if (config.fw_path.empty()) {\n    std::println(stderr, \"[ERROR] -flashcmd requires a command file path.\");\n    return -1;\n  }\n  \n  auto firmware_res \u003d ReadBinaryFile(config.fw_path);\n  if (!firmware_res) {\n    std::println(stderr, \"[ERROR] Cannot open or read file \u0027{}\u0027: {}\",\n                 config.fw_path,\n                 std::make_error_code(firmware_res.error()).message());\n    return -1;\n  }\n\n  // Fix: Defer execution to the new helper\n  return ProgramRawCommandPayload(boot_comm, firmware_res.value());\n}\n\n```\n\n**3\\. Location:** `util/egis/et171_flash.cc` inside `main()` Update the call to `RunFlashCmd` to match the new signature (remove `brom`).\n\n```c\n  if (config.mode \u003d\u003d \"flashfw\") {\n    status \u003d RunFlashFw(config, brom);\n  } else if (config.mode \u003d\u003d \"flashcmd\") {\n    // Fix: Remove brom argument\n    status \u003d RunFlashCmd(config, boot_comm);\n  } else {\n\n```",
+      "range": {
+        "startLine": 514,
+        "startChar": 0,
+        "endLine": 588,
+        "endChar": 1
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "63d6ab7f_2f3af979",
         "filename": "util/egis/usb_comm.cc",
         "patchSetId": 20
