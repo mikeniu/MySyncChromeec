@@ -43,6 +43,75 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ed891188_65e1ecf4",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T17:54:09Z",
+      "side": 1,
+      "message": "**Location:** `util/egis/bootrom.cc` (`GetBootromInfo` and `GetFlashInfo`)\n\n**The Problem:** You are passing magic numbers like `12` and `40` as expected response sizes, and using manual offsets (`payload.subspan(4)`, `resp-\u003edata() + 8`) to extract data.\n\n**The Fix:** Define packed structs in `bootrom.h` to represent these response payloads. This eliminates the magic numbers, documents the protocol, and makes extraction robust.\n\n*In `bootrom.h`:*\n\n```c\nnamespace EgisBootrom {\n// ... existing constants ...\n\nstruct BootromInfoResponse {\n  uint32_t version;\n  uint32_t max_cmd_size;\n  uint32_t max_fw_upgrade_size;\n} __attribute__((packed));\n\nstruct FlashInfoResponse {\n  uint32_t flash_size;\n  uint32_t reserved; \n  char prod_name[8];\n  // Note: The rest of the 40-byte payload can be mapped here or left implicit\n} __attribute__((packed));\n\n} // namespace EgisBootrom\n\n```\n\n*In `bootrom.cc`:*\n\n```c\nstd::expected\u003cvoid, BootromError\u003e BootromComm::GetBootromInfo() {\n  std::vector\u003cuint8_t\u003e cmd \u003d {EgisBootrom::kCmdGetBootInfo};\n  \n  // Use sizeof() instead of 12\n  auto resp \u003d SendBootromCommand(cmd, sizeof(EgisBootrom::BootromInfoResponse));\n  if (!resp) return std::unexpected(resp.error());\n\n  if (resp-\u003esize() \u003e\u003d sizeof(EgisBootrom::BootromInfoResponse)) {\n    const auto* info \u003d reinterpret_cast\u003cconst EgisBootrom::BootromInfoResponse*\u003e(resp-\u003edata());\n    \n    // Use FromLittleEndian from the earlier refactor!\n    std::println(\"Bootrom Version: 0x{:x}\", FromLittleEndian(info-\u003eversion));\n    std::println(\"Max Command Size: {} bytes\", FromLittleEndian(info-\u003emax_cmd_size));\n    std::println(\"Max FW Upgrade Size: {} bytes\", FromLittleEndian(info-\u003emax_fw_upgrade_size));\n  }\n  return {};\n}\n\n```\n\n*(Apply the exact same struct-casting pattern to `GetFlashInfo` to get rid of `resp-\u003edata() + 8`.)*",
+      "range": {
+        "startLine": 632,
+        "startChar": 0,
+        "endLine": 632,
+        "endChar": 65
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4be89328_9d909309",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 691,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T17:54:09Z",
+      "side": 1,
+      "message": "**Location:** `util/egis/bootrom.cc`\n\n**The Problem:** In `SystemReset()`, you append `0x01` to the command without explanation. In `SendBootromCommandAes()`, you hardcode the Additional Authenticated Data (AAD): `uint8_t aad[4] \u003d {0x01, 0x00, 0x00, 0x00};`\n\n**The Fix:** Declare these values as named constants in `bootrom.h` to explain their intent.\n\n*In `bootrom.h`:*\n\n```c\nnamespace EgisBootrom {\n  // ...\n  constexpr uint8_t kSystemResetTypeNormal \u003d 0x01;\n  \n  // Chip ID / Revision used as AAD for AES-GCM\n  constexpr uint32_t kChipIdAad \u003d 0x00000001; \n}\n\n```\n\n*In `bootrom.cc` (`SystemReset`):*\n\n```c\n  std::vector\u003cuint8_t\u003e cmd \u003d {EgisBootrom::kCmdSystemReset, \n                              EgisBootrom::kSystemResetTypeNormal};\n\n```\n\n*In `bootrom.cc` (`SendBootromCommandAes`):*\n\n```c\n  // Use your AppendLittleEndian helper to convert the uint32_t into a byte array dynamically\n  std::vector\u003cuint8_t\u003e aad_vec;\n  AppendLittleEndian(aad_vec, EgisBootrom::kChipIdAad);\n  \n  if (!AesGcmEncryptOpenssl(aes_key_, header.iv, aad_vec, data, ciphertext, header.tag)) { ... }\n\n```",
+      "range": {
+        "startLine": 691,
+        "startChar": 0,
+        "endLine": 691,
+        "endChar": 66
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "427bff8f_c39298a8",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T17:54:09Z",
+      "side": 1,
+      "message": "**Location:** `util/egis/ec_comm.cc` (`EcCommand::UpdateChecksum`)\n\n**The Problem:** You are manually indexing `buf[1]` to inject the checksum.\n\n```c\n  uint8_t *buf \u003d cmd_bytes_.data();\n  buf[1] \u003d 0;\n  for (size_t i \u003d 0; i \u003c cmd_bytes_.size(); i++) sum +\u003d buf[i];\n  buf[1] \u003d (256 - (sum % 256)) % 256;\n\n```\n\n**The Fix:** Tie it directly to the protocol struct using `offsetof`, which makes it explicitly clear *why* you are mutating that specific byte.\n\n```c\n  uint8_t *buf \u003d cmd_bytes_.data();\n  const size_t csum_offset \u003d offsetof(EcHostCommandRequest, checksum);\n  \n  buf[csum_offset] \u003d 0;\n  for (size_t i \u003d 0; i \u003c cmd_bytes_.size(); i++) {\n    sum +\u003d buf[i];\n  }\n  buf[csum_offset] \u003d static_cast\u003cuint8_t\u003e((256 - (sum % 256)) % 256);\n\n```",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 39
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b4a5d921_642f6900",
         "filename": "util/egis/ec_comm.cc",
         "patchSetId": 20
@@ -77,6 +146,29 @@
       "writtenOn": "2026-05-22T17:44:00Z",
       "side": 1,
       "message": "There are multiple places in the code that manually check `if constexpr (std::endian::native !\u003d std::endian::little)` and apply `std::byteswap`. This is repetitive and error-prone. Creating generic `ToLittleEndian` and `FromLittleEndian` templates centralizes this logic, significantly reducing boilerplate and making struct assignments cleaner.\n\n### Detailed Fix\n\n**Location:** `util/egis/egis_util.h`\n\nAdd the templates and refactor the existing `AppendLittleEndian` and `ReadLittleEndian` to use them.\n\n```c\ntemplate \u003cstd::integral T\u003e\nconstexpr T ToLittleEndian(T value) {\n  return (std::endian::native \u003d\u003d std::endian::little) ? value : std::byteswap(value);\n}\n\n// Semantic alias for reading\ntemplate \u003cstd::integral T\u003e\nconstexpr T FromLittleEndian(T value) {\n  return ToLittleEndian(value);\n}\n\ntemplate \u003cstd::integral T\u003e\nvoid AppendLittleEndian(std::vector\u003cuint8_t\u003e \u0026vec, T value) {\n  T le_value \u003d ToLittleEndian(value);\n  const auto *bytes \u003d reinterpret_cast\u003cconst uint8_t *\u003e(\u0026le_value);\n  vec.append_range(std::span(bytes, sizeof(T)));\n}\n\ntemplate \u003cstd::integral T\u003e\nstd::expected\u003cT, int\u003e ReadLittleEndian(std::span\u003cconst uint8_t\u003e buffer) {\n  if (buffer.size() \u003c sizeof(T)) return std::unexpected(-1);\n  T value;\n  std::memcpy(\u0026value, buffer.data(), sizeof(T));\n  return FromLittleEndian(value);\n}\n\n```\n\n*(Once added, replace manual byte-swapping blocks in `ec_comm.cc` and `bootrom.cc` with inline calls to `ToLittleEndian()`.)*",
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd792f98_58a07310",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-22T17:54:09Z",
+      "side": 1,
+      "message": "**Location:** `util/egis/et171_flash.cc` (`GetNextPacketSize`)\n\n**The Problem:** When parsing the wrapped packet headers, you have:\n\n```c\nauto wrapped_size \u003d ReadLittleEndian\u003cuint32_t\u003e(fw.subspan(2, 4));\n\n```\n\n`2` and `4` are magic numbers representing the offset and size of the `payload_len` field. If the header ever changes, this breaks silently.\n\n**The Fix:** Since you already defined `SecureCommandShaHeader` at the top of the file, use `offsetof` and `sizeof` to make it strictly tied to the struct definition.\n\n```c\n  auto wrapped_size \u003d ReadLittleEndian\u003cuint32_t\u003e(\n      fw.subspan(offsetof(SecureCommandShaHeader, payload_len), \n                 sizeof(SecureCommandShaHeader::payload_len)));\n\n```",
+      "range": {
+        "startLine": 114,
+        "startChar": 0,
+        "endLine": 114,
+        "endChar": 67
+      },
       "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
