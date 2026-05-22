@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e0700d3_6498d38f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-22T17:28:33Z",
+      "side": 1,
+      "message": "This is still a little hairy, particularly the refactoring CLs at the beginning of the stack. It occurred to me after I did them that I may be retreading ground that you\u0027ve already covered.",
+      "revId": "fc9a58e774d55263b8e62916ea8ac2d07854ed6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
