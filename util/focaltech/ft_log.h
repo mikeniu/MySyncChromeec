@@ -1,3 +1,7 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
 #ifndef UTIL_FOCALTECH_FT_LOG_H_
 #define UTIL_FOCALTECH_FT_LOG_H_
 
@@ -15,6 +19,7 @@ enum class LogLevel {
 };
 
 constexpr LogLevel kCurrentLogLevel = LogLevel::kDebug;
+constexpr const char* kLogTag = "focaltech";
 
 template <typename... Args>
 void FtLog(LogLevel level, const std::source_location& loc,
@@ -57,8 +62,8 @@ void FtLog(LogLevel level, const std::source_location& loc,
     file = file.substr(pos + 1);
   }
 
-  std::print("{}[{:%m-%d %H:%M:%S}] {} [{}:{}] ", color, now, level_str, file,
-             loc.line());
+  std::print("{}[{:%m-%d %H:%M:%S}] {} [{}][{}:{}] ", color, now, level_str,
+             kLogTag, file, loc.line());
   std::println(fmt, std::forward<Args>(args)...);
 
   if (!color.empty()) {

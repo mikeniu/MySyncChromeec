@@ -1,3 +1,8 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
 #include "usb_context.h"
 
 #include <chrono>
@@ -5,6 +10,7 @@
 #include <vector>
 
 #include "ft_log.h"
+#include "ft_util.h"
 
 namespace {
 
@@ -20,27 +26,6 @@ using ScopedDeviceList =
     std::unique_ptr<libusb_device*, LibusbDeviceListDeleter>;
 
 }  // namespace
-
-// Definition of global device removal flag
-std::atomic<int> UsbDevice::g_device_removed_flag = 0;
-
-// Hotplug callback for USB device removal events (uses std::atomic<int>)
-int LIBUSB_CALL UsbRemoveEventCallback(libusb_context* /*ctx*/,
-                                       libusb_device* dev,
-                                       libusb_hotplug_event event,
-                                       void* user_data) {
-  libusb_device_descriptor desc{};
-  libusb_get_device_descriptor(dev, &desc);
-
-  if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT) {
-    auto* flag = static_cast<std::atomic<int>*>(user_data);
-    if (flag) {
-      flag->store(kFtUsbDeviceRemoveMagic);
-    }
-    LOGW("USB device removed: {:04x}:{:04x}", desc.idVendor, desc.idProduct);
-  }
-  return 0;
-}
 
 std::expected<UsbDevice, FtError> UsbDevice::Create(
     const UsbContext& ctx, UsbConnectionDetails& out_details) {
@@ -69,7 +54,7 @@ std::expected<UsbDevice, FtError> UsbDevice::Create(
                                            desc.idProduct != kFocalEcPid9865 &&
                                            desc.idProduct != kFocalEcPid9869)) {
         LOGI(
-            "Found Google device {:04x}:{:04x}, but not Focal fingerprint. "
+            "Found Google device {:04x}:{:04x}, but not Focal fingerprint."
             "Skipping.",
             desc.idVendor, desc.idProduct);
         continue;
@@ -149,9 +134,6 @@ std::expected<UsbDevice, FtError> UsbDevice::Create(
   out_details.ep_bulk_in = ep_in;
   out_details.ep_bulk_out = ep_out;
 
-  // Short delay for device enumeration
-  std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
   // Detach kernel driver if active
   if (libusb_kernel_driver_active(handle_holder.get(), interface_num) == 1) {
     LOGD("Kernel driver active, detaching...");
@@ -171,30 +153,6 @@ std::expected<UsbDevice, FtError> UsbDevice::Create(
 
   // Wait for device to re-enumerate after reset
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
-
-  // Register hotplug callback for device removal events
-  if (libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG)) {
-    libusb_hotplug_callback_handle hotplug_handle;
-    int ret = libusb_hotplug_register_callback(
-        ctx.get(),                                   // correct context
-        LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,            // listen only for removal
-        0,                                           // flags
-        out_details.vid,                             // vendor ID
-        out_details.pid,                             // product ID
-        LIBUSB_HOTPLUG_MATCH_ANY,                    // device class (any)
-        UsbRemoveEventCallback,                      // callback function
-        static_cast<void*>(&g_device_removed_flag),  // user data
-        &hotplug_handle);  // output handle (not saved)
-    if (ret != LIBUSB_SUCCESS) {
-      LOGW("Failed to register hotplug callback: {}", libusb_error_name(ret));
-    } else {
-      LOGD("Hotplug callback registered for VID:PID {:04x}:{:04x}",
-           out_details.vid, out_details.pid);
-    }
-  } else {
-    LOGW("Hotplug capability not available");
-  }
-
   LOGD("reset mcu success");
 
   // Claim interface
@@ -216,13 +174,22 @@ std::expected<int, FtError> UsbDevice::Send(std::span<const uint8_t> buf,
     return std::unexpected(FtError::kNoSuchDevice);
   }
 
+  LOGV("timeout_ms={}", timeout_ms);
+
   int actual_len = 0;
   int r = libusb_bulk_transfer(
       handle_.get(), endpoint_out_, const_cast<uint8_t*>(buf.data()),
       static_cast<int>(buf.size()), &actual_len, timeout_ms);
+
   if (r != LIBUSB_SUCCESS) {
+
     libusb_reset_device(handle_.get());
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    if (r == LIBUSB_ERROR_NO_DEVICE) {
+      return std::unexpected(FtError::kNoSuchDevice);
+    }
+
     return std::unexpected(FtError::kResultFail);
   }
   return actual_len;
@@ -234,48 +201,49 @@ std::expected<int, FtError> UsbDevice::Recv(std::span<uint8_t> buf,
     return std::unexpected(FtError::kNoSuchDevice);
   }
 
+  LOGV("timeout_ms={}", timeout_ms);
+
   int actual_len = 0;
   int r = libusb_bulk_transfer(handle_.get(), endpoint_in_, buf.data(),
                                static_cast<int>(buf.size()), &actual_len,
                                timeout_ms);
   if (r != LIBUSB_SUCCESS) {
+
     libusb_reset_device(handle_.get());
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    if (r == LIBUSB_ERROR_NO_DEVICE) {
+      return std::unexpected(FtError::kNoSuchDevice);
+    }
+
     return std::unexpected(FtError::kResultFail);
   }
+
   return std::min(actual_len, static_cast<int>(buf.size()));
 }
 
-// Renamed from ResetComplate
 int UsbDevice::ResetComplete(int timeout_sec) const {
   if (!handle_) {
     LOGE("Invalid device handle");
     return -1;
   }
 
-  libusb_context* ctx = ctx_;
-  if (!ctx) {
-    LOGE("Failed to obtain libusb context");
-    return -1;
-  }
-
-  const int poll_ms = 100;  // poll every 100 ms
+  const int poll_ms = 100;
   const int timeout_ms = timeout_sec * 1000;
   int elapsed_ms = 0;
 
   while (timeout_sec == 0 || elapsed_ms < timeout_ms) {
-    // Process USB events (triggers the hotplug callback)
-    struct timeval tv = {0, poll_ms * 1000};  // microseconds
-    int ret = libusb_handle_events_timeout(ctx, &tv);
-    if (ret < 0 && ret != LIBUSB_ERROR_INTERRUPTED) {
-      LOGW("libusb_handle_events_timeout failed: {}", libusb_error_name(ret));
-    }
+    int config = 0;
+    // Attempt a harmless control transfer to the device
+    int r = libusb_get_configuration(handle_.get(), &config);
 
-    // Check the global atomic flag
-    if (g_device_removed_flag.load() == kFtUsbDeviceRemoveMagic) {
-      LOGI("USB device removal detected");
-      g_device_removed_flag.store(0);  // reset for next use
-      return 0;
+    // If the OS dropped the device due to the MCU reset, the handle
+    // becomes stale and libusb throws this specific error.
+    if (r == LIBUSB_ERROR_NO_DEVICE) {
+      LOGI("USB device removal/reset detected");
+      return 0;  // Success
+    } else {
+      LOGV("r={}", r);
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(poll_ms));

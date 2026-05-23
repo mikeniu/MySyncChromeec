@@ -1,3 +1,8 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
 #ifndef UTIL_FOCALTECH_USB_CONTEXT_H_
 #define UTIL_FOCALTECH_USB_CONTEXT_H_
 
@@ -11,15 +16,7 @@
 #include <string_view>
 
 #include "ft_log.h"
-
-enum class FtError {
-  kSuccess = 0,
-  kNoSuchDevice = -1,
-  kParameterError = -2,
-  kNoSuchFile = -3,
-  kResultFail = -4,
-  kInvalidMode = -5,
-};
+#include "ft_util.h"
 
 enum class FtDeviceMode {
   kUnknown,
@@ -50,6 +47,8 @@ enum class FtFlashWpArea {
   kOutRange,
 };
 
+enum class TransferDirection { kIn, kOut, kSendOnly };
+
 constexpr uint16_t kFocalRomVid = 0x2FD0;
 constexpr uint16_t kFocalBootVid = 0x2808;
 constexpr uint16_t kFocalEcVid = 0x18D1;
@@ -57,10 +56,6 @@ constexpr uint16_t kFocalEcVid = 0x18D1;
 constexpr uint16_t kFocalEcPidTest = 0xFACE;
 constexpr uint16_t kFocalEcPid9865 = 0x5403;
 constexpr uint16_t kFocalEcPid9869 = 0x5404;
-
-constexpr int kUsbSendOnly = 2;
-
-constexpr int kFtUsbDeviceRemoveMagic = 0x55aa;
 
 struct FtDeviceInfo {
   FtDeviceMode current_mode = FtDeviceMode::kUnknown;
@@ -136,7 +131,8 @@ class UsbDevice {
   static void ResetDeviceRemovedFlag() { g_device_removed_flag.store(0); }
 
   // Wait for device removal (hotplug event)
-  int ResetComplete(int timeout_sec) const;  // renamed from ResetComplate
+  int ResetComplete(int timeout_sec) const;
+  void UsbResetRecvPipe(void) const;
 
  private:
   // Constructor takes a libusb_context* for later event handling

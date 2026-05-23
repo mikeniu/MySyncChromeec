@@ -1,18 +1,19 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "ft_scsi.h"
+
 #include <endian.h>
 
-#include <array>
-#include <cstdint>
-#include <cstring>
-#include <span>
-
 #include "ft_log.h"
-#include "usb_context.h"
+#include "ft_util.h"
 
 namespace {
 
 constexpr uint32_t kUsbMsCbwSignature = 0x43425355;
 constexpr uint32_t kUsbMsCswSignature = 0x53425355;
-constexpr size_t kFtCmdLength = 16;
 
 struct BulkCbWrap {
   uint32_t signature;
@@ -33,11 +34,11 @@ struct BulkCsWrap {
 
 struct FtCmdFormat {
   uint8_t opcode;
-  uint32_t para2;
-  uint32_t para3;
-  uint32_t para4;
+  uint32_t address;
+  uint32_t length;
+  uint32_t aux_address;
   uint8_t subcmd;
-  uint8_t sub_para;
+  uint8_t flags;
   uint8_t reserved;
 } __attribute__((packed));
 
@@ -45,27 +46,26 @@ uint32_t g_cdb_tag = 1;
 
 }  // namespace
 
-std::array<uint8_t, kFtCmdLength> BuildFtCmd(uint8_t opcode, uint8_t subcmd,
-                                             uint32_t para2, uint32_t para3,
-                                             uint32_t para4, uint8_t sub_para) {
-  std::array<uint8_t, kFtCmdLength> cmd_buf{};
+std::array<uint8_t, 16> BuildFtCmd(uint8_t opcode, uint8_t subcmd,
+                                   uint32_t address, uint32_t length,
+                                   uint32_t aux_address, uint8_t flags) {
+  std::array<uint8_t, 16> cmd_buf{};
   auto* cmd = reinterpret_cast<FtCmdFormat*>(cmd_buf.data());
 
   cmd->opcode = opcode;
   cmd->subcmd = subcmd;
-  cmd->sub_para = sub_para;
-  cmd->para2 = para2;
-  cmd->para3 = para3;
-  cmd->para4 = para4;
+  cmd->flags = flags;
+  cmd->address = address;
+  cmd->length = length;
+  cmd->aux_address = aux_address;
 
   return cmd_buf;
 }
 
-std::expected<void, FtError> SendBulkCommand(const UsbDevice& device,
-                                             std::span<const uint8_t> scsi_cmd,
-                                             std::span<uint8_t> data_buffer,
-                                             int is_data_in,
-                                             uint32_t timeout_ms) {
+std::expected<void, FtError> SendBulkCommand(
+    const UsbDevice& device, std::span<const uint8_t> scsi_cmd,
+    std::span<uint8_t> data_buffer, TransferDirection dir,
+    std::chrono::milliseconds timeout_ms) {
   if (scsi_cmd.size() > 16 || scsi_cmd.empty()) {
     LOGE("Invalid SCSI command length.");
     return std::unexpected(FtError::kParameterError);
@@ -75,7 +75,7 @@ std::expected<void, FtError> SendBulkCommand(const UsbDevice& device,
   BulkCbWrap cbw{};
   cbw.signature = htole32(kUsbMsCbwSignature);
   cbw.tag = htole32(g_cdb_tag++);
-  cbw.flags = !is_data_in ? 0x00 : 0x80;
+  cbw.flags = (dir == TransferDirection::kIn) ? 0x80 : 0x00;
   cbw.lun = 0;
   cbw.cmd_len = static_cast<uint8_t>(scsi_cmd.size());
   cbw.data_transfer_length = htole32(data_buffer.size());
@@ -84,7 +84,7 @@ std::expected<void, FtError> SendBulkCommand(const UsbDevice& device,
   // Send CBW
   auto cbw_span = std::span<const uint8_t>(
       reinterpret_cast<const uint8_t*>(&cbw), sizeof(cbw));
-  auto send_res = device.Send(cbw_span, timeout_ms);
+  auto send_res = device.Send(cbw_span, timeout_ms.count());
   if (!send_res) {
     LOGE("CBW transfer failed.");
     return std::unexpected(send_res.error());
@@ -95,8 +95,8 @@ std::expected<void, FtError> SendBulkCommand(const UsbDevice& device,
   }
 
   // MCU reset, cannot receive data – wait for device removal instead
-  if (is_data_in == kUsbSendOnly) {
-    if (device.ResetComplete(3)) {  // renamed method
+  if (dir == TransferDirection::kSendOnly) {
+    if (device.ResetComplete(3)) {
       return std::unexpected(FtError::kResultFail);
     }
     return {};
@@ -104,15 +104,15 @@ std::expected<void, FtError> SendBulkCommand(const UsbDevice& device,
 
   // Data phase
   if (!data_buffer.empty()) {
-    if (is_data_in) {  // read from device
-      auto recv_res = device.Recv(data_buffer, timeout_ms);
+    if (dir == TransferDirection::kIn) {  // read from device
+      auto recv_res = device.Recv(data_buffer, timeout_ms.count());
       if (!recv_res) {
         LOGE("Data IN transfer failed.");
         return std::unexpected(recv_res.error());
       }
       // actual received length is returned; caller can check if needed
     } else {  // write to device
-      auto send_res = device.Send(data_buffer, timeout_ms);
+      auto send_res = device.Send(data_buffer, timeout_ms.count());
       if (!send_res) {
         LOGE("Data OUT transfer failed.");
         return std::unexpected(send_res.error());
@@ -129,9 +129,10 @@ std::expected<void, FtError> SendBulkCommand(const UsbDevice& device,
   BulkCsWrap csw{};
   auto csw_span =
       std::span<uint8_t>(reinterpret_cast<uint8_t*>(&csw), sizeof(csw));
-  auto recv_res = device.Recv(csw_span, timeout_ms);
+  auto recv_res = device.Recv(csw_span, timeout_ms.count());
   if (!recv_res) {
     LOGE("CSW transfer failed.");
+
     return std::unexpected(recv_res.error());
   }
   if (*recv_res != sizeof(csw)) {
@@ -142,7 +143,8 @@ std::expected<void, FtError> SendBulkCommand(const UsbDevice& device,
   // Validate CSW
   if (le32toh(csw.signature) != kUsbMsCswSignature ||
       le32toh(csw.tag) != le32toh(cbw.tag)) {
-    LOGE("CSW signature/tag mismatch.");
+    LOGE("CSW signature/tag mismatch.csw.tag={},{},sign={}", le32toh(csw.tag),
+         le32toh(cbw.tag), le32toh(csw.signature));
     return std::unexpected(FtError::kResultFail);
   }
 
