@@ -6147,6 +6147,16 @@ struct ec_response_thread_info_detail {
 	uint32_t sp;
 } __ec_align4;
 
+/**
+ * Simulate 2 consecutive delayed power button short presses.
+ */
+#define EC_CMD_POWER_BUTTON_DOUBLE_PRESS 0x00E6
+
+struct ec_params_power_button_double_press {
+	uint32_t first_after_ms;
+	uint32_t second_after_ms;
+} __ec_align4;
+
 /*****************************************************************************/
 /*
  * PD commands

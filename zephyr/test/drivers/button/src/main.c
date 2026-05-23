@@ -7,6 +7,8 @@
 #include "button.h"
 #include "console.h"
 #include "hooks.h"
+#include "host_command.h"
+#include "include/power_button.h"
 #include "mkbp_fifo.h"
 #include "power.h"
 #include "test/drivers/test_state.h"
@@ -385,4 +387,47 @@ ZTEST(button, test_activate_warm_reset_exec)
 	zassert_equal(1, chipset_reset_fake.call_count);
 	zassert_equal(CHIPSET_RESET_DBG_WARM_REBOOT,
 		      chipset_reset_fake.arg0_val);
+}
+
+ZTEST(button, test_hc_power_button_double_press)
+{
+	struct ec_params_power_button_double_press hc_params = {
+		.first_after_ms = 1000,
+		.second_after_ms = 5000,
+	};
+	struct host_cmd_handler_args hc_pbdp = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_POWER_BUTTON_DOUBLE_PRESS, 0, hc_params);
+
+	/* PBTN up on start. */
+	zassert_equal(power_button_is_pressed(), 0);
+
+	/* Issue double press. */
+	zassert_ok(host_command_process(&hc_pbdp));
+	zassert_equal(power_button_is_pressed(), 0);
+
+	/* PBTN up before the 1000ms mark. */
+	pass_time(800); /* T + 900ms */
+	zassert_equal(power_button_is_pressed(), 0);
+
+	/* PBTN down between 1000-1200ms mark. */
+	pass_time(0); /* T + 1000ms */
+	zassert_equal(power_button_is_pressed(), 1);
+	pass_time(0); /* T + 1100ms */
+	zassert_equal(power_button_is_pressed(), 1);
+
+	/* PBTN up between 1200-5000ms marks. */
+	pass_time(0); /* T + 1200ms */
+	zassert_equal(power_button_is_pressed(), 0);
+	pass_time(3600); /* T + 4900ms */
+	zassert_equal(power_button_is_pressed(), 0);
+
+	/* PBTN down between 5000-5200ms marks. */
+	pass_time(0); /* T + 5000ms */
+	zassert_equal(power_button_is_pressed(), 1);
+	pass_time(0); /* T + 5100ms */
+	zassert_equal(power_button_is_pressed(), 1);
+
+	/* PBTN up after the 5200ms mark. */
+	pass_time(0); /* T + 5200ms */
+	zassert_equal(power_button_is_pressed(), 0);
 }

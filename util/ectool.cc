@@ -11185,6 +11185,37 @@ int cmd_force_lid_open(int argc, char *argv[])
 	return 0;
 }
 
+int cmd_pbdp(int argc, char *argv[])
+{
+	struct ec_params_power_button_double_press p;
+	char *e;
+	int rv;
+
+	if (argc != 3) {
+		fprintf(stderr,
+			"Usage: %s <first_after_ms> <second_after_ms>\n",
+			argv[0]);
+		return -1;
+	}
+	p.first_after_ms = strtol(argv[1], &e, 0);
+	if (e && *e) {
+		fprintf(stderr, "Bad value.\n");
+		return -1;
+	}
+	p.second_after_ms = strtol(argv[2], &e, 0);
+	if (e && *e) {
+		fprintf(stderr, "Bad value.\n");
+		return -1;
+	}
+
+	rv = ec_command(EC_CMD_POWER_BUTTON_DOUBLE_PRESS, 0, &p, sizeof(p),
+			NULL, 0);
+	if (rv < 0)
+		return rv;
+	printf("Success.\n");
+	return 0;
+}
+
 int cmd_charge_port_override(int argc, char *argv[])
 {
 	struct ec_params_charge_port_override p;
@@ -13178,6 +13209,9 @@ const struct command commands[] = {
 	{ "pause_in_s5", cmd_s5,
 	  "[on|off]\n"
 	  "\tWhether or not the AP should pause in S5 on shutdown." },
+	{ "pbdp", cmd_pbdp,
+	  "<first_after_ms> <second_after_ms>\n"
+	  "\tSimulate 2 consecutive delayed power button presses." },
 	{ "pchg", cmd_pchg,
 	  "[<port>]\n"
 	  "\tGet peripheral charge port count and status." },
