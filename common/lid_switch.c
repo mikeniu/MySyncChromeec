@@ -185,6 +185,34 @@ static enum ec_status hc_force_lid_open(struct host_cmd_handler_args *args)
 }
 DECLARE_HOST_COMMAND(EC_CMD_FORCE_LID_OPEN, hc_force_lid_open, EC_VER_MASK(0));
 
+static void lid_close_deferred(void)
+{
+	lid_switch_close();
+}
+DECLARE_DEFERRED(lid_close_deferred);
+
+static void lid_open_deferred(void)
+{
+	lid_switch_open();
+}
+DECLARE_DEFERRED(lid_open_deferred);
+
+/**
+ * Host command to schedule a delayed lid close followed by open.
+ */
+static enum ec_status hc_lid_sleep(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_lid_sleep *p = args->params;
+
+	/* Schedule lid close */
+	hook_call_deferred(&lid_close_deferred_data, p->close_after_ms * MSEC);
+	/* Schedule lid open */
+	hook_call_deferred(&lid_open_deferred_data, p->open_after_ms * MSEC);
+
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_LID_SLEEP, hc_lid_sleep, EC_VER_MASK(0));
+
 #if defined(HAS_TASK_KEYSCAN) || defined(CONFIG_CROS_EC_KEYBOARD_INPUT)
 
 static void keyboard_lid_change(void)

@@ -11185,6 +11185,35 @@ int cmd_force_lid_open(int argc, char *argv[])
 	return 0;
 }
 
+int cmd_lid_sleep(int argc, char *argv[])
+{
+	struct ec_params_lid_sleep p;
+	char *e;
+	int rv;
+
+	if (argc != 3) {
+		fprintf(stderr, "Usage: %s <close_after_ms> <open_after_ms>\n",
+			argv[0]);
+		return -1;
+	}
+	p.close_after_ms = strtol(argv[1], &e, 0);
+	if (e && *e) {
+		fprintf(stderr, "Bad value.\n");
+		return -1;
+	}
+	p.open_after_ms = strtol(argv[2], &e, 0);
+	if (e && *e) {
+		fprintf(stderr, "Bad value.\n");
+		return -1;
+	}
+
+	rv = ec_command(EC_CMD_LID_SLEEP, 0, &p, sizeof(p), NULL, 0);
+	if (rv < 0)
+		return rv;
+	printf("Success.\n");
+	return 0;
+}
+
 int cmd_charge_port_override(int argc, char *argv[])
 {
 	struct ec_params_charge_port_override p;

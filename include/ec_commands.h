@@ -6147,6 +6147,17 @@ struct ec_response_thread_info_detail {
 	uint32_t sp;
 } __ec_align4;
 
+/**
+ * Simulate lid sleep.
+ * Schedules lidclose and lidopen at given delays.
+ */
+#define EC_CMD_LID_SLEEP 0x00E6
+
+struct ec_params_lid_sleep {
+	uint32_t close_after_ms;
+	uint32_t open_after_ms;
+} __ec_align4;
+
 /*****************************************************************************/
 /*
  * PD commands

@@ -293,5 +293,41 @@ ZTEST(lid_switch, test_hc_force_lid_open)
 	zassert_equal(lid_is_open(), 1);
 }
 
+ZTEST(lid_switch, test_hc_lid_sleep)
+{
+	struct ec_params_lid_sleep hc_params = {
+		.close_after_ms = 200,
+		.open_after_ms = 400,
+	};
+	struct host_cmd_handler_args hc_lid_sleep =
+		BUILD_HOST_COMMAND_PARAMS(EC_CMD_LID_SLEEP, 0, hc_params);
+
+	/* Start open. */
+	zassert_ok(emul_lid_open());
+	k_sleep(K_MSEC(100));
+	zassert_equal(lid_is_open(), 1);
+
+	/* Issue lid sleep - lid should remain open. */
+	zassert_ok(host_command_process(&hc_lid_sleep));
+	k_sleep(K_MSEC(100));
+	zassert_equal(lid_is_open(), 1);
+
+	/* Still open before the 200ms mark. */
+	k_sleep(K_MSEC(50));
+	zassert_equal(lid_is_open(), 1);
+
+	/* Should be closed after 200ms mark. */
+	k_sleep(K_MSEC(100));
+	zassert_equal(lid_is_open(), 0);
+
+	/* Still closed before the 400ms mark. */
+	k_sleep(K_MSEC(100));
+	zassert_equal(lid_is_open(), 0);
+
+	/* Should be open after 400ms mark. */
+	k_sleep(K_MSEC(100));
+	zassert_equal(lid_is_open(), 1);
+}
+
 ZTEST_SUITE(lid_switch, drivers_predicate_post_main, lid_switch_setup,
 	    lid_switch_before, lid_switch_after, NULL);
