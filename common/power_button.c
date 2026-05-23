@@ -29,6 +29,8 @@
 #define CONFIG_POWER_BUTTON_FLAGS 0
 #endif
 
+#define POWER_BUTTON_SHORTPRESS 200
+
 /* Debounced power button state */
 test_export_static int debounced_power_pressed;
 static int simulate_power_pressed;
@@ -308,3 +310,38 @@ static int command_powerbtn(int argc, const char **argv)
 }
 DECLARE_CONSOLE_COMMAND(powerbtn, command_powerbtn, "[msec]",
 			"Simulate power button press");
+
+/*****************************************************************************/
+/* Host commands */
+
+static void power_button_1st_deferred(void)
+{
+	power_button_simulate_press(POWER_BUTTON_SHORTPRESS);
+}
+DECLARE_DEFERRED(power_button_1st_deferred);
+
+static void power_button_2nd_deferred(void)
+{
+	power_button_simulate_press(POWER_BUTTON_SHORTPRESS);
+}
+DECLARE_DEFERRED(power_button_2nd_deferred);
+
+/**
+ * Host command to schedule 2 delayed power button short presses.
+ */
+static enum ec_status
+hc_power_button_double_press(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_power_button_double_press *p = args->params;
+
+	/* Schedule first press */
+	hook_call_deferred(&power_button_1st_deferred_data,
+			   p->first_after_ms * MSEC);
+	/* Schedule second press */
+	hook_call_deferred(&power_button_2nd_deferred_data,
+			   p->second_after_ms * MSEC);
+
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_POWER_BUTTON_DOUBLE_PRESS,
+		     hc_power_button_double_press, EC_VER_MASK(0));
