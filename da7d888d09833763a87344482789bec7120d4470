@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7779add7_bd88d3a8",
+        "filename": "zephyr/drivers/cros_system/Kconfig",
+        "patchSetId": 3
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-05-23T03:53:44Z",
+      "side": 1,
+      "message": "Some of the above chips, like `cros_system_xec`, doesn\u0027t have the compile error check for this.\n\n```\n#if CONFIG_CROS_SYSTEM_INIT_PRIORITY \u003e\u003d \\\n\tCONFIG_PLATFORM_EC_SYSTEM_PRE_INIT_PRIORITY\n#error \"CROS_SYSTEM must initialize before the SYSTEM_PRE initialization\"\n#endif\n```\n\nDoes this need to be included for all of them?",
+      "range": {
+        "startLine": 98,
+        "startChar": 3,
+        "endLine": 98,
+        "endChar": 60
+      },
+      "revId": "da7d888d09833763a87344482789bec7120d4470",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
