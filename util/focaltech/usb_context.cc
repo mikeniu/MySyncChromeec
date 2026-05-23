@@ -246,7 +246,7 @@ std::expected<int, FtError> UsbDevice::Recv(std::span<uint8_t> buf,
   return std::min(actual_len, static_cast<int>(buf.size()));
 }
 
-// Renamed from ResetComplate
+
 int UsbDevice::ResetComplete(int timeout_sec) const {
   if (!handle_) {
     LOGE("Invalid device handle");

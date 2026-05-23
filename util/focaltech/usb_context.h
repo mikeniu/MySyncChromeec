@@ -136,7 +136,7 @@ class UsbDevice {
   static void ResetDeviceRemovedFlag() { g_device_removed_flag.store(0); }
 
   // Wait for device removal (hotplug event)
-  int ResetComplete(int timeout_sec) const;  // renamed from ResetComplate
+  int ResetComplete(int timeout_sec) const;  
 
  private:
   // Constructor takes a libusb_context* for later event handling
