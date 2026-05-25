@@ -407,6 +407,12 @@ static void tps6699x_emul_handle_sryr(struct tps6699x_emul_pdc_data *data,
 	data_reg[0] = TASK_COMPLETED_SUCCESSFULLY;
 }
 
+static void tps6699x_emul_handle_trig(struct tps6699x_emul_pdc_data *data,
+				      uint8_t *data_reg)
+{
+	data_reg[0] = TASK_COMPLETED_SUCCESSFULLY;
+}
+
 static void aneg_delayable_work_handler(struct k_work *w)
 {
 	struct k_work_delayable *dwork = k_work_delayable_from_work(w);
@@ -505,7 +511,9 @@ static int tps6699x_emul_handle_sbud(struct tps6699x_emul_pdc_data *data,
 	}
 	/* LCOV_EXCL_STOP */
 
-	data->reg_val[REG_STATUS][3] = mode << 2;
+	union reg_status *r = (union reg_status *)data->reg_val[REG_STATUS];
+	r->sbumux_mode = mode;
+
 	data_reg[0] = TASK_COMPLETED_SUCCESSFULLY;
 
 	return 0;
@@ -560,6 +568,9 @@ static void tps6699x_emul_handle_command(struct tps6699x_emul_pdc_data *data,
 		break;
 	case COMMAND_TASK_GAID:
 		tps6699x_emul_handle_gaid(data, data_reg);
+		break;
+	case COMMAND_TASK_TRIG:
+		tps6699x_emul_handle_trig(data, data_reg);
 		break;
 	default: {
 		char task_str[5] = {
@@ -1114,7 +1125,9 @@ static int emul_tps6699x_reset(const struct emul *target)
 	const union reg_port_control *pdc_port_control =
 		(const union reg_port_control *)data->reg_val[REG_PORT_CONTROL];
 	union reg_mode *reg_mode = (union reg_mode *)data->reg_val[REG_MODE];
-
+	union reg_received_attention_vdm *attention_vdm =
+		(union reg_received_attention_vdm *)
+			data->reg_val[REG_RECEIVED_ATTENTION_VDM];
 	memset(data->reg_val, 0, sizeof(data->reg_val));
 
 	/* Reset PDOs. */
@@ -1136,6 +1149,12 @@ static int emul_tps6699x_reset(const struct emul *target)
 
 	/* Initialize reg_mode to APP0 to indicate running from flash. */
 	*((uint32_t *)reg_mode->data) = REG_MODE_APP0;
+
+	/* Init received attention vdm */
+	attention_vdm->number_valid_vdos = 2;
+	attention_vdm->sequence_number = 1;
+	attention_vdm->vdm_header = 0;
+	attention_vdm->vdo = 0x1;
 
 	data->pending_rdo = 0;
 	k_work_cancel_delayable(&data->delayed_sink_contract_negotiation_work);
@@ -1206,6 +1225,9 @@ static int tps6699x_emul_init(const struct emul *emul,
 	const struct i2c_common_emul_cfg *cfg = emul->cfg;
 	union reg_mode *reg_mode =
 		(union reg_mode *)data->pdc_data.reg_val[REG_MODE];
+	union reg_received_attention_vdm *attention_vdm =
+		(union reg_received_attention_vdm *)
+			data->pdc_data.reg_val[REG_RECEIVED_ATTENTION_VDM];
 	LOG_INF("TPS669X emul init");
 
 	data->common.i2c = parent;
@@ -1224,6 +1246,12 @@ static int tps6699x_emul_init(const struct emul *emul,
 
 	/* Init register to APP0 */
 	*((uint32_t *)reg_mode->data) = REG_MODE_APP0;
+
+	/* Init received attention vdm */
+	attention_vdm->number_valid_vdos = 2;
+	attention_vdm->sequence_number = 1;
+	attention_vdm->vdm_header = 0;
+	attention_vdm->vdo = 0x1;
 
 	return 0;
 }
@@ -1453,6 +1481,48 @@ static int emul_tps6699x_get_autoneg_sink(const struct emul *target,
 	return 0;
 }
 
+static int emul_tps6699x_set_identity(const struct emul *target, uint32_t *vdos)
+{
+	struct tps6699x_emul_pdc_data *data =
+		tps6699x_emul_get_pdc_data(target);
+	memcpy(&data->identity, vdos,
+	       sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT);
+	return 0;
+}
+
+static int emul_tps6699x_set_revision(const struct emul *target, uint32_t rmdo)
+{
+	struct tps6699x_emul_pdc_data *data =
+		tps6699x_emul_get_pdc_data(target);
+	data->rmdo = rmdo;
+	return 0;
+}
+
+static int emul_tps6699x_set_current_cam(const struct emul *target,
+					 uint32_t current_cam)
+{
+	struct tps6699x_emul_pdc_data *data =
+		tps6699x_emul_get_pdc_data(target);
+	data->current_cam = current_cam;
+	return 0;
+}
+
+static int emul_tps6699x_get_sbu_mux_mode(const struct emul *target,
+					  enum pdc_sbu_mux_mode *mode)
+{
+	struct tps6699x_emul_pdc_data *data =
+		tps6699x_emul_get_pdc_data(target);
+
+	if (mode == NULL) {
+		return -EINVAL;
+	}
+
+	union reg_status *r = (union reg_status *)data->reg_val[REG_STATUS];
+	*mode = r->sbumux_mode;
+
+	return 0;
+}
+
 static int emul_tps6699x_get_max_pdp(const struct emul *target,
 				     enum max_pdp_t *max_pdp)
 {
@@ -1513,6 +1583,10 @@ static DEVICE_API(emul_pdc, emul_tps6699x_api) = {
 	.clear_feature_flag = emul_tps6699x_clear_feature_flag,
 	.reset_feature_flags = emul_tps6699x_reset_feature_flags,
 	.get_autoneg_sink = emul_tps6699x_get_autoneg_sink,
+	.set_identity = emul_tps6699x_set_identity,
+	.set_revision = emul_tps6699x_set_revision,
+	.set_current_cam = emul_tps6699x_set_current_cam,
+	.get_sbu_mux_mode = emul_tps6699x_get_sbu_mux_mode,
 	.get_max_pdp = emul_tps6699x_get_max_pdp,
 };
 
