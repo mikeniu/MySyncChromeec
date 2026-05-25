@@ -147,6 +147,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc9074b2_6334f9b3",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-25T11:23:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f4b542f8_e7915c14",
+      "range": {
+        "startLine": 190,
+        "startChar": 5,
+        "endLine": 190,
+        "endChar": 63
+      },
+      "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5ab0c391_b781c1a1",
@@ -184,6 +208,30 @@
       "side": 1,
       "message": "OK, update on patchset 20.\n- Reused check_prot_reg() in cros_flash_em32f967_get_protect() to\n  avoid duplicating overlap logic and keep protection checks centralized",
       "parentUuid": "5ab0c391_b781c1a1",
+      "range": {
+        "startLine": 309,
+        "startChar": 0,
+        "endLine": 318,
+        "endChar": 69
+      },
+      "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4418d42_230d5787",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-25T11:23:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b495f69f_50f2fc67",
       "range": {
         "startLine": 309,
         "startChar": 0,
@@ -241,6 +289,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ace4d076_c2982e22",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-25T11:23:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "17830f92_67a1adb6",
+      "range": {
+        "startLine": 341,
+        "startChar": 0,
+        "endLine": 347,
+        "endChar": 2
+      },
+      "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e916c83e_8d72cae4",
@@ -278,6 +350,30 @@
       "side": 1,
       "message": "Good point.\n\nThe write-protection APIs have been updated to use byte ranges (start/end)\ninstead of bank/page counts. This removes the dependency on\nCONFIG_FLASH_BANK_SIZE and avoids any potential mismatch between the\ndriver and the underlying hardware representation.\n\nThe conversion from byte ranges to hardware-specific protection settings\nis now fully handled within the private library, keeping the driver\naligned with the range-based abstraction used throughout the patch.",
       "parentUuid": "e916c83e_8d72cae4",
+      "range": {
+        "startLine": 470,
+        "startChar": 2,
+        "endLine": 470,
+        "endChar": 28
+      },
+      "revId": "a70ef1c332b1d4772b52d177f6042e419ec83522",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7330da4_bca149d3",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_em32f967.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-25T11:23:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc1f2e95_b6418bdb",
       "range": {
         "startLine": 470,
         "startChar": 2,
