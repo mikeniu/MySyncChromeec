@@ -20,11 +20,13 @@ import sys
 # pylint: disable=import-error
 from google.protobuf import json_format
 
+
 # Find chromite!  Assume this code only runs inside the SDK.
 sys.path.insert(0, "/mnt/host/source")
 
 # pylint: disable=wrong-import-position
 from chromite.api.gen_sdk.chromite.api import firmware_pb2
+
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 BUILD_DIR = os.path.join(DIR, "build")
@@ -50,6 +52,8 @@ BUNDLE_FILES = [
     ("RW/ec.RW.dis", ""),
     ("RW/ec.RW.elf.fips", "ec.RW.elf"),
     ("RW/ec.RW.map", ""),
+    ("RW/ec.RW.flat.hashes.hashes", "ec.RW.hashes"),
+    ("RW/ec.RW_B.flat.hashes.hashes", "ec.RW_B.hashes"),
     ("RW/space_free_ram.txt", ""),
     ("RW/space_free_flash.txt", ""),
     ("../../util/signer/fuses.xml", ""),
@@ -68,6 +72,27 @@ BUNDLE_FILES = [
 ]
 
 
+def run_cmd(cmd, exec_dir=None):
+    """Run the passed in command, optionally in a different directory.
+
+    By default run the commands in this script's directory.
+
+    Return command's console output.
+    """
+    if exec_dir is None:
+        exec_dir = DIR
+    else:
+        exec_dir = os.path.realpath(exec_dir)
+    print(f"# Running \"{' '.join(cmd)}\" in {exec_dir}")
+    result = subprocess.run(
+        cmd,
+        cwd=exec_dir,
+        check=True,
+        stdout=subprocess.PIPE,
+    )
+    return result.stdout.decode().strip()
+
+
 def init_toolchain():
     """Initialize coreboot-sdk.
 
@@ -79,34 +104,33 @@ def init_toolchain():
         ("COREBOOT_SDK_ROOT_arm", "@cr50-coreboot-sdk-arm-eabi//:get_path"),
     ]
 
-    subprocess.run(
+    run_cmd(
         [
             "bazel",
             "--project",
             "fwsdk",
             "build",
             *(target for _, target in toolchains),
-        ],
-        check=True,
+        ]
     )
 
-    result = {}
     for name, target in toolchains:
-        run_result = subprocess.run(
-            ["bazel", "--project", "fwsdk", "run", target],
-            check=True,
-            stdout=subprocess.PIPE,
-        )
-        result[name] = run_result.stdout.strip()
+        run_result = run_cmd(["bazel", "--project", "fwsdk", "run", target])
+        os.environ[name] = run_result
 
-    return result
+
+def build_codesigner():
+    """Build codesigner utility if it is not there"""
+    codesigner_root = os.path.realpath(
+        os.path.join(DIR, "../cr50-utils/software/tools/codesigner")
+    )
+    run_cmd(["make", "codesigner"], exec_dir=codesigner_root)
 
 
 def build(opts):
     """Builds all Cr50 firmware targets"""
     metrics = firmware_pb2.FwBuildMetricList()
-    env = os.environ.copy()
-    env.update(init_toolchain())
+    init_toolchain()
 
     if opts.code_coverage:
         print(
@@ -115,77 +139,87 @@ def build(opts):
         )
         return
 
-    cmd = ["make", "BOARD=cr50", "all", "dis", "-j{}".format(opts.cpus)]
-    print(f'# Running {" ".join(cmd)}.')
-    subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
+    # Codesigner is needed for images' hashes generation.
+    build_codesigner()
+
+    run_cmd(
+        [
+            "make",
+            "PROD_BUILD_MODE=1",
+            "BOARD=cr50",
+            "all",
+            "dis",
+            "-j{}".format(opts.cpus),
+        ]
+    )
     add_size_metrics(metrics, "ro-prod", f"{BUILD_DIR}/cr50/RO/ec.RO.map")
     add_size_metrics(metrics, "rw-prod", f"{BUILD_DIR}/cr50/RW/ec.RW.map")
-    cmd = [
-        "make",
-        "out=build/dbg_test",
-        "BOARD=cr50",
-        "all",
-        "dis",
-        "CR50_DEV=1",
-        "-j{}".format(opts.cpus),
-    ]
-    print(f'# Running {" ".join(cmd)}.')
-    subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
+    run_cmd(
+        [
+            "make",
+            "out=build/dbg_test",
+            "BOARD=cr50",
+            "all",
+            "dis",
+            "CR50_DEV=1",
+            "-j{}".format(opts.cpus),
+        ]
+    )
     add_size_metrics(metrics, "ro-dev", f"{BUILD_DIR}/dbg_test/RO/ec.RO.map")
     add_size_metrics(metrics, "rw-dev", f"{BUILD_DIR}/dbg_test/RW/ec.RW.map")
-    cmd = [
-        "make",
-        "out=build/crypto_test",
-        "BOARD=cr50",
-        "all",
-        "dis",
-        "CRYPTO_TEST=1",
-        "-j{}".format(opts.cpus),
-    ]
-    print(f'# Running {" ".join(cmd)}.')
-    subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
-    cmd = [
-        "make",
-        "out=build/crypto_test_rb",
-        "BOARD=cr50",
-        "all",
-        "dis",
-        "CRYPTO_TEST=1",
-        "H1_RED_BOARD=1",
-        "-j{}".format(opts.cpus),
-    ]
-    print(f'# Running {" ".join(cmd)}.')
-    subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
+    run_cmd(
+        [
+            "make",
+            "out=build/crypto_test",
+            "BOARD=cr50",
+            "all",
+            "dis",
+            "CRYPTO_TEST=1",
+            "-j{}".format(opts.cpus),
+        ]
+    )
+    run_cmd(
+        [
+            "make",
+            "out=build/crypto_test_rb",
+            "BOARD=cr50",
+            "all",
+            "dis",
+            "CRYPTO_TEST=1",
+            "H1_RED_BOARD=1",
+            "-j{}".format(opts.cpus),
+        ]
+    )
 
     # Build MP Cr50 image
-    cmd = [
-        "make",
-        "out=build/mp_build",
-        "BOARD=cr50",
-        "BRANCH=MP",
-        "SPACE_BUFFER=2048", # Support updating from 0.3.22
-        "RW_SIGNER_EXTRAS=' --override-keyid'",
-        "all",
-        "dis",
-        "-j{}".format(opts.cpus),
-    ]
-    print(f'# Running {" ".join(cmd)}.')
-    subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
+    run_cmd(
+        [
+            "make",
+            "out=build/mp_build",
+            "PROD_BUILD_MODE=1",
+            "BOARD=cr50",
+            "BRANCH=MP",
+            "SPACE_BUFFER=2048",  # Support updating from 0.3.22
+            "all",
+            "dis",
+            "-j{}".format(opts.cpus),
+        ]
+    )
 
     # Build PREPVT Cr50 image
-    cmd = [
-        "make",
-        "out=build/prepvt_build",
-        "BOARD=cr50",
-        "BRANCH=PREPVT",
-        "SPACE_BUFFER=2048", # Support updating from 0.3.22
-        "RW_SIGNER_EXTRAS=' --override-keyid'",
-        "all",
-        "dis",
-        "-j{}".format(opts.cpus),
-    ]
-    print(f'# Running {" ".join(cmd)}.')
-    subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
+    run_cmd(
+        [
+            "make",
+            "out=build/prepvt_build",
+            "PROD_BUILD_MODE=1",
+            "BOARD=cr50",
+            "BRANCH=PREPVT",
+            "SPACE_BUFFER=2048",  # Support updating from 0.3.22
+            "all",
+            "dis",
+            "-j{}".format(opts.cpus),
+        ]
+    )
 
     with open(opts.metrics, "w") as f:
         f.write(json_format.MessageToJson(metrics))
@@ -251,8 +285,10 @@ def bundle_coverage(opts):
     ec_dir = os.path.dirname(__file__)
     tarball_name = "coverage.tbz2"
     tarball_path = os.path.join(bundle_dir, tarball_name)
-    cmd = ["tar", "cvfj", tarball_path, "lcov.info"]
-    subprocess.run(cmd, cwd=os.path.join(ec_dir, "build/coverage"), check=True)
+    run_cmd(
+        ["tar", "cvfj", tarball_path, "lcov.info"],
+        exec_dir=os.path.join(DIR, "build/coverage"),
+    )
     meta = info.objects.add()
     meta.file_name = tarball_name
     meta.lcov_info.type = (
@@ -272,17 +308,19 @@ def create_artifact_dir(ec_dir, build_target):
     if build_target == "host":
         return ["--exclude=*.o.d", "--exclude=*.o", "."]
 
-    build_dir = os.path.join(ec_dir, "build", build_target)
-    cmd = ["mkdir", build_target]
-    subprocess.run(cmd, cwd=build_dir, check=True)
+    build_dir = os.path.realpath(os.path.join(ec_dir, "build", build_target))
+    run_cmd(["mkdir", build_target], exec_dir=build_dir)
     for src, dest in BUNDLE_FILES:
         dest = os.path.join(build_target, dest)
+        if build_target not in ("cr50", "mp_build", "prepvt_build"):
+            if dest.endswith(".hashes"):
+                # Hashes are generated only for Cr50 images.
+                continue
         # The non-cr50 builds are DBG and crypto test images. Rename their elf
         # files, so it's not possible for the signer to sign them.
         if dest.endswith(".elf") and build_target != "cr50":
             dest += ".test"
-        cmd = ["cp", src, dest]
-        subprocess.run(cmd, cwd=build_dir, check=True)
+        run_cmd(["cp", src, dest], exec_dir=build_dir)
     return [build_target]
 
 
@@ -297,10 +335,9 @@ def bundle_firmware(opts):
         tarball_path = os.path.join(bundle_dir, tarball_name)
 
         artifact_dir = create_artifact_dir(ec_dir, build_target)
-        cmd = ["tar", "cvfj", tarball_path]
-        cmd.extend(artifact_dir)
-        subprocess.run(
-            cmd, cwd=os.path.join(ec_dir, "build", build_target), check=True
+        run_cmd(
+            ["tar", "cvfj", tarball_path] + artifact_dir,
+            exec_dir=os.path.join(DIR, "build", build_target),
         )
         meta = info.objects.add()
         meta.file_name = tarball_name
@@ -320,8 +357,7 @@ def bundle_firmware(opts):
 def test(opts):
     """Runs all of the unit tests for EC firmware"""
     metrics = firmware_pb2.FwTestMetricList()
-    env = os.environ.copy()
-    env.update(init_toolchain())
+    init_toolchain()
     with open(opts.metrics, "w") as f:
         f.write(json_format.MessageToJson(metrics))
 
@@ -332,9 +368,7 @@ def test(opts):
     # Otherwise, build the 'runtests' target, which verifies all
     # posix-based unit tests build and pass.
     target = "coverage" if opts.code_coverage else "runtests"
-    cmd = ["make", target, "-j{}".format(opts.cpus)]
-    print(f'# Running {" ".join(cmd)}.')
-    subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
+    run_cmd(["make", target, "-j{}".format(opts.cpus)])
 
 
 def main(args):

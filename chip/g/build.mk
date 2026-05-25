@@ -153,7 +153,8 @@ CODESIGNER_PATH := $(abspath ../cr50-utils/software/tools/codesigner)
 SIGNER := $(firstword $(wildcard /usr/bin/cr50-codesigner\
 	    $(CODESIGNER_PATH)/codesigner))
 
-SANITIZE_MANIFEST := $(abspath ../gsc-utils/util/convert_signing_json.sh)
+SANITIZE_MANIFEST := $(abspath \
+		     ../gsc-utils$(BRANCH_EXT)/util/convert_signing_json.sh)
 
 # We'll have to tweak the manifest no matter what, but different ways
 # depending on the way the image is built.
@@ -175,8 +176,13 @@ RW_SIGNER_EXTRAS += --swap $(RMA_KEY_BASE).test,$(RMA_KEY_BASE).prod
 endif
 
 ifeq ($(H1_DEVIDS),)
+ifneq ($(PROD_BUILD_MODE),)
+CR50_RW_KEY = cr50_RW-prod-2026.04.pem.pub
+RW_SIGNER_EXTRAS += --hashes=$@.hashes --override-keyid
+else
 # Signing with non-secret test key.
 CR50_RW_KEY = loader-testkey-A.pem
+endif
 else
 # Try to build signer from the known location, if it is missing
 ifeq ($(wildcard $(SIGNER)),)

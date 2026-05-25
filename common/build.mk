@@ -223,7 +223,7 @@ endif
 
 # Build platform/pinweaver.
 ifeq ($(CONFIG_PLATFORM_PINWEAVER),y)
-PINWEAVERLIB := $(realpath ../pinweaver)
+PINWEAVERLIB := $(realpath ../pinweaver$(BRANCH_EXT))
 CPPFLAGS += -I$(PINWEAVERLIB) -I$(PINWEAVERLIB)/eal/cr50
 
 common-y += pinweaver.o
@@ -237,7 +237,7 @@ endif
 
 # Build platform/gsc-utils/dice.
 ifeq ($(CONFIG_PLATFORM_BOOT_PARAM),y)
-BOOT_PARAM_PATH := $(realpath ../gsc-utils/boot_param)
+BOOT_PARAM_PATH := $(realpath ../gsc-utils$(BRANCH_EXT)/boot_param)
 CPPFLAGS += -I$(BOOT_PARAM_PATH)
 
 common-y += boot_param.o

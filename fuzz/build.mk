@@ -36,7 +36,7 @@ $(out)/RW/fuzz/pinweaver_model.o: ${CR50_PROTO_HEADERS}
 $(out)/RW/fuzz/pinweaver_fuzz.o: ${CR50_PROTO_HEADERS}
 $(out)/RW/fuzz/pinweaver_fuzz.o: CPPFLAGS+=${LIBPROTOBUF_MUTATOR_CFLAGS}
 
-TPM2_LIB_ROOT := $(CROS_WORKON_SRCROOT)/src/third_party/tpm2
+TPM2_LIB_ROOT := $(CROS_WORKON_SRCROOT)/src/third_party/tpm2$(BRANCH_EXT)
 $(out)/RW/fuzz/nvmem_tpm2_mock.o: CFLAGS += -I$(TPM2_LIB_ROOT)
 $(out)/RO/common/u2f.o: CFLAGS += -DU2F_TEST
 
