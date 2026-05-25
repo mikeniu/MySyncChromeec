@@ -16,6 +16,23 @@
       "message": "Verified on quartz",
       "revId": "0e3637d412dbec6e3d975ec28595d07495b53ffa",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "785aa874_c2d6a67a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1564607
+      },
+      "writtenOn": "2026-05-25T08:00:58Z",
+      "side": 1,
+      "message": "Blocking this as there have been new comments from the ODM (https://b.corp.google.com/issues/514974910#comment18) which make using the lid as the signal not viable.",
+      "revId": "0e3637d412dbec6e3d975ec28595d07495b53ffa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
