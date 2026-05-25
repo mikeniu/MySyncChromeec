@@ -236,6 +236,7 @@ endif
 endif
 
 common-$(TEST_BUILD)+=test_util.o
+common-$(TEST_BUILD)+=test_util_cxx.o
 
 ifneq ($(CONFIG_RSA_OPTIMIZED),)
 $(out)/RW/common/rsa.o: CFLAGS+=-O3
