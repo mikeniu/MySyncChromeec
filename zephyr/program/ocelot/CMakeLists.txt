@@ -52,8 +52,8 @@ if(DEFINED CONFIG_BOARD_WCLFFB)
 	zephyr_library_sources("wclffb/src/touch_panel.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_CUSTOMIZATION
 					"wclffb/src/keyboard_customization.c")
-	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC
-					"wclffb/src/board_usbc.c")
+	#zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC
+	#				"wclffb/src/board_usbc.c")
 endif()
 
 if(DEFINED CONFIG_BOARD_OCICAT)
