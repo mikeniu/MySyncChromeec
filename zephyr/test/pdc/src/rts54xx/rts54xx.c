@@ -369,20 +369,84 @@ ZTEST_USER(rts54xx, test_vdo_integrity_roundtrip)
 	pdc_set_cc_callback(dev, NULL);
 }
 
+static uint32_t get_expected_idh(bool usb_device)
+{
+	union id_header_vdo_rev30 idh_vdo;
+
+	idh_vdo.raw_value = 0;
+	idh_vdo.usb_host = true;
+	if (usb_device) {
+		idh_vdo.usb_device = true;
+		idh_vdo.product_type_ufp = IDH_PTYPE_UFP_PERIPH;
+	}
+	set_idh_product_type_dfp(&idh_vdo, IDH_PTYPE_DFP_HOST);
+	idh_vdo.connector_type = USB_TYPEC_RECEPTACLE;
+	idh_vdo.usb_vendor_id = USB_VID_GOOGLE;
+
+	return idh_vdo.raw_value;
+}
+
+ZTEST_USER(rts54xx, test_vdo_surgical_update)
+{
+	uint32_t idh;
+	union get_vdo_t vdo_req;
+	uint8_t vdo_types[] = { VDO_INDEX_IDH };
+	/* Non-zero IDH with specific VID (0x1234), Product Type (2), and Modal
+	 * bit (1) */
+	uint32_t initial_idh = VDO_IDH(1, 0, 2, 1, 0x1234);
+
+	vdo_req.raw_value = 0;
+	vdo_req.num_vdos = 1;
+	vdo_req.vdo_origin = 0; /* PDC origin */
+
+	/* 1. Setup emulator with a specific ID Header */
+	zassert_ok(emul_pdc_set_vdo(emul, 1, vdo_types, &initial_idh));
+
+	/* 2. Trigger re-init of the driver to run surgical update */
+	zassert_ok(pdc_reset(dev));
+	zassert_ok(emul_pdc_idle_wait(emul));
+
+	/* 3. Verify: bits 30, 29:27, and 22:21 should be updated, others
+	 * preserved
+	 */
+	zassert_ok(pdc_get_vdo(dev, vdo_req, vdo_types, &idh));
+	zassert_ok(emul_pdc_idle_wait(emul));
+
+	bool usb_device_cap = true;
+	uint32_t expected_idh = get_expected_idh(usb_device_cap);
+
+	zassert_equal(
+		idh, expected_idh,
+		"IDH VDO should be surgically updated (0x%08x -> 0x%08x), got 0x%08x",
+		initial_idh, expected_idh, idh);
+
+	/* 4. Verify specific fields match expected values */
+	zassert_equal(PD_IDH_PTYPE(idh), IDH_PTYPE_UFP_PERIPH,
+		      "Product Type should be %d", IDH_PTYPE_UFP_PERIPH);
+	zassert_equal(PD_IDH_IS_MODAL(idh), 0, "Modal bit should be 0");
+	zassert_equal((idh >> 31) & 1, 1, "Host bit should be 1");
+	zassert_equal((idh >> 21) & 3, USB_TYPEC_RECEPTACLE,
+		      "Connector Type should be %d", USB_TYPEC_RECEPTACLE);
+}
+
 ZTEST_USER(rts54xx, test_usb_comm_capable_as_device)
 {
 	uint32_t idh;
 	union get_vdo_t vdo_req;
 	struct pdc_info_t info;
 	uint8_t vdo_types[] = { VDO_INDEX_IDH };
+	uint32_t initial_idh_0 = 0x8A001234;
+	uint32_t initial_idh_1 = 0x0C005678;
 
 	vdo_req.raw_value = 0;
 	vdo_req.num_vdos = 1;
 	vdo_req.vdo_origin = 0; /* PDC origin */
 
-	/* Trigger re-init of the driver because it was already initialized at
-	 * boot, but emulator state was wiped by rts54xx_before_test.
-	 */
+	/* 1. Setup emulators with specific ID Headers */
+	zassert_ok(emul_pdc_set_vdo(emul, 1, vdo_types, &initial_idh_0));
+	zassert_ok(emul_pdc_set_vdo(emul2, 1, vdo_types, &initial_idh_1));
+
+	/* 2. Trigger re-init of the driver */
 	zassert_ok(pdc_reset(dev));
 	zassert_ok(pdc_reset(dev2));
 
@@ -390,29 +454,35 @@ ZTEST_USER(rts54xx, test_usb_comm_capable_as_device)
 	zassert_ok(emul_pdc_idle_wait(emul));
 	zassert_ok(emul_pdc_idle_wait(emul2));
 
-	/* Verify port 0 (pdc_emul1) has USB Device bit set (bit 30) */
+	/* Verify port 0 (pdc_emul1) has USB Device bit set (bit 30) AND
+	 * others preserved/updated as expected
+	 */
 	zassert_ok(pdc_get_info(dev, &info, true));
 	zassert_ok(emul_pdc_idle_wait(emul));
 	zassert_true(info.usb_comm_capable_as_device);
 
 	zassert_ok(pdc_get_vdo(dev, vdo_req, vdo_types, &idh));
-	/* Wait for command to complete */
 	zassert_ok(emul_pdc_idle_wait(emul));
-	zassert_true(idh & BIT(30),
-		     "IDH VDO should have USB Device bit set (0x%08x)", idh);
 
-	/* Verify port 1 (pdc_emul2) does not have USB Device bit set (bit 30)
-	 */
+	bool usb_device_cap = true;
+	uint32_t expected_idh_device_cap = get_expected_idh(usb_device_cap);
+	bool usb_device_not_cap = false;
+	uint32_t expected_idh = get_expected_idh(usb_device_not_cap);
+
+	zassert_equal(
+		idh, expected_idh_device_cap,
+		"Port 0 IDH should be surgically updated (0x%08x -> 0x%08x), got 0x%08x",
+		initial_idh_0, expected_idh_device_cap, idh);
+
+	/* Verify port 1 (pdc_emul2) was SKIPPED (remains original value) */
 	zassert_ok(pdc_get_info(dev2, &info, true));
 	zassert_ok(emul_pdc_idle_wait(emul2));
 	zassert_false(info.usb_comm_capable_as_device);
 
 	zassert_ok(pdc_get_vdo(dev2, vdo_req, vdo_types, &idh));
-	/* Wait for command to complete */
-	zassert_ok(emul_pdc_idle_wait(emul));
-	zassert_false(idh & BIT(30),
-		      "IDH VDO should not have USB Device bit set (0x%08x)",
-		      idh);
+	zassert_ok(emul_pdc_idle_wait(emul2));
+	zassert_equal(idh, expected_idh,
+		      "Port 1 IDH should be unchanged (skipped) (0x%08x)", idh);
 }
 
 ZTEST_USER(rts54xx, test_alert_received)
@@ -451,4 +521,36 @@ ZTEST_USER(rts54xx, test_alert_received)
 void ucsi_cc_callback(const struct device *port, struct pdc_callback *cb,
 		      union cci_event_t cci_event)
 {
+}
+
+ZTEST_USER(rts54xx, test_idh_vdo_rev30_helpers)
+{
+	union id_header_vdo_rev30 idh;
+
+	/* Test all DFP product types */
+	enum idh_ptype_dfp ptypes[] = { IDH_PTYPE_DFP_NOT_DFP,
+					IDH_PTYPE_DFP_HUB, IDH_PTYPE_DFP_HOST,
+					IDH_PTYPE_DFP_POWER_BRICK };
+
+	for (int i = 0; i < ARRAY_SIZE(ptypes); i++) {
+		idh.raw_value = 0;
+		set_idh_product_type_dfp(&idh, ptypes[i]);
+		zassert_equal(get_idh_product_type_dfp(&idh), ptypes[i],
+			      "DFP product type mismatch for type %d",
+			      ptypes[i]);
+
+		/* Verify the bits are set correctly (lo in bit 23, hi in bits
+		 * 25:24) relative to the start of the 32-bit VDO. struct
+		 * id_header_vdo_rev30: usb_vendor_id : 16 reserved : 5
+		 *   connector_type : 2
+		 *   product_type_dfp_lo : 1 (bit 23)
+		 *   product_type_dfp_hi : 2 (bits 25:24)
+		 */
+		uint32_t expected_bits = ((ptypes[i] & 0x1) << 23) |
+					 ((ptypes[i] >> 1) << 24);
+		zassert_equal(
+			idh.raw_value & (0x7 << 23), expected_bits,
+			"Raw bits mismatch for type %d (raw=0x%08x, expected=0x%08x)",
+			ptypes[i], idh.raw_value, expected_bits);
+	}
 }
