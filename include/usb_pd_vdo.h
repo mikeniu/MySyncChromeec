@@ -79,6 +79,50 @@ enum idh_ptype_dfp {
 	IDH_PTYPE_DFP_POWER_BRICK,
 	IDH_PTYPE_DFP_AMC,
 };
+
+/**
+ * ID Header VDO
+ *
+ * Reference: USB Power Delivery Specification Revision 3.2, Table 6-34
+ *
+ * Note: PD 3.0 ID header makes use of reserved bits 25:21 for a connector type
+ * and product type (DFP). It is not advised to create a structure using these
+ * bits however, as the DFP product type crosses a byte boundary and causes
+ * problems with gcc's structure alignment.
+ */
+struct id_header_vdo_rev30 {
+	uint32_t usb_vendor_id : 16;
+	uint32_t reserved : 5;
+	uint32_t connector_type : 2;
+	/*
+	 * These two fields represent a single field of type enum idh_ptype_dfp,
+	 * but that field is split to avoid structure-packing issues across a
+	 * byte boundary. Do not access these fields directly. Instead, use the
+	 * helper functions set_idh_product_type_dfp() and
+	 * get_idh_product_type_dfp().
+	 */
+	uint32_t product_type_dfp_lo : 1;
+	uint32_t product_type_dfp_hi : 2;
+	uint32_t modal_supported : 1;
+	uint32_t product_type_ufp : 3;
+	uint32_t usb_device : 1;
+	uint32_t usb_host : 1;
+};
+
+static inline void set_idh_product_type_dfp(struct id_header_vdo_rev30 *idh,
+					    enum idh_ptype_dfp ptype)
+{
+	idh->product_type_dfp_hi = ptype >> 1;
+	idh->product_type_dfp_lo = ptype & 0x1;
+}
+
+static inline enum idh_ptype_dfp
+get_idh_product_type_dfp(const struct id_header_vdo_rev30 *idh)
+{
+	return (enum idh_ptype_dfp)((idh->product_type_dfp_hi << 1) |
+				    idh->product_type_dfp_lo);
+}
+BUILD_ASSERT(sizeof(struct id_header_vdo_rev30) == 4);
 /*****************************************************************************/
 /*
  * Table 6-38 Cert Stat VDO (Note: same as Revision 2.0)
