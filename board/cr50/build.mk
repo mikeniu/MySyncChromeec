@@ -30,6 +30,9 @@ CHIP_VARIANT ?= cr50_fpga
 # This is the PREPVT branch.
 BRANCH:=PREPVT
 
+# Path extension to use for all of the projects
+BRANCH_EXT:=
+
 # Additional / overriding warnings for common rules and chip
 # (TODO) enable after https://crrev.com/c/3198155
 # CFLAGS_BOARD :=-Wno-array-parameter -Wno-stringop-overread
@@ -257,7 +260,7 @@ board-y+= $(FIPS_MODULE)
 endif
 
 # Build and link with an external library
-EXTLIB := $(realpath ../../third_party/tpm2)
+EXTLIB := $(realpath ../../third_party/tpm2$(BRANCH_EXT))
 CFLAGS += -I$(EXTLIB)
 
 # For the benefit of the tpm2 library.

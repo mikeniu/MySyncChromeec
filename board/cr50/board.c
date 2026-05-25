@@ -812,7 +812,8 @@ static struct brdprop_payload bp_flog;
 static void flog_brdprop_event(enum brdprop_ev event, uint8_t config)
 {
 	if (event >= BRDPROP_COUNT) {
-		CPRINTS("%s: invalid event %d", __func__, event);
+		/* old message: invalid event */
+		CPRINTS("%s: ERR %d", __func__, event);
 		return;
 	}
 	bp_flog.events |= (1 << event);
@@ -1188,7 +1189,8 @@ static void key_combo0_irq(void)
 		hook_call_deferred(&board_reboot_ec_data, 0);
 	}
 
-	CPRINTS("Recovery Requested");
+	/* old message: Recovery Requested */
+	CPRINTS("Rec Req");
 }
 DECLARE_IRQ(GC_IRQNUM_RBOX0_INTR_BUTTON_COMBO0_RDY_INT, key_combo0_irq, 0);
 
@@ -1553,8 +1555,12 @@ static int get_strap_config(uint8_t *config)
 			return EC_ERROR_INVAL;
 		use_spi = spi_prop;
 		metrics_status |= (1 << CR50_METRICSV_AMBIGUOUS_STRAP_SHIFT);
-		CPRINTS("WARN Ambiguous strap cfg. Use %s based on old "
-			"brdprop.", use_spi ? "spi" : "i2c");
+		/*
+		 * old message:
+		 * WARN Ambiguous strap cfg. Use %s based on old brdprop.
+		 */
+		CPRINTS("WARN Ambiguous strap cfg. Fallback to %s",
+			use_spi ? "spi" : "i2c");
 	}
 
 	/* Now that I2C vs SPI is known, mask the unused strap bits. */
@@ -1804,7 +1810,8 @@ static enum vendor_cmd_rc vc_invalidate_inactive_rw(enum vendor_cmd_cc code,
 	system_update_rollback_mask_with_active_img();
 
 	if (other_rw_is_inactive()) {
-		CPRINTS("%s: Inactive region is disabled", __func__);
+		/* old message: Inactive region is disabled */
+		CPRINTS("%s: already done", __func__);
 		return VENDOR_RC_SUCCESS;
 	}
 
@@ -1822,7 +1829,11 @@ static enum vendor_cmd_rc vc_invalidate_inactive_rw(enum vendor_cmd_cc code,
 	GWRITE_FIELD(GLOBALSEC, FLASH_REGION6_CTRL, RD_EN, 1);
 	GWRITE_FIELD(GLOBALSEC, FLASH_REGION6_CTRL, WR_EN, 1);
 
-	CPRINTS("%s: TPM verified corrupting inactive image, magic before %x",
+	/*
+	 * old message:
+	 * TPM verified corrupting inactive image, magic before %x
+	 */
+	CPRINTS("%s: corrupting inactive RW, magic before %x",
 		__func__, header->magic);
 
 	flash_physical_write((intptr_t)&header->magic -

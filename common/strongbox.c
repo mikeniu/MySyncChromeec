@@ -1507,7 +1507,7 @@ static enum strongbox_error sb_Begin(struct km *km, uint32_t *buf,
 
 	/* Check if we have free slots for the operation. */
 	if (km->used_slots == ((1U << KM_MAX_OPS) - 1))
-		return SBERR_KeyMaxOpsExceeded;
+		return SBERR_TooManyOperations;
 	/* Find free slot */
 	slot = count_trailing_zeros(~km->used_slots);
 

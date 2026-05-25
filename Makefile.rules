@@ -116,7 +116,7 @@ cmd_host_test = $(MAKE) --no-print-directory BOARD=host PROJECT=$* \
 	build/host/$*/$*.exe
 cmd_run_host_test = ./util/run_host_test $* $(silent)
 # generate new version.h, compare if it changed and replace if so
-cmd_version = ./util/getversion.sh > $@.tmp && \
+cmd_version = BRANCH_EXT=$(BRANCH_EXT) ./util/getversion.sh > $@.tmp && \
 	cmp -s $@.tmp $@ && rm -f $@.tmp || mv $@.tmp $@
 cmd_vif = $(out)/util/genvif -b $(BOARD) -o $(out)
 cmd_mv_from_tmp = mv $(out)/$*.bin.tmp $(out)/$*.bin
@@ -572,7 +572,8 @@ $(out)/RW/%.a:
 # changed.
 old_version_hash := $(shell cat $(out)/ec_version.h 2> /dev/null | md5sum -)
 new_version_hash := $(shell BOARD=$(BOARD) CR50_DEV=$(CR50_DEV) \
-  CRYPTO_TEST=$(CRYPTO_TEST) ./util/getversion.sh | md5sum -)
+  CRYPTO_TEST=$(CRYPTO_TEST) BRANCH_EXT=$(BRANCH_EXT) ./util/getversion.sh | \
+  md5sum -)
 
 ifneq ($(old_version_hash),$(new_version_hash))
 .PHONY: $(out)/ec_version.h

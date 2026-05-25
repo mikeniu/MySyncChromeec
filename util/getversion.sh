@@ -37,7 +37,7 @@ get_tree_version() {
   local ver_major
 
   if ghash=`git rev-parse --short --verify HEAD 2>/dev/null`; then
-    if gdesc=`git describe --dirty --match='v*' 2>/dev/null`; then
+    if gdesc=`git describe --dirty --tags --match='v*' 2>/dev/null`; then
       IFS="-" fields=($gdesc)
       tag="${fields[0]}"
       IFS="." vernum=($tag)
@@ -99,9 +99,9 @@ main() {
   if [[ -n ${BOARD} ]]; then
     case "${BOARD}" in
       (cr50)
-        dir_list+=( ../../third_party/tpm2 )
-        dir_list+=( ../pinweaver )
-        dir_list+=( ../gsc-utils )
+        dir_list+=( ../../third_party/tpm2${BRANCH_EXT} )
+        dir_list+=( ../pinweaver${BRANCH_EXT} )
+        dir_list+=( ../gsc-utils${BRANCH_EXT} )
         ;;
       (*_fp)
         dir_list+=( ./private )
@@ -130,7 +130,8 @@ main() {
       most_recents+=("$(realpath "${most_recent_file}")")
     fi
     if [ "${component}" != "." ]; then
-      ver+=" ${component}:"
+      # remove the branch ext suffix
+      ver+=" ${component/${BRANCH_EXT}/}:"
     fi
     ver+="${vbase}"
     tool_ver+="${vbase}"
