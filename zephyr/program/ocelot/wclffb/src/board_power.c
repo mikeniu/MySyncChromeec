@@ -5,6 +5,7 @@
 
 #include "gpio.h"
 #include "gpio_signal.h"
+#include "hooks.h"
 #include "include/system.h"
 #include "system_boot_time.h"
 
@@ -22,6 +23,13 @@ LOG_MODULE_DECLARE(ap_pwrseq, LOG_LEVEL_INF);
 
 /* Power cycling primary rail requires at least 30 ms 'off' time */
 #define BOARD_OCELOT_MINIMUM_POWER_DOWN_DELAY_MS 30
+
+static void board_wclffb_resume(void)
+{
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_soc_pwr_btn_odl), 0);
+}
+DECLARE_HOOK(HOOK_CHIPSET_RESUME, board_wclffb_resume, HOOK_PRIO_DEFAULT);
+
 
 void board_ap_power_force_shutdown(void)
 {

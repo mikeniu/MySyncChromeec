@@ -77,7 +77,7 @@
 			no-auto-init;
 		};
 		gpio_all_sys_pwrgd_out: all_sys_pwrgd_out {
-			gpios = <&gpioe 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
+			gpios = <&gpioe 7 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 		};
 		gpio_sys_rst_odl: sys_rst_odl {
 			gpios = <&gpiof 3 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;

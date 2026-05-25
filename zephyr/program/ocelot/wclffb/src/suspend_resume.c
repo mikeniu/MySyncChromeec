@@ -14,6 +14,8 @@ LOG_MODULE_REGISTER(board_init, LOG_LEVEL_INF);
 static void wclffb_power_event_handler(struct ap_power_ev_callback *callback,
 				      struct ap_power_ev_data data)
 {
+	LOG_ERR("=== event=0x%x ===", data.event);
+
 	switch (data.event) {
 	case AP_POWER_PRE_INIT:
 		/* fall-through */
