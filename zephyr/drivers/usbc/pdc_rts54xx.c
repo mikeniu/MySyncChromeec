@@ -1746,24 +1746,32 @@ static int rts54_set_vdo(const struct device *dev, const vdo_config_t *config,
 
 static int rts54_set_vdo_idh(const struct device *dev)
 {
-	struct pdc_data_t *data = dev->data;
 	const struct pdc_config_t *cfg = dev->config;
-	uint32_t idh[1];
+	struct id_header_vdo_rev30 idh_vdo;
 	vdo_config_t config = { .raw = 0 };
 	uint8_t vdo_type[] = { VDO_INDEX_IDH };
 
-	/* ID Header VDO (Discovery Identity response)
-	 * Bit 31: USB Host capable
-	 * Bit 30: USB Device capable
-	 * We assume the port is Host capable.
-	 */
-	idh[0] = VDO_IDH(1, cfg->usb_comm_capable_as_device ? 1 : 0,
-			 IDH_PTYPE_UNDEF, 0, data->info.vid);
+	/* ID Header VDO (Discovery Identity response) */
+	memset(&idh_vdo, 0, sizeof(idh_vdo));
+
+	idh_vdo.usb_host = 1;
+	/* Product Type (DFP): 010b = PDUSB Host */
+	set_idh_product_type_dfp(&idh_vdo, IDH_PTYPE_DFP_HOST);
+
+	if (cfg->usb_comm_capable_as_device) {
+		idh_vdo.usb_device = 1;
+		/* Product Type (UFP): 010b = PDUSB Peripheral */
+		idh_vdo.product_type_ufp = IDH_PTYPE_PERIPH;
+	}
+
+	/* Connector Type: 10b = USB Type-C Receptacle */
+	idh_vdo.connector_type = USB_TYPEC_RECEPTACLE;
+	idh_vdo.usb_vendor_id = USB_VID_GOOGLE;
 
 	config.fields.num_vdos = 1;
 	config.fields.origin = RTS54XX_PDC_ORIGIN;
 
-	return rts54_set_vdo(dev, &config, vdo_type, idh);
+	return rts54_set_vdo(dev, &config, vdo_type, (uint32_t *)&idh_vdo);
 }
 
 /**
