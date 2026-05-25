@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "99ce5629_195b070d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-25T03:59:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ae119102_dd8472d8",
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aebbed54_6ab7833b",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-05-22T17:44:00Z",
       "side": 1,
       "message": "Both `SendBootromCommandSha` and `SendBootromCommandAes` contain identical, verbose logic to read the inner payload length from the response buffer, calculate the safe payload boundary, and protect against out-of-bounds reads. Extracting this into a single helper method removes duplicate code and centralizes boundary validation.\n\n### Detailed Fix\n\n**Location:** `util/egis/bootrom.h` (Declaration) and `util/egis/bootrom.cc` (Implementation)\n\nDeclare the private helper in `BootromComm`:\n\n```c\n  std::expected\u003cstd::span\u003cconst uint8_t\u003e, BootromError\u003e ExtractWrappedPayload(\n      std::span\u003cconst uint8_t\u003e response, size_t header_size);\n\n```\n\nImplement it:\n\n```c\nstd::expected\u003cstd::span\u003cconst uint8_t\u003e, BootromError\u003e\nBootromComm::ExtractWrappedPayload(std::span\u003cconst uint8_t\u003e response,\n                                   size_t header_size) {\n  auto len_res \u003d\n      ReadLittleEndian\u003cuint32_t\u003e(response.subspan(kStatusHeaderSize));\n  if (!len_res) return std::unexpected(BootromError::kResponseTruncated);\n\n  uint32_t rsp_wrapped_len \u003d std::min\u003cuint32_t\u003e(\n      len_res.value(), response.size() - header_size);\n\n  return response.subspan(header_size, rsp_wrapped_len);\n}\n\n```\n\nUpdate `SendBootromCommandSha`:\n\n```c\n  // ... (send logic) ...\n  auto ret_res \u003d DoUsbTransfer(cmd, kScHeaderSizeSha, timeout);\n  if (!ret_res) return std::unexpected(ret_res.error());\n\n  auto payload_res \u003d ExtractWrappedPayload(ret_res.value(), kScHeaderSizeSha);\n  if (!payload_res) return std::unexpected(payload_res.error());\n\n  return std::vector\u003cuint8_t\u003e(payload_res-\u003ebegin(), payload_res-\u003eend());\n\n```\n\nUpdate `SendBootromCommandAes`:\n\n```c\n  // ... (send logic) ...\n  auto ret_res \u003d DoUsbTransfer(cmd, kScHeaderSizeAes, timeout);\n  if (!ret_res) return std::unexpected(ret_res.error());\n  \n  auto payload_res \u003d ExtractWrappedPayload(ret_res.value(), kScHeaderSizeAes);\n  if (!payload_res) return std::unexpected(payload_res.error());\n\n  // Extract IV and Tag dynamically from the response buffer\n  size_t offset \u003d kStatusHeaderSize + kWrappedCommandSize;\n  auto rsp_iv \u003d std::span(ret_res.value()).subspan(offset, kAesGcmIvSize);\n  offset +\u003d kAesGcmIvSize;\n  auto rsp_tag \u003d std::span(ret_res.value()).subspan(offset, kAesGcmTagSize);\n  \n  std::span\u003cconst uint8_t\u003e rsp_payload \u003d payload_res.value();\n  std::vector\u003cuint8_t\u003e decrypted_payload(rsp_payload.size());\n\n  if (!AesGcmDecryptOpenssl(aes_key_, rsp_iv, aad, rsp_payload, rsp_tag,\n                            decrypted_payload)) {\n    std::println(stderr, \"[ERROR] AES-GCM Authentication Failed (Tag mismatch)\");\n    return std::unexpected(BootromError::kGcmAuthenticationFailed);\n  }\n\n  return decrypted_payload;\n\n```",
+      "range": {
+        "startLine": 243,
+        "startChar": 0,
+        "endLine": 243,
+        "endChar": 65
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e601682e_9f825d48",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-25T03:59:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aebbed54_6ab7833b",
       "range": {
         "startLine": 243,
         "startChar": 0,
@@ -64,6 +106,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "482afa42_48144099",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-25T03:59:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed891188_65e1ecf4",
+      "range": {
+        "startLine": 632,
+        "startChar": 0,
+        "endLine": 632,
+        "endChar": 65
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4be89328_9d909309",
@@ -77,6 +143,30 @@
       "writtenOn": "2026-05-22T17:54:09Z",
       "side": 1,
       "message": "**Location:** `util/egis/bootrom.cc`\n\n**The Problem:** In `SystemReset()`, you append `0x01` to the command without explanation. In `SendBootromCommandAes()`, you hardcode the Additional Authenticated Data (AAD): `uint8_t aad[4] \u003d {0x01, 0x00, 0x00, 0x00};`\n\n**The Fix:** Declare these values as named constants in `bootrom.h` to explain their intent.\n\n*In `bootrom.h`:*\n\n```c\nnamespace EgisBootrom {\n  // ...\n  constexpr uint8_t kSystemResetTypeNormal \u003d 0x01;\n  \n  // Chip ID / Revision used as AAD for AES-GCM\n  constexpr uint32_t kChipIdAad \u003d 0x00000001; \n}\n\n```\n\n*In `bootrom.cc` (`SystemReset`):*\n\n```c\n  std::vector\u003cuint8_t\u003e cmd \u003d {EgisBootrom::kCmdSystemReset, \n                              EgisBootrom::kSystemResetTypeNormal};\n\n```\n\n*In `bootrom.cc` (`SendBootromCommandAes`):*\n\n```c\n  // Use your AppendLittleEndian helper to convert the uint32_t into a byte array dynamically\n  std::vector\u003cuint8_t\u003e aad_vec;\n  AppendLittleEndian(aad_vec, EgisBootrom::kChipIdAad);\n  \n  if (!AesGcmEncryptOpenssl(aes_key_, header.iv, aad_vec, data, ciphertext, header.tag)) { ... }\n\n```",
+      "range": {
+        "startLine": 691,
+        "startChar": 0,
+        "endLine": 691,
+        "endChar": 66
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5f05d2c_de39878e",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 691,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-25T03:59:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4be89328_9d909309",
       "range": {
         "startLine": 691,
         "startChar": 0,
@@ -110,6 +200,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d32d2b1a_48383e6d",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-25T03:59:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c4b43b0d_1bd67362",
+      "range": {
+        "startLine": 130,
+        "startChar": 0,
+        "endLine": 130,
+        "endChar": 57
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "987bdcb1_48cbc6ca",
@@ -123,6 +237,30 @@
       "writtenOn": "2026-05-22T17:55:01Z",
       "side": 1,
       "message": "Instead of scattering `std::chrono::milliseconds(200)` and `std::chrono::milliseconds(500)` across your function declarations, define them as named constants at the top of the `BootromComm` class alongside your other timeouts.\n\n**1\\. Define the Constants in `bootrom.h`:**\n\n```c\nclass BootromComm {\n public:\n  // ... existing constants ...\n  static constexpr auto kFlashTimeout \u003d std::chrono::milliseconds(5000);\n  static constexpr auto kResetTimeout \u003d std::chrono::milliseconds(500);\n  \n  // Add these new constants:\n  static constexpr auto kDefaultCommandTimeout \u003d std::chrono::milliseconds(200);\n  static constexpr auto kFlashReadyPollTimeout \u003d std::chrono::milliseconds(500);\n\n```\n\n**2\\. Update the Function Declarations in `bootrom.h`:** Replace the hardcoded values with your new constants in the `private` section of the class.\n\n```c\n private:\n  // ...\n  \n  std::expected\u003cvoid, BootromError\u003e WaitForFlashReady(\n      std::chrono::milliseconds timeout \u003d kFlashReadyPollTimeout);\n\n  // ...\n\n  std::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e SendBootromCommandRaw(\n      std::span\u003cconst uint8_t\u003e data, size_t resp_size,\n      std::chrono::milliseconds timeout \u003d kDefaultCommandTimeout);\n\n  std::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e SendBootromCommandSha(\n      std::span\u003cconst uint8_t\u003e data, size_t resp_size,\n      std::chrono::milliseconds timeout \u003d kDefaultCommandTimeout);\n\n  std::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e SendBootromCommandAes(\n      std::span\u003cconst uint8_t\u003e data, size_t resp_size,\n      std::chrono::milliseconds timeout \u003d kDefaultCommandTimeout);\n\n  std::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e SendBootromCommand(\n      std::span\u003cconst uint8_t\u003e data, size_t resp_size,\n      std::chrono::milliseconds timeout \u003d kDefaultCommandTimeout);\n\n```\n\n### Why this is better:\n\n1. **DRY (Don\u0027t Repeat Yourself):** The 200ms timeout was repeated four times. Now it is defined in exactly one place.  \n2. **Self-Documenting:** `kDefaultCommandTimeout` and `kFlashReadyPollTimeout` explicitly communicate *what* these durations are used for, eliminating ambiguity.  \n3. **Maintainability:** If you ever need to tune these timings for a slower board or a noisier USB environment, you only have to update the values at the top of the class definition rather than hunting down magic numbers buried in method signatures.",
+      "range": {
+        "startLine": 214,
+        "startChar": 0,
+        "endLine": 228,
+        "endChar": 74
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d072ca8_91000091",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-25T03:59:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "987bdcb1_48cbc6ca",
       "range": {
         "startLine": 214,
         "startChar": 0,
@@ -156,6 +294,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c19c2bd4_95bb8bc2",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-25T03:59:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "427bff8f_c39298a8",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 39
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b4a5d921_642f6900",
@@ -169,6 +331,30 @@
       "writtenOn": "2026-05-22T17:44:00Z",
       "side": 1,
       "message": "The EC protocol transmits its headers in little-endian. While the packing logic correctly uses `std::byteswap` to handle this when sending data, the receiving logic reads the multi-byte `result` and `data_length` fields natively. If this tool is executed on a big-endian architecture, it will misinterpret these fields (e.g., a length of `0x0001` would be read as `0x0100`), leading to false error detections and out-of-bounds memory access.\n\n### Detailed Fix\n\n**Location:** `util/egis/ec_comm.cc` inside `EcComm::SendCommand()`\n\nExtract the fields into local variables using the endianness helper (defined in Fix 3 below) immediately after checksum validation.\n\n```c\n  EcHostCommandResponse *resp_hdr \u003d\n      reinterpret_cast\u003cEcHostCommandResponse *\u003e(resp_buf.data());\n      \n  // Fix: Convert little-endian fields to native host endianness\n  uint16_t result \u003d FromLittleEndian(resp_hdr-\u003eresult);\n  uint16_t data_length \u003d FromLittleEndian(resp_hdr-\u003edata_length);\n\n  if (result !\u003d 0) {\n    std::println(stderr, \"[ERROR] EC device returned error code: {}\", result);\n    return std::unexpected(EcError::kDeviceError);\n  }\n\n  std::vector\u003cuint8_t\u003e resp_out;\n  if (data_length \u003e 0) {\n    size_t header_len \u003d sizeof(EcHostCommandResponse);\n    if (header_len + data_length \u003e resp_buf.size()) {\n      std::println(\n          stderr, \"[ERROR] EC response data truncated. Claimed: {}, Actual: {}\",\n          data_length, resp_buf.size() - header_len);\n      return std::unexpected(EcError::kResponseTooShort);\n    }\n    resp_out.assign(resp_buf.begin() + header_len,\n                    resp_buf.begin() + header_len + data_length);\n  }\n\n```",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 65
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a86641ee_de7ee831",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-25T03:59:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4a5d921_642f6900",
       "range": {
         "startLine": 82,
         "startChar": 0,
@@ -196,6 +382,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d829585e_42a852de",
+        "filename": "util/egis/egis_util.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-25T03:59:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "deb775e9_c49d5684",
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bd792f98_58a07310",
@@ -209,6 +413,30 @@
       "writtenOn": "2026-05-22T17:54:09Z",
       "side": 1,
       "message": "**Location:** `util/egis/et171_flash.cc` (`GetNextPacketSize`)\n\n**The Problem:** When parsing the wrapped packet headers, you have:\n\n```c\nauto wrapped_size \u003d ReadLittleEndian\u003cuint32_t\u003e(fw.subspan(2, 4));\n\n```\n\n`2` and `4` are magic numbers representing the offset and size of the `payload_len` field. If the header ever changes, this breaks silently.\n\n**The Fix:** Since you already defined `SecureCommandShaHeader` at the top of the file, use `offsetof` and `sizeof` to make it strictly tied to the struct definition.\n\n```c\n  auto wrapped_size \u003d ReadLittleEndian\u003cuint32_t\u003e(\n      fw.subspan(offsetof(SecureCommandShaHeader, payload_len), \n                 sizeof(SecureCommandShaHeader::payload_len)));\n\n```",
+      "range": {
+        "startLine": 114,
+        "startChar": 0,
+        "endLine": 114,
+        "endChar": 67
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "941de4aa_8f058f96",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-25T03:59:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd792f98_58a07310",
       "range": {
         "startLine": 114,
         "startChar": 0,
@@ -242,6 +470,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4c7a9f6_aa93b8b5",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-25T03:59:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "80c5249d_94eee56f",
+      "range": {
+        "startLine": 371,
+        "startChar": 0,
+        "endLine": 378,
+        "endChar": 64
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "afd4b775_1b0eb81d",
@@ -255,6 +507,30 @@
       "writtenOn": "2026-05-22T17:44:00Z",
       "side": 1,
       "message": "Both the `RunFlashFw` and `RunFlashCmd` subroutines duplicate the exact same code block to trigger a system reset upon successful completion before returning `0`. Lifting this logic to `main()` centralizes the success-path behavior and cleanly separates flash logic from teardown logic.\n\n### Detailed Fix\n\n**Location:** `util/egis/et171_flash.cc`\n\nDelete the `brom.SystemReset()` blocks from the bottom of `RunFlashFw` and `RunFlashCmd`. Then, implement it conditionally at the end of `main()`.\n\n```c\n  // 4. Dispatch to chosen mode\n  int status \u003d -1;\n  if (config.mode \u003d\u003d \"flashfw\") {\n    status \u003d RunFlashFw(config, brom);\n  } else if (config.mode \u003d\u003d \"flashcmd\") {\n    status \u003d RunFlashCmd(config, boot_comm, brom);\n  } else {\n    std::println(stderr, \"[ERROR] Unknown or unhandled mode: {}\", config.mode);\n  }\n\n  // Execute system reset centrally on success\n  if (status \u003d\u003d 0) {\n    if (auto res \u003d brom.SystemReset(); !res) {\n      std::println(stderr, \"[WARN] System reset command failed: {}\", ToString(res.error()));\n    }\n  }\n\n  return status;\n}\n\n```",
+      "range": {
+        "startLine": 383,
+        "startChar": 0,
+        "endLine": 383,
+        "endChar": 60
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d341efe_69c2717a",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-25T03:59:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "afd4b775_1b0eb81d",
       "range": {
         "startLine": 383,
         "startChar": 0,
@@ -288,6 +564,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b42354f_f7be33d7",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 512,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-25T03:59:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "13b343fd_a277145e",
+      "range": {
+        "startLine": 400,
+        "startChar": 0,
+        "endLine": 512,
+        "endChar": 0
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "955b363a_730b9613",
@@ -311,6 +611,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "56844e9c_9af7db64",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 588,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-25T03:59:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "955b363a_730b9613",
+      "range": {
+        "startLine": 514,
+        "startChar": 0,
+        "endLine": 588,
+        "endChar": 1
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "63d6ab7f_2f3af979",
@@ -324,6 +648,30 @@
       "writtenOn": "2026-05-22T17:44:00Z",
       "side": 1,
       "message": "In `UsbComm::Wait()`, the code relies on a retry counter (`retries`) to bound the wait time for a specific interrupt. However, if the device returns an unexpected interrupt payload, the code simply falls through the `if/else` block without incrementing `retries`. If the device spams invalid interrupts, the loop will spin infinitely, causing the flash tool to hang permanently. Incrementing the counter on unexpected payloads ensures the loop eventually terminates and returns an error.\n\n### Detailed Fix\n\n**Location:** `util/egis/usb_comm.cc` inside `UsbComm::Wait()`\n\nUpdate the `rc \u003d\u003d 0` block to increment `retries` when the interrupt is successfully received but doesn\u0027t match the expected `kResponseReadyIrq`.\n\n```c\n  while (retries \u003c kMaxRetries) {\n    int rc \u003d libusb_interrupt_transfer(handle_.get(), kEpInInt, irq_buf.data(),\n                                       irq_buf.size(), \u0026transferred,\n                                       kTransferTimeout.count());\n\n    if (rc \u003d\u003d 0) {\n      if (transferred \u003e 0 \u0026\u0026 irq_buf[0] \u003d\u003d kResponseReadyIrq) {\n        return {};\n      }\n      // Fix: Unexpected IRQ payload received; count as a retry\n      retries++;\n    } else if (rc \u003d\u003d LIBUSB_ERROR_TIMEOUT) {\n      retries++;\n    } else {\n      std::println(stderr, \"[ERROR] Interrupt IN error: {}\",\n                   LibusbErrorToString(rc));\n      break;\n    }\n  }\n\n```",
+      "range": {
+        "startLine": 144,
+        "startChar": 0,
+        "endLine": 144,
+        "endChar": 47
+      },
+      "revId": "4a9df6df830d80bf0be662539ea84f83fdb41473",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca1dd8dc_5c918769",
+        "filename": "util/egis/usb_comm.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-25T03:59:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "63d6ab7f_2f3af979",
       "range": {
         "startLine": 144,
         "startChar": 0,
