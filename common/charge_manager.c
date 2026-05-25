@@ -236,6 +236,11 @@ static bool is_valid_override_port(int port)
 	return (OVERRIDE_DONT_CHARGE <= port) && (port < CHARGE_PORT_COUNT);
 }
 
+int pd_is_connected(int port)
+{
+	return 0;
+}
+
 static int is_connected(int port)
 {
 	if (!is_pd_port(port))
