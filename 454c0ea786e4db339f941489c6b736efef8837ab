@@ -1,0 +1,79 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c272723_10af0670",
+        "filename": "zephyr/drivers/pwrmon/power_monitor_pac194x.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-25T16:24:46Z",
+      "side": 1,
+      "message": "would `*power \u003d llabs(sensor_value_to_micro(\u0026val));` work here?",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 38
+      },
+      "revId": "454c0ea786e4db339f941489c6b736efef8837ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "311b15e0_42ea9e8e",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-25T16:24:46Z",
+      "side": 1,
+      "message": "you can use `LOG_ERR_DEVICE_NOT_READY` here",
+      "fixSuggestions": [
+        {
+          "fixId": "463c208c_843a6754",
+          "description": "prompt_to_edit API",
+          "replacements": [
+            {
+              "path": "zephyr/drivers/pwrmon/pwrmon.c",
+              "range": {
+                "startLine": 81,
+                "startChar": 0,
+                "endLine": 82,
+                "endChar": 0
+              },
+              "replacement": "\t\tLOG_ERR_DEVICE_NOT_READY(config-\u003epwrmon_gpio.port);\n"
+            }
+          ]
+        }
+      ],
+      "revId": "454c0ea786e4db339f941489c6b736efef8837ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3a45809_5824f9b1",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-25T16:24:46Z",
+      "side": 1,
+      "message": "I think it\u0027d be a good idea to use strncpy here, make sure you don\u0027t write over sizeof(r-\u003edump_info.channel_name), just in case since channel_name seems to be unbound",
+      "revId": "454c0ea786e4db339f941489c6b736efef8837ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
