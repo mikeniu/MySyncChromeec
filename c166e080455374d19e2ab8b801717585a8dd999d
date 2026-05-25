@@ -16,6 +16,24 @@
       "message": "Please file a bug to add code-coverage for this board and add the `LOW_COVERAGE_REASON\u003db:xxxxxx tracking`",
       "revId": "c166e080455374d19e2ab8b801717585a8dd999d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1768f48_3ecc6665",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-05-25T07:50:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2504dce4_55a8911a",
+      "revId": "c166e080455374d19e2ab8b801717585a8dd999d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
