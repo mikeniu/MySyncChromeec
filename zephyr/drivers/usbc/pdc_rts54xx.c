@@ -232,7 +232,7 @@ enum init_state_t {
 	/** Set the PDC Notifications */
 	INIT_PDC_SET_NOTIFICATION_ENABLE,
 	/** Set VDOs on the PDC */
-	INIT_PDC_SET_VDO,
+	INIT_PDC_SET_VDO_ACK,
 	/** Reset the PDC */
 	INIT_PDC_RESET,
 	/** Initialization complete */
@@ -523,7 +523,7 @@ static int rts54_get_info(const struct device *dev, struct pdc_info_t *info,
 			  bool live);
 static int rts54_get_error_status(const struct device *dev,
 				  union error_status_t *es);
-static int rts54_set_vdo_idh(const struct device *dev);
+static int rts54_set_vdo_id_ack(const struct device *dev);
 
 /**
  * @brief PDC port data used in interrupt handler
@@ -845,21 +845,21 @@ static enum smf_state_result st_init_run(void *o)
 			set_state(data, ST_DISABLE);
 			return SMF_EVENT_HANDLED;
 		}
-		init_write_cmd_and_change_state(data, INIT_PDC_SET_VDO);
-		return SMF_EVENT_HANDLED;
-	case INIT_PDC_SET_VDO:
-		rv = rts54_set_vdo_idh(data->dev);
-		if (rv) {
-			LOG_ERR("RTK%d:, Internal(INIT_PDC_SET_VDO)", cnum);
-			set_state(data, ST_DISABLE);
-			return SMF_EVENT_HANDLED;
-		}
 		init_write_cmd_and_change_state(data, INIT_PDC_RESET);
 		return SMF_EVENT_HANDLED;
 	case INIT_PDC_RESET:
 		rv = rts54_reset(data->dev);
 		if (rv) {
 			LOG_ERR("RTK%d:, Internal(INIT_PDC_RESET)", cnum);
+			set_state(data, ST_DISABLE);
+			return SMF_EVENT_HANDLED;
+		}
+		init_write_cmd_and_change_state(data, INIT_PDC_SET_VDO_ACK);
+		return SMF_EVENT_HANDLED;
+	case INIT_PDC_SET_VDO_ACK:
+		rv = rts54_set_vdo_id_ack(data->dev);
+		if (rv) {
+			LOG_ERR("RTK%d:, Internal(INIT_PDC_SET_VDO_ACK)", cnum);
 			set_state(data, ST_DISABLE);
 			return SMF_EVENT_HANDLED;
 		}
@@ -915,6 +915,11 @@ static enum smf_state_result st_init_run(void *o)
 			}
 
 			/* PDC returned an error */
+			if (data->init_local_current_state ==
+			    INIT_PDC_SET_VDO_ACK) {
+				LOG_ERR("RTK%d: VDO Configuration FAILED",
+					cfg->connector_number);
+			}
 			data->init_local_state = INIT_ERROR;
 		} else {
 			/* PDC Error status was read */
@@ -931,6 +936,12 @@ static enum smf_state_result st_init_run(void *o)
 					set_state(data, ST_DISABLE);
 				}
 				return SMF_EVENT_HANDLED;
+			}
+
+			if (data->init_local_current_state ==
+			    INIT_PDC_SET_VDO_ACK) {
+				LOG_INF("RTK%d: VDO Configuration Successful",
+					cfg->connector_number);
 			}
 
 			data->init_local_state = data->init_local_next_state;
@@ -1744,27 +1755,59 @@ static int rts54_set_vdo(const struct device *dev, const vdo_config_t *config,
 	return rts54_post_command(dev, CMD_SET_VDO, payload, total_size, NULL);
 }
 
-static int rts54_set_vdo_idh(const struct device *dev)
+static int rts54_set_vdo_id_ack(const struct device *dev)
 {
-	struct pdc_data_t *data = dev->data;
 	const struct pdc_config_t *cfg = dev->config;
-	uint32_t idh[1];
+
+	/* ID Header */
+	union id_header_vdo_rev30 idh_vdo = { .raw = 0 };
+	union ufp_vdo_rev32 ufp_vdo = { .raw = 0 };
+	union dfp_vdo_rev32 dfp_vdo = { .raw = 0 };
 	vdo_config_t config = { .raw = 0 };
-	uint8_t vdo_type[] = { VDO_INDEX_IDH };
+	uint8_t vdo_type[] = { VDO_INDEX_IDH, VDO_INDEX_PTYPE_DFP_VDO,
+			       VDO_INDEX_PTYPE_UFP1_VDO };
 
-	/* ID Header VDO (Discovery Identity response)
-	 * Bit 31: USB Host capable
-	 * Bit 30: USB Device capable
-	 * We assume the port is Host capable.
-	 */
-	idh[0] = VDO_IDH(1, cfg->usb_comm_capable_as_device ? 1 : 0,
-			 IDH_PTYPE_UNDEF, 0, data->info.vid);
-
-	config.fields.num_vdos = 1;
+	config.fields.num_vdos = 2;
 	config.fields.origin = RTS54XX_PDC_ORIGIN;
 
-	return rts54_set_vdo(dev, &config, vdo_type, idh);
+	/* ID Header VDO (Discovery Identity response) */
+	idh_vdo.usb_host = true;
+	/* Product Type (DFP): 010b = PDUSB Host */
+	set_idh_product_type_dfp(&idh_vdo, IDH_PTYPE_DFP_HOST);
+	/* Connector Type: 10b = USB Type-C Receptacle */
+	idh_vdo.connector_type = USB_TYPEC_RECEPTACLE;
+	idh_vdo.usb_vendor_id = USB_VID_GOOGLE;
+
+	/* DFP VDO */
+	dfp_vdo.version = DFP_VERSION_1_2;
+	dfp_vdo.usb4_cap = false; /* TODO */
+	dfp_vdo.usb3_cap = true;
+	dfp_vdo.usb2_cap = true;
+	dfp_vdo.port_num = cfg->connector_number;
+
+	if (cfg->usb_comm_capable_as_device) {
+		config.fields.num_vdos = 3;
+		/* ID Header - device capable */
+		idh_vdo.usb_device = true;
+		/* Product Type (UFP): 010b = PDUSB Peripheral */
+		idh_vdo.product_type_ufp = IDH_PTYPE_UFP_PERIPH;
+
+		/* UFP VDO */
+		ufp_vdo.version = UFP_VERSION_1_3;
+		ufp_vdo.usb4_cap = false;
+		ufp_vdo.usb3_cap = true;
+		ufp_vdo.usb2_cap = USB2_CAPABLE;
+		ufp_vdo.vconn = false;
+		ufp_vdo.vbus = false;
+		ufp_vdo.no_signal_reconfig = false; /* TODO */
+		ufp_vdo.non_tbt3_signal_reconfig = false; /* TODO */
+		ufp_vdo.tbt_support = false; /* TODO */
+		ufp_vdo.speed = GEN1; /* TODO */
+	}
+	uint32_t vdos[] = { idh_vdo.raw, dfp_vdo.raw, ufp_vdo.raw };
+	return rts54_set_vdo(dev, &config, vdo_type, vdos);
 }
+
 
 /**
  * @param offset Starting location in PD Status information payload.
