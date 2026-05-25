@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4f9ec21_8d94df73",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-05-25T11:30:45Z",
+      "side": 1,
+      "message": "Looks good to me. Waiting for Dawid review.",
+      "revId": "e88d6b0660e53ad32037c5e7bcba68c07c980101",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
