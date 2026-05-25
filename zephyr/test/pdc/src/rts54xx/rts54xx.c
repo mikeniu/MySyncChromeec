@@ -369,20 +369,66 @@ ZTEST_USER(rts54xx, test_vdo_integrity_roundtrip)
 	pdc_set_cc_callback(dev, NULL);
 }
 
+ZTEST_USER(rts54xx, test_vdo_surgical_update)
+{
+	uint32_t idh;
+	union get_vdo_t vdo_req;
+	uint8_t vdo_types[] = { VDO_INDEX_IDH };
+	/* Non-zero IDH with specific VID (0x1234), Product Type (2), and Modal
+	 * bit (1) */
+	uint32_t initial_idh = VDO_IDH(1, 0, 2, 1, 0x1234);
+
+	vdo_req.raw_value = 0;
+	vdo_req.num_vdos = 1;
+	vdo_req.vdo_origin = 0; /* PDC origin */
+
+	/* 1. Setup emulator with a specific ID Header */
+	zassert_ok(emul_pdc_set_vdo(emul, 1, vdo_types, &initial_idh));
+
+	/* 2. Trigger re-init of the driver to run surgical update */
+	zassert_ok(pdc_reset(dev));
+	zassert_ok(emul_pdc_idle_wait(emul));
+
+	/* 3. Verify: bits 30, 29:27, and 22:21 should be updated, others preserved
+	 */
+	zassert_ok(pdc_get_vdo(dev, vdo_req, vdo_types, &idh));
+	zassert_ok(emul_pdc_idle_wait(emul));
+
+	uint32_t expected_idh = initial_idh | BIT(30) | (2U << 21);
+	/* PType was already 2, but let's ensure it's still 2 */
+	expected_idh &= ~(7U << 27);
+	expected_idh |= (2U << 27);
+
+	zassert_equal(idh, expected_idh,
+		      "IDH VDO should be surgically updated (0x%08x -> 0x%08x), got 0x%08x",
+		      initial_idh, expected_idh, idh);
+
+	/* 4. Verify specific fields are preserved */
+	zassert_equal(idh & 0xffff, 0x1234, "VID should be preserved");
+	zassert_equal(PD_IDH_PTYPE(idh), 2, "Product Type should be 2");
+	zassert_equal(PD_IDH_IS_MODAL(idh), 1, "Modal bit should be preserved");
+	zassert_equal((idh >> 31) & 1, 1, "Host bit should be preserved");
+	zassert_equal((idh >> 21) & 3, 2, "Connector Type should be 2");
+}
+
 ZTEST_USER(rts54xx, test_usb_comm_capable_as_device)
 {
 	uint32_t idh;
 	union get_vdo_t vdo_req;
 	struct pdc_info_t info;
 	uint8_t vdo_types[] = { VDO_INDEX_IDH };
+	uint32_t initial_idh_0 = 0x8A001234;
+	uint32_t initial_idh_1 = 0x0C005678;
 
 	vdo_req.raw_value = 0;
 	vdo_req.num_vdos = 1;
 	vdo_req.vdo_origin = 0; /* PDC origin */
 
-	/* Trigger re-init of the driver because it was already initialized at
-	 * boot, but emulator state was wiped by rts54xx_before_test.
-	 */
+	/* 1. Setup emulators with specific ID Headers */
+	zassert_ok(emul_pdc_set_vdo(emul, 1, vdo_types, &initial_idh_0));
+	zassert_ok(emul_pdc_set_vdo(emul2, 1, vdo_types, &initial_idh_1));
+
+	/* 2. Trigger re-init of the driver */
 	zassert_ok(pdc_reset(dev));
 	zassert_ok(pdc_reset(dev2));
 
@@ -390,29 +436,33 @@ ZTEST_USER(rts54xx, test_usb_comm_capable_as_device)
 	zassert_ok(emul_pdc_idle_wait(emul));
 	zassert_ok(emul_pdc_idle_wait(emul2));
 
-	/* Verify port 0 (pdc_emul1) has USB Device bit set (bit 30) */
+	/* Verify port 0 (pdc_emul1) has USB Device bit set (bit 30) AND
+	 * others preserved/updated as expected
+	 */
 	zassert_ok(pdc_get_info(dev, &info, true));
 	zassert_ok(emul_pdc_idle_wait(emul));
 	zassert_true(info.usb_comm_capable_as_device);
 
 	zassert_ok(pdc_get_vdo(dev, vdo_req, vdo_types, &idh));
-	/* Wait for command to complete */
 	zassert_ok(emul_pdc_idle_wait(emul));
-	zassert_true(idh & BIT(30),
-		     "IDH VDO should have USB Device bit set (0x%08x)", idh);
 
-	/* Verify port 1 (pdc_emul2) does not have USB Device bit set (bit 30)
-	 */
+	uint32_t expected_idh_0 = initial_idh_0 | BIT(30) | (2U << 21);
+	expected_idh_0 &= ~(7U << 27);
+	expected_idh_0 |= (2U << 27);
+
+	zassert_equal(idh, expected_idh_0,
+		      "Port 0 IDH should be surgically updated (0x%08x -> 0x%08x), got 0x%08x",
+		      initial_idh_0, expected_idh_0, idh);
+
+	/* Verify port 1 (pdc_emul2) was SKIPPED (remains original value) */
 	zassert_ok(pdc_get_info(dev2, &info, true));
 	zassert_ok(emul_pdc_idle_wait(emul2));
 	zassert_false(info.usb_comm_capable_as_device);
 
 	zassert_ok(pdc_get_vdo(dev2, vdo_req, vdo_types, &idh));
-	/* Wait for command to complete */
-	zassert_ok(emul_pdc_idle_wait(emul));
-	zassert_false(idh & BIT(30),
-		      "IDH VDO should not have USB Device bit set (0x%08x)",
-		      idh);
+	zassert_ok(emul_pdc_idle_wait(emul2));
+	zassert_equal(idh, initial_idh_1,
+		      "Port 1 IDH should be unchanged (skipped) (0x%08x)", idh);
 }
 
 ZTEST_USER(rts54xx, test_alert_received)

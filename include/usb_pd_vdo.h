@@ -696,6 +696,63 @@ enum vpd_cts_support {
  * <25:16> : Reserved
  * <15:0>  : USB Vendor ID
  */
+
+// BIT 15 - Product Type DFP
+// BIT 14 - Connector Type
+// BIT 13 - Connector Type
+// BIT 12-8 - Reserved
+// BIT 7 - USB HOST
+// BIT 6 - USB device
+// BIT 5 - Product type UPF
+// BIT 4 - Product type UPF
+// BIT 3 - Product type UPF
+// BIT 2 - Modal operation
+// BIT 1 - Product Type DFP
+// BIT 0 - Product Type DFP
+/* --- Bit-field Shift & Mask Definitions --- */
+#define IDH_CONN_TYPE_SHIFT       13
+#define IDH_CONN_TYPE_MASK        (0x3U << IDH_CONN_TYPE_SHIFT)
+
+#define IDH_RESERVED_MASK         (0x1FU << 8) // Bits 8:12
+
+#define IDH_USB_HOST_BIT          BIT(7)
+#define IDH_USB_DEVICE_BIT        BIT(6)
+
+#define IDH_PROD_TYPE_UPF_SHIFT   3
+#define IDH_PROD_TYPE_UPF_MASK    (0x7U << IDH_PROD_TYPE_UPF_SHIFT)
+
+#define IDH_MODAL_OP_BIT          BIT(2)
+
+#define IDH_PROD_TYPE_DFP_MASK    (BIT(15) | BIT(1) | BIT(0))
+
+/**
+ * IDH_HEADER
+ * Configures the lower 16-bits of a USB PD ID Header VDO.
+ * * @vdo:   The original 32-bit uint32_t data source (e.g., data->idh)
+ * @host:  USB Host support (0 or 1)
+ * @dev:   USB Device support (0 or 1)
+ * @upf:   Product Type UFP value (0 to 7)
+ * @modal: Modal Operation support (0 or 1)
+ * @dfp:   Product Type DFP value (0 to 7)
+ * @conn:  Connector Type value (0 to 3)
+ */
+#define IDH_HEADER(vdo, host, dev, upf, modal, dfp, conn) (               \
+    /* 1. Keep the upper 16 bits untouched, wipe the lower 16 bits clean */       \
+    ((vdo) & 0xFFFF0000U) |                                                       \
+                                                                                  \
+    /* 2. Position and map the multi-bit fields */                                \
+    (((uint32_t)(conn)  << IDH_CONN_TYPE_SHIFT)     & IDH_CONN_TYPE_MASK)       | \
+    (((uint32_t)(upf)   << IDH_PROD_TYPE_UPF_SHIFT) & IDH_PROD_TYPE_UPF_MASK)    | \
+                                                                                  \
+    /* DFP is split across bits [15] and [1:0]. We map bits 0,1 and 2 of 'dfp' */  \
+    ((((uint32_t)(dfp) & 0x4) ? BIT(15) : 0) | ((uint32_t)(dfp) & 0x3))         | \
+                                                                                  \
+    /* 3. Apply the single-bit flags */                                           \
+    ((host)  ? IDH_USB_HOST_BIT   : 0)                                            | \
+    ((dev)   ? IDH_USB_DEVICE_BIT : 0)                                            | \
+    ((modal) ? IDH_MODAL_OP_BIT   : 0)                                            \
+)
+
 enum idh_ptype {
 	IDH_PTYPE_UNDEF,
 	IDH_PTYPE_HUB,
