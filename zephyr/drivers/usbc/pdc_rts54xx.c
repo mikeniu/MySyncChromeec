@@ -232,7 +232,7 @@ enum init_state_t {
 	/** Set the PDC Notifications */
 	INIT_PDC_SET_NOTIFICATION_ENABLE,
 	/** Set VDOs on the PDC */
-	INIT_PDC_SET_VDO,
+	INIT_PDC_SET_VDO_ACK,
 	/** Reset the PDC */
 	INIT_PDC_RESET,
 	/** Initialization complete */
@@ -523,7 +523,7 @@ static int rts54_get_info(const struct device *dev, struct pdc_info_t *info,
 			  bool live);
 static int rts54_get_error_status(const struct device *dev,
 				  union error_status_t *es);
-static int rts54_set_vdo_idh(const struct device *dev);
+static int rts54_set_vdo_id_ack(const struct device *dev);
 
 /**
  * @brief PDC port data used in interrupt handler
@@ -845,21 +845,21 @@ static enum smf_state_result st_init_run(void *o)
 			set_state(data, ST_DISABLE);
 			return SMF_EVENT_HANDLED;
 		}
-		init_write_cmd_and_change_state(data, INIT_PDC_SET_VDO);
-		return SMF_EVENT_HANDLED;
-	case INIT_PDC_SET_VDO:
-		rv = rts54_set_vdo_idh(data->dev);
-		if (rv) {
-			LOG_ERR("RTK%d:, Internal(INIT_PDC_SET_VDO)", cnum);
-			set_state(data, ST_DISABLE);
-			return SMF_EVENT_HANDLED;
-		}
 		init_write_cmd_and_change_state(data, INIT_PDC_RESET);
 		return SMF_EVENT_HANDLED;
 	case INIT_PDC_RESET:
 		rv = rts54_reset(data->dev);
 		if (rv) {
 			LOG_ERR("RTK%d:, Internal(INIT_PDC_RESET)", cnum);
+			set_state(data, ST_DISABLE);
+			return SMF_EVENT_HANDLED;
+		}
+		init_write_cmd_and_change_state(data, INIT_PDC_SET_VDO_ACK);
+		return SMF_EVENT_HANDLED;
+	case INIT_PDC_SET_VDO_ACK:
+		rv = rts54_set_vdo_id_ack(data->dev);
+		if (rv) {
+			LOG_ERR("RTK%d:, Internal(INIT_PDC_SET_VDO_ACK)", cnum);
 			set_state(data, ST_DISABLE);
 			return SMF_EVENT_HANDLED;
 		}
@@ -914,7 +914,6 @@ static enum smf_state_result st_init_run(void *o)
 				return SMF_EVENT_HANDLED;
 			}
 
-			/* PDC returned an error */
 			data->init_local_state = INIT_ERROR;
 		} else {
 			/* PDC Error status was read */
@@ -1744,26 +1743,30 @@ static int rts54_set_vdo(const struct device *dev, const vdo_config_t *config,
 	return rts54_post_command(dev, CMD_SET_VDO, payload, total_size, NULL);
 }
 
-static int rts54_set_vdo_idh(const struct device *dev)
+static int rts54_set_vdo_id_ack(const struct device *dev)
 {
-	struct pdc_data_t *data = dev->data;
 	const struct pdc_config_t *cfg = dev->config;
-	uint32_t idh[1];
+
+	/* ID Header */
+	union id_header_vdo_rev30 idh_vdo = { .raw_value = 0 };
 	vdo_config_t config = { .raw = 0 };
 	uint8_t vdo_type[] = { VDO_INDEX_IDH };
-
-	/* ID Header VDO (Discovery Identity response)
-	 * Bit 31: USB Host capable
-	 * Bit 30: USB Device capable
-	 * We assume the port is Host capable.
-	 */
-	idh[0] = VDO_IDH(1, cfg->usb_comm_capable_as_device ? 1 : 0,
-			 IDH_PTYPE_UNDEF, 0, data->info.vid);
 
 	config.fields.num_vdos = 1;
 	config.fields.origin = RTS54XX_PDC_ORIGIN;
 
-	return rts54_set_vdo(dev, &config, vdo_type, idh);
+	/* ID Header VDO (Discovery Identity response) */
+	idh_vdo.usb_host = true;
+	set_idh_product_type_dfp(&idh_vdo, IDH_PTYPE_DFP_HOST);
+	idh_vdo.connector_type = USB_TYPEC_RECEPTACLE;
+	idh_vdo.usb_vendor_id = USB_VID_GOOGLE;
+
+	if (cfg->usb_comm_capable_as_device) {
+		idh_vdo.usb_device = true;
+		idh_vdo.product_type_ufp = IDH_PTYPE_UFP_PERIPH;
+	}
+	uint32_t vdos[] = { idh_vdo.raw_value };
+	return rts54_set_vdo(dev, &config, vdo_type, vdos);
 }
 
 /**
