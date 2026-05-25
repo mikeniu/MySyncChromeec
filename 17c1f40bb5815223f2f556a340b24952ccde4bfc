@@ -122,6 +122,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "15bf0201_08286974",
+        "filename": "zephyr/program/fatcat/moonstone/gpios.dtsi",
+        "patchSetId": 18
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-25T14:24:14Z",
+      "side": 1,
+      "message": "1. Deferred sounds really good, unfortunately I couldn\u0027t get it to work due to priority validation.\n ```\nERROR: Device initialization priority validation failed, the sequence of initialization calls does not match the devicetree dependencies.\nERROR: Non-deferred device /pwrmon depends on deferred device /soc/i2c@f04300/pac1954@10\n.\n.\n.\nERROR: Non-deferred device /pwrmon depends on deferred device /soc/i2c@f04300/pac1954@1b\n```\n2. Adjusting `pwrmon.c` priority doesn\u0027t help either. Changing priority with `zephyr,deferred-init` gave me the same error.\n```\nERROR: Device initialization priority validation failed, the sequence of initialization calls does not match the devicetree dependencies.\nERROR: /pwrmon \u003cpwrmon_init\u003e is initialized before its dependency /soc/i2c@f04300/pac1954@10 \u003cpac194x_init\u003e (POST_KERNEL+4 \u003c POST_KERNEL+18)\n```\n\n3. Probably we should go this road, since two previous option don\u0027t work.",
+      "parentUuid": "42707b52_0a73d475",
+      "range": {
+        "startLine": 181,
+        "startChar": 0,
+        "endLine": 181,
+        "endChar": 35
+      },
+      "revId": "17c1f40bb5815223f2f556a340b24952ccde4bfc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bdced5d3_0c2d01cd",
         "filename": "zephyr/program/fatcat/program.conf",
         "patchSetId": 18
