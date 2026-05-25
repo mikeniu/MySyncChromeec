@@ -21,21 +21,18 @@
 		dbg-label = "Enable output for PWR_PRIM_VR";
 		enum-name = "PWR_PRIM_VR";
 		gpios = <&gpiod 5 0>;
-		output;
 	};
 	pwr-en-s5-pp3300-rails {
 		compatible = "intel,ap-pwrseq-gpio";
 		dbg-label = "EN_S5_RAILS enable output for PP3300";
 		enum-name = "PWR_EN_PP3300_A";
 		gpios = <&gpiog 6 0>;
-		output;
 	};
 	pwr-en-s5-pp1800-rails {
 		compatible = "intel,ap-pwrseq-gpio";
 		dbg-label = "EN_S5_RAILS enable output for PP1800";
 		enum-name = "PWR_EN_PP1800_A";
 		gpios = <&gpioh 6 0>;
-		output;
 	};
 	pwr_rsmrst_pwrgd: rsmrst-pwrgd-ec-n {
 		compatible = "intel,ap-pwrseq-gpio";
@@ -51,7 +48,7 @@
 		enum-name = "PWR_EC_PCH_RSMRST";
                 /* RM_RSMST_N_R net */
 	        gpios = <&gpioe 3 GPIO_ACTIVE_LOW>;
-		reset-val = <1>;
+		reset-val = <0>;
 		output;
 	};
 	pwr_pch_pwrok: ec-pm-pch-pwrok {
