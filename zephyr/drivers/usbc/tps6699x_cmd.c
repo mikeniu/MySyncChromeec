@@ -19,6 +19,7 @@
 #include <zephyr/drivers/smbus.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/minmax.h>
 LOG_MODULE_DECLARE(tps6699x, CONFIG_USBC_LOG_LEVEL);
 #include <zephyr/smf.h>
 
@@ -241,6 +242,14 @@ int tps_rw_autonegotiate_sink(const struct i2c_dt_spec *i2c,
 			    sizeof(union reg_autonegotiate_sink), flag);
 }
 
+int tps_rw_thunderbolt_configuration(const struct i2c_dt_spec *i2c,
+				     union reg_thunderbolt_configuration *buf,
+				     int flag)
+{
+	return tps_xfer_reg(i2c, REG_THUNDERBOLT_CONFIGURATION, buf->raw_value,
+			    sizeof(union reg_thunderbolt_configuration), flag);
+}
+
 int tps_rd_power_path_status(const struct i2c_dt_spec *i2c,
 			     union reg_power_path_status *buf)
 {
@@ -323,7 +332,7 @@ int tps_stream_data(const struct i2c_dt_spec *i2c,
 	     chunk_offset += TPS_STREAM_CHUNK_SIZE) {
 		/* Set up I2C write */
 		msg[0].buf = (uint8_t *)buf + chunk_offset;
-		msg[0].len = MIN(TPS_STREAM_CHUNK_SIZE, buf_len - chunk_offset);
+		msg[0].len = min(TPS_STREAM_CHUNK_SIZE, buf_len - chunk_offset);
 		msg[0].flags = I2C_MSG_WRITE | I2C_MSG_STOP;
 
 		rv = i2c_transfer_dt(&stream_i2c, msg, 1);
@@ -342,3 +351,13 @@ int tps_stream_data(const struct i2c_dt_spec *i2c,
 }
 /* LCOV_EXCL_STOP */
 #endif
+
+int tps_rd_received_attention_vdm(
+	const struct i2c_dt_spec *i2c,
+	union reg_received_attention_vdm *received_attention_vdm)
+{
+	return tps_xfer_reg(i2c, REG_RECEIVED_ATTENTION_VDM,
+			    received_attention_vdm->raw_value,
+			    sizeof(union reg_received_attention_vdm),
+			    I2C_MSG_READ);
+}
