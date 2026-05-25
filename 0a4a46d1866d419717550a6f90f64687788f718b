@@ -70,6 +70,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f1a8465_2b9abdb1",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-25T14:30:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98fbf871_9e475fc4",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 56
+      },
+      "revId": "0a4a46d1866d419717550a6f90f64687788f718b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ecd52089_9e6af997",
@@ -83,6 +107,30 @@
       "writtenOn": "2026-05-22T17:22:15Z",
       "side": 1,
       "message": "The zephyr convention is to extract the driver instance config and data from the passed in `const struct device *dev`.\n\n```\nconst struct pwrmon_config *pwrmon_config \u003d dev-\u003econfig;\nstruct pwrmon_data *pwrmon_config \u003d dev-\u003edata;\n```",
+      "range": {
+        "startLine": 86,
+        "startChar": 21,
+        "endLine": 86,
+        "endChar": 34
+      },
+      "revId": "0a4a46d1866d419717550a6f90f64687788f718b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e38ba9cf_2ff86c29",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-25T14:30:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ecd52089_9e6af997",
       "range": {
         "startLine": 86,
         "startChar": 21,
