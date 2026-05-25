@@ -10,7 +10,7 @@ config UCSI_PPM
 
 config UCSI_PPM_STACK_SIZE
 	int "UCSI PPM implementation thread stack size"
-	default 1024
+	default 1280
 	help
 	  Stack size of thread created for PPM.
 
@@ -22,6 +22,8 @@ config UCSI_PPM_THREAD_PRIORITY
 
 config UCSI_PPM_CONSOLE
 	bool "UCSI PPM console commands"
+	default y
+	depends on UCSI_PPM
 	help
 	  Enable the `ppm` console command, which supports calling various
 	  UCSI commands through the PPM subsystem to the PDCs.

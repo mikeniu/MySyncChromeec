@@ -338,6 +338,19 @@ int tps_rw_autonegotiate_sink(const struct i2c_dt_spec *i2c,
 			      union reg_autonegotiate_sink *buf, int flag);
 
 /**
+ * @brief Read or Write Thunderbolt Configuration
+ *
+ * @param i2c device pointer to i2c device
+ * @param buf pointer where data is stored
+ * @param int flag set to I2C_MSG_READ for read and I2C_MSG_WRITE for write
+ *
+ * @return 0 on success, else -EIO
+ */
+int tps_rw_thunderbolt_configuration(const struct i2c_dt_spec *i2c,
+				     union reg_thunderbolt_configuration *buf,
+				     int flag);
+
+/**
  * @brief Read ADC Results
  *
  * @param i2c device pointer to i2c device
@@ -481,4 +494,15 @@ int tps_stream_data(const struct i2c_dt_spec *i2c,
 		    size_t buf_len);
 #endif
 
+/**
+ * @brief Read the received attention VDM register (0x4E)
+ *
+ * @param i2c device pointer to i2c device
+ * @param received_attention_vdm pointer where data is stored
+ *
+ * @return 0 on success, else -EIO
+ */
+int tps_rd_received_attention_vdm(
+	const struct i2c_dt_spec *i2c,
+	union reg_received_attention_vdm *received_attention_vdm);
 #endif /* ZEPHYR_DRIVERS_USBC_TPS6699X_H_ */

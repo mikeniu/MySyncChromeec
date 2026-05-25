@@ -37,10 +37,6 @@ LOG_MODULE_REGISTER(pdc_rts54_fwup, LOG_LEVEL_INF);
 #define RTS54XX_VALIDATE_ISP_CMD 0x16
 #define RTS54XX_GET_IC_STATUS_CMD 0x3A
 
-/** Number of GET_IC_STATUS bytes that can be requested while running in ROM
- *  code */
-#define RTS54XX_GET_IC_STATUS_SAFE_READ_LEN 20
-
 static struct {
 	bool fwup_session_active;
 	struct i2c_dt_spec pdc_i2c;
@@ -153,7 +149,7 @@ static int rts54xx_get_ic_status(const struct i2c_dt_spec *i2c,
 {
 	uint8_t get_ic_status[] = { RTS54XX_GET_IC_STATUS_CMD, 3, 0x00, 0x00,
 				    RTS54XX_GET_IC_STATUS_SAFE_READ_LEN };
-	uint8_t rx_buffer[RTS54XX_GET_IC_STATUS_SAFE_READ_LEN] = { 0 };
+	uint8_t rx_buffer[RTS54XX_GET_IC_STATUS_RX_BUF_LEN] = { 0 };
 	union ping_status_t ping_status;
 	int rv;
 
@@ -169,7 +165,9 @@ static int rts54xx_get_ic_status(const struct i2c_dt_spec *i2c,
 		return rv;
 	}
 
-	rv = rts54xx_block_in_transfer(i2c, ARRAY_SIZE(rx_buffer), rx_buffer);
+	rv = rts54xx_block_in_transfer(
+		i2c, min(ARRAY_SIZE(rx_buffer), ping_status.data_len + 1),
+		rx_buffer);
 	if (rv) {
 		LOG_ERR("GET_IC_STATUS block in transfer failed: %d (ping=0x%02x)",
 			rv, ping_status.raw_value);
@@ -693,23 +691,26 @@ static int cmd_pdc_rtk_fwup_abort(const struct shell *sh, size_t argc,
 SHELL_STATIC_SUBCMD_SET_CREATE(
 	sub_pdc_rtk_fwup_cmds,
 	SHELL_CMD_ARG(start, NULL,
-		      "Prepare the PDC for a firmware download\n"
-		      "Usage: pdc_rtk_fwup start <port>\n"
-		      "       pdc_rtk_fwup start <device> <addr>\n"
-		      "         (`device` is an I2C bus, likely I2C_PORT_PD)",
+		      SHELL_HELP("Prepare the PDC for a firmware download",
+				 "<port>\n"
+				 "<device> <addr>\n"
+				 "(`device` is an I2C bus, likely I2C_PORT_PD)"),
 		      cmd_pdc_rtk_fwup_start, 2, 1),
-	SHELL_CMD_ARG(write, NULL,
-		      "Write packets of 29 FW payload bytes to the PDC\n"
-		      "Usage: pdc_rtk_fwup write <base64>",
-		      cmd_pdc_rtk_fwup_write, 2, 0),
-	SHELL_CMD_ARG(finish, NULL,
-		      "Finalize the FW update and restart PD subsystem\n"
-		      "Usage: pdc_rtk_fwup finish",
-		      cmd_pdc_rtk_fwup_finish, 1, 0),
-	SHELL_CMD_ARG(abort, NULL,
-		      "Recover from a failed or interrupted update session\n"
-		      "Usage: pdc_rtk_fwup abort",
-		      cmd_pdc_rtk_fwup_abort, 1, 0),
+	SHELL_CMD_ARG(
+		write, NULL,
+		SHELL_HELP("Write packets of 29 FW payload bytes to the PDC",
+			   "<base64>"),
+		cmd_pdc_rtk_fwup_write, 2, 0),
+	SHELL_CMD_ARG(
+		finish, NULL,
+		SHELL_HELP("Finalize the FW update and restart PD subsystem",
+			   NULL),
+		cmd_pdc_rtk_fwup_finish, 1, 0),
+	SHELL_CMD_ARG(
+		abort, NULL,
+		SHELL_HELP("Recover from a failed or interrupted update session",
+			   NULL),
+		cmd_pdc_rtk_fwup_abort, 1, 0),
 	SHELL_SUBCMD_SET_END);
 
 SHELL_CMD_REGISTER(pdc_rtk_fwup, &sub_pdc_rtk_fwup_cmds,
