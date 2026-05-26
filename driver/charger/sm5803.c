@@ -65,6 +65,7 @@ static mutex_t flow1_access_lock[CHARGER_NUM];
 static mutex_t flow2_access_lock[CHARGER_NUM];
 
 static int charger_vbus[CHARGER_NUM];
+static int vbus_voltage_cache[CHARGER_NUM];
 
 /* Tracker for charging failures per port */
 struct {
@@ -565,6 +566,48 @@ enum ec_error_list sm5803_set_ibat_phot_sel(int chgnum, int ibat_sel)
 	return EC_SUCCESS;
 }
 
+static enum ec_error_list sm5803_configure_vbus_thresholds(int chgnum)
+{
+	enum ec_error_list rv;
+	int vbus_mv;
+
+	rv = sm5803_get_vbus_voltage(chgnum, chgnum, &vbus_mv);
+	if (rv != EC_SUCCESS) {
+		CPRINTS("%s %d: Failed to read VBUS voltage", CHARGER_NAME,
+			chgnum);
+		return rv;
+	}
+
+	vbus_voltage_cache[chgnum] = vbus_mv;
+	if (vbus_mv >= PD_V_SAFE5V_MIN) {
+		/* VBUS present: monitor disconnect */
+		rv = meas_write8(chgnum, SM5803_REG_VBUS_HIGH_TH,
+				 SM5803_VBUS_MAX_LEVEL);
+		rv |= meas_write8(chgnum, SM5803_REG_VBUS_LOW_TH,
+				  SM5803_VBUS_REMOVED_LEVEL);
+	} else if (vbus_mv <= PD_V_SAFE0V_MAX) {
+		/* vSafe0V: monitor attach */
+		rv = meas_write8(chgnum, SM5803_REG_VBUS_HIGH_TH,
+				 SM5803_VBUS_PRESENT_LEVEL);
+		rv |= meas_write8(chgnum, SM5803_REG_VBUS_LOW_TH,
+				  SM5803_VBUS_MIN_LEVEL);
+	} else if (vbus_mv <= PD_V_SINK_DISCONNECT_MAX) {
+		/* VBUS removed: monitor vSafe0V */
+		rv = meas_write8(chgnum, SM5803_REG_VBUS_HIGH_TH,
+				 SM5803_VBUS_MAX_LEVEL);
+		rv |= meas_write8(chgnum, SM5803_REG_VBUS_LOW_TH,
+				  SM5803_VBUS_SAFE0V_LEVEL);
+	}
+
+	if (rv != EC_SUCCESS) {
+		CPRINTS("%s %d: Failed configuring VBUS thresholds",
+			CHARGER_NAME, chgnum);
+		return rv;
+	}
+
+	return EC_SUCCESS;
+}
+
 static void sm5803_init(int chgnum)
 {
 	enum ec_error_list rv;
@@ -836,11 +879,15 @@ static void sm5803_init(int chgnum)
 	rv |= meas_write8(chgnum, SM5803_REG_TINT_LOW_TH,
 			  SM5803_TINT_MIN_LEVEL);
 
-	/*
-	 * Configure TINT interrupt to fire after thresholds are set.
-	 */
-	rv |= main_write8(chgnum, SM5803_REG_INT2_EN, SM5803_INT2_TINT);
+	/* Configure VBUS Threshold for interrupt */
+	rv |= sm5803_configure_vbus_thresholds(chgnum);
 
+	/*
+	 * Configure TINT & VBUS interrupt to fire after thresholds are set.
+	 */
+	rv |= main_read8(chgnum, SM5803_REG_INT2_EN, &reg);
+	reg |= SM5803_INT2_TINT | SM5803_INT2_VBUS;
+	rv |= main_write8(chgnum, SM5803_REG_INT2_EN, reg);
 	/*
 	 * Configure CHG_ENABLE to only be set through I2C by setting
 	 * HOST_MODE_EN bit (all other register bits are 0 by default)
@@ -1299,6 +1346,16 @@ void sm5803_handle_interrupt(int chgnum)
 		 */
 	}
 
+	/*
+	 * VBUS threshold interrupt handling
+	 */
+	if (int_reg & SM5803_INT2_VBUS) {
+		rv = sm5803_configure_vbus_thresholds(chgnum);
+		if (rv != EC_SUCCESS) {
+			return;
+		}
+	}
+
 	/* TODO(b/159376384): Take action on fatal BFET power alert. */
 	rv = main_read8(chgnum, SM5803_REG_INT3_REQ, &int_reg);
 	if (rv) {
@@ -1670,8 +1727,7 @@ static enum ec_error_list sm5803_discharge_on_ac(int chgnum, int enable)
 	return rv;
 }
 
-static enum ec_error_list sm5803_get_vbus_voltage(int chgnum, int port,
-						  int *voltage)
+enum ec_error_list sm5803_get_vbus_voltage(int chgnum, int port, int *voltage)
 {
 	enum ec_error_list rv;
 	int reg;
@@ -1702,7 +1758,8 @@ static enum ec_error_list sm5803_get_vbus_voltage(int chgnum, int port,
 
 bool sm5803_check_vbus_level(int chgnum, enum vbus_level level)
 {
-	int rv, vbus_voltage;
+	enum ec_error_list rv;
+	int reg;
 
 	/*
 	 * Analog reading of VBUS is more accurate and helps reliability when
@@ -1714,9 +1771,13 @@ bool sm5803_check_vbus_level(int chgnum, enum vbus_level level)
 	 * impact performance because the GPADCs should be enabled in any
 	 * situation where we're doing a PRS.
 	 */
-	rv = sm5803_get_vbus_voltage(chgnum, chgnum, &vbus_voltage);
-	if (rv == EC_ERROR_NOT_POWERED) {
-		/* VBUS ADC is disabled, use digital presence */
+	rv = meas_read8(chgnum, SM5803_REG_GPADC_CONFIG1, &reg);
+
+	if (rv != EC_SUCCESS)
+		return false;
+
+	/* VBUS ADC is disabled, use digital presence */
+	if (!(reg & SM5803_GPADCC1_VBUS_EN)) {
 		switch (level) {
 		case VBUS_PRESENT:
 			return sm5803_is_vbus_present(chgnum);
@@ -1729,18 +1790,14 @@ bool sm5803_check_vbus_level(int chgnum, enum vbus_level level)
 			return false;
 		}
 	}
-	if (rv != EC_SUCCESS) {
-		/* Unhandled communication error; assume unsatisfied */
-		return false;
-	}
 
 	switch (level) {
 	case VBUS_PRESENT:
-		return vbus_voltage > PD_V_SAFE5V_MIN;
-	case VBUS_SAFE0V:
-		return vbus_voltage < PD_V_SAFE0V_MAX;
+		return vbus_voltage_cache[chgnum] >= PD_V_SAFE5V_MIN;
 	case VBUS_REMOVED:
-		return vbus_voltage < PD_V_SINK_DISCONNECT_MAX;
+		return vbus_voltage_cache[chgnum] <= PD_V_SINK_DISCONNECT_MAX;
+	case VBUS_SAFE0V:
+		return vbus_voltage_cache[chgnum] <= PD_V_SAFE0V_MAX;
 	default:
 		CPRINTS("%s: unrecognized vbus_level value: %d", __func__,
 			level);
