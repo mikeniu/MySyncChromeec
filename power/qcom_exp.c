@@ -228,6 +228,12 @@ enum power_on_event_t chipset_get_power_on_reason(void)
 	return power_on_reason;
 }
 
+int chipset_is_offmode_charging_wake(void)
+{
+	return (power_on_reason == POWER_ON_BY_AC_ON ||
+		power_on_reason == POWER_ON_BY_RTC_ALARM);
+}
+
 /**
  * Return values for check_for_power_off_event().
  */
