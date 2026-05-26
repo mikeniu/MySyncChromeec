@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0679968_4c154ece",
+        "filename": "util/egis/usb_comm.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T20:18:18Z",
+      "side": 1,
+      "message": "* **Leaky Abstraction in `UsbComm` Endpoints:** In `usb_comm.h`, `kEpOutBulk` (0x01) and `kEpInBulk` (0x81) are globally hardcoded, and `UsbComm::Send()` explicitly routes traffic to `kEpOutBulk`. However, `BootromComm` bypasses `Send()` entirely and calls `usb_.BulkWrite()` directly because it needs to write to endpoint `0x02` (`kBootromEpOutBulk`).  \n    \n* **Suggestion:** Remove the hardcoded endpoints from `UsbComm`. Make endpoints configurable either via the constructor `UsbComm(ctx, vid, pid, ep_in, ep_out)` or by passing them directly into `Send()` and `Receive()`.",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 145,
+        "endChar": 0
+      },
+      "revId": "817ae722586fc8ae52aaff59d5adcdb0dbc5b42a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
