@@ -95,6 +95,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "98a5c269_0a4aa17a",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T17:38:13Z",
+      "side": 1,
+      "message": "* **Missing Header File / Manual Forward Declarations:** `updater.cc` manually forward-declares `BuildFtCmd` and `SendBulkCommand`. This violates the DRY principle and bypasses the compiler\u0027s ability to catch signature mismatches. If `ft_scsi.cc` changes its interface, `updater.cc` will fail at link-time rather than compile-time.  \n    \n* *Suggestion:* Create an `ft_scsi.h` header file containing these declarations and `#include` it in both `ft_scsi.cc` and `updater.cc`.",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 80
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bfeddef5_1bb9c7e3",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 13
