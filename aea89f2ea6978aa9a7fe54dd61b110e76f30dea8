@@ -118,6 +118,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "30f2abee_59a2e199",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T17:38:44Z",
+      "side": 1,
+      "message": "Here is a Gemini-generated solution. Verify that it is correct before using:\n\n----\n\n### 1\\. Create `util/focaltech/ft_scsi.h`\n\nCreate this new file with standard include guards and the necessary dependencies.\n\n```c\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n\n#ifndef UTIL_FOCALTECH_FT_SCSI_H_\n#define UTIL_FOCALTECH_FT_SCSI_H_\n\n#include \u003carray\u003e\n#include \u003cchrono\u003e\n#include \u003ccstdint\u003e\n#include \u003cexpected\u003e\n#include \u003cspan\u003e\n\n#include \"usb_context.h\"\n\n// Builds a 16-byte FocalTech vendor-specific SCSI command.\nstd::array\u003cuint8_t, 16\u003e BuildFtCmd(uint8_t opcode, uint8_t subcmd,\n                                   uint32_t para2, uint32_t para3,\n                                   uint32_t para4, uint8_t sub_para);\n\n// Sends a SCSI command wrapped in a USB Mass Storage Bulk-Only Transfer (BOT).\nstd::expected\u003cvoid, FtError\u003e SendBulkCommand(const UsbDevice\u0026 device,\n                                             std::span\u003cconst uint8_t\u003e scsi_cmd,\n                                             std::span\u003cuint8_t\u003e data_buffer,\n                                             TransferDirection direction,\n                                             std::chrono::milliseconds timeout);\n\n#endif  // UTIL_FOCALTECH_FT_SCSI_H_\n\n```\n\n### 2\\. Update `util/focaltech/ft_scsi.cc`\n\nInclude the new header at the top of the file. This forces the compiler to verify that the function definitions in this file exactly match the signatures promised in the header.\n\n**Add the include:**\n\n```c\n#include \u003cendian.h\u003e\n\n#include \u003carray\u003e\n#include \u003ccstdint\u003e\n#include \u003ccstring\u003e\n#include \u003cspan\u003e\n\n#include \"ft_log.h\"\n#include \"ft_scsi.h\"     // \u003c--- Add this new include\n#include \"usb_context.h\"\n\n```\n\n### 3\\. Update `util/focaltech/updater.cc`\n\nRemove the fragile manual forward declarations and replace them with the new header.\n\n**Remove:**\n\n```c\nstd::array\u003cuint8_t, 16\u003e BuildFtCmd(uint8_t opcode, uint8_t subcmd,\n                                   uint32_t para2, uint32_t para3,\n                                   uint32_t para4, uint8_t sub_para);\nstd::expected\u003cvoid, FtError\u003e SendBulkCommand(const UsbDevice\u0026 device,\n                                             std::span\u003cconst uint8_t\u003e scsi_cmd,\n                                             std::span\u003cuint8_t\u003e data_buffer,\n                                             TransferDirection direction,\n                                             std::chrono::milliseconds timeout);\n\n```\n\n**Add the include:**\n\n```c\n#include \u003copenssl/sha.h\u003e\n\n#include \u003calgorithm\u003e\n#include \u003ccstdint\u003e\n#include \u003cfstream\u003e\n#include \u003cspan\u003e\n#include \u003cstring_view\u003e\n#include \u003cvector\u003e\n\n#include \"ft_log.h\"\n#include \"ft_scsi.h\"     // \u003c--- Add this new include\n#include \"ft_util.h\"\n#include \"usb_context.h\"\n\n```\n\nWith this infrastructure in place, the architecture is much cleaner.",
+      "parentUuid": "98a5c269_0a4aa17a",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 80
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bfeddef5_1bb9c7e3",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 13
