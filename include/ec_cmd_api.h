@@ -388,6 +388,7 @@ _CROS_EC_C1_F_PF_RF(EC_CMD_HOST_SLEEP_EVENT, host_sleep_event);
 _CROS_EC_C0_F_RF(EC_CMD_HOST_SLEEP_SIGNAL_TRANSITIONS,
 		 host_sleep_signal_transitions);
 _CROS_EC_C0_F_PF_RF(EC_CMD_I2C_CONTROL, i2c_control);
+_CROS_EC_C0_F_PF_RF(EC_CMD_I2C_PASSTHRU, i2c_passthru);
 _CROS_EC_C0_F_PF_RF(EC_CMD_I2C_PASSTHRU_PROTECT, i2c_passthru_protect);
 _CROS_EC_C0_F_RF(EC_CMD_KEYBOARD_FACTORY_TEST, keyboard_factory_test);
 _CROS_EC_CV_F_P_R(EC_CMD_LED_CONTROL, 1, led_control_v1, led_control,
@@ -410,6 +411,7 @@ _CROS_EC_CV_F_P(EC_CMD_OVERRIDE_DEDICATED_CHARGER_LIMIT, 0,
 _CROS_EC_C0_F_RF(EC_CMD_PCHG_COUNT, pchg_count);
 _CROS_EC_C0_F_PF_RF(EC_CMD_PDC_TRACE_MSG_ENABLE, pdc_trace_msg_enable);
 _CROS_EC_C0_F_RF(EC_CMD_PDC_TRACE_MSG_GET_ENTRIES, pdc_trace_msg_get_entries);
+_CROS_EC_C0_F_PF_RF(EC_CMD_PDC_UPDATE, pdc_update);
 _CROS_EC_CV_F_P(EC_CMD_PD_CHARGE_PORT_OVERRIDE, 0, pd_charge_port_override,
 		charge_port_override);
 _CROS_EC_CV_F_P_R(EC_CMD_PD_CHIP_INFO, 3, pd_chip_info_v3, pd_chip_info,

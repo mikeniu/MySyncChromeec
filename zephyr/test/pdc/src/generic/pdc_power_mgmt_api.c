@@ -3125,3 +3125,23 @@ ZTEST_USER(pdc_power_mgmt_api_suspended,
 	zassert_ok(pdc_power_mgmt_set_comms_state(false));
 }
 #endif /* !defined(CONFIG_TODO_B_345292002) */
+
+ZTEST_USER(pdc_power_mgmt_api, test_update_mode)
+{
+	int port;
+
+	/* 1. Start update mode */
+	zassert_ok(pdc_power_mgmt_update_start(TEST_PORT));
+	zassert_true(pdc_power_mgmt_is_update_mode(&port));
+	zassert_equal(TEST_PORT, port);
+
+	/* 2. Cannot start another update while one is active */
+	zassert_equal(-EBUSY, pdc_power_mgmt_update_start(TEST_PORT));
+
+	/* 3. Finish update mode */
+	zassert_ok(pdc_power_mgmt_update_finish(TEST_PORT));
+	zassert_false(pdc_power_mgmt_is_update_mode(NULL));
+
+	/* 4. Invalid port finish */
+	zassert_equal(-EINVAL, pdc_power_mgmt_update_finish(TEST_PORT));
+}

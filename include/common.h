@@ -19,8 +19,10 @@
 #include <zephyr/sys/util.h>
 #include <zephyr/toolchain.h>
 #ifdef CONFIG_TEST
+#ifndef TEST_BUILD
 #define TEST_BUILD
-#endif /* CONFIG_ZTEST */
+#endif
+#endif /* CONFIG_TEST */
 #endif /* CONFIG_ZEPHYR */
 
 #ifndef __THROW

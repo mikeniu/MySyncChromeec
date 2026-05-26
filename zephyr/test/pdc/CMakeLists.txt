@@ -11,6 +11,8 @@ add_subdirectory(${PLATFORM_EC}/zephyr/test/test_utils test_utils)
 
 zephyr_include_directories(include)
 
+zephyr_compile_definitions_ifdef(CONFIG_PLATFORM_EC_TEST_BUILD TEST_BUILD)
+
 target_sources(app PRIVATE src/main.c)
 target_sources(app PRIVATE src/fakes.c)
 
@@ -106,6 +108,7 @@ endif()
 if (DEFINED CONFIG_TEST_SUITE_PDC_HOSTCMD)
 	target_sources(app PRIVATE src/generic/pdc_host_cmd.c)
 	target_sources(app PRIVATE src/mock_pdc_power_mgmt.c)
+	target_sources(app PRIVATE ${PLATFORM_EC}/common/i2c_passthru.c)
 endif()
 
 if (DEFINED CONFIG_TEST_SUITE_UCSI_HOSTCMD)

@@ -370,6 +370,7 @@ tests:
     extra_configs:
     - CONFIG_TEST_SUITE_PDC_HOSTCMD=y
     - CONFIG_PLATFORM_EC_HOSTCMD_PD_CHIP_INFO=y
+    - CONFIG_PLATFORM_EC_USB_PD_CONTROLLER=y
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
 

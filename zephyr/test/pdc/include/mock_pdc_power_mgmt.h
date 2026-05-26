@@ -8,7 +8,7 @@
 
 #include <zephyr/fff.h>
 
-/* FFF fake declarations for select functions in `pdc_power_mgmt.c` */
+/* FFF fake declarations */
 
 DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_connector_reset, int,
 			enum connector_reset);
@@ -18,6 +18,8 @@ DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_get_connector_status, int,
 			union connector_status_t *);
 DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_get_info, int, struct pdc_info_t *,
 			bool);
+DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_get_hw_config, int,
+			struct pdc_hw_config_t *);
 DECLARE_FAKE_VALUE_FUNC(bool, pdc_power_mgmt_get_partner_data_swap_capable,
 			int);
 DECLARE_FAKE_VALUE_FUNC(enum pd_power_role, pdc_power_mgmt_get_power_role, int);
@@ -58,6 +60,10 @@ DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_set_bbr_cts, int, bool);
 DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_set_ap_power_state,
 			enum power_state);
 DECLARE_FAKE_VOID_FUNC(pdc_power_mgmt_simulate_power_button_press, int);
+DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_update_start, int);
+DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_update_finish, int);
+DECLARE_FAKE_VALUE_FUNC(bool, pdc_power_mgmt_is_update_mode, int *);
+DECLARE_FAKE_VALUE_FUNC(uint8_t, pdc_power_mgmt_get_usb_pd_port_count);
 
 /**
  * @brief Reset the above set of fakes

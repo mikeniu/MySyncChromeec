@@ -11802,6 +11802,158 @@ int cmd_pd_chip_info(int argc, char *argv[])
 	return 0;
 }
 
+int cmd_pdc_update(int argc, char *argv[])
+{
+	struct ec_params_pdc_update p;
+	struct ec_response_pdc_update r;
+	char *e;
+	int rv;
+
+	if (argc < 3) {
+		fprintf(stderr, "Usage: %s <port> <start|finish|status>\n",
+			argv[0]);
+		return -1;
+	}
+
+	p.port = strtol(argv[1], &e, 0);
+	if (e && *e) {
+		fprintf(stderr, "Bad port number.\n");
+		return -1;
+	}
+
+	if (!strcmp(argv[2], "start"))
+		p.subcmd = PDC_UPDATE_START;
+	else if (!strcmp(argv[2], "finish"))
+		p.subcmd = PDC_UPDATE_FINISH;
+	else if (!strcmp(argv[2], "status"))
+		p.subcmd = PDC_UPDATE_GET_STATUS;
+	else {
+		fprintf(stderr, "Unknown subcommand: %s\n", argv[2]);
+		return -1;
+	}
+
+	rv = ec_command(EC_CMD_PDC_UPDATE, 0, &p, sizeof(p), &r, sizeof(r));
+	if (rv < 0)
+		return rv;
+
+	if (p.subcmd == PDC_UPDATE_GET_STATUS) {
+		printf("Status: %s\n", r.status ? "In Update Mode" : "Normal");
+		if (r.status)
+			printf("Port:   %d\n", r.port);
+	}
+
+	return 0;
+}
+
+int cmd_pdc_passthru(int argc, char *argv[])
+{
+	struct ec_params_pdc_update update_p;
+	struct ec_response_pdc_update update_r;
+	struct ec_params_i2c_passthru *p;
+	struct ec_response_i2c_passthru *r;
+	char *e;
+	int rv, i;
+	int port, addr, read_len;
+	int write_len = 0;
+	uint8_t *buffer;
+	int buffer_size = 512;
+
+	if (argc < 4) {
+		fprintf(stderr,
+			"Usage: %s <port> <addr> <read_len> [write_bytes...]\n",
+			argv[0]);
+		return -1;
+	}
+
+	port = strtol(argv[1], &e, 0);
+	if (e && *e) {
+		fprintf(stderr, "Bad port number.\n");
+		return -1;
+	}
+
+	/* Get the I2C bus for this PDC port */
+	update_p.port = port;
+	update_p.subcmd = PDC_UPDATE_GET_STATUS;
+	rv = ec_command(EC_CMD_PDC_UPDATE, 0, &update_p, sizeof(update_p),
+			&update_r, sizeof(update_r));
+	if (rv < 0) {
+		fprintf(stderr, "Failed to get PDC config.\n");
+		return rv;
+	}
+
+	addr = strtol(argv[2], &e, 0);
+	if (e && *e) {
+		fprintf(stderr, "Bad address.\n");
+		return -1;
+	}
+
+	if (addr != update_r.i2c_addr) {
+		fprintf(stderr, "Address mismatch (expected 0x%02x)\n",
+			update_r.i2c_addr);
+		return -1;
+	}
+
+	read_len = strtol(argv[3], &e, 0);
+	if (e && *e) {
+		fprintf(stderr, "Bad read length.\n");
+		return -1;
+	}
+
+	write_len = argc - 4;
+
+	buffer = (uint8_t *)malloc(buffer_size);
+	if (!buffer)
+		return -1;
+
+	p = (struct ec_params_i2c_passthru *)buffer;
+	p->port = update_r.i2c_bus;
+	p->num_msgs = (read_len > 0 && write_len > 0) ? 2 : 1;
+
+	if (write_len > 0) {
+		p->msg[0].addr_flags = addr;
+		p->msg[0].len = write_len;
+		for (i = 0; i < write_len; i++) {
+			buffer[sizeof(*p) + p->num_msgs * sizeof(p->msg[0]) +
+			       i] = strtol(argv[4 + i], &e, 0);
+			if (e && *e) {
+				fprintf(stderr, "Bad write byte %d.\n", i);
+				free(buffer);
+				return -1;
+			}
+		}
+	}
+
+	if (read_len > 0) {
+		int msg_idx = (write_len > 0) ? 1 : 0;
+		p->msg[msg_idx].addr_flags = addr | EC_I2C_FLAG_READ;
+		p->msg[msg_idx].len = read_len;
+	}
+
+	rv = ec_command(EC_CMD_I2C_PASSTHRU, 0, p,
+			sizeof(*p) + p->num_msgs * sizeof(p->msg[0]) +
+				write_len,
+			buffer, buffer_size);
+
+	if (rv < 0) {
+		free(buffer);
+		return rv;
+	}
+
+	r = (struct ec_response_i2c_passthru *)buffer;
+	if (r->i2c_status) {
+		fprintf(stderr, "I2C error: %d\n", r->i2c_status);
+		free(buffer);
+		return -1;
+	}
+
+	for (i = 0; i < read_len; i++)
+		printf("0x%02x ", r->data[i]);
+	if (read_len > 0)
+		printf("\n");
+
+	free(buffer);
+	return 0;
+}
 int cmd_pd_write_log(int argc, char *argv[])
 {
 	struct ec_params_pd_write_log_entry p;
@@ -13184,6 +13336,12 @@ const struct command commands[] = {
 	{ "pdchipinfo", cmd_pd_chip_info,
 	  "<port>\n"
 	  "\tGet PD chip information." },
+	{ "pdcupdate", cmd_pdc_update,
+	  "<port> <start|finish|status>\n"
+	  "\tManage PDC firmware update session." },
+	{ "pdcpassthru", cmd_pdc_passthru,
+	  "<port> <addr> <read_len> [write_bytes...]\n"
+	  "\tSecure I2C passthru to PDC." },
 	{ "pdcontrol", cmd_pd_control,
 	  "[suspend|resume|reset|disable|on]\n"
 	  "\tControls the PD chip." },

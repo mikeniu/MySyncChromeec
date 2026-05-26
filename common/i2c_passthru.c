@@ -18,6 +18,7 @@
 
 #ifdef CONFIG_ZEPHYR
 #include "i2c/i2c.h"
+#include "usbc/pdc_power_mgmt.h"
 #endif
 
 #define CPUTS(outstr) cputs(CC_I2C, outstr)
@@ -158,6 +159,39 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 	 */
 	if (battery_is_cut_off())
 		return EC_RES_ACCESS_DENIED;
+#endif
+
+#ifdef CONFIG_PLATFORM_EC_USB_PD_CONTROLLER
+	/* REQ-EC-01: The EC acts as the security gatekeeper for the PDC.
+	 * Only allow passthru to PDC if it is in update mode.
+	 */
+	for (i = 0; i < board_get_usb_pd_port_count(); i++) {
+		struct pdc_hw_config_t hw;
+
+		if (pdc_power_mgmt_get_hw_config(i, &hw) == 0) {
+			if (hw.bus_type == PDC_BUS_TYPE_I2C) {
+				int pdc_ec_port = i2c_get_port_from_device(
+					hw.i2c.bus);
+
+				if (pdc_ec_port == port) {
+					for (int m = 0; m < params->num_msgs;
+					     m++) {
+						if (hw.i2c.addr ==
+						    (params->msg[m].addr_flags &
+						     EC_I2C_ADDR_MASK)) {
+							int update_port;
+
+							if (!pdc_power_mgmt_is_update_mode(
+								    &update_port) ||
+							    update_port != i) {
+								return EC_RES_ACCESS_DENIED;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 #endif
 
 	i2c_port = get_i2c_port(port);
