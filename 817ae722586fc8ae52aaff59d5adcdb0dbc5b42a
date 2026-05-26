@@ -212,6 +212,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4e957beb_9f04d17f",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T21:24:26Z",
+      "side": 1,
+      "message": "We should be using an enum instead of string for this. Here\u0027s Gemini-generated code to fix. Review for correctness:\n\n----\n\nUsing a `std::string` to track internal application state is often called \"stringly-typed programming.\" It violates the principle of strong typing and opens the door to silent bugs (e.g., a typo like `if (config.mode \u003d\u003d \"flash_fw\")` will compile perfectly but fail at runtime).\n\nThe Google C++ Style Guide prefers `enum class` for this exact scenario. Transitioning to an enum brings three major benefits:\n\n1. **Type Safety:** You can only assign valid modes to the config.  \n2. **Exhaustiveness Checking:** If you use a `switch` statement in `main()` without a `default` case, the compiler will warn you if you ever add a new mode to the enum but forget to handle it.  \n3. **Simpler Parsing:** You eliminate string allocations and string comparisons.\n\nHere is how to seamlessly swap it out.\n\n### 1\\. Define the Enum and Update the Config\n\nAdd the `AppMode` enum right above your `AppConfig` struct, and replace the string. Introduce a `kUnknown` or `kNone` state to represent the uninitialized state.\n\n```c\nenum class AppMode {\n  kNone,\n  kFlashFw,\n  kFlashCmd,\n};\n\nstruct AppConfig {\n  AppMode mode \u003d AppMode::kNone; // Replaces std::string mode;\n  std::string fw_path;\n  std::string key_path;\n  EgisCryptoType algo_type \u003d EgisCryptoType::kSha256;\n  uint32_t flash_offset \u003d 0x00001000;\n  uint32_t fw_size_override \u003d 0;\n  bool dump_cmd_fw \u003d false;\n};\n\n```\n\n### 2\\. Update `ParseArgs`\n\nSince your CLI parser uses `-f` for firmware and `-c` for commands, you don\u0027t even need to parse strings. You just set the enum directly when the flag is hit.\n\n```c\nstd::optional\u003cAppConfig\u003e ParseArgs(int argc, char *argv[]) {\n  AppConfig config;\n  // ... option definitions ...\n\n  while ((opt \u003d getopt_long_only(argc, argv, \"f:c:a:k:o:s:dh\", long_options, nullptr)) !\u003d -1) {\n    switch (opt) {\n      case \u0027f\u0027:\n        config.mode \u003d AppMode::kFlashFw;\n        config.fw_path \u003d optarg;\n        break;\n      case \u0027c\u0027:\n        config.mode \u003d AppMode::kFlashCmd;\n        config.fw_path \u003d optarg;\n        break;\n      // ... rest of the cases ...\n    }\n  }\n\n  // ... \n\n  if (config.mode \u003d\u003d AppMode::kNone) {\n    std::println(stderr, \"[ERROR] You must specify a mode (--flashfw, --flashcmd)\");\n    PrintHelp(argv[0]);\n    return std::nullopt;\n  }\n\n  if (config.mode \u003d\u003d AppMode::kFlashFw \u0026\u0026 config.algo_type \u003d\u003d EgisCryptoType::kAesGcm \u0026\u0026\n      config.key_path.empty()) {\n    std::println(stderr, \"[ERROR] AESGCM requires a key file...\");\n    return std::nullopt;\n  }\n\n  return config;\n}\n\n```\n\n### 3\\. Update `main()` with a Switch\n\nReplace the `if/else if` chain with a `switch` statement.\n\n```c\nint main(int argc, char *argv[]) {\n  // ... parse args, connect USB ...\n\n  std::expected\u003cvoid, egis::AppError\u003e status;\n\n  // 4. Dispatch to chosen mode using exhaustive switch\n  switch (config.mode) {\n    case egis::AppMode::kFlashFw:\n      status \u003d egis::RunFlashFw(config, brom);\n      break;\n    case egis::AppMode::kFlashCmd:\n      status \u003d egis::RunFlashCmd(config, boot_comm);\n      break;\n    case egis::AppMode::kNone:\n      // This should be caught by ParseArgs, but handled here for completeness\n      status \u003d std::unexpected(egis::AppError::kInvalidArgs);\n      break;\n  }\n\n  // 5. Final exit handling\n  if (status.has_value()) {\n    if (auto res \u003d brom.SystemReset(); !res) {\n      std::println(stderr, \"[WARN] System reset command failed: {}\",\n                   egis::ToString(res.error()));\n    }\n    return EXIT_SUCCESS;\n  }\n\n  return EXIT_FAILURE;\n}\n\n```",
+      "range": {
+        "startLine": 382,
+        "startChar": 0,
+        "endLine": 382,
+        "endChar": 32
+      },
+      "revId": "817ae722586fc8ae52aaff59d5adcdb0dbc5b42a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d0679968_4c154ece",
         "filename": "util/egis/usb_comm.cc",
         "patchSetId": 21
