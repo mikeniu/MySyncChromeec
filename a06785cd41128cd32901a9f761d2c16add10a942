@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1a4ebd5_08aa2de3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1564607
+      },
+      "writtenOn": "2026-05-26T14:16:10Z",
+      "side": 1,
+      "message": "In a sense, yes. That is unless we change the existing behavior, which is: go to sleep from the lock screen. Unless we can use the lid open/close (which we can\u0027t because of the way DUTs are stored in factory flow) we can\u0027t really force the device to suspend properly. This seems the closest approximation we can get.",
+      "parentUuid": "7f219047_d497b78d",
+      "revId": "a06785cd41128cd32901a9f761d2c16add10a942",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "fd363c8e_7b69f8a1",
