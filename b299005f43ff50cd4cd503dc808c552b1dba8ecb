@@ -1,6 +1,29 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c0d25bb_57274277",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-26T20:15:10Z",
+      "side": 1,
+      "message": "The capitalized MIN/MAX evaluate the arguments twice, leading to hard to debug issues if one of the arguments is a function call with side effects.\n\nUpstream still has lowercase min/max, but the definition got moved to \"\u003czephyr/sys/minmax.h\u003e\".\n\nYou just need to add the new include.",
+      "range": {
+        "startLine": 7,
+        "startChar": 21,
+        "endLine": 7,
+        "endChar": 24
+      },
+      "revId": "b299005f43ff50cd4cd503dc808c552b1dba8ecb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "8c2e7d67_cbe481f5",
