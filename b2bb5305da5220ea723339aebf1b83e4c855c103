@@ -51,6 +51,24 @@
       "parentUuid": "824ea07a_a566857c",
       "revId": "b2bb5305da5220ea723339aebf1b83e4c855c103",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42e34136_0af07379",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4495208
+      },
+      "writtenOn": "2026-05-26T07:50:27Z",
+      "side": 1,
+      "message": "For this unitest command and default command, latest version was able to pass.And presubmit has no more errors.\n./twister -ivc -s drivers.default",
+      "parentUuid": "1703a097_84513899",
+      "revId": "b2bb5305da5220ea723339aebf1b83e4c855c103",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
