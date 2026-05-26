@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43b70400_bf74c4f5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 31
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-26T16:49:07Z",
+      "side": 1,
+      "message": "Please fix formatting errors by running\n`cros format zephyr/drivers/wot/wot.c`",
+      "revId": "469d9cf3723e5bccc9a9690e41e3a2ffa8c8fcae",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
