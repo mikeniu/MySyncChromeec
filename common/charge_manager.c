@@ -238,7 +238,7 @@ static bool is_valid_override_port(int port)
 
 int pd_is_connected(int port)
 {
-	return 0;
+	return 1;
 }
 
 static int is_connected(int port)
