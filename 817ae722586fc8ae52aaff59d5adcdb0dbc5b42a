@@ -73,6 +73,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f58809b9_d7a6ab54",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 626,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T21:11:23Z",
+      "side": 1,
+      "message": "Let\u0027s use `struct`s for all data transfers. Here is Gemini-generated code to fix it. Review for correctness:\n\n----\n\n**The Rationale:** Currently, both of these functions take the raw `std::vector\u003cuint8_t\u003e` response from the USB transfer and use `reinterpret_cast` to overlay a typed struct pointer (`BootromInfoResponse` or `FlashInfoResponse`). This violates C++ strict aliasing rules. We will replace this with the standard-compliant `ReadStruct` helper to safely copy the bytes into local, typed structs.\n\n**The Implementation (`bootrom.cc`):**\n\n```c\nstd::expected\u003cvoid, BootromError\u003e BootromComm::GetBootromInfo() {\n  std::vector\u003cuint8_t\u003e cmd \u003d {EgisBootrom::kCmdGetBootInfo};\n  auto resp \u003d SendBootromCommand(cmd);\n  if (!resp) return std::unexpected(resp.error());\n\n  // Safely extract the response using ReadStruct\n  auto info_res \u003d ReadStruct\u003cEgisBootrom::BootromInfoResponse\u003e(*resp);\n  if (!info_res) {\n    return std::unexpected(BootromError::kResponseTruncated);\n  }\n  \n  EgisBootrom::BootromInfoResponse info \u003d info_res.value();\n\n  std::println(\"Bootrom Version: 0x{:x}\", FromLittleEndian(info.version));\n  std::println(\"Max Command Size: {} bytes\", FromLittleEndian(info.max_cmd_size));\n  std::println(\"Max FW Upgrade Size: {} bytes\", FromLittleEndian(info.max_fw_upgrade_size));\n  \n  return {};\n}\n\nstd::expected\u003cvoid, BootromError\u003e BootromComm::GetFlashInfo() {\n  std::vector\u003cuint8_t\u003e cmd \u003d {EgisBootrom::kCmdFlashInfo};\n  std::println(\"--- Fetching Flash Information ---\");\n\n  auto resp \u003d SendBootromCommand(cmd);\n  if (!resp) {\n    std::println(stderr, \"[ERROR] Unable to retrieve Flash info.\");\n    return std::unexpected(resp.error());\n  }\n\n  // Safely extract the response using ReadStruct\n  auto info_res \u003d ReadStruct\u003cEgisBootrom::FlashInfoResponse\u003e(*resp);\n  if (!info_res) {\n    std::println(stderr, \"[ERROR] Response length insufficient: {}\", resp-\u003esize());\n    return std::unexpected(BootromError::kResponseTruncated);\n  }\n\n  EgisBootrom::FlashInfoResponse info \u003d info_res.value();\n\n  std::array\u003cchar, 9\u003e prod_name{};\n  std::memcpy(prod_name.data(), info.prod_name, 8);\n  uint32_t flash_size \u003d FromLittleEndian(info.flash_size);\n\n  std::println(\"[SUCCESS] Flash Data Received:\");\n  std::println(\"  Product Name  : {}\", prod_name.data());\n  std::println(\"  Flash Size  : {} bytes ({} MB)\", flash_size, flash_size / 1024 / 1024);\n  \n  return {};\n}\n\n```",
+      "range": {
+        "startLine": 610,
+        "startChar": 0,
+        "endLine": 626,
+        "endChar": 12
+      },
+      "revId": "817ae722586fc8ae52aaff59d5adcdb0dbc5b42a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4e178f3f_c99f8699",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 21
