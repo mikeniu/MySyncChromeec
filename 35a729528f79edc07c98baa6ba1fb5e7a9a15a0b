@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c6b23f8_6476efee",
+        "filename": "common/power_button.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-26T15:31:31Z",
+      "side": 1,
+      "message": "POWER_BUTTON_SHORTPRESS",
+      "range": {
+        "startLine": 299,
+        "startChar": 10,
+        "endLine": 299,
+        "endChar": 13
+      },
+      "revId": "35a729528f79edc07c98baa6ba1fb5e7a9a15a0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "790e34d2_6dbafcd0",
+        "filename": "common/power_button.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-26T15:31:31Z",
+      "side": 1,
+      "message": "This should probably be configurable. POWER_BUTTON_SHORTPRESS could be the default when unspecified.",
+      "revId": "35a729528f79edc07c98baa6ba1fb5e7a9a15a0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc81c44c_57fb6bd7",
+        "filename": "common/power_button.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-26T15:31:31Z",
+      "side": 1,
+      "message": "No check for first_after_ms \u003c\u003d second_after_ms. Perhaps this is ok, but the params should probably be renamed to power_button_press_1_delay_ms and power_button_press_2_delay_ms if order is not being enforced.",
+      "revId": "35a729528f79edc07c98baa6ba1fb5e7a9a15a0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae4be917_249cdaef",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 6151,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-26T15:31:31Z",
+      "side": 1,
+      "message": "I think it\u0027s worth making this new command more generic so it could be used for other scenarios like long press shutdown followed by short press to boot. \n\ne.g. rename to EC_CMD_POWER_BUTTON_PRESS, add first_press_duration_ms and second_press_duration_ms, make the parameters optional.",
+      "revId": "35a729528f79edc07c98baa6ba1fb5e7a9a15a0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2492d531_9f56e966",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 6156,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-26T15:31:31Z",
+      "side": 1,
+      "message": "nit: I think \"delay\" is more idiomatic than \"after\"",
+      "revId": "35a729528f79edc07c98baa6ba1fb5e7a9a15a0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8f9b420_4e04da4f",
+        "filename": "util/ectool.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 13212,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-26T15:31:31Z",
+      "side": 1,
+      "message": "Please make the command more verbos, e.g. pwrbtn_double_press.",
+      "revId": "35a729528f79edc07c98baa6ba1fb5e7a9a15a0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
