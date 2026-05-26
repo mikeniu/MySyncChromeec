@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3e9d54b_0ce3a382",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-05-26T20:23:02Z",
+      "side": 1,
+      "message": "This was introduced in https://crrev.com/c/7080810; you can see more details in that CL\u0027s commit message.\n\nThat said, each of these usages seem safe to use the double-evaluating uppercase Zephyr macros",
+      "parentUuid": "3c0d25bb_57274277",
+      "range": {
+        "startLine": 7,
+        "startChar": 21,
+        "endLine": 7,
+        "endChar": 24
+      },
+      "revId": "b299005f43ff50cd4cd503dc808c552b1dba8ecb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "8c2e7d67_cbe481f5",
