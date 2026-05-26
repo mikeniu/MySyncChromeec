@@ -132,6 +132,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0c9d1ed6_5fa97362",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-05-26T08:39:23Z",
+      "side": 1,
+      "message": "Or actually it is not. It might cause deadlock when timer handler would be waiting for already acquired mutex. Check if timer expired in the handler should be sufficient.",
+      "parentUuid": "bfa574ef_2fabb299",
+      "range": {
+        "startLine": 95,
+        "startChar": 1,
+        "endLine": 95,
+        "endChar": 24
+      },
+      "revId": "6b287ec2f838e4ab139e96943ce790929c6f3b21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6440ea3c_3ce6a70d",
         "filename": "common/fpsensor/fpsensor_led.cc",
         "patchSetId": 15
