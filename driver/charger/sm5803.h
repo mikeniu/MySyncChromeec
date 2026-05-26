@@ -162,6 +162,11 @@ enum sm5803_gpio0_modes {
  */
 #define SM5803_VBUS_LOW_LEVEL 0x25
 #define SM5803_VBUS_HIGH_LEVEL 0x2C
+#define SM5803_VBUS_SAFE0V_LEVEL 0x08 /* ~0.8V */
+#define SM5803_VBUS_REMOVED_LEVEL 0x27 /* ~3.7V */
+#define SM5803_VBUS_PRESENT_LEVEL 0x33 /* ~4.75V */
+#define SM5803_VBUS_MAX_LEVEL 0xFF
+#define SM5803_VBUS_MIN_LEVEL 0x00
 
 /*
  * TINT thresholds.  TINT steps are in 0.43 K with the upper threshold set to
@@ -502,6 +507,7 @@ enum ec_error_list sm5803_configure_gpio0(int chgnum,
 enum ec_error_list sm5803_set_gpio0_level(int chgnum, int level);
 enum ec_error_list sm5803_configure_chg_det_od(int chgnum, int enable);
 enum ec_error_list sm5803_get_chg_det(int chgnum, int *chg_det);
+enum ec_error_list sm5803_get_vbus_voltage(int chgnum, int port, int *voltage);
 
 /* Expose Vbus discharge function */
 enum ec_error_list sm5803_set_vbus_disch(int chgnum, int enable);
