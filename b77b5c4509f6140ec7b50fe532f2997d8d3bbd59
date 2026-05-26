@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ed40cdd1_8155d2c5",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-05-26T07:07:11Z",
+      "side": 1,
+      "message": "I think that is OK to use `mpu_config.num_regions` if `CONFIG_NULL_POINTER_EXCEPTION_DETECTION_MPU` is not enabled and no other MPU region is defined in devicetree. So I just removed the comment.",
+      "parentUuid": "b5051883_93b3124a",
+      "range": {
+        "startLine": 32,
+        "startChar": 1,
+        "endLine": 36,
+        "endChar": 6
+      },
+      "revId": "b77b5c4509f6140ec7b50fe532f2997d8d3bbd59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cfc00122_5c0a6b4d",
         "filename": "zephyr/shim/core/cortex-m/mpu.c",
         "patchSetId": 3
@@ -49,6 +73,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cb03cdc5_a1593ff9",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-05-26T07:07:11Z",
+      "side": 1,
+      "message": "Actually, I don\u0027t quite understand the purpose of this function mpu_enable(). The MPU has already been configured and enabled during the Zephyr initialization phase, but this function re-enables it.",
+      "parentUuid": "cfc00122_5c0a6b4d",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 56
+      },
+      "revId": "b77b5c4509f6140ec7b50fe532f2997d8d3bbd59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "948f43f4_72f50ec9",
         "filename": "zephyr/shim/core/cortex-m/mpu.c",
         "patchSetId": 3
@@ -60,6 +108,30 @@
       "writtenOn": "2026-05-21T18:25:29Z",
       "side": 1,
       "message": "* **Issue:** The file is becoming heavily fragmented with \\#if defined(CONFIG\\_CPU\\_CORTEX\\_M33) and \\#else blocks inside function bodies (e.g., mpu\\_enable, mpu\\_lock\\_rollback).  \n* **Suggestion:** To improve maintainability, consider abstracting the architecture-specific MPU register manipulations into static inline helper functions. For example:\n\n```c\nstatic inline void mpu_arch_enable_region_by_id(int region_id) {\n#if defined(CONFIG_CPU_CORTEX_M33)\n    MPU-\u003eRNR \u003d region_id;\n    MPU-\u003eRLAR |\u003d MPU_RLAR_EN_Msk;\n#else\n    MPU-\u003eRNR \u003d region_id;\n    MPU-\u003eRASR |\u003d MPU_RASR_ENABLE_Msk;\n#endif\n}\n```",
+      "range": {
+        "startLine": 31,
+        "startChar": 1,
+        "endLine": 65,
+        "endChar": 2
+      },
+      "revId": "b77b5c4509f6140ec7b50fe532f2997d8d3bbd59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e885e443_3f6214db",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-05-26T07:07:11Z",
+      "side": 1,
+      "message": "OK, modified",
+      "parentUuid": "948f43f4_72f50ec9",
       "range": {
         "startLine": 31,
         "startChar": 1,

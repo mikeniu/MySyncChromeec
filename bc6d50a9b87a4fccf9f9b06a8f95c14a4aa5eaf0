@@ -91,6 +91,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "53e60f90_44139247",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-05-26T07:07:11Z",
+      "side": 1,
+      "message": "Add a `BUILD_ASSERT` to check if the two rollback region is contiguous.",
+      "parentUuid": "1eea4b7a_27bfce95",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f25dfe15_e946d95d",
         "filename": "zephyr/shim/core/cortex-m/mpu.c",
         "patchSetId": 2
@@ -173,6 +191,24 @@
       "side": 1,
       "message": "Can you add a comment explaining this?",
       "parentUuid": "9b878d50_8b1e72c8",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b4484a5_cd031304",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-05-26T07:07:11Z",
+      "side": 1,
+      "message": "I have added a comment about this.\nHowever, this configuration causes MPU-related tests (such as rollback_region) to consistently fail because the tests are running in privileged mode, so MPU errors cannot be triggered when running these tests. And I noticed that the FPMCU applications do not enable `CONFIG_USERSPACE`, so the MPU\u0027s protection function is unlikely to be working. Do you have any idea about it?",
+      "parentUuid": "1baf009c_92e8e96e",
       "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
