@@ -39,6 +39,92 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "b299005f43ff50cd4cd503dc808c552b1dba8ecb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1ef5eb5_85b815e1",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-05-26T20:20:28Z",
+      "side": 1,
+      "message": "```suggestion\n#include \u003czephyr/smf.h\u003e\n#include \u003czephyr/sys/minmax.h\u003e\n#include \u003czephyr/sys/util.h\u003e\n```",
+      "range": {
+        "startLine": 20,
+        "startChar": 23,
+        "endLine": 21,
+        "endChar": 30
+      },
+      "revId": "b299005f43ff50cd4cd503dc808c552b1dba8ecb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e344c54_b220f669",
+        "filename": "zephyr/drivers/usbc/tps6699x_cmd.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-05-26T20:20:28Z",
+      "side": 1,
+      "message": "```suggestion\n#include \u003czephyr/logging/log.h\u003e\n#include \u003czephyr/sys/minmax.h\u003e\n#include \u003czephyr/sys/util.h\u003e\n```",
+      "range": {
+        "startLine": 21,
+        "startChar": 31,
+        "endLine": 22,
+        "endChar": 30
+      },
+      "revId": "b299005f43ff50cd4cd503dc808c552b1dba8ecb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d94b880c_62a1fbc0",
+        "filename": "zephyr/shim/src/hooks.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-05-26T20:20:28Z",
+      "side": 1,
+      "message": "```suggestion\n#include \u003czephyr/sys/minmax.h\u003e\n#include \u003czephyr/sys/util.h\u003e\n```",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 30
+      },
+      "revId": "b299005f43ff50cd4cd503dc808c552b1dba8ecb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6712445d_4065cd39",
+        "filename": "zephyr/subsys/ucsi/ppm_console.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-05-26T20:20:28Z",
+      "side": 1,
+      "message": "Unrelated to this change, so can be done later, but not sure why we are using a quoted include instead of a system include?\n\nLooks like we are inconsistent in other places too: https://source.corp.google.com/search?q\u003d%5C%22zephyr%2Fsys%2Futil.h%5C%22\u0026sq\u003d(repo:chrome-internal%2Fchromeos%2Fsuperproject%20branch:main%20OR%20git:chromium%2Finfra%2Finfra_superproject@main)%20-f:gen%2Farm-generic%2Fchroot%20-f:release-firmware%20-f:labpack%20-f:infra%2Fautotest-drone\n\nBut I don\u0027t see a local override in our project, wondering if there was in the shim and we deleted it as a part of the EC split?",
+      "revId": "b299005f43ff50cd4cd503dc808c552b1dba8ecb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
