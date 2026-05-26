@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff8723c5_6e770831",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-26T06:15:47Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 22.",
+      "parentUuid": "5c955cf2_06cd650d",
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b6ed3e86_deeeff62",
@@ -49,6 +67,30 @@
       "writtenOn": "2026-05-22T17:04:06Z",
       "side": 1,
       "message": "Let\u0027s remove this comment. It was just there to help you understand when the code was shared.",
+      "range": {
+        "startLine": 30,
+        "startChar": 45,
+        "endLine": 30,
+        "endChar": 78
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed35df7f_1d17d1c8",
+        "filename": "util/elan/file_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-26T06:15:47Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 22.",
+      "parentUuid": "b6ed3e86_deeeff62",
       "range": {
         "startLine": 30,
         "startChar": 45,
@@ -82,6 +124,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "27909d63_950b7acd",
+        "filename": "util/elan/file_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-26T06:15:47Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 22.",
+      "parentUuid": "876d39e6_7e134747",
+      "range": {
+        "startLine": 43,
+        "startChar": 16,
+        "endLine": 43,
+        "endChar": 79
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b172b9f2_a1b7d33b",
@@ -95,6 +161,30 @@
       "writtenOn": "2026-05-22T16:41:29Z",
       "side": 1,
       "message": "Is this used anywhere? If not, just remove it rather than commenting it out.",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 36
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "acb2eb8b_285e16cf",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-26T06:15:47Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 22.",
+      "parentUuid": "b172b9f2_a1b7d33b",
       "range": {
         "startLine": 18,
         "startChar": 0,
@@ -128,6 +218,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35c63745_06c813fd",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-26T06:15:47Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 22.",
+      "parentUuid": "55f48c74_187e2f75",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 40
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8960bc9c_cf19f893",
@@ -141,6 +255,30 @@
       "writtenOn": "2026-05-22T17:04:06Z",
       "side": 1,
       "message": "In `RunIapProcess`, the ROM address is hardcoded twice using a magic number:\n\n```c\n  if (auto res \u003d SetRomAddress(0x0000); !res)\n\n```\n\n* **Recommendation:** Define a constant (e.g., `constexpr uint32_t kBaseRomAddress \u003d 0x0000;`) in `iap_control.h` or in the anonymous namespace, and use it in both the Read and Write phases.",
+      "range": {
+        "startLine": 106,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 45
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a10dd03_06f39e37",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-26T06:15:47Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 22.",
+      "parentUuid": "8960bc9c_cf19f893",
       "range": {
         "startLine": 106,
         "startChar": 0,
@@ -174,6 +312,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "924b695c_e7079065",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-26T06:15:47Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 22.",
+      "parentUuid": "e247bddf_1dad0a9b",
+      "range": {
+        "startLine": 109,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 58
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f2b4717c_dd281574",
@@ -187,6 +349,30 @@
       "writtenOn": "2026-05-22T17:00:28Z",
       "side": 1,
       "message": "There is a massive opportunity to DRY up the command formatting. If you look at `iap_control.cc`, you have six different functions that do the exact same thing: initialize an 8-byte array, set the first byte to a command code, put a 32-bit payload at byte offset 4, and send it.\n\nYou can cut out nearly 60 lines of boilerplate by implementing two small helper functions and taking advantage of **tail returns** for `std::expected`.\n\n### 1. The Command Helpers\n\nAdd these two private methods to `IapControl`:\n\n```cpp\nstd::expected\u003cvoid, IapError\u003e IapControl::SendCmdOnly(uint8_t cmd_code) {\n  uint8_t data_send[kEp1Length] \u003d {cmd_code};\n  return IapCommand(data_send);\n}\n\nstd::expected\u003cvoid, IapError\u003e IapControl::SendCmdWithU32Payload(\n    uint8_t cmd_code, uint32_t payload) {\n  uint8_t data_send[kEp1Length] \u003d {};\n  data_send[0] \u003d cmd_code;\n\n  if (auto res \u003d Set32Le(std::span\u003cuint8_t\u003e(data_send + 4, 4), payload); !res) {\n    return res;\n  }\n\n  return IapCommand(data_send);\n}\n\n```\n\n*Note on tail returns:* Notice how we just do `return IapCommand(...)` at the end instead of checking `!res` and returning `std::unexpected(res.error())` or `{}`? Because the return types match exactly (`std::expected\u003cvoid, IapError\u003e`), you can just return the result of the inner function directly.\n\n### 2. Refactoring the Callers\n\nNow you can collapse eight different functions down to single-liners.\n\n**Commands with a 32-bit Payload:**\n\n```cpp\nstd::expected\u003cvoid, IapError\u003e IapControl::WriteRom(uint32_t length) {\n  return SendCmdWithU32Payload(kCmdWriteRom, length);\n}\n\nstd::expected\u003cvoid, IapError\u003e IapControl::WriteRomFinish(uint32_t checksum) {\n  return SendCmdWithU32Payload(kCmdWriteRomFinish, checksum);\n}\n\nstd::expected\u003cvoid, IapError\u003e IapControl::SetRomAddress(uint32_t address) {\n  return SendCmdWithU32Payload(kCmdSetRomAddress, address);\n}\n\nstd::expected\u003cvoid, IapError\u003e IapControl::ReadRom(uint32_t length) {\n  return SendCmdWithU32Payload(kCmdReadRom, length);\n}\n\nstd::expected\u003cvoid, IapError\u003e IapControl::ReadRomFinish(uint32_t checksum) {\n  return SendCmdWithU32Payload(kCmdReadRomFinish, checksum);\n}\n\nstd::expected\u003cvoid, IapError\u003e IapControl::FinishIap(uint32_t checksum) {\n  return SendCmdWithU32Payload(kCmdFinishedIap, checksum);\n}\n\n```\n\n**Commands without a Payload:**\n\n```cpp\nstd::expected\u003cvoid, IapError\u003e IapControl::SoftwareReset() {\n  return SendCmdOnly(kCmdSoftwareReset);\n}\n\nstd::expected\u003cvoid, IapError\u003e IapControl::AbortProcess() {\n  return SendCmdOnly(kCmdAbortProcess);\n}\n\n```\n\n**Custom Payload (RunIap):**\n`RunIap` sets a `uint8_t` payload at index 4 instead of a 32-bit one, so it can\u0027t use the `U32` helper, but you can still use the direct return trick:\n\n```cpp\nstd::expected\u003cvoid, IapError\u003e IapControl::RunIap(uint8_t iap_mode) {\n  uint8_t data_send[kEp1Length] \u003d {};\n  data_send[0] \u003d kCmdRunIap;\n  data_send[4] \u003d iap_mode;\n  return IapCommand(data_send);\n}\n\n```\n\nBy adding those two helpers and returning `std::expected` directly, you remove dozens of redundant array initializations and identical error-checking blocks, making the protocol logic much easier to read at a glance.",
+      "range": {
+        "startLine": 236,
+        "startChar": 0,
+        "endLine": 249,
+        "endChar": 0
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4dd8623a_24d573a3",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-26T06:15:47Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 22.",
+      "parentUuid": "f2b4717c_dd281574",
       "range": {
         "startLine": 236,
         "startChar": 0,
@@ -220,6 +406,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e36f9882_d021f76f",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 488,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-26T06:15:47Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 22.",
+      "parentUuid": "f2f2ca05_3062b6dc",
+      "range": {
+        "startLine": 478,
+        "startChar": 1,
+        "endLine": 488,
+        "endChar": 53
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0c8cfa87_654efad9",
@@ -243,6 +453,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5df93536_adeb6922",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-26T06:15:47Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 22.",
+      "parentUuid": "0c8cfa87_654efad9",
+      "range": {
+        "startLine": 507,
+        "startChar": 1,
+        "endLine": 521,
+        "endChar": 3
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3a3747c0_4e0447a6",
@@ -256,6 +490,30 @@
       "writtenOn": "2026-05-22T16:55:09Z",
       "side": 1,
       "message": "In a few places (like `IapControl::ReleaseResource` and `IapSendCommand`), there are checks against the size of containers:\n\n```c\nif (buff.size() \u003d\u003d 0) return std::unexpected(IapError::BufferEmpty);\nif (hid_interfaces_.size() \u003d\u003d 0) return {};\n\n```\n\nIdiomatic C++ heavily prefers `.empty()`:\n\n```c\nif (buff.empty()) return std::unexpected(IapError::BufferEmpty);\nif (hid_interfaces_.empty()) return {};\n\n```\n\n*Why it\u0027s better:* It reads more like English, and for some complex container types (like `std::forward_list`), `size()` is $O(N)$ whereas `empty()` is always `O(1)`. While `std::span` and `std::vector` sizes are `O(1)`, using `empty()` is a good universal habit.",
+      "range": {
+        "startLine": 629,
+        "startChar": 0,
+        "endLine": 629,
+        "endChar": 45
+      },
+      "revId": "13647d998b1aaa5b4d0ef7b7dfa09da41b48ec6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "737f19c9_5bd9cf1b",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 629,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-05-26T06:15:47Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 22.",
+      "parentUuid": "3a3747c0_4e0447a6",
       "range": {
         "startLine": 629,
         "startChar": 0,
