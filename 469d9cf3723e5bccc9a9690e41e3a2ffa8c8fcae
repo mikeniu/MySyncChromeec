@@ -16,6 +16,29 @@
       "message": "Please fix formatting errors by running\n`cros format zephyr/drivers/wot/wot.c`",
       "revId": "469d9cf3723e5bccc9a9690e41e3a2ffa8c8fcae",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f57ba45_63eb96f1",
+        "filename": "zephyr/dts/bindings/wot/cros-ec,wot.yaml",
+        "patchSetId": 31
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-26T17:00:21Z",
+      "side": 1,
+      "message": "Adding a GPIO to check the AP power state needs more justification.\nDiscussion moved to b/444942125#comment14",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 51
+      },
+      "revId": "469d9cf3723e5bccc9a9690e41e3a2ffa8c8fcae",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
