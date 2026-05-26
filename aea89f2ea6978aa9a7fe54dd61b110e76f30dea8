@@ -95,6 +95,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bfeddef5_1bb9c7e3",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T17:26:33Z",
+      "side": 1,
+      "message": "* **Rationale:** The `SendBulkCommand` wrapper function relies on an `int is_data_in` parameter to dictate the USB transfer type. However, caller sites pass a confusing mix of boolean values (`true`/`false`) for standard read/write operations and a macro integer (`kUsbSendOnly` \\\u003d 2\\) for device resets. Relying on an integer to juggle multiple semantic states (boolean logic mixed with macro constants) undermines type safety and makes the function\u0027s contract unintuitive.  \n* **Fix:** Introduce a strongly typed enum for the data direction to eliminate ambiguity:\n\n```c\nenum class TransferDirection { \n    kIn, \n    kOut, \n    kSendOnly \n};\n\n```\n\nUpdate the `SendBulkCommand` signature to accept `TransferDirection direction` instead of `int is_data_in`, and replace all `true`, `false`, and `kUsbSendOnly` arguments at the invocation sites in `ft_scsi.cc` and `updater.cc` with their respective enum values.",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 67
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "29cdfc18_4962a143",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 13
