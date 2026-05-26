@@ -535,6 +535,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "51a08d21_4b8bd785",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T18:06:08Z",
+      "side": 1,
+      "message": "The `goto cleanup;` pattern—often called the \"single exit point\" or \"goto error\" pattern—is a staple of Linux kernel C programming. However, in modern C++, it is heavily discouraged because it breaks control flow visibility and bypasses the language\u0027s built-in scope management.\n\nIn modern C++, there are two primary ways to replace this:\n\n1. **RAII (Resource Acquisition Is Initialization) / Scope Guards:** Creating an object whose destructor automatically runs the cleanup code unless explicitly canceled.  \n2. **Local Lambda Helpers:** Defining a local closure to handle the cleanup and return the error simultaneously.\n\nBecause C++ does not yet have a standard library scope guard (like `std::scope_fail`), and writing a custom RAII struct for a single function is overkill, the **Lambda Helper** is the cleanest, most idiomatic solution here.\n\nAs a bonus, the original `goto` implementation had a hidden bug: it swallowed the original error and always returned `FtError::kResultFail`. Using a lambda allows us to easily preserve and return the actual error code.\n\nHere is how to implement this modernization.\n\n### 1\\. Define the Cleanup Lambda\n\nAt the top of the `UpdateFw` function, right after determining the `target_addr`, define a local lambda that captures the necessary context by reference (`[\u0026]`).\n\n```c\nstd::expected\u003cvoid, FtError\u003e UpdateFw(const UsbDevice\u0026 device,\n                                      FtDeviceInfo\u0026 info) {\n  std::string boot_version;\n  uint32_t target_addr \u003d kFocalRomCfgAddr;\n  uint32_t code_start_addr \u003d 0;\n\n  // ... [Normal firmware update config page checks] ...\n  \n  // --- Modern C++ Cleanup Helper ---\n  auto abort_update \u003d [\u0026](FtError err) {\n    if (target_addr \u003d\u003d kFocalBootCfgAddr || target_addr \u003d\u003d kFocalRomCfgAddr) {\n      // Erase the config page so the device stays in its safe bootloader/rom state\n      FtErasePage(device, kFocalConfigSize, target_addr);\n      LOGW(\"Update aborted. Staying in {} mode\",\n           target_addr \u003d\u003d kFocalBootCfgAddr ? \"boot\" : \"rom\");\n    }\n    return std::unexpected(err);\n  };\n\n```\n\n### 2\\. Replace the `goto` Jumps\n\nNow, replace all the `goto cleanup;` statements with an immediate return of your lambda, passing the actual error code that triggered the failure.\n\n**Before:**\n\n```c\n  auto res \u003d FtGetBootVersion(device);\n  if (!res) {\n    LOGE(\"Get boot version failed\");\n    goto cleanup;\n  }\n\n```\n\n**After:**\n\n```c\n  auto res \u003d FtGetBootVersion(device);\n  if (!res) {\n    LOGE(\"Get boot version failed\");\n    return abort_update(res.error());\n  }\n\n  if (info.ec_bin.empty()) {\n    LOGE(\"ec bin is null\");\n    return abort_update(FtError::kParameterError);\n  }\n  \n  LOGI(\"Begin firmware update: {}\", info.ec_bin);\n  \n  res \u003d FtDownloadBin(device, info.ec_bin, target_addr);\n  if (!res) {\n    LOGE(\"Download failed\");\n    return abort_update(res.error());\n  }\n\n  res \u003d FtVerifyData(device, info.ec_bin, target_addr);\n  if (!res) {\n    LOGE(\"Verification failed\");\n    return abort_update(res.error());\n  }\n\n  LOGI(\"Firmware flashed successfully\");\n\n  res \u003d FtMcuReset(device, target_addr);\n  if (!res) {\n    LOGE(\"MCU reset failed\");\n    return abort_update(res.error());\n  }\n\n  return {};\n\n```\n\n### 3\\. Delete the `cleanup:` Label\n\nFinally, delete the entire `cleanup:` block at the bottom of the function. The function will now end cleanly with `return {};`.\n\nThis approach removes the `goto` spaghetti, fixes the error-swallowing bug, and utilizes C++ lambda closures exactly as they were intended.",
+      "range": {
+        "startLine": 345,
+        "startChar": 0,
+        "endLine": 345,
+        "endChar": 8
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b354922a_e33562a4",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 13
