@@ -511,6 +511,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5028d525_bbb46f31",
+        "filename": "util/focaltech/usb_context.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T17:36:05Z",
+      "side": 1,
+      "message": "The `FtError` enum itself is still clinging to legacy C idioms, which undermines the benefits of `std::expected`.\n\nHere is how to fully modernize the error return types.\n\n### 1\\. Modernize the `FtError` Enum\n\nIn `usb_context.h`, the enum defines `kSuccess \u003d 0` and assigns negative numbers to the errors (e.g., `kResultFail \u003d -4`).\n\n**The Issues:**\n\n* **Redundant Success State:** `std::expected\u003cT, E\u003e` intrinsically tracks success. Returning `{}` (or the expected value) represents success. You should *never* return `FtError::kSuccess` as an error type.  \n* **C-Style Integers:** Negative enum values are a holdover from when functions returned `\u003c 0` for errors and `\u003e\u003d 0` for bytes transferred. Because `std::expected` strictly separates the value from the error, the underlying integer representation no longer matters.  \n* **Vague Vocabulary:** `kResultFail` is used as a catch-all for everything from USB timeouts to SHA256 hash mismatches.\n\n**The Fix:** Remove the integers, delete `kSuccess`, and expand the vocabulary to be highly specific.\n\n```c\nenum class FtError {\n  kNoSuchDevice,\n  kParameterError,\n  kNoSuchFile,\n  kInvalidMode,\n  kUsbTransferFailed,    // Replaces kResultFail for I/O\n  kHashMismatch,         // Replaces kResultFail for verification\n  kDeviceTimeout,        // For reset/polling timeouts\n  kMissingConfigPage,    // For firmware file validation\n};\n\n```\n\n### 2\\. Stringify the Errors for the User\n\nIn `main.cc`, the code currently prints: `LOGE(\"Failed to open device: error code {}\", static_cast\u003cint\u003e(device_result.error()));`\n\nUsers should not have to cross-reference the source code to figure out what \"error code \\-4\" means. Since you are using `\u003cprint\u003e` and `\u003cformat\u003e`, you should provide a string-conversion helper.\n\nAdd this right beneath the enum in `usb_context.h`:\n\n```c\nconstexpr std::string_view ToString(FtError err) {\n  switch (err) {\n    case FtError::kNoSuchDevice:      return \"No such device found\";\n    case FtError::kParameterError:    return \"Invalid parameter provided\";\n    case FtError::kNoSuchFile:        return \"File not found or cannot be read\";\n    case FtError::kInvalidMode:       return \"Device is in an invalid mode for this operation\";\n    case FtError::kUsbTransferFailed: return \"USB bulk transfer failed\";\n    case FtError::kHashMismatch:      return \"Firmware verification hash mismatch\";\n    case FtError::kDeviceTimeout:     return \"Operation timed out\";\n    case FtError::kMissingConfigPage: return \"Firmware binary lacks required config page\";\n  }\n  return \"Unknown error\";\n}\n\n```\n\nNow, update `main.cc` to be user-friendly:\n\n```c\n  auto device_result \u003d UsbDevice::Create(usb_ctx, details);\n  if (!device_result) {\n    LOGE(\"Failed to open device: {}\", ToString(device_result.error()));\n    return EXIT_FAILURE;\n  }\n\n```\n\n### 3\\. Fix the `ResetComplete` Outlier\n\n`UsbDevice::ResetComplete` still returns `int` (`0` for success, `-1` for error). To truly standardize the codebase, *every* function that can fail should use `std::expected`.\n\n**Update `usb_context.h`:**\n\n```c\n  // Old: int ResetComplete(int timeout_sec) const;\n  std::expected\u003cvoid, FtError\u003e ResetComplete(std::chrono::seconds timeout) const;\n\n```\n\n**Update `usb_context.cc` (using the simplified polling method):**\n\n```c\nstd::expected\u003cvoid, FtError\u003e UsbDevice::ResetComplete(std::chrono::seconds timeout) const {\n  if (!handle_) {\n    LOGE(\"Invalid device handle\");\n    return std::unexpected(FtError::kNoSuchDevice);\n  }\n\n  const auto poll_interval \u003d 100ms;\n  auto elapsed \u003d 0ms;\n\n  while (timeout \u003d\u003d 0s || elapsed \u003c timeout) {\n    int config \u003d 0;\n    int r \u003d libusb_get_configuration(handle_.get(), \u0026config);\n\n    if (r \u003d\u003d LIBUSB_ERROR_NO_DEVICE) {\n      LOGI(\"USB device removal/reset detected\");\n      return {}; // Success!\n    }\n\n    std::this_thread::sleep_for(poll_interval);\n    elapsed +\u003d poll_interval;\n  }\n\n  LOGW(\"Timeout waiting for device removal\");\n  return std::unexpected(FtError::kDeviceTimeout);\n}\n\n```\n\nBy applying these changes, your error handling becomes universally predictable, type-safe, and self-documenting.",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 2
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c7ac0596_02659e57",
         "filename": "util/focaltech/usb_context.h",
         "patchSetId": 13
