@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "78e48918_a0892ddb",
+        "filename": "util/elan/file_control.cc",
+        "patchSetId": 22
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T18:34:56Z",
+      "side": 1,
+      "message": "Currently, `GetBinary` calls `GetBinarySize`, which opens the file, seeks to the end, gets the size, and closes the file. Then, `GetBinary` opens the file *again* to read the contents. This is an unnecessary double-I/O operation.\n\n**Suggestion:** Consolidate this into a single pass within `GetBinary`. You can open the file at the end (`std::ios::ate`), grab the size, rewind to the beginning, and read the data into the buffer. This eliminates the need for `GetBinarySize` entirely, or allows `GetBinarySize` to be removed from the public header if it\u0027s not used elsewhere.\n\n```c\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, elan::IapError\u003e GetBinary(\n    const std::string \u0026file_path) {\n  std::ifstream bin_file(file_path, std::ios::binary | std::ios::ate);\n  if (!bin_file) return std::unexpected(elan::IapError::FileOpenFailed);\n\n  std::streamsize size \u003d bin_file.tellg();\n  if (size \u003c\u003d 0) return std::unexpected(elan::IapError::InvalidFileSize);\n\n  bin_file.seekg(0, std::ios::beg);\n  std::vector\u003cuint8_t\u003e buffer(size);\n\n  if (!bin_file.read(reinterpret_cast\u003cchar *\u003e(buffer.data()), size)) {\n    return std::unexpected(elan::IapError::FileReadFailed);\n  }\n\n  return buffer;\n}\n\n```",
+      "range": {
+        "startLine": 10,
+        "startChar": 1,
+        "endLine": 44,
+        "endChar": 1
+      },
+      "revId": "b370733341811e7c7b843cb4dbd5f6990648eb19",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7a3dee6c_51bf44ed",
         "filename": "util/elan/iap_control.cc",
         "patchSetId": 22
