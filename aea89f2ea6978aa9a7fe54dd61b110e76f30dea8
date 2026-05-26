@@ -281,6 +281,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d18d74ba_6a5a60d7",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T18:00:09Z",
+      "side": 1,
+      "message": "### The Problem with the Current Code\n\nIn `main.cc`, the `CheckEcBuildVersion` function currently uses a massive, chained `if` statement to check the strings:\n\n```c\n  if (info.find(kFtProjectNameTest) \u003d\u003d std::string_view::npos \u0026\u0026\n      info.find(kFtProjectName9865) \u003d\u003d std::string_view::npos \u0026\u0026\n      info.find(kFtProjectName9869) \u003d\u003d std::string_view::npos \u0026\u0026\n      info.find(kFtProjectName9849) \u003d\u003d std::string_view::npos) {\n    LOGE(\"can\u0027t find focal project device\");\n    return std::unexpected(FtError::kNoSuchDevice);\n  }\n\n```\n\nEvery time a new hardware project is added, this `if` statement will grow longer, harder to read, and more prone to copy-paste errors.\n\n### The Fix: `std::array` \\+ `std::ranges`\n\nBy grouping the names into a `std::array`, we can use C++20 ranges to elegantly search the list, separating the *data* from the *logic*.\n\n**1\\. Define the Array (Top of `main.cc`)** Replace the four floating constants with a single structured array inside the anonymous namespace:\n\n```c\nnamespace {\n// ...\n\n// List of supported FocalTech hardware project names\nconstexpr std::array\u003cstd::string_view, 4\u003e kSupportedProjects \u003d {\n    \"ft9001\",\n    \"chojnik\",\n    \"chudow\",\n    \"chobienia\"\n};\n\n// ...\n} // namespace\n\n```\n\n**2\\. Refactor the Version Check** Include `\u003calgorithm\u003e` at the top of the file, and then replace the chained `if` statement in `CheckEcBuildVersion` with `std::ranges::any_of`.\n\n```c\n#include \u003calgorithm\u003e\n\n// ... inside CheckEcBuildVersion ...\n\n  // Check if the hardware info string contains ANY of our supported project names\n  bool is_focal_device \u003d std::ranges::any_of(kSupportedProjects, \n      [\u0026info](std::string_view project) {\n          return info.find(project) !\u003d std::string_view::npos;\n      });\n\n  if (!is_focal_device) {\n    LOGE(\"can\u0027t find focal project device\");\n    return std::unexpected(FtError::kNoSuchDevice);\n  }\n\n```\n\n### Why this is better:\n\n* **Scalability:** When hardware engineering releases a new project named `\"chelm\"`, you only have to add `\"chelm\"` to the array. You don\u0027t have to touch the logic at all.  \n* **Readability:** `std::ranges::any_of` perfectly expresses the semantic intent of the code (\"Is *any of* these strings inside the info block?\").  \n* **Performance:** It is evaluated just as efficiently as the chained `if` statements, short-circuiting and returning `true` the moment it finds a match.",
+      "range": {
+        "startLine": 101,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 51
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0ab8577c_8d52d48e",
         "filename": "util/focaltech/main.cc",
         "patchSetId": 13
