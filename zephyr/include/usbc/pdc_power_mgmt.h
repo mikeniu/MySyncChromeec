@@ -735,6 +735,32 @@ mux_state_t pdc_power_mgmt_get_dp_mux_mode(int port);
 int pdc_power_mgmt_get_connector_status_for_ppm(
 	int port, union connector_status_t *connector_status);
 
+/**
+ * @brief Start a PDC firmware update session for a given port.
+ *        This will suspend the PDC state machine and all communications.
+ *
+ * @param port USB-C port number
+ * @retval 0 on success, or negative error code.
+ */
+int pdc_power_mgmt_update_start(int port);
+
+/**
+ * @brief Finish a PDC firmware update session.
+ *        This will resume the PDC state machine and communications.
+ *
+ * @param port USB-C port number
+ * @retval 0 on success, or negative error code.
+ */
+int pdc_power_mgmt_update_finish(int port);
+
+/**
+ * @brief Check if any port is currently in update mode.
+ *
+ * @param port Output pointer for the port currently being updated.
+ * @retval true if in update mode, false otherwise.
+ */
+bool pdc_power_mgmt_is_update_mode(int *port);
+
 #ifdef CONFIG_USBC_PDC_DRIVEN_CCD
 /**
  * @brief Find an active port with CCD enabled based on devicetree properties
