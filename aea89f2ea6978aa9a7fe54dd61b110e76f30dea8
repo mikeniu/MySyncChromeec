@@ -281,6 +281,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f828a717_c52e7bd5",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T17:31:58Z",
+      "side": 1,
+      "message": "Please create constants for all of the timeouts.\n\n* **Single Source of Truth:** If you ever need to debug a slow device and increase the flash erase timeout, you only have to change it in one place at the top of the file, rather than hunting down the specific `SendBulkCommand` invocation hidden deep in the logic.  \n* **Semantic Meaning:** A constant named `kEraseTimeout` tells the reader *why* the delay exists, whereas a raw `6s` just tells them *how long* it is.  \n* **Consistency:** It prevents accidental mismatches where one function uses `1000ms` for a page write and another uses `1200ms` for the exact same hardware operation.\n\nHere is Gemini-generated code for how to do this. Please review for correctness:\n\n----\n\n### 1\\. Define the Constants in the Anonymous Namespace\n\nIn `updater.cc`, you already have an anonymous `namespace { ... }` block at the top. This is the perfect place to define file-scoped constants.\n\nBring in the `std::chrono_literals` namespace here so you can define the constants cleanly.\n\n```c\nnamespace {\n\nusing namespace std::chrono_literals;\n\n// ... existing constants (kFocalConfigSize, etc.) ...\n\n// --- USB Transfer Timeouts ---\nconstexpr auto kErasePageTimeout \u003d 6s;\nconstexpr auto kDownloadPageTimeout \u003d 1s;\nconstexpr auto kVerifyHashTimeout \u003d 1s;\nconstexpr auto kMcuResetTimeout \u003d 200ms;\nconstexpr auto kGenericInfoTimeout \u003d 200ms;\n\n// ...\n}  // namespace\n\n```\n\n### 2\\. Update the Call Sites\n\nNow, substitute the named constants into your `SendBulkCommand` calls throughout the file.\n\n**Example in `FtErasePage`:**\n\n```c\n  // Old: return SendBulkCommand(device, cmd, {}, TransferDirection::kOut, 6s);\n  return SendBulkCommand(device, cmd, {}, TransferDirection::kOut, kErasePageTimeout);\n\n```\n\n**Example in `FtDownloadPage`:**\n\n```c\n  // Write data to SRAM\n  auto res \u003d SendBulkCommand(\n      device, write_cmd,\n      std::span\u003cuint8_t\u003e(const_cast\u003cuint8_t*\u003e(data.data()), per_len), \n      TransferDirection::kOut, kDownloadPageTimeout);\n\n  // Execute code (burn to flash)\n  res \u003d SendBulkCommand(device, code_cmd, {}, TransferDirection::kOut, kDownloadPageTimeout);\n\n```\n\n**Example in `FtMcuReset`:**\n\n```c\n  // Old: return SendBulkCommand(device, cmd, {}, TransferDirection::kSendOnly, 200ms);\n  return SendBulkCommand(device, cmd, {}, TransferDirection::kSendOnly, kMcuResetTimeout);\n\n```\n\nBy doing this, the top of your `updater.cc` file acts as a configuration panel. If a hardware engineer later determines the flash memory needs more time to settle, the software fix takes three seconds to implement.",
+      "range": {
+        "startLine": 101,
+        "startChar": 0,
+        "endLine": 101,
+        "endChar": 55
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dde11899_3463c6cb",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 13
