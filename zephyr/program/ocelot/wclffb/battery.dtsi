@@ -5,7 +5,10 @@
 
 / {
 	batteries {
-		default_battery: cosmx-ap23abl {
+		default_battery: gfl-nb0367 {
+			compatible = "gfl,nb0367", "battery-smart";
+		};
+		cosmx-ap23abl {
 			compatible = "cosmx,ap23abl", "battery-smart";
 		};
 		atl-ap24cal {
