@@ -45,6 +45,29 @@
       },
       "revId": "b370733341811e7c7b843cb4dbd5f6990648eb19",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6fb9eb2d_5e37d527",
+        "filename": "util/elan/iap_tool.cc",
+        "patchSetId": 22
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T18:37:07Z",
+      "side": 1,
+      "message": "The `CommandLineManager` class is an example of the \"Object-Oriented Noun\" anti-pattern. It holds no complex mutating state and is only instantiated once to immediately parse arguments and yield a struct.\n\n**Suggestion:** Drop the class entirely. Convert `ParseCommandLine` into a standalone free function that returns `std::expected\u003cCmdLine, ...\u003e` or `std::optional\u003cCmdLine\u003e`. This removes the class declaration, constructor boilerplate, and the `GetCommandLine()` getter, drastically flattening the `main.cc` logic.",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 26
+      },
+      "revId": "b370733341811e7c7b843cb4dbd5f6990648eb19",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
