@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4e178f3f_c99f8699",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T20:28:42Z",
+      "side": 1,
+      "message": "You have integrated `std::expected` in the lower layers (`BootromComm`, `UsbComm`), but the upper layers in `et171_flash.cc` (e.g., `ProgramFlashPayload`, `RunFlashFw`, `RunFlashCmd`) revert to returning raw `int` (`0` or `-1`).\n\n**The Fix:** Push `std::expected` all the way up to `main()`. This prevents state confusion and standardizes how failures are caught and reported.",
+      "range": {
+        "startLine": 259,
+        "startChar": 0,
+        "endLine": 259,
+        "endChar": 65
+      },
+      "revId": "817ae722586fc8ae52aaff59d5adcdb0dbc5b42a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d0679968_4c154ece",
         "filename": "util/egis/usb_comm.cc",
         "patchSetId": 21
