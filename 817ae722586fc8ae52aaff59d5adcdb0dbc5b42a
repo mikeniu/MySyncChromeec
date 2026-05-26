@@ -73,6 +73,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "66e96a9c_beb03c04",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T21:12:30Z",
+      "side": 1,
+      "message": "Let\u0027s use structs for all data transfers. Here is Gemini-generated code to fix it. Review for correctness:\n\n----\n\n**The Rationale:** These functions currently build their memory read commands dynamically inside loops by repeatedly calling `push_back` and `AppendLittleEndian` on a `std::vector`. This causes severe heap thrashing. By defining a strictly typed `MemReadCommand` struct, we can construct the exact 10-byte packet entirely on the stack and pass it directly to the sender.\n\n**Step 1: Define the Struct (`bootrom.h`)**\n\n```c\nnamespace EgisBootrom {\n  struct MemReadCommand {\n    uint8_t command_id \u003d kCmdMemRead;\n    uint32_t address;\n    uint8_t access_size;\n    uint32_t count;\n  } __attribute__((packed));\n}\n\n```\n\n**Step 2: The Implementations (`bootrom.cc`)**\n\n```c\nstd::expected\u003cuint32_t, BootromError\u003e BootromComm::ReadReg(uint32_t addr) {\n  // 1. Build the packet on the stack\n  EgisBootrom::MemReadCommand req{\n      .address \u003d ToLittleEndian(addr),\n      .access_size \u003d EgisBootrom::kAccessSizeUint32,\n      .count \u003d ToLittleEndian(uint32_t{1})\n  };\n\n  // 2. Cast stack struct to byte span\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t*\u003e(\u0026req), sizeof(req));\n  \n  auto resp \u003d SendBootromCommand(req_span);\n  if (!resp) return std::unexpected(resp.error());\n  \n  // 3. Safely deserialize\n  auto value_out \u003d ReadStruct\u003cuint32_t\u003e(*resp);\n  if (!value_out) return std::unexpected(BootromError::kResponseTruncated);\n  \n  return FromLittleEndian(value_out.value());\n}\n\nstd::expected\u003cvoid, BootromError\u003e BootromComm::BackupFlash(\n    std::string_view filename, uint32_t total_size) {\n  std::ofstream outfile(std::string(filename), std::ios::binary | std::ios::trunc);\n  if (!outfile.is_open()) return std::unexpected(BootromError::kFileOperationFailed);\n\n  std::println(\"--- Executing CMD_MEM_READ (0x20) ---\");\n\n  for (uint32_t addr \u003d 0; addr \u003c total_size; addr +\u003d kMaxFlashReadSize) {\n    uint32_t current_read \u003d std::min\u003cuint32_t\u003e(kMaxFlashReadSize, total_size - addr);\n    uint32_t flash_addr \u003d EgisBootrom::kFlashBaseAddr + addr;\n\n    // Build the packet directly on the stack inside the tight loop\n    EgisBootrom::MemReadCommand req{\n        .address \u003d ToLittleEndian(flash_addr),\n        .access_size \u003d EgisBootrom::kAccessSizeUint8,\n        .count \u003d ToLittleEndian(current_read)\n    };\n\n    std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t*\u003e(\u0026req), sizeof(req));\n    auto resp \u003d SendBootromCommand(req_span, kFlashTimeout);\n    \n    if (!resp) {\n      std::println(stderr, \"\\n[HALT] Failed at address 0x{:x}\", addr);\n      return std::unexpected(resp.error());\n    }\n\n    if (resp-\u003esize() \u003c current_read) {\n      std::println(stderr, \"\\n[WARN] Incomplete payload received.\");\n      return std::unexpected(BootromError::kResponseTruncated);\n    }\n    \n    outfile.write(reinterpret_cast\u003cconst char *\u003e(resp-\u003edata()), resp-\u003esize());\n    std::print(\"\\rBackup Progress: {:.1f}%\", (100.0 * (addr + current_read) / total_size));\n    std::fflush(stdout);\n  }\n\n  outfile.close();\n  std::println(\"\\nFlash Backup Completed\");\n  return {};\n}\n\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e BootromComm::ReadFlash(\n    uint32_t offset, uint32_t length) {\n  std::vector\u003cuint8_t\u003e buffer;\n  buffer.reserve(length); // Pre-allocate to prevent dynamic resizing\n\n  for (uint32_t addr_offset \u003d 0; addr_offset \u003c length; addr_offset +\u003d kMaxFlashReadSize) {\n    uint32_t current_read \u003d std::min\u003cuint32_t\u003e(kMaxFlashReadSize, length - addr_offset);\n    uint32_t flash_addr \u003d EgisBootrom::kFlashBaseAddr + offset + addr_offset;\n\n    // Build the packet directly on the stack\n    EgisBootrom::MemReadCommand req{\n        .address \u003d ToLittleEndian(flash_addr),\n        .access_size \u003d EgisBootrom::kAccessSizeUint8,\n        .count \u003d ToLittleEndian(current_read)\n    };\n\n    std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t*\u003e(\u0026req), sizeof(req));\n    auto resp \u003d SendBootromCommand(req_span, kFlashTimeout);\n    \n    if (!resp) {\n      std::println(stderr, \"[ERROR] read_flash failed at addr 0x{:x}\", flash_addr);\n      return std::unexpected(resp.error());\n    }\n    if (resp-\u003esize() \u003c current_read) {\n      std::println(stderr, \"[ERROR] read_flash size mismatch at addr 0x{:x}\", flash_addr);\n      return std::unexpected(BootromError::kResponseTruncated);\n    }\n\n    buffer.insert(buffer.end(), resp-\u003ebegin(), resp-\u003eend());\n  }\n  return buffer;\n}\n\n```",
+      "range": {
+        "startLine": 343,
+        "startChar": 0,
+        "endLine": 357,
+        "endChar": 1
+      },
+      "revId": "817ae722586fc8ae52aaff59d5adcdb0dbc5b42a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f58809b9_d7a6ab54",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 21
