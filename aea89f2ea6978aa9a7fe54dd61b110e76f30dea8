@@ -49,6 +49,98 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3e566283_ef824a24",
+        "filename": "util/focaltech/ft_help.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:59:11Z",
+      "side": 1,
+      "message": "add newline",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 6
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d014b661_871634e5",
+        "filename": "util/focaltech/ft_log.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:59:11Z",
+      "side": 1,
+      "message": "add newline",
+      "range": {
+        "startLine": 81,
+        "startChar": 0,
+        "endLine": 81,
+        "endChar": 35
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29cdfc18_4962a143",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:59:11Z",
+      "side": 1,
+      "message": "add newline",
+      "range": {
+        "startLine": 155,
+        "startChar": 0,
+        "endLine": 155,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddd9dcbd_fba608ff",
+        "filename": "util/focaltech/ft_util.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:59:11Z",
+      "side": 1,
+      "message": "add newline",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 36
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0ab8577c_8d52d48e",
         "filename": "util/focaltech/main.cc",
         "patchSetId": 13
@@ -96,6 +188,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5f46df1f_1756e9bd",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:59:11Z",
+      "side": 1,
+      "message": "add newline",
+      "range": {
+        "startLine": 403,
+        "startChar": 0,
+        "endLine": 403,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ef0a8ca8_b45a1fcf",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 13
@@ -112,6 +227,144 @@
         "startChar": 13,
         "endLine": 43,
         "endChar": 44
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dde11899_3463c6cb",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:59:11Z",
+      "side": 1,
+      "message": "add newline",
+      "range": {
+        "startLine": 125,
+        "startChar": 0,
+        "endLine": 125,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52acf602_de389a1c",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:59:11Z",
+      "side": 1,
+      "message": "add newline",
+      "range": {
+        "startLine": 188,
+        "startChar": 0,
+        "endLine": 188,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5cc916e_0e6fdfdf",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:59:11Z",
+      "side": 1,
+      "message": "add newline",
+      "range": {
+        "startLine": 233,
+        "startChar": 0,
+        "endLine": 233,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f64d5ac8_b3720d9f",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:59:11Z",
+      "side": 1,
+      "message": "add newline",
+      "range": {
+        "startLine": 252,
+        "startChar": 0,
+        "endLine": 252,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d31c404_cb307acf",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:59:11Z",
+      "side": 1,
+      "message": "add newline",
+      "range": {
+        "startLine": 275,
+        "startChar": 0,
+        "endLine": 275,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b354922a_e33562a4",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 429,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:59:11Z",
+      "side": 1,
+      "message": "add newline",
+      "range": {
+        "startLine": 429,
+        "startChar": 0,
+        "endLine": 429,
+        "endChar": 1
       },
       "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -142,6 +395,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ad88a174_fc8c0960",
+        "filename": "util/focaltech/usb_context.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:59:11Z",
+      "side": 1,
+      "message": "add newline",
+      "range": {
+        "startLine": 287,
+        "startChar": 0,
+        "endLine": 287,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c7ac0596_02659e57",
         "filename": "util/focaltech/usb_context.h",
         "patchSetId": 13
@@ -158,6 +434,29 @@
         "startChar": 45,
         "endLine": 139,
         "endChar": 74
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf0915e3_ee6bc6f4",
+        "filename": "util/focaltech/usb_context.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:59:11Z",
+      "side": 1,
+      "message": "add newline",
+      "range": {
+        "startLine": 158,
+        "startChar": 0,
+        "endLine": 158,
+        "endChar": 40
       },
       "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
