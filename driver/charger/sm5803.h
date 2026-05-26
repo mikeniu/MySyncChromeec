@@ -162,6 +162,11 @@ enum sm5803_gpio0_modes {
  */
 #define SM5803_VBUS_LOW_LEVEL 0x25
 #define SM5803_VBUS_HIGH_LEVEL 0x2C
+#define SM5803_VBUS_SAFE0V_LEVEL 0x22 /* ~0.8V */
+#define SM5803_VBUS_REMOVED_LEVEL 0x9E /* ~3.7V */
+#define SM5803_VBUS_PRESENT_LEVEL 0xCB /* ~4.75V */
+#define SM5803_VBUS_MAX_LEVEL 0xFF
+#define SM5803_VBUS_MIN_LEVEL 0x00
 
 /*
  * TINT thresholds.  TINT steps are in 0.43 K with the upper threshold set to
@@ -533,6 +538,8 @@ enum ec_error_list sm5803_is_acok(int chgnum, bool *acok);
  *         is not or if there is a problem communicating with the charger.
  */
 bool sm5803_check_vbus_level(int chgnum, enum vbus_level level);
+
+enum ec_error_list sm5803_get_vbus_voltage(int chgnum, int port, int *voltage);
 
 /* Expose low power mode functions */
 void sm5803_disable_low_power_mode(int chgnum);
