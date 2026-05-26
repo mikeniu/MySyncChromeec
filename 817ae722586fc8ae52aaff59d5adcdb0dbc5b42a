@@ -96,6 +96,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b7bff094_46405a75",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T21:13:43Z",
+      "side": 1,
+      "message": "Let\u0027s use structs for all data transfers. Here is Gemini-generated code to fix it. Review for correctness:\n\n----\n\n**The Rationale:** `WriteFlash` must serialize a header and an arbitrary payload together. We will define a specific struct for block writes that omits the single `value` field used in `WriteReg`, making the memory layout perfect. Then we use `WriteStruct` and a single vector allocation to cleanly concatenate them.\n\n**Step 1: Define the Struct (`bootrom.h`)**\n\n```c\nnamespace EgisBootrom {\n  struct BlockWriteCommand {\n    uint8_t command_id \u003d kCmdMemWrite;\n    uint32_t address;\n    uint8_t access_size \u003d kAccessSizeUint8;\n    uint32_t count;\n  } __attribute__((packed));\n}\n\n```\n\n**Step 2: The Implementation (`bootrom.cc`)**\n\n```c\nstd::expected\u003cvoid, BootromError\u003e BootromComm::WriteFlash(\n    uint32_t offset, std::span\u003cconst uint8_t\u003e data) {\n  \n  if (data.size() \u003e kMaxFlashWriteSize) {\n    std::println(stderr, \"[ERROR] Payload size {} exceeds max limit\", data.size());\n    return std::unexpected(BootromError::kPayloadSizeExceedsLimit);\n  }\n\n  // 1. Initialize the strict header on the stack\n  EgisBootrom::BlockWriteCommand req_hdr{\n      .address \u003d ToLittleEndian(EgisBootrom::kFlashBaseAddr + offset),\n      .count \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(data.size()))\n  };\n\n  // 2. Allocate the command buffer exactly once\n  std::vector\u003cuint8_t\u003e cmd(sizeof(req_hdr) + data.size());\n\n  // 3. Safely serialize the header into the front of the vector\n  if (!WriteStruct(std::span{cmd}, req_hdr)) {\n    return std::unexpected(BootromError::kBufferTooSmall);\n  }\n  \n  // 4. Copy the payload directly into the back half of the vector\n  std::memcpy(cmd.data() + sizeof(req_hdr), data.data(), data.size());\n\n  // 5. Transmit\n  auto resp \u003d SendBootromCommand(cmd, kFlashTimeout);\n\n  if (!resp) {\n    std::println(stderr, \"\\n[HALT] USB transmission failed at 0x{:x}\", req_hdr.address);\n    return std::unexpected(resp.error());\n  }\n\n  if (auto res \u003d WaitForFlashReady(); !res) {\n    std::println(stderr, \"\\n[HALT] Timeout waiting for flash write at 0x{:x}\", req_hdr.address);\n    return std::unexpected(res.error());\n  }\n  \n  return {};\n}\n\n```",
+      "range": {
+        "startLine": 522,
+        "startChar": 0,
+        "endLine": 561,
+        "endChar": 1
+      },
+      "revId": "817ae722586fc8ae52aaff59d5adcdb0dbc5b42a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f58809b9_d7a6ab54",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 21
