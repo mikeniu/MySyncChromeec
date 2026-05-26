@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dd3a0e68_503061c4",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T20:35:56Z",
+      "side": 1,
+      "message": "Similar to the other comment, we should return `std::expected`. Also, the boringssl code should be moved to its own file.",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 51
+      },
+      "revId": "817ae722586fc8ae52aaff59d5adcdb0dbc5b42a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4e178f3f_c99f8699",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 21
