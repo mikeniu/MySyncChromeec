@@ -1,0 +1,53 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config TEST_ATRIA_RVP_USBC_RUNTIME_3PORT
+	bool "Atria RVP USB-C runtime tests — 3-port hardware config"
+	help
+	  Tests for rvp_usbc_runtime.c with all three TI TPS6699x PDC emulators
+	  present (RVP_TCSS_THREE_TI). Exercises discover_tcss_modules() and all
+	  board_get_pdc_for_port() THREE_TI paths in a single test.
+
+config TEST_ATRIA_RVP_USBC_RUNTIME_2PORT
+	bool "Atria RVP USB-C runtime tests — 2-port hardware config"
+	help
+	  Tests for rvp_usbc_runtime.c with only C0 and C1 TI TPS6699x PDC
+	  emulators present (RVP_TCSS_DUAL_TI). Covers the NULL-dev guard in
+	  probe_pdc_chip() and board_get_pdc_for_port() DUAL_TI paths.
+
+config TEST_ATRIA_RVP_USBC_RUNTIME_NONE
+	bool "Atria RVP USB-C runtime tests — no PDCs detected"
+	help
+	  Tests for rvp_usbc_runtime.c with all PDC probes failing (RVP_TCSS_NONE).
+
+config TEST_ATRIA_RVP_USBC_RUNTIME_C0_ONLY
+	bool "Atria RVP USB-C runtime tests — C0 only"
+	help
+	  Tests for rvp_usbc_runtime.c with only C0 TI PDC responding (RVP_TCSS_C0_TI).
+
+config TEST_ATRIA_RVP_USBC_RUNTIME_UNSUPPORTED
+	bool "Atria RVP USB-C runtime tests — unsupported PDC combo"
+	help
+	  Tests for rvp_usbc_runtime.c with an unsupported combo (C0+C2, no C1),
+	  exercising the default switch case in board_get_pdc_for_port().
+
+config TEST_ATRIA_RVP_USBC_RUNTIME_C0_RTK
+	bool "Atria RVP USB-C runtime tests — C0 RTK only"
+	help
+	  Tests for rvp_usbc_runtime.c with only C0 RTK PDC responding
+	  (RVP_TCSS_C0_RTK).
+
+config TEST_ATRIA_RVP_USBC_RUNTIME_DUAL_RTK
+	bool "Atria RVP USB-C runtime tests — dual RTK"
+	help
+	  Tests for rvp_usbc_runtime.c with C0 and C1 RTK PDCs responding
+	  (RVP_TCSS_DUAL_RTK).
+
+config TEST_ATRIA_RVP_USBC_RUNTIME_THREE_RTK
+	bool "Atria RVP USB-C runtime tests — three RTK"
+	help
+	  Tests for rvp_usbc_runtime.c with all three RTK PDCs responding
+	  (RVP_TCSS_THREE_RTK).
+
+source "Kconfig.zephyr"

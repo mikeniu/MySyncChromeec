@@ -1,0 +1,72 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+common:
+  platform_allow:
+    - native_sim
+tests:
+  atria.rvp_usbc_runtime.3port:
+    extra_configs:
+      - CONFIG_TEST_ATRIA_RVP_USBC_RUNTIME_3PORT=y
+      - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
+    extra_args:
+      - DTS_EXTRA_CPPFLAGS=-DATRIA_3PORT
+    extra_dtc_overlay_files:
+      - "boards/native_sim.overlay"
+  atria.rvp_usbc_runtime.2port:
+    extra_configs:
+      - CONFIG_TEST_ATRIA_RVP_USBC_RUNTIME_2PORT=y
+      - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
+    extra_args:
+      - DTS_EXTRA_CPPFLAGS=-DATRIA_2PORT
+    extra_dtc_overlay_files:
+      - "boards/native_sim.overlay"
+  atria.rvp_usbc_runtime.none:
+    extra_configs:
+      - CONFIG_TEST_ATRIA_RVP_USBC_RUNTIME_NONE=y
+      - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
+    extra_args:
+      - DTS_EXTRA_CPPFLAGS=-DATRIA_NONE
+    extra_dtc_overlay_files:
+      - "boards/native_sim.overlay"
+  atria.rvp_usbc_runtime.c0only:
+    extra_configs:
+      - CONFIG_TEST_ATRIA_RVP_USBC_RUNTIME_C0_ONLY=y
+      - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
+    extra_args:
+      - DTS_EXTRA_CPPFLAGS=-DATRIA_C0ONLY
+    extra_dtc_overlay_files:
+      - "boards/native_sim.overlay"
+  atria.rvp_usbc_runtime.unsupported:
+    extra_configs:
+      - CONFIG_TEST_ATRIA_RVP_USBC_RUNTIME_UNSUPPORTED=y
+      - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
+    extra_args:
+      - DTS_EXTRA_CPPFLAGS=-DATRIA_UNSUPPORTED
+    extra_dtc_overlay_files:
+      - "boards/native_sim.overlay"
+  atria.rvp_usbc_runtime.c0rtk:
+    extra_configs:
+      - CONFIG_TEST_ATRIA_RVP_USBC_RUNTIME_C0_RTK=y
+      - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
+    extra_args:
+      - DTS_EXTRA_CPPFLAGS=-DATRIA_C0RTK
+    extra_dtc_overlay_files:
+      - "boards/native_sim.overlay"
+  atria.rvp_usbc_runtime.dual_rtk:
+    extra_configs:
+      - CONFIG_TEST_ATRIA_RVP_USBC_RUNTIME_DUAL_RTK=y
+      - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
+    extra_args:
+      - DTS_EXTRA_CPPFLAGS=-DATRIA_DUAL_RTK
+    extra_dtc_overlay_files:
+      - "boards/native_sim.overlay"
+  atria.rvp_usbc_runtime.three_rtk:
+    extra_configs:
+      - CONFIG_TEST_ATRIA_RVP_USBC_RUNTIME_THREE_RTK=y
+      - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
+    extra_args:
+      - DTS_EXTRA_CPPFLAGS=-DATRIA_THREE_RTK
+    extra_dtc_overlay_files:
+      - "boards/native_sim.overlay"

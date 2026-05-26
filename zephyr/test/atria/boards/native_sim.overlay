@@ -1,0 +1,325 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ *
+ * Consolidated native_sim overlay for all rvp_usbc_runtime test configs.
+ *
+ * CMakeLists.txt injects one of the following into DTS_EXTRA_CPPFLAGS before
+ * find_package(Zephyr) (DTS preprocessing fires before Kconfig, so
+ * CONFIG_TEST_ATRIA_* are not yet visible at overlay time):
+ *
+ *  TI configurations
+ *   ATRIA_3PORT       — C0+C1+C2 TI respond          → THREE_TI
+ *   ATRIA_2PORT       — C0+C1 TI respond, C2=NULL     → DUAL_TI
+ *   ATRIA_NONE        — no chips respond               → NONE
+ *   ATRIA_C0ONLY      — only C0 TI responds            → C0_TI
+ *   ATRIA_UNSUPPORTED — C0+C2 TI, no C1               → default
+ *
+ *  RTK configurations (use realtek,rts54-pdc emulator nodes to make probes succeed)
+ *   ATRIA_C0RTK       — only C0 RTK responds           → C0_RTK
+ *   ATRIA_DUAL_RTK    — C0+C1 RTK respond, C2=NULL     → DUAL_RTK
+ *   ATRIA_THREE_RTK   — all three RTK respond           → THREE_RTK
+ *
+ * RTK probe success is simulated by placing realtek,rts54-pdc emulators at the
+ * RTK node labels; probe_pdc_chip() only needs an I2C ACK, not a specific
+ * driver type.  TI nodes are always fake-absent in RTK tests so no TI bits
+ * are set in ctx.detected_cards.
+ */
+
+#include <board-overlays/native_sim.dts>
+#include <it8xxx2_emul.dts>
+#include <usbc-policy.dtsi>
+
+/ {
+	usbc: usbc-ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		usbc_p0: port0@0 {
+			compatible = "named-usbc-port";
+			reg = <0>;
+#if defined(ATRIA_C0RTK) || defined(ATRIA_DUAL_RTK) || defined(ATRIA_THREE_RTK)
+			pdc = <&pdc_rtk_c0>;
+#else
+			pdc = <&pdc_ti_c0>;
+#endif
+			chg = <&charger>;
+			policy = <&cros_policy>;
+			zephyr,deferred-init;
+		};
+
+		usbc_p1: port1@1 {
+			compatible = "named-usbc-port";
+			reg = <1>;
+#if defined(ATRIA_DUAL_RTK) || defined(ATRIA_THREE_RTK)
+			pdc = <&pdc_rtk_c1>;
+#else
+			pdc = <&pdc_ti_c1>;
+#endif
+			policy = <&cros_policy>;
+			zephyr,deferred-init;
+		};
+
+		/* 3-port configs */
+#if defined(ATRIA_3PORT) || defined(ATRIA_UNSUPPORTED)
+		usbc_p2: port2@2 {
+			compatible = "named-usbc-port";
+			reg = <2>;
+			pdc = <&pdc_ti_c2>;
+			policy = <&cros_policy>;
+			zephyr,deferred-init;
+		};
+#elif defined(ATRIA_THREE_RTK)
+		usbc_p2: port2@2 {
+			compatible = "named-usbc-port";
+			reg = <2>;
+			pdc = <&pdc_rtk_c2>;
+			policy = <&cros_policy>;
+			zephyr,deferred-init;
+		};
+#endif
+
+		ppm_driver_nodelabel: ppm-driver {
+			compatible = "ucsi-ppm";
+		};
+	};
+
+	named-i2c-ports {
+		compatible = "named-i2c-ports";
+		i2c_port_pd: i2c_pd {
+			i2c-port = <&i2c0>;
+			enum-names = "I2C_PORT_USB_C0_TCPC";
+		};
+		i2c_port_battery: i2c_battery {
+			i2c-port = <&i2c0>;
+			enum-names = "I2C_PORT_BATTERY";
+		};
+	};
+
+	batteries {
+		default_battery: lgc_ac17a8m {
+			compatible = "lgc,ac17a8m", "battery-smart";
+		};
+	};
+};
+
+&i2c0 {
+	battery: sb@b {
+		compatible = "zephyr,smart-battery-emul";
+		reg = <0xb>;
+		cycle-count = <6>;
+		version = "BATTERY_SPEC_VER_1_1_WITH_PEC";
+		desired-charg-volt = <11250>;
+		desired-charg-cur = <2400>;
+		mf-name = "LGC";
+		dev-name = "AP18C8K";
+	};
+
+	charger: isl9238@9 {
+		compatible = "cros,isl923x-emul";
+		status = "okay";
+		reg = <0x9>;
+		battery = <&battery>;
+	};
+
+	/* ------------------------------------------------------------------ */
+	/* RTK PDC nodes                                                        */
+	/*                                                                      */
+	/* TI-only tests: fake-absent at unused addresses (probes fail)         */
+	/* RTK tests: realtek,rts54-pdc emulator nodes so the I2C ACK succeeds  */
+	/* ------------------------------------------------------------------ */
+
+#if defined(ATRIA_C0RTK) || defined(ATRIA_DUAL_RTK) || defined(ATRIA_THREE_RTK)
+	/* Required by the rts54-pdc emulator for SMBUS ARA handling */
+	smbus_ara_emul: smbus_ara@c {
+		compatible = "zephyr,smbus-ara-emul";
+		reg = <0xc>;
+	};
+
+	pdc_rtk_c0: rts5453p@30 {
+		compatible = "realtek,rts54-pdc";
+		reg = <0x30>;
+		irq-gpios = <&gpiof 0 GPIO_ACTIVE_LOW>;
+		zephyr,deferred-init;
+	};
+#else
+	pdc_rtk_c0: fake-absent-pdc@78 {
+		compatible = "cros,fake-absent-pdc";
+		reg = <0x78>;
+		zephyr,deferred-init;
+	};
+#endif
+
+#if defined(ATRIA_DUAL_RTK) || defined(ATRIA_THREE_RTK)
+	pdc_rtk_c1: rts5453p@34 {
+		compatible = "realtek,rts54-pdc";
+		reg = <0x34>;
+		irq-gpios = <&gpiof 1 GPIO_ACTIVE_LOW>;
+		zephyr,deferred-init;
+	};
+#else
+	pdc_rtk_c1: fake-absent-pdc@79 {
+		compatible = "cros,fake-absent-pdc";
+		reg = <0x79>;
+		zephyr,deferred-init;
+	};
+#endif
+
+#if defined(ATRIA_THREE_RTK)
+	pdc_rtk_c2: rts5453p@31 {
+		compatible = "realtek,rts54-pdc";
+		reg = <0x31>;
+		irq-gpios = <&gpiof 2 GPIO_ACTIVE_LOW>;
+		zephyr,deferred-init;
+	};
+#elif defined(ATRIA_3PORT) || defined(ATRIA_UNSUPPORTED)
+	/* TI 3-port: C2 RTK is absent */
+	pdc_rtk_c2: fake-absent-pdc@7a {
+		compatible = "cros,fake-absent-pdc";
+		reg = <0x7a>;
+		zephyr,deferred-init;
+	};
+#endif
+
+	/* ------------------------------------------------------------------ */
+	/* TI PDC nodes — topology-specific                                    */
+	/* ------------------------------------------------------------------ */
+
+#if defined(ATRIA_3PORT)
+	/* THREE_TI: all three TPS6699x emulators respond. */
+	pdc_ti_c0: tps6699-pdc@20 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x20>;
+		irq-gpios = <&gpiof 5 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		port-index-on-chip = <0x1>;
+		frs-supported;
+		zephyr,deferred-init;
+	};
+
+	pdc_ti_c1: tps6699-pdc@24 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x24>;
+		irq-gpios = <&gpiof 6 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		port-index-on-chip = <0x2>;
+		frs-supported;
+		ccd;
+		zephyr,deferred-init;
+	};
+
+	pdc_ti_c2: tps6699-pdc@21 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x21>;
+		irq-gpios = <&gpiof 7 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		port-index-on-chip = <0x1>;
+		frs-supported;
+		zephyr,deferred-init;
+	};
+
+#elif defined(ATRIA_2PORT)
+	/*
+	 * DUAL_TI: C0 and C1 respond; C2=NULL (USB_PD_PORT_MAX_COUNT=2)
+	 * so probe_pdc_chip(NULL) returns false immediately.
+	 */
+	pdc_ti_c0: tps6699-pdc@20 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x20>;
+		irq-gpios = <&gpiof 5 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		port-index-on-chip = <0x1>;
+		frs-supported;
+		zephyr,deferred-init;
+	};
+
+	pdc_ti_c1: tps6699-pdc@24 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x24>;
+		irq-gpios = <&gpiof 6 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		port-index-on-chip = <0x2>;
+		frs-supported;
+		ccd;
+		zephyr,deferred-init;
+	};
+
+#elif defined(ATRIA_NONE)
+	/* NONE: both fake-absent; all probes fail. */
+	pdc_ti_c0: fake-absent-pdc@7b {
+		compatible = "cros,fake-absent-pdc";
+		reg = <0x7b>;
+		zephyr,deferred-init;
+	};
+
+	pdc_ti_c1: fake-absent-pdc@7c {
+		compatible = "cros,fake-absent-pdc";
+		reg = <0x7c>;
+		zephyr,deferred-init;
+	};
+
+#elif defined(ATRIA_C0ONLY)
+	/* C0_TI: C0 responds; C1 fake-absent; C2=NULL. */
+	pdc_ti_c0: tps6699-pdc@20 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x20>;
+		irq-gpios = <&gpiof 5 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		port-index-on-chip = <0x1>;
+		frs-supported;
+		zephyr,deferred-init;
+	};
+
+	pdc_ti_c1: fake-absent-pdc@7d {
+		compatible = "cros,fake-absent-pdc";
+		reg = <0x7d>;
+		zephyr,deferred-init;
+	};
+
+#elif defined(ATRIA_UNSUPPORTED)
+	/* Unsupported: C0+C2 respond; C1 fake-absent → default case. */
+	pdc_ti_c0: tps6699-pdc@20 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x20>;
+		irq-gpios = <&gpiof 5 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		port-index-on-chip = <0x1>;
+		frs-supported;
+		zephyr,deferred-init;
+	};
+
+	pdc_ti_c1: fake-absent-pdc@7d {
+		compatible = "cros,fake-absent-pdc";
+		reg = <0x7d>;
+		zephyr,deferred-init;
+	};
+
+	pdc_ti_c2: tps6699-pdc@21 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x21>;
+		irq-gpios = <&gpiof 7 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		port-index-on-chip = <0x1>;
+		frs-supported;
+		zephyr,deferred-init;
+	};
+
+#elif defined(ATRIA_C0RTK) || defined(ATRIA_DUAL_RTK) || defined(ATRIA_THREE_RTK)
+	/*
+	 * RTK tests: all TI nodes are fake-absent so no TI bits are set in
+	 * ctx.detected_cards, giving a pure RTK detection result.
+	 */
+	pdc_ti_c0: fake-absent-pdc@7b {
+		compatible = "cros,fake-absent-pdc";
+		reg = <0x7b>;
+		zephyr,deferred-init;
+	};
+
+	pdc_ti_c1: fake-absent-pdc@7c {
+		compatible = "cros,fake-absent-pdc";
+		reg = <0x7c>;
+		zephyr,deferred-init;
+	};
+
+#if defined(ATRIA_THREE_RTK)
+	pdc_ti_c2: fake-absent-pdc@7e {
+		compatible = "cros,fake-absent-pdc";
+		reg = <0x7e>;
+		zephyr,deferred-init;
+	};
+#endif
+
+#endif
+};
