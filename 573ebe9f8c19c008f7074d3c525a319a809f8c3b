@@ -16,6 +16,24 @@
       "message": "Should we call the PM_DEVICE suspend/resume routines in the off/on functions?",
       "revId": "573ebe9f8c19c008f7074d3c525a319a809f8c3b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7465608d_86d5579a",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-05-26T08:19:50Z",
+      "side": 1,
+      "message": "Probably a good idea. Currently not possible for niedzica:\n```\n# TODO(b/450715297): Enable power saving mode once supported\nCONFIG_PM\u003dn\nCONFIG_PM_DEVICE\u003dn\n```\nWould be also great do do it together with the pwm led power consumption measurements.",
+      "parentUuid": "974c063a_05b0d10b",
+      "revId": "573ebe9f8c19c008f7074d3c525a319a809f8c3b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
