@@ -126,6 +126,17 @@ void chipset_handle_espi_reset_assert(void);
  */
 void chipset_pre_init_callback(void);
 
+/**
+ * Check if the current wake is a background wake.
+ *
+ * This can be used by the power sequence or board specific code to indicate if
+ * the current wake occurs due to a background task which won't be booting to
+ * the OS, for example clean-up related activities, charging wake etc.
+ *
+ * @return non-zero if the current wake is a background wake.
+ */
+int chipset_is_background_wake(void);
+
 #else /* !CONFIG_AP_POWER_CONTROL */
 
 #if defined(CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE) || \
