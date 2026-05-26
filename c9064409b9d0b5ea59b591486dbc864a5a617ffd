@@ -16,6 +16,24 @@
       "message": "Does anything bad happen if we get rid of the config checks now? I generally consider config checks on declarations to be be a code smell, and I think you\u0027ve just fixed the reason for them.",
       "revId": "c9064409b9d0b5ea59b591486dbc864a5a617ffd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b167c667_116cc433",
+        "filename": "zephyr/shim/include/power_host_sleep.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-05-26T17:35:40Z",
+      "side": 1,
+      "message": "Removed and ran `zmake compare-builds` with no issues detected",
+      "parentUuid": "3f1096e9_0028780e",
+      "revId": "c9064409b9d0b5ea59b591486dbc864a5a617ffd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
