@@ -192,4 +192,8 @@ config TEST_SNIFF_POWER_MGMT_PDC_APIS
 	  This is used to allow tests to create sniffing PDC APIs in
 	  pdc_power_mgmt.c that can be mocked in tests.
 
+config PLATFORM_EC_TEST_BUILD
+	bool "Define TEST_BUILD macro for this test suite"
+	default y
+
 source "Kconfig.zephyr"

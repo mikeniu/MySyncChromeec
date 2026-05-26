@@ -11,8 +11,11 @@
 #include <string.h>
 
 #include <zephyr/device.h>
+#include <zephyr/logging/log.h>
 
 #include <drivers/pdc.h>
+
+LOG_MODULE_REGISTER(pdc_host_cmd, CONFIG_USB_PDC_LOG_LEVEL);
 
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_PD_CHIP_INFO
 /* EC_CMD_PD_CHIP_INFO implementation when a PDC is used. */
@@ -103,6 +106,124 @@ static enum ec_status hc_pd_ports(struct host_cmd_handler_args *args)
 	return EC_RES_SUCCESS;
 }
 DECLARE_HOST_COMMAND(EC_CMD_USB_PD_PORTS, hc_pd_ports, EC_VER_MASK(0));
+
+static enum ec_status hc_pdc_update(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_pdc_update *p = args->params;
+	struct ec_response_pdc_update *r = args->response;
+	int port;
+
+	switch (p->subcmd) {
+	case PDC_UPDATE_START:
+		LOG_INF("HC: PDC_UPDATE_START port %d", p->port);
+		if (pdc_power_mgmt_update_start(p->port)) {
+			LOG_ERR("HC: PDC_UPDATE_START failed port %d",
+				p->port);
+			return EC_RES_BUSY;
+		}
+		return EC_RES_SUCCESS;
+
+	case PDC_UPDATE_FINISH:
+		LOG_INF("HC: PDC_UPDATE_FINISH port %d", p->port);
+		if (pdc_power_mgmt_update_finish(p->port)) {
+			LOG_ERR("HC: PDC_UPDATE_FINISH failed port %d",
+				p->port);
+			return EC_RES_INVALID_PARAM;
+		}
+		return EC_RES_SUCCESS;
+
+	case PDC_UPDATE_GET_STATUS:
+		r->status = pdc_power_mgmt_is_update_mode(&port);
+		r->port = (uint8_t)port;
+		args->response_size = sizeof(*r);
+		LOG_INF("HC: PDC_UPDATE_GET_STATUS status %d port %d",
+			r->status, r->port);
+		return EC_RES_SUCCESS;
+
+	default:
+		return EC_RES_INVALID_COMMAND;
+	}
+}
+DECLARE_HOST_COMMAND(EC_CMD_PDC_UPDATE, hc_pdc_update, EC_VER_MASK(0));
+
+static enum ec_status hc_pdc_passthru(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_pdc_passthru *p = args->params;
+	struct ec_response_pdc_passthru *r = args->response;
+	struct pdc_hw_config_t hw_config;
+	struct i2c_msg msgs[2];
+	int i, rv;
+	int update_port;
+	const uint8_t *out_data;
+	uint8_t *in_data;
+
+	LOG_DBG("HC: PDC_PASSTHRU port %d addr 0x%02x num_msgs %d",
+		p->port, p->i2c_addr, p->num_msgs);
+
+	if (!pdc_power_mgmt_is_update_mode(&update_port) ||
+	    update_port != p->port) {
+		LOG_WRN("HC: PDC_PASSTHRU access denied (not in update mode) port %d",
+			p->port);
+		return EC_RES_ACCESS_DENIED;
+	}
+
+	if (pdc_power_mgmt_get_hw_config(p->port, &hw_config)) {
+		LOG_ERR("HC: PDC_PASSTHRU failed to get HW config port %d",
+			p->port);
+		return EC_RES_INVALID_PARAM;
+	}
+
+	if (hw_config.bus_type != PDC_BUS_TYPE_I2C ||
+	    p->i2c_addr != hw_config.i2c.addr) {
+		LOG_WRN("HC: PDC_PASSTHRU address mismatch port %d addr 0x%02x (expected 0x%02x)",
+			p->port, p->i2c_addr, hw_config.i2c.addr);
+		return EC_RES_ACCESS_DENIED;
+	}
+
+	if (p->num_msgs > ARRAY_SIZE(msgs)) {
+		LOG_ERR("HC: PDC_PASSTHRU too many msgs %d",
+			p->num_msgs);
+		return EC_RES_INVALID_PARAM;
+	}
+
+	out_data = p->data;
+	in_data = r->data;
+
+	for (i = 0; i < p->num_msgs; i++) {
+		msgs[i].buf = (p->msg[i].addr_flags & EC_I2C_FLAG_READ) ?
+				      in_data :
+				      (uint8_t *)out_data;
+		msgs[i].len = p->msg[i].len;
+		msgs[i].flags = (p->msg[i].addr_flags & EC_I2C_FLAG_READ) ?
+					I2C_MSG_READ :
+					I2C_MSG_WRITE;
+
+		LOG_DBG("HC: msg %d %s len %d", i,
+			(msgs[i].flags & I2C_MSG_READ) ? "READ" : "WRITE",
+			msgs[i].len);
+
+		if (p->msg[i].addr_flags & EC_I2C_FLAG_READ) {
+			in_data += p->msg[i].len;
+		} else {
+			out_data += p->msg[i].len;
+		}
+
+		/* Always use STOP for PDC compatibility */
+		msgs[i].flags |= I2C_MSG_STOP;
+	}
+
+	rv = i2c_transfer_dt(&hw_config.i2c, msgs, p->num_msgs);
+	if (rv) {
+		LOG_ERR("HC: PDC_PASSTHRU I2C transfer failed: %d", rv);
+	}
+
+	r->i2c_status = rv ? EC_I2C_STATUS_NAK : 0;
+	r->num_msgs = p->num_msgs;
+	args->response_size = sizeof(*r) + (in_data - r->data);
+
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_PDC_PASSTHRU, hc_pdc_passthru, EC_VER_MASK(0));
 
 #ifndef CONFIG_PDC_POWER_MGMT_USB_MUX
 static enum ec_status hc_usb_pd_mux_info(struct host_cmd_handler_args *args)

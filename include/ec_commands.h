@@ -8489,6 +8489,52 @@ struct ec_params_switch_enable_poe {
 } __ec_align1;
 
 /*****************************************************************************/
+/* PDC Secure I2C Tunnel */
+
+/**
+ * Host Command: EC_CMD_PDC_PASSTHRU
+ * Allows secure I2C tunneling to a PDC chip.
+ */
+#define EC_CMD_PDC_PASSTHRU 0x0146
+
+struct ec_params_pdc_passthru {
+	uint8_t port; /* PDC port index (0, 1, ...) */
+	uint8_t i2c_addr; /* Target I2C address for validation */
+	uint8_t num_msgs; /* Number of I2C messages (typically 1 or 2) */
+	uint8_t reserved; /* Alignment */
+	struct ec_params_i2c_passthru_msg msg[2];
+	uint8_t data[]; /* Write data for messages */
+} __ec_align1;
+
+struct ec_response_pdc_passthru {
+	uint8_t i2c_status; /* enum ec_i2c_status */
+	uint8_t num_msgs; /* Number of messages processed */
+	uint8_t data[]; /* Data read from messages */
+} __ec_align1;
+
+/**
+ * Host Command: EC_CMD_PDC_UPDATE
+ * Manages the PDC firmware update session.
+ */
+#define EC_CMD_PDC_UPDATE 0x0147
+
+enum ec_pdc_update_cmd {
+	PDC_UPDATE_START = 0,
+	PDC_UPDATE_FINISH = 1,
+	PDC_UPDATE_GET_STATUS = 2,
+};
+
+struct ec_params_pdc_update {
+	uint8_t port;
+	uint8_t subcmd; /* enum ec_pdc_update_cmd */
+} __ec_align1;
+
+struct ec_response_pdc_update {
+	uint8_t status; /* 1 if in update mode, 0 otherwise */
+	uint8_t port; /* Port currently in update mode */
+} __ec_align1;
+
+/*****************************************************************************/
 /* The command range 0x200-0x2FF is reserved for Rotor. */
 
 /*****************************************************************************/

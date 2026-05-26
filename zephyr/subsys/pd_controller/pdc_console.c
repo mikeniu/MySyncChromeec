@@ -945,6 +945,151 @@ static int cmd_pdc_dump(const struct shell *sh, size_t argc, char **argv)
 	return 0;
 }
 
+static int cmd_pdc_update(const struct shell *sh, size_t argc, char **argv)
+{
+	int rv;
+	uint8_t port;
+	int update_port;
+
+	rv = cmd_get_pd_port(sh, argv[1], &port);
+	if (rv)
+		return rv;
+
+	if (!strcmp(argv[2], "start")) {
+		shell_info(sh, "custom Console: PDC_UPDATE_START port %d",
+			   port);
+		rv = pdc_power_mgmt_update_start(port);
+	} else if (!strcmp(argv[2], "finish")) {
+		shell_info(sh, "custom Console: PDC_UPDATE_FINISH port %d",
+			   port);
+		rv = pdc_power_mgmt_update_finish(port);
+	} else if (!strcmp(argv[2], "status")) {
+		bool in_mode = pdc_power_mgmt_is_update_mode(&update_port);
+		shell_info(sh, "custom Console: Status: %s",
+			   in_mode ? "In Update Mode" : "Normal");
+		if (in_mode) {
+			shell_info(sh, "custom Console: Port:   %d",
+				   update_port);
+		}
+		return 0;
+	} else {
+		shell_error(sh, "Unknown subcommand: %s", argv[2]);
+		return -EINVAL;
+	}
+
+	if (rv) {
+		shell_error(sh, "custom Console: Command failed (%d)", rv);
+	}
+
+	return rv;
+}
+
+static int cmd_pdc_passthru(const struct shell *sh, size_t argc, char **argv)
+{
+	uint8_t port;
+	uint8_t addr;
+	uint8_t read_len;
+	struct pdc_hw_config_t hw_config;
+	struct i2c_msg msgs[2];
+	uint8_t read_data[16]; /* Small buffer for console convenience */
+	int update_port;
+	int rv;
+	char *e;
+
+	rv = cmd_get_pd_port(sh, argv[1], &port);
+	if (rv)
+		return rv;
+
+	addr = strtoul(argv[2], &e, 0);
+	if (*e) {
+		shell_error(sh, "Invalid address");
+		return -EINVAL;
+	}
+
+	read_len = strtoul(argv[3], &e, 0);
+	if (*e || read_len > sizeof(read_data)) {
+		shell_error(sh, "Invalid read length (max %zu)",
+			    sizeof(read_data));
+		return -EINVAL;
+	}
+
+	shell_info(sh, "custom Console: PDC_PASSTHRU port %d addr 0x%02x", port,
+		   addr);
+
+	if (!pdc_power_mgmt_is_update_mode(&update_port) ||
+	    update_port != port) {
+		shell_error(
+			sh,
+			"custom Console: Access denied (not in update mode) port %d",
+			port);
+		return -EACCES;
+	}
+
+	if (pdc_power_mgmt_get_hw_config(port, &hw_config)) {
+		shell_error(sh, "custom Console: Failed to get HW config");
+		return -EINVAL;
+	}
+
+	if (hw_config.bus_type != PDC_BUS_TYPE_I2C ||
+	    addr != hw_config.i2c.addr) {
+		shell_error(
+			sh,
+			"custom Console: Address mismatch (expected 0x%02x)",
+			hw_config.i2c.addr);
+		return -EACCES;
+	}
+
+	/* Simple implementation for console: single read or single write+read
+	 */
+	int num_msgs = 0;
+	uint8_t write_data[16];
+	int write_len = 0;
+
+	if (argc > 4) {
+		/* Write data provided */
+		for (int i = 4; i < argc && write_len < sizeof(write_data);
+		     i++) {
+			write_data[write_len++] = strtoul(argv[i], &e, 0);
+		}
+		msgs[num_msgs].buf = write_data;
+		msgs[num_msgs].len = write_len;
+		/* Always use STOP for PDC compatibility */
+		msgs[num_msgs].flags = I2C_MSG_WRITE | I2C_MSG_STOP;
+		num_msgs++;
+		}
+
+		if (read_len > 0) {
+		msgs[num_msgs].buf = read_data;
+		msgs[num_msgs].len = read_len;
+		/* Always use STOP for PDC compatibility */
+		msgs[num_msgs].flags = I2C_MSG_READ | I2C_MSG_STOP;
+		num_msgs++;
+		}
+
+
+	if (num_msgs == 0) {
+		shell_error(sh, "Nothing to do");
+		return -EINVAL;
+	}
+
+	rv = i2c_transfer_dt(&hw_config.i2c, msgs, num_msgs);
+	if (rv) {
+		shell_error(sh, "custom Console: I2C transfer failed: %d", rv);
+		return rv;
+	}
+
+	if (read_len > 0) {
+		shell_fprintf(sh, SHELL_NORMAL, "Read:");
+		for (int i = 0; i < read_len; i++) {
+			shell_fprintf(sh, SHELL_NORMAL, " 0x%02x",
+				      read_data[i]);
+		}
+		shell_fprintf(sh, SHELL_NORMAL, "\n");
+	}
+
+	return 0;
+}
+
 SHELL_STATIC_SUBCMD_SET_CREATE(
 	sub_pdc_cmds,
 	SHELL_CMD_ARG(status, NULL, SHELL_HELP("Get PD status", "<port>"),
@@ -1033,6 +1178,15 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 		      "Print diagnostic data for all ports\n"
 		      "Usage: pdc dump",
 		      cmd_pdc_dump, 1, 0),
+	SHELL_CMD_ARG(pdcupdate, NULL,
+		      "Manage PDC firmware update session\n"
+		      "Usage: pdc pdcupdate <port> <start|finish|status>",
+		      cmd_pdc_update, 3, 0),
+	SHELL_CMD_ARG(
+		pdcpassthru, NULL,
+		"Secure I2C passthru to PDC\n"
+		"Usage: pdc pdcpassthru <port> <addr> <read_len> [write_bytes...]",
+		cmd_pdc_passthru, 4, 16),
 	SHELL_SUBCMD_SET_END);
 
 SHELL_CMD_REGISTER(pdc, &sub_pdc_cmds, "PDC console commands", NULL);
