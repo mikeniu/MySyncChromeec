@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "20135db3_c444eced",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-26T20:50:51Z",
+      "side": 1,
+      "message": "While these are safe wrt double-evaluation, I think it best to consistently use the lower-case version everywhere.",
+      "parentUuid": "d3e9d54b_0ce3a382",
+      "range": {
+        "startLine": 7,
+        "startChar": 21,
+        "endLine": 7,
+        "endChar": 24
+      },
+      "revId": "b299005f43ff50cd4cd503dc808c552b1dba8ecb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "8c2e7d67_cbe481f5",
