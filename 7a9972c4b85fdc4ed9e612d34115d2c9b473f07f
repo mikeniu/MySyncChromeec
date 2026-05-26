@@ -94,6 +94,30 @@
       },
       "revId": "7a9972c4b85fdc4ed9e612d34115d2c9b473f07f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10e04b28_75541539",
+        "filename": "zephyr/subsys/ap_pwrseq/include/signal_vw.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-26T17:53:58Z",
+      "side": 1,
+      "message": "Modifying only the `CONFIG_AP_PWRSEQ_DRIVER` path is fine.",
+      "parentUuid": "14b44f9f_b887a9a2",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 45
+      },
+      "revId": "7a9972c4b85fdc4ed9e612d34115d2c9b473f07f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
