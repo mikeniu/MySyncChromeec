@@ -49,6 +49,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5dea332d_d5d9711b",
+        "filename": "util/focaltech/ft_help.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T17:56:06Z",
+      "side": 1,
+      "message": "We can clean this up and use better names for \"back_to_bootloader\" and \"back_to_rom_boot\". Here is the Gemini-suggested fix. Review for correctness:\n\n---\n\n\n### 1\\. Update the Help Menu (`util/focaltech/ft_help.h`)\n\nUpdate the command list to reflect the new names while keeping the descriptions clear. (This incorporates the dynamic program name fix we discussed earlier).\n\n```c\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n\n#ifndef UTIL_FOCALTECH_FT_HELP_H_\n#define UTIL_FOCALTECH_FT_HELP_H_\n\n#include \u003cstring_view\u003e\n\nnamespace ft_help {\ninline constexpr std::string_view kCmdHelpString \u003d R\"(Usage: {} \u003ccommand\u003e [arguments]\n\nCommands:\n  \u003cfirmware.bin\u003e         Update firmware using the specified .bin file.\n                         (Requires ROM or Bootloader mode).\n  enter_bootloader       Command the MCU to enter bootloader mode.\n                         (Valid from EC mode: PID 0x5403, 0x5404).\n  enter_rom              Command the MCU to enter ROM boot mode.\n                         (Valid from test FW [0xFACE] or bootloader).\n  flash_get_protect      Get the current flash write protection area.\n                         (Requires bootloader mode).\n  flash_set_protect \u003cN\u003e  Set the flash write protection area.\n                         (Requires bootloader mode).\n                         Levels (1-4):\n                           1: Disable all write protection.\n                           2: Disable up to the bootloader.\n                           3: Disable up to RO.\n                           4: Disable up to RW.\n  get_ec_version         Read and display the current EC build version.\n\nOptions:\n  -h, --help             Show this help message and exit.\n)\";\n}\n\n#endif // UTIL_FOCALTECH_FT_HELP_H_\n\n```\n\n### 2\\. Update the Command Parser (`util/focaltech/main.cc`)\n\nModify the string matching inside the `ParseCommand` function.\n\n**Before:**\n\n```c\nconstexpr Command ParseCommand(std::string_view cmd_str) {\n  if (cmd_str \u003d\u003d \"back_to_bootloader\") return Command::kEnterBoot;\n  if (cmd_str \u003d\u003d \"back_to_rom_boot\") return Command::kEnterRom;\n  // ...\n\n```\n\n**After:**\n\n```c\nconstexpr Command ParseCommand(std::string_view cmd_str) {\n  if (cmd_str \u003d\u003d \"enter_bootloader\") return Command::kEnterBoot;\n  if (cmd_str \u003d\u003d \"enter_rom\") return Command::kEnterRom;\n  // ...\n\n```\n\n### 3\\. Update the Action Logging (`util/focaltech/main.cc`)\n\nFinally, update the terminal output in your `main()` switch statement so that the tool\u0027s logs match the new terminology.\n\n**Before:**\n\n```c\n    case Command::kEnterBoot:\n      LOGI(\"Switching to bootloader mode...\");\n      // ...\n\n    case Command::kEnterRom:\n      LOGI(\"Switching to ROM mode...\");\n      // ...\n\n```\n\n**After:**\n\n```c\n    case Command::kEnterBoot:\n      LOGI(\"Entering bootloader mode...\");\n      // ...\n\n    case Command::kEnterRom:\n      LOGI(\"Entering ROM mode...\");\n      // ...\n\n```\n\nThis ensures a cohesive experience from the `--help` text down to the execution logs.",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3e566283_ef824a24",
         "filename": "util/focaltech/ft_help.h",
         "patchSetId": 13
