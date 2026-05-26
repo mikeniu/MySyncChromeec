@@ -72,6 +72,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e34f39df_b5cfc1ad",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:52:08Z",
+      "side": 1,
+      "message": "Here is a Gemini created fix. Verify it\u0027s correct before using it:\n\n----\n\nHere is how you can implement and integrate it:\n\n### 1. The Helper Function\n\nYou can place this near the top of `main.cc`, just after the includes and constants. It leverages `std::expected` to match the error-handling paradigm already present in the codebase.\n\n```cpp\n#include \u003ccharconv\u003e\n\n// Helper function for safe string_view to int conversion\nstd::expected\u003cint, FtError\u003e ParseInt(std::string_view str) {\n  int value \u003d 0;\n  auto [ptr, ec] \u003d std::from_chars(str.data(), str.data() + str.size(), value);\n  \n  // Ensure there were no parsing errors AND that the whole string was consumed\n  if (ec !\u003d std::errc() || ptr !\u003d str.data() + str.size()) {\n    return std::unexpected(FtError::kParameterError);\n  }\n  \n  return value;\n}\n\n```\n\n### 2. The Refactored `ParseArguments` block\n\nNow, your command parsing block becomes incredibly clean and descriptive.\n\n```cpp\n  } else if (config.cmd \u003d\u003d Command::kSetFlashWp) {\n    if (args.size() \u003c 2) {\n      LOGE(\"flash_set_protect requires an area parameter (1-4).\");\n      return std::unexpected(FtError::kParameterError);\n    }\n    \n    auto param_res \u003d ParseInt(args[1]);\n    if (!param_res) {\n      LOGE(\"Invalid integer format for flash_set_protect parameter: {}\", args[1]);\n      return std::unexpected(param_res.error());\n    }\n    \n    config.action_param \u003d *param_res;\n  }\n\n```",
+      "parentUuid": "0ab8577c_8d52d48e",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 223,
+        "endChar": 52
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ef0a8ca8_b45a1fcf",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 13
