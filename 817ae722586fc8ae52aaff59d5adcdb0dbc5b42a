@@ -142,6 +142,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3d62743f_6aee2b74",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 676,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T21:21:33Z",
+      "side": 1,
+      "message": "Let\u0027s use `struct`s for all data transfers. Here is Gemini-generated code to fix it. Review for correctness:\n\n----\n\n### Step 1: Define the Command Structs (`bootrom.h`)\n\nAdd these minimal structs to the `EgisBootrom` namespace. They use default member initializers so you don\u0027t even have to populate them at the call site.\n\n```c\nnamespace EgisBootrom {\n\n// ... existing structs ...\n\nstruct GetBootromInfoCommand {\n  uint8_t command_id \u003d kCmdGetBootInfo;\n} __attribute__((packed));\n\nstruct GetFlashInfoCommand {\n  uint8_t command_id \u003d kCmdFlashInfo;\n} __attribute__((packed));\n\nstruct SystemResetCommand {\n  uint8_t command_id \u003d kCmdSystemReset;\n  uint8_t reset_type \u003d kSystemResetTypeNormal;\n} __attribute__((packed));\n\n} // namespace EgisBootrom\n\n```\n\n---\n\n### Step 2: Implement the Refactor (`bootrom.cc`)\n\nReplace the dynamic vectors with the stack-allocated structs, and cast them to `std::span` for transmission.\n\n#### 1\\. System Reset\n\n```c\nstd::expected\u003cvoid, BootromError\u003e BootromComm::SystemReset() {\n  std::println(\"--- Executing System Reset (0x12) ---\");\n\n  // 1. Build the exact 2-byte packet on the stack\n  EgisBootrom::SystemResetCommand req;\n\n  // 2. Cast stack struct to a byte span for transmission\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t*\u003e(\u0026req), sizeof(req));\n  \n  auto resp \u003d SendBootromCommand(req_span, kResetTimeout);\n\n  if (resp.has_value()) {\n    std::println(\"[SUCCESS] Reset command acknowledged.\");\n  } else {\n    std::println(\"[INFO] Command sent, device is resetting...\");\n  }\n  return {};\n}\n\n```\n\n#### 2\\. Get Flash Info\n\nNotice how this cleanly merges with the `ReadStruct` deserialization we implemented earlier.\n\n```c\nstd::expected\u003cvoid, BootromError\u003e BootromComm::GetFlashInfo() {\n  std::println(\"--- Fetching Flash Information ---\");\n\n  // 1. Build the 1-byte packet on the stack\n  EgisBootrom::GetFlashInfoCommand req;\n\n  // 2. Cast to byte span and transmit\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t*\u003e(\u0026req), sizeof(req));\n  auto resp \u003d SendBootromCommand(req_span);\n  \n  if (!resp) {\n    std::println(stderr, \"[ERROR] Unable to retrieve Flash info.\");\n    return std::unexpected(resp.error());\n  }\n\n  // 3. Safely deserialize the response\n  auto info_res \u003d ReadStruct\u003cEgisBootrom::FlashInfoResponse\u003e(*resp);\n  if (!info_res) {\n    std::println(stderr, \"[ERROR] Response length insufficient: {}\", resp-\u003esize());\n    return std::unexpected(BootromError::kResponseTruncated);\n  }\n\n  EgisBootrom::FlashInfoResponse info \u003d info_res.value();\n\n  std::array\u003cchar, 9\u003e prod_name{};\n  std::memcpy(prod_name.data(), info.prod_name, 8);\n  uint32_t flash_size \u003d FromLittleEndian(info.flash_size);\n\n  std::println(\"[SUCCESS] Flash Data Received:\");\n  std::println(\"  Product Name  : {}\", prod_name.data());\n  std::println(\"  Flash Size  : {} bytes ({} MB)\", flash_size, flash_size / 1024 / 1024);\n  \n  return {};\n}\n\n```\n\n#### 3\\. Get Bootrom Info\n\n```c\nstd::expected\u003cvoid, BootromError\u003e BootromComm::GetBootromInfo() {\n  // 1. Build the 1-byte packet on the stack\n  EgisBootrom::GetBootromInfoCommand req;\n\n  // 2. Cast to byte span and transmit\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t*\u003e(\u0026req), sizeof(req));\n  auto resp \u003d SendBootromCommand(req_span);\n  \n  if (!resp) return std::unexpected(resp.error());\n\n  // 3. Safely deserialize the response\n  auto info_res \u003d ReadStruct\u003cEgisBootrom::BootromInfoResponse\u003e(*resp);\n  if (!info_res) {\n    return std::unexpected(BootromError::kResponseTruncated);\n  }\n  \n  EgisBootrom::BootromInfoResponse info \u003d info_res.value();\n\n  std::println(\"Bootrom Version: 0x{:x}\", FromLittleEndian(info.version));\n  std::println(\"Max Command Size: {} bytes\", FromLittleEndian(info.max_cmd_size));\n  std::println(\"Max FW Upgrade Size: {} bytes\", FromLittleEndian(info.max_fw_upgrade_size));\n  \n  return {};\n}\n\n```",
+      "range": {
+        "startLine": 661,
+        "startChar": 0,
+        "endLine": 676,
+        "endChar": 1
+      },
+      "revId": "817ae722586fc8ae52aaff59d5adcdb0dbc5b42a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4e178f3f_c99f8699",
         "filename": "util/egis/et171_flash.cc",
         "patchSetId": 21
