@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47c9380b_3e6eb175",
+        "filename": "util/focaltech/build.mk",
+        "patchSetId": 13
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:50:09Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by Trailing Whitespace: Please remove the trailing whitespace.",
+      "range": {
+        "startLine": 8,
+        "startChar": 48,
+        "endLine": 8,
+        "endChar": 49
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7b612e0_ac49b651",
+        "filename": "util/focaltech/build.mk",
+        "patchSetId": 13
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:50:09Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by Trailing Whitespace: Please remove the trailing whitespace.",
+      "range": {
+        "startLine": 17,
+        "startChar": 51,
+        "endLine": 17,
+        "endChar": 52
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ab8577c_8d52d48e",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:50:09Z",
+      "side": 1,
+      "message": "To safely parse the integer without relying on null-termination, you should replace `std::atoi` with `std::from_chars`.\n\nBecause a `std::string_view` simply points to a segment of memory and a length, calling `.data()` on it does not guarantee a null character `\\0` at the end of that segment. If `args[1]` is ever derived from a larger, un-terminated buffer, `std::atoi` will read out of bounds.",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 223,
+        "endChar": 52
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef0a8ca8_b45a1fcf",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:50:09Z",
+      "side": 1,
+      "message": "Remove this",
+      "range": {
+        "startLine": 43,
+        "startChar": 13,
+        "endLine": 43,
+        "endChar": 44
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8d4d340_c05051e5",
+        "filename": "util/focaltech/usb_context.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:50:09Z",
+      "side": 1,
+      "message": "Remove this comment",
+      "range": {
+        "startLine": 249,
+        "startChar": 0,
+        "endLine": 249,
+        "endChar": 29
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7ac0596_02659e57",
+        "filename": "util/focaltech/usb_context.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-26T16:50:09Z",
+      "side": 1,
+      "message": "Remove this comment",
+      "range": {
+        "startLine": 139,
+        "startChar": 45,
+        "endLine": 139,
+        "endChar": 74
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
