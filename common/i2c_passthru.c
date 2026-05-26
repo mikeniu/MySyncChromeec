@@ -18,6 +18,7 @@
 
 #ifdef CONFIG_ZEPHYR
 #include "i2c/i2c.h"
+#include "usbc/pdc_power_mgmt.h"
 #endif
 
 #define CPUTS(outstr) cputs(CC_I2C, outstr)
@@ -117,6 +118,35 @@ static int check_i2c_params(const uint8_t port,
 	return EC_RES_SUCCESS;
 }
 
+enum ec_status i2c_passthru_is_allowed(int port, uint16_t addr_flags)
+{
+	const struct i2c_port_t *i2c_port;
+
+	i2c_port = get_i2c_port(port);
+	if (!i2c_port)
+		return EC_RES_INVALID_PARAM;
+
+#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED
+	if (system_is_locked()) {
+		struct i2c_cmd_desc_t cmd_desc;
+
+		cmd_desc.port = port;
+		cmd_desc.addr_flags = addr_flags;
+		if (!board_allow_i2c_passthru(&cmd_desc)) {
+			return EC_RES_ACCESS_DENIED;
+		}
+	}
+#endif
+
+	if (port_protected[port]) {
+		if (!i2c_port->passthru_allowed) {
+			return EC_RES_ACCESS_DENIED;
+		}
+	}
+
+	return EC_RES_SUCCESS;
+}
+
 #ifdef CONFIG_I2C_VIRTUAL_BATTERY
 static inline int is_i2c_port_virtual_battery(int port)
 {
@@ -158,6 +188,41 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 	 */
 	if (battery_is_cut_off())
 		return EC_RES_ACCESS_DENIED;
+#endif
+
+#ifdef CONFIG_PLATFORM_EC_USB_PD_CONTROLLER
+	/* REQ-EC-01: The EC acts as the security gatekeeper for the PDC.
+	 * Only allow passthru to PDC if it is in update mode.
+	 */
+	for (i = 0; i < board_get_usb_pd_port_count(); i++) {
+		struct pdc_hw_config_t hw;
+
+		if (pdc_power_mgmt_get_hw_config(i, &hw) == 0) {
+			if (hw.bus_type == PDC_BUS_TYPE_I2C) {
+				int pdc_ec_port = i2c_get_port_from_device(
+					hw.i2c.bus);
+
+				if (pdc_ec_port == port) {
+					for (int m = 0; m < params->num_msgs;
+					     m++) {
+						if (hw.i2c.addr ==
+						    (params->msg[m].addr_flags &
+						     EC_I2C_ADDR_MASK)) {
+							int update_port;
+
+							if (!pdc_power_mgmt_is_update_mode(
+								    &update_port) ||
+							    update_port != i) {
+								CPRINTS("custom PDC passthru denied: port %d not in update mode (active update port: %d)",
+									i, update_port);
+								return EC_RES_ACCESS_DENIED;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 #endif
 
 	i2c_port = get_i2c_port(port);

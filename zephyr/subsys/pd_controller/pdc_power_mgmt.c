@@ -7,6 +7,7 @@
  * PD Controller subsystem
  */
 
+#include "common.h"
 #include "zephyr/device.h"
 #include "zephyr/toolchain.h"
 #define DT_DRV_COMPAT named_usbc_port
@@ -1310,6 +1311,105 @@ static uint32_t pdc_max_request_mv = CONFIG_PLATFORM_EC_USB_PD_MAX_VOLTAGE_MV;
  */
 static uint32_t pdc_max_operating_power =
 	CONFIG_PLATFORM_EC_USB_PD_MAX_POWER_MW;
+
+static int pdc_update_port = -1;
+
+void pdc_update_watchdog_handler(struct k_timer *timer)
+{
+	LOG_ERR("custom PDC update watchdog expired for port C%d",
+		pdc_update_port);
+	pdc_power_mgmt_update_finish(pdc_update_port);
+}
+
+K_TIMER_DEFINE(pdc_update_watchdog, pdc_update_watchdog_handler, NULL);
+
+#define PDC_UPDATE_TIMEOUT_MS 60000
+
+test_mockable int pdc_power_mgmt_update_start(int port)
+{
+	struct pdc_hw_config_t hw_config;
+	int physical_port;
+	int rv;
+
+	if (!pdc_power_mgmt_is_pdc_port_valid(port)) {
+		LOG_ERR("custom Update START: Invalid port %d", port);
+		return -ERANGE;
+	}
+
+	if (pdc_update_port != -1) {
+		LOG_ERR("custom Update START: Port %d busy, Port %d currently being updated",
+			port, pdc_update_port);
+		return -EBUSY;
+	}
+
+	/* Ensure I2C passthru is actually allowed for this PDC before suspending */
+	if (pdc_power_mgmt_get_hw_config(port, &hw_config) == 0) {
+		if (hw_config.bus_type == PDC_BUS_TYPE_I2C) {
+			physical_port = i2c_get_port_from_device(
+				hw_config.i2c.bus);
+			if (i2c_passthru_is_allowed(physical_port,
+						    hw_config.i2c.addr) !=
+			    EC_RES_SUCCESS) {
+				LOG_ERR("custom Update START: Passthru denied for port C%d (bus %d addr 0x%02x). Aborting suspend.",
+					port, physical_port,
+					hw_config.i2c.addr);
+				return -EACCES;
+			}
+		}
+	}
+
+	LOG_ERR("custom PDC update mode starting for port C%d", port);
+
+	rv = pdc_power_mgmt_set_comms_state(false);
+	if (rv && rv != -EALREADY) {
+		LOG_ERR("custom Update START: Failed to suspend PDC comms: %d",
+			rv);
+		return rv;
+	}
+
+	pdc_update_port = port;
+	k_timer_start(&pdc_update_watchdog, K_MSEC(PDC_UPDATE_TIMEOUT_MS),
+		      K_NO_WAIT);
+
+	LOG_ERR("custom PDC update mode active for port C%d (Watchdog: %d ms)",
+		port, PDC_UPDATE_TIMEOUT_MS);
+
+	return 0;
+}
+
+test_mockable int pdc_power_mgmt_update_finish(int port)
+{
+	if (pdc_update_port == -1) {
+		LOG_ERR("custom Update FINISH: No update session active");
+		return -EINVAL;
+	}
+
+	if (pdc_update_port != port) {
+		LOG_ERR("custom Update FINISH: Port mismatch (active: %d, requested: %d)",
+			pdc_update_port, port);
+		return -EINVAL;
+	}
+
+	LOG_ERR("custom PDC update mode finishing for port C%d", port);
+
+	k_timer_stop(&pdc_update_watchdog);
+	pdc_update_port = -1;
+
+	return pdc_power_mgmt_set_comms_state(true);
+}
+
+test_mockable bool pdc_power_mgmt_is_update_mode(int *port)
+{
+	if (pdc_update_port == -1) {
+		return false;
+	}
+
+	if (port) {
+		*port = pdc_update_port;
+	}
+
+	return true;
+}
 
 static enum pdc_state_t get_pdc_state(struct pdc_port_t *port)
 {
@@ -4520,7 +4620,7 @@ const struct device *pdc_power_mgmt_get_port_pdc_driver(int port)
 
 /* Note: this is defined in pdc_runtime_port_config.c when
  * CONFIG_PDC_RUNTIME_PORT_CONFIG is enabled */
-uint8_t pdc_power_mgmt_get_usb_pd_port_count(void)
+test_mockable uint8_t pdc_power_mgmt_get_usb_pd_port_count(void)
 {
 	return CONFIG_USB_PD_PORT_MAX_COUNT;
 }
@@ -5428,8 +5528,8 @@ test_mockable int pdc_power_mgmt_get_lpm_ppm_info(int port,
 	return 0;
 }
 
-int pdc_power_mgmt_get_hw_config(int port,
-				 struct pdc_hw_config_t *pdc_hw_config)
+test_mockable int
+pdc_power_mgmt_get_hw_config(int port, struct pdc_hw_config_t *pdc_hw_config)
 {
 	if (!pdc_power_mgmt_is_pdc_port_valid(port)) {
 		return -ERANGE;
@@ -5794,17 +5894,17 @@ test_mockable int pdc_power_mgmt_set_comms_state(bool enable_comms)
 	static bool current_comms_status = true;
 
 	if (enable_comms == current_comms_status) {
-		LOG_ERR("PD: Unnecessary suspend or resume. "
+		LOG_ERR("custom PD: Unnecessary suspend or resume. "
 			"Current state already %d",
 			current_comms_status);
 		return -EALREADY;
 	}
 
 	if (enable_comms) {
-		LOG_INF("PD: Resume PDC communication");
+		LOG_ERR("custom PD: Resume PDC communication");
 		ret = resume_pdc_comms();
 	} else {
-		LOG_INF("PD: Suspend PDC communication");
+		LOG_ERR("custom PD: Suspend PDC communication");
 		ret = suspend_pdc_comms();
 	}
 

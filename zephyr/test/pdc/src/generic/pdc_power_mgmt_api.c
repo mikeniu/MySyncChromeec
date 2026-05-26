@@ -8,6 +8,7 @@
 #include "drivers/intel_altmode.h"
 #include "drivers/ucsi_v3.h"
 #include "emul/emul_pdc.h"
+#include "fakes.h"
 #include "hooks.h"
 #include "test/util.h"
 #include "usbc/pdc_power_mgmt.h"
@@ -70,6 +71,8 @@ static void reset_fakes(void)
 	RESET_FAKE(system_jumped_late);
 	RESET_FAKE(chipset_in_state);
 	RESET_FAKE(pdc_power_mgmt_simulate_power_button_press);
+	RESET_FAKE(system_is_locked);
+	RESET_FAKE(board_allow_i2c_passthru);
 
 	fake_chipset_state = CHIPSET_STATE_ON;
 	chipset_in_state_fake.custom_fake = custom_fake_chipset_in_state;
@@ -3125,3 +3128,58 @@ ZTEST_USER(pdc_power_mgmt_api_suspended,
 	zassert_ok(pdc_power_mgmt_set_comms_state(false));
 }
 #endif /* !defined(CONFIG_TODO_B_345292002) */
+
+ZTEST_USER(pdc_power_mgmt_api, test_update_mode)
+{
+	int port;
+
+	/* 1. Start update mode */
+	zassert_ok(pdc_power_mgmt_update_start(TEST_PORT));
+	zassert_true(pdc_power_mgmt_is_update_mode(&port));
+	zassert_equal(TEST_PORT, port);
+
+	/* 2. Cannot start another update while one is active */
+	zassert_equal(-EBUSY, pdc_power_mgmt_update_start(TEST_PORT));
+
+	/* 3. Finish update mode */
+	zassert_ok(pdc_power_mgmt_update_finish(TEST_PORT));
+	zassert_false(pdc_power_mgmt_is_update_mode(NULL));
+
+	/* 4. Invalid port finish */
+	zassert_equal(-EINVAL, pdc_power_mgmt_update_finish(TEST_PORT));
+}
+
+extern struct k_timer pdc_update_watchdog;
+void pdc_update_watchdog_handler(struct k_timer *timer);
+
+ZTEST_USER(pdc_power_mgmt_api, test_update_mode_watchdog)
+{
+	int port;
+
+	/* 1. Start update mode */
+	zassert_ok(pdc_power_mgmt_update_start(TEST_PORT));
+	zassert_true(pdc_power_mgmt_is_update_mode(&port));
+	zassert_equal(TEST_PORT, port);
+
+	/* 2. Manually trigger the watchdog handler */
+	pdc_update_watchdog_handler(&pdc_update_watchdog);
+
+	/* 3. Verify update mode is cleared */
+	zassert_false(pdc_power_mgmt_is_update_mode(NULL),
+		      "Update mode should be cleared after watchdog expiry");
+}
+
+ZTEST_USER(pdc_power_mgmt_api, test_update_mode_start_denied_by_i2c)
+{
+	/* Setup: System is LOCKED and not in allowlist */
+	system_is_locked_fake.return_val = 1;
+	board_allow_i2c_passthru_fake.return_val = 0;
+
+	/* 1. Attempt to start update mode */
+	zassert_equal(-EACCES, pdc_power_mgmt_update_start(TEST_PORT),
+		      "Start should fail with -EACCES when I2C is denied");
+
+	/* 2. Verify update mode was NOT entered */
+	zassert_false(pdc_power_mgmt_is_update_mode(NULL),
+		      "Should not be in update mode after failed start");
+}

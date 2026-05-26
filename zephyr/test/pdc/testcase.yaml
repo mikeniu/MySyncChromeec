@@ -33,6 +33,7 @@ tests:
     - CONFIG_USBC_PDC_TRACE_MSG=y
     - CONFIG_USB_PDC_LOG_LEVEL_DBG=y
     - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED=y
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
 
@@ -370,6 +371,8 @@ tests:
     extra_configs:
     - CONFIG_TEST_SUITE_PDC_HOSTCMD=y
     - CONFIG_PLATFORM_EC_HOSTCMD_PD_CHIP_INFO=y
+    - CONFIG_PLATFORM_EC_USB_PD_CONTROLLER=y
+    - CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED=y
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
 

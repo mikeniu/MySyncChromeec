@@ -4,6 +4,8 @@
  */
 
 #include "battery.h"
+#include "i2c.h"
+#include "system.h"
 
 #include <zephyr/fff.h>
 
@@ -26,3 +28,7 @@ void set_battery_remaining_capacity(int capacity);
 void set_battery_status(int status);
 void set_battery_design_capacity(int design_capacity);
 void set_battery_full_charge_capacity(int full_charge_capacity);
+
+DECLARE_FAKE_VALUE_FUNC(int, system_is_locked);
+DECLARE_FAKE_VALUE_FUNC(int, board_allow_i2c_passthru,
+			const struct i2c_cmd_desc_t *);

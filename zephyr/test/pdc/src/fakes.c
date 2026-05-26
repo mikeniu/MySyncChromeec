@@ -80,6 +80,10 @@ int battery_is_present(void)
 	return bp_val;
 }
 
+DEFINE_FAKE_VALUE_FUNC(int, system_is_locked);
+DEFINE_FAKE_VALUE_FUNC(int, board_allow_i2c_passthru,
+		       const struct i2c_cmd_desc_t *);
+
 int extpower_is_present(void)
 {
 	return 0;

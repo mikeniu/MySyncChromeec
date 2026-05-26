@@ -11,8 +11,11 @@
 #include <string.h>
 
 #include <zephyr/device.h>
+#include <zephyr/logging/log.h>
 
 #include <drivers/pdc.h>
+
+LOG_MODULE_REGISTER(pdc_host_cmd, CONFIG_USB_PDC_LOG_LEVEL);
 
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_PD_CHIP_INFO
 /* EC_CMD_PD_CHIP_INFO implementation when a PDC is used. */
@@ -103,6 +106,56 @@ static enum ec_status hc_pd_ports(struct host_cmd_handler_args *args)
 	return EC_RES_SUCCESS;
 }
 DECLARE_HOST_COMMAND(EC_CMD_USB_PD_PORTS, hc_pd_ports, EC_VER_MASK(0));
+
+static enum ec_status hc_pdc_update(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_pdc_update *p = args->params;
+	struct ec_response_pdc_update *r = args->response;
+	struct pdc_hw_config_t hw_config;
+	int port;
+
+	switch (p->subcmd) {
+	case PDC_UPDATE_START:
+		LOG_ERR("custom HC: PDC_UPDATE_START port %d", p->port);
+		if (pdc_power_mgmt_update_start(p->port)) {
+			LOG_ERR("custom HC: PDC_UPDATE_START failed port %d",
+				p->port);
+			return EC_RES_BUSY;
+		}
+		return EC_RES_SUCCESS;
+
+	case PDC_UPDATE_FINISH:
+		LOG_ERR("custom HC: PDC_UPDATE_FINISH port %d", p->port);
+		if (pdc_power_mgmt_update_finish(p->port)) {
+			LOG_ERR("custom HC: PDC_UPDATE_FINISH failed port %d",
+				p->port);
+			return EC_RES_INVALID_PARAM;
+		}
+		return EC_RES_SUCCESS;
+
+	case PDC_UPDATE_GET_STATUS:
+		memset(r, 0, sizeof(*r));
+		r->status = pdc_power_mgmt_is_update_mode(&port);
+		r->port = (uint8_t)port;
+
+		if (pdc_power_mgmt_get_hw_config(p->port, &hw_config) == 0) {
+			if (hw_config.bus_type == PDC_BUS_TYPE_I2C) {
+				r->i2c_bus = i2c_get_port_from_device(
+					hw_config.i2c.bus);
+				r->i2c_addr = hw_config.i2c.addr;
+			}
+		}
+
+		args->response_size = sizeof(*r);
+		LOG_ERR("custom HC: PDC_UPDATE_GET_STATUS status %d port %d bus %d addr 0x%02x",
+			r->status, r->port, r->i2c_bus, r->i2c_addr);
+		return EC_RES_SUCCESS;
+
+	default:
+		return EC_RES_INVALID_COMMAND;
+	}
+}
+DECLARE_HOST_COMMAND(EC_CMD_PDC_UPDATE, hc_pdc_update, EC_VER_MASK(0));
 
 #ifndef CONFIG_PDC_POWER_MGMT_USB_MUX
 static enum ec_status hc_usb_pd_mux_info(struct host_cmd_handler_args *args)

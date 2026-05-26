@@ -8,7 +8,7 @@
 
 #include <zephyr/fff.h>
 
-/* FFF fake definitions for select functions in `pdc_power_mgmt.c` */
+/* FFF fake definitions */
 
 DEFINE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_connector_reset, int,
 		       enum connector_reset);
@@ -18,6 +18,8 @@ DEFINE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_get_connector_status, int,
 		       union connector_status_t *);
 DEFINE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_get_info, int, struct pdc_info_t *,
 		       bool);
+DEFINE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_get_hw_config, int,
+		       struct pdc_hw_config_t *);
 DEFINE_FAKE_VALUE_FUNC(bool, pdc_power_mgmt_get_partner_data_swap_capable, int);
 DEFINE_FAKE_VALUE_FUNC(enum pd_power_role, pdc_power_mgmt_get_power_role, int);
 DEFINE_FAKE_VALUE_FUNC(const char *, pdc_power_mgmt_get_task_state_name, int);
@@ -54,13 +56,17 @@ DEFINE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_set_bbr_cts, int, bool);
 DEFINE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_set_ap_power_state,
 		       enum power_state);
 DEFINE_FAKE_VOID_FUNC(pdc_power_mgmt_simulate_power_button_press, int);
+DEFINE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_update_start, int);
+DEFINE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_update_finish, int);
+DEFINE_FAKE_VALUE_FUNC(bool, pdc_power_mgmt_is_update_mode, int *);
+DEFINE_FAKE_VALUE_FUNC(uint8_t, pdc_power_mgmt_get_usb_pd_port_count);
 
 void helper_reset_pdc_power_mgmt_fakes(void)
 {
-	RESET_FAKE(pdc_power_mgmt_connector_reset);
 	RESET_FAKE(pdc_power_mgmt_get_cable_prop);
 	RESET_FAKE(pdc_power_mgmt_get_connector_status);
 	RESET_FAKE(pdc_power_mgmt_get_info);
+	RESET_FAKE(pdc_power_mgmt_get_hw_config);
 	RESET_FAKE(pdc_power_mgmt_get_partner_data_swap_capable);
 	RESET_FAKE(pdc_power_mgmt_get_power_role);
 	RESET_FAKE(pdc_power_mgmt_get_task_state_name);
@@ -88,4 +94,11 @@ void helper_reset_pdc_power_mgmt_fakes(void)
 	RESET_FAKE(pdc_power_mgmt_set_bbr_cts);
 	RESET_FAKE(pdc_power_mgmt_set_ap_power_state);
 	RESET_FAKE(pdc_power_mgmt_simulate_power_button_press);
+	RESET_FAKE(pdc_power_mgmt_update_start);
+	RESET_FAKE(pdc_power_mgmt_update_finish);
+	RESET_FAKE(pdc_power_mgmt_is_update_mode);
+	RESET_FAKE(pdc_power_mgmt_get_usb_pd_port_count);
+
+	pdc_power_mgmt_get_usb_pd_port_count_fake.return_val =
+		CONFIG_USB_PD_PORT_MAX_COUNT;
 }

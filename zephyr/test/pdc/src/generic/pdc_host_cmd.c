@@ -8,8 +8,11 @@
 #include "drivers/ucsi_v3.h"
 #include "ec_commands.h"
 #include "emul/emul_pdc.h"
+#include "fakes.h"
 #include "mock_pdc_power_mgmt.h"
 
+#include "i2c/i2c.h"
+#include <zephyr/drivers/i2c.h>
 #include <zephyr/ztest.h>
 
 #define TEST_PORT 0
@@ -19,6 +22,8 @@ BUILD_ASSERT(TEST_PORT < CONFIG_USB_PD_PORT_MAX_COUNT);
 static void host_cmd_pdc_reset(void *fixture)
 {
 	helper_reset_pdc_power_mgmt_fakes();
+	RESET_FAKE(system_is_locked);
+	RESET_FAKE(board_allow_i2c_passthru);
 }
 
 ZTEST_SUITE(host_cmd_pdc, NULL, NULL, host_cmd_pdc_reset, host_cmd_pdc_reset,
@@ -398,3 +403,217 @@ ZTEST(host_cmd_pdc, test_ec_cmd_usb_pd_control__swap_data_role)
 	zassert_equal(1, pdc_power_mgmt_request_data_swap_fake.call_count,
 		      "pdc_power_mgmt_request_data_swap not called!");
 }
+
+static bool custom_fake_pdc_is_update_mode(int *port)
+{
+	if (pdc_power_mgmt_update_start_fake.call_count > 0 &&
+	    pdc_power_mgmt_update_finish_fake.call_count == 0) {
+		if (port) {
+			*port = pdc_power_mgmt_update_start_fake.arg0_history[0];
+		}
+		return true;
+	}
+	return false;
+}
+
+static int custom_fake_pdc_get_hw_config(int port,
+					 struct pdc_hw_config_t *config)
+{
+	config->bus_type = PDC_BUS_TYPE_I2C;
+	config->i2c.bus = i2c_get_device_for_port(0);
+	config->i2c.addr = (port == 0) ? 0x66 : 0x67;
+	return 0;
+}
+
+ZTEST(host_cmd_pdc, test_ec_cmd_pdc_update)
+{
+	struct ec_params_pdc_update params;
+	struct ec_response_pdc_update resp;
+	int rv;
+
+	/* Test START */
+	params.port = 0;
+	params.subcmd = PDC_UPDATE_START;
+	pdc_power_mgmt_update_start_fake.return_val = 0;
+	rv = ec_cmd_pdc_update(NULL, &params, &resp);
+	zassert_equal(EC_RES_SUCCESS, rv);
+	zassert_equal(1, pdc_power_mgmt_update_start_fake.call_count);
+	zassert_equal(0, pdc_power_mgmt_update_start_fake.arg0_history[0]);
+
+	/* Test GET_STATUS while in update mode */
+	params.subcmd = PDC_UPDATE_GET_STATUS;
+	pdc_power_mgmt_is_update_mode_fake.custom_fake =
+		custom_fake_pdc_is_update_mode;
+	pdc_power_mgmt_get_hw_config_fake.custom_fake =
+		custom_fake_pdc_get_hw_config;
+	rv = ec_cmd_pdc_update(NULL, &params, &resp);
+	zassert_equal(EC_RES_SUCCESS, rv);
+	zassert_true(resp.status);
+	zassert_equal(0, resp.port);
+	zassert_equal(0, resp.i2c_bus); /* i2c0 is bus 0 */
+	zassert_equal(0x66, resp.i2c_addr);
+
+	/* Test FINISH */
+	params.subcmd = PDC_UPDATE_FINISH;
+	pdc_power_mgmt_update_finish_fake.return_val = 0;
+	rv = ec_cmd_pdc_update(NULL, &params, &resp);
+	zassert_equal(EC_RES_SUCCESS, rv);
+	zassert_equal(1, pdc_power_mgmt_update_finish_fake.call_count);
+}
+
+ZTEST(host_cmd_pdc, test_ec_cmd_i2c_passthru_pdc)
+{
+	struct {
+		struct ec_params_i2c_passthru p;
+		struct ec_params_i2c_passthru_msg msg[1];
+		uint8_t data[2];
+	} __packed req;
+	struct {
+		struct ec_response_i2c_passthru r;
+		uint8_t data[2];
+	} __packed resp;
+	int rv;
+
+	/* Setup: Mock update mode and hardware config */
+	pdc_power_mgmt_get_usb_pd_port_count_fake.return_val = 1;
+	pdc_power_mgmt_update_start_fake.call_count = 1;
+	pdc_power_mgmt_update_start_fake.arg0_history[0] = 0;
+	pdc_power_mgmt_is_update_mode_fake.custom_fake =
+		custom_fake_pdc_is_update_mode;
+	pdc_power_mgmt_get_hw_config_fake.custom_fake =
+		custom_fake_pdc_get_hw_config;
+
+	/* 1. Success path (Read 2 bytes from PDC) */
+	req.p.port = 0; /* i2c0 */
+	req.p.num_msgs = 1;
+	req.msg[0].addr_flags = 0x66 | EC_I2C_FLAG_READ; /* Match PDC addr */
+	req.msg[0].len = 2;
+
+	rv = CROS_EC_COMMAND(NULL, EC_CMD_I2C_PASSTHRU, 0, &req, sizeof(req),
+			     &resp, sizeof(resp));
+	zassert_equal(EC_RES_SUCCESS, rv, "Expected success, got %d", rv);
+	zassert_equal(0, resp.r.i2c_status);
+
+	/* 2. Access Denied (PDC not in update mode) */
+	pdc_power_mgmt_update_start_fake.call_count = 0;
+	rv = CROS_EC_COMMAND(NULL, EC_CMD_I2C_PASSTHRU, 0, &req, sizeof(req),
+			     &resp, sizeof(resp));
+	zassert_equal(EC_RES_ACCESS_DENIED, rv);
+	pdc_power_mgmt_update_start_fake.call_count = 1;
+
+	/* 3. Success (Different address on same bus - NOT a PDC) */
+	req.msg[0].addr_flags = 0x09 | EC_I2C_FLAG_READ;
+	rv = CROS_EC_COMMAND(NULL, EC_CMD_I2C_PASSTHRU, 0, &req, sizeof(req),
+			     &resp, sizeof(resp));
+	zassert_equal(EC_RES_SUCCESS, rv);
+}
+
+ZTEST(host_cmd_pdc, test_ec_cmd_i2c_passthru_pdc_port_mismatch)
+{
+	struct {
+		struct ec_params_i2c_passthru p;
+		struct ec_params_i2c_passthru_msg msg[1];
+	} __packed req;
+	struct {
+		struct ec_response_i2c_passthru r;
+		uint8_t data[1];
+	} __packed resp;
+	int rv;
+
+	/* Setup: Port 0 is in update mode */
+	pdc_power_mgmt_get_usb_pd_port_count_fake.return_val = 2;
+	pdc_power_mgmt_update_start_fake.call_count = 1;
+	pdc_power_mgmt_update_start_fake.arg0_history[0] = 0;
+	pdc_power_mgmt_is_update_mode_fake.custom_fake =
+		custom_fake_pdc_is_update_mode;
+	pdc_power_mgmt_get_hw_config_fake.custom_fake =
+		custom_fake_pdc_get_hw_config;
+
+	/* Attempt passthru to Port 1's PDC (Addr 0x67) on I2C bus 0 */
+	req.p.port = 0;
+	req.p.num_msgs = 1;
+	req.msg[0].addr_flags = 0x67 | EC_I2C_FLAG_READ;
+	req.msg[0].len = 1;
+
+	rv = CROS_EC_COMMAND(NULL, EC_CMD_I2C_PASSTHRU, 0, &req, sizeof(req),
+			     &resp, sizeof(resp));
+
+	/* Should be denied because Port 0 is the one in update mode */
+	zassert_equal(EC_RES_ACCESS_DENIED, rv, "Expected ACCESS_DENIED, got %d",
+		      rv);
+}
+
+ZTEST(host_cmd_pdc, test_ec_cmd_i2c_passthru_pdc_mixed_msgs)
+{
+	struct {
+		struct ec_params_i2c_passthru p;
+		struct ec_params_i2c_passthru_msg msg[2];
+	} __packed req;
+	struct {
+		struct ec_response_i2c_passthru r;
+		uint8_t data[2];
+	} __packed resp;
+	int rv;
+
+	/* Setup: PDC is NOT in update mode */
+	pdc_power_mgmt_update_start_fake.call_count = 0;
+	pdc_power_mgmt_is_update_mode_fake.return_val = false;
+	pdc_power_mgmt_get_hw_config_fake.custom_fake =
+		custom_fake_pdc_get_hw_config;
+
+	req.p.port = 0;
+	req.p.num_msgs = 2;
+
+	/* Msg 1: Allowed address (Battery) */
+	req.msg[0].addr_flags = 0x09 | EC_I2C_FLAG_READ;
+	req.msg[0].len = 1;
+
+	/* Msg 2: Forbidden address (PDC) */
+	req.msg[1].addr_flags = 0x66 | EC_I2C_FLAG_READ;
+	req.msg[1].len = 1;
+
+	rv = CROS_EC_COMMAND(NULL, EC_CMD_I2C_PASSTHRU, 0, &req, sizeof(req),
+			     &resp, sizeof(resp));
+
+	/* The entire transaction must be denied if any part targets an unauthorized PDC */
+	zassert_equal(EC_RES_ACCESS_DENIED, rv,
+		      "Expected ACCESS_DENIED for mixed msgs, got %d", rv);
+}
+
+ZTEST(host_cmd_pdc, test_ec_cmd_i2c_passthru_pdc_locked_system)
+{
+	struct {
+		struct ec_params_i2c_passthru p;
+		struct ec_params_i2c_passthru_msg msg[1];
+	} __packed req;
+	struct {
+		struct ec_response_i2c_passthru r;
+		uint8_t data[1];
+	} __packed resp;
+	int rv;
+
+	/* Setup: PDC is in update mode, but system is LOCKED */
+	pdc_power_mgmt_get_usb_pd_port_count_fake.return_val = 1;
+	pdc_power_mgmt_update_start_fake.call_count = 1;
+	pdc_power_mgmt_update_start_fake.arg0_history[0] = 0;
+	pdc_power_mgmt_is_update_mode_fake.custom_fake =
+		custom_fake_pdc_is_update_mode;
+	pdc_power_mgmt_get_hw_config_fake.custom_fake =
+		custom_fake_pdc_get_hw_config;
+
+	system_is_locked_fake.return_val = 1;
+	board_allow_i2c_passthru_fake.return_val = 0; /* Not in allowlist */
+
+	req.p.port = 0;
+	req.p.num_msgs = 1;
+	req.msg[0].addr_flags = 0x66 | EC_I2C_FLAG_READ;
+	req.msg[0].len = 1;
+
+	rv = CROS_EC_COMMAND(NULL, EC_CMD_I2C_PASSTHRU, 0, &req, sizeof(req),
+			     &resp, sizeof(resp));
+
+	/* Locked system MUST deny passthru if not in allowlist, even in update mode */
+	zassert_equal(EC_RES_ACCESS_DENIED, rv,
+		      "Expected ACCESS_DENIED for locked system, got %d", rv);
+}
+
