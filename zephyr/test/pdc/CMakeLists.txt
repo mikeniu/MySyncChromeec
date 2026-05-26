@@ -11,6 +11,8 @@ add_subdirectory(${PLATFORM_EC}/zephyr/test/test_utils test_utils)
 
 zephyr_include_directories(include)
 
+zephyr_compile_definitions_ifdef(CONFIG_PLATFORM_EC_TEST_BUILD TEST_BUILD)
+
 target_sources(app PRIVATE src/main.c)
 target_sources(app PRIVATE src/fakes.c)
 
