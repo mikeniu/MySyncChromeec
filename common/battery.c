@@ -134,6 +134,11 @@ static void print_battery_strings(void)
 {
 	char text[32];
 
+#ifdef CONFIG_BATTERY_ACCESS_LIMIT
+	if (BATTERY_ACCESS_NOT_ALLOWED == battery_check_access_limit())
+		return;
+#endif
+
 	print_item_name("Manuf:");
 	if (check_print_error(battery_manufacturer_name(text, sizeof(text))))
 		ccprintf("%s\n", text);
@@ -224,6 +229,11 @@ static void print_battery_info(void)
 	int value;
 	int hour, minute;
 	int year, month, day;
+
+#ifdef CONFIG_BATTERY_ACCESS_LIMIT
+	if (BATTERY_ACCESS_NOT_ALLOWED == battery_check_access_limit())
+		return;
+#endif
 
 	print_item_name("ManufDate:");
 	if (check_print_error(battery_manufacture_date(&year, &month, &day))) {
@@ -323,11 +333,6 @@ static int command_battery(int argc, const char **argv)
 	int loop;
 	int sleep_ms = 0;
 	char *e;
-
-#ifdef CONFIG_BATTERY_ACCESS_LIMIT
-	if (BATTERY_ACCESS_NOT_ALLOWED == battery_check_access_limit())
-		return EC_ERROR_ACCESS_DENIED;
-#endif
 
 	if (argc > 1) {
 		repeat = strtoi(argv[1], &e, 0);
