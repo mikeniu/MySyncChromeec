@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "530cce1e_22f08303",
+        "filename": "zephyr/program/calypso/mensa/led_pins.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-05-27T07:07:38Z",
+      "side": 1,
+      "message": "```suggestion\n/* Copyright 2026 The ChromiumOS Authors\n```",
+      "revId": "a3a10a388ac280c8de5b997535db8595e49aeb8d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
