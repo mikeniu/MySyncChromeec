@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5d70c32e_460809b6",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T20:52:53Z",
+      "side": 1,
+      "message": "Let\u0027s create a helper function to do the endian conversion. Here\u0027s code from Gemini. Verify that it\u0027s correct:\n\n----\n\nImplementing an Endianness Helper directly addresses several core software engineering principles, specifically for hardware-facing utilities like `elaniap`:\n\n1. **DRY (Don\u0027t Repeat Yourself):** In the original patch, the exact same `if constexpr (std::endian::native \u003d\u003d std::endian::big)` block is written four separate times (`GetFwVersion`, `SendCmdWithU32Payload`, `Set32Le`, `Get32Le`). Abstracting this centralizes the logic.\n2. **Improved Readability:** Hardware communication code is already dense. Inline endianness checks add visual noise that distracts from the actual business logic (e.g., sending a payload or verifying a checksum). A semantic function call like `ToLittleEndian(val)` immediately communicates the *intent* of the code to the reader.\n3. **Compile-Time Efficiency:** By using `constexpr` and templates, this abstraction incurs zero runtime overhead. On a little-endian machine (which is the vast majority of modern consumer hardware), the compiler will completely optimize the function call away, leaving just the raw value.\n\n---\n\n### The Implementation\n\nHere are the specific changes needed to implement this across your files, adhering strictly to Google C++ Style guidelines.\n\n#### 1. Add the Helper to `utility.h`\n\nYou will need to include `\u003cbit\u003e` and `\u003cconcepts\u003e` at the top of the file, and then add the template function inside the `elan` namespace. Because it converts from native to little-endian (and vice-versa, since the operation is symmetric), we can use a single helper.\n\n```cpp\n#include \u003cbit\u003e\n#include \u003cconcepts\u003e\n// ... existing includes ...\n\nnamespace elan {\n\n// Converts an integral type between native byte order and little-endian.\ntemplate \u003cstd::integral T\u003e\nconstexpr T ToLittleEndian(T val) {\n  if constexpr (std::endian::native \u003d\u003d std::endian::big) {\n    return std::byteswap(val);\n  }\n  return val;\n}\n\n// ... existing IapError enum and ToString ...\n\n```\n\n#### 2. Refactor `iap_control.cc`\n\nNow, you can strip out the manual `std::endian` checks and replace them with the helper. Here are the target areas:\n\n**Update `SendCmdWithU32Payload`:**\n\n```cpp\nstd::expected\u003cvoid, IapError\u003e IapControl::SendCmdWithU32Payload(\n    uint8_t cmd_code, uint32_t payload_val) {\n  IapCommandPacket packet \u003d {\n      .cmd_code \u003d cmd_code, \n      .reserved \u003d {0}, \n      .payload_le \u003d ToLittleEndian(payload_val)};\n  \n  return IapCommand(packet);\n}\n\n```\n\n**Update `GetFwVersion`:**\n\n```cpp\n// ... inside GetFwVersion() ...\n  if (stat_recv.cmd_echo !\u003d packet.cmd_code ||\n      stat_recv.status_code !\u003d kErrStaSuccess) {\n    return std::unexpected(IapError::CommandFailed);\n  }\n\n  uint32_t fw_ver \u003d ToLittleEndian(stat_recv.return_value);\n\n  LogInfo(\"[IAP] {} - fw version: 0x{:08X}, boot type: 0x{:02X}\\n\", __func__,\n          fw_ver, stat_recv.boot_type);\n// ...\n\n```\n\n**Update `Set32Le`:**\n\n```cpp\nstd::expected\u003cvoid, IapError\u003e IapControl::Set32Le(std::span\u003cuint8_t\u003e buff,\n                                                  uint32_t value) {\n  if (buff.size() \u003c sizeof(value)) {\n    return std::unexpected(IapError::BufferTooSmall);\n  }\n\n  uint32_t le_value \u003d ToLittleEndian(value);\n  std::memcpy(buff.data(), \u0026le_value, sizeof(le_value));\n\n  return {};\n}\n\n```\n\n**Update `Get32Le`:**\n\n```cpp\nstd::expected\u003cuint32_t, IapError\u003e IapControl::Get32Le(\n    std::span\u003cconst uint8_t\u003e buff) {\n  if (buff.size() \u003c sizeof(uint32_t)) {\n    return std::unexpected(IapError::BufferTooSmall);\n  }\n\n  uint32_t value;\n  std::memcpy(\u0026value, buff.data(), sizeof(value));\n\n  return ToLittleEndian(value);\n}\n\n```\n\n**Update the Debug Log in `IapCommand`:**\n\n```cpp\n// ... inside IapCommand() ...\n  if (stat_recv.cmd_echo !\u003d packet.cmd_code ||\n      stat_recv.status_code !\u003d kErrStaSuccess) {\n    \n    uint32_t debug_val \u003d ToLittleEndian(stat_recv.return_value);\n    auto debug_str \u003d debug_val ? std::format(\"0x{:08X}\", debug_val) : \"N/A\";\n\n    LogErr(\n// ...\n\n```",
+      "range": {
+        "startLine": 378,
+        "startChar": 1,
+        "endLine": 380,
+        "endChar": 3
+      },
+      "revId": "3627ebeb3f1e9a3688f74863715a776cca07e22f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ff0f6c6b_53505f56",
         "filename": "util/elan/iap_control.h",
         "patchSetId": 23
