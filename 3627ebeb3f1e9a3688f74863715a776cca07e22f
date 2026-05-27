@@ -3,6 +3,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "462932a7_18e26fd0",
+        "filename": "util/elan/file_control.h",
+        "patchSetId": 23
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T20:48:15Z",
+      "side": 1,
+      "message": "* **Include Guards:** In `file_control.h` and `iap_control.h`, the include guards are missing the underscores between words.  \n    \n* *Change:* `#ifndef UTIL_ELAN_FILECONTROL_H_`  \n    \n* *To:* `#ifndef UTIL_ELAN_FILE_CONTROL_H_`",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 32
+      },
+      "revId": "3627ebeb3f1e9a3688f74863715a776cca07e22f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff0f6c6b_53505f56",
+        "filename": "util/elan/iap_control.h",
+        "patchSetId": 23
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T20:48:15Z",
+      "side": 1,
+      "message": "* **Include Guards:** In `file_control.h` and `iap_control.h`, the include guards are missing the underscores between words.  \n    \n* *Change:* `#ifndef UTIL_ELAN_IAPCONTROL_H_`  \n    \n* *To:* `#ifndef UTIL_ELAN_IAP_CONTROL_H_`",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 31
+      },
+      "revId": "3627ebeb3f1e9a3688f74863715a776cca07e22f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "90e7b281_569a60b1",
         "filename": "util/elan/iap_control.h",
         "patchSetId": 23
@@ -42,6 +88,29 @@
         "startChar": 0,
         "endLine": 48,
         "endChar": 24
+      },
+      "revId": "3627ebeb3f1e9a3688f74863715a776cca07e22f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46a90075_251adb0b",
+        "filename": "util/elan/iap_tool.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T20:48:15Z",
+      "side": 1,
+      "message": "* **Pointer Declarations:** Google prefers the pointer asterisk attached to the type.  \n    \n* *Change:* `int main(int argc, char *argv[])`  \n    \n* *To:* `int main(int argc, char* argv[])`",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 65
       },
       "revId": "3627ebeb3f1e9a3688f74863715a776cca07e22f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
