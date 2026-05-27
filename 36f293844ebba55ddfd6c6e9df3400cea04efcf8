@@ -186,6 +186,29 @@
       },
       "revId": "36f293844ebba55ddfd6c6e9df3400cea04efcf8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b21f3183_4148d71b",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T21:55:23Z",
+      "side": 1,
+      "message": "At nearly 700 lines, `et171_flash.cc` has become a \"kitchen sink\" file. It currently violates the Single Responsibility Principle by mixing command-line parsing, file I/O, USB lifecycle management, and two completely distinct flashing algorithms.\n\nBreaking this file up will significantly improve maintainability, make it easier to write unit tests for the individual components, and make the code much easier for future developers to navigate.\n\nHere is a recommended architectural split to distribute the responsibilities logically.\n\n### **Recommended File Structure**\n\n#### **1. `cli_options.h` / `cli_options.cc` (The Frontend)**\n\nExtract everything related to user input and configuration here.\n\n* **Move:** `AppConfig` struct, `AppMode` enum, `AppError` enum.\n* **Move:** `ParseArgs()`, `ParseHex()`, and `PrintHelp()`.\n* **Benefit:** Keeps the noisy `getopt_long_only` logic and input validation completely isolated from the business logic.\n\n#### **2. `file_util.h` / `file_util.cc` (The I/O Layer)**\n\nExtract the generic file system operations.\n\n* **Move:** `ReadBinaryFile()` and `LoadAesKey()`.\n* **Benefit:** These functions have nothing to do with flashing or USB; they are pure host-side file operations. Separating them allows you to mock file contents easily during unit testing.\n\n#### **3. `flasher_logic.h` / `flasher_logic.cc` (The Core Engine)**\n\nExtract the actual flashing algorithms and packet parsing. You can wrap these in a namespace or a dedicated `EgisFlasher` class.\n\n* **Move:** `ProgramFlashPayload()`, `ProgramRawCommandPayload()`, `GetNextPacketSize()`.\n* **Move:** `RunFlashFw()` and `RunFlashCmd()`.\n* **Benefit:** This isolates the most complex and critical parts of the application. It separates the \"how to flash\" from the \"how to connect.\"\n\n#### **4. `et171_flash.cc` (The Orchestrator / Entry Point)**\n\nOnce you extract the above, your main file will shrink to ~100 lines. It should act purely as the high-level orchestrator.\n\n* **Keep:** `ConnectToBootloader()`, `ExecuteGetVersion()`, `ExecuteBootLoader()`.\n* **Keep:** `main()`.\n\n### **The Resulting `main()**`\n\nIf you implement this split, your `main()` function becomes a beautifully clean, readable narrative of what the application actually does:\n\n```cpp\nint main(int argc, char *argv[]) {\n  // 1. Parse Config (from cli_options.h)\n  auto config_opt \u003d egis::ParseArgs(argc, argv);\n  if (!config_opt) return EXIT_FAILURE;\n  const egis::AppConfig \u0026config \u003d config_opt.value();\n\n  // 2. Initialize USB\n  libusb_context *raw_ctx \u003d nullptr;\n  if (libusb_init(\u0026raw_ctx) !\u003d 0) return EXIT_FAILURE;\n  std::unique_ptr\u003clibusb_context, decltype(\u0026libusb_exit)\u003e usb_ctx(raw_ctx, \u0026libusb_exit);\n\n  // 3. Connect to Device\n  egis::UsbComm boot_comm(usb_ctx.get(), ...);\n  if (!egis::ConnectToBootloader(usb_ctx.get(), boot_comm)) return EXIT_FAILURE;\n  \n  egis::BootromComm brom(boot_comm);\n  brom.SetWrappedAlgo(config.algo_type);\n\n  // 4. Dispatch to Flasher (from flasher_logic.h)\n  std::expected\u003cvoid, egis::AppError\u003e status;\n  if (config.mode \u003d\u003d egis::AppMode::kFlashFw) {\n    status \u003d egis::RunFlashFw(config, brom);\n  } else if (config.mode \u003d\u003d egis::AppMode::kFlashCmd) {\n    status \u003d egis::RunFlashCmd(config, boot_comm);\n  }\n\n  return status.has_value() ? EXIT_SUCCESS : EXIT_FAILURE;\n}\n\n```\n\nThis refactor transforms a dense, monolithic file into a modular, testable system.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 0
+      },
+      "revId": "36f293844ebba55ddfd6c6e9df3400cea04efcf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
