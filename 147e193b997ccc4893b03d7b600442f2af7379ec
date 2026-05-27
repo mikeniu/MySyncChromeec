@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "edb6f903_590a5e46",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-05-27T09:13:01Z",
+      "side": 1,
+      "message": "Hi Matt, \n\nThis change was intentionally done to avoid ACOK toggle issues on the previous platforms, Are you not able to detect charger without this change ?",
+      "revId": "147e193b997ccc4893b03d7b600442f2af7379ec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
