@@ -16,6 +16,63 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "89dadb34d1fe57578898f9cd4a4655cdcf6e3cc1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f04e9c7e_f7547700",
+        "filename": "common/power_button.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-27T19:47:15Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: This overlap check fails if first_press_duration_ms is 0. If it is 0, the effective duration will be POWER_BUTTON_SHORTPRESS (200ms). The check should use the effective duration to prevent overlaps.",
+      "range": {
+        "startLine": 354,
+        "startChar": 0,
+        "endLine": 354,
+        "endChar": 0
+      },
+      "revId": "89dadb34d1fe57578898f9cd4a4655cdcf6e3cc1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66ed1dce_02ab5de5",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 6157,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-27T19:47:15Z",
+      "side": 1,
+      "message": "nit: first_press_delay_ms",
+      "revId": "89dadb34d1fe57578898f9cd4a4655cdcf6e3cc1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90882d26_2b945c76",
+        "filename": "util/ectool.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 13251,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-27T19:47:15Z",
+      "side": 1,
+      "message": "How about changing the name to just powerbtn_press and making the first param optional too? Then this ectool command would effectively behave like the exiting pwrbtn console command by default.",
+      "revId": "89dadb34d1fe57578898f9cd4a4655cdcf6e3cc1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
