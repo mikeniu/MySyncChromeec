@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "22ec04cc_54b185fd",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 580,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T21:42:48Z",
+      "side": 1,
+      "message": "Throughout `bootrom.cc` and `ec_comm.cc`, there are many instances of casting structs to `uint8_t` spans.\n\n**Current Pattern:**\n\n```c\nEgisBootrom::SystemResetCommand req;\nstd::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026req), sizeof(req));\nauto resp \u003d SendBootromCommand(req_span);\n\n```\n\nUsing `reinterpret_cast` directly in business logic violates the principle of keeping type-punning isolated. You can completely DRY this up by adding a helper to `egis_util.h` and a generic send method to `BootromComm`.\n\n**The Fix:** Add a byte-casting helper in `egis_util.h`:\n\n```c\ntemplate \u003cTriviallyCopyable T\u003e\nstd::span\u003cconst uint8_t\u003e AsBytes(const T\u0026 obj) {\n  return {reinterpret_cast\u003cconst uint8_t*\u003e(\u0026obj), sizeof(T)};\n}\n\n```\n\nAdd a template wrapper in `bootrom.h`:\n\n```c\ntemplate \u003ctypename T\u003e\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e SendStruct(\n    const T\u0026 command, \n    std::chrono::milliseconds timeout \u003d kDefaultCommandTimeout) {\n  return SendBootromCommand(AsBytes(command), timeout);\n}\n\n```\n\n**Resulting Clean Code (in `bootrom.cc`):**\n\n```c\nEgisBootrom::SystemResetCommand req;\nauto resp \u003d SendStruct(req); // Replaces 3 lines with 2, no casts!\n\n```",
+      "range": {
+        "startLine": 577,
+        "startChar": 0,
+        "endLine": 580,
+        "endChar": 49
+      },
+      "revId": "36f293844ebba55ddfd6c6e9df3400cea04efcf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "00674ca5_1391f9a7",
         "filename": "util/egis/crypto_util.cc",
         "patchSetId": 23
