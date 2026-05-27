@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "239364ae_b7de4b3c",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T21:47:41Z",
+      "side": 1,
+      "message": "`SendBootromCommandSha` and `SendBootromCommandAes` duplicate the logic for validating `SecureResponseHeader`, handling truncation, and extracting the payload length.\n\n**The Fix:** Extract the common response parsing into a private helper in `BootromComm`:\n\n```c\nstd::expected\u003cstd::span\u003cconst uint8_t\u003e, BootromError\u003e BootromComm::ExtractSecurePayload(\n    std::span\u003cconst uint8_t\u003e raw_response, size_t min_resp_size) {\n    \n  auto rsp_hdr_res \u003d ReadStruct\u003cSecureResponseHeader\u003e(raw_response);\n  if (!rsp_hdr_res) return std::unexpected(BootromError::kResponseTruncated);\n  \n  uint32_t rsp_wrapped_len \u003d FromLittleEndian(rsp_hdr_res-\u003epayload_len);\n  if (rsp_wrapped_len \u003e raw_response.size() - min_resp_size) {\n    rsp_wrapped_len \u003d raw_response.size() - min_resp_size;\n  }\n  \n  return raw_response.subspan(sizeof(SecureResponseHeader), rsp_wrapped_len);\n}\n\n```\n\nYou can then call this inside both `Sha` and `Aes` command handlers, drastically reducing their visual footprint.",
+      "range": {
+        "startLine": 95,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 53
+      },
+      "revId": "36f293844ebba55ddfd6c6e9df3400cea04efcf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "22ec04cc_54b185fd",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 23
