@@ -7,4 +7,12 @@
 	aliases {
 		gpio-btn-ign-out = &gpio_btn_ign_out;
 	};
+
+	gpio-leds {
+		compatible = "gpio-leds"; /* Common pattern in Zephyr for GPIO outputs */
+
+		gpio_btn_ign_out: gpio_btn_ign_out {
+			gpios = <&gpiob 9 GPIO_ACTIVE_HIGH>;
+		};
+	};
 };
