@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "91e40177_cec95b11",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T22:35:09Z",
+      "side": 1,
+      "message": "Where does this come from? We should probably use whatever constant already exists rather than duplicating.",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 33
+      },
+      "revId": "6234994f1a33c9554fb117f5e8c5f7049771826b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e73c64e6_8ca1a643",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
         "patchSetId": 13
