@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ccf9dd9_8b131d7b",
+        "filename": "util/focaltech/build.mk",
+        "patchSetId": 13
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "47c9380b_3e6eb175",
+      "range": {
+        "startLine": 8,
+        "startChar": 48,
+        "endLine": 8,
+        "endChar": 49
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d7b612e0_ac49b651",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-05-26T16:50:09Z",
       "side": 1,
       "message": "Please fix this WARNING reported by Trailing Whitespace: Please remove the trailing whitespace.",
+      "range": {
+        "startLine": 17,
+        "startChar": 51,
+        "endLine": 17,
+        "endChar": 52
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd33e427_a19d1eee",
+        "filename": "util/focaltech/build.mk",
+        "patchSetId": 13
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d7b612e0_ac49b651",
       "range": {
         "startLine": 17,
         "startChar": 51,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac41d632_c2b00232",
+        "filename": "util/focaltech/ft_help.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5dea332d_d5d9711b",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3e566283_ef824a24",
@@ -93,6 +165,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1741f56c_f0406e52",
+        "filename": "util/focaltech/ft_help.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3e566283_ef824a24",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 6
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d014b661_871634e5",
@@ -106,6 +202,30 @@
       "writtenOn": "2026-05-26T16:59:11Z",
       "side": 1,
       "message": "add newline",
+      "range": {
+        "startLine": 81,
+        "startChar": 0,
+        "endLine": 81,
+        "endChar": 35
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a980c3a_af6bef42",
+        "filename": "util/focaltech/ft_log.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d014b661_871634e5",
       "range": {
         "startLine": 81,
         "startChar": 0,
@@ -163,6 +283,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fce589ab_d2166a0d",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f2abee_59a2e199",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 80
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "437a7ddb_5d33e5db",
@@ -176,6 +320,30 @@
       "writtenOn": "2026-05-26T17:48:41Z",
       "side": 1,
       "message": "Here are some improvements from Gemini. **Please review the suggested names to make sure they actually match the Focaltech protocol.** If they are not correct, please come up with a different name.\n\n----\n\n### Part 1: Parameter Renaming\n\n**Rationale:** The names `para2`, `para3`, `para4`, and `sub_para` are opaque artifacts from legacy code. They force developers to cross-reference documentation to understand what a command is doing. By analyzing the hardware protocol, we can see these bytes serve specific, consistent purposes:\n\n* `para2` is predominantly a **Memory Address**.  \n* `para3` is predominantly a **Length or Size**.  \n* `para4` is an **Auxiliary Address** (used when moving data between flash and SRAM).  \n* `sub_para` holds **Flags or Modes** (like hash modes or reset types).\n\nRenaming these makes the function signatures self-documenting and eliminates ambiguity at the call sites.\n\n**Code Changes:**\n\n**1\\. Update `util/focaltech/ft_scsi.cc` (The Struct)** Update the underlying packed struct to reflect the true semantic meaning of the bytes.\n\n```c\n// Replace the old FtCmdFormat struct with this:\nstruct FtCmdFormat {\n  uint8_t opcode;\n  uint32_t address;      // Replaces para2\n  uint32_t length;       // Replaces para3\n  uint32_t aux_address;  // Replaces para4\n  uint8_t subcmd;\n  uint8_t flags;         // Replaces sub_para\n  uint8_t reserved;\n} __attribute__((packed));\n\n```\n\n**2\\. Update `util/focaltech/ft_scsi.cc` (The Implementation)** Update the implementation of the builder function to map the new parameters to the struct.\n\n```c\nstd::array\u003cuint8_t, 16\u003e BuildFtCmd(uint8_t opcode, uint8_t subcmd,\n                                   uint32_t address, uint32_t length,\n                                   uint32_t aux_address, uint8_t flags) {\n  std::array\u003cuint8_t, 16\u003e cmd_buf{};\n  auto* cmd \u003d reinterpret_cast\u003cFtCmdFormat*\u003e(cmd_buf.data());\n\n  cmd-\u003eopcode \u003d opcode;\n  cmd-\u003esubcmd \u003d subcmd;\n  cmd-\u003eflags \u003d flags;            // Formerly sub_para\n  cmd-\u003eaddress \u003d address;        // Formerly para2\n  cmd-\u003elength \u003d length;          // Formerly para3\n  cmd-\u003eaux_address \u003d aux_address;// Formerly para4\n\n  return cmd_buf;\n}\n\n```\n\n---\n\n### Part 2: DRYing the Codebase\n\n**Rationale:** Currently, `updater.cc` repeats a verbose two-step process for almost every hardware operation: building a command (often passing trailing `0`s for unused parameters) and then sending it.\n\nBy taking advantage of C++ default arguments (which comply with the Google C++ Style Guide for non-virtual functions) and creating a unified `SendAction` wrapper, we can collapse 3–4 lines of boilerplate into a single, highly readable function call.\n\n**Code Changes:**\n\n**1\\. Update `util/focaltech/ft_scsi.h` (Default Arguments)** Add the new parameter names and assign default values of `0` to the trailing arguments.\n\n```c\n// Allow omitting trailing parameters when they are just 0\nstd::array\u003cuint8_t, 16\u003e BuildFtCmd(uint8_t opcode, uint8_t subcmd,\n                                   uint32_t address \u003d 0, uint32_t length \u003d 0,\n                                   uint32_t aux_address \u003d 0, uint8_t flags \u003d 0);\n\n```\n\n\\*\\*2. Add `SendAction` to `util/focaltech/updater.cc**` Place this helper function inside the anonymous `namespace { ... }` at the top of the file. It automatically injects the `kFtCmdAction` opcode, which is used by almost every command in this file.\n\n```c\nnamespace {\n// ... existing constants ...\n\n// Helper to build a standard kFtCmdAction command and send it immediately\nstd::expected\u003cvoid, FtError\u003e SendAction(\n    const UsbDevice\u0026 device, uint8_t subcmd, uint32_t address,\n    std::span\u003cuint8_t\u003e data, TransferDirection dir, std::chrono::milliseconds timeout,\n    uint32_t length \u003d 0, uint32_t aux_address \u003d 0, uint8_t flags \u003d 0) {\n  \n  auto cmd \u003d BuildFtCmd(kFtCmdAction, subcmd, address, length, aux_address, flags);\n  return SendBulkCommand(device, cmd, data, dir, timeout);\n}\n\n} // namespace\n\n```\n\n\\*\\*3. Refactor Functions in `updater.cc` to use `SendAction**` Replace the verbose build-and-send pairs with the new wrapper. Here are the most prominent examples:\n\n*Refactoring `FtErasePage`:*\n\n```c\nstatic std::expected\u003cvoid, FtError\u003e FtErasePage(const UsbDevice\u0026 device,\n                                                int length, int addr) {\n  uint32_t pages \u003d FtDivRoundUp(static_cast\u003cuint32_t\u003e(length), kFocalConfigSize);\n  return SendAction(device, kFtSubcmdErasePage, addr, {}, \n                    TransferDirection::kOut, kErasePageTimeout, pages);\n}\n\n```\n\n*Refactoring `FtMcuReset`:*\n\n```c\nstatic std::expected\u003cvoid, FtError\u003e FtMcuReset(const UsbDevice\u0026 device,\n                                               uint32_t target_addr) {\n  if (target_addr !\u003d kFocalRomCfgAddr \u0026\u0026 target_addr !\u003d kFocalBootCfgAddr) {\n    LOGE(\"Reset address invalid: {:#x}\", target_addr);\n    return std::unexpected(FtError::kParameterError);\n  }\n  // Passing 0s for length and aux_address to reach the flags parameter\n  return SendAction(device, kFtSubcmdSoftReset, 0, {}, \n                    TransferDirection::kSendOnly, kMcuResetTimeout, 0, 0, kSoftPor);\n}\n\n```\n\n*Refactoring `FtVerifyData`:*\n\n```c\nstd::expected\u003cvoid, FtError\u003e FtVerifyData(const UsbDevice\u0026 device,\n                                          std::string_view file_path,\n                                          uint32_t target_addr) {\n  // ... [file reading logic] ...\n\n  uint8_t hash_mode \u003d (target_addr \u003d\u003d kFocalRomCfgAddr) ? (0x04 \u003c\u003c 4) : 0x04;\n\n  std::array\u003cuint8_t, SHA256_DIGEST_LENGTH\u003e device_hash{};\n  \n  auto io_res \u003d SendAction(device, kFtSubcmdVerify, target_addr, device_hash, \n                           TransferDirection::kIn, kVerifyHashTimeout, \n                           firmware_data.size(), 0, hash_mode);\n  \n  // ... [hash comparison logic] ...\n\n```",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 21
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9249a999_52830b33",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "437a7ddb_5d33e5db",
       "range": {
         "startLine": 56,
         "startChar": 0,
@@ -233,6 +401,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b234665_77cd3b01",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "58767a06_9e43957a",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 67
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "29cdfc18_4962a143",
@@ -246,6 +438,30 @@
       "writtenOn": "2026-05-26T16:59:11Z",
       "side": 1,
       "message": "add newline",
+      "range": {
+        "startLine": 155,
+        "startChar": 0,
+        "endLine": 155,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7741c153_9ca5c616",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "29cdfc18_4962a143",
       "range": {
         "startLine": 155,
         "startChar": 0,
@@ -279,6 +495,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "09b68f39_e24d7bb4",
+        "filename": "util/focaltech/ft_util.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ddd9dcbd_fba608ff",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 36
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d18d74ba_6a5a60d7",
@@ -292,6 +532,30 @@
       "writtenOn": "2026-05-26T18:00:09Z",
       "side": 1,
       "message": "### The Problem with the Current Code\n\nIn `main.cc`, the `CheckEcBuildVersion` function currently uses a massive, chained `if` statement to check the strings:\n\n```c\n  if (info.find(kFtProjectNameTest) \u003d\u003d std::string_view::npos \u0026\u0026\n      info.find(kFtProjectName9865) \u003d\u003d std::string_view::npos \u0026\u0026\n      info.find(kFtProjectName9869) \u003d\u003d std::string_view::npos \u0026\u0026\n      info.find(kFtProjectName9849) \u003d\u003d std::string_view::npos) {\n    LOGE(\"can\u0027t find focal project device\");\n    return std::unexpected(FtError::kNoSuchDevice);\n  }\n\n```\n\nEvery time a new hardware project is added, this `if` statement will grow longer, harder to read, and more prone to copy-paste errors.\n\n### The Fix: `std::array` \\+ `std::ranges`\n\nBy grouping the names into a `std::array`, we can use C++20 ranges to elegantly search the list, separating the *data* from the *logic*.\n\n**1\\. Define the Array (Top of `main.cc`)** Replace the four floating constants with a single structured array inside the anonymous namespace:\n\n```c\nnamespace {\n// ...\n\n// List of supported FocalTech hardware project names\nconstexpr std::array\u003cstd::string_view, 4\u003e kSupportedProjects \u003d {\n    \"ft9001\",\n    \"chojnik\",\n    \"chudow\",\n    \"chobienia\"\n};\n\n// ...\n} // namespace\n\n```\n\n**2\\. Refactor the Version Check** Include `\u003calgorithm\u003e` at the top of the file, and then replace the chained `if` statement in `CheckEcBuildVersion` with `std::ranges::any_of`.\n\n```c\n#include \u003calgorithm\u003e\n\n// ... inside CheckEcBuildVersion ...\n\n  // Check if the hardware info string contains ANY of our supported project names\n  bool is_focal_device \u003d std::ranges::any_of(kSupportedProjects, \n      [\u0026info](std::string_view project) {\n          return info.find(project) !\u003d std::string_view::npos;\n      });\n\n  if (!is_focal_device) {\n    LOGE(\"can\u0027t find focal project device\");\n    return std::unexpected(FtError::kNoSuchDevice);\n  }\n\n```\n\n### Why this is better:\n\n* **Scalability:** When hardware engineering releases a new project named `\"chelm\"`, you only have to add `\"chelm\"` to the array. You don\u0027t have to touch the logic at all.  \n* **Readability:** `std::ranges::any_of` perfectly expresses the semantic intent of the code (\"Is *any of* these strings inside the info block?\").  \n* **Performance:** It is evaluated just as efficiently as the chained `if` statements, short-circuiting and returning `true` the moment it finds a match.",
+      "range": {
+        "startLine": 101,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 51
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85d56028_e2af6558",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d18d74ba_6a5a60d7",
       "range": {
         "startLine": 101,
         "startChar": 0,
@@ -349,6 +613,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "74cef35a_94feceaa",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e34f39df_b5cfc1ad",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 223,
+        "endChar": 52
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5689f20_38805717",
@@ -362,6 +650,30 @@
       "writtenOn": "2026-05-26T18:15:11Z",
       "side": 1,
       "message": "Main is very long and complex. Here\u0027s Gemini-generated code to simplify. Please review for correctness before using:\n\n\n----\n\nThis refactor applies two core principles of clean software design:\n\n1. **True Encapsulation (The Push-Down):** A hardware function should enforce its own physical prerequisites. If changing flash protection requires the MCU to be in bootloader mode, that rule is a fundamental property of the hardware operation, not a quirk of the CLI. Centralizing the guard inside the function prevents catastrophic accidental hardware writes if another developer uses the function later.  \n2. **Single Responsibility Principle (The Extraction):** Your `main()` function is currently acting as a parser, a USB initializer, and a business-logic router. By extracting the routing into an `ExecuteCommand` function, `main()` becomes a highly readable, linear initialization pipeline, and the router becomes a simple \"dumb\" switchboard mapping user intent to C++ functions.\n\n---\n\n### Step 1: Update Signatures in `updater.cc`\n\nFirst, modify the signatures of the worker functions to accept the `FtDeviceMode` so they can validate their own prerequisites.\n\n*(Note: `CheckEcBuildVersion`, `SwitchToBoot`, and `TestEcSwitchToRom` already accept `FtDeviceMode` in your original patch\\!)*\n\n```c\n// 1. FtGetFlashProtect\nstd::expected\u003cFtFlashWpArea, FtError\u003e FtGetFlashProtect(\n    const UsbDevice\u0026 device, FtDeviceMode current_mode);\n\n// 2. FtSetFlashProtect\nstd::expected\u003cvoid, FtError\u003e FtSetFlashProtect(\n    const UsbDevice\u0026 device, FtDeviceMode current_mode, FtFlashWpArea wp_area);\n\n// 3. FtBackToRomBoot\nstd::expected\u003cvoid, FtError\u003e FtBackToRomBoot(\n    const UsbDevice\u0026 device, FtDeviceMode current_mode);\n\n```\n\n---\n\n### Step 2: Inject the Guard Clauses (`updater.cc`)\n\nMove the `if` statements out of `main.cc` and put them at the very top of these worker functions as early-exit guard clauses.\n\n**For `FtGetFlashProtect`:**\n\n```c\nstd::expected\u003cFtFlashWpArea, FtError\u003e FtGetFlashProtect(\n    const UsbDevice\u0026 device, FtDeviceMode current_mode) {\n  \n  if (current_mode !\u003d FtDeviceMode::kBoot) {\n    LOGE(\"Get flash protect should only be done in boot mode\");\n    return std::unexpected(FtError::kInvalidMode);\n  }\n\n  // ... [existing I/O logic] ...\n\n```\n\n**For `FtSetFlashProtect`:**\n\n```c\nstd::expected\u003cvoid, FtError\u003e FtSetFlashProtect(const UsbDevice\u0026 device,\n                                               FtDeviceMode current_mode,\n                                               FtFlashWpArea wp_area) {\n  if (current_mode !\u003d FtDeviceMode::kBoot) {\n    LOGE(\"Set flash protect should only be done in boot mode\");\n    return std::unexpected(FtError::kInvalidMode);\n  }\n\n  // ... [existing parameter validation and I/O logic] ...\n\n```\n\n**For `FtBackToRomBoot`:**\n\n```c\nstd::expected\u003cvoid, FtError\u003e FtBackToRomBoot(const UsbDevice\u0026 device, \n                                             FtDeviceMode current_mode) {\n  if (current_mode !\u003d FtDeviceMode::kBoot) {\n    LOGE(\"Current mode cannot switch to ROM via back command\");\n    return std::unexpected(FtError::kInvalidMode);\n  }\n\n  // ... [existing erase and reset logic] ...\n}\n\n```\n\n---\n\n### Step 3: Create the Dispatcher (`main.cc`)\n\nPlace this function above `main()`. Because the domain functions now protect themselves, the switch statement drops all of its validation clutter.\n\n```c\n// Helper function to route the parsed command to the correct operation\nstd::expected\u003cvoid, FtError\u003e ExecuteCommand(const AppConfig\u0026 config, \n                                            const UsbDevice\u0026 usb_device, \n                                            FtDeviceInfo\u0026 info) {\n  switch (config.cmd) {\n    case Command::kGetEcVersion:\n      LOGI(\"Tool version is v1.0.2\");\n      return CheckEcBuildVersion(usb_device, info.current_mode);\n\n    case Command::kSetFlashWp:\n      LOGI(\"Setting flash write protect to area: {}\", config.action_param);\n      return FtSetFlashProtect(usb_device, info.current_mode, \n                               static_cast\u003cFtFlashWpArea\u003e(config.action_param));\n\n    case Command::kGetFlashWp:\n      LOGI(\"Getting flash write protect area...\");\n      if (auto res \u003d FtGetFlashProtect(usb_device, info.current_mode); res) {\n        LOGI(\"Flash write protect area \u003d {}\", static_cast\u003cint\u003e(*res));\n        return {};\n      }\n      return std::unexpected(res.error());\n\n    case Command::kEnterBoot:\n      LOGI(\"Entering bootloader mode...\");\n      return SwitchToBoot(usb_device, info.current_mode);\n\n    case Command::kEnterRom:\n      LOGI(\"Entering ROM mode...\");\n      // Route to the correct ROM switch function based on the current mode\n      if (info.current_mode \u003d\u003d FtDeviceMode::kTest) {\n        return TestEcSwitchToRom(usb_device, info.current_mode);\n      }\n      return FtBackToRomBoot(usb_device, info.current_mode); \n\n    case Command::kUpdate:\n      LOGI(\"Updating firmware...\");\n      if (info.ec_bin.empty()) {\n        LOGE(\"No firmware file specified\");\n        return std::unexpected(FtError::kParameterError);\n      }\n      // The retry loop stays here because it is a higher-level CLI execution policy\n      for (int retry \u003d 1; retry \u003c\u003d 3; ++retry) {\n        if (auto res \u003d UpdateFw(usb_device, info); res) {\n          LOGI(\"Firmware update successful\");\n          return {};\n        }\n        LOGW(\"Firmware update fail attempt {}\", retry);\n      }\n      LOGE(\"Firmware update failed\");\n      return std::unexpected(FtError::kUsbTransferFailed);\n\n    default:\n      LOGE(\"Command not implemented.\");\n      return std::unexpected(FtError::kParameterError);\n  }\n}\n\n```\n\n---\n\n### Step 4: Streamline `main` (`main.cc`)\n\nWith the dispatcher handling the execution routing, your `main` function shrinks down to a clean sequence of initialization steps.\n\n```c\nint main(int argc, char** argv) {\n  std::vector\u003cstd::string_view\u003e args(argv + 1, argv + argc);\n\n  if (!args.empty() \u0026\u0026 (args[0] \u003d\u003d \"-h\" || args[0] \u003d\u003d \"--help\")) {\n    std::println(ft_help::kCmdHelpString, argv[0]);\n    return EXIT_SUCCESS;\n  }\n\n  // 1. Parse Arguments\n  auto config_res \u003d ParseArguments(args);\n  if (!config_res.has_value()) {\n    return EXIT_FAILURE;\n  }\n  const AppConfig\u0026 config \u003d config_res.value();\n\n  // 2. Initialize USB Subsystem\n  UsbContext usb_ctx;\n  if (!usb_ctx.IsValid()) {\n    LOGE(\"Failed to initialize libusb.\");\n    return EXIT_FAILURE;\n  }\n\n  UsbConnectionDetails details;\n  auto device_result \u003d UsbDevice::Create(usb_ctx, details);\n  if (!device_result) {\n    LOGE(\"Failed to open device: {}\", ToString(device_result.error()));\n    return EXIT_FAILURE;\n  }\n  UsbDevice usb_device \u003d std::move(*device_result);\n\n  // 3. Initialize Device State\n  FtDeviceInfo info \u003d {};\n  if (auto init_res \u003d DeviceInit(details, info); !init_res) {\n    LOGE(\"Cannot find Focal device\");\n    return EXIT_FAILURE;\n  }\n\n  // 4. Execute the requested command\n  if (auto exec_res \u003d ExecuteCommand(config, usb_device, info); !exec_res) {\n    LOGE(\"Command failed: {}\", ToString(exec_res.error()));\n    return EXIT_FAILURE;\n  }\n\n  return EXIT_SUCCESS;\n}\n\n```",
+      "range": {
+        "startLine": 257,
+        "startChar": 0,
+        "endLine": 259,
+        "endChar": 25
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bfba689_4a611c86",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5689f20_38805717",
       "range": {
         "startLine": 257,
         "startChar": 0,
@@ -395,6 +707,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcdc9890_9e33c99e",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f46df1f_1756e9bd",
+      "range": {
+        "startLine": 403,
+        "startChar": 0,
+        "endLine": 403,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ef0a8ca8_b45a1fcf",
@@ -408,6 +744,30 @@
       "writtenOn": "2026-05-26T16:50:09Z",
       "side": 1,
       "message": "Remove this",
+      "range": {
+        "startLine": 43,
+        "startChar": 13,
+        "endLine": 43,
+        "endChar": 44
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b8a17f5_57a05b41",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef0a8ca8_b45a1fcf",
       "range": {
         "startLine": 43,
         "startChar": 13,
@@ -441,6 +801,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8833c60b_d96eaf52",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f828a717_c52e7bd5",
+      "range": {
+        "startLine": 101,
+        "startChar": 0,
+        "endLine": 101,
+        "endChar": 55
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dde11899_3463c6cb",
@@ -454,6 +838,30 @@
       "writtenOn": "2026-05-26T16:59:11Z",
       "side": 1,
       "message": "add newline",
+      "range": {
+        "startLine": 125,
+        "startChar": 0,
+        "endLine": 125,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bfcfe9a_5da9cf09",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dde11899_3463c6cb",
       "range": {
         "startLine": 125,
         "startChar": 0,
@@ -487,6 +895,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3824bfc2_3f1a9028",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52acf602_de389a1c",
+      "range": {
+        "startLine": 188,
+        "startChar": 0,
+        "endLine": 188,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a5cc916e_0e6fdfdf",
@@ -500,6 +932,30 @@
       "writtenOn": "2026-05-26T16:59:11Z",
       "side": 1,
       "message": "add newline",
+      "range": {
+        "startLine": 233,
+        "startChar": 0,
+        "endLine": 233,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9a65f83_04228ab1",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a5cc916e_0e6fdfdf",
       "range": {
         "startLine": 233,
         "startChar": 0,
@@ -533,6 +989,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b54d537_27402ef6",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f64d5ac8_b3720d9f",
+      "range": {
+        "startLine": 252,
+        "startChar": 0,
+        "endLine": 252,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0d31c404_cb307acf",
@@ -546,6 +1026,30 @@
       "writtenOn": "2026-05-26T16:59:11Z",
       "side": 1,
       "message": "add newline",
+      "range": {
+        "startLine": 275,
+        "startChar": 0,
+        "endLine": 275,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a5f8951_77ef7100",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d31c404_cb307acf",
       "range": {
         "startLine": 275,
         "startChar": 0,
@@ -579,6 +1083,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d04284c_e5ce67cb",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51a08d21_4b8bd785",
+      "range": {
+        "startLine": 345,
+        "startChar": 0,
+        "endLine": 345,
+        "endChar": 8
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b354922a_e33562a4",
@@ -602,6 +1130,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ac1a669_741f8740",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 429,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b354922a_e33562a4",
+      "range": {
+        "startLine": 429,
+        "startChar": 0,
+        "endLine": 429,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b8d4d340_c05051e5",
@@ -615,6 +1167,30 @@
       "writtenOn": "2026-05-26T16:50:09Z",
       "side": 1,
       "message": "Remove this comment",
+      "range": {
+        "startLine": 249,
+        "startChar": 0,
+        "endLine": 249,
+        "endChar": 29
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33cb3c16_6bb0eeba",
+        "filename": "util/focaltech/usb_context.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b8d4d340_c05051e5",
       "range": {
         "startLine": 249,
         "startChar": 0,
@@ -671,6 +1247,54 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb5fc195_a6639c8d",
+        "filename": "util/focaltech/usb_context.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ad88a174_fc8c0960",
+      "range": {
+        "startLine": 287,
+        "startChar": 0,
+        "endLine": 287,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "940c759b_ddf47160",
+        "filename": "util/focaltech/usb_context.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31ef43cf_5afe4311",
+      "range": {
+        "startLine": 250,
+        "startChar": 0,
+        "endLine": 287,
+        "endChar": 1
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5028d525_bbb46f31",
@@ -684,6 +1308,30 @@
       "writtenOn": "2026-05-26T17:36:05Z",
       "side": 1,
       "message": "The `FtError` enum itself is still clinging to legacy C idioms, which undermines the benefits of `std::expected`.\n\nHere is how to fully modernize the error return types.\n\n### 1\\. Modernize the `FtError` Enum\n\nIn `usb_context.h`, the enum defines `kSuccess \u003d 0` and assigns negative numbers to the errors (e.g., `kResultFail \u003d -4`).\n\n**The Issues:**\n\n* **Redundant Success State:** `std::expected\u003cT, E\u003e` intrinsically tracks success. Returning `{}` (or the expected value) represents success. You should *never* return `FtError::kSuccess` as an error type.  \n* **C-Style Integers:** Negative enum values are a holdover from when functions returned `\u003c 0` for errors and `\u003e\u003d 0` for bytes transferred. Because `std::expected` strictly separates the value from the error, the underlying integer representation no longer matters.  \n* **Vague Vocabulary:** `kResultFail` is used as a catch-all for everything from USB timeouts to SHA256 hash mismatches.\n\n**The Fix:** Remove the integers, delete `kSuccess`, and expand the vocabulary to be highly specific.\n\n```c\nenum class FtError {\n  kNoSuchDevice,\n  kParameterError,\n  kNoSuchFile,\n  kInvalidMode,\n  kUsbTransferFailed,    // Replaces kResultFail for I/O\n  kHashMismatch,         // Replaces kResultFail for verification\n  kDeviceTimeout,        // For reset/polling timeouts\n  kMissingConfigPage,    // For firmware file validation\n};\n\n```\n\n### 2\\. Stringify the Errors for the User\n\nIn `main.cc`, the code currently prints: `LOGE(\"Failed to open device: error code {}\", static_cast\u003cint\u003e(device_result.error()));`\n\nUsers should not have to cross-reference the source code to figure out what \"error code \\-4\" means. Since you are using `\u003cprint\u003e` and `\u003cformat\u003e`, you should provide a string-conversion helper.\n\nAdd this right beneath the enum in `usb_context.h`:\n\n```c\nconstexpr std::string_view ToString(FtError err) {\n  switch (err) {\n    case FtError::kNoSuchDevice:      return \"No such device found\";\n    case FtError::kParameterError:    return \"Invalid parameter provided\";\n    case FtError::kNoSuchFile:        return \"File not found or cannot be read\";\n    case FtError::kInvalidMode:       return \"Device is in an invalid mode for this operation\";\n    case FtError::kUsbTransferFailed: return \"USB bulk transfer failed\";\n    case FtError::kHashMismatch:      return \"Firmware verification hash mismatch\";\n    case FtError::kDeviceTimeout:     return \"Operation timed out\";\n    case FtError::kMissingConfigPage: return \"Firmware binary lacks required config page\";\n  }\n  return \"Unknown error\";\n}\n\n```\n\nNow, update `main.cc` to be user-friendly:\n\n```c\n  auto device_result \u003d UsbDevice::Create(usb_ctx, details);\n  if (!device_result) {\n    LOGE(\"Failed to open device: {}\", ToString(device_result.error()));\n    return EXIT_FAILURE;\n  }\n\n```\n\n### 3\\. Fix the `ResetComplete` Outlier\n\n`UsbDevice::ResetComplete` still returns `int` (`0` for success, `-1` for error). To truly standardize the codebase, *every* function that can fail should use `std::expected`.\n\n**Update `usb_context.h`:**\n\n```c\n  // Old: int ResetComplete(int timeout_sec) const;\n  std::expected\u003cvoid, FtError\u003e ResetComplete(std::chrono::seconds timeout) const;\n\n```\n\n**Update `usb_context.cc` (using the simplified polling method):**\n\n```c\nstd::expected\u003cvoid, FtError\u003e UsbDevice::ResetComplete(std::chrono::seconds timeout) const {\n  if (!handle_) {\n    LOGE(\"Invalid device handle\");\n    return std::unexpected(FtError::kNoSuchDevice);\n  }\n\n  const auto poll_interval \u003d 100ms;\n  auto elapsed \u003d 0ms;\n\n  while (timeout \u003d\u003d 0s || elapsed \u003c timeout) {\n    int config \u003d 0;\n    int r \u003d libusb_get_configuration(handle_.get(), \u0026config);\n\n    if (r \u003d\u003d LIBUSB_ERROR_NO_DEVICE) {\n      LOGI(\"USB device removal/reset detected\");\n      return {}; // Success!\n    }\n\n    std::this_thread::sleep_for(poll_interval);\n    elapsed +\u003d poll_interval;\n  }\n\n  LOGW(\"Timeout waiting for device removal\");\n  return std::unexpected(FtError::kDeviceTimeout);\n}\n\n```\n\nBy applying these changes, your error handling becomes universally predictable, type-safe, and self-documenting.",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 2
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd64ac73_4c25341c",
+        "filename": "util/focaltech/usb_context.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5028d525_bbb46f31",
       "range": {
         "startLine": 15,
         "startChar": 0,
@@ -717,6 +1365,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f438006_7eeede50",
+        "filename": "util/focaltech/usb_context.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c7ac0596_02659e57",
+      "range": {
+        "startLine": 139,
+        "startChar": 45,
+        "endLine": 139,
+        "endChar": 74
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bf0915e3_ee6bc6f4",
@@ -730,6 +1402,30 @@
       "writtenOn": "2026-05-26T16:59:11Z",
       "side": 1,
       "message": "add newline",
+      "range": {
+        "startLine": 158,
+        "startChar": 0,
+        "endLine": 158,
+        "endChar": 40
+      },
+      "revId": "aea89f2ea6978aa9a7fe54dd61b110e76f30dea8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cfd0e30_ee304248",
+        "filename": "util/focaltech/usb_context.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-27T11:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf0915e3_ee6bc6f4",
       "range": {
         "startLine": 158,
         "startChar": 0,
