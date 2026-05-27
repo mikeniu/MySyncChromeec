@@ -23,9 +23,9 @@ test_static int test_watchdog()
 
 	/*
 	 * TODO(b/390021325): It appears that the watchdog timer is being set
-	 * to longer than CONFIG_WATCHDOG_PERIOD_MS on bloonchipper/dartmonkey.
+	 * to longer than CONFIG_WATCHDOG_PERIOD_MS on dartmonkey.
 	 */
-	if (IS_ENABLED(BOARD_BLOONCHIPPER) || IS_ENABLED(BOARD_DARTMONKEY)) {
+	if (IS_ENABLED(BOARD_DARTMONKEY)) {
 		us_to_wait = watchdog_period_us * 3;
 	}
 
