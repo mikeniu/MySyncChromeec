@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00674ca5_1391f9a7",
+        "filename": "util/egis/crypto_util.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T21:33:18Z",
+      "side": 1,
+      "message": "**Unvalidated Span Sizes in `crypto_util.cc`** The `AesGcmEncrypt` and `AesGcmDecrypt` functions accept `std::span` arguments for keys, IVs, and tags, but they fail to validate the lengths of these spans before passing the underlying raw pointers to OpenSSL/BoringSSL.\n\n* **Vulnerability:** `EVP_aes_256_gcm()` strictly requires a 32-byte key. If a caller passes a smaller key span, `EVP_EncryptInit_ex` will perform an out-of-bounds read, potentially leading to a segfault or extracting arbitrary memory into the cipher state.  \n* **Remediation:** Add strict length validations at the beginning of these functions:\n\n```c\nif (key.size() !\u003d 32 || iv.size() !\u003d 12 || tag.size() !\u003d 16) {\n    return std::unexpected(CryptoError::kInvalidParam); // Add this error code\n}\n\n```",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 68
+      },
+      "revId": "36f293844ebba55ddfd6c6e9df3400cea04efcf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "201423b5_6e6e2dce",
+        "filename": "util/egis/crypto_util.h",
+        "patchSetId": 23
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T21:33:18Z",
+      "side": 1,
+      "message": "boringssl",
+      "range": {
+        "startLine": 55,
+        "startChar": 33,
+        "endLine": 55,
+        "endChar": 40
+      },
+      "revId": "36f293844ebba55ddfd6c6e9df3400cea04efcf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
