@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdbd6f95_6351c116",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-27T13:10:22Z",
+      "side": 1,
+      "message": "NIT: Use /* */",
+      "revId": "d4d7e01e5f70db8455a5f5131d97ebdad6d14809",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5483faab_1a8f1e77",
+        "filename": "zephyr/program/fpmcu/et171/btn_ign.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-27T13:10:22Z",
+      "side": 1,
+      "message": "One thing to check, how upstream Zephyr code handles child nodes of `gpio-leds`? Does it perform any configuration?",
+      "revId": "d4d7e01e5f70db8455a5f5131d97ebdad6d14809",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b3bba16_19a7bd37",
+        "filename": "zephyr/program/fpmcu/et171/btn_ign.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-27T13:10:22Z",
+      "side": 1,
+      "message": "NIT: please use `gpio-leds` above `compatible \u003d \"gpio-leds\";` in /* */.",
+      "revId": "d4d7e01e5f70db8455a5f5131d97ebdad6d14809",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
