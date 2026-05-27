@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90184b60_f863c7df",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-27T11:28:00Z",
+      "side": 1,
+      "message": "Do you think we should place this code inside #ifdef RW to make sure it\u0027s not used in RO and leave only init of the pin in RO?",
+      "revId": "b8cac6c0ce3a71586886cbe414d8afa2069db4d1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "357a69df_33423dc1",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-27T11:28:00Z",
+      "side": 1,
+      "message": "Does it have to be outside namespace? If so, maybe please move the init function outside as well, next to `SYS_INIT`?",
+      "revId": "b8cac6c0ce3a71586886cbe414d8afa2069db4d1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c7ded47_76387894",
+        "filename": "zephyr/program/fpmcu/ft9001/btn_ign.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-27T11:28:00Z",
+      "side": 1,
+      "message": "Maybe add a comment that it is a common pattern in Zephyr to use gpio-leds node for defining single GPIO pins?",
+      "revId": "b8cac6c0ce3a71586886cbe414d8afa2069db4d1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
