@@ -22,6 +22,30 @@
       },
       "revId": "1b22f62938765bc8650e061b3244b6ec8474ef9d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f6a8744_fcc93e58",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T22:31:03Z",
+      "side": 1,
+      "message": "Here\u0027s a suggestion from Gemini that seems reasonable:\n\n----\n\nTo safely support the test cases without compromising the production encapsulation or triggering Undefined Behavior, you can use Zephyr\u0027s standard testing macro (`CONFIG_ZTEST`) to compile a dedicated testing seam.\n\nHere are the specific additions you should make to both files.\n\n### 1. Header Changes (`src/platform/ec/include/fpsensor/fpsensor_frame_size.h`)\n\nAdd the new method declaration in the `public` section, wrapped in the Zephyr test configuration macro.\n\n```cpp\n \tuint32_t get_frame_size(enum fp_capture_type capture_type) const;\n \n+#ifdef CONFIG_ZTEST\n+\t/**\n+\t * @brief Test-only method to manually set a frame size.\n+\t *\n+\t * Allows unit tests to bypass normal populate_cache bounds checking to\n+\t * intentionally simulate corrupted, oversized, or specific mock states.\n+\t *\n+\t * @param capture_type The enum fp_capture_type to set.\n+\t * @param size The frame size byte count to inject.\n+\t */\n+\tvoid set_frame_size_for_test(enum fp_capture_type capture_type,\n+\t\t\t\t     uint32_t size);\n+#endif\n+\n     private:\n \tstd::array\u003cuint32_t, FP_CAPTURE_TYPE_MAX\u003e frame_sizes_ \u003d {};\n };\n\n```\n\n### 2. Implementation Changes (`src/platform/ec/common/fpsensor/fpsensor_frame_size.cc`)\n\nAppend the implementation at the bottom of the source file, also protected by the macro. Adding a quick bounds check here is good practice even for test functions to prevent accidental out-of-bounds writes that crash the test runner.\n\n```cpp\n \tif (frame_sizes_[capture_type] \u003d\u003d 0) {\n \t\tCPRINTF(\"Error: FpFrameSizeCache is uninitialized or capture type %u\"\n \t\t\t\" is invalid, returning size 0.\",\n \t\t\tcapture_type);\n \t}\n \n \treturn frame_sizes_[capture_type];\n }\n+\n+#ifdef CONFIG_ZTEST\n+void FpFrameSizeCache::set_frame_size_for_test(\n+\tenum fp_capture_type capture_type, uint32_t size)\n+{\n+\tif (static_cast\u003csize_t\u003e(capture_type) \u003c frame_sizes_.size() \u0026\u0026\n+\t    capture_type \u003e\u003d 0) {\n+\t\tframe_sizes_[capture_type] \u003d size;\n+\t} else {\n+\t\tCPRINTF(\"Test Error: Tried to mock out-of-bounds capture type %d\\n\",\n+\t\t\tcapture_type);\n+\t}\n+}\n+#endif\n\n```\n\n### 3. Update the Test File\n\nWith this seam in place, you can strip out the brittle `reinterpret_cast` logic from `fpsensor_get_frame.cc` and replace it with a clean method call.\n\n**Old Test Code:**\n\n```cpp\n\tauto *raw_storage \u003d\n\t\treinterpret_cast\u003cstd::array\u003cuint32_t, FP_CAPTURE_TYPE_MAX\u003e *\u003e(\n\t\t\t\u0026global_context.fp_frame_size_cache);\n\t(*raw_storage)[FP_CAPTURE_VENDOR_FORMAT] \u003d FP_SENSOR_IMAGE_SIZE + 1;\n\n```\n\n**New Test Code:**\n\n```cpp\n\tglobal_context.fp_frame_size_cache.set_frame_size_for_test(\n\t\tFP_CAPTURE_VENDOR_FORMAT, FP_SENSOR_IMAGE_SIZE + 1);\n\n```",
+      "parentUuid": "60ced6a7_73196ad2",
+      "range": {
+        "startLine": 134,
+        "startChar": 0,
+        "endLine": 144,
+        "endChar": 0
+      },
+      "revId": "1b22f62938765bc8650e061b3244b6ec8474ef9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
