@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7bb57b69_95d5dac4",
+        "filename": "common/battery.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 569,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-05-27T20:35:35Z",
+      "side": 1,
+      "message": "This case should be supported. So move the check after that.",
+      "range": {
+        "startLine": 566,
+        "startChar": 0,
+        "endLine": 569,
+        "endChar": 25
+      },
+      "revId": "4d41667c7975e00bfcc1ec434a3e84e8c61ff2d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
