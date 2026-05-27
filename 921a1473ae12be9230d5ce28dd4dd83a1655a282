@@ -37,6 +37,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "616246a6_583b21f5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-27T17:28:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2abfc95c_d6aaa6bd",
+      "revId": "921a1473ae12be9230d5ce28dd4dd83a1655a282",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "d8c40391_81cb26c7",
         "filename": "zephyr/program/fpmcu/et171/prj.conf",
         "patchSetId": 1
