@@ -135,7 +135,7 @@
 		*/
 		/* ===== TODO: Not implemented yet ===== */
 		gpio_ec_pd_rest_n: ec_pd_rest_n {
-			gpios = <&gpioa 6 (GPIO_OUTPUT | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
+			gpios = <&gpioa 6 GPIO_INPUT>;
 		};
 		gpio_p_charger_d: p_charger_d {
 			gpios = <&gpiob 6 GPIO_INPUT>;
