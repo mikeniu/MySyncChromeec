@@ -89,3 +89,17 @@ FpFrameSizeCache::get_frame_size(enum fp_capture_type capture_type) const
 
 	return frame_sizes_[capture_type];
 }
+
+#ifdef CONFIG_ZTEST
+void FpFrameSizeCache::set_frame_size(enum fp_capture_type capture_type,
+				      uint32_t size)
+{
+	if (static_cast<size_t>(capture_type) < frame_sizes_.size() &&
+	    capture_type >= 0) {
+		frame_sizes_[capture_type] = size;
+	} else {
+		CPRINTF("Test Error: Tried to mock out-of-bounds capture type %d\n",
+			capture_type);
+	}
+}
+#endif

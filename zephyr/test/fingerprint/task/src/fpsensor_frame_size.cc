@@ -153,3 +153,26 @@ ZTEST(fpsensor_frame_size, test_cache_boundary_negative_index)
 		cache->get_frame_size(static_cast<enum fp_capture_type>(-1)), 0,
 		"Expected zero size for negative capture type (-1).");
 }
+
+ZTEST(fpsensor_frame_size, test_set_frame_size)
+{
+	FpFrameSizeCache *cache = cache_fixture.get();
+	const enum fp_capture_type test_type = FP_CAPTURE_VENDOR_FORMAT;
+	const uint32_t new_size = 1024;
+
+	/* Verify the state before modification */
+	uint32_t original_size = cache->get_frame_size(test_type);
+	zassert_not_equal(
+		new_size, original_size,
+		"Test setup error: new_size should be different from original.");
+
+	/* Use the test-only setter to override the cache */
+	cache->set_frame_size(test_type, new_size);
+
+	/* Verify the state after modification */
+	uint32_t updated_size = cache->get_frame_size(test_type);
+	zassert_equal(
+		updated_size, new_size,
+		"Cache failed to update with set_frame_size. Expected: %u, Actual: %u",
+		new_size, updated_size);
+}

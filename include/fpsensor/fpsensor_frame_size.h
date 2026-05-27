@@ -43,6 +43,17 @@ class FpFrameSizeCache {
 	 */
 	uint32_t get_frame_size(enum fp_capture_type capture_type) const;
 
+#ifdef CONFIG_ZTEST
+	/**
+	 * @brief Test-only method to manually override frame size values.
+	 *
+	 * @param capture_type The `fp_capture_type` to modify.
+	 * @param size The size in bytes to write to the cache. If the
+	 * capture_type is out of bounds, this call is a no-op.
+	 */
+	void set_frame_size(enum fp_capture_type capture_type, uint32_t size);
+#endif
+
     private:
 	std::array<uint32_t, FP_CAPTURE_TYPE_MAX> frame_sizes_ = {};
 };
