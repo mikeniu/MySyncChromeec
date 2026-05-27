@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6f338a1_950fb451",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T22:33:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a1274a7_90fb1e6c",
+      "revId": "ac2ed337cbf54383188a0c3ada23a4309531a009",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "19f7f4e4_24e13db8",
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "can potentially do that.",
       "parentUuid": "69cf8afc_b7ddedb1",
+      "revId": "ac2ed337cbf54383188a0c3ada23a4309531a009",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e14a1891_bf07a47c",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T22:33:16Z",
+      "side": 1,
+      "message": "This is a good suggestion and the same as suggested in the [other CL](https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7843342/comment/60ced6a7_73196ad2/)",
+      "parentUuid": "0e9c836a_f79269e8",
       "revId": "ac2ed337cbf54383188a0c3ada23a4309531a009",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
