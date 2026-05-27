@@ -4,9 +4,9 @@
  */
 
 /* This test file meant to be executed on a real device. Example:
- * 1. make tests BOARD=helipilot
- * 2. servod --board=helipilot
- * 3. flash_ec --board helipilot --image build/helipilot/test-mpu.bin
+ * 1. make tests BOARD=bloonchipper
+ * 2. servod --board=bloonchipper
+ * 3. flash_ec --board bloonchipper --image build/bloonchipper/test-mpu.bin
  * 4. Open console via dut-control raw_fpmcu_console_uart_pty
  * 5. runtest on console
  */

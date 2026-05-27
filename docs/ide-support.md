@@ -99,7 +99,7 @@ navigation. The installation of CrOS IDE disables the built-in
 1.  Select a particular board:
 
     ```bash
-    (chroot) $ export BOARD=dartmonkey
+    (chroot) $ export BOARD=bloonchipper
     ```
 
 1.  Copy the new `compile_commands.json` in the root of the EC repository:

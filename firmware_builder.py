@@ -37,6 +37,7 @@ DEFAULT_BUNDLE_METADATA_FILE = "/tmp/artifact_bundle_metadata"
 # TODO(b/172501728) On-device unit tests should build for all boards, but
 # they've bit rotted, so we only build the ones that compile.
 BOARDS_UNIT_TEST = [
+    "bloonchipper",
     "dartmonkey",
     "helipilot",
 ]
@@ -98,6 +99,8 @@ EXPECTED_UNUSED_BOARDS = {
     "whiskers",  # Remove 2029-06
     "zed",  # Remove 2031-06
     # Fingerprint development
+    "bloonchipper-druid",
+    "hatch_fp",
     "nocturne_fp",
     "nucleo-dartmonkey",
     "nucleo-f412zg",

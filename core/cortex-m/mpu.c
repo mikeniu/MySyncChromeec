@@ -388,7 +388,8 @@ int mpu_lock_rollback(bool lock)
 	 * Note that on the Cortex-M3, Cortex-M4, and Cortex-M7, the base
 	 * address used for an MPU region must be aligned to the size of the
 	 * region, so it's not possible to use a single region to protect the
-	 * entire rollback flash on the STM32F412; we have to use two.
+	 * entire rollback flash on the STM32F412 (bloonchipper); we have to
+	 * use two.
 	 *
 	 * See mpu_update_region for alignment details.
 	 */
