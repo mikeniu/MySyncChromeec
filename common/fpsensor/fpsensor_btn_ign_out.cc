@@ -17,15 +17,26 @@ LOG_MODULE_REGISTER(fp_btn_ign_out, LOG_LEVEL_INF);
 namespace
 {
 
-const struct gpio_dt_spec *btn_ign_gpio = GPIO_DT_FROM_ALIAS(gpio_btn_ign_out);
+const gpio_dt_spec btn_ign_gpio =
+	GPIO_DT_SPEC_GET(DT_ALIAS(gpio_btn_ign_out), gpios);
 K_SEM_DEFINE(btn_ign_lock, 1, 1);
 bool is_active = false;
+
+int init()
+{
+	int ret = gpio_pin_configure_dt(&btn_ign_gpio, GPIO_OUTPUT_INACTIVE);
+	if (ret < 0) {
+		LOG_ERR("Failed to configure power button ignore GPIO: %d",
+			ret);
+	}
+	return ret;
+}
 
 void deactivation_handler(struct k_work *)
 {
 	k_sem_take(&btn_ign_lock, K_FOREVER);
 	if (!is_active) {
-		gpio_pin_set_dt(btn_ign_gpio, 0);
+		gpio_pin_set_dt(&btn_ign_gpio, 0);
 		LOG_INF("Power button ignore deactivated.");
 	}
 	k_sem_give(&btn_ign_lock);
@@ -39,7 +50,7 @@ void activate()
 	if (!is_active) {
 		is_active = true;
 		k_work_cancel_delayable(&deactivation_dwork);
-		gpio_pin_set_dt(btn_ign_gpio, 1);
+		gpio_pin_set_dt(&btn_ign_gpio, 1);
 		LOG_INF("Power button ignore activated.");
 	}
 	k_sem_give(&btn_ign_lock);
@@ -72,3 +83,5 @@ void update(std::uint32_t sensor_mode)
 }
 
 } // namespace fp_btn_ign_out
+
+SYS_INIT(init, POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY);
