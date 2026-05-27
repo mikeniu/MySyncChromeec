@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76365bbc_762ca8e2",
+        "filename": "zephyr/program/calypso/mensa/gpios.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-05-27T09:15:33Z",
+      "side": 0,
+      "message": "I beleive this PIN is present on-board, lets not remove it.",
+      "range": {
+        "startLine": 151,
+        "startChar": 0,
+        "endLine": 154,
+        "endChar": 4
+      },
+      "revId": "0af064896b94ba042d976e92f72de8d44801b741",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
