@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b050856b_27cb9f63",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 580,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T21:44:30Z",
+      "side": 1,
+      "message": "Here is the Gemini-generated code to implement. Check for correctness:\n\n----\n\nHere are all the specific locations in the patch that will be drastically simplified by this refactor, along with exactly how to implement the changes.\n\n### Step 1: Add the Helpers\n\n**1\\. In `util/egis/egis_util.h` (add to the bottom of the namespace):**\n\n```c\ntemplate \u003cTriviallyCopyable T\u003e\nstd::span\u003cconst uint8_t\u003e AsBytes(const T \u0026obj) {\n  return {reinterpret_cast\u003cconst uint8_t *\u003e(\u0026obj), sizeof(T)};\n}\n\n```\n\n**2\\. In `util/egis/bootrom.h` (add to `BootromComm` class public methods):**\n\n```c\n  template \u003ctypename T\u003e\n  std::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e SendStruct(\n      const T \u0026command,\n      std::chrono::milliseconds timeout \u003d kDefaultCommandTimeout) {\n    return SendBootromCommand(AsBytes(command), timeout);\n  }\n\n```\n\n---\n\n### Step 2: Clean up `bootrom.cc`\n\nHere is every function in `bootrom.cc` where you can delete the `req_span` and `reinterpret_cast` boilerplate.\n\n#### 1\\. `BootromComm::WriteReg`\n\n**Before:**\n\n```c\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026req),\n                                    sizeof(req));\n  auto resp \u003d SendBootromCommand(req_span);\n\n```\n\n**After:**\n\n```c\n  auto resp \u003d SendStruct(req);\n\n```\n\n#### 2\\. `BootromComm::ReadReg`\n\n**Before:**\n\n```c\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026req),\n                                    sizeof(req));\n  auto resp \u003d SendBootromCommand(req_span);\n\n```\n\n**After:**\n\n```c\n  auto resp \u003d SendStruct(req);\n\n```\n\n#### 3\\. `BootromComm::BackupFlash`\n\n**Before:**\n\n```c\n    std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026req),\n                                      sizeof(req));\n    auto resp \u003d SendBootromCommand(req_span, kFlashTimeout);\n\n```\n\n**After:**\n\n```c\n    auto resp \u003d SendStruct(req, kFlashTimeout);\n\n```\n\n#### 4\\. `BootromComm::ReadFlash`\n\n**Before:**\n\n```c\n    std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026req),\n                                      sizeof(req));\n    auto resp \u003d SendBootromCommand(req_span, kFlashTimeout);\n\n```\n\n**After:**\n\n```c\n    auto resp \u003d SendStruct(req, kFlashTimeout);\n\n```\n\n#### 5\\. `BootromComm::EraseFlash`\n\n**Before:**\n\n```c\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026req),\n                                    sizeof(req));\n  auto resp \u003d SendBootromCommand(req_span, kFlashTimeout);\n\n```\n\n**After:**\n\n```c\n  auto resp \u003d SendStruct(req, kFlashTimeout);\n\n```\n\n#### 6\\. `BootromComm::GetBootromInfo`\n\n**Before:**\n\n```c\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026req),\n                                    sizeof(req));\n  auto resp \u003d SendBootromCommand(req_span);\n\n```\n\n**After:**\n\n```c\n  auto resp \u003d SendStruct(req);\n\n```\n\n#### 7\\. `BootromComm::GetFlashInfo`\n\n**Before:**\n\n```c\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026req),\n                                    sizeof(req));\n  auto resp \u003d SendBootromCommand(req_span);\n\n```\n\n**After:**\n\n```c\n  auto resp \u003d SendStruct(req);\n\n```\n\n---\n\n### Step 3: Bonus Cleanups using `AsBytes`\n\nEven when not using `SendStruct`, the new `AsBytes` helper cleans up other areas where raw byte representation of a local variable is needed.\n\n#### `BootromComm::SystemReset`\n\nBecause this command immediately drops the USB connection, it intentionally bypasses `SendBootromCommand` to call `usb_.Send` directly, so we can\u0027t use `SendStruct`. But we *can* use `AsBytes`.\n\n**Before:**\n\n```c\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026req),\n                                    sizeof(req));\n  DumpRawCmd(req_span);\n  if (auto res \u003d usb_.Send(req_span, kResetTimeout); !res) {\n\n```\n\n**After:**\n\n```c\n  DumpRawCmd(AsBytes(req));\n  if (auto res \u003d usb_.Send(AsBytes(req), kResetTimeout); !res) {\n\n```\n\n#### `BootromComm::SendBootromCommandAes` (AAD calculation)\n\nYou manually cast `aad_val` to an `aad_span` to pass it to the crypto function.\n\n**Before:**\n\n```c\n  uint32_t aad_val \u003d ToLittleEndian(EgisBootrom::kChipIdAad);\n  std::span\u003cconst uint8_t\u003e aad_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026aad_val),\n                                    sizeof(aad_val));\n\n```\n\n**After:**\n\n```c\n  uint32_t aad_val \u003d ToLittleEndian(EgisBootrom::kChipIdAad);\n  auto aad_span \u003d AsBytes(aad_val);\n\n```",
+      "parentUuid": "22ec04cc_54b185fd",
+      "range": {
+        "startLine": 577,
+        "startChar": 0,
+        "endLine": 580,
+        "endChar": 49
+      },
+      "revId": "36f293844ebba55ddfd6c6e9df3400cea04efcf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "00674ca5_1391f9a7",
         "filename": "util/egis/crypto_util.cc",
         "patchSetId": 23
