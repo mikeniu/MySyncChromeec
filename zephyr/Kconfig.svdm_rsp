@@ -14,7 +14,9 @@ choice SVDM_RSP_CHOICE
 
 config SVDM_RSP_DFP_ONLY
 	bool "DFP-only"
-	# USB4 and TBT modes require more support
+	# TODO(b/498101464): Revisit these dependencies in a future CL,
+	# since USB4/TBT support is now available in the common SVDM
+	# response implementation.
 	depends on !PLATFORM_EC_USB_PD_USB4
 	depends on !PLATFORM_EC_USB_PD_TBT_COMPAT_MODE
 	# DRDs are not DFP-only
