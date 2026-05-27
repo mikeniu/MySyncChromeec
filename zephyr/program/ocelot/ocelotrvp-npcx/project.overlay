@@ -70,6 +70,8 @@ tach_fan0: &tach1 {};
 		entering-rw {
 			enum-name = "GPIO_ENTERING_RW";
 		};
+		/* Managed by ap-power-events driver */
+		/delete-node/ amp_mute_odl;
 	};
 
 	chosen {
@@ -79,6 +81,12 @@ tach_fan0: &tach1 {};
 	cse_early_recovery: cse-early-recovery {
 		compatible = "cros-ec,cse-early-rec";
 		cse-early-rec-gpios = <&gpiof 5 (GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_VOLTAGE_1P8)>;
+	};
+
+	ap-power-events {
+		compatible = "cros-ec,ap-power-events";
+		event-gpios = <&gpiod 1 (GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH |
+					GPIO_VOLTAGE_1P8)>;
 	};
 };
 
