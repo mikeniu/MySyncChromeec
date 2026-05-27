@@ -52,6 +52,24 @@
       "parentUuid": "7f93b9a1_63f165f9",
       "revId": "81499f2ff0abd5654ad558f34faab9d52f92cab7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15bee43e_4dcb4e5c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-27T23:37:51Z",
+      "side": 1,
+      "message": "because the last test I added strictly checks for the change in the logic of `get_frame`. For that test to work, I need to have an FP_IMAGE_OFFSET no equal zero and this is why I made the change to the dts tree.",
+      "parentUuid": "cc033251_8cd439b5",
+      "revId": "81499f2ff0abd5654ad558f34faab9d52f92cab7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
