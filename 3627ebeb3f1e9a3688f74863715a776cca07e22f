@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90e7b281_569a60b1",
+        "filename": "util/elan/iap_control.h",
+        "patchSetId": 23
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T20:42:54Z",
+      "side": 1,
+      "message": "I constructed these from what I thought the code was doing. Are the names correct? Should we have definitions for the `reserved` fields?\n\nCan you add documentation comments here on what each field means?",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 4
+      },
+      "revId": "3627ebeb3f1e9a3688f74863715a776cca07e22f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7f5ba13_0ab8bf02",
+        "filename": "util/elan/iap_control.h",
+        "patchSetId": 23
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T20:42:54Z",
+      "side": 1,
+      "message": "I constructed these from what I thought the code was doing. Are the names correct? Should we have definitions for the `reserved` fields?\n\nCan you add documentation comments here on what each field means?",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 24
+      },
+      "revId": "3627ebeb3f1e9a3688f74863715a776cca07e22f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
