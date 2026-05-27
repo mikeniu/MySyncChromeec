@@ -30,7 +30,8 @@
 namespace {
 constexpr const struct device* kClient =
     DEVICE_DT_GET_OR_NULL(DT_ALIAS(test_dsp_client));
-static_assert(kClient != nullptr, "Missing alias 'test_dsp_client'");
+static_assert(DT_NODE_HAS_STATUS_OKAY(DT_ALIAS(test_dsp_client)),
+              "Missing alias 'test_dsp_client'");
 
 constexpr const struct i2c_dt_spec kClientBusSpec =
     I2C_DT_SPEC_GET(DT_ALIAS(test_dsp_client));
