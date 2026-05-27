@@ -51,11 +51,6 @@
 			enum-name = "GPIO_PG_EC_ALL_SYS_PWRGD";
 			no-auto-init;
 		};
-		gpio_amp_mute_odl: amp_mute_odl {
-			gpios = <&gpiod 1 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH |
-						GPIO_OUTPUT_INIT_HIGH | GPIO_OUTPUT_INIT_LOGICAL |
-						GPIO_VOLTAGE_1P8)>;
-		};
 		gpio_ccd_mode_odl: ccd_mode_odl {
 			gpios = <&gpio4 3 (GPIO_INPUT)>;
 			enum-name = "GPIO_CCD_MODE_ODL";
