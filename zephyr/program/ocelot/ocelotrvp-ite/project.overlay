@@ -71,6 +71,8 @@ tach_fan0: &tach0 {};
 		entering-rw {
 			enum-name = "GPIO_ENTERING_RW";
 		};
+		/* Managed by ap-power-events driver */
+		/delete-node/ c_ec_pdb_ctrl_r;
 	};
 
 	chosen {
@@ -80,6 +82,11 @@ tach_fan0: &tach0 {};
 	cse_early_recovery: cse-early-recovery {
 		compatible = "cros-ec,cse-early-rec";
 		cse-early-rec-gpios = <&gpioj 3 (GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH)>;
+	};
+
+	ap-power-events {
+		compatible = "cros-ec,ap-power-events";
+		event-gpios = <&gpioh 0 GPIO_ACTIVE_HIGH>;
 	};
 };
 
