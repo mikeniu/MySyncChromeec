@@ -163,6 +163,29 @@
       },
       "revId": "36f293844ebba55ddfd6c6e9df3400cea04efcf8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf7075e2_884bca97",
+        "filename": "util/egis/egis_util.h",
+        "patchSetId": 23
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T21:49:37Z",
+      "side": 1,
+      "message": "In `egis_util.h`, `ReadStruct` returns `std::expected\u003cT, std::errc\u003e`, but `ReadLittleEndian` returns `std::optional\u003cT\u003e`.\n\nAccording to Google C++ Style, you should prefer `std::expected` when the reason for failure is actionable or needs to be logged, and `std::optional` only when the absence of a value is a normal, expected state. Since reading past the end of a buffer is an error state, make them consistent.\n\n**The Fix:** Change `ReadLittleEndian` to return `std::expected\u003cT, std::errc\u003e`:\n\n```c\ntemplate \u003cstd::integral T\u003e\nstd::expected\u003cT, std::errc\u003e ReadLittleEndian(std::span\u003cconst uint8_t\u003e buffer) {\n  if (buffer.size() \u003c sizeof(T)) return std::unexpected(std::errc::message_size);\n\n  T value;\n  std::memcpy(\u0026value, buffer.data(), sizeof(T));\n  return FromLittleEndian(value);\n}\n\n```",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 60,
+        "endChar": 1
+      },
+      "revId": "36f293844ebba55ddfd6c6e9df3400cea04efcf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
