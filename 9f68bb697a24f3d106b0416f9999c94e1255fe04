@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35015116_b57d2b59",
+        "filename": "include/battery.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-05-27T20:37:27Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "055fc347_98d771e1",
+      "range": {
+        "startLine": 339,
+        "startChar": 0,
+        "endLine": 339,
+        "endChar": 16
+      },
+      "revId": "9f68bb697a24f3d106b0416f9999c94e1255fe04",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bbfd15ec_93efd2cb",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-05-27T20:23:02Z",
       "side": 1,
       "message": "Use the same attributes `test_mockable`.",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 10
+      },
+      "revId": "9f68bb697a24f3d106b0416f9999c94e1255fe04",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "39e6c1ad_e0e75344",
+        "filename": "zephyr/subsys/adsp_comms/adsp_comms.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-05-27T20:37:27Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "bbfd15ec_93efd2cb",
       "range": {
         "startLine": 43,
         "startChar": 0,
