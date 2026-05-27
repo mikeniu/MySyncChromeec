@@ -16,6 +16,40 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "921a1473ae12be9230d5ce28dd4dd83a1655a282",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2abfc95c_d6aaa6bd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-27T17:12:10Z",
+      "side": 1,
+      "message": "Can you also please adjust the Kconfig for [cros_flash driver](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/cros_flash/Kconfig;l\u003d159)?\nI think just replace:\n```\n\tdepends on DT_HAS_ANDESTECH_QSPI_NOR_XIP_CROS_FLASH_ENABLED\n```\nwith\n```\n\tdepends on FLASH_ANDES_QSPI_XIP\n```",
+      "revId": "921a1473ae12be9230d5ce28dd4dd83a1655a282",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8c40391_81cb26c7",
+        "filename": "zephyr/program/fpmcu/et171/prj.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-27T17:12:10Z",
+      "side": 1,
+      "message": "This should be done automatically by I can see it isn\u0027t so something went wrong in upstream. I\u0027ll take care of it.",
+      "revId": "921a1473ae12be9230d5ce28dd4dd83a1655a282",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
