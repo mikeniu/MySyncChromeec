@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ec35601_0a3ec792",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-27T06:36:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "896864e0_b57405b8",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 51
+      },
+      "revId": "817ae722586fc8ae52aaff59d5adcdb0dbc5b42a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9c909b45_950af420",
@@ -61,6 +85,30 @@
       "writtenOn": "2026-05-26T21:03:06Z",
       "side": 1,
       "message": "Let\u0027s refactor the serialization / deserialization to use `struct`s.\n\nHere\u0027s code from Gemini. Check that it\u0027s correct.\n\n-----\n\n1. **Eradicates Undefined Behavior (UB):** Treating an array of bytes as a typed `struct` via `reinterpret_cast` violates the \"Strict Aliasing Rule.\" `std::memcpy` is explicitly defined by the C++ standard as the safe, legal way to copy object representations.\n2. **Zero-Cost Abstraction:** Modern compilers optimize `std::memcpy` with statically known sizes completely away, translating it directly into register loads and stores. You get perfect safety with zero performance penalty.\n3. **Single Allocation (Zero Heap Churn):** By using `std::span` and our helpers, we allocate a single `std::vector` exactly once per command, neatly packing the header and payload together without triggering dynamic reallocations.\n4. **Self-Documenting \u0026 Safe Initialization:** Magic math (like `offset +\u003d 12`) is replaced by explicit struct layouts. C++20 designated initializers ensure no fields are accidentally left uninitialized with garbage memory.\n5. **Centralized Safety:** The `WriteStruct` and `ReadStruct` helpers enforce bounds checking at compile time (via concepts) and run time (via span sizes), bubbling up errors uniformly via `std::expected`.\n\n---\n\n### Step 1: The Core Helpers (`egis_util.h`)\n\nFirst, define the standard-compliant serialization helpers that enforce bounds checking and type safety.\n\n```cpp\n#include \u003cconcepts\u003e\n#include \u003ccstring\u003e\n#include \u003cexpected\u003e\n#include \u003cspan\u003e\n#include \u003csystem_error\u003e\n#include \u003ctype_traits\u003e\n\nnamespace egis {\n\ntemplate \u003ctypename T\u003e\nconcept TriviallyCopyable \u003d std::is_trivially_copyable_v\u003cT\u003e;\n\n// Safely serializes a struct into a byte span.\ntemplate \u003cTriviallyCopyable T\u003e\nstd::expected\u003cvoid, std::errc\u003e WriteStruct(std::span\u003cuint8_t\u003e buffer, const T\u0026 obj, size_t offset \u003d 0) {\n  if (buffer.size() \u003c offset + sizeof(T)) {\n    return std::unexpected(std::errc::no_buffer_space);\n  }\n  std::memcpy(buffer.data() + offset, \u0026obj, sizeof(T));\n  return {};\n}\n\n// Safely deserializes a struct from a byte span.\ntemplate \u003cTriviallyCopyable T\u003e\nstd::expected\u003cT, std::errc\u003e ReadStruct(std::span\u003cconst uint8_t\u003e buffer, size_t offset \u003d 0) {\n  if (buffer.size() \u003c offset + sizeof(T)) {\n    return std::unexpected(std::errc::message_size);\n  }\n  T obj;\n  std::memcpy(\u0026obj, buffer.data() + offset, sizeof(T));\n  return obj;\n}\n\n}  // namespace egis\n\n```\n\n---\n\n### Step 2: Define the Protocol Structs (`bootrom.h`)\n\nDefine your packets using `__attribute__((packed))` and default member initializers.\n\n```cpp\nnamespace EgisBootrom {\n  struct FlashEraseCommand {\n    uint8_t command_id \u003d kCmdFlashErase;\n    uint32_t address;\n    uint32_t size;\n  } __attribute__((packed));\n}\n\n// Inside class BootromComm:\nstruct SecureCommandShaHeader {\n  uint8_t command_id \u003d EgisBootrom::kCmdSecureWrapped;\n  uint8_t algo;\n  uint32_t payload_len;\n  std::array\u003cuint8_t, kSha256DigestSize\u003e hash{}; // Zero-initializes\n} __attribute__((packed));\n\nstruct SecureShaResponseHeader {\n  uint16_t status;\n  uint32_t payload_len;\n} __attribute__((packed));\n\n```\n\n---\n\n### Step 3: Refactor the Call Sites\n\n#### Implementation A: The EC Response Parser (`ec_comm.cc`)\n\nRemove the UB pointer cast and use our safe `ReadStruct` helper.\n\n```cpp\n// Inside ec_comm.cc : SendCommand()\n\n// ❌ REMOVE THIS:\n// EcHostCommandResponse *resp_hdr \u003d reinterpret_cast\u003cEcHostCommandResponse *\u003e(resp_buf.data());\n\n// ✅ REPLACE WITH:\nauto hdr_res \u003d ReadStruct\u003cEcHostCommandResponse\u003e(resp_buf);\nif (!hdr_res) {\n  return std::unexpected(EcError::kResponseTooShort);\n}\nEcHostCommandResponse resp_hdr \u003d hdr_res.value();\n\nuint16_t result \u003d FromLittleEndian(resp_hdr.result);\nuint16_t data_length \u003d FromLittleEndian(resp_hdr.data_length);\n\n```\n\n#### Implementation B: The SHA256 Secure Command (`bootrom.cc`)\n\nReplace the multiple allocations and offset math with our streamlined stack-to-span pipeline.\n\n```cpp\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e\nBootromComm::SendBootromCommandSha(std::span\u003cconst uint8_t\u003e data,\n                                   std::chrono::milliseconds timeout) {\n  // --- 1. Serialize using Designated Initializers ---\n  SecureCommandShaHeader req_hdr{\n      .algo \u003d static_cast\u003cuint8_t\u003e(wrapped_algo_),\n      .payload_len \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(data.size()))\n  };\n  SHA256(data.data(), data.size(), req_hdr.hash.data());\n\n  // Allocate exactly once\n  std::vector\u003cuint8_t\u003e cmd(sizeof(req_hdr) + data.size());\n  \n  if (!WriteStruct(std::span{cmd}, req_hdr)) {\n    return std::unexpected(BootromError::kBufferTooSmall);\n  }\n  // Copy payload directly after the header\n  std::memcpy(cmd.data() + sizeof(req_hdr), data.data(), data.size());\n\n  // --- 2. Send Data ---\n  auto ret_res \u003d DoUsbTransfer(cmd, sizeof(SecureShaResponseHeader), timeout);\n  if (!ret_res) return std::unexpected(ret_res.error());\n  auto \u0026ret \u003d ret_res.value();\n\n  // --- 3. Deserialize safely ---\n  auto rsp_hdr_res \u003d ReadStruct\u003cSecureShaResponseHeader\u003e(ret);\n  if (!rsp_hdr_res) {\n    return std::unexpected(BootromError::kResponseTruncated);\n  }\n  SecureShaResponseHeader rsp_hdr \u003d rsp_hdr_res.value();\n\n  uint32_t rsp_wrapped_len \u003d FromLittleEndian(rsp_hdr.payload_len);\n  if (rsp_wrapped_len \u003e ret.size() - sizeof(SecureShaResponseHeader)) {\n    rsp_wrapped_len \u003d ret.size() - sizeof(SecureShaResponseHeader);\n  }\n\n  auto rsp_payload \u003d std::span\u003cconst uint8_t\u003e(ret).subspan(\n      sizeof(SecureShaResponseHeader), rsp_wrapped_len);\n\n  return std::vector\u003cuint8_t\u003e(rsp_payload.begin(), rsp_payload.end());\n}\n\n```\n\n#### Implementation C: Basic Flash Commands (`bootrom.cc`)\n\nSend simple commands directly from the stack without allocating vectors at all.\n\n```cpp\nstd::expected\u003cvoid, BootromError\u003e BootromComm::EraseFlash(uint32_t offset,\n                                                          uint32_t size) {\n  std::println(\"--- Executing CMD_FLASH_ERASE (0x22) ---\");\n\n  // Build the packet on the stack\n  EgisBootrom::FlashEraseCommand req{\n      .address \u003d ToLittleEndian(EgisBootrom::kFlashBaseAddr + offset),\n      .size \u003d ToLittleEndian(size)\n  };\n\n  // Treat the stack struct as a byte span\n  // (Casting FROM a struct pointer TO const uint8_t* is legal and safe)\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t*\u003e(\u0026req), sizeof(req));\n\n  auto resp \u003d SendBootromCommand(req_span, kFlashTimeout);\n  if (!resp) {\n    std::println(stderr, \"Erase Failed!\");\n    return std::unexpected(resp.error());\n  }\n  \n  std::println(\"Erase Success: {} bytes at 0x{:08x}\", size, req.address);\n  return {};\n}\n\n```",
+      "range": {
+        "startLine": 187,
+        "startChar": 0,
+        "endLine": 190,
+        "endChar": 32
+      },
+      "revId": "817ae722586fc8ae52aaff59d5adcdb0dbc5b42a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e827256_c1ec1137",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-27T06:36:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9c909b45_950af420",
       "range": {
         "startLine": 187,
         "startChar": 0,
@@ -94,6 +142,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d855887_24ede567",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-27T06:36:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "66e96a9c_beb03c04",
+      "range": {
+        "startLine": 343,
+        "startChar": 0,
+        "endLine": 357,
+        "endChar": 1
+      },
+      "revId": "817ae722586fc8ae52aaff59d5adcdb0dbc5b42a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b7bff094_46405a75",
@@ -107,6 +179,30 @@
       "writtenOn": "2026-05-26T21:13:43Z",
       "side": 1,
       "message": "Let\u0027s use structs for all data transfers. Here is Gemini-generated code to fix it. Review for correctness:\n\n----\n\n**The Rationale:** `WriteFlash` must serialize a header and an arbitrary payload together. We will define a specific struct for block writes that omits the single `value` field used in `WriteReg`, making the memory layout perfect. Then we use `WriteStruct` and a single vector allocation to cleanly concatenate them.\n\n**Step 1: Define the Struct (`bootrom.h`)**\n\n```c\nnamespace EgisBootrom {\n  struct BlockWriteCommand {\n    uint8_t command_id \u003d kCmdMemWrite;\n    uint32_t address;\n    uint8_t access_size \u003d kAccessSizeUint8;\n    uint32_t count;\n  } __attribute__((packed));\n}\n\n```\n\n**Step 2: The Implementation (`bootrom.cc`)**\n\n```c\nstd::expected\u003cvoid, BootromError\u003e BootromComm::WriteFlash(\n    uint32_t offset, std::span\u003cconst uint8_t\u003e data) {\n  \n  if (data.size() \u003e kMaxFlashWriteSize) {\n    std::println(stderr, \"[ERROR] Payload size {} exceeds max limit\", data.size());\n    return std::unexpected(BootromError::kPayloadSizeExceedsLimit);\n  }\n\n  // 1. Initialize the strict header on the stack\n  EgisBootrom::BlockWriteCommand req_hdr{\n      .address \u003d ToLittleEndian(EgisBootrom::kFlashBaseAddr + offset),\n      .count \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(data.size()))\n  };\n\n  // 2. Allocate the command buffer exactly once\n  std::vector\u003cuint8_t\u003e cmd(sizeof(req_hdr) + data.size());\n\n  // 3. Safely serialize the header into the front of the vector\n  if (!WriteStruct(std::span{cmd}, req_hdr)) {\n    return std::unexpected(BootromError::kBufferTooSmall);\n  }\n  \n  // 4. Copy the payload directly into the back half of the vector\n  std::memcpy(cmd.data() + sizeof(req_hdr), data.data(), data.size());\n\n  // 5. Transmit\n  auto resp \u003d SendBootromCommand(cmd, kFlashTimeout);\n\n  if (!resp) {\n    std::println(stderr, \"\\n[HALT] USB transmission failed at 0x{:x}\", req_hdr.address);\n    return std::unexpected(resp.error());\n  }\n\n  if (auto res \u003d WaitForFlashReady(); !res) {\n    std::println(stderr, \"\\n[HALT] Timeout waiting for flash write at 0x{:x}\", req_hdr.address);\n    return std::unexpected(res.error());\n  }\n  \n  return {};\n}\n\n```",
+      "range": {
+        "startLine": 522,
+        "startChar": 0,
+        "endLine": 561,
+        "endChar": 1
+      },
+      "revId": "817ae722586fc8ae52aaff59d5adcdb0dbc5b42a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38b1544b_3c743cd6",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-27T06:36:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b7bff094_46405a75",
       "range": {
         "startLine": 522,
         "startChar": 0,
@@ -140,6 +236,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "639c2145_bc445f01",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 626,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-27T06:36:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f58809b9_d7a6ab54",
+      "range": {
+        "startLine": 610,
+        "startChar": 0,
+        "endLine": 626,
+        "endChar": 12
+      },
+      "revId": "817ae722586fc8ae52aaff59d5adcdb0dbc5b42a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3d62743f_6aee2b74",
@@ -153,6 +273,30 @@
       "writtenOn": "2026-05-26T21:21:33Z",
       "side": 1,
       "message": "Let\u0027s use `struct`s for all data transfers. Here is Gemini-generated code to fix it. Review for correctness:\n\n----\n\n### Step 1: Define the Command Structs (`bootrom.h`)\n\nAdd these minimal structs to the `EgisBootrom` namespace. They use default member initializers so you don\u0027t even have to populate them at the call site.\n\n```c\nnamespace EgisBootrom {\n\n// ... existing structs ...\n\nstruct GetBootromInfoCommand {\n  uint8_t command_id \u003d kCmdGetBootInfo;\n} __attribute__((packed));\n\nstruct GetFlashInfoCommand {\n  uint8_t command_id \u003d kCmdFlashInfo;\n} __attribute__((packed));\n\nstruct SystemResetCommand {\n  uint8_t command_id \u003d kCmdSystemReset;\n  uint8_t reset_type \u003d kSystemResetTypeNormal;\n} __attribute__((packed));\n\n} // namespace EgisBootrom\n\n```\n\n---\n\n### Step 2: Implement the Refactor (`bootrom.cc`)\n\nReplace the dynamic vectors with the stack-allocated structs, and cast them to `std::span` for transmission.\n\n#### 1\\. System Reset\n\n```c\nstd::expected\u003cvoid, BootromError\u003e BootromComm::SystemReset() {\n  std::println(\"--- Executing System Reset (0x12) ---\");\n\n  // 1. Build the exact 2-byte packet on the stack\n  EgisBootrom::SystemResetCommand req;\n\n  // 2. Cast stack struct to a byte span for transmission\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t*\u003e(\u0026req), sizeof(req));\n  \n  auto resp \u003d SendBootromCommand(req_span, kResetTimeout);\n\n  if (resp.has_value()) {\n    std::println(\"[SUCCESS] Reset command acknowledged.\");\n  } else {\n    std::println(\"[INFO] Command sent, device is resetting...\");\n  }\n  return {};\n}\n\n```\n\n#### 2\\. Get Flash Info\n\nNotice how this cleanly merges with the `ReadStruct` deserialization we implemented earlier.\n\n```c\nstd::expected\u003cvoid, BootromError\u003e BootromComm::GetFlashInfo() {\n  std::println(\"--- Fetching Flash Information ---\");\n\n  // 1. Build the 1-byte packet on the stack\n  EgisBootrom::GetFlashInfoCommand req;\n\n  // 2. Cast to byte span and transmit\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t*\u003e(\u0026req), sizeof(req));\n  auto resp \u003d SendBootromCommand(req_span);\n  \n  if (!resp) {\n    std::println(stderr, \"[ERROR] Unable to retrieve Flash info.\");\n    return std::unexpected(resp.error());\n  }\n\n  // 3. Safely deserialize the response\n  auto info_res \u003d ReadStruct\u003cEgisBootrom::FlashInfoResponse\u003e(*resp);\n  if (!info_res) {\n    std::println(stderr, \"[ERROR] Response length insufficient: {}\", resp-\u003esize());\n    return std::unexpected(BootromError::kResponseTruncated);\n  }\n\n  EgisBootrom::FlashInfoResponse info \u003d info_res.value();\n\n  std::array\u003cchar, 9\u003e prod_name{};\n  std::memcpy(prod_name.data(), info.prod_name, 8);\n  uint32_t flash_size \u003d FromLittleEndian(info.flash_size);\n\n  std::println(\"[SUCCESS] Flash Data Received:\");\n  std::println(\"  Product Name  : {}\", prod_name.data());\n  std::println(\"  Flash Size  : {} bytes ({} MB)\", flash_size, flash_size / 1024 / 1024);\n  \n  return {};\n}\n\n```\n\n#### 3\\. Get Bootrom Info\n\n```c\nstd::expected\u003cvoid, BootromError\u003e BootromComm::GetBootromInfo() {\n  // 1. Build the 1-byte packet on the stack\n  EgisBootrom::GetBootromInfoCommand req;\n\n  // 2. Cast to byte span and transmit\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t*\u003e(\u0026req), sizeof(req));\n  auto resp \u003d SendBootromCommand(req_span);\n  \n  if (!resp) return std::unexpected(resp.error());\n\n  // 3. Safely deserialize the response\n  auto info_res \u003d ReadStruct\u003cEgisBootrom::BootromInfoResponse\u003e(*resp);\n  if (!info_res) {\n    return std::unexpected(BootromError::kResponseTruncated);\n  }\n  \n  EgisBootrom::BootromInfoResponse info \u003d info_res.value();\n\n  std::println(\"Bootrom Version: 0x{:x}\", FromLittleEndian(info.version));\n  std::println(\"Max Command Size: {} bytes\", FromLittleEndian(info.max_cmd_size));\n  std::println(\"Max FW Upgrade Size: {} bytes\", FromLittleEndian(info.max_fw_upgrade_size));\n  \n  return {};\n}\n\n```",
+      "range": {
+        "startLine": 661,
+        "startChar": 0,
+        "endLine": 676,
+        "endChar": 1
+      },
+      "revId": "817ae722586fc8ae52aaff59d5adcdb0dbc5b42a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55146287_048acbb4",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 676,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-27T06:36:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d62743f_6aee2b74",
       "range": {
         "startLine": 661,
         "startChar": 0,
@@ -210,6 +354,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "419c238c_857f6b4a",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-27T06:36:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fe64600_de5536a5",
+      "range": {
+        "startLine": 259,
+        "startChar": 0,
+        "endLine": 259,
+        "endChar": 65
+      },
+      "revId": "817ae722586fc8ae52aaff59d5adcdb0dbc5b42a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4e957beb_9f04d17f",
@@ -223,6 +391,30 @@
       "writtenOn": "2026-05-26T21:24:26Z",
       "side": 1,
       "message": "We should be using an enum instead of string for this. Here\u0027s Gemini-generated code to fix. Review for correctness:\n\n----\n\nUsing a `std::string` to track internal application state is often called \"stringly-typed programming.\" It violates the principle of strong typing and opens the door to silent bugs (e.g., a typo like `if (config.mode \u003d\u003d \"flash_fw\")` will compile perfectly but fail at runtime).\n\nThe Google C++ Style Guide prefers `enum class` for this exact scenario. Transitioning to an enum brings three major benefits:\n\n1. **Type Safety:** You can only assign valid modes to the config.  \n2. **Exhaustiveness Checking:** If you use a `switch` statement in `main()` without a `default` case, the compiler will warn you if you ever add a new mode to the enum but forget to handle it.  \n3. **Simpler Parsing:** You eliminate string allocations and string comparisons.\n\nHere is how to seamlessly swap it out.\n\n### 1\\. Define the Enum and Update the Config\n\nAdd the `AppMode` enum right above your `AppConfig` struct, and replace the string. Introduce a `kUnknown` or `kNone` state to represent the uninitialized state.\n\n```c\nenum class AppMode {\n  kNone,\n  kFlashFw,\n  kFlashCmd,\n};\n\nstruct AppConfig {\n  AppMode mode \u003d AppMode::kNone; // Replaces std::string mode;\n  std::string fw_path;\n  std::string key_path;\n  EgisCryptoType algo_type \u003d EgisCryptoType::kSha256;\n  uint32_t flash_offset \u003d 0x00001000;\n  uint32_t fw_size_override \u003d 0;\n  bool dump_cmd_fw \u003d false;\n};\n\n```\n\n### 2\\. Update `ParseArgs`\n\nSince your CLI parser uses `-f` for firmware and `-c` for commands, you don\u0027t even need to parse strings. You just set the enum directly when the flag is hit.\n\n```c\nstd::optional\u003cAppConfig\u003e ParseArgs(int argc, char *argv[]) {\n  AppConfig config;\n  // ... option definitions ...\n\n  while ((opt \u003d getopt_long_only(argc, argv, \"f:c:a:k:o:s:dh\", long_options, nullptr)) !\u003d -1) {\n    switch (opt) {\n      case \u0027f\u0027:\n        config.mode \u003d AppMode::kFlashFw;\n        config.fw_path \u003d optarg;\n        break;\n      case \u0027c\u0027:\n        config.mode \u003d AppMode::kFlashCmd;\n        config.fw_path \u003d optarg;\n        break;\n      // ... rest of the cases ...\n    }\n  }\n\n  // ... \n\n  if (config.mode \u003d\u003d AppMode::kNone) {\n    std::println(stderr, \"[ERROR] You must specify a mode (--flashfw, --flashcmd)\");\n    PrintHelp(argv[0]);\n    return std::nullopt;\n  }\n\n  if (config.mode \u003d\u003d AppMode::kFlashFw \u0026\u0026 config.algo_type \u003d\u003d EgisCryptoType::kAesGcm \u0026\u0026\n      config.key_path.empty()) {\n    std::println(stderr, \"[ERROR] AESGCM requires a key file...\");\n    return std::nullopt;\n  }\n\n  return config;\n}\n\n```\n\n### 3\\. Update `main()` with a Switch\n\nReplace the `if/else if` chain with a `switch` statement.\n\n```c\nint main(int argc, char *argv[]) {\n  // ... parse args, connect USB ...\n\n  std::expected\u003cvoid, egis::AppError\u003e status;\n\n  // 4. Dispatch to chosen mode using exhaustive switch\n  switch (config.mode) {\n    case egis::AppMode::kFlashFw:\n      status \u003d egis::RunFlashFw(config, brom);\n      break;\n    case egis::AppMode::kFlashCmd:\n      status \u003d egis::RunFlashCmd(config, boot_comm);\n      break;\n    case egis::AppMode::kNone:\n      // This should be caught by ParseArgs, but handled here for completeness\n      status \u003d std::unexpected(egis::AppError::kInvalidArgs);\n      break;\n  }\n\n  // 5. Final exit handling\n  if (status.has_value()) {\n    if (auto res \u003d brom.SystemReset(); !res) {\n      std::println(stderr, \"[WARN] System reset command failed: {}\",\n                   egis::ToString(res.error()));\n    }\n    return EXIT_SUCCESS;\n  }\n\n  return EXIT_FAILURE;\n}\n\n```",
+      "range": {
+        "startLine": 382,
+        "startChar": 0,
+        "endLine": 382,
+        "endChar": 32
+      },
+      "revId": "817ae722586fc8ae52aaff59d5adcdb0dbc5b42a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f5a5472_44e3f0a2",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-27T06:36:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4e957beb_9f04d17f",
       "range": {
         "startLine": 382,
         "startChar": 0,
@@ -270,6 +462,30 @@
       "side": 1,
       "message": "Here\u0027s a fix generated by Gemini. Review the code for correctness and make sure it works with a device:\n\n----\n\nThe cleanest architectural fix is **Constructor Injection**. By passing the specific IN, OUT, and Interrupt endpoints into the `UsbComm` constructor, the class becomes truly reusable, and `BootromComm` can stop bypassing the high-level `Send()` and `Receive()` methods.\n\nHere are the specific changes to make:\n\n### 1\\. Update `usb_comm.h`\n\nRemove the hardcoded constants and add the endpoints as member variables initialized via the constructor.\n\n```c\n// Remove these globally hardcoded endpoints:\n// constexpr uint8_t kEpOutBulk \u003d 0x01;\n// constexpr uint8_t kEpInBulk \u003d 0x81;\n// constexpr uint8_t kEpInInt \u003d 0x82;\n\nclass UsbComm {\n public:\n  // Update the constructor to accept endpoints:\n  UsbComm(libusb_context *ctx, uint16_t vid, uint16_t pid, \n          uint8_t ep_out, uint8_t ep_in, uint8_t ep_int \u003d 0);\n  \n  // ... (keep existing methods)\n\n private:\n  libusb_context *ctx_ \u003d nullptr;\n  std::unique_ptr\u003clibusb_device_handle, decltype(\u0026libusb_close)\u003e handle_{\n      nullptr, \u0026libusb_close};\n  uint16_t vid_;\n  uint16_t pid_;\n  bool kernel_driver_detached_ \u003d false;\n\n  // Add the endpoint members:\n  uint8_t ep_out_;\n  uint8_t ep_in_;\n  uint8_t ep_int_;\n};\n\n```\n\n### 2\\. Update `usb_comm.cc`\n\nWire up the new constructor and replace the hardcoded constants in `Send`, `Receive`, and `Wait`.\n\n```c\n// 1. Update the constructor:\nUsbComm::UsbComm(libusb_context *ctx, uint16_t vid, uint16_t pid, \n                 uint8_t ep_out, uint8_t ep_in, uint8_t ep_int)\n    : ctx_(ctx), vid_(vid), pid_(pid), \n      ep_out_(ep_out), ep_in_(ep_in), ep_int_(ep_int) {}\n\n// 2. In Send(), replace kEpOutBulk with ep_out_:\nint rc \u003d libusb_bulk_transfer(handle_.get(), ep_out_,\n                              const_cast\u003cuint8_t *\u003e(data.data()), data.size(),\n                              \u0026transferred, kTransferTimeout.count());\n\n// 3. In Receive(), replace kEpInBulk with ep_in_:\nint rc \u003d libusb_bulk_transfer(handle_.get(), ep_in_, data.data(), data.size(),\n                              \u0026transferred, kTransferTimeout.count());\n\n// 4. In Wait(), replace kEpInInt with ep_int_:\nint rc \u003d libusb_interrupt_transfer(handle_.get(), ep_int_, irq_buf.data(),\n                                   irq_buf.size(), \u0026transferred,\n                                   kTransferTimeout.count());\n\n```\n\n### 3\\. Clean up `bootrom.cc`\n\nNow that `UsbComm` is properly encapsulated, `BootromComm` no longer needs to use the lower-level `BulkWrite` and `BulkRead` methods. You can update `DoUsbTransfer` to use the cleaner abstractions:\n\n```c\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e BootromComm::DoUsbTransfer(\n    std::span\u003cconst uint8_t\u003e tx_cmd, size_t min_expected_rx_size,\n    std::chrono::milliseconds timeout) {\n  DumpRawCmd(tx_cmd);\n\n  // Replace direct BulkWrite with Send:\n  if (auto res \u003d usb_.Send(tx_cmd); !res)\n    return std::unexpected(BootromError::kUsbWriteFailed);\n\n  std::vector\u003cuint8_t\u003e ret(kMaxPayloadSize + min_expected_rx_size, 0);\n  \n  // Replace direct BulkRead with Receive:\n  auto read_res \u003d usb_.Receive(ret);\n  if (!read_res || read_res.value() \u003c\u003d 0)\n    return std::unexpected(BootromError::kUsbReadFailed);\n\n  // ... (keep rest of function identical)\n}\n\n```\n\n### 4\\. Wire it together in `et171_flash.cc`\n\nFinally, update the instantiations of `UsbComm` to pass the correct endpoints based on whether you are talking to the EC App or the Bootrom.\n\n```c\n// In ConnectToBootloader:\n// EC App uses 0x01 (OUT), 0x81 (IN), and 0x82 (INT)\nUsbComm app_comm(usb_ctx, kVidGoogle, kPidEgisApp, 0x01, 0x81, 0x82);\n\n// In main():\n// Bootloader uses 0x02 (OUT) and 0x81 (IN). Pass 0 for INT since it\u0027s unused.\negis::UsbComm boot_comm(usb_ctx.get(), egis::kVidEgis,\n                        egis::kPidEgisBootloader, 0x02, 0x81, 0);\n\n```",
       "parentUuid": "d0679968_4c154ece",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 145,
+        "endChar": 0
+      },
+      "revId": "817ae722586fc8ae52aaff59d5adcdb0dbc5b42a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "86fcab28_73dc22e3",
+        "filename": "util/egis/usb_comm.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-27T06:36:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1d21954b_95a7d4aa",
       "range": {
         "startLine": 127,
         "startChar": 0,
