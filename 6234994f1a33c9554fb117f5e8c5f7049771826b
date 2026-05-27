@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e73c64e6_8ca1a643",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T22:34:14Z",
+      "side": 1,
+      "message": "**Issue in `test_get_frame_absolute_success`:** In earlier tests like `test_get_frame_shifted_layout_success`, you elegantly verify the output buffer using `zassert_mem_equal` against a pre-initialized expected array. However, in `test_get_frame_absolute_success`, you switch to asserting individual byte indices:\n\n```c\nzassert_equal(output_buffer[0], 0xAA, \"Data mismatch at index 0\");\nzassert_equal(output_buffer[1], 0xBB, \"Data mismatch at index 1\");\nzassert_equal(output_buffer[2], 0xCC, \"Data mismatch at index 2\");\n\n```\n\nThis leaves the remaining 533 bytes of the buffer unverified. If `get_frame` had a bug that copied garbage data beyond index 2, this test would still pass.\n\n**Recommendation:** Standardize your buffer verification. Create an `expected_output` array, populate the first three indices, leave the rest as `0` (which correctly mirrors the `memset` behavior of `fp_buffer`), and use `zassert_mem_equal` to verify the entire 536-byte chunk.",
+      "range": {
+        "startLine": 329,
+        "startChar": 0,
+        "endLine": 332,
+        "endChar": 1
+      },
+      "revId": "6234994f1a33c9554fb117f5e8c5f7049771826b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
