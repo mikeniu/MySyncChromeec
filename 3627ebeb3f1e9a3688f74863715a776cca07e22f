@@ -72,6 +72,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "14b98c93_64e01f41",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 524,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T21:24:47Z",
+      "side": 1,
+      "message": "Let\u0027s refactor this so that we can eliminate `Get32Le` and `Set32Le`.\n\nHere is Gemini-generated code (it assumes you haven\u0027t implemented the `ToLittleEndian` helper from the other comment; if you have already implemented it, obviously skip that step):\n\n----\n\n### The Rationale\n\nRefactoring `GetChecksum` to keep the span chunking while inlining the memory extraction provides a perfect balance between readability and architectural cleanliness. Here is why this specific approach is highly effective:\n\n1. **Readability via Sliding Window:** Using `remaining.first()` and `remaining.subspan()` explicitly models a sliding window moving across the firmware buffer. This self-documenting pattern makes the parsing intent immediately obvious to anyone reading the code without needing to parse pointer arithmetic or index math.\n2. **Localized Memory Access:** By bringing `std::memcpy` directly into `GetChecksum`, you make the memory extraction transparent. The reader can see exactly how the 4-byte chunk is being transformed into a 32-bit integer, rather than having to jump to a separate helper function to verify the behavior.\n3. **Dead Code Elimination (YAGNI):** By handling the extraction locally, `Get32Le` becomes obsolete. `Set32Le` was already unused. Stripping these out entirely removes dead weight from the class API, reducing the cognitive load for future maintainers.\n\n---\n\n### Required Changes (Relative to the Original Patch)\n\nHere are the step-by-step changes needed to implement this specific refactor against your original patch, strictly adhering to Google C++ Style Guidelines.\n\n#### 1. Add the Endianness Helper (`utility.h`)\n\nBecause the new `GetChecksum` relies on a clean way to handle byte-swapping, you must add the `ToLittleEndian` helper to your utility header. Add `#include \u003cbit\u003e` and `#include \u003cconcepts\u003e` at the top of the file.\n\n```cpp\nnamespace elan {\n\n// Converts an integral type between native byte order and little-endian.\ntemplate \u003cstd::integral T\u003e\nconstexpr T ToLittleEndian(T val) {\n  if constexpr (std::endian::native \u003d\u003d std::endian::big) {\n    return std::byteswap(val);\n  }\n  return val;\n}\n\n// ... existing IapError enum ...\n\n```\n\n#### 2. Remove Dead Declarations (`iap_control.h`)\n\nDelete the unused 32-bit helper declarations from the private section of your class header.\n\n```cpp\n// Delete these two lines from iap_control.h:\n  std::expected\u003cvoid, IapError\u003e Set32Le(std::span\u003cuint8_t\u003e buff,\n                                        uint32_t value);\n  std::expected\u003cuint32_t, IapError\u003e Get32Le(std::span\u003cconst uint8_t\u003e buff);\n\n```\n\n#### 3. Remove Dead Implementations (`iap_control.cc`)\n\nLocate and entirely delete the implementations of `Set32Le` and `Get32Le`.\n\n```cpp\n// DELETE THIS ENTIRE FUNCTION BLOCK\nstd::expected\u003cvoid, IapError\u003e IapControl::Set32Le(std::span\u003cuint8_t\u003e buff,\n                                                  uint32_t value) {\n  // ...\n}\n\n// DELETE THIS ENTIRE FUNCTION BLOCK\nstd::expected\u003cuint32_t, IapError\u003e IapControl::Get32Le(\n    std::span\u003cconst uint8_t\u003e buff) {\n  // ...\n}\n\n```\n\n#### 4. Rewrite `GetChecksum` (`iap_control.cc`)\n\nReplace the original `GetChecksum` implementation with this version. It preserves your original `while` loop chunking logic, but safely handles the 4-byte extraction and byte-swapping locally.\n\n```cpp\nstd::expected\u003cuint32_t, IapError\u003e IapControl::GetChecksum(\n    std::span\u003cconst uint8_t\u003e buff) {\n  if (buff.size() % sizeof(uint32_t) !\u003d 0) {\n    return std::unexpected(IapError::BufferTooSmall);\n  }\n\n  uint32_t checksum \u003d 0;\n  auto remaining \u003d buff;\n\n  while (!remaining.empty()) {\n    auto chunk \u003d remaining.first(sizeof(uint32_t));\n\n    uint32_t val;\n    std::memcpy(\u0026val, chunk.data(), sizeof(val));\n    checksum +\u003d ToLittleEndian(val);\n\n    remaining \u003d remaining.subspan(sizeof(uint32_t));\n  }\n\n  return checksum;\n}\n\n```",
+      "range": {
+        "startLine": 508,
+        "startChar": 0,
+        "endLine": 524,
+        "endChar": 1
+      },
+      "revId": "3627ebeb3f1e9a3688f74863715a776cca07e22f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ff0f6c6b_53505f56",
         "filename": "util/elan/iap_control.h",
         "patchSetId": 23
@@ -118,6 +141,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a8b581b5_7f0fd981",
+        "filename": "util/elan/iap_control.h",
+        "patchSetId": 23
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T21:24:47Z",
+      "side": 1,
+      "message": "I think this can be simplified to:\n\n```\nstd::span\u003cconst uint8_t\u003e AsByteSpan() const {\n    return {reinterpret_cast\u003cconst uint8_t*\u003e(this), sizeof(*this)};\n  }\n```\n\nMake sure it compiles.",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 51
+      },
+      "revId": "3627ebeb3f1e9a3688f74863715a776cca07e22f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f7f5ba13_0ab8bf02",
         "filename": "util/elan/iap_control.h",
         "patchSetId": 23
@@ -134,6 +180,29 @@
         "startChar": 0,
         "endLine": 48,
         "endChar": 24
+      },
+      "revId": "3627ebeb3f1e9a3688f74863715a776cca07e22f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b3bddeb_6d2da875",
+        "filename": "util/elan/iap_control.h",
+        "patchSetId": 23
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T21:24:47Z",
+      "side": 1,
+      "message": "I think this can be simplified to:\n\n```\nstd::span\u003cuint8_t\u003e AsByteSpan() const {\n    return {reinterpret_cast\u003cuint8_t*\u003e(this), sizeof(*this)};\n  }\n```\n\nMake sure it compiles.",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 80
       },
       "revId": "3627ebeb3f1e9a3688f74863715a776cca07e22f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
