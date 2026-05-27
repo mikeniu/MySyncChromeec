@@ -14,6 +14,10 @@
 
 static int svdm_identity(int port, uint32_t *payload)
 {
+	bool tbt_mode = IS_ENABLED(CONFIG_USB_PD_TBT_COMPAT_MODE);
+
+	uint32_t ufp_type = tbt_mode ? IDH_PTYPE_PERIPH : IDH_PTYPE_UNDEF;
+
 	/* The SVID in the Discover Identity Command request Shall be set to the
 	 * PD SID */
 	if (PD_VDO_VID(payload[VDO_INDEX_HDR]) != USB_SID_PD) {
@@ -26,9 +30,9 @@ static int svdm_identity(int port, uint32_t *payload)
 
 	if (pd_get_rev(port, TCPCI_MSG_SOP) < PD_REV30) {
 		payload[VDO_I(IDH)] = VDO_IDH(1, /* USB host */
-					      0, /* Not a USB device */
-					      IDH_PTYPE_UNDEF, /* Not a UFP */
-					      0, /* No alt modes (not a UFP) */
+					      tbt_mode, /* USB device capable */
+					      ufp_type, tbt_mode, /* UFP modal
+								     support */
 					      CONFIG_USB_VID);
 
 		return VDO_I(PRODUCT) + 1;
@@ -43,18 +47,25 @@ static int svdm_identity(int port, uint32_t *payload)
 #endif
 
 	/* PD 3.0 */
-	payload[VDO_I(IDH)] = VDO_IDH_REV30(1, /* USB host */
-					    0, /* Not a USB device */
-					    IDH_PTYPE_UNDEF, /* Not a UFP */
-					    0, /* No alt modes (not a UFP) */
-					    IDH_PTYPE_DFP_HOST, /* PDUSB host */
-					    USB_TYPEC_RECEPTACLE,
-					    CONFIG_USB_VID);
+	payload[VDO_I(IDH)] =
+		VDO_IDH_REV30(1, /* USB host */
+			      tbt_mode, /* USB device capable */
+			      ufp_type, tbt_mode, /* UFP modal support */
+			      IDH_PTYPE_DFP_HOST, /* PDUSB host */
+			      USB_TYPEC_RECEPTACLE, CONFIG_USB_VID);
 
-	payload[VDO_I(PRODUCT) + 1] =
-		VDO_DFP(host_cap, USB_TYPEC_RECEPTACLE, port);
+	int idx = VDO_I(PRODUCT) + 1;
 
-	return VDO_I(PRODUCT) + 2;
+#ifdef CONFIG_USB_PD_TBT_COMPAT_MODE
+	payload[idx++] = VDO_UFP1((VDO_UFP1_CAPABILITY_USB20 |
+				   VDO_UFP1_CAPABILITY_USB32),
+				  USB_TYPEC_RECEPTACLE, VDO_UFP1_ALT_MODE_TBT3,
+				  USB_R30_SS_U40_GEN3);
+#endif
+
+	payload[idx++] = VDO_DFP(host_cap, USB_TYPEC_RECEPTACLE, port);
+
+	return idx;
 }
 
 __override const struct svdm_response svdm_rsp = {
