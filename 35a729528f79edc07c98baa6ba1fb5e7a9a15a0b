@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8111a12d_56dae523",
+        "filename": "common/power_button.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1564607
+      },
+      "writtenOn": "2026-05-27T14:14:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c6b23f8_6476efee",
+      "range": {
+        "startLine": 299,
+        "startChar": 10,
+        "endLine": 299,
+        "endChar": 13
+      },
+      "revId": "35a729528f79edc07c98baa6ba1fb5e7a9a15a0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "790e34d2_6dbafcd0",
@@ -37,6 +61,24 @@
       "writtenOn": "2026-05-26T15:31:31Z",
       "side": 1,
       "message": "This should probably be configurable. POWER_BUTTON_SHORTPRESS could be the default when unspecified.",
+      "revId": "35a729528f79edc07c98baa6ba1fb5e7a9a15a0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9440665b_d084c948",
+        "filename": "common/power_button.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1564607
+      },
+      "writtenOn": "2026-05-27T14:14:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "790e34d2_6dbafcd0",
       "revId": "35a729528f79edc07c98baa6ba1fb5e7a9a15a0b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -58,6 +100,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5cce980_2bcfe51e",
+        "filename": "common/power_button.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 1564607
+      },
+      "writtenOn": "2026-05-27T14:14:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc81c44c_57fb6bd7",
+      "revId": "35a729528f79edc07c98baa6ba1fb5e7a9a15a0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae4be917_249cdaef",
@@ -71,6 +131,24 @@
       "writtenOn": "2026-05-26T15:31:31Z",
       "side": 1,
       "message": "I think it\u0027s worth making this new command more generic so it could be used for other scenarios like long press shutdown followed by short press to boot. \n\ne.g. rename to EC_CMD_POWER_BUTTON_PRESS, add first_press_duration_ms and second_press_duration_ms, make the parameters optional.",
+      "revId": "35a729528f79edc07c98baa6ba1fb5e7a9a15a0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ce806ab_02163316",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 6151,
+      "author": {
+        "id": 1564607
+      },
+      "writtenOn": "2026-05-27T14:14:52Z",
+      "side": 1,
+      "message": "Sure thing. I didn\u0027t add it in the first place because it would require reserving at least extra 4b on BSS for holding the parameters on top of all the extra workqueues. Though I think I can fit all in a space taken by the second workqueue.",
+      "parentUuid": "ae4be917_249cdaef",
       "revId": "35a729528f79edc07c98baa6ba1fb5e7a9a15a0b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -92,6 +170,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bc2bdb4_b2c2fb8b",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 6156,
+      "author": {
+        "id": 1564607
+      },
+      "writtenOn": "2026-05-27T14:14:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2492d531_9f56e966",
+      "revId": "35a729528f79edc07c98baa6ba1fb5e7a9a15a0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e8f9b420_4e04da4f",
@@ -105,6 +201,24 @@
       "writtenOn": "2026-05-26T15:31:31Z",
       "side": 1,
       "message": "Please make the command more verbos, e.g. pwrbtn_double_press.",
+      "revId": "35a729528f79edc07c98baa6ba1fb5e7a9a15a0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "504f451f_05cf066f",
+        "filename": "util/ectool.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 13212,
+      "author": {
+        "id": 1564607
+      },
+      "writtenOn": "2026-05-27T14:14:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8f9b420_4e04da4f",
       "revId": "35a729528f79edc07c98baa6ba1fb5e7a9a15a0b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
