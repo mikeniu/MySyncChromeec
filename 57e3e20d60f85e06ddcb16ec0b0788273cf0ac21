@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "450a80e2_07e4f218",
+        "filename": "zephyr/drivers/gpio_suspend_resume/gpio_suspend_resume.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-05-27T18:26:35Z",
+      "side": 1,
+      "message": "Acknowledged.",
+      "parentUuid": "f6ec1649_9f8b5295",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 80
+      },
+      "revId": "57e3e20d60f85e06ddcb16ec0b0788273cf0ac21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "75747395_639cdce1",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9498520b_aa5a4c93",
+        "filename": "zephyr/dts/bindings/power/cros-ec,gpio-suspend-resume.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-05-27T18:26:35Z",
+      "side": 1,
+      "message": "acknowledged.",
+      "parentUuid": "75747395_639cdce1",
+      "range": {
+        "startLine": 14,
+        "startChar": 21,
+        "endLine": 14,
+        "endChar": 40
+      },
+      "revId": "57e3e20d60f85e06ddcb16ec0b0788273cf0ac21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5ef22d2e_1c8db5a1",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-05-20T21:28:12Z",
       "side": 1,
       "message": "This should be a list of GPIO phandles and should not use `named-gpio` nodes.\n\nThe `cros,aic-pins` driver does this.\n\n[Example usage](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/program/ec-aic/npcx-aic/project.overlay;l\u003d33;drc\u003dc37b01cada9fbb953562b91d132befe308506b32)\n\nThe driver code can create an array of GPIOs like this:\n```\nstatic const struct gpio_dt_spec ec_io_gpio[] \u003d {\n        DT_INST_FOREACH_PROP_ELEM_SEP(0, io_gpios, GPIO_DT_SPEC_GET_BY_IDX, (, ))\n    };\n```",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 12
+      },
+      "revId": "57e3e20d60f85e06ddcb16ec0b0788273cf0ac21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "11c56232_73074b5a",
+        "filename": "zephyr/dts/bindings/power/cros-ec,gpio-suspend-resume.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-05-27T18:26:35Z",
+      "side": 1,
+      "message": "acknowledged.",
+      "parentUuid": "5ef22d2e_1c8db5a1",
       "range": {
         "startLine": 17,
         "startChar": 0,
