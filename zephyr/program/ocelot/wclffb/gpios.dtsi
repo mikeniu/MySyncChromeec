@@ -50,7 +50,7 @@
 			gpios = <&gpiod 7 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW | GPIO_OPEN_DRAIN)>;
 		};
 		gpio_prim_vr_en: prim_vr_en {
-			gpios = <&gpiod 5 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW | GPIO_OPEN_DRAIN)>;
+			gpios = <&gpiod 5 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
 			/* no-auto-init; */
 		};
 		gpio_en_pp3300_rails: en_pp3300_rails {

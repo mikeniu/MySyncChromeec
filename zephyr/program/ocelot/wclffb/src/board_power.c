@@ -43,7 +43,7 @@ void board_ap_power_force_shutdown(void)
 	power_signal_set(PWR_EC_PCH_RSMRST, 1);
 
 	/* Turn off PRIM load switch. */
-	power_signal_set(PWR_PRIM_VR, 0);
+	//power_signal_set(PWR_PRIM_VR, 0);
 	power_signal_set(PWR_EN_PP3300_A, 0);
 	power_signal_set(PWR_EN_PP1800_A, 0);
 
@@ -74,7 +74,7 @@ static int board_ap_power_action_g3_run(void *data)
 		power_signal_set(PWR_EN_PP3300_A, 1);
 		power_signal_set(PWR_EN_PP1800_A, 1);
 		k_busy_wait(5000);
-		power_signal_set(PWR_PRIM_VR, 1);
+		//power_signal_set(PWR_PRIM_VR, 1);
 
 		update_ap_boot_time(ARAIL);
 	}

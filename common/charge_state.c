@@ -1490,10 +1490,6 @@ void charger_task(void *u)
 	bool prev_full = false;
 	int prev_bf = 0;
 
-	while (1) {
-		task_wait_event(-1);
-	}
-
 	/* Set up the task - note that charger_init() has already run. */
 	charger_setup(info);
 

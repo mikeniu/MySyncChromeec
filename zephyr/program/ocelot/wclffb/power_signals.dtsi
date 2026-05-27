@@ -15,13 +15,14 @@
 		all-sys-pwrgd-timeout = <20>;
 		sys-reset-delay = <60>;
 	};
-
+	/*
 	pwr-en-s5-prim-vr-rails {
 		compatible = "intel,ap-pwrseq-gpio";
 		dbg-label = "Enable output for PWR_PRIM_VR";
 		enum-name = "PWR_PRIM_VR";
 		gpios = <&gpiod 5 0>;
 	};
+	*/
 	pwr-en-s5-pp3300-rails {
 		compatible = "intel,ap-pwrseq-gpio";
 		dbg-label = "EN_S5_RAILS enable output for PP3300";
