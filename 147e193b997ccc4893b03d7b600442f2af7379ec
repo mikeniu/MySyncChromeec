@@ -16,6 +16,24 @@
       "message": "Hi Matt, \n\nThis change was intentionally done to avoid ACOK toggle issues on the previous platforms, Are you not able to detect charger without this change ?",
       "revId": "147e193b997ccc4893b03d7b600442f2af7379ec",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1cb6356c_37ac0853",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-05-27T09:16:52Z",
+      "side": 1,
+      "message": "Yes, if not change the ACOK GPIO, the EC cannot get the AC on/off when the AC status changes.",
+      "parentUuid": "edb6f903_590a5e46",
+      "revId": "147e193b997ccc4893b03d7b600442f2af7379ec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
