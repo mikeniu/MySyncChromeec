@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60ced6a7_73196ad2",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-27T22:28:35Z",
+      "side": 1,
+      "message": "**Issue in `test_get_frame_cache_size_exceeds_buffer`:** You are intentionally bypassing class encapsulation to pollute the cache using a `reinterpret_cast`:\n\n```c\nauto *raw_storage \u003d\n\treinterpret_cast\u003cstd::array\u003cuint32_t, FP_CAPTURE_TYPE_MAX\u003e *\u003e(\n\t\t\u0026global_context.fp_frame_size_cache);\n\n```\n\nWhile standard layout guarantees might make this \"work\" on your current compiler by overlaying the memory, this violates C++ strict aliasing rules and causes Undefined Behavior (UB). It makes the test highly brittle; any future additions to the `fp_frame_size_cache` class (e.g., virtual destructors, new private member variables, or changes to access specifiers) will silently break this memory overlay and corrupt the test environment.\n\n**Recommendation:** Do not rely on pointer casting to access private class members. Instead, modify the `fp_frame_size_cache` class to expose a safe, test-only setter. You can wrap this in an `#ifdef` block within the header to ensure it doesn\u0027t leak into production firmware:\n\n```c\n#ifdef CONFIG_ZTEST\nvoid set_frame_size_for_test(uint32_t capture_type, uint32_t size) {\n    // safe assignment logic\n}\n#endif\n\n```",
+      "range": {
+        "startLine": 134,
+        "startChar": 0,
+        "endLine": 144,
+        "endChar": 0
+      },
+      "revId": "1b22f62938765bc8650e061b3244b6ec8474ef9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
