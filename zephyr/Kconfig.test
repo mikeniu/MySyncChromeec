@@ -13,7 +13,7 @@ config PLATFORM_EC_TEST_CC_USBPD
 
 # ZTEST is enabled with Renode, we want these configs
 # for normal ZTEST built on native_posix
-if ARCH_POSIX
+if EC_HOST_CMD && ARCH_POSIX
 config EC_HOST_CMD_BACKEND_SIMULATOR
 	default y
 
@@ -27,7 +27,7 @@ config EC_HOST_CMD_HANDLER_RX_BUFFER_SIZE
 
 config EC_HOST_CMD_HANDLER_TX_BUFFER_SIZE
 	default 544
-endif # ARCH_POSIX
+endif # EC_HOST_CMD && ARCH_POSIX
 
 endif # ZTEST
 
