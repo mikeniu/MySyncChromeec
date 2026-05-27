@@ -16,6 +16,24 @@
       "message": "Please move `ec_ac_present_odl` (gpiof 0)to unused gpio list if it\u0027s not used.",
       "revId": "74e7085d7ad0f980f35049acde65eeaf267d4fc4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1d01cfd_b35a31f5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-05-27T07:25:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "afa8698f_db94f9ad",
+      "revId": "74e7085d7ad0f980f35049acde65eeaf267d4fc4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
