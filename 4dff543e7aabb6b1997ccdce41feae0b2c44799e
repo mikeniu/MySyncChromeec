@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c595d873_be766326",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1760,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-05-28T16:36:09Z",
+      "side": 0,
+      "message": "Let\u0027s leave this logic in place. If pdc_set_vdo_idh ever gets called separately, it should populate the correct data.",
+      "range": {
+        "startLine": 1760,
+        "startChar": 21,
+        "endLine": 1760,
+        "endChar": 61
+      },
+      "revId": "4dff543e7aabb6b1997ccdce41feae0b2c44799e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
