@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "72f2d5e1_c4130327",
+        "filename": "zephyr/drivers/pwrmon/power_monitor_pac194x.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-28T13:58:41Z",
+      "side": 1,
+      "message": "I\u0027ve reworked how shim work.\n\nI will eventually write an MFD device, I don\u0027t like shims in general. MFD have potential to completely eliminate this.",
+      "parentUuid": "e0879453_e24b9607",
+      "range": {
+        "startLine": 6,
+        "startChar": 4,
+        "endLine": 6,
+        "endChar": 22
+      },
+      "revId": "0a4a46d1866d419717550a6f90f64687788f718b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5e31cb91_d0d53017",
         "filename": "zephyr/drivers/pwrmon/pwrmon.c",
         "patchSetId": 25
@@ -37,6 +61,30 @@
       "writtenOn": "2026-05-22T17:22:15Z",
       "side": 1,
       "message": "Move all const data inside `struct pwrmon_config`.",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 35
+      },
+      "revId": "0a4a46d1866d419717550a6f90f64687788f718b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb45c8e1_d74b091d",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-28T13:58:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5e31cb91_d0d53017",
       "range": {
         "startLine": 53,
         "startChar": 0,

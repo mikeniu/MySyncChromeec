@@ -188,6 +188,30 @@
       },
       "revId": "1b43d5935c607a4d2a86349d21eb5c41c9182b52",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bfddc27_a144d716",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 23
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-28T13:58:41Z",
+      "side": 1,
+      "message": "Changed all `DT` to `DT_INST`.",
+      "parentUuid": "bfca4051_cd1c94dd",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 62
+      },
+      "revId": "1b43d5935c607a4d2a86349d21eb5c41c9182b52",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

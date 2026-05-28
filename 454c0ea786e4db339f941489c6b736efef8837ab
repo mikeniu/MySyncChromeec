@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a50dc9cb_9d103a88",
+        "filename": "zephyr/drivers/pwrmon/power_monitor_pac194x.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-28T13:58:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c272723_10af0670",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 38
+      },
+      "revId": "454c0ea786e4db339f941489c6b736efef8837ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "311b15e0_42ea9e8e",
@@ -59,6 +83,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa5a8b4f_8d47f4a2",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-28T13:58:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "311b15e0_42ea9e8e",
+      "revId": "454c0ea786e4db339f941489c6b736efef8837ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b3a45809_5824f9b1",
@@ -72,6 +114,24 @@
       "writtenOn": "2026-05-25T16:24:46Z",
       "side": 1,
       "message": "I think it\u0027d be a good idea to use strncpy here, make sure you don\u0027t write over sizeof(r-\u003edump_info.channel_name), just in case since channel_name seems to be unbound",
+      "revId": "454c0ea786e4db339f941489c6b736efef8837ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab09ccd2_bfbc196c",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-28T13:58:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b3a45809_5824f9b1",
       "revId": "454c0ea786e4db339f941489c6b736efef8837ab",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
