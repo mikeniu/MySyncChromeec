@@ -33,6 +33,24 @@
       "message": "[Gerrit AI Review] Note that this assertion doesn\u0027t technically prove that `set_frame_size` avoided an out-of-bounds memory write. If `set_frame_size` had a bug and wrote past the end of the `frame_sizes_` array, this `zassert_equal` would still pass because `get_frame_size()` has its own independent bounds checking and will short-circuit to return `0` without ever attempting to read the corrupted memory.\n\nThat said, invoking `set_frame_size` with an out-of-bounds value here is still very valuable because it exercises the error path and gives AddressSanitizer (if enabled during testing) a chance to catch any out-of-bounds writes. The test is good as-is, just something to keep in mind regarding what the assertion is actually proving.",
       "revId": "f19344aec135778f73af4b97727427c3d83d3ef2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2e069a9_e3a46c0a",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_frame_size.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-28T17:34:19Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "6b13ad6c_cd32e75e",
+      "revId": "f19344aec135778f73af4b97727427c3d83d3ef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
