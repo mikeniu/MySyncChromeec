@@ -164,6 +164,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8e0ab41f_ede0165a",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:43:30Z",
+      "side": 1,
+      "message": "Gemini generated fix. Check for correctness:\n\n----\n\nHere are the specific code changes required to implement the \"Fix the Root Types\" strategy. By propagating `size_t` and `uint32_t` through the function signatures and local variables, we eliminate the type mismatches that caused the excessive casting.\n\nThese changes all take place in `util/focaltech/updater.cc`.\n\n### 1. Update Helper Function Signatures\n\nFirst, fix the parameters in the helper functions. Memory addresses should always be unsigned integers (`uint32_t` for this MCU), and sizes/lengths should be `size_t`.\n\n**Before:**\n\n```cpp\nstatic std::expected\u003cvoid, FtError\u003e FtErasePage(const UsbDevice\u0026 device,\n                                                int length, int addr) { ... }\n\nstatic std::expected\u003cvoid, FtError\u003e FtDownloadPage(\n    const UsbDevice\u0026 device, uint32_t downaddr, int per_len,\n    std::span\u003cconst uint8_t\u003e data) { ... }\n\n```\n\n**After:**\n\n```cpp\nstatic std::expected\u003cvoid, FtError\u003e FtErasePage(const UsbDevice\u0026 device,\n                                                size_t length, uint32_t addr) { ... }\n\nstatic std::expected\u003cvoid, FtError\u003e FtDownloadPage(\n    const UsbDevice\u0026 device, uint32_t downaddr, size_t per_len,\n    std::span\u003cconst uint8_t\u003e data) { ... }\n\n```\n\n---\n\n### 2. Update Variable Declarations in `FtDownloadBin`\n\nNow, update the local variables inside the main download loop. Since `buffer.size()` returns a `size_t`, we declare all derived length variables as `size_t` to match.\n\n**Before:**\n\n```cpp\n  const auto\u0026 buffer \u003d *file_data;\n  int file_len \u003d buffer.size();\n  int total_frame \u003d\n      FtDivRoundUp(static_cast\u003cuint32_t\u003e(file_len), kFocalConfigSize);\n\n  // ... [erase logic] ...\n\n  int len \u003d total_frame * kFocalConfigSize;\n  std::vector\u003cuint8_t\u003e write_buffer(len, 0xFF);\n  std::memcpy(write_buffer.data(), buffer.data(), file_len);\n\n  uint8_t* p \u003d write_buffer.data();\n  uint32_t downaddr \u003d target_addr;\n  int per_len \u003d kFocalConfigSize;\n  int frame \u003d 0;\n\n```\n\n**After:**\n\n```cpp\n  const auto\u0026 buffer \u003d *file_data;\n  size_t file_len \u003d buffer.size();\n  \n  // No cast needed. We explicitly pass \u003csize_t\u003e to the template.\n  size_t total_frame \u003d FtDivRoundUp\u003csize_t\u003e(file_len, kFocalConfigSize);\n\n  // ... [erase logic] ...\n\n  size_t len \u003d total_frame * kFocalConfigSize;\n  std::vector\u003cuint8_t\u003e write_buffer(len, 0xFF);\n  std::memcpy(write_buffer.data(), buffer.data(), file_len);\n\n  uint8_t* p \u003d write_buffer.data();\n  uint32_t downaddr \u003d target_addr;\n  size_t per_len \u003d kFocalConfigSize;\n  size_t frame \u003d 0;\n\n```\n\n---\n\n### 3. Clean Up the Download Loop\n\nBecause the types now correctly align with the C++ standard library, you can completely strip out the functional casts `size_t(...)` and `static_cast(...)` when interacting with the spans and the `FtDivRoundUp` utility.\n\n**Before:**\n\n```cpp\n  while (len \u003e\u003d per_len) {\n    auto page_res \u003d\n        FtDownloadPage(device, downaddr, per_len, {p, size_t(per_len)});\n    // ...\n  }\n\n  if (len \u003e 0) {\n    len \u003d FtDivRoundUp(static_cast\u003cuint32_t\u003e(len), static_cast\u003cuint32_t\u003e(4));\n    auto page_res \u003d FtDownloadPage(device, downaddr, len, {p, size_t(len)});\n    // ...\n  }\n\n```\n\n**After:**\n\n```cpp\n  while (len \u003e\u003d per_len) {\n    // Cast removed: per_len is already a size_t\n    auto page_res \u003d FtDownloadPage(device, downaddr, per_len, {p, per_len});\n    // ...\n  }\n\n  if (len \u003e 0) {\n    // Casts removed: explicitly using \u003csize_t\u003e template parameter\n    len \u003d FtDivRoundUp\u003csize_t\u003e(len, 4);\n    \n    // Cast removed: len is already a size_t\n    auto page_res \u003d FtDownloadPage(device, downaddr, len, {p, len});\n    // ...\n  }\n\n```",
+      "parentUuid": "5aff917c_cde57745",
+      "range": {
+        "startLine": 146,
+        "startChar": 0,
+        "endLine": 148,
+        "endChar": 70
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "54bf2ad3_558c3844",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 15
