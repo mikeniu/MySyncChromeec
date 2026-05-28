@@ -49,6 +49,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8db88dc0_5f853b54",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:40:23Z",
+      "side": 1,
+      "message": "Let\u0027s use designated initializers. Gemini generated code below. Check for correctness.\n\n-----\n\nIn `ft_scsi.cc` (`SendBulkCommand` or our refactored `SendCbw` helper), you initialize `BulkCbWrap` line by line. Using designated initializers makes it immediately clear what data goes into the struct upon creation.\n\n**Before:**\n\n```c\n  BulkCbWrap cbw{};\n  cbw.signature \u003d htole32(kUsbMsCbwSignature);\n  cbw.tag \u003d htole32(g_cdb_tag++);\n  cbw.flags \u003d (dir \u003d\u003d TransferDirection::kIn) ? 0x80 : 0x00;\n  cbw.lun \u003d 0;\n  cbw.cmd_len \u003d static_cast\u003cuint8_t\u003e(scsi_cmd.size());\n  cbw.data_transfer_length \u003d htole32(data_buffer.size());\n  std::memcpy(cbw.cmd, scsi_cmd.data(), scsi_cmd.size());\n\n```\n\n**After:**\n\n```c\n  BulkCbWrap cbw{\n      .signature \u003d htole32(kUsbMsCbwSignature),\n      .tag \u003d htole32(device.GetNextCdbTag()), // Using our previous refactor\n      .data_transfer_length \u003d htole32(data_buffer.size()),\n      .flags \u003d static_cast\u003cuint8_t\u003e((dir \u003d\u003d TransferDirection::kIn) ? 0x80 : 0x00),\n      .lun \u003d 0,\n      .cmd_len \u003d static_cast\u003cuint8_t\u003e(scsi_cmd.size()),\n      // Any omitted fields (like .cmd) are automatically zero-initialized\n  };\n  \n  // We still use memcpy for the array field because we are copying a span\n  std::memcpy(cbw.cmd, scsi_cmd.data(), scsi_cmd.size());\n\n```",
+      "range": {
+        "startLine": 74,
+        "startChar": 1,
+        "endLine": 83,
+        "endChar": 0
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fcde0f39_15a05179",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 15
