@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fcde0f39_15a05179",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:21:30Z",
+      "side": 1,
+      "message": "Casting shouldn\u0027t be needed here",
+      "range": {
+        "startLine": 113,
+        "startChar": 0,
+        "endLine": 113,
+        "endChar": 68
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b8d3041_133470ef",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:21:30Z",
+      "side": 1,
+      "message": "Casting shouldn\u0027t be needed here",
+      "range": {
+        "startLine": 148,
+        "startChar": 0,
+        "endLine": 148,
+        "endChar": 70
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54bf2ad3_558c3844",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:21:30Z",
+      "side": 1,
+      "message": "Casting shouldn\u0027t be needed here",
+      "range": {
+        "startLine": 187,
+        "startChar": 0,
+        "endLine": 187,
+        "endChar": 77
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
