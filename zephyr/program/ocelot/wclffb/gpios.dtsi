@@ -117,7 +117,8 @@
 			/*
 			gpios = <&gpioa 7 GPIO_INPUT>;
 			*/
-			gpios = <&gpioa 7 GPIO_OUTPUT_HIGH>;
+			gpios = <&gpioa 7 GPIO_OUTPUT>;
+			no-auto-init;
 		};
 		gpio_ec_soc_int_odl: ec_soc_int_odl {
 			gpios = <&gpiom 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW)>;

@@ -55,7 +55,7 @@ tach_fan0: &tach0 {};
 / {
 	hibernate_z5: hibernate-z5 {
 		compatible = "cros-ec,hibernate-z5";
-		en-slp-z-gpios = <&gpioa 7 GPIO_ACTIVE_HIGH>;
+		en-slp-z-gpios = <&gpioa 7 GPIO_ACTIVE_LOW>;
 	};
 };
 
