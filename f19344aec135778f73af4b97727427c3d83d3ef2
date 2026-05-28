@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c28f894b_eaeb0bff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:32:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/e044df54-9b60-4702-b59e-0c8b0e8e379c)]\n\n### Review Summary\n\n*   **Functionality**: The `set_frame_size` logic correctly implements a test-only setter and successfully addressed previous comments regarding bounds checking.\n*   **Security**: No security issues identified. The test-only method is safely guarded with `#ifdef CONFIG_ZTEST`.\n*   **Style**: The code follows the standard project style, and the docstring accurately describes the out-of-bounds behavior.\n*   **Testing**: The patch includes good unit tests. I left a minor observation on the boundary tests pointing out that `get_frame_size()`\u0027s own bounds checking masks out-of-bounds writes from being verified by the assertion itself, though the test is still useful for triggering sanitizers.",
+      "revId": "f19344aec135778f73af4b97727427c3d83d3ef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b13ad6c_cd32e75e",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_frame_size.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:32:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Note that this assertion doesn\u0027t technically prove that `set_frame_size` avoided an out-of-bounds memory write. If `set_frame_size` had a bug and wrote past the end of the `frame_sizes_` array, this `zassert_equal` would still pass because `get_frame_size()` has its own independent bounds checking and will short-circuit to return `0` without ever attempting to read the corrupted memory.\n\nThat said, invoking `set_frame_size` with an out-of-bounds value here is still very valuable because it exercises the error path and gives AddressSanitizer (if enabled during testing) a chance to catch any out-of-bounds writes. The test is good as-is, just something to keep in mind regarding what the assertion is actually proving.",
+      "revId": "f19344aec135778f73af4b97727427c3d83d3ef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
