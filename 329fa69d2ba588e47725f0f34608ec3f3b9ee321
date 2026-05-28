@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c9e38df7_cea796b8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T18:07:00Z",
+      "side": 1,
+      "message": "Here is Gemini generated code. Check for correctness:\n\n----\n\n### 1\\. The Inline USB Timeouts (`main.cc`)\n\nIn `main.cc`, inside functions like `CheckEcBuildVersion`, `TestEcSwitchToRom`, and `SwitchToBoot`, you have naked integers passed directly into the `Send` and `Recv` calls.\n\n**The Offense:**\n\n```c\nauto sr \u003d usb.Send(kGetBuildVersionCmd, 200); // What is 200? ms? us?\nauto rr \u003d usb.Recv(rx, 1000); \n\n```\n\n**The Fix:** At the top of `main.cc` (under your `#include`s), define these as explicit `std::chrono` literals:\n\n```c\nusing namespace std::chrono_literals;\n\nconstexpr auto kFastUsbTimeout \u003d 200ms;\nconstexpr auto kSlowUsbTimeout \u003d 1000ms;\nconstexpr auto kResetWaitTimeout \u003d 3s; // Used for ResetComplete(3)\n\n```\n\nThen, update the calls:\n\n```c\nauto sr \u003d usb.Send(kGetBuildVersionCmd, kFastUsbTimeout.count()); \n\n```\n\n*(Note: If you update `Send` and `Recv` to take `std::chrono::milliseconds` instead of `uint32_t`, you can drop the `.count()` entirely, just like we did with `ResetComplete`\\!)*\n\n### 2\\. The Hardcoded Polling Delays\n\nThroughout the patch, the code forces the thread to sleep using magic inline numbers when polling the device state.\n\n**The Offense (in `main.cc` and `usb_context.cc`):**\n\n```c\nstd::this_thread::sleep_for(std::chrono::milliseconds(10));\nstd::this_thread::sleep_for(std::chrono::milliseconds(200));\n\n```\n\n**The Fix:** Define these as semantic constants at the top of their respective files. In `main.cc`:\n\n```c\nconstexpr auto kMcuRebootPollInterval \u003d 10ms;\n// ...\nstd::this_thread::sleep_for(kMcuRebootPollInterval);\n\n```\n\nIn `usb_context.cc`:\n\n```c\nconstexpr auto kUsbEnumerationDelay \u003d 200ms;\n// ...\nstd::this_thread::sleep_for(kUsbEnumerationDelay);\n\n```\n\n### 3\\. Payload Offsets and Status Codes\n\nThis is perhaps the most dangerous type of magic number, as it relates to protocol memory boundaries.\n\n**The Offense (in `main.cc`):**\n\n```c\n// Version string starts at byte 8.\nstd::string_view info(reinterpret_cast\u003cconst char*\u003e(rx.data() + 8),\n                      kRxLen - 9);\n\n```\n\n**The Fix:**\n\n```c\nconstexpr size_t kEcResponseHeaderSize \u003d 8;\nconstexpr size_t kEcResponseNullTerminatorSize \u003d 1;\n\nstd::string_view info(\n    reinterpret_cast\u003cconst char*\u003e(rx.data() + kEcResponseHeaderSize),\n    kRxLen - kEcResponseHeaderSize - kEcResponseNullTerminatorSize);\n\n```\n\n**The Offense (in `ft_scsi.cc`):**\n\n```c\ncbw.flags \u003d (dir \u003d\u003d TransferDirection::kIn) ? 0x80 : 0x00;\n// ...\nif (csw.status !\u003d 0x00) {\n\n```\n\n**The Fix:**\n\n**1\\. At the top of `ft_scsi.cc` (in the anonymous namespace):**\n\n```c\nnamespace {\n\n// Safely cast the libusb macros into strongly typed 8-bit integers\nconstexpr uint8_t kBotDirectionIn \u003d static_cast\u003cuint8_t\u003e(LIBUSB_ENDPOINT_IN);\nconstexpr uint8_t kBotDirectionOut \u003d static_cast\u003cuint8_t\u003e(LIBUSB_ENDPOINT_OUT);\n\n// Standard BOT (Bulk-Only Transport) CSW Status Codes\nconstexpr uint8_t kBotCommandPassed \u003d 0x00;\nconstexpr uint8_t kBotCommandFailed \u003d 0x01;\nconstexpr uint8_t kBotPhaseError \u003d 0x02;\n\n// ... existing structs ...\n}\n\n```\n\n**2\\. Inside `SendCbw`:**\n\nNow you can write the designated initializer exactly how you originally wanted to—cleanly, with no inline casts:\n\n```c\n  BulkCbWrap cbw{\n      .signature \u003d htole32(kUsbMsCbwSignature),\n      .tag \u003d htole32(device.GetNextCdbTag()), \n      .data_transfer_length \u003d htole32(data_length),\n      // Clean, readable, and type-safe!\n      .flags \u003d (dir \u003d\u003d TransferDirection::kIn) ? kBotDirectionIn : kBotDirectionOut,\n      .lun \u003d 0,\n      .cmd_len \u003d static_cast\u003cuint8_t\u003e(scsi_cmd.size()),\n  };\n\n```",
+      "parentUuid": "838bbd7c_f50fd6ed",
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5d7a12e3_5f8b347e",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 15
