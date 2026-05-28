@@ -109,6 +109,29 @@
       },
       "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3167de11_71f50bbe",
+        "filename": "util/egis/crypto_util.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T18:53:43Z",
+      "side": 1,
+      "message": "In `crypto_util.h`, you accept dynamically sized spans and check their sizes at runtime inside the implementation. C++20 allows you to enforce these sizes at **compile-time** using fixed-extent spans. You actually did this perfectly in `BootromComm::SetAesKey`, but missed it in the core crypto functions.\n\n**Current (`crypto_util.h`):**\n\n```c\nstd::expected\u003cvoid, CryptoError\u003e AesGcmEncrypt(\n    std::span\u003cconst uint8_t\u003e key, std::span\u003cconst uint8_t\u003e iv, ...);\n\n```\n\n**Better:** Enforce the exact byte lengths in the signature. If a caller tries to pass a dynamically sized vector without explicitly converting it, or an array of the wrong size, the compiler will catch it.\n\n```c\nstd::expected\u003cvoid, CryptoError\u003e AesGcmEncrypt(\n    std::span\u003cconst uint8_t, kAes256KeySize\u003e key,\n    std::span\u003cconst uint8_t, kAesGcmIvSize\u003e iv,\n    std::span\u003cconst uint8_t\u003e aad, \n    std::span\u003cconst uint8_t\u003e plaintext,\n    std::span\u003cuint8_t\u003e ciphertext, \n    std::span\u003cuint8_t, kAesGcmTagSize\u003e tag);\n\n```\n\n*(You can then remove the runtime `key.size() !\u003d kAes256KeySize` checks from `crypto_util.cc` entirely).*",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 3
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
