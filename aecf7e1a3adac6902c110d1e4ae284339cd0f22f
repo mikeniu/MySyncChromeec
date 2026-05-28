@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72adb98b_bfa7e759",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T16:40:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/79b44b7b-88a3-4045-a6f6-9d3df35e3ed0)]\n\n### Review Summary\n\n*   **Functionality**: The test-only setter `set_frame_size` behaves as expected, enabling unit tests to safely mock frame sizes. A minor logic reordering suggestion has been left regarding the bounds check.\n*   **Security**: No security risks. The new code is properly guarded by `#ifdef CONFIG_ZTEST` and won\u0027t be compiled into production binaries.\n*   **Style \u0026 Documentation**: The code is clean and adheres to the project\u0027s formatting. An inline comment suggests a slight clarification to the docstring for out-of-bounds behavior.\n*   **Testing**: The patch includes a well-structured unit test (`test_set_frame_size`) that successfully validates the new functionality.",
+      "revId": "aecf7e1a3adac6902c110d1e4ae284339cd0f22f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37a03682_f849284d",
+        "filename": "common/fpsensor/fpsensor_frame_size.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T16:40:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider checking `capture_type \u003e\u003d 0` *before* casting it to `size_t` (i.e., `capture_type \u003e\u003d 0 \u0026\u0026 static_cast\u003csize_t\u003e(capture_type) \u003c frame_sizes_.size()`). If `capture_type` is negative, casting it to `size_t` (an unsigned type) will wrap around to a very large positive number. While the current check technically works (because the large number will be `\u003e\u003d frame_sizes_.size()` and short-circuit), checking the lower bound before the unsigned cast makes the intent clearer and avoids the wrap-around. (Note that a similar check exists in `get_frame_size()`.)",
+      "revId": "aecf7e1a3adac6902c110d1e4ae284339cd0f22f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "494df225_a1766fd2",
+        "filename": "include/fpsensor/fpsensor_frame_size.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T16:40:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The docstring states that if `capture_type` is out of bounds, this call is a no-op, but the implementation actively logs an error using `CPRINTF`. Consider updating this comment to mention the error log, or removing the `CPRINTF` in the implementation if you intend for it to be a completely silent no-op.",
+      "revId": "aecf7e1a3adac6902c110d1e4ae284339cd0f22f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
