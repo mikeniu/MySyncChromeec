@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3805a3bc_0b37accb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T16:37:43Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass.\n\n### Review Summary\n\n*   **Functionality**: The CL adds a comprehensive suite of unit tests for the `get_frame` function in the fingerprint sensor subsystem. The tests cover a wide range of scenarios including system lock states, invalid parameters, memory overflows, and successful frame reads under various boundary conditions.\n*   **Security**: By thoroughly verifying the bounds checking and access control mechanisms within `get_frame`, this patch helps validate the security and stability of the fingerprint sensor driver against potential out-of-bounds reads and unauthorized access.\n*   **Style**: The code strictly adheres to Zephyr testing conventions and Google\u0027s C++ style guidelines. The use of clear setup logic, well-named tests, and appropriate mocking with the FFF framework makes the test suite highly readable and maintainable. All prior feedback has been flawlessly integrated.\n*   **Testing**: The patch successfully achieves its goal of significantly increasing test coverage for the frame retrieval logic, providing high confidence in the subsystem\u0027s robustness.",
+      "revId": "a8d455c09a76d662c3f57ff3bb9cb6b69a19035d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
