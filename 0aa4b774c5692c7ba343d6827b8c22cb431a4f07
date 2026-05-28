@@ -168,6 +168,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "1493cdc9_29559535",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-28T18:34:29Z",
+      "side": 1,
+      "message": "This looks like an improvement, but I\u0027ll confess to not deeply grokking how all of the configs fit together. They each seem reasonable at first glance.\n\nWith the simplified build/test structure, is it practical to use the I2C emulator\u0027s failure injection mechanism as Keith originally proposed, instead of the fake absent PDC emulator? Or is `discover_tcss_modules` still caching data from I2C responses before the test?",
+      "parentUuid": "2dd95d39_13aafb4e",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 10
+      },
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "ebf64224_3caf4d46",

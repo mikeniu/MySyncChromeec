@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "804ee171_31a65c11",
+        "filename": "zephyr/test/atria/Kconfig",
+        "patchSetId": 16
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-28T18:34:29Z",
+      "side": 1,
+      "message": "Nit: There should probably be a comment somewhere explaining why each of these builds only has a single test case and that any future tests in this vein should follow that pattern. Maybe this file is a good place, or maybe `testcase.yaml`.",
+      "revId": "f22daca9a3e77a4e38cd44da8d68c6bb71eddf38",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6483c6c7_dcde670f",
+        "filename": "zephyr/test/atria/src/rvp_usbc_runtime_3port_test.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-28T18:34:29Z",
+      "side": 1,
+      "message": "IMO, in the general case, the specific return value for failed board/driver calls is just informational. Therefore, it\u0027s usually fine to use `zassert_not_ok` in tests for this code instead of checking the specific return value with `zassert_equal`. Theoretically, that should make the tests more flexible against trivial changes in the implementation. The appropriateness and future value of `zassert_not_ok` will vary from test to test.",
+      "revId": "f22daca9a3e77a4e38cd44da8d68c6bb71eddf38",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
