@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd62fa4a_c126e94d",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-05-28T15:14:56Z",
+      "side": 1,
+      "message": "hey just to followup on the sync up meeting we had, have you had a chance to consider MKBP for the actual data streaming? it\u0027d be way easier to do it now than switch to that later",
+      "revId": "a405444314a2cc5767a76de98a34fe33ca6c27ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
