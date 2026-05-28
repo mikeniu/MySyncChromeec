@@ -88,4 +88,5 @@ if(DEFINED CONFIG_BOARD_RUBY)
 	zephyr_library_sources("ruby/src/forcepad.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_CUSTOMIZATION
 					"ruby/src/keyboard_customization.c")
+	zephyr_library_sources("ruby/src/imvp_program.c")
 endif()
