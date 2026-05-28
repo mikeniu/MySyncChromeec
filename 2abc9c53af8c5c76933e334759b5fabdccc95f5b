@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b5a10d8_90f53258",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 857,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-05-28T22:51:35Z",
+      "side": 1,
+      "message": "Yes branch in the flow is not the best. So far combination GET + SET VDO doesn\u0027t work. Logs shows correct values but IDH is not actually set based on PD traffic. For now I will try to stick to just setting IDH VDO since it is pretty simple and static. By removing getting VDO we can not compare old and new value, because of this there is also need to send it in case of non usb device capable port, just in case we want to disable this and previously was enabled.",
+      "parentUuid": "8890ca30_56943911",
+      "revId": "2abc9c53af8c5c76933e334759b5fabdccc95f5b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "771a0171_4a67deee",
@@ -69,6 +87,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cc125b2_c15795f7",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 871,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-05-28T22:51:35Z",
+      "side": 1,
+      "message": "Dropped getting VDO, struct added.",
+      "parentUuid": "9a2c1a9b_857d1011",
+      "revId": "2abc9c53af8c5c76933e334759b5fabdccc95f5b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4ff8d907_f6216a65",
@@ -86,6 +122,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "12cd38dc_24a917c8",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 1721,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-05-28T22:51:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4ff8d907_f6216a65",
+      "revId": "2abc9c53af8c5c76933e334759b5fabdccc95f5b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de853ef9_49ccbe0b",
@@ -99,6 +153,24 @@
       "writtenOn": "2026-05-28T20:07:34Z",
       "side": 1,
       "message": "Recapping chats from earlier:\n* This format of modifying the VDO makes it pretty hard to tell what\u0027s changing.\n* In spite of the [comments](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/include/usb_pd_vdo.h;l\u003d678;drc\u003d41520674f93769897147c5f9bb0ac191e9840379) in `usb_pd_vdo.h`, I think that it\u0027s practical to make a packed struct for the PD 3.0 IDH. You\u0027d just have to split the DFP Product Type field at the byte boundary and access it via helper functions that did bit ops on the two fields. That\u0027s annoying, but it\u0027s less annoying than doing bit ops on every field, every time we handle this VDO.",
+      "revId": "2abc9c53af8c5c76933e334759b5fabdccc95f5b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0084a275_2913c903",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 1805,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-05-28T22:51:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de853ef9_49ccbe0b",
       "revId": "2abc9c53af8c5c76933e334759b5fabdccc95f5b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
