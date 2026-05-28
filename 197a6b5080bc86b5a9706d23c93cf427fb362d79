@@ -156,6 +156,29 @@
       },
       "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da2c7ebe_465a8635",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T18:58:18Z",
+      "side": 1,
+      "message": "In `et171_flash.cc` (`ExecuteGetVersion`), you manually `std::memcpy` the raw byte response into a `GetVersionResponse` struct. This is inherently risky. Because you already wrote the brilliant `ReadStruct` template in `egis_util.h`, you can add a templated wrapper directly inside `EcComm`.\n\n**Add this to `EcComm` (`ec_comm.h`):**\n\n```c\n  template \u003cTriviallyCopyable T\u003e\n  std::expected\u003cT, EcError\u003e SendCommandTyped(\n      uint16_t id, uint8_t ver, std::span\u003cconst uint8_t\u003e payload \u003d {}) {\n    auto raw_res \u003d SendCommand(id, ver, payload);\n    if (!raw_res) return std::unexpected(raw_res.error());\n    \n    auto parsed \u003d ReadStruct\u003cT\u003e(raw_res.value());\n    if (!parsed) return std::unexpected(EcError::kResponseTooShort);\n    return parsed.value();\n  }\n\n```\n\n**Resulting Cleanup in `et171_flash.cc`:** This eliminates the manual memory copying, size clamping, and raw buffer handling in the application layer.\n\n```c\n  auto resp \u003d ec_comm.SendCommandTyped\u003cGetVersionResponse\u003e(\n      std::to_underlying(EcCommandId::kEcCmdGetVersion), 1);\n      \n  if (!resp) return std::unexpected(resp.error());\n  GetVersionResponse response \u003d resp.value();\n  \n  response.current_image \u003d FromLittleEndian(response.current_image);\n  // ... proceed with printing ...\n\n```",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 60,
+        "endChar": 52
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
