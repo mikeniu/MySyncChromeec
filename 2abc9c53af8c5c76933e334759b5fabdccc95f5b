@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c03d1959_eb2c686a",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-28T20:07:34Z",
+      "side": 1,
+      "message": "This isn\u0027t specific to this CL, but every time we need to tweak the configuration of the PDC, we end up adding an init sub-state, and our decisions about flow through those states end up being opportunities for error. I\u0027m wondering if there is a better way to organize what we\u0027re trying to do here.",
+      "revId": "2abc9c53af8c5c76933e334759b5fabdccc95f5b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8890ca30_56943911",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 857,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-28T20:07:34Z",
+      "side": 1,
+      "message": "Nit: This creates a branch in the state flow, and it puts decisions about the VDO states in the notification state. Also, this logic presumes that the initial state is not-device-capable. I think that\u0027s correct now, but it would be nice to minimize coupling between the init code and the PDC firmware config.\n\nIt seems a little more straightforward to me to\n1. Unconditionally go to the get VDO state here,\n2. Get the current value in the get VDO state,\n3. Update the value based on the config in the set VDO state, and\n4. Only send the command if the value changed. Otherwise, just go to the PDC reset state without sending a command.",
+      "revId": "2abc9c53af8c5c76933e334759b5fabdccc95f5b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "771a0171_4a67deee",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 861,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-28T20:07:34Z",
+      "side": 1,
+      "message": "Nit: The states should be called something like GET_IDH and SET_IDH. You might add another state later that sets a different VDO.",
+      "revId": "2abc9c53af8c5c76933e334759b5fabdccc95f5b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a2c1a9b_857d1011",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 871,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-28T20:07:34Z",
+      "side": 1,
+      "message": "I don\u0027t see where you\u0027re using the IDH that you retrieved in the last state. I think this function would be more composable if it took a `struct id_header_vdo_rev30` or `union id_header_vdo_rev30` (see comment below) as a parameter and just set whatever value was passed in. This state would then take the previously gotten IDH and make the specific field change you want to make before passing it into `rts54_set_vdo_idh`. That would separate concerns and make the intent clear.",
+      "revId": "2abc9c53af8c5c76933e334759b5fabdccc95f5b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ff8d907_f6216a65",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 1721,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-28T20:07:34Z",
+      "side": 1,
+      "message": "This might be a bit more helpful if it separated the individual fields. If you create a structure for the IDH, I suspect that implementation will be the most natural as well.",
+      "revId": "2abc9c53af8c5c76933e334759b5fabdccc95f5b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de853ef9_49ccbe0b",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 1805,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-28T20:07:34Z",
+      "side": 1,
+      "message": "Recapping chats from earlier:\n* This format of modifying the VDO makes it pretty hard to tell what\u0027s changing.\n* In spite of the [comments](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/include/usb_pd_vdo.h;l\u003d678;drc\u003d41520674f93769897147c5f9bb0ac191e9840379) in `usb_pd_vdo.h`, I think that it\u0027s practical to make a packed struct for the PD 3.0 IDH. You\u0027d just have to split the DFP Product Type field at the byte boundary and access it via helper functions that did bit ops on the two fields. That\u0027s annoying, but it\u0027s less annoying than doing bit ops on every field, every time we handle this VDO.",
+      "revId": "2abc9c53af8c5c76933e334759b5fabdccc95f5b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
