@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9bc71ade_29a89353",
+        "filename": "common/power_button.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 1564607
+      },
+      "writtenOn": "2026-05-28T12:03:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f04e9c7e_f7547700",
+      "range": {
+        "startLine": 354,
+        "startChar": 0,
+        "endLine": 354,
+        "endChar": 0
+      },
+      "revId": "89dadb34d1fe57578898f9cd4a4655cdcf6e3cc1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "66ed1dce_02ab5de5",
@@ -58,6 +82,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae0e5db5_ea543acd",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 6157,
+      "author": {
+        "id": 1564607
+      },
+      "writtenOn": "2026-05-28T12:03:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "66ed1dce_02ab5de5",
+      "revId": "89dadb34d1fe57578898f9cd4a4655cdcf6e3cc1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90882d26_2b945c76",
@@ -71,6 +113,24 @@
       "writtenOn": "2026-05-27T19:47:15Z",
       "side": 1,
       "message": "How about changing the name to just powerbtn_press and making the first param optional too? Then this ectool command would effectively behave like the exiting pwrbtn console command by default.",
+      "revId": "89dadb34d1fe57578898f9cd4a4655cdcf6e3cc1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43f0aa1e_07caafc8",
+        "filename": "util/ectool.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 13251,
+      "author": {
+        "id": 1564607
+      },
+      "writtenOn": "2026-05-28T12:03:22Z",
+      "side": 1,
+      "message": "Good idea.",
+      "parentUuid": "90882d26_2b945c76",
       "revId": "89dadb34d1fe57578898f9cd4a4655cdcf6e3cc1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
