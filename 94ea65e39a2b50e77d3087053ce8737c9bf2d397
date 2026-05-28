@@ -16,6 +16,57 @@
       "message": "This CL causes reconnection loop.",
       "revId": "94ea65e39a2b50e77d3087053ce8737c9bf2d397",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a2c7f54_f9c55ea5",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-28T23:05:22Z",
+      "side": 1,
+      "message": "Nit: If you\u0027re going to refer to a table number, you need to also mention the spec version. The table numbers can change. The latest is 1.2.",
+      "revId": "94ea65e39a2b50e77d3087053ce8737c9bf2d397",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7291a007_bafd454a",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-28T23:05:22Z",
+      "side": 1,
+      "message": "This copies a comment from further down in this file. I\u0027m not sure why the VDOs are out of the order that they appear in the Discover Identity message, but this structure should be next to the PD 2.0 version, and this comment should only appear once.\n\nAlso, I have a bone to pick with this (pre-existing) wording. These fields are not reserved. They\u0027re defined in the latest revision of the spec.\n\nAnyway, the comment needs to be updated. You have now created a structure where it was previously \"not advised.\" 😄",
+      "revId": "94ea65e39a2b50e77d3087053ce8737c9bf2d397",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42698556_7a3ff6de",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-28T23:05:22Z",
+      "side": 1,
+      "message": "IMO, you should make this a union with a `uint32_t`. Then you could get rid of the casts to `uiint32_t *` and `memset`s and just assign to and from `.raw`.",
+      "revId": "94ea65e39a2b50e77d3087053ce8737c9bf2d397",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
