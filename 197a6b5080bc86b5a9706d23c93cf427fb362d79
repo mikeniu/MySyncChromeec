@@ -86,6 +86,29 @@
       },
       "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70608fe5_db865e2d",
+        "filename": "util/egis/cli_options.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T18:42:26Z",
+      "side": 1,
+      "message": "Let\u0027s use designated initializers to make this a bit easier to read:\n\n----\n\n### `util/egis/cli_options.cc`\n\n**Current:**\n\n```cpp\n  static struct option long_options[] \u003d {\n      {\"flashfw\", required_argument, nullptr, \u0027f\u0027},\n      {\"flashcmd\", required_argument, nullptr, \u0027c\u0027},\n      {\"algo\", required_argument, nullptr, \u0027a\u0027},\n      {\"key\", required_argument, nullptr, \u0027k\u0027},\n      {\"offset\", required_argument, nullptr, \u0027o\u0027},\n      {\"size\", required_argument, nullptr, \u0027s\u0027},\n      {\"dumpcmd\", no_argument, nullptr, \u0027d\u0027},\n      {\"help\", no_argument, nullptr, \u0027h\u0027},\n      {nullptr, 0, nullptr, 0}};\n\n```\n\n**Better:**\n\n```cpp\n  static struct option long_options[] \u003d {\n      {.name \u003d \"flashfw\",  .has_arg \u003d required_argument, .flag \u003d nullptr, .val \u003d \u0027f\u0027},\n      {.name \u003d \"flashcmd\", .has_arg \u003d required_argument, .flag \u003d nullptr, .val \u003d \u0027c\u0027},\n      {.name \u003d \"algo\",     .has_arg \u003d required_argument, .flag \u003d nullptr, .val \u003d \u0027a\u0027},\n      {.name \u003d \"key\",      .has_arg \u003d required_argument, .flag \u003d nullptr, .val \u003d \u0027k\u0027},\n      {.name \u003d \"offset\",   .has_arg \u003d required_argument, .flag \u003d nullptr, .val \u003d \u0027o\u0027},\n      {.name \u003d \"size\",     .has_arg \u003d required_argument, .flag \u003d nullptr, .val \u003d \u0027s\u0027},\n      {.name \u003d \"dumpcmd\",  .has_arg \u003d no_argument,       .flag \u003d nullptr, .val \u003d \u0027d\u0027},\n      {.name \u003d \"help\",     .has_arg \u003d no_argument,       .flag \u003d nullptr, .val \u003d \u0027h\u0027},\n      {nullptr, 0, nullptr, 0}\n  };\n\n```",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 32
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
