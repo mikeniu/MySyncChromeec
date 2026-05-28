@@ -16,6 +16,29 @@
       "message": "ㄇ",
       "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1840a22_8b11b92d",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T18:31:26Z",
+      "side": 1,
+      "message": "The Google C++ Style Guide mandates a [very specific, strictly grouped order](https://google.github.io/styleguide/cppguide.html#Names_and_Order_of_Includes) for `#include` directives to prevent hidden dependencies.\n\nThe required order is:\n\n1. **Related header** (e.g., `foo.cc` includes `foo.h` first).\n2. A blank line.\n3. **C system files** (e.g., `\u003cunistd.h\u003e`, `\u003cstdlib.h\u003e`).\n4. A blank line.\n5. **C++ system files** (e.g., `\u003cvector\u003e`, `\u003cprint\u003e`).\n6. A blank line.\n7. **Other libraries\u0027 headers** (e.g., `\u003clibusb-1.0/libusb.h\u003e`, `\u003copenssl/evp.h\u003e`).\n8. A blank line.\n9. **Your project\u0027s headers** (e.g., `\"crypto_util.h\"`, `\"egis_util.h\"`).\n\n**The Issue:** In files like `bootrom.cc`, `et171_flash.cc`, and `ec_comm.cc`, you placed \"Your project\u0027s headers\" right after the related header and *before* the system headers.\n\n**Remediation (Example in `bootrom.cc`):**\n\nReorder the includes to push the internal project headers to the very bottom block.\n\n```cpp\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n#include \"bootrom.h\"\n\n// C system files\n#include \u003ccstdio\u003e\n#include \u003ccstring\u003e\n\n// C++ system files\n#include \u003calgorithm\u003e\n#include \u003cbit\u003e\n#include \u003cchrono\u003e\n#include \u003cconcepts\u003e\n#include \u003cfstream\u003e\n#include \u003climits\u003e\n#include \u003cprint\u003e\n#include \u003cranges\u003e\n#include \u003cthread\u003e\n#include \u003cvector\u003e\n\n// Project headers\n#include \"crypto_util.h\"\n#include \"egis_util.h\"\n\nnamespace egis {\n// ...\n\n```\n\n*(You will need to apply this reordering to `bootrom.cc`, `ec_comm.cc`, `et171_flash.cc`, and `flasher_logic.cc`).*",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 17
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
