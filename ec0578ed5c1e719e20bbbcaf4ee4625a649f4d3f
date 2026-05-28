@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9286b349_a777ef27",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-28T16:41:36Z",
+      "side": 1,
+      "message": "It be helpful to break this into a few smaller changes, maybe one for cleaning up the host command shim and tests and another for enabling by default on all boards.",
+      "revId": "ec0578ed5c1e719e20bbbcaf4ee4625a649f4d3f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87f64005_d6accc7f",
+        "filename": "driver/usb_mux/usb_mux.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 889,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-05-28T16:41:36Z",
+      "side": 1,
+      "message": "Can this clean up be a different CL?",
+      "revId": "ec0578ed5c1e719e20bbbcaf4ee4625a649f4d3f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
