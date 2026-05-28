@@ -72,6 +72,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8070ca86_d1ad6b4d",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:41:30Z",
+      "side": 1,
+      "message": "Let\u0027s use designated intializers. Gemini generated below. Check for correctness.\n\n----\n\nIn `main.cc`, you instantiate configuration structs and then fill them sequentially. While this works, using designated initializers (even if you only set one or two fields) prevents you from forgetting to initialize new members if you ever expand the struct in the future.\n\n**In `ParseArguments` (main.cc):**\n\n```c\n// Before:\nAppConfig config;\nconfig.cmd \u003d ParseCommand(args[0]);\n\n// After:\nAppConfig config{\n    .cmd \u003d ParseCommand(args[0]),\n};\n\n```\n\n**In `DeviceInit` (main.cc):**\n\n```c\n// Before:\nFtDeviceInfo info \u003d {};\ninfo.action \u003d FtDeviceAction::kNormal;\n\n// After:\nFtDeviceInfo info{\n    .action \u003d FtDeviceAction::kNormal,\n};\n\n```",
+      "range": {
+        "startLine": 238,
+        "startChar": 1,
+        "endLine": 238,
+        "endChar": 19
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fcde0f39_15a05179",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 15
