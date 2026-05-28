@@ -5,7 +5,10 @@
 
 #include "system.h"
 #include "system_chip.h"
+#include "hooks.h"
 
+#include <soc.h>
+#include <zephyr/devicetree.h>
 #include <zephyr/drivers/bbram.h>
 #include <zephyr/logging/log.h>
 
@@ -93,3 +96,19 @@ static int chip_system_init(void)
 #endif
 SYS_INIT(chip_system_init, PRE_KERNEL_1,
 	 CONFIG_CROS_SYSTEM_NPCX_PRE_INIT_PRIORITY);
+
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(itims), okay)
+static void npcx_sysjump_dis_sys_timer(void)
+{
+	/* Disable 64-bit system timer before sysjump to ensure it is re-initialized
+	 * cleanly in the next image, even if the next image is older and doesn't
+	 * explicitly disable it at init.
+	 */
+	struct itim64_reg *const sys_tmr = (struct itim64_reg *)
+		DT_REG_ADDR_BY_NAME(DT_NODELABEL(itims), sys_itim);
+
+	sys_tmr->ITCTS64 &= ~BIT(0); /* Disable ITEN */
+}
+DECLARE_HOOK(HOOK_SYSJUMP, npcx_sysjump_dis_sys_timer, HOOK_PRIO_LAST);
+#endif
+
