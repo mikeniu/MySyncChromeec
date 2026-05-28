@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9f37b784_ddd0efa4",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-28T11:02:35Z",
+      "side": 1,
+      "message": "Remaining time can be 0, but the work is queued.",
+      "revId": "6fddbbefa48c83f18ccd2f5efd7260a39742accb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7793f3b5_fb58a8d2",
         "filename": "common/fpsensor/fpsensor_led.cc",
         "patchSetId": 18
@@ -31,6 +48,23 @@
       "writtenOn": "2026-05-28T10:26:15Z",
       "side": 1,
       "message": "Add a comment sem is locked.",
+      "revId": "6fddbbefa48c83f18ccd2f5efd7260a39742accb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "420e075a_f3d1f338",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-28T11:02:35Z",
+      "side": 1,
+      "message": "The schedule function does not affect a work item is already scheduled or submitted.",
       "revId": "6fddbbefa48c83f18ccd2f5efd7260a39742accb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
