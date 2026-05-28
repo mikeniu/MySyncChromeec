@@ -254,6 +254,29 @@
       },
       "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "075bdddf_cb1e3514",
+        "filename": "util/focaltech/usb_context.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:52:02Z",
+      "side": 1,
+      "message": "Let\u0027s make this return `std::expected` like other functions. Also should use `std::chrono` for the arg. Here\u0027s a Gemini-generated fix. Check for correctness:\n\n----\n\nIn modern C++, passing raw integers to represent time is a known anti-pattern. It forces the caller to guess or check the documentation to know whether `3` means 3 seconds, 3 milliseconds, or 3 microseconds. Since the rest of the SCSI API in this patch (like `SendBulkDataOut`) is already using `std::chrono::milliseconds`, `ResetComplete` definitely needs the `\u003cchrono\u003e` treatment to unify the API and enforce type safety.\n\nHere is how you can rewrite `ResetComplete` to fully embrace `std::chrono`.\n\nAs a bonus, by using `std::chrono::steady_clock`, we can make the timeout calculation immune to thread-scheduling delays (previously, `elapsed_ms +\u003d 100` assumed `sleep_for(100ms)` took exactly 100ms, which is rarely true at the OS level).\n\n### 1. Update the Header (`usb_context.h`)\n\nWe change the signature to accept a strongly-typed `std::chrono::milliseconds`. This matches the other APIs and allows the user to pass any chrono duration (seconds, minutes, etc.), which the compiler will safely auto-convert to milliseconds.\n\n```cpp\n#include \u003cchrono\u003e\n\nclass UsbDevice {\n  // ...\n  \n  // Pass a std::chrono duration instead of a raw int\n  std::expected\u003cvoid, FtError\u003e ResetComplete(std::chrono::milliseconds timeout) const;\n  \n  // ...\n};\n\n```\n\n### 2. Update the Implementation (`usb_context.cc`)\n\nWe replace the integer math with proper time-point comparisons.\n\n```cpp\nstd::expected\u003cvoid, FtError\u003e UsbDevice::ResetComplete(\n    std::chrono::milliseconds timeout) const {\n  if (!handle_) {\n    LOGE(\"Invalid device handle\");\n    return std::unexpected(FtError::kNoSuchDevice);\n  }\n\n  constexpr auto poll_interval \u003d std::chrono::milliseconds(100);\n  \n  const auto start_time \u003d std::chrono::steady_clock::now();\n\n  while (true) {\n    int config \u003d 0;\n    int r \u003d libusb_get_configuration(handle_.get(), \u0026config);\n\n    if (r \u003d\u003d LIBUSB_ERROR_NO_DEVICE) {\n      LOGI(\"USB device removal/reset detected\");\n      return {};\n    } else {\n      LOGV(\"r\u003d{}\", r);\n    }\n\n    auto elapsed \u003d std::chrono::steady_clock::now() - start_time;\n    if (timeout !\u003d std::chrono::milliseconds::zero() \u0026\u0026 elapsed \u003e\u003d timeout) {\n      break;\n    }\n\n    std::this_thread::sleep_for(poll_interval);\n  }\n\n  LOGW(\"Timeout after {} ms waiting for device removal\", timeout.count());\n  return std::unexpected(FtError::kResultFail);\n}\n\n```\n\n### 3. Update the Call Sites\n\nNow, when you call `ResetComplete` in `ft_scsi.cc`, you get to use standard C++ chrono literals (like `3s` for 3 seconds), which makes the code incredibly readable:\n\n```cpp\nusing namespace std::chrono_literals;\n\n// ... inside SendBulkDataOut:\n\n  if (dir \u003d\u003d TransferDirection::kSendOnly) {\n    // Beautiful, self-documenting code. \n    // The compiler knows \u00273s\u0027 is 3000 milliseconds.\n    if (auto res \u003d device.ResetComplete(3s); !res) {\n      return std::unexpected(res.error());\n    }\n    return {};\n  }\n\n```",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 254,
+        "endChar": 0
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
