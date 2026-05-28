@@ -86,6 +86,42 @@
       "parentUuid": "5483faab_1a8f1e77",
       "revId": "d4d7e01e5f70db8455a5f5131d97ebdad6d14809",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "edbec632_7bc28694",
+        "filename": "zephyr/program/fpmcu/et171/btn_ign.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-28T06:59:32Z",
+      "side": 1,
+      "message": "IMO it\u0027s not a problem. We can even explicitly say `CONFIG_LED_GPIO\u003dn` for niedzica since it uses LED_PWM IIRC.",
+      "parentUuid": "11b718c8_4ea28dd5",
+      "revId": "d4d7e01e5f70db8455a5f5131d97ebdad6d14809",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f91a99c2_297cf840",
+        "filename": "zephyr/program/fpmcu/et171/btn_ign.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-28T06:59:32Z",
+      "side": 1,
+      "message": "Ping.",
+      "parentUuid": "1b3bba16_19a7bd37",
+      "revId": "d4d7e01e5f70db8455a5f5131d97ebdad6d14809",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
