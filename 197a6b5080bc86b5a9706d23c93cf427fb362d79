@@ -160,6 +160,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "47615a69_26612f40",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 563,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T21:12:53Z",
+      "side": 1,
+      "message": "We can simplify this a bit with `string_view` and `std::ranges::find`.\n\nGemini-generated code. Check that it\u0027s correct:\n\n----\n\n```cpp\nstd::println(\"  Product Name: {}\", std::string_view(info.prod_name, std::ranges::find(info.prod_name, \u0027\\0\u0027)));\n\n```\n\n### Why this is the ultimate approach here:\n\n1. **Zero State:** You don\u0027t leave a `prod_name` variable hanging around in the local scope that you don\u0027t need anymore.\n2. **Safety First:** You might wonder, *\"Why not just pass `info.prod_name` directly to `std::println`?\"* If you do that (`std::println(\"{}\", info.prod_name)`), the formatter will treat it as a standard C-string. If the product name happens to take up exactly 8 bytes and lacks a null terminator, the formatter will read past the end of the array into unallocated memory, causing Undefined Behavior (UB).\n3. **Clean Output:** By using `ranges::find` as the boundary, you ensure that if the name is shorter than 8 bytes, `std::println` won\u0027t print out the trailing `\\0` characters as empty spaces or garbage.\n\nThis inline `std::string_view` guarantees memory safety, handles the null-trimming perfectly, and keeps your source code extremely concise.",
+      "range": {
+        "startLine": 563,
+        "startChar": 0,
+        "endLine": 563,
+        "endChar": 57
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "70608fe5_db865e2d",
         "filename": "util/egis/cli_options.cc",
         "patchSetId": 24
@@ -176,6 +199,29 @@
         "startChar": 0,
         "endLine": 85,
         "endChar": 32
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bad435b_8cd9d29e",
+        "filename": "util/egis/cli_options.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T21:12:53Z",
+      "side": 1,
+      "message": "This is a magic number. Let\u0027s add a constant.",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 37
       },
       "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -246,6 +292,52 @@
         "startChar": 0,
         "endLine": 60,
         "endChar": 52
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ccf5be3d_e580a458",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T21:12:53Z",
+      "side": 1,
+      "message": "When you receive the `GetVersionResponse` from the EC, you manually force a null terminator at the very end of the arrays to prevent buffer overruns before printing them.\n\n**Current (`et171_flash.cc`):**\n\n```c\n  // Manually mutating the struct to force null-termination\n  response.ro_ver[sizeof(response.ro_ver) - 1] \u003d \u0027\\0\u0027;\n  response.rw_ver[sizeof(response.rw_ver) - 1] \u003d \u0027\\0\u0027;\n  \n  std::println(\"\\n--- Parsed Version Info ---\");\n  std::println(\"RO Version: {}\", response.ro_ver);\n  std::println(\"RW Version: {}\", response.rw_ver);\n\n```\n\n**The Idiomatic C++23 Way:** You can completely delete the manual null-termination lines. Because you shouldn\u0027t mutate parsed network data just to print it, you can use the exact same inline `std::string_view` \\+ `std::ranges::find` pattern.\n\n```c\n  std::println(\"\\n--- Parsed Version Info ---\");\n  std::println(\"RO Version: {}\", std::string_view(response.ro_ver, std::ranges::find(response.ro_ver, \u0027\\0\u0027)));\n  std::println(\"RW Version: {}\", std::string_view(response.rw_ver, std::ranges::find(response.rw_ver, \u0027\\0\u0027)));\n\n```\n\n*(Note: The `GetVersionResponse` also has `fwid_ro` and `fwid_rw` fields, which you could safely print using this exact same one-liner if you decide to expose them later).*",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 50
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c58e270_aa85afe6",
+        "filename": "util/egis/flasher_logic.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T21:12:53Z",
+      "side": 1,
+      "message": "In `util/egis/flasher_logic.cc` (`RunFlashFw`), when you build the dump filename, you use `std::string::substr`:\n\n**Current (`flasher_logic.cc`):**\n\n```c\n  if (config.dump_cmd_fw) {\n    std::ostringstream oss;\n    \n    // This allocates a brand new std::string on the heap just to hold the sub-string\n    std::string fw_filename \u003d config.fw_path.substr(config.fw_path.find_last_of(\"/\\\\\") + 1);\n    \n    std::string algo_tag \u003d (config.algo_type \u003d\u003d EgisCryptoType::kAesGcm) ? \"aes\" : \"sha256\";\n    oss \u003c\u003c fw_filename \u003c\u003c \"_\" \u003c\u003c algo_tag \u003c\u003c \"_cmd_\" \u003c\u003c std::time(nullptr) \u003c\u003c \".bin\";\n    // ...\n\n```\n\n**The Idiomatic C++23 Way:** If you convert the base string to a `std::string_view` first, calling `.substr()` on it returns another lightweight, non-owning view rather than allocating a new string on the heap. `std::ostringstream` natively accepts string views.\n\n```c\n  if (config.dump_cmd_fw) {\n    std::ostringstream oss;\n    \n    // 1. Cast the path to a view\n    std::string_view path_view \u003d config.fw_path;\n    \n    // 2. substr() on a view returns a view (Zero allocations!)\n    auto fw_filename \u003d path_view.substr(path_view.find_last_of(\"/\\\\\") + 1);\n    \n    std::string_view algo_tag \u003d (config.algo_type \u003d\u003d EgisCryptoType::kAesGcm) ? \"aes\" : \"sha256\";\n    oss \u003c\u003c fw_filename \u003c\u003c \"_\" \u003c\u003c algo_tag \u003c\u003c \"_cmd_\" \u003c\u003c std::time(nullptr) \u003c\u003c \".bin\";\n    // ...\n\n```\n\n*(Notice I also changed `algo_tag` from `std::string` to `std::string_view` since it\u0027s just pointing to string literals).*\n\nBy making these changes, you ensure that your code never allocates memory or mutates buffers solely for the purpose of string formatting.",
+      "range": {
+        "startLine": 214,
+        "startChar": 3,
+        "endLine": 220,
+        "endChar": 18
       },
       "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
