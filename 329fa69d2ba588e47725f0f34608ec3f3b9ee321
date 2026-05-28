@@ -118,6 +118,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d76f0322_98d3c333",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:44:24Z",
+      "side": 1,
+      "message": "In `updater.cc` (`FtDownloadPage`), you have a very dangerous cast: `std::span\u003cuint8_t\u003e(const_cast\u003cuint8_t*\u003e(data.data()), per_len)`\n\nThis happens because `SendAction` and `SendBulkCommand` take a mutable `std::span\u003cuint8_t\u003e`, even though an \"OUT\" transfer only reads the data. Forcing a `const_cast` to strip away `const` is a massive red flag in modern C++.\n\n**The Fix:** Split your `SendAction` and `SendBulkCommand` into explicit Read/Write functions, or use overloads so the compiler handles the `const` correctly.\n\n```c\n// Add a const version for OUT transfers\nstd::expected\u003cvoid, FtError\u003e SendBulkDataOut(\n    const UsbDevice\u0026 device, std::span\u003cconst uint8_t\u003e scsi_cmd,\n    std::span\u003cconst uint8_t\u003e data_buffer, std::chrono::milliseconds timeout_ms);\n\n// Keep the mutable version for IN transfers\nstd::expected\u003cvoid, FtError\u003e ReceiveBulkDataIn(\n    const UsbDevice\u0026 device, std::span\u003cconst uint8_t\u003e scsi_cmd,\n    std::span\u003cuint8_t\u003e data_buffer, std::chrono::milliseconds timeout_ms);\n\n```\n\n**The Impact:** You can now pass `std::span\u003cconst uint8_t\u003e` directly to the write functions without ever using `const_cast`.",
+      "range": {
+        "startLine": 124,
+        "startChar": 0,
+        "endLine": 124,
+        "endChar": 80
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9b8d3041_133470ef",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 15
