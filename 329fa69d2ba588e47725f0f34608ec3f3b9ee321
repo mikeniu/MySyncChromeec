@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ba9d6216_ced31581",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:39:25Z",
+      "side": 1,
+      "message": "Let\u0027s use designated initializers. Here\u0027s Gemini generated code. Verify for correctness:\n\n----\n\nIn `ft_scsi.cc`, you are currently creating a byte array and using `reinterpret_cast` to map a struct over it. This technically violates strict aliasing rules in C++.\n\nBy combining designated initializers with C++20\u0027s `std::bit_cast`, you can make this memory-safe, expressive, and UB-free.\n\n**Before:**\n\n```c\nstd::array\u003cuint8_t, 16\u003e BuildFtCmd(uint8_t opcode, uint8_t subcmd, /* ... */) {\n  std::array\u003cuint8_t, 16\u003e cmd_buf{};\n  auto* cmd \u003d reinterpret_cast\u003cFtCmdFormat*\u003e(cmd_buf.data());\n\n  cmd-\u003eopcode \u003d opcode;\n  cmd-\u003esubcmd \u003d subcmd;\n  cmd-\u003eflags \u003d flags;\n  cmd-\u003eaddress \u003d address;\n  cmd-\u003elength \u003d length;\n  cmd-\u003eaux_address \u003d aux_address;\n\n  return cmd_buf;\n}\n\n```\n\n**After (Clean C++23):**\n\n```c\n#include \u003cbit\u003e // For std::bit_cast\n\nstd::array\u003cuint8_t, 16\u003e BuildFtCmd(uint8_t opcode, uint8_t subcmd,\n                                   uint32_t address \u003d 0, uint32_t length \u003d 0,\n                                   uint32_t aux_address \u003d 0, uint8_t flags \u003d 0) {\n  // Constructed in the exact order declared in the struct\n  FtCmdFormat cmd{\n      .opcode \u003d opcode,\n      .address \u003d address,\n      .length \u003d length,\n      .aux_address \u003d aux_address,\n      .subcmd \u003d subcmd,\n      .flags \u003d flags,\n      .reserved \u003d 0,\n  };\n\n  // Safely cast the struct to a byte array (requires \u003cbit\u003e)\n  return std::bit_cast\u003cstd::array\u003cuint8_t, 16\u003e\u003e(cmd);\n}\n\n```",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 63,
+        "endChar": 1
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fcde0f39_15a05179",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 15
