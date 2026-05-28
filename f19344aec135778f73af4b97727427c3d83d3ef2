@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "186894f4_ccd46df1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T23:53:27Z",
+      "side": 1,
+      "message": "This is good to submit. However, I do think this suggestion is cleaner and you could do it in a followup:\n\n---\n\nHere is how you can use the `friend class` pattern to completely remove the test-specific setter from your production public API.\n\nBy making a test helper class a `friend` of `FpFrameSizeCache`, the test code gains the ability to modify private variables directly, while the rest of the production codebase remains strictly locked out.\n\n### 1. The Production Header (`fpsensor_frame_size.h`)\n\nYou remove the `set_frame_size` method entirely. Instead, you just declare a test class as a `friend` at the bottom of the class definition.\n\n```cpp\n#ifndef __CROS_EC_FPSENSOR_FPSENSOR_FRAME_SIZE_H\n#define __CROS_EC_FPSENSOR_FPSENSOR_FRAME_SIZE_H\n\n#include \"ec_commands.h\"\n#include \u003carray\u003e\n#include \u003ccstdint\u003e\n\nclass FpFrameSizeCache {\npublic:\n    FpFrameSizeCache() \u003d default;\n\n    FpFrameSizeCache(const FpFrameSizeCache \u0026) \u003d delete;\n    FpFrameSizeCache \u0026operator\u003d(const FpFrameSizeCache \u0026) \u003d delete;\n\n    void populate_cache(uint32_t max_frame_size_bytes);\n    uint32_t get_frame_size(enum fp_capture_type capture_type) const;\n\nprivate:\n    std::array\u003cuint32_t, FP_CAPTURE_TYPE_MAX\u003e frame_sizes_ \u003d {};\n\n#ifdef CONFIG_ZTEST\n    /* Grant the test helper full access to private members */\n    friend class FpFrameSizeCacheTestHelper;\n#endif\n};\n\n#endif /* __CROS_EC_FPSENSOR_FPSENSOR_FRAME_SIZE_H */\n\n```\n\n### 2. The Test File (`fpsensor_frame_size.cc`)\n\nIn your test file, you define the `FpFrameSizeCacheTestHelper` class. Because it is a `friend`, it can access `cache.frame_sizes_` directly to perform the mutations needed for your tests.\n\n```cpp\n#include \"fpsensor/fpsensor_frame_size.h\"\n#include \u003czephyr/ztest.h\u003e\n\n/* * Define the friend class here in the test file.\n * It acts as a bridge to manipulate the private state of the cache.\n */\nclass FpFrameSizeCacheTestHelper {\npublic:\n    static void set_frame_size(FpFrameSizeCache\u0026 cache, \n                               enum fp_capture_type capture_type, \n                               uint32_t size) \n    {\n        // We can access the private frame_sizes_ array directly!\n        if (static_cast\u003csize_t\u003e(capture_type) \u003c cache.frame_sizes_.size()) {\n            cache.frame_sizes_[static_cast\u003csize_t\u003e(capture_type)] \u003d size;\n        }\n    }\n};\n\n// ... (existing test setup code) ...\n\nZTEST(fpsensor_frame_size, test_set_frame_size)\n{\n    FpFrameSizeCache *cache \u003d cache_fixture.get();\n    const enum fp_capture_type test_type \u003d FP_CAPTURE_VENDOR_FORMAT;\n    const uint32_t new_size \u003d 1024;\n\n    /* Verify the state before modification */\n    uint32_t original_size \u003d cache-\u003eget_frame_size(test_type);\n    zassert_not_equal(new_size, original_size, \n                      \"Test setup error: new_size should be different.\");\n\n    /* Use the friend helper to mutate the private state */\n    FpFrameSizeCacheTestHelper::set_frame_size(*cache, test_type, new_size);\n\n    /* Verify the state after modification */\n    uint32_t updated_size \u003d cache-\u003eget_frame_size(test_type);\n    zassert_equal(updated_size, new_size,\n                  \"Cache failed to update. Expected: %u, Actual: %u\",\n                  new_size, updated_size);\n}\n\n```\n\n### Why this is structurally better:\n\n* **Clean Public API:** If another developer looks at `FpFrameSizeCache` via autocomplete or documentation in the production codebase, they won\u0027t see a setter. The class remains strictly read-only after initialization (which matches its intended design).\n* **Consolidated Test Logic:** The bounds checking for test mutations is now strictly contained within the test file where it belongs, rather than mixed into the production source file.",
+      "revId": "f19344aec135778f73af4b97727427c3d83d3ef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6b13ad6c_cd32e75e",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_frame_size.cc",
         "patchSetId": 5
@@ -66,6 +83,52 @@
       "side": 1,
       "message": "Acknowledged",
       "parentUuid": "6b13ad6c_cd32e75e",
+      "revId": "f19344aec135778f73af4b97727427c3d83d3ef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e15f7c42_a2e41aa3",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_frame_size.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T23:53:27Z",
+      "side": 1,
+      "message": "\"set_frame_size should ignore the out-of-bounds index FP_CAPTURE_TYPE_MAX.\"",
+      "range": {
+        "startLine": 190,
+        "startChar": 0,
+        "endLine": 190,
+        "endChar": 70
+      },
+      "revId": "f19344aec135778f73af4b97727427c3d83d3ef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0c578cd_5fe69a00",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_frame_size.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T23:53:27Z",
+      "side": 1,
+      "message": "\"set_frame_size should ignore the negative out-of-bounds index -1.\"",
+      "range": {
+        "startLine": 203,
+        "startChar": 0,
+        "endLine": 203,
+        "endChar": 68
+      },
       "revId": "f19344aec135778f73af4b97727427c3d83d3ef2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
