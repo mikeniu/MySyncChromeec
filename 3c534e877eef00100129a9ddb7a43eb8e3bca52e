@@ -33,6 +33,24 @@
       "message": "[Gerrit AI Review] Consider adding boundary tests for `set_frame_size` (e.g., calling it with `-1` or `FP_CAPTURE_TYPE_MAX`) to verify that it correctly handles out-of-bounds `capture_type` values without modifying memory out of bounds. You already have similar boundary tests (`test_cache_boundary_negative_index`, `test_cache_boundary_max_index`) for `get_frame_size`.",
       "revId": "3c534e877eef00100129a9ddb7a43eb8e3bca52e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56548006_086ea86f",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_frame_size.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-28T17:29:19Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "046bd232_2ebc990a",
+      "revId": "3c534e877eef00100129a9ddb7a43eb8e3bca52e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
