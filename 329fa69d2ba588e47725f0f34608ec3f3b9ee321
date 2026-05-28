@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "838bbd7c_f50fd6ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T18:00:57Z",
+      "side": 1,
+      "message": "**Magic Numbers** We have several hardcoded integers for timeouts (`200`, `1000`), polling delays (`10`, `200`), and buffer offsets (`8`, `9`) scattered through `main.cc`, `ft_scsi.cc`, and `usb_context.cc`. Please hoist these into `constexpr` values at the top of their respective files (using `\u003cchrono\u003e` literals where applicable, matching the excellent pattern you established in `updater.cc`). This will make tuning the USB timings much safer and easier in the future.",
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5d7a12e3_5f8b347e",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 15
