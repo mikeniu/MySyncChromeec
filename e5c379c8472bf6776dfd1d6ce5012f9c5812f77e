@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef3df9e6_555b4aed",
+        "filename": "util/focaltech/build.mk",
+        "patchSetId": 14
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:10:11Z",
+      "side": 1,
+      "message": "I am removing `static` for now since it won\u0027t work in our CQ environment.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 94
+      },
+      "revId": "e5c379c8472bf6776dfd1d6ce5012f9c5812f77e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71490a99_7b2983b8",
+        "filename": "util/focaltech/usb_context.h",
+        "patchSetId": 14
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:10:11Z",
+      "side": 1,
+      "message": "This is no longer used. Remove.",
+      "range": {
+        "startLine": 129,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 74
+      },
+      "revId": "e5c379c8472bf6776dfd1d6ce5012f9c5812f77e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "439dc149_00a1b3e8",
+        "filename": "util/focaltech/usb_context.h",
+        "patchSetId": 14
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:10:11Z",
+      "side": 1,
+      "message": "This is no longer used. Remove.",
+      "range": {
+        "startLine": 151,
+        "startChar": 0,
+        "endLine": 151,
+        "endChar": 77
+      },
+      "revId": "e5c379c8472bf6776dfd1d6ce5012f9c5812f77e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
