@@ -232,7 +232,7 @@ enum init_state_t {
 	/** Set the PDC Notifications */
 	INIT_PDC_SET_NOTIFICATION_ENABLE,
 	/** Set VDOs on the PDC */
-	INIT_PDC_SET_VDO,
+	INIT_PDC_SET_IDH_VDO,
 	/** Reset the PDC */
 	INIT_PDC_RESET,
 	/** Initialization complete */
@@ -845,12 +845,15 @@ static enum smf_state_result st_init_run(void *o)
 			set_state(data, ST_DISABLE);
 			return SMF_EVENT_HANDLED;
 		}
-		init_write_cmd_and_change_state(data, INIT_PDC_SET_VDO);
+		init_write_cmd_and_change_state(
+			data, cfg->usb_comm_capable_as_device ?
+				      INIT_PDC_SET_IDH_VDO :
+				      INIT_PDC_RESET);
 		return SMF_EVENT_HANDLED;
-	case INIT_PDC_SET_VDO:
+	case INIT_PDC_SET_IDH_VDO:
 		rv = rts54_set_vdo_idh(data->dev);
 		if (rv) {
-			LOG_ERR("RTK%d:, Internal(INIT_PDC_SET_VDO)", cnum);
+			LOG_ERR("RTK%d:, Internal(INIT_PDC_SET_IDH_VDO)", cnum);
 			set_state(data, ST_DISABLE);
 			return SMF_EVENT_HANDLED;
 		}
@@ -1747,7 +1750,6 @@ static int rts54_set_vdo(const struct device *dev, const vdo_config_t *config,
 static int rts54_set_vdo_idh(const struct device *dev)
 {
 	struct pdc_data_t *data = dev->data;
-	const struct pdc_config_t *cfg = dev->config;
 	uint32_t idh[1];
 	vdo_config_t config = { .raw = 0 };
 	uint8_t vdo_type[] = { VDO_INDEX_IDH };
@@ -1757,8 +1759,7 @@ static int rts54_set_vdo_idh(const struct device *dev)
 	 * Bit 30: USB Device capable
 	 * We assume the port is Host capable.
 	 */
-	idh[0] = VDO_IDH(1, cfg->usb_comm_capable_as_device ? 1 : 0,
-			 IDH_PTYPE_UNDEF, 0, data->info.vid);
+	idh[0] = VDO_IDH(1, 1, IDH_PTYPE_UNDEF, 0, data->info.vid);
 
 	config.fields.num_vdos = 1;
 	config.fields.origin = RTS54XX_PDC_ORIGIN;
