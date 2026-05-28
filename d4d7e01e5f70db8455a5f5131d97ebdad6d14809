@@ -122,6 +122,24 @@
       "parentUuid": "1b3bba16_19a7bd37",
       "revId": "d4d7e01e5f70db8455a5f5131d97ebdad6d14809",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a96ebf62_ff1845b9",
+        "filename": "zephyr/program/fpmcu/et171/btn_ign.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-28T07:22:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f91a99c2_297cf840",
+      "revId": "d4d7e01e5f70db8455a5f5131d97ebdad6d14809",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
