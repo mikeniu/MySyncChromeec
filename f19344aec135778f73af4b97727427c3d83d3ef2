@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d565dca3_d20ffe78",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:36:30Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/153e307e-1790-4bf7-a61e-209d544440e1)]\n\n### Review Summary\n\n*   **Functionality**: The `set_frame_size` test-only method is well-implemented and provides the necessary functionality for testing `FpFrameSizeCache`. The bounds checking logic correctly avoids integer underflow issues, and error handling logs are appropriate.\n*   **Style**: The code follows the style guidelines and is well documented. The docstrings accurately reflect the behavior.\n*   **Security**: No security risks. The added functionality is correctly wrapped in `#ifdef CONFIG_ZTEST`, ensuring test-only methods do not leak into production builds.\n*   **Testing**: The changes include robust unit tests (`test_set_frame_size`, `test_set_frame_size_boundary_max_index`, `test_set_frame_size_boundary_negative_index`) that verify the happy path as well as the out-of-bounds error handling.",
+      "revId": "f19344aec135778f73af4b97727427c3d83d3ef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6b13ad6c_cd32e75e",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_frame_size.cc",
         "patchSetId": 5
