@@ -39,6 +39,29 @@
       },
       "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1768c456_80e31be7",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T18:37:29Z",
+      "side": 1,
+      "message": "You currently use `static_cast` to extract the integer values from your strongly typed enums (`enum class`). C++23 introduced a much safer, expressive standard library function for exactly this.\n\n**Current:**\n\n```c\nreq_hdr.algo \u003d static_cast\u003cuint8_t\u003e(wrapped_algo_);\n// ...\nauto resp \u003d ec_comm.SendCommand(static_cast\u003cuint16_t\u003e(EcCommandId::kEcCmdGetVersion), 1);\n\n```\n\n**Better (C++23):** Include `\u003cutility\u003e` and use `std::to_underlying`. This prevents accidental truncation if the underlying type of the enum ever changes.\n\n```c\n#include \u003cutility\u003e\n\nreq_hdr.algo \u003d std::to_underlying(wrapped_algo_);\n// ...\nauto resp \u003d ec_comm.SendCommand(std::to_underlying(EcCommandId::kEcCmdGetVersion), 1);\n\n```",
+      "range": {
+        "startLine": 132,
+        "startChar": 0,
+        "endLine": 132,
+        "endChar": 50
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
