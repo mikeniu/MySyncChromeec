@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8bba335_117b9f7f",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-28T03:20:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cfc3ed50_56fea094",
+      "range": {
+        "startLine": 95,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 53
+      },
+      "revId": "36f293844ebba55ddfd6c6e9df3400cea04efcf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "22ec04cc_54b185fd",
@@ -85,6 +109,30 @@
       "side": 1,
       "message": "Here is the Gemini-generated code to implement. Check for correctness:\n\n----\n\nHere are all the specific locations in the patch that will be drastically simplified by this refactor, along with exactly how to implement the changes.\n\n### Step 1: Add the Helpers\n\n**1\\. In `util/egis/egis_util.h` (add to the bottom of the namespace):**\n\n```c\ntemplate \u003cTriviallyCopyable T\u003e\nstd::span\u003cconst uint8_t\u003e AsBytes(const T \u0026obj) {\n  return {reinterpret_cast\u003cconst uint8_t *\u003e(\u0026obj), sizeof(T)};\n}\n\n```\n\n**2\\. In `util/egis/bootrom.h` (add to `BootromComm` class public methods):**\n\n```c\n  template \u003ctypename T\u003e\n  std::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e SendStruct(\n      const T \u0026command,\n      std::chrono::milliseconds timeout \u003d kDefaultCommandTimeout) {\n    return SendBootromCommand(AsBytes(command), timeout);\n  }\n\n```\n\n---\n\n### Step 2: Clean up `bootrom.cc`\n\nHere is every function in `bootrom.cc` where you can delete the `req_span` and `reinterpret_cast` boilerplate.\n\n#### 1\\. `BootromComm::WriteReg`\n\n**Before:**\n\n```c\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026req),\n                                    sizeof(req));\n  auto resp \u003d SendBootromCommand(req_span);\n\n```\n\n**After:**\n\n```c\n  auto resp \u003d SendStruct(req);\n\n```\n\n#### 2\\. `BootromComm::ReadReg`\n\n**Before:**\n\n```c\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026req),\n                                    sizeof(req));\n  auto resp \u003d SendBootromCommand(req_span);\n\n```\n\n**After:**\n\n```c\n  auto resp \u003d SendStruct(req);\n\n```\n\n#### 3\\. `BootromComm::BackupFlash`\n\n**Before:**\n\n```c\n    std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026req),\n                                      sizeof(req));\n    auto resp \u003d SendBootromCommand(req_span, kFlashTimeout);\n\n```\n\n**After:**\n\n```c\n    auto resp \u003d SendStruct(req, kFlashTimeout);\n\n```\n\n#### 4\\. `BootromComm::ReadFlash`\n\n**Before:**\n\n```c\n    std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026req),\n                                      sizeof(req));\n    auto resp \u003d SendBootromCommand(req_span, kFlashTimeout);\n\n```\n\n**After:**\n\n```c\n    auto resp \u003d SendStruct(req, kFlashTimeout);\n\n```\n\n#### 5\\. `BootromComm::EraseFlash`\n\n**Before:**\n\n```c\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026req),\n                                    sizeof(req));\n  auto resp \u003d SendBootromCommand(req_span, kFlashTimeout);\n\n```\n\n**After:**\n\n```c\n  auto resp \u003d SendStruct(req, kFlashTimeout);\n\n```\n\n#### 6\\. `BootromComm::GetBootromInfo`\n\n**Before:**\n\n```c\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026req),\n                                    sizeof(req));\n  auto resp \u003d SendBootromCommand(req_span);\n\n```\n\n**After:**\n\n```c\n  auto resp \u003d SendStruct(req);\n\n```\n\n#### 7\\. `BootromComm::GetFlashInfo`\n\n**Before:**\n\n```c\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026req),\n                                    sizeof(req));\n  auto resp \u003d SendBootromCommand(req_span);\n\n```\n\n**After:**\n\n```c\n  auto resp \u003d SendStruct(req);\n\n```\n\n---\n\n### Step 3: Bonus Cleanups using `AsBytes`\n\nEven when not using `SendStruct`, the new `AsBytes` helper cleans up other areas where raw byte representation of a local variable is needed.\n\n#### `BootromComm::SystemReset`\n\nBecause this command immediately drops the USB connection, it intentionally bypasses `SendBootromCommand` to call `usb_.Send` directly, so we can\u0027t use `SendStruct`. But we *can* use `AsBytes`.\n\n**Before:**\n\n```c\n  std::span\u003cconst uint8_t\u003e req_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026req),\n                                    sizeof(req));\n  DumpRawCmd(req_span);\n  if (auto res \u003d usb_.Send(req_span, kResetTimeout); !res) {\n\n```\n\n**After:**\n\n```c\n  DumpRawCmd(AsBytes(req));\n  if (auto res \u003d usb_.Send(AsBytes(req), kResetTimeout); !res) {\n\n```\n\n#### `BootromComm::SendBootromCommandAes` (AAD calculation)\n\nYou manually cast `aad_val` to an `aad_span` to pass it to the crypto function.\n\n**Before:**\n\n```c\n  uint32_t aad_val \u003d ToLittleEndian(EgisBootrom::kChipIdAad);\n  std::span\u003cconst uint8_t\u003e aad_span(reinterpret_cast\u003cconst uint8_t *\u003e(\u0026aad_val),\n                                    sizeof(aad_val));\n\n```\n\n**After:**\n\n```c\n  uint32_t aad_val \u003d ToLittleEndian(EgisBootrom::kChipIdAad);\n  auto aad_span \u003d AsBytes(aad_val);\n\n```",
       "parentUuid": "22ec04cc_54b185fd",
+      "range": {
+        "startLine": 577,
+        "startChar": 0,
+        "endLine": 580,
+        "endChar": 49
+      },
+      "revId": "36f293844ebba55ddfd6c6e9df3400cea04efcf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8fa5717b_c4afde4c",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 580,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-28T03:20:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b050856b_27cb9f63",
       "range": {
         "startLine": 577,
         "startChar": 0,
@@ -142,6 +190,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f70a75e8_e418ac18",
+        "filename": "util/egis/crypto_util.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-28T03:20:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb4abb26_496627c9",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 68
+      },
+      "revId": "36f293844ebba55ddfd6c6e9df3400cea04efcf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "201423b5_6e6e2dce",
@@ -165,6 +237,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab851a13_236c2f7b",
+        "filename": "util/egis/crypto_util.h",
+        "patchSetId": 23
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-28T03:20:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "201423b5_6e6e2dce",
+      "range": {
+        "startLine": 55,
+        "startChar": 33,
+        "endLine": 55,
+        "endChar": 40
+      },
+      "revId": "36f293844ebba55ddfd6c6e9df3400cea04efcf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bf7075e2_884bca97",
@@ -178,6 +274,30 @@
       "writtenOn": "2026-05-27T21:49:37Z",
       "side": 1,
       "message": "In `egis_util.h`, `ReadStruct` returns `std::expected\u003cT, std::errc\u003e`, but `ReadLittleEndian` returns `std::optional\u003cT\u003e`.\n\nAccording to Google C++ Style, you should prefer `std::expected` when the reason for failure is actionable or needs to be logged, and `std::optional` only when the absence of a value is a normal, expected state. Since reading past the end of a buffer is an error state, make them consistent.\n\n**The Fix:** Change `ReadLittleEndian` to return `std::expected\u003cT, std::errc\u003e`:\n\n```c\ntemplate \u003cstd::integral T\u003e\nstd::expected\u003cT, std::errc\u003e ReadLittleEndian(std::span\u003cconst uint8_t\u003e buffer) {\n  if (buffer.size() \u003c sizeof(T)) return std::unexpected(std::errc::message_size);\n\n  T value;\n  std::memcpy(\u0026value, buffer.data(), sizeof(T));\n  return FromLittleEndian(value);\n}\n\n```",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 60,
+        "endChar": 1
+      },
+      "revId": "36f293844ebba55ddfd6c6e9df3400cea04efcf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40d0d21a_9ebb8ee1",
+        "filename": "util/egis/egis_util.h",
+        "patchSetId": 23
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-28T03:20:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf7075e2_884bca97",
       "range": {
         "startLine": 53,
         "startChar": 0,
@@ -225,6 +345,30 @@
       "side": 1,
       "message": "Here are Gemini generated instructions to break it up. Verify for correctness:\n\n----\n\nHere is the step-by-step guide to executing this architectural split. This will involve creating three new sets of header/source files, trimming down your `main` file, and updating your build script.\n\n---\n\n### **Step 1: Extract CLI Parsing (`cli_options`)**\n\nCreate `util/egis/cli_options.h` and `util/egis/cli_options.cc` to handle all user input.\n\n**1. Create `cli_options.h`:**\n\n```cpp\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n#ifndef UTIL_EGIS_CLI_OPTIONS_H_\n#define UTIL_EGIS_CLI_OPTIONS_H_\n\n#include \u003ccstdint\u003e\n#include \u003coptional\u003e\n#include \u003cstring\u003e\n\n#include \"bootrom.h\" // For EgisCryptoType\n\nnamespace egis {\n\nenum class AppError {\n  kInvalidArgs,\n  kFileIoError,\n  kCryptoError,\n  kBootromError,\n  kUsbError,\n  kParseError,\n};\n\nenum class AppMode {\n  kNone,\n  kFlashFw,\n  kFlashCmd,\n};\n\nstruct AppConfig {\n  AppMode mode \u003d AppMode::kNone;\n  std::string fw_path;\n  std::string key_path;\n  EgisCryptoType algo_type \u003d EgisCryptoType::kSha256;\n  uint32_t flash_offset \u003d 0x00001000;\n  uint32_t fw_size_override \u003d 0;\n  bool dump_cmd_fw \u003d false;\n};\n\nvoid PrintHelp(const char *prog_name);\nstd::optional\u003cAppConfig\u003e ParseArgs(int argc, char *argv[]);\n\n}  // namespace egis\n\n#endif  // UTIL_EGIS_CLI_OPTIONS_H_\n\n```\n\n**2. Create `cli_options.cc`:**\nMove `ParseHex`, `PrintHelp`, and `ParseArgs` from `et171_flash.cc` into this file. Make sure to `#include \u003cgetopt.h\u003e`, `\u003ccharconv\u003e`, and `\u003cprint\u003e`.\n\n---\n\n### **Step 2: Extract File Utilities (`file_util`)**\n\nCreate `util/egis/file_util.h` and `util/egis/file_util.cc` for isolated disk I/O.\n\n**1. Create `file_util.h`:**\n\n```cpp\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n#ifndef UTIL_EGIS_FILE_UTIL_H_\n#define UTIL_EGIS_FILE_UTIL_H_\n\n#include \u003ccstdint\u003e\n#include \u003cexpected\u003e\n#include \u003cspan\u003e\n#include \u003cstring_view\u003e\n#include \u003csystem_error\u003e\n#include \u003cvector\u003e\n\nnamespace egis {\n\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, std::errc\u003e ReadBinaryFile(std::string_view path);\n\nstd::expected\u003cvoid, std::errc\u003e LoadAesKey(std::string_view key_file_path,\n                                          std::span\u003cuint8_t, 32\u003e key_buffer);\n\n}  // namespace egis\n\n#endif  // UTIL_EGIS_FILE_UTIL_H_\n\n```\n\n**2. Create `file_util.cc`:**\nMove the implementations of `ReadBinaryFile` and `LoadAesKey` here. Include `\u003cfstream\u003e`, `\"crypto_util.h\"`, and `\u003ccerrno\u003e`.\n\n---\n\n### **Step 3: Extract the Flashing Engine (`flasher_logic`)**\n\nCreate `util/egis/flasher_logic.h` and `util/egis/flasher_logic.cc` to hold the heavy lifting.\n\n**1. Create `flasher_logic.h`:**\n\n```cpp\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n#ifndef UTIL_EGIS_FLASHER_LOGIC_H_\n#define UTIL_EGIS_FLASHER_LOGIC_H_\n\n#include \u003cexpected\u003e\n\n#include \"bootrom.h\"\n#include \"cli_options.h\"\n#include \"usb_comm.h\"\n\nnamespace egis {\n\nstd::expected\u003cvoid, AppError\u003e RunFlashFw(const AppConfig \u0026config,\n                                         BootromComm \u0026brom);\n\nstd::expected\u003cvoid, AppError\u003e RunFlashCmd(const AppConfig \u0026config,\n                                          UsbComm \u0026boot_comm);\n\n}  // namespace egis\n\n#endif  // UTIL_EGIS_FLASHER_LOGIC_H_\n\n```\n\n**2. Create `flasher_logic.cc`:**\nMove `RunFlashFw`, `RunFlashCmd`, `ProgramFlashPayload`, `ProgramRawCommandPayload`, and `GetNextPacketSize` here. *Note: Keep `GetNextPacketSize`, `ProgramFlashPayload`, and `ProgramRawCommandPayload` inside an anonymous `namespace { ... }` so they remain private to this translation unit.*\n\n---\n\n### **Step 4: Trim `et171_flash.cc**`\n\nNow, strip `et171_flash.cc` down to its core orchestrator role.\n\n```cpp\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n\n// C/C++ system files\n#include \u003cchrono\u003e\n#include \u003ccstdio\u003e\n#include \u003ccstdlib\u003e\n#include \u003cmemory\u003e\n#include \u003cprint\u003e\n#include \u003cthread\u003e\n\n// Project headers\n#include \"bootrom.h\"\n#include \"cli_options.h\"\n#include \"ec_comm.h\"\n#include \"ec_protocol_defs.h\"\n#include \"flasher_logic.h\"\n#include \"usb_comm.h\"\n\nnamespace egis {\n\nusing namespace std::chrono_literals;\n\n// ... [Keep ExecuteGetVersion here] ...\n// ... [Keep ExecuteBootLoader here] ...\n// ... [Keep ConnectToBootloader here] ...\n\n} // namespace egis\n\nint main(int argc, char *argv[]) {\n  // 1. Parse Arguments\n  auto config_opt \u003d egis::ParseArgs(argc, argv);\n  if (!config_opt) {\n    return EXIT_FAILURE;\n  }\n  const egis::AppConfig \u0026config \u003d config_opt.value();\n\n  // 2. Initialize USB Context\n  libusb_context *raw_ctx \u003d nullptr;\n  if (libusb_init(\u0026raw_ctx) !\u003d 0) {\n    std::println(stderr, \"[ERROR] Failed to initialize libusb\");\n    return EXIT_FAILURE;\n  }\n  std::unique_ptr\u003clibusb_context, decltype(\u0026libusb_exit)\u003e usb_ctx(raw_ctx, \u0026libusb_exit);\n\n  // 3. Connect to Device\n  egis::UsbComm boot_comm(usb_ctx.get(), egis::kVidEgis,\n                          egis::kPidEgisBootloader, egis::kBootloaderEpOut,\n                          egis::kBootloaderEpIn);\n  if (auto res \u003d egis::ConnectToBootloader(usb_ctx.get(), boot_comm); !res) {\n    std::println(stderr, \"[ERROR] Failed to connect: {}\", egis::ToString(res.error()));\n    return EXIT_FAILURE;\n  }\n  egis::BootromComm brom(boot_comm);\n  brom.SetWrappedAlgo(config.algo_type);\n\n  // 4. Dispatch to Flasher\n  std::expected\u003cvoid, egis::AppError\u003e status;\n  if (config.mode \u003d\u003d egis::AppMode::kFlashFw) {\n    status \u003d egis::RunFlashFw(config, brom);\n  } else if (config.mode \u003d\u003d egis::AppMode::kFlashCmd) {\n    status \u003d egis::RunFlashCmd(config, boot_comm);\n  }\n\n  if (status.has_value()) {\n    return EXIT_SUCCESS;\n  }\n  return EXIT_FAILURE;\n}\n\n```\n\n---\n\n### **Step 5: Update the Build System (`build.mk`)**\n\nFinally, you must tell `make` to compile the three new source files. Update `util/egis/build.mk` to include them in the object list.\n\n```makefile\n# In util/egis/build.mk\n\nhost-util-bin-cxx-y +\u003d et171_flash\net171_flash-objs :\u003d $(addprefix $(_cur_dir)/, \\\n    et171_flash.o \\\n    bootrom.o \\\n    usb_comm.o \\\n    ec_comm.o \\\n    crypto_util.o \\\n    cli_options.o \\     # \u003c-- Add this\n    file_util.o \\       # \u003c-- Add this\n    flasher_logic.o \\   # \u003c-- Add this\n)\n\n```",
       "parentUuid": "b21f3183_4148d71b",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 0
+      },
+      "revId": "36f293844ebba55ddfd6c6e9df3400cea04efcf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f5eda84_61fdfae1",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-28T03:20:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "abc827be_c8e3cc23",
       "range": {
         "startLine": 1,
         "startChar": 0,
