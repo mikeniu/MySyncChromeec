@@ -33,6 +33,23 @@
       "message": "Add a comment sem is locked.",
       "revId": "6fddbbefa48c83f18ccd2f5efd7260a39742accb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab7ed915_409c3afd",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-28T10:31:30Z",
+      "side": 1,
+      "message": "Please consider adding turning off the LED in RO with this init.",
+      "revId": "6fddbbefa48c83f18ccd2f5efd7260a39742accb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
