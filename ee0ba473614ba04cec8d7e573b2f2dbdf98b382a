@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a65d94f4_5fd83aa8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T16:44:00Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/99d46b54-3fe7-4cb9-bea8-68ceeb11c385)]\n\n### Review Summary\n- **Functionality:** The test case correctly validates that `get_frame` enforces bounds checks when an offset-shifted read straddles the absolute edge of the physical `fp_buffer`. The integer underflow check ensures the test remains safely configured even if buffer sizes or offset constants change.\n- **Style:** The test adheres perfectly to the ZTEST framework patterns established in the file. The inline comments explaining the test\u0027s intent and edge conditions are excellent and very clear.\n- **Security:** This test explicitly verifies that hardware boundary limits cannot be bypassed, adding robust regression protection against potential out-of-bounds reads and buffer overflows.\n- **Overall quality:** High. The test addresses a complex edge case safely and correctly uses the newly introduced `set_frame_size` test helper to cleanly perform the test setup.",
+      "revId": "ee0ba473614ba04cec8d7e573b2f2dbdf98b382a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
