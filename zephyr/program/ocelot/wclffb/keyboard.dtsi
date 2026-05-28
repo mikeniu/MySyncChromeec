@@ -118,7 +118,7 @@
 	kso-gpio {
 		compatible = "cros-ec,col-gpio";
 		col-num = <2>;
-		col-gpios = <&gpioksol 2 GPIO_ACTIVE_LOW>;
+		col-gpios = <&gpioksol 2 GPIO_ACTIVE_HIGH>;
 	};
 
 	/*
