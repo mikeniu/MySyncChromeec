@@ -90,6 +90,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "19cdb7bb_9abe4dbc",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 536,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T19:00:20Z",
+      "side": 1,
+      "message": "Currently, `BootromComm::GetBootromInfo()` and `BootromComm::GetFlashInfo()` parse the data into strongly typed structs (`BootromInfoResponse`, `FlashInfoResponse`) but then immediately print the results to `stdout` and return `void`.\n\nA protocol class like `BootromComm` should act as a pure data broker. It shouldn\u0027t know anything about console formatting.\n\n**Current (`bootrom.cc`):**\n\n```c\nstd::expected\u003cvoid, BootromError\u003e BootromComm::GetBootromInfo() {\n  // ... reads BootromInfoResponse ...\n  std::println(\"Bootrom Version: 0x{:x}\", FromLittleEndian(info.version));\n  return {};\n}\n\n```\n\n**Better:** Return the parsed struct. Let `et171_flash.cc` (the application layer) handle the `std::println` logic.\n\n```c\nstd::expected\u003cEgisBootrom::BootromInfoResponse, BootromError\u003e BootromComm::GetBootromInfo() {\n  EgisBootrom::GetBootromInfoCommand req;\n  auto resp \u003d SendStruct(req);\n  if (!resp) return std::unexpected(resp.error());\n\n  auto info_res \u003d ReadStruct\u003cEgisBootrom::BootromInfoResponse\u003e(*resp);\n  if (!info_res) return std::unexpected(BootromError::kResponseTruncated);\n  \n  // Fix endianness right here before returning it to the caller\n  EgisBootrom::BootromInfoResponse info \u003d info_res.value();\n  info.version \u003d FromLittleEndian(info.version);\n  info.max_cmd_size \u003d FromLittleEndian(info.max_cmd_size);\n  info.max_fw_upgrade_size \u003d FromLittleEndian(info.max_fw_upgrade_size);\n  \n  return info;\n}\n\n```",
+      "range": {
+        "startLine": 518,
+        "startChar": 0,
+        "endLine": 536,
+        "endChar": 1
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "70608fe5_db865e2d",
         "filename": "util/egis/cli_options.cc",
         "patchSetId": 24
