@@ -70,6 +70,24 @@
       "parentUuid": "cc033251_8cd439b5",
       "revId": "81499f2ff0abd5654ad558f34faab9d52f92cab7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9194b8a3_32da552e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-28T03:37:44Z",
+      "side": 1,
+      "message": "in addition, adding the offset to the dts file, will simulate the error that we got in real live. If the offset is added, those 2 tests will fail unless we add the fix which is implemented in this CL.\n\n```\n1. test_finger_capture_simple_image_scan_success_get_frame\n2. test_finger_capture_simple_image_scan_success_get_frame_v1\n```",
+      "parentUuid": "15bee43e_4dcb4e5c",
+      "revId": "81499f2ff0abd5654ad558f34faab9d52f92cab7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
