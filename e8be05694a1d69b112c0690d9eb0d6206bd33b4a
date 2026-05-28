@@ -16,6 +16,40 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "e8be05694a1d69b112c0690d9eb0d6206bd33b4a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9cbce879_a9215935",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-28T20:18:58Z",
+      "side": 1,
+      "message": "This appears to overlap CL:7870901 significantly. If this is the more official version, then consider my comments on that CL to apply to this CL.",
+      "revId": "e8be05694a1d69b112c0690d9eb0d6206bd33b4a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38ad91cb_bb265bae",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1767,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-28T20:18:58Z",
+      "side": 1,
+      "message": "The get VDO function is updating the stored IDH to the retrieved value. After this call to set VDO, that stored value will be incorrect. If you intend to use that value in the future, you could update it at this point, assuming the command will succeed. If you know that the chip will not unilaterally update its IDH between now and the next time you call set VDO, then you could base any future calls to set VDO on the cached value from the last set VDO, without calling get VDO again.",
+      "revId": "e8be05694a1d69b112c0690d9eb0d6206bd33b4a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

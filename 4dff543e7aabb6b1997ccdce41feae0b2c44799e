@@ -22,6 +22,30 @@
       },
       "revId": "4dff543e7aabb6b1997ccdce41feae0b2c44799e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dea5528f_da67c0bc",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1760,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-28T20:18:58Z",
+      "side": 0,
+      "message": "I think the init states and these functions could be a bit more straight-line with separated concerns. To my mind, that would involve taking the IDH value to set as a parameter to this function. That argument would need to be based on manipulating the previously gotten IDH from the PDC.\n\nThe basis for this CL seems to be that the PDC\u0027s IDH will have initial values that the EC can\u0027t or shouldn\u0027t derive from its own a priori knowledge. If that\u0027s the case, then probably all calls to this function should be preceded by calls to `rts54_set_vdo_idh`, and the new value to set should be derived from that fetched value. (But see below about caching.)\n\nI mentioned this in CL:7870901, and it seems like there\u0027s some overlap here.",
+      "parentUuid": "c595d873_be766326",
+      "range": {
+        "startLine": 1760,
+        "startChar": 21,
+        "endLine": 1760,
+        "endChar": 61
+      },
+      "revId": "4dff543e7aabb6b1997ccdce41feae0b2c44799e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
