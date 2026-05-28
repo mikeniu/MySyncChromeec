@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5d7a12e3_5f8b347e",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:37:16Z",
+      "side": 1,
+      "message": "Having global (or static) variables is not good practice. Here\u0027s a Gemini-generated way to eliminate it. Check for correctness.\n\n----\n\nEven when hidden in an anonymous namespace, a global state variable like `g_cdb_tag` (or `cdb_tag`) is an anti-pattern. It makes the code harder to test, introduces hidden dependencies, and is inherently not thread-safe.\n\nIn the context of USB Mass Storage Bulk-Only Transport, the `tag` is a sequence number used to match a Command Block Wrapper (CBW) with its corresponding Command Status Wrapper (CSW). Therefore, **the tag logically belongs to the USB connection session**.\n\nThe best way to eliminate the global variable is to encapsulate this state within the `UsbDevice` class. Here is how to cleanly refactor the code:\n\n### Step 1: Add the tag state to `UsbDevice`\n\nOpen `util/focaltech/usb_context.h` and add a new atomic member variable to the `UsbDevice` class, along with a getter method to safely increment and retrieve it.\n\n**In `usb_context.h` (inside the `UsbDevice` class):**\n\n```cpp\nclass UsbDevice {\n public:\n  // ... existing methods ...\n\n  // Safe method to get and increment the command tag\n  uint32_t GetNextCdbTag() const { \n    // fetch_add returns the value before addition, matching the post-increment behavior\n    return cdb_tag_.fetch_add(1, std::memory_order_relaxed); \n  }\n\n  // ... existing methods ...\n\n private:\n  // ... existing private members ...\n  \n  libusb_context* ctx_ \u003d nullptr;\n  \n  // Encapsulated state for SCSI command sequence matching.\n  // Marked mutable so it can be incremented even when UsbDevice is passed as const.\n  mutable std::atomic\u003cuint32_t\u003e cdb_tag_{1};\n};\n\n```\n\n### Step 2: Use the encapsulated tag in `ft_scsi.cc`\n\nNow, open `util/focaltech/ft_scsi.cc`. Delete the global variable entirely and update `SendBulkCommand` to request the tag from the `device` object passed into it.\n\n**In `ft_scsi.cc`:**\n\n```cpp\n// 1. DELETE this line from the anonymous namespace:\n// uint32_t g_cdb_tag \u003d 1; \n\n// ...\n\nstd::expected\u003cvoid, FtError\u003e SendBulkCommand(\n    const UsbDevice\u0026 device, std::span\u003cconst uint8_t\u003e scsi_cmd,\n    std::span\u003cuint8_t\u003e data_buffer, TransferDirection dir,\n    std::chrono::milliseconds timeout_ms) {\n  \n  if (scsi_cmd.size() \u003e 16 || scsi_cmd.empty()) {\n    LOGE(\"Invalid SCSI command length.\");\n    return std::unexpected(FtError::kParameterError);\n  }\n\n  // 2. UPDATE the CBW construction to use the device\u0027s tag:\n  BulkCbWrap cbw{};\n  cbw.signature \u003d htole32(kUsbMsCbwSignature);\n  cbw.tag \u003d htole32(device.GetNextCdbTag()); // \u003c--- Changed here\n  cbw.flags \u003d (dir \u003d\u003d TransferDirection::kIn) ? 0x80 : 0x00;\n  // ...\n\n```\n\n### Why this is the best approach:\n\n* **No Global State:** You have completely eliminated the external variable.\n* **Thread Safety:** By using `std::atomic\u003cuint32_t\u003e`, you ensure that if multiple threads were to ever share the same `UsbDevice` instance, the tags would remain perfectly sequential without race conditions.\n* **Correct Architecture:** If the tool ever evolves to support flashing multiple FocalTech devices simultaneously, each `UsbDevice` instance will correctly maintain its own independent tag sequence, avoiding tag collisions between different USB endpoints.",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 23
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fcde0f39_15a05179",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 15
