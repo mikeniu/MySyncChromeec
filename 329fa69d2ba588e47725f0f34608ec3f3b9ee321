@@ -141,6 +141,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5aff917c_cde57745",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:43:07Z",
+      "side": 1,
+      "message": "The vast majority of your casts happen because size variables (`len`, `file_len`, `per_len`) are declared as signed `int`, but the standard library (`std::vector::size()`, `std::span`) and your USB APIs expect unsigned types (`size_t` or `uint32_t`).\n\n**In `updater.cc` (`FtDownloadBin`):**\n\n```c\n// BAD (Current):\nint file_len \u003d buffer.size();\nint len \u003d total_frame * kFocalConfigSize;\nint per_len \u003d kFocalConfigSize;\n\n// GOOD:\nsize_t file_len \u003d buffer.size();\nsize_t len \u003d total_frame * kFocalConfigSize;\nsize_t per_len \u003d kFocalConfigSize;\n\n```\n\n**The Impact:** By making these `size_t`, you completely eliminate the need for functional casts like `size_t(per_len)` and `size_t(len)` when creating spans later in the function.",
+      "range": {
+        "startLine": 146,
+        "startChar": 0,
+        "endLine": 148,
+        "endChar": 70
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "54bf2ad3_558c3844",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 15
