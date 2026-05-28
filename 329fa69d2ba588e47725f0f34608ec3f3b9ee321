@@ -339,6 +339,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2c843b6f_ad0b9be6",
+        "filename": "util/focaltech/usb_context.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T18:18:41Z",
+      "side": 1,
+      "message": "**The Problem:** In `UsbDevice::Send` and `UsbDevice::Recv`, the exact same 7 lines of error-handling logic are duplicated. If `libusb_bulk_transfer` fails, the code resets the device, sleeps, and translates the error code.\n\n**The Fix:** Extract the recovery logic into a private helper method inside the `UsbDevice` class.",
+      "range": {
+        "startLine": 184,
+        "startChar": 1,
+        "endLine": 193,
+        "endChar": 3
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "075bdddf_cb1e3514",
         "filename": "util/focaltech/usb_context.cc",
         "patchSetId": 15
