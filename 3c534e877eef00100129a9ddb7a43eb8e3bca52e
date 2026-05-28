@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fa1f66c_9d0a86fa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:13:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/c776ee3e-9cd1-4812-abe8-3f8c3af96b88)]\n\n### Review Summary\n\n*   **Functionality**: The `set_frame_size` method correctly enables unit tests to mock the cache state. A minor suggestion is to add tests verifying its out-of-bounds error handling.\n*   **Security**: No security risks identified. The new setter is safely guarded by `#ifdef CONFIG_ZTEST` ensuring it does not compile into production binaries.\n*   **Style**: The code matches project formatting and is well-documented.\n*   **Testing**: The patch includes a valid unit test for the happy path. An inline comment suggests adding boundary test cases to ensure robustness.",
+      "revId": "3c534e877eef00100129a9ddb7a43eb8e3bca52e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "046bd232_2ebc990a",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_frame_size.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:13:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider adding boundary tests for `set_frame_size` (e.g., calling it with `-1` or `FP_CAPTURE_TYPE_MAX`) to verify that it correctly handles out-of-bounds `capture_type` values without modifying memory out of bounds. You already have similar boundary tests (`test_cache_boundary_negative_index`, `test_cache_boundary_max_index`) for `get_frame_size`.",
+      "revId": "3c534e877eef00100129a9ddb7a43eb8e3bca52e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
