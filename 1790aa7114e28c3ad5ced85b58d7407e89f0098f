@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a60761d6_9588289d",
+        "filename": "common/i2c_controller.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-05-28T19:36:02Z",
+      "side": 1,
+      "message": "todo- need to break on success and unknown errors, loop for ec_error_inval (-EIO)",
+      "range": {
+        "startLine": 108,
+        "startChar": 0,
+        "endLine": 108,
+        "endChar": 27
+      },
+      "revId": "1790aa7114e28c3ad5ced85b58d7407e89f0098f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
