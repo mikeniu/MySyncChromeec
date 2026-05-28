@@ -149,7 +149,7 @@
 			gpios = <&gpioe 4 (GPIO_INPUT)>;
 		};
 		gpio_ec_ac_present_odl: ec_ac_present_odl {
-			gpios = <&gpiof 0 (GPIO_INPUT)>;
+			gpios = <&gpiof 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 			enum-name = "GPIO_AC_PRESENT";
 		};
 		gpio_gsc_ec_voldn_btn_odl: gsc_ec_voldn_btn_odl {
