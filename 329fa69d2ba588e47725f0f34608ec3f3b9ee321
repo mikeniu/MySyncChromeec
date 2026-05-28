@@ -107,6 +107,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f8d88cf9_f7faea5d",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T18:16:26Z",
+      "side": 1,
+      "message": "It looks like there is some duplicated code here. Let\u0027s simplify.\n\nHere\u0027s Gemini-generated code to fix. Check for correctness:\n\n----\n\n**The Problem:** In `main.cc`, the functions `TestEcSwitchToRom` and `SwitchToBoot` are almost identical. They both:\n\n1. Call `CheckEcBuildVersion`.  \n2. Enter a `for` loop to retry sending a command.  \n3. Catch and ignore `kNoSuchDevice` errors (because the MCU resets and drops off the bus).  \n4. Attempt to read a response.  \n5. Wait for the USB reset to complete using `ResetComplete`.\n\n**The Fix:** Extract this into a single, generic `SwitchMcuMode` function that takes the specific command as an argument.\n\n**Add this generic function to `main.cc` (replacing the two old functions):**\n\n```c\n// Generic helper to send a mode-switch command and wait for the MCU to reset\nstd::expected\u003cvoid, FtError\u003e SwitchMcuMode(UsbDevice\u0026 usb, \n                                           FtDeviceMode current_mode,\n                                           std::span\u003cconst uint8_t\u003e switch_cmd,\n                                           std::string_view mode_name) {\n  if (auto res \u003d CheckEcBuildVersion(usb, current_mode); !res) {\n    LOGE(\"Cannot find focal device\");\n    return std::unexpected(FtError::kResultFail);\n  }\n\n  std::array\u003cuint8_t, 4\u003e rx{};\n\n  for (int attempt \u003d 1; attempt \u003c\u003d kMaxRetry; ++attempt) {\n    auto sr \u003d usb.Send(switch_cmd, kFastUsbTimeout.count());\n    if (!sr) {\n      if (sr.error() \u003d\u003d FtError::kNoSuchDevice) {\n        LOGW(\"USB device lost (expected during {} switch).\", mode_name);\n        return {};\n      }\n      LOGW(\"MCU reset to {} — send failed.\", mode_name);\n    }\n\n    auto rr \u003d usb.Recv(rx, kFastUsbTimeout.count());\n    if (rr \u0026\u0026 *rr \u003e 0) {\n      LOGW(\"MCU reset — received {} bytes.\", *rr);\n      break; \n    }\n    \n    if (!rr \u0026\u0026 rr.error() \u003d\u003d FtError::kNoSuchDevice) {\n      LOGW(\"USB device lost (expected during {} switch).\", mode_name);\n      return {};\n    }\n\n    std::this_thread::sleep_for(kMcuRebootPollInterval);\n  }\n\n  if (auto res \u003d usb.ResetComplete(kResetWaitTimeout); !res) {\n    return std::unexpected(res.error());\n  }\n  return {};\n}\n\n```\n\n**Now, update the `ExecuteCommand` switch statement in `main.cc` to use it:**\n\n```c\n    case Command::kEnterBoot:\n      if (info.current_mode \u003d\u003d FtDeviceMode::kBoot) {\n        LOGW(\"Already in bootloader mode.\");\n        return {};\n      }\n      LOGI(\"Entering bootloader mode...\");\n      return SwitchMcuMode(usb_device, info.current_mode, kSwitchToBootCmd, \"boot\");\n\n    case Command::kEnterRom:\n      LOGI(\"Entering ROM mode...\");\n      if (info.current_mode \u003d\u003d FtDeviceMode::kTest) {\n        return SwitchMcuMode(usb_device, info.current_mode, kTestEcSwitchToRomCmd, \"ROM\");\n      }\n      return FtBackToRomBoot(usb_device, info.current_mode);\n\n```\n\n*(This completely eliminates roughly 60 lines of duplicated code).*",
+      "range": {
+        "startLine": 123,
+        "startChar": 1,
+        "endLine": 124,
+        "endChar": 75
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8070ca86_d1ad6b4d",
         "filename": "util/focaltech/main.cc",
         "patchSetId": 15
