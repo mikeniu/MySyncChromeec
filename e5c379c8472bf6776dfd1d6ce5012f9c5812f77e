@@ -26,6 +26,92 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b6b90d05_06b98de4",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 14
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:20:43Z",
+      "side": 1,
+      "message": "**File:** `util/focaltech/main.cc` (Lines \\~310-315)\n\n**Corrected Snippet:**\n\n```c\n      /*Fix an issue where, when the display is off but the system has not yet\n       * entered suspend, the host may forcibly switch the FPMCU into suspend\n       * state, causing the upgrade to fail. Retry updating the firmware.*/\n      for (int attempt \u003d 1; attempt \u003c\u003d kMaxRetry; ++attempt) {\n        if (auto res \u003d UpdateFw(usb_device, info); res) {\n          LOGI(\"Firmware update successful\");\n          return {};\n        }\n        LOGW(\"Firmware update fail attempt {}\", attempt);\n      }\n\n```\n\n* **Rationale:** The `k` prefix is strictly reserved for variables that are `constexpr` or `const` (constants). Mutable local variables and loop counters must use standard `snake_case`. Naming a mutable loop counter `kRetries` violates both the constant naming rule and the local variable naming rule.  \n* **Google Style Guide:** [Variable Names](https://google.github.io/styleguide/cppguide.html#Variable_Names) \u0026 [Constant Names](https://google.github.io/styleguide/cppguide.html#Constant_Names)",
+      "range": {
+        "startLine": 347,
+        "startChar": 0,
+        "endLine": 357,
+        "endChar": 7
+      },
+      "revId": "e5c379c8472bf6776dfd1d6ce5012f9c5812f77e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d278842_1bdce42e",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 14
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:20:43Z",
+      "side": 1,
+      "message": "Remove blank line.",
+      "revId": "e5c379c8472bf6776dfd1d6ce5012f9c5812f77e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38a38fa9_cac27134",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 14
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:20:43Z",
+      "side": 1,
+      "message": "**File:** `util/focaltech/updater.cc` (and similarly for `usb_context.h`)\n\n**Corrected Snippet:**\n\n```c\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n\n#include \u003calgorithm\u003e\n#include \u003ccstdint\u003e\n#include \u003cfstream\u003e\n#include \u003cspan\u003e\n#include \u003cstring_view\u003e\n#include \u003cvector\u003e\n\n// Third-party libraries come AFTER standard C++ libraries\n#include \u003copenssl/sha.h\u003e\n\n#include \"ft_log.h\"\n#include \"ft_scsi.h\"\n#include \"ft_util.h\"\n\n```\n\n* **Rationale:** To prevent hidden dependencies, headers must be included in a strict order: 1\\) The related header, 2\\) C system headers, 3\\) C++ standard library headers, 4\\) Other libraries\u0027 headers, 5\\) Your project\u0027s headers. OpenSSL (`\u003copenssl/sha.h\u003e`) is a third-party library and belongs in group 4\\.  \n* **Google Style Guide:** [Names and Order of Includes](https://google.github.io/styleguide/cppguide.html#Names_and_Order_of_Includes)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 20
+      },
+      "revId": "e5c379c8472bf6776dfd1d6ce5012f9c5812f77e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13771406_5ec8619b",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 14
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:20:43Z",
+      "side": 1,
+      "message": "**File:** `util/focaltech/updater.cc` (Lines \\~163 \u0026 \\~168)\n\n**Corrected Snippet:**\n\n```c\n  while (len \u003e\u003d per_len) {\n    auto page_res \u003d\n        FtDownloadPage(device, downaddr, per_len, {p, static_cast\u003csize_t\u003e(per_len)});\n    if (!page_res) return page_res;\n\n```\n\n*(Note: You will need to apply this exact same `static_cast` to line 168 as well)*\n\n* **Rationale:** C++ requires explicit type casting methods (`static_cast`, `const_cast`, `reinterpret_cast`) because they explicitly state the intent of the cast, enforce compiler checks, and are easy to `grep` for in a large codebase. Functional casts like `size_t(per_len)` or C-style casts like `(size_t)per_len` bypass these checks and are explicitly forbidden.  \n* **Google Style Guide:** [Casting](https://google.github.io/styleguide/cppguide.html#Casting)",
+      "range": {
+        "startLine": 175,
+        "startChar": 0,
+        "endLine": 175,
+        "endChar": 26
+      },
+      "revId": "e5c379c8472bf6776dfd1d6ce5012f9c5812f77e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "71490a99_7b2983b8",
         "filename": "util/focaltech/usb_context.h",
         "patchSetId": 14
@@ -42,6 +128,29 @@
         "startChar": 0,
         "endLine": 131,
         "endChar": 74
+      },
+      "revId": "e5c379c8472bf6776dfd1d6ce5012f9c5812f77e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4a66b3a_9f43798d",
+        "filename": "util/focaltech/usb_context.h",
+        "patchSetId": 14
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T17:20:43Z",
+      "side": 1,
+      "message": "**File:** `util/focaltech/usb_context.h` (Line \\~135)\n\n**Corrected Snippet:**\n\n```c\n  // Wait for device removal (hotplug event)\n  int ResetComplete(int timeout_sec) const;\n  void UsbResetRecvPipe() const; // Removed (void)\n\n```\n\n* **Rationale:** In standard C, an empty parameter list `()` means a function can take an unspecified number of arguments, so `(void)` was used to strictly define zero arguments. In C++, `()` strictly means zero arguments. Using `(void)` is an outdated C idiom that adds unnecessary visual clutter in modern C++.  \n* **Google Style Guide:** While implicit in the overall mandate to use modern C++ standard features over legacy C paradigms, this is universally accepted as standard C++ practice. (See [C++ Core Guidelines NL.25](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#rl-void)).",
+      "range": {
+        "startLine": 135,
+        "startChar": 0,
+        "endLine": 135,
+        "endChar": 36
       },
       "revId": "e5c379c8472bf6776dfd1d6ce5012f9c5812f77e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
