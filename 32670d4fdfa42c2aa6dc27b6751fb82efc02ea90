@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35432af5_7d63f540",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-28T16:42:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/a40e9bb7-b486-4b47-b97a-92ee45d89051)]\n\n### Review Summary\n\n**Functionality**\nThe fix correctly addresses the false validation failures. By evaluating `offset` and `size` against `current_frame_size` *before* adding `FP_SENSOR_IMAGE_OFFSET`, the host-requested chunk bounds are accurately validated against the logical frame.\n\n**Security**\nThe inclusion of the explicit bounds check (`if (offset + size \u003e sizeof(fp_buffer))`) guarantees memory safety and prevents the Out-Of-Bounds (OOB) read risk that was present in the initial implementation.\n\n**Style \u0026 Consistency**\nThe code adheres to the project guidelines, and the comments were moved appropriately alongside the logic they describe.\n\n**Testing**\nThe commit message lists adequate manual validation using `ectool`. The decision to defer unit tests is documented and accepted in the review thread.",
+      "revId": "32670d4fdfa42c2aa6dc27b6751fb82efc02ea90",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
