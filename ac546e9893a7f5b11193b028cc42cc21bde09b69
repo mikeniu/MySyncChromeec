@@ -3,6 +3,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ff9864ae_7768d5d4",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T00:05:15Z",
+      "side": 1,
+      "message": "For followup CL:\n\n**Unprotected Integer Overflow in Offset Calculation** In the new `get_frame` function, there is a vulnerability when shifting the offset for specific capture types:\n\n```c\n\tif (skip_image_offset(global_context.current_capture_type))\n\t\toffset +\u003d FP_SENSOR_IMAGE_OFFSET;\n\n```\n\nBecause `offset` is a `uint32_t` provided by the caller (ultimately derived from host commands), adding `FP_SENSOR_IMAGE_OFFSET` without bounds checking can cause `offset` to wrap around to a very small number (e.g., `UINT32_MAX + 10` becomes `9`).\n\nIf this happens, the wrapped `offset` will easily pass the subsequent `validate_fp_buffer_offset` check. The host will then successfully read memory from the beginning of `fp_buffer` rather than receiving an out-of-bounds error.",
+      "range": {
+        "startLine": 619,
+        "startChar": 0,
+        "endLine": 621,
+        "endChar": 0
+      },
+      "revId": "ac546e9893a7f5b11193b028cc42cc21bde09b69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e86fef9_b5ced3d7",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 648,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T00:05:15Z",
+      "side": 1,
+      "message": "For followup CL:\n\n----\n\n**2. Variable Shadowing in `fp_command_frame_v0** In the modified `fp_command_frame_v0` function, you declare `enum ec_error_list ret;` at the top of the function. Inside the `if (idx \u003d\u003d FP_FRAME_INDEX_RAW_IMAGE)` block, you redeclare it with a different type:\n\n```c\n\tif (idx \u003d\u003d FP_FRAME_INDEX_RAW_IMAGE) {\n\t\t/* The host requested a frame. */\n\t\tenum ec_status ret \u003d get_frame(offset, size, (uint8_t *)out);\n\t\tif (ret !\u003d EC_RES_SUCCESS) {\n\t\t\treturn ret;\n\t\t}\n\n```\n\nWhile this compiles, variable shadowing is a known code smell that can lead to confusion and bugs during future refactoring.\n\n* **Remediation:** Rename the inner variable to reflect its specific type (e.g., `status`), or remove the type declaration if you intend to reuse an appropriately scoped variable.\n\n```c\n\t\tenum ec_status status \u003d get_frame(offset, size, (uint8_t *)out);\n\t\tif (status !\u003d EC_RES_SUCCESS) {\n\t\t\treturn status;\n\t\t}\n\n```",
+      "range": {
+        "startLine": 648,
+        "startChar": 0,
+        "endLine": 648,
+        "endChar": 24
+      },
+      "revId": "ac546e9893a7f5b11193b028cc42cc21bde09b69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9a01cd1a_7795541c",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
         "patchSetId": 17
