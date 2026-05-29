@@ -110,6 +110,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "51312af5_5d47efa6",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_frame_size.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-29T01:38:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e15f7c42_a2e41aa3",
+      "range": {
+        "startLine": 190,
+        "startChar": 0,
+        "endLine": 190,
+        "endChar": 70
+      },
+      "revId": "f19344aec135778f73af4b97727427c3d83d3ef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b0c578cd_5fe69a00",
@@ -123,6 +147,30 @@
       "writtenOn": "2026-05-28T23:53:27Z",
       "side": 1,
       "message": "\"set_frame_size should ignore the negative out-of-bounds index -1.\"",
+      "range": {
+        "startLine": 203,
+        "startChar": 0,
+        "endLine": 203,
+        "endChar": 68
+      },
+      "revId": "f19344aec135778f73af4b97727427c3d83d3ef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2585429_5f8cef4e",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_frame_size.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-29T01:38:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0c578cd_5fe69a00",
       "range": {
         "startLine": 203,
         "startChar": 0,
