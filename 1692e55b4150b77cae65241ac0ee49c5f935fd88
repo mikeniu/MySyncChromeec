@@ -68,6 +68,30 @@
       },
       "revId": "1692e55b4150b77cae65241ac0ee49c5f935fd88",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ded4ecd5_7f3ae514",
+        "filename": "util/elan/iap_control.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T18:06:36Z",
+      "side": 1,
+      "message": "Once the above works, we should add more comprehensive tests to `IapControlTest`. Here are some  Gemini generated tests. Verify for correctness and make sure they pass:\n\n----\n\n\n### 1. Initialization Edge Cases\n\nWe tested the happy path, but we need to ensure the class gracefully handles the two specific ways USB initialization can fail at the hardware level.\n\n```cpp\nTEST_F(IapControlTest, InitializeFailsWhenLibusbInitFails) {\n  // libusb_init returns a non-zero error code\n  EXPECT_CALL(*mock_usb_, Initialize()).WillOnce(Return(-99));\n  \n  auto result \u003d ctrl_-\u003eInitialize(kBootVid, kBootPid);\n  \n  ASSERT_FALSE(result.has_value());\n  EXPECT_EQ(result.error(), IapError::UsbInitFailed);\n}\n\nTEST_F(IapControlTest, InitializeFailsWhenDeviceNotFound) {\n  EXPECT_CALL(*mock_usb_, Initialize()).WillOnce(Return(0));\n  // Device list fetched, but VID/PID not found\n  EXPECT_CALL(*mock_usb_, OpenDevice(kBootVid, kBootPid))\n      .WillOnce(Return(LIBUSB_ERROR_NO_DEVICE));\n\n  auto result \u003d ctrl_-\u003eInitialize(kBootVid, kBootPid);\n  \n  ASSERT_FALSE(result.has_value());\n  EXPECT_EQ(result.error(), IapError::DeviceNotFound);\n}\n\n```\n\n### 2. Business Logic: The Google Firmware Prefix Check\n\nIn `RunIapProcess`, there is a strict domain rule: `if (fw_ver_google !\u003d kGoogleFwVerPrefix)`. If someone tries to flash generic vendor firmware instead of the Google-signed firmware, the tool must abort.\n\nTo test this, we have to simulate the USB conversation for `AbortProcess` and `GetFwVersion`, and purposefully inject a bad version number into the read buffer.\n\n*Note: Because `InterruptTransfer` takes a `std::span`, we use Google Mock\u0027s `Invoke` to write fake hardware data into that span.*\n\n```cpp\nTEST_F(IapControlTest, RejectsInvalidFirmwarePrefix) {\n  // 1. Mock Init\n  EXPECT_CALL(*mock_usb_, Initialize()).WillOnce(Return(0));\n  EXPECT_CALL(*mock_usb_, OpenDevice(_, _)).WillOnce(Return(0));\n  ASSERT_TRUE(ctrl_-\u003eInitialize(kBootVid, kBootPid).has_value());\n\n  // 2. AbortProcess sequence (Send Cmd 0x48, Recv Status)\n  EXPECT_CALL(*mock_usb_, InterruptTransfer(0x01, _, _)).WillOnce(Return(0)); \n  EXPECT_CALL(*mock_usb_, InterruptTransfer(0x82, _, _))\n      .WillOnce(testing::Invoke([](uint8_t, std::span\u003cuint8_t\u003e data, auto) {\n        data[0] \u003d 0x48; // cmd_echo\n        data[1] \u003d 0x01; // status_code (Success)\n        return 0;\n      }));\n\n  // 3. GetFwVersion sequence (Send Cmd 0x41, Recv Status with BAD version)\n  EXPECT_CALL(*mock_usb_, InterruptTransfer(0x01, _, _)).WillOnce(Return(0));\n  EXPECT_CALL(*mock_usb_, InterruptTransfer(0x82, _, _))\n      .WillOnce(testing::Invoke([](uint8_t, std::span\u003cuint8_t\u003e data, auto) {\n        data[0] \u003d 0x41; // cmd_echo\n        data[1] \u003d 0x01; // status_code (Success)\n        \n        // Inject an invalid prefix (e.g., 0x99 instead of 0x10) into the payload\n        uint32_t bad_version \u003d 0x99000000; \n        std::memcpy(\u0026data[4], \u0026bad_version, sizeof(bad_version));\n        return 0;\n      }));\n\n  // 4. Execute the main process with dummy ROM data\n  std::vector\u003cuint8_t\u003e dummy_rom(64, 0xFF);\n  auto result \u003d ctrl_-\u003eRunIapProcess(dummy_rom);\n\n  // 5. Assert it caught the bad prefix\n  ASSERT_FALSE(result.has_value());\n  EXPECT_EQ(result.error(), IapError::InvalidFirmware);\n}\n\n```",
+      "parentUuid": "5fb3525c_9943bf9b",
+      "range": {
+        "startLine": 135,
+        "startChar": 0,
+        "endLine": 138,
+        "endChar": 27
+      },
+      "revId": "1692e55b4150b77cae65241ac0ee49c5f935fd88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
