@@ -92,6 +92,29 @@
       },
       "revId": "ac546e9893a7f5b11193b028cc42cc21bde09b69",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dba2a593_f96cf9e5",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T00:13:02Z",
+      "side": 1,
+      "message": "**Missing Shifted-Offset Overflow Test** The test suite is highly thorough, but `test_get_frame_integer_overflow` misses the exact edge case described in the first critical finding. The current overflow test runs with `global_context.current_capture_type \u003d FP_CAPTURE_VENDOR_FORMAT`, meaning `skip_image_offset()` evaluates to false, and the `offset +\u003d FP_SENSOR_IMAGE_OFFSET` code path is never triggered.\n\n* **Remediation:** Add a new test case explicitly targeting this scenario. Set the capture type to `FP_CAPTURE_SIMPLE_IMAGE` and set `offset \u003d UINT32_MAX - FP_SENSOR_IMAGE_OFFSET + 1` to prove the function securely rejects mathematical wrap-arounds during the offset shift.",
+      "range": {
+        "startLine": 173,
+        "startChar": 0,
+        "endLine": 173,
+        "endChar": 58
+      },
+      "revId": "ac546e9893a7f5b11193b028cc42cc21bde09b69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
