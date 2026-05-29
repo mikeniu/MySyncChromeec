@@ -16,6 +16,23 @@
       "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/d1996440-5d73-458e-80ec-f21e5e1ad0db)]\n\n### Review Summary\n* **Functionality**: The CL introduces a comprehensive unit test suite for `get_frame` in the fingerprint sensor task, providing excellent coverage for error handling, size calculations, and data layout.\n* **Security**: The unit tests proactively cover access control (`system_is_locked`) and boundary checking (linear/integer overflows), which validates the memory safety of the frame retrieval logic.\n* **Style**: The code follows standard Zephyr `ztest` conventions, uses fakes (`fff`) appropriately, and structures the tests effectively with a dedicated setup routine.\n* **Testing**: Excellent test coverage added for an essential data-path function.",
       "revId": "7c8bbda23d0ec4d408c2abf9c87ebde23dc5a0c0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6286fc8_563b2633",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T16:43:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/1349c588-c7b1-46c4-8a1d-c88acd027cbb)]\n\n### Review Summary\n\n*   **Functionality**: The CL adds a comprehensive suite of unit tests for the `get_frame` function in the fingerprint sensor subsystem. The tests cover a wide range of scenarios including system lock states, invalid parameters, memory overflows, and successful frame reads under various boundary conditions.\n*   **Security**: By thoroughly verifying the bounds checking and access control mechanisms within `get_frame`, this patch helps validate the security and stability of the fingerprint sensor driver against potential out-of-bounds reads and unauthorized access.\n*   **Style**: The code strictly adheres to Zephyr testing conventions and C++ style guidelines. The use of clear setup logic, well-named tests, and appropriate mocking with the FFF framework makes the test suite highly readable and maintainable. All prior feedback has been integrated successfully.\n*   **Testing**: The patch achieves its goal of significantly increasing test coverage for the frame retrieval logic, providing high confidence in the subsystem\u0027s robustness.",
+      "revId": "7c8bbda23d0ec4d408c2abf9c87ebde23dc5a0c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
