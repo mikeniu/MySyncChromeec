@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97351007_aab44e66",
+        "filename": "zephyr/program/fatcat/moonstone/i2c_pac.dtsi",
+        "patchSetId": 24
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-29T16:50:31Z",
+      "side": 1,
+      "message": "Wrong year.  And the formatting of this file is very inconsistent.\n\nIt should use hard-tabs for all indentation.",
+      "range": {
+        "startLine": 1,
+        "startChar": 13,
+        "endLine": 1,
+        "endChar": 17
+      },
+      "revId": "541d3224fe91ec14b3b0ce66c6928660e801c2c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
