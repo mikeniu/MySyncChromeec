@@ -1,10 +1,7 @@
-
 /* Copyright 2026 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-
-#include <openssl/sha.h>
 
 #include <algorithm>
 #include <cstdint>
@@ -13,21 +10,17 @@
 #include <string_view>
 #include <vector>
 
+// Third-party libraries come AFTER standard C++ libraries
+#include <openssl/sha.h>
+
 #include "ft_log.h"
 #include "ft_scsi.h"
 #include "ft_util.h"
+#include "usb_context.h"
 
 namespace {
 
 using namespace std::chrono_literals;
-
-// --- USB Transfer Timeouts ---
-// Before bootloader v1.8, erasing the flash takes about 4.4 seconds.
-constexpr auto kErasePageTimeout = 6000ms;
-constexpr auto kDownloadPageTimeout = 1000ms;
-constexpr auto kVerifyHashTimeout = 1000ms;
-constexpr auto kMcuResetTimeout = 200ms;
-constexpr auto kGenericInfoTimeout = 200ms;
 
 // FocalTech vendor-specific SCSI command opcodes
 constexpr uint8_t kFtCmdReadInfo = 0xDB;
@@ -47,7 +40,7 @@ constexpr size_t kFtBootVersionMax = 36;
 constexpr uint32_t kFtWriteSramAddr = 0x20002000;
 constexpr size_t kFtEcBinSizeMax = 2 * 1024 * 1024;
 
-constexpr uint32_t kFocalConfigSize = 0x1000;
+constexpr size_t kFocalConfigSize = 0x1000;
 constexpr uint32_t kFocalRomCfgAddr = 0x10000000;
 constexpr uint32_t kFocalBootCfgAddr = 0x10080000;
 constexpr uint32_t kFocalRomRunAddr = 0x10002000;
@@ -96,42 +89,50 @@ std::array<uint8_t, SHA256_DIGEST_LENGTH> CalculateSha256(
 
 }  // namespace
 
-// Helper to build a standard kFtCmdAction command and send it immediately
-std::expected<void, FtError> SendAction(
+// For sending data to the MCU
+std::expected<void, FtError> SendActionOut(
     const UsbDevice& device, uint8_t subcmd, uint32_t address,
-    std::span<uint8_t> data, TransferDirection dir,
+    std::span<const uint8_t> data, TransferDirection dir,
     std::chrono::milliseconds timeout, uint32_t length = 0,
     uint32_t aux_address = 0, uint8_t flags = 0) {
   auto cmd =
       BuildFtCmd(kFtCmdAction, subcmd, address, length, aux_address, flags);
-  return SendBulkCommand(device, cmd, data, dir, timeout);
+  return SendBulkDataOut(device, cmd, data, dir, timeout);
+}
+
+// For reading data from the MCU
+std::expected<void, FtError> ReceiveActionIn(
+    const UsbDevice& device, uint8_t subcmd, uint32_t address,
+    std::span<uint8_t> data, std::chrono::milliseconds timeout,
+    uint32_t length = 0, uint32_t aux_address = 0, uint8_t flags = 0) {
+  auto cmd =
+      BuildFtCmd(kFtCmdAction, subcmd, address, length, aux_address, flags);
+  return ReceiveBulkDataIn(device, cmd, data, timeout);
 }
 
 static std::expected<void, FtError> FtErasePage(const UsbDevice& device,
-                                                int length, int addr) {
-  uint32_t pages =
-      FtDivRoundUp(static_cast<uint32_t>(length), kFocalConfigSize);
-  return SendAction(device, kFtSubcmdErasePage, addr, {},
-                    TransferDirection::kOut, kErasePageTimeout, pages);
+                                                size_t length, uint32_t addr) {
+  uint32_t pages = FtDivRoundUp(length, kFocalConfigSize);
+  return SendActionOut(device, kFtSubcmdErasePage, addr, {},
+                       TransferDirection::kOut, kErasePageTimeout, pages);
 }
 
 static std::expected<void, FtError> FtDownloadPage(
-    const UsbDevice& device, uint32_t downaddr, int per_len,
+    const UsbDevice& device, uint32_t downaddr, size_t per_len,
     std::span<const uint8_t> data) {
   // Write data to SRAM (kFtSubcmdWriteBin)
-  auto res =
-      SendAction(device, kFtSubcmdWriteBin, kFtWriteSramAddr,
-                 std::span<uint8_t>(const_cast<uint8_t*>(data.data()), per_len),
-                 TransferDirection::kOut, kDownloadPageTimeout, per_len);
+  auto res = SendActionOut(device, kFtSubcmdWriteBin, kFtWriteSramAddr,
+                           data.subspan(0, per_len), TransferDirection::kOut,
+                           kDownloadPageTimeout, per_len);
   if (!res) {
     LOGE("Write bin error");
     return res;
   }
 
-  // Execute code (burn to flash) (kFtSubcmdCodeBin)
-  res = SendAction(device, kFtSubcmdCodeBin, downaddr, {},
-                   TransferDirection::kOut, kDownloadPageTimeout, per_len,
-                   kFtWriteSramAddr);
+  // Execute code
+  res = SendActionOut(device, kFtSubcmdCodeBin, downaddr, {},
+                      TransferDirection::kOut, kDownloadPageTimeout, per_len,
+                      kFtWriteSramAddr);
   if (!res) LOGE("Code bin error");
   return res;
 }
@@ -143,9 +144,8 @@ static std::expected<void, FtError> FtDownloadBin(const UsbDevice& device,
   if (!file_data) return std::unexpected(file_data.error());
 
   const auto& buffer = *file_data;
-  int file_len = buffer.size();
-  int total_frame =
-      FtDivRoundUp(static_cast<uint32_t>(file_len), kFocalConfigSize);
+  size_t file_len = buffer.size();
+  size_t total_frame = FtDivRoundUp(file_len, kFocalConfigSize);
 
   // Erase config page area if needed
   if (target_addr != kFocalBootCfgAddr) {
@@ -156,14 +156,14 @@ static std::expected<void, FtError> FtDownloadBin(const UsbDevice& device,
   auto erase_res = FtErasePage(device, file_len, target_addr);
   if (!erase_res) return erase_res;
 
-  int len = total_frame * kFocalConfigSize;
+  size_t len = total_frame * kFocalConfigSize;
   std::vector<uint8_t> write_buffer(len, 0xFF);
   std::memcpy(write_buffer.data(), buffer.data(), file_len);
 
   uint8_t* p = write_buffer.data();
   uint32_t downaddr = target_addr;
-  int per_len = kFocalConfigSize;
-  int frame = 0;
+  size_t per_len = kFocalConfigSize;
+  size_t frame = 0;
 
   if (target_addr == kFocalBootCfgAddr || target_addr == kFocalRomCfgAddr) {
     LOGI("Write config page last");
@@ -173,8 +173,7 @@ static std::expected<void, FtError> FtDownloadBin(const UsbDevice& device,
   }
 
   while (len >= per_len) {
-    auto page_res =
-        FtDownloadPage(device, downaddr, per_len, {p, size_t(per_len)});
+    auto page_res = FtDownloadPage(device, downaddr, per_len, {p, per_len});
     if (!page_res) return page_res;
 
     len -= per_len;
@@ -184,8 +183,8 @@ static std::expected<void, FtError> FtDownloadBin(const UsbDevice& device,
   }
 
   if (len > 0) {
-    len = FtDivRoundUp(static_cast<uint32_t>(len), static_cast<uint32_t>(4));
-    auto page_res = FtDownloadPage(device, downaddr, len, {p, size_t(len)});
+    len = FtDivRoundUp<size_t>(len, 4);
+    auto page_res = FtDownloadPage(device, downaddr, len, {p, len});
     if (!page_res) return page_res;
   }
 
@@ -214,9 +213,9 @@ std::expected<void, FtError> FtVerifyData(const UsbDevice& device,
 
   std::array<uint8_t, SHA256_DIGEST_LENGTH> device_hash{};
 
-  auto io_res = SendAction(device, kFtSubcmdVerify, target_addr, device_hash,
-                           TransferDirection::kIn, kVerifyHashTimeout,
-                           firmware_data.size(), 0, hash_mode);
+  auto io_res =
+      ReceiveActionIn(device, kFtSubcmdVerify, target_addr, device_hash,
+                      kVerifyHashTimeout, firmware_data.size(), 0, hash_mode);
 
   if (!io_res.has_value()) {
     LOGE("Verification command failed over USB.");
@@ -241,9 +240,9 @@ static std::expected<void, FtError> FtMcuReset(const UsbDevice& device,
     return std::unexpected(FtError::kParameterError);
   }
   // Passing 0s for length and aux_address to reach the flags parameter
-  return SendAction(device, kFtSubcmdSoftReset, 0, {},
-                    TransferDirection::kSendOnly, kMcuResetTimeout, 0, 0,
-                    kSoftPor);
+  return SendActionOut(device, kFtSubcmdSoftReset, 0, {},
+                       TransferDirection::kSendOnly, kMcuResetTimeout, 0, 0,
+                       kSoftPor);
 }
 
 // -----------------------------------------------------------------------------
@@ -253,8 +252,7 @@ static std::expected<void, FtError> FtGetBootVersion(const UsbDevice& device) {
   auto cmd = BuildFtCmd(kFtCmdReadInfo, kFtSubcmdReadData, 0, 0, 0, 0);
   std::vector<uint8_t> data(kFtBootVersionMax, 0);
 
-  auto res = SendBulkCommand(device, cmd, data, TransferDirection::kIn,
-                             kGenericInfoTimeout);
+  auto res = ReceiveBulkDataIn(device, cmd, data, kGenericInfoTimeout);
   if (!res) {
     LOGE("Failed to read boot version");
     return res;
@@ -386,8 +384,8 @@ std::expected<FtFlashWpArea, FtError> FtGetFlashProtect(
   std::vector<uint8_t> data(
       512, 0);  // Device returns 512 bytes, first byte holds area
 
-  auto res = SendAction(device, kFtSubcmdFlashWpGet, 0, data,
-                        TransferDirection::kIn, kGenericInfoTimeout);
+  auto res = ReceiveActionIn(device, kFtSubcmdFlashWpGet, 0, data,
+                             kGenericInfoTimeout);
   if (!res) {
     LOGE("Failed to get flash protect status");
     return std::unexpected(res.error());
@@ -420,10 +418,9 @@ std::expected<void, FtError> FtSetFlashProtect(const UsbDevice& device,
 
   std::vector<uint8_t> dummy(512, 0);  // Some firmware expects a buffer
 
-  auto res = SendAction(
+  auto res = ReceiveActionIn(
       device, kFtSubcmdFlashWpSet, static_cast<uint32_t>(wp_area), dummy,
-      TransferDirection::kIn, kGenericInfoTimeout,
-      ~static_cast<uint32_t>(wp_area));  // complement as per original
+      kGenericInfoTimeout, ~static_cast<uint32_t>(wp_area));
   if (!res) {
     LOGE("Failed to set flash protect");
     return std::unexpected(res.error());
