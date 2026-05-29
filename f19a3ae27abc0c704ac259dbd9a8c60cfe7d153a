@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "765e3c94_67ffa9f0",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-29T17:16:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "baa90f80_5c27ebb6",
+      "revId": "f19a3ae27abc0c704ac259dbd9a8c60cfe7d153a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4b74ac6a_22e7ac6e",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Done. It is set to max",
       "parentUuid": "4b74ac6a_22e7ac6e",
+      "revId": "f19a3ae27abc0c704ac259dbd9a8c60cfe7d153a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d72ee625_d1f12fb1",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-29T17:16:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fd63b84d_68ee3456",
       "revId": "f19a3ae27abc0c704ac259dbd9a8c60cfe7d153a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

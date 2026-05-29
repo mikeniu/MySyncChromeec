@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "532a0af0_acfa00bb",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-29T17:16:40Z",
+      "side": 1,
+      "message": "Why int32, not uint32?",
+      "range": {
+        "startLine": 132,
+        "startChar": 46,
+        "endLine": 132,
+        "endChar": 53
+      },
+      "revId": "bcd59f5945a727930d1e706c0223591f5bb1f431",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96d212f5_a6f4a5b1",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-29T17:16:40Z",
+      "side": 1,
+      "message": "I think using the `k_timeout_t` structure is not needed. And I think accessing the struct member is not a good approach. Maybe use a macro like `k_ms_to_ticks_ceil64(delay_ms)`?",
+      "range": {
+        "startLine": 137,
+        "startChar": 47,
+        "endLine": 137,
+        "endChar": 61
+      },
+      "revId": "bcd59f5945a727930d1e706c0223591f5bb1f431",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
