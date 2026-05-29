@@ -7,6 +7,7 @@ find_package(Zephyr REQUIRED HINTS "${ZEPHYR_BASE}")
 project(fpsensor_task_test)
 
 target_include_directories(app PUBLIC ${PLATFORM_EC}/common)
+zephyr_include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 target_sources(app PRIVATE src/mock_fingerprint_algorithm.c)
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_CAPTURE app PRIVATE
