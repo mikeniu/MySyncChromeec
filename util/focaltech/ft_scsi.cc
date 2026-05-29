@@ -3,17 +3,23 @@
  * found in the LICENSE file.
  */
 
-#include "ft_scsi.h"
-
 #include <endian.h>
+
+#include <bit>
 
 #include "ft_log.h"
 #include "ft_util.h"
+#include "usb_context.h"
+// To prevent the formatter from rearranging the header include order.
+#include "ft_scsi.h"
 
 namespace {
 
 constexpr uint32_t kUsbMsCbwSignature = 0x43425355;
 constexpr uint32_t kUsbMsCswSignature = 0x53425355;
+constexpr uint8_t kBotDirectionIn = static_cast<uint8_t>(LIBUSB_ENDPOINT_IN);
+constexpr uint8_t kBotDirectionOut = static_cast<uint8_t>(LIBUSB_ENDPOINT_OUT);
+constexpr uint8_t kBotCommandPassed = 0x00;
 
 struct BulkCbWrap {
   uint32_t signature;
@@ -42,116 +48,113 @@ struct FtCmdFormat {
   uint8_t reserved;
 } __attribute__((packed));
 
-uint32_t g_cdb_tag = 1;
+std::expected<BulkCbWrap, FtError> SendCbw(
+    const UsbDevice& device, std::span<const uint8_t> scsi_cmd,
+    size_t data_length, TransferDirection dir,
+    std::chrono::milliseconds timeout_ms) {
+  BulkCbWrap cbw{
+      .signature = htole32(kUsbMsCbwSignature),
+      .tag = htole32(device.GetNextCdbTag()),  // Using atomic thread-safe tag
+      .data_transfer_length = htole32(data_length),
+      .flags =
+          (dir == TransferDirection::kIn) ? kBotDirectionIn : kBotDirectionOut,
+      .lun = 0,
+      .cmd_len = static_cast<uint8_t>(scsi_cmd.size()),
+  };
+  std::memcpy(cbw.cmd, scsi_cmd.data(), scsi_cmd.size());
+
+  auto cbw_span = std::span<const uint8_t>(
+      reinterpret_cast<const uint8_t*>(&cbw), sizeof(cbw));
+  auto send_res = device.Send(cbw_span, timeout_ms);
+
+  if (!send_res || *send_res != sizeof(cbw)) {
+    LOGE("CBW transfer failed.");
+    return std::unexpected(FtError::kResultFail);
+  }
+  return cbw;
+}
+
+std::expected<void, FtError> ReceiveAndValidateCsw(
+    const UsbDevice& device, const BulkCbWrap& cbw,
+    std::chrono::milliseconds timeout_ms) {
+  BulkCsWrap csw{};
+  auto csw_span =
+      std::span<uint8_t>(reinterpret_cast<uint8_t*>(&csw), sizeof(csw));
+  auto recv_res = device.Recv(csw_span, timeout_ms);
+
+  if (!recv_res || *recv_res != sizeof(csw)) {
+    LOGE("CSW transfer failed.");
+    return std::unexpected(FtError::kResultFail);
+  }
+
+  if (le32toh(csw.signature) != kUsbMsCswSignature ||
+      le32toh(csw.tag) != le32toh(cbw.tag)) {
+    LOGE("CSW signature/tag mismatch.");
+    return std::unexpected(FtError::kResultFail);
+  }
+
+  if (csw.status != kBotCommandPassed) {
+    LOGW("Command failed with CSW status: {:02x}", csw.status);
+    return std::unexpected(FtError::kResultFail);
+  }
+  return {};
+}
 
 }  // namespace
 
 std::array<uint8_t, 16> BuildFtCmd(uint8_t opcode, uint8_t subcmd,
                                    uint32_t address, uint32_t length,
                                    uint32_t aux_address, uint8_t flags) {
-  std::array<uint8_t, 16> cmd_buf{};
-  auto* cmd = reinterpret_cast<FtCmdFormat*>(cmd_buf.data());
-
-  cmd->opcode = opcode;
-  cmd->subcmd = subcmd;
-  cmd->flags = flags;
-  cmd->address = address;
-  cmd->length = length;
-  cmd->aux_address = aux_address;
-
-  return cmd_buf;
+  FtCmdFormat cmd{
+      .opcode = opcode,
+      .address = address,
+      .length = length,
+      .aux_address = aux_address,
+      .subcmd = subcmd,
+      .flags = flags,
+      .reserved = 0,
+  };
+  return std::bit_cast<std::array<uint8_t, 16>>(cmd);
 }
 
-std::expected<void, FtError> SendBulkCommand(
+std::expected<void, FtError> SendBulkDataOut(
     const UsbDevice& device, std::span<const uint8_t> scsi_cmd,
-    std::span<uint8_t> data_buffer, TransferDirection dir,
+    std::span<const uint8_t> data_buffer, TransferDirection dir,
     std::chrono::milliseconds timeout_ms) {
-  if (scsi_cmd.size() > 16 || scsi_cmd.empty()) {
-    LOGE("Invalid SCSI command length.");
-    return std::unexpected(FtError::kParameterError);
-  }
+  auto cbw_res = SendCbw(device, scsi_cmd, data_buffer.size(), dir, timeout_ms);
+  if (!cbw_res) return std::unexpected(cbw_res.error());
 
-  // Build CBW
-  BulkCbWrap cbw{};
-  cbw.signature = htole32(kUsbMsCbwSignature);
-  cbw.tag = htole32(g_cdb_tag++);
-  cbw.flags = (dir == TransferDirection::kIn) ? 0x80 : 0x00;
-  cbw.lun = 0;
-  cbw.cmd_len = static_cast<uint8_t>(scsi_cmd.size());
-  cbw.data_transfer_length = htole32(data_buffer.size());
-  std::memcpy(cbw.cmd, scsi_cmd.data(), scsi_cmd.size());
-
-  // Send CBW
-  auto cbw_span = std::span<const uint8_t>(
-      reinterpret_cast<const uint8_t*>(&cbw), sizeof(cbw));
-  auto send_res = device.Send(cbw_span, timeout_ms.count());
-  if (!send_res) {
-    LOGE("CBW transfer failed.");
-    return std::unexpected(send_res.error());
-  }
-  if (*send_res != sizeof(cbw)) {
-    LOGE("CBW transfer short: sent {} of {}", *send_res, sizeof(cbw));
-    return std::unexpected(FtError::kResultFail);
-  }
-
-  // MCU reset, cannot receive data – wait for device removal instead
   if (dir == TransferDirection::kSendOnly) {
-    if (device.ResetComplete(3)) {
+    if (device.ResetComplete(kResetWaitTimeout))
       return std::unexpected(FtError::kResultFail);
-    }
     return {};
   }
 
-  // Data phase
   if (!data_buffer.empty()) {
-    if (dir == TransferDirection::kIn) {  // read from device
-      auto recv_res = device.Recv(data_buffer, timeout_ms.count());
-      if (!recv_res) {
-        LOGE("Data IN transfer failed.");
-        return std::unexpected(recv_res.error());
-      }
-      // actual received length is returned; caller can check if needed
-    } else {  // write to device
-      auto send_res = device.Send(data_buffer, timeout_ms.count());
-      if (!send_res) {
-        LOGE("Data OUT transfer failed.");
-        return std::unexpected(send_res.error());
-      }
-      if (*send_res != static_cast<int>(data_buffer.size())) {
-        LOGE("Data OUT transfer short: sent {} of {}", *send_res,
-             data_buffer.size());
-        return std::unexpected(FtError::kResultFail);
-      }
+    auto send_res = device.Send(data_buffer, timeout_ms);
+    if (!send_res || *send_res != static_cast<int>(data_buffer.size())) {
+      LOGE("Data OUT transfer failed.");
+      return std::unexpected(FtError::kResultFail);
     }
   }
 
-  // Receive CSW
-  BulkCsWrap csw{};
-  auto csw_span =
-      std::span<uint8_t>(reinterpret_cast<uint8_t*>(&csw), sizeof(csw));
-  auto recv_res = device.Recv(csw_span, timeout_ms.count());
-  if (!recv_res) {
-    LOGE("CSW transfer failed.");
+  return ReceiveAndValidateCsw(device, *cbw_res, timeout_ms);
+}
 
-    return std::unexpected(recv_res.error());
-  }
-  if (*recv_res != sizeof(csw)) {
-    LOGE("CSW transfer short: received {} of {}", *recv_res, sizeof(csw));
-    return std::unexpected(FtError::kResultFail);
-  }
+std::expected<void, FtError> ReceiveBulkDataIn(
+    const UsbDevice& device, std::span<const uint8_t> scsi_cmd,
+    std::span<uint8_t> data_buffer, std::chrono::milliseconds timeout_ms) {
+  auto cbw_res = SendCbw(device, scsi_cmd, data_buffer.size(),
+                         TransferDirection::kIn, timeout_ms);
+  if (!cbw_res) return std::unexpected(cbw_res.error());
 
-  // Validate CSW
-  if (le32toh(csw.signature) != kUsbMsCswSignature ||
-      le32toh(csw.tag) != le32toh(cbw.tag)) {
-    LOGE("CSW signature/tag mismatch.csw.tag={},{},sign={}", le32toh(csw.tag),
-         le32toh(cbw.tag), le32toh(csw.signature));
-    return std::unexpected(FtError::kResultFail);
+  if (!data_buffer.empty()) {
+    auto recv_res = device.Recv(data_buffer, timeout_ms);
+    if (!recv_res) {
+      LOGE("Data IN transfer failed.");
+      return std::unexpected(recv_res.error());
+    }
   }
 
-  if (csw.status != 0x00) {
-    LOGW("Command failed with CSW status: {:02x}", csw.status);
-    return std::unexpected(FtError::kResultFail);
-  }
-
-  return {};
+  return ReceiveAndValidateCsw(device, *cbw_res, timeout_ms);
 }
