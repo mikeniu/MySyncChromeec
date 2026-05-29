@@ -1040,42 +1040,13 @@ test_mockable void chipset_power_on(void)
  */
 static int warm_reset_seq(void)
 {
-	int rv;
-
 	/*
-	 * Warm reset sequence:
-	 * 1. Issue a high pulse to PMIC_RESIN, which triggers PMIC
-	 *    to do a warm reset (requiring reprogramming PMIC registers
-	 *    to make PMIC_RESIN as a warm reset trigger).
-	 * 2. PMIC then issues a low pulse to AP_RST_L and high pulse to PS_HOLD
-	 *    to reset AP. EC monitors the signal to check for pulses.
-	 *    2.1. If both pulse found, done.
-	 *    2.2. If a pulse not found (the above PMIC registers not
-	 *         programmed or programmed wrong), issue a request to initiate
-	 *         a cold reset power sequence.
+	 * Bypassing warm reset as it's currently unreliable.
+	 * Returning error to fall back to cold reset.
+	 * See b/511449849 for details.
 	 */
-
-	gpio_set_level(GPIO_PMIC_RESIN, 1);
-	crec_usleep(PMIC_RESIN_PULSE_LENGTH);
-	gpio_set_level(GPIO_PMIC_RESIN, 0);
-
-	/* Check that the PMIC asserts PON_RESET_N*/
-	rv = power_wait_signals_timeout(IN_AP_RST_ASSERTED,
-					PMIC_POWER_AP_RESPONSE_TIMEOUT);
-
-	/* Exception case: PMIC not work as expected, request a cold reset */
-	if (rv != EC_SUCCESS)
-		return rv;
-
-	CPRINTS("AP_RST asserted, checking PS_HOLD.");
-	/* Wait until ps_hold_ls goes back high*/
-	rv = power_wait_signals_timeout(IN_AP_PS_HOLD_DEASSERTED,
-					PMIC_POWER_AP_RESPONSE_TIMEOUT);
-	/* Exception case: PMIC not work as expected, request a cold reset */
-	if (rv != EC_SUCCESS)
-		return rv;
-
-	return EC_SUCCESS;
+	CPRINTS("Warm reset is skipped, falling back to cold reset");
+	return EC_ERROR_UNKNOWN;
 }
 
 /**
