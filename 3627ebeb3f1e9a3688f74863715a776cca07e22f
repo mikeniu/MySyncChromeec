@@ -38,6 +38,47 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9be9e957_16ae6c5f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 23
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T17:19:39Z",
+      "side": 1,
+      "message": "You deleted the `elaniap` binary. We need *both* the `elaniap` binary and the `elaniap_test` binary. Note that \"Step 2\" says \"append\", not \"replace\".",
+      "parentUuid": "8e5e1218_7e39bb31",
+      "revId": "3627ebeb3f1e9a3688f74863715a776cca07e22f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f437ab73_5737542c",
+        "filename": "util/elan/build.mk",
+        "patchSetId": 23
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T17:19:39Z",
+      "side": 1,
+      "message": "You deleted the `elaniap` binary. We need *both* the `elaniap` binary and the `elaniap_test` binary. `elaniap` is the real tool, while `elaniap_test` is only the tests.",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 19
+      },
+      "revId": "3627ebeb3f1e9a3688f74863715a776cca07e22f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "462932a7_18e26fd0",
         "filename": "util/elan/file_control.h",
         "patchSetId": 23
