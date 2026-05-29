@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3786698a_fc216124",
+        "filename": "util/elan/elaniap_test.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T17:36:15Z",
+      "side": 1,
+      "message": "Let\u0027s break these up into separate files that correspond to the source code being tested. Here\u0027s a Gemini generated example of how to do it. Make sure the tests compile and all run and pass:\n\n----\n\nThe industry standard—and specifically the Google C++ Style convention—is to maintain a strict 1:1 mapping between source files and test files.\n\nFor this project, that means breaking apart the single test file into three distinct files:\n\n* `file_control_test.cc`\n* `iap_control_test.cc`\n* `utility_test.cc`\n\nHere is why this architectural shift is highly recommended:\n\n### 1. Faster Incremental Builds\n\nIf you add a new test case for file handling, the compiler only has to rebuild `file_control_test.cc`. When everything is bundled into one monolithic file, adding a single assertion forces the compiler to re-parse and re-link all the tests for USB transfers, utility functions, and file operations. As the project grows, this becomes a major bottleneck.\n\n### 2. Immediate Discoverability\n\nA 1:1 mapping provides instant visual documentation. A developer (or future you) looking at `iap_control.cc` knows immediately to open `iap_control_test.cc` to understand the expected behavior, edge cases, and how the API is intended to be used.\n\n### 3. Test Parallelization\n\nModern test runners often optimize execution by running separate test files in parallel across different CPU cores. A massive, single test file limits the runner\u0027s ability to distribute the workload effectively.\n\n### 4. Scope Isolation\n\nIt prevents \"header bleed.\" If your utility tests need specific string-manipulation headers, and your USB tests need `libusb` mock headers, keeping them in separate files prevents unnecessary `#include` dependencies from polluting unrelated tests.\n\n---\n\n**How to implement this:**\nWhen you split the files up, you will no longer put the `main()` function at the bottom of a specific test file. Instead, you can simply update `util/elan/build.mk` to link against Google Test\u0027s pre-built main runner:\n\n```makefile\n$(_elaniap_test_bin): HOST_LDFLAGS+\u003d$(shell $(HOST_PKG_CONFIG) \\\n                      --libs libusb-1.0 gtest gtest_main gmock)\n\n```\n\nBy adding `gtest_main`, Google Test provides the `main()` function for you automatically, and it will discover and run all the `TEST` and `TEST_P` blocks across `file_control_test.cc`, `iap_control_test.cc`, and `utility_test.cc`.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 20
+      },
+      "revId": "1692e55b4150b77cae65241ac0ee49c5f935fd88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
