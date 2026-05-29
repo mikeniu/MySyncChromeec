@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "108b0237_51de291f",
+        "filename": "zephyr/test/pdc/src/pdc_policy/src_policy_3a_port.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 1158719
+      },
+      "writtenOn": "2026-05-29T00:03:11Z",
+      "side": 1,
+      "message": "if this is timing out now, maybe we put these into a `TEST_EXTENDED_TIMEOUT` constant with a comment quickly describing this?\n\ni\u0027m not super familiar with this codebase, so i defer to experts though :)",
+      "range": {
+        "startLine": 710,
+        "startChar": 58,
+        "endLine": 710,
+        "endChar": 62
+      },
+      "revId": "88ab5775320d990077e73a6e1b26ef087a8df37e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
