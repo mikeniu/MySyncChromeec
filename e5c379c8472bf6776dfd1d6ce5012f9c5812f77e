@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aaf47f44_57fb43ca",
+        "filename": "util/focaltech/build.mk",
+        "patchSetId": 14
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "After removing static, there will be linking problems.\n\n126|sapphire:/tmp # ls -l                                                                                                                                                                    \ntotal 4984\n-rwxrwxrwx 1 shell shell 1048576 2026-05-11 01:58 chudow_16673.0.0.bin\n-rwxrwxrwx 1 shell shell 4052448 2026-05-29 01:46 focaltech_fingerprint_iap\nsapphire:/tmp # ./focaltech_fingerprint_iap                                                                                                                                                  \n/system/bin/sh: ./focaltech_fingerprint_iap: No such file or directory\n126|sapphire:/tmp # ./focaltech_fingerprint_iap chudow_16673.0.0.bin                                                                                                                         \n/system/bin/sh: ./focaltech_fingerprint_iap: No such file or directory\n126|sapphire:/tmp # file focaltech_fingerprint_iap                                                                                                                                           \nfocaltech_fingerprint_iap: ELF shared object, 64-bit LSB arm64, dynamic (/lib/ld-linux-aarch64.so.1), BuildID\u003dc0d7aedc80d9611d90a5cca65294cd87ffd9b034, not stripped",
+      "parentUuid": "ef3df9e6_555b4aed",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 94
+      },
+      "revId": "e5c379c8472bf6776dfd1d6ce5012f9c5812f77e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b6b90d05_06b98de4",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-05-28T17:20:43Z",
       "side": 1,
       "message": "**File:** `util/focaltech/main.cc` (Lines \\~310-315)\n\n**Corrected Snippet:**\n\n```c\n      /*Fix an issue where, when the display is off but the system has not yet\n       * entered suspend, the host may forcibly switch the FPMCU into suspend\n       * state, causing the upgrade to fail. Retry updating the firmware.*/\n      for (int attempt \u003d 1; attempt \u003c\u003d kMaxRetry; ++attempt) {\n        if (auto res \u003d UpdateFw(usb_device, info); res) {\n          LOGI(\"Firmware update successful\");\n          return {};\n        }\n        LOGW(\"Firmware update fail attempt {}\", attempt);\n      }\n\n```\n\n* **Rationale:** The `k` prefix is strictly reserved for variables that are `constexpr` or `const` (constants). Mutable local variables and loop counters must use standard `snake_case`. Naming a mutable loop counter `kRetries` violates both the constant naming rule and the local variable naming rule.  \n* **Google Style Guide:** [Variable Names](https://google.github.io/styleguide/cppguide.html#Variable_Names) \u0026 [Constant Names](https://google.github.io/styleguide/cppguide.html#Constant_Names)",
+      "range": {
+        "startLine": 347,
+        "startChar": 0,
+        "endLine": 357,
+        "endChar": 7
+      },
+      "revId": "e5c379c8472bf6776dfd1d6ce5012f9c5812f77e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d201f5b2_d631948b",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 14
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6b90d05_06b98de4",
       "range": {
         "startLine": 347,
         "startChar": 0,
@@ -64,6 +112,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b5912c2_cbcb3dc9",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 14
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9d278842_1bdce42e",
+      "revId": "e5c379c8472bf6776dfd1d6ce5012f9c5812f77e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "38a38fa9_cac27134",
@@ -77,6 +143,30 @@
       "writtenOn": "2026-05-28T17:20:43Z",
       "side": 1,
       "message": "**File:** `util/focaltech/updater.cc` (and similarly for `usb_context.h`)\n\n**Corrected Snippet:**\n\n```c\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n\n#include \u003calgorithm\u003e\n#include \u003ccstdint\u003e\n#include \u003cfstream\u003e\n#include \u003cspan\u003e\n#include \u003cstring_view\u003e\n#include \u003cvector\u003e\n\n// Third-party libraries come AFTER standard C++ libraries\n#include \u003copenssl/sha.h\u003e\n\n#include \"ft_log.h\"\n#include \"ft_scsi.h\"\n#include \"ft_util.h\"\n\n```\n\n* **Rationale:** To prevent hidden dependencies, headers must be included in a strict order: 1\\) The related header, 2\\) C system headers, 3\\) C++ standard library headers, 4\\) Other libraries\u0027 headers, 5\\) Your project\u0027s headers. OpenSSL (`\u003copenssl/sha.h\u003e`) is a third-party library and belongs in group 4\\.  \n* **Google Style Guide:** [Names and Order of Includes](https://google.github.io/styleguide/cppguide.html#Names_and_Order_of_Includes)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 20
+      },
+      "revId": "e5c379c8472bf6776dfd1d6ce5012f9c5812f77e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56861715_6eac2b77",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 14
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Marked as resolved.",
+      "parentUuid": "38a38fa9_cac27134",
       "range": {
         "startLine": 7,
         "startChar": 0,
@@ -110,6 +200,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "147c9037_163724a1",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 14
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "13771406_5ec8619b",
+      "range": {
+        "startLine": 175,
+        "startChar": 0,
+        "endLine": 175,
+        "endChar": 26
+      },
+      "revId": "e5c379c8472bf6776dfd1d6ce5012f9c5812f77e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "71490a99_7b2983b8",
@@ -123,6 +237,30 @@
       "writtenOn": "2026-05-28T17:10:11Z",
       "side": 1,
       "message": "This is no longer used. Remove.",
+      "range": {
+        "startLine": 129,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 74
+      },
+      "revId": "e5c379c8472bf6776dfd1d6ce5012f9c5812f77e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d38df114_a1297351",
+        "filename": "util/focaltech/usb_context.h",
+        "patchSetId": 14
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "71490a99_7b2983b8",
       "range": {
         "startLine": 129,
         "startChar": 0,
@@ -156,6 +294,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2b88e8b_8efa7761",
+        "filename": "util/focaltech/usb_context.h",
+        "patchSetId": 14
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e4a66b3a_9f43798d",
+      "range": {
+        "startLine": 135,
+        "startChar": 0,
+        "endLine": 135,
+        "endChar": 36
+      },
+      "revId": "e5c379c8472bf6776dfd1d6ce5012f9c5812f77e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "439dc149_00a1b3e8",
@@ -169,6 +331,30 @@
       "writtenOn": "2026-05-28T17:10:11Z",
       "side": 1,
       "message": "This is no longer used. Remove.",
+      "range": {
+        "startLine": 151,
+        "startChar": 0,
+        "endLine": 151,
+        "endChar": 77
+      },
+      "revId": "e5c379c8472bf6776dfd1d6ce5012f9c5812f77e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c48451a1_d1573196",
+        "filename": "util/focaltech/usb_context.h",
+        "patchSetId": 14
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "439dc149_00a1b3e8",
       "range": {
         "startLine": 151,
         "startChar": 0,

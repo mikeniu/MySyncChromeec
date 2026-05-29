@@ -70,6 +70,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6451eff2_784a9cf4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "59bd0021_2f2eaf32",
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "027b3205_7ae84456",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c9e38df7_cea796b8",
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5d7a12e3_5f8b347e",
@@ -83,6 +119,30 @@
       "writtenOn": "2026-05-28T17:37:16Z",
       "side": 1,
       "message": "Having global (or static) variables is not good practice. Here\u0027s a Gemini-generated way to eliminate it. Check for correctness.\n\n----\n\nEven when hidden in an anonymous namespace, a global state variable like `g_cdb_tag` (or `cdb_tag`) is an anti-pattern. It makes the code harder to test, introduces hidden dependencies, and is inherently not thread-safe.\n\nIn the context of USB Mass Storage Bulk-Only Transport, the `tag` is a sequence number used to match a Command Block Wrapper (CBW) with its corresponding Command Status Wrapper (CSW). Therefore, **the tag logically belongs to the USB connection session**.\n\nThe best way to eliminate the global variable is to encapsulate this state within the `UsbDevice` class. Here is how to cleanly refactor the code:\n\n### Step 1: Add the tag state to `UsbDevice`\n\nOpen `util/focaltech/usb_context.h` and add a new atomic member variable to the `UsbDevice` class, along with a getter method to safely increment and retrieve it.\n\n**In `usb_context.h` (inside the `UsbDevice` class):**\n\n```cpp\nclass UsbDevice {\n public:\n  // ... existing methods ...\n\n  // Safe method to get and increment the command tag\n  uint32_t GetNextCdbTag() const { \n    // fetch_add returns the value before addition, matching the post-increment behavior\n    return cdb_tag_.fetch_add(1, std::memory_order_relaxed); \n  }\n\n  // ... existing methods ...\n\n private:\n  // ... existing private members ...\n  \n  libusb_context* ctx_ \u003d nullptr;\n  \n  // Encapsulated state for SCSI command sequence matching.\n  // Marked mutable so it can be incremented even when UsbDevice is passed as const.\n  mutable std::atomic\u003cuint32_t\u003e cdb_tag_{1};\n};\n\n```\n\n### Step 2: Use the encapsulated tag in `ft_scsi.cc`\n\nNow, open `util/focaltech/ft_scsi.cc`. Delete the global variable entirely and update `SendBulkCommand` to request the tag from the `device` object passed into it.\n\n**In `ft_scsi.cc`:**\n\n```cpp\n// 1. DELETE this line from the anonymous namespace:\n// uint32_t g_cdb_tag \u003d 1; \n\n// ...\n\nstd::expected\u003cvoid, FtError\u003e SendBulkCommand(\n    const UsbDevice\u0026 device, std::span\u003cconst uint8_t\u003e scsi_cmd,\n    std::span\u003cuint8_t\u003e data_buffer, TransferDirection dir,\n    std::chrono::milliseconds timeout_ms) {\n  \n  if (scsi_cmd.size() \u003e 16 || scsi_cmd.empty()) {\n    LOGE(\"Invalid SCSI command length.\");\n    return std::unexpected(FtError::kParameterError);\n  }\n\n  // 2. UPDATE the CBW construction to use the device\u0027s tag:\n  BulkCbWrap cbw{};\n  cbw.signature \u003d htole32(kUsbMsCbwSignature);\n  cbw.tag \u003d htole32(device.GetNextCdbTag()); // \u003c--- Changed here\n  cbw.flags \u003d (dir \u003d\u003d TransferDirection::kIn) ? 0x80 : 0x00;\n  // ...\n\n```\n\n### Why this is the best approach:\n\n* **No Global State:** You have completely eliminated the external variable.\n* **Thread Safety:** By using `std::atomic\u003cuint32_t\u003e`, you ensure that if multiple threads were to ever share the same `UsbDevice` instance, the tags would remain perfectly sequential without race conditions.\n* **Correct Architecture:** If the tool ever evolves to support flashing multiple FocalTech devices simultaneously, each `UsbDevice` instance will correctly maintain its own independent tag sequence, avoiding tag collisions between different USB endpoints.",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 23
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b5f019a_a7ebc0a0",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d7a12e3_5f8b347e",
       "range": {
         "startLine": 45,
         "startChar": 0,
@@ -116,6 +176,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c2611cf_239cd6d2",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba9d6216_ced31581",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 63,
+        "endChar": 1
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8db88dc0_5f853b54",
@@ -129,6 +213,30 @@
       "writtenOn": "2026-05-28T17:40:23Z",
       "side": 1,
       "message": "Let\u0027s use designated initializers. Gemini generated code below. Check for correctness.\n\n-----\n\nIn `ft_scsi.cc` (`SendBulkCommand` or our refactored `SendCbw` helper), you initialize `BulkCbWrap` line by line. Using designated initializers makes it immediately clear what data goes into the struct upon creation.\n\n**Before:**\n\n```c\n  BulkCbWrap cbw{};\n  cbw.signature \u003d htole32(kUsbMsCbwSignature);\n  cbw.tag \u003d htole32(g_cdb_tag++);\n  cbw.flags \u003d (dir \u003d\u003d TransferDirection::kIn) ? 0x80 : 0x00;\n  cbw.lun \u003d 0;\n  cbw.cmd_len \u003d static_cast\u003cuint8_t\u003e(scsi_cmd.size());\n  cbw.data_transfer_length \u003d htole32(data_buffer.size());\n  std::memcpy(cbw.cmd, scsi_cmd.data(), scsi_cmd.size());\n\n```\n\n**After:**\n\n```c\n  BulkCbWrap cbw{\n      .signature \u003d htole32(kUsbMsCbwSignature),\n      .tag \u003d htole32(device.GetNextCdbTag()), // Using our previous refactor\n      .data_transfer_length \u003d htole32(data_buffer.size()),\n      .flags \u003d static_cast\u003cuint8_t\u003e((dir \u003d\u003d TransferDirection::kIn) ? 0x80 : 0x00),\n      .lun \u003d 0,\n      .cmd_len \u003d static_cast\u003cuint8_t\u003e(scsi_cmd.size()),\n      // Any omitted fields (like .cmd) are automatically zero-initialized\n  };\n  \n  // We still use memcpy for the array field because we are copying a span\n  std::memcpy(cbw.cmd, scsi_cmd.data(), scsi_cmd.size());\n\n```",
+      "range": {
+        "startLine": 74,
+        "startChar": 1,
+        "endLine": 83,
+        "endChar": 0
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ef92b8c_4437367e",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8db88dc0_5f853b54",
       "range": {
         "startLine": 74,
         "startChar": 1,
@@ -162,6 +270,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "58edff6b_b306c5d4",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f8d88cf9_f7faea5d",
+      "range": {
+        "startLine": 123,
+        "startChar": 1,
+        "endLine": 124,
+        "endChar": 75
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8070ca86_d1ad6b4d",
@@ -185,6 +317,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "32c27b8e_71eaf891",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8070ca86_d1ad6b4d",
+      "range": {
+        "startLine": 238,
+        "startChar": 1,
+        "endLine": 238,
+        "endChar": 19
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fcde0f39_15a05179",
@@ -198,6 +354,30 @@
       "writtenOn": "2026-05-28T17:21:30Z",
       "side": 1,
       "message": "Casting shouldn\u0027t be needed here",
+      "range": {
+        "startLine": 113,
+        "startChar": 0,
+        "endLine": 113,
+        "endChar": 68
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "765ee277_3931e4f0",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fcde0f39_15a05179",
       "range": {
         "startLine": 113,
         "startChar": 0,
@@ -245,6 +425,30 @@
       "side": 1,
       "message": "Gemini generated fix. Check for correctness:\n\n----\n\n### 1. `util/focaltech/ft_scsi.h`\n\nReplace the single `SendBulkCommand` declaration with two explicit, strictly typed functions.\n\n```cpp\n#ifndef UTIL_FOCALTECH_FT_SCSI_H_\n#define UTIL_FOCALTECH_FT_SCSI_H_\n\n#include \u003carray\u003e\n#include \u003cchrono\u003e\n#include \u003ccstdint\u003e\n#include \u003ccstring\u003e\n#include \u003cexpected\u003e\n#include \u003cspan\u003e\n\n#include \"usb_context.h\"\n\nstd::array\u003cuint8_t, 16\u003e BuildFtCmd(uint8_t opcode, uint8_t subcmd,\n                                   uint32_t address \u003d 0, uint32_t length \u003d 0,\n                                   uint32_t aux_address \u003d 0, uint8_t flags \u003d 0);\n\n// For sending data TO the device (Data buffer is const)\nstd::expected\u003cvoid, FtError\u003e SendBulkDataOut(\n    const UsbDevice\u0026 device, std::span\u003cconst uint8_t\u003e scsi_cmd,\n    std::span\u003cconst uint8_t\u003e data_buffer, TransferDirection dir,\n    std::chrono::milliseconds timeout_ms);\n\n// For receiving data FROM the device (Data buffer is mutable)\nstd::expected\u003cvoid, FtError\u003e ReceiveBulkDataIn(\n    const UsbDevice\u0026 device, std::span\u003cconst uint8_t\u003e scsi_cmd,\n    std::span\u003cuint8_t\u003e data_buffer, std::chrono::milliseconds timeout_ms);\n\n#endif  // UTIL_FOCALTECH_FT_SCSI_H_\n\n```\n\n---\n\n### 2. `util/focaltech/ft_scsi.cc`\n\nReplace everything below your includes with this modernized block. It uses designated initializers, `std::bit_cast`, and the private helpers to route the new public functions safely.\n\n```cpp\n#include \u003cbit\u003e // Required for std::bit_cast\n\nnamespace {\n\nconstexpr uint32_t kUsbMsCbwSignature \u003d 0x43425355;\nconstexpr uint32_t kUsbMsCswSignature \u003d 0x53425355;\n\nstruct BulkCbWrap {\n  uint32_t signature;\n  uint32_t tag;\n  uint32_t data_transfer_length;\n  uint8_t flags;\n  uint8_t lun;\n  uint8_t cmd_len;\n  uint8_t cmd[16];\n} __attribute__((packed));\n\nstruct BulkCsWrap {\n  uint32_t signature;\n  uint32_t tag;\n  uint32_t data_residue;\n  uint8_t status;\n} __attribute__((packed));\n\nstruct FtCmdFormat {\n  uint8_t opcode;\n  uint32_t address;\n  uint32_t length;\n  uint32_t aux_address;\n  uint8_t subcmd;\n  uint8_t flags;\n  uint8_t reserved;\n} __attribute__((packed));\n\nstd::expected\u003cBulkCbWrap, FtError\u003e SendCbw(\n    const UsbDevice\u0026 device, std::span\u003cconst uint8_t\u003e scsi_cmd,\n    size_t data_length, TransferDirection dir,\n    std::chrono::milliseconds timeout_ms) {\n  BulkCbWrap cbw{\n      .signature \u003d htole32(kUsbMsCbwSignature),\n      .tag \u003d htole32(device.GetNextCdbTag()), // Using atomic thread-safe tag\n      .data_transfer_length \u003d htole32(data_length),\n      .flags \u003d static_cast\u003cuint8_t\u003e((dir \u003d\u003d TransferDirection::kIn) ? 0x80 : 0x00),\n      .lun \u003d 0,\n      .cmd_len \u003d static_cast\u003cuint8_t\u003e(scsi_cmd.size()),\n  };\n  std::memcpy(cbw.cmd, scsi_cmd.data(), scsi_cmd.size());\n\n  auto cbw_span \u003d std::span\u003cconst uint8_t\u003e(\n      reinterpret_cast\u003cconst uint8_t*\u003e(\u0026cbw), sizeof(cbw));\n  auto send_res \u003d device.Send(cbw_span, timeout_ms.count());\n\n  if (!send_res || *send_res !\u003d sizeof(cbw)) {\n    LOGE(\"CBW transfer failed.\");\n    return std::unexpected(FtError::kResultFail);\n  }\n  return cbw;\n}\n\nstd::expected\u003cvoid, FtError\u003e ReceiveAndValidateCsw(\n    const UsbDevice\u0026 device, const BulkCbWrap\u0026 cbw,\n    std::chrono::milliseconds timeout_ms) {\n  BulkCsWrap csw{};\n  auto csw_span \u003d\n      std::span\u003cuint8_t\u003e(reinterpret_cast\u003cuint8_t*\u003e(\u0026csw), sizeof(csw));\n  auto recv_res \u003d device.Recv(csw_span, timeout_ms.count());\n\n  if (!recv_res || *recv_res !\u003d sizeof(csw)) {\n    LOGE(\"CSW transfer failed.\");\n    return std::unexpected(FtError::kResultFail);\n  }\n\n  if (le32toh(csw.signature) !\u003d kUsbMsCswSignature ||\n      le32toh(csw.tag) !\u003d le32toh(cbw.tag)) {\n    LOGE(\"CSW signature/tag mismatch.\");\n    return std::unexpected(FtError::kResultFail);\n  }\n\n  if (csw.status !\u003d 0x00) {\n    LOGW(\"Command failed with CSW status: {:02x}\", csw.status);\n    return std::unexpected(FtError::kResultFail);\n  }\n  return {};\n}\n\n}  // namespace\n\nstd::array\u003cuint8_t, 16\u003e BuildFtCmd(uint8_t opcode, uint8_t subcmd,\n                                   uint32_t address, uint32_t length,\n                                   uint32_t aux_address, uint8_t flags) {\n  FtCmdFormat cmd{\n      .opcode \u003d opcode,\n      .address \u003d address,\n      .length \u003d length,\n      .aux_address \u003d aux_address,\n      .subcmd \u003d subcmd,\n      .flags \u003d flags,\n      .reserved \u003d 0,\n  };\n  return std::bit_cast\u003cstd::array\u003cuint8_t, 16\u003e\u003e(cmd);\n}\n\nstd::expected\u003cvoid, FtError\u003e SendBulkDataOut(\n    const UsbDevice\u0026 device, std::span\u003cconst uint8_t\u003e scsi_cmd,\n    std::span\u003cconst uint8_t\u003e data_buffer, TransferDirection dir,\n    std::chrono::milliseconds timeout_ms) {\n  auto cbw_res \u003d SendCbw(device, scsi_cmd, data_buffer.size(), dir, timeout_ms);\n  if (!cbw_res) return std::unexpected(cbw_res.error());\n\n  if (dir \u003d\u003d TransferDirection::kSendOnly) {\n    if (device.ResetComplete(3)) return std::unexpected(FtError::kResultFail);\n    return {};\n  }\n\n  if (!data_buffer.empty()) {\n    auto send_res \u003d device.Send(data_buffer, timeout_ms.count());\n    if (!send_res || *send_res !\u003d static_cast\u003cint\u003e(data_buffer.size())) {\n      LOGE(\"Data OUT transfer failed.\");\n      return std::unexpected(FtError::kResultFail);\n    }\n  }\n\n  return ReceiveAndValidateCsw(device, *cbw_res, timeout_ms);\n}\n\nstd::expected\u003cvoid, FtError\u003e ReceiveBulkDataIn(\n    const UsbDevice\u0026 device, std::span\u003cconst uint8_t\u003e scsi_cmd,\n    std::span\u003cuint8_t\u003e data_buffer, std::chrono::milliseconds timeout_ms) {\n  auto cbw_res \u003d SendCbw(device, scsi_cmd, data_buffer.size(),\n                         TransferDirection::kIn, timeout_ms);\n  if (!cbw_res) return std::unexpected(cbw_res.error());\n\n  if (!data_buffer.empty()) {\n    auto recv_res \u003d device.Recv(data_buffer, timeout_ms.count());\n    if (!recv_res) {\n      LOGE(\"Data IN transfer failed.\");\n      return std::unexpected(recv_res.error());\n    }\n  }\n\n  return ReceiveAndValidateCsw(device, *cbw_res, timeout_ms);\n}\n\n```\n\n---\n\n### 3. `util/focaltech/updater.cc`\n\nFirst, replace your single `SendAction` function with the two split versions:\n\n```cpp\n// For sending data to the MCU\nstd::expected\u003cvoid, FtError\u003e SendActionOut(\n    const UsbDevice\u0026 device, uint8_t subcmd, uint32_t address,\n    std::span\u003cconst uint8_t\u003e data, TransferDirection dir,\n    std::chrono::milliseconds timeout, uint32_t length \u003d 0,\n    uint32_t aux_address \u003d 0, uint8_t flags \u003d 0) {\n  auto cmd \u003d\n      BuildFtCmd(kFtCmdAction, subcmd, address, length, aux_address, flags);\n  return SendBulkDataOut(device, cmd, data, dir, timeout);\n}\n\n// For reading data from the MCU\nstd::expected\u003cvoid, FtError\u003e ReceiveActionIn(\n    const UsbDevice\u0026 device, uint8_t subcmd, uint32_t address,\n    std::span\u003cuint8_t\u003e data, std::chrono::milliseconds timeout,\n    uint32_t length \u003d 0, uint32_t aux_address \u003d 0, uint8_t flags \u003d 0) {\n  auto cmd \u003d\n      BuildFtCmd(kFtCmdAction, subcmd, address, length, aux_address, flags);\n  return ReceiveBulkDataIn(device, cmd, data, timeout);\n}\n\n```\n\nThen, update the actual function calls throughout the rest of `updater.cc`:\n\n**In `FtErasePage`:**\n\n```cpp\n  return SendActionOut(device, kFtSubcmdErasePage, addr, {},\n                       TransferDirection::kOut, kErasePageTimeout, pages);\n\n```\n\n**In `FtDownloadPage` (The critical `const_cast` removal):**\n\n```cpp\n  // Write data to SRAM\n  auto res \u003d SendActionOut(\n      device, kFtSubcmdWriteBin, kFtWriteSramAddr,\n      data.subspan(0, per_len), // Clean and type-safe! No const_cast.\n      TransferDirection::kOut, kDownloadPageTimeout, per_len);\n  if (!res) {\n    LOGE(\"Write bin error\");\n    return res;\n  }\n\n  // Execute code\n  res \u003d SendActionOut(device, kFtSubcmdCodeBin, downaddr, {},\n                      TransferDirection::kOut, kDownloadPageTimeout, per_len,\n                      kFtWriteSramAddr);\n\n```\n\n**In `FtVerifyData`:**\n\n```cpp\n  auto io_res \u003d ReceiveActionIn(\n      device, kFtSubcmdVerify, target_addr, device_hash,\n      kVerifyHashTimeout, firmware_data.size(), 0, hash_mode);\n\n```\n\n**In `FtMcuReset`:**\n\n```cpp\n  return SendActionOut(device, kFtSubcmdSoftReset, 0, {},\n                       TransferDirection::kSendOnly, kMcuResetTimeout, 0, 0,\n                       kSoftPor);\n\n```\n\n**In `FtGetFlashProtect`:**\n\n```cpp\n  auto res \u003d ReceiveActionIn(device, kFtSubcmdFlashWpGet, 0, data,\n                             kGenericInfoTimeout);\n\n```\n\n**In `FtSetFlashProtect`:**\n\n```cpp\n  auto res \u003d ReceiveActionIn(\n      device, kFtSubcmdFlashWpSet, static_cast\u003cuint32_t\u003e(wp_area), dummy,\n      kGenericInfoTimeout, ~static_cast\u003cuint32_t\u003e(wp_area));\n\n```",
       "parentUuid": "d76f0322_98d3c333",
+      "range": {
+        "startLine": 124,
+        "startChar": 0,
+        "endLine": 124,
+        "endChar": 80
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33db0c80_f69971f4",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc365a27_bc8e3004",
       "range": {
         "startLine": 124,
         "startChar": 0,
@@ -325,6 +529,54 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6808d01a_ed2e15c5",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e0ab41f_ede0165a",
+      "range": {
+        "startLine": 146,
+        "startChar": 0,
+        "endLine": 148,
+        "endChar": 70
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5925ab33_19b65c64",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b8d3041_133470ef",
+      "range": {
+        "startLine": 148,
+        "startChar": 0,
+        "endLine": 148,
+        "endChar": 70
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "54bf2ad3_558c3844",
@@ -348,6 +600,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "804b89c8_b554f3fa",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "54bf2ad3_558c3844",
+      "range": {
+        "startLine": 187,
+        "startChar": 0,
+        "endLine": 187,
+        "endChar": 77
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "960c32a6_71a7067d",
@@ -361,6 +637,30 @@
       "writtenOn": "2026-05-28T18:10:14Z",
       "side": 1,
       "message": "This function is very long and complex, which makes it hard to read and maintain.\n\nHere\u0027s Gemini-generated code to fix it. Check for correctness:\n\n----\n\n`UsbDevice::Create` is suffering from \"God Function\" syndrome. It is trying to do too many things at once, violating the Single Responsibility Principle (SRP) and introducing deep, difficult-to-read nesting (the endpoint discovery loop is four levels deep!).\n\nA clean factory method should read like a high-level table of contents. We can drastically simplify this by extracting the heavily nested logic into private static helper functions inside the anonymous namespace of `usb_context.cc`.\n\nHere is how to slice that monolithic function into readable, maintainable pieces.\n\n### Step 1: Extract Device Discovery\n\nPull the iteration over the `libusb` device list into its own helper. This isolates the VID/PID matching logic.\n\n**Add to the anonymous namespace in `usb_context.cc`:**\n\n```cpp\n// Helper to find the specific FocalTech device in the USB tree\nlibusb_device* FindFocalDevice(libusb_device** list, ssize_t count, \n                               libusb_device_descriptor\u0026 out_desc) {\n  for (ssize_t i \u003d 0; i \u003c count; ++i) {\n    libusb_device* dev \u003d list[i];\n    if (libusb_get_device_descriptor(dev, \u0026out_desc) \u003c 0) {\n      continue;\n    }\n\n    if (out_desc.idVendor \u003d\u003d kFocalBootVid || \n        out_desc.idVendor \u003d\u003d kFocalRomVid ||\n        out_desc.idVendor \u003d\u003d kFocalEcVid) {\n          \n      // Filter out non-fingerprint Google devices\n      if (out_desc.idVendor \u003d\u003d kFocalEcVid \u0026\u0026 \n          (out_desc.idProduct !\u003d kFocalEcPidTest \u0026\u0026\n           out_desc.idProduct !\u003d kFocalEcPid9865 \u0026\u0026\n           out_desc.idProduct !\u003d kFocalEcPid9869)) {\n        LOGI(\"Found Google device {:04x}:{:04x}, but not Focal. Skipping.\",\n             out_desc.idVendor, out_desc.idProduct);\n        continue;\n      }\n      return dev; // Match found\n    }\n  }\n  return nullptr;\n}\n\n```\n\n### Step 2: Extract Endpoint Discovery\n\nThis is the biggest win for readability. Pulling the 4-level deep nested loop out of the main function prevents cognitive overload.\n\n**Add to the anonymous namespace in `usb_context.cc`:**\n\n```cpp\n// Helper to parse the configuration descriptor for bulk IN/OUT endpoints\nbool FindBulkEndpoints(libusb_device* dev, UsbConnectionDetails\u0026 details) {\n  libusb_config_descriptor* config \u003d nullptr;\n  if (libusb_get_config_descriptor(dev, 0, \u0026config) !\u003d LIBUSB_SUCCESS) {\n    return false;\n  }\n\n  bool found_endpoints \u003d false;\n\n  for (int j \u003d 0; j \u003c config-\u003ebNumInterfaces \u0026\u0026 !found_endpoints; ++j) {\n    const libusb_interface\u0026 interface \u003d config-\u003einterface[j];\n    \n    for (int k \u003d 0; k \u003c interface.num_altsetting \u0026\u0026 !found_endpoints; ++k) {\n      const libusb_interface_descriptor\u0026 alt \u003d interface.altsetting[k];\n      details.interface_num \u003d alt.bInterfaceNumber;\n\n      for (int l \u003d 0; l \u003c alt.bNumEndpoints; ++l) {\n        const libusb_endpoint_descriptor\u0026 ep \u003d alt.endpoint[l];\n        \n        if ((ep.bmAttributes \u0026 LIBUSB_TRANSFER_TYPE_MASK) \u003d\u003d LIBUSB_TRANSFER_TYPE_BULK) {\n          if ((ep.bEndpointAddress \u0026 LIBUSB_ENDPOINT_DIR_MASK) \u003d\u003d LIBUSB_ENDPOINT_IN) {\n            details.ep_bulk_in \u003d ep.bEndpointAddress;\n          } else {\n            details.ep_bulk_out \u003d ep.bEndpointAddress;\n          }\n        }\n      }\n      if (details.ep_bulk_in !\u003d 0 \u0026\u0026 details.ep_bulk_out !\u003d 0) {\n        found_endpoints \u003d true;\n      }\n    }\n  }\n  \n  libusb_free_config_descriptor(config);\n  return found_endpoints;\n}\n\n```\n\n### Step 3: Rewrite `UsbDevice::Create`\n\nNow, the factory method acts strictly as an orchestrator. It reads sequentially, clearly detailing the steps to establish a connection without getting bogged down in the implementation details.\n\n**Replace the existing `UsbDevice::Create` with this:**\n\n```cpp\nstd::expected\u003cUsbDevice, FtError\u003e UsbDevice::Create(\n    const UsbContext\u0026 ctx, UsbConnectionDetails\u0026 out_details) {\n        \n  libusb_device** list_raw \u003d nullptr;\n  ssize_t count \u003d libusb_get_device_list(ctx.get(), \u0026list_raw);\n  if (count \u003c 0) {\n    LOGE(\"Failed to get USB device list: {}\", libusb_error_name(count));\n    return std::unexpected(FtError::kNoSuchDevice);\n  }\n  ScopedDeviceList dev_list(list_raw);\n\n  // 1. Find Device\n  libusb_device_descriptor target_desc{};\n  libusb_device* target_dev \u003d FindFocalDevice(dev_list.get(), count, target_desc);\n  if (!target_dev) {\n    return std::unexpected(FtError::kNoSuchDevice);\n  }\n  \n  out_details.vid \u003d target_desc.idVendor;\n  out_details.pid \u003d target_desc.idProduct;\n  LOGI(\"Found device VID {:04x}: PID {:04x}\", out_details.vid, out_details.pid);\n\n  // 2. Open Handle\n  libusb_device_handle* handle \u003d nullptr;\n  int r \u003d libusb_open(target_dev, \u0026handle);\n  if (r !\u003d LIBUSB_SUCCESS || !handle) {\n    LOGE(\"Failed to open device: {}\", libusb_error_name(r));\n    return std::unexpected(FtError::kNoSuchDevice);\n  }\n  std::unique_ptr\u003clibusb_device_handle, LibusbDeviceHandleDeleter\u003e handle_holder(handle);\n\n  // 3. Find Endpoints\n  if (!FindBulkEndpoints(target_dev, out_details)) {\n    LOGE(\"Could not find required bulk IN/OUT endpoints.\");\n    return std::unexpected(FtError::kNoSuchDevice);\n  }\n\n  // 4. Initialize Connection (Detach, Reset, Claim)\n  if (libusb_kernel_driver_active(handle_holder.get(), out_details.interface_num) \u003d\u003d 1) {\n    if (libusb_detach_kernel_driver(handle_holder.get(), out_details.interface_num) !\u003d LIBUSB_SUCCESS) {\n      LOGE(\"Failed to detach kernel driver.\");\n      return std::unexpected(FtError::kResultFail);\n    }\n  }\n\n  if (libusb_reset_device(handle_holder.get()) \u003c 0) {\n    LOGE(\"Failed to reset the device\");\n    return std::unexpected(FtError::kResultFail);\n  }\n  std::this_thread::sleep_for(std::chrono::milliseconds(200)); \n\n  if (libusb_claim_interface(handle_holder.get(), out_details.interface_num) \u003c 0) {\n    LOGE(\"Failed to claim interface.\");\n    return std::unexpected(FtError::kResultFail);\n  }\n\n  // 5. Transfer ownership to the class\n  return UsbDevice(handle_holder.release(), out_details.ep_bulk_in, \n                   out_details.ep_bulk_out, ctx.get());\n}\n\n```",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 169,
+        "endChar": 1
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eeca554d_a97ce02a",
+        "filename": "util/focaltech/usb_context.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "960c32a6_71a7067d",
       "range": {
         "startLine": 30,
         "startChar": 0,
@@ -418,6 +718,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9effedfc_65da4319",
+        "filename": "util/focaltech/usb_context.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "27749ecf_006305e9",
+      "range": {
+        "startLine": 184,
+        "startChar": 1,
+        "endLine": 193,
+        "endChar": 3
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "075bdddf_cb1e3514",
@@ -431,6 +755,30 @@
       "writtenOn": "2026-05-28T17:52:02Z",
       "side": 1,
       "message": "Let\u0027s make this return `std::expected` like other functions. Also should use `std::chrono` for the arg. Here\u0027s a Gemini-generated fix. Check for correctness:\n\n----\n\nIn modern C++, passing raw integers to represent time is a known anti-pattern. It forces the caller to guess or check the documentation to know whether `3` means 3 seconds, 3 milliseconds, or 3 microseconds. Since the rest of the SCSI API in this patch (like `SendBulkDataOut`) is already using `std::chrono::milliseconds`, `ResetComplete` definitely needs the `\u003cchrono\u003e` treatment to unify the API and enforce type safety.\n\nHere is how you can rewrite `ResetComplete` to fully embrace `std::chrono`.\n\nAs a bonus, by using `std::chrono::steady_clock`, we can make the timeout calculation immune to thread-scheduling delays (previously, `elapsed_ms +\u003d 100` assumed `sleep_for(100ms)` took exactly 100ms, which is rarely true at the OS level).\n\n### 1. Update the Header (`usb_context.h`)\n\nWe change the signature to accept a strongly-typed `std::chrono::milliseconds`. This matches the other APIs and allows the user to pass any chrono duration (seconds, minutes, etc.), which the compiler will safely auto-convert to milliseconds.\n\n```cpp\n#include \u003cchrono\u003e\n\nclass UsbDevice {\n  // ...\n  \n  // Pass a std::chrono duration instead of a raw int\n  std::expected\u003cvoid, FtError\u003e ResetComplete(std::chrono::milliseconds timeout) const;\n  \n  // ...\n};\n\n```\n\n### 2. Update the Implementation (`usb_context.cc`)\n\nWe replace the integer math with proper time-point comparisons.\n\n```cpp\nstd::expected\u003cvoid, FtError\u003e UsbDevice::ResetComplete(\n    std::chrono::milliseconds timeout) const {\n  if (!handle_) {\n    LOGE(\"Invalid device handle\");\n    return std::unexpected(FtError::kNoSuchDevice);\n  }\n\n  constexpr auto poll_interval \u003d std::chrono::milliseconds(100);\n  \n  const auto start_time \u003d std::chrono::steady_clock::now();\n\n  while (true) {\n    int config \u003d 0;\n    int r \u003d libusb_get_configuration(handle_.get(), \u0026config);\n\n    if (r \u003d\u003d LIBUSB_ERROR_NO_DEVICE) {\n      LOGI(\"USB device removal/reset detected\");\n      return {};\n    } else {\n      LOGV(\"r\u003d{}\", r);\n    }\n\n    auto elapsed \u003d std::chrono::steady_clock::now() - start_time;\n    if (timeout !\u003d std::chrono::milliseconds::zero() \u0026\u0026 elapsed \u003e\u003d timeout) {\n      break;\n    }\n\n    std::this_thread::sleep_for(poll_interval);\n  }\n\n  LOGW(\"Timeout after {} ms waiting for device removal\", timeout.count());\n  return std::unexpected(FtError::kResultFail);\n}\n\n```\n\n### 3. Update the Call Sites\n\nNow, when you call `ResetComplete` in `ft_scsi.cc`, you get to use standard C++ chrono literals (like `3s` for 3 seconds), which makes the code incredibly readable:\n\n```cpp\nusing namespace std::chrono_literals;\n\n// ... inside SendBulkDataOut:\n\n  if (dir \u003d\u003d TransferDirection::kSendOnly) {\n    // Beautiful, self-documenting code. \n    // The compiler knows \u00273s\u0027 is 3000 milliseconds.\n    if (auto res \u003d device.ResetComplete(3s); !res) {\n      return std::unexpected(res.error());\n    }\n    return {};\n  }\n\n```",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 254,
+        "endChar": 0
+      },
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2728ff7_c30ff62d",
+        "filename": "util/focaltech/usb_context.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-05-29T09:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "075bdddf_cb1e3514",
       "range": {
         "startLine": 223,
         "startChar": 0,
