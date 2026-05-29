@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f29605b_20e666a5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1504745
+      },
+      "writtenOn": "2026-05-29T20:57:10Z",
+      "side": 1,
+      "message": "This should now be fixed in an LLVM backport here: https://chromium-review.git.corp.google.com/c/external/github.com/llvm/llvm-project/+/7881158",
+      "revId": "2524d73dbde899de99b5e87408841f684647a8a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
