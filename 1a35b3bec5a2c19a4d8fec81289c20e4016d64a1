@@ -46,6 +46,30 @@
       },
       "revId": "1a35b3bec5a2c19a4d8fec81289c20e4016d64a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5899cda6_f3085e8b",
+        "filename": "zephyr/program/calypso/src/battery.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1369106
+      },
+      "writtenOn": "2026-05-29T07:47:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1d27d42b_89def573",
+      "range": {
+        "startLine": 6,
+        "startChar": 17,
+        "endLine": 6,
+        "endChar": 25
+      },
+      "revId": "1a35b3bec5a2c19a4d8fec81289c20e4016d64a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
