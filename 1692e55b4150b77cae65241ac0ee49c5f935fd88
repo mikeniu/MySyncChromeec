@@ -116,6 +116,30 @@
       },
       "revId": "1692e55b4150b77cae65241ac0ee49c5f935fd88",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4900d94c_4e37e4c8",
+        "filename": "util/elan/iap_control.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T18:12:30Z",
+      "side": 1,
+      "message": "We also need to test the \"happy path\" where everything works correctly. Here\u0027s Gemini generated code:\n\n----\n\nTesting a massive orchestration method like `RunIapProcess` is where developers often fall into the \"brittle test\" trap.\n\nIf you use `testing::InSequence` and explicitly mock all 15 endpoints with exact payload byte-matching, the test will inevitably break the next time someone adds a benign log read or tweaks a timeout.\n\nInstead, the most robust way to test the Happy Path is to build a full **\"Virtual Device\"** using Google Mock\u0027s `WillRepeatedly`. We give the mock simple rules on how to behave like a real EM32F967 chip, feed it the dummy ROM, and let `IapControl` sail all the way through to the final Software Reset.\n\nHere is the complete Happy Path test. You can append this directly to `iap_control_test.cc`:\n\n```cpp\nTEST_F(IapControlTest, RunIapProcessHappyPathCompletesSuccessfully) {\n  // 1. Mock the Initialization\n  EXPECT_CALL(*mock_usb_, Initialize()).WillOnce(Return(0));\n  EXPECT_CALL(*mock_usb_, OpenDevice(_, _)).WillOnce(Return(0));\n  ASSERT_TRUE(ctrl_-\u003eInitialize(kBootVid, kBootPid).has_value());\n\n  // Create a dummy 64-byte firmware payload\n  std::vector\u003cuint8_t\u003e expected_rom(64, 0xAA);\n  uint8_t last_cmd \u003d 0;\n  size_t bytes_read_so_far \u003d 0;\n\n  // 2. Outgoing: Accept all Commands (Ep 0x01) and ROM Data Writes (Ep 0x03)\n  EXPECT_CALL(*mock_usb_, InterruptTransfer(::testing::AnyOf(0x01, 0x03), _, _))\n      .WillRepeatedly(testing::Invoke([\u0026last_cmd](uint8_t ep, auto data, auto) {\n        // If it\u0027s a command packet, record the command ID so we can echo it\n        if (ep \u003d\u003d 0x01 \u0026\u0026 !data.empty()) last_cmd \u003d data[0];\n        return 0; // Return success\n      }));\n\n  // 3. Incoming Status: Simulate a perfectly compliant device on Ep 0x82\n  EXPECT_CALL(*mock_usb_, InterruptTransfer(0x82, _, _))\n      .WillRepeatedly(testing::Invoke([\u0026last_cmd](uint8_t, auto data, auto) {\n        std::ranges::fill(data, 0);\n        data[0] \u003d last_cmd; // Echo the command we just received\n        data[1] \u003d 0x01;     // Status Code: Success\n\n        // If the tool asks for the firmware version (0x41), inject the \n        // mandatory Google prefix (0x10) into the payload.\n        if (last_cmd \u003d\u003d 0x41) data[5] \u003d 0x10; \n        \n        return 0;\n      }));\n\n  // 4. Incoming Data: Feed the expected ROM back during the verify phase (Ep 0x84)\n  EXPECT_CALL(*mock_usb_, InterruptTransfer(0x84, _, _))\n      .WillRepeatedly(testing::Invoke([\u0026expected_rom, \u0026bytes_read_so_far](uint8_t, auto data, auto) {\n        // Calculate how much data to feed back in this chunk\n        size_t chunk_size \u003d std::min(data.size(), expected_rom.size() - bytes_read_so_far);\n        \n        // Copy the pristine dummy ROM into the device\u0027s read buffer\n        std::ranges::copy_n(expected_rom.begin() + bytes_read_so_far, \n                            chunk_size, \n                            data.begin());\n        \n        bytes_read_so_far +\u003d chunk_size;\n        return 0;\n      }));\n\n  // 5. Execute the entire sequence\n  auto result \u003d ctrl_-\u003eRunIapProcess(expected_rom);\n\n  // 6. Assert that it navigated all 15 steps, verified the ROM, and succeeded\n  EXPECT_TRUE(result.has_value());\n}\n\n```",
+      "parentUuid": "e3054b91_ef2be35a",
+      "range": {
+        "startLine": 135,
+        "startChar": 0,
+        "endLine": 138,
+        "endChar": 27
+      },
+      "revId": "1692e55b4150b77cae65241ac0ee49c5f935fd88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
