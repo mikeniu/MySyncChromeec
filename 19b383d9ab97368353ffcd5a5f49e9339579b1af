@@ -16,6 +16,24 @@
       "message": "We still need to figure out why two system_can_boot_ap in a row will have issue.\n1st was success, there is no CAN_BOOT_AP_CHECK_WAIT delay\n2nd request was failure\n\nBTW, I will suggest we go for this route to reduce calling system_can_boot_ap if we can identify what cause the failure of 2nd request",
       "revId": "19b383d9ab97368353ffcd5a5f49e9339579b1af",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6625112a_463c786a",
+        "filename": "power/mt8186.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-05-29T18:33:34Z",
+      "side": 0,
+      "message": "I think the new implementation is more correct because the value of 1st and 2nd system_can_boot_ap return may differ at any time. reasons:\n\n1. system_can_boot_ap calls battery_state_of_charge_abs, which calls sb_read, which calls i2c_read and i2c_read has fail rate.\n2. system_can_boot_ap checks the battery percent and the battery percent may be enough in the 1st call and become not enough the 2nd call.\n3. system_can_boot_ap checks the battery percent and the battery percent may be not enough in the 1st call and become enough the 2nd call.\n\nOnly the second case, we do not want to boot the AP. This could be handled by the charger task which will shutdown the device when the battery is low.",
+      "parentUuid": "d774a782_382e80d2",
+      "revId": "19b383d9ab97368353ffcd5a5f49e9339579b1af",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
