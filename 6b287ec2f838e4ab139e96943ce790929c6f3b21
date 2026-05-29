@@ -149,6 +149,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4de3591_010056ad",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-29T10:11:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23be899c_89d2da83",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 83,
+        "endChar": 59
+      },
+      "revId": "6b287ec2f838e4ab139e96943ce790929c6f3b21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f55ed57c_7a394ae4",
@@ -311,6 +335,24 @@
       "side": 1,
       "message": "I changed to reschedule without cancellation",
       "parentUuid": "7a4e4d12_442008b1",
+      "revId": "6b287ec2f838e4ab139e96943ce790929c6f3b21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56337cf1_78612ec1",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-29T10:11:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3dd05b2c_dc83b2b1",
       "revId": "6b287ec2f838e4ab139e96943ce790929c6f3b21",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
