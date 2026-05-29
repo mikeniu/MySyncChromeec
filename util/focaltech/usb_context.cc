@@ -3,14 +3,15 @@
  * found in the LICENSE file.
  */
 
-#include "usb_context.h"
-
 #include <chrono>
 #include <thread>
 #include <vector>
 
 #include "ft_log.h"
 #include "ft_util.h"
+
+// To prevent the formatter from rearranging the header include order.
+#include "usb_context.h"
 
 namespace {
 
@@ -27,6 +28,78 @@ using ScopedDeviceList =
 
 }  // namespace
 
+libusb_device* FindFocalDevice(libusb_device** device_list, ssize_t num_devices,
+                               libusb_device_descriptor& out_desc) {
+  for (ssize_t i = 0; i < num_devices; ++i) {
+    libusb_device* dev = device_list[i];
+    if (libusb_get_device_descriptor(dev, &out_desc) != LIBUSB_SUCCESS) {
+      continue;  // Skip if descriptor cannot be read
+    }
+
+    const uint16_t vid = out_desc.idVendor;
+    const uint16_t pid = out_desc.idProduct;
+
+    // Check for known Focal device VID/PID combinations
+    const bool is_boot_device = (vid == kFocalBootVid && pid == kFocalBootPid);
+    const bool is_rom_device = (vid == kFocalRomVid && pid == kFocalRomPid);
+    const bool is_ec_device = (vid == kFocalEcVid);
+
+    if (is_boot_device || is_rom_device || is_ec_device) {
+      // For EC devices, ensure it's a fingerprint model
+      if (is_ec_device) {
+        const bool is_valid_fingerprint = (pid == kFocalEcPidTest) ||
+                                          (pid == kFocalEcPid9865) ||
+                                          (pid == kFocalEcPid9869);
+        if (!is_valid_fingerprint) {
+          LOGI("Found Google device {:04x}:{:04x}, but not Focal. Skipping.",
+               vid, pid);
+          continue;
+        }
+      }
+      return dev;  // Matching device found
+    }
+  }
+  return nullptr;  // No matching device
+}
+
+bool FindBulkEndpoints(libusb_device* dev, UsbConnectionDetails& details) {
+  libusb_config_descriptor* config = nullptr;
+  if (libusb_get_config_descriptor(dev, 0, &config) != LIBUSB_SUCCESS) {
+    return false;
+  }
+
+  bool found_endpoints = false;
+
+  for (int j = 0; j < config->bNumInterfaces && !found_endpoints; ++j) {
+    const libusb_interface& interface = config->interface[j];
+
+    for (int k = 0; k < interface.num_altsetting && !found_endpoints; ++k) {
+      const libusb_interface_descriptor& alt = interface.altsetting[k];
+      details.interface_num = alt.bInterfaceNumber;
+
+      for (int l = 0; l < alt.bNumEndpoints; ++l) {
+        const libusb_endpoint_descriptor& ep = alt.endpoint[l];
+
+        if ((ep.bmAttributes & LIBUSB_TRANSFER_TYPE_MASK) ==
+            LIBUSB_TRANSFER_TYPE_BULK) {
+          if ((ep.bEndpointAddress & LIBUSB_ENDPOINT_DIR_MASK) ==
+              LIBUSB_ENDPOINT_IN) {
+            details.ep_bulk_in = ep.bEndpointAddress;
+          } else {
+            details.ep_bulk_out = ep.bEndpointAddress;
+          }
+        }
+      }
+      if (details.ep_bulk_in != 0 && details.ep_bulk_out != 0) {
+        found_endpoints = true;
+      }
+    }
+  }
+
+  libusb_free_config_descriptor(config);
+  return found_endpoints;
+}
+
 std::expected<UsbDevice, FtError> UsbDevice::Create(
     const UsbContext& ctx, UsbConnectionDetails& out_details) {
   libusb_device** list_raw = nullptr;
@@ -35,208 +108,117 @@ std::expected<UsbDevice, FtError> UsbDevice::Create(
     LOGE("Failed to get USB device list: {}", libusb_error_name(count));
     return std::unexpected(FtError::kNoSuchDevice);
   }
-
   ScopedDeviceList dev_list(list_raw);
-  libusb_device* target_dev = nullptr;
+
+  // 1. Find Device
   libusb_device_descriptor target_desc{};
-
-  // Find target Focal device
-  for (ssize_t i = 0; i < count; ++i) {
-    libusb_device* dev = dev_list.get()[i];
-    libusb_device_descriptor desc{};
-    if (libusb_get_device_descriptor(dev, &desc) < 0) {
-      continue;
-    }
-
-    if (desc.idVendor == kFocalBootVid || desc.idVendor == kFocalRomVid ||
-        desc.idVendor == kFocalEcVid) {
-      if (desc.idVendor == kFocalEcVid && (desc.idProduct != kFocalEcPidTest &&
-                                           desc.idProduct != kFocalEcPid9865 &&
-                                           desc.idProduct != kFocalEcPid9869)) {
-        LOGI(
-            "Found Google device {:04x}:{:04x}, but not Focal fingerprint."
-            "Skipping.",
-            desc.idVendor, desc.idProduct);
-        continue;
-      }
-
-      LOGI("Found device VID {:04x}: PID {:04x}", desc.idVendor,
-           desc.idProduct);
-      target_dev = dev;
-      target_desc = desc;
-      break;
-    }
-  }
-
-  if (target_dev == nullptr) {
+  libusb_device* target_dev =
+      FindFocalDevice(dev_list.get(), count, target_desc);
+  if (!target_dev) {
     return std::unexpected(FtError::kNoSuchDevice);
   }
 
-  // Open device
+  out_details.vid = target_desc.idVendor;
+  out_details.pid = target_desc.idProduct;
+  LOGI("Found device VID {:04x}: PID {:04x}", out_details.vid, out_details.pid);
+
+  // 2. Open Handle
   libusb_device_handle* handle = nullptr;
   int r = libusb_open(target_dev, &handle);
-  if (r != LIBUSB_SUCCESS || handle == nullptr) {
+  if (r != LIBUSB_SUCCESS || !handle) {
     LOGE("Failed to open device: {}", libusb_error_name(r));
     return std::unexpected(FtError::kNoSuchDevice);
   }
-
   std::unique_ptr<libusb_device_handle, LibusbDeviceHandleDeleter>
       handle_holder(handle);
 
-  // Get configuration descriptor
-  libusb_config_descriptor* config = nullptr;
-  r = libusb_get_config_descriptor(target_dev, 0, &config);
-  if (r != LIBUSB_SUCCESS) {
-    LOGE("Couldn't retrieve configuration descriptors.");
-    return std::unexpected(FtError::kNoSuchDevice);
-  }
-
-  // Find bulk IN/OUT endpoints
-  bool found_endpoints = false;
-  uint8_t ep_in = 0, ep_out = 0;
-  uint8_t interface_num = 0;
-
-  for (int j = 0; j < config->bNumInterfaces && !found_endpoints; ++j) {
-    const libusb_interface& interface = config->interface[j];
-    for (int k = 0; k < interface.num_altsetting && !found_endpoints; ++k) {
-      const libusb_interface_descriptor& alt = interface.altsetting[k];
-      interface_num = alt.bInterfaceNumber;
-
-      for (int l = 0; l < alt.bNumEndpoints; ++l) {
-        const libusb_endpoint_descriptor& ep = alt.endpoint[l];
-        if ((ep.bmAttributes & LIBUSB_TRANSFER_TYPE_MASK) ==
-            LIBUSB_TRANSFER_TYPE_BULK) {
-          if ((ep.bEndpointAddress & LIBUSB_ENDPOINT_DIR_MASK) ==
-              LIBUSB_ENDPOINT_IN) {
-            ep_in = ep.bEndpointAddress;
-          } else {
-            ep_out = ep.bEndpointAddress;
-          }
-        }
-      }
-
-      if (ep_in != 0 && ep_out != 0) {
-        found_endpoints = true;
-      }
-    }
-  }
-  libusb_free_config_descriptor(config);
-
-  if (!found_endpoints) {
+  // 3. Find Endpoints
+  if (!FindBulkEndpoints(target_dev, out_details)) {
     LOGE("Could not find required bulk IN/OUT endpoints.");
     return std::unexpected(FtError::kNoSuchDevice);
   }
 
-  // Fill output details
-  out_details.vid = target_desc.idVendor;
-  out_details.pid = target_desc.idProduct;
-  out_details.interface_num = interface_num;
-  out_details.ep_bulk_in = ep_in;
-  out_details.ep_bulk_out = ep_out;
-
-  // Detach kernel driver if active
-  if (libusb_kernel_driver_active(handle_holder.get(), interface_num) == 1) {
-    LOGD("Kernel driver active, detaching...");
-    if (libusb_detach_kernel_driver(handle_holder.get(), interface_num) !=
-        LIBUSB_SUCCESS) {
+  // 4. Initialize Connection (Detach, Reset, Claim)
+  if (libusb_kernel_driver_active(handle_holder.get(),
+                                  out_details.interface_num) == 1) {
+    if (libusb_detach_kernel_driver(
+            handle_holder.get(), out_details.interface_num) != LIBUSB_SUCCESS) {
       LOGE("Failed to detach kernel driver.");
       return std::unexpected(FtError::kResultFail);
     }
   }
+  if (libusb_reset_device(handle_holder.get()) < 0) {
+    LOGE("Failed to reset the device");
+    return std::unexpected(FtError::kResultFail);
+  }
+  std::this_thread::sleep_for(kUsbEnumerationDelay);
 
-  // Reset device
-  r = libusb_reset_device(handle_holder.get());
-  if (r < 0) {
-    LOGE("failed to reset the device");
+  if (libusb_claim_interface(handle_holder.get(), out_details.interface_num) <
+      0) {
+    LOGE("Failed to claim interface.");
     return std::unexpected(FtError::kResultFail);
   }
 
-  // Wait for device to re-enumerate after reset
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  LOGD("reset mcu success");
-
-  // Claim interface
-  r = libusb_claim_interface(handle_holder.get(), interface_num);
-  if (r < 0) {
-    LOGE("Failed to claim interface: {}", libusb_error_name(r));
-    return std::unexpected(FtError::kResultFail);
-  }
-
-  LOGD("Device connected and interface claimed successfully.");
-
-  // Create UsbDevice object, transferring ownership of handle
-  return UsbDevice(handle_holder.release(), ep_in, ep_out, ctx.get());
+  // 5. Transfer ownership to the class
+  return UsbDevice(handle_holder.release(), out_details.ep_bulk_in,
+                   out_details.ep_bulk_out, ctx.get());
 }
 
-std::expected<int, FtError> UsbDevice::Send(std::span<const uint8_t> buf,
-                                            uint32_t timeout_ms) const {
-  if (!handle_) {
+std::expected<int, FtError> UsbDevice::HandleTransferError(
+    int libusb_error) const {
+  libusb_reset_device(handle_.get());
+  std::this_thread::sleep_for(kUsbEnumerationDelay);
+
+  if (libusb_error == LIBUSB_ERROR_NO_DEVICE) {
     return std::unexpected(FtError::kNoSuchDevice);
   }
+  return std::unexpected(FtError::kResultFail);
+}
 
-  LOGV("timeout_ms={}", timeout_ms);
+std::expected<int, FtError> UsbDevice::Send(
+    std::span<const uint8_t> buf, std::chrono::milliseconds timeout_ms) const {
+  if (!handle_) return std::unexpected(FtError::kNoSuchDevice);
 
   int actual_len = 0;
-  int r = libusb_bulk_transfer(
-      handle_.get(), endpoint_out_, const_cast<uint8_t*>(buf.data()),
-      static_cast<int>(buf.size()), &actual_len, timeout_ms);
+  int r = libusb_bulk_transfer(handle_.get(), endpoint_out_,
+                               const_cast<uint8_t*>(buf.data()),
+                               static_cast<int>(buf.size()), &actual_len,
+                               static_cast<unsigned int>(timeout_ms.count()));
 
   if (r != LIBUSB_SUCCESS) {
-    libusb_reset_device(handle_.get());
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-
-    if (r == LIBUSB_ERROR_NO_DEVICE) {
-      return std::unexpected(FtError::kNoSuchDevice);
-    }
-
-    return std::unexpected(FtError::kResultFail);
+    return HandleTransferError(r);
   }
   return actual_len;
 }
 
-std::expected<int, FtError> UsbDevice::Recv(std::span<uint8_t> buf,
-                                            uint32_t timeout_ms) const {
-  if (!handle_) {
-    return std::unexpected(FtError::kNoSuchDevice);
-  }
-
-  LOGV("timeout_ms={}", timeout_ms);
+std::expected<int, FtError> UsbDevice::Recv(
+    std::span<uint8_t> buf, std::chrono::milliseconds timeout_ms) const {
+  if (!handle_) return std::unexpected(FtError::kNoSuchDevice);
 
   int actual_len = 0;
   int r = libusb_bulk_transfer(handle_.get(), endpoint_in_, buf.data(),
                                static_cast<int>(buf.size()), &actual_len,
-                               timeout_ms);
+                               static_cast<unsigned int>(timeout_ms.count()));
+
   if (r != LIBUSB_SUCCESS) {
-    libusb_reset_device(handle_.get());
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-
-    if (r == LIBUSB_ERROR_NO_DEVICE) {
-      return std::unexpected(FtError::kNoSuchDevice);
-    }
-
-    return std::unexpected(FtError::kResultFail);
+    return HandleTransferError(r);
   }
-
   return std::min(actual_len, static_cast<int>(buf.size()));
 }
 
-int UsbDevice::ResetComplete(int timeout_sec) const {
+int UsbDevice::ResetComplete(std::chrono::milliseconds timeout) const {
   if (!handle_) {
     LOGE("Invalid device handle");
     return -1;
   }
 
-  const int poll_ms = 100;
-  const int timeout_ms = timeout_sec * 1000;
-  int elapsed_ms = 0;
+  constexpr auto poll_interval = kPollinterval;
+  const auto start_time = std::chrono::steady_clock::now();
 
-  while (timeout_sec == 0 || elapsed_ms < timeout_ms) {
+  while (true) {
     int config = 0;
-    // Attempt a harmless control transfer to the device
     int r = libusb_get_configuration(handle_.get(), &config);
 
-    // If the OS dropped the device due to the MCU reset, the handle
-    // becomes stale and libusb throws this specific error.
     if (r == LIBUSB_ERROR_NO_DEVICE) {
       LOGI("USB device removal/reset detected");
       return 0;  // Success
@@ -244,10 +226,20 @@ int UsbDevice::ResetComplete(int timeout_sec) const {
       LOGV("r={}", r);
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(poll_ms));
-    elapsed_ms += poll_ms;
+    auto elapsed = std::chrono::steady_clock::now() - start_time;
+    if (timeout != std::chrono::milliseconds::zero() && elapsed >= timeout) {
+      break;
+    }
+
+    std::this_thread::sleep_for(poll_interval);
   }
 
-  LOGW("Timeout after {} seconds waiting for device removal", timeout_sec);
-  return -1;
+  LOGW("Timeout after {} ms waiting for device removal", timeout.count());
+  return -1;  // Failure
+}
+
+uint32_t UsbDevice::GetNextCdbTag() const {
+  // fetch_add returns the value before addition, matching post‑increment
+  // behavior.
+  return cdb_tag_->fetch_add(1, std::memory_order_relaxed);
 }
