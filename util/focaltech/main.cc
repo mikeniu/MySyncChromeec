@@ -59,6 +59,8 @@ constexpr std::array<uint8_t, 8> kSwitchToBootCmd = {0x03, 0x1B, 0xE2, 0x00,
                                                      0x00, 0x00, 0x00, 0x00};
 constexpr std::array<uint8_t, 8> kGetBuildVersionCmd = {0x03, 0xF9, 0x04, 0x00,
                                                         0x00, 0x00, 0x00, 0x00};
+constexpr size_t kEcResponseHeaderSize = 8;
+constexpr size_t kEcResponseNullTerminatorSize = 1;
 
 constexpr Command ParseCommand(std::string_view cmd_str) {
   if (cmd_str == "enter_bootloader") return Command::kEnterBoot;
@@ -86,24 +88,25 @@ std::expected<void, FtError> CheckEcBuildVersion(UsbDevice& usb,
   }
 
   for (int i = 0; i < kRetries; ++i) {
-    auto sr = usb.Send(kGetBuildVersionCmd, 200);
+    auto sr = usb.Send(kGetBuildVersionCmd, kFastUsbTimeout);
     if (!sr.has_value() || sr.value() <= 0) {
       LOGW("Send build-version cmd failed.");
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      std::this_thread::sleep_for(kMcuRebootPollInterval);
       continue;
     }
 
-    auto rr = usb.Recv(rx, 1000);
+    auto rr = usb.Recv(rx, kSlowUsbTimeout);
     if (rr.has_value() && rr.value() > 0) {
       break;
     }
     LOGW("Recv build-version failed.");
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    std::this_thread::sleep_for(kMcuRebootPollInterval);
   }
 
   // Version string starts at byte 8.
-  std::string_view info(reinterpret_cast<const char*>(rx.data() + 8),
-                        kRxLen - 9);
+  std::string_view info(
+      reinterpret_cast<const char*>(rx.data() + kEcResponseHeaderSize),
+      kRxLen - kEcResponseHeaderSize - kEcResponseNullTerminatorSize);
   LOGI("EC build version: {}", info);
 
   bool is_focal_device =
@@ -119,104 +122,45 @@ std::expected<void, FtError> CheckEcBuildVersion(UsbDevice& usb,
   return {};
 }
 
-// Sends the "switch to ROM mode" command over direct bulk USB.
-std::expected<void, FtError> TestEcSwitchToRom(UsbDevice& usb,
-                                               FtDeviceMode current_mode) {
-  std::array<uint8_t, 4> rx{};
-  constexpr int kRetries = kMaxRetry;
-
+// Generic helper to send a mode-switch command and wait for the MCU to reset
+std::expected<void, FtError> SwitchMcuMode(UsbDevice& usb,
+                                           FtDeviceMode current_mode,
+                                           std::span<const uint8_t> switch_cmd,
+                                           std::string_view mode_name) {
   if (auto res = CheckEcBuildVersion(usb, current_mode); !res) {
-    LOGE("can't find focal device");
-    return std::unexpected(FtError::kResultFail);
-  }
-
-  for (int i = 0; i < kRetries; ++i) {
-    auto sr = usb.Send(kTestEcSwitchToRomCmd, 200);
-    if (!sr.has_value()) {
-      LOGW("MCU reset to ROM — send failed (expected).");
-      if (sr.error() == FtError::kNoSuchDevice) {
-        LOGW("Usb device lost");
-        return {};
-      }
-    }
-
-    auto rr = usb.Recv(rx, 200);
-    if (rr.has_value() && rr.value() > 0) {
-      LOGW("MCU reset — received {} bytes.", rr.value());
-    }
-    if (!rr.has_value()) {
-      LOGW("MCU can't receive data during reset.");
-      if (rr.error() == FtError::kNoSuchDevice) {
-        LOGW("Usb device lost");
-        return {};
-      }
-    } else {
-      break;
-    }
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-  }
-
-  if (usb.ResetComplete(3)) {
-    return std::unexpected(FtError::kResultFail);
-  }
-
-  return {};
-}
-
-// Sends the "switch to bootloader" command over direct bulk USB.
-std::expected<void, FtError> SwitchToBoot(UsbDevice& usb,
-                                          FtDeviceMode current_mode) {
-  if (current_mode == FtDeviceMode::kBoot) {
-    LOGW("Already in bootloader mode.");
-    return {};
-  }
-  if (current_mode != FtDeviceMode::kTest &&
-      current_mode != FtDeviceMode::kEc && current_mode != FtDeviceMode::kRo &&
-      current_mode != FtDeviceMode::kRw) {
-    LOGE("Can only switch from EC mode to boot mode.");
-    return std::unexpected(FtError::kResultFail);
-  }
-
-  if (auto res = CheckEcBuildVersion(usb, current_mode); !res) {
-    LOGE("can't find focal device");
+    LOGE("Cannot find focal device");
     return std::unexpected(FtError::kResultFail);
   }
 
   std::array<uint8_t, 4> rx{};
-  constexpr int kRetries = kMaxRetry;
 
-  for (int i = 0; i < kRetries; ++i) {
-    auto sr = usb.Send(kSwitchToBootCmd, 200);
-    if (!sr.has_value()) {
+  for (int attempt = 1; attempt <= kMaxRetry; ++attempt) {
+    auto sr = usb.Send(switch_cmd, kFastUsbTimeout);
+    if (!sr) {
       if (sr.error() == FtError::kNoSuchDevice) {
-        LOGW("Usb device lost");
+        LOGW("USB device lost (expected during {} switch).", mode_name);
         return {};
       }
-      LOGW("MCU reset to boot — send failed (expected).");
+      LOGW("MCU reset to {} — send failed.", mode_name);
     }
 
-    auto rr = usb.Recv(rx, 200);
-    if (rr.has_value() && rr.value() > 0) {
-      LOGW("MCU reset — received {} bytes.", rr.value());
-    }
-    if (!rr.has_value()) {
-      if (rr.error() == FtError::kNoSuchDevice) {
-        LOGW("Usb device lost");
-        return {};
-      }
-      LOGW("Can't receive data during MCU reset.");
-    } else {
+    auto rr = usb.Recv(rx, kFastUsbTimeout);
+    if (rr && *rr > 0) {
+      LOGW("MCU reset — received {} bytes.", *rr);
       break;
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    if (!rr && rr.error() == FtError::kNoSuchDevice) {
+      LOGW("USB device lost (expected during {} switch).", mode_name);
+      return {};
+    }
+
+    std::this_thread::sleep_for(kMcuRebootPollInterval);
   }
 
-  if (usb.ResetComplete(3)) {
+  if (auto res = usb.ResetComplete(kResetWaitTimeout); !res) {
     return std::unexpected(FtError::kResultFail);
   }
-
   return {};
 }
 
@@ -235,14 +179,14 @@ std::expected<int, FtError> ParseInt(std::string_view str) {
 
 std::expected<AppConfig, FtError> ParseArguments(
     std::span<const std::string_view> args) {
-  AppConfig config;
+  AppConfig config{
+      .cmd = ParseCommand(args[0]),
+  };
 
   if (args.empty()) {
     LOGE("No subcommand specified.");
     return std::unexpected(FtError::kParameterError);
   }
-
-  config.cmd = ParseCommand(args[0]);
 
   if (config.cmd == Command::kUnknown) {
     LOGE("Unknown subcommand: {}", args[0]);
@@ -277,8 +221,6 @@ std::expected<AppConfig, FtError> ParseArguments(
 // Initializes device info based on USB descriptor to determine current mode.
 std::expected<void, FtError> DeviceInit(const UsbConnectionDetails& details,
                                         FtDeviceInfo& info) {
-  info.action = FtDeviceAction::kNormal;
-
   switch (details.vid) {
     case kFocalRomVid:
       info.current_mode = FtDeviceMode::kRom;
@@ -327,13 +269,15 @@ std::expected<void, FtError> ExecuteCommand(const AppConfig& config,
 
     case Command::kEnterBoot:
       LOGI("Entering bootloader mode...");
-      return SwitchToBoot(usb_device, info.current_mode);
+      return SwitchMcuMode(usb_device, info.current_mode, kSwitchToBootCmd,
+                           "boot");
 
     case Command::kEnterRom:
       LOGI("Entering ROM mode...");
       // Route to the correct ROM switch function based on the current mode
       if (info.current_mode == FtDeviceMode::kTest) {
-        return TestEcSwitchToRom(usb_device, info.current_mode);
+        return SwitchMcuMode(usb_device, info.current_mode,
+                             kTestEcSwitchToRomCmd, "ROM");
       }
       return FtBackToRomBoot(usb_device, info.current_mode);
 
@@ -348,12 +292,12 @@ std::expected<void, FtError> ExecuteCommand(const AppConfig& config,
       /*Fix an issue where, when the display is off but the system has not yet
        * entered suspend, the host may forcibly switch the FPMCU into suspend
        * state, causing the upgrade to fail. Retry updating the firmware.*/
-      for (int kRetries = 1; kRetries <= kMaxRetry; ++kRetries) {
+      for (int attempt = 1; attempt <= kMaxRetry; ++attempt) {
         if (auto res = UpdateFw(usb_device, info); res) {
           LOGI("Firmware update successful");
           return {};
         }
-        LOGW("Firmware update fail attempt {}", kRetries);
+        LOGW("Firmware update fail attempt {}", attempt);
       }
       LOGE("Firmware update failed");
       return std::unexpected(FtError::kResultFail);
@@ -367,7 +311,7 @@ std::expected<void, FtError> ExecuteCommand(const AppConfig& config,
 int main(int argc, char** argv) {
   std::vector<std::string_view> args(argv + 1, argv + argc);
 
-  if (!args.empty() && (args[0] == "-h" || args[0] == "--help")) {
+  if (args.empty() || args[0] == "-h" || args[0] == "--help") {
     std::println("{}", ft_help::kCmdHelpString);
     return EXIT_SUCCESS;
   }
@@ -392,9 +336,11 @@ int main(int argc, char** argv) {
     return EXIT_FAILURE;
   }
 
-  UsbDevice usb_device = std::move(*device_result);
+  UsbDevice& usb_device = *device_result;
 
-  FtDeviceInfo info = {};
+  FtDeviceInfo info{
+      .action = FtDeviceAction::kNormal,
+  };
   auto init_res = DeviceInit(details, info);
   if (!init_res) {
     LOGE("Cannot find Focal device");
