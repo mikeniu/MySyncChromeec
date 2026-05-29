@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "000e2000_97fe7daf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T04:47:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/d91c0106-9a3e-4a38-be07-ebfe1cb7d7d8)]\n\n**Review Summary**\n* **Functionality**: The changes successfully extract test-specific logic out of the production class and into a dedicated test helper. This refactor keeps the production API clean and ensures the cache remains read-only outside of test environments.\n* **Style**: The new test helper is implemented cleanly in a shared test header file with proper include guards. The method is defined inline inside the class, correctly avoiding any ODR (One Definition Rule) violations across multiple test files. Previous feedback has been fully addressed.\n* **Security**: No security concerns introduced.\n* **Testing**: The test files have been correctly updated to use the new `FpFrameSizeCacheTestHelper`.",
+      "revId": "db053f3a35342c49b58e393593978d2e8804cf90",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
