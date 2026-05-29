@@ -16,6 +16,24 @@
       "message": "hey just to followup on the sync up meeting we had, have you had a chance to consider MKBP for the actual data streaming? it\u0027d be way easier to do it now than switch to that later",
       "revId": "a405444314a2cc5767a76de98a34fe33ca6c27ea",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b19f161_9675e617",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-05-29T12:59:49Z",
+      "side": 1,
+      "message": "We have stable kernel driver, MKBP requires modifying kernel driver, it can lead to regression.\n\nHowever, I\u0027 working on sending multiple channels in one `EC_PWRMON_GET` command to reduce overhead.",
+      "parentUuid": "bd62fa4a_c126e94d",
+      "revId": "a405444314a2cc5767a76de98a34fe33ca6c27ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
