@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28e4262e_a39b5bf4",
+        "filename": "zephyr/program/fatcat/moonstone/pwrmon.dtsi",
+        "patchSetId": 14
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-29T16:50:19Z",
+      "side": 1,
+      "message": "Needs a copyright header.",
+      "revId": "2bbb68340a07e7db1c0cfe8db5e4e01822476cb8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
