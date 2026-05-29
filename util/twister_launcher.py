@@ -398,7 +398,7 @@ def main():
     # Look for board yaml files in the EC zephyr/boards directory
     twister_cli.extend(["--board-root", str(ec_base / "zephyr" / "boards")])
 
-    if in_cros_sdk():
+    if in_cros_sdk() or intercepted_args.toolchain == "coreboot-sdk":
         twister_cli.extend(get_coreboot_toolchain_flags(ec_base))
 
     # Prepare environment variables for export to Twister. Inherit the parent
@@ -407,7 +407,14 @@ def main():
     with tempfile.TemporaryDirectory() as parsetab_dir:
         toolchain_root = os.environ.get(
             "TOOLCHAIN_ROOT",
-            str(ec_base / "zephyr") if in_cros_sdk() else str(zephyr_base),
+            (
+                str(ec_base / "zephyr")
+                if (
+                    in_cros_sdk()
+                    or intercepted_args.toolchain == "coreboot-sdk"
+                )
+                else str(zephyr_base)
+            ),
         )
 
         twister_cli.extend([f"-x=TOOLCHAIN_ROOT={toolchain_root}"])
