@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb0e9544_8eb0d578",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T06:28:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/d1996440-5d73-458e-80ec-f21e5e1ad0db)]\n\n### Review Summary\n* **Functionality**: The CL introduces a comprehensive unit test suite for `get_frame` in the fingerprint sensor task, providing excellent coverage for error handling, size calculations, and data layout.\n* **Security**: The unit tests proactively cover access control (`system_is_locked`) and boundary checking (linear/integer overflows), which validates the memory safety of the frame retrieval logic.\n* **Style**: The code follows standard Zephyr `ztest` conventions, uses fakes (`fff`) appropriately, and structures the tests effectively with a dedicated setup routine.\n* **Testing**: Excellent test coverage added for an essential data-path function.",
+      "revId": "7c8bbda23d0ec4d408c2abf9c87ebde23dc5a0c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
