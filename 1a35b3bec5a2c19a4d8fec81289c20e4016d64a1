@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d05981e_cbd757bd",
+        "filename": "zephyr/program/calypso/src/battery.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-05-29T07:27:30Z",
+      "side": 1,
+      "message": "Replace `Bluey` with `Mensa` or remove the whole line.",
+      "range": {
+        "startLine": 6,
+        "startChar": 17,
+        "endLine": 6,
+        "endChar": 25
+      },
+      "revId": "1a35b3bec5a2c19a4d8fec81289c20e4016d64a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
