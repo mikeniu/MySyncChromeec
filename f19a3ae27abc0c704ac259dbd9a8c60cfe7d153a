@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b67c4e60_a0647af5",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-29T10:43:36Z",
+      "side": 1,
+      "message": "Just ticks number? Or MS?",
+      "revId": "f19a3ae27abc0c704ac259dbd9a8c60cfe7d153a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b74ac6a_22e7ac6e",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-05-29T10:43:36Z",
+      "side": 1,
+      "message": "Please set timer_scheduled_at_ticks and no need to use `has_timer`.",
+      "revId": "f19a3ae27abc0c704ac259dbd9a8c60cfe7d153a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
