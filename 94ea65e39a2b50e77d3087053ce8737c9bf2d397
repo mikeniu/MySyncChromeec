@@ -90,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "97482275_0d5ecfe6",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-29T18:29:17Z",
+      "side": 1,
+      "message": "OK, I kind of get how this is set up now. All of the PD 3.x structures come first, then all of the PD 2.0 structures. I guess that\u0027s fine. The new code looks like it\u0027s in approximately the right place.\n\nThe new code still substantially duplicates the comment block immediately below it. Since yours is based on a new spec version, I\u0027d just get rid of the old one.",
+      "parentUuid": "37a904d9_cf0c3310",
+      "revId": "94ea65e39a2b50e77d3087053ce8737c9bf2d397",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "42698556_7a3ff6de",
         "filename": "include/usb_pd_vdo.h",
         "patchSetId": 11

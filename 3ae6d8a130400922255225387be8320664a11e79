@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a255f643_eb231dd7",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-29T18:29:17Z",
+      "side": 1,
+      "message": "Nit, and others may disagree about this: I find it unintuitive to use an explicit-size data type for a bit field of a different size. In this case, it\u0027s a 32-bit data type cut down to size 16. This one could just be a `uint16_t`. For the ones that are 5 bits or something, I\u0027d just use `unsigned` or the relevant enum type, e.g. `enum connector_type`. Where it makes sense, I\u0027d use `bool`.",
+      "revId": "3ae6d8a130400922255225387be8320664a11e79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ec9e815_98aaf4fc",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-05-29T18:29:17Z",
+      "side": 1,
+      "message": "Nit: `\u003d\u003d sizeof(uint32_t)`\n\nAlso, this should go after the structure, not after the functions.",
+      "revId": "3ae6d8a130400922255225387be8320664a11e79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
