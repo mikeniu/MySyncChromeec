@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d2841ba_43f7d804",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-05-29T19:57:09Z",
+      "side": 1,
+      "message": "To follow convention, somehow zephyr uses signed types for time. For example \u0027static inline int32_t k_msleep(int32_t ms)\u0027 or \u0027int64_t k_uptime_ticks(void);\u0027.",
+      "parentUuid": "532a0af0_acfa00bb",
+      "range": {
+        "startLine": 132,
+        "startChar": 46,
+        "endLine": 132,
+        "endChar": 53
+      },
+      "revId": "bcd59f5945a727930d1e706c0223591f5bb1f431",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "96d212f5_a6f4a5b1",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-05-29T17:16:40Z",
       "side": 1,
       "message": "I think using the `k_timeout_t` structure is not needed. And I think accessing the struct member is not a good approach. Maybe use a macro like `k_ms_to_ticks_ceil64(delay_ms)`?",
+      "range": {
+        "startLine": 137,
+        "startChar": 47,
+        "endLine": 137,
+        "endChar": 61
+      },
+      "revId": "bcd59f5945a727930d1e706c0223591f5bb1f431",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e072caf3_e0d30c1e",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-05-29T19:57:09Z",
+      "side": 1,
+      "message": "I used k_ms_to_ticks_floor64. It is better if it is smaller for comparison in the handler.",
+      "parentUuid": "96d212f5_a6f4a5b1",
       "range": {
         "startLine": 137,
         "startChar": 47,
