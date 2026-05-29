@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4837a630_617f732e",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-29T06:21:15Z",
+      "side": 1,
+      "message": "added unit test and bound check\n\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7884088/1",
+      "parentUuid": "cb5cc665_1ce0717d",
+      "range": {
+        "startLine": 619,
+        "startChar": 0,
+        "endLine": 621,
+        "endChar": 0
+      },
+      "revId": "ac546e9893a7f5b11193b028cc42cc21bde09b69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4e86fef9_b5ced3d7",
         "filename": "common/fpsensor/fpsensor.cc",
         "patchSetId": 17
@@ -61,6 +85,30 @@
       "writtenOn": "2026-05-29T00:05:15Z",
       "side": 1,
       "message": "For followup CL:\n\n----\n\n**2. Variable Shadowing in `fp_command_frame_v0** In the modified `fp_command_frame_v0` function, you declare `enum ec_error_list ret;` at the top of the function. Inside the `if (idx \u003d\u003d FP_FRAME_INDEX_RAW_IMAGE)` block, you redeclare it with a different type:\n\n```c\n\tif (idx \u003d\u003d FP_FRAME_INDEX_RAW_IMAGE) {\n\t\t/* The host requested a frame. */\n\t\tenum ec_status ret \u003d get_frame(offset, size, (uint8_t *)out);\n\t\tif (ret !\u003d EC_RES_SUCCESS) {\n\t\t\treturn ret;\n\t\t}\n\n```\n\nWhile this compiles, variable shadowing is a known code smell that can lead to confusion and bugs during future refactoring.\n\n* **Remediation:** Rename the inner variable to reflect its specific type (e.g., `status`), or remove the type declaration if you intend to reuse an appropriately scoped variable.\n\n```c\n\t\tenum ec_status status \u003d get_frame(offset, size, (uint8_t *)out);\n\t\tif (status !\u003d EC_RES_SUCCESS) {\n\t\t\treturn status;\n\t\t}\n\n```",
+      "range": {
+        "startLine": 648,
+        "startChar": 0,
+        "endLine": 648,
+        "endChar": 24
+      },
+      "revId": "ac546e9893a7f5b11193b028cc42cc21bde09b69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d2168a4_e4f5d4a7",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 648,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-29T06:21:15Z",
+      "side": 1,
+      "message": "will do in a follow up CL",
+      "parentUuid": "4e86fef9_b5ced3d7",
       "range": {
         "startLine": 648,
         "startChar": 0,
@@ -94,6 +142,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8540e383_c8c1cfbb",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-29T06:21:15Z",
+      "side": 1,
+      "message": "Done. I am using CONFIG_EC_HOST_CMD_HANDLER_TX_BUFFER_SIZE",
+      "parentUuid": "9a01cd1a_7795541c",
+      "range": {
+        "startLine": 17,
+        "startChar": 32,
+        "endLine": 17,
+        "endChar": 60
+      },
+      "revId": "ac546e9893a7f5b11193b028cc42cc21bde09b69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c7d7665a_6c96589a",
@@ -117,6 +189,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ca18308_eb9ffa71",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-29T06:21:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c7d7665a_6c96589a",
+      "range": {
+        "startLine": 108,
+        "startChar": 0,
+        "endLine": 111,
+        "endChar": 4
+      },
+      "revId": "ac546e9893a7f5b11193b028cc42cc21bde09b69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dba2a593_f96cf9e5",
@@ -130,6 +226,30 @@
       "writtenOn": "2026-05-29T00:13:02Z",
       "side": 1,
       "message": "**Missing Shifted-Offset Overflow Test** The test suite is highly thorough, but `test_get_frame_integer_overflow` misses the exact edge case described in the first critical finding. The current overflow test runs with `global_context.current_capture_type \u003d FP_CAPTURE_VENDOR_FORMAT`, meaning `skip_image_offset()` evaluates to false, and the `offset +\u003d FP_SENSOR_IMAGE_OFFSET` code path is never triggered.\n\n* **Remediation:** Add a new test case explicitly targeting this scenario. Set the capture type to `FP_CAPTURE_SIMPLE_IMAGE` and set `offset \u003d UINT32_MAX - FP_SENSOR_IMAGE_OFFSET + 1` to prove the function securely rejects mathematical wrap-arounds during the offset shift.",
+      "range": {
+        "startLine": 173,
+        "startChar": 0,
+        "endLine": 173,
+        "endChar": 58
+      },
+      "revId": "ac546e9893a7f5b11193b028cc42cc21bde09b69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd9b08cf_49c30685",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-29T06:21:15Z",
+      "side": 1,
+      "message": "added it in a separate CL. this will also not work unless `FP_SENSOR_IMAGE_OFFSET` is non-zero. Otherwise, offset itself will overflow and wrapping is not handled and the test will fail because it is not designed well.\n\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7884088",
+      "parentUuid": "dba2a593_f96cf9e5",
       "range": {
         "startLine": 173,
         "startChar": 0,
