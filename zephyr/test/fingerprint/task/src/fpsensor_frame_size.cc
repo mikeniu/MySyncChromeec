@@ -6,6 +6,7 @@
 #include "ec_commands.h"
 
 #include <zephyr/fff.h>
+#include <zephyr/logging/log.h>
 #include <zephyr/sys/util.h>
 #include <zephyr/ztest.h>
 
@@ -14,6 +15,8 @@
 #include <fpsensor/fpsensor_frame_size.h>
 #include <memory>
 #include <mkbp_event.h>
+
+LOG_MODULE_REGISTER(fpsensor_frame_size, LOG_LEVEL_INF);
 
 DEFINE_FFF_GLOBALS;
 
@@ -58,6 +61,31 @@ static void fpsensor_frame_size_setup(void *fixture)
 
 	cache_fixture->populate_cache(sizeof(image_buffer));
 }
+
+class FpFrameSizeCacheTestHelper {
+    public:
+	/**
+	 * @brief Test-only method to manually override frame size values.
+	 *
+	 * @param capture_type The `fp_capture_type` to modify.
+	 * @param size The size in bytes to write to the cache. If the
+	 * capture_type is out of bounds, this function logs an error and
+	 * performs no operation.
+	 */
+	static void set_frame_size(FpFrameSizeCache &cache,
+				   enum fp_capture_type capture_type,
+				   uint32_t size)
+	{
+		if (capture_type < 0 || static_cast<size_t>(capture_type) >=
+						cache.frame_sizes_.size()) {
+			LOG_ERR("Error: Invalid capture type %d\n",
+				capture_type);
+			return;
+		}
+
+		cache.frame_sizes_[static_cast<size_t>(capture_type)] = size;
+	}
+};
 
 ZTEST_SUITE(fpsensor_frame_size, NULL, NULL, fpsensor_frame_size_setup, NULL,
 	    NULL);
@@ -167,7 +195,7 @@ ZTEST(fpsensor_frame_size, test_set_frame_size)
 		"Test setup error: new_size should be different from original.");
 
 	/* Use the test-only setter to override the cache */
-	cache->set_frame_size(test_type, new_size);
+	FpFrameSizeCacheTestHelper::set_frame_size(*cache, test_type, new_size);
 
 	/* Verify the state after modification */
 	uint32_t updated_size = cache->get_frame_size(test_type);
@@ -183,7 +211,8 @@ ZTEST(fpsensor_frame_size, test_set_frame_size_boundary_max_index)
 	const uint32_t new_size = 512;
 
 	/* Verify that calling with FP_CAPTURE_TYPE_MAX is a no-op */
-	cache->set_frame_size(FP_CAPTURE_TYPE_MAX, new_size);
+	FpFrameSizeCacheTestHelper::set_frame_size(*cache, FP_CAPTURE_TYPE_MAX,
+						   new_size);
 
 	zassert_equal(
 		cache->get_frame_size(FP_CAPTURE_TYPE_MAX), 0,
@@ -196,7 +225,8 @@ ZTEST(fpsensor_frame_size, test_set_frame_size_boundary_negative_index)
 	const uint32_t new_size = 512;
 
 	/* Verify that calling with -1 is a no-op */
-	cache->set_frame_size(static_cast<enum fp_capture_type>(-1), new_size);
+	FpFrameSizeCacheTestHelper::set_frame_size(
+		*cache, static_cast<enum fp_capture_type>(-1), new_size);
 
 	zassert_equal(
 		cache->get_frame_size(static_cast<enum fp_capture_type>(-1)), 0,
