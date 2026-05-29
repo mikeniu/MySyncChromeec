@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd7ae587_89477ec5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-29T04:26:28Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "4e436c19_4ddabe32",
+      "revId": "746cd4e23aeb6bf64e4cea21820a375fc87acc6e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5bab934c_07bead44",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-29T04:13:25Z",
       "side": 1,
       "message": "[Gerrit AI Review] Consider extracting `FpFrameSizeCacheTestHelper` into a shared test header file instead of duplicating its definition across multiple `.cc` files (it\u0027s also defined in `fpsensor_get_frame.cc`).\n\nWhile defining it locally works, a shared header reduces code duplication and prevents potential One Definition Rule (ODR) violations if these test files are ever compiled and linked into the same test executable.",
+      "revId": "746cd4e23aeb6bf64e4cea21820a375fc87acc6e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5857c81f_acdf56db",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_frame_size.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-29T04:26:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5bab934c_07bead44",
       "revId": "746cd4e23aeb6bf64e4cea21820a375fc87acc6e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
