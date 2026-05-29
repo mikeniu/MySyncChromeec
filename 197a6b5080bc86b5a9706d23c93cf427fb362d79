@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "88bdb1c8_a7a1b6a7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 24
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-29T06:43:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cb5ab357_48bc25c2",
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b1840a22_8b11b92d",
@@ -48,6 +66,30 @@
       "writtenOn": "2026-05-28T18:31:26Z",
       "side": 1,
       "message": "The Google C++ Style Guide mandates a [very specific, strictly grouped order](https://google.github.io/styleguide/cppguide.html#Names_and_Order_of_Includes) for `#include` directives to prevent hidden dependencies.\n\nThe required order is:\n\n1. **Related header** (e.g., `foo.cc` includes `foo.h` first).\n2. A blank line.\n3. **C system files** (e.g., `\u003cunistd.h\u003e`, `\u003cstdlib.h\u003e`).\n4. A blank line.\n5. **C++ system files** (e.g., `\u003cvector\u003e`, `\u003cprint\u003e`).\n6. A blank line.\n7. **Other libraries\u0027 headers** (e.g., `\u003clibusb-1.0/libusb.h\u003e`, `\u003copenssl/evp.h\u003e`).\n8. A blank line.\n9. **Your project\u0027s headers** (e.g., `\"crypto_util.h\"`, `\"egis_util.h\"`).\n\n**The Issue:** In files like `bootrom.cc`, `et171_flash.cc`, and `ec_comm.cc`, you placed \"Your project\u0027s headers\" right after the related header and *before* the system headers.\n\n**Remediation (Example in `bootrom.cc`):**\n\nReorder the includes to push the internal project headers to the very bottom block.\n\n```cpp\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n#include \"bootrom.h\"\n\n// C system files\n#include \u003ccstdio\u003e\n#include \u003ccstring\u003e\n\n// C++ system files\n#include \u003calgorithm\u003e\n#include \u003cbit\u003e\n#include \u003cchrono\u003e\n#include \u003cconcepts\u003e\n#include \u003cfstream\u003e\n#include \u003climits\u003e\n#include \u003cprint\u003e\n#include \u003cranges\u003e\n#include \u003cthread\u003e\n#include \u003cvector\u003e\n\n// Project headers\n#include \"crypto_util.h\"\n#include \"egis_util.h\"\n\nnamespace egis {\n// ...\n\n```\n\n*(You will need to apply this reordering to `bootrom.cc`, `ec_comm.cc`, `et171_flash.cc`, and `flasher_logic.cc`).*",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 17
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a5a7792_8ab8a053",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-29T06:43:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b1840a22_8b11b92d",
       "range": {
         "startLine": 5,
         "startChar": 0,
@@ -105,6 +147,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "21ba03fe_a4df23b6",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-29T06:43:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87ff1a42_b13cbdec",
+      "range": {
+        "startLine": 132,
+        "startChar": 0,
+        "endLine": 132,
+        "endChar": 50
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "148fcc1b_a9e9db60",
@@ -118,6 +184,30 @@
       "writtenOn": "2026-05-28T19:26:55Z",
       "side": 1,
       "message": "We use this pattern in a few places (combine header and payload). Let\u0027s create a helper to simplify and DRY the code. Here\u0027s Gemini-generated code. Check for correctness:\n\n----\n\n\n### 1\\. The Utility Function\n\nAdd this to `util/egis/egis_util.h`. If your C++23 standard library fully supports it, you can use `buffer.append_range()`. If not, standard `.insert()` works perfectly and is equally safe.\n\n```c\ntemplate \u003cTriviallyCopyable T\u003e\nstd::vector\u003cuint8_t\u003e PackMessage(const T\u0026 header, std::span\u003cconst uint8_t\u003e payload \u003d {}) {\n  std::vector\u003cuint8_t\u003e buffer;\n  // Pre-allocate the exact size to prevent reallocations\n  buffer.reserve(sizeof(T) + payload.size());\n  \n  auto header_bytes \u003d AsBytes(header);\n  \n  // Using standard insert \n  // Prefer C++23 buffer.append_range if it compiles.\n  buffer.insert(buffer.end(), header_bytes.begin(), header_bytes.end());\n  buffer.insert(buffer.end(), payload.begin(), payload.end());\n  \n  return buffer;\n}\n\n```\n\n### 2\\. The Implementation\n\nNow, you can replace those 6 lines of boilerplate in `WriteFlash` (and similarly in `SendBootromCommandSha`) with a single, highly readable function call.\n\n**In `WriteFlash`:**\n\n```c\n  EgisBootrom::BlockWriteCommand req_hdr{\n      .address \u003d ToLittleEndian(addr),\n      .count \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(data.size()))};\n\n  // One line. No manual offsets, no memcpy, no redundant error checking.\n  std::vector\u003cuint8_t\u003e cmd \u003d PackMessage(req_hdr, data);\n\n  auto resp \u003d SendBootromCommand(cmd, kFlashTimeout);\n\n```\n\n**In `SendBootromCommandSha`:**\n\n```c\n  SecureCommandShaHeader req_hdr{\n      .algo \u003d std::to_underlying(wrapped_algo_),\n      .payload_len \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(data.size()))};\n  \n  crypto::Sha256(data, req_hdr.hash);\n\n  // Instantly pack the header and the payload\n  std::vector\u003cuint8_t\u003e cmd \u003d PackMessage(req_hdr, data);\n\n  auto ret_res \u003d DoUsbTransfer(cmd, sizeof(SecureResponseHeader), timeout);\n\n```\n\n### Why this is better:\n\n1. **Zero `memcpy`:** You eliminate manual pointer arithmetic entirely.  \n2. **No Unreachable Error Handling:** In your original code, `WriteStruct` could technically return an error, forcing you to handle `kBufferTooSmall` even though you *just* created the vector to be the exact correct size. `PackMessage` guarantees sizing.  \n3. **DRY:** You reuse this anywhere you need to stick a header onto a payload.\n\n----\n\nHere is how the refactored `EcCommand` class in `util/egis/ec_comm.cc` looks when utilizing the new utility.\n\n### The Refactored `EcCommand`\n\nBy using `PackMessage`, we can completely delete the `PackCommand` helper method and handle everything safely in the constructor.\n\n**Current (`ec_comm.cc`):**\n\n```c\nclass EcCommand {\n public:\n  EcCommand(uint16_t cmd_id, uint8_t cmd_ver,\n            std::span\u003cconst uint8_t\u003e payload \u003d {})\n      : cmd_id_(cmd_id), cmd_ver_(cmd_ver) {\n    PackCommand(payload);\n  }\n\n  const std::vector\u003cuint8_t\u003e \u0026bytes() const { return cmd_bytes_; }\n\n private:\n  uint16_t cmd_id_;\n  uint8_t cmd_ver_;\n  std::vector\u003cuint8_t\u003e cmd_bytes_;\n\n  void PackCommand(std::span\u003cconst uint8_t\u003e payload) {\n    EcHostCommandRequest hdr \u003d {\n        .command_id \u003d ToLittleEndian(cmd_id_),\n        .command_version \u003d cmd_ver_,\n        .data_length \u003d ToLittleEndian(static_cast\u003cuint16_t\u003e(payload.size()))};\n    cmd_bytes_.resize(sizeof(hdr) + payload.size());\n    WriteStruct(std::span\u003cuint8_t\u003e(cmd_bytes_), hdr);\n\n    if (!payload.empty()) {\n      std::memcpy(cmd_bytes_.data() + sizeof(hdr), payload.data(),\n                  payload.size());\n    }\n    UpdateChecksum();\n  }\n\n  void UpdateChecksum() {\n    uint32_t sum \u003d 0;\n    // hdr.checksum is initialized to 0 by WriteStruct, so we can directly sum\n    for (uint8_t byte : cmd_bytes_) sum +\u003d byte;\n    cmd_bytes_[offsetof(EcHostCommandRequest, checksum)] \u003d\n        static_cast\u003cuint8_t\u003e(-sum);\n  }\n};\n\n```\n\n**New \u0026 Improved (`ec_comm.cc`):**\n\n```c\nclass EcCommand {\n public:\n  EcCommand(uint16_t cmd_id, uint8_t cmd_ver, std::span\u003cconst uint8_t\u003e payload \u003d {}) {\n    \n    EcHostCommandRequest hdr \u003d {\n        .command_id \u003d ToLittleEndian(cmd_id),\n        .command_version \u003d cmd_ver,\n        .data_length \u003d ToLittleEndian(static_cast\u003cuint16_t\u003e(payload.size()))};\n\n    // 1. Pack the header and payload instantly without memcpy\n    cmd_bytes_ \u003d PackMessage(hdr, payload);\n    \n    // 2. Apply the checksum\n    UpdateChecksum();\n  }\n\n  const std::vector\u003cuint8_t\u003e \u0026bytes() const { return cmd_bytes_; }\n\n private:\n  std::vector\u003cuint8_t\u003e cmd_bytes_;\n\n  void UpdateChecksum() {\n    uint32_t sum \u003d 0;\n    for (uint8_t byte : cmd_bytes_) sum +\u003d byte;\n    \n    // Safely map the header back over the vector rather than using offsetof\n    auto* hdr \u003d reinterpret_cast\u003cEcHostCommandRequest*\u003e(cmd_bytes_.data());\n    hdr-\u003echecksum \u003d static_cast\u003cuint8_t\u003e(-sum);\n  }\n};\n\n```\n\n### Why this is a massive improvement:\n\n1. **Deleted State:** We removed `cmd_id_` and `cmd_ver_` from the class entirely. They were only being stored temporarily to be used inside `PackCommand()`. Now, they are consumed directly in the constructor.  \n2. **Deleted Complexity:** The 12 lines of memory resizing, struct writing, and empty-payload checking are replaced by one simple `PackMessage` call.  \n3. **Fixed Security Issue:** The `UpdateChecksum` method now uses `reinterpret_cast` to access the `checksum` field. If someone modifies `EcHostCommandRequest` to include padding in the future, `offsetof` would have silently written to the wrong memory address. Reinterpreting the struct guarantees memory safety.\n\n----\n\nWe can also use it in `SendBootromCommandAes`\n\nSince we are trading the zero-copy approach for safety, we can now use the `PackMessage` utility here as well. The workflow becomes remarkably straightforward: generate the ciphertext into a temporary buffer, and then pack the header and ciphertext together.\n\nHere is the fully refactored `SendBootromCommandAes` incorporating the hoisted payload check, compile-time spans, visual chunking, and the new `PackMessage` utility.\n\n### `util/egis/bootrom.cc`\n\n```c\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e\nBootromComm::SendBootromCommandAes(std::span\u003cconst uint8_t\u003e data,\n                                   std::chrono::milliseconds timeout) {\n  \n  SecureCommandAesHeader req_hdr{\n      .algo \u003d std::to_underlying(wrapped_algo_),\n      .payload_len \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(data.size()))};\n\n  uint32_t aad_val \u003d ToLittleEndian(EgisBootrom::kChipIdAad);\n\n  // ---------------------------------------------------------\n  // PHASE 1: Encrypt\n  // ---------------------------------------------------------\n  std::vector\u003cuint8_t\u003e ciphertext(data.size());\n  {\n    if (auto res \u003d crypto::GenerateGcmIv(req_hdr.iv); !res) {\n      std::println(stderr, \"[ERROR] IV Generation Failed\");\n      return std::unexpected(BootromError::kGcmIvGenerationFailed);\n    }\n\n    if (auto res \u003d crypto::AesGcmEncrypt(aes_key_, req_hdr.iv, AsBytes(aad_val), \n                                         data, ciphertext, req_hdr.tag); !res) {\n      std::println(stderr, \"[ERROR] Encryption Failed\");\n      return std::unexpected(BootromError::kGcmEncryptionFailed);\n    }\n  }\n\n  // ---------------------------------------------------------\n  // PHASE 2: Pack and Transmit\n  // ---------------------------------------------------------\n  std::span\u003cconst uint8_t\u003e secure_data; \n  auto ret_res \u003d DoUsbTransfer(PackMessage(req_hdr, ciphertext), \n                               BootromComm::kScHeaderSizeAes, timeout);\n  {\n    if (!ret_res) return std::unexpected(ret_res.error());\n\n    auto extracted \u003d ExtractSecureData(ret_res.value(), BootromComm::kScHeaderSizeAes);\n    if (!extracted) return std::unexpected(extracted.error());\n    \n    secure_data \u003d extracted.value();\n  }\n\n  // ---------------------------------------------------------\n  // PHASE 3: Unpack and Decrypt Response\n  // ---------------------------------------------------------\n  std::vector\u003cuint8_t\u003e decrypted_payload;\n  {\n    auto rsp_iv \u003d secure_data.first\u003ccrypto::kAesGcmIvSize\u003e();\n    auto rsp_tag \u003d secure_data.subspan\u003ccrypto::kAesGcmIvSize, crypto::kAesGcmTagSize\u003e();\n    auto rsp_ciphertext \u003d secure_data.subspan(crypto::kAesGcmIvSize + crypto::kAesGcmTagSize);\n\n    decrypted_payload.resize(rsp_ciphertext.size());\n\n    if (auto res \u003d crypto::AesGcmDecrypt(aes_key_, rsp_iv, AsBytes(aad_val), \n                                         rsp_ciphertext, rsp_tag, decrypted_payload); !res) {\n      std::println(stderr, \"[ERROR] Decryption Failed\");\n      return std::unexpected(BootromError::kGcmAuthenticationFailed);\n    }\n  }\n\n  return decrypted_payload;\n}\n\n```",
+      "range": {
+        "startLine": 444,
+        "startChar": 0,
+        "endLine": 452,
+        "endChar": 70
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51e0ad86_c0626664",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-29T06:43:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "148fcc1b_a9e9db60",
       "range": {
         "startLine": 444,
         "startChar": 0,
@@ -175,6 +265,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f9fd981_b4bcbd93",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 536,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-29T06:43:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a97c44b_0310e4d9",
+      "range": {
+        "startLine": 518,
+        "startChar": 0,
+        "endLine": 536,
+        "endChar": 1
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "47615a69_26612f40",
@@ -188,6 +302,30 @@
       "writtenOn": "2026-05-28T21:12:53Z",
       "side": 1,
       "message": "We can simplify this a bit with `string_view` and `std::ranges::find`.\n\nGemini-generated code. Check that it\u0027s correct:\n\n----\n\n```cpp\nstd::println(\"  Product Name: {}\", std::string_view(info.prod_name, std::ranges::find(info.prod_name, \u0027\\0\u0027)));\n\n```\n\n### Why this is the ultimate approach here:\n\n1. **Zero State:** You don\u0027t leave a `prod_name` variable hanging around in the local scope that you don\u0027t need anymore.\n2. **Safety First:** You might wonder, *\"Why not just pass `info.prod_name` directly to `std::println`?\"* If you do that (`std::println(\"{}\", info.prod_name)`), the formatter will treat it as a standard C-string. If the product name happens to take up exactly 8 bytes and lacks a null terminator, the formatter will read past the end of the array into unallocated memory, causing Undefined Behavior (UB).\n3. **Clean Output:** By using `ranges::find` as the boundary, you ensure that if the name is shorter than 8 bytes, `std::println` won\u0027t print out the trailing `\\0` characters as empty spaces or garbage.\n\nThis inline `std::string_view` guarantees memory safety, handles the null-trimming perfectly, and keeps your source code extremely concise.",
+      "range": {
+        "startLine": 563,
+        "startChar": 0,
+        "endLine": 563,
+        "endChar": 57
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f7f5374_a5f24435",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 563,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-29T06:43:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "47615a69_26612f40",
       "range": {
         "startLine": 563,
         "startChar": 0,
@@ -221,6 +359,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f89c5298_8e76086e",
+        "filename": "util/egis/cli_options.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-29T06:43:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70608fe5_db865e2d",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 32
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5bad435b_8cd9d29e",
@@ -234,6 +396,30 @@
       "writtenOn": "2026-05-28T21:12:53Z",
       "side": 1,
       "message": "This is a magic number. Let\u0027s add a constant.",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 37
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08f13d55_526bd29c",
+        "filename": "util/egis/cli_options.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-29T06:43:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5bad435b_8cd9d29e",
       "range": {
         "startLine": 36,
         "startChar": 0,
@@ -291,6 +477,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "43efb146_d50e95b1",
+        "filename": "util/egis/crypto_util.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-29T06:43:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9611de4_41ef9935",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 3
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "da2c7ebe_465a8635",
@@ -304,6 +514,30 @@
       "writtenOn": "2026-05-28T18:58:18Z",
       "side": 1,
       "message": "In `et171_flash.cc` (`ExecuteGetVersion`), you manually `std::memcpy` the raw byte response into a `GetVersionResponse` struct. This is inherently risky. Because you already wrote the brilliant `ReadStruct` template in `egis_util.h`, you can add a templated wrapper directly inside `EcComm`.\n\n**Add this to `EcComm` (`ec_comm.h`):**\n\n```c\n  template \u003cTriviallyCopyable T\u003e\n  std::expected\u003cT, EcError\u003e SendCommandTyped(\n      uint16_t id, uint8_t ver, std::span\u003cconst uint8_t\u003e payload \u003d {}) {\n    auto raw_res \u003d SendCommand(id, ver, payload);\n    if (!raw_res) return std::unexpected(raw_res.error());\n    \n    auto parsed \u003d ReadStruct\u003cT\u003e(raw_res.value());\n    if (!parsed) return std::unexpected(EcError::kResponseTooShort);\n    return parsed.value();\n  }\n\n```\n\n**Resulting Cleanup in `et171_flash.cc`:** This eliminates the manual memory copying, size clamping, and raw buffer handling in the application layer.\n\n```c\n  auto resp \u003d ec_comm.SendCommandTyped\u003cGetVersionResponse\u003e(\n      std::to_underlying(EcCommandId::kEcCmdGetVersion), 1);\n      \n  if (!resp) return std::unexpected(resp.error());\n  GetVersionResponse response \u003d resp.value();\n  \n  response.current_image \u003d FromLittleEndian(response.current_image);\n  // ... proceed with printing ...\n\n```",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 60,
+        "endChar": 52
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "91990f8a_3b2837f6",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-29T06:43:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da2c7ebe_465a8635",
       "range": {
         "startLine": 58,
         "startChar": 0,
@@ -337,6 +571,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "20c5ca17_7606bfe4",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-29T06:43:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ccf5be3d_e580a458",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 50
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4c58e270_aa85afe6",
@@ -350,6 +608,30 @@
       "writtenOn": "2026-05-28T21:12:53Z",
       "side": 1,
       "message": "In `util/egis/flasher_logic.cc` (`RunFlashFw`), when you build the dump filename, you use `std::string::substr`:\n\n**Current (`flasher_logic.cc`):**\n\n```c\n  if (config.dump_cmd_fw) {\n    std::ostringstream oss;\n    \n    // This allocates a brand new std::string on the heap just to hold the sub-string\n    std::string fw_filename \u003d config.fw_path.substr(config.fw_path.find_last_of(\"/\\\\\") + 1);\n    \n    std::string algo_tag \u003d (config.algo_type \u003d\u003d EgisCryptoType::kAesGcm) ? \"aes\" : \"sha256\";\n    oss \u003c\u003c fw_filename \u003c\u003c \"_\" \u003c\u003c algo_tag \u003c\u003c \"_cmd_\" \u003c\u003c std::time(nullptr) \u003c\u003c \".bin\";\n    // ...\n\n```\n\n**The Idiomatic C++23 Way:** If you convert the base string to a `std::string_view` first, calling `.substr()` on it returns another lightweight, non-owning view rather than allocating a new string on the heap. `std::ostringstream` natively accepts string views.\n\n```c\n  if (config.dump_cmd_fw) {\n    std::ostringstream oss;\n    \n    // 1. Cast the path to a view\n    std::string_view path_view \u003d config.fw_path;\n    \n    // 2. substr() on a view returns a view (Zero allocations!)\n    auto fw_filename \u003d path_view.substr(path_view.find_last_of(\"/\\\\\") + 1);\n    \n    std::string_view algo_tag \u003d (config.algo_type \u003d\u003d EgisCryptoType::kAesGcm) ? \"aes\" : \"sha256\";\n    oss \u003c\u003c fw_filename \u003c\u003c \"_\" \u003c\u003c algo_tag \u003c\u003c \"_cmd_\" \u003c\u003c std::time(nullptr) \u003c\u003c \".bin\";\n    // ...\n\n```\n\n*(Notice I also changed `algo_tag` from `std::string` to `std::string_view` since it\u0027s just pointing to string literals).*\n\nBy making these changes, you ensure that your code never allocates memory or mutates buffers solely for the purpose of string formatting.",
+      "range": {
+        "startLine": 214,
+        "startChar": 3,
+        "endLine": 220,
+        "endChar": 18
+      },
+      "revId": "197a6b5080bc86b5a9706d23c93cf427fb362d79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90bf5b28_0c7bb157",
+        "filename": "util/egis/flasher_logic.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-05-29T06:43:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4c58e270_aa85afe6",
       "range": {
         "startLine": 214,
         "startChar": 3,
