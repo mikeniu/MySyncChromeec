@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d971de1e_c7cf44da",
+        "filename": "util/elan/elaniap_test.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T17:38:17Z",
+      "side": 1,
+      "message": "When you split this into another file (see other comment), we should rewrite it to be parameterized. Gemini-generated code below. Check for correctness:\n\n---\n\n\n```cpp\n#include \u003cgtest/gtest.h\u003e\n\n#include \u003cfilesystem\u003e\n#include \u003cformat\u003e\n#include \u003cfstream\u003e\n#include \u003coptional\u003e\n#include \u003cstring\u003e\n#include \u003cvector\u003e\n\n// Assuming utility.h and file_control.h are included here\n\nnamespace elan {\nnamespace {\n\nstruct GetBinaryTestCase {\n  std::string test_name;\n  // std::nullopt \u003d missing file. Empty vector \u003d 0-byte file.\n  std::optional\u003cstd::vector\u003cuint8_t\u003e\u003e file_content;\n  elan::IapError expected_error;\n};\n\nclass FileControlParamTest : public ::testing::TestWithParam\u003cGetBinaryTestCase\u003e {\n protected:\n  void SetUp() override {\n    const auto* info \u003d ::testing::UnitTest::GetInstance()-\u003ecurrent_test_info();\n    temp_filepath_ \u003d std::filesystem::path(testing::TempDir()) / \n                     std::format(\"test_fw_{}.bin\", info-\u003ename());\n  }\n\n  void TearDown() override {\n    std::filesystem::remove(temp_filepath_);\n  }\n\n  void WriteTestData(std::span\u003cconst uint8_t\u003e data) {\n    std::ofstream ofs(temp_filepath_, std::ios::binary);\n    ASSERT_TRUE(ofs.is_open());\n    ofs.write(reinterpret_cast\u003cconst char*\u003e(data.data()), data.size());\n  }\n\n  std::filesystem::path temp_filepath_;\n};\n\nTEST_P(FileControlParamTest, ValidatesFileHandling) {\n  const GetBinaryTestCase\u0026 param \u003d GetParam();\n\n  // 1. Setup: Only create the file if the optional contains a value\n  if (param.file_content.has_value()) {\n    WriteTestData(*param.file_content);\n  }\n\n  // 2. Execute\n  auto res \u003d GetBinary(temp_filepath_.string());\n\n  // 3. Assert\n  if (param.expected_error \u003d\u003d elan::IapError::None) {\n    ASSERT_TRUE(res.has_value());\n    EXPECT_EQ(res.value(), *param.file_content);\n  } else {\n    ASSERT_FALSE(res.has_value());\n    EXPECT_EQ(res.error(), param.expected_error);\n  }\n}\n\nINSTANTIATE_TEST_SUITE_P(\n    FileSizesAndAlignments,\n    FileControlParamTest,\n    ::testing::Values(\n        GetBinaryTestCase{\n            .test_name \u003d \"Aligned4Bytes\",\n            .file_content \u003d std::vector\u003cuint8_t\u003e{0x10, 0x20, 0x30, 0x40},\n            .expected_error \u003d elan::IapError::None},\n        GetBinaryTestCase{\n            .test_name \u003d \"EmptyFile\",\n            .file_content \u003d std::vector\u003cuint8_t\u003e{},\n            .expected_error \u003d elan::IapError::InvalidFileSize},\n        GetBinaryTestCase{\n            .test_name \u003d \"MissingFile\",\n            .file_content \u003d std::nullopt,\n            .expected_error \u003d elan::IapError::FileOpenFailed}\n    ),\n    [](const testing::TestParamInfo\u003cGetBinaryTestCase\u003e\u0026 info) {\n      return info.param.test_name;\n    }\n);\n\n}  // namespace\n}  // namespace elan\n\n```",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 1
+      },
+      "revId": "1692e55b4150b77cae65241ac0ee49c5f935fd88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3786698a_fc216124",
         "filename": "util/elan/elaniap_test.cc",
         "patchSetId": 24
