@@ -108,6 +108,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5b446164_8f0a371a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T18:55:18Z",
+      "side": 1,
+      "message": "Notice that \"Step 2\" said \"Append the test binary definition\". You put the test binary in the Makefile before the `_focaltech_bin` binary. `_focaltech_bin` should be first.",
+      "parentUuid": "6451eff2_784a9cf4",
+      "revId": "329fa69d2ba588e47725f0f34608ec3f3b9ee321",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5d7a12e3_5f8b347e",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 15

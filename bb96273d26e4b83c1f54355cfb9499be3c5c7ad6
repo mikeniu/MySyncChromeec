@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c887d59_f27bd521",
+        "filename": "util/focaltech/build.mk",
+        "patchSetId": 16
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T18:55:18Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by Trailing Whitespace: Please remove the trailing whitespace.",
+      "range": {
+        "startLine": 24,
+        "startChar": 106,
+        "endLine": 24,
+        "endChar": 107
+      },
+      "revId": "bb96273d26e4b83c1f54355cfb9499be3c5c7ad6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18e1d47d_32a037c7",
+        "filename": "util/focaltech/build.mk",
+        "patchSetId": 16
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T18:55:18Z",
+      "side": 1,
+      "message": "**Incorrect Makefile Variable for C++ Sources (`util/focaltech/build.mk`)** The `focaltech_fingerprint_iap` target is built from C++ source files (`main.o`, `updater.o`, etc.), but the makefile attempts to configure the compiler using C flags.\n\n* **The Issue:** Make\u0027s default rules for C++ sources use `CXXFLAGS` (or `HOST_CXXFLAGS` in the ChromiumOS build system).\n* **Remediation:** Change `HOST_CFLAGS` to `HOST_CXXFLAGS` for `_focaltech_bin`.",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 78
+      },
+      "revId": "bb96273d26e4b83c1f54355cfb9499be3c5c7ad6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
