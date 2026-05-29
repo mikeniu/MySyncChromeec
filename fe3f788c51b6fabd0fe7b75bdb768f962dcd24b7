@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f610416c_0600ba60",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-29T21:52:14Z",
+      "side": 1,
+      "message": "This looks great.  Please create a unit test.  You can use the existing brox [suspend_resume.c](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/brox/tests/baseboard/src/suspend_resume.c) as a template for the test.",
+      "revId": "fe3f788c51b6fabd0fe7b75bdb768f962dcd24b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
