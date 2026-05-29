@@ -127,6 +127,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "23be899c_89d2da83",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-05-29T09:08:49Z",
+      "side": 1,
+      "message": "Changed to checking expected time of timer expiry.",
+      "parentUuid": "fb53e163_cdd79d63",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 83,
+        "endChar": 59
+      },
+      "revId": "6b287ec2f838e4ab139e96943ce790929c6f3b21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f55ed57c_7a394ae4",
         "filename": "common/fpsensor/fpsensor_led.cc",
         "patchSetId": 15
@@ -269,6 +293,24 @@
       "side": 1,
       "message": "So is cancel needed, maybe just `set_led_brightness`?\n\nWhat about if the work is already running? Have you checked reschedule function?",
       "parentUuid": "159117a3_a36b1a3f",
+      "revId": "6b287ec2f838e4ab139e96943ce790929c6f3b21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3dd05b2c_dc83b2b1",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-05-29T09:08:49Z",
+      "side": 1,
+      "message": "I changed to reschedule without cancellation",
+      "parentUuid": "7a4e4d12_442008b1",
       "revId": "6b287ec2f838e4ab139e96943ce790929c6f3b21",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

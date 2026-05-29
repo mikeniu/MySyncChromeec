@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4ad7b1fd_583c2fec",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-05-29T09:08:49Z",
+      "side": 1,
+      "message": "Changed to checking if the event happened at the expected timeout to filter out events which were already running when rescheduling.",
+      "parentUuid": "9f37b784_ddd0efa4",
+      "revId": "6fddbbefa48c83f18ccd2f5efd7260a39742accb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7793f3b5_fb58a8d2",
         "filename": "common/fpsensor/fpsensor_led.cc",
         "patchSetId": 18
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f9a3a7cd_ec5b9e3a",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-05-29T09:08:49Z",
+      "side": 1,
+      "message": "I moved the checks to auxiliary functions. I did not want to remove mode enum and it would be redundant with new variable.",
+      "parentUuid": "7793f3b5_fb58a8d2",
+      "revId": "6fddbbefa48c83f18ccd2f5efd7260a39742accb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6e25291a_ad64c4dc",
         "filename": "common/fpsensor/fpsensor_led.cc",
         "patchSetId": 18
@@ -48,6 +84,24 @@
       "writtenOn": "2026-05-28T10:26:15Z",
       "side": 1,
       "message": "Add a comment sem is locked.",
+      "revId": "6fddbbefa48c83f18ccd2f5efd7260a39742accb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f16cc76f_de7b7f2c",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-05-29T09:08:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e25291a_ad64c4dc",
       "revId": "6fddbbefa48c83f18ccd2f5efd7260a39742accb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -71,6 +125,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "77eca24a_f4e2e7f7",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-05-29T09:08:49Z",
+      "side": 1,
+      "message": "Changed to reschedule. Together with removing cancellation it should have less chances to fail (schedule can fail if cancellation is ongoing). In case of reschedule failure brightness is set to 0.",
+      "parentUuid": "420e075a_f3d1f338",
+      "revId": "6fddbbefa48c83f18ccd2f5efd7260a39742accb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ab7ed915_409c3afd",
         "filename": "common/fpsensor/fpsensor_led.cc",
         "patchSetId": 18
@@ -82,6 +154,24 @@
       "writtenOn": "2026-05-28T10:31:30Z",
       "side": 1,
       "message": "Please consider adding turning off the LED in RO with this init.",
+      "revId": "6fddbbefa48c83f18ccd2f5efd7260a39742accb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad330be2_103a4513",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-05-29T09:08:49Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "ab7ed915_409c3afd",
       "revId": "6fddbbefa48c83f18ccd2f5efd7260a39742accb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
