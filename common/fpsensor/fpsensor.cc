@@ -630,6 +630,9 @@ test_export_static enum ec_status get_frame(uint32_t offset, uint32_t size,
 	 * pattern1, and reset_test.
 	 */
 	if (skip_image_offset(global_context.current_capture_type)) {
+		if (offset > (UINT32_MAX - FP_SENSOR_IMAGE_OFFSET)) {
+			return EC_RES_INVALID_PARAM;
+		}
 		offset += FP_SENSOR_IMAGE_OFFSET;
 		if (offset + size > sizeof(fp_buffer)) {
 			return EC_RES_INVALID_PARAM;
