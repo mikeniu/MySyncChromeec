@@ -98,6 +98,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "efb09f6f_963a5398",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-29T14:04:16Z",
+      "side": 1,
+      "message": "per https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7884088\nit seems this condition cannot be met because of a previous check. So this check is redundant. I verified by changing the error code. The error code that is triggered with this test is `\tret \u003d validate_fp_buffer_offset(current_frame_size, offset, size);`, which also checks for overflow.\n\nThis suggestion make sense here. However, when we place the `offset +\u003d FP_SENSOR_IMAGE_OFFSET;` at the correct location, this check become redundant. I cannot simulate this check before the move, because the current `FP_SENSOR_IMAGE_OFFSET` is zero.",
+      "parentUuid": "32ed751c_c6967287",
+      "range": {
+        "startLine": 619,
+        "startChar": 0,
+        "endLine": 621,
+        "endChar": 0
+      },
+      "revId": "ac546e9893a7f5b11193b028cc42cc21bde09b69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4e86fef9_b5ced3d7",
         "filename": "common/fpsensor/fpsensor.cc",
         "patchSetId": 17
