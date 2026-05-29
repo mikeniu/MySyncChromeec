@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "608830f4_684dd8ff",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-29T21:52:45Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by Spellchecker: \"varients\" is a possible misspelling of \"variants\".\n\nTo bypass Spellchecker, add...\n\n\"varients\" is a possible misspelling of \"variants\".\n\nTo bypass Spellchecker, add a footer with DISABLE_SPELLCHECKER",
+      "range": {
+        "startLine": 7,
+        "startChar": 56,
+        "endLine": 7,
+        "endChar": 64
+      },
+      "revId": "4ae30c68018e9bbee2ef3ccf9f8af2c04ae4a935",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
