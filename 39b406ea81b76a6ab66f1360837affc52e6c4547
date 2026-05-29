@@ -16,6 +16,115 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "39b406ea81b76a6ab66f1360837affc52e6c4547",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb829013_f47b167a",
+        "filename": "docs/charging_subsystems.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-29T17:21:35Z",
+      "side": 1,
+      "message": "Add a `[TOC]` tag.",
+      "revId": "39b406ea81b76a6ab66f1360837affc52e6c4547",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f26d303d_a6a510f2",
+        "filename": "docs/charging_subsystems.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-29T17:21:35Z",
+      "side": 1,
+      "message": "Drop the chapter numbers throughout.",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 3,
+        "endChar": 36
+      },
+      "revId": "39b406ea81b76a6ab66f1360837affc52e6c4547",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b1b8828_36d478fc",
+        "filename": "docs/charging_subsystems.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-29T17:21:35Z",
+      "side": 1,
+      "message": "After reading this section, I still don\u0027t fully understand what a \"charge ceiling\" is.",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 36
+      },
+      "revId": "39b406ea81b76a6ab66f1360837affc52e6c4547",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd260d3e_4a40bb56",
+        "filename": "docs/charging_subsystems.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-29T17:21:35Z",
+      "side": 1,
+      "message": "It would be better to create sub-sections that detail the host commands and console commands usage related to the charge manager.",
+      "range": {
+        "startLine": 59,
+        "startChar": 33,
+        "endLine": 62,
+        "endChar": 0
+      },
+      "revId": "39b406ea81b76a6ab66f1360837affc52e6c4547",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90ed7ca2_d2373a1a",
+        "filename": "docs/charging_subsystems.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-05-29T17:21:35Z",
+      "side": 1,
+      "message": "unnecessary acronym - this will be confused with System on a Chip (SoC), which usually means the application processor.",
+      "range": {
+        "startLine": 69,
+        "startChar": 28,
+        "endLine": 69,
+        "endChar": 50
+      },
+      "revId": "39b406ea81b76a6ab66f1360837affc52e6c4547",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
