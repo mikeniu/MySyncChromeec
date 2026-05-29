@@ -189,6 +189,34 @@ ZTEST(fpsensor_get_frame, test_get_frame_integer_overflow)
 			  "Output buffer modified during failure path");
 }
 
+ZTEST(fpsensor_get_frame, test_get_frame_shifted_integer_overflow)
+{
+	uint8_t output_buffer[kMaxReadSize];
+	memset(output_buffer, 0xA5, sizeof(output_buffer));
+
+	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
+
+	uint32_t size = kMaxReadSize;
+	uint32_t offset = UINT32_MAX - FP_SENSOR_IMAGE_OFFSET + 1;
+
+	/*
+	 * Verify that the offset + image_offset will definitely overflow 32
+	 * bits
+	 */
+	zassert_true(
+		(uint64_t)offset + FP_SENSOR_IMAGE_OFFSET > UINT32_MAX,
+		"Test setup: Expected overflow condition, but calculation is safe.");
+
+	enum ec_status status = get_frame(offset, size, output_buffer);
+
+	zassert_equal(
+		status, EC_RES_INVALID_PARAM,
+		"Expected rejection of offset causing integer wrap-around");
+
+	zassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer),
+			  "Output buffer modified during overflow attack");
+}
+
 ZTEST(fpsensor_get_frame, test_get_frame_shifted_layout_success)
 {
 	uint8_t output_buffer[kMaxReadSize];
