@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+#include "fpsensor_test_utils.h"
+
 #include <string.h>
 
 #include <zephyr/autoconf.h>
@@ -136,8 +138,9 @@ ZTEST(fpsensor_get_frame, test_get_frame_cache_size_exceeds_buffer)
 	 * Cache Pollution: Use the test-only setter to override the cache value
 	 * without violating strict aliasing rules.
 	 */
-	global_context.fp_frame_size_cache.set_frame_size(
-		FP_CAPTURE_VENDOR_FORMAT, FP_SENSOR_IMAGE_SIZE + 1);
+	FpFrameSizeCacheTestHelper::set_frame_size(
+		global_context.fp_frame_size_cache, FP_CAPTURE_VENDOR_FORMAT,
+		FP_SENSOR_IMAGE_SIZE + 1);
 
 	enum ec_status status = get_frame(offset, size, output_buffer);
 
@@ -330,8 +333,9 @@ ZTEST(fpsensor_get_frame, test_get_frame_physical_hardware_buffer_overflow)
 	 * Cache Pollution: Use the test-only setter to override the cache value
 	 * without violating strict aliasing rules.
 	 */
-	global_context.fp_frame_size_cache.set_frame_size(
-		FP_CAPTURE_SIMPLE_IMAGE, sizeof(fp_buffer));
+	FpFrameSizeCacheTestHelper::set_frame_size(
+		global_context.fp_frame_size_cache, FP_CAPTURE_SIMPLE_IMAGE,
+		sizeof(fp_buffer));
 
 	enum ec_status status = get_frame(offset, size, output_buffer);
 
