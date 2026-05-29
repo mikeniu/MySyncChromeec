@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cb5cc665_1ce0717d",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T00:05:56Z",
+      "side": 1,
+      "message": "Note that I don\u0027t think this will be caught by [`-ftrapv`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/program/fpmcu/CMakeLists.txt;l\u003d9-10;drc\u003d93efde27eca7db72ce31133c5e9382ae31315b4d) since it\u0027s unsigned overflow.",
+      "parentUuid": "ff9864ae_7768d5d4",
+      "range": {
+        "startLine": 619,
+        "startChar": 0,
+        "endLine": 621,
+        "endChar": 0
+      },
+      "revId": "ac546e9893a7f5b11193b028cc42cc21bde09b69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4e86fef9_b5ced3d7",
         "filename": "common/fpsensor/fpsensor.cc",
         "patchSetId": 17
