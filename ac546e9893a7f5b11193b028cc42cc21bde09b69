@@ -122,6 +122,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dc76e331_b9e13a3f",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-05-29T16:04:25Z",
+      "side": 1,
+      "message": "just to summarize:\n\n- The suggested test is valid. However, it cannot be implemented in the current settings. If `I specify uint32_t offset \u003d UINT32_MAX - FP_SENSOR_IMAGE_OFFSET + 1;` as suggested, and because `FP_SENSOR_IMAGE_OFFSET` is currently set to zero in the dts tree, the offset value will overflow and it will not be useful in testing. \n\n- In order to make use of the suggestion, I have to make `FP_SENSOR_IMAGE_OFFSET` non-zero. This is something I made in a later CL. However, with this change, I have to order the check as done in https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7842120/12/common/fpsensor/fpsensor.cc. This is necessary because the capture tests simulate real case scenario and we detected this in real live application.\n\n- With this change, the suggested check become redundant. \n\nIn summary, it is a good suggestion. However, it requires changes that makes this test redundant.",
+      "parentUuid": "efb09f6f_963a5398",
+      "range": {
+        "startLine": 619,
+        "startChar": 0,
+        "endLine": 621,
+        "endChar": 0
+      },
+      "revId": "ac546e9893a7f5b11193b028cc42cc21bde09b69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4e86fef9_b5ced3d7",
         "filename": "common/fpsensor/fpsensor.cc",
         "patchSetId": 17
