@@ -96,6 +96,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c7d7665a_6c96589a",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T00:13:41Z",
+      "side": 1,
+      "message": "**2. Minor Comment Inaccuracy in test_get_frame_size_zero** The comment states: \"A size of 0 should be a valid request that result in no operations...\" Strictly speaking, the function still executes the validations and calls memcpy(output, fp_buffer + offset, 0). It does perform operations; they just safely result in a zero-byte copy. This is a very minor semantic detail, but tweaking the comment to \"A size of 0 is a valid request that safely copies zero bytes\" makes it strictly accurate to the underlying C execution.",
+      "range": {
+        "startLine": 108,
+        "startChar": 0,
+        "endLine": 111,
+        "endChar": 4
+      },
+      "revId": "ac546e9893a7f5b11193b028cc42cc21bde09b69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dba2a593_f96cf9e5",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
         "patchSetId": 17
