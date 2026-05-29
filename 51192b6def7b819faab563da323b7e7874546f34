@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "beb4d489_29815dca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T04:28:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/bcecec32-615f-4b0e-bf19-5f5c95ecbb3b)]\n\n**Review Summary**\n* **Functionality**: The extraction of test-specific logic into a helper is a good design choice that cleans up the production API. However, the current implementation in the shared header introduces a critical issue (using `LOG_MODULE_REGISTER`) that will cause One Definition Rule (ODR) violations and linker errors when compiling the test suite.\n* **Style**: The new test helper header file lacks standard include guards.\n* **Security**: No security issues identified.\n* **Testing**: The test files have been correctly updated to use the new `FpFrameSizeCacheTestHelper`.",
+      "revId": "51192b6def7b819faab563da323b7e7874546f34",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23638c52_d0cf78ca",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_test_utils.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T04:28:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please add standard header include guards (`#ifndef ...`, `#define ...`, `#endif`) or `#pragma once` to prevent multiple inclusion issues.",
+      "revId": "51192b6def7b819faab563da323b7e7874546f34",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db7055ce_f029a794",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_test_utils.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T04:28:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Using `LOG_MODULE_REGISTER` in a header file will cause One Definition Rule (ODR) violations and linker errors if this header is included in multiple `.cc` files (as it currently is in `fpsensor_frame_size.cc` and `fpsensor_get_frame.cc`).\n\nIn Zephyr, `LOG_MODULE_REGISTER` must be called exactly once per module, typically in a `.c` or `.cc` file. \n\n**Suggestions:**\n1. Move `LOG_MODULE_REGISTER(fpsensor_test_utils, ...)` into a new `fpsensor_test_utils.cc` file, and use `LOG_MODULE_DECLARE(fpsensor_test_utils, ...)` here in the header.\n2. Alternatively, for a simple test helper like this, you can just use `printk` or `ztest_print` instead of the Zephyr logging subsystem to avoid needing a separate `.cc` file entirely.",
+      "revId": "51192b6def7b819faab563da323b7e7874546f34",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
