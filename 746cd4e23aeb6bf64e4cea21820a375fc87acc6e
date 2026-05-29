@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e436c19_4ddabe32",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T04:13:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/33616f97-4b65-4aa5-8169-0f573c4b8553)]\n\n**Review Summary**\n* **Functionality**: The changes successfully extract test-specific logic out of the production class and into a test helper. This is a great refactor that keeps the production API clean and ensures the cache remains read-only outside of test environments.\n* **Style**: There is some code duplication because `FpFrameSizeCacheTestHelper` is defined in both `fpsensor_frame_size.cc` and `fpsensor_get_frame.cc`. I\u0027ve left an inline suggestion to consider moving it to a shared test header.\n* **Security**: No security concerns introduced.\n* **Testing**: The test files have been correctly updated to use the new `FpFrameSizeCacheTestHelper`.",
+      "revId": "746cd4e23aeb6bf64e4cea21820a375fc87acc6e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bab934c_07bead44",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_frame_size.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T04:13:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider extracting `FpFrameSizeCacheTestHelper` into a shared test header file instead of duplicating its definition across multiple `.cc` files (it\u0027s also defined in `fpsensor_get_frame.cc`).\n\nWhile defining it locally works, a shared header reduces code duplication and prevents potential One Definition Rule (ODR) violations if these test files are ever compiled and linked into the same test executable.",
+      "revId": "746cd4e23aeb6bf64e4cea21820a375fc87acc6e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
