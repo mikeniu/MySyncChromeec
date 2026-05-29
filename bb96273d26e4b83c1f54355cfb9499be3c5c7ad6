@@ -45,6 +45,98 @@
       },
       "revId": "bb96273d26e4b83c1f54355cfb9499be3c5c7ad6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aacaebd0_162b3b1b",
+        "filename": "util/focaltech/ft_log.h",
+        "patchSetId": 16
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T19:01:34Z",
+      "side": 1,
+      "message": "**Global Constant Linkage (`util/focaltech/ft_log.h`)**\n\n* **The Issue:** `constexpr const char* kLogTag \u003d \"focaltech\";` at the global scope in a header. While `constexpr` implies internal linkage for variables, Google style prefers these to be explicitly scoped.  \n* **Remediation:** Place `kLogTag` and `kCurrentLogLevel` inside an unnamed namespace (if only used in one `.cc` file) or a named namespace like `ft_log` to be perfectly compliant with Google\u0027s scoping rules.",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 44
+      },
+      "revId": "bb96273d26e4b83c1f54355cfb9499be3c5c7ad6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed25a4f9_b5946fa5",
+        "filename": "util/focaltech/ft_log.h",
+        "patchSetId": 16
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T19:01:34Z",
+      "side": 1,
+      "message": "**Macro Naming and Usage (`util/focaltech/ft_log.h`)**\n\n* **The Issue:** Google Style strongly discourages macros, but concedes they are sometimes necessary for things like `std::source_location`. However, the names `LOGE`, `LOGW`, etc., are too generic and violate the naming convention, risking ODR violations or collisions with Chromium\u0027s `base/logging.h`.  \n* **Remediation:** Prefix them to match the project (e.g., `FT_LOG_ERROR`, `FT_LOG_INFO`).",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 84,
+        "endChar": 80
+      },
+      "revId": "bb96273d26e4b83c1f54355cfb9499be3c5c7ad6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d8e4e43_3770f45f",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T19:01:34Z",
+      "side": 1,
+      "message": "**The \"Related Header\" Include Order (`util/focaltech/ft_scsi.cc` \u0026 `usb_context.cc`)** You have comments in your implementation files saying:\n\n```c\n// To prevent the formatter from rearranging the header include order.\n#include \"ft_scsi.h\"\n\n```\n\n* **The Issue:** The Google C++ Style Guide explicitly mandates that a `.cc` file\u0027s *first* include must be its related `.h` file (e.g., `ft_scsi.cc` must include `ft_scsi.h` before `\u003cbit\u003e`, `\u003cendian.h\u003e`, or anything else). This rule exists to ensure that every header is completely self-contained and doesn\u0027t secretly rely on includes from the `.cc` file.  \n* **Remediation:** Remove the comment and move `#include \"ft_scsi.h\"` to the very top of `ft_scsi.cc`. Do the same for `usb_context.h` in `usb_context.cc`. Let `clang-format` do its job; it is trying to enforce the correct Google style rule.",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 70
+      },
+      "revId": "bb96273d26e4b83c1f54355cfb9499be3c5c7ad6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b288964_40814891",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T19:01:34Z",
+      "side": 1,
+      "message": "**. Uninitialized Memory in String View (`util/focaltech/main.cc`)** In `CheckEcBuildVersion`, the response payload is read into a fixed 64-byte array (`rx`).\n\n* **The Issue:** The `std::string_view` is unconditionally instantiated with a length of `kRxLen - kEcResponseHeaderSize - kEcResponseNullTerminatorSize` (55 bytes). If `rr.value()` (actual bytes received) is less than 64, the `string_view` will contain embedded null characters `\\0` from the zero-initialized array, leading to malformed log outputs and potential matching errors in `std::any_of`.  \n* **Remediation:** Size the `string_view` dynamically based on `rr.value()`.\n\n```c\nsize_t valid_data_len \u003d std::max\u003csize_t\u003e(0, rr.value() - kEcResponseHeaderSize);\nstd::string_view info(\n    reinterpret_cast\u003cconst char*\u003e(rx.data() + kEcResponseHeaderSize),\n    valid_data_len);\n\n```",
+      "range": {
+        "startLine": 105,
+        "startChar": 1,
+        "endLine": 109,
+        "endChar": 37
+      },
+      "revId": "bb96273d26e4b83c1f54355cfb9499be3c5c7ad6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
