@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ecd4237_7580b185",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-05-29T12:01:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a2c7f54_f9c55ea5",
+      "revId": "94ea65e39a2b50e77d3087053ce8737c9bf2d397",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7291a007_bafd454a",
@@ -54,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "37a904d9_cf0c3310",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-05-29T12:01:06Z",
+      "side": 1,
+      "message": "I tried my best to align struct to file format with updating wording from spec. Please check if I got it right.",
+      "parentUuid": "7291a007_bafd454a",
+      "revId": "94ea65e39a2b50e77d3087053ce8737c9bf2d397",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "42698556_7a3ff6de",
         "filename": "include/usb_pd_vdo.h",
         "patchSetId": 11
@@ -65,6 +101,24 @@
       "writtenOn": "2026-05-28T23:05:22Z",
       "side": 1,
       "message": "IMO, you should make this a union with a `uint32_t`. Then you could get rid of the casts to `uiint32_t *` and `memset`s and just assign to and from `.raw`.",
+      "revId": "94ea65e39a2b50e77d3087053ce8737c9bf2d397",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bf6c12e_8e028e7f",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-05-29T12:01:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "42698556_7a3ff6de",
       "revId": "94ea65e39a2b50e77d3087053ce8737c9bf2d397",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
