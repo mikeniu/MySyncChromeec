@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70f30df4_670f2e8b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T06:26:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/24d090b1-8194-4361-8ea1-b5396c87edaf)]\n\n### Review Summary\n**Functionality**: ❌ The integer wrap-around vulnerability this patch aims to fix does not exist. The `offset` parameter is already bounded by `validate_fp_buffer_offset` on line 623 to be less than or equal to `sizeof(fp_buffer)`. Because of this prior validation, it is mathematically impossible for `offset + FP_SENSOR_IMAGE_OFFSET` to wrap around `UINT32_MAX`. The newly added check is therefore dead code. The added regression test passes only because `validate_fp_buffer_offset` rejects the large offset before the new check is even evaluated.\n**Security**: ✅ No new security vulnerabilities introduced. The existing bounds checking (`validate_fp_buffer_offset` and the subsequent bounds check after adding the image offset) correctly prevent out-of-bounds reads.\n**Style**: ✅ The code is clean and adheres to style guidelines.\n**Testing**: ✅ A new regression test was added. While it tests the correct behavior (an error is returned), this rejection is handled by the existing validation logic. The test is still valuable as a regression test for `validate_fp_buffer_offset` itself.\n**Overall Quality**: The patch adds redundant code to address an impossible condition. I recommend dropping the redundant check in `fpsensor.cc` and keeping the test, potentially rewording its comments to reflect that it exercises `validate_fp_buffer_offset`.",
+      "revId": "c8b4f776d01eb9b8dd8333f996961e19ef565be8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a904e69b_847efb25",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 633,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-05-29T06:26:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This check is mathematically impossible to trigger and constitutes dead code.\n\nOn line 623, `validate_fp_buffer_offset(current_frame_size, offset, size)` ensures that `offset + size \u003c\u003d current_frame_size` (and it uses `check_add_overflow` internally to prevent integer wrap-around).\nSince `current_frame_size` is explicitly bounded by `sizeof(fp_buffer)` on line 619, we are mathematically guaranteed that `offset \u003c\u003d sizeof(fp_buffer)` upon reaching this block.\n\nBecause `offset` cannot exceed `sizeof(fp_buffer)` (which is a relatively small constant), the addition `offset + FP_SENSOR_IMAGE_OFFSET` can never wrap around `UINT32_MAX`.\n\nThe regression test added in this CL (`test_get_frame_shifted_integer_overflow`) actually passes because `validate_fp_buffer_offset` correctly catches the large `offset` parameter and returns an error *before* execution ever reaches this new check. I recommend dropping this redundant check.",
+      "revId": "c8b4f776d01eb9b8dd8333f996961e19ef565be8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
