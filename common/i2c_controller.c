@@ -10,7 +10,6 @@
 #include "crc8.h"
 #include "host_command.h"
 #include "i2c.h"
-#include "i2c_bitbang.h"
 #include "i2c_private.h"
 #include "printf.h"
 #include "system.h"
@@ -32,7 +31,7 @@
 #define I2C_CONTROLLER_COUNT I2C_PORT_COUNT
 #endif
 
-static mutex_t port_mutex[I2C_CONTROLLER_COUNT + I2C_BITBANG_PORT_COUNT];
+static mutex_t port_mutex[I2C_CONTROLLER_COUNT];
 
 /* A bitmap of the controllers which are currently servicing a request. */
 static volatile uint32_t i2c_port_active_list;
@@ -58,10 +57,6 @@ SYS_INIT(init_port_mutex, POST_KERNEL, 50);
 STATIC_IF_NOT(CONFIG_ZTEST)
 int i2c_port_is_locked(int port)
 {
-#ifdef CONFIG_I2C_MULTI_PORT_CONTROLLER
-	/* Test the controller, not the port */
-	port = i2c_port_to_controller(port);
-#endif
 	/* can't lock a non-existing port */
 	if (port < 0)
 		return 0;
@@ -88,102 +83,8 @@ const struct i2c_port_t *get_i2c_port(const int port)
 		}
 	}
 
-	if (IS_ENABLED(CONFIG_I2C_BITBANG_CROS_EC)) {
-		/* Find the matching port in i2c_bitbang_ports[] table. */
-		for (i = 0; i < i2c_bitbang_ports_used; i++) {
-			if (i2c_bitbang_ports[i].port == port)
-				return &i2c_bitbang_ports[i];
-		}
-	}
-
 	return NULL;
 }
-
-__maybe_unused static int chip_i2c_xfer_with_notify(const int port,
-						    const uint16_t addr_flags,
-						    const uint8_t *out,
-						    int out_size, uint8_t *in,
-						    int in_size, int flags)
-{
-	int ret;
-	uint16_t no_pec_af = addr_flags;
-	const struct i2c_port_t *i2c_port = get_i2c_port(port);
-
-	if (i2c_port == NULL)
-		return EC_ERROR_INVAL;
-
-	if (IS_ENABLED(CONFIG_I2C_XFER_BOARD_CALLBACK))
-		i2c_start_xfer_notify(port, addr_flags);
-
-	if (IS_ENABLED(CONFIG_SMBUS_PEC))
-		/*
-		 * Since we've done PEC processing here,
-		 * remove the flag so it won't confuse chip driver.
-		 */
-		no_pec_af &= ~I2C_FLAG_PEC;
-
-	if (i2c_port->drv)
-		ret = i2c_port->drv->xfer(i2c_port, no_pec_af, out, out_size,
-					  in, in_size, flags);
-	else
-		ret = chip_i2c_xfer(port, no_pec_af, out, out_size, in, in_size,
-				    flags);
-
-	if (IS_ENABLED(CONFIG_I2C_XFER_BOARD_CALLBACK))
-		i2c_end_xfer_notify(port, addr_flags);
-
-	if (IS_ENABLED(CONFIG_I2C_DEBUG)) {
-		i2c_trace_notify(port, addr_flags, out, out_size, in, in_size,
-				 ret);
-	}
-
-	return ret;
-}
-
-#ifdef CONFIG_I2C_XFER_LARGE_TRANSFER
-/*
- * Internal function that splits transfer into multiple chip_i2c_xfer() calls
- * if in_size or out_size exceeds CONFIG_I2C_CHIP_MAX_TRANSFER_SIZE.
- */
-static int i2c_xfer_no_retry(const int port, const uint16_t addr_flags,
-			     const uint8_t *out, int out_size, uint8_t *in,
-			     int in_size, int flags)
-{
-	int offset;
-
-	for (offset = 0; offset < out_size;) {
-		int chunk_size = min(out_size - offset,
-				     CONFIG_I2C_CHIP_MAX_TRANSFER_SIZE);
-		int out_flags = 0;
-
-		if (offset == 0)
-			out_flags |= flags & I2C_XFER_START;
-		if (in_size == 0 && offset + chunk_size == out_size)
-			out_flags |= flags & I2C_XFER_STOP;
-
-		RETURN_ERROR(chip_i2c_xfer_with_notify(port, addr_flags,
-						       out + offset, chunk_size,
-						       NULL, 0, out_flags));
-		offset += chunk_size;
-	}
-	for (offset = 0; offset < in_size;) {
-		int chunk_size = min(in_size - offset,
-				     CONFIG_I2C_CHIP_MAX_TRANSFER_SIZE);
-		int in_flags = 0;
-
-		if (offset == 0)
-			in_flags |= flags & I2C_XFER_START;
-		if (offset + chunk_size == in_size)
-			in_flags |= flags & I2C_XFER_STOP;
-
-		RETURN_ERROR(chip_i2c_xfer_with_notify(port, addr_flags, NULL,
-						       0, in + offset,
-						       chunk_size, in_flags));
-		offset += chunk_size;
-	}
-	return EC_SUCCESS;
-}
-#endif /* CONFIG_I2C_XFER_LARGE_TRANSFER */
 
 int i2c_xfer_unlocked(const int port, const uint16_t addr_flags,
 		      const uint8_t *out, int out_size, uint8_t *in,
@@ -259,13 +160,20 @@ int i2c_xfer_unlocked(const int port, const uint16_t addr_flags,
 		default:
 			return EC_ERROR_UNKNOWN;
 		}
-#elif defined(CONFIG_I2C_XFER_LARGE_TRANSFER)
-		ret = i2c_xfer_no_retry(port, no_pec_af, out, out_size, in,
-					in_size, flags);
 #else
-		ret = chip_i2c_xfer_with_notify(port, no_pec_af, out, out_size,
-						in, in_size, flags);
-#endif /* CONFIG_I2C_XFER_LARGE_TRANSFER */
+		const struct i2c_port_t *i2c_port = get_i2c_port(port);
+
+		if (i2c_port == NULL)
+			return EC_ERROR_INVAL;
+
+		ret = chip_i2c_xfer(port, no_pec_af, out, out_size, in, in_size,
+				    flags);
+
+		if (IS_ENABLED(CONFIG_I2C_DEBUG)) {
+			i2c_trace_notify(port, addr_flags, out, out_size, in,
+					 in_size, ret);
+		}
+#endif /* !CONFIG_ZEPHYR */
 		if (ret != EC_ERROR_BUSY)
 			break;
 	}
@@ -287,10 +195,6 @@ int i2c_xfer(const int port, const uint16_t addr_flags, const uint8_t *out,
 
 void i2c_lock(int port, int lock)
 {
-#ifdef CONFIG_I2C_MULTI_PORT_CONTROLLER
-	/* Lock the controller, not the port */
-	port = i2c_port_to_controller(port);
-#endif
 	if (port < 0 || port >= ARRAY_SIZE(port_mutex))
 		return;
 
