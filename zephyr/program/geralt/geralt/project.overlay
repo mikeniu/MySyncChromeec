@@ -20,10 +20,4 @@
 #include "battery.dtsi"
 #include "led.dtsi"
 
-/ {
-	chosen {
-		zephyr,host-cmd-shi-backend = &shi0;
-	};
-};
-
 /delete-node/ &int_spi0_cs;
