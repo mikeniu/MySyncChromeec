@@ -22,6 +22,30 @@
       },
       "revId": "541d3224fe91ec14b3b0ce66c6928660e801c2c9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24759354_2ba70463",
+        "filename": "zephyr/program/fatcat/moonstone/i2c_pac.dtsi",
+        "patchSetId": 24
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-06-01T14:18:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97351007_aab44e66",
+      "range": {
+        "startLine": 1,
+        "startChar": 13,
+        "endLine": 1,
+        "endChar": 17
+      },
+      "revId": "541d3224fe91ec14b3b0ce66c6928660e801c2c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
