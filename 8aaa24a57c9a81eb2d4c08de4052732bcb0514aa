@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "721cc8d4_970bb46f",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T22:21:38Z",
+      "side": 1,
+      "message": "Consider this for a followup CL. We should see how the real code behaves too so that the simulator and real code behave the same way:\n\n-----\n\n\n**Location:** `fp_simulator_acquire_image`\n\nIf the requested `mode` is not found in the `config-\u003esensor_image_configs` array, the loop exits without matching.\n\n* **The Issue:** `frame_size` and `offset` remain `0`. The code then proceeds to calculate `total_required_size` as `0`, passes the buffer size check, executes a 0-byte `memcpy`, and returns `FINGERPRINT_SENSOR_SCAN_GOOD` (if that was the pre-existing state). Returning a \"good scan\" for an unsupported mode is misleading and hides invalid requests.\n* **Remediation:** Introduce a boolean flag or check if the mode was actually found during the iteration. If it wasn\u0027t, return an appropriate error code (e.g., `-ENOTSUP` or `-EINVAL`).\n```c\nbool mode_found \u003d false;\nfor (uint8_t i \u003d 0; i \u003c config-\u003esensor_info.num_capture_types; ++i) {\n    if (config-\u003esensor_image_configs[i].fp_capture_type \u003d\u003d mode) {\n        frame_size \u003d config-\u003esensor_image_configs[i].frame_size;\n        if (apply_image_offset) {\n            offset \u003d config-\u003esensor_image_configs[i].image_data_offset_bytes;\n        }\n        mode_found \u003d true;\n        break;\n    }\n}\n\nif (!mode_found) {\n    return -ENOTSUP;\n}\n\n```",
+      "range": {
+        "startLine": 141,
+        "startChar": 2,
+        "endLine": 141,
+        "endChar": 64
+      },
+      "revId": "8aaa24a57c9a81eb2d4c08de4052732bcb0514aa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
