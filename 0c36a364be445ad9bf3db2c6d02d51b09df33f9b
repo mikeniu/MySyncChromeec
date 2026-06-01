@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70efdfb9_8d49a43e",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 647,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T20:30:43Z",
+      "side": 1,
+      "message": "Is this supposed to be `\u003d` or `+\u003d`?",
+      "range": {
+        "startLine": 647,
+        "startChar": 0,
+        "endLine": 647,
+        "endChar": 27
+      },
+      "revId": "0c36a364be445ad9bf3db2c6d02d51b09df33f9b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
