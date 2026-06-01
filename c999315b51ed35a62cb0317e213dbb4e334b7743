@@ -70,6 +70,30 @@
       },
       "revId": "c999315b51ed35a62cb0317e213dbb4e334b7743",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34daffdc_e5254217",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 22
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-06-01T20:46:02Z",
+      "side": 1,
+      "message": "My understanding is that `TX_BUFFER_SIZE` corresponds to the response size, while `RX_BUFFER_SIZE` corresponds to the request size. This is vs. host\n\nthis is where it is used in a test:\n\nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/hwtest/src/fp_transport.c;l\u003d128?q\u003dplatform%2Fec%20EC_HOST_CMD_HANDLER_TX_BUFFER_SIZE#:~:text\u003d127-,128,-129\n\nI believe the 544 is platform dependent. They use 544 for simulated test\n\n```\nTX (Transmit) Buffer: This is the buffer used by the EC to send data back to the host. When the EC completes a command, it writes the result and the response data into this buffer to transmit it to the host. Therefore, CONFIG_EC_HOST_CMD_HANDLER_TX_BUFFER_SIZE limits the maximum size of a response packet.\n\nRX (Receive) Buffer: This is the buffer used by the EC to receive data from the host. This holds the request header and any command data sent by the host. Therefore, CONFIG_EC_HOST_CMD_HANDLER_RX_BUFFER_SIZE limits the maximum size of a request packet.\n```\n\nI will go ahead and make the change",
+      "parentUuid": "cad65df6_7b38e9ee",
+      "range": {
+        "startLine": 18,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 6
+      },
+      "revId": "c999315b51ed35a62cb0317e213dbb4e334b7743",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
