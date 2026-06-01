@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "844b8733_d5dbc77a",
+        "filename": "zephyr/mock/CMakeLists.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-01T22:17:13Z",
+      "side": 1,
+      "message": "Can this file along with the usb_mux.c files be moved to a separate CL?",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 66
+      },
+      "revId": "10202ea5e4300c963b03d9f5550b4ef189738864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1020cddd_5bcaaa4e",
+        "filename": "zephyr/shim/src/host_command.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-01T22:17:13Z",
+      "side": 1,
+      "message": "There are 4 separate `#ifdef CONFIG_EC_HOST_CMD` blocks in this file.  Can those be moved into their own file to clean this up?",
+      "range": {
+        "startLine": 16,
+        "startChar": 7,
+        "endLine": 16,
+        "endChar": 25
+      },
+      "revId": "10202ea5e4300c963b03d9f5550b4ef189738864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d1d60b1_b5064459",
+        "filename": "zephyr/shim/src/host_command.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-01T22:17:13Z",
+      "side": 1,
+      "message": "Is this only used by tests? No actual boards should need this. \n\nThis should be moved into the test utils, and there should be a plan to eliminate `host_command_process()` calls from all the existing tests.",
+      "range": {
+        "startLine": 222,
+        "startChar": 9,
+        "endLine": 222,
+        "endChar": 34
+      },
+      "revId": "10202ea5e4300c963b03d9f5550b4ef189738864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d232422c_075f2c26",
+        "filename": "zephyr/shim/src/tasks.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-01T22:17:13Z",
+      "side": 1,
+      "message": "I think these call all be converted to `if (IS_ENABLED())` checks. \n\nAt a minimum, you can convert to a series of `#if` blocks since each one returns.\n\n```\n#if defined(CONFIG_TASK_HOSTCMD_THREAD_MAIN) || \\...\n    return get_main_thread();\n#endif\n\n#ifdef CONFIG_EC_HOST_CMD\n    return \u0026hc-\u003ethread;\n#endif\n...\n```",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 133,
+        "endChar": 1
+      },
+      "revId": "10202ea5e4300c963b03d9f5550b4ef189738864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b9d96c8_06e40d19",
+        "filename": "zephyr/shim/src/tasks.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-01T22:17:13Z",
+      "side": 1,
+      "message": "Braces shouldn\u0027t be needed.  This also makes more sense in the `host_command_upstream_init() routine.",
+      "range": {
+        "startLine": 418,
+        "startChar": 0,
+        "endLine": 418,
+        "endChar": 2
+      },
+      "revId": "10202ea5e4300c963b03d9f5550b4ef189738864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4649671b_d8baf543",
+        "filename": "zephyr/test/drivers/default/src/usb_mux.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 935,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-01T22:17:13Z",
+      "side": 1,
+      "message": "Separate out with the other usb_mux changes.",
+      "range": {
+        "startLine": 935,
+        "startChar": 1,
+        "endLine": 935,
+        "endChar": 18
+      },
+      "revId": "10202ea5e4300c963b03d9f5550b4ef189738864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b84d248_29e28fe9",
+        "filename": "zephyr/test/drivers/flash/src/flash.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-01T22:17:13Z",
+      "side": 1,
+      "message": "Is this a requirement of the upstream host command driver?  Add a comment.",
+      "range": {
+        "startLine": 156,
+        "startChar": 0,
+        "endLine": 156,
+        "endChar": 31
+      },
+      "revId": "10202ea5e4300c963b03d9f5550b4ef189738864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
