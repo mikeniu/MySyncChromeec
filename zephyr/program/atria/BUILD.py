@@ -19,6 +19,7 @@ def register_rtk59_project(
         boards=["atria"],
         zephyr_board="realtek/rts5912",
         dts_overlays=[
+            here / "common.overlay",
             here / project_name / "project.overlay",
         ],
         kconfig_files=[
@@ -52,6 +53,7 @@ def register_it8xxx2_project(
         boards=["atria"],
         zephyr_board="it8xxx2/it82002aw",
         dts_overlays=[
+            here / "common.overlay",
             here / project_name / "project.overlay",
         ],
         kconfig_files=[
