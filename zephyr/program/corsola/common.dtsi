@@ -6,6 +6,9 @@
 #include <dt-bindings/wake_mask_event_defines.h>
 
 / {
+	chosen {
+		zephyr,host-cmd-shi-backend = &shi0;
+	};
 	ec-mkbp-host-event-wakeup-mask {
 		compatible = "cros-ec,mkbp-host-event-wakeup-mask";
 		wakeup-mask = <(
