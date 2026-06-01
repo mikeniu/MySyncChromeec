@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "def1bdd7_2c07ff3c",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 23
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T21:49:10Z",
+      "side": 1,
+      "message": "Let\u0027s use `check_add_overflow`:\n\n```\nif (data-\u003estate.acquire_image_result \u003d\u003d FINGERPRINT_SENSOR_SCAN_GOOD) {\n\t\tuint32_t total_required_size;\n\n\t\t/*\n\t\t * Safely calculate required buffer size, rejecting if the \n\t\t * offset + frame_size calculation overflows or exceeds the buffer.\n\t\t */\n\t\tif (check_add_overflow(offset, frame_size, \u0026total_required_size) ||\n\t\t    total_required_size \u003e image_buf_size) {\n\t\t\treturn -EINVAL;\n\t\t}\n\n\t\tmemcpy(image_buf + offset, config-\u003eimage_buffer, frame_size);\n\t}\n```",
+      "range": {
+        "startLine": 158,
+        "startChar": 0,
+        "endLine": 160,
+        "endChar": 3
+      },
+      "revId": "ee647d6d436e5838328bdde0cde9814b979ef3e6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
