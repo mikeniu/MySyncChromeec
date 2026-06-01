@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bfc27e00_b553afc6",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T21:08:44Z",
+      "side": 1,
+      "message": "These are EC commands, right? You should write them the same way that we do in `ec_commands.h`",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 80
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6819d473_75f1477c",
         "filename": "util/focaltech/cli.h",
         "patchSetId": 17
