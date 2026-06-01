@@ -10,6 +10,7 @@
 	chosen {
 		zephyr,console = &uart2;
 		zephyr,shell-uart = &uart2;
+		zephyr,host-cmd-espi-backend = &espi0;
 	};
 
 	prochot-vcmp {
