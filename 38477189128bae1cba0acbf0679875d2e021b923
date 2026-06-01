@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22c3a67d_cb970298",
+        "filename": "zephyr/test/fingerprint/task/include/fpsensor_test_utils.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T18:32:42Z",
+      "side": 1,
+      "message": "In `zephyr/test/fingerprint/task/include/fpsensor_test_utils.h`, the header guard is defined as:\n\n```cpp\n#ifndef __TASK_FPSENSOR_TEST_UTILS_H\n#define __TASK_FPSENSOR_TEST_UTILS_H\n\n```\n\nIn C++, identifiers that begin with two consecutive underscores (or an underscore followed by a capital letter) are strictly reserved for the compiler and standard library implementation. Using them can technically lead to undefined behavior or conflicts.\n\n**Suggestion:** Remove the leading underscores. A standard, safe format would be:\n\n```cpp\n#ifndef TASK_FPSENSOR_TEST_UTILS_H_\n#define TASK_FPSENSOR_TEST_UTILS_H_\n\n```",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 0
+      },
+      "revId": "38477189128bae1cba0acbf0679875d2e021b923",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11a424a2_a8480aa3",
+        "filename": "zephyr/test/fingerprint/task/include/fpsensor_test_utils.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T18:32:42Z",
+      "side": 1,
+      "message": "`FpFrameSizeCacheTestHelper` acts purely as a scoping mechanism for static helper functions. Since it contains no member variables and isn\u0027t meant to be instantiated, it\u0027s a good practice to explicitly prevent object creation.\n\n**Suggestion:** Delete the default constructor.\n\n```cpp\nclass FpFrameSizeCacheTestHelper {\npublic:\n    FpFrameSizeCacheTestHelper() \u003d delete; // Prevent instantiation\n\n    static void set_frame_size(FpFrameSizeCache \u0026cache,\n                               enum fp_capture_type capture_type,\n                               uint32_t size)\n    {\n        // ...\n    }\n};\n\n```",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 34
+      },
+      "revId": "38477189128bae1cba0acbf0679875d2e021b923",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3ab0e31_10424958",
+        "filename": "zephyr/test/fingerprint/task/include/fpsensor_test_utils.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T18:32:42Z",
+      "side": 1,
+      "message": "In `fpsensor_test_utils.h`, if an invalid `capture_type` is provided, the helper prints an error and returns:\n\n```cpp\nif (capture_type \u003c 0 || static_cast\u003csize_t\u003e(capture_type) \u003e\u003d cache.frame_sizes_.size()) {\n    printk(\"Error: Invalid capture type %d\\n\", capture_type);\n    return;\n}\n\n```\n\nWhile this mimics the legacy `CPRINTF` behavior from the production code, this is now exclusively a **test utility**. Test utilities should fail loudly. If a test passes an invalid bounds parameter to a setup helper, it indicates a bug in the test itself, and the test should immediately abort rather than silently returning and potentially causing cascading false positives/negatives.\n\n**Suggestion:** Replace `printk` with a Zephyr `zassert` macro. This will explicitly fail the test execution and provide better test reliability.\n\n```cpp\n#include \u003czephyr/ztest.h\u003e\n\n// Inside the set_frame_size method:\nzassert_true(capture_type \u003e\u003d 0 \u0026\u0026 static_cast\u003csize_t\u003e(capture_type) \u003c cache.frame_sizes_.size(),\n             \"Invalid capture type %d provided to test helper\", capture_type);\n\ncache.frame_sizes_[static_cast\u003csize_t\u003e(capture_type)] \u003d size;\n\n```",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 3
+      },
+      "revId": "38477189128bae1cba0acbf0679875d2e021b923",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
