@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a3118fa_a87eca6b",
+        "filename": "zephyr/program/nissa/joxer/project.conf",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-06-01T22:28:39Z",
+      "side": 0,
+      "message": "These were added earlier in the stack and are being taken back out here. Should this happen in the next CL? Can you move the ram-saving change to the bottom of the stack?",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 20
+      },
+      "revId": "31cf365778290742ac6825d658739e4e4323ae25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
