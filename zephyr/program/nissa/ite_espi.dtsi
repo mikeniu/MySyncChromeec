@@ -6,3 +6,5 @@
 &espi0 {
 	status = "okay";
 };
+
+#include "host_cmd.dtsi"

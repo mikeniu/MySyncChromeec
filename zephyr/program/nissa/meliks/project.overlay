@@ -4,6 +4,7 @@
  */
 
 #include "../cbi.dtsi"
+#include "../host_cmd.dtsi"
 
 #include "keyboard.dtsi"
 #include "motionsense.dtsi"
