@@ -982,6 +982,64 @@ frame_err:
 	return -1;
 }
 
+int load_sram(int uart_fd, const char *file_name, uint32_t sram_start,
+	      uint32_t sram_entry)
+{
+	printf("Load SRAM operation initiated\n");
+
+	FILE *file = fopen(file_name, "rb");
+	if (!file) {
+		perror("Failed to open binary file");
+		return -1;
+	}
+	size_t total_bytes_sent = 0;
+	size_t page = 0;
+	/* Get the total file size */
+	fseek(file, 0, SEEK_END);
+	size_t total_file_size = ftell(file);
+	fseek(file, 0, SEEK_SET);
+
+	DBG_PRINT("Total File Size: %zu bytes\n", total_file_size);
+
+	while (total_bytes_sent < total_file_size) {
+		for (size_t i = 0; total_bytes_sent < total_file_size; i++) {
+			uint32_t sram_address = sram_start + (i * PAGE_SIZE);
+
+			/* Just send pages to EC's ram */
+			if (send_pages(uart_fd, file, sram_address,
+				       &total_bytes_sent, &page) != 0) {
+				goto load_sram_err;
+			}
+		}
+
+		/* End loop if this is the final round */
+		if (total_bytes_sent >= total_file_size) {
+			break;
+		}
+	}
+
+	DBG_PRINT("Sending entry point to EC: 0x%08X\n", sram_entry);
+	if (send_packet_b(uart_fd, START_FRAME_TO_WRITE_TO_FLASH, sram_entry) !=
+	    0) {
+		goto load_sram_err;
+	}
+
+	if (wait_for_response(uart_fd, 0x06, RESPONSE_TIMEOUT) != 0) {
+		ERR_PRINT(
+			"\nFailed to receive expected response for entry point execution\n");
+		goto load_sram_err;
+	}
+
+	printf("Load SRAM operation finished.\n");
+	fclose(file);
+	return 0;
+
+load_sram_err:
+	fclose(file);
+	return -1;
+}
+
+
 /* Function: Write protect (WP) operation */
 int write_protect(int uart_fd, uint32_t protect)
 {
@@ -1171,6 +1229,7 @@ void usage_print(const char *progname)
 	       "    %s --method frame --uart_dev <dev> [frame options]\n"
 	       "    %s --method wp --uart_dev <dev> [wp options]\n"
 	       "    %s --method read_bin --uart_dev <dev> [read_bin options]\n"
+	       "    %s --method load_sram --uart_dev <dev> [load_sram options]\n"
 	       "Flash options:\n"
 	       "  -s, --spi_start <spi_start>: Specifies the SPI flash offset\n"
 	       "  -f, --file <binary_file>: File to program with into flash.\n"
@@ -1182,8 +1241,12 @@ void usage_print(const char *progname)
 	       "read_bin options:\n"
 	       "  -s, --spi_start <spi_start>: Specifies the SPI flash offset\n"
 	       "  -f, --file <binary_file>: File to read from flash.\n"
-	       "  -o, --bin_length <bin_length>: Range read from flash.\n",
-	       progname, progname, progname, progname);
+	       "  -o, --bin_length <bin_length>: Range read from flash.\n"
+	       "Load SRAM options:\n"
+	       "  -f, --file <binary_file>: File to load into SRAM.\n"
+	       "  -r, --sram_start <address>: Starting SRAM address.\n"
+	       "  -e, --sram_entry <address>: Entry point SRAM address.\n",
+	       progname, progname, progname, progname, progname);
 }
 
 static void sighandler(int signum)
@@ -1216,6 +1279,8 @@ int main(int argc, char *argv[])
 	const char *uart_device = NULL;
 	uint32_t bin_length = 0;
 	uint32_t protect = 0xFFFFFFFF;
+	uint32_t sram_start = 0xFFFFFFFF;
+	uint32_t sram_entry = 0xFFFFFFFF;
 	int opt, para_err = 0;
 
 	static struct option long_options[] = {
@@ -1225,10 +1290,12 @@ int main(int argc, char *argv[])
 		{ "uart_device", required_argument, 0, 'u' },
 		{ "bin_length", optional_argument, 0, 'o' },
 		{ "protect", optional_argument, 0, 'p' },
+		{ "sram_start", required_argument, 0, 'r' },
+		{ "sram_entry", required_argument, 0, 'e' },
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((opt = getopt_long(argc, argv, "m:s:f:u:o:p:", long_options,
+	while ((opt = getopt_long(argc, argv, "m:s:f:u:o:p:r:e:", long_options,
 				  NULL)) != -1) {
 		switch (opt) {
 		case 'm':
@@ -1248,6 +1315,12 @@ int main(int argc, char *argv[])
 			break;
 		case 'p':
 			protect = strtoul(optarg, NULL, 0);
+			break;
+		case 'r':
+			sram_start = strtoul(optarg, NULL, 0);
+			break;
+		case 'e':
+			sram_entry = strtoul(optarg, NULL, 0);
 			break;
 		default:
 			usage_print(argv[0]);
@@ -1317,6 +1390,29 @@ int main(int argc, char *argv[])
 		printf("Binary File: %s\n", file_name);
 		if (frame(uart_fd, file_name) != 0) {
 			fprintf(stderr, "Frame process failed\n");
+			goto main_err;
+		}
+	} else if (strcmp(method, "load_sram") == 0) {
+		if (!file_name) {
+			fprintf(stderr, "load_sram missing file_name argument\n");
+			para_err = 1;
+		}
+		if (sram_start == 0xFFFFFFFF) {
+			fprintf(stderr, "load_sram missing sram_start argument\n");
+			para_err = 1;
+		}
+		if (sram_entry == 0xFFFFFFFF) {
+			fprintf(stderr, "load_sram missing sram_entry argument\n");
+			para_err = 1;
+		}
+		if (para_err) {
+			goto main_err;
+		}
+		printf("Binary File: %s\n", file_name);
+		printf("SRAM Start: 0x%08X\n", sram_start);
+		printf("SRAM Entry: 0x%08X\n", sram_entry);
+		if (load_sram(uart_fd, file_name, sram_start, sram_entry) != 0) {
+			fprintf(stderr, "Load SRAM process failed\n");
 			goto main_err;
 		}
 	} else if (strcmp(method, "wp") == 0) {

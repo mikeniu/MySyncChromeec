@@ -25,6 +25,14 @@
 	};
 };
 
+&flash0 {
+        reg = < 0x20010000 0x40000 >;
+};
+
+&swj_port {
+	status = "okay";
+};
+
 &i2c_0 {
         pinctrl-0 = <&i2c00_clk_gpio094
                      &i2c00_data_gpio095>;
