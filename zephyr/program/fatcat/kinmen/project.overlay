@@ -26,6 +26,9 @@
 #include "usba.dtsi"
 
 / {
+	chosen {
+		zephyr,host-cmd-espi-backend = &espi0;
+	};
 	batteries {
 		default_battery: cosmx-ap23abl {
 			compatible = "cosmx,ap23abl", "battery-smart";
