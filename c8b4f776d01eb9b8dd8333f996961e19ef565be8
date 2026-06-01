@@ -33,6 +33,24 @@
       "message": "[Gerrit AI Review] This check is mathematically impossible to trigger and constitutes dead code.\n\nOn line 623, `validate_fp_buffer_offset(current_frame_size, offset, size)` ensures that `offset + size \u003c\u003d current_frame_size` (and it uses `check_add_overflow` internally to prevent integer wrap-around).\nSince `current_frame_size` is explicitly bounded by `sizeof(fp_buffer)` on line 619, we are mathematically guaranteed that `offset \u003c\u003d sizeof(fp_buffer)` upon reaching this block.\n\nBecause `offset` cannot exceed `sizeof(fp_buffer)` (which is a relatively small constant), the addition `offset + FP_SENSOR_IMAGE_OFFSET` can never wrap around `UINT32_MAX`.\n\nThe regression test added in this CL (`test_get_frame_shifted_integer_overflow`) actually passes because `validate_fp_buffer_offset` correctly catches the large `offset` parameter and returns an error *before* execution ever reaches this new check. I recommend dropping this redundant check.",
       "revId": "c8b4f776d01eb9b8dd8333f996961e19ef565be8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e60913d_272638a6",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 633,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T18:23:40Z",
+      "side": 1,
+      "message": "It\u0027s probably better to use [`check_add_overflow`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/third_party/linux/overflow.h;l\u003d56;drc\u003ddda108fd4a55564ba657d9d26f782e9ff788f6b2) to avoid integer overflow, since it\u0027s a little easier to read.\n\nEven if it\u0027s not strictly necessary, it doesn\u0027t hurt to have it since it will help prevent mistakes in cases where we refactor the code.\n\nLet\u0027s review the entire file to see if there are other places we should also update.",
+      "parentUuid": "a904e69b_847efb25",
+      "revId": "c8b4f776d01eb9b8dd8333f996961e19ef565be8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
