@@ -3859,6 +3859,11 @@
  */
 #undef CONFIG_POWER_BUTTON_TO_PCH_CUSTOM
 
+/*
+ * Enable power button press host command.
+ */
+#undef CONFIG_HOSTCMD_POWER_BUTTON_PRESS
+
 /* Compile common code for AP power state machine */
 #undef CONFIG_POWER_COMMON
 
