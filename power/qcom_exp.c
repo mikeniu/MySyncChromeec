@@ -115,7 +115,7 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 #define SWITCHCAP_PG_CHECK_WAIT (6 * MSEC)
 
 /* The timeout of the check if the switchcap outputs reset voltage */
-#define SWITCHCAP_RESET_TIMEOUT (2000 * MSEC)
+#define SWITCHCAP_RESET_TIMEOUT (200 * MSEC)
 
 /* Wait for polling if the switchcap outputs reset voltage */
 #define SWITCHCAP_RESET_CHECK_WAIT (6 * MSEC)
