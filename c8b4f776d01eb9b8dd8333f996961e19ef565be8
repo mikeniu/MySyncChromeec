@@ -69,6 +69,24 @@
       "parentUuid": "4e60913d_272638a6",
       "revId": "c8b4f776d01eb9b8dd8333f996961e19ef565be8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "738fff4d_f2031c6e",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 633,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T21:53:01Z",
+      "side": 1,
+      "message": "Let\u0027s keep the test. However, review this Gemini feedback for correctness:\n\n---\n\nIn your final assertion, you reference `expected_canary`:\n\n```c\nzassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer), ...);\n\n```\n\nHowever, `expected_canary` is not defined in the scope of this test. Since you initialized the buffer with `0xA5`, you need an array filled with `0xA5` to compare it against.\n\nYou can fix this easily by defining the expected state at the top of the test:\n\n```c\nZTEST(fpsensor_get_frame, test_get_frame_shifted_integer_overflow)\n{\n\tuint8_t output_buffer[kMaxReadSize];\n\tuint8_t expected_canary[kMaxReadSize];\n\t\n\t/* Initialize both with our known canary value */\n\tmemset(output_buffer, 0xA5, sizeof(output_buffer));\n\tmemset(expected_canary, 0xA5, sizeof(expected_canary));\n\n\tglobal_context.current_capture_type \u003d FP_CAPTURE_SIMPLE_IMAGE;\n        \n        // ... rest of your test ...\n\n```",
+      "parentUuid": "b9690e40_537ef2b1",
+      "revId": "c8b4f776d01eb9b8dd8333f996961e19ef565be8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
