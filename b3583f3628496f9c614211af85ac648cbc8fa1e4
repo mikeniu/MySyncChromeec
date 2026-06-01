@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "25e7f253_d6f293e3",
+        "filename": "util/focaltech/build.mk",
+        "patchSetId": 17
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T20:50:02Z",
+      "side": 1,
+      "message": "Fix trailing whitespace",
+      "range": {
+        "startLine": 22,
+        "startChar": 18,
+        "endLine": 22,
+        "endChar": 20
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6819d473_75f1477c",
         "filename": "util/focaltech/cli.h",
         "patchSetId": 17
@@ -42,6 +65,29 @@
         "startChar": 0,
         "endLine": 2,
         "endChar": 39
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1492b58c_dabcb48d",
+        "filename": "util/focaltech/usb_transport.h",
+        "patchSetId": 17
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T20:50:02Z",
+      "side": 1,
+      "message": "Missing newline at end of file",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 6
       },
       "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
