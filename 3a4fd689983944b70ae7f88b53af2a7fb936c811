@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f76d5f57_ed097113",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T21:43:00Z",
+      "side": 1,
+      "message": "**Observation:**\nYou used a C-style cast for the offset addition:\n\n```cpp\nif (check_add_overflow(offset, (uint32_t)FP_SENSOR_IMAGE_OFFSET, \u0026adjusted_offset))\n\n```\n\n**Concern:**\nSince this file is compiled as C++ (`fpsensor.cc`), modern C++ guidelines generally prefer `static_cast\u003cuint32_t\u003e(...)`.",
+      "range": {
+        "startLine": 640,
+        "startChar": 0,
+        "endLine": 643,
+        "endChar": 3
+      },
+      "revId": "3a4fd689983944b70ae7f88b53af2a7fb936c811",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
