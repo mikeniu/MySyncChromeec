@@ -60,12 +60,11 @@
 		output;
 	};
 	pwr-slp-s3 {
-		compatible = "intel,ap-pwrseq-vw";
-		dbg-label = "SLP_S3 virtual wire input from PCH";
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "SLP_S3_L input from PCH";
 		enum-name = "PWR_SLP_S3";
-		virtual-wire = "ESPI_VWIRE_SIGNAL_SLP_S3";
-		reset-val = <1>;
-		vw-invert;
+		gpios = <&gpiog 7 GPIO_ACTIVE_LOW>;
+		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
 	};
 	pwr-slp-s4 {
 		compatible = "intel,ap-pwrseq-vw";
