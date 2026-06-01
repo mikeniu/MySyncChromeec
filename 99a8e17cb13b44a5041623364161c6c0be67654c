@@ -22,6 +22,30 @@
       },
       "revId": "99a8e17cb13b44a5041623364161c6c0be67654c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62aa2816_bf030a21",
+        "filename": "util/egis/et171_flash_test.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-01T03:53:57Z",
+      "side": 1,
+      "message": "Done. \nHere is the test log.\n\n(cr) egis@TPE-HARRY-CHEN ~/chromiumos/src/platform/ec/build/host/util $ ./et171_flash_test \nRunning main() from /var/tmp/portage/dev-cpp/gtest-1.16.0-r17/work/gtest-1.16.0/googletest/src/gtest_main.cc\n[\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d] Running 17 tests from 8 test suites.\n[----------] Global test environment set-up.\n[----------] 3 tests from BootromCommTest\n[ RUN      ] BootromCommTest.GetBootromInfoSuccess\n[       OK ] BootromCommTest.GetBootromInfoSuccess (0 ms)\n[ RUN      ] BootromCommTest.SecureCommandAesSuccess\n[       OK ] BootromCommTest.SecureCommandAesSuccess (0 ms)\n[ RUN      ] BootromCommTest.SecureCommandAesAuthenticationFailure\n[ERROR] Decryption Failed\n[       OK ] BootromCommTest.SecureCommandAesAuthenticationFailure (0 ms)\n[----------] 3 tests from BootromCommTest (0 ms total)\n\n[----------] 2 tests from CliOptionsTest\n[ RUN      ] CliOptionsTest.ParseHelpReturnsNullopt\n\n\u003d\u003d\u003d ET171 Flash Tool \u003d\u003d\u003d\n\nUsage:\n  et171_flash \u003cmode\u003e [options]\n\nModes (mutually exclusive):\n  --flashfw \u003cfw.bin\u003e      Flash firmware with real-time encryption.\n  --flashcmd \u003ccmd.bin\u003e    Flash a pre-processed raw command binary.\nOptions:\n  --algo \u003ctype\u003e           Encryption algorithm: SHA256 (default) or AESGCM.\n  --key \u003ckey.bin\u003e         Path to the AES-GCM key file (required for AESGCM).\n  --offset \u003caddr\u003e         Flash start offset in hex (Default: 0x00001000).\n  --size \u003cbytes\u003e          Size to flash in hex (Default: entire firmware file).\n  --dumpcmd               Save processed commands to a file (for --flashfw mode).\n  --help, -h              Show this help message.\n\nExamples:\n  et171_flash --flashfw fw.bin --algo AESGCM --key key.bin\n  et171_flash --flashcmd cmd.bin\n[       OK ] CliOptionsTest.ParseHelpReturnsNullopt (0 ms)\n[ RUN      ] CliOptionsTest.ParseValidFlashFw\n[       OK ] CliOptionsTest.ParseValidFlashFw (0 ms)\n[----------] 2 tests from CliOptionsTest (0 ms total)\n\n[----------] 1 test from CryptoUtilTest\n[ RUN      ] CryptoUtilTest.Sha256KnownValue\n[       OK ] CryptoUtilTest.Sha256KnownValue (0 ms)\n[----------] 1 test from CryptoUtilTest (0 ms total)\n\n[----------] 2 tests from EcCommTest\n[ RUN      ] EcCommTest.SendCommandSuccess\n[       OK ] EcCommTest.SendCommandSuccess (0 ms)\n[ RUN      ] EcCommTest.SendCommandInvalidChecksum\n[ERROR] EC response checksum verification failed.\n[       OK ] EcCommTest.SendCommandInvalidChecksum (0 ms)\n[----------] 2 tests from EcCommTest (0 ms total)\n\n[----------] 2 tests from EgisUtilTest\n[ RUN      ] EgisUtilTest.EndianSwap\n[       OK ] EgisUtilTest.EndianSwap (0 ms)\n[ RUN      ] EgisUtilTest.ReadWriteStruct\n[       OK ] EgisUtilTest.ReadWriteStruct (0 ms)\n[----------] 2 tests from EgisUtilTest (0 ms total)\n\n[----------] 2 tests from FileUtilTest\n[ RUN      ] FileUtilTest.ReadBinaryFileSuccess\n[       OK ] FileUtilTest.ReadBinaryFileSuccess (0 ms)\n[ RUN      ] FileUtilTest.ReadBinaryFileNotFound\n[       OK ] FileUtilTest.ReadBinaryFileNotFound (0 ms)\n[----------] 2 tests from FileUtilTest (0 ms total)\n\n[----------] 3 tests from FlasherLogicTest\n[ RUN      ] FlasherLogicTest.RunFlashFwInvalidArgs\n[INFO] Flash FW Mode\nFW  : \nKey : \nOffset : 0x00001000\nSize : 0x00000000\n[INFO] Flash FW Mode\nFW  : /tmp/test_fw.bin\nKey : \nOffset : 0x00001000\nSize : 0x00000000\n[       OK ] FlasherLogicTest.RunFlashFwInvalidArgs (0 ms)\n[ RUN      ] FlasherLogicTest.RunFlashFwSuccessFlow\n[INFO] Flash FW Mode\nFW  : /tmp/test_fw.bin\nKey : \nOffset : 0x00000000\nSize : 0x00000000\n--- Disabling Watchdog ---\nOld SR1: 0x00\nNew SR1: 0x00\n--- Flashing Full Binary with Key ---\n--- Erasing Flash ---\n--- Executing CMD_FLASH_ERASE (0x22) ---\nErase Success: 4096 bytes at 0x80000000\n--- Writing Flash ---\nWriting Progress: 8 / 8 (100.0%)\n[OK] Flash Full Binary Write successful\n[       OK ] FlasherLogicTest.RunFlashFwSuccessFlow (52 ms)\n[ RUN      ] FlasherLogicTest.RunFlashCmdTruncatedPacket\n--- Flash RAW CMD Binary Flashing ---\n\n[ERROR] Parse failed at offset 0x0: Data truncated before full header could be read\n[       OK ] FlasherLogicTest.RunFlashCmdTruncatedPacket (1 ms)\n[----------] 3 tests from FlasherLogicTest (54 ms total)\n\n[----------] 2 tests from UsbCommTest\n[ RUN      ] UsbCommTest.FailsWhenNotConnected\n[ERROR] Not connected. Call connect() first.\n[ERROR] Not connected. Call connect() first.\n[       OK ] UsbCommTest.FailsWhenNotConnected (0 ms)\n[ RUN      ] UsbCommTest.ConnectFailsWithNullContext\n[ERROR] libusb context is not initialized.\n[       OK ] UsbCommTest.ConnectFailsWithNullContext (0 ms)\n[----------] 2 tests from UsbCommTest (0 ms total)\n\n[----------] Global test environment tear-down\n[\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d] 17 tests from 8 test suites ran. (56 ms total)\n[  PASSED  ] 17 tests.",
+      "parentUuid": "9fdad770_d6848a62",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 1
+      },
+      "revId": "99a8e17cb13b44a5041623364161c6c0be67654c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
