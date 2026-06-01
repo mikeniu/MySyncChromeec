@@ -583,3 +583,5 @@
 &thermistor_1V8_100K_100K_4250B{
 	status = "okay";
 };
+
+/delete-node/ &int_spi0_cs;
