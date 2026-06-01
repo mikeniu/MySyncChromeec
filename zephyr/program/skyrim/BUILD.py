@@ -14,6 +14,7 @@ def register_skyrim_project(
         project_name=project_name,
         zephyr_board="npcx9/npcx9m3f",
         dts_overlays=[
+            here / "common.overlay",
             here / project_name / "project.overlay",
         ],
         kconfig_files=[
