@@ -19,6 +19,7 @@ def register_npcx9_project(
         project_name=project_name,
         zephyr_board="npcx9/npcx9m7f",
         dts_overlays=[
+            here / "common.overlay",
             here / project_name / "project.overlay",
         ],
         kconfig_files=[
@@ -51,6 +52,7 @@ def register_it8xxx2_project(
         project_name=project_name,
         zephyr_board=chip,
         dts_overlays=[
+            here / "common.overlay",
             here / project_name / "project.overlay",
         ],
         kconfig_files=[
@@ -82,6 +84,7 @@ def register_mec172x_project(
         project_name=project_name,
         zephyr_board="mec172x/mec172x_nsz/mec1727",
         dts_overlays=[
+            here / "common.overlay",
             here / project_name / "project.overlay",
         ],
         kconfig_files=[
@@ -111,6 +114,7 @@ def register_rtk59_project(
         boards=["ocelot"],
         zephyr_board="realtek/rts5912",
         dts_overlays=[
+            here / "common.overlay",
             here / project_name / "project.overlay",
         ],
         kconfig_files=[
@@ -190,6 +194,7 @@ matsu.variant(
     project_name="matsu_it82000",
     zephyr_board="it8xxx2/it82000bw",
     dts_overlays=[
+        here / "common.overlay",
         here / "matsu" / "it82000.overlay",
     ],
 )
