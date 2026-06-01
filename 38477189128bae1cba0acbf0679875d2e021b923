@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "106ffe23_f807d2ff",
+        "filename": "zephyr/test/fingerprint/task/include/fpsensor_test_utils.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-06-01T19:34:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22c3a67d_cb970298",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 0
+      },
+      "revId": "38477189128bae1cba0acbf0679875d2e021b923",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "11a424a2_a8480aa3",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75b9b405_dfe1f35a",
+        "filename": "zephyr/test/fingerprint/task/include/fpsensor_test_utils.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-06-01T19:34:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "11a424a2_a8480aa3",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 34
+      },
+      "revId": "38477189128bae1cba0acbf0679875d2e021b923",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e3ab0e31_10424958",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-06-01T18:32:42Z",
       "side": 1,
       "message": "In `fpsensor_test_utils.h`, if an invalid `capture_type` is provided, the helper prints an error and returns:\n\n```cpp\nif (capture_type \u003c 0 || static_cast\u003csize_t\u003e(capture_type) \u003e\u003d cache.frame_sizes_.size()) {\n    printk(\"Error: Invalid capture type %d\\n\", capture_type);\n    return;\n}\n\n```\n\nWhile this mimics the legacy `CPRINTF` behavior from the production code, this is now exclusively a **test utility**. Test utilities should fail loudly. If a test passes an invalid bounds parameter to a setup helper, it indicates a bug in the test itself, and the test should immediately abort rather than silently returning and potentially causing cascading false positives/negatives.\n\n**Suggestion:** Replace `printk` with a Zephyr `zassert` macro. This will explicitly fail the test execution and provide better test reliability.\n\n```cpp\n#include \u003czephyr/ztest.h\u003e\n\n// Inside the set_frame_size method:\nzassert_true(capture_type \u003e\u003d 0 \u0026\u0026 static_cast\u003csize_t\u003e(capture_type) \u003c cache.frame_sizes_.size(),\n             \"Invalid capture type %d provided to test helper\", capture_type);\n\ncache.frame_sizes_[static_cast\u003csize_t\u003e(capture_type)] \u003d size;\n\n```",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 3
+      },
+      "revId": "38477189128bae1cba0acbf0679875d2e021b923",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16f385d3_76442c8d",
+        "filename": "zephyr/test/fingerprint/task/include/fpsensor_test_utils.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-06-01T19:34:15Z",
+      "side": 1,
+      "message": "if you do it this way, you cannot test for the failing cases. the test will automically fail. \n\nHow about making it return a bool?",
+      "parentUuid": "e3ab0e31_10424958",
       "range": {
         "startLine": 18,
         "startChar": 0,
