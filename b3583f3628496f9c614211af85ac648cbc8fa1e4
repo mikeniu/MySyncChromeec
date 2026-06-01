@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6819d473_75f1477c",
+        "filename": "util/focaltech/cli.h",
+        "patchSetId": 17
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T20:48:37Z",
+      "side": 1,
+      "message": "Missing license header. This is caught with `repo upload` checks. Make sure to always run that.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 2,
+        "endChar": 29
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75d0377c_351c7309",
+        "filename": "util/focaltech/usb_transport.h",
+        "patchSetId": 17
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T20:48:37Z",
+      "side": 1,
+      "message": "Missing license header. This is caught with `repo upload` checks. Make sure to always run that.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 2,
+        "endChar": 39
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
