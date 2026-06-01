@@ -137,6 +137,29 @@
       },
       "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "733f42de_3a5b5202",
+        "filename": "util/egis/flasher_logic_test.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T19:10:39Z",
+      "side": 1,
+      "message": "We should add more tests for more complete coverage. Here is Gemini generated code. Check for correctness and completeness in coverage:",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 49
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
