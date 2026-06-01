@@ -118,6 +118,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4dbd1e2e_7b5877c4",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T21:21:56Z",
+      "side": 1,
+      "message": "### 1\\. The Move Assignment Segfault (Rule of Zero Violation)\n\nIn `libusb_transport.cc`, your manual move assignment operator destroys resources in the wrong order:\n\n```c\nLibusbTransport\u0026 LibusbTransport::operator\u003d(LibusbTransport\u0026\u0026 other) noexcept {\n  if (this !\u003d \u0026other) {\n    ctx_ \u003d std::move(other.ctx_);       // 💥 Old libusb_context is destroyed HERE\n    handle_ \u003d std::move(other.handle_); // 💥 Old handle is destroyed HERE (Too late!)\n    // ...\n\n```\n\n**The Bug:** `libusb` requires that all device handles be closed *before* the context is exited. Because `std::unique_ptr::operator\u003d` immediately destroys the old managed object, you are calling `libusb_exit()` while a device handle is still open. This triggers a `libusb` warning at best, and a segmentation fault at worst.\n\n**The Fix:** You don\u0027t need to write this function at all. Because your class members are all smart pointers and primitive types, the compiler can safely generate the move operations for you. Standard C++ guarantees that members are destroyed in the *reverse* order of their declaration, which perfectly matches your header (`ctx_` declared first, `handle_` second).\n\nRemove the manual move constructor and assignment operator from the `.cc` file entirely, and in your `.h` file, use `\u003d default`:\n\n```c\n  // Move semantics\n  LibusbTransport(LibusbTransport\u0026\u0026) noexcept \u003d default;\n  LibusbTransport\u0026 operator\u003d(LibusbTransport\u0026\u0026) noexcept \u003d default;\n\n```\n\n### 2\\. The Dead Handle Trap (`libusb_reset_device`)\n\nIn `LibusbTransport::Create()`, you have this sequence:\n\n```c\n  // 7. Reset device and wait for re-enumeration\n  if (libusb_reset_device(handle.get()) \u003c 0) { ... }\n  std::this_thread::sleep_for(kUsbEnumerationDelay);\n\n  // 8. Claim the interface\n  if (libusb_claim_interface(handle.get(), ep_info.interface_num) \u003c 0) { ... }\n\n```\n\n**The Bug:** `libusb_reset_device` attempts to reset the port. If the reset is significant enough that the OS re-enumerates the device (which your `sleep_for` strongly implies you expect), **the current `handle` becomes permanently invalid**. Calling `libusb_claim_interface` on a dead handle will fail with `LIBUSB_ERROR_NO_DEVICE` or crash.\n\n**The Fix:** You usually do not need to proactively reset the device upon opening it. Detaching the kernel driver (which you are already doing) is sufficient to claim the interface.\n\n* **Remove step 7 entirely.** \\* Only call `libusb_reset_device` in your `HandleTransferError` recovery path (where you correctly expect the connection to be severed).\n\n### 3\\. Modernizing C-Arrays (`FindFocalDevice`)\n\nYou are using a raw C-pointer and a length variable, which is a relic of the underlying C API.\n\n```c\nlibusb_device* FindFocalDevice(libusb_device** device_list, ssize_t num_devices,\n                               libusb_device_descriptor\u0026 out_desc) {\n  for (ssize_t i \u003d 0; i \u003c num_devices; ++i) {\n\n```\n\nSince we are in C++23, we can bridge this gap elegantly using `std::span`. This eliminates the raw loop and brings it up to Google Style standards:\n\n```c\n// Change signature to accept a span\nlibusb_device* FindFocalDevice(std::span\u003clibusb_device*\u003e devices, \n                               libusb_device_descriptor\u0026 out_desc) {\n  for (libusb_device* dev : devices) {\n    if (libusb_get_device_descriptor(dev, \u0026out_desc) !\u003d LIBUSB_SUCCESS)\n      continue;\n    // ... remainder of your logic\n  }\n}\n\n```\n\nAnd in `Create()`, you invoke it safely:\n\n```c\n  // Create a span from the raw list and count\n  auto devices \u003d std::span(dev_list.get(), count);\n  libusb_device* target \u003d FindFocalDevice(devices, desc);\n\n```\n\n### Summary of Action Items\n\n1. Delete the custom Move Constructor/Assignment implementations in `.cc` and `\u003d default` them in the `.h`.  \n2. Delete the proactive `libusb_reset_device` call in `Create()`.  \n3. Wrap the raw `libusb_device` list in a `std::span` for safer iteration.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 4,
+        "endChar": 3
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2173ed93_215ba9b6",
         "filename": "util/focaltech/libusb_transport.cc",
         "patchSetId": 17
