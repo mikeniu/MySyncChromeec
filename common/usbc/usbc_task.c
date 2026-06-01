@@ -114,11 +114,13 @@ static int pd_task_timeout(int port)
 {
 	int timeout;
 
-	if (paused[port])
+	if (paused[port]) {
 		timeout = -1;
-	else {
+	} else {
 		timeout = pd_timer_next_expiration(port);
-		if (timeout < 0 || timeout > USBC_EVENT_TIMEOUT)
+		if (timeout < 0)
+			timeout = USBC_EVENT_TIMEOUT - 1;
+		else if (timeout > USBC_EVENT_TIMEOUT)
 			timeout = USBC_EVENT_TIMEOUT;
 		else if (timeout < USBC_MIN_EVENT_TIMEOUT)
 			timeout = USBC_MIN_EVENT_TIMEOUT;
