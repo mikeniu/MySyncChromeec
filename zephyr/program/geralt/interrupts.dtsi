@@ -74,11 +74,6 @@
 			 */
 			handler = "power_signal_interrupt";
 		};
-		int_spi0_cs: spi0-cs {
-			irq-pin = <&spi0_cs>;
-			flags = <GPIO_INT_EDGE_FALLING>;
-			handler = "spi_event";
-		};
 		int_ccd_mode_odl: ccd-mode-odl {
 			irq-pin = <&gpio_ccd_mode_odl>;
 			flags = <GPIO_INT_EDGE_FALLING>;
