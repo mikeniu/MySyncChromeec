@@ -16,6 +16,24 @@
       "message": "Can you please check if LED_GPIO is enabled? And disable it if it is.",
       "revId": "6b66d6ed47b1f35de05ede406a8780cd6810f0c4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c123bf25_ff6f0e67",
+        "filename": "zephyr/program/fpmcu/em32f967/prj.conf",
+        "patchSetId": 23
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-06-01T06:08:40Z",
+      "side": 1,
+      "message": "Ii was enabled. Now it is explicitly disabled.",
+      "parentUuid": "60306c41_c1006e5b",
+      "revId": "6b66d6ed47b1f35de05ede406a8780cd6810f0c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
