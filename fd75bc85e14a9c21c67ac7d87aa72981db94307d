@@ -121,6 +121,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c24dcfe7_084bae17",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T18:59:50Z",
+      "side": 1,
+      "message": "Looks like you still have:\n\n```\nFAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);\n```",
+      "parentUuid": "af184e81_24d7c5e1",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 47
+      },
+      "revId": "fd75bc85e14a9c21c67ac7d87aa72981db94307d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7a1bb913_c3a87ced",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
         "patchSetId": 20
