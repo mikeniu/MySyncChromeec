@@ -26,3 +26,5 @@
 		};
 	};
 };
+
+/delete-node/ &int_spi0_cs;
