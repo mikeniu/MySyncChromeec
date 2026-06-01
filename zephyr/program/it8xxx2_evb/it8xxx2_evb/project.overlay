@@ -12,3 +12,10 @@
 #include "interrupts.dtsi"
 #include "pwm.dtsi"
 #include "shi.dtsi"
+/ {
+	chosen {
+		zephyr,host-cmd-shi-backend = &shi0;
+	};
+};
+
+/delete-node/ &int_spi0_cs;
