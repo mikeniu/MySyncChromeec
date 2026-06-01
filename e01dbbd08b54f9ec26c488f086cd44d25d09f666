@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66da3fd7_77341fb4",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_frame_size.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T22:17:18Z",
+      "side": 1,
+      "message": "* **Unchecked Return Values in Test Setup:** The original `set_frame_size` method returned `void`, but the newly introduced `FpFrameSizeCacheTestHelper::set_frame_size` returns a `bool` to indicate success or failure. In `zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc`, the helper is called multiple times to configure the test environment, but the return value is ignored. If the helper fails for any reason, the test will proceed with an invalid state, potentially leading to false positives. Wrap these setup calls in a `zassert_true` macro.",
+      "range": {
+        "startLine": 171,
+        "startChar": 0,
+        "endLine": 171,
+        "endChar": 73
+      },
+      "revId": "e01dbbd08b54f9ec26c488f086cd44d25d09f666",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
