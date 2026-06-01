@@ -48,6 +48,9 @@
 /* fatcatrvp-npcx overrides follow... */
 
 / {
+	chosen {
+		zephyr,host-cmd-espi-backend = &espi0;
+	};
 	aliases {
 		gpio-wp = &gpio_wp_odl;
 	};
