@@ -26,6 +26,7 @@
 #include "link_defs.h"
 #include "mkbp_event.h"
 #include "openssl/mem.h"
+#include "overflow.h"
 #include "scoped_fast_cpu.h"
 #include "sha256.h"
 #include "spi.h"
@@ -633,8 +634,20 @@ test_export_static enum ec_status get_frame(uint32_t offset, uint32_t size,
 	 * the embedded/offset image bytes, like simple, pattern0,
 	 * pattern1, and reset_test.
 	 */
-	if (skip_image_offset(global_context.current_capture_type))
-		offset += FP_SENSOR_IMAGE_OFFSET;
+	if (skip_image_offset(global_context.current_capture_type)) {
+		uint32_t adjusted_offset;
+
+		if (check_add_overflow(offset, (uint32_t)FP_SENSOR_IMAGE_OFFSET,
+				       &adjusted_offset)) {
+			return EC_RES_INVALID_PARAM;
+		}
+
+		if (adjusted_offset + size > sizeof(fp_buffer)) {
+			return EC_RES_INVALID_PARAM;
+		}
+
+		offset = adjusted_offset;
+	}
 
 	memcpy(output, fp_buffer + offset, size);
 
