@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f55a19f_822bd02e",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T18:44:37Z",
+      "side": 1,
+      "message": "**File:** `util/egis/bootrom.cc`\n\nIn `ExtractSecureData`, there is a dangerous integer underflow vulnerability if the device returns a response smaller than `min_resp_size` but larger than `sizeof(SecureResponseHeader)`:\n\n```c\n  // If raw_response.size() \u003c min_resp_size, this subtraction underflows\n  // to a massive unsigned value.\n  if (rsp_wrapped_len \u003e raw_response.size() - min_resp_size) {\n    rsp_wrapped_len \u003d raw_response.size() - min_resp_size;\n  }\n\n```\n\nIf an underflow occurs, `rsp_wrapped_len` is not clamped correctly, and the subsequent `raw_response.subspan(...)` call will either throw an out-of-bounds exception or cause Undefined Behavior.\n\n**Remediation:** Add a strict size check at the top of the function immediately after validating the header:\n\n```c\n  if (raw_response.size() \u003c min_resp_size) {\n    return std::unexpected(BootromError::kResponseTruncated);\n  }\n\n```",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 77
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d2d7094_d016b908",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T18:44:37Z",
+      "side": 1,
+      "message": "**File:** `util/egis/ec_comm.cc`\n\nYou are using `reinterpret_cast` to cast an underlying byte array to a struct pointer to modify a field:\n\n```c\n  auto *hdr \u003d reinterpret_cast\u003cEcHostCommandRequest *\u003e(cmd_bytes_.data());\n  hdr-\u003echecksum \u003d static_cast\u003cuint8_t\u003e(-sum);\n\n```\n\nWhile `__attribute__((packed))` often makes compilers forgive this, casting a byte array to an object type and mutating it violates C++ strict aliasing rules, resulting in Undefined Behavior.\n\n**Remediation:** \n\nGoogle C++ Style heavily discourages `reinterpret_cast` except in very specific hardware/serialization boundaries, and mutating through an aliased pointer is Undefined Behavior in standard C++. Since you are operating on a `std::vector\u003cuint8_t\u003e` that you just packed, utilize `\u003ccstddef\u003e` and `offsetof` to mutate the exact byte safely.\n\n```c\n#include \u003ccstddef\u003e // Ensure this is included\n\n  void UpdateChecksum() {\n    uint32_t sum \u003d 0;\n    for (uint8_t byte : cmd_bytes_) sum +\u003d byte;\n\n    // Safely update the checksum byte directly in the vector\n    // EcHostCommandRequest must be a Standard Layout Type for offsetof\n    cmd_bytes_[offsetof(EcHostCommandRequest, checksum)] \u003d static_cast\u003cuint8_t\u003e(-sum);\n  }\n\n```",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 47
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
