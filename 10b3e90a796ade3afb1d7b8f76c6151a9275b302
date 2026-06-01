@@ -16,6 +16,24 @@
       "message": "Please add a bug# for better tracking.",
       "revId": "10b3e90a796ade3afb1d7b8f76c6151a9275b302",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0216dac_97c605ef",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1160139
+      },
+      "writtenOn": "2026-06-01T16:13:57Z",
+      "side": 1,
+      "message": "As well as better assessment for the severity of the issue.",
+      "parentUuid": "3334549b_50e5d4d5",
+      "revId": "10b3e90a796ade3afb1d7b8f76c6151a9275b302",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
