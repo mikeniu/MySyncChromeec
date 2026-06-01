@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3334549b_50e5d4d5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1160139
+      },
+      "writtenOn": "2026-06-01T16:11:24Z",
+      "side": 1,
+      "message": "Please add a bug# for better tracking.",
+      "revId": "10b3e90a796ade3afb1d7b8f76c6151a9275b302",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
