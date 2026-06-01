@@ -27,6 +27,7 @@ def register_brox_project(
         project_name=project_name,
         zephyr_board=chip,
         dts_overlays=[
+            here / "common.overlay",
             here / project_name / "project.overlay",
         ],
         kconfig_files=kconfig_files,
