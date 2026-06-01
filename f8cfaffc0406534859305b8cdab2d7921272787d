@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03d9fd5b_8c930fd6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1504745
+      },
+      "writtenOn": "2026-06-01T18:49:02Z",
+      "side": 1,
+      "message": "To EC reviewers:\n\nUncertain if I need to add these to the release-firmware directories? Please provide some guidance on that. Thanks!",
+      "revId": "f8cfaffc0406534859305b8cdab2d7921272787d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
