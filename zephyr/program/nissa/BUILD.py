@@ -103,6 +103,7 @@ naktal = register_nissa_project(
 craask = register_nissa_project(
     project_name="craask",
     chip="npcx9/npcx9m3f",
+    snippets=["npcx-test"],
 )
 
 pujjo = register_nissa_project(

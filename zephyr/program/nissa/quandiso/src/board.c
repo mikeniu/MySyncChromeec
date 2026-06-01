@@ -104,3 +104,48 @@ __override void board_power_change(struct ap_power_ev_callback *cb,
 		break;
 	}
 }
+
+#include <zephyr/kernel.h>
+#include <zephyr/pm/pm.h>
+
+/* Create a global counter to prove it happened */
+volatile uint32_t suspend_count = 0;
+volatile uint32_t resume_count = 0;
+
+/* Define the callback for when the system wakes up */
+static void my_pm_state_enter_hook(enum pm_state state)
+{
+    if(++suspend_count % 32 == 0) {
+		LOG_ERR("my_pm_state_enter_hook %u. state: %d\n", suspend_count, state);
+	}
+}
+
+/* Define the callback for when the system wakes up */
+// static void my_pm_state_exit_hook(enum pm_state state)
+// {
+//     resume_count++;
+// }
+
+/* Define the notifier structure */
+static struct pm_notifier my_pm_notifier = {
+    .state_entry = my_pm_state_enter_hook,
+    // .state_exit = my_pm_state_exit_hook,
+};
+
+static int pm_init(void) {
+	pm_notifier_register(&my_pm_notifier);
+	return 0;
+}
+SYS_INIT(pm_init, POST_KERNEL, 50);
+
+static int command_mypm(int argc, const char **argv)
+{
+	if (argc < 1)
+		return EC_ERROR_PARAM_COUNT;
+
+	LOG_ERR("System has suspend %u times and resumed %u times.\n", suspend_count, resume_count);
+	return EC_SUCCESS;
+}
+DECLARE_CONSOLE_COMMAND(mypm, command_mypm,
+			"123",
+			"456.");
