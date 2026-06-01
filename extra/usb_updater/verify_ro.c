@@ -4,7 +4,6 @@
  * found in the LICENSE file.
  */
 
-#include <endian.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -18,6 +17,7 @@
 #include "misc_util.h"
 #include "tpm_vendor_cmds.h"
 #include "verify_ro.h"
+#include "compat.h"
 
 /* Index of the matching hash variant. */
 static ssize_t matching_variant;

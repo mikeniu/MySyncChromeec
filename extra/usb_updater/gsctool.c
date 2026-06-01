@@ -4,9 +4,7 @@
  * found in the LICENSE file.
  */
 
-#include <asm/byteorder.h>
 #include <ctype.h>
-#include <endian.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
@@ -42,6 +40,7 @@
 #include "u2f.h"
 #include "usb_descriptor.h"
 #include "verify_ro.h"
+#include "compat.h"
 
 /*
  * This enum must match CcdCap enum in applications/sys_mgr/src/ccd.rs in the
