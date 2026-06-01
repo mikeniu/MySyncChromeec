@@ -6,6 +6,9 @@
 #include <dt-bindings/usb_pd_tcpm.h>
 
 / {
+	chosen {
+		zephyr,host-cmd-espi-backend = &espi0;
+	};
 	aliases {
 		gpio-wp = &gpio_gsc_flash_wp_odl;
 		gpio-cbi-wp = &gpio_ec_cbi_wp;
