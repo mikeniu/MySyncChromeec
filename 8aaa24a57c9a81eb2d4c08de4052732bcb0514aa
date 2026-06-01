@@ -22,6 +22,30 @@
       },
       "revId": "8aaa24a57c9a81eb2d4c08de4052732bcb0514aa",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f30d92f_28100535",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-06-01T22:38:23Z",
+      "side": 1,
+      "message": "ok. will add it as a follow up CL",
+      "parentUuid": "721cc8d4_970bb46f",
+      "range": {
+        "startLine": 141,
+        "startChar": 2,
+        "endLine": 141,
+        "endChar": 64
+      },
+      "revId": "8aaa24a57c9a81eb2d4c08de4052732bcb0514aa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
