@@ -45,6 +45,29 @@
       },
       "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36120784_b251d2d9",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T18:46:02Z",
+      "side": 1,
+      "message": "**File:** `util/egis/egis_util.h` \u0026 `util/egis/et171_flash.cc`\n\nWhile your usage of `std::ranges::find` invoking the `(iterator, iterator)` constructor of `std::string_view` is valid C++20/23, doing it inline is verbose. Google Style strongly encourages writing small, readable helper functions for text manipulation.\n\nAdd this C++23 compliant helper to `egis_util.h`:\n\n```c\n// Safely creates a string_view from a fixed-size character array that may\n// or may not be null-terminated.\ntemplate \u003csize_t N\u003e\nconstexpr std::string_view MakeStringView(const char (\u0026str)[N]) {\n  auto end_it \u003d std::ranges::find(str, \u0027\\0\u0027);\n  return std::string_view(str, end_it);\n}\n\n```\n\nThen, update your print statements in `et171_flash.cc` for a massive readability win:\n\n```c\n  std::println(\"\\n--- Parsed Version Info ---\");\n  std::println(\"RO Version: {}\", MakeStringView(response.ro_ver));\n  std::println(\"RW Version: {}\", MakeStringView(response.rw_ver));\n\n```\n\nAlso update the usage in `PrintDeviceDiagnostics`.",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 75
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
