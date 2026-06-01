@@ -69,6 +69,29 @@
       },
       "revId": "fd75bc85e14a9c21c67ac7d87aa72981db94307d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a1bb913_c3a87ced",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T18:17:42Z",
+      "side": 1,
+      "message": "**Hardcoded Multipliers in Shifted Layout Test** In `test_get_frame_shifted_layout_success`, the test setup dynamically calculates `offset` but uses a hardcoded multiplier:\n\n```c\nuint32_t size \u003d kMaxReadSize;\n/* Calculate offset dynamically based on 3rd chunk index. */\nuint32_t offset \u003d 3 * kMaxReadSize;\n// ...\nzassert_true(absolute_destination + size \u003c\u003d FP_SENSOR_IMAGE_SIZE, ...);\n\n```\n\nWhile this math currently passes, it makes the test brittle to Kconfig changes. If `CONFIG_EC_HOST_CMD_HANDLER_TX_BUFFER_SIZE` is increased in the future for a specific board, `3 * kMaxReadSize` might inadvertently cause `absolute_destination + size` to exceed `FP_SENSOR_IMAGE_SIZE`, causing the test\u0027s sanity `zassert_true` to abort the test.\n\n* **Suggestion:** To make the test perfectly resilient to buffer size configurations, calculate the offset mathematically based on the buffer limits rather than a hardcoded chunk multiplier. For example:\n\n```c\n/* Safely place the read chunk at the end of the allowable shifted boundary */\nuint32_t offset \u003d FP_SENSOR_IMAGE_SIZE - FP_SENSOR_IMAGE_OFFSET - size;\n\n```",
+      "range": {
+        "startLine": 203,
+        "startChar": 0,
+        "endLine": 204,
+        "endChar": 36
+      },
+      "revId": "fd75bc85e14a9c21c67ac7d87aa72981db94307d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
