@@ -88,3 +88,10 @@
         zero-symbol = <BINARY(1,0,0,0,0)>;
     };
 };
+
+
+/ {
+	chosen {
+		zephyr,host-cmd-espi-backend = &espi0;
+	};
+};
