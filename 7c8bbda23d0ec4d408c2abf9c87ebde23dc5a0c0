@@ -33,6 +33,42 @@
       "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/1349c588-c7b1-46c4-8a1d-c88acd027cbb)]\n\n### Review Summary\n\n*   **Functionality**: The CL adds a comprehensive suite of unit tests for the `get_frame` function in the fingerprint sensor subsystem. The tests cover a wide range of scenarios including system lock states, invalid parameters, memory overflows, and successful frame reads under various boundary conditions.\n*   **Security**: By thoroughly verifying the bounds checking and access control mechanisms within `get_frame`, this patch helps validate the security and stability of the fingerprint sensor driver against potential out-of-bounds reads and unauthorized access.\n*   **Style**: The code strictly adheres to Zephyr testing conventions and C++ style guidelines. The use of clear setup logic, well-named tests, and appropriate mocking with the FFF framework makes the test suite highly readable and maintainable. All prior feedback has been integrated successfully.\n*   **Testing**: The patch achieves its goal of significantly increasing test coverage for the frame retrieval logic, providing high confidence in the subsystem\u0027s robustness.",
       "revId": "7c8bbda23d0ec4d408c2abf9c87ebde23dc5a0c0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7683f98b_c9e0224f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T18:16:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e6286fc8_563b2633",
+      "revId": "7c8bbda23d0ec4d408c2abf9c87ebde23dc5a0c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2778ecf0_59b194ad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T18:16:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb0e9544_8eb0d578",
+      "revId": "7c8bbda23d0ec4d408c2abf9c87ebde23dc5a0c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

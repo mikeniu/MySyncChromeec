@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7bc7c80_010db3ac",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T18:16:15Z",
+      "side": 1,
+      "message": "**Redundant `extern` Declarations** Lines 31-32 in `fpsensor_get_frame.cc`:\n\n```c\nextern uint8_t fp_buffer[FP_SENSOR_IMAGE_SIZE];\nextern struct fpsensor_context global_context;\n\n```\n\nBoth `fp_buffer` and `global_context` are standard shared state variables in the ChromeOS EC fingerprint codebase,",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 46
+      },
+      "revId": "fd75bc85e14a9c21c67ac7d87aa72981db94307d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "964bc048_6b1d7e2b",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T18:16:15Z",
+      "side": 1,
+      "message": "**Unused FFF Fake** In `fpsensor_get_frame.cc`, you define and set up a fake for `mkbp_send_event`:\n\n```c\nFAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);\n// ... inside get_frame_before()\nRESET_FAKE(mkbp_send_event);\nmkbp_send_event_fake.return_val \u003d 0;\n\n```\n\nBecause the `get_frame()` function does not trigger any MKBP events or interact with the event queue, this fake is unused. It is likely a leftover copy-paste artifact from another test file.\n\n* **Suggestion:** Remove the fake definition, reset, and return value assignment to reduce boilerplate and avoid confusing future maintainers.",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 47
+      },
+      "revId": "fd75bc85e14a9c21c67ac7d87aa72981db94307d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
