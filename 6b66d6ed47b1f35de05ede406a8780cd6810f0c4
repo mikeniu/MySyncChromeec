@@ -34,6 +34,24 @@
       "parentUuid": "60306c41_c1006e5b",
       "revId": "6b66d6ed47b1f35de05ede406a8780cd6810f0c4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e950a25_4d1c4fba",
+        "filename": "zephyr/program/fpmcu/em32f967/prj.conf",
+        "patchSetId": 23
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-06-01T06:11:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c123bf25_ff6f0e67",
+      "revId": "6b66d6ed47b1f35de05ede406a8780cd6810f0c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
