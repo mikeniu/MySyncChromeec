@@ -25,5 +25,6 @@
 / {
 chosen {
 		cros,rtc = &mtc;
+		zephyr,host-cmd-shi-backend = &shi0;
 	};
 };
