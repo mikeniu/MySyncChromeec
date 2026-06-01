@@ -72,6 +72,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ec13cf92_a62c9cff",
+        "filename": "zephyr/shim/src/host_command.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-06-01T22:34:02Z",
+      "side": 1,
+      "message": "Will these two structures always be compatible? Perhaps a BUILD_ASSERT should be added to ensure compatibility.",
+      "revId": "10202ea5e4300c963b03d9f5550b4ef189738864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d232422c_075f2c26",
         "filename": "zephyr/shim/src/tasks.c",
         "patchSetId": 7
