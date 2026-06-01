@@ -13,3 +13,10 @@
 	/* unused but needed by dt binding */
 	cs-gpios = <&gpiom 5 GPIO_VOLTAGE_1P8>;
 };
+
+
+/ {
+	chosen {
+		zephyr,host-cmd-shi-backend = &shi0;
+	};
+};
