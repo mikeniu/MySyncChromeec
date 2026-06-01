@@ -295,6 +295,62 @@ def iterate_power_states(edt, project_name, policies):
     return num_errors
 
 
+def check_pattern_durations(project_name, policies):
+    """Checks if all patterns sharing the same ID have the same total duration.
+
+    Args:
+        project_name: Name of the board that is being built
+        policies: The led-policy node instance to check
+
+    Returns:
+        num_errors: Number of mismatched duration policies detected.
+    """
+    num_errors = 0
+
+    for state_node in policies.children.values():
+        # Dictionary to group durations by led-id
+        led_id_durations = {}
+
+        for pattern_node in state_node.children.values():
+            led_id = pattern_node.props["led-id"].val
+
+            sum_period = 0
+            for color_node in pattern_node.children.values():
+                if "period-ms" in color_node.props:
+                    sum_period += color_node.props["period-ms"].val
+
+            cycle_count = 0
+            if "cycle-count" in pattern_node.props:
+                cycle_count = pattern_node.props["cycle-count"].val
+
+            # Format the duration string to catch mismatches
+            if cycle_count == 0:
+                total_duration = f"Infinite (loop: {sum_period}ms)"
+            else:
+                total_duration = f"{sum_period * cycle_count}ms"
+
+            if led_id not in led_id_durations:
+                led_id_durations[led_id] = {}
+
+            led_id_durations[led_id][pattern_node.name] = total_duration
+
+        # Check for mismatches within each led-id group
+        for led_id, durations in led_id_durations.items():
+            if len(durations) > 1:
+                unique_durations = set(durations.values())
+                if len(unique_durations) > 1:
+                    logging.error(
+                        "%s: Policy '%s' has mismatched total durations for %s: %s",
+                        project_name,
+                        state_node.name,
+                        led_id,
+                        durations,
+                    )
+                    num_errors += 1
+
+    return num_errors
+
+
 def parse_args(argv: Optional[List[str]] = None):
     """Returns parsed command-line arguments"""
     parser = util.EdtArgumentParser(
@@ -332,6 +388,7 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
     num_errors = 0
     for policy in edt.compat2okay["cros-ec,led-policy"]:
         num_errors += iterate_power_states(edt, project_dir.name, policy)
+        num_errors += check_pattern_durations(project_dir.name, policy)
 
     if num_errors:
         return 1
