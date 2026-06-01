@@ -21,6 +21,7 @@ def register_npcx9_project(
         project_name=project_name,
         zephyr_board=zephyr_board,
         dts_overlays=[
+            here / "common.overlay",
             here / project_name / "project.overlay",
         ],
         kconfig_files=[
@@ -53,6 +54,7 @@ def register_it8xxx2_project(
         project_name=project_name,
         zephyr_board="it8xxx2/it82002aw",
         dts_overlays=[
+            here / "common.overlay",
             here / project_name / "project.overlay",
         ],
         kconfig_files=[
@@ -85,6 +87,7 @@ def register_realtek_project(
         project_name=project_name,
         zephyr_board="realtek/rts5912",
         dts_overlays=[
+            here / "common.overlay",
             here / project_name / "project.overlay",
         ],
         kconfig_files=[
