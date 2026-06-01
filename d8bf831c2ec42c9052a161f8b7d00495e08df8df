@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22a78528_760263eb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-01T18:09:23Z",
+      "side": 1,
+      "message": "Code LGTM. Further review pending determination whether this actually works.",
+      "revId": "d8bf831c2ec42c9052a161f8b7d00495e08df8df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83d2a36e_74351d4f",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-01T18:09:23Z",
+      "side": 1,
+      "message": "Nit: Different indentation here",
+      "revId": "d8bf831c2ec42c9052a161f8b7d00495e08df8df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d9fa16d_07318553",
+        "filename": "zephyr/test/pdc/src/rts54xx/rts54xx.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-01T18:09:23Z",
+      "side": 1,
+      "message": "I\u0027m not necessarily opposed to the use of the macros in these tests as long as we still need them for existing code, which I expect to be the case for the foreseeable future. If the test uses a different way of generating and accessing the data structure than the implementation, that effectively tests that the implementation structure is valid in a way that using the same structure both places would not. However, I would be disinclined to prioritize that over readability. I\u0027m not sure where to draw the line. Up to you.",
+      "revId": "d8bf831c2ec42c9052a161f8b7d00495e08df8df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
