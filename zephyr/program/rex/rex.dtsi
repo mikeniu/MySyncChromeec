@@ -7,6 +7,9 @@
 #include <cros/integrated_fwid.dtsi>
 
 / {
+	chosen {
+		zephyr,host-cmd-espi-backend = &espi0;
+	};
 	aliases {
 		gpio-wp = &gpio_ec_wp_l;
 		gpio-cbi-wp = &gpio_ec_cbi_wp;
