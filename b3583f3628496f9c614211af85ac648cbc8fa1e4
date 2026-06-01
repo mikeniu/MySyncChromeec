@@ -49,6 +49,98 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a199954f_8b56aa35",
+        "filename": "util/focaltech/ft_log.h",
+        "patchSetId": 17
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T20:57:28Z",
+      "side": 1,
+      "message": "**Constant Initialization (`ft_log.h`)** `constexpr const char* kLogTag` works, but modern C++ style prefers `inline constexpr` for header-defined string constants to prevent One Definition Rule (ODR) violations and duplicate string literals across translation units.\n\n* **Fix:** `inline constexpr std::string_view kLogTag \u003d \"focaltech\";`",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 44
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2173ed93_215ba9b6",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T20:57:28Z",
+      "side": 1,
+      "message": "**Redundant Move Logic (`libusb_transport.cc`)** In your move constructor for `LibusbTransport`, you correctly use `std::move()` on your `std::unique_ptr`s (`ctx_` and `handle_`). `std::unique_ptr` naturally nulls out the source pointer upon being moved.\n\n* **Improvement:** You only need to reset the primitive members of the `other` object. The smart pointers handle themselves.",
+      "range": {
+        "startLine": 195,
+        "startChar": 0,
+        "endLine": 203,
+        "endChar": 28
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b899cb5_41db5840",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T20:57:28Z",
+      "side": 1,
+      "message": "The Google C++ Style Guide mandates that a source file\u0027s corresponding header must be the absolute first `#include`. This ensures the header is entirely self-contained and does not silently rely on dependencies implicitly provided by other headers.\n* **Fix:** Move `#include \"updater.h\"` to the top of the include block in `updater.cc`:\n\n\n```cpp\n#include \"updater.h\"\n\n#include \u003calgorithm\u003e\n#include \u003ccstdint\u003e\n// ... remaining standard headers\n\n#include \u003copenssl/sha.h\u003e\n\n// ... remaining project headers\n\n```",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 23
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bd5edc1_3eeeb2cb",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T20:57:28Z",
+      "side": 1,
+      "message": "**String termination in `FtGetBootVersion` (`updater.cc`)** You are guaranteeing a null-terminator at the very end of the buffer using `data.back() \u003d \u0027\\0\u0027`. However, if the device returns a short version string followed by uninitialized garbage (instead of null-padding), `std::string` will include that garbage until it hits the final byte.\n\n* **Fix:** Read up to the first null byte explicitly.\n\n```c\nauto null_pos \u003d std::ranges::find(data, \u0027\\0\u0027);\nstd::string version(data.begin(), null_pos);\n\n```",
+      "range": {
+        "startLine": 264,
+        "startChar": 0,
+        "endLine": 267,
+        "endChar": 39
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "75d0377c_351c7309",
         "filename": "util/focaltech/usb_transport.h",
         "patchSetId": 17
