@@ -118,6 +118,30 @@
       },
       "revId": "c999315b51ed35a62cb0317e213dbb4e334b7743",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93d00502_3ce3b873",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 22
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T21:39:15Z",
+      "side": 1,
+      "message": "\u003e I believe the 544 is platform dependent. They use 544 for simulated test\n\nYes, it\u0027s platform dependent. What I\u0027m asking is whether TX and RX were accidentally switched in that original test based on [these configs](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/subsys/mgmt/ec_host_cmd/Kconfig;l\u003d24-44;drc\u003dfc318404abdb74bfb52727c17f0614a892b6ff94).",
+      "parentUuid": "16512151_6cb72a52",
+      "range": {
+        "startLine": 18,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 6
+      },
+      "revId": "c999315b51ed35a62cb0317e213dbb4e334b7743",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
