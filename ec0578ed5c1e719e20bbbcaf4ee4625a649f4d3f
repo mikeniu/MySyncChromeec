@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "20d7fe49_9db87810",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-01T20:32:03Z",
+      "side": 1,
+      "message": "I separated the CLs into enabling by default (but disabled on all boards) and fixing tests.  Then the next CLs in the chain enable it per board family.",
+      "parentUuid": "9286b349_a777ef27",
+      "revId": "ec0578ed5c1e719e20bbbcaf4ee4625a649f4d3f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "87f64005_d6accc7f",
         "filename": "driver/usb_mux/usb_mux.c",
         "patchSetId": 6
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-28T16:41:36Z",
       "side": 1,
       "message": "Can this clean up be a different CL?",
+      "revId": "ec0578ed5c1e719e20bbbcaf4ee4625a649f4d3f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5128719_2fffa814",
+        "filename": "driver/usb_mux/usb_mux.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 889,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-01T20:32:03Z",
+      "side": 1,
+      "message": "This fixes a redefinition of this host command within tests.",
+      "parentUuid": "87f64005_d6accc7f",
       "revId": "ec0578ed5c1e719e20bbbcaf4ee4625a649f4d3f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
