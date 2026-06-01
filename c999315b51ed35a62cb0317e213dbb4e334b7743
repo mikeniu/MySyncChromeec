@@ -22,6 +22,30 @@
       },
       "revId": "c999315b51ed35a62cb0317e213dbb4e334b7743",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7baef6a2_550ec505",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 22
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-06-01T20:32:54Z",
+      "side": 1,
+      "message": "`config EC_HOST_CMD_HANDLER_TX_BUFFER_SIZE` is defined in [src/third_party/zephyrproject/zephyr/subsys/mgmt/ec_host_cmd/Kconfig](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/subsys/mgmt/ec_host_cmd/Kconfig?q\u003d%22config%20EC_HOST_CMD_HANDLER_TX_BUFFER_SIZE%22\u0026start\u003d1#:~:text\u003d23-,24,-25). It is not available without enabling `config EC_HOST_CMD`. If I defined `CONFIG_ EC_HOST_CMD`, it requires other configs to be added and it becomes complicated.\n\nIn another zephyr test [src/platform/ec/zephyr/test/fpmcu/Kconfig](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/fpmcu/Kconfig?q\u003d%22config%20EC_HOST_CMD_HANDLER_TX_BUFFER_SIZE%22\u0026start\u003d1#:~:text\u003d39-,40,-41), I see it defined locally\n\n```\nconfig EC_HOST_CMD_HANDLER_TX_BUFFER_SIZE\n\tint \"HC TX buffer size\"\n\tdefault 544\n```\n\nI can use this approach and get rid of the ifdef/define/endif\n\nPlease let me know your preference.",
+      "parentUuid": "396fb676_095fb48d",
+      "range": {
+        "startLine": 18,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 6
+      },
+      "revId": "c999315b51ed35a62cb0317e213dbb4e334b7743",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
