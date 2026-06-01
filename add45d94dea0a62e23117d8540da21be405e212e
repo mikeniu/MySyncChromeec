@@ -53,6 +53,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c03939f_c58239c6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-06-01T19:17:14Z",
+      "side": 1,
+      "message": "I do not agree with this review. The offset is added for all images. There is another function that decided whether to physically add the offset.",
+      "parentUuid": "1d30201e_8185926b",
+      "revId": "add45d94dea0a62e23117d8540da21be405e212e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "213e49a0_4b33a17a",
@@ -101,6 +119,24 @@
       "writtenOn": "2026-05-21T17:17:33Z",
       "side": 1,
       "message": "[Gerrit AI Review] Regarding the source pointer: if `config-\u003eimage_buffer` was loaded with a full raw frame (e.g., via `z_impl_fingerprint_load_image`), then `config-\u003eimage_buffer` begins with the 400-byte header.\n\nWhen `offset` is 400 (as for `SIMPLE_IMAGE`), this `memcpy` will copy the *header* into the destination buffer (at `image_buf + 400`) instead of the pixel data. Should the source also be shifted by `offset`?\n\n```c\nmemcpy(image_buf + offset, config-\u003eimage_buffer + offset, frame_size);\n```",
+      "revId": "add45d94dea0a62e23117d8540da21be405e212e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6eaae976_c7722d74",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-06-01T19:17:14Z",
+      "side": 1,
+      "message": "I do not agree with this review. The offset is added for all images. There is another function that decided whether to physically add the offset.",
+      "parentUuid": "3585e234_5ef89997",
       "revId": "add45d94dea0a62e23117d8540da21be405e212e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -188,6 +224,24 @@
       "writtenOn": "2026-05-21T17:17:33Z",
       "side": 1,
       "message": "[Gerrit AI Review] Setting `image-data-offset-bytes \u003d \u003c400\u003e` here while keeping `frame-size \u003d \u003c25600\u003e` will cause acquisition failures in the simulator for all capture types using these properties (like `SIMPLE_IMAGE`), because the driver now enforces `offset + frame_size \u003c\u003d image_buf_size`.\n\nIf these modes are intended to have an offset, `frame-size` should likely be increased to 26000 to reflect the required buffer size. Otherwise, this offset should remain 0.",
+      "revId": "add45d94dea0a62e23117d8540da21be405e212e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb28d309_076a80a1",
+        "filename": "zephyr/test/fingerprint/task/boards/native_sim.overlay",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-06-01T19:17:14Z",
+      "side": 1,
+      "message": "I do not agree with this review. The offset is added for all images. There is another function that decided whether to physically add the offset.",
+      "parentUuid": "39c8744b_afd7eb47",
       "revId": "add45d94dea0a62e23117d8540da21be405e212e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
