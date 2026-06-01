@@ -30,6 +30,9 @@ i2c3ALT: &i2c3 {
 #define PD_POW_IRQ_GPIO &gpiof 5
 
 / {
+	chosen {
+		zephyr,host-cmd-espi-backend = &espi0;
+	};
 	named-gpios {
 		/*
 		 * Aliases for power signal names
