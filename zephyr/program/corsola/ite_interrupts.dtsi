@@ -72,11 +72,6 @@
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "xhci_interrupt";
 		};
-		int_spi0_cs: spi0_cs {
-			irq-pin = <&spi0_cs>;
-			flags = <GPIO_INT_EDGE_FALLING>;
-			handler = "spi_event";
-		};
 		int_x_ec_gpio2: x_ec_gpio2 {
 			irq-pin = <&gpio_x_ec_gpio2>;
 			flags = <GPIO_INT_EDGE_BOTH>;
