@@ -4,6 +4,7 @@
  */
 
 #include "../cbi.dtsi"
+#include "../host_cmd.dtsi"
 
 #include "cbi.dtsi"
 #include "gpio.dtsi"
