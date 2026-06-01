@@ -34,6 +34,9 @@
 #include "moonstone_ec_ufsc.dtsi"
 
 / {
+	chosen {
+		zephyr,host-cmd-espi-backend = &espi0;
+	};
 	batteries {
 		default_battery: atl-ap25aap {
 			compatible = "atl,ap25aap", "battery-smart";
