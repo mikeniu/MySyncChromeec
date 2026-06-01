@@ -105,7 +105,8 @@ enum fan_status board_override_fan_control_duty(int ch)
 {
 	/* If the last power-on is due to AC, which enters the charging loop in
 	 * the AP firmware stop the fan */
-	if (POWER_ON_BY_AC_ON == chipset_get_power_on_reason()) {
+	if (POWER_ON_BY_AC_ON == chipset_get_power_on_reason() ||
+	    POWER_ON_BY_RTC_ALARM == chipset_get_power_on_reason()) {
 		fan_set_duty(ch, 0);
 		return FAN_STATUS_STOPPED;
 	}
