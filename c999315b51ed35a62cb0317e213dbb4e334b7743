@@ -142,6 +142,30 @@
       },
       "revId": "c999315b51ed35a62cb0317e213dbb4e334b7743",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7bdd0d5_483f2131",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 22
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-06-01T21:41:56Z",
+      "side": 1,
+      "message": "It does not seem they are mixed.",
+      "parentUuid": "93d00502_3ce3b873",
+      "range": {
+        "startLine": 18,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 6
+      },
+      "revId": "c999315b51ed35a62cb0317e213dbb4e334b7743",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
