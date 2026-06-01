@@ -68,6 +68,29 @@
       },
       "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68f444d5_cfd5e594",
+        "filename": "util/egis/flasher_logic.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T18:47:16Z",
+      "side": 1,
+      "message": "**File:** `util/egis/flasher_logic.cc`\n\nWhen parsing raw command binaries, you combine `header_size` and `wrapped_size.value()`:\n\n```c\n  return header_size + wrapped_size.value();\n\n```\n\nBecause `wrapped_size.value()` is parsed directly from potentially untrusted or corrupted binary input, an exceptionally large value (e.g., `0xFFFFFFFF`) could cause an integer overflow on 32-bit architectures, wrapping around to a small `size_t`. This would bypass subsequent length checks in `ProgramRawCommandPayload`.\n\n**Remediation:** Validate `wrapped_size.value()` against a reasonable upper bound (like `BootromComm::kMaxPayloadSize`) before returning.\n\n\n```c\n  auto wrapped_size \u003d ReadLittleEndian\u003cuint32_t\u003e(\n      fw.subspan(offsetof(BootromComm::SecureCommandShaHeader, payload_len),\n                 sizeof(BootromComm::SecureCommandShaHeader::payload_len)));\n  if (!wrapped_size) return std::unexpected(ParseError::kInvalidPayloadSize);\n\n  // CRITICAL FIX: Prevent integer overflow and enforce hardware limits\n  if (wrapped_size.value() \u003e BootromComm::kMaxPayloadSize) {\n    return std::unexpected(ParseError::kInvalidPayloadSize); \n  }\n\n  return header_size + wrapped_size.value();\n\n```",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 52
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
