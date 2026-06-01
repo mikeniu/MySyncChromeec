@@ -11,6 +11,7 @@
 
 / {
 	chosen {
+		zephyr,host-cmd-espi-backend = &espi0;
 		intel-ap-pwrseq,espi = &espi0;
 	};
 
