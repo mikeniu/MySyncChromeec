@@ -25,6 +25,7 @@ def register_trulo_project(
             project_name=project_name,
             zephyr_board=zephyr_board,
             dts_overlays=[
+                here / "common.overlay",
                 here / project_name / "project.overlay",
             ],
             kconfig_files=kconfig_files + [here / "dsp_comms.conf"],
@@ -38,6 +39,7 @@ def register_trulo_project(
             project_name=project_name,
             zephyr_board=zephyr_board,
             dts_overlays=[
+                here / "common.overlay",
                 here / project_name / "project.overlay",
             ],
             kconfig_files=kconfig_files + [here / "dsp_comms.conf"],
