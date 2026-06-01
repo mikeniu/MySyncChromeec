@@ -465,3 +465,5 @@
 		board-init = "ps8743_eq_c1_setting";
 	};
 };
+
+/delete-node/ &int_spi0_cs;

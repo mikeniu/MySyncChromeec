@@ -221,3 +221,5 @@
 	enable-pins = <&en_pp5000_usb_a0_vbus
 		       &en_pp5000_usb_a1_vbus>;
 };
+
+/delete-node/ &int_spi0_cs;
