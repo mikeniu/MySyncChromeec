@@ -51,6 +51,24 @@
       "parentUuid": "a904e69b_847efb25",
       "revId": "c8b4f776d01eb9b8dd8333f996961e19ef565be8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9690e40_537ef2b1",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 633,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-06-01T20:27:41Z",
+      "side": 1,
+      "message": "ok. I added this check in a separate CL: https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7891280/1\n\nDo you want to keep the test in this CL?",
+      "parentUuid": "4e60913d_272638a6",
+      "revId": "c8b4f776d01eb9b8dd8333f996961e19ef565be8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
