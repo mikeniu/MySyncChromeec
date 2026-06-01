@@ -46,6 +46,30 @@
       },
       "revId": "c999315b51ed35a62cb0317e213dbb4e334b7743",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cad65df6_7b38e9ee",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 22
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T20:40:50Z",
+      "side": 1,
+      "message": "\u003e In another zephyr test src/platform/ec/zephyr/test/fpmcu/Kconfig, \n\nI think it\u0027s a bit better if we define it in the Kconfig. In terms of the value, why is it `544`? From the link above it looks like that\u0027s the `RX_BUFFER_SIZE`, not the `TX_BUFFER_SIZE`?",
+      "parentUuid": "7baef6a2_550ec505",
+      "range": {
+        "startLine": 18,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 6
+      },
+      "revId": "c999315b51ed35a62cb0317e213dbb4e334b7743",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
