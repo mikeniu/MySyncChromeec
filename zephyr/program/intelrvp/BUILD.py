@@ -22,7 +22,7 @@ def register_intelrvp_project(
         register_func = register_npcx_project
 
     kconfig_files = [here / "program.conf"]
-    dts_overlays = []
+    dts_overlays = [here / "common.overlay"]
     if project_name.startswith("adlrvp"):
         kconfig_files.append(here / "adlrvp/prj.conf")
         dts_overlays.append(here / "adlrvp/battery.dts")
