@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "36b30b78_53d64187",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-06-01T19:59:29Z",
+      "side": 1,
+      "message": "isn\u0027t this change going to be incompatible with previous board spins,\nin particular devices we\u0027re current using for testing?",
+      "range": {
+        "startLine": 7,
+        "startChar": 58,
+        "endLine": 7,
+        "endChar": 61
+      },
+      "revId": "10b3e90a796ade3afb1d7b8f76c6151a9275b302",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3334549b_50e5d4d5",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
