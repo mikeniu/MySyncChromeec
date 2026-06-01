@@ -24,3 +24,10 @@
 #include "../felino/power_signals.dtsi"
 #include "../felino/temp_sensors.dtsi"
 #include "../felino/usb_typec.dtsi"
+
+
+/ {
+	chosen {
+		zephyr,host-cmd-espi-backend = &espi0;
+	};
+};
