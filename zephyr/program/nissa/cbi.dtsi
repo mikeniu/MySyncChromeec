@@ -4,6 +4,9 @@
  */
 
 / {
+	chosen {
+		zephyr,host-cmd-espi-backend = &espi0;
+	};
 	nissa-fw-config {
 		compatible = "cros-ec,cbi-fw-config";
 
