@@ -44,6 +44,7 @@
 
 	chosen {
 		cros-ec,keyboard = &kbd;
+		zephyr,host-cmd-espi-backend = &espi0;
 	};
 };
 
