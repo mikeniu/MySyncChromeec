@@ -6,3 +6,10 @@
 &espi0 {
 	status = "okay";
 };
+
+/{
+	chosen {
+		zephyr,host-cmd-espi-backend = &espi0;
+	};
+};
+
