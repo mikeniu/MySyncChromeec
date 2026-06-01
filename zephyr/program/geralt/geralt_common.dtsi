@@ -6,3 +6,9 @@
 /* Geralt program common DTS includes */
 
 #include <cros/integrated_fwid.dtsi>
+
+/ {
+	chosen {
+		zephyr,host-cmd-shi-backend = &shi0;
+	};
+};
