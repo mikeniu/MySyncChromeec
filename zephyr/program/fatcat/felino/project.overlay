@@ -24,3 +24,10 @@
 #include "power_signals.dtsi"
 #include "temp_sensors.dtsi"
 #include "usb_typec.dtsi"
+
+
+/ {
+	chosen {
+		zephyr,host-cmd-espi-backend = &espi0;
+	};
+};
