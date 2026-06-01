@@ -137,6 +137,7 @@ static int fp_simulator_acquire_image(const struct device *dev,
 		(mode != FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT &&
 		 mode != FINGERPRINT_CAPTURE_TYPE_QUALITY_TEST);
 
+	bool mode_found = false;
 	for (uint8_t i = 0; i < config->sensor_info.num_capture_types; ++i) {
 		if (config->sensor_image_configs[i].fp_capture_type == mode) {
 			frame_size = config->sensor_image_configs[i].frame_size;
@@ -144,8 +145,13 @@ static int fp_simulator_acquire_image(const struct device *dev,
 				offset = config->sensor_image_configs[i]
 						 .image_data_offset_bytes;
 			}
+			mode_found = true;
 			break;
 		}
+	}
+
+	if (!mode_found) {
+		return -ENOTSUP;
 	}
 
 	data->state.last_acquire_image_mode = mode;
