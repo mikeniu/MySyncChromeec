@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1df5d568_1bc39aec",
+        "filename": "util/focaltech/build.mk",
+        "patchSetId": 16
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-01T09:18:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c887d59_f27bd521",
+      "range": {
+        "startLine": 24,
+        "startChar": 106,
+        "endLine": 24,
+        "endChar": 107
+      },
+      "revId": "bb96273d26e4b83c1f54355cfb9499be3c5c7ad6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "18e1d47d_32a037c7",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-05-29T18:55:18Z",
       "side": 1,
       "message": "**Incorrect Makefile Variable for C++ Sources (`util/focaltech/build.mk`)** The `focaltech_fingerprint_iap` target is built from C++ source files (`main.o`, `updater.o`, etc.), but the makefile attempts to configure the compiler using C flags.\n\n* **The Issue:** Make\u0027s default rules for C++ sources use `CXXFLAGS` (or `HOST_CXXFLAGS` in the ChromiumOS build system).\n* **Remediation:** Change `HOST_CFLAGS` to `HOST_CXXFLAGS` for `_focaltech_bin`.",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 78
+      },
+      "revId": "bb96273d26e4b83c1f54355cfb9499be3c5c7ad6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec8e8df2_1f1b6b47",
+        "filename": "util/focaltech/build.mk",
+        "patchSetId": 16
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-01T09:18:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "18e1d47d_32a037c7",
       "range": {
         "startLine": 35,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b31d2780_9f4e86ff",
+        "filename": "util/focaltech/focaltech_test.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-01T09:18:41Z",
+      "side": 1,
+      "message": "Test pass:\n\n./build/host/util/focaltech_test \nRunning main() from /var/tmp/portage/dev-cpp/gtest-1.16.0-r17/work/gtest-1.16.0/googletest/src/gtest_main.cc\n[\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d] Running 55 tests from 6 test suites.\n[----------] Global test environment set-up.\n[----------] 23 tests from CliTest\n[ RUN      ] CliTest.ParseArguments_UpdateCommand\n[       OK ] CliTest.ParseArguments_UpdateCommand (0 ms)\n[ RUN      ] CliTest.ParseArguments_EnterBootloader\n[       OK ] CliTest.ParseArguments_EnterBootloader (0 ms)\n[ RUN      ] CliTest.ParseArguments_EnterRom\n[       OK ] CliTest.ParseArguments_EnterRom (0 ms)\n[ RUN      ] CliTest.ParseArguments_GetFlashWp\n[       OK ] CliTest.ParseArguments_GetFlashWp (0 ms)\n[ RUN      ] CliTest.ParseArguments_SetFlashWp_Valid\n[       OK ] CliTest.ParseArguments_SetFlashWp_Valid (0 ms)\n[ RUN      ] CliTest.ParseArguments_SetFlashWp_InvalidParam\n[06-01 08:51:43.367929] E [focaltech][cli.cc:180] Invalid integer format for flash_set_protect parameter: abc\n[       OK ] CliTest.ParseArguments_SetFlashWp_InvalidParam (0 ms)\n[ RUN      ] CliTest.ParseArguments_GetEcVersion\n[       OK ] CliTest.ParseArguments_GetEcVersion (0 ms)\n[ RUN      ] CliTest.ParseArguments_UnknownCommand\n[06-01 08:51:43.367959] E [focaltech][cli.cc:161] Unknown subcommand: unknown\n[       OK ] CliTest.ParseArguments_UnknownCommand (0 ms)\n[ RUN      ] CliTest.ParseInt_Valid\n[       OK ] CliTest.ParseInt_Valid (0 ms)\n[ RUN      ] CliTest.ParseInt_Negative\n[       OK ] CliTest.ParseInt_Negative (0 ms)\n[ RUN      ] CliTest.ParseInt_Invalid\n[       OK ] CliTest.ParseInt_Invalid (0 ms)\n[ RUN      ] CliTest.DeviceInit_RomMode\n[       OK ] CliTest.DeviceInit_RomMode (0 ms)\n[ RUN      ] CliTest.DeviceInit_BootMode\n[       OK ] CliTest.DeviceInit_BootMode (0 ms)\n[ RUN      ] CliTest.DeviceInit_EcTestMode\n[       OK ] CliTest.DeviceInit_EcTestMode (0 ms)\n[ RUN      ] CliTest.DeviceInit_EcNormalMode\n[       OK ] CliTest.DeviceInit_EcNormalMode (0 ms)\n[ RUN      ] CliTest.DeviceInit_Unknown\n[06-01 08:51:43.368034] E [focaltech][cli.cc:210] Unrecognized Focal device.\n[       OK ] CliTest.DeviceInit_Unknown (0 ms)\n[ RUN      ] CliTest.ExecuteCommand_GetEcVersion_Success\n[06-01 08:51:43.368047] I [focaltech][cli.cc:222] Tool version is v1.0.3\n[06-01 08:51:43.368054] I [focaltech][cli.cc:79] EC build version: chojnik_v1.2.3\n[       OK ] CliTest.ExecuteCommand_GetEcVersion_Success (0 ms)\n[ RUN      ] CliTest.ExecuteCommand_GetFlashWp_Success\n[06-01 08:51:43.368074] I [focaltech][updater.cc:385] Getting flash write protect area...\n[06-01 08:51:43.368080] I [focaltech][updater.cc:398] Flash write-protect area \u003d 2\n[06-01 08:51:43.368087] I [focaltech][cli.cc:235] Flash write protect area \u003d 2\n[       OK ] CliTest.ExecuteCommand_GetFlashWp_Success (0 ms)\n[ RUN      ] CliTest.ExecuteCommand_SetFlashWp_Success\n[06-01 08:51:43.368106] I [focaltech][updater.cc:420] Setting flash write protect to area: 3\n[06-01 08:51:43.368114] I [focaltech][updater.cc:385] Getting flash write protect area...\n[06-01 08:51:43.368124] I [focaltech][updater.cc:398] Flash write-protect area \u003d 3\n[06-01 08:51:43.368132] I [focaltech][updater.cc:440] Flash write-protect successfully set to area 3\n[       OK ] CliTest.ExecuteCommand_SetFlashWp_Success (0 ms)\n[ RUN      ] CliTest.ExecuteCommand_EnterBoot_Success\n[06-01 08:51:43.368150] I [focaltech][cli.cc:240] Entering bootloader mode...\n[06-01 08:51:43.368161] I [focaltech][cli.cc:79] EC build version: chojnik_v1.0\n[       OK ] CliTest.ExecuteCommand_EnterBoot_Success (51 ms)\n[ RUN      ] CliTest.ExecuteCommand_UnknownCommand\n[06-01 08:51:43.419587] E [focaltech][cli.cc:275] Command not implemented.\n[       OK ] CliTest.ExecuteCommand_UnknownCommand (0 ms)\n[ RUN      ] CliTest.CheckEcBuildVersion_Success\n[06-01 08:51:43.419662] I [focaltech][cli.cc:79] EC build version: ft9001_v2.0\n[       OK ] CliTest.CheckEcBuildVersion_Success (0 ms)\n[ RUN      ] CliTest.CheckEcBuildVersion_UnsupportedProject\n[06-01 08:51:43.419700] I [focaltech][cli.cc:79] EC build version: unknown_project_v1.0\n[06-01 08:51:43.419721] E [focaltech][cli.cc:88] can\u0027t find focal project device\n[       OK ] CliTest.CheckEcBuildVersion_UnsupportedProject (0 ms)\n[----------] 23 tests from CliTest (51 ms total)\n\n[----------] 4 tests from FtHelpTest\n[ RUN      ] FtHelpTest.HelpStringNotEmpty\n[       OK ] FtHelpTest.HelpStringNotEmpty (0 ms)\n[ RUN      ] FtHelpTest.HelpStringContainsExpectedCommands\n[       OK ] FtHelpTest.HelpStringContainsExpectedCommands (0 ms)\n[ RUN      ] FtHelpTest.HelpStringContainsHelpOption\n[       OK ] FtHelpTest.HelpStringContainsHelpOption (0 ms)\n[ RUN      ] FtHelpTest.HelpStringContainsUsageLine\n[       OK ] FtHelpTest.HelpStringContainsUsageLine (0 ms)\n[----------] 4 tests from FtHelpTest (0 ms total)\n\n[----------] 10 tests from FtScsiTest\n[ RUN      ] FtScsiTest.BuildFtCmd_VerifyFields\n[       OK ] FtScsiTest.BuildFtCmd_VerifyFields (0 ms)\n[ RUN      ] FtScsiTest.BuildFtCmd_ZeroDefaults\n[       OK ] FtScsiTest.BuildFtCmd_ZeroDefaults (0 ms)\n[ RUN      ] FtScsiTest.SendBulkDataOut_DataOutSuccess\n[       OK ] FtScsiTest.SendBulkDataOut_DataOutSuccess (0 ms)\n[ RUN      ] FtScsiTest.SendBulkDataOut_SendOnlySuccess\n[       OK ] FtScsiTest.SendBulkDataOut_SendOnlySuccess (0 ms)\n[ RUN      ] FtScsiTest.SendBulkDataOut_CbwSendFails\n[06-01 08:51:43.420023] E [focaltech][ft_scsi.cc:74] CBW transfer failed.\n[       OK ] FtScsiTest.SendBulkDataOut_CbwSendFails (0 ms)\n[ RUN      ] FtScsiTest.SendBulkDataOut_DataSendFails\n[06-01 08:51:43.420067] E [focaltech][ft_scsi.cc:140] Data OUT transfer failed.\n[       OK ] FtScsiTest.SendBulkDataOut_DataSendFails (0 ms)\n[ RUN      ] FtScsiTest.SendBulkDataOut_CswSignatureMismatch\n[06-01 08:51:43.420112] E [focaltech][ft_scsi.cc:95] CSW signature/tag mismatch.\n[       OK ] FtScsiTest.SendBulkDataOut_CswSignatureMismatch (0 ms)\n[ RUN      ] FtScsiTest.ReceiveBulkDataIn_Success\n[       OK ] FtScsiTest.ReceiveBulkDataIn_Success (0 ms)\n[ RUN      ] FtScsiTest.ReceiveBulkDataIn_EmptyBuffer\n[       OK ] FtScsiTest.ReceiveBulkDataIn_EmptyBuffer (0 ms)\n[ RUN      ] FtScsiTest.ReceiveBulkDataIn_DataRecvFails\n[06-01 08:51:43.420204] E [focaltech][ft_scsi.cc:158] Data IN transfer failed.\n[       OK ] FtScsiTest.ReceiveBulkDataIn_DataRecvFails (0 ms)\n[----------] 10 tests from FtScsiTest (0 ms total)\n\n[----------] 6 tests from FtUtilTest\n[ RUN      ] FtUtilTest.DivRoundUp_ExactDivision\n[       OK ] FtUtilTest.DivRoundUp_ExactDivision (0 ms)\n[ RUN      ] FtUtilTest.DivRoundUp_NeedRoundUp\n[       OK ] FtUtilTest.DivRoundUp_NeedRoundUp (0 ms)\n[ RUN      ] FtUtilTest.DivRoundUp_LargeNumbers\n[       OK ] FtUtilTest.DivRoundUp_LargeNumbers (0 ms)\n[ RUN      ] FtUtilTest.DivRoundUp_DifferentTypes\n[       OK ] FtUtilTest.DivRoundUp_DifferentTypes (0 ms)\n[ RUN      ] FtUtilTest.ToString_ReturnsCorrectString\n[       OK ] FtUtilTest.ToString_ReturnsCorrectString (0 ms)\n[ RUN      ] FtUtilTest.ToString_UnknownError\n[       OK ] FtUtilTest.ToString_UnknownError (0 ms)\n[----------] 6 tests from FtUtilTest (0 ms total)\n\n[----------] 1 test from UpdaterTest\n[ RUN      ] UpdaterTest.UpdateFwSuccessBootloaderMode",
+      "parentUuid": "cebcf1f7_843059c4",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 1
+      },
+      "revId": "bb96273d26e4b83c1f54355cfb9499be3c5c7ad6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aacaebd0_162b3b1b",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-05-29T19:01:34Z",
       "side": 1,
       "message": "**Global Constant Linkage (`util/focaltech/ft_log.h`)**\n\n* **The Issue:** `constexpr const char* kLogTag \u003d \"focaltech\";` at the global scope in a header. While `constexpr` implies internal linkage for variables, Google style prefers these to be explicitly scoped.  \n* **Remediation:** Place `kLogTag` and `kCurrentLogLevel` inside an unnamed namespace (if only used in one `.cc` file) or a named namespace like `ft_log` to be perfectly compliant with Google\u0027s scoping rules.",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 44
+      },
+      "revId": "bb96273d26e4b83c1f54355cfb9499be3c5c7ad6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "79aa7cf8_0ecf5471",
+        "filename": "util/focaltech/ft_log.h",
+        "patchSetId": 16
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-01T09:18:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aacaebd0_162b3b1b",
       "range": {
         "startLine": 21,
         "startChar": 0,
@@ -116,6 +212,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5ff4abc_acf013b7",
+        "filename": "util/focaltech/ft_log.h",
+        "patchSetId": 16
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-01T09:18:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed25a4f9_b5946fa5",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 84,
+        "endChar": 80
+      },
+      "revId": "bb96273d26e4b83c1f54355cfb9499be3c5c7ad6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8d8e4e43_3770f45f",
@@ -139,6 +259,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7431957e_deb59e03",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-01T09:18:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d8e4e43_3770f45f",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 70
+      },
+      "revId": "bb96273d26e4b83c1f54355cfb9499be3c5c7ad6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9b288964_40814891",
@@ -152,6 +296,30 @@
       "writtenOn": "2026-05-29T19:01:34Z",
       "side": 1,
       "message": "**. Uninitialized Memory in String View (`util/focaltech/main.cc`)** In `CheckEcBuildVersion`, the response payload is read into a fixed 64-byte array (`rx`).\n\n* **The Issue:** The `std::string_view` is unconditionally instantiated with a length of `kRxLen - kEcResponseHeaderSize - kEcResponseNullTerminatorSize` (55 bytes). If `rr.value()` (actual bytes received) is less than 64, the `string_view` will contain embedded null characters `\\0` from the zero-initialized array, leading to malformed log outputs and potential matching errors in `std::any_of`.  \n* **Remediation:** Size the `string_view` dynamically based on `rr.value()`.\n\n```c\nsize_t valid_data_len \u003d std::max\u003csize_t\u003e(0, rr.value() - kEcResponseHeaderSize);\nstd::string_view info(\n    reinterpret_cast\u003cconst char*\u003e(rx.data() + kEcResponseHeaderSize),\n    valid_data_len);\n\n```",
+      "range": {
+        "startLine": 105,
+        "startChar": 1,
+        "endLine": 109,
+        "endChar": 37
+      },
+      "revId": "bb96273d26e4b83c1f54355cfb9499be3c5c7ad6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3e97e2e_64a34430",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 16
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-01T09:18:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b288964_40814891",
       "range": {
         "startLine": 105,
         "startChar": 1,
