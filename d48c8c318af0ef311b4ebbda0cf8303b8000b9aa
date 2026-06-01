@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5d9ccd6_d1b70135",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 15
+      },
+      "lineNbr": 640,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T20:32:00Z",
+      "side": 1,
+      "message": "Since you\u0027re adding the checked validation in the followup CL: https://crrev.com/c/7891280, let\u0027s keep this one limited to just moving the location of the check.",
+      "range": {
+        "startLine": 638,
+        "startChar": 2,
+        "endLine": 640,
+        "endChar": 3
+      },
+      "revId": "d48c8c318af0ef311b4ebbda0cf8303b8000b9aa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
