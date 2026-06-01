@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f12d624a_e94720b1",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T18:28:05Z",
+      "side": 1,
+      "message": "**Issue:**\nThe assertion validating the test setup could be clearer.\n\n```cpp\nzassert_true(\n    (FP_SENSOR_IMAGE_OFFSET + size) \u003c\u003d (sizeof(fp_buffer) + 1),\n    \"Test setup: Underflow condition not met; check your constants.\");\n\n```\n\nWhile the math is technically correct (verifying that the subtraction yielding `offset` didn\u0027t wrap around below zero), the phrasing \"Underflow condition not met\" is slightly confusing. It suggests the test *wants* an underflow to happen, rather than asserting that an underflow *did not* happen during setup.\n\n**Suggestion:**\nReword the assertion message to clearly state the invariant being enforced:\n\n```cpp\nzassert_true(\n    (sizeof(fp_buffer) + 1) \u003e\u003d (FP_SENSOR_IMAGE_OFFSET + size),\n    \"Test setup: Offset calculation wrapped. FP_SENSOR_IMAGE_OFFSET + size must be \u003c\u003d sizeof(fp_buffer) + 1.\");\n\n```\n\nThis makes it immediately obvious to future maintainers why the assertion exists: to ensure the derived `offset` remains a valid positive integer.",
+      "range": {
+        "startLine": 322,
+        "startChar": 0,
+        "endLine": 325,
+        "endChar": 68
+      },
+      "revId": "963bfd49f051ee03c97523dfcbd0022229012ee4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
