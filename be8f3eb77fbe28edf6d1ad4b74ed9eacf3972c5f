@@ -73,6 +73,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8e0857ec_872b4701",
+        "filename": "util/egis/cli_options.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T19:19:22Z",
+      "side": 1,
+      "message": "Let\u0027s move this to a common utility file so that we can test it directly. Here\u0027s Gemini generated instructions and code. Verify for correctness:\n\n---\n\n\nHere are the exact changes to lift `ParseHex` out of the CLI parsing logic and into the shared utility space, bringing its tests along with it.\n\n### 1. Update `util/egis/egis_util.h`\n\nWe add `\u003ccharconv\u003e` and `\u003cstring_view\u003e` to the includes, and place the template alongside your other data manipulation utilities.\n\n*(Showing the newly added code block to append before the closing `} // namespace egis`)*\n\n```cpp\n// Add these to the includes at the top:\n#include \u003ccharconv\u003e\n#include \u003cstring_view\u003e\n\n// ... existing egis_util.h code ...\n\ntemplate \u003cstd::integral T\u003e\nstd::expected\u003cT, std::errc\u003e ParseHex(std::string_view strv) {\n  if (strv.empty()) return std::unexpected(std::errc::invalid_argument);\n\n  // Strip standard hex prefixes\n  if (strv.starts_with(\"0x\") || strv.starts_with(\"0X\")) {\n    strv.remove_prefix(2);\n  }\n\n  if (strv.empty()) return std::unexpected(std::errc::invalid_argument);\n\n  T val;\n  auto [ptr, ec] \u003d\n      std::from_chars(strv.data(), strv.data() + strv.size(), val, 16);\n\n  // Catch overflow or formatting errors natively reported by from_chars\n  if (ec !\u003d std::errc{}) {\n    return std::unexpected(ec);\n  }\n\n  // Catch trailing garbage (e.g., \"1000xyz\")\n  if (ptr !\u003d strv.data() + strv.size()) {\n    return std::unexpected(std::errc::invalid_argument);\n  }\n\n  return val;\n}\n\n// MakeStringView helper from earlier review\ntemplate \u003csize_t N\u003e\nconstexpr std::string_view MakeStringView(const char (\u0026str)[N]) {\n  auto end_it \u003d std::ranges::find(str, \u0027\\0\u0027);\n  return std::string_view(str, end_it);\n}\n\n}  // namespace egis\n\n#endif  // UTIL_EGIS_UTIL_H_\n\n```\n\n### 2. Update `util/egis/egis_util_test.cc`\n\nNow we can test the integer boundaries directly without wrestling with C-style `argv` arrays.\n\n```cpp\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n#include \"egis_util.h\"\n\n#include \u003cgtest/gtest.h\u003e\n\n#include \u003carray\u003e\n\nnamespace egis {\nnamespace {\nstruct SampleStruct {\n  uint16_t a;\n  uint32_t b;\n} __attribute__((packed));\n\nTEST(EgisUtilTest, EndianSwap) {\n  uint32_t val \u003d 0x12345678;\n  EXPECT_EQ(ToLittleEndian(val), val);\n}\n\nTEST(EgisUtilTest, ReadWriteStruct) {\n  std::array\u003cuint8_t, 6\u003e buffer{};\n  SampleStruct in{.a \u003d 0xAAAA, .b \u003d 0xBBBBCCCC};\n  ASSERT_TRUE(WriteStruct\u003cSampleStruct\u003e(buffer, in).has_value());\n  auto read_res \u003d ReadStruct\u003cSampleStruct\u003e(buffer);\n  ASSERT_TRUE(read_res.has_value());\n  EXPECT_EQ(read_res-\u003ea, 0xAAAA);\n  EXPECT_EQ(read_res-\u003eb, 0xBBBBCCCC);\n}\n\n// --- NEW COVERAGE ---\n\nTEST(EgisUtilTest, ParseHexValid) {\n  EXPECT_EQ(ParseHex\u003cuint32_t\u003e(\"1000\").value(), 0x1000);\n  EXPECT_EQ(ParseHex\u003cuint32_t\u003e(\"0x1A2B\").value(), 0x1A2B);\n  EXPECT_EQ(ParseHex\u003cuint32_t\u003e(\"0XFFFF\").value(), 0xFFFF);\n}\n\nTEST(EgisUtilTest, ParseHexFailures) {\n  // Invalid characters\n  EXPECT_EQ(ParseHex\u003cuint32_t\u003e(\"0x100G\").error(), std::errc::invalid_argument);\n  // Integer Overflow for a 32-bit int\n  EXPECT_EQ(ParseHex\u003cuint32_t\u003e(\"0xFFFFFFFFFF\").error(), std::errc::result_out_of_range);\n  // Empty states\n  EXPECT_EQ(ParseHex\u003cuint32_t\u003e(\"0x\").error(), std::errc::invalid_argument);\n  EXPECT_EQ(ParseHex\u003cuint32_t\u003e(\"\").error(), std::errc::invalid_argument);\n}\n\n}  // namespace\n}  // namespace egis\n\n```\n\n### 3. Clean up `util/egis/cli_options.cc`\n\nWe remove the anonymous namespace entirely and just make sure we are pulling in `egis_util.h`.\n\n```cpp\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n#include \"cli_options.h\"\n\n// C system files\n#include \u003cgetopt.h\u003e\n\n// C++ system files\n#include \u003cprint\u003e\n#include \u003cstring_view\u003e\n\n// Project headers\n#include \"egis_util.h\"\n\nnamespace egis {\n\nvoid PrintHelp(const char *prog_name) {\n  // ... remains completely unchanged ...\n}\n\nstd::optional\u003cAppConfig\u003e ParseArgs(int argc, char *argv[]) {\n  // ... remains completely unchanged ...\n  // It will now transparently use the ParseHex from egis_util.h\n}\n\n}  // namespace egis\n\n```",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 15
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5a7256b_6ccee3b2",
+        "filename": "util/egis/cli_options_test.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-01T19:19:22Z",
+      "side": 1,
+      "message": "We should add more coverage. Here is Gemini generated code. Check for correctness and coverage:\n\n----",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 38
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fd6e234d_8bb7866f",
         "filename": "util/egis/crypto_util_test.cc",
         "patchSetId": 27
