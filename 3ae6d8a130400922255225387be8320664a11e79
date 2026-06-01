@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "86e81871_2e22ba69",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-06-01T12:21:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a255f643_eb231dd7",
+      "revId": "3ae6d8a130400922255225387be8320664a11e79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6ec9e815_98aaf4fc",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-29T18:29:17Z",
       "side": 1,
       "message": "Nit: `\u003d\u003d sizeof(uint32_t)`\n\nAlso, this should go after the structure, not after the functions.",
+      "revId": "3ae6d8a130400922255225387be8320664a11e79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76c71135_cca303f7",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-06-01T12:21:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6ec9e815_98aaf4fc",
       "revId": "3ae6d8a130400922255225387be8320664a11e79",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
