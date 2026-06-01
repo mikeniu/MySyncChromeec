@@ -1046,6 +1046,7 @@ test_mockable void chipset_power_on(void)
  */
 static int warm_reset_seq(void)
 {
+#ifdef CONFIG_PLATFORM_EC_POWERSEQ_QC_EXP_WARM_RESET
 	int rv;
 
 	/*
@@ -1082,6 +1083,10 @@ static int warm_reset_seq(void)
 		return rv;
 
 	return EC_SUCCESS;
+#else
+	CPRINTS("Warm reset is disabled, falling back to cold reset");
+	return EC_ERROR_UNKNOWN;
+#endif
 }
 
 /**
