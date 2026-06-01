@@ -145,6 +145,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a56dcba5_81595fd1",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-06-01T19:02:24Z",
+      "side": 1,
+      "message": "you cannot remove this. you will get a linker error:\n\n```\ncd /mnt/host/source/src/platform/ec/twister-out/native_sim_native/host_llvm/platform/ec/zephyr/test/fingerprint/task/fingerprint.task.get_frame/zephyr \u0026\u0026 /usr/bin/make -f /mnt/host/source/src/third_party/zephyrproject/zephyr/scripts/native_simulator/Makefile all --warn-undefined-variables -r NSI_CONFIG_FILE\u003d/mnt/host/source/src/platform/ec/twister-out/native_sim_native/host_llvm/platform/ec/zephyr/test/fingerprint/task/fingerprint.task.get_frame/zephyr/NSI/nsi_config\nld.lld: error: undefined symbol: mkbp_send_event\n\u003e\u003e\u003e referenced by ap_events.c:0 (/mnt/host/source/src/platform/ec/zephyr/subsys/ap_pwrseq/ap_events.c:0)\n\u003e\u003e\u003e               /mnt/host/source/src/platform/ec/twister-out/native_sim_native/host_llvm/platform/ec/zephyr/test/fingerprint/task/fingerprint.task.get_frame/zephyr/NSI/mnt/host/source/src/platform/ec/twister-out/native_sim_native/host_llvm/platform/ec/zephyr/test/fingerprint/task/fingerprint.task.get_frame/zephyr/zephyr.elf.loc_cpusw.o:(send_mkbp_event(unsigned int))\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\nmake: *** [/mnt/host/source/src/third_party/zephyrproject/zephyr/scripts/native_simulator/Makefile:142: /mnt/host/source/src/platform/ec/twister-out/native_sim_native/host_llvm/platform/ec/zephyr/test/fingerprint/task/fingerprint.task.get_frame/zephyr/zephyr.exe] Error 1\nninja: build stopped: subcommand failed.\n\nINFO    - /mnt/host/source/src/platform/ec/twister-out/native_sim_native/host_llvm/platform/ec/zephyr/test/fingerprint/task/fingerprint.task.get_frame/build.log\n```\n\nI believe all the other test in task have defined this. It is not a copy paste thing.",
+      "parentUuid": "af184e81_24d7c5e1",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 47
+      },
+      "revId": "fd75bc85e14a9c21c67ac7d87aa72981db94307d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7a1bb913_c3a87ced",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
         "patchSetId": 20
