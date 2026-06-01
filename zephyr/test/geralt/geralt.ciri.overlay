@@ -13,7 +13,6 @@
 
 /delete-node/ &int_volume_up;
 /delete-node/ &int_volume_down;
-/delete-node/ &int_spi0_cs;
 /delete-node/ &int_ccd_mode_odl;
 /delete-node/ &int_lid_360;
 
