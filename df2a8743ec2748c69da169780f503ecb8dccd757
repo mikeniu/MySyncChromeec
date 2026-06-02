@@ -26,6 +26,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c82036c6_2c93a5ab",
+        "filename": "util/elan/iap_control.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T18:46:57Z",
+      "side": 1,
+      "message": "Please add comments to document what these fields are.",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 4
+      },
+      "revId": "df2a8743ec2748c69da169780f503ecb8dccd757",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "073b6c48_0dfa4490",
+        "filename": "util/elan/iap_control.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T18:46:57Z",
+      "side": 1,
+      "message": "Please add comments to document what these fields are.",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 24
+      },
+      "revId": "df2a8743ec2748c69da169780f503ecb8dccd757",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3e2e063f_3bd7cb8b",
         "filename": "util/elan/iap_control_test.cc",
         "patchSetId": 25
