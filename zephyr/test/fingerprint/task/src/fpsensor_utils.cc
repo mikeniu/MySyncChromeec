@@ -11,8 +11,6 @@
 #include <mkbp_event.h>
 #include <rollback.h>
 
-DEFINE_FFF_GLOBALS;
-
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
 ZTEST_SUITE(fpsensor_utils, NULL, NULL, NULL, NULL, NULL);
