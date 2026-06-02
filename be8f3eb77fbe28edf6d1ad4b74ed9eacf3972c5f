@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b251404_962cda9c",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-02T06:09:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f55a19f_822bd02e",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 77
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5d58a19e_d726a393",
@@ -71,6 +95,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a88602e4_32b24ace",
+        "filename": "util/egis/bootrom_test.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-02T06:09:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "01a01c04_6bcd8bd8",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 24
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e0857ec_872b4701",
@@ -84,6 +132,30 @@
       "writtenOn": "2026-06-01T19:19:22Z",
       "side": 1,
       "message": "Let\u0027s move this to a common utility file so that we can test it directly. Here\u0027s Gemini generated instructions and code. Verify for correctness:\n\n---\n\n\nHere are the exact changes to lift `ParseHex` out of the CLI parsing logic and into the shared utility space, bringing its tests along with it.\n\n### 1. Update `util/egis/egis_util.h`\n\nWe add `\u003ccharconv\u003e` and `\u003cstring_view\u003e` to the includes, and place the template alongside your other data manipulation utilities.\n\n*(Showing the newly added code block to append before the closing `} // namespace egis`)*\n\n```cpp\n// Add these to the includes at the top:\n#include \u003ccharconv\u003e\n#include \u003cstring_view\u003e\n\n// ... existing egis_util.h code ...\n\ntemplate \u003cstd::integral T\u003e\nstd::expected\u003cT, std::errc\u003e ParseHex(std::string_view strv) {\n  if (strv.empty()) return std::unexpected(std::errc::invalid_argument);\n\n  // Strip standard hex prefixes\n  if (strv.starts_with(\"0x\") || strv.starts_with(\"0X\")) {\n    strv.remove_prefix(2);\n  }\n\n  if (strv.empty()) return std::unexpected(std::errc::invalid_argument);\n\n  T val;\n  auto [ptr, ec] \u003d\n      std::from_chars(strv.data(), strv.data() + strv.size(), val, 16);\n\n  // Catch overflow or formatting errors natively reported by from_chars\n  if (ec !\u003d std::errc{}) {\n    return std::unexpected(ec);\n  }\n\n  // Catch trailing garbage (e.g., \"1000xyz\")\n  if (ptr !\u003d strv.data() + strv.size()) {\n    return std::unexpected(std::errc::invalid_argument);\n  }\n\n  return val;\n}\n\n// MakeStringView helper from earlier review\ntemplate \u003csize_t N\u003e\nconstexpr std::string_view MakeStringView(const char (\u0026str)[N]) {\n  auto end_it \u003d std::ranges::find(str, \u0027\\0\u0027);\n  return std::string_view(str, end_it);\n}\n\n}  // namespace egis\n\n#endif  // UTIL_EGIS_UTIL_H_\n\n```\n\n### 2. Update `util/egis/egis_util_test.cc`\n\nNow we can test the integer boundaries directly without wrestling with C-style `argv` arrays.\n\n```cpp\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n#include \"egis_util.h\"\n\n#include \u003cgtest/gtest.h\u003e\n\n#include \u003carray\u003e\n\nnamespace egis {\nnamespace {\nstruct SampleStruct {\n  uint16_t a;\n  uint32_t b;\n} __attribute__((packed));\n\nTEST(EgisUtilTest, EndianSwap) {\n  uint32_t val \u003d 0x12345678;\n  EXPECT_EQ(ToLittleEndian(val), val);\n}\n\nTEST(EgisUtilTest, ReadWriteStruct) {\n  std::array\u003cuint8_t, 6\u003e buffer{};\n  SampleStruct in{.a \u003d 0xAAAA, .b \u003d 0xBBBBCCCC};\n  ASSERT_TRUE(WriteStruct\u003cSampleStruct\u003e(buffer, in).has_value());\n  auto read_res \u003d ReadStruct\u003cSampleStruct\u003e(buffer);\n  ASSERT_TRUE(read_res.has_value());\n  EXPECT_EQ(read_res-\u003ea, 0xAAAA);\n  EXPECT_EQ(read_res-\u003eb, 0xBBBBCCCC);\n}\n\n// --- NEW COVERAGE ---\n\nTEST(EgisUtilTest, ParseHexValid) {\n  EXPECT_EQ(ParseHex\u003cuint32_t\u003e(\"1000\").value(), 0x1000);\n  EXPECT_EQ(ParseHex\u003cuint32_t\u003e(\"0x1A2B\").value(), 0x1A2B);\n  EXPECT_EQ(ParseHex\u003cuint32_t\u003e(\"0XFFFF\").value(), 0xFFFF);\n}\n\nTEST(EgisUtilTest, ParseHexFailures) {\n  // Invalid characters\n  EXPECT_EQ(ParseHex\u003cuint32_t\u003e(\"0x100G\").error(), std::errc::invalid_argument);\n  // Integer Overflow for a 32-bit int\n  EXPECT_EQ(ParseHex\u003cuint32_t\u003e(\"0xFFFFFFFFFF\").error(), std::errc::result_out_of_range);\n  // Empty states\n  EXPECT_EQ(ParseHex\u003cuint32_t\u003e(\"0x\").error(), std::errc::invalid_argument);\n  EXPECT_EQ(ParseHex\u003cuint32_t\u003e(\"\").error(), std::errc::invalid_argument);\n}\n\n}  // namespace\n}  // namespace egis\n\n```\n\n### 3. Clean up `util/egis/cli_options.cc`\n\nWe remove the anonymous namespace entirely and just make sure we are pulling in `egis_util.h`.\n\n```cpp\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n#include \"cli_options.h\"\n\n// C system files\n#include \u003cgetopt.h\u003e\n\n// C++ system files\n#include \u003cprint\u003e\n#include \u003cstring_view\u003e\n\n// Project headers\n#include \"egis_util.h\"\n\nnamespace egis {\n\nvoid PrintHelp(const char *prog_name) {\n  // ... remains completely unchanged ...\n}\n\nstd::optional\u003cAppConfig\u003e ParseArgs(int argc, char *argv[]) {\n  // ... remains completely unchanged ...\n  // It will now transparently use the ParseHex from egis_util.h\n}\n\n}  // namespace egis\n\n```",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 15
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07e174d0_299e5a31",
+        "filename": "util/egis/cli_options.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-02T06:09:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e0857ec_872b4701",
       "range": {
         "startLine": 20,
         "startChar": 0,
@@ -141,6 +213,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "78ddaef6_170ec28b",
+        "filename": "util/egis/cli_options_test.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-02T06:09:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d71c488_00f24307",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 38
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd6e234d_8bb7866f",
@@ -154,6 +250,30 @@
       "writtenOn": "2026-06-01T18:56:54Z",
       "side": 1,
       "message": "Let\u0027s add additional tests to get coverage for all of the functions in the source file. Here\u0027s Gemini-generated code. Review it for correctness and completeness:\n\n---\n\n```cpp\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n#include \"crypto_util.h\"\n\n#include \u003cgtest/gtest.h\u003e\n#include \u003copenssl/sha.h\u003e\n\n#include \u003calgorithm\u003e\n#include \u003carray\u003e\n#include \u003cranges\u003e\n#include \u003cvector\u003e\n\nnamespace egis {\nnamespace {\n\nconstexpr auto kTestKey \u003d std::to_array\u003cuint8_t\u003e({\n    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, \n    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,\n    0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, \n    0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f\n});\n\nconstexpr auto kTestPlaintext \u003d std::to_array\u003cuint8_t\u003e({\n    \u0027C\u0027, \u0027h\u0027, \u0027r\u0027, \u0027o\u0027, \u0027m\u0027, \u0027i\u0027, \u0027u\u0027, \u0027m\u0027, \u0027O\u0027, \u0027S\u0027\n});\n\nconstexpr auto kTestAad \u003d std::to_array\u003cuint8_t\u003e({\n    0xAA, 0xBB, 0xCC, 0xDD\n});\n\nTEST(CryptoUtilTest, Sha256KnownValue) {\n  const auto data \u003d std::to_array\u003cuint8_t\u003e({\u0027a\u0027, \u0027b\u0027, \u0027c\u0027});\n  \n  // SHA256(\"abc\") -\u003e ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\n  const auto kExpectedHash \u003d std::to_array\u003cuint8_t\u003e({\n      0xba, 0x78, 0x16, 0xbf, 0x8f, 0x01, 0xcf, 0xea,\n      0x41, 0x41, 0x40, 0xde, 0x5d, 0xae, 0x22, 0x23,\n      0xb0, 0x03, 0x61, 0xa3, 0x96, 0x17, 0x7a, 0x9c,\n      0xb4, 0x10, 0xff, 0x61, 0xf2, 0x00, 0x15, 0xad\n  });\n\n  std::array\u003cuint8_t, SHA256_DIGEST_LENGTH\u003e hash{};\n  crypto::Sha256(data, hash);\n\n  EXPECT_EQ(kExpectedHash, hash);\n}\n\nTEST(CryptoUtilTest, GenerateGcmIvSanityCheck) {\n  std::array\u003cuint8_t, crypto::kAesGcmIvSize\u003e iv1{};\n  std::array\u003cuint8_t, crypto::kAesGcmIvSize\u003e iv2{};\n\n  ASSERT_TRUE(crypto::GenerateGcmIv(iv1).has_value());\n  ASSERT_TRUE(crypto::GenerateGcmIv(iv2).has_value());\n\n  // It is cryptographically improbable (1 in 2^96) for two generated IVs to match,\n  // or for an IV to be entirely zeroes if the RNG is working correctly.\n  auto all_zeros \u003d std::to_array\u003cuint8_t, crypto::kAesGcmIvSize\u003e({});\n  EXPECT_NE(iv1, all_zeros);\n  EXPECT_NE(iv1, iv2);\n}\n\nTEST(CryptoUtilTest, AesGcmRoundTripWithAad) {\n  std::array\u003cuint8_t, crypto::kAesGcmIvSize\u003e iv{};\n  ASSERT_TRUE(crypto::GenerateGcmIv(iv).has_value());\n\n  std::vector\u003cuint8_t\u003e ciphertext(kTestPlaintext.size());\n  std::array\u003cuint8_t, crypto::kAesGcmTagSize\u003e tag{};\n\n  // 1. Encrypt\n  auto enc_res \u003d crypto::AesGcmEncrypt(kTestKey, iv, kTestAad, kTestPlaintext, \n                                       ciphertext, tag);\n  ASSERT_TRUE(enc_res.has_value());\n\n  // 2. Decrypt\n  std::array\u003cuint8_t, kTestPlaintext.size()\u003e decrypted{};\n  auto dec_res \u003d crypto::AesGcmDecrypt(kTestKey, iv, kTestAad, ciphertext, \n                                       tag, decrypted);\n  ASSERT_TRUE(dec_res.has_value());\n\n  // 3. Verify\n  EXPECT_EQ(kTestPlaintext, decrypted);\n}\n\nTEST(CryptoUtilTest, AesGcmRoundTripWithoutAad) {\n  std::array\u003cuint8_t, crypto::kAesGcmIvSize\u003e iv{};\n  ASSERT_TRUE(crypto::GenerateGcmIv(iv).has_value());\n\n  std::vector\u003cuint8_t\u003e ciphertext(kTestPlaintext.size());\n  std::array\u003cuint8_t, crypto::kAesGcmTagSize\u003e tag{};\n\n  // Encrypt with empty AAD\n  ASSERT_TRUE(crypto::AesGcmEncrypt(kTestKey, iv, {}, kTestPlaintext, \n                                    ciphertext, tag).has_value());\n\n  // Decrypt with empty AAD\n  std::array\u003cuint8_t, kTestPlaintext.size()\u003e decrypted{};\n  ASSERT_TRUE(crypto::AesGcmDecrypt(kTestKey, iv, {}, ciphertext, \n                                    tag, decrypted).has_value());\n\n  EXPECT_EQ(kTestPlaintext, decrypted);\n}\n\nTEST(CryptoUtilTest, AesGcmFailsOnTagTampering) {\n  std::array\u003cuint8_t, crypto::kAesGcmIvSize\u003e iv{};\n  ASSERT_TRUE(crypto::GenerateGcmIv(iv).has_value());\n\n  std::vector\u003cuint8_t\u003e ciphertext(kTestPlaintext.size());\n  std::array\u003cuint8_t, crypto::kAesGcmTagSize\u003e tag{};\n\n  ASSERT_TRUE(crypto::AesGcmEncrypt(kTestKey, iv, kTestAad, kTestPlaintext, \n                                    ciphertext, tag).has_value());\n\n  // Corrupt the tag\n  tag[0] ^\u003d 0xFF;\n\n  std::array\u003cuint8_t, kTestPlaintext.size()\u003e decrypted{};\n  auto dec_res \u003d crypto::AesGcmDecrypt(kTestKey, iv, kTestAad, ciphertext, \n                                       tag, decrypted);\n  \n  ASSERT_FALSE(dec_res.has_value());\n  EXPECT_EQ(dec_res.error(), crypto::CryptoError::kTagMismatch);\n}\n\nTEST(CryptoUtilTest, AesGcmFailsOnCiphertextTampering) {\n  std::array\u003cuint8_t, crypto::kAesGcmIvSize\u003e iv{};\n  ASSERT_TRUE(crypto::GenerateGcmIv(iv).has_value());\n\n  std::vector\u003cuint8_t\u003e ciphertext(kTestPlaintext.size());\n  std::array\u003cuint8_t, crypto::kAesGcmTagSize\u003e tag{};\n\n  ASSERT_TRUE(crypto::AesGcmEncrypt(kTestKey, iv, kTestAad, kTestPlaintext, \n                                    ciphertext, tag).has_value());\n\n  // Corrupt the ciphertext\n  ciphertext[0] ^\u003d 0xFF;\n\n  std::array\u003cuint8_t, kTestPlaintext.size()\u003e decrypted{};\n  auto dec_res \u003d crypto::AesGcmDecrypt(kTestKey, iv, kTestAad, ciphertext, \n                                       tag, decrypted);\n  \n  ASSERT_FALSE(dec_res.has_value());\n  EXPECT_EQ(dec_res.error(), crypto::CryptoError::kTagMismatch);\n}\n\nTEST(CryptoUtilTest, AesGcmFailsOnAadTampering) {\n  std::array\u003cuint8_t, crypto::kAesGcmIvSize\u003e iv{};\n  ASSERT_TRUE(crypto::GenerateGcmIv(iv).has_value());\n\n  std::vector\u003cuint8_t\u003e ciphertext(kTestPlaintext.size());\n  std::array\u003cuint8_t, crypto::kAesGcmTagSize\u003e tag{};\n\n  ASSERT_TRUE(crypto::AesGcmEncrypt(kTestKey, iv, kTestAad, kTestPlaintext, \n                                    ciphertext, tag).has_value());\n\n  // Use incorrect AAD during decryption\n  auto bad_aad \u003d std::to_array\u003cuint8_t\u003e({0xDE, 0xAD, 0xBE, 0xEF});\n\n  std::array\u003cuint8_t, kTestPlaintext.size()\u003e decrypted{};\n  auto dec_res \u003d crypto::AesGcmDecrypt(kTestKey, iv, bad_aad, ciphertext, \n                                       tag, decrypted);\n  \n  ASSERT_FALSE(dec_res.has_value());\n  EXPECT_EQ(dec_res.error(), crypto::CryptoError::kTagMismatch);\n}\n\nTEST(CryptoUtilTest, CleanseZeroesBuffer) {\n  auto sensitive_data \u003d std::to_array\u003cuint8_t\u003e({0xDE, 0xAD, 0xBE, 0xEF});\n  const auto expected_zeros \u003d std::to_array\u003cuint8_t\u003e({0x00, 0x00, 0x00, 0x00});\n\n  crypto::Cleanse(sensitive_data);\n\n  EXPECT_EQ(expected_zeros, sensitive_data);\n}\n\n}  // namespace\n}  // namespace egis\n\n```",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 1
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd672338_9b954e44",
+        "filename": "util/egis/crypto_util_test.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-02T06:09:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fd6e234d_8bb7866f",
       "range": {
         "startLine": 14,
         "startChar": 0,
@@ -187,6 +307,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "59012f13_df3dde2c",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-02T06:09:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d2d7094_d016b908",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 47
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ca06d08e_4ac31a1b",
@@ -200,6 +344,30 @@
       "writtenOn": "2026-06-01T20:36:24Z",
       "side": 1,
       "message": "Let\u0027s add more comprehensive tests. Here is code generated by Gemini. Verify correctness and coverage:\n\n---\n\nBy leveraging the `FakeUsbComm` we built earlier, we can strip out all the verbose mocking and replace it with a clean Test Fixture. This allows us to focus entirely on how the `EcComm` class handles corrupted data, hardware rejections, and missing payloads.\n\n\n```cpp\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n#include \"ec_comm.h\"\n\n#include \u003cgtest/gtest.h\u003e\n\n#include \u003carray\u003e\n#include \u003ccstddef\u003e\n#include \u003cvector\u003e\n\n#include \"fake_usb_comm.h\"\n\nnamespace egis {\nnamespace {\n\n// \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n// Test Fixture for EC Communication\n// \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\nclass EcCommTest : public ::testing::Test {\n protected:\n  // Helper to construct mathematically sound EC responses with valid checksums\n  std::vector\u003cuint8_t\u003e MakeMockResponse(uint16_t result_code, \n                                        std::span\u003cconst uint8_t\u003e payload \u003d {}) {\n    EcHostCommandResponse hdr{\n        .protocol_version \u003d 3,\n        .checksum \u003d 0,  // Calculated below\n        .result \u003d ToLittleEndian(result_code),\n        .data_length \u003d ToLittleEndian(static_cast\u003cuint16_t\u003e(payload.size()))};\n\n    auto packet \u003d PackMessage(hdr, payload);\n\n    // Calculate the two\u0027s complement checksum required by the EC protocol\n    uint32_t sum \u003d 0;\n    for (uint8_t byte : packet) sum +\u003d byte;\n    \n    packet[offsetof(EcHostCommandResponse, checksum)] \u003d static_cast\u003cuint8_t\u003e(-sum);\n    return packet;\n  }\n\n  FakeUsbComm fake_usb_;\n  EcComm ec_{fake_usb_};\n};\n\n// --- Success Flows ---\n\nTEST_F(EcCommTest, SendCommandSuccess) {\n  // Push a successful response with no payload\n  fake_usb_.PushDeviceResponse(MakeMockResponse(0));\n\n  auto result \u003d ec_.SendCommand(std::to_underlying(EcCommandId::kEcCmdGetVersion), 1);\n  \n  ASSERT_TRUE(result.has_value());\n  EXPECT_TRUE(result-\u003eempty());\n  \n  // Verify the host properly dispatched the command packet\n  EXPECT_EQ(fake_usb_.GetHostTransmissions().size(), 1);\n}\n\nTEST_F(EcCommTest, SendCommandWithPayloadSuccess) {\n  const auto mock_payload \u003d std::to_array\u003cuint8_t\u003e({0xAA, 0xBB, 0xCC});\n  fake_usb_.PushDeviceResponse(MakeMockResponse(0, mock_payload));\n\n  auto result \u003d ec_.SendCommand(std::to_underlying(EcCommandId::kEcCmdGetVersion), 1);\n  \n  ASSERT_TRUE(result.has_value());\n  EXPECT_EQ(mock_payload, result.value());\n}\n\n// --- Protocol Integrity Boundaries ---\n\nTEST_F(EcCommTest, InvalidChecksumIsRejected) {\n  auto packet \u003d MakeMockResponse(0);\n  \n  // Flip bits in the checksum byte to simulate line corruption\n  packet[offsetof(EcHostCommandResponse, checksum)] ^\u003d 0xFF;\n  fake_usb_.PushDeviceResponse(packet);\n\n  auto result \u003d ec_.SendCommand(std::to_underlying(EcCommandId::kEcCmdGetVersion), 1);\n  \n  ASSERT_FALSE(result.has_value());\n  EXPECT_EQ(result.error(), EcError::kInvalidChecksum);\n}\n\nTEST_F(EcCommTest, TruncatedPayloadIsCaught) {\n  // Construct a header that claims a 64-byte payload is attached\n  EcHostCommandResponse hdr{\n      .protocol_version \u003d 3,\n      .checksum \u003d 0,\n      .result \u003d ToLittleEndian(static_cast\u003cuint16_t\u003e(0)),\n      .data_length \u003d ToLittleEndian(static_cast\u003cuint16_t\u003e(64))};\n\n  // Only provide 4 bytes of actual payload to simulate a dropped USB frame\n  const auto partial_payload \u003d std::to_array\u003cuint8_t\u003e({1, 2, 3, 4});\n  auto packet \u003d PackMessage(hdr, partial_payload);\n\n  uint32_t sum \u003d 0;\n  for (uint8_t byte : packet) sum +\u003d byte;\n  packet[offsetof(EcHostCommandResponse, checksum)] \u003d static_cast\u003cuint8_t\u003e(-sum);\n\n  fake_usb_.PushDeviceResponse(packet);\n\n  auto result \u003d ec_.SendCommand(std::to_underlying(EcCommandId::kEcCmdGetVersion), 1);\n  \n  // The parser must catch the size mismatch and abort safely\n  ASSERT_FALSE(result.has_value());\n  EXPECT_EQ(result.error(), EcError::kResponseTooShort);\n}\n\n// --- Device State Handling ---\n\nTEST_F(EcCommTest, DeviceErrorIsMapped) {\n  // Simulate the EC returning kAccessDenied (0x0004)\n  uint16_t access_denied_code \u003d std::to_underlying(EcCommandResult::kAccessDenied);\n  fake_usb_.PushDeviceResponse(MakeMockResponse(access_denied_code));\n\n  auto result \u003d ec_.SendCommand(std::to_underlying(EcCommandId::kEcCmdGetVersion), 1);\n  \n  ASSERT_FALSE(result.has_value());\n  EXPECT_EQ(result.error(), EcError::kDeviceError);\n}\n\nTEST_F(EcCommTest, UsbReceiveFailure) {\n  // The Fake queue is empty, so Receive() will immediately return kTimeout\n  auto result \u003d ec_.SendCommand(std::to_underlying(EcCommandId::kEcCmdGetVersion), 1);\n  \n  ASSERT_FALSE(result.has_value());\n  EXPECT_EQ(result.error(), EcError::kUsbReceiveFailed);\n}\n\n}  // namespace\n}  // namespace egis\n\n```",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 38
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aececc00_9a17235b",
+        "filename": "util/egis/ec_comm_test.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-02T06:09:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ca06d08e_4ac31a1b",
       "range": {
         "startLine": 20,
         "startChar": 0,
@@ -233,6 +401,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "61a6a0ac_9e911821",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-02T06:09:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "36120784_b251d2d9",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 75
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e76a64c3_ba481972",
@@ -256,6 +448,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b436e171_1456ea60",
+        "filename": "util/egis/file_util_test.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-02T06:09:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e76a64c3_ba481972",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 43
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "68f444d5_cfd5e594",
@@ -269,6 +485,30 @@
       "writtenOn": "2026-06-01T18:47:16Z",
       "side": 1,
       "message": "**File:** `util/egis/flasher_logic.cc`\n\nWhen parsing raw command binaries, you combine `header_size` and `wrapped_size.value()`:\n\n```c\n  return header_size + wrapped_size.value();\n\n```\n\nBecause `wrapped_size.value()` is parsed directly from potentially untrusted or corrupted binary input, an exceptionally large value (e.g., `0xFFFFFFFF`) could cause an integer overflow on 32-bit architectures, wrapping around to a small `size_t`. This would bypass subsequent length checks in `ProgramRawCommandPayload`.\n\n**Remediation:** Validate `wrapped_size.value()` against a reasonable upper bound (like `BootromComm::kMaxPayloadSize`) before returning.\n\n\n```c\n  auto wrapped_size \u003d ReadLittleEndian\u003cuint32_t\u003e(\n      fw.subspan(offsetof(BootromComm::SecureCommandShaHeader, payload_len),\n                 sizeof(BootromComm::SecureCommandShaHeader::payload_len)));\n  if (!wrapped_size) return std::unexpected(ParseError::kInvalidPayloadSize);\n\n  // CRITICAL FIX: Prevent integer overflow and enforce hardware limits\n  if (wrapped_size.value() \u003e BootromComm::kMaxPayloadSize) {\n    return std::unexpected(ParseError::kInvalidPayloadSize); \n  }\n\n  return header_size + wrapped_size.value();\n\n```",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 52
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dad8d0b8_cf5395ab",
+        "filename": "util/egis/flasher_logic.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-02T06:09:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "68f444d5_cfd5e594",
       "range": {
         "startLine": 53,
         "startChar": 0,
@@ -316,6 +556,30 @@
       "side": 1,
       "message": "By applying the Fake pattern here, we can completely eliminate `\u003cgmock/gmock.h\u003e` from the file. The \"Sticky Response\" is perfect for orchestration tests: we just tell the Fake, \"always respond with a generic success packet,\" and the orchestrator can happily run through its entire state machine (disabling watchdogs, erasing, chunking, etc.) without us needing to mock every single transaction.\n\nHere is the fully simplified, mock-free `flasher_logic_test.cc`:\n\n```cpp\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n#include \"flasher_logic.h\"\n\n#include \u003cgtest/gtest.h\u003e\n\n#include \u003carray\u003e\n#include \u003cfilesystem\u003e\n#include \u003cfstream\u003e\n#include \u003cstring\u003e\n#include \u003cutility\u003e\n#include \u003cvector\u003e\n\n#include \"bootrom.h\"\n#include \"fake_usb_comm.h\"\n\nnamespace egis {\nnamespace {\n\nclass FlasherLogicTest : public ::testing::Test {\n protected:\n  void SetUp() override {\n    fw_path_ \u003d std::filesystem::temp_directory_path() / \"test_fw.bin\";\n    \n    // Use the sticky response to simulate a completely compliant, happy device.\n    // It will constantly return a generic success packet for all operations,\n    // allowing the high-level logic to run uninterrupted.\n    BootromComm::SecureResponseHeader mock_hdr{\n        .status \u003d 0,\n        .payload_len \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(4))};\n    const auto mock_payload \u003d std::to_array\u003cuint8_t\u003e({0, 0, 0, 0});\n    \n    fake_usb_.SetStickyDeviceResponse(PackMessage(mock_hdr, mock_payload));\n  }\n\n  void TearDown() override { \n    if (std::filesystem::exists(fw_path_)) {\n      std::filesystem::remove(fw_path_); \n    }\n  }\n\n  void WriteTestFile(std::span\u003cconst uint8_t\u003e data) {\n    std::ofstream(fw_path_, std::ios::binary)\n        .write(reinterpret_cast\u003cconst char*\u003e(data.data()), data.size());\n  }\n\n  std::filesystem::path fw_path_;\n  FakeUsbComm fake_usb_;\n  BootromComm brom_{fake_usb_};\n};\n\n// \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n// RunFlashFw (High-Level Firmware Flashing) Tests\n// \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n\nTEST_F(FlasherLogicTest, RunFlashFwInvalidArgs) {\n  AppConfig config;\n\n  // Missing FW Path\n  EXPECT_EQ(RunFlashFw(config, brom_).error(), AppError::kInvalidArgs);\n\n  // Missing Key Path when AES is requested\n  WriteTestFile(std::to_array\u003cuint8_t\u003e({0x01, 0x02}));\n  config.fw_path \u003d fw_path_.string();\n  config.algo_type \u003d EgisCryptoType::kAesGcm;\n  EXPECT_EQ(RunFlashFw(config, brom_).error(), AppError::kInvalidArgs);\n}\n\nTEST_F(FlasherLogicTest, RunFlashFwOversizedChunking) {\n  // Create an 80KB firmware file to force chunking \n  // (Max chunk is BootromComm::kMaxFlashWriteSize \u003d 32KB)\n  std::vector\u003cuint8_t\u003e large_fw(80 * 1024, 0xFF);\n  WriteTestFile(large_fw);\n\n  AppConfig config{\n      .fw_path \u003d fw_path_.string(),\n      .algo_type \u003d EgisCryptoType::kSha256,\n      .flash_offset \u003d 0x0000,\n  };\n\n  EXPECT_TRUE(RunFlashFw(config, brom_).has_value());\n  \n  // We expect exactly 10 transactions to occur during a full flash:\n  // Disable Watchdog (4) + Disable WP (2) + Erase (1) + Flash chunks (3)\n  EXPECT_EQ(fake_usb_.GetHostTransmissions().size(), 10);\n}\n\n// \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n// RunFlashCmd (Raw Parser \u0026 Stream Flasher) Tests\n// \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n\nTEST_F(FlasherLogicTest, RunFlashCmdParserDataTooSmall) {\n  // A file with only 1 byte cannot possibly contain a valid header\n  WriteTestFile(std::to_array\u003cuint8_t\u003e({EgisBootrom::kCmdSecureWrapped}));\n\n  AppConfig config{.mode \u003d AppMode::kFlashCmd, .fw_path \u003d fw_path_.string()};\n  EXPECT_EQ(RunFlashCmd(config, fake_usb_).error(), AppError::kParseError);\n}\n\nTEST_F(FlasherLogicTest, RunFlashCmdParserInvalidHeader) {\n  // Not a System Reset (0x12) or Secure Wrapped (0xF4) command\n  WriteTestFile(std::to_array\u003cuint8_t\u003e({0xFF, 0x00, 0x00, 0x00}));\n\n  AppConfig config{.mode \u003d AppMode::kFlashCmd, .fw_path \u003d fw_path_.string()};\n  EXPECT_EQ(RunFlashCmd(config, fake_usb_).error(), AppError::kParseError);\n}\n\nTEST_F(FlasherLogicTest, RunFlashCmdParserTruncatedPayload) {\n  // Valid AES header, claims payload length is 100 bytes, but file ends early\n  BootromComm::SecureCommandAesHeader hdr{\n      .algo \u003d std::to_underlying(EgisCryptoType::kAesGcm),\n      .payload_len \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(100))};\n  \n  WriteTestFile(AsBytes(hdr));\n\n  AppConfig config{.mode \u003d AppMode::kFlashCmd, .fw_path \u003d fw_path_.string()};\n  EXPECT_EQ(RunFlashCmd(config, fake_usb_).error(), AppError::kParseError);\n}\n\nTEST_F(FlasherLogicTest, RunFlashCmdSuccessReset) {\n  // System Reset is a special case: 2 bytes, no response expected\n  WriteTestFile(std::to_array\u003cuint8_t\u003e({EgisBootrom::kCmdSystemReset, \n                                        EgisBootrom::kSystemResetTypeNormal}));\n\n  AppConfig config{.mode \u003d AppMode::kFlashCmd, .fw_path \u003d fw_path_.string()};\n  \n  EXPECT_TRUE(RunFlashCmd(config, fake_usb_).has_value());\n  EXPECT_EQ(fake_usb_.GetHostTransmissions().size(), 1);\n}\n\nTEST_F(FlasherLogicTest, RunFlashCmdDeviceErrorHalt) {\n  // Construct a valid SHA header claiming a 4-byte payload\n  BootromComm::SecureCommandShaHeader hdr{\n      .algo \u003d std::to_underlying(EgisCryptoType::kSha256),\n      .payload_len \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(4))};\n  \n  auto valid_packet \u003d PackMessage(hdr, std::to_array\u003cuint8_t\u003e({1, 2, 3, 4}));\n  WriteTestFile(valid_packet);\n\n  AppConfig config{.mode \u003d AppMode::kFlashCmd, .fw_path \u003d fw_path_.string()};\n\n  // Clear the sticky success response, and push an explicit error response (0x0001)\n  fake_usb_.Reset();\n  uint16_t error_status \u003d ToLittleEndian(static_cast\u003cuint16_t\u003e(1));\n  fake_usb_.PushDeviceResponse(AsBytes(error_status));\n\n  // The logic must detect the non-zero status and abort with kBootromError\n  EXPECT_EQ(RunFlashCmd(config, fake_usb_).error(), AppError::kBootromError);\n}\n\n}  // namespace\n}  // namespace egis\n\n```\n\n### Why This is Better\n\n1. **Zero Mocks:** We have completely removed Google Mock and its verbose `EXPECT_CALL` syntax.\n2. **Deterministic Validation:** Instead of setting up expectations beforehand, we run the code and simply assert against `fake_usb_.GetHostTransmissions().size()` afterward.\n3. **Readability:** The `RunFlashCmdDeviceErrorHalt` test is much easier to understand. We `Reset()` the fake to clear the default success state, push an error byte, and assert that it failed.",
       "parentUuid": "733f42de_3a5b5202",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 49
+      },
+      "revId": "be8f3eb77fbe28edf6d1ad4b74ed9eacf3972c5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc678de7_682e92ca",
+        "filename": "util/egis/flasher_logic_test.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-02T06:09:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "20c57f1a_919809c3",
       "range": {
         "startLine": 24,
         "startChar": 0,
