@@ -50,6 +50,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d0593044_ab63c2dd",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T18:50:00Z",
+      "side": 1,
+      "message": "Instead of `htole32`, let\u0027s create a templated function to handle endianness:\n\n---\n\nReplacing the POSIX `\u003cendian.h\u003e` macros with the native C++23 `\u003cbit\u003e` template provides several major architectural and safety benefits. Here is the rationale for making this transition:\n\n### 1. True Cross-Platform Portability\n\nThe most critical issue with `htole32` and `\u003cendian.h\u003e` is that they are **not part of the C++ standard**. They are POSIX/glibc extensions primarily found on Linux.\n\n* **The Problem:** If someone tries to compile this tool on Windows (using MSVC), macOS, or for a bare-metal microcontroller environment (like Zephyr or FreeRTOS), the build will fail because `\u003cendian.h\u003e` does not exist there. You would have to write messy preprocessor blocks (`#ifdef _WIN32`, etc.) to map OS-specific byte-swapping functions.\n* **The Solution:** C++20 introduced `std::endian` and C++23 introduced `std::byteswap`. Because these are ISO C++ standards, `ToLittleEndian` is guaranteed to compile and behave identically on every operating system and compiler that supports C++23.\n\n### 2. Strict Type Safety and Flexibility\n\nC macros are notorious for bypassing the C++ type system.\n\n* **The Problem:** `htole32` strictly expects a 32-bit unsigned integer. If you accidentally pass a 16-bit or 64-bit value, the macro might silently truncate data or trigger implicit conversions without a compiler warning. Furthermore, to support different sizes, you have to remember to use the exact correct macro variant (`htole16`, `htole32`, `htole64`).\n* **The Solution:** By using `template \u003cstd::integral T\u003e`, the C++ compiler strictly enforces that the input is an integer type, and `std::byteswap` automatically adapts to the exact bit-width (8, 16, 32, or 64-bit) of the variable passed in. This eliminates truncation risks and provides a single unified function name for all integer types.\n\n### 3. API Symmetry and Cleanliness\n\nIn the original POSIX implementation, you have to manage the conceptual direction of the swap:\n\n* `htole32`: Host to Little-Endian (used when sending data to the USB device).\n* `le32toh`: Little-Endian to Host (used when reading data from the USB device).\n\nUnder the hood, if your host is Big-Endian, both functions do exactly the same thing: they reverse the bytes. If your host is Little-Endian, both do nothing.\nBy creating a single `ToLittleEndian` template, you simplify the API. You tell the compiler \"ensure this value is formatted in Little-Endian,\" and it mathematically handles the rest, making the code much easier to read and maintain.\n\n### 4. Guaranteed Compile-Time Evaluation (`constexpr`)\n\nWhile modern C libraries try to make macros efficient, `std::byteswap` and `std::endian` are strictly defined by the C++ standard to be usable in `constexpr` contexts. This guarantees that if you construct a command struct using compile-time constants, the compiler can resolve the endianness swap at compile-time, resulting in zero runtime overhead.",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 61,
+        "endChar": 51
+      },
+      "revId": "b41d7944f2f336049361c29878bbdf28c28e5184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c8487b5d_ddda9858",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 18
