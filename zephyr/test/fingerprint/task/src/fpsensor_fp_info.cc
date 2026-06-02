@@ -19,8 +19,6 @@
 #include <host_command.h>
 #include <mkbp_event.h>
 
-DEFINE_FFF_GLOBALS;
-
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
 static const size_t fp_info_v3_buffer_size =
