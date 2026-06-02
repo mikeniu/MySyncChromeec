@@ -52,6 +52,24 @@
       "parentUuid": "07566e5f_4fdeed90",
       "revId": "95f1c09524883c072cbb66f5067c396eeabb9f0d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6bb1c393_865b250d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-06-02T20:51:20Z",
+      "side": 1,
+      "message": "all vendors have a similar logic in a sense of having their own `convert_fp_capture_type_to_xxxx_capture_type` function",
+      "parentUuid": "dbb1bacf_49da4faa",
+      "revId": "95f1c09524883c072cbb66f5067c396eeabb9f0d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
