@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d77aeec1_8108b7dd",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T18:22:31Z",
+      "side": 1,
+      "message": "Flagged by Gemini:\n\n----\n\n**Data Truncation Bug in Payload Padding (`updater.cc`)** In `FtDownloadBin`, the calculation to pad the remaining payload to a 4-byte boundary unintentionally truncates the buffer length instead of aligning it.\n\n```c\n// Current Code\nif (len \u003e 0) {\n  len \u003d FtDivRoundUp\u003csize_t\u003e(len, 4); // \u003c--- Converts byte count to word count!\n  auto page_res \u003d FtDownloadPage(device, downaddr, len, {p, len});\n  ...\n}\n\n```\n\nBecause `len` is modified to represent the *number of words*, the `{p, len}` span construction only captures a fraction of the remaining bytes. For example, if 3 bytes are remaining, `len` becomes 1, and only 1 byte is flashed.\n\n* **Recommendation:** Multiply the rounded value back by 4 to maintain byte-length semantics, or use a proper alignment macro.\n\n```c\nlen \u003d FtDivRoundUp\u003csize_t\u003e(len, 4) * 4;\n\n```\n\n*(Note: Based on your `total_frame` logic, `len` will almost always perfectly zero out before this block anyway, but this guard needs to be functionally correct).*",
+      "range": {
+        "startLine": 189,
+        "startChar": 0,
+        "endLine": 193,
+        "endChar": 3
+      },
+      "revId": "b41d7944f2f336049361c29878bbdf28c28e5184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3cf80ae8_ca6f294d",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 18
