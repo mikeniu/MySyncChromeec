@@ -1,4 +1,4 @@
-/* Copyright 2025 The ChromiumOS Authors
+/* Copyright 2026 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
@@ -6,6 +6,7 @@
 / {
 	aliases {
 		gpio-wp = &gpio_ec_flash_wp_odl;
+		gpio-btn-ign-in = &gpio_fp_pwr_btn_ignore;
 	};
 
 	named-gpios {
@@ -41,7 +42,7 @@
 			gpios = <&gpio6 0 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 		};
 		gpio_en_pac_odl: en_pac_odl {
-			gpios = <&gpio6 2 (GPIO_OUTPUT)>;
+			gpios = <&gpio6 2 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_OUTPUT_INIT_HIGH)>;
 		};
 		gpio_pg_pp5000_s5_od: pg_pp5000_s5_od {
 			gpios = <&gpio6 3 (GPIO_INPUT)>;
@@ -53,14 +54,17 @@
 			gpios = <&gpio7 0 (GPIO_INPUT)>;
 		};
 		gpio_ec_fan_tach: ec_fan_tach {
-			gpios = <&gpio7 3 (GPIO_INPUT | GPIO_PULL_UP)>;
+			gpios = <&gpio7 3 (GPIO_INPUT)>;
 		};
-		gpio_acpi_int: ec_acpi_int {
+		gpio_soc_int: ec_soc_int {
 			gpios = <&gpio7 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
 			enum-name = "GPIO_EC_INT_L";
 		};
 		gpio_ec_bkoff_odl: ec_bkoff_odl {
 			gpios = <&gpio8 0 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
+		};
+		gpio_en_pp3300_z1: en_pp3300_z1 {
+			gpios = <&gpio8 5 (GPIO_OUTPUT)>;
 		};
 		gpio_sys_rst_odl: sys_rst_odl {
 			gpios = <&gpio9 3 (GPIO_INPUT)>;
@@ -82,9 +86,9 @@
 			enum-name = "GPIO_AP_SUSPEND";
 		};
 		gpio_en_i2c_ec_adsp_batt: en_i2c_ec_adsp_batt {
-			gpios = <&gpioa 1 (GPIO_OUTPUT)>;
+			gpios = <&gpioa 1 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
 		};
-		gpio_ec_soc_qsh_int_odl: ec_soc_qsh_int_odl {
+		gpio_ec_acpi_int: ec_acpi_int {
 			gpios = <&gpioa 2 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
 		};
 		gpio_soc_ps_hold_ls: soc_ps_hold_ls {
@@ -135,24 +139,14 @@
 			gpios = <&gpiod 4 (GPIO_OUTPUT)>;
 			enum-name = "GPIO_PACKET_MODE_EN";
 		};
-		gpio_en_hdmi_pwr: en_hdmi_pwr {
-			gpios = <&gpiod 5 (GPIO_OUTPUT)>;
-		};
 		gpio_ec_pmic_lid_open_od: ec_pmic_lid_open_od {
 			gpios = <&gpiod 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
-		};
-		gpio_kbl_pwr_en_odl: kbl_pwr_en_odl {
-			gpios = <&gpioe 2 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
 		};
 		gpio_ec_en_usba: ec_en_usba {
 			gpios = <&gpioe 3 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 		};
 		gpio_tablet_mode_l: tablet_mode_l {
 			gpios = <&gpioe 4 (GPIO_INPUT)>;
-		};
-		gpio_ccd_mode_odl: ccd_mode_odl {
-			gpios = <&gpioe 5 (GPIO_INPUT)>;
-			enum-name = "GPIO_CCD_MODE_ODL";
 		};
 		gpio_ec_ac_present_odl: ec_ac_present_odl {
 			gpios = <&gpiof 0 (GPIO_INPUT)>;
@@ -182,10 +176,6 @@
 			<&gpio3 4 0>,
 			<&gpio3 7 0>,
 			<&gpio4 1 0>,
-			<&gpio4 2 0>,
-			<&gpio4 3 0>,
-			<&gpio4 4 0>,
-			<&gpio4 5 0>,
 			<&gpio5 1 0>,
 			<&gpio5 6 0>,
 			<&gpio6 1 0>,
@@ -198,8 +188,11 @@
 			<&gpioa 3 0>,
 			<&gpioa 6 0>,
 			<&gpioc 5 0>,
+			<&gpiod 5 0>,
 			<&gpioe 0 0>,
 			<&gpioe 1 0>,
+			<&gpioe 2 0>,
+			<&gpioe 5 0>,
 			<&gpiof 1 0>,
 			<&gpio3 2 0>;
 	};

@@ -27,12 +27,6 @@ int fp_vendor_command(uint32_t param, uint8_t *buf, size_t buf_size)
 	return mt_data->size;
 }
 
-/* TODO(b/432682921): Change based on the final solution of WP state. */
-bool write_protect_is_asserted_custom(void)
-{
-	return false;
-}
-
 /* TODO: Remove once https://github.com/zephyrproject-rtos/zephyr/issues/104587
  * is resolved.
  */
