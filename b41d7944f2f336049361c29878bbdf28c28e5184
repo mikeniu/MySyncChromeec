@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c8487b5d_ddda9858",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T18:25:18Z",
+      "side": 1,
+      "message": "**Endianness Vulnerability in Command Construction (`ft_scsi.cc`)** You correctly apply `htole32` to the CBW tag and signature. However, in `BuildFtCmd`, you directly assign `uint32_t` values to the `FtCmdFormat` struct.\n\n```c\nFtCmdFormat cmd{\n  .opcode \u003d opcode,\n  .address \u003d address, // \u003c-- Host-endian assignment\n  .length \u003d length,\n  // ...\n};\nreturn std::bit_cast\u003cstd::array\u003cuint8_t, 16\u003e\u003e(cmd);\n\n```\n\nWhile ChromiumOS predominantly runs on little-endian architectures (where host-endian matches USB-endian), directly passing host-endian structures violates USB specifications and breaks portability.\n\n* **Recommendation:** Wrap these fields in `htole32()`.\n\n```c\n.address \u003d htole32(address),\n.length \u003d htole32(length),\n.aux_address \u003d htole32(aux_address),\n\n```",
+      "range": {
+        "startLine": 111,
+        "startChar": 0,
+        "endLine": 120,
+        "endChar": 53
+      },
+      "revId": "b41d7944f2f336049361c29878bbdf28c28e5184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d77aeec1_8108b7dd",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 18
