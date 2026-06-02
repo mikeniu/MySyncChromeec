@@ -10,6 +10,7 @@
 #include "button.h"
 #include "charge_manager.h"
 #include "charge_state.h"
+#include "chipset.h"
 #include "common.h"
 #include "console.h"
 #include "ec_ec_comm_client.h"
@@ -133,6 +134,11 @@ static void print_battery_strings(void)
 {
 	char text[32];
 
+#ifdef CONFIG_BATTERY_ACCESS_LIMIT
+	if (BATTERY_ACCESS_NOT_ALLOWED == battery_check_access_limit())
+		return;
+#endif
+
 	print_item_name("Manuf:");
 	if (check_print_error(battery_manufacturer_name(text, sizeof(text))))
 		ccprintf("%s\n", text);
@@ -223,6 +229,11 @@ static void print_battery_info(void)
 	int value;
 	int hour, minute;
 	int year, month, day;
+
+#ifdef CONFIG_BATTERY_ACCESS_LIMIT
+	if (BATTERY_ACCESS_NOT_ALLOWED == battery_check_access_limit())
+		return;
+#endif
 
 	print_item_name("ManufDate:");
 	if (check_print_error(battery_manufacture_date(&year, &month, &day))) {
@@ -322,11 +333,6 @@ static int command_battery(int argc, const char **argv)
 	int loop;
 	int sleep_ms = 0;
 	char *e;
-
-#ifdef CONFIG_BATTERY_ACCESS_LIMIT
-	if (BATTERY_ACCESS_NOT_ALLOWED == battery_check_access_limit())
-		return EC_ERROR_ACCESS_DENIED;
-#endif
 
 	if (argc > 1) {
 		repeat = strtoi(argv[1], &e, 0);
@@ -540,6 +546,13 @@ static void ac_change(void)
 	CPRINTS("Refresh+Unplug! Scheduling cutoff.");
 	battery_cutoff_state = BATTERY_CUTOFF_STATE_SCHEDULED;
 	battery_cutoff_retry_left = CONFIG_BATTERY_CUTOFF_RETRY_COUNT;
+
+	if (IS_ENABLED(CONFIG_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN)) {
+		if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
+			chipset_force_shutdown(CHIPSET_SHUTDOWN_BATTERY_CUTOFF);
+			return;
+		}
+	}
 	hook_call_deferred(&pending_cutoff_deferred_data,
 			   CONFIG_BATTERY_CUTOFF_DELAY_US);
 }
@@ -559,6 +572,9 @@ static enum ec_status battery_command_cutoff(struct host_cmd_handler_args *args)
 		}
 	}
 
+	if (IS_ENABLED(CONFIG_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN))
+		return EC_RES_ERROR;
+
 	return battery_cutoff_start();
 }
 DECLARE_HOST_COMMAND(EC_CMD_BATTERY_CUT_OFF, battery_command_cutoff,
@@ -574,10 +590,19 @@ static void check_pending_cutoff(void)
 				   CONFIG_BATTERY_CUTOFF_DELAY_US);
 	}
 }
-DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, check_pending_cutoff, HOOK_PRIO_LAST);
+DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN_COMPLETE, check_pending_cutoff,
+	     HOOK_PRIO_LAST);
 
 static int command_cutoff(int argc, const char **argv)
 {
+	if (IS_ENABLED(CONFIG_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN)) {
+		battery_cutoff_state = BATTERY_CUTOFF_STATE_SCHEDULED;
+		if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
+			chipset_force_shutdown(CHIPSET_SHUTDOWN_BATTERY_CUTOFF);
+			return EC_SUCCESS;
+		}
+	}
+
 	if (argc > 1) {
 		if (!strcasecmp(argv[1], "at-shutdown")) {
 			battery_cutoff_state = BATTERY_CUTOFF_STATE_SCHEDULED;

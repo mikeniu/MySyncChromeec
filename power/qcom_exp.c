@@ -115,7 +115,7 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 #define SWITCHCAP_PG_CHECK_WAIT (6 * MSEC)
 
 /* The timeout of the check if the switchcap outputs reset voltage */
-#define SWITCHCAP_RESET_TIMEOUT (2000 * MSEC)
+#define SWITCHCAP_RESET_TIMEOUT (200 * MSEC)
 
 /* Wait for polling if the switchcap outputs reset voltage */
 #define SWITCHCAP_RESET_CHECK_WAIT (6 * MSEC)
@@ -1040,6 +1040,7 @@ test_mockable void chipset_power_on(void)
  */
 static int warm_reset_seq(void)
 {
+#ifdef CONFIG_PLATFORM_EC_POWERSEQ_QC_EXP_WARM_RESET
 	int rv;
 
 	/*
@@ -1076,6 +1077,10 @@ static int warm_reset_seq(void)
 		return rv;
 
 	return EC_SUCCESS;
+#else
+	CPRINTS("Warm reset is disabled, falling back to cold reset");
+	return EC_ERROR_UNKNOWN;
+#endif
 }
 
 /**
