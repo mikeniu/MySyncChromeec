@@ -49,6 +49,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "92fabc7c_64d17464",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T19:15:55Z",
+      "side": 1,
+      "message": "We still have a lot of magic constants sprinkled around the code. Please replace with descriptive constants. Here are suggestions from Gemini, though it may not be complete. You should make sure the aren\u0027t more.\n\n---\n\n### 1. The `SwitchToRom` Payload (`cli.cc`)\n\nIn `SwitchToRom`, you send a very specific 3-byte payload to the MCU, but its purpose is undocumented.\n\n```cpp\n// Current Code:\nconstexpr uint16_t kTestEcSwitchToRomCmd \u003d 0xFACE;\nstd::vector\u003cuint8_t\u003e params \u003d {0xAA, 0x06, 0x00}; // Magic payload!\n\n```\n\n**The Fix:** Define this at the top of `cli.cc` (or near the function) with a descriptive name.\n\n```cpp\nconstexpr uint16_t kTestEcSwitchToRomCmd \u003d 0xFACE;\nconstexpr std::array\u003cuint8_t, 3\u003e kSwitchToRomPayload \u003d {0xAA, 0x06, 0x00};\n\nstd::expected\u003cvoid, FtError\u003e SwitchToRom(UsbDevice\u0026 device) {\n  auto data \u003d SendEcCommandAndReadResponse(device, kTestEcSwitchToRomCmd, 0, \n                                           kSwitchToRomPayload);\n  // ...\n\n```\n\n### 2. Hash Mode Flags (`updater.cc`)\n\nIn `FtVerifyData`, there is a hardcoded bitwise operation to determine the hash mode based on the target address.\n\n```cpp\n// Current Code:\n// HASH256 mode\nuint8_t hash_mode \u003d (target_addr \u003d\u003d kFocalRomCfgAddr) ? (0x04 \u003c\u003c 4) : 0x04;\n\n```\n\n**The Fix:** Give these flags clear names at the top of `updater.cc` alongside your other sub-commands.\n\n```cpp\n// Near the top of updater.cc:\nconstexpr uint8_t kFtHashModeSha256 \u003d 0x04;\nconstexpr uint8_t kFtHashModeRomShift \u003d 4;\n\n// In FtVerifyData:\nuint8_t hash_mode \u003d (target_addr \u003d\u003d kFocalRomCfgAddr) \n                    ? (kFtHashModeSha256 \u003c\u003c kFtHashModeRomShift) \n                    : kFtHashModeSha256;\n\n```\n\n### 3. Flash Protection Buffer Size (`updater.cc`)\n\nIn both `FtGetFlashProtect` and `FtSetFlashProtect`, you allocate a 512-byte buffer. This number also leaks into the mock test files.\n\n```cpp\n// Current Code:\nstd::vector\u003cuint8_t\u003e data(512, 0);  // Device returns 512 bytes, first byte holds area\n\n```\n\n**The Fix:** Create a constant for the WP buffer size at the top of `updater.cc`.\n\n```cpp\n// Near the top of updater.cc:\nconstexpr size_t kFtFlashWpBufferSize \u003d 512;\n\n// In FtGetFlashProtect / FtSetFlashProtect:\nstd::vector\u003cuint8_t\u003e data(kFtFlashWpBufferSize, 0); \n\n```\n\n*(You can also export this constant to `updater.h` or `test_utils.h` so the test suite can use it instead of hardcoding `512` in `cli_test.cc` and `updater_test.cc`).*\n\n### 4. Word Size Alignment (`updater.cc`)\n\nWhen we fixed the payload truncation bug in `FtDownloadBin`, we used the number `4` to represent 4-byte word alignment.\n\n```cpp\n// Current Code:\nlen \u003d FtDivRoundUp\u003csize_t\u003e(len, 4) * 4;\n\n```\n\n**The Fix:** Replace `4` with `sizeof(uint32_t)` to mathematically explicitly show that you are aligning the payload to a 32-bit word boundary.\n\n```cpp\nconstexpr size_t kWordSize \u003d sizeof(uint32_t);\nlen \u003d FtDivRoundUp\u003csize_t\u003e(len, kWordSize) * kWordSize;\n\n```\n\n### 5. Tool Version String (`cli.cc`)\n\nIn `ExecuteCommand`, the tool version is hardcoded inline inside the `kGetEcVersion` switch case.\n\n```cpp\n// Current Code:\ncase Command::kGetEcVersion:\n  FT_LOGI(\"Tool version is v1.0.3\");\n\n```\n\n**The Fix:** Move this to `cli.h` or `ft_help.h` as `constexpr std::string_view kToolVersion \u003d \"v1.0.3\";` so it can be easily updated in the future without hunting through the execution logic.",
+      "range": {
+        "startLine": 152,
+        "startChar": 0,
+        "endLine": 152,
+        "endChar": 51
+      },
+      "revId": "b41d7944f2f336049361c29878bbdf28c28e5184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "917fa633_d06cae59",
         "filename": "util/focaltech/ft_log.h",
         "patchSetId": 18
