@@ -843,6 +843,7 @@ static const char *reset_cause_to_str(uint16_t cause)
 		"shutdown: thermal",
 		"shutdown: power button",
 		"shutdown: at AP's request",
+		"shutdown: for battery cutoff",
 	};
 	BUILD_ASSERT(ARRAY_SIZE(shutdown_causes) ==
 		     CHIPSET_SHUTDOWN_COUNT - CHIPSET_SHUTDOWN_BEGIN);
