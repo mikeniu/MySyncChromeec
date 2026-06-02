@@ -70,6 +70,30 @@
       },
       "revId": "abb71dfeec23b342d15adb88e034246dc4e0270b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cbcd461_33a90275",
+        "filename": "zephyr/test/fingerprint/task/include/fpsensor_test_utils.h",
+        "patchSetId": 22
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T20:59:21Z",
+      "side": 1,
+      "message": "Ok, let\u0027s keep as `printk`.",
+      "parentUuid": "5c6379c0_1b8a4806",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 16
+      },
+      "revId": "abb71dfeec23b342d15adb88e034246dc4e0270b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
