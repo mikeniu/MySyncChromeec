@@ -50,7 +50,8 @@ const struct watchdog_info wdt_info[] = {
 		.config = {
 #if ((DT_NODE_HAS_COMPAT(DT_CHOSEN(cros_ec_watchdog), st_stm32_watchdog)) || \
      (DT_NODE_HAS_COMPAT(DT_CHOSEN(cros_ec_watchdog),                        \
-			 realtek_rts5912_watchdog)))
+			 realtek_rts5912_watchdog)) ||                       \
+     (DT_NODE_HAS_COMPAT(DT_CHOSEN(cros_ec_watchdog), ft_ft90_wdt)))
 			.flags = WDT_FLAG_RESET_SOC,
 			.window.min = 0U,
 			.window.max = CONFIG_WATCHDOG_PERIOD_MS,
@@ -123,7 +124,7 @@ static int watchdog_init_device(const struct watchdog_info *info)
 	int chan, err;
 
 	if (!device_is_ready(wdt_dev)) {
-		LOG_ERR("device %s not ready", wdt_dev->name);
+		LOG_ERR_DEVICE_NOT_READY(wdt_dev);
 		return -ENODEV;
 	}
 
