@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "43483f80_bd9d55a4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3387694
+      },
+      "writtenOn": "2026-06-02T07:41:02Z",
+      "side": 1,
+      "message": "These change is compatible since EVT board already change to these pins.",
+      "parentUuid": "36b30b78_53d64187",
+      "range": {
+        "startLine": 7,
+        "startChar": 58,
+        "endLine": 7,
+        "endChar": 61
+      },
+      "revId": "10b3e90a796ade3afb1d7b8f76c6151a9275b302",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3334549b_50e5d4d5",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
@@ -55,6 +79,24 @@
       "side": 1,
       "message": "As well as better assessment for the severity of the issue.",
       "parentUuid": "3334549b_50e5d4d5",
+      "revId": "10b3e90a796ade3afb1d7b8f76c6151a9275b302",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b36ca525_50361f1a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 3387694
+      },
+      "writtenOn": "2026-06-02T07:41:02Z",
+      "side": 1,
+      "message": "ec_plt_pwrok only affects the gpioget/gpioset command.\nThe power_signals.dts setting is correct.\n\ni2c_mcu is connected to the lightbar mcu and it is not used currently.",
+      "parentUuid": "d0216dac_97c605ef",
       "revId": "10b3e90a796ade3afb1d7b8f76c6151a9275b302",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
