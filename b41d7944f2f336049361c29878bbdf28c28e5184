@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "49ea5ee7_7e0b10f0",
+        "filename": "util/focaltech/ft_log.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T18:34:56Z",
+      "side": 1,
+      "message": "Here is Gemini generated code to fix it. Verify for correctness:\n\n---\n\nTo implement the TTY detection, you will need to pull in the POSIX headers for `isatty()` and `fileno()`, and then conditionally apply the ANSI color codes.\n\nSince checking `isatty()` involves a system call, it is a best practice to check it exactly once and cache the result in a `static` variable, rather than executing the system call every single time a log is emitted.\n\nHere is the `diff` showing the exact changes needed for `util/focaltech/ft_log.h`:\n\n```diff\n--- a/util/focaltech/ft_log.h\n+++ b/util/focaltech/ft_log.h\n@@ -5,6 +5,8 @@\n #ifndef UTIL_FOCALTECH_FT_LOG_H_\n #define UTIL_FOCALTECH_FT_LOG_H_\n \n+#include \u003ccstdio\u003e\n+#include \u003cunistd.h\u003e\n #include \u003cchrono\u003e\n #include \u003cprint\u003e\n #include \u003csource_location\u003e\n@@ -21,6 +23,12 @@\n namespace ft_log {\n constexpr LogLevel kCurrentLogLevel \u003d LogLevel::kDebug;\n inline constexpr std::string_view kLogTag \u003d \"focaltech\";\n+\n+// Evaluate and cache whether stdout is attached to a terminal\n+inline bool UseColor() {\n+  static const bool use_color \u003d isatty(fileno(stdout));\n+  return use_color;\n+}\n }  // namespace ft_log\n \n template \u003ctypename... Args\u003e\n@@ -33,29 +41,26 @@\n   auto now \u003d std::chrono::system_clock::now();\n   std::string_view level_str;\n   std::string_view color;\n-  std::string_view reset \u003d \"\\033[0m\";\n+  std::string_view reset;\n+\n+  bool enable_color \u003d ft_log::UseColor();\n \n   switch (level) {\n     case LogLevel::kVerbose:\n       level_str \u003d \"V\";\n-      color \u003d \"\";\n       break;\n     case LogLevel::kDebug:\n       level_str \u003d \"D\";\n-      color \u003d \"\";\n       break;\n     case LogLevel::kInfo:\n       level_str \u003d \"I\";\n-      color \u003d \"\\033[36m\";\n+      if (enable_color) color \u003d \"\\033[36m\";\n       break;\n     case LogLevel::kWarning:\n       level_str \u003d \"W\";\n-      color \u003d \"\\033[33m\";\n+      if (enable_color) color \u003d \"\\033[33m\";\n       break;\n     case LogLevel::kError:\n       level_str \u003d \"E\";\n-      color \u003d \"\\033[31m\";\n+      if (enable_color) color \u003d \"\\033[31m\";\n       break;\n   }\n+\n+  if (enable_color \u0026\u0026 !color.empty()) {\n+    reset \u003d \"\\033[0m\";\n+  }\n \n   // Extract filename from the path.\n   std::string_view file \u003d loc.file_name();\n@@ -66,7 +71,7 @@\n   std::print(\"{}[{:%m-%d %H:%M:%S}] {} [{}][{}:{}] \", color, now, level_str,\n              ft_log::kLogTag, file, loc.line());\n   std::println(fmt, std::forward\u003cArgs\u003e(args)...);\n \n-  if (!color.empty()) {\n+  if (!reset.empty()) {\n     std::print(\"{}\", reset);\n   }\n }\n\n```\n\n### Why this approach works:\n\n1. **Performance:** `static const bool use_color \u003d isatty(fileno(stdout));` ensures the OS is only queried the very first time `FtLog` is called. Subsequent logs instantly read the cached boolean.\n2. **Clean Output:** If someone runs `ectool focaltech_iap ... \u003e log.txt` or runs the tool via an automated testing script without a pseudo-terminal (pty), `UseColor()` evaluates to `false`. The `color` and `reset` strings remain empty, and the output is perfectly clean plain text.",
+      "parentUuid": "917fa633_d06cae59",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 37
+      },
+      "revId": "b41d7944f2f336049361c29878bbdf28c28e5184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c8487b5d_ddda9858",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 18
