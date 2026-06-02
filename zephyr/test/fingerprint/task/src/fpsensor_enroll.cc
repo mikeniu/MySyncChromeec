@@ -459,6 +459,30 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_finish_success)
 	zassert_equal(test_info_buffer->template_info.template_dirty, 0x1);
 }
 
+ZTEST_USER(fpsensor_enroll, test_enroll_max_capacity_reached)
+{
+	struct ec_params_fp_mode params = {
+		.mode = FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE,
+	};
+	struct ec_response_fp_mode response;
+	int result;
+
+	/* Set to full capacity to simulate reaching the storage limit. */
+	global_context.templ_valid = FP_MAX_FINGER_COUNT;
+
+	/* Attempt to start enrollment session. */
+	result = ec_cmd_fp_mode(NULL, &params, &response);
+
+	/* Confirm that the command was rejected. */
+	zassert_not_equal(
+		result, EC_SUCCESS,
+		"Enrollment command should have been rejected due to capacity");
+
+	/* Confirm that the enrollment session was not started. */
+	zassert_false(response.mode & FP_MODE_ENROLL_SESSION,
+		      "Enrollment session should not be active");
+}
+
 static void *fpsensor_setup(void)
 {
 	/* Start shimmed tasks. */
@@ -488,6 +512,9 @@ static void fpsensor_before(void *f)
 	};
 	struct ec_response_fp_mode response;
 	uint32_t fp_events;
+
+	/* Reset global context to a clean state */
+	global_context.templ_valid = 0;
 
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
 	zassert_equal(response.mode, 0);
