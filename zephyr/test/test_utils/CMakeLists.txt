@@ -19,4 +19,6 @@ if (CONFIG_ZTEST_TC_UTIL_USER_OVERRIDE AND CONFIG_BOARD_NATIVE_SIM)
   zephyr_library_sources(ztest_printk)
 endif()
 
+zephyr_library_sources_ifdef(CONFIG_EC_HOST_CMD host_command.c)
+
 zephyr_library_link_libraries(test_utils)

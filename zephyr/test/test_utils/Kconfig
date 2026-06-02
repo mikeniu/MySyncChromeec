@@ -1,0 +1,9 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config TEST_UTILS_HOST_CMD_RESPONSE_TIMEOUT_MS
+	int "Host command response timeout in milliseconds"
+	default 1000
+	help
+	  Default timeout in ms used for waiting for host command response
