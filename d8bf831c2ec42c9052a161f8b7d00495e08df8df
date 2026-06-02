@@ -37,6 +37,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "5aa5fb04_1a991959",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-06-02T12:53:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "83d2a36e_74351d4f",
+      "revId": "d8bf831c2ec42c9052a161f8b7d00495e08df8df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "5d9fa16d_07318553",
         "filename": "zephyr/test/pdc/src/rts54xx/rts54xx.c",
         "patchSetId": 13
