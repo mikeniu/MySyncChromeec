@@ -1202,13 +1202,6 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 	 * is performed during the G3 to S5 transition.
 	 */
 	case POWER_G3S5:
-		/*
-		 * The boot process is delayed until the power button is
-		 * released. This prevents the application processor from
-		 * powering on during a long-hold of the power and volume
-		 * buttons, which is often used to trigger recovery mode.
-		 */
-		power_button_wait_for_release(-1);
 
 		/* Initialize components to ready state before AP is up. */
 		hook_notify(HOOK_CHIPSET_PRE_INIT);
