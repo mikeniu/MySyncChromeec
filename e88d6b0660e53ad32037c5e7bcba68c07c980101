@@ -16,6 +16,23 @@
       "message": "Looks good to me. Waiting for Dawid review.",
       "revId": "e88d6b0660e53ad32037c5e7bcba68c07c980101",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a62c8b2e_2bb61a1b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-06-02T11:11:21Z",
+      "side": 1,
+      "message": "Double-checked on hardware",
+      "revId": "e88d6b0660e53ad32037c5e7bcba68c07c980101",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
