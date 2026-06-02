@@ -16,6 +16,24 @@
       "message": "Does the real code behave this way?",
       "revId": "95f1c09524883c072cbb66f5067c396eeabb9f0d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07566e5f_4fdeed90",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-06-02T01:27:45Z",
+      "side": 1,
+      "message": "This is the implementation if real live scenario:\n\nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/fingerprint/fingerprint_fpc1025.c;l\u003d372?q\u003dplatform%2Fec%20fingerprint_fpc1025.c\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch#:~:text\u003d371-,372,-373\n\nFirst, we try to convert the type\n\n```\n\trc \u003d convert_fp_capture_type_to_fpc_capture_type(capture_type);\n\n\tif (rc \u003c 0) {\n\t\tLOG_ERR(\"Unsupported capture_type %d provided\", capture_type);\n\t\treturn rc;\n\t}\n```\n\nSecond, the internal acquire image can a negative value\n```\n\trc \u003d fp_sensor_acquire_image_with_mode(image_buf, rc);\n\tif (rc \u003c 0) {\n\t\tLOG_ERR(\"Failed to acquire image with capture_type %d: %d\",\n\t\t\tcapture_type, rc);\n\t\treturn rc;\n\t}\n```\n\nI believe the implemented here is slightly different but captures what is available in the device tree, which should mimic `\trc \u003d convert_fp_capture_type_to_fpc_capture_type(capture_type);`",
+      "parentUuid": "928c9737_a0336549",
+      "revId": "95f1c09524883c072cbb66f5067c396eeabb9f0d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
