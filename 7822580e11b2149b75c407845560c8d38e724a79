@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01eab0c7_c405f622",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-02T22:54:13Z",
+      "side": 1,
+      "message": "First pass. I still haven\u0027t checked this against the datasheet.",
+      "revId": "7822580e11b2149b75c407845560c8d38e724a79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2091bfc6_94e66c9a",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 841,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-02T22:54:13Z",
+      "side": 1,
+      "message": "I think it\u0027s possible that VBUS will already be on when this runs (board in G3 when adapter plugged in). You may need to check the current VBUS level before setting the thresholds. That may mean that it makes sense to have a separate function for setting the thresholds based on the present VBUS voltage.",
+      "revId": "7822580e11b2149b75c407845560c8d38e724a79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dffb41eb_25e9e1b3",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 1317,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-02T22:54:13Z",
+      "side": 1,
+      "message": "Probably you should bail out early with some error message in the event of a failed I2C. As it stands, all of the return value records below this will be thrown away.",
+      "revId": "7822580e11b2149b75c407845560c8d38e724a79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "edd13147_d2015171",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 1777,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-02T22:54:13Z",
+      "side": 1,
+      "message": "Per the above comment, is there any condition under which we cannot expect to receive the interrupts enabled by this CL? Is that what this is checking for?",
+      "revId": "7822580e11b2149b75c407845560c8d38e724a79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
