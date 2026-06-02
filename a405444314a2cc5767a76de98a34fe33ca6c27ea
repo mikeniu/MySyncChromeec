@@ -83,6 +83,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "337358c5_25daac45",
+        "filename": "zephyr/drivers/pwrmon/power_monitor.h",
+        "patchSetId": 29
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-06-02T14:23:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "edf0a43e_a2f357e8",
+      "range": {
+        "startLine": 7,
+        "startChar": 4,
+        "endLine": 7,
+        "endChar": 27
+      },
+      "revId": "a405444314a2cc5767a76de98a34fe33ca6c27ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2a75adc2_61657495",
