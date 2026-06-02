@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ddab8c47_57c76c0f",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T19:10:40Z",
+      "side": 1,
+      "message": "Let\u0027s use designated intializers. Gemini code:\n\n----\n\nInstead of zero-initializing structs and assigning fields procedurally, you can declare the desired state upfront. This is safer because it guarantees all intended fields are set at the moment of creation, and it\u0027s much easier to read.\n\n**In `BuildEcCommand`:**\n\n```cpp\n// Before:\nec_host_request req{};\nreq.struct_version \u003d EC_HOST_REQUEST_VERSION;\nreq.command \u003d command;\nreq.command_version \u003d version;\nreq.data_len \u003d params.size();\nreq.reserved \u003d 0;\n\n// After:\nec_host_request req{\n    .struct_version \u003d EC_HOST_REQUEST_VERSION,\n    .checksum \u003d 0, // Will be overwritten later\n    .command \u003d command,\n    .command_version \u003d version,\n    .reserved \u003d 0,\n    .data_len \u003d static_cast\u003cuint16_t\u003e(params.size()),\n};\n\n```\n\n**In `SwitchToBootloader`:**\n\n```cpp\n// Before:\nec_params_enter_bootloader params{};\nparams.mode \u003d mode;\n\n// After:\nec_params_enter_bootloader params{\n    .mode \u003d mode,\n};\n\n```\n\n*(Note: The same cleanup applies to `FtConfigPage` in `updater_test.cc` and `BulkCsWrap` in the test files, though we partially addressed those in the previous `test_utils.h` refactor).*",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 19
+      },
+      "revId": "b41d7944f2f336049361c29878bbdf28c28e5184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "baf0f0b5_fe0691ca",
         "filename": "util/focaltech/cli.cc",
         "patchSetId": 18
