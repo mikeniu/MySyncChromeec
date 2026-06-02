@@ -109,6 +109,16 @@ static uint32_t fp_process_enroll(void)
 {
 	int percent = 0;
 
+	/* Prevent enrollment if we have reached max capacity. */
+	if (global_context.templ_valid >= FP_MAX_FINGER_COUNT) {
+		CPRINTS("Error: Max templates reached.");
+		fp_enrollment_finish(nullptr);
+		global_context.sensor_mode &= ~FP_MODE_ENROLL_SESSION;
+		enroll_session &= ~FP_MODE_ENROLL_SESSION;
+		return EC_MKBP_FP_ENROLL |
+		       EC_MKBP_FP_ERRCODE(EC_MKBP_FP_ERR_ENROLL_INTERNAL);
+	}
+
 	if (global_context.template_newly_enrolled != FP_NO_SUCH_TEMPLATE)
 		CPRINTS("Warning: previously enrolled template has not been "
 			"read yet.");
