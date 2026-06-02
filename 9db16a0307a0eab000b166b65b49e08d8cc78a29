@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2174536d_5c9b4d89",
+        "filename": "zephyr/drivers/ap_power_events/ap_power_events.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-06-02T17:38:08Z",
+      "side": 1,
+      "message": "Can this be `const` as well?",
+      "range": {
+        "startLine": 85,
+        "startChar": 36,
+        "endLine": 85,
+        "endChar": 48
+      },
+      "revId": "9db16a0307a0eab000b166b65b49e08d8cc78a29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c90fc27_4c6f0ede",
+        "filename": "zephyr/test/drivers/ap_power_events/prj.conf",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-06-02T17:38:08Z",
+      "side": 1,
+      "message": "This is a helper symbol that defaults to enabled. Is it necessary to explicitly enable it here?",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 18
+      },
+      "revId": "9db16a0307a0eab000b166b65b49e08d8cc78a29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "831adb22_3cae6988",
+        "filename": "zephyr/test/drivers/ap_power_events/src/ap_power_events.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-06-02T17:38:08Z",
+      "side": 1,
+      "message": "Can you add a setup function that checks that all the GPIOs initialize as de-asserted? This will run once before any of these test cases. This might be unreliable if power sequencing code immediately starts up, though.",
+      "range": {
+        "startLine": 20,
+        "startChar": 35,
+        "endLine": 20,
+        "endChar": 39
+      },
+      "revId": "9db16a0307a0eab000b166b65b49e08d8cc78a29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "722cb809_5b205cf1",
+        "filename": "zephyr/test/drivers/ap_power_events/src/ap_power_events.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-06-02T17:38:08Z",
+      "side": 1,
+      "message": "Can this be moved to a ztest before function?",
+      "range": {
+        "startLine": 24,
+        "startChar": 1,
+        "endLine": 27,
+        "endChar": 2
+      },
+      "revId": "9db16a0307a0eab000b166b65b49e08d8cc78a29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
