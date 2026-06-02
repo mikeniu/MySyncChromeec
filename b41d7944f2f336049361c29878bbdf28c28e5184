@@ -72,6 +72,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "230a95be_f7b6d9aa",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T19:16:44Z",
+      "side": 1,
+      "message": "More from Gemini:\n\n----\n\n### 1. SCSI Command Buffer Size (`ft_scsi.h` \u0026 `ft_scsi.cc`)\n\nThe size of the FocalTech vendor-specific SCSI command is hardcoded as `16` in several places, including the function signature and the `BulkCbWrap` struct.\n\n**The Fix:** Define `kFtScsiCmdSize` in `ft_scsi.h`.\n\n```cpp\n// In ft_scsi.h:\nconstexpr size_t kFtScsiCmdSize \u003d 16;\n\nstd::array\u003cuint8_t, kFtScsiCmdSize\u003e BuildFtCmd(...);\n\n// In ft_scsi.cc (BulkCbWrap struct):\nstruct BulkCbWrap {\n  // ...\n  uint8_t cmd[kFtScsiCmdSize];\n} __attribute__((packed));\n\n```\n\n### 2. Config Page Size in Tests (`updater_test.cc`)\n\nIn `updater.cc`, you correctly use `kFocalConfigSize` (which is `0x1000` or 4096 bytes). However, in your test files, you accidentally hardcoded the integer `4096` when building the mock firmware payloads.\n\n```cpp\n// Current Code (updater_test.cc):\nstd::vector\u003cuint8_t\u003e fw_data(sizeof(FtConfigPage) + 4096, 0xBB);\n\n```\n\n**The Fix:** Use the existing constant so the tests stay in sync if the hardware spec ever changes.\n\n```cpp\n// After:\nstd::vector\u003cuint8_t\u003e fw_data(sizeof(FtConfigPage) + kFocalConfigSize, 0xBB);\n\n```\n\n### 3. The EC Checksum Offset (`cli.cc`)\n\nWhen you calculate the checksum for the EC command packet, you hardcode index `1` to overwrite the placeholder byte.\n\n```cpp\n// Current Code:\npacket[1] \u003d static_cast\u003cuint8_t\u003e(~checksum + 1);  // Overwrite checksum field\n\n```\n\n**The Fix:** Give that index a name at the top of the file so it\u0027s instantly clear *why* you are mutating the second byte of the packet.\n\n```cpp\n// Near the top of cli.cc:\nconstexpr size_t kEcChecksumOffset \u003d 1;\n\n// In BuildEcCommand:\npacket[kEcChecksumOffset] \u003d static_cast\u003cuint8_t\u003e(~checksum + 1);\n\n```\n\n### 4. Default Bootloader Mode (`cli.h` \u0026 `cli.cc`)\n\nThe `SwitchToBootloader` function defaults to `mode \u003d 0`. While `0` is often a safe default, in the context of embedded systems, it usually represents a specific hardware state (e.g., cold reset, soft reset, or jumping to a specific partition).\n\n```cpp\n// Current Code (cli.h):\nstd::expected\u003cvoid, FtError\u003e SwitchToBootloader(UsbDevice\u0026 device, uint8_t mode \u003d 0);\n\n```\n\n**The Fix:** Define what `0` means. If it just means the standard jump command, label it.\n\n```cpp\nconstexpr uint8_t kEcBootloaderModeDefault \u003d 0;\n\nstd::expected\u003cvoid, FtError\u003e SwitchToBootloader(\n    UsbDevice\u0026 device, uint8_t mode \u003d kEcBootloaderModeDefault);\n\n```\n\n### 5. Flash Erased Byte (`updater.cc`)\n\nWhen you pad the firmware binary before writing it to the device, you fill the empty space with `0xFF`. Every embedded engineer knows `0xFF` means \"erased flash,\" but it\u0027s still best practice to label it, especially when paired with modern C++ containers.\n\n```cpp\n// Current Code:\nstd::vector\u003cuint8_t\u003e write_buffer(padded_buffer_size, 0xFF);\n\n```\n\n**The Fix:**\n\n```cpp\nconstexpr uint8_t kFlashErasedByte \u003d 0xFF;\nstd::vector\u003cuint8_t\u003e write_buffer(padded_buffer_size, kFlashErasedByte);\n\n```",
+      "parentUuid": "92fabc7c_64d17464",
+      "range": {
+        "startLine": 152,
+        "startChar": 0,
+        "endLine": 152,
+        "endChar": 51
+      },
+      "revId": "b41d7944f2f336049361c29878bbdf28c28e5184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "917fa633_d06cae59",
         "filename": "util/focaltech/ft_log.h",
         "patchSetId": 18
