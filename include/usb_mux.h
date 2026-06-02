@@ -332,14 +332,7 @@ static inline void usb_mux_set_single(int port, int index, mux_state_t mux_mode,
  * @param port port number.
  * @return current MUX state (USB_PD_MUX_*).
  */
-#if defined(CONFIG_USBC_SS_MUX) || defined(CONFIG_ZTEST)
 mux_state_t usb_mux_get(int port);
-#else
-static inline mux_state_t usb_mux_get(int port)
-{
-	return 0;
-}
-#endif
 
 /**
  * Flip the superspeed muxes on type-C port.
