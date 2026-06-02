@@ -80,7 +80,7 @@
 #endif
 
 /* The timeout of the check if the system can boot AP */
-#define CAN_BOOT_AP_CHECK_TIMEOUT (1600 * MSEC)
+#define CAN_BOOT_AP_CHECK_TIMEOUT (2200 * MSEC)
 
 /* Wait for polling if the system can boot AP */
 #define CAN_BOOT_AP_CHECK_WAIT (200 * MSEC)
@@ -361,14 +361,6 @@ enum power_state power_chipset_init(void)
 		init_state = POWER_G3;
 		is_s5g3_passed = true;
 	}
-
-	if (battery_is_present() == BP_YES)
-		/*
-		 * (crosbug.com/p/28289): Wait battery stable.
-		 * Some batteries use clock stretching feature, which requires
-		 * more time to be stable.
-		 */
-		battery_wait_for_stable();
 
 	if (exit_hard_off && init_state == POWER_G3) {
 		/* Auto-power on */

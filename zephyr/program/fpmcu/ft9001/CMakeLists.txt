@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-zephyr_library_sources("src/platform.c")
-
 if(DEFINED CONFIG_CROS_EC_RO)
 
 add_library(config_page OBJECT src/config_page.c)
@@ -23,4 +21,9 @@ add_custom_target(config_page_binary ALL
   VERBATIM
 )
 
+endif()
+
+# TODO(b/502744651): Remove OTP initialization once all boards are initialized
+if(DEFINED CONFIG_CROS_EC_RW AND DEFINED CONFIG_FOCALTECH_OTP_KEY)
+  zephyr_library_sources("src/otp_init.c")
 endif()
