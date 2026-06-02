@@ -46,6 +46,30 @@
       },
       "revId": "abb71dfeec23b342d15adb88e034246dc4e0270b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c6379c0_1b8a4806",
+        "filename": "zephyr/test/fingerprint/task/include/fpsensor_test_utils.h",
+        "patchSetId": 22
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-06-02T20:58:02Z",
+      "side": 1,
+      "message": "I did a quick search for `platform/ec/zephyr/test CPRINTF`. I can mainly see `ccprintf`\n\nhttps://source.chromium.org/search?q\u003dplatform%2Fec%2Fzephyr%2Ftest%20CPRINTF\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch\n\nI can also see `printk`:\n\nhttps://source.chromium.org/search?q\u003dplatform%2Fec%2Fzephyr%2Ftest%20printk\u0026sq\u003d\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch\n\nthis is a zephyr-only test and will not be copied to `ec-legacy`\n\nI do not believe I can use the `LOG_INF` because this is a header file.",
+      "parentUuid": "a4a63161_78cec9b1",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 16
+      },
+      "revId": "abb71dfeec23b342d15adb88e034246dc4e0270b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
