@@ -412,6 +412,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef86fe1f_c96d18cb",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-06-02T14:14:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c42a4b85_ada82200",
+      "range": {
+        "startLine": 163,
+        "startChar": 0,
+        "endLine": 163,
+        "endChar": 34
+      },
+      "revId": "a405444314a2cc5767a76de98a34fe33ca6c27ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bd62fa4a_c126e94d",
@@ -461,6 +485,24 @@
       "side": 1,
       "message": "I think it is still worth investigating whether MKBP can be used here. It this isn\u0027t evaluated now, we\u0027re locked into a potentially inferior solution.",
       "parentUuid": "3b19f161_9675e617",
+      "revId": "a405444314a2cc5767a76de98a34fe33ca6c27ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "391237bb_e284e075",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-06-02T14:14:47Z",
+      "side": 1,
+      "message": "I did some research what I need to do to convert to MKBP, besides modification to `cros_ec_pwrmon.c` and `pwrmon.c`, I need to modify to common `cros_ec_commands.h`, which is a GKI header. IMO modifying common GKI header is out of reach.\n\nSpeaking about modification, this is what I need to add [here](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/include/ec_commands.h;drc\u003dc4ec9ee779756327fd1a4b50f97679c05c493992;l\u003d4270) `struct ec_response_pwrmon_fifo_info` or `struct ec_response_pwrmon_data_fifo`.",
+      "parentUuid": "b679e3f8_b587c3f6",
       "revId": "a405444314a2cc5767a76de98a34fe33ca6c27ea",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
