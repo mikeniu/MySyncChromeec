@@ -70,6 +70,24 @@
       "parentUuid": "dbb1bacf_49da4faa",
       "revId": "95f1c09524883c072cbb66f5067c396eeabb9f0d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e27f2adc_13000932",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T21:15:06Z",
+      "side": 1,
+      "message": "\u003e all vendors have a similar logic in a sense of having their own convert_fp_capture_type_to_xxxx_capture_type function\n\nYeah, but do they? It\u0027s probably all custom logic, rather than a consistent function. And it\u0027s not enforced, so you could accidentally remove/change it. I\u0027m trying to think of a way that can enforce it and make sure the real implementation stays in sync with the simulator version.",
+      "parentUuid": "6bb1c393_865b250d",
+      "revId": "95f1c09524883c072cbb66f5067c396eeabb9f0d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
