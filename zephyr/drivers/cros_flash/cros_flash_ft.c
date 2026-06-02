@@ -48,6 +48,7 @@
 #include <zephyr/drivers/spi.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/minmax.h>
 
 #include <drivers/cros_flash.h>
 #include <soc.h>
@@ -615,7 +616,7 @@ static int flash_ft_xip_init(const struct device *dev)
 
 	data->flash_dev = DEVICE_DT_GET(FLASH_DEV);
 	if (!device_is_ready(data->flash_dev)) {
-		LOG_ERR("device %s not ready", data->flash_dev->name);
+		LOG_ERR_DEVICE_NOT_READY(data->flash_dev);
 		return -ENODEV;
 	}
 	k_mutex_init(&data->flash_lock);

@@ -580,6 +580,12 @@
 #undef CONFIG_BATTERY_CHECK_CHARGE_TEMP_LIMITS
 
 /*
+ * If this option is enabled, all battery cutoff commands will be
+ * deferred until the chipset is shutting down.
+ */
+#undef CONFIG_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN
+
+/*
  * Support battery cut-off as host command and console command.
  *
  * Once defined, you have to implement a board_cut_off_battery() function
@@ -2895,20 +2901,6 @@
 #define CONFIG_I2C_CHIP_MAX_TRANSFER_SIZE 255
 
 /*
- * Enable i2c_xfer() for receiving request larger than
- * CONFIG_I2C_CHIP_MAX_TRANSFER_SIZE.
- */
-#undef CONFIG_I2C_XFER_LARGE_TRANSFER
-
-/*
- * If defined, makes i2c_xfer callback into board-provided functions before the
- * start and after the end of every I2C transaction. This can be used by boards
- * to implement any I2C device specific quirks e.g. requiring minimum bus-free
- * time between every I2C transaction with a device.
- */
-#undef CONFIG_I2C_XFER_BOARD_CALLBACK
-
-/*
  * EC uses an I2C controller interface.
  * Note: if this is defined, i2c_init() will be called
  * automatically at board boot.
@@ -2938,30 +2930,6 @@
  * size.
  */
 #define CONFIG_I2C_EXTRA_PACKET_SIZE 0
-
-/*
- * I2C multi-port controller.
- *
- * If CONFIG_I2C_MULTI_PORT_CONTROLLER is defined, a single on-chip I2C
- * controller may have multiple I2C ports attached. Therefore, I2c operations
- * must lock the controller (not just the port) to prevent hardware access
- * conflicts.
- */
-#undef CONFIG_I2C_MULTI_PORT_CONTROLLER
-
-/*
- * Enable the legacy I2C bitbang driver.
- *
- * If defined, the board must define array i2c_bitbang_ports[] and
- * i2c_bitbang_ports_count (same as i2c_ports/i2c_ports_count), but with
- * port number starting from I2C_PORT_COUNT, and .drv=&bitbang_drv.
- *
- * For example:
- * {"battery", 2, 100, GPIO_I2C3_SCL, GPIO_I2C3_SDA, .drv = &bitbang_drv},
- *
- * This option cannot be used by Zephyr EC projects.
- */
-#undef CONFIG_I2C_BITBANG_CROS_EC
 
 /*
  * If defined, reduce I2C traffic from update functions (i2c_update8/16
@@ -5477,17 +5445,6 @@
 
 /* SYV682 does not pass through CC, instead it bypasses to the TCPC */
 #undef CONFIG_USBC_PPC_SYV682X_NO_CC
-
-/*
- * TODO(b/445132756): This config is now a no-op.
- *
- * Smart discharge support in the SYV682x driver has been removed due to
- * unreliable behavior (see bug for details). This config is kept temporarily
- * to avoid breaking builds for boards that may still define it.
- *
- */
-/* Define to enable SYV682X VBUS smart discharge. */
-#undef CONFIG_USBC_PPC_SYV682X_SMART_DISCHARGE
 
 /* PPC is capable of gating the SBU lines. */
 #undef CONFIG_USBC_PPC_SBU

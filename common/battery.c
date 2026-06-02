@@ -10,6 +10,7 @@
 #include "button.h"
 #include "charge_manager.h"
 #include "charge_state.h"
+#include "chipset.h"
 #include "common.h"
 #include "console.h"
 #include "ec_ec_comm_client.h"
@@ -133,6 +134,11 @@ static void print_battery_strings(void)
 {
 	char text[32];
 
+#ifdef CONFIG_BATTERY_ACCESS_LIMIT
+	if (BATTERY_ACCESS_NOT_ALLOWED == battery_check_access_limit())
+		return;
+#endif
+
 	print_item_name("Manuf:");
 	if (check_print_error(battery_manufacturer_name(text, sizeof(text))))
 		ccprintf("%s\n", text);
@@ -224,6 +230,11 @@ static void print_battery_info(void)
 	int hour, minute;
 	int year, month, day;
 
+#ifdef CONFIG_BATTERY_ACCESS_LIMIT
+	if (BATTERY_ACCESS_NOT_ALLOWED == battery_check_access_limit())
+		return;
+#endif
+
 	print_item_name("ManufDate:");
 	if (check_print_error(battery_manufacture_date(&year, &month, &day))) {
 		ccprintf("%04u-%02u-%02u\n", year, month, day);
@@ -298,6 +309,13 @@ static void print_battery_info(void)
 		value = !value;
 	print_item_name("C-FET:");
 	ccprintf("%d\n", value);
+
+	value = battery_get_disconnect_state();
+	print_item_name("D-FET:");
+	if (value == BATTERY_DISCONNECT_ERROR)
+		ccprintf("ERR\n");
+	else
+		ccprintf("%d\n", value);
 #endif
 }
 
@@ -315,11 +333,6 @@ static int command_battery(int argc, const char **argv)
 	int loop;
 	int sleep_ms = 0;
 	char *e;
-
-#ifdef CONFIG_BATTERY_ACCESS_LIMIT
-	if (BATTERY_ACCESS_NOT_ALLOWED == battery_check_access_limit())
-		return EC_ERROR_ACCESS_DENIED;
-#endif
 
 	if (argc > 1) {
 		repeat = strtoi(argv[1], &e, 0);
@@ -533,6 +546,13 @@ static void ac_change(void)
 	CPRINTS("Refresh+Unplug! Scheduling cutoff.");
 	battery_cutoff_state = BATTERY_CUTOFF_STATE_SCHEDULED;
 	battery_cutoff_retry_left = CONFIG_BATTERY_CUTOFF_RETRY_COUNT;
+
+	if (IS_ENABLED(CONFIG_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN)) {
+		if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
+			chipset_force_shutdown(CHIPSET_SHUTDOWN_BATTERY_CUTOFF);
+			return;
+		}
+	}
 	hook_call_deferred(&pending_cutoff_deferred_data,
 			   CONFIG_BATTERY_CUTOFF_DELAY_US);
 }
@@ -552,6 +572,9 @@ static enum ec_status battery_command_cutoff(struct host_cmd_handler_args *args)
 		}
 	}
 
+	if (IS_ENABLED(CONFIG_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN))
+		return EC_RES_ERROR;
+
 	return battery_cutoff_start();
 }
 DECLARE_HOST_COMMAND(EC_CMD_BATTERY_CUT_OFF, battery_command_cutoff,
@@ -567,10 +590,19 @@ static void check_pending_cutoff(void)
 				   CONFIG_BATTERY_CUTOFF_DELAY_US);
 	}
 }
-DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, check_pending_cutoff, HOOK_PRIO_LAST);
+DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN_COMPLETE, check_pending_cutoff,
+	     HOOK_PRIO_LAST);
 
 static int command_cutoff(int argc, const char **argv)
 {
+	if (IS_ENABLED(CONFIG_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN)) {
+		battery_cutoff_state = BATTERY_CUTOFF_STATE_SCHEDULED;
+		if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
+			chipset_force_shutdown(CHIPSET_SHUTDOWN_BATTERY_CUTOFF);
+			return EC_SUCCESS;
+		}
+	}
+
 	if (argc > 1) {
 		if (!strcasecmp(argv[1], "at-shutdown")) {
 			battery_cutoff_state = BATTERY_CUTOFF_STATE_SCHEDULED;
@@ -873,6 +905,100 @@ DECLARE_HOOK(HOOK_CHIPSET_STARTUP, reduce_input_voltage_when_full,
 	     HOOK_PRIO_DEFAULT);
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, reduce_input_voltage_when_full,
 	     HOOK_PRIO_DEFAULT);
+#endif
+
+static int fake_state_of_charge = -1;
+static int fake_temperature = -1;
+
+void battery_set_fake_soc(int soc)
+{
+	fake_state_of_charge = soc;
+}
+
+int battery_get_fake_soc(void)
+{
+	return fake_state_of_charge;
+}
+
+void battery_set_fake_temp(int temp)
+{
+	fake_temperature = temp;
+}
+
+int battery_get_fake_temp(void)
+{
+	return fake_temperature;
+}
+
+void battery_apply_fake_params(struct batt_params *batt)
+{
+	if (fake_temperature >= 0) {
+		batt->temperature = fake_temperature;
+		batt->flags &= ~BATT_FLAG_BAD_TEMPERATURE;
+	}
+
+	if (fake_state_of_charge >= 0) {
+		int full;
+
+		if (batt->flags & BATT_FLAG_BAD_FULL_CAPACITY)
+			battery_design_capacity(&full);
+		else
+			full = batt->full_capacity;
+
+		batt->state_of_charge = fake_state_of_charge;
+		batt->remaining_capacity = full * fake_state_of_charge / 100;
+		battery_compensate_params(batt);
+		batt->flags &= ~BATT_FLAG_BAD_STATE_OF_CHARGE;
+		batt->flags &= ~BATT_FLAG_BAD_REMAINING_CAPACITY;
+	}
+}
+
+#if defined(CONFIG_CMD_BATTFAKE)
+static int command_battfake(int argc, const char **argv)
+{
+	char *e;
+	int v;
+
+	if (argc == 2) {
+		v = strtoi(argv[1], &e, 0);
+		if (*e || v < -1 || v > 100)
+			return EC_ERROR_PARAM1;
+
+		fake_state_of_charge = v;
+	}
+
+	if (fake_state_of_charge >= 0)
+		ccprintf("Fake batt %d%%\n", fake_state_of_charge);
+
+	return EC_SUCCESS;
+}
+DECLARE_CONSOLE_COMMAND(battfake, command_battfake,
+			"percent (-1 = use real level)",
+			"Set fake battery level");
+
+static int command_batttempfake(int argc, const char **argv)
+{
+	char *e;
+	int t;
+
+	if (argc == 2) {
+		t = strtoi(argv[1], &e, 0);
+		if (*e || t < -1 || t > 5000)
+			return EC_ERROR_PARAM1;
+
+		fake_temperature = t;
+	}
+
+	if (fake_temperature >= 0)
+		ccprintf("Fake batt temperature %d.%d K\n",
+			 fake_temperature / 10, fake_temperature % 10);
+
+	return EC_SUCCESS;
+}
+DECLARE_CONSOLE_COMMAND(
+	batttempfake, command_batttempfake,
+	"temperature (-1 = use real temperature)",
+	"Set fake battery temperature in deciKelvin (2731 = 273.1 K = 0 deg C)");
 #endif
 
 void battery_validate_params(struct batt_params *batt)

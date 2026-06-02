@@ -10,6 +10,8 @@
 #include "temp_sensor/temp_sensor.h"
 #include "usb_pd.h"
 
+#include <zephyr/sys/minmax.h>
+
 #define POLL_COUNT 5
 #define CHARGER_LIMIT_LEVELS 4
 #define TEMP_MAX 120
@@ -38,9 +40,9 @@ static const charge_limit_t charger_limit_table[CHARGER_LIMIT_LEVELS] = {
 };
 
 static const temp_limit_t charge_temp_limits[CHARGER_LIMIT_LEVELS - 1] = {
-	{ 51, 49 },
-	{ 60, 58 },
-	{ 62, 60 }
+	{ 49, 47 },
+	{ 57, 55 },
+	{ 60, 58 }
 };
 
 static bool temp_is_valid(int temp)
