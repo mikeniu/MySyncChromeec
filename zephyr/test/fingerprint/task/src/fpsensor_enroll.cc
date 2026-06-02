@@ -495,6 +495,57 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_finish_success)
 	zassert_equal(test_info_buffer->template_info.template_dirty, 0x1);
 }
 
+ZTEST_USER(fpsensor_enroll, test_enroll_max_capacity_reached)
+{
+	struct ec_params_fp_mode params = {
+		.mode = FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE,
+	};
+	struct ec_response_fp_mode response;
+	struct fingerprint_sensor_state state;
+	uint32_t fp_events;
+
+	/* Successfully start an enrollment session. */
+	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
+	zassert_true(response.mode &
+		     (FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE));
+
+	/* Give opportunity for fpsensor task to change mode. */
+	k_msleep(1);
+
+	/* Artificially simulate reaching full capacity mid-session. */
+	global_context.templ_valid = FP_MAX_FINGER_COUNT;
+
+	/* Put finger on the sensor. */
+	fingerprint_get_state(fp_sim, &state);
+	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
+	fingerprint_set_state(fp_sim, &state);
+
+	/* Prepare image. */
+	memset(image_buffer, 1, IMAGE_SIZE);
+	fingerprint_load_image(fp_sim, image_buffer, IMAGE_SIZE);
+
+	/* Ping fpsensor task. */
+	fingerprint_run_callback(fp_sim);
+	k_msleep(1);
+
+	/* Confirm MKBP event was sent and contains the error payload. */
+	zassert_equal(mkbp_send_event_fake.call_count, 1);
+
+	fp_get_next_event((uint8_t *)&fp_events);
+	zassert_true(fp_events & EC_MKBP_FP_ENROLL);
+	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
+		      EC_MKBP_FP_ERR_ENROLL_INTERNAL);
+
+	/* Confirm that the enrollment session was automatically torn down and
+	 * the algorithm's state is properly cleaned up. */
+	params.mode = FP_MODE_DONT_CHANGE;
+	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
+	zassert_false(response.mode & FP_MODE_ENROLL_SESSION,
+		      "Enrollment session should have been deactivated");
+	zassert_equal(mock_alg_enroll_finish_fake.call_count, 1,
+		      "Algorithm enrollment state should be aborted");
+}
+
 static void *fpsensor_setup(void)
 {
 	/* Start shimmed tasks. */
