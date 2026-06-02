@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "687584cd_240a49dd",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 28
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T17:52:49Z",
+      "side": 1,
+      "message": "We can improve the readability if we create a small `WriteRegs` helper function. Here are instructions from Gemini. Verify the code is correct.\n\n\n----\n\nHere is the complete set of changes required to implement the `WriteRegs` helper and update all applicable call sites in the codebase.\n\nBy grouping these sequential register writes into single `std::initializer_list` calls, we eliminate a significant amount of boilerplate error-checking and make the hardware sequences much easier to read.\n\n### 1. Header Changes (`util/egis/bootrom.h`)\n\nFirst, we define the `RegWrite` struct and declare the `WriteRegs` method inside the `BootromComm` class.\n\n```cpp\n// Inside class BootromComm { ... }\n public:\n  // Add this struct definition\n  struct RegWrite {\n    uint32_t address;\n    uint32_t value;\n  };\n\n  // ... existing methods ...\n  std::expected\u003cuint32_t, BootromError\u003e ReadReg(uint32_t addr);\n  std::expected\u003cvoid, BootromError\u003e WriteReg(uint32_t addr, uint32_t value);\n  \n  // Add the new helper method declaration\n  std::expected\u003cvoid, BootromError\u003e WriteRegs(std::initializer_list\u003cRegWrite\u003e regs);\n\n```\n\n---\n\n### 2. Implementation Changes (`util/egis/bootrom.cc`)\n\nNext, we implement the helper and refactor the four functions that perform sequential register writes: `DisableWatchdog()`, `WriteEnable()`, `GetSr1()`, and `SetSr1()`.\n\n#### Add the `WriteRegs` Implementation\n\n```cpp\nstd::expected\u003cvoid, BootromError\u003e BootromComm::WriteRegs(\n    std::initializer_list\u003cRegWrite\u003e regs) {\n  for (const auto\u0026 [addr, val] : regs) {\n    if (auto res \u003d WriteReg(addr, val); !res) return res;\n  }\n  return {};\n}\n\n```\n\n#### Refactor `DisableWatchdog`\n\n```cpp\nstd::expected\u003cvoid, BootromError\u003e BootromComm::DisableWatchdog() {\n  std::println(\"--- Disabling Watchdog ---\");\n  return WriteRegs({\n      {EgisBootrom::kRegPwmCtrl, EgisBootrom::kPwmCtrlDisableMask},\n      {EgisBootrom::kRegPwmReload, EgisBootrom::kPwmReloadTimeoutVal},\n      {EgisBootrom::kRegPwmChnen, EgisBootrom::kPwmChnenDisableVal},\n      {EgisBootrom::kRegPwmMux, EgisBootrom::kPwmMuxDisableVal}\n  });\n}\n\n```\n\n#### Refactor `WriteEnable`\n\n```cpp\nstd::expected\u003cvoid, BootromError\u003e BootromComm::WriteEnable() {\n  uint32_t tctrl \u003d EgisBootrom::kTrnsModeNoneData | EgisBootrom::kTctrlCmdEnMsk;\n  \n  if (auto res \u003d WriteRegs({\n          {EgisBootrom::kSpiRegTfmat, 0},\n          {EgisBootrom::kSpiRegTctrl, tctrl},\n          {EgisBootrom::kSpiRegTfmat, EgisBootrom::kTfmat},\n          {EgisBootrom::kSpiRegCmd, EgisBootrom::kFlashWren}\n      }); !res) {\n    return res;\n  }\n  \n  return WaitForFlashReady();\n}\n\n```\n\n#### Refactor `GetSr1`\n\n```cpp\nstd::expected\u003cuint8_t, BootromError\u003e BootromComm::GetSr1() {\n  uint32_t tctrl \u003d EgisBootrom::kTrnsModeReadOnly | EgisBootrom::kTctrlCmdEnMsk;\n  \n  if (auto res \u003d WriteRegs({\n          {EgisBootrom::kSpiRegRdcnt, 0},\n          {EgisBootrom::kSpiRegTctrl, tctrl},\n          {EgisBootrom::kSpiRegTfmat, EgisBootrom::kTfmat},\n          {EgisBootrom::kSpiRegCmd, EgisBootrom::kFlashRdsr}\n      }); !res) {\n    return std::unexpected(res.error());\n  }\n  \n  std::this_thread::sleep_for(std::chrono::milliseconds(10));\n\n  auto res \u003d ReadReg(EgisBootrom::kSpiRegData);\n  if (!res) return std::unexpected(res.error());\n\n  return static_cast\u003cuint8_t\u003e(res.value() \u0026 0xFF);\n}\n\n```\n\n#### Refactor `SetSr1`\n\n```cpp\nstd::expected\u003cvoid, BootromError\u003e BootromComm::SetSr1(uint8_t sr1) {\n  if (auto res \u003d WriteEnable(); !res) return res;\n\n  uint32_t tctrl \u003d EgisBootrom::kTrnsModeWriteOnly | EgisBootrom::kTctrlCmdEnMsk;\n  \n  if (auto res \u003d WriteRegs({\n          {EgisBootrom::kSpiRegWrcnt, 0},\n          {EgisBootrom::kSpiRegTctrl, tctrl},\n          {EgisBootrom::kSpiRegTfmat, EgisBootrom::kTfmat},\n          {EgisBootrom::kSpiRegData, static_cast\u003cuint32_t\u003e(sr1)},\n          {EgisBootrom::kSpiRegCmd, EgisBootrom::kFlashWrsr}\n      }); !res) {\n    return res;\n  }\n\n  if (auto res \u003d WaitForFlashReady(); !res) {\n    std::println(stderr, \"[WARN] SetSr1 timed out waiting for flash.\");\n    return res;\n  }\n  return {};\n}\n\n```",
+      "range": {
+        "startLine": 266,
+        "startChar": 0,
+        "endLine": 276,
+        "endChar": 1
+      },
+      "revId": "1db65c830210c0700b3292a900db14253cbe5a43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d09a4e4c_1f0d26d0",
+        "filename": "util/egis/crypto_util_test.cc",
+        "patchSetId": 28
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T17:52:49Z",
+      "side": 1,
+      "message": "Slightly simpler way to write it:\n\n```\nstd::array\u003cuint8_t, crypto::kAesGcmIvSize\u003e all_zeros{};\n```",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 69
+      },
+      "revId": "1db65c830210c0700b3292a900db14253cbe5a43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
