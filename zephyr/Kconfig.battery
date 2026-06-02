@@ -110,6 +110,14 @@ config PLATFORM_EC_BATTERY_PRESENT_NONE
 
 endchoice # PLATFORM_EC_BATTERY_PRESENT_MODE
 
+config PLATFORM_EC_BATTERY_STATUS_CUSTOM
+	bool "Call a custom battery_status function"
+	help
+	  Use this method to provide a custom battery_status() function.
+	  This can be used to intercept or override the battery status
+	  reading from the fuel gauge, for example to provide status
+	  from an external processor.
+
 config PLATFORM_EC_USE_BATTERY_DEVICE_CHEMISTRY
 	bool "Provide information about battery chemistry"
 	help
@@ -166,6 +174,21 @@ config PLATFORM_EC_BATTERY_CUT_OFF
 	  console command and the EC_CMD_BATTERY_CUT_OFF host command.
 	  Once defined, a board specific board_cut_off_battery() function
 	  has to be provided.
+
+config PLATFORM_EC_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN
+	bool "Battery cut-off at shutdown"
+	depends on PLATFORM_EC_BATTERY_CUT_OFF
+	help
+	  If this option is enabled, all battery cutoff commands will be
+	  deferred until the chipset is shutting down.
+
+	  Some boards can only execute a battery cutoff when the power state is
+	  G3 (fully off). This feature allows for that requirement by forcing
+	  a shutdown when a cutoff is requested and delaying the actual
+	  battery command until the transition to G3.
+
+	  When enabled, the actual battery cutoff command is deferred until the
+	  transition to G3, triggered by the HOOK_CHIPSET_SHUTDOWN_COMPLETE hook.
 
 config PLATFORM_EC_BATTERY_CUTOFF_TIMEOUT_MSEC
 	int "Timeout for battery cutoff completion"
@@ -372,6 +395,11 @@ config PLATFORM_EC_HOSTCMD_BATTERY_INFO
 	  ec_response_battery_static/dynamic_info structures, only make sense
 	  when PLATFORM_EC_BATTERY_INFO is enabled.
 
+config PLATFORM_EC_HOSTCMD_BATTERY_GET_MISC_INFO
+	bool "Host command: battery misc info"
+	depends on PLATFORM_EC_BATTERY_FUEL_GAUGE
+	help
+	  Include host command to fetch battery misc info.
 endif # PLATFORM_EC_BATTERY_INFO
 
 if PLATFORM_EC_I2C_VIRTUAL_BATTERY
