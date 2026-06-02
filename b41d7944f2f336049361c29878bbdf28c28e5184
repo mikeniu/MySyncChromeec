@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cf80ae8_ca6f294d",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T18:13:12Z",
+      "side": 1,
+      "message": "**Silent Memory Corruption on Small Files (`updater.cc`)** In `IsEcBinHasConfigPage`, the EOF stream checking logic is flawed, leading to uninitialized memory reads.\n\n```c\n// Current Code\nfile.read(reinterpret_cast\u003cchar*\u003e(\u0026config), sizeof(config));\nif (!file.good() \u0026\u0026 !file.eof()) { ... }\n\n```\n\nIf the file is smaller than `sizeof(config)`, `file.read` hits EOF. This sets both `failbit` and `eofbit`. `!file.good()` evaluates to `true`, but `!file.eof()` evaluates to `false`. The entire `if` block evaluates to `false`, and the application incorrectly proceeds to validate `config.code_valid_control_word` on uninitialized stack memory.\n\n* **Recommendation:** Check if the correct number of bytes were read.\n\n```c\nif (file.gcount() !\u003d sizeof(config)) {\n  FT_LOGE(\"Failed to read config page (file too small).\");\n  return std::unexpected(FtError::kResultFail);\n}\n\n```",
+      "range": {
+        "startLine": 271,
+        "startChar": 0,
+        "endLine": 271,
+        "endChar": 57
+      },
+      "revId": "b41d7944f2f336049361c29878bbdf28c28e5184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
