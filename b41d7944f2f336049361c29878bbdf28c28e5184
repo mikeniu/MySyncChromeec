@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "917fa633_d06cae59",
+        "filename": "util/focaltech/ft_log.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T18:30:34Z",
+      "side": 1,
+      "message": "**Hardcoded ANSI Colors in Logs (`ft_log.h`)** Using `\\033[31m` escape sequences looks great in an interactive terminal but will pollute automated build logs, `syslog`, or `cros flash` output with visual garbage (e.g., `^[[31m`).\n\n* **Recommendation:** Detect if `stdout` is a TTY (`isatty(fileno(stdout))`).",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 37
+      },
+      "revId": "b41d7944f2f336049361c29878bbdf28c28e5184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c8487b5d_ddda9858",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 18
