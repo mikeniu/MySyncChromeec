@@ -125,6 +125,18 @@ utils-host:
 	$(error Building utils-host not supported when BOARD is not "host")
 endif
 
+# Top-level target for host utility unit tests
+.PHONY: utils-test
+ifeq ($(BOARD),host)
+# utils-test depends on utils-host to ensure binaries are compiled first
+utils-test: utils-host
+	@echo "======= running host utility unit tests"
+else
+utils-test:
+	$(error Running utils-test not supported when BOARD is not "host")
+endif
+
+
 # On board test binaries
 test-targets=$(foreach t,$(test-list-y),test-$(t))
 .PHONY: $(test-targets)
@@ -310,6 +322,7 @@ help:
 	@echo "  test-coverage        - Build and run all host unit tests for code coverage"
 	@echo ""
 	@echo "  BOARD=host utils-host        - Build EC host utilities"
+	@echo "  BOARD=host utils-test        - Build and run EC host utility unit tests"
 	@echo ""
 	@echo "  print-tests     [BOARD=]     - Print on-device test targets"
 	@echo "  print-host-tests             - Print all host unit test targets"
