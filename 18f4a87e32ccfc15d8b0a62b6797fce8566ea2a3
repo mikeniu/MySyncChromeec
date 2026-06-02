@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "986be92f_655bcb7b",
+        "filename": "zephyr/dts/bindings/battery/battery-smart.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-06-02T06:04:59Z",
+      "side": 1,
+      "message": "Please follow the naming style in this folder, and rename these to \u0027smp,xxxxx\u0027 in all lowercase.",
+      "range": {
+        "startLine": 147,
+        "startChar": 0,
+        "endLine": 152,
+        "endChar": 27
+      },
+      "revId": "18f4a87e32ccfc15d8b0a62b6797fce8566ea2a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
