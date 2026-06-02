@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa6476e1_1a983a0f",
+        "filename": "zephyr/program/calypso/mensa/led_policy.dtsi",
+        "patchSetId": 5
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-06-02T08:38:56Z",
+      "side": 1,
+      "message": "we don\u0027t have the charge-state enabled for this platform yet.\n\nchipset-state and battery should be available.",
+      "range": {
+        "startLine": 25,
+        "startChar": 3,
+        "endLine": 25,
+        "endChar": 39
+      },
+      "revId": "13307e4589a8196b5f4f9798f96ab83a88977297",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
