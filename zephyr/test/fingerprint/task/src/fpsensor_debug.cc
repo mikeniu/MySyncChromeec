@@ -39,8 +39,6 @@ int system_is_locked(void)
 	return is_locked;
 }
 
-DEFINE_FFF_GLOBALS;
-
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
 ZTEST_SUITE(fpsensor_debug, NULL, NULL, NULL, NULL, NULL);
