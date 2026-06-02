@@ -19,8 +19,6 @@
 #include <zephyr/sys/util.h>
 #include <zephyr/ztest.h>
 
-DEFINE_FFF_GLOBALS;
-
 #define TEST_KBD_SCAN_NODE DT_NODELABEL(fake_input_device)
 
 INPUT_KBD_MATRIX_DT_DEFINE(TEST_KBD_SCAN_NODE);

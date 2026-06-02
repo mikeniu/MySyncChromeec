@@ -14,8 +14,6 @@ extern "C" {
 #include <fpsensor/fpsensor_led.h>
 #include <mkbp_event.h>
 
-DEFINE_FFF_GLOBALS;
-
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
 const struct device *pwm_fp_led =
