@@ -559,7 +559,8 @@ static enum ec_error_list encrypt_template(uint16_t fgr)
 	return EC_SUCCESS;
 }
 
-static enum ec_status get_frame(uint32_t offset, uint32_t size, uint8_t *output)
+test_export_static enum ec_status get_frame(uint32_t offset, uint32_t size,
+					    uint8_t *output)
 {
 	enum ec_error_list ret;
 
