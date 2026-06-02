@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0dc2541c_05207af2",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T19:19:49Z",
+      "side": 1,
+      "message": "Some more from Gemini:\n\n----\n\n\n### 1. `ec_host_response` Construction (`cli_test.cc`)\n\nJust like `ec_host_request` in `cli.cc`, the mock response builder in the tests assigns fields procedurally.\n\n```cpp\n// Before:\nec_host_response resp{};\nresp.struct_version \u003d EC_HOST_RESPONSE_VERSION;  // \u003d 3\nresp.result \u003d result;\nresp.data_len \u003d data.size();\nresp.reserved \u003d 0;\n\n// After:\nec_host_response resp{\n    .struct_version \u003d EC_HOST_RESPONSE_VERSION,\n    .checksum \u003d 0, // Placeholder for checksum calculation\n    .result \u003d static_cast\u003cuint16_t\u003e(result),\n    .data_len \u003d static_cast\u003cuint16_t\u003e(data.size()),\n    .reserved \u003d 0,\n};\n\n```\n\n### 2. `UsbDeviceId` Instantiations (Multiple Files)\n\nIn a few places, `UsbDeviceId` is initialized using positional arguments. While this works because it\u0027s a simple aggregate `(uint16_t, uint16_t)`, designated initializers prevent accidental field swapping (e.g., passing PID where VID is expected).\n\n**In `libusb_transport.cc`:**\n\n```cpp\n// Before:\nUsbDeviceId id{desc.idVendor, desc.idProduct};\n\n// After:\nUsbDeviceId id{.vid \u003d desc.idVendor, .pid \u003d desc.idProduct};\n\n```\n\n**In `updater_test.cc` (StubUsbTransport):**\n\n```cpp\n// Before:\nUsbDeviceId device_id() const override { return {0x2808, 0x0001}; }\n\n// After:\nUsbDeviceId device_id() const override { \n    return UsbDeviceId{.vid \u003d 0x2808, .pid \u003d 0x0001}; \n}\n\n```\n\n**In `usb_device_test.cc`:**\n\n```cpp\n// Before:\nUsbDeviceId expected_id{0x2808, 0x0001};\n\n// After:\nUsbDeviceId expected_id{.vid \u003d 0x2808, .pid \u003d 0x0001};\n\n```\n\n### 3. Procedural `Csw` Construction (`ft_scsi_test.cc`)\n\n*(Note: If you implement the `test_utils.h` refactor we discussed earlier, this is automatically fixed! But looking purely at the original patch, it stands out).*\n\nIn `ft_scsi_test.cc`, `BuildValidCsw` and the malformed CSW test both construct the struct procedurally.\n\n```cpp\n// Before:\nCsw csw;\ncsw.sig \u003d htole32(0x53425355);\ncsw.tag \u003d htole32(tag);\ncsw.residue \u003d 0;\ncsw.status \u003d 0;\n\n// After (Using the native C++23 endianness helper):\nCsw csw{\n    .sig \u003d ToLittleEndian\u003cuint32_t\u003e(0x53425355),\n    .tag \u003d ToLittleEndian\u003cuint32_t\u003e(tag),\n    .residue \u003d 0,\n    .status \u003d 0,\n};\n\n```",
+      "parentUuid": "ddab8c47_57c76c0f",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 19
+      },
+      "revId": "b41d7944f2f336049361c29878bbdf28c28e5184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "baf0f0b5_fe0691ca",
         "filename": "util/focaltech/cli.cc",
         "patchSetId": 18
