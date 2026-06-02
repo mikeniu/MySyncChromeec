@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7068098a_ab4016c8",
+        "filename": "util/focaltech/build.mk",
+        "patchSetId": 17
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-02T10:06:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "25e7f253_d6f293e3",
+      "range": {
+        "startLine": 22,
+        "startChar": 18,
+        "endLine": 22,
+        "endChar": 20
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bfc27e00_b553afc6",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-01T21:08:44Z",
       "side": 1,
       "message": "These are EC commands, right? You should write them the same way that we do in `ec_commands.h`",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 80
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b8323dd_fd46e79d",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-02T10:06:21Z",
+      "side": 1,
+      "message": "Yes, it is. Add ec_command.h, reference the macro definitions EC_CMD_GET_BUILD_INFO / EC_CMD_ENTER_BOOTLOADER and the ec_host_response / ec_host_request structures from ec_command.h.",
+      "parentUuid": "bfc27e00_b553afc6",
       "range": {
         "startLine": 16,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b5c3a27_15cb95df",
+        "filename": "util/focaltech/cli.h",
+        "patchSetId": 17
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-02T10:06:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6819d473_75f1477c",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 2,
+        "endChar": 29
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8285579f_7ab666fb",
@@ -93,6 +165,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae45b998_0e093b7b",
+        "filename": "util/focaltech/cli_test.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-02T10:06:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8285579f_7ab666fb",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 45
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a199954f_8b56aa35",
@@ -106,6 +202,30 @@
       "writtenOn": "2026-06-01T20:57:28Z",
       "side": 1,
       "message": "**Constant Initialization (`ft_log.h`)** `constexpr const char* kLogTag` works, but modern C++ style prefers `inline constexpr` for header-defined string constants to prevent One Definition Rule (ODR) violations and duplicate string literals across translation units.\n\n* **Fix:** `inline constexpr std::string_view kLogTag \u003d \"focaltech\";`",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 44
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1e218ba_2f538f34",
+        "filename": "util/focaltech/ft_log.h",
+        "patchSetId": 17
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-02T10:06:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a199954f_8b56aa35",
       "range": {
         "startLine": 23,
         "startChar": 0,
@@ -163,6 +283,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4e138fc_866b9b2e",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-02T10:06:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e52ce64_df70d3ee",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 4,
+        "endChar": 3
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2173ed93_215ba9b6",
@@ -176,6 +320,30 @@
       "writtenOn": "2026-06-01T20:57:28Z",
       "side": 1,
       "message": "**Redundant Move Logic (`libusb_transport.cc`)** In your move constructor for `LibusbTransport`, you correctly use `std::move()` on your `std::unique_ptr`s (`ctx_` and `handle_`). `std::unique_ptr` naturally nulls out the source pointer upon being moved.\n\n* **Improvement:** You only need to reset the primitive members of the `other` object. The smart pointers handle themselves.",
+      "range": {
+        "startLine": 195,
+        "startChar": 0,
+        "endLine": 203,
+        "endChar": 28
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7e40625_70b3d5f9",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-02T10:06:21Z",
+      "side": 1,
+      "message": "This is defensive programming, and the overhead is very low. The current implementation is acceptable.",
+      "parentUuid": "2173ed93_215ba9b6",
       "range": {
         "startLine": 195,
         "startChar": 0,
@@ -209,6 +377,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d9c360e_b5ae2bb4",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-02T10:06:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b899cb5_41db5840",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 23
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8bd5edc1_3eeeb2cb",
@@ -222,6 +414,30 @@
       "writtenOn": "2026-06-01T20:57:28Z",
       "side": 1,
       "message": "**String termination in `FtGetBootVersion` (`updater.cc`)** You are guaranteeing a null-terminator at the very end of the buffer using `data.back() \u003d \u0027\\0\u0027`. However, if the device returns a short version string followed by uninitialized garbage (instead of null-padding), `std::string` will include that garbage until it hits the final byte.\n\n* **Fix:** Read up to the first null byte explicitly.\n\n```c\nauto null_pos \u003d std::ranges::find(data, \u0027\\0\u0027);\nstd::string version(data.begin(), null_pos);\n\n```",
+      "range": {
+        "startLine": 264,
+        "startChar": 0,
+        "endLine": 267,
+        "endChar": 39
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54f6fc89_35a3057c",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-02T10:06:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8bd5edc1_3eeeb2cb",
       "range": {
         "startLine": 264,
         "startChar": 0,
@@ -255,6 +471,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "38fe19ff_693303a8",
+        "filename": "util/focaltech/updater_test.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-02T10:06:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "085fc702_b03e936a",
+      "range": {
+        "startLine": 143,
+        "startChar": 0,
+        "endLine": 143,
+        "endChar": 50
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "75d0377c_351c7309",
@@ -278,6 +518,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4450a866_2adf196d",
+        "filename": "util/focaltech/usb_transport.h",
+        "patchSetId": 17
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-02T10:06:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "75d0377c_351c7309",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 2,
+        "endChar": 39
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1492b58c_dabcb48d",
@@ -291,6 +555,30 @@
       "writtenOn": "2026-06-01T20:50:02Z",
       "side": 1,
       "message": "Missing newline at end of file",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 6
+      },
+      "revId": "b3583f3628496f9c614211af85ac648cbc8fa1e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "839facb3_3e27c90f",
+        "filename": "util/focaltech/usb_transport.h",
+        "patchSetId": 17
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-02T10:06:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1492b58c_dabcb48d",
       "range": {
         "startLine": 29,
         "startChar": 0,
