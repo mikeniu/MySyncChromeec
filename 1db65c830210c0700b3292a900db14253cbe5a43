@@ -45,6 +45,29 @@
       },
       "revId": "1db65c830210c0700b3292a900db14253cbe5a43",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cb45bcc_60d9df00",
+        "filename": "util/egis/egis_util.h",
+        "patchSetId": 28
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T17:53:37Z",
+      "side": 1,
+      "message": "Slightly simpler way to write it:\n\n```\ntemplate \u003csize_t N\u003e\nconstexpr std::string_view MakeStringView(const char (\u0026str)[N]) {\n  return std::string_view(str, std::ranges::find(str, \u0027\\0\u0027));\n}\n```",
+      "range": {
+        "startLine": 87,
+        "startChar": 0,
+        "endLine": 92,
+        "endChar": 0
+      },
+      "revId": "1db65c830210c0700b3292a900db14253cbe5a43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
