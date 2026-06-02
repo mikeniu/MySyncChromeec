@@ -46,6 +46,30 @@
       },
       "revId": "51aee4b51c298834377abc3a06ccaadd501c7750",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69490f96_4d061e8a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 17
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T21:26:10Z",
+      "side": 1,
+      "message": "The current commit message still sounds like you\u0027re adding some validation rather than adding a test.",
+      "parentUuid": "3e0ed854_7c698942",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 62
+      },
+      "revId": "51aee4b51c298834377abc3a06ccaadd501c7750",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

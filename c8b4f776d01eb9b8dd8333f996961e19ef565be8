@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d9cd321_ee91ffee",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T21:26:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70f30df4_670f2e8b",
+      "revId": "c8b4f776d01eb9b8dd8333f996961e19ef565be8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a904e69b_847efb25",
@@ -103,6 +121,24 @@
       "side": 1,
       "message": "I set `expected_canary` in `static void get_frame_before(void *f)`. This is the same pattern for all unit tests.",
       "parentUuid": "738fff4d_f2031c6e",
+      "revId": "c8b4f776d01eb9b8dd8333f996961e19ef565be8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "369f0fbe_87fce4a8",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 633,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T21:26:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6c9a65bf_7728f48f",
       "revId": "c8b4f776d01eb9b8dd8333f996961e19ef565be8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
