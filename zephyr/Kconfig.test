@@ -6,6 +6,8 @@
 
 if ZTEST
 
+rsource "test/test_utils/Kconfig"
+
 config PLATFORM_EC_TEST_CC_USBPD
 	bool "Enable USBPD console channel"
 	help
