@@ -19,7 +19,7 @@ $(_focaltech_bin): HOST_CXXFLAGS+=$(shell $(HOST_PKG_CONFIG) --cflags libusb-1.0
 $(_focaltech_bin): HOST_LDFLAGS+=$(shell $(HOST_PKG_CONFIG) --libs  libusb-1.0 boringssl)
 
 
-#add focaltech test 
+#add focaltech test
 host-util-bin-cxx-y += focaltech_test
 focaltech_test-objs := $(addprefix $(_cur_dir)/, \
 	ft_util_test.o \

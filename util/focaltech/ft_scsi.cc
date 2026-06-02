@@ -22,7 +22,7 @@ constexpr uint8_t kBotDirectionOut = 0x00;
 constexpr uint8_t kBotCommandPassed = 0x00;
 
 using namespace std::chrono_literals;
-constexpr auto kResetWaitTimeout = 200ms;
+constexpr auto kResetWaitTimeout = 3000ms;
 
 struct BulkCbWrap {
   uint32_t signature;

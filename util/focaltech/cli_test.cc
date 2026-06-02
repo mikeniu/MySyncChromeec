@@ -5,10 +5,12 @@
 
 #include "cli.h"
 
+#include <ec_commands.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <array>
+#include <cstring>
 #include <span>
 #include <string_view>
 #include <vector>
@@ -26,26 +28,120 @@ using ::testing::SetArgPointee;
 constexpr size_t kUsbCbwSize = 31;
 constexpr size_t kUsbCswSize = 13;
 
-// Mock USB transport for CLI tests that require hardware interaction.
-class MockUsbTransport : public UsbTransport {
- public:
-  MOCK_METHOD(UsbDeviceId, device_id, (), (const, override));
-  MOCK_METHOD((std::expected<int, FtError>), Send,
-              (std::span<const uint8_t>, std::chrono::milliseconds),
-              (override));
-  MOCK_METHOD((std::expected<int, FtError>), Recv,
-              (std::span<uint8_t>, std::chrono::milliseconds), (override));
-  MOCK_METHOD((std::expected<void, FtError>), WaitForReset,
-              (std::chrono::milliseconds), (override));
-};
-
-// Helper to create a UsbDevice with a given transport.
 static UsbDevice MakeDevice(std::unique_ptr<UsbTransport> transport) {
   return UsbDevice(std::move(transport));
 }
 
 // -----------------------------------------------------------------------------
-// ParseArguments Tests
+// Enhanced fake transport that supports multiple responses and selective send
+// failures.
+// -----------------------------------------------------------------------------
+class FakeEcTransport : public UsbTransport {
+ public:
+  explicit FakeEcTransport(UsbDeviceId id = {kFocalEcVid, kFocalEcPidTest})
+      : device_id_(id) {}
+
+  // Add a response that will be returned for the next command (FIFO).
+  void AddResponse(std::vector<uint8_t> response) {
+    responses_.push_back(std::move(response));
+  }
+
+  // Make the Nth send (0‑based) fail with FtError::kNoSuchDevice.
+  void FailSendOnCommand(size_t cmd_index) { fail_on_command_ = cmd_index; }
+
+  // UsbTransport interface
+  UsbDeviceId device_id() const override { return device_id_; }
+
+  std::expected<int, FtError> Send(std::span<const uint8_t> data,
+                                   std::chrono::milliseconds) override {
+    last_sent_.assign(data.begin(), data.end());
+
+    if (send_count_ == fail_on_command_) {
+      ++send_count_;
+      return std::unexpected(FtError::kNoSuchDevice);
+    }
+    ++send_count_;
+    return static_cast<int>(data.size());
+  }
+
+  std::expected<int, FtError> Recv(std::span<uint8_t> data,
+                                   std::chrono::milliseconds) override {
+    if (response_idx_ >= responses_.size()) {
+      // No response prepared – return 0 bytes (simulates empty read).
+      return 0;
+    }
+
+    const auto& resp = responses_[response_idx_];
+    if (recv_offset_ >= resp.size()) {
+      // Fully consumed this response; move to next one for the next command.
+      ++response_idx_;
+      recv_offset_ = 0;
+      if (response_idx_ >= responses_.size()) {
+        return 0;
+      }
+      // Recursively call to serve the next response (should not happen in
+      // normal flow because Recv is called once per command).
+      return Recv(data, std::chrono::milliseconds(0));
+    }
+
+    size_t to_copy = std::min(data.size(), resp.size() - recv_offset_);
+    memcpy(data.data(), resp.data() + recv_offset_, to_copy);
+    recv_offset_ += to_copy;
+    return static_cast<int>(to_copy);
+  }
+
+  std::expected<void, FtError> WaitForReset(
+      std::chrono::milliseconds) override {
+    return {};
+  }
+
+  const std::vector<uint8_t>& last_sent() const { return last_sent_; }
+
+ private:
+  UsbDeviceId device_id_;
+  std::vector<std::vector<uint8_t>> responses_;
+  size_t response_idx_ = 0;
+  size_t recv_offset_ = 0;
+  size_t send_count_ = 0;
+  size_t fail_on_command_ = static_cast<size_t>(-1);
+  std::vector<uint8_t> last_sent_;
+};
+
+// -----------------------------------------------------------------------------
+// Helper functions to build EC responses
+// -----------------------------------------------------------------------------
+std::vector<uint8_t> BuildEcResponse(uint16_t result,
+                                     std::vector<uint8_t> data) {
+  ec_host_response resp{};
+  resp.struct_version = EC_HOST_RESPONSE_VERSION;  // = 3
+  resp.result = result;
+  resp.data_len = data.size();
+  resp.reserved = 0;
+
+  std::vector<uint8_t> packet(sizeof(resp) + data.size());
+  memcpy(packet.data(), &resp, sizeof(resp));
+  if (!data.empty()) {
+    memcpy(packet.data() + sizeof(resp), data.data(), data.size());
+  }
+
+  uint8_t checksum = 0;
+  for (uint8_t b : packet) checksum += b;
+  packet[1] = -checksum;
+  return packet;
+}
+
+std::vector<uint8_t> BuildStringResponse(std::string_view str) {
+  std::vector<uint8_t> data(str.begin(), str.end());
+  if (data.empty() || data.back() != '\0') data.push_back('\0');
+  return BuildEcResponse(EC_RES_SUCCESS, data);
+}
+
+std::vector<uint8_t> BuildEmptySuccessResponse() {
+  return BuildEcResponse(EC_RES_SUCCESS, {});
+}
+
+// -----------------------------------------------------------------------------
+// ParseArguments, ParseInt, DeviceInit tests (unchanged)
 // -----------------------------------------------------------------------------
 TEST(CliTest, ParseArguments_UpdateCommand) {
   std::vector<std::string_view> args = {"firmware.bin"};
@@ -108,9 +204,6 @@ TEST(CliTest, ParseArguments_UnknownCommand) {
   EXPECT_EQ(config.error(), FtError::kParameterError);
 }
 
-// -----------------------------------------------------------------------------
-// ParseInt Utility Tests
-// -----------------------------------------------------------------------------
 TEST(CliTest, ParseInt_Valid) {
   auto res = ParseInt("42");
   ASSERT_TRUE(res.has_value());
@@ -129,9 +222,6 @@ TEST(CliTest, ParseInt_Invalid) {
   EXPECT_EQ(res.error(), FtError::kParameterError);
 }
 
-// -----------------------------------------------------------------------------
-// DeviceInit Tests
-// -----------------------------------------------------------------------------
 TEST(CliTest, DeviceInit_RomMode) {
   UsbDeviceId id{.vid = kFocalRomVid, .pid = kFocalRomPid};
   FtDeviceInfo info;
@@ -173,10 +263,221 @@ TEST(CliTest, DeviceInit_Unknown) {
 }
 
 // -----------------------------------------------------------------------------
-// ExecuteCommand Tests using proper fake transports with CSW handling
+// EC protocol command tests
 // -----------------------------------------------------------------------------
+TEST(CliTest, GetBuildInfo_Success) {
+  auto transport = std::make_unique<FakeEcTransport>();
+  auto* fake = transport.get();
+  UsbDevice device = MakeDevice(std::move(transport));
+  fake->AddResponse(BuildStringResponse("chojnik_v1.2.3"));
 
-// Helper: build a valid CSW.
+  auto result = GetBuildInfo(device);
+  ASSERT_TRUE(result.has_value());
+  EXPECT_EQ(*result, "chojnik_v1.2.3");
+}
+
+TEST(CliTest, GetBuildInfo_NoDevice) {
+  auto transport = std::make_unique<FakeEcTransport>();
+  auto* fake = transport.get();
+  UsbDevice device = MakeDevice(std::move(transport));
+  fake->FailSendOnCommand(0);  // First send fails with kNoSuchDevice
+
+  auto result = GetBuildInfo(device);
+  EXPECT_FALSE(result.has_value());
+  EXPECT_EQ(result.error(), FtError::kNoSuchDevice);
+}
+
+TEST(CliTest, SwitchToBootloader_Success) {
+  auto transport = std::make_unique<FakeEcTransport>();
+  auto* fake = transport.get();
+  UsbDevice device = MakeDevice(std::move(transport));
+  fake->AddResponse(BuildEmptySuccessResponse());
+
+  auto result = SwitchToBootloader(device, 0);
+  EXPECT_TRUE(result.has_value());
+
+  const auto& sent = fake->last_sent();
+  ASSERT_GE(sent.size(), sizeof(ec_host_request));
+  const ec_host_request* req =
+      reinterpret_cast<const ec_host_request*>(sent.data());
+  EXPECT_EQ(req->command, EC_CMD_ENTER_BOOTLOADER);
+}
+
+TEST(CliTest, SwitchToRom_Success) {
+  auto transport = std::make_unique<FakeEcTransport>();
+  auto* fake = transport.get();
+  UsbDevice device = MakeDevice(std::move(transport));
+  fake->AddResponse(BuildEmptySuccessResponse());
+
+  auto result = SwitchToRom(device);
+  EXPECT_TRUE(result.has_value());
+
+  const auto& sent = fake->last_sent();
+  ASSERT_GE(sent.size(), sizeof(ec_host_request));
+  const ec_host_request* req =
+      reinterpret_cast<const ec_host_request*>(sent.data());
+  EXPECT_EQ(req->command, 0xFACE);
+}
+
+// -----------------------------------------------------------------------------
+// CheckEcBuildVersion tests
+// -----------------------------------------------------------------------------
+TEST(CliTest, CheckEcBuildVersion_Success) {
+  auto transport = std::make_unique<FakeEcTransport>();
+  auto* fake = transport.get();
+  UsbDevice device = MakeDevice(std::move(transport));
+  fake->AddResponse(BuildStringResponse("ft9001_v2.0"));
+
+  auto result = CheckEcBuildVersion(device, FtDeviceMode::kEc);
+  EXPECT_TRUE(result.has_value());
+}
+
+TEST(CliTest, CheckEcBuildVersion_UnsupportedProject) {
+  auto transport = std::make_unique<FakeEcTransport>();
+  auto* fake = transport.get();
+  UsbDevice device = MakeDevice(std::move(transport));
+  fake->AddResponse(BuildStringResponse("unsupported_project_v1.0"));
+
+  auto result = CheckEcBuildVersion(device, FtDeviceMode::kEc);
+  EXPECT_FALSE(result.has_value());
+  EXPECT_EQ(result.error(), FtError::kNoSuchDevice);
+}
+
+TEST(CliTest, CheckEcBuildVersion_RetrySuccess) {
+  auto transport = std::make_unique<FakeEcTransport>();
+  auto* fake = transport.get();
+  UsbDevice device = MakeDevice(std::move(transport));
+  // First attempt fails with device loss, second succeeds.
+  fake->FailSendOnCommand(0);
+  fake->AddResponse(BuildStringResponse("chojnik_v3.0"));
+
+  auto result = CheckEcBuildVersion(device, FtDeviceMode::kEc);
+  EXPECT_TRUE(result.has_value());
+}
+
+TEST(CliTest, CheckEcBuildVersion_AllRetriesFail) {
+  auto transport = std::make_unique<FakeEcTransport>();
+  auto* fake = transport.get();
+  UsbDevice device = MakeDevice(std::move(transport));
+  // Make all kMaxRetry attempts fail with device loss.
+  for (int i = 0; i < kMaxRetry; ++i) {
+    fake->FailSendOnCommand(i);
+  }
+  // No response added – will cause recv to return 0 after send succeeds,
+  // which triggers "Insufficient data" error.
+  // We actually want the send to always fail, so we already set failures.
+  // No response needed.
+
+  auto result = CheckEcBuildVersion(device, FtDeviceMode::kEc);
+  EXPECT_FALSE(result.has_value());
+  EXPECT_EQ(result.error(), FtError::kResultFail);
+}
+
+// -----------------------------------------------------------------------------
+// SwitchMcuMode tests
+// -----------------------------------------------------------------------------
+TEST(CliTest, SwitchMcuMode_EnterBoot) {
+  auto transport = std::make_unique<FakeEcTransport>();
+  auto* fake = transport.get();
+  UsbDevice device = MakeDevice(std::move(transport));
+
+  // Command 0: GetBuildInfo (succeeds)
+  fake->AddResponse(BuildStringResponse("ft9001_v1.0"));
+  // Command 1: SwitchToBootloader – we simulate device loss.
+  fake->FailSendOnCommand(1);
+  // We don't need a response for the switch command because send fails.
+
+  auto result = SwitchMcuMode(device, FtDeviceMode::kEc, Command::kEnterBoot);
+  EXPECT_TRUE(result.has_value());
+}
+
+TEST(CliTest, SwitchMcuMode_EnterRom) {
+  auto transport = std::make_unique<FakeEcTransport>();
+  auto* fake = transport.get();
+  UsbDevice device = MakeDevice(std::move(transport));
+
+  // Command 0: GetBuildInfo (succeeds)
+  fake->AddResponse(BuildStringResponse("chojnik_v2.0"));
+  // Command 1: SwitchToRom – device loss.
+  fake->FailSendOnCommand(1);
+
+  auto result = SwitchMcuMode(device, FtDeviceMode::kTest, Command::kEnterRom);
+  EXPECT_TRUE(result.has_value());
+}
+
+TEST(CliTest, SwitchMcuMode_FailsIfBuildVersionFails) {
+  auto transport = std::make_unique<FakeEcTransport>();
+  auto* fake = transport.get();
+  UsbDevice device = MakeDevice(std::move(transport));
+
+  // First command (GetBuildInfo) fails with device loss.
+  fake->FailSendOnCommand(0);
+
+  auto result = SwitchMcuMode(device, FtDeviceMode::kEc, Command::kEnterBoot);
+  EXPECT_FALSE(result.has_value());
+  EXPECT_EQ(result.error(), FtError::kResultFail);
+}
+
+// -----------------------------------------------------------------------------
+// ExecuteCommand tests for EC commands
+// -----------------------------------------------------------------------------
+TEST(CliTest, ExecuteCommand_GetEcVersion_Success) {
+  auto transport = std::make_unique<FakeEcTransport>();
+  auto* fake = transport.get();
+  UsbDevice device = MakeDevice(std::move(transport));
+  fake->AddResponse(BuildStringResponse("ft9001_v2.0"));
+
+  AppConfig config{.cmd = Command::kGetEcVersion};
+  FtDeviceInfo info{.current_mode = FtDeviceMode::kEc};
+
+  auto result = ExecuteCommand(config, device, info);
+  EXPECT_TRUE(result.has_value());
+}
+
+TEST(CliTest, ExecuteCommand_EnterBoot_Success) {
+  auto transport = std::make_unique<FakeEcTransport>();
+  auto* fake = transport.get();
+  UsbDevice device = MakeDevice(std::move(transport));
+
+  fake->AddResponse(BuildStringResponse("ft9001_v1.0"));
+  fake->FailSendOnCommand(1);  // Switch command fails with device loss
+
+  AppConfig config{.cmd = Command::kEnterBoot};
+  FtDeviceInfo info{.current_mode = FtDeviceMode::kEc};
+
+  auto result = ExecuteCommand(config, device, info);
+  EXPECT_TRUE(result.has_value());
+}
+
+TEST(CliTest, ExecuteCommand_EnterRom_FromTestMode) {
+  auto transport = std::make_unique<FakeEcTransport>();
+  auto* fake = transport.get();
+  UsbDevice device = MakeDevice(std::move(transport));
+
+  fake->AddResponse(BuildStringResponse("ft9001_v1.0"));
+  fake->FailSendOnCommand(1);  // Switch command fails with device loss
+
+  AppConfig config{.cmd = Command::kEnterRom};
+  FtDeviceInfo info{.current_mode = FtDeviceMode::kTest};
+
+  auto result = ExecuteCommand(config, device, info);
+  EXPECT_TRUE(result.has_value());
+}
+
+TEST(CliTest, ExecuteCommand_UnknownCommand) {
+  auto transport = std::make_unique<FakeEcTransport>();
+  UsbDevice device = MakeDevice(std::move(transport));
+  AppConfig config{.cmd = Command::kUnknown};
+  FtDeviceInfo info{.current_mode = FtDeviceMode::kBoot};
+
+  auto result = ExecuteCommand(config, device, info);
+  EXPECT_FALSE(result.has_value());
+  EXPECT_EQ(result.error(), FtError::kParameterError);
+}
+
+// -----------------------------------------------------------------------------
+// SCSI-based command tests (GetFlashWp, SetFlashWp) – unchanged
+// -----------------------------------------------------------------------------
 static void BuildCsw(std::span<uint8_t> data, uint32_t tag, uint8_t status) {
   struct __attribute__((packed)) BulkCsWrap {
     uint32_t signature;
@@ -184,59 +485,11 @@ static void BuildCsw(std::span<uint8_t> data, uint32_t tag, uint8_t status) {
     uint32_t data_residue;
     uint8_t status;
   };
-  BulkCsWrap csw{.signature = htole32(0x53425355),  // kUsbMsCswSignature
+  BulkCsWrap csw{.signature = htole32(0x53425355),
                  .tag = htole32(tag),
                  .data_residue = 0,
                  .status = status};
   std::memcpy(data.data(), &csw, sizeof(csw));
-}
-
-TEST(CliTest, ExecuteCommand_GetEcVersion_Success) {
-  class FakeForVersion : public UsbTransport {
-   public:
-    UsbDeviceId device_id() const override {
-      return {kFocalEcVid, kFocalEcPidTest};
-    }
-
-    std::expected<int, FtError> Send(std::span<const uint8_t> data,
-                                     std::chrono::milliseconds) override {
-      if (data.size() == kUsbCbwSize) {
-        current_cbw_tag_ = *reinterpret_cast<const uint32_t*>(&data[4]);
-      }
-      return data.size();
-    }
-
-    std::expected<int, FtError> Recv(std::span<uint8_t> data,
-                                     std::chrono::milliseconds) override {
-      if (data.size() == kUsbCswSize) {
-        BuildCsw(data, current_cbw_tag_, 0);
-        return kUsbCswSize;
-      }
-      if (data.size() == 64) {
-        const char* version = "chojnik_v1.2.3";
-        size_t len = std::strlen(version);
-        std::copy(version, version + len, data.begin() + 8);
-        return 8 + len;
-      }
-      return 0;
-    }
-
-    std::expected<void, FtError> WaitForReset(
-        std::chrono::milliseconds) override {
-      return {};
-    }
-
-   private:
-    uint32_t current_cbw_tag_ = 0;
-  };
-
-  auto transport = std::make_unique<FakeForVersion>();
-  UsbDevice device = MakeDevice(std::move(transport));
-  AppConfig config{.cmd = Command::kGetEcVersion};
-  FtDeviceInfo info{.current_mode = FtDeviceMode::kTest};
-
-  auto result = ExecuteCommand(config, device, info);
-  EXPECT_TRUE(result.has_value());
 }
 
 TEST(CliTest, ExecuteCommand_GetFlashWp_Success) {
@@ -245,7 +498,6 @@ TEST(CliTest, ExecuteCommand_GetFlashWp_Success) {
     UsbDeviceId device_id() const override {
       return {kFocalBootVid, kFocalBootPid};
     }
-
     std::expected<int, FtError> Send(std::span<const uint8_t> data,
                                      std::chrono::milliseconds) override {
       if (data.size() == kUsbCbwSize) {
@@ -253,7 +505,6 @@ TEST(CliTest, ExecuteCommand_GetFlashWp_Success) {
       }
       return data.size();
     }
-
     std::expected<int, FtError> Recv(std::span<uint8_t> data,
                                      std::chrono::milliseconds) override {
       if (data.size() == kUsbCswSize) {
@@ -266,7 +517,6 @@ TEST(CliTest, ExecuteCommand_GetFlashWp_Success) {
       }
       return 0;
     }
-
     std::expected<void, FtError> WaitForReset(
         std::chrono::milliseconds) override {
       return {};
@@ -291,7 +541,6 @@ TEST(CliTest, ExecuteCommand_SetFlashWp_Success) {
     UsbDeviceId device_id() const override {
       return {kFocalBootVid, kFocalBootPid};
     }
-
     std::expected<int, FtError> Send(std::span<const uint8_t> data,
                                      std::chrono::milliseconds) override {
       if (data.size() == kUsbCbwSize) {
@@ -299,7 +548,6 @@ TEST(CliTest, ExecuteCommand_SetFlashWp_Success) {
       }
       return data.size();
     }
-
     std::expected<int, FtError> Recv(std::span<uint8_t> data,
                                      std::chrono::milliseconds) override {
       if (data.size() == kUsbCswSize) {
@@ -307,13 +555,11 @@ TEST(CliTest, ExecuteCommand_SetFlashWp_Success) {
         return kUsbCswSize;
       }
       if (data.size() == 512) {
-        // Return the newly set area (e.g., kRo)
         data[0] = static_cast<uint8_t>(FtFlashWpArea::kRo);
         return 512;
       }
       return 0;
     }
-
     std::expected<void, FtError> WaitForReset(
         std::chrono::milliseconds) override {
       return {};
@@ -330,152 +576,4 @@ TEST(CliTest, ExecuteCommand_SetFlashWp_Success) {
 
   auto result = ExecuteCommand(config, device, info);
   EXPECT_TRUE(result.has_value());
-}
-
-TEST(CliTest, ExecuteCommand_EnterBoot_Success) {
-  class FakeEnterBoot : public UsbTransport {
-   public:
-    UsbDeviceId device_id() const override {
-      return {kFocalEcVid, kFocalEcPid9865};
-    }
-
-    std::expected<int, FtError> Send(std::span<const uint8_t> data,
-                                     std::chrono::milliseconds) override {
-      if (data.size() == kUsbCbwSize) {
-        current_cbw_tag_ = *reinterpret_cast<const uint32_t*>(&data[4]);
-      }
-      return data.size();
-    }
-
-    std::expected<int, FtError> Recv(std::span<uint8_t> data,
-                                     std::chrono::milliseconds) override {
-      if (data.size() == kUsbCswSize) {
-        BuildCsw(data, current_cbw_tag_, 0);
-        return kUsbCswSize;
-      }
-      if (data.size() == 64) {
-        const char* ver = "chojnik_v1.0";
-        std::copy(ver, ver + strlen(ver), data.begin() + 8);
-        return 8 + strlen(ver);
-      }
-      if (data.size() == 4) {
-        // Dummy response for mode switch
-        return 0;
-      }
-      return 0;
-    }
-
-    std::expected<void, FtError> WaitForReset(
-        std::chrono::milliseconds) override {
-      return {};
-    }
-
-   private:
-    uint32_t current_cbw_tag_ = 0;
-  };
-
-  auto transport = std::make_unique<FakeEnterBoot>();
-  UsbDevice device = MakeDevice(std::move(transport));
-  AppConfig config{.cmd = Command::kEnterBoot};
-  FtDeviceInfo info{.current_mode = FtDeviceMode::kEc};
-
-  auto result = ExecuteCommand(config, device, info);
-  EXPECT_TRUE(result.has_value());
-}
-
-TEST(CliTest, ExecuteCommand_UnknownCommand) {
-  auto transport = std::make_unique<MockUsbTransport>();
-  UsbDevice device = MakeDevice(std::move(transport));
-  AppConfig config{.cmd = Command::kUnknown};
-  FtDeviceInfo info{.current_mode = FtDeviceMode::kBoot};
-
-  auto result = ExecuteCommand(config, device, info);
-  EXPECT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(), FtError::kParameterError);
-}
-
-// -----------------------------------------------------------------------------
-// CheckEcBuildVersion Tests (using proper fake with CSW)
-// -----------------------------------------------------------------------------
-TEST(CliTest, CheckEcBuildVersion_Success) {
-  class FakeVersion : public UsbTransport {
-   public:
-    UsbDeviceId device_id() const override { return {0, 0}; }
-
-    std::expected<int, FtError> Send(std::span<const uint8_t> data,
-                                     std::chrono::milliseconds) override {
-      if (data.size() == kUsbCbwSize) {
-        current_cbw_tag_ = *reinterpret_cast<const uint32_t*>(&data[4]);
-      }
-      return data.size();
-    }
-
-    std::expected<int, FtError> Recv(std::span<uint8_t> data,
-                                     std::chrono::milliseconds) override {
-      if (data.size() == kUsbCswSize) {
-        BuildCsw(data, current_cbw_tag_, 0);
-        return kUsbCswSize;
-      }
-      if (data.size() == 64) {
-        const char* version = "ft9001_v2.0";
-        std::copy(version, version + strlen(version), data.begin() + 8);
-        return 8 + strlen(version);
-      }
-      return 0;
-    }
-
-    std::expected<void, FtError> WaitForReset(
-        std::chrono::milliseconds) override {
-      return {};
-    }
-
-   private:
-    uint32_t current_cbw_tag_ = 0;
-  };
-
-  auto transport = std::make_unique<FakeVersion>();
-  UsbDevice device = MakeDevice(std::move(transport));
-  auto result = CheckEcBuildVersion(device, FtDeviceMode::kEc);
-  EXPECT_TRUE(result.has_value());
-}
-
-TEST(CliTest, CheckEcBuildVersion_UnsupportedProject) {
-  class FakeVersionUnsupported : public UsbTransport {
-   public:
-    std::expected<int, FtError> Send(std::span<const uint8_t> data,
-                                     std::chrono::milliseconds) override {
-      if (data.size() == kUsbCbwSize) {
-        current_cbw_tag_ = *reinterpret_cast<const uint32_t*>(&data[4]);
-      }
-      return data.size();
-    }
-
-    std::expected<int, FtError> Recv(std::span<uint8_t> data,
-                                     std::chrono::milliseconds) override {
-      if (data.size() == kUsbCswSize) {
-        BuildCsw(data, current_cbw_tag_, 0);
-        return kUsbCswSize;
-      }
-      if (data.size() == 64) {
-        const char* version = "unknown_project_v1.0";
-        std::copy(version, version + strlen(version), data.begin() + 8);
-        return 8 + strlen(version);
-      }
-      return 0;
-    }
-
-    UsbDeviceId device_id() const override { return {0, 0}; }
-    std::expected<void, FtError> WaitForReset(
-        std::chrono::milliseconds) override {
-      return {};
-    }
-
-   private:
-    uint32_t current_cbw_tag_ = 0;
-  };
-  auto transport = std::make_unique<FakeVersionUnsupported>();
-  UsbDevice device = MakeDevice(std::move(transport));
-  auto result = CheckEcBuildVersion(device, FtDeviceMode::kEc);
-  EXPECT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(), FtError::kNoSuchDevice);
 }

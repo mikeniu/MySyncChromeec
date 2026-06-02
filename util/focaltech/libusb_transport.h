@@ -6,16 +6,16 @@
 #ifndef UTIL_FOCALTECH_LIBUSB_TRANSPORT_H_
 #define UTIL_FOCALTECH_LIBUSB_TRANSPORT_H_
 
-#include <libusb-1.0/libusb.h>
-
 #include <chrono>
 #include <cstdint>
 #include <expected>
 #include <memory>
 #include <span>
 
-#include "ft_util.h"
 #include "usb_transport.h"
+
+struct libusb_context;
+struct libusb_device_handle;
 
 // USB identifiers for Focal devices
 constexpr uint16_t kFocalRomVid = 0x2FD0;
@@ -29,34 +29,31 @@ constexpr uint16_t kFocalEcPid9869 = 0x5404;
 
 namespace focaltech {
 
-// RAII deleters for libusb types
+// Deleter for libusb_context
 struct LibusbContextDeleter {
-  void operator()(libusb_context* ctx) const {
-    if (ctx) libusb_exit(ctx);
-  }
+  void operator()(libusb_context* ctx) const;
 };
 
+// Deleter for libusb_device_handle
 struct LibusbDeviceHandleDeleter {
-  void operator()(libusb_device_handle* handle) const {
-    if (handle) libusb_close(handle);
-  }
+  void operator()(libusb_device_handle* handle) const;
 };
 
-// Concrete USB transport implementation using libusb-1.0
+// USB transport implementation using raw libusb calls.
 class LibusbTransport : public UsbTransport {
  public:
-  // Factory method: finds and opens the first matching Focal device.
+  // initializes libusb, finds a Focal device, opens it,
+  // detaches kernel driver, claims interface, and returns a transport object.
   static std::expected<LibusbTransport, FtError> Create();
 
-  // Move semantics only (no copy)
-  LibusbTransport(LibusbTransport&& other) noexcept;
-  LibusbTransport& operator=(LibusbTransport&& other) noexcept;
   LibusbTransport(const LibusbTransport&) = delete;
   LibusbTransport& operator=(const LibusbTransport&) = delete;
 
-  ~LibusbTransport() override = default;
+  // Move operations are defaulted – safe because members are destroyed
+  LibusbTransport(LibusbTransport&&) noexcept = default;
+  LibusbTransport& operator=(LibusbTransport&&) noexcept = default;
 
-  // ---------- UsbTransport interface implementation ----------
+  // UsbTransport interface.
   UsbDeviceId device_id() const override { return device_id_; }
   std::expected<int, FtError> Send(std::span<const uint8_t> data,
                                    std::chrono::milliseconds timeout) override;
@@ -65,26 +62,20 @@ class LibusbTransport : public UsbTransport {
   std::expected<void, FtError> WaitForReset(
       std::chrono::milliseconds timeout) override;
 
-  // Optional: raw handle access for debugging
-  libusb_device_handle* GetHandle() const { return handle_.get(); }
-
  private:
-  // Private constructor – objects are created via Create()
   LibusbTransport(
       std::unique_ptr<libusb_context, LibusbContextDeleter> ctx,
       std::unique_ptr<libusb_device_handle, LibusbDeviceHandleDeleter> handle,
-      UsbDeviceId id, uint8_t ep_in, uint8_t ep_out, uint8_t interface_num);
+      UsbDeviceId id, uint8_t ep_in, uint8_t ep_out);
 
-  // Helper: handle bulk transfer errors (reset device, map error)
+  // Helper to handle bulk transfer errors (resets device, maps error).
   std::expected<int, FtError> HandleTransferError(int libusb_error) const;
 
-  // Member variables
   std::unique_ptr<libusb_context, LibusbContextDeleter> ctx_;
   std::unique_ptr<libusb_device_handle, LibusbDeviceHandleDeleter> handle_;
   UsbDeviceId device_id_;
   uint8_t endpoint_in_ = 0;
   uint8_t endpoint_out_ = 0;
-  uint8_t interface_num_ = 0;
 };
 
 }  // namespace focaltech

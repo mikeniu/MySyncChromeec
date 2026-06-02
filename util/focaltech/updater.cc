@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+#include "updater.h"
+
 #include <algorithm>
 #include <cstdint>
 #include <fstream>
@@ -15,7 +17,6 @@
 
 #include "ft_log.h"
 #include "ft_scsi.h"
-#include "updater.h"
 #include "usb_device.h"
 
 namespace {
@@ -262,8 +263,8 @@ static std::expected<void, FtError> FtGetBootVersion(const UsbDevice& device) {
   }
 
   // Ensure null termination
-  data.back() = '\0';
-  std::string version(reinterpret_cast<char*>(data.data()));
+  auto null_pos = std::ranges::find(data, '\0');
+  std::string version(data.begin(), null_pos);
   FT_LOGI("Boot version: {}", version);
   return {};
 }

@@ -20,7 +20,7 @@ enum class LogLevel {
 
 namespace ft_log {
 constexpr LogLevel kCurrentLogLevel = LogLevel::kDebug;
-constexpr const char* kLogTag = "focaltech";
+inline constexpr std::string_view kLogTag = "focaltech";
 }  // namespace ft_log
 
 template <typename... Args>

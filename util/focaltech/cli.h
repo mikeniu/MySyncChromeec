@@ -1,3 +1,8 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
 #ifndef UTIL_FOCALTECH_CLI_H_
 #define UTIL_FOCALTECH_CLI_H_
 
@@ -54,13 +59,21 @@ std::expected<void, FtError> ExecuteCommand(const AppConfig& config,
                                             UsbDevice& usb_device,
                                             FtDeviceInfo& info);
 
+// Core EC command functions
+std::expected<std::string, FtError> GetBuildInfo(UsbDevice& device);
+
 std::expected<void, FtError> CheckEcBuildVersion(UsbDevice& usb,
                                                  FtDeviceMode current_mode);
 
+std::expected<void, FtError> SwitchToBootloader(UsbDevice& device,
+                                                uint8_t mode = 0);
+
+std::expected<void, FtError> SwitchToRom(UsbDevice& device);
+
+// Mode switch helper with retry and device-loss detection
 std::expected<void, FtError> SwitchMcuMode(UsbDevice& usb,
                                            FtDeviceMode current_mode,
-                                           std::span<const uint8_t> switch_cmd,
-                                           std::string_view mode_name);
+                                           Command target_cmd);
 
 std::expected<int, FtError> ParseInt(std::string_view str);
 

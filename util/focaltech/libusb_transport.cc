@@ -5,10 +5,14 @@
 
 #include "libusb_transport.h"
 
+#include <libusb.h>
+
 #include <chrono>
+#include <span>
 #include <thread>
 
 #include "ft_log.h"
+#include "ft_util.h"
 
 namespace focaltech {
 namespace {
@@ -27,11 +31,9 @@ struct LibusbDeviceListDeleter {
 using ScopedDeviceList =
     std::unique_ptr<libusb_device*, LibusbDeviceListDeleter>;
 
-// Find the first Focal device in the list
-libusb_device* FindFocalDevice(libusb_device** device_list, ssize_t num_devices,
+libusb_device* FindFocalDevice(std::span<libusb_device*> devices,
                                libusb_device_descriptor& out_desc) {
-  for (ssize_t i = 0; i < num_devices; ++i) {
-    libusb_device* dev = device_list[i];
+  for (libusb_device* dev : devices) {
     if (libusb_get_device_descriptor(dev, &out_desc) != LIBUSB_SUCCESS)
       continue;
 
@@ -100,7 +102,18 @@ bool FindBulkEndpoints(libusb_device* dev, EndpointInfo& info) {
 }  // anonymous namespace
 
 // --------------------------------------------------------------------------
-// initialize libusb, find device, open, claim interface
+// Deleter implementations
+// --------------------------------------------------------------------------
+void LibusbContextDeleter::operator()(libusb_context* ctx) const {
+  if (ctx) libusb_exit(ctx);
+}
+
+void LibusbDeviceHandleDeleter::operator()(libusb_device_handle* handle) const {
+  if (handle) libusb_close(handle);
+}
+
+// --------------------------------------------------------------------------
+// Factory: initialize libusb, find device, open, claim interface
 // --------------------------------------------------------------------------
 std::expected<LibusbTransport, FtError> LibusbTransport::Create() {
   // 1. Initialize libusb context
@@ -122,7 +135,8 @@ std::expected<LibusbTransport, FtError> LibusbTransport::Create() {
 
   // 3. Find target device
   libusb_device_descriptor desc;
-  libusb_device* target = FindFocalDevice(dev_list.get(), count, desc);
+  auto devices = std::span(raw_list, static_cast<size_t>(count));
+  libusb_device* target = FindFocalDevice(devices, desc);
   if (!target) {
     FT_LOGE("No matching Focal device found");
     return std::unexpected(FtError::kNoSuchDevice);
@@ -156,23 +170,15 @@ std::expected<LibusbTransport, FtError> LibusbTransport::Create() {
     }
   }
 
-  // 7. Reset device and wait for re-enumeration
-  if (libusb_reset_device(handle.get()) < 0) {
-    FT_LOGE("Failed to reset the device");
-    return std::unexpected(FtError::kResultFail);
-  }
-  std::this_thread::sleep_for(kUsbEnumerationDelay);
-
-  // 8. Claim the interface
+  // 7. Claim the interface – no proactive device reset needed.
   if (libusb_claim_interface(handle.get(), ep_info.interface_num) < 0) {
     FT_LOGE("Failed to claim interface");
     return std::unexpected(FtError::kResultFail);
   }
 
-  // 9. Construct and return the transport object
+  // 8. Construct and return the transport object
   return LibusbTransport(std::move(ctx), std::move(handle), id,
-                         ep_info.ep_bulk_in, ep_info.ep_bulk_out,
-                         ep_info.interface_num);
+                         ep_info.ep_bulk_in, ep_info.ep_bulk_out);
 }
 
 // --------------------------------------------------------------------------
@@ -181,45 +187,12 @@ std::expected<LibusbTransport, FtError> LibusbTransport::Create() {
 LibusbTransport::LibusbTransport(
     std::unique_ptr<libusb_context, LibusbContextDeleter> ctx,
     std::unique_ptr<libusb_device_handle, LibusbDeviceHandleDeleter> handle,
-    UsbDeviceId id, uint8_t ep_in, uint8_t ep_out, uint8_t interface_num)
+    UsbDeviceId id, uint8_t ep_in, uint8_t ep_out)
     : ctx_(std::move(ctx)),
       handle_(std::move(handle)),
       device_id_(id),
       endpoint_in_(ep_in),
-      endpoint_out_(ep_out),
-      interface_num_(interface_num) {}
-
-// --------------------------------------------------------------------------
-// Move constructor
-// --------------------------------------------------------------------------
-LibusbTransport::LibusbTransport(LibusbTransport&& other) noexcept
-    : ctx_(std::move(other.ctx_)),
-      handle_(std::move(other.handle_)),
-      device_id_(other.device_id_),
-      endpoint_in_(other.endpoint_in_),
-      endpoint_out_(other.endpoint_out_),
-      interface_num_(other.interface_num_) {
-  other.endpoint_in_ = other.endpoint_out_ = other.interface_num_ = 0;
-  other.device_id_ = {0, 0};
-}
-
-// --------------------------------------------------------------------------
-// Move assignment
-// --------------------------------------------------------------------------
-LibusbTransport& LibusbTransport::operator=(LibusbTransport&& other) noexcept {
-  if (this != &other) {
-    ctx_ = std::move(other.ctx_);
-    handle_ = std::move(other.handle_);
-    device_id_ = other.device_id_;
-    endpoint_in_ = other.endpoint_in_;
-    endpoint_out_ = other.endpoint_out_;
-    interface_num_ = other.interface_num_;
-
-    other.device_id_ = {0, 0};
-    other.endpoint_in_ = other.endpoint_out_ = other.interface_num_ = 0;
-  }
-  return *this;
-}
+      endpoint_out_(ep_out) {}
 
 // --------------------------------------------------------------------------
 // Send data over bulk OUT endpoint
