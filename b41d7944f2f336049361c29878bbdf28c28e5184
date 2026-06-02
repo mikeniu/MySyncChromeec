@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "baf0f0b5_fe0691ca",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-02T19:09:17Z",
+      "side": 1,
+      "message": "The safest and most idiomatic C++ approach is to scan from the **front** to find the first null byte, and treat that as the definitive end of the string. If no null byte exists, you safely consume the entire buffer.\n\nHere is the modernized, safe version using C++20 `\u003cranges\u003e`:\n\n```cpp\n#include \u003calgorithm\u003e\n\n// Scan from the front to find the first null terminator.\n// If none exists, end_it will safely point to data-\u003eend().\nauto end_it \u003d std::ranges::find(*data, \u0027\\0\u0027);\nreturn std::string(data-\u003ebegin(), end_it);\n\n```\n\n### Why this is better:\n\n* **Safe against garbage:** If the device returns `[\u0027v\u0027, \u00271\u0027, \u0027.\u0027, \u00270\u0027, \u0027\\0\u0027, 0xFF, 0xEE]`, the original code would fail to trim the `\\0` because it checks the very back (`0xEE`). This new approach safely stops at the first `\\0`, ignoring the trailing garbage.\n* **Safe against missing terminators:** If the device returns a raw string without a null byte, `std::ranges::find` returns the end iterator, and the entire buffer is safely copied.\n* **Zero Casts:** Using the iterator constructor `(begin, end)` completely eliminates the need for `reinterpret_cast\u003cchar*\u003e`, preventing strict aliasing violations and keeping the code type-safe.",
+      "range": {
+        "startLine": 126,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 74
+      },
+      "revId": "b41d7944f2f336049361c29878bbdf28c28e5184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "917fa633_d06cae59",
         "filename": "util/focaltech/ft_log.h",
         "patchSetId": 18
