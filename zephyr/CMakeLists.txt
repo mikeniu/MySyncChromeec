@@ -399,6 +399,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FINGERPRINT_AUTH_METHOD_ASCP
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_auth_ascp.cc")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FINGERPRINT_BTN_IGN_OUT
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_btn_ign_out.cc")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FP_LED
+						"${PLATFORM_EC}/common/fpsensor/fpsensor_led.cc")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
                                                 "${PLATFORM_EC}/common/host_command.c")
 if (NOT DEFINED CONFIG_EC_HOST_CMD)
@@ -672,7 +674,7 @@ endif ()
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_HOST_CMD
                                                 "${PLATFORM_EC}/common/usb_pd_host_cmd_common.c")
 
-zephyr_library_sources_ifdef(CONFIG_SVDM_RSP_DFP_ONLY
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SVDM_RSP_DFP_ONLY
                                                 "${PLATFORM_EC}/common/usbc/svdm_rsp_dfp_only.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_OCP
                                                 "${PLATFORM_EC}/common/usbc_ocp.c")
