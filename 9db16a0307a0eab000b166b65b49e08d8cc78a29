@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b02529e6_87faa687",
+        "filename": "zephyr/drivers/ap_power_events/ap_power_events.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-06-03T18:10:44Z",
+      "side": 1,
+      "message": "The \"ap_pwr_data_##n\" struct couldn\u0027t be \"const\" because it\ncontains \"struct ap_power_ev_callback cb\", which is mutated by\n\"ap_power_ev_init_callback\" and \"ap_power_ev_add_callback\". To address this,\nI split the struct into an immutable \"ap_power_events_config\" (holding `gpios`\nand \u0027num_gpios\u0027, declared \u0027const\u0027) and a mutable \"ap_power_events_data\"\n(holding only \u0027cb\u0027 and a \u0027const\u0027 pointer back to the config). The handler and\ninit function are updated accordingly.",
+      "parentUuid": "2174536d_5c9b4d89",
+      "range": {
+        "startLine": 85,
+        "startChar": 36,
+        "endLine": 85,
+        "endChar": 48
+      },
+      "revId": "9db16a0307a0eab000b166b65b49e08d8cc78a29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0c90fc27_4c6f0ede",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-02T17:38:08Z",
       "side": 1,
       "message": "This is a helper symbol that defaults to enabled. Is it necessary to explicitly enable it here?",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 18
+      },
+      "revId": "9db16a0307a0eab000b166b65b49e08d8cc78a29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99cafa98_9c5d008f",
+        "filename": "zephyr/test/drivers/ap_power_events/prj.conf",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-06-03T18:10:44Z",
+      "side": 1,
+      "message": "Acknowledged.",
+      "parentUuid": "0c90fc27_4c6f0ede",
       "range": {
         "startLine": 5,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9cfccd10_10871a09",
+        "filename": "zephyr/test/drivers/ap_power_events/src/ap_power_events.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-06-03T18:10:44Z",
+      "side": 1,
+      "message": "Added the setup function initially, but found some reliability concerns which proved correct while testing. The test suite runs twice — once on the initial boot (where it passed) and again after the EC firmware triggers a reboot via\n\"auto_power_on set due to reset flags\". On the second boot, the EC power state\nmachine fires AP_POWER_STARTUP before the suite setup function runs, asserting\nboth GPIOs. This caused the setup\u0027s zassert_false to fail, putting the suite\ninto ZTEST_RESULT_SUITE_FAIL and failing all 5 tests.\n\nSo I removed the setup function and kept NULL instead. Added before function which handles resetting GPIO state before every test, so tests remain correct across both boots.",
+      "parentUuid": "831adb22_3cae6988",
+      "range": {
+        "startLine": 20,
+        "startChar": 35,
+        "endLine": 20,
+        "endChar": 39
+      },
+      "revId": "9db16a0307a0eab000b166b65b49e08d8cc78a29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "722cb809_5b205cf1",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-06-02T17:38:08Z",
       "side": 1,
       "message": "Can this be moved to a ztest before function?",
+      "range": {
+        "startLine": 24,
+        "startChar": 1,
+        "endLine": 27,
+        "endChar": 2
+      },
+      "revId": "9db16a0307a0eab000b166b65b49e08d8cc78a29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33701e53_c2e15552",
+        "filename": "zephyr/test/drivers/ap_power_events/src/ap_power_events.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-06-03T18:10:44Z",
+      "side": 1,
+      "message": "Acknowledged.",
+      "parentUuid": "722cb809_5b205cf1",
       "range": {
         "startLine": 24,
         "startChar": 1,
