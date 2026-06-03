@@ -40,6 +40,11 @@
 #include <array>
 #include <variant>
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/pm/policy.h>
+#include <zephyr/shell/shell.h>
+#endif
+
 #if !defined(CONFIG_RNG)
 #error "fpsensor requires RNG"
 #endif
@@ -67,6 +72,17 @@ static uint8_t timestamps_invalid;
 static int8_t stats_template_matched;
 
 BUILD_ASSERT(sizeof(struct ec_fp_template_encryption_metadata) % 4 == 0);
+
+#ifndef CONFIG_ZEPHYR
+/* Define the PM functions for compatibility with EC-legacy. */
+static inline void pm_policy_state_all_lock_get(void)
+{
+}
+
+static inline void pm_policy_state_all_lock_put(void)
+{
+}
+#endif /* CONFIG_ZEPHYR */
 
 /* Interrupt line from the fingerprint sensor */
 extern "C" void fps_event(enum gpio_signal signal)
@@ -252,7 +268,10 @@ static enum ec_status fp_commit_template(std::span<const uint8_t> context);
 extern "C" void fp_task(void)
 {
 	int timeout_us = -1;
+	__maybe_unused bool pm_locked = true;
 
+	/* Lock PM for initialization. */
+	pm_policy_state_all_lock_get();
 	CPRINTS("FP_SENSOR_SEL: %s",
 		fp_sensor_type_to_str(fpsensor_detect_get_type()));
 
@@ -265,8 +284,23 @@ extern "C" void fp_task(void)
 	while (1) {
 		enum finger_state st = FINGER_NONE;
 
+		/* Unlock PM while waiting for an event except for an
+		 * enrollment process.
+		 */
+		if (!(global_context.sensor_mode & FP_MODE_ENROLL_SESSION)) {
+			pm_policy_state_all_lock_put();
+			pm_locked = false;
+		}
 		/* Wait for a sensor IRQ or a new mode configuration */
 		uint32_t evt = task_wait_event(timeout_us);
+
+		/* Lock PM for any FP related actions, especially communication
+		 * with a FP sensor.
+		 */
+		if (!pm_locked) {
+			pm_policy_state_all_lock_get();
+			pm_locked = true;
+		}
 
 		if (evt & TASK_EVENT_UPDATE_CONFIG) {
 			uint32_t mode = global_context.sensor_mode;
