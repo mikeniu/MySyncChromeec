@@ -46,6 +46,30 @@
       },
       "revId": "00b70df57f560b5475708acf7349780eaa4703f5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "709c66e9_793586a1",
+        "filename": "zephyr/test/ap_power/src/ap_pwrseq.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 635,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-06-03T17:51:08Z",
+      "side": 0,
+      "message": "I do not see an issue here",
+      "parentUuid": "c8190da2_8161e8e6",
+      "range": {
+        "startLine": 635,
+        "startChar": 1,
+        "endLine": 635,
+        "endChar": 28
+      },
+      "revId": "00b70df57f560b5475708acf7349780eaa4703f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
