@@ -140,6 +140,24 @@
       "parentUuid": "48c89c5b_f70bced1",
       "revId": "719cabbcd796e8db2938352dffa640a4c424b273",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc22e2db_43bb09f3",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 3058,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-03T17:17:30Z",
+      "side": 1,
+      "message": "This looks good to me as far as normal behavior goes. I would expect the port to run the first `if` clause over and over and not source VBUS or change states until the CC lines change.\n\nWhat happens if the force-sink flag is set during this indefinite time period? I think the desired outcome would be that we go to Unattached.SNK within a state machine cycle. I think the actual outcome would be that we stay in AttachWait.SRC indefinitely. Should there be an extra check for force-sink before the early return?",
+      "parentUuid": "d65e4269_b2eba35b",
+      "revId": "719cabbcd796e8db2938352dffa640a4c424b273",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
