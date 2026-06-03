@@ -6,10 +6,6 @@
 
 / {
 
-	aliases {
-		gpio-nb-mode = &gpio_ish_nb_mode_l;
-	};
-
 	named-gpios {
 		compatible = "named-gpios";
 
@@ -19,20 +15,6 @@
 
 		gpio_accel_mb_int_l: accel_mb_int_l {
 			gpios = <&gpio0 4 GPIO_INPUT>;
-		};
-
-		gpio_tablet_mode_l: tablet_mode_l {
-			gpios = <&gpio0 3 GPIO_INPUT>;
-			enum-name = "GPIO_TABLET_MODE_L";
-		};
-
-		gpio_lid_open: lid_open {
-			gpios = <&gpio0 9 GPIO_INPUT>;
-			enum-name = "GPIO_LID_OPEN";
-		};
-
-		gpio_ish_nb_mode_l: ish_nb_mode_l {
-			gpios = <&gpio0 1 (GPIO_ACTIVE_LOW | GPIO_OUTPUT_ACTIVE)>;
 		};
 
 		ec_entering_rw {
@@ -53,18 +35,6 @@
 			irq-pin = <&gpio_accel_mb_int_l>;
 			flags = <GPIO_INT_EDGE_FALLING>;
 			handler = "bmi3xx_interrupt";
-		};
-
-		int_lid_open: int-lid-open {
-			irq-pin = <&gpio_lid_open>;
-			flags = <GPIO_INT_EDGE_BOTH>;
-			handler = "lid_interrupt";
-		};
-
-		int_tablet_mode: int-tablet-mode {
-			irq-pin = <&gpio_tablet_mode_l>;
-			flags = <GPIO_INT_EDGE_BOTH>;
-			handler = "gmr_tablet_switch_isr";
 		};
 	};
 };
