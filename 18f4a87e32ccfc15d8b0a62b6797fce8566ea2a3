@@ -22,6 +22,30 @@
       },
       "revId": "18f4a87e32ccfc15d8b0a62b6797fce8566ea2a3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "901ce2f4_a9215828",
+        "filename": "zephyr/dts/bindings/battery/battery-smart.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 4590738
+      },
+      "writtenOn": "2026-06-03T02:32:35Z",
+      "side": 1,
+      "message": "Those names(line.145-152) were renamed to match the naming style.\nr2d2\u0027s and kyogre\u0027s project.overelay were also updated. Thanks.",
+      "parentUuid": "986be92f_655bcb7b",
+      "range": {
+        "startLine": 147,
+        "startChar": 0,
+        "endLine": 152,
+        "endChar": 27
+      },
+      "revId": "18f4a87e32ccfc15d8b0a62b6797fce8566ea2a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
