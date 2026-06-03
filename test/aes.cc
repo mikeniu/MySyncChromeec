@@ -18,6 +18,8 @@
 
 #include <memory>
 #include <span>
+#include <string>
+#include <vector>
 
 /* Temporary buffer, to avoid using too much stack space. */
 static uint8_t tmp[512];
