@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "455aa145_6740b21e",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 581,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-03T18:31:21Z",
+      "side": 1,
+      "message": "I think for the name of this function to be accurate, it would need to start here. See below for related refactoring suggestions.",
+      "revId": "caa065b8478e4a8bfc6494cc96bc91b8bd526094",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0734023_df3f4103",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 883,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-03T18:31:21Z",
+      "side": 1,
+      "message": "There is already a call to `get_vbus_voltage` earlier in this function, and I think you could reuse the result here. That would mean that you would not need to call it again inside `configure_vbus_thresholds`.",
+      "revId": "caa065b8478e4a8bfc6494cc96bc91b8bd526094",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ea766ad_5d946fef",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 889,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-03T18:31:21Z",
+      "side": 1,
+      "message": "The previous code was doing this as a plain write, whereas you\u0027re now doing it as a read-modify-write. Is there reason to believe that we need to preserve the preexisting values in this register?",
+      "revId": "caa065b8478e4a8bfc6494cc96bc91b8bd526094",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0087493c_80a5ba6c",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 1352,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-03T18:31:21Z",
+      "side": 1,
+      "message": "I\u0027d suggest a slightly different flow here.\n\nIn the normal case, I would expect that the VBUS interrupt fires at the same time as the CHG_DETECT bit changes in STATUS1, but I would think that technically either of those events would invalidate the previously configured VBUS thresholds. Furthermore, if we\u0027ve put the chip into a low-power state, I would expect that the charger detect bit might change when the VBUS bit does not fire. It\u0027s not very clear to me what this CL would do if VBUS changes while the ADC is disabled.\n\nWould this make sense?\n1. If either the charger detect or VBUS threshold events occur, try to get the VBUS voltage\n2. If the ADC is inactive, write some special value to the cached VBUS value signifying an invalid read. I\u0027m not sure whether it makes more sense to always do this inside `get_vbus_voltage` or do it explicitly here in the ISR. Either way, the ISR would call `get_vbus_voltage` and `configure_vbus_thresholds` separately.\n3. In `configure_vbus_thresholds`, if the cached VBUS value is invalid, set the thresholds to min and max values. This would correspond to an additional `else` clause in the existing structure.\n\nRelated: In `check_vbus_level`, instead of checking the config register to fall back to digital presence detection, check whether the cached value is the invalid indicator. This might avoid a scenario where the VBUS value has changed significantly during a period when the ADC was disabled. It would also avoid a register read.\n\nIIUC, we should always have the ADC enabled when VBUS is detectable, so perhaps my concerns about VBUS changing while the ADC is disabled are unwarranted. In any case, my hope would be to make the code as obviously correct as it can be.\n\nThink through that and let me know if you think I\u0027m off-base. At this point, you\u0027re more familiar with this part than I am.",
+      "revId": "caa065b8478e4a8bfc6494cc96bc91b8bd526094",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6d81002_139982c6",
+        "filename": "driver/charger/sm5803.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-03T18:31:21Z",
+      "side": 1,
+      "message": "Nit: Mention named constants from spec in comments.",
+      "revId": "caa065b8478e4a8bfc6494cc96bc91b8bd526094",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
