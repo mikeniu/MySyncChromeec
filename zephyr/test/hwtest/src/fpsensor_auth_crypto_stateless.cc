@@ -18,6 +18,8 @@
 
 #include <zephyr/ztest.h>
 
+#include <array>
+
 ZTEST_SUITE(fpsensor_auth_crypto_stateless, NULL, NULL, NULL, NULL, NULL);
 
 ZTEST(fpsensor_auth_crypto_stateless, test_fp_create_ec_key_from_pubkey)
