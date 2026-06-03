@@ -11,6 +11,7 @@
 #include "host_command.h"
 
 #include <ascp/ascp.h>
+#include <array>
 #include <span>
 
 /* The FPMCU pairing key. */
