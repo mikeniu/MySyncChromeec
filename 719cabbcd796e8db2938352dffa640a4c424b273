@@ -122,6 +122,24 @@
       "parentUuid": "175040bd_63021673",
       "revId": "719cabbcd796e8db2938352dffa640a4c424b273",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d65e4269_b2eba35b",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 3058,
+      "author": {
+        "id": 4253897
+      },
+      "writtenOn": "2026-06-03T09:12:19Z",
+      "side": 1,
+      "message": "Insted of set_state_tc if we keep as it is and just return non DTS port won\u0027t source VBUS.",
+      "parentUuid": "48c89c5b_f70bced1",
+      "revId": "719cabbcd796e8db2938352dffa640a4c424b273",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
