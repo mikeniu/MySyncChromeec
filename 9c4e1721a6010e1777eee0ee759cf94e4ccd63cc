@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c9f614b_4bb70303",
+        "filename": "zephyr/program/ocelot/ocelotrvp-ite/project.overlay",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-06-03T18:11:46Z",
+      "side": 1,
+      "message": "Acknowledged.",
+      "parentUuid": "6b183691_31407613",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 32
+      },
+      "revId": "9c4e1721a6010e1777eee0ee759cf94e4ccd63cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c3ddffaa_12189e0a",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-02T16:56:46Z",
       "side": 1,
       "message": "Nit - add a comment as to what GPIO H0 is used for.",
+      "range": {
+        "startLine": 89,
+        "startChar": 18,
+        "endLine": 89,
+        "endChar": 23
+      },
+      "revId": "9c4e1721a6010e1777eee0ee759cf94e4ccd63cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93e684d9_61b51ad2",
+        "filename": "zephyr/program/ocelot/ocelotrvp-ite/project.overlay",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-06-03T18:11:46Z",
+      "side": 1,
+      "message": "Acknowledged.",
+      "parentUuid": "c3ddffaa_12189e0a",
       "range": {
         "startLine": 89,
         "startChar": 18,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "67238147_0a692e9d",
+        "filename": "zephyr/program/ocelot/ocelotrvp-npcx/project.overlay",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-06-03T18:11:46Z",
+      "side": 1,
+      "message": "Acknowledged.",
+      "parentUuid": "10673b80_96aaf94f",
+      "range": {
+        "startLine": 74,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 29
+      },
+      "revId": "9c4e1721a6010e1777eee0ee759cf94e4ccd63cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "55477d37_0789a992",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-06-02T16:56:46Z",
       "side": 1,
       "message": "Add a comment.",
+      "range": {
+        "startLine": 88,
+        "startChar": 25,
+        "endLine": 88,
+        "endChar": 26
+      },
+      "revId": "9c4e1721a6010e1777eee0ee759cf94e4ccd63cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3114136b_e85605af",
+        "filename": "zephyr/program/ocelot/ocelotrvp-npcx/project.overlay",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-06-03T18:11:46Z",
+      "side": 1,
+      "message": "Acknowledged.",
+      "parentUuid": "55477d37_0789a992",
       "range": {
         "startLine": 88,
         "startChar": 25,
