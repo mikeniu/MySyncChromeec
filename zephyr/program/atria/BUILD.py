@@ -75,6 +75,7 @@ register_ish_project(
     ],
     kconfig_files=[
         here / "atriarvp-ish" / "project.conf",
+        here / "dsp_comms.conf",
         here / ".." / ".." / "ish.conf",
     ],
 )
