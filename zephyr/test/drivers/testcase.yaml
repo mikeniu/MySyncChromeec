@@ -617,6 +617,25 @@ tests:
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
+  drivers.flash.rollback:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_FLASH=y
+    - CONFIG_PLATFORM_EC_CONSOLE_CMD_FLASH=y
+    - CONFIG_PLATFORM_EC_ROLLBACK=y
+    extra_dtc_overlay_files:
+    - ./boards/native_sim.overlay
+    - ./flash/rollback.dts
+  drivers.flash.rollback.ec_host_cmd:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_FLASH=y
+    - CONFIG_PLATFORM_EC_CONSOLE_CMD_FLASH=y
+    - CONFIG_PLATFORM_EC_ROLLBACK=y
+    extra_conf_files:
+    - prj.conf
+    - ec_host_cmd.conf
+    extra_dtc_overlay_files:
+    - ./boards/native_sim.overlay
+    - ./flash/rollback.dts
   drivers.gpio_init:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_GPIO_INIT=y
@@ -1836,6 +1855,7 @@ tests:
     - CONFIG_LINK_TEST_SUITE_ONE_WIRE_UART=y
     - CONFIG_PLATFORM_EC_ONE_WIRE_UART_TABLET=y
     - CONFIG_I2C_TARGET=y
+    - CONFIG_I2C_TARGET_BUFFER_MODE=y
   drivers.smart_battery:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_SMART_BATTERY=y
@@ -1873,10 +1893,10 @@ tests:
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - ./tabletmode_interrupt/boards/native_sim.overlay
-  drivers.write_protection_custom:
+  drivers.write_protection_external:
     extra_configs:
-    - CONFIG_LINK_TEST_SUITE_WRITE_PROTECTION_CUSTOM=y
-    - CONFIG_PLATFORM_EC_WP_CUSTOM=y
+    - CONFIG_LINK_TEST_SUITE_WRITE_PROTECTION_EXTERNAL=y
+    - CONFIG_PLATFORM_EC_WP_EXTERNAL=y
   drivers.rt3645:
     extra_conf_files:
     - prj.conf

@@ -116,6 +116,9 @@ struct pdc_info_t {
 	bool no_fw_update;
 	/** True if the PDC hardware supports FRS */
 	bool frs_supported;
+	/** True if the USB-C port is capable of USB communication as a device
+	 */
+	bool usb_comm_capable_as_device;
 	/** Extra information (optional) */
 	uint16_t extra;
 };
@@ -198,6 +201,14 @@ enum pdc_power_policy {
 	/** Transition to or remain in the source role, and block external power
 	    role swap requests */
 	PDC_POWER_POLICY_SOURCE_DISALLOW_SWAP,
+};
+
+/**
+ * Used to define device maximum source PDP
+ */
+enum max_pdp_t {
+	MAX_PDP_7_5W,
+	MAX_PDP_15W,
 };
 
 /** Helper macro to set the policy to sink and allow or disallow external swaps
@@ -308,6 +319,8 @@ typedef int (*pdc_get_vendor_status_t)(
 	const struct device *dev,
 	union vendor_status_change_bits_t *vendor_status);
 typedef int (*pdc_get_alert_t)(const struct device *dev, uint32_t *ado);
+typedef int (*pdc_set_max_pdp_t)(const struct device *dev,
+				 enum max_pdp_t max_pdp);
 
 /**
  * @cond INTERNAL_HIDDEN
@@ -364,6 +377,7 @@ __subsystem struct pdc_driver_api {
 	pdc_set_bbr_cts_t set_bbr_cts;
 	pdc_get_vendor_status_t get_vendor_status;
 	pdc_get_alert_t get_alert;
+	pdc_set_max_pdp_t set_max_pdp;
 };
 /**
  * @endcond
@@ -1533,6 +1547,19 @@ static inline int pdc_get_alert(const struct device *dev, uint32_t *ado)
 	}
 
 	return DEVICE_API_GET(pdc, dev)->get_alert(dev, ado);
+}
+
+static inline int pdc_set_max_pdp(const struct device *dev,
+				  enum max_pdp_t max_pdp)
+{
+	const struct pdc_driver_api *api =
+		(const struct pdc_driver_api *)dev->api;
+
+	if (api->set_max_pdp == NULL) {
+		return -ENOSYS;
+	}
+
+	return api->set_max_pdp(dev, max_pdp);
 }
 
 #ifdef __cplusplus
