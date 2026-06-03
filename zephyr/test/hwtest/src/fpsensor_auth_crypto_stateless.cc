@@ -15,6 +15,7 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <array>
 
 #include <zephyr/ztest.h>
 
