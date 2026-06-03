@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "08b2c624_18a378e2",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 841,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-06-03T10:53:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2091bfc6_94e66c9a",
+      "revId": "7822580e11b2149b75c407845560c8d38e724a79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dffb41eb_25e9e1b3",
@@ -52,6 +70,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "12f482c0_179ee27b",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 1317,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-06-03T10:53:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dffb41eb_25e9e1b3",
+      "revId": "7822580e11b2149b75c407845560c8d38e724a79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "edd13147_d2015171",
@@ -65,6 +101,24 @@
       "writtenOn": "2026-06-02T22:54:13Z",
       "side": 1,
       "message": "Per the above comment, is there any condition under which we cannot expect to receive the interrupts enabled by this CL? Is that what this is checking for?",
+      "revId": "7822580e11b2149b75c407845560c8d38e724a79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2afe942_476ea5c5",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 1777,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-06-03T10:53:17Z",
+      "side": 1,
+      "message": "Yes, Threshold interrupts require GPADC VBUS monitoring. When GPADC is disabled in low power mode, We fall back to digital CHG_DET status.",
+      "parentUuid": "edd13147_d2015171",
       "revId": "7822580e11b2149b75c407845560c8d38e724a79",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
