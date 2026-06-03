@@ -22,6 +22,30 @@
       },
       "revId": "3f543556e7157ce1cc564324d6b490880d181727",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2e115d8_40ed52b3",
+        "filename": "util/focaltech/usb_transport.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-03T09:03:26Z",
+      "side": 1,
+      "message": "It should be that after modifying this file, I didn’t run find util/focaltech/ -iname \"*.h\" -o -iname \"*.cc\" | xargs clang-format -i.",
+      "parentUuid": "cd7b207d_cd514eb6",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 40
+      },
+      "revId": "3f543556e7157ce1cc564324d6b490880d181727",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ],
   "submitRequirementResults": [
