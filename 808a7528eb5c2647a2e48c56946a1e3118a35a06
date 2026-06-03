@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82e7761a_c1953992",
+        "filename": "Makefile.rules",
+        "patchSetId": 2
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-06-03T22:07:01Z",
+      "side": 1,
+      "message": "Wait this doesn\u0027t do anything.\n\nAlso it would be nice to delete this makefile.  Wouldn\u0027t you rather do something like `make -C utils run-tests`",
+      "range": {
+        "startLine": 132,
+        "startChar": 0,
+        "endLine": 133,
+        "endChar": 48
+      },
+      "revId": "808a7528eb5c2647a2e48c56946a1e3118a35a06",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
