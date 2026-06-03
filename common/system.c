@@ -1847,9 +1847,21 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 		args->result = EC_RES_SUCCESS;
 		host_send_response(args);
 #else
+#ifndef CONFIG_ZTEST
+		/* TODO(b/xxxxx):
+		 * Upstream Host command handler expects a 1:1 request/response.
+		 * The error status returned at the end of this function is not
+		 * sent as a result of the following response being sent
+		 * preemptively to prevent the host from waiting indefinitely.
+		 * Ideally the actions of this host command should be deferred
+		 * so a valid response can be sent back to host.
+		 * Removing this from ZTEST framework allows
+		 * test_rwsig_host_command_jump_rw to validate the jump to RW is
+		 * properly EC_RES_ACCESS_DENIED. */
 		ec_host_cmd_send_response(
 			EC_HOST_CMD_SUCCESS,
 			(struct ec_host_cmd_handler_args *)args);
+#endif
 #endif
 	}
 #endif
