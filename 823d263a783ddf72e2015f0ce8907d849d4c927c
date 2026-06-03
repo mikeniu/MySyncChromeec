@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5921c33a_2864d1e0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1564607
+      },
+      "writtenOn": "2026-06-03T18:20:58Z",
+      "side": 1,
+      "message": "Verified on one of bluey devices.",
+      "revId": "823d263a783ddf72e2015f0ce8907d849d4c927c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
