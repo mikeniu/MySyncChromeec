@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b3c2663_09cdca5c",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 28
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-03T03:06:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "687584cd_240a49dd",
+      "range": {
+        "startLine": 266,
+        "startChar": 0,
+        "endLine": 276,
+        "endChar": 1
+      },
+      "revId": "1db65c830210c0700b3292a900db14253cbe5a43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d09a4e4c_1f0d26d0",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "df7d0712_73071778",
+        "filename": "util/egis/crypto_util_test.cc",
+        "patchSetId": 28
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-03T03:06:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d09a4e4c_1f0d26d0",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 69
+      },
+      "revId": "1db65c830210c0700b3292a900db14253cbe5a43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5cb45bcc_60d9df00",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-06-02T17:53:37Z",
       "side": 1,
       "message": "Slightly simpler way to write it:\n\n```\ntemplate \u003csize_t N\u003e\nconstexpr std::string_view MakeStringView(const char (\u0026str)[N]) {\n  return std::string_view(str, std::ranges::find(str, \u0027\\0\u0027));\n}\n```",
+      "range": {
+        "startLine": 87,
+        "startChar": 0,
+        "endLine": 92,
+        "endChar": 0
+      },
+      "revId": "1db65c830210c0700b3292a900db14253cbe5a43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8022cd0c_ab4ae814",
+        "filename": "util/egis/egis_util.h",
+        "patchSetId": 28
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-03T03:06:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cb45bcc_60d9df00",
       "range": {
         "startLine": 87,
         "startChar": 0,
