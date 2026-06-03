@@ -14,6 +14,8 @@
 
 #include <memory>
 #include <span>
+#include <string>
+#include <vector>
 
 ZTEST_SUITE(aes, NULL, NULL, NULL, NULL, NULL);
 
