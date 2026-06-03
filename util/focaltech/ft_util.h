@@ -5,13 +5,24 @@
 #ifndef UTIL_FOCALTECH_FT_UTIL_H_
 #define UTIL_FOCALTECH_FT_UTIL_H_
 
+#include <bit>
 #include <cassert>
+#include <concepts>
 #include <string_view>
 
 template <typename T>
 constexpr T FtDivRoundUp(T n, T d) {
   assert(d != 0);
   return (n + d - 1) / d;
+}
+
+// C++23 native endianness swapping
+template <std::integral T>
+constexpr T ToLittleEndian(T value) {
+  if constexpr (std::endian::native == std::endian::big) {
+    return std::byteswap(value);
+  }
+  return value;
 }
 
 enum class FtError {

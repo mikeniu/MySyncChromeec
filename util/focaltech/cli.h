@@ -25,10 +25,13 @@
 
 class UsbDevice;
 
+constexpr std::string_view kToolVersion = "v1.0.4";
+
 // Constants
 inline constexpr std::array<std::string_view, 4> kSupportedProjects = {
     "ft9001", "chojnik", "chudow", "chobienia"};
 inline constexpr int kMaxRetry = 5;
+constexpr uint8_t kEcBootloaderModeDefault = 0;
 
 // Command enum
 enum class Command {
@@ -65,8 +68,8 @@ std::expected<std::string, FtError> GetBuildInfo(UsbDevice& device);
 std::expected<void, FtError> CheckEcBuildVersion(UsbDevice& usb,
                                                  FtDeviceMode current_mode);
 
-std::expected<void, FtError> SwitchToBootloader(UsbDevice& device,
-                                                uint8_t mode = 0);
+std::expected<void, FtError> SwitchToBootloader(
+    UsbDevice& device, uint8_t mode = kEcBootloaderModeDefault);
 
 std::expected<void, FtError> SwitchToRom(UsbDevice& device);
 

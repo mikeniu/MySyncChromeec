@@ -17,15 +17,20 @@ constexpr auto kResetWaitTimeout = 3s;
 // Default timeout for EC commands
 constexpr auto kEcCommandTimeout = std::chrono::milliseconds(200);
 
+constexpr uint16_t kTestEcSwitchToRomCmd = 0xFACE;
+constexpr std::array<uint8_t, 3> kSwitchToRomPayload = {0xAA, 0x06, 0x00};
+
 // Build EC command packet (protocol version 3)
 std::vector<uint8_t> BuildEcCommand(uint16_t command, uint8_t version,
                                     std::span<const uint8_t> params = {}) {
-  ec_host_request req{};
-  req.struct_version = EC_HOST_REQUEST_VERSION;  // = 3
-  req.command = command;
-  req.command_version = version;
-  req.data_len = params.size();
-  req.reserved = 0;
+  ec_host_request req{
+      .struct_version = EC_HOST_REQUEST_VERSION,  //=3
+      .checksum = 0,                              // Will be overwritten later
+      .command = command,
+      .command_version = version,
+      .reserved = 0,
+      .data_len = static_cast<uint16_t>(params.size()),
+  };
 
   std::vector<uint8_t> packet(sizeof(req) + params.size());
   memcpy(packet.data(), &req, sizeof(req));
@@ -37,7 +42,8 @@ std::vector<uint8_t> BuildEcCommand(uint16_t command, uint8_t version,
   uint8_t checksum = 0;
   for (uint8_t b : packet) checksum += b;
 
-  packet[1] = -checksum;  // Overwrite checksum field (offset 1)
+  uint8_t* checksum_ptr = packet.data() + offsetof(ec_host_request, checksum);
+  *checksum_ptr = -checksum;
   return packet;
 }
 
@@ -123,19 +129,18 @@ std::expected<std::string, FtError> GetBuildInfo(UsbDevice& device) {
   if (!data) {
     return std::unexpected(data.error());
   }
-  // Response is a null-terminated string.
-  // Remove trailing null byte(s) for a clean std::string.
-  while (!data->empty() && data->back() == '\0') {
-    data->pop_back();
-  }
-  return std::string(reinterpret_cast<char*>(data->data()), data->size());
+  // Scan from the front to find the first null terminator.
+  // If none exists, end_it will safely point to data->end().
+  auto end_it = std::ranges::find(*data, '\0');
+  return std::string(data->begin(), end_it);
 }
 
 // 2. Switch to bootloader mode
 std::expected<void, FtError> SwitchToBootloader(UsbDevice& device,
                                                 uint8_t mode) {
-  ec_params_enter_bootloader params{};
-  params.mode = mode;
+  ec_params_enter_bootloader params{
+      .mode = mode,
+  };
   auto params_span = std::span<const uint8_t>(
       reinterpret_cast<const uint8_t*>(&params), sizeof(params));
   auto data = SendEcCommandAndReadResponse(device, EC_CMD_ENTER_BOOTLOADER, 0,
@@ -148,10 +153,8 @@ std::expected<void, FtError> SwitchToBootloader(UsbDevice& device,
 
 // 3. Switch to ROM mode using custom Focal command (only for test firmware)
 std::expected<void, FtError> SwitchToRom(UsbDevice& device) {
-  constexpr uint16_t kTestEcSwitchToRomCmd = 0xFACE;
-  std::vector<uint8_t> params = {0xAA, 0x06, 0x00};
-  auto data =
-      SendEcCommandAndReadResponse(device, kTestEcSwitchToRomCmd, 0, params);
+  auto data = SendEcCommandAndReadResponse(device, kTestEcSwitchToRomCmd, 0,
+                                           kSwitchToRomPayload);
   if (!data) {
     return std::unexpected(data.error());
   }
@@ -357,7 +360,7 @@ std::expected<void, FtError> ExecuteCommand(const AppConfig& config,
                                             FtDeviceInfo& info) {
   switch (config.cmd) {
     case Command::kGetEcVersion:
-      FT_LOGI("Tool version is v1.0.3");
+      FT_LOGI("Tool version is {}", kToolVersion);
       return CheckEcBuildVersion(usb_device, info.current_mode);
 
     case Command::kSetFlashWp:

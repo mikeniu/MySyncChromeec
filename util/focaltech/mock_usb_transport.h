@@ -2,9 +2,15 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
+
+#ifndef UTIL_FOCALTECH_MOCK_USB_TRANSPORT_H_
+#define UTIL_FOCALTECH_MOCK_USB_TRANSPORT_H_
+
 #include <gmock/gmock.h>
 
 #include "usb_transport.h"
+
+namespace focaltech::testing {
 
 class MockUsbTransport : public UsbTransport {
  public:
@@ -17,3 +23,7 @@ class MockUsbTransport : public UsbTransport {
   MOCK_METHOD((std::expected<void, FtError>), WaitForReset,
               (std::chrono::milliseconds), (override));
 };
+
+}  // namespace focaltech::testing
+
+#endif  // UTIL_FOCALTECH_MOCK_USB_TRANSPORT_H_

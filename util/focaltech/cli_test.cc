@@ -15,18 +15,17 @@
 #include <string_view>
 #include <vector>
 
+#include "test_utils.h"
 #include "updater.h"
 #include "usb_device.h"
 
 using namespace std::chrono_literals;
+using ::focaltech::testing::BuildValidCsw;
 using ::testing::_;
 using ::testing::DoAll;
 using ::testing::Invoke;
 using ::testing::Return;
 using ::testing::SetArgPointee;
-
-constexpr size_t kUsbCbwSize = 31;
-constexpr size_t kUsbCswSize = 13;
 
 static UsbDevice MakeDevice(std::unique_ptr<UsbTransport> transport) {
   return UsbDevice(std::move(transport));
@@ -476,22 +475,8 @@ TEST(CliTest, ExecuteCommand_UnknownCommand) {
 }
 
 // -----------------------------------------------------------------------------
-// SCSI-based command tests (GetFlashWp, SetFlashWp) – unchanged
+// SCSI-based command tests (GetFlashWp, SetFlashWp)
 // -----------------------------------------------------------------------------
-static void BuildCsw(std::span<uint8_t> data, uint32_t tag, uint8_t status) {
-  struct __attribute__((packed)) BulkCsWrap {
-    uint32_t signature;
-    uint32_t tag;
-    uint32_t data_residue;
-    uint8_t status;
-  };
-  BulkCsWrap csw{.signature = htole32(0x53425355),
-                 .tag = htole32(tag),
-                 .data_residue = 0,
-                 .status = status};
-  std::memcpy(data.data(), &csw, sizeof(csw));
-}
-
 TEST(CliTest, ExecuteCommand_GetFlashWp_Success) {
   class FakeForFlashWp : public UsbTransport {
    public:
@@ -500,20 +485,20 @@ TEST(CliTest, ExecuteCommand_GetFlashWp_Success) {
     }
     std::expected<int, FtError> Send(std::span<const uint8_t> data,
                                      std::chrono::milliseconds) override {
-      if (data.size() == kUsbCbwSize) {
+      if (data.size() == focaltech::testing::kUsbCbwSize) {
         current_cbw_tag_ = *reinterpret_cast<const uint32_t*>(&data[4]);
       }
       return data.size();
     }
     std::expected<int, FtError> Recv(std::span<uint8_t> data,
                                      std::chrono::milliseconds) override {
-      if (data.size() == kUsbCswSize) {
-        BuildCsw(data, current_cbw_tag_, 0);
-        return kUsbCswSize;
+      if (data.size() == focaltech::testing::kUsbCswSize) {
+        BuildValidCsw(data, current_cbw_tag_, 0);
+        return focaltech::testing::kUsbCswSize;
       }
-      if (data.size() == 512) {
+      if (data.size() == kFtFlashWpBufferSize) {
         data[0] = static_cast<uint8_t>(FtFlashWpArea::kBoot);
-        return 512;
+        return kFtFlashWpBufferSize;
       }
       return 0;
     }
@@ -543,20 +528,20 @@ TEST(CliTest, ExecuteCommand_SetFlashWp_Success) {
     }
     std::expected<int, FtError> Send(std::span<const uint8_t> data,
                                      std::chrono::milliseconds) override {
-      if (data.size() == kUsbCbwSize) {
+      if (data.size() == focaltech::testing::kUsbCbwSize) {
         current_cbw_tag_ = *reinterpret_cast<const uint32_t*>(&data[4]);
       }
       return data.size();
     }
     std::expected<int, FtError> Recv(std::span<uint8_t> data,
                                      std::chrono::milliseconds) override {
-      if (data.size() == kUsbCswSize) {
-        BuildCsw(data, current_cbw_tag_, 0);
-        return kUsbCswSize;
+      if (data.size() == focaltech::testing::kUsbCswSize) {
+        BuildValidCsw(data, current_cbw_tag_, 0);
+        return focaltech::testing::kUsbCswSize;
       }
-      if (data.size() == 512) {
+      if (data.size() == kFtFlashWpBufferSize) {
         data[0] = static_cast<uint8_t>(FtFlashWpArea::kRo);
-        return 512;
+        return kFtFlashWpBufferSize;
       }
       return 0;
     }

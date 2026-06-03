@@ -5,7 +5,10 @@
 #ifndef UTIL_FOCALTECH_FT_LOG_H_
 #define UTIL_FOCALTECH_FT_LOG_H_
 
+#include <unistd.h>
+
 #include <chrono>
+#include <cstdio>
 #include <print>
 #include <source_location>
 #include <string_view>
@@ -21,6 +24,17 @@ enum class LogLevel {
 namespace ft_log {
 constexpr LogLevel kCurrentLogLevel = LogLevel::kDebug;
 inline constexpr std::string_view kLogTag = "focaltech";
+
+// Evaluate and cache whether stdout is attached to a terminal
+inline bool UseColor() {
+#ifdef FT_LOG_COLOR_EN
+  static const bool use_color = isatty(fileno(stdout));
+  return use_color;
+#else
+  return false;
+#endif
+}
+
 }  // namespace ft_log
 
 template <typename... Args>
@@ -33,29 +47,33 @@ void FtLog(LogLevel level, const std::source_location& loc,
   auto now = std::chrono::system_clock::now();
   std::string_view level_str;
   std::string_view color;
-  std::string_view reset = "\033[0m";
+  std::string_view reset;
+
+  bool enable_color = ft_log::UseColor();
 
   switch (level) {
     case LogLevel::kVerbose:
       level_str = "V";
-      color = "";
       break;
     case LogLevel::kDebug:
       level_str = "D";
-      color = "";
       break;
     case LogLevel::kInfo:
       level_str = "I";
-      color = "\033[36m";
+      if (enable_color) color = "\033[36m";
       break;
     case LogLevel::kWarning:
       level_str = "W";
-      color = "\033[33m";
+      if (enable_color) color = "\033[33m";
       break;
     case LogLevel::kError:
       level_str = "E";
-      color = "\033[31m";
+      if (enable_color) color = "\033[31m";
       break;
+  }
+
+  if (enable_color && !color.empty()) {
+    reset = "\033[0m";
   }
 
   // Extract filename from the path.
@@ -68,10 +86,12 @@ void FtLog(LogLevel level, const std::source_location& loc,
              ft_log::kLogTag, file, loc.line());
   std::println(fmt, std::forward<Args>(args)...);
 
-  if (!color.empty()) {
+  if (!reset.empty()) {
     std::print("{}", reset);
   }
 }
+
+#ifndef FT_LOG_DIS
 
 // Convenience macros for standardizing call sites.
 #define FT_LOGE(fmt, ...) \
@@ -84,5 +104,15 @@ void FtLog(LogLevel level, const std::source_location& loc,
   FtLog(LogLevel::kDebug, std::source_location::current(), fmt, ##__VA_ARGS__)
 #define FT_LOGV(fmt, ...) \
   FtLog(LogLevel::kVerbose, std::source_location::current(), fmt, ##__VA_ARGS__)
+
+#else  // FT_LOG_DIS
+
+#define FT_LOGE(fmt, ...)
+#define FT_LOGW(fmt, ...)
+#define FT_LOGI(fmt, ...)
+#define FT_LOGD(fmt, ...)
+#define FT_LOGV(fmt, ...)
+
+#endif  // FT_LOG_DIS
 
 #endif  // UTIL_FOCALTECH_FT_LOG_H_

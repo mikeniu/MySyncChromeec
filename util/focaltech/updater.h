@@ -31,6 +31,33 @@ struct FtConfigPage {
   uint32_t code_start_address;
 } __attribute__((packed));
 
+constexpr size_t kFtFlashWpBufferSize = 512;
+// FocalTech vendor-specific SCSI command opcodes
+constexpr uint8_t kFtCmdReadInfo = 0xDB;
+constexpr uint8_t kFtCmdAction = 0xDC;
+
+// Sub-commands for kFtCmdAction
+constexpr uint8_t kFtSubcmdReadData = 0x01;
+constexpr uint8_t kFtSubcmdWriteBin = 0x03;
+constexpr uint8_t kFtSubcmdCodeBin = 0x04;
+constexpr uint8_t kFtSubcmdErasePage = 0x08;
+constexpr uint8_t kFtSubcmdVerify = 0xBB;
+constexpr uint8_t kFtSubcmdSoftReset = 0xDD;
+constexpr uint8_t kFtSubcmdFlashWpSet = 0xF7;
+constexpr uint8_t kFtSubcmdFlashWpGet = 0xF8;
+
+constexpr size_t kFtBootVersionMax = 36;
+constexpr uint32_t kFtWriteSramAddr = 0x20002000;
+constexpr size_t kFtEcBinSizeMax = 2 * 1024 * 1024;
+
+constexpr size_t kFocalConfigSize = 0x1000;
+constexpr uint32_t kFocalRomCfgAddr = 0x10000000;
+constexpr uint32_t kFocalBootCfgAddr = 0x10080000;
+constexpr uint32_t kFocalRomRunAddr = 0x10002000;
+constexpr uint32_t kFocalBootRunAddr = 0x10081000;
+
+constexpr uint32_t kCodeValidMagic = 0x3AEC3721;
+
 // ----------------------------------------------------------------------------
 // Firmware update
 // ----------------------------------------------------------------------------

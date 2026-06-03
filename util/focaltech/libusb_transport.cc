@@ -113,9 +113,9 @@ void LibusbDeviceHandleDeleter::operator()(libusb_device_handle* handle) const {
 }
 
 // --------------------------------------------------------------------------
-// Factory: initialize libusb, find device, open, claim interface
+// Step 1: Find a Focal device (no opening)
 // --------------------------------------------------------------------------
-std::expected<LibusbTransport, FtError> LibusbTransport::Create() {
+std::expected<FoundDeviceInfo, FtError> LibusbTransport::FindDevice() {
   // 1. Initialize libusb context
   libusb_context* raw_ctx = nullptr;
   if (libusb_init(&raw_ctx) != LIBUSB_SUCCESS) {
@@ -141,65 +141,129 @@ std::expected<LibusbTransport, FtError> LibusbTransport::Create() {
     FT_LOGE("No matching Focal device found");
     return std::unexpected(FtError::kNoSuchDevice);
   }
-  UsbDeviceId id{desc.idVendor, desc.idProduct};
+
+  // Increase reference count on the device so it remains valid after the device
+  // list is freed
+  libusb_ref_device(target);
+
+  // Release the device list (all devices are unref'ed, but target has an extra
+  // ref)
+  dev_list.reset();
+
+  UsbDeviceId id{.vid = desc.idVendor, .pid = desc.idProduct};
   FT_LOGI("Found device VID {:04x}: PID {:04x}", id.vid, id.pid);
 
-  // 4. Open device
+  return FoundDeviceInfo{std::move(ctx), target, id};
+}
+
+// --------------------------------------------------------------------------
+// Constructor (lazy open – does not open device)
+// --------------------------------------------------------------------------
+LibusbTransport::LibusbTransport(FoundDeviceInfo info)
+    : ctx_(std::move(info.ctx)),
+      device_(info.dev),
+      device_id_(info.id),
+      handle_(nullptr),
+      endpoint_in_(0),
+      endpoint_out_(0),
+      interface_num_(0),
+      opened_(false) {}
+
+// --------------------------------------------------------------------------
+// Destructor: release device reference
+// --------------------------------------------------------------------------
+LibusbTransport::~LibusbTransport() {
+  if (device_) {
+    libusb_unref_device(device_);
+    device_ = nullptr;
+  }
+}
+
+// --------------------------------------------------------------------------
+// Ensure device is opened (lazy initialization)
+// --------------------------------------------------------------------------
+std::expected<void, FtError> LibusbTransport::EnsureOpened() {
+  if (opened_) {
+    return {};
+  }
+
+  FT_LOGD("start open usb device");
+
+  if (!device_) {
+    FT_LOGE("Invalid device pointer");
+    return std::unexpected(FtError::kNoSuchDevice);
+  }
+
+  // 1. Open the device
   libusb_device_handle* raw_handle = nullptr;
-  int r = libusb_open(target, &raw_handle);
+  int r = libusb_open(device_, &raw_handle);
   if (r != LIBUSB_SUCCESS || !raw_handle) {
     FT_LOGE("Failed to open device: {}", libusb_error_name(r));
     return std::unexpected(FtError::kNoSuchDevice);
   }
-  std::unique_ptr<libusb_device_handle, LibusbDeviceHandleDeleter> handle(
-      raw_handle);
+  handle_.reset(raw_handle);
 
-  // 5. Find bulk endpoints
+  // 2. Find bulk endpoints
   EndpointInfo ep_info;
-  if (!FindBulkEndpoints(target, ep_info)) {
+  if (!FindBulkEndpoints(device_, ep_info)) {
     FT_LOGE("Could not find required bulk IN/OUT endpoints");
     return std::unexpected(FtError::kNoSuchDevice);
   }
+  endpoint_in_ = ep_info.ep_bulk_in;
+  endpoint_out_ = ep_info.ep_bulk_out;
+  interface_num_ = ep_info.interface_num;
 
-  // 6. Detach kernel driver if active
-  if (libusb_kernel_driver_active(handle.get(), ep_info.interface_num) == 1) {
-    if (libusb_detach_kernel_driver(handle.get(), ep_info.interface_num) !=
+  // 3. Detach kernel driver if active
+  if (libusb_kernel_driver_active(handle_.get(), interface_num_) == 1) {
+    if (libusb_detach_kernel_driver(handle_.get(), interface_num_) !=
         LIBUSB_SUCCESS) {
       FT_LOGE("Failed to detach kernel driver");
       return std::unexpected(FtError::kResultFail);
     }
   }
 
-  // 7. Claim the interface – no proactive device reset needed.
-  if (libusb_claim_interface(handle.get(), ep_info.interface_num) < 0) {
+  // 4. Claim the interface
+  if (libusb_claim_interface(handle_.get(), interface_num_) < 0) {
     FT_LOGE("Failed to claim interface");
     return std::unexpected(FtError::kResultFail);
   }
 
-  // 8. Construct and return the transport object
-  return LibusbTransport(std::move(ctx), std::move(handle), id,
-                         ep_info.ep_bulk_in, ep_info.ep_bulk_out);
+  // 5. We no longer need the separate device reference (handle holds its own)
+  if (device_) {
+    libusb_unref_device(device_);
+    device_ = nullptr;
+  }
+
+  opened_ = true;
+  return {};
+}
+
+/*Only locate the Focal device to support the following scenario:
+1.The system image contains this tool that automatically detects whether the
+fingerprint device is in bootloader mode and automatically upgrades the
+firmware.
+2.After the upgrade, the fingerprint device is in FtDeviceMode::kEc,
+and this tool must not perform USB claim / libusb_detach_kernel_driver
+operations on the fingerprint device, as that could affect fingerprint
+functionality.*/
+
+std::expected<LibusbTransport, FtError> LibusbTransport::Create() {
+  auto find_res = FindDevice();
+  if (!find_res) {
+    return std::unexpected(find_res.error());
+  }
+  return LibusbTransport(std::move(*find_res));
 }
 
 // --------------------------------------------------------------------------
-// Private constructor
-// --------------------------------------------------------------------------
-LibusbTransport::LibusbTransport(
-    std::unique_ptr<libusb_context, LibusbContextDeleter> ctx,
-    std::unique_ptr<libusb_device_handle, LibusbDeviceHandleDeleter> handle,
-    UsbDeviceId id, uint8_t ep_in, uint8_t ep_out)
-    : ctx_(std::move(ctx)),
-      handle_(std::move(handle)),
-      device_id_(id),
-      endpoint_in_(ep_in),
-      endpoint_out_(ep_out) {}
-
-// --------------------------------------------------------------------------
-// Send data over bulk OUT endpoint
+// Send data over bulk OUT endpoint (lazy open)
 // --------------------------------------------------------------------------
 std::expected<int, FtError> LibusbTransport::Send(
     std::span<const uint8_t> data, std::chrono::milliseconds timeout) {
-  if (!handle_) return std::unexpected(FtError::kNoSuchDevice);
+  auto open_res = EnsureOpened();
+  if (!open_res) {
+    return std::unexpected(open_res.error());
+  }
 
   int actual = 0;
   int r = libusb_bulk_transfer(handle_.get(), endpoint_out_,
@@ -211,11 +275,14 @@ std::expected<int, FtError> LibusbTransport::Send(
 }
 
 // --------------------------------------------------------------------------
-// Receive data over bulk IN endpoint
+// Receive data over bulk IN endpoint (lazy open)
 // --------------------------------------------------------------------------
 std::expected<int, FtError> LibusbTransport::Recv(
     std::span<uint8_t> data, std::chrono::milliseconds timeout) {
-  if (!handle_) return std::unexpected(FtError::kNoSuchDevice);
+  auto open_res = EnsureOpened();
+  if (!open_res) {
+    return std::unexpected(open_res.error());
+  }
 
   int actual = 0;
   int r = libusb_bulk_transfer(handle_.get(), endpoint_in_, data.data(),
@@ -230,9 +297,9 @@ std::expected<int, FtError> LibusbTransport::Recv(
 // --------------------------------------------------------------------------
 std::expected<void, FtError> LibusbTransport::WaitForReset(
     std::chrono::milliseconds timeout) {
-  if (!handle_) {
-    FT_LOGE("Invalid device handle");
-    return std::unexpected(FtError::kNoSuchDevice);
+  auto open_res = EnsureOpened();
+  if (!open_res) {
+    return std::unexpected(open_res.error());
   }
 
   const auto start = std::chrono::steady_clock::now();
@@ -262,6 +329,7 @@ std::expected<void, FtError> LibusbTransport::WaitForReset(
 // --------------------------------------------------------------------------
 std::expected<int, FtError> LibusbTransport::HandleTransferError(
     int libusb_error) const {
+  if (!handle_) return std::unexpected(FtError::kNoSuchDevice);
   // Attempt to reset the device to recover
   libusb_reset_device(handle_.get());
   std::this_thread::sleep_for(kUsbEnumerationDelay);

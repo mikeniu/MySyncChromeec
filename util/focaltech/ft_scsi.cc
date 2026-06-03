@@ -5,8 +5,6 @@
 
 #include "ft_scsi.h"
 
-#include <endian.h>
-
 #include <bit>
 
 #include "ft_log.h"
@@ -24,23 +22,6 @@ constexpr uint8_t kBotCommandPassed = 0x00;
 using namespace std::chrono_literals;
 constexpr auto kResetWaitTimeout = 3000ms;
 
-struct BulkCbWrap {
-  uint32_t signature;
-  uint32_t tag;
-  uint32_t data_transfer_length;
-  uint8_t flags;
-  uint8_t lun;
-  uint8_t cmd_len;
-  uint8_t cmd[16];
-} __attribute__((packed));
-
-struct BulkCsWrap {
-  uint32_t signature;
-  uint32_t tag;
-  uint32_t data_residue;
-  uint8_t status;
-} __attribute__((packed));
-
 struct FtCmdFormat {
   uint8_t opcode;
   uint32_t address;
@@ -56,9 +37,10 @@ std::expected<BulkCbWrap, FtError> SendCbw(
     size_t data_length, TransferDirection dir,
     std::chrono::milliseconds timeout_ms) {
   BulkCbWrap cbw{
-      .signature = htole32(kUsbMsCbwSignature),
-      .tag = htole32(device.GetNextCdbTag()),  // Using atomic thread-safe tag
-      .data_transfer_length = htole32(data_length),
+      .signature = ToLittleEndian(kUsbMsCbwSignature),
+      .tag = ToLittleEndian(device.GetNextCdbTag()),
+      .data_transfer_length =
+          ToLittleEndian(static_cast<uint32_t>(data_length)),
       .flags =
           (dir == TransferDirection::kIn) ? kBotDirectionIn : kBotDirectionOut,
       .lun = 0,
@@ -90,8 +72,8 @@ std::expected<void, FtError> ReceiveAndValidateCsw(
     return std::unexpected(FtError::kResultFail);
   }
 
-  if (le32toh(csw.signature) != kUsbMsCswSignature ||
-      le32toh(csw.tag) != le32toh(cbw.tag)) {
+  if (ToLittleEndian(csw.signature) != kUsbMsCswSignature ||
+      ToLittleEndian(csw.tag) != ToLittleEndian(cbw.tag)) {
     FT_LOGE("CSW signature/tag mismatch.");
     return std::unexpected(FtError::kResultFail);
   }
@@ -105,19 +87,21 @@ std::expected<void, FtError> ReceiveAndValidateCsw(
 
 }  // namespace
 
-std::array<uint8_t, 16> BuildFtCmd(uint8_t opcode, uint8_t subcmd,
-                                   uint32_t address, uint32_t length,
-                                   uint32_t aux_address, uint8_t flags) {
+std::array<uint8_t, kFtScsiCmdSize> BuildFtCmd(uint8_t opcode, uint8_t subcmd,
+                                               uint32_t address,
+                                               uint32_t length,
+                                               uint32_t aux_address,
+                                               uint8_t flags) {
   FtCmdFormat cmd{
       .opcode = opcode,
-      .address = address,
-      .length = length,
-      .aux_address = aux_address,
+      .address = ToLittleEndian(address),
+      .length = ToLittleEndian(length),
+      .aux_address = ToLittleEndian(aux_address),
       .subcmd = subcmd,
       .flags = flags,
       .reserved = 0,
   };
-  return std::bit_cast<std::array<uint8_t, 16>>(cmd);
+  return std::bit_cast<std::array<uint8_t, kFtScsiCmdSize>>(cmd);
 }
 
 std::expected<void, FtError> SendBulkDataOut(

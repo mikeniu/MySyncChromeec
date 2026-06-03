@@ -12,26 +12,15 @@
 #include <memory>
 #include <thread>
 
+#include "mock_usb_transport.h"
 #include "usb_transport.h"
 
 using namespace std::chrono_literals;
+using ::focaltech::testing::MockUsbTransport;
 using ::testing::_;
 using ::testing::ByMove;
 using ::testing::Invoke;
 using ::testing::Return;
-
-// Mock USB transport
-class MockUsbTransport : public UsbTransport {
- public:
-  MOCK_METHOD(UsbDeviceId, device_id, (), (const, override));
-  MOCK_METHOD((std::expected<int, FtError>), Send,
-              (std::span<const uint8_t>, std::chrono::milliseconds),
-              (override));
-  MOCK_METHOD((std::expected<int, FtError>), Recv,
-              (std::span<uint8_t>, std::chrono::milliseconds), (override));
-  MOCK_METHOD((std::expected<void, FtError>), WaitForReset,
-              (std::chrono::milliseconds), (override));
-};
 
 // Helper: create a UsbDevice with given mock
 static UsbDevice MakeDevice(std::unique_ptr<MockUsbTransport> mock) {
@@ -135,7 +124,7 @@ TEST(UsbDeviceTest, WaitForResetHandlesError) {
 
 TEST(UsbDeviceTest, DeviceIdReturnsFromTransport) {
   auto mock = std::make_unique<MockUsbTransport>();
-  UsbDeviceId expected_id{0x2808, 0x0001};
+  UsbDeviceId expected_id{.vid = 0x2808, .pid = 0x0001};
 
   // WillRepeatedly because device_id() is called twice (for vid and pid)
   EXPECT_CALL(*mock, device_id()).WillRepeatedly(Return(expected_id));

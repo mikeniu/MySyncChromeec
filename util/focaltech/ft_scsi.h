@@ -12,11 +12,32 @@
 
 #include "usb_device.h"
 
+constexpr size_t kFtScsiCmdSize = 16;
+
+struct BulkCbWrap {
+  uint32_t signature;
+  uint32_t tag;
+  uint32_t data_transfer_length;
+  uint8_t flags;
+  uint8_t lun;
+  uint8_t cmd_len;
+  uint8_t cmd[kFtScsiCmdSize];
+} __attribute__((packed));
+
+struct BulkCsWrap {
+  uint32_t signature;
+  uint32_t tag;
+  uint32_t data_residue;
+  uint8_t status;
+} __attribute__((packed));
+
 enum class TransferDirection { kIn, kOut, kSendOnly };
 
-std::array<uint8_t, 16> BuildFtCmd(uint8_t opcode, uint8_t subcmd,
-                                   uint32_t address = 0, uint32_t length = 0,
-                                   uint32_t aux_address = 0, uint8_t flags = 0);
+std::array<uint8_t, kFtScsiCmdSize> BuildFtCmd(uint8_t opcode, uint8_t subcmd,
+                                               uint32_t address = 0,
+                                               uint32_t length = 0,
+                                               uint32_t aux_address = 0,
+                                               uint8_t flags = 0);
 
 // For sending data TO the device (Data buffer is const)
 std::expected<void, FtError> SendBulkDataOut(

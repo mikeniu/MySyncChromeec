@@ -23,41 +23,17 @@ namespace {
 
 using namespace std::chrono_literals;
 
-// FocalTech vendor-specific SCSI command opcodes
-constexpr uint8_t kFtCmdReadInfo = 0xDB;
-constexpr uint8_t kFtCmdAction = 0xDC;
-
-// Sub-commands for kFtCmdAction
-constexpr uint8_t kFtSubcmdReadData = 0x01;
-constexpr uint8_t kFtSubcmdWriteBin = 0x03;
-constexpr uint8_t kFtSubcmdCodeBin = 0x04;
-constexpr uint8_t kFtSubcmdErasePage = 0x08;
-constexpr uint8_t kFtSubcmdVerify = 0xBB;
-constexpr uint8_t kFtSubcmdSoftReset = 0xDD;
-constexpr uint8_t kFtSubcmdFlashWpSet = 0xF7;
-constexpr uint8_t kFtSubcmdFlashWpGet = 0xF8;
-
-constexpr size_t kFtBootVersionMax = 36;
-constexpr uint32_t kFtWriteSramAddr = 0x20002000;
-constexpr size_t kFtEcBinSizeMax = 2 * 1024 * 1024;
-
-constexpr size_t kFocalConfigSize = 0x1000;
-constexpr uint32_t kFocalRomCfgAddr = 0x10000000;
-constexpr uint32_t kFocalBootCfgAddr = 0x10080000;
-constexpr uint32_t kFocalRomRunAddr = 0x10002000;
-constexpr uint32_t kFocalBootRunAddr = 0x10081000;
-
-constexpr uint32_t kCodeValidMagic = 0x3AEC3721;
-
 constexpr uint8_t kSoftPor = 0;
 
-using namespace std::chrono_literals;
 // Before bootloader v1.8, erasing the flash takes about 4.4 seconds.
 constexpr auto kErasePageTimeout = 6000ms;
 constexpr auto kDownloadPageTimeout = 1000ms;
 constexpr auto kVerifyHashTimeout = 1000ms;
 constexpr auto kMcuResetTimeout = 3000ms;
 constexpr auto kGenericInfoTimeout = 200ms;
+
+constexpr uint8_t kFtHashModeSha256 = 0x04;
+constexpr uint8_t kFtHashModeRomShift = 4;
 
 std::expected<std::vector<uint8_t>, FtError> ReadFileToVector(
     std::string_view path) {
@@ -160,20 +136,23 @@ static std::expected<void, FtError> FtDownloadBin(const UsbDevice& device,
   auto erase_res = FtErasePage(device, file_len, target_addr);
   if (!erase_res) return erase_res;
 
-  size_t len = total_frame * kFocalConfigSize;
-  std::vector<uint8_t> write_buffer(len, 0xFF);
+  size_t padded_buffer_size = total_frame * kFocalConfigSize;
+  // 0xFF is the initial value of flash.
+  constexpr uint8_t kFlashInitValue = 0xFF;
+  std::vector<uint8_t> write_buffer(padded_buffer_size, kFlashInitValue);
   std::memcpy(write_buffer.data(), buffer.data(), file_len);
 
   uint8_t* p = write_buffer.data();
   uint32_t downaddr = target_addr;
   size_t per_len = kFocalConfigSize;
-  size_t frame = 0;
+  [[maybe_unused]] size_t frame = 0;  // Used only in logging macros
+  size_t len = file_len;              // Use exact file length for transmission
 
   if (target_addr == kFocalBootCfgAddr || target_addr == kFocalRomCfgAddr) {
     FT_LOGI("Write config page last");
     downaddr += per_len;
     p += per_len;
-    len -= per_len;
+    len = (len > per_len) ? (len - per_len) : 0;
   }
 
   while (len >= per_len) {
@@ -187,7 +166,9 @@ static std::expected<void, FtError> FtDownloadBin(const UsbDevice& device,
   }
 
   if (len > 0) {
-    len = FtDivRoundUp<size_t>(len, 4);
+    constexpr size_t kWordSize = sizeof(uint32_t);
+    len = FtDivRoundUp<size_t>(len, kWordSize) *
+          kWordSize;  // Align to 4-byte boundary correctly
     auto page_res = FtDownloadPage(device, downaddr, len, {p, len});
     if (!page_res) return page_res;
   }
@@ -212,8 +193,11 @@ std::expected<void, FtError> FtVerifyData(const UsbDevice& device,
   }
   const auto& firmware_data = file_res.value();
 
-  // HASH256 mode
-  uint8_t hash_mode = (target_addr == kFocalRomCfgAddr) ? (0x04 << 4) : 0x04;
+  // SHA256 mode, In ROM mode, this parameter needs to be left-shifted by 4
+  // bits.
+  uint8_t hash_mode = (target_addr == kFocalRomCfgAddr)
+                          ? (kFtHashModeSha256 << kFtHashModeRomShift)
+                          : kFtHashModeSha256;
 
   std::array<uint8_t, SHA256_DIGEST_LENGTH> device_hash{};
 
@@ -268,6 +252,7 @@ static std::expected<void, FtError> FtGetBootVersion(const UsbDevice& device) {
   FT_LOGI("Boot version: {}", version);
   return {};
 }
+
 static std::expected<bool, FtError> IsEcBinHasConfigPage(
     std::string_view file_path, uint32_t& code_start_addr) {
   std::ifstream file(std::string{file_path}, std::ios::binary);
@@ -287,6 +272,11 @@ static std::expected<bool, FtError> IsEcBinHasConfigPage(
     return false;
   }
 
+  if (file.gcount() != sizeof(config)) {
+    FT_LOGE("Failed to read config page (file too small).");
+    return std::unexpected(FtError::kResultFail);
+  }
+
   code_start_addr = config.code_start_address;
   FT_LOGD("Config page found: start=0x{:x}", code_start_addr);
   return true;
@@ -294,7 +284,6 @@ static std::expected<bool, FtError> IsEcBinHasConfigPage(
 
 std::expected<void, FtError> UpdateFw(const UsbDevice& device,
                                       FtDeviceInfo& info) {
-  std::string boot_version;
   uint32_t target_addr = kFocalRomCfgAddr;
   uint32_t code_start_addr = 0;
 
@@ -346,7 +335,7 @@ std::expected<void, FtError> UpdateFw(const UsbDevice& device,
 
   if (info.ec_bin.empty()) {
     FT_LOGE("ec bin is null");
-    return abort_update(res.error());
+    return abort_update(FtError::kParameterError);
   }
   FT_LOGI("Begin firmware update: {}", info.ec_bin);
   // Download, verify, reset
@@ -386,7 +375,8 @@ std::expected<FtFlashWpArea, FtError> FtGetFlashProtect(
   FT_LOGI("Getting flash write protect area...");
 
   std::vector<uint8_t> data(
-      512, 0);  // Device returns 512 bytes, first byte holds area
+      kFtFlashWpBufferSize,
+      0);  // Device returns 512 bytes, first byte holds area
 
   auto res = ReceiveActionIn(device, kFtSubcmdFlashWpGet, 0, data,
                              kGenericInfoTimeout);
@@ -420,7 +410,8 @@ std::expected<void, FtError> FtSetFlashProtect(const UsbDevice& device,
 
   FT_LOGI("Setting flash write protect to area: {}", static_cast<int>(wp_area));
 
-  std::vector<uint8_t> dummy(512, 0);  // Some firmware expects a buffer
+  std::vector<uint8_t> dummy(kFtFlashWpBufferSize,
+                             0);  // Some firmware expects a buffer
 
   auto res = ReceiveActionIn(
       device, kFtSubcmdFlashWpSet, static_cast<uint32_t>(wp_area), dummy,

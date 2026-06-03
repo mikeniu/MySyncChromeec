@@ -5,7 +5,6 @@
 
 #include "updater.h"
 
-#include <endian.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -21,28 +20,18 @@
 #include <openssl/sha.h>
 
 #include "mock_usb_transport.h"
+#include "test_utils.h"
 #include "usb_device.h"
 
 using namespace std::chrono_literals;
+using ::focaltech::testing::BuildValidCsw;
+using ::focaltech::testing::ComputeSha256;
+using ::focaltech::testing::kUsbCbwSize;
+using ::focaltech::testing::kUsbCswSize;
+using ::focaltech::testing::MockUsbTransport;
 using ::testing::_;
 using ::testing::Invoke;
 using ::testing::Return;
-
-constexpr size_t kUsbCbwSize = 31;
-constexpr size_t kUsbCswSize = 13;
-constexpr uint32_t kUsbMsCswSignature = 0x53425355;
-
-// FocalTech constants for tests
-constexpr uint32_t kFocalBootCfgAddr = 0x10080000;
-constexpr uint32_t kFocalBootRunAddr = 0x10081000;
-constexpr uint32_t kCodeValidMagic = 0x3AEC3721;
-
-struct BulkCsWrap {
-  uint32_t signature;
-  uint32_t tag;
-  uint32_t data_residue;
-  uint8_t status;
-} __attribute__((packed));
 
 // RAII: Automatically deletes the test firmware file when the test finishes.
 class ScopedTempFile {
@@ -59,29 +48,14 @@ class ScopedTempFile {
   std::filesystem::path path_;
 };
 
-// Helper: compute SHA256 of a byte span.
-static std::array<uint8_t, SHA256_DIGEST_LENGTH> ComputeSha256(
-    std::span<const uint8_t> data) {
-  std::array<uint8_t, SHA256_DIGEST_LENGTH> hash{};
-  SHA256(data.data(), data.size(), hash.data());
-  return hash;
-}
-
-// Helper: build a valid CSW with the given tag
-static void BuildValidCsw(std::span<uint8_t> data, uint32_t tag) {
-  BulkCsWrap csw{.signature = htole32(kUsbMsCswSignature),
-                 .tag = htole32(tag),
-                 .data_residue = 0,
-                 .status = 0};
-  std::memcpy(data.data(), &csw, sizeof(csw));
-}
-
 // -----------------------------------------------------------------------------
 // STUB TRANSPORT FOR ORCHESTRATION TESTS
 // -----------------------------------------------------------------------------
 class StubUsbTransport : public UsbTransport {
  public:
-  UsbDeviceId device_id() const override { return {0x2808, 0x0001}; }
+  UsbDeviceId device_id() const override {
+    return UsbDeviceId{.vid = 0x2808, .pid = 0x0001};
+  }
 
   void SetExpectedHash(const std::array<uint8_t, SHA256_DIGEST_LENGTH>& hash) {
     expected_hash_ = hash;
@@ -94,11 +68,19 @@ class StubUsbTransport : public UsbTransport {
     return erased_addresses_;
   }
 
+  // Expose data payload sizes for verification
+  const std::vector<size_t>& GetDataPayloadSizes() const {
+    return data_payload_sizes_;
+  }
+
   std::expected<int, FtError> Send(std::span<const uint8_t> data,
                                    std::chrono::milliseconds) override {
     // Capture tag from CBW for later CSW generation
     if (data.size() == kUsbCbwSize) {
       current_tag_ = *reinterpret_cast<const uint32_t*>(&data[4]);
+    } else {
+      // If it's not a CBW, it's a data payload phase
+      data_payload_sizes_.push_back(data.size());
     }
 
     // Intercept Erase Page commands:
@@ -106,9 +88,10 @@ class StubUsbTransport : public UsbTransport {
     // - SCSI opcode (byte 15) == 0xDC (kFtCmdAction)
     // - Subcommand (byte 28) == 0x08 (kFtSubcmdErasePage)
     // - Address is at bytes 16..19 (little-endian)
-    if (data.size() == kUsbCbwSize && data[15] == 0xDC && data[28] == 0x08) {
+    if (data.size() == kUsbCbwSize && data[15] == kFtCmdAction &&
+        data[28] == kFtSubcmdErasePage) {
       uint32_t address = *reinterpret_cast<const uint32_t*>(&data[16]);
-      erased_addresses_.push_back(le32toh(address));
+      erased_addresses_.push_back(ToLittleEndian(address));
     }
     return static_cast<int>(data.size());
   }
@@ -122,9 +105,9 @@ class StubUsbTransport : public UsbTransport {
     }
 
     // Boot version request (36 bytes expected)
-    if (data.size() == 36) {
+    if (data.size() == kFtBootVersionMax) {
       std::ranges::copy(std::string("boot_v1.0"), data.begin());
-      return 36;
+      return kFtBootVersionMax;
     }
 
     // Verify hash request (32 bytes expected)
@@ -149,6 +132,7 @@ class StubUsbTransport : public UsbTransport {
  private:
   bool force_verify_fail_ = false;
   std::vector<uint32_t> erased_addresses_;
+  std::vector<size_t> data_payload_sizes_;
   std::array<uint8_t, SHA256_DIGEST_LENGTH> expected_hash_{};
   uint32_t current_tag_ = 1;
 };
@@ -161,7 +145,7 @@ TEST(UpdaterTest, UpdateFw_SuccessBootloaderMode) {
   FtConfigPage config{.code_valid_control_word = kCodeValidMagic,
                       .code_start_address = kFocalBootRunAddr};
 
-  std::vector<uint8_t> fw_data(sizeof(FtConfigPage) + 4096, 0xBB);
+  std::vector<uint8_t> fw_data(sizeof(FtConfigPage) + kFocalConfigSize, 0xBB);
   std::memcpy(fw_data.data(), &config, sizeof(config));
   auto expected_hash = ComputeSha256(fw_data);
   ScopedTempFile fw_file(fw_data);
@@ -178,7 +162,7 @@ TEST(UpdaterTest, UpdateFw_SuccessBootloaderMode) {
 }
 
 TEST(UpdaterTest, UpdateFw_FailsOnMissingConfigPage) {
-  std::vector<uint8_t> fw_data(sizeof(FtConfigPage) + 4096, 0xFF);
+  std::vector<uint8_t> fw_data(sizeof(FtConfigPage) + kFocalConfigSize, 0xFF);
   ScopedTempFile fw_file(fw_data);
   std::string fw_path = fw_file.path();
 
@@ -191,11 +175,59 @@ TEST(UpdaterTest, UpdateFw_FailsOnMissingConfigPage) {
   EXPECT_EQ(res.error(), FtError::kParameterError);
 }
 
-TEST(UpdaterTest, UpdateFw_FailsOnModeMismatch) {
-  FtConfigPage config{.code_valid_control_word = kCodeValidMagic,
-                      .code_start_address = 0x10002000};  // ROM run address
+TEST(UpdaterTest, UpdateFw_PadsPartialPayloadsToWordBoundary) {
+  // Create a file of 4096 (config page) + 13 bytes (partial payload) = 4109
+  // bytes
+  std::vector<uint8_t> fw_data(kFocalConfigSize + 13, 0xAA);
 
-  std::vector<uint8_t> fw_data(sizeof(FtConfigPage) + 4096, 0xFF);
+  // Inject a valid config header so it passes initial validation
+  FtConfigPage config{.code_valid_control_word = kCodeValidMagic,
+                      .code_start_address = kFocalBootRunAddr};
+  std::memcpy(fw_data.data(), &config, sizeof(config));
+
+  ScopedTempFile fw_file(fw_data);
+  std::string fw_path = fw_file.path();
+
+  auto transport = std::make_unique<StubUsbTransport>();
+  transport->SetExpectedHash(ComputeSha256(fw_data));
+  auto* raw_transport = transport.get();
+
+  UsbDevice device(std::move(transport));
+  FtDeviceInfo info{.current_mode = FtDeviceMode::kBoot, .ec_bin = fw_path};
+
+  auto res = UpdateFw(device, info);
+  EXPECT_TRUE(res.has_value());
+
+  // Verify that the 13-byte remainder was padded to a 16-byte boundary on the
+  // wire
+  const auto& payload_sizes = raw_transport->GetDataPayloadSizes();
+  EXPECT_TRUE(std::ranges::contains(payload_sizes, 16))
+      << "Expected a 16-byte padded transmission for the 13-byte remainder.";
+}
+
+TEST(UpdaterTest, UpdateFw_FailsOnFileTooSmall) {
+  // Create a payload strictly 1 byte smaller than required to test EOF handling
+  std::vector<uint8_t> undersized_data(sizeof(FtConfigPage) - 1, 0xFF);
+  ScopedTempFile fw_file(undersized_data);
+  std::string fw_path = fw_file.path();
+
+  auto transport = std::make_unique<StubUsbTransport>();
+  UsbDevice device(std::move(transport));
+
+  FtDeviceInfo info{.current_mode = FtDeviceMode::kBoot, .ec_bin = fw_path};
+
+  auto res = UpdateFw(device, info);
+
+  EXPECT_FALSE(res.has_value());
+  EXPECT_EQ(res.error(), FtError::kParameterError);
+}
+
+TEST(UpdaterTest, UpdateFw_FailsOnModeMismatch) {
+  FtConfigPage config{
+      .code_valid_control_word = kCodeValidMagic,
+      .code_start_address = kFocalRomRunAddr};  // ROM run address
+
+  std::vector<uint8_t> fw_data(sizeof(FtConfigPage) + kFocalConfigSize, 0xFF);
   std::memcpy(fw_data.data(), &config, sizeof(config));
   ScopedTempFile fw_file(fw_data);
   std::string fw_path = fw_file.path();
@@ -214,7 +246,7 @@ TEST(UpdaterTest, UpdateFw_VerifyFails_AbortsAndErasesConfig) {
   FtConfigPage config{.code_valid_control_word = kCodeValidMagic,
                       .code_start_address = kFocalBootRunAddr};
 
-  std::vector<uint8_t> fw_data(sizeof(FtConfigPage) + 4096, 0x00);
+  std::vector<uint8_t> fw_data(sizeof(FtConfigPage) + kFocalConfigSize, 0x00);
   std::memcpy(fw_data.data(), &config, sizeof(config));
   ScopedTempFile fw_file(fw_data);
   std::string fw_path = fw_file.path();
@@ -254,7 +286,7 @@ TEST(UpdaterTest, FtGetFlashProtect_Success) {
           [](std::span<uint8_t> data, auto) -> std::expected<int, FtError> {
             std::fill(data.begin(), data.end(), 0);
             data[0] = static_cast<uint8_t>(FtFlashWpArea::kRo);
-            return 512;
+            return kFtFlashWpBufferSize;
           }))
       .WillOnce(Invoke(
           [](std::span<uint8_t> data, auto) -> std::expected<int, FtError> {
@@ -301,7 +333,7 @@ TEST(UpdaterTest, FtSetFlashProtect_Success) {
       .WillOnce(Invoke(
           [](std::span<uint8_t> data, auto) -> std::expected<int, FtError> {
             // Data read for SET command (dummy 512 bytes)
-            return 512;
+            return kFtFlashWpBufferSize;
           }))
       .WillOnce(Invoke(
           [](std::span<uint8_t> data, auto) -> std::expected<int, FtError> {
@@ -314,7 +346,7 @@ TEST(UpdaterTest, FtSetFlashProtect_Success) {
             // Data read for GET command: return the WP area that was set (kRw)
             std::fill(data.begin(), data.end(), 0);
             data[0] = static_cast<uint8_t>(FtFlashWpArea::kRw);
-            return 512;
+            return kFtFlashWpBufferSize;
           }))
       .WillOnce(Invoke(
           [](std::span<uint8_t> data, auto) -> std::expected<int, FtError> {
