@@ -18,6 +18,7 @@
 
 #include <stdbool.h>
 
+#include <array>
 #include <span>
 
 #if !defined(CONFIG_BORINGSSL_CRYPTO) || !defined(CONFIG_ROLLBACK_SECRET_SIZE)
