@@ -72,6 +72,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d8bcf4c4_2a8f9330",
+        "filename": "util/focaltech/cli_test.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T00:50:59Z",
+      "side": 1,
+      "message": "In your test mock `FakeEcTransport` (`cli_test.cc`), you initialize a size variable using a C-style `-1` cast to represent an infinite/unset state:\n\n**Current:**\n\n```cpp\n  size_t fail_on_command_ \u003d static_cast\u003csize_t\u003e(-1);\n\n```\n\n**Recommendation:**\nYou can use `\u003climits\u003e`:\n\n```cpp\n  size_t fail_on_command_ \u003d std::numeric_limits\u003csize_t\u003e::max();\n\n```",
+      "range": {
+        "startLine": 105,
+        "startChar": 0,
+        "endLine": 105,
+        "endChar": 52
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7ccb24b6_454cc593",
         "filename": "util/focaltech/ft_scsi_test.cc",
         "patchSetId": 19
