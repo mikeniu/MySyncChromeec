@@ -402,21 +402,32 @@ def find_toolchains():
     """
     env = dict(os.environ)
     if "COREBOOT_SDK_ROOT" not in env:
-        for sys_path in sys.path:
-            ec_util_path = (
-                pathlib.Path(sys_path) / ".." / ".." / "util"
-            ).resolve()
-            if ec_util_path.is_dir():
-                run_result = subprocess.run(
-                    ["./coreboot_sdk.py", "-j"],
-                    check=True,
-                    stdout=subprocess.PIPE,
-                    cwd=str(ec_util_path),
-                )
-                env_vars = json.loads(run_result.stdout.decode("utf-8"))
-                if env_vars:
-                    os.environ.update(env_vars.items())
-                break
+        # Try to find util relative to this file first (handles running from source/editable)
+        ec_util_path = (
+            pathlib.Path(__file__).resolve().parent.parent.parent.parent
+            / "util"
+        ).resolve()
+        if not ec_util_path.is_dir():
+            # Fallback to sys.path
+            for sys_path in sys.path:
+                ec_util_path = (
+                    pathlib.Path(sys_path) / ".." / ".." / "util"
+                ).resolve()
+                if ec_util_path.is_dir():
+                    break
+            else:
+                ec_util_path = None
+
+        if ec_util_path and ec_util_path.is_dir():
+            run_result = subprocess.run(
+                ["./coreboot_sdk.py", "-j"],
+                check=True,
+                stdout=subprocess.PIPE,
+                cwd=str(ec_util_path),
+            )
+            env_vars = json.loads(run_result.stdout.decode("utf-8"))
+            if env_vars:
+                os.environ.update(env_vars.items())
 
 
 def main(argv=None):
