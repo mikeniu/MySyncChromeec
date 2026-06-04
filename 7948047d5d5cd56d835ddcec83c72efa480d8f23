@@ -96,6 +96,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "86a62320_d99b9c65",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T21:08:18Z",
+      "side": 1,
+      "message": "Let\u0027s group these into a struct for better organization and type safety. Gemini feedback:\n\n----\n\n### Rationale\n\nReplacing the loose `constexpr` integers with `UsbDeviceId` and `UsbDeviceProfile` resolves a classic code smell known as **Primitive Obsession**.\n\n1. **Type Safety:** By grouping the parameters, it becomes physically impossible to accidentally pass `ep_in` as `ep_out`, or to mismatch the App PID with the Bootloader endpoints when calling the `UsbComm` constructor.\n2. **Domain Accuracy:** A USB device is universally identified by a VID/PID pair. Extracting `UsbDeviceId` into its own struct accurately models this reality and gives you a reusable type for future USB bus scanning.\n3. **Free Operations:** Defaulting `operator\u003d\u003d` makes the ID a \"Regular\" type, granting free equality and inequality comparisons if you ever need to validate a connected device.\n4. **Self-Documenting Code:** Using C++20 designated initializers (`.vid \u003d ...`) means the call sites explicitly state what each value represents without relying on IDE hints.\n\nHere are the exact steps to implement this across the codebase.\n\n---\n\n### Step 1: Define the Structs in `usb_comm.h`\n\nAdd the nested struct definitions and update the constructor to take a `UsbDeviceProfile` instead of loose integers.\n\n**Modify `util/egis/usb_comm.h`:**\n\n```cpp\nnamespace egis {\n\nstruct UsbDeviceId {\n  uint16_t vid;\n  uint16_t pid;\n\n  bool operator\u003d\u003d(const UsbDeviceId \u0026) const \u003d default;\n};\n\nstruct UsbDeviceProfile {\n  UsbDeviceId id;\n  uint8_t ep_out;\n  uint8_t ep_in;\n};\n\nclass UsbComm : public UsbInterface {\n public:  \n  // Require the caller to provide the context and the profile\n  UsbComm(libusb_context *ctx, const UsbDeviceProfile \u0026profile);\n  ~UsbComm() override;\n\n  // ... [rest of the class remains unchanged] ...\n\n```\n\n---\n\n### Step 2: Update the Constructor Implementation in `usb_comm.cc`\n\nUnpack the profile properties into the class member variables.\n\n**Modify `util/egis/usb_comm.cc`:**\n\n```cpp\nUsbComm::UsbComm(libusb_context *ctx, const UsbDeviceProfile \u0026profile)\n    : ctx_(ctx), \n      vid_(profile.id.vid), \n      pid_(profile.id.pid), \n      ep_out_(profile.ep_out), \n      ep_in_(profile.ep_in) {}\n\n```\n\n---\n\n### Step 3: Modernize the Target Profiles in `et171_flash.cc`\n\nDelete the 8 loose `constexpr` integers and replace them with cleanly scoped `UsbDeviceProfile` objects using nested designated initializers. Then, update the `UsbComm` instantiations.\n\n**Modify `util/egis/et171_flash.cc`:**\n\n```cpp\nnamespace {\n\n// Replace the loose kVidGoogle, kPidEgisApp, etc. with these profiles:\nconstexpr egis::UsbDeviceProfile kAppProfile \u003d {\n    .id \u003d {\n        .vid \u003d 0x18D1,\n        .pid \u003d 0x5401,\n    },\n    .ep_out \u003d 0x01,\n    .ep_in \u003d 0x81,\n};\n\nconstexpr egis::UsbDeviceProfile kBootloaderProfile \u003d {\n    .id \u003d {\n        .vid \u003d 0x1C7A,\n        .pid \u003d 0x1002,\n    },\n    .ep_out \u003d 0x02,\n    .ep_in \u003d 0x81,\n};\n\nconstexpr auto kBootloaderTransitionDelay \u003d std::chrono::milliseconds(800);\n// ... [other timeouts remain unchanged] ...\n\nstd::expected\u003cvoid, UsbError\u003e ConnectToBootloader(libusb_context *usb_ctx,\n                                                  UsbComm \u0026boot_comm) {\n  // Pass the profile struct instead of 4 integers\n  UsbComm app_comm(usb_ctx, kAppProfile);\n  if (auto res \u003d app_comm.Connect(); res) {\n  // ... [rest of function unchanged] ...\n\n```\n\n*And further down in `main()`:*\n\n```cpp\n  // 3. Connect to Device\n  // Pass the Bootloader profile instead of 4 integers\n  egis::UsbComm boot_comm(usb_ctx.get(), kBootloaderProfile);\n\n```\n\n---\n\n### Step 4: Update the Test Suite\n\nYour `usb_comm_test.cc` file also needs to be updated to construct a test profile rather than passing loose values.\n\n**Modify `util/egis/usb_comm_test.cc`:**\n\n```cpp\nnamespace {\n\nconstexpr UsbDeviceProfile kTestProfile \u003d {\n    .id \u003d {\n        .vid \u003d 0x1234,\n        .pid \u003d 0x5678,\n    },\n    .ep_out \u003d 0x01,\n    .ep_in \u003d 0x81,\n};\n\nTEST(UsbCommTest, FailsWhenNotConnected) {\n  UsbComm comm(nullptr, kTestProfile);\n  std::vector\u003cuint8_t\u003e test_data(4);\n  EXPECT_EQ(comm.Send(test_data).error(), UsbError::kNotConnected);\n  EXPECT_EQ(comm.Receive(test_data).error(), UsbError::kNotConnected);\n}\n\nTEST(UsbCommTest, ConnectFailsWithNullContext) {\n  UsbComm comm(nullptr, kTestProfile);\n  EXPECT_EQ(comm.Connect().error(), UsbError::kInvalidParam);\n}\n\n}  // namespace\n\n```",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 47
+      },
+      "revId": "7948047d5d5cd56d835ddcec83c72efa480d8f23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "166f862e_70a90282",
         "filename": "util/egis/flasher_logic.cc",
         "patchSetId": 31
