@@ -1739,7 +1739,6 @@ tests:
   drivers.host_cmd_thread.ec_host_cmd:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_HOST_CMD_THREAD=y
-    - CONFIG_TASK_HOSTCMD_THREAD_MAIN=y
     - CONFIG_EC_HOST_CMD_DEDICATED_THREAD=n
     extra_conf_files:
     - prj.conf
