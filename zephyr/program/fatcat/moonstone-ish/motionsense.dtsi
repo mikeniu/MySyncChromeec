@@ -179,9 +179,6 @@
 		 * List of GPIO interrupts that have to be enabled at initial
 		 * stage.sensor_alt_id
 		 */
-		sensor-irqs = <&int_base_accel>;
-
-		/* list of sensors in force mode */
-		accel-force-mode-sensors = <&lid_accel>;
+		sensor-irqs = <&int_base_accel &int_lid_accel>;
 	};
 };
