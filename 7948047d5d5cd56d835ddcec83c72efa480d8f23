@@ -69,6 +69,29 @@
       },
       "revId": "7948047d5d5cd56d835ddcec83c72efa480d8f23",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "166f862e_70a90282",
+        "filename": "util/egis/flasher_logic.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T20:51:19Z",
+      "side": 1,
+      "message": "In `GetNextPacketSize()`, you dynamically calculate the payload length of a raw command. However, you hardcode the assumption that the `payload_len` field exists at the exact same offset for both SHA and AES headers by hardcoding the `SecureCommandShaHeader` type:\n\n```c\nauto wrapped_size \u003d ReadLittleEndian\u003cuint32_t\u003e(\n    fw.subspan(offsetof(BootromComm::SecureCommandShaHeader, payload_len),\n               sizeof(BootromComm::SecureCommandShaHeader::payload_len)));\n\n```\n\nWhile currently true (both are at offset 2), this is a \"time bomb.\" If an engineer later adds a field to `SecureCommandAesHeader`, this parsing logic will silently read garbage memory for AES commands without throwing a compiler error.\n\n**The Fix:** Extract a common base header or statically assert that their offsets are identical.\n\n*Option A: Statically guarantee the layout in `bootrom_protocol.h`:*\n\n```c\nstatic_assert(offsetof(SecureCommandShaHeader, payload_len) \u003d\u003d \n              offsetof(SecureCommandAesHeader, payload_len), \n              \"Parser assumes payload_len is at the same offset for all secure headers\");\n\n```\n\n *Extract a Base Header (Cleaner):*\n\n```c\nstruct SecureCommandBaseHeader {\n  CommandId command_id \u003d CommandId::kSecureWrapped;\n  uint8_t algo;\n  uint32_t payload_len;\n} __attribute__((packed));\n\nstruct SecureCommandShaHeader : public SecureCommandBaseHeader {\n  std::array\u003cuint8_t, crypto::kSha256DigestSize\u003e hash{};\n} __attribute__((packed));\n\nstruct SecureCommandAesHeader : public SecureCommandBaseHeader {\n  std::array\u003cuint8_t, crypto::kAesGcmIvSize\u003e iv{};\n  std::array\u003cuint8_t, crypto::kAesGcmTagSize\u003e tag{};\n} __attribute__((packed));\n\n```\n\nWith this change `flasher_logic.cc` simply reads a `SecureCommandBaseHeader` first, avoiding any fragile `offsetof` assumptions completely:\n\n```c\nauto base_hdr_res \u003d ReadStruct\u003cSecureCommandBaseHeader\u003e(fw);\nif (!base_hdr_res) return std::unexpected(ParseError::kTruncatedHeader);\nuint32_t wrapped_size \u003d FromLittleEndian(base_hdr_res-\u003epayload_len);\n\n```",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 0
+      },
+      "revId": "7948047d5d5cd56d835ddcec83c72efa480d8f23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
