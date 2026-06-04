@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2d80ef3_d7649307",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T17:04:05Z",
+      "side": 1,
+      "message": "**The Issue:**\nIn `cli.cc`, the `SendEcCommandAndReadResponse` function reads data from the USB bulk endpoint. Because USB bulk transfers often pad packets to a specific boundary (like 64 bytes), the `initial_buffer` might pull in the 8-byte `ec_host_response` header plus 56 bytes of payload data, even if the EC only intended to send back a 4-byte response (`resp.data_len \u003d\u003d 4`).\n\nCurrently, the code properly fetches *more* data if `response_data.size() \u003c resp.data_len`, but it doesn\u0027t trim the vector if the initial read grabbed too much. This means the caller could receive trailing garbage data.\n\n**The Fix:**\nYou just need to enforce the exact payload size right before returning the data.\n\nIn `util/focaltech/cli.cc`, at the end of `SendEcCommandAndReadResponse` (around line 117):\n\n**Current Code:**\n\n```cpp\n    response_data.insert(response_data.end(), additional.begin(),\n                         additional.end());\n  }\n\n  return response_data;\n}\n\n```\n\n**Updated Code:**\n\n```cpp\n    response_data.insert(response_data.end(), additional.begin(),\n                         additional.end());\n  }\n\n  // USB bulk reads may return padded packets. Ensure we only return the exact \n  // payload length the EC specified in its header.\n  if (response_data.size() \u003e resp.data_len) {\n    response_data.resize(resp.data_len);\n  }\n\n  return response_data;\n}\n\n```",
+      "range": {
+        "startLine": 115,
+        "startChar": 0,
+        "endLine": 117,
+        "endChar": 3
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
