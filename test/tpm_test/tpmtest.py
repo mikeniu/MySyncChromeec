@@ -6,36 +6,39 @@
 
 """Module for initializing and driving a SPI TPM."""
 
-from __future__ import print_function
-
+import binascii
 import getopt
 import os
 import struct
 import sys
 import traceback
 
-
 # Suppressing pylint warning about an import not at the top of the file. The
 # path needs to be set *before* the last import.
 # pylint: disable=wrong-import-position
 ROOT_DIR = os.path.dirname(os.path.abspath(sys.argv[0]))
 sys.path.append(os.path.join(ROOT_DIR, "..", "..", "build", "tpm_test"))
+sys.path.append(
+    os.path.join(ROOT_DIR, "..", "..", "..", "ti50", "common", "tools")
+)
 
+import common # Comes from Ti50 tree.
 import crypto_test
 import drbg_test
 import ecc_test
 import ecies_test
 import fipscmd
-import ftdi_spi_tpm
 import hash_test
 import hkdf_test
 import rsa_test
 import sb
 import subcmd
 import tpm
+import tpm_raw # Comes from Ti50 tree.
 import trng_test
 import u2f_test
 import upgrade_test
+import utils
 
 
 # Extension command for dcypto testing
@@ -62,11 +65,14 @@ class TPM:
         "80 01 00 00 00 0a 00 00 01 00",
     )
 
-    def __init__(self, freq=2000 * 1000, debug_mode=False):
+    def __init__(self, debug_mode=False):
         self._debug_enabled = debug_mode
-        self._handle = ftdi_spi_tpm
-        if not self._handle.FtdiSpiInit(freq, debug_mode):
-            raise subcmd.TpmTestError("Failed to connect")
+        self.tpm_raw = tpm_raw.TPMCommunicator()
+
+    def tpm(self, data):
+        # TPMCommunicator accepts data in either byte or hexascii formats, but
+        # always returns hexascii.
+        return binascii.unhexlify(self.tpm_raw.send_cmd(data))
 
     def parse_response(self, data_blob):
         (tag, size, cmd_code, _) = struct.unpack_from(
@@ -95,7 +101,9 @@ class TPM:
             # Startup response code, extension or vendor command response code
             if cmd_code not in (0, 0x100, 0x500):
                 raise subcmd.TpmTestError(
-                    prefix + "invalid response code 0x%x" % cmd_code
+                    prefix
+                    + "invalid response code 0x%x\n" % cmd_code
+                    + utils.hex_dump(data_blob)
                 )
             return
         if check_cmd == False:
@@ -113,14 +121,14 @@ class TPM:
     def command(self, cmd_data):
         """Verify command header"""
         self.validate(cmd_data)
-        response = self._handle.FtdiSendCommandAndWait(cmd_data)
+        response = self.tpm(cmd_data)
         self.validate(response, response_mode=True)
         return response
 
     def command_unchecked(self, cmd_data):
         """Verify command header"""
         self.validate(cmd_data)
-        response = self._handle.FtdiSendCommandAndWait(cmd_data)
+        response = self.tpm(cmd_data)
         size, cmd_code = self.validate(
             response, response_mode=False, check_cmd=False
         )
@@ -329,4 +337,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    common.starter(main)
