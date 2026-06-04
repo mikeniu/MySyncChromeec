@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31bf0928_a15910ef",
+        "filename": "util/egis/build.mk",
+        "patchSetId": 30
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T00:10:39Z",
+      "side": 1,
+      "message": "@harry.chen@egistec.corp-partner.google.com FYI, I added this small change to test out the build system integration in the CQ (https://crrev.com/c/7897427, https://crrev.com/c/7897426).",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 19
+      },
+      "revId": "f73c814fe0c3803a112c8ac7da467635e99b8058",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
