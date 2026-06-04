@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f64108a_d0e012a8",
+        "filename": "util/elan/elaniap_test.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-04T06:20:55Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 26",
+      "parentUuid": "cff596d3_b5395c60",
+      "range": {
+        "startLine": 19,
+        "startChar": 1,
+        "endLine": 44,
+        "endChar": 2
+      },
+      "revId": "df2a8743ec2748c69da169780f503ecb8dccd757",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c82036c6_2c93a5ab",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-02T18:46:57Z",
       "side": 1,
       "message": "Please add comments to document what these fields are.",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 4
+      },
+      "revId": "df2a8743ec2748c69da169780f503ecb8dccd757",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94e93ba6_fe6ba7e4",
+        "filename": "util/elan/iap_control.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-04T06:20:55Z",
+      "side": 1,
+      "message": "Added comments to patch 26. Also renamed the field to better match its definition.",
+      "parentUuid": "c82036c6_2c93a5ab",
       "range": {
         "startLine": 26,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d64cba4_826d7abe",
+        "filename": "util/elan/iap_control.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-04T06:20:55Z",
+      "side": 1,
+      "message": "Added comments to patch 26. Also renamed the field to better match its definition.",
+      "parentUuid": "073b6c48_0dfa4490",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 24
+      },
+      "revId": "df2a8743ec2748c69da169780f503ecb8dccd757",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3e2e063f_3bd7cb8b",
@@ -93,6 +165,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d83d1ea7_99f15482",
+        "filename": "util/elan/iap_control_test.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-04T06:20:55Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 26",
+      "parentUuid": "3e2e063f_3bd7cb8b",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 0
+      },
+      "revId": "df2a8743ec2748c69da169780f503ecb8dccd757",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8c96a3c3_0b5c76c9",
@@ -106,6 +202,30 @@
       "writtenOn": "2026-06-02T17:27:34Z",
       "side": 1,
       "message": "We should have tests for these functions. Here is Gemini instructions. Verify they are correct:\n\n----\n\nTo thoroughly test `ParseCommandLine` and `ParseHex`, we need to extract them from the anonymous namespace inside `iap_tool.cc` so the test runner can link to them.\n\nTo make this fully Google C++ Style compliant and highly testable, we will expose `ParseHex` in an `internal` namespace. We will also remove the `std::exit()` call from the `-h` (help) option in the parser, so the test runner doesn\u0027t accidentally kill itself if it parses a help flag.\n\nHere are the step-by-step file changes to implement this cleanly.\n\n### 1. Create the Header (`util/elan/cli.h`)\n\nThis defines the structures and exposes the parsing functions. By putting `ParseHex` in the `internal` namespace, we signal that it is an implementation detail, but still expose it for unit testing.\n\n```cpp\n// Copyright 2026 The ChromiumOS Authors\n// Use of this source code is governed by a BSD-style license that can be\n// found in the LICENSE file.\n\n#ifndef UTIL_ELAN_CLI_H_\n#define UTIL_ELAN_CLI_H_\n\n#include \u003ccstdint\u003e\n#include \u003coptional\u003e\n#include \u003cstring\u003e\n#include \u003cstring_view\u003e\n\n#include \"iap_control.h\"\n\nnamespace elan {\n\nstruct CmdLine {\n  uint16_t vid;\n  uint16_t pid;\n  std::string file_path;\n  bool show_help \u003d false;\n};\n\nstd::optional\u003cCmdLine\u003e ParseCommandLine(int argc, char* argv[]);\nvoid PrintHelp(const char* program_name);\n\nnamespace internal {\n// Exposed for unit testing\nstd::optional\u003cuint16_t\u003e ParseHex(std::string_view strv);\n}  // namespace internal\n\n}  // namespace elan\n\n#endif\n\n```\n\n### 2. Implement the Parser (`util/elan/cli.cc`)\n\nMove the parsing logic out of `iap_tool.cc` and into this new file. Notice that `-h` now sets a flag rather than calling `std::exit()`, delegating the exit logic to `main()`.\n\n```cpp\n// Copyright 2026 The ChromiumOS Authors\n// Use of this source code is governed by a BSD-style license that can be\n// found in the LICENSE file.\n\n#include \"cli.h\"\n\n#include \u003cgetopt.h\u003e\n\n#include \u003ccharconv\u003e\n#include \u003cprint\u003e\n\n#include \"utility.h\"\n\nnamespace elan {\n\nvoid PrintHelp(const char* program_name) {\n  std::print(R\"(Usage: {} [OPTIONS]\n\nOptions:\n  -F, --file \u003cpath\u003e   Path to the firmware binary (Required)\n  -V, --vid \u003chex\u003e     USB Vendor ID (default: 0x04F3)\n  -P, --pid \u003chex\u003e     USB Product ID (default: 0x0910)\n  -h, --help          Show this help message\n)\",\n             program_name);\n}\n\nnamespace internal {\n\nstd::optional\u003cuint16_t\u003e ParseHex(std::string_view strv) {\n  if (strv.empty()) return std::nullopt;\n\n  // Strip standard hex prefixes\n  if (strv.starts_with(\"0x\") || strv.starts_with(\"0X\")) {\n    strv.remove_prefix(2);\n  }\n\n  uint16_t val;\n  auto [ptr, ec] \u003d\n      std::from_chars(strv.data(), strv.data() + strv.size(), val, 16);\n\n  if (ec \u003d\u003d std::errc() \u0026\u0026 ptr \u003d\u003d strv.data() + strv.size()) {\n    return val;\n  }\n\n  return std::nullopt;\n}\n\n}  // namespace internal\n\nstd::optional\u003cCmdLine\u003e ParseCommandLine(int argc, char* argv[]) {\n  CmdLine cmd{kBootVid, kBootPid, \"\", false};\n\n  static struct option long_options[] \u003d {\n      {\"file\", required_argument, nullptr, \u0027F\u0027},\n      {\"vid\", required_argument, nullptr, \u0027V\u0027},\n      {\"pid\", required_argument, nullptr, \u0027P\u0027},\n      {\"help\", no_argument, nullptr, \u0027h\u0027},\n      {nullptr, 0, nullptr, 0}};\n\n  int opt;\n  // Reset getopt internal state in case it\u0027s called multiple times (e.g. tests)\n  optind \u003d 1;\n\n  while ((opt \u003d getopt_long(argc, argv, \"hF:V:P:\", long_options, nullptr)) !\u003d\n         -1) {\n    switch (opt) {\n      case \u0027h\u0027:\n        cmd.show_help \u003d true;\n        return cmd;\n      case \u0027F\u0027:\n        cmd.file_path \u003d optarg;\n        break;\n      case \u0027V\u0027: {\n        if (auto val \u003d internal::ParseHex(optarg)) {\n          cmd.vid \u003d *val;\n        } else {\n          LogErr(\"Invalid VID format: {}\\n\", optarg);\n          return std::nullopt;\n        }\n        break;\n      }\n      case \u0027P\u0027: {\n        if (auto val \u003d internal::ParseHex(optarg)) {\n          cmd.pid \u003d *val;\n        } else {\n          LogErr(\"Invalid PID format: {}\\n\", optarg);\n          return std::nullopt;\n        }\n        break;\n      }\n      default:\n        PrintHelp(argv[0]);\n        return std::nullopt;\n    }\n  }\n\n  if (cmd.file_path.empty()) {\n    LogErr(\"Error: Missing required argument \u0027--file\u0027\\n\");\n    PrintHelp(argv[0]);\n    return std::nullopt;\n  }\n\n  return cmd;\n}\n\n}  // namespace elan\n\n```\n\n### 3. Add the Tests (`util/elan/cli_test.cc`)\n\nNow we can rigorously test the CLI without `const_cast` noise, and directly verify the hex parsing logic.\n\n```cpp\n// Copyright 2026 The ChromiumOS Authors\n// Use of this source code is governed by a BSD-style license that can be\n// found in the LICENSE file.\n\n#include \"cli.h\"\n\n#include \u003cgetopt.h\u003e\n#include \u003cgtest/gtest.h\u003e\n\n#include \u003cstring\u003e\n#include \u003cvector\u003e\n\nnamespace elan {\nnamespace {\n\n// --- ParseHex Tests ---\n\nTEST(CliHexTest, ParsesHexCorrectly) {\n  EXPECT_EQ(internal::ParseHex(\"1234\"), 0x1234);\n  EXPECT_EQ(internal::ParseHex(\"0xABCD\"), 0xABCD);\n  EXPECT_EQ(internal::ParseHex(\"0XFFFF\"), 0xFFFF);\n}\n\nTEST(CliHexTest, RejectsInvalidHex) {\n  EXPECT_FALSE(internal::ParseHex(\"\"));\n  EXPECT_FALSE(internal::ParseHex(\"0xGHIJ\")); // Invalid characters\n  EXPECT_FALSE(internal::ParseHex(\"123456\")); // Overflow uint16_t\n}\n\n// --- ParseCommandLine Tests ---\n\nclass CliTest : public ::testing::Test {\n protected:\n  // Helper to safely convert string literals to mutable char* arrays\n  std::vector\u003cchar*\u003e MakeArgv(std::vector\u003cstd::string\u003e\u0026 args) {\n    std::vector\u003cchar*\u003e argv;\n    argv.reserve(args.size());\n    for (auto\u0026 arg : args) {\n      argv.push_back(arg.data()); // C++17 string::data() is non-const\n    }\n    return argv;\n  }\n};\n\nTEST_F(CliTest, ParsesValidArguments) {\n  std::vector\u003cstd::string\u003e args \u003d {\n      \"elaniap_tool\", \"--file\", \"fw.bin\", \"--vid\", \"0x1234\", \"--pid\", \"ABCD\"};\n  auto argv \u003d MakeArgv(args);\n\n  auto cmd \u003d ParseCommandLine(argv.size(), argv.data());\n  \n  ASSERT_TRUE(cmd.has_value());\n  EXPECT_EQ(cmd-\u003efile_path, \"fw.bin\");\n  EXPECT_EQ(cmd-\u003evid, 0x1234);\n  EXPECT_EQ(cmd-\u003epid, 0xABCD);\n  EXPECT_FALSE(cmd-\u003eshow_help);\n}\n\nTEST_F(CliTest, FailsOnMissingFile) {\n  std::vector\u003cstd::string\u003e args \u003d {\"elaniap_tool\", \"--vid\", \"0x1234\"};\n  auto argv \u003d MakeArgv(args);\n\n  EXPECT_FALSE(ParseCommandLine(argv.size(), argv.data()).has_value());\n}\n\nTEST_F(CliTest, SetsHelpFlag) {\n  std::vector\u003cstd::string\u003e args \u003d {\"elaniap_tool\", \"--help\"};\n  auto argv \u003d MakeArgv(args);\n\n  auto cmd \u003d ParseCommandLine(argv.size(), argv.data());\n  ASSERT_TRUE(cmd.has_value());\n  EXPECT_TRUE(cmd-\u003eshow_help);\n}\n\n}  // namespace\n}  // namespace elan\n\n```\n\n### 4. Clean Up `util/elan/iap_tool.cc`\n\nRemove all the parsing logic and simply use the new module. Notice how clean `main()` becomes.\n\n```cpp\n// Copyright 2026 The ChromiumOS Authors\n// Use of this source code is governed by a BSD-style license that can be\n// found in the LICENSE file.\n\n#include \u003ccstdlib\u003e\n\n#include \"cli.h\"\n#include \"file_control.h\"\n#include \"iap_control.h\"\n#include \"libusb_backend.h\"\n#include \"utility.h\"\n\nvoid SetProgressBar(size_t progress, size_t total_size);\n\nint main(int argc, char *argv[]) {\n  auto cmd_line \u003d elan::ParseCommandLine(argc, argv);\n  if (!cmd_line) {\n    LogErr(\"[IAP] Failed to parse command line\\n\");\n    return EXIT_FAILURE;\n  }\n\n  // Handle help flag exiting here, so it doesn\u0027t crash the test runner\n  if (cmd_line-\u003eshow_help) {\n    elan::PrintHelp(argv[0]);\n    return EXIT_SUCCESS;\n  }\n\n  auto usb_backend \u003d std::make_unique\u003celan::LibusbBackend\u003e();\n  elan::IapControl iap_ctrl(std::move(usb_backend));\n\n  if (auto res \u003d iap_ctrl.Initialize(cmd_line-\u003evid, cmd_line-\u003epid); !res) {\n    LogErr(\"[IAP] Device initialization failed: {}\\n\",\n           elan::ToString(res.error()));\n    return EXIT_FAILURE;\n  }\n\n  LogInfo(\"[IAP] File Path: {}\\n\", cmd_line-\u003efile_path);\n\n  auto binary \u003d GetBinary(cmd_line-\u003efile_path);\n  if (!binary) {\n    LogErr(\"[IAP] Failed to get binary: {}\\n\", elan::ToString(binary.error()));\n    return EXIT_FAILURE;\n  }\n\n  LogInfo(\"[IAP] Binary file size {} bytes\\n\", binary-\u003esize());\n\n  iap_ctrl.SetProgressCallback(SetProgressBar);\n\n  if (auto res \u003d iap_ctrl.RunIapProcess(*binary); !res) {\n    LogErr(\"[IAP] IAP process failed: {}\\n\", elan::ToString(res.error()));\n    return EXIT_FAILURE;\n  }\n\n  return EXIT_SUCCESS;\n}\n\nvoid SetProgressBar(size_t progress, size_t total_size) {\n  // ... (Keep existing implementation) ...\n}\n\n```\n\n### 5. Update `util/elan/build.mk`\n\nFinally, add `cli.o` and `cli_test.o` to the respective build targets so the compiler picks them up.\n\n```makefile\n# 1. Build the Main Production Tool\nhost-util-bin-cxx-y +\u003d elaniap_tool\nelaniap_tool-objs :\u003d $(addprefix $(_cur_dir)/, \\\n\tiap_tool.o \\\n\tcli.o \\\n\tiap_control.o \\\n\tfile_control.o \\\n\tlibusb_backend.o \\\n)\n\n# ... (Libusb linker flags stay the same) ...\n\n# 2. Build the Unified Test Binary (Excludes libusb_backend.o)\nhost-util-bin-cxx-y +\u003d elaniap_test_runner\nelaniap_test_runner-objs :\u003d $(addprefix $(_cur_dir)/, \\\n\tcli_test.o \\\n\tfile_control_test.o \\\n\tiap_control_test.o \\\n\tutility_test.o \\\n\tcli.o \\\n\tfile_control.o \\\n\tiap_control.o \\\n)\n\n# ... (GTest linker flags stay the same) ...\n\n```",
+      "range": {
+        "startLine": 47,
+        "startChar": 1,
+        "endLine": 67,
+        "endChar": 50
+      },
+      "revId": "df2a8743ec2748c69da169780f503ecb8dccd757",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "626d2ae4_02b458f7",
+        "filename": "util/elan/iap_tool.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-04T06:20:55Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 26",
+      "parentUuid": "8c96a3c3_0b5c76c9",
       "range": {
         "startLine": 47,
         "startChar": 1,
