@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ee3139d3_5904addb",
+        "filename": "util/focaltech/cli_test.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T00:37:11Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\n### 1. The Biggest Google Style Violation: Anonymous Namespaces\n\nIn `cli_test.cc`, `ft_scsi_test.cc`, and `updater_test.cc`, your helper classes (`FakeEcTransport`, `StubUsbTransport`, `ScopedTempFile`) and helper functions (`MakeDevice`, `BuildEcResponse`) are declared in the global namespace (or using C-style `static`).\n\nGoogle Style strictly dictates that all test-only helpers, fixtures, and mock implementations must be enclosed in an anonymous namespace to prevent One Definition Rule (ODR) violations when multiple test files are linked together into a single binary.\n\n**Recommendation:**\nWrap the entire contents of your test files (after the `#include` statements) in an anonymous namespace:\n\n```cpp\n#include \"...\" // all includes\n\nnamespace {\n\nusing namespace std::chrono_literals;\n// ... using declarations ...\n\nclass ScopedTempFile { ... };\nclass StubUsbTransport : public UsbTransport { ... };\n\nTEST(UpdaterTest, UpdateFw_SuccessBootloaderMode) { ... }\n\n}  // namespace\n\n```\n\n### 2. GMock `ByMove` Overkill\n\nIn `usb_device_test.cc`, you are returning `std::expected` errors using `ByMove`:\n\n```cpp\n  EXPECT_CALL(*mock, Send(_, timeout))\n      .WillOnce(Return(ByMove(std::expected\u003cint, FtError\u003e(\n          std::unexpected(FtError::kNoSuchDevice)))));\n\n```\n\n`ByMove` is designed for move-only types like `std::unique_ptr`. Because `std::expected\u003cint, FtError\u003e` is trivially copyable (it just contains an `int` and an `enum`), using `ByMove` here is unnecessary and adds visual noise. Furthermore, because `std::expected` has an implicit constructor from `std::unexpected`, you don\u0027t even need the verbose type cast.\n\n**Recommendation:**\nYou can dramatically simplify this to:\n\n```cpp\n  EXPECT_CALL(*mock, Send(_, timeout))\n      .WillOnce(Return(std::unexpected(FtError::kNoSuchDevice)));\n\n```\n\n### 3. DRY (Don\u0027t Repeat Yourself) with the `Csw` Struct\n\nIn `test_utils.h`, you safely defined `BuildValidCsw` with a localized `Csw` packed struct.\n\nHowever, in `ft_scsi_test.cc` (`SendBulkDataOut_CswSignatureMismatch`), you completely redefine the packed `Csw` struct locally just so you can inject a bad signature (`0xDEADBEEF`).\n\n**Recommendation:**\nInstead of redefining the packed struct inside the test, you can promote the `Csw` struct definition out of `BuildValidCsw` into the `focaltech::testing` namespace in `test_utils.h`. This allows you to reuse the exact same struct definition across all tests when you need to intentionally corrupt it:\n\n**In `test_utils.h`:**\n\n```cpp\nnamespace focaltech::testing {\nstruct __attribute__((packed)) Csw {\n  uint32_t sig;\n  uint32_t tag;\n  uint32_t residue;\n  uint8_t status;\n};\n// ... BuildValidCsw uses the struct ...\n}\n\n```\n\n**In `ft_scsi_test.cc`:**\n\n```cpp\n  EXPECT_CALL(*mock, Recv(_, _))\n      .WillOnce(Invoke(\n          [](std::span\u003cuint8_t\u003e data, auto) -\u003e std::expected\u003cint, FtError\u003e {\n            focaltech::testing::Csw csw{\n                .sig \u003d ToLittleEndian\u003cuint32_t\u003e(0xDEADBEEF), // Bad signature\n                .tag \u003d ToLittleEndian\u003cuint32_t\u003e(1),\n                .residue \u003d 0,\n                .status \u003d 0,\n            };\n            std::memcpy(data.data(), \u0026csw, sizeof(csw));\n            return sizeof(csw);\n          }));\n\n```\n\n### 4. Magic Dummy Payload Sizes\n\nIn `ft_scsi_test.cc` and `usb_device_test.cc`, you frequently use hardcoded buffer sizes and filler bytes like `std::vector\u003cuint8_t\u003e data(10)` or `std::vector\u003cuint8_t\u003e buffer(10, 0)`.\n\nWhile magic numbers in tests aren\u0027t as dangerous as in production code, it\u0027s a good habit to use `constexpr` for sizes, even in tests, so it\u0027s clear *why* that size was chosen.\n\n**Recommendation:**\nIf a buffer size is arbitrary for the sake of the test, name it:\n\n```cpp\nconstexpr size_t kArbitraryTestBufferSize \u003d 10;\nstd::vector\u003cuint8_t\u003e data(kArbitraryTestBufferSize);\n\n```",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 24
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "88d51d00_df7569b8",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 19
