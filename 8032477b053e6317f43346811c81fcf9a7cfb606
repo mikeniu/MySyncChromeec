@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fd54495_766c69cf",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-04T07:57:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9650b8de_6fffb28d",
+      "range": {
+        "startLine": 106,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 66
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6704e4cb_4dee73b8",
@@ -54,6 +78,30 @@
       "writtenOn": "2026-06-04T00:29:50Z",
       "side": 1,
       "message": "Since we\u0027re using C++23, you can use the much cleaner `std::ranges` algorithms, and completely eliminate the `!\u003d npos` boilerplate using C++23\u0027s native string `contains()` method.\n\n**Recommendation:**\n\n```cpp\n  bool is_focal_device \u003d\n      std::ranges::any_of(kSupportedProjects, [\u0026build_info](std::string_view project) {\n          return build_info.contains(project);\n      });\n\n```",
+      "range": {
+        "startLine": 197,
+        "startChar": 0,
+        "endLine": 201,
+        "endChar": 21
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05a61ed4_85ebae06",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-04T07:57:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6704e4cb_4dee73b8",
       "range": {
         "startLine": 197,
         "startChar": 0,
@@ -87,6 +135,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5065cc27_ecc99854",
+        "filename": "util/focaltech/cli_test.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-04T07:57:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee3139d3_5904addb",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 24
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d8bcf4c4_2a8f9330",
@@ -100,6 +172,30 @@
       "writtenOn": "2026-06-04T00:50:59Z",
       "side": 1,
       "message": "In your test mock `FakeEcTransport` (`cli_test.cc`), you initialize a size variable using a C-style `-1` cast to represent an infinite/unset state:\n\n**Current:**\n\n```cpp\n  size_t fail_on_command_ \u003d static_cast\u003csize_t\u003e(-1);\n\n```\n\n**Recommendation:**\nYou can use `\u003climits\u003e`:\n\n```cpp\n  size_t fail_on_command_ \u003d std::numeric_limits\u003csize_t\u003e::max();\n\n```",
+      "range": {
+        "startLine": 105,
+        "startChar": 0,
+        "endLine": 105,
+        "endChar": 52
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e69bc1c_0910f5c4",
+        "filename": "util/focaltech/cli_test.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-04T07:57:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8bcf4c4_2a8f9330",
       "range": {
         "startLine": 105,
         "startChar": 0,
@@ -133,6 +229,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0dce4ecd_9fb104e4",
+        "filename": "util/focaltech/ft_scsi_test.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-04T07:57:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ccb24b6_454cc593",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 63,
+        "endChar": 1
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d7744991_11e10303",
@@ -156,6 +276,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b7b7b65_5556c51d",
+        "filename": "util/focaltech/ft_util_test.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-04T07:57:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d7744991_11e10303",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 66
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "88d51d00_df7569b8",
@@ -169,6 +313,30 @@
       "writtenOn": "2026-06-04T00:29:50Z",
       "side": 1,
       "message": "In `util/focaltech/updater.cc`, you correctly use an anonymous namespace `namespace { ... }` at the top of the file for helper functions like `ReadFileToVector` and `CalculateSha256`.\n\nHowever, right below that, you fall back to C-style `static` linkage for other helpers:\n\n```cpp\nstatic std::expected\u003cvoid, FtError\u003e FtErasePage(...)\nstatic std::expected\u003cvoid, FtError\u003e FtDownloadPage(...)\nstatic std::expected\u003cvoid, FtError\u003e FtDownloadBin(...)\n\n```\n\n**The Google C++ Style Guide explicitly states:** *\"Use internal linkage (anonymous namespaces) in .cc files. Do not use `static` for internal linkage of functions or variables.\"*\n\n**Recommendation:** Move `FtErasePage`, `FtDownloadPage`, `FtDownloadBin`, `FtMcuReset`, and `FtGetBootVersion` into the anonymous namespace at the top of the file and drop the `static` keyword.",
+      "range": {
+        "startLine": 93,
+        "startChar": 0,
+        "endLine": 101,
+        "endChar": 59
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d133d49_0ff60910",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-04T07:57:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "88d51d00_df7569b8",
       "range": {
         "startLine": 93,
         "startChar": 0,
@@ -226,6 +394,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1111b270_69b10833",
+        "filename": "util/focaltech/updater.h",
+        "patchSetId": 19
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-04T07:57:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cfcbd66d_7ae6bafd",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 26
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "715a07d7_83c64f59",
@@ -239,6 +431,30 @@
       "writtenOn": "2026-06-04T00:43:03Z",
       "side": 1,
       "message": "Gemini feedback. Verify for correctness:\n\n----\n\n### 1. Replacing `memcmp` with `ElementsAreArray` (`usb_device_test.cc`)\n\nIn `SendForwardsToTransport`, the test manually verifies the contents of the `std::span` by capturing it in an `Invoke` lambda and using C-style `memcmp`:\n\n**Current:**\n\n```cpp\n  EXPECT_CALL(*mock, Send(_, timeout))\n      .WillOnce(Invoke([\u0026](std::span\u003cconst uint8_t\u003e data, auto) {\n        EXPECT_EQ(data.size(), test_data.size());\n        EXPECT_EQ(memcmp(data.data(), test_data.data(), data.size()), 0);\n        return std::expected\u003cint, FtError\u003e(test_data.size());\n      }));\n\n```\n\n**Recommendation:**\nYou can eliminate the manual `Invoke` validation entirely by moving the assertion into the `EXPECT_CALL` matcher itself using `testing::ElementsAreArray`. This is exactly what GMock was designed for and gives much better failure output than a generic `memcmp` failure.\n\n```cpp\n  EXPECT_CALL(*mock, Send(testing::ElementsAreArray(test_data), timeout))\n      .WillOnce(Return(test_data.size()));\n\n```\n\n### 2. Verifying the Entire Payload Instead of Just the Header (`cli_test.cc`)\n\nIn `SwitchToRom_Success` (and similarly in `SwitchToBootloader_Success`), you are capturing the outgoing packet, casting the pointer to an `ec_host_request`, and only verifying the `command` field:\n\n**Current:**\n\n```cpp\n  const ec_host_request* req \u003d\n      reinterpret_cast\u003cconst ec_host_request*\u003e(sent.data());\n  EXPECT_EQ(req-\u003ecommand, 0xFACE);\n\n```\n\nThis is dangerous because it completely ignores the payload (`kSwitchToRomPayload`) and the checksum! If a bug is introduced where the payload isn\u0027t attached to the packet, this test will still pass.\n\n**Recommendation:**\nBecause `SwitchToRom` builds a very specific 11-byte sequence (8-byte header + 3-byte payload), you should use `ElementsAre` to verify the *entire* wire-format packet.\n*(Note: 0xFACE in little-endian is `0xCE, 0xFA`)*:\n\n```cpp\n  const auto\u0026 sent \u003d fake-\u003elast_sent();\n  \n  // Calculate checksum for the EXPECT_THAT (sum of bytes negated)\n  // 3 (version) + 0xCE + 0xFA + 0 + 0 + 3 (len) + 0 + 0xAA + 6 + 0 \u003d 0x27E\n  // Checksum \u003d static_cast\u003cuint8_t\u003e(-0x7E) \u003d 0x82\n  \n  EXPECT_THAT(sent, testing::ElementsAre(\n      3,      // struct_version (EC_HOST_REQUEST_VERSION)\n      0x82,   // checksum\n      0xCE, 0xFA, // command (0xFACE little-endian)\n      0,      // command_version\n      0,      // reserved\n      3, 0,   // data_len (3 bytes little-endian)\n      // Payload (kSwitchToRomPayload)\n      0xAA, 0x06, 0x00\n  ));\n\n```\n\n### 3. Replacing Magic Indices with Struct Casting (`updater_test.cc`)\n\nIn your `StubUsbTransport::Send` implementation, you manually sniff the incoming packets to see if they are \"Erase Page\" commands. To do this, you rely on hardcoded array indices (`15`, `28`, `16`):\n\n**Current:**\n\n```cpp\n    // Intercept Erase Page commands:\n    if (data.size() \u003d\u003d kUsbCbwSize \u0026\u0026 data[15] \u003d\u003d kFtCmdAction \u0026\u0026\n        data[28] \u003d\u003d kFtSubcmdErasePage) {\n      uint32_t address \u003d *reinterpret_cast\u003cconst uint32_t*\u003e(\u0026data[16]);\n      erased_addresses_.push_back(ToLittleEndian(address));\n    }\n\n```\n\n**Recommendation:**\nSince you already went through the trouble of defining the `BulkCbWrap` and `FtCmdFormat` packed structs in `ft_scsi.h` (and we are adding `static_asserts` to them), you should use them here! Casting to the struct makes the intent obvious and completely eliminates the magic numbers:\n\n```cpp\n    if (data.size() \u003d\u003d sizeof(BulkCbWrap)) {\n      const auto* cbw \u003d reinterpret_cast\u003cconst BulkCbWrap*\u003e(data.data());\n      const auto* ft_cmd \u003d reinterpret_cast\u003cconst FtCmdFormat*\u003e(cbw-\u003ecmd);\n      \n      if (ft_cmd-\u003eopcode \u003d\u003d kFtCmdAction \u0026\u0026 ft_cmd-\u003esubcmd \u003d\u003d kFtSubcmdErasePage) {\n        erased_addresses_.push_back(ToLittleEndian(ft_cmd-\u003eaddress));\n      }\n    }\n\n```",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 10
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8aa6f18_c7133800",
+        "filename": "util/focaltech/usb_device_test.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-04T07:57:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "715a07d7_83c64f59",
       "range": {
         "startLine": 39,
         "startChar": 0,

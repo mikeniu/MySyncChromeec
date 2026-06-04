@@ -96,6 +96,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "af1f969b_781a2d62",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-04T07:57:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d5773b9_be46a48c",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 19
+      },
+      "revId": "b41d7944f2f336049361c29878bbdf28c28e5184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "baf0f0b5_fe0691ca",
@@ -228,6 +252,30 @@
       "side": 1,
       "message": "Still more magic numbers found by Gemini. Please review these for correctness and also check to see if there are any more that were missed:\n\n----\n\n### 1. The Unused Constant (`cli.cc`)\n\nIn `cli.h`, the author did the right thing and defined a constant for the default bootloader mode:\n`constexpr uint8_t kEcBootloaderModeDefault \u003d 0;`\n\nBut in `cli.cc` (inside `SwitchMcuMode`), they accidentally hardcoded `0` instead of using their constant:\n**Current:**\n\n```cpp\n  if (target_cmd \u003d\u003d Command::kEnterBoot) {\n    return SwitchToBootloader(usb, 0); \n  }\n\n```\n\n**Recommendation:**\n\n```cpp\n    return SwitchToBootloader(usb, kEcBootloaderModeDefault);\n\n```\n\n### 2. The Mysterious Payload Bytes (`cli.cc`)\n\nAt the top of `cli.cc`, the author extracted the ROM switch payload into a constant array, but the *contents* of the array are still unexplained magic bytes.\n**Current:**\n\n```cpp\nconstexpr std::array\u003cuint8_t, 3\u003e kSwitchToRomPayload \u003d {0xAA, 0x06, 0x00};\n\n```\n\n**Recommendation:**\nIf `0xAA`, `0x06`, and `0x00` have specific meanings in the FocalTech protocol (e.g., a command byte, a sub-command, and a flag), they should be named. If they are just an opaque sequence required by the vendor, add a comment explicitly stating that:\n\n```cpp\n// Vendor-specific magic sequence required to force the MCU into ROM mode.\nconstexpr std::array\u003cuint8_t, 3\u003e kSwitchToRomPayload \u003d {0xAA, 0x06, 0x00};\n\n```\n\n### 3. The Struct Padding Size (`updater.h`)\n\nIn the `FtConfigPage` struct, the reserved array size is hardcoded to `28`.\n**Current:**\n\n```cpp\nstruct FtConfigPage {\n  uint32_t code_valid_control_word;\n  uint8_t reserved[28];\n  uint32_t code_start_address;\n} __attribute__((packed));\n\n```\n\n**Recommendation:**\nWhile `28` makes the math work out to 36 total bytes, magic array sizes in packed structs are dangerous. Define a constant for it to document *why* it\u0027s 28 bytes:\n\n```cpp\nconstexpr size_t kFtConfigReservedSize \u003d 28;\n\nstruct FtConfigPage {\n  uint32_t code_valid_control_word;\n  uint8_t reserved[kFtConfigReservedSize];\n  uint32_t code_start_address;\n} __attribute__((packed));\n\n```\n\n### 4. USB Default Configuration \u0026 Active State (`libusb_transport.cc`)\n\nWhen dealing with the `libusb` API, there are two instances of magic numbers being passed/checked.\n\n**First:** Asking for the default configuration index (`0`).\n\n```cpp\nif (libusb_get_config_descriptor(dev, 0, \u0026config) !\u003d LIBUSB_SUCCESS)\n\n```\n\n**Second:** Checking if the kernel driver is active. The API returns `1` if active, `0` if not.\n\n```cpp\nif (libusb_kernel_driver_active(handle_.get(), interface_num_) \u003d\u003d 1)\n\n```\n\n**Recommendation:**\nWhile API return values are sometimes tolerated as raw numbers, defining them at the top of the file in the anonymous namespace prevents ambiguity:\n\n```cpp\nconstexpr uint8_t kDefaultUsbConfigIndex \u003d 0;\nconstexpr int kKernelDriverActive \u003d 1;\n// ...\nif (libusb_get_config_descriptor(dev, kDefaultUsbConfigIndex, \u0026config) !\u003d LIBUSB_SUCCESS)\n// ...\nif (libusb_kernel_driver_active(handle_.get(), interface_num_) \u003d\u003d kKernelDriverActive)\n\n```\n\n### 5. SCSI Logical Unit Number (`ft_scsi.cc`)\n\nWhen building the Command Block Wrapper (`BulkCbWrap`), the `lun` (Logical Unit Number) is hardcoded.\n**Current:**\n\n```cpp\n      .lun \u003d 0,\n\n```\n\n**Recommendation:**\nSince this tool targets a single, specific interface endpoint, LUN 0 is standard, but it should still be a named constant.\n\n```cpp\nconstexpr uint8_t kDefaultLun \u003d 0;\n// ...\n      .lun \u003d kDefaultLun,\n\n```",
       "parentUuid": "664a9987_baf602b2",
+      "range": {
+        "startLine": 152,
+        "startChar": 0,
+        "endLine": 152,
+        "endChar": 51
+      },
+      "revId": "b41d7944f2f336049361c29878bbdf28c28e5184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e77548c_001f9c55",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-04T07:57:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3098b9a2_f0af6f5e",
       "range": {
         "startLine": 152,
         "startChar": 0,
