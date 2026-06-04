@@ -6,14 +6,14 @@
 # (warnings/errors only). Use echo thus: $(call echo,"stuff  to  echo")
 ifeq ($(V),0)
 Q := @
-echo = echo -n;
+echo =
 else
-echo = echo $(1);
 ifeq ($(V),)
 Q := @
 else
 Q :=
 endif
+echo = $(Q)@echo $(1);
 endif
 
 obj = ../../build/tpm_test
@@ -73,7 +73,7 @@ $(obj)/%.o: $(obj)/%.c
 $(obj)/%.o: %.c
 	$(call echo,"  CC      $(notdir $@)")
 	$(Q)gcc $(CFLAGS) -Wall -Werror -Wno-error=deprecated-declarations\
-		-Wno-error=unused-variable -MMD -MF $@.d -MT $@ -o $@ $<
+	 -DBRANCH_TOT -Wno-error=unused-variable -MMD -MF $@.d -MT $@ -o $@ $<
 
 $(obj)/_$(TARGET).so: $(OBJS) $(obj)/$(TARGET).py
 	$(call echo,"  LD      $(notdir $@)")
