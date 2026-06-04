@@ -190,7 +190,7 @@
 		};
 		/* TP_Disable */
 		gpio_tp_disable: tp_disable {
-			gpios = <&gpioh 11 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_HIGH)>;
+			gpios = <&gpioh 11 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 		};
 		/* Amber LED */
 		gpio_led_amber: led_amber {
