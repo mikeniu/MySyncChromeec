@@ -28,7 +28,7 @@ extern "C" {
  * For cortex-m we cannot use irq_lock() for disabling all the interrupts
  * because it leaves some (NMI and faults) still enabled.
  */
-#define interrupt_disable_all() __asm__("cpsid i")
+#define interrupt_disable_all() __asm__ volatile("cpsid i" ::: "memory")
 #elif CONFIG_ZTEST
 #define interrupt_disable_all()
 #else /* !CONFIG_CPU_CORTEX_M */
