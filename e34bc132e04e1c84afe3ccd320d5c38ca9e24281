@@ -22,6 +22,30 @@
       },
       "revId": "e34bc132e04e1c84afe3ccd320d5c38ca9e24281",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3155ad6c_87b3fce3",
+        "filename": "util/twister_launcher.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-04T22:01:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3737c356_cf303119",
+      "range": {
+        "startLine": 401,
+        "startChar": 4,
+        "endLine": 401,
+        "endChar": 69
+      },
+      "revId": "e34bc132e04e1c84afe3ccd320d5c38ca9e24281",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
