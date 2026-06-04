@@ -51,6 +51,24 @@
       "parentUuid": "f293ab26_55a9ec0f",
       "revId": "0ee36e732fe7b839a32f9fc9ff31c1b5987bbe25",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b7e01de_9c95956b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-04T18:59:11Z",
+      "side": 1,
+      "message": "You need to run the EC stress on these boards specifically if you are going to make this change.",
+      "parentUuid": "738f2a81_a00e6cbd",
+      "revId": "0ee36e732fe7b839a32f9fc9ff31c1b5987bbe25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
