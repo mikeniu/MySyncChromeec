@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9a644ca_cfb2a8fa",
+        "filename": "zephyr/program/calypso/mensa/led_pins.dtsi",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-06-04T08:32:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "137a67b7_94b11aca",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 15
+      },
+      "revId": "1d27cc98da640df9952046bf8d450758d1176ff8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bd7b8206_65616ee6",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-04T05:54:17Z",
       "side": 1,
       "message": "Should it be Power LED?",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 63,
+        "endChar": 16
+      },
+      "revId": "1d27cc98da640df9952046bf8d450758d1176ff8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ad9c377_ff07b7c1",
+        "filename": "zephyr/program/calypso/mensa/led_pins.dtsi",
+        "patchSetId": 7
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-06-04T08:32:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd7b8206_65616ee6",
       "range": {
         "startLine": 63,
         "startChar": 0,
