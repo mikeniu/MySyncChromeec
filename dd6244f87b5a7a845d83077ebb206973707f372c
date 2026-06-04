@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fdab7392_73d166aa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T19:17:04Z",
+      "side": 1,
+      "message": "Let\u0027s clean up the comments:\n\n----\n\nA core tenet of the Google C++ Style Guide is that **\"comments that simply restate the code are not useful.\"** Code should explain *what* is happening; comments should only be reserved for *why* it is happening (context, edge cases, or business logic).\n\nLooking through the patch with a ruthless \"self-documenting\" lens, there is a lot of \"play-by-play\" commentary that can be completely deleted.\n\nHere is a purge list of unnecessary comments that merely restate obvious code.\n\n### 1. The \"Play-by-Play\" Narrator (`iap_control.cc`)\n\nIn `RunIapProcess`, the comments just read the function names aloud. The function names are already clear.\n\n**Delete these completely:**\n\n```cpp\n  // write rom           \u003c-- Delete\n  LogInfo(\"[IAP] {} - write rom data\\n\", __func__);\n  if (auto res \u003d SetRomAddress(kBaseRomAddress); !res)\n\n  // read rom            \u003c-- Delete\n  LogInfo(\"[IAP] {} - verify rom data\\n\", __func__);\n  \n  // compare data        \u003c-- Delete\n  if (!std::ranges::equal(rom, rom_read))\n\n  // finish iap          \u003c-- Delete\n  if (auto res \u003d FinishIap(*checksum); !res)\n\n  // sw reset            \u003c-- Delete\n  if (auto res \u003d SoftwareReset(); !res) return std::unexpected(res.error());\n\n```\n\n### 2. Over-explaining Standard C++ (`iap_control.cc` \u0026 `cli.cc`)\n\nYou are using standard C++ features (`std::span`, `std::string_view`) correctly. You don\u0027t need to explain how they work to the reader.\n\n**Delete these:**\n\n```cpp\n  // cli.cc\n  // Strip standard hex prefixes    \u003c-- Delete (obvious from strv.starts_with(\"0x\"))\n  if (strv.starts_with(\"0x\") || strv.starts_with(\"0X\")) {\n\n  // iap_control.cc (in WriteRomData)\n  // Create a mutable view of the const data  \u003c-- Delete\n  auto remaining \u003d buff; \n\n  // Slice off the front chunk, then advance the remaining view  \u003c-- Delete\n  auto chunk \u003d remaining.first(chunk_size);\n  remaining \u003d remaining.subspan(chunk_size);\n\n```\n\n### 3. Redundant Test Comments (`file_control_test.cc` \u0026 `utility_test.cc`)\n\nUnit tests are often the worst offenders for useless comments. The code is trivial to read.\n\n**Delete these:**\n\n```cpp\n  // file_control_test.cc\n  // Test file_control.h (File I/O Operations)  \u003c-- Delete\n  \n  // Create temporary file                      \u003c-- Delete\n  {\n    std::ofstream ofs(temp_filename, std::ios::binary | std::ios::trunc);\n    // ...\n  }\n\n  // Read binary back using vendor\u0027s GetBinary  \u003c-- Delete\n  auto res \u003d GetBinary(temp_filename);\n\n  // Clean up                                   \u003c-- Delete\n  std::remove(temp_filename.c_str());\n\n```\n\n```cpp\n  // utility_test.cc\n  std::vector\u003cuint8_t\u003e small_buffer \u003d {0x01, 0x02, 0x03}; // 3 bytes  \u003c-- Delete\n\n```\n\n### 4. Replace a Comment with Code (`fake_usb_backend.h`)\n\nInstead of using a magic number and explaining it with a comment, just use the constant directly. This is the ultimate form of self-documenting code.\n\n**Before:**\n\n```cpp\n    }\n    return -1; // LIBUSB_ERROR_IO\n  }\n\n```\n\n**After:**\n\n```cpp\n    }\n    return LIBUSB_ERROR_IO; \n  }\n\n```\n\n### What Comments *Should* Stay?\n\nApplying this philosophy, the comments that survive are the ones explaining *why*:\n\n* `// the Google fw prefix is defined in bits 8-15 (not bits 24-31).` (Explains the bitshift logic against external requirements).\n* `// Reset getopt internal state in case it\u0027s called multiple times (e.g. tests)` (Explains an unusual workaround for global C state).\n* `// C++17 string::data() is non-const` (Explains why `const_cast` isn\u0027t needed here, preventing someone from \"fixing\" it later).",
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0ce52f0c_6d929fdd",
         "filename": "util/elan/iap_control.cc",
         "patchSetId": 26
