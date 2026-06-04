@@ -73,6 +73,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "322f2fec_05583f62",
+        "filename": "util/focaltech/ft_scsi.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T17:35:02Z",
+      "side": 1,
+      "message": "Put each `static_assert` directly after the associated struct definition.",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 54
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "848ad177_f82d2293",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 20
@@ -132,6 +155,29 @@
       "message": "Since we\u0027re using C++, we don\u0027t need the `Ft` prefix. We can use namespaces. Here are Gemini instructions to rename functions and use the `focaltech` namespace:\n\n----\n\n### Step 1: Rename Types and Enums\n\nTo fully embrace the C++ namespace, strip the `Ft` prefix from your core data types across all headers (`ft_util.h`, `usb_device.h`, `updater.h`, `ft_scsi.h`) and update their references in the `.cc` files:\n\n* `FtError` ➔ **`Error`**\n* `FtDeviceMode` ➔ **`DeviceMode`**\n* `FtDeviceInfo` ➔ **`DeviceInfo`**\n* `FtFlashWpArea` ➔ **`FlashWpArea`**\n* `FtConfigPage` ➔ **`ConfigPage`**\n* `FtCmdFormat` ➔ **`CmdFormat`**\n\n### Step 2: Rename the Functions\n\nUpdate these function signatures in the headers (`cli.h`, `updater.h`) and their implementations/callers in the `.cc` files:\n\n* `DeviceInit` ➔ **`InitDevice`**\n* `IsEcBinHasConfigPage` ➔ **`HasValidConfigPage`**\n* `FtBackToRomBoot` ➔ **`ReturnToRomBoot`**\n* `FtMcuReset` ➔ **`ResetMcu`**\n* `FtGetFlashProtect` ➔ **`GetFlashProtection`**\n* `FtSetFlashProtect` ➔ **`SetFlashProtection`**\n* `FtErasePage` ➔ **`ErasePage`**\n* `FtDownloadPage` ➔ **`DownloadPage`**\n* `FtDownloadBin` ➔ **`DownloadBin`**\n* `FtVerifyData` ➔ **`VerifyData`**\n* `FtGetBootVersion` ➔ **`GetBootVersion`**\n* *(Note: The math helper `FtDivRoundUp` in `ft_util.h` should also become just `DivRoundUp`)*\n\n### Step 3: Wrap Headers and Source Files in `namespace focaltech`\n\nFor the following files, place `namespace focaltech {` right after your `#include` directives, and `}  // namespace focaltech` at the very bottom of the file.\n\n**Headers:**\n\n* `cli.h`\n* `ft_help.h`\n* `ft_log.h` *(Note: you already have `namespace ft_log` here, you can nest it or rename it to `namespace focaltech::log`)*\n* `ft_scsi.h`\n* `ft_util.h`\n* `updater.h`\n* `usb_device.h`\n* `usb_transport.h`\n\n**Source Files:**\n\n* `cli.cc`\n* `ft_scsi.cc`\n* `updater.cc`\n\n*(Note: `libusb_transport.h/cc` and `test_utils.h` are already in the `focaltech` namespace, so you don\u0027t need to change their namespace boundaries).*\n\n### Step 4: Update `main.cc`\n\nBecause `main()` must remain in the global namespace, you will need to explicitly use the `focaltech::` prefix for the types and functions you just moved.\n\nReplace the bottom half of your `main.cc` with this:\n\n```cpp\n  // 1. Parse Inputs (Logic now lives in cli.cc)\n  auto config \u003d focaltech::ParseArguments(args);\n  if (!config) return EXIT_FAILURE;\n\n  // 2. Create Hardware Connection\n  auto transport \u003d focaltech::LibusbTransport::Create();\n  if (!transport) {\n    FT_LOGE(\"Failed to open USB device.\");\n    return EXIT_FAILURE;\n  }\n\n  // 3. Inject hardware into domain object\n  focaltech::UsbDevice usb_device(std::make_unique\u003cfocaltech::LibusbTransport\u003e(\n      std::move(transport.value())));\n\n  focaltech::DeviceInfo info;\n  if (auto init_res \u003d focaltech::InitDevice(usb_device.device_id(), info); !init_res) {\n    FT_LOGE(\"Cannot find Focal device\");\n    return EXIT_FAILURE;\n  }\n\n  // 4. Execute\n  if (auto exec_res \u003d focaltech::ExecuteCommand(config.value(), usb_device, info);\n      !exec_res) {\n    FT_LOGE(\"Command failed\");\n    return EXIT_FAILURE;\n  }\n  return EXIT_SUCCESS;\n}\n\n```\n\n### Step 5: Wrap the Tests (Option 1)\n\nTo comply with the Google C++ Style Guide while avoiding `focaltech::` boilerplate in your tests, wrap all of your test files inside the `focaltech` namespace.\n\nApply this structure to `cli_test.cc`, `updater_test.cc`, `ft_scsi_test.cc`, `ft_util_test.cc`, `usb_device_test.cc`, and `ft_help_test.cc`:\n\n```cpp\n/* Copyright ... */\n\n#include \"...\" // Your includes\n#include \u003cgtest/gtest.h\u003e\n\nnamespace focaltech {\n\nnamespace {\n// Your test helpers, constants, and fake classes go here\n} // namespace\n\n// Your TEST() macros go here. \n// Because they are inside namespace focaltech, they can call InitDevice(), \n// Error, and ReturnToRomBoot() directly without prefixes!\nTEST(UpdaterTest, UpdateFw_SuccessBootloaderMode) {\n  // ...\n}\n\n}  // namespace focaltech\n\n```\n\n*(Note: In `updater_test.cc` and `ft_scsi_test.cc`, you can now remove lines like `using ::focaltech::testing::BuildValidCsw;` because being inside the `focaltech` namespace gives you direct access to the `testing` inner namespace!)*",
       "range": {
         "startLine": 17,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 2
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd13e3af_55be6738",
+        "filename": "util/focaltech/usb_device.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T17:35:02Z",
+      "side": 1,
+      "message": "### The Issue: `DeviceInfo` is a Mutable Data Bag\n\nIn `usb_device.h`, you have this struct:\n\n```cpp\nstruct DeviceInfo {\n  DeviceMode current_mode \u003d DeviceMode::kUnknown;\n  DeviceMode next_mode \u003d DeviceMode::kUnknown;\n  std::string_view ec_bin;\n};\n\n```\n\n1. `next_mode` is **100% dead code**. It is never read or written anywhere in the codebase.\n2. `ec_bin` is already securely held inside `AppConfig`! You copy it over in `ExecuteCommand` just to pass it to `UpdateFw`.\n3. Because of this struct, `InitDevice` requires an out-parameter (`InitDevice(usb.device_id(), info)`), which is less idiomatic than simply returning a value.\n\n### The Fix: Make the Data Flow Functional\n\n**1. Delete the struct entirely**\nOpen `util/focaltech/usb_device.h` and simply delete the `DeviceInfo` struct.\n\n**2. Turn `InitDevice` into `GetDeviceMode**`\nIn `cli.h` and `cli.cc`, replace `InitDevice` with a function that strictly evaluates the USB IDs and returns the mode:\n\n```cpp\nstd::expected\u003cDeviceMode, Error\u003e GetDeviceMode(const UsbDeviceId\u0026 details) {\n  switch (details.vid) {\n    case kFocalRomVid:\n      return DeviceMode::kRom;\n    case kFocalBootVid:\n      return DeviceMode::kBoot;\n    case kFocalEcVid:\n      return (details.pid \u003d\u003d kFocalEcPidTest) ? DeviceMode::kTest : DeviceMode::kEc;\n    default:\n      FT_LOGE(\"Unrecognized Focal device.\");\n      return std::unexpected(Error::kNoSuchDevice);\n  }\n}\n\n```\n\n*(Look at how much cleaner that `switch` statement is without all the `break`s and `info.current_mode \u003d ...` assignments!)*\n\n**3. Update `ExecuteCommand` to take the mode directly**\nIn `cli.h` and `cli.cc`, update the signature to accept `DeviceMode current_mode` instead of the struct.\n\n```cpp\nstd::expected\u003cvoid, Error\u003e ExecuteCommand(const AppConfig\u0026 config,\n                                          UsbDevice\u0026 usb_device,\n                                          DeviceMode current_mode) {\n// ...\n\n```\n\nInside the `Command::kUpdate` switch case, you no longer need to copy the `ec_bin` string. Just pass it directly to `UpdateFw`:\n\n```cpp\n    case Command::kUpdate:\n      FT_LOGI(\"Updating firmware...\");\n      if (config.ec_bin.empty()) {\n        FT_LOGE(\"No firmware file specified\");\n        return std::unexpected(Error::kParameterError);\n      }\n      \n      for (int attempt \u003d 1; attempt \u003c\u003d kMaxRetry; ++attempt) {\n        // Pass config.ec_bin and current_mode directly!\n        if (auto res \u003d UpdateFw(usb_device, config.ec_bin, current_mode); res) {\n          FT_LOGI(\"Firmware update successful\");\n          return {};\n        }\n// ...\n\n```\n\n**4. Update `UpdateFw` to accept the isolated variables**\nIn `updater.h` and `updater.cc`, change the signature from `DeviceInfo\u0026 info` to the individual required variables:\n\n```cpp\nstd::expected\u003cvoid, Error\u003e UpdateFw(const UsbDevice\u0026 device,\n                                    std::string_view ec_bin,\n                                    DeviceMode current_mode) {\n// ...\n\n```\n\n*(You will just need to replace the couple of references to `info.ec_bin` with `ec_bin`, and `info.current_mode` with `current_mode` inside the function).*\n\n**5. Clean up `main.cc**`\nFinally, your entry point becomes incredibly linear and functional, with no mutable out-parameters!\n\n```cpp\n  // 3. Inject hardware into domain object\n  focaltech::UsbDevice usb_device(std::make_unique\u003cfocaltech::LibusbTransport\u003e(\n      std::move(transport.value())));\n\n  // Get the mode directly\n  auto mode_res \u003d focaltech::GetDeviceMode(usb_device.device_id());\n  if (!mode_res) {\n    FT_LOGE(\"Cannot find Focal device\");\n    return EXIT_FAILURE;\n  }\n\n  // 4. Execute using the resolved mode\n  if (auto exec_res \u003d focaltech::ExecuteCommand(config.value(), usb_device, *mode_res);\n      !exec_res) {\n    FT_LOGE(\"Command failed\");\n    return EXIT_FAILURE;\n  }\n\n```\n\nThis drastically simplifies the data architecture of the tool. State now flows strictly downward (Config ➔ Mode ➔ Execute ➔ Update), effectively wiping out the last remaining \"C-style\" state-bag pattern from the migration!",
+      "range": {
+        "startLine": 26,
         "startChar": 0,
         "endLine": 30,
         "endChar": 2
