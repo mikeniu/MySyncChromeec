@@ -829,8 +829,7 @@ __overridable enum battery_disconnect_state battery_get_disconnect_state(void)
 #error "Voltage limit must be between 5000 and CONFIG_USB_PD_MAX_VOLTAGE_MV"
 #endif
 
-#if !((defined(CONFIG_USB_PD_TCPMV1) && defined(CONFIG_USB_PD_DUAL_ROLE)) || \
-      (defined(CONFIG_USB_PD_TCPMV2) && defined(CONFIG_USB_PE_SM)) ||        \
+#if !((defined(CONFIG_USB_PD_TCPMV2) && defined(CONFIG_USB_PE_SM)) || \
       defined(CONFIG_USB_PD_CONTROLLER))
 #error "Voltage reducing requires TCPM with Policy Engine or PDC"
 #endif

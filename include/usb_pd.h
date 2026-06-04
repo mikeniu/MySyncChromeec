@@ -258,13 +258,7 @@ enum pdo_augmented_pps {
  * value is the duration before the Hard Reset can be sent.
  * The timer value was experimentally determined to pass TEST.PD.PROT.SNK.5 and
  * TEST.PD.PROT.SRC.3 on various boards.
- * Leaving TCPMv1 as it was as there are no current requests to adjust
- * for compliance on the old stack and making this change breaks the
- * usb_pd unit test.
  */
-#ifdef CONFIG_USB_PD_TCPMV1
-#define PD_T_SENDER_RESPONSE (30 * MSEC) /* between 24ms and 30ms */
-#else
 /* PD R2.0 V1.3: between 24ms and 30ms */
 #define PD2_T_SENDER_RESPONSE (26 * MSEC)
 /*
@@ -274,7 +268,7 @@ enum pdo_augmented_pps {
  * TEST.PD.PROT.SRC.3 on various boards.
  */
 #define PD3_T_SENDER_RESPONSE (28 * MSEC)
-#endif
+
 #define PD_T_PS_TRANSITION (500 * MSEC) /* between 450ms and 550ms */
 /*
  * This is adjusted for PD3.1 Compliance test TEST.PD.PROT.SRC.10.
@@ -828,8 +822,8 @@ BUILD_ASSERT(sizeof(struct skedb) == 24);
 
 /* PD Stack Version */
 enum pd_stack_version {
-	TCPMV1 = 1,
-	TCPMV2,
+	/* TCPMV1 not used in platform/ec */
+	TCPMV2 = 2,
 	PD_CONTROLLER,
 };
 
@@ -846,9 +840,7 @@ enum pd_rev_type {
 #define PD_REVISION PD_REV20
 #endif
 
-#if defined(CONFIG_USB_PD_TCPMV1)
-#define PD_STACK_VERSION TCPMV1
-#elif defined(CONFIG_USB_PD_TCPMV2)
+#if defined(CONFIG_USB_PD_TCPMV2)
 #define PD_STACK_VERSION TCPMV2
 #elif defined(CONFIG_USB_PD_CONTROLLER)
 #define PD_STACK_VERSION PD_CONTROLLER
@@ -1164,46 +1156,6 @@ enum pd_states {
 #ifndef CONFIG_USB_PD_DUAL_ROLE_AUTO_TOGGLE
 #define PD_STATE_DRP_AUTO_TOGGLE UNSUPPORTED_PD_STATE_DRP_AUTO_TOGGLE
 #endif
-
-#ifdef CONFIG_USB_PD_TCPMV1
-/* Flags used for TCPMv1 */
-#define PD_FLAGS_PING_ENABLED BIT(0) /* SRC_READY pings enabled */
-#define PD_FLAGS_PARTNER_DR_POWER BIT(1) /* port partner is dualrole power */
-#define PD_FLAGS_PARTNER_DR_DATA BIT(2) /* port partner is dualrole data */
-#define PD_FLAGS_CHECK_IDENTITY BIT(3) /* discover identity in READY */
-#define PD_FLAGS_SNK_CAP_RECVD BIT(4) /* sink capabilities received */
-#define PD_FLAGS_TCPC_DRP_TOGGLE BIT(5) /* TCPC-controlled DRP toggling */
-#define PD_FLAGS_EXPLICIT_CONTRACT BIT(6) /* explicit pwr contract in place */
-#define PD_FLAGS_VBUS_NEVER_LOW BIT(7) /* VBUS input has never been low */
-#define PD_FLAGS_PREVIOUS_PD_CONN BIT(8) /* previously PD connected */
-#define PD_FLAGS_CHECK_PR_ROLE BIT(9) /* check power role in READY */
-#define PD_FLAGS_CHECK_DR_ROLE BIT(10) /* check data role in READY */
-#define PD_FLAGS_PARTNER_UNCONSTR BIT(11) /* port partner unconstrained pwr */
-#define PD_FLAGS_VCONN_ON BIT(12) /* vconn is being sourced */
-#define PD_FLAGS_TRY_SRC BIT(13) /* Try.SRC states are active */
-#define PD_FLAGS_PARTNER_USB_COMM BIT(14) /* port partner is USB comms */
-#define PD_FLAGS_UPDATE_SRC_CAPS BIT(15) /* send new source capabilities */
-#define PD_FLAGS_TS_DTS_PARTNER BIT(16) /* partner has rp/rp or rd/rd */
-/*
- * These PD_FLAGS_LPM* flags track the software state (PD_LPM_FLAGS_REQUESTED)
- * and hardware state (PD_LPM_FLAGS_ENGAGED) of the TCPC low power mode.
- * PD_FLAGS_LPM_TRANSITION is set while the HW is transitioning into or out of
- * low power (when PD_LPM_FLAGS_ENGAGED is changing).
- */
-#ifdef CONFIG_USB_PD_TCPC_LOW_POWER
-#define PD_FLAGS_LPM_REQUESTED BIT(17) /* Tracks SW LPM state */
-#define PD_FLAGS_LPM_ENGAGED BIT(18) /* Tracks HW LPM state */
-#define PD_FLAGS_LPM_TRANSITION BIT(19) /* Tracks HW LPM transition */
-#define PD_FLAGS_LPM_EXIT BIT(19) /* Tracks HW LPM exit */
-#endif
-/*
- * Tracks whether port negotiation may have stalled due to not starting reset
- * timers in SNK_DISCOVERY
- */
-#define PD_FLAGS_SNK_WAITING_BATT BIT(21)
-/* Check vconn state in READY */
-#define PD_FLAGS_CHECK_VCONN_STATE BIT(22)
-#endif /* CONFIG_USB_PD_TCPMV1 */
 
 /* Per-port battery backed RAM flags */
 #define PD_BBRMFLG_EXPLICIT_CONTRACT BIT(0)

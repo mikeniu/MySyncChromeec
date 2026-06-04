@@ -4693,23 +4693,11 @@
  * Enables USB Power Delivery
  *
  * When this config option is enabled, one of the following must be enabled:
- *	CONFIG_USB_PD_TCPMV1 - legacy power delivery state machine
  *	CONFIG_USB_PD_TCPMV2 - current power delivery state machine
  *	CONFIG_USB_PD_CONTROLLER - power delivery controller state machine
+ * TCPMv1 is not supported in platform/ec (see platform/ec-legacy)
  */
 #undef CONFIG_USB_POWER_DELIVERY
-
-/*
- * Enables the Legacy power delivery state machine.
- * NOTE: Should not be used for new designs.
- */
-#undef CONFIG_USB_PD_TCPMV1
-
-/*
- * Enables PD protocol state names in the TPCMv1 console output.
- * Disable to save ~900 bytes in flash space.
- */
-#define CONFIG_USB_PD_TCPMV1_DEBUG
 
 /*
  * Enables Version 2 of the Power Delivery state machine
@@ -6212,21 +6200,18 @@
 /******************************************************************************/
 /*
  * If CONFIG_USB_POWER_DELIVERY is enabled, make sure either
- * CONFIG_USB_PD_TCPMV1 or CONFIG_USB_PD_TCPMV2 is enabled but not both. Also
- * make sure CONFIG_USB_PD_DECODE_SOP is enabled with CONFIG_USB_PD_TCPMV2
+ * CONFIG_USB_PD_CONTROLLER or CONFIG_USB_PD_TCPMV2 is enabled but not both.
+ * Also make sure CONFIG_USB_PD_DECODE_SOP is enabled with CONFIG_USB_PD_TCPMV2
  */
 #ifdef CONFIG_USB_POWER_DELIVERY
-#if defined(CONFIG_USB_PD_TCPMV1) && defined(CONFIG_USB_PD_TCPMV2)
-#error Only one version of the USB PD State Machine can be enabled.
+#if defined(CONFIG_USB_PD_TCPMV2) == defined(CONFIG_USB_PD_CONTROLLER)
+#error Enable exactly one of CONFIG_USB_PD_TCPMV2 or CONFIG_USB_PD_CONTROLLER
 #endif
-#if !defined(CONFIG_USB_PD_TCPMV1) && !defined(CONFIG_USB_PD_TCPMV2) && \
-	!defined(CONFIG_USB_PD_CONTROLLER)
-#error Please enable CONFIG_USB_PD_TCPMV1 or CONFIG_USB_PD_TCPMV2 or CONFIG_USB_PD_CONTROLLER.
-#endif
+
 #if defined(CONFIG_USB_PD_TCPMV2) && !defined(CONFIG_USB_PD_DECODE_SOP)
 #error CONFIG_USB_PD_DECODE_SOP must be enabled with the TCPMV2 PD state machine
 #endif
-#endif
+#endif /* CONFIG_USB_POWER_DELIVERY */
 
 /******************************************************************************/
 /*
@@ -7320,14 +7305,6 @@
 	"CONFIG_USB_PD_TCPM_PS8* are intended to support in a board."
 #endif
 #endif /* defined(CONFIG_USB_PD_TCPM_PS8705) + ... */
-
-/*
- * CONFIG_HOSTCMD_TYPEC_CONTROL is not supported for TCPMv1, so disable it in
- * that case.
- */
-#ifdef CONFIG_USB_PD_TCPMV1
-#undef CONFIG_HOSTCMD_TYPEC_CONTROL
-#endif /* CONFIG_USB_PD_TCPMV1 */
 
 /******************************************************************************/
 /* Check body detection setup */
