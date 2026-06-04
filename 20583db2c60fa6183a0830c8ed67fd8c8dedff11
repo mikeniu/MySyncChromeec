@@ -96,6 +96,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a0961738_87a5693c",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T17:37:24Z",
+      "side": 1,
+      "message": "In `libusb_transport.cc`, the logic that identifies the Focal device is nested in a way that requires some mental gymnastics to read:\n\n**The issue:**\n\n```c\n    if (is_boot || is_rom || is_ec) {\n      if (is_ec) {\n        const bool valid_fp \u003d (pid \u003d\u003d kFocalEcPidTest) ||\n                              (pid \u003d\u003d kFocalEcPid9865) ||\n                              (pid \u003d\u003d kFocalEcPid9869);\n        if (!valid_fp) {\n          FT_LOGI(\"Found Google device {:04x}:{:04x}, but not Focal. Skipping.\",\n                  vid, pid);\n          continue;\n        }\n      }\n      return dev;\n    }\n\n```\n\n**The Simplification:** You can eliminate the nesting by checking the simplest states first and returning early.\n\n*Refactored:*\n\n```c\n    if (is_boot || is_rom) {\n      return dev;\n    }\n    \n    if (is_ec) {\n      const bool valid_fp \u003d (pid \u003d\u003d kFocalEcPidTest) ||\n                            (pid \u003d\u003d kFocalEcPid9865) ||\n                            (pid \u003d\u003d kFocalEcPid9869);\n      if (valid_fp) {\n        return dev;\n      }\n      FT_LOGI(\"Found Google device {:04x}:{:04x}, but not Focal. Skipping.\", vid, pid);\n    }\n\n```\n\nThis reads linearly, clearly isolating the Google/EC VID special case from the dedicated ROM/Boot VIDs.",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 17
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a3a4974_2f6d92c6",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T17:37:24Z",
+      "side": 1,
+      "message": "Gemini feedback. Verify that it is correct:\n\n----\n\nIn `updater.cc`, `DownloadBin` allocates a `write_buffer` padded to the nearest 4096-byte page boundary, initializes it with `0xFF`, and copies the entire firmware into it.\n\n**The issue:** You only ever iterate over the exact `file_len`, padding the *very last* chunk to a 4-byte boundary. The only time the code explicitly uses `write_buffer.data()` is at the very end to write the 4KB config page. But because the firmware is much larger than 4KB, the first 4KB of `write_buffer` is *identical* to the first 4KB of the original `buffer`. The padded allocation is completely unused\\!\n\n**The Simplification:** Delete `write_buffer` entirely and just use the original `buffer` vector.\n\n*Remove this:*\n\n```c\n  size_t padded_buffer_size \u003d total_frame * kFocalConfigSize;\n  // 0xFF is the initial value of flash.\n  constexpr uint8_t kFlashInitValue \u003d 0xFF;\n  std::vector\u003cuint8_t\u003e write_buffer(padded_buffer_size, kFlashInitValue);\n  std::memcpy(write_buffer.data(), buffer.data(), file_len);\n\n  uint8_t* p \u003d write_buffer.data();\n\n```\n\n*Replace with this:*\n\n```c\n  // Point directly to the original file buffer\n  const uint8_t* p \u003d buffer.data(); \n\n```\n\nThen, at the very end of the function where the config page is written, update the reference to use `buffer`:\n\n```c\n  if (target_addr \u003d\u003d kFocalBootCfgAddr || target_addr \u003d\u003d kFocalRomCfgAddr) {\n    FT_LOGI(\"Write config page\");\n    auto page_res \u003d DownloadPage(device, target_addr, kFocalConfigSize,\n                                   {buffer.data(), kFocalConfigSize}); // \u003c-- Changed to buffer.data()\n    // ...\n\n```\n\nThis saves \\~2MB of heap allocation and an unnecessary `memcpy` of the entire firmware\\!",
+      "range": {
+        "startLine": 138,
+        "startChar": 0,
+        "endLine": 141,
+        "endChar": 60
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "848ad177_f82d2293",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 20
