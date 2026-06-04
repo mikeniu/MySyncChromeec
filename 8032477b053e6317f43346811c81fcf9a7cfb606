@@ -68,6 +68,30 @@
       },
       "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfcbd66d_7ae6bafd",
+        "filename": "util/focaltech/updater.h",
+        "patchSetId": 19
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T00:31:29Z",
+      "side": 1,
+      "message": "A few more places that Gemini found. Double-check for correctness:\n\n----\n\nBecause USB protocols strictly mandate exact byte sizes (specifically 31 bytes for a Command Block Wrapper and 13 bytes for a Command Status Wrapper), adding `static_assert` here is highly recommended to prevent catastrophic protocol failures if the struct is ever modified or if a compiler interprets the packing differently.\n\nHere are the other places you should add them:\n\n### 1. `BulkCbWrap` (Command Block Wrapper)\n\n**File:** `util/focaltech/ft_scsi.h`\nThis struct represents the USB BOT CBW, which must be exactly 31 bytes.\n\n```cpp\nstruct BulkCbWrap {\n  uint32_t signature;\n  uint32_t tag;\n  uint32_t data_transfer_length;\n  uint8_t flags;\n  uint8_t lun;\n  uint8_t cmd_len;\n  uint8_t cmd[kFtScsiCmdSize];\n} __attribute__((packed));\n\nstatic_assert(sizeof(BulkCbWrap) \u003d\u003d 31, \"USB CBW must be exactly 31 bytes\");\n\n```\n\n### 2. `BulkCsWrap` (Command Status Wrapper)\n\n**File:** `util/focaltech/ft_scsi.h`\nThis struct represents the USB BOT CSW, which must be exactly 13 bytes.\n\n```cpp\nstruct BulkCsWrap {\n  uint32_t signature;\n  uint32_t tag;\n  uint32_t data_residue;\n  uint8_t status;\n} __attribute__((packed));\n\nstatic_assert(sizeof(BulkCsWrap) \u003d\u003d 13, \"USB CSW must be exactly 13 bytes\");\n\n```\n\n*(Note: You also have an inline mock version of this named `Csw` in `util/focaltech/test_utils.h`, `ft_scsi_test.cc`, and `updater_test.cc`. It\u0027s good practice to add the assert to `test_utils.h` as well, though using the main `BulkCsWrap` in your tests instead of redefining it would be even better).*\n\n### 3. `FtCmdFormat` (FocalTech SCSI Command)\n\n**File:** `util/focaltech/ft_scsi.cc`\nThis represents the inner payload of the CBW command block (`cmd[kFtScsiCmdSize]`). Since `kFtScsiCmdSize` is defined as 16, this struct must also be exactly 16 bytes so it can be safely bit-cast to the 16-byte array.\n\n```cpp\nstruct FtCmdFormat {\n  uint8_t opcode;\n  uint32_t address;\n  uint32_t length;\n  uint32_t aux_address;\n  uint8_t subcmd;\n  uint8_t flags;\n  uint8_t reserved;\n} __attribute__((packed));\n\nstatic_assert(sizeof(FtCmdFormat) \u003d\u003d 16, \"FtCmdFormat must match kFtScsiCmdSize (16 bytes)\");\n\n```",
+      "parentUuid": "8a38d455_52bbb7ae",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 26
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
