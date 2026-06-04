@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58c8d969_274c3b00",
+        "filename": "include/tpm_vendor_cmds.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1521968
+      },
+      "writtenOn": "2026-06-04T09:18:02Z",
+      "side": 1,
+      "message": "Why don\u0027t we cherry pick this CL?\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7523268\n\nDon\u0027t we need `VENDOR_CC_HW_DRM_COUNTER` and `VENDOR_CC_READ_OWNERS_CONFIG`? (I have no idea about these)",
+      "revId": "f6311dd3281cc60fc3e87281071c57aa883ce62b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
