@@ -34,6 +34,24 @@
       "parentUuid": "58c8d969_274c3b00",
       "revId": "f6311dd3281cc60fc3e87281071c57aa883ce62b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "660eeacd_2a2c6c62",
+        "filename": "include/tpm_vendor_cmds.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1521968
+      },
+      "writtenOn": "2026-06-04T09:31:45Z",
+      "side": 1,
+      "message": "I\u0027m fine with either way, just in case you missed something.",
+      "parentUuid": "6797ed58_503bd89c",
+      "revId": "f6311dd3281cc60fc3e87281071c57aa883ce62b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
