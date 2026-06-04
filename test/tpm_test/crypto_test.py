@@ -11,11 +11,14 @@ import struct
 import xml.etree.ElementTree as ET
 
 import subcmd
+
 import utils
+
 
 # Basic crypto operations
 DECRYPT = 0
 ENCRYPT = 1
+
 
 def get_attribute(tdesc, attr_name, required=True):
     """Retrieve an attribute value from an XML node.
@@ -36,61 +39,66 @@ def get_attribute(tdesc, attr_name, required=True):
              attribute is not found, the error message describes the problem.
     """
     # Fields stored in hex format by default.
-    default_hex = ('aad', 'cipher_text', 'iv', 'key', 'tag')
+    default_hex = ("aad", "cipher_text", "iv", "key", "tag")
 
     data = tdesc.find(attr_name)
     if data is None:
         if required:
-            raise subcmd.TpmTestError('node "%s" does not have attribute "%s"' %
-                                      (tdesc.get('name'), attr_name))
-        return ''
+            raise subcmd.TpmTestError(
+                'node "%s" does not have attribute "%s"'
+                % (tdesc.get("name"), attr_name)
+            )
+        return ""
 
     # Attribute is present, does it have to be decoded from hex?
-    cell_format = data.get('format')
+    cell_format = data.get("format")
     if not cell_format:
         if attr_name in default_hex:
-            cell_format = 'hex'
+            cell_format = "hex"
         else:
-            cell_format = 'ascii'
-    elif cell_format not in ('hex', 'ascii'):
-        raise subcmd.TpmTestError('%s:%s, unrecognizable format "%s"' %
-                                  (tdesc.get('name'), attr_name, cell_format))
+            cell_format = "ascii"
+    elif cell_format not in ("hex", "ascii"):
+        raise subcmd.TpmTestError(
+            '%s:%s, unrecognizable format "%s"'
+            % (tdesc.get("name"), attr_name, cell_format)
+        )
 
-    text = ' '.join(x.strip() for x in data.text.splitlines() if x)
-    if cell_format == 'ascii':
+    text = " ".join(x.strip() for x in data.text.splitlines() if x)
+    if cell_format == "ascii":
         return text
 
     # Drop spaces from hex representation.
-    text = text.replace(' ', '')
+    text = text.replace(" ", "")
 
     # Convert hex-text to little-endian binary (in 4-byte word chunks)
-    value = b''
-    for block in range(len(text)//8):
+    value = b""
+    for block in range(len(text) // 8):
         try:
-            value += struct.pack('<I', int('0x%s' % text[8*block:8*(block+1)],
-                                           16))
+            value += struct.pack(
+                "<I", int("0x%s" % text[8 * block : 8 * (block + 1)], 16)
+            )
         except ValueError:
-            raise subcmd.TpmTestError('%s:%s %swrong hex value' %
-                                      (tdesc.get('name'), attr_name,
-                                       utils.hex_dump(text)))
+            raise subcmd.TpmTestError(
+                "%s:%s %swrong hex value"
+                % (tdesc.get("name"), attr_name, utils.hex_dump(text))
+            )
 
     # Unpack remaining hex text, without introducing a zero pad.
     for block in range(-1, -(len(text) % 8), -1):
-        value += int(text[2*block:len(text) +\
-                 (2*block)+2], 16).to_bytes(1, 'big')
+        value += int(
+            text[2 * block : len(text) + (2 * block) + 2], 16
+        ).to_bytes(1, "big")
 
     return value
 
+
 SUPPORTED_MODES = {
-  'AES': (subcmd.AES, {
-    'ECB': 0,
-    'CTR': 1,
-    'CBC': 2,
-    'GCM': 3,
-    'OFB': 4,
-    'CFB': 5
-  }),
+    "AES": (
+        subcmd.AES,
+        {"ECB": 0, "CTR": 1, "CBC": 2, "GCM": 3, "OFB": 4, "CFB": 5},
+    ),
 }
+
 
 # pylint: disable=too-many-arguments, too-many-locals
 def crypto_run(node_name, op_type, key, init_vec, aad, in_text, out_text, tpm):
@@ -125,7 +133,7 @@ def crypto_run(node_name, op_type, key, init_vec, aad, in_text, out_text, tpm):
         subcmd.TpmTestError: in case there were problems parsing the node name,
         or verifying the operation results.
     """
-    mode_name, submode_name = node_name.split(':')
+    mode_name, submode_name = node_name.split(":")
     submode_name = submode_name[:3].upper()
 
     # commands below will raise exception if incorrect mode/submode used
@@ -133,8 +141,9 @@ def crypto_run(node_name, op_type, key, init_vec, aad, in_text, out_text, tpm):
         mode_cmd, submodes = SUPPORTED_MODES[mode_name.upper()]
         submode = submodes[submode_name]
     except KeyError:
-        raise subcmd.TpmTestError('unrecognizable mode in node "%s"' %
-                                  node_name)
+        raise subcmd.TpmTestError(
+            'unrecognizable mode in node "%s"' % node_name
+        )
     # Command structure, shared out of band with the test driver running
     # on the host:
     #
@@ -150,31 +159,45 @@ def crypto_run(node_name, op_type, key, init_vec, aad, in_text, out_text, tpm):
     # aad         |  aad_len | additional authentication data
     # text_len    |    2     | size of the text to process, big endian
     # text        | text_len | text to encrypt/decrypt
-    cmd = op_type.to_bytes(1, 'big') + submode.to_bytes(1, 'big') +\
-          len(key).to_bytes(1, 'big') +  key +\
-          len(init_vec).to_bytes(1, 'big') + init_vec +\
-          len(aad).to_bytes(1, 'big') + aad +\
-          len(in_text).to_bytes(2, 'big') + in_text
+    cmd = (
+        op_type.to_bytes(1, "big")
+        + submode.to_bytes(1, "big")
+        + len(key).to_bytes(1, "big")
+        + key
+        + len(init_vec).to_bytes(1, "big")
+        + init_vec
+        + len(aad).to_bytes(1, "big")
+        + aad
+        + len(in_text).to_bytes(2, "big")
+        + in_text
+    )
 
     if tpm.debug_enabled():
-        print('%d:%d cmd size' % (op_type, mode_cmd),
-              len(cmd), utils.hex_dump(cmd))
+        print(
+            "%d:%d cmd size" % (op_type, mode_cmd),
+            len(cmd),
+            utils.hex_dump(cmd),
+        )
     wrapped_response = tpm.command(tpm.wrap_ext_command(mode_cmd, cmd))
     real_out_text = tpm.unwrap_ext_response(mode_cmd, wrapped_response)
     if out_text:
         if len(real_out_text) > len(out_text):
-            real_out_text = real_out_text[:len(out_text)]  # Ignore padding
+            real_out_text = real_out_text[: len(out_text)]  # Ignore padding
         if real_out_text != out_text:
             if tpm.debug_enabled():
-                print('Out text mismatch in node %s:\n' % node_name)
+                print("Out text mismatch in node %s:\n" % node_name)
             else:
                 raise subcmd.TpmTestError(
-                  'Out text mismatch in node %s, operation %s:\n'
-                  'In text:%sExpected out text:%sReal out text:%s' % (
-                    node_name, 'ENCRYPT' if op_type == ENCRYPT else 'DECRYPT',
-                    utils.hex_dump(in_text),
-                    utils.hex_dump(out_text),
-                    utils.hex_dump(real_out_text)))
+                    "Out text mismatch in node %s, operation %s:\n"
+                    "In text:%sExpected out text:%sReal out text:%s"
+                    % (
+                        node_name,
+                        "ENCRYPT" if op_type == ENCRYPT else "DECRYPT",
+                        utils.hex_dump(in_text),
+                        utils.hex_dump(out_text),
+                        utils.hex_dump(real_out_text),
+                    )
+                )
     return real_out_text
 
 
@@ -193,53 +216,70 @@ def crypto_test(tdesc, tpm):
         subcmd.TpmTestError: on various execution errors, the details are
         included in the error message.
     """
-    node_name = tdesc.get('name')
-    key = get_attribute(tdesc, 'key')
+    node_name = tdesc.get("name")
+    key = get_attribute(tdesc, "key")
     if len(key) not in (16, 24, 32):
-        raise subcmd.TpmTestError('wrong key size "%s:%s"' % (
-          node_name,
-          ''.join('%2.2x' % ord(x) for x in key)))
-    init_vec = get_attribute(tdesc, 'iv', required=False)
+        raise subcmd.TpmTestError(
+            'wrong key size "%s:%s"'
+            % (node_name, "".join("%2.2x" % ord(x) for x in key))
+        )
+    init_vec = get_attribute(tdesc, "iv", required=False)
     if isinstance(init_vec, str):
-        init_vec = bytes(init_vec, 'ascii')
-    if init_vec and not node_name.startswith('AES:GCM') and len(init_vec) != 16:
-        raise subcmd.TpmTestError('wrong iv size "%s:%s"' % (
-          node_name,
-          ''.join('%2.2x' % ord(x) for x in init_vec)))
-    clear_text = get_attribute(tdesc, 'clear_text', required=False)
+        init_vec = bytes(init_vec, "ascii")
+    if init_vec and not node_name.startswith("AES:GCM") and len(init_vec) != 16:
+        raise subcmd.TpmTestError(
+            'wrong iv size "%s:%s"'
+            % (node_name, "".join("%2.2x" % ord(x) for x in init_vec))
+        )
+    clear_text = get_attribute(tdesc, "clear_text", required=False)
     if isinstance(clear_text, str):
-        clear_text = bytes(clear_text, 'ascii')
+        clear_text = bytes(clear_text, "ascii")
     if clear_text:
-        clear_text_len = get_attribute(tdesc, 'clear_text_len', required=False)
+        clear_text_len = get_attribute(tdesc, "clear_text_len", required=False)
         if clear_text_len:
-            clear_text = clear_text[:int(clear_text_len)]
+            clear_text = clear_text[: int(clear_text_len)]
     else:
         clear_text_len = None
     if tpm.debug_enabled():
-        print('clear text size', len(clear_text))
-    cipher_text = get_attribute(tdesc, 'cipher_text', required=False)
+        print("clear text size", len(clear_text))
+    cipher_text = get_attribute(tdesc, "cipher_text", required=False)
     if isinstance(cipher_text, str):
-        cipher_text = bytes(cipher_text, 'ascii')
+        cipher_text = bytes(cipher_text, "ascii")
     if clear_text_len:
-        cipher_text = cipher_text[:int(clear_text_len)]
-    tag = get_attribute(tdesc, 'tag', required=False)
+        cipher_text = cipher_text[: int(clear_text_len)]
+    tag = get_attribute(tdesc, "tag", required=False)
     if isinstance(tag, str):
-        tag = bytes(tag, 'ascii')
+        tag = bytes(tag, "ascii")
 
-    aad = get_attribute(tdesc, 'aad', required=False) or b''
+    aad = get_attribute(tdesc, "aad", required=False) or b""
     if isinstance(aad, str):
-        aad = bytes(aad, 'ascii')
+        aad = bytes(aad, "ascii")
     if aad:
-        aad_len = get_attribute(tdesc, 'aad_len', required=False)
+        aad_len = get_attribute(tdesc, "aad_len", required=False)
         if aad_len:
-            aad = aad[:int(aad_len)]
-    real_cipher_text = crypto_run(node_name, ENCRYPT, key, init_vec,
-                                  aad, clear_text,
-                                  cipher_text + tag, tpm)
-    crypto_run(node_name, DECRYPT, key, init_vec, aad,
-               real_cipher_text[:len(real_cipher_text) - len(tag)],
-               clear_text + tag, tpm)
-    print(utils.cursor_back() + 'SUCCESS: %s' % node_name)
+            aad = aad[: int(aad_len)]
+    real_cipher_text = crypto_run(
+        node_name,
+        ENCRYPT,
+        key,
+        init_vec,
+        aad,
+        clear_text,
+        cipher_text + tag,
+        tpm,
+    )
+    crypto_run(
+        node_name,
+        DECRYPT,
+        key,
+        init_vec,
+        aad,
+        real_cipher_text[: len(real_cipher_text) - len(tag)],
+        clear_text + tag,
+        tpm,
+    )
+    print(utils.cursor_back() + "SUCCESS: %s" % node_name)
+
 
 def crypto_tests(tpm, xml_file):
     """Run AES cryptographic tests"""

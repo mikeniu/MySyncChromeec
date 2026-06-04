@@ -2,19 +2,24 @@
 # Copyright 2019 The ChromiumOS Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
+
 """Tests for trng."""
 
 from math import gcd
 import struct
+
 import subcmd
+
 import utils
 
-TRNG_TEST_FMT = '>HB'
-TRNG_TEST_RSP_FMT = '>H2IH'
+
+TRNG_TEST_FMT = ">HB"
+TRNG_TEST_RSP_FMT = ">H2IH"
 TRNG_TEST_CC = 0x33
 
-TRNG_SAMPLE_SIZE = 1000 # minimal recommended by NIST is 1000 bytes per sample
-TRNG_SAMPLE_COUNT = 1000000 # NIST require at least 1000000 of 8-bit samples
+TRNG_SAMPLE_SIZE = 1000  # minimal recommended by NIST is 1000 bytes per sample
+TRNG_SAMPLE_COUNT = 1000000  # NIST require at least 1000000 of 8-bit samples
+
 
 # Command structure, shared out of band with the test running on the target:
 # field     |    size  |                  note
@@ -26,11 +31,17 @@ def get_random_command(size, trng_op):
     """Encode get_random command"""
     return struct.pack(TRNG_TEST_FMT, size, trng_op)
 
+
 def get_random_command_rsp(size):
     """Create expected response to get_random"""
-    return struct.pack(TRNG_TEST_RSP_FMT, 0x8001,
-                       struct.calcsize(TRNG_TEST_RSP_FMT) + size,
-                       0, TRNG_TEST_CC)
+    return struct.pack(
+        TRNG_TEST_RSP_FMT,
+        0x8001,
+        struct.calcsize(TRNG_TEST_RSP_FMT) + size,
+        0,
+        TRNG_TEST_CC,
+    )
+
 
 def to_bitstring(s, n=1):
     """Split bytes into individual samples
@@ -40,20 +51,22 @@ def to_bitstring(s, n=1):
     as it comes from TRNG, including the fact that rand_bytes() reverse
     byte order in every 32-bit chunk.
     """
-    out = b''
+    out = b""
     val_left = 0
     bits_left = 0
     while s:
-        val = (struct.unpack('>I', s[0:4].rjust(4, b'\0'))[0] << bits_left) +\
-              val_left
+        val = (
+            struct.unpack(">I", s[0:4].rjust(4, b"\0"))[0] << bits_left
+        ) + val_left
         bits_left += 8 * len(s[0:4])
         s = s[4:]
         while bits_left >= n:
-            out += struct.pack('B', val & ((1 << n) - 1))
+            out += struct.pack("B", val & ((1 << n) - 1))
             val >>= n
             bits_left -= n
         val_left = val
     return out
+
 
 def trng_test(tpm, trng_output, trng_mode, tsb=1):
     """Download entropy samples from TRNG
@@ -70,7 +83,7 @@ def trng_test(tpm, trng_output, trng_mode, tsb=1):
     """
 
     if trng_mode not in [0, 1, 2, 3]:
-        raise subcmd.TpmTestError('Unknown random source: %d' % trng_mode)
+        raise subcmd.TpmTestError("Unknown random source: %d" % trng_mode)
 
     # minimal recommended by NIST is 1000 samples per block
     # TRNG_SAMPLE_BITS is internal setting for TRNG which is important for
@@ -88,7 +101,7 @@ def trng_test(tpm, trng_output, trng_mode, tsb=1):
     # this variable should be divisible by 4 to match 32bit reads from TRNG
 
     if not 8 >= tsb > 0:
-        raise subcmd.TpmTestError('NIST only supports 1 to 8 bits per sample')
+        raise subcmd.TpmTestError("NIST only supports 1 to 8 bits per sample")
 
     # compute number of bytes, which is multiple of 4 containing whole number
     # of samples, each size tsb bits. This a reduction of
@@ -102,27 +115,44 @@ def trng_test(tpm, trng_output, trng_mode, tsb=1):
     samples_per_read = 8 * bytes_per_read // tsb
 
     if samples_per_read < 1000:
-        raise subcmd.TpmTestError("Can't meet NIST requirement of min 1000 "
-                                  'samples in batch - %d bytes only contain'
-                                  ' %d samples' % (bytes_per_read,
-                                  samples_per_read))
-    print('TRNG bits per sample = ', tsb, 'Read size (bytes) =',
-          bytes_per_read, 'Samples per read =', samples_per_read)
+        raise subcmd.TpmTestError(
+            "Can't meet NIST requirement of min 1000 "
+            "samples in batch - %d bytes only contain"
+            " %d samples" % (bytes_per_read, samples_per_read)
+        )
+    print(
+        "TRNG bits per sample = ",
+        tsb,
+        "Read size (bytes) =",
+        bytes_per_read,
+        "Samples per read =",
+        samples_per_read,
+    )
 
     remaining_samples = TRNG_SAMPLE_COUNT
-    with open(trng_output, 'wb') as out_file:
+    with open(trng_output, "wb") as out_file:
         while remaining_samples:
-            response = tpm.command(tpm.wrap_ext_command(TRNG_TEST_CC,
-                                            get_random_command(bytes_per_read,
-                                                               trng_mode)))
+            response = tpm.command(
+                tpm.wrap_ext_command(
+                    TRNG_TEST_CC, get_random_command(bytes_per_read, trng_mode)
+                )
+            )
             if response[:12] != get_random_command_rsp(bytes_per_read):
-                raise subcmd.TpmTestError("Unexpected response to '%s': %s" %
-                                        ('trng', utils.hex_dump(response)))
+                raise subcmd.TpmTestError(
+                    "Unexpected response to '%s': %s"
+                    % ("trng", utils.hex_dump(response))
+                )
             bits = to_bitstring(response[12:], tsb)
             bits = bits[:remaining_samples]
             out_file.write(bits)
             remaining_samples -= len(bits)
-            print('%s %d%%\r' % (utils.cursor_back(),
-                                ((TRNG_SAMPLE_COUNT - remaining_samples)*100)\
-                                // TRNG_SAMPLE_COUNT), end='')
-    print('%sSUCCESS: %s' % (utils.cursor_back(), trng_output))
+            print(
+                "%s %d%%\r"
+                % (
+                    utils.cursor_back(),
+                    ((TRNG_SAMPLE_COUNT - remaining_samples) * 100)
+                    // TRNG_SAMPLE_COUNT,
+                ),
+                end="",
+            )
+    print("%sSUCCESS: %s" % (utils.cursor_back(), trng_output))

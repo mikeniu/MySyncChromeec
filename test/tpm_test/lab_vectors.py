@@ -10,7 +10,9 @@ from __future__ import print_function
 import os
 
 import drbg_test
+
 import utils
+
 
 class LabTest(object):
     """Base class implementing the lab vector interface.
@@ -42,10 +44,13 @@ class LabTest(object):
         else:
             self._expected_vector = None
 
-        out_file = (os.path.basename(request_file).strip('.json') +
-                    '-output.json')
-        self._result_file = os.path.join(result_dir,
-            os.path.basename(request_file).strip('.json') + '-output.json')
+        out_file = (
+            os.path.basename(request_file).strip(".json") + "-output.json"
+        )
+        self._result_file = os.path.join(
+            result_dir,
+            os.path.basename(request_file).strip(".json") + "-output.json",
+        )
         self._result_json = None
         self._test_inputs = []
 
@@ -55,15 +60,17 @@ class LabTest(object):
 
     def get_test_inputs(self):
         """Convert the lab vectors into the format required for the test."""
-        raise NotImplementedError('Algorithm needs to provide the vector processing')
+        raise NotImplementedError(
+            "Algorithm needs to provide the vector processing"
+        )
 
     def _algo_get_formatted_results(self, results):
         """Convert the results list into the lab format."""
-        raise NotImplementedError('Algorithm needs to process results list')
+        raise NotImplementedError("Algorithm needs to process results list")
 
     def save_test_results(self, results):
         """Convert the results to the lab format and save them to a file."""
-        print('Saving results in', self._result_file)
+        print("Saving results in", self._result_file)
         self._result_json = utils.read_vectors(self._request_file)
         formatted_results = self._algo_get_formatted_results(results)
         self._result_json[1][self.GROUPS] = formatted_results
@@ -77,6 +84,7 @@ class DRBGLabTest(LabTest):
     Convert the response list from the drbg test to the same format as the
     expected vectors.
     """
+
     RESPONSE_KEY = "returnedBits"
     RESPONSE_BITS = RESPONSE_KEY + "Len"
     NONCE = "nonce"
@@ -116,11 +124,11 @@ class DRBGLabTest(LabTest):
                 drbg_op = drbg_test.DRBG_GENERATE
                 generate_calls += 1
                 if entropy:
-                    raise ValueError('Got entropy during generate %r' % step)
+                    raise ValueError("Got entropy during generate %r" % step)
                 # The vectors only verify the second generate command. Only pass in
                 # the result if it will match.
                 check_result = generate_calls == 2
-                expected_response = response if check_result else ''
+                expected_response = response if check_result else ""
                 drbg_params = (input1, expected_response, check_result)
             else:
                 raise ValueError("Invalid mode %r" % mode)
@@ -140,7 +148,6 @@ class DRBGLabTest(LabTest):
                 response = self._get_expected_response(i, j)
                 self._process_test_case(test, response)
         return self._test_inputs
-
 
     def _algo_get_formatted_results(self, results):
         """Format the results into the list the lab expects.

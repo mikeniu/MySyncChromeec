@@ -2,6 +2,7 @@
 # Copyright 2016 The ChromiumOS Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
+
 """Firmware upgrade tests"""
 
 from __future__ import print_function
@@ -11,6 +12,7 @@ import os
 import struct
 
 import subcmd
+
 import utils
 
 
@@ -31,39 +33,39 @@ def upgrade(tpm):
     Raises:
         subcmd.TpmTestError: In case of various test problems
     """
-    cmd = struct.pack('>II', 0, 0)  # address, data (a noop)
+    cmd = struct.pack(">II", 0, 0)  # address, data (a noop)
     wrapped_response = tpm.command(tpm.wrap_ext_command(subcmd.FW_UPGRADE, cmd))
     base_str = tpm.unwrap_ext_response(subcmd.FW_UPGRADE, wrapped_response)
     if len(base_str) < 4:
-        raise subcmd.TpmTestError('Initialization error %d' %
-                                  ord(base_str[0]))
-    base = struct.unpack_from('>4I', base_str)[3]
+        raise subcmd.TpmTestError("Initialization error %d" % ord(base_str[0]))
+    base = struct.unpack_from(">4I", base_str)[3]
     if base == 0x44000:
-        fname = 'build/cr50/RW/ec.RW_B.flat'
+        fname = "build/cr50/RW/ec.RW_B.flat"
     elif base == 0x4000:
-        fname = 'build/cr50/RW/ec.RW.flat'
+        fname = "build/cr50/RW/ec.RW.flat"
     else:
-        raise subcmd.TpmTestError('Unknown base address 0x%x' % base)
-    fname = os.path.join(os.path.dirname(__file__), '../..', fname)
-    data = open(fname, 'rb').read()[:2000]
+        raise subcmd.TpmTestError("Unknown base address 0x%x" % base)
+    fname = os.path.join(os.path.dirname(__file__), "../..", fname)
+    data = open(fname, "rb").read()[:2000]
     transferred = 0
     block_size = 1024
 
     while transferred < len(data):
         tx_size = min(block_size, len(data) - transferred)
-        chunk = data[transferred:transferred+tx_size]
-        cmd = struct.pack('>I', base)  # address
+        chunk = data[transferred : transferred + tx_size]
+        cmd = struct.pack(">I", base)  # address
         hash_block = hashlib.sha1()
         hash_block.update(cmd)
         hash_block.update(chunk)
         cmd = hash_block.digest()[0:4] + cmd + chunk
-        resp = tpm.unwrap_ext_response(subcmd.FW_UPGRADE,
-                                       tpm.command(tpm.wrap_ext_command(
-                                         subcmd.FW_UPGRADE, cmd)))
+        resp = tpm.unwrap_ext_response(
+            subcmd.FW_UPGRADE,
+            tpm.command(tpm.wrap_ext_command(subcmd.FW_UPGRADE, cmd)),
+        )
         code = resp[0]
         if code:
-            raise subcmd.TpmTestError('%x - resp %d' % (base, code))
+            raise subcmd.TpmTestError("%x - resp %d" % (base, code))
         base += tx_size
         transferred += tx_size
 
-    print('%sSUCCESS: Firmware upgrade' % (utils.cursor_back()))
+    print("%sSUCCESS: Firmware upgrade" % (utils.cursor_back()))

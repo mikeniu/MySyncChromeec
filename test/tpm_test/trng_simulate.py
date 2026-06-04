@@ -2,10 +2,13 @@
 # Copyright 2023 The ChromiumOS Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
+
 """Module for simulation TRNG output for NIST entropy testing"""
 
 import sys
+
 from scipy.stats import invgauss
+
 
 # NIST requires 1000000 samples
 numcolls = 1000000
@@ -20,24 +23,26 @@ if len(sys.argv) != 2:
 out_file = str(sys.argv[1])
 
 # create bytearray for lsbs
-lsb_bytearray = [None]*(int(numcolls))
-lsb_count = [0]*(int(1 << bits))
+lsb_bytearray = [None] * (int(numcolls))
+lsb_count = [0] * (int(1 << bits))
 
 # determine shape of inverse gaussian distribution
 mu = 0.785
 loc = 0
 scale = 1525
-timeout = 0xfff
+timeout = 0xFFF
 
 # confirm that mean, var, skew closely match model expectations
-mean, var, skew, kurt = invgauss.stats(mu, loc=loc, scale=scale, moments='mvsk')
+mean, var, skew, kurt = invgauss.stats(mu, loc=loc, scale=scale, moments="mvsk")
 
-print(f"mu = {mu:.3f}\nloc = {loc:.3f}\nscale = {scale:.3f}\n"
-      f"mean = {mean:.3f}\nvar = {var:.3f}\nskew = {skew:.3f}\n"
-      f"kurt = {kurt:.3f}\nlamda = {mean*mean*mean/var:.3f}")
+print(
+    f"mu = {mu:.3f}\nloc = {loc:.3f}\nscale = {scale:.3f}\n"
+    f"mean = {mean:.3f}\nvar = {var:.3f}\nskew = {skew:.3f}\n"
+    f"kurt = {kurt:.3f}\nlamda = {mean*mean*mean/var:.3f}"
+)
 
 # create numcolls collapse values, generate 2x to handle timeouts
-r = invgauss.rvs(mu, loc=loc, scale=scale, size=numcolls*2)
+r = invgauss.rvs(mu, loc=loc, scale=scale, size=numcolls * 2)
 
 # basic stats tracking
 byteval = 0
@@ -58,8 +63,10 @@ for rval in r:
         break
 
 print(f"timeouts = {timeouts}")
-print(f"bin size = {len(lsb_bytearray)}\t"
-      f"max = {max(lsb_bytearray)}\tvalue min = {min(lsb_bytearray)}")
+print(
+    f"bin size = {len(lsb_bytearray)}\t"
+    f"max = {max(lsb_bytearray)}\tvalue min = {min(lsb_bytearray)}"
+)
 for i, count in enumerate(lsb_count):
     print(f"P[{i}] = {count / numcolls}")
 with open(f"{out_file}", "wb") as fbin:
