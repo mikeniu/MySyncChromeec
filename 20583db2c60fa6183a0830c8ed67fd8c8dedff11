@@ -142,6 +142,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0045c820_2f0ea8f7",
+        "filename": "util/focaltech/libusb_transport.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T18:02:40Z",
+      "side": 1,
+      "message": "We should use the `UsbDeviceId` struct for these. Here are instructions from Gemini:\n\n----\n\nBy leveraging C++20\u0027s default comparison operator (`\u003d default`), you can compare entire VID/PID pairs in a single stroke.\n\nHere is how you can implement this:\n\n### 1. Enable C++20 Comparisons on `UsbDeviceId`\n\nIn `util/focaltech/usb_transport.h`, add the default equality operator:\n\n```cpp\nstruct UsbDeviceId {\n  uint16_t vid \u003d 0;\n  uint16_t pid \u003d 0;\n\n  bool operator\u003d\u003d(const UsbDeviceId\u0026) const \u003d default;\n};\n\n```\n\n### 2. Define the Constants as `UsbDeviceId` Instances\n\nIn `util/focaltech/libusb_transport.h`, replace the raw integers with instantiated structs. (Note: `0x18D1` is actually Google\u0027s official USB Vendor ID, so it\u0027s clearer to label it as such).\n\n```cpp\n// Common Google VID used for ECs\ninline constexpr uint16_t kGoogleVid \u003d 0x18D1;\n\n// USB identifiers for Focal devices\ninline constexpr UsbDeviceId kFocalRomId       \u003d {0x2FD0, 0x0000};\ninline constexpr UsbDeviceId kFocalBootId      \u003d {0x2808, 0x0001};\ninline constexpr UsbDeviceId kFocalEcTestId    \u003d {kGoogleVid, 0xFACE};\ninline constexpr UsbDeviceId kFocalEcPid9865Id \u003d {kGoogleVid, 0x5403};\ninline constexpr UsbDeviceId kFocalEcPid9869Id \u003d {kGoogleVid, 0x5404};\n\n```\n\n### 3. Simplify the Call Sites\n\nThis change dramatically cleans up your routing logic by allowing you to compare the whole device identity at once instead of nesting `vid` and `pid` checks.\n\n**In `cli.cc` (`GetDeviceMode` / formerly `InitDevice`):**\n\n```cpp\nstd::expected\u003cDeviceMode, Error\u003e GetDeviceMode(const UsbDeviceId\u0026 id) {\n  if (id \u003d\u003d kFocalRomId) return DeviceMode::kRom;\n  if (id \u003d\u003d kFocalBootId) return DeviceMode::kBoot;\n  if (id \u003d\u003d kFocalEcTestId) return DeviceMode::kTest;\n  if (id \u003d\u003d kFocalEcPid9865Id || id \u003d\u003d kFocalEcPid9869Id) return DeviceMode::kEc;\n\n  FT_LOGE(\"Unrecognized Focal device.\");\n  return std::unexpected(Error::kNoSuchDevice);\n}\n\n```\n\n**In `libusb_transport.cc` (`FindFocalDevice`):**\n\n```cpp\n    UsbDeviceId current_id{.vid \u003d out_desc.idVendor, .pid \u003d out_desc.idProduct};\n\n    if (current_id \u003d\u003d kFocalBootId || current_id \u003d\u003d kFocalRomId) {\n      return dev;\n    }\n\n    if (current_id.vid \u003d\u003d kGoogleVid) {\n      if (current_id \u003d\u003d kFocalEcTestId || \n          current_id \u003d\u003d kFocalEcPid9865Id || \n          current_id \u003d\u003d kFocalEcPid9869Id) {\n        return dev;\n      }\n      FT_LOGI(\"Found Google device {:04x}:{:04x}, but not Focal. Skipping.\",\n              current_id.vid, current_id.pid);\n    }\n\n```\n\nBy elevating the raw integers into domain objects (`UsbDeviceId`), you get strict type safety, zero casting overhead, and significantly cleaner business logic.",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 44
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3a3a4974_2f6d92c6",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 20
