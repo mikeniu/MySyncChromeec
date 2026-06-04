@@ -68,9 +68,10 @@ TEST_PATTERNS='**/*_benchmark.cc' \
 	'$(THIRD_PARTY)/zephyrproject/zephyr/subsys/emul/**' \
 	'$(THIRD_PARTY)/zephyrproject/zephyr/subsys/testsuite/**'
 
-.PHONY: test twister_host twister_llvm
+.PHONY: test twister_host twister_llvm test_host_utils
 
 test: zmake_unit_tests
+test: test_host_utils
 ifdef COVERAGE
 # List all of the files expected by firmware_builder.py
 test: $(PLATFORM_EC)/twister-out-host/coverage.info # EC_ZEPHYR_TESTS_GCC
@@ -92,6 +93,10 @@ else
 zmake_unit_tests:
 	zmake/run_tests.sh
 endif
+
+.PHONY: test_host_utils
+test_host_utils:
+	$(MAKE) -C .. utils-test BOARD=host
 
 zephyr_check_compliance_unittest:
 	$(PLATFORM_EC)/util/zephyr_check_compliance_unittest.py
