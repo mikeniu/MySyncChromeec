@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af0882ee_7b66bae3",
+        "filename": "zephyr/mock/usb_mux.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-04T17:42:18Z",
+      "side": 1,
+      "message": "usb_mux.h already appears to have this [stubbed out](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/include/usb_mux.h;l\u003d335;drc\u003d6757ebe2dce2a23e2cd3149eb82b32faa4f16908)\n\nPick one location for the stub.  Either this mock or the original stub above.  I prefer this mock if it can be made to work.",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 40
+      },
+      "revId": "02f367314a8fcec8cec72f79c84730a5aad774d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
