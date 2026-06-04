@@ -22,6 +22,30 @@
       },
       "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "897c785a_329efa78",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T17:06:08Z",
+      "side": 1,
+      "message": "We should also add a test case for this. Here is Gemini generated code:\n\n----\n\n### 1. Update `util/focaltech/cli.h`\n\nAdd the `internal` namespace at the bottom of the file to expose the function for testing:\n\n```cpp\n// Mode switch helper with retry and device-loss detection\nstd::expected\u003cvoid, FtError\u003e SwitchMcuMode(UsbDevice\u0026 usb,\n                                           FtDeviceMode current_mode,\n                                           Command target_cmd);\n\nstd::expected\u003cint, FtError\u003e ParseInt(std::string_view str);\n\nnamespace internal {\n// Exposed for testing.\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, FtError\u003e SendEcCommandAndReadResponse(\n    UsbDevice\u0026 device, uint16_t command, uint8_t version,\n    std::span\u003cconst uint8_t\u003e params \u003d {});\n}  // namespace internal\n\n#endif  // UTIL_FOCALTECH_CLI_H_\n\n```\n\n### 2. Update `util/focaltech/cli.cc`\n\n**A. Move the function and add the truncation fix:**\nFind `SendEcCommandAndReadResponse` inside the anonymous namespace. Move it out of the anonymous namespace and wrap it in `namespace internal`. Add the truncation logic right before returning:\n\n```cpp\n}  // namespace (end of anonymous namespace)\n\nnamespace internal {\n\n// Send EC command and read response using UsbDevice\n// Handles the case where Recv returns more bytes than requested (e.g., 64-byte\n// USB packets)\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, FtError\u003e SendEcCommandAndReadResponse(\n    UsbDevice\u0026 device, uint16_t command, uint8_t version,\n    std::span\u003cconst uint8_t\u003e params) {\n  constexpr size_t kMaxPacketSize \u003d 64;\n  auto packet \u003d BuildEcCommand(command, version, params);\n\n  // ... (keep the existing sending and receiving logic) ...\n\n  // If we still need more data to reach resp.data_len, read the rest\n  if (response_data.size() \u003c resp.data_len) {\n    // ... (keep existing read loop) ...\n    response_data.insert(response_data.end(), additional.begin(),\n                         additional.end());\n  }\n\n  // USB bulk reads may return padded packets. Ensure we only return the exact\n  // payload length the EC specified in its header.\n  if (response_data.size() \u003e resp.data_len) {\n    response_data.resize(resp.data_len);\n  }\n\n  return response_data;\n}\n\n}  // namespace internal\n\n```\n\n**B. Update the callers:**\nPrefix the three calls to this function with `internal::`:\n\n```cpp\n// 1. Get build version string\nstd::expected\u003cstd::string, FtError\u003e GetBuildInfo(UsbDevice\u0026 device) {\n  auto data \u003d\n      internal::SendEcCommandAndReadResponse(device, EC_CMD_GET_BUILD_INFO, 0, {});\n// ...\n\n// 2. Switch to bootloader mode\nstd::expected\u003cvoid, FtError\u003e SwitchToBootloader(UsbDevice\u0026 device,\n                                                uint8_t mode) {\n// ...\n  auto data \u003d internal::SendEcCommandAndReadResponse(device, EC_CMD_ENTER_BOOTLOADER, 0,\n                                           params_span);\n// ...\n\n// 3. Switch to ROM mode using custom Focal command (only for test firmware)\nstd::expected\u003cvoid, FtError\u003e SwitchToRom(UsbDevice\u0026 device) {\n  auto data \u003d internal::SendEcCommandAndReadResponse(device, kTestEcSwitchToRomCmd, 0,\n                                           kSwitchToRomPayload);\n// ...\n\n```\n\n### 3. Update `util/focaltech/cli_test.cc`\n\nAdd the new test suite for internal logic right after the `DeviceInit` tests (or anywhere logically grouped with EC protocol tests):\n\n```cpp\n// -----------------------------------------------------------------------------\n// Internal EC protocol command tests\n// -----------------------------------------------------------------------------\nTEST(CliTest, SendEcCommandAndReadResponse_TruncatesPaddedUsbData) {\n  auto transport \u003d std::make_unique\u003cFakeEcTransport\u003e();\n  auto* fake \u003d transport.get();\n  UsbDevice device \u003d MakeDevice(std::move(transport));\n\n  // 1. Build a valid response with exactly 3 bytes of payload.\n  std::vector\u003cuint8_t\u003e packet \u003d\n      BuildEcResponse(EC_RES_SUCCESS, {0x01, 0x02, 0x03});\n\n  // 2. Simulate USB bulk endpoint behavior by padding it out to 64 bytes.\n  packet.resize(64, 0xAA);\n  fake-\u003eAddResponse(packet);\n\n  auto result \u003d internal::SendEcCommandAndReadResponse(device, 0x1234, 0);\n\n  ASSERT_TRUE(result.has_value());\n  // Expect exactly 3 bytes, proving the 53 bytes of padding were cleanly truncated.\n  EXPECT_THAT(*result, ElementsAre(0x01, 0x02, 0x03));\n}\n\n```",
+      "parentUuid": "e2d80ef3_d7649307",
+      "range": {
+        "startLine": 115,
+        "startChar": 0,
+        "endLine": 117,
+        "endChar": 3
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
