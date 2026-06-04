@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "484a2c88_03e44e99",
+        "filename": "zephyr/mock/CMakeLists.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-04T05:07:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "844b8733_d5dbc77a",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 66
+      },
+      "revId": "10202ea5e4300c963b03d9f5550b4ef189738864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1020cddd_5bcaaa4e",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-01T22:17:13Z",
       "side": 1,
       "message": "There are 4 separate `#ifdef CONFIG_EC_HOST_CMD` blocks in this file.  Can those be moved into their own file to clean this up?",
+      "range": {
+        "startLine": 16,
+        "startChar": 7,
+        "endLine": 16,
+        "endChar": 25
+      },
+      "revId": "10202ea5e4300c963b03d9f5550b4ef189738864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54b63cc7_975ea236",
+        "filename": "zephyr/shim/src/host_command.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-04T05:07:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1020cddd_5bcaaa4e",
       "range": {
         "startLine": 16,
         "startChar": 7,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c61513aa_e94b223b",
+        "filename": "zephyr/shim/src/host_command.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-04T05:07:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d1d60b1_b5064459",
+      "range": {
+        "startLine": 222,
+        "startChar": 9,
+        "endLine": 222,
+        "endChar": 34
+      },
+      "revId": "10202ea5e4300c963b03d9f5550b4ef189738864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ec13cf92_a62c9cff",
@@ -87,6 +159,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b17b1f2e_4943f804",
+        "filename": "zephyr/shim/src/host_command.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-04T05:07:42Z",
+      "side": 1,
+      "message": "This is handled in lines 50-65 of this file.",
+      "parentUuid": "ec13cf92_a62c9cff",
+      "revId": "10202ea5e4300c963b03d9f5550b4ef189738864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d232422c_075f2c26",
@@ -100,6 +190,30 @@
       "writtenOn": "2026-06-01T22:17:13Z",
       "side": 1,
       "message": "I think these call all be converted to `if (IS_ENABLED())` checks. \n\nAt a minimum, you can convert to a series of `#if` blocks since each one returns.\n\n```\n#if defined(CONFIG_TASK_HOSTCMD_THREAD_MAIN) || \\...\n    return get_main_thread();\n#endif\n\n#ifdef CONFIG_EC_HOST_CMD\n    return \u0026hc-\u003ethread;\n#endif\n...\n```",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 133,
+        "endChar": 1
+      },
+      "revId": "10202ea5e4300c963b03d9f5550b4ef189738864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59977aec_b0dd429a",
+        "filename": "zephyr/shim/src/tasks.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-04T05:07:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d232422c_075f2c26",
       "range": {
         "startLine": 119,
         "startChar": 0,
@@ -133,6 +247,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "082043e6_7e9496b8",
+        "filename": "zephyr/shim/src/tasks.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-04T05:07:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b9d96c8_06e40d19",
+      "range": {
+        "startLine": 418,
+        "startChar": 0,
+        "endLine": 418,
+        "endChar": 2
+      },
+      "revId": "10202ea5e4300c963b03d9f5550b4ef189738864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4649671b_d8baf543",
@@ -156,6 +294,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "02f23379_9fe941ff",
+        "filename": "zephyr/test/drivers/default/src/usb_mux.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 935,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-04T05:07:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4649671b_d8baf543",
+      "range": {
+        "startLine": 935,
+        "startChar": 1,
+        "endLine": 935,
+        "endChar": 18
+      },
+      "revId": "10202ea5e4300c963b03d9f5550b4ef189738864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0b84d248_29e28fe9",
@@ -169,6 +331,30 @@
       "writtenOn": "2026-06-01T22:17:13Z",
       "side": 1,
       "message": "Is this a requirement of the upstream host command driver?  Add a comment.",
+      "range": {
+        "startLine": 156,
+        "startChar": 0,
+        "endLine": 156,
+        "endChar": 31
+      },
+      "revId": "10202ea5e4300c963b03d9f5550b4ef189738864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "167e264d_57786226",
+        "filename": "zephyr/test/drivers/flash/src/flash.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-04T05:07:42Z",
+      "side": 1,
+      "message": "I was hitting a fault early on with this. I probably didn\u0027t have the backend simulator properly configured.  I\u0027ll revert this file as the failure is no longer reproduced.",
+      "parentUuid": "0b84d248_29e28fe9",
       "range": {
         "startLine": 156,
         "startChar": 0,
