@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e988f00d_8fa1bb41",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T20:58:57Z",
+      "side": 1,
+      "message": "Please use descriptive constants instead of hardcoding magic values throughout the code. Gemini suggestions are here, but please check for more:\n\n\n---\n\n\n### 1. The Delays in `bootrom.cc`\n\n**The Magic:**\n\n* `std::this_thread::sleep_for(std::chrono::milliseconds(10));` in `GetSr1()`\n* `std::this_thread::sleep_for(std::chrono::milliseconds(1));` in `WaitForFlashReady()`\n\n**The Fix:**\nAdd these as static constants to your `BootromComm` class in `util/egis/bootrom.h` (right next to `kFlashReadyPollTimeout`):\n\n```cpp\n  static constexpr auto kFlashReadyPollTimeout \u003d std::chrono::milliseconds(500);\n  static constexpr auto kFlashReadyPollInterval \u003d std::chrono::milliseconds(1);\n  static constexpr auto kFlashStatusReadDelay \u003d std::chrono::milliseconds(10);\n\n```\n\nThen, update `util/egis/bootrom.cc`:\n\n```cpp\n// In GetSr1()\nstd::this_thread::sleep_for(kFlashStatusReadDelay);\n\n// In WaitForFlashReady()\nstd::this_thread::sleep_for(kFlashReadyPollInterval);\n\n```\n\n---\n\n### 2. The Raw Command Read Buffer in `flasher_logic.cc`\n\n**The Magic:**\n\n```cpp\nstd::vector\u003cuint8_t\u003e resp(128, 0);\nauto read_res \u003d boot_comm.Receive(resp);\n\n```\n\n`128` is an arbitrary guess at the device\u0027s maximum response size. If the device returns more data (e.g., from a memory read command executed via the raw stream), `libusb` will fail with an overflow error.\n\n**The Fix:**\nUse the protocol\u0027s known maximums provided by the `BootromComm` class so it scales safely.\n\n```cpp\n// In ProgramRawCommandPayload()\nstd::vector\u003cuint8_t\u003e resp(BootromComm::kMaxPayloadSize + BootromComm::kStatusHeaderSize, 0);\n\n```\n\n---\n\n### 3. The Protocol Version in `ec_comm.cc`\n\n**The Magic:**\n\n```cpp\n// The protocol version should always be 3.\nif (resp_hdr.protocol_version !\u003d 3) {\n\n```\n\n**The Fix:**\nDefine the protocol version explicitly in `util/egis/ec_protocol_defs.h` instead of hardcoding `3` in the code and default struct initializations:\n\n```cpp\nnamespace egis {\n\nconstexpr uint8_t kEcProtocolVersion3 \u003d 3;\n\n// Update your structs to use the constant:\nstruct EcHostCommandRequest {\n  uint8_t protocol_version \u003d kEcProtocolVersion3; \n// ...\n\n```\n\nThen in `util/egis/ec_comm.cc`:\n\n```cpp\nif (resp_hdr.protocol_version !\u003d kEcProtocolVersion3) {\n\n```\n\n---\n\n### 4. The System Reset Size Hack in `flasher_logic.cc`\n\n**The Magic:**\n\n```cpp\nif (fw.size() \u003c 2) return std::unexpected(ParseError::kDataTooSmall);\n\nif (fw[0] \u003d\u003d EgisBootrom::kCmdSystemReset) return 2;\n\n```\n\n`2` is hardcoded as the length of the System Reset command.\n\n**The Fix:**\nUse the actual size of the struct you defined for this purpose. This way, if the struct definition ever changes, the parser mathematically adapts.\n\n```cpp\n// In GetNextPacketSize()\nconstexpr size_t kResetCmdSize \u003d sizeof(EgisBootrom::SystemResetCommand);\n\nif (fw.size() \u003c kResetCmdSize) return std::unexpected(ParseError::kDataTooSmall);\n\nif (fw[0] \u003d\u003d std::to_underlying(EgisBootrom::CommandId::kSystemReset)) {\n  return kResetCmdSize;\n}\n\n```\n\n### Summary\n\nLifting these out eliminates comments like `// The protocol version should always be 3.` because the code becomes self-documenting. It also ties arbitrary buffer sizes and bounds checks directly to the physical structures (`sizeof()`) or defined limits (`kMaxPayloadSize`), eliminating fragility.",
+      "range": {
+        "startLine": 299,
+        "startChar": 0,
+        "endLine": 299,
+        "endChar": 61
+      },
+      "revId": "7948047d5d5cd56d835ddcec83c72efa480d8f23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "08c51853_85aac763",
         "filename": "util/egis/bootrom.h",
         "patchSetId": 31
