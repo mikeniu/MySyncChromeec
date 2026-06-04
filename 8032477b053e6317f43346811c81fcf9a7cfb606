@@ -72,6 +72,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d7744991_11e10303",
+        "filename": "util/focaltech/ft_util_test.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T00:45:15Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n---\n\n### 1. Drop `static_cast` for Literals (Use C++23 `uz` suffix)\n\nIn `util/focaltech/ft_util_test.cc`, you are casting the literal `1` to a `size_t` so that the template deduces the types correctly:\n\n**Current:**\n\n```cpp\n  EXPECT_EQ(FtDivRoundUp(kLarge, static_cast\u003csize_t\u003e(1)), kLarge);\n\n```\n\n**Recommendation:**\nC++23 introduces the `uz` suffix for `size_t` literals. You can drop the cast entirely:\n\n```cpp\n  EXPECT_EQ(FtDivRoundUp(kLarge, 1uz), kLarge);\n\n```\n\n### 2. Replace `static_cast` for Enums (Use `std::to_underlying`)\n\nIn `util/focaltech/updater.cc` (`FtSetFlashProtect` and `FtGetFlashProtect`), you are casting the strongly-typed enum `FtFlashWpArea` to integers for logging and bitwise operations.\n\n**Current:**\n\n```cpp\n  FT_LOGI(\"Flash write-protect area \u003d {}\", static_cast\u003cint\u003e(wp_area));\n  // ...\n  auto res \u003d ReceiveActionIn(\n      device, kFtSubcmdFlashWpSet, static_cast\u003cuint32_t\u003e(wp_area), dummy,\n      kGenericInfoTimeout, ~static_cast\u003cuint32_t\u003e(wp_area));\n\n```\n\n**Recommendation:**\nC++23 provides `std::to_underlying` (in the `\u003cutility\u003e` header), which is the modern, typesafe way to extract the integer value from a scoped enum without a manual `static_cast`. It protects you if the underlying type of the enum ever changes.\n\n```cpp\n#include \u003cutility\u003e\n\n  FT_LOGI(\"Flash write-protect area \u003d {}\", std::to_underlying(wp_area));\n  // ...\n  auto res \u003d ReceiveActionIn(\n      device, kFtSubcmdFlashWpSet, std::to_underlying(wp_area), dummy,\n      kGenericInfoTimeout, ~std::to_underlying(wp_area));\n\n```\n\n### 3. Remove Strict Aliasing `reinterpret_cast` (Use `memcpy`)\n\nIn the test files `ft_scsi_test.cc` and `updater_test.cc`, you are extracting a 32-bit integer (the tag) directly from a byte array via pointer casting:\n\n**Current:**\n\n```cpp\n  if (data.size() \u003d\u003d focaltech::testing::kUsbCbwSize) {\n    current_cbw_tag_ \u003d *reinterpret_cast\u003cconst uint32_t*\u003e(\u0026data[4]);\n  }\n\n```\n\nCasting a `uint8_t*` buffer to a `uint32_t*` and dereferencing it is a classic violation of C++ strict aliasing rules, which can lead to unpredictable optimization bugs. It can also cause unaligned memory access faults on certain hardware architectures (like some ARM chips).\n\n**Recommendation:**\nThe universally safe, standard-compliant way to parse bytes into an integer without casting is `std::memcpy`. Modern compilers (GCC/Clang) recognize this specific pattern and will optimize it away into a single, safe register load, meaning there is zero performance penalty:\n\n```cpp\n  if (data.size() \u003d\u003d focaltech::testing::kUsbCbwSize) {\n    std::memcpy(\u0026current_cbw_tag_, \u0026data[4], sizeof(current_cbw_tag_));\n  }\n\n```\n\n*(Note: While C++20 introduced `std::bit_cast`, it requires the source and destination types to be the exact same size. Since you are extracting 4 bytes out of a larger array, `memcpy` remains the correct tool here).*",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 66
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "88d51d00_df7569b8",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 19
