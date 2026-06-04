@@ -74,6 +74,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8d5773b9_be46a48c",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T00:25:59Z",
+      "side": 1,
+      "message": "Looks like there are still cases to be fixed. Please check the code for any more:\n\n----\n\n### 1. Sequential Assignment in `cli_test.cc`\n\nIn the `BuildEcResponse` helper, `ec_host_response` is default-initialized and then its fields are populated line-by-line.\n\n**Current:**\n\n```cpp\n  ec_host_response resp{};\n  resp.struct_version \u003d EC_HOST_RESPONSE_VERSION;  // \u003d 3\n  resp.result \u003d result;\n  resp.data_len \u003d data.size();\n  resp.reserved \u003d 0;\n\n```\n\n**Recommendation:**\n\n```cpp\n  ec_host_response resp{\n      .struct_version \u003d EC_HOST_RESPONSE_VERSION,\n      .checksum \u003d 0, \n      .result \u003d static_cast\u003cuint16_t\u003e(result),\n      .data_len \u003d static_cast\u003cuint16_t\u003e(data.size()),\n      .reserved \u003d 0,\n  };\n\n```\n\n### 2. Positional Return in `libusb_transport.cc`\n\nAt the end of `LibusbTransport::FindDevice()`, the `FoundDeviceInfo` struct is instantiated using positional arguments. If someone were to add a new pointer or integer to that struct in the future, positional initialization could lead to silent bugs.\n\n**Current:**\n\n```cpp\n  return FoundDeviceInfo{std::move(ctx), target, id};\n\n```\n\n**Recommendation:**\n\n```cpp\n  return FoundDeviceInfo{\n      .ctx \u003d std::move(ctx),\n      .dev \u003d target,\n      .id \u003d id,\n  };\n\n```\n\n### 3. Positional Initialization in `usb_device_test.cc`\n\nIn a couple of the move constructor/assignment tests, `UsbDeviceId` is mocked using positional initialization, despite other tests correctly using designated initializers for this exact struct.\n\n**Current:**\n\n```cpp\n  EXPECT_CALL(*raw_ptr, device_id())\n      .WillOnce(Return(UsbDeviceId{0x1234, 0x5678}));\n// ... and ...\n  EXPECT_CALL(*raw_ptr1, device_id())\n      .WillOnce(Return(UsbDeviceId{0x1111, 0x2222}));\n\n```\n\n**Recommendation:**\n\n```cpp\n  EXPECT_CALL(*raw_ptr, device_id())\n      .WillOnce(Return(UsbDeviceId{.vid \u003d 0x1234, .pid \u003d 0x5678}));\n// ... and ...\n  EXPECT_CALL(*raw_ptr1, device_id())\n      .WillOnce(Return(UsbDeviceId{.vid \u003d 0x1111, .pid \u003d 0x2222}));\n\n```",
+      "parentUuid": "a97e8249_bed748e5",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 19
+      },
+      "revId": "b41d7944f2f336049361c29878bbdf28c28e5184",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "baf0f0b5_fe0691ca",
         "filename": "util/focaltech/cli.cc",
         "patchSetId": 18
