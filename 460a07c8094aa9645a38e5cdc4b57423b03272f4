@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4770895_c4ce96ec",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-06-04T23:31:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fd46ff9_d1773085",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 9
+      },
+      "revId": "460a07c8094aa9645a38e5cdc4b57423b03272f4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "133f93c7_79c55764",
@@ -61,6 +85,30 @@
       "side": 1,
       "message": "I am still validating this change. I uploaded it because this and the following was in my stack when I was editing the test coverage CL to address Al\u0027s comments.",
       "parentUuid": "133f93c7_79c55764",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 0
+      },
+      "revId": "460a07c8094aa9645a38e5cdc4b57423b03272f4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57b0a771_c8abc9ce",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-06-04T23:31:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eefe8889_4fd55656",
       "range": {
         "startLine": 14,
         "startChar": 0,
