@@ -83,10 +83,24 @@ enum battery_access_type battery_check_access_limit(void)
 
 void board_battery_compensate_params(struct batt_params *batt)
 {
-	/* Update display SOC based on current state_of_charge (multiply by 10)
+	/* Scale 4-97% state of charge to 0-100% display SOC (0-1000)
+	 * so a 4% state of charge displays as 0%.
 	 */
 	if (!(batt->flags & BATT_FLAG_BAD_STATE_OF_CHARGE)) {
-		batt->display_charge = batt->state_of_charge * 10;
+		if (batt->state_of_charge <= 4) {
+			batt->display_charge = 0;
+		} else if (batt->state_of_charge >= 97) {
+			batt->display_charge = 1000;
+		} else {
+			/* Linear scale formula with standard rounding built-in:
+			 * ((true_soc - 4) * 1000 + (93 / 2)) / 93
+			 * ((true_soc - 4) * 1000 + 46) / 93
+			 */
+			batt->display_charge =
+				((batt->state_of_charge - 4) * 1000 + 46) / 93;
+		}
+
+		/* Final safety clamps to ensure absolute stability */
 		if (batt->display_charge < 0)
 			batt->display_charge = 0;
 		if (batt->display_charge > 1000)
