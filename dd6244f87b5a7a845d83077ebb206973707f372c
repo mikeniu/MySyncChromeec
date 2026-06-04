@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0ce52f0c_6d929fdd",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 26
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T19:00:09Z",
+      "side": 1,
+      "message": "It\u0027s not clear what mode `0` means. Here is Gemini code to resolve this:\n\n----\n\nCurrently, `RunIapProcess` calls `RunIap(0)`. Passing a naked `0` is a classic \"magic number\" anti-pattern—it tells the reader nothing about what `0` actually represents. Converting it to an `enum class` makes the intent immediately obvious and prevents invalid modes from being passed in the future.\n\nHere is how you can seamlessly integrate it alongside the `Command` and `Status` enums:\n\n### Step 1: Define the Enum and Update the Packet Struct\n\nPlace the new enum right next to your `Command` and `Status` enums. Since we don\u0027t have the vendor spec for what other modes exist, naming `0` as `Normal` or `Default` is the safest bet.\n\n**File:** `util/elan/iap_control.h`\n\n```cpp\nenum class IapMode : uint8_t {\n  Normal \u003d 0x00,\n  // Add other modes here in the future if ELAN specifies them\n};\n\n// Update the packet struct union:\nstruct IapCommandPacket {\n  Command cmd_code;\n  uint8_t reserved;\n  uint8_t parameter_2[2];\n  union {\n    uint32_t payload_le;\n    IapMode iap_mode;      // \u003c-- Strongly typed now!\n  };\n  // ...\n} __attribute__((packed));\n\nclass IapControl {\n  // ...\n private:\n  // Update the method signature\n  std::expected\u003cvoid, IapError\u003e RunIap(IapMode iap_mode); \n  // ...\n};\n\n```\n\n### Step 2: Update the Implementation and Call Site\n\nNow update the function definition and replace the magic `0` at the call site.\n\n**File:** `util/elan/iap_control.cc`\n\n```cpp\n// 1. Update the call site in RunIapProcess\nstd::expected\u003cvoid, IapError\u003e IapControl::RunIapProcess(\n    std::span\u003cconst uint8_t\u003e rom) {\n  // ...\n  \n  // Much more readable than RunIap(0)!\n  if (auto res \u003d RunIap(IapMode::Normal); !res) return std::unexpected(res.error());\n  \n  // ...\n}\n\n\n// 2. Update the function definition\nstd::expected\u003cvoid, IapError\u003e IapControl::RunIap(IapMode iap_mode) {\n  IapCommandPacket packet \u003d {.cmd_code \u003d Command::RunIap,\n                             .reserved \u003d 0,\n                             .parameter_2 \u003d {0},\n                             .iap_mode \u003d iap_mode}; // Type safe assignment\n  return IapCommand(packet);\n}\n\n```\n\n### Why this completes the refactor:\n\nBy changing `iap_mode` to an enum, your `IapCommandPacket` struct is now almost entirely self-documenting. The union explicitly tells the developer: \"If you aren\u0027t sending a `payload_le`, you must be sending an `IapMode`.\" It enforces correct usage at compile time and makes `RunIapProcess` read like plain English.",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 70
+      },
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "16e19d35_fcece99f",
         "filename": "util/elan/iap_control.h",
         "patchSetId": 26
