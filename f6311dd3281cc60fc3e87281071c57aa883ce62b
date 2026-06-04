@@ -16,6 +16,24 @@
       "message": "Why don\u0027t we cherry pick this CL?\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7523268\n\nDon\u0027t we need `VENDOR_CC_HW_DRM_COUNTER` and `VENDOR_CC_READ_OWNERS_CONFIG`? (I have no idea about these)",
       "revId": "f6311dd3281cc60fc3e87281071c57aa883ce62b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6797ed58_503bd89c",
+        "filename": "include/tpm_vendor_cmds.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1136059
+      },
+      "writtenOn": "2026-06-04T09:27:19Z",
+      "side": 1,
+      "message": "There were more merge conflicts. I thought if other factory branches needed to pick a CL they could just pick this one without having to worry about others, but I\u0027ll change it to pick both.",
+      "parentUuid": "58c8d969_274c3b00",
+      "revId": "f6311dd3281cc60fc3e87281071c57aa883ce62b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
