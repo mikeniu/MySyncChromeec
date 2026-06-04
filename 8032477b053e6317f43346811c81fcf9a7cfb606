@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9650b8de_6fffb28d",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T00:47:33Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\n### 1. Drop `static_cast` for Signed/Unsigned Comparisons (Use `std::cmp_not_equal`)\n\nIn `util/focaltech/cli.cc`, you are verifying that the number of bytes read matches the requested size. Because libusb/transport layers return `int` (to allow for negative error codes), but sizes are `size_t` (unsigned), you currently cast the `size_t` to an `int` to suppress the compiler warning:\n\n**Current:**\n\n```cpp\n  if (!recv_more || *recv_more !\u003d static_cast\u003cint\u003e(remaining)) {\n\n```\n\n**Recommendation:**\nC++20 introduced a family of safe integer comparison functions in `\u003cutility\u003e` (`std::cmp_equal`, `std::cmp_not_equal`, `std::cmp_less`, etc.). These perform mathematically correct comparisons between signed and unsigned integers without any casting or truncation risks:\n\n```cpp\n#include \u003cutility\u003e\n\n  if (!recv_more || std::cmp_not_equal(*recv_more, remaining)) {\n\n```\n\n### 2. Drop `static_cast` for Enum Creation (Use Direct Initialization)\n\nIn modern C++ (C++17 and later), you can initialize an enum from an underlying integer type using braced direct-list-initialization instead of `static_cast`. It looks cleaner and prevents accidental narrowing conversions.\n\n**First Instance (`ft_util_test.cc`):**\n\n```cpp\n  // Current:\n  auto unknown \u003d static_cast\u003cFtError\u003e(100);\n  \n  // Recommendation:\n  auto unknown \u003d FtError{100};\n\n```\n\n**Second Instance (`cli.cc` inside `ExecuteCommand`):**\n\n```cpp\n  // Current:\n  return FtSetFlashProtect(usb_device,\n                           static_cast\u003cFtFlashWpArea\u003e(config.action_param),\n                           info.current_mode);\n\n  // Recommendation:\n  return FtSetFlashProtect(usb_device,\n                           FtFlashWpArea{config.action_param},\n                           info.current_mode);\n\n```\n\n### 3. Missed `std::to_underlying` Opportunities\n\nIn the previous pass, we converted the logging in `updater.cc` to use `std::to_underlying`. There are two more spots hiding in `cli.cc` where `static_cast\u003cint\u003e` is being used to log an enum value.\n\n**In `SwitchMcuMode` (Logging `FtError`):**\n\n```cpp\n  // Current:\n  FT_LOGW(\"Switch to {} failed (attempt {}): error\u003d{}\",\n          target_cmd \u003d\u003d Command::kEnterBoot ? \"bootloader\" : \"ROM\", attempt,\n          static_cast\u003cint\u003e(result.error()));\n\n  // Recommendation:\n  FT_LOGW(\"Switch to {} failed (attempt {}): error\u003d{}\",\n          target_cmd \u003d\u003d Command::kEnterBoot ? \"bootloader\" : \"ROM\", attempt,\n          std::to_underlying(result.error()));\n\n```\n\n**In `ExecuteCommand` (Logging `FtFlashWpArea`):**\n\n```cpp\n  // Current:\n  FT_LOGI(\"Flash write protect area \u003d {}\", static_cast\u003cint\u003e(*wp_res));\n\n  // Recommendation:\n  FT_LOGI(\"Flash write protect area \u003d {}\", std::to_underlying(*wp_res));\n\n```\n\n### Note on `reinterpret_cast` for File IO\n\nYou might notice there are a few `reinterpret_cast\u003cchar*\u003e` calls in `updater.cc` when interacting with `\u003cfstream\u003e` (e.g., `file.read(reinterpret_cast\u003cchar*\u003e(buffer.data()), size)`).\n\nDo **not** remove these! Because C++ streams strictly operate on `char*`, and your buffer is correctly using `uint8_t`, this specific `reinterpret_cast` is required and completely idiomatic standard C++.",
+      "range": {
+        "startLine": 106,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 66
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6704e4cb_4dee73b8",
         "filename": "util/focaltech/cli.cc",
         "patchSetId": 19
