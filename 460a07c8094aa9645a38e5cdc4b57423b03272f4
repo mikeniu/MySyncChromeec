@@ -45,6 +45,30 @@
       },
       "revId": "460a07c8094aa9645a38e5cdc4b57423b03272f4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eefe8889_4fd55656",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-06-04T22:41:47Z",
+      "side": 1,
+      "message": "I am still validating this change. I uploaded it because this and the following was in my stack when I was editing the test coverage CL to address Al\u0027s comments.",
+      "parentUuid": "133f93c7_79c55764",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 0
+      },
+      "revId": "460a07c8094aa9645a38e5cdc4b57423b03272f4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
