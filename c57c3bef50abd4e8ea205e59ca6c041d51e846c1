@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "adfd68d9_a354e97c",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 577,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-04T18:08:03Z",
+      "side": 1,
+      "message": "Nit: disable -\u003e disabled. Your checking that it\u0027s disabled, not actively disabling it.",
+      "revId": "c57c3bef50abd4e8ea205e59ca6c041d51e846c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1eb20030_43d320f0",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 1348,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-04T18:08:03Z",
+      "side": 1,
+      "message": "Nit: You might as well have separate variables for each interrupt register. It\u0027s not necessary to save each value for later like you want to do with INT1, but it would make each of these bit checks incrementally clearer. The compiler should reuse registers the same as it was before, so I don\u0027t think this function is gaining any efficiency by reusing the single variable.",
+      "revId": "c57c3bef50abd4e8ea205e59ca6c041d51e846c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b74f33d5_888fe9de",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 1350,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-04T18:08:03Z",
+      "side": 1,
+      "message": "The way this is written right now, it would catch errors previously observed in clause above about TINT. Don\u0027t worry about that for now, but after we get this working, it wouldn\u0027t hurt to come back in another CL and clean up the error handling in this function.",
+      "revId": "c57c3bef50abd4e8ea205e59ca6c041d51e846c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0284d793_9261b1b8",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 1746,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-04T18:08:03Z",
+      "side": 1,
+      "message": "Given how this will be used later, you could also do this in the error case. That would save you some error handling in the calling code.",
+      "revId": "c57c3bef50abd4e8ea205e59ca6c041d51e846c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba2f996c_0129c4b5",
+        "filename": "driver/charger/sm5803.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-04T18:08:03Z",
+      "side": 1,
+      "message": "Nit: These don\u0027t appear to be used anywhere. You might want to delete them.",
+      "revId": "c57c3bef50abd4e8ea205e59ca6c041d51e846c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

@@ -106,6 +106,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "220abdfc_5f1bcbf9",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 889,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-04T18:08:03Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "622fed18_24292c0a",
+      "revId": "caa065b8478e4a8bfc6494cc96bc91b8bd526094",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0087493c_80a5ba6c",
@@ -141,6 +159,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0245aa9b_d685b58d",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 1352,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-04T18:08:03Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d84731d2_4a747898",
+      "revId": "caa065b8478e4a8bfc6494cc96bc91b8bd526094",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a6d81002_139982c6",
@@ -172,6 +208,24 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "a6d81002_139982c6",
+      "revId": "caa065b8478e4a8bfc6494cc96bc91b8bd526094",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81d4e20c_9a299fc2",
+        "filename": "driver/charger/sm5803.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-04T18:08:03Z",
+      "side": 1,
+      "message": "I mean, still leave the voltage values. I think those were useful as well.",
+      "parentUuid": "caad9ebf_4e70341d",
       "revId": "caa065b8478e4a8bfc6494cc96bc91b8bd526094",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
