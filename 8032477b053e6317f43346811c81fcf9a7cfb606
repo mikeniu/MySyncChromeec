@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6704e4cb_4dee73b8",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T00:29:50Z",
+      "side": 1,
+      "message": "Since we\u0027re using C++23, you can use the much cleaner `std::ranges` algorithms, and completely eliminate the `!\u003d npos` boilerplate using C++23\u0027s native string `contains()` method.\n\n**Recommendation:**\n\n```cpp\n  bool is_focal_device \u003d\n      std::ranges::any_of(kSupportedProjects, [\u0026build_info](std::string_view project) {\n          return build_info.contains(project);\n      });\n\n```",
+      "range": {
+        "startLine": 197,
+        "startChar": 0,
+        "endLine": 201,
+        "endChar": 21
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88d51d00_df7569b8",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T00:29:50Z",
+      "side": 1,
+      "message": "In `util/focaltech/updater.cc`, you correctly use an anonymous namespace `namespace { ... }` at the top of the file for helper functions like `ReadFileToVector` and `CalculateSha256`.\n\nHowever, right below that, you fall back to C-style `static` linkage for other helpers:\n\n```cpp\nstatic std::expected\u003cvoid, FtError\u003e FtErasePage(...)\nstatic std::expected\u003cvoid, FtError\u003e FtDownloadPage(...)\nstatic std::expected\u003cvoid, FtError\u003e FtDownloadBin(...)\n\n```\n\n**The Google C++ Style Guide explicitly states:** *\"Use internal linkage (anonymous namespaces) in .cc files. Do not use `static` for internal linkage of functions or variables.\"*\n\n**Recommendation:** Move `FtErasePage`, `FtDownloadPage`, `FtDownloadBin`, `FtMcuReset`, and `FtGetBootVersion` into the anonymous namespace at the top of the file and drop the `static` keyword.",
+      "range": {
+        "startLine": 93,
+        "startChar": 0,
+        "endLine": 101,
+        "endChar": 59
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a38d455_52bbb7ae",
+        "filename": "util/focaltech/updater.h",
+        "patchSetId": 19
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T00:29:50Z",
+      "side": 1,
+      "message": "In `util/focaltech/updater.h`, you define a packed struct for firmware config:\n\n```cpp\nstruct FtConfigPage {\n  uint32_t code_valid_control_word;\n  uint8_t reserved[28];\n  uint32_t code_start_address;\n} __attribute__((packed));\n\n```\n\nWhile `__attribute__((packed))` prevents the compiler from adding padding, Google Style encourages pairing packed structs defining wire/hardware protocols with a `static_assert` to act as an un-ignorable unit test for struct layout. If someone accidentally changes `uint32_t` to `size_t` in the future, the build will immediately fail rather than flashing a corrupted config page.\n\n**Recommendation:**\nAdd this immediately below the struct definition:\n\n```cpp\nstatic_assert(sizeof(FtConfigPage) \u003d\u003d 36, \"FtConfigPage must be exactly 36 bytes\");\n\n```",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 26
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
