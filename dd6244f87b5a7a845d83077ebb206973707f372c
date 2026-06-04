@@ -20,6 +20,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "201f2a42_23e0a1e1",
+        "filename": "util/elan/cli_test.cc",
+        "patchSetId": 26
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T19:31:24Z",
+      "side": 1,
+      "message": "* **The Gap:** You don\u0027t test the failure paths of `ParseCommandLine` when provided with invalid hex inputs.\n* **Actionable Fix:** Add a test verifying that `ParseCommandLine` gracefully rejects bad VID/PID formats and returns `std::nullopt`.\n```cpp\nTEST_F(CliTest, FailsOnInvalidVidHex) {\n  std::vector\u003cstd::string\u003e args \u003d {\n      \"elaniap_tool\", \"--file\", \"fw.bin\", \"--vid\", \"NOT_HEX\"};\n  auto argv \u003d MakeArgv(args);\n  EXPECT_FALSE(ParseCommandLine(argv.size(), argv.data()).has_value());\n}\n\n```",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 11
+      },
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "052bcb55_f76968ca",
+        "filename": "util/elan/elaniap_test.cc",
+        "patchSetId": 26
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T19:31:24Z",
+      "side": 1,
+      "message": "Remove this comment.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 58
+      },
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0ce52f0c_6d929fdd",
         "filename": "util/elan/iap_control.cc",
         "patchSetId": 26
@@ -151,6 +197,29 @@
         "startChar": 0,
         "endLine": 121,
         "endChar": 49
+      },
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7831e375_eacc5faf",
+        "filename": "util/elan/iap_control_test.cc",
+        "patchSetId": 26
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T19:31:24Z",
+      "side": 1,
+      "message": "We should also cover the failure cases in the tests. Gemini feedback:\n\n---\n\n### Rationale\n\nWhile the existing tests do an excellent job validating the \"happy path\" (where the user inputs the right arguments and the hardware works perfectly), a firmware flashing tool\u0027s most critical logic is its **error handling**.\n\n1. **Safety First:** If the tool attempts to flash a firmware image intended for a different vendor (invalid prefix), or if the USB cable is bumped causing corrupted data (data mismatch), the tool *must* abort. Testing these specific error branches guarantees the safety mechanisms actually work.\n2. **Hardware Resilience:** By injecting simulated `libusb` I/O failures via the Mock, we verify that hardware communication errors bubble up gracefully to the user instead of causing undefined behavior.\n3. **Simplicity:** By adding public control variables to the `FakeUsbBackend` rather than using getter/setter methods, we keep the test infrastructure lightweight, readable, and free of unnecessary object-oriented boilerplate.\n\n---\n\n### Implementation Steps\n\nHere are the exact changes needed to implement this coverage.\n\n#### Step 1: Add the CLI Failure Test\n\nVerify that the command line parser correctly rejects badly formatted hex strings instead of silently failing or parsing garbage.\n\n**File:** `util/elan/cli_test.cc`\n\n```cpp\n// Add this under the ParseCommandLine tests\nTEST_F(CliTest, FailsOnInvalidVidHex) {\n  std::vector\u003cstd::string\u003e args \u003d {\n      \"elaniap_tool\", \"--file\", \"fw.bin\", \"--vid\", \"NOT_HEX\"};\n  auto argv \u003d MakeArgv(args);\n\n  EXPECT_FALSE(ParseCommandLine(argv.size(), argv.data()).has_value());\n}\n\n```\n\n#### Step 2: Upgrade the Fake Backend\n\nAdd public variables to control the fake hardware\u0027s state, and update the endpoints to respond to them.\n\n*(Note: This uses the `Command` and `Status` enums and `kFwVerPrefixShift` constant from our previous refactoring).*\n\n**File:** `util/elan/fake_usb_backend.h`\n\n```cpp\nclass FakeUsbBackend : public UsbBackend {\n public:\n  // Direct test injection variables\n  uint32_t fw_version \u003d \n      (IapControl::kGoogleFwVerPrefix \u003c\u003c IapControl::kFwVerPrefixShift);\n  bool corrupt_readback \u003d false;\n\n  int Initialize() override { return 0; }\n  int OpenDevice(UsbDeviceId device_id) override { return 0; }\n  void Release() override {}\n\n  int InterruptTransfer(uint8_t endpoint, std::span\u003cuint8_t\u003e data,\n                        std::chrono::milliseconds timeout) override {\n    switch (endpoint) {\n      case IapControl::kEpCmdOut:\n        if (!data.empty()) last_cmd_ \u003d data[0];\n        return 0;\n\n      case IapControl::kEpStatusIn: {\n        IapStatusPacket status \u003d {};\n        // Cast the raw byte back to the enum for our refactored struct\n        status.cmd_echo \u003d static_cast\u003cCommand\u003e(last_cmd_);\n        status.status_code \u003d Status::Success;\n\n        if (last_cmd_ \u003d\u003d std::to_underlying(Command::GetFwVersion)) {\n          // Serve the injected firmware version\n          status.parameter_1 \u003d elan::ToLittleEndian(fw_version);\n        }\n\n        std::ranges::copy(status.AsByteSpan(), data.begin());\n        return 0;\n      }\n\n      case IapControl::kEpDataOut:\n        device_flash_.insert(device_flash_.end(), data.begin(), data.end());\n        return 0;\n\n      case IapControl::kEpDataIn:\n        if (read_offset_ \u003c device_flash_.size()) {\n          size_t chunk \u003d\n              std::min(data.size(), device_flash_.size() - read_offset_);\n          std::ranges::copy_n(device_flash_.begin() + read_offset_, chunk,\n                              data.begin());\n          \n          // Inject corruption if requested\n          if (corrupt_readback \u0026\u0026 !data.empty()) {\n            data[0] ^\u003d 0xFF;\n          }\n          read_offset_ +\u003d chunk;\n        }\n        return 0;\n    }\n    return LIBUSB_ERROR_IO;\n  }\n\n  const std::vector\u003cuint8_t\u003e\u0026 GetFlashedData() const { return device_flash_; }\n\n private:\n  uint8_t last_cmd_ \u003d 0;\n  size_t read_offset_ \u003d 0;\n  std::vector\u003cuint8_t\u003e device_flash_;\n};\n\n```\n\n#### Step 3: Add the IAP Error Path Tests\n\nNow, use the new hooks and the Mock backend to verify the safety checks in `RunIapProcess`.\n\n**File:** `util/elan/iap_control_test.cc`\n\n```cpp\n// Add these below your existing IapControlTest cases\n\nTEST_F(IapControlTest, AbortsOnInvalidFirmwarePrefix) {\n  auto [fake_ptr, ctrl] \u003d CreateFakeController();\n  ASSERT_TRUE(ctrl-\u003eInitialize(kBootDevice).has_value());\n\n  // Inject a bad prefix (e.g., 0x20 instead of the required 0x10)\n  fake_ptr-\u003efw_version \u003d (0x20 \u003c\u003c IapControl::kFwVerPrefixShift);\n\n  std::vector\u003cuint8_t\u003e valid_rom(64, 0xAA);\n  auto result \u003d ctrl-\u003eRunIapProcess(valid_rom);\n\n  ASSERT_FALSE(result.has_value());\n  EXPECT_EQ(result.error(), IapError::InvalidFirmware);\n}\n\nTEST_F(IapControlTest, AbortsOnDataMismatch) {\n  auto [fake_ptr, ctrl] \u003d CreateFakeController();\n  ASSERT_TRUE(ctrl-\u003eInitialize(kBootDevice).has_value());\n\n  // Trigger the corruption hook for the read-back phase\n  fake_ptr-\u003ecorrupt_readback \u003d true;\n\n  std::vector\u003cuint8_t\u003e valid_rom(64, 0xAA);\n  auto result \u003d ctrl-\u003eRunIapProcess(valid_rom);\n\n  ASSERT_FALSE(result.has_value());\n  EXPECT_EQ(result.error(), IapError::DataMismatch);\n}\n\nTEST_F(IapControlTest, AbortsOnHardwareTransferFailure) {\n  auto mock \u003d std::make_unique\u003cMockUsbBackend\u003e();\n\n  // Setup basic initialization\n  EXPECT_CALL(*mock, Initialize()).WillOnce(Return(0));\n  EXPECT_CALL(*mock, OpenDevice(_)).WillOnce(Return(0));\n\n  // The first action in RunIapProcess is AbortProcess, which sends a command.\n  // We simulate a raw libusb I/O error happening on that first transfer.\n  EXPECT_CALL(*mock, InterruptTransfer(IapControl::kEpCmdOut, _, _))\n      .WillOnce(Return(LIBUSB_ERROR_IO));\n\n  IapControl ctrl(std::move(mock));\n  ASSERT_TRUE(ctrl.Initialize(kBootDevice).has_value());\n\n  std::vector\u003cuint8_t\u003e valid_rom(64, 0xAA);\n  auto result \u003d ctrl.RunIapProcess(valid_rom);\n\n  ASSERT_FALSE(result.has_value());\n  EXPECT_EQ(result.error(), IapError::TransferFailed);\n}\n\n```",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 47
       },
       "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
