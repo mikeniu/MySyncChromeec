@@ -138,6 +138,29 @@
       },
       "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "715a07d7_83c64f59",
+        "filename": "util/focaltech/usb_device_test.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T00:43:03Z",
+      "side": 1,
+      "message": "Gemini feedback. Verify for correctness:\n\n----\n\n### 1. Replacing `memcmp` with `ElementsAreArray` (`usb_device_test.cc`)\n\nIn `SendForwardsToTransport`, the test manually verifies the contents of the `std::span` by capturing it in an `Invoke` lambda and using C-style `memcmp`:\n\n**Current:**\n\n```cpp\n  EXPECT_CALL(*mock, Send(_, timeout))\n      .WillOnce(Invoke([\u0026](std::span\u003cconst uint8_t\u003e data, auto) {\n        EXPECT_EQ(data.size(), test_data.size());\n        EXPECT_EQ(memcmp(data.data(), test_data.data(), data.size()), 0);\n        return std::expected\u003cint, FtError\u003e(test_data.size());\n      }));\n\n```\n\n**Recommendation:**\nYou can eliminate the manual `Invoke` validation entirely by moving the assertion into the `EXPECT_CALL` matcher itself using `testing::ElementsAreArray`. This is exactly what GMock was designed for and gives much better failure output than a generic `memcmp` failure.\n\n```cpp\n  EXPECT_CALL(*mock, Send(testing::ElementsAreArray(test_data), timeout))\n      .WillOnce(Return(test_data.size()));\n\n```\n\n### 2. Verifying the Entire Payload Instead of Just the Header (`cli_test.cc`)\n\nIn `SwitchToRom_Success` (and similarly in `SwitchToBootloader_Success`), you are capturing the outgoing packet, casting the pointer to an `ec_host_request`, and only verifying the `command` field:\n\n**Current:**\n\n```cpp\n  const ec_host_request* req \u003d\n      reinterpret_cast\u003cconst ec_host_request*\u003e(sent.data());\n  EXPECT_EQ(req-\u003ecommand, 0xFACE);\n\n```\n\nThis is dangerous because it completely ignores the payload (`kSwitchToRomPayload`) and the checksum! If a bug is introduced where the payload isn\u0027t attached to the packet, this test will still pass.\n\n**Recommendation:**\nBecause `SwitchToRom` builds a very specific 11-byte sequence (8-byte header + 3-byte payload), you should use `ElementsAre` to verify the *entire* wire-format packet.\n*(Note: 0xFACE in little-endian is `0xCE, 0xFA`)*:\n\n```cpp\n  const auto\u0026 sent \u003d fake-\u003elast_sent();\n  \n  // Calculate checksum for the EXPECT_THAT (sum of bytes negated)\n  // 3 (version) + 0xCE + 0xFA + 0 + 0 + 3 (len) + 0 + 0xAA + 6 + 0 \u003d 0x27E\n  // Checksum \u003d static_cast\u003cuint8_t\u003e(-0x7E) \u003d 0x82\n  \n  EXPECT_THAT(sent, testing::ElementsAre(\n      3,      // struct_version (EC_HOST_REQUEST_VERSION)\n      0x82,   // checksum\n      0xCE, 0xFA, // command (0xFACE little-endian)\n      0,      // command_version\n      0,      // reserved\n      3, 0,   // data_len (3 bytes little-endian)\n      // Payload (kSwitchToRomPayload)\n      0xAA, 0x06, 0x00\n  ));\n\n```\n\n### 3. Replacing Magic Indices with Struct Casting (`updater_test.cc`)\n\nIn your `StubUsbTransport::Send` implementation, you manually sniff the incoming packets to see if they are \"Erase Page\" commands. To do this, you rely on hardcoded array indices (`15`, `28`, `16`):\n\n**Current:**\n\n```cpp\n    // Intercept Erase Page commands:\n    if (data.size() \u003d\u003d kUsbCbwSize \u0026\u0026 data[15] \u003d\u003d kFtCmdAction \u0026\u0026\n        data[28] \u003d\u003d kFtSubcmdErasePage) {\n      uint32_t address \u003d *reinterpret_cast\u003cconst uint32_t*\u003e(\u0026data[16]);\n      erased_addresses_.push_back(ToLittleEndian(address));\n    }\n\n```\n\n**Recommendation:**\nSince you already went through the trouble of defining the `BulkCbWrap` and `FtCmdFormat` packed structs in `ft_scsi.h` (and we are adding `static_asserts` to them), you should use them here! Casting to the struct makes the intent obvious and completely eliminates the magic numbers:\n\n```cpp\n    if (data.size() \u003d\u003d sizeof(BulkCbWrap)) {\n      const auto* cbw \u003d reinterpret_cast\u003cconst BulkCbWrap*\u003e(data.data());\n      const auto* ft_cmd \u003d reinterpret_cast\u003cconst FtCmdFormat*\u003e(cbw-\u003ecmd);\n      \n      if (ft_cmd-\u003eopcode \u003d\u003d kFtCmdAction \u0026\u0026 ft_cmd-\u003esubcmd \u003d\u003d kFtSubcmdErasePage) {\n        erased_addresses_.push_back(ToLittleEndian(ft_cmd-\u003eaddress));\n      }\n    }\n\n```",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 10
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
