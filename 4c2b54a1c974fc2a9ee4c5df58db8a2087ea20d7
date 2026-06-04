@@ -16,6 +16,24 @@
       "message": "Running this command inside the container actually passes all tests on real hardware.\n```\npython3 ./twister -ivc --toolchain\u003dcoreboot-sdk -p realtek/rts5912 \\\n  --device-testing --device-serial /dev/ttyACM1 \\\n  --flash-command ../dagwood/flash.py,--no-preserve \\\n  --device-flash-timeout 60\n```\n\nSee the readme for details.\n\nI think it makes more sense for this to live in the EC repo instead of dagwood, but I can be convinced otherwise.",
       "revId": "4c2b54a1c974fc2a9ee4c5df58db8a2087ea20d7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48838dcb_3d3813bd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-04T19:03:45Z",
+      "side": 1,
+      "message": "Let\u0027s land this here, at least initially.  We can move to another repo later if needed.",
+      "parentUuid": "1fea9135_99024651",
+      "revId": "4c2b54a1c974fc2a9ee4c5df58db8a2087ea20d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
