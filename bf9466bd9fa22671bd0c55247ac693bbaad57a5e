@@ -16,6 +16,24 @@
       "message": "LGTM once you add some test cases.",
       "revId": "bf9466bd9fa22671bd0c55247ac693bbaad57a5e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cb488cb_77bc4c50",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-06-04T23:38:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0c228d21_29620733",
+      "revId": "bf9466bd9fa22671bd0c55247ac693bbaad57a5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
