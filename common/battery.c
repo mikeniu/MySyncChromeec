@@ -215,7 +215,8 @@ static void print_battery_params(void)
 	print_item_name("Charge:");
 	ccprintf("%d %%\n", batt->state_of_charge);
 
-	if (IS_ENABLED(CONFIG_CHARGER)) {
+	if (IS_ENABLED(CONFIG_CHARGER) ||
+	    IS_ENABLED(CONFIG_PLATFORM_EC_ADSP_CHARGE_MANAGER)) {
 		int value;
 
 		print_item_name("  Display:");
