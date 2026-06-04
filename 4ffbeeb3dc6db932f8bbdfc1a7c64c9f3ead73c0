@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15d02caa_d11de6a7",
+        "filename": "zephyr/emul/emul_lis2dh.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-04T16:20:29Z",
+      "side": 1,
+      "message": "Why are we not using `Z_ASSERT`s here?",
+      "revId": "4ffbeeb3dc6db932f8bbdfc1a7c64c9f3ead73c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ff9f836_a0a1df1d",
+        "filename": "zephyr/emul/emul_lis2dh.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-04T16:20:29Z",
+      "side": 1,
+      "message": "Seems like the ASSERT should come before using `emul` pointer.",
+      "range": {
+        "startLine": 251,
+        "startChar": 1,
+        "endLine": 254,
+        "endChar": 32
+      },
+      "revId": "4ffbeeb3dc6db932f8bbdfc1a7c64c9f3ead73c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd34e1c9_fb033ef4",
+        "filename": "zephyr/test/drivers/lis2dh/sensor.dts",
+        "patchSetId": 7
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-04T16:20:29Z",
+      "side": 1,
+      "message": "The formatting of this file looks off.",
+      "revId": "4ffbeeb3dc6db932f8bbdfc1a7c64c9f3ead73c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
