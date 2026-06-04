@@ -46,6 +46,30 @@
       },
       "revId": "808a7528eb5c2647a2e48c56946a1e3118a35a06",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf4507b9_c1bd7ede",
+        "filename": "Makefile.rules",
+        "patchSetId": 2
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1361259
+      },
+      "writtenOn": "2026-06-04T01:23:59Z",
+      "side": 1,
+      "message": "Describing that in a comment would be nice, both as instructions to anybody looking to add one later, and as a hint to somebody reading this as to how to find what it will actually run.",
+      "parentUuid": "857a0a84_0d512f14",
+      "range": {
+        "startLine": 132,
+        "startChar": 0,
+        "endLine": 133,
+        "endChar": 48
+      },
+      "revId": "808a7528eb5c2647a2e48c56946a1e3118a35a06",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
