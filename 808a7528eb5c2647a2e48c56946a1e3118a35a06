@@ -22,6 +22,30 @@
       },
       "revId": "808a7528eb5c2647a2e48c56946a1e3118a35a06",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "857a0a84_0d512f14",
+        "filename": "Makefile.rules",
+        "patchSetId": 2
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T00:01:17Z",
+      "side": 1,
+      "message": "Yeah, it\u0027s a little convoluted, but I was going to add dependencies directly in the `build.mk` for the utils in the CLs for those utilities (example: https://crrev.com/c/7678390):\n\n```\n# Attach our specific test run to the utils-test target\nutils-test: run-et171_flash_test\n```",
+      "parentUuid": "82e7761a_c1953992",
+      "range": {
+        "startLine": 132,
+        "startChar": 0,
+        "endLine": 133,
+        "endChar": 48
+      },
+      "revId": "808a7528eb5c2647a2e48c56946a1e3118a35a06",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
