@@ -69,6 +69,24 @@
       "parentUuid": "738f2a81_a00e6cbd",
       "revId": "0ee36e732fe7b839a32f9fc9ff31c1b5987bbe25",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc13bf9e_ac607aa9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-06-04T22:11:34Z",
+      "side": 1,
+      "message": "Looks like domika and yavilla were disabled by https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7796487, but this didn\u0027t get tested or cherry-picked to the nissa branch. So this change may be problematic too.\n\nWe can use crosfleet to run many iterations of the test with and without this config. If the results look ok, we should just remove the default for all of nissa.",
+      "parentUuid": "5b7e01de_9c95956b",
+      "revId": "0ee36e732fe7b839a32f9fc9ff31c1b5987bbe25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
