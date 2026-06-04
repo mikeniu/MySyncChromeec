@@ -33,6 +33,24 @@
       "message": "Moving the kernel out of ram has a significant impact on performance. This is not a trivial change. It could cause these boards to fail stress tests.",
       "revId": "0ee36e732fe7b839a32f9fc9ff31c1b5987bbe25",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "738f2a81_a00e6cbd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-04T17:44:17Z",
+      "side": 1,
+      "message": "What has the stability looked like on these [boards](https://source.corp.google.com/search?q\u003dCONFIG_SOC_IT8XXX2_KERNEL_IN_RAM%3Dn%20f:platform%2Fec%2Fzephyr%2Fprogram\u0026sq\u003dr:chrome-internal%2Fchromeos%2Fsuperproject%20b:main) that are doing the same already?",
+      "parentUuid": "f293ab26_55a9ec0f",
+      "revId": "0ee36e732fe7b839a32f9fc9ff31c1b5987bbe25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
