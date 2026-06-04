@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "89446267_98a1e125",
+        "filename": "zephyr/emul/emul_lis2dh.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-06-04T19:51:56Z",
+      "side": 1,
+      "message": "That is what was used for emul_lis2dw12.c which is what I used as starting point given that both chips have a very similar register set. I also see __ASSERT being used in many of the existing emulators.",
+      "parentUuid": "15d02caa_d11de6a7",
+      "revId": "4ffbeeb3dc6db932f8bbdfc1a7c64c9f3ead73c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2ff9f836_a0a1df1d",
         "filename": "zephyr/emul/emul_lis2dh.c",
         "patchSetId": 7
@@ -31,6 +49,30 @@
       "writtenOn": "2026-06-04T16:20:29Z",
       "side": 1,
       "message": "Seems like the ASSERT should come before using `emul` pointer.",
+      "range": {
+        "startLine": 251,
+        "startChar": 1,
+        "endLine": 254,
+        "endChar": 32
+      },
+      "revId": "4ffbeeb3dc6db932f8bbdfc1a7c64c9f3ead73c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c78a7fd4_4c487109",
+        "filename": "zephyr/emul/emul_lis2dh.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-06-04T19:51:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2ff9f836_a0a1df1d",
       "range": {
         "startLine": 251,
         "startChar": 1,
@@ -54,6 +96,24 @@
       "writtenOn": "2026-06-04T16:20:29Z",
       "side": 1,
       "message": "The formatting of this file looks off.",
+      "revId": "4ffbeeb3dc6db932f8bbdfc1a7c64c9f3ead73c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f4c7f97_bdf95913",
+        "filename": "zephyr/test/drivers/lis2dh/sensor.dts",
+        "patchSetId": 7
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-06-04T19:51:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd34e1c9_fb033ef4",
       "revId": "4ffbeeb3dc6db932f8bbdfc1a7c64c9f3ead73c0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
