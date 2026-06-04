@@ -19,18 +19,10 @@ constexpr uint8_t kBotDirectionIn = 0x80;
 constexpr uint8_t kBotDirectionOut = 0x00;
 constexpr uint8_t kBotCommandPassed = 0x00;
 
+constexpr uint8_t kDefaultLun = 0;
+
 using namespace std::chrono_literals;
 constexpr auto kResetWaitTimeout = 3000ms;
-
-struct FtCmdFormat {
-  uint8_t opcode;
-  uint32_t address;
-  uint32_t length;
-  uint32_t aux_address;
-  uint8_t subcmd;
-  uint8_t flags;
-  uint8_t reserved;
-} __attribute__((packed));
 
 std::expected<BulkCbWrap, FtError> SendCbw(
     const UsbDevice& device, std::span<const uint8_t> scsi_cmd,
@@ -43,7 +35,7 @@ std::expected<BulkCbWrap, FtError> SendCbw(
           ToLittleEndian(static_cast<uint32_t>(data_length)),
       .flags =
           (dir == TransferDirection::kIn) ? kBotDirectionIn : kBotDirectionOut,
-      .lun = 0,
+      .lun = kDefaultLun,
       .cmd_len = static_cast<uint8_t>(scsi_cmd.size()),
   };
   std::memcpy(cbw.cmd, scsi_cmd.data(), scsi_cmd.size());

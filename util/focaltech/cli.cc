@@ -7,6 +7,8 @@
 
 #include <ec_commands.h>
 
+#include <utility>
+
 #include "updater.h"
 
 namespace {
@@ -18,14 +20,15 @@ constexpr auto kResetWaitTimeout = 3s;
 constexpr auto kEcCommandTimeout = std::chrono::milliseconds(200);
 
 constexpr uint16_t kTestEcSwitchToRomCmd = 0xFACE;
+// Vendor-specific magic sequence required to force the MCU into ROM mode.
 constexpr std::array<uint8_t, 3> kSwitchToRomPayload = {0xAA, 0x06, 0x00};
 
 // Build EC command packet (protocol version 3)
 std::vector<uint8_t> BuildEcCommand(uint16_t command, uint8_t version,
                                     std::span<const uint8_t> params = {}) {
   ec_host_request req{
-      .struct_version = EC_HOST_REQUEST_VERSION,  //=3
-      .checksum = 0,                              // Will be overwritten later
+      .struct_version = EC_HOST_REQUEST_VERSION,
+      .checksum = 0,
       .command = command,
       .command_version = version,
       .reserved = 0,
@@ -103,7 +106,7 @@ std::expected<std::vector<uint8_t>, FtError> SendEcCommandAndReadResponse(
     size_t remaining = resp.data_len - response_data.size();
     std::vector<uint8_t> additional(remaining);
     auto recv_more = device.Recv(additional, kEcCommandTimeout);
-    if (!recv_more || *recv_more != static_cast<int>(remaining)) {
+    if (!recv_more || std::cmp_not_equal(*recv_more, remaining)) {
       FT_LOGE(
           "Failed to read remaining response data: expected {} bytes, got {}",
           remaining, recv_more.has_value() ? *recv_more : -1);
@@ -194,11 +197,10 @@ std::expected<void, FtError> CheckEcBuildVersion(UsbDevice& usb,
 
   FT_LOGI("EC build version: {}", build_info);
 
-  bool is_focal_device =
-      std::any_of(kSupportedProjects.begin(), kSupportedProjects.end(),
-                  [&build_info](std::string_view project) {
-                    return build_info.find(project) != std::string_view::npos;
-                  });
+  bool is_focal_device = std::ranges::any_of(
+      kSupportedProjects, [&build_info](std::string_view project) {
+        return build_info.contains(project);
+      });
 
   if (!is_focal_device) {
     FT_LOGE("Can't find focal project device");
@@ -222,7 +224,7 @@ std::expected<void, FtError> SwitchMcuMode(UsbDevice& usb,
   // Choose the appropriate switch function
   auto switch_func = [&]() -> std::expected<void, FtError> {
     if (target_cmd == Command::kEnterBoot) {
-      return SwitchToBootloader(usb, 0);
+      return SwitchToBootloader(usb, kEcBootloaderModeDefault);
     } else if (target_cmd == Command::kEnterRom) {
       return SwitchToRom(usb);
     } else {
@@ -246,7 +248,7 @@ std::expected<void, FtError> SwitchMcuMode(UsbDevice& usb,
       }
       FT_LOGW("Switch to {} failed (attempt {}): error={}",
               target_cmd == Command::kEnterBoot ? "bootloader" : "ROM", attempt,
-              static_cast<int>(result.error()));
+              std::to_underlying(result.error()));
       std::this_thread::sleep_for(kMcuRebootPollInterval);
       continue;
     }
@@ -364,8 +366,7 @@ std::expected<void, FtError> ExecuteCommand(const AppConfig& config,
       return CheckEcBuildVersion(usb_device, info.current_mode);
 
     case Command::kSetFlashWp:
-      return FtSetFlashProtect(usb_device,
-                               static_cast<FtFlashWpArea>(config.action_param),
+      return FtSetFlashProtect(usb_device, FtFlashWpArea{config.action_param},
                                info.current_mode);
 
     case Command::kGetFlashWp: {
@@ -373,7 +374,7 @@ std::expected<void, FtError> ExecuteCommand(const AppConfig& config,
       if (!wp_res) {
         return std::unexpected(wp_res.error());
       }
-      FT_LOGI("Flash write protect area = {}", static_cast<int>(*wp_res));
+      FT_LOGI("Flash write protect area = {}", std::to_underlying(*wp_res));
       return {};
     }
 

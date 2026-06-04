@@ -15,17 +15,23 @@
 #include "mock_usb_transport.h"
 #include "usb_transport.h"
 
+namespace {
+
 using namespace std::chrono_literals;
 using ::focaltech::testing::MockUsbTransport;
 using ::testing::_;
-using ::testing::ByMove;
+using ::testing::ElementsAreArray;
 using ::testing::Invoke;
 using ::testing::Return;
 
 // Helper: create a UsbDevice with given mock
-static UsbDevice MakeDevice(std::unique_ptr<MockUsbTransport> mock) {
+UsbDevice MakeDevice(std::unique_ptr<MockUsbTransport> mock) {
   return UsbDevice(std::move(mock));
 }
+
+constexpr size_t kArbitraryBufferSize = 10;
+
+}  // namespace
 
 // -----------------------------------------------------------------------------
 // Tests for UsbDevice
@@ -36,12 +42,9 @@ TEST(UsbDeviceTest, SendForwardsToTransport) {
   std::vector<uint8_t> test_data = {0x01, 0x02, 0x03};
   auto timeout = 100ms;
 
-  EXPECT_CALL(*mock, Send(_, timeout))
-      .WillOnce(Invoke([&](std::span<const uint8_t> data, auto) {
-        EXPECT_EQ(data.size(), test_data.size());
-        EXPECT_EQ(memcmp(data.data(), test_data.data(), data.size()), 0);
-        return std::expected<int, FtError>(test_data.size());
-      }));
+  // Use ElementsAreArray to match the exact data content.
+  EXPECT_CALL(*mock, Send(ElementsAreArray(test_data), timeout))
+      .WillOnce(Return(test_data.size()));
 
   UsbDevice device = MakeDevice(std::move(mock));
   auto result = device.Send(test_data, timeout);
@@ -54,8 +57,7 @@ TEST(UsbDeviceTest, SendHandlesError) {
   auto timeout = 100ms;
 
   EXPECT_CALL(*mock, Send(_, timeout))
-      .WillOnce(Return(ByMove(std::expected<int, FtError>(
-          std::unexpected(FtError::kNoSuchDevice)))));
+      .WillOnce(Return(std::unexpected(FtError::kNoSuchDevice)));
 
   UsbDevice device = MakeDevice(std::move(mock));
   std::vector<uint8_t> test_data = {0x01};
@@ -66,7 +68,7 @@ TEST(UsbDeviceTest, SendHandlesError) {
 
 TEST(UsbDeviceTest, RecvForwardsToTransport) {
   auto mock = std::make_unique<MockUsbTransport>();
-  std::vector<uint8_t> buffer(10, 0);
+  std::vector<uint8_t> buffer(kArbitraryBufferSize, 0);
   auto timeout = 200ms;
 
   EXPECT_CALL(*mock, Recv(_, timeout))
@@ -86,11 +88,10 @@ TEST(UsbDeviceTest, RecvHandlesError) {
   auto timeout = 200ms;
 
   EXPECT_CALL(*mock, Recv(_, timeout))
-      .WillOnce(Return(ByMove(
-          std::expected<int, FtError>(std::unexpected(FtError::kResultFail)))));
+      .WillOnce(Return(std::unexpected(FtError::kResultFail)));
 
   UsbDevice device = MakeDevice(std::move(mock));
-  std::vector<uint8_t> buffer(10);
+  std::vector<uint8_t> buffer(kArbitraryBufferSize);
   auto result = device.Recv(buffer, timeout);
   EXPECT_FALSE(result.has_value());
   EXPECT_EQ(result.error(), FtError::kResultFail);
@@ -113,8 +114,7 @@ TEST(UsbDeviceTest, WaitForResetHandlesError) {
   auto timeout = 500ms;
 
   EXPECT_CALL(*mock, WaitForReset(timeout))
-      .WillOnce(Return(std::expected<void, FtError>(
-          std::unexpected(FtError::kNoSuchDevice))));
+      .WillOnce(Return(std::unexpected(FtError::kNoSuchDevice)));
 
   UsbDevice device = MakeDevice(std::move(mock));
   auto result = device.WaitForReset(timeout);
@@ -126,7 +126,6 @@ TEST(UsbDeviceTest, DeviceIdReturnsFromTransport) {
   auto mock = std::make_unique<MockUsbTransport>();
   UsbDeviceId expected_id{.vid = 0x2808, .pid = 0x0001};
 
-  // WillRepeatedly because device_id() is called twice (for vid and pid)
   EXPECT_CALL(*mock, device_id()).WillRepeatedly(Return(expected_id));
 
   UsbDevice device = MakeDevice(std::move(mock));
@@ -178,7 +177,7 @@ TEST(UsbDeviceTest, MoveConstructorTransfersOwnership) {
   UsbDevice device2(std::move(device1));
 
   EXPECT_CALL(*raw_ptr, device_id())
-      .WillOnce(Return(UsbDeviceId{0x1234, 0x5678}));
+      .WillOnce(Return(UsbDeviceId{.vid = 0x1234, .pid = 0x5678}));
   EXPECT_EQ(device2.device_id().vid, 0x1234);
 }
 
@@ -192,6 +191,6 @@ TEST(UsbDeviceTest, MoveAssignmentTransfersOwnership) {
   device2 = std::move(device1);
 
   EXPECT_CALL(*raw_ptr1, device_id())
-      .WillOnce(Return(UsbDeviceId{0x1111, 0x2222}));
+      .WillOnce(Return(UsbDeviceId{.vid = 0x1111, .pid = 0x2222}));
   EXPECT_EQ(device2.device_id().vid, 0x1111);
 }
