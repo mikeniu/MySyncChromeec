@@ -63,6 +63,30 @@
       },
       "revId": "f73c814fe0c3803a112c8ac7da467635e99b8058",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e313ae1e_e45bebe6",
+        "filename": "util/egis/build.mk",
+        "patchSetId": 30
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T16:46:05Z",
+      "side": 1,
+      "message": "The previous version wasn\u0027t quite right and the tests didn\u0027t run. Trying again.",
+      "parentUuid": "9d9724ca_5ef2c55f",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 19
+      },
+      "revId": "f73c814fe0c3803a112c8ac7da467635e99b8058",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
