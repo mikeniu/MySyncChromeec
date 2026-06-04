@@ -67,8 +67,6 @@ std::array<uint8_t, SHA256_DIGEST_LENGTH> CalculateSha256(
   return hash;
 }
 
-}  // namespace
-
 // For sending data to the MCU
 std::expected<void, FtError> SendActionOut(
     const UsbDevice& device, uint8_t subcmd, uint32_t address,
@@ -90,16 +88,16 @@ std::expected<void, FtError> ReceiveActionIn(
   return ReceiveBulkDataIn(device, cmd, data, timeout);
 }
 
-static std::expected<void, FtError> FtErasePage(const UsbDevice& device,
-                                                size_t length, uint32_t addr) {
+std::expected<void, FtError> FtErasePage(const UsbDevice& device, size_t length,
+                                         uint32_t addr) {
   uint32_t pages = FtDivRoundUp(length, kFocalConfigSize);
   return SendActionOut(device, kFtSubcmdErasePage, addr, {},
                        TransferDirection::kOut, kErasePageTimeout, pages);
 }
 
-static std::expected<void, FtError> FtDownloadPage(
-    const UsbDevice& device, uint32_t downaddr, size_t per_len,
-    std::span<const uint8_t> data) {
+std::expected<void, FtError> FtDownloadPage(const UsbDevice& device,
+                                            uint32_t downaddr, size_t per_len,
+                                            std::span<const uint8_t> data) {
   // Write data to SRAM (kFtSubcmdWriteBin)
   auto res = SendActionOut(device, kFtSubcmdWriteBin, kFtWriteSramAddr,
                            data.subspan(0, per_len), TransferDirection::kOut,
@@ -117,9 +115,9 @@ static std::expected<void, FtError> FtDownloadPage(
   return res;
 }
 
-static std::expected<void, FtError> FtDownloadBin(const UsbDevice& device,
-                                                  std::string_view file_path,
-                                                  uint32_t target_addr) {
+std::expected<void, FtError> FtDownloadBin(const UsbDevice& device,
+                                           std::string_view file_path,
+                                           uint32_t target_addr) {
   auto file_data = ReadFileToVector(file_path);
   if (!file_data) return std::unexpected(file_data.error());
 
@@ -233,10 +231,7 @@ static std::expected<void, FtError> FtMcuReset(const UsbDevice& device,
                        kSoftPor);
 }
 
-// -----------------------------------------------------------------------------
-// Get boot version string from device
-// -----------------------------------------------------------------------------
-static std::expected<void, FtError> FtGetBootVersion(const UsbDevice& device) {
+std::expected<void, FtError> FtGetBootVersion(const UsbDevice& device) {
   auto cmd = BuildFtCmd(kFtCmdReadInfo, kFtSubcmdReadData, 0, 0, 0, 0);
   std::vector<uint8_t> data(kFtBootVersionMax, 0);
 
@@ -253,8 +248,11 @@ static std::expected<void, FtError> FtGetBootVersion(const UsbDevice& device) {
   return {};
 }
 
-static std::expected<bool, FtError> IsEcBinHasConfigPage(
-    std::string_view file_path, uint32_t& code_start_addr) {
+// -----------------------------------------------------------------------------
+// Helper to check if EC binary contains a valid config page
+// -----------------------------------------------------------------------------
+std::expected<bool, FtError> IsEcBinHasConfigPage(std::string_view file_path,
+                                                  uint32_t& code_start_addr) {
   std::ifstream file(std::string{file_path}, std::ios::binary);
   if (!file) {
     FT_LOGE("Cannot open {}", file_path);
@@ -282,6 +280,11 @@ static std::expected<bool, FtError> IsEcBinHasConfigPage(
   return true;
 }
 
+}  // namespace
+
+// -----------------------------------------------------------------------------
+// Firmware update (public)
+// -----------------------------------------------------------------------------
 std::expected<void, FtError> UpdateFw(const UsbDevice& device,
                                       FtDeviceInfo& info) {
   uint32_t target_addr = kFocalRomCfgAddr;
@@ -386,13 +389,12 @@ std::expected<FtFlashWpArea, FtError> FtGetFlashProtect(
   }
 
   auto wp_area = static_cast<FtFlashWpArea>(data[0]);
-  FT_LOGI("Flash write-protect area = {}", static_cast<int>(wp_area));
+  FT_LOGI("Flash write-protect area = {}", std::to_underlying(wp_area));
   return wp_area;
 }
 
 // -----------------------------------------------------------------------------
 // Set flash write-protect area (only valid in bootloader mode)
-// wp_area: desired protection area (kAll, kBoot, kRo, kRw)
 // -----------------------------------------------------------------------------
 std::expected<void, FtError> FtSetFlashProtect(const UsbDevice& device,
                                                FtFlashWpArea wp_area,
@@ -404,18 +406,18 @@ std::expected<void, FtError> FtSetFlashProtect(const UsbDevice& device,
 
   if (wp_area <= FtFlashWpArea::kUnknown ||
       wp_area >= FtFlashWpArea::kOutRange) {
-    FT_LOGE("Invalid wp_area: {}", static_cast<int>(wp_area));
+    FT_LOGE("Invalid wp_area: {}", std::to_underlying(wp_area));
     return std::unexpected(FtError::kParameterError);
   }
 
-  FT_LOGI("Setting flash write protect to area: {}", static_cast<int>(wp_area));
+  FT_LOGI("Setting flash write protect to area: {}",
+          std::to_underlying(wp_area));
 
-  std::vector<uint8_t> dummy(kFtFlashWpBufferSize,
-                             0);  // Some firmware expects a buffer
+  std::vector<uint8_t> dummy(kFtFlashWpBufferSize, 0);
 
-  auto res = ReceiveActionIn(
-      device, kFtSubcmdFlashWpSet, static_cast<uint32_t>(wp_area), dummy,
-      kGenericInfoTimeout, ~static_cast<uint32_t>(wp_area));
+  auto res =
+      ReceiveActionIn(device, kFtSubcmdFlashWpSet, std::to_underlying(wp_area),
+                      dummy, kGenericInfoTimeout, ~std::to_underlying(wp_area));
   if (!res) {
     FT_LOGE("Failed to set flash protect");
     return std::unexpected(res.error());
@@ -429,7 +431,7 @@ std::expected<void, FtError> FtSetFlashProtect(const UsbDevice& device,
   }
 
   FT_LOGI("Flash write-protect successfully set to area {}",
-          static_cast<int>(wp_area));
+          std::to_underlying(wp_area));
   return {};
 }
 

@@ -21,6 +21,7 @@ namespace {
 using namespace std::chrono_literals;
 constexpr auto kUsbEnumerationDelay = 200ms;
 constexpr auto kPollinterval = 100ms;
+constexpr uint8_t kDefaultUsbConfigIndex = 0;
 
 // RAII wrapper for libusb device list
 struct LibusbDeviceListDeleter {
@@ -71,7 +72,8 @@ struct EndpointInfo {
 // Locate bulk IN/OUT endpoints on the device
 bool FindBulkEndpoints(libusb_device* dev, EndpointInfo& info) {
   libusb_config_descriptor* config = nullptr;
-  if (libusb_get_config_descriptor(dev, 0, &config) != LIBUSB_SUCCESS)
+  if (libusb_get_config_descriptor(dev, kDefaultUsbConfigIndex, &config) !=
+      LIBUSB_SUCCESS)
     return false;
 
   bool found = false;
@@ -153,7 +155,11 @@ std::expected<FoundDeviceInfo, FtError> LibusbTransport::FindDevice() {
   UsbDeviceId id{.vid = desc.idVendor, .pid = desc.idProduct};
   FT_LOGI("Found device VID {:04x}: PID {:04x}", id.vid, id.pid);
 
-  return FoundDeviceInfo{std::move(ctx), target, id};
+  return FoundDeviceInfo{
+      .ctx = std::move(ctx),
+      .dev = target,
+      .id = id,
+  };
 }
 
 // --------------------------------------------------------------------------
@@ -214,7 +220,7 @@ std::expected<void, FtError> LibusbTransport::EnsureOpened() {
   interface_num_ = ep_info.interface_num;
 
   // 3. Detach kernel driver if active
-  if (libusb_kernel_driver_active(handle_.get(), interface_num_) == 1) {
+  if (libusb_kernel_driver_active(handle_.get(), interface_num_)) {
     if (libusb_detach_kernel_driver(handle_.get(), interface_num_) !=
         LIBUSB_SUCCESS) {
       FT_LOGE("Failed to detach kernel driver");
@@ -223,7 +229,7 @@ std::expected<void, FtError> LibusbTransport::EnsureOpened() {
   }
 
   // 4. Claim the interface
-  if (libusb_claim_interface(handle_.get(), interface_num_) < 0) {
+  if (libusb_claim_interface(handle_.get(), interface_num_) < LIBUSB_SUCCESS) {
     FT_LOGE("Failed to claim interface");
     return std::unexpected(FtError::kResultFail);
   }

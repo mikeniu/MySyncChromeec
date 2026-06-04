@@ -25,7 +25,7 @@ TEST(FtUtilTest, DivRoundUp_NeedRoundUp) {
 
 TEST(FtUtilTest, DivRoundUp_LargeNumbers) {
   constexpr size_t kLarge = 1000000;
-  EXPECT_EQ(FtDivRoundUp(kLarge, static_cast<size_t>(1)), kLarge);
+  EXPECT_EQ(FtDivRoundUp(kLarge, 1uz), kLarge);  // C++23 uz suffix
   EXPECT_EQ(FtDivRoundUp(kLarge, kLarge), 1);
   EXPECT_EQ(FtDivRoundUp(kLarge + 1, kLarge), 2);
 }
@@ -52,11 +52,10 @@ TEST(FtUtilTest, ToString_ReturnsCorrectString) {
 }
 
 TEST(FtUtilTest, ToString_UnknownError) {
-  // Cast an invalid integer to FtError to test default case.
-  auto unknown = static_cast<FtError>(100);
+  auto unknown = FtError{100};
   EXPECT_EQ(ToString(unknown), "Unknown error");
 }
 
-// Compile-time checks for constexpr (if needed)
+// Compile-time checks for constexpr
 static_assert(FtDivRoundUp(5, 2) == 3, "constexpr test failed");
 static_assert(FtDivRoundUp(8, 4) == 2, "constexpr test failed");

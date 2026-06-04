@@ -5,6 +5,8 @@
 #ifndef UTIL_FOCALTECH_FT_SCSI_H_
 #define UTIL_FOCALTECH_FT_SCSI_H_
 
+#include <assert.h>
+
 #include <array>
 #include <cstdint>
 #include <cstring>
@@ -30,6 +32,22 @@ struct BulkCsWrap {
   uint32_t data_residue;
   uint8_t status;
 } __attribute__((packed));
+
+struct FtCmdFormat {
+  uint8_t opcode;
+  uint32_t address;
+  uint32_t length;
+  uint32_t aux_address;
+  uint8_t subcmd;
+  uint8_t flags;
+  uint8_t reserved;
+} __attribute__((packed));
+
+static_assert(sizeof(BulkCsWrap) == 13, "USB CSW must be exactly 13 bytes");
+static_assert(sizeof(BulkCbWrap) == 31, "USB CBW must be exactly 31 bytes");
+
+static_assert(sizeof(FtCmdFormat) == 16,
+              "FtCmdFormat must be exactly 16 bytes");
 
 enum class TransferDirection { kIn, kOut, kSendOnly };
 

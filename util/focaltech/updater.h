@@ -6,6 +6,8 @@
 #ifndef UTIL_FOCALTECH_UPDATER_H_
 #define UTIL_FOCALTECH_UPDATER_H_
 
+#include <assert.h>
+
 #include <cstdint>
 #include <expected>
 #include <string_view>
@@ -15,6 +17,10 @@
 
 // Forward declarations
 class UsbDevice;
+
+// This configuration item is not used during the upgrade; it is only used as an
+// address offset.
+constexpr size_t kFtConfigReservedSize = 28;
 
 enum class FtFlashWpArea {
   kUnknown,
@@ -27,9 +33,12 @@ enum class FtFlashWpArea {
 
 struct FtConfigPage {
   uint32_t code_valid_control_word;
-  uint8_t reserved[28];
+  uint8_t reserved[kFtConfigReservedSize];
   uint32_t code_start_address;
 } __attribute__((packed));
+
+static_assert(sizeof(FtConfigPage) == 36,
+              "FtConfigPage must be exactly 36 bytes");
 
 constexpr size_t kFtFlashWpBufferSize = 512;
 // FocalTech vendor-specific SCSI command opcodes
@@ -79,12 +88,5 @@ std::expected<void, FtError> FtSetFlashProtect(const UsbDevice& device,
 // ----------------------------------------------------------------------------
 std::expected<void, FtError> FtBackToRomBoot(const UsbDevice& device,
                                              FtDeviceMode current_mode);
-
-// ----------------------------------------------------------------------------
-// Verification utility (exposed for testing if needed)
-// ----------------------------------------------------------------------------
-std::expected<void, FtError> FtVerifyData(const UsbDevice& device,
-                                          std::string_view file_path,
-                                          uint32_t target_addr);
 
 #endif  // UTIL_FOCALTECH_UPDATER_H_
