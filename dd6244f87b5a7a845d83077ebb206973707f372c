@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f051565b_b4aa5bff",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 26
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T19:03:44Z",
+      "side": 1,
+      "message": "Let\u0027s eliminate all \"magic numbers\". Here is Gemini feedback, but check for others:\n\n----\n\nHere are the most prominent magic values that should be refactored into descriptive constants:\n\n### 1. The USB Transfer Timeout (`iap_control.cc`)\n\nIn `DoUsbTransfer`, the timeout is hardcoded to `1000ms`. Burying timeouts deep in implementation logic makes them hard to find and adjust if flashing on slower hardware ever requires a longer window.\n\n**File:** `util/elan/iap_control.h`\n\n```cpp\n  // --- USB Endpoints \u0026 Lengths ---\n  // ...\n  static constexpr auto kUsbTimeout \u003d std::chrono::milliseconds(1000);\n\n```\n\n**File:** `util/elan/iap_control.cc`\n\n```cpp\n  // Before\n  if (int err \u003d usb_-\u003eInterruptTransfer(endpoint, buff, 1000ms); err !\u003d 0) {\n      \n  // After\n  if (int err \u003d usb_-\u003eInterruptTransfer(endpoint, buff, kUsbTimeout); err !\u003d 0) {\n\n```\n\n### 2. The Progress Bar Dimensions (`iap_tool.cc`)\n\nIn `SetProgressBar`, there are raw `5`s and `100`s scattered throughout the print statement to calculate the width of the progress bar. It takes mental gymnastics to realize that dividing by 5 makes the bar 20 characters wide.\n\n**File:** `util/elan/iap_tool.cc`\n\n```cpp\nvoid SetProgressBar(size_t progress, size_t total_size) {\n  // Add expressive constants at the top\n  constexpr int kMaxPercent \u003d 100;\n  constexpr int kBarWidthChars \u003d 20;\n  constexpr int kPercentPerChar \u003d kMaxPercent / kBarWidthChars;\n\n  int percent \u003d (total_size \u003d\u003d 0) ? 0 : (100 * progress) / total_size;\n  percent \u003d std::min(kMaxPercent, percent); // (Includes our earlier bounds-check fix!)\n\n  int filled_chars \u003d percent / kPercentPerChar;\n  int empty_chars \u003d kBarWidthChars - filled_chars;\n\n  LogInfo(\"\\r[{}{}] {} % [Data {} of {}]\", \n          std::string(filled_chars, \u0027#\u0027),\n          std::string(empty_chars, \u0027 \u0027), \n          percent, progress, total_size);\n          \n  std::fflush(stdout);\n  if (percent \u003e\u003d kMaxPercent) LogInfo(\"\\n\");\n}\n\n```\n\n### 3. Firmware Version Bit-Shift (`iap_control.cc` \u0026 `fake_usb_backend.h`)\n\nWhen validating the Google firmware prefix, you extract it via `fw_ver \u003e\u003e 8`. While the comment explains it, a constant is better—especially since the same `8` is used in the fake backend to construct the mock version.\n\n**File:** `util/elan/iap_control.h`\n\n```cpp\n  static constexpr uint8_t kGoogleFwVerPrefix \u003d 0x10;\n  static constexpr uint8_t kFwVerPrefixShift \u003d 8; // \u003c-- Add this\n\n```\n\n**File:** `util/elan/iap_control.cc`\n\n```cpp\n  // After: Implicit narrowing fix + constant usage\n  uint8_t fw_ver_google \u003d static_cast\u003cuint8_t\u003e(\n      (fw_ver_info-\u003efw_ver \u003e\u003e kFwVerPrefixShift) \u0026 0xFF);\n\n```\n\n*(You should also update `fake_usb_backend.h` to use `kFwVerPrefixShift` instead of `8` when it shifts the mock prefix into place).*\n\n\n### 4. `libusb_free_device_list` Flag (`libusb_backend.cc`)\n\nIn the deleter for the device list, there is a `1` passed to `libusb_free_device_list`.\n\n```cpp\nstruct DeviceListDeleter {\n  void operator()(libusb_device** l) const { libusb_free_device_list(l, 1); }\n};\n\n```\n\nIn the `libusb` API, this parameter is `unref_devices`. `1` means \"yes, unreference the devices so they can be freed.\" Since this is a boolean integer in a C API, leaving it as `1` is common practice, but an inline comment clarifies it instantly for developers unfamiliar with libusb:\n\n```cpp\n  void operator()(libusb_device** l) const { \n    // 1 \u003d unref_devices (decrement reference count for each device in the list)\n    libusb_free_device_list(l, 1); \n  }\n\n```",
+      "range": {
+        "startLine": 289,
+        "startChar": 0,
+        "endLine": 289,
+        "endChar": 76
+      },
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "16e19d35_fcece99f",
         "filename": "util/elan/iap_control.h",
         "patchSetId": 26
