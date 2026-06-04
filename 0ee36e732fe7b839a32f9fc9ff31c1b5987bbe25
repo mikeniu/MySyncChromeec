@@ -16,6 +16,23 @@
       "message": "Please check with Rob on this.  There was a lot of tuning of the RAM usage on nissa boards done in order to pass the EC stress tests.",
       "revId": "0ee36e732fe7b839a32f9fc9ff31c1b5987bbe25",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f293ab26_55a9ec0f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-06-04T17:39:17Z",
+      "side": 1,
+      "message": "Moving the kernel out of ram has a significant impact on performance. This is not a trivial change. It could cause these boards to fail stress tests.",
+      "revId": "0ee36e732fe7b839a32f9fc9ff31c1b5987bbe25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
