@@ -417,11 +417,14 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FP_LED
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
                                                 "${PLATFORM_EC}/common/host_command.c")
 if (NOT DEFINED CONFIG_EC_HOST_CMD)
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
+  zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
                                                 "${PLATFORM_EC}/common/host_command_task.c")
 endif()
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
-                                                "${PLATFORM_EC}/common/host_event_commands.c")
+
+if (DEFINED CONFIG_PLATFORM_EC_HOSTCMD OR DEFINED CONFIG_EC_HOST_CMD)
+  zephyr_library_sources("${PLATFORM_EC}/common/host_event_commands.c")
+endif()
+
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE
                                                 "${PLATFORM_EC}/common/uart_hostcmd.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_GET_UPTIME_INFO
