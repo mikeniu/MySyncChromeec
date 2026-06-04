@@ -333,6 +333,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "aecf5a8f_a1144edd",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 524,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T18:46:34Z",
+      "side": 1,
+      "message": "Here are the updated instructions from Gemini based on the current code:\n\n----\n\nHere are the step-by-step changes required to implement the `GetChecksum` refactoring, eliminate the dead code, and introduce the clearer alignment error code.\n\n### Step 1: Update the Error Enum\n\nAdd `InvalidAlignment` to represent the modulo-4 failure accurately, as discussed earlier.\n\n**File:** `util/elan/utility.h`\n\n```cpp\n// 1. Add to the IapError enum:\nenum class IapError {\n  None,\n  // ... existing errors ...\n  DataMismatch,\n  BufferTooSmall,\n  BufferEmpty,\n  InvalidAlignment,  // \u003c-- Add this\n  CommandFailed\n};\n\n// 2. Update ToString():\nconstexpr std::string_view ToString(IapError err) {\n  switch (err) {\n    // ... existing cases ...\n    case IapError::BufferEmpty:\n      return \"Buffer is empty for operation\";\n    case IapError::InvalidAlignment:             // \u003c-- Add this\n      return \"Buffer size is not 4-byte aligned\"; // \u003c-- Add this\n    case IapError::CommandFailed:\n      return \"Device rejected command\";\n    default:\n      return \"Unknown Error\";\n  }\n}\n\n```\n\n### Step 2: Delete the Dead Abstractions\n\nRemove `Get32Le` and `Set32Le` completely.\n\n**File:** `util/elan/utility.h`\n*Remove these completely:*\n\n```cpp\n// Delete this block:\ninline std::expected\u003cvoid, IapError\u003e Set32Le(...) { ... }\ninline std::expected\u003cuint32_t, IapError\u003e Get32Le(...) { ... }\n\n```\n\n### Step 3: Refactor `GetChecksum`\n\nInline the memory extraction and utilize the new error code.\n\n**File:** `util/elan/iap_control.cc`\n\n```cpp\nstd::expected\u003cuint32_t, IapError\u003e IapControl::GetChecksum(\n    std::span\u003cconst uint8_t\u003e buff) {\n  // Use the specific alignment error instead of BufferTooSmall\n  if ((buff.size() % 4) !\u003d 0) return std::unexpected(IapError::InvalidAlignment);\n\n  uint32_t checksum \u003d 0;\n  auto remaining \u003d buff;\n\n  while (!remaining.empty()) {\n    uint32_t chunk_val \u003d 0;\n    // Extract exactly 4 bytes locally\n    std::memcpy(\u0026chunk_val, remaining.data(), sizeof(chunk_val));\n    checksum +\u003d ToLittleEndian(chunk_val);\n    \n    // Advance the window\n    remaining \u003d remaining.subspan(4);\n  }\n\n  return checksum;\n}\n\n```\n\n### Step 4: Clean Up the Unit Tests\n\nRemove the tests for the deleted helpers and update the alignment test to expect the new error code.\n\n**File:** `util/elan/utility_test.cc`\n*Remove the following tests:*\n\n* `TEST(UtilityTest, Get32LeRejectsSmallBuffer)`\n* `TEST(UtilityTest, Set32LeRejectsSmallBuffer)`\n* `TEST(UtilityTest, GetAndSet32LeRoundTrip)`\n\n**File:** `util/elan/iap_control_test.cc`\n*Update the expected error in the alignment test:*\n\n```cpp\nTEST_F(IapControlTest, RejectsUnalignedRomData) {\n  auto [_, ctrl] \u003d CreateFakeController();\n  ASSERT_TRUE(ctrl-\u003eInitialize(kBootVid, kBootPid).has_value());\n\n  std::vector\u003cuint8_t\u003e unaligned_rom(61, 0xBB); \n  auto result \u003d ctrl-\u003eRunIapProcess(unaligned_rom);\n\n  ASSERT_FALSE(result.has_value());\n  // Update to check for the new error code\n  EXPECT_EQ(result.error(), IapError::InvalidAlignment); \n}\n\n```",
+      "parentUuid": "35c5a4cd_3060e0c8",
+      "range": {
+        "startLine": 508,
+        "startChar": 0,
+        "endLine": 524,
+        "endChar": 1
+      },
+      "revId": "3627ebeb3f1e9a3688f74863715a776cca07e22f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ff0f6c6b_53505f56",
         "filename": "util/elan/iap_control.h",
         "patchSetId": 23
