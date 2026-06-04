@@ -137,6 +137,30 @@
       },
       "revId": "faa7380ce795803100dfac3d67f19f4cfdb3cd39",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "756c6056_79d04551",
+        "filename": "zephyr/program/atria/atriarvp-rtk/src/rvp_usbc_runtime.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-04T22:31:25Z",
+      "side": 1,
+      "message": "Ok sounds good I will clean up the no longer needed pieces and clean up the code. I posted this for reference initially cause it was a large departure from the original method.",
+      "parentUuid": "5ce4255d_387effc4",
+      "range": {
+        "startLine": 222,
+        "startChar": 0,
+        "endLine": 222,
+        "endChar": 39
+      },
+      "revId": "faa7380ce795803100dfac3d67f19f4cfdb3cd39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
