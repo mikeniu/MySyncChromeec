@@ -46,6 +46,52 @@
       },
       "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "848ad177_f82d2293",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T17:12:50Z",
+      "side": 1,
+      "message": "This is grammatically awkward. Let\u0027s rename to `HasValidConfigPage`.",
+      "range": {
+        "startLine": 242,
+        "startChar": 29,
+        "endLine": 242,
+        "endChar": 49
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6901aec9_16a69694",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T17:12:50Z",
+      "side": 1,
+      "message": "**The Issue:**\nIn `util/focaltech/updater.cc`, the function `IsEcBinHasConfigPage` reads the configuration header from the firmware file and then evaluates whether the magic string matches.\n\n```cpp\n  FtConfigPage config{};\n  file.read(reinterpret_cast\u003cchar*\u003e(\u0026config), sizeof(config));\n  if (!file.good() \u0026\u0026 !file.eof()) {\n    FT_LOGE(\"Failed to read config page\");\n    return std::unexpected(FtError::kResultFail);\n  }\n\n  if (config.code_valid_control_word !\u003d kCodeValidMagic) {\n    return false;\n  }\n\n  if (file.gcount() !\u003d sizeof(config)) {\n    FT_LOGE(\"Failed to read config page (file too small).\");\n    return std::unexpected(FtError::kResultFail);\n  }\n\n```\n\nWhile initializing with `FtConfigPage config{};` prevents undefined behavior by zeroing the memory first, it is still logically backwards to inspect the parsed data (`code_valid_control_word`) *before* you\u0027ve confirmed that the file actually contained enough bytes to populate the structure (`file.gcount() !\u003d sizeof(config)`).\n\n**The Fix:**\nSimply swap the order of the checks so that you validate the size of the read before evaluating the payload.\n\n**Updated Code:**\n\n```cpp\n  FtConfigPage config{};\n  file.read(reinterpret_cast\u003cchar*\u003e(\u0026config), sizeof(config));\n  if (!file.good() \u0026\u0026 !file.eof()) {\n    FT_LOGE(\"Failed to read config page\");\n    return std::unexpected(FtError::kResultFail);\n  }\n\n  if (file.gcount() !\u003d sizeof(config)) {\n    FT_LOGE(\"Failed to read config page (file too small).\");\n    return std::unexpected(FtError::kResultFail);\n  }\n\n  if (config.code_valid_control_word !\u003d kCodeValidMagic) {\n    return false;\n  }\n\n```",
+      "range": {
+        "startLine": 257,
+        "startChar": 0,
+        "endLine": 265,
+        "endChar": 0
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
