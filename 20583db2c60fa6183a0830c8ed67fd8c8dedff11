@@ -50,6 +50,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "62722eb2_2f717364",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T17:24:24Z",
+      "side": 1,
+      "message": "This is redundant.\n\n----\n\nSince `kMaxRetry` is already defined as an `inline constexpr int` in `cli.h`, creating local aliases like `constexpr int kRetries \u003d kMaxRetry;` inside the functions is completely redundant. In fact, you already use `kMaxRetry` directly inside `ExecuteCommand` further down in the file!\n\nYou can safely remove these local constant re-declarations and just use `kMaxRetry` directly in the loops.\n\nHere are the two places in `util/focaltech/cli.cc` you should clean up:\n\n**1. In `CheckEcBuildVersion`:**\n\n*Remove:*\n\n```cpp\n  constexpr int kRetries \u003d kMaxRetry;\n  std::string build_info;\n\n  for (int attempt \u003d 1; attempt \u003c\u003d kRetries; ++attempt) {\n\n```\n\n*Replace with:*\n\n```cpp\n  std::string build_info;\n\n  for (int attempt \u003d 1; attempt \u003c\u003d kMaxRetry; ++attempt) {\n\n```\n\n**2. In `SwitchMcuMode`:**\n\n*Remove:*\n\n```cpp\n  // Attempt the switch with retries; device loss indicates success\n  constexpr int kMaxSwitchRetries \u003d kMaxRetry;\n  bool device_lost \u003d false;\n\n  for (int attempt \u003d 1; attempt \u003c\u003d kMaxSwitchRetries; ++attempt) {\n\n```\n\n*Replace with:*\n\n```cpp\n  // Attempt the switch with retries; device loss indicates success\n  bool device_lost \u003d false;\n\n  for (int attempt \u003d 1; attempt \u003c\u003d kMaxRetry; ++attempt) {\n\n```",
+      "range": {
+        "startLine": 178,
+        "startChar": 0,
+        "endLine": 178,
+        "endChar": 37
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "848ad177_f82d2293",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 20
