@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3737c356_cf303119",
+        "filename": "util/twister_launcher.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-06-04T21:24:36Z",
+      "side": 1,
+      "message": "Can we make a function `is_coreboot_sdk()` that evaluates `in_cros_sdk() or intercepted_args.toolchain \u003d\u003d \"coreboot-sdk\"`?\n\nIt can just be a nested closure for easy access to intercepted_args",
+      "range": {
+        "startLine": 401,
+        "startChar": 4,
+        "endLine": 401,
+        "endChar": 69
+      },
+      "revId": "e34bc132e04e1c84afe3ccd320d5c38ca9e24281",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
