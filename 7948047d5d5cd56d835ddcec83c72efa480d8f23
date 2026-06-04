@@ -22,6 +22,29 @@
       },
       "revId": "7948047d5d5cd56d835ddcec83c72efa480d8f23",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d5d949c_077d33a6",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T20:44:56Z",
+      "side": 1,
+      "message": "In `ec_comm.cc`, the two\u0027s-complement checksum calculation is written manually inside `EcCommand`. In `ec_comm_test.cc`, that exact same `for` loop is copy-pasted **four separate times** to generate mock responses.\n\n**The Fix:** Extract this into a standalone helper function so both the production code and the test suite can guarantee they are computing it identically.\n\n*In `ec_comm.cc` (or a shared `ec_util.h`):*\n\n```c\nvoid ApplyEcChecksum(std::span\u003cuint8_t\u003e packet) {\n  // Ensure the packet is large enough to contain the header\n  if (packet.size() \u003c sizeof(EcHostCommandRequest)) return;\n  \n  // Temporarily zero the checksum field for calculation\n  packet[offsetof(EcHostCommandRequest, checksum)] \u003d 0;\n  \n  uint32_t sum \u003d 0;\n  for (uint8_t byte : packet) sum +\u003d byte;\n  \n  packet[offsetof(EcHostCommandRequest, checksum)] \u003d static_cast\u003cuint8_t\u003e(-sum);\n}\n\n```\n\nNow, in `ec_comm.cc`\u0027s constructor and in your test\u0027s `MakeMockResponse`, you just call `ApplyEcChecksum(packet);` before sending it.",
+      "range": {
+        "startLine": 62,
+        "startChar": 1,
+        "endLine": 72,
+        "endChar": 2
+      },
+      "revId": "7948047d5d5cd56d835ddcec83c72efa480d8f23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
