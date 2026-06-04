@@ -49,6 +49,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7ccb24b6_454cc593",
+        "filename": "util/focaltech/ft_scsi_test.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T00:40:13Z",
+      "side": 1,
+      "message": "Gemini feedback. Verify that the comments it adds about the fields are correct:\n\n----\n\n### 1. The Hex Values (`0x12345678`, `0x78`, `0x56`)\n\nIn `BuildFtCmd_VerifyFields`, using `0x12345678` and explicitly checking for `0x78`, `0x56`, `0x34`, `0x12` is actually exactly what you want to do.\n\nIf you used constants, you risk accidentally replicating the production logic in the test. By hardcoding the literal byte sequence in the test assertion, you create an independent, un-fakeable mathematical proof that your `ToLittleEndian` conversion and struct packing are working perfectly.\n\n**Verdict:** Keep the hex payload literals. They are doing important work.\n\n### 2. The Input Parameters (`0xDC`, `0x08`)\n\nWhile the payload data should remain hardcoded hex, the actual opcodes passed into the function should probably use the constants the author already defined in `updater.h` (`kFtCmdAction` and `kFtSubcmdErasePage`). This makes it obvious *what* kind of command is being simulated.\n\n### 3. The Array Indices (`cmd[0]` through `cmd[15]`)\n\nThis is where the test gets ugly. Using 16 individual `EXPECT_EQ` lines with hardcoded indices is verbose and creates a lot of visual noise. While you *could* define constants for every single byte offset (e.g., `kOpcodeOffset \u003d 0`), that is usually considered overkill.\n\n**The Modern Google Mock Solution:**\nInstead of 16 individual assertions with magic index numbers, you can eliminate the array indices entirely by using GMock\u0027s `ElementsAre`. This perfectly expresses the intent: \"This array must exactly match this sequence of bytes.\"\n\n### Recommended Refactoring\n\nHere is how you can rewrite both tests to be cleaner, remove the magic array indices, and utilize the proper constants, all while preserving the strict byte-level verification:\n\n```cpp\n#include \u003cgmock/gmock.h\u003e // Ensure this is included\n\nTEST(FtScsiTest, BuildFtCmd_VerifyFields) {\n  // Using constants for the opcodes, but raw hex for the payload to verify endianness\n  auto cmd \u003d BuildFtCmd(kFtCmdAction, kFtSubcmdErasePage, 0x12345678, 0x1000, 0x2000, 0x01);\n  \n  // ElementsAre verifies the exact byte-for-byte layout without magic array indices\n  EXPECT_THAT(cmd, testing::ElementsAre(\n      kFtCmdAction,           // [0] opcode\n      0x78, 0x56, 0x34, 0x12, // [1-4] address (Little Endian)\n      0x00, 0x10, 0x00, 0x00, // [5-8] length (Little Endian)\n      0x00, 0x20, 0x00, 0x00, // [9-12] aux_address (Little Endian)\n      kFtSubcmdErasePage,     // [13] subcmd\n      0x01,                   // [14] flags\n      0x00                    // [15] reserved\n  ));\n}\n\nTEST(FtScsiTest, BuildFtCmd_ZeroDefaults) {\n  auto cmd \u003d BuildFtCmd(kFtCmdReadInfo, kFtSubcmdReadData);\n  \n  EXPECT_THAT(cmd, testing::ElementsAre(\n      kFtCmdReadInfo,         // [0] opcode\n      0x00, 0x00, 0x00, 0x00, // [1-4] address\n      0x00, 0x00, 0x00, 0x00, // [5-8] length\n      0x00, 0x00, 0x00, 0x00, // [9-12] aux_address\n      kFtSubcmdReadData,      // [13] subcmd\n      0x00,                   // [14] flags\n      0x00                    // [15] reserved\n  ));\n}\n\n```\n\nThis approach removes the magic indices (`cmd[13]`), incorporates the existing constants, and makes it incredibly easy for a reviewer to visually verify the 16-byte wire format at a glance!",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 63,
+        "endChar": 1
+      },
+      "revId": "8032477b053e6317f43346811c81fcf9a7cfb606",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "88d51d00_df7569b8",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 19
