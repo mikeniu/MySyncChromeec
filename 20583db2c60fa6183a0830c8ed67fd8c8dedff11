@@ -142,6 +142,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fbdde282_d39d93cb",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T17:40:25Z",
+      "side": 1,
+      "message": "Also verify that this feedback is correct:\n\n---\n\n### 1. Upgrade the `DownloadBin` Loop to use `std::span` (and fix an OOB read!)\n\nIn my previous message, I suggested removing the 2MB padded `write_buffer` and pointing a raw pointer directly at `buffer.data()`.\n\n**The Hidden Bug:**\nIf the firmware file size isn\u0027t perfectly aligned to 4 bytes, the final block does this:\n\n```cpp\n    len \u003d DivRoundUp\u003csize_t\u003e(len, kWordSize) * kWordSize; // e.g. 13 bytes becomes 16 bytes\n    auto page_res \u003d DownloadPage(device, downaddr, len, {p, len}); // OUT OF BOUNDS READ!\n\n```\n\nBecause `p` only has 13 bytes of backing memory left, creating a span of 16 bytes and passing it to the USB transport will cause a buffer over-read!\n\n**The Simplification \u0026 Fix:**\nInstead of using raw pointers (`p`) and manual math (`len`), we can use `std::span` to safely slice the buffer. When we hit the final non-aligned chunk, we can copy it into a tiny local padded buffer before sending.\n\nHere is the fully modernized, memory-safe replacement for the `DownloadBin` loop (in `updater.cc`):\n\n```cpp\n  // 1. Erase flash sections... (keep your existing erase code)\n  \n  // 2. Safely slice the buffer using std::span\n  std::span\u003cconst uint8_t\u003e remaining_data \u003d buffer;\n  uint32_t downaddr \u003d target_addr;\n\n  // Skip the config page initially if we are writing it last\n  if (target_addr \u003d\u003d kFocalBootCfgAddr || target_addr \u003d\u003d kFocalRomCfgAddr) {\n    FT_LOGI(\"Write config page last\");\n    remaining_data \u003d remaining_data.subspan(std::min(remaining_data.size(), kFocalConfigSize));\n    downaddr +\u003d kFocalConfigSize;\n  }\n\n  // 3. Send full pages\n  [[maybe_unused]] size_t frame \u003d 0;\n  while (remaining_data.size() \u003e\u003d kFocalConfigSize) {\n    auto page_res \u003d DownloadPage(device, downaddr, kFocalConfigSize, \n                                 remaining_data.first(kFocalConfigSize));\n    if (!page_res) return page_res;\n\n    remaining_data \u003d remaining_data.subspan(kFocalConfigSize);\n    downaddr +\u003d kFocalConfigSize;\n    FT_LOGD(\"Download frame {}/{}\", ++frame, total_frame);\n  }\n\n  // 4. Send the final partial page safely (padded to 4-byte word boundary)\n  if (!remaining_data.empty()) {\n    constexpr size_t kWordSize \u003d sizeof(uint32_t);\n    size_t padded_len \u003d DivRoundUp\u003csize_t\u003e(remaining_data.size(), kWordSize) * kWordSize;\n    \n    // Copy into a tiny local buffer padded with 0xFF to prevent out-of-bounds read\n    std::vector\u003cuint8_t\u003e final_chunk(padded_len, 0xFF);\n    std::ranges::copy(remaining_data, final_chunk.begin());\n\n    auto page_res \u003d DownloadPage(device, downaddr, padded_len, final_chunk);\n    if (!page_res) return page_res;\n  }\n\n  // 5. Write the config page last... (keep your existing code)\n\n```\n\nNotice how `remaining_data.subspan()` and `remaining_data.first()` completely eliminate pointer arithmetic! It is impossible to read out-of-bounds with this implementation.",
+      "parentUuid": "3a3a4974_2f6d92c6",
+      "range": {
+        "startLine": 138,
+        "startChar": 0,
+        "endLine": 141,
+        "endChar": 60
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "848ad177_f82d2293",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 20
