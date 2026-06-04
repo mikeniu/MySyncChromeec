@@ -45,6 +45,29 @@
       },
       "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4886647_793a4d78",
+        "filename": "util/elan/libusb_backend.cc",
+        "patchSetId": 26
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T18:43:24Z",
+      "side": 1,
+      "message": "Gemini feedback. Review for correctness:\n\n\n---\n\n### Rationale: Realigning State with Reality\n\nThe original implementation suffered from a state tracking bug because it recorded the *intent* to perform an action rather than the *success* of that action.\n\n1. **Flawed Cleanup:** The original code pushed interface numbers into `claimed_interfaces_` during the discovery phase. If a subsequent call to `libusb_claim_interface()` failed, the function exited via `Release()`. However, `Release()` would blindly iterate over `claimed_interfaces_` and attempt to release interfaces the application never actually owned, potentially causing `libusb` errors or kernel log spam. The same issue applied to `detached_kernel_drivers_`.\n2. **Unnecessary Complexity:** The code looped through the configuration descriptors to find target interfaces, stored them, and then looped *again* to actually open the device and claim them.\n\nBy restructuring the flow to open the device *first*, we can consolidate discovery, detaching, claiming, and state-recording into a single, efficient pass. Most importantly, we only push to our state vectors `claimed_interfaces_` and `detached_kernel_drivers_` **after** the respective `libusb` calls return successfully.\n\n### Changes to be Made\n\n**File:** `util/elan/libusb_backend.cc`\n**Function:** `LibusbBackend::OpenDevice`\n\nReplace the latter half of the function (starting right after the device is found) with the unified single-pass loop.\n\n**Original Code:**\n\n```cpp\n  // ... device discovery above ...\n  if (!found_dev) return LIBUSB_ERROR_NO_DEVICE;\n\n  libusb_config_descriptor* config \u003d nullptr;\n  int err \u003d libusb_get_config_descriptor(found_dev, 0, \u0026config);\n  if (err !\u003d 0) return err;\n\n  for (int i \u003d 0; i \u003c config-\u003ebNumInterfaces; i++) {\n    const struct libusb_interface* inter \u003d \u0026config-\u003einterface[i];\n    for (int j \u003d 0; j \u003c inter-\u003enum_altsetting; j++) {\n      if (inter-\u003ealtsetting[j].bInterfaceClass \u003d\u003d LIBUSB_CLASS_HID) {\n        claimed_interfaces_.push_back(inter-\u003ealtsetting[j].bInterfaceNumber);\n        break;\n      }\n    }\n  }\n  libusb_free_config_descriptor(config);\n\n  err \u003d libusb_open(found_dev, \u0026dev_handle_);\n  if (err !\u003d 0) return err;\n\n  for (int interface_num : claimed_interfaces_) {\n    if (libusb_kernel_driver_active(dev_handle_, interface_num) \u003d\u003d 1) {\n      libusb_detach_kernel_driver(dev_handle_, interface_num);\n      detached_kernel_drivers_.push_back(interface_num);\n    }\n    err \u003d libusb_claim_interface(dev_handle_, interface_num);\n    if (err !\u003d 0) {\n      Release();\n      return err;\n    }\n  }\n  return 0;\n}\n\n```\n\n**Updated Code:**\n\n```cpp\n  // ... device discovery above ...\n  if (!found_dev) return LIBUSB_ERROR_NO_DEVICE;\n\n  // 1. Open the device BEFORE parsing interfaces so we can claim them immediately\n  int err \u003d libusb_open(found_dev, \u0026dev_handle_);\n  if (err !\u003d 0) return err;\n\n  libusb_config_descriptor* config \u003d nullptr;\n  err \u003d libusb_get_config_descriptor(found_dev, 0, \u0026config);\n  if (err !\u003d 0) {\n    Release(); \n    return err;\n  }\n\n  // 2. Discover, Detach, and Claim in a single pass\n  for (int i \u003d 0; i \u003c config-\u003ebNumInterfaces; i++) {\n    const struct libusb_interface* inter \u003d \u0026config-\u003einterface[i];\n    for (int j \u003d 0; j \u003c inter-\u003enum_altsetting; j++) {\n      if (inter-\u003ealtsetting[j].bInterfaceClass \u003d\u003d LIBUSB_CLASS_HID) {\n        int intf_num \u003d inter-\u003ealtsetting[j].bInterfaceNumber;\n\n        // Safely detach kernel driver and ONLY record it if successful\n        if (libusb_kernel_driver_active(dev_handle_, intf_num) \u003d\u003d 1 \u0026\u0026\n            libusb_detach_kernel_driver(dev_handle_, intf_num) \u003d\u003d 0) {\n          detached_kernel_drivers_.push_back(intf_num);\n        }\n\n        // Attempt to claim the interface\n        err \u003d libusb_claim_interface(dev_handle_, intf_num);\n        if (err !\u003d 0) {\n          libusb_free_config_descriptor(config);\n          Release(); // dev_handle_ is valid and safely closed here\n          return err;\n        }\n\n        // ONLY record the interface as claimed AFTER successful claim\n        claimed_interfaces_.push_back(intf_num);\n        break; \n      }\n    }\n  }\n\n  libusb_free_config_descriptor(config);\n  return 0;\n}\n\n```",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 84,
+        "endChar": 11
+      },
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
