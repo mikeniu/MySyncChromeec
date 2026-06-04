@@ -216,6 +216,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "4dd911d0_cadf0cda",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-04T22:26:01Z",
+      "side": 1,
+      "message": "I think this is ok.  Will this allow you to drop the various `CONFIG_TEST_ATRIA_RVP_USBC_RUNTIME_2PORT` definitions?",
+      "parentUuid": "315b2ab5_5b138ef8",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 10
+      },
+      "revId": "0aa4b774c5692c7ba343d6827b8c22cb431a4f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "ebf64224_3caf4d46",
