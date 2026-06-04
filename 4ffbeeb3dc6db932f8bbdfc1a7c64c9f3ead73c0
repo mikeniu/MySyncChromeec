@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3ad1a0d_7337b2b3",
+        "filename": "zephyr/emul/emul_lis2dh.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-06-04T23:32:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "89446267_98a1e125",
+      "revId": "4ffbeeb3dc6db932f8bbdfc1a7c64c9f3ead73c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ff9f836_a0a1df1d",
