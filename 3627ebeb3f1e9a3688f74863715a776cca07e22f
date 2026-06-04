@@ -309,6 +309,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "35c5a4cd_3060e0c8",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 524,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-04T18:35:43Z",
+      "side": 1,
+      "message": "You still need to use the `ToLittleEndian` helper, remove `Set32Le` and `Get32Le`, and update `GetChecksum` as described in the above instructions.",
+      "parentUuid": "a4ce81a1_b57eed73",
+      "range": {
+        "startLine": 508,
+        "startChar": 0,
+        "endLine": 524,
+        "endChar": 1
+      },
+      "revId": "3627ebeb3f1e9a3688f74863715a776cca07e22f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ff0f6c6b_53505f56",
         "filename": "util/elan/iap_control.h",
         "patchSetId": 23
