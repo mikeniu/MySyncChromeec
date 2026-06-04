@@ -22,6 +22,30 @@
       },
       "revId": "31cf365778290742ac6825d658739e4e4323ae25",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a41d5e35_bc25c916",
+        "filename": "zephyr/program/nissa/joxer/project.conf",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-04T16:22:45Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "9a3118fa_a87eca6b",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 20
+      },
+      "revId": "31cf365778290742ac6825d658739e4e4323ae25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
