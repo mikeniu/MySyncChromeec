@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "027120ac_4e8896c5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 30
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1594262
+      },
+      "writtenOn": "2026-06-04T03:48:50Z",
+      "side": 1,
+      "message": "The previous build (https://cr-buildbucket.appspot.com/build/8679970424351005153) is being automatically retried for the following reasons:\n- Some child builders are now retryable:bluey-cq, calypso-cq\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
+      "revId": "f73c814fe0c3803a112c8ac7da467635e99b8058",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "31bf0928_a15910ef",
