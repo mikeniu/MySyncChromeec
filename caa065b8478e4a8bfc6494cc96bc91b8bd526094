@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bc37e24_5ab9bb6b",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 581,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-06-04T12:41:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "455aa145_6740b21e",
+      "revId": "caa065b8478e4a8bfc6494cc96bc91b8bd526094",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a0734023_df3f4103",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-03T18:31:21Z",
       "side": 1,
       "message": "There is already a call to `get_vbus_voltage` earlier in this function, and I think you could reuse the result here. That would mean that you would not need to call it again inside `configure_vbus_thresholds`.",
+      "revId": "caa065b8478e4a8bfc6494cc96bc91b8bd526094",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ee57c98_689d43d8",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 883,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-06-04T12:41:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a0734023_df3f4103",
       "revId": "caa065b8478e4a8bfc6494cc96bc91b8bd526094",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -54,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "622fed18_24292c0a",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 889,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-06-04T12:41:03Z",
+      "side": 1,
+      "message": "Ah right, preserve preexisting values are not required here, I will switch it back to plain write",
+      "parentUuid": "1ea766ad_5d946fef",
+      "revId": "caa065b8478e4a8bfc6494cc96bc91b8bd526094",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0087493c_80a5ba6c",
         "filename": "driver/charger/sm5803.c",
         "patchSetId": 9
@@ -71,6 +125,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d84731d2_4a747898",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 1352,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-06-04T12:41:03Z",
+      "side": 1,
+      "message": "Thanks for detail feedback, your suggestions looks right, I have refactored code as expected. it\u0027s testing details will be update in bug",
+      "parentUuid": "0087493c_80a5ba6c",
+      "revId": "caa065b8478e4a8bfc6494cc96bc91b8bd526094",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a6d81002_139982c6",
         "filename": "driver/charger/sm5803.h",
         "patchSetId": 9
@@ -82,6 +154,24 @@
       "writtenOn": "2026-06-03T18:31:21Z",
       "side": 1,
       "message": "Nit: Mention named constants from spec in comments.",
+      "revId": "caa065b8478e4a8bfc6494cc96bc91b8bd526094",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "caad9ebf_4e70341d",
+        "filename": "driver/charger/sm5803.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-06-04T12:41:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a6d81002_139982c6",
       "revId": "caa065b8478e4a8bfc6494cc96bc91b8bd526094",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
