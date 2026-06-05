@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e1d06e5_012b8213",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1158719
+      },
+      "writtenOn": "2026-06-05T17:31:37Z",
+      "side": 1,
+      "message": "leaving +2 to OWNERS since they likely know best if the existing testing behavior was intentional\n\nthanks!",
+      "revId": "9ad5efdfa6bd3011a1b93dab3489f244756721e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
