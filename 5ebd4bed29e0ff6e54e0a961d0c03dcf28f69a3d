@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "73aad5a6_b85b1a51",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-05T19:59:57Z",
+      "side": 1,
+      "message": "@pmarheine@chromium.org It looks like you have some history with this driver. Can you check that what we\u0027re doing here makes sense?",
+      "revId": "5ebd4bed29e0ff6e54e0a961d0c03dcf28f69a3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3a585a8b_3c2d37ca",
