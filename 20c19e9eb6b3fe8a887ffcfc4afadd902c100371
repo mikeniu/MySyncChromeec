@@ -95,6 +95,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "388166cc_1971f242",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T21:09:03Z",
+      "side": 1,
+      "message": "We can also add some tests for this code. Gemini feedback:\n\n----\n\nCurrently, `cli_test.cc` only tests the path where the command fails with `Error::kNoSuchDevice` (simulating the expected USB drop during a reboot). Both `SwitchMcuMode_EnterBoot` and `SwitchMcuMode_EnterRom` trigger this path by explicitly calling `fake-\u003eFailSendOnCommand(1)`.\n\nHowever, the tests **do not cover** the two other possible paths for `command_accepted`:\n\n1. **Perfect Success:** The switch command succeeds perfectly (no USB drop detected before the function returns).\n2. **Exhausted Retries:** The command fails with an *unexpected* error (like `kResultFail` from a bad response), loops 5 times, and correctly returns `std::unexpected(Error::kResultFail)`.\n\n\n```\nTEST(CliTest, SwitchMcuMode_SuccessWithoutDisconnect) {\n  auto transport \u003d std::make_unique\u003cFakeEcTransport\u003e();\n  auto* fake \u003d transport.get();\n  UsbDevice device \u003d MakeDevice(std::move(transport));\n\n  // Queue valid responses for both the build version check and the switch command.\n  fake-\u003eAddResponse(BuildStringResponse(\"ft9001_v1.0\"));\n  fake-\u003eAddResponse(BuildEmptySuccessResponse());\n\n  auto result \u003d SwitchMcuMode(device, DeviceMode::kEc, Command::kEnterBoot);\n  \n  EXPECT_TRUE(result.has_value());\n}\n\nTEST(CliTest, SwitchMcuMode_FailsAfterMaxRetries) {\n  auto transport \u003d std::make_unique\u003cFakeEcTransport\u003e();\n  auto* fake \u003d transport.get();\n  UsbDevice device \u003d MakeDevice(std::move(transport));\n\n  // Provide a response only for the initial build version check. \n  // Omitting the response for the switch command forces a timeout, causing \n  // the retry loop to exhaust its attempts and fail gracefully.\n  fake-\u003eAddResponse(BuildStringResponse(\"ft9001_v1.0\"));\n\n  auto result \u003d SwitchMcuMode(device, DeviceMode::kEc, Command::kEnterBoot);\n  \n  EXPECT_FALSE(result.has_value());\n  EXPECT_EQ(result.error(), Error::kResultFail);\n}\n```",
+      "parentUuid": "396a6f02_48a1b46a",
+      "range": {
+        "startLine": 211,
+        "startChar": 2,
+        "endLine": 232,
+        "endChar": 3
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a72fd66c_ff6b60a8",
         "filename": "util/focaltech/cli.cc",
         "patchSetId": 21
