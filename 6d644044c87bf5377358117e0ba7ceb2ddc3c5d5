@@ -279,6 +279,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f8bc3bbd_99526ba5",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:53:28Z",
+      "side": 1,
+      "message": "Gemini suggested fix and test case:\n\n----\n\n### 1. Fix the payload parsing in `ec_comm.cc`\n\nOpen `util/egis/ec_comm.cc` and locate the `SendCommand` function. Find this block of code (around line 75):\n\n```cpp\n  if (actual_res.value() \u003c static_cast\u003cint\u003e(sizeof(EcHostCommandResponse))) {\n    std::println(stderr, \"[ERROR] EC response was too short to be valid.\");\n    return std::unexpected(EcError::kResponseTooShort);\n  }\n  resp_buf.resize(actual_res.value());\n\n  if (!VerifyResponseChecksum(resp_buf)) {\n    std::println(stderr, \"[ERROR] EC response checksum verification failed.\");\n    return std::unexpected(EcError::kInvalidChecksum);\n  }\n\n  auto hdr_res \u003d ReadStruct\u003cEcHostCommandResponse\u003e(resp_buf);\n  if (!hdr_res) {\n    return std::unexpected(EcError::kResponseTooShort);\n  }\n  EcHostCommandResponse resp_hdr \u003d hdr_res.value();\n\n```\n\nReplace that entire block with the new padding-safe logic:\n\n```cpp\n  size_t rx_size \u003d actual_res.value();\n  if (rx_size \u003c sizeof(EcHostCommandResponse)) {\n    std::println(stderr, \"[ERROR] EC response was too short to be valid.\");\n    return std::unexpected(EcError::kResponseTooShort);\n  }\n\n  auto resp_hdr \u003d ReadStruct\u003cEcHostCommandResponse\u003e(resp_buf).value();\n  uint16_t data_length \u003d FromLittleEndian(resp_hdr.data_length);\n  size_t exact_packet_size \u003d sizeof(EcHostCommandResponse) + data_length;\n\n  if (rx_size \u003c exact_packet_size) {\n    std::println(stderr, \"[ERROR] EC response data truncated. Claimed: {}, Actual: {}\",\n                 data_length, rx_size - sizeof(EcHostCommandResponse));\n    return std::unexpected(EcError::kResponseTooShort);\n  }\n\n  resp_buf.resize(exact_packet_size);\n\n  if (!VerifyResponseChecksum(resp_buf)) {\n    std::println(stderr, \"[ERROR] EC response checksum verification failed.\");\n    return std::unexpected(EcError::kInvalidChecksum);\n  }\n\n```\n\n### 2. Add the unit test in `ec_comm_test.cc`\n\nOpen `util/egis/ec_comm_test.cc` and scroll to the bottom of the file. Insert the new test block right before the closing namespaces (`}  // namespace`):\n\n```cpp\nTEST_F(EcCommTest, UsbPaddingIsIgnored) {\n  const std::vector\u003cuint8_t\u003e mock_payload \u003d {0x01, 0x02, 0x03};\n  auto packet \u003d MakeMockResponse(0, mock_payload);\n\n  // Simulate USB bulk endpoint padding (e.g., to a 64-byte frame boundary)\n  constexpr size_t kUsbPaddedSize \u003d 64;\n  packet.resize(kUsbPaddedSize, 0xAA); \n  \n  fake_usb_.PushDeviceResponse(packet);\n\n  auto result \u003d\n      ec_.SendCommand(std::to_underlying(EcCommandId::kEcCmdGetVersion), 1);\n\n  ASSERT_TRUE(result.has_value());\n  EXPECT_EQ(result.value(), mock_payload);\n}\n\n```",
+      "parentUuid": "d0f9de23_c7edc97b",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 3
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d6aeedef_ec397c2c",
         "filename": "util/egis/ec_comm.h",
         "patchSetId": 33
