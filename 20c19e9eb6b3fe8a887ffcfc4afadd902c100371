@@ -185,6 +185,29 @@
       },
       "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d024e3b_a25aa62d",
+        "filename": "util/focaltech/usb_device_test.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T20:33:29Z",
+      "side": 1,
+      "message": "Almost every single test in `usb_device_test.cc` repeats the exact same 3 lines to set up the mock and the device:\n\n```c\n  auto mock \u003d std::make_unique\u003cMockUsbTransport\u003e();\n  // setup mock...\n  UsbDevice device \u003d MakeDevice(std::move(mock));\n\n```\n\n**The Fix:** Use a Google Mock Test Fixture (`::testing::Test`) to automatically inject the mock and the device into every test, trimming significant boilerplate.\n\n**In `util/focaltech/usb_device_test.cc`:**\n\n```c\nclass UsbDeviceTest : public ::testing::Test {\n protected:\n  void SetUp() override {\n    auto m \u003d std::make_unique\u003cMockUsbTransport\u003e();\n    mock_ \u003d m.get(); // Keep a raw pointer for setting EXPECT_CALLs\n    device_ \u003d std::make_unique\u003cUsbDevice\u003e(std::move(m));\n  }\n\n  MockUsbTransport* mock_;\n  std::unique_ptr\u003cUsbDevice\u003e device_;\n};\n\n```\n\nYou can then simplify all tests by swapping `TEST` to `TEST_F`, allowing them to focus purely on the logic:\n\n```\n-TEST(UsbDeviceTest, SendForwardsToTransport) {\n-  auto mock \u003d std::make_unique\u003cMockUsbTransport\u003e();\n+TEST_F(UsbDeviceTest, SendForwardsToTransport) {\n   std::vector\u003cuint8_t\u003e test_data \u003d {0x01, 0x02, 0x03};\n   auto timeout \u003d 100ms;\n \n-  EXPECT_CALL(*mock, Send(ElementsAreArray(test_data), timeout))\n+  EXPECT_CALL(*mock_, Send(ElementsAreArray(test_data), timeout))\n       .WillOnce(Return(test_data.size()));\n \n-  UsbDevice device \u003d MakeDevice(std::move(mock));\n-  auto result \u003d device.Send(test_data, timeout);\n+  auto result \u003d device_-\u003eSend(test_data, timeout);\n   ASSERT_TRUE(result.has_value());\n   EXPECT_EQ(*result, test_data.size());\n }\n\n```",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 23
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
