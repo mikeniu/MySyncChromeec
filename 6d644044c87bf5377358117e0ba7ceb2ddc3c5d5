@@ -1,0 +1,372 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9ffba3d_f8b81049",
+        "filename": "util/egis/bootrom_protocol.h",
+        "patchSetId": 33
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:45:24Z",
+      "side": 1,
+      "message": "needs newline at end of file",
+      "range": {
+        "startLine": 194,
+        "startChar": 0,
+        "endLine": 194,
+        "endChar": 40
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d630752f_ed73e02a",
+        "filename": "util/egis/build.mk",
+        "patchSetId": 33
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:45:24Z",
+      "side": 1,
+      "message": "These should actually be `HOST_CXXFLAGS` like `_egis_test_bin`, not `HOST_CFLAGS`.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 55
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a7f48e4_2b4e2766",
+        "filename": "util/egis/build.mk",
+        "patchSetId": 33
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:45:24Z",
+      "side": 1,
+      "message": "Let\u0027s remove this comment since it\u0027s obvious from the context.",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 48
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2e64f52_2a4e7b86",
+        "filename": "util/egis/build.mk",
+        "patchSetId": 33
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:45:24Z",
+      "side": 1,
+      "message": "Let\u0027s remove this comment since it\u0027s obvious from the context.",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 49
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6863c72_de22ec7e",
+        "filename": "util/egis/build.mk",
+        "patchSetId": 33
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:45:24Z",
+      "side": 1,
+      "message": "Let\u0027s remove this comment since it\u0027s obvious from the context.",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 51
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4541afd0_4127bda8",
+        "filename": "util/egis/build.mk",
+        "patchSetId": 33
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:45:24Z",
+      "side": 1,
+      "message": "Let\u0027s remove this comment since it\u0027s obvious from the context.",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 59
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b849b159_62683222",
+        "filename": "util/egis/cli_options.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:45:24Z",
+      "side": 1,
+      "message": "These comments are unnecessary. Remove all comments about headers in all files.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 17
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e7c68c0_d07490dc",
+        "filename": "util/egis/cli_options.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:45:24Z",
+      "side": 1,
+      "message": "These comments are unnecessary. Remove all comments about headers in all files.",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 19
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e51740c_4bf80448",
+        "filename": "util/egis/cli_options.h",
+        "patchSetId": 33
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:45:24Z",
+      "side": 1,
+      "message": "These comments are unnecessary. Remove all comments about headers in all files.",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 19
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "470afff9_287872ea",
+        "filename": "util/egis/cli_options.h",
+        "patchSetId": 33
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:45:24Z",
+      "side": 1,
+      "message": "These comments are unnecessary. Remove all comments about headers in all files.",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 18
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44a9fee6_bebd9ca7",
+        "filename": "util/egis/crypto_util.h",
+        "patchSetId": 33
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:45:24Z",
+      "side": 1,
+      "message": "These comments are unnecessary. Remove all comments about headers in all files.",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 19
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6aeedef_ec397c2c",
+        "filename": "util/egis/ec_comm.h",
+        "patchSetId": 33
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:45:24Z",
+      "side": 1,
+      "message": "These comments are unnecessary. Remove all comments about headers in all files.",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 19
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0aea10d_0293db13",
+        "filename": "util/egis/ec_comm.h",
+        "patchSetId": 33
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:45:24Z",
+      "side": 1,
+      "message": "These comments are unnecessary. Remove all comments about headers in all files.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 18
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee468d36_fcb3f16e",
+        "filename": "util/egis/file_util.h",
+        "patchSetId": 33
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:45:24Z",
+      "side": 1,
+      "message": "These comments are unnecessary. Remove all comments about headers in all files.",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 19
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41bb3e44_db569556",
+        "filename": "util/egis/flasher_logic.h",
+        "patchSetId": 33
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:45:24Z",
+      "side": 1,
+      "message": "These comments are unnecessary. Remove all comments about headers in all files.",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 19
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e913b0f9_0e3a35fc",
+        "filename": "util/egis/flasher_logic.h",
+        "patchSetId": 33
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:45:24Z",
+      "side": 1,
+      "message": "These comments are unnecessary. Remove all comments about headers in all files.",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 18
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
