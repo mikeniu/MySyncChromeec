@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "edc65a39_e61da332",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 577,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-06-05T17:35:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "adfd68d9_a354e97c",
+      "revId": "c57c3bef50abd4e8ea205e59ca6c041d51e846c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1eb20030_43d320f0",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-04T18:08:03Z",
       "side": 1,
       "message": "Nit: You might as well have separate variables for each interrupt register. It\u0027s not necessary to save each value for later like you want to do with INT1, but it would make each of these bit checks incrementally clearer. The compiler should reuse registers the same as it was before, so I don\u0027t think this function is gaining any efficiency by reusing the single variable.",
+      "revId": "c57c3bef50abd4e8ea205e59ca6c041d51e846c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da191ca2_ffb31c5f",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 1348,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-06-05T17:35:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1eb20030_43d320f0",
       "revId": "c57c3bef50abd4e8ea205e59ca6c041d51e846c1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -52,6 +88,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d4ed009_fd1c68ee",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 1350,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-06-05T17:35:27Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b74f33d5_888fe9de",
+      "revId": "c57c3bef50abd4e8ea205e59ca6c041d51e846c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0284d793_9261b1b8",
@@ -69,6 +123,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4317a4ad_f5f50c75",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 1746,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-06-05T17:35:27Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "0284d793_9261b1b8",
+      "revId": "c57c3bef50abd4e8ea205e59ca6c041d51e846c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ba2f996c_0129c4b5",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-06-04T18:08:03Z",
       "side": 1,
       "message": "Nit: These don\u0027t appear to be used anywhere. You might want to delete them.",
+      "revId": "c57c3bef50abd4e8ea205e59ca6c041d51e846c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f9d2403_549c32a4",
+        "filename": "driver/charger/sm5803.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-06-05T17:35:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba2f996c_0129c4b5",
       "revId": "c57c3bef50abd4e8ea205e59ca6c041d51e846c1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
