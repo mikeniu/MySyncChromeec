@@ -1227,6 +1227,7 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		 * path to S0 to handle any reset conditions.
 		 */
 		power_reset_host_sleep_state();
+
 		return POWER_S5;
 
 	case POWER_S5:
@@ -1236,6 +1237,15 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		if (shutdown_from_on) {
 			CPRINTS("power off %d", shutdown_from_on);
 			return POWER_S5G3;
+		}
+
+		/*
+		 * Gate the transition to S3/S0 if we are in off-mode charging,
+		 * maintaining the logical S5 state to avoid running normal S0
+		 * indicators.
+		 */
+		if (chipset_is_offmode_charging_wake()) {
+			break;
 		}
 
 		return POWER_S5S3;
