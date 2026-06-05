@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d07b2d5c_f7c82775",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 394,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:10:56Z",
+      "side": 1,
+      "message": "**Missing Flash Boundary Checks** In `bootrom.cc`, functions like `ReadFlash`, `EraseFlash`, and `WriteFlash` compute the target address:\n\n```c\nuint32_t addr \u003d EgisBootrom::kFlashBaseAddr + offset;\n\n```\n\nThere are no safeguards ensuring that `offset + length` does not exceed `EgisBootrom::kFlashTotalSize`.\n\n* **Suggestion:** Add a bounds check in these methods before sending the command over USB to prevent commanding the bootrom to access invalid memory regions.",
+      "range": {
+        "startLine": 393,
+        "startChar": 0,
+        "endLine": 394,
+        "endChar": 48
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e9ffba3d_f8b81049",
         "filename": "util/egis/bootrom_protocol.h",
         "patchSetId": 33
@@ -19,6 +42,29 @@
         "startChar": 0,
         "endLine": 194,
         "endChar": 40
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "950f93d7_54bba96d",
+        "filename": "util/egis/bootrom_test.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:10:56Z",
+      "side": 1,
+      "message": "Let\u0027s use designated intializers:\n\n```\nEgisBootrom::FlashInfoResponse info{\n      .flash_size \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(2 * 1024 * 1024)),\n};\n```",
+      "range": {
+        "startLine": 91,
+        "startChar": 0,
+        "endLine": 92,
+        "endChar": 75
       },
       "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
