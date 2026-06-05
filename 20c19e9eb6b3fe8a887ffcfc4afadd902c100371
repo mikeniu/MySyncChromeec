@@ -116,6 +116,29 @@
       },
       "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40033af0_4316193b",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T20:21:30Z",
+      "side": 1,
+      "message": "You have two identical implementations of the SHA-256 hashing logic: `CalculateSha256` in `updater.cc` and `ComputeSha256` in `test_utils.h`.\n\n**The Fix:** Centralize this in `updater.h` so both production and test code use the exact same function.\n\n**In `util/focaltech/updater.h`**, add the include and declaration:\n\n```c\n#include \u003copenssl/sha.h\u003e\n\n// ... inside focaltech namespace ...\nstd::array\u003cuint8_t, SHA256_DIGEST_LENGTH\u003e ComputeSha256(\n    std::span\u003cconst uint8_t\u003e data);\n\n```\n\n*   **In `util/focaltech/updater.cc`**, expose the implementation and remove the old static one:\n    ```cpp\n    std::array\u003cuint8_t, SHA256_DIGEST_LENGTH\u003e ComputeSha256(\n        std::span\u003cconst uint8_t\u003e data) {\n      std::array\u003cuint8_t, SHA256_DIGEST_LENGTH\u003e hash{};\n      SHA256(data.data(), data.size(), hash.data());\n      return hash;\n    }\n    ```\n\n\n*(Don\u0027t forget to update the call inside `VerifyData` to use `ComputeSha256`!)*\n\n\n* **In `util/focaltech/test_utils.h`**, completely delete `ComputeSha256` and just `#include \"updater.h\"`.",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 1
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
