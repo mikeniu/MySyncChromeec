@@ -305,6 +305,30 @@
       },
       "revId": "faa7380ce795803100dfac3d67f19f4cfdb3cd39",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a626fb28_9f106dd0",
+        "filename": "zephyr/program/atria/atriarvp-rtk/src/rvp_usbc_runtime.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-05T19:38:21Z",
+      "side": 1,
+      "message": "I agree with Keith that this is preferable to the heavily permuted device tree/numerous separate test builds approach. To the extent that this does not actually use the init hook that will be used in production, we should already have tests that verify that init hooks work.",
+      "parentUuid": "7d557fd6_bb5d7170",
+      "range": {
+        "startLine": 222,
+        "startChar": 0,
+        "endLine": 222,
+        "endChar": 39
+      },
+      "revId": "faa7380ce795803100dfac3d67f19f4cfdb3cd39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

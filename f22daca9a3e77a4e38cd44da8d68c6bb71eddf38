@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "c17e880b_b18b61af",
+        "filename": "zephyr/test/atria/Kconfig",
+        "patchSetId": 16
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-05T19:38:21Z",
+      "side": 1,
+      "message": "Not relevant in patchset 18.",
+      "parentUuid": "804ee171_31a65c11",
+      "revId": "f22daca9a3e77a4e38cd44da8d68c6bb71eddf38",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "6483c6c7_dcde670f",
         "filename": "zephyr/test/atria/src/rvp_usbc_runtime_3port_test.c",
         "patchSetId": 16

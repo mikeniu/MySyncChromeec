@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09f6ffeb_52d6866c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-05T19:38:21Z",
+      "side": 1,
+      "message": "LGTM as far as what is actually running. It kind of looks to me like there are remaining config knobs not actually being used anymore in the current approach.",
+      "revId": "d69b79a471e65cbeb78fac156999e62b104b97fe",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6d586d6_7a477c5d",
+        "filename": "zephyr/program/atria/atriarvp-rtk/src/rvp_usbc_runtime.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-05T19:38:21Z",
+      "side": 1,
+      "message": "Line length",
+      "revId": "d69b79a471e65cbeb78fac156999e62b104b97fe",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f47b8693_c3e2c2a1",
+        "filename": "zephyr/test/atria/testcase.yaml",
+        "patchSetId": 18
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-05T19:38:21Z",
+      "side": 1,
+      "message": "This feels like an unnecessary mechanism. Would this work any differently if there were just another config controlling this?\n\nMore to the point, right now you only have a single test config that enables this. All of the variation in port setup is handled at runtime via error injection. Is this knob needed at all? What about the remaining config checks in the device tree? What about the port count checks in the test code?",
+      "revId": "d69b79a471e65cbeb78fac156999e62b104b97fe",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
