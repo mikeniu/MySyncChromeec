@@ -16,6 +16,24 @@
       "message": "Does `link_path.exists(follow_symlinks\u003dFalse)` correct the issue?",
       "revId": "ae20d978855357554b64d5d20066d4953f3d3a1b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "969053bf_a7649714",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-06-05T21:49:48Z",
+      "side": 1,
+      "message": "Yes, this is a newer alternative. But `link_path.exists(follow_symlinks\u003dFalse)` was introduced in Python 3.12 and our zmake environment specifies `python_requires\u003d\"\u003e\u003d3.6, \u003c4\"`, so it is not guaranteed.",
+      "parentUuid": "f8746e66_fc5de94b",
+      "revId": "ae20d978855357554b64d5d20066d4953f3d3a1b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
