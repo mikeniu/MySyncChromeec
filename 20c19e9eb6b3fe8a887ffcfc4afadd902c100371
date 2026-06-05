@@ -142,6 +142,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "836f40a6_d2f7453a",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T21:25:49Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn `ft_scsi.cc`, you define magic numbers for the USB Bulk-Only Transport (BOT) flags and status codes:\n\n```c\nconstexpr uint8_t kBotDirectionIn \u003d 0x80;\nconstexpr uint8_t kBotDirectionOut \u003d 0x00;\nconstexpr uint8_t kBotCommandPassed \u003d 0x00;\n\n```\n\nBecause `BulkCbWrap` and `BulkCsWrap` represent strict USB hardware structures, typing their fields explicitly enforces the protocol rules at compile time and makes the struct definitions self-documenting.\n\n**In `util/focaltech/ft_scsi.h`:**\n\n```\n--- a/util/focaltech/ft_scsi.h\n+++ b/util/focaltech/ft_scsi.h\n@@ -32,23 +32,35 @@\n   kFlashWpGet \u003d 0xF8,\n };\n \n+enum class CbwDirection : uint8_t {\n+  kOut \u003d 0x00,\n+  kIn \u003d 0x80,\n+};\n+\n struct BulkCbWrap {\n   uint32_t signature;\n   uint32_t tag;\n   uint32_t data_transfer_length;\n-  uint8_t flags;\n+  CbwDirection flags; // Spec calls this bmCBWFlags\n   uint8_t lun;\n   uint8_t cmd_len;\n   uint8_t cmd[kScsiCmdSize];\n } __attribute__((packed));\n \n+enum class CswStatus : uint8_t {\n+  kCommandPassed \u003d 0x00,\n+  kCommandFailed \u003d 0x01,\n+  kPhaseError \u003d 0x02,\n+};\n+\n struct BulkCsWrap {\n   uint32_t signature;\n   uint32_t tag;\n   uint32_t data_residue;\n-  uint8_t status;\n+  CswStatus status;\n } __attribute__((packed));\n\n```\n\n**In `util/focaltech/ft_scsi.cc`:** Remove the `kBot*` constants and use the enums directly.\n\n```\n--- a/util/focaltech/ft_scsi.cc\n+++ b/util/focaltech/ft_scsi.cc\n@@ -21,10 +21,6 @@\n constexpr uint32_t kUsbMsCbwSignature \u003d 0x43425355;\n constexpr uint32_t kUsbMsCswSignature \u003d 0x53425355;\n-constexpr uint8_t kBotDirectionIn \u003d 0x80;\n-constexpr uint8_t kBotDirectionOut \u003d 0x00;\n-constexpr uint8_t kBotCommandPassed \u003d 0x00;\n \n@@ -37,8 +33,8 @@\n       .tag \u003d ToLittleEndian(device.GetNextCdbTag()),\n       .data_transfer_length \u003d\n           ToLittleEndian(static_cast\u003cuint32_t\u003e(data_length)),\n-      .flags \u003d\n-          (dir \u003d\u003d TransferDirection::kIn) ? kBotDirectionIn : kBotDirectionOut,\n+      .flags \u003d (dir \u003d\u003d TransferDirection::kIn) ? CbwDirection::kIn \n+                                               : CbwDirection::kOut,\n       .lun \u003d kDefaultLun,\n@@ -74,8 +70,8 @@\n     return std::unexpected(Error::kResultFail);\n   }\n \n-  if (csw.status !\u003d kBotCommandPassed) {\n-    FT_LOGW(\"Command failed with CSW status: {:02x}\", csw.status);\n+  if (csw.status !\u003d CswStatus::kCommandPassed) {\n+    FT_LOGW(\"Command failed with CSW status: {:02x}\", std::to_underlying(csw.status));\n     return std::unexpected(Error::kResultFail);\n   }\n\n```",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 43
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "64f1b84d_bc075dfd",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 21
