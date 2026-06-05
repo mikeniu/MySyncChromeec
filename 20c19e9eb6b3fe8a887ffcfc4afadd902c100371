@@ -69,6 +69,30 @@
       },
       "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8546139e_5e86dcae",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T20:13:27Z",
+      "side": 1,
+      "message": "Gemini feedback on how to fix and add a test:\n\n----\n\n\n**1. Fix the bug in `util/focaltech/ft_scsi.cc**`\n\nUpdate the `ReceiveBulkDataIn` function to ensure it fails if the received byte count does not perfectly match the requested buffer size:\n\n```diff\n--- a/util/focaltech/ft_scsi.cc\n+++ b/util/focaltech/ft_scsi.cc\n@@ -131,9 +131,9 @@\n \n   if (!data_buffer.empty()) {\n     auto recv_res \u003d device.Recv(data_buffer, timeout_ms);\n-    if (!recv_res) {\n+    if (!recv_res || *recv_res !\u003d static_cast\u003cint\u003e(data_buffer.size())) {\n       FT_LOGE(\"Data IN transfer failed.\");\n-      return std::unexpected(recv_res.error());\n+      return std::unexpected(Error::kResultFail);\n     }\n   }\n\n```\n\n**2. Add the test and missing `Return` matcher in `util/focaltech/ft_scsi_test.cc**`\n\nFirst, add `using ::testing::Return;` to the anonymous namespace at the top of the file so we can use the simpler mock returns:\n\n```diff\n--- a/util/focaltech/ft_scsi_test.cc\n+++ b/util/focaltech/ft_scsi_test.cc\n@@ -25,6 +25,7 @@\n using ::testing::_;\n using ::testing::ElementsAre;\n using ::testing::Invoke;\n+using ::testing::Return;\n \n UsbDevice MakeDevice(std::unique_ptr\u003cUsbTransport\u003e transport) {\n\n```\n\nThen, add the new simplified test at the bottom of the file:\n\n```diff\n--- a/util/focaltech/ft_scsi_test.cc\n+++ b/util/focaltech/ft_scsi_test.cc\n@@ -232,4 +233,18 @@\n   EXPECT_EQ(result.error(), Error::kNoSuchDevice);\n }\n \n+TEST(FtScsiTest, ReceiveBulkDataIn_ShortReadFails) {\n+  auto mock \u003d std::make_unique\u003ctesting::MockUsbTransport\u003e();\n+  \n+  EXPECT_CALL(*mock, Send(_, _)).WillOnce(Return(testing::kUsbCbwSize));\n+  EXPECT_CALL(*mock, Recv(_, _)).WillOnce(Return(1));\n+\n+  UsbDevice dev \u003d MakeDevice(std::move(mock));\n+  std::array\u003cuint8_t, kScsiCmdSize\u003e scsi_cmd{};\n+  std::vector\u003cuint8_t\u003e out_buffer(2);\n+  \n+  auto result \u003d ReceiveBulkDataIn(dev, scsi_cmd, out_buffer, kScsiCmdTimeOut);\n+  EXPECT_FALSE(result.has_value());\n+  EXPECT_EQ(result.error(), Error::kResultFail);\n+}\n+\n }  // namespace focaltech\n\n```",
+      "parentUuid": "c3a8f1cd_d71bfb47",
+      "range": {
+        "startLine": 131,
+        "startChar": 0,
+        "endLine": 138,
+        "endChar": 0
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
