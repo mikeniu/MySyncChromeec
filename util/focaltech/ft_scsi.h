@@ -14,7 +14,9 @@
 
 #include "usb_device.h"
 
-constexpr size_t kFtScsiCmdSize = 16;
+namespace focaltech {
+
+constexpr size_t kScsiCmdSize = 16;
 
 struct BulkCbWrap {
   uint32_t signature;
@@ -23,8 +25,10 @@ struct BulkCbWrap {
   uint8_t flags;
   uint8_t lun;
   uint8_t cmd_len;
-  uint8_t cmd[kFtScsiCmdSize];
+  uint8_t cmd[kScsiCmdSize];
 } __attribute__((packed));
+
+static_assert(sizeof(BulkCbWrap) == 31, "USB CBW must be exactly 31 bytes");
 
 struct BulkCsWrap {
   uint32_t signature;
@@ -33,7 +37,9 @@ struct BulkCsWrap {
   uint8_t status;
 } __attribute__((packed));
 
-struct FtCmdFormat {
+static_assert(sizeof(BulkCsWrap) == 13, "USB CSW must be exactly 13 bytes");
+
+struct CmdFormat {
   uint8_t opcode;
   uint32_t address;
   uint32_t length;
@@ -43,29 +49,27 @@ struct FtCmdFormat {
   uint8_t reserved;
 } __attribute__((packed));
 
-static_assert(sizeof(BulkCsWrap) == 13, "USB CSW must be exactly 13 bytes");
-static_assert(sizeof(BulkCbWrap) == 31, "USB CBW must be exactly 31 bytes");
-
-static_assert(sizeof(FtCmdFormat) == 16,
-              "FtCmdFormat must be exactly 16 bytes");
+static_assert(sizeof(CmdFormat) == 16, "CmdFormat must be exactly 16 bytes");
 
 enum class TransferDirection { kIn, kOut, kSendOnly };
 
-std::array<uint8_t, kFtScsiCmdSize> BuildFtCmd(uint8_t opcode, uint8_t subcmd,
-                                               uint32_t address = 0,
-                                               uint32_t length = 0,
-                                               uint32_t aux_address = 0,
-                                               uint8_t flags = 0);
+std::array<uint8_t, kScsiCmdSize> BuildFtCmd(uint8_t opcode, uint8_t subcmd,
+                                             uint32_t address = 0,
+                                             uint32_t length = 0,
+                                             uint32_t aux_address = 0,
+                                             uint8_t flags = 0);
 
 // For sending data TO the device (Data buffer is const)
-std::expected<void, FtError> SendBulkDataOut(
+std::expected<void, Error> SendBulkDataOut(
     const UsbDevice& device, std::span<const uint8_t> scsi_cmd,
     std::span<const uint8_t> data_buffer, TransferDirection dir,
     std::chrono::milliseconds timeout_ms);
 
 // For receiving data FROM the device (Data buffer is mutable)
-std::expected<void, FtError> ReceiveBulkDataIn(
+std::expected<void, Error> ReceiveBulkDataIn(
     const UsbDevice& device, std::span<const uint8_t> scsi_cmd,
     std::span<uint8_t> data_buffer, std::chrono::milliseconds timeout_ms);
+
+}  // namespace focaltech
 
 #endif  // UTIL_FOCALTECH_FT_SCSI_H_

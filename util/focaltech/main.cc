@@ -17,33 +17,30 @@
 int main(int argc, char** argv) {
   std::vector<std::string_view> args(argv + 1, argv + argc);
   if (args.empty() || args[0] == "-h" || args[0] == "--help") {
-    std::println("{}", ft_help::kCmdHelpString);
+    std::println("{}", focaltech::kCmdHelpString);
     return EXIT_SUCCESS;
   }
 
-  // 1. Parse Inputs (Logic now lives in cli.cc)
-  auto config = ParseArguments(args);
+  auto config = focaltech::ParseArguments(args);
   if (!config) return EXIT_FAILURE;
 
-  // 2. Create Hardware Connection
   auto transport = focaltech::LibusbTransport::Create();
   if (!transport) {
     FT_LOGE("Failed to open USB device.");
     return EXIT_FAILURE;
   }
 
-  // 3. Inject hardware into domain object
-  UsbDevice usb_device(std::make_unique<focaltech::LibusbTransport>(
+  focaltech::UsbDevice usb_device(std::make_unique<focaltech::LibusbTransport>(
       std::move(transport.value())));
 
-  FtDeviceInfo info;
-  if (auto init_res = DeviceInit(usb_device.device_id(), info); !init_res) {
+  auto mode_res = focaltech::GetDeviceMode(usb_device.device_id());
+  if (!mode_res) {
     FT_LOGE("Cannot find Focal device");
     return EXIT_FAILURE;
   }
 
-  // 4. Execute
-  if (auto exec_res = ExecuteCommand(config.value(), usb_device, info);
+  if (auto exec_res =
+          focaltech::ExecuteCommand(config.value(), usb_device, *mode_res);
       !exec_res) {
     FT_LOGE("Command failed");
     return EXIT_FAILURE;

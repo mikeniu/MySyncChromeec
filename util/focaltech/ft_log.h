@@ -13,6 +13,8 @@
 #include <source_location>
 #include <string_view>
 
+namespace focaltech {
+
 enum class LogLevel {
   kVerbose,
   kDebug,
@@ -21,7 +23,7 @@ enum class LogLevel {
   kError,
 };
 
-namespace ft_log {
+namespace log {
 constexpr LogLevel kCurrentLogLevel = LogLevel::kDebug;
 inline constexpr std::string_view kLogTag = "focaltech";
 
@@ -35,12 +37,12 @@ inline bool UseColor() {
 #endif
 }
 
-}  // namespace ft_log
+}  // namespace log
 
 template <typename... Args>
 void FtLog(LogLevel level, const std::source_location& loc,
            std::format_string<Args...> fmt, Args&&... args) {
-  if (level < ft_log::kCurrentLogLevel) {
+  if (level < log::kCurrentLogLevel) {
     return;
   }
 
@@ -49,7 +51,7 @@ void FtLog(LogLevel level, const std::source_location& loc,
   std::string_view color;
   std::string_view reset;
 
-  bool enable_color = ft_log::UseColor();
+  bool enable_color = log::UseColor();
 
   switch (level) {
     case LogLevel::kVerbose:
@@ -83,7 +85,7 @@ void FtLog(LogLevel level, const std::source_location& loc,
   }
 
   std::print("{}[{:%m-%d %H:%M:%S}] {} [{}][{}:{}] ", color, now, level_str,
-             ft_log::kLogTag, file, loc.line());
+             log::kLogTag, file, loc.line());
   std::println(fmt, std::forward<Args>(args)...);
 
   if (!reset.empty()) {
@@ -91,19 +93,26 @@ void FtLog(LogLevel level, const std::source_location& loc,
   }
 }
 
+}  // namespace focaltech
+
 #ifndef FT_LOG_DIS
 
 // Convenience macros for standardizing call sites.
-#define FT_LOGE(fmt, ...) \
-  FtLog(LogLevel::kError, std::source_location::current(), fmt, ##__VA_ARGS__)
-#define FT_LOGW(fmt, ...) \
-  FtLog(LogLevel::kWarning, std::source_location::current(), fmt, ##__VA_ARGS__)
-#define FT_LOGI(fmt, ...) \
-  FtLog(LogLevel::kInfo, std::source_location::current(), fmt, ##__VA_ARGS__)
-#define FT_LOGD(fmt, ...) \
-  FtLog(LogLevel::kDebug, std::source_location::current(), fmt, ##__VA_ARGS__)
-#define FT_LOGV(fmt, ...) \
-  FtLog(LogLevel::kVerbose, std::source_location::current(), fmt, ##__VA_ARGS__)
+#define FT_LOGE(fmt, ...)                           \
+  ::focaltech::FtLog(::focaltech::LogLevel::kError, \
+                     std::source_location::current(), fmt, ##__VA_ARGS__)
+#define FT_LOGW(fmt, ...)                             \
+  ::focaltech::FtLog(::focaltech::LogLevel::kWarning, \
+                     std::source_location::current(), fmt, ##__VA_ARGS__)
+#define FT_LOGI(fmt, ...)                          \
+  ::focaltech::FtLog(::focaltech::LogLevel::kInfo, \
+                     std::source_location::current(), fmt, ##__VA_ARGS__)
+#define FT_LOGD(fmt, ...)                           \
+  ::focaltech::FtLog(::focaltech::LogLevel::kDebug, \
+                     std::source_location::current(), fmt, ##__VA_ARGS__)
+#define FT_LOGV(fmt, ...)                             \
+  ::focaltech::FtLog(::focaltech::LogLevel::kVerbose, \
+                     std::source_location::current(), fmt, ##__VA_ARGS__)
 
 #else  // FT_LOG_DIS
 

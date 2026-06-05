@@ -13,23 +13,28 @@
 
 #include "ft_util.h"
 
+namespace focaltech {
+
 struct UsbDeviceId {
   uint16_t vid = 0;
   uint16_t pid = 0;
+
+  bool operator==(const UsbDeviceId&) const = default;
 };
 
-// Pure virtual interface: defines WHAT a connection does, not HOW.
 class UsbTransport {
  public:
   virtual ~UsbTransport() = default;
 
   virtual UsbDeviceId device_id() const = 0;
-  virtual std::expected<int, FtError> Send(
-      std::span<const uint8_t> data, std::chrono::milliseconds timeout) = 0;
-  virtual std::expected<int, FtError> Recv(
-      std::span<uint8_t> data, std::chrono::milliseconds timeout) = 0;
-  virtual std::expected<void, FtError> WaitForReset(
+  virtual std::expected<int, Error> Send(std::span<const uint8_t> data,
+                                         std::chrono::milliseconds timeout) = 0;
+  virtual std::expected<int, Error> Recv(std::span<uint8_t> data,
+                                         std::chrono::milliseconds timeout) = 0;
+  virtual std::expected<void, Error> WaitForReset(
       std::chrono::milliseconds timeout) = 0;
 };
+
+}  // namespace focaltech
 
 #endif  // UTIL_FOCALTECH_USB_TRANSPORT_H_

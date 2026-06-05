@@ -9,12 +9,12 @@
 
 #include <string_view>
 
-TEST(FtHelpTest, HelpStringNotEmpty) {
-  EXPECT_FALSE(ft_help::kCmdHelpString.empty());
-}
+namespace focaltech {
+
+TEST(FtHelpTest, HelpStringNotEmpty) { EXPECT_FALSE(kCmdHelpString.empty()); }
 
 TEST(FtHelpTest, HelpStringContainsExpectedCommands) {
-  std::string_view help = ft_help::kCmdHelpString;
+  std::string_view help = kCmdHelpString;
   EXPECT_TRUE(help.find("enter_bootloader") != std::string_view::npos);
   EXPECT_TRUE(help.find("enter_rom") != std::string_view::npos);
   EXPECT_TRUE(help.find("flash_get_protect") != std::string_view::npos);
@@ -24,13 +24,15 @@ TEST(FtHelpTest, HelpStringContainsExpectedCommands) {
 }
 
 TEST(FtHelpTest, HelpStringContainsHelpOption) {
-  std::string_view help = ft_help::kCmdHelpString;
+  std::string_view help = kCmdHelpString;
   EXPECT_TRUE(help.find("-h, --help") != std::string_view::npos);
   EXPECT_TRUE(help.find("Show this help message") != std::string_view::npos);
 }
 
 TEST(FtHelpTest, HelpStringContainsUsageLine) {
-  std::string_view help = ft_help::kCmdHelpString;
+  std::string_view help = kCmdHelpString;
   EXPECT_TRUE(help.find("Usage: {} <command> [arguments]") !=
               std::string_view::npos);
 }
+
+}  // namespace focaltech

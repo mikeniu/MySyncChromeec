@@ -9,7 +9,7 @@ focaltech_fingerprint_iap-objs := $(addprefix $(_cur_dir)/, \
 	libusb_transport.o \
 	ft_scsi.o \
 	updater.o \
-	cli.o 	\
+	cli.o \
 	main.o \
 )
 
@@ -18,8 +18,6 @@ $(_focaltech_bin): HOST_CXXFLAGS+=-fvisibility=hidden -DFT_LOG_COLOR_EN
 $(_focaltech_bin): HOST_CXXFLAGS+=$(shell $(HOST_PKG_CONFIG) --cflags libusb-1.0 boringssl)
 $(_focaltech_bin): HOST_LDFLAGS+=$(shell $(HOST_PKG_CONFIG) --libs  libusb-1.0 boringssl)
 
-
-#add focaltech test
 host-util-bin-cxx-y += focaltech_test
 focaltech_test-objs := $(addprefix $(_cur_dir)/, \
 	ft_util_test.o \
@@ -34,7 +32,6 @@ focaltech_test-objs := $(addprefix $(_cur_dir)/, \
 )
 
 _focaltech_test_bin := $(out)/util/focaltech_test
-# Configure flags to pull in gtest and gmock via pkg-config
 $(_focaltech_test_bin): HOST_CXXFLAGS+=-fvisibility=hidden -Iutil/focaltech -DFT_LOG_DIS
 $(_focaltech_test_bin): HOST_CXXFLAGS+=$(shell $(HOST_PKG_CONFIG) --cflags libusb-1.0 boringssl gtest gmock)
 $(_focaltech_test_bin): HOST_LDFLAGS+=$(shell $(HOST_PKG_CONFIG) --libs  libusb-1.0 boringssl gtest gmock gtest_main)

@@ -14,7 +14,9 @@
 #include "ft_util.h"
 #include "usb_transport.h"
 
-enum class FtDeviceMode {
+namespace focaltech {
+
+enum class DeviceMode {
   kUnknown,
   kRom,
   kBoot,
@@ -23,28 +25,21 @@ enum class FtDeviceMode {
   kForceUpdate,
 };
 
-struct FtDeviceInfo {
-  FtDeviceMode current_mode = FtDeviceMode::kUnknown;
-  FtDeviceMode next_mode = FtDeviceMode::kUnknown;
-  std::string_view ec_bin;
-};
-
 class UsbDevice {
  public:
-  // "Inject" the transport dependency here.
   explicit UsbDevice(std::unique_ptr<UsbTransport> transport)
       : transport_(std::move(transport)),
         cdb_tag_(std::make_unique<std::atomic<uint32_t>>(1)) {}
 
-  std::expected<int, FtError> Send(std::span<const uint8_t> data,
-                                   std::chrono::milliseconds timeout) const {
+  std::expected<int, Error> Send(std::span<const uint8_t> data,
+                                 std::chrono::milliseconds timeout) const {
     return transport_->Send(data, timeout);
   }
-  std::expected<int, FtError> Recv(std::span<uint8_t> data,
-                                   std::chrono::milliseconds timeout) const {
+  std::expected<int, Error> Recv(std::span<uint8_t> data,
+                                 std::chrono::milliseconds timeout) const {
     return transport_->Recv(data, timeout);
   }
-  std::expected<void, FtError> WaitForReset(
+  std::expected<void, Error> WaitForReset(
       std::chrono::milliseconds timeout) const {
     return transport_->WaitForReset(timeout);
   }
@@ -58,5 +53,7 @@ class UsbDevice {
   std::unique_ptr<UsbTransport> transport_;
   mutable std::unique_ptr<std::atomic<uint32_t>> cdb_tag_;
 };
+
+}  // namespace focaltech
 
 #endif  // UTIL_FOCALTECH_USB_DEVICE_H_

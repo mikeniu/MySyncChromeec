@@ -11,6 +11,8 @@
 #include "ft_util.h"
 #include "usb_device.h"
 
+namespace focaltech {
+
 namespace {
 
 constexpr uint32_t kUsbMsCbwSignature = 0x43425355;
@@ -24,10 +26,11 @@ constexpr uint8_t kDefaultLun = 0;
 using namespace std::chrono_literals;
 constexpr auto kResetWaitTimeout = 3000ms;
 
-std::expected<BulkCbWrap, FtError> SendCbw(
-    const UsbDevice& device, std::span<const uint8_t> scsi_cmd,
-    size_t data_length, TransferDirection dir,
-    std::chrono::milliseconds timeout_ms) {
+std::expected<BulkCbWrap, Error> SendCbw(const UsbDevice& device,
+                                         std::span<const uint8_t> scsi_cmd,
+                                         size_t data_length,
+                                         TransferDirection dir,
+                                         std::chrono::milliseconds timeout_ms) {
   BulkCbWrap cbw{
       .signature = ToLittleEndian(kUsbMsCbwSignature),
       .tag = ToLittleEndian(device.GetNextCdbTag()),
@@ -40,51 +43,48 @@ std::expected<BulkCbWrap, FtError> SendCbw(
   };
   std::memcpy(cbw.cmd, scsi_cmd.data(), scsi_cmd.size());
 
-  auto cbw_span = std::span<const uint8_t>(
-      reinterpret_cast<const uint8_t*>(&cbw), sizeof(cbw));
+  auto cbw_span = AsUint8Span(cbw);
   auto send_res = device.Send(cbw_span, timeout_ms);
 
   if (!send_res || *send_res != sizeof(cbw)) {
     FT_LOGE("CBW transfer failed.");
-    return std::unexpected(FtError::kResultFail);
+    return std::unexpected(Error::kResultFail);
   }
   return cbw;
 }
 
-std::expected<void, FtError> ReceiveAndValidateCsw(
+std::expected<void, Error> ReceiveAndValidateCsw(
     const UsbDevice& device, const BulkCbWrap& cbw,
     std::chrono::milliseconds timeout_ms) {
   BulkCsWrap csw{};
-  auto csw_span =
-      std::span<uint8_t>(reinterpret_cast<uint8_t*>(&csw), sizeof(csw));
+  auto csw_span = AsWritableUint8Span(csw);
   auto recv_res = device.Recv(csw_span, timeout_ms);
 
   if (!recv_res || *recv_res != sizeof(csw)) {
     FT_LOGE("CSW transfer failed.");
-    return std::unexpected(FtError::kResultFail);
+    return std::unexpected(Error::kResultFail);
   }
 
   if (ToLittleEndian(csw.signature) != kUsbMsCswSignature ||
       ToLittleEndian(csw.tag) != ToLittleEndian(cbw.tag)) {
     FT_LOGE("CSW signature/tag mismatch.");
-    return std::unexpected(FtError::kResultFail);
+    return std::unexpected(Error::kResultFail);
   }
 
   if (csw.status != kBotCommandPassed) {
     FT_LOGW("Command failed with CSW status: {:02x}", csw.status);
-    return std::unexpected(FtError::kResultFail);
+    return std::unexpected(Error::kResultFail);
   }
   return {};
 }
 
 }  // namespace
 
-std::array<uint8_t, kFtScsiCmdSize> BuildFtCmd(uint8_t opcode, uint8_t subcmd,
-                                               uint32_t address,
-                                               uint32_t length,
-                                               uint32_t aux_address,
-                                               uint8_t flags) {
-  FtCmdFormat cmd{
+std::array<uint8_t, kScsiCmdSize> BuildFtCmd(uint8_t opcode, uint8_t subcmd,
+                                             uint32_t address, uint32_t length,
+                                             uint32_t aux_address,
+                                             uint8_t flags) {
+  CmdFormat cmd{
       .opcode = opcode,
       .address = ToLittleEndian(address),
       .length = ToLittleEndian(length),
@@ -93,10 +93,10 @@ std::array<uint8_t, kFtScsiCmdSize> BuildFtCmd(uint8_t opcode, uint8_t subcmd,
       .flags = flags,
       .reserved = 0,
   };
-  return std::bit_cast<std::array<uint8_t, kFtScsiCmdSize>>(cmd);
+  return std::bit_cast<std::array<uint8_t, kScsiCmdSize>>(cmd);
 }
 
-std::expected<void, FtError> SendBulkDataOut(
+std::expected<void, Error> SendBulkDataOut(
     const UsbDevice& device, std::span<const uint8_t> scsi_cmd,
     std::span<const uint8_t> data_buffer, TransferDirection dir,
     std::chrono::milliseconds timeout_ms) {
@@ -105,7 +105,7 @@ std::expected<void, FtError> SendBulkDataOut(
 
   if (dir == TransferDirection::kSendOnly) {
     if (auto res = device.WaitForReset(kResetWaitTimeout); !res) {
-      return std::unexpected(FtError::kResultFail);
+      return std::unexpected(Error::kResultFail);
     }
     return {};
   }
@@ -114,14 +114,14 @@ std::expected<void, FtError> SendBulkDataOut(
     auto send_res = device.Send(data_buffer, timeout_ms);
     if (!send_res || *send_res != static_cast<int>(data_buffer.size())) {
       FT_LOGE("Data OUT transfer failed.");
-      return std::unexpected(FtError::kResultFail);
+      return std::unexpected(Error::kResultFail);
     }
   }
 
   return ReceiveAndValidateCsw(device, *cbw_res, timeout_ms);
 }
 
-std::expected<void, FtError> ReceiveBulkDataIn(
+std::expected<void, Error> ReceiveBulkDataIn(
     const UsbDevice& device, std::span<const uint8_t> scsi_cmd,
     std::span<uint8_t> data_buffer, std::chrono::milliseconds timeout_ms) {
   auto cbw_res = SendCbw(device, scsi_cmd, data_buffer.size(),
@@ -138,3 +138,5 @@ std::expected<void, FtError> ReceiveBulkDataIn(
 
   return ReceiveAndValidateCsw(device, *cbw_res, timeout_ms);
 }
+
+}  // namespace focaltech

@@ -23,17 +23,17 @@
 #include "libusb_transport.h"
 #include "usb_device.h"
 
+namespace focaltech {
+
 class UsbDevice;
 
 constexpr std::string_view kToolVersion = "v1.0.4";
 
-// Constants
 inline constexpr std::array<std::string_view, 4> kSupportedProjects = {
     "ft9001", "chojnik", "chudow", "chobienia"};
 inline constexpr int kMaxRetry = 5;
 constexpr uint8_t kEcBootloaderModeDefault = 0;
 
-// Command enum
 enum class Command {
   kUnknown,
   kEnterBoot,
@@ -44,40 +44,43 @@ enum class Command {
   kUpdate,
 };
 
-// App configuration struct
 struct AppConfig {
   Command cmd = Command::kUnknown;
   std::string_view ec_bin;
   int action_param = 0;
 };
 
-// Function declarations
-std::expected<AppConfig, FtError> ParseArguments(
+std::expected<AppConfig, Error> ParseArguments(
     std::span<const std::string_view> args);
 
-std::expected<void, FtError> DeviceInit(const UsbDeviceId& details,
-                                        FtDeviceInfo& info);
+std::expected<void, Error> ExecuteCommand(const AppConfig& config,
+                                          UsbDevice& usb_device,
+                                          DeviceMode current_mode);
 
-std::expected<void, FtError> ExecuteCommand(const AppConfig& config,
-                                            UsbDevice& usb_device,
-                                            FtDeviceInfo& info);
+std::expected<std::string, Error> GetBuildInfo(UsbDevice& device);
 
-// Core EC command functions
-std::expected<std::string, FtError> GetBuildInfo(UsbDevice& device);
+std::expected<void, Error> CheckEcBuildVersion(UsbDevice& usb,
+                                               DeviceMode current_mode);
 
-std::expected<void, FtError> CheckEcBuildVersion(UsbDevice& usb,
-                                                 FtDeviceMode current_mode);
-
-std::expected<void, FtError> SwitchToBootloader(
+std::expected<void, Error> SwitchToBootloader(
     UsbDevice& device, uint8_t mode = kEcBootloaderModeDefault);
 
-std::expected<void, FtError> SwitchToRom(UsbDevice& device);
+std::expected<void, Error> SwitchToRom(UsbDevice& device);
 
-// Mode switch helper with retry and device-loss detection
-std::expected<void, FtError> SwitchMcuMode(UsbDevice& usb,
-                                           FtDeviceMode current_mode,
-                                           Command target_cmd);
+std::expected<void, Error> SwitchMcuMode(UsbDevice& usb,
+                                         DeviceMode current_mode,
+                                         Command target_cmd);
 
-std::expected<int, FtError> ParseInt(std::string_view str);
+std::expected<int, Error> ParseInt(std::string_view str);
+
+std::expected<DeviceMode, Error> GetDeviceMode(const UsbDeviceId& id);
+
+namespace internal {
+std::expected<std::vector<uint8_t>, Error> SendEcCommandAndReadResponse(
+    UsbDevice& device, uint16_t command, uint8_t version,
+    std::span<const uint8_t> params = {});
+}  // namespace internal
+
+}  // namespace focaltech
 
 #endif  // UTIL_FOCALTECH_CLI_H_
