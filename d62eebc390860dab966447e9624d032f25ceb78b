@@ -20,6 +20,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f7f53152_27ea89a4",
+        "filename": "util/elan/cli.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:51:38Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\n### **Test-Specific Global State (`optind`) in Production Code**\n\n**Issue:**\nIn `util/elan/cli.cc`, `ParseCommandLine` resets `optind \u003d 1;` with the comment `// Reset getopt internal state in case it\u0027s called multiple times (e.g. tests)`.\n\nThere are two main issues with this approach:\n\n1. **Design Anti-pattern:** Production code shouldn\u0027t carry global state resets solely to accommodate the quirks of a unit testing framework.\n2. **glibc Quirk:** On GNU libc (which ChromeOS uses), setting `optind \u003d 1` resets the index but does *not* completely clear `getopt_long`\u0027s internal scanning state. A full reset actually requires setting `optind \u003d 0`.\n\nAdditionally, there\u0027s a related issue in the test fixture: `getopt_long` strictly expects POSIX `argv` semantics, meaning the array must be null-terminated (`argv[argc] \u003d\u003d nullptr`). The current `MakeArgv` helper in the tests misses this.\n\n**Recommendation:**\nKeep the test logic entirely within the test files.\n\n**1. In `util/elan/cli.cc`:**\nRemove the following lines:\n\n```cpp\n  // Reset getopt internal state in case it\u0027s called multiple times (e.g. tests)\n  optind \u003d 1;\n\n```\n\n**2. In `util/elan/cli_test.cc`:**\nManage the `optind` reset via the `SetUp()` override, and add the missing `nullptr` termination to your `MakeArgv` helper:\n\n```cpp\nclass CliTest : public ::testing::Test {\n protected:\n  void SetUp() override {\n    // Fully reset getopt_long internal state for glibc between test runs.\n    optind \u003d 0; \n  }\n\n  // Helper to safely convert string literals to mutable char* arrays\n  std::vector\u003cchar*\u003e MakeArgv(std::vector\u003cstd::string\u003e\u0026 args) {\n    std::vector\u003cchar*\u003e argv;\n    argv.reserve(args.size() + 1); // +1 to accommodate the null terminator\n    for (auto\u0026 arg : args) {\n      argv.push_back(arg.data());\n    }\n    // POSIX requirement: argv array must be null-terminated\n    argv.push_back(nullptr); \n    return argv;\n  }\n};\n\n```",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 13
+      },
+      "revId": "d62eebc390860dab966447e9624d032f25ceb78b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "42650d86_e3181626",
         "filename": "util/elan/elaniap_test.cc",
         "patchSetId": 27
@@ -65,6 +88,29 @@
       "writtenOn": "2026-06-05T18:41:44Z",
       "side": 1,
       "message": "[Gerrit AI Review] This file still contains the old `GetBinaryFileNotFound` and `GetBinarySuccess` tests. Please replace them with the `FileControlParamTest` parameterized tests that are currently orphaned in `elaniap_test.cc`.",
+      "revId": "d62eebc390860dab966447e9624d032f25ceb78b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c6585b7_353b2811",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:51:38Z",
+      "side": 1,
+      "message": "**Unnecessary `std::expected`:**\n`IapControl::SetProgressCallback` currently returns `std::expected\u003cvoid, IapError\u003e`, but the implementation simply assigns the callback and returns `{}`. It cannot fail. You also intentionally ignore its return value in `iap_tool.cc`.\n*   **Recommendation:** Change the return type of `SetProgressCallback` to `void`.",
+      "range": {
+        "startLine": 93,
+        "startChar": 0,
+        "endLine": 98,
+        "endChar": 1
+      },
       "revId": "d62eebc390860dab966447e9624d032f25ceb78b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
