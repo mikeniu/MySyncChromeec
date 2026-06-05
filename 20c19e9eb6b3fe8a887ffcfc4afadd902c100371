@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "253997b0_51c710b1",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T21:00:49Z",
+      "side": 1,
+      "message": "You applied `ToLittleEndian` to the SCSI structs, but overlooked the `ec_host_request` and `ec_host_response` headers in `cli.cc`. While this tool typically runs on Little-Endian hosts (x86\\_64/ARM), fixing this guarantees complete cross-architecture correctness and keeps your USB encoding rules 100% consistent across the codebase.\n\n**In `util/focaltech/cli.cc`:**\n\n```\n--- a/util/focaltech/cli.cc\n+++ b/util/focaltech/cli.cc\n@@ -28,10 +28,10 @@\n   ec_host_request req{\n       .struct_version \u003d EC_HOST_REQUEST_VERSION,\n       .checksum \u003d 0,\n-      .command \u003d command,\n+      .command \u003d ToLittleEndian(command),\n       .command_version \u003d version,\n       .reserved \u003d 0,\n-      .data_len \u003d static_cast\u003cuint16_t\u003e(params.size()),\n+      .data_len \u003d ToLittleEndian(static_cast\u003cuint16_t\u003e(params.size())),\n   };\n \n   std::vector\u003cuint8_t\u003e packet(sizeof(req) + params.size());\n\n```\n\nAnd ensuring we swap the response length back when reading it off the wire:\n\n```\n@@ -85,15 +85,17 @@\n \n   ec_host_response resp;\n   memcpy(\u0026resp, initial_buffer.data(), sizeof(resp));\n-  FT_LOGD(\"resp.data_len \u003d {}\", resp.data_len);\n+  \n+  uint16_t data_len \u003d FromLittleEndian(resp.data_len);\n+  FT_LOGD(\"resp.data_len \u003d {}\", data_len);\n \n   std::vector\u003cuint8_t\u003e response_data;\n   size_t header_size \u003d sizeof(ec_host_response);\n   size_t data_already_received \u003d received - header_size;\n   if (data_already_received \u003e 0) {\n     response_data.insert(response_data.end(),\n                          initial_buffer.begin() + header_size,\n                          initial_buffer.begin() + received);\n   }\n \n-  if (response_data.size() \u003c resp.data_len) {\n-    size_t remaining \u003d resp.data_len - response_data.size();\n+  if (response_data.size() \u003c data_len) {\n+    size_t remaining \u003d data_len - response_data.size();\n     std::vector\u003cuint8_t\u003e additional(remaining);\n@@ -111,8 +113,8 @@\n   }\n \n-  if (response_data.size() \u003e resp.data_len) {\n-    response_data.resize(resp.data_len);\n+  if (response_data.size() \u003e data_len) {\n+    response_data.resize(data_len);\n   }\n\n```",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 4
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f79c86dc_b564217e",
         "filename": "util/focaltech/cli.cc",
         "patchSetId": 21
