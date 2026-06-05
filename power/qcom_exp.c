@@ -1227,6 +1227,16 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		 * path to S0 to handle any reset conditions.
 		 */
 		power_reset_host_sleep_state();
+
+		/*
+		 * If booting for off-mode charging, manually notify the RESUME
+		 * hooks to enable host communication interfaces (e.g. SPI/I2C),
+		 * since the system will be gated in S5 and never reach S0.
+		 */
+		if (chipset_is_offmode_charging_wake()) {
+			hook_notify(HOOK_CHIPSET_RESUME);
+		}
+
 		return POWER_S5;
 
 	case POWER_S5:
@@ -1236,6 +1246,15 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		if (shutdown_from_on) {
 			CPRINTS("power off %d", shutdown_from_on);
 			return POWER_S5G3;
+		}
+
+		/*
+		 * Gate the transition to S3/S0 if we are in off-mode charging,
+		 * maintaining the logical S5 state to avoid running normal S0
+		 * indicators.
+		 */
+		if (chipset_is_offmode_charging_wake()) {
+			break;
 		}
 
 		return POWER_S5S3;
@@ -1336,6 +1355,15 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 
 	case POWER_S5G3:
 		cancel_power_button_timer();
+
+		/*
+		 * If shutdown from off-mode charging, manually notify the
+		 * SUSPEND hooks to disable host communication interfaces (e.g.
+		 * SPI/I2C), since the system will be gated in S5 and never
+		 * reach S0.
+		 */
+		if (chipset_is_offmode_charging_wake())
+			hook_notify(HOOK_CHIPSET_SUSPEND);
 
 		/* Call hooks before we drop power rails */
 		hook_notify(HOOK_CHIPSET_SHUTDOWN);
