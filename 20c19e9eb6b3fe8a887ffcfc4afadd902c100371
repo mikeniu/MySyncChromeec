@@ -513,6 +513,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c59a1768_398fdb96",
+        "filename": "util/focaltech/updater.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T21:29:06Z",
+      "side": 1,
+      "message": "Verify this feedback from Gemini is correct:\n\n----\n\n**No, the current test suite does not cover this, and your question just uncovered how severe this bug actually was.**\n\nBecause the test didn\u0027t verify the outgoing USB bytes, it hid the fact that this bug wasn\u0027t just a compiler warning—it was actively sending garbage data to the device!\n\n### The Hidden Impact of the Bug\n\nLook at the signature for `ReceiveActionIn`:\n\n```cpp\nstd::expected\u003cvoid, Error\u003e ReceiveActionIn(\n    const UsbDevice\u0026 device, uint8_t subcmd, uint32_t address,\n    std::span\u003cuint8_t\u003e data, std::chrono::milliseconds timeout,\n    uint32_t length \u003d 0, /* ... */)\n\n```\n\nWhen you called it in `SetFlashProtection`:\n\n```cpp\nReceiveActionIn(..., ~std::to_underlying(wp_area)); \n\n```\n\nYou were passing the bitwise NOT into the `length` parameter, which is a **32-bit unsigned integer (`uint32_t`)**.\n\n* **Without `uint8_t` on the enum:** `~4` evaluates as a signed 32-bit int (`0xFFFFFFFB`). It gets passed into `length` as `0xFFFFFFFB`.\n* **With `uint8_t` on the enum:** `~4` evaluates as an unsigned byte (`0xFB`). It gets passed into `length` and safely zero-extended to `0x000000FB`.\n\nBecause the test mock blindly returned success without inspecting the CBW payload, it completely missed that the host was sending `0xFFFFFFFB` over the wire!\n\n### The Fix: Update the Test to Inspect the Wire Bytes\n\nWe need to update `TEST(UpdaterTest, SetFlashProtection_Success)` in **`util/focaltech/updater_test.cc`** so that the mock actually cracks open the SCSI command and verifies the bitwise math.\n\nHere is the updated test. Notice how we replace the first `Send` mock to intercept and validate the `CmdFormat` struct:\n\n```diff\n--- a/util/focaltech/updater_test.cc\n+++ b/util/focaltech/updater_test.cc\n@@ -288,9 +288,25 @@\n   auto mock \u003d std::make_unique\u003ctesting::MockUsbTransport\u003e();\n \n   EXPECT_CALL(*mock, Send(_, _))\n-      .WillOnce(Invoke([](auto, auto) -\u003e std::expected\u003cint, Error\u003e {\n-        return testing::kUsbCbwSize;\n-      }))\n+      .WillOnce(Invoke([](std::span\u003cconst uint8_t\u003e data, auto) -\u003e std::expected\u003cint, Error\u003e {\n+        // 1. Crack open the USB packet being sent to the device\n+        EXPECT_EQ(data.size(), sizeof(BulkCbWrap));\n+        BulkCbWrap cbw;\n+        std::memcpy(\u0026cbw, data.data(), sizeof(cbw));\n+\n+        // 2. Extract the FocalTech SCSI command\n+        auto ft_cmd \u003d std::bit_cast\u003cCmdFormat\u003e(cbw.cmd);\n+        \n+        EXPECT_EQ(ft_cmd.opcode, Opcode::kAction);\n+        EXPECT_EQ(ft_cmd.subcmd, Subcmd::kFlashWpSet);\n+        \n+        // 3. VERIFY THE BITWISE MATH BUG IS FIXED\n+        // kRw is 4. ~4 as a uint8_t is 251 (0xFB). \n+        // We expect exactly 0x000000FB, NOT 0xFFFFFFFB.\n+        EXPECT_EQ(FromLittleEndian(ft_cmd.length), 0xFB);\n+\n+        return sizeof(BulkCbWrap);\n+      }))\n       .WillOnce(Invoke([](auto, auto) -\u003e std::expected\u003cint, Error\u003e {\n-        return testing::kUsbCbwSize;\n+        return sizeof(BulkCbWrap); // Second send is for GetFlashProtection\n       }));\n\n```\n\nIf you run this test *without* adding `: uint8_t` to the `FlashWpArea` enum, the test will correctly fail, proving the test now successfully guards against the underlying type bug. Brilliant catch!",
+      "parentUuid": "053eeba0_7703e69b",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 2
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f3b86e78_64cfbe56",
         "filename": "util/focaltech/usb_device.h",
         "patchSetId": 21
