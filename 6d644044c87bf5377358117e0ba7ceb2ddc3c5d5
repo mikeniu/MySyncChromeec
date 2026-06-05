@@ -303,6 +303,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ced46bd8_ab17b682",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:56:18Z",
+      "side": 1,
+      "message": "Once you make the above fix, you can simplify this:\n\n----\n\nBecause of our previous fix, `resp_buf` was resized to perfectly match the exact packet size. This means you no longer need the intermediate `resp_out` vector, the `data_length` offset math, or the duplicate bounds checking at the bottom of the function.\n\nYou can delete that entire final block (lines 104-118):\n\n```cpp\n  std::vector\u003cuint8_t\u003e resp_out;\n  if (data_length \u003e 0) {\n    size_t header_len \u003d sizeof(EcHostCommandResponse);\n    if (header_len + data_length \u003e resp_buf.size()) {\n      std::println(\n          stderr, \"[ERROR] EC response data truncated. Claimed: {}, Actual: {}\",\n          data_length, resp_buf.size() - header_len);\n      return std::unexpected(EcError::kResponseTooShort);\n    }\n    resp_out.assign(resp_buf.begin() + header_len,\n                    resp_buf.begin() + header_len + data_length);\n  }\n\n  return resp_out;\n\n```\n\nAnd replace it with a single, elegant return statement using iterator construction. Since `resp_buf` ends exactly where the payload ends, you can just return everything from the end of the header to `resp_buf.end()`:\n\n```cpp\n  return std::vector\u003cuint8_t\u003e(resp_buf.begin() + sizeof(EcHostCommandResponse), \n                              resp_buf.end());\n\n```\n\n### Why this is better:\n\n1. **Removes Dead Code:** Our earlier `rx_size \u003c exact_packet_size` check made the inner bounds check redundant.\n2. **Zero Offset Math:** Using `.end()` prevents any off-by-one errors that can happen when manually adding `data_length`.\n3. **No Empty State Checks:** If `data_length` is 0, `.begin() + sizeof(...)` equals `.end()`, and the constructor safely returns an empty vector without needing an `if (data_length \u003e 0)` check.",
+      "range": {
+        "startLine": 107,
+        "startChar": 1,
+        "endLine": 118,
+        "endChar": 3
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d6aeedef_ec397c2c",
         "filename": "util/egis/ec_comm.h",
         "patchSetId": 33
