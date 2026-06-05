@@ -15,13 +15,15 @@
 #include "mock_usb_transport.h"
 #include "usb_transport.h"
 
+namespace focaltech {
+
 namespace {
 
 using namespace std::chrono_literals;
-using ::focaltech::testing::MockUsbTransport;
 using ::testing::_;
 using ::testing::ElementsAreArray;
 using ::testing::Invoke;
+using testing::MockUsbTransport;
 using ::testing::Return;
 
 // Helper: create a UsbDevice with given mock
@@ -42,7 +44,6 @@ TEST(UsbDeviceTest, SendForwardsToTransport) {
   std::vector<uint8_t> test_data = {0x01, 0x02, 0x03};
   auto timeout = 100ms;
 
-  // Use ElementsAreArray to match the exact data content.
   EXPECT_CALL(*mock, Send(ElementsAreArray(test_data), timeout))
       .WillOnce(Return(test_data.size()));
 
@@ -57,13 +58,13 @@ TEST(UsbDeviceTest, SendHandlesError) {
   auto timeout = 100ms;
 
   EXPECT_CALL(*mock, Send(_, timeout))
-      .WillOnce(Return(std::unexpected(FtError::kNoSuchDevice)));
+      .WillOnce(Return(std::unexpected(Error::kNoSuchDevice)));
 
   UsbDevice device = MakeDevice(std::move(mock));
   std::vector<uint8_t> test_data = {0x01};
   auto result = device.Send(test_data, timeout);
   EXPECT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(), FtError::kNoSuchDevice);
+  EXPECT_EQ(result.error(), Error::kNoSuchDevice);
 }
 
 TEST(UsbDeviceTest, RecvForwardsToTransport) {
@@ -74,7 +75,7 @@ TEST(UsbDeviceTest, RecvForwardsToTransport) {
   EXPECT_CALL(*mock, Recv(_, timeout))
       .WillOnce(Invoke([&](std::span<uint8_t> data, auto) {
         std::fill(data.begin(), data.begin() + 5, 0xAB);
-        return std::expected<int, FtError>(5);
+        return std::expected<int, Error>(5);
       }));
 
   UsbDevice device = MakeDevice(std::move(mock));
@@ -88,13 +89,13 @@ TEST(UsbDeviceTest, RecvHandlesError) {
   auto timeout = 200ms;
 
   EXPECT_CALL(*mock, Recv(_, timeout))
-      .WillOnce(Return(std::unexpected(FtError::kResultFail)));
+      .WillOnce(Return(std::unexpected(Error::kResultFail)));
 
   UsbDevice device = MakeDevice(std::move(mock));
   std::vector<uint8_t> buffer(kArbitraryBufferSize);
   auto result = device.Recv(buffer, timeout);
   EXPECT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(), FtError::kResultFail);
+  EXPECT_EQ(result.error(), Error::kResultFail);
 }
 
 TEST(UsbDeviceTest, WaitForResetForwardsToTransport) {
@@ -102,7 +103,7 @@ TEST(UsbDeviceTest, WaitForResetForwardsToTransport) {
   auto timeout = 500ms;
 
   EXPECT_CALL(*mock, WaitForReset(timeout))
-      .WillOnce(Return(std::expected<void, FtError>()));
+      .WillOnce(Return(std::expected<void, Error>()));
 
   UsbDevice device = MakeDevice(std::move(mock));
   auto result = device.WaitForReset(timeout);
@@ -114,12 +115,12 @@ TEST(UsbDeviceTest, WaitForResetHandlesError) {
   auto timeout = 500ms;
 
   EXPECT_CALL(*mock, WaitForReset(timeout))
-      .WillOnce(Return(std::unexpected(FtError::kNoSuchDevice)));
+      .WillOnce(Return(std::unexpected(Error::kNoSuchDevice)));
 
   UsbDevice device = MakeDevice(std::move(mock));
   auto result = device.WaitForReset(timeout);
   EXPECT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(), FtError::kNoSuchDevice);
+  EXPECT_EQ(result.error(), Error::kNoSuchDevice);
 }
 
 TEST(UsbDeviceTest, DeviceIdReturnsFromTransport) {
@@ -194,3 +195,5 @@ TEST(UsbDeviceTest, MoveAssignmentTransfersOwnership) {
       .WillOnce(Return(UsbDeviceId{.vid = 0x1111, .pid = 0x2222}));
   EXPECT_EQ(device2.device_id().vid, 0x1111);
 }
+
+}  // namespace focaltech

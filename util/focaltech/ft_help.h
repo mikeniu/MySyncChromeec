@@ -8,7 +8,7 @@
 
 #include <string_view>
 
-namespace ft_help {
+namespace focaltech {
 inline constexpr std::string_view kCmdHelpString = R"(
 Usage: {} <command> [arguments]
 
@@ -33,6 +33,6 @@ Commands:
 Options:
   -h, --help             Show this help message and exit.
 )";
-}
+}  // namespace focaltech
 
 #endif  // UTIL_FOCALTECH_FT_HELP_H_

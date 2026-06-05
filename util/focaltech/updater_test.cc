@@ -7,8 +7,10 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <openssl/sha.h>
 
 #include <array>
+#include <bit>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
@@ -16,22 +18,16 @@
 #include <span>
 #include <vector>
 
-// Third-party libraries come AFTER standard C++ libraries
-#include <openssl/sha.h>
-
 #include "ft_scsi.h"
 #include "mock_usb_transport.h"
 #include "test_utils.h"
 #include "usb_device.h"
 
+namespace focaltech {
+
 namespace {
 
 using namespace std::chrono_literals;
-using ::focaltech::testing::BuildValidCsw;
-using ::focaltech::testing::ComputeSha256;
-using ::focaltech::testing::kUsbCbwSize;
-using ::focaltech::testing::kUsbCswSize;
-using ::focaltech::testing::MockUsbTransport;
 using ::testing::_;
 using ::testing::Invoke;
 using ::testing::Return;
@@ -70,22 +66,23 @@ class StubUsbTransport : public UsbTransport {
     return data_payload_sizes_;
   }
 
-  std::expected<int, FtError> Send(std::span<const uint8_t> data,
-                                   std::chrono::milliseconds) override {
-    if (data.size() == kUsbCbwSize) {
+  std::expected<int, Error> Send(std::span<const uint8_t> data,
+                                 std::chrono::milliseconds) override {
+    if (data.size() == testing::kUsbCbwSize) {
       std::memcpy(&current_tag_, &data[4], sizeof(current_tag_));
     } else {
       data_payload_sizes_.push_back(data.size());
     }
 
-    // Use structured packet inspection instead of magic indices.
     if (data.size() == sizeof(BulkCbWrap)) {
-      const auto* cbw = reinterpret_cast<const BulkCbWrap*>(data.data());
-      // Ensure the CBW contains an FocalTech command (opcode 0xDC).
-      if (cbw->cmd[0] == kFtCmdAction) {
-        const auto* ft_cmd = reinterpret_cast<const FtCmdFormat*>(cbw->cmd);
-        if (ft_cmd->subcmd == kFtSubcmdErasePage) {
-          erased_addresses_.push_back(ToLittleEndian(ft_cmd->address));
+      BulkCbWrap cbw;
+      std::memcpy(&cbw, data.data(), sizeof(cbw));
+
+      if (cbw.cmd[0] == kCmdAction) {
+        auto ft_cmd = std::bit_cast<CmdFormat>(cbw.cmd);
+
+        if (ft_cmd.subcmd == kSubcmdErasePage) {
+          erased_addresses_.push_back(ToLittleEndian(ft_cmd.address));
         }
       }
     }
@@ -93,16 +90,16 @@ class StubUsbTransport : public UsbTransport {
     return static_cast<int>(data.size());
   }
 
-  std::expected<int, FtError> Recv(std::span<uint8_t> data,
-                                   std::chrono::milliseconds) override {
-    if (data.size() == kUsbCswSize) {
-      BuildValidCsw(data, current_tag_);
-      return kUsbCswSize;
+  std::expected<int, Error> Recv(std::span<uint8_t> data,
+                                 std::chrono::milliseconds) override {
+    if (data.size() == testing::kUsbCswSize) {
+      testing::BuildValidCsw(data, current_tag_);
+      return testing::kUsbCswSize;
     }
 
-    if (data.size() == kFtBootVersionMax) {
+    if (data.size() == kBootVersionMax) {
       std::ranges::copy(std::string("boot_v1.0"), data.begin());
-      return kFtBootVersionMax;
+      return kBootVersionMax;
     }
 
     if (data.size() == SHA256_DIGEST_LENGTH) {
@@ -117,8 +114,7 @@ class StubUsbTransport : public UsbTransport {
     return static_cast<int>(data.size());
   }
 
-  std::expected<void, FtError> WaitForReset(
-      std::chrono::milliseconds) override {
+  std::expected<void, Error> WaitForReset(std::chrono::milliseconds) override {
     return {};
   }
 
@@ -133,12 +129,12 @@ class StubUsbTransport : public UsbTransport {
 }  // namespace
 
 TEST(UpdaterTest, UpdateFw_SuccessBootloaderMode) {
-  FtConfigPage config{.code_valid_control_word = kCodeValidMagic,
-                      .code_start_address = kFocalBootRunAddr};
+  ConfigPage config{.code_valid_control_word = kCodeValidMagic,
+                    .code_start_address = kBootRunAddr};
 
-  std::vector<uint8_t> fw_data(sizeof(FtConfigPage) + kFocalConfigSize, 0xBB);
+  std::vector<uint8_t> fw_data(sizeof(ConfigPage) + kFocalConfigSize, 0xBB);
   std::memcpy(fw_data.data(), &config, sizeof(config));
-  auto expected_hash = ComputeSha256(fw_data);
+  auto expected_hash = testing::ComputeSha256(fw_data);
   ScopedTempFile fw_file(fw_data);
   std::string fw_path = fw_file.path();
 
@@ -146,72 +142,65 @@ TEST(UpdaterTest, UpdateFw_SuccessBootloaderMode) {
   transport->SetExpectedHash(expected_hash);
   UsbDevice device(std::move(transport));
 
-  FtDeviceInfo info{.current_mode = FtDeviceMode::kBoot, .ec_bin = fw_path};
-
-  auto res = UpdateFw(device, info);
+  auto res = UpdateFw(device, fw_path, DeviceMode::kBoot);
   EXPECT_TRUE(res.has_value());
 }
 
 TEST(UpdaterTest, UpdateFw_FailsOnMissingConfigPage) {
-  std::vector<uint8_t> fw_data(sizeof(FtConfigPage) + kFocalConfigSize, 0xFF);
+  std::vector<uint8_t> fw_data(sizeof(ConfigPage) + kFocalConfigSize, 0xFF);
   ScopedTempFile fw_file(fw_data);
   std::string fw_path = fw_file.path();
 
   auto transport = std::make_unique<StubUsbTransport>();
   UsbDevice device(std::move(transport));
-  FtDeviceInfo info{.current_mode = FtDeviceMode::kBoot, .ec_bin = fw_path};
 
-  auto res = UpdateFw(device, info);
+  auto res = UpdateFw(device, fw_path, DeviceMode::kBoot);
   EXPECT_FALSE(res.has_value());
-  EXPECT_EQ(res.error(), FtError::kParameterError);
+  EXPECT_EQ(res.error(), Error::kParameterError);
 }
 
 TEST(UpdaterTest, UpdateFw_PadsPartialPayloadsToWordBoundary) {
   std::vector<uint8_t> fw_data(kFocalConfigSize + 13, 0xAA);
 
-  FtConfigPage config{.code_valid_control_word = kCodeValidMagic,
-                      .code_start_address = kFocalBootRunAddr};
+  ConfigPage config{.code_valid_control_word = kCodeValidMagic,
+                    .code_start_address = kBootRunAddr};
   std::memcpy(fw_data.data(), &config, sizeof(config));
 
   ScopedTempFile fw_file(fw_data);
   std::string fw_path = fw_file.path();
 
   auto transport = std::make_unique<StubUsbTransport>();
-  transport->SetExpectedHash(ComputeSha256(fw_data));
+  transport->SetExpectedHash(testing::ComputeSha256(fw_data));
   auto* raw_transport = transport.get();
 
   UsbDevice device(std::move(transport));
-  FtDeviceInfo info{.current_mode = FtDeviceMode::kBoot, .ec_bin = fw_path};
 
-  auto res = UpdateFw(device, info);
+  auto res = UpdateFw(device, fw_path, DeviceMode::kBoot);
   EXPECT_TRUE(res.has_value());
 
   const auto& payload_sizes = raw_transport->GetDataPayloadSizes();
-  EXPECT_TRUE(std::ranges::contains(payload_sizes, 16))
-      << "Expected a 16-byte padded transmission for the 13-byte remainder.";
+  EXPECT_TRUE(std::ranges::contains(payload_sizes, kFocalConfigSize))
+      << "Expected a 4096-byte padded transmission for the 13-byte remainder.";
 }
 
 TEST(UpdaterTest, UpdateFw_FailsOnFileTooSmall) {
-  std::vector<uint8_t> undersized_data(sizeof(FtConfigPage) - 1, 0xFF);
+  std::vector<uint8_t> undersized_data(sizeof(ConfigPage) - 1, 0xFF);
   ScopedTempFile fw_file(undersized_data);
   std::string fw_path = fw_file.path();
 
   auto transport = std::make_unique<StubUsbTransport>();
   UsbDevice device(std::move(transport));
 
-  FtDeviceInfo info{.current_mode = FtDeviceMode::kBoot, .ec_bin = fw_path};
-
-  auto res = UpdateFw(device, info);
-
+  auto res = UpdateFw(device, fw_path, DeviceMode::kBoot);
   EXPECT_FALSE(res.has_value());
-  EXPECT_EQ(res.error(), FtError::kParameterError);
+  EXPECT_EQ(res.error(), Error::kResultFail);
 }
 
 TEST(UpdaterTest, UpdateFw_FailsOnModeMismatch) {
-  FtConfigPage config{.code_valid_control_word = kCodeValidMagic,
-                      .code_start_address = kFocalRomRunAddr};
+  ConfigPage config{.code_valid_control_word = kCodeValidMagic,
+                    .code_start_address = kRomRunAddr};
 
-  std::vector<uint8_t> fw_data(sizeof(FtConfigPage) + kFocalConfigSize, 0xFF);
+  std::vector<uint8_t> fw_data(sizeof(ConfigPage) + kFocalConfigSize, 0xFF);
   std::memcpy(fw_data.data(), &config, sizeof(config));
   ScopedTempFile fw_file(fw_data);
   std::string fw_path = fw_file.path();
@@ -219,18 +208,16 @@ TEST(UpdaterTest, UpdateFw_FailsOnModeMismatch) {
   auto transport = std::make_unique<StubUsbTransport>();
   UsbDevice device(std::move(transport));
 
-  FtDeviceInfo info{.current_mode = FtDeviceMode::kBoot, .ec_bin = fw_path};
-
-  auto res = UpdateFw(device, info);
+  auto res = UpdateFw(device, fw_path, DeviceMode::kBoot);
   EXPECT_FALSE(res.has_value());
-  EXPECT_EQ(res.error(), FtError::kParameterError);
+  EXPECT_EQ(res.error(), Error::kParameterError);
 }
 
 TEST(UpdaterTest, UpdateFw_VerifyFails_AbortsAndErasesConfig) {
-  FtConfigPage config{.code_valid_control_word = kCodeValidMagic,
-                      .code_start_address = kFocalBootRunAddr};
+  ConfigPage config{.code_valid_control_word = kCodeValidMagic,
+                    .code_start_address = kBootRunAddr};
 
-  std::vector<uint8_t> fw_data(sizeof(FtConfigPage) + kFocalConfigSize, 0x00);
+  std::vector<uint8_t> fw_data(sizeof(ConfigPage) + kFocalConfigSize, 0x00);
   std::memcpy(fw_data.data(), &config, sizeof(config));
   ScopedTempFile fw_file(fw_data);
   std::string fw_path = fw_file.path();
@@ -240,117 +227,117 @@ TEST(UpdaterTest, UpdateFw_VerifyFails_AbortsAndErasesConfig) {
 
   auto* raw_transport = transport.get();
   UsbDevice device(std::move(transport));
-  FtDeviceInfo info{.current_mode = FtDeviceMode::kBoot, .ec_bin = fw_path};
 
-  auto res = UpdateFw(device, info);
-
+  auto res = UpdateFw(device, fw_path, DeviceMode::kBoot);
   EXPECT_FALSE(res.has_value());
-  EXPECT_EQ(res.error(), FtError::kResultFail);
+  EXPECT_EQ(res.error(), Error::kResultFail);
 
   const auto& erased = raw_transport->GetErasedAddresses();
-  EXPECT_TRUE(std::ranges::contains(erased, kFocalBootCfgAddr))
+  EXPECT_TRUE(std::ranges::contains(erased, kBootCfgAddr))
       << "Abort sequence failed to erase the config page.";
 }
 
-TEST(UpdaterTest, FtGetFlashProtect_Success) {
-  auto mock = std::make_unique<MockUsbTransport>();
+TEST(UpdaterTest, GetFlashProtection_Success) {
+  auto mock = std::make_unique<testing::MockUsbTransport>();
 
   EXPECT_CALL(*mock, Send(_, _))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, FtError> {
-        return kUsbCbwSize;
+      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
+        return testing::kUsbCbwSize;
       }));
 
   EXPECT_CALL(*mock, Recv(_, _))
       .WillOnce(Invoke(
-          [](std::span<uint8_t> data, auto) -> std::expected<int, FtError> {
+          [](std::span<uint8_t> data, auto) -> std::expected<int, Error> {
             std::fill(data.begin(), data.end(), 0);
-            data[0] = static_cast<uint8_t>(FtFlashWpArea::kRo);
-            return kFtFlashWpBufferSize;
+            data[0] = static_cast<uint8_t>(FlashWpArea::kRo);
+            return kFlashWpBufferSize;
           }))
       .WillOnce(Invoke(
-          [](std::span<uint8_t> data, auto) -> std::expected<int, FtError> {
-            BuildValidCsw(data, 1);
-            return kUsbCswSize;
+          [](std::span<uint8_t> data, auto) -> std::expected<int, Error> {
+            testing::BuildValidCsw(data, 1);
+            return testing::kUsbCswSize;
           }));
 
   UsbDevice device(std::move(mock));
-  auto res = FtGetFlashProtect(device, FtDeviceMode::kBoot);
+  auto res = GetFlashProtection(device, DeviceMode::kBoot);
 
   ASSERT_TRUE(res.has_value());
-  EXPECT_EQ(*res, FtFlashWpArea::kRo);
+  EXPECT_EQ(*res, FlashWpArea::kRo);
 }
 
-TEST(UpdaterTest, FtGetFlashProtect_FailsNotInBootMode) {
-  auto mock = std::make_unique<MockUsbTransport>();
+TEST(UpdaterTest, GetFlashProtection_FailsNotInBootMode) {
+  auto mock = std::make_unique<testing::MockUsbTransport>();
   UsbDevice device(std::move(mock));
 
-  auto res = FtGetFlashProtect(device, FtDeviceMode::kRom);
+  auto res = GetFlashProtection(device, DeviceMode::kRom);
   EXPECT_FALSE(res.has_value());
-  EXPECT_EQ(res.error(), FtError::kInvalidMode);
+  EXPECT_EQ(res.error(), Error::kInvalidMode);
 }
 
-TEST(UpdaterTest, FtSetFlashProtect_Success) {
-  auto mock = std::make_unique<MockUsbTransport>();
+TEST(UpdaterTest, SetFlashProtection_Success) {
+  auto mock = std::make_unique<testing::MockUsbTransport>();
 
   EXPECT_CALL(*mock, Send(_, _))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, FtError> {
-        return kUsbCbwSize;
+      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
+        return testing::kUsbCbwSize;
       }))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, FtError> {
-        return kUsbCbwSize;
+      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
+        return testing::kUsbCbwSize;
       }));
 
   EXPECT_CALL(*mock, Recv(_, _))
       .WillOnce(Invoke(
-          [](std::span<uint8_t> data, auto) -> std::expected<int, FtError> {
-            return kFtFlashWpBufferSize;
+          [](std::span<uint8_t> data, auto) -> std::expected<int, Error> {
+            return kFlashWpBufferSize;
           }))
       .WillOnce(Invoke(
-          [](std::span<uint8_t> data, auto) -> std::expected<int, FtError> {
-            BuildValidCsw(data, 1);
-            return kUsbCswSize;
+          [](std::span<uint8_t> data, auto) -> std::expected<int, Error> {
+            testing::BuildValidCsw(data, 1);
+            return testing::kUsbCswSize;
           }))
       .WillOnce(Invoke(
-          [](std::span<uint8_t> data, auto) -> std::expected<int, FtError> {
+          [](std::span<uint8_t> data, auto) -> std::expected<int, Error> {
             std::fill(data.begin(), data.end(), 0);
-            data[0] = static_cast<uint8_t>(FtFlashWpArea::kRw);
-            return kFtFlashWpBufferSize;
+            data[0] = static_cast<uint8_t>(FlashWpArea::kRw);
+            return kFlashWpBufferSize;
           }))
       .WillOnce(Invoke(
-          [](std::span<uint8_t> data, auto) -> std::expected<int, FtError> {
-            BuildValidCsw(data, 2);
-            return kUsbCswSize;
+          [](std::span<uint8_t> data, auto) -> std::expected<int, Error> {
+            testing::BuildValidCsw(data, 2);
+            return testing::kUsbCswSize;
           }));
 
   UsbDevice device(std::move(mock));
-  auto res = FtSetFlashProtect(device, FtFlashWpArea::kRw, FtDeviceMode::kBoot);
+  auto res = SetFlashProtection(device, FlashWpArea::kRw, DeviceMode::kBoot);
 
   EXPECT_TRUE(res.has_value());
 }
 
-TEST(UpdaterTest, FtBackToRomBoot_Success) {
-  auto mock = std::make_unique<MockUsbTransport>();
+TEST(UpdaterTest, ReturnToRomBoot_Success) {
+  auto mock = std::make_unique<testing::MockUsbTransport>();
 
   EXPECT_CALL(*mock, Send(_, _))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, FtError> {
-        return kUsbCbwSize;
+      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
+        return testing::kUsbCbwSize;
       }))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, FtError> {
-        return kUsbCbwSize;
+      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
+        return testing::kUsbCbwSize;
       }));
 
   EXPECT_CALL(*mock, Recv(_, _))
       .WillOnce(Invoke(
-          [](std::span<uint8_t> data, auto) -> std::expected<int, FtError> {
-            BuildValidCsw(data, 1);
-            return kUsbCswSize;
+          [](std::span<uint8_t> data, auto) -> std::expected<int, Error> {
+            testing::BuildValidCsw(data, 1);
+            return testing::kUsbCswSize;
           }));
 
   EXPECT_CALL(*mock, WaitForReset(_))
-      .WillOnce(Return(std::expected<void, FtError>()));
+      .WillOnce(Return(std::expected<void, Error>()));
 
   UsbDevice device(std::move(mock));
-  auto res = FtBackToRomBoot(device, FtDeviceMode::kBoot);
+  auto res = ReturnToRomBoot(device, DeviceMode::kBoot);
 
   EXPECT_TRUE(res.has_value());
 }
+
+}  // namespace focaltech
