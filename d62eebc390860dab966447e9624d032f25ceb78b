@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8907957e_38996da8",
+        "filename": "util/elan/build.mk",
+        "patchSetId": 27
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:41:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] As requested in a previous review, please rename the binaries back to `elaniap` and `elaniap_test`.",
+      "revId": "d62eebc390860dab966447e9624d032f25ceb78b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42650d86_e3181626",
+        "filename": "util/elan/elaniap_test.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:41:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] It looks like the parameterized tests (`FileControlParamTest`) were placed here instead of `file_control_test.cc`.\n\nCurrently, `elaniap_test.cc` is completely unreferenced in `build.mk` (it is missing from the test runner objects list), which means these parameterized tests are orphaned and never compiled or run.\n\nPlease delete `elaniap_test.cc` entirely, and move the `FileControlParamTest` implementation over to `file_control_test.cc` (replacing the older tests there).",
+      "revId": "d62eebc390860dab966447e9624d032f25ceb78b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6324df7f_bc5169af",
+        "filename": "util/elan/file_control.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:41:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Minor: `\u003cformat\u003e` is included but not used in this file. You can safely remove it.",
+      "revId": "d62eebc390860dab966447e9624d032f25ceb78b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1344c47_a46c6fd7",
+        "filename": "util/elan/file_control_test.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:41:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This file still contains the old `GetBinaryFileNotFound` and `GetBinarySuccess` tests. Please replace them with the `FileControlParamTest` parameterized tests that are currently orphaned in `elaniap_test.cc`.",
+      "revId": "d62eebc390860dab966447e9624d032f25ceb78b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
