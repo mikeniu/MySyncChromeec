@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bc805ff_56617cf8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 31
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-05T05:05:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a261cdee_966d11c7",
+      "revId": "7948047d5d5cd56d835ddcec83c72efa480d8f23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e988f00d_8fa1bb41",
@@ -41,6 +59,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0864a0d_470df573",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-05T05:05:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e988f00d_8fa1bb41",
+      "range": {
+        "startLine": 299,
+        "startChar": 0,
+        "endLine": 299,
+        "endChar": 61
+      },
+      "revId": "7948047d5d5cd56d835ddcec83c72efa480d8f23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "08c51853_85aac763",
@@ -54,6 +96,30 @@
       "writtenOn": "2026-06-04T20:39:03Z",
       "side": 1,
       "message": "Let\u0027s pull these out into a separate header file. Instructions from Gemini:\n\n----\n\n### Step 1: Create `util/egis/bootrom_protocol.h`\n\nCreate a new file to serve as the strict, dependency-free definition of the hardware\u0027s wire format.\n\n**Create `util/egis/bootrom_protocol.h` and insert:**\n\n```cpp\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n#ifndef UTIL_EGIS_BOOTROM_PROTOCOL_H_\n#define UTIL_EGIS_BOOTROM_PROTOCOL_H_\n\n#include \u003carray\u003e\n#include \u003ccstddef\u003e\n#include \u003ccstdint\u003e\n\n#include \"crypto_util.h\"\n\nnamespace egis::EgisBootrom {\n\n// \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n// Mutually Exclusive Options (Strongly Typed)\n// \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n\nenum class CommandId : uint8_t {\n  kGetBootInfo \u003d 0x10,\n  kFlashInfo \u003d 0x11,\n  kSystemReset \u003d 0x12,\n  kMemRead \u003d 0x20,\n  kMemWrite \u003d 0x21,\n  kFlashErase \u003d 0x22,\n  kOtpRead \u003d 0x23,\n  kOtpWrite \u003d 0x24,\n  kSecureWrapped \u003d 0xF4,\n};\n\nenum class AccessSize : uint8_t {\n  kUint8 \u003d 0x01,\n  kUint16 \u003d 0x02,\n  kUint32 \u003d 0x04,\n};\n\nenum class SpiFlashOpcode : uint8_t {\n  kWriteStatusReg \u003d 0x01,\n  kReadStatusReg \u003d 0x05,\n  kWriteEnable \u003d 0x06,\n};\n\n// \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n// Hardware Constants \u0026 Memory Map\n// \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n\nconstexpr uint8_t kSystemResetTypeNormal \u003d 0x01;\nconstexpr uint32_t kChipIdAad \u003d 0x00000001;\n\n// Flash address map\nconstexpr uint32_t kFlashBaseAddr \u003d 0x80000000;\nconstexpr uint32_t kFlashTotalSize \u003d 2 * 1024 * 1024;\nconstexpr uint32_t kFlashSectorSize \u003d 4096;\n\n// SPI registers\nconstexpr uint32_t kSpiRegBase \u003d 0xf0b00000;\nconstexpr uint32_t kSpiRegId \u003d kSpiRegBase + 0x0;\nconstexpr uint32_t kSpiRegTfmat \u003d kSpiRegBase + 0x10;\nconstexpr uint32_t kSpiRegWrcnt \u003d kSpiRegBase + 0x18;\nconstexpr uint32_t kSpiRegRdcnt \u003d kSpiRegBase + 0x1C;\nconstexpr uint32_t kSpiRegTctrl \u003d kSpiRegBase + 0x20;\nconstexpr uint32_t kSpiRegCmd \u003d kSpiRegBase + 0x24;\nconstexpr uint32_t kSpiRegAddr \u003d kSpiRegBase + 0x28;\nconstexpr uint32_t kSpiRegData \u003d kSpiRegBase + 0x2C;\n\n// Watchdog / PWM registers\nconstexpr uint32_t kRegPwmChnen \u003d 0xf040001c;\nconstexpr uint32_t kRegPwmCtrl \u003d 0xf0400020;\nconstexpr uint32_t kRegPwmReload \u003d 0xf0400024;\nconstexpr uint32_t kRegPwmMux \u003d 0xf0e00100;\n\n// \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n// Bitmasks \u0026 Register Payloads (Unsigned Literals)\n// \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n\n// TCTRL bit definitions\nconstexpr uint32_t kTctrlTrnsModeOffset \u003d 24;\nconstexpr uint32_t kTctrlAddrFmtMsk \u003d (1U \u003c\u003c 28);\nconstexpr uint32_t kTctrlAddrEnMsk \u003d (1U \u003c\u003c 29);\nconstexpr uint32_t kTctrlCmdEnMsk \u003d (1U \u003c\u003c 30);\n\nconstexpr uint32_t kTrnsModeWriteOnly \u003d (1U \u003c\u003c kTctrlTrnsModeOffset);\nconstexpr uint32_t kTrnsModeReadOnly \u003d (2U \u003c\u003c kTctrlTrnsModeOffset);\nconstexpr uint32_t kTrnsModeNoneData \u003d (7U \u003c\u003c kTctrlTrnsModeOffset);\n\nconstexpr uint32_t kTfmat \u003d 0x00020700;\nconstexpr uint8_t kFlashSr1Wip \u003d 0x01;\n\n// Watchdog / PWM disable payloads\nconstexpr uint32_t kPwmCtrlDisableMask \u003d 0x00000004;\nconstexpr uint32_t kPwmReloadTimeoutVal \u003d 0x00070a21;\nconstexpr uint32_t kPwmChnenDisableVal \u003d 0x00000008;\nconstexpr uint32_t kPwmMuxDisableVal \u003d 0x0c000004;\n\n// \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n// Hardware Wire Protocols (Packed Structs \u0026 Size Assertions)\n// \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n\nstruct GetBootromInfoCommand {\n  CommandId command_id \u003d CommandId::kGetBootInfo;\n} __attribute__((packed));\nstatic_assert(sizeof(GetBootromInfoCommand) \u003d\u003d 1, \"Must be exactly 1 byte\");\n\nstruct GetFlashInfoCommand {\n  CommandId command_id \u003d CommandId::kFlashInfo;\n} __attribute__((packed));\nstatic_assert(sizeof(GetFlashInfoCommand) \u003d\u003d 1, \"Must be exactly 1 byte\");\n\nstruct SystemResetCommand {\n  CommandId command_id \u003d CommandId::kSystemReset;\n  uint8_t reset_type \u003d kSystemResetTypeNormal;\n} __attribute__((packed));\nstatic_assert(sizeof(SystemResetCommand) \u003d\u003d 2, \"Must be exactly 2 bytes\");\n\nstruct FlashEraseCommand {\n  CommandId command_id \u003d CommandId::kFlashErase;\n  uint32_t address;\n  uint32_t size;\n} __attribute__((packed));\nstatic_assert(sizeof(FlashEraseCommand) \u003d\u003d 9, \"Must be exactly 9 bytes\");\n\nstruct MemReadCommand {\n  CommandId command_id \u003d CommandId::kMemRead;\n  uint32_t address;\n  AccessSize access_size;\n  uint32_t count;\n} __attribute__((packed));\nstatic_assert(sizeof(MemReadCommand) \u003d\u003d 10, \"Must be exactly 10 bytes\");\n\nstruct BlockWriteCommand {\n  CommandId command_id \u003d CommandId::kMemWrite;\n  uint32_t address;\n  AccessSize access_size \u003d AccessSize::kUint8;\n  uint32_t count;\n} __attribute__((packed));\nstatic_assert(sizeof(BlockWriteCommand) \u003d\u003d 10, \"Must be exactly 10 bytes\");\n\nstruct MemWriteRegCommand {\n  CommandId command_id \u003d CommandId::kMemWrite;\n  uint32_t address;\n  AccessSize access_size \u003d AccessSize::kUint32;\n  uint32_t count;\n  uint32_t value;\n} __attribute__((packed));\nstatic_assert(sizeof(MemWriteRegCommand) \u003d\u003d 14, \"Must be exactly 14 bytes\");\n\nstruct BootromInfoResponse {\n  uint32_t version;\n  uint32_t max_cmd_size;\n  uint32_t max_fw_upgrade_size;\n} __attribute__((packed));\nstatic_assert(sizeof(BootromInfoResponse) \u003d\u003d 12, \"Must be exactly 12 bytes\");\n\nstruct FlashInfoResponse {\n  uint32_t flash_size;\n  uint32_t reserved;\n  char prod_name[8];\n  uint8_t remaining[24];\n} __attribute__((packed));\nstatic_assert(sizeof(FlashInfoResponse) \u003d\u003d 40, \"Must be exactly 40 bytes\");\n\nstruct SecureCommandShaHeader {\n  CommandId command_id \u003d CommandId::kSecureWrapped;\n  uint8_t algo;\n  uint32_t payload_len;\n  std::array\u003cuint8_t, crypto::kSha256DigestSize\u003e hash{};\n} __attribute__((packed));\nstatic_assert(sizeof(SecureCommandShaHeader) \u003d\u003d 38, \"Must be exactly 38 bytes\");\n\nstruct SecureCommandAesHeader {\n  CommandId command_id \u003d CommandId::kSecureWrapped;\n  uint8_t algo;\n  uint32_t payload_len;\n  std::array\u003cuint8_t, crypto::kAesGcmIvSize\u003e iv{};\n  std::array\u003cuint8_t, crypto::kAesGcmTagSize\u003e tag{};\n} __attribute__((packed));\nstatic_assert(sizeof(SecureCommandAesHeader) \u003d\u003d 34, \"Must be exactly 34 bytes\");\n\nstruct SecureResponseHeader {\n  uint16_t status;\n  uint32_t payload_len;\n} __attribute__((packed));\nstatic_assert(sizeof(SecureResponseHeader) \u003d\u003d 6, \"Must be exactly 6 bytes\");\n\n}  // namespace egis::EgisBootrom\n\n#endif  // UTIL_EGIS_BOOTROM_PROTOCOL_H_\n\n```\n\n---\n\n### Step 2: Refactor `bootrom.h`\n\nStrip out all the protocol definitions and include the new file. This shrinks the header from 335 lines to roughly 85 lines.\n\n**Modify `util/egis/bootrom.h`:**\n\n```cpp\n// 1. Add the protocol header include\n#include \"bootrom_protocol.h\"\n\n// 2. Delete the entire `namespace EgisBootrom { ... }` block from bootrom.h\n\n// 3. Delete the `SecureCommandShaHeader`, `SecureCommandAesHeader`, and `SecureResponseHeader` structs from inside the `BootromComm` class definition.\n\n// 4. Leave the remaining constants inside `BootromComm`:\nclass BootromComm {\n public:\n  static constexpr size_t kStatusHeaderSize \u003d 2;\n  static constexpr size_t kWrappedCommandSize \u003d 4;\n  static constexpr size_t kSha256DigestSize \u003d 32;\n  static constexpr size_t kScHeaderSizeSha \u003d\n      kStatusHeaderSize + kWrappedCommandSize + kSha256DigestSize;\n  static constexpr size_t kScHeaderSizeAes \u003d\n      kStatusHeaderSize + kWrappedCommandSize + crypto::kAesGcmIvSize +\n      crypto::kAesGcmTagSize;\n\n  static constexpr size_t kMaxPayloadSize \u003d 4 * 1024;\n  // ... rest of the class remains unchanged ...\n\n```\n\n---\n\n### Step 3: Refactor Implementations (Enum Conversions)\n\nNow that `CommandId`, `AccessSize`, and `SpiFlashOpcode` are strongly typed `enum class` types, you must cast them when reading raw command buffers or sending raw data to generic `uint32_t` registers.\n\n**1. Modify `util/egis/bootrom.cc`:**\n\n```cpp\n// Change 1: In SendBootromCommandSha()\n  EgisBootrom::SecureCommandShaHeader req_hdr{\n      .algo \u003d std::to_underlying(wrapped_algo_),\n      .payload_len \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(data.size()))};\n\n// Change 2: In SendBootromCommandAes()\n  EgisBootrom::SecureCommandAesHeader req_hdr{\n      .algo \u003d std::to_underlying(wrapped_algo_),\n      .payload_len \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(data.size()))};\n\n// Change 3: In ExtractSecureData()\n  auto rsp_hdr_res \u003d ReadStruct\u003cEgisBootrom::SecureResponseHeader\u003e(raw_response);\n  // and update `sizeof(EgisBootrom::SecureResponseHeader)` instances.\n\n// Change 4: In SendBootromCommand()\n  if ((data[0] \u003e\u003d std::to_underlying(EgisBootrom::CommandId::kMemRead)) \u0026\u0026\n      (data[0] \u003c\u003d std::to_underlying(EgisBootrom::CommandId::kOtpWrite))) { ... }\n\n// Change 5: In WriteEnable() and SetSr1() update the SPI opcodes:\n  {EgisBootrom::kSpiRegCmd, std::to_underlying(EgisBootrom::SpiFlashOpcode::kWriteEnable)}\n  // ... and ...\n  {EgisBootrom::kSpiRegCmd, std::to_underlying(EgisBootrom::SpiFlashOpcode::kWriteStatusReg)}\n\n```\n\n**2. Modify `util/egis/flasher_logic.cc`:**\n\n```cpp\n// Change 1: In GetNextPacketSize()\n  if (fw[0] \u003d\u003d std::to_underlying(EgisBootrom::CommandId::kSystemReset)) return 2;\n  if (fw[0] !\u003d std::to_underlying(EgisBootrom::CommandId::kSecureWrapped))\n    return std::unexpected(ParseError::kInvalidHeader);\n\n// Change 2: In GetNextPacketSize() offset lookup\n  auto wrapped_size \u003d ReadLittleEndian\u003cuint32_t\u003e(\n      fw.subspan(offsetof(EgisBootrom::SecureCommandShaHeader, payload_len),\n                 sizeof(EgisBootrom::SecureCommandShaHeader::payload_len)));\n\n// Change 3: In ProgramRawCommandPayload()\n  if (packet[0] \u003d\u003d std::to_underlying(EgisBootrom::CommandId::kSystemReset)) {\n      // ...\n\n```\n\n**3. Update Tests (`bootrom_test.cc` / `flasher_logic_test.cc`):**\nPrefix `SecureResponseHeader` and `SecureCommandAesHeader` references with `EgisBootrom::` everywhere in the test files. Also, update any hardcoded byte arrays simulating opcodes (e.g., `EgisBootrom::kCmdSecureWrapped` -\u003e `std::to_underlying(EgisBootrom::CommandId::kSecureWrapped)`).",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 206,
+        "endChar": 50
+      },
+      "revId": "7948047d5d5cd56d835ddcec83c72efa480d8f23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c50f3f58_100f9640",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 31
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-05T05:05:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08c51853_85aac763",
       "range": {
         "startLine": 84,
         "startChar": 0,
@@ -111,6 +177,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee449c6d_59da4b67",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-05T05:05:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d6e28560_0d8627a6",
+      "range": {
+        "startLine": 62,
+        "startChar": 1,
+        "endLine": 72,
+        "endChar": 2
+      },
+      "revId": "7948047d5d5cd56d835ddcec83c72efa480d8f23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "86a62320_d99b9c65",
@@ -124,6 +214,30 @@
       "writtenOn": "2026-06-04T21:08:18Z",
       "side": 1,
       "message": "Let\u0027s group these into a struct for better organization and type safety. Gemini feedback:\n\n----\n\n### Rationale\n\nReplacing the loose `constexpr` integers with `UsbDeviceId` and `UsbDeviceProfile` resolves a classic code smell known as **Primitive Obsession**.\n\n1. **Type Safety:** By grouping the parameters, it becomes physically impossible to accidentally pass `ep_in` as `ep_out`, or to mismatch the App PID with the Bootloader endpoints when calling the `UsbComm` constructor.\n2. **Domain Accuracy:** A USB device is universally identified by a VID/PID pair. Extracting `UsbDeviceId` into its own struct accurately models this reality and gives you a reusable type for future USB bus scanning.\n3. **Free Operations:** Defaulting `operator\u003d\u003d` makes the ID a \"Regular\" type, granting free equality and inequality comparisons if you ever need to validate a connected device.\n4. **Self-Documenting Code:** Using C++20 designated initializers (`.vid \u003d ...`) means the call sites explicitly state what each value represents without relying on IDE hints.\n\nHere are the exact steps to implement this across the codebase.\n\n---\n\n### Step 1: Define the Structs in `usb_comm.h`\n\nAdd the nested struct definitions and update the constructor to take a `UsbDeviceProfile` instead of loose integers.\n\n**Modify `util/egis/usb_comm.h`:**\n\n```cpp\nnamespace egis {\n\nstruct UsbDeviceId {\n  uint16_t vid;\n  uint16_t pid;\n\n  bool operator\u003d\u003d(const UsbDeviceId \u0026) const \u003d default;\n};\n\nstruct UsbDeviceProfile {\n  UsbDeviceId id;\n  uint8_t ep_out;\n  uint8_t ep_in;\n};\n\nclass UsbComm : public UsbInterface {\n public:  \n  // Require the caller to provide the context and the profile\n  UsbComm(libusb_context *ctx, const UsbDeviceProfile \u0026profile);\n  ~UsbComm() override;\n\n  // ... [rest of the class remains unchanged] ...\n\n```\n\n---\n\n### Step 2: Update the Constructor Implementation in `usb_comm.cc`\n\nUnpack the profile properties into the class member variables.\n\n**Modify `util/egis/usb_comm.cc`:**\n\n```cpp\nUsbComm::UsbComm(libusb_context *ctx, const UsbDeviceProfile \u0026profile)\n    : ctx_(ctx), \n      vid_(profile.id.vid), \n      pid_(profile.id.pid), \n      ep_out_(profile.ep_out), \n      ep_in_(profile.ep_in) {}\n\n```\n\n---\n\n### Step 3: Modernize the Target Profiles in `et171_flash.cc`\n\nDelete the 8 loose `constexpr` integers and replace them with cleanly scoped `UsbDeviceProfile` objects using nested designated initializers. Then, update the `UsbComm` instantiations.\n\n**Modify `util/egis/et171_flash.cc`:**\n\n```cpp\nnamespace {\n\n// Replace the loose kVidGoogle, kPidEgisApp, etc. with these profiles:\nconstexpr egis::UsbDeviceProfile kAppProfile \u003d {\n    .id \u003d {\n        .vid \u003d 0x18D1,\n        .pid \u003d 0x5401,\n    },\n    .ep_out \u003d 0x01,\n    .ep_in \u003d 0x81,\n};\n\nconstexpr egis::UsbDeviceProfile kBootloaderProfile \u003d {\n    .id \u003d {\n        .vid \u003d 0x1C7A,\n        .pid \u003d 0x1002,\n    },\n    .ep_out \u003d 0x02,\n    .ep_in \u003d 0x81,\n};\n\nconstexpr auto kBootloaderTransitionDelay \u003d std::chrono::milliseconds(800);\n// ... [other timeouts remain unchanged] ...\n\nstd::expected\u003cvoid, UsbError\u003e ConnectToBootloader(libusb_context *usb_ctx,\n                                                  UsbComm \u0026boot_comm) {\n  // Pass the profile struct instead of 4 integers\n  UsbComm app_comm(usb_ctx, kAppProfile);\n  if (auto res \u003d app_comm.Connect(); res) {\n  // ... [rest of function unchanged] ...\n\n```\n\n*And further down in `main()`:*\n\n```cpp\n  // 3. Connect to Device\n  // Pass the Bootloader profile instead of 4 integers\n  egis::UsbComm boot_comm(usb_ctx.get(), kBootloaderProfile);\n\n```\n\n---\n\n### Step 4: Update the Test Suite\n\nYour `usb_comm_test.cc` file also needs to be updated to construct a test profile rather than passing loose values.\n\n**Modify `util/egis/usb_comm_test.cc`:**\n\n```cpp\nnamespace {\n\nconstexpr UsbDeviceProfile kTestProfile \u003d {\n    .id \u003d {\n        .vid \u003d 0x1234,\n        .pid \u003d 0x5678,\n    },\n    .ep_out \u003d 0x01,\n    .ep_in \u003d 0x81,\n};\n\nTEST(UsbCommTest, FailsWhenNotConnected) {\n  UsbComm comm(nullptr, kTestProfile);\n  std::vector\u003cuint8_t\u003e test_data(4);\n  EXPECT_EQ(comm.Send(test_data).error(), UsbError::kNotConnected);\n  EXPECT_EQ(comm.Receive(test_data).error(), UsbError::kNotConnected);\n}\n\nTEST(UsbCommTest, ConnectFailsWithNullContext) {\n  UsbComm comm(nullptr, kTestProfile);\n  EXPECT_EQ(comm.Connect().error(), UsbError::kInvalidParam);\n}\n\n}  // namespace\n\n```",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 47
+      },
+      "revId": "7948047d5d5cd56d835ddcec83c72efa480d8f23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a61bba8e_fb899629",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-05T05:05:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "86a62320_d99b9c65",
       "range": {
         "startLine": 34,
         "startChar": 0,
@@ -157,6 +271,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "73be20ef_efb156d9",
+        "filename": "util/egis/flasher_logic.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-05T05:05:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "166f862e_70a90282",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 0
+      },
+      "revId": "7948047d5d5cd56d835ddcec83c72efa480d8f23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "af3d9c6e_b030f90f",
@@ -170,6 +308,30 @@
       "writtenOn": "2026-06-04T20:55:20Z",
       "side": 1,
       "message": "Gemini feedback:\n\n----\n\n### Rationale for the Consuming Span \u0026 Address Boundary Patterns\n\nIn traditional C++, iterating over buffers is done using `for` loops, an index `i`, and pointer arithmetic (`buffer.data() + i`). This is notorious for causing off-by-one errors, out-of-bounds memory accesses, and variable tracking fatigue.\n\nBy upgrading to the **Consuming Span** (for writes) and **Address Boundary** (for reads) patterns, we achieve the absolute floor for code complexity:\n\n1. **Single Source of Truth:** Instead of maintaining a base address *and* a loop index *and* a remaining counter, you just track what is left.\n2. **Eliminates Index Math:** `payload.first(take)` safely grabs bytes, and `payload.subspan(take)` safely shrinks the view. The compiler handles the pointer arithmetic.\n3. **Idiomatic C++20/23:** Mutating a `std::span` is practically free (it\u0027s just a pointer and a size increment). It replaces the need for `std::views::chunk` entirely while being more readable.\n\nHere are the exact steps to implement this across the four chunking loops in your code.\n\n---\n\n### Step 1: Update Flash Writing (`util/egis/flasher_logic.cc`)\n\nIn `ProgramFlashPayload`, replace the `for` loop with a `while` loop that consumes the `payload` span directly.\n\n```cpp\nstd::expected\u003cvoid, AppError\u003e ProgramFlashPayload(\n    BootromComm \u0026brom, uint32_t flash_offset,\n    std::span\u003cconst uint8_t\u003e payload) {\n  \n  // ... [erase logic remains unchanged] ...\n\n  std::println(\"--- Writing Flash ---\");\n  const size_t total_size \u003d payload.size();\n  uint32_t current_addr \u003d flash_offset;\n\n  while (!payload.empty()) {\n    // 1. Determine size and slice the chunk in-line\n    size_t take \u003d std::min(BootromComm::kMaxFlashWriteSize, payload.size());\n    \n    // 2. Write the chunk\n    if (auto res \u003d brom.WriteFlash(current_addr, payload.first(take)); !res) {\n      std::println(stderr, \"\\n[HALT] Flash Write failed at address 0x{:X}: {}\",\n                   current_addr, ToString(res.error()));\n      return std::unexpected(AppError::kBootromError);\n    }\n\n    // 3. Advance hardware address and consume the span\n    current_addr +\u003d take;\n    payload \u003d payload.subspan(take);\n\n    // 4. Calculate progress using the remaining span size\n    size_t done \u003d total_size - payload.size();\n    std::print(\"\\rWriting Progress: {} / {} ({:.1f}%)\", done, total_size,\n               (static_cast\u003cfloat\u003e(done) / total_size * 100.0f));\n    std::fflush(stdout);\n  }\n\n  std::println(\"\\n[OK] Flash Full Binary Write successful\");\n  return {};\n}\n\n```\n\n---\n\n### Step 2: Update Command Parsing (`util/egis/flasher_logic.cc`)\n\nIn `ProgramRawCommandPayload`, remove the `done` offset counter entirely. The span itself will track our progress through the firmware file.\n\n```cpp\nstd::expected\u003cvoid, AppError\u003e ProgramRawCommandPayload(\n    UsbInterface \u0026boot_comm, std::span\u003cconst uint8_t\u003e firmware) {\n  std::println(\"--- Flash RAW CMD Binary Flashing ---\");\n  const size_t total_size \u003d firmware.size();\n\n  while (!firmware.empty()) {\n    auto packet_size_res \u003d GetNextPacketSize(firmware);\n    size_t offset \u003d total_size - firmware.size(); // Only needed for error reporting\n\n    if (!packet_size_res || packet_size_res.value() \u003e firmware.size()) {\n      std::println(stderr, \"\\n[ERROR] Parse failed or truncated at offset 0x{:X}\", offset);\n      return std::unexpected(AppError::kParseError);\n    }\n\n    size_t take \u003d packet_size_res.value();\n    \n    // 1. Slice the exact packet\n    std::span\u003cconst uint8_t\u003e packet \u003d firmware.first(take);\n    \n    // 2. Consume the span so the next iteration starts fresh\n    firmware \u003d firmware.subspan(take);\n\n    // 3. Send the sliced packet\n    if (auto res \u003d boot_comm.Send(packet); !res) {\n      // ... [Error handling logic unchanged] ...\n    }\n\n    // ... [Read response logic unchanged] ...\n\n    size_t done \u003d total_size - firmware.size();\n    std::print(\"\\rFlashing Progress: {} / {} ({:.1f}%)\", done, total_size,\n               (static_cast\u003cfloat\u003e(done) / total_size * 100.0f));\n    std::fflush(stdout);\n  }\n\n  std::println(\"\\n[OK] RAW CMD Flashing Finished\");\n  return {};\n}\n\n```\n\n---\n\n### Step 3: Update Flash Backup (`util/egis/bootrom.cc`)\n\nSwitch to the **Address Boundary** pattern. We drop the `remaining` counter and instead just loop until `flash_addr` hits `end_addr`.\n\n```cpp\nstd::expected\u003cvoid, BootromError\u003e BootromComm::BackupFlash(\n    std::string_view filename, uint32_t total_size) {\n  // ... [file opening logic remains unchanged] ...\n\n  std::println(\"--- Executing CMD_MEM_READ (0x20) ---\");\n\n  uint32_t flash_addr \u003d EgisBootrom::kFlashBaseAddr;\n  const uint32_t end_addr \u003d flash_addr + total_size;\n\n  while (flash_addr \u003c end_addr) {\n    uint32_t take \u003d std::min(kMaxFlashReadSize, end_addr - flash_addr);\n\n    EgisBootrom::MemReadCommand req{\n        .address \u003d ToLittleEndian(flash_addr),\n        .access_size \u003d EgisBootrom::AccessSize::kUint8, // Assuming enum refactor\n        .count \u003d ToLittleEndian(take)};\n\n    auto resp \u003d SendStruct(req, kFlashTimeout);\n    if (!resp.has_value()) {\n      std::println(stderr, \"\\n[HALT] Failed at address 0x{:x}\", flash_addr);\n      return std::unexpected(resp.error());\n    }\n\n    if (resp-\u003esize() \u003c take) {\n      std::println(stderr, \"\\n[WARN] Incomplete payload received\");\n      return std::unexpected(BootromError::kResponseTruncated);\n    }\n    outfile.write(reinterpret_cast\u003cconst char *\u003e(resp-\u003edata()), resp-\u003esize());\n\n    // Advance address\n    flash_addr +\u003d take;\n\n    uint32_t done \u003d total_size - (end_addr - flash_addr);\n    std::print(\"\\rBackup Progress: {} / {} ({:.1f}%)\", done,\n               total_size, (100.0 * done / total_size));\n    std::fflush(stdout);\n  }\n\n  outfile.close();\n  std::println(\"\\nFlash Backup Completed\");\n  return {};\n}\n\n```\n\n---\n\n### Step 4: Update Flash Reading (`util/egis/bootrom.cc`)\n\nApply the exact same Address Boundary pattern to `ReadFlash`.\n\n```cpp\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e BootromComm::ReadFlash(\n    uint32_t offset, uint32_t length) {\n  std::vector\u003cuint8_t\u003e buffer;\n  buffer.reserve(length);\n\n  uint32_t flash_addr \u003d EgisBootrom::kFlashBaseAddr + offset;\n  const uint32_t end_addr \u003d flash_addr + length;\n\n  while (flash_addr \u003c end_addr) {\n    uint32_t take \u003d std::min(kMaxFlashReadSize, end_addr - flash_addr);\n\n    EgisBootrom::MemReadCommand req{\n        .address \u003d ToLittleEndian(flash_addr),\n        .access_size \u003d EgisBootrom::AccessSize::kUint8, // Assuming enum refactor\n        .count \u003d ToLittleEndian(take)};\n\n    auto resp \u003d SendStruct(req, kFlashTimeout);\n\n    if (!resp.has_value()) {\n      std::println(stderr, \"[ERROR] read_flash failed at addr 0x{:x}: {}\",\n                   flash_addr, ToString(resp.error()));\n      return std::unexpected(resp.error());\n    }\n    if (resp-\u003esize() \u003c take) {\n      std::println(stderr, \"[ERROR] read_flash failed (size mismatch)\");\n      return std::unexpected(BootromError::kResponseTruncated);\n    }\n\n    buffer.insert(buffer.end(), resp-\u003ebegin(), resp-\u003eend());\n\n    // Advance address\n    flash_addr +\u003d take;\n  }\n  return buffer;\n}\n\n```",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 90,
+        "endChar": 45
+      },
+      "revId": "7948047d5d5cd56d835ddcec83c72efa480d8f23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55e6c40c_fc053690",
+        "filename": "util/egis/flasher_logic.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-05T05:05:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "af3d9c6e_b030f90f",
       "range": {
         "startLine": 89,
         "startChar": 0,
