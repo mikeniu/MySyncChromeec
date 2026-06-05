@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2716186a_0c5a2123",
+        "filename": "zephyr/dts/bindings/test/cros,fake-absent-pdc.yaml",
+        "patchSetId": 17
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-05T17:42:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a603de1_e6b3984a",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 34
+      },
+      "revId": "faa7380ce795803100dfac3d67f19f4cfdb3cd39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce606d7f_1dae0fd8",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-04T22:26:01Z",
       "side": 1,
       "message": "Obsolete?",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 28
+      },
+      "revId": "faa7380ce795803100dfac3d67f19f4cfdb3cd39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5a667c2_15c3a14e",
+        "filename": "zephyr/emul/CMakeLists.txt",
+        "patchSetId": 17
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-05T17:42:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce606d7f_1dae0fd8",
       "range": {
         "startLine": 54,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1d5473f_59978a39",
+        "filename": "zephyr/emul/Kconfig",
+        "patchSetId": 17
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-05T17:42:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "880a7213_13f97ab1",
+      "range": {
+        "startLine": 262,
+        "startChar": 7,
+        "endLine": 262,
+        "endChar": 27
+      },
+      "revId": "faa7380ce795803100dfac3d67f19f4cfdb3cd39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae7c67ba_72cefb9f",
@@ -93,6 +165,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffbda4ac_544f8e6d",
+        "filename": "zephyr/emul/emul_common_i2c.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-05T17:42:23Z",
+      "side": 1,
+      "message": "Moved all Emulator changes to their own patches",
+      "parentUuid": "ae7c67ba_72cefb9f",
+      "range": {
+        "startLine": 327,
+        "startChar": 0,
+        "endLine": 327,
+        "endChar": 65
+      },
+      "revId": "faa7380ce795803100dfac3d67f19f4cfdb3cd39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "40e477cd_156b72ed",
@@ -106,6 +202,30 @@
       "writtenOn": "2026-06-04T22:26:01Z",
       "side": 1,
       "message": "Obsolete?",
+      "range": {
+        "startLine": 13,
+        "startChar": 21,
+        "endLine": 13,
+        "endChar": 22
+      },
+      "revId": "faa7380ce795803100dfac3d67f19f4cfdb3cd39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aca1afa2_a8da3231",
+        "filename": "zephyr/emul/emul_fake_absent_pdc.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-05T17:42:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "40e477cd_156b72ed",
       "range": {
         "startLine": 13,
         "startChar": 21,
@@ -153,6 +273,30 @@
       "side": 1,
       "message": "Ok sounds good I will clean up the no longer needed pieces and clean up the code. I posted this for reference initially cause it was a large departure from the original method.",
       "parentUuid": "5ce4255d_387effc4",
+      "range": {
+        "startLine": 222,
+        "startChar": 0,
+        "endLine": 222,
+        "endChar": 39
+      },
+      "revId": "faa7380ce795803100dfac3d67f19f4cfdb3cd39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d557fd6_bb5d7170",
+        "filename": "zephyr/program/atria/atriarvp-rtk/src/rvp_usbc_runtime.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-05T17:42:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "756c6056_79d04551",
       "range": {
         "startLine": 222,
         "startChar": 0,
