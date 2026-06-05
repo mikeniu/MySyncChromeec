@@ -280,6 +280,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "340f1a74_102b4b55",
+        "filename": "util/egis/cli_options.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:17:48Z",
+      "side": 1,
+      "message": "Gemini suggested fix:\n\n-----\n\nTo fix this, you need to allow `ParseArgs` to distinguish between \"parsing failed\" (which should return `std::nullopt` and exit with an error) and \"the user asked for help\" (which should parse successfully but tell the application to exit cleanly).\n\nWe can do this cleanly by adding a `kHelp` state to your `AppMode` enum.\n\nHere are the exact steps to implement this fix:\n\n### 1. Update the Mode Enum (`cli_options.h`)\n\nOpen `util/egis/cli_options.h` and add `kHelp` to the `AppMode` enum:\n\n```cpp\nenum class AppMode {\n  kNone,\n  kFlashFw,\n  kFlashCmd,\n  kHelp,     // \u003c-- Add this\n};\n\n```\n\n### 2. Update the Parser (`cli_options.cc`)\n\nOpen `util/egis/cli_options.cc` and locate the `switch` statement inside `ParseArgs`. Change the `\u0027h\u0027` case to set the mode and return the config, rather than returning `std::nullopt`:\n\n```cpp\n      case \u0027h\u0027:\n        PrintHelp(argv[0]);\n        config.mode \u003d AppMode::kHelp;\n        return config; // \u003c-- Return the config instead of std::nullopt\n\n```\n\n### 3. Handle the Help Mode in `main` (`et171_flash.cc`)\n\nOpen `util/egis/et171_flash.cc` and check for the help mode right after parsing the arguments. If the mode is `kHelp`, return `EXIT_SUCCESS` (0) immediately so the program cleanly halts before trying to initialize USB devices.\n\n```cpp\nint main(int argc, char *argv[]) {\n  auto config_opt \u003d egis::ParseArgs(argc, argv);\n  if (!config_opt) {\n    // Parsing failed (invalid args)\n    return EXIT_FAILURE;\n  }\n  const egis::AppConfig \u0026config \u003d config_opt.value();\n\n  // Exit cleanly if the user just requested the help menu\n  if (config.mode \u003d\u003d egis::AppMode::kHelp) {\n    return EXIT_SUCCESS;\n  }\n\n  libusb_context *raw_ctx \u003d nullptr;\n  // ... rest of main() stays the same\n\n```\n\n### 4. Fix the Unit Test (`cli_options_test.cc`)\n\nBecause we changed the expected behavior of `--help`, we must update its unit test to prevent a test failure.\n\nOpen `util/egis/cli_options_test.cc` and replace the `ParseHelpReturnsNullopt` test with this updated version:\n\n```cpp\nTEST(CliOptionsTest, ParseHelpReturnsHelpMode) {\n  auto config \u003d RunParseArgs(\"et171_flash\", \"--help\");\n  ASSERT_TRUE(config.has_value());\n  EXPECT_EQ(config-\u003emode, AppMode::kHelp);\n}\n\n```\n\n### Why this is the best approach:\n\nBy treating `--help` as a valid \"Application Mode\", you gracefully separate fatal input errors (`std::nullopt` resulting in `EXIT_FAILURE`) from an intentional user action (`kHelp` resulting in `EXIT_SUCCESS`). It prevents the USB initialization stack from running needlessly and satisfies POSIX CLI conventions.",
+      "parentUuid": "cc107f84_bfaee228",
+      "range": {
+        "startLine": 144,
+        "startChar": 0,
+        "endLine": 144,
+        "endChar": 28
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3e51740c_4bf80448",
         "filename": "util/egis/cli_options.h",
         "patchSetId": 33
