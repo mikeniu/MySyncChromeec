@@ -490,6 +490,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "053eeba0_7703e69b",
+        "filename": "util/focaltech/updater.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T21:27:09Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn `updater.h`, you defined `FlashWpArea` as a standard scoped enum without specifying its underlying type:\n\n```c\nenum class FlashWpArea {\n  kUnknown,\n  kAll,\n  // ...\n};\n\n```\n\nBecause you didn\u0027t specify `: uint8_t`, the C++ compiler defaults the underlying type to `int` (a signed 32-bit integer).\n\nThis becomes dangerous in `updater.cc` where you apply the bitwise NOT operator to it:\n\n```c\n~std::to_underlying(wp_area)\n\n```\n\nIf `wp_area` is `3`, `std::to_underlying` returns a 32-bit `int` (`0x00000003`). `~` flips it to `0xFFFFFFFC` (a negative number). When you pass that into `ReceiveActionIn` (which expects an unsigned integer), you trigger an implicit narrowing conversion from a signed 32-bit int. While it technically works on standard architectures due to two\u0027s complement, it is considered unsafe C++ and triggers compiler warnings under strict flags.\n\n**The Fix:** Bind `FlashWpArea` to `uint8_t`. This guarantees `std::to_underlying` returns an unsigned byte, keeping your bitwise math perfectly clean and portable.\n\n**In `util/focaltech/updater.h`:**\n\n```\n-enum class FlashWpArea {\n+enum class FlashWpArea : uint8_t {\n   kUnknown,\n   kAll,\n   kBoot,\n   kRo,\n   kRw,\n   kOutRange,\n };\n\n```\n\n*(Note: We leave `flags` inside `CmdFormat` as a standard `uint8_t` because it is polymorphic — it holds `kHashModeSha256` for Verification, but `kSoftPor` for Resets. Typing it strictly would require messy enum casting across different command types).*",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 2
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f3b86e78_64cfbe56",
         "filename": "util/focaltech/usb_device.h",
         "patchSetId": 21
