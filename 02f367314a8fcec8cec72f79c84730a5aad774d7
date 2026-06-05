@@ -22,6 +22,30 @@
       },
       "revId": "02f367314a8fcec8cec72f79c84730a5aad774d7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13208670_eb2bcfb2",
+        "filename": "zephyr/mock/usb_mux.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-05T17:21:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "af0882ee_7b66bae3",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 40
+      },
+      "revId": "02f367314a8fcec8cec72f79c84730a5aad774d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
