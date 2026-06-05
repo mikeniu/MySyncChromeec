@@ -282,6 +282,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4bd2810b_f0a93e64",
+        "filename": "util/focaltech/ft_scsi.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T21:39:10Z",
+      "side": 1,
+      "message": "You currently have `TransferDirection { kIn, kOut, kSendOnly }`, which is passed down from the `updater` layer all the way into `SendBulkDataOut`.\n\nHowever, `SendBulkDataOut` inherently means **OUT** (even if the data size is 0), and `ReceiveBulkDataIn` inherently means **IN**. Passing a parameter to tell a function to do what its name already implies is redundant. We can drop the parameter completely and hardcode the hardware flag.",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 54
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3a7c3794_fa2d19f9",
         "filename": "util/focaltech/ft_scsi.h",
         "patchSetId": 21
