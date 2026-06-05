@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f1217e2f_28149ee9",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:24:09Z",
+      "side": 1,
+      "message": "Remove, since it\u0027s obvious that the address is advanced.",
+      "range": {
+        "startLine": 374,
+        "startChar": 0,
+        "endLine": 374,
+        "endChar": 22
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d07b2d5c_f7c82775",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 33
@@ -43,6 +66,29 @@
         "startChar": 0,
         "endLine": 394,
         "endChar": 48
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50152534_18edc2a7",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:24:09Z",
+      "side": 1,
+      "message": "Remove since it\u0027s obvious it\u0027s advancing",
+      "range": {
+        "startLine": 423,
+        "startChar": 0,
+        "endLine": 423,
+        "endChar": 22
       },
       "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -482,6 +528,75 @@
         "startChar": 0,
         "endLine": 14,
         "endChar": 18
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b271cfd_f39ed90b",
+        "filename": "util/egis/ec_protocol_defs.h",
+        "patchSetId": 33
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:24:09Z",
+      "side": 1,
+      "message": "Remove since it\u0027s obvious from the code",
+      "range": {
+        "startLine": 92,
+        "startChar": 0,
+        "endLine": 92,
+        "endChar": 40
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ef4985a_389cc033",
+        "filename": "util/egis/ec_protocol_defs.h",
+        "patchSetId": 33
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:24:09Z",
+      "side": 1,
+      "message": "Remove since it\u0027s obvious from the code",
+      "range": {
+        "startLine": 95,
+        "startChar": 0,
+        "endLine": 95,
+        "endChar": 21
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a54a3a4_77fccf40",
+        "filename": "util/egis/ec_protocol_defs.h",
+        "patchSetId": 33
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:24:09Z",
+      "side": 1,
+      "message": "Remove since it\u0027s obvious from the code",
+      "range": {
+        "startLine": 101,
+        "startChar": 0,
+        "endLine": 101,
+        "endChar": 34
       },
       "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
