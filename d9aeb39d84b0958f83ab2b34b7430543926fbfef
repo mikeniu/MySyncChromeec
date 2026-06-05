@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "d9aeb39d84b0958f83ab2b34b7430543926fbfef",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89275a90_96a5779d",
+        "filename": "power/qcom_exp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1238,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-06-05T22:45:59Z",
+      "side": 1,
+      "message": "Moving the bus switch to STARTUP/SHUTDOWN hook aligns better with the hook design and these calls won\u0027t be needed. Right?",
+      "range": {
+        "startLine": 1231,
+        "startChar": 0,
+        "endLine": 1238,
+        "endChar": 3
+      },
+      "revId": "d9aeb39d84b0958f83ab2b34b7430543926fbfef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
