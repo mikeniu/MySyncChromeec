@@ -305,6 +305,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "27c5d7ce_932bc6b1",
+        "filename": "util/focaltech/ft_scsi.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T21:39:50Z",
+      "side": 1,
+      "message": "Gemini instructions:\n\n----\n\n\\*\\*1. `util/focaltech/ft_scsi.h**` Remove the enum and update the `SendBulkDataOut` signature.\n\n```\n--- a/util/focaltech/ft_scsi.h\n+++ b/util/focaltech/ft_scsi.h\n@@ -37,8 +37,6 @@\n   kIn \u003d 0x80,\n };\n \n-enum class TransferDirection { kIn, kOut, kSendOnly };\n-\n // ... [skip down to signatures] ...\n \n std::expected\u003cvoid, Error\u003e SendBulkDataOut(\n     const UsbDevice\u0026 device,\n     std::span\u003cconst uint8_t\u003e cmd,\n     std::span\u003cconst uint8_t\u003e data,\n-    TransferDirection dir,\n     std::chrono::milliseconds timeout);\n\n```\n\n\\*\\*2. `util/focaltech/ft_scsi.cc**` Update the signature and hardcode the `CbwDirection` to `kOut`.\n\n```\n--- a/util/focaltech/ft_scsi.cc\n+++ b/util/focaltech/ft_scsi.cc\n@@ -32,15 +32,13 @@\n std::expected\u003cvoid, Error\u003e SendBulkDataOut(\n     const UsbDevice\u0026 device,\n     std::span\u003cconst uint8_t\u003e cmd,\n     std::span\u003cconst uint8_t\u003e data,\n-    TransferDirection dir,\n     std::chrono::milliseconds timeout) {\n   BulkCbWrap cbw{\n       // ...\n       .data_transfer_length \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(data.size())),\n-      .flags \u003d (dir \u003d\u003d TransferDirection::kIn) ? CbwDirection::kIn \n-                                               : CbwDirection::kOut,\n+      .flags \u003d CbwDirection::kOut,\n       .lun \u003d kDefaultLun,\n\n```\n\n\\*\\*3. `util/focaltech/updater.cc**` Remove `dir` from `SendActionOut` and all the functions that call it.\n\n```\n--- a/util/focaltech/updater.cc\n+++ b/util/focaltech/updater.cc\n@@ -69,13 +69,12 @@\n std::expected\u003cvoid, Error\u003e SendActionOut(\n     const UsbDevice\u0026 device, Subcmd subcmd, uint32_t address,\n     std::span\u003cconst uint8_t\u003e data, std::chrono::milliseconds timeout,\n-    TransferDirection dir \u003d TransferDirection::kOut,\n     uint32_t length \u003d 0, uint32_t aux_address \u003d 0, uint8_t flags \u003d 0) {\n   auto cmd \u003d BuildFtCmd(Opcode::kAction, subcmd, address, length, aux_address, flags);\n-  return SendBulkDataOut(device, cmd, data, dir, timeout);\n+  return SendBulkDataOut(device, cmd, data, timeout);\n }\n\n```\n\n*(Now go through `ErasePage`, `DownloadPage`, `SystemReset`, and `SetFlashProtection` and simply delete `, TransferDirection::kOut` from their argument lists).*",
+      "parentUuid": "4bd2810b_f0a93e64",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 54
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3a7c3794_fa2d19f9",
         "filename": "util/focaltech/ft_scsi.h",
         "patchSetId": 21
