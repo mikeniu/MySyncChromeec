@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f79c86dc_b564217e",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T20:23:35Z",
+      "side": 1,
+      "message": "Both `cli.cc` (`BuildEcCommand`) and `cli_test.cc` (`BuildEcResponse`) manually calculate the packet checksum using a `for` loop and verbose pointer arithmetic. You can compress this elegantly using standard C++ algorithms.\n\nInclude `\u003cnumeric\u003e` at the top of both files, and replace the checksum generation logic with `std::accumulate` and direct vector indexing:\n\n**In `util/focaltech/cli.cc` (`BuildEcCommand`):**\n\n```\n-  uint8_t checksum \u003d 0;\n-  for (uint8_t b : packet) checksum +\u003d b;\n-\n-  uint8_t* checksum_ptr \u003d packet.data() + offsetof(ec_host_request, checksum);\n-  *checksum_ptr \u003d -checksum;\n+  uint8_t checksum \u003d std::accumulate(packet.begin(), packet.end(), uint8_t{0});\n+  packet[offsetof(ec_host_request, checksum)] \u003d -checksum;\n\n```\n\n**In `util/focaltech/cli_test.cc` (`BuildEcResponse`):**\n\n```\n-  uint8_t checksum \u003d 0;\n-  for (uint8_t b : packet) checksum +\u003d b;\n-\n-  const size_t checksum_offset \u003d offsetof(ec_host_response, checksum);\n-  packet[checksum_offset] \u003d -checksum;\n+  uint8_t checksum \u003d std::accumulate(packet.begin(), packet.end(), uint8_t{0});\n+  packet[offsetof(ec_host_response, checksum)] \u003d -checksum;\n\n```\n\n*(Note: Passing `uint8_t{0}` to `std::accumulate` ensures it safely wraps around at 256, which is exactly the behavior you want for this type of checksum).*",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 28
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "64f1b84d_bc075dfd",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 21
