@@ -1274,6 +1274,15 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 			return POWER_S5G3;
 		}
 
+		/*
+		 * Gate the transition to S3/S0 if we are in off-mode charging,
+		 * maintaining the logical S5 state to avoid running normal S0
+		 * indicators.
+		 */
+		if (chipset_is_offmode_charging_wake()) {
+			break;
+		}
+
 		return POWER_S5S3;
 
 	case POWER_S5S3:
