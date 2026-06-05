@@ -965,7 +965,6 @@ static void it8xxx2_tcpm_hook_connect(void)
 	if (port > (CONFIG_USB_PD_ITE_ACTIVE_PORT_COUNT - 1))
 		return;
 
-#ifdef CONFIG_USB_PD_TCPMV2
 	/*
 	 * There are five cases that hook_connect() be called by TCPMv2:
 	 * 1)AttachWait.SNK -> Attached.SNK: disable detect interrupt.
@@ -984,7 +983,7 @@ static void it8xxx2_tcpm_hook_connect(void)
 	 * out or the SNK disable detect, so TCPMv1 needn't this.
 	 */
 	it8xxx2_tcpm_switch_plug_out_type(port);
-#endif
+
 	/* Enable PD PHY Tx and Rx module since type-c has connected. */
 	USBPD_ENABLE_BMC_PHY(port);
 	/*

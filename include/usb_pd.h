@@ -846,34 +846,6 @@ enum pd_rev_type {
 #define PD_STACK_VERSION PD_CONTROLLER
 #endif
 
-/* Cable structure for storing cable attributes */
-struct pd_cable {
-	/* Note: the following fields are used by TCPMv1 */
-	/* Last received SOP' message id counter*/
-	uint8_t last_sop_p_msg_id;
-	/* Last received SOP'' message id counter*/
-	uint8_t last_sop_p_p_msg_id;
-	/* Cable flags. See CABLE_FLAGS_* */
-	uint8_t flags;
-	/* For storing Discover mode response from device */
-	union tbt_mode_resp_device dev_mode_resp;
-	/* For storing Discover mode response from cable */
-	union tbt_mode_resp_cable cable_mode_resp;
-
-	/* Cable revision */
-	enum pd_rev_type rev;
-};
-
-/* Note: These flags are only used for TCPMv1 */
-/* Check if Thunderbolt-compatible mode enabled */
-#define CABLE_FLAGS_TBT_COMPAT_ENABLE BIT(0)
-/* Flag to limit speed to TBT Gen 2 passive cable */
-#define CABLE_FLAGS_TBT_COMPAT_LIMIT_SPEED BIT(1)
-/* Flag for checking if device is USB4.0 capable */
-#define CABLE_FLAGS_USB4_CAPABLE BIT(2)
-/* Flag for entering ENTER_USB mode */
-#define CABLE_FLAGS_ENTER_USB_MODE BIT(3)
-
 /*
  * SVDM Discover SVIDs request -> response
  *
@@ -1278,8 +1250,7 @@ enum pd_cc_states pd_get_task_cc_state(int port);
  *
  * @param port USB-C Port number
  * @return PD state
- * Note: TCPMv1 returns enum pd_states
- *       TCPMv2 returns enum usb_tc_state
+ * Note: TCPMv2 returns enum usb_tc_state
  *       PD_CONTROLLER returns enum pdc_state_t
  */
 uint8_t pd_get_task_state(int port);
