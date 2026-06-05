@@ -158,6 +158,24 @@
       "parentUuid": "d65e4269_b2eba35b",
       "revId": "719cabbcd796e8db2938352dffa640a4c424b273",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ac7c4b4_7145435f",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 3058,
+      "author": {
+        "id": 4253897
+      },
+      "writtenOn": "2026-06-05T07:36:28Z",
+      "side": 1,
+      "message": "Check added for force-sink flag before it returns.",
+      "parentUuid": "dc22e2db_43bb09f3",
+      "revId": "719cabbcd796e8db2938352dffa640a4c424b273",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
