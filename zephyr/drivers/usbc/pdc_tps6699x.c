@@ -382,7 +382,6 @@ static void task_ucsi(struct pdc_data_t *data,
 		      enum ucsi_command_t ucsi_command);
 static void task_raw_ucsi(struct pdc_data_t *data);
 
-static int pdc_autonegotiate_sink_reset(struct pdc_data_t *data);
 static void tps_check_and_notify_irq(void);
 
 /**
@@ -570,37 +569,6 @@ static int pdc_port_control_init(struct pdc_data_t *data)
 	};
 
 	return tps_rw_port_control(&cfg->i2c, &pdc_port_control, I2C_MSG_WRITE);
-}
-
-static int pdc_autonegotiate_sink_reset(struct pdc_data_t *data)
-{
-	union reg_autonegotiate_sink an_snk;
-	struct pdc_config_t const *cfg = data->dev->config;
-	int rv;
-
-	rv = tps_rw_autonegotiate_sink(&cfg->i2c, &an_snk, I2C_MSG_READ);
-	if (rv) {
-		LOG_ERR("TI%d: Failed to read auto negotiate sink register.",
-			cfg->connector_number);
-		return rv;
-	}
-
-	an_snk.auto_compute_sink_min_power = 0;
-	an_snk.auto_compute_sink_min_voltage = 0;
-	an_snk.auto_compute_sink_max_voltage = 0;
-	an_snk.auto_neg_max_current = 3000 / 10;
-	an_snk.auto_neg_sink_min_required_power = 15000 / 250;
-	an_snk.auto_neg_max_voltage = 5000 / 50;
-	an_snk.auto_neg_min_voltage = 5000 / 50;
-
-	rv = tps_rw_autonegotiate_sink(&cfg->i2c, &an_snk, I2C_MSG_WRITE);
-	if (rv) {
-		LOG_ERR("TI%d: Failed to write auto negotiate sink register.",
-			cfg->connector_number);
-		return rv;
-	}
-
-	return 0;
 }
 
 static void set_all_ports_to_init(const int delay_ms)
@@ -808,12 +776,6 @@ static enum smf_state_result st_init_run(void *o)
 	rv = pdc_interrupt_mask_init(data);
 	if (rv < 0) {
 		LOG_ERR("TI%d: Write interrupt mask failed (%d)",
-			cfg->connector_number, rv);
-		goto error;
-	}
-	rv = pdc_autonegotiate_sink_reset(data);
-	if (rv < 0) {
-		LOG_ERR("TI%d: Reset autonegotiate_sink reg failed (%d)",
 			cfg->connector_number, rv);
 		goto error;
 	}
@@ -2404,8 +2366,6 @@ static enum smf_state_result st_task_wait_run(void *o)
 			 */
 			data->cached_conn_status = *cs;
 			data->use_cached_conn_status_change = true;
-			if (!cs->connect_status)
-				pdc_autonegotiate_sink_reset(data);
 		}
 		break;
 	}
