@@ -1,0 +1,39 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "ft_util.h"
+
+#include <fstream>
+#include <vector>
+
+#include "ft_log.h"
+
+namespace focaltech {
+
+std::expected<std::vector<uint8_t>, Error> ReadFileToVector(
+    std::string_view path) {
+  std::ifstream file(std::string{path}, std::ios::binary | std::ios::ate);
+  if (!file) {
+    FT_LOGE("Cannot open file: {}", path);
+    return std::unexpected(Error::kNoSuchFile);
+  }
+
+  auto size = file.tellg();
+  if (size <= 0) {
+    FT_LOGE("File is empty or invalid: {}", path);
+    return std::unexpected(Error::kParameterError);
+  }
+
+  std::vector<uint8_t> buffer(size);
+  file.seekg(0, std::ios::beg);
+  if (!file.read(reinterpret_cast<char*>(buffer.data()), size)) {
+    FT_LOGE("Failed to read file payload.");
+    return std::unexpected(Error::kResultFail);
+  }
+
+  return buffer;
+}
+
+}  // namespace focaltech
