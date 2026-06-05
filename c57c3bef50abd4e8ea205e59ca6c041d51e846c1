@@ -143,6 +143,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7e48155d_89ccb3bd",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 1746,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-05T18:09:45Z",
+      "side": 1,
+      "message": "Optional: You could even set this in the case where the config read fails. That would simplify error handling even further.",
+      "parentUuid": "4317a4ad_f5f50c75",
+      "revId": "c57c3bef50abd4e8ea205e59ca6c041d51e846c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ba2f996c_0129c4b5",
         "filename": "driver/charger/sm5803.h",
         "patchSetId": 10
