@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "810f45ad_2de3f4af",
+        "filename": "util/elan/build.mk",
+        "patchSetId": 28
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T19:05:29Z",
+      "side": 1,
+      "message": "@michael.cheng@elan.corp-partner.google.com: I added this so that the tests will automatically be run in the CQ. Make sure to pull my changes before making yours.",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 27
+      },
+      "revId": "6f30071f0c87c76f04d7124926197fdc051c5733",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
