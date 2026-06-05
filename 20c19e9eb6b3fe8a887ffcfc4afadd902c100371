@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64f1b84d_bc075dfd",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T20:00:10Z",
+      "side": 1,
+      "message": "**Double Endian-Swapping (`ft_scsi.cc`)** In `ReceiveAndValidateCsw`, you perform the following check:\n\n```c\n  if (ToLittleEndian(csw.signature) !\u003d kUsbMsCswSignature ||\n      ToLittleEndian(csw.tag) !\u003d ToLittleEndian(cbw.tag)) {\n\n```\n\nWhile this functions correctly, it relies on a double-negative logic quirk. The `cbw.tag` was *already* converted to Little-Endian when the `BulkCbWrap` was constructed. By calling `ToLittleEndian(cbw.tag)` here, you are inadvertently swapping it *back* to native endianness on Big-Endian systems. `ToLittleEndian(csw.tag)` swaps the wire Little-Endian to native, meaning both sides end up comparing the native values.\n\n* **Remedy:** Since both `cbw.tag` and `csw.tag` are in wire (Little-Endian) format, compare them directly: `if (csw.tag !\u003d cbw.tag)`.  \n* **Readability Tip:** Introduce a symmetric `FromLittleEndian` alias in `ft_util.h` (e.g., `constexpr T FromLittleEndian(T value) { return ToLittleEndian(value); }`). Reading *from* the wire should logically use `FromLittleEndian(csw.signature)`.",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 59
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
