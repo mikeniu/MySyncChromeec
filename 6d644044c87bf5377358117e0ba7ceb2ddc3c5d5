@@ -96,6 +96,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "751b614f_a7a930d3",
+        "filename": "util/egis/bootrom_protocol.h",
+        "patchSetId": 33
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:35:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] You previously received feedback to document why this specific Additional Authenticated Data (AAD) is used. Please add a brief comment explaining that it is a protocol requirement for the bootrom so future maintainers do not mistake it for leftover debug code.",
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e9ffba3d_f8b81049",
         "filename": "util/egis/bootrom_protocol.h",
         "patchSetId": 33
@@ -390,6 +407,23 @@
         "endLine": 13,
         "endChar": 18
       },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30e20f75_d69bbcac",
+        "filename": "util/egis/crypto_util.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:35:13Z",
+      "side": 1,
+      "message": "Please place the C/C++ system headers (`\u003ccstdlib\u003e`, `\u003cmemory\u003e`) before the third-party library headers (`\u003copenssl/...\u003e`) to conform to the Google C++ Style Guide.",
       "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
