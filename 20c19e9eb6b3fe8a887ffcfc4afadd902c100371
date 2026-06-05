@@ -281,6 +281,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f9b8d8dc_9fcc31ec",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T20:43:49Z",
+      "side": 1,
+      "message": "Review this feedback from Gemini (I haven\u0027t checked to see if it\u0027s correct):\n\n----\n\nThere is a test intended to cover this exact logic: **`UpdateFw_PadsPartialPayloadsToWordBoundary`** in `updater_test.cc`.\n\nHowever, **the current test has a logical flaw (a false positive)** that prevents it from actually verifying the padding.\n\nHere is the current assertion in that test:\n\n```cpp\n  const auto\u0026 payload_sizes \u003d raw_transport-\u003eGetDataPayloadSizes();\n  EXPECT_TRUE(std::ranges::contains(payload_sizes, kFocalConfigSize))\n      \u003c\u003c \"Expected a 4096-byte padded transmission for the 13-byte remainder.\";\n\n```\n\nBecause the firmware file includes the initial 4096-byte config page, the transport *will always* record at least one transmission of `kFocalConfigSize`. `std::ranges::contains` returns true immediately upon seeing that first block, so the test will pass even if the 13-byte remainder is silently dropped or sent as an unpadded 13-byte chunk! It also completely fails to verify that the padding bytes are actually `0xFF`.\n\n### The Fix\n\nTo truly test the padding logic, we need to capture the actual data payloads in the `StubUsbTransport`, and then verify that the final chunk has exactly the `0xFF` bytes appended to it.\n\n**1. Update `StubUsbTransport` to capture payload data:**\nIn `util/focaltech/updater_test.cc`, add a member to capture the raw vectors of data payloads.\n\n```diff\n   const std::vector\u003csize_t\u003e\u0026 GetDataPayloadSizes() const {\n     return data_payload_sizes_;\n   }\n+\n+  const std::vector\u003cstd::vector\u003cuint8_t\u003e\u003e\u0026 GetDataPayloads() const {\n+    return data_payloads_;\n+  }\n \n   std::expected\u003cint, Error\u003e Send(std::span\u003cconst uint8_t\u003e data,\n                                  std::chrono::milliseconds) override {\n     if (data.size() \u003d\u003d testing::kUsbCbwSize) {\n       std::memcpy(\u0026current_tag_, \u0026data[4], sizeof(current_tag_));\n     } else {\n       data_payload_sizes_.push_back(data.size());\n+      data_payloads_.push_back(std::vector\u003cuint8_t\u003e(data.begin(), data.end()));\n     }\n\n```\n\n```diff\n  private:\n   bool force_verify_fail_ \u003d false;\n   std::vector\u003cuint32_t\u003e erased_addresses_;\n   std::vector\u003csize_t\u003e data_payload_sizes_;\n+  std::vector\u003cstd::vector\u003cuint8_t\u003e\u003e data_payloads_;\n   std::array\u003cuint8_t, SHA256_DIGEST_LENGTH\u003e expected_hash_{};\n   uint32_t current_tag_ \u003d 1;\n };\n\n```\n\n**2. Update the test to verify exact counts and padding bytes:**\nNow we can rewrite the test to assert exactly how many chunks were sent, and look inside the padded chunk to ensure our C++ vector `.resize(kFocalConfigSize, 0xFF)` logic worked perfectly.\n\n```diff\n TEST(UpdaterTest, UpdateFw_PadsPartialPayloadsToWordBoundary) {\n   std::vector\u003cuint8_t\u003e fw_data(kFocalConfigSize + 13, 0xAA);\n \n   ConfigPage config{.code_valid_control_word \u003d kCodeValidMagic,\n                     .code_start_address \u003d kBootRunAddr};\n   std::memcpy(fw_data.data(), \u0026config, sizeof(config));\n \n   ScopedTempFile fw_file(fw_data);\n   std::string fw_path \u003d fw_file.path();\n \n   auto transport \u003d std::make_unique\u003cStubUsbTransport\u003e();\n   transport-\u003eSetExpectedHash(ComputeSha256(fw_data));\n   auto* raw_transport \u003d transport.get();\n \n   UsbDevice device(std::move(transport));\n \n   auto res \u003d UpdateFw(device, fw_path, DeviceMode::kBoot);\n   EXPECT_TRUE(res.has_value());\n \n-  const auto\u0026 payload_sizes \u003d raw_transport-\u003eGetDataPayloadSizes();\n-  EXPECT_TRUE(std::ranges::contains(payload_sizes, kFocalConfigSize))\n-      \u003c\u003c \"Expected a 4096-byte padded transmission for the 13-byte remainder.\";\n+  // DownloadBin skips the config page at the start, writes the rest, then \n+  // writes the config page at the end. For a (4096 + 13) byte file, we expect \n+  // exactly TWO data transfers:\n+  // 1. The 13 bytes padded out to 4096 bytes.\n+  // 2. The 4096 byte config page.\n+  const auto\u0026 payloads \u003d raw_transport-\u003eGetDataPayloads();\n+  ASSERT_EQ(payloads.size(), 2);\n+  \n+  // Verify the padded chunk sizes\n+  EXPECT_EQ(payloads[0].size(), kFocalConfigSize);\n+  EXPECT_EQ(payloads[1].size(), kFocalConfigSize);\n+\n+  // Verify the first 13 bytes are the actual firmware data (0xAA)\n+  EXPECT_EQ(payloads[0][12], 0xAA);\n+  \n+  // Verify the 14th byte onwards is properly padded with 0xFF\n+  EXPECT_EQ(payloads[0][13], 0xFF);\n+  EXPECT_EQ(payloads[0].back(), 0xFF);\n }\n\n```\n\nWith this change, the test is no longer vulnerable to false positives and mathematically proves the `final_chunk.resize(kFocalConfigSize, 0xFF)` logic is flawless!",
+      "parentUuid": "fdc3be6c_d3bf434d",
+      "range": {
+        "startLine": 155,
+        "startChar": 0,
+        "endLine": 158,
+        "endChar": 59
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4d024e3b_a25aa62d",
         "filename": "util/focaltech/usb_device_test.cc",
         "patchSetId": 21
