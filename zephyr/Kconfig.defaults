@@ -72,6 +72,7 @@ config I2C_TRANSFER_TIMEOUT_MS
 	default 100
 
 config DEVICE_API_ASSERT
+	bool
 	default n
 
 orsource "Kconfig.defaults-$(ARCH)"
