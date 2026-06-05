@@ -71,4 +71,7 @@ config CURRENT_THREAD_USE_TLS
 config I2C_TRANSFER_TIMEOUT_MS
 	default 100
 
+config DEVICE_API_ASSERT
+	default n
+
 orsource "Kconfig.defaults-$(ARCH)"
