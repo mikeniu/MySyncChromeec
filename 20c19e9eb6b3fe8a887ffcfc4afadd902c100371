@@ -22,6 +22,30 @@
       },
       "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67b72a89_1cf9a2a1",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T20:01:21Z",
+      "side": 1,
+      "message": "Gemini feedback on how to add `ToLittleEndian`:\n\n----\n\n\nHere is how to introduce the `FromLittleEndian` helper and the exact places in the codebase that should be updated to use it or be simplified.\n\n### 1. Define `FromLittleEndian` in `ft_util.h`\n\nEndian swapping is symmetric, so `FromLittleEndian` will functionally do the exact same thing as `ToLittleEndian`. However, giving it a distinct name makes the developer\u0027s intent explicit: \"I am writing *to* the wire\" vs. \"I am reading *from* the wire.\"\n\n**File:** `util/focaltech/ft_util.h`\n\n```cpp\n // C++23 native endianness swapping\n template \u003cstd::integral T\u003e\n constexpr T ToLittleEndian(T value) {\n   if constexpr (std::endian::native \u003d\u003d std::endian::big) {\n     return std::byteswap(value);\n   }\n   return value;\n }\n \n+// Alias for reading from the wire to clarify intent\n+template \u003cstd::integral T\u003e\n+constexpr T FromLittleEndian(T value) {\n+  return ToLittleEndian(value);\n+}\n\n```\n\n### 2. Update `ReceiveAndValidateCsw` in `ft_scsi.cc`\n\nHere, we are reading the CSW (Command Status Wrapper) back *from* the USB device.\n\n* **Signature:** We should read it `FromLittleEndian` to compare it against the native constant.\n* **Tag:** Both `csw.tag` and `cbw.tag` are already stored in their raw wire format (Little-Endian). Converting both back to native just to compare them is redundant. We can compare the wire bytes directly.\n\n**File:** `util/focaltech/ft_scsi.cc`\n\n```cpp\n std::expected\u003cvoid, Error\u003e ReceiveAndValidateCsw(\n     const UsbDevice\u0026 device, const BulkCbWrap\u0026 cbw,\n     std::chrono::milliseconds timeout_ms) {\n   BulkCsWrap csw{};\n   auto csw_span \u003d AsWritableUint8Span(csw);\n   auto recv_res \u003d device.Recv(csw_span, timeout_ms);\n \n   if (!recv_res || *recv_res !\u003d sizeof(csw)) {\n     FT_LOGE(\"CSW transfer failed.\");\n     return std::unexpected(Error::kResultFail);\n   }\n \n-  if (ToLittleEndian(csw.signature) !\u003d kUsbMsCswSignature ||\n-      ToLittleEndian(csw.tag) !\u003d ToLittleEndian(cbw.tag)) {\n+  if (FromLittleEndian(csw.signature) !\u003d kUsbMsCswSignature ||\n+      csw.tag !\u003d cbw.tag) {\n     FT_LOGE(\"CSW signature/tag mismatch.\");\n     return std::unexpected(Error::kResultFail);\n   }\n\n```\n\n### 3. Update the Test Mock in `updater_test.cc`\n\nIn the unit tests, your mock transport inspects the commands being \"sent\" over the wire. Since `ft_cmd` represents the raw packet byte structure (in Little-Endian), reading `ft_cmd.address` requires converting it *from* Little-Endian back to native format before pushing it to your `erased_addresses_` vector.\n\n**File:** `util/focaltech/updater_test.cc`\n\n```cpp\n       if (cbw.cmd[0] \u003d\u003d kCmdAction) {\n         auto ft_cmd \u003d std::bit_cast\u003cCmdFormat\u003e(cbw.cmd);\n \n         if (ft_cmd.subcmd \u003d\u003d kSubcmdErasePage) {\n-          erased_addresses_.push_back(ToLittleEndian(ft_cmd.address));\n+          erased_addresses_.push_back(FromLittleEndian(ft_cmd.address));\n         }\n       }\n\n```\n\n### Summary of what stays the same:\n\nAnywhere you are building a struct to send out (like `BuildFtCmd` and `SendCbw` in `ft_scsi.cc`, or building valid mock packets in `test_utils.h`), you should keep `ToLittleEndian`. You only use `FromLittleEndian` when reading data that was parsed directly from incoming device buffers.",
+      "parentUuid": "64f1b84d_bc075dfd",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 59
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
