@@ -49,6 +49,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a72fd66c_ff6b60a8",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T20:40:11Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nRight now, you have duplicated logic determining what constitutes a valid Focal device.\n\n* `FindFocalDevice` in `libusb_transport.cc` uses a massive `if/else` block to match VID/PIDs.  \n* `GetDeviceMode` in `cli.cc` does the exact same VID/PID matching to return a `DeviceMode`.\n\n**The Fix:** Move `GetDeviceMode` down into `usb_device.h` (where the `DeviceMode` enum actually lives), and use it to cleanly deduplicate the transport discovery loop.\n\n**In `util/focaltech/cli.h` \u0026 `cli.cc`:**\n\n* *Delete* the `GetDeviceMode` declaration and definition entirely.\n\n**In `util/focaltech/usb_device.h`:**\n\n```\n #include \"ft_util.h\"\n #include \"usb_transport.h\"\n+#include \"libusb_transport.h\"\n \n namespace focaltech {\n \n enum class DeviceMode { /* ... */ };\n \n+// Moved from cli to centralize device identification logic\n+constexpr std::expected\u003cDeviceMode, Error\u003e GetDeviceMode(const UsbDeviceId\u0026 id) {\n+  if (id \u003d\u003d kFocalRomId) return DeviceMode::kRom;\n+  if (id \u003d\u003d kFocalBootId) return DeviceMode::kBoot;\n+  if (id \u003d\u003d kFocalEcTestId) return DeviceMode::kTest;\n+  if (id \u003d\u003d kFocalEcPid9865Id || id \u003d\u003d kFocalEcPid9869Id)\n+    return DeviceMode::kEc;\n+\n+  return std::unexpected(Error::kNoSuchDevice);\n+}\n\n```\n\n**In `util/focaltech/libusb_transport.cc`:** Include `\"usb_device.h\"` and replace the `FindFocalDevice` loop with this elegant version:\n\n```\n libusb_device* FindFocalDevice(std::span\u003clibusb_device*\u003e devices,\n                                libusb_device_descriptor\u0026 out_desc,\n                                UsbDeviceId\u0026 out_id) {\n   for (libusb_device* dev : devices) {\n     if (libusb_get_device_descriptor(dev, \u0026out_desc) !\u003d LIBUSB_SUCCESS)\n       continue;\n \n     UsbDeviceId current_id{.vid \u003d out_desc.idVendor, .pid \u003d out_desc.idProduct};\n \n-    if (current_id \u003d\u003d kFocalBootId || current_id \u003d\u003d kFocalRomId) {\n-      out_id \u003d current_id;\n-      return dev;\n-    }\n-\n-    if (current_id.vid \u003d\u003d kGoogleVid) {\n-      if (current_id \u003d\u003d kFocalEcTestId || current_id \u003d\u003d kFocalEcPid9865Id ||\n-          current_id \u003d\u003d kFocalEcPid9869Id) {\n-        out_id \u003d current_id;\n-        return dev;\n-      }\n+    if (GetDeviceMode(current_id).has_value()) {\n+      out_id \u003d current_id;\n+      return dev;\n+    }\n+\n+    if (current_id.vid \u003d\u003d kGoogleVid) {\n       FT_LOGI(\"Found Google device {:04x}:{:04x}, but not Focal. Skipping.\",\n               current_id.vid, current_id.pid);\n     }\n   }\n   return nullptr;\n }\n\n```",
+      "range": {
+        "startLine": 303,
+        "startChar": 0,
+        "endLine": 312,
+        "endChar": 1
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "64f1b84d_bc075dfd",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 21
