@@ -329,6 +329,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "97d0a5bc_de73d524",
+        "filename": "util/focaltech/ft_scsi.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T21:40:56Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\nInstead of treating the SCSI command as an anonymous 16-byte array, we can use `CmdFormat` directly as the type inside the USB BOT wrapper. This eliminates raw arrays and guarantees the command perfectly matches the 16-byte BOT specification at compile time.",
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3a7c3794_fa2d19f9",
         "filename": "util/focaltech/ft_scsi.h",
         "patchSetId": 21
