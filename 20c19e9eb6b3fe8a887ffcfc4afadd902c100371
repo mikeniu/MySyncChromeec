@@ -72,6 +72,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "396a6f02_48a1b46a",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T21:06:14Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nThe variable name `device_lost` implies an error, but it is actually set to `true` on *success*. Rename it to `command_accepted` to make the loop logic self-evident, and extract the repeated ternary formatting strings to adhere to DRY principles.\n\n```\n-  bool device_lost \u003d false;\n+  bool command_accepted \u003d false;\n+  std::string_view target_name \u003d (target_cmd \u003d\u003d Command::kEnterBoot) ? \"bootloader\" : \"ROM\";\n \n   for (int attempt \u003d 1; attempt \u003c\u003d kMaxRetry; ++attempt) {\n     auto result \u003d switch_func();\n     if (!result) {\n       if (result.error() \u003d\u003d Error::kNoSuchDevice) {\n-        FT_LOGW(\"USB device lost (expected during {} switch).\",\n-                target_cmd \u003d\u003d Command::kEnterBoot ? \"bootloader\" : \"ROM\");\n-        device_lost \u003d true;\n+        FT_LOGW(\"USB device lost (expected during {} switch).\", target_name);\n+        command_accepted \u003d true;\n         break;\n       }\n-      FT_LOGW(\"Switch to {} failed (attempt {}): error\u003d{}\",\n-              target_cmd \u003d\u003d Command::kEnterBoot ? \"bootloader\" : \"ROM\", attempt,\n-              std::to_underlying(result.error()));\n+      FT_LOGW(\"Switch to {} failed (attempt {}): error\u003d{}\", target_name, attempt, std::to_underlying(result.error()));\n       std::this_thread::sleep_for(kMcuRebootPollInterval);\n       continue;\n     }\n-    FT_LOGI(\"Switch to {} command sent successfully\",\n-            target_cmd \u003d\u003d Command::kEnterBoot ? \"bootloader\" : \"ROM\");\n-    device_lost \u003d true;\n+    FT_LOGI(\"Switch to {} command sent successfully\", target_name);\n+    command_accepted \u003d true;\n     break;\n   }\n \n-  if (!device_lost) {\n+  if (!command_accepted) {\n     FT_LOGE(\"Failed to send switch command after {} attempts\", kMaxRetry);\n     return std::unexpected(Error::kResultFail);\n   }\n\n```",
+      "range": {
+        "startLine": 211,
+        "startChar": 2,
+        "endLine": 232,
+        "endChar": 3
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a72fd66c_ff6b60a8",
         "filename": "util/focaltech/cli.cc",
         "patchSetId": 21
@@ -228,6 +251,29 @@
         "startChar": 0,
         "endLine": 199,
         "endChar": 79
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9b5f3c8_1df90560",
+        "filename": "util/focaltech/libusb_transport.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T21:06:14Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\n\nIn `libusb_transport.cc`, you manually manage the lifecycle of the `libusb_device*` pointer. You correctly unref it in the destructor and inside `EnsureOpened()`, but manual pointer management is prone to regressions.\n\nSince you already wrote custom deleters for `libusb_context` and `libusb_device_handle`, you should do the exact same thing for `libusb_device`.\n\n**In `util/focaltech/libusb_transport.h`:**\n\n```\n struct LibusbDeviceHandleDeleter {\n   void operator()(libusb_device_handle* handle) const;\n };\n+\n+struct LibusbDeviceDeleter {\n+  void operator()(libusb_device* dev) const;\n+};\n \n class LibusbTransport : public UsbTransport {\n // ...\n  private:\n   std::unique_ptr\u003clibusb_context, LibusbContextDeleter\u003e ctx_;\n-  libusb_device* device_ \u003d nullptr;\n+  std::unique_ptr\u003clibusb_device, LibusbDeviceDeleter\u003e device_;\n   UsbDeviceId device_id_;\n\n```\n\n**In `util/focaltech/libusb_transport.cc`:** Add the implementation, and watch how much manual cleanup code evaporates:\n\n```\n+void LibusbDeviceDeleter::operator()(libusb_device* dev) const {\n+  if (dev) libusb_unref_device(dev);\n+}\n\n```\n\n```\n LibusbTransport::LibusbTransport(\n     std::unique_ptr\u003clibusb_context, LibusbContextDeleter\u003e ctx,\n     libusb_device* dev, UsbDeviceId id)\n     : ctx_(std::move(ctx)),\n-      device_(dev),\n+      device_(dev), // unique_ptr takes ownership\n       device_id_(id),\n       handle_(nullptr),\n       opened_(false) {}\n \n-LibusbTransport::~LibusbTransport() {\n-  if (device_) {\n-    libusb_unref_device(device_);\n-    device_ \u003d nullptr;\n-  }\n-}\n+LibusbTransport::~LibusbTransport() \u003d default;\n\n```\n\nAnd inside `EnsureOpened()`:\n\n```\n   if (libusb_claim_interface(handle_.get(), interface_num_) !\u003d LIBUSB_SUCCESS) {\n     FT_LOGE(\"Failed to claim interface\");\n     return std::unexpected(Error::kResultFail);\n   }\n \n-  if (device_) {\n-    libusb_unref_device(device_);\n-    device_ \u003d nullptr;\n-  }\n+  device_.reset(); // Safely unrefs and sets to null\n \n   opened_ \u003d true;\n\n```",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 35
       },
       "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
