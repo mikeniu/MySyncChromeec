@@ -257,6 +257,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cc107f84_bfaee228",
+        "filename": "util/egis/cli_options.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:16:49Z",
+      "side": 1,
+      "message": "**Help Flag Triggers Application Failure** In `cli_options.cc`, explicitly requesting help returns `std::nullopt`, which cascades up to `main()` and results in an `EXIT_FAILURE` (1).\n\n* **Suggestion:** Add an explicit exit code state to `AppConfig` or throw a distinct expected value to ensure that invoking `--help` exits gracefully with `EXIT_SUCCESS` (0).",
+      "range": {
+        "startLine": 144,
+        "startChar": 0,
+        "endLine": 144,
+        "endChar": 28
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3e51740c_4bf80448",
         "filename": "util/egis/cli_options.h",
         "patchSetId": 33
