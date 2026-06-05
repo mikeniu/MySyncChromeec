@@ -93,6 +93,29 @@
       },
       "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3743520_3a1ff7c3",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T20:14:05Z",
+      "side": 1,
+      "message": "**Check against `LIBUSB_SUCCESS` (`libusb_transport.cc`)**\n\n```c\n  if (libusb_claim_interface(handle_.get(), interface_num_) \u003c LIBUSB_SUCCESS) {\n\n```\n\nWhile technically correct since `LIBUSB_SUCCESS` is 0 and libusb errors are negative, standard libusb convention dictates explicitly checking for inequality.\n\n* **Remedy:** Change to `!\u003d LIBUSB_SUCCESS`.",
+      "range": {
+        "startLine": 199,
+        "startChar": 0,
+        "endLine": 199,
+        "endChar": 79
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
