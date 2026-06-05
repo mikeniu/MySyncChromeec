@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "66aac157_00f608aa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-05T09:39:56Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 27.",
+      "parentUuid": "fdab7392_73d166aa",
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "201f2a42_23e0a1e1",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-06-04T19:31:24Z",
       "side": 1,
       "message": "* **The Gap:** You don\u0027t test the failure paths of `ParseCommandLine` when provided with invalid hex inputs.\n* **Actionable Fix:** Add a test verifying that `ParseCommandLine` gracefully rejects bad VID/PID formats and returns `std::nullopt`.\n```cpp\nTEST_F(CliTest, FailsOnInvalidVidHex) {\n  std::vector\u003cstd::string\u003e args \u003d {\n      \"elaniap_tool\", \"--file\", \"fw.bin\", \"--vid\", \"NOT_HEX\"};\n  auto argv \u003d MakeArgv(args);\n  EXPECT_FALSE(ParseCommandLine(argv.size(), argv.data()).has_value());\n}\n\n```",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 11
+      },
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68610e7d_64580612",
+        "filename": "util/elan/cli_test.cc",
+        "patchSetId": 26
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-05T09:39:56Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 27.",
+      "parentUuid": "201f2a42_23e0a1e1",
       "range": {
         "startLine": 14,
         "startChar": 0,
@@ -64,6 +106,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8335a37_60e2ee29",
+        "filename": "util/elan/elaniap_test.cc",
+        "patchSetId": 26
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-05T09:39:56Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 27.",
+      "parentUuid": "052bcb55_f76968ca",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 58
+      },
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0ce52f0c_6d929fdd",
@@ -77,6 +143,30 @@
       "writtenOn": "2026-06-04T19:00:09Z",
       "side": 1,
       "message": "It\u0027s not clear what mode `0` means. Here is Gemini code to resolve this:\n\n----\n\nCurrently, `RunIapProcess` calls `RunIap(0)`. Passing a naked `0` is a classic \"magic number\" anti-pattern—it tells the reader nothing about what `0` actually represents. Converting it to an `enum class` makes the intent immediately obvious and prevents invalid modes from being passed in the future.\n\nHere is how you can seamlessly integrate it alongside the `Command` and `Status` enums:\n\n### Step 1: Define the Enum and Update the Packet Struct\n\nPlace the new enum right next to your `Command` and `Status` enums. Since we don\u0027t have the vendor spec for what other modes exist, naming `0` as `Normal` or `Default` is the safest bet.\n\n**File:** `util/elan/iap_control.h`\n\n```cpp\nenum class IapMode : uint8_t {\n  Normal \u003d 0x00,\n  // Add other modes here in the future if ELAN specifies them\n};\n\n// Update the packet struct union:\nstruct IapCommandPacket {\n  Command cmd_code;\n  uint8_t reserved;\n  uint8_t parameter_2[2];\n  union {\n    uint32_t payload_le;\n    IapMode iap_mode;      // \u003c-- Strongly typed now!\n  };\n  // ...\n} __attribute__((packed));\n\nclass IapControl {\n  // ...\n private:\n  // Update the method signature\n  std::expected\u003cvoid, IapError\u003e RunIap(IapMode iap_mode); \n  // ...\n};\n\n```\n\n### Step 2: Update the Implementation and Call Site\n\nNow update the function definition and replace the magic `0` at the call site.\n\n**File:** `util/elan/iap_control.cc`\n\n```cpp\n// 1. Update the call site in RunIapProcess\nstd::expected\u003cvoid, IapError\u003e IapControl::RunIapProcess(\n    std::span\u003cconst uint8_t\u003e rom) {\n  // ...\n  \n  // Much more readable than RunIap(0)!\n  if (auto res \u003d RunIap(IapMode::Normal); !res) return std::unexpected(res.error());\n  \n  // ...\n}\n\n\n// 2. Update the function definition\nstd::expected\u003cvoid, IapError\u003e IapControl::RunIap(IapMode iap_mode) {\n  IapCommandPacket packet \u003d {.cmd_code \u003d Command::RunIap,\n                             .reserved \u003d 0,\n                             .parameter_2 \u003d {0},\n                             .iap_mode \u003d iap_mode}; // Type safe assignment\n  return IapCommand(packet);\n}\n\n```\n\n### Why this completes the refactor:\n\nBy changing `iap_mode` to an enum, your `IapCommandPacket` struct is now almost entirely self-documenting. The union explicitly tells the developer: \"If you aren\u0027t sending a `payload_le`, you must be sending an `IapMode`.\" It enforces correct usage at compile time and makes `RunIapProcess` read like plain English.",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 70
+      },
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "427ecb96_1b9c02d4",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 26
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-05T09:39:56Z",
+      "side": 1,
+      "message": "So far, this project only supports normal mode. I still modified it on Patchset 27.",
+      "parentUuid": "0ce52f0c_6d929fdd",
       "range": {
         "startLine": 46,
         "startChar": 0,
@@ -110,6 +200,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "335dbdaf_714533ef",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 26
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-05T09:39:56Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 27.",
+      "parentUuid": "f051565b_b4aa5bff",
+      "range": {
+        "startLine": 289,
+        "startChar": 0,
+        "endLine": 289,
+        "endChar": 76
+      },
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "16e19d35_fcece99f",
@@ -123,6 +237,30 @@
       "writtenOn": "2026-06-04T18:30:01Z",
       "side": 1,
       "message": "Since your comment says this is \"Parameter 1\", let\u0027s rename this variable to `parameter_1` like the `IapStatusPacket`.",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 74
+      },
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0466f0de_30eef700",
+        "filename": "util/elan/iap_control.h",
+        "patchSetId": 26
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-05T09:39:56Z",
+      "side": 1,
+      "message": "I changed it to match IapStatusPacket on Patchset 27.",
+      "parentUuid": "16e19d35_fcece99f",
       "range": {
         "startLine": 31,
         "startChar": 0,
@@ -156,6 +294,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1746963_be4dd9a2",
+        "filename": "util/elan/iap_control.h",
+        "patchSetId": 26
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-05T09:39:56Z",
+      "side": 1,
+      "message": "I changed it to match IapStatusPacket on Patchset 27.",
+      "parentUuid": "c8f933e9_6d055db9",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 21
+      },
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "67a66536_2580befb",
@@ -169,6 +331,30 @@
       "writtenOn": "2026-06-04T18:52:55Z",
       "side": 1,
       "message": "We should create a `struct` to hold `vid` and `pid` together.\n\n----\n\n\n### Rationale\n\nRefactoring the loose `vid` and `pid` variables into a cohesive `UsbDeviceId` struct brings several significant architectural improvements:\n\n1. **Prevents \"Primitive Obsession\" \u0026 Accidental Swaps:** When APIs accept multiple parameters of the same primitive type (e.g., `Initialize(uint16_t vid, uint16_t pid)`), the compiler cannot prevent you from accidentally passing `Initialize(pid, vid)`. Wrapping them in a struct enforces compile-time type safety.\n2. **Self-Documenting Code:** Leveraging C++20 designated initializers (`{.vid \u003d ..., .pid \u003d ...}`) explicitly documents the intent at the call site and initialization points.\n3. **Value Semantics:** A VID/PID pair represents a single logical identity. Adding a C++20 defaulted `\u003d\u003d` operator allows the struct to be treated as a strict value type.\n4. **Testability:** Google Mock requires arguments to be equality-comparable to match them in `EXPECT_CALL`. Furthermore, `EXPECT_EQ` can now assert against the entire struct at once, rather than requiring line-by-line checks for `vid` and `pid`.\n\n---\n\n### Required Changes\n\nHere are the step-by-step updates needed across the codebase to implement this:\n\n#### 1. Define the Struct \u0026 Update Base Interfaces\n\n**File: `util/elan/usb_backend.h**`\n\n```cpp\n// 1. Add the struct definition above the UsbBackend class\nstruct UsbDeviceId {\n  uint16_t vid;\n  uint16_t pid;\n\n  // C++20 auto-generates the member-wise comparison\n  bool operator\u003d\u003d(const UsbDeviceId\u0026) const \u003d default;\n};\n\nclass UsbBackend {\n public:\n  virtual ~UsbBackend() \u003d default;\n\n  virtual int Initialize() \u003d 0;\n  // 2. Refactor OpenDevice\n  virtual int OpenDevice(UsbDeviceId device_id) \u003d 0; \n  // ...\n};\n\n```\n\n#### 2. Update Constants and Controller API\n\n**File: `util/elan/iap_control.h**`\n\n```cpp\n// 1. Replace the separate constants\nconstexpr UsbDeviceId kBootDevice \u003d {.vid \u003d 0x04F3, .pid \u003d 0x0910};\n\nclass IapControl {\n public:\n  // ...\n  // 2. Update signature\n  [[nodiscard]] std::expected\u003cvoid, IapError\u003e Initialize(UsbDeviceId device_id);\n\n```\n\n**File: `util/elan/iap_control.cc**`\n\n```cpp\nstd::expected\u003cvoid, IapError\u003e IapControl::Initialize(UsbDeviceId device_id) {\n  if (int err \u003d usb_-\u003eInitialize(); err !\u003d 0) {\n    return std::unexpected(IapError::UsbInitFailed);\n  }\n  // Pass the struct directly down to the backend\n  if (int err \u003d usb_-\u003eOpenDevice(device_id); err !\u003d 0) {\n    return std::unexpected(IapError::DeviceNotFound);\n  }\n  return {};\n}\n\n```\n\n#### 3. Update the USB Implementations\n\n**File: `util/elan/libusb_backend.h**`\n\n```cpp\n  int OpenDevice(UsbDeviceId device_id) override;\n\n```\n\n**File: `util/elan/libusb_backend.cc**`\n\n```cpp\nint LibusbBackend::OpenDevice(UsbDeviceId device_id) {\n// ... inside the descriptor loop:\n      if (desc.idVendor \u003d\u003d device_id.vid \u0026\u0026 desc.idProduct \u003d\u003d device_id.pid) {\n        found_dev \u003d list.get()[i];\n        break;\n      }\n\n```\n\n**File: `util/elan/fake_usb_backend.h**`\n\n```cpp\n  int OpenDevice(UsbDeviceId device_id) override { return 0; }\n\n```\n\n**File: `util/elan/mock_usb_backend.h**`\n\n```cpp\n  MOCK_METHOD(int, OpenDevice, (UsbDeviceId device_id), (override));\n\n```\n\n#### 4. Update the CLI State\n\n**File: `util/elan/cli.h**`\n\n```cpp\nstruct CmdLine {\n  UsbDeviceId device_id; // Replaces vid and pid\n  std::string file_path;\n  bool show_help \u003d false;\n};\n\n```\n\n**File: `util/elan/cli.cc**`\n\n```cpp\nstd::optional\u003cCmdLine\u003e ParseCommandLine(int argc, char* argv[]) {\n  // Use designated initializers for clean default state\n  CmdLine cmd{\n      .device_id \u003d kBootDevice,\n      .file_path \u003d \"\",\n      .show_help \u003d false\n  };\n\n  // ... in switch case \u0027V\u0027:\n        if (auto val \u003d internal::ParseHex(optarg)) {\n          cmd.device_id.vid \u003d *val;\n        }\n  // ... in switch case \u0027P\u0027:\n        if (auto val \u003d internal::ParseHex(optarg)) {\n          cmd.device_id.pid \u003d *val;\n        }\n\n```\n\n#### 5. Update `main` and Unit Tests\n\n**File: `util/elan/iap_tool.cc**`\n\n```cpp\n  // Pass the struct directly\n  if (auto res \u003d iap_ctrl.Initialize(cmd_line-\u003edevice_id); !res) {\n\n```\n\n**File: `util/elan/cli_test.cc**`\n\n```cpp\nTEST_F(CliTest, ParsesValidArguments) {\n  // ...\n  ASSERT_TRUE(cmd.has_value());\n  EXPECT_EQ(cmd-\u003efile_path, \"fw.bin\");\n  // Assert the entire struct at once. (Note: The extra parentheses are \n  // required to prevent the preprocessor from splitting on the comma).\n  EXPECT_EQ(cmd-\u003edevice_id, (UsbDeviceId{.vid \u003d 0x1234, .pid \u003d 0xABCD}));\n  EXPECT_FALSE(cmd-\u003eshow_help);\n}\n\n```\n\n**File: `util/elan/iap_control_test.cc**`\n*(Find all instances of Initialize calls and update them)*\n\n```cpp\n  // Replace all instances of:\n  ASSERT_TRUE(ctrl-\u003eInitialize(kBootVid, kBootPid).has_value());\n  // With:\n  ASSERT_TRUE(ctrl-\u003eInitialize(kBootDevice).has_value());\n\n```",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 37
+      },
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c5ef1f0_df416978",
+        "filename": "util/elan/iap_control.h",
+        "patchSetId": 26
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-05T09:39:56Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 27.",
+      "parentUuid": "67a66536_2580befb",
       "range": {
         "startLine": 64,
         "startChar": 0,
@@ -202,6 +388,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "86cc66d6_aa2684f2",
+        "filename": "util/elan/iap_control.h",
+        "patchSetId": 26
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-05T09:39:56Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 27.",
+      "parentUuid": "df6f35b5_7f246a18",
+      "range": {
+        "startLine": 107,
+        "startChar": 0,
+        "endLine": 121,
+        "endChar": 49
+      },
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7831e375_eacc5faf",
@@ -225,6 +435,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3217055_ad5722ba",
+        "filename": "util/elan/iap_control_test.cc",
+        "patchSetId": 26
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-05T09:39:56Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 27.",
+      "parentUuid": "7831e375_eacc5faf",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 47
+      },
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d4886647_793a4d78",
@@ -238,6 +472,30 @@
       "writtenOn": "2026-06-04T18:43:24Z",
       "side": 1,
       "message": "Gemini feedback. Review for correctness:\n\n\n---\n\n### Rationale: Realigning State with Reality\n\nThe original implementation suffered from a state tracking bug because it recorded the *intent* to perform an action rather than the *success* of that action.\n\n1. **Flawed Cleanup:** The original code pushed interface numbers into `claimed_interfaces_` during the discovery phase. If a subsequent call to `libusb_claim_interface()` failed, the function exited via `Release()`. However, `Release()` would blindly iterate over `claimed_interfaces_` and attempt to release interfaces the application never actually owned, potentially causing `libusb` errors or kernel log spam. The same issue applied to `detached_kernel_drivers_`.\n2. **Unnecessary Complexity:** The code looped through the configuration descriptors to find target interfaces, stored them, and then looped *again* to actually open the device and claim them.\n\nBy restructuring the flow to open the device *first*, we can consolidate discovery, detaching, claiming, and state-recording into a single, efficient pass. Most importantly, we only push to our state vectors `claimed_interfaces_` and `detached_kernel_drivers_` **after** the respective `libusb` calls return successfully.\n\n### Changes to be Made\n\n**File:** `util/elan/libusb_backend.cc`\n**Function:** `LibusbBackend::OpenDevice`\n\nReplace the latter half of the function (starting right after the device is found) with the unified single-pass loop.\n\n**Original Code:**\n\n```cpp\n  // ... device discovery above ...\n  if (!found_dev) return LIBUSB_ERROR_NO_DEVICE;\n\n  libusb_config_descriptor* config \u003d nullptr;\n  int err \u003d libusb_get_config_descriptor(found_dev, 0, \u0026config);\n  if (err !\u003d 0) return err;\n\n  for (int i \u003d 0; i \u003c config-\u003ebNumInterfaces; i++) {\n    const struct libusb_interface* inter \u003d \u0026config-\u003einterface[i];\n    for (int j \u003d 0; j \u003c inter-\u003enum_altsetting; j++) {\n      if (inter-\u003ealtsetting[j].bInterfaceClass \u003d\u003d LIBUSB_CLASS_HID) {\n        claimed_interfaces_.push_back(inter-\u003ealtsetting[j].bInterfaceNumber);\n        break;\n      }\n    }\n  }\n  libusb_free_config_descriptor(config);\n\n  err \u003d libusb_open(found_dev, \u0026dev_handle_);\n  if (err !\u003d 0) return err;\n\n  for (int interface_num : claimed_interfaces_) {\n    if (libusb_kernel_driver_active(dev_handle_, interface_num) \u003d\u003d 1) {\n      libusb_detach_kernel_driver(dev_handle_, interface_num);\n      detached_kernel_drivers_.push_back(interface_num);\n    }\n    err \u003d libusb_claim_interface(dev_handle_, interface_num);\n    if (err !\u003d 0) {\n      Release();\n      return err;\n    }\n  }\n  return 0;\n}\n\n```\n\n**Updated Code:**\n\n```cpp\n  // ... device discovery above ...\n  if (!found_dev) return LIBUSB_ERROR_NO_DEVICE;\n\n  // 1. Open the device BEFORE parsing interfaces so we can claim them immediately\n  int err \u003d libusb_open(found_dev, \u0026dev_handle_);\n  if (err !\u003d 0) return err;\n\n  libusb_config_descriptor* config \u003d nullptr;\n  err \u003d libusb_get_config_descriptor(found_dev, 0, \u0026config);\n  if (err !\u003d 0) {\n    Release(); \n    return err;\n  }\n\n  // 2. Discover, Detach, and Claim in a single pass\n  for (int i \u003d 0; i \u003c config-\u003ebNumInterfaces; i++) {\n    const struct libusb_interface* inter \u003d \u0026config-\u003einterface[i];\n    for (int j \u003d 0; j \u003c inter-\u003enum_altsetting; j++) {\n      if (inter-\u003ealtsetting[j].bInterfaceClass \u003d\u003d LIBUSB_CLASS_HID) {\n        int intf_num \u003d inter-\u003ealtsetting[j].bInterfaceNumber;\n\n        // Safely detach kernel driver and ONLY record it if successful\n        if (libusb_kernel_driver_active(dev_handle_, intf_num) \u003d\u003d 1 \u0026\u0026\n            libusb_detach_kernel_driver(dev_handle_, intf_num) \u003d\u003d 0) {\n          detached_kernel_drivers_.push_back(intf_num);\n        }\n\n        // Attempt to claim the interface\n        err \u003d libusb_claim_interface(dev_handle_, intf_num);\n        if (err !\u003d 0) {\n          libusb_free_config_descriptor(config);\n          Release(); // dev_handle_ is valid and safely closed here\n          return err;\n        }\n\n        // ONLY record the interface as claimed AFTER successful claim\n        claimed_interfaces_.push_back(intf_num);\n        break; \n      }\n    }\n  }\n\n  libusb_free_config_descriptor(config);\n  return 0;\n}\n\n```",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 84,
+        "endChar": 11
+      },
+      "revId": "dd6244f87b5a7a845d83077ebb206973707f372c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2365956e_171a301f",
+        "filename": "util/elan/libusb_backend.cc",
+        "patchSetId": 26
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-05T09:39:56Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 27.",
+      "parentUuid": "d4886647_793a4d78",
       "range": {
         "startLine": 35,
         "startChar": 0,
