@@ -46,6 +46,29 @@
       },
       "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3a8f1cd_d71bfb47",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T20:12:38Z",
+      "side": 1,
+      "message": "**Silent Ignorance of Short USB Reads (`ft_scsi.cc`)** In `ReceiveBulkDataIn`, you properly request data from the USB device, but you do not verify if the device actually returned the expected number of bytes.\n\n```c\n  if (!data_buffer.empty()) {\n    auto recv_res \u003d device.Recv(data_buffer, timeout_ms);\n    if (!recv_res) { // Checks for transport error, but not short reads!\n      FT_LOGE(\"Data IN transfer failed.\");\n      return std::unexpected(recv_res.error());\n    }\n  }\n\n```\n\nIf the USB device responds with a short packet (e.g., 5 bytes instead of the requested 512), `recv_res` will evaluate to true (containing `5`). The function will then successfully return, leaving the rest of the caller\u0027s buffer uninitialized or holding stale data.\n\n* **Remedy:** Enforce a strict length check against the buffer size, or update the function to return the actual number of bytes read so callers can react accordingly. Furthermore, you should evaluate the `csw.data_residue` field in `ReceiveAndValidateCsw` to detect mismatched transfer sizes at the SCSI level.",
+      "range": {
+        "startLine": 131,
+        "startChar": 0,
+        "endLine": 138,
+        "endChar": 0
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
