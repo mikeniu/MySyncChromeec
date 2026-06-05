@@ -143,6 +143,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a9f76310_48dc20e9",
+        "filename": "util/focaltech/test_utils.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T20:26:13Z",
+      "side": 1,
+      "message": "In your test utilities, you manually define `kUsbCbwSize \u003d 31` and `kUsbCswSize \u003d 13`, and then scatter these constants across all your mock return values in the test files. Since `test_utils.h` already includes `ft_scsi.h`, these constants are duplicating the structural knowledge of the USB wrapper structs.\n\n**The Fix:** Tie your constants directly to the struct definitions.\n\n```\n-inline constexpr size_t kUsbCbwSize \u003d 31;\n-inline constexpr size_t kUsbCswSize \u003d 13;\n+inline constexpr size_t kUsbCbwSize \u003d sizeof(BulkCbWrap);\n+inline constexpr size_t kUsbCswSize \u003d sizeof(BulkCsWrap);\n inline constexpr uint32_t kUsbMsCswSignature \u003d 0x53425355;\n```",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 41
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "40033af0_4316193b",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 21
