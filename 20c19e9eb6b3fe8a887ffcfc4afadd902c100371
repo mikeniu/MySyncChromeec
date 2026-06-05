@@ -328,6 +328,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f3b86e78_64cfbe56",
+        "filename": "util/focaltech/usb_device.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T20:59:37Z",
+      "side": 1,
+      "message": "The `DeviceMode` enum contains two states that are completely unused anywhere in the logic: `kUnknown` and `kForceUpdate`.\n\nWhen `GetDeviceMode` encounters an unrecognized device, it correctly returns `std::unexpected(Error::kNoSuchDevice)` rather than `kUnknown`, rendering `kUnknown` entirely dead code. Keeping the state machine strictly to the 4 actionable states prevents future switch-statement warnings.\n\n**In `util/focaltech/usb_device.h`:**\n\n```\n--- a/util/focaltech/usb_device.h\n+++ b/util/focaltech/usb_device.h\n@@ -17,12 +17,10 @@\n namespace focaltech {\n \n enum class DeviceMode {\n-  kUnknown,\n   kRom,\n   kBoot,\n   kTest,\n   kEc,\n-  kForceUpdate,\n };\n\n```",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 2
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4d024e3b_a25aa62d",
         "filename": "util/focaltech/usb_device_test.cc",
         "patchSetId": 21
