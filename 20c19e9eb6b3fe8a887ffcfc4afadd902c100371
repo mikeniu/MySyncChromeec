@@ -258,6 +258,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fdc3be6c_d3bf434d",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T20:43:05Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn `DownloadBin`, when padding the final flash chunk to 4096 bytes, you instantiate a full vector of `0xFF` and then manually use `std::ranges::copy` to overwrite the beginning. You can achieve this without the extra variable or manual copy step by utilizing standard vector constructors and the `.resize()` method, which natively accepts a padding value.\n\n**In `util/focaltech/updater.cc`:**\n\n```\n   if (!remaining_data.empty()) {\n-    size_t padded_len \u003d kFocalConfigSize;\n-    // 0xFF is the initial value of flash.\n-    std::vector\u003cuint8_t\u003e final_chunk(padded_len, 0xFF);\n-    std::ranges::copy(remaining_data, final_chunk.begin());\n-\n-    auto page_res \u003d DownloadPage(device, downaddr, padded_len, final_chunk);\n+    // Construct from remaining data, then pad out to config size using 0xFF\n+    std::vector\u003cuint8_t\u003e final_chunk(remaining_data.begin(), remaining_data.end());\n+    final_chunk.resize(kFocalConfigSize, 0xFF);\n+\n+    auto page_res \u003d DownloadPage(device, downaddr, final_chunk.size(), final_chunk);\n     if (!page_res) return page_res;\n   }\n\n```",
+      "range": {
+        "startLine": 155,
+        "startChar": 0,
+        "endLine": 158,
+        "endChar": 59
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4d024e3b_a25aa62d",
         "filename": "util/focaltech/usb_device_test.cc",
         "patchSetId": 21
