@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc67dc18_86a71c48",
+        "filename": "util/elan/build.mk",
+        "patchSetId": 27
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T19:04:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8907957e_38996da8",
+      "revId": "d62eebc390860dab966447e9624d032f25ceb78b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c5b01309_6463a0b7",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-06-05T18:56:50Z",
       "side": 1,
       "message": "Remove this comment",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 62
+      },
+      "revId": "d62eebc390860dab966447e9624d032f25ceb78b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4075401c_6e8a6a06",
+        "filename": "util/elan/build.mk",
+        "patchSetId": 27
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T19:04:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5b01309_6463a0b7",
       "range": {
         "startLine": 24,
         "startChar": 0,
