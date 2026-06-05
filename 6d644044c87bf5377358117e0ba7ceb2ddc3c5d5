@@ -256,6 +256,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d0f9de23_c7edc97b",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T17:49:42Z",
+      "side": 1,
+      "message": "**EC Checksum Validation is Vulnerable to USB Padding** In `ec_comm.cc`, `VerifyResponseChecksum` calculates the checksum across the entire received USB payload:\n\n```c\nresp_buf.resize(actual_res.value());\nif (!VerifyResponseChecksum(resp_buf)) { ... }\n\n```\n\nUSB bulk endpoints frequently pad transmissions to specific boundaries (e.g., 64 bytes). If the EC responds with 12 bytes but the USB bridge pads the packet to 64 bytes with garbage data, the checksum validation will fail incorrectly.\n\n* **Suggestion:** Parse the header first, validate the `data_length` against the received size, and then run the checksum *strictly* over `sizeof(EcHostCommandResponse) + data_length` bytes.",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 3
+      },
+      "revId": "6d644044c87bf5377358117e0ba7ceb2ddc3c5d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d6aeedef_ec397c2c",
         "filename": "util/egis/ec_comm.h",
         "patchSetId": 33
