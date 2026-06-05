@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6176e51b_8a779588",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-05T09:39:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f05c0f49_7a69d0d6",
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e2d80ef3_d7649307",
@@ -65,6 +83,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d870666e_e26e1786",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-05T09:39:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "897c785a_329efa78",
+      "range": {
+        "startLine": 115,
+        "startChar": 0,
+        "endLine": 117,
+        "endChar": 3
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9942f58e_ac1fe3ff",
@@ -78,6 +120,30 @@
       "writtenOn": "2026-06-04T17:56:10Z",
       "side": 1,
       "message": "Throughout the code, you frequently convert POD (Plain Old Data) structs into `std::span\u003cuint8_t\u003e` for USB transmission:\n\n```c\n// In cli.cc\nauto params_span \u003d std::span\u003cconst uint8_t\u003e(reinterpret_cast\u003cconst uint8_t*\u003e(\u0026params), sizeof(params));\n\n// In ft_scsi.cc\nauto cbw_span \u003d std::span\u003cconst uint8_t\u003e(reinterpret_cast\u003cconst uint8_t*\u003e(\u0026cbw), sizeof(cbw));\n\n```\n\nC++20 introduced `std::as_bytes(std::span{...})`, but it returns `std::byte`, whereas your USB layer correctly uses `uint8_t`. Instead of scattering `reinterpret_cast` everywhere, you can centralize this into a pair of highly safe, universally usable templates.\n\n**Add these to `util/focaltech/ft_util.h`:**\n\n```c\n// Safely view any TriviallyCopyable object as a read-only byte span\ntemplate \u003ctypename T\u003e\n  requires std::is_trivially_copyable_v\u003cT\u003e\ninline std::span\u003cconst uint8_t\u003e AsUint8Span(const T\u0026 obj) {\n  return {reinterpret_cast\u003cconst uint8_t*\u003e(\u0026obj), sizeof(T)};\n}\n\n// Safely view any TriviallyCopyable object as a mutable byte span\ntemplate \u003ctypename T\u003e\n  requires std::is_trivially_copyable_v\u003cT\u003e\ninline std::span\u003cuint8_t\u003e AsWritableUint8Span(T\u0026 obj) {\n  return {reinterpret_cast\u003cuint8_t*\u003e(\u0026obj), sizeof(T)};\n}\n\n```\n\nNow, your protocol parsing becomes beautifully clean:\n\n* In `cli.cc`: `auto params_span \u003d AsUint8Span(params);`  \n* In `ft_scsi.cc`: `auto cbw_span \u003d AsUint8Span(cbw);`  \n* In `ft_scsi.cc`: `auto csw_span \u003d AsWritableUint8Span(csw);`",
+      "range": {
+        "startLine": 147,
+        "startChar": 0,
+        "endLine": 148,
+        "endChar": 65
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cdf8aef9_386f28b8",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-05T09:39:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9942f58e_ac1fe3ff",
       "range": {
         "startLine": 147,
         "startChar": 0,
@@ -111,6 +177,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0944b8ee_b9bebdf4",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-05T09:39:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62722eb2_2f717364",
+      "range": {
+        "startLine": 178,
+        "startChar": 0,
+        "endLine": 178,
+        "endChar": 37
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "322f2fec_05583f62",
@@ -124,6 +214,30 @@
       "writtenOn": "2026-06-04T17:35:02Z",
       "side": 1,
       "message": "Put each `static_assert` directly after the associated struct definition.",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 54
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5305a4e_d888d2db",
+        "filename": "util/focaltech/ft_scsi.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-05T09:39:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "322f2fec_05583f62",
       "range": {
         "startLine": 46,
         "startChar": 0,
@@ -157,6 +271,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2356c740_69d8f020",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-05T09:39:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a0961738_87a5693c",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 17
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0045c820_2f0ea8f7",
@@ -180,6 +318,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8891ef2_2cfdcecc",
+        "filename": "util/focaltech/libusb_transport.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-05T09:39:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0045c820_2f0ea8f7",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 44
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6630b61a_98fa7ace",
@@ -193,6 +355,30 @@
       "writtenOn": "2026-06-04T18:07:14Z",
       "side": 1,
       "message": "This is a little confusing. Here is a suggestion from Gemini on how to clean it up:\n\n----\n\nThe reason this \"legacy\" behavior exists is actually explained by a block comment hiding down in `libusb_transport.cc`:\n\n```cpp\n/*Only locate the Focal device to support the following scenario:\n1.The system image contains this tool that automatically detects whether the\nfingerprint device is in bootloader mode and automatically upgrades the firmware.\n2.After the upgrade, the fingerprint device is in FtDeviceMode::kEc,\nand this tool must not perform USB claim / libusb_detach_kernel_driver\noperations on the fingerprint device, as that could affect fingerprint functionality.*/\n\n```\n\nThe author realized that aggressively claiming the USB interface on startup would crash the fingerprint driver for users simply running the tool to check the firmware version. Their solution was \"lazy opening\" (waiting until `Send` or `Recv` is called to actually claim the interface).\n\nHowever, they made an architectural misstep: **they exposed the intermediate steps of this lazy-open pattern to the public API.** Because the `LibusbTransport` class encapsulates the lazy-open behavior internally, the public API doesn\u0027t need to know about `FoundDeviceInfo` or `FindDevice()` at all!\n\nHere is how you can collapse this down into a single, clean factory method:\n\n### 1. Update `libusb_transport.h`\n\nDelete the `FoundDeviceInfo` struct entirely. Move the crucial explanatory comment to the class declaration, and make the constructor private so that `Create()` is the only way to instantiate the transport.\n\n```cpp\n// ... existing includes/deleters ...\n\nnamespace focaltech {\n\n// USB transport implementation using raw libusb calls.\n// Note: To prevent interfering with normal OS fingerprint operations, this \n// class employs a \"lazy open\" pattern. Instantiation locates the device but \n// does NOT claim the USB interface or detach the kernel driver until \n// Send/Recv are explicitly called.\nclass LibusbTransport : public UsbTransport {\n public:\n  // Creates a transport for the first matching Focal device.\n  static std::expected\u003cLibusbTransport, Error\u003e Create();\n\n  LibusbTransport(const LibusbTransport\u0026) \u003d delete;\n  LibusbTransport\u0026 operator\u003d(const LibusbTransport\u0026) \u003d delete;\n\n  LibusbTransport(LibusbTransport\u0026\u0026) noexcept \u003d default;\n  LibusbTransport\u0026 operator\u003d(LibusbTransport\u0026\u0026) noexcept \u003d default;\n\n  // UsbTransport interface.\n  UsbDeviceId device_id() const override { return device_id_; }\n  std::expected\u003cint, Error\u003e Send(std::span\u003cconst uint8_t\u003e data,\n                                 std::chrono::milliseconds timeout) override;\n  std::expected\u003cint, Error\u003e Recv(std::span\u003cuint8_t\u003e data,\n                                 std::chrono::milliseconds timeout) override;\n  std::expected\u003cvoid, Error\u003e WaitForReset(\n      std::chrono::milliseconds timeout) override;\n\n  ~LibusbTransport() override;\n\n private:\n  // Private constructor called internally by Create()\n  explicit LibusbTransport(std::unique_ptr\u003clibusb_context, LibusbContextDeleter\u003e ctx,\n                           libusb_device* dev, UsbDeviceId id);\n\n  std::expected\u003cvoid, Error\u003e EnsureOpened();\n  std::expected\u003cint, Error\u003e HandleTransferError(int libusb_error) const;\n\n  std::unique_ptr\u003clibusb_context, LibusbContextDeleter\u003e ctx_;\n  libusb_device* device_ \u003d nullptr;\n  UsbDeviceId device_id_;\n\n  std::unique_ptr\u003clibusb_device_handle, LibusbDeviceHandleDeleter\u003e handle_;\n  uint8_t endpoint_in_ \u003d 0;\n  uint8_t endpoint_out_ \u003d 0;\n  uint8_t interface_num_ \u003d 0;\n  bool opened_ \u003d false;\n};\n\n}  // namespace focaltech\n\n```\n\n### 2. Update `libusb_transport.cc`\n\nCompletely delete the `FindDevice()` method. Take its logic and paste it directly into `Create()`. Then, update the constructor implementation.\n\n**The Consolidated `Create()` method:**\n\n```cpp\nstd::expected\u003cLibusbTransport, Error\u003e LibusbTransport::Create() {\n  // 1. Initialize libusb context\n  libusb_context* raw_ctx \u003d nullptr;\n  if (libusb_init(\u0026raw_ctx) !\u003d LIBUSB_SUCCESS) {\n    FT_LOGE(\"Failed to initialize libusb\");\n    return std::unexpected(Error::kResultFail);\n  }\n  std::unique_ptr\u003clibusb_context, LibusbContextDeleter\u003e ctx(raw_ctx);\n\n  // 2. Get device list\n  libusb_device** raw_list \u003d nullptr;\n  ssize_t count \u003d libusb_get_device_list(ctx.get(), \u0026raw_list);\n  if (count \u003c 0) {\n    FT_LOGE(\"Failed to get USB device list: {}\", libusb_error_name(count));\n    return std::unexpected(Error::kNoSuchDevice);\n  }\n  ScopedDeviceList dev_list(raw_list);\n\n  // 3. Find target device\n  libusb_device_descriptor desc;\n  auto devices \u003d std::span(raw_list, static_cast\u003csize_t\u003e(count));\n  libusb_device* target \u003d FindFocalDevice(devices, desc);\n  if (!target) {\n    FT_LOGE(\"No matching Focal device found\");\n    return std::unexpected(Error::kNoSuchDevice);\n  }\n\n  // Increase reference count on the device so it remains valid \n  // after the device list is freed\n  libusb_ref_device(target);\n  dev_list.reset();\n\n  UsbDeviceId id{.vid \u003d desc.idVendor, .pid \u003d desc.idProduct};\n  FT_LOGI(\"Found device VID {:04x}: PID {:04x}\", id.vid, id.pid);\n\n  // Pass directly to the private constructor\n  return LibusbTransport(std::move(ctx), target, id);\n}\n\n```\n\n**The Updated Constructor:**\n\n```cpp\nLibusbTransport::LibusbTransport(\n    std::unique_ptr\u003clibusb_context, LibusbContextDeleter\u003e ctx,\n    libusb_device* dev, UsbDeviceId id)\n    : ctx_(std::move(ctx)),\n      device_(dev),\n      device_id_(id),\n      handle_(nullptr),\n      endpoint_in_(0),\n      endpoint_out_(0),\n      interface_num_(0),\n      opened_(false) {}\n\n```\n\n### Why this is better:\n\n1. **Zero Impact on Callers:** `main.cc` was already calling `LibusbTransport::Create()`, so no changes are needed outside this class!\n2. **True Encapsulation:** The ugly `libusb` pointer mechanics are now completely hidden inside the class. The user simply calls `Create()` and gets a fully self-managed, lazy-opening C++ object.\n3. **Removes the \"Legacy\" Cruft:** It deletes `FoundDeviceInfo` entirely, which served no purpose other than being a glorified argument-passing struct between two setup methods.",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 49
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7dcd3333_8c046b28",
+        "filename": "util/focaltech/libusb_transport.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-05T09:39:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6630b61a_98fa7ace",
       "range": {
         "startLine": 55,
         "startChar": 0,
@@ -250,6 +436,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9f24c0c_88c7f4ad",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-05T09:39:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fbdde282_d39d93cb",
+      "range": {
+        "startLine": 138,
+        "startChar": 0,
+        "endLine": 141,
+        "endChar": 60
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "848ad177_f82d2293",
@@ -263,6 +473,30 @@
       "writtenOn": "2026-06-04T17:12:50Z",
       "side": 1,
       "message": "This is grammatically awkward. Let\u0027s rename to `HasValidConfigPage`.",
+      "range": {
+        "startLine": 242,
+        "startChar": 29,
+        "endLine": 242,
+        "endChar": 49
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "96a824b5_cc52e523",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-05T09:39:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "848ad177_f82d2293",
       "range": {
         "startLine": 242,
         "startChar": 29,
@@ -296,6 +530,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "87d664c5_dfe952bf",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-05T09:39:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6901aec9_16a69694",
+      "range": {
+        "startLine": 257,
+        "startChar": 0,
+        "endLine": 265,
+        "endChar": 0
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6fdf5f4c_7ee3bbf2",
@@ -309,6 +567,30 @@
       "writtenOn": "2026-06-04T17:56:10Z",
       "side": 1,
       "message": "### Rationale\n\nIn C++, the **Strict Aliasing Rule** allows the compiler\u0027s optimizer to assume that pointers of completely different types (like `uint8_t*` and `BulkCbWrap*`) will never point to the same memory location.\n\nWhen you use `reinterpret_cast` to cast a raw byte array directly into a struct pointer:\n\n```cpp\nconst auto* cbw \u003d reinterpret_cast\u003cconst BulkCbWrap*\u003e(data.data());\n\n```\n\nYou are violating this rule. In unoptimized builds, this usually works fine. However, when compiling with optimizations enabled (`-O2` or `-O3`), the compiler may aggressively reorder, cache, or completely optimize away the memory reads because it assumes nothing is mutating the struct\u0027s underlying memory. This causes unpredictable \"heisenbugs\" where tests randomly fail in release builds.\n\n**The Solution:**\n\n1. **`std::memcpy`**: For moving data from a pointer (`data.data()`) into a struct, `memcpy` is the standard-compliant approach. Modern compilers recognize this pattern and optimize it into zero-cost register reads—no actual function call is made.\n2. **`std::bit_cast`**: For converting between two types that are the exact same size at compile-time (like the 16-byte `cbw.cmd` array to the 16-byte `FtCmdFormat` struct), C++20\u0027s `std::bit_cast` is the safest, most idiomatic tool for type-punning.\n\n---\n\n### The Change\n\n**File:** `util/focaltech/updater_test.cc`\n**Location:** Inside `StubUsbTransport::Send()`\n\n**Remove this block:**\n\n```cpp\n        // Use structured packet inspection instead of magic indices.\n        if (data.size() \u003d\u003d sizeof(BulkCbWrap)) {\n          const auto* cbw \u003d reinterpret_cast\u003cconst BulkCbWrap*\u003e(data.data());\n          // Ensure the CBW contains an FocalTech command (opcode 0xDC).\n          if (cbw-\u003ecmd[0] \u003d\u003d kFtCmdAction) {\n            const auto* ft_cmd \u003d reinterpret_cast\u003cconst FtCmdFormat*\u003e(cbw-\u003ecmd);\n            if (ft_cmd-\u003esubcmd \u003d\u003d kFtSubcmdErasePage) {\n              erased_addresses_.push_back(ToLittleEndian(ft_cmd-\u003eaddress));\n            }\n          }\n        }\n\n```\n\n**Replace with this block:**\n\n```cpp\n        // Use structured packet inspection instead of magic indices.\n        if (data.size() \u003d\u003d sizeof(BulkCbWrap)) {\n          // 1. Use memcpy because data.data() is a pointer, preventing bit_cast.\n          BulkCbWrap cbw;\n          std::memcpy(\u0026cbw, data.data(), sizeof(cbw));\n\n          // Ensure the CBW contains a FocalTech command (opcode 0xDC).\n          if (cbw.cmd[0] \u003d\u003d kFtCmdAction) {\n            // 2. Use bit_cast because cbw.cmd (uint8_t[16]) and FtCmdFormat are exactly 16 bytes.\n            auto ft_cmd \u003d std::bit_cast\u003cFtCmdFormat\u003e(cbw.cmd);\n            \n            if (ft_cmd.subcmd \u003d\u003d kFtSubcmdErasePage) {\n              erased_addresses_.push_back(ToLittleEndian(ft_cmd.address));\n            }\n          }\n        }\n\n```\n\n*(Note: If you have already applied the C++ namespace refactor we discussed earlier, remember to drop the `Ft` prefix from `FtCmdFormat`, `kFtCmdAction`, and `kFtSubcmdErasePage` in your updated code!)*",
+      "range": {
+        "startLine": 81,
+        "startChar": 0,
+        "endLine": 91,
+        "endChar": 5
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc961ed4_0d262afe",
+        "filename": "util/focaltech/updater_test.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-05T09:39:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6fdf5f4c_7ee3bbf2",
       "range": {
         "startLine": 81,
         "startChar": 0,
@@ -357,6 +639,54 @@
       "message": "### The Issue: `DeviceInfo` is a Mutable Data Bag\n\nIn `usb_device.h`, you have this struct:\n\n```cpp\nstruct DeviceInfo {\n  DeviceMode current_mode \u003d DeviceMode::kUnknown;\n  DeviceMode next_mode \u003d DeviceMode::kUnknown;\n  std::string_view ec_bin;\n};\n\n```\n\n1. `next_mode` is **100% dead code**. It is never read or written anywhere in the codebase.\n2. `ec_bin` is already securely held inside `AppConfig`! You copy it over in `ExecuteCommand` just to pass it to `UpdateFw`.\n3. Because of this struct, `InitDevice` requires an out-parameter (`InitDevice(usb.device_id(), info)`), which is less idiomatic than simply returning a value.\n\n### The Fix: Make the Data Flow Functional\n\n**1. Delete the struct entirely**\nOpen `util/focaltech/usb_device.h` and simply delete the `DeviceInfo` struct.\n\n**2. Turn `InitDevice` into `GetDeviceMode**`\nIn `cli.h` and `cli.cc`, replace `InitDevice` with a function that strictly evaluates the USB IDs and returns the mode:\n\n```cpp\nstd::expected\u003cDeviceMode, Error\u003e GetDeviceMode(const UsbDeviceId\u0026 details) {\n  switch (details.vid) {\n    case kFocalRomVid:\n      return DeviceMode::kRom;\n    case kFocalBootVid:\n      return DeviceMode::kBoot;\n    case kFocalEcVid:\n      return (details.pid \u003d\u003d kFocalEcPidTest) ? DeviceMode::kTest : DeviceMode::kEc;\n    default:\n      FT_LOGE(\"Unrecognized Focal device.\");\n      return std::unexpected(Error::kNoSuchDevice);\n  }\n}\n\n```\n\n*(Look at how much cleaner that `switch` statement is without all the `break`s and `info.current_mode \u003d ...` assignments!)*\n\n**3. Update `ExecuteCommand` to take the mode directly**\nIn `cli.h` and `cli.cc`, update the signature to accept `DeviceMode current_mode` instead of the struct.\n\n```cpp\nstd::expected\u003cvoid, Error\u003e ExecuteCommand(const AppConfig\u0026 config,\n                                          UsbDevice\u0026 usb_device,\n                                          DeviceMode current_mode) {\n// ...\n\n```\n\nInside the `Command::kUpdate` switch case, you no longer need to copy the `ec_bin` string. Just pass it directly to `UpdateFw`:\n\n```cpp\n    case Command::kUpdate:\n      FT_LOGI(\"Updating firmware...\");\n      if (config.ec_bin.empty()) {\n        FT_LOGE(\"No firmware file specified\");\n        return std::unexpected(Error::kParameterError);\n      }\n      \n      for (int attempt \u003d 1; attempt \u003c\u003d kMaxRetry; ++attempt) {\n        // Pass config.ec_bin and current_mode directly!\n        if (auto res \u003d UpdateFw(usb_device, config.ec_bin, current_mode); res) {\n          FT_LOGI(\"Firmware update successful\");\n          return {};\n        }\n// ...\n\n```\n\n**4. Update `UpdateFw` to accept the isolated variables**\nIn `updater.h` and `updater.cc`, change the signature from `DeviceInfo\u0026 info` to the individual required variables:\n\n```cpp\nstd::expected\u003cvoid, Error\u003e UpdateFw(const UsbDevice\u0026 device,\n                                    std::string_view ec_bin,\n                                    DeviceMode current_mode) {\n// ...\n\n```\n\n*(You will just need to replace the couple of references to `info.ec_bin` with `ec_bin`, and `info.current_mode` with `current_mode` inside the function).*\n\n**5. Clean up `main.cc**`\nFinally, your entry point becomes incredibly linear and functional, with no mutable out-parameters!\n\n```cpp\n  // 3. Inject hardware into domain object\n  focaltech::UsbDevice usb_device(std::make_unique\u003cfocaltech::LibusbTransport\u003e(\n      std::move(transport.value())));\n\n  // Get the mode directly\n  auto mode_res \u003d focaltech::GetDeviceMode(usb_device.device_id());\n  if (!mode_res) {\n    FT_LOGE(\"Cannot find Focal device\");\n    return EXIT_FAILURE;\n  }\n\n  // 4. Execute using the resolved mode\n  if (auto exec_res \u003d focaltech::ExecuteCommand(config.value(), usb_device, *mode_res);\n      !exec_res) {\n    FT_LOGE(\"Command failed\");\n    return EXIT_FAILURE;\n  }\n\n```\n\nThis drastically simplifies the data architecture of the tool. State now flows strictly downward (Config ➔ Mode ➔ Execute ➔ Update), effectively wiping out the last remaining \"C-style\" state-bag pattern from the migration!",
       "range": {
         "startLine": 26,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 2
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "630ae8bf_ea6f9d9c",
+        "filename": "util/focaltech/usb_device.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-05T09:39:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd13e3af_55be6738",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 2
+      },
+      "revId": "20583db2c60fa6183a0830c8ed67fd8c8dedff11",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "805de9fb_ae4d6e9d",
+        "filename": "util/focaltech/usb_device.h",
+        "patchSetId": 20
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-05T09:39:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "89ff1206_a4d47ccf",
+      "range": {
+        "startLine": 17,
         "startChar": 0,
         "endLine": 30,
         "endChar": 2
