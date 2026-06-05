@@ -113,6 +113,29 @@
       },
       "revId": "d62eebc390860dab966447e9624d032f25ceb78b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70439ae2_a63ebd9c",
+        "filename": "util/elan/utility.h",
+        "patchSetId": 27
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T18:53:48Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n---\n\nByte-swapping is a symmetric operation (if the host is Big-Endian, you swap the bytes; if it\u0027s Little-Endian, you do nothing). Because of this symmetry, `ToLittleEndian` mechanically works for both encoding and decoding.\n\nHowever, reading `uint32_t fw_ver \u003d ToLittleEndian(stat_recv.parameter_1);` is semantically confusing. It implies we are converting the host\u0027s native data *into* little-endian format, when in reality, we are taking little-endian data from the USB bus and converting it *back to* native host format.\n\nBy introducing `FromLittleEndian` as a semantic alias, we allow the code to clearly document the direction of data flow (serialization vs. deserialization) without adding any runtime overhead. It makes the call sites read perfectly as English.\n\n---\n\n### **Required Code Changes**\n\n**1. In `util/elan/utility.h**`\nAdd the `FromLittleEndian` alias right below the existing `ToLittleEndian` definition:\n\n```cpp\n// Converts an integral type between native byte order and little-endian.\ntemplate \u003cstd::integral T\u003e\nconstexpr T ToLittleEndian(T val) {\n  if constexpr (std::endian::native \u003d\u003d std::endian::big) {\n    return std::byteswap(val);\n  }\n  return val;\n}\n\n// Semantic alias for converting from little-endian to native byte order.\ntemplate \u003cstd::integral T\u003e\nconstexpr T FromLittleEndian(T val) {\n  return ToLittleEndian(val);\n}\n\n```\n\n**2. In `util/elan/utility_test.cc**`\nUpdate the existing test to cover the new alias:\n\n```cpp\nTEST(UtilityTest, EndianConversions) {\n  uint32_t val \u003d 0x11223344;\n  // Since x86/ARM natively use Little Endian, this ensures the byteswap\n  // template doesn\u0027t accidentally corrupt data on standard host machines.\n  EXPECT_EQ(ToLittleEndian(val), 0x11223344);\n  EXPECT_EQ(FromLittleEndian(val), 0x11223344);\n}\n\n```\n\n**3. In `util/elan/iap_control.cc**`\nUpdate the two places where data is being *read* from the device or firmware file to use the new alias:\n\n*In `IapControl::GetFwVersion()` (~line 136):*\n\n```cpp\n  if (stat_recv.cmd_echo !\u003d packet.cmd_code ||\n      stat_recv.status_code !\u003d Status::Success) {\n    return std::unexpected(IapError::CommandFailed);\n  }\n\n  uint32_t fw_ver \u003d FromLittleEndian(stat_recv.parameter_1); \n\n  LogInfo(\"[IAP] {} - fw version: 0x{:08X}, boot type: 0x{:02X}\\n\", __func__,\n\n```\n\n*In `IapControl::GetChecksum()` (~line 280):*\n\n```cpp\n  while (!remaining.empty()) {\n    uint32_t chunk_val \u003d 0;\n    // Extract exactly 4 bytes locally\n    std::memcpy(\u0026chunk_val, remaining.data(), sizeof(chunk_val));\n    \n    checksum +\u003d FromLittleEndian(chunk_val); \n\n    remaining \u003d remaining.subspan(4);\n  }\n\n```\n\n*(Note: Keep `ToLittleEndian` in `RunIap`, `SendCmdWithU32Payload`, and `fake_usb_backend.h`, as those are correctly serializing data *to* the wire format!)*",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 1
+      },
+      "revId": "d62eebc390860dab966447e9624d032f25ceb78b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
