@@ -373,6 +373,79 @@ ZTEST(ap_pwrseq, test_ap_pwrseq_0_wake)
 	zassert_equal(s0ix_cnt_ev_r.s0ix_counter, 0);
 }
 
+#if defined(CONFIG_AP_X86_INTEL_MTL) && defined(CONFIG_AP_PWRSEQ_DRIVER)
+/*
+ * Verify that the AP resumes from S0ix as soon as SLP_S0# (and SLP_S3#) are
+ * de-asserted, even when no HOST_SLEEP_EVENT_S0IX_RESUME notification has been
+ * received from the AP.
+ *
+ * This exercises the MTL S0ix substate handler change that dropped the
+ * dependency on AP_POWER_SLEEP_RESUME and now relies solely on the SLP_S0 and
+ * SLP_S3 signals being off.
+ *
+ * This test assumes the current power state is S0 (left by the preceding
+ * test_ap_pwrseq_0_wake) and at completion the power state is S0 again.
+ */
+ZTEST(ap_pwrseq, test_ap_pwrseq_0_wake_no_resume_notify)
+{
+	struct ec_params_host_sleep_event_v1 host_sleep_ev_p = {
+		.sleep_event = HOST_SLEEP_EVENT_S0IX_SUSPEND,
+		.suspend_params = { EC_HOST_SLEEP_TIMEOUT_DEFAULT },
+	};
+	struct ec_response_host_sleep_event_v1 host_sleep_ev_r;
+	struct host_cmd_handler_args host_sleep_ev_args = BUILD_HOST_COMMAND(
+		EC_CMD_HOST_SLEEP_EVENT, 1, host_sleep_ev_r, host_sleep_ev_p);
+
+	/* Make sure we start out running in S0. */
+	zassert_true(chipset_in_state(CHIPSET_STATE_ON),
+		     "AP not in S0 at the start of the test");
+
+	/* Tell the EC the AP is going to suspend, then assert SLP_S0# so the
+	 * state machine transitions S0 -> S0ix.
+	 */
+	zassert_ok(host_command_process(&host_sleep_ev_args));
+	zassert_equal(0,
+		      power_signal_emul_load(
+			      EMUL_POWER_SIGNAL_TEST_PLATFORM(tp_sys_sleep)),
+		      "Unable to load test platform `tp_sys_sleep`");
+	k_msleep(500);
+
+	/* Confirm the AP suspended into S0ix (S0ix maps to STANDBY). */
+	zassert_true(chipset_in_state(CHIPSET_STATE_STANDBY),
+		     "AP did not suspend to S0ix");
+
+	/* The emulator only allows a single platform loaded at a time, so the
+	 * sleep platform must be unloaded before loading the wake platform.
+	 */
+	power_signal_emul_unload();
+
+	/* Critically, do NOT send a HOST_SLEEP_EVENT_S0IX_RESUME host command.
+	 * The sleep notification must not be in the RESUME state when we
+	 * de-assert SLP_S0#.
+	 */
+	zassert_not_equal(AP_POWER_SLEEP_RESUME, ap_power_sleep_get_notify(),
+			  "Resume notification unexpectedly set");
+
+	/* De-assert SLP_S0# (SLP_S3# is already off). With the resume-event
+	 * check removed, this alone must drive the AP back to S0.
+	 */
+	zassert_equal(0,
+		      power_signal_emul_load(
+			      EMUL_POWER_SIGNAL_TEST_PLATFORM(tp_sys_wake)),
+		      "Unable to load test platform `tp_sys_wake`");
+	k_msleep(500);
+
+	zassert_true(chipset_in_state(CHIPSET_STATE_ON),
+		     "AP did not resume to S0 without a resume notification");
+
+	/* Restore a clean host sleep notification state so the subsequent
+	 * ordered tests start from the same baseline as before this test ran.
+	 */
+	host_sleep_ev_p.sleep_event = HOST_SLEEP_EVENT_S0IX_RESUME;
+	zassert_ok(host_command_process(&host_sleep_ev_args));
+}
+#endif /* CONFIG_AP_X86_INTEL_MTL && CONFIG_AP_PWRSEQ_DRIVER */
+
 ZTEST(ap_pwrseq, test_ap_pwrseq_1)
 {
 	zassert_equal(0,
