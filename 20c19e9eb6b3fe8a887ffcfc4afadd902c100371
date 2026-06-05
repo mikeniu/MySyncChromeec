@@ -143,6 +143,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3a7c3794_fa2d19f9",
+        "filename": "util/focaltech/ft_scsi.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T20:39:19Z",
+      "side": 1,
+      "message": "Currently, `SendBulkDataOut` and `ReceiveBulkDataIn` accept the SCSI command as a `std::span\u003cconst uint8_t\u003e scsi_cmd`. However, a USB Bulk-Only Transport (BOT) wrapper *strictly* requires exactly 16 bytes for the `cmd` array. By accepting a span, you lose the compile-time size guarantee—passing a smaller span would result in uninitialized bytes being read into the `BulkCbWrap`.\n\nSince your `BuildFtCmd` helper already returns an exact `std::array\u003cuint8_t, 16\u003e`, we can update the signatures to enforce this at compile time.\n\n**In `util/focaltech/ft_scsi.h`:**\n\n```\n // For sending data TO the device (Data buffer is const)\n std::expected\u003cvoid, Error\u003e SendBulkDataOut(\n-    const UsbDevice\u0026 device, std::span\u003cconst uint8_t\u003e scsi_cmd,\n+    const UsbDevice\u0026 device, const std::array\u003cuint8_t, kScsiCmdSize\u003e\u0026 scsi_cmd,\n     std::span\u003cconst uint8_t\u003e data_buffer, TransferDirection dir,\n     std::chrono::milliseconds timeout_ms);\n \n // For receiving data FROM the device (Data buffer is mutable)\n std::expected\u003cvoid, Error\u003e ReceiveBulkDataIn(\n-    const UsbDevice\u0026 device, std::span\u003cconst uint8_t\u003e scsi_cmd,\n+    const UsbDevice\u0026 device, const std::array\u003cuint8_t, kScsiCmdSize\u003e\u0026 scsi_cmd,\n     std::span\u003cuint8_t\u003e data_buffer, std::chrono::milliseconds timeout_ms);\n\n```\n\n*(Apply the exact same signature changes to the implementations in `ft_scsi.cc`)*",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 74
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f3743520_3a1ff7c3",
         "filename": "util/focaltech/libusb_transport.cc",
         "patchSetId": 21
