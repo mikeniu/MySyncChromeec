@@ -72,6 +72,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "034997e9_f3c8ed83",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-05T21:47:24Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n-----\n\nCurrently, when an error occurs, you log its underlying integer value (e.g., `error\u003d2`). This forces developers to constantly cross-reference `ft_util.h` while debugging logs.\n\nYou can find all of them by running a global search in your IDE for:\n`std::to_underlying(.*error())` or `error()}` inside an `FT_LOG` macro.\n\nHere are the specific places you should update to use `ToString()`:\n\n### 1. The Retry Loops (`cli.cc`)\n\nWe caught this one earlier, but make sure it is updated. When hardware is rebooting, it throws expected errors (like `kNoSuchDevice`).\n\n```diff\n-      FT_LOGW(\"Switch to {} failed (attempt {}): error\u003d{}\", target_name, attempt,\n-              std::to_underlying(result.error()));\n+      FT_LOGW(\"Switch to {} failed (attempt {}): error\u003d{}\", target_name, attempt,\n+              ToString(result.error()));\n\n```\n\n### 2. The Main Entry Point / Command Dispatcher (`cli.cc` or `main.cc`)\n\nAt the very top level of your program, you likely execute the command, check the final `std::expected` result, and log it before exiting the program. This is the most important place to use `ToString`, as it\u0027s the final error the user actually sees!\n\n```diff\n   auto result \u003d ExecuteCommand(device, config);\n   if (!result) {\n-    FT_LOGE(\"Execution failed with error code: {}\", std::to_underlying(result.error()));\n+    FT_LOGE(\"Execution failed: {}\", ToString(result.error()));\n     return -1;\n   }\n\n```\n\n### 3. I/O and Protocol Failures (`ft_scsi.cc` \u0026 `updater.cc`)\n\nWhen a command fails but doesn\u0027t immediately crash the program, there is usually a debug or warning log right before the `return std::unexpected(...)`.\n\nFor example, if a SCSI command fails, you might be logging the error before bubbling it up:\n\n```diff\n   auto res \u003d ReceiveBulkDataIn(device, cmd, data, timeout);\n   if (!res) {\n-    FT_LOGD(\"Failed to read flash protection: {}\", std::to_underlying(res.error()));\n+    FT_LOGD(\"Failed to read flash protection: {}\", ToString(res.error()));\n     return res;\n   }\n\n```\n\n### The Quick Checklist\n\nTo make sure you caught them all, just search your codebase for these three patterns:\n\n1. `std::to_underlying` (If you\u0027ve applied all our optimizations, this function shouldn\u0027t be used anywhere in the codebase anymore except inside `ToString()` itself!)\n2. `FT_LOGE(..., result.error())` (Where the compiler implicitly casts it).\n3. `FT_LOGW(..., res.error())`\n\nIf you swap all of those out for `ToString(res.error())`, your terminal output will instantly transform from cryptic numbers into clean, human-readable diagnostics.",
+      "range": {
+        "startLine": 222,
+        "startChar": 0,
+        "endLine": 224,
+        "endChar": 50
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "396a6f02_48a1b46a",
         "filename": "util/focaltech/cli.cc",
         "patchSetId": 21
