@@ -22,6 +22,30 @@
       },
       "revId": "ea2b2da9451a77c07350355fc1e370435a77ca6a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52d04d76_c90490b6",
+        "filename": "zephyr/program/bluey/src/battery.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-06-06T16:45:21Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "20163349_2e07598a",
+      "range": {
+        "startLine": 92,
+        "startChar": 38,
+        "endLine": 92,
+        "endChar": 40
+      },
+      "revId": "ea2b2da9451a77c07350355fc1e370435a77ca6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
