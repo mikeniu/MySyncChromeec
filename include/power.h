@@ -257,6 +257,13 @@ int power_get_pause_in_s5(void);
  */
 void power_set_pause_in_s5(int pause);
 
+/**
+ * Enable/disable the S5 inactivity timer.
+ *
+ * @param enable True to enable, false to disable/bypass.
+ */
+void power_set_s5_inactivity_timer_enable(int enable);
+
 #ifdef CONFIG_POWER_TRACK_HOST_SLEEP_STATE
 /**
  * Get sleep state of host, as reported by the host.
