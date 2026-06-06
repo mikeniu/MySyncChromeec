@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8d05aa1e_05890dbf",
+        "filename": "zephyr/program/bluey/src/battery.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-06-06T16:58:03Z",
+      "side": 1,
+      "message": "Formatting done by `cros format` tool, linter will fail otherwise.",
+      "parentUuid": "8e2155a8_37cc0fbf",
+      "revId": "39290f0b28d72c64cc22542b6d4c62eb89072c3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fa1a265b_70ab48c3",
         "filename": "zephyr/program/bluey/src/battery.c",
         "patchSetId": 4
@@ -73,6 +91,30 @@
           ]
         }
       ],
+      "revId": "39290f0b28d72c64cc22542b6d4c62eb89072c3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cd5a9ab_56064c55",
+        "filename": "zephyr/program/bluey/src/battery.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-06-06T16:58:03Z",
+      "side": 1,
+      "message": "Formatting done by `cros format` tool, linter will fail otherwise.",
+      "parentUuid": "fa1a265b_70ab48c3",
+      "range": {
+        "startLine": 107,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 22
+      },
       "revId": "39290f0b28d72c64cc22542b6d4c62eb89072c3e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
