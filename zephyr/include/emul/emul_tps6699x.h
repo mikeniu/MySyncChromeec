@@ -7,6 +7,7 @@
 #define __EMUL_TPS6699X_H_
 
 #include "drivers/ucsi_v3.h"
+#include "emul/emul_pdc.h"
 #include "emul/emul_pdc_pdo.h"
 #include "include/usb_pd.h"
 #include "tps6699x_reg.h"
@@ -14,6 +15,9 @@
 #include <stdint.h>
 
 #include <zephyr/drivers/gpio.h>
+
+/* Forward declaration for i2c_common_emul_data */
+struct i2c_common_emul_data;
 
 #define TPS6699X_MAX_REG 0xa4
 #define TPS6699X_REG_SIZE 64
@@ -132,5 +136,16 @@ int emul_pdc_fail_next_ucsi_command(const struct emul *target,
  * ports.
  */
 int emul_pdc_set_interrupt_patch_loaded(const struct emul *target);
+
+/**
+ * @brief Get pointer to i2c_common_emul_data for TPS6699x emulator
+ *
+ * Used to configure I2C failure injection for testing error paths.
+ *
+ * @param emul Pointer to TPS6699x emulator
+ * @return Pointer to i2c_common_emul_data structure
+ */
+struct i2c_common_emul_data *
+emul_tps6699x_get_i2c_common_data(const struct emul *emul);
 
 #endif /* __EMUL_TPS6699X_H_ */

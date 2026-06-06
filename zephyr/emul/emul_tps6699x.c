@@ -1636,6 +1636,13 @@ static DEVICE_API(emul_pdc, emul_tps6699x_api) = {
 	.get_max_pdp = emul_tps6699x_get_max_pdp,
 };
 
+struct i2c_common_emul_data *
+emul_tps6699x_get_i2c_common_data(const struct emul *emul)
+{
+	struct tps6699x_emul_data *data = emul->data;
+	return &data->common;
+}
+
 /* clang-format off */
 #define TPS6699X_EMUL_DEFINE(n) \
 	static struct tps6699x_emul_data tps6699x_emul_data_##n = { \
