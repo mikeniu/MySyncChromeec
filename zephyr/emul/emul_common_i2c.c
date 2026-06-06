@@ -324,8 +324,12 @@ int i2c_common_emul_transfer_workhorse(const struct emul *target,
 				if (ret) {
 					return ret;
 				}
-				/* Wait for write message with acctual data */
+				/* Check for FAIL_ALL before processing zero-length writes */
 				if (msgs->len == 0) {
+					if (data->write_fail_reg ==
+					    I2C_COMMON_EMUL_FAIL_ALL_REG) {
+						return -EIO;
+					}
 					continue;
 				}
 				/* Dispatch command/register address */
@@ -343,8 +347,12 @@ int i2c_common_emul_transfer_workhorse(const struct emul *target,
 					return ret;
 				}
 			} else {
-				/* Wait for write message with acctual data */
+				/* Check for FAIL_ALL before processing zero-length writes */
 				if (msgs->len == 0) {
+					if (data->write_fail_reg ==
+					    I2C_COMMON_EMUL_FAIL_ALL_REG) {
+						return -EIO;
+					}
 					continue;
 				}
 				/* Dispatch command/register address */
