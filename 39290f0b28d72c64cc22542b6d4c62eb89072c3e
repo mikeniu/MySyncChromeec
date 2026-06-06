@@ -1,0 +1,80 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e2155a8_37cc0fbf",
+        "filename": "zephyr/program/bluey/src/battery.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1532003
+      },
+      "writtenOn": "2026-06-06T16:48:35Z",
+      "side": 1,
+      "message": "mostly fit into line abobve",
+      "fixSuggestions": [
+        {
+          "fixId": "f2536964_2edd0ccd",
+          "description": "prompt_to_edit API",
+          "replacements": [
+            {
+              "path": "zephyr/program/bluey/src/battery.c",
+              "range": {
+                "startLine": 104,
+                "startChar": 0,
+                "endLine": 106,
+                "endChar": 0
+              },
+              "replacement": "\t\t\t\t((batt-\u003estate_of_charge - DISPLAY_SOC_MIN) * 1000 +\n"
+            }
+          ]
+        }
+      ],
+      "revId": "39290f0b28d72c64cc22542b6d4c62eb89072c3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa1a265b_70ab48c3",
+        "filename": "zephyr/program/bluey/src/battery.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1532003
+      },
+      "writtenOn": "2026-06-06T16:48:35Z",
+      "side": 1,
+      "message": "mostly will fit into line above",
+      "range": {
+        "startLine": 107,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 22
+      },
+      "fixSuggestions": [
+        {
+          "fixId": "69aeb3d2_c7fcc6c7",
+          "description": "prompt_to_edit API",
+          "replacements": [
+            {
+              "path": "zephyr/program/bluey/src/battery.c",
+              "range": {
+                "startLine": 106,
+                "startChar": 0,
+                "endLine": 108,
+                "endChar": 0
+              },
+              "replacement": "\t\t\t\t (DISPLAY_SOC_RANGE / 2)) / DISPLAY_SOC_RANGE;\n"
+            }
+          ]
+        }
+      ],
+      "revId": "39290f0b28d72c64cc22542b6d4c62eb89072c3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
