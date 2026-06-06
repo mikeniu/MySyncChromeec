@@ -39,6 +39,30 @@
       },
       "revId": "d9aeb39d84b0958f83ab2b34b7430543926fbfef",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce20e757_5a5b196b",
+        "filename": "power/qcom_exp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1238,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-06-06T23:06:23Z",
+      "side": 1,
+      "message": "Sure tom, will take a look into this later this week, filed a bug to track this. Marking this closed for now. b/520812490",
+      "parentUuid": "89275a90_96a5779d",
+      "range": {
+        "startLine": 1231,
+        "startChar": 0,
+        "endLine": 1238,
+        "endChar": 3
+      },
+      "revId": "d9aeb39d84b0958f83ab2b34b7430543926fbfef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
