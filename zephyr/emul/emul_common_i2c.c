@@ -302,6 +302,12 @@ int i2c_common_emul_transfer_workhorse(const struct emul *target,
 		read = msgs->flags & I2C_MSG_READ;
 		stop = msgs->flags & I2C_MSG_STOP;
 
+		/* Early FAIL_ALL check for both reads and writes */
+		if (data->read_fail_reg == I2C_COMMON_EMUL_FAIL_ALL_REG ||
+		    data->write_fail_reg == I2C_COMMON_EMUL_FAIL_ALL_REG) {
+			return -EIO;
+		}
+
 		switch (data->msg_state) {
 		case I2C_COMMON_EMUL_IN_WRITE:
 			if (read) {
@@ -324,7 +330,7 @@ int i2c_common_emul_transfer_workhorse(const struct emul *target,
 				if (ret) {
 					return ret;
 				}
-				/* Wait for write message with acctual data */
+				/* Wait for write message with actual data */
 				if (msgs->len == 0) {
 					continue;
 				}
@@ -343,7 +349,7 @@ int i2c_common_emul_transfer_workhorse(const struct emul *target,
 					return ret;
 				}
 			} else {
-				/* Wait for write message with acctual data */
+				/* Wait for write message with actual data */
 				if (msgs->len == 0) {
 					continue;
 				}
