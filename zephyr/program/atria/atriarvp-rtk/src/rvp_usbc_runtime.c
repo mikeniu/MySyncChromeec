@@ -70,9 +70,12 @@ static bool probe_pdc_chip(const struct device *dev)
 
 	rv = pdc_get_hw_config(dev, &config);
 	if (rv) {
+		/* LCOV_EXCL_START Unlikely that the device tree is
+		 * misconfigured for a known board */
 		LOG_ERR("%s: Cannot get bus info for PDC %s: %d", __func__,
 			dev->name ? dev->name : "unnamed", rv);
 		return false;
+		/* LCOV_EXCL_STOP */
 	}
 
 	struct i2c_msg msgs[1];
@@ -213,3 +216,12 @@ int board_get_pdc_for_port(int port, const struct device **dev)
 	*dev = NULL;
 	return -ENOENT;
 }
+
+#ifdef CONFIG_ZTEST
+/* Test-only function to reset discovery state for i2c failure injection tests */
+void reset_pdc_discovery_for_test(void)
+{
+	ctx.initialized = false;
+	ctx.detected_cards = RVP_TCSS_NONE;
+}
+#endif
