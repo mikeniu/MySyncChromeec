@@ -144,6 +144,14 @@ bool motion_sensor_in_forced_mode(const struct motion_sensor_t *sensor)
 		return true;
 	}
 
+	/*
+	 * Check case where forced_mode is enabled dynamically based on
+	 * ufsc/ssfc checks.
+	 */
+	if (sensor->flags & MOTIONSENSE_FLAG_IN_FORCED_MODE) {
+		return true;
+	}
+
 	if (!IS_ENABLED(CONFIG_SENSOR_EC_RATE_FORCE_MODE)) {
 		return false;
 	}
