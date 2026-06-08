@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce50610c_4ef53c8a",
+        "filename": "zephyr/zmake/zmake/compare_builds.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-06-08T19:58:31Z",
+      "side": 1,
+      "message": "`shlex.join` in the exception handler below cannot handle `Path` objects even though subprocess does.",
+      "range": {
+        "startLine": 120,
+        "startChar": 24,
+        "endLine": 120,
+        "endChar": 37
+      },
+      "revId": "6006d78a17f5a298810d03eea1c1ebdb91cc1cfe",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
