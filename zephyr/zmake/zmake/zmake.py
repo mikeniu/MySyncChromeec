@@ -476,7 +476,8 @@ class Zmake:
 
         for checkout in cmp_builds.checkouts:
             self.logger.info(
-                "Checkout %s: full hash %s", checkout.ref, checkout.full_ref
+                "Checkout %s",
+                checkout,
             )
 
         cmp_builds.do_checkouts(self.zephyr_base, self.module_paths)
@@ -536,7 +537,7 @@ class Zmake:
         if len(self.failed_projects) == 0:
             self.logger.info("Zephyr compare builds successful:")
             for checkout in cmp_builds.checkouts:
-                self.logger.info("   %s: %s", checkout.ref, checkout.full_ref)
+                self.logger.info("   %s", checkout)
 
         return len(self.failed_projects)
 
