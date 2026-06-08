@@ -9,6 +9,9 @@
 #include <string_view>
 
 namespace focaltech {
+
+constexpr std::string_view kToolVersion = "v1.0.5";
+
 inline constexpr std::string_view kCmdHelpString = R"(
 Usage: {} <command> [arguments]
 

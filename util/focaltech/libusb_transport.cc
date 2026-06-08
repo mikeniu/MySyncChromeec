@@ -8,11 +8,14 @@
 #include <libusb.h>
 
 #include <chrono>
+#include <memory>
+#include <optional>
 #include <span>
 #include <thread>
 
 #include "ft_log.h"
 #include "ft_util.h"
+#include "usb_device.h"
 
 namespace focaltech {
 
@@ -28,6 +31,7 @@ struct LibusbDeviceListDeleter {
     if (list) libusb_free_device_list(list, /*unref_devices=*/1);
   }
 };
+
 using ScopedDeviceList =
     std::unique_ptr<libusb_device*, LibusbDeviceListDeleter>;
 
@@ -40,17 +44,12 @@ libusb_device* FindFocalDevice(std::span<libusb_device*> devices,
 
     UsbDeviceId current_id{.vid = out_desc.idVendor, .pid = out_desc.idProduct};
 
-    if (current_id == kFocalBootId || current_id == kFocalRomId) {
+    if (GetDeviceMode(current_id).has_value()) {
       out_id = current_id;
       return dev;
     }
 
     if (current_id.vid == kGoogleVid) {
-      if (current_id == kFocalEcTestId || current_id == kFocalEcPid9865Id ||
-          current_id == kFocalEcPid9869Id) {
-        out_id = current_id;
-        return dev;
-      }
       FT_LOGI("Found Google device {:04x}:{:04x}, but not Focal. Skipping.",
               current_id.vid, current_id.pid);
     }
@@ -64,35 +63,50 @@ struct EndpointInfo {
   uint8_t ep_bulk_out = 0;
 };
 
-bool FindBulkEndpoints(libusb_device* dev, EndpointInfo& info) {
-  libusb_config_descriptor* config = nullptr;
-  if (libusb_get_config_descriptor(dev, kDefaultUsbConfigIndex, &config) !=
-      LIBUSB_SUCCESS)
-    return false;
+std::optional<EndpointInfo> ParseAltSetting(
+    const libusb_interface_descriptor& alt) {
+  EndpointInfo info{.interface_num = alt.bInterfaceNumber};
 
-  bool found = false;
-  for (int i = 0; i < config->bNumInterfaces && !found; ++i) {
-    const libusb_interface& iface = config->interface[i];
-    for (int j = 0; j < iface.num_altsetting && !found; ++j) {
-      const libusb_interface_descriptor& alt = iface.altsetting[j];
-      info.interface_num = alt.bInterfaceNumber;
+  for (const auto& ep : std::span(alt.endpoint, alt.bNumEndpoints)) {
+    if ((ep.bmAttributes & LIBUSB_TRANSFER_TYPE_MASK) !=
+        LIBUSB_TRANSFER_TYPE_BULK) {
+      continue;
+    }
 
-      for (int k = 0; k < alt.bNumEndpoints; ++k) {
-        const libusb_endpoint_descriptor& ep = alt.endpoint[k];
-        if ((ep.bmAttributes & LIBUSB_TRANSFER_TYPE_MASK) ==
-            LIBUSB_TRANSFER_TYPE_BULK) {
-          if ((ep.bEndpointAddress & LIBUSB_ENDPOINT_DIR_MASK) ==
-              LIBUSB_ENDPOINT_IN)
-            info.ep_bulk_in = ep.bEndpointAddress;
-          else
-            info.ep_bulk_out = ep.bEndpointAddress;
-        }
-      }
-      if (info.ep_bulk_in != 0 && info.ep_bulk_out != 0) found = true;
+    if ((ep.bEndpointAddress & LIBUSB_ENDPOINT_DIR_MASK) ==
+        LIBUSB_ENDPOINT_IN) {
+      info.ep_bulk_in = ep.bEndpointAddress;
+    } else {
+      info.ep_bulk_out = ep.bEndpointAddress;
     }
   }
-  libusb_free_config_descriptor(config);
-  return found;
+
+  if (info.ep_bulk_in != 0 && info.ep_bulk_out != 0) {
+    return info;
+  }
+  return std::nullopt;
+}
+
+std::optional<EndpointInfo> FindBulkEndpoints(libusb_device* dev) {
+  libusb_config_descriptor* raw_config = nullptr;
+  if (libusb_get_config_descriptor(dev, kDefaultUsbConfigIndex, &raw_config) !=
+      LIBUSB_SUCCESS) {
+    return std::nullopt;
+  }
+
+  std::unique_ptr<libusb_config_descriptor, LibusbConfigDeleter> config(
+      raw_config);
+
+  for (const auto& iface :
+       std::span(config->interface, config->bNumInterfaces)) {
+    for (const auto& alt : std::span(iface.altsetting, iface.num_altsetting)) {
+      if (auto info = ParseAltSetting(alt)) {
+        return info;
+      }
+    }
+  }
+
+  return std::nullopt;
 }
 
 }  // namespace
@@ -103,6 +117,14 @@ void LibusbContextDeleter::operator()(libusb_context* ctx) const {
 
 void LibusbDeviceHandleDeleter::operator()(libusb_device_handle* handle) const {
   if (handle) libusb_close(handle);
+}
+
+void LibusbDeviceDeleter::operator()(libusb_device* dev) const {
+  if (dev) libusb_unref_device(dev);
+}
+
+void LibusbConfigDeleter::operator()(libusb_config_descriptor* config) const {
+  if (config) libusb_free_config_descriptor(config);
 }
 
 std::expected<LibusbTransport, Error> LibusbTransport::Create() {
@@ -152,12 +174,7 @@ LibusbTransport::LibusbTransport(
       interface_num_(0),
       opened_(false) {}
 
-LibusbTransport::~LibusbTransport() {
-  if (device_) {
-    libusb_unref_device(device_);
-    device_ = nullptr;
-  }
-}
+LibusbTransport::~LibusbTransport() = default;
 
 std::expected<void, Error> LibusbTransport::EnsureOpened() {
   if (opened_) {
@@ -172,21 +189,21 @@ std::expected<void, Error> LibusbTransport::EnsureOpened() {
   }
 
   libusb_device_handle* raw_handle = nullptr;
-  int r = libusb_open(device_, &raw_handle);
+  int r = libusb_open(device_.get(), &raw_handle);
   if (r != LIBUSB_SUCCESS || !raw_handle) {
     FT_LOGE("Failed to open device: {}", libusb_error_name(r));
     return std::unexpected(Error::kNoSuchDevice);
   }
   handle_.reset(raw_handle);
 
-  EndpointInfo ep_info;
-  if (!FindBulkEndpoints(device_, ep_info)) {
+  auto ep_info = FindBulkEndpoints(device_.get());
+  if (!ep_info) {
     FT_LOGE("Could not find required bulk IN/OUT endpoints");
     return std::unexpected(Error::kNoSuchDevice);
   }
-  endpoint_in_ = ep_info.ep_bulk_in;
-  endpoint_out_ = ep_info.ep_bulk_out;
-  interface_num_ = ep_info.interface_num;
+  endpoint_in_ = ep_info->ep_bulk_in;
+  endpoint_out_ = ep_info->ep_bulk_out;
+  interface_num_ = ep_info->interface_num;
 
   if (libusb_kernel_driver_active(handle_.get(), interface_num_)) {
     if (libusb_detach_kernel_driver(handle_.get(), interface_num_) !=
@@ -196,15 +213,12 @@ std::expected<void, Error> LibusbTransport::EnsureOpened() {
     }
   }
 
-  if (libusb_claim_interface(handle_.get(), interface_num_) < LIBUSB_SUCCESS) {
+  if (libusb_claim_interface(handle_.get(), interface_num_) != LIBUSB_SUCCESS) {
     FT_LOGE("Failed to claim interface");
     return std::unexpected(Error::kResultFail);
   }
 
-  if (device_) {
-    libusb_unref_device(device_);
-    device_ = nullptr;
-  }
+  device_.reset();
 
   opened_ = true;
   return {};

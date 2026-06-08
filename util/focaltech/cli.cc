@@ -20,6 +20,8 @@ constexpr auto kMcuRebootPollInterval = 10ms;
 constexpr auto kResetWaitTimeout = 3s;
 constexpr auto kEcCommandTimeout = std::chrono::milliseconds(200);
 
+// The Test FW use the magic number for FW jumping to ROM, test FW USB PID is
+// 0xface, and the Payload data is only for verification.
 constexpr uint16_t kTestEcSwitchToRomCmd = 0xFACE;
 constexpr std::array<uint8_t, 3> kSwitchToRomPayload = {0xAA, 0x06, 0x00};
 
@@ -28,10 +30,10 @@ std::vector<uint8_t> BuildEcCommand(uint16_t command, uint8_t version,
   ec_host_request req{
       .struct_version = EC_HOST_REQUEST_VERSION,
       .checksum = 0,
-      .command = command,
+      .command = ToLittleEndian(command),
       .command_version = version,
       .reserved = 0,
-      .data_len = static_cast<uint16_t>(params.size()),
+      .data_len = ToLittleEndian(static_cast<uint16_t>(params.size())),
   };
 
   std::vector<uint8_t> packet(sizeof(req) + params.size());
@@ -40,11 +42,8 @@ std::vector<uint8_t> BuildEcCommand(uint16_t command, uint8_t version,
     memcpy(packet.data() + sizeof(req), params.data(), params.size());
   }
 
-  uint8_t checksum = 0;
-  for (uint8_t b : packet) checksum += b;
-
-  uint8_t* checksum_ptr = packet.data() + offsetof(ec_host_request, checksum);
-  *checksum_ptr = -checksum;
+  uint8_t checksum = std::accumulate(packet.begin(), packet.end(), uint8_t{0});
+  packet[offsetof(ec_host_request, checksum)] = -checksum;
   return packet;
 }
 
@@ -84,7 +83,8 @@ std::expected<std::vector<uint8_t>, Error> SendEcCommandAndReadResponse(
 
   ec_host_response resp;
   memcpy(&resp, initial_buffer.data(), sizeof(resp));
-  FT_LOGD("resp.data_len = {}", resp.data_len);
+  uint16_t data_len = FromLittleEndian(resp.data_len);
+  FT_LOGD("resp.data_len = {}", data_len);
 
   std::vector<uint8_t> response_data;
   size_t header_size = sizeof(ec_host_response);
@@ -95,8 +95,8 @@ std::expected<std::vector<uint8_t>, Error> SendEcCommandAndReadResponse(
                          initial_buffer.begin() + received);
   }
 
-  if (response_data.size() < resp.data_len) {
-    size_t remaining = resp.data_len - response_data.size();
+  if (response_data.size() < data_len) {
+    size_t remaining = data_len - response_data.size();
     std::vector<uint8_t> additional(remaining);
     auto recv_more = device.Recv(additional, kEcCommandTimeout);
     if (!recv_more || std::cmp_not_equal(*recv_more, remaining)) {
@@ -109,8 +109,8 @@ std::expected<std::vector<uint8_t>, Error> SendEcCommandAndReadResponse(
                          additional.end());
   }
 
-  if (response_data.size() > resp.data_len) {
-    response_data.resize(resp.data_len);
+  if (response_data.size() > data_len) {
+    response_data.resize(data_len);
   }
 
   return response_data;
@@ -153,8 +153,12 @@ std::expected<void, Error> SwitchToRom(UsbDevice& device) {
 std::expected<void, Error> CheckEcBuildVersion(UsbDevice& usb,
                                                DeviceMode current_mode) {
   if (current_mode != DeviceMode::kTest && current_mode != DeviceMode::kEc) {
-    FT_LOGE("Invalid mode for fw version get");
-    return std::unexpected(Error::kResultFail);
+    auto res = GetBootVersion(usb, current_mode);
+    if (!res) {
+      FT_LOGE("Get boot version failed");
+      return std::unexpected(Error::kResultFail);
+    }
+    return {};
   }
 
   std::string build_info;
@@ -208,30 +212,29 @@ std::expected<void, Error> SwitchMcuMode(UsbDevice& usb,
     }
   };
 
-  bool device_lost = false;
+  bool command_accepted = false;
+  std::string_view target_name =
+      (target_cmd == Command::kEnterBoot) ? "bootloader" : "ROM";
 
   for (int attempt = 1; attempt <= kMaxRetry; ++attempt) {
     auto result = switch_func();
     if (!result) {
       if (result.error() == Error::kNoSuchDevice) {
-        FT_LOGW("USB device lost (expected during {} switch).",
-                target_cmd == Command::kEnterBoot ? "bootloader" : "ROM");
-        device_lost = true;
+        FT_LOGW("USB device lost (expected during {} switch).", target_name);
+        command_accepted = true;
         break;
       }
-      FT_LOGW("Switch to {} failed (attempt {}): error={}",
-              target_cmd == Command::kEnterBoot ? "bootloader" : "ROM", attempt,
-              std::to_underlying(result.error()));
+      FT_LOGW("Switch to {} failed (attempt {}): error={}", target_name,
+              attempt, ToString(result.error()));
       std::this_thread::sleep_for(kMcuRebootPollInterval);
       continue;
     }
-    FT_LOGI("Switch to {} command sent successfully",
-            target_cmd == Command::kEnterBoot ? "bootloader" : "ROM");
-    device_lost = true;
+    FT_LOGI("Switch to {} command sent successfully", target_name);
+    command_accepted = true;
     break;
   }
 
-  if (!device_lost) {
+  if (!command_accepted) {
     FT_LOGE("Failed to send switch command after {} attempts", kMaxRetry);
     return std::unexpected(Error::kResultFail);
   }
@@ -300,23 +303,12 @@ std::expected<AppConfig, Error> ParseArguments(
   return config;
 }
 
-std::expected<DeviceMode, Error> GetDeviceMode(const UsbDeviceId& id) {
-  if (id == kFocalRomId) return DeviceMode::kRom;
-  if (id == kFocalBootId) return DeviceMode::kBoot;
-  if (id == kFocalEcTestId) return DeviceMode::kTest;
-  if (id == kFocalEcPid9865Id || id == kFocalEcPid9869Id)
-    return DeviceMode::kEc;
-
-  FT_LOGE("Unrecognized Focal device.");
-  return std::unexpected(Error::kNoSuchDevice);
-}
-
 std::expected<void, Error> ExecuteCommand(const AppConfig& config,
                                           UsbDevice& usb_device,
                                           DeviceMode current_mode) {
   switch (config.cmd) {
     case Command::kGetEcVersion:
-      FT_LOGI("Tool version is {}", kToolVersion);
+
       return CheckEcBuildVersion(usb_device, current_mode);
 
     case Command::kSetFlashWp:
@@ -343,18 +335,23 @@ std::expected<void, Error> ExecuteCommand(const AppConfig& config,
       }
       return ReturnToRomBoot(usb_device, current_mode);
 
-    case Command::kUpdate:
+    case Command::kUpdate: {
       FT_LOGI("Updating firmware...");
       if (config.ec_bin.empty()) {
         FT_LOGE("No firmware file specified");
         return std::unexpected(Error::kParameterError);
       }
 
+      auto fw_data_res = ReadFileToVector(config.ec_bin);
+      if (!fw_data_res) {
+        return std::unexpected(fw_data_res.error());
+      }
+
       /* Fix an issue where, when the display is off but the system has not yet
        * entered suspend, the host may forcibly switch the FPMCU into suspend
        * state, causing the upgrade to fail. Retry updating the firmware. */
       for (int attempt = 1; attempt <= kMaxRetry; ++attempt) {
-        if (auto res = UpdateFw(usb_device, config.ec_bin, current_mode); res) {
+        if (auto res = UpdateFw(usb_device, *fw_data_res, current_mode); res) {
           FT_LOGI("Firmware update successful");
           return {};
         }
@@ -362,6 +359,7 @@ std::expected<void, Error> ExecuteCommand(const AppConfig& config,
       }
       FT_LOGE("Firmware update failed");
       return std::unexpected(Error::kResultFail);
+    }
 
     default:
       FT_LOGE("Command not implemented.");

@@ -113,11 +113,8 @@ std::vector<uint8_t> BuildEcResponse(uint16_t result,
     memcpy(packet.data() + sizeof(resp), data.data(), data.size());
   }
 
-  uint8_t checksum = 0;
-  for (uint8_t b : packet) checksum += b;
-
-  const size_t checksum_offset = offsetof(ec_host_response, checksum);
-  packet[checksum_offset] = -checksum;
+  uint8_t checksum = std::accumulate(packet.begin(), packet.end(), uint8_t{0});
+  packet[offsetof(ec_host_response, checksum)] = -checksum;
   return packet;
 }
 
@@ -241,6 +238,37 @@ TEST(CliTest, GetDeviceMode_Unknown) {
   auto res = GetDeviceMode(unknown);
   EXPECT_FALSE(res.has_value());
   EXPECT_EQ(res.error(), Error::kNoSuchDevice);
+}
+
+TEST(CliTest, SwitchMcuMode_SuccessWithoutDisconnect) {
+  auto transport = std::make_unique<FakeEcTransport>();
+  auto* fake = transport.get();
+  UsbDevice device = MakeDevice(std::move(transport));
+
+  // Queue valid responses for both the build version check and the switch
+  // command.
+  fake->AddResponse(BuildStringResponse("ft9001_v1.0"));
+  fake->AddResponse(BuildEmptySuccessResponse());
+
+  auto result = SwitchMcuMode(device, DeviceMode::kEc, Command::kEnterBoot);
+
+  EXPECT_TRUE(result.has_value());
+}
+
+TEST(CliTest, SwitchMcuMode_FailsAfterMaxRetries) {
+  auto transport = std::make_unique<FakeEcTransport>();
+  auto* fake = transport.get();
+  UsbDevice device = MakeDevice(std::move(transport));
+
+  // Provide a response only for the initial build version check.
+  // Omitting the response for the switch command forces a timeout, causing
+  // the retry loop to exhaust its attempts and fail gracefully.
+  fake->AddResponse(BuildStringResponse("ft9001_v1.0"));
+
+  auto result = SwitchMcuMode(device, DeviceMode::kEc, Command::kEnterBoot);
+
+  EXPECT_FALSE(result.has_value());
+  EXPECT_EQ(result.error(), Error::kResultFail);
 }
 
 TEST(CliTest, SendEcCommandAndReadResponse_TruncatesPaddedUsbData) {
@@ -450,7 +478,7 @@ class FakeForFlashWp : public UsbTransport {
   std::expected<int, Error> Recv(std::span<uint8_t> data,
                                  std::chrono::milliseconds) override {
     if (data.size() == testing::kUsbCswSize) {
-      BuildValidCsw(data, current_cbw_tag_, 0);
+      BuildValidCsw(data, current_cbw_tag_, CswStatus::kCommandPassed);
       return testing::kUsbCswSize;
     }
     if (data.size() == kFlashWpBufferSize) {
@@ -480,7 +508,7 @@ class FakeForSetWp : public UsbTransport {
   std::expected<int, Error> Recv(std::span<uint8_t> data,
                                  std::chrono::milliseconds) override {
     if (data.size() == testing::kUsbCswSize) {
-      BuildValidCsw(data, current_cbw_tag_, 0);
+      BuildValidCsw(data, current_cbw_tag_, CswStatus::kCommandPassed);
       return testing::kUsbCswSize;
     }
     if (data.size() == kFlashWpBufferSize) {

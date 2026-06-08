@@ -15,6 +15,8 @@
 #include "usb_device.h"
 
 int main(int argc, char** argv) {
+  FT_LOGI("Tool version is {}", focaltech::kToolVersion);
+
   std::vector<std::string_view> args(argv + 1, argv + argc);
   if (args.empty() || args[0] == "-h" || args[0] == "--help") {
     std::println("{}", focaltech::kCmdHelpString);
@@ -42,7 +44,7 @@ int main(int argc, char** argv) {
   if (auto exec_res =
           focaltech::ExecuteCommand(config.value(), usb_device, *mode_res);
       !exec_res) {
-    FT_LOGE("Command failed");
+    FT_LOGE("Execution failed: {}", ToString(exec_res.error()));
     return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;

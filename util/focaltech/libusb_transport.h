@@ -16,6 +16,7 @@
 
 struct libusb_context;
 struct libusb_device_handle;
+struct libusb_config_descriptor;
 struct libusb_device;
 
 namespace focaltech {
@@ -34,6 +35,14 @@ struct LibusbContextDeleter {
 
 struct LibusbDeviceHandleDeleter {
   void operator()(libusb_device_handle* handle) const;
+};
+
+struct LibusbDeviceDeleter {
+  void operator()(libusb_device* dev) const;
+};
+
+struct LibusbConfigDeleter {
+  void operator()(libusb_config_descriptor* config) const;
 };
 
 class LibusbTransport : public UsbTransport {
@@ -65,7 +74,7 @@ class LibusbTransport : public UsbTransport {
   std::expected<int, Error> HandleTransferError(int libusb_error) const;
 
   std::unique_ptr<libusb_context, LibusbContextDeleter> ctx_;
-  libusb_device* device_ = nullptr;
+  std::unique_ptr<libusb_device, LibusbDeviceDeleter> device_;
   UsbDeviceId device_id_;
 
   std::unique_ptr<libusb_device_handle, LibusbDeviceHandleDeleter> handle_;

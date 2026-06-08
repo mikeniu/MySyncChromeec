@@ -12,6 +12,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <filesystem>
+#include <numeric>
 #include <print>
 #include <span>
 #include <string_view>
@@ -26,8 +27,6 @@
 namespace focaltech {
 
 class UsbDevice;
-
-constexpr std::string_view kToolVersion = "v1.0.4";
 
 inline constexpr std::array<std::string_view, 4> kSupportedProjects = {
     "ft9001", "chojnik", "chudow", "chobienia"};
@@ -47,7 +46,7 @@ enum class Command {
 struct AppConfig {
   Command cmd = Command::kUnknown;
   std::string_view ec_bin;
-  int action_param = 0;
+  uint32_t action_param = 0;
 };
 
 std::expected<AppConfig, Error> ParseArguments(
@@ -72,8 +71,6 @@ std::expected<void, Error> SwitchMcuMode(UsbDevice& usb,
                                          Command target_cmd);
 
 std::expected<int, Error> ParseInt(std::string_view str);
-
-std::expected<DeviceMode, Error> GetDeviceMode(const UsbDeviceId& id);
 
 namespace internal {
 std::expected<std::vector<uint8_t>, Error> SendEcCommandAndReadResponse(

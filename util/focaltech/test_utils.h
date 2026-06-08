@@ -15,15 +15,16 @@
 
 #include "ft_scsi.h"
 #include "ft_util.h"
+#include "updater.h"
 
 namespace focaltech::testing {
 
-inline constexpr size_t kUsbCbwSize = 31;
-inline constexpr size_t kUsbCswSize = 13;
+inline constexpr size_t kUsbCbwSize = sizeof(BulkCbWrap);
+inline constexpr size_t kUsbCswSize = sizeof(BulkCsWrap);
 inline constexpr uint32_t kUsbMsCswSignature = 0x53425355;
 
 inline void BuildValidCsw(std::span<uint8_t> data, uint32_t tag,
-                          uint8_t status = 0) {
+                          CswStatus status = CswStatus::kCommandPassed) {
   BulkCsWrap csw{
       .signature = ToLittleEndian(kUsbMsCswSignature),
       .tag = ToLittleEndian(tag),
@@ -31,13 +32,6 @@ inline void BuildValidCsw(std::span<uint8_t> data, uint32_t tag,
       .status = status,
   };
   std::memcpy(data.data(), &csw, sizeof(csw));
-}
-
-inline std::array<uint8_t, SHA256_DIGEST_LENGTH> ComputeSha256(
-    std::span<const uint8_t> data) {
-  std::array<uint8_t, SHA256_DIGEST_LENGTH> hash{};
-  SHA256(data.data(), data.size(), hash.data());
-  return hash;
 }
 
 }  // namespace focaltech::testing
