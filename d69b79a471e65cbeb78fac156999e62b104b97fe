@@ -50,6 +50,24 @@
       "message": "This feels like an unnecessary mechanism. Would this work any differently if there were just another config controlling this?\n\nMore to the point, right now you only have a single test config that enables this. All of the variation in port setup is handled at runtime via error injection. Is this knob needed at all? What about the remaining config checks in the device tree? What about the port count checks in the test code?",
       "revId": "d69b79a471e65cbeb78fac156999e62b104b97fe",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1fe16112_1a750b4a",
+        "filename": "zephyr/test/atria/testcase.yaml",
+        "patchSetId": 18
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-08T15:06:01Z",
+      "side": 1,
+      "message": "Let me clean this up overlooked this file when I did my cleanup I don\u0027t think the extra args is needed anymore",
+      "parentUuid": "f47b8693_c3e2c2a1",
+      "revId": "d69b79a471e65cbeb78fac156999e62b104b97fe",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
