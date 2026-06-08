@@ -157,7 +157,15 @@ def get_projects():
         # are fixed correctly.
         if (
             project.config.project_name
-            in ["lapis", "moonstone", "ruby", "sapphire", "quartz", "mica"]
+            in [
+                "lapis",
+                "moonstone",
+                "ruby",
+                "sapphire",
+                "quartz",
+                "mica",
+                "mensa",
+            ]
             and not platform_ec_private.exists()
         ):
             continue
