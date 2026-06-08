@@ -34,6 +34,24 @@
       "parentUuid": "1aaa0264_a8f802e6",
       "revId": "bb2543a82b242b37d610ba267d7a165e324558f4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02865e3e_dfb3bbf6",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 3085,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-08T17:55:36Z",
+      "side": 1,
+      "message": "I\u0027m surprised that `cros format` changed these extra lines. First of all, `cros format` should have already been applied to this entire file, so running it again on the lines you didn\u0027t touch should be a no-op. Secondly, at least in the `cros format` one-liners emitted by the pre-upload failures, I think it\u0027s only supposed to touch the lines you changed. I might be wrong about that.\n\nAnyway, the scope of the change looks appropriate now.",
+      "parentUuid": "6eaa2fda_0d5e355a",
+      "revId": "bb2543a82b242b37d610ba267d7a165e324558f4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
