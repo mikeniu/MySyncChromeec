@@ -35,7 +35,6 @@ void board_chipset_startup_mensa(void)
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_ppvar_oled), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_fan), 1);
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_pp5000_led_x), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_i2c_ec_adsp_batt), 1);
 	hook_call_deferred(&usba_pwr_enable_deferred_data,
 			   USBA_PWR_ENABLE_DELAY);
@@ -56,7 +55,6 @@ void board_chipset_shutdown_mensa(void)
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp3300_s3), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_ppvar_oled), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_fan), 0);
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_pp5000_led_x), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_i2c_ec_adsp_batt), 0);
 }
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, board_chipset_shutdown_mensa,
