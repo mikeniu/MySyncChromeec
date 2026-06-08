@@ -81,3 +81,11 @@ config PLATFORM_EC_HOSTCMD_TYPEC_STATUS
 
 	  This host command can be manually executed using the
 	  "ectool typecstatus" command from the Chromium OS shell.
+
+config PLATFORM_EC_HOSTCMD_USB_PD_MUX_INFO
+	bool "Host command: EC_CMD_USB_PD_MUX_INFO"
+	default y if !USB_PDC_POWER_MGMT || PDC_POWER_MGMT_USB_MUX
+	help
+	  Enables EC_CMD_USB_PD_MUX_INFO host command. This allows AP to
+	  get the mux info for port.
+
