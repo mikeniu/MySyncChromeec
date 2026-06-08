@@ -12,18 +12,26 @@
 #include <memory>
 
 #include "ft_util.h"
+#include "libusb_transport.h"
 #include "usb_transport.h"
 
 namespace focaltech {
 
 enum class DeviceMode {
-  kUnknown,
   kRom,
   kBoot,
   kTest,
   kEc,
-  kForceUpdate,
 };
+
+inline std::expected<DeviceMode, Error> GetDeviceMode(const UsbDeviceId& id) {
+  if (id == kFocalRomId) return DeviceMode::kRom;
+  if (id == kFocalBootId) return DeviceMode::kBoot;
+  if (id == kFocalEcTestId) return DeviceMode::kTest;
+  if (id == kFocalEcPid9865Id || id == kFocalEcPid9869Id)
+    return DeviceMode::kEc;
+  return std::unexpected(Error::kNoSuchDevice);
+}
 
 class UsbDevice {
  public:

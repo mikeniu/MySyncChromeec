@@ -7,6 +7,7 @@
 #define UTIL_FOCALTECH_UPDATER_H_
 
 #include <assert.h>
+#include <openssl/sha.h>
 
 #include <cstdint>
 #include <expected>
@@ -23,7 +24,7 @@ class UsbDevice;
 // address offset.
 constexpr size_t kConfigReservedSize = 28;
 
-enum class FlashWpArea {
+enum class FlashWpArea : uint32_t {
   kUnknown,
   kAll,
   kBoot,
@@ -41,19 +42,9 @@ struct ConfigPage {
 static_assert(sizeof(ConfigPage) == 36, "ConfigPage must be exactly 36 bytes");
 
 constexpr size_t kFlashWpBufferSize = 512;
-constexpr uint8_t kCmdReadInfo = 0xDB;
-constexpr uint8_t kCmdAction = 0xDC;
 
-constexpr uint8_t kSubcmdReadData = 0x01;
-constexpr uint8_t kSubcmdWriteBin = 0x03;
-constexpr uint8_t kSubcmdCodeBin = 0x04;
-constexpr uint8_t kSubcmdErasePage = 0x08;
-constexpr uint8_t kSubcmdVerify = 0xBB;
-constexpr uint8_t kSubcmdSoftReset = 0xDD;
-constexpr uint8_t kSubcmdFlashWpSet = 0xF7;
-constexpr uint8_t kSubcmdFlashWpGet = 0xF8;
-
-constexpr size_t kBootVersionMax = 36;
+constexpr size_t kBootVersionMax = 22;
+constexpr size_t kRomVersionMax = 36;
 constexpr uint32_t kWriteSramAddr = 0x20002000;
 constexpr size_t kEcBinSizeMax = 2 * 1024 * 1024;
 
@@ -66,7 +57,7 @@ constexpr uint32_t kBootRunAddr = 0x10081000;
 constexpr uint32_t kCodeValidMagic = 0x3AEC3721;
 
 std::expected<void, Error> UpdateFw(const UsbDevice& device,
-                                    std::string_view ec_bin,
+                                    std::span<const uint8_t> fw_data,
                                     DeviceMode current_mode);
 
 std::expected<FlashWpArea, Error> GetFlashProtection(const UsbDevice& device,
@@ -78,6 +69,16 @@ std::expected<void, Error> SetFlashProtection(const UsbDevice& device,
 
 std::expected<void, Error> ReturnToRomBoot(const UsbDevice& device,
                                            DeviceMode current_mode);
+
+std::expected<void, Error> GetBootVersion(const UsbDevice& device,
+                                          DeviceMode current_mode);
+
+inline std::array<uint8_t, SHA256_DIGEST_LENGTH> CalculateSha256(
+    std::span<const uint8_t> data) {
+  std::array<uint8_t, SHA256_DIGEST_LENGTH> hash{};
+  SHA256(data.data(), data.size(), hash.data());
+  return hash;
+}
 
 }  // namespace focaltech
 

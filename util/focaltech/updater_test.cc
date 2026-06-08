@@ -7,13 +7,10 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <openssl/sha.h>
 
 #include <array>
 #include <bit>
 #include <cstring>
-#include <filesystem>
-#include <fstream>
 #include <ranges>
 #include <span>
 #include <vector>
@@ -31,20 +28,6 @@ using namespace std::chrono_literals;
 using ::testing::_;
 using ::testing::Invoke;
 using ::testing::Return;
-
-class ScopedTempFile {
- public:
-  explicit ScopedTempFile(std::span<const uint8_t> data) {
-    path_ = std::filesystem::temp_directory_path() / "test_fw.bin";
-    std::ofstream ofs(path_, std::ios::binary);
-    ofs.write(reinterpret_cast<const char*>(data.data()), data.size());
-  }
-  ~ScopedTempFile() { std::filesystem::remove(path_); }
-  std::string path() const { return path_.string(); }
-
- private:
-  std::filesystem::path path_;
-};
 
 class StubUsbTransport : public UsbTransport {
  public:
@@ -66,23 +49,26 @@ class StubUsbTransport : public UsbTransport {
     return data_payload_sizes_;
   }
 
+  const std::vector<std::vector<uint8_t>>& GetDataPayloads() const {
+    return data_payloads_;
+  }
+
   std::expected<int, Error> Send(std::span<const uint8_t> data,
                                  std::chrono::milliseconds) override {
     if (data.size() == testing::kUsbCbwSize) {
       std::memcpy(&current_tag_, &data[4], sizeof(current_tag_));
     } else {
       data_payload_sizes_.push_back(data.size());
+      data_payloads_.push_back(std::vector<uint8_t>(data.begin(), data.end()));
     }
 
     if (data.size() == sizeof(BulkCbWrap)) {
       BulkCbWrap cbw;
       std::memcpy(&cbw, data.data(), sizeof(cbw));
 
-      if (cbw.cmd[0] == kCmdAction) {
-        auto ft_cmd = std::bit_cast<CmdFormat>(cbw.cmd);
-
-        if (ft_cmd.subcmd == kSubcmdErasePage) {
-          erased_addresses_.push_back(ToLittleEndian(ft_cmd.address));
+      if (cbw.cmd.opcode == Opcode::kAction) {
+        if (cbw.cmd.subcmd == Subcmd::kErasePage) {
+          erased_addresses_.push_back(FromLittleEndian(cbw.cmd.address));
         }
       }
     }
@@ -122,6 +108,7 @@ class StubUsbTransport : public UsbTransport {
   bool force_verify_fail_ = false;
   std::vector<uint32_t> erased_addresses_;
   std::vector<size_t> data_payload_sizes_;
+  std::vector<std::vector<uint8_t>> data_payloads_;
   std::array<uint8_t, SHA256_DIGEST_LENGTH> expected_hash_{};
   uint32_t current_tag_ = 1;
 };
@@ -134,27 +121,23 @@ TEST(UpdaterTest, UpdateFw_SuccessBootloaderMode) {
 
   std::vector<uint8_t> fw_data(sizeof(ConfigPage) + kFocalConfigSize, 0xBB);
   std::memcpy(fw_data.data(), &config, sizeof(config));
-  auto expected_hash = testing::ComputeSha256(fw_data);
-  ScopedTempFile fw_file(fw_data);
-  std::string fw_path = fw_file.path();
+  auto expected_hash = CalculateSha256(fw_data);
 
   auto transport = std::make_unique<StubUsbTransport>();
   transport->SetExpectedHash(expected_hash);
   UsbDevice device(std::move(transport));
 
-  auto res = UpdateFw(device, fw_path, DeviceMode::kBoot);
+  auto res = UpdateFw(device, fw_data, DeviceMode::kBoot);
   EXPECT_TRUE(res.has_value());
 }
 
 TEST(UpdaterTest, UpdateFw_FailsOnMissingConfigPage) {
   std::vector<uint8_t> fw_data(sizeof(ConfigPage) + kFocalConfigSize, 0xFF);
-  ScopedTempFile fw_file(fw_data);
-  std::string fw_path = fw_file.path();
 
   auto transport = std::make_unique<StubUsbTransport>();
   UsbDevice device(std::move(transport));
 
-  auto res = UpdateFw(device, fw_path, DeviceMode::kBoot);
+  auto res = UpdateFw(device, fw_data, DeviceMode::kBoot);
   EXPECT_FALSE(res.has_value());
   EXPECT_EQ(res.error(), Error::kParameterError);
 }
@@ -166,32 +149,40 @@ TEST(UpdaterTest, UpdateFw_PadsPartialPayloadsToWordBoundary) {
                     .code_start_address = kBootRunAddr};
   std::memcpy(fw_data.data(), &config, sizeof(config));
 
-  ScopedTempFile fw_file(fw_data);
-  std::string fw_path = fw_file.path();
-
   auto transport = std::make_unique<StubUsbTransport>();
-  transport->SetExpectedHash(testing::ComputeSha256(fw_data));
+  transport->SetExpectedHash(CalculateSha256(fw_data));
   auto* raw_transport = transport.get();
 
   UsbDevice device(std::move(transport));
 
-  auto res = UpdateFw(device, fw_path, DeviceMode::kBoot);
+  auto res = UpdateFw(device, fw_data, DeviceMode::kBoot);
   EXPECT_TRUE(res.has_value());
 
-  const auto& payload_sizes = raw_transport->GetDataPayloadSizes();
-  EXPECT_TRUE(std::ranges::contains(payload_sizes, kFocalConfigSize))
-      << "Expected a 4096-byte padded transmission for the 13-byte remainder.";
+  // DownloadBin skips the config page at the start, writes the rest, then
+  // writes the config page at the end. For a (4096 + 13) byte file, we expect
+  // exactly TWO data transfers:
+  // 1. The 13 bytes padded out to 4096 bytes.
+  // 2. The 4096 byte config page.
+  const auto& payloads = raw_transport->GetDataPayloads();
+  ASSERT_EQ(payloads.size(), 2);
+
+  EXPECT_EQ(payloads[0].size(), kFocalConfigSize);
+  EXPECT_EQ(payloads[1].size(), kFocalConfigSize);
+
+  // First 13 bytes are the original data (0xAA)
+  EXPECT_EQ(payloads[0][12], 0xAA);
+  // Bytes 14 and onward are padded with 0xFF
+  EXPECT_EQ(payloads[0][13], 0xFF);
+  EXPECT_EQ(payloads[0].back(), 0xFF);
 }
 
 TEST(UpdaterTest, UpdateFw_FailsOnFileTooSmall) {
   std::vector<uint8_t> undersized_data(sizeof(ConfigPage) - 1, 0xFF);
-  ScopedTempFile fw_file(undersized_data);
-  std::string fw_path = fw_file.path();
 
   auto transport = std::make_unique<StubUsbTransport>();
   UsbDevice device(std::move(transport));
 
-  auto res = UpdateFw(device, fw_path, DeviceMode::kBoot);
+  auto res = UpdateFw(device, undersized_data, DeviceMode::kBoot);
   EXPECT_FALSE(res.has_value());
   EXPECT_EQ(res.error(), Error::kResultFail);
 }
@@ -202,13 +193,11 @@ TEST(UpdaterTest, UpdateFw_FailsOnModeMismatch) {
 
   std::vector<uint8_t> fw_data(sizeof(ConfigPage) + kFocalConfigSize, 0xFF);
   std::memcpy(fw_data.data(), &config, sizeof(config));
-  ScopedTempFile fw_file(fw_data);
-  std::string fw_path = fw_file.path();
 
   auto transport = std::make_unique<StubUsbTransport>();
   UsbDevice device(std::move(transport));
 
-  auto res = UpdateFw(device, fw_path, DeviceMode::kBoot);
+  auto res = UpdateFw(device, fw_data, DeviceMode::kBoot);
   EXPECT_FALSE(res.has_value());
   EXPECT_EQ(res.error(), Error::kParameterError);
 }
@@ -219,8 +208,6 @@ TEST(UpdaterTest, UpdateFw_VerifyFails_AbortsAndErasesConfig) {
 
   std::vector<uint8_t> fw_data(sizeof(ConfigPage) + kFocalConfigSize, 0x00);
   std::memcpy(fw_data.data(), &config, sizeof(config));
-  ScopedTempFile fw_file(fw_data);
-  std::string fw_path = fw_file.path();
 
   auto transport = std::make_unique<StubUsbTransport>();
   transport->ForceVerifyFailure(true);
@@ -228,13 +215,12 @@ TEST(UpdaterTest, UpdateFw_VerifyFails_AbortsAndErasesConfig) {
   auto* raw_transport = transport.get();
   UsbDevice device(std::move(transport));
 
-  auto res = UpdateFw(device, fw_path, DeviceMode::kBoot);
+  auto res = UpdateFw(device, fw_data, DeviceMode::kBoot);
   EXPECT_FALSE(res.has_value());
   EXPECT_EQ(res.error(), Error::kResultFail);
 
   const auto& erased = raw_transport->GetErasedAddresses();
-  EXPECT_TRUE(std::ranges::contains(erased, kBootCfgAddr))
-      << "Abort sequence failed to erase the config page.";
+  EXPECT_TRUE(std::ranges::contains(erased, kBootCfgAddr));
 }
 
 TEST(UpdaterTest, GetFlashProtection_Success) {

@@ -5,8 +5,6 @@
 
 #include "updater.h"
 
-#include <openssl/sha.h>
-
 #include <algorithm>
 #include <cstdint>
 #include <fstream>
@@ -36,68 +34,36 @@ constexpr auto kGenericInfoTimeout = 200ms;
 constexpr uint8_t kHashModeSha256 = 0x04;
 constexpr uint8_t kHashModeRomShift = 4;
 
-std::expected<std::vector<uint8_t>, Error> ReadFileToVector(
-    std::string_view path) {
-  constexpr size_t kConfigPageSize = sizeof(ConfigPage);
-  std::ifstream file(std::string{path}, std::ios::binary | std::ios::ate);
-  if (!file) {
-    FT_LOGE("Cannot open file: {}", path);
-    return std::unexpected(Error::kNoSuchFile);
-  }
-
-  auto size = file.tellg();
-  if (size < kConfigPageSize || size > kEcBinSizeMax) {
-    FT_LOGE("Invalid file size: {}", static_cast<int64_t>(size));
-    return std::unexpected(Error::kParameterError);
-  }
-
-  std::vector<uint8_t> buffer(size);
-  file.seekg(0, std::ios::beg);
-  if (!file.read(reinterpret_cast<char*>(buffer.data()), size)) {
-    FT_LOGE("Failed to read file payload.");
-    return std::unexpected(Error::kResultFail);
-  }
-
-  return buffer;
-}
-
-std::array<uint8_t, SHA256_DIGEST_LENGTH> CalculateSha256(
-    std::span<const uint8_t> data) {
-  std::array<uint8_t, SHA256_DIGEST_LENGTH> hash{};
-  SHA256(data.data(), data.size(), hash.data());
-  return hash;
-}
-
 std::expected<void, Error> SendActionOut(
-    const UsbDevice& device, uint8_t subcmd, uint32_t address,
+    const UsbDevice& device, Subcmd subcmd, uint32_t address,
     std::span<const uint8_t> data, TransferDirection dir,
     std::chrono::milliseconds timeout, uint32_t length = 0,
     uint32_t aux_address = 0, uint8_t flags = 0) {
   auto cmd =
-      BuildFtCmd(kCmdAction, subcmd, address, length, aux_address, flags);
+      BuildFtCmd(Opcode::kAction, subcmd, address, length, aux_address, flags);
   return SendBulkDataOut(device, cmd, data, dir, timeout);
 }
 
 std::expected<void, Error> ReceiveActionIn(
-    const UsbDevice& device, uint8_t subcmd, uint32_t address,
+    const UsbDevice& device, Subcmd subcmd, uint32_t address,
     std::span<uint8_t> data, std::chrono::milliseconds timeout,
     uint32_t length = 0, uint32_t aux_address = 0, uint8_t flags = 0) {
   auto cmd =
-      BuildFtCmd(kCmdAction, subcmd, address, length, aux_address, flags);
+      BuildFtCmd(Opcode::kAction, subcmd, address, length, aux_address, flags);
   return ReceiveBulkDataIn(device, cmd, data, timeout);
 }
 
 std::expected<void, Error> ErasePage(const UsbDevice& device, size_t length,
                                      uint32_t addr) {
   uint32_t pages = DivRoundUp(length, kFocalConfigSize);
-  return SendActionOut(device, kSubcmdErasePage, addr, {},
+  return SendActionOut(device, Subcmd::kErasePage, addr, {},
                        TransferDirection::kOut, kErasePageTimeout, pages);
 }
 
 std::expected<void, Error> DownloadPage(const UsbDevice& device,
                                         uint32_t downaddr, size_t per_len,
                                         std::span<const uint8_t> data) {
-  auto res = SendActionOut(device, kSubcmdWriteBin, kWriteSramAddr,
+  auto res = SendActionOut(device, Subcmd::kWriteBin, kWriteSramAddr,
                            data.subspan(0, per_len), TransferDirection::kOut,
                            kDownloadPageTimeout, per_len);
   if (!res) {
@@ -105,7 +71,7 @@ std::expected<void, Error> DownloadPage(const UsbDevice& device,
     return res;
   }
 
-  res = SendActionOut(device, kSubcmdCodeBin, downaddr, {},
+  res = SendActionOut(device, Subcmd::kCodeBin, downaddr, {},
                       TransferDirection::kOut, kDownloadPageTimeout, per_len,
                       kWriteSramAddr);
   if (!res) FT_LOGE("Code bin error");
@@ -113,12 +79,8 @@ std::expected<void, Error> DownloadPage(const UsbDevice& device,
 }
 
 std::expected<void, Error> DownloadBin(const UsbDevice& device,
-                                       std::string_view file_path,
+                                       std::span<const uint8_t> buffer,
                                        uint32_t target_addr) {
-  auto file_data = ReadFileToVector(file_path);
-  if (!file_data) return std::unexpected(file_data.error());
-
-  const auto& buffer = *file_data;
   size_t file_len = buffer.size();
 
   if (target_addr != kBootCfgAddr) {
@@ -152,12 +114,14 @@ std::expected<void, Error> DownloadBin(const UsbDevice& device,
   }
 
   if (!remaining_data.empty()) {
-    size_t padded_len = kFocalConfigSize;
+    std::vector<uint8_t> final_chunk(remaining_data.begin(),
+                                     remaining_data.end());
     // 0xFF is the initial value of flash.
-    std::vector<uint8_t> final_chunk(padded_len, 0xFF);
-    std::ranges::copy(remaining_data, final_chunk.begin());
+    // When writing to flash, the transmitted data length must be 4KB aligned.
+    final_chunk.resize(kFocalConfigSize, 0xFF);
 
-    auto page_res = DownloadPage(device, downaddr, padded_len, final_chunk);
+    auto page_res =
+        DownloadPage(device, downaddr, final_chunk.size(), final_chunk);
     if (!page_res) return page_res;
   }
 
@@ -173,14 +137,8 @@ std::expected<void, Error> DownloadBin(const UsbDevice& device,
 }
 
 std::expected<void, Error> VerifyData(const UsbDevice& device,
-                                      std::string_view file_path,
+                                      std::span<const uint8_t> firmware_data,
                                       uint32_t target_addr) {
-  auto file_res = ReadFileToVector(file_path);
-  if (!file_res.has_value()) {
-    return std::unexpected(file_res.error());
-  }
-  const auto& firmware_data = file_res.value();
-
   // SHA256 mode, In ROM mode, this parameter needs to be left-shifted by 4
   // bits.
   uint8_t hash_mode = (target_addr == kRomCfgAddr)
@@ -190,7 +148,7 @@ std::expected<void, Error> VerifyData(const UsbDevice& device,
   std::array<uint8_t, SHA256_DIGEST_LENGTH> device_hash{};
 
   auto io_res =
-      ReceiveActionIn(device, kSubcmdVerify, target_addr, device_hash,
+      ReceiveActionIn(device, Subcmd::kVerify, target_addr, device_hash,
                       kVerifyHashTimeout, firmware_data.size(), 0, hash_mode);
 
   if (!io_res.has_value()) {
@@ -209,41 +167,15 @@ std::expected<void, Error> VerifyData(const UsbDevice& device,
   return {};
 }
 
-std::expected<void, Error> GetBootVersion(const UsbDevice& device) {
-  auto cmd = BuildFtCmd(kCmdReadInfo, kSubcmdReadData, 0, 0, 0, 0);
-  std::vector<uint8_t> data(kBootVersionMax, 0);
-
-  auto res = ReceiveBulkDataIn(device, cmd, data, kGenericInfoTimeout);
-  if (!res) {
-    FT_LOGE("Failed to read boot version");
-    return res;
-  }
-
-  auto null_pos = std::ranges::find(data, '\0');
-  std::string version(data.begin(), null_pos);
-  FT_LOGI("Boot version: {}", version);
-  return {};
-}
-
-std::expected<bool, Error> HasValidConfigPage(std::string_view file_path,
+std::expected<bool, Error> HasValidConfigPage(std::span<const uint8_t> fw_data,
                                               uint32_t& code_start_addr) {
-  std::ifstream file(std::string{file_path}, std::ios::binary);
-  if (!file) {
-    FT_LOGE("Cannot open {}", file_path);
-    return std::unexpected(Error::kNoSuchFile);
+  if (fw_data.size() < sizeof(ConfigPage)) {
+    FT_LOGE("Firmware data too small for config page.");
+    return std::unexpected(Error::kResultFail);
   }
 
   ConfigPage config{};
-  file.read(reinterpret_cast<char*>(&config), sizeof(config));
-  if (!file.good() && !file.eof()) {
-    FT_LOGE("Failed to read config page");
-    return std::unexpected(Error::kResultFail);
-  }
-
-  if (file.gcount() != sizeof(config)) {
-    FT_LOGE("Failed to read config page (file too small).");
-    return std::unexpected(Error::kResultFail);
-  }
+  std::memcpy(&config, fw_data.data(), sizeof(config));
 
   if (config.code_valid_control_word != kCodeValidMagic) {
     return false;
@@ -261,18 +193,29 @@ std::expected<void, Error> ResetMcu(const UsbDevice& device,
     return std::unexpected(Error::kParameterError);
   }
   // Passing 0s for length and aux_address to reach the flags parameter
-  return SendActionOut(device, kSubcmdSoftReset, 0, {},
-                       TransferDirection::kSendOnly, kMcuResetTimeout, 0, 0,
-                       kSoftPor);
+  auto res = SendActionOut(device, Subcmd::kSoftReset, 0, {},
+                           TransferDirection::kSendOnly, kMcuResetTimeout, 0, 0,
+                           kSoftPor);
+
+  if (!res) {
+    return std::unexpected(Error::kResultFail);
+  }
+
+  return {};
 }
 
 }  // namespace
 
 std::expected<void, Error> UpdateFw(const UsbDevice& device,
-                                    std::string_view ec_bin,
+                                    std::span<const uint8_t> fw_data,
                                     DeviceMode current_mode) {
   uint32_t target_addr = kRomCfgAddr;
   uint32_t code_start_addr = 0;
+
+  if (fw_data.size() > kEcBinSizeMax) {
+    FT_LOGE("Firmware file exceeds maximum allowed size.");
+    return std::unexpected(Error::kParameterError);
+  }
 
   auto abort_update = [&](Error err) {
     if (target_addr == kBootCfgAddr || target_addr == kRomCfgAddr) {
@@ -283,7 +226,7 @@ std::expected<void, Error> UpdateFw(const UsbDevice& device,
     return std::unexpected(err);
   };
 
-  auto config_res = HasValidConfigPage(ec_bin, code_start_addr);
+  auto config_res = HasValidConfigPage(fw_data, code_start_addr);
   if (!config_res) return std::unexpected(config_res.error());
   if (!*config_res) {
     FT_LOGE("Firmware lacks config page, cannot upgrade");
@@ -310,24 +253,20 @@ std::expected<void, Error> UpdateFw(const UsbDevice& device,
     return std::unexpected(Error::kInvalidMode);
   }
 
-  auto res = GetBootVersion(device);
+  auto res = GetBootVersion(device, current_mode);
   if (!res) {
     FT_LOGE("Get boot version failed");
     return abort_update(res.error());
   }
 
-  if (ec_bin.empty()) {
-    FT_LOGE("ec bin is null");
-    return abort_update(Error::kParameterError);
-  }
-  FT_LOGI("Begin firmware update: {}", ec_bin);
-  res = DownloadBin(device, ec_bin, target_addr);
+  FT_LOGI("Begin firmware update");
+  res = DownloadBin(device, fw_data, target_addr);
   if (!res) {
     FT_LOGE("Download failed");
     return abort_update(res.error());
   }
 
-  res = VerifyData(device, ec_bin, target_addr);
+  res = VerifyData(device, fw_data, target_addr);
   if (!res) {
     FT_LOGE("Verification failed");
     return abort_update(res.error());
@@ -355,8 +294,8 @@ std::expected<FlashWpArea, Error> GetFlashProtection(const UsbDevice& device,
 
   std::vector<uint8_t> data(kFlashWpBufferSize, 0);
 
-  auto res =
-      ReceiveActionIn(device, kSubcmdFlashWpGet, 0, data, kGenericInfoTimeout);
+  auto res = ReceiveActionIn(device, Subcmd::kFlashWpGet, 0, data,
+                             kGenericInfoTimeout);
   if (!res) {
     FT_LOGE("Failed to get flash protect status");
     return std::unexpected(res.error());
@@ -386,7 +325,7 @@ std::expected<void, Error> SetFlashProtection(const UsbDevice& device,
   std::vector<uint8_t> dummy(kFlashWpBufferSize, 0);
 
   auto res =
-      ReceiveActionIn(device, kSubcmdFlashWpSet, std::to_underlying(wp_area),
+      ReceiveActionIn(device, Subcmd::kFlashWpSet, std::to_underlying(wp_area),
                       dummy, kGenericInfoTimeout, ~std::to_underlying(wp_area));
   if (!res) {
     FT_LOGE("Failed to set flash protect");
@@ -423,6 +362,26 @@ std::expected<void, Error> ReturnToRomBoot(const UsbDevice& device,
   }
 
   FT_LOGD("Device switched to ROM boot mode");
+  return {};
+}
+
+std::expected<void, Error> GetBootVersion(const UsbDevice& device,
+                                          DeviceMode current_mode) {
+  auto cmd = BuildFtCmd(Opcode::kReadInfo, Subcmd::kReadData, 0, 0, 0, 0);
+
+  const size_t buffer_size =
+      (current_mode == DeviceMode::kBoot) ? kBootVersionMax : kRomVersionMax;
+  std::vector<uint8_t> data(buffer_size, 0);
+
+  auto res = ReceiveBulkDataIn(device, cmd, data, kGenericInfoTimeout);
+  if (!res) {
+    FT_LOGE("Failed to read version info");
+    return res;
+  }
+
+  auto null_pos = std::ranges::find(data, '\0');
+  std::string version(data.begin(), null_pos);
+  FT_LOGI("Boot version: {}", version);
   return {};
 }
 

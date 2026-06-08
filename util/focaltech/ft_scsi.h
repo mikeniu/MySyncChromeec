@@ -18,56 +18,79 @@ namespace focaltech {
 
 constexpr size_t kScsiCmdSize = 16;
 
-struct BulkCbWrap {
-  uint32_t signature;
-  uint32_t tag;
-  uint32_t data_transfer_length;
-  uint8_t flags;
-  uint8_t lun;
-  uint8_t cmd_len;
-  uint8_t cmd[kScsiCmdSize];
-} __attribute__((packed));
+enum class CbwDirection : uint8_t {
+  kOut = 0x00,
+  kIn = 0x80,
+};
 
-static_assert(sizeof(BulkCbWrap) == 31, "USB CBW must be exactly 31 bytes");
+enum class Opcode : uint8_t {
+  kReadInfo = 0xDB,
+  kAction = 0xDC,
+};
 
-struct BulkCsWrap {
-  uint32_t signature;
-  uint32_t tag;
-  uint32_t data_residue;
-  uint8_t status;
-} __attribute__((packed));
-
-static_assert(sizeof(BulkCsWrap) == 13, "USB CSW must be exactly 13 bytes");
+enum class Subcmd : uint8_t {
+  kReadData = 0x01,
+  kWriteBin = 0x03,
+  kCodeBin = 0x04,
+  kErasePage = 0x08,
+  kVerify = 0xBB,
+  kSoftReset = 0xDD,
+  kFlashWpSet = 0xF7,
+  kFlashWpGet = 0xF8,
+};
 
 struct CmdFormat {
-  uint8_t opcode;
+  Opcode opcode;
   uint32_t address;
   uint32_t length;
   uint32_t aux_address;
-  uint8_t subcmd;
+  Subcmd subcmd;
   uint8_t flags;
   uint8_t reserved;
 } __attribute__((packed));
 
 static_assert(sizeof(CmdFormat) == 16, "CmdFormat must be exactly 16 bytes");
 
+struct BulkCbWrap {
+  uint32_t signature;
+  uint32_t tag;
+  uint32_t data_transfer_length;
+  CbwDirection flags;
+  uint8_t lun;
+  uint8_t cmd_len;
+  CmdFormat cmd;
+} __attribute__((packed));
+
+static_assert(sizeof(BulkCbWrap) == 31, "USB CBW must be exactly 31 bytes");
+
+enum class CswStatus : uint8_t {
+  kCommandPassed = 0x00,
+  kCommandFailed = 0x01,
+  kPhaseError = 0x02,
+};
+
+struct BulkCsWrap {
+  uint32_t signature;
+  uint32_t tag;
+  uint32_t data_residue;
+  CswStatus status;
+} __attribute__((packed));
+
+static_assert(sizeof(BulkCsWrap) == 13, "USB CSW must be exactly 13 bytes");
+
 enum class TransferDirection { kIn, kOut, kSendOnly };
 
-std::array<uint8_t, kScsiCmdSize> BuildFtCmd(uint8_t opcode, uint8_t subcmd,
-                                             uint32_t address = 0,
-                                             uint32_t length = 0,
-                                             uint32_t aux_address = 0,
-                                             uint8_t flags = 0);
+CmdFormat BuildFtCmd(Opcode opcode, Subcmd subcmd, uint32_t address = 0,
+                     uint32_t length = 0, uint32_t aux_address = 0,
+                     uint8_t flags = 0);
 
-// For sending data TO the device (Data buffer is const)
 std::expected<void, Error> SendBulkDataOut(
-    const UsbDevice& device, std::span<const uint8_t> scsi_cmd,
+    const UsbDevice& device, const CmdFormat& scsi_cmd,
     std::span<const uint8_t> data_buffer, TransferDirection dir,
     std::chrono::milliseconds timeout_ms);
 
-// For receiving data FROM the device (Data buffer is mutable)
 std::expected<void, Error> ReceiveBulkDataIn(
-    const UsbDevice& device, std::span<const uint8_t> scsi_cmd,
+    const UsbDevice& device, const CmdFormat& scsi_cmd,
     std::span<uint8_t> data_buffer, std::chrono::milliseconds timeout_ms);
 
 }  // namespace focaltech

@@ -9,9 +9,11 @@
 #include <cassert>
 #include <concepts>
 #include <cstdint>
+#include <expected>
 #include <span>
 #include <string_view>
 #include <type_traits>
+#include <vector>
 
 namespace focaltech {
 
@@ -28,6 +30,12 @@ constexpr T ToLittleEndian(T value) {
     return std::byteswap(value);
   }
   return value;
+}
+
+// Convert a little-endian value from the wire to host endianness.
+template <typename T>
+constexpr T FromLittleEndian(T value) {
+  return ToLittleEndian(value);
 }
 
 // Safely view any TriviallyCopyable object as a read-only byte span
@@ -71,6 +79,9 @@ inline std::string_view ToString(Error err) {
       return "Unknown error";
   }
 }
+
+std::expected<std::vector<uint8_t>, Error> ReadFileToVector(
+    std::string_view path);
 
 }  // namespace focaltech
 
