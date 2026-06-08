@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc2a8bd0_dda907f6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-08T15:42:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "46b67cf2_5e6cd4b2",
+      "revId": "6ab1efe165d71b86d7b541d53eb6d50aea46c3d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a9b143c4_c8128d9d",
@@ -35,6 +53,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a904f24_19f7e410",
+        "filename": "zephyr/emul/emul_common_i2c.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-08T15:42:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a9b143c4_c8128d9d",
+      "revId": "6ab1efe165d71b86d7b541d53eb6d50aea46c3d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "afd94991_e56dced3",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-06-05T19:19:32Z",
       "side": 1,
       "message": "Superficially, this is a special case of behavior ordinarily handled in `read_byte` and `write_byte`, but I\u0027m wondering if it can be more generic. If the fail register is `FAIL_ALL_REG`, then I would expect any transaction to fail immediately, without having to evaluate the register. Could we handle all cases of `FAIL_ALL_REG` here, independent of length, and only handle specific register failures in the byte functions?",
+      "revId": "6ab1efe165d71b86d7b541d53eb6d50aea46c3d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2979e3aa_909fa60f",
+        "filename": "zephyr/emul/emul_common_i2c.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-08T15:42:30Z",
+      "side": 1,
+      "message": "I\u0027ll look into this further but I think this check is the only one actively bypassing the failure flags",
+      "parentUuid": "afd94991_e56dced3",
       "revId": "6ab1efe165d71b86d7b541d53eb6d50aea46c3d9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
