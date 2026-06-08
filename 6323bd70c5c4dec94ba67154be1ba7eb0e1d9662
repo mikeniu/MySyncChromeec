@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1104bf2b_44e2ab11",
+        "filename": "zephyr/include/usbc/pdc_power_mgmt.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 828,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-06-08T03:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4fe62ae0_9461e69a",
+      "range": {
+        "startLine": 826,
+        "startChar": 0,
+        "endLine": 828,
+        "endChar": 5
+      },
+      "revId": "6323bd70c5c4dec94ba67154be1ba7eb0e1d9662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0d6b5492_1ad99689",
