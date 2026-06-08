@@ -33,6 +33,10 @@ SECTIONS {
 		KEEP(*(.rodata.HOOK_INIT_EARLY))
 		__hooks_init_early_end = .;
 
+		__hooks_battery_wokeup = .;
+		KEEP(*(.rodata.HOOK_BATTERY_WOKEUP))
+		__hooks_battery_wokeup_end = .;
+
 		__hooks_pre_freq_change = .;
 		*(.rodata.HOOK_PRE_FREQ_CHANGE)
 		__hooks_pre_freq_change_end = .;

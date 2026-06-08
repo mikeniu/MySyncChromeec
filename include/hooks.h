@@ -91,6 +91,12 @@ enum hook_type {
 	HOOK_INIT_EARLY,
 
 	/*
+	 * This hook is called when the battery transitions out of
+	 * ST_PRECHARGE or a dead-battery condition.
+	 */
+	HOOK_BATTERY_WOKEUP,
+
+	/*
 	 * System clock changed frequency.
 	 *
 	 * The "pre" frequency hook is called before we change the frequency.

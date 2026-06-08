@@ -1081,8 +1081,8 @@ static void revive_battery(int *need_static)
 		/* Update the battery-specific values */
 		batt_info = battery_get_info();
 		*need_static = 1;
+		hook_notify(HOOK_BATTERY_WOKEUP);
 	}
-
 	battery_seems_dead = 0;
 }
 
