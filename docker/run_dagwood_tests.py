@@ -68,13 +68,6 @@ def main():
         for scenario in args.test_scenario:
             twister_args.extend(["-s", scenario])
 
-    # If neither test-dir nor test-scenario is specified, default to ec-aic
-    if not args.test_dir and not args.test_scenario:
-        print(
-            "Neither -T nor -s specified. Defaulting to -T zephyr/test/ec-aic"
-        )
-        twister_args.extend(["-T", "zephyr/test/ec-aic"])
-
     script_dir = os.path.dirname(os.path.realpath(__file__))
     run_docker_sh = os.path.join(script_dir, "run_docker.sh")
 
