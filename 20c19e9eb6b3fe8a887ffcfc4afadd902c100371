@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7353bc4d_da09fe0e",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a01c9124_c8700101",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 74
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "253997b0_51c710b1",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-05T21:00:49Z",
       "side": 1,
       "message": "You applied `ToLittleEndian` to the SCSI structs, but overlooked the `ec_host_request` and `ec_host_response` headers in `cli.cc`. While this tool typically runs on Little-Endian hosts (x86\\_64/ARM), fixing this guarantees complete cross-architecture correctness and keeps your USB encoding rules 100% consistent across the codebase.\n\n**In `util/focaltech/cli.cc`:**\n\n```\n--- a/util/focaltech/cli.cc\n+++ b/util/focaltech/cli.cc\n@@ -28,10 +28,10 @@\n   ec_host_request req{\n       .struct_version \u003d EC_HOST_REQUEST_VERSION,\n       .checksum \u003d 0,\n-      .command \u003d command,\n+      .command \u003d ToLittleEndian(command),\n       .command_version \u003d version,\n       .reserved \u003d 0,\n-      .data_len \u003d static_cast\u003cuint16_t\u003e(params.size()),\n+      .data_len \u003d ToLittleEndian(static_cast\u003cuint16_t\u003e(params.size())),\n   };\n \n   std::vector\u003cuint8_t\u003e packet(sizeof(req) + params.size());\n\n```\n\nAnd ensuring we swap the response length back when reading it off the wire:\n\n```\n@@ -85,15 +85,17 @@\n \n   ec_host_response resp;\n   memcpy(\u0026resp, initial_buffer.data(), sizeof(resp));\n-  FT_LOGD(\"resp.data_len \u003d {}\", resp.data_len);\n+  \n+  uint16_t data_len \u003d FromLittleEndian(resp.data_len);\n+  FT_LOGD(\"resp.data_len \u003d {}\", data_len);\n \n   std::vector\u003cuint8_t\u003e response_data;\n   size_t header_size \u003d sizeof(ec_host_response);\n   size_t data_already_received \u003d received - header_size;\n   if (data_already_received \u003e 0) {\n     response_data.insert(response_data.end(),\n                          initial_buffer.begin() + header_size,\n                          initial_buffer.begin() + received);\n   }\n \n-  if (response_data.size() \u003c resp.data_len) {\n-    size_t remaining \u003d resp.data_len - response_data.size();\n+  if (response_data.size() \u003c data_len) {\n+    size_t remaining \u003d data_len - response_data.size();\n     std::vector\u003cuint8_t\u003e additional(remaining);\n@@ -111,8 +113,8 @@\n   }\n \n-  if (response_data.size() \u003e resp.data_len) {\n-    response_data.resize(resp.data_len);\n+  if (response_data.size() \u003e data_len) {\n+    response_data.resize(data_len);\n   }\n\n```",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 4
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07c37efc_0dfdc3f5",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "253997b0_51c710b1",
       "range": {
         "startLine": 28,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "00a60a55_9d3c2f7a",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f79c86dc_b564217e",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 28
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "034997e9_f3c8ed83",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-06-05T21:47:24Z",
       "side": 1,
       "message": "Gemini feedback:\n\n-----\n\nCurrently, when an error occurs, you log its underlying integer value (e.g., `error\u003d2`). This forces developers to constantly cross-reference `ft_util.h` while debugging logs.\n\nYou can find all of them by running a global search in your IDE for:\n`std::to_underlying(.*error())` or `error()}` inside an `FT_LOG` macro.\n\nHere are the specific places you should update to use `ToString()`:\n\n### 1. The Retry Loops (`cli.cc`)\n\nWe caught this one earlier, but make sure it is updated. When hardware is rebooting, it throws expected errors (like `kNoSuchDevice`).\n\n```diff\n-      FT_LOGW(\"Switch to {} failed (attempt {}): error\u003d{}\", target_name, attempt,\n-              std::to_underlying(result.error()));\n+      FT_LOGW(\"Switch to {} failed (attempt {}): error\u003d{}\", target_name, attempt,\n+              ToString(result.error()));\n\n```\n\n### 2. The Main Entry Point / Command Dispatcher (`cli.cc` or `main.cc`)\n\nAt the very top level of your program, you likely execute the command, check the final `std::expected` result, and log it before exiting the program. This is the most important place to use `ToString`, as it\u0027s the final error the user actually sees!\n\n```diff\n   auto result \u003d ExecuteCommand(device, config);\n   if (!result) {\n-    FT_LOGE(\"Execution failed with error code: {}\", std::to_underlying(result.error()));\n+    FT_LOGE(\"Execution failed: {}\", ToString(result.error()));\n     return -1;\n   }\n\n```\n\n### 3. I/O and Protocol Failures (`ft_scsi.cc` \u0026 `updater.cc`)\n\nWhen a command fails but doesn\u0027t immediately crash the program, there is usually a debug or warning log right before the `return std::unexpected(...)`.\n\nFor example, if a SCSI command fails, you might be logging the error before bubbling it up:\n\n```diff\n   auto res \u003d ReceiveBulkDataIn(device, cmd, data, timeout);\n   if (!res) {\n-    FT_LOGD(\"Failed to read flash protection: {}\", std::to_underlying(res.error()));\n+    FT_LOGD(\"Failed to read flash protection: {}\", ToString(res.error()));\n     return res;\n   }\n\n```\n\n### The Quick Checklist\n\nTo make sure you caught them all, just search your codebase for these three patterns:\n\n1. `std::to_underlying` (If you\u0027ve applied all our optimizations, this function shouldn\u0027t be used anywhere in the codebase anymore except inside `ToString()` itself!)\n2. `FT_LOGE(..., result.error())` (Where the compiler implicitly casts it).\n3. `FT_LOGW(..., res.error())`\n\nIf you swap all of those out for `ToString(res.error())`, your terminal output will instantly transform from cryptic numbers into clean, human-readable diagnostics.",
+      "range": {
+        "startLine": 222,
+        "startChar": 0,
+        "endLine": 224,
+        "endChar": 50
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d2c08d7_cbfc6411",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "034997e9_f3c8ed83",
       "range": {
         "startLine": 222,
         "startChar": 0,
@@ -140,6 +236,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e064fab9_2ad8fc64",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "388166cc_1971f242",
+      "range": {
+        "startLine": 211,
+        "startChar": 2,
+        "endLine": 232,
+        "endChar": 3
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a72fd66c_ff6b60a8",
@@ -163,6 +283,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3669958a_fd26799e",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a72fd66c_ff6b60a8",
+      "range": {
+        "startLine": 303,
+        "startChar": 0,
+        "endLine": 312,
+        "endChar": 1
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "836f40a6_d2f7453a",
@@ -176,6 +320,30 @@
       "writtenOn": "2026-06-05T21:25:49Z",
       "side": 1,
       "message": "Gemini feedback:\n\n----\n\nIn `ft_scsi.cc`, you define magic numbers for the USB Bulk-Only Transport (BOT) flags and status codes:\n\n```c\nconstexpr uint8_t kBotDirectionIn \u003d 0x80;\nconstexpr uint8_t kBotDirectionOut \u003d 0x00;\nconstexpr uint8_t kBotCommandPassed \u003d 0x00;\n\n```\n\nBecause `BulkCbWrap` and `BulkCsWrap` represent strict USB hardware structures, typing their fields explicitly enforces the protocol rules at compile time and makes the struct definitions self-documenting.\n\n**In `util/focaltech/ft_scsi.h`:**\n\n```\n--- a/util/focaltech/ft_scsi.h\n+++ b/util/focaltech/ft_scsi.h\n@@ -32,23 +32,35 @@\n   kFlashWpGet \u003d 0xF8,\n };\n \n+enum class CbwDirection : uint8_t {\n+  kOut \u003d 0x00,\n+  kIn \u003d 0x80,\n+};\n+\n struct BulkCbWrap {\n   uint32_t signature;\n   uint32_t tag;\n   uint32_t data_transfer_length;\n-  uint8_t flags;\n+  CbwDirection flags; // Spec calls this bmCBWFlags\n   uint8_t lun;\n   uint8_t cmd_len;\n   uint8_t cmd[kScsiCmdSize];\n } __attribute__((packed));\n \n+enum class CswStatus : uint8_t {\n+  kCommandPassed \u003d 0x00,\n+  kCommandFailed \u003d 0x01,\n+  kPhaseError \u003d 0x02,\n+};\n+\n struct BulkCsWrap {\n   uint32_t signature;\n   uint32_t tag;\n   uint32_t data_residue;\n-  uint8_t status;\n+  CswStatus status;\n } __attribute__((packed));\n\n```\n\n**In `util/focaltech/ft_scsi.cc`:** Remove the `kBot*` constants and use the enums directly.\n\n```\n--- a/util/focaltech/ft_scsi.cc\n+++ b/util/focaltech/ft_scsi.cc\n@@ -21,10 +21,6 @@\n constexpr uint32_t kUsbMsCbwSignature \u003d 0x43425355;\n constexpr uint32_t kUsbMsCswSignature \u003d 0x53425355;\n-constexpr uint8_t kBotDirectionIn \u003d 0x80;\n-constexpr uint8_t kBotDirectionOut \u003d 0x00;\n-constexpr uint8_t kBotCommandPassed \u003d 0x00;\n \n@@ -37,8 +33,8 @@\n       .tag \u003d ToLittleEndian(device.GetNextCdbTag()),\n       .data_transfer_length \u003d\n           ToLittleEndian(static_cast\u003cuint32_t\u003e(data_length)),\n-      .flags \u003d\n-          (dir \u003d\u003d TransferDirection::kIn) ? kBotDirectionIn : kBotDirectionOut,\n+      .flags \u003d (dir \u003d\u003d TransferDirection::kIn) ? CbwDirection::kIn \n+                                               : CbwDirection::kOut,\n       .lun \u003d kDefaultLun,\n@@ -74,8 +70,8 @@\n     return std::unexpected(Error::kResultFail);\n   }\n \n-  if (csw.status !\u003d kBotCommandPassed) {\n-    FT_LOGW(\"Command failed with CSW status: {:02x}\", csw.status);\n+  if (csw.status !\u003d CswStatus::kCommandPassed) {\n+    FT_LOGW(\"Command failed with CSW status: {:02x}\", std::to_underlying(csw.status));\n     return std::unexpected(Error::kResultFail);\n   }\n\n```",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 43
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44b6eeae_fe390df4",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "836f40a6_d2f7453a",
       "range": {
         "startLine": 20,
         "startChar": 0,
@@ -233,6 +401,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6b75433_95b86b95",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "67b72a89_1cf9a2a1",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 59
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c3a8f1cd_d71bfb47",
@@ -280,6 +472,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b50340dd_b27fad70",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8546139e_5e86dcae",
+      "range": {
+        "startLine": 131,
+        "startChar": 0,
+        "endLine": 138,
+        "endChar": 0
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "65f82303_9d58472d",
@@ -293,6 +509,30 @@
       "writtenOn": "2026-06-05T21:22:13Z",
       "side": 1,
       "message": "We have definitions for `opcode` and `subcmd` in the `updater.h` file. Let\u0027s use an `enum class` to make these strongly typed. Here is Gemini feedback on how to do this:\n\n-----\n\nYou should absolutely group the `kCmd` and `kSubcmd` constants into strongly-typed `enum class`es.\n\nRight now, your `BuildFtCmd` function takes `(uint8_t opcode, uint8_t subcmd)`. Because they are the same type, the compiler won\u0027t stop you from accidentally swapping them (e.g., `BuildFtCmd(kSubcmdErasePage, kCmdAction)`).\n\nBy making them `enum class`es, you gain compile-time type safety and self-documenting code.\n\nSince we specified `: uint8_t` as the underlying type for both `enum class`es, the C++ standard guarantees they will occupy exactly one byte in memory.\n\nThis means we can use them directly inside the `__attribute__((packed))` struct. It completely eliminates the need for `std::to_underlying`, keeping the code extremely clean and strictly type-safe from top to bottom.\n\nAlso, because these enums define the structural format of the SCSI commands, they actually belong in **`ft_scsi.h`** (alongside `CmdFormat`) rather than in `updater.h`.\n\nHere are the exact changes to implement this:\n\n### 1. Define Enums and Update Struct (`util/focaltech/ft_scsi.h`)\n\nMove the constants from `updater.h`, convert them to enums, and plug them directly into `CmdFormat` and `BuildFtCmd`.\n\n```diff\n--- a/util/focaltech/ft_scsi.h\n+++ b/util/focaltech/ft_scsi.h\n@@ -16,6 +16,22 @@\n \n constexpr size_t kScsiCmdSize \u003d 16;\n \n+enum class Opcode : uint8_t {\n+  kReadInfo \u003d 0xDB,\n+  kAction \u003d 0xDC,\n+};\n+\n+enum class Subcmd : uint8_t {\n+  kReadData \u003d 0x01,\n+  kWriteBin \u003d 0x03,\n+  kCodeBin \u003d 0x04,\n+  kErasePage \u003d 0x08,\n+  kVerify \u003d 0xBB,\n+  kSoftReset \u003d 0xDD,\n+  kFlashWpSet \u003d 0xF7,\n+  kFlashWpGet \u003d 0xF8,\n+};\n+\n struct BulkCbWrap {\n   uint32_t signature;\n   uint32_t tag;\n@@ -38,11 +54,11 @@\n static_assert(sizeof(BulkCsWrap) \u003d\u003d 13, \"USB CSW must be exactly 13 bytes\");\n \n struct CmdFormat {\n-  uint8_t opcode;\n+  Opcode opcode;\n   uint32_t address;\n   uint32_t length;\n   uint32_t aux_address;\n-  uint8_t subcmd;\n+  Subcmd subcmd;\n   uint8_t flags;\n   uint8_t reserved;\n } __attribute__((packed));\n@@ -51,7 +67,7 @@\n \n enum class TransferDirection { kIn, kOut, kSendOnly };\n \n-std::array\u003cuint8_t, kScsiCmdSize\u003e BuildFtCmd(uint8_t opcode, uint8_t subcmd,\n+std::array\u003cuint8_t, kScsiCmdSize\u003e BuildFtCmd(Opcode opcode, Subcmd subcmd,\n                                              uint32_t address \u003d 0,\n                                              uint32_t length \u003d 0,\n                                              uint32_t aux_address \u003d 0,\n\n```\n\n### 2. Simplify Implementation (`util/focaltech/ft_scsi.cc`)\n\nUpdate the function signature. Notice how we assign the enums directly to the struct—no casting required!\n\n```diff\n--- a/util/focaltech/ft_scsi.cc\n+++ b/util/focaltech/ft_scsi.cc\n@@ -82,7 +82,7 @@\n \n }  // namespace\n \n-std::array\u003cuint8_t, kScsiCmdSize\u003e BuildFtCmd(uint8_t opcode, uint8_t subcmd,\n+std::array\u003cuint8_t, kScsiCmdSize\u003e BuildFtCmd(Opcode opcode, Subcmd subcmd,\n                                              uint32_t address, uint32_t length,\n                                              uint32_t aux_address,\n                                              uint8_t flags) {\n\n```\n\n### 3. Clean up `updater.h` (`util/focaltech/updater.h`)\n\nRemove the old flat constants completely.\n\n```diff\n--- a/util/focaltech/updater.h\n+++ b/util/focaltech/updater.h\n@@ -41,18 +41,6 @@\n \n constexpr size_t kFlashWpBufferSize \u003d 512;\n-constexpr uint8_t kCmdReadInfo \u003d 0xDB;\n-constexpr uint8_t kCmdAction \u003d 0xDC;\n-\n-constexpr uint8_t kSubcmdReadData \u003d 0x01;\n-constexpr uint8_t kSubcmdWriteBin \u003d 0x03;\n-constexpr uint8_t kSubcmdCodeBin \u003d 0x04;\n-constexpr uint8_t kSubcmdErasePage \u003d 0x08;\n-constexpr uint8_t kSubcmdVerify \u003d 0xBB;\n-constexpr uint8_t kSubcmdSoftReset \u003d 0xDD;\n-constexpr uint8_t kSubcmdFlashWpSet \u003d 0xF7;\n-constexpr uint8_t kSubcmdFlashWpGet \u003d 0xF8;\n \n constexpr size_t kBootVersionMax \u003d 36;\n\n```\n\n### 4. Update Call Sites in `updater.cc`\n\nReplace the old constants with the new scoped enums.\n\n```diff\n--- a/util/focaltech/updater.cc\n+++ b/util/focaltech/updater.cc\n@@ -69,24 +69,24 @@\n std::expected\u003cvoid, Error\u003e SendActionOut(\n     const UsbDevice\u0026 device, uint8_t subcmd, uint32_t address, // ...\n {\n-  auto cmd \u003d BuildFtCmd(kCmdAction, subcmd, address, length, aux_address, flags);\n+  auto cmd \u003d BuildFtCmd(Opcode::kAction, subcmd, address, length, aux_address, flags);\n   return SendBulkDataOut(device, cmd, data, dir, timeout);\n }\n \n std::expected\u003cvoid, Error\u003e ReceiveActionIn(\n     const UsbDevice\u0026 device, uint8_t subcmd, uint32_t address, // ...\n {\n-  auto cmd \u003d BuildFtCmd(kCmdAction, subcmd, address, length, aux_address, flags);\n+  auto cmd \u003d BuildFtCmd(Opcode::kAction, subcmd, address, length, aux_address, flags);\n   return ReceiveBulkDataIn(device, cmd, data, timeout);\n }\n \n std::expected\u003cvoid, Error\u003e ErasePage(...) {\n   uint32_t pages \u003d DivRoundUp(length, kFocalConfigSize);\n-  return SendActionOut(device, kSubcmdErasePage, addr, {},\n+  return SendActionOut(device, Subcmd::kErasePage, addr, {},\n                        TransferDirection::kOut, kErasePageTimeout, pages);\n }\n \n std::expected\u003cvoid, Error\u003e DownloadPage(...) {\n-  auto res \u003d SendActionOut(device, kSubcmdWriteBin, kWriteSramAddr,\n+  auto res \u003d SendActionOut(device, Subcmd::kWriteBin, kWriteSramAddr,\n                            data.subspan(0, per_len), TransferDirection::kOut,\n                            kDownloadPageTimeout, per_len);\n   if (!res) {\n     FT_LOGE(\"Write bin error\");\n     return res;\n   }\n \n-  res \u003d SendActionOut(device, kSubcmdCodeBin, downaddr, {},\n+  res \u003d SendActionOut(device, Subcmd::kCodeBin, downaddr, {},\n                       TransferDirection::kOut, kDownloadPageTimeout, per_len,\n                       kWriteSramAddr);\n\n```\n\n*(You\u0027ll also apply this to `kSubcmdVerify`, `kSubcmdSoftReset`, `kSubcmdFlashWpGet`, and `kSubcmdFlashWpSet` in their respective functions, and `kCmdReadInfo`/`kSubcmdReadData` in `GetBootVersion`).*\n\n### 5. Update Tests (`ft_scsi_test.cc` \u0026 `updater_test.cc`)\n\nThe struct parsing in your test mocks now elegantly reads the enum directly!\n\n**In `util/focaltech/updater_test.cc`:**\n\n```diff\n--- a/util/focaltech/updater_test.cc\n+++ b/util/focaltech/updater_test.cc\n@@ -78,10 +78,10 @@\n       BulkCbWrap cbw;\n       std::memcpy(\u0026cbw, data.data(), sizeof(cbw));\n \n-      if (cbw.cmd[0] \u003d\u003d kCmdAction) {\n+      if (cbw.cmd[0] \u003d\u003d std::to_underlying(Opcode::kAction)) {\n         auto ft_cmd \u003d std::bit_cast\u003cCmdFormat\u003e(cbw.cmd);\n \n-        if (ft_cmd.subcmd \u003d\u003d kSubcmdErasePage) {\n+        if (ft_cmd.subcmd \u003d\u003d Subcmd::kErasePage) {\n           erased_addresses_.push_back(FromLittleEndian(ft_cmd.address));\n         }\n       }\n\n```\n\n**In `util/focaltech/ft_scsi_test.cc`:**\n\n```diff\n--- a/util/focaltech/ft_scsi_test.cc\n+++ b/util/focaltech/ft_scsi_test.cc\n@@ -37,18 +37,18 @@\n }  // namespace\n \n TEST(FtScsiTest, BuildFtCmd_VerifyFields) {\n-  auto cmd \u003d BuildFtCmd(kCmdAction, kSubcmdErasePage, 0x12345678, 0x1000,\n-                        0x2000, 0x01);\n+  auto cmd \u003d BuildFtCmd(Opcode::kAction, Subcmd::kErasePage, 0x12345678,\n+                        0x1000, 0x2000, 0x01);\n \n-  EXPECT_THAT(cmd, ElementsAre(kCmdAction, 0x78, 0x56, 0x34, 0x12, 0x00, 0x10,\n+  EXPECT_THAT(cmd, ElementsAre(0xDC, 0x78, 0x56, 0x34, 0x12, 0x00, 0x10,\n                                0x00, 0x00, 0x00, 0x20, 0x00, 0x00,\n-                               kSubcmdErasePage, 0x01, 0x00));\n+                               0x08, 0x01, 0x00));\n }\n \n TEST(FtScsiTest, BuildFtCmd_ZeroDefaults) {\n-  auto cmd \u003d BuildFtCmd(kCmdReadInfo, kSubcmdReadData);\n+  auto cmd \u003d BuildFtCmd(Opcode::kReadInfo, Subcmd::kReadData);\n \n-  EXPECT_THAT(cmd, ElementsAre(kCmdReadInfo, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\n+  EXPECT_THAT(cmd, ElementsAre(0xDB, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\n                                0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\n-                               kSubcmdReadData, 0x00, 0x00));\n+                               0x01, 0x00, 0x00));\n }\n\n```\n\n*(And simply replace `kCmdAction` with `Opcode::kAction` and `kSubcmdWriteBin` with `Subcmd::kWriteBin` etc. in the rest of the SCSI tests).*",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 17
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b55e0c8_b159d9b9",
+        "filename": "util/focaltech/ft_scsi.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "65f82303_9d58472d",
       "range": {
         "startLine": 43,
         "startChar": 0,
@@ -350,6 +590,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb708218_45697dad",
+        "filename": "util/focaltech/ft_scsi.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "The patch provided by the Gemini is incorrect because it ignores the actual usage of kSendOnly. Removing the TransferDirection enum without providing an alternative mechanism would break the ResetMcu functionality. The correct approach is to preserve support for the special mode of “sending only the CBW and then waiting for a reset”. Additionally, SendCbw is also called by ReceiveBulkDataIn for receiving data.",
+      "parentUuid": "27c5d7ce_932bc6b1",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 54
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "97d0a5bc_de73d524",
@@ -385,6 +649,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a91d07aa_624a03c7",
+        "filename": "util/focaltech/ft_scsi.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b7eb6078_ba013b73",
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3a7c3794_fa2d19f9",
@@ -398,6 +680,30 @@
       "writtenOn": "2026-06-05T20:39:19Z",
       "side": 1,
       "message": "Currently, `SendBulkDataOut` and `ReceiveBulkDataIn` accept the SCSI command as a `std::span\u003cconst uint8_t\u003e scsi_cmd`. However, a USB Bulk-Only Transport (BOT) wrapper *strictly* requires exactly 16 bytes for the `cmd` array. By accepting a span, you lose the compile-time size guarantee—passing a smaller span would result in uninitialized bytes being read into the `BulkCbWrap`.\n\nSince your `BuildFtCmd` helper already returns an exact `std::array\u003cuint8_t, 16\u003e`, we can update the signatures to enforce this at compile time.\n\n**In `util/focaltech/ft_scsi.h`:**\n\n```\n // For sending data TO the device (Data buffer is const)\n std::expected\u003cvoid, Error\u003e SendBulkDataOut(\n-    const UsbDevice\u0026 device, std::span\u003cconst uint8_t\u003e scsi_cmd,\n+    const UsbDevice\u0026 device, const std::array\u003cuint8_t, kScsiCmdSize\u003e\u0026 scsi_cmd,\n     std::span\u003cconst uint8_t\u003e data_buffer, TransferDirection dir,\n     std::chrono::milliseconds timeout_ms);\n \n // For receiving data FROM the device (Data buffer is mutable)\n std::expected\u003cvoid, Error\u003e ReceiveBulkDataIn(\n-    const UsbDevice\u0026 device, std::span\u003cconst uint8_t\u003e scsi_cmd,\n+    const UsbDevice\u0026 device, const std::array\u003cuint8_t, kScsiCmdSize\u003e\u0026 scsi_cmd,\n     std::span\u003cuint8_t\u003e data_buffer, std::chrono::milliseconds timeout_ms);\n\n```\n\n*(Apply the exact same signature changes to the implementations in `ft_scsi.cc`)*",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 74
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bef5ee1_b92ce23e",
+        "filename": "util/focaltech/ft_scsi.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a7c3794_fa2d19f9",
       "range": {
         "startLine": 62,
         "startChar": 0,
@@ -431,6 +737,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fad07461_bf5b7f42",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2cc940c3_5e0fbe18",
+      "range": {
+        "startLine": 67,
+        "startChar": 0,
+        "endLine": 95,
+        "endChar": 15
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f3743520_3a1ff7c3",
@@ -444,6 +774,30 @@
       "writtenOn": "2026-06-05T20:14:05Z",
       "side": 1,
       "message": "**Check against `LIBUSB_SUCCESS` (`libusb_transport.cc`)**\n\n```c\n  if (libusb_claim_interface(handle_.get(), interface_num_) \u003c LIBUSB_SUCCESS) {\n\n```\n\nWhile technically correct since `LIBUSB_SUCCESS` is 0 and libusb errors are negative, standard libusb convention dictates explicitly checking for inequality.\n\n* **Remedy:** Change to `!\u003d LIBUSB_SUCCESS`.",
+      "range": {
+        "startLine": 199,
+        "startChar": 0,
+        "endLine": 199,
+        "endChar": 79
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bae9826_a03f5b2e",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f3743520_3a1ff7c3",
       "range": {
         "startLine": 199,
         "startChar": 0,
@@ -477,6 +831,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8380483f_f8bf84aa",
+        "filename": "util/focaltech/libusb_transport.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d9b5f3c8_1df90560",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 35
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a9f76310_48dc20e9",
@@ -500,6 +878,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a7725b7_75c16f25",
+        "filename": "util/focaltech/test_utils.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a9f76310_48dc20e9",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 41
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "40033af0_4316193b",
@@ -513,6 +915,30 @@
       "writtenOn": "2026-06-05T20:21:30Z",
       "side": 1,
       "message": "You have two identical implementations of the SHA-256 hashing logic: `CalculateSha256` in `updater.cc` and `ComputeSha256` in `test_utils.h`.\n\n**The Fix:** Centralize this in `updater.h` so both production and test code use the exact same function.\n\n**In `util/focaltech/updater.h`**, add the include and declaration:\n\n```c\n#include \u003copenssl/sha.h\u003e\n\n// ... inside focaltech namespace ...\nstd::array\u003cuint8_t, SHA256_DIGEST_LENGTH\u003e ComputeSha256(\n    std::span\u003cconst uint8_t\u003e data);\n\n```\n\n*   **In `util/focaltech/updater.cc`**, expose the implementation and remove the old static one:\n    ```cpp\n    std::array\u003cuint8_t, SHA256_DIGEST_LENGTH\u003e ComputeSha256(\n        std::span\u003cconst uint8_t\u003e data) {\n      std::array\u003cuint8_t, SHA256_DIGEST_LENGTH\u003e hash{};\n      SHA256(data.data(), data.size(), hash.data());\n      return hash;\n    }\n    ```\n\n\n*(Don\u0027t forget to update the call inside `VerifyData` to use `ComputeSha256`!)*\n\n\n* **In `util/focaltech/test_utils.h`**, completely delete `ComputeSha256` and just `#include \"updater.h\"`.",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 1
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a2bc2b5_00ae8dd6",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "40033af0_4316193b",
       "range": {
         "startLine": 64,
         "startChar": 0,
@@ -570,6 +996,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3109f203_47c8b1ef",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9b8d8dc_9fcc31ec",
+      "range": {
+        "startLine": 155,
+        "startChar": 0,
+        "endLine": 158,
+        "endChar": 59
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee5c1802_9931994d",
@@ -583,6 +1033,30 @@
       "writtenOn": "2026-06-05T20:55:02Z",
       "side": 1,
       "message": "Gemini feedback:\n\n----\n\n## Rationale for Decoupling File I/O\n\n1. **Eliminate Redundant Disk Access:** The original design opened and read the firmware file from disk three separate times per update cycle (`HasValidConfigPage`, `DownloadBin`, and `VerifyData`). By reading the file into a memory buffer once at the CLI level, we eliminate redundant system calls and disk I/O.\n2. **Pure, Fast Unit Tests:** `UpdateFw` accepting a file path forced unit tests to write binary fixtures to the physical filesystem using `ScopedTempFile`. Accepting a `std::span` allows tests to pass in-memory vectors directly, making the test suite faster, memory-bound, and immune to filesystem permission quirks.\n3. **Strict Separation of Concerns:** Moving file reading to a new generic `ft_util.cc` isolates system I/O. `updater.cc` becomes exclusively responsible for firmware domain logic (USB protocol, parsing headers, enforcing max sizes), and `cli.cc` handles routing data between the two.\n\n---\n\n## Required Changes\n\n### 1. `util/focaltech/build.mk`\n\nAdd the new utility source file to the build targets.\n\n```diff\n--- a/util/focaltech/build.mk\n+++ b/util/focaltech/build.mk\n@@ -6,6 +6,7 @@\n \n host-util-bin-cxx-y +\u003d focaltech_fingerprint_iap\n focaltech_fingerprint_iap-objs :\u003d $(addprefix $(_cur_dir)/, \\\n+\tft_util.o \\\n \tlibusb_transport.o \\\n \tft_scsi.o \\\n \tupdater.o \\\n@@ -20,6 +21,7 @@\n \n host-util-bin-cxx-y +\u003d focaltech_test\n focaltech_test-objs :\u003d $(addprefix $(_cur_dir)/, \\\n+\tft_util.o \\\n \tft_util_test.o \\\n \tft_help_test.o \\\n \tft_scsi_test.o \\\n\n```\n\n### 2. `util/focaltech/ft_util.h` \u0026 `util/focaltech/ft_util.cc`\n\nDeclare and implement the generic file reader.\n\n```diff\n--- a/util/focaltech/ft_util.h\n+++ b/util/focaltech/ft_util.h\n@@ -10,6 +10,7 @@\n #include \u003ccstdint\u003e\n #include \u003cspan\u003e\n #include \u003cstring_view\u003e\n+#include \u003cvector\u003e\n #include \u003ctype_traits\u003e\n \n namespace focaltech {\n@@ -71,6 +72,9 @@\n   }\n }\n \n+// Generic file reader\n+std::expected\u003cstd::vector\u003cuint8_t\u003e, Error\u003e ReadFileToVector(\n+    std::string_view path);\n+\n }  // namespace focaltech\n\n```\n\n**Create a new file: `util/focaltech/ft_util.cc**`\n\n```cpp\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n\n#include \"ft_util.h\"\n\n#include \u003cfstream\u003e\n#include \u003cvector\u003e\n\n#include \"ft_log.h\"\n\nnamespace focaltech {\n\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, Error\u003e ReadFileToVector(\n    std::string_view path) {\n  std::ifstream file(std::string{path}, std::ios::binary | std::ios::ate);\n  if (!file) {\n    FT_LOGE(\"Cannot open file: {}\", path);\n    return std::unexpected(Error::kNoSuchFile);\n  }\n\n  auto size \u003d file.tellg();\n  if (size \u003c\u003d 0) {\n    FT_LOGE(\"File is empty or invalid: {}\", path);\n    return std::unexpected(Error::kParameterError);\n  }\n\n  std::vector\u003cuint8_t\u003e buffer(size);\n  file.seekg(0, std::ios::beg);\n  if (!file.read(reinterpret_cast\u003cchar*\u003e(buffer.data()), size)) {\n    FT_LOGE(\"Failed to read file payload.\");\n    return std::unexpected(Error::kResultFail);\n  }\n\n  return buffer;\n}\n\n}  // namespace focaltech\n\n```\n\n### 3. `util/focaltech/cli.cc`\n\nRead the file into memory once before passing it into the update loop.\n\n```diff\n--- a/util/focaltech/cli.cc\n+++ b/util/focaltech/cli.cc\n@@ -348,11 +348,16 @@\n         return std::unexpected(Error::kParameterError);\n       }\n \n+      auto fw_data_res \u003d ReadFileToVector(config.ec_bin);\n+      if (!fw_data_res) {\n+        return std::unexpected(fw_data_res.error());\n+      }\n+\n       /* Fix an issue where, when the display is off but the system has not yet\n        * entered suspend, the host may forcibly switch the FPMCU into suspend\n        * state, causing the upgrade to fail. Retry updating the firmware. */\n       for (int attempt \u003d 1; attempt \u003c\u003d kMaxRetry; ++attempt) {\n-        if (auto res \u003d UpdateFw(usb_device, config.ec_bin, current_mode); res) {\n+        if (auto res \u003d UpdateFw(usb_device, *fw_data_res, current_mode); res) {\n           FT_LOGI(\"Firmware update successful\");\n           return {};\n         }\n\n```\n\n### 4. `util/focaltech/updater.h` \u0026 `util/focaltech/updater.cc`\n\nUpdate signatures to accept `std::span`, remove redundant file reading logic, and enforce the firmware maximum size.\n\n```diff\n--- a/util/focaltech/updater.h\n+++ b/util/focaltech/updater.h\n@@ -69,7 +69,7 @@\n     std::span\u003cconst uint8_t\u003e data);\n \n std::expected\u003cvoid, Error\u003e UpdateFw(const UsbDevice\u0026 device,\n-                                    std::string_view ec_bin,\n+                                    std::span\u003cconst uint8_t\u003e fw_data,\n                                     DeviceMode current_mode);\n \n std::expected\u003cFlashWpArea, Error\u003e GetFlashProtection(const UsbDevice\u0026 device,\n\n```\n\n```diff\n--- a/util/focaltech/updater.cc\n+++ b/util/focaltech/updater.cc\n@@ -9,7 +9,6 @@\n #include \u003calgorithm\u003e\n #include \u003ccstdint\u003e\n-#include \u003cfstream\u003e\n #include \u003cspan\u003e\n #include \u003cstring_view\u003e\n #include \u003cvector\u003e\n@@ -36,31 +35,6 @@\n constexpr uint8_t kHashModeSha256 \u003d 0x04;\n constexpr uint8_t kHashModeRomShift \u003d 4;\n \n-std::expected\u003cstd::vector\u003cuint8_t\u003e, Error\u003e ReadFileToVector(\n-    std::string_view path) {\n-// ... [DELETE ENTIRE FUNCTION] ...\n-}\n-\n std::expected\u003cvoid, Error\u003e SendActionOut(\n@@ -112,14 +86,10 @@\n }\n \n std::expected\u003cvoid, Error\u003e DownloadBin(const UsbDevice\u0026 device,\n-                                       std::string_view file_path,\n+                                       std::span\u003cconst uint8_t\u003e buffer,\n                                        uint32_t target_addr) {\n-  auto file_data \u003d ReadFileToVector(file_path);\n-  if (!file_data) return std::unexpected(file_data.error());\n-\n-  const auto\u0026 buffer \u003d *file_data;\n   size_t file_len \u003d buffer.size();\n@@ -171,15 +141,9 @@\n }\n \n std::expected\u003cvoid, Error\u003e VerifyData(const UsbDevice\u0026 device,\n-                                      std::string_view file_path,\n+                                      std::span\u003cconst uint8_t\u003e firmware_data,\n                                       uint32_t target_addr) {\n-  auto file_res \u003d ReadFileToVector(file_path);\n-  if (!file_res.has_value()) {\n-    return std::unexpected(file_res.error());\n-  }\n-  const auto\u0026 firmware_data \u003d file_res.value();\n-\n   // SHA256 mode, In ROM mode, this parameter needs to be left-shifted by 4\n@@ -213,20 +177,15 @@\n   return {};\n }\n \n-std::expected\u003cbool, Error\u003e HasValidConfigPage(std::string_view file_path,\n+std::expected\u003cbool, Error\u003e HasValidConfigPage(std::span\u003cconst uint8_t\u003e fw_data,\n                                               uint32_t\u0026 code_start_addr) {\n-  std::ifstream file(std::string{file_path}, std::ios::binary);\n-  if (!file) {\n-    FT_LOGE(\"Cannot open {}\", file_path);\n-    return std::unexpected(Error::kNoSuchFile);\n-  }\n-\n+  if (fw_data.size() \u003c sizeof(ConfigPage)) {\n+    FT_LOGE(\"Firmware data too small for config page.\");\n+    return std::unexpected(Error::kResultFail);\n+  }\n+\n   ConfigPage config{};\n-  file.read(reinterpret_cast\u003cchar*\u003e(\u0026config), sizeof(config));\n-  if (!file.good() \u0026\u0026 !file.eof()) {\n-    FT_LOGE(\"Failed to read config page\");\n-    return std::unexpected(Error::kResultFail);\n-  }\n+  std::memcpy(\u0026config, fw_data.data(), sizeof(config));\n \n   if (config.code_valid_control_word !\u003d kCodeValidMagic) {\n     return false;\n@@ -250,8 +209,13 @@\n }  // namespace\n \n std::expected\u003cvoid, Error\u003e UpdateFw(const UsbDevice\u0026 device,\n-                                    std::string_view ec_bin,\n+                                    std::span\u003cconst uint8_t\u003e fw_data,\n                                     DeviceMode current_mode) {\n+  if (fw_data.size() \u003e kEcBinSizeMax) {\n+    FT_LOGE(\"Firmware file exceeds maximum allowed size.\");\n+    return std::unexpected(Error::kParameterError);\n+  }\n+\n   uint32_t target_addr \u003d kRomCfgAddr;\n   uint32_t code_start_addr \u003d 0;\n@@ -266,7 +230,7 @@\n     return std::unexpected(err);\n   };\n \n-  auto config_res \u003d HasValidConfigPage(ec_bin, code_start_addr);\n+  auto config_res \u003d HasValidConfigPage(fw_data, code_start_addr);\n   if (!config_res) return std::unexpected(config_res.error());\n   if (!*config_res) {\n     FT_LOGE(\"Firmware lacks config page, cannot upgrade\");\n@@ -298,18 +262,13 @@\n     return abort_update(res.error());\n   }\n \n-  if (ec_bin.empty()) {\n-    FT_LOGE(\"ec bin is null\");\n-    return abort_update(Error::kParameterError);\n-  }\n-  FT_LOGI(\"Begin firmware update: {}\", ec_bin);\n-  res \u003d DownloadBin(device, ec_bin, target_addr);\n+  res \u003d DownloadBin(device, fw_data, target_addr);\n   if (!res) {\n     FT_LOGE(\"Download failed\");\n     return abort_update(res.error());\n   }\n \n-  res \u003d VerifyData(device, ec_bin, target_addr);\n+  res \u003d VerifyData(device, fw_data, target_addr);\n   if (!res) {\n     FT_LOGE(\"Verification failed\");\n     return abort_update(res.error());\n\n```\n\n### 5. `util/focaltech/updater_test.cc`\n\nPurge the file I/O mocks and simply pass the `std::vector` to the function.\n\n```diff\n--- a/util/focaltech/updater_test.cc\n+++ b/util/focaltech/updater_test.cc\n@@ -12,8 +12,6 @@\n #include \u003carray\u003e\n #include \u003cbit\u003e\n #include \u003ccstring\u003e\n-#include \u003cfilesystem\u003e\n-#include \u003cfstream\u003e\n #include \u003cranges\u003e\n #include \u003cspan\u003e\n #include \u003cvector\u003e\n@@ -32,20 +30,6 @@\n using ::testing::Invoke;\n using ::testing::Return;\n \n-class ScopedTempFile {\n- public:\n-  explicit ScopedTempFile(std::span\u003cconst uint8_t\u003e data) {\n-    path_ \u003d std::filesystem::temp_directory_path() / \"test_fw.bin\";\n-    std::ofstream ofs(path_, std::ios::binary);\n-    ofs.write(reinterpret_cast\u003cconst char*\u003e(data.data()), data.size());\n-  }\n-  ~ScopedTempFile() { std::filesystem::remove(path_); }\n-  std::string path() const { return path_.string(); }\n-\n- private:\n-  std::filesystem::path path_;\n-};\n-\n class StubUsbTransport : public UsbTransport {\n  public:\n   UsbDeviceId device_id() const override {\n@@ -134,26 +118,22 @@\n   std::vector\u003cuint8_t\u003e fw_data(sizeof(ConfigPage) + kFocalConfigSize, 0xBB);\n   std::memcpy(fw_data.data(), \u0026config, sizeof(config));\n   auto expected_hash \u003d testing::ComputeSha256(fw_data);\n-  ScopedTempFile fw_file(fw_data);\n-  std::string fw_path \u003d fw_file.path();\n \n   auto transport \u003d std::make_unique\u003cStubUsbTransport\u003e();\n   transport-\u003eSetExpectedHash(expected_hash);\n   UsbDevice device(std::move(transport));\n \n-  auto res \u003d UpdateFw(device, fw_path, DeviceMode::kBoot);\n+  auto res \u003d UpdateFw(device, fw_data, DeviceMode::kBoot);\n   EXPECT_TRUE(res.has_value());\n }\n \n TEST(UpdaterTest, UpdateFw_FailsOnMissingConfigPage) {\n   std::vector\u003cuint8_t\u003e fw_data(sizeof(ConfigPage) + kFocalConfigSize, 0xFF);\n-  ScopedTempFile fw_file(fw_data);\n-  std::string fw_path \u003d fw_file.path();\n \n   auto transport \u003d std::make_unique\u003cStubUsbTransport\u003e();\n   UsbDevice device(std::move(transport));\n \n-  auto res \u003d UpdateFw(device, fw_path, DeviceMode::kBoot);\n+  auto res \u003d UpdateFw(device, fw_data, DeviceMode::kBoot);\n   EXPECT_FALSE(res.has_value());\n   EXPECT_EQ(res.error(), Error::kParameterError);\n }\n@@ -165,16 +145,14 @@\n                     .code_start_address \u003d kBootRunAddr};\n   std::memcpy(fw_data.data(), \u0026config, sizeof(config));\n \n-  ScopedTempFile fw_file(fw_data);\n-  std::string fw_path \u003d fw_file.path();\n-\n   auto transport \u003d std::make_unique\u003cStubUsbTransport\u003e();\n   transport-\u003eSetExpectedHash(testing::ComputeSha256(fw_data));\n   auto* raw_transport \u003d transport.get();\n \n   UsbDevice device(std::move(transport));\n \n-  auto res \u003d UpdateFw(device, fw_path, DeviceMode::kBoot);\n+  auto res \u003d UpdateFw(device, fw_data, DeviceMode::kBoot);\n   EXPECT_TRUE(res.has_value());\n \n   // DownloadBin skips the config page at the start, writes the rest, then\n@@ -197,13 +175,11 @@\n \n TEST(UpdaterTest, UpdateFw_FailsOnFileTooSmall) {\n   std::vector\u003cuint8_t\u003e undersized_data(sizeof(ConfigPage) - 1, 0xFF);\n-  ScopedTempFile fw_file(undersized_data);\n-  std::string fw_path \u003d fw_file.path();\n \n   auto transport \u003d std::make_unique\u003cStubUsbTransport\u003e();\n   UsbDevice device(std::move(transport));\n \n-  auto res \u003d UpdateFw(device, fw_path, DeviceMode::kBoot);\n+  auto res \u003d UpdateFw(device, undersized_data, DeviceMode::kBoot);\n   EXPECT_FALSE(res.has_value());\n   EXPECT_EQ(res.error(), Error::kResultFail);\n }\n@@ -214,13 +190,11 @@\n \n   std::vector\u003cuint8_t\u003e fw_data(sizeof(ConfigPage) + kFocalConfigSize, 0xFF);\n   std::memcpy(fw_data.data(), \u0026config, sizeof(config));\n-  ScopedTempFile fw_file(fw_data);\n-  std::string fw_path \u003d fw_file.path();\n \n   auto transport \u003d std::make_unique\u003cStubUsbTransport\u003e();\n   UsbDevice device(std::move(transport));\n \n-  auto res \u003d UpdateFw(device, fw_path, DeviceMode::kBoot);\n+  auto res \u003d UpdateFw(device, fw_data, DeviceMode::kBoot);\n   EXPECT_FALSE(res.has_value());\n   EXPECT_EQ(res.error(), Error::kParameterError);\n }\n@@ -231,8 +205,6 @@\n \n   std::vector\u003cuint8_t\u003e fw_data(sizeof(ConfigPage) + kFocalConfigSize, 0x00);\n   std::memcpy(fw_data.data(), \u0026config, sizeof(config));\n-  ScopedTempFile fw_file(fw_data);\n-  std::string fw_path \u003d fw_file.path();\n \n   auto transport \u003d std::make_unique\u003cStubUsbTransport\u003e();\n   transport-\u003eForceVerifyFailure(true);\n@@ -240,7 +212,7 @@\n   auto* raw_transport \u003d transport.get();\n   UsbDevice device(std::move(transport));\n \n-  auto res \u003d UpdateFw(device, fw_path, DeviceMode::kBoot);\n+  auto res \u003d UpdateFw(device, fw_data, DeviceMode::kBoot);\n   EXPECT_FALSE(res.has_value());\n   EXPECT_EQ(res.error(), Error::kResultFail);\n\n```",
+      "range": {
+        "startLine": 228,
+        "startChar": 0,
+        "endLine": 234,
+        "endChar": 3
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7302623f_f3e5efbd",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee5c1802_9931994d",
       "range": {
         "startLine": 228,
         "startChar": 0,
@@ -640,6 +1114,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "486333d9_08f2d9cd",
+        "filename": "util/focaltech/updater.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "The test should verify that the 32‑bit value 0xFFFFFFFB is sent. The proposed test that expects 0xFB is wrong and would mask a real bug if the firmware later changed or if the code was ported.",
+      "parentUuid": "c59a1768_398fdb96",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 2
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f3b86e78_64cfbe56",
@@ -653,6 +1151,30 @@
       "writtenOn": "2026-06-05T20:59:37Z",
       "side": 1,
       "message": "The `DeviceMode` enum contains two states that are completely unused anywhere in the logic: `kUnknown` and `kForceUpdate`.\n\nWhen `GetDeviceMode` encounters an unrecognized device, it correctly returns `std::unexpected(Error::kNoSuchDevice)` rather than `kUnknown`, rendering `kUnknown` entirely dead code. Keeping the state machine strictly to the 4 actionable states prevents future switch-statement warnings.\n\n**In `util/focaltech/usb_device.h`:**\n\n```\n--- a/util/focaltech/usb_device.h\n+++ b/util/focaltech/usb_device.h\n@@ -17,12 +17,10 @@\n namespace focaltech {\n \n enum class DeviceMode {\n-  kUnknown,\n   kRom,\n   kBoot,\n   kTest,\n   kEc,\n-  kForceUpdate,\n };\n\n```",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 2
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c8c7522_fa46d99f",
+        "filename": "util/focaltech/usb_device.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f3b86e78_64cfbe56",
       "range": {
         "startLine": 19,
         "startChar": 0,
@@ -700,6 +1222,30 @@
       "side": 1,
       "message": "Full patch from Gemini: check for correctness:\n\n----\n\n```\n--- a/util/focaltech/usb_device_test.cc\n+++ b/util/focaltech/usb_device_test.cc\n@@ -26,11 +26,6 @@\n using testing::MockUsbTransport;\n using ::testing::Return;\n \n-// Helper: create a UsbDevice with given mock\n-UsbDevice MakeDevice(std::unique_ptr\u003cMockUsbTransport\u003e mock) {\n-  return UsbDevice(std::move(mock));\n-}\n-\n constexpr size_t kArbitraryBufferSize \u003d 10;\n \n }  // namespace\n@@ -39,157 +34,149 @@\n // Tests for UsbDevice\n // -----------------------------------------------------------------------------\n \n-TEST(UsbDeviceTest, SendForwardsToTransport) {\n-  auto mock \u003d std::make_unique\u003cMockUsbTransport\u003e();\n+class UsbDeviceTest : public ::testing::Test {\n+ protected:\n+  void SetUp() override {\n+    auto m \u003d std::make_unique\u003cMockUsbTransport\u003e();\n+    mock_ \u003d m.get();  // Keep a raw pointer for setting EXPECT_CALLs\n+    device_ \u003d std::make_unique\u003cUsbDevice\u003e(std::move(m));\n+  }\n+\n+  MockUsbTransport* mock_;\n+  std::unique_ptr\u003cUsbDevice\u003e device_;\n+};\n+\n+TEST_F(UsbDeviceTest, SendForwardsToTransport) {\n   std::vector\u003cuint8_t\u003e test_data \u003d {0x01, 0x02, 0x03};\n   auto timeout \u003d 100ms;\n \n-  EXPECT_CALL(*mock, Send(ElementsAreArray(test_data), timeout))\n+  EXPECT_CALL(*mock_, Send(ElementsAreArray(test_data), timeout))\n       .WillOnce(Return(test_data.size()));\n \n-  UsbDevice device \u003d MakeDevice(std::move(mock));\n-  auto result \u003d device.Send(test_data, timeout);\n+  auto result \u003d device_-\u003eSend(test_data, timeout);\n   ASSERT_TRUE(result.has_value());\n   EXPECT_EQ(*result, test_data.size());\n }\n \n-TEST(UsbDeviceTest, SendHandlesError) {\n-  auto mock \u003d std::make_unique\u003cMockUsbTransport\u003e();\n+TEST_F(UsbDeviceTest, SendHandlesError) {\n   auto timeout \u003d 100ms;\n \n-  EXPECT_CALL(*mock, Send(_, timeout))\n+  EXPECT_CALL(*mock_, Send(_, timeout))\n       .WillOnce(Return(std::unexpected(Error::kNoSuchDevice)));\n \n-  UsbDevice device \u003d MakeDevice(std::move(mock));\n   std::vector\u003cuint8_t\u003e test_data \u003d {0x01};\n-  auto result \u003d device.Send(test_data, timeout);\n+  auto result \u003d device_-\u003eSend(test_data, timeout);\n   EXPECT_FALSE(result.has_value());\n   EXPECT_EQ(result.error(), Error::kNoSuchDevice);\n }\n \n-TEST(UsbDeviceTest, RecvForwardsToTransport) {\n-  auto mock \u003d std::make_unique\u003cMockUsbTransport\u003e();\n+TEST_F(UsbDeviceTest, RecvForwardsToTransport) {\n   std::vector\u003cuint8_t\u003e buffer(kArbitraryBufferSize, 0);\n   auto timeout \u003d 200ms;\n \n-  EXPECT_CALL(*mock, Recv(_, timeout))\n+  EXPECT_CALL(*mock_, Recv(_, timeout))\n       .WillOnce(Invoke([\u0026](std::span\u003cuint8_t\u003e data, auto) {\n         std::fill(data.begin(), data.begin() + 5, 0xAB);\n         return std::expected\u003cint, Error\u003e(5);\n       }));\n \n-  UsbDevice device \u003d MakeDevice(std::move(mock));\n-  auto result \u003d device.Recv(buffer, timeout);\n+  auto result \u003d device_-\u003eRecv(buffer, timeout);\n   ASSERT_TRUE(result.has_value());\n   EXPECT_EQ(*result, 5);\n }\n \n-TEST(UsbDeviceTest, RecvHandlesError) {\n-  auto mock \u003d std::make_unique\u003cMockUsbTransport\u003e();\n+TEST_F(UsbDeviceTest, RecvHandlesError) {\n   auto timeout \u003d 200ms;\n \n-  EXPECT_CALL(*mock, Recv(_, timeout))\n+  EXPECT_CALL(*mock_, Recv(_, timeout))\n       .WillOnce(Return(std::unexpected(Error::kResultFail)));\n \n-  UsbDevice device \u003d MakeDevice(std::move(mock));\n   std::vector\u003cuint8_t\u003e buffer(kArbitraryBufferSize);\n-  auto result \u003d device.Recv(buffer, timeout);\n+  auto result \u003d device_-\u003eRecv(buffer, timeout);\n   EXPECT_FALSE(result.has_value());\n   EXPECT_EQ(result.error(), Error::kResultFail);\n }\n \n-TEST(UsbDeviceTest, WaitForResetForwardsToTransport) {\n-  auto mock \u003d std::make_unique\u003cMockUsbTransport\u003e();\n+TEST_F(UsbDeviceTest, WaitForResetForwardsToTransport) {\n   auto timeout \u003d 500ms;\n \n-  EXPECT_CALL(*mock, WaitForReset(timeout))\n+  EXPECT_CALL(*mock_, WaitForReset(timeout))\n       .WillOnce(Return(std::expected\u003cvoid, Error\u003e()));\n \n-  UsbDevice device \u003d MakeDevice(std::move(mock));\n-  auto result \u003d device.WaitForReset(timeout);\n+  auto result \u003d device_-\u003eWaitForReset(timeout);\n   EXPECT_TRUE(result.has_value());\n }\n \n-TEST(UsbDeviceTest, WaitForResetHandlesError) {\n-  auto mock \u003d std::make_unique\u003cMockUsbTransport\u003e();\n+TEST_F(UsbDeviceTest, WaitForResetHandlesError) {\n   auto timeout \u003d 500ms;\n \n-  EXPECT_CALL(*mock, WaitForReset(timeout))\n+  EXPECT_CALL(*mock_, WaitForReset(timeout))\n       .WillOnce(Return(std::unexpected(Error::kNoSuchDevice)));\n \n-  UsbDevice device \u003d MakeDevice(std::move(mock));\n-  auto result \u003d device.WaitForReset(timeout);\n+  auto result \u003d device_-\u003eWaitForReset(timeout);\n   EXPECT_FALSE(result.has_value());\n   EXPECT_EQ(result.error(), Error::kNoSuchDevice);\n }\n \n-TEST(UsbDeviceTest, DeviceIdReturnsFromTransport) {\n-  auto mock \u003d std::make_unique\u003cMockUsbTransport\u003e();\n+TEST_F(UsbDeviceTest, DeviceIdReturnsFromTransport) {\n   UsbDeviceId expected_id{.vid \u003d 0x2808, .pid \u003d 0x0001};\n \n-  EXPECT_CALL(*mock, device_id()).WillRepeatedly(Return(expected_id));\n+  EXPECT_CALL(*mock_, device_id()).WillRepeatedly(Return(expected_id));\n \n-  UsbDevice device \u003d MakeDevice(std::move(mock));\n-  EXPECT_EQ(device.device_id().vid, expected_id.vid);\n-  EXPECT_EQ(device.device_id().pid, expected_id.pid);\n+  EXPECT_EQ(device_-\u003edevice_id().vid, expected_id.vid);\n+  EXPECT_EQ(device_-\u003edevice_id().pid, expected_id.pid);\n }\n \n-TEST(UsbDeviceTest, GetNextCdbTagIncrements) {\n-  auto mock \u003d std::make_unique\u003cMockUsbTransport\u003e();\n-  UsbDevice device \u003d MakeDevice(std::move(mock));\n-\n-  uint32_t tag1 \u003d device.GetNextCdbTag();\n-  uint32_t tag2 \u003d device.GetNextCdbTag();\n-  uint32_t tag3 \u003d device.GetNextCdbTag();\n+TEST_F(UsbDeviceTest, GetNextCdbTagIncrements) {\n+  uint32_t tag1 \u003d device_-\u003eGetNextCdbTag();\n+  uint32_t tag2 \u003d device_-\u003eGetNextCdbTag();\n+  uint32_t tag3 \u003d device_-\u003eGetNextCdbTag();\n \n   EXPECT_EQ(tag1, 1);\n   EXPECT_EQ(tag2, 2);\n   EXPECT_EQ(tag3, 3);\n }\n \n-TEST(UsbDeviceTest, GetNextCdbTagThreadSafe) {\n-  auto mock \u003d std::make_unique\u003cMockUsbTransport\u003e();\n-  UsbDevice device \u003d MakeDevice(std::move(mock));\n-\n+TEST_F(UsbDeviceTest, GetNextCdbTagThreadSafe) {\n   constexpr int kIterations \u003d 1000;\n   std::atomic\u003cuint32_t\u003e last_tag{0};\n \n-  auto worker \u003d [\u0026device, \u0026last_tag]() {\n+  auto worker \u003d [this, \u0026last_tag]() {\n     for (int i \u003d 0; i \u003c kIterations; ++i) {\n-      uint32_t tag \u003d device.GetNextCdbTag();\n+      uint32_t tag \u003d device_-\u003eGetNextCdbTag();\n       last_tag \u003d tag;\n     }\n   };\n \n   std::thread t1(worker);\n   std::thread t2(worker);\n   t1.join();\n   t2.join();\n \n   EXPECT_GE(last_tag.load(), 1);\n   SUCCEED();\n }\n \n-TEST(UsbDeviceTest, MoveConstructorTransfersOwnership) {\n-  auto mock \u003d std::make_unique\u003cMockUsbTransport\u003e();\n-  MockUsbTransport* raw_ptr \u003d mock.get();\n-\n-  UsbDevice device1 \u003d MakeDevice(std::move(mock));\n-  UsbDevice device2(std::move(device1));\n+TEST_F(UsbDeviceTest, MoveConstructorTransfersOwnership) {\n+  // Move the device out of the fixture\u0027s unique_ptr\n+  UsbDevice device2(std::move(*device_));\n \n-  EXPECT_CALL(*raw_ptr, device_id())\n+  EXPECT_CALL(*mock_, device_id())\n       .WillOnce(Return(UsbDeviceId{.vid \u003d 0x1234, .pid \u003d 0x5678}));\n       \n   EXPECT_EQ(device2.device_id().vid, 0x1234);\n }\n \n-TEST(UsbDeviceTest, MoveAssignmentTransfersOwnership) {\n-  auto mock1 \u003d std::make_unique\u003cMockUsbTransport\u003e();\n+TEST_F(UsbDeviceTest, MoveAssignmentTransfersOwnership) {\n   auto mock2 \u003d std::make_unique\u003cMockUsbTransport\u003e();\n-  MockUsbTransport* raw_ptr1 \u003d mock1.get();\n-\n-  UsbDevice device1 \u003d MakeDevice(std::move(mock1));\n   UsbDevice device2 \u003d MakeDevice(std::move(mock2));\n-  device2 \u003d std::move(device1);\n+  \n+  // Move assignment from the fixture\u0027s device\n+  device2 \u003d std::move(*device_);\n \n-  EXPECT_CALL(*raw_ptr1, device_id())\n+  EXPECT_CALL(*mock_, device_id())\n       .WillOnce(Return(UsbDeviceId{.vid \u003d 0x1111, .pid \u003d 0x2222}));\n       \n   EXPECT_EQ(device2.device_id().vid, 0x1111);\n }\n```",
       "parentUuid": "4d024e3b_a25aa62d",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 23
+      },
+      "revId": "20c19e9eb6b3fe8a887ffcfc4afadd902c100371",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "663f8cbb_8b5360d0",
+        "filename": "util/focaltech/usb_device_test.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-08T13:02:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d675a785_7e7d17dd",
       "range": {
         "startLine": 43,
         "startChar": 0,
