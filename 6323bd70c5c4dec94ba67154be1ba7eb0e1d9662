@@ -110,6 +110,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "76a8c0f7_a25842a5",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-06-08T03:24:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "28a02cd3_56b1c30e",
+      "range": {
+        "startLine": 375,
+        "startChar": 0,
+        "endLine": 380,
+        "endChar": 2
+      },
+      "revId": "6323bd70c5c4dec94ba67154be1ba7eb0e1d9662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "79fb4ea6_0262d6bd",
@@ -123,6 +147,30 @@
       "writtenOn": "2026-06-08T03:22:27Z",
       "side": 1,
       "message": "```suggestion\n#ifdef CONFIG_USBC_PDC_DPM_STICKY_LOCK\n\t\tatomic_set_bit(\u0026forced_1500ma_mask, port);\n#endif /* CONFIG_USBC_PDC_DPM_STICKY_LOCK */\n```",
+      "range": {
+        "startLine": 389,
+        "startChar": 0,
+        "endLine": 389,
+        "endChar": 44
+      },
+      "revId": "6323bd70c5c4dec94ba67154be1ba7eb0e1d9662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a243c92_f8a22a47",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-06-08T03:24:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "79fb4ea6_0262d6bd",
       "range": {
         "startLine": 389,
         "startChar": 0,
