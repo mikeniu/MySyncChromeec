@@ -16,6 +16,24 @@
       "message": "If you just included `emul_common_id2c.h` here would that break anything?",
       "revId": "3ae0056da17644c84caab62bec5640c6553fac8b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9026801a_ddc09e07",
+        "filename": "zephyr/include/emul/emul_realtek_rts54xx_public.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-08T15:42:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6691c9de_e4cac963",
+      "revId": "3ae0056da17644c84caab62bec5640c6553fac8b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
