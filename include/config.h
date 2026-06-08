@@ -160,24 +160,7 @@
  */
 #define CONFIG_SENSOR_TIGHT_TIMESTAMPS
 
-/* Sync event driver */
-#undef CONFIG_SYNC
 
-/*
- * How many sync events to buffer before motion_sense gets a chance to run.
- * This is similar to sensor side fifos.
- * Note: for vsync, anything above 2 is probably plenty.
- */
-#define CONFIG_SYNC_QUEUE_SIZE 8
-
-/* Simulate command for sync */
-#undef CONFIG_SYNC_COMMAND
-
-/*
- * Define the event to raise when the sync event happens.
- * Must be within TASK_EVENT_MOTION_INTERRUPT_MASK.
- */
-#undef CONFIG_SYNC_INT_EVENT
 
 /* Compile chip support for analog-to-digital convertor */
 #undef CONFIG_ADC
