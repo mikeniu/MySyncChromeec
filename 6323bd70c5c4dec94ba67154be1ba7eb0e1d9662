@@ -1,0 +1,136 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29e82b1d_1270ce47",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-06-08T03:22:27Z",
+      "side": 1,
+      "message": "Please also test with CONFIG_USBC_PDC_DPM_STICKY_LOCK\u003dn to ensure the build succeeds.",
+      "revId": "6323bd70c5c4dec94ba67154be1ba7eb0e1d9662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4fe62ae0_9461e69a",
+        "filename": "zephyr/include/usbc/pdc_power_mgmt.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 828,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-06-08T03:22:27Z",
+      "side": 1,
+      "message": "Move this up inside the #else block:\n\n```suggestion\n#else /* CONFIG_USBC_PDC_DPM_STICKY_LOCK */\nbool pdc_dpm_is_port_locked_at_1500(int port);\nvoid pdc_dpm_clear_1500ma_lock(int port);\n```",
+      "range": {
+        "startLine": 826,
+        "startChar": 0,
+        "endLine": 828,
+        "endChar": 5
+      },
+      "revId": "6323bd70c5c4dec94ba67154be1ba7eb0e1d9662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d6b5492_1ad99689",
+        "filename": "zephyr/program/skywalker/jaina/src/typec_limit.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-06-08T03:22:27Z",
+      "side": 1,
+      "message": "```suggestion\n#CONFIG_USBC_PDC_DPM_STICKY_LOCK\n\t\t\t\t\tpdc_dpm_clear_1500ma_lock(i);\n#endif /* CONFIG_USBC_PDC_DPM_STICKY_LOCK */\n```",
+      "range": {
+        "startLine": 42,
+        "startChar": 5,
+        "endLine": 42,
+        "endChar": 30
+      },
+      "revId": "6323bd70c5c4dec94ba67154be1ba7eb0e1d9662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60badfdc_ade4d26c",
+        "filename": "zephyr/subsys/pd_controller/Kconfig",
+        "patchSetId": 5
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-06-08T03:22:27Z",
+      "side": 1,
+      "message": "```suggestion\n\tdefault n\n\thelp\n```",
+      "range": {
+        "startLine": 136,
+        "startChar": 0,
+        "endLine": 136,
+        "endChar": 5
+      },
+      "revId": "6323bd70c5c4dec94ba67154be1ba7eb0e1d9662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28a02cd3_56b1c30e",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-06-08T03:22:27Z",
+      "side": 1,
+      "message": "```suggestion\n#if CONFIG_USBC_PDC_DPM_STICKY_LOCK\n\tif (current_ma \u003e 1500 \u0026\u0026 atomic_test_bit(\u0026forced_1500ma_mask, port)) {\n\t\tLOG_INF(\"DPM: Port %d locked at 1.5A. Ignored request for %d mA\",\n\t\t\tport, current_ma);\n\t\tk_mutex_unlock(\u0026max_current_claimed_mtx);\n\t\treturn;\n\t}\n#endif /* CONFIG_USBC_PDC_DPM_STICKY_LOCK */\n```",
+      "range": {
+        "startLine": 375,
+        "startChar": 0,
+        "endLine": 380,
+        "endChar": 2
+      },
+      "revId": "6323bd70c5c4dec94ba67154be1ba7eb0e1d9662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79fb4ea6_0262d6bd",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-06-08T03:22:27Z",
+      "side": 1,
+      "message": "```suggestion\n#ifdef CONFIG_USBC_PDC_DPM_STICKY_LOCK\n\t\tatomic_set_bit(\u0026forced_1500ma_mask, port);\n#endif /* CONFIG_USBC_PDC_DPM_STICKY_LOCK */\n```",
+      "range": {
+        "startLine": 389,
+        "startChar": 0,
+        "endLine": 389,
+        "endChar": 44
+      },
+      "revId": "6323bd70c5c4dec94ba67154be1ba7eb0e1d9662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
