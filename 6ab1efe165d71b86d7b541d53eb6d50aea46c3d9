@@ -104,6 +104,24 @@
       "parentUuid": "afd94991_e56dced3",
       "revId": "6ab1efe165d71b86d7b541d53eb6d50aea46c3d9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b4f32c1_85e2559a",
+        "filename": "zephyr/emul/emul_common_i2c.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-08T17:41:41Z",
+      "side": 1,
+      "message": "Yeah, I wasn\u0027t saying that this is insufficient, just that a more natural factoring might available.",
+      "parentUuid": "2979e3aa_909fa60f",
+      "revId": "6ab1efe165d71b86d7b541d53eb6d50aea46c3d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
