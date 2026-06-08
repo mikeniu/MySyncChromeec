@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91b21150_dde62afa",
+        "filename": "driver/usb_mux/usb_mux.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 890,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-08T16:16:44Z",
+      "side": 1,
+      "message": "Run compare builds against this change. \n\nYou could also make a helper Kconfig symbol `PLATFORM_EC_HOSTCMD_USB_PD_MUX_INFO` that gets selected using the same logic.",
+      "range": {
+        "startLine": 890,
+        "startChar": 9,
+        "endLine": 890,
+        "endChar": 38
+      },
+      "revId": "b47a941de82dcc899d6258f5e39e1053af47425b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
