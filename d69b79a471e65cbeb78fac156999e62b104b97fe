@@ -68,6 +68,24 @@
       "parentUuid": "f47b8693_c3e2c2a1",
       "revId": "d69b79a471e65cbeb78fac156999e62b104b97fe",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2d9ecd5_3d9f1b73",
+        "filename": "zephyr/test/atria/testcase.yaml",
+        "patchSetId": 18
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-08T15:55:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1fe16112_1a750b4a",
+      "revId": "d69b79a471e65cbeb78fac156999e62b104b97fe",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
