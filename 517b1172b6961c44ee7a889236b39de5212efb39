@@ -16,6 +16,24 @@
       "message": "Nit: I\u0027m not wild about adding a PORT0 constant just for this file. I thought one already existed, but I can\u0027t find it. With the functionality as-is, I\u0027d probably prefer just comparing to `0`.\n\nHowever, I think what you actually want here is `\u003d\u003d CONFIG_CCD_USBC_PORT_NUMBER`.",
       "revId": "517b1172b6961c44ee7a889236b39de5212efb39",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9baecfa0_b0ede250",
+        "filename": "common/usb_common.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 4253897
+      },
+      "writtenOn": "2026-06-08T11:24:16Z",
+      "side": 1,
+      "message": "Added in latest patchset.",
+      "parentUuid": "5b4691d3_edd90ac1",
+      "revId": "517b1172b6961c44ee7a889236b39de5212efb39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

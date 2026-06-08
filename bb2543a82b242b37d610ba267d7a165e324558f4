@@ -16,6 +16,24 @@
       "message": "It looks like you reflowed some comments with different line break points, but I don\u0027t think the comment texts changed, and the previous line break points look OK to me in Gerrit. Did you by any chance do something weird with your tab sizes or text width?\n\nThis looks like quite a large whitespace delta. I\u0027d prefer to keep it out of this CL. Can you pull down the patchset before you did this, apply your code changes again, and push it back up?",
       "revId": "bb2543a82b242b37d610ba267d7a165e324558f4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6eaa2fda_0d5e355a",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 3085,
+      "author": {
+        "id": 4253897
+      },
+      "writtenOn": "2026-06-08T11:24:16Z",
+      "side": 1,
+      "message": "I guess this issue is because of cros format. Apllied the code changes and checked again with latest patchset which looks to be fine.",
+      "parentUuid": "1aaa0264_a8f802e6",
+      "revId": "bb2543a82b242b37d610ba267d7a165e324558f4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
