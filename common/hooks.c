@@ -34,6 +34,7 @@ struct hook_ptrs {
 static const struct hook_ptrs hook_list[] = {
 	{ __hooks_init, __hooks_init_end },
 	{ __hooks_init_early, __hooks_init_early_end },
+	{ __hooks_battery_wokeup, __hooks_battery_wokeup_end },
 	{ __hooks_pre_freq_change, __hooks_pre_freq_change_end },
 	{ __hooks_freq_change, __hooks_freq_change_end },
 	{ __hooks_sysjump, __hooks_sysjump_end },

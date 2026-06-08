@@ -36,6 +36,8 @@ extern const struct hook_data __hooks_init[];
 extern const struct hook_data __hooks_init_end[];
 extern const struct hook_data __hooks_init_early[];
 extern const struct hook_data __hooks_init_early_end[];
+extern const struct hook_data __hooks_battery_wokeup[];
+extern const struct hook_data __hooks_battery_wokeup_end[];
 extern const struct hook_data __hooks_pre_freq_change[];
 extern const struct hook_data __hooks_pre_freq_change_end[];
 extern const struct hook_data __hooks_freq_change[];
