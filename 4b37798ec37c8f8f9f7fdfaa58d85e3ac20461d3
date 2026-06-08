@@ -50,6 +50,23 @@
       "message": "I\u0027m not sure I\u0027m fully cognizant to review this CL. At first glance, I\u0027m skeptical that the battery situation on yoda requires a new hook. I will attempt to seek out other expertise.",
       "revId": "4b37798ec37c8f8f9f7fdfaa58d85e3ac20461d3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8921f62_a1c127a6",
+        "filename": "include/hooks.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-08T20:16:53Z",
+      "side": 1,
+      "message": "Can this be reused instead of defining a new hook?",
+      "revId": "4b37798ec37c8f8f9f7fdfaa58d85e3ac20461d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
