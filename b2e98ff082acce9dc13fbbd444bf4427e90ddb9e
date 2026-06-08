@@ -16,6 +16,24 @@
       "message": "This currently fails compare-builds. Trying to figure out why, there is no obvious pattern to the failed boards:\n\n```\nFailed projects by diff in binary:\nocelotrvp-ite, ciri, fatcatrvp-ite, sapphire, ite-aic-rtk-pdc, baze, caboc, rauru, mtlrvpp_npcx, tarkin, matsu_it82000, greenbayupoc, adlrvp_npcx, felino, padme, juchi, brox, luuke, grogu, navi, brox-ish-ec, felino4es, jubilant, dooku, matsu, lotso, mtlrvpp_m1723, kinmen, jaina, ocicat, hylia, mtlrvpp_mchp, geralt, moonstone, tanjiro, sheev, brox-sku4, anakin, adlrvp_mchp\n```\n\nThe previous CL does compare and is good to go.",
       "revId": "b2e98ff082acce9dc13fbbd444bf4427e90ddb9e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9443cab_4a2beda0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-06-08T19:33:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a1ef824_b0fc17ae",
+      "revId": "b2e98ff082acce9dc13fbbd444bf4427e90ddb9e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
