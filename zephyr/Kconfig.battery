@@ -432,4 +432,12 @@ config PLATFORM_EC_BATTERY_ACCESS_LIMIT
 	help
 	  Enabling this limits the access to the battery host commands from the EC console.
 
+config PLATFORM_EC_BATTERY_REPLACE_NULLS
+	bool "Replace null characters in battery manufacturer name with underscores"
+	default n
+	help
+	  Enable this to replace null characters in the battery manufacturer
+	  name with underscores, to avoid issues with string comparison
+	  when the name contains embedded nulls.
+
 endif # PLATFORM_EC_BATTERY
