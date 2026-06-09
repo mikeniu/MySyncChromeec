@@ -5,7 +5,8 @@
 
 / {
 	chosen {
-		zephyr,bt-hci = &bt_hci_uart;
+		//zephyr,bt-hci = &bt_hci_uart;
+		zephyr,bt-hci = &btcnvi;
 		zephyr,bt-c2h-uart = &uart1;
 	};
 };
