@@ -32,7 +32,7 @@
 	};
 };
 
-&i2c5_1 {
+&i2c6_1 {
 	label = "I2C_MCU";
 	clock-frequency = <I2C_BITRATE_STANDARD>;
 };

@@ -148,6 +148,8 @@ struct motion_data_t {
  * the components.
  */
 #define MOTIONSENSE_FLAG_IN_SPOOF_MODE BIT(1)
+/* When set the sensor is in forced (polled) mode for sample collection */
+#define MOTIONSENSE_FLAG_IN_FORCED_MODE BIT(2)
 
 struct motion_sensor_t {
 	/* RO fields */
