@@ -8,6 +8,7 @@
 def register_rex_project(
     project_name,
     kconfig_files=None,
+    snippets=None,
 ):
     """Register a variant of Rex."""
     if kconfig_files is None:
@@ -26,6 +27,7 @@ def register_rex_project(
         ],
         kconfig_files=kconfig_files,
         inherited_from=["rex"],
+        snippets=snippets,
     )
 
 
@@ -53,6 +55,7 @@ register_rex_project(
 )
 register_rex_project(
     project_name="karis",
+    snippets=["npcx-45mhz"],
 )
 
 register_ish_project(
