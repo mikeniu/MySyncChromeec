@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "76b2005d_d112c117",
+        "filename": "zephyr/test/atria/boards/native_sim.overlay",
+        "patchSetId": 19
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-09T17:27:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "353c016a_3dd3b84e",
+      "revId": "9680a02e135eb90c2fe3308f326b5ba870b12a00",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "79b60257_c9cdd168",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-06-08T22:04:01Z",
       "side": 1,
       "message": "This is always true with the current overlay.",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 36
+      },
+      "revId": "9680a02e135eb90c2fe3308f326b5ba870b12a00",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b8d6815_64263924",
+        "filename": "zephyr/test/atria/src/rvp_usbc_runtime_test.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-09T17:27:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "79b60257_c9cdd168",
       "range": {
         "startLine": 42,
         "startChar": 0,
