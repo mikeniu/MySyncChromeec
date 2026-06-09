@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b47d6e76_ba3cd2c2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-09T22:01:12Z",
+      "side": 1,
+      "message": "@david1.huang@lcfc.corp-partner.google.com Have you verified that this avoids getting stuck at 500 mA?",
+      "revId": "c6bb0f6c60e9440557e7e57c98997589a9a03537",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
