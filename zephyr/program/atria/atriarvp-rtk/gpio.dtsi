@@ -79,9 +79,6 @@
                 prochot-ec-n-3v3-od {
                         gpios = <RTS5912_GPIO122 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
                 };
-		c-en-pp5000-typea-3v3-pp {
-                        gpios = <RTS5912_GPIO123 GPIO_INPUT>;
-                };
 		pm-pwrbtn-n-1v8-od {
 			gpios = <RTS5912_GPIO124 (GPIO_ODR_HIGH | GPIO_VOLTAGE_1P8)>;
 			enum-name = "GPIO_PCH_PWRBTN_L";
