@@ -5,7 +5,3 @@
 #
 # Host tools build
 #
-
-ifeq ($(CHIP),npcx)
-build-util-bin=ecst
-endif
