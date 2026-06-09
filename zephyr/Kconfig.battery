@@ -434,7 +434,7 @@ config PLATFORM_EC_BATTERY_ACCESS_LIMIT
 
 config PLATFORM_EC_BATTERY_REPLACE_NULLS
 	bool "Replace null characters in battery manufacturer name with underscores"
-	default n
+	default $(dt_nodelabel_bool_prop,default_battery,replace_nulls)
 	help
 	  Enable this to replace null characters in the battery manufacturer
 	  name with underscores, to avoid issues with string comparison
