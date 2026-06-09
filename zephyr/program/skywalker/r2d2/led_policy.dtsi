@@ -7,52 +7,51 @@
 
 / {
 
-	led_colors: led-colors {
+	led_colors {
 		compatible = "cros-ec,led-policy";
-		led-pins = <&led_pins>;
 
-		pwr-power-state-on {
+		chipset-state-s0 {
 			chipset-state = "POWER_S0";
 
 			power-led {
 				led-id = "EC_LED_ID_POWER_LED";
 
 				color-0 {
-					led-color = <&power_led_white>;
+					led-color = "LED_WHITE";
 				};
 			};
 		};
 
-		pwr-power-state-s3 {
+		chipset-state-s3 {
 			chipset-state = "POWER_S3";
 
 			power-led {
 				led-id = "EC_LED_ID_POWER_LED";
 
 				color-0 {
-					led-color = <&power_led_white>;
+					led-color = "LED_WHITE";
 					period-ms = <500>;
 				};
 
 				color-1 {
-					led-color = <&power_led_off>;
+					led-color = "LED_OFF";
 					period-ms = <2500>;
 				};
 			};
 		};
 
-		pwr-power-state-off {
+		chipset-state-s5 {
 			chipset-state = "POWER_S5";
 
 			power-led {
 				led-id = "EC_LED_ID_POWER_LED";
 				color-0 {
-					led-color = <&power_led_off>;
+					led-color = "LED_OFF";
 				};
 			};
 		};
 
-		bat-state1-charge {
+		power-state-charge-lvl-1 {
 			charge-state = "LED_PWRS_CHARGE";
 			/* Battery display percent range (>= 0, <= 89%) */
 			batt-lvl = <BATTERY_LEVEL_EMPTY 89>;
@@ -60,12 +59,12 @@
 			battery-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = <&battery_led_amber>;
+					led-color = "LED_AMBER";
 				};
 			};
 		};
 
-		bat-state2-charge {
+		power-state-charge-lvl-2 {
 			charge-state = "LED_PWRS_CHARGE";
 			/* Battery display percent range (>= 90, <= 100) */
 			batt-lvl = <90 100>;
@@ -73,71 +72,71 @@
 			battery-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = <&battery_led_white>;
+					led-color = "LED_WHITE";
 				};
 			};
 		};
 
-		bat-state-charge-near-full {
+		power-state-near-full {
 			charge-state = "LED_PWRS_CHARGE_NEAR_FULL";
 
 			battery-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = <&battery_led_white>;
+					led-color = "LED_WHITE";
 				};
 			};
 		};
 
-		bat-state-discharge {
+		power-state-discharge {
 			charge-state = "LED_PWRS_DISCHARGE";
 
 			battery-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = <&battery_led_off>;
+					led-color = "LED_OFF";
 				};
 			};
 		};
 
-		bat-state-error {
+		power-state-error {
 			charge-state = "LED_PWRS_ERROR";
 
 			battery-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = <&battery_led_amber>;
+					led-color = "LED_AMBER";
 					period-ms = <1000>;
 				};
 				color-1 {
-					led-color = <&battery_led_off>;
+					led-color = "LED_OFF";
 					period-ms = <1000>;
 				};
 			};
 		};
 
-		bat-state-idle {
+		power-state-idle {
 			charge-state = "LED_PWRS_IDLE";
 
 			battery-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = <&battery_led_white>;
+					led-color = "LED_WHITE";
 				};
 			};
 		};
 
-		bat-state-forced-idle {
+		power-state-forced-idle {
 			charge-state = "LED_PWRS_FORCED_IDLE";
 
 			battery-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = <&battery_led_amber>;
+					led-color = "LED_AMBER";
 					period-ms = <2000>;
 				};
 				color-1 {
-					led-color = <&battery_led_white>;
+					led-color = "LED_WHITE";
 					period-ms = <2000>;
 				};
 			};
