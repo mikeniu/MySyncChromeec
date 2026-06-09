@@ -74,7 +74,8 @@ static unsigned int finalize_crc_32(unsigned int crc);
 static int splice_into_path(char *result, const char *path, int resultsz,
 			    const char *prefix)
 {
-	char *last_delim, *result_last_delim;
+	const char *last_delim;
+	char *result_last_delim;
 
 	if (strlen(path) + strlen(prefix) + 1 > resultsz) {
 		my_printf(TERR,
