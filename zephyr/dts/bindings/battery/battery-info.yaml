@@ -72,3 +72,8 @@ properties:
        The battery can report a manufacture info string. This is
        the SB_MANUFACTURE_INFO (0x70) register on smart batteries.
     type: boolean
+  replace_nulls:
+    description: |
+       Replace null characters in the battery manufacturer name with
+       underscores.
+    type: boolean
