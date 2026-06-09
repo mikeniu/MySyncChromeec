@@ -13,6 +13,8 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/net_buf.h>
+#include <zephyr/sys/atomic.h>
+#include <zephyr/sys/byteorder.h>
 
 LOG_MODULE_REGISTER(bt_passthru, CONFIG_BT_PASSTHRU_LOG_LEVEL);
 
@@ -20,6 +22,10 @@ static K_FIFO_DEFINE(hci_rx_queue);
 
 static chre::ZephyrBtSender g_bt_sender;
 static chre::CrosHostcmdTransport g_host_transport;
+
+K_SEM_DEFINE(shell_cc_sem, 0, 1);
+atomic_t shell_pending_opcode = (atomic_t)UINT16_MAX;
+atomic_t shell_last_status = (atomic_t)UINT8_MAX;
 
 static void hci_rx_thread_entry(void *p1, void *p2, void *p3)
 {
@@ -36,6 +42,24 @@ static void hci_rx_thread_entry(void *p1, void *p2, void *p3)
 			uint8_t h4_type = buf->data[0];
 			LOG_DBG("RX from BT Controller: H:4 Type 0x%02X, Size %d bytes",
 				h4_type, buf->len);
+
+			/* Shell command interception */
+			if (h4_type == BT_HCI_H4_EVT && buf->len >= 1 + sizeof(struct bt_hci_evt_hdr)) {
+				struct bt_hci_evt_hdr *hdr = (struct bt_hci_evt_hdr *)&buf->data[1];
+			if (hdr->evt == BT_HCI_EVT_CMD_COMPLETE) {
+					struct bt_hci_evt_cmd_complete *cc =
+						(struct bt_hci_evt_cmd_complete *)&buf->data[1 + sizeof(*hdr)];
+					uint16_t opcode = sys_le16_to_cpu(cc->opcode);
+
+					if (opcode == atomic_get(&shell_pending_opcode)) {
+						uint8_t *status = (uint8_t *)(cc + 1);
+						atomic_set(&shell_last_status, *status);
+						k_sem_give(&shell_cc_sem);
+						net_buf_unref(buf);
+						continue;
+					}
+				}
+			}
 
 			pw::span<const uint8_t> rx_payload(buf->data, buf->len);
 
