@@ -16,6 +16,8 @@
 #include "util.h"
 #include "watchdog.h"
 
+#include <string>
+#include <vector>
 #include <memory>
 #include <span>
 
