@@ -387,11 +387,8 @@ static int nx20p348x_init(int port)
 	nx20p348x_set_ovp_limit(port);
 
 	/* Set the Vbus current limit after dead battery mode exit */
-#ifdef CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT
-	initial_current_limit = CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT;
-#else
 	initial_current_limit = TYPEC_RP_1A5;
-#endif
+
 	nx20p348x_set_vbus_source_current_limit(port, initial_current_limit);
 
 	/* Restore power-on reset value */

@@ -1,0 +1,13 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config AP_POWER_EVENTS
+	bool "AP power events GPIO driver"
+	default y
+	depends on DT_HAS_CROS_EC_AP_POWER_EVENTS_ENABLED
+	depends on AP_EVENTS
+	help
+	  Driver to control GPIOs based on AP power state. GPIOs defined
+	  in devicetree are asserted on AP_POWER_STARTUP and de-asserted
+	  on AP_POWER_HARD_OFF.
