@@ -157,11 +157,14 @@ enum sm5803_gpio0_modes {
 #define SM5803_REG_TINT_HIGH_TH 0x2D
 
 /*
- * Vbus levels increment in 23.4 mV, set thresholds to below 3.5V and above 4.0V
- * to mirror what TCPCI uses for Vbus present indication
+ * VBUS threshold levels (23.4 mV/step) used for Type-C state transitions
+ * and PD VBUS detection.
  */
-#define SM5803_VBUS_LOW_LEVEL 0x25
-#define SM5803_VBUS_HIGH_LEVEL 0x2C
+#define SM5803_VBUS_SAFE0V_LEVEL 0x08 /* 0.8V (PD_V_SAFE0V_MAX) */
+#define SM5803_VBUS_REMOVED_LEVEL 0x27 /* 3.67V (PD_V_SINK_DISCONNECT_MAX) */
+#define SM5803_VBUS_PRESENT_LEVEL 0x33 /* 4.75V (PD_V_SAFE5V_MIN) */
+#define SM5803_VBUS_MAX_LEVEL 0xFF
+#define SM5803_VBUS_MIN_LEVEL 0x00
 
 /*
  * TINT thresholds.  TINT steps are in 0.43 K with the upper threshold set to
@@ -502,6 +505,7 @@ enum ec_error_list sm5803_configure_gpio0(int chgnum,
 enum ec_error_list sm5803_set_gpio0_level(int chgnum, int level);
 enum ec_error_list sm5803_configure_chg_det_od(int chgnum, int enable);
 enum ec_error_list sm5803_get_chg_det(int chgnum, int *chg_det);
+enum ec_error_list sm5803_get_vbus_voltage(int chgnum, int port, int *voltage);
 
 /* Expose Vbus discharge function */
 enum ec_error_list sm5803_set_vbus_disch(int chgnum, int enable);
