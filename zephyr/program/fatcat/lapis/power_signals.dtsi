@@ -67,12 +67,11 @@
 		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
 	};
 	pwr-slp-s4 {
-		compatible = "intel,ap-pwrseq-vw";
-		dbg-label = "SLP_S4 virtual wire input from PCH";
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "SLP_S4_L input from PCH";
 		enum-name = "PWR_SLP_S4";
-		virtual-wire = "ESPI_VWIRE_SIGNAL_SLP_S4";
-		reset-val = <1>;
-		vw-invert;
+		gpios = <&gpiof 1 GPIO_ACTIVE_LOW>;
+		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
 	};
 	pwr-slp-s5 {
 		compatible = "intel,ap-pwrseq-vw";
