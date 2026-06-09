@@ -177,6 +177,21 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 /* 1 if the power button was pressed last time we checked */
 static char power_button_was_pressed;
 
+/* 1 if we should ignore the first power button release */
+static char power_button_eat_release;
+
+/**
+ * Check if the power button release should be ignored.
+ */
+int power_button_is_eating_release(void)
+{
+	int ret = power_button_eat_release;
+
+	if (!power_button_is_pressed())
+		power_button_eat_release = 0;
+
+	return ret;
+}
 /* 1 if lid-open event has been detected */
 static char lid_opened;
 
@@ -803,6 +818,13 @@ enum power_state power_chipset_init(void)
 		CPRINTS("auto_power_on disabled");
 	}
 
+	/*
+	 * Since we can't detect if a power button was already pressed before
+	 * the EC booted, we assume the first release event should be ignored
+	 * if the button is still pressed when we initialize.
+	 */
+	power_button_eat_release = 1;
+
 	return init_power_state;
 }
 
@@ -972,8 +994,16 @@ static uint8_t check_for_power_off_event(void)
 	/*
 	 * Check for power button press.
 	 */
-	if (power_button_is_pressed())
+	if (power_button_is_pressed()) {
 		pressed = POWER_OFF_BY_POWER_BUTTON_PRESSED;
+	} else if (power_button_is_eating_release()) {
+		CPRINTS("PB ignoring release");
+		if (power_button_was_pressed) {
+			timer_cancel(TASK_ID_CHIPSET);
+			power_button_was_pressed = 0;
+		}
+		return POWER_OFF_CANCEL;
+	}
 
 	now = get_time();
 	if (pressed) {
@@ -1200,6 +1230,11 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 			CPRINTS("power on %d", boot_from_off);
 			return POWER_G3S5;
 		}
+		/*
+		 * If the power button is not pressed at this point, we can
+		 * stop trying to ignore the next release event.
+		 */
+		power_button_is_eating_release();
 		break;
 	/*
 	 * For Qualcomm QC_EXP SoCs, the ADSP firmware manages battery
@@ -1355,6 +1390,7 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		 */
 		power_button_wait_for_release(-1);
 		power_button_was_pressed = 0;
+		power_button_is_eating_release();
 		return POWER_G3;
 
 	default:
