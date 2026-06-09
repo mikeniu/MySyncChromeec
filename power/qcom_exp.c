@@ -115,7 +115,7 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 #define SWITCHCAP_PG_CHECK_WAIT (6 * MSEC)
 
 /* The timeout of the check if the switchcap outputs reset voltage */
-#define SWITCHCAP_RESET_TIMEOUT (2000 * MSEC)
+#define SWITCHCAP_RESET_TIMEOUT (200 * MSEC)
 
 /* Wait for polling if the switchcap outputs reset voltage */
 #define SWITCHCAP_RESET_CHECK_WAIT (6 * MSEC)
@@ -226,6 +226,12 @@ static enum power_on_event_t power_on_reason;
 enum power_on_event_t chipset_get_power_on_reason(void)
 {
 	return power_on_reason;
+}
+
+int chipset_is_offmode_charging_wake(void)
+{
+	return (power_on_reason == POWER_ON_BY_AC_ON ||
+		power_on_reason == POWER_ON_BY_RTC_ALARM);
 }
 
 /**
@@ -1040,6 +1046,7 @@ test_mockable void chipset_power_on(void)
  */
 static int warm_reset_seq(void)
 {
+#ifdef CONFIG_PLATFORM_EC_POWERSEQ_QC_EXP_WARM_RESET
 	int rv;
 
 	/*
@@ -1076,6 +1083,10 @@ static int warm_reset_seq(void)
 		return rv;
 
 	return EC_SUCCESS;
+#else
+	CPRINTS("Warm reset is disabled, falling back to cold reset");
+	return EC_ERROR_UNKNOWN;
+#endif
 }
 
 /**
@@ -1197,13 +1208,6 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 	 * is performed during the G3 to S5 transition.
 	 */
 	case POWER_G3S5:
-		/*
-		 * The boot process is delayed until the power button is
-		 * released. This prevents the application processor from
-		 * powering on during a long-hold of the power and volume
-		 * buttons, which is often used to trigger recovery mode.
-		 */
-		power_button_wait_for_release(-1);
 
 		/* Initialize components to ready state before AP is up. */
 		hook_notify(HOOK_CHIPSET_PRE_INIT);

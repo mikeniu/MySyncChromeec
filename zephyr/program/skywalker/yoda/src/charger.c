@@ -56,8 +56,8 @@ static int set_chg_reg_custom(enum battery_cells battery_cell)
 	case BATT_2_CELLS: {
 		// Address: 0x37, Voltage: 6.0 V
 		ret |= write_reg(BQ25720_REG_VMIN_ACTIVE_PROTECTION, 0x0070);
-		// Address: 0x3E, Voltage: 6.6 V
-		ret |= write_reg(BQ25710_REG_MIN_SYSTEM_VOLTAGE, 0x4200);
+		// Address: 0x3E, Voltage: 6.3 V
+		ret |= write_reg(BQ25710_REG_MIN_SYSTEM_VOLTAGE, 0x3f00);
 		break;
 	}
 	case BATT_3_CELLS: {
