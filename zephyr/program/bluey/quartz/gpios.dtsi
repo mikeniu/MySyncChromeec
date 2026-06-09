@@ -190,9 +190,9 @@
 
 		unused-gpios =
 			<&gpio0 2 0>,
-			<&gpio3 4 0>,
-			<&gpio3 7 0>,
-			<&gpio4 1 0>,
+			<&gpio3 4 (GPIO_INPUT | GPIO_PULL_DOWN)>,
+			<&gpio3 7 (GPIO_INPUT | GPIO_PULL_DOWN)>,
+			<&gpio4 1 (GPIO_INPUT | GPIO_PULL_DOWN)>,
 			<&gpio5 2 0>,
 			<&gpio5 6 0>,
 			<&gpio6 1 0>,

@@ -1,0 +1,92 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "dt-bindings/gpio_defines.h"
+#include <dt-bindings/motionsense/utils.h>
+
+/ {
+	aliases {
+		lis2dh-int = &ms_lis2dh_accel;
+		/delete-property/ bmi160-int;
+		/delete-property/ bmi260-int;
+		/delete-property/ tcs3400-int;
+	};
+
+	motionsense-mutex {
+		mutex_lis2dh: lis2dh-mutex {
+		};
+	};
+
+	motionsense-sensor-data {
+		lis2dh_data_accel: lis2dh-accel-drv-data {
+			compatible = "cros-ec,drvdata-lis2de";
+			status = "okay";
+		};
+	};
+
+	motionsense-sensor {
+
+		lid_accel: ms-bma4xx {};
+
+		base_accel: ms_lis2dh_accel: ms-lis2dh-accel {
+			compatible = "cros-ec,lis2de";
+			status = "okay";
+
+			active-mask = "SENSOR_ACTIVE_S0";
+			location = "MOTIONSENSE_LOC_BASE";
+			mutex = <&mutex_lis2dh>;
+			port = <&named_i2c1>;
+			drv-data = <&lis2dh_data_accel>;
+			configs {
+				compatible =
+					"cros-ec,motionsense-sensor-config";
+				ec-s0 {
+					odr = <(10000 | ROUND_UP_FLAG)>;
+				};
+			};
+		};
+	};
+
+	motionsense-sensor-info {
+		accel-force-mode-sensors = <&ms_bma4xx>;
+		sensor-irqs = <&base_imu>;
+	};
+
+	gpio-interrupts {
+		compatible = "cros-ec,gpio-interrupts";
+
+		base_imu: base-imu {
+			irq-pin = <&gpio_base_accel_int_l>;
+			flags = <GPIO_INT_EDGE_FALLING>;
+			handler = "lis2dh_interrupt";
+		};
+	};
+	named-gpios {
+		compatible = "named-gpios";
+		gpio_base_accel_int_l: accel_base_int_l {
+			gpios = <&gpio0 1 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
+	};
+};
+
+&i2c1 {
+	lis2dh_emul: lis2dh@19 {
+		compatible = "cros,lis2dh";
+		status = "okay";
+		reg = <0x19>;
+		int-gpios = <&gpio0 1 GPIO_ACTIVE_LOW>;
+	};
+};
+
+/delete-node/ &ms_bma255;
+/delete-node/ &ms_bmi260_accel;
+/delete-node/ &ms_bmi260_gyro;
+/delete-node/ &ms_bmi160_accel;
+/delete-node/ &ms_bmi160_gyro;
+/delete-node/ &tcs3400_clear;
+/delete-node/ &tcs3400_rgb;
+/delete-node/ &accel_bmi160;
+/delete-node/ &bma422_emul;
+/delete-node/ &mspi0;

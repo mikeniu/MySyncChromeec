@@ -10,7 +10,7 @@
 #include "hooks.h"
 
 /* Define delays for deferred power sequencing */
-#define PP5000_PWR_DISABLE_DELAY (10 * USEC_PER_MSEC)
+#define PP5000_PWR_DISABLE_DELAY (100 * USEC_PER_MSEC)
 
 /*
  * Deferred function to deassert gpio_ec_en_pp5000.

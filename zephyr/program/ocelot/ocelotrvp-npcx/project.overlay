@@ -80,6 +80,13 @@ tach_fan0: &tach1 {};
 		compatible = "cros-ec,cse-early-rec";
 		cse-early-rec-gpios = <&gpiof 5 (GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_VOLTAGE_1P8)>;
 	};
+
+	ap-power-events {
+		compatible = "cros-ec,ap-power-events";
+		/* GPIO D1: Power down signal(AMP_MUTE_ODL) for codec amplifier */
+		event-gpios = <&gpiod 1 (GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH |
+					GPIO_VOLTAGE_1P8)>;
+	};
 };
 
 &sha0 {
