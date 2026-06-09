@@ -32,19 +32,14 @@
 		sys_write8(IT8XXX2_SMFI_SCARH_DISABLE, addr + 2);  \
 	} while (0)
 
-static void ilm_sysjump_disable(void)
+void chip_pre_system_jump(void)
 {
-	unsigned int key;
-
 	/* Disable all ILM mappings before sysjump, otherwise the new image
 	 * may attempt to execute stale code from the previous image.
 	 */
-	key = irq_lock();
 	LISTIFY(DT_NUM_REGS(DT_NODELABEL(ilm)), DISABLE_ILM_MAPPING, (;),
 		DT_NODELABEL(ilm));
-	irq_unlock(key);
 }
-DECLARE_HOOK(HOOK_SYSJUMP, ilm_sysjump_disable, HOOK_PRIO_LAST);
 #endif
 
 uintptr_t system_get_fw_reset_vector(uintptr_t base)

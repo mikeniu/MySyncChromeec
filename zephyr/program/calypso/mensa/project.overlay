@@ -10,6 +10,7 @@
 #include "../psl.dtsi"
 #include "../adc.dtsi"
 #include "../common.dtsi"
+#include "battery.dtsi"
 
 /* mensa project DTS includes */
 
@@ -18,6 +19,8 @@
 #include "i2c.dtsi"
 #include "interrupts.dtsi"
 #include "keyboard.dtsi"
+#include "led_pins.dtsi"
+#include "led_policy.dtsi"
 #include "temp_sensors.dtsi"
 
 /* mensa overrides follow... */

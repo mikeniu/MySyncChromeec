@@ -166,24 +166,8 @@ static int ktu1125_init(int port)
 	 * Setting control register SET_SW_CFG
 	 */
 
-#ifdef CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT
-	/* Set the sourcing current limit value */
-	switch (CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT) {
-	case TYPEC_RP_3A0:
-		/* Set current limit to ~3A */
-		sysb_clp = KTU1125_SYSB_ILIM_3_30;
-		break;
-
-	case TYPEC_RP_1A5:
-	default:
-		/* Set current limit to ~1.5A */
-		sysb_clp = KTU1125_SYSB_ILIM_1_70;
-		break;
-	}
-#else /* !defined(CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT) */
 	/* Default SRC current limit to ~1.5A */
 	sysb_clp = KTU1125_SYSB_ILIM_1_70;
-#endif /* defined(CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT) */
 
 	/* Set SYSB Current Limit Protection */
 	set_sw_cfg |= sysb_clp << KTU1125_SYSB_CLP_SHIFT;

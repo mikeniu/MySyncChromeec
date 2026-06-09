@@ -262,7 +262,7 @@ ZTEST_USER(espi, test_host_command_ec_cmd_get_features)
 
 ZTEST(espi, test_hc_gpio_set_system_is_locked)
 {
-	struct ec_params_gpio_set params;
+	struct ec_params_gpio_set params = { 0 };
 
 	system_is_locked_fake.return_val = 1;
 	zassert_equal(EC_RES_ACCESS_DENIED, ec_cmd_gpio_set(NULL, &params),

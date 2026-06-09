@@ -296,19 +296,6 @@ and can help troubleshoot PD issues when a PD analyzer isn't available.
 It is not recommended to set the fixed debug level to `DEBUG_DISABLE` (0) on any
 shipping firmware.
 
-### TCPMv1 Configuration
-
-Many older platforms still use the legacy TCPMv1 (`CONFIG_USB_PD_TCPMV1`)
-implementation. Specific to TCPMv1, the PD protocol state names can be removed
-from the debug output by adding the following to the board.h/baseboard.h file.
-
-```c
-#undef CONFIG_USB_PD_TCPMV1_DEBUG
-```
-
-This saves around 900 bytes of flash space. TCPMv2 does not currently provide an
-equivalent configuration option, so there is also no Kconfig equivalent.
-
 ## Other optional features
 
 ### ASSERT() Calls

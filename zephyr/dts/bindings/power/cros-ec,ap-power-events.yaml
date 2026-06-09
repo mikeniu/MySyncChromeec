@@ -1,0 +1,19 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: |
+  Driver to control GPIOs based on AP power state.
+  GPIOs are asserted (set active) on AP POWER_STARTUP / POWER_PRE_INIT
+  and de-asserted (set inactive) on AP POWER_HARD_OFF.
+
+compatible: "cros-ec,ap-power-events"
+
+properties:
+  event-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      List of GPIO phandles with flags. These GPIOs are asserted
+      (set active) on POWER_STARTUP and de-asserted (set inactive) on
+      POWER_HARD_OFF.
