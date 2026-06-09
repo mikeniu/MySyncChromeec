@@ -33,6 +33,24 @@
       "message": "Nit: Add a comment like\n\u003e Type-C r2.4 ss 4.5.2.2.8.2 Exiting from AttachWait.SRC State does not describe a state transition when a port not supporting Debug Accessory detects Rd on both CC lines, so, in this case, the port is required to remain in AttachWait.SRC indefinitely. TD 4.8.2 checks this requirement. Only transition out of this state in response to observed CC changes or DRP policy changes.",
       "revId": "8a88fd1a9f96ce970d25cb6a09f34ce1e58e86ba",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0fbe3ee_387c7346",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 3062,
+      "author": {
+        "id": 4253897
+      },
+      "writtenOn": "2026-06-09T06:07:12Z",
+      "side": 1,
+      "message": "Added this comment in new patchset.",
+      "parentUuid": "4b341d5f_1a4a17d1",
+      "revId": "8a88fd1a9f96ce970d25cb6a09f34ce1e58e86ba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
