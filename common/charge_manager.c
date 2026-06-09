@@ -108,7 +108,7 @@ static int save_log[CHARGE_PORT_COUNT];
 #endif
 
 /* Use mutexing to sync charge_manager_refresh and pdc_power_mgmt */
-#ifdef CONFIG_USB_PDC_POWER_MGMT
+#ifdef CONFIG_ZEPHYR
 K_MUTEX_DEFINE(cm_refresh);
 
 // #define CM_MUTEX_DEBUG
