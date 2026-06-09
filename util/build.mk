@@ -20,6 +20,7 @@ host-util-bin-cxx-y += itecomdbgr
 host-util-bin-cxx-y += cbi-util
 
 host-util-bin-cxx-y += rtkupdate
+host-util-bin-cxx-y += rts5817_flash
 build-util-art-y += util/export_taskinfo.so
 
 build-util-bin-$(CHIP_NPCX) += ecst
@@ -54,6 +55,8 @@ iteflash-objs = iteflash.o usb_if.o
 $(out)/util/iteflash: HOST_LDFLAGS+=$(LIBFTDIUSB_HOST_LDLIBS)
 itecomdbgr-objs = itecomdbgr.o uart_utils.o
 rtkupdate-objs = rtkupdate.o uart_utils.o
+rts5817_flash-objs = rts5817_flash.o
+$(out)/util/rts5817_flash: HOST_LDFLAGS+=$(shell $(HOST_PKG_CONFIG) --libs libusb-1.0)
 ectool-objs=ectool.o ectool_keyscan.o ec_flash.o $(comm-objs)
 ectool-objs+=ectool_i2c.o
 ectool-objs+=ectool_pdc_trace.o
