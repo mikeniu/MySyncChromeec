@@ -22,6 +22,30 @@
       },
       "revId": "b47a941de82dcc899d6258f5e39e1053af47425b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1b108c1_ea46fa42",
+        "filename": "driver/usb_mux/usb_mux.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 890,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-09T17:22:25Z",
+      "side": 1,
+      "message": "Done - made this a separate CL for cleaner compare-build run",
+      "parentUuid": "91b21150_dde62afa",
+      "range": {
+        "startLine": 890,
+        "startChar": 9,
+        "endLine": 890,
+        "endChar": 38
+      },
+      "revId": "b47a941de82dcc899d6258f5e39e1053af47425b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
