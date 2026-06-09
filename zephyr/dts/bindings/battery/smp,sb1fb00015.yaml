@@ -1,22 +1,22 @@
-# Copyright 2024 The ChromiumOS Authors
+# Copyright 2026 The ChromiumOS Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-description: "SIMPLO CP856932"
-compatible: "SIMPLO,CP856932"
+description: "SIMPLO SB1FB00015"
+compatible: "smp,sb1fb00015"
 
 include: battery-smart.yaml
 
 properties:
   enum-name:
     type: string
-    default: "SIMPLO,CP856932"
+    default: "smp,sb1fb00015"
 
   # Fuel gauge
   manuf_name:
     default: "SIMPLO"
   device_name:
-    default: "CP856932"
+    default: "SB1FB00015"
   ship_mode_reg_addr:
     default: 0x3A
   ship_mode_reg_data:
@@ -36,9 +36,9 @@ properties:
 
   # Battery info
   voltage_max:
-    default: 12900
+    default: 12600
   voltage_normal:
-    default: 11490
+    default: 11390
   voltage_min:
     default: 9000
   precharge_current:
