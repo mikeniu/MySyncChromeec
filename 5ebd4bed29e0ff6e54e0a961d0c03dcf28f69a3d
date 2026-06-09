@@ -33,6 +33,24 @@
       "message": "You shouldn\u0027t need to do this explicitly. If you got `EC_ERROR_NOT_POWERED`, then `vbus_mv` should already have this value, so you could combine the cases.\n\nAs noted below, you could go even further and do this regardless of the return value or pass `\u0026vbus_voltage_cache[chgnum]` directly into `get_vbus_voltage`, relying upon `get_vbus_voltage` to always assign a value that `configure_vbus_thresholds` can use. If you still wanted to log the I2C error informationally, you could do that in `get_vbus_voltage`.",
       "revId": "5ebd4bed29e0ff6e54e0a961d0c03dcf28f69a3d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dee3148e_267b053e",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 1353,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-06-09T13:24:41Z",
+      "side": 1,
+      "message": "Implementation updating vbus_voltage_cache with SM5803_VBUS_INVALID_MV (-1) and configure its threshold (00h \u0026 FFh) whenever VBUS ADC disabled, leading to unstable USB2.0/Type-C behavior during 4.6.x testing. Therefore, change reverted for now vbus_voltage_cache \u0026 configure threshold only when valid ADC readings and removed SM5803_VBUS_INVALID_MV (-1) \u0026 SM5803_REG_GPADC_CONFIG1 used for digital presence when VBUS ADC disabled",
+      "parentUuid": "3a585a8b_3c2d37ca",
+      "revId": "5ebd4bed29e0ff6e54e0a961d0c03dcf28f69a3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
