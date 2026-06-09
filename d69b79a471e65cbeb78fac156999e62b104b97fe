@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c5b77ec_55070404",
+        "filename": "zephyr/program/atria/atriarvp-rtk/src/rvp_usbc_runtime.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-09T14:54:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a6d586d6_7a477c5d",
+      "revId": "d69b79a471e65cbeb78fac156999e62b104b97fe",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f47b8693_c3e2c2a1",
