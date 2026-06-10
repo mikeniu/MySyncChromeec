@@ -159,6 +159,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7cb2501_7919418d",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 1746,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-10T17:19:51Z",
+      "side": 1,
+      "message": "At least for the time being, this comment is obsolete.",
+      "parentUuid": "7e48155d_89ccb3bd",
+      "revId": "c57c3bef50abd4e8ea205e59ca6c041d51e846c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ba2f996c_0129c4b5",

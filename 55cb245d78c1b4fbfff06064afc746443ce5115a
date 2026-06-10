@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "21ad32e1_5f34bf2f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-10T17:19:51Z",
+      "side": 1,
+      "message": "Note to self: Patchset 13 removes the \"invalid\" default value for measured voltage added in patchset 10. Patchset 9 is the latest reasonable comparison point.",
+      "revId": "55cb245d78c1b4fbfff06064afc746443ce5115a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0417ce35_a106b4cb",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 1346,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-10T17:19:51Z",
+      "side": 1,
+      "message": "Line length. If you switch the `rv` check on line 1342 to a guard clause, you\u0027ll get back a level of indentation. I\u0027d say that\u0027s generally a good policy, especially in a driver like this with so many levels of register reads.",
+      "revId": "55cb245d78c1b4fbfff06064afc746443ce5115a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
