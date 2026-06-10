@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae348881_a9280311",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-10T16:53:42Z",
+      "side": 1,
+      "message": "I have no objection to this CL per se. To the extent that I find this weird, I\u0027ll discuss that on the previous CL.",
+      "revId": "a063b779a7ac8543b386995c199156a727742b2b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
