@@ -81,6 +81,8 @@ static int lis2dh_load_fifo(struct motion_sensor_t *s, int nsamples,
 	int ret, left, length, i;
 	int *axis = s->raw_xyz;
 	uint8_t fifo[FIFO_READ_LEN];
+	int read_count;
+	uint32_t ts;
 
 	/* Each sample are OUT_XYZ_SIZE bytes. */
 	left = nsamples * OUT_XYZ_SIZE;
@@ -100,6 +102,7 @@ static int lis2dh_load_fifo(struct motion_sensor_t *s, int nsamples,
 		if (ret != EC_SUCCESS)
 			return ret;
 
+		read_count = 0;
 		for (i = 0; i < length; i += OUT_XYZ_SIZE) {
 			/* Apply precision, sensitivity and rotation vector. */
 			st_normalize(s, axis, &fifo[i]);
@@ -116,8 +119,24 @@ static int lis2dh_load_fifo(struct motion_sensor_t *s, int nsamples,
 				vect.data[Z] = axis[Z];
 				vect.flags = 0;
 				vect.sensor_num = s - motion_sensors;
-				motion_sense_fifo_stage_data(&vect, s, 3,
-							     timestamp);
+
+				/*
+				 * TODO (b/522434347): The minimum number of
+				 * samples that will be read from the fifo is 2
+				 * because interrupts are triggering when fss >
+				 * fth. Because the motionsense fifo needs to
+				 * pair each sample with a unique timestamp,
+				 * generate a timestamp for the 1st sample from
+				 * the timestamp that was latched in the
+				 * interrupt handler for the 2nd sample.
+				 */
+				read_count++;
+				ts = nsamples > 1 ?
+					     timestamp - s->collection_rate *
+								 (nsamples -
+								  read_count) :
+					     timestamp;
+				motion_sense_fifo_stage_data(&vect, s, 3, ts);
 			} else {
 				motion_sense_push_raw_xyz(s);
 			}
