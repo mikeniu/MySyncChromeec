@@ -16,6 +16,24 @@
       "message": "LGTM - as follow up let\u0027s consider dropping the npcx-40mhz snippet and switching boards over to to faster configuration.",
       "revId": "c891322aa8c526dad96cd1f906a5e66b4ee0da59",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cec8c017_c4b212aa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-10T15:17:19Z",
+      "side": 1,
+      "message": "I see that is done at the end of this CL stack.",
+      "parentUuid": "ef7caef0_19cc632a",
+      "revId": "c891322aa8c526dad96cd1f906a5e66b4ee0da59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
