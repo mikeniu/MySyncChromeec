@@ -143,82 +143,39 @@ def build(opts):
     # Codesigner is needed for images' hashes generation.
     build_codesigner()
 
-    run_cmd(
-        [
-            "make",
-            "PROD_BUILD_MODE=1",
-            "BOARD=cr50",
-            "all",
-            "dis",
-            "-j{}".format(opts.cpus),
-        ]
-    )
+    base_cmd = ["make", "BOARD=cr50", "all", "dis", f"-j{opts.cpus}"]
+
+    run_cmd(base_cmd + ["PROD_BUILD_MODE=1"])
     add_size_metrics(metrics, "ro-prod", f"{BUILD_DIR}/cr50/RO/ec.RO.map")
     add_size_metrics(metrics, "rw-prod", f"{BUILD_DIR}/cr50/RW/ec.RW.map")
-    run_cmd(
-        [
-            "make",
-            "out=build/dbg_test",
-            "BOARD=cr50",
-            "all",
-            "dis",
-            "CR50_DEV=1",
-            "-j{}".format(opts.cpus),
-        ]
-    )
+    run_cmd(base_cmd + ["out=build/dbg_test", "CR50_DEV=1"])
     add_size_metrics(metrics, "ro-dev", f"{BUILD_DIR}/dbg_test/RO/ec.RO.map")
     add_size_metrics(metrics, "rw-dev", f"{BUILD_DIR}/dbg_test/RW/ec.RW.map")
+    run_cmd(base_cmd + ["out=build/crypto_test", "CRYPTO_TEST=1"])
     run_cmd(
-        [
-            "make",
-            "out=build/crypto_test",
-            "BOARD=cr50",
-            "all",
-            "dis",
-            "CRYPTO_TEST=1",
-            "-j{}".format(opts.cpus),
-        ]
-    )
-    run_cmd(
-        [
-            "make",
-            "out=build/crypto_test_rb",
-            "BOARD=cr50",
-            "all",
-            "dis",
-            "CRYPTO_TEST=1",
-            "H1_RED_BOARD=1",
-            "-j{}".format(opts.cpus),
-        ]
+        base_cmd
+        + ["out=build/crypto_test_rb", "CRYPTO_TEST=1", "H1_RED_BOARD=1"]
     )
 
     # Build MP Cr50 image
     run_cmd(
-        [
-            "make",
+        base_cmd
+        + [
             "out=build/mp_build",
             "PROD_BUILD_MODE=1",
-            "BOARD=cr50",
             "BRANCH=MP",
             "SPACE_BUFFER=2048",  # Support updating from 0.3.22
-            "all",
-            "dis",
-            "-j{}".format(opts.cpus),
         ]
     )
 
     # Build PREPVT Cr50 image
     run_cmd(
-        [
-            "make",
+        base_cmd
+        + [
             "out=build/prepvt_build",
             "PROD_BUILD_MODE=1",
-            "BOARD=cr50",
             "BRANCH=PREPVT",
             "SPACE_BUFFER=2048",  # Support updating from 0.3.22
-            "all",
-            "dis",
-            "-j{}".format(opts.cpus),
         ]
     )
 
