@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eac007de_9b54a2d5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-06-10T10:42:46Z",
+      "side": 1,
+      "message": "The branch of fimware-R150-167.00.2.B-main has not been merged into this change.",
+      "revId": "996519574fd44ad64770cac8af31d0fd6c4e2577",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
