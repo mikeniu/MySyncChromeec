@@ -51,6 +51,24 @@
       "parentUuid": "0417ce35_a106b4cb",
       "revId": "55cb245d78c1b4fbfff06064afc746443ce5115a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c10d184_9c4c747d",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 1346,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-10T21:25:26Z",
+      "side": 1,
+      "message": "Patchset 13 is also over 80 columns. You can see for yourself by setting diff width to 80 and tab width to 8 in the gerrit diff view settings.\n\nI think the pre-upload script should be catching this. Are you running pre-upload checks when you upload?",
+      "parentUuid": "9687b247_fc712777",
+      "revId": "55cb245d78c1b4fbfff06064afc746443ce5115a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
