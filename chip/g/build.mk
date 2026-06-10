@@ -158,8 +158,7 @@ SANITIZE_MANIFEST := $(abspath \
 
 # We'll have to tweak the manifest no matter what, but different ways
 # depending on the way the image is built.
-SIGNER_MANIFEST := $(shell mktemp /tmp/h1.signer.XXXXXX)
-COPY_MANIFEST := $(shell /bin/cp $(MANIFEST) $(SIGNER_MANIFEST))
+SIGNER_MANIFEST := $(out)/RW/updated.manifest.json
 
 RW_SIGNER_EXTRAS += -j $(SIGNER_MANIFEST) -x util/signer/fuses.xml
 
@@ -222,39 +221,11 @@ endif
 #
 # H1_DEVIDS='<num 1> <num 2>' make ...
 #
-ifneq ($(CR50_DEV),)
-
-#
-# When building a debug image, we don't want rollback protection to be in the
-# way - a debug image, which is guaranteed to be node locked should run on any
-# H1, whatever its info mask state is. The awk script below clears out the
-# info {} section of the manifest.
-#
-MODIFY_MANIFEST := $(shell /usr/bin/awk -i inplace 'BEGIN {skip = 0}; \
-	/^},/ {skip = 0}; \
-	{if (!skip) {print };} \
-	/"info": {/ {skip = 1};' $(SIGNER_MANIFEST))
-endif
 RW_SIGNER_EXTRAS += --dev_id0=$(word 1, $(H1_DEVIDS))
 RW_SIGNER_EXTRAS += --dev_id1=$(word 2, $(H1_DEVIDS))
 endif  # H1_DEVIDS defined
 
-# Modify the manifest tag field to match the board name. This is necessary for
-# perosnalization to succeed.
-#
-# Personalization infrastructure uses hslt_XXX board names with the underscore
-# replaced with a space and the part after undersore (if any), capitalized.
-# Edit the board name and express it in hex:
-HEX_NAME := $(shell printf "$(BOARD)" | /usr/bin/awk -F_ ' \
-	 {if (NF == 2) \
-	     { printf($$1" "toupper($$2)) } \
-	   else \
-	     { printf($$0) } \
-	  }' | hexdump -ve '1/1 "%.2x"')
-# This many zeros in the tag field need to be replaced.
-HEX_LEN  := $(shell printf $(HEX_NAME) | wc -c)
-$(shell sed -i "s/tag\": \"0\{$(HEX_LEN)\}/tag\": \"$(HEX_NAME)/" \
-       ${SIGNER_MANIFEST})
+
 
 # This file is included twice by the Makefile, once to determine the CHIP info
 # # and then again after defining all the CONFIG_ and HAS_TASK variables. We use
@@ -262,7 +233,37 @@ $(shell sed -i "s/tag\": \"0\{$(HEX_LEN)\}/tag\": \"$(HEX_NAME)/" \
 # # second time.
 else
 # This is the second pass of this make file.
+$(SIGNER_MANIFEST): $(MANIFEST)
+	$(Q)mkdir -p $(dir $@)
+# Drop comments to make the manifest acceptable by jq.
+	$(Q)sed 's|\/\/.*||' $< > $@.tmp
+ifneq ($(H1_DEVIDS),)
+ifneq ($(CR50_DEV),)
+# When building a debug image, we don't want rollback protection to be in the
+# way - a debug image, which is guaranteed to be node locked should run on any
+# H1, whatever its info mask state is. The jq script below clears out the
+# info {} section of the manifest.
+	$(Q)jq '.info={}' $@.tmp > $@.tmp1
+	mv $@.tmp1 $@.tmp
+endif
+endif
+# Modify the manifest tag field to match the board name. This is necessary for
+# personalization to succeed.
+#
+# Personalization infrastructure uses hslt_XXX board names with the underscore
+# replaced with a space and the part after underscore (if any), capitalized.
+# Edit the board name and express it in hex:
+	$(Q)HEX_NAME=$$(printf "$(BOARD)" | /usr/bin/awk -F_ ' \
+		 {if (NF == 2) \
+		     { printf($$1" "toupper($$2)) } \
+		   else \
+		     { printf($$0) } \
+		  }' | hexdump -ve '1/1 "%.2x"') && \
+	HEX_LEN=$$(printf $$HEX_NAME | wc -c) && \
+	sed "s/tag\": \"0\{$$HEX_LEN\}/tag\": \"$$HEX_NAME/" $@.tmp > $@
+
 $(out)/RW/ec.RW_B.flat: $(out)/RW/ec.RW.flat
 $(out)/RW/ec.RW.flat $(out)/RW/ec.RW_B.flat: SIGNER_EXTRAS = $(RW_SIGNER_EXTRAS)
+$(out)/RW/ec.RW.flat $(out)/RW/ec.RW_B.flat: $(SIGNER_MANIFEST)
 
 endif   # CHIP_MK_INCLUDED_ONCE is nonempty
