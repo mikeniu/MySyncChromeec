@@ -33,6 +33,24 @@
       "message": "Line length. If you switch the `rv` check on line 1342 to a guard clause, you\u0027ll get back a level of indentation. I\u0027d say that\u0027s generally a good policy, especially in a driver like this with so many levels of register reads.",
       "revId": "55cb245d78c1b4fbfff06064afc746443ce5115a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9687b247_fc712777",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 1346,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-06-10T18:58:57Z",
+      "side": 1,
+      "message": "Please check patch-set 13 ISR, if it suits expectation well, i will update accordingly",
+      "parentUuid": "0417ce35_a106b4cb",
+      "revId": "55cb245d78c1b4fbfff06064afc746443ce5115a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
