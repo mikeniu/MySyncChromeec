@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 # Copyright 2021 The ChromiumOS Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
@@ -179,7 +178,7 @@ def build(opts):
         ]
     )
 
-    with open(opts.metrics, "w") as f:
+    with open(opts.metrics, "w", encoding="utf-8") as f:
         f.write(json_format.MessageToJson(metrics))
 
 
@@ -187,7 +186,8 @@ def add_size_metrics(metrics, platform_name, mapfile):
     item = metrics.value.add()
     item.target_name = "cr50"
     item.platform_name = platform_name
-    mapfile = open(mapfile).read()
+    with open(mapfile, "r", encoding="utf-8") as mapf:
+        mapfile = mapf.read()
     image_size = re.search(r"(0x[0-9a-f]+) +__image_size", mapfile)
     ram_size = re.search(r"IRAM +0x[0-9a-f]+ +(0x[0-9a-f]+) ", mapfile)
     ram_free = re.search(r"(0x[0-9a-f]+) +__ram_free", mapfile)
@@ -231,7 +231,7 @@ def write_metadata(opts, info):
     bundle_metadata_file = (
         opts.metadata if opts.metadata else DEFAULT_BUNDLE_METADATA_FILE
     )
-    with open(bundle_metadata_file, "w") as f:
+    with open(bundle_metadata_file, "w", encoding="utf-8") as f:
         f.write(json_format.MessageToJson(info))
 
 
@@ -240,7 +240,6 @@ def bundle_coverage(opts):
     info = firmware_pb2.FirmwareArtifactInfo()
     info.bcs_version_info.version_string = opts.bcs_version
     bundle_dir = get_bundle_dir(opts)
-    ec_dir = os.path.dirname(__file__)
     tarball_name = "coverage.tbz2"
     tarball_path = os.path.join(bundle_dir, tarball_name)
     run_cmd(
@@ -283,8 +282,8 @@ def create_artifact_dir(ec_dir, build_target):
         # codesigner.
         if dest.endswith(".hashes"):
             dest = dest.replace(".hashes", ".digest")
-            with open(os.path.join(build_dir, src), "rb") as hash:
-                digest = hashlib.sha256(hash.read()).digest()
+            with open(os.path.join(build_dir, src), "rb") as hashf:
+                digest = hashlib.sha256(hashf.read()).digest()
                 with open(os.path.join(build_dir, dest), "wb") as f:
                     f.write(digest)
     return [build_target]
@@ -324,7 +323,7 @@ def test(opts):
     """Runs all of the unit tests for EC firmware"""
     metrics = firmware_pb2.FwTestMetricList()
     init_toolchain()
-    with open(opts.metrics, "w") as f:
+    with open(opts.metrics, "w", encoding="utf-8") as f:
         f.write(json_format.MessageToJson(metrics))
 
     # If building for code coverage, build the 'coverage' target, which
@@ -334,7 +333,7 @@ def test(opts):
     # Otherwise, build the 'runtests' target, which verifies all
     # posix-based unit tests build and pass.
     target = "coverage" if opts.code_coverage else "runtests"
-    run_cmd(["make", target, "-j{}".format(opts.cpus)])
+    run_cmd(["make", target, f"-j{opts.cpus}"])
 
 
 def main(args):
