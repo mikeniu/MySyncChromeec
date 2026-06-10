@@ -16,6 +16,24 @@
       "message": "Remove it.",
       "revId": "bb0d100103358368d4bea115fc53ce9e0664e043",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c56cd20_c17793e8",
+        "filename": "common/mkbp_input_devices.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-06-10T08:29:45Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "77a88aea_228bbd6a",
+      "revId": "bb0d100103358368d4bea115fc53ce9e0664e043",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
