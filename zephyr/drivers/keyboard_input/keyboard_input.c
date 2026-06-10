@@ -8,6 +8,8 @@
 #include "keyboard_protocol.h"
 #include "keyboard_scan.h"
 #include "system.h"
+#include "battery_fuel_gauge.h"
+#include "hooks.h"
 
 #include <stdio.h>
 
@@ -98,6 +100,58 @@ static uint8_t mkbp_data[CROS_EC_KEYBOARD_COLS_MAX];
 
 #endif
 
+#define KEYBOARD_COL_ALT	13 /* KSO */
+#define KEYBOARD_ROW_ALT	6  /* KSI */
+#define KEYBOARD_COL_C		5  /* KSO */
+#define KEYBOARD_ROW_C		5  /* KSI */
+#define KEYBOARD_COL_B		3  /* KSO */
+#define KEYBOARD_ROW_B		0  /* KSI */
+
+static int ks;
+
+static void ks_set(int bit, int is_pressed){
+	if (is_pressed)
+		ks |=  (1 << bit);
+	else
+		ks &= ~(1 << bit);
+}
+
+static void check_battery_cutoff_key(int row, int col, int is_pressed)
+{
+	if (ks == -1) {
+		LOG_INF("battery cutoff scheduled\n");
+		return;
+	}
+
+	if(row == KEYBOARD_ROW_ALT && col == KEYBOARD_COL_ALT) {
+		ks_set(0, is_pressed);
+	}
+
+	else if(row == KEYBOARD_ROW_C && col == KEYBOARD_COL_C) {
+		ks_set(1, is_pressed);
+	}
+
+	else if(row == KEYBOARD_ROW_B && col == KEYBOARD_COL_B) {
+		ks_set(2, is_pressed);
+	}
+
+	if (ks == 7) {
+		LOG_INF("g3 battery cutoff scheduled!!\n");
+		ks = -1;
+	}
+}
+
+void battery_cutoff_g3(void)
+{
+	if (ks == -1) {
+		LOG_INF("Start battery cutoff!!\n");
+		run_battery_cutoff_start();
+		ks = 0;
+	}
+	return;
+}
+DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, battery_cutoff_g3, HOOK_PRIO_DEFAULT);
+
 static void keyboard_input_cb(struct input_event *evt, void *user_data)
 {
 	static int row;
@@ -120,6 +174,7 @@ static void keyboard_input_cb(struct input_event *evt, void *user_data)
 		return;
 	}
 
+	check_battery_cutoff_key(row, col, pressed);
 	LOG_DBG("keyboard_state_changed %d %d %d", row, col, pressed);
 
 	keyboard_state_changed(row, col, pressed);

@@ -395,6 +395,14 @@ static void battery_cutoff_clear(void)
 	hook_call_deferred(&pending_cutoff_deferred_data, -1);
 }
 
+static int battery_cutoff_start(void);
+
+int run_battery_cutoff_start(void)
+{
+	battery_cutoff_start();
+	return 0;
+}
+
 static int battery_cutoff_start(void)
 {
 	int rv;

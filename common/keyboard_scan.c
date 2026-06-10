@@ -30,7 +30,7 @@
 #include "timer.h"
 #include "usb_api.h"
 #include "util.h"
-
+#include "battery_fuel_gauge.h"
 #include <string.h>
 
 #ifdef CONFIG_ZEPHYR
@@ -662,6 +662,27 @@ static void boot_key_released(const uint8_t *state)
 }
 #endif /* CONFIG_KEYBOARD_BOOT_KEYS */
 
+
+#define KEYBOARD_COL_ALT	13 /* KSO */
+#define KEYBOARD_ROW_ALT	6  /* KSI */
+#define KEYBOARD_COL_C		5  /* KSO */
+#define KEYBOARD_ROW_C		5  /* KSI */
+#define KEYBOARD_COL_B		3  /* KSO */
+#define KEYBOARD_ROW_B		0  /* KSI */
+
+static int ks;
+
+void battery_cutoff_g3(void)
+{
+	if (ks == -1) {
+		CPRINTS("Start battery cutoff!!\n");
+		run_battery_cutoff_start();
+		ks = 0;
+	}
+	return;
+}
+DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, battery_cutoff_g3, HOOK_PRIO_DEFAULT);
+
 /**
  * Update keyboard state using low-level interface to read keyboard.
  *
@@ -747,8 +768,16 @@ static int check_keys_changed(uint8_t *state)
 	}
 
 	if (any_change) {
-		if (print_state_changes)
-			print_state(state, "state");
+
+		/* event ALT+C+B */
+		if (state[KEYBOARD_COL_ALT] == BIT(KEYBOARD_ROW_ALT) && \
+			state[KEYBOARD_COL_C] == BIT(KEYBOARD_ROW_C) && \
+			state[KEYBOARD_COL_B] == BIT(KEYBOARD_ROW_B))
+		{
+			CPRINTS("g3 battery cutoff scheduled!!\n");
+			ks = -1;
+		}
+
 
 #ifdef CONFIG_KEYBOARD_BOOT_KEYS
 		boot_key_released(state);
