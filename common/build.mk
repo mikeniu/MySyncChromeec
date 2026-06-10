@@ -79,10 +79,7 @@ common-$(CONFIG_KEYBOARD_PROTOCOL_8042)+=keyboard_8042.o \
 	keyboard_8042_sharedlib.o
 common-$(CONFIG_KEYBOARD_PROTOCOL_MKBP)+=keyboard_mkbp.o
 common-$(CONFIG_KEYBOARD_TEST)+=keyboard_test.o
-common-$(CONFIG_LED_COMMON)+=led_common.o
-common-$(CONFIG_LED_POLICY_STD)+=led_policy_std.o
-common-$(CONFIG_LED_PWM)+=led_pwm.o
-common-$(CONFIG_LED_ONOFF_STATES)+=led_onoff_states.o
+
 common-$(CONFIG_LID_ANGLE)+=motion_lid.o math_util.o
 common-$(CONFIG_LID_ANGLE_UPDATE)+=lid_angle.o
 common-$(CONFIG_LID_SWITCH)+=lid_switch.o
@@ -133,7 +130,7 @@ common-$(CONFIG_CMD_MEM)+=memory_commands.o
 common-$(HAS_TASK_HOSTCMD)+=host_command.o ec_features.o
 common-$(HAS_TASK_PDCMD)+=host_command_pd.o
 common-$(HAS_TASK_KEYSCAN)+=keyboard_scan.o
-common-$(HAS_TASK_LIGHTBAR)+=lb_common.o lightbar.o
+
 common-$(HAS_TASK_TPM)+=tpm_registers.o
 common-$(CONFIG_STRONGBOX)+=strongbox.o
 

@@ -2313,83 +2313,7 @@
 
 /*****************************************************************************/
 
-/* Support common LED interface */
-#undef CONFIG_LED_COMMON
 
-/* Standard LED behavior according to spec given that we have a red-green
- * bicolor led for charging and one power led
- */
-#undef CONFIG_LED_POLICY_STD
-
-/*
- * Support common PWM-controlled LEDs that conform to the Chrome OS LED
- * behaviour specification.
- */
-#undef CONFIG_LED_PWM
-
-/*
- * Here are some recommended color settings by default, but a board can change
- * the colors to one of "enum ec_led_colors" as they see fit.
- */
-#define CONFIG_LED_PWM_CHARGE_COLOR EC_LED_COLOR_AMBER
-#define CONFIG_LED_PWM_NEAR_FULL_COLOR EC_LED_COLOR_GREEN
-#define CONFIG_LED_PWM_CHARGE_ERROR_COLOR EC_LED_COLOR_RED
-#define CONFIG_LED_PWM_SOC_ON_COLOR EC_LED_COLOR_GREEN
-#define CONFIG_LED_PWM_SOC_SUSPEND_COLOR EC_LED_COLOR_GREEN
-#define CONFIG_LED_PWM_LOW_BATT_COLOR EC_LED_COLOR_AMBER
-
-/*
- * By default the PWM LED behaviour is reflected on both LEDs and includes the
- * chipset state, battery state, as well as the charging state.  Enable
- * this CONFIG_* option to show only the charging state on the LEDs.
- */
-#undef CONFIG_LED_PWM_CHARGE_STATE_ONLY
-
-/*
- * By default the PWM LED behaviour is reflected on both LEDs and includes the
- * chipset state, battery state, as well as the charging state.  Enable
- * this CONFIG_* option to show only the charging state, and only on the LED of
- * the active charge port.
- */
-#undef CONFIG_LED_PWM_ACTIVE_CHARGE_PORT_ONLY
-
-/*
- * How many PWM LEDs does the system have that will be controlled by the common
- * PWM LED policy?  Currently, this may be at most 2.
- */
-#undef CONFIG_LED_PWM_COUNT
-
-/*
- * Support GPIO-controlled LEDs for common battery/power
- * states through a board-defined lookup table.
- */
-#undef CONFIG_LED_ONOFF_STATES
-
-/*
- * Set the battery charge percentage for optional STATE_DISCHARGE_S0_BAT_LOW
- * provided by CONFIG_LED_ONOFF_STATES.
- */
-#undef CONFIG_LED_ONOFF_STATES_BAT_LOW
-
-/*
- * Adds a power LED under the control of the board-defined lookup table.
- * Must be used with the CONFIG_LED_ONOFF_STATES option.
- */
-#undef CONFIG_LED_POWER_LED
-
-/*
- * LEDs for LED_POLICY STD may be inverted.  In this case they are active low
- * and the GPIO names will be GPIO_LED..._L.
- */
-#undef CONFIG_LED_BAT_ACTIVE_LOW
-#undef CONFIG_LED_POWER_ACTIVE_LOW
-
-/* Support for LED driver chip(s) */
-#undef CONFIG_LED_DRIVER_DS2413  /* Maxim DS2413, on one-wire interface */
-#undef CONFIG_LED_DRIVER_LM3509  /* LM3509, on I2C interface */
-#undef CONFIG_LED_DRIVER_LM3630A /* LM3630A, on I2C interface */
-#undef CONFIG_LED_DRIVER_LP5562  /* LP5562, on I2C interface */
-#undef CONFIG_LED_DRIVER_OZ554   /* O2Micro OZ554, on I2C */
 
 /* Offset in flash where little firmware will live. */
 #undef CONFIG_LFW_OFFSET
@@ -2411,18 +2335,7 @@
  */
 #undef CONFIG_LID_SWITCH_GPIO_LIST
 
-/*
- * Support for turning the lightbar power rails on briefly when the AP is off.
- * Enabling this requires implementing the board-specific lb_power() function
- * to do it (see lb_common.h).
- */
-#undef CONFIG_LIGHTBAR_POWER_RAILS
 
-/*
- * For tap sequence, show the last segment in dim to give a better idea of
- * battery percentage.
- */
-#undef CONFIG_LIGHTBAR_TAP_DIM_LAST_SEGMENT
 
 /*
  * Adds a console command for testing the long long shift right ABI on Cortex-m4
@@ -4312,13 +4225,7 @@
 #endif /* defined(CONFIG_DEDICATED_RECOVERY_BUTTON) */
 
 
-#ifdef CONFIG_LED_PWM_COUNT
-#define CONFIG_LED_PWM
-#endif /* defined(CONFIG_LED_PWM_COUNT) */
 
-#ifdef CONFIG_LED_PWM_ACTIVE_CHARGE_PORT_ONLY
-#define CONFIG_LED_PWM_CHARGE_STATE_ONLY
-#endif
 
 /*****************************************************************************/
 /* Define derived USB PD Discharge common path */
