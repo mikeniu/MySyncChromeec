@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "441b9849_69762961",
+        "filename": "power/qcom_exp.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1230,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-06-11T20:15:49Z",
+      "side": 1,
+      "message": "Nit: unrelated change.",
+      "range": {
+        "startLine": 1230,
+        "startChar": 0,
+        "endLine": 1230,
+        "endChar": 0
+      },
+      "revId": "f833dad843a82345405bdaa7949e6dffb174a7a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
