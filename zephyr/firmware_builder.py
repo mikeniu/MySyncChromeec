@@ -26,6 +26,7 @@ from chromite.lib.chromeos_version import VersionInfo
 import scripts.firmware_builder_lib
 from scripts.firmware_builder_lib import find_checkout
 from scripts.firmware_builder_lib import prepare_codebase
+from scripts.firmware_builder_lib import restore_codebase
 
 
 # Add the zmake dir early in the python search path
@@ -855,11 +856,28 @@ def main(args):
         print("Must select a valid sub command!")
         return -1
 
+<<<<<<< PATCH SET (c6da406f7bfd2fe8a64efd8878032f920d9e47b3 ec: Add functionality to check local workspace)
+    applied_patches = []
+    copied_files = []
+    try:
+        prepare_codebase(opts, applied_patches, copied_files)
+        # Run selected sub command function
+        return opts.func(opts)
+    finally:
+        restore_codebase(applied_patches, copied_files)
+||||||| BASE      (5fce165dfe92dc8c8a7d5fde5b30d0a6a2b860cd Add support for source overrides)
+    # Prepare any temprorary code
+    prepare_codebase(opts)
+
+    # Run selected sub command function
+    return opts.func(opts)
+=======
     # Prepare any temporary code
     prepare_codebase(opts)
 
     # Run selected sub command function
     return opts.func(opts)
+>>>>>>> BASE      (22ec5d3b51540f8c90d9d6fe56257f7113125ed8 Add support for source overrides)
 
 
 if __name__ == "__main__":
