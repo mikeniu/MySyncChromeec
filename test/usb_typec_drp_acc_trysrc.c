@@ -843,6 +843,46 @@ __maybe_unused static int test_wake_tcpc_toggle_change(void)
 
 	return EC_SUCCESS;
 }
+//
+static int test_attach_wait_src_unsupported_debug_acc_no_force(void)
+{
+	const int port = 0;
+
+	/* 1. Setup initial state */
+	set_state_tc(port, TC_ATTACH_WAIT_SRC);
+
+	/* 2. Mock CC lines (Pull both to Rd) */
+	mock_cc_state(port, TYPEC_CC_VOLT_RD, TYPEC_CC_VOLT_RD);
+
+	/* 3. Ensure normal toggle state */
+	pd_set_dual_role(port, PD_DRP_TOGGLE_ON);
+
+	/* 4. Run the state machine */
+	tc_state_machine_run(port);
+
+	/* 5. Assert the outcome */
+	TEST_EQ(get_state_tc(port), TC_ATTACH_WAIT_SRC, "%d");
+
+	return EC_SUCCESS;
+}
+
+static int test_attach_wait_src_unsupported_debug_acc_force_sink(void)
+{
+	const int port = 0;
+
+	set_state_tc(port, TC_ATTACH_WAIT_SRC);
+	mock_cc_state(port, TYPEC_CC_VOLT_RD, TYPEC_CC_VOLT_RD);
+
+	/* Trigger force sink */
+	pd_set_dual_role(port, PD_DRP_FORCE_SINK);
+
+	tc_state_machine_run(port);
+
+	/* Assert we exited to Unattached.SNK */
+	TEST_EQ(get_state_tc(port), TC_UNATTACHED_SNK, "%d");
+
+	return EC_SUCCESS;
+}
 
 /* Reset the mocks before each test */
 void before_test(void)
