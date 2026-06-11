@@ -16,6 +16,24 @@
       "message": "@david1.huang@lcfc.corp-partner.google.com Have you verified that this avoids getting stuck at 500 mA?",
       "revId": "c6bb0f6c60e9440557e7e57c98997589a9a03537",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dec77deb_49ca9814",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3387694
+      },
+      "writtenOn": "2026-06-11T07:13:06Z",
+      "side": 1,
+      "message": "Yes, it can switch to 3A normally",
+      "parentUuid": "b47d6e76_ba3cd2c2",
+      "revId": "c6bb0f6c60e9440557e7e57c98997589a9a03537",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
