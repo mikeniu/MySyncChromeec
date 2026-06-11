@@ -26,6 +26,7 @@ from chromite.lib.chromeos_version import VersionInfo
 import scripts.firmware_builder_lib
 from scripts.firmware_builder_lib import find_checkout
 from scripts.firmware_builder_lib import prepare_codebase
+from scripts.firmware_builder_lib import restore_codebase
 
 
 # Add the zmake dir early in the python search path
@@ -855,11 +856,14 @@ def main(args):
         print("Must select a valid sub command!")
         return -1
 
-    # Prepare any temporary code
-    prepare_codebase(opts)
-
-    # Run selected sub command function
-    return opts.func(opts)
+    applied_patches = []
+    copied_files = []
+    try:
+        prepare_codebase(opts, applied_patches, copied_files)
+        # Run selected sub command function
+        return opts.func(opts)
+    finally:
+        restore_codebase(applied_patches, copied_files)
 
 
 if __name__ == "__main__":
