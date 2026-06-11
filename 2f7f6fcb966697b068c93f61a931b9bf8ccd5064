@@ -34,6 +34,24 @@
       "parentUuid": "d70a444f_e6d0985f",
       "revId": "2f7f6fcb966697b068c93f61a931b9bf8ccd5064",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c73b4566_324ea768",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1136059
+      },
+      "writtenOn": "2026-06-11T05:41:46Z",
+      "side": 1,
+      "message": "There are no official uses for this script. We just used it for manual testing. LGTM",
+      "parentUuid": "fe9e0753_400eb7c7",
+      "revId": "2f7f6fcb966697b068c93f61a931b9bf8ccd5064",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
