@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e97b7a72_d795ba43",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1262393
+      },
+      "writtenOn": "2026-06-11T07:50:40Z",
+      "side": 1,
+      "message": "Edit to at_1500ma",
+      "revId": "a71ffbfee967a265d65f1b6e9d50716729c46c3b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16ab8f9b_cea8fd69",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 1262393
+      },
+      "writtenOn": "2026-06-11T07:50:40Z",
+      "side": 1,
+      "message": "Please use macro to define the value.",
+      "revId": "a71ffbfee967a265d65f1b6e9d50716729c46c3b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbc789c1_3840b07e",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 1262393
+      },
+      "writtenOn": "2026-06-11T07:50:40Z",
+      "side": 1,
+      "message": "Also use macro to define the value.",
+      "range": {
+        "startLine": 375,
+        "startChar": 18,
+        "endLine": 375,
+        "endChar": 23
+      },
+      "revId": "a71ffbfee967a265d65f1b6e9d50716729c46c3b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "592a7e68_e506f3ac",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 1262393
+      },
+      "writtenOn": "2026-06-11T07:50:40Z",
+      "side": 1,
+      "message": "Also use macro to define the value.",
+      "range": {
+        "startLine": 382,
+        "startChar": 19,
+        "endLine": 382,
+        "endChar": 23
+      },
+      "revId": "a71ffbfee967a265d65f1b6e9d50716729c46c3b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
