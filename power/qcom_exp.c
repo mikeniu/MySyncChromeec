@@ -910,6 +910,9 @@ static uint8_t check_for_power_on_event(void)
 	} else if (auto_power_on) {
 		/* power on requested at EC startup for recovery */
 		ret = POWER_ON_BY_AUTO_POWER_ON;
+	} else if (power_button_is_pressed()) {
+		/* check for power button press */
+		ret = POWER_ON_BY_POWER_BUTTON_PRESSED;
 	} else if (lid_opened) {
 		/* check lid open */
 		ret = POWER_ON_BY_LID_OPEN;
@@ -919,9 +922,6 @@ static uint8_t check_for_power_on_event(void)
 	} else if (rtc_wake) {
 		/* check for RTC alarm wake */
 		ret = POWER_ON_BY_RTC_ALARM;
-	} else if (power_button_is_pressed()) {
-		/* check for power button press */
-		ret = POWER_ON_BY_POWER_BUTTON_PRESSED;
 	} else {
 		ret = POWER_ON_CANCEL;
 	}
