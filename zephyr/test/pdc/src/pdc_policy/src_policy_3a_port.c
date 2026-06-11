@@ -38,6 +38,13 @@ BUILD_ASSERT(CONFIG_PLATFORM_EC_USB_PD_3A_PORTS == 1,
 
 static enum chipset_state_mask fake_chipset_state = CHIPSET_STATE_ON;
 
+static int mock_usb_pd_3a_ports = 1;
+
+int pd_get_usb_pd_3a_ports(void)
+{
+	return mock_usb_pd_3a_ports;
+}
+
 static int custom_fake_chipset_in_state(int mask)
 {
 	return !!(fake_chipset_state & mask);
@@ -58,6 +65,8 @@ static void src_policy_before(void *f)
 	struct src_policy_fixture *fixture = f;
 	uint32_t lpm_src_pdo =
 		PDO_FIXED(5000, 1500, PDO_FIXED_PEAK_CURR(PDO_PEAK_OCP));
+
+	mock_usb_pd_3a_ports = 1;
 
 	RESET_FAKE(chipset_in_state);
 
@@ -920,4 +929,41 @@ ZTEST_USER_F(src_policy, test_src_max_pdp)
 					&max_pdp));
 	zassert_equal(MAX_PDP_15W, max_pdp,
 		      "Expected max PDP to be 15W, got %d", max_pdp);
+}
+
+/* Verify that the sink device does not get a 3A contract
+ * when the 3A budget is 0.
+ */
+ZTEST_USER_F(src_policy, test_src_policy_snk_no_3a_when_budget_zero)
+{
+	union connector_status_t connector_status = { 0 };
+	/* Simulate a connected sink device requesting 3A (3000mA) in its PDO */
+	uint32_t partner_snk_pdo = PDO_FIXED(5000, 3000, 0);
+
+	/* Core step: Simulate an overload condition where 3A port budget is 0
+	 */
+	mock_usb_pd_3a_ports = 0;
+
+	/* Simulate connecting the device to Port 0 */
+	emul_pdc_configure_src(fixture->emul_pdc[TEST_USBC_PORT0],
+			       &connector_status);
+	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT0],
+				     SINK_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
+				     &partner_snk_pdo));
+	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
+					    &connector_status));
+
+	/* Wait for the DPM state machine to finish processing */
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	/* Assert 1: Verify the configured LPM Source PDO only offers 1.5A */
+	zassert_ok(
+		verify_lpm_source_pdo(fixture, TEST_USBC_PORT0, 5000, 1500,
+				      PDO_PEAK_OCP),
+		"PD sink should NOT be offered 3A when pd_get_usb_pd_3a_ports() is 0");
+
+	/* Assert 2: Verify that pdc_dpm_get_source_current() correctly reports
+	 * 1500mA */
+	zassert_equal(pdc_dpm_get_source_current(TEST_USBC_PORT0), 1500,
+		      "Source current should be limited to 1500mA");
 }
