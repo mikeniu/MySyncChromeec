@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "537d3b39_6bfc4ab3",
+        "filename": "power/qcom_exp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1552197
+      },
+      "writtenOn": "2026-06-11T05:50:07Z",
+      "side": 1,
+      "message": "what if we reset it here itself?",
+      "range": {
+        "startLine": 188,
+        "startChar": 8,
+        "endLine": 188,
+        "endChar": 32
+      },
+      "revId": "1765ffe2b191df4bf42a09413e5968741fd37977",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
