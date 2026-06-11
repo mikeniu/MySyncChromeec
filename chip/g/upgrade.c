@@ -36,10 +36,14 @@ static int header_restored(uint32_t offset)
 {
 	struct SignedHeader *header;
 	uint32_t new_size;
+	uint32_t max_size;
 	int rv;
 	bool ro_header;
 
 	header = (struct SignedHeader *)(CONFIG_PROGRAM_MEMORY_BASE + offset);
+	ro_header = (offset == CONFIG_RO_MEM_OFF) ||
+		    (offset == CHIP_RO_B_MEM_OFF);
+	max_size = ro_header ? MAX_RO_CODE_SIZE : CONFIG_RW_SIZE;
 
 	new_size = header->image_size;
 	if (!(new_size & TOP_IMAGE_SIZE_BIT))
@@ -50,11 +54,9 @@ static int header_restored(uint32_t offset)
 	 * Clear only in case the size is sensible (i.e. not set to all
 	 * ones).
 	 */
-	if (new_size > CONFIG_RW_SIZE)
+	if ((new_size < CONFIG_FLASH_BANK_SIZE) || (new_size > max_size))
 		return 0;
 
-	ro_header = (offset == CONFIG_RO_MEM_OFF) ||
-		    (offset == CHIP_RO_B_MEM_OFF);
 	if (ro_header)
 		flash_open_ro_window(offset, sizeof(struct SignedHeader));
 

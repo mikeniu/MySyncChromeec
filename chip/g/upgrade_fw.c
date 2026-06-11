@@ -498,11 +498,34 @@ void fw_upgrade_command_handler(void *body,
 		 * not run until it's time to switch.
 		 */
 		struct SignedHeader *header;
+		uint32_t max_size;
 
 		header = (struct SignedHeader *) upgrade_data;
+		if (block_offset == valid_sections.ro_base_offset) {
+			max_size = valid_sections.ro_top_offset -
+				   valid_sections.ro_base_offset;
+		} else {
+			max_size = valid_sections.rw_top_offset -
+				   valid_sections.rw_base_offset;
+		}
+
+		if (header->image_size & TOP_IMAGE_SIZE_BIT) {
+			*error_code = UPGRADE_TRUNCATED_HEADER_ERROR;
+			CPRINTF("%s:%d image at %x already marked\n",
+				__func__, __LINE__, block_offset);
+			return;
+		}
+
 		if (header->image_size < CONFIG_FLASH_BANK_SIZE) {
 			*error_code = UPGRADE_TRUNCATED_HEADER_ERROR;
 			CPRINTF("%s:%d image at %x too small\n",
+				__func__, __LINE__, block_offset);
+			return;
+		}
+
+		if (header->image_size > max_size) {
+			*error_code = UPGRADE_BAD_ADDR;
+			CPRINTF("%s:%d image at %x too large\n",
 				__func__, __LINE__, block_offset);
 			return;
 		}
