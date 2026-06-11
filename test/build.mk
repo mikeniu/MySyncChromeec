@@ -23,14 +23,13 @@ test-list-host += ec_comm21
 test-list-host += entropy
 test-list-host += flash
 test-list-host += flash_log
-test-list-host += float
-test-list-host += fp
+
 test-list-host += hooks
 test-list-host += host_command
 test-list-host += interrupt
 test-list-host += is_enabled
 test-list-host += is_enabled_error
-test-list-host += math_util
+
 test-list-host += mutex
 test-list-host += nvmem
 test-list-host += pingpong
@@ -73,7 +72,7 @@ hooks-y=hooks.o
 host_command-y=host_command.o
 interrupt-y=interrupt.o
 is_enabled-y=is_enabled.o
-math_util-y=math_util.o
+
 mutex-y=mutex.o
 nvmem-y=nvmem.o nvmem_tpm2_mock.o
 pingpong-y=pingpong.o
@@ -100,8 +99,7 @@ u2f-y+=../board/cr50/dcrypto/u2f.o
 utils-y=utils.o
 utils_str-y=utils_str.o
 vboot-y=vboot.o
-float-y=fp.o
-fp-y=fp.o
+
 x25519-y=x25519.o
 
 TPM2_ROOT := $(CROS_WORKON_SRCROOT)/src/third_party/tpm2$(BRANCH_EXT)

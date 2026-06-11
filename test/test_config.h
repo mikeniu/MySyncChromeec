@@ -40,19 +40,7 @@
 #define CONFIG_MALLOC
 #endif
 
-#ifdef TEST_MATH_UTIL
-#define CONFIG_MATH_UTIL
-#endif
 
-#ifdef TEST_FLOAT
-#define CONFIG_FPU
-#define CONFIG_MAG_CALIBRATE
-#endif
-
-#ifdef TEST_FP
-#undef CONFIG_FPU
-#define CONFIG_MAG_CALIBRATE
-#endif
 
 #ifdef TEST_RMA_AUTH
 

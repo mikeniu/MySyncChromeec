@@ -12,22 +12,14 @@ _common_dir:=$(dir $(lastword $(MAKEFILE_LIST)))
 common-y=util.o
 common-y+=version.o printf.o queue.o queue_policies.o
 
-common-$(CONFIG_ACCELGYRO_BMA255)+=math_util.o
-common-$(CONFIG_ACCELGYRO_BMI160)+=math_util.o
-common-$(CONFIG_ACCELGYRO_LSM6DS0)+=math_util.o
-common-$(CONFIG_ACCELGYRO_LSM6DSM)+=math_util.o
-common-$(CONFIG_ACCELGYRO_LSM6DSO)+=math_util.o
-common-$(CONFIG_ACCEL_LIS2DW12)+=math_util.o
-common-$(CONFIG_ACCEL_LIS2DH)+=math_util.o
-common-$(CONFIG_ACCEL_KXCJ9)+=math_util.o
-common-$(CONFIG_ACCEL_KX022)+=math_util.o
+
 ifneq ($(CORE),cortex-m)
 common-$(CONFIG_AES)+=aes.o
 endif
 common-$(CONFIG_AES_GCM)+=aes-gcm.o
 common-$(CONFIG_AP_RO_VERIFICATION)+=ap_ro_integrity_check.o
 common-$(CONFIG_CMD_ADC)+=adc.o
-common-$(HAS_TASK_ALS)+=als.o
+
 common-$(CONFIG_AP_HANG_DETECT)+=ap_hang_detect.o
 common-$(CONFIG_AUDIO_CODEC)+=audio_codec.o
 common-$(CONFIG_AUDIO_CODEC_DMIC)+=audio_codec_dmic.o
@@ -69,7 +61,7 @@ common-$(CONFIG_FLASH_NVMEM)+=nvmem.o
 common-$(CONFIG_FLASH_NVMEM)+=new_nvmem.o
 common-$(CONFIG_FLASH_NVMEM_VARS)+=nvmem_vars.o
 common-$(CONFIG_FMAP)+=fmap.o
-common-$(CONFIG_GESTURE_SW_DETECTION)+=gesture.o
+
 common-$(CONFIG_HOSTCMD_EVENTS)+=host_event_commands.o
 common-$(CONFIG_HOSTCMD_RTC)+=rtc.o
 common-$(CONFIG_I2C_CONTROLLER)+=i2c_controller.o
@@ -80,11 +72,10 @@ common-$(CONFIG_KEYBOARD_PROTOCOL_8042)+=keyboard_8042.o \
 common-$(CONFIG_KEYBOARD_PROTOCOL_MKBP)+=keyboard_mkbp.o
 common-$(CONFIG_KEYBOARD_TEST)+=keyboard_test.o
 
-common-$(CONFIG_LID_ANGLE)+=motion_lid.o math_util.o
-common-$(CONFIG_LID_ANGLE_UPDATE)+=lid_angle.o
+
 common-$(CONFIG_LID_SWITCH)+=lid_switch.o
 common-$(CONFIG_LPC)+=acpi.o port80.o ec_features.o
-common-$(CONFIG_MAG_CALIBRATE)+= mag_cal.o math_util.o vec3.o mat33.o mat44.o
+
 common-$(CONFIG_MKBP_EVENT)+=mkbp_event.o
 common-$(CONFIG_PECI_COMMON)+=peci.o
 common-$(CONFIG_PHYSICAL_PRESENCE)+=physical_presence.o
@@ -99,7 +90,7 @@ common-$(CONFIG_RMA_AUTH)+=rma_auth.o
 common-$(CONFIG_RSA)+=rsa.o
 common-$(CONFIG_RWSIG)+=rwsig.o vboot/common.o
 common-$(CONFIG_RWSIG_TYPE_RWSIG)+=vboot/vb21_lib.o
-common-$(CONFIG_MATH_UTIL)+=math_util.o
+
 common-$(CONFIG_SHA1)+= sha1.o
 common-$(CONFIG_SHA256)+=sha256.o
 common-$(CONFIG_SOFTWARE_CLZ)+=clz.o
