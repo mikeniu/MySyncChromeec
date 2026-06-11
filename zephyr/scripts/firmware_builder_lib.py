@@ -8,6 +8,7 @@ import argparse
 import multiprocessing
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 
@@ -94,6 +95,43 @@ def prepare_codebase(opts):
             print(f"Failed to apply patch {patch_file}: {e}")
             sys.exit(1)
 
+    if not hasattr(opts, "src_override_dir"):
+        return
+
+    src_override_dir = pathlib.Path(opts.src_override_dir)
+    if not src_override_dir.exists():
+        print(
+            f"Source override directory {src_override_dir} does not exist. "
+            "Skipping file copying."
+        )
+        return
+
+    print(f"Copying files from {src_override_dir}")
+    checkout_root = find_checkout()
+
+    copied_files = []
+    for root, _, files in os.walk(src_override_dir):
+        for file in files:
+            copied_files.append(pathlib.Path(root) / file)
+
+    if not copied_files:
+        print(f"No files found in {src_override_dir}.")
+        return
+
+    for src_file in copied_files:
+        rel_path = src_file.relative_to(src_override_dir)
+        target_file = checkout_root / rel_path
+
+        # Create parent directories if they don't exist
+        target_file.parent.mkdir(parents=True, exist_ok=True)
+
+        print(f"Copying {src_file} to {target_file}")
+        try:
+            shutil.copy2(src_file, target_file)
+        except (OSError, shutil.Error) as e:
+            print(f"Failed to copy {src_file} to {target_file}: {e}")
+            sys.exit(1)
+
 
 def create_arg_parser(build, bundle, test):
     """Parse all command line args and return opts dict."""
@@ -146,6 +184,14 @@ def create_arg_parser(build, bundle, test):
             find_checkout() / "src" / "platform" / "ec-private" / "patches"
         ),
         help="Path to the patches directory",
+    )
+
+    parser.add_argument(
+        "--src-override-dir",
+        default=str(
+            find_checkout() / "src" / "platform" / "ec-private" / "src-override"
+        ),
+        help="Path to the directory for source file overrides",
     )
 
     # Would make this required=True, but not available until 3.7
