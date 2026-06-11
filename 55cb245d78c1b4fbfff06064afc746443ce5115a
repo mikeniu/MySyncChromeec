@@ -69,6 +69,24 @@
       "parentUuid": "9687b247_fc712777",
       "revId": "55cb245d78c1b4fbfff06064afc746443ce5115a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84a621d6_c1b594c3",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 1346,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-06-11T11:55:23Z",
+      "side": 1,
+      "message": "Got it. updated patch guard clause style and reformatted to avoid the extra indentation and line length issue. I usually run cros format before repo upload .  also run hook scripts, I don\u0027t know why it not caught while uploading",
+      "parentUuid": "1c10d184_9c4c747d",
+      "revId": "55cb245d78c1b4fbfff06064afc746443ce5115a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
