@@ -43,6 +43,18 @@ static K_WORK_DELAYABLE_DEFINE(dpm_work, pdc_dpm_balance_source_ports);
 
 static K_MUTEX_DEFINE(max_current_claimed_mtx);
 
+#ifdef CONFIG_USBC_PDC_DPM_STICKY_LOCK
+static atomic_t forced_1500ma_mask;
+bool pdc_dpm_is_port_locked_at_1500(int port)
+{
+	return atomic_test_bit(&forced_1500ma_mask, port);
+}
+void pdc_dpm_clear_1500ma_lock(int port)
+{
+	atomic_clear_bit(&forced_1500ma_mask, port);
+}
+#endif /* CONFIG_USBC_PDC_DPM_STICKY_LOCK */
+
 #define LOWEST_PORT(p) __builtin_ctz(p) /* Undefined behavior if p == 0 */
 
 static int count_port_bits(uint32_t bitmask)
@@ -328,6 +340,16 @@ int pdc_dpm_get_source_current(const int port)
 		return 0;
 	}
 
+#ifdef CONFIG_USBC_PDC_DPM_STICKY_LOCK
+	/* Override the reported current to 1.5A if the sticky lock is
+	 * engaged, bypassing the internal ledger state to reflect the actual
+	 * physical contract.
+	 */
+	if (atomic_test_bit(&forced_1500ma_mask, port)) {
+		return 1500;
+	}
+#endif
+
 	if (max_current_claimed & BIT(port)) {
 		return 3000;
 	}
@@ -337,3 +359,44 @@ int pdc_dpm_get_source_current(const int port)
 	 */
 	return 1500;
 }
+
+#ifdef CONFIG_USBC_PDC_DPM_STICKY_LOCK
+/*
+ * Set the source current limit for a specific port.
+ * This modifies the DPM ledger and triggers a re-evaluation of the PD contract.
+ */
+void pdc_dpm_set_source_current_limit(int port, uint16_t current_ma)
+{
+	k_mutex_lock(&max_current_claimed_mtx, K_FOREVER);
+
+	/* If the port is locked at 1.5A and the requested current is higher,
+	 * ignore the request and return early to prevent restoring 3.0A.
+	 */
+	if (current_ma > 1500 && atomic_test_bit(&forced_1500ma_mask, port)) {
+		LOG_INF("DPM: Port %d locked at 1.5A. Ignored request for %d mA",
+			port, current_ma);
+		k_mutex_unlock(&max_current_claimed_mtx);
+		return;
+	}
+
+	if (current_ma <= 1500) {
+		max_current_claimed &= ~BIT(port);
+		atomic_clear_bit(&sink_max_pdo_requested, port);
+		atomic_clear_bit(&source_frs_max_requested, port);
+		atomic_clear_bit(&non_pd_sink_max_requested, port);
+
+		/* Engage the sticky lock for this port. */
+		atomic_set_bit(&forced_1500ma_mask, port);
+	} else {
+		/* Clear the sticky lock when restoring to a higher current. */
+		atomic_clear_bit(&forced_1500ma_mask, port);
+		/* Set sink flag to hold the 3A current request during DPM
+		 * re-evaluation */
+		atomic_set_bit(&sink_max_pdo_requested, port);
+		k_work_reschedule(&dpm_work, K_NO_WAIT);
+	}
+
+	k_mutex_unlock(&max_current_claimed_mtx);
+	pdc_power_mgmt_set_new_power_request(port);
+}
+#endif /* CONFIG_USBC_PDC_DPM_STICKY_LOCK */

@@ -6020,6 +6020,18 @@ int pdc_power_mgmt_set_current_limit(int port_num,
 	if (!pdc_power_mgmt_is_pdc_port_valid(port_num)) {
 		return -ERANGE;
 	}
+#ifdef CONFIG_USBC_PDC_DPM_STICKY_LOCK
+	/* Reject the request with -EBUSY to prevent the upper layer (AP/OS)
+	 * from falsely updating its state to 3.0A while the hardware is locked
+	 * at 1.5A.
+	 */
+	if (current == TC_CURRENT_3_0A &&
+	    pdc_dpm_is_port_locked_at_1500(port_num)) {
+		LOG_INF("C%d: Blocked attempt to restore 3.0A due to sticky lock",
+			port_num);
+		return -EBUSY;
+	}
+#endif
 
 	pdc = &pdc_data[port_num]->port;
 
