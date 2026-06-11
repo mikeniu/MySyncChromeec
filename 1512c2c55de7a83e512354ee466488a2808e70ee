@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88109729_e4b07a44",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-06-11T22:28:09Z",
+      "side": 1,
+      "message": "Resubmit once https://crrev.com/c/7925637 has merged and annealed",
+      "revId": "1512c2c55de7a83e512354ee466488a2808e70ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
