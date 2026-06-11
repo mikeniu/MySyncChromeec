@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "506caaa2_dcf96cef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000039
+      },
+      "writtenOn": "2026-06-11T23:40:53Z",
+      "side": 1,
+      "message": "while checking the image header size is a good start, the real check should be at the point where data is written into flash: in this case even images with size larger than the header advertised value would be discarded.",
+      "revId": "fa909e6335ffd7a9d2bace63a50f57470f8baf66",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
