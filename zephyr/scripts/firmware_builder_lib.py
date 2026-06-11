@@ -6,6 +6,93 @@
 
 import argparse
 import multiprocessing
+import os
+import pathlib
+import subprocess
+import sys
+
+
+def find_checkout():
+    """Find the path to the base of the checkout (e.g., ~/chromiumos)."""
+    for path in pathlib.Path(__file__).resolve().parents:
+        if (path / ".repo").is_dir():
+            return path
+    raise FileNotFoundError("Unable to locate the root of the checkout")
+
+
+def prepare_codebase(opts):
+    """Apply patches recursively from patches_dir to the checkout."""
+    patches_dir = pathlib.Path(opts.patches_dir)
+
+    if not patches_dir.exists():
+        print(
+            f"Patches directory {patches_dir} does not exist. Skipping patch application."
+        )
+        return
+
+    checkout_root = find_checkout()
+
+    patch_files = []
+    for root, _, files in os.walk(patches_dir):
+        for file in files:
+            if file.endswith(".patch"):
+                patch_files.append(pathlib.Path(root) / file)
+
+    patch_files.sort()
+
+    if not patch_files:
+        print(f"No patches found in {patches_dir}.")
+        return
+
+    for patch_file in patch_files:
+        rel_path = patch_file.relative_to(patches_dir)
+        target_rel_dir = rel_path.parent
+        target_dir = checkout_root / target_rel_dir
+
+        if not target_dir.exists():
+            print(
+                f"Warning: Target directory {target_dir} for patch "
+                f"{patch_file} does not exist. Skipping."
+            )
+            continue
+
+        print(f"Processing patch {patch_file} for {target_dir}")
+        try:
+            # Check if it can be applied
+            can_apply = subprocess.run(
+                ["git", "apply", "--check", str(patch_file)],
+                cwd=target_dir,
+                capture_output=True,
+                check=False,
+            )
+            if can_apply.returncode == 0:
+                subprocess.run(
+                    ["git", "apply", str(patch_file)],
+                    cwd=target_dir,
+                    check=True,
+                )
+                print(f"Applied patch {patch_file}")
+            else:
+                # Check if already applied
+                already_applied = subprocess.run(
+                    ["git", "apply", "-R", "--check", str(patch_file)],
+                    cwd=target_dir,
+                    capture_output=True,
+                    check=False,
+                )
+                if already_applied.returncode == 0:
+                    print(f"Patch {patch_file} already applied. Skipping.")
+                else:
+                    print(
+                        f"Error: Patch {patch_file} cannot be applied "
+                        "and does not seem to be already applied."
+                    )
+                    print(f"stdout: {can_apply.stdout.decode()}")
+                    print(f"stderr: {can_apply.stderr.decode()}")
+                    sys.exit(1)
+        except subprocess.CalledProcessError as e:
+            print(f"Failed to apply patch {patch_file}: {e}")
+            sys.exit(1)
 
 
 def create_arg_parser(build, bundle, test):
@@ -51,6 +138,14 @@ def create_arg_parser(build, bundle, test):
         required=False,
         # TODO(b/180008931): make this required=True.
         help="BCS version to include in metadata.",
+    )
+
+    parser.add_argument(
+        "--patches-dir",
+        default=str(
+            find_checkout() / "src" / "platform" / "ec-private" / "patches"
+        ),
+        help="Path to the patches directory",
     )
 
     # Would make this required=True, but not available until 3.7
