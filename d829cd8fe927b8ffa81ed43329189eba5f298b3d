@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d99ffb57_a4905e5a",
+        "filename": "zephyr/subsys/adsp_comms/adsp_comms.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-06-11T20:28:38Z",
+      "side": 1,
+      "message": "`-1` is the uninitialized value. Maybe leave it as-is instead of `0`?",
+      "range": {
+        "startLine": 53,
+        "startChar": 5,
+        "endLine": 53,
+        "endChar": 12
+      },
+      "revId": "d829cd8fe927b8ffa81ed43329189eba5f298b3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
