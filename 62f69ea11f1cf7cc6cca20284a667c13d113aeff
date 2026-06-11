@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58cf5281_feadcab4",
+        "filename": "zephyr/firmware_builder.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 858,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-06-11T18:53:14Z",
+      "side": 1,
+      "message": "temporary",
+      "range": {
+        "startLine": 858,
+        "startChar": 18,
+        "endLine": 858,
+        "endChar": 28
+      },
+      "revId": "62f69ea11f1cf7cc6cca20284a667c13d113aeff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
