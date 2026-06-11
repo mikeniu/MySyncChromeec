@@ -34,6 +34,23 @@
       "parentUuid": "b47d6e76_ba3cd2c2",
       "revId": "c6bb0f6c60e9440557e7e57c98997589a9a03537",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac069d6b_b535e13f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-11T15:20:36Z",
+      "side": 1,
+      "message": "Do you know what other threads are getting the wrong state?  \n\nI\u0027m not against this change, I initially wanted this for all Zephyr boards, but we wanted to limit the scope of impact in case of introducing any potential dead lock scenarios.  I think this code has matured enough that we can safely expand its coverage.",
+      "revId": "c6bb0f6c60e9440557e7e57c98997589a9a03537",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
