@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5c9b7ee9_bdd8666c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-06-11T17:44:23Z",
+      "side": 1,
+      "message": "I don\u0027t think we need to worry about this, the AP does not attempt to set Src Current on our PDC-based devices.",
+      "range": {
+        "startLine": 17,
+        "startChar": 16,
+        "endLine": 17,
+        "endChar": 21
+      },
+      "revId": "a71ffbfee967a265d65f1b6e9d50716729c46c3b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e97b7a72_d795ba43",
         "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
         "patchSetId": 1
@@ -76,6 +99,29 @@
         "startChar": 19,
         "endLine": 382,
         "endChar": 23
+      },
+      "revId": "a71ffbfee967a265d65f1b6e9d50716729c46c3b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41d3ad92_f3296254",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-06-11T17:44:23Z",
+      "side": 1,
+      "message": "Is it possible to do this within the existing DPM? I mean, can you instead override `pd_get_usb_pd_3a_ports()` to return 0 to block 3A allocation? \n\nThis would allow us to have a single source of truth for 3A allocation instead of checking both the available 3A ports and each port for a 1.5A forced limit",
+      "range": {
+        "startLine": 389,
+        "startChar": 2,
+        "endLine": 389,
+        "endChar": 16
       },
       "revId": "a71ffbfee967a265d65f1b6e9d50716729c46c3b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
