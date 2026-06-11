@@ -325,6 +325,10 @@ int pdc_dpm_get_source_current(const int port)
 		return 0;
 	}
 
+	if (pd_get_usb_pd_3a_ports() == 0) {
+		return 1500;
+	}
+
 	if (max_current_claimed & BIT(port)) {
 		return 3000;
 	}
