@@ -73,9 +73,12 @@ cmd_flat_to_obj = $(CC) -Wl,-T $(out)/firmware_image.lds -nostdlib $(CFLAGS) \
 # Allow the .roshared section to overlap other sections (itself)
 cmd_ec_elf_to_flat ?= $(OBJCOPY) --set-section-flags .roshared=share \
 				-O binary $< $@
-cmd_elf_to_signed ?= $(SIGNER) --key=util/signer/$(3) --override-keyid \
-	--b --input=$< --format=bin --output=$@.signed $(SIGNER_EXTRAS) \
-	&& sudo chown $(shell whoami) $@.signed && mv $@.signed $@
+cmd_elf_to_signed ?= ./util/signer/signer_helper.py \
+	--signer=$(SIGNER) \
+	--branch=$(BRANCH) \
+	--output=$@ \
+	--key=util/signer/$(3) \
+	--override-keyid --b --input=$< --format=bin $(SIGNER_EXTRAS)
 cmd_elf_to_elf_fips = ./util/inject_fips_fingerprint.sh $(OBJCOPY) $(OBJDUMP) \
 	$^ $(CHECK_FIPS) $(silent)
 cmd_elf_to_dis = $(OBJDUMP) -D $< > $@
