@@ -122,6 +122,24 @@
       "parentUuid": "2979e3aa_909fa60f",
       "revId": "6ab1efe165d71b86d7b541d53eb6d50aea46c3d9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b37aa6e_8012d476",
+        "filename": "zephyr/emul/emul_common_i2c.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-12T21:08:56Z",
+      "side": 1,
+      "message": "Changes this around to fail at the entry point I ran any tests that were utilizing the I2C emulator and looks like it is working as expected",
+      "parentUuid": "3b4f32c1_85e2559a",
+      "revId": "6ab1efe165d71b86d7b541d53eb6d50aea46c3d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
