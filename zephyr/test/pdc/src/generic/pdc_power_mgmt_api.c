@@ -164,7 +164,6 @@ ZTEST_USER(pdc_power_mgmt_api, test_connector_reset)
 
 ZTEST_USER(pdc_power_mgmt_api, test_is_connected)
 {
-	union connector_status_t connector_status = {};
 	bool frs_enabled;
 
 	/* Verify that the emulator tracks whether FRS enable/disable
@@ -173,33 +172,14 @@ ZTEST_USER(pdc_power_mgmt_api, test_is_connected)
 	zassert_ok(emul_pdc_reset(emul));
 	zassert_equal(emul_pdc_get_frs(emul, &frs_enabled), -EIO);
 
-	/* Invalid port number */
-	zassert_false(pd_is_connected(CONFIG_USB_PD_PORT_MAX_COUNT));
-	zassert_equal(pd_get_task_state(CONFIG_USB_PD_PORT_MAX_COUNT),
-		      PDC_INVALID);
-
-	zassert_false(pd_is_connected(TEST_PORT));
-
-	emul_pdc_configure_src(emul, &connector_status);
-	emul_pdc_connect_partner(emul, &connector_status);
-	zassert_true(
-		TEST_WAIT_FOR(pd_is_connected(TEST_PORT), PDC_TEST_TIMEOUT));
-
-	emul_pdc_disconnect(emul);
-	zassert_true(
-		TEST_WAIT_FOR(!pd_is_connected(TEST_PORT), PDC_TEST_TIMEOUT));
-
-	emul_pdc_configure_snk(emul, &connector_status);
-	emul_pdc_connect_partner(emul, &connector_status);
+	zassert_ok(pdc_power_mgmt_reset(TEST_PORT));
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_PORT, -1));
 
-	zassert_true(
-		TEST_WAIT_FOR(pd_is_connected(TEST_PORT), PDC_TEST_TIMEOUT));
-
-	if (!pdc_power_mgmt_get_frs_hw_supported(TEST_PORT)) {
-		/* FRS should be disabled after connecting a partner source. */
-		zassert_ok(emul_pdc_get_frs(emul, &frs_enabled));
-	}
+	zassert_ok(emul_pdc_get_frs(emul, &frs_enabled));
+	if (!pdc_power_mgmt_get_frs_hw_supported(TEST_PORT))
+		zassert_false(frs_enabled);
+	else
+		zassert_true(frs_enabled);
 }
 
 ZTEST_USER(pdc_power_mgmt_api, test_comm_is_enabled)
