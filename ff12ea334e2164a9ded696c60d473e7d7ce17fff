@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83f4e749_ed913154",
+        "filename": "zephyr/drivers/pwrmon/Kconfig",
+        "patchSetId": 34
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-12T19:07:05Z",
+      "side": 1,
+      "message": "If this and `PWRMON_POWER_MONITOR_PAC194X` are mutually exclusive, then use a `choice` style symbol.",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 34
+      },
+      "revId": "ff12ea334e2164a9ded696c60d473e7d7ce17fff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22ee8759_2f2fc9a6",
+        "filename": "zephyr/drivers/pwrmon/power_monitor.h",
+        "patchSetId": 34
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-12T19:07:05Z",
+      "side": 1,
+      "message": "Missing copyright header and formatting is not correct.\nPlease make sure you are running pre-upload checks using `repo upload . --cbr` instead of `git push`",
+      "range": {
+        "startLine": 1,
+        "startChar": 8,
+        "endLine": 1,
+        "endChar": 46
+      },
+      "revId": "ff12ea334e2164a9ded696c60d473e7d7ce17fff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
