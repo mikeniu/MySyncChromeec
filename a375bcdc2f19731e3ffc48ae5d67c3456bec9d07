@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a0e49c3_0d8f02cc",
+        "filename": "zephyr/program/bluey/CMakeLists.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1544342
+      },
+      "writtenOn": "2026-06-12T06:08:43Z",
+      "side": 1,
+      "message": "Please remove the trailing whitespace.",
+      "range": {
+        "startLine": 30,
+        "startChar": 60,
+        "endLine": 30,
+        "endChar": 61
+      },
+      "revId": "a375bcdc2f19731e3ffc48ae5d67c3456bec9d07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "826a8022_35938a74",
+        "filename": "zephyr/program/bluey/CMakeLists.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1544342
+      },
+      "writtenOn": "2026-06-12T06:08:43Z",
+      "side": 1,
+      "message": "Please remove the trailing whitespace.",
+      "range": {
+        "startLine": 33,
+        "startChar": 60,
+        "endLine": 33,
+        "endChar": 61
+      },
+      "revId": "a375bcdc2f19731e3ffc48ae5d67c3456bec9d07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b37d3d1d_3129f5b0",
+        "filename": "zephyr/program/bluey/mica/src/mica_throttle.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1544342
+      },
+      "writtenOn": "2026-06-12T06:08:43Z",
+      "side": 1,
+      "message": "use tab",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 8
+      },
+      "revId": "a375bcdc2f19731e3ffc48ae5d67c3456bec9d07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6662a6d3_ec3d6893",
+        "filename": "zephyr/program/bluey/mica/src/mica_throttle.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1544342
+      },
+      "writtenOn": "2026-06-12T06:08:43Z",
+      "side": 1,
+      "message": "use tab",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 8
+      },
+      "revId": "a375bcdc2f19731e3ffc48ae5d67c3456bec9d07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6527241f_78a6e345",
+        "filename": "zephyr/program/bluey/mica/src/mica_throttle.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1544342
+      },
+      "writtenOn": "2026-06-12T06:08:43Z",
+      "side": 1,
+      "message": "use tab",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 20
+      },
+      "revId": "a375bcdc2f19731e3ffc48ae5d67c3456bec9d07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
