@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71fd94ab_bef17c83",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1158719
+      },
+      "writtenOn": "2026-06-12T13:35:46Z",
+      "side": 1,
+      "message": "```\n      15:38:09: WARNING: include/system.h: needs formatting\n      15:38:05: WARNING: common/usbc/usb_pd_console.c: needs formatting\n      15:38:08: WARNING: include/hwtimer.h: needs formatting\n      15:38:04: WARNING: chip/stm32/usb_endpoints.c: needs formatting\n      15:38:03: WARNING: chip/stm32/flash-f.c: needs formatting\n      15:38:05: WARNING: common/panic_output.c: needs formatting\n      15:38:08: WARNING: include/panic.h: needs formatting\n      15:38:01: WARNING: chip/host/reboot.h: needs formatting\n      15:38:03: WARNING: chip/stm32/spi.c: needs formatting\n      15:38:11: NOTICE: You can fix formatting errors by running:\n        cros format chip/host/reboot.h chip/stm32/flash-f.c chip/stm32/spi.c chip/stm32/usb_endpoints.c common/panic_output.c common/usbc/usb_pd_console.c include/hwtimer.h include/panic.h include/system.h\n```\n\nnone of these were touched by this CL, will add a parent commit to appease the presubmits i guess",
+      "revId": "388f184b2c96084c23dfc16ee19c42ea698f334d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
