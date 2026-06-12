@@ -22,6 +22,30 @@
       },
       "revId": "fc702dac613b7a1b45a0a94a839a94ad745b4a86",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e72d2182_97bf5e83",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-06-12T22:15:17Z",
+      "side": 1,
+      "message": "This is written into the PD Spec, section 5.8.6.3 Fast Role Swap Detection\n\n\u003e The Initial Sink Shall only respond to the Fast Role Swap Request when all the following conditions have been met\n\u003e ...\n\u003e The Initial Sink is able and willing to source the current requested by the Initial Source in the Fast Role\nSwap bits of its Sink_Capabilities Message\n\nThere won\u0027t be details in the spec about which layer this needs to be implemented at, but I think it is reasonable to point to this and ask our PD vendors to not request an FR Swap when the power isn\u0027t available.\n\nIf this isn\u0027t implemented correctly by a PDC we could end up with the PDC sending an FR_Swap request to a partner which requires 15W, then not be able to supply 15W after the swap. But this is functionally the same behavior we have now where FR swap is just disabled.",
+      "parentUuid": "de4c4212_395bbde4",
+      "range": {
+        "startLine": 11,
+        "startChar": 38,
+        "endLine": 14,
+        "endChar": 0
+      },
+      "revId": "fc702dac613b7a1b45a0a94a839a94ad745b4a86",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
