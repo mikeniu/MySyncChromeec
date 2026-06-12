@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "740d4853_1cc90d4d",
+        "filename": "zephyr/test/ec-aic/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-06-12T17:07:32Z",
+      "side": 1,
+      "message": "guess this can mention RTK as well now?",
+      "revId": "36a4ae025d551716c7a7cbdf2eb71d8995f34b0f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
