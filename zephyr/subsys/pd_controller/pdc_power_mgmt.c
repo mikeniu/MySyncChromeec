@@ -645,6 +645,8 @@ BUILD_ASSERT(ARRAY_SIZE(pdc_state_names) == PDC_STATE_COUNT,
 enum policy_common_t {
 	/** COMMON_POLICY_SET_POWER_STATE */
 	COMMON_POLICY_SET_POWER_STATE,
+	/** COMMON_POLICY_SET_RP */
+	COMMON_POLICY_SET_RP,
 	/** COMMON_POLICY_GET_ALERT */
 	COMMON_POLICY_GET_ALERT,
 	/** When set, run CMD_PDC_SET_SBU_MUX_MODE to set the port's SBU mux
@@ -806,8 +808,6 @@ enum policy_src_attached_t {
 	SRC_POLICY_SWAP_TO_SNK,
 	/** Forces sink-only operation, even if it requires a disconnect */
 	SRC_POLICY_FORCE_SNK,
-	/** Triggers sending CMD_SET_POWER_LEVEL to set Rp value */
-	SRC_POLICY_SET_RP,
 	/** Trigger a call into DPM source current balancing policy */
 	SRC_POLICY_EVAL_SNK_FIXED_PDO,
 	/** Triggers a Get_Sink_Cap message to the partner. */
@@ -1772,6 +1772,13 @@ static bool run_common_policies(struct pdc_port_t *port)
 	}
 
 	if (atomic_test_and_clear_bit(port->common_policy.flags,
+				      COMMON_POLICY_SET_RP)) {
+		/* Check if Rp value needs to be adjusted */
+		queue_internal_cmd(port, CMD_PDC_SET_POWER_LEVEL);
+		return true;
+	}
+
+	if (atomic_test_and_clear_bit(port->common_policy.flags,
 				      COMMON_POLICY_GET_ALERT)) {
 		/* Read latest ADO */
 		queue_internal_cmd(port, CMD_PDC_GET_ALERT);
@@ -2239,12 +2246,8 @@ static void run_typec_src_policies(struct pdc_port_t *port)
 		return;
 	}
 
-	/* Check if Rp value needs to be adjusted */
 	if (atomic_test_and_clear_bit(port->src_policy.flags,
-				      SRC_POLICY_SET_RP)) {
-		queue_internal_cmd(port, CMD_PDC_SET_POWER_LEVEL);
-	} else if (atomic_test_and_clear_bit(port->src_policy.flags,
-					     SRC_POLICY_FORCE_SNK)) {
+				      SRC_POLICY_FORCE_SNK)) {
 		queue_internal_cmd(port, CMD_PDC_SET_CCOM);
 	} else if (atomic_test_and_clear_bit(port->src_policy.flags,
 					     SRC_POLICY_UPDATE_SRC_CAPS)) {
@@ -6010,7 +6013,7 @@ int pdc_power_mgmt_set_current_limit(int port_num,
 		 * Active TypeC only SRC connection. Because the connection is
 		 * active and not a PD connection, apply the new Rp value now.
 		 */
-		atomic_set_bit(pdc->src_policy.flags, SRC_POLICY_SET_RP);
+		atomic_set_bit(pdc->common_policy.flags, COMMON_POLICY_SET_RP);
 		__fallthrough;
 	case SRC_ATTACHED_STATE:
 		/*
@@ -6024,6 +6027,11 @@ int pdc_power_mgmt_set_current_limit(int port_num,
 			       SRC_POLICY_UPDATE_SRC_CAPS);
 		break;
 	case SNK_ATTACHED_STATE:
+		/*
+		 * Src policy can be set in a Snk connection to support an FRS
+		 * partner. Update RP accordingly.
+		 */
+		atomic_set_bit(pdc->common_policy.flags, COMMON_POLICY_SET_RP);
 		__fallthrough;
 	case SNK_ATTACHED_TYPEC_ONLY_STATE:
 		/* Even when operating as a SNK, update the SRC caps
