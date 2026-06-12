@@ -20,13 +20,6 @@
 void pdc_dpm_eval_sink_fixed_pdo(int port, uint32_t vsafe5v_pdo);
 
 /**
- * @brief Add USB PD source to max current request
- *
- * @param port USBC port number
- */
-void pdc_dpm_add_pd_source(int port);
-
-/**
  * @brief Add typec-only port to max current request
  *
  * @param port USBC port number
