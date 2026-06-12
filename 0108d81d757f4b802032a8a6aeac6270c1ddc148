@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5614d62_be441f44",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-06-12T06:34:18Z",
+      "side": 1,
+      "message": "BSP PM CL:7921952 merged. We can enable Atria ISH PM now.",
+      "revId": "0108d81d757f4b802032a8a6aeac6270c1ddc148",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
