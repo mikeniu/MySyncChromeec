@@ -69,6 +69,24 @@
       "parentUuid": "dec77deb_49ca9814",
       "revId": "c6bb0f6c60e9440557e7e57c98997589a9a03537",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bb76f66_b1cd8cb3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3387694
+      },
+      "writtenOn": "2026-06-12T03:11:23Z",
+      "side": 1,
+      "message": "We found that only these two threads hit the race condition currently.",
+      "parentUuid": "ac069d6b_b535e13f",
+      "revId": "c6bb0f6c60e9440557e7e57c98997589a9a03537",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
