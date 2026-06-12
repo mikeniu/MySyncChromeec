@@ -150,8 +150,7 @@ test_mockable_static
 #if !(defined(TEST_FUZZ) || defined(CONFIG_ZTEST))
 	__noreturn
 #endif
-	void
-	complete_panic(const char *fname, int linenum)
+	void complete_panic(const char *fname, int linenum)
 {
 	/* Top two bytes of info register is first two characters of file name.
 	 * Bottom two bytes of info register is line number.
