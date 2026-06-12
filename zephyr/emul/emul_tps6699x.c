@@ -646,9 +646,8 @@ static void
 tps6699x_emul_handle_port_control(struct tps6699x_emul_pdc_data *data,
 				  const union reg_port_control *pc)
 {
-	if (data->port_control.fr_swap_enabled != pc->fr_swap_enabled) {
-		data->frs_configured = true;
-	}
+	/* Any access to this register sets the FRS bit */
+	data->frs_configured = true;
 
 	/*
 	 * The tps6699x driver doesn't send the UCSI_SET_UOR cmd to control data
