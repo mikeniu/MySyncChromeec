@@ -529,6 +529,24 @@
       "parentUuid": "b679e3f8_b587c3f6",
       "revId": "a405444314a2cc5767a76de98a34fe33ca6c27ea",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08e1bea1_6e8eb367",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-06-12T15:37:13Z",
+      "side": 1,
+      "message": "I made an test with sending multiple channels per one `GET` command:\n\nFor batch of 4 with current upstream version of PAC194X driver, EC needs 6-8 ms to return response, for 8 channel batch around 10-15 ms are needed to send back data.\n\nHowever, If this [PR](https://github.com/zephyrproject-rtos/zephyr/pull/109415) gets merged, EC needs 3-5 ms for 4 channel batch and 4-7 ms for batch of 8. Additionally this PR will simplify `pwrmon` logic.",
+      "parentUuid": "391237bb_e284e075",
+      "revId": "a405444314a2cc5767a76de98a34fe33ca6c27ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
