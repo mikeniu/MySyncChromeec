@@ -924,22 +924,9 @@ flash_err:
 	return -1;
 }
 
-/* Function: Frame operation */
-int frame(int uart_fd, const char *file_name)
+/* Function: Upload data to SRAM page by page */
+int upload_to_sram(int uart_fd, const char *file_name, uint32_t sram_start)
 {
-	printf("Frame operation initiated\n");
-	char monitor_version[32] = "";
-	uint32_t monitor_features = 0;
-
-	if (get_monitor_metadata(file_name, monitor_version,
-				 sizeof(monitor_version), &monitor_features)) {
-		printf("Monitor version: %s\n", monitor_version);
-		printf("Monitor features: 0x%08X\n", monitor_features);
-	} else {
-		fprintf(stderr, "Failed to parse monitor metadata from %s\n",
-			file_name);
-	}
-
 	FILE *file = fopen(file_name, "rb");
 	if (!file) {
 		perror("Failed to open binary file");
@@ -956,30 +943,79 @@ int frame(int uart_fd, const char *file_name)
 
 	while (total_bytes_sent < total_file_size) {
 		for (size_t i = 0; total_bytes_sent < total_file_size; i++) {
-			uint32_t sram_address =
-				FRAME_SRAM_BASE_ADDRESS + (i * PAGE_SIZE);
+			uint32_t sram_address = sram_start + (i * PAGE_SIZE);
 
 			/* Just send pages to EC's ram */
 			if (send_pages(uart_fd, file, sram_address,
 				       &total_bytes_sent, &page) != 0) {
-				goto frame_err;
+				fclose(file);
+				return -1;
 			}
 		}
 
-		DBG_PRINT("EC successfully processed function pointer.\n");
 		/* End loop if this is the final round */
 		if (total_bytes_sent >= total_file_size) {
 			break;
 		}
 	}
-
-	printf("Frame operation finished.\n");
 	fclose(file);
 	return 0;
+}
 
-frame_err:
-	fclose(file);
-	return -1;
+/* Function: Frame operation */
+int frame(int uart_fd, const char *file_name)
+{
+	printf("Frame operation initiated\n");
+	char monitor_version[32] = "";
+	uint32_t monitor_features = 0;
+
+	if (get_monitor_metadata(file_name, monitor_version,
+				 sizeof(monitor_version), &monitor_features)) {
+		printf("Monitor version: %s\n", monitor_version);
+		printf("Monitor features: 0x%08X\n", monitor_features);
+	} else {
+		fprintf(stderr, "Failed to parse monitor metadata from %s\n",
+			file_name);
+	}
+
+	if (upload_to_sram(uart_fd, file_name, FRAME_SRAM_BASE_ADDRESS) != 0) {
+		return -1;
+	}
+
+	printf("Frame operation finished.\n");
+	return 0;
+}
+
+int load_sram(int uart_fd, const char *file_name)
+{
+	/* b/518863832: The bootrom hard codes the GOTO target
+	 * address to 0x20010020. So this assumes the file
+	 * passed to the load_sram method is configured with
+	 * the start address and entry point both at this address.
+	 */
+	uint32_t sram_start = UPLOAD_FUNCTION_POINTER;
+	uint32_t sram_entry = UPLOAD_FUNCTION_POINTER;
+
+	printf("Load SRAM operation initiated\n");
+
+	if (upload_to_sram(uart_fd, file_name, sram_start) != 0) {
+		return -1;
+	}
+
+	DBG_PRINT("Sending entry point to EC: 0x%08X\n", sram_entry);
+	if (send_packet_b(uart_fd, START_FRAME_TO_WRITE_TO_FLASH, sram_entry) !=
+	    0) {
+		return -1;
+	}
+
+	if (wait_for_response(uart_fd, 0x06, RESPONSE_TIMEOUT) != 0) {
+		ERR_PRINT(
+			"\nFailed to receive expected response for entry point execution\n");
+		return -1;
+	}
+
+	printf("Load SRAM operation finished.\n");
+	return 0;
 }
 
 /* Function: Write protect (WP) operation */
@@ -1171,6 +1207,7 @@ void usage_print(const char *progname)
 	       "    %s --method frame --uart_dev <dev> [frame options]\n"
 	       "    %s --method wp --uart_dev <dev> [wp options]\n"
 	       "    %s --method read_bin --uart_dev <dev> [read_bin options]\n"
+	       "    %s --method load_sram --uart_dev <dev> [load_sram options]\n"
 	       "Flash options:\n"
 	       "  -s, --spi_start <spi_start>: Specifies the SPI flash offset\n"
 	       "  -f, --file <binary_file>: File to program with into flash.\n"
@@ -1182,8 +1219,10 @@ void usage_print(const char *progname)
 	       "read_bin options:\n"
 	       "  -s, --spi_start <spi_start>: Specifies the SPI flash offset\n"
 	       "  -f, --file <binary_file>: File to read from flash.\n"
-	       "  -o, --bin_length <bin_length>: Range read from flash.\n",
-	       progname, progname, progname, progname);
+	       "  -o, --bin_length <bin_length>: Range read from flash.\n"
+	       "Load SRAM options:\n"
+	       "  -f, --file <binary_file>: File to load into SRAM.\n",
+	       progname, progname, progname, progname, progname);
 }
 
 static void sighandler(int signum)
@@ -1317,6 +1356,17 @@ int main(int argc, char *argv[])
 		printf("Binary File: %s\n", file_name);
 		if (frame(uart_fd, file_name) != 0) {
 			fprintf(stderr, "Frame process failed\n");
+			goto main_err;
+		}
+	} else if (strcmp(method, "load_sram") == 0) {
+		if (!file_name) {
+			fprintf(stderr,
+				"load_sram missing file_name argument\n");
+			goto main_err;
+		}
+		printf("Binary File: %s\n", file_name);
+		if (load_sram(uart_fd, file_name) != 0) {
+			fprintf(stderr, "Load SRAM process failed\n");
 			goto main_err;
 		}
 	} else if (strcmp(method, "wp") == 0) {
