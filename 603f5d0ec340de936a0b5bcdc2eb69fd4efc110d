@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92cd7b40_b987c556",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1544342
+      },
+      "writtenOn": "2026-06-12T09:25:33Z",
+      "side": 1,
+      "message": "remove extra space",
+      "range": {
+        "startLine": 9,
+        "startChar": 50,
+        "endLine": 9,
+        "endChar": 51
+      },
+      "revId": "603f5d0ec340de936a0b5bcdc2eb69fd4efc110d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d986ea17_2c7437ba",
+        "filename": "zephyr/program/bluey/CMakeLists.txt",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1544342
+      },
+      "writtenOn": "2026-06-12T09:25:33Z",
+      "side": 1,
+      "message": "if (DEFINED CONFIG_BOARD_MICA)?",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 21
+      },
+      "revId": "603f5d0ec340de936a0b5bcdc2eb69fd4efc110d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
