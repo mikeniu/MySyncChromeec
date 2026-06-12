@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de4c4212_395bbde4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-06-12T21:53:57Z",
+      "side": 1,
+      "message": "Can we rely on the PDC to maintain this behavior? Is this codified in any spec?\n\nIf so I like seeing this complexity removed from the EC code, thanks!",
+      "range": {
+        "startLine": 11,
+        "startChar": 38,
+        "endLine": 14,
+        "endChar": 0
+      },
+      "revId": "fc702dac613b7a1b45a0a94a839a94ad745b4a86",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
