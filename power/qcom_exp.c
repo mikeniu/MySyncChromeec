@@ -1263,6 +1263,12 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		 * path to S0 to handle any reset conditions.
 		 */
 		power_reset_host_sleep_state();
+
+		if (chipset_is_offmode_charging_wake()) {
+			power_set_s5_inactivity_timer_enable(0);
+		} else {
+			power_set_s5_inactivity_timer_enable(1);
+		}
 		return POWER_S5;
 
 	case POWER_S5:
@@ -1380,6 +1386,7 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		return POWER_S5;
 
 	case POWER_S5G3:
+		power_set_s5_inactivity_timer_enable(1);
 		cancel_power_button_timer();
 
 		/* Call hooks before we drop power rails */
