@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc692231_3d2753a5",
+        "filename": "zephyr/program/bluey/CMakeLists.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-06-12T06:25:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a0e49c3_0d8f02cc",
+      "range": {
+        "startLine": 30,
+        "startChar": 60,
+        "endLine": 30,
+        "endChar": 61
+      },
+      "revId": "a375bcdc2f19731e3ffc48ae5d67c3456bec9d07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "826a8022_35938a74",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-12T06:08:43Z",
       "side": 1,
       "message": "Please remove the trailing whitespace.",
+      "range": {
+        "startLine": 33,
+        "startChar": 60,
+        "endLine": 33,
+        "endChar": 61
+      },
+      "revId": "a375bcdc2f19731e3ffc48ae5d67c3456bec9d07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3329ccb_fa5c3f66",
+        "filename": "zephyr/program/bluey/CMakeLists.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-06-12T06:25:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "826a8022_35938a74",
       "range": {
         "startLine": 33,
         "startChar": 60,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b61235b6_f72af115",
+        "filename": "zephyr/program/bluey/mica/src/mica_throttle.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-06-12T06:25:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b37d3d1d_3129f5b0",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 8
+      },
+      "revId": "a375bcdc2f19731e3ffc48ae5d67c3456bec9d07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6662a6d3_ec3d6893",
@@ -93,6 +165,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d07fd43_2f520c23",
+        "filename": "zephyr/program/bluey/mica/src/mica_throttle.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-06-12T06:25:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6662a6d3_ec3d6893",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 8
+      },
+      "revId": "a375bcdc2f19731e3ffc48ae5d67c3456bec9d07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6527241f_78a6e345",
@@ -106,6 +202,30 @@
       "writtenOn": "2026-06-12T06:08:43Z",
       "side": 1,
       "message": "use tab",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 20
+      },
+      "revId": "a375bcdc2f19731e3ffc48ae5d67c3456bec9d07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "470302a9_02b323e9",
+        "filename": "zephyr/program/bluey/mica/src/mica_throttle.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-06-12T06:25:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6527241f_78a6e345",
       "range": {
         "startLine": 43,
         "startChar": 0,
