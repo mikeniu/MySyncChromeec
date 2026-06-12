@@ -13,30 +13,10 @@
 #include "console.h"
 #include "extpower.h"
 #include "hooks.h"
-#include "task.h"
 
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_DECLARE(adsp_comms, LOG_LEVEL_INF);
-
-static void adsp_pet_chipset(void);
-DECLARE_DEFERRED(adsp_pet_chipset);
-
-/**
- * Pet the chipset inactivity timer.
- *
- * This function wakes the chipset task to reset its inactivity timer.
- * It reschedules itself as long as the chipset remains in a soft-off (S5/S4)
- * state, ensuring the system stays powered during off-mode charging once the
- * ADSP is active.
- */
-static void adsp_pet_chipset(void)
-{
-	if (chipset_in_state(CHIPSET_STATE_SOFT_OFF)) {
-		task_wake(TASK_ID_CHIPSET);
-		hook_call_deferred(&adsp_pet_chipset_data, 5 * USEC_PER_SEC);
-	}
-}
 
 static int active_charge_port = CHARGE_PORT_NONE;
 static enum led_pwr_state active_charge_state = LED_PWRS_IDLE;
@@ -116,7 +96,6 @@ static void adsp_oem_version_cb(uint8_t fid, uint8_t addr, uint16_t data)
 {
 	if (data == ADSP_OEM_CUSTOM_VERSION_1) {
 		LOG_INF("ADSP: Version 1 identified");
-		hook_call_deferred(&adsp_pet_chipset_data, 0);
 	} else {
 		LOG_ERR("ADSP: Incorrect version received: %d (expected %d)",
 			data, ADSP_OEM_CUSTOM_VERSION_1);
