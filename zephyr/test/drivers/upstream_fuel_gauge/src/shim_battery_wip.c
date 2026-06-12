@@ -24,19 +24,19 @@ void battery_get_params(struct batt_params *batt)
 
 	int ret;
 
-	ret = fuel_gauge_get_prop(dev, FUEL_GAUGE_VOLTAGE, &raw_voltage);
+	ret = fuel_gauge_get_prop(dev, FUEL_GAUGE_VOLTAGE_UV, &raw_voltage);
 	if (ret) {
 		batt->status = ret;
 		return;
 	}
-	ret = fuel_gauge_get_prop(dev, FUEL_GAUGE_CURRENT, &raw_current);
+	ret = fuel_gauge_get_prop(dev, FUEL_GAUGE_CURRENT_UA, &raw_current);
 	if (ret) {
 		batt->status = ret;
 		return;
 	}
 
-	batt->voltage = raw_voltage.voltage / 1000;
-	batt->current = raw_current.current / 1000;
+	batt->voltage = raw_voltage.voltage_uv / 1000;
+	batt->current = raw_current.current_ua / 1000;
 
 	battery_apply_fake_params(batt);
 
