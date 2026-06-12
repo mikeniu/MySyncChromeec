@@ -87,6 +87,24 @@
       "parentUuid": "ac069d6b_b535e13f",
       "revId": "c6bb0f6c60e9440557e7e57c98997589a9a03537",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6d9c28f_bfb1999d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-12T15:17:26Z",
+      "side": 1,
+      "message": "I see, looking at the bug it seems like TCPC thread is waking up and calling `charge_manager_force_ceil`",
+      "parentUuid": "8bb76f66_b1cd8cb3",
+      "revId": "c6bb0f6c60e9440557e7e57c98997589a9a03537",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
