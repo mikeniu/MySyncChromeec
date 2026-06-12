@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1601207_d45748da",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-06-12T17:06:43Z",
+      "side": 1,
+      "message": "typo? trampline",
+      "revId": "b5ff437cf7010c77b8619176ecb0e1a7c5686566",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39ceb003_a4b7fe7a",
+        "filename": "zephyr/snippets/sram-only/realtek-ram-trampoline.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-06-12T17:06:43Z",
+      "side": 1,
+      "message": "I think normally there\u0027s no spaces here `\u003c0x20010020 0x40000\u003e;`",
+      "revId": "b5ff437cf7010c77b8619176ecb0e1a7c5686566",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fe4001d_13343802",
+        "filename": "zephyr/snippets/sram-only/realtek-ram-trampoline.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-06-12T17:06:43Z",
+      "side": 1,
+      "message": "nit: extra blank line",
+      "revId": "b5ff437cf7010c77b8619176ecb0e1a7c5686566",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
