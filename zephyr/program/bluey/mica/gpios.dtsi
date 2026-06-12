@@ -34,7 +34,7 @@
 			gpios = <&gpio5 0 (GPIO_INPUT)>;
 		};
 		gpio_ec_sys_throttle_mira: ec_sys_throttle_mira {
-			gpios = <&gpio5 2 (GPIO_INPUT | GPIO_PULL_UP)>;
+			gpios = <&gpio5 2 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 			enum-name = "GPIO_CPU_PROCHOT";
 		};
 		gpio_dock_vdm_pwr_on: dock_vdm_pwr_on {
