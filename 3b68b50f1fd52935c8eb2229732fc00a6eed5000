@@ -52,6 +52,24 @@
       "parentUuid": "73cf41f6_88688ba8",
       "revId": "3b68b50f1fd52935c8eb2229732fc00a6eed5000",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6a4f6c2_c42d9c78",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1158719
+      },
+      "writtenOn": "2026-06-12T16:32:35Z",
+      "side": 1,
+      "message": "ack, thanks again for TAL!",
+      "parentUuid": "cb3296ac_307c7ba5",
+      "revId": "3b68b50f1fd52935c8eb2229732fc00a6eed5000",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
