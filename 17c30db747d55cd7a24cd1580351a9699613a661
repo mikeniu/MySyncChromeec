@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61680dc4_62d6776c",
+        "filename": "zephyr/program/bluey/mica/src/mica_throttle.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-06-12T10:36:17Z",
+      "side": 1,
+      "message": "nit: Rename file to throttle.c",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 0
+      },
+      "revId": "17c30db747d55cd7a24cd1580351a9699613a661",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
