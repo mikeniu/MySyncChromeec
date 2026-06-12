@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c8edea7_d2949fd8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-12T17:21:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a1601207_d45748da",
+      "revId": "b5ff437cf7010c77b8619176ecb0e1a7c5686566",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "39ceb003_a4b7fe7a",
@@ -35,6 +53,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "69c437cc_25a8aca1",
+        "filename": "zephyr/snippets/sram-only/realtek-ram-trampoline.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-12T17:21:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "39ceb003_a4b7fe7a",
+      "revId": "b5ff437cf7010c77b8619176ecb0e1a7c5686566",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2fe4001d_13343802",
@@ -48,6 +84,47 @@
       "writtenOn": "2026-06-12T17:06:43Z",
       "side": 1,
       "message": "nit: extra blank line",
+      "revId": "b5ff437cf7010c77b8619176ecb0e1a7c5686566",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a89283d_55df2d66",
+        "filename": "zephyr/snippets/sram-only/realtek-ram-trampoline.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-12T17:21:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2fe4001d_13343802",
+      "revId": "b5ff437cf7010c77b8619176ecb0e1a7c5686566",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c064d69_e5a01240",
+        "filename": "zephyr/snippets/sram-only/snippet.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-12T17:21:25Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by Trailing Whitespace: Please remove the trailing whitespace.",
+      "range": {
+        "startLine": 12,
+        "startChar": 66,
+        "endLine": 12,
+        "endChar": 67
+      },
       "revId": "b5ff437cf7010c77b8619176ecb0e1a7c5686566",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
