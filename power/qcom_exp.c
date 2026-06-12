@@ -953,6 +953,14 @@ static uint8_t check_for_power_on_event(void)
 	} else {
 		ret = POWER_ON_CANCEL;
 	}
+#ifdef CONFIG_POWER_BUTTON
+	/*
+	 * If the power button is not pressed at this point, we can
+	 * stop trying to ignore the next release event.
+	 */
+	if (!power_button_is_pressed())
+		power_button_eat_release = 0;
+#endif
 
 	/* The flags are handled above. Clear them all. */
 	power_request = POWER_REQ_NONE;
@@ -977,6 +985,15 @@ static uint8_t check_for_power_off_event(void)
 {
 	timestamp_t now;
 	int pressed = 0;
+
+#ifdef CONFIG_POWER_BUTTON
+	/*
+	 * If the power button is not pressed at this point, we can
+	 * stop trying to ignore the next release event.
+	 */
+	if (!power_button_is_pressed())
+		power_button_eat_release = 0;
+#endif
 
 	if (power_request == POWER_REQ_OFF) {
 		power_request = POWER_REQ_NONE;
@@ -1228,14 +1245,6 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 			CPRINTS("power on %d", boot_from_off);
 			return POWER_G3S5;
 		}
-#ifdef CONFIG_POWER_BUTTON
-		/*
-		 * If the power button is not pressed at this point, we can
-		 * stop trying to ignore the next release event.
-		 */
-		if (!power_button_is_pressed())
-			power_button_eat_release = 0;
-#endif
 		break;
 	/*
 	 * For Qualcomm QC_EXP SoCs, the ADSP firmware manages battery
