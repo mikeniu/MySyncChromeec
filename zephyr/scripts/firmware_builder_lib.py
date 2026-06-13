@@ -5,6 +5,7 @@
 """Helper functions shared across firmware builder scripts."""
 
 import argparse
+import contextlib
 import json
 import multiprocessing
 import os
@@ -15,27 +16,157 @@ import sys
 import tempfile
 
 
+_CONFIG = {
+    "checkout_path": None,
+}
+
+
+def set_checkout(path):
+    """Override the checkout path to be used by find_checkout."""
+    old_path = _CONFIG["checkout_path"]
+    if path is None:
+        _CONFIG["checkout_path"] = None
+    else:
+        _CONFIG["checkout_path"] = pathlib.Path(path)
+    return old_path
+
+
 def find_checkout():
     """Find the path to the base of the checkout (e.g., ~/chromiumos)."""
+    if _CONFIG["checkout_path"]:
+        return _CONFIG["checkout_path"]
     for path in pathlib.Path(__file__).resolve().parents:
         if (path / ".repo").is_dir():
             return path
     raise FileNotFoundError("Unable to locate the root of the checkout")
 
 
-def apply_patches(opts, applied_patches):
+def find_git_repo(path):
+    """Find the git repository root for a given path."""
+    current_path = pathlib.Path(path).absolute()
+    if (current_path / ".git").exists():
+        return current_path
+    for parent in current_path.parents:
+        if (parent / ".git").exists():
+            return parent
+    return None
+
+
+def get_dirty_files(repo_dir, checkout_root):
+    """Get list of dirty/untracked files in a repo, relative to checkout."""
+    repo_path = pathlib.Path(repo_dir)
+    checkout_path = pathlib.Path(checkout_root).resolve()
+    result = subprocess.run(
+        ["git", "status", "--porcelain", "-uall", "-z"],
+        cwd=repo_path,
+        capture_output=True,
+        check=True,
+        text=True,
+    )
+    dirty_files = set()
+    tokens = result.stdout.split("\0")
+    idx = 0
+    while idx < len(tokens):
+        entry = tokens[idx]
+        idx += 1
+        if len(entry) < 4:
+            continue
+        status = entry[:2]
+        rel_paths = [entry[3:]]
+        if ("R" in status or "C" in status) and idx < len(tokens):
+            if tokens[idx]:
+                rel_paths.append(tokens[idx])
+            idx += 1
+        for file_rel in rel_paths:
+            raw_path = repo_path / file_rel
+            abs_path = raw_path.parent.resolve() / raw_path.name
+            with contextlib.suppress(ValueError):
+                dirty_files.add(abs_path.relative_to(checkout_path))
+    return dirty_files
+
+
+def _find_patch_files(patches_dir):
+    """Yield all patch files recursively from patches_dir."""
+    for root, dirs, files in os.walk(patches_dir):
+        if ".git" in dirs:
+            dirs.remove(".git")
+        for file in files:
+            if file.endswith(".patch"):
+                yield pathlib.Path(root) / file
+
+
+def _find_override_files(src_override_dir):
+    """Yield all non-ignored override files recursively from src_override_dir."""
+    for root, dirs, files in os.walk(src_override_dir):
+        if ".git" in dirs:
+            dirs.remove(".git")
+        for file in files:
+            if (
+                file.startswith(".git")
+                or file == ".keep"
+                or file.endswith(".md")
+                or file in ["OWNERS", "DIR_METADATA", "LICENSE"]
+            ):
+                continue
+            yield pathlib.Path(root) / file
+
+
+def find_target_repos(checkout_root, opts):
+    """Find all git repositories that are targets of overrides or patches."""
+    repos = set()
+    root_path = pathlib.Path(checkout_root).resolve()
+
+    if hasattr(opts, "src_override_dir") and opts.src_override_dir:
+        src_override_dir = pathlib.Path(opts.src_override_dir).resolve()
+        if src_override_dir.exists():
+            for src_file in _find_override_files(src_override_dir):
+                rel_path = src_file.relative_to(src_override_dir)
+                real_path = root_path / rel_path
+                repo = find_git_repo(real_path)
+                if repo:
+                    repos.add(repo)
+
+    if hasattr(opts, "patches_dir") and opts.patches_dir:
+        patches_dir = pathlib.Path(opts.patches_dir).resolve()
+        if patches_dir.exists():
+            for patch_file in _find_patch_files(patches_dir):
+                rel_path = patch_file.relative_to(patches_dir)
+                repo_rel_path = rel_path.parent
+                repo = (root_path / repo_rel_path).resolve()
+                repo_git = find_git_repo(repo)
+                if repo_git:
+                    repos.add(repo_git)
+    return repos
+
+
+def get_patch_modified_files(patch_file, target_dir):
+    """Get list of files modified by a patch file."""
+    result = subprocess.run(
+        ["git", "apply", "--numstat", str(patch_file)],
+        cwd=target_dir,
+        capture_output=True,
+        check=True,
+        text=True,
+    )
+    files = []
+    for line in result.stdout.splitlines():
+        parts = line.split(maxsplit=2)
+        if len(parts) >= 3:
+            files.append(pathlib.Path(parts[2].strip('"')))
+    return files
+
+
+def apply_patches(opts, applied_patches, user_dirty_files=None):
     """Apply patches recursively from patches_dir to the checkout."""
-    patches_dir = pathlib.Path(opts.patches_dir)
-    checkout_root = find_checkout()
+    if user_dirty_files is None:
+        user_dirty_files = set()
+    if not hasattr(opts, "patches_dir") or not opts.patches_dir:
+        return
+    patches_dir = pathlib.Path(opts.patches_dir).resolve()
+    checkout_root = find_checkout().resolve()
 
     if patches_dir.exists():
-        patch_files = []
-        for root, _, files in os.walk(patches_dir):
-            for file in files:
-                if file.endswith(".patch"):
-                    patch_files.append(pathlib.Path(root) / file)
-
-        patch_files.sort()
+        patch_files = sorted(list(_find_patch_files(patches_dir)))
 
         for patch_file in patch_files:
             rel_path = patch_file.relative_to(patches_dir)
@@ -50,14 +181,43 @@ def apply_patches(opts, applied_patches):
                 continue
 
             print(f"Processing patch {patch_file} for {target_dir}")
-            try:
-                # Check if it can be applied
-                can_apply = subprocess.run(
-                    ["git", "apply", "--check", str(patch_file)],
+            can_apply = subprocess.run(
+                ["git", "apply", "--check", str(patch_file)],
+                cwd=target_dir,
+                capture_output=True,
+                check=False,
+            )
+            if can_apply.returncode != 0:
+                already_applied = subprocess.run(
+                    ["git", "apply", "-R", "--check", str(patch_file)],
                     cwd=target_dir,
                     capture_output=True,
                     check=False,
                 )
+                if already_applied.returncode == 0:
+                    print(f"Patch {patch_file} already applied. Skipping.")
+                    continue
+
+            try:
+                modified_files = get_patch_modified_files(
+                    patch_file, target_dir
+                )
+                for mod_file in modified_files:
+                    abs_mod_file = (target_dir / mod_file).resolve()
+                    rel_mod_file = abs_mod_file.relative_to(checkout_root)
+                    if rel_mod_file in user_dirty_files:
+                        print(
+                            f"Error: Patch {patch_file} modifies file "
+                            f"{abs_mod_file} which has local changes. Aborting."
+                        )
+                        sys.exit(1)
+            except subprocess.CalledProcessError as e:
+                print(
+                    f"Failed to get modified files for patch {patch_file}: {e}"
+                )
+                sys.exit(1)
+
+            try:
                 if can_apply.returncode == 0:
                     subprocess.run(
                         ["git", "apply", str(patch_file)],
@@ -67,23 +227,13 @@ def apply_patches(opts, applied_patches):
                     print(f"Applied patch {patch_file}")
                     applied_patches.append((patch_file, target_dir))
                 else:
-                    # Check if already applied
-                    already_applied = subprocess.run(
-                        ["git", "apply", "-R", "--check", str(patch_file)],
-                        cwd=target_dir,
-                        capture_output=True,
-                        check=False,
+                    print(
+                        f"Error: Patch {patch_file} cannot be applied "
+                        "and does not seem to be already applied."
                     )
-                    if already_applied.returncode == 0:
-                        print(f"Patch {patch_file} already applied. Skipping.")
-                    else:
-                        print(
-                            f"Error: Patch {patch_file} cannot be applied "
-                            "and does not seem to be already applied."
-                        )
-                        print(f"stdout: {can_apply.stdout.decode()}")
-                        print(f"stderr: {can_apply.stderr.decode()}")
-                        sys.exit(1)
+                    print(f"stdout: {can_apply.stdout.decode()}")
+                    print(f"stderr: {can_apply.stderr.decode()}")
+                    sys.exit(1)
             except subprocess.CalledProcessError as e:
                 print(f"Failed to apply patch {patch_file}: {e}")
                 sys.exit(1)
@@ -94,12 +244,14 @@ def apply_patches(opts, applied_patches):
         )
 
 
-def copy_source_overrides(opts, copied_files):
+def copy_source_overrides(opts, copied_files, user_dirty_files=None):
     """Copy source overrides to the checkout."""
-    if not hasattr(opts, "src_override_dir"):
+    if user_dirty_files is None:
+        user_dirty_files = set()
+    if not hasattr(opts, "src_override_dir") or not opts.src_override_dir:
         return
 
-    src_override_dir = pathlib.Path(opts.src_override_dir)
+    src_override_dir = pathlib.Path(opts.src_override_dir).resolve()
     if not src_override_dir.exists():
         print(
             f"Source override directory {src_override_dir} does not exist. "
@@ -108,18 +260,9 @@ def copy_source_overrides(opts, copied_files):
         return
 
     print(f"Copying files from {src_override_dir}")
-    checkout_root = find_checkout()
+    checkout_root = find_checkout().resolve()
 
-    copied_files_raw = []
-    for root, _, files in os.walk(src_override_dir):
-        for file in files:
-            if (
-                file.startswith(".git")
-                or file.endswith(".md")
-                or file in ["OWNERS", "DIR_METADATA", "LICENSE"]
-            ):
-                continue
-            copied_files_raw.append(pathlib.Path(root) / file)
+    copied_files_raw = sorted(_find_override_files(src_override_dir))
 
     if not copied_files_raw:
         print(f"No files found in {src_override_dir}.")
@@ -129,9 +272,15 @@ def copy_source_overrides(opts, copied_files):
         rel_path = src_file.relative_to(src_override_dir)
         target_file = checkout_root / rel_path
 
-        existed_before = target_file.exists()
+        existed_before = target_file.exists() or target_file.is_symlink()
         if existed_before:
-            # Check if tracked
+            if rel_path in user_dirty_files:
+                print(
+                    f"Error: File {target_file} has local changes or is "
+                    "untracked. Aborting to prevent data loss."
+                )
+                sys.exit(1)
+
             was_tracked = (
                 subprocess.run(
                     ["git", "ls-files", "--error-unmatch", target_file.name],
@@ -149,31 +298,16 @@ def copy_source_overrides(opts, copied_files):
                 )
                 sys.exit(1)
 
-            # Check if dirty
-            is_dirty = (
-                subprocess.run(
-                    ["git", "diff", "--name-only", target_file.name],
-                    cwd=target_file.parent,
-                    capture_output=True,
-                    check=False,
-                ).stdout.strip()
-                != b""
-            )
-            if is_dirty:
-                print(
-                    f"Error: File {target_file} has local changes. "
-                    "Aborting to prevent data loss."
-                )
-                sys.exit(1)
-
         # Create parent directories if they don't exist
         target_file.parent.mkdir(parents=True, exist_ok=True)
 
         print(f"Copying {src_file} to {target_file}")
         try:
+            if target_file.is_symlink():
+                target_file.unlink()
             shutil.copy2(src_file, target_file)
             copied_files.append((target_file, existed_before))
-        except (OSError, shutil.Error) as e:
+        except OSError as e:
             print(f"Failed to copy {src_file} to {target_file}: {e}")
             sys.exit(1)
 
@@ -222,17 +356,232 @@ def revert_patches(applied_patches):
             print(f"Failed to revert patch {patch_file}: {e}")
 
 
-def prepare_codebase(opts, applied_patches, copied_files):
-    """Apply patches and copy source overrides to the checkout."""
-    apply_patches(opts, applied_patches)
-    copy_source_overrides(opts, copied_files)
+def fix_symlinks(directory, old_prefix, new_prefix):
+    """Find and fix symlinks pointing to old_prefix to point to new_prefix."""
+    old_str = str(old_prefix).rstrip(os.sep)
+    new_str = str(new_prefix).rstrip(os.sep)
+    for root, dirs, files in os.walk(directory):
+        for d in dirs + files:
+            path = pathlib.Path(root) / d
+            if path.is_symlink():
+                target = os.readlink(path)
+                if target == old_str or target.startswith(old_str + os.sep):
+                    new_target = new_str + target[len(old_str) :]
+                    path.unlink()
+                    os.symlink(new_target, path)
+
+
+def copy_outputs_back(shadow_checkout, real_checkout, ec_rel_path):
+    """Copy build and twister outputs back to real checkout and fix symlinks."""
+    shadow_ec = shadow_checkout / ec_rel_path
+    real_ec = real_checkout / ec_rel_path
+
+    shadow_build = shadow_ec / "build"
+    real_build = real_ec / "build"
+    if shadow_build.exists():
+        print("Copying build outputs back to real checkout...")
+        if real_build.exists():
+            shutil.rmtree(real_build)
+        shutil.copytree(shadow_build, real_build, symlinks=True)
+        fix_symlinks(real_build, shadow_checkout, real_checkout)
+
+    for shadow_path in shadow_ec.glob("twister-out*"):
+        rel_path = shadow_path.relative_to(shadow_ec)
+        real_path = real_ec / rel_path
+        print(f"Copying {rel_path} back to real checkout...")
+        if real_path.exists():
+            shutil.rmtree(real_path)
+        shutil.copytree(shadow_path, real_path, symlinks=True)
+        fix_symlinks(real_path, shadow_checkout, real_checkout)
+
+
+def create_shadow_checkout(
+    real_checkout,
+    shadow_root,
+    modules,
+    zephyr_base,
+    src_override_dir=None,
+    patches_dir=None,
+):
+    """Create a shadow checkout with copies of target repos and symlinks."""
+    real_root = pathlib.Path(real_checkout).resolve()
+    shadow_path = pathlib.Path(shadow_root).resolve()
+    (shadow_path / ".repo").mkdir(parents=True, exist_ok=True)
+    override_root = (
+        pathlib.Path(src_override_dir).resolve() if src_override_dir else None
+    )
+    patch_root = pathlib.Path(patches_dir).resolve() if patches_dir else None
+
+    paths_to_handle = {
+        "zephyr_base": zephyr_base,
+        "ec_private": real_root / "src" / "platform" / "ec-private",
+        "chromiumos_overlay": (
+            real_root / "src" / "third_party" / "chromiumos-overlay"
+        ),
+        "project": real_root / "src" / "project",
+    }
+
+    for name, path in modules.items():
+        paths_to_handle[f"module:{name}"] = path
+
+    copied_rel_paths = set()
+    for key, path in paths_to_handle.items():
+        if not path.exists():
+            continue
+        try:
+            rel_path = path.resolve().relative_to(real_root)
+        except ValueError:
+            continue
+        dst_path = shadow_path / rel_path
+
+        need_copy = key == "module:ec"
+        if not need_copy and override_root and override_root.exists():
+            override_sub = override_root / rel_path
+            if override_sub.exists() and any(
+                _find_override_files(override_sub)
+            ):
+                need_copy = True
+        if not need_copy and patch_root and patch_root.exists():
+            patch_sub = patch_root / rel_path
+            if patch_sub.exists() and any(_find_patch_files(patch_sub)):
+                need_copy = True
+
+        if need_copy:
+            copied_rel_paths.add(rel_path)
+            print(f"Copying {rel_path} to shadow checkout...")
+            dst_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil_ignore = shutil.ignore_patterns(
+                ".git", "build", "twister-out*"
+            )
+            shutil.copytree(path, dst_path, ignore=shutil_ignore, symlinks=True)
+            subprocess.run(
+                ["git", "init"], cwd=dst_path, capture_output=True, check=True
+            )
+            subprocess.run(
+                ["git", "add", "-A"],
+                cwd=dst_path,
+                capture_output=True,
+                check=True,
+            )
+            env = os.environ.copy()
+            env["GIT_AUTHOR_NAME"] = "Shadow Builder"
+            env["GIT_AUTHOR_EMAIL"] = "shadow@builder.org"
+            env["GIT_COMMITTER_NAME"] = "Shadow Builder"
+            env["GIT_COMMITTER_EMAIL"] = "shadow@builder.org"
+            subprocess.run(
+                ["git", "commit", "-m", "initial"],
+                cwd=dst_path,
+                capture_output=True,
+                check=True,
+                env=env,
+            )
+        else:
+            print(f"Symlinking {rel_path} to shadow checkout...")
+            dst_path.parent.mkdir(parents=True, exist_ok=True)
+            os.symlink(path, dst_path)
+
+    zp_rel = pathlib.Path("src/third_party/zephyrproject")
+    zp_touched = any(
+        rel == zp_rel or zp_rel in rel.parents for rel in copied_rel_paths
+    )
+    real_zephyrproject_git = real_root / zp_rel / ".git"
+    shadow_zephyrproject = shadow_path / zp_rel
+    if (
+        not zp_touched
+        and real_zephyrproject_git.exists()
+        and shadow_zephyrproject.is_dir()
+        and not (shadow_zephyrproject / ".git").exists()
+    ):
+        os.symlink(
+            real_zephyrproject_git.resolve(), shadow_zephyrproject / ".git"
+        )
+
+
+def prepare_codebase(
+    opts, applied_patches, copied_files, user_dirty_files=None
+):
+    """Copy source overrides and then apply patches to the checkout."""
+    if user_dirty_files is None:
+        user_dirty_files = set()
+        checkout_root = find_checkout()
+        target_repos = find_target_repos(checkout_root, opts)
+        for repo in target_repos:
+            user_dirty_files.update(get_dirty_files(repo, checkout_root))
+    copy_source_overrides(opts, copied_files, user_dirty_files)
+    apply_patches(opts, applied_patches, user_dirty_files)
 
 
 def restore_codebase(applied_patches, copied_files):
     """Revert applied patches and restore/remove copied overrides."""
     print("Restoring codebase to clean state...")
-    revert_source_overrides(copied_files)
     revert_patches(applied_patches)
+    revert_source_overrides(copied_files)
+
+
+@contextlib.contextmanager
+def prepared_workspace(opts, modules):
+    """Context manager to prepare a shadow or in-place workspace."""
+    applied_patches = []
+    copied_files = []
+    real_checkout = find_checkout()
+
+    src_override_dir = getattr(opts, "src_override_dir", None)
+    patches_dir = getattr(opts, "patches_dir", None)
+    has_overrides = bool(
+        src_override_dir
+        and pathlib.Path(src_override_dir).exists()
+        and any(_find_override_files(pathlib.Path(src_override_dir)))
+    )
+    has_patches = bool(
+        patches_dir
+        and pathlib.Path(patches_dir).exists()
+        and any(_find_patch_files(pathlib.Path(patches_dir)))
+    )
+
+    if has_overrides or has_patches:
+        print("Using shadow workspace for build...")
+        target_repos = find_target_repos(real_checkout, opts)
+        user_dirty_files = set()
+        for repo in target_repos:
+            user_dirty_files.update(get_dirty_files(repo, real_checkout))
+
+        ec_rel_path = modules["ec"].resolve().relative_to(real_checkout)
+        zephyr_base = (
+            real_checkout / "src" / "third_party" / "zephyrproject" / "zephyr"
+        )
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            shadow_checkout = pathlib.Path(tmp_dir) / "shadow"
+            shadow_checkout.mkdir()
+
+            prev_checkout = set_checkout(shadow_checkout)
+            shadow_ready = False
+            try:
+                create_shadow_checkout(
+                    real_checkout,
+                    shadow_checkout,
+                    modules,
+                    zephyr_base,
+                    src_override_dir,
+                    patches_dir,
+                )
+                prepare_codebase(
+                    opts, applied_patches, copied_files, user_dirty_files
+                )
+                shadow_ready = True
+                yield shadow_checkout / ec_rel_path
+            finally:
+                if shadow_ready:
+                    copy_outputs_back(
+                        shadow_checkout, real_checkout, ec_rel_path
+                    )
+                set_checkout(prev_checkout)
+    else:
+        try:
+            prepare_codebase(opts, applied_patches, copied_files)
+            yield None
+        finally:
+            restore_codebase(applied_patches, copied_files)
 
 
 def get_safe_lcov_workers(requested_cpus):
