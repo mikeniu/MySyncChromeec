@@ -111,6 +111,12 @@ def copy_source_overrides(opts, copied_files):
     copied_files_raw = []
     for root, _, files in os.walk(src_override_dir):
         for file in files:
+            if (
+                file.startswith(".git")
+                or file.endswith(".md")
+                or file in ["OWNERS", "DIR_METADATA", "LICENSE"]
+            ):
+                continue
             copied_files_raw.append(pathlib.Path(root) / file)
 
     if not copied_files_raw:
