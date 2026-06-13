@@ -18,15 +18,21 @@ import shlex
 import shutil
 import subprocess
 import sys
+import tempfile
 
 from google.protobuf import json_format  # pylint: disable=import-error
 
 from chromite.api.gen_sdk.chromite.api import firmware_pb2
 from chromite.lib.chromeos_version import VersionInfo
 import scripts.firmware_builder_lib
+from scripts.firmware_builder_lib import copy_outputs_back
+from scripts.firmware_builder_lib import create_shadow_checkout
 from scripts.firmware_builder_lib import find_checkout
+from scripts.firmware_builder_lib import find_target_repos
+from scripts.firmware_builder_lib import get_dirty_files
 from scripts.firmware_builder_lib import prepare_codebase
 from scripts.firmware_builder_lib import restore_codebase
+from scripts.firmware_builder_lib import set_checkout
 
 
 # Add the zmake dir early in the python search path
@@ -263,7 +269,7 @@ def build_host_utils(opts, platform_ec, env, extra_env):
     )
 
 
-def build_compare_builds():
+def build_compare_builds(checkout_dir=None):
     """Runs compare-builds a select set of targets"""
     env = os.environ.copy()
     env.update(init_toolchain())
@@ -276,7 +282,10 @@ def build_compare_builds():
     # Run compare-builds at the same git reference.  This forces the
     # compare-builds step to compile only, skipping the firmware binary
     # comparison.
-    cmd = ["zmake", "-D", "compare-builds", "--ref1", "HEAD", "--ref2", "HEAD"]
+    cmd = ["zmake"]
+    if checkout_dir:
+        cmd.extend(["--checkout", str(checkout_dir)])
+    cmd.extend(["-D", "compare-builds", "--ref1", "HEAD", "--ref2", "HEAD"])
     for board in COMPARE_BUILDS_BOARDS:
         cmd.append(board)
 
@@ -309,7 +318,7 @@ def build(opts):
         build_host_utils(opts, platform_ec, env, {"TEST_ASAN": "y"})
         build_host_utils(opts, platform_ec, env, {"TEST_MSAN": "y"})
         # Verify compare-builds isn't fundamentally broken
-        build_compare_builds()
+        build_compare_builds(find_checkout())
 
     # Start with a clean build environment
     cmd = ["make", "-f", "Makefile.cq", "clobber"]
@@ -322,7 +331,14 @@ def build(opts):
         env=env,
     )
 
-    cmd = ["zmake", "-D", "build", "--static"]
+    cmd = [
+        "zmake",
+        "--checkout",
+        str(find_checkout()),
+        "-D",
+        "build",
+        "--static",
+    ]
     if opts.code_coverage:
         cmd.append("--coverage")
     if opts.bcs_version:
@@ -832,6 +848,8 @@ def _extract_lcov_summary(name, metrics, filename):
 
 def main(args):
     """Builds and tests all of the Zephyr targets and reports build metrics"""
+    # pylint: disable=global-statement
+    global ZEPHYR_DIR
     parser, sub_cmds = scripts.firmware_builder_lib.create_arg_parser(
         build, bundle, test
     )
@@ -858,12 +876,74 @@ def main(args):
 
     applied_patches = []
     copied_files = []
-    try:
-        prepare_codebase(opts, applied_patches, copied_files)
-        # Run selected sub command function
-        return opts.func(opts)
-    finally:
-        restore_codebase(applied_patches, copied_files)
+
+    real_checkout = find_checkout()
+
+    has_overrides = False
+    if hasattr(opts, "src_override_dir"):
+        d = pathlib.Path(opts.src_override_dir)
+        if d.exists() and any(d.iterdir()):
+            has_overrides = True
+
+    has_patches = False
+    if hasattr(opts, "patches_dir"):
+        d = pathlib.Path(opts.patches_dir)
+        if d.exists() and any(d.iterdir()):
+            has_patches = True
+
+    use_shadow = has_overrides or has_patches
+
+    if use_shadow:
+        print("Using shadow workspace for build...")
+        target_repos = find_target_repos(real_checkout, opts)
+        user_dirty_files = set()
+        for repo in target_repos:
+            user_dirty_files.update(get_dirty_files(repo, real_checkout))
+
+        modules = zmake.modules.locate_from_checkout(real_checkout)
+        zephyr_base = (
+            real_checkout / "src" / "third_party" / "zephyrproject" / "zephyr"
+        )
+        code_override_path = real_checkout / "src" / "platform" / "ec-private"
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            shadow_checkout = pathlib.Path(tmp_dir) / "shadow"
+            shadow_checkout.mkdir()
+
+            original_zephyr_dir = ZEPHYR_DIR
+            try:
+                create_shadow_checkout(
+                    real_checkout,
+                    shadow_checkout,
+                    modules,
+                    zephyr_base,
+                    code_override_path,
+                )
+
+                set_checkout(shadow_checkout)
+                ZEPHYR_DIR = (
+                    shadow_checkout / "src" / "platform" / "ec" / "zephyr"
+                )
+
+                prepare_codebase(
+                    opts, applied_patches, copied_files, user_dirty_files
+                )
+
+                ret = opts.func(opts)
+
+                if ret == 0 or ret is None:
+                    copy_outputs_back(shadow_checkout, real_checkout)
+
+                return ret
+            finally:
+                set_checkout(None)
+                ZEPHYR_DIR = original_zephyr_dir
+    else:
+        try:
+            prepare_codebase(opts, applied_patches, copied_files)
+            return opts.func(opts)
+        finally:
+            restore_codebase(applied_patches, copied_files)
 
 
 if __name__ == "__main__":
