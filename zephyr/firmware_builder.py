@@ -24,16 +24,6 @@ from google.protobuf import json_format  # pylint: disable=import-error
 
 from chromite.api.gen_sdk.chromite.api import firmware_pb2
 from chromite.lib.chromeos_version import VersionInfo
-import scripts.firmware_builder_lib
-from scripts.firmware_builder_lib import (
-    get_safe_lcov_workers as _get_safe_lcov_workers,
-)
-from scripts.firmware_builder_lib import find_checkout
-from scripts.firmware_builder_lib import merge_shard_coverage_reports
-from scripts.firmware_builder_lib import prepare_codebase
-from scripts.firmware_builder_lib import restore_codebase
-from scripts.firmware_builder_lib import save_or_load_shard_info
-from scripts.firmware_builder_lib import shard_projects
 
 
 # Add the zmake dir early in the python search path
@@ -45,8 +35,21 @@ sys.path.append(str(ZEPHYR_DIR / "../util"))
 
 # pylint: disable=wrong-import-position, import-error
 from coreboot_sdk import init_toolchain
-import zmake.modules  # pylint: disable=wrong-import-position
-import zmake.project  # pylint: disable=wrong-import-position
+import zmake.modules
+import zmake.project
+
+from scripts.firmware_builder_lib import (
+    get_safe_lcov_workers as _get_safe_lcov_workers,
+)
+from scripts.firmware_builder_lib import create_arg_parser
+from scripts.firmware_builder_lib import find_checkout
+from scripts.firmware_builder_lib import merge_shard_coverage_reports
+from scripts.firmware_builder_lib import prepared_workspace
+from scripts.firmware_builder_lib import save_or_load_shard_info
+from scripts.firmware_builder_lib import shard_projects
+
+
+# pylint: enable=wrong-import-position, import-error
 
 
 DEFAULT_BUNDLE_DIRECTORY = "/tmp/artifact_bundles"
@@ -288,20 +291,17 @@ def build_host_utils(opts, platform_ec, env, extra_env):
     )
 
 
-def build_compare_builds():
+def build_compare_builds(checkout_dir=None):
     """Runs compare-builds a select set of targets"""
     env = os.environ.copy()
     env.update(init_toolchain())
-    env.update(
-        {
-            "PYTHONPATH": str(ZEPHYR_DIR / "zmake"),
-        }
-    )
+    env["PYTHONPATH"] = str(ZEPHYR_DIR / "zmake")
 
     # Run compare-builds at the same git reference.  This forces the
     # compare-builds step to compile only, skipping the firmware binary
     # comparison.
-    cmd = ["zmake", "-D", "compare-builds", "--ref1", "HEAD", "--ref2", "HEAD"]
+    cmd = ["zmake", "--checkout", str(checkout_dir or find_checkout())]
+    cmd.extend(["-D", "compare-builds", "--ref1", "HEAD", "--ref2", "HEAD"])
     for board in COMPARE_BUILDS_BOARDS:
         cmd.append(board)
 
@@ -320,11 +320,7 @@ def build(opts):
     metric_list = firmware_pb2.FwBuildMetricList()  # pylint: disable=no-member
     env = os.environ.copy()
     env.update(init_toolchain())
-    env.update(
-        {
-            "PYTHONPATH": str(ZEPHYR_DIR / "zmake"),
-        }
-    )
+    env["PYTHONPATH"] = str(ZEPHYR_DIR / "zmake")
 
     platform_ec = ZEPHYR_DIR.parent
 
@@ -334,7 +330,7 @@ def build(opts):
         build_host_utils(opts, platform_ec, env, {"TEST_ASAN": "y"})
         build_host_utils(opts, platform_ec, env, {"TEST_MSAN": "y"})
         # Verify compare-builds isn't fundamentally broken
-        build_compare_builds()
+        build_compare_builds(find_checkout())
 
     # Start with a clean build environment
     cmd = ["make", "-f", "Makefile.cq", "clobber"]
@@ -348,7 +344,8 @@ def build(opts):
     )
     save_or_load_shard_info(opts, ZEPHYR_DIR, save=True)
 
-    cmd = ["zmake", "-D", "build", "--static"]
+    cmd = ["zmake", "--checkout", str(find_checkout())]
+    cmd.extend(["-D", "build", "--static"])
     if opts.code_coverage:
         cmd.append("--coverage")
     if opts.bcs_version:
@@ -956,9 +953,7 @@ def _extract_lcov_summary_worker(name, filename):
 
 def main(args):
     """Builds and tests all of the Zephyr targets and reports build metrics"""
-    parser, sub_cmds = scripts.firmware_builder_lib.create_arg_parser(
-        build, bundle, test, merge_shards
-    )
+    parser, sub_cmds = create_arg_parser(build, bundle, test, merge_shards)
 
     check_boards_cmd = sub_cmds.add_parser(
         "check_boards",
@@ -980,14 +975,21 @@ def main(args):
         print("Must select a valid sub command!")
         return -1
 
-    applied_patches = []
-    copied_files = []
+    # Populate version before entering shadow checkout
+    if not opts.bcs_version:
+        opts.bcs_version = get_version()
+
+    orig_dir = ZEPHYR_DIR
     try:
-        prepare_codebase(opts, applied_patches, copied_files)
-        # Run selected sub command function
-        return opts.func(opts)
+        with prepared_workspace(
+            opts, zmake.modules.locate_from_checkout(find_checkout())
+        ) as shadow_ec:
+            globals()["ZEPHYR_DIR"] = (
+                shadow_ec / "zephyr" if shadow_ec else orig_dir
+            )
+            return opts.func(opts)
     finally:
-        restore_codebase(applied_patches, copied_files)
+        globals()["ZEPHYR_DIR"] = orig_dir
 
 
 if __name__ == "__main__":
