@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec06c22a_4e95b343",
+        "filename": "zephyr/program/rex/screebo/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-15T19:29:24Z",
+      "side": 1,
+      "message": "This is already enabled for all of rex. I presume that you meant to enable `CONFIG_SVDM_RSP_DFP_ONLY`.",
+      "revId": "f6edf24291314b2a65104ef259df874c1d9941ec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
