@@ -487,6 +487,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a9016625_2f692944",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T23:18:56Z",
+      "side": 1,
+      "message": "Gemini feedback;\n\n-----\n\n`ReceiveActionIn` suffers from the exact same \"parameter soup\" problem as `SendActionOut`. By eliminating it and using C++20 designated initializers directly with `ReceiveBulkDataIn`, you make the payload structure instantly readable.\n\nThere is one **critical caveat** to keep in mind: the old `BuildFtCmd` helper was silently applying `ToLittleEndian()` to the `address`, `length`, and `aux_address` fields under the hood. When you construct the `CmdFormat` struct directly, you must apply the endianness swaps explicitly. This is actually a massive readability win, as it makes the wire-format serialization transparent to the reader.\n\nHere is how you can eliminate `ReceiveActionIn` across its three call sites:\n\n### 1. `GetFlashProtection`\n\nThis one is trivial, as everything except the opcodes are zeros.\n\n```cpp\n// Before:\nauto res \u003d ReceiveActionIn(device, Subcmd::kFlashWpGet, 0, data, kGenericInfoTimeout);\n\n// After:\nauto res \u003d ReceiveBulkDataIn(device, CmdFormat{\n    .opcode \u003d Opcode::kAction,\n    .subcmd \u003d Subcmd::kFlashWpGet\n}, data, kGenericInfoTimeout);\n\n```\n\n### 2. `SetFlashProtection`\n\nThis eliminates the confusing trailing `~std::to_underlying(wp_area)` argument, explicitly showing that the inverted value goes into the `length` field.\n\n```cpp\n// Before:\nauto res \u003d ReceiveActionIn(device, Subcmd::kFlashWpSet, std::to_underlying(wp_area),\n                           dummy, kGenericInfoTimeout, ~std::to_underlying(wp_area));\n\n// After:\nauto res \u003d ReceiveBulkDataIn(device, CmdFormat{\n    .opcode \u003d Opcode::kAction,\n    .address \u003d ToLittleEndian(std::to_underlying(wp_area)),\n    .length \u003d ToLittleEndian(~std::to_underlying(wp_area)),\n    .subcmd \u003d Subcmd::kFlashWpSet\n}, dummy, kGenericInfoTimeout);\n\n```\n\n### 3. `VerifyData`\n\nThis clears up the confusing `0` argument (which was `aux_address`) just to reach the `hash_mode` flag.\n\n```cpp\n// Before:\nauto io_res \u003d ReceiveActionIn(device, Subcmd::kVerify, target_addr, device_hash,\n                              kVerifyHashTimeout, firmware_data.size(), 0, hash_mode);\n\n// After:\nauto io_res \u003d ReceiveBulkDataIn(device, CmdFormat{\n    .opcode \u003d Opcode::kAction,\n    .address \u003d ToLittleEndian(target_addr),\n    .length \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(firmware_data.size())),\n    .subcmd \u003d Subcmd::kVerify,\n    .flags \u003d hash_mode\n}, device_hash, kVerifyHashTimeout);\n\n```\n\nWith these changes (and the previous `SendActionOut` ones), you can completely delete `SendActionOut`, `ReceiveActionIn`, and `BuildFtCmd` from the codebase. The SCSI construction is now entirely type-safe, self-documenting, and localized to the exact spot the command is executed.",
+      "parentUuid": "f1a90fd9_34308638",
+      "range": {
+        "startLine": 195,
+        "startChar": 0,
+        "endLine": 198,
+        "endChar": 37
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "05833988_c714f39d",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 23
