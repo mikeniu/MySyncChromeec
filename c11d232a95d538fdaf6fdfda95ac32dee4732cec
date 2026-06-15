@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "395d6715_10945924",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-15T22:05:19Z",
+      "side": 1,
+      "message": "For Realtek, the `.set_power_level` call translates to the `SET_TPC_RP` command, which is valid if the port is acting as a source only or as a DRP.  We are always a DRP, unless we are operating as SINK only.",
+      "revId": "c11d232a95d538fdaf6fdfda95ac32dee4732cec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
