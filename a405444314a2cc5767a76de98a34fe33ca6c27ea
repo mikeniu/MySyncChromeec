@@ -413,6 +413,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4aa3134_7f2bd5e2",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-06-15T14:36:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9081e95f_395644bc",
+      "range": {
+        "startLine": 95,
+        "startChar": 0,
+        "endLine": 95,
+        "endChar": 47
+      },
+      "revId": "a405444314a2cc5767a76de98a34fe33ca6c27ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "36cddc41_9fd18ecd",

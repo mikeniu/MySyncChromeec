@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca7138f0_db457d5d",
+        "filename": "zephyr/drivers/pwrmon/Kconfig",
+        "patchSetId": 34
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-06-15T14:36:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "83f4e749_ed913154",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 34
+      },
+      "revId": "ff12ea334e2164a9ded696c60d473e7d7ce17fff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "22ee8759_2f2fc9a6",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-12T19:07:05Z",
       "side": 1,
       "message": "Missing copyright header and formatting is not correct.\nPlease make sure you are running pre-upload checks using `repo upload . --cbr` instead of `git push`",
+      "range": {
+        "startLine": 1,
+        "startChar": 8,
+        "endLine": 1,
+        "endChar": 46
+      },
+      "revId": "ff12ea334e2164a9ded696c60d473e7d7ce17fff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94942541_67790a5e",
+        "filename": "zephyr/drivers/pwrmon/power_monitor.h",
+        "patchSetId": 34
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-06-15T14:36:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22ee8759_2f2fc9a6",
       "range": {
         "startLine": 1,
         "startChar": 8,
