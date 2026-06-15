@@ -141,6 +141,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c2149424_efb621ee",
+        "filename": "util/focaltech/cli_test.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T23:25:10Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n---\n\nIn `FakeEcTransport::Recv`, you calculate an offset and apply it directly to a raw pointer to handle partial reads:\n\n```c\nsize_t to_copy \u003d std::min(data.size(), resp.size() - recv_offset_);\n\n// POINTER MATH: resp.data() + recv_offset_\nmemcpy(data.data(), resp.data() + recv_offset_, to_copy);\n\n```\n\n**Improvement:** You can eliminate the pointer math by slicing a `std::span` over the response buffer. Combined with `std::ranges::copy`, this makes the operation entirely bounds-checked and pointer-free:\n\n```c\nauto unread_data \u003d std::span(resp).subspan(recv_offset_);\nsize_t to_copy \u003d std::min(data.size(), unread_data.size());\n\nstd::ranges::copy(unread_data.first(to_copy), data.begin());\n\n```",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 37
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c9d8f674_b20a0bd2",
         "filename": "util/focaltech/ft_log.h",
         "patchSetId": 23
