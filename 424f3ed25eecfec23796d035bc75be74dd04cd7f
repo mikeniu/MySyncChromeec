@@ -33,6 +33,24 @@
       "message": "I\u0027m not totally clear on the state flow here, but will this mean that if you set all writes to fail, reads will fail too, and vice versa? Is that the way it\u0027s supposed to work? On the level of physical analogy, that kind of makes sense, but it seems unintuitive for the test writer. I\u0027m not sure we have rigorously defined requirements here.",
       "revId": "424f3ed25eecfec23796d035bc75be74dd04cd7f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3499641_7f21e946",
+        "filename": "zephyr/emul/emul_common_i2c.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-15T20:39:59Z",
+      "side": 1,
+      "message": "Hmm I didn\u0027t think about that aspect and it didn\u0027t seem like any tests were failing because of this change...but I can see this causing some issues. However I think the passed in data should only ever have one or the other and only for the intended operation. I\u0027ll check to verify that that is in fact the case it was only my assumption",
+      "parentUuid": "fe7dcd8b_3c71ab96",
+      "revId": "424f3ed25eecfec23796d035bc75be74dd04cd7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
