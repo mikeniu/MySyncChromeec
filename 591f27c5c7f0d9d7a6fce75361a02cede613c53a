@@ -20,6 +20,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "08ca3055_b394058b",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 586,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:37:15Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n-----\n\n\nIn `bootrom.cc`, functions like `GetBootromInfo`, `GetFlashInfo`, and `ReadReg` repeatedly do this dance:\n\n1. Initialize a `req` struct.  \n2. `SendStruct(req)`.  \n3. Check for error.  \n4. `ReadStruct\u003cResponse\u003e`.  \n5. Check for error.  \n6. Return data.\n\nYou already implemented `SendCommandTyped\u003cT\u003e` in `EcComm` to solve exactly this problem\\! You can do the exact same thing in `BootromComm`:\n\n```c\n// Add to BootromComm\ntemplate \u003cTriviallyCopyable Resp, TriviallyCopyable Req\u003e\nstd::expected\u003cResp, BootromError\u003e SendAndReadStruct(const Req\u0026 req) {\n  auto resp \u003d SendStruct(req);\n  if (!resp) return std::unexpected(resp.error());\n  \n  auto parsed \u003d ReadStruct\u003cResp\u003e(*resp);\n  if (!parsed) return std::unexpected(BootromError::kResponseTruncated);\n  return parsed.value();\n}\n\n```\n\nNow `GetBootromInfo` becomes incredibly concise:\n\n```c\nstd::expected\u003cEgisBootrom::BootromInfoResponse, BootromError\u003e BootromComm::GetBootromInfo() {\n  auto info_res \u003d SendAndReadStruct\u003cEgisBootrom::BootromInfoResponse\u003e(\n      EgisBootrom::GetBootromInfoCommand{});\n      \n  if (info_res) {\n    info_res-\u003eversion \u003d FromLittleEndian(info_res-\u003eversion);\n    info_res-\u003emax_cmd_size \u003d FromLittleEndian(info_res-\u003emax_cmd_size);\n    info_res-\u003emax_fw_upgrade_size \u003d FromLittleEndian(info_res-\u003emax_fw_upgrade_size);\n  }\n  return info_res;\n}\n\n```",
+      "range": {
+        "startLine": 554,
+        "startChar": 0,
+        "endLine": 586,
+        "endChar": 1
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cbcc2354_98a4527f",
         "filename": "util/egis/build.mk",
         "patchSetId": 39
@@ -128,6 +151,29 @@
         "startChar": 0,
         "endLine": 107,
         "endChar": 0
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26d8cd5e_a7b21ccc",
+        "filename": "util/egis/usb_comm.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:37:15Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\n`Send` and `Receive` are exactly the same, right down to the error formatting, except for the endpoint variable (`ep_out_` vs `ep_in_`) and a `const` cast. You can abstract the core `libusb_bulk_transfer` into a private helper:\n\n```c\nstd::expected\u003cint, UsbError\u003e UsbComm::DoTransfer(\n    uint8_t ep, uint8_t* data, int length, std::chrono::milliseconds timeout) {\n  if (!handle_) {\n    std::println(stderr, \"[ERROR] Not connected. Call connect() first.\");\n    return std::unexpected(UsbError::kNotConnected);\n  }\n\n  int transferred \u003d 0;\n  int rc \u003d libusb_bulk_transfer(handle_.get(), ep, data, length, \n                                \u0026transferred, static_cast\u003cunsigned int\u003e(timeout.count()));\n  if (rc !\u003d 0) {\n    std::println(stderr, \"[ERROR] USB Transfer failed: {}\", LibusbErrorToString(rc));\n    return std::unexpected(LibusbErrorToUsbError(rc));\n  }\n  return transferred;\n}\n\n```\n\nThen `Send` and `Receive` become:\n\n```c\nstd::expected\u003cvoid, UsbError\u003e UsbComm::Send(...) {\n  auto res \u003d DoTransfer(ep_out_, const_cast\u003cuint8_t*\u003e(data.data()), data.size(), timeout);\n  if (!res || res.value() !\u003d static_cast\u003cint\u003e(data.size())) {\n     return std::unexpected(res ? UsbError::kIoError : res.error()); \n  }\n  return {};\n}\n\nstd::expected\u003cint, UsbError\u003e UsbComm::Receive(...) {\n  return DoTransfer(ep_in_, data.data(), data.size(), timeout);\n}\n\n```",
+      "range": {
+        "startLine": 106,
+        "startChar": 0,
+        "endLine": 146,
+        "endChar": 1
       },
       "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
