@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7def083d_4ea4eadb",
+        "filename": "zephyr/emul/emul_common_i2c.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-15T20:34:38Z",
+      "side": 1,
+      "message": "I think these are now redundant.",
+      "revId": "424f3ed25eecfec23796d035bc75be74dd04cd7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe7dcd8b_3c71ab96",
+        "filename": "zephyr/emul/emul_common_i2c.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-15T20:34:38Z",
+      "side": 1,
+      "message": "I\u0027m not totally clear on the state flow here, but will this mean that if you set all writes to fail, reads will fail too, and vice versa? Is that the way it\u0027s supposed to work? On the level of physical analogy, that kind of makes sense, but it seems unintuitive for the test writer. I\u0027m not sure we have rigorously defined requirements here.",
+      "revId": "424f3ed25eecfec23796d035bc75be74dd04cd7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
