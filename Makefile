@@ -76,10 +76,11 @@ ifeq ($(TEST_FUZZ)_$(TEST_ASAN)$(TEST_MSAN)$(TEST_UBSAN),y_)
 override TEST_ASAN:=y
 endif
 
-include Makefile.toolchain
-
 # Define the traditional first target. The dependencies of this are near the
 # bottom as they can be altered by chip and board files.
+# Helper for setting compiler options (defined early for toolchain.mk)
+set-option = $(eval $1=$$(strip $$(if $(2),$(2),$(3))))
+
 .PHONY: all
 all:
 
@@ -128,14 +129,23 @@ CROSS_COMPILE_TARGET_arm:=arm-eabi
 CROSS_TOOLCHAIN:=$(CROSS_COMPILE_TARGET_$(COREBOOT_TOOLCHAIN))
 CROSS_COREBOOT:=$(CROSS_COMPILE_TARGET_$(COREBOOT_TOOLCHAIN))
 
-ifneq (,$(COREBOOT_SDK_ROOT_$(COREBOOT_TOOLCHAIN)))
-CROSS_COMPILE:=$(COREBOOT_SDK_ROOT_$(COREBOOT_TOOLCHAIN))/bin/$(CROSS_COREBOOT)-
+# Determine compiler prefix path (CROSS_COMPILE)
+COREBOOT_SDK_ROOT := $(COREBOOT_SDK_ROOT_$(COREBOOT_TOOLCHAIN))
+
+ifeq ($(CROSS_COMPILE_CC_NAME),clang)
+  ifeq ($(COREBOOT_SDK_ROOT),)
+    COREBOOT_SDK_ROOT := /opt/ti50-sdk
+  endif
+  CROSS_COMPILE := $(COREBOOT_SDK_ROOT)/bin/
 else
-ifneq (,$(USE_COREBOOT_SDK))
-CROSS_COMPILE:=$(shell bazel --project fwsdk run \
-	@cr50-coreboot-sdk-$(CROSS_TOOLCHAIN)//:get_path)/bin/$(CROSS_COREBOOT)-
+  ifeq ($(COREBOOT_SDK_ROOT),)
+    COREBOOT_SDK_ROOT := $(lastword $(shell bazel \
+			 --project fwsdk run @cr50-coreboot-sdk-arm-eabi//:get_path 2>/dev/null))
+  endif
+  CROSS_COMPILE := $(COREBOOT_SDK_ROOT)/bin/$(CROSS_COREBOOT)-
 endif
-endif
+
+include Makefile.toolchain
 
 # Create uppercase config variants, to avoid mixed case constants.
 # Also translate '-' to '_', so 'cortex-m' turns into 'CORTEX_M'.  This must

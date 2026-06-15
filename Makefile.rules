@@ -54,10 +54,14 @@ quiet = $(cmd_$(1))
 endif
 endif
 
+ifeq ($(CROSS_COMPILE_CC_NAME),clang)
+CHECK_FIPS=0
+else
 ifeq ($(CR50_DEV)$(CRYPTO_TEST),)
 CHECK_FIPS=1
 else
 CHECK_FIPS=0
+endif
 endif
 
 # commands to build all targets
@@ -69,7 +73,7 @@ cmd_lds_b = $(cmd_lds) -DRW_B_LDS=$(EMPTY)
 # Allow obj_to_bin to be overridden by board or chip specific commands
 cmd_obj_to_bin ?= $(OBJCOPY) --gap-fill=0xff -O binary $^ $(out)/$*.bin.tmp
 cmd_flat_to_obj = $(CC) -Wl,-T $(out)/firmware_image.lds -nostdlib $(CFLAGS) \
-                  -Wl,--build-id=none -o $@ $<
+                  -Wl,--entry=0 -Wl,--build-id=none -o $@ $<
 # Allow the .roshared section to overlap other sections (itself)
 cmd_ec_elf_to_flat ?= $(OBJCOPY) --set-section-flags .roshared=share \
 				-O binary $< $@
@@ -85,7 +89,8 @@ cmd_elf_to_dis = $(OBJDUMP) -D $< > $@
 cmd_elf_to_bin = $(OBJCOPY) -O binary $< $@
 cmd_elf_to_hex = $(OBJCOPY) -O ihex $< $@
 cmd_bin_to_hex = $(OBJCOPY) -I binary -O ihex \
-	--change-addresses $(_program_memory_base) $^ $@
+	--change-section-address=*+$(_program_memory_base) \
+	--change-start=$(_program_memory_base) $^ $@
 cmd_smap = $(NM) $< | sort > $@
 cmd_elf = $(CC) $(objs) $(libsharedobjs_elf-y) $(LDFLAGS) \
 	-o $@ -Wl,-T,$< -Wl,-Map,$(patsubst %.elf,%.map,$@)
@@ -376,9 +381,9 @@ cmd_size=
 cmd_compatibility_checks=
 else
 cmd_size=$(Q)awk '\
-  /__image_size =/ {image_size = strtonum($$1)} \
-  /^FLASH/ {flash_size = strtonum($$3)} \
-  /__ram_free =/ {ram_free = strtonum($$1)} \
+  $$3 == "__image_size" {image_size = strtonum("0x" $$1)} \
+  $$3 == "__flash_size" {flash_size = strtonum("0x" $$1)} \
+  $$3 == "__ram_free" {ram_free = strtonum("0x" $$1)} \
   END {room_free = flash_size - image_size; \
        print ram_free > "$(out)/$(1)/space_free_ram.txt"; \
        printf "  *** "; \
@@ -388,7 +393,7 @@ cmd_size=$(Q)awk '\
        } \
        printf ("%s bytes in RAM still available on $(BRANCH) $(BOARD) $(1) " \
            "****\n", ram_free) \
-  }' $(out)/$(1)/$(PROJECT).$(1).map
+  }' $(out)/$(1)/$(PROJECT).$(1).smap
 
 cmd_compatibility_checks = util/check_legacy_size.sh \
 	$(out)/$(1)/space_free_flash.txt $(SPACE_BUFFER)

@@ -46,15 +46,21 @@ main() {
   fi
   vals=( $(${objdump}  -x -j .text "${rw_elf_in}" | awk '
   {
-          if ($2 == ".text" ) {
-                  file_offs = $6
-                  base_addr = $5
+          if ($1 == "LOAD" && $2 == "off") {
+                  load_segments[strtonum($5)] = strtonum($3)
           }
-          if ($5 == "__fips_module_start") {fips_start = $1 }
-          if ($5 == "__fips_module_end") {fips_end = $1 }
+          if ($2 == ".text") {
+                  text_vma = strtonum("0x" $4)
+          }
+          if ($5 == "__fips_module_start") { fips_start = strtonum("0x" $1) }
+          if ($5 == "__fips_module_end") { fips_end = strtonum("0x" $1) }
   }
-  END { printf "0x%s 0x%s 0x%s 0x%s\n", file_offs, base_addr, fips_start,
-  fips_end }') )
+  END {
+          file_offs = load_segments[text_vma]
+          base_addr = text_vma
+          printf "0x%x 0x%x 0x%x 0x%x\n", file_offs, base_addr,
+                 fips_start, fips_end
+  }') )
 
   file_offset=${vals[0]}
   base_addr=${vals[1]}
