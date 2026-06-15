@@ -10,7 +10,15 @@
 CFLAGS_FPU-$(CONFIG_FPU)=-mfpu=fpv4-sp-d16 -mfloat-abi=hard
 
 # CPU specific compilation flags
-CFLAGS_CPU+=-mthumb -Os -mno-sched-prolog
+CFLAGS_CPU+=-mthumb
+ifeq ($(CROSS_COMPILE_CC_NAME),clang)
+CFLAGS_CPU+=-Oz
+else
+CFLAGS_CPU+=-Os
+endif
+ifneq ($(CROSS_COMPILE_CC_NAME),clang)
+CFLAGS_CPU+=-mno-sched-prolog
+endif
 CFLAGS_CPU+=-mno-unaligned-access
 CFLAGS_CPU+=$(CFLAGS_FPU-y)
 
@@ -19,6 +27,7 @@ CFLAGS_CPU+=-flto
 LDFLAGS_EXTRA+=-flto
 endif
 
+ifneq ($(CROSS_COMPILE_CC_NAME),clang)
 # gcc 11.2 had a known issue which doesn't affect Cr50 build anymore
 # but we can't remove -fno-ipa-modref as it changes FIPS module digest
 GCC_VERSION := $(shell $(CROSS_COMPILE)$(CROSS_COMPILE_CC_NAME) -dumpversion)
@@ -43,6 +52,7 @@ endif
 # Set an option to force LTO to generate target machine code.
 # `-flinker-output=nolto-rel` first became available in gcc 9.x
 CFLAGS_LTO_PARTIAL_LINK := -flinker-output=nolto-rel
+endif
 
 core-y=cpu.o init.o ldivmod.o llsr.o uldivmod.o vecttable.o
 core-$(CONFIG_AES)+=aes.o

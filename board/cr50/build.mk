@@ -235,8 +235,13 @@ ifneq ($(fips-y),)
 FIPS_MODULE=dcrypto/fips_module.o
 FIPS_LD_SCRIPT=$(BDIR)/dcrypto/fips_module.ld
 RW_FIPS_OBJS=$(patsubst %.o, $(RW_BD_OUT)/%.o, $(fips-y))
+ifeq ($(CROSS_COMPILE_CC_NAME),clang)
+$(RW_FIPS_OBJS): CFLAGS += -frandom-seed=0 -Wswitch -Wsign-compare\
+			   -Wuninitialized
+else
 $(RW_FIPS_OBJS): CFLAGS += -frandom-seed=0 -fno-fat-lto-objects -Wswitch\
 			   -Wsign-compare -Wuninitialized -fconserve-stack
+endif
 
 $(RW_FIPS_OBJS): | $(out)/ec_version.h $(out)/env_config.h
 rw_board_deps := $(addsuffix .d, $(RW_FIPS_OBJS))
@@ -244,15 +249,21 @@ rw_board_deps := $(addsuffix .d, $(RW_FIPS_OBJS))
 # Note, since FIPS object files are compiled with lto, actual compilation
 # and code optimization take place during link time.
 # Consider -ffile-prefix-map=old_path=new_path if needed
+ifeq ($(CROSS_COMPILE_CC_NAME),clang)
+FIPS_CFLAGS = $(CFLAGS) -frandom-seed=0 -flto -fvisibility=hidden
+FIPS_LDFLAGS = -Wl,-mllvm,-inline-threshold=-20
+else
 FIPS_CFLAGS = $(CFLAGS) -frandom-seed=0 -flto=1 -flto-partition=1to1 -fipa-pta\
   -fvisibility=hidden -fipa-cp-clone -fweb -ftree-partial-pre\
   -flive-range-shrinkage -fgcse-after-reload -fgcse-sm -fgcse-las -fivopts\
   -fpredictive-commoning -freorder-blocks-algorithm=stc\
   $(CFLAGS_LTO_PARTIAL_LINK)
+FIPS_LDFLAGS =
+endif
 
 $(RW_BD_OUT)/$(FIPS_MODULE): $(RW_FIPS_OBJS) $(FIPS_LD_SCRIPT)
 	@echo "  LD      $(notdir $@)"
-	$(Q)$(CC) $(FIPS_CFLAGS) --static -Wl,--relocatable\
+	$(Q)$(CC) $(FIPS_CFLAGS) $(FIPS_LDFLAGS) --static -Wl,--relocatable\
 		-Wl,-T $(FIPS_LD_SCRIPT) -Wl,-Map=$@.map -o $@ $(RW_FIPS_OBJS)
 	$(Q)$(OBJDUMP) -th $@ > $@.sym
 

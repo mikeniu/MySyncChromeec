@@ -7,8 +7,11 @@
 CORE:=cortex-m
 CFLAGS_CPU+=-march=armv7-m -mcpu=cortex-m3
 
-# Flags to reduce unnecessary warnings with gcc 11.2
-CFLAGS_CHIP :=-Wno-stringop-overflow -Wno-array-parameter -Wno-stringop-overread
+# Flags to reduce unnecessary warnings with gcc 11.2 (only for non-Clang)
+GCC_WARNING_FLAGS = -Wno-stringop-overflow -Wno-array-parameter\
+		    -Wno-stringop-overread
+CFLAGS_CHIP = $(if \
+	        $(filter clang,$(CROSS_COMPILE_CC_NAME)),,$(GCC_WARNING_FLAGS))
 
 ifeq ($(CONFIG_DCRYPTO),y)
 INCLUDE_ROOT := $(abspath ./include)
