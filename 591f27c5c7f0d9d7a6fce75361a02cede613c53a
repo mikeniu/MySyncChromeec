@@ -182,6 +182,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "94f3e9bd_7f17f261",
+        "filename": "util/egis/bootrom_test.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:08:40Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nI mentioned this previously for `PackMessage`, but it applies across several other files (like `bootrom.cc` and `bootrom_test.cc`). You are using the legacy `\u003cvector\u003e` idiom of calling `.insert()` with `.begin()` and `.end()` iterators:\n\n```c\nbuffer.insert(buffer.end(), resp-\u003ebegin(), resp-\u003eend());\n\n// In bootrom_test.cc:\nresp_packet.insert(resp_packet.end(), tag.begin(), tag.end());\nresp_packet.insert(resp_packet.end(), ciphertext.begin(), ciphertext.end());\n\n```\n\n**The Fix:** C++23 introduced `std::vector::append_range`, which accepts any range (like `std::vector`, `std::array`, or `std::span`) directly. This is safer, more performant, and drastically more readable:\n\n```c\nbuffer.append_range(*resp);\n\n// In bootrom_test.cc:\nresp_packet.append_range(tag);\nresp_packet.append_range(ciphertext);\n\n```",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 23
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cbcc2354_98a4527f",
         "filename": "util/egis/build.mk",
         "patchSetId": 39
