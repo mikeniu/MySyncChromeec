@@ -204,6 +204,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "390c22e1_b46aeb20",
+        "filename": "util/egis/egis_util.h",
+        "patchSetId": 39
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:52:58Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn `egis_util.h`, `PackMessage` uses the pre-C++23 idiom of calling `.insert()` with `begin()` and `end()` iterators to concatenate data.\n\nC++23 introduced `.append_range()`, which accepts `std::span` (or any range) directly. This removes the iterator boilerplate and clearly expresses your intent:\n\n**Before:**\n\n```c\ntemplate \u003cTriviallyCopyable T\u003e\nstd::vector\u003cuint8_t\u003e PackMessage(const T \u0026header, std::span\u003cconst uint8_t\u003e payload \u003d {}) {\n  std::vector\u003cuint8_t\u003e buffer;\n  buffer.reserve(sizeof(T) + payload.size());\n  \n  auto header_bytes \u003d AsBytes(header);\n  buffer.insert(buffer.end(), header_bytes.begin(), header_bytes.end());\n  buffer.insert(buffer.end(), payload.begin(), payload.end());\n  \n  return buffer;\n}\n\n```\n\n**After:**\n\n```c\ntemplate \u003cTriviallyCopyable T\u003e\nstd::vector\u003cuint8_t\u003e PackMessage(const T \u0026header, std::span\u003cconst uint8_t\u003e payload \u003d {}) {\n  std::vector\u003cuint8_t\u003e buffer;\n  buffer.reserve(sizeof(T) + payload.size());\n  \n  buffer.append_range(AsBytes(header));\n  buffer.append_range(payload);\n  \n  return buffer;\n}\n\n```",
+      "range": {
+        "startLine": 70,
+        "startChar": 1,
+        "endLine": 83,
+        "endChar": 1
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "05a9c10b_0649b3df",
         "filename": "util/egis/flasher_logic.cc",
         "patchSetId": 39
