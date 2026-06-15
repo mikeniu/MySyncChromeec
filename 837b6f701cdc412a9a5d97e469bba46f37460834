@@ -302,6 +302,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "61a9c8e9_6363f1a5",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T23:39:45Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn `ft_scsi.cc`, the USB Bulk-Only Transfer signatures are defined in an anonymous namespace:\n\n```c\nconstexpr uint32_t kUsbMsCbwSignature \u003d 0x43425355;\nconstexpr uint32_t kUsbMsCswSignature \u003d 0x53425355;\n\n```\n\nHowever, because they are hidden in the `.cc` file, `test_utils.h` had to redefine the CSW signature to build fake responses:\n\n```c\n// In test_utils.h\ninline constexpr uint32_t kUsbMsCswSignature \u003d 0x53425355; // Duplicate!\n\n```\n\n**Fix:** Move these two constants into `ft_scsi.h` so the test framework and the implementation share the exact same source of truth.",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 51
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fb835fd6_96094fe5",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 23
@@ -479,6 +502,29 @@
         "startChar": 0,
         "endLine": 88,
         "endChar": 1
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2d7779f_06f1799b",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T23:39:45Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n---\n\nIn `libusb_transport.cc`, you check for an active kernel driver by placing the C-API function directly inside an `if` statement:\n\n```cpp\nif (libusb_kernel_driver_active(handle_.get(), interface_num_)) {\n  if (libusb_detach_kernel_driver(...) !\u003d LIBUSB_SUCCESS) { ... }\n}\n\n```\n\n**Why it\u0027s dangerous:**\nThe `libusb_kernel_driver_active` function does not return a boolean. It returns:\n\n* `1` if a kernel driver is active.\n* `0` if no kernel driver is active.\n* **A negative `LIBUSB_ERROR_*` code on failure.**\n\nBecause C++ evaluates *any* non-zero integer as `true`, if the device suddenly disconnects and the function returns `LIBUSB_ERROR_NO_DEVICE` (which is `-4`), the `if` statement evaluates to `true`. Your code will then erroneously attempt to detach a driver from a missing device, generating a confusing secondary error rather than handling the actual issue.\n\n**The Fix:**\nDefine a constant for the `1` state and check for exact equality. This explicitly documents the API\u0027s behavior and safely ignores negative error codes (treating them as \"not active\", allowing standard error handling to catch the missing device elsewhere).\n\n```cpp\nconstexpr int kKernelDriverActive \u003d 1;\n\nif (libusb_kernel_driver_active(handle_.get(), interface_num_) \u003d\u003d kKernelDriverActive) {\n  if (libusb_detach_kernel_driver(handle_.get(), interface_num_) !\u003d LIBUSB_SUCCESS) {\n    FT_LOGE(\"Failed to detach kernel driver\");\n    return std::unexpected(Error::kResultFail);\n  }\n}\n\n```",
+      "range": {
+        "startLine": 208,
+        "startChar": 0,
+        "endLine": 208,
+        "endChar": 67
       },
       "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
