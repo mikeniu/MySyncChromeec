@@ -9,6 +9,11 @@
 #include "common.h"
 #include "usb_hw.h"
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Winitializer-overrides"
+#endif
+
 typedef void (*xfer_func)(void);
 typedef void (*rst_func) (void);
 typedef int (*iface_func)(struct usb_setup_packet *req);
@@ -155,4 +160,8 @@ table(iface_func, usb_iface_request,
 #undef PASS
 #define PASS 2
 #include "usb_endpoints.c"
+#endif
+
+#ifdef __clang__
+#pragma clang diagnostic pop
 #endif
