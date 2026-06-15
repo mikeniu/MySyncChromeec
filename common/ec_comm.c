@@ -94,7 +94,8 @@ DECLARE_HOOK(HOOK_INIT, ec_comm_init_, HOOK_PRIO_INIT_EC_CR50_COMM);
  *                                     are not same.
  *         0 if it deosn't have to respond to EC.
  */
-static uint16_t decode_packet_(const struct cr50_comm_packet *ph, int bytes)
+static __attribute__((noinline))
+uint16_t decode_packet_(const struct cr50_comm_packet *ph, int bytes)
 {
 	const int offset_cmd = offsetof(struct cr50_comm_packet, cmd);
 	uint8_t crc8_calc;

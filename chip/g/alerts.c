@@ -110,7 +110,7 @@ static void alert_intr_clear(int alert)
 	*INTR_STATUS_ADDR[reg] = 1 << offset;
 }
 
-static void alert_interrupt_process(int alert)
+static void __attribute__((noinline)) alert_interrupt_process(int alert)
 {
 	alert_counters[alert]++;
 	alert_intr_clear(alert);

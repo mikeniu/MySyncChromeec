@@ -99,6 +99,16 @@ static enum ec_reboot_cmd reboot_at_shutdown;
 /* On-going actions preventing going into deep-sleep mode */
 uint32_t sleep_mask;
 
+void enable_sleep(uint32_t mask)
+{
+	atomic_clear(&sleep_mask, mask);
+}
+
+void disable_sleep(uint32_t mask)
+{
+	atomic_or(&sleep_mask, mask);
+}
+
 /**
  * Return the program memory address where the image `copy` begins or should
  * begin. In the case of external storage, the image may or may not currently

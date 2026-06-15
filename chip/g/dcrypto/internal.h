@@ -212,6 +212,14 @@ int dcrypto_ladder_derive(enum dcrypto_appid appid, const uint32_t salt[8],
 			  const uint32_t input[8], uint32_t output[8]);
 #endif
 
+#ifndef __optimize
+#ifndef __clang__
+#define __optimize(a) __attribute__((optimize(a)))
+#else
+#define __optimize(a) __attribute__((hot))
+#endif
+#endif
+
 #ifdef __cplusplus
 }
 #endif

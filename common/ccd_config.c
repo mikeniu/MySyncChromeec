@@ -1380,6 +1380,8 @@ static enum vendor_cmd_rc ccd_get_info(struct vendor_cmd_params *p)
 {
 	int i;
 	struct ccd_info_response response = {};
+	uint32_t caps_current[CCD_CAPS_WORDS] = {0};
+	uint32_t caps_defaults[CCD_CAPS_WORDS] = {0};
 
 	for (i = 0; i < CCD_CAP_COUNT; i++) {
 		int index;
@@ -1388,8 +1390,8 @@ static enum vendor_cmd_rc ccd_get_info(struct vendor_cmd_params *p)
 		/* Each capability takes 2 bits. */
 		index = i / (32 / CCD_CAP_BITS);
 		shift = (i % (32 / CCD_CAP_BITS)) * CCD_CAP_BITS;
-		response.ccd_caps_current[index] |= raw_get_cap(i, 1) << shift;
-		response.ccd_caps_defaults[index] |=
+		caps_current[index] |= raw_get_cap(i, 1) << shift;
+		caps_defaults[index] |=
 			cap_info[i].default_state << shift;
 	}
 
@@ -1400,11 +1402,11 @@ static enum vendor_cmd_rc ccd_get_info(struct vendor_cmd_params *p)
 	response.ccd_indicator_bitmap |= raw_check_all_caps_default() ?
 				CCD_INDICATOR_BIT_ALL_CAPS_DEFAULT : 0;
 	response.ccd_force_disabled = force_disabled;
-	for (i = 0; i < ARRAY_SIZE(response.ccd_caps_current); i++) {
+	for (i = 0; i < ARRAY_SIZE(caps_current); i++) {
 		response.ccd_caps_current[i] =
-			htobe32(response.ccd_caps_current[i]);
+			htobe32(caps_current[i]);
 		response.ccd_caps_defaults[i] =
-			htobe32(response.ccd_caps_defaults[i]);
+			htobe32(caps_defaults[i]);
 	}
 
 	p->out_size = sizeof(response);

@@ -178,6 +178,7 @@ __stdlib_compat void *memmove(void *dest, const void *src, size_t len)
 }
 
 
+__attribute__((noinline))
 void reverse(void *dest, size_t len)
 {
 	size_t i;

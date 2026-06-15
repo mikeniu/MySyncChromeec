@@ -38,7 +38,8 @@ static void set_one_gpio_bit(uint32_t port, uint16_t mask, int value)
 
 static uint32_t gpio_sleepmask;
 
-static void gpio_control_sleep(enum gpio_signal signal, int enable)
+static __attribute__((noinline))
+void gpio_control_sleep(enum gpio_signal signal, int enable)
 {
 #ifdef CONFIG_GPIO_DISABLE_SLEEP
 	uint32_t signal_mask;

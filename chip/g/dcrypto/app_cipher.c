@@ -10,7 +10,7 @@
  * compiler to optimize for speed here.  Incidentally -O produces
  * faster code than -O2!
  */
-static int __attribute__((optimize("O")))
+static int __optimize("O")
 inner_loop(uint32_t **out, const uint32_t **in, size_t len)
 {
 	uint32_t *outw = *out;

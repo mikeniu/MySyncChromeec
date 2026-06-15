@@ -1175,7 +1175,8 @@ static uint32_t bn_mod_f4(const struct LITE_BIGNUM *d)
 #define ROUNDS_384  22
 
 /* Miller-Rabin from HAC, algorithm 4.24. */
-static int bn_probable_prime(const struct LITE_BIGNUM *p)
+static __attribute__((noinline))
+int bn_probable_prime(const struct LITE_BIGNUM *p)
 {
 	int j;
 	int s = 0;
@@ -1187,6 +1188,7 @@ static int bn_probable_prime(const struct LITE_BIGNUM *p)
 	struct LITE_BIGNUM A;
 	struct LITE_BIGNUM y;
 	uint8_t *buffer;
+	uint32_t tmp_buffer[RSA_WORDS_2K * 3];
 	size_t p_len;
 
 	const int rounds = bn_bits(p) >= 1024 ? ROUNDS_1024 :
@@ -1207,7 +1209,7 @@ static int bn_probable_prime(const struct LITE_BIGNUM *p)
 	 * this way we reduce code size for alignments.
 	 */
 
-	buffer = alloca(p_len * 3);
+	buffer = (uint8_t *)tmp_buffer;
 
 	DCRYPTO_bn_wrap(&ONE, &ONE_buf, sizeof(ONE_buf));
 	DCRYPTO_bn_wrap(&r, buffer, p_len);

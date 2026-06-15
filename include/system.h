@@ -407,21 +407,8 @@ extern uint32_t sleep_mask;
  *
  * @param Sleep mask to enable.
  */
-static inline void enable_sleep(uint32_t mask)
-{
-	atomic_clear(&sleep_mask, mask);
-}
-
-/**
- * Disable low power sleep mask. For low power sleep to take affect, all masks
- * in the sleep mask enum above must be enabled.
- *
- * @param Sleep mask to enable.
- */
-static inline void disable_sleep(uint32_t mask)
-{
-	atomic_or(&sleep_mask, mask);
-}
+void enable_sleep(uint32_t mask);
+void disable_sleep(uint32_t mask);
 
 /* The following three functions are not available on all chips. */
 /**

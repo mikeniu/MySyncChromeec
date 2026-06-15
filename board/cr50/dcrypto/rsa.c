@@ -81,6 +81,7 @@ static enum dcrypto_result MGF1_xor(uint8_t *dst, uint32_t dst_len,
  * };
  */
 /* encrypt */
+__attribute__((noinline))
 static enum dcrypto_result oaep_pad(uint8_t *output, uint32_t output_len,
 				    const uint8_t *msg, uint32_t msg_len,
 				    enum hashing_mode hashing,
@@ -127,6 +128,7 @@ static enum dcrypto_result oaep_pad(uint8_t *output, uint32_t output_len,
 }
 
 /* decrypt */
+__attribute__((noinline))
 static enum dcrypto_result check_oaep_pad(uint8_t *out, size_t *out_len,
 			uint8_t *padded, size_t padded_len,
 			enum hashing_mode hashing, const char *label)
@@ -406,9 +408,10 @@ static enum dcrypto_result check_pkcs1_type1_pad(const uint8_t *msg,
 static const uint8_t ZEROS[8] = { 0 };
 
 /* sign */
-static enum dcrypto_result pkcs1_pss_pad(uint8_t *padded, size_t padded_len,
-					 const uint8_t *in, size_t in_len,
-					 enum hashing_mode hashing)
+static __attribute__((noinline))
+enum dcrypto_result pkcs1_pss_pad(uint8_t *padded, size_t padded_len,
+				  const uint8_t *in, size_t in_len,
+				  enum hashing_mode hashing)
 {
 	const uint32_t hash_size = DCRYPTO_hash_size(hashing);
 	const uint32_t salt_len = MIN(padded_len - hash_size - 2, hash_size);
@@ -454,10 +457,11 @@ static enum dcrypto_result pkcs1_pss_pad(uint8_t *padded, size_t padded_len,
 }
 
 /* verify */
-static enum dcrypto_result check_pkcs1_pss_pad(const uint8_t *in, size_t in_len,
-					       uint8_t *padded,
-					       size_t padded_len,
-					       enum hashing_mode hashing)
+static __attribute__((noinline))
+enum dcrypto_result check_pkcs1_pss_pad(const uint8_t *in, size_t in_len,
+					uint8_t *padded,
+					size_t padded_len,
+					enum hashing_mode hashing)
 {
 	const uint32_t hash_size = DCRYPTO_hash_size(hashing);
 	uint32_t db_len;
@@ -513,8 +517,9 @@ static enum dcrypto_result check_pkcs1_pss_pad(const uint8_t *in, size_t in_len,
 	return result;
 }
 
-static enum dcrypto_result check_modulus_params(const struct RSA *rsa,
-						size_t *out_len)
+static __attribute__((noinline))
+enum dcrypto_result check_modulus_params(const struct RSA *rsa,
+					 size_t *out_len)
 {
 	/* We don't check for prime exponents, but at least check it is odd. */
 	if ((rsa->e & 1) == 0)

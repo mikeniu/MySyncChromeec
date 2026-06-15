@@ -616,7 +616,7 @@ enum dcrypto_result DCRYPTO_aes_cmac_verify(const uint8_t *key,
 #ifndef __clang__
 #define __optimize(a) __attribute__((optimize(a)))
 #else
-#define __optimize(a)
+#define __optimize(a) __attribute__((hot))
 #endif
 #endif
 
