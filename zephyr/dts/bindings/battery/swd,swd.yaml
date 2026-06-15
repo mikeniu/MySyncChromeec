@@ -16,11 +16,11 @@ properties:
   manuf_name:
     default: "SWD"
   device_name:
-    default: "G82300957-YMD"
+    default: "G82300957"
   ship_mode_reg_addr:
     default: 0x00
   ship_mode_reg_data:
-    default: [0x00f0, 0x00f0]
+    default: [0x0010, 0x0010]
   flags:
     default: 0x0004
   fet_reg_addr:
