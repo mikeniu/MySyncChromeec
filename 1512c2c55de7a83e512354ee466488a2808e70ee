@@ -16,6 +16,24 @@
       "message": "Resubmit once https://crrev.com/c/7925637 has merged and annealed",
       "revId": "1512c2c55de7a83e512354ee466488a2808e70ee",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "080c120d_9d7c02f9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-06-15T16:55:25Z",
+      "side": 1,
+      "message": "Thanks, passing CQ now",
+      "parentUuid": "88109729_e4b07a44",
+      "revId": "1512c2c55de7a83e512354ee466488a2808e70ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
