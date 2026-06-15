@@ -95,6 +95,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "db621ede_ae35c6b3",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T23:34:13Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nWhenever you call `SendEcCommandAndReadResponse`, you pass a raw `0` for the version parameter:\n\n```c\ninternal::SendEcCommandAndReadResponse(device, EC_CMD_GET_BUILD_INFO, 0, {});\ninternal::SendEcCommandAndReadResponse(device, EC_CMD_ENTER_BOOTLOADER, 0, params_span);\n\n```\n\n**Why it\u0027s magic:** EC commands frequently have multiple versions (v0, v1, v2). Passing a raw `0` makes it look like an unused or default parameter, rather than an explicit protocol version constraint. **Fix:** Define it as a constant so it reads cleanly at the call site:\n\n```c\nconstexpr uint8_t kEcCmdVersion0 \u003d 0;\n\ninternal::SendEcCommandAndReadResponse(device, EC_CMD_GET_BUILD_INFO, kEcCmdVersion0, {});\n\n```",
+      "range": {
+        "startLine": 123,
+        "startChar": 0,
+        "endLine": 123,
+        "endChar": 44
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5bc1b3e4_fe30a6fd",
         "filename": "util/focaltech/cli.cc",
         "patchSetId": 23
@@ -111,6 +134,29 @@
         "startChar": 1,
         "endLine": 241,
         "endChar": 0
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "687c9ac3_fa489d02",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T23:34:13Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn `cli.cc`, the CLI parsing matches against raw string literals:\n\n```c\nif (cmd_str \u003d\u003d \"enter_bootloader\") return Command::kEnterBoot;\nif (cmd_str \u003d\u003d \"flash_set_protect\") return Command::kSetFlashWp;\n\n```\n\nThese exact same string literals are then hardcoded again in `cli_test.cc`:\n\n```c\nstd::vector\u003cstd::string_view\u003e args \u003d {\"enter_bootloader\"};\n\n```\n\n**Why it\u0027s magic:** If a command name ever changes (e.g., `\"enter_bootloader\"` becomes `\"bootloader\"`), you have to hunt down the raw strings in both the implementation and the tests. **Fix:** Define them as `constexpr std::string_view` constants in `cli.h` so the parsing, the tests, and even the help text can share a single source of truth:\n\n```c\ninline constexpr std::string_view kCmdEnterBoot \u003d \"enter_bootloader\";\ninline constexpr std::string_view kCmdEnterRom \u003d \"enter_rom\";\n// ...\n\n```",
+      "range": {
+        "startLine": 250,
+        "startChar": 0,
+        "endLine": 250,
+        "endChar": 64
       },
       "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -364,6 +410,29 @@
         "startChar": 0,
         "endLine": 39,
         "endChar": 1
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70c5c545_b42c11f2",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T23:34:13Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nWhen freeing the device list, you pass a raw integer to act as a boolean flag:\n\n```c\nlibusb_free_device_list(list, /*unref_devices\u003d*/1);\n\n```\n\n**Why it\u0027s magic:** While the inline comment helps human readers, Google C++ Style strongly prefers using named constants over raw boolean/integer flags in C APIs to ensure the compiler enforces intent.   \n**Fix:**\n\n```c\nconstexpr int kUnrefDevices \u003d 1;\nlibusb_free_device_list(list, kUnrefDevices);\n\n```",
+      "range": {
+        "startLine": 31,
+        "startChar": 43,
+        "endLine": 31,
+        "endChar": 64
       },
       "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
