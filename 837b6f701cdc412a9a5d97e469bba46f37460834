@@ -49,6 +49,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "945b6d08_3e2db204",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:57:14Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn both `BuildEcCommand` and `BuildEcResponse`, you construct a payload by allocating a vector and manually calling `memcpy` multiple times with `sizeof()` math.\n\n```c\nstd::vector\u003cuint8_t\u003e packet(sizeof(req) + params.size());\nmemcpy(packet.data(), \u0026req, sizeof(req));\nif (!params.empty()) {\n  memcpy(packet.data() + sizeof(req), params.data(), params.size());\n}\n\n```\n\n**Improvement:** You already wrote a brilliant `AsUint8Span` helper in `ft_util.h` for exact use cases like this\\! You can eliminate the raw pointer math and `memcpy` calls:\n\n```c\nstd::vector\u003cuint8_t\u003e packet;\npacket.reserve(sizeof(req) + params.size());\n\nstd::ranges::append_range(packet, AsUint8Span(req));\nstd::ranges::append_range(packet, params);\n```",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 3
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6e6069c6_55c87a37",
         "filename": "util/focaltech/cli.cc",
         "patchSetId": 23
@@ -249,6 +272,29 @@
         "startChar": 0,
         "endLine": 88,
         "endChar": 1
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36e2b082_7c050e94",
+        "filename": "util/focaltech/libusb_transport.h",
+        "patchSetId": 23
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:57:14Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n---\n\nYou currently have four distinct structs defined solely to act as deleters for `libusb` types:\n\n```c\nstruct LibusbContextDeleter { void operator()(libusb_context* ctx) const; };\nstruct LibusbDeviceHandleDeleter { void operator()(libusb_device_handle* handle) const; };\n// ... etc\n\n```\n\n**Improvement:** You can delete all four of these structs and their implementations entirely. `std::unique_ptr` accepts free-function pointers directly via `decltype`. Since `std::unique_ptr` natively checks for `nullptr` before invoking the deleter, you can pass the libusb cleanup functions directly:\n\n```c\n// In libusb_transport.h, replace the custom types:\nusing ScopedContext \u003d std::unique_ptr\u003clibusb_context, decltype(\u0026libusb_exit)\u003e;\nusing ScopedDevice \u003d std::unique_ptr\u003clibusb_device, decltype(\u0026libusb_unref_device)\u003e;\nusing ScopedHandle \u003d std::unique_ptr\u003clibusb_device_handle, decltype(\u0026libusb_close)\u003e;\nusing ScopedConfig \u003d std::unique_ptr\u003clibusb_config_descriptor, decltype(\u0026libusb_free_config_descriptor)\u003e;\n\n// In libusb_transport.cc, instantiation becomes a one-liner:\nScopedContext ctx(raw_ctx, libusb_exit);\n\n```",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 2
       },
       "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
