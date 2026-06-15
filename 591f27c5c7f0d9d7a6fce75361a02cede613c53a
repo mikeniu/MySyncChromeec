@@ -20,6 +20,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a05fe177_71aaf372",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:05:26Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n---\n\nAcross the codebase, you frequently check `std::expected` for validity, and then call `.value()` to extract the underlying object.\n\n```c\nauto flash_res \u003d brom.GetFlashInfo();\nif (flash_res) {\n  auto \u0026flash \u003d flash_res.value();\n  std::println(\"  Product Name: {}\", MakeStringView(flash.prod_name));\n}\n\n```\n\n**The Fix:** `std::expected` intentionally implements pointer-like semantics via `operator*` and `operator-\u003e`. Leveraging these makes the code much more concise and visually distinguishes error-handling from data extraction.\n\nYou can collapse variable declarations and clean up the syntax everywhere:\n\n```c\nif (auto flash \u003d brom.GetFlashInfo()) {\n  std::println(\"  Product Name: {}\", MakeStringView(flash-\u003eprod_name));\n}\n\n```\n\nSimilarly, anywhere you are currently doing:\n\n```c\nauto ret_res \u003d DoUsbTransfer(...);\nif (!ret_res) return std::unexpected(ret_res.error());\nauto \u0026ret \u003d ret_res.value();\nreturn std::vector\u003cuint8_t\u003e(ret.begin(), ret.end());\n\n```\n\nIt can become a much cleaner:\n\n```c\nauto ret \u003d DoUsbTransfer(...);\nif (!ret) return std::unexpected(ret.error());\nreturn std::vector\u003cuint8_t\u003e(ret-\u003ebegin(), ret-\u003eend());\n\n```",
+      "range": {
+        "startLine": 100,
+        "startChar": 0,
+        "endLine": 102,
+        "endChar": 30
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "858282cc_c3b7ffd5",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 39
