@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4c2c2a0_aaed9911",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-06-15T01:08:57Z",
+      "side": 1,
+      "message": "We don\u0027t need to set the current anymore, we just need ectool usbpdpower to output 1500mA when pd_get_usb_pd_3a_ports() \u003d\u003d 0",
+      "parentUuid": "5c9b7ee9_bdd8666c",
+      "range": {
+        "startLine": 17,
+        "startChar": 16,
+        "endLine": 17,
+        "endChar": 21
+      },
+      "revId": "a71ffbfee967a265d65f1b6e9d50716729c46c3b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e97b7a72_d795ba43",
@@ -37,6 +61,24 @@
       "writtenOn": "2026-06-11T07:50:40Z",
       "side": 1,
       "message": "Edit to at_1500ma",
+      "revId": "a71ffbfee967a265d65f1b6e9d50716729c46c3b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c81bc55f_819705fe",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-06-15T01:08:57Z",
+      "side": 1,
+      "message": "In the latest patchset, we no longer need to return these values.",
+      "parentUuid": "e97b7a72_d795ba43",
       "revId": "a71ffbfee967a265d65f1b6e9d50716729c46c3b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -58,6 +100,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "48a3d6e0_6a8a1e7e",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-06-15T01:08:57Z",
+      "side": 1,
+      "message": "In the latest patchset, we no longer need to return these values.",
+      "parentUuid": "16ab8f9b_cea8fd69",
+      "revId": "a71ffbfee967a265d65f1b6e9d50716729c46c3b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cbc789c1_3840b07e",
@@ -71,6 +131,30 @@
       "writtenOn": "2026-06-11T07:50:40Z",
       "side": 1,
       "message": "Also use macro to define the value.",
+      "range": {
+        "startLine": 375,
+        "startChar": 18,
+        "endLine": 375,
+        "endChar": 23
+      },
+      "revId": "a71ffbfee967a265d65f1b6e9d50716729c46c3b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9821890b_8a23991b",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-06-15T01:08:57Z",
+      "side": 1,
+      "message": "In the latest patchset, we no longer need to return these values.",
+      "parentUuid": "cbc789c1_3840b07e",
       "range": {
         "startLine": 375,
         "startChar": 18,
@@ -104,6 +188,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5eef3b82_a5551b3f",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-06-15T01:08:57Z",
+      "side": 1,
+      "message": "In the latest patchset, we no longer need to return these values.",
+      "parentUuid": "592a7e68_e506f3ac",
+      "range": {
+        "startLine": 382,
+        "startChar": 19,
+        "endLine": 382,
+        "endChar": 23
+      },
+      "revId": "a71ffbfee967a265d65f1b6e9d50716729c46c3b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "41d3ad92_f3296254",
@@ -117,6 +225,30 @@
       "writtenOn": "2026-06-11T17:44:23Z",
       "side": 1,
       "message": "Is it possible to do this within the existing DPM? I mean, can you instead override `pd_get_usb_pd_3a_ports()` to return 0 to block 3A allocation? \n\nThis would allow us to have a single source of truth for 3A allocation instead of checking both the available 3A ports and each port for a 1.5A forced limit",
+      "range": {
+        "startLine": 389,
+        "startChar": 2,
+        "endLine": 389,
+        "endChar": 16
+      },
+      "revId": "a71ffbfee967a265d65f1b6e9d50716729c46c3b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "35796b08_0d4b9de0",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-06-15T01:08:57Z",
+      "side": 1,
+      "message": "Thanks for the suggestion. I have refactored the code using pd_get_usb_pd_3a_ports().",
+      "parentUuid": "41d3ad92_f3296254",
       "range": {
         "startLine": 389,
         "startChar": 2,
