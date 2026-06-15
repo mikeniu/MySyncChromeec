@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "536aedbd_6ad15dda",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 38
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:06:07Z",
+      "side": 1,
+      "message": "This is failing the `repo upload` presubmit check due to a formatting issue. Please make sure to always run `repo upload` when uploading to make sure that all checks pass.",
+      "revId": "d31a7f77b7d392e1b8fbbcd78ddfe5d17c3061bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
