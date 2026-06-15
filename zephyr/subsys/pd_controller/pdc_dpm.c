@@ -341,3 +341,18 @@ int pdc_dpm_get_source_current(const int port)
 	 */
 	return 1500;
 }
+
+void pdc_dpm_set_source_current_limit(int port, uint16_t current_ma)
+{
+	k_mutex_lock(&max_current_claimed_mtx, K_FOREVER);
+
+	if (current_ma >= 3000) {
+		atomic_set_bit(&sink_max_pdo_requested, port);
+		max_current_claimed |= BIT(port);
+	} else {
+		atomic_clear_bit(&sink_max_pdo_requested, port);
+		max_current_claimed &= ~BIT(port);
+	}
+
+	k_mutex_unlock(&max_current_claimed_mtx);
+}
