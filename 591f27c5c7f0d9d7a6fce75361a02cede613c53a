@@ -39,6 +39,98 @@
       },
       "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94ef99f5_6a6e7e52",
+        "filename": "util/egis/cli_options.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:32:38Z",
+      "side": 1,
+      "message": "The style guide states that variables with static storage duration should be strongly typed and immutable where possible.\n\nIn **`cli_options.cc`**, the `getopt` long options array is mutable:\n\n```c\nstatic struct option long_options[] \u003d { ... };\n\n```\n\n**Fix:** Make it a `constexpr` array to enforce immutability at compile time:\n\n```c\nstatic constexpr option long_options[] \u003d { ... };\n\n```",
+      "range": {
+        "startLine": 79,
+        "startChar": 2,
+        "endLine": 79,
+        "endChar": 41
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a722f4e_cb3b38ca",
+        "filename": "util/egis/cli_options.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:32:38Z",
+      "side": 1,
+      "message": "The style guide generally forbids assignments inside `if`, `while`, or `switch` conditions because they are visually confusing and error-prone, unless the variable is being newly declared in that exact scope (e.g., `while (int x \u003d ...)`).\n\nIn **`cli_options.cc`**, the CLI parsing loop relies on a traditional C-style `getopt` idiom:\n\n```c\nint opt;\nwhile ((opt \u003d getopt_long_only(argc, argv, \"f:c:a:k:o:s:d:p:h\", long_options,\n                               nullptr)) !\u003d -1) {\n\n```\n\n**Fix:** Extract the assignment to prioritize readability and strict compliance:\n\n```c\nwhile (true) {\n  int opt \u003d getopt_long_only(argc, argv, \"f:c:a:k:o:s:d:p:h\", long_options, nullptr);\n  if (opt \u003d\u003d -1) {\n    break;\n  }\n  switch (opt) {\n    // ...\n\n```",
+      "range": {
+        "startLine": 115,
+        "startChar": 0,
+        "endLine": 117,
+        "endChar": 51
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db679c36_a6a3bad9",
+        "filename": "util/egis/crypto_util.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:32:38Z",
+      "side": 1,
+      "message": "The style guide prohibits the use of the `NULL` macro or the `0` integer literal for pointers.\n\nIn **`crypto_util.cc`**, the OpenSSL API calls use `NULL`:\n\n```c\nif (EVP_EncryptInit_ex(ctx.get(), EVP_aes_256_gcm(), NULL, NULL, NULL) !\u003d 1 ||\n    EVP_CIPHER_CTX_ctrl(ctx.get(), EVP_CTRL_GCM_SET_IVLEN, iv.size(), NULL) !\u003d 1 ||\n    EVP_EncryptInit_ex(ctx.get(), NULL, NULL, key.data(), iv.data()) !\u003d 1) {\n\n```\n\n**Fix:** Replace all instances of `NULL` passed to `EVP_*` functions with `nullptr`. OpenSSL C APIs safely accept `nullptr` in modern C++ environments.",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 0
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98a1d8b5_e8abd34c",
+        "filename": "util/egis/crypto_util.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:32:38Z",
+      "side": 1,
+      "message": "We can simplify this with BoringSSL\u0027s APIs:\n\n----\n\n\nThe transition to BoringSSL\u0027s `EVP_AEAD` scatter/gather API combined with native stack-based RAII represents the safest and most performant way to handle authenticated encryption in modern C++.\n\n## Rationale\n\n1. **Zero-Copy Disjoint Memory:** Your hardware protocol enforces a scattered memory layout (the authentication tag lives in the `SecureCommandAesHeader`, while the ciphertext lives dynamically in the payload). Standard AEAD APIs require contiguous memory `[Ciphertext | Tag]`. The `seal_scatter` and `open_gather` functions natively bridge this gap, reading and writing directly to your disjoint `std::span` buffers without requiring intermediate vectors or `std::copy_n` operations.\n2. **Atomic Cryptographic Safety:** The legacy `EVP_CIPHER` streaming API forces you to manage a state machine (`Init` → `Update AAD` → `Update Payload` → `Final` → `Get/Set Tag`). This is notoriously error-prone. The AEAD API reduces encryption and decryption to pure, one-shot atomic functions. It is impossible to accidentally decrypt the plaintext without the tag being strictly verified first.\n3. **Zero Heap Allocation:** By using BoringSSL\u0027s native `bssl::ScopedEVP_AEAD_CTX`, the cryptographic context is allocated entirely on the stack. It zeroes itself on construction and automatically cleans up on destruction. This completely eliminates heap fragmentation, `malloc`/`free` overhead, and the risk of memory leaks on error paths.\n\n---\n\n## The Changes\n\nYou can completely overwrite **`util/egis/crypto_util.cc`** with this implementation. No changes are required in `crypto_util.h`.\n\n```cpp\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n\n#include \"crypto_util.h\"\n\n#include \u003copenssl/aead.h\u003e\n#include \u003copenssl/crypto.h\u003e\n#include \u003copenssl/rand.h\u003e\n#include \u003copenssl/sha.h\u003e\n\nnamespace egis::crypto {\n\nstd::expected\u003cvoid, CryptoError\u003e GenerateGcmIv(\n    std::span\u003cuint8_t, kAesGcmIvSize\u003e iv_buf) {\n  if (RAND_bytes(iv_buf.data(), iv_buf.size()) !\u003d 1) {\n    return std::unexpected(CryptoError::kRngFailed);\n  }\n  return {};\n}\n\nstd::expected\u003cvoid, CryptoError\u003e AesGcmEncrypt(\n    std::span\u003cconst uint8_t, kAes256KeySize\u003e key,\n    std::span\u003cconst uint8_t, kAesGcmIvSize\u003e iv, std::span\u003cconst uint8_t\u003e aad,\n    std::span\u003cconst uint8_t\u003e plaintext, std::span\u003cuint8_t\u003e ciphertext,\n    std::span\u003cuint8_t, kAesGcmTagSize\u003e tag) {\n  \n  bssl::ScopedEVP_AEAD_CTX ctx;\n  if (!EVP_AEAD_CTX_init(ctx.get(), EVP_aead_aes_256_gcm(), key.data(),\n                         key.size(), tag.size(), nullptr)) {\n    return std::unexpected(CryptoError::kInitFailed);\n  }\n\n  size_t out_tag_len \u003d 0;\n\n  if (!EVP_AEAD_CTX_seal_scatter(\n          ctx.get(), ciphertext.data(), tag.data(), \u0026out_tag_len, tag.size(),\n          iv.data(), iv.size(), plaintext.data(), plaintext.size(),\n          /*extra_in\u003d*/nullptr, 0, aad.data(), aad.size())) {\n    return std::unexpected(CryptoError::kUpdateFailed);\n  }\n\n  return {};\n}\n\nstd::expected\u003cvoid, CryptoError\u003e AesGcmDecrypt(\n    std::span\u003cconst uint8_t, kAes256KeySize\u003e key,\n    std::span\u003cconst uint8_t, kAesGcmIvSize\u003e iv, std::span\u003cconst uint8_t\u003e aad,\n    std::span\u003cconst uint8_t\u003e ciphertext,\n    std::span\u003cconst uint8_t, kAesGcmTagSize\u003e tag,\n    std::span\u003cuint8_t\u003e plaintext) {\n  \n  bssl::ScopedEVP_AEAD_CTX ctx;\n  if (!EVP_AEAD_CTX_init(ctx.get(), EVP_aead_aes_256_gcm(), key.data(),\n                         key.size(), tag.size(), nullptr)) {\n    return std::unexpected(CryptoError::kInitFailed);\n  }\n\n  if (!EVP_AEAD_CTX_open_gather(\n          ctx.get(), plaintext.data(), iv.data(), iv.size(),\n          ciphertext.data(), ciphertext.size(), tag.data(), tag.size(),\n          aad.data(), aad.size())) {\n    return std::unexpected(CryptoError::kTagMismatch);\n  }\n\n  return {};\n}\n\nvoid Sha256(std::span\u003cconst uint8_t\u003e data, std::span\u003cuint8_t\u003e hash_out) {\n  if (hash_out.size() \u003c SHA256_DIGEST_LENGTH) {\n    std::abort();\n  }\n  ::SHA256(data.data(), data.size(), hash_out.data());\n}\n\nvoid Cleanse(std::span\u003cuint8_t\u003e data) {\n  OPENSSL_cleanse(data.data(), data.size());\n}\n\n}  // namespace egis::crypto\n\n```",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 0
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
