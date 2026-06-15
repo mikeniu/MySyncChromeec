@@ -380,8 +380,7 @@ const char *system_get_build_info(void);
 #if !(defined(TEST_FUZZ) || defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void
-	system_reset(int flags);
+	void system_reset(int flags);
 
 /**
  * Set a scratchpad register to the specified value.

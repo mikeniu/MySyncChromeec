@@ -17,8 +17,7 @@
 #ifndef TEST_USB_PD_CONSOLE
 static
 #endif
-	int
-	command_pd(int argc, const char **argv)
+	int command_pd(int argc, const char **argv)
 {
 	int port;
 	char *e;
