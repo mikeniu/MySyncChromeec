@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67a4f65b_fae6b807",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1158719
+      },
+      "writtenOn": "2026-06-15T13:56:02Z",
+      "side": 1,
+      "message": "the fullcheckout-presubmit breakages seem like something that\u0027ll have to be fixed before any CL that can land in this repo (unfortunately)\n\nmight be best to `cros format chip/host/reboot.h chip/stm32/flash-f.c chip/stm32/spi.c chip/stm32/usb_endpoints.c common/panic_output.c common/usbc/usb_pd_console.c include/hwtimer.h include/panic.h include/system.h` in helipilot-release and upload a parent CL to this one - should be an easy stamp unless someone else beats you to it",
+      "revId": "e8bf0aa2a6e0c064fdf3ae260257ce23b4420167",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
