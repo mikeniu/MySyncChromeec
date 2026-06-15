@@ -20,6 +20,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2589a080_21606070",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:53:40Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n-----\n\nIn `bootrom_protocol.h`, you very cleanly define default values for your hardware structs. For example:\n\n```c\nstruct MemReadCommand {\n  CommandId command_id \u003d CommandId::kMemRead;\n  uint32_t address;\n  AccessSize access_size;\n  uint32_t count;\n} __attribute__((packed));\n\n```\n\nHowever, in `bootrom.cc`, you are manually redefining the `.command_id` (and sometimes `.access_size`) every time you instantiate the structs:\n\n```c\n  EgisBootrom::MemReadCommand req{\n      .command_id \u003d EgisBootrom::CommandId::kMemRead, // \u003c-- Redundant\n      .address \u003d ToLittleEndian(flash_addr),\n      .access_size \u003d EgisBootrom::AccessSize::kUint8,\n      .count \u003d ToLittleEndian(take)};\n\n```\n\nC++20 designated initializers automatically fall back to the default member initializers defined in the struct. You can delete the redundant `.command_id` lines across the entire codebase to make the payloads much cleaner to read:\n\n```c\n  EgisBootrom::MemReadCommand req{\n      .address \u003d ToLittleEndian(flash_addr),\n      .access_size \u003d EgisBootrom::AccessSize::kUint8,\n      .count \u003d ToLittleEndian(take)};\n\n```",
+      "range": {
+        "startLine": 257,
+        "startChar": 0,
+        "endLine": 261,
+        "endChar": 44
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "08ca3055_b394058b",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 39
