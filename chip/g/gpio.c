@@ -471,6 +471,8 @@ static void gpio_interrupt(int port)
 	}
 }
 
+DECLARE_IRQ(GC_IRQNUM_GPIO0_GPIOCOMBINT, _gpio0_interrupt, 1);
+DECLARE_IRQ(GC_IRQNUM_GPIO1_GPIOCOMBINT, _gpio1_interrupt, 1);
 void _gpio0_interrupt(void)
 {
 	gpio_interrupt(0);
@@ -479,8 +481,6 @@ void _gpio1_interrupt(void)
 {
 	gpio_interrupt(1);
 }
-DECLARE_IRQ(GC_IRQNUM_GPIO0_GPIOCOMBINT, _gpio0_interrupt, 1);
-DECLARE_IRQ(GC_IRQNUM_GPIO1_GPIOCOMBINT, _gpio1_interrupt, 1);
 
 #ifdef CONFIG_CMD_PINMUX
 /*

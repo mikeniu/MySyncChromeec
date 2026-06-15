@@ -181,8 +181,11 @@ static enum vendor_cmd_rc vc_sn_inc_rma(enum vendor_cmd_cc code,
 {
 	uint8_t *pbuf = buf;
 
-	if (wp_is_asserted())
-		return EC_ERROR_ACCESS_DENIED;
+	if (wp_is_asserted()) {
+		*response_size = 1;
+		*pbuf = EC_ERROR_ACCESS_DENIED;
+		return VENDOR_RC_NOT_ALLOWED;
+	}
 
 	*response_size = 1;
 

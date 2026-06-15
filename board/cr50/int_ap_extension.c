@@ -75,6 +75,7 @@ static void disable_timer_(void)
 }
 
 /* Interrupt handler of timehs0_timint1, a timer for INT_AP_L extension. */
+DECLARE_IRQ(GC_IRQNUM_TIMEHS0_TIMINT1, timer_int_ap_irq_handler, 1);
 void timer_int_ap_irq_handler(void)
 {
 	disable_timer_();
@@ -94,7 +95,6 @@ void timer_int_ap_irq_handler(void)
 	/* Toggle the INT_AP_L level. */
 	set_int_ap_(!int_ap_asserted_);
 }
-DECLARE_IRQ(GC_IRQNUM_TIMEHS0_TIMINT1, timer_int_ap_irq_handler, 1);
 
 int assert_int_ap(void)
 {

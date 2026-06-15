@@ -1156,6 +1156,7 @@ static void usb_reset(void)
 	usb_init_endpoints();
 }
 
+DECLARE_IRQ(GC_IRQNUM_USB0_USBINTR, usb_interrupt, 1);
 void usb_interrupt(void)
 {
 	uint32_t status = GR_USB_GINTSTS;
@@ -1237,7 +1238,7 @@ void usb_interrupt(void)
 
 	print_later("end of interrupt", 0, 0, 0, 0, 0);
 }
-DECLARE_IRQ(GC_IRQNUM_USB0_USBINTR, usb_interrupt, 1);
+
 
 static void usb_softreset(void)
 {

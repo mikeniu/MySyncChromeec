@@ -236,7 +236,7 @@ DECLARE_SAFE_CONSOLE_COMMAND(bpforce, command_bpforce,
 
 static int command_wp(int argc, char **argv)
 {
-	int val;
+	int val = 0;
 	int forced;
 
 	if (argc > 1) {

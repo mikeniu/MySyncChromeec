@@ -21,8 +21,11 @@ enum init_values {
 
 static enum init_values done_uart_init_yet;
 
-#define USE_UART_INTERRUPTS (!(defined(CONFIG_CUSTOMIZED_RO) && \
-			       defined(SECTION_IS_RO)))
+#if defined(CONFIG_CUSTOMIZED_RO) && defined(SECTION_IS_RO)
+#define USE_UART_INTERRUPTS 0
+#else
+#define USE_UART_INTERRUPTS 1
+#endif
 #ifndef UARTN
 #define UARTN 0
 #endif
@@ -87,7 +90,8 @@ int uart_read_char(void)
 /**
  * Interrupt handlers for UART0
  */
-static void uart_console_tx_interrupt(void)
+DECLARE_IRQ(GC_IRQNUM_UART0_TXINT, uart_console_tx_interrupt, 1);
+void uart_console_tx_interrupt(void)
 {
 	/* Clear transmit interrupt status */
 	GR_UART_ISTATECLR(UARTN) = GC_UART_ISTATECLR_TX_MASK;
@@ -95,9 +99,9 @@ static void uart_console_tx_interrupt(void)
 	/* Fill output FIFO */
 	uart_process_output();
 }
-DECLARE_IRQ(GC_IRQNUM_UART0_TXINT, uart_console_tx_interrupt, 1);
 
-static void uart_console_rx_interrupt(void)
+DECLARE_IRQ(GC_IRQNUM_UART0_RXINT, uart_console_rx_interrupt, 1);
+void uart_console_rx_interrupt(void)
 {
 	/* Clear receive interrupt status */
 	GR_UART_ISTATECLR(UARTN) = GC_UART_ISTATECLR_RX_MASK;
@@ -105,7 +109,6 @@ static void uart_console_rx_interrupt(void)
 	/* Read input FIFO until empty */
 	uart_process_input();
 }
-DECLARE_IRQ(GC_IRQNUM_UART0_RXINT, uart_console_rx_interrupt, 1);
 #endif  /* USE_UART_INTERRUPTS */
 
 void uart_init(void)

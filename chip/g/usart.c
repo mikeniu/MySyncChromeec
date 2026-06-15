@@ -18,8 +18,11 @@
 #include "usart.h"
 #include "usb-stream.h"
 
-#define USE_UART_INTERRUPTS (!(defined(CONFIG_CUSTOMIZED_RO) && \
-defined(SECTION_IS_RO)))
+#if defined(CONFIG_CUSTOMIZED_RO) && defined(SECTION_IS_RO)
+#define USE_UART_INTERRUPTS 0
+#else
+#define USE_UART_INTERRUPTS 1
+#endif
 #define QUEUE_SIZE 64
 /*
  * Want to be able to accumulate larger amounts of data while USB is

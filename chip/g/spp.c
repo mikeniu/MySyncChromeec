@@ -437,25 +437,25 @@ static void spp_cs_deassert_interrupt(uint32_t port)
 	}
 }
 
+DECLARE_IRQ(GC_IRQNUM_SPS0_RXFIFO_LVL_INTR, _sps0_interrupt, 1);
 void _sps0_interrupt(void)
 {
 	spp_rx_interrupt(0, 0);
 }
 
+DECLARE_IRQ(GC_IRQNUM_SPS0_CS_DEASSERT_INTR, _sps0_cs_deassert_interrupt, 1);
 void _sps0_cs_deassert_interrupt(void)
 {
 	spp_cs_deassert_interrupt(0);
 }
-DECLARE_IRQ(GC_IRQNUM_SPS0_CS_DEASSERT_INTR, _sps0_cs_deassert_interrupt, 1);
-DECLARE_IRQ(GC_IRQNUM_SPS0_RXFIFO_LVL_INTR, _sps0_interrupt, 1);
 
+DECLARE_IRQ(GC_IRQNUM_SPS0_CS_ASSERT_INTR, sps0_cs_assert_interrupt_, 1);
 void sps0_cs_assert_interrupt_(void)
 {
 	GWRITE_FIELD(SPS, ISTATE_CLR, CS_ASSERT, 1);
 
 	deassert_int_ap();
 }
-DECLARE_IRQ(GC_IRQNUM_SPS0_CS_ASSERT_INTR, sps0_cs_assert_interrupt_, 1);
 
 #ifdef CONFIG_SPP_TEST
 

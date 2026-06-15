@@ -30,13 +30,13 @@ SECTIONS
 	/* Rest of the FIPS module data. */
 	.rodata.fips : {
 		/* Combine read-only data. */
-		*(SORT_BY_NAME(.rodata*) SORT_BY_NAME(.srodata*) \
+		*(SORT_BY_NAME(.rodata*) SORT_BY_NAME(.srodata*)
 		 .gnu.linkonce.r.*)
 	} =0xffffffff
 	.data.fips :
 	{
-		*(SORT_BY_NAME(.data*) \
-		  SORT_BY_NAME(.sdata*) \
+		*(SORT_BY_NAME(.data*)
+		  SORT_BY_NAME(.sdata*)
 		  SORT_BY_NAME(.ramfunc*))
 	}
 	ASSERT(SIZEOF(.data.fips) == 0, "No .data for FIPS module is allowed")
