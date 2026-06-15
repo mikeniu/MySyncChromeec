@@ -66,6 +66,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "33c8c2d5_f807299b",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 39
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:54:23Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nAcross `bootrom.h`, `ec_comm.h`, `usb_interface.h`, and `crypto_util.h`, you implement `ToString(ErrorEnum)` functions using `switch` statements with a `default:` case:\n\n```c\nconstexpr std::string_view ToString(BootromError err) {\n  switch (err) {\n    case BootromError::kUsbWriteFailed: return \"USB write failed\";\n    // ...\n    default: return \"An unknown error occurred\";\n  }\n}\n\n```\n\n**The Issue:** By including a `default:` case, you suppress the compiler\u0027s `-Wswitch` warning. If a future maintainer adds a new enum value (e.g., `BootromError::kVerificationFailed`), the compiler *will not warn them* that they forgot to update the stringifier, leading to blind spots in your logs.\n\n**The Fix:** Remove the `default:` label and put the fallback return *outside* the `switch` block. This forces the compiler to statically verify that every single enum value is explicitly handled in the `switch`.\n\n```c\nconstexpr std::string_view ToString(BootromError err) {\n  switch (err) {\n    case BootromError::kUsbWriteFailed: return \"USB write failed\";\n    // ... all explicitly defined cases ...\n  }\n  // The compiler will warn if a new enum is added but missed above!\n  return \"An unknown error occurred\"; \n}\n\n```",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 41
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cbcc2354_98a4527f",
         "filename": "util/egis/build.mk",
         "patchSetId": 39
