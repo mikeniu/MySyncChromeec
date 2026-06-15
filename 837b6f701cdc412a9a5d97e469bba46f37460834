@@ -114,6 +114,30 @@
       },
       "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab755527_7c892ed5",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:42:07Z",
+      "side": 1,
+      "message": "Let\u0027s also rename \"dummy\" to \"ignored_response\"",
+      "parentUuid": "05833988_c714f39d",
+      "range": {
+        "startLine": 325,
+        "startChar": 0,
+        "endLine": 325,
+        "endChar": 52
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
