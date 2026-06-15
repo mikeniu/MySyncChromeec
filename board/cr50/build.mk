@@ -50,63 +50,63 @@ ENV_VARS := CR50_DEV CRYPTO_TEST CMAC_TEST DCRYPTO_TEST DRBG_TEST ECDSA_TEST\
 	    SHA1_TEST SHA256_TEST U2F_TEST U2F_VERBOSE CR50_USE_FIXED_CERT
 
 ifneq ($(H1_RED_BOARD),)
-CPPFLAGS += -DH1_RED_BOARD=$(EMPTY)
+BOARD_CPPFLAGS += -DH1_RED_BOARD=$(EMPTY)
 # Enable deep sleep by default on H1 red board
 ifneq ($(H1_RED_BOARD_DEEP_SLEEP),)
-CPPFLAGS += -DH1_RED_BOARD_DEEP_SLEEP=1
+BOARD_CPPFLAGS += -DH1_RED_BOARD_DEEP_SLEEP=1
 endif
 endif
 
 ifneq ($(CR50_USE_FIXED_CERT),)
-CPPFLAGS += -DCR50_USE_FIXED_CERT=1
+BOARD_CPPFLAGS += -DCR50_USE_FIXED_CERT=1
 endif
 
 ifneq ($(CRYPTO_TEST),)
-CPPFLAGS += -DCRYPTO_TEST_SETUP
+BOARD_CPPFLAGS += -DCRYPTO_TEST_SETUP
 
 # These options only work with CRYPTO_TEST=1
 ifneq ($(DCRYPTO_TEST),)
-CPPFLAGS_RW += -DCRYPTO_TEST_CMD_DCRYPTO_TEST=1
+BOARD_CPPFLAGS_RW += -DCRYPTO_TEST_CMD_DCRYPTO_TEST=1
 endif
 
 ifneq ($(DRBG_TEST),)
-CPPFLAGS_RW += -DCRYPTO_TEST_CMD_HMAC_DRBG=1
+BOARD_CPPFLAGS_RW += -DCRYPTO_TEST_CMD_HMAC_DRBG=1
 endif
 
 ifneq ($(ECDSA_TEST),)
-CPPFLAGS_RW += -DCRYPTO_TEST_CMD_DCRYPTO_ECDSA=1
+BOARD_CPPFLAGS_RW += -DCRYPTO_TEST_CMD_DCRYPTO_ECDSA=1
 endif
 
 ifneq ($(HMAC_SHA256_TEST),)
-CPPFLAGS_RW += -DHMAC_SHA256_TEST=1
+BOARD_CPPFLAGS_RW += -DHMAC_SHA256_TEST=1
 endif
 
 ifneq ($(P256_BIN_TEST),)
-CPPFLAGS_RW += -DP256_BIN_TEST=1
+BOARD_CPPFLAGS_RW += -DP256_BIN_TEST=1
 endif
 
 ifneq ($(RND_TEST),)
-CPPFLAGS_RW += -DCRYPTO_TEST_CMD_RAND=1
+BOARD_CPPFLAGS_RW += -DCRYPTO_TEST_CMD_RAND=1
 endif
 
 ifneq ($(SELF_TEST),)
-CPPFLAGS_RW += -DSELF_INTEGRITY_TEST=1
+BOARD_CPPFLAGS_RW += -DSELF_INTEGRITY_TEST=1
 endif
 
 ifneq ($(SHA1_TEST),)
-CPPFLAGS_RW += -DSHA1_TEST=1
+BOARD_CPPFLAGS_RW += -DSHA1_TEST=1
 endif
 
 ifneq ($(SHA256_TEST),)
-CPPFLAGS_RW += -DSHA256_TEST=1
+BOARD_CPPFLAGS_RW += -DSHA256_TEST=1
 endif
 
 ifneq ($(U2F_TEST),)
-CPPFLAGS_RW += -DCRYPTO_TEST_CMD_U2F_TEST=1
+BOARD_CPPFLAGS_RW += -DCRYPTO_TEST_CMD_U2F_TEST=1
 endif
 
 ifneq ($(U2F_VERBOSE),)
-CPPFLAGS_RW += -DU2F_DEV_VERBOSE=1
+BOARD_CPPFLAGS_RW += -DU2F_DEV_VERBOSE=1
 endif
 
 endif # CRYPTO_TEST=1
@@ -274,16 +274,14 @@ endif
 EXTLIB := $(realpath ../../third_party/tpm2$(BRANCH_EXT))
 CFLAGS += -I$(EXTLIB)
 
-# For the benefit of the tpm2 library.
-INCLUDE_ROOT := $(abspath ./include)
-CFLAGS += -I$(INCLUDE_ROOT)
-CPPFLAGS += -I$(abspath ./builtin)
-CPPFLAGS += -I$(abspath ./chip/$(CHIP))
-# For core includes
-CPPFLAGS += -I$(abspath .)
-CPPFLAGS += -I$(abspath $(BDIR))
-CPPFLAGS += -I$(abspath ./fuzz)
-CPPFLAGS += -I$(abspath ./test)
+BOARD_CPPFLAGS_RW += -I$(realpath $(BDIR)/dcrypto)
+BOARD_CPPFLAGS += -I$(abspath ./builtin)
+BOARD_CPPFLAGS += -I$(abspath ./include)
+BOARD_CPPFLAGS += -I$(abspath ./chip/$(CHIP))
+BOARD_CPPFLAGS += -I$(abspath .)
+BOARD_CPPFLAGS += -I$(abspath $(BDIR))
+BOARD_CPPFLAGS += -I$(abspath ./fuzz)
+BOARD_CPPFLAGS += -I$(abspath ./test)
 
 # Make sure the context of the software sha512 implementation fits. If it ever
 # increases, a compile time assert will fire in tpm2/hash.c.
@@ -298,7 +296,7 @@ CFLAGS += -DEMBEDDED_MODE=1
 # Use absolute path as the destination to ensure that TPM2 makefile finds the
 # place for output.
 outdir := $(abspath $(RW_BD_OUT))
-cmd_tpm2linked := $(MAKE) obj=$(outdir) EMBEDDED_MODE=1 LTO=1 \
+cmd_tpm2linked = CFLAGS="$(CFLAGS)" $(MAKE) obj=$(outdir) EMBEDDED_MODE=1 LTO=1\
 		 -C $(EXTLIB) --no-print-directory $(outdir)/$(TPM2_MODULE)
 
 tpm2_check_clean := $(cmd_tpm2linked) -q && echo clean
@@ -311,3 +309,6 @@ $(RW_BD_OUT)/$(TPM2_MODULE):
 	$(call quiet,tpm2linked,TPM2   )
 
 endif   # BOARD_MK_INCLUDED_ONCE is nonempty
+
+CPPFLAGS += $(BOARD_CPPFLAGS)
+CPPFLAGS_RW += $(BOARD_CPPFLAGS_RW)

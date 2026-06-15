@@ -243,8 +243,9 @@ endif
 CPPFLAGS += -I$(CRYPTOCLIB)/include
 CRYPTOC_LDFLAGS := -L$(out)/cryptoc -lcryptoc
 
-cmd_cryptolib = $(MAKE) obj=$(realpath $(out))/cryptoc SUPPORT_UNALIGNED=1 \
-		CONFIG_UPTO_SHA512=$(CONFIG_UPTO_SHA512) -C $(CRYPTOCLIB)
+cmd_cryptolib = CFLAGS="$(CFLAGS)" $(MAKE) obj=$(realpath $(out))/cryptoc \
+		SUPPORT_UNALIGNED=1 CONFIG_UPTO_SHA512=$(CONFIG_UPTO_SHA512) \
+		-C $(CRYPTOCLIB)
 
 cryptolib_check_clean = $(cmd_cryptolib) -q && echo clean
 
