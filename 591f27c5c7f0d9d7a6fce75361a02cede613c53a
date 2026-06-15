@@ -205,6 +205,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1f13cc3d_fe672534",
+        "filename": "util/egis/bootrom_protocol.h",
+        "patchSetId": 39
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:29:05Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn `bootrom_protocol.h`, `SecureCommandBaseHeader` stores the cryptographic algorithm as a raw `uint8_t`:\n\n```c\nstruct SecureCommandBaseHeader {\n  CommandId command_id \u003d CommandId::kSecureWrapped;\n  uint8_t algo; // \u003c--- Raw integer\n  uint32_t payload_len;\n} __attribute__((packed));\n\n```\n\nThis forces you to use `std::to_underlying` or `static_cast\u003cuint8_t\u003e` every time you build the header in `bootrom.cc`.\n\nBecause you explicitly defined the underlying type of `EgisCryptoType` as `uint8_t` (`enum class EgisCryptoType : uint8_t`), C++ allows you to use the enum directly inside packed structs. It will still compile down to exactly 1 byte on the wire.\n\n**The Fix:**\n\n```c\nstruct SecureCommandBaseHeader {\n  CommandId command_id \u003d CommandId::kSecureWrapped;\n  EgisCryptoType algo; // \u003c--- Strongly typed\n  uint32_t payload_len;\n} __attribute__((packed));\n\n```\n\nNow, in `bootrom.cc`, you can assign it natively: `req_hdr.algo \u003d wrapped_algo_;`",
+      "range": {
+        "startLine": 169,
+        "startChar": 0,
+        "endLine": 169,
+        "endChar": 15
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "94f3e9bd_7f17f261",
         "filename": "util/egis/bootrom_test.cc",
         "patchSetId": 39
@@ -320,6 +343,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f20426f2_f8ed7328",
+        "filename": "util/egis/cli_options_test.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:29:05Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n---\n\nIn `cli_options_test.cc`, you wrote a very clever variadic template to wrap the C-style `getopt` parsing:\n\n```c\ntemplate \u003ctypename... Args\u003e\nstd::optional\u003cAppConfig\u003e RunParseArgs(Args... args) {\n  std::array\u003cchar*, sizeof...(args)\u003e argv \u003d {const_cast\u003cchar*\u003e(args)...};\n  return ParseArgs(argv.size(), argv.data());\n}\n\n```\n\n**The Issue:** The POSIX specification for `getopt` and `getopt_long` requires that the `argv` array is explicitly terminated by a null pointer (`argv[argc] \u003d\u003d NULL`). Your array is exactly the size of the arguments, meaning there is no trailing null pointer. Depending on the standard library implementation of `getopt`, this can read past the bounds of the array and invoke Undefined Behavior.\n\n**The Fix:** Expand the array by 1 and explicitly provide the `nullptr`.\n\n```c\ntemplate \u003ctypename... Args\u003e\nstd::optional\u003cAppConfig\u003e RunParseArgs(Args... args) {\n  // Add +1 to the size, and a trailing nullptr\n  std::array\u003cchar*, sizeof...(args) + 1\u003e argv \u003d {const_cast\u003cchar*\u003e(args)..., nullptr};\n  \n  // Pass size - 1 for argc\n  return ParseArgs(argv.size() - 1, argv.data());\n}\n\n```",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 1
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "db679c36_a6a3bad9",
         "filename": "util/egis/crypto_util.cc",
         "patchSetId": 39
@@ -366,6 +412,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bc67be5f_6434038e",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:29:05Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n---\n\n```cpp\n#include \u003cnumeric\u003e\n\nbool VerifyResponseChecksum(std::span\u003cconst uint8_t\u003e response) {\n  uint8_t sum \u003d std::accumulate(response.begin(), response.end(), uint8_t{0});\n  return sum \u003d\u003d 0;\n}\n\n```",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 1
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "decce9dd_bb4ac2ff",
         "filename": "util/egis/ec_comm.cc",
         "patchSetId": 39
@@ -400,6 +469,30 @@
       "writtenOn": "2026-06-15T22:15:28Z",
       "side": 1,
       "message": "Gemini feedback:\n\n----\n\nIn `ec_protocol_defs.h`, you calculate the EC checksum using a raw `for` loop:\n\n```c\n  uint32_t sum \u003d 0;\n  for (uint8_t byte : packet) {\n    sum +\u003d byte;\n  }\n  packet[kChecksumOffset] \u003d static_cast\u003cuint8_t\u003e(-sum);\n\n```\n\n**The Issue:** While perfectly functional, modern C++ philosophy (and Google Style) strongly encourages replacing raw `for` loops with standard algorithms whenever possible to explicitly declare *intent*. Computing the sum of a range is the textbook use case for `\u003cnumeric\u003e`.\n\n**The Fix:** Include `\u003cnumeric\u003e` and use `std::accumulate`. It reduces the calculation to a safe, declarative one-liner:\n\n```c\n#include \u003cnumeric\u003e\n\ninline void ApplyEcChecksum(std::span\u003cuint8_t\u003e packet) {\n  constexpr size_t kChecksumOffset \u003d offsetof(EcHostCommandRequest, checksum);\n  if (packet.size() \u003c\u003d kChecksumOffset) return;\n\n  packet[kChecksumOffset] \u003d 0;\n\n  int sum \u003d std::accumulate(packet.begin(), packet.end(), 0);\n  \n  packet[kChecksumOffset] \u003d static_cast\u003cuint8_t\u003e(-sum);\n}\n\n```",
+      "range": {
+        "startLine": 94,
+        "startChar": 0,
+        "endLine": 98,
+        "endChar": 0
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95dc751b_b83f9264",
+        "filename": "util/egis/ec_protocol_defs.h",
+        "patchSetId": 39
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:29:05Z",
+      "side": 1,
+      "message": "Better version:\n\n----\n\n```cpp\ninline void ApplyEcChecksum(std::span\u003cuint8_t\u003e packet) {\n  constexpr size_t kChecksumOffset \u003d offsetof(EcHostCommandRequest, checksum);\n  if (packet.size() \u003c\u003d kChecksumOffset) return;\n\n  packet[kChecksumOffset] \u003d 0;\n\n  uint8_t sum \u003d std::accumulate(packet.begin(), packet.end(), uint8_t{0});\n  \n  packet[kChecksumOffset] \u003d static_cast\u003cuint8_t\u003e(-sum); \n}\n\n```",
+      "parentUuid": "bf8b18ed_b1858b15",
       "range": {
         "startLine": 94,
         "startChar": 0,
