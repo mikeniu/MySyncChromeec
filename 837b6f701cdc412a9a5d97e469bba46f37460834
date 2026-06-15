@@ -811,6 +811,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "46e9cda9_489da80d",
+        "filename": "util/focaltech/updater_test.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T23:41:02Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn the test `UpdateFw_PadsPartialPayloadsToWordBoundary`, you test the 4KB padding logic using the magic numbers `13` and `12`:\n\n```c\nstd::vector\u003cuint8_t\u003e fw_data(kFocalConfigSize + 13, 0xAA);\n// ...\nEXPECT_EQ(payloads[0][12], 0xAA);\nEXPECT_EQ(payloads[0][13], 0xFF);\n\n```\n\n**Why it\u0027s magic:** The number `13` is an arbitrary unaligned remainder, but without a name, `12` and `13` just look like random array accesses in the assertion block. If someone changes `13` to `20` later, they will forget to update the `12` assertion, and the test will fail.\n\n**Fix:** Define the unaligned remainder as a constant inside the test, and base the assertions dynamically on that constant:\n\n```c\nconstexpr size_t kUnalignedRemainder \u003d 13;\nconstexpr uint8_t kPayloadByte \u003d 0xAA;\nconstexpr uint8_t kPaddingByte \u003d 0xFF;\n\nstd::vector\u003cuint8_t\u003e fw_data(kFocalConfigSize + kUnalignedRemainder, kPayloadByte);\n// ...\nEXPECT_EQ(payloads[0][kUnalignedRemainder - 1], kPayloadByte);\nEXPECT_EQ(payloads[0][kUnalignedRemainder], kPaddingByte);\n\n```",
+      "range": {
+        "startLine": 172,
+        "startChar": 0,
+        "endLine": 175,
+        "endChar": 35
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2f8369f8_8a363006",
         "filename": "util/focaltech/usb_device_test.cc",
         "patchSetId": 23
