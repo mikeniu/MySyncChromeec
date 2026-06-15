@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e40f17e7_fd446256",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:48:25Z",
+      "side": 1,
+      "message": "`200ms` like the other variables",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 66
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6e6069c6_55c87a37",
         "filename": "util/focaltech/cli.cc",
         "patchSetId": 23
@@ -42,6 +65,29 @@
         "startChar": 0,
         "endLine": 96,
         "endChar": 3
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d034c7d5_f25b1558",
+        "filename": "util/focaltech/cli_test.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:48:25Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n---\n\nAcross `cli_test.cc`, `ft_scsi_test.cc`, and `updater_test.cc`, almost every single test case repeats the exact same 3–4 lines of setup boilerplate:\n\n```c\nauto transport \u003d std::make_unique\u003cFakeEcTransport\u003e();\nauto* fake \u003d transport.get();\nUsbDevice device \u003d MakeDevice(std::move(transport));\n\n```\n\n**Improvement:** You can eliminate dozens of lines of repetitive code by upgrading your `TEST` macros to `TEST_F` and using a GTest fixture. GTest will automatically run `SetUp()` before every test:\n\n```c\nclass CliTest : public ::testing::Test {\n protected:\n  void SetUp() override {\n    auto t \u003d std::make_unique\u003cFakeEcTransport\u003e();\n    fake_ \u003d t.get();\n    device_ \u003d std::make_unique\u003cUsbDevice\u003e(std::move(t));\n  }\n  \n  FakeEcTransport* fake_;\n  std::unique_ptr\u003cUsbDevice\u003e device_;\n};\n\n// Now tests are instantly 3 lines shorter:\nTEST_F(CliTest, SwitchToBootloader_Success) {\n  fake_-\u003eAddResponse(BuildEmptySuccessResponse());\n  auto result \u003d SwitchToBootloader(*device_, 0);\n  EXPECT_TRUE(result.has_value());\n}\n\n```",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 21
       },
       "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -95,6 +141,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f60d14cd_960b9bb2",
+        "filename": "util/focaltech/ft_scsi_test.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:48:25Z",
+      "side": 1,
+      "message": "`100ms`",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 64
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "55583ed0_020fa7ae",
         "filename": "util/focaltech/ft_scsi_test.cc",
         "patchSetId": 23
@@ -111,6 +180,75 @@
         "startChar": 0,
         "endLine": 65,
         "endChar": 9
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "adeee410_6ca94b5c",
+        "filename": "util/focaltech/ft_util.h",
+        "patchSetId": 23
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:48:25Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nYou correctly applied the `std::integral` concept to `ToLittleEndian`, but you forgot to apply it to its counterpart, `FromLittleEndian`.\n\n```c\n// Has constraint\ntemplate \u003cstd::integral T\u003e\nconstexpr T ToLittleEndian(T value) { ... }\n\n// Missing constraint!\ntemplate \u003ctypename T\u003e\nconstexpr T FromLittleEndian(T value) {\n  return ToLittleEndian(value);\n}\n\n```\n\n**Improvement:** Add `std::integral` to `FromLittleEndian` so the compiler catches invalid types (like pointers or structs) immediately at the call site, rather than burying the error inside the function body.",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 1
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1844b7c_02097d2b",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:48:25Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n---\n\n`FindFocalDevice` uses C-style output parameters (`\u0026 out_desc`, `\u0026 out_id`) to return multiple values. Modern C++ (and Google Style) strongly prefers returning structs or `std::optional` instead of mutating references.\n\nEven better, looking at `LibusbTransport::Create()`, the `libusb_device_descriptor` isn\u0027t even used after `FindFocalDevice` returns\\! **Improvement:** Remove `out_desc` entirely, and return an `std::optional` containing a custom struct:\n\n```c\nstruct FoundDevice {\n  libusb_device* handle;\n  UsbDeviceId id;\n};\n\nstd::optional\u003cFoundDevice\u003e FindFocalDevice(std::span\u003clibusb_device*\u003e devices) {\n  for (libusb_device* dev : devices) {\n    libusb_device_descriptor desc;\n    if (libusb_get_device_descriptor(dev, \u0026desc) !\u003d LIBUSB_SUCCESS) continue;\n\n    UsbDeviceId current_id{.vid \u003d desc.idVendor, .pid \u003d desc.idProduct};\n    if (GetDeviceMode(current_id).has_value()) {\n      return FoundDevice{.handle \u003d dev, .id \u003d current_id};\n    }\n    // ... log skipped devices ...\n  }\n  return std::nullopt;\n}\n\n```",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 53
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f288483c_4fc40ed4",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:48:25Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn `ParseAltSetting`, you loop over all endpoints to find the Bulk IN and Bulk OUT addresses:\n\n```c\nfor (const auto\u0026 ep : std::span(alt.endpoint, alt.bNumEndpoints)) {\n  // ... check and assign info.ep_bulk_in / ep_bulk_out ...\n}\n\nif (info.ep_bulk_in !\u003d 0 \u0026\u0026 info.ep_bulk_out !\u003d 0) {\n  return info;\n}\n\n```\n\n**Improvement:** You can move that `if` check *inside* the loop. Once you\u0027ve found both endpoints, there is no need to keep iterating through remaining endpoints for that interface setting.\n\n```c\nfor (const auto\u0026 ep : std::span(alt.endpoint, alt.bNumEndpoints)) {\n  // ... assignment logic ...\n  \n  if (info.ep_bulk_in !\u003d 0 \u0026\u0026 info.ep_bulk_out !\u003d 0) {\n    return info; // Exit early the moment we have both\n  }\n}\nreturn std::nullopt;\n\n```",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 1
       },
       "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
