@@ -20,6 +20,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "858282cc_c3b7ffd5",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:59:54Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn `bootrom.cc` (`WaitForFlashReady`) and `et171_flash.cc` (`ConnectToBootloader`), you are calculating timeouts by doing repeated time arithmetic on every iteration of a `while` loop:\n\n```c\nauto start_time \u003d std::chrono::steady_clock::now();\nwhile (std::chrono::steady_clock::now() - start_time \u003c timeout) {\n    // ...\n\n```\n\nWhile this works, it requires the CPU to do a subtraction and a comparison on every tick. The idiomatic C++ `std::chrono` approach is to calculate an **absolute deadline** once before the loop begins.\n\n**The Fix:**\n\n```c\nauto deadline \u003d std::chrono::steady_clock::now() + timeout;\nwhile (std::chrono::steady_clock::now() \u003c deadline) {\n    // ...\n\n```\n\nThis is computationally cheaper, impossible to get the subtraction order wrong, and clearly reads as \"while now is before the deadline.\"",
+      "range": {
+        "startLine": 194,
+        "startChar": 2,
+        "endLine": 195,
+        "endChar": 67
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2589a080_21606070",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 39
@@ -36,6 +59,29 @@
         "startChar": 0,
         "endLine": 261,
         "endChar": 44
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9a4cb71_8e9c9b6c",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:59:54Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn `bootrom.cc` (`BackupFlash`) and `flasher_logic.cc` (`ProgramFlashPayload` and `ProgramRawCommandPayload`), you repeat the exact same progress bar calculation, formatting, and flush logic three times:\n\n```c\n  size_t done \u003d total_size - payload.size();\n  std::print(\"\\rWriting Progress: {} / {} ({:.1f}%)\", done, total_size,\n             (static_cast\u003cfloat\u003e(done) / total_size * 100.0f));\n  std::fflush(stdout);\n\n```\n\n**The Fix:** Centralize this into `egis_util.h` (or a dedicated `ui_util.h`). If you ever want to change how progress looks (e.g., adding a visual bar `[\u003d\u003d\u003d\u003d\u003e   ]`), you only have to update it in one place.\n\n**In `egis_util.h`:**\n\n```c\ninline void PrintProgress(std::string_view prefix, size_t done, size_t total) {\n  if (total \u003d\u003d 0) return;\n  std::print(\"\\r{}: {} / {} ({:.1f}%)\", prefix, done, total,\n             (static_cast\u003cfloat\u003e(done) / total * 100.0f));\n  std::fflush(stdout);\n}\n\n```\n\nNow, your flasher loops become perfectly clean one-liners:\n\n```c\n  PrintProgress(\"Flashing Progress\", total_size - firmware.size(), total_size);\n\n```",
+      "range": {
+        "startLine": 388,
+        "startChar": 0,
+        "endLine": 392,
+        "endChar": 24
       },
       "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -266,6 +312,29 @@
         "startChar": 1,
         "endLine": 83,
         "endChar": 1
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5563e894_cca4b0ee",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:59:54Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn `et171_flash.cc` and `ec_comm_test.cc`, you are forcing the caller to explicitly cast Enums to their underlying types every time they send an EC command:\n\n```c\nauto resp \u003d ec_comm.SendCommand(\n    std::to_underlying(EcCommandId::kEcCmdEnterBootloader), 0);\n\n```\n\nThis leaks protocol implementation details to the caller. The `EcComm` class knows that `EcCommandId` is an enum, so it should accept the strongly-typed enum directly.\n\n**In `ec_comm.h`:**\n\n```c\n  // Change parameter from uint16_t id to EcCommandId id\n  std::expected\u003cstd::vector\u003cuint8_t\u003e, EcError\u003e SendCommand(\n      EcCommandId id, uint8_t ver, std::span\u003cconst uint8_t\u003e payload \u003d {});\n\n  template \u003cTriviallyCopyable T\u003e\n  std::expected\u003cT, EcError\u003e SendCommandTyped(\n      EcCommandId id, uint8_t ver, std::span\u003cconst uint8_t\u003e payload \u003d {}) { ... }\n\n```\n\n**In `ec_comm.cc`:**\n\n```c\n// Move the std::to_underlying inside the implementation:\nEcHostCommandRequest hdr \u003d {\n    .command_id \u003d ToLittleEndian(std::to_underlying(id)), \n    // ...\n\n```\n\nNow, the caller code in `et171_flash.cc` becomes beautifully readable, passing the enum natively:\n\n```c\nauto resp \u003d ec_comm.SendCommand(EcCommandId::kEcCmdEnterBootloader, 0);\n\n```",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 65
       },
       "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
