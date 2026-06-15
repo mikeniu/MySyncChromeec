@@ -51,6 +51,24 @@
       "parentUuid": "fe7dcd8b_3c71ab96",
       "revId": "424f3ed25eecfec23796d035bc75be74dd04cd7f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82476399_6444b7f6",
+        "filename": "zephyr/emul/emul_common_i2c.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-15T21:07:02Z",
+      "side": 1,
+      "message": "It wouldn\u0027t surprise me if we don\u0027t have any tests exercising this set of inputs. If you think there\u0027s a straightforward way this _should_ work, I\u0027d welcome for this CL to describe that in the header comments for `i2c_common_emul_set_{read,write}_fail_reg`.",
+      "parentUuid": "c3499641_7f21e946",
+      "revId": "424f3ed25eecfec23796d035bc75be74dd04cd7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
