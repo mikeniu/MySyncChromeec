@@ -41,6 +41,7 @@ GE_BOARD = "reef"
 DEFAULT_BUNDLE_DIRECTORY = "/tmp/artifact_bundles"
 DEFAULT_BUNDLE_METADATA_FILE = "/tmp/artifact_bundle_metadata"
 RO_VER = "0.0.14"
+DEFAULT_COMPILER = "gcc"
 # List of files to bundle each element is a tuple with the source and dest
 # filenames. If the dest filename is empty, it'll keep the same basename.
 # This is the same list of files the ebuild bundles.
@@ -94,15 +95,18 @@ def run_cmd(cmd, exec_dir=None):
 
 
 def init_toolchain():
-    """Initialize coreboot-sdk.
+    """Initialize toolchain.
 
     Returns:
         Environment variables to use for toolchain.
     """
-    # (environment variable, bazel target)
-    toolchains = [
-        ("COREBOOT_SDK_ROOT_arm", "@cr50-coreboot-sdk-arm-eabi//:get_path"),
-    ]
+    if "CROSS_COMPILE_CC_NAME" not in os.environ:
+        os.environ["CROSS_COMPILE_CC_NAME"] = DEFAULT_COMPILER
+
+    if os.environ["CROSS_COMPILE_CC_NAME"] == "clang":
+        target = "@ti50-sdk//:get_path"
+    else:
+        target = "@cr50-coreboot-sdk-arm-eabi//:get_path"
 
     run_cmd(
         [
@@ -110,13 +114,12 @@ def init_toolchain():
             "--project",
             "fwsdk",
             "build",
-            *(target for _, target in toolchains),
+            target,
         ]
     )
 
-    for name, target in toolchains:
-        run_result = run_cmd(["bazel", "--project", "fwsdk", "run", target])
-        os.environ[name] = run_result
+    run_result = run_cmd(["bazel", "--project", "fwsdk", "run", target])
+    os.environ["COREBOOT_SDK_ROOT_arm"] = run_result
 
 
 def build_codesigner():
@@ -320,18 +323,21 @@ def bundle_firmware(opts):
 def test(opts):
     """Runs all of the unit tests for EC firmware"""
     metrics = firmware_pb2.FwTestMetricList()
-    init_toolchain()
     with open(opts.metrics, "w", encoding="utf-8") as f:
         f.write(json_format.MessageToJson(metrics))
 
-    # If building for code coverage, build the 'coverage' target, which
-    # builds the posix-based unit tests for code coverage and assembles
-    # the LCOV information.
-    #
-    # Otherwise, build the 'runtests' target, which verifies all
-    # posix-based unit tests build and pass.
-    target = "coverage" if opts.code_coverage else "runtests"
-    run_cmd(["make", target, f"-j{opts.cpus}"])
+    def run_suite(cc, target):
+        print(f"Running {target} with {cc}...")
+        os.environ["CROSS_COMPILE_CC_NAME"] = cc
+        init_toolchain()
+        run_cmd(["make", "clean"])
+        run_cmd(["make", target, f"-j{opts.cpus}"])
+
+    if opts.code_coverage:
+        run_suite("clang", "coverage")
+    else:
+        for cc in ["gcc", "clang"]:
+            run_suite(cc, "runtests")
 
 
 def main(args):
