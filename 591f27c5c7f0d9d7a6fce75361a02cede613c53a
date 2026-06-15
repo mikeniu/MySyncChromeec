@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbcc2354_98a4527f",
+        "filename": "util/egis/build.mk",
+        "patchSetId": 39
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:11:08Z",
+      "side": 1,
+      "message": "@harry.chen@egistec.corp-partner.google.com I added this target to run the egis tests in the CQ. Please make sure you preserve it when you make changes.",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 27
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
