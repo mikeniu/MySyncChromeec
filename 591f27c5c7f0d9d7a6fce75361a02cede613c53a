@@ -158,6 +158,75 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "decce9dd_bb4ac2ff",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:46:56Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n-----\n\nIn `ec_comm.cc`, you define a full class (`EcCommand`) with private members and an accessor, solely to pack a struct and vector together exactly once. This is a classic C++ anti-pattern where a simple sequence of statements is wrapped in unnecessary Object-Oriented boilerplate.\n\nYou can delete the entire `EcCommand` class definition and inline the logic directly into `SendCommand`, saving \\~15 lines and making the function flow linearly.\n\n**In `ec_comm.cc`:**\n\n```c\n// 1. Delete the entire class EcCommand { ... }; block.\n\n// 2. Rewrite SendCommand:\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, EcError\u003e EcComm::SendCommand(\n    uint16_t cmd_id, uint8_t cmd_ver, std::span\u003cconst uint8_t\u003e payload) {\n  \n  if (payload.size() \u003e std::numeric_limits\u003cuint16_t\u003e::max()) {\n    std::println(stderr, \"[FATAL] EC command payload exceeds limit.\");\n    std::abort();\n  }\n\n  EcHostCommandRequest hdr \u003d {\n      .command_id \u003d ToLittleEndian(cmd_id),\n      .command_version \u003d cmd_ver,\n      .data_length \u003d ToLittleEndian(static_cast\u003cuint16_t\u003e(payload.size()))};\n\n  auto tx_bytes \u003d PackMessage(hdr, payload);\n  ApplyEcChecksum(tx_bytes);\n\n  if (auto res \u003d usb_.Send(tx_bytes); !res) {\n    std::println(stderr, \"[ERROR] Failed to send EC command: {}\", ToString(res.error()));\n    return std::unexpected(EcError::kUsbSendFailed);\n  }\n  \n  // ... rest of the receive logic remains unchanged\n}\n\n```",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 1
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db0acd42_47530982",
+        "filename": "util/egis/egis_util.h",
+        "patchSetId": 39
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:46:56Z",
+      "side": 1,
+      "message": "In `egis_util.h`, `ReadLittleEndian` is an exact duplicate of `ReadStruct`, with the only difference being the call to `FromLittleEndian`.\n\nBecause you are using C++23, `std::expected` has a `.transform()` monadic operation. You can completely eliminate the duplicated `memcpy` and bounds-checking logic by routing `ReadLittleEndian` through `ReadStruct`.\n\n**In `egis_util.h`:**\n\n```c\n// Replace the current ReadLittleEndian with this 1-liner:\ntemplate \u003cstd::integral T\u003e\nstd::expected\u003cT, std::errc\u003e ReadLittleEndian(std::span\u003cconst uint8_t\u003e buffer, \n                                             size_t offset \u003d 0) {\n  return ReadStruct\u003cT\u003e(buffer, offset).transform(FromLittleEndian\u003cT\u003e);\n}\n\n```",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 63,
+        "endChar": 1
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05a9c10b_0649b3df",
+        "filename": "util/egis/flasher_logic.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:46:56Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n-----\n\nIn `flasher_logic.cc` (`ProgramRawCommandPayload`), you are manually making `boot_comm.Send()` and `boot_comm.Receive()` calls, and then manually unpacking and verifying the 2-byte little-endian status header.\n\nThis breaks encapsulation: **`BootromComm::DoUsbTransfer` already does exactly this.**\n\nInstead of rewriting the USB response validation logic in the flasher, you should promote `DoUsbTransfer` to a public method on `BootromComm` (perhaps renamed to `SendPrewrappedPacket`) and inject `BootromComm` into `RunFlashCmd` instead of raw `UsbInterface`.\n\n**In `bootrom.h` (move from private to public and rename):**\n\n```cpp\n  std::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e SendPrewrappedPacket(\n      std::span\u003cconst uint8_t\u003e tx_cmd, size_t min_expected_rx_size \u003d 0,\n      std::chrono::milliseconds timeout \u003d kDefaultCommandTimeout);\n\n```\n\n**Now `ProgramRawCommandPayload` (in `flasher_logic.cc`) becomes drastically simpler:**\n\n```cpp\nstd::expected\u003cvoid, AppError\u003e ProgramRawCommandPayload(\n    BootromComm \u0026brom, std::span\u003cconst uint8_t\u003e firmware) {  // \u003c-- Takes BootromComm now\n  std::println(\"--- Flash RAW CMD Binary Flashing ---\");\n  const size_t total_size \u003d firmware.size();\n\n  while (!firmware.empty()) {\n    auto packet_size_res \u003d GetNextPacketSize(firmware);\n    size_t offset \u003d total_size - firmware.size();\n\n    if (!packet_size_res || packet_size_res.value() \u003e firmware.size()) {\n      std::println(stderr, \"\\n[ERROR] Parse failed/truncated at offset 0x{:X}\", offset);\n      return std::unexpected(AppError::kParseError);\n    }\n\n    size_t take \u003d packet_size_res.value();\n    std::span\u003cconst uint8_t\u003e packet \u003d firmware.first(take);\n    firmware \u003d firmware.subspan(take);\n\n    // If it\u0027s a reset, just send it raw\n    if (packet[0] \u003d\u003d std::to_underlying(EgisBootrom::CommandId::kSystemReset)) {\n       brom.SystemReset(); // \u003c-- Reusing existing BootromComm logic\n       continue;\n    }\n\n    // Send it through BootromComm, which handles the USB receive and Status Header validation automatically!\n    if (auto res \u003d brom.SendPrewrappedPacket(packet); !res) {\n      std::println(stderr, \"\\n[ERROR] Device error at 0x{:X}: {}\", offset, ToString(res.error()));\n      return std::unexpected(AppError::kBootromError);\n    }\n\n    size_t done \u003d total_size - firmware.size();\n    std::print(\"\\rFlashing Progress: {} / {} ({:.1f}%)\", done, total_size,\n               (static_cast\u003cfloat\u003e(done) / total_size * 100.0f));\n    std::fflush(stdout);\n  }\n\n  std::println(\"\\n[OK] RAW CMD Flashing Finished\");\n  return {};\n}\n\n```\n\n*Don\u0027t forget to update the signature of `RunFlashCmd` in `flasher_logic.h`/`.cc` and `et171_flash.cc` to pass `brom` instead of `boot_comm`.*",
+      "range": {
+        "startLine": 128,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 44
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "26d8cd5e_a7b21ccc",
         "filename": "util/egis/usb_comm.cc",
         "patchSetId": 39
