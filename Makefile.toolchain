@@ -53,6 +53,20 @@ CROSS_COMPILE_CXX_NAME?=$(CROSS_COMPILE_CC_NAME)++
 endif
 endif
 
+ifeq ($(CROSS_COMPILE_CC_NAME),clang)
+# For clang, we use LLVM tools.
+is_path=$(filter %/,$(CROSS_COMPILE))
+LLVM_PREFIX=$(if $(is_path),$(CROSS_COMPILE),)
+AR=$(LLVM_PREFIX)llvm-ar
+CC=$(CCACHE) $(CROSS_COMPILE)clang
+CPP=$(CC) -E
+CXX=$(CROSS_COMPILE)clang++
+LD=$(CROSS_COMPILE)ld.lld
+NM=$(LLVM_PREFIX)llvm-nm
+OBJCOPY=$(LLVM_PREFIX)llvm-objcopy
+OBJDUMP=$(LLVM_PREFIX)llvm-objdump
+ADDR2LINE=$(LLVM_PREFIX)llvm-addr2line
+else
 AR=$(CROSS_COMPILE)ar
 CC=$(CCACHE) $(CROSS_COMPILE)$(CROSS_COMPILE_CC_NAME)
 CPP=$(CC) -E
@@ -62,6 +76,7 @@ NM=$(CROSS_COMPILE)nm
 OBJCOPY=$(CROSS_COMPILE)objcopy
 OBJDUMP=$(CROSS_COMPILE)objdump
 ADDR2LINE=$(CROSS_COMPILE)addr2line
+endif
 PKG_CONFIG?=pkg-config
 
 ifeq ($(shell which /usr/bin/x86_64-pc-linux-gnu-$(CROSS_COMPILE_CC_NAME) 2>/dev/null),)
@@ -90,6 +105,8 @@ COMMON_WARN += -Wall -Wundef \
 ifndef ALLOW_WARNINGS
 COMMON_WARN+=-Werror
 endif
+
+COMMON_WARN-clang += -Wno-unaligned-access -Wno-unused-command-line-argument
 
 
 UBSAN_FLAGS=-fsanitize=array-bounds,vla-bound \
@@ -184,7 +201,7 @@ HOST_CFLAGS+=-DCHROMIUM_EC=$(EMPTY)
 ifneq (${SYSROOT},)
   LDFLAGS_EXTRA+=--sysroot=${SYSROOT}
 endif
-LDFLAGS=-nostdlib -no-pie -g -Wl,-X -Wl,--gc-sections -Wl,--build-id=none \
+LDFLAGS=-nostdlib -g -Wl,-X -Wl,--gc-sections -Wl,--build-id=none \
   $(LDFLAGS_EXTRA) $(CFLAGS_CPU) $(CFLAGS_CHIP) $(CFLAGS_BOARD)
 BUILD_LDFLAGS=$(LIBFTDIUSB_LDLIBS)
 HOST_LDFLAGS=$(LIBFTDIUSB_LDLIBS)
@@ -196,8 +213,25 @@ HOST_TEST_LDFLAGS=-Wl,-T core/host/host_exe.lds -lrt -pthread -rdynamic -lm -g \
       $(if $(TEST_UBSAN), ${UBSAN_FLAGS}) \
       $(if $(TEST_FUZZ), -fsanitize=fuzzer -fcoverage-mapping -fprofile-instr-generate)
 
-# utility function to provide overridable defaults
-# $1: name of variable to set
-# $2: first default to use
-# $3: second default to use
-set-option = $(eval $1=$$(strip $$(if $(2),$(2),$(3))))
+
+# Clang target specific configurations
+ifneq ($(BOARD),host)
+ifeq ($(CROSS_COMPILE_CC_NAME),clang)
+CLANG_TARGET:=arm-none-eabi
+CFLAGS+=--target=$(CLANG_TARGET)
+CFLAGS+=-mllvm -inline-threshold=-20
+CFLAGS+=-fno-unwind-tables -fno-asynchronous-unwind-tables -fno-exceptions
+CFLAGS+=-fdata-sections
+LDFLAGS+=--target=$(CLANG_TARGET)
+# Use lld for linking
+LDFLAGS+=-fuse-ld=lld
+LDFLAGS+=-Wl,-mllvm,-inline-threshold=-20
+LDFLAGS+=-Wl,--icf=all
+# Link against compiler-rt builtins
+CLANG_RT_BUILTINS:=$(shell $(CC) --target=$(CLANG_TARGET) -print-file-name=libclang_rt.builtins-arm.a)
+$(info CLANG_RT_BUILTINS=$(CLANG_RT_BUILTINS))
+ifneq ($(CLANG_RT_BUILTINS),libclang_rt.builtins-arm.a)
+LDFLAGS+=$(CLANG_RT_BUILTINS)
+endif
+endif
+endif

@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 CROSS_COMPILE_HOST_DEFAULT:=x86_64-pc-linux-gnu-
-CROSS_COMPILE_CC_NAME?=gcc
+CROSS_COMPILE_CC_NAME?=clang
 
 $(call set-option,CROSS_COMPILE,\
 	$(CROSS_COMPILE_host),\

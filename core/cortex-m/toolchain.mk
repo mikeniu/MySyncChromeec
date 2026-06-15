@@ -2,14 +2,14 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# Force gcc compiler
-CROSS_COMPILE_CC_NAME:=gcc
+# Default to clang compiler, but allow override
+CROSS_COMPILE_CC_NAME?=clang
 
 CROSS_COMPILE_ARM_DEFAULT:=arm-eabi
 COREBOOT_TOOLCHAIN:=arm
-USE_COREBOOT_SDK:=1
+USE_SDK?=1
 
-# Use coreboot-sdk
+# Use SDK toolchain
 $(call set-option,CROSS_COMPILE,\
 	$(CROSS_COMPILE_arm),\
-	arm-eabi)
+	arm-none-eabi-)

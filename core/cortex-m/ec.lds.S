@@ -420,6 +420,7 @@ SECTIONS
 #else
     __image_size = __hey_flash_used;
 #endif
+    __flash_size = FW_SIZE(SECTION);
 #if !(defined(SECTION_IS_RO) && defined(CONFIG_FLASH))
     /DISCARD/ : { *(.google) }
 #endif

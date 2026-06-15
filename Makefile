@@ -76,10 +76,11 @@ ifeq ($(TEST_FUZZ)_$(TEST_ASAN)$(TEST_MSAN)$(TEST_UBSAN),y_)
 override TEST_ASAN:=y
 endif
 
-include Makefile.toolchain
-
 # Define the traditional first target. The dependencies of this are near the
 # bottom as they can be altered by chip and board files.
+# Helper for setting compiler options (defined early for toolchain.mk)
+set-option = $(eval $1=$$(strip $$(if $(2),$(2),$(3))))
+
 .PHONY: all
 all:
 
@@ -128,13 +129,39 @@ CROSS_COMPILE_TARGET_arm:=arm-eabi
 CROSS_TOOLCHAIN:=$(CROSS_COMPILE_TARGET_$(COREBOOT_TOOLCHAIN))
 CROSS_COREBOOT:=$(CROSS_COMPILE_TARGET_$(COREBOOT_TOOLCHAIN))
 
-ifneq (,$(COREBOOT_SDK_ROOT_$(COREBOOT_TOOLCHAIN)))
-CROSS_COMPILE:=$(COREBOOT_SDK_ROOT_$(COREBOOT_TOOLCHAIN))/bin/$(CROSS_COREBOOT)-
+# Determine compiler prefix path (CROSS_COMPILE)
+ifeq ($(CROSS_COMPILE_CC_NAME),clang)
+  # Clang toolchain setup
+  ifneq (,$(COREBOOT_SDK_ROOT_$(COREBOOT_TOOLCHAIN)))
+    # Use explicitly provided SDK root
+    CROSS_COMPILE:=$(COREBOOT_SDK_ROOT_$(COREBOOT_TOOLCHAIN))/bin/
+  else ifneq (,$(USE_SDK))
+    # Default to ti50-sdk (either preinstalled in /opt or via bazel)
+    ifneq ($(wildcard /opt/ti50-sdk/bin/clang),)
+      CROSS_COMPILE:=/opt/ti50-sdk/bin/
+    else
+      TI50_SDK_PATH:=$(shell bazel --project fwsdk run @ti50-sdk//:get_path)
+      CROSS_COMPILE:=$(TI50_SDK_PATH)/bin/
+    endif
+  endif
 else
-ifneq (,$(USE_COREBOOT_SDK))
-CROSS_COMPILE:=$(shell bazel --project fwsdk run \
-	@cr50-coreboot-sdk-$(CROSS_TOOLCHAIN)//:get_path)/bin/$(CROSS_COREBOOT)-
+  # GCC toolchain setup
+  COREBOOT_SDK_ROOT:=$(COREBOOT_SDK_ROOT_$(COREBOOT_TOOLCHAIN))
+  ifneq (,$(COREBOOT_SDK_ROOT))
+    # Use explicitly provided SDK root
+    CROSS_COMPILE:=$(COREBOOT_SDK_ROOT)/bin/$(CROSS_COREBOOT)-
+  else ifneq (,$(USE_SDK))
+    # GCC has no default path, it must be provided
+    ifeq ($(CROSS_COMPILE),)
+      $(error Missing GCC toolchain in COREBOOT_SDK_ROOT_$(COREBOOT_TOOLCHAIN))
+    endif
+  endif
 endif
+
+include Makefile.toolchain
+
+ifeq ($(CROSS_COMPILE_CC_NAME),clang)
+export LD_LIBRARY_PATH:=$(CROSS_COMPILE)../lib:$(LD_LIBRARY_PATH)
 endif
 
 # Create uppercase config variants, to avoid mixed case constants.
