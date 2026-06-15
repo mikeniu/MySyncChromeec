@@ -95,6 +95,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5bc1b3e4_fe30a6fd",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T23:01:01Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn `SwitchMcuMode`, you use a `command_accepted` boolean to track loop success before proceeding to the reset wait.\n\n**Improvement:** You can eliminate the boolean entirely by structuring the loop properly and tail-calling `WaitForReset`. It makes the logic much more linear:\n\n```c\n  std::string_view target_name \u003d (target_cmd \u003d\u003d Command::kEnterBoot) ? \"bootloader\" : \"ROM\";\n\n  for (int attempt \u003d 1; attempt \u003c\u003d kMaxRetry; ++attempt) {\n    auto result \u003d switch_func();\n    if (result) {\n      FT_LOGI(\"Switch to {} command sent successfully\", target_name);\n      break;\n    }\n    if (result.error() \u003d\u003d Error::kNoSuchDevice) {\n      FT_LOGW(\"USB device lost (expected during {} switch).\", target_name);\n      break;\n    }\n    \n    if (attempt \u003d\u003d kMaxRetry) {\n      FT_LOGE(\"Failed to send switch command after {} attempts\", kMaxRetry);\n      return std::unexpected(Error::kResultFail);\n    }\n    \n    FT_LOGW(\"Switch to {} failed... retrying\", target_name);\n    std::this_thread::sleep_for(kMcuRebootPollInterval);\n  }\n\n  return usb.WaitForReset(kResetWaitTimeout);\n\n```",
+      "range": {
+        "startLine": 215,
+        "startChar": 1,
+        "endLine": 241,
+        "endChar": 0
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d034c7d5_f25b1558",
         "filename": "util/focaltech/cli_test.cc",
         "patchSetId": 23
