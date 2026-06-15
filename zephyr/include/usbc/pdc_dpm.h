@@ -56,4 +56,12 @@ void pdc_dpm_remove_source(int port);
  */
 int pdc_dpm_get_source_current(const int port);
 
+/**
+ * @brief Manually override the DPM source current ledger.
+ *
+ * @param port The Type-C port number.
+ * @param current_ma The source current limit in mA.
+ */
+void pdc_dpm_set_source_current_limit(int port, uint16_t current_ma);
+
 #endif /* __CROS_EC_PDC_DPM_H */
