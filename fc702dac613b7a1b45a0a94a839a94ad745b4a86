@@ -46,6 +46,30 @@
       },
       "revId": "fc702dac613b7a1b45a0a94a839a94ad745b4a86",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5507ed5d_07ad4832",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-15T22:02:49Z",
+      "side": 1,
+      "message": "I agree this a great change.  Because of the timing constraints of FRS, there is a strong argument that it should be handled automatically by the PDC directly.",
+      "parentUuid": "e72d2182_97bf5e83",
+      "range": {
+        "startLine": 11,
+        "startChar": 38,
+        "endLine": 14,
+        "endChar": 0
+      },
+      "revId": "fc702dac613b7a1b45a0a94a839a94ad745b4a86",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
