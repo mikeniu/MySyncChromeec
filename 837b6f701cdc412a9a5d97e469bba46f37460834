@@ -348,6 +348,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c4a0bf9b_58aec772",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T23:02:00Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n-----\n\nIn `DownloadBin`, when handling the final trailing bytes of the firmware, you allocate a `std::vector` on the heap just to pad it with `0xFF`:\n\n```c\nif (!remaining_data.empty()) {\n  std::vector\u003cuint8_t\u003e final_chunk(remaining_data.begin(), remaining_data.end());\n  final_chunk.resize(kFocalConfigSize, 0xFF);\n  // ...\n}\n\n```\n\n**Improvement:** Because `kFocalConfigSize` is exactly 4096 bytes, this is incredibly safe to do on the stack. Using `std::array` here completely eliminates dynamic heap allocations during the flash write loop:\n\n```c\nif (!remaining_data.empty()) {\n  std::array\u003cuint8_t, kFocalConfigSize\u003e final_chunk;\n  final_chunk.fill(0xFF);\n  std::ranges::copy(remaining_data, final_chunk.begin());\n  \n  auto page_res \u003d DownloadPage(device, downaddr, final_chunk.size(), final_chunk);\n  if (!page_res) return page_res;\n}\n\n```",
+      "range": {
+        "startLine": 117,
+        "startChar": 0,
+        "endLine": 121,
+        "endChar": 47
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "05833988_c714f39d",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 23
