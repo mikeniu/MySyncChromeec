@@ -182,6 +182,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c0a31736_8b57e415",
+        "filename": "util/egis/bootrom_protocol.h",
+        "patchSetId": 39
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:15:28Z",
+      "side": 1,
+      "message": "In `bootrom_protocol.h`, you enclose the hardware definitions in a capitalized namespace:\n\n```c\nnamespace egis::EgisBootrom {\n\n```\n\n**The Issue:** The Google C++ Style Guide explicitly states: *\"Namespace names are all lower-case, with words separated by underscores.\"* (e.g., `mac_address_table`). Capitalized names are strictly reserved for Types and Classes.\n\n**The Fix:** Rename the inner namespace to snake\\_case.\n\n```c\nnamespace egis::bootrom_protocol {\n\n```\n\n*(You will then update usages like `EgisBootrom::CommandId` to `bootrom_protocol::CommandId` across the codebase).*",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 29
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "94f3e9bd_7f17f261",
         "filename": "util/egis/bootrom_test.cc",
         "patchSetId": 39
@@ -198,6 +221,29 @@
         "startChar": 0,
         "endLine": 58,
         "endChar": 23
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2617e6ef_0d721ce9",
+        "filename": "util/egis/bootrom_test.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:15:28Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn your tests (`bootrom_test.cc`, `ec_comm_test.cc`), you verify payload equivalence using standard ranges:\n\n```c\nEXPECT_TRUE(std::ranges::equal(kTestPlaintext, *res));\n\n```\n\n**The Issue:** If this test fails on a CI server, GoogleTest will output: `Expected: true` `Actual: false` You will have absolutely no idea *which* bytes mismatched, forcing you to run the test locally with a debugger.\n\n**The Fix:** Include `\u003cgmock/gmock.h\u003e` and leverage GoogleTest\u0027s native container matchers. It natively understands `std::vector`, `std::array`, and `std::span`.\n\n```c\n#include \u003cgmock/gmock.h\u003e\n\n// Inside the test:\nEXPECT_THAT(*res, ::testing::ElementsAreArray(kTestPlaintext));\n\n```\n\nIf this fails, GoogleTest will now print a beautiful diff showing the exact index and hex values where the arrays diverged, saving hours of debugging time.",
+      "range": {
+        "startLine": 120,
+        "startChar": 0,
+        "endLine": 120,
+        "endChar": 63
       },
       "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -336,6 +382,29 @@
         "startChar": 0,
         "endLine": 115,
         "endChar": 1
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf8b18ed_b1858b15",
+        "filename": "util/egis/ec_protocol_defs.h",
+        "patchSetId": 39
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T22:15:28Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn `ec_protocol_defs.h`, you calculate the EC checksum using a raw `for` loop:\n\n```c\n  uint32_t sum \u003d 0;\n  for (uint8_t byte : packet) {\n    sum +\u003d byte;\n  }\n  packet[kChecksumOffset] \u003d static_cast\u003cuint8_t\u003e(-sum);\n\n```\n\n**The Issue:** While perfectly functional, modern C++ philosophy (and Google Style) strongly encourages replacing raw `for` loops with standard algorithms whenever possible to explicitly declare *intent*. Computing the sum of a range is the textbook use case for `\u003cnumeric\u003e`.\n\n**The Fix:** Include `\u003cnumeric\u003e` and use `std::accumulate`. It reduces the calculation to a safe, declarative one-liner:\n\n```c\n#include \u003cnumeric\u003e\n\ninline void ApplyEcChecksum(std::span\u003cuint8_t\u003e packet) {\n  constexpr size_t kChecksumOffset \u003d offsetof(EcHostCommandRequest, checksum);\n  if (packet.size() \u003c\u003d kChecksumOffset) return;\n\n  packet[kChecksumOffset] \u003d 0;\n\n  int sum \u003d std::accumulate(packet.begin(), packet.end(), 0);\n  \n  packet[kChecksumOffset] \u003d static_cast\u003cuint8_t\u003e(-sum);\n}\n\n```",
+      "range": {
+        "startLine": 94,
+        "startChar": 0,
+        "endLine": 98,
+        "endChar": 0
       },
       "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
