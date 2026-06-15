@@ -12,8 +12,11 @@
 #include "uart.h"
 #include "util.h"
 
-#define USE_UART_INTERRUPTS (!(defined(CONFIG_CUSTOMIZED_RO) && \
-			       defined(SECTION_IS_RO)))
+#if defined(CONFIG_CUSTOMIZED_RO) && defined(SECTION_IS_RO)
+#define USE_UART_INTERRUPTS 0
+#else
+#define USE_UART_INTERRUPTS 1
+#endif
 
 struct uartn_interrupts {
 	int tx_int;

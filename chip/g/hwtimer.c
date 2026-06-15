@@ -117,12 +117,12 @@ void __hw_clock_event_set(uint32_t deadline)
  * a race condition that could lead to a watchdog timeout if preempted after
  * the get_time() call in process_timers().
  */
+DECLARE_IRQ(GC_IRQNUM_TIMELS0_TIMINT1, __hw_clock_event_irq, 1);
 void __hw_clock_event_irq(void)
 {
 	__hw_clock_event_clear();
 	process_timers(0);
 }
-DECLARE_IRQ(GC_IRQNUM_TIMELS0_TIMINT1, __hw_clock_event_irq, 1);
 
 uint32_t __hw_clock_source_read(void)
 {
@@ -139,6 +139,7 @@ void __hw_clock_source_set(uint32_t ts)
 }
 
 /* This handles rollover in the HW timer */
+DECLARE_IRQ(GC_IRQNUM_TIMELS0_TIMINT0, __hw_clock_source_irq, 1);
 void __hw_clock_source_irq(void)
 {
 	/* Clear the interrupt */
@@ -152,7 +153,6 @@ void __hw_clock_source_irq(void)
 
 	process_timers(1);
 }
-DECLARE_IRQ(GC_IRQNUM_TIMELS0_TIMINT0, __hw_clock_source_irq, 1);
 
 int __hw_clock_source_init(uint32_t start_t)
 {

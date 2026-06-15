@@ -294,6 +294,20 @@ static const char *pw_error_str(int code)
 		} \
 	} while (0)
 
+#define TEST_ASRT_NORET_ARRAY_EQ(s, d, n) \
+	do { \
+		int __i; \
+		for (__i = 0; __i < n; ++__i) \
+			if ((s)[__i] != (d)[__i]) { \
+				int x = 0; \
+				ccprintf("%d: ASSERT_ARRAY_EQ failed at " \
+					 "index=%d: %d != %d\n", __LINE__, \
+					 __i, (int)(s)[__i], (int)(d)[__i]); \
+				task_dump_trace(); \
+				x = 1 / x; \
+			} \
+	} while (0)
+
 /* For debugging and generating test data. */
 void print_array(const uint8_t *data, size_t n) __attribute__ ((unused));
 void print_array(const uint8_t *data, size_t n)
@@ -949,11 +963,11 @@ enum dcrypto_result DCRYPTO_aes_ctr(uint8_t *out, const uint8_t *key,
 		return DCRYPTO_FAIL;
 	}
 
-	TEST_ASSERT(key_bits == 256);
-	TEST_ASSERT_ARRAY_EQ(key, EMPTY_TREE.wrap_key,
+	TEST_ASRT_NORET(key_bits == 256);
+	TEST_ASRT_NORET_ARRAY_EQ(key, EMPTY_TREE.wrap_key,
 			     sizeof(EMPTY_TREE.wrap_key));
-	TEST_ASSERT_ARRAY_EQ(iv, DEFAULT_IV, sizeof(DEFAULT_IV));
-	TEST_ASSERT(in_len == sizeof(struct leaf_sensitive_data_t));
+	TEST_ASRT_NORET_ARRAY_EQ(iv, DEFAULT_IV, sizeof(DEFAULT_IV));
+	TEST_ASRT_NORET(in_len == sizeof(struct leaf_sensitive_data_t));
 
 	for (x = 0; x < in_len; ++x)
 		out[x] = MOCK_AES_XOR_BYTE(x) ^ in[x];

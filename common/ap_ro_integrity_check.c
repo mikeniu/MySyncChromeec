@@ -397,7 +397,7 @@ static enum vendor_cmd_rc vc_seed_ap_ro_check(enum vendor_cmd_cc code,
 		}
 
 		*response_size = 0;
-		return EC_SUCCESS;
+		return VENDOR_RC_SUCCESS;
 	}
 
 	/* There should be at least one range and the hash. */
