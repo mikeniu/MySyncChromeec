@@ -394,6 +394,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f1a90fd9_34308638",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T23:06:05Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nBecause `SendActionOut` wraps `BuildFtCmd` using positional arguments, calling it sometimes requires passing meaningless `0`s just to reach a later argument. For example, in `ResetMcu`:\n\n```c\nauto res \u003d SendActionOut(device, Subcmd::kSoftReset, 0, {},\n                         TransferDirection::kSendOnly, kMcuResetTimeout, 0, 0,\n                         kSoftPor);\n\n```\n\n**Improvement:** By giving the fields in `CmdFormat` (in `ft_scsi.h`) default values of `0`, you can drop the `SendActionOut` helper entirely and use C++20 designated initializers directly. It makes the call sites completely self-documenting:\n\n```c\n// In ft_scsi.h\nstruct CmdFormat {\n  Opcode opcode;\n  uint32_t address \u003d 0;\n  uint32_t length \u003d 0;\n  uint32_t aux_address \u003d 0;\n  Subcmd subcmd;\n  uint8_t flags \u003d 0;\n  uint8_t reserved \u003d 0;\n} __attribute__((packed));\n\n// In updater.cc, the ResetMcu call becomes:\nauto res \u003d SendBulkDataOut(device, CmdFormat{\n    .opcode \u003d Opcode::kAction,\n    .subcmd \u003d Subcmd::kSoftReset,\n    .flags \u003d kSoftPor\n}, {}, TransferDirection::kSendOnly, kMcuResetTimeout);\n\n```",
+      "range": {
+        "startLine": 195,
+        "startChar": 0,
+        "endLine": 198,
+        "endChar": 37
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "05833988_c714f39d",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 23
