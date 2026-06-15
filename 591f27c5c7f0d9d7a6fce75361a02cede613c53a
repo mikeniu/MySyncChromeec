@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9474e64d_e4b5332c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 39
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T21:19:13Z",
+      "side": 1,
+      "message": "The style guide strictly mandates that every file must directly `#include` the headers for the symbols it uses, rather than relying on transitive inclusions.\n\n* **`bootrom.h`**: Uses `std::copy` in `SetAesKey()`, but is missing `#include \u003calgorithm\u003e`.  \n* **`file_util.cc`**: Uses `std::copy` in `LoadAesKey()`, but is missing `#include \u003calgorithm\u003e`.  \n* **`cli_options_test.cc`**: Uses `std::array` in `RunParseArgs()`, but is missing `#include \u003carray\u003e`.  \n* **`ec_comm_test.cc`**: Uses `std::equal` in `SendCommandWithPayloadSuccess`, but is missing `#include \u003calgorithm\u003e`.",
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cbcc2354_98a4527f",
         "filename": "util/egis/build.mk",
         "patchSetId": 39
