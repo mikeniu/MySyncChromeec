@@ -164,6 +164,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bdb8aab5_bea37740",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T23:56:44Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIf a user runs `enter_bootloader` while the device is in Bootloader or ROM mode, `ExecuteCommand` blindly passes it to `SwitchMcuMode`. `SwitchMcuMode` will actually succeed in getting the device\u0027s boot version (using SCSI commands), but then it will attempt to send a ChromiumOS EC command (`EC_CMD_ENTER_BOOTLOADER`) over the SCSI interface.\n\nThe device will drop the invalid packet, the USB transport will time out, and the tool will eventually fail—but it will take several seconds and print confusing error logs about missing EC responses rather than a clean \"Invalid Mode\" error.\n\n### The Fix\n\nYou should add an explicit guard inside the `ExecuteCommand` switch statement in `cli.cc` to match the help text:\n\n```cpp\n    case Command::kEnterBoot:\n      if (current_mode !\u003d DeviceMode::kEc) {\n        FT_LOGE(\"enter_bootloader command is only valid from EC mode.\");\n        return std::unexpected(Error::kInvalidMode);\n      }\n      FT_LOGI(\"Entering bootloader mode...\");\n      return SwitchMcuMode(usb_device, current_mode, Command::kEnterBoot);\n\n```",
+      "range": {
+        "startLine": 327,
+        "startChar": 0,
+        "endLine": 329,
+        "endChar": 74
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d034c7d5_f25b1558",
         "filename": "util/focaltech/cli_test.cc",
         "patchSetId": 23
