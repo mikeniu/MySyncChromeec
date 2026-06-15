@@ -179,7 +179,8 @@ static void rctd_poll(void)
 }
 #endif
 
-static void power_button_handler(void)
+DECLARE_IRQ(GC_IRQNUM_RBOX0_INTR_PWRB_IN_FED_INT, power_button_handler, 1);
+void power_button_handler(void)
 {
 	CPRINTS("power button pressed");
 
@@ -199,9 +200,10 @@ static void power_button_handler(void)
 
 	GWRITE_FIELD(RBOX, INT_STATE, INTR_PWRB_IN_FED, 1);
 }
-DECLARE_IRQ(GC_IRQNUM_RBOX0_INTR_PWRB_IN_FED_INT, power_button_handler, 1);
 
-static void power_button_release_handler(void)
+DECLARE_IRQ(GC_IRQNUM_RBOX0_INTR_PWRB_IN_RED_INT, power_button_release_handler,
+	1);
+void power_button_release_handler(void)
 {
 #ifdef CR50_DEV
 	CPRINTS("power button released");
@@ -216,8 +218,6 @@ static void power_button_release_handler(void)
 	/* Note that this is for one-time use through the current power on. */
 	power_button_release_enable_interrupt(0);
 }
-DECLARE_IRQ(GC_IRQNUM_RBOX0_INTR_PWRB_IN_RED_INT, power_button_release_handler,
-	1);
 
 #ifdef CONFIG_U2F
 static void power_button_init(void)

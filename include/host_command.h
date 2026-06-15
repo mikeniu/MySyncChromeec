@@ -271,9 +271,9 @@ void host_packet_receive(struct host_packet *pkt);
 		= {routine, EC_PRIVATE_HOST_COMMAND_VALUE(command), \
 		   version_mask}
 #else
-#define DECLARE_HOST_COMMAND(command, routine, version_mask)    \
-	enum ec_status (routine)(struct host_cmd_handler_args *args)       \
-		__attribute__((unused))
+#define DECLARE_HOST_COMMAND(command, routine, version_mask)                \
+	static __attribute__((unused)) enum ec_status (*__dummy_##routine)( \
+		struct host_cmd_handler_args *) = routine
 
 #define DECLARE_PRIVATE_HOST_COMMAND(command, routine, version_mask)	\
 	DECLARE_HOST_COMMAND(command, routine, version_mask)

@@ -425,7 +425,9 @@ enum {
  * Falling edge indicates AC no longer present (removal of the charger cable)
  * and rising edge indicates AP present (insertion of charger cable).
  */
-static void ac_power_state_changed(void)
+DECLARE_IRQ(GC_IRQNUM_RBOX0_INTR_AC_PRESENT_RED_INT, ac_power_state_changed, 1);
+DECLARE_IRQ(GC_IRQNUM_RBOX0_INTR_AC_PRESENT_FED_INT, ac_power_state_changed, 1);
+void ac_power_state_changed(void)
 {
 	uint32_t req;
 	/* Get current status and clear it. */
@@ -464,8 +466,6 @@ static void ac_power_state_changed(void)
 	 */
 	hook_call_deferred(&ac_stayed_disconnected_data, CUTOFF_TIMEOUT_US);
 }
-DECLARE_IRQ(GC_IRQNUM_RBOX0_INTR_AC_PRESENT_RED_INT, ac_power_state_changed, 1);
-DECLARE_IRQ(GC_IRQNUM_RBOX0_INTR_AC_PRESENT_FED_INT, ac_power_state_changed, 1);
 
 /* Enable interrupts on plugging in and yanking out of the charger cable. */
 static void init_ac_detect(void)
@@ -525,6 +525,7 @@ static void init_pmu(void)
 	GWRITE_FIELD(PMU, INT_ENABLE, INTR_WAKEUP, 1);
 }
 
+DECLARE_IRQ(GC_IRQNUM_PMU_INTR_WAKEUP_INT, pmu_wakeup_interrupt, 1);
 void pmu_wakeup_interrupt(void)
 {
 	int wakeup_src;
@@ -592,7 +593,7 @@ void pmu_wakeup_interrupt(void)
 	if (wakeup_src & GC_PMU_EXITPD_SRC_TIMELS0_PD_EXIT_TIMER1_MASK)
 		task_trigger_irq(GC_IRQNUM_TIMELS0_TIMINT1);
 }
-DECLARE_IRQ(GC_IRQNUM_PMU_INTR_WAKEUP_INT, pmu_wakeup_interrupt, 1);
+
 
 void board_configure_deep_sleep_wakepins(void)
 {
@@ -1174,7 +1175,8 @@ void board_reboot_ec_deferred(int32_t usec_delay)
 /*
  * This interrupt handler will be called if the RBOX key combo is detected.
  */
-static void key_combo0_irq(void)
+DECLARE_IRQ(GC_IRQNUM_RBOX0_INTR_BUTTON_COMBO0_RDY_INT, key_combo0_irq, 0);
+void key_combo0_irq(void)
 {
 	GWRITE_FIELD(RBOX, INT_STATE, INTR_BUTTON_COMBO0_RDY, 1);
 
@@ -1192,7 +1194,6 @@ static void key_combo0_irq(void)
 	/* old message: Recovery Requested */
 	CPRINTS("Rec Req");
 }
-DECLARE_IRQ(GC_IRQNUM_RBOX0_INTR_BUTTON_COMBO0_RDY_INT, key_combo0_irq, 0);
 
 #ifdef CONFIG_CMD_SYSRST
 static int is_sys_rst_asserted(void)
