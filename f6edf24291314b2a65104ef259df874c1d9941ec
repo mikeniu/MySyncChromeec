@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fb83bdd_dad005b9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-15T19:43:01Z",
+      "side": 1,
+      "message": "For testing purposes with screebo, just changing the screebo config is fine. Assuming this works, you\u0027ll want to do this for all of the TBT3/USB4, TCPMv2 models.\n\nAnother option would be to set this config to be enabled by default, then remove all of the individual settings in the board files. In Zephyr, you\u0027d want to make it dependent on TCPMv2. In legacy EC, it should already be dependent on TCPMv2 implicitly, because `common/usbc/build.mk` is only included if TCPMv2 is enabled.\n\nIf you\u0027ve already enabled this for all non-TBT3, TCPMv2 models, then enabling it for all TCPMv2 models would be equivalent to incrementally enabling it for all TBT3, TCPMv2 models. If you\u0027ve only enabled it for a subset of non-TBT3, TCPMv2 models up to this point, it\u0027s probably best to continue enabling it for specific boards. Enabling it for every TCPMv2 board would then be a pretty large change.",
+      "revId": "f6edf24291314b2a65104ef259df874c1d9941ec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ec06c22a_4e95b343",
