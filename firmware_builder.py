@@ -94,29 +94,35 @@ def run_cmd(cmd, exec_dir=None):
 
 
 def init_toolchain():
-    """Initialize coreboot-sdk.
+    """Initialize toolchain.
 
     Returns:
         Environment variables to use for toolchain.
     """
-    # (environment variable, bazel target)
-    toolchains = [
-        ("COREBOOT_SDK_ROOT_arm", "@cr50-coreboot-sdk-arm-eabi//:get_path"),
-    ]
-
-    run_cmd(
-        [
-            "bazel",
-            "--project",
-            "fwsdk",
-            "build",
-            *(target for _, target in toolchains),
+    if os.path.exists('/opt/ti50-sdk/bin/clang'):
+        os.environ["COREBOOT_SDK_ROOT_arm"] = "/opt/ti50-sdk"
+    else:
+        # (environment variable, bazel target)
+        toolchains = [
+            # ("COREBOOT_SDK_ROOT_arm", "@cr50-coreboot-sdk-arm-eabi//:get_path"),
+            ("COREBOOT_SDK_ROOT_arm", "@ti50-sdk//:get_path"),
         ]
-    )
 
-    for name, target in toolchains:
-        run_result = run_cmd(["bazel", "--project", "fwsdk", "run", target])
-        os.environ[name] = run_result
+        run_cmd(
+            [
+                "bazel",
+                "--project",
+                "fwsdk",
+                "build",
+                *(target for _, target in toolchains),
+            ]
+        )
+
+        for name, target in toolchains:
+            run_result = run_cmd(["bazel", "--project", "fwsdk", "run", target])
+            os.environ[name] = run_result
+
+    os.environ["CROSS_COMPILE_CC_NAME"] = "clang"
 
 
 def build_codesigner():
