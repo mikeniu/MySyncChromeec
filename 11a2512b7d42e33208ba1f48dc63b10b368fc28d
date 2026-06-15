@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56c1ca23_f0e7e0b7",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 3059,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-15T20:02:17Z",
+      "side": 1,
+      "message": "I\u0027m suspicious of these coverage results. This check is covered, but neither branch of the `if/else` is covered. That shouldn\u0027t be possible. Based on the default configs, I would guess that the branch where `board_is_dts_port()` returns true is covered.\n\nWhichever branch is being executed now, the way to cover the other branch would be to get the opposite return value from `board_is_dts_port()`. That is probably as simple as running the test on port 1 in addition to port 0. If DTS is not enabled in the test build, you will need to modify that in a way that doesn\u0027t break any other tests. If you\u0027re doing this in a new Zephyr test config, that will be natural.",
+      "revId": "11a2512b7d42e33208ba1f48dc63b10b368fc28d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c076fb74_58918ff8",
+        "filename": "test/usb_typec_drp_acc_trysrc.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-15T20:02:17Z",
+      "side": 1,
+      "message": "For new tests, Zephyr tests are strongly preferred over legacy EC tests.",
+      "revId": "11a2512b7d42e33208ba1f48dc63b10b368fc28d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0863e9e5_2dc5d7af",
+        "filename": "test/usb_typec_drp_acc_trysrc.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 851,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-15T20:02:17Z",
+      "side": 1,
+      "message": "I don\u0027t understand the need for this policy change. If the default condition is DRP on, and the TCPC only shows Rd, then the TCPM should end up in AttachWait.SRC without setting the DRP policy to force source.",
+      "revId": "11a2512b7d42e33208ba1f48dc63b10b368fc28d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "357b5c4c_bb6901e4",
+        "filename": "test/usb_typec_drp_acc_trysrc.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 870,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-15T20:02:17Z",
+      "side": 1,
+      "message": "The requirement in this case is that the TCPM stay in AttachWait.SRC and not proceed to Attached.SRC. This condition would be true in either of those states. I think the correct check here should be whether the port is sourcing VBUS. That is also the check that the CTS uses.",
+      "revId": "11a2512b7d42e33208ba1f48dc63b10b368fc28d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
