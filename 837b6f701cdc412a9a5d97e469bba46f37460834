@@ -164,6 +164,75 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5d95379f_c6741774",
+        "filename": "util/focaltech/cli_test.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T23:29:42Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n---\n\nThe value `64` (the USB Full Speed max packet size) is scattered across multiple files. It appears as `kMaxPacketSize` in `cli.cc` and `ft_scsi_test.cc`, and as a raw inline integer in `cli_test.cc`:\n\n```c\npacket.resize(64, 0xAA); // cli_test.cc\n\n```\n\n**Fix:** Centralize this into `usb_transport.h` so the entire project shares the same source of truth for USB chunking:\n\n```c\ninline constexpr size_t kUsbBulkMaxPacketSize \u003d 64;\n\n```",
+      "range": {
+        "startLine": 281,
+        "startChar": 0,
+        "endLine": 281,
+        "endChar": 26
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7c3fd3b_4a55d697",
+        "filename": "util/focaltech/cli_test.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 504,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T23:29:42Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn `FakeForFlashWp::Send` and `FakeForSetWp::Send`, you extract the `tag` from the incoming USB packet using a hardcoded index of `4`:\n\n```c\nif (data.size() \u003d\u003d testing::kUsbCbwSize) {\n  std::memcpy(\u0026current_cbw_tag_, \u0026data[4], sizeof(current_cbw_tag_));\n}\n\n```\n\n**Why it\u0027s magic:** `4` represents the byte offset of the `tag` field within the USB Bulk-Only Transfer CBW. If the struct alignment or definition ever changes, this test will silently read garbage data. **Fix:** Use `offsetof` to make it mathematically tied to the structure:\n\n```c\nstd::memcpy(\u0026current_cbw_tag_, \u0026data[offsetof(BulkCbWrap, tag)], sizeof(current_cbw_tag_));\n\n```",
+      "range": {
+        "startLine": 504,
+        "startChar": 0,
+        "endLine": 504,
+        "endChar": 73
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85ed0a78_61b3df17",
+        "filename": "util/focaltech/ft_log.h",
+        "patchSetId": 23
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T23:29:42Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n-----\n\nThe terminal color codes are hardcoded strings mixed into the switch statement logic:\n\n```c\nif (enable_color) color \u003d \"\\033[36m\";\n// ...\nreset \u003d \"\\033[0m\";\n\n```\n\n**Fix:** Pull these out into descriptive constants to eliminate the opaque terminal escapes from the logic block:\n\n```c\ninline constexpr std::string_view kColorCyan   \u003d \"\\033[36m\";\ninline constexpr std::string_view kColorYellow \u003d \"\\033[33m\";\ninline constexpr std::string_view kColorRed    \u003d \"\\033[31m\";\ninline constexpr std::string_view kColorReset  \u003d \"\\033[0m\";\n\n```",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 43
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c9d8f674_b20a0bd2",
         "filename": "util/focaltech/ft_log.h",
         "patchSetId": 23
@@ -180,6 +249,29 @@
         "startChar": 0,
         "endLine": 123,
         "endChar": 25
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb835fd6_96094fe5",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T23:29:42Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nYou have defined the exact same 3-second reboot wait timeout under three different names in three different files:\n\n* `constexpr auto kResetWaitTimeout \u003d 3s;` (`cli.cc`)  \n* `constexpr auto kMcuResetTimeout \u003d 3000ms;` (`updater.cc`)  \n* `constexpr auto kResetWaitTimeout \u003d 3000ms;` (`ft_scsi.cc`)\n\n**Fix:** Move this to `usb_device.h` as a single shared constant:\n\n```c\ninline constexpr auto kDeviceRebootTimeout \u003d 3s;\n\n```",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 42
       },
       "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -457,6 +549,29 @@
         "startChar": 0,
         "endLine": 121,
         "endChar": 47
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba4d7b28_c6ab9a27",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T23:29:42Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nIn `DownloadBin`, you pad the final chunk of the firmware with `0xFF`:\n\n```c\n// 0xFF is the initial value of flash.\nfinal_chunk.resize(kFocalConfigSize, 0xFF);\n\n```\n\n**Fix:** Instead of using a comment to explain a magic literal, encode the meaning directly into a constant:\n\n```c\nconstexpr uint8_t kErasedFlashByte \u003d 0xFF;\nfinal_chunk.resize(kFocalConfigSize, kErasedFlashByte);\n\n```",
+      "range": {
+        "startLine": 121,
+        "startChar": 41,
+        "endLine": 121,
+        "endChar": 45
       },
       "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
