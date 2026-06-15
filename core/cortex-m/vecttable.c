@@ -5,6 +5,11 @@
  * Cortex-M CPU vector table
  */
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Winitializer-overrides"
+#endif
+
 #ifndef ___INIT
 #define ___INIT
 #include "config.h"
@@ -383,4 +388,8 @@ table(
 #undef PASS
 #define PASS 2
 #include "vecttable.c"
+#endif
+
+#ifdef __clang__
+#pragma clang diagnostic pop
 #endif
