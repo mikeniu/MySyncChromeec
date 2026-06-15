@@ -132,6 +132,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d5275683_f4166772",
+        "filename": "util/elan/cli.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-15T20:21:27Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nThe issue isn\u0027t the `nullptr` itself, but rather the `argc` value you are passing to `ParseCommandLine` in your tests.\n\n### What is actually happening?\n\n1. **The Segfault (with `nullptr`):**\nWhen you added `argv.push_back(nullptr)`, the size of your `argv` vector increased by 1. By calling `ParseCommandLine(argv.size(), argv.data())`, you are telling `getopt_long` that `argc` includes the `nullptr`. It expects a string, tries to dereference the `nullptr`, and immediately segfaults.\n2. **The Unrelated Test Failure (without `nullptr`):**\nWhen you comment out the `nullptr`, `getopt_long` still attempts to peek at `argv[argc]` under the hood (standard POSIX behavior). Since the vector doesn\u0027t have a `nullptr` at the end, it reads uninitialized memory past the end of the vector\u0027s buffer. This out-of-bounds read corrupts the heap or the test runner\u0027s internal state, which causes the completely unrelated `FileControlParamTest` to fail right after it.\n\n### The Fix\n\nYou must keep the `nullptr` to satisfy POSIX and prevent the memory corruption, but you need to subtract 1 from `argv.size()` so that `argc` only counts the actual string arguments.\n\nKeep your `MakeArgv` helper exactly as you updated it (with the `nullptr`), but update your test calls like this:\n\n**Incorrect:**\n\n```cpp\nauto cmd \u003d ParseCommandLine(argv.size(), argv.data());\n\n```\n\n**Correct:**\n\n```cpp\n// Subtract 1 from argv.size() so the nullptr isn\u0027t counted in argc\nauto cmd \u003d ParseCommandLine(argv.size() - 1, argv.data()); \n\n```\n\n*(Alternatively, you can just pass `args.size()` as the first parameter, which represents the true string count).*\n\nApply this change to all the `ParseCommandLine` calls in your `cli_test.cc` file, and both the segfault and the file test failure will disappear.",
+      "parentUuid": "057de0f7_2751ca2a",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 13
+      },
+      "revId": "d62eebc390860dab966447e9624d032f25ceb78b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "42650d86_e3181626",
         "filename": "util/elan/elaniap_test.cc",
         "patchSetId": 27
