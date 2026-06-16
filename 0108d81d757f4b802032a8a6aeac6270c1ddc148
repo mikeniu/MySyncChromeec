@@ -16,6 +16,29 @@
       "message": "BSP PM CL:7921952 merged. We can enable Atria ISH PM now.",
       "revId": "0108d81d757f4b802032a8a6aeac6270c1ddc148",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e977eba8_2efc7d4f",
+        "filename": "zephyr/program/atria/atriarvp-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-16T22:03:08Z",
+      "side": 1,
+      "message": "Nit: Looking through `soc/intel/intel_ish`, it looks like the settings here for `PM_DEVICE`, `GDT_DYNAMIC`, `GDT_RESERVED_NUM_ENTRIES`, and `DYNAMIC_INTERRUPTS` are already the defaults. Do they do anything here?",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 27
+      },
+      "revId": "0108d81d757f4b802032a8a6aeac6270c1ddc148",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
