@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4f89f73_5f670f25",
+        "filename": "zephyr/emul/emul_common_i2c.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-16T15:57:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7def083d_4ea4eadb",
+      "revId": "424f3ed25eecfec23796d035bc75be74dd04cd7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fe7dcd8b_3c71ab96",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "It wouldn\u0027t surprise me if we don\u0027t have any tests exercising this set of inputs. If you think there\u0027s a straightforward way this _should_ work, I\u0027d welcome for this CL to describe that in the header comments for `i2c_common_emul_set_{read,write}_fail_reg`.",
       "parentUuid": "c3499641_7f21e946",
+      "revId": "424f3ed25eecfec23796d035bc75be74dd04cd7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8d33630_00a8f0ce",
+        "filename": "zephyr/emul/emul_common_i2c.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-16T15:57:54Z",
+      "side": 1,
+      "message": "I made the check here better so I don\u0027t think any more comments are needed and I removed the now redundant checks from the read and write paths",
+      "parentUuid": "82476399_6444b7f6",
       "revId": "424f3ed25eecfec23796d035bc75be74dd04cd7f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
