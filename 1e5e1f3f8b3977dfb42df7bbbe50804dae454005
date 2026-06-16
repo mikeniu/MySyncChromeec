@@ -39,6 +39,52 @@
       },
       "revId": "1e5e1f3f8b3977dfb42df7bbbe50804dae454005",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb6ce1cf_87c9345c",
+        "filename": "util/elan/iap_tool.cc",
+        "patchSetId": 30
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-16T21:56:40Z",
+      "side": 1,
+      "message": "Remove this comment",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 40
+      },
+      "revId": "1e5e1f3f8b3977dfb42df7bbbe50804dae454005",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e511041_db3694a0",
+        "filename": "util/elan/usb_backend.h",
+        "patchSetId": 30
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-16T21:56:40Z",
+      "side": 1,
+      "message": "Remove this comment",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 52
+      },
+      "revId": "1e5e1f3f8b3977dfb42df7bbbe50804dae454005",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
