@@ -131,6 +131,41 @@ config USB_MUX_SYS_INIT_PRIORITY
 	  PDC power management initialization priority.
 endif
 
+<<<<<<< HEAD   (52dcdc899b48abe60cce1456bc52355a394f72dc rtk: Add DFP definition and refactor UFP VDOs for USB PD 3.x)
+||||||| BASE   (834fd7914959f1ad896fd4c1ef105879e30ab1db zephyr: pw_log: Move spinlock key to local function scope)
+config USBC_PDC_TBT_SUPPORTED
+	bool "TBT support is enabled on PDC-based device"
+	depends on USB_PDC_POWER_MGMT
+	default n
+	help
+	  Set on PDC-based devices with Thunderbolt support. This will
+	  enable features to improve interop with Thunderbolt devices.
+	  (1) Hard reset after 15W allocation to Sinks.
+
+=======
+config USBC_PDC_TBT_SUPPORTED
+	bool "TBT support is enabled on PDC-based device"
+	depends on USB_PDC_POWER_MGMT
+	default n
+	help
+	  Set on PDC-based devices with Thunderbolt support. This will
+	  enable features to improve interop with Thunderbolt devices.
+	  (1) Hard reset after 15W allocation to Sinks.
+
+M_PROP_I := max-discharge-current-ma
+M_PROP_P := max-discharge-power-mw
+
+config PDC_POWER_MGMT_SRC_THROTTLING
+	bool "Enable SRC throttling"
+	default y
+	depends on \
+		$(dt_compat_any_has_prop,$(DT_COMPAT_USBC_PORT_POLICY),$(M_PROP_I)) || \
+		$(dt_compat_any_has_prop,$(DT_COMPAT_USBC_PORT_POLICY),$(M_PROP_P))
+	help
+	  Dynamically throttles Type-C source current limits to 1.5A when
+	  battery discharging current or power exceeds specified thresholds.
+
+>>>>>>> CHANGE (e5a946df1c6787d35d35aaa29438a19c45494690 pd_controller: Implement dynamic SRC throttling for battery )
 module = USB_PDC
 module-str = USB PDC
 source "subsys/logging/Kconfig.template.log_config"
