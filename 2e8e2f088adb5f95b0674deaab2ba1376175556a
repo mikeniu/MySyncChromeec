@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d73ea19_25006572",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-16T19:44:34Z",
+      "side": 1,
+      "message": "This duplicates code starting on line 292, including the enums. If you need to represent that the UFP VDO structure is different among VDO versions, you should do something like\n```\nunion ufp_vdo {\n struct ufp_vdo_rev30 rev30;\n struct ufp_vdo_rev32 rev32;\n uint32_t raw;\n};\n```\n\nThe exact structure depends on how much overlap there is in the structures. I think there\u0027s a lot, so it might make more sense to only permute a few fields instead of having completely disjoint structs like my example does.",
+      "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce0106de_a319ba49",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 858,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-16T19:44:34Z",
+      "side": 1,
+      "message": "Does the command return a status immediately? If it\u0027s not done yet, what happens?",
+      "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9df5e63a_93915767",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 1820,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-16T19:44:34Z",
+      "side": 1,
+      "message": "Is there an action that needs to happen the clear the event, or is it already cleared by the time this happens?",
+      "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
