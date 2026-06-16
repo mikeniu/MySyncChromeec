@@ -211,6 +211,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "00f08bce_17b66d52",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 23
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-16T00:04:51Z",
+      "side": 1,
+      "message": "We should have a test for this. Gemini code:\n\n----\n\nWhen you have code specifically written to work around a weird hardware quirk or race condition (like the host suspending the MCU mid-transfer), it is critical to test it. These are exactly the kinds of workarounds that future developers (or even you, six months from now) might look at, think *\"Why is this looping? That seems redundant,\"* and accidentally remove, re-introducing the bug.\n\nTo test this properly, you need to verify two things:\n\n1. **Transient Failure:** If the first attempt fails but the second attempt succeeds, the overall function should report success.\n2. **Persistent Failure:** If the device is truly broken and fails every time, the loop must eventually give up and report an error (preventing an infinite loop).\n\nHere is the absolute simplest way to test the retry loop. We will use a brilliant GMock trick for the transient failure: **we tell the mock to fail once, and then delegate all future work to your existing `StubUsbTransport`!** This saves you from having to mock the 50+ back-and-forth SCSI commands required for a successful flash.\n\n### 1. Test for Persistent Failure (Gives up eventually)\n\nThis simply proves the loop doesn\u0027t run forever if the MCU never wakes up.\n\n```cpp\nTEST(UpdaterTest, UpdateFw_FailsAfterMaxRetriesExhausted) {\n  ConfigPage config{.code_valid_control_word \u003d kCodeValidMagic};\n  auto mock \u003d std::make_unique\u003ctesting::MockUsbTransport\u003e();\n\n  // The MCU is completely dead. Fail every single transfer.\n  EXPECT_CALL(*mock, Send(_, _))\n      .WillRepeatedly(Return(std::unexpected(Error::kResultFail)));\n\n  UsbDevice device(std::move(mock));\n  auto res \u003d UpdateFw(device, AsUint8Span(config), DeviceMode::kBoot);\n\n  EXPECT_FALSE(res.has_value());\n  EXPECT_EQ(res.error(), Error::kResultFail);\n}\n\n```\n\n### 2. Test for Transient Failure (The \"Delegate to Stub\" Trick)\n\nInstead of manually writing `EXPECT_CALL` for every single erase/write/verify step of a successful flash, we capture your existing stub in a lambda. The mock fails the first try, then acts as a transparent proxy to the stub.\n\n```cpp\nTEST(UpdaterTest, UpdateFw_RetriesAndSucceedsOnTransientSuspend) {\n  ConfigPage config{.code_valid_control_word \u003d kCodeValidMagic};\n  \n  auto mock \u003d std::make_unique\u003ctesting::MockUsbTransport\u003e();\n  StubUsbTransport stub; // Your existing fake that simulates a perfect flash\n  \n  // 1. Fail the first attempt (simulating the host suspending the MCU).\n  // 2. Delegate everything else to the stub so the retry succeeds effortlessly.\n  EXPECT_CALL(*mock, Send(_, _))\n      .WillOnce(Return(std::unexpected(Error::kResultFail)))\n      .WillRepeatedly([\u0026stub](auto data, auto timeout) { return stub.Send(data, timeout); });\n\n  // Route all incoming data reads to the stub as well\n  EXPECT_CALL(*mock, Recv(_, _))\n      .WillRepeatedly([\u0026stub](auto data, auto timeout) { return stub.Recv(data, timeout); });\n\n  UsbDevice device(std::move(mock));\n  auto res \u003d UpdateFw(device, AsUint8Span(config), DeviceMode::kBoot);\n\n  // The function should catch the failure, retry, and report success!\n  EXPECT_TRUE(res.has_value());\n}\n\n```",
+      "range": {
+        "startLine": 350,
+        "startChar": 1,
+        "endLine": 352,
+        "endChar": 76
+      },
+      "revId": "837b6f701cdc412a9a5d97e469bba46f37460834",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d034c7d5_f25b1558",
         "filename": "util/focaltech/cli_test.cc",
         "patchSetId": 23
