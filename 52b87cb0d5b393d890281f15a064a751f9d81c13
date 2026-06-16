@@ -66,6 +66,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ddeef289_d826cd06",
+        "filename": "util/focaltech/ft_help.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-16T22:39:01Z",
+      "side": 1,
+      "message": "We discussed this internally and decided that we don\u0027t want to have this tool perform the \"enter bootloader\" operation. We already have this capability with `ectool --name\u003dcros_fp enter_bootloader`, so we don\u0027t want to duplicate it here. Removing it will simplify the code.\n\nSimilarly, we should remove `get_ec_version` (`ectool --name\u003dcros_fp version`) and the \"enter_rom\" mode from the test firmware. That will allow us to completely remove the EC command logic from this tool.",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 66
+      },
+      "revId": "52b87cb0d5b393d890281f15a064a751f9d81c13",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b9304220_6b8245cd",
         "filename": "util/focaltech/libusb_transport.cc",
         "patchSetId": 24
