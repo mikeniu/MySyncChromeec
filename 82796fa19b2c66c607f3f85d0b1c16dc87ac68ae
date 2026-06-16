@@ -51,6 +51,24 @@
       "parentUuid": "82aae703_c103c380",
       "revId": "82796fa19b2c66c607f3f85d0b1c16dc87ac68ae",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e55e73c_7c327c4b",
+        "filename": "zephyr/drivers/cros_system/cros_system_ft90.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-06-16T08:53:27Z",
+      "side": 1,
+      "message": "But I meant you are using `reset_cause` instead of `hwinfo_reset_cause` and `data-\u003ereset`. Is that correct?",
+      "parentUuid": "e958a0ef_b05bd5c0",
+      "revId": "82796fa19b2c66c607f3f85d0b1c16dc87ac68ae",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
