@@ -34,6 +34,24 @@
       "message": "@david1.huang@lcfc.corp-partner.google.com Can you make a CL to update the comment here and on line 149 to reflect the change to `CONFIG_ZEPHYR`? Sorry I didn\u0027t catch that before this merged.",
       "revId": "87a44bd0f210765748fa97cb5d2100317d1f00d8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "689af173_a63adaea",
+        "filename": "common/charge_manager.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 3387694
+      },
+      "writtenOn": "2026-06-16T06:13:59Z",
+      "side": 1,
+      "message": "Done in https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7949357",
+      "parentUuid": "9faafafb_a04098b0",
+      "revId": "87a44bd0f210765748fa97cb5d2100317d1f00d8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
