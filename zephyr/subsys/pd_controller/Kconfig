@@ -131,6 +131,19 @@ config USB_MUX_SYS_INIT_PRIORITY
 	  PDC power management initialization priority.
 endif
 
+M_PROP_I := max-discharge-current-ma
+M_PROP_P := max-discharge-power-mw
+
+config PDC_POWER_MGMT_SRC_THROTTLING
+	bool "Enable SRC throttling"
+	default y
+	depends on \
+		$(dt_compat_any_has_prop,$(DT_COMPAT_USBC_PORT_POLICY),$(M_PROP_I)) || \
+		$(dt_compat_any_has_prop,$(DT_COMPAT_USBC_PORT_POLICY),$(M_PROP_P))
+	help
+	  Dynamically throttles Type-C source current limits to 1.5A when
+	  battery discharging current or power exceeds specified thresholds.
+
 module = USB_PDC
 module-str = USB PDC
 source "subsys/logging/Kconfig.template.log_config"
