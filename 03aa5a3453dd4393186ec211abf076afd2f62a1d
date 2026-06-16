@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40492fc2_6617e764",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 40
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-16T17:19:54Z",
+      "side": 1,
+      "message": "As discussed in the bug, let\u0027s remove the feature to enter the bootloader. We can rely on `ectool --name\u003dcros_fp enter_bootloader` to do this.\n\nGemini feedback on what needs to be removed:\n\n----\n\n### 1. Updates to `et171_flash.cc`\n\nYou need to remove all references to the active EC application firmware and have `main()` connect directly to the BootROM profile (`VID 0x1C7A, PID 0x1002`).\n\n* **Remove Headers**: Delete `#include \"ec_comm.h\"` and `#include \"ec_protocol_defs.h\"`.\n* **Remove Obsolete Functions \u0026 Profiles**: Delete `kAppProfile`, `kBootloaderTransitionDelay`, `ExecuteGetVersion`, `ExecuteBootLoader`, and `ConnectToBootloader`.\n* **Refactor `main()`**: Replace the bootloader connection logic with a clean retry loop that attempts to connect directly to `boot_comm`:\n\n```cpp\n// ... inside main() ...\negis::UsbDeviceProfile boot_profile \u003d egis::kBootloaderProfile;\negis::UsbComm boot_comm(usb_ctx.get(), boot_profile);\n\nstd::println(\"Connecting to Bootloader...\");\nauto deadline \u003d std::chrono::steady_clock::now() + kBootloaderConnectTimeout;\nbool connected \u003d false;\nwhile (std::chrono::steady_clock::now() \u003c deadline) {\n  if (auto res \u003d boot_comm.Connect(); res) {\n    connected \u003d true;\n    break;\n  }\n  std::this_thread::sleep_for(200ms);\n}\n\nif (!connected) {\n  std::println(stderr, \"[ERROR] Failed to connect to bootloader.\");\n  return EXIT_FAILURE;\n}\n\negis::BootromComm brom(boot_comm);\n// ... continue to PrintDeviceDiagnostics / RunFlashFw ...\n```\n\n---\n\n### 2. Updates to `util/egis/build.mk`\n\nWith `ec_comm` removed, you must remove its object files from the Make targets so the build doesn\u0027t attempt to compile them.\n\n* **Production Binary**: Remove `ec_comm.o` from `et171_flash-objs`.\n* **Test Binary**: Remove `ec_comm.o` and `ec_comm_test.o` from `et171_flash_test-objs`.\n\n---\n\n### 3. File Deletions\n\nFinally, delete the now-dead protocol and communication files from the `util/egis` directory entirely:\n* `ec_comm.h`\n* `ec_comm.cc`\n* `ec_comm_test.cc`\n* `ec_protocol_defs.h`",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 1
+      },
+      "revId": "03aa5a3453dd4393186ec211abf076afd2f62a1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
