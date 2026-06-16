@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "776ff88b_668a27f6",
+        "filename": "util/focaltech/build.mk",
+        "patchSetId": 24
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-16T22:01:21Z",
+      "side": 1,
+      "message": "Also these lines",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 89
+      },
+      "revId": "52b87cb0d5b393d890281f15a064a751f9d81c13",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0d35beb0_42d15128",
         "filename": "util/focaltech/build.mk",
         "patchSetId": 24
