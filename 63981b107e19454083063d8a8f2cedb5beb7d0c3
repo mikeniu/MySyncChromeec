@@ -50,6 +50,29 @@
       "message": "If the power-on happens imediately after the shutdown, during power-on the PP5000_S5 will be disabled",
       "revId": "63981b107e19454083063d8a8f2cedb5beb7d0c3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69f2bad3_d558e0cb",
+        "filename": "zephyr/program/bluey/quartz/src/chipset.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-06-16T16:14:49Z",
+      "side": 1,
+      "message": "Before re-enabling the pp5000_s5 rail, please ensure that the disable_pp5000_s5 hook is killed.",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 66
+      },
+      "revId": "63981b107e19454083063d8a8f2cedb5beb7d0c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
