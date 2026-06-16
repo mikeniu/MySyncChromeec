@@ -3,11 +3,16 @@
  * found in the LICENSE file.
  */
 
+#include "battery.h"
+#include "charge_state.h"
+#include "extpower.h"
+#include "hooks.h"
 #include "usb_pd.h"
 #include "usbc/pdc_power_mgmt.h"
 
 #include <zephyr/device.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/atomic.h>
 
 #include <drivers/pdc.h>
 #include <usbc/utils.h>
@@ -341,3 +346,88 @@ int pdc_dpm_get_source_current(const int port)
 	 */
 	return 1500;
 }
+
+#ifdef CONFIG_PDC_POWER_MGMT_SRC_THROTTLING
+
+#define USBC_POLICY_NODE \
+	DT_COMPAT_GET_ANY_STATUS_OKAY(chromeos_usbc_port_policy)
+static atomic_t is_battery_overloaded = ATOMIC_INIT(0);
+
+bool pdc_is_battery_overloaded(void)
+{
+	return atomic_get(&is_battery_overloaded) != 0;
+}
+
+bool pdc_clear_battery_overload(void)
+{
+	return atomic_cas(&is_battery_overloaded, 1, 0);
+}
+
+#define _UPDATE_MAX_I(node_id)                                              \
+	{                                                                   \
+		int val = DT_PROP_OR(node_id, max_discharge_current_ma, 0); \
+		if (val > max_i) {                                          \
+			max_i = val;                                        \
+		}                                                           \
+	}
+
+#define _UPDATE_MAX_P(node_id)                                            \
+	{                                                                 \
+		int val = DT_PROP_OR(node_id, max_discharge_power_mw, 0); \
+		if (val > max_p) {                                        \
+			max_p = val;                                      \
+		}                                                         \
+	}
+
+static void pdc_monitor_battery_overload(void)
+{
+	const struct batt_params *batt;
+	int discharging_current_ma = 0;
+	int discharging_power_mw = 0;
+	int i;
+	static int overload_counter = 0;
+
+	int max_i = 0;
+	int max_p = 0;
+
+	DT_FOREACH_STATUS_OKAY(usbc_port_policy, _UPDATE_MAX_I)
+	DT_FOREACH_STATUS_OKAY(usbc_port_policy, _UPDATE_MAX_P)
+
+	if (max_i == 0 && max_p == 0) {
+		return;
+	}
+
+	if (extpower_is_present()) {
+		overload_counter = 0;
+		return;
+	}
+
+	batt = charger_current_battery_params();
+	if (batt->flags & (BATT_FLAG_BAD_CURRENT | BATT_FLAG_BAD_VOLTAGE)) {
+		return;
+	}
+
+	discharging_current_ma = batt->current < 0 ? -batt->current :
+						     batt->current;
+	discharging_power_mw = (discharging_current_ma * batt->voltage) / 1000;
+
+	if ((max_i > 0 && discharging_current_ma > max_i) ||
+	    (max_p > 0 && discharging_power_mw > max_p)) {
+		overload_counter++;
+		if (overload_counter >= 3) {
+			if (atomic_cas(&is_battery_overloaded, 0, 1)) {
+				for (i = 0; i < board_get_usb_pd_port_count();
+				     i++) {
+					pdc_power_mgmt_set_current_limit(
+						i, TC_CURRENT_1_5A);
+					pdc_power_mgmt_set_new_power_request(i);
+				}
+			}
+		}
+	} else {
+		overload_counter = 0;
+	}
+}
+DECLARE_HOOK(HOOK_SECOND, pdc_monitor_battery_overload, HOOK_PRIO_DEFAULT);
+
+#endif /* CONFIG_PDC_POWER_MGMT_SRC_THROTTLING */
