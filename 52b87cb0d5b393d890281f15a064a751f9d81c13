@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b3233514_2521ffa3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 24
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-16T22:16:01Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n---\n\n**Missing Standard Library Headers (IWYU)** While the code currently compiles (likely due to transitive includes from other headers or GTest), it relies on symbols without directly including their standard headers:\n\n* `cli.cc`: Uses `offsetof`, which requires `#include \u003ccstddef\u003e`.  \n* `ft_scsi.cc`: Uses `std::to_underlying`, which requires `#include \u003cutility\u003e`.  \n* `ft_util.cc`: Uses `std::string{path}`, which requires `#include \u003cstring\u003e`.  \n* **Remediation:** Include these standard headers to prevent build breakages if the include tree changes in the future.",
+      "revId": "52b87cb0d5b393d890281f15a064a751f9d81c13",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "776ff88b_668a27f6",
         "filename": "util/focaltech/build.mk",
         "patchSetId": 24
@@ -42,6 +59,29 @@
         "startChar": 0,
         "endLine": 39,
         "endChar": 117
+      },
+      "revId": "52b87cb0d5b393d890281f15a064a751f9d81c13",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f16673f9_1a21e61f",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-16T22:16:01Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n---\n\n**Use Span\u0027s `first()` Method** In `updater.cc`, to enforce safer bounds-checking instead of using the explicit span constructor:\n\n```c\n// Instead of:\nDownloadPage(device, target_addr, kFocalConfigSize, {buffer.data(), kFocalConfigSize});\n\n// Use:\nDownloadPage(device, target_addr, kFocalConfigSize, buffer.first(kFocalConfigSize));\n\n```\n\n`first()` will assert at runtime if the requested size exceeds the span, immediately failing fast rather than silently creating an invalid memory view.",
+      "range": {
+        "startLine": 131,
+        "startChar": 0,
+        "endLine": 132,
+        "endChar": 68
       },
       "revId": "52b87cb0d5b393d890281f15a064a751f9d81c13",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
