@@ -15,7 +15,7 @@ focaltech_iap-objs := $(addprefix $(_cur_dir)/, \
 )
 
 _focaltech_bin := $(out)/util/focaltech_iap
-$(_focaltech_bin): HOST_CXXFLAGS+=-fvisibility=hidden -DFT_LOG_COLOR_EN 
+$(_focaltech_bin): HOST_CXXFLAGS+=-fvisibility=hidden -DFT_LOG_COLOR_EN
 $(_focaltech_bin): HOST_CXXFLAGS+=$(shell $(HOST_PKG_CONFIG) --cflags libusb-1.0 boringssl)
 $(_focaltech_bin): HOST_LDFLAGS+=$(shell $(HOST_PKG_CONFIG) --libs  libusb-1.0 boringssl)
 

@@ -24,6 +24,9 @@ enum class DeviceMode {
   kEc,
 };
 
+using namespace std::chrono_literals;
+inline constexpr auto kDeviceRebootTimeout = 3s;
+
 inline std::expected<DeviceMode, Error> GetDeviceMode(const UsbDeviceId& id) {
   if (id == kFocalRomId) return DeviceMode::kRom;
   if (id == kFocalBootId) return DeviceMode::kBoot;
@@ -39,12 +42,12 @@ class UsbDevice {
       : transport_(std::move(transport)),
         cdb_tag_(std::make_unique<std::atomic<uint32_t>>(1)) {}
 
-  std::expected<int, Error> Send(std::span<const uint8_t> data,
-                                 std::chrono::milliseconds timeout) const {
+  std::expected<size_t, Error> Send(std::span<const uint8_t> data,
+                                    std::chrono::milliseconds timeout) const {
     return transport_->Send(data, timeout);
   }
-  std::expected<int, Error> Recv(std::span<uint8_t> data,
-                                 std::chrono::milliseconds timeout) const {
+  std::expected<size_t, Error> Recv(std::span<uint8_t> data,
+                                    std::chrono::milliseconds timeout) const {
     return transport_->Recv(data, timeout);
   }
   std::expected<void, Error> WaitForReset(

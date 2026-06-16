@@ -15,13 +15,9 @@ namespace focaltech {
 
 namespace {
 
-constexpr uint32_t kUsbMsCbwSignature = 0x43425355;
-constexpr uint32_t kUsbMsCswSignature = 0x53425355;
-
 constexpr uint8_t kDefaultLun = 0;
 
 using namespace std::chrono_literals;
-constexpr auto kResetWaitTimeout = 3000ms;
 
 std::expected<BulkCbWrap, Error> SendCbw(const UsbDevice& device,
                                          const CmdFormat& scsi_cmd,
@@ -43,8 +39,6 @@ std::expected<BulkCbWrap, Error> SendCbw(const UsbDevice& device,
   auto cbw_span = AsUint8Span(cbw);
   auto send_res = device.Send(cbw_span, timeout_ms);
 
-  // We need to propagate the USB no such device event to confirm that the
-  // device has been properly reset.
   if (!send_res) {
     return std::unexpected(send_res.error());
   }
@@ -105,7 +99,7 @@ std::expected<void, Error> SendBulkDataOut(
   if (!cbw_res) return std::unexpected(cbw_res.error());
 
   if (dir == TransferDirection::kSendOnly) {
-    if (auto res = device.WaitForReset(kResetWaitTimeout); !res) {
+    if (auto res = device.WaitForReset(kDeviceRebootTimeout); !res) {
       return std::unexpected(Error::kResultFail);
     }
     return {};
@@ -113,13 +107,10 @@ std::expected<void, Error> SendBulkDataOut(
 
   if (!data_buffer.empty()) {
     auto send_res = device.Send(data_buffer, timeout_ms);
-
-    // We need to propagate the USB no such device event to confirm that the
-    // device has been properly reset.
     if (!send_res) {
       return std::unexpected(send_res.error());
     }
-    if (*send_res != static_cast<int>(data_buffer.size())) {
+    if (*send_res != data_buffer.size()) {
       FT_LOGE("Data OUT transfer failed: short write.");
       return std::unexpected(Error::kResultFail);
     }
@@ -137,18 +128,11 @@ std::expected<void, Error> ReceiveBulkDataIn(
 
   if (!data_buffer.empty()) {
     auto recv_res = device.Recv(data_buffer, timeout_ms);
-
-    // We need to propagate the USB no such device event to confirm that the
-    // device has been properly reset.
     if (!recv_res) {
       return std::unexpected(recv_res.error());
     }
 
-    if (*recv_res != static_cast<int>(data_buffer.size())) {
-      // Note: The mismatch is logged but not treated as an error because
-      // some device modes (e.g., boot mode) may return shorter valid data.
-      // Callers that require exact sizing should check the log or
-      // handle partial data explicitly.
+    if (*recv_res != data_buffer.size()) {
       FT_LOGW("Data IN transfer length mismatch (expected {}, got {})",
               data_buffer.size(), *recv_res);
     }

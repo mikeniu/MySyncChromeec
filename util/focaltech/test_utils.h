@@ -31,7 +31,7 @@ inline void BuildValidCsw(std::span<uint8_t> data, uint32_t tag,
       .data_residue = 0,
       .status = status,
   };
-  std::memcpy(data.data(), &csw, sizeof(csw));
+  std::ranges::copy(AsUint8Span(csw), data.begin());
 }
 
 }  // namespace focaltech::testing

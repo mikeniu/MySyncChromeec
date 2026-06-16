@@ -6,6 +6,8 @@
 #ifndef UTIL_FOCALTECH_LIBUSB_TRANSPORT_H_
 #define UTIL_FOCALTECH_LIBUSB_TRANSPORT_H_
 
+#include <libusb.h>
+
 #include <chrono>
 #include <cstdint>
 #include <expected>
@@ -13,11 +15,6 @@
 #include <span>
 
 #include "usb_transport.h"
-
-struct libusb_context;
-struct libusb_device_handle;
-struct libusb_config_descriptor;
-struct libusb_device;
 
 namespace focaltech {
 
@@ -29,21 +26,13 @@ inline constexpr UsbDeviceId kFocalEcTestId = {kGoogleVid, 0xFACE};
 inline constexpr UsbDeviceId kFocalEcPid9865Id = {kGoogleVid, 0x5403};
 inline constexpr UsbDeviceId kFocalEcPid9869Id = {kGoogleVid, 0x5404};
 
-struct LibusbContextDeleter {
-  void operator()(libusb_context* ctx) const;
-};
-
-struct LibusbDeviceHandleDeleter {
-  void operator()(libusb_device_handle* handle) const;
-};
-
-struct LibusbDeviceDeleter {
-  void operator()(libusb_device* dev) const;
-};
-
-struct LibusbConfigDeleter {
-  void operator()(libusb_config_descriptor* config) const;
-};
+using ScopedContext = std::unique_ptr<libusb_context, decltype(&libusb_exit)>;
+using ScopedDevice =
+    std::unique_ptr<libusb_device, decltype(&libusb_unref_device)>;
+using ScopedHandle =
+    std::unique_ptr<libusb_device_handle, decltype(&libusb_close)>;
+using ScopedConfig = std::unique_ptr<libusb_config_descriptor,
+                                     decltype(&libusb_free_config_descriptor)>;
 
 class LibusbTransport : public UsbTransport {
  public:
@@ -56,28 +45,27 @@ class LibusbTransport : public UsbTransport {
   LibusbTransport& operator=(LibusbTransport&&) noexcept = default;
 
   UsbDeviceId device_id() const override { return device_id_; }
-  std::expected<int, Error> Send(std::span<const uint8_t> data,
-                                 std::chrono::milliseconds timeout) override;
-  std::expected<int, Error> Recv(std::span<uint8_t> data,
-                                 std::chrono::milliseconds timeout) override;
+  std::expected<size_t, Error> Send(std::span<const uint8_t> data,
+                                    std::chrono::milliseconds timeout) override;
+  std::expected<size_t, Error> Recv(std::span<uint8_t> data,
+                                    std::chrono::milliseconds timeout) override;
   std::expected<void, Error> WaitForReset(
       std::chrono::milliseconds timeout) override;
 
-  ~LibusbTransport() override;
+  ~LibusbTransport() override = default;
 
  private:
-  explicit LibusbTransport(
-      std::unique_ptr<libusb_context, LibusbContextDeleter> ctx,
-      libusb_device* dev, UsbDeviceId id);
+  explicit LibusbTransport(ScopedContext ctx, libusb_device* dev,
+                           UsbDeviceId id);
 
   std::expected<void, Error> EnsureOpened();
-  std::expected<int, Error> HandleTransferError(int libusb_error) const;
+  std::expected<size_t, Error> HandleTransferError(int libusb_error) const;
 
-  std::unique_ptr<libusb_context, LibusbContextDeleter> ctx_;
-  std::unique_ptr<libusb_device, LibusbDeviceDeleter> device_;
+  ScopedContext ctx_;
+  ScopedDevice device_{nullptr, libusb_unref_device};
   UsbDeviceId device_id_;
 
-  std::unique_ptr<libusb_device_handle, LibusbDeviceHandleDeleter> handle_;
+  ScopedHandle handle_{nullptr, libusb_close};
   uint8_t endpoint_in_ = 0;
   uint8_t endpoint_out_ = 0;
   uint8_t interface_num_ = 0;

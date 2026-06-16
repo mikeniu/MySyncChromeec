@@ -15,10 +15,10 @@ namespace focaltech::testing {
 class MockUsbTransport : public UsbTransport {
  public:
   MOCK_METHOD(UsbDeviceId, device_id, (), (const, override));
-  MOCK_METHOD((std::expected<int, Error>), Send,
+  MOCK_METHOD((std::expected<size_t, Error>), Send,
               (std::span<const uint8_t>, std::chrono::milliseconds),
               (override));
-  MOCK_METHOD((std::expected<int, Error>), Recv,
+  MOCK_METHOD((std::expected<size_t, Error>), Recv,
               (std::span<uint8_t>, std::chrono::milliseconds), (override));
   MOCK_METHOD((std::expected<void, Error>), WaitForReset,
               (std::chrono::milliseconds), (override));

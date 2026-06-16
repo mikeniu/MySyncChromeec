@@ -5,9 +5,8 @@
 #ifndef UTIL_FOCALTECH_FT_SCSI_H_
 #define UTIL_FOCALTECH_FT_SCSI_H_
 
-#include <assert.h>
-
 #include <array>
+#include <cassert>
 #include <cstdint>
 #include <cstring>
 #include <span>
@@ -15,6 +14,9 @@
 #include "usb_device.h"
 
 namespace focaltech {
+
+constexpr uint32_t kUsbMsCbwSignature = 0x43425355;
+constexpr uint32_t kUsbMsCswSignature = 0x53425355;
 
 constexpr size_t kScsiCmdSize = 16;
 
@@ -41,12 +43,12 @@ enum class Subcmd : uint8_t {
 
 struct CmdFormat {
   Opcode opcode;
-  uint32_t address;
-  uint32_t length;
-  uint32_t aux_address;
+  uint32_t address = 0;
+  uint32_t length = 0;
+  uint32_t aux_address = 0;
   Subcmd subcmd;
-  uint8_t flags;
-  uint8_t reserved;
+  uint8_t flags = 0;
+  uint8_t reserved = 0;
 } __attribute__((packed));
 
 static_assert(sizeof(CmdFormat) == 16, "CmdFormat must be exactly 16 bytes");

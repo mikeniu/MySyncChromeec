@@ -15,6 +15,12 @@
 
 namespace focaltech {
 
+// ANSI terminal color escape sequences.
+inline constexpr std::string_view kColorCyan = "\033[36m";
+inline constexpr std::string_view kColorYellow = "\033[33m";
+inline constexpr std::string_view kColorRed = "\033[31m";
+inline constexpr std::string_view kColorReset = "\033[0m";
+
 enum class LogLevel {
   kVerbose,
   kDebug,
@@ -49,9 +55,7 @@ void FtLog(LogLevel level, const std::source_location& loc,
   auto now = std::chrono::system_clock::now();
   std::string_view level_str;
   std::string_view color;
-  std::string_view reset;
-
-  bool enable_color = log::UseColor();
+  const bool enable_color = log::UseColor();
 
   switch (level) {
     case LogLevel::kVerbose:
@@ -62,20 +66,16 @@ void FtLog(LogLevel level, const std::source_location& loc,
       break;
     case LogLevel::kInfo:
       level_str = "I";
-      if (enable_color) color = "\033[36m";
+      if (enable_color) color = kColorCyan;
       break;
     case LogLevel::kWarning:
       level_str = "W";
-      if (enable_color) color = "\033[33m";
+      if (enable_color) color = kColorYellow;
       break;
     case LogLevel::kError:
       level_str = "E";
-      if (enable_color) color = "\033[31m";
+      if (enable_color) color = kColorRed;
       break;
-  }
-
-  if (enable_color && !color.empty()) {
-    reset = "\033[0m";
   }
 
   // Extract filename from the path.
@@ -84,12 +84,17 @@ void FtLog(LogLevel level, const std::source_location& loc,
     file = file.substr(pos + 1);
   }
 
-  std::print("{}[{:%m-%d %H:%M:%S}] {} [{}][{}:{}] ", color, now, level_str,
-             log::kLogTag, file, loc.line());
+  // Apply color before the log line, then reset after.
+  if (!color.empty()) {
+    std::print("{}[{:%m-%d %H:%M:%S}] {} [{}][{}:{}] ", color, now, level_str,
+               log::kLogTag, file, loc.line());
+  } else {
+    std::print("[{:%m-%d %H:%M:%S}] {} [{}][{}:{}] ", now, level_str,
+               log::kLogTag, file, loc.line());
+  }
   std::println(fmt, std::forward<Args>(args)...);
-
-  if (!reset.empty()) {
-    std::print("{}", reset);
+  if (!color.empty()) {
+    std::print("{}", kColorReset);
   }
 }
 
@@ -116,11 +121,21 @@ void FtLog(LogLevel level, const std::source_location& loc,
 
 #else  // FT_LOG_DIS
 
-#define FT_LOGE(fmt, ...)
-#define FT_LOGW(fmt, ...)
-#define FT_LOGI(fmt, ...)
-#define FT_LOGD(fmt, ...)
-#define FT_LOGV(fmt, ...)
+#define FT_LOGE(fmt, ...) \
+  do {                    \
+  } while (0)
+#define FT_LOGW(fmt, ...) \
+  do {                    \
+  } while (0)
+#define FT_LOGI(fmt, ...) \
+  do {                    \
+  } while (0)
+#define FT_LOGD(fmt, ...) \
+  do {                    \
+  } while (0)
+#define FT_LOGV(fmt, ...) \
+  do {                    \
+  } while (0)
 
 #endif  // FT_LOG_DIS
 

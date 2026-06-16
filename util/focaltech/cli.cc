@@ -17,13 +17,19 @@ namespace {
 
 using namespace std::chrono_literals;
 constexpr auto kMcuRebootPollInterval = 10ms;
-constexpr auto kResetWaitTimeout = 3s;
-constexpr auto kEcCommandTimeout = std::chrono::milliseconds(200);
+constexpr auto kEcCommandTimeout = 200ms;
 
-// The Test FW use the magic number for FW jumping to ROM, test FW USB PID is
-// 0xface, and the Payload data is only for verification.
 constexpr uint16_t kTestEcSwitchToRomCmd = 0xFACE;
 constexpr std::array<uint8_t, 3> kSwitchToRomPayload = {0xAA, 0x06, 0x00};
+
+// Parse a string to a FlashWpArea.
+std::expected<FlashWpArea, Error> ParseWpArea(std::string_view arg) {
+  if (arg == "none") return FlashWpArea::kNone;
+  if (arg == "boot") return FlashWpArea::kBoot;
+  if (arg == "ro") return FlashWpArea::kRo;
+  if (arg == "all") return FlashWpArea::kAll;
+  return std::unexpected(Error::kParameterError);
+}
 
 std::vector<uint8_t> BuildEcCommand(uint16_t command, uint8_t version,
                                     std::span<const uint8_t> params = {}) {
@@ -36,11 +42,12 @@ std::vector<uint8_t> BuildEcCommand(uint16_t command, uint8_t version,
       .data_len = ToLittleEndian(static_cast<uint16_t>(params.size())),
   };
 
-  std::vector<uint8_t> packet(sizeof(req) + params.size());
-  memcpy(packet.data(), &req, sizeof(req));
-  if (!params.empty()) {
-    memcpy(packet.data() + sizeof(req), params.data(), params.size());
-  }
+  std::vector<uint8_t> packet;
+  packet.reserve(sizeof(req) + params.size());
+
+  auto req_span = AsUint8Span(req);
+  packet.insert(packet.end(), req_span.begin(), req_span.end());
+  packet.insert(packet.end(), params.begin(), params.end());
 
   uint8_t checksum = std::accumulate(packet.begin(), packet.end(), uint8_t{0});
   packet[offsetof(ec_host_request, checksum)] = -checksum;
@@ -54,7 +61,6 @@ namespace internal {
 std::expected<std::vector<uint8_t>, Error> SendEcCommandAndReadResponse(
     UsbDevice& device, uint16_t command, uint8_t version,
     std::span<const uint8_t> params) {
-  constexpr size_t kMaxPacketSize = 64;
   auto packet = BuildEcCommand(command, version, params);
 
   auto send_result = device.Send(packet, kEcCommandTimeout);
@@ -65,7 +71,7 @@ std::expected<std::vector<uint8_t>, Error> SendEcCommandAndReadResponse(
     return std::unexpected(send_result.error());
   }
 
-  std::array<uint8_t, kMaxPacketSize> initial_buffer;
+  std::array<uint8_t, kUsbBulkMaxPacketSize> initial_buffer;
   auto recv_initial = device.Recv(initial_buffer, kEcCommandTimeout);
   if (!recv_initial) {
     if (recv_initial.error() == Error::kNoSuchDevice) {
@@ -86,14 +92,9 @@ std::expected<std::vector<uint8_t>, Error> SendEcCommandAndReadResponse(
   uint16_t data_len = FromLittleEndian(resp.data_len);
   FT_LOGD("resp.data_len = {}", data_len);
 
-  std::vector<uint8_t> response_data;
-  size_t header_size = sizeof(ec_host_response);
-  size_t data_already_received = received - header_size;
-  if (data_already_received > 0) {
-    response_data.insert(response_data.end(),
-                         initial_buffer.begin() + header_size,
-                         initial_buffer.begin() + received);
-  }
+  std::vector<uint8_t> response_data(
+      initial_buffer.begin() + sizeof(ec_host_response),
+      initial_buffer.begin() + received);
 
   if (response_data.size() < data_len) {
     size_t remaining = data_len - response_data.size();
@@ -120,7 +121,7 @@ std::expected<std::vector<uint8_t>, Error> SendEcCommandAndReadResponse(
 
 std::expected<std::string, Error> GetBuildInfo(UsbDevice& device) {
   auto data = internal::SendEcCommandAndReadResponse(
-      device, EC_CMD_GET_BUILD_INFO, 0, {});
+      device, EC_CMD_GET_BUILD_INFO, kEcCmdVersion0, {});
   if (!data) {
     return std::unexpected(data.error());
   }
@@ -134,7 +135,7 @@ std::expected<void, Error> SwitchToBootloader(UsbDevice& device, uint8_t mode) {
   };
   auto params_span = AsUint8Span(params);
   auto data = internal::SendEcCommandAndReadResponse(
-      device, EC_CMD_ENTER_BOOTLOADER, 0, params_span);
+      device, EC_CMD_ENTER_BOOTLOADER, kEcCmdVersion0, params_span);
   if (!data) {
     return std::unexpected(data.error());
   }
@@ -143,7 +144,7 @@ std::expected<void, Error> SwitchToBootloader(UsbDevice& device, uint8_t mode) {
 
 std::expected<void, Error> SwitchToRom(UsbDevice& device) {
   auto data = internal::SendEcCommandAndReadResponse(
-      device, kTestEcSwitchToRomCmd, 0, kSwitchToRomPayload);
+      device, kTestEcSwitchToRomCmd, kEcCmdVersion0, kSwitchToRomPayload);
   if (!data) {
     return std::unexpected(data.error());
   }
@@ -212,46 +213,37 @@ std::expected<void, Error> SwitchMcuMode(UsbDevice& usb,
     }
   };
 
-  bool command_accepted = false;
   std::string_view target_name =
       (target_cmd == Command::kEnterBoot) ? "bootloader" : "ROM";
 
   for (int attempt = 1; attempt <= kMaxRetry; ++attempt) {
     auto result = switch_func();
-    if (!result) {
-      if (result.error() == Error::kNoSuchDevice) {
-        FT_LOGW("USB device lost (expected during {} switch).", target_name);
-        command_accepted = true;
-        break;
-      }
-      FT_LOGW("Switch to {} failed (attempt {}): error={}", target_name,
-              attempt, ToString(result.error()));
-      std::this_thread::sleep_for(kMcuRebootPollInterval);
-      continue;
+    if (result) {
+      FT_LOGI("Switch to {} command sent successfully", target_name);
+      break;
     }
-    FT_LOGI("Switch to {} command sent successfully", target_name);
-    command_accepted = true;
-    break;
+    if (result.error() == Error::kNoSuchDevice) {
+      FT_LOGW("USB device lost (expected during {} switch).", target_name);
+      break;
+    }
+    if (attempt == kMaxRetry) {
+      FT_LOGE("Failed to send switch command after {} attempts", kMaxRetry);
+      return std::unexpected(Error::kResultFail);
+    }
+    FT_LOGW("Switch to {} failed (attempt {}): error={}", target_name, attempt,
+            ToString(result.error()));
+    std::this_thread::sleep_for(kMcuRebootPollInterval);
   }
 
-  if (!command_accepted) {
-    FT_LOGE("Failed to send switch command after {} attempts", kMaxRetry);
-    return std::unexpected(Error::kResultFail);
-  }
-
-  if (auto wait_res = usb.WaitForReset(kResetWaitTimeout); !wait_res) {
-    FT_LOGE("Device did not reappear after mode switch");
-    return std::unexpected(Error::kResultFail);
-  }
-  return {};
+  return usb.WaitForReset(kDeviceRebootTimeout);
 }
 
 constexpr Command ParseCommand(std::string_view cmd_str) {
-  if (cmd_str == "enter_bootloader") return Command::kEnterBoot;
-  if (cmd_str == "enter_rom") return Command::kEnterRom;
-  if (cmd_str == "flash_get_protect") return Command::kGetFlashWp;
-  if (cmd_str == "flash_set_protect") return Command::kSetFlashWp;
-  if (cmd_str == "get_ec_version") return Command::kGetEcVersion;
+  if (cmd_str == kCmdEnterBoot) return Command::kEnterBoot;
+  if (cmd_str == kCmdEnterRom) return Command::kEnterRom;
+  if (cmd_str == kCmdGetFlashWp) return Command::kGetFlashWp;
+  if (cmd_str == kCmdSetFlashWp) return Command::kSetFlashWp;
+  if (cmd_str == kCmdGetEcVersion) return Command::kGetEcVersion;
   if (cmd_str.ends_with(".bin")) return Command::kUpdate;
   return Command::kUnknown;
 }
@@ -289,16 +281,18 @@ std::expected<AppConfig, Error> ParseArguments(
     config.ec_bin = args[0];
   } else if (config.cmd == Command::kSetFlashWp) {
     if (args.size() < 2) {
-      FT_LOGE("flash_set_protect requires an area parameter (1-4).");
+      FT_LOGE(
+          "flash_set_protect requires an area parameter (none, boot, ro, "
+          "all).");
       return std::unexpected(Error::kParameterError);
     }
-    auto param_res = ParseInt(args[1]);
-    if (!param_res) {
-      FT_LOGE("Invalid integer format for flash_set_protect parameter: {}",
+    auto wp_res = ParseWpArea(args[1]);
+    if (!wp_res) {
+      FT_LOGE("Invalid protection area: '{}'. Must be none, boot, ro, or all.",
               args[1]);
-      return std::unexpected(param_res.error());
+      return std::unexpected(Error::kParameterError);
     }
-    config.action_param = *param_res;
+    config.wp_area = *wp_res;
   }
   return config;
 }
@@ -308,23 +302,31 @@ std::expected<void, Error> ExecuteCommand(const AppConfig& config,
                                           DeviceMode current_mode) {
   switch (config.cmd) {
     case Command::kGetEcVersion:
-
       return CheckEcBuildVersion(usb_device, current_mode);
 
     case Command::kSetFlashWp:
-      return SetFlashProtection(usb_device, FlashWpArea{config.action_param},
-                                current_mode);
+      return SetFlashProtection(usb_device, config.wp_area, current_mode);
 
     case Command::kGetFlashWp: {
       auto wp_res = GetFlashProtection(usb_device, current_mode);
       if (!wp_res) {
         return std::unexpected(wp_res.error());
       }
-      FT_LOGI("Flash write protect area = {}", std::to_underlying(*wp_res));
+      FT_LOGI("Flash write protect area = {}", ToString(*wp_res));
       return {};
     }
 
     case Command::kEnterBoot:
+      // enter_bootloader is only valid from EC mode (PID 0x5403 or 0x5404).
+      // If the device is already in bootloader or ROM mode, the EC command
+      // will not be understood and will cause a confusing timeout.
+      if (current_mode != DeviceMode::kEc) {
+        FT_LOGE(
+            "enter_bootloader command is only valid from EC mode. "
+            "Current mode: {}",
+            static_cast<int>(current_mode));
+        return std::unexpected(Error::kInvalidMode);
+      }
       FT_LOGI("Entering bootloader mode...");
       return SwitchMcuMode(usb_device, current_mode, Command::kEnterBoot);
 
@@ -333,6 +335,7 @@ std::expected<void, Error> ExecuteCommand(const AppConfig& config,
       if (current_mode == DeviceMode::kTest) {
         return SwitchMcuMode(usb_device, current_mode, Command::kEnterRom);
       }
+      // From bootloader mode, erase the config page and reset.
       return ReturnToRomBoot(usb_device, current_mode);
 
     case Command::kUpdate: {

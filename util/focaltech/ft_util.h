@@ -33,7 +33,7 @@ constexpr T ToLittleEndian(T value) {
 }
 
 // Convert a little-endian value from the wire to host endianness.
-template <typename T>
+template <std::integral T>
 constexpr T FromLittleEndian(T value) {
   return ToLittleEndian(value);
 }
@@ -59,6 +59,8 @@ enum class Error {
   kNoSuchFile = -3,
   kResultFail = -4,
   kInvalidMode = -5,
+  kFormatError = -6,   // Firmware format invalid (bad magic number)
+  kVerifyFailed = -7,  // Post-write verification hash mismatch
 };
 
 inline std::string_view ToString(Error err) {
@@ -75,6 +77,10 @@ inline std::string_view ToString(Error err) {
       return "Result fail";
     case Error::kInvalidMode:
       return "Invalid mode";
+    case Error::kFormatError:
+      return "Firmware format error";
+    case Error::kVerifyFailed:
+      return "Post-write verification failed";
     default:
       return "Unknown error";
   }

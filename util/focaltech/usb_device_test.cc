@@ -73,12 +73,12 @@ TEST_F(UsbDeviceTest, RecvForwardsToTransport) {
   EXPECT_CALL(*mock_, Recv(_, timeout))
       .WillOnce(Invoke([&](std::span<uint8_t> data, auto) {
         std::fill(data.begin(), data.begin() + 5, 0xAB);
-        return std::expected<int, Error>(5);
+        return std::expected<size_t, Error>(5);
       }));
 
   auto result = device_->Recv(buffer, timeout);
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(*result, 5);
+  EXPECT_EQ(*result, 5u);
 }
 
 TEST_F(UsbDeviceTest, RecvHandlesError) {
@@ -135,12 +135,10 @@ TEST_F(UsbDeviceTest, GetNextCdbTagIncrements) {
 
 TEST_F(UsbDeviceTest, GetNextCdbTagThreadSafe) {
   constexpr int kIterations = 1000;
-  std::atomic<uint32_t> last_tag{0};
 
-  auto worker = [this, &last_tag]() {
+  auto worker = [this]() {
     for (int i = 0; i < kIterations; ++i) {
-      uint32_t tag = device_->GetNextCdbTag();
-      last_tag = tag;
+      device_->GetNextCdbTag();
     }
   };
 
@@ -149,8 +147,8 @@ TEST_F(UsbDeviceTest, GetNextCdbTagThreadSafe) {
   t1.join();
   t2.join();
 
-  EXPECT_GE(last_tag.load(), 1);
-  SUCCEED();
+  EXPECT_EQ(device_->GetNextCdbTag(),
+            static_cast<uint32_t>((kIterations * 2) + 1));
 }
 
 TEST(UsbDeviceMoveTest, MoveConstructorTransfersOwnership) {

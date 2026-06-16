@@ -6,9 +6,9 @@
 #ifndef UTIL_FOCALTECH_UPDATER_H_
 #define UTIL_FOCALTECH_UPDATER_H_
 
-#include <assert.h>
 #include <openssl/sha.h>
 
+#include <cassert>
 #include <cstdint>
 #include <expected>
 #include <string_view>
@@ -24,14 +24,32 @@ class UsbDevice;
 // address offset.
 constexpr size_t kConfigReservedSize = 28;
 
+// Flash write protection areas.
+// The numeric values correspond to the underlying hardware values.
 enum class FlashWpArea : uint32_t {
   kUnknown,
-  kAll,
-  kBoot,
-  kRo,
-  kRw,
+  kNone,  // Disable all write protection
+  kBoot,  // Protect bootloader only
+  kRo,    // Protect bootloader + RO region
+  kAll,   // Protect the entire flash (Bootloader, RO, and RW)
   kOutRange,
 };
+
+// Convert a FlashWpArea to its user-facing string representation.
+constexpr std::string_view ToString(FlashWpArea area) {
+  switch (area) {
+    case FlashWpArea::kNone:
+      return "none";
+    case FlashWpArea::kBoot:
+      return "boot";
+    case FlashWpArea::kRo:
+      return "ro";
+    case FlashWpArea::kAll:
+      return "all";
+    default:
+      return "unknown";
+  }
+}
 
 struct ConfigPage {
   uint32_t code_valid_control_word;

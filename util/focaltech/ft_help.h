@@ -24,13 +24,13 @@ Commands:
                          (Valid from test FW [0xFACE] or bootloader).
   flash_get_protect      Get the current flash write protection area.
                          (Requires bootloader mode).
-  flash_set_protect <N>  Set the flash write protection area.
+  flash_set_protect <area>  Set the flash write protection area.
                          (Requires bootloader mode).
-                         Levels (1-4):
-                           1: Disable all write protection.
-                           2: Disable up to the bootloader.
-                           3: Disable up to RO.
-                           4: Disable up to RW.
+                         Areas:
+                           none: Disable all write protection.
+                           boot: Protect only the bootloader.
+                           ro:   Protect the bootloader and RO region.
+                           all:  Protect the entire flash (Bootloader, RO, and RW).
   get_ec_version         Read and display the current EC build version.
 
 Options:

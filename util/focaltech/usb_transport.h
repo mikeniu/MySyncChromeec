@@ -15,6 +15,9 @@
 
 namespace focaltech {
 
+// USB Full Speed bulk endpoint maximum packet size.
+inline constexpr size_t kUsbBulkMaxPacketSize = 64;
+
 struct UsbDeviceId {
   uint16_t vid = 0;
   uint16_t pid = 0;
@@ -27,10 +30,10 @@ class UsbTransport {
   virtual ~UsbTransport() = default;
 
   virtual UsbDeviceId device_id() const = 0;
-  virtual std::expected<int, Error> Send(std::span<const uint8_t> data,
-                                         std::chrono::milliseconds timeout) = 0;
-  virtual std::expected<int, Error> Recv(std::span<uint8_t> data,
-                                         std::chrono::milliseconds timeout) = 0;
+  virtual std::expected<size_t, Error> Send(
+      std::span<const uint8_t> data, std::chrono::milliseconds timeout) = 0;
+  virtual std::expected<size_t, Error> Recv(
+      std::span<uint8_t> data, std::chrono::milliseconds timeout) = 0;
   virtual std::expected<void, Error> WaitForReset(
       std::chrono::milliseconds timeout) = 0;
 };

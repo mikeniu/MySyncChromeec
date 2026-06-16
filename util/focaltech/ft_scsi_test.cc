@@ -32,13 +32,25 @@ UsbDevice MakeDevice(std::unique_ptr<UsbTransport> transport) {
   return UsbDevice(std::move(transport));
 }
 
-constexpr size_t kMaxPacketSize = 64;
 constexpr size_t kArbitraryDataSize = 10;
-constexpr auto kScsiCmdTimeOut = std::chrono::milliseconds(100);
+constexpr auto kScsiCmdTimeOut = 100ms;
+
+// ========== Test Fixture ==========
+class FtScsiTest : public ::testing::Test {
+ protected:
+  void SetUp() override {
+    auto mock = std::make_unique<testing::MockUsbTransport>();
+    mock_ = mock.get();
+    device_ = std::make_unique<UsbDevice>(std::move(mock));
+  }
+
+  testing::MockUsbTransport* mock_;
+  std::unique_ptr<UsbDevice> device_;
+};
 
 }  // namespace
 
-TEST(FtScsiTest, BuildFtCmd_VerifyFields) {
+TEST_F(FtScsiTest, BuildFtCmd_VerifyFields) {
   auto cmd = BuildFtCmd(Opcode::kAction, Subcmd::kErasePage, 0x12345678, 0x1000,
                         0x2000, 0x01);
 
@@ -48,7 +60,7 @@ TEST(FtScsiTest, BuildFtCmd_VerifyFields) {
                           0x00, 0x20, 0x00, 0x00, 0x08, 0x01, 0x00));
 }
 
-TEST(FtScsiTest, BuildFtCmd_ZeroDefaults) {
+TEST_F(FtScsiTest, BuildFtCmd_ZeroDefaults) {
   auto cmd = BuildFtCmd(Opcode::kReadInfo, Subcmd::kReadData);
 
   auto cmd_span = AsUint8Span(cmd);
@@ -57,114 +69,81 @@ TEST(FtScsiTest, BuildFtCmd_ZeroDefaults) {
                           0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00));
 }
 
-TEST(FtScsiTest, SendBulkDataOut_DataOutSuccess) {
-  auto mock = std::make_unique<testing::MockUsbTransport>();
-  EXPECT_CALL(*mock, Send(_, _))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
-        return testing::kUsbCbwSize;
-      }))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
-        return kMaxPacketSize;
-      }));
-  EXPECT_CALL(*mock, Recv(_, _))
+TEST_F(FtScsiTest, SendBulkDataOut_DataOutSuccess) {
+  EXPECT_CALL(*mock_, Send(_, _))
+      .WillOnce(Return(testing::kUsbCbwSize))
+      .WillOnce(Return(kUsbBulkMaxPacketSize));
+  EXPECT_CALL(*mock_, Recv(_, _))
       .WillOnce(Invoke(
-          [](std::span<uint8_t> data, auto) -> std::expected<int, Error> {
+          [](std::span<uint8_t> data, auto) -> std::expected<size_t, Error> {
             testing::BuildValidCsw(data, 1);
             return testing::kUsbCswSize;
           }));
 
-  UsbDevice dev = MakeDevice(std::move(mock));
   CmdFormat scsi_cmd = BuildFtCmd(Opcode::kAction, Subcmd::kWriteBin);
-  std::vector<uint8_t> data_buffer(kMaxPacketSize, 0xAA);
-  auto result = SendBulkDataOut(dev, scsi_cmd, data_buffer,
+  std::vector<uint8_t> data_buffer(kUsbBulkMaxPacketSize, 0xAA);
+  auto result = SendBulkDataOut(*device_, scsi_cmd, data_buffer,
                                 TransferDirection::kOut, kScsiCmdTimeOut);
   EXPECT_TRUE(result.has_value());
 }
 
-TEST(FtScsiTest, SendBulkDataOut_SendOnlySuccess) {
-  auto mock = std::make_unique<testing::MockUsbTransport>();
-  EXPECT_CALL(*mock, Send(_, _))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
-        return testing::kUsbCbwSize;
-      }));
-  EXPECT_CALL(*mock, WaitForReset(_))
-      .WillOnce(Invoke([](auto) -> std::expected<void, Error> { return {}; }));
+TEST_F(FtScsiTest, SendBulkDataOut_SendOnlySuccess) {
+  EXPECT_CALL(*mock_, Send(_, _)).WillOnce(Return(testing::kUsbCbwSize));
+  EXPECT_CALL(*mock_, WaitForReset(_))
+      .WillOnce(Return(std::expected<void, Error>{}));
 
-  UsbDevice dev = MakeDevice(std::move(mock));
   CmdFormat scsi_cmd = BuildFtCmd(Opcode::kAction, Subcmd::kSoftReset);
   std::vector<uint8_t> empty;
-  auto result = SendBulkDataOut(dev, scsi_cmd, empty,
+  auto result = SendBulkDataOut(*device_, scsi_cmd, empty,
                                 TransferDirection::kSendOnly, kScsiCmdTimeOut);
   EXPECT_TRUE(result.has_value());
 }
 
-TEST(FtScsiTest, SendBulkDataOut_SendOnlyWaitResetFails) {
-  auto mock = std::make_unique<testing::MockUsbTransport>();
-  EXPECT_CALL(*mock, Send(_, _))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
-        return testing::kUsbCbwSize;
-      }));
-  EXPECT_CALL(*mock, WaitForReset(_))
-      .WillOnce(Invoke([](auto) -> std::expected<void, Error> {
-        return std::unexpected(Error::kNoSuchDevice);
-      }));
+TEST_F(FtScsiTest, SendBulkDataOut_SendOnlyWaitResetFails) {
+  EXPECT_CALL(*mock_, Send(_, _)).WillOnce(Return(testing::kUsbCbwSize));
+  EXPECT_CALL(*mock_, WaitForReset(_))
+      .WillOnce(Return(std::unexpected(Error::kNoSuchDevice)));
 
-  UsbDevice dev = MakeDevice(std::move(mock));
   CmdFormat scsi_cmd = BuildFtCmd(Opcode::kAction, Subcmd::kSoftReset);
   std::vector<uint8_t> empty;
-  auto result = SendBulkDataOut(dev, scsi_cmd, empty,
+  auto result = SendBulkDataOut(*device_, scsi_cmd, empty,
                                 TransferDirection::kSendOnly, kScsiCmdTimeOut);
   EXPECT_FALSE(result.has_value());
   EXPECT_EQ(result.error(), Error::kResultFail);
 }
 
-TEST(FtScsiTest, SendBulkDataOut_CbwSendFails) {
-  auto mock = std::make_unique<testing::MockUsbTransport>();
-  EXPECT_CALL(*mock, Send(_, _))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
-        return std::unexpected(Error::kNoSuchDevice);
-      }));
+TEST_F(FtScsiTest, SendBulkDataOut_CbwSendFails) {
+  EXPECT_CALL(*mock_, Send(_, _))
+      .WillOnce(Return(std::unexpected(Error::kNoSuchDevice)));
 
-  UsbDevice dev = MakeDevice(std::move(mock));
   CmdFormat scsi_cmd = BuildFtCmd(Opcode::kAction, Subcmd::kWriteBin);
   std::vector<uint8_t> data(kArbitraryDataSize);
-  auto result = SendBulkDataOut(dev, scsi_cmd, data, TransferDirection::kOut,
-                                kScsiCmdTimeOut);
+  auto result = SendBulkDataOut(*device_, scsi_cmd, data,
+                                TransferDirection::kOut, kScsiCmdTimeOut);
   EXPECT_FALSE(result.has_value());
   EXPECT_EQ(result.error(), Error::kNoSuchDevice);
 }
 
-TEST(FtScsiTest, SendBulkDataOut_DataSendFails) {
-  auto mock = std::make_unique<testing::MockUsbTransport>();
-  EXPECT_CALL(*mock, Send(_, _))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
-        return testing::kUsbCbwSize;
-      }))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
-        return std::unexpected(Error::kNoSuchDevice);
-      }));
+TEST_F(FtScsiTest, SendBulkDataOut_DataSendFails) {
+  EXPECT_CALL(*mock_, Send(_, _))
+      .WillOnce(Return(testing::kUsbCbwSize))
+      .WillOnce(Return(std::unexpected(Error::kNoSuchDevice)));
 
-  UsbDevice dev = MakeDevice(std::move(mock));
   CmdFormat scsi_cmd = BuildFtCmd(Opcode::kAction, Subcmd::kWriteBin);
   std::vector<uint8_t> data(kArbitraryDataSize);
-  auto result = SendBulkDataOut(dev, scsi_cmd, data, TransferDirection::kOut,
-                                kScsiCmdTimeOut);
+  auto result = SendBulkDataOut(*device_, scsi_cmd, data,
+                                TransferDirection::kOut, kScsiCmdTimeOut);
   EXPECT_FALSE(result.has_value());
   EXPECT_EQ(result.error(), Error::kNoSuchDevice);
 }
 
-TEST(FtScsiTest, SendBulkDataOut_CswSignatureMismatch) {
-  auto mock = std::make_unique<testing::MockUsbTransport>();
-  EXPECT_CALL(*mock, Send(_, _))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
-        return testing::kUsbCbwSize;
-      }))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
-        return kArbitraryDataSize;
-      }));
-  EXPECT_CALL(*mock, Recv(_, _))
+TEST_F(FtScsiTest, SendBulkDataOut_CswSignatureMismatch) {
+  EXPECT_CALL(*mock_, Send(_, _))
+      .WillOnce(Return(testing::kUsbCbwSize))
+      .WillOnce(Return(kArbitraryDataSize));
+  EXPECT_CALL(*mock_, Recv(_, _))
       .WillOnce(Invoke(
-          [](std::span<uint8_t> data, auto) -> std::expected<int, Error> {
+          [](std::span<uint8_t> data, auto) -> std::expected<size_t, Error> {
             BulkCsWrap csw{
                 .signature = ToLittleEndian<uint32_t>(0xDEADBEEF),
                 .tag = ToLittleEndian<uint32_t>(1),
@@ -175,95 +154,113 @@ TEST(FtScsiTest, SendBulkDataOut_CswSignatureMismatch) {
             return sizeof(csw);
           }));
 
-  UsbDevice dev = MakeDevice(std::move(mock));
   CmdFormat scsi_cmd = BuildFtCmd(Opcode::kAction, Subcmd::kWriteBin);
   std::vector<uint8_t> data(kArbitraryDataSize);
-  auto result = SendBulkDataOut(dev, scsi_cmd, data, TransferDirection::kOut,
-                                kScsiCmdTimeOut);
+  auto result = SendBulkDataOut(*device_, scsi_cmd, data,
+                                TransferDirection::kOut, kScsiCmdTimeOut);
   EXPECT_FALSE(result.has_value());
   EXPECT_EQ(result.error(), Error::kResultFail);
 }
 
-TEST(FtScsiTest, ReceiveBulkDataIn_Success) {
-  auto mock = std::make_unique<testing::MockUsbTransport>();
-  EXPECT_CALL(*mock, Send(_, _))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
-        return testing::kUsbCbwSize;
-      }));
-  EXPECT_CALL(*mock, Recv(_, _))
+TEST_F(FtScsiTest, ReceiveBulkDataIn_Success) {
+  EXPECT_CALL(*mock_, Send(_, _)).WillOnce(Return(testing::kUsbCbwSize));
+  EXPECT_CALL(*mock_, Recv(_, _))
       .WillOnce(Invoke(
-          [](std::span<uint8_t> data, auto) -> std::expected<int, Error> {
+          [](std::span<uint8_t> data, auto) -> std::expected<size_t, Error> {
             std::fill(data.begin(), data.end(), 0xAB);
-            return kMaxPacketSize;
+            return kUsbBulkMaxPacketSize;
           }))
       .WillOnce(Invoke(
-          [](std::span<uint8_t> data, auto) -> std::expected<int, Error> {
+          [](std::span<uint8_t> data, auto) -> std::expected<size_t, Error> {
             testing::BuildValidCsw(data, 1);
             return testing::kUsbCswSize;
           }));
 
-  UsbDevice dev = MakeDevice(std::move(mock));
   CmdFormat scsi_cmd = BuildFtCmd(Opcode::kReadInfo, Subcmd::kReadData);
-  std::vector<uint8_t> out_buffer(kMaxPacketSize);
-  auto result = ReceiveBulkDataIn(dev, scsi_cmd, out_buffer, kScsiCmdTimeOut);
+  std::vector<uint8_t> out_buffer(kUsbBulkMaxPacketSize);
+  auto result =
+      ReceiveBulkDataIn(*device_, scsi_cmd, out_buffer, kScsiCmdTimeOut);
   EXPECT_TRUE(result.has_value());
 }
 
-TEST(FtScsiTest, ReceiveBulkDataIn_ShortReadFails) {
-  auto mock = std::make_unique<testing::MockUsbTransport>();
+TEST_F(FtScsiTest, ReceiveBulkDataIn_ShortReadFails) {
+  EXPECT_CALL(*mock_, Send(_, _)).WillOnce(Return(testing::kUsbCbwSize));
 
-  EXPECT_CALL(*mock, Send(_, _)).WillOnce(Return(testing::kUsbCbwSize));
-
-  EXPECT_CALL(*mock, Recv(_, _))
+  EXPECT_CALL(*mock_, Recv(_, _))
       .WillOnce(Return(1))  // short data read
       .WillOnce(Return(std::unexpected(Error::kResultFail)));  // CSW failure
 
-  UsbDevice dev = MakeDevice(std::move(mock));
   CmdFormat scsi_cmd{};
   std::vector<uint8_t> out_buffer(2);
 
-  auto result = ReceiveBulkDataIn(dev, scsi_cmd, out_buffer, kScsiCmdTimeOut);
+  auto result =
+      ReceiveBulkDataIn(*device_, scsi_cmd, out_buffer, kScsiCmdTimeOut);
   EXPECT_FALSE(result.has_value());
   EXPECT_EQ(result.error(), Error::kResultFail);
 }
 
-TEST(FtScsiTest, ReceiveBulkDataIn_EmptyBuffer) {
-  auto mock = std::make_unique<testing::MockUsbTransport>();
-  EXPECT_CALL(*mock, Send(_, _))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
-        return testing::kUsbCbwSize;
-      }));
-  EXPECT_CALL(*mock, Recv(_, _))
+TEST_F(FtScsiTest, ReceiveBulkDataIn_EmptyBuffer) {
+  EXPECT_CALL(*mock_, Send(_, _)).WillOnce(Return(testing::kUsbCbwSize));
+  EXPECT_CALL(*mock_, Recv(_, _))
       .WillOnce(Invoke(
-          [](std::span<uint8_t> data, auto) -> std::expected<int, Error> {
+          [](std::span<uint8_t> data, auto) -> std::expected<size_t, Error> {
             testing::BuildValidCsw(data, 1);
             return testing::kUsbCswSize;
           }));
 
-  UsbDevice dev = MakeDevice(std::move(mock));
   CmdFormat scsi_cmd = BuildFtCmd(Opcode::kReadInfo, Subcmd::kReadData);
   std::vector<uint8_t> empty;
-  auto result = ReceiveBulkDataIn(dev, scsi_cmd, empty, kScsiCmdTimeOut);
+  auto result = ReceiveBulkDataIn(*device_, scsi_cmd, empty, kScsiCmdTimeOut);
   EXPECT_TRUE(result.has_value());
 }
 
-TEST(FtScsiTest, ReceiveBulkDataIn_DataRecvFails) {
-  auto mock = std::make_unique<testing::MockUsbTransport>();
-  EXPECT_CALL(*mock, Send(_, _))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
-        return testing::kUsbCbwSize;
-      }));
-  EXPECT_CALL(*mock, Recv(_, _))
-      .WillOnce(Invoke([](auto, auto) -> std::expected<int, Error> {
-        return std::unexpected(Error::kNoSuchDevice);
-      }));
+TEST_F(FtScsiTest, ReceiveBulkDataIn_DataRecvFails) {
+  EXPECT_CALL(*mock_, Send(_, _)).WillOnce(Return(testing::kUsbCbwSize));
+  EXPECT_CALL(*mock_, Recv(_, _))
+      .WillOnce(Return(std::unexpected(Error::kNoSuchDevice)));
 
-  UsbDevice dev = MakeDevice(std::move(mock));
   CmdFormat scsi_cmd = BuildFtCmd(Opcode::kReadInfo, Subcmd::kReadData);
-  std::vector<uint8_t> out_buffer(kMaxPacketSize);
-  auto result = ReceiveBulkDataIn(dev, scsi_cmd, out_buffer, kScsiCmdTimeOut);
+  std::vector<uint8_t> out_buffer(kUsbBulkMaxPacketSize);
+  auto result =
+      ReceiveBulkDataIn(*device_, scsi_cmd, out_buffer, kScsiCmdTimeOut);
   EXPECT_FALSE(result.has_value());
   EXPECT_EQ(result.error(), Error::kNoSuchDevice);
+}
+
+// ============================================================================
+// CSW Status Test
+// ============================================================================
+
+// Test that a non-zero CSW status (Command Failed) causes the function to fail.
+TEST_F(FtScsiTest, ReceiveBulkDataIn_FailsOnNonZeroCswStatus) {
+  auto mock = std::make_unique<testing::MockUsbTransport>();
+  auto* mock_ptr = mock.get();
+
+  // Mock Send to return success (the CBW transfer should succeed).
+  EXPECT_CALL(*mock_ptr, Send(_, _)).WillOnce(Return(testing::kUsbCbwSize));
+
+  // The device will send a CSW with status = 1 (Command Failed).
+  EXPECT_CALL(*mock_ptr, Recv(_, _))
+      .WillOnce(Invoke(
+          [](std::span<uint8_t> data, auto) -> std::expected<size_t, Error> {
+            BulkCsWrap csw{
+                .signature = ToLittleEndian(kUsbMsCswSignature),
+                .tag = ToLittleEndian(1),
+                .data_residue = 0,
+                .status = CswStatus::kCommandFailed,  // Non-zero status!
+            };
+            std::memcpy(data.data(), &csw, sizeof(csw));
+            return sizeof(csw);
+          }));
+
+  UsbDevice device(std::move(mock));
+  CmdFormat scsi_cmd{};
+  std::vector<uint8_t> empty_buffer;
+
+  auto res = ReceiveBulkDataIn(device, scsi_cmd, empty_buffer, 1s);
+
+  EXPECT_FALSE(res.has_value());
+  EXPECT_EQ(res.error(), Error::kResultFail);
 }
 
 }  // namespace focaltech

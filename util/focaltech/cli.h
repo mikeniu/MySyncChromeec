@@ -22,6 +22,7 @@
 #include "ft_log.h"
 #include "ft_util.h"
 #include "libusb_transport.h"
+#include "updater.h"
 #include "usb_device.h"
 
 namespace focaltech {
@@ -32,6 +33,14 @@ inline constexpr std::array<std::string_view, 4> kSupportedProjects = {
     "ft9001", "chojnik", "chudow", "chobienia"};
 inline constexpr int kMaxRetry = 5;
 constexpr uint8_t kEcBootloaderModeDefault = 0;
+
+constexpr uint8_t kEcCmdVersion0 = 0;
+
+inline constexpr std::string_view kCmdEnterBoot = "enter_bootloader";
+inline constexpr std::string_view kCmdEnterRom = "enter_rom";
+inline constexpr std::string_view kCmdGetFlashWp = "flash_get_protect";
+inline constexpr std::string_view kCmdSetFlashWp = "flash_set_protect";
+inline constexpr std::string_view kCmdGetEcVersion = "get_ec_version";
 
 enum class Command {
   kUnknown,
@@ -46,7 +55,7 @@ enum class Command {
 struct AppConfig {
   Command cmd = Command::kUnknown;
   std::string_view ec_bin;
-  uint32_t action_param = 0;
+  FlashWpArea wp_area = FlashWpArea::kUnknown;
 };
 
 std::expected<AppConfig, Error> ParseArguments(

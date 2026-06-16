@@ -26,27 +26,37 @@ constexpr auto kUsbEnumerationDelay = 200ms;
 constexpr auto kPollinterval = 100ms;
 constexpr uint8_t kDefaultUsbConfigIndex = 0;
 
+// libusb_kernel_driver_active returns 1 if a kernel driver is bound.
+constexpr int kKernelDriverActive = 1;
+
 struct LibusbDeviceListDeleter {
   void operator()(libusb_device** list) const {
-    if (list) libusb_free_device_list(list, /*unref_devices=*/1);
+    if (list) {
+      constexpr int kUnrefDevices = 1;
+      libusb_free_device_list(list, kUnrefDevices);
+    }
   }
 };
 
 using ScopedDeviceList =
     std::unique_ptr<libusb_device*, LibusbDeviceListDeleter>;
 
-libusb_device* FindFocalDevice(std::span<libusb_device*> devices,
-                               libusb_device_descriptor& out_desc,
-                               UsbDeviceId& out_id) {
-  for (libusb_device* dev : devices) {
-    if (libusb_get_device_descriptor(dev, &out_desc) != LIBUSB_SUCCESS)
-      continue;
+struct FoundDevice {
+  libusb_device* handle;
+  UsbDeviceId id;
+};
 
-    UsbDeviceId current_id{.vid = out_desc.idVendor, .pid = out_desc.idProduct};
+std::optional<FoundDevice> FindFocalDevice(std::span<libusb_device*> devices) {
+  for (libusb_device* dev : devices) {
+    libusb_device_descriptor desc;
+    if (libusb_get_device_descriptor(dev, &desc) != LIBUSB_SUCCESS) {
+      continue;
+    }
+
+    UsbDeviceId current_id{.vid = desc.idVendor, .pid = desc.idProduct};
 
     if (GetDeviceMode(current_id).has_value()) {
-      out_id = current_id;
-      return dev;
+      return FoundDevice{.handle = dev, .id = current_id};
     }
 
     if (current_id.vid == kGoogleVid) {
@@ -54,7 +64,7 @@ libusb_device* FindFocalDevice(std::span<libusb_device*> devices,
               current_id.vid, current_id.pid);
     }
   }
-  return nullptr;
+  return std::nullopt;
 }
 
 struct EndpointInfo {
@@ -79,11 +89,12 @@ std::optional<EndpointInfo> ParseAltSetting(
     } else {
       info.ep_bulk_out = ep.bEndpointAddress;
     }
+
+    if (info.ep_bulk_in != 0 && info.ep_bulk_out != 0) {
+      return info;
+    }
   }
 
-  if (info.ep_bulk_in != 0 && info.ep_bulk_out != 0) {
-    return info;
-  }
   return std::nullopt;
 }
 
@@ -94,8 +105,7 @@ std::optional<EndpointInfo> FindBulkEndpoints(libusb_device* dev) {
     return std::nullopt;
   }
 
-  std::unique_ptr<libusb_config_descriptor, LibusbConfigDeleter> config(
-      raw_config);
+  ScopedConfig config(raw_config, libusb_free_config_descriptor);
 
   for (const auto& iface :
        std::span(config->interface, config->bNumInterfaces)) {
@@ -111,29 +121,13 @@ std::optional<EndpointInfo> FindBulkEndpoints(libusb_device* dev) {
 
 }  // namespace
 
-void LibusbContextDeleter::operator()(libusb_context* ctx) const {
-  if (ctx) libusb_exit(ctx);
-}
-
-void LibusbDeviceHandleDeleter::operator()(libusb_device_handle* handle) const {
-  if (handle) libusb_close(handle);
-}
-
-void LibusbDeviceDeleter::operator()(libusb_device* dev) const {
-  if (dev) libusb_unref_device(dev);
-}
-
-void LibusbConfigDeleter::operator()(libusb_config_descriptor* config) const {
-  if (config) libusb_free_config_descriptor(config);
-}
-
 std::expected<LibusbTransport, Error> LibusbTransport::Create() {
   libusb_context* raw_ctx = nullptr;
   if (libusb_init(&raw_ctx) != LIBUSB_SUCCESS) {
     FT_LOGE("Failed to initialize libusb");
     return std::unexpected(Error::kResultFail);
   }
-  std::unique_ptr<libusb_context, LibusbContextDeleter> ctx(raw_ctx);
+  ScopedContext ctx(raw_ctx, libusb_exit);
 
   libusb_device** raw_list = nullptr;
   ssize_t count = libusb_get_device_list(ctx.get(), &raw_list);
@@ -143,38 +137,26 @@ std::expected<LibusbTransport, Error> LibusbTransport::Create() {
   }
   ScopedDeviceList dev_list(raw_list);
 
-  libusb_device_descriptor desc;
-  UsbDeviceId found_id;
   auto devices = std::span(raw_list, static_cast<size_t>(count));
-  libusb_device* target = FindFocalDevice(devices, desc, found_id);
-  if (!target) {
+  auto found = FindFocalDevice(devices);
+  if (!found) {
     FT_LOGE("No matching Focal device found");
     return std::unexpected(Error::kNoSuchDevice);
   }
 
   // Increase reference count on the device so it remains valid after the device
-  // list is freed
-  libusb_ref_device(target);
+  // list is freed.
+  libusb_ref_device(found->handle);
   dev_list.reset();
 
-  FT_LOGI("Found device VID {:04x}: PID {:04x}", found_id.vid, found_id.pid);
+  FT_LOGI("Found device VID {:04x}: PID {:04x}", found->id.vid, found->id.pid);
 
-  return LibusbTransport(std::move(ctx), target, found_id);
+  return LibusbTransport(std::move(ctx), found->handle, found->id);
 }
 
-LibusbTransport::LibusbTransport(
-    std::unique_ptr<libusb_context, LibusbContextDeleter> ctx,
-    libusb_device* dev, UsbDeviceId id)
-    : ctx_(std::move(ctx)),
-      device_(dev),
-      device_id_(id),
-      handle_(nullptr),
-      endpoint_in_(0),
-      endpoint_out_(0),
-      interface_num_(0),
-      opened_(false) {}
-
-LibusbTransport::~LibusbTransport() = default;
+LibusbTransport::LibusbTransport(ScopedContext ctx, libusb_device* dev,
+                                 UsbDeviceId id)
+    : ctx_(std::move(ctx)), device_(dev, libusb_unref_device), device_id_(id) {}
 
 std::expected<void, Error> LibusbTransport::EnsureOpened() {
   if (opened_) {
@@ -205,7 +187,12 @@ std::expected<void, Error> LibusbTransport::EnsureOpened() {
   endpoint_out_ = ep_info->ep_bulk_out;
   interface_num_ = ep_info->interface_num;
 
-  if (libusb_kernel_driver_active(handle_.get(), interface_num_)) {
+  // Check for active kernel driver with exact equality.
+  // libusb_kernel_driver_active returns 1 if active, 0 if not, and negative
+  // error codes on failure. Treating negative values as "active" would be
+  // incorrect, so we check for exactly 1.
+  if (libusb_kernel_driver_active(handle_.get(), interface_num_) ==
+      kKernelDriverActive) {
     if (libusb_detach_kernel_driver(handle_.get(), interface_num_) !=
         LIBUSB_SUCCESS) {
       FT_LOGE("Failed to detach kernel driver");
@@ -219,7 +206,6 @@ std::expected<void, Error> LibusbTransport::EnsureOpened() {
   }
 
   device_.reset();
-
   opened_ = true;
   return {};
 }
@@ -232,8 +218,7 @@ firmware.
 and this tool must not perform USB claim / libusb_detach_kernel_driver
 operations on the fingerprint device, as that could affect fingerprint
 functionality. */
-
-std::expected<int, Error> LibusbTransport::Send(
+std::expected<size_t, Error> LibusbTransport::Send(
     std::span<const uint8_t> data, std::chrono::milliseconds timeout) {
   auto open_res = EnsureOpened();
   if (!open_res) {
@@ -246,10 +231,10 @@ std::expected<int, Error> LibusbTransport::Send(
                                static_cast<int>(data.size()), &actual,
                                static_cast<unsigned int>(timeout.count()));
   if (r != LIBUSB_SUCCESS) return HandleTransferError(r);
-  return actual;
+  return static_cast<size_t>(actual);
 }
 
-std::expected<int, Error> LibusbTransport::Recv(
+std::expected<size_t, Error> LibusbTransport::Recv(
     std::span<uint8_t> data, std::chrono::milliseconds timeout) {
   auto open_res = EnsureOpened();
   if (!open_res) {
@@ -261,7 +246,7 @@ std::expected<int, Error> LibusbTransport::Recv(
                                static_cast<int>(data.size()), &actual,
                                static_cast<unsigned int>(timeout.count()));
   if (r != LIBUSB_SUCCESS) return HandleTransferError(r);
-  return std::min(actual, static_cast<int>(data.size()));
+  return static_cast<size_t>(std::min(actual, static_cast<int>(data.size())));
 }
 
 std::expected<void, Error> LibusbTransport::WaitForReset(
@@ -293,7 +278,7 @@ std::expected<void, Error> LibusbTransport::WaitForReset(
   return std::unexpected(Error::kResultFail);
 }
 
-std::expected<int, Error> LibusbTransport::HandleTransferError(
+std::expected<size_t, Error> LibusbTransport::HandleTransferError(
     int libusb_error) const {
   if (!handle_) return std::unexpected(Error::kNoSuchDevice);
   libusb_reset_device(handle_.get());
