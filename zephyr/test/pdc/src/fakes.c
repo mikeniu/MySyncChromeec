@@ -80,7 +80,8 @@ int battery_is_present(void)
 	return bp_val;
 }
 
+int test_extpower_present = 0;
 int extpower_is_present(void)
 {
-	return 0;
+	return test_extpower_present;
 }
