@@ -178,6 +178,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f30fff3d_fa24f00f",
+        "filename": "util/elan/cli.cc",
+        "patchSetId": 27
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-16T07:10:20Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 30.",
+      "parentUuid": "f237ac4d_eabd9526",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 13
+      },
+      "revId": "d62eebc390860dab966447e9624d032f25ceb78b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "42650d86_e3181626",
