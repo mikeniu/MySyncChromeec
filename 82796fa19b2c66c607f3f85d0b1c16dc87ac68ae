@@ -33,6 +33,24 @@
       "message": "Are the variables correct?",
       "revId": "82796fa19b2c66c607f3f85d0b1c16dc87ac68ae",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e958a0ef_b05bd5c0",
+        "filename": "zephyr/drivers/cros_system/cros_system_ft90.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 4219742
+      },
+      "writtenOn": "2026-06-16T08:50:22Z",
+      "side": 1,
+      "message": "We checked the reset_cause_val, the Power on flag was set at power on boot, but previous version, we checked watchdog flag first, and the other falgs will be ingored if the watchdog flag was set, so we move the checking of power on flag to the first place.",
+      "parentUuid": "82aae703_c103c380",
+      "revId": "82796fa19b2c66c607f3f85d0b1c16dc87ac68ae",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
