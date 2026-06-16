@@ -56,4 +56,21 @@ void pdc_dpm_remove_source(int port);
  */
 int pdc_dpm_get_source_current(const int port);
 
+#ifdef CONFIG_PDC_POWER_MGMT_SRC_THROTTLING
+/**
+ * @brief Check if the system is currently in a battery overload state.
+ *
+ * @return true if overloaded, false otherwise.
+ */
+bool pdc_is_battery_overloaded(void);
+
+/**
+ * @brief Clear the battery overload state safely.
+ *
+ * @return true if the state was successfully transitioned from overloaded to
+ * normal.
+ */
+bool pdc_clear_battery_overload(void);
+#endif /* CONFIG_PDC_POWER_MGMT_SRC_THROTTLING */
+
 #endif /* __CROS_EC_PDC_DPM_H */
