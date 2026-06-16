@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdfab565_abcd9965",
+        "filename": "common/system.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1116,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-16T17:46:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc3bc862_fae27dbd",
+      "revId": "aee07f26b40764a1ac5c0f6dadc8ed519362c3b4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2856c803_4de55fdc",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-09T08:33:36Z",
       "side": 1,
       "message": "Thinking loudly - maybe we should also add conditions for sysjumps here from the `system_run_image_copy_with_flags` function? Otherwise, the host command can return success, but the actual jump may fail.",
+      "revId": "aee07f26b40764a1ac5c0f6dadc8ed519362c3b4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d0cb844_0f0399c1",
+        "filename": "common/system.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1157,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-16T17:46:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2856c803_4de55fdc",
       "revId": "aee07f26b40764a1ac5c0f6dadc8ed519362c3b4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -75,6 +111,48 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae2aeb6c_7958cd46",
+        "filename": "common/system.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1909,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-16T17:46:17Z",
+      "side": 1,
+      "message": "Yes, its needed for host command specific functions.",
+      "parentUuid": "a3f3b2ce_de9d1731",
+      "range": {
+        "startLine": 1909,
+        "startChar": 4,
+        "endLine": 1909,
+        "endChar": 29
+      },
+      "revId": "aee07f26b40764a1ac5c0f6dadc8ed519362c3b4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7614d7e7_620d53dd",
+        "filename": "common/system.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1909,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-16T17:46:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45028862_4e722c1d",
+      "revId": "aee07f26b40764a1ac5c0f6dadc8ed519362c3b4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9679c068_7bfbc7c4",
@@ -92,6 +170,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0efecbf_4732a353",
+        "filename": "common/system.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1910,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-16T17:46:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9679c068_7bfbc7c4",
+      "revId": "aee07f26b40764a1ac5c0f6dadc8ed519362c3b4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b52dec13_b5efe9c5",
@@ -105,6 +201,24 @@
       "writtenOn": "2026-06-09T08:33:36Z",
       "side": 1,
       "message": "Why not k_work queue? Also, please check if a reboot is already scheduled.",
+      "revId": "aee07f26b40764a1ac5c0f6dadc8ed519362c3b4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb37bbc0_f9e43c8c",
+        "filename": "common/system.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1926,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-16T17:46:17Z",
+      "side": 1,
+      "message": "`hook_call_deferred` uses `k_work_queue` in its zephyr [implementation](https://chromium.googlesource.com/chromiumos/platform/ec/+/main/zephyr/shim/src/hooks.c#177), as this code lives in the legacy area, I prefer to keep the code consistent on APIs used.",
+      "parentUuid": "b52dec13_b5efe9c5",
       "revId": "aee07f26b40764a1ac5c0f6dadc8ed519362c3b4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
