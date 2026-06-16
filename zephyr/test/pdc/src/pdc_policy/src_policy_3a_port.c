@@ -38,12 +38,14 @@ BUILD_ASSERT(CONFIG_PLATFORM_EC_USB_PD_3A_PORTS == 1,
 
 static enum chipset_state_mask fake_chipset_state = CHIPSET_STATE_ON;
 
+#ifndef CONFIG_PDC_POWER_MGMT_SRC_THROTTLING
 static int mock_usb_pd_3a_ports = 1;
 
 int pd_get_usb_pd_3a_ports(void)
 {
 	return mock_usb_pd_3a_ports;
 }
+#endif
 
 static int custom_fake_chipset_in_state(int mask)
 {
@@ -66,7 +68,9 @@ static void src_policy_before(void *f)
 	uint32_t lpm_src_pdo =
 		PDO_FIXED(5000, 1500, PDO_FIXED_PEAK_CURR(PDO_PEAK_OCP));
 
+#ifndef CONFIG_PDC_POWER_MGMT_SRC_THROTTLING
 	mock_usb_pd_3a_ports = 1;
+#endif
 
 	RESET_FAKE(chipset_in_state);
 
@@ -936,6 +940,9 @@ ZTEST_USER_F(src_policy, test_src_max_pdp)
  */
 ZTEST_USER_F(src_policy, test_src_policy_snk_no_3a_when_budget_zero)
 {
+#ifdef CONFIG_PDC_POWER_MGMT_SRC_THROTTLING
+	ztest_test_skip();
+#else
 	union connector_status_t connector_status = { 0 };
 	/* Simulate a connected sink device requesting 3A (3000mA) in its PDO */
 	uint32_t partner_snk_pdo = PDO_FIXED(5000, 3000, 0);
@@ -966,4 +973,5 @@ ZTEST_USER_F(src_policy, test_src_policy_snk_no_3a_when_budget_zero)
 	 * 1500mA */
 	zassert_equal(pdc_dpm_get_source_current(TEST_USBC_PORT0), 1500,
 		      "Source current should be limited to 1500mA");
+#endif
 }
