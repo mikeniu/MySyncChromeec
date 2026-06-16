@@ -66,6 +66,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b9304220_6b8245cd",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-16T22:19:58Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\n**Missing Kernel Driver Reattachment** In `libusb_transport.cc`, `EnsureOpened()` correctly detaches the active kernel driver using `libusb_detach_kernel_driver`. However, the driver is *never reattached* when the tool exits. For input/fingerprint devices, this means the device will remain dead to the host OS (ChromeOS) until a physical replug or a full system reboot.\n\n* **Remediation:** Track whether the kernel driver was detached (e.g., a `bool kernel_driver_detached_ \u003d false;` member in `LibusbTransport`). In the destructor of `LibusbTransport` (or a dedicated `Close()` method), check this boolean and call `libusb_attach_kernel_driver(handle_.get(), interface_num_)` if it evaluates to `true`.",
+      "range": {
+        "startLine": 161,
+        "startChar": 0,
+        "endLine": 161,
+        "endChar": 60
+      },
+      "revId": "52b87cb0d5b393d890281f15a064a751f9d81c13",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f16673f9_1a21e61f",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 24
