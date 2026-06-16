@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b771049f_bef69c67",
+        "filename": "util/elan/build.mk",
+        "patchSetId": 29
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-16T17:23:06Z",
+      "side": 1,
+      "message": "It\u0027s still there",
+      "parentUuid": "f80e9627_86f00232",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 35
+      },
+      "revId": "3db60d6c138476583ce445be94d86cc08c404ec8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "60ca3c45_f7e92338",
         "filename": "util/elan/build.mk",
         "patchSetId": 29
@@ -85,6 +109,30 @@
       "side": 1,
       "message": "Fixed and updated code to Patchset 30.",
       "parentUuid": "60ca3c45_f7e92338",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 62
+      },
+      "revId": "3db60d6c138476583ce445be94d86cc08c404ec8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29519d33_fc564ba7",
+        "filename": "util/elan/build.mk",
+        "patchSetId": 29
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-16T17:23:06Z",
+      "side": 1,
+      "message": "It\u0027s still there",
+      "parentUuid": "909f5e69_89ecf14e",
       "range": {
         "startLine": 24,
         "startChar": 0,
