@@ -89,6 +89,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8aff5b50_b5236144",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-16T22:23:41Z",
+      "side": 1,
+      "message": "Simpler fix from Gemini:\n\n----\n\n\n### 1. `util/focaltech/libusb_transport.h`\n\nChange the destructor from a defaulted inline implementation to a declared override so we can define custom cleanup logic.\n\n**Find:**\n\n```cpp\n  std::expected\u003cvoid, Error\u003e WaitForReset(\n      std::chrono::milliseconds timeout) override;\n\n  ~LibusbTransport() override \u003d default;\n\n private:\n  explicit LibusbTransport(ScopedContext ctx, libusb_device* dev,\n                           UsbDeviceId id);\n\n```\n\n**Replace with:**\n\n```cpp\n  std::expected\u003cvoid, Error\u003e WaitForReset(\n      std::chrono::milliseconds timeout) override;\n\n  ~LibusbTransport() override;\n\n private:\n  explicit LibusbTransport(ScopedContext ctx, libusb_device* dev,\n                           UsbDeviceId id);\n\n```\n\n---\n\n### 2. `util/focaltech/libusb_transport.cc`\n\n#### A. Add the auto-detach constant\n\nDefine the constant in the anonymous namespace at the top of the file. You can also safely remove the `kKernelDriverActive` constant, as it is no longer needed.\n\n**Find:**\n\n```cpp\nconstexpr auto kPollinterval \u003d 100ms;\nconstexpr uint8_t kDefaultUsbConfigIndex \u003d 0;\n\n// libusb_kernel_driver_active returns 1 if a kernel driver is bound.\nconstexpr int kKernelDriverActive \u003d 1;\n\n```\n\n**Replace with:**\n\n```cpp\nconstexpr auto kPollinterval \u003d 100ms;\nconstexpr uint8_t kDefaultUsbConfigIndex \u003d 0;\n\n// libusb_set_auto_detach_kernel_driver expects 1 to enable.\nconstexpr int kEnableAutoDetach \u003d 1;\n\n```\n\n#### B. Update `EnsureOpened()`\n\nRemove the manual checking and detaching logic, replacing it with the single auto-detach call.\n\n**Find:**\n\n```cpp\n  endpoint_in_ \u003d ep_info-\u003eep_bulk_in;\n  endpoint_out_ \u003d ep_info-\u003eep_bulk_out;\n  interface_num_ \u003d ep_info-\u003einterface_num;\n\n  // Check for active kernel driver with exact equality.\n  // libusb_kernel_driver_active returns 1 if active, 0 if not, and negative\n  // error codes on failure. Treating negative values as \"active\" would be\n  // incorrect, so we check for exactly 1.\n  if (libusb_kernel_driver_active(handle_.get(), interface_num_) \u003d\u003d\n      kKernelDriverActive) {\n    if (libusb_detach_kernel_driver(handle_.get(), interface_num_) !\u003d\n        LIBUSB_SUCCESS) {\n      FT_LOGE(\"Failed to detach kernel driver\");\n      return std::unexpected(Error::kResultFail);\n    }\n  }\n\n  if (libusb_claim_interface(handle_.get(), interface_num_) !\u003d LIBUSB_SUCCESS) {\n\n```\n\n**Replace with:**\n\n```cpp\n  endpoint_in_ \u003d ep_info-\u003eep_bulk_in;\n  endpoint_out_ \u003d ep_info-\u003eep_bulk_out;\n  interface_num_ \u003d ep_info-\u003einterface_num;\n\n  // Enable auto-detach. libusb will automatically detach the kernel driver\n  // on claim, and reattach it on release.\n  libusb_set_auto_detach_kernel_driver(handle_.get(), kEnableAutoDetach);\n\n  if (libusb_claim_interface(handle_.get(), interface_num_) !\u003d LIBUSB_SUCCESS) {\n\n```\n\n#### C. Add the Destructor Implementation\n\nAdd the custom destructor to the very bottom of the file (just above the closing `} // namespace focaltech`). The class\u0027s destructor body runs *before* its member variables (like the `ScopedHandle`) are destroyed, ensuring the interface is released while the USB handle is still completely valid.\n\n**Add to the bottom of the file:**\n\n```cpp\nLibusbTransport::~LibusbTransport() {\n  if (opened_ \u0026\u0026 handle_) {\n    // Releasing the interface signals libusb to automatically reattach \n    // the host OS kernel driver, bringing the sensor back online.\n    int r \u003d libusb_release_interface(handle_.get(), interface_num_);\n    if (r !\u003d LIBUSB_SUCCESS) {\n      // Use verbose logging here. If the user physically unplugged the device,\n      // releasing the interface will naturally fail, and we don\u0027t want to spam \n      // the console with expected error logs.\n      FT_LOGV(\"Failed to release interface during cleanup: {}\", r);\n    }\n  }\n}\n\n}  // namespace focaltech\n\n```",
+      "parentUuid": "b9304220_6b8245cd",
+      "range": {
+        "startLine": 161,
+        "startChar": 0,
+        "endLine": 161,
+        "endChar": 60
+      },
+      "revId": "52b87cb0d5b393d890281f15a064a751f9d81c13",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f16673f9_1a21e61f",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 24
