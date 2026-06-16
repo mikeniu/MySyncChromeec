@@ -16,6 +16,29 @@
       "message": "There are formatting issues that are causing the presubmit checks to fail. You must always run \"repo upload\" when uploading to verify that the presubmit checks pass.",
       "revId": "1e5e1f3f8b3977dfb42df7bbbe50804dae454005",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "738db734_9c0f99f2",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 30
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-16T21:53:45Z",
+      "side": 1,
+      "message": "* **Location:** `util/elan/iap_control.cc`\n* **Issue:** The Google Style Guide strictly forbids `using-directives` at the global scope, even for literals.\n```cpp\n#include \u003cformat\u003e\nusing namespace std::chrono_literals; // VIOLATION\n\nnamespace elan {\n\n```\n\n\n\n\n*   **Suggestion:** Move the directive inside the `elan` namespace, or ideally, into the tightest scope possible (or just inside the specific functions that need it).\n    ```cpp\n    namespace elan {\n    using namespace std::chrono_literals;\n    // ...",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 37
+      },
+      "revId": "1e5e1f3f8b3977dfb42df7bbbe50804dae454005",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
