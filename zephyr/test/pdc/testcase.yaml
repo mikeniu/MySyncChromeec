@@ -473,3 +473,42 @@ tests:
     # b/406176587: These tests cause code coverage flakes. Continue running
     # the tests when unit testing, but skip when measuring code coverage.
     filter: not CONFIG_COVERAGE
+<<<<<<< HEAD   (52dcdc899b48abe60cce1456bc52355a394f72dc rtk: Add DFP definition and refactor UFP VDOs for USB PD 3.x)
+||||||| BASE   (834fd7914959f1ad896fd4c1ef105879e30ab1db zephyr: pw_log: Move spinlock key to local function scope)
+
+  pdc.comms_suspend_resume.rts54xx:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_COMMS_SUSPEND_RESUME=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.comms_suspend_resume.tps6699x:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_COMMS_SUSPEND_RESUME=y
+    extra_dtc_overlay_files:
+    - "./boards/tps6699x.overlay"
+=======
+
+  pdc.comms_suspend_resume.rts54xx:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_COMMS_SUSPEND_RESUME=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
+  pdc.comms_suspend_resume.tps6699x:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_COMMS_SUSPEND_RESUME=y
+    extra_dtc_overlay_files:
+    - "./boards/tps6699x.overlay"
+
+  pdc.policy.battery_overload:
+    timeout: 300
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_POLICY=y
+    - CONFIG_USBC_PDC_TRACE_MSG=y
+    - CONFIG_USB_PDC_LOG_LEVEL_DBG=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_PDC_POWER_MGMT_SRC_THROTTLING=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+>>>>>>> CHANGE (e5a946df1c6787d35d35aaa29438a19c45494690 pd_controller: Implement dynamic SRC throttling for battery )
