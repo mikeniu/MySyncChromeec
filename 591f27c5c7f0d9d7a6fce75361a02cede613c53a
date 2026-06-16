@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b402fc8_4dd83381",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 39
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9474e64d_e4b5332c",
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a05fe177_71aaf372",
@@ -65,6 +83,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3001a94_15a246b9",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc84946a_c18ef6ca",
+      "range": {
+        "startLine": 100,
+        "startChar": 0,
+        "endLine": 102,
+        "endChar": 30
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "858282cc_c3b7ffd5",
@@ -78,6 +120,30 @@
       "writtenOn": "2026-06-15T21:59:54Z",
       "side": 1,
       "message": "Gemini feedback:\n\n----\n\nIn `bootrom.cc` (`WaitForFlashReady`) and `et171_flash.cc` (`ConnectToBootloader`), you are calculating timeouts by doing repeated time arithmetic on every iteration of a `while` loop:\n\n```c\nauto start_time \u003d std::chrono::steady_clock::now();\nwhile (std::chrono::steady_clock::now() - start_time \u003c timeout) {\n    // ...\n\n```\n\nWhile this works, it requires the CPU to do a subtraction and a comparison on every tick. The idiomatic C++ `std::chrono` approach is to calculate an **absolute deadline** once before the loop begins.\n\n**The Fix:**\n\n```c\nauto deadline \u003d std::chrono::steady_clock::now() + timeout;\nwhile (std::chrono::steady_clock::now() \u003c deadline) {\n    // ...\n\n```\n\nThis is computationally cheaper, impossible to get the subtraction order wrong, and clearly reads as \"while now is before the deadline.\"",
+      "range": {
+        "startLine": 194,
+        "startChar": 2,
+        "endLine": 195,
+        "endChar": 67
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8aab443_fc1bb8b8",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "858282cc_c3b7ffd5",
       "range": {
         "startLine": 194,
         "startChar": 2,
@@ -111,6 +177,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "89063a9c_dd42c61c",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2589a080_21606070",
+      "range": {
+        "startLine": 257,
+        "startChar": 0,
+        "endLine": 261,
+        "endChar": 44
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d9a4cb71_8e9c9b6c",
@@ -124,6 +214,30 @@
       "writtenOn": "2026-06-15T21:59:54Z",
       "side": 1,
       "message": "Gemini feedback:\n\n----\n\nIn `bootrom.cc` (`BackupFlash`) and `flasher_logic.cc` (`ProgramFlashPayload` and `ProgramRawCommandPayload`), you repeat the exact same progress bar calculation, formatting, and flush logic three times:\n\n```c\n  size_t done \u003d total_size - payload.size();\n  std::print(\"\\rWriting Progress: {} / {} ({:.1f}%)\", done, total_size,\n             (static_cast\u003cfloat\u003e(done) / total_size * 100.0f));\n  std::fflush(stdout);\n\n```\n\n**The Fix:** Centralize this into `egis_util.h` (or a dedicated `ui_util.h`). If you ever want to change how progress looks (e.g., adding a visual bar `[\u003d\u003d\u003d\u003d\u003e   ]`), you only have to update it in one place.\n\n**In `egis_util.h`:**\n\n```c\ninline void PrintProgress(std::string_view prefix, size_t done, size_t total) {\n  if (total \u003d\u003d 0) return;\n  std::print(\"\\r{}: {} / {} ({:.1f}%)\", prefix, done, total,\n             (static_cast\u003cfloat\u003e(done) / total * 100.0f));\n  std::fflush(stdout);\n}\n\n```\n\nNow, your flasher loops become perfectly clean one-liners:\n\n```c\n  PrintProgress(\"Flashing Progress\", total_size - firmware.size(), total_size);\n\n```",
+      "range": {
+        "startLine": 388,
+        "startChar": 0,
+        "endLine": 392,
+        "endChar": 24
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef0e0e08_f9d04f37",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d9a4cb71_8e9c9b6c",
       "range": {
         "startLine": 388,
         "startChar": 0,
@@ -157,6 +271,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "87530362_cfe0b833",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 586,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08ca3055_b394058b",
+      "range": {
+        "startLine": 554,
+        "startChar": 0,
+        "endLine": 586,
+        "endChar": 1
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "33c8c2d5_f807299b",
@@ -170,6 +308,30 @@
       "writtenOn": "2026-06-15T21:54:23Z",
       "side": 1,
       "message": "Gemini feedback:\n\n----\n\nAcross `bootrom.h`, `ec_comm.h`, `usb_interface.h`, and `crypto_util.h`, you implement `ToString(ErrorEnum)` functions using `switch` statements with a `default:` case:\n\n```c\nconstexpr std::string_view ToString(BootromError err) {\n  switch (err) {\n    case BootromError::kUsbWriteFailed: return \"USB write failed\";\n    // ...\n    default: return \"An unknown error occurred\";\n  }\n}\n\n```\n\n**The Issue:** By including a `default:` case, you suppress the compiler\u0027s `-Wswitch` warning. If a future maintainer adds a new enum value (e.g., `BootromError::kVerificationFailed`), the compiler *will not warn them* that they forgot to update the stringifier, leading to blind spots in your logs.\n\n**The Fix:** Remove the `default:` label and put the fallback return *outside* the `switch` block. This forces the compiler to statically verify that every single enum value is explicitly handled in the `switch`.\n\n```c\nconstexpr std::string_view ToString(BootromError err) {\n  switch (err) {\n    case BootromError::kUsbWriteFailed: return \"USB write failed\";\n    // ... all explicitly defined cases ...\n  }\n  // The compiler will warn if a new enum is added but missed above!\n  return \"An unknown error occurred\"; \n}\n\n```",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 41
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e98341fb_c9a7963c",
+        "filename": "util/egis/bootrom.h",
+        "patchSetId": 39
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "33c8c2d5_f807299b",
       "range": {
         "startLine": 79,
         "startChar": 0,
@@ -203,6 +365,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1401a9a6_3f056bf9",
+        "filename": "util/egis/bootrom_protocol.h",
+        "patchSetId": 39
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c0a31736_8b57e415",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 29
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1f13cc3d_fe672534",
@@ -216,6 +402,30 @@
       "writtenOn": "2026-06-15T22:29:05Z",
       "side": 1,
       "message": "Gemini feedback:\n\n----\n\nIn `bootrom_protocol.h`, `SecureCommandBaseHeader` stores the cryptographic algorithm as a raw `uint8_t`:\n\n```c\nstruct SecureCommandBaseHeader {\n  CommandId command_id \u003d CommandId::kSecureWrapped;\n  uint8_t algo; // \u003c--- Raw integer\n  uint32_t payload_len;\n} __attribute__((packed));\n\n```\n\nThis forces you to use `std::to_underlying` or `static_cast\u003cuint8_t\u003e` every time you build the header in `bootrom.cc`.\n\nBecause you explicitly defined the underlying type of `EgisCryptoType` as `uint8_t` (`enum class EgisCryptoType : uint8_t`), C++ allows you to use the enum directly inside packed structs. It will still compile down to exactly 1 byte on the wire.\n\n**The Fix:**\n\n```c\nstruct SecureCommandBaseHeader {\n  CommandId command_id \u003d CommandId::kSecureWrapped;\n  EgisCryptoType algo; // \u003c--- Strongly typed\n  uint32_t payload_len;\n} __attribute__((packed));\n\n```\n\nNow, in `bootrom.cc`, you can assign it natively: `req_hdr.algo \u003d wrapped_algo_;`",
+      "range": {
+        "startLine": 169,
+        "startChar": 0,
+        "endLine": 169,
+        "endChar": 15
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6cf56b57_fbc5b6c2",
+        "filename": "util/egis/bootrom_protocol.h",
+        "patchSetId": 39
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f13cc3d_fe672534",
       "range": {
         "startLine": 169,
         "startChar": 0,
@@ -249,6 +459,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bec44d4_ebbf2549",
+        "filename": "util/egis/bootrom_test.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94f3e9bd_7f17f261",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 23
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2617e6ef_0d721ce9",
@@ -262,6 +496,30 @@
       "writtenOn": "2026-06-15T22:15:28Z",
       "side": 1,
       "message": "Gemini feedback:\n\n----\n\nIn your tests (`bootrom_test.cc`, `ec_comm_test.cc`), you verify payload equivalence using standard ranges:\n\n```c\nEXPECT_TRUE(std::ranges::equal(kTestPlaintext, *res));\n\n```\n\n**The Issue:** If this test fails on a CI server, GoogleTest will output: `Expected: true` `Actual: false` You will have absolutely no idea *which* bytes mismatched, forcing you to run the test locally with a debugger.\n\n**The Fix:** Include `\u003cgmock/gmock.h\u003e` and leverage GoogleTest\u0027s native container matchers. It natively understands `std::vector`, `std::array`, and `std::span`.\n\n```c\n#include \u003cgmock/gmock.h\u003e\n\n// Inside the test:\nEXPECT_THAT(*res, ::testing::ElementsAreArray(kTestPlaintext));\n\n```\n\nIf this fails, GoogleTest will now print a beautiful diff showing the exact index and hex values where the arrays diverged, saving hours of debugging time.",
+      "range": {
+        "startLine": 120,
+        "startChar": 0,
+        "endLine": 120,
+        "endChar": 63
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "28aa50f3_6254f639",
+        "filename": "util/egis/bootrom_test.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2617e6ef_0d721ce9",
       "range": {
         "startLine": 120,
         "startChar": 0,
@@ -295,6 +553,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc8cdee9_b9232b53",
+        "filename": "util/egis/build.mk",
+        "patchSetId": 39
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cbcc2354_98a4527f",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 27
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "94ef99f5_6a6e7e52",
@@ -308,6 +590,30 @@
       "writtenOn": "2026-06-15T21:32:38Z",
       "side": 1,
       "message": "The style guide states that variables with static storage duration should be strongly typed and immutable where possible.\n\nIn **`cli_options.cc`**, the `getopt` long options array is mutable:\n\n```c\nstatic struct option long_options[] \u003d { ... };\n\n```\n\n**Fix:** Make it a `constexpr` array to enforce immutability at compile time:\n\n```c\nstatic constexpr option long_options[] \u003d { ... };\n\n```",
+      "range": {
+        "startLine": 79,
+        "startChar": 2,
+        "endLine": 79,
+        "endChar": 41
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e7a0d91_d5215e1b",
+        "filename": "util/egis/cli_options.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94ef99f5_6a6e7e52",
       "range": {
         "startLine": 79,
         "startChar": 2,
@@ -341,6 +647,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "29b64d80_0ec7d459",
+        "filename": "util/egis/cli_options.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a722f4e_cb3b38ca",
+      "range": {
+        "startLine": 115,
+        "startChar": 0,
+        "endLine": 117,
+        "endChar": 51
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f20426f2_f8ed7328",
@@ -354,6 +684,30 @@
       "writtenOn": "2026-06-15T22:29:05Z",
       "side": 1,
       "message": "Gemini feedback:\n\n---\n\nIn `cli_options_test.cc`, you wrote a very clever variadic template to wrap the C-style `getopt` parsing:\n\n```c\ntemplate \u003ctypename... Args\u003e\nstd::optional\u003cAppConfig\u003e RunParseArgs(Args... args) {\n  std::array\u003cchar*, sizeof...(args)\u003e argv \u003d {const_cast\u003cchar*\u003e(args)...};\n  return ParseArgs(argv.size(), argv.data());\n}\n\n```\n\n**The Issue:** The POSIX specification for `getopt` and `getopt_long` requires that the `argv` array is explicitly terminated by a null pointer (`argv[argc] \u003d\u003d NULL`). Your array is exactly the size of the arguments, meaning there is no trailing null pointer. Depending on the standard library implementation of `getopt`, this can read past the bounds of the array and invoke Undefined Behavior.\n\n**The Fix:** Expand the array by 1 and explicitly provide the `nullptr`.\n\n```c\ntemplate \u003ctypename... Args\u003e\nstd::optional\u003cAppConfig\u003e RunParseArgs(Args... args) {\n  // Add +1 to the size, and a trailing nullptr\n  std::array\u003cchar*, sizeof...(args) + 1\u003e argv \u003d {const_cast\u003cchar*\u003e(args)..., nullptr};\n  \n  // Pass size - 1 for argc\n  return ParseArgs(argv.size() - 1, argv.data());\n}\n\n```",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 1
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a35452a_fe2853a4",
+        "filename": "util/egis/cli_options_test.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f20426f2_f8ed7328",
       "range": {
         "startLine": 11,
         "startChar": 0,
@@ -387,6 +741,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3eb877d6_7b3250ad",
+        "filename": "util/egis/crypto_util.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db679c36_a6a3bad9",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 0
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "98a1d8b5_e8abd34c",
@@ -400,6 +778,30 @@
       "writtenOn": "2026-06-15T21:32:38Z",
       "side": 1,
       "message": "We can simplify this with BoringSSL\u0027s APIs:\n\n----\n\n\nThe transition to BoringSSL\u0027s `EVP_AEAD` scatter/gather API combined with native stack-based RAII represents the safest and most performant way to handle authenticated encryption in modern C++.\n\n## Rationale\n\n1. **Zero-Copy Disjoint Memory:** Your hardware protocol enforces a scattered memory layout (the authentication tag lives in the `SecureCommandAesHeader`, while the ciphertext lives dynamically in the payload). Standard AEAD APIs require contiguous memory `[Ciphertext | Tag]`. The `seal_scatter` and `open_gather` functions natively bridge this gap, reading and writing directly to your disjoint `std::span` buffers without requiring intermediate vectors or `std::copy_n` operations.\n2. **Atomic Cryptographic Safety:** The legacy `EVP_CIPHER` streaming API forces you to manage a state machine (`Init` → `Update AAD` → `Update Payload` → `Final` → `Get/Set Tag`). This is notoriously error-prone. The AEAD API reduces encryption and decryption to pure, one-shot atomic functions. It is impossible to accidentally decrypt the plaintext without the tag being strictly verified first.\n3. **Zero Heap Allocation:** By using BoringSSL\u0027s native `bssl::ScopedEVP_AEAD_CTX`, the cryptographic context is allocated entirely on the stack. It zeroes itself on construction and automatically cleans up on destruction. This completely eliminates heap fragmentation, `malloc`/`free` overhead, and the risk of memory leaks on error paths.\n\n---\n\n## The Changes\n\nYou can completely overwrite **`util/egis/crypto_util.cc`** with this implementation. No changes are required in `crypto_util.h`.\n\n```cpp\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n\n#include \"crypto_util.h\"\n\n#include \u003copenssl/aead.h\u003e\n#include \u003copenssl/crypto.h\u003e\n#include \u003copenssl/rand.h\u003e\n#include \u003copenssl/sha.h\u003e\n\nnamespace egis::crypto {\n\nstd::expected\u003cvoid, CryptoError\u003e GenerateGcmIv(\n    std::span\u003cuint8_t, kAesGcmIvSize\u003e iv_buf) {\n  if (RAND_bytes(iv_buf.data(), iv_buf.size()) !\u003d 1) {\n    return std::unexpected(CryptoError::kRngFailed);\n  }\n  return {};\n}\n\nstd::expected\u003cvoid, CryptoError\u003e AesGcmEncrypt(\n    std::span\u003cconst uint8_t, kAes256KeySize\u003e key,\n    std::span\u003cconst uint8_t, kAesGcmIvSize\u003e iv, std::span\u003cconst uint8_t\u003e aad,\n    std::span\u003cconst uint8_t\u003e plaintext, std::span\u003cuint8_t\u003e ciphertext,\n    std::span\u003cuint8_t, kAesGcmTagSize\u003e tag) {\n  \n  bssl::ScopedEVP_AEAD_CTX ctx;\n  if (!EVP_AEAD_CTX_init(ctx.get(), EVP_aead_aes_256_gcm(), key.data(),\n                         key.size(), tag.size(), nullptr)) {\n    return std::unexpected(CryptoError::kInitFailed);\n  }\n\n  size_t out_tag_len \u003d 0;\n\n  if (!EVP_AEAD_CTX_seal_scatter(\n          ctx.get(), ciphertext.data(), tag.data(), \u0026out_tag_len, tag.size(),\n          iv.data(), iv.size(), plaintext.data(), plaintext.size(),\n          /*extra_in\u003d*/nullptr, 0, aad.data(), aad.size())) {\n    return std::unexpected(CryptoError::kUpdateFailed);\n  }\n\n  return {};\n}\n\nstd::expected\u003cvoid, CryptoError\u003e AesGcmDecrypt(\n    std::span\u003cconst uint8_t, kAes256KeySize\u003e key,\n    std::span\u003cconst uint8_t, kAesGcmIvSize\u003e iv, std::span\u003cconst uint8_t\u003e aad,\n    std::span\u003cconst uint8_t\u003e ciphertext,\n    std::span\u003cconst uint8_t, kAesGcmTagSize\u003e tag,\n    std::span\u003cuint8_t\u003e plaintext) {\n  \n  bssl::ScopedEVP_AEAD_CTX ctx;\n  if (!EVP_AEAD_CTX_init(ctx.get(), EVP_aead_aes_256_gcm(), key.data(),\n                         key.size(), tag.size(), nullptr)) {\n    return std::unexpected(CryptoError::kInitFailed);\n  }\n\n  if (!EVP_AEAD_CTX_open_gather(\n          ctx.get(), plaintext.data(), iv.data(), iv.size(),\n          ciphertext.data(), ciphertext.size(), tag.data(), tag.size(),\n          aad.data(), aad.size())) {\n    return std::unexpected(CryptoError::kTagMismatch);\n  }\n\n  return {};\n}\n\nvoid Sha256(std::span\u003cconst uint8_t\u003e data, std::span\u003cuint8_t\u003e hash_out) {\n  if (hash_out.size() \u003c SHA256_DIGEST_LENGTH) {\n    std::abort();\n  }\n  ::SHA256(data.data(), data.size(), hash_out.data());\n}\n\nvoid Cleanse(std::span\u003cuint8_t\u003e data) {\n  OPENSSL_cleanse(data.data(), data.size());\n}\n\n}  // namespace egis::crypto\n\n```",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 0
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d12f253c_20d7834c",
+        "filename": "util/egis/crypto_util.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98a1d8b5_e8abd34c",
       "range": {
         "startLine": 19,
         "startChar": 0,
@@ -433,6 +835,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14cf099a_f3cf1344",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc67be5f_6434038e",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 1
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "decce9dd_bb4ac2ff",
@@ -446,6 +872,30 @@
       "writtenOn": "2026-06-15T21:46:56Z",
       "side": 1,
       "message": "Gemini feedback:\n\n-----\n\nIn `ec_comm.cc`, you define a full class (`EcCommand`) with private members and an accessor, solely to pack a struct and vector together exactly once. This is a classic C++ anti-pattern where a simple sequence of statements is wrapped in unnecessary Object-Oriented boilerplate.\n\nYou can delete the entire `EcCommand` class definition and inline the logic directly into `SendCommand`, saving \\~15 lines and making the function flow linearly.\n\n**In `ec_comm.cc`:**\n\n```c\n// 1. Delete the entire class EcCommand { ... }; block.\n\n// 2. Rewrite SendCommand:\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, EcError\u003e EcComm::SendCommand(\n    uint16_t cmd_id, uint8_t cmd_ver, std::span\u003cconst uint8_t\u003e payload) {\n  \n  if (payload.size() \u003e std::numeric_limits\u003cuint16_t\u003e::max()) {\n    std::println(stderr, \"[FATAL] EC command payload exceeds limit.\");\n    std::abort();\n  }\n\n  EcHostCommandRequest hdr \u003d {\n      .command_id \u003d ToLittleEndian(cmd_id),\n      .command_version \u003d cmd_ver,\n      .data_length \u003d ToLittleEndian(static_cast\u003cuint16_t\u003e(payload.size()))};\n\n  auto tx_bytes \u003d PackMessage(hdr, payload);\n  ApplyEcChecksum(tx_bytes);\n\n  if (auto res \u003d usb_.Send(tx_bytes); !res) {\n    std::println(stderr, \"[ERROR] Failed to send EC command: {}\", ToString(res.error()));\n    return std::unexpected(EcError::kUsbSendFailed);\n  }\n  \n  // ... rest of the receive logic remains unchanged\n}\n\n```",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 1
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5d32a45_459c0274",
+        "filename": "util/egis/ec_comm.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "decce9dd_bb4ac2ff",
       "range": {
         "startLine": 23,
         "startChar": 0,
@@ -503,6 +953,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "72b0d784_356328a2",
+        "filename": "util/egis/ec_protocol_defs.h",
+        "patchSetId": 39
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "95dc751b_b83f9264",
+      "range": {
+        "startLine": 94,
+        "startChar": 0,
+        "endLine": 98,
+        "endChar": 0
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "db0acd42_47530982",
@@ -516,6 +990,30 @@
       "writtenOn": "2026-06-15T21:46:56Z",
       "side": 1,
       "message": "In `egis_util.h`, `ReadLittleEndian` is an exact duplicate of `ReadStruct`, with the only difference being the call to `FromLittleEndian`.\n\nBecause you are using C++23, `std::expected` has a `.transform()` monadic operation. You can completely eliminate the duplicated `memcpy` and bounds-checking logic by routing `ReadLittleEndian` through `ReadStruct`.\n\n**In `egis_util.h`:**\n\n```c\n// Replace the current ReadLittleEndian with this 1-liner:\ntemplate \u003cstd::integral T\u003e\nstd::expected\u003cT, std::errc\u003e ReadLittleEndian(std::span\u003cconst uint8_t\u003e buffer, \n                                             size_t offset \u003d 0) {\n  return ReadStruct\u003cT\u003e(buffer, offset).transform(FromLittleEndian\u003cT\u003e);\n}\n\n```",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 63,
+        "endChar": 1
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0af77958_f73921a7",
+        "filename": "util/egis/egis_util.h",
+        "patchSetId": 39
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db0acd42_47530982",
       "range": {
         "startLine": 55,
         "startChar": 0,
@@ -549,6 +1047,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9461f96e_61f5811e",
+        "filename": "util/egis/egis_util.h",
+        "patchSetId": 39
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "390c22e1_b46aeb20",
+      "range": {
+        "startLine": 70,
+        "startChar": 1,
+        "endLine": 83,
+        "endChar": 1
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5563e894_cca4b0ee",
@@ -562,6 +1084,30 @@
       "writtenOn": "2026-06-15T21:59:54Z",
       "side": 1,
       "message": "Gemini feedback:\n\n----\n\nIn `et171_flash.cc` and `ec_comm_test.cc`, you are forcing the caller to explicitly cast Enums to their underlying types every time they send an EC command:\n\n```c\nauto resp \u003d ec_comm.SendCommand(\n    std::to_underlying(EcCommandId::kEcCmdEnterBootloader), 0);\n\n```\n\nThis leaks protocol implementation details to the caller. The `EcComm` class knows that `EcCommandId` is an enum, so it should accept the strongly-typed enum directly.\n\n**In `ec_comm.h`:**\n\n```c\n  // Change parameter from uint16_t id to EcCommandId id\n  std::expected\u003cstd::vector\u003cuint8_t\u003e, EcError\u003e SendCommand(\n      EcCommandId id, uint8_t ver, std::span\u003cconst uint8_t\u003e payload \u003d {});\n\n  template \u003cTriviallyCopyable T\u003e\n  std::expected\u003cT, EcError\u003e SendCommandTyped(\n      EcCommandId id, uint8_t ver, std::span\u003cconst uint8_t\u003e payload \u003d {}) { ... }\n\n```\n\n**In `ec_comm.cc`:**\n\n```c\n// Move the std::to_underlying inside the implementation:\nEcHostCommandRequest hdr \u003d {\n    .command_id \u003d ToLittleEndian(std::to_underlying(id)), \n    // ...\n\n```\n\nNow, the caller code in `et171_flash.cc` becomes beautifully readable, passing the enum natively:\n\n```c\nauto resp \u003d ec_comm.SendCommand(EcCommandId::kEcCmdEnterBootloader, 0);\n\n```",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 65
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06fe9724_d9f452ad",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5563e894_cca4b0ee",
       "range": {
         "startLine": 75,
         "startChar": 0,
@@ -595,6 +1141,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "87388371_72785fd7",
+        "filename": "util/egis/flasher_logic.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "05a9c10b_0649b3df",
+      "range": {
+        "startLine": 128,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 44
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "26d8cd5e_a7b21ccc",
@@ -608,6 +1178,30 @@
       "writtenOn": "2026-06-15T21:37:15Z",
       "side": 1,
       "message": "Gemini feedback:\n\n----\n\n`Send` and `Receive` are exactly the same, right down to the error formatting, except for the endpoint variable (`ep_out_` vs `ep_in_`) and a `const` cast. You can abstract the core `libusb_bulk_transfer` into a private helper:\n\n```c\nstd::expected\u003cint, UsbError\u003e UsbComm::DoTransfer(\n    uint8_t ep, uint8_t* data, int length, std::chrono::milliseconds timeout) {\n  if (!handle_) {\n    std::println(stderr, \"[ERROR] Not connected. Call connect() first.\");\n    return std::unexpected(UsbError::kNotConnected);\n  }\n\n  int transferred \u003d 0;\n  int rc \u003d libusb_bulk_transfer(handle_.get(), ep, data, length, \n                                \u0026transferred, static_cast\u003cunsigned int\u003e(timeout.count()));\n  if (rc !\u003d 0) {\n    std::println(stderr, \"[ERROR] USB Transfer failed: {}\", LibusbErrorToString(rc));\n    return std::unexpected(LibusbErrorToUsbError(rc));\n  }\n  return transferred;\n}\n\n```\n\nThen `Send` and `Receive` become:\n\n```c\nstd::expected\u003cvoid, UsbError\u003e UsbComm::Send(...) {\n  auto res \u003d DoTransfer(ep_out_, const_cast\u003cuint8_t*\u003e(data.data()), data.size(), timeout);\n  if (!res || res.value() !\u003d static_cast\u003cint\u003e(data.size())) {\n     return std::unexpected(res ? UsbError::kIoError : res.error()); \n  }\n  return {};\n}\n\nstd::expected\u003cint, UsbError\u003e UsbComm::Receive(...) {\n  return DoTransfer(ep_in_, data.data(), data.size(), timeout);\n}\n\n```",
+      "range": {
+        "startLine": 106,
+        "startChar": 0,
+        "endLine": 146,
+        "endChar": 1
+      },
+      "revId": "591f27c5c7f0d9d7a6fce75361a02cede613c53a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9aff6080_87dcd87c",
+        "filename": "util/egis/usb_comm.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-16T10:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "26d8cd5e_a7b21ccc",
       "range": {
         "startLine": 106,
         "startChar": 0,
