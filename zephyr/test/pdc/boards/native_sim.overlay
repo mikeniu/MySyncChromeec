@@ -113,3 +113,8 @@
 		battery = <&battery>;
 	};
 };
+
+&cros_policy {
+	max-discharge-current-ma = <4500>;
+	max-discharge-power-mw = <41000>;
+};
