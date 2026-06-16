@@ -89,6 +89,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a3acfe21_1227d7b9",
+        "filename": "util/focaltech/ft_help.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-16T22:40:57Z",
+      "side": 1,
+      "message": "Here are instructions from Gemini on how to do this (double-check that they are correct):\n\n---\n\nHere is the complete, comprehensive set of updated steps to remove `enter_bootloader`, `get_ec_version`, `enter_rom` from test firmware, and fully eliminate `BuildEcCommand`, `SendEcCommandAndReadResponse`, and all application-phase USB communication from the Focaltech tool.\n\n---\n\n### 1. Update Help Strings (`ft_help.h` \u0026 `ft_help_test.cc`)\n* **`ft_help.h`**: Remove `enter_bootloader` and `get_ec_version` from `kCmdHelpString`. Update `enter_rom` to specify it is now only valid from bootloader mode:\n  ```text\n    enter_rom              Command the MCU to enter ROM boot mode.\n                           (Valid from bootloader mode).\n  ```\n* **`ft_help_test.cc`**: Update the help string assertion to match the newly trimmed `kCmdHelpString`.\n\n---\n\n### 2. Strip USB Profiles \u0026 Device Modes (`libusb_transport.h` \u0026 `usb_device.h`)\n* **`libusb_transport.h`**: Delete `kFocalEcTestId`, `kFocalEcPid9865Id`, and `kFocalEcPid9869Id`.\n* **`usb_device.h`**: Delete `kTest` and `kEc` from the `DeviceMode` enum class. In `GetDeviceMode()`, remove the checks for `kFocalEcTestId`, `kFocalEcPid9865Id`, and `kFocalEcPid9869Id`.\n\n---\n\n### 3. Clean Up Definitions \u0026 Declarations (`cli.h`)\n* **Constants**: Delete `kEcBootloaderModeDefault`, `kEcCmdVersion0`, `kCmdEnterBoot`, and `kCmdGetEcVersion`.\n* **Enum**: Delete `kEnterBoot` and `kGetEcVersion` from the `Command` enum class.\n* **Functions**: Delete the declarations for `CheckEcBuildVersion`, `GetBuildInfo`, `SwitchToBootloader`, `SwitchToRom`, and `SwitchMcuMode`.\n* **Namespace**: Delete the entire `internal` namespace declaration (`SendEcCommandAndReadResponse`).\n\n---\n\n### 4. Purge Implementation Logic (`cli.cc`)\n* **Remove Header**: Delete `#include \u003cec_commands.h\u003e`.\n* **Remove Constants**: Delete `kTestEcSwitchToRomCmd`, `kSwitchToRomPayload`, `kEcCommandTimeout`, and `kMcuRebootPollInterval`.\n* **Delete `BuildEcCommand`**: Remove the entire packet framing helper function.\n* **Delete `internal::SendEcCommandAndReadResponse`**: Remove the entire USB Bulk IN/OUT function and its `ec_host_request`/`ec_host_response` parsing logic.\n* **Delete Mode Switching Helpers**: Remove `GetBuildInfo`, `SwitchToBootloader`, `SwitchToRom`, `CheckEcBuildVersion`, and `SwitchMcuMode` entirely.\n* **Update `ParseCommand`**: Remove `kCmdEnterBoot` and `kCmdGetEcVersion`.\n* **Update `ExecuteCommand`**: \n  * Delete `case Command::kGetEcVersion:` and `case Command::kEnterBoot:`.\n  * Simplify `case Command::kEnterRom:` to purely execute `ReturnToRomBoot`:\n\n```cpp\ncase Command::kEnterRom:\n  FT_LOGI(\"Entering ROM mode...\");\n  if (current_mode !\u003d DeviceMode::kBoot) {\n    FT_LOGE(\"enter_rom is only valid from bootloader mode. Current mode: {}\", static_cast\u003cint\u003e(current_mode));\n    return std::unexpected(Error::kInvalidMode);\n  }\n  return ReturnToRomBoot(usb_device, current_mode);\n```\n\n---\n\n### 5. Clean Up Unit Tests (`cli_test.cc` \u0026 `usb_device_test.cc`)\n* **`cli_test.cc`**: Delete all test cases covering `enter_bootloader`, `get_ec_version`, `SwitchToRom` from test firmware, `SendEcCommandAndReadResponse`, `CheckEcBuildVersion`, `GetBuildInfo`, `SwitchMcuMode`, and any references to `DeviceMode::kEc` or `DeviceMode::kTest`.\n* **`usb_device_test.cc`**: Delete test cases covering `GetDeviceMode` matching `kFocalEcTestId`, `kFocalEcPid9865Id`, or `kFocalEcPid9869Id`.",
+      "parentUuid": "ddeef289_d826cd06",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 66
+      },
+      "revId": "52b87cb0d5b393d890281f15a064a751f9d81c13",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b9304220_6b8245cd",
         "filename": "util/focaltech/libusb_transport.cc",
         "patchSetId": 24
