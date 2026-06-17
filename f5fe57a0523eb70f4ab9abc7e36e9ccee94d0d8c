@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cecce4f9_a7118d77",
+        "filename": "zephyr/emul/emul_common_i2c.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-17T22:31:28Z",
+      "side": 1,
+      "message": "@keithshort@chromium.org do you think this also needs the finish method calls? This state machine is a bit messy and I just want to make sure adding the EMUL_NONE_MSG is sufficient if we are failing before entering the switch",
+      "revId": "f5fe57a0523eb70f4ab9abc7e36e9ccee94d0d8c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
