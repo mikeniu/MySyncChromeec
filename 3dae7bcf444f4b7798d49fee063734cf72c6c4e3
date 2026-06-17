@@ -142,6 +142,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "174980ce_533b84f5",
+        "filename": "util/focaltech/ft_log.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:29:17Z",
+      "side": 1,
+      "message": "### **DRY Up the Logging Macro Branching**\n\n**Location:** `util/focaltech/ft_log.h` -\u003e `FtLog`\n\n**The Issue:** The `FtLog` function has redundant branching to handle terminal coloring. It explicitly checks if `color` is empty to decide which format string to use:\n\n```cpp\n  if (!color.empty()) {\n    std::print(\"{}[{:%m-%d %H:%M:%S}] {} [{}][{}:{}] \", color, now, level_str, log::kLogTag, file, loc.line());\n  } else {\n    std::print(\"[{:%m-%d %H:%M:%S}] {} [{}][{}:{}] \", now, level_str, log::kLogTag, file, loc.line());\n  }\n\n```\n\n**Remediation:** Since `color` defaults to an empty `std::string_view` when disabled, `std::print` will safely and cleanly substitute nothing for the first argument. You can delete the `else` branch completely:\n\n```cpp\n  std::print(\"{}[{:%m-%d %H:%M:%S}] {} [{}][{}:{}] \", color, now, level_str, log::kLogTag, file, loc.line());\n  \n  std::println(fmt, std::forward\u003cArgs\u003e(args)...);\n  \n  // Only the reset sequence needs an explicit check\n  if (!color.empty()) {\n    std::print(\"{}\", kColorReset);\n  }\n\n```",
+      "range": {
+        "startLine": 87,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 3
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e5ca8071_4a478589",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 25
