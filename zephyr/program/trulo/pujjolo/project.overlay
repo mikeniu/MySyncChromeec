@@ -26,6 +26,15 @@
 
 /* Trulo overrides follow... */
 
+/ {
+	named-bbram-regions {
+		board-batt-keep {
+		offset = <0x10>;
+		size = <0x04>;
+		};
+	};
+};
+
 &cbi_flash {
 	/*
 	 * CBI section size is 0x1000 bytes, the CBI portion lies at the end of

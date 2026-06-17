@@ -3,10 +3,15 @@
  * found in the LICENSE file.
  */
 /* Quandiso hardware configuration */
+#include "bbram.h"
+#include "charge_state.h"
 #include "charger.h"
 #include "driver/charger/bq257x0_regs.h"
+#include "extpower.h"
 #include "gpio/gpio_int.h"
 #include "hooks.h"
+#include "power_button.h"
+#include "system.h"
 #include "usb_pd.h"
 
 #include <zephyr/devicetree.h>
@@ -17,6 +22,8 @@
 #include <zephyr/sys/printk.h>
 
 #include <ap_power/ap_power.h>
+
+LOG_MODULE_DECLARE(trulo, LOG_LEVEL_INF);
 
 void pen_detect_interrupt(enum gpio_signal s)
 {
@@ -79,3 +86,82 @@ static void bq25710_min_input_voltage(void)
 		    BQ25710_REG_INPUT_VOLTAGE, BQ25710_MIN_INPUT_VOLTAGE_MV);
 }
 DECLARE_HOOK(HOOK_INIT, bq25710_min_input_voltage, HOOK_PRIO_DEFAULT);
+
+static const struct device *const bbram_dev =
+	COND_CODE_1(DT_HAS_CHOSEN(cros_ec_bbram),
+		    DEVICE_DT_GET(DT_CHOSEN(cros_ec_bbram)), NULL);
+
+static int system_get_battkeep(uint32_t *value)
+{
+	if (bbram_dev == NULL) {
+		LOG_ERR("bbram_dev doesn't binding");
+		return -EC_ERROR_INVAL;
+	}
+
+	if (system_bbram_read(bbram_dev, BBRAM_REGION_OFFSET(board_batt_keep),
+			      BBRAM_REGION_SIZE(board_batt_keep),
+			      (uint8_t *)value)) {
+		return -EC_ERROR_INVAL;
+	}
+
+	return 0;
+}
+
+static int system_set_battkeep(uint32_t value)
+{
+	if (bbram_dev == NULL) {
+		LOG_ERR("bbram_dev doesn't binding");
+		return -EC_ERROR_INVAL;
+	}
+
+	return system_bbram_write(bbram_dev,
+				  BBRAM_REGION_OFFSET(board_batt_keep),
+				  BBRAM_REGION_SIZE(board_batt_keep),
+				  (uint8_t *)&value);
+}
+
+#ifdef CONFIG_BOARD_PREVENT_POWERON_CUSTOM
+__override bool board_prevent_power_on_custom(void)
+{
+	uint32_t board_batt_keep_val;
+
+	system_get_battkeep(&board_batt_keep_val);
+	if ((board_batt_keep_val == 0) || (board_batt_keep_val == 0xA5A5A5A5)) {
+		if ((battery_is_present() == BP_YES) &&
+		    !extpower_is_present()) {
+			return true;
+		}
+		board_batt_keep_val = 0xA2A2A2A2;
+		system_set_battkeep(board_batt_keep_val);
+		return false;
+	} else {
+		return false;
+	}
+}
+
+static void ac_change_clear_reset_cause(void)
+{
+	uint32_t board_batt_keep_val;
+	system_get_battkeep(&board_batt_keep_val);
+	if (((board_batt_keep_val == 0) ||
+	     (board_batt_keep_val == 0xA5A5A5A5)) &&
+	    extpower_is_present()) {
+		board_batt_keep_val = 0xA1A1A1A1;
+		system_set_battkeep(board_batt_keep_val);
+		system_reset(SYSTEM_RESET_HARD);
+	}
+}
+DECLARE_HOOK(HOOK_AC_CHANGE, ac_change_clear_reset_cause, HOOK_PRIO_DEFAULT);
+#endif /* CONFIG_BOARD_PREVENT_POWERON_CUSTOM */
+
+static void check_first_boot(void)
+{
+	uint32_t board_batt_keep_val = 0;
+	system_get_battkeep(&board_batt_keep_val);
+
+	if (board_batt_keep_val == 0x00) {
+		board_batt_keep_val = 0xA5A5A5A5;
+		system_set_battkeep(board_batt_keep_val);
+	}
+}
+DECLARE_HOOK(HOOK_INIT, check_first_boot, HOOK_PRIO_DEFAULT);
