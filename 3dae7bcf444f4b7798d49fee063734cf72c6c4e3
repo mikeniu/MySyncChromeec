@@ -96,6 +96,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f018ed66_34ec2f11",
+        "filename": "util/focaltech/cli.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:23:47Z",
+      "side": 1,
+      "message": "**Ambiguous Acronyms in the CLI Parser**\n\n* **Location:** `util/focaltech/cli.h` -\u003e `AppConfig`\n* **Current:** `std::string_view ec_bin;`\n* **Issue:** \"EC\" stands for Embedded Controller, which is standard ChromiumOS terminology. However, from the context of the CLI parsing tool, this variable just holds a file path.\n* **Suggestion:** Rename it to `firmware_path` or `bin_file_path` to clarify that it holds a string representing the path, not the actual binary data itself.",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 26
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e5ca8071_4a478589",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 25
@@ -190,6 +213,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b5c8a9d2_4e302f9f",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:23:47Z",
+      "side": 1,
+      "message": "** Capitalization Typo in Constant**\n\n* **Location:** `util/focaltech/libusb_transport.cc`\n* **Current:** `constexpr auto kPollinterval \u003d 100ms;`\n* **Suggestion:** Rename to `kPollInterval`. (Capital \u0027I\u0027).",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 37
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "58df2e29_6c12bd4a",
         "filename": "util/focaltech/libusb_transport.h",
         "patchSetId": 25
@@ -206,6 +252,29 @@
         "startChar": 0,
         "endLine": 21,
         "endChar": 46
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ded80449_0b3d8567",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:23:47Z",
+      "side": 1,
+      "message": "**Awkward Parameter Names in `DownloadPage`**\n\n* **Location:** `util/focaltech/updater.cc` -\u003e `DownloadPage`\n* **Current:** `uint32_t downaddr`, `size_t per_len`\n* **Issue:** `downaddr` is a mashed-together abbreviation, and `per_len` is slightly ambiguous (presumably meaning \"payload length\" or \"bytes per length\").\n* **Suggestion:** Rename `downaddr` to `target_address` (which matches the variable name used in `DownloadBin`). As noted in our previous refactoring discussion, `per_len` should ideally be removed entirely in favor of using `chunk.size()`. If you keep it, rename it to `chunk_size` or `payload_size`.",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 72
       },
       "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
