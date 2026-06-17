@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "045ff5fe_c71b8439",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1569497
+      },
+      "writtenOn": "2026-06-17T23:36:32Z",
+      "side": 1,
+      "message": "We are upgrading GCC and glibc in the toolchain, which hit compilation issues in BoringSSL. We were advised to uprev BoringSSL to the latest version instead of manually patching it.\nDuring the uprev build on FPMCU (buccaneer), the build failed because the new BoringSSL unconditionally configures Google Benchmark, which fails on bare-metal ARM due to missing regex support (see the brya-cq build infra logs https://ci.chromium.org/ui/p/chromeos/builders/brya/brya-cq/b8678741505483708625/infra and the specific install_packages buccaneer log https://logs.chromium.org/logs/chromeos/buildbucket/cr-buildbucket/8678741505483708625/+/u/install_packages/sys-firmware_chromeos-fpmcu-release-buccaneer_log\n\nDisabling BUILD_TESTING i think is completely harmless here, as we only need the crypto library for the FPMCU firmware. We cannot run BoringSSL internal unit tests or benchmarks on the microcontroller anyway.",
+      "parentUuid": "73ad458a_a8d16570",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 39
+      },
+      "revId": "285d2053df3f692876992cd7194b18a251abc8c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "b4255f52_3da738d3",
