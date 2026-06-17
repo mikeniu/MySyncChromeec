@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c995c9c_62457c38",
+        "filename": "util/egis/usb_interface.h",
+        "patchSetId": 41
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T23:12:27Z",
+      "side": 1,
+      "message": "### Default Arguments on Virtual Functions (Strict Violation)\n\nThe Google C++ Style Guide explicitly dictates: **\"Virtual functions should not have default arguments.\"** This is because default arguments are statically bound at compile time based on the static type of the pointer/reference, not the dynamic type of the object, which can lead to highly confusing behavior if overridden.\n\nIn `usb_interface.h`:\n\n```c\nclass UsbInterface {\n public:\n  static constexpr auto kDefaultTimeout \u003d std::chrono::milliseconds(1000);\n\n  virtual ~UsbInterface() \u003d default;\n\n  virtual std::expected\u003cvoid, UsbError\u003e Connect() \u003d 0;\n\n  virtual std::expected\u003cvoid, UsbError\u003e Send(\n      std::span\u003cconst uint8_t\u003e data,\n      std::chrono::milliseconds timeout \u003d kDefaultTimeout) \u003d 0; // Violation\n\n  virtual std::expected\u003cint, UsbError\u003e Receive(\n      std::span\u003cuint8_t\u003e data,\n      std::chrono::milliseconds timeout \u003d kDefaultTimeout) \u003d 0; // Violation\n};\n\n```\n\n**Remediation:** Remove the default arguments from the `virtual` declarations. If you want the convenience of a default timeout, use an overloaded non-virtual function (potentially in the base class via the Non-Virtual Interface pattern) that calls the virtual function.",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 63
+      },
+      "revId": "6bdacfc9cff7f136d29026915e24f4196a4daa79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
