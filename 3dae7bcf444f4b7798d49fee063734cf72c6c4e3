@@ -213,6 +213,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "52d09d81_4654bbfd",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:19:58Z",
+      "side": 1,
+      "message": "**Location:** `util/focaltech/updater.cc` and `updater.h`\n\n**The Issue:** `DownloadPage` requires a `std::span\u003cconst uint8_t\u003e data` parameter *and* a `size_t per_len` parameter. Inside the function, it applies `data.subspan(0, per_len)` to ensure it doesn\u0027t read out of bounds. However, when `DownloadBin` calls this function, it explicitly slices the span *before* passing it in (e.g., `remaining_data.first(kFocalConfigSize)`). Passing both the chunked span and the length of the chunk is redundant and creates a risk where `per_len` might desync from the actual `span.size()`.\n\n**Remediation:** Remove `per_len` entirely. Trust the `size()` of the span.\n\n**Changes:**\n\n1. Update the signature in `updater.h` and `updater.cc`:\n\n```c\nstd::expected\u003cvoid, Error\u003e DownloadPage(const UsbDevice\u0026 device,\n                                        uint32_t downaddr,\n                                        std::span\u003cconst uint8_t\u003e chunk) {\n\n```\n\n2. Inside `DownloadPage`, use `chunk.size()` and remove the subspan slicing:\n\n```c\n    CmdFormat{\n        .opcode \u003d Opcode::kAction,\n        .address \u003d ToLittleEndian(kWriteSramAddr),\n        .length \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(chunk.size())),\n        .subcmd \u003d Subcmd::kWriteBin,\n    },\n    chunk, TransferDirection::kOut, kDownloadPageTimeout);\n\n```\n\n3. Simplify the caller in `DownloadBin`:\n\n```c\n// Old:\nauto page_res \u003d DownloadPage(device, downaddr, kFocalConfigSize, \n                             remaining_data.first(kFocalConfigSize));\n\n// New:\nauto page_res \u003d DownloadPage(device, downaddr, remaining_data.first(kFocalConfigSize));\n\n```",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 1
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "563ceec4_04b41351",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 25
