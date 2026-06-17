@@ -91,6 +91,30 @@
       },
       "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8899108_ea3fac3a",
+        "filename": "util/focaltech/updater_test.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T19:10:04Z",
+      "side": 1,
+      "message": "Gemini instructions:\n\n----\n\nThe trailing return types on lambdas (`-\u003e std::expected\u003csize_t, Error\u003e`) are exclusively found inside the `Invoke` blocks for `MockUsbTransport` calls.\n\nThey appear in exactly two files: **`ft_scsi_test.cc`** and **`updater_test.cc`**.\n\nHere is the exact list of the 12 instances you will need to update across those two files:\n\n### **In `util/focaltech/ft_scsi_test.cc` (6 instances):**\n\n1. `SendBulkDataOut_DataOutSuccess` (mocking `Recv` for CSW)\n2. `SendBulkDataOut_CswSignatureMismatch` (mocking `Recv` for CSW)\n3. `ReceiveBulkDataIn_Success` (mocking `Recv` for data)\n4. `ReceiveBulkDataIn_Success` (mocking `Recv` for CSW)\n5. `ReceiveBulkDataIn_EmptyBuffer` (mocking `Recv` for CSW)\n6. `ReceiveBulkDataIn_FailsOnNonZeroCswStatus` (mocking `Recv` for CSW)\n\n### **In `util/focaltech/updater_test.cc` (6 instances):**\n\n7. `GetFlashProtection_Success` (mocking `Recv` for data)\n8. `GetFlashProtection_Success` (mocking `Recv` for CSW)\n9. `SetFlashProtection_Success` (mocking `Recv` for first CSW)\n10. `SetFlashProtection_Success` (mocking `Recv` for data)\n11. `SetFlashProtection_Success` (mocking `Recv` for second CSW)\n12. `ReturnToRomBoot_Success` (mocking `Recv` for CSW)\n\nFor all of these, you can simply delete the `-\u003e std::expected\u003csize_t, Error\u003e` and let C++14/C++23 do the type deduction for you!",
+      "parentUuid": "1833646c_6c40012a",
+      "range": {
+        "startLine": 406,
+        "startChar": 0,
+        "endLine": 416,
+        "endChar": 14
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
