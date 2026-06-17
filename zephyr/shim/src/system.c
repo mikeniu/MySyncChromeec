@@ -84,6 +84,7 @@ void chip_save_reset_flags(uint32_t flags)
 		return;
 	}
 
+	LOG_ERR("chip_save_reset_flags 0x%X", flags);
 	system_bbram_write(bbram_dev, BBRAM_REGION_OFFSET(saved_reset_flags),
 			   BBRAM_REGION_SIZE(saved_reset_flags),
 			   (uint8_t *)&flags);
