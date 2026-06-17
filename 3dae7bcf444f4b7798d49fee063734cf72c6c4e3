@@ -143,6 +143,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ef77af88_44dbed1d",
+        "filename": "util/focaltech/ft_scsi_test.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:12:34Z",
+      "side": 1,
+      "message": "**Location:** `util/focaltech/ft_scsi_test.cc` and `updater_test.cc`\n\n**The Issue:** Across both test files, the exact same lambda is written over a dozen times to simulate a valid USB CSW response:\n\n```c\n  .WillOnce(Invoke([](std::span\u003cuint8_t\u003e data, auto) {\n      testing::BuildValidCsw(data, 1);\n      return testing::kUsbCswSize;\n  }))\n\n```\n\n**Remediation:** GoogleMock provides the `ACTION` macro specifically to DRY up this kind of repetitive side-effect logic. You can define a custom action at the top of your test file (or in `test_utils.h`) and vastly simplify your test cases.\n\n```c\n// Define this once:\nACTION_P(ReturnValidCsw, tag) {\n  // arg0 corresponds to the first argument of Recv (std::span\u003cuint8_t\u003e data)\n  focaltech::testing::BuildValidCsw(arg0, tag);\n  return focaltech::testing::kUsbCswSize;\n}\n\n// And then replace all the verbose lambdas with this clean one-liner:\nEXPECT_CALL(*mock_, Recv(_, _)).WillOnce(ReturnValidCsw(1));\n\n```",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 81,
+        "endChar": 14
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "58df2e29_6c12bd4a",
         "filename": "util/focaltech/libusb_transport.h",
         "patchSetId": 25
