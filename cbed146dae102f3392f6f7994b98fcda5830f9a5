@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd0832b0_c09bc2fb",
+        "filename": "zephyr/program/fpmcu/em32f967/prj.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-06-17T14:32:04Z",
+      "side": 1,
+      "message": "Need to be removed",
+      "revId": "cbed146dae102f3392f6f7994b98fcda5830f9a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
