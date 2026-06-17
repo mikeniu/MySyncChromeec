@@ -1379,6 +1379,9 @@
 /* Minimum battery percentage for power on with an imbalanced pack */
 #undef CONFIG_CHARGER_MIN_BAT_PCT_IMBALANCED_POWER_ON
 
+/* Prevent power on for board function customize */
+#undef CONFIG_BOARD_PREVENT_POWERON_CUSTOM
+
 /*
  * Maximum battery cell imbalance to accept before considering the pack to be
  * imbalanced, in millivolts.

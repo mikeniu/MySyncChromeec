@@ -1569,6 +1569,13 @@ int charge_want_shutdown(void)
 	       (curr.batt.state_of_charge < battery_level_shutdown);
 }
 
+#ifdef CONFIG_BOARD_PREVENT_POWERON_CUSTOM
+__overridable bool board_prevent_power_on_custom(void)
+{
+	return false;
+}
+#endif /* CONFIG_BOARD_PREVENT_POWERON_CUSTOM */
+
 #ifdef CONFIG_CHARGER_MIN_BAT_PCT_FOR_POWER_ON
 test_export_static int charge_prevent_power_on_automatic_power_on = 1;
 #endif
@@ -1708,6 +1715,10 @@ bool charge_prevent_power_on(bool power_button_pressed)
 		prevent_power_on = 1;
 #endif /* CONFIG_SYSTEM_UNLOCKED */
 
+#ifdef CONFIG_BOARD_PREVENT_POWERON_CUSTOM
+	if (board_prevent_power_on_custom())
+		prevent_power_on = 1;
+#endif /* CONFIG_BOARD_PREVENT_POWERON_CUSTOM */
 	return prevent_power_on != 0;
 }
 
