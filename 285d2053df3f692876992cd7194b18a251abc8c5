@@ -72,6 +72,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a4974f5_6b81f288",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T23:41:51Z",
+      "side": 1,
+      "message": "Also, can you see what these cmake checks are looking for exactly?\n\n```\n-- Performing Test STD_REGEX -- failed\n  CC      RW/chip/stm32/host_command_common.o\n  CC      RW/chip/stm32/hwtimer32.o\n  CC      RW/chip/stm32/spi.o\n  CC      RW/chip/stm32/spi_controller-stm32h7.o\n  CC      RW/chip/stm32/system.o\n  CC      RW/chip/stm32/trng.o\n-- Performing Test GNU_POSIX_REGEX -- failed\n  CC      RW/chip/stm32/uart.o\n  CC      RW/chip/stm32/watchdog.o\n  CC      RW/common/console.o\n  CC      RW/common/console_output.o\n  CC      RW/common/debug.o\n-- Performing Test POSIX_REGEX -- failed\n\u001b[31mCMake Error at third_party/benchmark/CMakeLists.txt:325 (message):\n  Failed to determine the source files for the regular expression backend\n```\n\nAs mentioned, I don\u0027t think we explicitly disabled `std::regex`, so I would expect the `STD_REGEX` check to pass.",
+      "parentUuid": "a9598275_888f64c5",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 39
+      },
+      "revId": "285d2053df3f692876992cd7194b18a251abc8c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "b4255f52_3da738d3",
