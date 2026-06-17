@@ -1,6 +1,29 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "73ad458a_a8d16570",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T20:57:36Z",
+      "side": 1,
+      "message": "Could you give some more details on this? What regex library?\n\nWe are [disabling some libc++ libraries](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/chromiumos-overlay/sys-libs/libcxx/libcxx-9999.ebuild;l\u003d211-228;drc\u003d920ccd5cdb8d6598727dffe49fddd2a03217542c), but I\u0027m not sure we\u0027re disabling `std::regex`.",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 39
+      },
+      "revId": "285d2053df3f692876992cd7194b18a251abc8c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "b4255f52_3da738d3",
