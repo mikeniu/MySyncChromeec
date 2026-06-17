@@ -171,10 +171,12 @@ static enum ec_status hc_thread_info_detail(struct host_cmd_handler_args *args)
 		r->stack_cur = 0;
 	}
 
+#ifdef CONFIG_INIT_STACKS
 	size_t unused_stack;
 	if (k_thread_stack_space_get(thread, &unused_stack) == 0) {
 		r->stack_max = thread->stack_info.size - unused_stack;
 	}
+#endif
 #endif /* CONFIG_THREAD_STACK_INFO */
 
 #ifdef CONFIG_SCHED_THREAD_USAGE

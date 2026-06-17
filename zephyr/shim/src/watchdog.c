@@ -189,6 +189,9 @@ void watchdog_reload(void)
 }
 DECLARE_HOOK(HOOK_TICK, watchdog_reload, HOOK_PRIO_LAST);
 
+extern char __text_region_start[];
+extern char __text_region_end[];
+
 static void print_sp_pc(const struct k_thread *thread)
 {
 	uint32_t sp = get_stack_ptr(thread);
@@ -198,8 +201,39 @@ static void print_sp_pc(const struct k_thread *thread)
 	get_thread_name(thread, thread_name, sizeof(thread_name));
 
 #if defined(CONFIG_ARM)
-	printk("%s [SP=%p, PC=%p, LR=%p]\n", thread_name, (void *)sp,
-	       (void *)esf->basic.pc, (void *)esf->basic.lr);
+	printk("%s [addr=%p, SP=%p, PC=%p, LR=%p]\n", thread_name,
+	       (void *)thread, (void *)sp, (void *)esf->basic.pc,
+	       (void *)esf->basic.lr);
+
+	if (thread != k_current_get() && sp != 0) {
+		uint32_t text_start = (uint32_t)&__text_region_start;
+		uint32_t text_end = (uint32_t)&__text_region_end;
+		uint32_t *stack_ptr = (uint32_t *)sp;
+		int count = 0;
+
+		printk("  Call Stack (raw):");
+		for (int i = 0; i < 64; i++) {
+			uint32_t stack_bottom = thread->stack_info.start;
+			uint32_t stack_top = thread->stack_info.start +
+					     thread->stack_info.size;
+			uint32_t curr_addr = (uint32_t)(stack_ptr + i);
+
+			if (curr_addr >= stack_top ||
+			    curr_addr < stack_bottom) {
+				break;
+			}
+
+			uint32_t val = stack_ptr[i];
+			if (val >= text_start && val < text_end && (val & 1)) {
+				printk(" %p", (void *)val);
+				count++;
+			}
+		}
+		if (count == 0) {
+			printk(" (none)");
+		}
+		printk("\n");
+	}
 #elif defined(CONFIG_X86)
 #if defined(CONFIG_X86_64)
 	printk("%s [SP=%p, PC=%p]\n", thread_name, (void *)sp,
