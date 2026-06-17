@@ -22,6 +22,30 @@
       },
       "revId": "03aa5a3453dd4393186ec211abf076afd2f62a1d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4189c226_d6872138",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 40
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-17T03:14:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "40492fc2_6617e764",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 1
+      },
+      "revId": "03aa5a3453dd4393186ec211abf076afd2f62a1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
