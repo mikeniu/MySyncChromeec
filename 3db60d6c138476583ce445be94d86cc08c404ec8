@@ -72,6 +72,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "46887991_eeab1b35",
+        "filename": "util/elan/build.mk",
+        "patchSetId": 29
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-17T02:39:20Z",
+      "side": 1,
+      "message": "Sorry, I missed this. I\u0027ve updated it to the patch 31.",
+      "parentUuid": "b771049f_bef69c67",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 35
+      },
+      "revId": "3db60d6c138476583ce445be94d86cc08c404ec8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "60ca3c45_f7e92338",
@@ -133,6 +157,30 @@
       "side": 1,
       "message": "It\u0027s still there",
       "parentUuid": "909f5e69_89ecf14e",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 62
+      },
+      "revId": "3db60d6c138476583ce445be94d86cc08c404ec8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b61c066_930b6d82",
+        "filename": "util/elan/build.mk",
+        "patchSetId": 29
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-17T02:39:20Z",
+      "side": 1,
+      "message": "Sorry, I missed this. I\u0027ve updated it to the patch 31.",
+      "parentUuid": "29519d33_fc564ba7",
       "range": {
         "startLine": 24,
         "startChar": 0,

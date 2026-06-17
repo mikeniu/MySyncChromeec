@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90f48891_21de3f0a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 30
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-17T02:39:20Z",
+      "side": 1,
+      "message": "Updated it to patch 31.",
+      "parentUuid": "5e843029_556018a6",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 28
+      },
+      "revId": "1e5e1f3f8b3977dfb42df7bbbe50804dae454005",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eb02ee11_3989e0cd",
@@ -41,6 +65,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "60b1c340_2a5b4cd1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 30
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-17T02:39:20Z",
+      "side": 1,
+      "message": "Got it. I\u0027ll double-check the formatting.",
+      "parentUuid": "eb02ee11_3989e0cd",
+      "revId": "1e5e1f3f8b3977dfb42df7bbbe50804dae454005",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "738db734_9c0f99f2",
@@ -54,6 +96,30 @@
       "writtenOn": "2026-06-16T21:53:45Z",
       "side": 1,
       "message": "* **Location:** `util/elan/iap_control.cc`\n* **Issue:** The Google Style Guide strictly forbids `using-directives` at the global scope, even for literals.\n```cpp\n#include \u003cformat\u003e\nusing namespace std::chrono_literals; // VIOLATION\n\nnamespace elan {\n\n```\n\n\n\n\n*   **Suggestion:** Move the directive inside the `elan` namespace, or ideally, into the tightest scope possible (or just inside the specific functions that need it).\n    ```cpp\n    namespace elan {\n    using namespace std::chrono_literals;\n    // ...",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 37
+      },
+      "revId": "1e5e1f3f8b3977dfb42df7bbbe50804dae454005",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34cd6b48_4f4df39e",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 30
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-17T02:39:20Z",
+      "side": 1,
+      "message": "Updated it to patch 31.",
+      "parentUuid": "738db734_9c0f99f2",
       "range": {
         "startLine": 12,
         "startChar": 0,
@@ -87,6 +153,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e64a300_6dacc04f",
+        "filename": "util/elan/iap_tool.cc",
+        "patchSetId": 30
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-17T02:39:20Z",
+      "side": 1,
+      "message": "Updated it to patch 31.",
+      "parentUuid": "eb6ce1cf_87c9345c",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 40
+      },
+      "revId": "1e5e1f3f8b3977dfb42df7bbbe50804dae454005",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7e511041_db3694a0",
@@ -100,6 +190,30 @@
       "writtenOn": "2026-06-16T21:56:40Z",
       "side": 1,
       "message": "Remove this comment",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 52
+      },
+      "revId": "1e5e1f3f8b3977dfb42df7bbbe50804dae454005",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d372a427_ee2e56b4",
+        "filename": "util/elan/usb_backend.h",
+        "patchSetId": 30
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-17T02:39:20Z",
+      "side": 1,
+      "message": "Updated it to patch 31.",
+      "parentUuid": "7e511041_db3694a0",
       "range": {
         "startLine": 18,
         "startChar": 0,
