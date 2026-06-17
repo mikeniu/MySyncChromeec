@@ -510,6 +510,29 @@
       },
       "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "516e0bc0_48bae1d6",
+        "filename": "util/focaltech/usb_device_test.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:37:55Z",
+      "side": 1,
+      "message": "### **Modernize Sub-Range Manipulations in Tests**\n\n**Location:** `util/focaltech/usb_device_test.cc` and `updater_test.cc`\n\n**The Issue:** There are a few places in the tests where memory buffers are filled using raw iterator arithmetic (e.g., `buffer.begin() + offset`). This is a C++98 pattern that is prone to off-by-one errors and out-of-bounds access if the math is wrong.\n\n**Remediation:** Use C++20 `std::ranges` along with span slicing methods to modify subsets of the data declaratively and safely.\n\n**Changes in `usb_device_test.cc`:**\n\n```c\n  // Old:\n  std::fill(data.begin(), data.begin() + 5, 0xAB);\n  \n  // New:\n  std::ranges::fill(data.first(5), 0xAB);\n\n```",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 56
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
