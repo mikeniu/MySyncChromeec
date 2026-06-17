@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8500eab0_febce740",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 24
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-17T07:49:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b3233514_2521ffa3",
+      "revId": "52b87cb0d5b393d890281f15a064a751f9d81c13",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "776ff88b_668a27f6",
@@ -41,6 +59,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "03f19116_8115c31e",
+        "filename": "util/focaltech/build.mk",
+        "patchSetId": 24
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-17T07:49:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "776ff88b_668a27f6",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 89
+      },
+      "revId": "52b87cb0d5b393d890281f15a064a751f9d81c13",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0d35beb0_42d15128",
@@ -54,6 +96,30 @@
       "writtenOn": "2026-06-16T22:00:54Z",
       "side": 1,
       "message": "`repo upload` complains about long lines in this file. Make sure you run `repo upload` on all changes to make sure that the linter is happy.",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 117
+      },
+      "revId": "52b87cb0d5b393d890281f15a064a751f9d81c13",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ab38cfb_fe272608",
+        "filename": "util/focaltech/build.mk",
+        "patchSetId": 24
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-17T07:49:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d35beb0_42d15128",
       "range": {
         "startLine": 37,
         "startChar": 0,
@@ -111,6 +177,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0cb48fca_92ccec69",
+        "filename": "util/focaltech/ft_help.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-17T07:49:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a3acfe21_1227d7b9",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 66
+      },
+      "revId": "52b87cb0d5b393d890281f15a064a751f9d81c13",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9304220_6b8245cd",
@@ -158,6 +248,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee26d4c1_5c4befca",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-17T07:49:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8aff5b50_b5236144",
+      "range": {
+        "startLine": 161,
+        "startChar": 0,
+        "endLine": 161,
+        "endChar": 60
+      },
+      "revId": "52b87cb0d5b393d890281f15a064a751f9d81c13",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f16673f9_1a21e61f",
@@ -171,6 +285,30 @@
       "writtenOn": "2026-06-16T22:16:01Z",
       "side": 1,
       "message": "Gemini feedback:\n\n---\n\n**Use Span\u0027s `first()` Method** In `updater.cc`, to enforce safer bounds-checking instead of using the explicit span constructor:\n\n```c\n// Instead of:\nDownloadPage(device, target_addr, kFocalConfigSize, {buffer.data(), kFocalConfigSize});\n\n// Use:\nDownloadPage(device, target_addr, kFocalConfigSize, buffer.first(kFocalConfigSize));\n\n```\n\n`first()` will assert at runtime if the requested size exceeds the span, immediately failing fast rather than silently creating an invalid memory view.",
+      "range": {
+        "startLine": 131,
+        "startChar": 0,
+        "endLine": 132,
+        "endChar": 68
+      },
+      "revId": "52b87cb0d5b393d890281f15a064a751f9d81c13",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45c80a7d_ffdc4046",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-17T07:49:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f16673f9_1a21e61f",
       "range": {
         "startLine": 131,
         "startChar": 0,
