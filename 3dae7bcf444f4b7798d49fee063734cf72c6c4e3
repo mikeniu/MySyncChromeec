@@ -533,6 +533,30 @@
       },
       "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fbbc14d_00cc9d73",
+        "filename": "util/focaltech/usb_device_test.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:39:23Z",
+      "side": 1,
+      "message": "Gemini feedback on other places we can do this:\n\n----\n\nHere are the remaining places to apply modern sub-range and memory patterns:\n\n### \\*\\*1. Eliminate `std::memcpy` in `ft_scsi_test.cc**`\n\n**The Issue:** In the tests designed to simulate bad CSW responses, the author fell back to C-style `memcpy` with raw pointers. However, in `test_utils.h`, they already wrote the perfect modern equivalent using `std::ranges::copy` and `AsUint8Span`. We should make these tests consistent with `BuildValidCsw`.\n\n**Changes:** In `SendBulkDataOut_CswSignatureMismatch` and `ReceiveBulkDataIn_FailsOnNonZeroCswStatus`:\n\n```c\n  // Old:\n  std::memcpy(data.data(), \u0026csw, sizeof(csw));\n\n  // New:\n  std::ranges::copy(AsUint8Span(csw), data.begin());\n\n```\n\n---\n\n### \\*\\*2. Eliminate `std::memcpy` in `updater_test.cc**`\n\n**The Issue:** The `ConfigPageToBytes` helper does the exact same thing in reverse (copying a struct into a byte vector) using raw pointers.\n\n**Changes:** In `ConfigPageToBytes`:\n\n```c\n  // Old:\n  std::memcpy(bytes.data(), \u0026config, sizeof(config));\n\n  // New:\n  std::ranges::copy(AsUint8Span(config), bytes.begin());\n\n```\n\n---\n\n### \\*\\*3. Upgrade `std::fill` to `std::ranges::fill` in `updater_test.cc**`\n\n**The Issue:** There are a few places where the old `std::fill(begin, end, val)` is used instead of the more concise C++20 `std::ranges::fill(container, val)`.\n\n**Changes:** In `StubUsbTransport::Recv` (inside `force_verify_fail_` logic):\n\n```c\n  // Old:\n  std::fill(data.begin(), data.end(), 0xAA);\n\n  // New:\n  std::ranges::fill(data, 0xAA);\n\n```\n\nIn the mock lambdas for `GetFlashProtection_Success` and `SetFlashProtection_Success`:\n\n```c\n  // Old:\n  std::fill(data.begin(), data.end(), 0);\n\n  // New:\n  std::ranges::fill(data, 0);\n\n```",
+      "parentUuid": "516e0bc0_48bae1d6",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 56
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
