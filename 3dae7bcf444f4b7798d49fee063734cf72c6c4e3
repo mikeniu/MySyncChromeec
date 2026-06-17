@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f67ec2f1_992d0607",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T19:12:30Z",
+      "side": 1,
+      "message": "* **Location:** Multiple files (e.g., `cli.cc`, `updater.cc`, `ft_scsi.cc`)  \n* **Issue:** Google style recommends making local variables `const` if they are not modified after initialization. This reduces cognitive load.  \n* **Remediation:** Add `const` to `auto` declarations that never mutate.\n\nExamples to update:\n\n* In `cli.cc`: `const auto wp_res \u003d ParseWpArea(args[1]);`  \n* In `updater.cc`: `const uint32_t pages \u003d ...;`  \n* In `updater.cc`: `const bool is_config_update \u003d ...;`",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 39
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "58df2e29_6c12bd4a",
         "filename": "util/focaltech/libusb_transport.h",
         "patchSetId": 25
