@@ -3,10 +3,14 @@
  * found in the LICENSE file.
  */
 /* Quandiso hardware configuration */
+#include "charge_state.h"
 #include "charger.h"
+#include "extpower.h"
 #include "driver/charger/bq257x0_regs.h"
 #include "gpio/gpio_int.h"
 #include "hooks.h"
+#include "power_button.h"
+#include "system.h"
 #include "usb_pd.h"
 
 #include <zephyr/devicetree.h>
@@ -17,6 +21,8 @@
 #include <zephyr/sys/printk.h>
 
 #include <ap_power/ap_power.h>
+
+LOG_MODULE_DECLARE(trulo, LOG_LEVEL_INF);
 
 void pen_detect_interrupt(enum gpio_signal s)
 {
@@ -79,3 +85,49 @@ static void bq25710_min_input_voltage(void)
 		    BQ25710_REG_INPUT_VOLTAGE, BQ25710_MIN_INPUT_VOLTAGE_MV);
 }
 DECLARE_HOOK(HOOK_INIT, bq25710_min_input_voltage, HOOK_PRIO_DEFAULT);
+
+#ifdef CONFIG_BOARD_PREVENT_POWERON_CUSTOM
+__override bool board_prevent_power_on_custom(void)
+{
+	uint32_t system_flags = system_get_reset_flags(); /* system reset flag */
+	uint32_t chip_flags;
+
+	system_get_scratchpad(&chip_flags);
+	LOG_ERR("board_prevent_power_on_custom");
+	LOG_ERR("board_prevent_power_on_custom 0x%X, 0x%X", system_flags, chip_flags);
+	if (chip_flags != 0) {
+		if ((chip_flags  & (EC_RESET_FLAG_POWER_ON | EC_RESET_FLAG_INITIAL_PWR)) ||! extpower_is_present()) {
+			LOG_ERR("board_prevent_power_on_custom chip true 0x%X", chip_flags);
+			return true;
+		}
+		return false;
+	} else if ((system_flags & ~(EC_RESET_FLAG_POWER_ON | EC_RESET_FLAG_INITIAL_PWR)) || extpower_is_present()) {
+		LOG_ERR("board_prevent_power_on_custom false 0x%X", system_flags);
+		return false;
+	} else {
+		system_flags = system_get_reset_flags();
+		LOG_ERR("board_prevent_power_on_custom true 0x%X", system_flags);
+		system_set_scratchpad(system_flags);
+		return true;
+	}
+}
+
+static void ac_change_clear_reset_cause(void)
+{
+	uint32_t chip_flags;
+	system_get_scratchpad(&chip_flags);
+	LOG_ERR("ac_change_clear_reset_cause original: 0x%X", system_get_reset_flags());
+	if (extpower_is_present()) {
+		LOG_ERR("ac_change_clear_reset_cause");
+		LOG_ERR("chip_flags0 0x%X", chip_flags);
+		chip_flags  &= ~(EC_RESET_FLAG_POWER_ON | EC_RESET_FLAG_INITIAL_PWR);
+		LOG_ERR("chip_flags1 0x%X", chip_flags);
+		system_set_scratchpad(chip_flags);
+		system_get_scratchpad(&chip_flags);
+		LOG_ERR("chip_flags2 0x%X", chip_flags);
+		system_reset(SYSTEM_RESET_HARD);
+	}
+	LOG_ERR("ac_change_clear_reset_cause : 0x%X", system_get_reset_flags());
+}
+DECLARE_HOOK(HOOK_AC_CHANGE, ac_change_clear_reset_cause, HOOK_PRIO_DEFAULT);
+#endif /* CONFIG_BOARD_PREVENT_POWERON_CUSTOM */
