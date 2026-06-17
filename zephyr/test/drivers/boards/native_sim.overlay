@@ -843,18 +843,6 @@
 			i2c-spi-addr-flags = "BMA4_I2C_ADDR_SECONDARY";
 		};
 
-		ms_lis2dw12_accel: ms-lis2dw12-accel {
-			compatible = "cros-ec,lis2dw12";
-			status = "okay";
-
-			location = "MOTIONSENSE_LOC_BASE";
-			mutex = <&mutex_lis2dw12>;
-			port = <&named_i2c0>;
-			drv-data = <&lis2dw12_data>;
-			default-range = <2>;
-			i2c-spi-addr-flags = "LIS2DWL_ADDR1_FLAGS";
-		};
-
 		tcs3400_clear: tcs3400-clear {
 			compatible = "cros-ec,tcs3400-clear";
 			status = "okay";
@@ -881,6 +869,18 @@
 			location = "MOTIONSENSE_LOC_BASE";
 			default-range = <0x10000>; /* scale = 1x, uscale = 0 */
 			drv-data = <&tcs_rgb_data>;
+		};
+
+		ms_lis2dw12_accel: ms-lis2dw12-accel {
+			compatible = "cros-ec,lis2dw12";
+			status = "okay";
+
+			location = "MOTIONSENSE_LOC_BASE";
+			mutex = <&mutex_lis2dw12>;
+			port = <&named_i2c0>;
+			drv-data = <&lis2dw12_data>;
+			default-range = <2>;
+			i2c-spi-addr-flags = "LIS2DWL_ADDR1_FLAGS";
 		};
 	};
 
