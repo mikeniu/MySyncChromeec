@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bdc2bb28_8abaaf48",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T19:07:01Z",
+      "side": 1,
+      "message": "Let\u0027s get rid of `ToLower`. We can just expect the user to pass lowercase.\n\nGemini instructions:\n\n----\n\nFor a low-level host utility like a firmware updater, dropping case-insensitivity is entirely standard and often preferred.\n\nHere is why removing `ToLower` is a great architectural choice:\n\n### **1. Alignment with Unix/POSIX Philosophy**\n\nCommand-line tools in Linux and ChromiumOS environments are almost universally case-sensitive. Users and automation scripts expect exact matches. If a user types `flash_set_protect BOOT` instead of `flash_set_protect boot`, throwing a parameter error is the expected and correct behavior for a POSIX-style CLI.\n\n### **2. Complete Elimination of Character Encoding Edge Cases**\n\nAs we discussed, case conversion in C++ is notoriously finicky due to locales and signed/unsigned character casting. By removing `ToLower`, you completely bypass a whole class of potential bugs related to character encoding.\n\n### **3. Drastic Code Simplification**\n\nYour code becomes significantly leaner. You can delete the `ToLower` function entirely and reduce `ParseWpArea` to a simple string comparison.\n\nHere is what the simplified code looks like:\n\n```cpp\n// Parse a string to a FlashWpArea (exact lowercase match).\nstd::expected\u003cFlashWpArea, Error\u003e ParseWpArea(std::string_view arg) {\n  if (arg \u003d\u003d \"none\") return FlashWpArea::kNone;\n  if (arg \u003d\u003d \"boot\") return FlashWpArea::kBoot;\n  if (arg \u003d\u003d \"ro\") return FlashWpArea::kRo;\n  if (arg \u003d\u003d \"all\") return FlashWpArea::kAll;\n  return std::unexpected(Error::kParameterError);\n}\n\n```\n\nSince your help string in `ft_help.h` already documents the areas in exact lowercase (`none`, `boot`, `ro`, `all`), the user documentation is already perfectly aligned with this strict checking.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 1
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "58df2e29_6c12bd4a",
         "filename": "util/focaltech/libusb_transport.h",
         "patchSetId": 25
