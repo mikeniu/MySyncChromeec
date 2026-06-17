@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ac157bf_a2e51d6d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 23
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-17T20:37:54Z",
+      "side": 1,
+      "message": "Perhaps more useful on this CL:\n```\nSTART - test_i2c_1_bad_read\n[0.303900] \u003cerr\u003e smart_battery: wrong write message size (2)\n\n    Assertion failed at CMAKE_SOURCE_DIR/smart_battery/src/battery_present.c:55: battery_present_test_i2c_1_bad_read: battery_is_present() not equal to BP_YES\n\n FAIL - test_i2c_1_bad_read in 0.001 seconds\n```\n\nI\u0027ll run CQ again with just this CL to hopefully narrow down the failure.",
+      "revId": "4ff2292c4bcce8c7d98a5cf431a34131bb028c6d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
