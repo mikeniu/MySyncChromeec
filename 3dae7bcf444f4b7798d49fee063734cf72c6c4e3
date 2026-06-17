@@ -351,6 +351,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b510db6b_9e2bfc36",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:33:55Z",
+      "side": 1,
+      "message": "Additional places to apply this pattern based on Gemini:\n\n----\n\nThe only place where `.value()` slipped through the cracks is in **`util/focaltech/main.cc`**.\n\nHere are the exactly two places that need to be updated to be consistent with the rest of the codebase and modern C++ idioms.\n\n### **File: `util/focaltech/main.cc**`\n\n**1. Passing the transport to `UsbDevice**`\n\nBecause the preceding `if (!transport)` check proves the expected object contains a value, you can safely dereference it using `*` instead of calling `.value()`.\n\n```cpp\n  // Old:\n  focaltech::UsbDevice usb_device(std::make_unique\u003cfocaltech::LibusbTransport\u003e(\n      std::move(transport.value())));\n\n  // New:\n  focaltech::UsbDevice usb_device(std::make_unique\u003cfocaltech::LibusbTransport\u003e(\n      std::move(*transport)));\n\n```\n\n**2. Passing the config to `ExecuteCommand**`\n\nSimilarly, `config` was already checked via `if (!config) return EXIT_FAILURE;` earlier in the function. (Notice how the author already correctly used `*mode_res` in the exact same function call!).\n\n```cpp\n  // Old:\n  if (auto exec_res \u003d\n          focaltech::ExecuteCommand(config.value(), usb_device, *mode_res);\n      !exec_res) {\n\n  // New (Applying const-correctness here as well!):\n  if (const auto exec_res \u003d\n          focaltech::ExecuteCommand(*config, usb_device, *mode_res);\n      !exec_res) {\n\n```\n\nBy making these two quick changes, the entire codebase will be 100% free of `.value()` calls, exclusively utilizing the idiomatic pointer-style access for `std::expected`.",
+      "parentUuid": "0df2477c_a9c0ad1a",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 37
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ded80449_0b3d8567",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 25
