@@ -7,7 +7,7 @@
  * SVDM identity support for DFP-only devices.
  *
  * This file is only supported for Zephyr builds, enabled by
- * CONFIG_SVDM_RSP_DFP_ONLY. No equivalent config exists for EC-OS.
+ * CONFIG_SVDM_IDENTITY_RSP. No equivalent config exists for EC-OS.
  */
 
 #include "chipset.h"
