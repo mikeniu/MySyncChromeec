@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a78ca557_85a49d7f",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 41
+      },
+      "lineNbr": 551,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T23:43:10Z",
+      "side": 1,
+      "message": "### Simplification: Encapsulate Endianness in the Protocol Structs\n\nIn `bootrom.cc`, functions like `GetBootromInfo` and `GetFlashInfo` manually mutate the struct fields after reading them to handle endianness:\n\n```c\ninfo_res-\u003eversion \u003d FromLittleEndian(info_res-\u003eversion);\ninfo_res-\u003emax_cmd_size \u003d FromLittleEndian(info_res-\u003emax_cmd_size);\n\n```\n\nThis is error-prone; if a new field is added to the struct in the future, the developer might forget to add the swap logic in the caller.\n\n**The Simplification:** Move the endian-swapping logic directly into the structs defined in `bootrom_protocol.h`. Add a simple `Unpack()` or `ToHost()` member function to the struct itself.\n\n```c\nstruct BootromInfoResponse {\n  uint32_t version;\n  uint32_t max_cmd_size;\n  uint32_t max_fw_upgrade_size;\n\n  void ToHost() {\n    version \u003d egis::FromLittleEndian(version);\n    max_cmd_size \u003d egis::FromLittleEndian(max_cmd_size);\n    max_fw_upgrade_size \u003d egis::FromLittleEndian(max_fw_upgrade_size);\n  }\n} __attribute__((packed));\n\n```",
+      "range": {
+        "startLine": 548,
+        "startChar": 0,
+        "endLine": 551,
+        "endChar": 56
+      },
+      "revId": "6bdacfc9cff7f136d29026915e24f4196a4daa79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1c995c9c_62457c38",
         "filename": "util/egis/usb_interface.h",
         "patchSetId": 41
