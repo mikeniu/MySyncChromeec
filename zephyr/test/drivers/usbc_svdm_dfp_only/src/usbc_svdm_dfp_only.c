@@ -2,9 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  *
- * This test exercises the SVDM_RSP_DFP_ONLY option, causing the device to
- * respond appropriately to SVDM Discover Identity requests when operating as
- * DFP.
+ * This test exercises the CONFIG_PLATFORM_EC_SVDM_RSP option,
+ * verifying that the device responds appropriately to SVDM requests.
  *
  * The tests correspond to TEST.PD.PVDM.SRC.1 Discovery Process and Enter Mode
  * as defined by the USB Power Delivery Compliance Test Specification.
