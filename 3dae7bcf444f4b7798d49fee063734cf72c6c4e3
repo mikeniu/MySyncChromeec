@@ -96,6 +96,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9e3dc4fe_5ee2a6f4",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:09:14Z",
+      "side": 1,
+      "message": "Gemini instructions to make this change:\n\n----\n\nThis is a great exercise because doing this actually uncovers a **silent endianness bug** in the original patch!\n\nIn the original patch, `BuildFtCmd` automatically applied `ToLittleEndian()` to the `address`, `length`, and `aux_address` fields. However, when the author used designated initializers manually in `updater.cc` (e.g., inside `ErasePage` and `DownloadPage`), they **forgot** to wrap the fields in `ToLittleEndian()`.\n\nWhile ChromeOS targets are overwhelmingly little-endian (making `ToLittleEndian` a no-op in practice), dropping the helper entirely means we must apply `ToLittleEndian()` explicitly for correctness.\n\nHere are all the places that need to be updated to completely remove `BuildFtCmd` and fix the endianness bug:\n\n### **1. Delete the Declaration and Definition**\n\n**File:** `util/focaltech/ft_scsi.h`\n\n* **Remove** this declaration:\n\n```cpp\nCmdFormat BuildFtCmd(Opcode opcode, Subcmd subcmd, uint32_t address \u003d 0,\n                     uint32_t length \u003d 0, uint32_t aux_address \u003d 0,\n                     uint8_t flags \u003d 0);\n\n```\n\n**File:** `util/focaltech/ft_scsi.cc`\n\n* **Remove** the entire function body:\n\n```cpp\nCmdFormat BuildFtCmd(Opcode opcode, Subcmd subcmd, uint32_t address,\n                     uint32_t length, uint32_t aux_address, uint8_t flags) {\n  return CmdFormat{\n      .opcode \u003d opcode,\n      .address \u003d ToLittleEndian(address),\n      .length \u003d ToLittleEndian(length),\n      .aux_address \u003d ToLittleEndian(aux_address),\n      .subcmd \u003d subcmd,\n      .flags \u003d flags,\n      .reserved \u003d 0,\n  };\n}\n\n```\n\n---\n\n### **2. Update Production Code (`updater.cc`)**\n\n**File:** `util/focaltech/updater.cc` -\u003e `GetBootVersion`\n\n* **Change:** Remove the helper and use the initializer. (Since address/length are `0`, we don\u0027t need `ToLittleEndian`).\n\n```cpp\n  // Old:\n  auto cmd \u003d BuildFtCmd(Opcode::kReadInfo, Subcmd::kReadData, 0, 0, 0, 0);\n\n  // New (with const-correctness from our previous step!):\n  const CmdFormat cmd{\n      .opcode \u003d Opcode::kReadInfo,\n      .subcmd \u003d Subcmd::kReadData,\n  };\n\n```\n\n**File:** `util/focaltech/updater.cc` -\u003e `ErasePage`, `DownloadPage`, `VerifyData`, `SetFlashProtection`\n\n* **Change:** Fix the silent endianness bug in the existing designated initializers by adding `ToLittleEndian()`.\n*(Example from `ErasePage`)*:\n\n```cpp\n  // Old:\n  CmdFormat{\n      .opcode \u003d Opcode::kAction,\n      .subcmd \u003d Subcmd::kErasePage,\n      .address \u003d addr,\n      .length \u003d pages,\n  }\n\n  // New:\n  CmdFormat{\n      .opcode \u003d Opcode::kAction,\n      .address \u003d ToLittleEndian(addr),\n      .length \u003d ToLittleEndian(pages),\n      .subcmd \u003d Subcmd::kErasePage,\n  }\n\n```\n\n*(Apply `ToLittleEndian` to `.address`, `.length`, and `.aux_address` for the other commands in this file as well).*\n\n---\n\n### **3. Remove Obsolete Unit Tests**\n\n**File:** `util/focaltech/ft_scsi_test.cc`\nSince we deleted `BuildFtCmd`, the unit tests specifically designed to test it are now dead code.\n\n* **Delete the following two tests entirely:**\n* `TEST_F(FtScsiTest, BuildFtCmd_VerifyFields)`\n* `TEST_F(FtScsiTest, BuildFtCmd_ZeroDefaults)`\n\n\n\n---\n\n### **4. Update Test Fixtures**\n\n**File:** `util/focaltech/ft_scsi_test.cc`\nThere are 8 instances across the test file where `BuildFtCmd` is used to mock an outgoing command. Update all of them to use designated initializers.\n\n* **Instances 1, 4, 5, 6** (Inside `SendBulkDataOut_DataOutSuccess`, `SendBulkDataOut_CbwSendFails`, `SendBulkDataOut_DataSendFails`, `SendBulkDataOut_CswSignatureMismatch`):\n\n```cpp\n  // Old:\n  CmdFormat scsi_cmd \u003d BuildFtCmd(Opcode::kAction, Subcmd::kWriteBin);\n\n  // New:\n  const CmdFormat scsi_cmd{\n      .opcode \u003d Opcode::kAction,\n      .subcmd \u003d Subcmd::kWriteBin,\n  };\n\n```\n\n* **Instances 2 \u0026 3** (Inside `SendBulkDataOut_SendOnlySuccess`, `SendBulkDataOut_SendOnlyWaitResetFails`):\n\n```cpp\n  // Old:\n  CmdFormat scsi_cmd \u003d BuildFtCmd(Opcode::kAction, Subcmd::kSoftReset);\n\n  // New:\n  const CmdFormat scsi_cmd{\n      .opcode \u003d Opcode::kAction,\n      .subcmd \u003d Subcmd::kSoftReset,\n  };\n\n```\n\n* **Instances 7, 8, 9** (Inside `ReceiveBulkDataIn_Success`, `ReceiveBulkDataIn_EmptyBuffer`, `ReceiveBulkDataIn_DataRecvFails`):\n\n```cpp\n  // Old:\n  CmdFormat scsi_cmd \u003d BuildFtCmd(Opcode::kReadInfo, Subcmd::kReadData);\n\n  // New:\n  const CmdFormat scsi_cmd{\n      .opcode \u003d Opcode::kReadInfo,\n      .subcmd \u003d Subcmd::kReadData,\n  };\n\n```\n\nBy making these changes, the codebase becomes significantly cleaner, more consistent in how structs are initialized, and perfectly robust against execution on big-endian architectures.",
+      "parentUuid": "e5ca8071_4a478589",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 93,
+        "endChar": 1
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "58df2e29_6c12bd4a",
         "filename": "util/focaltech/libusb_transport.h",
         "patchSetId": 25
