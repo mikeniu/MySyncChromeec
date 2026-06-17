@@ -43,6 +43,12 @@ def get_default_patches_dirs(checkout_root):
     """Get the default list of patches directories."""
     checkout_root = pathlib.Path(checkout_root)
     return [
+        checkout_root
+        / "src"
+        / "platform"
+        / "ec"
+        / "upstream_overrides"
+        / "patches",
         checkout_root / "src" / "platform" / "ec-private" / "patches",
     ]
 
@@ -51,6 +57,12 @@ def get_default_src_override_dirs(checkout_root):
     """Get the default list of source override directories."""
     checkout_root = pathlib.Path(checkout_root)
     return [
+        checkout_root
+        / "src"
+        / "platform"
+        / "ec"
+        / "upstream_overrides"
+        / "src-override",
         checkout_root / "src" / "platform" / "ec-private" / "src-override",
     ]
 
