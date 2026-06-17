@@ -119,6 +119,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2342daba_2ffce4a4",
+        "filename": "util/focaltech/cli.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:28:03Z",
+      "side": 1,
+      "message": "Now that we changed to strings `ParseInt` is never used and can be removed:\n\n----\n\n\n\n### **Dead Code Elimination: `ParseInt`**\n\n**Location:** `util/focaltech/cli.h`, `cli.cc`, and `cli_test.cc`\n\n**The Issue:** The `ParseInt` function is fully implemented using `\u003ccharconv\u003e` and has its own dedicated unit tests (`ParseInt_Valid`, `ParseInt_Negative`, `ParseInt_Invalid`). However, it is **never actually called** anywhere in the application. The current command set only parses file paths and the string enums (`none`, `boot`, `ro`, `all`).\n\n**Remediation:** Code that isn\u0027t executed is a maintenance burden. Delete the `ParseInt` declaration, definition, and unit tests entirely. If a future command requires integer parsing, it can be added back via version control.",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 57
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e5ca8071_4a478589",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 25
