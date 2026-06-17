@@ -85,6 +85,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "58fde502_8e3d3f9a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 30
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T16:46:41Z",
+      "side": 1,
+      "message": "It\u0027s still failing. You **must** run the `repo upload` checks to make sure everything is formatted correctly:\n\n```\n[FAILED] chromiumos/platform/ec: cros format\n    Hook script \"cros format --check --exclude \"*.xml\" --exclude \"extra/usb_updater/*.json\" --exclude \"third_party/*\" --commit ${PRESUBMIT_COMMIT}\" failed with code 1:\n      09:42:50: WARNING: util/elan/iap_control.cc: needs formatting\n      09:42:50: WARNING: util/elan/file_control.h: needs formatting\n      09:42:50: WARNING: util/elan/iap_control.h: needs formatting\n      09:42:50: WARNING: util/elan/utility.h: needs formatting\n      09:42:50: WARNING: util/elan/file_control.cc: needs formatting\n      09:42:50: WARNING: util/elan/iap_tool.cc: needs formatting\n      09:43:13: NOTICE: You can fix formatting errors by running:\n        cros format util/elan/file_control.cc util/elan/file_control.h util/elan/iap_control.cc util/elan/iap_control.h util/elan/iap_tool.cc util/elan/utility.h\n```",
+      "parentUuid": "60b1c340_2a5b4cd1",
+      "revId": "1e5e1f3f8b3977dfb42df7bbbe50804dae454005",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "738db734_9c0f99f2",
         "filename": "util/elan/iap_control.cc",
         "patchSetId": 30
