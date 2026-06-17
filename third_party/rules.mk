@@ -70,7 +70,14 @@ endif
 # example: $ make BORINGSSL_DIR=~/src/boringssl BOARD=bloonchipper
 BORINGSSL_DIR ?= ../../third_party/boringssl
 
+# TODO(b/389897612): boringssl changed its output layout recently.
+# To facilitate an upgrade, support both paths. Once the upgrade
+# sticks, delete the `else` block and hardcode the new path.
+ifneq ($(wildcard $(BORINGSSL_DIR)/third_party/benchmark),)
+BORINGSSL_OUTDIR := $(out)/third_party/boringssl
+else
 BORINGSSL_OUTDIR := $(out)/third_party/boringssl/crypto
+endif
 BORINGSSL_TOOLCHAIN := \
 	$(shell pwd)/third_party/boringssl/boringssl-toolchain.cmake
 
@@ -86,6 +93,7 @@ $(BORINGSSL_OUTDIR)/libcrypto.a:
 		-DCROS_EC_REPO=$(CURDIR) \
 		-DCMAKE_TOOLCHAIN_FILE=$(BORINGSSL_TOOLCHAIN) \
 		-DCMAKE_VERBOSE_MAKEFILE=$(V) \
+		-DBUILD_TESTING=OFF \
 		-B $(out)/third_party/boringssl/ \
 		-S $(BORINGSSL_DIR) \
 		-GNinja

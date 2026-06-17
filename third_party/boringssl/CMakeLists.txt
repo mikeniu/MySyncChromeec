@@ -42,6 +42,11 @@ set(CMAKE_SKIP_INSTALL_RULES YES)
 # We don't use generated assembly for now.
 set(OPENSSL_NO_ASM "1")
 
+# Disable BoringSSL testing targets since we only need the 'crypto' library.
+# Google Benchmark (included in BoringSSL tests) does not compile on embedded toolchains.
+# TODO(b/389897612): Remove this if we decide to support Google Benchmark on embedded.
+set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+
 zephyr_include_directories(${BORINGSSL_SOURCES}/include)
 zephyr_include_directories(include)
 
