@@ -328,6 +328,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0df2477c_a9c0ad1a",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:33:11Z",
+      "side": 1,
+      "message": "**Location:** `util/focaltech/main.cc`\n\n**The Issue:** When you check if a `std::expected` contains a value, using `.value()` to extract it is technically correct, but it is considered overly verbose and visually noisy in modern C++.\n\n**Remediation:** Since the preceding `if (!transport)` check proves the value exists, you can safely and idiomatically use the dereference operator (`*`) just like you would with an `std::optional` or a smart pointer.\n\n**Changes:**\n\n```c\n  // Old:\n  focaltech::UsbDevice usb_device(std::make_unique\u003cfocaltech::LibusbTransport\u003e(\n      std::move(transport.value())));\n      \n  if (auto exec_res \u003d\n          focaltech::ExecuteCommand(config.value(), usb_device, *mode_res);\n\n  // New:\n  focaltech::UsbDevice usb_device(std::make_unique\u003cfocaltech::LibusbTransport\u003e(\n      std::move(*transport)));\n      \n  if (auto exec_res \u003d focaltech::ExecuteCommand(*config, usb_device, *mode_res);\n\n```",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 37
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ded80449_0b3d8567",
         "filename": "util/focaltech/updater.cc",
         "patchSetId": 25
