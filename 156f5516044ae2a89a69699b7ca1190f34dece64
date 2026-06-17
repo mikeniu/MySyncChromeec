@@ -16,6 +16,24 @@
       "message": "Several of the existing Zephyr tests failed. I\u0027m guessing that this CL changed something about the contract of the I2C emulator that they weren\u0027t expecting:\n```\nSTART - test_i2c_1_bad_read\n[0.303900] \u003cerr\u003e smart_battery: wrong write message size (2)\n\n    Assertion failed at CMAKE_SOURCE_DIR/smart_battery/src/battery_present.c:55: battery_present_test_i2c_1_bad_read: battery_is_present() not equal to BP_YES\n\n FAIL - test_i2c_1_bad_read in 0.001 seconds\n```",
       "revId": "156f5516044ae2a89a69699b7ca1190f34dece64",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78dbfaaa_8dac4450",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-06-17T20:38:23Z",
+      "side": 1,
+      "message": "Hmm ok I will run them all again and see what happened I ran them all before the last iteration so must have been something with moving the check for read also",
+      "parentUuid": "780d0828_e1bee454",
+      "revId": "156f5516044ae2a89a69699b7ca1190f34dece64",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
