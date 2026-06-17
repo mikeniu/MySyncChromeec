@@ -12,8 +12,6 @@ import shutil
 import subprocess
 import sys
 
-from zmake.repository_prep import find_checkout
-
 
 def fix_symlinks(directory, old_prefix, new_prefix):
     """Find and fix symlinks pointing to old_prefix to point to new_prefix."""
@@ -54,8 +52,34 @@ def copy_outputs_back(shadow_checkout, real_checkout, ec_rel_path):
         fix_symlinks(real_path, shadow_checkout, real_checkout)
 
 
+def _find_override_files(src_override_dir):
+    """Yield all non-ignored override files recursively from src_override_dir."""
+    for root, _, files in os.walk(src_override_dir):
+        for file in files:
+            if (
+                file.startswith(".git")
+                or file.endswith(".md")
+                or file in ["OWNERS", "DIR_METADATA", "LICENSE"]
+            ):
+                continue
+            yield pathlib.Path(root) / file
+
+
+def _find_patch_files(patches_dir):
+    """Yield all patch files recursively from patches_dir."""
+    for root, _, files in os.walk(patches_dir):
+        for file in files:
+            if file.endswith(".patch"):
+                yield pathlib.Path(root) / file
+
+
 def create_shadow_checkout(
-    real_checkout, shadow_root, modules, zephyr_base, code_override_path
+    real_checkout,
+    shadow_root,
+    modules,
+    zephyr_base,
+    src_override_dirs,
+    patches_dirs,
 ):
     """Create a shadow checkout with copies of target repos and symlinks for others."""
     real_checkout = pathlib.Path(real_checkout).resolve()
@@ -77,17 +101,27 @@ def create_shadow_checkout(
         need_copy = False
         if key == "module:ec":
             need_copy = True
-        elif code_override_path and code_override_path.exists():
+        else:
             # Check overrides
-            override_path = code_override_path / "src-override" / rel_path
-            if override_path.exists():
-                need_copy = True
+            for override_dir in src_override_dirs:
+                override_dir = pathlib.Path(override_dir)
+                if override_dir.exists():
+                    d = override_dir / rel_path
+                    if d.exists() and any(d.iterdir()):
+                        need_copy = True
+                        break
+
             # Check patches
-            patch_path = code_override_path / "patches" / rel_path
-            if patch_path.exists() and any(
-                f.endswith(".patch") for f in os.listdir(patch_path)
-            ):
-                need_copy = True
+            if not need_copy:
+                for patches_dir in patches_dirs:
+                    patches_dir = pathlib.Path(patches_dir)
+                    if patches_dir.exists():
+                        d = patches_dir / rel_path
+                        if d.exists() and any(
+                            f.endswith(".patch") for f in os.listdir(d)
+                        ):
+                            need_copy = True
+                            break
 
         if need_copy:
             print(f"Copying {rel_path} to shadow checkout...")
@@ -170,18 +204,16 @@ def create_arg_parser(build, bundle, test):
 
     parser.add_argument(
         "--patches-dir",
-        default=str(
-            find_checkout() / "src" / "platform" / "ec-private" / "patches"
-        ),
-        help="Path to the patches directory",
+        action="append",
+        dest="patches_dirs",
+        help="Path to a patches directory. Can be repeated.",
     )
 
     parser.add_argument(
         "--src-override-dir",
-        default=str(
-            find_checkout() / "src" / "platform" / "ec-private" / "src-override"
-        ),
-        help="Path to the directory for source file overrides",
+        action="append",
+        dest="src_override_dirs",
+        help="Path to a source override directory. Can be repeated.",
     )
 
     # Would make this required=True, but not available until 3.7

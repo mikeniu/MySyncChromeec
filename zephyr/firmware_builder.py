@@ -11,6 +11,7 @@ This is the entry point for the custom firmware builder workflow recipe.
 
 import collections
 import json
+import logging
 import os
 import pathlib
 import re
@@ -21,17 +22,9 @@ import sys
 import tempfile
 
 from google.protobuf import json_format  # pylint: disable=import-error
-from zmake.repository_prep import CodebasePreparer
-from zmake.repository_prep import find_checkout
-from zmake.repository_prep import find_target_repos
-from zmake.repository_prep import get_dirty_files
-from zmake.repository_prep import set_checkout
 
 from chromite.api.gen_sdk.chromite.api import firmware_pb2
 from chromite.lib.chromeos_version import VersionInfo
-import scripts.firmware_builder_lib
-from scripts.firmware_builder_lib import copy_outputs_back
-from scripts.firmware_builder_lib import create_shadow_checkout
 
 
 # Add the zmake dir early in the python search path
@@ -43,8 +36,22 @@ sys.path.append(str(ZEPHYR_DIR / "../util"))
 
 # pylint: disable=wrong-import-position, import-error
 from coreboot_sdk import init_toolchain
-import zmake.modules  # pylint: disable=wrong-import-position
-import zmake.project  # pylint: disable=wrong-import-position
+import zmake.modules
+import zmake.project
+from zmake.repository_prep import CodebasePreparer
+from zmake.repository_prep import find_checkout
+from zmake.repository_prep import find_target_repos
+from zmake.repository_prep import get_default_patches_dirs
+from zmake.repository_prep import get_default_src_override_dirs
+from zmake.repository_prep import get_dirty_files
+from zmake.repository_prep import set_checkout
+
+import scripts.firmware_builder_lib
+from scripts.firmware_builder_lib import copy_outputs_back
+from scripts.firmware_builder_lib import create_shadow_checkout
+
+
+# pylint: enable=wrong-import-position, import-error
 
 
 DEFAULT_BUNDLE_DIRECTORY = "/tmp/artifact_bundles"
@@ -845,6 +852,13 @@ def _extract_lcov_summary(name, metrics, filename):
         metric.total_lines = int(re_match.group(3))
 
 
+def _has_files(path_str):
+    if not path_str:
+        return False
+    path = pathlib.Path(path_str)
+    return path.exists() and any(path.iterdir())
+
+
 def main(args):
     """Builds and tests all of the Zephyr targets and reports build metrics"""
     # pylint: disable=global-statement
@@ -875,34 +889,42 @@ def main(args):
 
     real_checkout = find_checkout()
 
-    patches_dir = opts.patches_dir if hasattr(opts, "patches_dir") else None
-    src_override_dir = (
-        opts.src_override_dir if hasattr(opts, "src_override_dir") else None
-    )
+    # Determine patches and override directories
+    if opts.patches_dirs:
+        patches_dirs = opts.patches_dirs
+    else:
+        patches_dirs = get_default_patches_dirs(real_checkout)
 
-    has_overrides = _has_files(src_override_dir)
-    has_patches = _has_files(patches_dir)
+    if opts.src_override_dirs:
+        src_override_dirs = opts.src_override_dirs
+    else:
+        src_override_dirs = get_default_src_override_dirs(real_checkout)
 
+    has_overrides = any(_has_files(d) for d in src_override_dirs)
+    has_patches = any(_has_files(d) for d in patches_dirs)
+    use_shadow = has_overrides or has_patches
+
+    # Set up logging
+    logging.basicConfig(level=logging.INFO)
+
+    # Populate version before entering shadow checkout
     if not opts.bcs_version:
         opts.bcs_version = get_version()
-
-    use_shadow = has_overrides or has_patches
 
     if use_shadow:
         print("Using shadow workspace for build...")
         target_repos = find_target_repos(
-            real_checkout, src_override_dir, patches_dir
+            real_checkout, src_override_dirs, patches_dirs
         )
         user_dirty_files = set()
         for repo in target_repos:
             user_dirty_files.update(get_dirty_files(repo, real_checkout))
 
         modules = zmake.modules.locate_from_checkout(real_checkout)
-        ec_rel_path = modules["ec"].resolve().relative_to(real_checkout)
         zephyr_base = (
             real_checkout / "src" / "third_party" / "zephyrproject" / "zephyr"
         )
-        code_override_path = real_checkout / "src" / "platform" / "ec-private"
+        ec_rel_path = modules["ec"].resolve().relative_to(real_checkout)
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             shadow_checkout = pathlib.Path(tmp_dir) / "shadow"
@@ -916,15 +938,16 @@ def main(args):
                     shadow_checkout,
                     modules,
                     zephyr_base,
-                    code_override_path,
+                    src_override_dirs,
+                    patches_dirs,
                 )
 
                 ZEPHYR_DIR = shadow_checkout / ec_rel_path / "zephyr"
 
                 with CodebasePreparer(
                     shadow_checkout,
-                    patches_dir,
-                    src_override_dir,
+                    patches_dirs,
+                    src_override_dirs,
                     user_dirty_files,
                 ):
                     os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
@@ -942,7 +965,7 @@ def main(args):
                 set_checkout(prev_checkout)
                 ZEPHYR_DIR = original_zephyr_dir
     else:
-        with CodebasePreparer(real_checkout, patches_dir, src_override_dir):
+        with CodebasePreparer(real_checkout, patches_dirs, src_override_dirs):
             os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
             return opts.func(opts)
 

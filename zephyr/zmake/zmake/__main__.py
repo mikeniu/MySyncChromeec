@@ -16,8 +16,8 @@ import sys
 from zmake import jobserver
 from zmake import multiproc
 from zmake.repository_prep import CodebasePreparer
-from zmake.repository_prep import get_default_patches_dir
-from zmake.repository_prep import get_default_src_override_dir
+from zmake.repository_prep import get_default_patches_dirs
+from zmake.repository_prep import get_default_src_override_dirs
 import zmake.zmake as zm
 
 
@@ -174,13 +174,17 @@ def get_argparser():
     )
     parser.add_argument(
         "--patches-dir",
+        action="append",
+        dest="patches_dirs",
         type=pathlib.Path,
-        help="Path to a patches directory.",
+        help="Path to a patches directory. Can be repeated.",
     )
     parser.add_argument(
         "--src-override-dir",
+        action="append",
+        dest="src_override_dirs",
         type=pathlib.Path,
-        help="Path to a source override directory.",
+        help="Path to a source override directory. Can be repeated.",
     )
 
     sub = parser.add_subparsers(
@@ -494,30 +498,35 @@ def main(argv=None):
                 checkout = None
 
         if checkout:
-            patches_dir = (
-                opts.patches_dir
-                if opts.patches_dir
-                else get_default_patches_dir(checkout)
+            patches_dirs = (
+                opts.patches_dirs
+                if opts.patches_dirs
+                else get_default_patches_dirs(checkout)
             )
-            src_override_dir = (
-                opts.src_override_dir
-                if opts.src_override_dir
-                else get_default_src_override_dir(checkout)
+            src_override_dirs = (
+                opts.src_override_dirs
+                if opts.src_override_dirs
+                else get_default_src_override_dirs(checkout)
             )
-            preparer = CodebasePreparer(checkout, patches_dir, src_override_dir)
+            preparer = CodebasePreparer(
+                checkout, patches_dirs, src_override_dirs
+            )
 
     if preparer:
         # pylint: disable=unnecessary-dunder-call
         preparer.__enter__()
 
     try:
+        if need_prep:
+            os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
+
         subcommand_method = getattr(zmake, opts.subcommand.replace("-", "_"))
         result = call_with_namespace(subcommand_method, opts)
         wait_rv = zmake.executor.wait()
         return result or wait_rv
     finally:
         if preparer:
-            preparer.__exit__(*sys.exc_info())
+            preparer.__exit__(None, None, None)
         multiproc.LogWriter.wait_for_log_end()
         for file, failed_projects in zmake.cmp_failed_projects.items():
             if failed_projects:
