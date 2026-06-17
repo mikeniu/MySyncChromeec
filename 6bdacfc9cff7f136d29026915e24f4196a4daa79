@@ -50,6 +50,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "26f5b35d_faf1ee09",
+        "filename": "util/egis/bootrom_test.cc",
+        "patchSetId": 41
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T23:54:00Z",
+      "side": 1,
+      "message": "### Style Guide Cleanup: Chrono Literals\n\n**Rationale:** The Google C++ Style Guide bans `using namespace` directives inside `.h` header files to prevent global namespace pollution, but strongly encourages the use of standard literal suffixes (e.g., `5s`, `200ms`) in `.cc` implementation files for readability.\n\n**The Changes:**\n\n* Leave the explicit `std::chrono::milliseconds(5000)` declarations inside `bootrom.h` and `usb_interface.h` untouched.\n* In your `_test.cc` and `.cc` files (where `using namespace std::chrono_literals;` is already declared), swap out verbose constructors for literals.\n\n```cpp\n// Change this:\nEXPECT_EQ(fake_usb_.Receive({}, std::chrono::milliseconds(0)).error(), UsbError::kTimeout);\n\n// To this:\nEXPECT_EQ(fake_usb_.Receive({}, 0ms).error(), UsbError::kTimeout);\n\n```",
+      "range": {
+        "startLine": 182,
+        "startChar": 33,
+        "endLine": 182,
+        "endChar": 62
+      },
+      "revId": "6bdacfc9cff7f136d29026915e24f4196a4daa79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1d2e6655_bd9ff041",
         "filename": "util/egis/cli_options.cc",
         "patchSetId": 41
