@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4494d6e_8d1b4140",
+        "filename": "zephyr/program/atria/atriarvp-ish/gpio.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-17T23:17:54Z",
+      "side": 1,
+      "message": "I think this connects to GPIO120 on the MECC. If that\u0027s right, can you add a comment here to note that?\n\nAlso, I don\u0027t see this in the EC `gpio.dtsi` right now. Does it need to be there? If so, this CL or another CL is fine.",
+      "revId": "ccbc8a45135a52f92e55d4e6a84457ce44f327b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5b99786_fa90e28a",
+        "filename": "zephyr/program/atria/atriarvp-ish/motionsense.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-17T23:17:54Z",
+      "side": 1,
+      "message": "This is a brox bug. Can you make a new one for atria?",
+      "revId": "ccbc8a45135a52f92e55d4e6a84457ce44f327b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea959232_00990803",
+        "filename": "zephyr/program/atria/atriarvp-ish/project.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-17T23:17:54Z",
+      "side": 1,
+      "message": "Nit: This is dependent on `PLATFORM_EC_TABLET_MODE`. Put it after that one.",
+      "revId": "cc389c53d8fab075e24b8a14f9e266411398200c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
