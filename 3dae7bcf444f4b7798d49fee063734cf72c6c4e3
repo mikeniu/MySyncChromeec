@@ -252,6 +252,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ad517fdb_c7c73e56",
+        "filename": "util/focaltech/ft_scsi_test.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:57:18Z",
+      "side": 1,
+      "message": "Let\u0027s remove this comment.",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 37
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ef77af88_44dbed1d",
         "filename": "util/focaltech/ft_scsi_test.cc",
         "patchSetId": 25
@@ -547,6 +570,29 @@
         "startChar": 0,
         "endLine": 416,
         "endChar": 14
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95e7dcae_af9ff9c5",
+        "filename": "util/focaltech/usb_device.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:57:18Z",
+      "side": 1,
+      "message": "The ROM vs bootloader mode is a bit unclear. Let\u0027s try to make it clearer with thse Gemini suggestions:\n\n**Double-check that the comments about `kRom` vs `kBootloader` are correct. Fix them if they are not.**\n\n----\n\nRight now, the distinction between ROM and Bootloader mode exists mostly in the developer\u0027s head and is scattered across the codebase in the form of loose variables (like `kRomCfgAddr` vs `kBootCfgAddr`).\n\nIf a future maintainer doesn\u0027t understand the hardware as well as you do, it is dangerously easy for them to mix up the addresses or pass the wrong mode.\n\nWe can use the C++ type system to tightly couple these modes to their respective memory addresses, making the code self-documenting and virtually impossible to misuse.\n\nHere are the three steps to drastically clarify the hardware modes in the code:\n\n### **1. Expand and Document the `DeviceMode` Enum**\n\n**Location:** `util/focaltech/usb_device.h`\n\n**Rationale:** `kBoot` is slightly ambiguous (is it the act of booting, or the bootloader?). Renaming it to `kBootloader` and adding explicit comments removes all guesswork.\n\n**Changes:**\n\n```cpp\n// Represents the current execution state of the Focaltech MCU.\nenum class DeviceMode {\n  // Hardwired mask ROM. Cannot be overwritten. Used for safe recovery.\n  kRom,        \n  // Updatable flash bootloader. Used for normal firmware updates.\n  kBootloader, \n};\n\n```\n\n*(Note: You\u0027ll need to update `GetDeviceMode` in `usb_device.h` and the switch cases in `cli.cc` to use `kBootloader` instead of `kBoot`).*\n\n---\n\n### **2. Create a Mode-to-Memory Mapping**\n\n**Location:** `util/focaltech/updater.h`\n\n**Rationale:** Currently, the configuration addresses and run addresses are defined as loose, disconnected constants. We should bundle them into a strict mapping function. This guarantees that if you know the `DeviceMode`, you automatically get the correct, safe memory addresses for that mode.\n\n**Changes:**\nDelete the loose constants:\n\n```cpp\n// Remove these:\n// constexpr uint32_t kRomCfgAddr \u003d 0x10000000;\n// constexpr uint32_t kBootCfgAddr \u003d 0x10080000;\n// constexpr uint32_t kRomRunAddr \u003d 0x10002000;\n// constexpr uint32_t kBootRunAddr \u003d 0x10081000;\n\n```\n\nReplace them with a structured memory map:\n\n```cpp\nstruct MemoryMap {\n  uint32_t config_address;\n  uint32_t run_address;\n};\n\n// Returns the safe hardware memory addresses for the given execution mode.\nconstexpr std::expected\u003cMemoryMap, Error\u003e GetMemoryMap(DeviceMode mode) {\n  switch (mode) {\n    case DeviceMode::kRom:\n      return MemoryMap{\n          .config_address \u003d 0x10000000, \n          .run_address \u003d 0x10002000\n      };\n    case DeviceMode::kBootloader:\n      return MemoryMap{\n          .config_address \u003d 0x10080000, \n          .run_address \u003d 0x10081000\n      };\n    default:\n      return std::unexpected(Error::kInvalidMode);\n  }\n}\n\n```\n\n---\n\n### **3. Refactor `UpdateFw` to use the Memory Map**\n\n**Location:** `util/focaltech/updater.cc`\n\n**Rationale:** The `UpdateFw` function currently has a clunky `if`/`else if` block that manually assigns `target_addr` based on the mode. By utilizing our new `GetMemoryMap` helper, we can make this logic declarative and entirely eliminate the risk of a mismatched address.\n\n**Changes:**\nReplace the mode validation block in `UpdateFw`:\n\n```cpp\n  auto start_addr_res \u003d GetCodeStartAddress(fw_data);\n  if (!start_addr_res) {\n    return std::unexpected(start_addr_res.error());\n  }\n  const uint32_t fw_run_address \u003d *start_addr_res;\n\n  auto map_res \u003d GetMemoryMap(current_mode);\n  if (!map_res) {\n    FT_LOGE(\"Invalid device mode for update\");\n    return std::unexpected(map_res.error());\n  }\n  const MemoryMap hw_map \u003d *map_res;\n\n  if (fw_run_address \u003d\u003d hw_map.run_address) {\n    FT_LOGE(\"Firmware run address (0x{:x}) conflicts with current mode run address.\", fw_run_address);\n    return std::unexpected(Error::kParameterError);\n  }\n\n  const uint32_t target_addr \u003d hw_map.config_address;\n\n```\n\n**Why this is vastly superior:**\n\n1. **Safety:** It explicitly separates the address *inside the file* (`fw_run_address`) from the address *expected by the hardware* (`hw_map.run_address`).\n2. **Readability:** The code now reads like a clear sequence of logical steps rather than a tangled web of `if/else` checks against loose constants.\n3. **Scalability:** If Focaltech releases a new chip revision with a third mode, you only have to add it to the `DeviceMode` enum and the `GetMemoryMap` switch statement. The `UpdateFw` logic will automatically handle it without needing a single modification.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 2
       },
       "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
