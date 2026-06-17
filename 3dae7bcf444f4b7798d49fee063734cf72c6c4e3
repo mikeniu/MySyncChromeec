@@ -229,6 +229,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "10475e49_a2680b77",
+        "filename": "util/focaltech/ft_scsi.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:50:19Z",
+      "side": 1,
+      "message": "Let\u0027s rename to `BuildCbw` and `BuildCsw` respectively. Here are Gemini instructions:\n\n----\n\nIn systems programming, adding a direct link to the hardware or protocol specification right next to the struct definitions is the gold standard for documentation. It prevents tribal knowledge and gives future maintainers an immediate lifeline if they need to debug protocol errors.\n\nThe canonical document for this is the **USB Mass Storage Class Bulk-Only Transport (BOT) Specification** hosted officially by USB.org.\n\nHere is how you can implement the strict acronyms and the documentation links across the codebase.\n\n### **1. Update the Header \u0026 Add the Spec Link**\n\n**Location:** `util/focaltech/ft_scsi.h`\n\nAdd the canonical URL directly above the struct definitions, and rename the structs to the strict CamelCase acronyms `BulkCbw` and `BulkCsw`.\n\n```cpp\n// ----------------------------------------------------------------------------\n// USB Mass Storage Class - Bulk-Only Transport (BOT)\n// Reference: https://www.usb.org/sites/default/files/usbmassbulk_10.pdf\n// ----------------------------------------------------------------------------\n\n// Command Block Wrapper (CBW)\nstruct BulkCbw {\n  uint32_t signature;\n  uint32_t tag;\n  uint32_t data_transfer_length;\n  CbwDirection flags;\n  uint8_t lun;\n  uint8_t cmd_len;\n  CmdFormat cmd;\n} __attribute__((packed));\n\nstatic_assert(sizeof(BulkCbw) \u003d\u003d 31, \"USB CBW must be exactly 31 bytes\");\n\n// Command Status Wrapper (CSW)\nstruct BulkCsw {\n  uint32_t signature;\n  uint32_t tag;\n  uint32_t data_residue;\n  CswStatus status;\n} __attribute__((packed));\n\nstatic_assert(sizeof(BulkCsw) \u003d\u003d 13, \"USB CSW must be exactly 13 bytes\");\n\n```\n\n---\n\n### **2. Propagate the Renames in `ft_scsi.cc**`\n\n**Location:** `util/focaltech/ft_scsi.cc`\n\nUpdate the function signatures and the local struct initializations to use the new names.\n\n**In `SendCbw`:**\n\n```cpp\n// Change signature return type\nstd::expected\u003cBulkCbw, Error\u003e SendCbw(...) {\n  \n  // Change local instantiation (keeping our const-correctness!)\n  const BulkCbw cbw{\n      .signature \u003d ToLittleEndian(kUsbMsCbwSignature),\n      // ...\n  };\n  \n  // ...\n  if (*send_res !\u003d sizeof(cbw)) {\n      FT_LOGE(\"CBW transfer failed: short write.\");\n  // ...\n\n```\n\n**In `ReceiveAndValidateCsw`:**\n\n```cpp\n// Change parameter type\nstd::expected\u003cvoid, Error\u003e ReceiveAndValidateCsw(\n    const UsbDevice\u0026 device, const BulkCbw\u0026 cbw,\n    std::chrono::milliseconds timeout_ms) {\n    \n  // Change local instantiation\n  BulkCsw csw{};\n  // ...\n\n```\n\n---\n\n### **3. Propagate the Renames in `test_utils.h**`\n\n**Location:** `util/focaltech/test_utils.h`\n\nUpdate your `sizeof` constants and the `BuildValidCsw` helper function.\n\n```cpp\n// Update the size constants\ninline constexpr size_t kUsbCbwSize \u003d sizeof(BulkCbw);\ninline constexpr size_t kUsbCswSize \u003d sizeof(BulkCsw);\n\n// Update the helper function initialization\ninline void BuildValidCsw(std::span\u003cuint8_t\u003e data, uint32_t tag,\n                          CswStatus status \u003d CswStatus::kCommandPassed) {\n  const BulkCsw csw{\n      .signature \u003d ToLittleEndian(kUsbMsCswSignature),\n      .tag \u003d ToLittleEndian(tag),\n      .data_residue \u003d 0,\n      .status \u003d status,\n  };\n  std::ranges::copy(AsUint8Span(csw), data.begin());\n}\n\n```\n\n---\n\n### **4. Propagate the Renames in the Test Files**\n\nBecause the test mocks use `offsetof` and instantiate these structs to simulate failures, you will need to apply a quick find-and-replace in these specific files:\n\n**In `cli_test.cc` (Inside `FakeUsbTransport::Send`):**\n\n```cpp\n// Old: offsetof(BulkCbWrap, tag)\n// New: offsetof(BulkCbw, tag)\nstd::memcpy(\u0026current_cbw_tag_, \u0026data[offsetof(BulkCbw, tag)], sizeof(current_cbw_tag_));\n\n```\n\n**In `ft_scsi_test.cc` (Inside `SendBulkDataOut_CswSignatureMismatch` and `ReceiveBulkDataIn_FailsOnNonZeroCswStatus`):**\n\n```cpp\n// Old: BulkCsWrap csw{...}\n// New: BulkCsw csw{...}\n\n```\n\n**In `updater_test.cc` (Inside `StubUsbTransport::Send`):**\n\n```cpp\n// Old: offsetof(BulkCbWrap, tag)\n// New: offsetof(BulkCbw, tag)\nstd::memcpy(\u0026current_tag_, \u0026data[offsetof(BulkCbw, tag)], sizeof(current_tag_));\n\n// Old: BulkCbWrap cbw;\n// New: BulkCbw cbw;\n\n```",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 26
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ef77af88_44dbed1d",
         "filename": "util/focaltech/ft_scsi_test.cc",
         "patchSetId": 25
