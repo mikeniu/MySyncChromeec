@@ -73,6 +73,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e5ca8071_4a478589",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:08:12Z",
+      "side": 1,
+      "message": "Now that we\u0027re using designated initializers, this is redundant and we can just use designated initializers directly everywhere.\n\n----\n\n\n**Location:** `util/focaltech/ft_scsi.cc` and `updater.cc`\n\n**The Issue:** The commit message mentions standardizing command creation using the new `BuildFtCmd` helper. However, the author seems to have discovered C++20 designated initializers halfway through writing the patch. As a result, `updater.cc` uses beautiful designated initializers almost everywhere, but `GetBootVersion` and the test files still use `BuildFtCmd`.\n\n**Why it matters:** `BuildFtCmd` requires passing up to six positional arguments, which often includes \"magic zeros\" (e.g., `BuildFtCmd(Opcode::kReadInfo, Subcmd::kReadData, 0, 0, 0, 0)`). Designated initializers (`CmdFormat{ .opcode \u003d ... }`) are self-documenting and strictly superior for readability.\n\n**Remediation:** 1\\. Delete the `BuildFtCmd` function entirely from `ft_scsi.h` and `ft_scsi.cc`. 2\\. Update the remaining calls to use designated initializers. For example, in `GetBootVersion`:\n\n```c\n// Old:\nconst auto cmd \u003d BuildFtCmd(Opcode::kReadInfo, Subcmd::kReadData, 0, 0, 0, 0);\n\n// New:\nconst CmdFormat cmd{\n    .opcode \u003d Opcode::kReadInfo,\n    .subcmd \u003d Subcmd::kReadData,\n}; // Omitted fields are automatically zero-initialized\n\n```",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 93,
+        "endChar": 1
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "58df2e29_6c12bd4a",
         "filename": "util/focaltech/libusb_transport.h",
         "patchSetId": 25
