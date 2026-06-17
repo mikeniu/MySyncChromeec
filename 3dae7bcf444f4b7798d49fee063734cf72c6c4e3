@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58df2e29_6c12bd4a",
+        "filename": "util/focaltech/libusb_transport.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T19:02:08Z",
+      "side": 1,
+      "message": "Is this used anywhere? If not, let\u0027s remove it.",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 46
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "563ceec4_04b41351",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T19:02:08Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n---\n\n### **1. Refactor `HasValidConfigPage` to `GetCodeStartAddress**`\n\n**Rationale:**\n\n1. **Google Style on Output Parameters:** The style guide strictly prefers return values over output parameters. Output parameters force the caller to instantiate variables in a dummy state before the function call, which breaks the flow of data and makes the code harder to reason about.\n2. **Boolean Naming Conventions:** Functions prefixed with `Is`, `Has`, `Can`, or `Should` universally signal a boolean return type. Returning a `std::expected` containing a non-boolean payload (like an address) from a `Has...` function violates the principle of least surprise.\n\n**Changes Needed:**\n\n* **File:** `util/focaltech/updater.cc`\n* **Update the function definition** (inside the anonymous namespace) to return the address directly:\n\n```cpp\nstd::expected\u003cuint32_t, Error\u003e GetCodeStartAddress(std::span\u003cconst uint8_t\u003e fw_data) {\n  if (fw_data.size() \u003c sizeof(ConfigPage)) {\n    FT_LOGE(\"Firmware data too small for config page.\");\n    return std::unexpected(Error::kResultFail);\n  }\n\n  ConfigPage config{};\n  std::memcpy(\u0026config, fw_data.data(), sizeof(config));\n\n  if (config.code_valid_control_word !\u003d kCodeValidMagic) {\n    FT_LOGE(\n        \"Invalid magic number in config page (expected 0x{:08x}, got 0x{:08x})\",\n        kCodeValidMagic, config.code_valid_control_word);\n    return std::unexpected(Error::kFormatError);\n  }\n\n  FT_LOGD(\"Config page found: start\u003d0x{:x}\", config.code_start_address);\n  return config.code_start_address;\n}\n\n```\n\n* **Update the caller** in `UpdateFw`:\n\n```cpp\n  // Delete: uint32_t code_start_addr \u003d 0;\n  // Replace the config_res block with:\n\n  auto start_addr_res \u003d GetCodeStartAddress(fw_data);\n  if (!start_addr_res) {\n    return std::unexpected(start_addr_res.error());\n  }\n  const uint32_t code_start_addr \u003d *start_addr_res;\n\n```",
+      "range": {
+        "startLine": 176,
+        "startChar": 0,
+        "endLine": 177,
+        "endChar": 74
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
