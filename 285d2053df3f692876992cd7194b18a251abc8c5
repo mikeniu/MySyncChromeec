@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9598275_888f64c5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T23:40:06Z",
+      "side": 1,
+      "message": "\u003e  We cannot run BoringSSL internal unit tests or benchmarks on the microcontroller anyway.\n\nWe\u0027re not running them right now, but we can run them and would like to run them since it\u0027s critical that security-related code works correctly: http://b/276363420.\n\nCan you just disable the benchmarks and not the unit tests?",
+      "parentUuid": "045ff5fe_c71b8439",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 39
+      },
+      "revId": "285d2053df3f692876992cd7194b18a251abc8c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "b4255f52_3da738d3",
