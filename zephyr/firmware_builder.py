@@ -21,18 +21,17 @@ import sys
 import tempfile
 
 from google.protobuf import json_format  # pylint: disable=import-error
+from zmake.repository_prep import CodebasePreparer
+from zmake.repository_prep import find_checkout
+from zmake.repository_prep import find_target_repos
+from zmake.repository_prep import get_dirty_files
+from zmake.repository_prep import set_checkout
 
 from chromite.api.gen_sdk.chromite.api import firmware_pb2
 from chromite.lib.chromeos_version import VersionInfo
 import scripts.firmware_builder_lib
 from scripts.firmware_builder_lib import copy_outputs_back
 from scripts.firmware_builder_lib import create_shadow_checkout
-from scripts.firmware_builder_lib import find_checkout
-from scripts.firmware_builder_lib import find_target_repos
-from scripts.firmware_builder_lib import get_dirty_files
-from scripts.firmware_builder_lib import prepare_codebase
-from scripts.firmware_builder_lib import restore_codebase
-from scripts.firmware_builder_lib import set_checkout
 
 
 # Add the zmake dir early in the python search path
@@ -874,22 +873,15 @@ def main(args):
         print("Must select a valid sub command!")
         return -1
 
-    applied_patches = []
-    copied_files = []
-
     real_checkout = find_checkout()
 
-    has_overrides = False
-    if hasattr(opts, "src_override_dir"):
-        d = pathlib.Path(opts.src_override_dir)
-        if d.exists() and any(d.iterdir()):
-            has_overrides = True
+    patches_dir = opts.patches_dir if hasattr(opts, "patches_dir") else None
+    src_override_dir = (
+        opts.src_override_dir if hasattr(opts, "src_override_dir") else None
+    )
 
-    has_patches = False
-    if hasattr(opts, "patches_dir"):
-        d = pathlib.Path(opts.patches_dir)
-        if d.exists() and any(d.iterdir()):
-            has_patches = True
+    has_overrides = _has_files(src_override_dir)
+    has_patches = _has_files(patches_dir)
 
     if not opts.bcs_version:
         opts.bcs_version = get_version()
@@ -898,7 +890,9 @@ def main(args):
 
     if use_shadow:
         print("Using shadow workspace for build...")
-        target_repos = find_target_repos(real_checkout, opts)
+        target_repos = find_target_repos(
+            real_checkout, src_override_dir, patches_dir
+        )
         user_dirty_files = set()
         for repo in target_repos:
             user_dirty_files.update(get_dirty_files(repo, real_checkout))
@@ -927,11 +921,14 @@ def main(args):
 
                 ZEPHYR_DIR = shadow_checkout / ec_rel_path / "zephyr"
 
-                prepare_codebase(
-                    opts, applied_patches, copied_files, user_dirty_files
-                )
-
-                ret = opts.func(opts)
+                with CodebasePreparer(
+                    shadow_checkout,
+                    patches_dir,
+                    src_override_dir,
+                    user_dirty_files,
+                ):
+                    os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
+                    ret = opts.func(opts)
 
                 if ret == 0 or ret is None:
                     # fmt: off
@@ -945,11 +942,9 @@ def main(args):
                 set_checkout(prev_checkout)
                 ZEPHYR_DIR = original_zephyr_dir
     else:
-        try:
-            prepare_codebase(opts, applied_patches, copied_files)
+        with CodebasePreparer(real_checkout, patches_dir, src_override_dir):
+            os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
             return opts.func(opts)
-        finally:
-            restore_codebase(applied_patches, copied_files)
 
 
 if __name__ == "__main__":
