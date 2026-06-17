@@ -39,43 +39,36 @@ def find_checkout():
     raise FileNotFoundError("Unable to locate the root of the checkout")
 
 
-def get_default_patches_dir(checkout_root):
-    """Get the default patches directory."""
-    return (
-        pathlib.Path(checkout_root)
-        / "src"
-        / "platform"
-        / "ec-private"
-        / "patches"
-    )
+def get_default_patches_dirs(checkout_root):
+    """Get the default list of patches directories."""
+    checkout_root = pathlib.Path(checkout_root)
+    return [
+        checkout_root / "src" / "platform" / "ec-private" / "patches",
+    ]
 
 
-def get_default_src_override_dir(checkout_root):
-    """Get the default source override directory."""
-    return (
-        pathlib.Path(checkout_root)
-        / "src"
-        / "platform"
-        / "ec-private"
-        / "src-override"
-    )
+def get_default_src_override_dirs(checkout_root):
+    """Get the default list of source override directories."""
+    checkout_root = pathlib.Path(checkout_root)
+    return [
+        checkout_root / "src" / "platform" / "ec-private" / "src-override",
+    ]
 
 
 def find_git_repo(path):
     """Find the git repository root for a given path."""
-    path = pathlib.Path(path).resolve()
-    for parent in [path] + list(path.parents):
-        if (parent / ".git").is_dir():
+    path = pathlib.Path(path).absolute()
+    if (path / ".git").exists():
+        return path
+    for parent in path.parents:
+        if (parent / ".git").exists():
             return parent
     return None
 
 
 def get_dirty_files(repo_dir, checkout_root):
-    """Get list of dirty files in a repo relative to checkout root."""
-    repo_dir = pathlib.Path(repo_dir).resolve()
+    """Get list of dirty/untracked files in a repo, relative to checkout."""
     checkout_root = pathlib.Path(checkout_root).resolve()
-
-    # Get status of files (modified, untracked, etc.)
     result = subprocess.run(
         ["git", "status", "--porcelain"],
         cwd=repo_dir,
@@ -83,40 +76,37 @@ def get_dirty_files(repo_dir, checkout_root):
         check=True,
         text=True,
     )
-
-    dirty_files = []
+    dirty_files = set()
     for line in result.stdout.splitlines():
-        if not line:
-            continue
-        # Format is "XY path"
-        parts = line.split(maxsplit=1)
-        if len(parts) == 2:
-            rel_path = parts[1]
-            abs_path = (repo_dir / rel_path).resolve()
+        if len(line) > 3:
+            path_str = line[3:]
+            if " -> " in path_str:
+                _, path_str = path_str.split(" -> ", 1)
+            abs_path = (repo_dir / path_str).resolve()
             try:
-                dirty_files.append(abs_path.relative_to(checkout_root))
+                rel_path = abs_path.relative_to(checkout_root)
+                dirty_files.add(rel_path)
             except ValueError:
-                # File is outside checkout root, shouldn't happen for target repos
                 pass
     return dirty_files
 
 
-def find_target_repos(checkout_root, src_override_dir, patches_dir):
+def find_target_repos(checkout_root, src_override_dirs, patches_dirs):
     """Find all git repositories that are targets of overrides or patches."""
     repos = set()
     checkout_root = pathlib.Path(checkout_root).resolve()
 
-    if src_override_dir:
-        src_override_dir = pathlib.Path(src_override_dir)
-        if src_override_dir.exists():
-            for src_file in _find_override_files(src_override_dir):
-                rel_path = src_file.relative_to(src_override_dir)
+    for override_dir in src_override_dirs:
+        override_dir = pathlib.Path(override_dir)
+        if override_dir.exists():
+            for src_file in _find_override_files(override_dir):
+                rel_path = src_file.relative_to(override_dir)
                 real_path = checkout_root / rel_path
                 repo = find_git_repo(real_path)
                 if repo:
                     repos.add(repo)
 
-    if patches_dir:
+    for patches_dir in patches_dirs:
         patches_dir = pathlib.Path(patches_dir)
         if patches_dir.exists():
             for patch_file in _find_patch_files(patches_dir):
@@ -127,6 +117,14 @@ def find_target_repos(checkout_root, src_override_dir, patches_dir):
                 if repo_git:
                     repos.add(repo_git)
     return repos
+
+
+def _find_patch_files(patches_dir):
+    """Yield all patch files recursively from patches_dir."""
+    for root, _, files in os.walk(patches_dir):
+        for file in files:
+            if file.endswith(".patch"):
+                yield pathlib.Path(root) / file
 
 
 def _find_override_files(src_override_dir):
@@ -142,16 +140,8 @@ def _find_override_files(src_override_dir):
             yield pathlib.Path(root) / file
 
 
-def _find_patch_files(patches_dir):
-    """Yield all patch files recursively from patches_dir."""
-    for root, _, files in os.walk(patches_dir):
-        for file in files:
-            if file.endswith(".patch"):
-                yield pathlib.Path(root) / file
-
-
 def get_patch_modified_files(patch_file, target_dir):
-    """Get list of files modified by a patch."""
+    """Get list of files modified by a patch file."""
     result = subprocess.run(
         ["git", "apply", "--numstat", str(patch_file)],
         cwd=target_dir,
@@ -159,36 +149,27 @@ def get_patch_modified_files(patch_file, target_dir):
         check=True,
         text=True,
     )
-    modified_files = []
+    files = []
     for line in result.stdout.splitlines():
-        if not line:
-            continue
         parts = line.split()
         if len(parts) >= 3:
-            # Format: added_lines deleted_lines filename
-            modified_files.append(parts[2])
-    return modified_files
+            files.append(pathlib.Path(parts[2]))
+    return files
 
 
 class CodebasePreparer:
-    """Context manager to prepare codebase for build and restore it after."""
+    """Manages the application and reversion of patches and overrides."""
 
     def __init__(
         self,
         checkout_root,
-        patches_dir,
-        src_override_dir,
+        patches_dirs,
+        src_override_dirs,
         user_dirty_files=None,
     ):
         self.checkout_root = pathlib.Path(checkout_root).resolve()
-        self.patches_dir = (
-            pathlib.Path(patches_dir).resolve() if patches_dir else None
-        )
-        self.src_override_dir = (
-            pathlib.Path(src_override_dir).resolve()
-            if src_override_dir
-            else None
-        )
+        self.patches_dirs = [pathlib.Path(d) for d in patches_dirs]
+        self.src_override_dirs = [pathlib.Path(d) for d in src_override_dirs]
         self.user_dirty_files = user_dirty_files
         self.applied_patches = []
         self.copied_files = []
@@ -200,241 +181,260 @@ class CodebasePreparer:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.restore()
 
-    def _check_file_dirty(self, abs_path, rel_path):
-        if self.user_dirty_files and rel_path in self.user_dirty_files:
-            logger.error(
-                "File %s has local changes. Aborting to prevent overwriting.",
-                abs_path,
-            )
-            sys.exit(1)
-
-    def prepare(self):
-        """Apply overrides and patches."""
-        if self.user_dirty_files is None:
-            self.user_dirty_files = set()
-            target_repos = find_target_repos(
-                self.checkout_root, self.src_override_dir, self.patches_dir
-            )
-            for repo in target_repos:
-                self.user_dirty_files.update(
-                    get_dirty_files(repo, self.checkout_root)
+    def _check_file_dirty(self, target_file, rel_path):
+        """Check if a file is dirty in user workspace."""
+        if self.user_dirty_files is not None:
+            if rel_path in self.user_dirty_files:
+                logger.error(
+                    "File %s has local changes or is untracked (from dirty list). "
+                    "Aborting to prevent data loss.",
+                    target_file,
                 )
-
-        self.apply_overrides()
-        self.apply_patches()
-
-    def restore(self):
-        """Restore codebase to original state."""
-        logger.info("Restoring codebase to clean state...")
-        self.revert_overrides()
-        self.revert_patches()
-
-    def apply_overrides(self):
-        """Copy source overrides to the checkout."""
-        if not self.src_override_dir:
-            return
-
-        if not self.src_override_dir.exists():
-            logger.debug(
-                "Source override directory %s does not exist. Skipping.",
-                self.src_override_dir,
-            )
-            return
-
-        logger.info("Copying source overrides from %s", self.src_override_dir)
-        copied_files_raw = list(_find_override_files(self.src_override_dir))
-
-        for src_file in copied_files_raw:
-            rel_path = src_file.relative_to(self.src_override_dir)
-            target_file = self.checkout_root / rel_path
-
-            existed_before = target_file.exists()
-            if existed_before:
-                self._check_file_dirty(target_file, rel_path)
-
-                was_tracked = (
+                sys.exit(1)
+        else:
+            # Check dirty locally using git diff
+            repo = find_git_repo(target_file)
+            if repo:
+                is_dirty = (
                     subprocess.run(
-                        [
-                            "git",
-                            "ls-files",
-                            "--error-unmatch",
-                            target_file.name,
-                        ],
+                        ["git", "diff", "--name-only", target_file.name],
                         cwd=target_file.parent,
                         capture_output=True,
                         check=False,
-                    ).returncode
-                    == 0
+                    ).stdout.strip()
+                    != b""
                 )
-
-                if not was_tracked:
+                if is_dirty:
                     logger.error(
-                        "File %s is untracked but exists. "
-                        "Aborting to prevent overwriting.",
+                        "File %s has local changes. Aborting to prevent data loss.",
                         target_file,
                     )
                     sys.exit(1)
 
-            # Create parent directories if they don't exist
-            target_file.parent.mkdir(parents=True, exist_ok=True)
+    def prepare(self):
+        """Apply overrides and then patches."""
+        self.copy_source_overrides()
+        self.apply_patches()
 
-            logger.info("Copying %s to %s", src_file, target_file)
-            try:
-                shutil.copy2(src_file, target_file)
-                self.copied_files.append((target_file, existed_before))
-            except (OSError, shutil.Error) as e:
-                logger.error(
-                    "Failed to copy %s to %s: %s", src_file, target_file, e
-                )
-                sys.exit(1)
+    def restore(self):
+        """Revert overrides and patches in reverse order."""
+        logger.info("Restoring codebase to clean state...")
+        self.revert_source_overrides()
+        self.revert_patches()
 
-    def revert_overrides(self):
-        """Revert applied source overrides."""
-        for target_file, existed_before in reversed(self.copied_files):
-            if existed_before:
-                # Restore from git
-                logger.info("Restoring %s from git", target_file)
-                subprocess.run(
-                    ["git", "checkout", "--quiet", target_file.name],
-                    cwd=target_file.parent,
-                    check=True,
-                )
-            else:
-                # Remove file and empty parent directories
-                logger.info("Removing %s", target_file)
-                try:
-                    target_file.unlink()
-                except FileNotFoundError:
-                    pass
-                # Clean up empty parent directories up to checkout root
-                parent = target_file.parent
-                while parent != self.checkout_root and parent.is_relative_to(
-                    self.checkout_root
-                ):
-                    try:
-                        parent.rmdir()
-                        logger.info("Removed empty directory %s", parent)
-                        parent = parent.parent
-                    except OSError:
-                        # Directory is not empty
-                        break
-
-    def apply_patches(self):
-        """Apply patches recursively from patches_dir to the checkout."""
-        if not self.patches_dir:
-            return
-
-        if not self.patches_dir.exists():
-            logger.debug(
-                "Patches directory %s does not exist. Skipping.",
-                self.patches_dir,
-            )
-            return
-
-        logger.info("Applying patches from %s", self.patches_dir)
-        patch_files = sorted(list(_find_patch_files(self.patches_dir)))
-
-        for patch_file in patch_files:
-            rel_path = patch_file.relative_to(self.patches_dir)
-            target_rel_dir = rel_path.parent
-            target_dir = self.checkout_root / target_rel_dir
-
-            if not target_dir.exists():
-                logger.warning(
-                    "Target directory %s for patch %s does not exist. Skipping.",
-                    target_dir,
-                    patch_file,
+    def copy_source_overrides(self):
+        """Copy source overrides to the checkout."""
+        for src_override_dir in self.src_override_dirs:
+            if not src_override_dir.exists():
+                logger.debug(
+                    "Source override directory %s does not exist. Skipping.",
+                    src_override_dir,
                 )
                 continue
 
-            try:
-                modified_files = get_patch_modified_files(
-                    patch_file, target_dir
-                )
-                for mod_file in modified_files:
-                    abs_mod_file = (target_dir / mod_file).resolve()
-                    rel_mod_file = abs_mod_file.relative_to(self.checkout_root)
-                    self._check_file_dirty(abs_mod_file, rel_mod_file)
-            except subprocess.CalledProcessError as e:
-                logger.error(
-                    "Failed to get modified files for patch %s: %s",
-                    patch_file,
-                    e,
-                )
-                sys.exit(1)
+            logger.info("Copying files from %s", src_override_dir)
+            copied_files_raw = list(_find_override_files(src_override_dir))
 
-            logger.info("Processing patch %s for %s", patch_file, target_dir)
-            try:
-                # Check if it can be applied
-                can_apply = subprocess.run(
-                    ["git", "apply", "--check", str(patch_file)],
-                    cwd=target_dir,
-                    capture_output=True,
-                    check=False,
-                )
-                if can_apply.returncode == 0:
-                    subprocess.run(
-                        ["git", "apply", str(patch_file)],
-                        cwd=target_dir,
-                        capture_output=True,
-                        check=True,
+            for src_file in copied_files_raw:
+                rel_path = src_file.relative_to(src_override_dir)
+                target_file = self.checkout_root / rel_path
+
+                existed_before = target_file.exists()
+                if existed_before:
+                    self._check_file_dirty(target_file, rel_path)
+
+                    was_tracked = (
+                        subprocess.run(
+                            [
+                                "git",
+                                "ls-files",
+                                "--error-unmatch",
+                                target_file.name,
+                            ],
+                            cwd=target_file.parent,
+                            capture_output=True,
+                            check=False,
+                        ).returncode
+                        == 0
                     )
-                    self.applied_patches.append((patch_file, target_dir))
-                else:
-                    # Check if already applied
-                    already_applied = subprocess.run(
-                        [
-                            "git",
-                            "apply",
-                            "--reverse",
-                            "--check",
-                            str(patch_file),
-                        ],
+
+                    if not was_tracked:
+                        logger.error(
+                            "File %s is untracked but exists. "
+                            "Aborting to prevent overwriting.",
+                            target_file,
+                        )
+                        sys.exit(1)
+
+                # Create parent directories if they don't exist
+                target_file.parent.mkdir(parents=True, exist_ok=True)
+
+                logger.info("Copying %s to %s", src_file, target_file)
+                try:
+                    shutil.copy2(src_file, target_file)
+                    self.copied_files.append((target_file, existed_before))
+                except (OSError, shutil.Error) as e:
+                    logger.error(
+                        "Failed to copy %s to %s: %s", src_file, target_file, e
+                    )
+                    sys.exit(1)
+
+    def apply_patches(self):
+        """Apply patches recursively from patches_dirs to the checkout."""
+        for patches_dir in self.patches_dirs:
+            if not patches_dir.exists():
+                logger.debug(
+                    "Patches directory %s does not exist. Skipping.",
+                    patches_dir,
+                )
+                continue
+
+            logger.info("Applying patches from %s", patches_dir)
+            patch_files = sorted(list(_find_patch_files(patches_dir)))
+
+            for patch_file in patch_files:
+                rel_path = patch_file.relative_to(patches_dir)
+                target_rel_dir = rel_path.parent
+                target_dir = self.checkout_root / target_rel_dir
+
+                if not target_dir.exists():
+                    logger.warning(
+                        "Target directory %s for patch %s does not exist. Skipping.",
+                        target_dir,
+                        patch_file,
+                    )
+                    continue
+
+                try:
+                    modified_files = get_patch_modified_files(
+                        patch_file, target_dir
+                    )
+                    for mod_file in modified_files:
+                        abs_mod_file = (target_dir / mod_file).resolve()
+                        rel_mod_file = abs_mod_file.relative_to(
+                            self.checkout_root
+                        )
+                        self._check_file_dirty(abs_mod_file, rel_mod_file)
+                except subprocess.CalledProcessError as e:
+                    logger.error(
+                        "Failed to get modified files for patch %s: %s",
+                        patch_file,
+                        e,
+                    )
+                    sys.exit(1)
+
+                logger.info(
+                    "Processing patch %s for %s", patch_file, target_dir
+                )
+                try:
+                    # Check if it can be applied
+                    can_apply = subprocess.run(
+                        ["git", "apply", "--check", str(patch_file)],
                         cwd=target_dir,
                         capture_output=True,
                         check=False,
                     )
-                    if already_applied.returncode == 0:
-                        logger.info(
-                            "Patch %s already applied. Skipping.", patch_file
+                    if can_apply.returncode == 0:
+                        subprocess.run(
+                            ["git", "apply", str(patch_file)],
+                            cwd=target_dir,
+                            check=True,
                         )
+                        logger.info("Applied patch %s", patch_file)
+                        self.applied_patches.append((patch_file, target_dir))
                     else:
-                        logger.error(
-                            "Patch %s cannot be applied:\n%s",
-                            patch_file,
-                            can_apply.stderr.decode("utf-8"),
+                        # Check if already applied
+                        already_applied = subprocess.run(
+                            [
+                                "git",
+                                "apply",
+                                "-R",
+                                "--check",
+                                str(patch_file),
+                            ],
+                            cwd=target_dir,
+                            capture_output=True,
+                            check=False,
                         )
-                        sys.exit(1)
-            except subprocess.CalledProcessError as e:
-                logger.error("Failed to apply patch %s: %s", patch_file, e)
-                sys.exit(1)
+                        if already_applied.returncode == 0:
+                            logger.info(
+                                "Patch %s already applied. Skipping.",
+                                patch_file,
+                            )
+                        else:
+                            logger.error(
+                                "Patch %s cannot be applied and "
+                                "does not seem to be already applied.",
+                                patch_file,
+                            )
+                            logger.error(
+                                "stdout: %s", can_apply.stdout.decode()
+                            )
+                            logger.error(
+                                "stderr: %s", can_apply.stderr.decode()
+                            )
+                            sys.exit(1)
+                except subprocess.CalledProcessError as e:
+                    logger.error("Failed to apply patch %s: %s", patch_file, e)
+                    sys.exit(1)
+
+    def revert_source_overrides(self):
+        """Restore or remove copied source overrides."""
+        for target_file, existed_before in reversed(self.copied_files):
+            if existed_before:
+                logger.info("Restoring tracked file %s", target_file)
+                try:
+                    subprocess.run(
+                        ["git", "restore", target_file.name],
+                        cwd=target_file.parent,
+                        check=True,
+                    )
+                except subprocess.CalledProcessError as e:
+                    logger.error("Failed to restore %s: %s", target_file, e)
+            else:
+                logger.info("Removing new file %s", target_file)
+                try:
+                    os.remove(target_file)
+                    # Clean empty parent directories
+                    parent = target_file.parent
+                    while parent != self.checkout_root:
+                        if not os.listdir(parent):
+                            os.rmdir(parent)
+                            parent = parent.parent
+                        else:
+                            break
+                except OSError as e:
+                    logger.error("Failed to remove %s: %s", target_file, e)
 
     def revert_patches(self):
-        """Revert applied patches."""
+        """Revert applied patches in reverse order."""
         for patch_file, target_dir in reversed(self.applied_patches):
-            logger.info("Reverting patch %s from %s", patch_file, target_dir)
-            subprocess.run(
-                ["git", "apply", "--reverse", str(patch_file)],
-                cwd=target_dir,
-                check=True,
-            )
+            logger.info("Reverting patch %s", patch_file)
+            try:
+                subprocess.run(
+                    ["git", "apply", "-R", str(patch_file)],
+                    cwd=target_dir,
+                    check=True,
+                )
+            except subprocess.CalledProcessError as e:
+                logger.error("Failed to revert patch %s: %s", patch_file, e)
 
 
+# Helper function to match the old API if needed, but updated for multiple paths
 def prepare_codebase(
-    opts, applied_patches, copied_files, user_dirty_files=None
+    checkout_root,
+    patches_dirs,
+    src_override_dirs,
+    applied_patches,
+    copied_files,
+    user_dirty_files=None,
 ):
-    """Legacy wrapper for prepare_codebase."""
-    checkout = find_checkout()
-    # We assume opts has src_override_dir and patches_dir (singular)
-    src_override_dir = (
-        opts.src_override_dir if hasattr(opts, "src_override_dir") else None
-    )
-    patches_dir = opts.patches_dir if hasattr(opts, "patches_dir") else None
-
+    """Apply patches and copy source overrides (legacy functional wrapper)."""
     preparer = CodebasePreparer(
-        checkout, patches_dir, src_override_dir, user_dirty_files
+        checkout_root, patches_dirs, src_override_dirs, user_dirty_files
     )
     preparer.prepare()
-    # Populate the legacy lists so restore_codebase works
+    # Mutate the passed lists to return the state (for legacy compatibility)
     applied_patches.extend(preparer.applied_patches)
     copied_files.extend(preparer.copied_files)
+    return preparer
