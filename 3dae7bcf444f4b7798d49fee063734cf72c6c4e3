@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2a53ac46_e0c0a617",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:10:22Z",
+      "side": 1,
+      "message": "**Location:** `util/focaltech/cli.cc` \\-\\\u003e `ParseCommand` and `ParseArguments`\n\n**The Issue:** The logic to detect if an argument is a firmware `.bin` file is duplicated across two functions. `ParseArguments` intercepts it, meaning the identical logic inside `ParseCommand` is dead code.\n\n**Remediation:** Remove the duplicated check from `ParseArguments` and trust `ParseCommand` to do its job.\n\n```c\n  // Delete this entire block from ParseArguments:\n  /*\n  if (first_arg.ends_with(\".bin\")) {\n    config.cmd \u003d Command::kUpdate;\n    config.ec_bin \u003d first_arg;\n    return config;\n  }\n  */\n\n  // Replace with this streamlined flow:\n  config.cmd \u003d ParseCommand(first_arg);\n  \n  if (config.cmd \u003d\u003d Command::kUnknown) {\n    FT_LOGE(\"Unknown subcommand: {}\", first_arg);\n    return std::unexpected(Error::kParameterError);\n  }\n\n  if (config.cmd \u003d\u003d Command::kUpdate) {\n    config.ec_bin \u003d first_arg;\n  }\n\n```",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 3
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f67ec2f1_992d0607",
         "filename": "util/focaltech/cli.cc",
         "patchSetId": 25
