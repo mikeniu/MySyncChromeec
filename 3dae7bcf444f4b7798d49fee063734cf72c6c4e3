@@ -213,6 +213,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9bc59894_2f86f98f",
+        "filename": "util/focaltech/ft_util.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T22:25:02Z",
+      "side": 1,
+      "message": "**Mixed Verb Tenses in Error Enums**\n\n* **Location:** `util/focaltech/ft_util.h` -\u003e `Error`\n* **Current:** `kResultFail`, `kVerifyFailed`\n* **Suggestion:** Pick a consistent tense. Since `kVerifyFailed` is past tense, `kResultFail` should probably be `kResultFailed` (or simply `kFailure`). Similarly, `kFormatError` and `kParameterError` are nouns. A more uniform enum list might be: `kSuccess`, `kDeviceNotFound`, `kFileNotFound`, `kInvalidParameter`, `kInvalidMode`, `kInvalidFormat`, `kVerificationFailed`, `kHardwareFailure`.",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 2
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b5c8a9d2_4e302f9f",
         "filename": "util/focaltech/libusb_transport.cc",
         "patchSetId": 25
