@@ -22,6 +22,30 @@
       },
       "revId": "6bdacfc9cff7f136d29026915e24f4196a4daa79",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d91cd8a_7c4942e5",
+        "filename": "util/egis/usb_interface.h",
+        "patchSetId": 41
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T23:15:34Z",
+      "side": 1,
+      "message": "Gemini feedback on how to make the change:\n\n----\n\nIf a base class and a derived class define different default arguments for the same virtual function, the default value injected at the call site depends *entirely* on the type of the pointer or reference being used to make the call, not the actual object type. This can lead to incredibly subtle and frustrating runtime bugs.\n\nTo keep the ergonomic convenience of a default timeout without violating the style guide (and avoiding potential compiler name-hiding warnings), the best practice is to use the **Non-Virtual Interface (NVI) pattern**.\n\nHere is how we can refactor your USB communication layer to implement it.\n\n### 1. `usb_interface.h` (The Base Class)\n\nMove the public `Send` and `Receive` to be non-virtual inline methods, and declare protected pure-virtual `DoSend` and `DoReceive`.\n\n```cpp\nclass UsbInterface {\n public:\n  static constexpr auto kDefaultTimeout \u003d std::chrono::milliseconds(1000);\n\n  virtual ~UsbInterface() \u003d default;\n\n  virtual std::expected\u003cvoid, UsbError\u003e Connect() \u003d 0;\n\n  // Non-virtual public API (Safe default arguments)\n  std::expected\u003cvoid, UsbError\u003e Send(\n      std::span\u003cconst uint8_t\u003e data,\n      std::chrono::milliseconds timeout \u003d kDefaultTimeout) {\n    return DoSend(data, timeout);\n  }\n\n  std::expected\u003cint, UsbError\u003e Receive(\n      std::span\u003cuint8_t\u003e data,\n      std::chrono::milliseconds timeout \u003d kDefaultTimeout) {\n    return DoReceive(data, timeout);\n  }\n\n protected:\n  // Pure virtual implementations (No default arguments)\n  virtual std::expected\u003cvoid, UsbError\u003e DoSend(\n      std::span\u003cconst uint8_t\u003e data,\n      std::chrono::milliseconds timeout) \u003d 0;\n\n  virtual std::expected\u003cint, UsbError\u003e DoReceive(\n      std::span\u003cuint8_t\u003e data,\n      std::chrono::milliseconds timeout) \u003d 0;\n};\n\n```\n\n### 2. `usb_comm.h` (The Production Implementation)\n\nReplace the `Send` and `Receive` overrides with `DoSend` and `DoReceive` in the protected scope.\n\n```cpp\nclass UsbComm : public UsbInterface {\n public:\n  UsbComm(libusb_context *ctx, const UsbDeviceProfile \u0026profile);\n  ~UsbComm() override;\n\n  UsbComm(const UsbComm \u0026) \u003d delete;\n  UsbComm \u0026operator\u003d(const UsbComm \u0026) \u003d delete;\n\n  std::expected\u003cvoid, UsbError\u003e Connect() override;\n\n protected:\n  std::expected\u003cvoid, UsbError\u003e DoSend(\n      std::span\u003cconst uint8_t\u003e data,\n      std::chrono::milliseconds timeout) override;\n      \n  std::expected\u003cint, UsbError\u003e DoReceive(\n      std::span\u003cuint8_t\u003e data,\n      std::chrono::milliseconds timeout) override;\n\n private:\n  // ... (keep DoTransfer and variables exactly as they are)\n};\n\n```\n\n### 3. `usb_comm.cc` (The Source File)\n\nSimply rename the function definitions. The internal logic remains completely unchanged.\n\n```cpp\nstd::expected\u003cvoid, UsbError\u003e UsbComm::DoSend(\n    std::span\u003cconst uint8_t\u003e data, std::chrono::milliseconds timeout) {\n  auto res \u003d DoTransfer(ep_out_, const_cast\u003cuint8_t *\u003e(data.data()),\n                        static_cast\u003cint\u003e(data.size()), timeout);\n  if (!res || *res !\u003d static_cast\u003cint\u003e(data.size())) {\n    return std::unexpected(res ? UsbError::kIoError : res.error());\n  }\n  return {};\n}\n\nstd::expected\u003cint, UsbError\u003e UsbComm::DoReceive(\n    std::span\u003cuint8_t\u003e data, std::chrono::milliseconds timeout) {\n  return DoTransfer(ep_in_, data.data(), static_cast\u003cint\u003e(data.size()),\n                    timeout);\n}\n\n```\n\n### 4. `fake_usb_comm.h` (The Test Mock)\n\nApply the exact same rename to your test double.\n\n```cpp\n protected: // Move under protected to match base class\n  std::expected\u003cvoid, UsbError\u003e DoSend(\n      std::span\u003cconst uint8_t\u003e data,\n      std::chrono::milliseconds timeout) override {\n    // ... keep your existing test logic ...\n  }\n\n  std::expected\u003cint, UsbError\u003e DoReceive(\n      std::span\u003cuint8_t\u003e data,\n      std::chrono::milliseconds timeout) override {\n    // ... keep your existing test logic ...\n  }\n\n```\n\n\n### Why this is the \"Gold Standard\"\n\n1. **Strictly Compliant:** Zero default arguments on virtual functions.\n2. **Caller Ergonomics:** The caller can still comfortably write `usb.Send(payload);` and let the default timeout automatically apply.\n3. **No Name Hiding:** If we had simply overloaded `Send` in the base class (one virtual, one non-virtual), the derived class overriding `Send` would hide the base class\u0027s non-virtual `Send`, forcing you to add `using UsbInterface::Send;` in the derived class. The NVI pattern neatly sidesteps this C++ quirk.",
+      "parentUuid": "1c995c9c_62457c38",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 63
+      },
+      "revId": "6bdacfc9cff7f136d29026915e24f4196a4daa79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
