@@ -119,6 +119,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3be96d98_eef75e07",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-17T19:18:29Z",
+      "side": 1,
+      "message": "**Location:** `util/focaltech/updater.cc` \\-\\\u003e `SetFlashProtection`\n\n**The Issue:** `FlashWpArea` is strictly defined as an `enum class FlashWpArea : uint32_t`. Calling `std::to_underlying` on it already yields a `uint32_t`. Wrapping that in `static_cast\u003cuint32_t\u003e(...)` adds visual noise with no functional benefit. Furthermore, applying the bitwise NOT operator (`~`) to a `uint32_t` results in an `unsigned int` (which is standardly a `uint32_t`), making the second cast redundant as well.\n\n**Remediation:** Remove the `static_cast` wrappers.\n\n```c\n  // Old:\n  .address \u003d static_cast\u003cuint32_t\u003e(std::to_underlying(wp_area)),\n  .length \u003d static_cast\u003cuint32_t\u003e(~std::to_underlying(wp_area)),\n\n  // New:\n  .address \u003d std::to_underlying(wp_area),\n  .length \u003d ~std::to_underlying(wp_area),\n\n```",
+      "range": {
+        "startLine": 341,
+        "startChar": 0,
+        "endLine": 350,
+        "endChar": 45
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1833646c_6c40012a",
         "filename": "util/focaltech/updater_test.cc",
         "patchSetId": 25
