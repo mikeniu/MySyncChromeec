@@ -373,6 +373,10 @@ __test_only bool charging_progress_displayed(void);
  */
 int board_should_charger_bypass(void);
 
+#ifdef CONFIG_BOARD_PREVENT_POWERON_CUSTOM
+bool board_prevent_power_on_custom(void);
+#endif /* CONFIG_BOARD_PREVENT_POWERON_CUSTOM */
+
 #ifdef __cplusplus
 }
 #endif
