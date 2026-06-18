@@ -51,6 +51,24 @@
       "parentUuid": "ec06c22a_4e95b343",
       "revId": "f6edf24291314b2a65104ef259df874c1d9941ec",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d20459e8_471c3d91",
+        "filename": "zephyr/program/rex/screebo/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 3879739
+      },
+      "writtenOn": "2026-06-18T11:25:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "92c475df_51d744e2",
+      "revId": "f6edf24291314b2a65104ef259df874c1d9941ec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
