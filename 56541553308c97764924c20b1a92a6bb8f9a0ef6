@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35f39cec_81c7d2af",
+        "filename": "zephyr/program/skywalker/jaina/project.overlay",
+        "patchSetId": 9
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-18T15:30:02Z",
+      "side": 1,
+      "message": "This change needs to be child of CL:7950198",
+      "revId": "56541553308c97764924c20b1a92a6bb8f9a0ef6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
