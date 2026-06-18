@@ -16,6 +16,24 @@
       "message": "Please make sure the EC change does not break panel power on/off sequence when suspend and resume",
       "revId": "f103ec704c6e60ab0b8d6b1b43d8ef24f56f3937",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6740d2cd_15f5e20e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-06-18T01:42:38Z",
+      "side": 1,
+      "message": "EE checked and verified this change does not break panel sequence.",
+      "parentUuid": "406ed086_ac5d91be",
+      "revId": "f103ec704c6e60ab0b8d6b1b43d8ef24f56f3937",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
