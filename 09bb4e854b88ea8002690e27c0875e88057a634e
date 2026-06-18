@@ -39,6 +39,29 @@
       },
       "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4504ae0f_9e4374fd",
+        "filename": "util/egis/file_util.cc",
+        "patchSetId": 42
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T19:02:39Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\nSince C++17, **Guaranteed Copy Elision** (PRVO) ensures that returning arrays or structs by value does not incur any copy overhead. The compiler constructs the returned object directly in the memory location designated by the caller.\n\nHere are the places you should refactor:\n\n### 1. `GenerateGcmIv` in `crypto_util.h/cc`\n\nCurrently, the caller has to instantiate an empty 12-byte array just to pass it in to be populated. Since the function always generates exactly 12 bytes, it should return the array.\n\n**Old Signature:**\n\n```cpp\nstd::expected\u003cvoid, CryptoError\u003e GenerateGcmIv(std::span\u003cuint8_t, kAesGcmIvSize\u003e iv_buf);\n\n```\n\n**New Refactored Version:**\n\n```cpp\n// crypto_util.h\nstd::expected\u003cstd::array\u003cuint8_t, kAesGcmIvSize\u003e, CryptoError\u003e GenerateGcmIv();\n\n// crypto_util.cc\nstd::expected\u003cstd::array\u003cuint8_t, kAesGcmIvSize\u003e, CryptoError\u003e GenerateGcmIv() {\n  std::array\u003cuint8_t, kAesGcmIvSize\u003e iv;\n  if (RAND_bytes(iv.data(), iv.size()) !\u003d 1) {\n    return std::unexpected(CryptoError::kRngFailed);\n  }\n  return iv;\n}\n\n```\n\n**Updated Call Site (`bootrom.cc`):**\n\n```cpp\n// Old:\n// std::array\u003cuint8_t, crypto::kAesGcmIvSize\u003e iv{};\n// if (auto res \u003d crypto::GenerateGcmIv(iv); !res) { ... }\n\n// New:\nauto iv_res \u003d crypto::GenerateGcmIv();\nif (!iv_res) {\n  return std::unexpected(BootromError::kGcmIvGenerationFailed);\n}\nreq_hdr.iv \u003d *iv_res;\n\n```\n\n---\n\n### 2. `LoadAesKey` in `file_util.h/cc`\n\nSimilarly, reading the 32-byte AES key from a file requires the caller to pre-allocate an array. Returning it directly inside the `std::expected` wrapper is much cleaner.\n\n*(Note: Because of copy elision, you don\u0027t need to worry about the key being copied across stack frames and leaving sensitive \"ghost\" data in memory.)*\n\n**Old Signature:**\n\n```cpp\nstd::expected\u003cvoid, std::errc\u003e LoadAesKey(std::string_view key_file_path, std::span\u003cuint8_t, 32\u003e key_buffer);\n\n```\n\n**New Refactored Version:**\n\n```cpp\n// file_util.h\nstd::expected\u003cstd::array\u003cuint8_t, 32\u003e, std::errc\u003e LoadAesKey(std::string_view key_file_path);\n\n// file_util.cc\nstd::expected\u003cstd::array\u003cuint8_t, 32\u003e, std::errc\u003e LoadAesKey(std::string_view key_file_path) {\n  auto key_res \u003d ReadBinaryFile(key_file_path);\n  if (!key_res) return std::unexpected(key_res.error());\n\n  auto \u0026key_opt \u003d *key_res;\n  if (key_opt.size() !\u003d 32) {\n    crypto::Cleanse(key_opt);\n    return std::unexpected(std::errc::invalid_argument);\n  }\n\n  std::array\u003cuint8_t, 32\u003e key_buffer;\n  std::ranges::copy(key_opt, key_buffer.begin());\n  crypto::Cleanse(key_opt);\n  return key_buffer;\n}\n\n```\n\n**Updated Call Site (`flasher_logic.cc`):**\n\n```cpp\n// Old:\n// std::array\u003cuint8_t, 32\u003e local_aes_key{};\n// if (auto key_res \u003d LoadAesKey(config.key_path, local_aes_key); !key_res) { ... }\n\n// New:\nauto key_res \u003d LoadAesKey(config.key_path);\nif (!key_res) {\n  // ... error handling\n}\nbootrom_comm.SetAesKey(*key_res);\ncrypto::Cleanse(*key_res); // Zero out the local copy\n\n```\n\n---\n\n### A Nuanced Case: What about `AesGcmEncrypt` / `Decrypt`?\n\nYou might look at `AesGcmEncrypt` and wonder if it should return a `std::vector` for the ciphertext and a `std::array` for the tag instead of using `std::span` out-parameters.\n\n**Verdict:** **Keep the out-parameters here.**\nWhile returning values is preferred, the Google Style Guide makes an explicit exception for out-parameters when dealing with dynamically sized buffers where allocation overhead is a concern.\n\nBy taking a `std::span\u003cuint8_t\u003e ciphertext`, your `AesGcmEncrypt` function leaves the memory allocation entirely up to the caller. This is a standard and highly secure C++ cryptography pattern. It allows the caller to:\n\n1. Pre-allocate the vector once and reuse it across multiple loop iterations.\n2. Back the span with mlock\u0027d memory or a specialized secure allocator if required in the future.",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 1
+      },
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
