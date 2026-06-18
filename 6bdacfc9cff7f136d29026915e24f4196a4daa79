@@ -173,6 +173,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "693ff047_9ffc2e07",
+        "filename": "util/egis/fake_usb_comm.h",
+        "patchSetId": 41
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T00:18:47Z",
+      "side": 1,
+      "message": "We can use `std::ranges::copy` to simplify here and other places.\n\nGemini response:\n\n----\n\nThe traditional `\u003calgorithm\u003e` approach of passing `begin()` and `end()` is prone to classic copy-paste errors (like accidentally mixing up the iterators of two different containers). The `\u003cranges\u003e` library eliminates this by allowing you to pass the container itself as a single conceptual entity.\n\nFor trivially copyable types (like `uint8_t`), the compiler will optimize both versions down to a highly efficient `memmove` or `memcpy` under the hood, so this is purely a win for safety and readability.\n\nHere are the places where you can make this upgrade across the patch:\n\n### 1. `fake_usb_comm.h` (Inside `Receive`)\n\n**Before:**\n\n```cpp\nstd::copy(response.begin(), response.end(), data.begin());\n\n```\n\n**After:**\n\n```cpp\nstd::ranges::copy(response, data.begin());\n\n```\n\n*(Note: Apply this to both instances of `std::copy` inside the `Receive` function).*\n\n### 2. `bootrom.h` (Inside `SetAesKey`)\n\n**Before:**\n\n```cpp\nvoid SetAesKey(std::span\u003cconst uint8_t, crypto::kAes256KeySize\u003e key) {\n  std::copy(key.begin(), key.end(), aes_key_.begin());\n}\n\n```\n\n**After:**\n\n```cpp\nvoid SetAesKey(std::span\u003cconst uint8_t, crypto::kAes256KeySize\u003e key) {\n  std::ranges::copy(key, aes_key_.begin());\n}\n\n```\n\n### 3. `file_util.cc` (Inside `LoadAesKey`)\n\n**Before:**\n\n```cpp\nstd::copy(key_opt.begin(), key_opt.end(), key_buffer.begin());\n\n```\n\n**After:**\n\n```cpp\nstd::ranges::copy(key_opt, key_buffer.begin());\n\n```\n\n### 4. `bootrom_test.cc` (Inside `GetFlashInfoSuccess`)\n\n**Before:**\n\n```cpp\nstd::string prod_name \u003d \"TestFlash\";\nstd::copy(prod_name.begin(), prod_name.end(), info.prod_name);\n\n```\n\n**After:**\n\n```cpp\nstd::string prod_name \u003d \"TestFlash\";\nstd::ranges::copy(prod_name, info.prod_name);\n\n```\n\n### Why does the destination still use `.begin()`?\n\nYou might wonder why we write `std::ranges::copy(response, data.begin());` instead of `std::ranges::copy(response, data);`.\n\nIn the C++ standard library, copy operations require an **output iterator**, not an output range. This is by design: it tells the compiler exactly *where* to start writing, allowing you to copy a 10-byte response into the start of a 50-byte buffer without the compiler complaining about size mismatches.\n\n*(Just ensure you have `#include \u003calgorithm\u003e` or `#include \u003cranges\u003e` wherever you make this switch!)*",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 64
+      },
+      "revId": "6bdacfc9cff7f136d29026915e24f4196a4daa79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1c995c9c_62457c38",
         "filename": "util/egis/usb_interface.h",
         "patchSetId": 41
