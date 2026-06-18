@@ -120,6 +120,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b99d9de_9a0a109f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T00:12:15Z",
+      "side": 1,
+      "message": "\u003e Seems the bare-metal toolchain does not include/support exception handling runtimes, so test fails.\n\nI think we only [disabled it for RISC-V](http://b/409825194), but some of those build failures are ARM (and your test was ARM).\n\n\u003e We can address FPMCU tests separately later if needed.\n\nPlease file a bug and add a TODO comment. I do need you to drive the fix though; I don\u0027t want to have to untangle all of this later when trying to build and run the unit tests.",
+      "parentUuid": "6c57f1d8_85a9bc5f",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 39
+      },
+      "revId": "285d2053df3f692876992cd7194b18a251abc8c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "b4255f52_3da738d3",
