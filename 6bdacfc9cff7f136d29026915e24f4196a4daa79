@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "67159fed_3b546455",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 41
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T00:04:40Z",
+      "side": 1,
+      "message": "### 1. Configuration Naming (`cli_options.h`)\n\nThe configuration struct and its members currently use generic terms and shorthand.\n\n* **`AppConfig`**: \"App\" is heavily overloaded. Since this struct exclusively controls the ET171 flashing tool, rename it to **`FlasherConfig`**.\n* **`fw_path` / `fw_size_override**`: While \"fw\" is common, configuration files and structs should be perfectly explicit to prevent any ambiguity. Rename these to **`firmware_path`** and **`firmware_size_override`**.\n* **`algo_type`**: \"Algo\" is a colloquial abbreviation. Rename it to **`crypto_algorithm`** (and update the CLI flag variable from `algo` to `algorithm` internally, even if the user still types `--algo`).\n\n### 2. Protocol Padding \u0026 Shorthand (`bootrom_protocol.h`)\n\nInside `FlashInfoResponse`, there are two fields that could be clearer:\n\n```cpp\nstruct FlashInfoResponse {\n  uint32_t flash_size;\n  uint32_t reserved;\n  char prod_name[8];\n  uint8_t remaining[24];\n  // ...\n\n```\n\n* **`prod_name`**: \"Prod\" can mean \"production\" or \"product.\" Rename it to **`product_name`**.\n* **`remaining`**: In hardware protocol structs, trailing bytes used to fill out a required packet size are standardly referred to as padding. Since you already have a `reserved` field, rename `remaining` to **`padding`** or **`reserved_padding`** to clearly indicate these bytes carry no semantic value.\n\n### 3. Interface Buffer Clarification (`usb_interface.h`)\n\nIn your `UsbInterface`, both `Send` and `Receive` take a parameter generically named `data`:\n\n```cpp\n  virtual std::expected\u003cvoid, UsbError\u003e DoSend(std::span\u003cconst uint8_t\u003e data, ...);\n  virtual std::expected\u003cint, UsbError\u003e DoReceive(std::span\u003cuint8_t\u003e data, ...);\n\n```\n\n* **The Issue:** For `DoSend`, `data` makes sense because you are passing a populated payload. But for `DoReceive`, `data` is an *output* buffer—it is empty mutable memory waiting to be populated.\n* **Recommendation:** Rename the parameter in `DoReceive` from `data` to **`rx_buffer`** or **`destination_buffer`**. This acts as inline documentation that the function expects a pre-allocated memory view to write into.\n\n### 4. Struct Member Unification (`bootrom_protocol.h`)\n\nIn `SecureCommandBaseHeader`, you have:\n\n```cpp\nstruct SecureCommandBaseHeader {\n  CommandId command_id \u003d CommandId::kSecureWrapped;\n  egis::EgisCryptoType algo;\n  uint32_t payload_len;\n\n```\n\n* **Recommendation:** Just like we did for the configuration struct, rename `algo` to **`algorithm`**.\n\n### 5. `take` in the Read Loops (`bootrom.cc`)\n\nEarlier, we discussed renaming the `take` variable in `WriteFlash` to `chunk_size`.\n\n* **Recommendation:** Ensure you also apply that exact same rename to the read loops in **`BackupFlash`** and **`ReadFlash`**. Keeping loop variables identical across symmetrical read/write operations drastically lowers the cognitive load for someone reading the file top-to-bottom.",
+      "parentUuid": "48dc1539_47c198e2",
+      "revId": "6bdacfc9cff7f136d29026915e24f4196a4daa79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a78ca557_85a49d7f",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 41
