@@ -16,6 +16,24 @@
       "message": "How about PM_DEVICE?",
       "revId": "63de24dfcd862c67883961c91b529d8bf938ae87",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c921a94_4cc43cb7",
+        "filename": "zephyr/program/fpmcu/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-06-18T06:15:47Z",
+      "side": 1,
+      "message": "PM_DEVICE is not enabled since drivers do not yet support\ndevice-level power management. We can enable it later once\nPM callbacks are implemented.\n\nWould you prefer we enable CONFIG_PM_DEVICE now for future\nreadiness, or keep it disabled until full support is added?",
+      "parentUuid": "d10ed253_4b54822e",
+      "revId": "63de24dfcd862c67883961c91b529d8bf938ae87",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
