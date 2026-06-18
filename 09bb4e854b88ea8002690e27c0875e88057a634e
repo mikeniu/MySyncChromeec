@@ -136,6 +136,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "19180c7a_dfbfeb99",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 42
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T21:47:20Z",
+      "side": 1,
+      "message": "### Adjectives as variable names (`done`)\n\n**Location:** `bootrom.cc` (`BackupFlash` and `ProgramRawCommandPayload`)\n\n**The Issue:**\n\n```cpp\nuint32_t done \u003d flash_addr - bootrom_protocol::kFlashBaseAddr;\nPrintProgress(\"Backup Progress\", done, total_size);\n\n```\n\n\"Done\" is an adjective, which makes it a great name for a boolean flag (`bool is_done \u003d false;`), but a terrible name for an integer counter.\n\n**The Fix:**\nRename it to `bytes_processed`, `bytes_read`, or `bytes_written` depending on the context.",
+      "range": {
+        "startLine": 392,
+        "startChar": 0,
+        "endLine": 393,
+        "endChar": 55
+      },
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "afaf81eb_43cbda1d",
         "filename": "util/egis/crypto_util.cc",
         "patchSetId": 42
@@ -152,6 +175,52 @@
         "startChar": 0,
         "endLine": 74,
         "endChar": 1
+      },
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49d34c9f_be08e435",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 42
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T21:47:20Z",
+      "side": 1,
+      "message": "### `status` vs `result` for Monads\n\n**Location:** `et171_flash.cc` (inside `main()`)\n\n**The Issue:**\n\n```cpp\nstd::expected\u003cvoid, egis::AppError\u003e status;\nif (config.mode \u003d\u003d egis::AppMode::kFlashFw) {\n  status \u003d egis::ExecuteFirmwareFlash(config, bootrom_comm);\n}\n\n```\n\n\"Status\" usually implies a primitive integer or an enum (like the `uint16_t status` inside your `SecureResponseHeader`). A `std::expected` is fundamentally a functional Result monad (representing either Success or an Error).\n\n**The Fix:**\nRename `status` to `result` or `flash_result` to align with standard C++23 functional nomenclature.",
+      "range": {
+        "startLine": 120,
+        "startChar": 2,
+        "endLine": 120,
+        "endChar": 45
+      },
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28a0f089_0c2da518",
+        "filename": "util/egis/file_util.cc",
+        "patchSetId": 42
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T21:47:20Z",
+      "side": 1,
+      "message": "### The `_opt` suffix on a Vector\n\n**Location:** `file_util.cc` (`LoadAesKey`)\n\n**The Issue:**\n\n```cpp\nauto key_res \u003d ReadBinaryFile(key_file_path);\n// ...\nauto \u0026key_opt \u003d *key_res;\n\n```\n\nBecause `key_res` is a `std::expected`, dereferencing it yields the inner `std::vector\u003cuint8_t\u003e`. Naming it `key_opt` is highly misleading because, in modern C++, the `_opt` suffix is universally understood to mean `std::optional`. A reader scanning this code will assume they need to check `if (key_opt.has_value())`, which isn\u0027t true here.\n\n**The Fix:**\nRename it to reflect its actual type: `key_data` or `raw_key_bytes`.",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 27
       },
       "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
