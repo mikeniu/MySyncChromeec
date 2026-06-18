@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "590c93a8_f0c5f248",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T22:20:35Z",
+      "side": 1,
+      "message": "### 1. `updater.cc` - `GetBootVersion` \u0026 `GetFlashProtection`\n\n**The Issue: The Generic `data` Buffer**\nIn both of these functions, the local `std::array` used to receive the USB payload is simply named `data`. While accurate, it forces the reader to constantly remember *what* kind of data is currently in the buffer, especially as the functions grow.\n\n**Current:**\n\n```cpp\nstd::array\u003cuint8_t, kMaxVersionBufferSize\u003e data{};\n// ...\nstd::array\u003cuint8_t, kFlashWpBufferSize\u003e data{};\n\n```\n\n**Improvement:** Name the buffer after its semantic purpose.\n\n```cpp\n// In GetBootVersion:\nstd::array\u003cuint8_t, kMaxVersionBufferSize\u003e version_buffer{};\n\n// In GetFlashProtection:\nstd::array\u003cuint8_t, kFlashWpBufferSize\u003e status_buffer{};\n\n```\n\n### 2. `ft_scsi.cc` - `SendCbw` \u0026 `SendBulkDataOut`\n\n**The Issue: The Ambiguous Abbreviation `dir**`\nThe `TransferDirection` parameter is named `dir`. While common, `dir` is overwhelmingly used in systems programming to mean \"directory\" (e.g., `mkdir`, `readdir`). While the type `TransferDirection` provides context, Google style prefers spelling out words completely unless the abbreviation is universally unambiguous.\n\n**Current:**\n\n```cpp\nstd::expected\u003cBulkCbw, Error\u003e SendCbw(..., TransferDirection dir, ...) {\n  // ...\n  .flags \u003d (dir \u003d\u003d TransferDirection::kIn) ? CbwDirection::kIn\n                                           : CbwDirection::kOut,\n\n```\n\n**Improvement:** Spell it out to remove all ambiguity.\n\n```cpp\nstd::expected\u003cBulkCbw, Error\u003e SendCbw(..., TransferDirection direction, ...) {\n\n```\n\n### 3. `libusb_transport.cc` - `WaitForReset`\n\n**The Issue: Terminology Shadowing (`config`)**\nInside the polling loop, an integer is declared as `int config \u003d 0;` to receive the output of `libusb_get_configuration`. In USB development, \"config\" almost always mentally maps to the heavily structured `libusb_config_descriptor`. Using it for a simple integer value representing the active configuration index is a slight mental stumble.\n\n**Current:**\n\n```cpp\n  while (true) {\n    int config \u003d 0;\n    const int r \u003d libusb_get_configuration(handle_.get(), \u0026config);\n    // ...\n\n```\n\n**Improvement:** Be explicit that this is just the active value/index.\n\n```cpp\n  while (true) {\n    int active_config_value \u003d 0;\n    const int status \u003d libusb_get_configuration(handle_.get(), \u0026active_config_value);\n    // ...\n\n```\n\n### 4. `ft_util.cc` - `ReadFileToVector`\n\n**The Issue: Lack of Units (`size`)**\nThe result of `file.tellg()` is stored in an `auto` variable named `size`. When dealing with memory allocation and file I/O, it is a best practice to encode the unit or the specific nature of the size directly into the variable name to prevent accidental mismatches (e.g., confusing byte counts with block counts).\n\n**Current:**\n\n```cpp\n  const auto size \u003d file.tellg();\n  if (size \u003c\u003d 0) { ... }\n  std::vector\u003cuint8_t\u003e buffer(size);\n\n```\n\n**Improvement:**\n\n```cpp\n  const auto file_size_bytes \u003d file.tellg();\n  if (file_size_bytes \u003c\u003d 0) { ... }\n  std::vector\u003cuint8_t\u003e buffer(static_cast\u003csize_t\u003e(file_size_bytes));\n\n```\n\n### 5. `libusb_transport.cc` - `ParseAltSetting`\n\n**The Issue: Truncated Naming (`alt`)**\nThe function takes a reference to `libusb_interface_descriptor` named `alt`. This is a truncation of \"alternate setting\".\n\n**Current:**\n\n```cpp\nstd::optional\u003cEndpointInfo\u003e ParseAltSetting(\n    const libusb_interface_descriptor\u0026 alt) {\n  EndpointInfo info{.interface_num \u003d alt.bInterfaceNumber};\n  for (const auto\u0026 ep : std::span(alt.endpoint, alt.bNumEndpoints)) { ... }\n\n```\n\n**Improvement:**\n\n```cpp\nstd::optional\u003cEndpointInfo\u003e ParseAltSetting(\n    const libusb_interface_descriptor\u0026 alt_setting) {\n  EndpointInfo info{.interface_num \u003d alt_setting.bInterfaceNumber};\n  for (const auto\u0026 ep : std::span(alt_setting.endpoint, alt_setting.bNumEndpoints)) { ... }\n\n```",
+      "parentUuid": "1720a292_c2778916",
+      "revId": "4559c7a866afc0a254616a40d1ee6896f4c2ff43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ba583f89_c89c8c0b",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 26
