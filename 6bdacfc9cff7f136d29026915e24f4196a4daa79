@@ -54,6 +54,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "72658467_05f77413",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 41
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-18T06:25:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "67159fed_3b546455",
+      "revId": "6bdacfc9cff7f136d29026915e24f4196a4daa79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a78ca557_85a49d7f",
@@ -91,6 +109,30 @@
       "side": 1,
       "message": "Here\u0027s a Gemini generated refactor to address this:\n\n----\n\n### 1. The Protocol Layer (`bootrom_protocol.h`)\n\nThis is the core of the refactor. We are shifting the responsibility of understanding the wire format (endianness and packet sizing) out of the application logic and directly into the structs that define the protocol.\n\n**The Changes:**\n\n* Include `\"egis_util.h\"` at the top of the file.\n* Add `FromLittleEndian()` to all incoming response and header structs.\n* Add a universal `RawResponseHeader` to handle the baseline USB response.\n* Add `constexpr` helper functions to map crypto algorithms to their exact byte sizes.\n\n```cpp\n#include \"crypto_util.h\"\n#include \"egis_util.h\"\n\n// 1. Encapsulate Endianness inside the Response Structs\nstruct BootromInfoResponse {\n  uint32_t version;\n  uint32_t max_cmd_size;\n  uint32_t max_fw_upgrade_size;\n\n  void FromLittleEndian() {\n    version \u003d egis::FromLittleEndian(version);\n    max_cmd_size \u003d egis::FromLittleEndian(max_cmd_size);\n    max_fw_upgrade_size \u003d egis::FromLittleEndian(max_fw_upgrade_size);\n  }\n} __attribute__((packed));\nstatic_assert(sizeof(BootromInfoResponse) \u003d\u003d 12, \"Must be exactly 12 bytes\");\n\nstruct FlashInfoResponse {\n  uint32_t flash_size;\n  uint32_t reserved;\n  char prod_name[8];\n  uint8_t remaining[24];\n\n  void FromLittleEndian() {\n    flash_size \u003d egis::FromLittleEndian(flash_size);\n    reserved \u003d egis::FromLittleEndian(reserved);\n  }\n} __attribute__((packed));\nstatic_assert(sizeof(FlashInfoResponse) \u003d\u003d 40, \"Must be exactly 40 bytes\");\n\n// 2. Define the Universal Baseline Response\nstruct RawResponseHeader {\n  uint16_t status;\n\n  void FromLittleEndian() {\n    status \u003d egis::FromLittleEndian(status);\n  }\n} __attribute__((packed));\nstatic_assert(sizeof(RawResponseHeader) \u003d\u003d 2, \"Must be exactly 2 bytes\");\n\n// 3. Encapsulate Secure Headers\nstruct SecureCommandBaseHeader {\n  CommandId command_id \u003d CommandId::kSecureWrapped;\n  egis::EgisCryptoType algo;\n  uint32_t payload_len;\n\n  void FromLittleEndian() {\n    payload_len \u003d egis::FromLittleEndian(payload_len);\n  }\n} __attribute__((packed));\nstatic_assert(sizeof(SecureCommandBaseHeader) \u003d\u003d 6, \"Must be exactly 6 bytes\");\n\nstruct SecureResponseHeader {\n  uint16_t status;\n  uint32_t payload_len;\n\n  void FromLittleEndian() {\n    status \u003d egis::FromLittleEndian(status);\n    payload_len \u003d egis::FromLittleEndian(payload_len);\n  }\n} __attribute__((packed));\nstatic_assert(sizeof(SecureResponseHeader) \u003d\u003d 6, \"Must be exactly 6 bytes\");\n\n// 4. Centralize Sizing Logic\nconstexpr std::expected\u003csize_t, std::errc\u003e GetSecureHeaderSize(EgisCryptoType algo) {\n  switch (algo) {\n    case EgisCryptoType::kSha256:\n      return sizeof(SecureCommandShaHeader);\n    case EgisCryptoType::kAesGcm:\n      return sizeof(SecureCommandAesHeader);\n    default:\n      return std::unexpected(std::errc::invalid_argument);\n  }\n}\n\nconstexpr std::expected\u003csize_t, std::errc\u003e GetSecureResponseEnvelopeSize(\n    EgisCryptoType algo) {\n  switch (algo) {\n    case EgisCryptoType::kSha256:\n      return sizeof(SecureResponseHeader); \n    case EgisCryptoType::kAesGcm:\n      return sizeof(SecureResponseHeader) + crypto::kAesGcmIvSize + \n             crypto::kAesGcmTagSize;\n    default:\n      return std::unexpected(std::errc::invalid_argument);\n  }\n}\n\n```\n\n**The Rationale:**\n\n* **Domain-Driven Design:** The protocol definitions act as the single source of truth for all byte-level layouts.\n* **Safety via Explicitness:** The name `FromLittleEndian()` leaves no ambiguity about the wire format or what the function does to the struct\u0027s internal state.\n* **Future-Proofing:** If HMAC support is added, the developer only updates the `switch` statements here. The application logic automatically inherits the new sizes.\n\n---\n\n### 2. The Communication Layer (`bootrom.cc`)\n\nWith the protocol layer enriched, the communication layer drops all manual byte-math and static size constants, transitioning to a pure orchestration role.\n\n**The Changes:**\n\n* Delete `kScHeaderSizeSha` and `kScHeaderSizeAes` from `bootrom.h`.\n* Remove the `min_expected_rx_size` parameter from `SendPrewrappedPacket` and `ExtractSecureData`.\n* Replace manual endian-swapping with `.FromLittleEndian()`.\n\n```cpp\n// 1. Simplified Packet Transmission\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e\nBootromComm::SendPrewrappedPacket(std::span\u003cconst uint8_t\u003e tx_cmd,\n                                  std::chrono::milliseconds timeout) {\n  DumpRawCmd(tx_cmd);\n\n  if (auto res \u003d usb_.Send(tx_cmd, timeout); !res)\n    return std::unexpected(BootromError::kUsbWriteFailed);\n\n  std::vector\u003cuint8_t\u003e ret(kMaxPayloadSize, 0);\n  auto read_res \u003d usb_.Receive(ret, timeout);\n  if (!read_res || *read_res \u003c\u003d 0)\n    return std::unexpected(BootromError::kUsbReadFailed);\n\n  ret.resize(*read_res);\n\n  // Unpack the universal baseline header\n  auto hdr_res \u003d ReadStruct\u003cbootrom_protocol::RawResponseHeader\u003e(ret);\n  if (!hdr_res) return std::unexpected(BootromError::kResponseTruncated);\n\n  hdr_res-\u003eFromLittleEndian();\n\n  if (hdr_res-\u003estatus !\u003d 0) return std::unexpected(BootromError::kInvalidStatusHeader);\n\n  return ret;\n}\n\n// 2. Abstracted Secure Data Extraction\nstd::expected\u003cstd::span\u003cconst uint8_t\u003e, BootromError\u003e\nBootromComm::ExtractSecureData(std::span\u003cconst uint8_t\u003e raw_response) {\n  auto rsp_hdr_res \u003d\n      ReadStruct\u003cbootrom_protocol::SecureResponseHeader\u003e(raw_response);\n  if (!rsp_hdr_res) return std::unexpected(BootromError::kResponseTruncated);\n\n  rsp_hdr_res-\u003eFromLittleEndian(); \n\n  // Dynamically fetch the correct size from the protocol layer\n  auto env_size_res \u003d bootrom_protocol::GetSecureResponseEnvelopeSize(wrapped_algo_);\n  if (!env_size_res) return std::unexpected(BootromError::kUnsupportedCrypto);\n  \n  const size_t min_resp_size \u003d *env_size_res;\n\n  if (raw_response.size() \u003c min_resp_size) {\n    return std::unexpected(BootromError::kResponseTruncated);\n  }\n\n  uint32_t rsp_wrapped_len \u003d rsp_hdr_res-\u003epayload_len;\n\n  if (rsp_wrapped_len \u003e raw_response.size() - min_resp_size) {\n    rsp_wrapped_len \u003d raw_response.size() - min_resp_size;\n  }\n\n  size_t extra_data_size \u003d\n      min_resp_size - sizeof(bootrom_protocol::SecureResponseHeader);\n\n  return raw_response.subspan(sizeof(bootrom_protocol::SecureResponseHeader),\n                              extra_data_size + rsp_wrapped_len);\n}\n\n```\n\n**The Rationale:**\n\n* **DRY (Don\u0027t Repeat Yourself):** Caller functions (like `SendBootromCommandAes`) no longer need to calculate and pass size variables down the stack.\n* **High Cohesion:** `BootromComm` only concerns itself with reading USB bytes and applying cryptographic transformations based on its internal state (`wrapped_algo_`), delegating protocol structure questions to the domain model.\n\n---\n\n### 3. The Flasher Logic (`flasher_logic.cc`)\n\nThe offline raw-command flasher is highly susceptible to parser errors. By leveraging the new struct methods, the parser drops its manual `if/else` byte-math chains.\n\n**The Changes:**\n\n* Use `.FromLittleEndian()` to safely read the embedded payload length.\n* Use `GetSecureHeaderSize()` to determine the packet boundary dynamically.\n\n```cpp\nstd::expected\u003csize_t, ParseError\u003e GetNextPacketSize(\n    std::span\u003cconst uint8_t\u003e fw) {\n  constexpr size_t kResetCmdSize \u003d sizeof(bootrom_protocol::SystemResetCommand);\n  if (fw.size() \u003c kResetCmdSize)\n    return std::unexpected(ParseError::kDataTooSmall);\n\n  if (fw[0] \u003d\u003d std::to_underlying(bootrom_protocol::CommandId::kSystemReset))\n    return kResetCmdSize;\n  else if (fw[0] !\u003d\n           std::to_underlying(bootrom_protocol::CommandId::kSecureWrapped))\n    return std::unexpected(ParseError::kInvalidHeader);\n\n  auto base_hdr_res \u003d ReadStruct\u003cbootrom_protocol::SecureCommandBaseHeader\u003e(fw);\n  if (!base_hdr_res) return std::unexpected(ParseError::kTruncatedHeader);\n\n  base_hdr_res-\u003eFromLittleEndian(); \n\n  constexpr size_t kMaxWrappedSize \u003d\n      BootromComm::kMaxFlashWriteSize +\n      sizeof(bootrom_protocol::BlockWriteCommand);\n      \n  if (base_hdr_res-\u003epayload_len \u003e kMaxWrappedSize)\n    return std::unexpected(ParseError::kInvalidPayloadSize);\n\n  // Fetch the correct header size cleanly\n  auto header_size_res \u003d bootrom_protocol::GetSecureHeaderSize(base_hdr_res-\u003ealgo);\n  if (!header_size_res) return std::unexpected(ParseError::kUnsupportedCrypto);\n\n  return *header_size_res + base_hdr_res-\u003epayload_len;\n}\n\n```\n\n**The Rationale:**\n\n* **Reduced Complexity:** The parser logic is strictly focused on stream validation (checking bounds, validating command IDs) rather than recalculating header geometries.\n* **Reliability:** The risk of forgetting an endian-swap inside a complex `if/else` block is entirely eliminated.",
       "parentUuid": "a78ca557_85a49d7f",
+      "range": {
+        "startLine": 548,
+        "startChar": 0,
+        "endLine": 551,
+        "endChar": 56
+      },
+      "revId": "6bdacfc9cff7f136d29026915e24f4196a4daa79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f222af9_0f8a3f17",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 41
+      },
+      "lineNbr": 551,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-18T06:25:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "26774216_3a67b588",
       "range": {
         "startLine": 548,
         "startChar": 0,
@@ -148,6 +190,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e33dcec_a94f4961",
+        "filename": "util/egis/bootrom_test.cc",
+        "patchSetId": 41
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-18T06:25:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "48cf5dfd_42db6b3c",
+      "range": {
+        "startLine": 182,
+        "startChar": 33,
+        "endLine": 182,
+        "endChar": 62
+      },
+      "revId": "6bdacfc9cff7f136d29026915e24f4196a4daa79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1d2e6655_bd9ff041",
@@ -171,6 +237,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "34a5e7fe_78d100ac",
+        "filename": "util/egis/cli_options.cc",
+        "patchSetId": 41
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-18T06:25:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1d2e6655_bd9ff041",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 13
+      },
+      "revId": "6bdacfc9cff7f136d29026915e24f4196a4daa79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "693ff047_9ffc2e07",
@@ -184,6 +274,30 @@
       "writtenOn": "2026-06-18T00:18:47Z",
       "side": 1,
       "message": "We can use `std::ranges::copy` to simplify here and other places.\n\nGemini response:\n\n----\n\nThe traditional `\u003calgorithm\u003e` approach of passing `begin()` and `end()` is prone to classic copy-paste errors (like accidentally mixing up the iterators of two different containers). The `\u003cranges\u003e` library eliminates this by allowing you to pass the container itself as a single conceptual entity.\n\nFor trivially copyable types (like `uint8_t`), the compiler will optimize both versions down to a highly efficient `memmove` or `memcpy` under the hood, so this is purely a win for safety and readability.\n\nHere are the places where you can make this upgrade across the patch:\n\n### 1. `fake_usb_comm.h` (Inside `Receive`)\n\n**Before:**\n\n```cpp\nstd::copy(response.begin(), response.end(), data.begin());\n\n```\n\n**After:**\n\n```cpp\nstd::ranges::copy(response, data.begin());\n\n```\n\n*(Note: Apply this to both instances of `std::copy` inside the `Receive` function).*\n\n### 2. `bootrom.h` (Inside `SetAesKey`)\n\n**Before:**\n\n```cpp\nvoid SetAesKey(std::span\u003cconst uint8_t, crypto::kAes256KeySize\u003e key) {\n  std::copy(key.begin(), key.end(), aes_key_.begin());\n}\n\n```\n\n**After:**\n\n```cpp\nvoid SetAesKey(std::span\u003cconst uint8_t, crypto::kAes256KeySize\u003e key) {\n  std::ranges::copy(key, aes_key_.begin());\n}\n\n```\n\n### 3. `file_util.cc` (Inside `LoadAesKey`)\n\n**Before:**\n\n```cpp\nstd::copy(key_opt.begin(), key_opt.end(), key_buffer.begin());\n\n```\n\n**After:**\n\n```cpp\nstd::ranges::copy(key_opt, key_buffer.begin());\n\n```\n\n### 4. `bootrom_test.cc` (Inside `GetFlashInfoSuccess`)\n\n**Before:**\n\n```cpp\nstd::string prod_name \u003d \"TestFlash\";\nstd::copy(prod_name.begin(), prod_name.end(), info.prod_name);\n\n```\n\n**After:**\n\n```cpp\nstd::string prod_name \u003d \"TestFlash\";\nstd::ranges::copy(prod_name, info.prod_name);\n\n```\n\n### Why does the destination still use `.begin()`?\n\nYou might wonder why we write `std::ranges::copy(response, data.begin());` instead of `std::ranges::copy(response, data);`.\n\nIn the C++ standard library, copy operations require an **output iterator**, not an output range. This is by design: it tells the compiler exactly *where* to start writing, allowing you to copy a 10-byte response into the start of a 50-byte buffer without the compiler complaining about size mismatches.\n\n*(Just ensure you have `#include \u003calgorithm\u003e` or `#include \u003cranges\u003e` wherever you make this switch!)*",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 64
+      },
+      "revId": "6bdacfc9cff7f136d29026915e24f4196a4daa79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad652c77_695f8ed3",
+        "filename": "util/egis/fake_usb_comm.h",
+        "patchSetId": 41
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-18T06:25:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "693ff047_9ffc2e07",
       "range": {
         "startLine": 48,
         "startChar": 0,
@@ -231,6 +345,30 @@
       "side": 1,
       "message": "Gemini feedback on how to make the change:\n\n----\n\nIf a base class and a derived class define different default arguments for the same virtual function, the default value injected at the call site depends *entirely* on the type of the pointer or reference being used to make the call, not the actual object type. This can lead to incredibly subtle and frustrating runtime bugs.\n\nTo keep the ergonomic convenience of a default timeout without violating the style guide (and avoiding potential compiler name-hiding warnings), the best practice is to use the **Non-Virtual Interface (NVI) pattern**.\n\nHere is how we can refactor your USB communication layer to implement it.\n\n### 1. `usb_interface.h` (The Base Class)\n\nMove the public `Send` and `Receive` to be non-virtual inline methods, and declare protected pure-virtual `DoSend` and `DoReceive`.\n\n```cpp\nclass UsbInterface {\n public:\n  static constexpr auto kDefaultTimeout \u003d std::chrono::milliseconds(1000);\n\n  virtual ~UsbInterface() \u003d default;\n\n  virtual std::expected\u003cvoid, UsbError\u003e Connect() \u003d 0;\n\n  // Non-virtual public API (Safe default arguments)\n  std::expected\u003cvoid, UsbError\u003e Send(\n      std::span\u003cconst uint8_t\u003e data,\n      std::chrono::milliseconds timeout \u003d kDefaultTimeout) {\n    return DoSend(data, timeout);\n  }\n\n  std::expected\u003cint, UsbError\u003e Receive(\n      std::span\u003cuint8_t\u003e data,\n      std::chrono::milliseconds timeout \u003d kDefaultTimeout) {\n    return DoReceive(data, timeout);\n  }\n\n protected:\n  // Pure virtual implementations (No default arguments)\n  virtual std::expected\u003cvoid, UsbError\u003e DoSend(\n      std::span\u003cconst uint8_t\u003e data,\n      std::chrono::milliseconds timeout) \u003d 0;\n\n  virtual std::expected\u003cint, UsbError\u003e DoReceive(\n      std::span\u003cuint8_t\u003e data,\n      std::chrono::milliseconds timeout) \u003d 0;\n};\n\n```\n\n### 2. `usb_comm.h` (The Production Implementation)\n\nReplace the `Send` and `Receive` overrides with `DoSend` and `DoReceive` in the protected scope.\n\n```cpp\nclass UsbComm : public UsbInterface {\n public:\n  UsbComm(libusb_context *ctx, const UsbDeviceProfile \u0026profile);\n  ~UsbComm() override;\n\n  UsbComm(const UsbComm \u0026) \u003d delete;\n  UsbComm \u0026operator\u003d(const UsbComm \u0026) \u003d delete;\n\n  std::expected\u003cvoid, UsbError\u003e Connect() override;\n\n protected:\n  std::expected\u003cvoid, UsbError\u003e DoSend(\n      std::span\u003cconst uint8_t\u003e data,\n      std::chrono::milliseconds timeout) override;\n      \n  std::expected\u003cint, UsbError\u003e DoReceive(\n      std::span\u003cuint8_t\u003e data,\n      std::chrono::milliseconds timeout) override;\n\n private:\n  // ... (keep DoTransfer and variables exactly as they are)\n};\n\n```\n\n### 3. `usb_comm.cc` (The Source File)\n\nSimply rename the function definitions. The internal logic remains completely unchanged.\n\n```cpp\nstd::expected\u003cvoid, UsbError\u003e UsbComm::DoSend(\n    std::span\u003cconst uint8_t\u003e data, std::chrono::milliseconds timeout) {\n  auto res \u003d DoTransfer(ep_out_, const_cast\u003cuint8_t *\u003e(data.data()),\n                        static_cast\u003cint\u003e(data.size()), timeout);\n  if (!res || *res !\u003d static_cast\u003cint\u003e(data.size())) {\n    return std::unexpected(res ? UsbError::kIoError : res.error());\n  }\n  return {};\n}\n\nstd::expected\u003cint, UsbError\u003e UsbComm::DoReceive(\n    std::span\u003cuint8_t\u003e data, std::chrono::milliseconds timeout) {\n  return DoTransfer(ep_in_, data.data(), static_cast\u003cint\u003e(data.size()),\n                    timeout);\n}\n\n```\n\n### 4. `fake_usb_comm.h` (The Test Mock)\n\nApply the exact same rename to your test double.\n\n```cpp\n protected: // Move under protected to match base class\n  std::expected\u003cvoid, UsbError\u003e DoSend(\n      std::span\u003cconst uint8_t\u003e data,\n      std::chrono::milliseconds timeout) override {\n    // ... keep your existing test logic ...\n  }\n\n  std::expected\u003cint, UsbError\u003e DoReceive(\n      std::span\u003cuint8_t\u003e data,\n      std::chrono::milliseconds timeout) override {\n    // ... keep your existing test logic ...\n  }\n\n```\n\n\n### Why this is the \"Gold Standard\"\n\n1. **Strictly Compliant:** Zero default arguments on virtual functions.\n2. **Caller Ergonomics:** The caller can still comfortably write `usb.Send(payload);` and let the default timeout automatically apply.\n3. **No Name Hiding:** If we had simply overloaded `Send` in the base class (one virtual, one non-virtual), the derived class overriding `Send` would hide the base class\u0027s non-virtual `Send`, forcing you to add `using UsbInterface::Send;` in the derived class. The NVI pattern neatly sidesteps this C++ quirk.",
       "parentUuid": "1c995c9c_62457c38",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 63
+      },
+      "revId": "6bdacfc9cff7f136d29026915e24f4196a4daa79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed8fe741_67e2127e",
+        "filename": "util/egis/usb_interface.h",
+        "patchSetId": 41
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-18T06:25:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2d91cd8a_7c4942e5",
       "range": {
         "startLine": 66,
         "startChar": 0,
