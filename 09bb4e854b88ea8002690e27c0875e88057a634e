@@ -90,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "481a534a_03a77e66",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T21:49:59Z",
+      "side": 1,
+      "message": "### 1. The Typo Trap: `boot_comm` vs. `bootrom_comm`\n\n**Location:** `et171_flash.cc` (inside `main()`)\n\n```cpp\negis::UsbComm boot_comm(usb_ctx.get(), boot_profile);\n// ...\negis::BootromComm bootrom_comm(boot_comm);\n\n```\n\n**The Issue:** These two variables represent completely different layers of the abstraction stack (the raw USB interface vs. the protocol execution engine), yet their names differ by only three letters (`rom`). They sit right next to each other, making autocomplete mistakes highly likely.\n**The Fix:** Give the USB layer a distinctly physical name to separate it from the logical bootrom layer:\n\n```cpp\negis::UsbComm usb_comm(usb_ctx.get(), boot_profile);\negis::BootromComm bootrom_comm(usb_comm);\n\n```\n\n### 2. Conflating the Register with its Value (Again)\n\n**Location:** `bootrom.cc` (inside `DisableWp()`)\n\n```cpp\nauto status_register_old \u003d ReadStatusRegister1();\n// ...\nauto status_register_new \u003d ReadStatusRegister1();\n\n```\n\n**The Issue:** Similar to the parameter in `WriteStatusRegister1` we discussed earlier, appending `_old` and `_new` to `status_register` implies you have two different registers. In reality, you have two different *snapshots of the value* belonging to the same register.\n**The Fix:** Rename them to reflect that they are data payloads, not hardware entities:\n\n```cpp\nauto status_val_old \u003d ReadStatusRegister1();\nauto status_val_new \u003d ReadStatusRegister1();\n\n```\n\n### 3. Vocabulary Inconsistency: `size` vs. `length`\n\n**Location:** `bootrom.h` / `bootrom.cc`\n\nIf you look at the signatures of your major flash operations, you use three different terms to describe byte counts:\n\n* `ReadFlash(uint32_t offset, uint32_t length)`\n* `EraseFlash(uint32_t offset, uint32_t size)`\n* `BackupFlash(std::string_view filename, uint32_t total_size)`\n\n**The Issue:** Switching between \"length\" and \"size\" for the exact same concept (a byte count) forces the reader to pause and wonder if there is a subtle semantic difference (e.g., does \"length\" mean sectors while \"size\" means bytes?).\n**The Fix:** The C++ Standard Template Library universally uses `.size()` for byte/element counts. Standardize on `size` across your entire public API:\n\n* `ReadFlash(uint32_t offset, uint32_t size)`\n* `EraseFlash(uint32_t offset, uint32_t size)`\n* `BackupFlash(std::string_view filename, uint32_t backup_size)`\n\n### 4. `crypto_type_` vs. `crypto_algorithm`\n\n**Location:** `bootrom.h` and `cli_options.h`\n\n**The Issue:** In the CLI configuration struct, you store the user\u0027s choice as `crypto_algorithm` (which perfectly maps to `SecureCommandBaseHeader::algorithm`). But when you pass it into the `BootromComm` class, you store it as `crypto_type_`. \"Type\" usually implies a broad category (like asymmetric vs. symmetric), whereas \"Algorithm\" correctly implies a specific cryptographic hash or cipher (SHA-256 vs. AES-GCM).\n**The Fix:** Keep the terminology consistent and precise. Rename `crypto_type_` to `crypto_algorithm_` inside the `BootromComm` class.",
+      "parentUuid": "0b26c327_a57ad4f1",
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a9db377a_1c1d94ee",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 42
