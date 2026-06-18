@@ -72,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0b26c327_a57ad4f1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T21:39:27Z",
+      "side": 1,
+      "message": "### 1. The generic `extra_size` in `SendPrewrappedPacket`\n\nIn `bootrom.cc`, when allocating the receive buffer:\n\n```cpp\nsize_t extra_size \u003d 0;\nif (auto env_size_res \u003d bootrom_protocol::GetSecureResponseEnvelopeSize(crypto_type_)) {\n  extra_size \u003d *env_size_res;\n}\nstd::vector\u003cuint8_t\u003e rx_buffer(kMaxPayloadSize + extra_size, 0);\n\n```\n\n**The Issue:** Just like we fixed the confusing math in `ExtractSecureData`, calling the crypto overhead `extra_size` is too generic.\n**The Fix:** Unify the terminology across the class. You are calculating the envelope overhead. Rename it to `envelope_size`:\n\n```cpp\nsize_t envelope_size \u003d 0;\nif (auto env_res \u003d bootrom_protocol::GetSecureResponseEnvelopeSize(crypto_type_)) {\n  envelope_size \u003d *env_res;\n}\nstd::vector\u003cuint8_t\u003e rx_buffer(kMaxPayloadSize + envelope_size, 0);\n\n```\n\n### 2. The generic `data` parameter in the `SendBootromCommand*` suite\n\nLook at the signatures for your internal send functions in `bootrom.h` and `bootrom.cc`:\n\n```cpp\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e SendBootromCommandSha(\n    std::span\u003cconst uint8_t\u003e data, std::chrono::milliseconds timeout);\n\n```\n\nInside `SendBootromCommand`, you do this:\n\n```cpp\nif ((data[0] \u003e\u003d std::to_underlying(bootrom_protocol::CommandId::kMemRead)) \u0026\u0026 ... )\n\n```\n\n**The Issue:** `data` is the most overused variable name in programming. In this specific context, the byte array being passed down isn\u0027t just raw data—it is a fully serialized hardware structure (like `MemReadCommand` or `BlockWriteCommand`) that is about to be cryptographically wrapped. Treating it as generic `data` makes the `data[0]` lookup look like a magic array access.\n**The Fix:** Rename the parameter to `inner_command` or `unwrapped_command`. This makes the array access instantly understandable (e.g., `unwrapped_command[0]` is clearly the Command ID byte).\n\n### 3. The `base_hdr_res` abbreviation in `flasher_logic.cc`\n\nInside the parser loop in `GetNextPacketSize()`:\n\n```cpp\nauto base_hdr_res \u003d ReadStruct\u003cbootrom_protocol::SecureCommandBaseHeader\u003e(remaining_data);\nif (!base_hdr_res) return std::unexpected(ParseError::kTruncatedHeader);\n\nbase_hdr_res-\u003eFromLittleEndian();\n\n```\n\n**The Issue:** The `_hdr_res` abbreviation is unnecessary and slightly clunky.\n**The Fix:** Just call it `base_header_res`. Or even better, since you immediately unpack it, extract it into a clean, immutable local variable:\n\n```cpp\nauto parsed_res \u003d ReadStruct\u003cbootrom_protocol::SecureCommandBaseHeader\u003e(remaining_data);\nif (!parsed_res) return std::unexpected(ParseError::kTruncatedHeader);\n\nauto base_header \u003d *parsed_res;\nbase_header.FromLittleEndian();\n// Now use base_header.payload_len cleanly below\n\n```\n\n### 4. `tctrl` variable naming in SPI operations\n\nIn `BootromComm::ReadStatusRegister1` and `WriteStatusRegister1`:\n\n```cpp\nuint32_t tctrl \u003d bootrom_protocol::kTrnsModeReadOnly | bootrom_protocol::kTctrlCmdEnMsk;\n\n```\n\n**The Issue:** `tctrl` is the exact name of the hardware register (`kSpiRegTctrl`). Naming a local variable exactly after the hardware component it targets often causes mental friction (is it an address? A struct? A value?).\n**The Fix:** Append `_val` or `_config` to denote that it is the *payload* bound for that register.\n\n```cpp\nuint32_t tctrl_config \u003d bootrom_protocol::kTrnsModeReadOnly | bootrom_protocol::kTctrlCmdEnMsk;\n\n```",
+      "parentUuid": "2952e1a3_369491d0",
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a9db377a_1c1d94ee",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 42
