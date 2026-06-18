@@ -52,6 +52,24 @@
       "parentUuid": "3a619fc8_60df9cba",
       "revId": "5e9ff86bd04c2354bff146848f76143786dd4d45",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14d89991_038002eb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-06-18T08:21:39Z",
+      "side": 1,
+      "message": "Yes, the commit \"fix(power): remove unused include file\" has to be upstreamed.",
+      "parentUuid": "591c25f9_ebbc9820",
+      "revId": "5e9ff86bd04c2354bff146848f76143786dd4d45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
