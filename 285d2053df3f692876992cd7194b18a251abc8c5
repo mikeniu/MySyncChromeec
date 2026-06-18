@@ -96,6 +96,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c57f1d8_85a9bc5f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1569497
+      },
+      "writtenOn": "2026-06-18T00:07:01Z",
+      "side": 1,
+      "message": "BoringSSL binds benchmarks to BUILD_TESTING unconditionally, so they cannot be disabled separately. Disabling  BUILD_TESTING  unblocks the GCC/glibc upgrade now without patching BoringSSL. We can address FPMCU tests separately later if needed.\n\nI compiled std_regex.cpp in the chroot using the FPMCU cross-compiler, armv7m-cros-eabi-clang++. It failed at the link stage with:\nld.lld: error: unable to find library -lgcc_eh\nSeems the bare-metal toolchain does not include/support exception handling runtimes, so test fails.",
+      "parentUuid": "7a4974f5_6b81f288",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 39
+      },
+      "revId": "285d2053df3f692876992cd7194b18a251abc8c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "b4255f52_3da738d3",
