@@ -16,6 +16,24 @@
       "message": "```\n[niedzica:ro] [248/534] Building C object modules/ec/zephyr/CMakeFiles/ec_shim.dir/shim/src/console.c.obj\n[francka:rw] [67/408] Building C object CMakeFiles/app.dir/mnt/host/source/src/platform/ec/build/zephyr/francka/modules/ec/common/espi.c.obj\n[minimal-npcx9:rw] [132/278] Building ASM object zephyr/arch/arch/arm/core/cortex_m/CMakeFiles/arch__arm__core__cortex_m.dir/swap_helper.S.obj\n[niedzica:rw]    31 | #include \"../../../drivers/usb/udc/udc_e967.h\"\n[niedzica:rw]       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n[niedzica:rw] 1 error generated.\n[niedzica:rw] [141/561] Building C object zephyr/CMakeFiles/zephyr.dir/kernel/sys/thread_entry.c.obj\n[winterhold:rw] [84/425] Building C object CMakeFiles/app.dir/mnt/host/source/src/platform/ec/build/zephyr/winterhold/modules/ec/power/host_sleep.c.obj\n[niedzica:rw] [142/561] Building C object zephyr/arch/common/CMakeFiles/arch__common.dir/sw_isr_common.c.obj\n[niedzica:rw] ninja: build stopped: subcommand failed.\nExecution failed (return code\u003d1): /usr/bin/ninja -C /mnt/host/source/src/platform/ec/build/zephyr/niedzica/build-rw all.libraries\nTraceback (most recent call last):\n  File \"/mnt/host/source/src/platform/ec/zephyr/zmake/zmake/multiproc.py\", line 383, in _run_fn\n    result \u003d func()\n             ^^^^^^\n  File \"/mnt/host/source/src/platform/ec/zephyr/zmake/zmake/zmake.py\", line 952, in _build_one_dir\n    raise OSError(get_process_failure_msg(proc))\nOSError: Execution failed (return code\u003d1): /usr/bin/ninja -C /mnt/host/source/src/platform/ec/build/zephyr/niedzica/build-rw all.libraries\n\n```",
       "revId": "5e9ff86bd04c2354bff146848f76143786dd4d45",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a619fc8_60df9cba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-06-18T08:13:31Z",
+      "side": 1,
+      "message": "I apologize for the build failure. I uploaded a new commit this morning to address the issue.",
+      "parentUuid": "4910762f_b2fa16b8",
+      "revId": "5e9ff86bd04c2354bff146848f76143786dd4d45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
