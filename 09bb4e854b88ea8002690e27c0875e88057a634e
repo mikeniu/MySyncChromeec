@@ -20,6 +20,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a9db377a_1c1d94ee",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 42
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T19:14:21Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n----\n\n\n## Issue Description\n\n**Location:** `util/egis/bootrom.cc` inside `BootromComm::ExtractSecureData()`\n\nWhen parsing a device response, the code reads the expected payload length from the hardware\u0027s secure header. However, if the actual data received over USB is smaller than what the header promised (e.g., due to a dropped packet or a short read), the current logic silently rewrites the expected length to match the truncated buffer.\n\n**Why this is dangerous:**\n\n1. **AES-GCM Mode (Ghost Crypto Failures):** The truncated ciphertext is passed to `AesGcmDecrypt`. Because bytes are missing, the MAC tag check will naturally fail. The tool will output a `kTagMismatch` (Authentication Failed) error, sending developers debugging their crypto keys instead of investigating the USB transfer.\n2. **SHA-256 Mode (Silent Corruption):** Because SHA-256 responses aren\u0027t actively authenticated on the RX side, the caller will simply receive the silently truncated array. If performing a `ReadFlash` or firmware backup, this results in a silently corrupted dump.\n\n## The Fix\n\nWe remove the silent clamping, replace it with an explicit truncation error, and apply the cleaner variable naming convention (`envelope_size`, `expected_payload_len`, `crypto_overhead_size`) to clarify the math.\n\n**Refactored `ExtractSecureData`:**\n\n```cpp\nstd::expected\u003cstd::span\u003cconst uint8_t\u003e, BootromError\u003e\nBootromComm::ExtractSecureData(std::span\u003cconst uint8_t\u003e raw_response) {\n  auto header_res \u003d ReadStruct\u003cbootrom_protocol::SecureResponseHeader\u003e(raw_response);\n  if (!header_res) return std::unexpected(BootromError::kResponseTruncated);\n\n  header_res-\u003eFromLittleEndian();\n  const uint32_t expected_payload_len \u003d header_res-\u003epayload_len;\n\n  auto envelope_size_res \u003d bootrom_protocol::GetSecureResponseEnvelopeSize(crypto_type_);\n  if (!envelope_size_res) return std::unexpected(BootromError::kUnsupportedCrypto);\n\n  const size_t envelope_size \u003d *envelope_size_res;\n\n  if (raw_response.size() \u003c envelope_size) {\n    return std::unexpected(BootromError::kResponseTruncated);\n  }\n\n  if (expected_payload_len \u003e raw_response.size() - envelope_size) {\n    std::println(stderr, \"[ERROR] Device promised {} payload bytes but only delivered {}.\", \n                 expected_payload_len, raw_response.size() - envelope_size);\n    return std::unexpected(BootromError::kResponseTruncated);\n  }\n\n  const size_t crypto_overhead_size \u003d \n      envelope_size - sizeof(bootrom_protocol::SecureResponseHeader);\n      \n  const size_t total_data_to_extract \u003d crypto_overhead_size + expected_payload_len;\n\n  return raw_response.subspan(sizeof(bootrom_protocol::SecureResponseHeader),\n                              total_data_to_extract);\n}\n\n```\n\n## The Test Case\n\nAdd this to `util/egis/bootrom_test.cc`. It relies on the existing `kTestPlaintext` constant to simulate a scenario where the header claims the payload is exactly 1 byte larger than the actual data packed into the mock USB response.\n\n```cpp\nTEST_F(BootromCommTest, SecureCommandResponsePayloadTruncated) {\n  bootrom_comm_.SetCryptoType(EgisCryptoType::kSha256);\n\n  bootrom_protocol::MemReadCommand read_cmd{\n      .address \u003d ToLittleEndian(bootrom_protocol::kFlashBaseAddr),\n      .access_size \u003d bootrom_protocol::AccessSize::kUint8,\n      .count \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(kTestPlaintext.size()))};\n\n  // The header claims the payload is strictly larger than what we will actually send\n  bootrom_protocol::SecureResponseHeader hdr{\n      .status \u003d 0,\n      .payload_len \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(kTestPlaintext.size() + 1))\n  };\n\n  // Pack the header with the original (shorter) kTestPlaintext\n  fake_usb_.PushDeviceResponse(PackMessage(hdr, kTestPlaintext));\n\n  auto res \u003d bootrom_comm_.SendStruct(read_cmd);\n\n  ASSERT_FALSE(res.has_value());\n  EXPECT_EQ(res.error(), BootromError::kResponseTruncated);\n}\n\n```",
+      "range": {
+        "startLine": 88,
+        "startChar": 0,
+        "endLine": 92,
+        "endChar": 3
+      },
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "afaf81eb_43cbda1d",
         "filename": "util/egis/crypto_util.cc",
         "patchSetId": 42
