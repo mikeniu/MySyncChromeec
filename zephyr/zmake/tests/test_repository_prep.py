@@ -11,7 +11,11 @@ import tempfile
 import pytest
 from zmake.repository_prep import _find_override_files
 from zmake.repository_prep import _find_patch_files
+from zmake.repository_prep import _has_files
 from zmake.repository_prep import CodebasePreparer
+from zmake.repository_prep import copy_outputs_back
+from zmake.repository_prep import create_shadow_checkout
+from zmake.repository_prep import main as prep_main
 
 
 def test_find_override_files():
@@ -207,3 +211,252 @@ def test_codebase_preparer_patches():
         assert (
             ec_path / "file_to_patch.c"
         ).read_text() == "original patch content\n"
+
+
+def test_codebase_preparer_commit():
+    """Test that commit=True commits changes and skips restore."""
+    with tempfile.TemporaryDirectory() as checkout_dir:
+        checkout_path = pathlib.Path(checkout_dir)
+        ec_path = checkout_path / "src" / "platform" / "ec"
+        ec_path.mkdir(parents=True)
+        setup_mock_git_repo(ec_path)
+
+        # Create overrides
+        override_root = checkout_path / "overrides"
+        override_ec = override_root / "src" / "platform" / "ec"
+        override_ec.mkdir(parents=True)
+        (override_ec / "file_to_override.c").write_text("overridden content\n")
+
+        # Prep preparer with commit=True
+        preparer = CodebasePreparer(
+            checkout_path,
+            patches_dirs=[],
+            src_override_dirs=[override_root],
+            commit=True,
+        )
+
+        # Apply
+        preparer.prepare()
+
+        assert (
+            ec_path / "file_to_override.c"
+        ).read_text() == "overridden content\n"
+
+        # Verify it was committed (git status should be clean)
+        status = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=ec_path,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        assert status.stdout.strip() == ""
+
+        # Verify commit message
+        log = subprocess.run(
+            ["git", "log", "-n", "1", "--format=%s"],
+            cwd=ec_path,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        assert log.stdout.strip() == "applied patches and overrides"
+
+        # Revert should be a no-op when commit=True
+        preparer.restore()
+
+        # Content should still be overridden because restore was skipped
+        assert (
+            ec_path / "file_to_override.c"
+        ).read_text() == "overridden content\n"
+
+
+def test_has_files_ignores_metadata():
+    """Test that _has_files ignores .gitkeep, .keep, README.md, OWNERS, etc."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = pathlib.Path(temp_dir)
+        assert not _has_files(temp_path)
+
+        (temp_path / ".gitkeep").touch()
+        (temp_path / ".keep").touch()
+        (temp_path / "README.md").touch()
+        (temp_path / "OWNERS").touch()
+        (temp_path / "DIR_METADATA").touch()
+        (temp_path / "LICENSE").touch()
+        assert not _has_files(temp_path)
+
+        (temp_path / "real_patch.patch").touch()
+        assert _has_files(temp_path)
+
+
+def test_codebase_preparer_override_then_patch_and_restore():
+    """Test overriding a file, patching that overridden file, and restoring both."""
+    with tempfile.TemporaryDirectory() as checkout_dir:
+        checkout_path = pathlib.Path(checkout_dir)
+        ec_path = checkout_path / "src" / "platform" / "ec"
+        ec_path.mkdir(parents=True)
+        setup_mock_git_repo(ec_path)
+
+        override_root = checkout_path / "overrides"
+        override_ec = override_root / "src" / "platform" / "ec"
+        override_ec.mkdir(parents=True)
+        (override_ec / "file_to_override.c").write_text("overridden line 1\n")
+
+        patch_dir = checkout_path / "patches"
+        patch_ec = patch_dir / "src" / "platform" / "ec"
+        patch_ec.mkdir(parents=True)
+        (patch_ec / "0001-patch-overridden.patch").write_text(
+            "--- a/file_to_override.c\n"
+            "+++ b/file_to_override.c\n"
+            "@@ -1 +1,2 @@\n"
+            " overridden line 1\n"
+            "+patched line 2\n"
+        )
+
+        preparer = CodebasePreparer(
+            checkout_path,
+            patches_dirs=[patch_dir],
+            src_override_dirs=[override_root],
+        )
+        preparer.prepare()
+        assert (ec_path / "file_to_override.c").read_text() == (
+            "overridden line 1\npatched line 2\n"
+        )
+
+        preparer.restore()
+        assert (
+            ec_path / "file_to_override.c"
+        ).read_text() == "original content\n"
+
+
+def test_codebase_preparer_path_mappings_and_cli():
+    """Test path_mappings in non-git ebuild layout and standalone CLI main()."""
+    with tempfile.TemporaryDirectory() as work_dir:
+        work_path = pathlib.Path(work_dir)
+        ec_mod = work_path / "zephyrproject" / "modules" / "ec"
+        ec_mod.mkdir(parents=True)
+        (ec_mod / "foo.c").write_text("base\n")
+
+        override_root = work_path / "overrides"
+        (override_root / "src" / "platform" / "ec").mkdir(parents=True)
+        (override_root / "src" / "platform" / "ec" / "foo.c").write_text(
+            "mapped override\n"
+        )
+
+        preparer = CodebasePreparer(
+            work_path,
+            patches_dirs=[],
+            src_override_dirs=[override_root],
+            path_mappings={"src/platform/ec": ec_mod},
+            allow_dirty=True,
+        )
+        preparer.prepare()
+        assert (ec_mod / "foo.c").read_text() == "mapped override\n"
+
+        # Test standalone CLI with explicit checkout and override dir
+        checkout_dir = work_path / "direct_checkout"
+        (checkout_dir / "src" / "platform" / "ec").mkdir(parents=True)
+        ret = prep_main(
+            [
+                "--checkout",
+                str(checkout_dir),
+                "--src-override-dir",
+                str(override_root),
+                "--allow-dirty",
+            ]
+        )
+        assert ret == 0
+        assert (
+            checkout_dir / "src" / "platform" / "ec" / "foo.c"
+        ).read_text() == "mapped override\n"
+
+
+def test_copy_outputs_back_merges_and_fixes_lcov_paths():
+    """Test that copy_outputs_back preserves prior build subdirs and fixes lcov paths."""
+    with tempfile.TemporaryDirectory() as work_dir:
+        work_path = pathlib.Path(work_dir)
+        real_co = work_path / "real"
+        shadow_co = work_path / "shadow"
+        ec_rel = pathlib.Path("src/platform/ec")
+
+        real_build = real_co / ec_rel / "build"
+        (real_build / "board_a").mkdir(parents=True)
+        (real_build / "board_a" / "ec.bin").write_text("bin_a\n")
+
+        shadow_build = shadow_co / ec_rel / "build"
+        (shadow_build / "board_b").mkdir(parents=True)
+        (shadow_build / "board_b" / "ec.bin").write_text("bin_b\n")
+        (shadow_build / "lcov.info").write_text(
+            f"SF:{shadow_co}/src/platform/ec/main.c\nend_of_record\n"
+        )
+
+        copy_outputs_back(shadow_co, real_co, ec_rel)
+
+        assert (real_build / "board_a" / "ec.bin").read_text() == "bin_a\n"
+        assert (real_build / "board_b" / "ec.bin").read_text() == "bin_b\n"
+        assert (real_build / "lcov.info").read_text() == (
+            f"SF:{real_co}/src/platform/ec/main.c\nend_of_record\n"
+        )
+
+
+def test_create_shadow_checkout_deduplicates_and_expands_fingerprint():
+    """Test create_shadow_checkout handles overlapping module and fingerprint paths."""
+    with tempfile.TemporaryDirectory() as work_dir:
+        work_path = pathlib.Path(work_dir)
+        real_co = work_path / "real"
+        shadow_co = work_path / "shadow"
+
+        ec_dir = real_co / "src" / "platform" / "ec"
+        ec_dir.mkdir(parents=True)
+        (ec_dir / "main.c").write_text("int main() {}\n")
+        (ec_dir / "twister-out-host.2").mkdir()
+        (ec_dir / "twister-out-host.2" / "log.txt").write_text("ignored\n")
+
+        boringssl = real_co / "src" / "third_party" / "boringssl"
+        boringssl.mkdir(parents=True)
+
+        egis_fp = real_co / "src" / "platform" / "fingerprint" / "egis"
+        egis_fp.mkdir(parents=True)
+        fpalg = real_co / "src" / "platform" / "fingerprint" / "google-fpalg"
+        fpalg.mkdir(parents=True)
+
+        zephyr_base = (
+            real_co / "src" / "third_party" / "zephyrproject" / "zephyr"
+        )
+        zephyr_base.mkdir(parents=True)
+
+        modules = {
+            "ec": ec_dir,
+            "boringssl": boringssl,
+            "egis_fp": egis_fp,
+        }
+
+        create_shadow_checkout(real_co, shadow_co, modules, zephyr_base, [], [])
+
+        shadow_ec = shadow_co / "src" / "platform" / "ec"
+        assert shadow_ec.is_dir() and not shadow_ec.is_symlink()
+        assert not (shadow_ec / "twister-out-host.2").exists()
+        short_hash = subprocess.run(
+            ["git", "rev-parse", "--short", "--verify", "HEAD"],
+            cwd=shadow_ec,
+            capture_output=True,
+            check=True,
+            text=True,
+        ).stdout.strip()
+        assert len(short_hash) >= 8
+        assert (shadow_co / "src" / "third_party" / "boringssl").is_symlink()
+        assert (
+            shadow_co / "src" / "platform" / "fingerprint" / "egis"
+        ).is_symlink()
+        assert (
+            shadow_co / "src" / "platform" / "fingerprint" / "google-fpalg"
+        ).is_symlink()
+
+        # Verify external zephyr_base outside real_checkout is skipped cleanly
+        ext_zephyr = work_path / "external_zephyr"
+        ext_zephyr.mkdir()
+        shadow_co_ext = work_path / "shadow_ext"
+        create_shadow_checkout(
+            real_co, shadow_co_ext, modules, ext_zephyr, [], []
+        )
+        assert (shadow_co_ext / "src" / "platform" / "ec").is_dir()

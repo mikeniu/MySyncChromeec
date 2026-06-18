@@ -43,15 +43,18 @@ def fixture_mock_locate_checkout():
 
 @pytest.fixture(name="clean_env")
 def fixture_clean_env(monkeypatch):
-    """Ensure ZMAKE_WORKSPACE_PREPARED is not set."""
+    """Ensure ZMAKE_WORKSPACE_PREPARED and MAKEFLAGS are not set."""
     monkeypatch.delenv("ZMAKE_WORKSPACE_PREPARED", raising=False)
+    monkeypatch.delenv("MAKEFLAGS", raising=False)
+    monkeypatch.setattr(main, "maybe_reexec", lambda argv: None)
+    monkeypatch.setattr(main, "find_toolchains", lambda: None)
 
 
 @pytest.mark.usefixtures(
     "mock_zmake_class", "mock_locate_checkout", "clean_env"
 )
 def test_main_build_triggers_prep(mock_preparer):
-    """Test that 'zmake build' triggers codebase preparation."""
+    """Test that 'zmake build' triggers codebase preparation in-place by default (no files)."""
     with mock.patch(
         "zmake.__main__.get_default_patches_dirs",
         return_value=[pathlib.Path("/fake/patches")],
@@ -65,6 +68,7 @@ def test_main_build_triggers_prep(mock_preparer):
         pathlib.Path("/fake/checkout"),
         [pathlib.Path("/fake/patches")],
         [pathlib.Path("/fake/overrides")],
+        commit=False,
     )
     # Verify context manager was used
     preparer_instance = mock_preparer.return_value
@@ -103,6 +107,7 @@ def test_main_custom_dirs(mock_preparer):
         pathlib.Path("/fake/checkout"),
         [pathlib.Path("/custom/patches1"), pathlib.Path("/custom/patches2")],
         [pathlib.Path("/custom/overrides")],
+        commit=False,
     )
 
 
@@ -136,4 +141,120 @@ def test_main_compare_builds_triggers_prep(mock_preparer):
         pathlib.Path("/fake/checkout"),
         [pathlib.Path("/fake/patches")],
         [pathlib.Path("/fake/overrides")],
+        commit=False,
+    )
+
+
+@pytest.mark.usefixtures(
+    "mock_zmake_class", "mock_locate_checkout", "clean_env"
+)
+@mock.patch("zmake.__main__._has_files", return_value=True)
+@mock.patch("zmake.__main__.create_shadow_checkout")
+@mock.patch("zmake.__main__.copy_outputs_back")
+def test_main_build_shadow_prep(
+    mock_copy, mock_create, _mock_has_files, mock_preparer
+):
+    """Test that shadow prep is used when overrides/patches exist."""
+    mock_ec_module = mock.Mock()
+    mock_ec_module.resolve.return_value = pathlib.Path(
+        "/fake/checkout/src/platform/ec"
+    )
+    modules_mock = {"ec": mock_ec_module}
+
+    with mock.patch(
+        "zmake.__main__.modules.locate_from_checkout",
+        return_value=modules_mock,
+    ), mock.patch(
+        "zmake.__main__.get_default_patches_dirs",
+        return_value=[pathlib.Path("/fake/patches")],
+    ), mock.patch(
+        "zmake.__main__.get_default_src_override_dirs",
+        return_value=[pathlib.Path("/fake/overrides")],
+    ):
+        main.main(["build", "project1"])
+
+    # Verify shadow checkout was created
+    mock_create.assert_called_once_with(
+        pathlib.Path("/fake/checkout"),
+        mock.ANY,
+        modules_mock,
+        pathlib.Path("/fake/checkout/src/third_party/zephyrproject/zephyr"),
+        [pathlib.Path("/fake/overrides")],
+        [pathlib.Path("/fake/patches")],
+    )
+    shadow_path = mock_create.call_args[0][1]
+    assert shadow_path.name == "shadow"
+    assert isinstance(shadow_path, pathlib.Path)
+
+    # Verify preparer was called with shadow path and commit=True
+    mock_preparer.assert_called_once_with(
+        shadow_path,
+        [pathlib.Path("/fake/patches")],
+        [pathlib.Path("/fake/overrides")],
+        commit=True,
+    )
+
+    # Verify outputs copied back
+    mock_copy.assert_called_once_with(
+        shadow_path,
+        pathlib.Path("/fake/checkout"),
+        pathlib.Path("src/platform/ec"),
+    )
+
+
+@pytest.mark.usefixtures(
+    "mock_zmake_class", "mock_locate_checkout", "clean_env"
+)
+@mock.patch("zmake.__main__._has_files", return_value=True)
+@mock.patch("zmake.__main__.create_shadow_checkout")
+@mock.patch("zmake.__main__.copy_outputs_back")
+def test_main_build_no_shadow_forced(
+    mock_copy, mock_create, _mock_has_files, mock_preparer
+):
+    """Test that --no-shadow forces in-place preparation even if files exist."""
+    with mock.patch(
+        "zmake.__main__.get_default_patches_dirs",
+        return_value=[pathlib.Path("/fake/patches")],
+    ), mock.patch(
+        "zmake.__main__.get_default_src_override_dirs",
+        return_value=[pathlib.Path("/fake/overrides")],
+    ):
+        main.main(["--no-shadow", "build", "project1"])
+
+    mock_create.assert_not_called()
+    mock_preparer.assert_called_once_with(
+        pathlib.Path("/fake/checkout"),
+        [pathlib.Path("/fake/patches")],
+        [pathlib.Path("/fake/overrides")],
+        commit=False,
+    )
+    mock_copy.assert_not_called()
+
+
+@pytest.mark.usefixtures("mock_zmake_class", "clean_env")
+def test_main_build_modules_dir_prep(mock_preparer):
+    """Test that passing --modules-dir and --zephyr-base prepares the ebuild worktree."""
+    ec_mod = pathlib.Path("/fake/work/zephyrproject/modules/ec")
+    with mock.patch(
+        "zmake.__main__.modules.locate_from_directory",
+        return_value={"ec": ec_mod},
+    ):
+        main.main(
+            [
+                "--modules-dir",
+                "/fake/work/zephyrproject/modules",
+                "--zephyr-base",
+                "/fake/work/zephyrproject/zephyr",
+                "build",
+                "project1",
+            ]
+        )
+
+    mock_preparer.assert_called_once()
+    call_args, call_kwargs = mock_preparer.call_args
+    assert call_args[0] == pathlib.Path("/fake/work/zephyrproject")
+    assert call_kwargs["commit"] is False
+    assert call_kwargs["allow_dirty"] is True
+    assert call_kwargs["path_mappings"][pathlib.Path("src/platform/ec")] == (
+        ec_mod
     )
