@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "48dc1539_47c198e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 41
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T00:02:43Z",
+      "side": 1,
+      "message": "### 1. SPI Status Register Abbreviations\n\nIn `bootrom.h` and `bootrom.cc`, you have functions for interacting with the flash chip\u0027s status register:\n\n```cpp\nstd::expected\u003cuint8_t, BootromError\u003e GetSr1();\nstd::expected\u003cvoid, BootromError\u003e SetSr1(uint8_t sr1);\n\n```\n\n* **The Issue:** `Sr1` is standard datasheet shorthand for \"Status Register 1,\" which is where the Write Protect (WP) and Write-In-Progress (WIP) bits live. However, to an engineer who hasn\u0027t memorized SPI NOR flash datasheets, `Sr1` looks like a random alphanumeric string.\n* **Recommendation:** Expand them to **`ReadStatusRegister1`** and **`WriteStatusRegister1`**. This makes your `DisableWp()` and `WaitForFlashReady()` logic instantly understandable to any C++ developer.\n\n### 2. Cryptographic State Clarity\n\nIn `bootrom.h`, the internal state for the selected crypto algorithm is tracked as:\n\n```cpp\nEgisCryptoType wrapped_algo_ \u003d EgisCryptoType::kSha256;\n\n```\n\n* **The Issue:** The term \"wrapped\" modifies \"algo\", implying that the algorithm itself is wrapped inside something else. What you actually mean is \"the algorithm used to wrap the payload.\"\n* **Recommendation:** Rename `wrapped_algo_` to **`active_crypto_algorithm_`** or simply **`crypto_type_`**. It is much more precise about what the state variable represents.\n\n### 3. SPI Transfer Mode Grammar\n\nIn `bootrom_protocol.h`, you define the bitmasks for the SPI controller\u0027s transaction mode:\n\n```cpp\nconstexpr uint32_t kTrnsModeWriteOnly \u003d (1U \u003c\u003c kTctrlTrnsModeOffset);\nconstexpr uint32_t kTrnsModeReadOnly \u003d (2U \u003c\u003c kTctrlTrnsModeOffset);\nconstexpr uint32_t kTrnsModeNoneData \u003d (7U \u003c\u003c kTctrlTrnsModeOffset);\n\n```\n\n* **The Issue:** \"NoneData\" is grammatically awkward. It represents a transaction that only consists of a command (like `Write Enable`), with no subsequent data payload phase.\n* **Recommendation:** Rename `kTrnsModeNoneData` to **`kTrnsModeNoDataPhase`** or **`kTrnsModeCommandOnly`**.\n\n### 4. Application Entry Point Verbs\n\nIn `flasher_logic.h`, the high-level orchestration functions are named:\n\n```cpp\nstd::expected\u003cvoid, AppError\u003e RunFlashFw(...);\nstd::expected\u003cvoid, AppError\u003e RunFlashCmd(...);\n\n```\n\n* **The Issue:** \"Run\" is a slightly weak, generic verb for a high-level orchestrator, and \"Fw/Cmd\" are unnecessary abbreviations in modern C++ where auto-complete handles long names effortlessly.\n* **Recommendation:** Rename them to use strong action verbs: **`ExecuteFirmwareFlash`** and **`ExecuteRawCommandFlash`**.\n\n### 5. USB Transfer Precision\n\nIn `usb_comm.h`, the private method that handles the actual libusb interaction is named:\n\n```cpp\nstd::expected\u003cint, UsbError\u003e DoTransfer(uint8_t ep, uint8_t *data, ...);\n\n```\n\n* **The Issue:** \"Transfer\" is an overloaded term in USB terminology (there are Control, Bulk, Interrupt, and Isochronous transfers). Because your implementation specifically routes to `libusb_bulk_transfer`, the name should reflect that operational constraint.\n* **Recommendation:** Rename `DoTransfer` to **`ExecuteBulkTransfer`**. This acts as internal documentation that this communication class is strictly designed for USB Bulk endpoints.",
+      "parentUuid": "0c5c7c0e_ba65734d",
+      "revId": "6bdacfc9cff7f136d29026915e24f4196a4daa79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a78ca557_85a49d7f",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 41
