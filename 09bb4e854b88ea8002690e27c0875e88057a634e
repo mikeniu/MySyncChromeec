@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2952e1a3_369491d0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T21:38:39Z",
+      "side": 1,
+      "message": "### 1\\. `Mask` vs. `Val` inconsistency (in `bootrom_protocol.h`)\n\nLook at your hardware constants for the Watchdog/PWM disable sequence:\n\n```c\n// Watchdog / PWM disable payloads\nconstexpr uint32_t kPwmCtrlDisableMask \u003d 0x00000004;\nconstexpr uint32_t kPwmReloadTimeoutVal \u003d 0x00070a21;\nconstexpr uint32_t kPwmChnenDisableVal \u003d 0x00000008;\n\n```\n\n**The Issue:** You named the first one `Mask` and the others `Val`. But in `BootromComm::DisableWatchdog()`, you write them *all* directly to the registers as absolute payloads. In embedded programming, a \"Mask\" implies bits that should be used with bitwise operators (`\u0026 ~mask` or `| mask`). **The Fix:** Rename it to `kPwmCtrlDisableVal` for perfect consistency.\n\n### 2\\. The `kTfmat` Register vs. Value overlap\n\nAlso in `bootrom_protocol.h`, you define:\n\n```c\nconstexpr uint32_t kSpiRegTfmat \u003d kSpiRegBase + 0x10; // The Register Address\nconstexpr uint32_t kTfmat \u003d 0x00020700;               // The Value to write\n\n```\n\nWhich results in this line of code in `BootromComm::WriteEnable()`:\n\n```c\n{bootrom_protocol::kSpiRegTfmat, bootrom_protocol::kTfmat}\n\n```\n\n**The Issue:** Giving a specific \"magic value\" the exact same name as the register it targets (just minus the `Reg` part) is confusing. It makes the code read like a circular assignment. Is `kTfmat` a default? A specific SPI frame format configuration? **The Fix:** Rename the value to describe *what* it configures, such as `kTfmatDefaultConfig` or `kSpiTfmatConfigVal`.\n\n### 3\\. Convoluted \"progress\" math in `BackupFlash`\n\nIn `bootrom.cc`, you calculate the backup progress like this:\n\n```c\nuint32_t flash_addr \u003d bootrom_protocol::kFlashBaseAddr;\nconst uint32_t end_addr \u003d flash_addr + total_size;\n\n// ... inside the while loop ...\nflash_addr +\u003d chunk_size;\nuint32_t done \u003d total_size - (end_addr - flash_addr);\n\n```\n\n**The Issue:** `end_addr - flash_addr` calculates the \"remaining bytes\", which you then subtract from `total_size` to get the \"done bytes\". It works, but the double-subtraction is mentally taxing to read. **The Fix:** Since `flash_addr` just increments steadily from the base address, the amount \"done\" is simply the current address minus the starting address:\n\n```c\nuint32_t done \u003d flash_addr - bootrom_protocol::kFlashBaseAddr;\n\n```\n\n### 4\\. Naming a parameter after the register it targets\n\nIn `bootrom.cc`:\n\n```c\nstd::expected\u003cvoid, BootromError\u003e BootromComm::WriteStatusRegister1(\n    uint8_t status_register) { ... }\n\n```\n\n**The Issue:** `status_register` is the name of the parameter holding the *value* to be written. Inside the function, it leads to code like `static_cast\u003cuint32_t\u003e(status_register)`, which reads as if you are casting a hardware register object rather than a byte value. **The Fix:** Rename the parameter to `reg_value` or `status_value` to clearly separate the data from the destination.",
+      "parentUuid": "d690200a_e39e1ae5",
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a9db377a_1c1d94ee",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 42
