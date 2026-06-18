@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7acc519d_60f85910",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 25
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "feb43c84_b84dccd4",
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bdc2bb28_8abaaf48",
@@ -41,6 +59,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2240d6a_d7c85f1d",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bdc2bb28_8abaaf48",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 1
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2a53ac46_e0c0a617",
@@ -54,6 +96,30 @@
       "writtenOn": "2026-06-17T22:10:22Z",
       "side": 1,
       "message": "**Location:** `util/focaltech/cli.cc` \\-\\\u003e `ParseCommand` and `ParseArguments`\n\n**The Issue:** The logic to detect if an argument is a firmware `.bin` file is duplicated across two functions. `ParseArguments` intercepts it, meaning the identical logic inside `ParseCommand` is dead code.\n\n**Remediation:** Remove the duplicated check from `ParseArguments` and trust `ParseCommand` to do its job.\n\n```c\n  // Delete this entire block from ParseArguments:\n  /*\n  if (first_arg.ends_with(\".bin\")) {\n    config.cmd \u003d Command::kUpdate;\n    config.ec_bin \u003d first_arg;\n    return config;\n  }\n  */\n\n  // Replace with this streamlined flow:\n  config.cmd \u003d ParseCommand(first_arg);\n  \n  if (config.cmd \u003d\u003d Command::kUnknown) {\n    FT_LOGE(\"Unknown subcommand: {}\", first_arg);\n    return std::unexpected(Error::kParameterError);\n  }\n\n  if (config.cmd \u003d\u003d Command::kUpdate) {\n    config.ec_bin \u003d first_arg;\n  }\n\n```",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 3
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53a23c25_50860ac1",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a53ac46_e0c0a617",
       "range": {
         "startLine": 69,
         "startChar": 0,
@@ -111,6 +177,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cfd0845_a2d7c7ce",
+        "filename": "util/focaltech/cli.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c7dc7669_c0a81116",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 39
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f018ed66_34ec2f11",
@@ -124,6 +214,30 @@
       "writtenOn": "2026-06-17T22:23:47Z",
       "side": 1,
       "message": "**Ambiguous Acronyms in the CLI Parser**\n\n* **Location:** `util/focaltech/cli.h` -\u003e `AppConfig`\n* **Current:** `std::string_view ec_bin;`\n* **Issue:** \"EC\" stands for Embedded Controller, which is standard ChromiumOS terminology. However, from the context of the CLI parsing tool, this variable just holds a file path.\n* **Suggestion:** Rename it to `firmware_path` or `bin_file_path` to clarify that it holds a string representing the path, not the actual binary data itself.",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 26
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0cbc8dc_9654fe5b",
+        "filename": "util/focaltech/cli.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f018ed66_34ec2f11",
       "range": {
         "startLine": 48,
         "startChar": 0,
@@ -157,6 +271,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "822f1cbd_7a3b7173",
+        "filename": "util/focaltech/cli.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2342daba_2ffce4a4",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 57
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "174980ce_533b84f5",
@@ -170,6 +308,30 @@
       "writtenOn": "2026-06-17T22:29:17Z",
       "side": 1,
       "message": "### **DRY Up the Logging Macro Branching**\n\n**Location:** `util/focaltech/ft_log.h` -\u003e `FtLog`\n\n**The Issue:** The `FtLog` function has redundant branching to handle terminal coloring. It explicitly checks if `color` is empty to decide which format string to use:\n\n```cpp\n  if (!color.empty()) {\n    std::print(\"{}[{:%m-%d %H:%M:%S}] {} [{}][{}:{}] \", color, now, level_str, log::kLogTag, file, loc.line());\n  } else {\n    std::print(\"[{:%m-%d %H:%M:%S}] {} [{}][{}:{}] \", now, level_str, log::kLogTag, file, loc.line());\n  }\n\n```\n\n**Remediation:** Since `color` defaults to an empty `std::string_view` when disabled, `std::print` will safely and cleanly substitute nothing for the first argument. You can delete the `else` branch completely:\n\n```cpp\n  std::print(\"{}[{:%m-%d %H:%M:%S}] {} [{}][{}:{}] \", color, now, level_str, log::kLogTag, file, loc.line());\n  \n  std::println(fmt, std::forward\u003cArgs\u003e(args)...);\n  \n  // Only the reset sequence needs an explicit check\n  if (!color.empty()) {\n    std::print(\"{}\", kColorReset);\n  }\n\n```",
+      "range": {
+        "startLine": 87,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 3
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f59a094f_fe2f27b8",
+        "filename": "util/focaltech/ft_log.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "174980ce_533b84f5",
       "range": {
         "startLine": 87,
         "startChar": 0,
@@ -227,6 +389,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a006cdc1_86feeddc",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e3dc4fe_5ee2a6f4",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 93,
+        "endChar": 1
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "10475e49_a2680b77",
@@ -250,6 +436,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc6b366f_e349e4df",
+        "filename": "util/focaltech/ft_scsi.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10475e49_a2680b77",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 26
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ad517fdb_c7c73e56",
@@ -263,6 +473,30 @@
       "writtenOn": "2026-06-17T22:57:18Z",
       "side": 1,
       "message": "Let\u0027s remove this comment.",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 37
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "063e9e54_fdd3f471",
+        "filename": "util/focaltech/ft_scsi_test.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ad517fdb_c7c73e56",
       "range": {
         "startLine": 38,
         "startChar": 0,
@@ -320,6 +554,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e49eb0ef_fb1dafa7",
+        "filename": "util/focaltech/ft_scsi_test.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "82eee708_382d3afe",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 81,
+        "endChar": 14
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9bc59894_2f86f98f",
@@ -367,6 +625,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "03e34a71_87ad2d54",
+        "filename": "util/focaltech/ft_util.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e3c667f0_9fe490c3",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 2
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b5c8a9d2_4e302f9f",
@@ -390,6 +672,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0326ab6a_14bfb137",
+        "filename": "util/focaltech/libusb_transport.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b5c8a9d2_4e302f9f",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 37
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "58df2e29_6c12bd4a",
@@ -403,6 +709,30 @@
       "writtenOn": "2026-06-17T19:02:08Z",
       "side": 1,
       "message": "Is this used anywhere? If not, let\u0027s remove it.",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 46
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac0543be_97798c93",
+        "filename": "util/focaltech/libusb_transport.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "yes",
+      "parentUuid": "58df2e29_6c12bd4a",
       "range": {
         "startLine": 21,
         "startChar": 0,
@@ -460,6 +790,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b180f93a_e6df3136",
+        "filename": "util/focaltech/main.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b510db6b_9e2bfc36",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 37
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ded80449_0b3d8567",
@@ -473,6 +827,30 @@
       "writtenOn": "2026-06-17T22:23:47Z",
       "side": 1,
       "message": "**Awkward Parameter Names in `DownloadPage`**\n\n* **Location:** `util/focaltech/updater.cc` -\u003e `DownloadPage`\n* **Current:** `uint32_t downaddr`, `size_t per_len`\n* **Issue:** `downaddr` is a mashed-together abbreviation, and `per_len` is slightly ambiguous (presumably meaning \"payload length\" or \"bytes per length\").\n* **Suggestion:** Rename `downaddr` to `target_address` (which matches the variable name used in `DownloadBin`). As noted in our previous refactoring discussion, `per_len` should ideally be removed entirely in favor of using `chunk.size()`. If you keep it, rename it to `chunk_size` or `payload_size`.",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 72
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a97956bf_857d40b2",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ded80449_0b3d8567",
       "range": {
         "startLine": 50,
         "startChar": 0,
@@ -506,6 +884,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a6872ae_3ec3430c",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52d09d81_4654bbfd",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 1
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "563ceec4_04b41351",
@@ -529,6 +931,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "477fc488_ad40ed34",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "563ceec4_04b41351",
+      "range": {
+        "startLine": 176,
+        "startChar": 0,
+        "endLine": 177,
+        "endChar": 74
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3be96d98_eef75e07",
@@ -542,6 +968,30 @@
       "writtenOn": "2026-06-17T19:18:29Z",
       "side": 1,
       "message": "**Location:** `util/focaltech/updater.cc` \\-\\\u003e `SetFlashProtection`\n\n**The Issue:** `FlashWpArea` is strictly defined as an `enum class FlashWpArea : uint32_t`. Calling `std::to_underlying` on it already yields a `uint32_t`. Wrapping that in `static_cast\u003cuint32_t\u003e(...)` adds visual noise with no functional benefit. Furthermore, applying the bitwise NOT operator (`~`) to a `uint32_t` results in an `unsigned int` (which is standardly a `uint32_t`), making the second cast redundant as well.\n\n**Remediation:** Remove the `static_cast` wrappers.\n\n```c\n  // Old:\n  .address \u003d static_cast\u003cuint32_t\u003e(std::to_underlying(wp_area)),\n  .length \u003d static_cast\u003cuint32_t\u003e(~std::to_underlying(wp_area)),\n\n  // New:\n  .address \u003d std::to_underlying(wp_area),\n  .length \u003d ~std::to_underlying(wp_area),\n\n```",
+      "range": {
+        "startLine": 341,
+        "startChar": 0,
+        "endLine": 350,
+        "endChar": 45
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eea1d4d6_b78fef0e",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3be96d98_eef75e07",
       "range": {
         "startLine": 341,
         "startChar": 0,
@@ -599,6 +1049,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8c16ebb_5174ad24",
+        "filename": "util/focaltech/updater_test.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f8899108_ea3fac3a",
+      "range": {
+        "startLine": 406,
+        "startChar": 0,
+        "endLine": 416,
+        "endChar": 14
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95e7dcae_af9ff9c5",
@@ -612,6 +1086,30 @@
       "writtenOn": "2026-06-17T22:57:18Z",
       "side": 1,
       "message": "The ROM vs bootloader mode is a bit unclear. Let\u0027s try to make it clearer with thse Gemini suggestions:\n\n**Double-check that the comments about `kRom` vs `kBootloader` are correct. Fix them if they are not.**\n\n----\n\nRight now, the distinction between ROM and Bootloader mode exists mostly in the developer\u0027s head and is scattered across the codebase in the form of loose variables (like `kRomCfgAddr` vs `kBootCfgAddr`).\n\nIf a future maintainer doesn\u0027t understand the hardware as well as you do, it is dangerously easy for them to mix up the addresses or pass the wrong mode.\n\nWe can use the C++ type system to tightly couple these modes to their respective memory addresses, making the code self-documenting and virtually impossible to misuse.\n\nHere are the three steps to drastically clarify the hardware modes in the code:\n\n### **1. Expand and Document the `DeviceMode` Enum**\n\n**Location:** `util/focaltech/usb_device.h`\n\n**Rationale:** `kBoot` is slightly ambiguous (is it the act of booting, or the bootloader?). Renaming it to `kBootloader` and adding explicit comments removes all guesswork.\n\n**Changes:**\n\n```cpp\n// Represents the current execution state of the Focaltech MCU.\nenum class DeviceMode {\n  // Hardwired mask ROM. Cannot be overwritten. Used for safe recovery.\n  kRom,        \n  // Updatable flash bootloader. Used for normal firmware updates.\n  kBootloader, \n};\n\n```\n\n*(Note: You\u0027ll need to update `GetDeviceMode` in `usb_device.h` and the switch cases in `cli.cc` to use `kBootloader` instead of `kBoot`).*\n\n---\n\n### **2. Create a Mode-to-Memory Mapping**\n\n**Location:** `util/focaltech/updater.h`\n\n**Rationale:** Currently, the configuration addresses and run addresses are defined as loose, disconnected constants. We should bundle them into a strict mapping function. This guarantees that if you know the `DeviceMode`, you automatically get the correct, safe memory addresses for that mode.\n\n**Changes:**\nDelete the loose constants:\n\n```cpp\n// Remove these:\n// constexpr uint32_t kRomCfgAddr \u003d 0x10000000;\n// constexpr uint32_t kBootCfgAddr \u003d 0x10080000;\n// constexpr uint32_t kRomRunAddr \u003d 0x10002000;\n// constexpr uint32_t kBootRunAddr \u003d 0x10081000;\n\n```\n\nReplace them with a structured memory map:\n\n```cpp\nstruct MemoryMap {\n  uint32_t config_address;\n  uint32_t run_address;\n};\n\n// Returns the safe hardware memory addresses for the given execution mode.\nconstexpr std::expected\u003cMemoryMap, Error\u003e GetMemoryMap(DeviceMode mode) {\n  switch (mode) {\n    case DeviceMode::kRom:\n      return MemoryMap{\n          .config_address \u003d 0x10000000, \n          .run_address \u003d 0x10002000\n      };\n    case DeviceMode::kBootloader:\n      return MemoryMap{\n          .config_address \u003d 0x10080000, \n          .run_address \u003d 0x10081000\n      };\n    default:\n      return std::unexpected(Error::kInvalidMode);\n  }\n}\n\n```\n\n---\n\n### **3. Refactor `UpdateFw` to use the Memory Map**\n\n**Location:** `util/focaltech/updater.cc`\n\n**Rationale:** The `UpdateFw` function currently has a clunky `if`/`else if` block that manually assigns `target_addr` based on the mode. By utilizing our new `GetMemoryMap` helper, we can make this logic declarative and entirely eliminate the risk of a mismatched address.\n\n**Changes:**\nReplace the mode validation block in `UpdateFw`:\n\n```cpp\n  auto start_addr_res \u003d GetCodeStartAddress(fw_data);\n  if (!start_addr_res) {\n    return std::unexpected(start_addr_res.error());\n  }\n  const uint32_t fw_run_address \u003d *start_addr_res;\n\n  auto map_res \u003d GetMemoryMap(current_mode);\n  if (!map_res) {\n    FT_LOGE(\"Invalid device mode for update\");\n    return std::unexpected(map_res.error());\n  }\n  const MemoryMap hw_map \u003d *map_res;\n\n  if (fw_run_address \u003d\u003d hw_map.run_address) {\n    FT_LOGE(\"Firmware run address (0x{:x}) conflicts with current mode run address.\", fw_run_address);\n    return std::unexpected(Error::kParameterError);\n  }\n\n  const uint32_t target_addr \u003d hw_map.config_address;\n\n```\n\n**Why this is vastly superior:**\n\n1. **Safety:** It explicitly separates the address *inside the file* (`fw_run_address`) from the address *expected by the hardware* (`hw_map.run_address`).\n2. **Readability:** The code now reads like a clear sequence of logical steps rather than a tangled web of `if/else` checks against loose constants.\n3. **Scalability:** If Focaltech releases a new chip revision with a third mode, you only have to add it to the `DeviceMode` enum and the `GetMemoryMap` switch statement. The `UpdateFw` logic will automatically handle it without needing a single modification.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 2
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "326789e6_75673e2c",
+        "filename": "util/focaltech/usb_device.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "95e7dcae_af9ff9c5",
       "range": {
         "startLine": 20,
         "startChar": 0,
@@ -659,6 +1157,30 @@
       "side": 1,
       "message": "Gemini feedback on other places we can do this:\n\n----\n\nHere are the remaining places to apply modern sub-range and memory patterns:\n\n### \\*\\*1. Eliminate `std::memcpy` in `ft_scsi_test.cc**`\n\n**The Issue:** In the tests designed to simulate bad CSW responses, the author fell back to C-style `memcpy` with raw pointers. However, in `test_utils.h`, they already wrote the perfect modern equivalent using `std::ranges::copy` and `AsUint8Span`. We should make these tests consistent with `BuildValidCsw`.\n\n**Changes:** In `SendBulkDataOut_CswSignatureMismatch` and `ReceiveBulkDataIn_FailsOnNonZeroCswStatus`:\n\n```c\n  // Old:\n  std::memcpy(data.data(), \u0026csw, sizeof(csw));\n\n  // New:\n  std::ranges::copy(AsUint8Span(csw), data.begin());\n\n```\n\n---\n\n### \\*\\*2. Eliminate `std::memcpy` in `updater_test.cc**`\n\n**The Issue:** The `ConfigPageToBytes` helper does the exact same thing in reverse (copying a struct into a byte vector) using raw pointers.\n\n**Changes:** In `ConfigPageToBytes`:\n\n```c\n  // Old:\n  std::memcpy(bytes.data(), \u0026config, sizeof(config));\n\n  // New:\n  std::ranges::copy(AsUint8Span(config), bytes.begin());\n\n```\n\n---\n\n### \\*\\*3. Upgrade `std::fill` to `std::ranges::fill` in `updater_test.cc**`\n\n**The Issue:** There are a few places where the old `std::fill(begin, end, val)` is used instead of the more concise C++20 `std::ranges::fill(container, val)`.\n\n**Changes:** In `StubUsbTransport::Recv` (inside `force_verify_fail_` logic):\n\n```c\n  // Old:\n  std::fill(data.begin(), data.end(), 0xAA);\n\n  // New:\n  std::ranges::fill(data, 0xAA);\n\n```\n\nIn the mock lambdas for `GetFlashProtection_Success` and `SetFlashProtection_Success`:\n\n```c\n  // Old:\n  std::fill(data.begin(), data.end(), 0);\n\n  // New:\n  std::ranges::fill(data, 0);\n\n```",
       "parentUuid": "516e0bc0_48bae1d6",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 56
+      },
+      "revId": "3dae7bcf444f4b7798d49fee063734cf72c6c4e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee1e8eac_ba2a4689",
+        "filename": "util/focaltech/usb_device_test.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-18T12:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2fbbc14d_00cc9d73",
       "range": {
         "startLine": 75,
         "startChar": 0,
