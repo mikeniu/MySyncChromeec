@@ -108,6 +108,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1a87038d_b8acf85d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T21:52:51Z",
+      "side": 1,
+      "message": "### 1. The Overloaded `flash_offset` (Hidden Architectural Assumption)\n\n**Location:** `cli_options.h` (`FlasherConfig`) and `flasher_logic.cc` (`ExecuteFirmwareFlash`)\n\nLook closely at how `config.flash_offset` is used in the code:\n\n```cpp\n// 1. It is used to skip bytes in the input file:\nauto fw_payload \u003d std::span\u003cconst uint8_t\u003e(firmware).subspan(config.flash_offset, size_to_flash);\n\n// 2. It is used as the physical hardware address:\nauto flash_res \u003d ProgramFlashPayload(bootrom_comm, config.flash_offset, fw_payload);\n\n```\n\n**The Issue:** Calling this variable `flash_offset` completely hides the fact that it **truncates the input file** by the exact same amount.\n\nThe tool implicitly assumes that the provided `.bin` file is a 1:1 memory map of the entire flash chip (starting from `0x00000000`). If a user compiles a tiny 4KB standalone payload meant to live at `0x1000` and runs `--offset 0x1000`, the tool will skip the first 4KB of their 4KB file, resulting in an empty span and an immediate error!\n\n**The Fix:**\nIf this 1:1 memory-mapped behavior is strictly intentional (which is common for ChromeOS AP/EC firmware), you must rename the variable so the user/developer understands it governs *both* the file and the hardware:\n\n* Rename `flash_offset` to `image_offset` or `memory_map_offset`.\n* Update the CLI help text for `--offset` to make this dual-behavior explicitly clear (you already started doing this in the README, but the code variable didn\u0027t reflect it).\n\nIf this behavior is *not* intentional, you need to split this into two variables: `file_skip_offset` and `target_flash_offset`.\n\n---\n\n### 2. The `header` Parameter in `PackMessage`\n\n**Location:** `egis_util.h`\n\n```cpp\ntemplate \u003cTriviallyCopyable T\u003e\nstd::vector\u003cuint8_t\u003e PackMessage(const T \u0026header, std::span\u003cconst uint8_t\u003e payload \u003d {})\n\n```\n\n**The Issue:** This is a fantastic, generic C++20 serialization template. However, you named the primary parameter `header`.\nBecause it is fully generic, it is used to pack `SystemResetCommand`, `RawResponseHeader`, and `MemReadCommand`. We already established that a `BlockWriteCommand` is a *command/instruction*, not a *header*. Naming the generic parameter `header` creates a terminology clash at the call sites.\n\n**The Fix:**\nRename the parameter to reflect its generic nature in the byte stream:\n\n```cpp\ntemplate \u003cTriviallyCopyable T\u003e\nstd::vector\u003cuint8_t\u003e PackMessage(const T \u0026base_object, std::span\u003cconst uint8_t\u003e payload \u003d {})\n\n```\n\n*(Or `prefix_struct`, or `command_struct`)*.\n\n---\n\n### 3. Vowels Are Free (`Trns` vs `Transfer`)\n\n**Location:** `bootrom_protocol.h`\n\n```cpp\nconstexpr uint32_t kTctrlTrnsModeOffset \u003d 24;\nconstexpr uint32_t kTrnsModeWriteOnly \u003d (1U \u003c\u003c kTctrlTrnsModeOffset);\n\n```\n\n**The Issue:** `Trns` is a legacy-style abbreviation. In modern C++ (and per the Google Style Guide, which favors descriptive names over saving keystrokes), omitting vowels without a universally recognized acronym (like `Cmd` or `Msg`) makes the code harder to read out loud.\n\n**The Fix:**\nExpand `Trns` to `Transfer`:\n\n```cpp\nconstexpr uint32_t kTctrlTransferModeOffset \u003d 24;\nconstexpr uint32_t kTransferModeWriteOnly \u003d (1U \u003c\u003c kTctrlTransferModeOffset);\n\n```",
+      "parentUuid": "481a534a_03a77e66",
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a9db377a_1c1d94ee",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 42
