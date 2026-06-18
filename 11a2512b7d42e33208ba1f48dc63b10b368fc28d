@@ -67,6 +67,24 @@
       "message": "The requirement in this case is that the TCPM stay in AttachWait.SRC and not proceed to Attached.SRC. This condition would be true in either of those states. I think the correct check here should be whether the port is sourcing VBUS. That is also the check that the CTS uses.",
       "revId": "11a2512b7d42e33208ba1f48dc63b10b368fc28d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd8d5d20_15507764",
+        "filename": "test/usb_typec_drp_acc_trysrc.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 870,
+      "author": {
+        "id": 4253897
+      },
+      "writtenOn": "2026-06-18T04:48:05Z",
+      "side": 1,
+      "message": "Checking if port is sourcing VBUS or not. But after reseting code coverage vote also i am not able to see code coverage status. @alevkoy@chromium.org what else we can do to get the code coverage?",
+      "parentUuid": "357b5c4c_bb6901e4",
+      "revId": "11a2512b7d42e33208ba1f48dc63b10b368fc28d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
