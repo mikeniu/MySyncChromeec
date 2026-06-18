@@ -16,6 +16,29 @@
       "message": "aa",
       "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "afaf81eb_43cbda1d",
+        "filename": "util/egis/crypto_util.cc",
+        "patchSetId": 42
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T18:58:15Z",
+      "side": 1,
+      "message": "Gemini feedback:\n\n---\n\nThe Google Style Guide explicitly states: **\"Prefer using return values over output parameters: they improve readability, and often provide the same or better performance.\"**\n\nReturning a 32-byte `std::array` is incredibly cheap. Because of Return Value Optimization (RVO), the compiler will construct the array directly in the caller\u0027s memory space, resulting in zero copy overhead.\n\nMaking this change immediately solves the safety issue with `std::abort()`, simplifies the function signature, and makes the call site much cleaner.\n\nHere is how you can refactor it:\n\n**1. Update `crypto_util.h**`\nChange the signature to return a fixed-size `std::array`:\n\n```cpp\nstd::array\u003cuint8_t, kSha256DigestSize\u003e Sha256(std::span\u003cconst uint8_t\u003e data);\n\n```\n\n**2. Update `crypto_util.cc**`\nRemove the out-parameter and the bounds check entirely. The size guarantee is now baked into the return type at compile time:\n\n```cpp\nstd::array\u003cuint8_t, kSha256DigestSize\u003e Sha256(std::span\u003cconst uint8_t\u003e data) {\n  std::array\u003cuint8_t, kSha256DigestSize\u003e hash{};\n  ::SHA256(data.data(), data.size(), hash.data());\n  return hash;\n}\n\n```\n\n**3. Update the Call Sites**\nIn `bootrom.cc`, the usage becomes a simple, readable assignment:\n\n```cpp\n// Old:\n// crypto::Sha256(data, req_hdr.hash);\n\n// New:\nreq_hdr.hash \u003d crypto::Sha256(data);\n\n```\n\nAnd in `crypto_util_test.cc`:\n\n```cpp\n// Old:\n// std::array\u003cuint8_t, SHA256_DIGEST_LENGTH\u003e hash{};\n// crypto::Sha256(data, hash);\n\n// New:\nauto hash \u003d crypto::Sha256(data);\n\n```",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 1
+      },
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
