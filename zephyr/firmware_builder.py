@@ -39,6 +39,8 @@ from coreboot_sdk import init_toolchain
 import zmake.modules
 import zmake.project
 from zmake.repository_prep import CodebasePreparer
+from zmake.repository_prep import copy_outputs_back
+from zmake.repository_prep import create_shadow_checkout
 from zmake.repository_prep import find_checkout
 from zmake.repository_prep import find_target_repos
 from zmake.repository_prep import get_default_patches_dirs
@@ -47,8 +49,6 @@ from zmake.repository_prep import get_dirty_files
 from zmake.repository_prep import set_checkout
 
 import scripts.firmware_builder_lib
-from scripts.firmware_builder_lib import copy_outputs_back
-from scripts.firmware_builder_lib import create_shadow_checkout
 
 
 # pylint: enable=wrong-import-position, import-error
@@ -953,15 +953,16 @@ def main(args):
                     os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
                     ret = opts.func(opts)
 
-                if ret == 0 or ret is None:
+                return ret
+            finally:
+                try:
                     # fmt: off
                     copy_outputs_back(
                         shadow_checkout, real_checkout, ec_rel_path
                     )
                     # fmt: on
-
-                return ret
-            finally:
+                except OSError as e:
+                    logging.error("Failed to copy outputs back: %s", e)
                 set_checkout(prev_checkout)
                 ZEPHYR_DIR = original_zephyr_dir
     else:

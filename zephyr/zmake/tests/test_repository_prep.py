@@ -207,3 +207,61 @@ def test_codebase_preparer_patches():
         assert (
             ec_path / "file_to_patch.c"
         ).read_text() == "original patch content\n"
+
+
+def test_codebase_preparer_commit():
+    """Test that commit=True commits changes and skips restore."""
+    with tempfile.TemporaryDirectory() as checkout_dir:
+        checkout_path = pathlib.Path(checkout_dir)
+        ec_path = checkout_path / "src" / "platform" / "ec"
+        ec_path.mkdir(parents=True)
+        setup_mock_git_repo(ec_path)
+
+        # Create overrides
+        override_root = checkout_path / "overrides"
+        override_ec = override_root / "src" / "platform" / "ec"
+        override_ec.mkdir(parents=True)
+        (override_ec / "file_to_override.c").write_text("overridden content\n")
+
+        # Prep preparer with commit=True
+        preparer = CodebasePreparer(
+            checkout_path,
+            patches_dirs=[],
+            src_override_dirs=[override_root],
+            commit=True,
+        )
+
+        # Apply
+        preparer.prepare()
+
+        assert (
+            ec_path / "file_to_override.c"
+        ).read_text() == "overridden content\n"
+
+        # Verify it was committed (git status should be clean)
+        status = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=ec_path,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        assert status.stdout.strip() == ""
+
+        # Verify commit message
+        log = subprocess.run(
+            ["git", "log", "-n", "1", "--format=%s"],
+            cwd=ec_path,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        assert log.stdout.strip() == "applied patches and overrides"
+
+        # Revert should be a no-op when commit=True
+        preparer.restore()
+
+        # Content should still be overridden because restore was skipped
+        assert (
+            ec_path / "file_to_override.c"
+        ).read_text() == "overridden content\n"

@@ -178,11 +178,13 @@ class CodebasePreparer:
         patches_dirs,
         src_override_dirs,
         user_dirty_files=None,
+        commit=False,
     ):
         self.checkout_root = pathlib.Path(checkout_root).resolve()
         self.patches_dirs = [pathlib.Path(d) for d in patches_dirs]
         self.src_override_dirs = [pathlib.Path(d) for d in src_override_dirs]
         self.user_dirty_files = user_dirty_files
+        self.commit = commit
         self.applied_patches = []
         self.copied_files = []
 
@@ -227,12 +229,62 @@ class CodebasePreparer:
         """Apply overrides and then patches."""
         self.copy_source_overrides()
         self.apply_patches()
+        if self.commit:
+            self.commit_changes()
 
     def restore(self):
         """Revert overrides and patches in reverse order."""
+        if self.commit:
+            logger.debug("Skipping restore for committed shadow workspace.")
+            return
         logger.info("Restoring codebase to clean state...")
         self.revert_source_overrides()
         self.revert_patches()
+
+    def commit_changes(self):
+        """Commit applied overrides and patches in shadow repositories."""
+        target_repos = find_target_repos(
+            self.checkout_root, self.src_override_dirs, self.patches_dirs
+        )
+        for repo in target_repos:
+            # repo is absolute path in shadow checkout
+            if repo.exists() and not repo.is_symlink():
+                logger.info("Committing applied changes in %s", repo)
+                try:
+                    subprocess.run(
+                        ["git", "add", "-A"],
+                        cwd=repo,
+                        capture_output=True,
+                        check=True,
+                    )
+                    env = os.environ.copy()
+                    env["GIT_AUTHOR_NAME"] = "Shadow Builder"
+                    env["GIT_AUTHOR_EMAIL"] = "shadow@builder.org"
+                    env["GIT_COMMITTER_NAME"] = "Shadow Builder"
+                    env["GIT_COMMITTER_EMAIL"] = "shadow@builder.org"
+
+                    status = subprocess.run(
+                        ["git", "status", "--porcelain"],
+                        cwd=repo,
+                        capture_output=True,
+                        check=True,
+                        text=True,
+                    )
+                    if status.stdout.strip():
+                        subprocess.run(
+                            [
+                                "git",
+                                "commit",
+                                "-m",
+                                "applied patches and overrides",
+                            ],
+                            cwd=repo,
+                            capture_output=True,
+                            check=True,
+                            env=env,
+                        )
+                except subprocess.CalledProcessError as e:
+                    logger.error("Failed to commit changes in %s: %s", repo, e)
 
     def copy_source_overrides(self):
         """Copy source overrides to the checkout."""
@@ -450,3 +502,140 @@ def prepare_codebase(
     applied_patches.extend(preparer.applied_patches)
     copied_files.extend(preparer.copied_files)
     return preparer
+
+
+def _has_files(path):
+    """Check if a path exists and contains files."""
+    if not path:
+        return False
+    p = pathlib.Path(path)
+    return p.exists() and any(p.iterdir())
+
+
+def fix_symlinks(directory, old_prefix, new_prefix):
+    """Find and fix symlinks pointing to old_prefix to point to new_prefix."""
+    for root, dirs, files in os.walk(directory):
+        for d in dirs + files:
+            path = pathlib.Path(root) / d
+            if path.is_symlink():
+                target = os.readlink(path)
+                if target.startswith(str(old_prefix)):
+                    new_target = target.replace(
+                        str(old_prefix), str(new_prefix), 1
+                    )
+                    path.unlink()
+                    os.symlink(new_target, path)
+
+
+def copy_outputs_back(shadow_checkout, real_checkout, ec_rel_path):
+    """Copy build and twister outputs back to real checkout and fix symlinks."""
+    shadow_ec = shadow_checkout / ec_rel_path
+    real_ec = real_checkout / ec_rel_path
+
+    shadow_build = shadow_ec / "build"
+    real_build = real_ec / "build"
+    if shadow_build.exists():
+        logger.info("Copying build outputs back to real checkout...")
+        if real_build.exists():
+            shutil.rmtree(real_build)
+        shutil.copytree(shadow_build, real_build, symlinks=True)
+        fix_symlinks(real_build, shadow_checkout, real_checkout)
+
+    for shadow_path in shadow_ec.glob("twister-out*"):
+        rel_path = shadow_path.relative_to(shadow_ec)
+        real_path = real_ec / rel_path
+        logger.info("Copying %s back to real checkout...", rel_path)
+        if real_path.exists():
+            shutil.rmtree(real_path)
+        shutil.copytree(shadow_path, real_path, symlinks=True)
+        fix_symlinks(real_path, shadow_checkout, real_checkout)
+
+
+def _needs_copy_for_overrides(rel_path, src_override_dirs):
+    """Check if the path has files in overrides."""
+    for override_dir in src_override_dirs:
+        override_dir = pathlib.Path(override_dir)
+        if override_dir.exists():
+            d = override_dir / rel_path
+            if d.exists() and any(d.iterdir()):
+                return True
+    return False
+
+
+def _needs_copy_for_patches(rel_path, patches_dirs):
+    """Check if the path has patches."""
+    for patches_dir in patches_dirs:
+        patches_dir = pathlib.Path(patches_dir)
+        if patches_dir.exists():
+            d = patches_dir / rel_path
+            if d.exists() and any(f.endswith(".patch") for f in os.listdir(d)):
+                return True
+    return False
+
+
+def create_shadow_checkout(
+    real_checkout,
+    shadow_root,
+    modules,
+    zephyr_base,
+    src_override_dirs,
+    patches_dirs,
+):
+    """Create a shadow checkout with copies of target repos and symlinks for others."""
+    real_checkout = pathlib.Path(real_checkout).resolve()
+    shadow_root = pathlib.Path(shadow_root).resolve()
+
+    paths_to_handle = {
+        "zephyr_base": zephyr_base,
+    }
+
+    for name, path in modules.items():
+        paths_to_handle[f"module:{name}"] = path
+
+    for key, path in paths_to_handle.items():
+        if not path.exists():
+            continue
+        rel_path = path.resolve().relative_to(real_checkout)
+        dst_path = shadow_root / rel_path
+
+        need_copy = False
+        if key == "module:ec":
+            need_copy = True
+        else:
+            need_copy = _needs_copy_for_overrides(
+                rel_path, src_override_dirs
+            ) or _needs_copy_for_patches(rel_path, patches_dirs)
+
+        if need_copy:
+            logger.info("Copying %s to shadow checkout...", rel_path)
+            dst_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil_ignore = shutil.ignore_patterns(
+                ".git", "build", "twister-out", "twister-out.*"
+            )
+            shutil.copytree(path, dst_path, ignore=shutil_ignore, symlinks=True)
+            # Init git
+            subprocess.run(
+                ["git", "init"], cwd=dst_path, capture_output=True, check=True
+            )
+            subprocess.run(
+                ["git", "add", "-A"],
+                cwd=dst_path,
+                capture_output=True,
+                check=True,
+            )
+            env = os.environ.copy()
+            env["GIT_AUTHOR_NAME"] = "Shadow Builder"
+            env["GIT_AUTHOR_EMAIL"] = "shadow@builder.org"
+            env["GIT_COMMITTER_NAME"] = "Shadow Builder"
+            env["GIT_COMMITTER_EMAIL"] = "shadow@builder.org"
+            subprocess.run(
+                ["git", "commit", "-m", "initial"],
+                cwd=dst_path,
+                capture_output=True,
+                check=True,
+                env=env,
+            )
+        else:
+            logger.debug("Symlinking %s to shadow checkout...", rel_path)
+            dst_path.parent.mkdir(parents=True, exist_ok=True)
+            os.symlink(path, dst_path)

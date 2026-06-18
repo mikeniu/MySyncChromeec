@@ -5,6 +5,7 @@
 """The entry point into zmake."""
 
 import argparse
+import contextlib
 import inspect
 import json
 import logging
@@ -12,10 +13,15 @@ import os
 import pathlib
 import subprocess
 import sys
+import tempfile
 
 from zmake import jobserver
+from zmake import modules
 from zmake import multiproc
+from zmake.repository_prep import _has_files
 from zmake.repository_prep import CodebasePreparer
+from zmake.repository_prep import copy_outputs_back
+from zmake.repository_prep import create_shadow_checkout
 from zmake.repository_prep import get_default_patches_dirs
 from zmake.repository_prep import get_default_src_override_dirs
 import zmake.zmake as zm
@@ -185,6 +191,11 @@ def get_argparser():
         dest="src_override_dirs",
         type=pathlib.Path,
         help="Path to a source override directory. Can be repeated.",
+    )
+    parser.add_argument(
+        "--no-shadow",
+        action="store_true",
+        help="Do not use a shadow workspace; apply changes in-place.",
     )
 
     sub = parser.add_subparsers(
@@ -482,63 +493,142 @@ def main(argv=None):
     jobserver_client = jobserver.GNUMakeJobClient.from_environ(jobs=opts.jobs)
     multiproc.LogWriter.reset()
 
-    zmake = call_with_namespace(zm.Zmake, opts, jobserver=jobserver_client)
-
+    zmake = None
     workspace_prepared = os.environ.get("ZMAKE_WORKSPACE_PREPARED") == "1"
     prep_subcommands = {"configure", "build", "compare-builds"}
     need_prep = opts.subcommand in prep_subcommands and not workspace_prepared
 
-    preparer = None
-    if need_prep:
+    with contextlib.ExitStack() as stack:
+        use_shadow = False
+        real_checkout = None
         checkout = opts.checkout
-        if not checkout:
-            try:
-                checkout = zm.util.locate_cros_checkout().resolve()
-            except FileNotFoundError:
-                checkout = None
 
-        if checkout:
-            patches_dirs = (
-                opts.patches_dirs
-                if opts.patches_dirs
-                else get_default_patches_dirs(checkout)
-            )
-            src_override_dirs = (
-                opts.src_override_dirs
-                if opts.src_override_dirs
-                else get_default_src_override_dirs(checkout)
-            )
-            preparer = CodebasePreparer(
-                checkout, patches_dirs, src_override_dirs
-            )
-
-    if preparer:
-        # pylint: disable=unnecessary-dunder-call
-        preparer.__enter__()
-
-    try:
         if need_prep:
-            os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
+            if not checkout:
+                try:
+                    checkout = zm.util.locate_cros_checkout().resolve()
+                except FileNotFoundError:
+                    checkout = None
 
-        subcommand_method = getattr(zmake, opts.subcommand.replace("-", "_"))
-        result = call_with_namespace(subcommand_method, opts)
-        wait_rv = zmake.executor.wait()
-        return result or wait_rv
-    finally:
-        if preparer:
-            preparer.__exit__(None, None, None)
-        multiproc.LogWriter.wait_for_log_end()
-        for file, failed_projects in zmake.cmp_failed_projects.items():
-            if failed_projects:
-                logging.error(
-                    "Failed projects by diff in %s: %s",
-                    file,
-                    ", ".join(failed_projects),
+            if checkout:
+                patches_dirs = (
+                    opts.patches_dirs
+                    if opts.patches_dirs
+                    else get_default_patches_dirs(checkout)
                 )
-        if zmake.failed_projects:
-            logging.error(
-                "All failed projects: %s", " ".join(zmake.failed_projects)
+                src_override_dirs = (
+                    opts.src_override_dirs
+                    if opts.src_override_dirs
+                    else get_default_src_override_dirs(checkout)
+                )
+
+                # Determine if we should use shadow workspace
+                has_overrides = any(_has_files(d) for d in src_override_dirs)
+                has_patches = any(_has_files(d) for d in patches_dirs)
+                # Default to shadow if we have overrides/patches,
+                # unless --no-shadow or --checkout is passed
+                use_shadow = (
+                    (has_overrides or has_patches)
+                    and not opts.no_shadow
+                    and not opts.checkout
+                )
+
+                if use_shadow:
+                    logging.info(
+                        "Using shadow workspace for zmake execution..."
+                    )
+                    shadow_dir_ctx = stack.enter_context(
+                        tempfile.TemporaryDirectory()
+                    )
+                    shadow_checkout = pathlib.Path(shadow_dir_ctx) / "shadow"
+                    shadow_checkout.mkdir()
+
+                    # Locate modules and zephyr_base from real checkout
+                    located_modules = modules.locate_from_checkout(checkout)
+                    if opts.zephyr_base:
+                        zephyr_base = opts.zephyr_base
+                    else:
+                        zephyr_base = (
+                            checkout
+                            / "src"
+                            / "third_party"
+                            / "zephyrproject"
+                            / "zephyr"
+                        )
+
+                    create_shadow_checkout(
+                        checkout,
+                        shadow_checkout,
+                        located_modules,
+                        zephyr_base,
+                        src_override_dirs,
+                        patches_dirs,
+                    )
+
+                    real_checkout = checkout
+                    checkout = shadow_checkout
+                    opts.checkout = shadow_checkout  # Override for Zmake
+
+                    stack.enter_context(
+                        CodebasePreparer(
+                            shadow_checkout,
+                            patches_dirs,
+                            src_override_dirs,
+                            commit=True,
+                        )
+                    )
+                    os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
+                else:
+                    stack.enter_context(
+                        CodebasePreparer(
+                            checkout,
+                            patches_dirs,
+                            src_override_dirs,
+                            commit=False,
+                        )
+                    )
+
+        try:
+            zmake = call_with_namespace(
+                zm.Zmake, opts, jobserver=jobserver_client
             )
+            subcommand_method = getattr(
+                zmake, opts.subcommand.replace("-", "_")
+            )
+            result = call_with_namespace(subcommand_method, opts)
+            wait_rv = zmake.executor.wait()
+            ret = result or wait_rv
+        finally:
+            if use_shadow and real_checkout:
+                try:
+                    # Resolve ec_rel_path to copy outputs back
+                    located_modules = modules.locate_from_checkout(
+                        real_checkout
+                    )
+                    ec_rel_path = (
+                        located_modules["ec"]
+                        .resolve()
+                        .relative_to(real_checkout)
+                    )
+                    logging.info("Copying outputs back to real checkout...")
+                    copy_outputs_back(checkout, real_checkout, ec_rel_path)
+                except OSError as e:
+                    logging.error("Failed to copy outputs back: %s", e)
+
+        multiproc.LogWriter.wait_for_log_end()
+        if zmake:
+            for file, failed_projects in zmake.cmp_failed_projects.items():
+                if failed_projects:
+                    logging.error(
+                        "Failed projects by diff in %s: %s",
+                        file,
+                        ", ".join(failed_projects),
+                    )
+            if zmake.failed_projects:
+                logging.error(
+                    "All failed projects: %s", " ".join(zmake.failed_projects)
+                )
+        return ret
 
 
 if __name__ == "__main__":
