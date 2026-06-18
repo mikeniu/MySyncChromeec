@@ -38,13 +38,13 @@ from coreboot_sdk import init_toolchain
 import zmake.modules
 import zmake.project
 from zmake.repository_prep import find_checkout
+from zmake.repository_prep import prepared_workspace
 
 from scripts.firmware_builder_lib import (
     get_safe_lcov_workers as _get_safe_lcov_workers,
 )
 from scripts.firmware_builder_lib import create_arg_parser
 from scripts.firmware_builder_lib import merge_shard_coverage_reports
-from scripts.firmware_builder_lib import prepared_workspace
 from scripts.firmware_builder_lib import save_or_load_shard_info
 from scripts.firmware_builder_lib import shard_projects
 
@@ -295,11 +295,7 @@ def build_compare_builds(checkout_dir=None):
     """Runs compare-builds a select set of targets"""
     env = os.environ.copy()
     env.update(init_toolchain())
-    env.update(
-        {
-            "PYTHONPATH": str(ZEPHYR_DIR / "zmake"),
-        }
-    )
+    env["PYTHONPATH"] = str(ZEPHYR_DIR / "zmake")
 
     # Run compare-builds at the same git reference.  This forces the
     # compare-builds step to compile only, skipping the firmware binary
@@ -324,11 +320,7 @@ def build(opts):
     metric_list = firmware_pb2.FwBuildMetricList()  # pylint: disable=no-member
     env = os.environ.copy()
     env.update(init_toolchain())
-    env.update(
-        {
-            "PYTHONPATH": str(ZEPHYR_DIR / "zmake"),
-        }
-    )
+    env["PYTHONPATH"] = str(ZEPHYR_DIR / "zmake")
 
     platform_ec = ZEPHYR_DIR.parent
 
@@ -984,9 +976,7 @@ def main(args):
 
     orig_dir = ZEPHYR_DIR
     try:
-        with prepared_workspace(
-            opts, zmake.modules.locate_from_checkout(find_checkout())
-        ) as shadow_ec:
+        with prepared_workspace(opts) as shadow_ec:
             globals()["ZEPHYR_DIR"] = (
                 shadow_ec / "zephyr" if shadow_ec else orig_dir
             )
