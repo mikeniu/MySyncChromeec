@@ -103,6 +103,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f2dc0901_498974e1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 30
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-18T06:41:40Z",
+      "side": 1,
+      "message": "This seems a bit odd. I always run repo upload --cbr . and make sure everything is clean before uploading.\nI re-uploaded the patch (patch 32) and then ran cros format --check util/elan/*.cc util/elan/*.h again after the upload completed. No formatting issues were reported.\n\nCould you please take another look? Thanks!!",
+      "parentUuid": "58fde502_8e3d3f9a",
+      "revId": "1e5e1f3f8b3977dfb42df7bbbe50804dae454005",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "738db734_9c0f99f2",
         "filename": "util/elan/iap_control.cc",
         "patchSetId": 30
