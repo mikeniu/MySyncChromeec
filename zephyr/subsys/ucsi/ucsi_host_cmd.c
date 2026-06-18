@@ -64,6 +64,10 @@ static enum ec_status hc_ucsi_ppm_set(struct host_cmd_handler_args *args)
 	if (!ppm_dev)
 		return EC_RES_UNAVAILABLE;
 
+	if (args->params_size < sizeof(p->offset)) {
+		return EC_RES_INVALID_PARAM;
+	}
+
 	if (ucsi_ppm_write(ppm_dev, p->offset, p->data,
 			   args->params_size - sizeof(p->offset)))
 		return EC_RES_ERROR;
