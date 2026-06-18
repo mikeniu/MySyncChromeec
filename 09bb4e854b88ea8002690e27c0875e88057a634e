@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bc055894_89b95d4f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T19:15:18Z",
+      "side": 1,
+      "message": "This is failing presubmit checks:\n\n```\n[FAILED] chromiumos/platform/ec: cros format\n    Hook script \"cros format --check --exclude \"*.xml\" --exclude \"extra/usb_updater/*.json\" --exclude \"third_party/*\" --commit ${PRESUBMIT_COMMIT}\" failed with code 1:\n      12:05:50: WARNING: util/egis/bootrom.cc: needs formatting\n      12:05:50: WARNING: util/egis/file_util.cc: needs formatting\n      12:05:50: WARNING: util/egis/cli_options.cc: needs formatting\n      12:05:50: WARNING: util/egis/bootrom.h: needs formatting\n      12:05:50: WARNING: util/egis/flasher_logic.cc: needs formatting\n      12:05:50: WARNING: util/egis/cli_options.h: needs formatting\n      12:05:50: WARNING: util/egis/flasher_logic.h: needs formatting\n      12:05:50: WARNING: util/egis/et171_flash.cc: needs formatting\n      12:05:50: WARNING: util/egis/egis_util.h: needs formatting\n      12:05:50: WARNING: util/egis/usb_comm.h: needs formatting\n      12:05:50: WARNING: util/egis/usb_comm.cc: needs formatting\n      12:06:13: NOTICE: You can fix formatting errors by running:\n        cros format util/egis/bootrom.cc util/egis/bootrom.h util/egis/cli_options.cc util/egis/cli_options.h util/egis/egis_util.h util/egis/et171_flash.cc util/egis/file_util.cc util/egis/flasher_logic.cc util/egis/flasher_logic.h util/egis/usb_comm.cc util/egis/usb_comm.h\n```\n\nYou *must* always run `repo upload` to make sure all presubmit checks pass before uploading.",
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a9db377a_1c1d94ee",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 42
