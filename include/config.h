@@ -1888,7 +1888,7 @@
 #undef CONFIG_PANIC_LOG_DEBUG
 
 /* Enable generic SVDM DFP identity response */
-#undef CONFIG_SVDM_RSP_DFP_ONLY
+#undef CONFIG_SVDM_IDENTITY_RSP
 
 /*
  * noinit_end_of_ram is a memory section placed at the very end
