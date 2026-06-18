@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "099b386e_b4a49ab9",
+        "filename": "zephyr/test/ec-aic/flash_protect/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-18T22:10:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3ce86ca4_f9bfe462",
+      "revId": "f2ca48c32817cba79aff8582826864bb20cafd43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f86e8be7_4e03b0ad",
@@ -35,6 +53,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d1381cb_eb23a096",
+        "filename": "zephyr/test/ec-aic/flash_protect/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-18T22:10:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f86e8be7_4e03b0ad",
+      "revId": "f2ca48c32817cba79aff8582826864bb20cafd43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f39e96ae_be6f9e24",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-06-18T21:42:05Z",
       "side": 1,
       "message": "Nit: These casts seem unnecessary.",
+      "revId": "f2ca48c32817cba79aff8582826864bb20cafd43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd5b2946_6d41e5fe",
+        "filename": "zephyr/test/ec-aic/flash_protect/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-18T22:10:27Z",
+      "side": 1,
+      "message": "off_t is signed, so the casting is needed to avoid a compiler warning.",
+      "parentUuid": "f39e96ae_be6f9e24",
       "revId": "f2ca48c32817cba79aff8582826864bb20cafd43",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
