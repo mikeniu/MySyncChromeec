@@ -85,6 +85,24 @@
       "parentUuid": "357b5c4c_bb6901e4",
       "revId": "11a2512b7d42e33208ba1f48dc63b10b368fc28d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1015f61e_a4122259",
+        "filename": "test/usb_typec_drp_acc_trysrc.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 870,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-18T17:30:15Z",
+      "side": 1,
+      "message": "I\u0027m assuming that the voltage check passed.\n\n`firmware-zephyr-cov-cq` executed. I\u0027m not sure why the results aren\u0027t showing in the Gerrit UI. I sent you a screenshot of the HTML report.\n\nFor iterating on the tests, see https://chromium.googlesource.com/chromiumos/platform/ec/+/HEAD/docs/code_coverage.md#Zephyr-ztest-code-coverage for running coverage locally. Incidentally, these instructions are specific to Zephyr tests, and ideally that\u0027s what you should be writing for this CL.",
+      "parentUuid": "cd8d5d20_15507764",
+      "revId": "11a2512b7d42e33208ba1f48dc63b10b368fc28d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
