@@ -144,6 +144,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "63168a98_d4aee395",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1474527
+      },
+      "writtenOn": "2026-06-18T05:39:46Z",
+      "side": 1,
+      "message": "I think the best course of action here is to skip the boringssl uprev: we can just add a trivial downstream patch to fix/unblock the glibc uprev.\n\nWe already did this for others components like ARC (keymint, keymaster).\n\nIn addition to the EC/fpmcu build complexities with the new boringssl revision, there are also some unknown risks and security implications with pulling in the new boringssl. So let\u0027s avoid these and just unblock glibc.",
+      "parentUuid": "6b99d9de_9a0a109f",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 39
+      },
+      "revId": "285d2053df3f692876992cd7194b18a251abc8c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "b4255f52_3da738d3",
