@@ -139,6 +139,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3977a089_384a75f2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 30
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T18:45:48Z",
+      "side": 1,
+      "message": "It\u0027s still failing (see the red `fullcheckout-presubmit` builder).\n\nYou may need to `repo sync` to make sure you\u0027re using the latest chroot. Try running the exact command that the error message suggests:\n\n```\n 11:19:54: NOTICE: You can fix formatting errors by running:\n        cros format util/elan/file_control.cc util/elan/file_control.h util/elan/iap_control.cc util/elan/iap_control.h util/elan/iap_tool.cc util/elan/utility.h\n```",
+      "parentUuid": "6ae29331_6271c8ad",
+      "revId": "1e5e1f3f8b3977dfb42df7bbbe50804dae454005",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "738db734_9c0f99f2",
         "filename": "util/elan/iap_control.cc",
         "patchSetId": 30
