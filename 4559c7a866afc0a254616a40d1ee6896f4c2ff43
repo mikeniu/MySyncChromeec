@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cbfbb9eb_6f01c1ba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T22:26:11Z",
+      "side": 1,
+      "message": "### 1. `updater.cc` / `cli.cc` - Firmware Data\n\n**The Issue: The `fw_` Prefix**\nThe prefix `fw_` is used extensively (`fw_data`, `fw_run_address`, `kFwBinSizeMax`). Again, while \"fw\" is a common industry shorthand for \"firmware,\" spelling it out explicitly aligns better with modern C++ readability standards.\n\n**Current:**\n\n```cpp\nstd::expected\u003cvoid, Error\u003e UpdateFw(const UsbDevice\u0026 device,\n                                    std::span\u003cconst uint8_t\u003e fw_data,\n                                    DeviceMode current_mode);\n\n```\n\n**Improvement:**\n\n```cpp\nstd::expected\u003cvoid, Error\u003e UpdateFirmware(const UsbDevice\u0026 device,\n                                          std::span\u003cconst uint8_t\u003e firmware_data,\n                                          DeviceMode current_mode);\n\n```\n\n### 2. `libusb_transport.cc` - Endpoint Struct\n\n**The Issue: The `ep_` Prefix**\nInside `EndpointInfo`, the fields are named `ep_bulk_in` and `ep_bulk_out`. The struct is already named `EndpointInfo`, making the `ep_` prefix somewhat redundant, but more importantly, it is an abbreviation.\n\n**Current:**\n\n```cpp\nstruct EndpointInfo {\n  uint8_t interface_num \u003d 0;\n  uint8_t ep_bulk_in \u003d 0;\n  uint8_t ep_bulk_out \u003d 0;\n};\n\n```\n\n**Improvement:** Either drop the prefix entirely (relying on the struct name for context) or spell it out. Dropping it is usually cleaner.\n\n```cpp\nstruct EndpointInfo {\n  uint8_t interface_number \u003d 0; // Also fixed _num -\u003e _number\n  uint8_t bulk_in \u003d 0;\n  uint8_t bulk_out \u003d 0;\n};\n\n```\n\n### 3. `libusb_transport.cc` - `Create`\n\n**The Issue: Vague Noun (`count`)**\nWhen asking libusb for a list of devices, the return value is stored in `count`. In a short function, this is mostly fine, but explicitly stating *what* is being counted removes all cognitive load.\n\n**Current:**\n\n```cpp\n  const ssize_t count \u003d libusb_get_device_list(ctx.get(), \u0026raw_list);\n  if (count \u003c 0) { ... }\n\n```\n\n**Improvement:**\n\n```cpp\n  const ssize_t device_count \u003d libusb_get_device_list(context.get(), \u0026raw_list);\n  if (device_count \u003c 0) { ... }\n\n```",
+      "parentUuid": "2b7e192d_e107d686",
+      "revId": "4559c7a866afc0a254616a40d1ee6896f4c2ff43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ba583f89_c89c8c0b",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 26
