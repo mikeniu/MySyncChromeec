@@ -34,6 +34,24 @@
       "parentUuid": "d10ed253_4b54822e",
       "revId": "63de24dfcd862c67883961c91b529d8bf938ae87",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d8dd378_ae13cca9",
+        "filename": "zephyr/program/fpmcu/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-06-18T06:18:40Z",
+      "side": 1,
+      "message": "I would prefer to enable it right now.",
+      "parentUuid": "2c921a94_4cc43cb7",
+      "revId": "63de24dfcd862c67883961c91b529d8bf938ae87",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
