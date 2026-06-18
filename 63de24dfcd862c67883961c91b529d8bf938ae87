@@ -52,6 +52,24 @@
       "parentUuid": "2c921a94_4cc43cb7",
       "revId": "63de24dfcd862c67883961c91b529d8bf938ae87",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1404b6c9_5bfa4309",
+        "filename": "zephyr/program/fpmcu/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-06-18T06:23:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d8dd378_ae13cca9",
+      "revId": "63de24dfcd862c67883961c91b529d8bf938ae87",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
