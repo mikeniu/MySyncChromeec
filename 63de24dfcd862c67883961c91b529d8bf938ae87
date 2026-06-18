@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d10ed253_4b54822e",
+        "filename": "zephyr/program/fpmcu/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-06-18T05:07:07Z",
+      "side": 1,
+      "message": "How about PM_DEVICE?",
+      "revId": "63de24dfcd862c67883961c91b529d8bf938ae87",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
