@@ -34,6 +34,24 @@
       "parentUuid": "4910762f_b2fa16b8",
       "revId": "5e9ff86bd04c2354bff146848f76143786dd4d45",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "591c25f9_ebbc9820",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-06-18T08:15:41Z",
+      "side": 1,
+      "message": "So it has to be upstreamed - https://chromium-review.git.corp.google.com/c/chromiumos/third_party/zephyrproject/+/7959024",
+      "parentUuid": "3a619fc8_60df9cba",
+      "revId": "5e9ff86bd04c2354bff146848f76143786dd4d45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
