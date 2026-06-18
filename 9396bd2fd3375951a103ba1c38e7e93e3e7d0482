@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff06d56c_f60bbc67",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-18T15:28:58Z",
+      "side": 1,
+      "message": "The change is fine, but you need to add a unit test to the [source policy tests](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/pdc/src/pdc_policy/src_policy_3a_port.c).\n\nThis should be pretty straight forward by adding a override to `pd_get_usb_pd_3a_ports()` to that source file.  Add a new test that verifies a SNK partner doesn\u0027t get a 3A contract when `pd_get_usb_pd_3a_ports()` returns 0.",
+      "revId": "9396bd2fd3375951a103ba1c38e7e93e3e7d0482",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
