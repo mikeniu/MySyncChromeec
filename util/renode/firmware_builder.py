@@ -22,8 +22,16 @@ import firmware_builder_lib
 
 # pylint: disable=import-error
 from google.protobuf import json_format
+from zmake.repository_prep import find_checkout
+from zmake.repository_prep import prepared_workspace
 
 from chromite.api.gen_sdk.chromite.api import firmware_pb2
+
+
+# pylint: enable=import-error
+
+
+EC_DIR = Path(__file__).parents[2].resolve()
 
 
 ZEPHYR_BOARDS = [
@@ -181,7 +189,7 @@ def _write_results(final_results: Dict[str, Any], output_path: Path) -> None:
 def test(opts: argparse.Namespace) -> int:
     """Runs EC unit tests with Renode."""
 
-    working_dir = Path(__file__).parents[2].resolve()
+    working_dir = EC_DIR
     renode_install_dir = working_dir.joinpath("renode")
 
     # Renode is built as a subtool and available versions can be found here:
@@ -251,6 +259,20 @@ def test(opts: argparse.Namespace) -> int:
     return 0
 
 
+def _run_subcommand(opts: argparse.Namespace) -> int:
+    """Run opts.func and print any failed boards on failure."""
+    try:
+        opts.func(opts)
+    except (subprocess.CalledProcessError, RuntimeError):
+        failed_dir = os.path.join(EC_DIR, ".failedboards")
+        if os.path.isdir(failed_dir):
+            print("Failed boards/tests:")
+            for fail in os.listdir(failed_dir):
+                print(f"\t{fail}")
+        return 1
+    return 0
+
+
 def main(args: list[str]) -> int:
     """Builds, bundles, or tests.
 
@@ -264,18 +286,22 @@ def main(args: list[str]) -> int:
         print("Must select a valid sub command!")
         return -1
 
-    # Run selected sub command function
+    if getattr(opts.func, "__name__", "") != "test":
+        return _run_subcommand(opts)
+
     try:
-        opts.func(opts)
-    except (subprocess.CalledProcessError, RuntimeError):
-        ec_dir = os.path.dirname(__file__)
-        failed_dir = os.path.join(ec_dir, ".failedboards")
-        if os.path.isdir(failed_dir):
-            print("Failed boards/tests:")
-            for fail in os.listdir(failed_dir):
-                print(f"\t{fail}")
-        return 1
-    return 0
+        find_checkout()
+    except FileNotFoundError:
+        return _run_subcommand(opts)
+
+    original_ec_dir = EC_DIR
+    try:
+        with prepared_workspace(opts) as shadow_ec:
+            if shadow_ec is not None:
+                globals()["EC_DIR"] = shadow_ec
+            return _run_subcommand(opts)
+    finally:
+        globals()["EC_DIR"] = original_ec_dir
 
 
 if __name__ == "__main__":
