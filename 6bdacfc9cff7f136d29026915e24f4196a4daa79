@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0c5c7c0e_ba65734d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 41
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T00:01:15Z",
+      "side": 1,
+      "message": "#### 1. The Generic `ret` Variable\n\nIn `bootrom.cc` (`BootromComm::SendPrewrappedPacket`), you use `ret` for the receive buffer:\n\n```cpp\nstd::vector\u003cuint8_t\u003e ret(kMaxPayloadSize + min_expected_rx_size, 0);\nauto read_res \u003d usb_.Receive(ret, timeout);\n// ...\nif (ret.size() \u003c kStatusHeaderSize)\n\n```\n\n* **The Issue:** `ret` is a generic abbreviation for \"return.\" When dealing with I/O, it is better to explicitly name buffers based on their direction.\n* **Recommendation:** Rename `ret` to **`rx_buffer`** or **`response_buffer`**.\n\n#### 2. The Abbreviation `brom`\n\nIn `et171_flash.cc` and the test files, the instance of `BootromComm` is named `brom` or `brom_`:\n\n```cpp\negis::BootromComm brom(boot_comm);\n\n```\n\n* **The Issue:** While \"brom\" is a common industry shorthand for \"bootrom,\" stripping out vowels makes the code slightly more opaque for onboarding new engineers.\n* **Recommendation:** Rename `brom` to **`bootrom`** or **`bootrom_comm`**.\n\n#### 3. The `take` Variable in Chunking Loops\n\nIn both `bootrom.cc` and `flasher_logic.cc`, you use `take` to define the size of the current slice being processed:\n\n```cpp\nsize_t take \u003d std::min(BootromComm::kMaxFlashWriteSize, payload.size());\n\n```\n\n* **The Issue:** `take` is technically accurate (as in \"take X bytes\"), but it acts as a verb where a noun is expected for a size variable.\n* **Recommendation:** Rename `take` to **`chunk_size`** or **`bytes_to_write`**.\n\n#### 4. The Context of `fw` in the Parser\n\nIn `flasher_logic.cc`, the `GetNextPacketSize` function accepts:\n\n```cpp\nstd::expected\u003csize_t, ParseError\u003e GetNextPacketSize(std::span\u003cconst uint8_t\u003e fw)\n\n```\n\n* **The Issue:** `fw` (firmware) implies the entire binary image. However, inside this function, you are actually inspecting a specific slice of the file to determine the boundaries of a single command packet.\n* **Recommendation:** Rename `fw` to **`remaining_data`** to better reflect that it is acting as a sliding window over the file, not just a static firmware blob.\n\n#### 5. The Terse `strv` in Hex Parsing\n\nIn `cli_options.cc`, the helper template uses `strv`:\n\n```cpp\ntemplate \u003cstd::integral T\u003e\nstd::expected\u003cT, std::errc\u003e ParseHex(std::string_view strv) {\n\n```\n\n* **The Issue:** `strv` is standard library shorthand for `string_view`, but naming a variable after its type (rather than its purpose) is an anti-pattern.\n* **Recommendation:** Rename `strv` to **`hex_string`** or **`input_string`**.",
+      "revId": "6bdacfc9cff7f136d29026915e24f4196a4daa79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a78ca557_85a49d7f",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 41
