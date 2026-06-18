@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7c6d572_7263ec9c",
+        "filename": "common/system.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 1898,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-06-18T09:47:12Z",
+      "side": 1,
+      "message": "bool?",
+      "revId": "b2ff9d8001fe2a3d1e61fd52bc2a87ba33dc28cb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f75bc487_89b8c328",
+        "filename": "common/system.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 1902,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-06-18T09:47:12Z",
+      "side": 1,
+      "message": "This should be cleared automatically during reboot. Please clear this after `handle_pending_reboot` in case it returns.",
+      "revId": "b2ff9d8001fe2a3d1e61fd52bc2a87ba33dc28cb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ffbd786_5e44ca9e",
+        "filename": "common/system.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 1903,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-06-18T09:47:12Z",
+      "side": 1,
+      "message": "This shouldn\u0027t return, right? Please check the possible return code and print possible error.",
+      "revId": "b2ff9d8001fe2a3d1e61fd52bc2a87ba33dc28cb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
