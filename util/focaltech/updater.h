@@ -64,13 +64,33 @@ constexpr size_t kFlashWpBufferSize = 512;
 constexpr size_t kBootVersionMax = 22;
 constexpr size_t kRomVersionMax = 36;
 constexpr uint32_t kWriteSramAddr = 0x20002000;
-constexpr size_t kEcBinSizeMax = 2 * 1024 * 1024;
+constexpr size_t kFwBinSizeMax = 2 * 1024 * 1024;
 
 constexpr size_t kFocalConfigSize = 0x1000;
+
+// Hardware memory addresses for ROM and Bootloader modes.
 constexpr uint32_t kRomCfgAddr = 0x10000000;
 constexpr uint32_t kBootCfgAddr = 0x10080000;
 constexpr uint32_t kRomRunAddr = 0x10002000;
 constexpr uint32_t kBootRunAddr = 0x10081000;
+
+struct MemoryMap {
+  uint32_t config_address;
+  uint32_t run_address;
+};
+
+constexpr std::expected<MemoryMap, Error> GetMemoryMap(DeviceMode mode) {
+  switch (mode) {
+    case DeviceMode::kRom:
+      return MemoryMap{.config_address = kRomCfgAddr,
+                       .run_address = kRomRunAddr};
+    case DeviceMode::kBootloader:
+      return MemoryMap{.config_address = kBootCfgAddr,
+                       .run_address = kBootRunAddr};
+    default:
+      return std::unexpected(Error::kInvalidMode);
+  }
+}
 
 constexpr uint32_t kCodeValidMagic = 0x3AEC3721;
 

@@ -28,6 +28,9 @@ using ::testing::Return;
 
 constexpr size_t kArbitraryBufferSize = 10;
 
+constexpr size_t kPartialReadSize = 5;
+constexpr uint8_t kArbitraryDataByte = 0xAB;
+
 class UsbDeviceTest : public ::testing::Test {
  protected:
   void SetUp() override {
@@ -58,12 +61,12 @@ TEST_F(UsbDeviceTest, SendHandlesError) {
   auto timeout = 100ms;
 
   EXPECT_CALL(*mock_, Send(_, timeout))
-      .WillOnce(Return(std::unexpected(Error::kNoSuchDevice)));
+      .WillOnce(Return(std::unexpected(Error::kDeviceNotFound)));
 
   std::vector<uint8_t> test_data = {0x01};
   auto result = device_->Send(test_data, timeout);
   EXPECT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(), Error::kNoSuchDevice);
+  EXPECT_EQ(result.error(), Error::kDeviceNotFound);
 }
 
 TEST_F(UsbDeviceTest, RecvForwardsToTransport) {
@@ -72,25 +75,25 @@ TEST_F(UsbDeviceTest, RecvForwardsToTransport) {
 
   EXPECT_CALL(*mock_, Recv(_, timeout))
       .WillOnce(Invoke([&](std::span<uint8_t> data, auto) {
-        std::fill(data.begin(), data.begin() + 5, 0xAB);
-        return std::expected<size_t, Error>(5);
+        std::ranges::fill(data.first(kPartialReadSize), kArbitraryDataByte);
+        return std::expected<size_t, Error>(kPartialReadSize);
       }));
 
   auto result = device_->Recv(buffer, timeout);
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(*result, 5u);
+  EXPECT_EQ(*result, kPartialReadSize);
 }
 
 TEST_F(UsbDeviceTest, RecvHandlesError) {
   auto timeout = 200ms;
 
   EXPECT_CALL(*mock_, Recv(_, timeout))
-      .WillOnce(Return(std::unexpected(Error::kResultFail)));
+      .WillOnce(Return(std::unexpected(Error::kHardwareFailure)));
 
   std::vector<uint8_t> buffer(kArbitraryBufferSize);
   auto result = device_->Recv(buffer, timeout);
   EXPECT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(), Error::kResultFail);
+  EXPECT_EQ(result.error(), Error::kHardwareFailure);
 }
 
 TEST_F(UsbDeviceTest, WaitForResetForwardsToTransport) {
@@ -107,11 +110,11 @@ TEST_F(UsbDeviceTest, WaitForResetHandlesError) {
   auto timeout = 500ms;
 
   EXPECT_CALL(*mock_, WaitForReset(timeout))
-      .WillOnce(Return(std::unexpected(Error::kNoSuchDevice)));
+      .WillOnce(Return(std::unexpected(Error::kDeviceNotFound)));
 
   auto result = device_->WaitForReset(timeout);
   EXPECT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(), Error::kNoSuchDevice);
+  EXPECT_EQ(result.error(), Error::kDeviceNotFound);
 }
 
 TEST_F(UsbDeviceTest, DeviceIdReturnsFromTransport) {

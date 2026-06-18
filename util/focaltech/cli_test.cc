@@ -33,7 +33,7 @@ class FakeUsbTransport : public UsbTransport {
   std::expected<size_t, Error> Send(std::span<const uint8_t> data,
                                     std::chrono::milliseconds) override {
     if (data.size() == testing::kUsbCbwSize) {
-      std::memcpy(&current_cbw_tag_, &data[offsetof(BulkCbWrap, tag)],
+      std::memcpy(&current_cbw_tag_, &data[offsetof(BulkCbw, tag)],
                   sizeof(current_cbw_tag_));
     }
     return data.size();
@@ -62,13 +62,12 @@ class FakeUsbTransport : public UsbTransport {
 
 }  // namespace
 
-// -------- ParseArguments tests --------
 TEST(CliTest, ParseArguments_UpdateCommand) {
   std::vector<std::string_view> args = {"firmware.bin"};
   auto config = ParseArguments(args);
   ASSERT_TRUE(config.has_value());
   EXPECT_EQ(config->cmd, Command::kUpdate);
-  EXPECT_EQ(config->ec_bin, "firmware.bin");
+  EXPECT_EQ(config->firmware_path, "firmware.bin");
   EXPECT_EQ(config->wp_area, FlashWpArea::kUnknown);
 }
 
@@ -77,7 +76,7 @@ TEST(CliTest, ParseArguments_EnterRom) {
   auto config = ParseArguments(args);
   ASSERT_TRUE(config.has_value());
   EXPECT_EQ(config->cmd, Command::kEnterRom);
-  EXPECT_TRUE(config->ec_bin.empty());
+  EXPECT_TRUE(config->firmware_path.empty());
   EXPECT_EQ(config->wp_area, FlashWpArea::kUnknown);
 }
 
@@ -101,32 +100,14 @@ TEST(CliTest, ParseArguments_SetFlashWp_InvalidParam) {
   std::vector<std::string_view> args = {kCmdSetFlashWp, "invalid_area"};
   auto config = ParseArguments(args);
   EXPECT_FALSE(config.has_value());
-  EXPECT_EQ(config.error(), Error::kParameterError);
+  EXPECT_EQ(config.error(), Error::kInvalidParameter);
 }
 
 TEST(CliTest, ParseArguments_UnknownCommand) {
   std::vector<std::string_view> args = {"unknown"};
   auto config = ParseArguments(args);
   EXPECT_FALSE(config.has_value());
-  EXPECT_EQ(config.error(), Error::kParameterError);
-}
-
-TEST(CliTest, ParseInt_Valid) {
-  auto res = ParseInt("42");
-  ASSERT_TRUE(res.has_value());
-  EXPECT_EQ(*res, 42);
-}
-
-TEST(CliTest, ParseInt_Negative) {
-  auto res = ParseInt("-5");
-  ASSERT_TRUE(res.has_value());
-  EXPECT_EQ(*res, -5);
-}
-
-TEST(CliTest, ParseInt_Invalid) {
-  auto res = ParseInt("12a");
-  EXPECT_FALSE(res.has_value());
-  EXPECT_EQ(res.error(), Error::kParameterError);
+  EXPECT_EQ(config.error(), Error::kInvalidParameter);
 }
 
 TEST(CliTest, GetDeviceMode_RomMode) {
@@ -138,21 +119,21 @@ TEST(CliTest, GetDeviceMode_RomMode) {
 TEST(CliTest, GetDeviceMode_BootMode) {
   auto res = GetDeviceMode(kFocalBootId);
   ASSERT_TRUE(res.has_value());
-  EXPECT_EQ(*res, DeviceMode::kBoot);
+  EXPECT_EQ(*res, DeviceMode::kBootloader);
 }
 
 TEST(CliTest, GetDeviceMode_Unknown) {
   UsbDeviceId unknown{.vid = 0x1234, .pid = 0x5678};
   auto res = GetDeviceMode(unknown);
   EXPECT_FALSE(res.has_value());
-  EXPECT_EQ(res.error(), Error::kNoSuchDevice);
+  EXPECT_EQ(res.error(), Error::kDeviceNotFound);
 }
 
 TEST(CliTest, ExecuteCommand_GetFlashWp_Success) {
   auto transport = std::make_unique<FakeUsbTransport>();
   UsbDevice device(std::move(transport));
   AppConfig config{.cmd = Command::kGetFlashWp};
-  auto result = ExecuteCommand(config, device, DeviceMode::kBoot);
+  auto result = ExecuteCommand(config, device, DeviceMode::kBootloader);
   EXPECT_TRUE(result.has_value());
 }
 
@@ -160,7 +141,7 @@ TEST(CliTest, ExecuteCommand_EnterRom_Success) {
   auto transport = std::make_unique<FakeUsbTransport>();
   UsbDevice device(std::move(transport));
   AppConfig config{.cmd = Command::kEnterRom};
-  auto result = ExecuteCommand(config, device, DeviceMode::kBoot);
+  auto result = ExecuteCommand(config, device, DeviceMode::kBootloader);
   EXPECT_TRUE(result.has_value());
 }
 
@@ -177,9 +158,9 @@ TEST(CliTest, ExecuteCommand_UnknownCommand) {
   AppConfig config{.cmd = Command::kUnknown};
   auto transport = std::make_unique<FakeUsbTransport>();
   UsbDevice device(std::move(transport));
-  auto result = ExecuteCommand(config, device, DeviceMode::kBoot);
+  auto result = ExecuteCommand(config, device, DeviceMode::kBootloader);
   EXPECT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(), Error::kParameterError);
+  EXPECT_EQ(result.error(), Error::kInvalidParameter);
 }
 
 }  // namespace focaltech

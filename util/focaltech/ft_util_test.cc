@@ -44,11 +44,13 @@ TEST(FtUtilTest, DivRoundUp_DifferentTypes) {
 // -----------------------------------------------------------------------------
 TEST(FtUtilTest, ToString_ReturnsCorrectString) {
   EXPECT_EQ(ToString(Error::kSuccess), "Success");
-  EXPECT_EQ(ToString(Error::kNoSuchDevice), "No such device");
-  EXPECT_EQ(ToString(Error::kParameterError), "Parameter error");
-  EXPECT_EQ(ToString(Error::kNoSuchFile), "No such file");
-  EXPECT_EQ(ToString(Error::kResultFail), "Result fail");
+  EXPECT_EQ(ToString(Error::kDeviceNotFound), "Device not found");
+  EXPECT_EQ(ToString(Error::kInvalidParameter), "Invalid parameter");
+  EXPECT_EQ(ToString(Error::kFileNotFound), "File not found");
+  EXPECT_EQ(ToString(Error::kHardwareFailure), "Hardware failure");
   EXPECT_EQ(ToString(Error::kInvalidMode), "Invalid mode");
+  EXPECT_EQ(ToString(Error::kInvalidFormat), "Invalid firmware format");
+  EXPECT_EQ(ToString(Error::kVerificationFailed), "Verification failed");
 }
 
 TEST(FtUtilTest, ToString_UnknownError) {

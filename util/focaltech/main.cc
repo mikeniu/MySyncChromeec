@@ -17,13 +17,13 @@
 int main(int argc, char** argv) {
   FT_LOGI("Tool version is {}", focaltech::kToolVersion);
 
-  std::vector<std::string_view> args(argv + 1, argv + argc);
+  const std::vector<std::string_view> args(argv + 1, argv + argc);
   if (args.empty() || args[0] == "-h" || args[0] == "--help") {
     std::println("{}", focaltech::kCmdHelpString);
     return EXIT_SUCCESS;
   }
 
-  auto config = focaltech::ParseArguments(args);
+  const auto config = focaltech::ParseArguments(args);
   if (!config) return EXIT_FAILURE;
 
   auto transport = focaltech::LibusbTransport::Create();
@@ -32,17 +32,17 @@ int main(int argc, char** argv) {
     return EXIT_FAILURE;
   }
 
-  focaltech::UsbDevice usb_device(std::make_unique<focaltech::LibusbTransport>(
-      std::move(transport.value())));
+  focaltech::UsbDevice usb_device(
+      std::make_unique<focaltech::LibusbTransport>(std::move(*transport)));
 
-  auto mode_res = focaltech::GetDeviceMode(usb_device.device_id());
+  const auto mode_res = focaltech::GetDeviceMode(usb_device.device_id());
   if (!mode_res) {
     FT_LOGE("Cannot find Focal device");
     return EXIT_FAILURE;
   }
 
-  if (auto exec_res =
-          focaltech::ExecuteCommand(config.value(), usb_device, *mode_res);
+  if (const auto exec_res =
+          focaltech::ExecuteCommand(*config, usb_device, *mode_res);
       !exec_res) {
     FT_LOGE("Execution failed: {}", ToString(exec_res.error()));
     return EXIT_FAILURE;

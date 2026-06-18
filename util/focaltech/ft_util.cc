@@ -18,20 +18,20 @@ std::expected<std::vector<uint8_t>, Error> ReadFileToVector(
   std::ifstream file(std::string{path}, std::ios::binary | std::ios::ate);
   if (!file) {
     FT_LOGE("Cannot open file: {}", path);
-    return std::unexpected(Error::kNoSuchFile);
+    return std::unexpected(Error::kFileNotFound);
   }
 
-  auto size = file.tellg();
+  const auto size = file.tellg();
   if (size <= 0) {
     FT_LOGE("File is empty or invalid: {}", path);
-    return std::unexpected(Error::kParameterError);
+    return std::unexpected(Error::kInvalidParameter);
   }
 
   std::vector<uint8_t> buffer(size);
   file.seekg(0, std::ios::beg);
   if (!file.read(reinterpret_cast<char*>(buffer.data()), size)) {
     FT_LOGE("Failed to read file payload.");
-    return std::unexpected(Error::kResultFail);
+    return std::unexpected(Error::kHardwareFailure);
   }
 
   return buffer;

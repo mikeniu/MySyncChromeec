@@ -17,9 +17,12 @@
 
 namespace focaltech {
 
+// Represents the current execution state of the Focaltech MCU.
 enum class DeviceMode {
+  // Hardwired mask ROM. Cannot be overwritten. Used for safe recovery.
   kRom,
-  kBoot,
+  // Updatable flash bootloader. Used for normal firmware updates.
+  kBootloader,
 };
 
 using namespace std::chrono_literals;
@@ -27,8 +30,8 @@ inline constexpr auto kDeviceRebootTimeout = 3s;
 
 inline std::expected<DeviceMode, Error> GetDeviceMode(const UsbDeviceId& id) {
   if (id == kFocalRomId) return DeviceMode::kRom;
-  if (id == kFocalBootId) return DeviceMode::kBoot;
-  return std::unexpected(Error::kNoSuchDevice);
+  if (id == kFocalBootId) return DeviceMode::kBootloader;
+  return std::unexpected(Error::kDeviceNotFound);
 }
 
 class UsbDevice {

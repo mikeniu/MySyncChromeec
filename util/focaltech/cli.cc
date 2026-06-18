@@ -17,24 +17,12 @@ namespace {
 
 using namespace std::chrono_literals;
 
-// Convert a string to lowercase for case-insensitive comparisons.
-std::string ToLower(std::string_view s) {
-  std::string result;
-  result.reserve(s.size());
-  for (char c : s) {
-    result.push_back(std::tolower(static_cast<unsigned char>(c)));
-  }
-  return result;
-}
-
-// Parse a string to a FlashWpArea (case-insensitive).
 std::expected<FlashWpArea, Error> ParseWpArea(std::string_view arg) {
-  auto lower = ToLower(arg);
-  if (lower == "none") return FlashWpArea::kNone;
-  if (lower == "boot") return FlashWpArea::kBoot;
-  if (lower == "ro") return FlashWpArea::kRo;
-  if (lower == "all") return FlashWpArea::kAll;
-  return std::unexpected(Error::kParameterError);
+  if (arg == "none") return FlashWpArea::kNone;
+  if (arg == "boot") return FlashWpArea::kBoot;
+  if (arg == "ro") return FlashWpArea::kRo;
+  if (arg == "all") return FlashWpArea::kAll;
+  return std::unexpected(Error::kInvalidParameter);
 }
 
 }  // namespace
@@ -47,36 +35,26 @@ constexpr Command ParseCommand(std::string_view cmd_str) {
   return Command::kUnknown;
 }
 
-std::expected<int, Error> ParseInt(std::string_view str) {
-  int value = 0;
-  auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), value);
-  if (ec != std::errc() || ptr != str.data() + str.size()) {
-    return std::unexpected(Error::kParameterError);
-  }
-  return value;
-}
-
 std::expected<AppConfig, Error> ParseArguments(
     std::span<const std::string_view> args) {
   if (args.empty()) {
     FT_LOGE("No subcommand specified.");
-    return std::unexpected(Error::kParameterError);
+    return std::unexpected(Error::kInvalidParameter);
   }
 
   AppConfig config;
-  std::string_view first_arg = args[0];
-
-  // If the first argument ends with ".bin", it's a firmware update.
-  if (first_arg.ends_with(".bin")) {
-    config.cmd = Command::kUpdate;
-    config.ec_bin = first_arg;
-    return config;
-  }
+  const std::string_view first_arg = args[0];
 
   config.cmd = ParseCommand(first_arg);
+
   if (config.cmd == Command::kUnknown) {
     FT_LOGE("Unknown subcommand: {}", first_arg);
-    return std::unexpected(Error::kParameterError);
+    return std::unexpected(Error::kInvalidParameter);
+  }
+
+  if (config.cmd == Command::kUpdate) {
+    config.firmware_path = first_arg;
+    return config;
   }
 
   if (config.cmd == Command::kSetFlashWp) {
@@ -84,13 +62,13 @@ std::expected<AppConfig, Error> ParseArguments(
       FT_LOGE(
           "flash_set_protect requires an area parameter (none, boot, ro, "
           "all).");
-      return std::unexpected(Error::kParameterError);
+      return std::unexpected(Error::kInvalidParameter);
     }
-    auto wp_res = ParseWpArea(args[1]);
+    const auto wp_res = ParseWpArea(args[1]);
     if (!wp_res) {
       FT_LOGE("Invalid protection area: '{}'. Must be none, boot, ro, or all.",
               args[1]);
-      return std::unexpected(Error::kParameterError);
+      return std::unexpected(Error::kInvalidParameter);
     }
     config.wp_area = *wp_res;
   }
@@ -106,7 +84,7 @@ std::expected<void, Error> ExecuteCommand(const AppConfig& config,
       return SetFlashProtection(usb_device, config.wp_area, current_mode);
 
     case Command::kGetFlashWp: {
-      auto wp_res = GetFlashProtection(usb_device, current_mode);
+      const auto wp_res = GetFlashProtection(usb_device, current_mode);
       if (!wp_res) {
         return std::unexpected(wp_res.error());
       }
@@ -116,7 +94,7 @@ std::expected<void, Error> ExecuteCommand(const AppConfig& config,
 
     case Command::kEnterRom:
       FT_LOGI("Entering ROM mode...");
-      if (current_mode != DeviceMode::kBoot) {
+      if (current_mode != DeviceMode::kBootloader) {
         FT_LOGE(
             "enter_rom is only valid from bootloader mode. Current mode: {}",
             static_cast<int>(current_mode));
@@ -126,12 +104,12 @@ std::expected<void, Error> ExecuteCommand(const AppConfig& config,
 
     case Command::kUpdate: {
       FT_LOGI("Updating firmware...");
-      if (config.ec_bin.empty()) {
+      if (config.firmware_path.empty()) {
         FT_LOGE("No firmware file specified");
-        return std::unexpected(Error::kParameterError);
+        return std::unexpected(Error::kInvalidParameter);
       }
 
-      auto fw_data_res = ReadFileToVector(config.ec_bin);
+      const auto fw_data_res = ReadFileToVector(config.firmware_path);
       if (!fw_data_res) {
         return std::unexpected(fw_data_res.error());
       }
@@ -140,7 +118,8 @@ std::expected<void, Error> ExecuteCommand(const AppConfig& config,
        * entered suspend, the host may forcibly switch the FPMCU into suspend
        * state, causing the upgrade to fail. Retry updating the firmware. */
       for (int attempt = 1; attempt <= kMaxRetry; ++attempt) {
-        if (auto res = UpdateFw(usb_device, *fw_data_res, current_mode); res) {
+        const auto res = UpdateFw(usb_device, *fw_data_res, current_mode);
+        if (res) {
           FT_LOGI("Firmware update successful");
           return {};
         }
@@ -150,12 +129,12 @@ std::expected<void, Error> ExecuteCommand(const AppConfig& config,
         }
       }
       FT_LOGE("Firmware update failed");
-      return std::unexpected(Error::kResultFail);
+      return std::unexpected(Error::kHardwareFailure);
     }
 
     default:
       FT_LOGE("Command not implemented.");
-      return std::unexpected(Error::kParameterError);
+      return std::unexpected(Error::kInvalidParameter);
   }
 }
 

@@ -52,7 +52,7 @@ void FtLog(LogLevel level, const std::source_location& loc,
     return;
   }
 
-  auto now = std::chrono::system_clock::now();
+  const auto now = std::chrono::system_clock::now();
   std::string_view level_str;
   std::string_view color;
   const bool enable_color = log::UseColor();
@@ -84,15 +84,11 @@ void FtLog(LogLevel level, const std::source_location& loc,
     file = file.substr(pos + 1);
   }
 
-  // Apply color before the log line, then reset after.
-  if (!color.empty()) {
-    std::print("{}[{:%m-%d %H:%M:%S}] {} [{}][{}:{}] ", color, now, level_str,
-               log::kLogTag, file, loc.line());
-  } else {
-    std::print("[{:%m-%d %H:%M:%S}] {} [{}][{}:{}] ", now, level_str,
-               log::kLogTag, file, loc.line());
-  }
+  std::print("{}[{:%m-%d %H:%M:%S}] {} [{}][{}:{}] ", color, now, level_str,
+             log::kLogTag, file, loc.line());
+
   std::println(fmt, std::forward<Args>(args)...);
+
   if (!color.empty()) {
     std::print("{}", kColorReset);
   }

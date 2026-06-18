@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <array>
-#include <charconv>
 #include <chrono>
 #include <cstdlib>
 #include <filesystem>
@@ -45,7 +44,7 @@ enum class Command {
 
 struct AppConfig {
   Command cmd = Command::kUnknown;
-  std::string_view ec_bin;
+  std::string_view firmware_path;
   FlashWpArea wp_area = FlashWpArea::kUnknown;
 };
 
@@ -55,8 +54,6 @@ std::expected<AppConfig, Error> ParseArguments(
 std::expected<void, Error> ExecuteCommand(const AppConfig& config,
                                           UsbDevice& usb_device,
                                           DeviceMode current_mode);
-
-std::expected<int, Error> ParseInt(std::string_view str);
 
 }  // namespace focaltech
 

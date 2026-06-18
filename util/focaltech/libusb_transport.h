@@ -18,8 +18,6 @@
 
 namespace focaltech {
 
-inline constexpr uint16_t kGoogleVid = 0x18D1;
-
 inline constexpr UsbDeviceId kFocalRomId = {0x2FD0, 0x0000};
 inline constexpr UsbDeviceId kFocalBootId = {0x2808, 0x0001};
 

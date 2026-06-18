@@ -24,7 +24,7 @@ namespace {
 
 using namespace std::chrono_literals;
 constexpr auto kUsbEnumerationDelay = 200ms;
-constexpr auto kPollinterval = 100ms;
+constexpr auto kPollInterval = 100ms;
 constexpr uint8_t kDefaultUsbConfigIndex = 0;
 
 // libusb_set_auto_detach_kernel_driver expects 1 to enable.
@@ -54,7 +54,7 @@ std::optional<FoundDevice> FindFocalDevice(std::span<libusb_device*> devices) {
       continue;
     }
 
-    UsbDeviceId current_id{.vid = desc.idVendor, .pid = desc.idProduct};
+    const UsbDeviceId current_id{.vid = desc.idVendor, .pid = desc.idProduct};
 
     if (GetDeviceMode(current_id).has_value()) {
       return FoundDevice{.handle = dev, .id = current_id};
@@ -121,23 +121,23 @@ std::expected<LibusbTransport, Error> LibusbTransport::Create() {
   libusb_context* raw_ctx = nullptr;
   if (libusb_init(&raw_ctx) != LIBUSB_SUCCESS) {
     FT_LOGE("Failed to initialize libusb");
-    return std::unexpected(Error::kResultFail);
+    return std::unexpected(Error::kHardwareFailure);
   }
   ScopedContext ctx(raw_ctx, libusb_exit);
 
   libusb_device** raw_list = nullptr;
-  ssize_t count = libusb_get_device_list(ctx.get(), &raw_list);
+  const ssize_t count = libusb_get_device_list(ctx.get(), &raw_list);
   if (count < 0) {
     FT_LOGE("Failed to get USB device list: {}", libusb_error_name(count));
-    return std::unexpected(Error::kNoSuchDevice);
+    return std::unexpected(Error::kDeviceNotFound);
   }
   ScopedDeviceList dev_list(raw_list);
 
-  auto devices = std::span(raw_list, static_cast<size_t>(count));
-  auto found = FindFocalDevice(devices);
+  const auto devices = std::span(raw_list, static_cast<size_t>(count));
+  const auto found = FindFocalDevice(devices);
   if (!found) {
     FT_LOGE("No matching Focal device found");
-    return std::unexpected(Error::kNoSuchDevice);
+    return std::unexpected(Error::kDeviceNotFound);
   }
 
   // Increase reference count on the device so it remains valid after the device
@@ -148,7 +148,7 @@ std::expected<LibusbTransport, Error> LibusbTransport::Create() {
   FT_LOGI("Found device VID {:04x}: PID {:04x}", found->id.vid, found->id.pid);
 
   LibusbTransport transport(std::move(ctx), found->handle, found->id);
-  auto open_res = transport.Open();
+  const auto open_res = transport.Open();
   if (!open_res) {
     return std::unexpected(open_res.error());
   }
@@ -168,21 +168,21 @@ std::expected<void, Error> LibusbTransport::Open() {
 
   if (!device_) {
     FT_LOGE("Invalid device pointer");
-    return std::unexpected(Error::kNoSuchDevice);
+    return std::unexpected(Error::kDeviceNotFound);
   }
 
   libusb_device_handle* raw_handle = nullptr;
-  int r = libusb_open(device_.get(), &raw_handle);
-  if (r != LIBUSB_SUCCESS || !raw_handle) {
-    FT_LOGE("Failed to open device: {}", libusb_error_name(r));
-    return std::unexpected(Error::kNoSuchDevice);
+  const int r_open = libusb_open(device_.get(), &raw_handle);
+  if (r_open != LIBUSB_SUCCESS || !raw_handle) {
+    FT_LOGE("Failed to open device: {}", libusb_error_name(r_open));
+    return std::unexpected(Error::kDeviceNotFound);
   }
   handle_.reset(raw_handle);
 
-  auto ep_info = FindBulkEndpoints(device_.get());
+  const auto ep_info = FindBulkEndpoints(device_.get());
   if (!ep_info) {
     FT_LOGE("Could not find required bulk IN/OUT endpoints");
-    return std::unexpected(Error::kNoSuchDevice);
+    return std::unexpected(Error::kDeviceNotFound);
   }
   endpoint_in_ = ep_info->ep_bulk_in;
   endpoint_out_ = ep_info->ep_bulk_out;
@@ -190,15 +190,16 @@ std::expected<void, Error> LibusbTransport::Open() {
 
   // Enable auto-detach. libusb will automatically detach the kernel driver
   // on claim, and reattach it on release.
-  r = libusb_set_auto_detach_kernel_driver(handle_.get(), kEnableAutoDetach);
-  if (r != LIBUSB_SUCCESS) {
-    FT_LOGW("libusb_set_auto_detach_kernel_driver failed: {}", r);
+  const int r_auto =
+      libusb_set_auto_detach_kernel_driver(handle_.get(), kEnableAutoDetach);
+  if (r_auto != LIBUSB_SUCCESS) {
+    FT_LOGW("libusb_set_auto_detach_kernel_driver failed: {}", r_auto);
     // Continue anyway, as the interface may still work.
   }
 
   if (libusb_claim_interface(handle_.get(), interface_num_) != LIBUSB_SUCCESS) {
     FT_LOGE("Failed to claim interface");
-    return std::unexpected(Error::kResultFail);
+    return std::unexpected(Error::kHardwareFailure);
   }
 
   device_.reset();
@@ -210,14 +211,14 @@ std::expected<size_t, Error> LibusbTransport::Send(
     std::span<const uint8_t> data, std::chrono::milliseconds timeout) {
   if (!opened_) {
     FT_LOGE("Device not opened");
-    return std::unexpected(Error::kNoSuchDevice);
+    return std::unexpected(Error::kDeviceNotFound);
   }
 
   int actual = 0;
-  int r = libusb_bulk_transfer(handle_.get(), endpoint_out_,
-                               const_cast<uint8_t*>(data.data()),
-                               static_cast<int>(data.size()), &actual,
-                               static_cast<unsigned int>(timeout.count()));
+  const int r = libusb_bulk_transfer(
+      handle_.get(), endpoint_out_, const_cast<uint8_t*>(data.data()),
+      static_cast<int>(data.size()), &actual,
+      static_cast<unsigned int>(timeout.count()));
   if (r != LIBUSB_SUCCESS) return HandleTransferError(r);
   return static_cast<size_t>(actual);
 }
@@ -226,13 +227,13 @@ std::expected<size_t, Error> LibusbTransport::Recv(
     std::span<uint8_t> data, std::chrono::milliseconds timeout) {
   if (!opened_) {
     FT_LOGE("Device not opened");
-    return std::unexpected(Error::kNoSuchDevice);
+    return std::unexpected(Error::kDeviceNotFound);
   }
 
   int actual = 0;
-  int r = libusb_bulk_transfer(handle_.get(), endpoint_in_, data.data(),
-                               static_cast<int>(data.size()), &actual,
-                               static_cast<unsigned int>(timeout.count()));
+  const int r = libusb_bulk_transfer(
+      handle_.get(), endpoint_in_, data.data(), static_cast<int>(data.size()),
+      &actual, static_cast<unsigned int>(timeout.count()));
   if (r != LIBUSB_SUCCESS) return HandleTransferError(r);
   return static_cast<size_t>(std::min(actual, static_cast<int>(data.size())));
 }
@@ -241,13 +242,13 @@ std::expected<void, Error> LibusbTransport::WaitForReset(
     std::chrono::milliseconds timeout) {
   if (!opened_) {
     FT_LOGE("Device not opened");
-    return std::unexpected(Error::kNoSuchDevice);
+    return std::unexpected(Error::kDeviceNotFound);
   }
 
   const auto start = std::chrono::steady_clock::now();
   while (true) {
     int config = 0;
-    int r = libusb_get_configuration(handle_.get(), &config);
+    const int r = libusb_get_configuration(handle_.get(), &config);
     if (r == LIBUSB_ERROR_NO_DEVICE) {
       FT_LOGI("USB device removal/reset detected");
       return {};
@@ -259,32 +260,30 @@ std::expected<void, Error> LibusbTransport::WaitForReset(
         (std::chrono::steady_clock::now() - start) >= timeout) {
       break;
     }
-    std::this_thread::sleep_for(kPollinterval);
+    std::this_thread::sleep_for(kPollInterval);
   }
 
   FT_LOGW("Timeout after {} ms waiting for device removal", timeout.count());
-  return std::unexpected(Error::kResultFail);
+  return std::unexpected(Error::kHardwareFailure);
 }
 
 std::expected<size_t, Error> LibusbTransport::HandleTransferError(
     int libusb_error) const {
-  if (!handle_) return std::unexpected(Error::kNoSuchDevice);
-  int r = libusb_reset_device(handle_.get());
+  if (!handle_) return std::unexpected(Error::kDeviceNotFound);
+  const int r = libusb_reset_device(handle_.get());
   if (r != LIBUSB_SUCCESS) {
     FT_LOGW("libusb_reset_device failed: {}", r);
   }
   std::this_thread::sleep_for(kUsbEnumerationDelay);
 
   if (libusb_error == LIBUSB_ERROR_NO_DEVICE)
-    return std::unexpected(Error::kNoSuchDevice);
-  return std::unexpected(Error::kResultFail);
+    return std::unexpected(Error::kDeviceNotFound);
+  return std::unexpected(Error::kHardwareFailure);
 }
 
 LibusbTransport::~LibusbTransport() {
   if (opened_ && handle_) {
-    // Releasing the interface signals libusb to automatically reattach
-    // the host OS kernel driver, bringing the sensor back online.
-    int r = libusb_release_interface(handle_.get(), interface_num_);
+    const int r = libusb_release_interface(handle_.get(), interface_num_);
     if (r != LIBUSB_SUCCESS) {
       FT_LOGV("Failed to release interface during cleanup: {}", r);
     }

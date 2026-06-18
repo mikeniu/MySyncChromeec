@@ -53,7 +53,7 @@ struct CmdFormat {
 
 static_assert(sizeof(CmdFormat) == 16, "CmdFormat must be exactly 16 bytes");
 
-struct BulkCbWrap {
+struct BulkCbw {
   uint32_t signature;
   uint32_t tag;
   uint32_t data_transfer_length;
@@ -63,7 +63,7 @@ struct BulkCbWrap {
   CmdFormat cmd;
 } __attribute__((packed));
 
-static_assert(sizeof(BulkCbWrap) == 31, "USB CBW must be exactly 31 bytes");
+static_assert(sizeof(BulkCbw) == 31, "USB CBW must be exactly 31 bytes");
 
 enum class CswStatus : uint8_t {
   kCommandPassed = 0x00,
@@ -71,20 +71,16 @@ enum class CswStatus : uint8_t {
   kPhaseError = 0x02,
 };
 
-struct BulkCsWrap {
+struct BulkCsw {
   uint32_t signature;
   uint32_t tag;
   uint32_t data_residue;
   CswStatus status;
 } __attribute__((packed));
 
-static_assert(sizeof(BulkCsWrap) == 13, "USB CSW must be exactly 13 bytes");
+static_assert(sizeof(BulkCsw) == 13, "USB CSW must be exactly 13 bytes");
 
 enum class TransferDirection { kIn, kOut, kSendOnly };
-
-CmdFormat BuildFtCmd(Opcode opcode, Subcmd subcmd, uint32_t address = 0,
-                     uint32_t length = 0, uint32_t aux_address = 0,
-                     uint8_t flags = 0);
 
 std::expected<void, Error> SendBulkDataOut(
     const UsbDevice& device, const CmdFormat& scsi_cmd,

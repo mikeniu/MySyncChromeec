@@ -54,33 +54,33 @@ inline std::span<uint8_t> AsWritableUint8Span(T& obj) {
 
 enum class Error {
   kSuccess = 0,
-  kNoSuchDevice = -1,
-  kParameterError = -2,
-  kNoSuchFile = -3,
-  kResultFail = -4,
+  kDeviceNotFound = -1,
+  kInvalidParameter = -2,
+  kFileNotFound = -3,
+  kHardwareFailure = -4,
   kInvalidMode = -5,
-  kFormatError = -6,   // Firmware format invalid (bad magic number)
-  kVerifyFailed = -7,  // Post-write verification hash mismatch
+  kInvalidFormat = -6,
+  kVerificationFailed = -7,
 };
 
 inline std::string_view ToString(Error err) {
   switch (err) {
     case Error::kSuccess:
       return "Success";
-    case Error::kNoSuchDevice:
-      return "No such device";
-    case Error::kParameterError:
-      return "Parameter error";
-    case Error::kNoSuchFile:
-      return "No such file";
-    case Error::kResultFail:
-      return "Result fail";
+    case Error::kDeviceNotFound:
+      return "Device not found";
+    case Error::kInvalidParameter:
+      return "Invalid parameter";
+    case Error::kFileNotFound:
+      return "File not found";
+    case Error::kHardwareFailure:
+      return "Hardware failure";
     case Error::kInvalidMode:
       return "Invalid mode";
-    case Error::kFormatError:
-      return "Firmware format error";
-    case Error::kVerifyFailed:
-      return "Post-write verification failed";
+    case Error::kInvalidFormat:
+      return "Invalid firmware format";
+    case Error::kVerificationFailed:
+      return "Verification failed";
     default:
       return "Unknown error";
   }
