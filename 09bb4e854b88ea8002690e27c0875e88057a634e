@@ -113,6 +113,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c22064d3_5267a0e2",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 42
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T21:42:31Z",
+      "side": 1,
+      "message": "### Inconsistent Bounds Checking (AES vs. SHA)\n\nIn `bootrom.cc`, you correctly check if the payload size will overflow the 32-bit `payload_len` field when wrapping a **SHA-256** command:\n\n```cpp\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e\nBootromComm::SendBootromCommandSha(...) {\n  if (data.size() \u003e std::numeric_limits\u003cuint32_t\u003e::max()) {\n    return std::unexpected(BootromError::kPayloadSizeExceedsLimit);\n  }\n  // ...\n\n```\n\nHowever, you missed this exact same check in `SendBootromCommandAes`. It blindly casts `data.size()` to `uint32_t`, which would result in integer truncation if a massive payload were passed:\n\n```cpp\nstd::expected\u003cstd::vector\u003cuint8_t\u003e, BootromError\u003e\nBootromComm::SendBootromCommandAes(...) {\n  bootrom_protocol::SecureCommandAesHeader req_hdr;\n  req_hdr.algorithm \u003d crypto_type_;\n  req_hdr.payload_len \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(data.size())); // Missing check!\n\n```\n\n* **The Fix:** Copy the `std::numeric_limits\u003cuint32_t\u003e::max()` check to the top of `SendBootromCommandAes`.",
+      "range": {
+        "startLine": 138,
+        "startChar": 0,
+        "endLine": 143,
+        "endChar": 75
+      },
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "afaf81eb_43cbda1d",
         "filename": "util/egis/crypto_util.cc",
         "patchSetId": 42
