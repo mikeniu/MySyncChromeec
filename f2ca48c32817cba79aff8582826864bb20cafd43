@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ce86ca4_f9bfe462",
+        "filename": "zephyr/test/ec-aic/flash_protect/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-18T21:42:05Z",
+      "side": 1,
+      "message": "Nit: you could break out early after this, and the result wouldn\u0027t change. Not that this is very much work.",
+      "revId": "f2ca48c32817cba79aff8582826864bb20cafd43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f86e8be7_4e03b0ad",
+        "filename": "zephyr/test/ec-aic/flash_protect/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-18T21:42:05Z",
+      "side": 1,
+      "message": "Nit: flash_write",
+      "revId": "f2ca48c32817cba79aff8582826864bb20cafd43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f39e96ae_be6f9e24",
+        "filename": "zephyr/test/ec-aic/flash_protect/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-18T21:42:05Z",
+      "side": 1,
+      "message": "Nit: These casts seem unnecessary.",
+      "revId": "f2ca48c32817cba79aff8582826864bb20cafd43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
