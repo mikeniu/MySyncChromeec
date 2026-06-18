@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d690200a_e39e1ae5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T21:37:59Z",
+      "side": 1,
+      "message": "We can make some of the variable names clearer:\n\n------\n\n### 1\\. The `ret_res` and `ret` habit (USB Responses)\n\nIn `SendBootromCommandRaw`, `SendBootromCommandSha`, and `SendBootromCommandAes`, the code captures the result of `SendPrewrappedPacket` like this:\n\n```c\nauto ret_res \u003d SendPrewrappedPacket(cmd, timeout);\nif (!ret_res) return std::unexpected(ret_res.error());\nauto \u0026ret \u003d *ret_res;\n\n```\n\n**The Issue:** `ret` implies \"return value,\" which is an abstract programming concept. In the context of a hardware protocol, this is a physical **Response Packet**. Calling it `ret` makes the subsequent byte-manipulation math harder to read.\n\n**The Fix:** Rename them to reflect the domain layer: `response_res` and `raw_response`.\n\n```c\nauto response_res \u003d SendPrewrappedPacket(cmd, timeout);\nif (!response_res) return std::unexpected(response_res.error());\nauto \u0026raw_response \u003d *response_res; \n\n// In SendBootromCommandRaw, this makes the extraction much clearer:\nreturn std::vector\u003cuint8_t\u003e(raw_response.begin() + kHeaderSize, raw_response.end());\n\n```\n\n### 2\\. Variable Shadowing of `res` in `SendBootromCommandAes`\n\nInside `SendBootromCommandAes`, you correctly use block scoping (`{ ... }`) to limit variable lifespans. However, inside those blocks, you repeatedly declare `auto res`:\n\n```c\n{\n  if (auto res \u003d crypto::GenerateGcmIv(req_hdr.iv); !res) { ... }\n  if (auto res \u003d crypto::AesGcmEncrypt(...); !res) { ... }\n}\n// ... later ...\n{\n  if (auto res \u003d crypto::AesGcmDecrypt(...); !res) { ... }\n}\n\n```\n\n**The Issue:** While perfectly valid C++, this is variable shadowing. If you ever need to refactor or move these checks around, having identical variable names doing different things is a trap. Furthermore, since we discussed refactoring `GenerateGcmIv` to return the `std::array` directly, we need meaningful names anyway.\n\n**The Fix:** Give them distinct, operation-specific names:\n\n```c\n// 1. IV Generation\nauto iv_res \u003d crypto::GenerateGcmIv();\nif (!iv_res) return std::unexpected(BootromError::kGcmIvGenerationFailed);\nreq_hdr.iv \u003d *iv_res;\n\n// 2. Encryption\nauto enc_res \u003d crypto::AesGcmEncrypt(aes_key_, req_hdr.iv, AsBytes(aad_val), \n                                     data, ciphertext, req_hdr.tag);\nif (!enc_res) return std::unexpected(BootromError::kGcmEncryptionFailed);\n\n// ... later for Decryption ...\nauto dec_res \u003d crypto::AesGcmDecrypt(aes_key_, rsp_iv, AsBytes(aad_val), \n                                     rsp_ciphertext, rsp_tag, decrypted_payload);\nif (!dec_res) return std::unexpected(BootromError::kGcmAuthenticationFailed);\n\n```\n\n### 3\\. Mislabeling `BlockWriteCommand` as a Header\n\nIn `BootromComm::WriteFlash`:\n\n```c\nbootrom_protocol::BlockWriteCommand req_hdr{\n    .address \u003d ToLittleEndian(addr),\n    .count \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(data.size()))};\n\nstd::vector\u003cuint8_t\u003e cmd \u003d PackMessage(req_hdr, data);\n\n```\n\n**The Issue:** `BlockWriteCommand` is called `req_hdr`. While it *is* prefixed before the payload in memory, structurally it is the core Command, not a \"header\". (A header usually contains metadata like lengths or checksums, whereas this contains the actual hardware instruction like address and access size). In other functions like `ReadReg` or `BackupFlash`, you correctly call similar structs `req`.\n\n**The Fix:** For consistency across the class, rename `req_hdr` to `req` or `command`:\n\n```c\nbootrom_protocol::BlockWriteCommand req{\n    .address \u003d ToLittleEndian(addr),\n    .count \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(data.size()))};\n\nstd::vector\u003cuint8_t\u003e cmd \u003d PackMessage(req, data);\n\n```",
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a9db377a_1c1d94ee",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 42
