@@ -74,6 +74,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ed775045_fa22733a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-18T22:28:21Z",
+      "side": 1,
+      "message": "### 1. `ft_scsi.cc` / `ft_scsi.h` - Chrono Unit Redundancy\n\n**The Issue: Encoding Units into Strongly Typed Variables (`timeout_ms`)**\nBefore C++11, if you had a timeout, you had to name it `timeout_ms` so the caller knew it wasn\u0027t seconds or microseconds. With `\u003cchrono\u003e`, the type system encodes the unit safely (`std::chrono::milliseconds`). The Google C++ Style Guide notes that if a variable is a `std::chrono` type, appending the unit to the variable name is redundant and should be avoided.\n\n**Current:**\n\n```cpp\nstd::expected\u003cvoid, Error\u003e ReceiveBulkDataIn(..., std::chrono::milliseconds timeout_ms);\n\n```\n\n**Improvement:** Trust the type system.\n\n```cpp\nstd::expected\u003cvoid, Error\u003e ReceiveBulkDataIn(..., std::chrono::milliseconds timeout);\n\n```\n\n### 2. `updater.cc` - The Classic C Abbreviations (`addr`, `len`)\n\n**The Issue: Dropping Vowels / Truncating**\nThese are the two most common abbreviations in all of C and C++, but they still technically violate the \"no abbreviations\" rule.\n\n**Current:**\n\n```cpp\n// In ErasePage:\nstd::expected\u003cvoid, Error\u003e ErasePage(const UsbDevice\u0026 device, size_t length,\n                                     uint32_t addr) { ... }\n\n// In DownloadBin:\nconst size_t file_len \u003d buffer.size();\n\n```\n\n**Improvement:**\n\n```cpp\nstd::expected\u003cvoid, Error\u003e ErasePage(const UsbDevice\u0026 device, size_t length_bytes,\n                                     uint32_t address) { ... }\n\nconst size_t file_length \u003d buffer.size();\n\n```\n\n*(Note: I added `_bytes` to `length` here because it is a raw scalar, unlike the chrono type above, so the unit suffix is actively helpful).*\n\n### 3. `libusb_transport.cc` - Range-Based For Loop Variables\n\n**The Issue: Single-Syllable Truncations (`dev`, `ep`)**\nWhen writing `for` loops, it is common to heavily abbreviate the iterator variable. However, because the body of the loop can grow, standardizing on the full word prevents confusion later.\n\n**Current:**\n\n```cpp\n// In FindFocalDevice:\nfor (libusb_device* dev : devices) {\n    libusb_device_descriptor desc;\n    if (libusb_get_device_descriptor(dev, \u0026desc) !\u003d LIBUSB_SUCCESS) { ... }\n}\n\n// In ParseAltSetting:\nfor (const auto\u0026 ep : std::span(alt.endpoint, alt.bNumEndpoints)) { ... }\n\n```\n\n**Improvement:**\n\n```cpp\nfor (libusb_device* device : devices) {\n    libusb_device_descriptor descriptor;\n    if (libusb_get_device_descriptor(device, \u0026descriptor) !\u003d LIBUSB_SUCCESS) { ... }\n}\n\nfor (const auto\u0026 endpoint : std::span(alternate_setting.endpoint, alternate_setting.bNumEndpoints)) { ... }\n\n```",
+      "parentUuid": "cbfbb9eb_6f01c1ba",
+      "revId": "4559c7a866afc0a254616a40d1ee6896f4c2ff43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ba583f89_c89c8c0b",
         "filename": "util/focaltech/ft_scsi.cc",
         "patchSetId": 26
