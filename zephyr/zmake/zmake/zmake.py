@@ -533,7 +533,7 @@ class Zmake:
             self.cmp_failed_projects["devicetree"] = failed_projects
             self.failed_projects.extend(failed_projects)
 
-        self.failed_projects = list(set(self.failed_projects))
+        self.failed_projects = sorted(list(set(self.failed_projects)))
         if len(self.failed_projects) == 0:
             self.logger.info("Zephyr compare builds successful:")
             for checkout in cmp_builds.checkouts:
