@@ -21,15 +21,15 @@ std::expected<std::vector<uint8_t>, Error> ReadFileToVector(
     return std::unexpected(Error::kFileNotFound);
   }
 
-  const auto size = file.tellg();
-  if (size <= 0) {
+  const auto file_size_bytes = file.tellg();
+  if (file_size_bytes <= 0) {
     FT_LOGE("File is empty or invalid: {}", path);
     return std::unexpected(Error::kInvalidParameter);
   }
 
-  std::vector<uint8_t> buffer(size);
+  std::vector<uint8_t> buffer(static_cast<size_t>(file_size_bytes));
   file.seekg(0, std::ios::beg);
-  if (!file.read(reinterpret_cast<char*>(buffer.data()), size)) {
+  if (!file.read(reinterpret_cast<char*>(buffer.data()), file_size_bytes)) {
     FT_LOGE("Failed to read file payload.");
     return std::unexpected(Error::kHardwareFailure);
   }

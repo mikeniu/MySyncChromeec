@@ -50,19 +50,20 @@ class LibusbTransport : public UsbTransport {
   ~LibusbTransport() override;
 
  private:
-  LibusbTransport(ScopedContext ctx, libusb_device* dev, UsbDeviceId id);
+  LibusbTransport(ScopedContext context, libusb_device* usb_device,
+                  UsbDeviceId id);
 
   std::expected<void, Error> Open();
   std::expected<size_t, Error> HandleTransferError(int libusb_error) const;
 
-  ScopedContext ctx_;
+  ScopedContext context_;
   ScopedDevice device_{nullptr, libusb_unref_device};
   UsbDeviceId device_id_;
 
   ScopedHandle handle_{nullptr, libusb_close};
   uint8_t endpoint_in_ = 0;
   uint8_t endpoint_out_ = 0;
-  uint8_t interface_num_ = 0;
+  uint8_t interface_number_ = 0;
   bool opened_ = false;
 };
 

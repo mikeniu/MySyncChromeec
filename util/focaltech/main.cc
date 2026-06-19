@@ -35,14 +35,14 @@ int main(int argc, char** argv) {
   focaltech::UsbDevice usb_device(
       std::make_unique<focaltech::LibusbTransport>(std::move(*transport)));
 
-  const auto mode_res = focaltech::GetDeviceMode(usb_device.device_id());
-  if (!mode_res) {
+  const auto mode_result = focaltech::GetDeviceMode(usb_device.device_id());
+  if (!mode_result) {
     FT_LOGE("Cannot find Focal device");
     return EXIT_FAILURE;
   }
 
   if (const auto exec_res =
-          focaltech::ExecuteCommand(*config, usb_device, *mode_res);
+          focaltech::ExecuteCommand(*config, usb_device, *mode_result);
       !exec_res) {
     FT_LOGE("Execution failed: {}", ToString(exec_res.error()));
     return EXIT_FAILURE;

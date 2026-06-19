@@ -176,7 +176,8 @@ TEST_F(FtScsiTest, ReceiveBulkDataIn_Success) {
   std::vector<uint8_t> out_buffer(kUsbBulkMaxPacketSize);
   auto result =
       ReceiveBulkDataIn(*device_, scsi_cmd, out_buffer, kScsiCmdTimeOut);
-  EXPECT_TRUE(result.has_value());
+  ASSERT_TRUE(result.has_value());
+  EXPECT_EQ(*result, kUsbBulkMaxPacketSize);
 }
 
 TEST_F(FtScsiTest, ReceiveBulkDataIn_ShortReadFails) {
@@ -205,7 +206,8 @@ TEST_F(FtScsiTest, ReceiveBulkDataIn_EmptyBuffer) {
   };
   std::vector<uint8_t> empty;
   auto result = ReceiveBulkDataIn(*device_, scsi_cmd, empty, kScsiCmdTimeOut);
-  EXPECT_TRUE(result.has_value());
+  ASSERT_TRUE(result.has_value());
+  EXPECT_EQ(*result, 0);
 }
 
 TEST_F(FtScsiTest, ReceiveBulkDataIn_DataRecvFails) {

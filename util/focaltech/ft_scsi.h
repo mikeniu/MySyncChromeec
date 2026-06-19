@@ -82,14 +82,15 @@ static_assert(sizeof(BulkCsw) == 13, "USB CSW must be exactly 13 bytes");
 
 enum class TransferDirection { kIn, kOut, kSendOnly };
 
-std::expected<void, Error> SendBulkDataOut(
-    const UsbDevice& device, const CmdFormat& scsi_cmd,
-    std::span<const uint8_t> data_buffer, TransferDirection dir,
-    std::chrono::milliseconds timeout_ms);
+std::expected<void, Error> SendBulkDataOut(const UsbDevice& device,
+                                           const CmdFormat& scsi_cmd,
+                                           std::span<const uint8_t> data_buffer,
+                                           TransferDirection direction,
+                                           std::chrono::milliseconds timeout);
 
-std::expected<void, Error> ReceiveBulkDataIn(
+std::expected<size_t, Error> ReceiveBulkDataIn(
     const UsbDevice& device, const CmdFormat& scsi_cmd,
-    std::span<uint8_t> data_buffer, std::chrono::milliseconds timeout_ms);
+    std::span<uint8_t> data_buffer, std::chrono::milliseconds timeout);
 
 }  // namespace focaltech
 

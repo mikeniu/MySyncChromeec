@@ -146,38 +146,38 @@ class UpdaterTest : public ::testing::Test {
 
 }  // namespace
 
-TEST_F(UpdaterTest, UpdateFw_SuccessBootloaderMode) {
+TEST_F(UpdaterTest, UpdateFirmware_SuccessBootloaderMode) {
   ConfigPage config{.code_valid_control_word = kCodeValidMagic,
                     .code_start_address = kBootRunAddr};
 
-  auto fw_data = ConfigPageToBytes(config);
-  auto expected_hash = CalculateSha256(fw_data);
+  auto firmware_data = ConfigPageToBytes(config);
+  auto expected_hash = CalculateSha256(firmware_data);
 
   stub_->SetExpectedHash(expected_hash);
-  auto res = UpdateFw(*device_, fw_data, DeviceMode::kBootloader);
+  auto res = UpdateFirmware(*device_, firmware_data, DeviceMode::kBootloader);
   EXPECT_TRUE(res.has_value());
 }
 
-TEST_F(UpdaterTest, UpdateFw_FailsOnMissingConfigPage) {
-  std::vector<uint8_t> fw_data(sizeof(ConfigPage) + kFocalConfigSize,
-                               kArbitraryPayloadByte);
-  auto res = UpdateFw(*device_, fw_data, DeviceMode::kBootloader);
+TEST_F(UpdaterTest, UpdateFirmware_FailsOnMissingConfigPage) {
+  std::vector<uint8_t> firmware_data(sizeof(ConfigPage) + kFocalConfigSize,
+                                     kArbitraryPayloadByte);
+  auto res = UpdateFirmware(*device_, firmware_data, DeviceMode::kBootloader);
   EXPECT_FALSE(res.has_value());
   EXPECT_EQ(res.error(), Error::kInvalidFormat);
 }
 
-TEST_F(UpdaterTest, UpdateFw_PadsPartialPayloadsToWordBoundary) {
-  std::vector<uint8_t> fw_data(kFocalConfigSize + kUnalignedRemainder,
-                               kArbitraryPayloadByte);
+TEST_F(UpdaterTest, UpdateFirmware_PadsPartialPayloadsToWordBoundary) {
+  std::vector<uint8_t> firmware_data(kFocalConfigSize + kUnalignedRemainder,
+                                     kArbitraryPayloadByte);
 
   ConfigPage config{.code_valid_control_word = kCodeValidMagic,
                     .code_start_address = kBootRunAddr};
-  std::memcpy(fw_data.data(), &config, sizeof(config));
+  std::memcpy(firmware_data.data(), &config, sizeof(config));
 
-  stub_->SetExpectedHash(CalculateSha256(fw_data));
+  stub_->SetExpectedHash(CalculateSha256(firmware_data));
   auto* raw_stub = stub_;
 
-  auto res = UpdateFw(*device_, fw_data, DeviceMode::kBootloader);
+  auto res = UpdateFirmware(*device_, firmware_data, DeviceMode::kBootloader);
   EXPECT_TRUE(res.has_value());
 
   const auto& payloads = raw_stub->GetDataPayloads();
@@ -191,40 +191,41 @@ TEST_F(UpdaterTest, UpdateFw_PadsPartialPayloadsToWordBoundary) {
   EXPECT_EQ(payloads[0].back(), kPaddingByte);
 }
 
-TEST_F(UpdaterTest, UpdateFw_FailsOnFileTooSmall) {
+TEST_F(UpdaterTest, UpdateFirmware_FailsOnFileTooSmall) {
   std::vector<uint8_t> undersized_data(sizeof(ConfigPage) - 1,
                                        kArbitraryPayloadByte);
-  auto res = UpdateFw(*device_, undersized_data, DeviceMode::kBootloader);
+  auto res = UpdateFirmware(*device_, undersized_data, DeviceMode::kBootloader);
   EXPECT_FALSE(res.has_value());
   EXPECT_EQ(res.error(), Error::kHardwareFailure);
 }
 
-TEST_F(UpdaterTest, UpdateFw_FailsOnModeMismatch) {
+TEST_F(UpdaterTest, UpdateFirmware_FailsOnModeMismatch) {
   ConfigPage config{.code_valid_control_word = kCodeValidMagic,
                     .code_start_address = kRomRunAddr};
 
-  auto fw_data = ConfigPageToBytes(config);
-  auto res = UpdateFw(*device_, fw_data, DeviceMode::kBootloader);
+  auto firmware_data = ConfigPageToBytes(config);
+  auto res = UpdateFirmware(*device_, firmware_data, DeviceMode::kBootloader);
   EXPECT_FALSE(res.has_value());
   EXPECT_EQ(res.error(), Error::kInvalidParameter);
 }
 
-TEST_F(UpdaterTest, UpdateFw_VerifyFails_AbortsAndErasesConfig) {
+TEST_F(UpdaterTest, UpdateFirmware_VerifyFails_AbortsAndErasesConfig) {
   ConfigPage config{.code_valid_control_word = kCodeValidMagic,
                     .code_start_address = kBootRunAddr};
 
-  auto fw_data = ConfigPageToBytes(config);
-  std::fill(fw_data.begin() + sizeof(ConfigPage), fw_data.end(), kZeroByte);
+  auto firmware_data = ConfigPageToBytes(config);
+  std::fill(firmware_data.begin() + sizeof(ConfigPage), firmware_data.end(),
+            kZeroByte);
 
   stub_->ForceVerifyFailure(true);
   auto* raw_stub = stub_;
 
-  auto res = UpdateFw(*device_, fw_data, DeviceMode::kBootloader);
+  auto res = UpdateFirmware(*device_, firmware_data, DeviceMode::kBootloader);
   EXPECT_FALSE(res.has_value());
   EXPECT_EQ(res.error(), Error::kVerificationFailed);
 
   const auto& erased = raw_stub->GetErasedAddresses();
-  EXPECT_TRUE(std::ranges::contains(erased, kBootCfgAddr));
+  EXPECT_TRUE(std::ranges::contains(erased, kBootConfigAddr));
 }
 
 TEST_F(UpdaterTest, GetFlashProtection_FailsNotInBootMode) {
@@ -241,7 +242,8 @@ TEST_F(UpdaterTest, ReturnToRomBoot_FailsInInvalidMode) {
 
 namespace {
 
-TEST(UpdaterMockTest, ExecuteCommand_UpdateFw_FailsAfterMaxRetriesExhausted) {
+TEST(UpdaterMockTest,
+     ExecuteCommand_UpdateFirmware_FailsAfterMaxRetriesExhausted) {
   ConfigPage config{.code_valid_control_word = kCodeValidMagic,
                     .code_start_address = kBootRunAddr};
   auto mock = std::make_unique<testing::MockUsbTransport>();
@@ -250,11 +252,12 @@ TEST(UpdaterMockTest, ExecuteCommand_UpdateFw_FailsAfterMaxRetriesExhausted) {
       .WillRepeatedly(Return(std::unexpected(Error::kHardwareFailure)));
 
   UsbDevice device(std::move(mock));
-  auto fw_data = ConfigPageToBytes(config);
+  auto firmware_data = ConfigPageToBytes(config);
 
   const std::string temp_path = "/tmp/test_firmware.bin";
   std::ofstream file(temp_path, std::ios::binary);
-  file.write(reinterpret_cast<const char*>(fw_data.data()), fw_data.size());
+  file.write(reinterpret_cast<const char*>(firmware_data.data()),
+             firmware_data.size());
   file.close();
 
   AppConfig app_config{.cmd = Command::kUpdate, .firmware_path = temp_path};
@@ -267,20 +270,21 @@ TEST(UpdaterMockTest, ExecuteCommand_UpdateFw_FailsAfterMaxRetriesExhausted) {
 }
 
 TEST(UpdaterMockTest,
-     ExecuteCommand_UpdateFw_RetriesAndSucceedsOnTransientSuspend) {
+     ExecuteCommand_UpdateFirmware_RetriesAndSucceedsOnTransientSuspend) {
   ConfigPage config{.code_valid_control_word = kCodeValidMagic,
                     .code_start_address = kBootRunAddr};
 
   auto mock = std::make_unique<testing::MockUsbTransport>();
   StubUsbTransport stub;
 
-  auto fw_data = ConfigPageToBytes(config);
-  auto expected_hash = CalculateSha256(fw_data);
+  auto firmware_data = ConfigPageToBytes(config);
+  auto expected_hash = CalculateSha256(firmware_data);
   stub.SetExpectedHash(expected_hash);
 
   const std::string temp_path = "/tmp/test_firmware.bin";
   std::ofstream file(temp_path, std::ios::binary);
-  file.write(reinterpret_cast<const char*>(fw_data.data()), fw_data.size());
+  file.write(reinterpret_cast<const char*>(firmware_data.data()),
+             firmware_data.size());
   file.close();
 
   EXPECT_CALL(*mock, Send(_, _))
@@ -307,26 +311,26 @@ TEST(UpdaterMockTest,
   EXPECT_TRUE(res.has_value());
 }
 
-TEST(UpdaterMockTest, UpdateFw_FailsOnInvalidMagicNumber) {
+TEST(UpdaterMockTest, UpdateFirmware_FailsOnInvalidMagicNumber) {
   ConfigPage config{.code_valid_control_word = kInvalidMagicNumber};
-  auto fw_data = ConfigPageToBytes(config);
+  auto firmware_data = ConfigPageToBytes(config);
 
   auto mock = std::make_unique<testing::MockUsbTransport>();
   EXPECT_CALL(*mock, Send(_, _)).Times(0);
   EXPECT_CALL(*mock, Recv(_, _)).Times(0);
 
   UsbDevice device(std::move(mock));
-  auto res = UpdateFw(device, fw_data, DeviceMode::kBootloader);
+  auto res = UpdateFirmware(device, firmware_data, DeviceMode::kBootloader);
 
   EXPECT_FALSE(res.has_value());
   EXPECT_EQ(res.error(), Error::kInvalidFormat);
 }
 
-TEST(UpdaterMockTest, UpdateFw_FailsIfVerificationMismatches) {
+TEST(UpdaterMockTest, UpdateFirmware_FailsIfVerificationMismatches) {
   ConfigPage config{.code_valid_control_word = kCodeValidMagic,
                     .code_start_address = kBootRunAddr};
-  auto fw_data = ConfigPageToBytes(config);
-  auto expected_hash = CalculateSha256(fw_data);
+  auto firmware_data = ConfigPageToBytes(config);
+  auto expected_hash = CalculateSha256(firmware_data);
 
   StubUsbTransport stub;
   stub.SetExpectedHash(expected_hash);
@@ -346,7 +350,7 @@ TEST(UpdaterMockTest, UpdateFw_FailsIfVerificationMismatches) {
       });
 
   UsbDevice device(std::move(mock));
-  auto res = UpdateFw(device, fw_data, DeviceMode::kBootloader);
+  auto res = UpdateFirmware(device, firmware_data, DeviceMode::kBootloader);
 
   EXPECT_FALSE(res.has_value());
   EXPECT_EQ(res.error(), Error::kVerificationFailed);
@@ -415,4 +419,5 @@ TEST(UpdaterMockTest, ReturnToRomBoot_Success) {
 }
 
 }  // namespace
+
 }  // namespace focaltech

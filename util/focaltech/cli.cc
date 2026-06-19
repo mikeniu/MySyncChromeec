@@ -64,13 +64,13 @@ std::expected<AppConfig, Error> ParseArguments(
           "all).");
       return std::unexpected(Error::kInvalidParameter);
     }
-    const auto wp_res = ParseWpArea(args[1]);
-    if (!wp_res) {
+    const auto wp_area_result = ParseWpArea(args[1]);
+    if (!wp_area_result) {
       FT_LOGE("Invalid protection area: '{}'. Must be none, boot, ro, or all.",
               args[1]);
       return std::unexpected(Error::kInvalidParameter);
     }
-    config.wp_area = *wp_res;
+    config.wp_area = *wp_area_result;
   }
 
   return config;
@@ -84,11 +84,11 @@ std::expected<void, Error> ExecuteCommand(const AppConfig& config,
       return SetFlashProtection(usb_device, config.wp_area, current_mode);
 
     case Command::kGetFlashWp: {
-      const auto wp_res = GetFlashProtection(usb_device, current_mode);
-      if (!wp_res) {
-        return std::unexpected(wp_res.error());
+      const auto wp_result = GetFlashProtection(usb_device, current_mode);
+      if (!wp_result) {
+        return std::unexpected(wp_result.error());
       }
-      FT_LOGI("Flash write protect area = {}", ToString(*wp_res));
+      FT_LOGI("Flash write protect area = {}", ToString(*wp_result));
       return {};
     }
 
@@ -109,17 +109,18 @@ std::expected<void, Error> ExecuteCommand(const AppConfig& config,
         return std::unexpected(Error::kInvalidParameter);
       }
 
-      const auto fw_data_res = ReadFileToVector(config.firmware_path);
-      if (!fw_data_res) {
-        return std::unexpected(fw_data_res.error());
+      const auto firmware_data_result = ReadFileToVector(config.firmware_path);
+      if (!firmware_data_result) {
+        return std::unexpected(firmware_data_result.error());
       }
 
       /* Fix an issue where, when the display is off but the system has not yet
        * entered suspend, the host may forcibly switch the FPMCU into suspend
        * state, causing the upgrade to fail. Retry updating the firmware. */
       for (int attempt = 1; attempt <= kMaxRetry; ++attempt) {
-        const auto res = UpdateFw(usb_device, *fw_data_res, current_mode);
-        if (res) {
+        const auto update_result =
+            UpdateFirmware(usb_device, *firmware_data_result, current_mode);
+        if (update_result) {
           FT_LOGI("Firmware update successful");
           return {};
         }

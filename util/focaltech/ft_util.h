@@ -18,9 +18,9 @@
 namespace focaltech {
 
 template <typename T>
-constexpr T DivRoundUp(T n, T d) {
-  assert(d != 0);
-  return (n + d - 1) / d;
+constexpr T DivRoundUp(T numerator, T denominator) {
+  assert(denominator != 0);
+  return (numerator + denominator - 1) / denominator;
 }
 
 // C++23 native endianness swapping

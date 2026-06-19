@@ -28,11 +28,11 @@ constexpr size_t kConfigReservedSize = 28;
 // The numeric values correspond to the underlying hardware values.
 enum class FlashWpArea : uint32_t {
   kUnknown,
-  kNone,  // Disable all write protection
-  kBoot,  // Protect bootloader only
-  kRo,    // Protect bootloader + RO region
-  kAll,   // Protect the entire flash (Bootloader, RO, and RW)
-  kOutRange,
+  kNone,        // Disable all write protection
+  kBoot,        // Protect bootloader only
+  kRo,          // Protect bootloader + RO region
+  kAll,         // Protect the entire flash (Bootloader, RO, and RW)
+  kOutOfRange,  // Boundary marker for validation
 };
 
 // Convert a FlashWpArea to its user-facing string representation.
@@ -64,13 +64,14 @@ constexpr size_t kFlashWpBufferSize = 512;
 constexpr size_t kBootVersionMax = 22;
 constexpr size_t kRomVersionMax = 36;
 constexpr uint32_t kWriteSramAddr = 0x20002000;
-constexpr size_t kFwBinSizeMax = 2 * 1024 * 1024;
+constexpr size_t kFirmwareBinSizeMax = 2 * 1024 * 1024;
 
 constexpr size_t kFocalConfigSize = 0x1000;
 
 // Hardware memory addresses for ROM and Bootloader modes.
-constexpr uint32_t kRomCfgAddr = 0x10000000;
-constexpr uint32_t kBootCfgAddr = 0x10080000;
+
+constexpr uint32_t kRomConfigAddr = 0x10000000;
+constexpr uint32_t kBootConfigAddr = 0x10080000;
 constexpr uint32_t kRomRunAddr = 0x10002000;
 constexpr uint32_t kBootRunAddr = 0x10081000;
 
@@ -82,10 +83,10 @@ struct MemoryMap {
 constexpr std::expected<MemoryMap, Error> GetMemoryMap(DeviceMode mode) {
   switch (mode) {
     case DeviceMode::kRom:
-      return MemoryMap{.config_address = kRomCfgAddr,
+      return MemoryMap{.config_address = kRomConfigAddr,
                        .run_address = kRomRunAddr};
     case DeviceMode::kBootloader:
-      return MemoryMap{.config_address = kBootCfgAddr,
+      return MemoryMap{.config_address = kBootConfigAddr,
                        .run_address = kBootRunAddr};
     default:
       return std::unexpected(Error::kInvalidMode);
@@ -94,9 +95,9 @@ constexpr std::expected<MemoryMap, Error> GetMemoryMap(DeviceMode mode) {
 
 constexpr uint32_t kCodeValidMagic = 0x3AEC3721;
 
-std::expected<void, Error> UpdateFw(const UsbDevice& device,
-                                    std::span<const uint8_t> fw_data,
-                                    DeviceMode current_mode);
+std::expected<void, Error> UpdateFirmware(
+    const UsbDevice& device, std::span<const uint8_t> firmware_data,
+    DeviceMode current_mode);
 
 std::expected<FlashWpArea, Error> GetFlashProtection(const UsbDevice& device,
                                                      DeviceMode current_mode);
