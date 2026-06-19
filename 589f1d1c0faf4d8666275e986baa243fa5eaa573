@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "331ede5a_b04b6baf",
+        "filename": "zephyr/test/ec-aic/flash_protect/src/main.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-06-19T11:05:35Z",
+      "side": 1,
+      "message": "can you use `TC_PRINT`? then you don\u0027t depend on the logging infrastructure.",
+      "revId": "589f1d1c0faf4d8666275e986baa243fa5eaa573",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
