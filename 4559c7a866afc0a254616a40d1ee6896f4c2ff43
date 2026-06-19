@@ -90,6 +90,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b27e22a_898941dc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-19T03:26:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed775045_fa22733a",
+      "revId": "4559c7a866afc0a254616a40d1ee6896f4c2ff43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ba583f89_c89c8c0b",
@@ -113,6 +131,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7061fb44_5fe5fc60",
+        "filename": "util/focaltech/ft_scsi.cc",
+        "patchSetId": 26
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-19T03:26:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba583f89_c89c8c0b",
+      "range": {
+        "startLine": 124,
+        "startChar": 0,
+        "endLine": 128,
+        "endChar": 3
+      },
+      "revId": "4559c7a866afc0a254616a40d1ee6896f4c2ff43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0240a26c_669b43e1",
@@ -126,6 +168,30 @@
       "writtenOn": "2026-06-18T22:09:19Z",
       "side": 1,
       "message": "Gemini feedback:\n\n---\n\n```cpp\nstd::expected\u003cvoid, Error\u003e GetBootVersion(const UsbDevice\u0026 device,\n                                          DeviceMode current_mode) {\n  const size_t expected_size \u003d (current_mode \u003d\u003d DeviceMode::kBootloader)\n                                   ? kBootVersionMax\n                                   : kRomVersionMax;\n\n  // Allocate the maximum possible size on the stack and zero-initialize it.\n  std::array\u003cuint8_t, std::max(kBootVersionMax, kRomVersionMax)\u003e data{};\n  \n  // Create a bounded view that acts as the single source of truth.\n  auto buffer \u003d std::span(data).first(expected_size);\n\n  if (const auto res \u003d ReceiveBulkDataIn(\n          device,\n          CmdFormat{.opcode \u003d Opcode::kReadInfo, .subcmd \u003d Subcmd::kReadData},\n          buffer, kGenericInfoTimeout);\n      !res) {\n    FT_LOGE(\"Failed to read version info\");\n    return res;\n  }\n\n  // Safely construct the string. If \u0027\\0\u0027 is not found, it stops exactly at buffer.end().\n  const std::string version(buffer.begin(), std::ranges::find(buffer, \u0027\\0\u0027));\n  \n  FT_LOGI(\"Boot version: {}\", version);\n  return {};\n}\n\n```\n\n### Key Improvements\n\n* **Single Source of Truth (`buffer`):** We slice the `std::array` into a `std::span` immediately. Both the USB read and the null-terminator search now operate *only* on this bounded `buffer`. This directly resolves the buffer-searching bug we identified earlier.\n* **One-Liner String Parsing:** `std::string(buffer.begin(), std::ranges::find(buffer, \u0027\\0\u0027))` cleanly handles both scenarios. If a null terminator exists, it truncates the string there. If the MCU returns a string without a null terminator, `std::ranges::find` returns `buffer.end()`, and the string safely copies the exact byte length without reading out of bounds.\n* **Inline Struct Instantiation:** Because the `CmdFormat` struct is only used once, defining it directly inside the `ReceiveBulkDataIn` call removes unnecessary local variables and keeps the function\u0027s vertical footprint small.\n* **Scoped Error Handling:** Using the C++17 `if` statement with an initializer (`if (const auto res \u003d ...; !res)`) limits the scope of the `res` variable strictly to the error-handling block, preventing accidental reuse later in the function.",
+      "range": {
+        "startLine": 387,
+        "startChar": 0,
+        "endLine": 413,
+        "endChar": 1
+      },
+      "revId": "4559c7a866afc0a254616a40d1ee6896f4c2ff43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8852346_6debffd5",
+        "filename": "util/focaltech/updater.cc",
+        "patchSetId": 26
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-19T03:26:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0240a26c_669b43e1",
       "range": {
         "startLine": 387,
         "startChar": 0,
