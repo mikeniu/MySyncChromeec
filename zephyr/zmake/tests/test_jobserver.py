@@ -96,44 +96,50 @@ def _do_test_jobserver(
                 ended_threads += 1
                 lock.notify_all()
 
-    logging.debug("Starting %s threads", thread_count)
-    for _ in range(thread_count):
-        threading.Thread(target=_my_thread, daemon=True).start()
+    try:
+        logging.debug("Starting %s threads", thread_count)
+        for _ in range(thread_count):
+            threading.Thread(target=_my_thread, daemon=True).start()
 
-    with lock:
-        lock.wait_for(
-            lambda: started_threads == thread_count
-            and active_threads == effective_jobs,
-            10,
-        )
-        logging.debug("Asserting %s active_threads", effective_jobs)
-        assert started_threads == thread_count
-        assert active_threads == effective_jobs
-        assert ended_threads == 0
+        with lock:
+            lock.wait_for(
+                lambda: started_threads == thread_count
+                and active_threads == effective_jobs,
+                10,
+            )
+            logging.debug("Asserting %s active_threads", effective_jobs)
+            assert started_threads == thread_count
+            assert active_threads == effective_jobs
+            assert ended_threads == 0
 
-    logging.debug("Ending %s threads", 5)
-    for _ in range(5):
-        please_exit.release()
+        logging.debug("Ending %s threads", 5)
+        for _ in range(5):
+            please_exit.release()
 
-    with lock:
-        lock.wait_for(
-            lambda: active_threads == effective_jobs and ended_threads == 5, 10
-        )
-        logging.debug("Asserting %s active_threads", effective_jobs)
-        assert started_threads == thread_count
-        assert active_threads == effective_jobs
-        assert ended_threads == 5
+        with lock:
+            lock.wait_for(
+                lambda: active_threads == effective_jobs and ended_threads == 5,
+                10,
+            )
+            logging.debug("Asserting %s active_threads", effective_jobs)
+            assert started_threads == thread_count
+            assert active_threads == effective_jobs
+            assert ended_threads == 5
 
-    logging.debug("Ending %s threads", thread_count - 5)
-    for _ in range(thread_count - 5):
-        please_exit.release()
+        logging.debug("Ending %s threads", thread_count - 5)
+        for _ in range(thread_count - 5):
+            please_exit.release()
 
-    with lock:
-        lock.wait_for(lambda: ended_threads == thread_count, 10)
-        logging.debug("Asserting %s active_threads", 0)
-        assert started_threads == thread_count
-        assert active_threads == 0
-        assert ended_threads == thread_count
+        with lock:
+            lock.wait_for(lambda: ended_threads == thread_count, 10)
+            logging.debug("Asserting %s active_threads", 0)
+            assert started_threads == thread_count
+            assert active_threads == 0
+            assert ended_threads == thread_count
+    finally:
+        if use_client and pipe and open_pipe:
+            os.close(pipe[0])
+            os.close(pipe[1])
 
 
 def test_jobserver_10():
