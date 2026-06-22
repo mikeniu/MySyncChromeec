@@ -50,8 +50,9 @@ void print_stack_trace(const struct k_thread *thread)
 	       thread_name,
 	       k_thread_state_str((k_tid_t)thread, state, sizeof(state)));
 
-	/* Pass esf if this is the currently interrupted thread */
-	if (is_current_thread) {
+	/* Pass esf only if the current thread was actually interrupted (in an
+	 * ISR) */
+	if (is_current_thread && k_is_in_isr()) {
 		sp = get_stack_ptr(thread);
 		esf = (struct arch_esf *)sp;
 	} else {
