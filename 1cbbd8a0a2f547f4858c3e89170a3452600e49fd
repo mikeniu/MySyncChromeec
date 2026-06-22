@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af931216_ab16ae8c",
+        "filename": "zephyr/shim/src/panic_utils.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-22T20:16:03Z",
+      "side": 1,
+      "message": "Unrelated to this change, but consider just overloading `get_stack_ptr()` with architecture specific versions that are compiled in via cmake.\n\nThe `#if #elif` nesting here is hard to follow.\n\ne.g.\npanic_utils_arm64.c, panic_utils_arm.c, panic_utils_x86.c, etc.",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 25
+      },
+      "revId": "1cbbd8a0a2f547f4858c3e89170a3452600e49fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
