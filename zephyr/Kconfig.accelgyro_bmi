@@ -29,5 +29,12 @@ config PLATFORM_EC_ACCELGYRO_BMI_COMM_I2C
 
 endchoice
 
+config BMI260_I2C_XFER_LARGE_PAYLOAD_SUPPORT
+    bool "Enable BMI260_I2C_XFER"
+	help
+	  To reduce BMI260 initialization overhead, this config leverages the
+	  DMA function. We switch to using `i2cxfer` during the initialization
+	  process after enabling I2C_XFER_LARGE_PAYLOAD_SUPPORT
+
 endmenu # BMI Sensor
 endif # PLATFORM_EC_ACCELGYRO_BMI
