@@ -465,12 +465,16 @@ static int bmi_config_load(const struct motion_sensor_t *s)
 	const uint8_t *bmi_config = NULL;
 	const unsigned char *bmi_config_tbin;
 	int bmi_config_tbin_len;
+#ifndef SOC_IT8XXX2_ENABLE_DMA
 	/*
 	 * Due to i2c transaction timeout limit,
 	 * burst_write_len should not be above 2048 to prevent timeout.
 	 */
 	int burst_write_len = 2048;
-
+#else
+	int burst_write_len = 256;
+	uint8_t transfer_buf[256 + 1];
+#endif
 	/*
 	 * The BMI config data may be linked into .rodata or the .init_rom
 	 * section. Get the actual memory mapped address.
@@ -509,33 +513,62 @@ static int bmi_config_load(const struct motion_sensor_t *s)
 	ASSERT(((burst_write_len & 1) == 0) && (burst_write_len != 0));
 
 	for (i = 0; i < bmi_config_tbin_len; i += burst_write_len) {
-		uint8_t addr[2];
 		const int len = min(burst_write_len, bmi_config_tbin_len - i);
+
+#ifndef SOC_IT8XXX2_ENABLE_DMA
+		uint8_t addr[2];
 
 		addr[0] = (i / 2) & 0xF;
 		addr[1] = (i / 2) >> 4;
 		ret = bmi_write_n(s->port, s->i2c_spi_addr_flags,
 				  BMI260_INIT_ADDR_0, addr, 2);
+#else
+		uint8_t addr_buf[3];
+		addr_buf[0] = BMI260_INIT_ADDR_0;
+		addr_buf[1] = (i / 2) & 0xF;
+		addr_buf[2] = (i / 2) >> 4;
+
+		ret = i2c_xfer(s->port, s->i2c_spi_addr_flags, addr_buf, 3,
+			       NULL, 0);
+#endif
+
 		if (ret)
 			break;
+#ifndef SOC_IT8XXX2_ENABLE_DMA
+#else
+		transfer_buf[0] = BMI260_INIT_DATA;
+#endif
 
 		if (!bmi_config) {
-			/*
-			 * init_rom region isn't memory mapped. Copy the
-			 * data through a RAM buffer.
-			 */
+/*
+ * init_rom region isn't memory mapped. Copy the
+ * data through a RAM buffer.
+ */
+#ifndef SOC_IT8XXX2_ENABLE_DMA
 			ret = init_rom_copy((int)&bmi_config_tbin[i], len,
 					    bmi_ram_buffer);
+#else
+			ret = init_rom_copy((int)&bmi_config_tbin[i], len,
+					    bmi_ram_buffer);
+#endif
 			if (ret)
 				break;
 
+#ifndef SOC_IT8XXX2_ENABLE_DMA
 			ret = bmi_write_n(s->port, s->i2c_spi_addr_flags,
 					  BMI260_INIT_DATA, bmi_ram_buffer,
 					  len);
+#else
+			memcpy(&transfer_buf[1], bmi_ram_buffer, len);
+#endif
 		} else {
+#ifndef SOC_IT8XXX2_ENABLE_DMA
 			ret = bmi_write_n(s->port, s->i2c_spi_addr_flags,
 					  BMI260_INIT_DATA, &bmi_config[i],
 					  len);
+#else
+			memcpy(&transfer_buf[1], &bmi_config[i], len);
+#endif
 		}
 
 		if (ret)
@@ -556,18 +589,40 @@ static int init_config(const struct motion_sensor_t *s)
 {
 	int init_status, ret;
 	uint16_t i;
+#ifndef SOC_IT8XXX2_ENABLE_DMA
+#else
+	uint8_t buf[2];
+#endif
 
+#ifndef SOC_IT8XXX2_ENABLE_DMA
 	/* disable advance power save but remain fifo self wakeup*/
 	bmi_write8(s->port, s->i2c_spi_addr_flags, BMI260_PWR_CONF, 2);
+#else
+	buf[0] = BMI260_PWR_CONF;
+	buf[1] = 2;
+	i2c_xfer(s->port, s->i2c_spi_addr_flags, buf, 2, NULL, 0);
+#endif
 	crec_msleep(1);
-	/* prepare for config load */
+/* prepare for config load */
+#ifndef SOC_IT8XXX2_ENABLE_DMA
 	bmi_write8(s->port, s->i2c_spi_addr_flags, BMI260_INIT_CTRL, 0);
-
+#else
+	buf[0] = BMI260_INIT_CTRL;
+	buf[1] = 0;
+	i2c_xfer(s->port, s->i2c_spi_addr_flags, buf, 2, NULL, 0);
+#endif
 	/* load config file to INIT_DATA */
 	ret = bmi_config_load(s);
 
-	/* finish config load */
+/* finish config load */
+#ifndef SOC_IT8XXX2_ENABLE_DMA
 	bmi_write8(s->port, s->i2c_spi_addr_flags, BMI260_INIT_CTRL, 1);
+#else
+	buf[0] = BMI260_INIT_CTRL;
+	buf[1] = 1;
+	i2c_xfer(s->port, s->i2c_spi_addr_flags, buf, 2, NULL, 0);
+#endif
+
 	/* return error if load config failed */
 	if (ret)
 		return ret;
