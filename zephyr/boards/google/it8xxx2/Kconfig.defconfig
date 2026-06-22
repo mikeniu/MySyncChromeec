@@ -51,6 +51,10 @@ choice PLATFORM_EC_SHA256_MODE
 endchoice
 endif # PLATFORM_EC_VBOOT_HASH
 
+config SOC_IT8XXX2_ENABLE_DMA
+    bool "Enable DMA for IT8XXX2"
+    default n
+
 if SRAM_SIZE >= 128
 config LTO
 	default n
