@@ -76,6 +76,11 @@ uint32_t get_stack_ptr(const struct k_thread *thread)
 	/* We are assuming that the SP of interest is SP_EL1 */
 	return thread->callee_saved.sp_elx;
 #elif defined(CONFIG_ARM)
+	if (thread == k_current_get()) {
+		uint32_t sp;
+		__asm__ volatile("mrs %0, psp" : "=r"(sp));
+		return sp;
+	}
 #ifdef CONFIG_USE_SWITCH
 	return (uintptr_t)thread->switch_handle;
 #else
