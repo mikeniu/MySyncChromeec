@@ -422,6 +422,14 @@ static uint8_t bmi_ram_buffer[BMI_RAM_BUFFER_SIZE];
 static uint8_t *bmi_ram_buffer;
 #endif
 
+#ifdef CONFIG_BMI260_I2C_XFER_LARGE_PAYLOAD_SUPPORT
+/* need to check if CONFIG_I2C_CQ_MODE_MAX_PAYLOAD_SIZE is larger than
+ * transfer_buf size + 5 */
+#if (CONFIG_I2C_CQ_MODE_MAX_PAYLOAD_SIZE < 262)
+#error "CQ_MODE_MAX_PAYLOAD_SIZE need larger than the buffer size + 5"
+#endif
+#endif /* CONFIG_BMI260_I2C_XFER_LARGE_PAYLOAD_SUPPORT */
+
 static int bmi_config_load(const struct motion_sensor_t *s)
 {
 	int ret = EC_SUCCESS;
@@ -429,12 +437,16 @@ static int bmi_config_load(const struct motion_sensor_t *s)
 	const uint8_t *bmi_config = NULL;
 	const unsigned char *bmi_config_tbin;
 	int bmi_config_tbin_len;
+#ifndef CONFIG_BMI260_I2C_XFER_LARGE_PAYLOAD_SUPPORT
 	/*
 	 * Due to i2c transaction timeout limit,
 	 * burst_write_len should not be above 2048 to prevent timeout.
 	 */
 	int burst_write_len = 2048;
-
+#else
+	int burst_write_len = 256;
+	static uint8_t transfer_buf[257];
+#endif /* CONFIG_BMI260_I2C_XFER_LARGE_PAYLOAD_SUPPORT */
 	/*
 	 * The BMI config data may be linked into .rodata or the .init_rom
 	 * section. Get the actual memory mapped address.
@@ -473,15 +485,30 @@ static int bmi_config_load(const struct motion_sensor_t *s)
 	ASSERT(((burst_write_len & 1) == 0) && (burst_write_len != 0));
 
 	for (i = 0; i < bmi_config_tbin_len; i += burst_write_len) {
-		uint8_t addr[2];
 		const int len = MIN(burst_write_len, bmi_config_tbin_len - i);
+
+#ifndef CONFIG_BMI260_I2C_XFER_LARGE_PAYLOAD_SUPPORT
+		uint8_t addr[2];
 
 		addr[0] = (i / 2) & 0xF;
 		addr[1] = (i / 2) >> 4;
 		ret = bmi_write_n(s->port, s->i2c_spi_addr_flags,
 				  BMI260_INIT_ADDR_0, addr, 2);
+#else
+		uint8_t addr_buf[3];
+		addr_buf[0] = BMI260_INIT_ADDR_0;
+		addr_buf[1] = (i / 2) & 0xF;
+		addr_buf[2] = (i / 2) >> 4;
+
+		ret = i2c_xfer(s->port, s->i2c_spi_addr_flags, addr_buf, 3,
+			       NULL, 0);
+#endif /* CONFIG_BMI260_I2C_XFER_LARGE_PAYLOAD_SUPPORT */
+
 		if (ret)
 			break;
+#ifdef CONFIG_BMI260_I2C_XFER_LARGE_PAYLOAD_SUPPORT
+		transfer_buf[0] = BMI260_INIT_DATA;
+#endif /* CONFIG_BMI260_I2C_XFER_LARGE_PAYLOAD_SUPPORT */
 
 		if (!bmi_config) {
 			/*
@@ -493,13 +520,25 @@ static int bmi_config_load(const struct motion_sensor_t *s)
 			if (ret)
 				break;
 
+#ifndef CONFIG_BMI260_I2C_XFER_LARGE_PAYLOAD_SUPPORT
 			ret = bmi_write_n(s->port, s->i2c_spi_addr_flags,
 					  BMI260_INIT_DATA, bmi_ram_buffer,
 					  len);
+#else
+			memcpy(&transfer_buf[1], bmi_ram_buffer, len);
+			ret = i2c_xfer(s->port, s->i2c_spi_addr_flags,
+				       transfer_buf, len + 1, NULL, 0);
+#endif /* CONFIG_BMI260_I2C_XFER_LARGE_PAYLOAD_SUPPORT */
 		} else {
+#ifndef CONFIG_BMI260_I2C_XFER_LARGE_PAYLOAD_SUPPORT
 			ret = bmi_write_n(s->port, s->i2c_spi_addr_flags,
 					  BMI260_INIT_DATA, &bmi_config[i],
 					  len);
+#else
+			memcpy(&transfer_buf[1], &bmi_config[i], len);
+			ret = i2c_xfer(s->port, s->i2c_spi_addr_flags,
+				       transfer_buf, len + 1, NULL, 0);
+#endif /* CONFIG_BMI260_I2C_XFER_LARGE_PAYLOAD_SUPPORT */
 		}
 
 		if (ret)
