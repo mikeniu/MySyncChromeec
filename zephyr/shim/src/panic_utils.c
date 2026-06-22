@@ -51,7 +51,7 @@ void print_stack_trace(const struct k_thread *thread)
 	       k_thread_state_str((k_tid_t)thread, state, sizeof(state)));
 
 	/* Pass esf if this is the currently interrupted thread */
-	if (is_current_thread) {
+	if (is_current_thread && k_is_in_isr()) {
 		sp = get_stack_ptr(thread);
 		esf = (struct arch_esf *)sp;
 	} else {
@@ -78,6 +78,11 @@ uint32_t get_stack_ptr(const struct k_thread *thread)
 #ifdef CONFIG_USE_SWITCH
 	return (uintptr_t)thread->switch_handle;
 #else
+	if (thread == k_current_get()) {
+		uint32_t sp;
+		__asm__ volatile("mrs %0, psp" : "=r"(sp));
+		return sp;
+	}
 	return thread->callee_saved.psp;
 #endif /* CONFIG_USE_SWITCH */
 #elif defined(CONFIG_X86)
