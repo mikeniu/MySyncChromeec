@@ -16,6 +16,24 @@
       "message": "@keithshort@chromium.org do you think this also needs the finish method calls? This state machine is a bit messy and I just want to make sure adding the EMUL_NONE_MSG is sufficient if we are failing before entering the switch",
       "revId": "f5fe57a0523eb70f4ab9abc7e36e9ccee94d0d8c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7a2c1a2_739f1643",
+        "filename": "zephyr/emul/emul_common_i2c.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-22T17:34:55Z",
+      "side": 1,
+      "message": "I don\u0027t think so.  Because you\u0027re never calling `start_read` or `start_write`, resetting directly to `I2C_COMMON_EMUL_NONE_MSG` makes sense.",
+      "parentUuid": "cecce4f9_a7118d77",
+      "revId": "f5fe57a0523eb70f4ab9abc7e36e9ccee94d0d8c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
