@@ -87,6 +87,24 @@
       "parentUuid": "cb486b1b_357e844c",
       "revId": "65df57720955f861a555ecca341e8282983a69a6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48cdf0d1_26cff604",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-22T19:10:53Z",
+      "side": 1,
+      "message": "\u003e Each CL needs to maintain the invariant that name from config.h needs to exist in config_chip.h, and the name in config.h needs to match the name in build.mk.\n\nAnother way of putting this: There can only be one relevant name in `config.h`. The legacy code that uses that name needs to change in the same commit. There can only be one relevant name in Kconfig, so the Zephyr code that uses that name needs to change in that same commit. `config_chip.h` needs to have the Kconfig name and the legacy name in it for the Zephyr build to work, but it can have more than one legacy name for a Zephyr name.\n\n_That means_ that you should be able to add a second legacy name to `config_chip.h`, then change the name in `config.h`, then remove the old name from `config_chip.h`, then change the Zephyr name in `config_chip.h`. That is basically the plan that I described in my original comment.\n\nAgain, you need to make sure that whatever you do works in practice.",
+      "parentUuid": "47992969_2ee41ddc",
+      "revId": "65df57720955f861a555ecca341e8282983a69a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
