@@ -126,6 +126,60 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "08ef0f67_0d498edf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-22T07:16:34Z",
+      "side": 1,
+      "message": "I have been using repo upload . --cbr to upload my changes, and the local presubmit hook for cros format passed successfully on my end.\n\nHowever, I do not have permission to view the Gerrit failure logs for this run. Could anyone help share the format diff or the error log details so I can see what formatting issues are being flagged by the remote check? Thank you!",
+      "parentUuid": "bc055894_89b95d4f",
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "393c2ae6_ee95d845",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-22T07:16:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a87038d_b8acf85d",
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5660529_bd823cfe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-22T07:16:34Z",
+      "side": 1,
+      "message": "I have been using repo upload . --cbr to upload my changes, and the local cros format check passed successfully on my end.\n\nHowever, I do not have permission to view the CQ build logs (getting a ResultDB/LUCI permission error: requested resource not found or ... does not have permission to view it).\n\nCould you help paste the format diff or details here so I can see what formatting issues the remote check found? Thank you!",
+      "parentUuid": "bc055894_89b95d4f",
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a9db377a_1c1d94ee",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 42
@@ -137,6 +191,30 @@
       "writtenOn": "2026-06-18T19:14:21Z",
       "side": 1,
       "message": "Gemini feedback:\n\n----\n\n\n## Issue Description\n\n**Location:** `util/egis/bootrom.cc` inside `BootromComm::ExtractSecureData()`\n\nWhen parsing a device response, the code reads the expected payload length from the hardware\u0027s secure header. However, if the actual data received over USB is smaller than what the header promised (e.g., due to a dropped packet or a short read), the current logic silently rewrites the expected length to match the truncated buffer.\n\n**Why this is dangerous:**\n\n1. **AES-GCM Mode (Ghost Crypto Failures):** The truncated ciphertext is passed to `AesGcmDecrypt`. Because bytes are missing, the MAC tag check will naturally fail. The tool will output a `kTagMismatch` (Authentication Failed) error, sending developers debugging their crypto keys instead of investigating the USB transfer.\n2. **SHA-256 Mode (Silent Corruption):** Because SHA-256 responses aren\u0027t actively authenticated on the RX side, the caller will simply receive the silently truncated array. If performing a `ReadFlash` or firmware backup, this results in a silently corrupted dump.\n\n## The Fix\n\nWe remove the silent clamping, replace it with an explicit truncation error, and apply the cleaner variable naming convention (`envelope_size`, `expected_payload_len`, `crypto_overhead_size`) to clarify the math.\n\n**Refactored `ExtractSecureData`:**\n\n```cpp\nstd::expected\u003cstd::span\u003cconst uint8_t\u003e, BootromError\u003e\nBootromComm::ExtractSecureData(std::span\u003cconst uint8_t\u003e raw_response) {\n  auto header_res \u003d ReadStruct\u003cbootrom_protocol::SecureResponseHeader\u003e(raw_response);\n  if (!header_res) return std::unexpected(BootromError::kResponseTruncated);\n\n  header_res-\u003eFromLittleEndian();\n  const uint32_t expected_payload_len \u003d header_res-\u003epayload_len;\n\n  auto envelope_size_res \u003d bootrom_protocol::GetSecureResponseEnvelopeSize(crypto_type_);\n  if (!envelope_size_res) return std::unexpected(BootromError::kUnsupportedCrypto);\n\n  const size_t envelope_size \u003d *envelope_size_res;\n\n  if (raw_response.size() \u003c envelope_size) {\n    return std::unexpected(BootromError::kResponseTruncated);\n  }\n\n  if (expected_payload_len \u003e raw_response.size() - envelope_size) {\n    std::println(stderr, \"[ERROR] Device promised {} payload bytes but only delivered {}.\", \n                 expected_payload_len, raw_response.size() - envelope_size);\n    return std::unexpected(BootromError::kResponseTruncated);\n  }\n\n  const size_t crypto_overhead_size \u003d \n      envelope_size - sizeof(bootrom_protocol::SecureResponseHeader);\n      \n  const size_t total_data_to_extract \u003d crypto_overhead_size + expected_payload_len;\n\n  return raw_response.subspan(sizeof(bootrom_protocol::SecureResponseHeader),\n                              total_data_to_extract);\n}\n\n```\n\n## The Test Case\n\nAdd this to `util/egis/bootrom_test.cc`. It relies on the existing `kTestPlaintext` constant to simulate a scenario where the header claims the payload is exactly 1 byte larger than the actual data packed into the mock USB response.\n\n```cpp\nTEST_F(BootromCommTest, SecureCommandResponsePayloadTruncated) {\n  bootrom_comm_.SetCryptoType(EgisCryptoType::kSha256);\n\n  bootrom_protocol::MemReadCommand read_cmd{\n      .address \u003d ToLittleEndian(bootrom_protocol::kFlashBaseAddr),\n      .access_size \u003d bootrom_protocol::AccessSize::kUint8,\n      .count \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(kTestPlaintext.size()))};\n\n  // The header claims the payload is strictly larger than what we will actually send\n  bootrom_protocol::SecureResponseHeader hdr{\n      .status \u003d 0,\n      .payload_len \u003d ToLittleEndian(static_cast\u003cuint32_t\u003e(kTestPlaintext.size() + 1))\n  };\n\n  // Pack the header with the original (shorter) kTestPlaintext\n  fake_usb_.PushDeviceResponse(PackMessage(hdr, kTestPlaintext));\n\n  auto res \u003d bootrom_comm_.SendStruct(read_cmd);\n\n  ASSERT_FALSE(res.has_value());\n  EXPECT_EQ(res.error(), BootromError::kResponseTruncated);\n}\n\n```",
+      "range": {
+        "startLine": 88,
+        "startChar": 0,
+        "endLine": 92,
+        "endChar": 3
+      },
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f4235e4_99fd4837",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 42
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-22T07:16:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a9db377a_1c1d94ee",
       "range": {
         "startLine": 88,
         "startChar": 0,
@@ -170,6 +248,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "56a6e6f2_ecc09585",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 42
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-22T07:16:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c22064d3_5267a0e2",
+      "range": {
+        "startLine": 138,
+        "startChar": 0,
+        "endLine": 143,
+        "endChar": 75
+      },
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "19180c7a_dfbfeb99",
@@ -183,6 +285,30 @@
       "writtenOn": "2026-06-18T21:47:20Z",
       "side": 1,
       "message": "### Adjectives as variable names (`done`)\n\n**Location:** `bootrom.cc` (`BackupFlash` and `ProgramRawCommandPayload`)\n\n**The Issue:**\n\n```cpp\nuint32_t done \u003d flash_addr - bootrom_protocol::kFlashBaseAddr;\nPrintProgress(\"Backup Progress\", done, total_size);\n\n```\n\n\"Done\" is an adjective, which makes it a great name for a boolean flag (`bool is_done \u003d false;`), but a terrible name for an integer counter.\n\n**The Fix:**\nRename it to `bytes_processed`, `bytes_read`, or `bytes_written` depending on the context.",
+      "range": {
+        "startLine": 392,
+        "startChar": 0,
+        "endLine": 393,
+        "endChar": 55
+      },
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "418fdb19_894d97d0",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 42
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-22T07:16:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19180c7a_dfbfeb99",
       "range": {
         "startLine": 392,
         "startChar": 0,
@@ -216,6 +342,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "108f6767_e86443a1",
+        "filename": "util/egis/crypto_util.cc",
+        "patchSetId": 42
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-22T07:16:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "afaf81eb_43cbda1d",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 1
+      },
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "49d34c9f_be08e435",
@@ -229,6 +379,30 @@
       "writtenOn": "2026-06-18T21:47:20Z",
       "side": 1,
       "message": "### `status` vs `result` for Monads\n\n**Location:** `et171_flash.cc` (inside `main()`)\n\n**The Issue:**\n\n```cpp\nstd::expected\u003cvoid, egis::AppError\u003e status;\nif (config.mode \u003d\u003d egis::AppMode::kFlashFw) {\n  status \u003d egis::ExecuteFirmwareFlash(config, bootrom_comm);\n}\n\n```\n\n\"Status\" usually implies a primitive integer or an enum (like the `uint16_t status` inside your `SecureResponseHeader`). A `std::expected` is fundamentally a functional Result monad (representing either Success or an Error).\n\n**The Fix:**\nRename `status` to `result` or `flash_result` to align with standard C++23 functional nomenclature.",
+      "range": {
+        "startLine": 120,
+        "startChar": 2,
+        "endLine": 120,
+        "endChar": 45
+      },
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2426fca_d73ee038",
+        "filename": "util/egis/et171_flash.cc",
+        "patchSetId": 42
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-22T07:16:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "49d34c9f_be08e435",
       "range": {
         "startLine": 120,
         "startChar": 2,
@@ -262,6 +436,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7daa4213_89810754",
+        "filename": "util/egis/file_util.cc",
+        "patchSetId": 42
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-22T07:16:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "28a0f089_0c2da518",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 27
+      },
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4504ae0f_9e4374fd",
@@ -275,6 +473,30 @@
       "writtenOn": "2026-06-18T19:02:39Z",
       "side": 1,
       "message": "Gemini feedback:\n\n----\n\nSince C++17, **Guaranteed Copy Elision** (PRVO) ensures that returning arrays or structs by value does not incur any copy overhead. The compiler constructs the returned object directly in the memory location designated by the caller.\n\nHere are the places you should refactor:\n\n### 1. `GenerateGcmIv` in `crypto_util.h/cc`\n\nCurrently, the caller has to instantiate an empty 12-byte array just to pass it in to be populated. Since the function always generates exactly 12 bytes, it should return the array.\n\n**Old Signature:**\n\n```cpp\nstd::expected\u003cvoid, CryptoError\u003e GenerateGcmIv(std::span\u003cuint8_t, kAesGcmIvSize\u003e iv_buf);\n\n```\n\n**New Refactored Version:**\n\n```cpp\n// crypto_util.h\nstd::expected\u003cstd::array\u003cuint8_t, kAesGcmIvSize\u003e, CryptoError\u003e GenerateGcmIv();\n\n// crypto_util.cc\nstd::expected\u003cstd::array\u003cuint8_t, kAesGcmIvSize\u003e, CryptoError\u003e GenerateGcmIv() {\n  std::array\u003cuint8_t, kAesGcmIvSize\u003e iv;\n  if (RAND_bytes(iv.data(), iv.size()) !\u003d 1) {\n    return std::unexpected(CryptoError::kRngFailed);\n  }\n  return iv;\n}\n\n```\n\n**Updated Call Site (`bootrom.cc`):**\n\n```cpp\n// Old:\n// std::array\u003cuint8_t, crypto::kAesGcmIvSize\u003e iv{};\n// if (auto res \u003d crypto::GenerateGcmIv(iv); !res) { ... }\n\n// New:\nauto iv_res \u003d crypto::GenerateGcmIv();\nif (!iv_res) {\n  return std::unexpected(BootromError::kGcmIvGenerationFailed);\n}\nreq_hdr.iv \u003d *iv_res;\n\n```\n\n---\n\n### 2. `LoadAesKey` in `file_util.h/cc`\n\nSimilarly, reading the 32-byte AES key from a file requires the caller to pre-allocate an array. Returning it directly inside the `std::expected` wrapper is much cleaner.\n\n*(Note: Because of copy elision, you don\u0027t need to worry about the key being copied across stack frames and leaving sensitive \"ghost\" data in memory.)*\n\n**Old Signature:**\n\n```cpp\nstd::expected\u003cvoid, std::errc\u003e LoadAesKey(std::string_view key_file_path, std::span\u003cuint8_t, 32\u003e key_buffer);\n\n```\n\n**New Refactored Version:**\n\n```cpp\n// file_util.h\nstd::expected\u003cstd::array\u003cuint8_t, 32\u003e, std::errc\u003e LoadAesKey(std::string_view key_file_path);\n\n// file_util.cc\nstd::expected\u003cstd::array\u003cuint8_t, 32\u003e, std::errc\u003e LoadAesKey(std::string_view key_file_path) {\n  auto key_res \u003d ReadBinaryFile(key_file_path);\n  if (!key_res) return std::unexpected(key_res.error());\n\n  auto \u0026key_opt \u003d *key_res;\n  if (key_opt.size() !\u003d 32) {\n    crypto::Cleanse(key_opt);\n    return std::unexpected(std::errc::invalid_argument);\n  }\n\n  std::array\u003cuint8_t, 32\u003e key_buffer;\n  std::ranges::copy(key_opt, key_buffer.begin());\n  crypto::Cleanse(key_opt);\n  return key_buffer;\n}\n\n```\n\n**Updated Call Site (`flasher_logic.cc`):**\n\n```cpp\n// Old:\n// std::array\u003cuint8_t, 32\u003e local_aes_key{};\n// if (auto key_res \u003d LoadAesKey(config.key_path, local_aes_key); !key_res) { ... }\n\n// New:\nauto key_res \u003d LoadAesKey(config.key_path);\nif (!key_res) {\n  // ... error handling\n}\nbootrom_comm.SetAesKey(*key_res);\ncrypto::Cleanse(*key_res); // Zero out the local copy\n\n```\n\n---\n\n### A Nuanced Case: What about `AesGcmEncrypt` / `Decrypt`?\n\nYou might look at `AesGcmEncrypt` and wonder if it should return a `std::vector` for the ciphertext and a `std::array` for the tag instead of using `std::span` out-parameters.\n\n**Verdict:** **Keep the out-parameters here.**\nWhile returning values is preferred, the Google Style Guide makes an explicit exception for out-parameters when dealing with dynamically sized buffers where allocation overhead is a concern.\n\nBy taking a `std::span\u003cuint8_t\u003e ciphertext`, your `AesGcmEncrypt` function leaves the memory allocation entirely up to the caller. This is a standard and highly secure C++ cryptography pattern. It allows the caller to:\n\n1. Pre-allocate the vector once and reuse it across multiple loop iterations.\n2. Back the span with mlock\u0027d memory or a specialized secure allocator if required in the future.",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 1
+      },
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17054e99_72ce9e9a",
+        "filename": "util/egis/file_util.cc",
+        "patchSetId": 42
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-22T07:16:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4504ae0f_9e4374fd",
       "range": {
         "startLine": 35,
         "startChar": 0,
