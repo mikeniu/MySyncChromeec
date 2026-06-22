@@ -191,7 +191,16 @@ DECLARE_HOOK(HOOK_TICK, watchdog_reload, HOOK_PRIO_LAST);
 
 static void print_sp_pc(const struct k_thread *thread)
 {
-	uint32_t sp = get_stack_ptr(thread);
+	uint32_t sp;
+#if defined(CONFIG_ARM)
+	if (thread == k_current_get()) {
+		__asm__ volatile("mrs %0, psp" : "=r"(sp));
+	} else {
+		sp = get_stack_ptr(thread);
+	}
+#else
+	sp = get_stack_ptr(thread);
+#endif
 	struct arch_esf *esf = (struct arch_esf *)sp;
 	char thread_name[16];
 
