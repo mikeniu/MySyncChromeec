@@ -29,5 +29,14 @@ config PLATFORM_EC_ACCELGYRO_BMI_COMM_I2C
 
 endchoice
 
+config I2C_XFER_LARGE_PAYLOAD_SUPPORT
+    bool "Enable DMA for IT8XXX2"
+	depends on SOC_FAMILY_ITE_EC
+	depends on PLATFORM_EC_ACCELGYRO_BMI260
+	help
+	  To reduce BMI260 initialization overhead, this config leverages the
+	  DMA function on the ITE8xxx2. We switch to using `i2cxfer` during
+	  the initialization process after enabling  I2C_XFER_LARGE_PAYLOAD_SUPPORT
+
 endmenu # BMI Sensor
 endif # PLATFORM_EC_ACCELGYRO_BMI
