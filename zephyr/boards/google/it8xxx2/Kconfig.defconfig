@@ -51,6 +51,10 @@ choice PLATFORM_EC_SHA256_MODE
 endchoice
 endif # PLATFORM_EC_VBOOT_HASH
 
+config I2C_XFER_LARGE_PAYLOAD_SUPPORT
+    bool "Enable DMA for IT8XXX2"
+	depends on SOC_FAMILY_ITE_EC
+
 if SRAM_SIZE >= 128
 config LTO
 	default n
