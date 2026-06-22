@@ -966,6 +966,7 @@ static void handle_irqs(struct pdc_data_t *data)
 {
 	uint8_t ara;
 	int rv;
+	int limit = 10;
 
 	/*
 	 * Since we use edge triggered interrupts, we need to check ARA for all
@@ -1020,7 +1021,11 @@ static void handle_irqs(struct pdc_data_t *data)
 				break;
 			}
 		}
-	} while (any_irq_gpio_asserted());
+	} while (any_irq_gpio_asserted() && --limit > 0);
+
+	if (limit == 0) {
+		LOG_WRN("PDC IRQ loop limit reached, IRQ still asserted!");
+	}
 }
 
 static void st_idle_entry(void *o)
