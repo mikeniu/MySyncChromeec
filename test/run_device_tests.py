@@ -1577,6 +1577,9 @@ def build_zephyr(
         for config in zephyr_extra_configs:
             f_test_config.write(f"{config}\n")
 
+    with open(test_conf, "r", encoding="utf-8") as f:
+        logging.info("test_conf content:\n%s", f.read())
+
     return cmd
 
 
