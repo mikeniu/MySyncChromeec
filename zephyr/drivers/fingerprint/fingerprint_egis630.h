@@ -15,6 +15,7 @@ struct egis630_cfg {
 	struct gpio_dt_spec interrupt;
 	struct gpio_dt_spec reset_pin;
 	uint32_t calibration_data_addr;
+	uint32_t calibration_data_size;
 	struct fingerprint_sensor_info sensor_info;
 	struct fingerprint_image_frame_params sensor_image_configs[];
 };

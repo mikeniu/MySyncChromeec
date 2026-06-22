@@ -14,6 +14,7 @@
 #include <zephyr/drivers/spi.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/byteorder.h>
+#include <zephyr/sys/math_extras.h>
 #include <zephyr/sys/util.h>
 #include <zephyr/sys/util_macro.h>
 
@@ -21,6 +22,13 @@
 #include <fingerprint/v4l2_types.h>
 
 LOG_MODULE_REGISTER(cros_fingerprint, LOG_LEVEL_INF);
+
+#ifdef CONFIG_ZTEST
+extern uint8_t egis630_mock_flash[];
+#define FLASH_BASE ((uintptr_t)egis630_mock_flash)
+#else
+#define FLASH_BASE CONFIG_FLASH_BASE_ADDRESS
+#endif
 
 IF_DISABLED(CONFIG_ZTEST, (static))
 egis_capture_mode_t convert_fp_capture_type_to_egis_capture_type(
@@ -161,15 +169,30 @@ static int egis630_init(const struct device *dev)
 		data->errors |= FINGERPRINT_ERROR_NO_IRQ;
 	}
 
-	if (!ret && (cfg->calibration_data_addr != 0)) {
-		calibration_data = (struct egis630_calibration_data
-					    *)(cfg->calibration_data_addr +
-					       CONFIG_FLASH_BASE_ADDRESS);
-		ret = egis_apply_calibration_data(calibration_data->data,
-						  calibration_data->size);
-		if (ret != EGIS_API_OK) {
-			LOG_WRN("Failed to apply calibration data from flash");
-		}
+	if (ret != EGIS_API_OK || cfg->calibration_data_addr == 0) {
+		return 0;
+	}
+
+	calibration_data = (struct egis630_calibration_data
+				    *)(cfg->calibration_data_addr + FLASH_BASE);
+	if (calibration_data->size == 0 || calibration_data->size == UINT32_MAX) {
+		LOG_WRN("mt_data size %u invalid", calibration_data->size);
+		return 0;
+	}
+
+	uint32_t total_size;
+	if (u32_add_overflow(calibration_data->size, sizeof(calibration_data->size),
+			     &total_size) ||
+	    total_size > cfg->calibration_data_size) {
+		LOG_WRN("mt_data size %u exceeds partition size %u",
+			calibration_data->size, cfg->calibration_data_size);
+		return 0;
+	}
+
+	ret = egis_apply_calibration_data(calibration_data->data,
+					  calibration_data->size);
+	if (ret != EGIS_API_OK) {
+		LOG_WRN("Failed to apply calibration data from flash");
 	}
 
 	return 0;
@@ -451,6 +474,11 @@ static int egis630_init_driver(const struct device *dev)
 			DT_NODE_EXISTS(                                              \
 				DT_INST_PHANDLE(inst, calibration_data)),            \
 			(DT_REG_ADDR(DT_INST_PHANDLE(inst, calibration_data))),      \
+			(0)),                                                        \
+		.calibration_data_size = COND_CODE_1(                                \
+			DT_NODE_EXISTS(                                              \
+				DT_INST_PHANDLE(inst, calibration_data)),            \
+			(DT_REG_SIZE(DT_INST_PHANDLE(inst, calibration_data))),      \
 			(0)),                                                        \
 		.sensor_info = EGIS630_SENSOR_INFO(inst),                            \
 		.sensor_image_configs = { LISTIFY(                                   \

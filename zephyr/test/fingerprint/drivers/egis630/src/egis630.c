@@ -31,6 +31,8 @@ struct egis630_fixture {
 	const struct emul *target;
 };
 
+uint8_t egis630_mock_flash[256];
+
 static void *egis630_setup(void)
 {
 	static struct egis630_fixture fixture = {
@@ -47,6 +49,8 @@ static void egis630_before(void *data)
 {
 	memset(printf_buffer, 0, sizeof(printf_buffer));
 	g_log_level = LOG_INFO;
+
+	memset(egis630_mock_flash, 0, sizeof(egis630_mock_flash));
 
 	return;
 }
@@ -578,4 +582,40 @@ ZTEST_F(egis630, test_egislog_v)
 {
 	egislog_v("The output is %d and %.1f", 6, 2.3);
 	zassert_equal(printf_buffer[0], '\0');
+}
+
+ZTEST_F(egis630, test_init_calibration_success)
+{
+	struct egis630_calibration_data *mock_flash =
+		(struct egis630_calibration_data *)(egis630_mock_flash + 0x10);
+	mock_flash->size = 64;
+
+	zassert_ok(fingerprint_init(fixture->dev));
+	zassert_not_null(strstr(printf_buffer, "Failed to apply calibration data from flash"),
+			 "Expected calibration pal call warning not found in printf_buffer: %s",
+			 printf_buffer);
+}
+
+ZTEST_F(egis630, test_init_calibration_invalid_size_zero)
+{
+	struct egis630_calibration_data *mock_flash =
+		(struct egis630_calibration_data *)(egis630_mock_flash + 0x10);
+	mock_flash->size = 0;
+
+	zassert_ok(fingerprint_init(fixture->dev));
+	zassert_not_null(strstr(printf_buffer, "mt_data size 0 invalid"),
+			 "Expected zero size warning not found in printf_buffer: %s",
+			 printf_buffer);
+}
+
+ZTEST_F(egis630, test_init_calibration_invalid_size_overflow)
+{
+	struct egis630_calibration_data *mock_flash =
+		(struct egis630_calibration_data *)(egis630_mock_flash + 0x10);
+	mock_flash->size = 130;
+
+	zassert_ok(fingerprint_init(fixture->dev));
+	zassert_not_null(strstr(printf_buffer, "mt_data size 130 exceeds partition size 128"),
+			 "Expected overflow warning not found in printf_buffer: %s",
+			 printf_buffer);
 }
