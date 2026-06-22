@@ -147,6 +147,7 @@ static int ft98xx_init(const struct device *dev)
 	int rc = 0;
 	int attempt;
 	struct ft98xx_data *data = dev->data;
+	const struct ft98xx_cfg *cfg = dev->config;
 	data->errors = FINGERPRINT_ERROR_DEAD_PIXELS_UNKNOWN;
 
 	if (!IS_ENABLED(CONFIG_HAVE_FT98XX_PRIVATE_DRIVER)) {
@@ -187,6 +188,16 @@ static int ft98xx_init(const struct device *dev)
 		uint16_t cols = ft_sensor_query_cols();
 		uint16_t rows = ft_sensor_query_rows();
 		LOG_INF("sensor id: %x, cols:%d, rows:%d", chipid, cols, rows);
+		/* Image size is the same for all capture types */
+		if ((cfg->sensor_info.num_capture_types > 0) &&
+		    ((cols != cfg->sensor_image_configs[0].width) ||
+		     (rows != cfg->sensor_image_configs[0].height))) {
+			LOG_ERR("Probed sensor size doesn't match DTS: %dx%d",
+				cfg->sensor_image_configs[0].width,
+				cfg->sensor_image_configs[0].height);
+			data->errors |= FINGERPRINT_ERROR_INIT_FAIL;
+			return -EINVAL;
+		}
 	} else {
 		LOG_ERR("ft98xx sensor init fail, result:%d", rc);
 		data->errors |= FINGERPRINT_ERROR_INIT_FAIL;
