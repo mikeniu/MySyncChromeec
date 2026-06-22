@@ -23,6 +23,11 @@
 	chosen {
 		cros-fp,fingerprint-sensor = &egis630;
 	};
+
+	mock_mt_data: partition@10 {
+		label = "mock_mt_data";
+		reg = <0x10 128>;
+	};
 };
 
 &spi0 {
@@ -65,5 +70,6 @@
 
 		irq-gpios = <&gpio0 1 GPIO_ACTIVE_HIGH>;
 		reset-gpios = <&gpio0 2 GPIO_ACTIVE_LOW>;
+		calibration-data = <&mock_mt_data>;
 	};
 };

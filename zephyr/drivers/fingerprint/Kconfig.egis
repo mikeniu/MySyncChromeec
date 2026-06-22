@@ -32,7 +32,7 @@ config FINGERPRINT_SENSOR_EGIS630_PAL
 
 # Enabled in private driver Kconfig
 config HAVE_EGIS630_PRIVATE_DRIVER
-	bool
+	bool "Have EGIS630 private driver"
 	default n
 	help
 	  If enabled, it indicates that the private driver is present.
@@ -76,7 +76,7 @@ config FINGERPRINT_SENSOR_EGIS660_APNS
 
 # Enabled in private driver Kconfig
 config HAVE_EGIS660_PRIVATE_DRIVER
-	bool
+	bool "Have EGIS660 private driver"
 	default n
 	help
 	  If enabled, it indicates that the private driver is present.
