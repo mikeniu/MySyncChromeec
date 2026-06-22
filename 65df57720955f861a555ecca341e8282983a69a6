@@ -69,6 +69,24 @@
       "parentUuid": "91957a11_c248616e",
       "revId": "65df57720955f861a555ecca341e8282983a69a6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47992969_2ee41ddc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-22T19:04:02Z",
+      "side": 1,
+      "message": "\u003e My plan is to first get the config_chip.h and config.h changes merged.\n\nI\u0027m assuming this also refers to the usages of the configs outside of legacy board code. As far as the Zephyr builds go, this plan doesn\u0027t really respond to my comment. There is a specific order that things need to happen _within_ the code on `main`, and in the current CL chain, that\u0027s not happening. Each CL needs to maintain the invariant that name from `config.h` needs to exist in `config_chip.h`, and the name in `config.h` needs to match the name in `build.mk`. Otherwise, the Zephyr builds will be broken on `main`.\n\nAlso, all of the changes to `config.h` and `build.mk` and other legacy files need to be cherry-pickable to `ec-legacy`, which means those CLs would ideally not contain any changes to Zephyr files.\n\nThe approach I described above was an attempt to maintain those requirements.\n\n\u003e Does that approach sound okay?\n\nMy guess would be no, but I was also guessing when I described the other approach.\n\nYou need to actively test the approach that you choose by\n1. Verifying that all of the boards and tests still build at every commit you make, and\n2. verifying that the commits that are only name changes don\u0027t change the build output for any boards using `compare-builds`, and\n3. verifying that the changes to legacy files cherry pick cleanly to `ec-legacy`, and\n4. verifying that `ec-legacy` build still works at every commit that you cherry pick to legacy, and\n5. verifying that the `ec-legacy` commits that are only name changes don\u0027t change the legacy build output using legacy `compare-builds`.\n\nIf that seems infeasible in the time available, an alternative would be to not worry about cleanly cherry picking. When you do the cherry pick, you would have to manually remove Zephyr files from the commit. That would probably let you have fewer commits overall. You\u0027d be able to skip step 3 above, and you\u0027d have fewer commits for the other steps.",
+      "parentUuid": "cb486b1b_357e844c",
+      "revId": "65df57720955f861a555ecca341e8282983a69a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
