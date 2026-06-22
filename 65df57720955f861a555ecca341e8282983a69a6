@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "901f63b5_fb068215",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3879739
+      },
+      "writtenOn": "2026-06-22T15:59:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "58308b16_2d54050d",
+      "revId": "65df57720955f861a555ecca341e8282983a69a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "91957a11_c248616e",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-18T18:00:00Z",
       "side": 1,
       "message": "I\u0027m not sure what the best way is to handle a config change across Zephyr and legacy in the general case.\n\nImplicitly, the majority of Zephyr builds should be enabling this config based on their other USB configs, and brya and dedede enable it in legacy. So do a few tests in both. Ideally, I\u0027d like to have clean cherry picks to `ec-legacy` and also not break `main` between commits.\n\nFirst stab at a commit organization to accomplish this:\n1. Add an extra line to `config_chip.h` in the check for `CONFIG_PLATFORM_EC_SVDM_RSP_DFP_ONLY` that sets the new legacy config name as well as the old name. Initially, this won\u0027t do anything.\n2. Change all uses of the config that touch legacy code. Leave Zephyr uses alone. Zephyr builds will switch from using the old legacy name to the new legacy name but continue to use the old Zephyr name.\n3. Switch Zephyr usages to the new Zephyr name. Delete the `config_chip.h` setting for the old Zephyr name.\n\nYou should make sure that every usage of this config, including Zephyr boards that implicitly it, still build and don\u0027t change in `compare-builds` before and after every commit that\u0027s part of the rename.",
+      "revId": "65df57720955f861a555ecca341e8282983a69a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb486b1b_357e844c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3879739
+      },
+      "writtenOn": "2026-06-22T15:59:36Z",
+      "side": 1,
+      "message": "My plan is to first get the config_chip.h and config.h changes merged. After that, I will cherry-pick config.h to ec-legacy and then replace the old config with the new config on all boards where it is currently defined.\n\nDoes that approach sound okay?",
+      "parentUuid": "91957a11_c248616e",
       "revId": "65df57720955f861a555ecca341e8282983a69a6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
