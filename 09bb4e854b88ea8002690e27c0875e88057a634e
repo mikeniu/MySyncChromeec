@@ -180,6 +180,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9262b898_4fd48c95",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-22T20:11:29Z",
+      "side": 1,
+      "message": "This message shows the files that are misformatted and the command that needs to be run:\n\n```\n[FAILED] chromiumos/platform/ec: cros format\n    Hook script \"cros format --check --exclude \"*.xml\" --exclude \"extra/usb_updater/*.json\" --exclude \"third_party/*\" --commit ${PRESUBMIT_COMMIT}\" failed with code 1:\n      11:25:12: WARNING: util/egis/cli_options.cc: needs formatting\n      11:25:12: WARNING: util/egis/bootrom.h: needs formatting\n      11:25:12: WARNING: util/egis/et171_flash.cc: needs formatting\n      11:25:12: WARNING: util/egis/usb_comm.cc: needs formatting\n      11:25:12: WARNING: util/egis/flasher_logic.h: needs formatting\n      11:25:12: WARNING: util/egis/flasher_logic.cc: needs formatting\n      11:25:12: WARNING: util/egis/egis_util.h: needs formatting\n      11:25:12: WARNING: util/egis/bootrom.cc: needs formatting\n      11:25:12: WARNING: util/egis/usb_comm.h: needs formatting\n      11:25:12: WARNING: util/egis/file_util.cc: needs formatting\n      11:25:12: WARNING: util/egis/cli_options.h: needs formatting\n      11:25:35: NOTICE: You can fix formatting errors by running:\n        cros format util/egis/bootrom.cc util/egis/bootrom.h util/egis/cli_options.cc util/egis/cli_options.h util/egis/egis_util.h util/egis/et171_flash.cc util/egis/file_util.cc util/egis/flasher_logic.cc util/egis/flasher_logic.h util/egis/usb_comm.cc util/egis/usb_comm.h\n```\n\nI think the reason that you may be seeing different results when using `repo upload . --cbr` is that you have not done a `repo sync` to get the latest changes.",
+      "parentUuid": "c5660529_bd823cfe",
+      "revId": "09bb4e854b88ea8002690e27c0875e88057a634e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a9db377a_1c1d94ee",
         "filename": "util/egis/bootrom.cc",
         "patchSetId": 42
