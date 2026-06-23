@@ -196,6 +196,8 @@ extern "C" {
 	((errors) & FINGERPRINT_ERROR_DEAD_PIXELS_MASK)
 /** Unknown number of dead pixels detected on the last maintenance. */
 #define FINGERPRINT_ERROR_DEAD_PIXELS_UNKNOWN FINGERPRINT_ERROR_DEAD_PIXELS_MASK
+/** Calibration failed. */
+#define FINGERPRINT_ERROR_CALIBRATION_FAILED BIT(10)
 /** No interrupt from the sensor. */
 #define FINGERPRINT_ERROR_NO_IRQ BIT(12)
 /** SPI communication error. */
