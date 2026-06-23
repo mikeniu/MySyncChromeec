@@ -897,6 +897,8 @@ int i2c_raw_mode(int port, int enable)
  */
 int i2c_unwedge(int port)
 {
+	static int debug_flag_gen = 0;
+	int debug_flag = debug_flag_gen++;
 	int i, j;
 	int ret = EC_SUCCESS;
 
@@ -914,25 +916,29 @@ int i2c_unwedge(int port)
 	if (i2c_raw_mode(port, 1) != EC_SUCCESS)
 		return EC_ERROR_UNKNOWN;
 
+	if(port == 1 && debug_flag % 256 == 0) {
+		CPRINTS("I2C%d i2c_unwedge %d", port, debug_flag);
+	}
 	/*
 	 * If clock is low, wait for a while in case of clock stretched
 	 * by a slave.
 	 */
-	if (!i2c_raw_get_scl(port)) {
+	if (!i2c_raw_get_scl(port) || port == 1) {
 		for (i = 0;; i++) {
 			if (i >= UNWEDGE_SCL_ATTEMPTS) {
 				/*
 				 * If we get here, a slave is holding the clock
 				 * low and there is nothing we can do.
 				 */
-				CPRINTS("I2C%d unwedge failed, "
+				CPRINTS("123 I2C%d unwedge failed, "
 					"SCL is held low", port);
 				ret = EC_ERROR_UNKNOWN;
 				goto unwedge_done;
 			}
 			udelay(I2C_BITBANG_DELAY_US);
-			if (i2c_raw_get_scl(port))
+			if (i2c_raw_get_scl(port) && port != 1) {
 				break;
+			}
 		}
 	}
 

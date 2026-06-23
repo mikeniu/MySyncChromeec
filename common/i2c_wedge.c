@@ -325,7 +325,7 @@ static int command_i2c_wedge(int argc, char **argv)
 	return EC_SUCCESS;
 }
 DECLARE_CONSOLE_COMMAND(i2cwedge, command_i2c_wedge,
-			"i2cwedge slave_addr out_byte "
+			"slave_addr out_byte "
 				"[wedge_flag [wedge_bit_count]]",
 			"Wedge host I2C bus");
 

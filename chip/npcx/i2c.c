@@ -927,7 +927,7 @@ int chip_i2c_xfer(const int port,
 	if ((flags & I2C_XFER_START) &&
 	     /* Ignore busy bus for repeated start */
 	     p_status->oper_state != SMB_WRITE_SUSPEND &&
-	     (i2c_bus_busy(ctrl)
+	     (i2c_bus_busy(ctrl) || port == 1
 	     || (i2c_get_line_levels(port) != I2C_LINE_IDLE))) {
 		int ret;
 
