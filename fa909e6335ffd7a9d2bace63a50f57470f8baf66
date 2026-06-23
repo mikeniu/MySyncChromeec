@@ -34,6 +34,24 @@
       "parentUuid": "506caaa2_dcf96cef",
       "revId": "fa909e6335ffd7a9d2bace63a50f57470f8baf66",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3600375b_9554ebf0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3869034
+      },
+      "writtenOn": "2026-06-23T19:24:31Z",
+      "side": 1,
+      "message": "just to clarify based on your response, none of the code needs to be changed at the moment and can be submitted? if so are you able to mark this CL with a Code-Review rating?\n\nalso marking this thread as resolved based on previous comment, feel free to change if needed.",
+      "parentUuid": "8dd1c921_263a3739",
+      "revId": "fa909e6335ffd7a9d2bace63a50f57470f8baf66",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
