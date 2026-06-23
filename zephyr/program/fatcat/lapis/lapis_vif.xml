@@ -115,7 +115,7 @@
     <vif:Type_C_Power_Source value="2">Both</vif:Type_C_Power_Source>
     <vif:Type_C_Sources_VCONN value="true" />
     <vif:Type_C_Is_Alt_Mode_Controller value="true" />
-    <vif:Type_C_Is_Alt_Mode_Adapter value="false" />
+    <vif:Type_C_Is_Alt_Mode_Adapter value="true" />
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <!--;USB4® Port-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
@@ -175,7 +175,7 @@
         <vif:Src_PDO_Peak_Current value="0">100% IOC</vif:Src_PDO_Peak_Current>
         <vif:Src_PDO_Voltage value="100">5000 mV (Factor = 50)</vif:Src_PDO_Voltage>
         <vif:Src_PDO_Max_Current value="150">1500 mA (Factor = 10)</vif:Src_PDO_Max_Current>
-        <vif:Src_PD_OCP_OC_Debounce value="0">0 msec</vif:Src_PD_OCP_OC_Debounce>
+        <vif:Src_PD_OCP_OC_Debounce value="100">100 msec</vif:Src_PD_OCP_OC_Debounce>
         <vif:Src_PD_OCP_OC_Threshold value="150">1500 mA (Factor = 10)</vif:Src_PD_OCP_OC_Threshold>
       </vif:SrcPDO>
     </vif:SrcPdoList>
@@ -226,45 +226,60 @@
     <vif:XID_SOP value="0">0</vif:XID_SOP>
     <vif:Data_Capable_As_USB_Host_SOP value="true" />
     <vif:Data_Capable_As_USB_Device_SOP value="false" />
-    <vif:Product_Type_UFP_SOP value="0">Undefined</vif:Product_Type_UFP_SOP>
+    <vif:Product_Type_UFP_SOP value="2">PDUSB Peripheral</vif:Product_Type_UFP_SOP>
     <vif:Product_Type_DFP_SOP value="2">PDUSB Host</vif:Product_Type_DFP_SOP>
     <vif:DFP_VDO_Port_Number value="0">0</vif:DFP_VDO_Port_Number>
-    <vif:Modal_Operation_Supported_SOP value="false" />
+    <vif:Modal_Operation_Supported_SOP value="true" />
     <vif:USB_VID_SOP value="6353">18D1</vif:USB_VID_SOP>
     <vif:PID_SOP value="20592">5070</vif:PID_SOP>
-    <vif:bcdDevice_SOP value="49">0031</vif:bcdDevice_SOP>
-    <opt:OptionalContent identifier="DPAM" xml:space="preserve">
-      <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
-      <!--;DisplayPort Alternate Mode-->
-      <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
-      <opt:DisplayPort_Product_Summary>
-        <opt:DP_Alt_Mode_Device_Type value="1">DisplayPort Source (Notebook)</opt:DP_Alt_Mode_Device_Type>
-        <opt:DPAM_Version value="1">DPAM Version 2.1 or higher</opt:DPAM_Version>
-        <opt:DP_Signaling_Rate_Support value="3">UHBR20 Supported</opt:DP_Signaling_Rate_Support>
-      </opt:DisplayPort_Product_Summary>
-      <opt:SOP_DP_Capabilities>
-        <opt:SOP_DP_Capability value="2">DP_Source_Capable</opt:SOP_DP_Capability>
-        <opt:SOP_Signaling_For_Transport_Of_DisplayPort_Protocol value="0">Reserved</opt:SOP_Signaling_For_Transport_Of_DisplayPort_Protocol>
-        <opt:SOP_DP_Receptacle_Indication value="1">DP on USB-C Receptacle</opt:SOP_DP_Receptacle_Indication>
-        <opt:SOP_USB2_Not_Used value="0">USB2.0 may be needed</opt:SOP_USB2_Not_Used>
-        <opt:SOP_DP_Source_Pin_Assignments value="7">DP_Src_Pin_Assignments_C, DP_Src_Pin_Assignments_D, DP_Src_Pin_Assignments_E</opt:SOP_DP_Source_Pin_Assignments>
-        <opt:SOP_DP_Sink_Pin_Assignments value="0" />
-        <opt:SOP_DP_Alt_Mode_Version value="0">DPAM Version 2.0 or earlier</opt:SOP_DP_Alt_Mode_Version>
-      </opt:SOP_DP_Capabilities>
-      <opt:SOPP_DisplayPort_Capabilities>
-        <opt:SOPP_DP_Signaling_Rate value="7">HBR3, UHBR10, &amp; UHBR20</opt:SOPP_DP_Signaling_Rate>
-        <opt:SOPP_DP_Src_Pin_Assignments value="0">Pin Assignment C &amp; D</opt:SOPP_DP_Src_Pin_Assignments>
-        <opt:SOPP_DP_Sink_Pin_Assignments value="0">Pin Assignment C &amp; D</opt:SOPP_DP_Sink_Pin_Assignments>
-        <opt:SOPP_DP_UHBR13p5_Support value="1">UHBR13.5 Supported</opt:SOPP_DP_UHBR13p5_Support>
-        <opt:SOPP_DP_Active_Component value="0">Passive Cable</opt:SOPP_DP_Active_Component>
-        <opt:SOPP_DPAM_Version value="0">DPAM Version 2.0 or earlier</opt:SOPP_DPAM_Version>
-      </opt:SOPP_DisplayPort_Capabilities>
-      <opt:DisplayPort_Status>
-        <opt:SOP_DP_Src_Sink_Device_Connected value="1">DP Source Connected</opt:SOP_DP_Src_Sink_Device_Connected>
-        <opt:SOP_DP_Multifunction_Preferred value="1">Multifunction is preferred</opt:SOP_DP_Multifunction_Preferred>
-        <opt:SOP_DP_Suspend_Support value="0">No preference for Low Power entry</opt:SOP_DP_Suspend_Support>
-      </opt:DisplayPort_Status>
-    </opt:OptionalContent>
+    <vif:bcdDevice_SOP value="4158">103E</vif:bcdDevice_SOP>
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <!--;SOP Modes-->
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <vif:SVID_Fixed_SOP value="true" />
+    <vif:Num_SVIDs_Min_SOP value="2">2</vif:Num_SVIDs_Min_SOP>
+    <vif:Num_SVIDs_Max_SOP value="2">2</vif:Num_SVIDs_Max_SOP>
+    <!--Bundle: SOPSVIDList-->
+    <vif:SOPSVIDList>
+      <vif:SOPSVID>
+        <!--SOP SVID 1-->
+        <vif:SVID_SOP value="32903">8087</vif:SVID_SOP>
+        <vif:SVID_Modes_Fixed_SOP value="true" />
+        <vif:SVID_Num_Modes_Min_SOP value="1">1</vif:SVID_Num_Modes_Min_SOP>
+        <vif:SVID_Num_Modes_Max_SOP value="1">1</vif:SVID_Num_Modes_Max_SOP>
+        <!--Bundle: SOPSVIDModeList-->
+        <vif:SOPSVIDModeList>
+          <vif:SOPSVIDMode>
+            <!--SOP SVID Mode 1-->
+            <vif:SVID_Mode_Enter_SOP value="true" />
+            <vif:SVID_Mode_Recog_Value_SOP value="1">00000001</vif:SVID_Mode_Recog_Value_SOP>
+          </vif:SOPSVIDMode>
+        </vif:SOPSVIDModeList>
+      </vif:SOPSVID>
+      <vif:SOPSVID>
+        <!--SOP SVID 2-->
+        <vif:SVID_SOP value="65281">FF01</vif:SVID_SOP>
+        <vif:SVID_Modes_Fixed_SOP value="true" />
+        <vif:SVID_Num_Modes_Min_SOP value="1">1</vif:SVID_Num_Modes_Min_SOP>
+        <vif:SVID_Num_Modes_Max_SOP value="1">1</vif:SVID_Num_Modes_Max_SOP>
+        <!--Bundle: SOPSVIDModeList-->
+        <vif:SOPSVIDModeList>
+          <vif:SOPSVIDMode>
+            <!--SOP SVID Mode 1-->
+            <vif:SVID_Mode_Enter_SOP value="true" />
+            <vif:SVID_Mode_Recog_Value_SOP value="1073749062">40001C46</vif:SVID_Mode_Recog_Value_SOP>
+          </vif:SOPSVIDMode>
+        </vif:SOPSVIDModeList>
+      </vif:SOPSVID>
+    </vif:SOPSVIDList>
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <!--;AMA-->
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <vif:AMA_HW_Vers value="0">0</vif:AMA_HW_Vers>
+    <vif:AMA_FW_Vers value="0">0</vif:AMA_FW_Vers>
+    <vif:AMA_VCONN_Reqd value="false" />
+    <vif:AMA_VBUS_Reqd value="false" />
+    <vif:AMA_Superspeed_Support value="0">USB 2.0 only</vif:AMA_Superspeed_Support>
   </vif:Component>
   <vif:Component>
     <!--Component 1: Port 1-->
@@ -334,7 +349,7 @@
     <vif:Type_C_Power_Source value="2">Both</vif:Type_C_Power_Source>
     <vif:Type_C_Sources_VCONN value="true" />
     <vif:Type_C_Is_Alt_Mode_Controller value="true" />
-    <vif:Type_C_Is_Alt_Mode_Adapter value="false" />
+    <vif:Type_C_Is_Alt_Mode_Adapter value="true" />
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <!--;USB4® Port-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
@@ -445,44 +460,59 @@
     <vif:XID_SOP value="0">0</vif:XID_SOP>
     <vif:Data_Capable_As_USB_Host_SOP value="true" />
     <vif:Data_Capable_As_USB_Device_SOP value="false" />
-    <vif:Product_Type_UFP_SOP value="0">Undefined</vif:Product_Type_UFP_SOP>
+    <vif:Product_Type_UFP_SOP value="2">PDUSB Peripheral</vif:Product_Type_UFP_SOP>
     <vif:Product_Type_DFP_SOP value="2">PDUSB Host</vif:Product_Type_DFP_SOP>
     <vif:DFP_VDO_Port_Number value="1">1</vif:DFP_VDO_Port_Number>
-    <vif:Modal_Operation_Supported_SOP value="false" />
+    <vif:Modal_Operation_Supported_SOP value="true" />
     <vif:USB_VID_SOP value="6353">18D1</vif:USB_VID_SOP>
     <vif:PID_SOP value="20592">5070</vif:PID_SOP>
-    <vif:bcdDevice_SOP value="49">0031</vif:bcdDevice_SOP>
-    <opt:OptionalContent identifier="DPAM" xml:space="preserve">
-      <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
-      <!--;DisplayPort Alternate Mode-->
-      <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
-      <opt:DisplayPort_Product_Summary>
-        <opt:DP_Alt_Mode_Device_Type value="1">DisplayPort Source (Notebook)</opt:DP_Alt_Mode_Device_Type>
-        <opt:DPAM_Version value="1">DPAM Version 2.1 or higher</opt:DPAM_Version>
-        <opt:DP_Signaling_Rate_Support value="3">UHBR20 Supported</opt:DP_Signaling_Rate_Support>
-      </opt:DisplayPort_Product_Summary>
-      <opt:SOP_DP_Capabilities>
-        <opt:SOP_DP_Capability value="2">DP_Source_Capable</opt:SOP_DP_Capability>
-        <opt:SOP_Signaling_For_Transport_Of_DisplayPort_Protocol value="0">Reserved</opt:SOP_Signaling_For_Transport_Of_DisplayPort_Protocol>
-        <opt:SOP_DP_Receptacle_Indication value="1">DP on USB-C Receptacle</opt:SOP_DP_Receptacle_Indication>
-        <opt:SOP_USB2_Not_Used value="0">USB2.0 may be needed</opt:SOP_USB2_Not_Used>
-        <opt:SOP_DP_Source_Pin_Assignments value="7">DP_Src_Pin_Assignments_C, DP_Src_Pin_Assignments_D, DP_Src_Pin_Assignments_E</opt:SOP_DP_Source_Pin_Assignments>
-        <opt:SOP_DP_Sink_Pin_Assignments value="0" />
-        <opt:SOP_DP_Alt_Mode_Version value="0">DPAM Version 2.0 or earlier</opt:SOP_DP_Alt_Mode_Version>
-      </opt:SOP_DP_Capabilities>
-      <opt:SOPP_DisplayPort_Capabilities>
-        <opt:SOPP_DP_Signaling_Rate value="7">HBR3, UHBR10, &amp; UHBR20</opt:SOPP_DP_Signaling_Rate>
-        <opt:SOPP_DP_Src_Pin_Assignments value="0">Pin Assignment C &amp; D</opt:SOPP_DP_Src_Pin_Assignments>
-        <opt:SOPP_DP_Sink_Pin_Assignments value="0">Pin Assignment C &amp; D</opt:SOPP_DP_Sink_Pin_Assignments>
-        <opt:SOPP_DP_UHBR13p5_Support value="1">UHBR13.5 Supported</opt:SOPP_DP_UHBR13p5_Support>
-        <opt:SOPP_DP_Active_Component value="0">Passive Cable</opt:SOPP_DP_Active_Component>
-        <opt:SOPP_DPAM_Version value="0">DPAM Version 2.0 or earlier</opt:SOPP_DPAM_Version>
-      </opt:SOPP_DisplayPort_Capabilities>
-      <opt:DisplayPort_Status>
-        <opt:SOP_DP_Src_Sink_Device_Connected value="1">DP Source Connected</opt:SOP_DP_Src_Sink_Device_Connected>
-        <opt:SOP_DP_Multifunction_Preferred value="1">Multifunction is preferred</opt:SOP_DP_Multifunction_Preferred>
-        <opt:SOP_DP_Suspend_Support value="0">No preference for Low Power entry</opt:SOP_DP_Suspend_Support>
-      </opt:DisplayPort_Status>
-    </opt:OptionalContent>
+    <vif:bcdDevice_SOP value="4158">103E</vif:bcdDevice_SOP>
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <!--;SOP Modes-->
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <vif:SVID_Fixed_SOP value="true" />
+    <vif:Num_SVIDs_Min_SOP value="2">2</vif:Num_SVIDs_Min_SOP>
+    <vif:Num_SVIDs_Max_SOP value="2">2</vif:Num_SVIDs_Max_SOP>
+    <!--Bundle: SOPSVIDList-->
+    <vif:SOPSVIDList>
+      <vif:SOPSVID>
+        <!--SOP SVID 1-->
+        <vif:SVID_SOP value="32903">8087</vif:SVID_SOP>
+        <vif:SVID_Modes_Fixed_SOP value="true" />
+        <vif:SVID_Num_Modes_Min_SOP value="1">1</vif:SVID_Num_Modes_Min_SOP>
+        <vif:SVID_Num_Modes_Max_SOP value="1">1</vif:SVID_Num_Modes_Max_SOP>
+        <!--Bundle: SOPSVIDModeList-->
+        <vif:SOPSVIDModeList>
+          <vif:SOPSVIDMode>
+            <!--SOP SVID Mode 1-->
+            <vif:SVID_Mode_Enter_SOP value="true" />
+            <vif:SVID_Mode_Recog_Value_SOP value="1">00000001</vif:SVID_Mode_Recog_Value_SOP>
+          </vif:SOPSVIDMode>
+        </vif:SOPSVIDModeList>
+      </vif:SOPSVID>
+      <vif:SOPSVID>
+        <!--SOP SVID 2-->
+        <vif:SVID_SOP value="65281">FF01</vif:SVID_SOP>
+        <vif:SVID_Modes_Fixed_SOP value="true" />
+        <vif:SVID_Num_Modes_Min_SOP value="1">1</vif:SVID_Num_Modes_Min_SOP>
+        <vif:SVID_Num_Modes_Max_SOP value="1">1</vif:SVID_Num_Modes_Max_SOP>
+        <!--Bundle: SOPSVIDModeList-->
+        <vif:SOPSVIDModeList>
+          <vif:SOPSVIDMode>
+            <!--SOP SVID Mode 1-->
+            <vif:SVID_Mode_Enter_SOP value="true" />
+            <vif:SVID_Mode_Recog_Value_SOP value="1073749062">40001C46</vif:SVID_Mode_Recog_Value_SOP>
+          </vif:SOPSVIDMode>
+        </vif:SOPSVIDModeList>
+      </vif:SOPSVID>
+    </vif:SOPSVIDList>
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <!--;AMA-->
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <vif:AMA_HW_Vers value="0">0</vif:AMA_HW_Vers>
+    <vif:AMA_FW_Vers value="0">0</vif:AMA_FW_Vers>
+    <vif:AMA_VCONN_Reqd value="false" />
+    <vif:AMA_VBUS_Reqd value="false" />
+    <vif:AMA_Superspeed_Support value="0">USB 2.0 only</vif:AMA_Superspeed_Support>
   </vif:Component>
 </vif:VIF>
