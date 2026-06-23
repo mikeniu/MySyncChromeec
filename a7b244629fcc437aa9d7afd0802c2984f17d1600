@@ -16,6 +16,24 @@
       "message": "I\u0027m suspicious that, as written, this CL will delete the existing rex implementation but not actually enable the default implementation. The `depends` lines in the Kconfig file should prevent this option from being enabled for rex and other USB4 boards. You can probably see a warning about this when you build screebo.\n\nI think the proper way to do this is to delete the depends lines from the Kconfig file (at least for USB4 and TBT) and delete the `svdm_rsp` implementations for each Zephyr USB4 model. That should implicitly enable this config for each model, and you shouldn\u0027t need to explicitly enable it for rex. You\u0027ll need to make sure that each of them still builds without any warnings about this config.",
       "revId": "a7b244629fcc437aa9d7afd0802c2984f17d1600",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd579cae_1a7fc2f8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3879739
+      },
+      "writtenOn": "2026-06-23T11:44:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9dc46558_9dbeb7ac",
+      "revId": "a7b244629fcc437aa9d7afd0802c2984f17d1600",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
