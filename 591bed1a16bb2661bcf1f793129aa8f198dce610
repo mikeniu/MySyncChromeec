@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8f52905_3207e5c0",
+        "filename": "docker/run_dagwood_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-23T23:54:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f8af2fbe_558cd3da",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 57
+      },
+      "revId": "591bed1a16bb2661bcf1f793129aa8f198dce610",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5ae87e73_bb27062f",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-18T23:45:26Z",
       "side": 1,
       "message": "`cmd.extend(twister_args)`",
+      "range": {
+        "startLine": 25,
+        "startChar": 24,
+        "endLine": 25,
+        "endChar": 38
+      },
+      "revId": "591bed1a16bb2661bcf1f793129aa8f198dce610",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc44c700_277456b5",
+        "filename": "util/dagwood_launcher.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-23T23:54:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ae87e73_bb27062f",
       "range": {
         "startLine": 25,
         "startChar": 24,
