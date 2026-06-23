@@ -2094,8 +2094,10 @@ extern char mock_end_of_ram_data[CONFIG_PRESERVED_END_OF_RAM_SIZE];
 #endif
 
 #undef CONFIG_SVDM_RSP_DFP_ONLY
+#undef CONFIG_SVDM_RSP
 #ifdef CONFIG_PLATFORM_EC_SVDM_RSP_DFP_ONLY
 #define CONFIG_SVDM_RSP_DFP_ONLY
+#define CONFIG_SVDM_RSP
 #endif
 
 #undef CONFIG_USB_PD_DPS
