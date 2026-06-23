@@ -22,6 +22,30 @@
       },
       "revId": "704b5b733898eb2d593a641519c043cf70be9b77",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "861f7a37_18977bd4",
+        "filename": "zephyr/program/fatcat/lapis/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-06-23T17:17:15Z",
+      "side": 1,
+      "message": "I propose we make the change just for lapis initially so it can be verified. After verifying I will apply the default upstream.",
+      "parentUuid": "11fba197_e00f392b",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 22
+      },
+      "revId": "704b5b733898eb2d593a641519c043cf70be9b77",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
