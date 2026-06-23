@@ -16,6 +16,24 @@
       "message": "@zhangpiaoxiang@focaltech.corp-partner.google.com This is now ready. See comment about how you need to [upload it yourself](http://b/438745964#comment79).",
       "revId": "7f1cbdb7b21bc533c99fa307a2274bc25aec0e92",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37e657c6_29bce98a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 27
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-23T22:57:10Z",
+      "side": 1,
+      "message": "Done The new CL is https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7989152",
+      "parentUuid": "bc3fef88_3c9aa079",
+      "revId": "7f1cbdb7b21bc533c99fa307a2274bc25aec0e92",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
