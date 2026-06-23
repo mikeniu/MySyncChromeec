@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61e88c33_d4a12f67",
+        "filename": "util/elan/cli_test.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-23T18:02:24Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Avoid fully qualifying names from well-known namespaces like `testing` with a leading `::` prefix. Please change `::testing::Test` to `testing::Test` here, and similarly for other `::testing::` usages in this file and other test files.",
+      "revId": "9ee7638f4e41b5873e84bdaf1050bfd9cc638edc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab3afa20_dd820f3a",
+        "filename": "util/elan/cli_test.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-23T18:02:24Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Do not use a leading `::` prefix for well-known, top-level namespaces like `testing`. Please use `public testing::Test`.",
+      "revId": "9ee7638f4e41b5873e84bdaf1050bfd9cc638edc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "914acc0f_f2e97e92",
+        "filename": "util/elan/file_control_test.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-23T18:02:24Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please remove the leading `::` prefix for well-known namespaces like `testing`. Use `public testing::TestWithParam`.",
+      "revId": "9ee7638f4e41b5873e84bdaf1050bfd9cc638edc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4dc32908_874f05fc",
+        "filename": "util/elan/file_control_test.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-23T18:02:24Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Remove the leading `::` prefix from `::testing::UnitTest`. Well-known namespaces should not have a leading `::` in general code.",
+      "revId": "9ee7638f4e41b5873e84bdaf1050bfd9cc638edc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc3b5e74_246c73d4",
+        "filename": "util/elan/file_control_test.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-23T18:02:24Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please remove the leading `::` from `::testing::Values`.",
+      "revId": "9ee7638f4e41b5873e84bdaf1050bfd9cc638edc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "514e6c77_a1f52c02",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-23T18:02:24Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This explicit `return;` at the end of a `void` function is redundant and should be removed.",
+      "revId": "9ee7638f4e41b5873e84bdaf1050bfd9cc638edc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a843427e_ca9d4739",
+        "filename": "util/elan/iap_control_test.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-23T18:02:24Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please use `public testing::Test` without the leading `::` prefix.",
+      "revId": "9ee7638f4e41b5873e84bdaf1050bfd9cc638edc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
