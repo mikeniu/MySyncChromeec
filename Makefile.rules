@@ -204,8 +204,8 @@ build_cr50_extras: build_boards
 	$(MAKE) proj-cr50 CR50_DEV=1 out=build/cr50_dbg
 	# b/462195667: the preinstalled GUC image restricts the RW size by 2048
 	# bytes. Make sure the PrePVT and MP builds don't pass this maximum.
-	$(MAKE) proj-cr50 BRANCH=PREPVT out=build/prepvt_build SPACE_BUFFER=2048
-	$(MAKE) proj-cr50 BRANCH=MP out=build/mp_build  SPACE_BUFFER=2048
+	$(MAKE) proj-cr50 BRANCH=PREPVT out=build/prepvt_build
+	$(MAKE) proj-cr50 BRANCH=MP out=build/mp_build
 
 .PHONY: buildall
 buildall: build_cr50_extras
