@@ -615,6 +615,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_HOST_CMD
 
 zephyr_library_sources_ifdef(CONFIG_SVDM_RSP_DFP_ONLY
                                                 "${PLATFORM_EC}/common/usbc/svdm_rsp_dfp_only.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SVDM_RSP_DFP_ONLY
+                                                "${PLATFORM_EC}/common/usbc/svdm_rsp.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_OCP
                                                 "${PLATFORM_EC}/common/usbc_ocp.c")
 

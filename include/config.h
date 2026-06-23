@@ -1826,6 +1826,45 @@
  */
 #define CONFIG_CMD_CRASH_NESTED
 
+/**
+ * Panic log captures a copy of the console log in uninitialized
+ * preserved ram. After a panic, the panic_log is frozen until it is
+ * dumped by the OS. Preserving the log is best effort. Integrity checks
+ * ensure corruption is detected and the log is discarded. The implementation
+ * is designed to be low overhead.
+ */
+#undef CONFIG_PANIC_LOG
+/* Size of panic log in bytes. Must be a power of 2. */
+#define CONFIG_PANIC_LOG_SIZE 2048
+/**
+ * Enables panic log debug features,
+ * including the `paniclog` console command.
+ */
+#undef CONFIG_PANIC_LOG_DEBUG
+
+/* Enable generic SVDM response support */
+#undef CONFIG_SVDM_RSP
+
+/*
+ * noinit_end_of_ram is a memory section placed at the very end
+ * of used ram, where it is least likely to overlap with RO ram.
+ * The section is useful for preserving data across reboots.
+ * May not be enabled in RO.
+ */
+#ifndef CONFIG_CROS_EC_RO
+#define CONFIG_NOINIT_END_OF_RAM_SECTION
+#else
+#undef CONFIG_NOINIT_END_OF_RAM_SECTION
+#endif
+
+/*
+ * Offset noinit_end_of_ram section. Only adjust in the rare case that
+ * RO ram overlaps with RW noinit_end_of_ram section.
+ */
+#ifndef CONFIG_NOINIT_END_OF_RAM_SECTION_OFFSET
+#define CONFIG_NOINIT_END_OF_RAM_SECTION_OFFSET 0
+#endif
+
 /*
  * Provide the default GPIO abstraction layer.
  * You want this unless you are doing a really tiny firmware.
