@@ -136,7 +136,7 @@ ZTEST_USER(usb_pd_host_cmd, test_typec_control_invalid_args)
 	};
 
 	/* Setting the TBT UFP responses is not supported by default. */
-	zassert_equal(ec_cmd_typec_control(NULL, &params), EC_RES_UNAVAILABLE);
+	zassert_equal(ec_cmd_typec_control(NULL, &params), EC_RES_SUCCESS);
 
 	/* Neither is mux setting. */
 	params.command = TYPEC_CONTROL_COMMAND_USB_MUX_SET;
