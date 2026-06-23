@@ -24,12 +24,35 @@
 
 DEFINE_FFF_GLOBALS;
 
+FAKE_VALUE_FUNC(egis_api_return_t, egis_get_hwid, uint16_t *);
+FAKE_VALUE_FUNC(egis_api_return_t, egis_sensor_init);
+FAKE_VALUE_FUNC(egis_api_return_t, egis_sensor_deinit);
+FAKE_VOID_FUNC(egis_sensor_power_down);
+FAKE_VALUE_FUNC(egis_api_return_t, egis_get_image_with_mode, uint8_t *, uint32_t, int);
+FAKE_VOID_FUNC(egis_set_detect_mode);
+FAKE_VALUE_FUNC(egis_api_return_t, egis_apply_calibration_data, uint8_t *, uint32_t);
+FAKE_VALUE_FUNC(egis_api_return_t, egis_check_int_status);
+
 extern char printf_buffer[256];
 extern LOG_LEVEL g_log_level;
 struct egis630_fixture {
 	const struct device *dev;
 	const struct emul *target;
 };
+
+uint8_t egis630_mock_flash[256];
+
+static const struct device *g_dev_for_custom_fake;
+
+static egis_api_return_t my_egis_sensor_init_custom_fake(void)
+{
+	if (g_dev_for_custom_fake != NULL) {
+		const struct egis630_cfg *cfg = g_dev_for_custom_fake->config;
+		int current_val = gpio_pin_get_dt(&cfg->interrupt);
+		gpio_emul_input_set(cfg->interrupt.port, cfg->interrupt.pin, !current_val);
+	}
+	return EGIS_API_OK;
+}
 
 static void *egis630_setup(void)
 {
@@ -40,6 +63,7 @@ static void *egis630_setup(void)
 
 	zassert_not_null(fixture.dev);
 	zassert_not_null(fixture.target);
+	g_dev_for_custom_fake = fixture.dev;
 	return &fixture;
 }
 
@@ -47,6 +71,19 @@ static void egis630_before(void *data)
 {
 	memset(printf_buffer, 0, sizeof(printf_buffer));
 	g_log_level = LOG_INFO;
+
+	memset(egis630_mock_flash, 0, sizeof(egis630_mock_flash));
+
+	RESET_FAKE(egis_get_hwid);
+	RESET_FAKE(egis_sensor_init);
+	RESET_FAKE(egis_sensor_deinit);
+	RESET_FAKE(egis_sensor_power_down);
+	RESET_FAKE(egis_get_image_with_mode);
+	RESET_FAKE(egis_set_detect_mode);
+	RESET_FAKE(egis_apply_calibration_data);
+	RESET_FAKE(egis_check_int_status);
+
+	egis_sensor_init_fake.custom_fake = my_egis_sensor_init_custom_fake;
 
 	return;
 }
@@ -132,6 +169,10 @@ ZTEST_F(egis630, test_get_info)
 		image_frame_params_array[NUM_IMAGE_CAPTURE_TYPES];
 	uint8_t num_params = NUM_IMAGE_CAPTURE_TYPES;
 
+	struct egis630_calibration_data *mock_flash =
+		(struct egis630_calibration_data *)(egis630_mock_flash + 0x10);
+	mock_flash->size = 64;
+
 	zassert_ok(fingerprint_init(fixture->dev));
 	zassert_ok(fingerprint_get_info(fixture->dev, &sensor_info,
 					image_frame_params_array, &num_params));
@@ -165,13 +206,13 @@ ZTEST_F(egis630, test_invalid_mode_not_supported)
 	zassert_equal(fingerprint_set_mode(fixture->dev, UINT16_MAX), -ENOTSUP);
 }
 
-ZTEST_F(egis630, test_maintenance_not_supported)
+ZTEST_F(egis630, test_maintenance_success)
 {
 	uint8_t buffer[CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE];
 
 	zassert_equal(fingerprint_maintenance(fixture->dev, buffer,
 					      sizeof(buffer)),
-		      -ENOTSUP);
+		      0);
 }
 
 ZTEST_F(egis630, test_maintenance_image_small_buffer_size)
@@ -183,9 +224,9 @@ ZTEST_F(egis630, test_maintenance_image_small_buffer_size)
 		      -EINVAL);
 }
 
-ZTEST_F(egis630, test_finger_status_not_supported)
+ZTEST_F(egis630, test_finger_status_success)
 {
-	zassert_equal(fingerprint_finger_status(fixture->dev), -ENOTSUP);
+	zassert_equal(fingerprint_finger_status(fixture->dev), FINGERPRINT_FINGER_STATE_NONE);
 }
 
 ZTEST_F(egis630, test_convert_fp_capture_type_to_egis_capture_type)
@@ -578,4 +619,57 @@ ZTEST_F(egis630, test_egislog_v)
 {
 	egislog_v("The output is %d and %.1f", 6, 2.3);
 	zassert_equal(printf_buffer[0], '\0');
+}
+
+ZTEST_F(egis630, test_init_calibration_success)
+{
+	struct fingerprint_sensor_info sensor_info;
+	uint8_t num_params = NUM_IMAGE_CAPTURE_TYPES;
+	struct fingerprint_image_frame_params image_frame_params_array[NUM_IMAGE_CAPTURE_TYPES];
+
+	struct egis630_calibration_data *mock_flash =
+		(struct egis630_calibration_data *)(egis630_mock_flash + 0x10);
+	mock_flash->size = 64;
+
+	egis_apply_calibration_data_fake.return_val = EGIS_API_ERROR;
+
+	zassert_ok(fingerprint_init(fixture->dev));
+	zassert_ok(fingerprint_get_info(fixture->dev, &sensor_info,
+					image_frame_params_array, &num_params));
+	zassert_equal(sensor_info.errors & FINGERPRINT_ERROR_BAD_CALIBRATION,
+		      FINGERPRINT_ERROR_BAD_CALIBRATION);
+}
+
+ZTEST_F(egis630, test_init_calibration_invalid_size_zero)
+{
+	struct fingerprint_sensor_info sensor_info;
+	uint8_t num_params = NUM_IMAGE_CAPTURE_TYPES;
+	struct fingerprint_image_frame_params image_frame_params_array[NUM_IMAGE_CAPTURE_TYPES];
+
+	struct egis630_calibration_data *mock_flash =
+		(struct egis630_calibration_data *)(egis630_mock_flash + 0x10);
+	mock_flash->size = 0;
+
+	zassert_ok(fingerprint_init(fixture->dev));
+	zassert_ok(fingerprint_get_info(fixture->dev, &sensor_info,
+					image_frame_params_array, &num_params));
+	zassert_equal(sensor_info.errors & FINGERPRINT_ERROR_BAD_CALIBRATION,
+		      FINGERPRINT_ERROR_BAD_CALIBRATION);
+}
+
+ZTEST_F(egis630, test_init_calibration_invalid_size_overflow)
+{
+	struct fingerprint_sensor_info sensor_info;
+	uint8_t num_params = NUM_IMAGE_CAPTURE_TYPES;
+	struct fingerprint_image_frame_params image_frame_params_array[NUM_IMAGE_CAPTURE_TYPES];
+
+	struct egis630_calibration_data *mock_flash =
+		(struct egis630_calibration_data *)(egis630_mock_flash + 0x10);
+	mock_flash->size = 130;
+
+	zassert_ok(fingerprint_init(fixture->dev));
+	zassert_ok(fingerprint_get_info(fixture->dev, &sensor_info,
+					image_frame_params_array, &num_params));
+	zassert_equal(sensor_info.errors & FINGERPRINT_ERROR_BAD_CALIBRATION,
+		      FINGERPRINT_ERROR_BAD_CALIBRATION);
 }

@@ -8656,6 +8656,8 @@ struct ec_response_fp_mode {
 #define FP_ERROR_DEAD_PIXELS(errors) ((errors) & FP_ERROR_DEAD_PIXELS_MASK)
 /* Unknown number of dead pixels detected on the last maintenance */
 #define FP_ERROR_DEAD_PIXELS_UNKNOWN (FP_ERROR_DEAD_PIXELS_MASK)
+/* Invalid calibration data */
+#define FP_ERROR_BAD_CALIBRATION BIT(10)
 /* No interrupt from the sensor */
 #define FP_ERROR_NO_IRQ BIT(12)
 /* SPI communication error */
