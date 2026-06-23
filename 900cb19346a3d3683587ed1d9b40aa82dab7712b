@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db8d5047_d119dbaf",
+        "filename": "driver/accelgyro_bmi260.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-06-23T08:24:41Z",
+      "side": 1,
+      "message": "On ITE EC, you probably also need to check if CONFIG_I2C_CQ_MODE_MAX_PAYLOAD_SIZE is larger than the buffer size + 5",
+      "range": {
+        "startLine": 476,
+        "startChar": 29,
+        "endLine": 476,
+        "endChar": 32
+      },
+      "revId": "900cb19346a3d3683587ed1d9b40aa82dab7712b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50c297b6_e8514164",
+        "filename": "driver/accelgyro_bmi260.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-06-23T08:24:41Z",
+      "side": 1,
+      "message": "bmi_write8 calls i2c_write8 directly, so this is not needed.",
+      "range": {
+        "startLine": 590,
+        "startChar": 1,
+        "endLine": 622,
+        "endChar": 0
+      },
+      "revId": "900cb19346a3d3683587ed1d9b40aa82dab7712b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f29e7bb1_bc8d99b8",
+        "filename": "zephyr/Kconfig.accelgyro_bmi",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-06-23T08:24:41Z",
+      "side": 1,
+      "message": "```\ndepends on !PLATFORM_EC_ACCELGYRO_BMI_COMM_SPI\n```",
+      "revId": "900cb19346a3d3683587ed1d9b40aa82dab7712b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fabd74cc_1deef936",
+        "filename": "zephyr/Kconfig.accelgyro_bmi",
+        "patchSetId": 9
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-06-23T08:24:41Z",
+      "side": 1,
+      "message": "fix indent",
+      "revId": "900cb19346a3d3683587ed1d9b40aa82dab7712b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c6286cd_1f746645",
+        "filename": "zephyr/shim/include/config_chip.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 3869,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-06-23T08:24:41Z",
+      "side": 1,
+      "message": "add CONFIG_ prefix",
+      "range": {
+        "startLine": 3869,
+        "startChar": 7,
+        "endLine": 3869,
+        "endChar": 44
+      },
+      "revId": "900cb19346a3d3683587ed1d9b40aa82dab7712b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
