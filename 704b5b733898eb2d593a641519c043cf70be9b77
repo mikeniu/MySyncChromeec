@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a8bc9ad_7c37d68d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-06-23T17:28:17Z",
+      "side": 1,
+      "message": "Let\u0027s also cherry-pick this to the 149-16667 branch right away.",
+      "revId": "704b5b733898eb2d593a641519c043cf70be9b77",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "11fba197_e00f392b",
