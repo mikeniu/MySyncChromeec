@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11fba197_e00f392b",
+        "filename": "zephyr/program/fatcat/lapis/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-06-23T16:45:00Z",
+      "side": 1,
+      "message": "should we just bump this for the realtek EC in general instead?",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 22
+      },
+      "revId": "704b5b733898eb2d593a641519c043cf70be9b77",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
