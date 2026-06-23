@@ -4,7 +4,10 @@
  */
 
 /*
- * SVDM identity support for DFP-only devices.
+ * SVDM response support.
+ *
+ * Built when CONFIG_SVDM_RSP is enabled and provides
+ * responses to Structured VDM requests.
  */
 
 #include "chipset.h"
