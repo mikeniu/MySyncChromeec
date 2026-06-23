@@ -47,5 +47,5 @@ common-usbc-$(CONFIG_TEST_USB_PD_TIMER) += usb_pd_timer.o
 common-usbc-$(CONFIG_TEST_USB_PE_SM) += usbc_pd_policy.o usb_pe_drp_sm.o
 common-usbc-$(CONFIG_TEST_SM) += usb_sm.o
 
-# SVDM DFP-only response
-common-usbc-$(CONFIG_SVDM_RSP_DFP_ONLY) += svdm_rsp_dfp_only.o
+# SVDM response support
+common-usbc-$(CONFIG_SVDM_RSP) += svdm_rsp.o
