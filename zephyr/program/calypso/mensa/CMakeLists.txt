@@ -3,4 +3,3 @@
 # found in the LICENSE file.
 
 zephyr_library_sources("src/chipset.c")
-zephyr_library_sources("src/extpower_custom.c")
