@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf4ee328_36acd59e",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 45
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-23T17:40:50Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Per https://google.github.io/styleguide/cppguide.html, use `static constexpr` (without `inline`) to define compile-time constants in function scopes.",
+      "revId": "0219608734a69fccdd8a49ec28f1ed05845f90da",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cba66c30_9b4a5209",
+        "filename": "util/egis/bootrom_protocol.h",
+        "patchSetId": 45
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-23T17:40:50Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Per https://google.github.io/styleguide/cppguide.html, use `inline constexpr` to define compile-time constants at namespace scope in header files (e.g., `inline constexpr uint8_t kSystemResetTypeNormal \u003d 0x01;`). Please apply this to all `constexpr` constants in this header file and others (e.g., `crypto_util.h`) to prevent ODR violations.",
+      "revId": "0219608734a69fccdd8a49ec28f1ed05845f90da",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
