@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e841993b_1795a629",
+        "filename": "driver/accelgyro_bmi260.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 1395690
+      },
+      "writtenOn": "2026-06-23T10:22:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db8d5047_d119dbaf",
+      "range": {
+        "startLine": 476,
+        "startChar": 29,
+        "endLine": 476,
+        "endChar": 32
+      },
+      "revId": "900cb19346a3d3683587ed1d9b40aa82dab7712b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "50c297b6_e8514164",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-23T08:24:41Z",
       "side": 1,
       "message": "bmi_write8 calls i2c_write8 directly, so this is not needed.",
+      "range": {
+        "startLine": 590,
+        "startChar": 1,
+        "endLine": 622,
+        "endChar": 0
+      },
+      "revId": "900cb19346a3d3683587ed1d9b40aa82dab7712b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0e434d8_971850dc",
+        "filename": "driver/accelgyro_bmi260.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 1395690
+      },
+      "writtenOn": "2026-06-23T10:22:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "50c297b6_e8514164",
       "range": {
         "startLine": 590,
         "startChar": 1,
@@ -64,6 +112,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ec2526f_de584491",
+        "filename": "zephyr/Kconfig.accelgyro_bmi",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1395690
+      },
+      "writtenOn": "2026-06-23T10:22:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f29e7bb1_bc8d99b8",
+      "revId": "900cb19346a3d3683587ed1d9b40aa82dab7712b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fabd74cc_1deef936",
@@ -81,6 +147,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6ad8cfb_cdc21ea8",
+        "filename": "zephyr/Kconfig.accelgyro_bmi",
+        "patchSetId": 9
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1395690
+      },
+      "writtenOn": "2026-06-23T10:22:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fabd74cc_1deef936",
+      "revId": "900cb19346a3d3683587ed1d9b40aa82dab7712b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8c6286cd_1f746645",
@@ -94,6 +178,30 @@
       "writtenOn": "2026-06-23T08:24:41Z",
       "side": 1,
       "message": "add CONFIG_ prefix",
+      "range": {
+        "startLine": 3869,
+        "startChar": 7,
+        "endLine": 3869,
+        "endChar": 44
+      },
+      "revId": "900cb19346a3d3683587ed1d9b40aa82dab7712b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf236919_fa4a11de",
+        "filename": "zephyr/shim/include/config_chip.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 3869,
+      "author": {
+        "id": 1395690
+      },
+      "writtenOn": "2026-06-23T10:22:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c6286cd_1f746645",
       "range": {
         "startLine": 3869,
         "startChar": 7,
