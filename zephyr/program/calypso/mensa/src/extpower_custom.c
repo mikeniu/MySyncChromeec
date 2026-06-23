@@ -19,8 +19,3 @@ void board_extpower_enable_interrupt(void)
 {
 	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_ac_present));
 }
-
-void board_extpower_disable_interrupt(void)
-{
-	gpio_disable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_ac_present));
-}
