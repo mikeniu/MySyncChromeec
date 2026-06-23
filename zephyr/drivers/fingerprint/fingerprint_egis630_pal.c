@@ -114,6 +114,9 @@ void __unused output_log(LOG_LEVEL level, const char *tag,
 	case LOG_ERROR:
 		LOG_ERR("%s", printf_buffer);
 		break;
+	case LOG_WARN:
+		LOG_WRN("%s", printf_buffer);
+		break;
 	case LOG_INFO:
 	case LOG_DEBUG:
 	case LOG_VERBOSE:
