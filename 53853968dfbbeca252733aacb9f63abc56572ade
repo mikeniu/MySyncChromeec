@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "764922b4_23409cea",
+        "filename": "driver/accelgyro_bmi260.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 1395690
+      },
+      "writtenOn": "2026-06-23T02:28:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bcd11c79_96f84811",
+      "range": {
+        "startLine": 537,
+        "startChar": 0,
+        "endLine": 538,
+        "endChar": 5
+      },
+      "revId": "53853968dfbbeca252733aacb9f63abc56572ade",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9bf4fa44_3f9b6534",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-23T01:38:16Z",
       "side": 1,
       "message": "```suggestion\n#ifdef I2C_XFER_LARGE_PAYLOAD_SUPPORT\n```",
+      "range": {
+        "startLine": 591,
+        "startChar": 0,
+        "endLine": 592,
+        "endChar": 5
+      },
+      "revId": "53853968dfbbeca252733aacb9f63abc56572ade",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9e98c68_ee07f4fb",
+        "filename": "driver/accelgyro_bmi260.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 592,
+      "author": {
+        "id": 1395690
+      },
+      "writtenOn": "2026-06-23T02:28:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9bf4fa44_3f9b6534",
       "range": {
         "startLine": 591,
         "startChar": 0,
