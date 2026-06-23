@@ -58,6 +58,7 @@ static int td_pd_vndi3_e3(enum pd_data_role data_role)
 	 */
 	TEST_EQ(verify_tcpci_transmit(TCPCI_MSG_SOP, 0, PD_DATA_VENDOR_DEF),
 		EC_SUCCESS, "%d");
+
 	mock_set_alert(TCPC_REG_ALERT_TX_SUCCESS);
 
 	/*
