@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a55074e3_e160f805",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 35
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3692199
+      },
+      "writtenOn": "2026-06-23T16:22:50Z",
+      "side": 1,
+      "message": "Hi Keith and Fabio, did you have a chance to take a look at Albert\u0027s new patch?",
+      "revId": "a693af173d9845efedfaab6dca3d6de52ad55f16",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
