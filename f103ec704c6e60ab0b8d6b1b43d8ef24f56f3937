@@ -87,6 +87,24 @@
       "message": "CQ failed due to formatting issue, please fix it:\n```\n      09:11:03: WARNING: zephyr/program/bluey/mica/src/chipset.c: needs formatting\n      09:11:23: NOTICE: You can fix formatting errors by running:\n        cros format zephyr/program/bluey/mica/src/chipset.c\n```",
       "revId": "f103ec704c6e60ab0b8d6b1b43d8ef24f56f3937",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6a74893_81204873",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-06-24T02:54:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2dc62edc_5f34727c",
+      "revId": "f103ec704c6e60ab0b8d6b1b43d8ef24f56f3937",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
