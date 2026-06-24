@@ -106,3 +106,12 @@ __attribute__((weak)) void led_control(enum ec_led_id led_id,
 	 */
 }
 #endif
+
+/* Trigger board-specific LED diagnostics for a power-on sequence failure.
+ *
+ * Boards that support power rail failure diagnostics should override this
+ * function.
+ */
+__attribute__((weak)) void board_diag_led_power_fail(void)
+{
+}
