@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d88b7029_04ff78cd",
+        "filename": "zephyr/Kconfig.svdm_rsp",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-24T19:46:33Z",
+      "side": 1,
+      "message": "Is this restriction still needed, or can we remove this as well?",
+      "revId": "2aaf6ec63d209e00d7689f44f0a4492ada35238b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
