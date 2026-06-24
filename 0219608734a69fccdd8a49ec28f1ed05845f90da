@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0abe97ea_5c1d12b1",
+        "filename": "util/egis/bootrom.cc",
+        "patchSetId": 45
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-24T02:47:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cf4ee328_36acd59e",
+      "revId": "0219608734a69fccdd8a49ec28f1ed05845f90da",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cba66c30_9b4a5209",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-23T17:40:50Z",
       "side": 1,
       "message": "[Gerrit AI Review] Per https://google.github.io/styleguide/cppguide.html, use `inline constexpr` to define compile-time constants at namespace scope in header files (e.g., `inline constexpr uint8_t kSystemResetTypeNormal \u003d 0x01;`). Please apply this to all `constexpr` constants in this header file and others (e.g., `crypto_util.h`) to prevent ODR violations.",
+      "revId": "0219608734a69fccdd8a49ec28f1ed05845f90da",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7048c890_b990be0b",
+        "filename": "util/egis/bootrom_protocol.h",
+        "patchSetId": 45
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 3639181
+      },
+      "writtenOn": "2026-06-24T02:47:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cba66c30_9b4a5209",
       "revId": "0219608734a69fccdd8a49ec28f1ed05845f90da",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
