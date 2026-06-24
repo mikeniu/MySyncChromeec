@@ -595,6 +595,24 @@
       "parentUuid": "391237bb_e284e075",
       "revId": "a405444314a2cc5767a76de98a34fe33ca6c27ea",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "397c5704_31b1bac2",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-06-24T14:37:16Z",
+      "side": 1,
+      "message": "How much of a problem is the GKI modification? Modifying a header does not sound like a huge deal plus android desktop has the whole system in place to land the change immediately in the downstream repository, it feels like we are taking a shortcut to be honest and the subsystem is using the wrong api at the moment, it\u0027d be nice to get it right from the start rather than changing it down the road.",
+      "parentUuid": "08e1bea1_6e8eb367",
+      "revId": "a405444314a2cc5767a76de98a34fe33ca6c27ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
