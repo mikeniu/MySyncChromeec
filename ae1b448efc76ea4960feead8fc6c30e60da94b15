@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "195ff2dc_ffece91c",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 2237,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-06-24T17:58:49Z",
+      "side": 1,
+      "message": "Non-blocking, but if we\u0027re updating the battery state in both PD-sink and PD-source roles, this can just be moved to the common policy flags. No need to attempt to maintain two flags.",
+      "range": {
+        "startLine": 2237,
+        "startChar": 6,
+        "endLine": 2237,
+        "endChar": 29
+      },
+      "revId": "ae1b448efc76ea4960feead8fc6c30e60da94b15",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
