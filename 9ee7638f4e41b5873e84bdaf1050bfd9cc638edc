@@ -35,6 +35,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b96746a_4ce04510",
+        "filename": "util/elan/cli_test.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-24T03:09:37Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 34.",
+      "parentUuid": "ab3afa20_dd820f3a",
+      "revId": "9ee7638f4e41b5873e84bdaf1050bfd9cc638edc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "816738a5_32bb813a",
+        "filename": "util/elan/cli_test.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-24T03:09:37Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 34.",
+      "parentUuid": "61e88c33_d4a12f67",
+      "revId": "9ee7638f4e41b5873e84bdaf1050bfd9cc638edc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "914acc0f_f2e97e92",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-06-23T18:02:24Z",
       "side": 1,
       "message": "[Gerrit AI Review] Please remove the leading `::` prefix for well-known namespaces like `testing`. Use `public testing::TestWithParam`.",
+      "revId": "9ee7638f4e41b5873e84bdaf1050bfd9cc638edc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b68e9c3_a724859d",
+        "filename": "util/elan/file_control_test.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-24T03:09:37Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 34.",
+      "parentUuid": "914acc0f_f2e97e92",
       "revId": "9ee7638f4e41b5873e84bdaf1050bfd9cc638edc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -69,6 +123,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1ab33e2_ce866f3c",
+        "filename": "util/elan/file_control_test.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-24T03:09:37Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 34.",
+      "parentUuid": "4dc32908_874f05fc",
+      "revId": "9ee7638f4e41b5873e84bdaf1050bfd9cc638edc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cc3b5e74_246c73d4",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-06-23T18:02:24Z",
       "side": 1,
       "message": "[Gerrit AI Review] Please remove the leading `::` from `::testing::Values`.",
+      "revId": "9ee7638f4e41b5873e84bdaf1050bfd9cc638edc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0ea7e32_b08f4f53",
+        "filename": "util/elan/file_control_test.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-24T03:09:37Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 34.",
+      "parentUuid": "cc3b5e74_246c73d4",
       "revId": "9ee7638f4e41b5873e84bdaf1050bfd9cc638edc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -103,6 +193,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "199380c3_e34ea2e7",
+        "filename": "util/elan/iap_control.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-24T03:09:37Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 34.",
+      "parentUuid": "514e6c77_a1f52c02",
+      "revId": "9ee7638f4e41b5873e84bdaf1050bfd9cc638edc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a843427e_ca9d4739",
@@ -116,6 +224,24 @@
       "writtenOn": "2026-06-23T18:02:24Z",
       "side": 1,
       "message": "[Gerrit AI Review] Please use `public testing::Test` without the leading `::` prefix.",
+      "revId": "9ee7638f4e41b5873e84bdaf1050bfd9cc638edc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "791ff1e7_f792bf8d",
+        "filename": "util/elan/iap_control_test.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4699568
+      },
+      "writtenOn": "2026-06-24T03:09:37Z",
+      "side": 1,
+      "message": "Fixed and updated code to Patchset 34.",
+      "parentUuid": "a843427e_ca9d4739",
       "revId": "9ee7638f4e41b5873e84bdaf1050bfd9cc638edc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
