@@ -86,7 +86,7 @@
 			enum-name = "GPIO_AP_SUSPEND";
 		};
 		gpio_en_i2c_ec_adsp_batt: en_i2c_ec_adsp_batt {
-			gpios = <&gpioa 1 (GPIO_OUTPUT)>;
+			gpios = <&gpioa 1 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
 		};
 		gpio_ec_acpi_int: ec_acpi_int {
 			gpios = <&gpioa 2 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
@@ -142,9 +142,6 @@
 		gpio_ec_pmic_lid_open_od: ec_pmic_lid_open_od {
 			gpios = <&gpiod 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
 		};
-		gpio_ec_en_usba: ec_en_usba {
-			gpios = <&gpioe 3 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
-		};
 		gpio_tablet_mode_l: tablet_mode_l {
 			gpios = <&gpioe 4 (GPIO_INPUT)>;
 		};
@@ -192,6 +189,7 @@
 			<&gpioe 0 0>,
 			<&gpioe 1 0>,
 			<&gpioe 2 0>,
+			<&gpioe 3 0>,
 			<&gpioe 5 0>,
 			<&gpiof 1 0>,
 			<&gpio3 2 0>;
