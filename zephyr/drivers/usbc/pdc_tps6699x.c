@@ -42,8 +42,14 @@ LOG_MODULE_REGISTER(tps6699x, CONFIG_USBC_LOG_LEVEL);
 /** @brief Trigger thread to send command complete back to
  *         PDC Power Mgmt thread */
 #define PDC_CMD_COMPLETE_EVENT BIT(4)
-/** @brief Bit mask of all PDC events */
-#define PDC_ALL_EVENTS BIT_MASK(5)
+/** @brief Set when initial PDC chip info is fully populated. This event should
+ *         not be cleared until the driver is re-initialized.
+ */
+#define PDC_CHIP_INFO_AVAIL_EVENT BIT(5)
+/** @brief Bit mask of all PDC events that should wake the PDC thread */
+#define PDC_ALL_THREAD_WAKE_EVENTS                                       \
+	(PDC_IRQ_EVENT | PDC_CMD_EVENT | PDC_CMD_SUSPEND_REQUEST_EVENT | \
+	 PDC_INTERNAL_EVENT | PDC_CMD_COMPLETE_EVENT)
 
 /** @brief Time between checking TI CMDx register for data ready */
 #define PDC_TI_DATA_READY_TIME_MS (10)
@@ -388,7 +394,6 @@ static void task_ucsi(struct pdc_data_t *data,
 		      enum ucsi_command_t ucsi_command);
 static void task_raw_ucsi(struct pdc_data_t *data);
 
-static int pdc_autonegotiate_sink_reset(struct pdc_data_t *data);
 static void tps_check_and_notify_irq(void);
 
 /**
@@ -578,37 +583,6 @@ static int pdc_port_control_init(struct pdc_data_t *data)
 	return tps_rw_port_control(&cfg->i2c, &pdc_port_control, I2C_MSG_WRITE);
 }
 
-static int pdc_autonegotiate_sink_reset(struct pdc_data_t *data)
-{
-	union reg_autonegotiate_sink an_snk;
-	struct pdc_config_t const *cfg = data->dev->config;
-	int rv;
-
-	rv = tps_rw_autonegotiate_sink(&cfg->i2c, &an_snk, I2C_MSG_READ);
-	if (rv) {
-		LOG_ERR("TI%d: Failed to read auto negotiate sink register.",
-			cfg->connector_number);
-		return rv;
-	}
-
-	an_snk.auto_compute_sink_min_power = 0;
-	an_snk.auto_compute_sink_min_voltage = 0;
-	an_snk.auto_compute_sink_max_voltage = 0;
-	an_snk.auto_neg_max_current = 3000 / 10;
-	an_snk.auto_neg_sink_min_required_power = 15000 / 250;
-	an_snk.auto_neg_max_voltage = 5000 / 50;
-	an_snk.auto_neg_min_voltage = 5000 / 50;
-
-	rv = tps_rw_autonegotiate_sink(&cfg->i2c, &an_snk, I2C_MSG_WRITE);
-	if (rv) {
-		LOG_ERR("TI%d: Failed to write auto negotiate sink register.",
-			cfg->connector_number);
-		return rv;
-	}
-
-	return 0;
-}
-
 static void set_all_ports_to_init(const int delay_ms)
 {
 	for (int port = 0; port < NUM_PDC_TPS6699X_PORTS; port++) {
@@ -796,6 +770,9 @@ static enum smf_state_result st_init_run(void *o)
 		goto error;
 	}
 
+	/* Cached chip info is now available */
+	k_event_post(&data->pdc_event, PDC_CHIP_INFO_AVAIL_EVENT);
+
 	LOG_INF("TI%d: FW Version %u.%u.%u, config='%s' (flash=%d)",
 		cfg->connector_number,
 		PDC_FWVER_GET_MAJOR(data->info.fw_version),
@@ -814,12 +791,6 @@ static enum smf_state_result st_init_run(void *o)
 	rv = pdc_interrupt_mask_init(data);
 	if (rv < 0) {
 		LOG_ERR("TI%d: Write interrupt mask failed (%d)",
-			cfg->connector_number, rv);
-		goto error;
-	}
-	rv = pdc_autonegotiate_sink_reset(data);
-	if (rv < 0) {
-		LOG_ERR("TI%d: Reset autonegotiate_sink reg failed (%d)",
 			cfg->connector_number, rv);
 		goto error;
 	}
@@ -1092,6 +1063,11 @@ static enum smf_state_result st_suspended_run(void *o)
 	}
 
 	data->init_attempt = 0;
+
+	/* Invalidate cached chip info data until it is re-read during the
+	 * INIT state. */
+	k_event_clear(&data->pdc_event, PDC_CHIP_INFO_AVAIL_EVENT);
+
 	set_state(data, ST_INIT);
 	return SMF_EVENT_HANDLED;
 }
@@ -2480,8 +2456,6 @@ static enum smf_state_result st_task_wait_run(void *o)
 			 */
 			data->cached_conn_status = *cs;
 			data->use_cached_conn_status_change = true;
-			if (!cs->connect_status)
-				pdc_autonegotiate_sink_reset(data);
 		}
 		break;
 	}
@@ -2869,13 +2843,20 @@ static int tps_get_info(const struct device *dev, struct pdc_info_t *info,
 	if (live == false) {
 		k_mutex_lock(&data->mtx, K_FOREVER);
 
-		/* Check FW ver for valid value to ensure we have a resident
-		 * value.
+		/* Check for an event flag to ensure we have a cached value.
+		 * Callers expect non-live reads to return immediately, so do
+		 * not block by waiting.
+		 *
+		 * Do not clear PDC_CHIP_INFO_AVAIL_EVENT to permit further
+		 * cached reads.
 		 */
-		if (data->info.fw_version == PDC_FWVER_INVALID) {
+		uint32_t events = k_event_test(&data->pdc_event,
+					       PDC_CHIP_INFO_AVAIL_EVENT);
+		if (!events) {
 			k_mutex_unlock(&data->mtx);
 
-			/* No cached value. Caller should request a live read */
+			/* No cached value. Caller may try again later or
+			 * request a live read. */
 			return -EAGAIN;
 		}
 
@@ -3345,8 +3326,9 @@ static void tps_thread(void *dev, void *unused1, void *unused2)
 		smf_run_state(SMF_CTX(data));
 
 		/* Wait for event to handle */
-		data->events = k_event_wait(&data->pdc_event, PDC_ALL_EVENTS,
-					    false, K_FOREVER);
+		data->events = k_event_wait(&data->pdc_event,
+					    PDC_ALL_THREAD_WAKE_EVENTS, false,
+					    K_FOREVER);
 		LOG_INF("TI%d: state=%s events=0x%X", cfg->connector_number,
 			state_names[get_state(data)], data->events);
 
@@ -3495,6 +3477,19 @@ bool pdc_tps6699x_test_idle_wait(void)
 	}
 
 	return false;
+}
+
+/**
+ * @brief For testing only, wipe the cached chip info from the driver and clear
+ *        the flag that indicates cached data is available.
+ */
+void pdc_tps6699x_test_invalidate_chip_info(const struct device *dev)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)dev->data;
+
+	k_event_clear(&data->pdc_event, PDC_CHIP_INFO_AVAIL_EVENT);
+
+	memset(&data->info, 0, sizeof(data->info));
 }
 /* LCOV_EXCL_STOP */
 

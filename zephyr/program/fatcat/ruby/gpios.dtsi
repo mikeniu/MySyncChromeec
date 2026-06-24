@@ -76,7 +76,7 @@
 			enum-name = "GPIO_EC_INT_L";
 		};
 		gpio_ec_plt_pwrok: ec_plt_pwrok {
-			gpios = <&gpioa 3 (GPIO_OUTPUT | GPIO_VOLTAGE_1P8)>;
+			gpios = <&gpioa 5 (GPIO_OUTPUT | GPIO_VOLTAGE_1P8)>;
 		};
 		gpio_ec_soc_pwr_btn_odl: ec_soc_pwr_btn_odl {
 			gpios = <&gpioc 1 (GPIO_ODR_HIGH | GPIO_VOLTAGE_1P8)>;
