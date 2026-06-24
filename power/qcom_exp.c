@@ -30,6 +30,7 @@
 #include "gpio.h"
 #include "hooks.h"
 #include "host_command.h"
+#include "led_common.h"
 #include "lid_switch.h"
 #include "power.h"
 #include "power/qcom.h"
@@ -1260,6 +1261,7 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		if (power_on_seq(boot_from_off) != EC_SUCCESS) {
 			power_off_seq(shutdown_from_on);
 			boot_from_off = 0;
+			board_diag_led_power_fail();
 			return POWER_G3;
 		}
 		CPRINTS("AP running ...");
