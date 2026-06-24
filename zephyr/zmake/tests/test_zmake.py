@@ -16,12 +16,14 @@ import unittest.mock
 import pytest
 from testfixtures import LogCapture
 from zmake import multiproc
+import zmake.__main__ as main
 import zmake.build_config
 import zmake.jobserver
 import zmake.output_packers
 import zmake.project
 import zmake.signers
 import zmake.toolchains
+import zmake.zmake as zm
 
 
 OUR_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -431,3 +433,47 @@ def test_find_projects(zmake_factory_from_dir):
         with pytest.raises(KeyError):
             zmk._resolve_projects(["%invalid"])
     # pylint: enable=W0212
+
+
+def test_failed_builds_sorting(monkeypatch):
+    """Test that failed projects are sorted alphabetically when logged."""
+    monkeypatch.delenv("MAKEFLAGS", raising=False)
+    # Mock maybe_reexec and find_toolchains to do nothing
+    monkeypatch.setattr(main, "maybe_reexec", lambda argv: None)
+    monkeypatch.setattr(main, "find_toolchains", lambda: None)
+
+    # Mock the Zmake class constructor
+    mock_zmake = unittest.mock.Mock()
+    mock_zmake.cmp_failed_projects = {
+        "binary": ["zebra", "apple", "monkey"],
+        "config": ["cat", "dog", "bear"],
+    }
+    mock_zmake.failed_projects = [
+        "zebra",
+        "apple",
+        "monkey",
+        "cat",
+        "dog",
+        "bear",
+    ]
+    mock_zmake.executor.wait.return_value = 0
+
+    # Mock call_with_namespace to return mock_zmake when building Zmake,
+    # or return 0 when calling subcommands.
+    def mock_call_with_namespace(func, _namespace, **_kwargs):
+        if func == zm.Zmake:
+            return mock_zmake
+        return 0
+
+    monkeypatch.setattr(main, "call_with_namespace", mock_call_with_namespace)
+
+    # Capture logs
+    with LogCapture(level=logging.ERROR) as cap:
+        main.main(argv=["build", "-a"])
+
+    recs = [rec.getMessage() for rec in cap.records]
+    assert recs == [
+        "Failed projects by diff in binary: apple, monkey, zebra",
+        "Failed projects by diff in config: bear, cat, dog",
+        "All failed projects: apple bear cat dog monkey zebra",
+    ]

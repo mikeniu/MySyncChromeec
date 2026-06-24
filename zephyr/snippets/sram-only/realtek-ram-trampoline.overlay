@@ -1,0 +1,15 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* The RTS5912 bootrom only supports jumping directly to address
+ * 0x20010020. Set flash start to this address so the entry point
+ * is correctly set to this fixed address.
+ * The trampoline code is linked at this address and sets up
+ * the initial stack pointer and reset handler which are required
+ * to be aligned on a 1 KiB boundary.
+ */
+&flash0 {
+	reg = <0x20010020 0x40000>;
+};
