@@ -193,6 +193,37 @@
 		>;
 	};
 
+	factory-test {
+		compatible = "cros-ec,keyboard-factory-test";
+
+		pin1-gpios  = <&gpio0 5 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 1  : KSO_12 */
+		pin2-gpios  = <&gpio1 1 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 2  : KSO_08 */
+		pin3-gpios  = <&gpio1 0 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 3  : KSO_09 */
+		pin4-gpios  = <&gpio0 6 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 4  : KSO_11 */
+		pin5-gpios  = <&gpio0 7 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 5  : KSO_10 */
+		pin6-gpios  = <&gpio8 2 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 6  : KSO_14 */
+		pin7-gpios  = <&gpio8 3 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 7  : KSO_15 */
+		pin8-gpios  = <&gpio1 4 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 8  : KSO_05 */
+		pin9-gpios  = <&gpio1 3 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 9  : KSO_06 */
+		pin10-gpios = <&gpio0 3 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 10 : KSO_16 */
+		pin11-gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 11 : KSO_03 */
+		pin12-gpios = <&gpio1 7 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 12 : KSO_02 */
+		pin13-gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 13 : KSI_00 */
+		pin14-gpios = <&gpio2 0 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 14 : KSO_01 */
+		pin15-gpios = <&gpio1 5 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 15 : KSO_04 */
+		pin16-gpios = <&gpio2 6 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 16 : KSI_03 */
+		pin17-gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 17 : KSI_02 */
+		pin18-gpios = <&gpio2 1 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 18 : KSO_00 */
+		pin19-gpios = <&gpio2 4 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 19 : KSI_05 */
+		pin20-gpios = <&gpio2 5 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 20 : KSI_04 */
+		pin21-gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 21 : KSO_07 */
+		pin22-gpios = <&gpio2 3 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 22 : KSI_06 */
+		pin23-gpios = <&gpio2 2 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 23 : KSI_07 */
+		pin24-gpios = <&gpio3 0 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 24 : KSI_01 */
+		pin25-gpios = <&gpio0 4 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 26 : KSO_13 */
+		pin26-gpios = <&gpiob 1 GPIO_ACTIVE_HIGH>;  /* JKB1 Pin 28 : KSO_17 */
+	};
+
 	scancode-set2 {
 		compatible = "cros-ec,scancode-set2";
 
