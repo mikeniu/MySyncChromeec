@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e8340c7_17cb0ea7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 25
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1003039
+      },
+      "writtenOn": "2026-06-24T17:42:49Z",
+      "side": 1,
+      "message": "I think based on the most recent changelist, we don\u0027t go to unattached, but we stay in AttachWait.SRC until the Rd-Rd goes away, which prevents Vbus from turning on.\n\nCan you update the commit message to reflect that?",
+      "range": {
+        "startLine": 9,
+        "startChar": 51,
+        "endLine": 9,
+        "endChar": 67
+      },
+      "revId": "fe84cfb85024b6899e7db41d9f9c5ee15b462cc5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
