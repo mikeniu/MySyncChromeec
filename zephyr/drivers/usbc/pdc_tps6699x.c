@@ -1071,9 +1071,10 @@ static enum smf_state_result st_suspended_run(void *o)
 {
 	struct pdc_data_t *data = (struct pdc_data_t *)o;
 
-	if (data->events & PDC_CMD_SUSPEND_REQUEST_EVENT) {
-		k_event_clear(&data->pdc_event, PDC_CMD_SUSPEND_REQUEST_EVENT);
-	}
+	/* Clear all events that might keep the thread busy, since the driver
+	 * will not be able to process them while suspended. This also includes
+	 * PDC_CMD_SUSPEND_REQUEST_EVENT. */
+	k_event_clear(&data->pdc_event, PDC_ALL_THREAD_WAKE_EVENTS);
 
 	/* Stay here while suspended */
 	if (check_comms_suspended()) {
