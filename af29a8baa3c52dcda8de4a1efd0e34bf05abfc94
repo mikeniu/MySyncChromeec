@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2aa79df3_2bca8c1a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-24T19:42:43Z",
+      "side": 1,
+      "message": "Just so we\u0027re on the same page, this is the CL that you\u0027ll need to cherry pick to `ec-legacy`. You\u0027ll have to manually modify that cherry pick to drop the change to `zephyr/CMakeLists.txt`.",
+      "revId": "af29a8baa3c52dcda8de4a1efd0e34bf05abfc94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
