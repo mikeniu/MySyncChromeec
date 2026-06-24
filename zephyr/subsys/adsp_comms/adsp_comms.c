@@ -4,6 +4,7 @@
  */
 
 #include "adsp_comms.h"
+#include "battery.h"
 #include "battery_smart.h"
 #include "charge_manager.h"
 #include "charge_state.h"
@@ -33,8 +34,29 @@ enum led_pwr_state led_pwr_get_state(void)
 
 static int command_chgstate(int argc, const char **argv)
 {
+	const char *state_str = "idle";
+	int soc = battery_get_fake_soc();
+	enum battery_present bp = battery_is_present();
+	const char *pres_str =
+		(bp == BP_YES) ? "YES" : (bp == BP_NO ? "NO" : "NOT_SURE");
+	int batt_is_charging = 0;
+
+	if (active_charge_state == LED_PWRS_CHARGE ||
+	    active_charge_state == LED_PWRS_CHARGE_NEAR_FULL) {
+		state_str = "charge";
+		batt_is_charging = 1;
+	} else if (active_charge_state == LED_PWRS_DISCHARGE ||
+		   active_charge_state == LED_PWRS_DISCHARGE_FULL) {
+		state_str = "discharge";
+	}
+
+	ccprintf("state = %s\n", state_str);
 	ccprintf("ac = %d\n", extpower_is_present());
-	/* TODO: b/493490329 add the rest of the details */
+	ccprintf("batt_is_charging = %d\n", batt_is_charging);
+	ccprintf("batt.*:\n");
+	ccprintf("\tstate_of_charge = %d%%\n", soc);
+	ccprintf("\tis_present = %s\n", pres_str);
+
 	return EC_SUCCESS;
 }
 DECLARE_CONSOLE_COMMAND(chgstate, command_chgstate, NULL,

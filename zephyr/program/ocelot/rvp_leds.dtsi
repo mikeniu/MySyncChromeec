@@ -9,16 +9,16 @@
 	led_pins: gpio-led-pins {
 		compatible = "cros-ec,gpio-led-pins";
 
-		/* This is re-using the caps lock LED to convey system and
-		 * battery status because the EC AICs cannot control the RVP's
-		 * usual charging status status LED over the MECC connector.
+		/* Using charger LED PWM GPIOs on the IT8801 IO expander
+		 * (GSC AIC) to drive battery and power LEDs. These GPIOs
+		 * have power available even when the system is shutdown.
 		 *
-		 * EC_LED_ID_BATTERY_LED: caps lock, DS1J3, MECC #17 (led1)
-		 * EC_LED_ID_POWER_LED: num lock, DS1J2, MECC #18 (led2)
+		 * EC_LED_ID_BATTERY_LED: LED DS411 on GSC AIC (ioex_it8801_port1 5)
+		 * EC_LED_ID_POWER_LED: LED DS410 on GSC AIC (ioex_it8801_port1 4)
 		 */
 		led1 {
 			led-id = "EC_LED_ID_BATTERY_LED";
-			led-pins = <&gpio_led_1>;
+			led-pins = <&gpio_batt_led>;
 
 			battery_led_off: color-off {
 				led-color = "LED_OFF";
@@ -33,7 +33,7 @@
 
 		led2 {
 			led-id = "EC_LED_ID_POWER_LED";
-			led-pins = <&gpio_led_2>;
+			led-pins = <&gpio_chgr_led>;
 
 			power_led_off: color-off {
 				led-color = "LED_OFF";

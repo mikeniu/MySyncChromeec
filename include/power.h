@@ -18,35 +18,7 @@
 extern "C" {
 #endif
 
-FORWARD_DECLARE_ENUM(power_state){
-	/* Steady states */
-	POWER_G3 = 0, /*
-		       * System is off (not technically all the way into G3,
-		       * which means totally unpowered...)
-		       */
-	POWER_S5, /* System is soft-off */
-	POWER_S4, /* System is suspended to disk */
-	POWER_S3, /* Suspend; RAM on, processor is asleep */
-	POWER_S0, /* System is on */
-#ifdef CONFIG_POWER_S0IX
-	POWER_S0ix,
-#endif
-	/* Transitions */
-	POWER_G3S5, /* G3 -> S5 (at system init time) */
-	POWER_S5S3, /* S5 -> S3 (skips S4 on non-Intel systems) */
-	POWER_S3S0, /* S3 -> S0 */
-	POWER_S0S3, /* S0 -> S3 */
-	POWER_S3S5, /* S3 -> S5 (skips S4 on non-Intel systems) */
-	POWER_S5G3, /* S5 -> G3 */
-	POWER_S3S4, /* S3 -> S4 */
-	POWER_S4S3, /* S4 -> S3 */
-	POWER_S4S5, /* S4 -> S5 */
-	POWER_S5S4, /* S5 -> S4 */
-#ifdef CONFIG_POWER_S0IX
-	POWER_S0ixS0, /* S0ix -> S0 */
-	POWER_S0S0ix, /* S0 -> S0ix */
-#endif
-};
+#include "power_state_defs.h"
 
 /*
  * Power signal flags:
@@ -256,6 +228,13 @@ int power_get_pause_in_s5(void);
  * @param pause True if we should pause in S5 when shutting down.
  */
 void power_set_pause_in_s5(int pause);
+
+/**
+ * Enable/disable the S5 inactivity timer.
+ *
+ * @param enable True to enable, false to disable/bypass.
+ */
+void power_set_s5_inactivity_timer_enable(int enable);
 
 #ifdef CONFIG_POWER_TRACK_HOST_SLEEP_STATE
 /**
