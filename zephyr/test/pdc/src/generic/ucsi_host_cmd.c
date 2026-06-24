@@ -108,9 +108,19 @@ ZTEST_USER(ucsi_host_cmd, test_get_unavailable)
 
 ZTEST_USER(ucsi_host_cmd, test_set_error)
 {
-	struct ec_params_ucsi_ppm_set params = {
-		.offset = 1,
+	enum {
+		DATA_SIZE = 2,
+		BUF_SIZE = sizeof(struct ec_params_ucsi_ppm_set) + DATA_SIZE,
 	};
+	union temp {
+		uint8_t data[BUF_SIZE];
+		struct ec_params_ucsi_ppm_set ppm_set;
+	} params = { .data = { 3, 2, 1, 0 },
+		     .ppm_set = {
+			     .offset = 1,
+		     } };
+	struct host_cmd_handler_args args =
+		BUILD_HOST_COMMAND_PARAMS(EC_CMD_UCSI_PPM_SET, 0, params);
 	enum ec_status rv;
 	struct ucsi_ppm_device fake_ppm_device;
 
@@ -118,19 +128,30 @@ ZTEST_USER(ucsi_host_cmd, test_set_error)
 	eppm_init();
 
 	ucsi_ppm_write_fake.return_val = 1;
-	rv = ec_cmd_ucsi_ppm_set(NULL, &params);
+	rv = host_command_process(&args);
 	zassert_equal(rv, EC_RES_ERROR);
 	zassert_equal(ucsi_ppm_write_fake.call_count, 1);
 	zassert_equal(ucsi_ppm_write_fake.arg0_val, &fake_ppm_device);
 	zassert_equal(ucsi_ppm_write_fake.arg1_val, 1);
-	zassert_equal(ucsi_ppm_write_fake.arg2_val, params.data);
+	zassert_mem_equal(ucsi_ppm_write_fake.arg2_val, params.ppm_set.data,
+			  DATA_SIZE);
 }
 
 ZTEST_USER(ucsi_host_cmd, test_set_success)
 {
-	struct ec_params_ucsi_ppm_set params = {
-		.offset = 1,
+	enum {
+		DATA_SIZE = 2,
+		BUF_SIZE = sizeof(struct ec_params_ucsi_ppm_set) + DATA_SIZE,
 	};
+	union temp {
+		uint8_t data[BUF_SIZE];
+		struct ec_params_ucsi_ppm_set ppm_set;
+	} params = { .data = { 3, 2, 1, 0 },
+		     .ppm_set = {
+			     .offset = 1,
+		     } };
+	struct host_cmd_handler_args args =
+		BUILD_HOST_COMMAND_PARAMS(EC_CMD_UCSI_PPM_SET, 0, params);
 	enum ec_status rv;
 	struct ucsi_ppm_device fake_ppm_device;
 
@@ -138,12 +159,13 @@ ZTEST_USER(ucsi_host_cmd, test_set_success)
 	eppm_init();
 
 	ucsi_ppm_write_fake.return_val = 0;
-	rv = ec_cmd_ucsi_ppm_set(NULL, &params);
+	rv = host_command_process(&args);
 	zassert_equal(rv, EC_RES_SUCCESS);
 	zassert_equal(ucsi_ppm_write_fake.call_count, 1);
 	zassert_equal(ucsi_ppm_write_fake.arg0_val, &fake_ppm_device);
 	zassert_equal(ucsi_ppm_write_fake.arg1_val, 1);
-	zassert_equal(ucsi_ppm_write_fake.arg2_val, params.data);
+	zassert_mem_equal(ucsi_ppm_write_fake.arg2_val, params.ppm_set.data,
+			  DATA_SIZE);
 }
 
 ZTEST_USER(ucsi_host_cmd, test_set_unavailable)

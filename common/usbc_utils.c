@@ -2,7 +2,7 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  *
- * USB-C utility functions for all PD stacks (TCPMv1, TCPMv2, PDC)
+ * USB-C utility functions for all PD stacks (TCPMv2 and PDC)
  */
 
 #include "common.h"

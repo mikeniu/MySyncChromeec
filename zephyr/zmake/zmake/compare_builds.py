@@ -45,6 +45,30 @@ def get_git_hash(ref):
     return full_reference
 
 
+def get_git_commit_title(ref):
+    """Get the git commit message title of the given ref.
+
+    Args:
+        ref: Git reference (e.g. HEAD, m/main, sha256)
+
+    Returns:
+        A string commit title, or None on failure
+    """
+
+    try:
+        result = subprocess.run(
+            ["git", "show", "-s", "--format=%s", ref],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            encoding="utf-8",
+        )
+    except subprocess.CalledProcessError:
+        return None
+
+    return result.stdout.strip()
+
+
 def _git_clone_repo(module_name, work_dir, git_source, dst_dir):
     """Clone a repository, skipping the checkout.
 
@@ -93,7 +117,7 @@ def _git_do_checkout(work_dir, dst_dir, git_ref):
     Returns:
         0 on success, non-zero otherwise
     """
-    cmd = ["git", "-C", dst_dir, "checkout", "--quiet", git_ref]
+    cmd = ["git", "-C", str(dst_dir), "checkout", "--quiet", git_ref]
     try:
         subprocess.run(
             cmd,
@@ -144,6 +168,7 @@ def _compare_non_test_projects(projects, cmp_method, *args):
     return failed_projects
 
 
+# pylint:disable=too-many-instance-attributes
 @dataclasses.dataclass
 class CheckoutConfig:
     """All the information needed to build the EC at a specific checkout."""
@@ -151,6 +176,7 @@ class CheckoutConfig:
     temp_dir: str
     ref: str
     full_ref: str = dataclasses.field(default_factory=str)
+    commit_title: str = dataclasses.field(default_factory=str)
     work_dir: pathlib.Path = dataclasses.field(default_factory=pathlib.Path)
     zephyr_dir: pathlib.Path = dataclasses.field(default_factory=pathlib.Path)
     modules_dir: pathlib.Path = dataclasses.field(default_factory=pathlib.Path)
@@ -158,6 +184,7 @@ class CheckoutConfig:
 
     def __post_init__(self):
         self.full_ref = get_git_hash(self.ref)
+        self.commit_title = get_git_commit_title(self.ref)
         self.work_dir = pathlib.Path(self.temp_dir) / self.full_ref
         self.zephyr_dir = self.work_dir / "zephyr-base"
         self.modules_dir = self.work_dir / "modules"
@@ -167,6 +194,9 @@ class CheckoutConfig:
         self.projects_dirs = zmake.modules.default_projects_dirs(modules)
 
         os.mkdir(self.work_dir)
+
+    def __str__(self):
+        return f"{self.ref} ({self.full_ref}): \"{self.commit_title or '<Unnamed>'}\""
 
 
 class CompareBuilds:

@@ -62,6 +62,14 @@ config COMMON_LIBC_MALLOC
 config LTO
 	default y if !X86 && !SOC_POSIX
 
+# For clang, this option sets the LTO optimization flag to "-flto=full"
+# instead of "-flto=thin" and yields smaller images.
+# For gcc, this option sets the LTO optimization flag to "-flto=1" instead
+# of "-flto=auto".  There is no size difference detected between these
+# settings on gcc.
+config LTO_SINGLE_THREADED
+	default y
+
 config ISR_TABLES_LOCAL_DECLARATION
 	default y
 
@@ -70,5 +78,8 @@ config CURRENT_THREAD_USE_TLS
 
 config I2C_TRANSFER_TIMEOUT_MS
 	default 100
+
+config DEVICE_API_ASSERT
+	default n
 
 orsource "Kconfig.defaults-$(ARCH)"

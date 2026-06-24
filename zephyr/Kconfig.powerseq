@@ -347,6 +347,15 @@ config PLATFORM_EC_POWERSEQ_QC_EXP
 	help
 	  Enable power sequencing for the Qualcomm QC_EXP chipset.
 
+config PLATFORM_EC_POWERSEQ_QC_EXP_WARM_RESET
+	bool "Enable warm reset for QC_EXP power sequencing"
+	depends on PLATFORM_EC_POWERSEQ_QC_EXP
+	default y
+	help
+	  Enable warm reset sequence for QC_EXP. If disabled, warm resets
+	  will fall back to cold resets. This is useful if the warm reset
+	  sequence is unreliable on certain platforms.
+
 config PLATFORM_EC_CONSOLE_CMD_S5_TIMEOUT
 	bool "Console command: s5_timeout"
 	help
