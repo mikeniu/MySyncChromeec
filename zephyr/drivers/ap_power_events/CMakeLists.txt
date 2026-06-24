@@ -2,4 +2,4 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC=40000000
+zephyr_library_sources_ifdef(CONFIG_AP_POWER_EVENTS ap_power_events.c)

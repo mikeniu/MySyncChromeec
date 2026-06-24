@@ -136,9 +136,17 @@ class GNUMakeJobClient(JobClient):
     job.
     """
 
-    def __init__(self, inheritable_pipe, jobs, internal_jobs=0, makeflags=None):
+    def __init__(
+        self,
+        inheritable_pipe,
+        jobs,
+        internal_jobs=0,
+        makeflags=None,
+        close_inheritable_pipe=False,
+    ):
         self._makeflags = makeflags
         self._inheritable_pipe = inheritable_pipe
+        self._close_inheritable_pipe = close_inheritable_pipe
         self.jobs = jobs
         self._selector = selectors.DefaultSelector()
         if internal_jobs:
@@ -161,7 +169,7 @@ class GNUMakeJobClient(JobClient):
             )
 
     def __del__(self):
-        if self._inheritable_pipe:
+        if self._inheritable_pipe and self._close_inheritable_pipe:
             os.close(self._inheritable_pipe[0])
             os.close(self._inheritable_pipe[1])
         if self._internal_pipe:
@@ -282,6 +290,6 @@ class GNUMakeJobServer(GNUMakeJobClient):
             jobs = multiprocessing.cpu_count()
         elif jobs > select.PIPE_BUF:
             jobs = select.PIPE_BUF
-        super().__init__(os.pipe(), jobs)
+        super().__init__(os.pipe(), jobs, close_inheritable_pipe=True)
 
         os.write(self._inheritable_pipe[1], b"+" * jobs)
