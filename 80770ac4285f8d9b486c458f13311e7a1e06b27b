@@ -16,6 +16,24 @@
       "message": "@scollyer@chromium.org do you know if we can increase this? Or maybe even drop rex-ish entirely not sure we actually use it",
       "revId": "80770ac4285f8d9b486c458f13311e7a1e06b27b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "70db17e3_b3aa2755",
+        "filename": "zephyr/program/rex/rex-ish/prj.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-06-24T09:25:48Z",
+      "side": 1,
+      "message": "(resolving, non blocking)",
+      "parentUuid": "d6d284a1_b4eef629",
+      "revId": "80770ac4285f8d9b486c458f13311e7a1e06b27b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
