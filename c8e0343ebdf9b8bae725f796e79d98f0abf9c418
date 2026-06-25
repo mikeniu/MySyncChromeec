@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0647ff7_1bb38870",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-06-25T22:25:44Z",
+      "side": 1,
+      "message": "Maybe add a `buf[7] \u003d \u0027\\0\u0027` to be safe.",
+      "revId": "c8e0343ebdf9b8bae725f796e79d98f0abf9c418",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
