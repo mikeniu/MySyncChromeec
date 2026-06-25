@@ -103,6 +103,7 @@ def register_rtk59_project(
     project_name,
     extra_kconfig_base_files=(),
     extra_kconfig_proj_files=(),
+    extra_modules=(),
 ):
     """Register a realtek based variant of ocelot."""
     register_rtk_project(
@@ -121,7 +122,7 @@ def register_rtk59_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_proj_files,
         ],
-        modules=["cmsis_6", "ec"],
+        modules=["cmsis_6", "ec", *extra_modules],
     )
 
 
@@ -172,6 +173,11 @@ register_rtk59_project(
 
 register_rtk59_project(
     project_name="kodkod",
+)
+
+register_rtk59_project(
+    project_name="hekla",
+    # extra_modules=["google-private"],
 )
 
 matsu = register_it8xxx2_project(
@@ -231,6 +237,7 @@ register_rtk59_project(
 
 # Note for reviews, do not let anyone edit these assertions, the addresses
 # must not change after the first RO release.
+assert_rw_fwid_DO_NOT_EDIT(project_name="hekla", addr=0x80404)
 assert_rw_fwid_DO_NOT_EDIT(project_name="kodkod", addr=0x80404)
 assert_rw_fwid_DO_NOT_EDIT(project_name="matsu", addr=0x60098)
 assert_rw_fwid_DO_NOT_EDIT(project_name="matsu_it82000", addr=0x60098)
