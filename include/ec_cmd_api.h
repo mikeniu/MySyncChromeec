@@ -419,7 +419,7 @@ _CROS_EC_CV_F_P_R(EC_CMD_PD_CHIP_INFO, 2, pd_chip_info_v2, pd_chip_info,
 _CROS_EC_CV_F_P_R(EC_CMD_PD_CHIP_INFO, 1, pd_chip_info_v1, pd_chip_info,
 		  pd_chip_info_v1);
 _CROS_EC_C0_F_PF_RF(EC_CMD_PD_CHIP_INFO, pd_chip_info);
-_CROS_EC_C0_F_PF(EC_CMD_PD_CONTROL, pd_control);
+_CROS_EC_C0_F_PF_RF(EC_CMD_PD_CONTROL, pd_control);
 _CROS_EC_CV_F_R(EC_CMD_PD_HOST_EVENT_STATUS, 0, pd_host_event_status,
 		host_event_status);
 _CROS_EC_C0_F_PF(EC_CMD_PD_WRITE_LOG_ENTRY, pd_write_log_entry);

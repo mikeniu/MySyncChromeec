@@ -3146,6 +3146,8 @@ void pd_request_data_swap(int port);
  */
 void pd_comm_enable(int port, int enable);
 
+bool pd_comm_status(int *port);
+
 /**
  * Set the PD pings enabled flag. When source has negotiated power over
  * PD successfully, it can optionally send pings periodically based on
