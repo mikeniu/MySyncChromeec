@@ -6656,12 +6656,18 @@ enum ec_pd_control_cmd {
 	PD_RESET, /* Force reset the PD chip */
 	PD_CONTROL_DISABLE, /* Disable further calls to this command */
 	PD_CHIP_ON, /* Power on the PD chip */
+	PD_GET_STATUS, /* Get suspend status */
 };
 
 struct ec_params_pd_control {
 	uint8_t chip; /* chip id */
 	uint8_t subcmd;
 } __ec_align1;
+
+struct ec_response_pd_control {
+	uint8_t status; /* 1 if suspended, 0 otherwise */
+	uint8_t port; /* Port currently suspended */
+};
 
 /* Get info about USB-C SS muxes */
 #define EC_CMD_USB_PD_MUX_INFO 0x011A

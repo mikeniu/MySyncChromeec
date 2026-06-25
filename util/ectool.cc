@@ -11750,8 +11750,8 @@ int cmd_pd_control(int argc, char *argv[])
 			return -1;
 		}
 	}
-
 	rv = ec_command(EC_CMD_PD_CONTROL, 0, &p, sizeof(p), NULL, 0);
+
 	return (rv < 0 ? rv : 0);
 }
 
