@@ -34,6 +34,24 @@
       "parentUuid": "6c003015_e0f5bd9d",
       "revId": "7cbd15e0b6fd1e9f5299cb98704008dccfdaa598",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6420b829_aedde956",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-06-25T16:28:01Z",
+      "side": 1,
+      "message": "I believe you need to add `Cq-Depend` to change in focaltech repository.",
+      "parentUuid": "0aaddac3_34f4be75",
+      "revId": "7cbd15e0b6fd1e9f5299cb98704008dccfdaa598",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
