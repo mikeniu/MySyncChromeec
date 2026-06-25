@@ -39,6 +39,30 @@
       },
       "revId": "0108d81d757f4b802032a8a6aeac6270c1ddc148",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "91ccc51f_137282d2",
+        "filename": "zephyr/program/atria/atriarvp-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-06-25T00:41:27Z",
+      "side": 1,
+      "message": "Removed first three which are set when PM\u003dy.",
+      "parentUuid": "e977eba8_2efc7d4f",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 27
+      },
+      "revId": "0108d81d757f4b802032a8a6aeac6270c1ddc148",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
