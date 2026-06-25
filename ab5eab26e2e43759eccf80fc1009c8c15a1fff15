@@ -34,6 +34,24 @@
       "parentUuid": "38e20e83_7149edb9",
       "revId": "ab5eab26e2e43759eccf80fc1009c8c15a1fff15",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f02d0fc2_b59587cb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-25T01:34:53Z",
+      "side": 1,
+      "message": "Resolve the conflict with include util/egis/build.mk when running git pull --rebase origin main.",
+      "parentUuid": "d897101a_061ccae9",
+      "revId": "ab5eab26e2e43759eccf80fc1009c8c15a1fff15",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
