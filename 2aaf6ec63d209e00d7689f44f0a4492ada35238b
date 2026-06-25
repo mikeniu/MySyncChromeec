@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "172def8c_6702aadb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3879739
+      },
+      "writtenOn": "2026-06-25T11:34:10Z",
+      "side": 1,
+      "message": "I checked this on Rex. With the current CL (patchset 3), CONFIG_PLATFORM_EC_SVDM_RSP is not enabled because it depends on !CONFIG_PLATFORM_EC_USB_PD_USB32_DRD, and Rex has CONFIG_PLATFORM_EC_USB_PD_USB32_DRD\u003dy. As a result, the common svdm_rsp.c implementation is not linked, and the build succeeds.\n\nAlso tried removing the DRD dependency (patchset 4), which results in CONFIG_PLATFORM_EC_SVDM_RSP\u003dy for Rex. The build still succeeded, and I did not see any duplicate implementation or linker errors. Looking at the build logic, usbc_tbt_compat.c is only compiled when both CONFIG_PLATFORM_EC_USB_PD_TBT_COMPAT_MODE and CONFIG_PLATFORM_EC_USB_PD_ALT_MODE_UFP are enabled. On Rex, CONFIG_PLATFORM_EC_USB_PD_ALT_MODE_UFP is not set, so usbc_tbt_compat.c is not included in the build.\n\nBuilt Screebo at this commit, and the build completed successfully.",
+      "parentUuid": "a41936d0_fecf53db",
+      "revId": "2aaf6ec63d209e00d7689f44f0a4492ada35238b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d88b7029_04ff78cd",
         "filename": "zephyr/Kconfig.svdm_rsp",
         "patchSetId": 3
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-24T19:46:33Z",
       "side": 1,
       "message": "Is this restriction still needed, or can we remove this as well?",
+      "revId": "2aaf6ec63d209e00d7689f44f0a4492ada35238b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fecaff31_4a273ef7",
+        "filename": "zephyr/Kconfig.svdm_rsp",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 3879739
+      },
+      "writtenOn": "2026-06-25T11:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d88b7029_04ff78cd",
       "revId": "2aaf6ec63d209e00d7689f44f0a4492ada35238b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
