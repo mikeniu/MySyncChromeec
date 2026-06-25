@@ -478,11 +478,12 @@ def main(argv=None):
                 logging.error(
                     "Failed projects by diff in %s: %s",
                     file,
-                    ", ".join(failed_projects),
+                    ", ".join(sorted(failed_projects)),
                 )
         if zmake.failed_projects:
             logging.error(
-                "All failed projects: %s", " ".join(zmake.failed_projects)
+                "All failed projects: %s",
+                " ".join(sorted(zmake.failed_projects)),
             )
 
 
