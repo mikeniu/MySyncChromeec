@@ -1695,6 +1695,13 @@ void pd_comm_enable(int port, int en)
 	tc_policy_pd_enable(port, en);
 }
 
+bool pd_comm_status(int *port)
+{
+	// TODO
+	port = -1;
+	return false;
+}
+
 uint8_t tc_get_polarity(int port)
 {
 	return tc[port].polarity;

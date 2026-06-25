@@ -181,9 +181,16 @@ uint8_t pd_get_product_type(int port)
 
 void pd_comm_enable(int port, int enable)
 {
-	ARG_UNUSED(port);
+	if (enable) {
+		(void)pdc_power_mgmt_update_done(port);
+	} else {
+		(void)pdc_power_mgmt_update_start(port);
+	}
+}
 
-	(void)pdc_power_mgmt_set_comms_state(enable);
+bool pd_comm_status(int *port)
+{
+	return pdc_power_mgmt_is_update_mode(port);
 }
 
 /* No-op on PDC devices. The suspend/enable operation is handled within
