@@ -16,6 +16,24 @@
       "message": "A change in the internal focaltech repository is missing.",
       "revId": "7cbd15e0b6fd1e9f5299cb98704008dccfdaa598",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0aaddac3_34f4be75",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-06-25T15:23:03Z",
+      "side": 1,
+      "message": "added it\n\nhttps://chrome-internal-review.git.corp.google.com/c/chromeos/vendor/fingerprint/focaltech/+/9470578",
+      "parentUuid": "6c003015_e0f5bd9d",
+      "revId": "7cbd15e0b6fd1e9f5299cb98704008dccfdaa598",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
