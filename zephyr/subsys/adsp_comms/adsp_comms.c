@@ -18,6 +18,13 @@
 
 LOG_MODULE_DECLARE(adsp_comms, LOG_LEVEL_INF);
 
+/*
+ * Duration to disable the AC_PRESENT interrupt to ignore the
+ * spurious toggle from the switchcap turning on/off.
+ * Based on o-scope measurements showing a ~500ms event.
+ */
+#define AC_IRQ_DISABLE_DURATION (2500 * USEC_PER_MSEC)
+
 static int active_charge_port = CHARGE_PORT_NONE;
 static enum led_pwr_state active_charge_state = LED_PWRS_IDLE;
 static int active_battery_status;
@@ -74,6 +81,37 @@ test_mockable int battery_status(int *status)
 }
 #endif
 
+/*
+ * Re-enables the AC interrupt after the "ignore" period and processes
+ * any settled state change.
+ */
+static void adsp_ac_irq_re_enable_and_check(void)
+{
+	/* Re-enable the AC interrupt */
+	extpower_enable_interrupt();
+
+	/*
+	 * Manually invoke the handler to process any genuine AC state
+	 * changes that may have occurred while the interrupt was
+	 * disabled. This synchronizes the system to the settled state.
+	 */
+	extpower_interrupt(GPIO_SIGNAL_ANY);
+}
+DECLARE_DEFERRED(adsp_ac_irq_re_enable_and_check);
+
+/*
+ * Disables the AC interrupt to ignore the spurious toggle from the
+ * switchcap and schedules a deferred task to re-enable it.
+ */
+static void adsp_start_ac_filter_window(void)
+{
+	/* Disable AC_PRESENT interrupt */
+	extpower_disable_interrupt();
+	/* Schedule the interrupt to be re-enabled after the event passes */
+	hook_call_deferred(&adsp_ac_irq_re_enable_and_check_data,
+			   AC_IRQ_DISABLE_DURATION);
+}
+
 static void adsp_power_state_cb(uint8_t fid, uint8_t addr, uint16_t data)
 {
 	LOG_INF("ADSP: Power State: 0x%04x", data);
@@ -96,6 +134,9 @@ static void adsp_oem_version_cb(uint8_t fid, uint8_t addr, uint16_t data)
 {
 	if (data == ADSP_OEM_CUSTOM_VERSION_1) {
 		LOG_INF("ADSP: Version 1 identified");
+		if (extpower_is_present()) {
+			adsp_start_ac_filter_window();
+		}
 	} else {
 		LOG_ERR("ADSP: Incorrect version received: %d (expected %d)",
 			data, ADSP_OEM_CUSTOM_VERSION_1);
