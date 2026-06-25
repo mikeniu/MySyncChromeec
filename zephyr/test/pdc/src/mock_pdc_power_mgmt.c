@@ -54,6 +54,9 @@ DEFINE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_set_bbr_cts, int, bool);
 DEFINE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_set_ap_power_state,
 		       enum power_state);
 DEFINE_FAKE_VOID_FUNC(pdc_power_mgmt_simulate_power_button_press, int);
+DEFINE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_update_start, int);
+DEFINE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_update_done, int);
+DEFINE_FAKE_VALUE_FUNC(bool, pdc_power_mgmt_is_update_mode, int *);
 
 void helper_reset_pdc_power_mgmt_fakes(void)
 {
@@ -88,4 +91,7 @@ void helper_reset_pdc_power_mgmt_fakes(void)
 	RESET_FAKE(pdc_power_mgmt_set_bbr_cts);
 	RESET_FAKE(pdc_power_mgmt_set_ap_power_state);
 	RESET_FAKE(pdc_power_mgmt_simulate_power_button_press);
+	RESET_FAKE(pdc_power_mgmt_update_start);
+	RESET_FAKE(pdc_power_mgmt_update_done);
+	RESET_FAKE(pdc_power_mgmt_is_update_mode);
 }

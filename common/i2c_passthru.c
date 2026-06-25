@@ -13,6 +13,7 @@
 #include "system.h"
 #include "usb_pd.h"
 #include "usb_pd_tcpm.h"
+#include "usbc/pdc_power_mgmt.h"
 #include "util.h"
 #include "virtual_battery.h"
 
@@ -112,6 +113,35 @@ static int check_i2c_params(const uint8_t port,
 	if (args->params_size < size + write_len) {
 		PTHRUPRINTS("overflow2");
 		return EC_RES_INVALID_PARAM;
+	}
+
+	return EC_RES_SUCCESS;
+}
+
+enum ec_status i2c_passthru_is_allowed(int port, uint16_t addr_flags)
+{
+	const struct i2c_port_t *i2c_port;
+
+	i2c_port = get_i2c_port(port);
+	if (!i2c_port)
+		return EC_RES_INVALID_PARAM;
+
+#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED
+	if (system_is_locked()) {
+		struct i2c_cmd_desc_t cmd_desc;
+
+		cmd_desc.port = port;
+		cmd_desc.addr_flags = addr_flags;
+		if (!board_allow_i2c_passthru(&cmd_desc)) {
+			return EC_RES_ACCESS_DENIED;
+		}
+	}
+#endif
+
+	if (port_protected[port]) {
+		if (!i2c_port->passthru_allowed) {
+			return EC_RES_ACCESS_DENIED;
+		}
 	}
 
 	return EC_RES_SUCCESS;

@@ -8508,6 +8508,29 @@ struct ec_params_switch_enable_poe {
 	uint8_t enabled;
 } __ec_align1;
 
+/**
+ * Host Command: EC_CMD_PDC_UPDATE
+ * Manages the PDC firmware update sessiion.
+ */
+
+#define EC_CMD_PDC_UPDATE 0x0147
+
+enum ec_pdc_update_cmd {
+	PDC_UPDATE_START = 0,
+	PDC_UPDATE_DONE = 1,
+	PDC_UPDATE_GET_STATUS = 2,
+};
+
+struct ec_params_pdc_update {
+	uint8_t port;
+	uint8_t subcmd; /* enum ec_pdc_update_cmd */
+} __ec_align1;
+
+struct ec_response_pdc_update {
+	uint8_t status; /* 1 if in update mode, 0 otherwise */
+	uint8_t port; /* Port currently in update mode */
+};
+
 /*****************************************************************************/
 /* The command range 0x200-0x2FF is reserved for Rotor. */
 
