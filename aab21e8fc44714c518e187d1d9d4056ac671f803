@@ -16,6 +16,52 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "aab21e8fc44714c518e187d1d9d4056ac671f803",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cbdcdc4_70e0b706",
+        "filename": "zephyr/program/bluey/mica/src/lb_policy.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-06-25T02:53:07Z",
+      "side": 1,
+      "message": "These are already defined in google-private repo [include/common/lightbar_policy_alt.h - chromeos/third_party/zephyr/google-private](https://chrome-internal.googlesource.com/chromeos/third_party/zephyr/google-private/+/main/include/common/lightbar_policy_alt.h#24).  But including lighbar_policy_alt.h here results in a build error.\n\n[Mica: Add diagnostic lightbar patterns (7992281)](https://crrev.com/c/7992281) is the ideal implementation, but the build error is yet to be solved.",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 35
+      },
+      "revId": "aab21e8fc44714c518e187d1d9d4056ac671f803",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "807ee2e0_86b04310",
+        "filename": "zephyr/program/bluey/mica/src/lb_policy.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-06-25T02:53:07Z",
+      "side": 1,
+      "message": "These are already defined in",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 35
+      },
+      "revId": "aab21e8fc44714c518e187d1d9d4056ac671f803",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
