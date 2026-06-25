@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92ca2d5d_085c2020",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-25T21:33:45Z",
+      "side": 1,
+      "message": "Note for future readers:\n\nThe development of this CL was done in https://crrev.com/c/7654450. See the comments there for historical context.",
+      "revId": "232e3c3e7bc5a2de000cde8dc45d344b73309952",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
