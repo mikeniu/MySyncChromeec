@@ -22,6 +22,7 @@
 		};
 		gpio_acok_r_od: acok_r_od {
 			gpios = <&gpio0 1 (GPIO_INPUT)>;
+			enum-name = "GPIO_AC_PRESENT";
 		};
 		gpio_ec_en_pp5000: ec_en_pp5000 {
 			gpios = <&gpio4 0 (GPIO_OUTPUT)>;
@@ -147,7 +148,6 @@
 		};
 		gpio_ec_ac_present_odl: ec_ac_present_odl {
 			gpios = <&gpiof 0 (GPIO_INPUT)>;
-			enum-name = "GPIO_AC_PRESENT";
 		};
 		gpio_gsc_ec_voldn_btn_odl: gsc_ec_voldn_btn_odl {
 			gpios = <&gpiof 4 (GPIO_INPUT)>;
