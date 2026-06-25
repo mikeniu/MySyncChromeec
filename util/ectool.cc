@@ -11845,6 +11845,49 @@ int cmd_pd_chip_info(int argc, char *argv[])
 	return 0;
 }
 
+int cmd_pdc_update(int argc, char *argv[])
+{
+	struct ec_params_pdc_update p;
+	struct ec_response_pdc_update r;
+	char *e;
+	int rv;
+
+	if (argc < 3) {
+		fprintf(stderr, "Usage: %s <port> <start|done|status>\n",
+			argv[0]);
+		return -1;
+	}
+
+	p.port = strtol(argv[1], &e, 0);
+	if (e && *e) {
+		fprintf(stderr, "Bad port number.\n");
+		return -1;
+	}
+
+	if (!strcmp(argv[2], "start"))
+		p.subcmd = PDC_UPDATE_START;
+	else if (!strcmp(argv[2], "done"))
+		p.subcmd = PDC_UPDATE_DONE;
+	else if (!strcmp(argv[2], "status"))
+		p.subcmd = PDC_UPDATE_GET_STATUS;
+	else {
+		fprintf(stderr, "Unknown subcommand: %s\n", argv[2]);
+		return -1;
+	}
+
+	rv = ec_command(EC_CMD_PDC_UPDATE, 0, &p, sizeof(p), &r, sizeof(r));
+	if (rv < 0)
+		return rv;
+
+	if (p.subcmd == PDC_UPDATE_GET_STATUS) {
+		printf("Status: %s\n", r.status ? "In Update Mode" : "Normal");
+		if (r.status)
+			printf("Port:   %d\n", r.port);
+	}
+
+	return 0;
+}
+
 int cmd_pd_write_log(int argc, char *argv[])
 {
 	struct ec_params_pd_write_log_entry p;
@@ -13227,6 +13270,9 @@ const struct command commands[] = {
 	{ "pdchipinfo", cmd_pd_chip_info,
 	  "<port>\n"
 	  "\tGet PD chip information." },
+	{ "pdcupdate", cmd_pdc_update,
+	  "<port> <start|done|status>\n"
+	  "\tManage PDC firmware update session." },
 	{ "pdcontrol", cmd_pd_control,
 	  "[suspend|resume|reset|disable|on]\n"
 	  "\tControls the PD chip." },

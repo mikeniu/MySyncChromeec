@@ -15,6 +15,7 @@
 #include "battery_smart.h"
 #include "charge_manager.h"
 #include "chipset.h"
+#include "common.h"
 #include "drivers/ucsi_v3.h"
 #include "ec_commands.h"
 #include "hooks.h"
@@ -1310,6 +1311,106 @@ static uint32_t pdc_max_request_mv = CONFIG_PLATFORM_EC_USB_PD_MAX_VOLTAGE_MV;
  */
 static uint32_t pdc_max_operating_power =
 	CONFIG_PLATFORM_EC_USB_PD_MAX_POWER_MW;
+
+static int pdc_update_port = -1;
+
+static void pdc_update_watchdog_handler(struct k_timer *timer)
+{
+	LOG_WRN("custom PDC update watchdog expired for port C%d",
+		pdc_update_port);
+	pdc_power_mgmt_update_done(pdc_update_port);
+}
+
+K_TIMER_DEFINE(pdc_update_watchdog, pdc_update_watchdog_handler, NULL);
+
+#define PDC_UPDATE_TIMEOUT_MS 120000
+
+test_mockable int pdc_power_mgmt_update_start(int port)
+{
+	struct pdc_hw_config_t hw_config;
+	int physical_port;
+	int rv;
+
+	if (!pdc_power_mgmt_is_pdc_port_valid(port)) {
+		LOG_ERR("custom Update START: Invalid port %d", port);
+		return -ERANGE;
+	}
+
+	if (pdc_update_port != -1) {
+		LOG_WRN("Update START: Port %d busy, Port %d currently being updated",
+			port, pdc_update_port);
+		return -EBUSY;
+	}
+
+	/* Ensure I2C passthru is actually allowed for this PDC before
+	 * suspending */
+	if (pdc_power_mgmt_get_hw_config(port, &hw_config) == 0) {
+		if (hw_config.bus_type == PDC_BUS_TYPE_I2C) {
+			physical_port =
+				i2c_get_port_from_device(hw_config.i2c.bus);
+			if (i2c_passthru_is_allowed(physical_port,
+						    hw_config.i2c.addr) !=
+			    EC_RES_SUCCESS) {
+				LOG_ERR("Update START: Passthru denied for port C%d (bus %d addr"
+					" 0x%02x). Aborting suspend.",
+					port, physical_port,
+					hw_config.i2c.addr);
+				return -EACCES;
+			}
+		}
+	}
+
+	LOG_INF("PDC update mode starting for port C%d", port);
+
+	rv = pdc_power_mgmt_set_comms_state(false);
+	if (rv && rv != -EALREADY) {
+		LOG_ERR("Update START: Failed to suspend PDC comms: %d", rv);
+		return rv;
+	}
+
+	pdc_update_port = port;
+	k_timer_start(&pdc_update_watchdog, K_MSEC(PDC_UPDATE_TIMEOUT_MS),
+		      K_NO_WAIT);
+
+	LOG_INF("PDC update mode active for port C%d (Watchdog: %d ms)", port,
+		PDC_UPDATE_TIMEOUT_MS);
+
+	return 0;
+}
+
+test_mockable int pdc_power_mgmt_update_done(int port)
+{
+	if (pdc_update_port == -1) {
+		LOG_WRN("Update FINISH: No update session active");
+		return -EINVAL;
+	}
+
+	if (pdc_update_port != port) {
+		LOG_ERR("Update FINISH: Port mismatch (active: %d, requested: %d)",
+			pdc_update_port, port);
+		return -EINVAL;
+	}
+
+	LOG_INF("PDC update mode finishing for port C%d", port);
+
+	k_timer_stop(&pdc_update_watchdog);
+	pdc_update_port = -1;
+
+	return pdc_power_mgmt_set_comms_state(true);
+}
+
+test_mockable bool pdc_power_mgmt_is_update_mode(int *port)
+{
+	if (pdc_update_port == -1) {
+		return false;
+	}
+
+	if (port) {
+		*port = pdc_update_port;
+	}
+
+	return true;
+}
 
 static enum pdc_state_t get_pdc_state(struct pdc_port_t *port)
 {

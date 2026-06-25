@@ -156,3 +156,44 @@ uint8_t get_pd_control_flags(int port)
 	return 0;
 }
 #endif
+
+static enum ec_status hc_pdc_update(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_pdc_update *p = args->params;
+	struct ec_response_pdc_update *r = args->response;
+	int rv;
+
+	switch (p->subcmd) {
+	case PDC_UPDATE_START:
+		rv = pdc_power_mgmt_update_start(p->port);
+		if (rv == -ERANGE) {
+			return EC_RES_INVALID_PARAM;
+		} else if (rv == -EBUSY) {
+			return EC_RES_BUSY;
+		} else if (rv) {
+			return EC_RES_ERROR;
+		}
+		break;
+	case PDC_UPDATE_DONE:
+		rv = pdc_power_mgmt_update_done(p->port);
+		if (rv == -EINVAL) {
+			return EC_RES_INVALID_PARAM;
+		} else if (rv) {
+			return EC_RES_ERROR;
+		}
+		break;
+	case PDC_UPDATE_GET_STATUS: {
+		int port;
+
+		r->status = pdc_power_mgmt_is_update_mode(&port);
+		r->port = (uint8_t)port;
+		args->response_size = sizeof(*r);
+		break;
+	}
+	default:
+		return EC_RES_INVALID_PARAM;
+	}
+
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_PDC_UPDATE, hc_pdc_update, EC_VER_MASK(0));

@@ -407,3 +407,47 @@ ZTEST(host_cmd_pdc, test_ec_cmd_usb_pd_control__swap_data_role)
 	zassert_equal(1, pdc_power_mgmt_request_data_swap_fake.call_count,
 		      "pdc_power_mgmt_request_data_swap not called!");
 }
+
+static bool custom_fake_pdc_is_update_mode(int *port)
+{
+	if (pdc_power_mgmt_update_start_fake.call_count > 0 &&
+	    pdc_power_mgmt_update_done_fake.call_count == 0) {
+		if (port) {
+			*port = pdc_power_mgmt_update_start_fake.arg0_history[0];
+		}
+		return true;
+	}
+	return false;
+}
+
+ZTEST(host_cmd_pdc, test_ec_cmd_pdc_update)
+{
+	struct ec_params_pdc_update params;
+	struct ec_response_pdc_update resp;
+	int rv;
+
+	/* Test START */
+	params.port = 0;
+	params.subcmd = PDC_UPDATE_START;
+	pdc_power_mgmt_update_start_fake.return_val = 0;
+	rv = ec_cmd_pdc_update(NULL, &params, &resp);
+	zassert_equal(EC_RES_SUCCESS, rv);
+	zassert_equal(1, pdc_power_mgmt_update_start_fake.call_count);
+	zassert_equal(0, pdc_power_mgmt_update_start_fake.arg0_history[0]);
+
+	/* Test GET_STATUS while in update mode */
+	params.subcmd = PDC_UPDATE_GET_STATUS;
+	pdc_power_mgmt_is_update_mode_fake.custom_fake =
+		custom_fake_pdc_is_update_mode;
+	rv = ec_cmd_pdc_update(NULL, &params, &resp);
+	zassert_equal(EC_RES_SUCCESS, rv);
+	zassert_true(resp.status);
+	zassert_equal(0, resp.port);
+
+	/* Test FINISH */
+	params.subcmd = PDC_UPDATE_DONE;
+	pdc_power_mgmt_update_done_fake.return_val = 0;
+	rv = ec_cmd_pdc_update(NULL, &params, &resp);
+	zassert_equal(EC_RES_SUCCESS, rv);
+	zassert_equal(1, pdc_power_mgmt_update_done_fake.call_count);
+}

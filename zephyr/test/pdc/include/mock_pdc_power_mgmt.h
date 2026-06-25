@@ -58,6 +58,9 @@ DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_set_bbr_cts, int, bool);
 DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_set_ap_power_state,
 			enum power_state);
 DECLARE_FAKE_VOID_FUNC(pdc_power_mgmt_simulate_power_button_press, int);
+DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_update_start, int);
+DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_update_done, int);
+DECLARE_FAKE_VALUE_FUNC(bool, pdc_power_mgmt_is_update_mode, int *);
 
 /**
  * @brief Reset the above set of fakes
