@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3752d48f_f377d6cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-25T17:49:01Z",
+      "side": 1,
+      "message": "@bleung@google.com I think this CL chain is now ready to test on screebo at this CL. Seems like the following CL is just cleanup.",
+      "revId": "4ea066f8f1004737aa8c181c89019c9c8eaed9c2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
