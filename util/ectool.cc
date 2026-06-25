@@ -11717,6 +11717,7 @@ int cmd_pd_log(int argc, char *argv[])
 int cmd_pd_control(int argc, char *argv[])
 {
 	struct ec_params_pd_control p;
+	struct ec_response_pd_control r;
 	int rv;
 
 	if (argc < 2) {
@@ -11735,6 +11736,8 @@ int cmd_pd_control(int argc, char *argv[])
 		p.subcmd = PD_CONTROL_DISABLE;
 	else if (!strcmp(argv[1], "on") || !strcmp(argv[1], "chip_on"))
 		p.subcmd = PD_CHIP_ON;
+	else if (!strcmp(argv[1], "status"))
+		p.subcmd = PD_GET_STATUS;
 	else {
 		fprintf(stderr, "Unknown command: %s\n", argv[1]);
 		return -1;
@@ -11751,7 +11754,14 @@ int cmd_pd_control(int argc, char *argv[])
 		}
 	}
 
-	rv = ec_command(EC_CMD_PD_CONTROL, 0, &p, sizeof(p), NULL, 0);
+	rv = ec_command(EC_CMD_PD_CONTROL, 0, &p, sizeof(p), &r, sizeof(r));
+
+	if (p.subcmd == PD_GET_STATUS) {
+		printf("Status: %s\n", r.status ? "Suspended" : "Normal");
+		if (r.status)
+			printf("Port:   %d\n", r.port);
+	}
+
 	return (rv < 0 ? rv : 0);
 }
 
@@ -13228,7 +13238,7 @@ const struct command commands[] = {
 	  "<port>\n"
 	  "\tGet PD chip information." },
 	{ "pdcontrol", cmd_pd_control,
-	  "[suspend|resume|reset|disable|on]\n"
+	  "[suspend|resume|reset|disable|on|status] [<port>]\n"
 	  "\tControls the PD chip." },
 	{ "pdctrace", cmd_pdc_trace, cmd_pdc_trace_usage },
 	{ "pdgetmode", cmd_pd_get_amode,

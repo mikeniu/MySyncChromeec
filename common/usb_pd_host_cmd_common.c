@@ -501,6 +501,7 @@ static enum ec_status pd_control(struct host_cmd_handler_args *args)
 {
 	const struct ec_params_pd_control *cmd = args->params;
 	int enable = 0;
+	struct ec_response_pd_control *r = args->response;
 
 	if (cmd->chip >= board_get_usb_pd_port_count())
 		return EC_RES_INVALID_PARAM;
@@ -514,18 +515,36 @@ static enum ec_status pd_control(struct host_cmd_handler_args *args)
 	if (pd_control_disabled[cmd->chip])
 		return EC_RES_ACCESS_DENIED;
 
-	if (cmd->subcmd == PD_SUSPEND) {
+	switch (cmd->subcmd) {
+	case PD_SUSPEND: {
 		if (!pd_firmware_upgrade_check_power_readiness(cmd->chip))
 			return EC_RES_BUSY;
 		enable = 0;
-	} else if (cmd->subcmd == PD_RESUME) {
+		break;
+	}
+	case PD_RESUME: {
 		enable = 1;
-	} else if (cmd->subcmd == PD_RESET) {
+		break;
+	}
+	case PD_RESET:
 		board_reset_pd_mcu();
-	} else if (cmd->subcmd == PD_CHIP_ON && board_set_tcpc_power_mode) {
-		board_set_tcpc_power_mode(cmd->chip, 1);
+		break;
+	case PD_CHIP_ON: {
+		if (board_set_tcpc_power_mode) {
+			board_set_tcpc_power_mode(cmd->chip, 1);
+			return EC_RES_SUCCESS;
+		} else {
+			return EC_RES_INVALID_COMMAND;
+		}
+	}
+	case PD_GET_STATUS: { // TODO
+		int port;
+		r->status = pd_comm_status(&port);
+		r->port = (uint8_t)port;
+		args->response_size = sizeof(*r);
 		return EC_RES_SUCCESS;
-	} else {
+	}
+	default:
 		return EC_RES_INVALID_COMMAND;
 	}
 
