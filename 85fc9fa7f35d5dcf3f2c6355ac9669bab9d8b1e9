@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffb6b1dc_49218831",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1544342
+      },
+      "writtenOn": "2026-06-25T03:52:04Z",
+      "side": 1,
+      "message": "Add a line to your commit message footer with the following format to override Code-Coverage -1:\n```\nLOW_COVERAGE_REASON\u003d\u003cexplanation_of_why_coverage_is_low\u003e \u003cbug_reference\u003e\n```",
+      "revId": "85fc9fa7f35d5dcf3f2c6355ac9669bab9d8b1e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
