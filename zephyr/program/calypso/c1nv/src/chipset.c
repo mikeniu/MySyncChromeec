@@ -24,7 +24,6 @@ DECLARE_DEFERRED(pp5000_pwr_disable_deferred);
 
 void board_chipset_startup_c1nv(void)
 {
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_usba), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp3300_s3), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_ppvar_oled), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000), 1);
@@ -44,7 +43,6 @@ void board_chipset_shutdown_c1nv(void)
 	 */
 	hook_call_deferred(&pp5000_pwr_disable_deferred_data,
 			   PP5000_PWR_DISABLE_DELAY);
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_usba), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp3300_s3), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_ppvar_oled), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_fan), 0);
