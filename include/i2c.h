@@ -213,6 +213,15 @@ void i2c_prepare_sysjump(void);
 void i2c_set_timeout(int port, uint32_t timeout);
 
 /**
+ * Check if I2C passthru is allowed for the given port and address.
+ *
+ * @param port		Physical I2C port
+ * @param addr_flags	I2C address and flags
+ * @return EC_RES_SUCCESS if allowed, or error code
+ */
+enum ec_status i2c_passthru_is_allowed(int port, uint16_t addr_flags);
+
+/**
  * Read a 32-bit register from the peripheral at 7-bit peripheral address
  * <addr_flags>, at the specified 8-bit <offset> in the peripheral's address
  * space.
