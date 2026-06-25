@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "107765fc_e2d0a649",
+        "filename": "zephyr/program/skywalker/jaina/src/typec_limit.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-06-25T06:51:59Z",
+      "side": 1,
+      "message": "This change have been addressed and moved to the parent CL:7950198",
+      "parentUuid": "e84e1544_af176fa8",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 66,
+        "endChar": 3
+      },
+      "revId": "b31a396ba3ed175f6bb50f4fe89930420e0b67cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "39129619_59cc5496",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-15T21:02:04Z",
       "side": 1,
       "message": "Use Zephyr\u0027s `SYS_INIT` instead of the legacy declare hook.",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 64
+      },
+      "revId": "b31a396ba3ed175f6bb50f4fe89930420e0b67cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24de3628_e370bf98",
+        "filename": "zephyr/program/skywalker/jaina/src/typec_limit.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-06-25T06:51:59Z",
+      "side": 1,
+      "message": "This change have been addressed and moved to the parent CL:7950198",
+      "parentUuid": "39129619_59cc5496",
       "range": {
         "startLine": 75,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3213ffbf_09bc980c",
+        "filename": "zephyr/program/skywalker/jaina/src/typec_limit.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-06-25T06:51:59Z",
+      "side": 1,
+      "message": "This change have been addressed and moved to the parent CL:7950198",
+      "parentUuid": "0ba7d61d_4ebe59f5",
+      "range": {
+        "startLine": 78,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 48
+      },
+      "revId": "b31a396ba3ed175f6bb50f4fe89930420e0b67cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "43d5f125_28d39b11",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-06-15T21:02:04Z",
       "side": 1,
       "message": "Whether or not this is added as board specific code or enabled with the `CONFIG_PDC_POWER_MGMT_SRC_THROTTLING` in the shared code, this needs unit tests before merging.",
+      "range": {
+        "startLine": 103,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 67
+      },
+      "revId": "b31a396ba3ed175f6bb50f4fe89930420e0b67cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3966cca_ff6ccb24",
+        "filename": "zephyr/program/skywalker/jaina/src/typec_limit.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-06-25T06:51:59Z",
+      "side": 1,
+      "message": "Will add unit test for CL:7950198",
+      "parentUuid": "43d5f125_28d39b11",
       "range": {
         "startLine": 103,
         "startChar": 0,

@@ -16,6 +16,24 @@
       "message": "This change needs to be child of CL:7950198",
       "revId": "56541553308c97764924c20b1a92a6bb8f9a0ef6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3aada1c3_041e0943",
+        "filename": "zephyr/program/skywalker/jaina/project.overlay",
+        "patchSetId": 9
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-06-25T06:51:59Z",
+      "side": 1,
+      "message": "Done, this CL changed to child of CL:7950198",
+      "parentUuid": "35f39cec_81c7d2af",
+      "revId": "56541553308c97764924c20b1a92a6bb8f9a0ef6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
