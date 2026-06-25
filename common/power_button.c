@@ -301,6 +301,13 @@ void power_button_simulate_press(unsigned int duration)
 			   duration * MSEC);
 }
 
+#ifdef CONFIG_POWER_BUTTON
+__overridable int power_button_is_eating_release(void)
+{
+	return 0;
+}
+#endif
+
 /*****************************************************************************/
 /* Console commands */
 

@@ -31,6 +31,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     device-tree-compiler \
     clang \
     llvm \
+    libc++-dev \
+    libc++abi-dev \
     zstd \
     u-boot-tools \
     python3-libfdt \

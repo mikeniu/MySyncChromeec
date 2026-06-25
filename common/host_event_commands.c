@@ -445,13 +445,14 @@ test_mockable void host_throttle_cpu(int throttle)
 
 /*
  * Events copy b is used by coreboot for logging the wake reason. For this to
- * work, events_copy_b needs to be cleared on every suspend.
+ * work, events_copy_b needs to be cleared on every suspend and shutdown.
  */
 void clear_events_copy_b(void)
 {
 	events_copy_b = 0;
 }
 DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, clear_events_copy_b, HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, clear_events_copy_b, HOOK_PRIO_DEFAULT);
 
 /*****************************************************************************/
 /* Console commands */
