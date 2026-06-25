@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d58e0ad_613b951b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-06-25T16:27:29Z",
+      "side": 1,
+      "message": "I don\u0027t think it is necessary to check any event flags before clearing. If there are unset this will just be a no-op.",
+      "revId": "b0a0c6cd8be976265af03263f6b5cf66384def76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
