@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a54175c_536aa703",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-25T17:48:15Z",
+      "side": 1,
+      "message": "Is there also a build rule for this .c file that needs to be removed?",
+      "revId": "8d61de021ce60b1924e44894a1e0e9bfd1418042",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
