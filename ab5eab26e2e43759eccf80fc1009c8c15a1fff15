@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38e20e83_7149edb9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-25T00:56:13Z",
+      "side": 1,
+      "message": "@zhangpiaoxiang@focaltech.corp-partner.google.com Can you rebase? There\u0027s a merge conflict.",
+      "revId": "ab5eab26e2e43759eccf80fc1009c8c15a1fff15",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
