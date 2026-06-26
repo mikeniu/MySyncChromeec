@@ -547,8 +547,8 @@ DECLARE_CONSOLE_COMMAND(panicinfo, command_panicinfo, "[clear]",
 /*****************************************************************************/
 /* Host commands */
 
-static enum ec_status
-host_command_panic_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_panic_info(struct ec_host_cmd_handler_args *args)
 {
 	uint32_t pdata_size = get_panic_data_size();
 	uintptr_t pdata_start = get_panic_data_start();
@@ -558,38 +558,48 @@ host_command_panic_info(struct host_cmd_handler_args *args)
 	uint16_t read_offset = 0;
 	uint8_t preserve_old_hostcmd_flag = 0;
 
+	if (args->version == 1) {
+		if (args->input_buf_size <
+		    sizeof(struct ec_params_get_panic_info_v1))
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
+	} else if (args->version >= 2) {
+		if (args->input_buf_size <
+		    sizeof(struct ec_params_get_panic_info_v2))
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
+	}
+
 	if (args->version >= 1) {
-		const struct ec_params_get_panic_info_v1 *p1 = args->params;
+		const struct ec_params_get_panic_info_v1 *p1 = args->input_buf;
 
 		preserve_old_hostcmd_flag = p1->preserve_old_hostcmd_flag;
 	}
 
 	if (args->version >= 2) {
-		const struct ec_params_get_panic_info_v2 *p2 = args->params;
+		const struct ec_params_get_panic_info_v2 *p2 = args->input_buf;
 
 		read_offset = p2->read_offset;
 	}
 
 	/* No panic data, just return empty success */
 	if (!pdata_start || pdata_size <= 0) {
-		args->response_size = 0;
-		return EC_RES_SUCCESS;
+		args->output_buf_size = 0;
+		return EC_HOST_CMD_SUCCESS;
 	}
 
 	/* Signal end of data with empty success */
 	if (read_offset == pdata_size) {
-		args->response_size = 0;
-		return EC_RES_SUCCESS;
+		args->output_buf_size = 0;
+		return EC_HOST_CMD_SUCCESS;
 	}
 
 	if (read_offset > pdata_size)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	read_size -= read_offset;
 	read_start += read_offset;
 
-	if (read_size > args->response_max) {
-		read_size = args->response_max;
+	if (read_size > args->output_buf_max) {
+		read_size = args->output_buf_max;
 		if (args->version < 2) {
 			panic_printf("Panic data size %u is too "
 				     "large, truncating to %u\n",
@@ -599,8 +609,8 @@ host_command_panic_info(struct host_cmd_handler_args *args)
 			}
 		}
 	}
-	memcpy(args->response, (void *)read_start, read_size);
-	args->response_size = read_size;
+	memcpy(args->output_buf, (void *)read_start, read_size);
+	args->output_buf_size = read_size;
 
 	if (pdata && !preserve_old_hostcmd_flag &&
 	    /* For version >= 2, only set flag if last byte has been read */
@@ -609,7 +619,7 @@ host_command_panic_info(struct host_cmd_handler_args *args)
 		pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTCMD;
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_GET_PANIC_INFO, host_command_panic_info,
-		     EC_VER_MASK(0) | EC_VER_MASK(1) | EC_VER_MASK(2));
+EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_GET_PANIC_INFO, host_command_panic_info,
+			    EC_VER_MASK(0) | EC_VER_MASK(1) | EC_VER_MASK(2));
