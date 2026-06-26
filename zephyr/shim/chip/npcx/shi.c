@@ -129,10 +129,10 @@ DECLARE_HOOK(HOOK_INIT, shi_init_no_return_val, HOOK_PRIO_POST_CHIPSET);
 #endif
 
 #ifndef CONFIG_EC_HOST_CMD
-/* Get protocol information */
-static enum ec_status shi_get_protocol_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+shi_get_protocol_info(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_get_protocol_info *r = args->response;
+	struct ec_response_get_protocol_info *r = args->output_buf;
 
 	memset(r, '\0', sizeof(*r));
 	r->protocol_versions = BIT(3);
@@ -140,10 +140,11 @@ static enum ec_status shi_get_protocol_info(struct host_cmd_handler_args *args)
 	r->max_response_packet_size = CONFIG_CROS_SHI_MAX_RESPONSE;
 	r->flags = EC_PROTOCOL_INFO_IN_PROGRESS_SUPPORTED;
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_GET_PROTOCOL_INFO, shi_get_protocol_info,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_GET_PROTOCOL_INFO, shi_get_protocol_info,
+			      EC_VER_MASK(0),
+			      struct ec_response_get_protocol_info);
 #endif /* !CONFIG_EC_HOST_CMD */
