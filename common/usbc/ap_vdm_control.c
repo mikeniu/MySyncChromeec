@@ -268,19 +268,20 @@ static enum ec_status ap_vdm_copy_reply(int port, uint8_t *type, uint8_t *size,
 }
 
 /* Feature-specific host commands */
-static enum ec_status hc_typec_vdm_response(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_typec_vdm_response(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_typec_vdm_response *p = args->params;
-	struct ec_response_typec_vdm_response *r = args->response;
+	const struct ec_params_typec_vdm_response *p = args->input_buf;
+	struct ec_response_typec_vdm_response *r = args->output_buf;
 	uint32_t data[VDO_MAX_SIZE];
 
 	if (p->port >= board_get_usb_pd_port_count())
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
-	if (args->response_max < sizeof(*r))
-		return EC_RES_RESPONSE_TOO_BIG;
+	if (args->output_buf_max < sizeof(*r))
+		return EC_HOST_CMD_OVERFLOW;
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
 	r->vdm_response_err = ap_vdm_copy_reply(p->port, &r->partner_type,
 						&r->vdm_data_objects, data);
@@ -295,7 +296,8 @@ static enum ec_status hc_typec_vdm_response(struct host_cmd_handler_args *args)
 		memcpy(r->vdm_attention, data,
 		       r->vdm_attention_objects * sizeof(uint32_t));
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_TYPEC_VDM_RESPONSE, hc_typec_vdm_response,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_TYPEC_VDM_RESPONSE, hc_typec_vdm_response,
+		    EC_VER_MASK(0), struct ec_params_typec_vdm_response,
+		    struct ec_response_typec_vdm_response);

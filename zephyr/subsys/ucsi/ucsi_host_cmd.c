@@ -57,35 +57,39 @@ int eppm_init(void)
 	return 0;
 }
 
-static enum ec_status hc_ucsi_ppm_set(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_ucsi_ppm_set(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_ucsi_ppm_set *p = args->params;
+	const struct ec_params_ucsi_ppm_set *p = args->input_buf;
 
 	if (!ppm_dev)
-		return EC_RES_UNAVAILABLE;
+		return EC_HOST_CMD_UNAVAILABLE;
 
 	if (ucsi_ppm_write(ppm_dev, p->offset, p->data,
-			   args->params_size - sizeof(p->offset)))
-		return EC_RES_ERROR;
+			   args->input_buf_size - sizeof(p->offset)))
+		return EC_HOST_CMD_ERROR;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_UCSI_PPM_SET, hc_ucsi_ppm_set, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_UCSI_PPM_SET, hc_ucsi_ppm_set,
+			     EC_VER_MASK(0), struct ec_params_ucsi_ppm_set);
 
-static enum ec_status hc_ucsi_ppm_get(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_ucsi_ppm_get(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_ucsi_ppm_get *p = args->params;
+	const struct ec_params_ucsi_ppm_get *p = args->input_buf;
 	int len;
 
 	if (!ppm_dev)
-		return EC_RES_UNAVAILABLE;
+		return EC_HOST_CMD_UNAVAILABLE;
 
-	len = ucsi_ppm_read(ppm_dev, p->offset, args->response, p->size);
+	len = ucsi_ppm_read(ppm_dev, p->offset, args->output_buf, p->size);
 	if (len < 0)
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 
-	args->response_size = len;
+	args->output_buf_size = len;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_UCSI_PPM_GET, hc_ucsi_ppm_get, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_UCSI_PPM_GET, hc_ucsi_ppm_get,
+			     EC_VER_MASK(0), struct ec_params_ucsi_ppm_get);
