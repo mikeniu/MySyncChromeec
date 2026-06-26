@@ -510,10 +510,11 @@ void motion_lid_calc(void)
  * @param args Hot command args
  * @return enum ec_status Exit status
  */
-enum ec_status host_cmd_motion_lid(struct host_cmd_handler_args *args)
+enum ec_host_cmd_status
+host_cmd_motion_lid(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_motion_sense *in = args->params;
-	struct ec_response_motion_sense *out = args->response;
+	const struct ec_params_motion_sense *in = args->input_buf;
+	struct ec_response_motion_sense *out = args->output_buf;
 
 	switch (in->cmd) {
 	case MOTIONSENSE_CMD_KB_WAKE_ANGLE:
@@ -530,16 +531,16 @@ enum ec_status host_cmd_motion_lid(struct host_cmd_handler_args *args)
 		} else {
 			out->kb_wake_angle.ret = 0;
 		}
-		args->response_size = sizeof(out->kb_wake_angle);
+		args->output_buf_size = sizeof(out->kb_wake_angle);
 
 		break;
 
 	case MOTIONSENSE_CMD_LID_ANGLE:
 		if (IS_ENABLED(CONFIG_LID_ANGLE)) {
 			out->lid_angle.value = motion_lid_get_angle();
-			args->response_size = sizeof(out->lid_angle);
+			args->output_buf_size = sizeof(out->lid_angle);
 		} else {
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		}
 		break;
 
@@ -551,22 +552,22 @@ enum ec_status host_cmd_motion_lid(struct host_cmd_handler_args *args)
 				in->tablet_mode_threshold.hys_degree);
 
 			if (ret != EC_RES_SUCCESS)
-				return ret;
+				return (enum ec_host_cmd_status)ret;
 
 			out->tablet_mode_threshold.lid_angle =
 				tablet_mode_lid_angle;
 			out->tablet_mode_threshold.hys_degree =
 				tablet_mode_hys_degree;
 
-			args->response_size =
+			args->output_buf_size =
 				sizeof(out->tablet_mode_threshold);
 		} else {
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		}
 		break;
 	default:
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
