@@ -84,7 +84,7 @@ ZTEST(axii, test_keyboard_event)
 
 ZTEST(axii, test_touchpad_event)
 {
-	struct usb_hid_touchpad_report report;
+	struct usb_hid_touchpad_report report = { 0 };
 
 	recv_cb(ROACH_CMD_TOUCHPAD_REPORT, (uint8_t *)&report, sizeof(report));
 	zassert_equal(set_touchpad_report_fake.call_count, 1);

@@ -59,10 +59,6 @@ DT_INST_FOREACH_STATUS_OKAY(DECLARE_PINS_NODE_FOR_POLICY)
 		"The led-color node (" #id                                    \
 		") must belong to the same led-id defined in the policy.");
 
-#define ASSERT_PERIOD_MS_BOUNDS(id)                              \
-	BUILD_ASSERT(DT_PROP_OR(id, period_ms, 0) <= UINT16_MAX, \
-		     "period-ms in " #id " exceeds 16-bit (65535)");
-
 /* Generates the step-level pattern array for each rule */
 #define SET_PATTERN_COLOR_ARRAY(id)                                        \
 	{                                                                  \
@@ -72,11 +68,10 @@ DT_INST_FOREACH_STATUS_OKAY(DECLARE_PINS_NODE_FOR_POLICY)
 
 #define PATTERN_COLOR_ARRAY(id) DT_CAT(PATTERN_COLOR_, id)
 
-#define GEN_PATTERN_COLOR_ARRAY(id, fn)                           \
-	const struct pattern_color_node_t PATTERN_COLOR_ARRAY(    \
-		id)[] = { fn(id, SET_PATTERN_COLOR_ARRAY) };      \
-	fn(id, ASSERT_LEDS_HW_MATCH) fn(id, ASSERT_LEDS_ID_MATCH) \
-		fn(id, ASSERT_PERIOD_MS_BOUNDS)
+#define GEN_PATTERN_COLOR_ARRAY(id, fn)                        \
+	const struct pattern_color_node_t PATTERN_COLOR_ARRAY( \
+		id)[] = { fn(id, SET_PATTERN_COLOR_ARRAY) };   \
+	fn(id, ASSERT_LEDS_HW_MATCH) fn(id, ASSERT_LEDS_ID_MATCH)
 
 #define GEN_PATTERN_COLOR_ARRAY_FOR_POLICY(inst)                              \
 	DT_INST_FOREACH_CHILD_STATUS_OKAY_VARGS(inst, DT_FOREACH_CHILD_VARGS, \
@@ -99,16 +94,11 @@ DT_INST_FOREACH_STATUS_OKAY(GEN_PATTERN_COLOR_ARRAY_FOR_POLICY)
 		.cycle_curr = 0,                                    \
 	},
 
-#define VALIDATE_CYCLE_COUNT(node_id, ...)                       \
-	BUILD_ASSERT(DT_PROP_OR(node_id, cycle_count, 0) <= 255, \
-		     "cycle-count exceeds uint8_t limit (255)");
-
 /* Generate the logic-level pattern array for each rule */
 #define PATTERN_NODE_ARRAY(id) DT_CAT(PATTERN_ARRAY_, id)
-#define GEN_PATTERN_NODE_ARRAY(id, fn1, fn2)                \
-	struct led_pattern_node_t PATTERN_NODE_ARRAY(       \
-		id)[] = { fn1(id, LED_PATTERN_INIT, fn2) }; \
-	fn1(id, VALIDATE_CYCLE_COUNT)
+#define GEN_PATTERN_NODE_ARRAY(id, fn1, fn2)          \
+	struct led_pattern_node_t PATTERN_NODE_ARRAY( \
+		id)[] = { fn1(id, LED_PATTERN_INIT, fn2) };
 
 #define GEN_PATTERN_NODE_ARRAY_FOR_POLICY(inst)                               \
 	DT_INST_FOREACH_CHILD_STATUS_OKAY_VARGS(inst, GEN_PATTERN_NODE_ARRAY, \

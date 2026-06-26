@@ -196,6 +196,8 @@ int __unused egis_apns_data_erase(uint32_t offset, size_t size)
 {
 	int rc;
 	uint32_t abs_offset;
+	size_t done = 0;
+	const size_t erase_chunk = storage_info.erase_align;
 
 	if ((size > APNS_STORAGE_SIZE) || (offset > APNS_STORAGE_SIZE - size)) {
 		LOG_ERR("egis_apns_data_erase: invalid offset=%u, size=%zu",
@@ -214,10 +216,15 @@ int __unused egis_apns_data_erase(uint32_t offset, size_t size)
 
 	LOG_DBG("egis_apns_data_erase: offset=%u, size=%zu", offset, size);
 
-	rc = cros_flash_physical_erase(cros_flash_dev, abs_offset, size);
-	if (rc != 0) {
-		LOG_ERR("egis_apns_data_erase: flash erase failed, rc=%d", rc);
-		return -EIO;
+	while (done < size) {
+		rc = cros_flash_physical_erase(cros_flash_dev,
+					       abs_offset + done, erase_chunk);
+		if (rc != 0) {
+			LOG_ERR("egis_apns_data_erase: flash erase failed, rc=%d",
+				rc);
+			return -EIO;
+		}
+		done += erase_chunk;
 	}
 
 	return 0;
@@ -263,6 +270,11 @@ int __unused egis_apns_data_write(uint32_t offset, const void *data,
 {
 	int rc;
 	uint32_t abs_offset;
+	size_t done = 0;
+	/* Use the erase size as write chunk to avoid switching to
+	 * the execute-from-RAM mode too often.
+	 */
+	const size_t write_chunk = storage_info.erase_align;
 
 	if ((size > APNS_STORAGE_SIZE) || (offset > APNS_STORAGE_SIZE - size)) {
 		LOG_ERR("egis_apns_data_write: invalid offset=%u, size=%zu",
@@ -285,11 +297,17 @@ int __unused egis_apns_data_write(uint32_t offset, const void *data,
 
 	LOG_DBG("egis_apns_data_write: offset=%u, size=%zu", offset, size);
 
-	rc = cros_flash_physical_write(cros_flash_dev, abs_offset, size,
-				       (const char *)data);
-	if (rc != 0) {
-		LOG_ERR("egis_apns_data_write: flash write failed, rc=%d", rc);
-		return -EIO;
+	while (done < size) {
+		size_t write_size = MIN(write_chunk, size - done);
+		rc = cros_flash_physical_write(cros_flash_dev,
+					       abs_offset + done, write_size,
+					       (const char *)data + done);
+		if (rc != 0) {
+			LOG_ERR("egis_apns_data_write: flash write failed, rc=%d",
+				rc);
+			return -EIO;
+		}
+		done += write_size;
 	}
 
 	return 0;

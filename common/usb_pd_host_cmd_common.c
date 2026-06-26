@@ -203,7 +203,8 @@ DECLARE_HOST_COMMAND(EC_CMD_USB_PD_CONTROL, hc_usb_pd_control,
 		     EC_VER_MASK(0) | EC_VER_MASK(1) | EC_VER_MASK(2));
 #endif /* CONFIG_COMMON_RUNTIME */
 
-#if defined(CONFIG_HOSTCMD_TYPEC_STATUS) && !defined(CONFIG_USB_PD_TCPMV1)
+#if defined(CONFIG_HOSTCMD_TYPEC_STATUS) && \
+	(defined(CONFIG_USB_PD_TCPMV2) || defined(CONFIG_USB_PD_CONTROLLER))
 /*
  * Validate ec_response_typec_status_v0's binary compatibility with
  * ec_response_typec_status, which is being deprecated.

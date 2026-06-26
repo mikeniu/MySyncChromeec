@@ -108,7 +108,7 @@ static int save_log[CHARGE_PORT_COUNT];
 #endif
 
 /* Use mutexing to sync charge_manager_refresh and pdc_power_mgmt */
-#ifdef CONFIG_USB_PDC_POWER_MGMT
+#ifdef CONFIG_ZEPHYR
 K_MUTEX_DEFINE(cm_refresh);
 
 // #define CM_MUTEX_DEBUG
@@ -142,11 +142,11 @@ void charge_manager_dump_mutex_history()
 #define CM_MUTEX_UNLOCK(m) mutex_unlock(m)
 #endif /* CM_MUTEX_DEBUG */
 
-#else /* CONFIG_USB_PDC_POWER_MGMT */
+#else /* CONFIG_ZEPHYR */
 /* TODO(b/427504021) - Legacy EC mutexes are not recursive */
 #define CM_MUTEX_LOCK(m)
 #define CM_MUTEX_UNLOCK(m)
-#endif /* CONFIG_USB_PDC_POWER_MGMT */
+#endif /* CONFIG_ZEPHYR */
 
 /* Store current state of port enable / charge current. */
 /* During charge_manager_refresh, the following data is considered stale. Make
@@ -1151,9 +1151,7 @@ static void charge_manager_refresh(void)
 	/* New power requests must be set only after updating the globals. */
 	if (is_pd_port(updated_new_port)) {
 		/* Check if we can get requested voltage/current */
-		if ((IS_ENABLED(CONFIG_USB_PD_TCPMV1) &&
-		     IS_ENABLED(CONFIG_USB_PD_DUAL_ROLE)) ||
-		    (IS_ENABLED(CONFIG_USB_PD_TCPMV2) &&
+		if ((IS_ENABLED(CONFIG_USB_PD_TCPMV2) &&
 		     IS_ENABLED(CONFIG_USB_PE_SM)) ||
 		    IS_ENABLED(CONFIG_USB_PDC_POWER_MGMT)) {
 			uint32_t pdo;
@@ -1681,99 +1679,6 @@ int charge_manager_set_acokref(int pdo_mv)
 {
 	return charger_set_acokref(charge_get_active_chg_chip(), pdo_mv);
 }
-
-#if defined(CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT) && \
-	!defined(CONFIG_USB_PD_TCPMV2)
-/* Note: this functionality is a part of the TCPMv2 Device Poicy Manager */
-
-/* Bitmap of ports used as power source */
-static volatile uint32_t source_port_bitmap;
-BUILD_ASSERT(sizeof(source_port_bitmap) * 8 >= CONFIG_USB_PD_PORT_MAX_COUNT);
-
-static inline int has_other_active_source(int port)
-{
-	return source_port_bitmap & ~BIT(port);
-}
-
-static inline int is_active_source(int port)
-{
-	return source_port_bitmap & BIT(port);
-}
-
-static int can_supply_max_current(int port)
-{
-#ifdef CONFIG_USB_PD_MAX_TOTAL_SOURCE_CURRENT
-	/*
-	 * This guarantees active 3A source continues to supply 3A.
-	 *
-	 * Since redistribution occurs sequentially, younger ports get
-	 * priority. Priority surfaces only when 3A source is released.
-	 * That is, when 3A source is released, the youngest active
-	 * port gets 3A.
-	 */
-	int p;
-	if (!is_active_source(port))
-		/* Non-active ports don't get 3A */
-		return 0;
-	for (p = 0; p < board_get_usb_pd_port_count(); p++) {
-		if (p == port)
-			continue;
-		if (source_port_rp[p] ==
-		    CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT)
-			return 0;
-	}
-	return 1;
-#else
-	return is_active_source(port) && !has_other_active_source(port);
-#endif /* CONFIG_USB_PD_MAX_TOTAL_SOURCE_CURRENT */
-}
-
-void charge_manager_source_port(int port, int enable)
-{
-	uint32_t prev_bitmap = source_port_bitmap;
-	int p, rp;
-
-	if (enable)
-		atomic_or((atomic_t *)&source_port_bitmap, 1 << port);
-	else
-		atomic_clear_bits((atomic_t *)&source_port_bitmap, 1 << port);
-
-	/* No change, exit early. */
-	if (prev_bitmap == source_port_bitmap)
-		return;
-
-	/* Set port limit according to policy */
-	for (p = 0; p < board_get_usb_pd_port_count(); p++) {
-		rp = can_supply_max_current(p) ?
-			     CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT :
-			     CONFIG_USB_PD_PULLUP;
-		source_port_rp[p] = rp;
-
-#ifdef CONFIG_USB_PD_LOGGING
-		if (is_connected(p) && !is_sink(p))
-			charge_manager_save_log(p);
-#endif
-
-		typec_set_source_current_limit(p, rp);
-		if (IS_ENABLED(CONFIG_USB_PD_TCPMV2))
-			typec_select_src_current_limit_rp(p, rp);
-		else
-			tcpm_select_rp_value(p, rp);
-		pd_update_contract(p);
-	}
-}
-
-int charge_manager_get_source_pdo(const uint32_t **src_pdo, const int port)
-{
-	if (can_supply_max_current(port)) {
-		*src_pdo = pd_src_pdo_max;
-		return pd_src_pdo_max_cnt;
-	}
-
-	*src_pdo = pd_src_pdo;
-	return pd_src_pdo_cnt;
-}
-#endif /* CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT && !CONFIG_USB_PD_TCPMV2 */
 
 static enum ec_status hc_pd_power_info(struct host_cmd_handler_args *args)
 {

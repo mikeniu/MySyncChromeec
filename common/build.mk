@@ -172,10 +172,6 @@ common-$(CONFIG_HAS_TASK_PD_INT)+=usbc_intr_task.o
 ifneq ($(CONFIG_USB_POWER_DELIVERY),)
 common-$(CONFIG_USB_POWER_DELIVERY)+=usb_common.o usb_pd_pdo.o typec_control.o \
 	usbc_utils.o
-ifneq ($(CONFIG_USB_PD_TCPMV1),)
-common-$(CONFIG_USB_POWER_DELIVERY)+=usb_pd_protocol.o usb_pd_policy.o \
-	usb_pd_pdo.o
-endif
 common-$(CONFIG_USB_PD_DUAL_ROLE)+=usb_pd_dual_role.o
 common-$(CONFIG_USB_PD_HOST_CMD)+=usb_pd_host_cmd.o usb_pd_host_cmd_common.o
 common-$(CONFIG_USB_PD_CONSOLE_CMD)+=usb_pd_console_cmd.o

@@ -80,3 +80,8 @@ static enum ec_status host_command_apreset(struct host_cmd_handler_args *args)
 DECLARE_HOST_COMMAND(EC_CMD_AP_RESET, host_command_apreset, EC_VER_MASK(0));
 
 #endif
+
+__attribute__((weak)) int chipset_is_offmode_charging_wake(void)
+{
+	return 0;
+}
