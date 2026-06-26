@@ -204,5 +204,6 @@ host_command_protocol_info(struct ec_host_cmd_handler_args *args)
 
 	return EC_HOST_CMD_SUCCESS;
 }
-EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_GET_PROTOCOL_INFO,
-			    host_command_protocol_info, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_GET_PROTOCOL_INFO,
+			      host_command_protocol_info, EC_VER_MASK(0),
+			      struct ec_response_get_protocol_info);
