@@ -1,0 +1,11 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config PLATFORM_EC_HOSTCMD_POWER_BUTTON_PRESS
+	bool "Enable power button press host command"
+	default n
+	depends on PLATFORM_EC_HOSTCMD
+	help
+	  Command used to simulate up to 2 power button presses from the host
+	  with configurable delay and duration.

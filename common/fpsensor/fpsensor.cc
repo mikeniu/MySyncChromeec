@@ -17,6 +17,7 @@
 #include "fpsensor/fpsensor_console.h"
 #include "fpsensor/fpsensor_crypto.h"
 #include "fpsensor/fpsensor_detect.h"
+#include "fpsensor/fpsensor_led.h"
 #include "fpsensor/fpsensor_modes.h"
 #include "fpsensor/fpsensor_state.h"
 #include "fpsensor/fpsensor_utils.h"
@@ -25,6 +26,7 @@
 #include "link_defs.h"
 #include "mkbp_event.h"
 #include "openssl/mem.h"
+#include "overflow.h"
 #include "scoped_fast_cpu.h"
 #include "sha256.h"
 #include "spi.h"
@@ -39,6 +41,7 @@
 #include <variant>
 
 #ifdef CONFIG_ZEPHYR
+#include <zephyr/pm/policy.h>
 #include <zephyr/shell/shell.h>
 #endif
 
@@ -69,6 +72,17 @@ static uint8_t timestamps_invalid;
 static int8_t stats_template_matched;
 
 BUILD_ASSERT(sizeof(struct ec_fp_template_encryption_metadata) % 4 == 0);
+
+#ifndef CONFIG_ZEPHYR
+/* Define the PM functions for compatibility with EC-legacy. */
+static inline void pm_policy_state_all_lock_get(void)
+{
+}
+
+static inline void pm_policy_state_all_lock_put(void)
+{
+}
+#endif /* CONFIG_ZEPHYR */
 
 /* Interrupt line from the fingerprint sensor */
 extern "C" void fps_event(enum gpio_signal signal)
@@ -190,6 +204,8 @@ static uint32_t fp_process_match(void)
 			timestamps_invalid |= FPSTATS_MATCHING_INV;
 		}
 
+		fp_led::update_match(fp_match_success(res));
+
 		if (res == EC_MKBP_FP_ERR_MATCH_YES_UPDATED)
 			global_context.templ_dirty |= updated;
 	} else {
@@ -254,7 +270,10 @@ static enum ec_status fp_commit_template(std::span<const uint8_t> context);
 extern "C" void fp_task(void)
 {
 	int timeout_us = -1;
+	__maybe_unused bool pm_locked = true;
 
+	/* Lock PM for initialization. */
+	pm_policy_state_all_lock_get();
 	CPRINTS("FP_SENSOR_SEL: %s",
 		fp_sensor_type_to_str(fpsensor_detect_get_type()));
 
@@ -267,8 +286,23 @@ extern "C" void fp_task(void)
 	while (1) {
 		enum finger_state st = FINGER_NONE;
 
+		/* Unlock PM while waiting for an event except for an
+		 * enrollment process.
+		 */
+		if (!(global_context.sensor_mode & FP_MODE_ENROLL_SESSION)) {
+			pm_policy_state_all_lock_put();
+			pm_locked = false;
+		}
 		/* Wait for a sensor IRQ or a new mode configuration */
 		uint32_t evt = task_wait_event(timeout_us);
+
+		/* Lock PM for any FP related actions, especially communication
+		 * with a FP sensor.
+		 */
+		if (!pm_locked) {
+			pm_policy_state_all_lock_get();
+			pm_locked = true;
+		}
 
 		if (evt & TASK_EVENT_UPDATE_CONFIG) {
 			uint32_t mode = global_context.sensor_mode;
@@ -440,6 +474,7 @@ extern "C" void fp_task(void)
 			}
 		}
 		fp_btn_ign_out::update(global_context.sensor_mode);
+		fp_led::update_mode(global_context.sensor_mode);
 	}
 #else /* !HAVE_FP_PRIVATE_DRIVER */
 	while (1) {
@@ -600,7 +635,8 @@ static enum ec_error_list encrypt_template(uint16_t fgr)
 	return EC_SUCCESS;
 }
 
-static enum ec_status get_frame(uint32_t offset, uint32_t size, uint8_t *output)
+test_export_static enum ec_status get_frame(uint32_t offset, uint32_t size,
+					    uint8_t *output)
 {
 	enum ec_error_list ret;
 
@@ -610,14 +646,6 @@ static enum ec_status get_frame(uint32_t offset, uint32_t size, uint8_t *output)
 	if (global_context.current_capture_type == FP_CAPTURE_TYPE_INVALID) {
 		return EC_RES_INVALID_PARAM;
 	}
-
-	/*
-	 * Checks if the capture type is one where we only care about
-	 * the embedded/offset image bytes, like simple, pattern0,
-	 * pattern1, and reset_test.
-	 */
-	if (skip_image_offset(global_context.current_capture_type))
-		offset += FP_SENSOR_IMAGE_OFFSET;
 
 	uint32_t current_frame_size =
 		global_context.fp_frame_size_cache.get_frame_size(
@@ -630,6 +658,29 @@ static enum ec_status get_frame(uint32_t offset, uint32_t size, uint8_t *output)
 	ret = validate_fp_buffer_offset(current_frame_size, offset, size);
 	if (ret != EC_SUCCESS)
 		return EC_RES_INVALID_PARAM;
+
+	/*
+	 * Checks if the capture type is one where we only care about
+	 * the embedded/offset image bytes, like simple, pattern0,
+	 * pattern1, and reset_test.
+	 */
+	if (skip_image_offset(global_context.current_capture_type)) {
+		uint32_t adjusted_offset;
+
+		if (check_add_overflow(
+			    offset,
+			    static_cast<uint32_t>(FP_SENSOR_IMAGE_OFFSET),
+			    &adjusted_offset)) {
+			return EC_RES_INVALID_PARAM;
+		}
+
+		ret = validate_fp_buffer_offset(sizeof(fp_buffer),
+						adjusted_offset, size);
+		if (ret != EC_SUCCESS)
+			return EC_RES_INVALID_PARAM;
+
+		offset = adjusted_offset;
+	}
 
 	memcpy(output, fp_buffer + offset, size);
 

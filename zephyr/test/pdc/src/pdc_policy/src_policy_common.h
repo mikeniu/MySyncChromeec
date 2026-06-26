@@ -20,6 +20,12 @@
 #endif
 
 #define PDC_TEST_TIMEOUT 2000
+/*
+ * Some state-machine syncs include multiple emulator command roundtrips.
+ * After the glibc and GCC uprev, native_sim hosts can need extra
+ * scheduling margin for these waits.
+ */
+#define TEST_EXTENDED_TIMEOUT 5000
 
 /* TODO: b/343760437 - Once the emulator can detect the PDC threads are idle,
  * remove the sleep delay to let the policy code run.
