@@ -69,7 +69,7 @@ ZTEST(ascp_claim, test_args_not_ok)
 
 	ret = CROS_EC_COMMAND(nullptr, EC_CMD_FP_ASCP_CLAIM, 0, nullptr, 0,
 			      &too_small_res, sizeof(too_small_res));
-	zassert_equal(EC_RES_RESPONSE_TOO_BIG, ret);
+	zassert_equal(EC_RES_INVALID_RESPONSE, ret);
 }
 
 ZTEST(ascp_claim, test_shell_command_success)
