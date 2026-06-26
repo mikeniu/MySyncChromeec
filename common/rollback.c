@@ -490,31 +490,39 @@ out:
 }
 DECLARE_DEFERRED(add_entropy_deferred);
 
-static enum ec_status
-hc_rollback_add_entropy(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_rollback_add_entropy(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_rollback_add_entropy *p = args->params;
+	const struct ec_params_rollback_add_entropy *p = args->input_buf;
 
 	switch (p->action) {
 	case ADD_ENTROPY_ASYNC:
 	case ADD_ENTROPY_RESET_ASYNC:
 		if (add_entropy_rv == EC_RES_BUSY)
-			return EC_RES_BUSY;
+			return EC_HOST_CMD_BUSY;
 
 		add_entropy_action = p->action;
 		add_entropy_rv = EC_RES_BUSY;
 		hook_call_deferred(&add_entropy_deferred_data, 0);
 
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 
 	case ADD_ENTROPY_GET_RESULT:
-		return add_entropy_rv;
+		switch (add_entropy_rv) {
+		case EC_RES_SUCCESS:
+			return EC_HOST_CMD_SUCCESS;
+		case EC_RES_BUSY:
+			return EC_HOST_CMD_BUSY;
+		default:
+			return EC_HOST_CMD_ERROR;
+		}
 	}
 
-	return EC_RES_INVALID_PARAM;
+	return EC_HOST_CMD_INVALID_PARAM;
 }
-DECLARE_HOST_COMMAND(EC_CMD_ADD_ENTROPY, hc_rollback_add_entropy,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_ADD_ENTROPY, hc_rollback_add_entropy,
+			     EC_VER_MASK(0),
+			     struct ec_params_rollback_add_entropy);
 #endif /* CONFIG_RNG */
 #endif /* CONFIG_ROLLBACK_SECRET_SIZE */
 #endif /* CONFIG_ROLLBACK_UPDATE */
@@ -569,13 +577,27 @@ failed:
 DECLARE_SAFE_CONSOLE_COMMAND(rollbackinfo, command_rollback_info, NULL,
 			     "Print rollback info");
 
-static enum ec_status
-host_command_rollback_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_rollback_info(struct ec_host_cmd_handler_args *args)
 {
-	int ret = EC_RES_UNAVAILABLE;
-	struct ec_response_rollback_info_v1 *r = args->response;
+	enum ec_host_cmd_status ret = EC_HOST_CMD_UNAVAILABLE;
+	struct ec_response_rollback_info_v1 *r = args->output_buf;
 	int min_region;
 	struct rollback_data data;
+
+	if (args->version == 1) {
+		if (args->output_buf_max <
+		    sizeof(struct ec_response_rollback_info_v1))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
+		args->output_buf_size =
+			sizeof(struct ec_response_rollback_info_v1);
+	} else {
+		if (args->output_buf_max <
+		    sizeof(struct ec_response_rollback_info))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
+		args->output_buf_size =
+			sizeof(struct ec_response_rollback_info);
+	}
 
 	min_region = get_latest_rollback(&data);
 
@@ -587,22 +609,21 @@ host_command_rollback_info(struct host_cmd_handler_args *args)
 	r->rw_rollback_version = system_get_rollback_version(EC_IMAGE_RW);
 
 	if (args->version == 1) {
-		args->response_size =
-			sizeof(struct ec_response_rollback_info_v1);
 		r->is_secret_inited = 0;
 #ifdef CONFIG_ROLLBACK_SECRET_SIZE
 		if (!bytes_are_trivial(data.secret, sizeof(data.secret))) {
 			r->is_secret_inited = 1;
 		}
 #endif
-	} else {
-		args->response_size = sizeof(struct ec_response_rollback_info);
 	}
-	ret = EC_RES_SUCCESS;
+	ret = EC_HOST_CMD_SUCCESS;
 
 failed:
 	clear_rollback(&data);
 	return ret;
 }
-DECLARE_HOST_COMMAND(EC_CMD_ROLLBACK_INFO, host_command_rollback_info,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_RESP_ONLY(
+	EC_CMD_ROLLBACK_INFO, host_command_rollback_info,
+	EC_VER_MASK(0) | EC_VER_MASK(1),
+	SMALLEST_TYPE(struct ec_response_rollback_info,
+		      struct ec_response_rollback_info_v1));
