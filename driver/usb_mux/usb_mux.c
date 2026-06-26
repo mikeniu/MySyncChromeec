@@ -887,18 +887,19 @@ DECLARE_CONSOLE_COMMAND(typec, command_typec, "[port|debug] [none|usb|dp|dock]",
 #endif
 
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_USB_PD_MUX_INFO
-static enum ec_status hc_usb_pd_mux_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_usb_pd_mux_info(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_usb_pd_mux_info *p = args->params;
-	struct ec_response_usb_pd_mux_info *r = args->response;
+	const struct ec_params_usb_pd_mux_info *p = args->input_buf;
+	struct ec_response_usb_pd_mux_info *r = args->output_buf;
 	int port = p->port;
 	mux_state_t mux_state;
 
 	if (port >= board_get_usb_pd_port_count())
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	if (try_usb_mux_get(port, &mux_state))
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 	r->flags = mux_state;
 
 	/* Clear HPD IRQ event since we're about to inform host of it. */
@@ -907,11 +908,12 @@ static enum ec_status hc_usb_pd_mux_info(struct host_cmd_handler_args *args)
 		usb_mux_hpd_update(port, r->flags & USB_PD_MUX_HPD_LVL);
 	}
 
-	args->response_size = sizeof(*r);
-	return EC_RES_SUCCESS;
+	args->output_buf_size = sizeof(*r);
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_USB_PD_MUX_INFO, hc_usb_pd_mux_info,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_USB_PD_MUX_INFO, hc_usb_pd_mux_info, EC_VER_MASK(0),
+		    struct ec_params_usb_pd_mux_info,
+		    struct ec_response_usb_pd_mux_info);
 #endif /* CONFIG_PLATFORM_EC_HOSTCMD_USB_PD_MUX_INFO */
 
 /*
@@ -924,24 +926,27 @@ void usb_mux_set_ack_complete(int port)
 		task_set_event(ack_task[port], PD_EVENT_AP_MUX_DONE);
 }
 
-static enum ec_status hc_usb_pd_mux_ack(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_usb_pd_mux_ack(struct ec_host_cmd_handler_args *args)
 {
-	__maybe_unused const struct ec_params_usb_pd_mux_ack *p = args->params;
+	__maybe_unused const struct ec_params_usb_pd_mux_ack *p =
+		args->input_buf;
 
 	if (!IS_ENABLED(CONFIG_USB_MUX_AP_ACK_REQUEST))
-		return EC_RES_INVALID_COMMAND;
+		return EC_HOST_CMD_INVALID_COMMAND;
 
 	if (p->port >= board_get_usb_pd_port_count())
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	if (ack_task[p->port] != TASK_ID_INVALID)
 		task_set_event(ack_task[p->port], PD_EVENT_AP_MUX_DONE);
 
 	usb_mux_set_ack_complete(p->port);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_USB_PD_MUX_ACK, hc_usb_pd_mux_ack, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_USB_PD_MUX_ACK, hc_usb_pd_mux_ack,
+			     EC_VER_MASK(0), struct ec_params_usb_pd_mux_ack);
 
 #ifdef CONFIG_CMD_RETIMER
 static int console_command_retimer(int argc, const char **argv)
