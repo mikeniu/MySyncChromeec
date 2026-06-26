@@ -160,11 +160,23 @@ ZTEST_USER(usb_pd_host_cmd, test_typec_status_invalid_args)
 
 	/* An invalid port should result in an error. */
 	zassert_equal(ec_cmd_typec_status(NULL, &params, &response),
-		      EC_RES_INVALID_PARAM);
+		      EC_HOST_CMD_INVALID_PARAM);
 
 	params.port = 0;
 	args.response_max = sizeof(struct ec_response_typec_status) - 1;
-	zassert_equal(host_command_process(&args), EC_RES_RESPONSE_TOO_BIG);
+	zassert_equal(host_command_process(&args),
+		      EC_HOST_CMD_INVALID_RESPONSE);
+
+	/* For version 1, the response size is larger. Specifying a response
+	 * max size that is larger than version 0 but smaller than version 1
+	 * will bypass the framework's min_rsp_size validation (which is version
+	 * 0) and return EC_HOST_CMD_OVERFLOW from the handler itself.
+	 */
+	struct ec_response_typec_status_v1 response_v1;
+	struct host_cmd_handler_args args_v1 =
+		BUILD_HOST_COMMAND(EC_CMD_TYPEC_STATUS, 1, response_v1, params);
+	args_v1.response_max = sizeof(struct ec_response_typec_status_v1) - 1;
+	zassert_equal(host_command_process(&args_v1), EC_HOST_CMD_OVERFLOW);
 }
 
 ZTEST_SUITE(usb_pd_host_cmd, drivers_predicate_post_main, NULL, NULL, NULL,
