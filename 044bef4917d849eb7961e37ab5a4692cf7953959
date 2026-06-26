@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "658ba577_93cfb0cb",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-06-26T12:01:56Z",
+      "side": 1,
+      "message": "Please check return value.",
+      "revId": "044bef4917d849eb7961e37ab5a4692cf7953959",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
