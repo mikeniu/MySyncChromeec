@@ -45,25 +45,27 @@ SHELL_CMD_REGISTER(rand, NULL, "Output random bytes to console.", command_rand);
 #endif
 
 #if defined(CONFIG_PLATFORM_EC_HOSTCMD_RAND)
-static enum ec_status host_command_rand(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_rand(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_rand_num *p = args->params;
-	struct ec_response_rand_num *r = args->response;
+	const struct ec_params_rand_num *p = args->input_buf;
+	struct ec_response_rand_num *r = args->output_buf;
 	uint16_t num_rand_bytes = p->num_rand_bytes;
 
 	if (system_is_locked())
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 
-	if (num_rand_bytes > args->response_max)
-		return EC_RES_OVERFLOW;
+	if (num_rand_bytes > args->output_buf_max)
+		return EC_HOST_CMD_OVERFLOW;
 
 	trng_rand_bytes(r->rand, num_rand_bytes);
 
-	args->response_size = num_rand_bytes;
+	args->output_buf_size = num_rand_bytes;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
 
-DECLARE_HOST_COMMAND(EC_CMD_RAND_NUM, host_command_rand,
-		     EC_VER_MASK(EC_VER_RAND_NUM));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_RAND_NUM, host_command_rand,
+			     EC_VER_MASK(EC_VER_RAND_NUM),
+			     struct ec_params_rand_num);
 #endif

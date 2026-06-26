@@ -51,12 +51,13 @@ DECLARE_CONSOLE_COMMAND(apshutdown, command_apshutdown, NULL,
 #endif
 
 #ifdef CONFIG_HOSTCMD_AP_RESET
-static enum ec_status host_command_apreset(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_apreset(struct ec_host_cmd_handler_args *args)
 {
 	/* Force the chipset to reset */
 	chipset_reset(CHIPSET_RESET_HOST_CMD);
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_AP_RESET, host_command_apreset, EC_VER_MASK(0));
-
+EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_AP_RESET, host_command_apreset,
+			    EC_VER_MASK(0));
 #endif
