@@ -1244,24 +1244,25 @@ DECLARE_HOOK(HOOK_USB_PM_CHANGE, keyboard_usb_pm_change, HOOK_PRIO_DEFAULT);
 /*****************************************************************************/
 /* Host commands */
 
-static enum ec_status
-mkbp_command_simulate_key(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+mkbp_command_simulate_key(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_mkbp_simulate_key *p = args->params;
+	const struct ec_params_mkbp_simulate_key *p = args->input_buf;
 
 	/* Only available on unlocked systems */
 	if (system_is_locked())
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 
 	if (p->col >= keyboard_cols || p->row >= KEYBOARD_ROWS)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	simulate_key(p->row, p->col, p->pressed);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_MKBP_SIMULATE_KEY, mkbp_command_simulate_key,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_MKBP_SIMULATE_KEY,
+			     mkbp_command_simulate_key, EC_VER_MASK(0),
+			     struct ec_params_mkbp_simulate_key);
 
 #ifdef CONFIG_KEYBOARD_FACTORY_TEST
 
@@ -1333,26 +1334,28 @@ done:
 	return shorted;
 }
 
-static enum ec_status keyboard_factory_test(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+keyboard_factory_test(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_keyboard_factory_test *r = args->response;
+	struct ec_response_keyboard_factory_test *r = args->output_buf;
 
 	/* Only available on unlocked systems */
 	if (system_is_locked())
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 
 	if (keyboard_factory_scan_pins_used == 0)
-		return EC_RES_INVALID_COMMAND;
+		return EC_HOST_CMD_INVALID_COMMAND;
 
 	r->shorted = keyboard_factory_test_scan();
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
 
-DECLARE_HOST_COMMAND(EC_CMD_KEYBOARD_FACTORY_TEST, keyboard_factory_test,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_KEYBOARD_FACTORY_TEST,
+			      keyboard_factory_test, EC_VER_MASK(0),
+			      struct ec_response_keyboard_factory_test);
 #endif
 
 /*****************************************************************************/
