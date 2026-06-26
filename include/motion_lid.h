@@ -34,7 +34,8 @@ extern "C" {
  */
 int motion_lid_get_angle(void);
 
-enum ec_status host_cmd_motion_lid(struct host_cmd_handler_args *args);
+enum ec_host_cmd_status
+host_cmd_motion_lid(struct ec_host_cmd_handler_args *args);
 
 void motion_lid_calc(void);
 
