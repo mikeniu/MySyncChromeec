@@ -29,27 +29,29 @@
 
 #ifdef CONFIG_HAS_HOSTCMD
 
-static enum ec_status hc_pd_ports(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_pd_ports(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_usb_pd_ports *r = args->response;
+	struct ec_response_usb_pd_ports *r = args->output_buf;
 
 	r->num_ports = board_get_usb_pd_port_count();
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_USB_PD_PORTS, hc_pd_ports, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_USB_PD_PORTS, hc_pd_ports, EC_VER_MASK(0),
+			      struct ec_response_usb_pd_ports);
 
 #if defined(CONFIG_HOSTCMD_RWHASHPD) && defined(CONFIG_COMMON_RUNTIME)
-static enum ec_status
-hc_remote_rw_hash_entry(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_remote_rw_hash_entry(struct ec_host_cmd_handler_args *args)
 {
 	int i, idx = 0, found = 0;
-	const struct ec_params_usb_pd_rw_hash_entry *p = args->params;
+	const struct ec_params_usb_pd_rw_hash_entry *p = args->input_buf;
 	static int rw_hash_next_idx;
 
 	if (!p->dev_id)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	for (i = 0; i < RW_HASH_ENTRIES; i++) {
 		if (p->dev_id == rw_hash_table[i].dev_id) {
@@ -67,38 +69,47 @@ hc_remote_rw_hash_entry(struct host_cmd_handler_args *args)
 	}
 	memcpy(&rw_hash_table[idx], p, sizeof(*p));
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_USB_PD_RW_HASH_ENTRY, hc_remote_rw_hash_entry,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_USB_PD_RW_HASH_ENTRY,
+			     hc_remote_rw_hash_entry, EC_VER_MASK(0),
+			     struct ec_params_usb_pd_rw_hash_entry);
 #endif /* CONFIG_HOSTCMD_RWHASHPD && CONFIG_COMMON_RUNTIME */
 
 #if defined(CONFIG_HOSTCMD_PD_CHIP_INFO) && !defined(CONFIG_USB_PD_TCPC)
-static enum ec_status hc_remote_pd_chip_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_remote_pd_chip_info(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_pd_chip_info *p = args->params;
+	const struct ec_params_pd_chip_info *p = args->input_buf;
 	struct ec_response_pd_chip_info_v1 info;
 
 	if (!board_pd_port_num_is_valid(p->port))
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	if (tcpm_get_chip_info(p->port, p->live, &info))
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 
 	/*
 	 * Take advantage of the fact that v0 and v1 structs have the
 	 * same layout for v0 data. (v1 just appends data)
 	 */
-	args->response_size =
+	size_t response_size =
 		args->version ? sizeof(struct ec_response_pd_chip_info_v1) :
 				sizeof(struct ec_response_pd_chip_info);
 
-	memcpy(args->response, &info, args->response_size);
+	if (args->output_buf_max < response_size)
+		return EC_HOST_CMD_RESPONSE_TOO_BIG;
 
-	return EC_RES_SUCCESS;
+	args->output_buf_size = response_size;
+	memcpy(args->output_buf, &info, args->output_buf_size);
+
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PD_CHIP_INFO, hc_remote_pd_chip_info,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER(EC_CMD_PD_CHIP_INFO, hc_remote_pd_chip_info,
+		    EC_VER_MASK(0) | EC_VER_MASK(1),
+		    struct ec_params_pd_chip_info,
+		    SMALLEST_TYPE(struct ec_response_pd_chip_info,
+				  struct ec_response_pd_chip_info_v1));
 #endif /* CONFIG_HOSTCMD_PD_CHIP_INFO && !CONFIG_USB_PD_TCPC */
 
 #ifdef CONFIG_COMMON_RUNTIME
