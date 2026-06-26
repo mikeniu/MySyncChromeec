@@ -399,56 +399,68 @@ common_cbi_set(const struct __ec_align4 ec_params_set_cbi *p)
 	return EC_RES_SUCCESS;
 }
 
-static enum ec_status hc_cbi_set(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status hc_cbi_set(struct ec_host_cmd_handler_args *args)
 {
-	const struct __ec_align4 ec_params_set_cbi *p = args->params;
+	const struct __ec_align4 ec_params_set_cbi *p = args->input_buf;
 
 	/* Given data size exceeds the packet size. */
-	if (args->params_size < sizeof(*p) + p->size)
-		return EC_RES_INVALID_PARAM;
+	if (args->input_buf_size < sizeof(*p) + p->size)
+		return EC_HOST_CMD_INVALID_PARAM;
 
-	return common_cbi_set(p);
+	switch (common_cbi_set(p)) {
+	case EC_RES_SUCCESS:
+		return EC_HOST_CMD_SUCCESS;
+	case EC_RES_INVALID_PARAM:
+		return EC_HOST_CMD_INVALID_PARAM;
+	case EC_RES_ACCESS_DENIED:
+		return EC_HOST_CMD_ACCESS_DENIED;
+	default:
+		return EC_HOST_CMD_ERROR;
+	}
 }
-DECLARE_HOST_COMMAND(EC_CMD_SET_CROS_BOARD_INFO, hc_cbi_set, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_SET_CROS_BOARD_INFO, hc_cbi_set,
+			     EC_VER_MASK(0), struct ec_params_set_cbi);
 
-static enum ec_status hc_cbi_bin_read(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_cbi_bin_read(struct ec_host_cmd_handler_args *args)
 {
-	const struct __ec_align4 ec_params_get_cbi_bin *p = args->params;
-	uint8_t size = min(args->response_max, UINT8_MAX);
+	const struct __ec_align4 ec_params_get_cbi_bin *p = args->input_buf;
+	uint8_t size = min(args->output_buf_max, UINT8_MAX);
 
 	if (size < p->size) {
 		/* Insufficient buffer size */
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 	if (p->offset >= CBI_FLASH_SIZE) {
 		/* Incorrect offset */
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 	if ((p->offset + p->size) > CBI_FLASH_SIZE) {
 		/* Incorrect area */
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 	if (p->offset < CBI_IMAGE_SIZE) {
 		uint32_t read_size = p->size;
 
 		if ((p->offset + p->size) > CBI_IMAGE_SIZE) {
 			read_size = CBI_IMAGE_SIZE - p->offset;
-			memset((uint8_t *)args->response + read_size, 0xFF,
+			memset((uint8_t *)args->output_buf + read_size, 0xFF,
 			       p->size - read_size);
 		}
 
-		if (cbi_config->drv->load(p->offset, args->response,
+		if (cbi_config->drv->load(p->offset, args->output_buf,
 					  read_size)) {
 			CPRINTS("Failed to read CBI");
-			return EC_RES_ERROR;
+			return EC_HOST_CMD_ERROR;
 		}
 	} else {
-		memset((uint8_t *)args->response, 0xFF, p->size);
+		memset((uint8_t *)args->output_buf, 0xFF, p->size);
 	}
-	args->response_size = p->size;
-	return EC_RES_SUCCESS;
+	args->output_buf_size = p->size;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_CBI_BIN_READ, hc_cbi_bin_read, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_CBI_BIN_READ, hc_cbi_bin_read,
+			     EC_VER_MASK(0), struct ec_params_get_cbi_bin);
 
 static bool is_valid_cbi(const uint8_t *cbi)
 {
@@ -498,32 +510,33 @@ static bool is_valid_cbi(const uint8_t *cbi)
 	return true;
 }
 
-static enum ec_status hc_cbi_bin_write(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_cbi_bin_write(struct ec_host_cmd_handler_args *args)
 {
 	/*
 	 * If we ultimately cannot write to the flash, then fail early
 	 */
 	if (cbi_config->drv->is_protected()) {
 		CPRINTS("Failed to write due to WP");
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 	}
-	const struct __ec_align4 ec_params_set_cbi_bin *p = args->params;
+	const struct __ec_align4 ec_params_set_cbi_bin *p = args->input_buf;
 
 	/* Given data size exceeds the packet size. */
-	if (args->params_size < sizeof(*p) + p->size)
-		return EC_RES_INVALID_PARAM;
+	if (args->input_buf_size < sizeof(*p) + p->size)
+		return EC_HOST_CMD_REQUEST_TRUNCATED;
 
 	if (p->offset >= CBI_FLASH_SIZE)
 		/* Incorrect offset */
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	/* Incorrect area */
 	if ((p->offset + p->size) > CBI_FLASH_SIZE)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	if (p->offset >= CBI_IMAGE_SIZE) {
 		CPRINTS("CBI buffer overflow");
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
 	cbi_invalidate_cache();
@@ -540,23 +553,24 @@ static enum ec_status hc_cbi_bin_write(struct host_cmd_handler_args *args)
 		if (is_valid_cbi(cbi)) {
 			if (cbi_config->drv->store(cbi)) {
 				CPRINTS("Failed to write CBI");
-				return EC_RES_ERROR;
+				return EC_HOST_CMD_ERROR;
 			}
 			cbi_read();
 			if (cbi_get_cache_status() != CBI_CACHE_STATUS_SYNCED) {
 				CPRINTF("Cannot Read CBI (Error %d)\n",
 					cbi_get_cache_status());
-				return EC_RES_ERROR;
+				return EC_HOST_CMD_ERROR;
 			}
 		} else {
 			CPRINTS("Invalid CBI in buffer");
-			return EC_RES_ERROR;
+			return EC_HOST_CMD_ERROR;
 		}
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_CBI_BIN_WRITE, hc_cbi_bin_write, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_CBI_BIN_WRITE, hc_cbi_bin_write,
+			     EC_VER_MASK(0), struct ec_params_set_cbi_bin);
 
 #ifdef CONFIG_CMD_CBI
 static void print_tag(const char *const tag, int rv, const uint32_t *val)
