@@ -187,6 +187,30 @@
       },
       "revId": "b31a396ba3ed175f6bb50f4fe89930420e0b67cd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78b29a56_d75bb040",
+        "filename": "zephyr/program/skywalker/jaina/src/typec_limit.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-06-26T09:30:12Z",
+      "side": 1,
+      "message": "add unit test in CL:7950198",
+      "parentUuid": "c3966cca_ff6ccb24",
+      "range": {
+        "startLine": 103,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 67
+      },
+      "revId": "b31a396ba3ed175f6bb50f4fe89930420e0b67cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
