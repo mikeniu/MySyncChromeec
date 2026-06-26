@@ -169,9 +169,10 @@ DECLARE_CONSOLE_COMMAND(lidstate, command_lidstate, NULL, "Get state of lid");
 /**
  * Host command to enable/disable lid opened.
  */
-static enum ec_status hc_force_lid_open(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_force_lid_open(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_force_lid_open *p = args->params;
+	const struct ec_params_force_lid_open *p = args->input_buf;
 	int old_state = forced_lid_open;
 
 	/* Override lid open if necessary */
@@ -181,9 +182,10 @@ static enum ec_status hc_force_lid_open(struct host_cmd_handler_args *args)
 	if (forced_lid_open != old_state)
 		hook_call_deferred(&lid_change_deferred_data, 0);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FORCE_LID_OPEN, hc_force_lid_open, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_FORCE_LID_OPEN, hc_force_lid_open,
+			     EC_VER_MASK(0), struct ec_params_force_lid_open);
 
 #if defined(HAS_TASK_KEYSCAN) || defined(CONFIG_CROS_EC_KEYBOARD_INPUT)
 

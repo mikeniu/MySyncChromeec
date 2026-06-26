@@ -311,33 +311,35 @@ DECLARE_CONSOLE_COMMAND(thermalset, command_thermalset,
  * not version 0. Different structs, different meanings.
  */
 
-static enum ec_status
-thermal_command_set_threshold(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+thermal_command_set_threshold(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_thermal_set_threshold_v1 *p = args->params;
+	const struct ec_params_thermal_set_threshold_v1 *p = args->input_buf;
 
 	if (p->sensor_num >= TEMP_SENSOR_COUNT)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	thermal_params[p->sensor_num] = p->cfg;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_THERMAL_SET_THRESHOLD,
-		     thermal_command_set_threshold, EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_THERMAL_SET_THRESHOLD,
+			     thermal_command_set_threshold, EC_VER_MASK(1),
+			     struct ec_params_thermal_set_threshold_v1);
 
-static enum ec_status
-thermal_command_get_threshold(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+thermal_command_get_threshold(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_thermal_get_threshold_v1 *p = args->params;
-	struct ec_thermal_config *r = args->response;
+	const struct ec_params_thermal_get_threshold_v1 *p = args->input_buf;
+	struct ec_thermal_config *r = args->output_buf;
 
 	if (p->sensor_num >= TEMP_SENSOR_COUNT)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	*r = thermal_params[p->sensor_num];
-	args->response_size = sizeof(*r);
-	return EC_RES_SUCCESS;
+	args->output_buf_size = sizeof(*r);
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_THERMAL_GET_THRESHOLD,
-		     thermal_command_get_threshold, EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER(EC_CMD_THERMAL_GET_THRESHOLD, thermal_command_get_threshold,
+		    EC_VER_MASK(1), struct ec_params_thermal_get_threshold_v1,
+		    struct ec_thermal_config);
